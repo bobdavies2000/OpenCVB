@@ -483,7 +483,7 @@ Public Class FeaturePoly_Stablizer : Inherits VB_Parent
         dst1.SetTo(0)
         dst1(rect) = syncImage(rect)
         DrawFatLine(fGrid.startAnchor, fGrid.anchor, dst1, cv.Scalar.White)
-        drawPolkaDot(fGrid.anchor, dst1)
+        DrawPolkaDot(fGrid.anchor, dst1)
 
         Dim r = New cv.Rect(0, 0, rect.Width, rect.Height)
         If fGrid.anchor.X > fGrid.startAnchor.X Then r.X = fGrid.anchor.X - fGrid.startAnchor.X

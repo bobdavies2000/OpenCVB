@@ -610,7 +610,11 @@ namespace CS_Classes
 
             Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType); // Assuming 'task' has 'lineType' property
         }
-
+        public void DrawPolkaDot(Point2f pt, Mat dst)
+        {
+            DrawCircle(dst, pt, task.DotSize + 2, Scalar.White, -1);
+            DrawCircle(dst, pt, task.DotSize, Scalar.Black);
+        }
         public void DrawCircle(Mat dst, Point2f p1, int radius, Scalar color, int lineWidth = -1)
         {
             var pt = new cv.Point(p1.X, p1.Y);

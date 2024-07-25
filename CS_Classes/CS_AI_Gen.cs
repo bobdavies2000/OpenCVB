@@ -21,6 +21,8 @@ using NAudio.Gui;
 using OpenCvSharp.Internal.Vectors;
 using CS_Classes;
 using OpenCvSharp.ML;
+using System.Threading;
+using System.Windows;
 
 namespace CS_Classes
 {
@@ -371,7 +373,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public Mat triangle;
         public Options_MinArea options = new Options_MinArea();
-        public List<Point2f> srcPoints;
+        public List<cv.Point2f> srcPoints;
 
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void MinTriangle_Run(IntPtr inputPtr, int numberOfPoints, IntPtr outputTriangle);
@@ -386,7 +388,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             options.RunVB();
             if (task.heartBeat)
             {
-                srcPoints = new List<Point2f>(options.srcPoints);
+                srcPoints = new List<cv.Point2f>(options.srcPoints);
             }
             else
             {
@@ -409,7 +411,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             for (int i = 0; i <= 2; i++)
             {
-                cv.Point2f pt = triangle.At<Point2f>(i);
+                cv.Point2f pt = triangle.At<cv.Point2f>(i);
                 cv.Point p1 = new cv.Point(pt.X, pt.Y);
                 pt = triangle.At<cv.Point2f>((i + 1) % 3);
                 cv.Point p2 = new cv.Point(pt.X, pt.Y);
@@ -532,12 +534,12 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Random_Basics : CS_Parent
     {
         public List<cv.Point2f> PointList = new List<cv.Point2f>();
-        public Rect range;
+        public cv.Rect range;
         public Options_Random options = new Options_Random();
 
         public CS_Random_Basics(VBtask task) : base(task)
         {
-            range = new Rect(0, 0, dst2.Cols, dst2.Rows);
+            range = new cv.Rect(0, 0, dst2.Cols, dst2.Rows);
             desc = "Create a uniform random mask with a specified number of pixels.";
         }
 
@@ -815,7 +817,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public RotatedRect minRect;
         Options_MinArea options = new Options_MinArea();
-        public List<Point2f> inputPoints = new List<Point2f>();
+        public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
 
         public CS_Area_MinRect(VBtask task) : base(task)
         {
@@ -901,7 +903,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 for (int x = 0; x < dst1.Width; x++)
                 {
-                    Rect r = new Rect(x * wStep, y * hStep, wStep - 1, hStep - 1);
+                    cv.Rect r = new cv.Rect(x * wStep, y * hStep, wStep - 1, hStep - 1);
                     int asciiChar = (int)(dst1.At<byte>(y, x) * grayRatio);
                     dst3[r].SetTo(asciiChar);
                 }
@@ -990,7 +992,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             mmData histMax = GetMinMax(histK.hist.histogram);
             labels[3] = $"Backprojecting {minRange.Val0} to {maxRange.Val0} with {count} of {totalPixels} compared to " +
                         $"mask pixels = {actualCount}.  Histogram max count = {histMax.maxVal}";
-            dst2.Rectangle(new Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            dst2.Rectangle(new cv.Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
         }
     }
 
@@ -1365,7 +1367,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst1 = maskDetect(gray, histIndex);
             if (dst1.Width == 0) return;
             dst3.SetTo(Scalar.White, dst1);
-            dst2.Rectangle(new Rect(histIndex * brickWidth, 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            dst2.Rectangle(new cv.Rect(histIndex * brickWidth, 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
         }
     }
 
@@ -1658,7 +1660,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[3] = "Backprojecting " + ((int)minRange.Val0).ToString() + " to " + ((int)maxRange.Val0).ToString() + " with " +
                          count.ToString() + " histogram samples and " + actualCount.ToString() + " mask count.  Histogram max count = " +
                          ((int)histMax.maxVal).ToString();
-            dst2.Rectangle(new Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            dst2.Rectangle(new cv.Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
         }
     }
 
@@ -2309,7 +2311,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 int section = i;
                 taskArray[i] = Task.Factory.StartNew(() =>
                 {
-                    Rect roi = new Rect((section % xfactor) * width, height * (int)Math.Floor((double)section / yfactor), width, height);
+                    cv.Rect roi = new cv.Rect((section % xfactor) * width, height * (int)Math.Floor((double)section / yfactor), width, height);
                     Mat correlation = new Mat();
                     if (roi.X + roi.Width > dst3.Width) roi.Width = dst3.Width - roi.X - 1;
                     if (roi.Y + roi.Height > dst3.Height) roi.Height = dst3.Height - roi.Y - 1;
@@ -3112,7 +3114,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             if (task.mousePicTag == 1) index = task.gridMap.At<int>(task.ClickPoint.Y, task.ClickPoint.X);
-            Rect roiSave = index < task.gridList.Count ? task.gridList[index] : new Rect();
+            cv.Rect roiSave = index < task.gridList.Count ? task.gridList[index] : new cv.Rect();
 
             if (task.optionsChanged) index = 0;
 
@@ -3148,7 +3150,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 for (int j = 0; j < task.gridList.Count; j++)
                 {
-                    Rect roi = task.gridList[j];
+                    cv.Rect roi = task.gridList[j];
                     Mat tmp = new Mat(matList[i], roi);
                     Cv2.FindContours(tmp, out allContours, out _, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
                     if (i == 0)
@@ -3172,7 +3174,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 Mat tmpVolatile = new Mat(dst0, roiSave) & tmp;
                 tmp.SetTo(Scalar.All(255), tmpVolatile);
                 new Mat(dst0, roiSave).CopyTo(tmp, tmpVolatile);
-                Rect r = new Rect(0, 0, (int)(tmp.Width * ratio), (int)(tmp.Height * ratio));
+                cv.Rect r = new cv.Rect(0, 0, (int)(tmp.Width * ratio), (int)(tmp.Height * ratio));
                 mats.mat[i][r] = tmp.Resize(new cv.Size(r.Width, r.Height));
 
                 if (task.heartBeat)
@@ -4153,8 +4155,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
             var blockMatch = StereoBM.Create();
             blockMatch.BlockSize = options.blockSize;
             blockMatch.MinDisparity = 0;
-            blockMatch.ROI1 = new Rect(0, 0, task.leftView.Width, task.leftView.Height);
-            blockMatch.ROI2 = new Rect(0, 0, task.leftView.Width, task.leftView.Height);
+            blockMatch.ROI1 = new cv.Rect(0, 0, task.leftView.Width, task.leftView.Height);
+            blockMatch.ROI2 = new cv.Rect(0, 0, task.leftView.Width, task.leftView.Height);
             blockMatch.PreFilterCap = 31;
             blockMatch.NumDisparities = options.numDisparity;
             blockMatch.TextureThreshold = 10;
@@ -4172,7 +4174,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst1 = dst1.Threshold(0, 0, ThresholdTypes.Tozero);
 
             int topMargin = 10, sideMargin = 8;
-            Rect rect = new Rect(options.numDisparity + sideMargin, topMargin, src.Width - options.numDisparity - sideMargin * 2, src.Height - topMargin * 2);
+            cv.Rect rect = new cv.Rect(options.numDisparity + sideMargin, topMargin, src.Width - options.numDisparity - sideMargin * 2, src.Height - topMargin * 2);
             Cv2.Divide(options.distance, dst1[rect], dst1[rect]); // this needs much more refinement. The trackbar value is just an approximation.
             dst1[rect] = dst1[rect].Threshold(10, 10, ThresholdTypes.Trunc);
 
@@ -4285,10 +4287,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
         public void RunCS(Mat src)
         {
-            Rect r = new Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50);
+            cv.Rect r = new cv.Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50);
             if (standaloneTest())
             {
-                if (task.drawRect != new Rect()) r = task.drawRect;
+                if (task.drawRect != new cv.Rect()) r = task.drawRect;
                 if (task.frameCount % 2 == 1)
                 {
                     blur.Run(src[r]);
@@ -4444,10 +4446,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             var outputImg = inputImg.Clone();
             int cx = outputImg.Width / 2;
             int cy = outputImg.Height / 2;
-            var q0 = new Mat(outputImg, new Rect(0, 0, cx, cy));
-            var q1 = new Mat(outputImg, new Rect(cx, 0, cx, cy));
-            var q2 = new Mat(outputImg, new Rect(0, cy, cx, cy));
-            var q3 = new Mat(outputImg, new Rect(cx, cy, cx, cy));
+            var q0 = new Mat(outputImg, new cv.Rect(0, 0, cx, cy));
+            var q1 = new Mat(outputImg, new cv.Rect(cx, 0, cx, cy));
+            var q2 = new Mat(outputImg, new cv.Rect(0, cy, cx, cy));
+            var q3 = new Mat(outputImg, new cv.Rect(cx, cy, cx, cy));
             var tmp = q0.Clone();
             q3.CopyTo(q0);
             tmp.CopyTo(q3);
@@ -4535,7 +4537,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             int width = src.Width;
             int height = src.Height;
-            var roi = new Rect(0, 0, width % 2 == 0 ? width : width - 1, height % 2 == 0 ? height : height - 1);
+            var roi = new cv.Rect(0, 0, width % 2 == 0 ? width : width - 1, height % 2 == 0 ? height : height - 1);
 
             var h = calcPSF(roi.Size, mblur.options.restoreLen, mblur.options.theta);
             var hW = calcWeinerFilter(h, 1.0 / mblur.options.SNR);
@@ -4556,7 +4558,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Boundary_Basics : CS_Parent
     {
         public RedCloud_CPP redCPP = new RedCloud_CPP();
-        public List<Rect> rects = new List<Rect>();
+        public List<cv.Rect> rects = new List<cv.Rect>();
         public List<Mat> masks = new List<Mat>();
         public List<List<cv.Point>> contours = new List<List<cv.Point>>();
         public bool runRedCPP = true;
@@ -4649,8 +4651,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Boundary_Rectangles : CS_Parent
     {
         public Boundary_Basics bounds = new Boundary_Basics();
-        public List<Rect> rects = new List<Rect>();
-        public List<Rect> smallRects = new List<Rect>();
+        public List<cv.Rect> rects = new List<cv.Rect>();
+        public List<cv.Rect> smallRects = new List<cv.Rect>();
         public List<List<cv.Point>> smallContours = new List<List<cv.Point>>();
         public Options_BoundaryRect options = new Options_BoundaryRect();
         public CS_Boundary_Rectangles(VBtask task) : base(task)
@@ -5211,7 +5213,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 translationY = 0;
             }
 
-            Rect r1, r2;
+            cv.Rect r1, r2;
             if (translationX == 0 && translationY == 0)
             {
                 dst2 = src;
@@ -5220,7 +5222,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             }
             else
             {
-                r1 = new Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
+                r1 = new cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
                               Math.Min(dst2.Height - translationY * 2, dst2.Height));
                 if (r1.X < 0)
                 {
@@ -5233,7 +5235,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     r1.Height += translationY * 2;
                 }
 
-                r2 = new Rect(Math.Abs(translationX), Math.Abs(translationY), r1.Width, r1.Height);
+                r2 = new cv.Rect(Math.Abs(translationX), Math.Abs(translationY), r1.Width, r1.Height);
 
                 task.camMotionPixels = (float)Math.Sqrt(translationX * translationX + translationY * translationY);
                 if (translationX == 0)
@@ -5359,8 +5361,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst3.SetTo(Scalar.All(0));
             if (Math.Abs(x1 - x2) > 0.5 || Math.Abs(y1 - y2) > 0.5)
             {
-                Rect r1 = new Rect((int)translationX, (int)translationY, dst2.Width - (int)translationX, dst2.Height - (int)translationY);
-                Rect r2 = new Rect(0, 0, r1.Width, r1.Height);
+                cv.Rect r1 = new cv.Rect((int)translationX, (int)translationY, dst2.Width - (int)translationX, dst2.Height - (int)translationY);
+                cv.Rect r2 = new cv.Rect(0, 0, r1.Width, r1.Height);
                 src[r1].CopyTo(dst1[r2]);
                 rotate.rotateAngle = rotationY;
                 rotate.rotateCenter = centerY;
@@ -5405,7 +5407,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public RotatedRect trackBox = new RotatedRect();
         CamShift_RedHue redHue = new CamShift_RedHue();
-        Rect roi = new Rect();
+        cv.Rect roi = new cv.Rect();
         Mat histogram = new Mat();
         public CS_CamShift_Basics(VBtask task) : base(task)
         {
@@ -5542,8 +5544,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_CComp_Basics : CS_Parent
     {
         public ConnectedComponents connectedComponents;
-        public List<Rect> rects = new List<Rect>();
-        public List<Point2f> centroids = new List<Point2f>();
+        public List<cv.Rect> rects = new List<cv.Rect>();
+        public List<cv.Point2f> centroids = new List<cv.Point2f>();
         Mat lastImage;
         Options_CComp options = new Options_CComp();
         public CS_CComp_Basics(VBtask task) : base(task)
@@ -5671,7 +5673,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_CComp_Stats : CS_Parent
     {
         public List<Mat> masks = new List<Mat>();
-        public List<Rect> rects = new List<Rect>();
+        public List<cv.Rect> rects = new List<cv.Rect>();
         public List<int> areas = new List<int>();
         public List<cv.Point> centroids = new List<cv.Point>();
         public int numberOfLabels;
@@ -5698,15 +5700,15 @@ public class CS_ApproxPoly_Basics : CS_Parent
             List<Vec3b> colors = new List<Vec3b>();
             SortedList<float, int> maskOrder = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
             List<Mat> unsortedMasks = new List<Mat>();
-            List<Rect> unsortedRects = new List<Rect>();
+            List<cv.Rect> unsortedRects = new List<cv.Rect>();
             List<cv.Point> unsortedCentroids = new List<cv.Point>();
             List<int> index = new List<int>();
             for (int i = 0; i < Math.Min(256, stats.Rows); i++)
             {
                 int area = stats.Get<int>(i, 4);
                 if (area < 10) continue;
-                Rect r1 = ValidateRect(stats.Get<Rect>(i, 0));
-                Rect r = ValidateRect(new Rect(r1.X, r1.Y, r1.Width, r1.Height));
+                cv.Rect r1 = ValidateRect(stats.Get<cv.Rect>(i, 0));
+                cv.Rect r = ValidateRect(new cv.Rect(r1.X, r1.Y, r1.Width, r1.Height));
                 if ((r.Width == dst2.Width && r.Height == dst2.Height) || (r.Width == 1 && r.Height == 1)) continue;
                 areas.Add(area);
                 unsortedRects.Add(r);
@@ -6296,7 +6298,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             random = new CS_Random_Basics(task);
             grid = new Mat(dst2.Height / factor, dst2.Width / factor, MatType.CV_8UC1, Scalar.All(0));
             nextgrid = grid.Clone();
-            random.range = new Rect(0, 0, grid.Width, grid.Height);
+            random.range = new cv.Rect(0, 0, grid.Width, grid.Height);
             FindSlider("Random Pixel Count").Value = (int)(grid.Width * grid.Height * 0.3); // we want about 30% of cells filled.
             desc = "Use OpenCV to implement the Game of Life";
         }
@@ -6767,13 +6769,13 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[2] = "Clone result - draw anywhere to clone a region";
             labels[3] = "Clone Region Mask";
             desc = "Clone a portion of one image into another. Draw on any image to change selected area.";
-            task.drawRect = new Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2);
+            task.drawRect = new cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2);
         }
 
         public void RunCS(Mat src)
         {
             Mat mask = new Mat(src.Size(), MatType.CV_8U, Scalar.All(0));
-            if (task.drawRect == new Rect())
+            if (task.drawRect == new cv.Rect())
             {
                 mask.SetTo(Scalar.All(255));
             }
@@ -6874,8 +6876,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         Mat sourceImage;
         Mat mask;
-        Rect srcROI;
-        Rect maskROI;
+        cv.Rect srcROI;
+        cv.Rect maskROI;
         cv.Point pt;
         Options_Clone options = new Options_Clone();
 
@@ -6883,11 +6885,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             sourceImage = Cv2.ImRead(task.HomeDir + "Data/CloneSource.png");
             sourceImage = sourceImage.Resize(new cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720));
-            srcROI = new Rect(0, 40, sourceImage.Width, sourceImage.Height);
+            srcROI = new cv.Rect(0, 40, sourceImage.Width, sourceImage.Height);
 
             mask = Cv2.ImRead(task.HomeDir + "Data/Clonemask.png");
             mask = mask.Resize(new cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720));
-            maskROI = new Rect(srcROI.Width, 40, mask.Width, mask.Height);
+            maskROI = new cv.Rect(srcROI.Width, 40, mask.Width, mask.Height);
 
             dst3.SetTo(0);
             dst3[srcROI] = sourceImage;
@@ -6934,7 +6936,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             cv.Point center = new cv.Point(src.Width / 2, src.Height / 2);
             int radius = 100;
-            if (task.drawRect == new Rect())
+            if (task.drawRect == new cv.Rect())
             {
                 dst3.SetTo(0);
                 DrawCircle(dst3, center, radius, Scalar.White);
@@ -7107,7 +7109,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             int xoffset = src.Width / 2 - side / 2;
             int yoffset = src.Height / 2 - side / 2;
-            Rect srcRect = new Rect(xoffset, yoffset, side, side);
+            cv.Rect srcRect = new cv.Rect(xoffset, yoffset, side, side);
             if (task.drawRect.Width != 0) srcRect = task.drawRect;
 
             dst2 = src.Clone();
@@ -8860,7 +8862,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 convex.RunAndMeasure(src, convex);
 
                 dst3.SetTo(0);
-                convex.dst2[new Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)].CopyTo(dst3[task.rc.rect]);
+                convex.dst2[new cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)].CopyTo(dst3[task.rc.rect]);
                 Cv2.Circle(dst3, task.rc.maxDist, task.DotSize, Scalar.White, -1);
             }
         }
@@ -8983,7 +8985,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
     public class CS_Corners_Basics : CS_Parent
     {
-        public List<Point2f> features = new List<Point2f>();
+        public List<cv.Point2f> features = new List<cv.Point2f>();
         public Options_Features options = new Options_Features();
         public Options_Corners optionCorner = new Options_Corners();
 
@@ -9226,7 +9228,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             fastCenters = new Point2f[task.gridList.Count];
             for (int i = 0; i < task.gridList.Count; i++)
             {
-                Rect roi = task.gridList[i];
+                cv.Rect roi = task.gridList[i];
                 Mat tmp = fast.dst3[roi];
                 var nonZero = tmp.FindNonZero();
                 if (nonZero.Rows > 0)
@@ -9293,7 +9295,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
     public class CS_Corners_HarrisDetector : CS_Parent
     {
-        public List<Point2f> features = new List<Point2f>();
+        public List<cv.Point2f> features = new List<cv.Point2f>();
         public Options_Features options = new Options_Features();
 
         public CS_Corners_HarrisDetector(VBtask task) : base(task)
@@ -9720,7 +9722,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             Mat frequencies = new Mat();
             Cv2.Dct(src32f, frequencies, (cv.DctFlags) options.removeFrequency);
 
-            Rect roi = new Rect(0, 0, options.removeFrequency, src32f.Height);
+            cv.Rect roi = new cv.Rect(0, 0, options.removeFrequency, src32f.Height);
             if (roi.Width > 0)
                 frequencies[roi].SetTo(0);
             labels[2] = "Frequencies below " + options.removeFrequency.ToString() + " removed";
@@ -9756,7 +9758,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 freqPlanes[i] = new Mat();
                 Cv2.Dct(src32f, freqPlanes[i], DctFlags.None);
 
-                Rect roi = new Rect(0, 0, dct.options.removeFrequency, src32f.Height);
+                cv.Rect roi = new cv.Rect(0, 0, dct.options.removeFrequency, src32f.Height);
                 if (roi.Width > 0)
                     freqPlanes[i][roi].SetTo(0);
 
@@ -9789,7 +9791,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             gray.ConvertTo(src32f, MatType.CV_32F, 1.0 / 255);
             Cv2.Dct(src32f, frequencies, dct.options.dctFlag);
 
-            Rect roi = new Rect(0, 0, dct.options.removeFrequency, src32f.Height);
+            cv.Rect roi = new cv.Rect(0, 0, dct.options.removeFrequency, src32f.Height);
             if (roi.Width > 0)
                 frequencies[roi].SetTo(0);
             labels[2] = dct.labels[2];
@@ -9830,7 +9832,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     {
                         if (runLen > dct.options.runLengthMin)
                         {
-                            Rect roi = new Rect(runStart, i, runLen, 1);
+                            cv.Rect roi = new cv.Rect(runStart, i, runLen, 1);
                             dst2[roi].SetTo(255);
                         }
                         runStart = j;
@@ -9894,12 +9896,12 @@ public class CS_ApproxPoly_Basics : CS_Parent
             mats.Run(new Mat());
             dst3 = mats.dst2;
 
-            Rect roi = task.gridList[maxIndex];
+            cv.Rect roi = task.gridList[maxIndex];
             if (roi.X == task.gridList[maxIndex].X && roi.Y == task.gridList[maxIndex].Y)
             {
                 if (roiCounts[maxIndex] > roi.Width * roi.Height / 4)
                 {
-                    List<Point3f> fitPoints = new List<Point3f>();
+                    List<cv.Point3f> fitPoints = new List<cv.Point3f>();
                     float minDepth = float.MaxValue, maxDepth = float.MinValue;
                     for (int j = 0; j < roi.Height; j++)
                     {
@@ -9934,7 +9936,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
     public class CS_Delaunay_Basics : CS_Parent
     {
-        public List<Point2f> inputPoints;
+        public List<cv.Point2f> inputPoints;
         public List<List<cv.Point>> facetList = new List<List<cv.Point>>();
         public Mat facet32s;
         Random_Enumerable randEnum = new Random_Enumerable();
@@ -9955,7 +9957,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 inputPoints = randEnum.points.ToList();
             }
 
-            subdiv.InitDelaunay(new Rect(0, 0, dst2.Width, dst2.Height));
+            subdiv.InitDelaunay(new cv.Rect(0, 0, dst2.Width, dst2.Height));
             subdiv.Insert(inputPoints.ToArray());
 
             cv.Point2f[][] facets = null;
@@ -9998,7 +10000,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 if (!task.heartBeat) return;
             }
 
-            var subdiv = new Subdiv2D(new Rect(0, 0, dst2.Width, dst2.Height));
+            var subdiv = new Subdiv2D(new cv.Rect(0, 0, dst2.Width, dst2.Height));
             random.Run(null);
             dst2.SetTo(new Scalar(0));
 
@@ -10062,7 +10064,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             }
             dst3 = dst2.Clone();
 
-            var subdiv = new Subdiv2D(new Rect(0, 0, dst3.Width, dst3.Height));
+            var subdiv = new Subdiv2D(new cv.Rect(0, 0, dst3.Width, dst3.Height));
             subdiv.Insert(points);
 
             cv.Point2f[][] facets = null;
@@ -10091,7 +10093,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
     public class CS_Delaunay_GenerationsNoKNN : CS_Parent
     {
-        public List<Point2f> inputPoints;
+        public List<cv.Point2f> inputPoints;
         public Delaunay_Basics facet = new Delaunay_Basics();
         Random_Basics random = new Random_Basics();
 
@@ -10147,7 +10149,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
     public class CS_Delaunay_Generations : CS_Parent
     {
-        public List<Point2f> inputPoints;
+        public List<cv.Point2f> inputPoints;
         public Delaunay_Basics facet = new Delaunay_Basics();
         KNN_Basics knn = new KNN_Basics();
         Random_Basics random = new Random_Basics();
@@ -10209,7 +10211,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
     public class CS_Delaunay_ConsistentColor : CS_Parent
     {
-        public List<Point2f> inputPoints;
+        public List<cv.Point2f> inputPoints;
         public List<List<cv.Point>> facetList = new List<List<cv.Point>>();
         public Mat facet32s;
         Random_Enumerable randEnum = new Random_Enumerable();
@@ -10233,7 +10235,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 inputPoints = randEnum.points.ToList();
             }
 
-            subdiv.InitDelaunay(new Rect(0, 0, dst2.Width, dst2.Height));
+            subdiv.InitDelaunay(new cv.Rect(0, 0, dst2.Width, dst2.Height));
             subdiv.Insert(inputPoints.ToArray());
 
             cv.Point2f[][] facets = null;
@@ -10276,7 +10278,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
     public class CS_Delaunay_Contours : CS_Parent
     {
-        public List<Point2f> inputPoints;
+        public List<cv.Point2f> inputPoints;
         Random_Enumerable randEnum = new Random_Enumerable();
         Subdiv2D subdiv = new Subdiv2D();
 
@@ -10295,7 +10297,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 inputPoints = randEnum.points.ToList();
             }
 
-            subdiv.InitDelaunay(new Rect(0, 0, dst2.Width, dst2.Height));
+            subdiv.InitDelaunay(new cv.Rect(0, 0, dst2.Width, dst2.Height));
             subdiv.Insert(inputPoints.ToArray());
 
             cv.Point2f[][] facets = null;
@@ -10749,7 +10751,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             Parallel.For(0, task.gridList.Count, i =>
             {
-                Rect roi = task.gridList[i];
+                cv.Rect roi = task.gridList[i];
                 mmData mm = GetMinMax(task.pcSplit[2][roi], task.depthMask[roi]);
                 if (mm.minLoc.X < 0 || mm.minLoc.Y < 0)
                     mm.minLoc = new cv.Point(0, 0);
@@ -10810,7 +10812,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             options.RunVB();
 
-            Rect rect = task.drawRect.Width != 0 ? task.drawRect : new Rect(0, 0, src.Width, src.Height);
+            cv.Rect rect = task.drawRect.Width != 0 ? task.drawRect : new cv.Rect(0, 0, src.Width, src.Height);
 
             if (task.FirstPass) lastDepth = task.pcSplit[2].Clone();
             Cv2.Subtract(lastDepth, task.pcSplit[2], dst2);
@@ -10953,8 +10955,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             //    kalman.kInput = new float[] { xx, yy, rectSize, rectSize };
             //    kalman.Run(src);
-            //    Rect nextRect = new Rect(xx, yy, rectSize, rectSize);
-            //    Rect kRect = new Rect((int)kalman.kOutput[0], (int)kalman.kOutput[1], (int)kalman.kOutput[2], (int)kalman.kOutput[3]);
+            //    cv.Rect nextRect = new cv.Rect(xx, yy, rectSize, rectSize);
+            //    cv.Rect kRect = new cv.Rect((int)kalman.kOutput[0], (int)kalman.kOutput[1], (int)kalman.kOutput[2], (int)kalman.kOutput[3]);
             //    dst2.Rectangle(kRect, Scalar.Red, 2);
             //    dst2.Rectangle(nextRect, Scalar.Blue, 2);
             //    if (Math.Abs(kRect.X - nextRect.X) < rectSize / 4 && Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4)
@@ -10965,7 +10967,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             //    }
             //}
         }
-        Rect ValidateRect(Rect rect)
+        cv.Rect ValidateRect(cv.Rect rect)
         {
             throw new NotImplementedException();
         }
@@ -11197,7 +11199,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst3 = task.pcSplit[2];
             dst2 = task.gridMask.Clone();
 
-            foreach (Rect roi in task.gridList)
+            foreach (cv.Rect roi in task.gridList)
             {
                 double minVal, maxVal;
                 Cv2.MinMaxLoc(dst3[roi], out minVal, out maxVal);
@@ -11693,7 +11695,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                         if (xy.Z != 0)
                         {
                             Point3f xyz = getWorldCoordinates(xy);
-                            dst3.Set<Point3f>(y, x, xyz);
+                            dst3.Set<cv.Point3f>(y, x, xyz);
                         }
                     }
                 }
@@ -11907,7 +11909,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst3 = task.color.Clone();
             dst3.SetTo(Scalar.White, mask);
             dst3.SetTo(0, task.noDepthMask);
-            Cv2.Rectangle(dst2, new Rect(histIndex * brickWidth, 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            Cv2.Rectangle(dst2, new cv.Rect(histIndex * brickWidth, 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
             string deriv = string.Format(fmt2, options.derivativeRange);
             labels[2] = "Histogram of first or second derivatives.  Range -" + deriv + " to " + deriv;
             labels[3] = "Backprojection into the image for the selected histogram entry - move mouse over dst2.";
@@ -12065,17 +12067,17 @@ public class CS_ApproxPoly_Basics : CS_Parent
             magnitude += Scalar.All(1);
             Cv2.Log(magnitude, magnitude);
 
-            spectrum = magnitude[new Rect(0, 0, magnitude.Cols & -2, magnitude.Rows & -2)];
+            spectrum = magnitude[new cv.Rect(0, 0, magnitude.Cols & -2, magnitude.Rows & -2)];
             spectrum = spectrum.Normalize(0, 255, NormTypes.MinMax);
             spectrum.ConvertTo(padded, MatType.CV_8U);
 
             int cx = padded.Cols / 2;
             int cy = padded.Rows / 2;
 
-            mats.mat[3] = padded[new Rect(0, 0, cx, cy)].Clone();
-            mats.mat[2] = padded[new Rect(cx, 0, cx, cy)].Clone();
-            mats.mat[1] = padded[new Rect(0, cy, cx, cy)].Clone();
-            mats.mat[0] = padded[new Rect(cx, cy, cx, cy)].Clone();
+            mats.mat[3] = padded[new cv.Rect(0, 0, cx, cy)].Clone();
+            mats.mat[2] = padded[new cv.Rect(cx, 0, cx, cy)].Clone();
+            mats.mat[1] = padded[new cv.Rect(0, cy, cx, cy)].Clone();
+            mats.mat[0] = padded[new cv.Rect(cx, cy, cx, cy)].Clone();
             mats.Run(empty);
             dst3 = mats.dst2;
 
@@ -12776,8 +12778,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 cv.Point p2 = new cv.Point((int)inPoint2.X, (int)inPoint2.Y);
                 Cv2.Line(dst2, p1, p2, task.HighlightColor, task.lineWidth);
 
-                Point3f vec1 = task.pointCloud.Get<Point3f>(p1.Y, p1.X);
-                Point3f vec2 = task.pointCloud.Get<Point3f>(p2.Y, p2.X);
+                Point3f vec1 = task.pointCloud.Get<cv.Point3f>(p1.Y, p1.X);
+                Point3f vec2 = task.pointCloud.Get<cv.Point3f>(p2.Y, p2.X);
             }
 
             float x = inPoint1.X - inPoint2.X;
@@ -13138,7 +13140,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                         center = new cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY));
                         int width = msRNG.Next(1, Math.Min(offsetX, offsetY));
                         int height = msRNG.Next(1, Math.Min(offsetX, offsetY));
-                        Rect rcenter = new Rect(center.X - width, center.Y - height / 2, width, height);
+                        cv.Rect rcenter = new cv.Rect(center.X - width, center.Y - height / 2, width, height);
                         Cv2.Rectangle(dst2, rcenter, color, -1, LineTypes.Link8);
                         break;
                     case 2: // Ellipse
@@ -13191,7 +13193,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Draw_Arc : CS_Parent
     {
         Kalman_Basics kalman = new Kalman_Basics();
-        Rect rect;
+        cv.Rect rect;
         float angle;
         float startAngle;
         float endAngle;
@@ -13217,7 +13219,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             }
             kalman.kInput = new[] { rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle };
             kalman.Run(src);
-            Rect r = new Rect((int)kalman.kOutput[0], (int)kalman.kOutput[1], (int)kalman.kOutput[2], (int)kalman.kOutput[3]);
+            cv.Rect r = new cv.Rect((int)kalman.kOutput[0], (int)kalman.kOutput[1], (int)kalman.kOutput[2], (int)kalman.kOutput[3]);
             if (r.Width <= 5) r.Width = 5;
             if (r.Height <= 5) r.Height = 5;
             RotatedRect rr = new RotatedRect(new Point2f(r.X, r.Y), new Size2f(r.Width, r.Height), angle);
@@ -13234,7 +13236,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 startAngle = kalman.kOutput[5];
                 endAngle = kalman.kOutput[6];
                 if (options.drawFill) thickness = -1;
-                Rect r1 = rr.BoundingRect();
+                cv.Rect r1 = rr.BoundingRect();
                 Cv2.Ellipse(dst2, new cv.Point(rr.Center.X, rr.Center.Y), new cv.Size(r1.Width, r1.Height),
                             angle, startAngle, endAngle, color, thickness, task.lineType);  
             }
@@ -13246,13 +13248,13 @@ public class CS_ApproxPoly_Basics : CS_Parent
         Kalman_Basics kalman = new Kalman_Basics();
         cv.Point pt1;
         cv.Point pt2;
-        Rect rect;
+        cv.Rect rect;
         int linenum = 0;
         int hitCount = 0;
         void setup()
         {
             kalman.kInput = new float[9];
-            Rect r = InitRandomRect(25);
+            cv.Rect r = InitRandomRect(25);
             pt1 = new cv.Point(r.X, r.Y);
             pt2 = new cv.Point(r.X + r.Width, r.Y + r.Height);
             rect = InitRandomRect(25);
@@ -13273,7 +13275,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             cv.Point p2 = new cv.Point((int)kalman.kOutput[2], (int)kalman.kOutput[3]);
             if (kalman.kOutput[6] < 5) kalman.kOutput[6] = 5; // don't let the width/height get too small...
             if (kalman.kOutput[7] < 5) kalman.kOutput[7] = 5;
-            Rect r = new Rect((int)kalman.kOutput[4], (int)kalman.kOutput[5], (int)kalman.kOutput[6], (int)kalman.kOutput[7]);
+            cv.Rect r = new cv.Rect((int)kalman.kOutput[4], (int)kalman.kOutput[5], (int)kalman.kOutput[6], (int)kalman.kOutput[7]);
             bool clipped = Cv2.ClipLine(r, ref p1, ref p2); // Returns false when the line and the rectangle don't intersect.
             Cv2.Line(dst3, p1, p2, clipped ? Scalar.White : Scalar.Black, task.lineWidth + 1, task.lineType);
             Cv2.Rectangle(dst3, r, clipped ? Scalar.Yellow : Scalar.Red, task.lineWidth + 1, task.lineType);
@@ -13365,10 +13367,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             int mid = src.Height / 2;
             float zIncr = task.MaxZmeters / mid;
             dst2 = src.Clone();
-            Rect fRect = new Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height);
+            cv.Rect fRect = new cv.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height);
             for (int i = 0; i <= src.Height / 2; i++)
             {
-                Cv2.Rectangle(dst2[fRect], new Rect(mid - i, mid - i, i * 2, (i + 1) * 2), i * zIncr, 1);
+                Cv2.Rectangle(dst2[fRect], new cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), i * zIncr, 1);
             }
             xyzDepth.Run(dst2);
             dst3 = xyzDepth.dst2.Resize(task.WorkingRes);
@@ -13638,7 +13640,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             Mat src32f = new Mat();
             gray.ConvertTo(src32f, MatType.CV_32F, 1.0 / 255);
             Cv2.Dct(src32f, frequencies, DctFlags.None);
-            Rect roi = new Rect(0, 0, options.removeFrequencies, src32f.Height);
+            cv.Rect roi = new cv.Rect(0, 0, options.removeFrequencies, src32f.Height);
             if (roi.Width > 0)
                 frequencies.SubMat(roi).SetTo(0);
             labels[2] = $"Highest {options.removeFrequencies} frequencies removed from RGBDepth";
@@ -13714,7 +13716,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             handleSrc.Free();
             if (imagePtr != IntPtr.Zero)
                 dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
-            Cv2.Rectangle(dst2, new Rect(0, 0, dst2.Width, dst2.Height), new Scalar(255), task.lineWidth);
+            Cv2.Rectangle(dst2, new cv.Rect(0, 0, dst2.Width, dst2.Height), new Scalar(255), task.lineWidth);
         }
         public void Close()
         {
@@ -13723,7 +13725,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_EdgeDraw_Segments : CS_Parent
     {
-        public List<Point2f> segPoints = new List<Point2f>();
+        public List<cv.Point2f> segPoints = new List<cv.Point2f>();
         public CS_EdgeDraw_Segments(VBtask task) : base(task)
         {
             cPtr = EdgeDraw_Lines_Open();
@@ -13748,8 +13750,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
             segPoints.Clear();
             for (int i = 0; i < ptData.Rows; i += 2)
             {
-                Point2f pt1 = ptData.Get<Point2f>(i, 0);
-                Point2f pt2 = ptData.Get<Point2f>(i, 1);
+                Point2f pt1 = ptData.Get<cv.Point2f>(i, 0);
+                Point2f pt2 = ptData.Get<cv.Point2f>(i, 1);
                 DrawLine(dst2, pt1, pt2, Scalar.White, task.lineWidth);
                 Cv2.Add(dst3, dst2, dst3);
                 segPoints.Add(pt1);
@@ -13818,7 +13820,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Eigen_FitLineInput : CS_Parent
     {
-        public List<Point2f> points = new List<Point2f>();
+        public List<cv.Point2f> points = new List<cv.Point2f>();
         public float m;
         public float bb;
         public Options_Eigen options = new Options_Eigen();
@@ -13925,7 +13927,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 eigenInput[3] += y * y;
             }
             eigenInput[2] = eigenInput[1];
-            List<Point2f> vec4f = new List<Point2f>
+            List<cv.Point2f> vec4f = new List<cv.Point2f>
         {
             new Point2f(eigenInput[0], eigenInput[1]),
             new Point2f(eigenInput[1], eigenInput[3])
@@ -13962,10 +13964,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public EMax_InputClusters emaxInput = new EMax_InputClusters();
         public List<int> eLabels = new List<int>();
-        public List<Point2f> eSamples = new List<Point2f>();
+        public List<cv.Point2f> eSamples = new List<cv.Point2f>();
         public int dimension = 2;
         public int regionCount;
-        public List<Point2f> centers = new List<Point2f>();
+        public List<cv.Point2f> centers = new List<cv.Point2f>();
         Options_Emax options = new Options_Emax();
         bool useInputClusters;
         Palette_Variable palette = new Palette_Variable();
@@ -13985,10 +13987,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 useInputClusters = true;
                 emaxInput.Run(empty);
                 eLabels = new List<int>(emaxInput.eLabels);
-                eSamples = new List<Point2f>(emaxInput.eSamples);
+                eSamples = new List<cv.Point2f>(emaxInput.eSamples);
                 regionCount = emaxInput.regionCount;
             }
-            if (centers.Count == 0) centers = new List<Point2f>(emaxInput.centers);
+            if (centers.Count == 0) centers = new List<cv.Point2f>(emaxInput.centers);
             labels[2] = $"{eLabels.Count} samples provided in {regionCount} regions";
             GCHandle handleSrc = GCHandle.Alloc(eSamples.ToArray(), GCHandleType.Pinned);
             GCHandle handleLabels = GCHandle.Alloc(eLabels.ToArray(), GCHandleType.Pinned);
@@ -14020,7 +14022,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 dst0 *= 255 / regionCount;
                 dst2 = ShowPalette(dst0);
             }
-            centers = new List<Point2f>(emaxInput.centers);
+            centers = new List<cv.Point2f>(emaxInput.centers);
         }
         public void Close()
         {
@@ -14039,7 +14041,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             emax.Run(src);
             dst2 = emax.dst2;
-            List<Point2f> lastCenters = new List<Point2f>(emax.centers);
+            List<cv.Point2f> lastCenters = new List<cv.Point2f>(emax.centers);
             for (int i = 0; i < emax.centers.Count; i++)
             {
                 Cv2.Circle(dst2, emax.centers[i].ToPoint(), task.DotSize + 1, task.HighlightColor);
@@ -14048,15 +14050,15 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     Cv2.Circle(dst2, lastCenters[i].ToPoint(), task.DotSize + 2, Scalar.Black);
                 }
             }
-            lastCenters = new List<Point2f>(emax.centers);
+            lastCenters = new List<cv.Point2f>(emax.centers);
         }
     }
     public class CS_EMax_InputClusters : CS_Parent
     {
         public int regionCount;
         public int[] eLabels;
-        public List<Point2f> eSamples = new List<Point2f>();
-        public List<Point2f> centers = new List<Point2f>();
+        public List<cv.Point2f> eSamples = new List<cv.Point2f>();
+        public List<cv.Point2f> centers = new List<cv.Point2f>();
         Options_EmaxInputClusters options = new Options_EmaxInputClusters();
         public CS_EMax_InputClusters(VBtask task) : base(task)
         {
@@ -14079,7 +14081,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             Mat eLabelMat = new Mat(regionCount * options.samplesPerRegion, 1, MatType.CV_32S);
             for (int i = 0; i < regionCount; i++)
             {
-                Rect roi = task.gridList[i];
+                cv.Rect roi = task.gridList[i];
                 eLabelMat.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion).SetTo(i);
                 Mat tmp = samples.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion);
                 Cv2.Randn(tmp, new Scalar(roi.X + task.gridSize / 2, roi.Y + task.gridSize / 2),
@@ -14091,7 +14093,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             centers.Clear();
             for (int i = 0; i < regionCount * options.samplesPerRegion; i++)
             {
-                Point2f pt = samples.Get<Point2f>(i, 0);
+                Point2f pt = samples.Get<cv.Point2f>(i, 0);
                 centers.Add(pt);
                 eSamples.Add(new Point2f((int)pt.X, (int)pt.Y));
                 int label = eLabelMat.Get<int>(i);
@@ -14105,7 +14107,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public EMax_InputClusters emaxInput = new EMax_InputClusters();
         public List<int> eLabels = new List<int>();
-        public List<Point2f> eSamples = new List<Point2f>();
+        public List<cv.Point2f> eSamples = new List<cv.Point2f>();
         public int dimension = 2;
         public int regionCount;
         public CS_EMax_VB_Failing(VBtask task) : base(task)
@@ -14116,7 +14118,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             emaxInput.Run(empty);
             eLabels = new List<int>(emaxInput.eLabels);
-            eSamples = new List<Point2f>(emaxInput.eSamples);
+            eSamples = new List<cv.Point2f>(emaxInput.eSamples);
             regionCount = emaxInput.regionCount;
             SetTrueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + "\n" +
                         "The C++ version works fine (EMax_RedCloud) and the 2 are functionally identical.", new cv.Point(20, 100));
@@ -14157,11 +14159,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             emax.Run(src);
             dst2 = emax.dst2;
-            knn.queries = new List<Point2f>(emax.centers);
+            knn.queries = new List<cv.Point2f>(emax.centers);
             knn.Run(empty);
             if (task.FirstPass)
             {
-                knn.trainInput = new List<Point2f>(knn.queries);
+                knn.trainInput = new List<cv.Point2f>(knn.queries);
                 return;
             }
             dst3.SetTo(0);
@@ -14173,7 +14175,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawCircle(dst3, p2, task.DotSize, Scalar.Red, -1);
                 DrawLine(dst3, p1, p2, Scalar.White, task.lineWidth);
             }
-            knn.trainInput = new List<Point2f>(knn.queries);
+            knn.trainInput = new List<cv.Point2f>(knn.queries);
             dst2 = dst2 | emax.emaxInput.dst2;
         }
     }
@@ -14269,7 +14271,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[2] = "Control entropy values with histogram bins slider";
             desc = "Compute the entropy in an image - a measure of contrast(iness)";
         }
-        Rect ValidatePreserve(Rect r)
+        cv.Rect ValidatePreserve(cv.Rect r)
         {
             if (r.Width <= 0) r.Width = 1;
             if (r.Height <= 0) r.Height = 1;
@@ -14282,13 +14284,13 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             int stdSize = 30;
-            if (task.drawRect == new Rect())
+            if (task.drawRect == new cv.Rect())
             {
-                task.drawRect = new Rect(30, 30, stdSize, stdSize); // arbitrary rectangle
+                task.drawRect = new cv.Rect(30, 30, stdSize, stdSize); // arbitrary rectangle
             }
             if (task.mouseClickFlag)
             {
-                task.drawRect = ValidatePreserve(new Rect(task.ClickPoint.X, task.ClickPoint.Y, stdSize, stdSize));
+                task.drawRect = ValidatePreserve(new cv.Rect(task.ClickPoint.X, task.ClickPoint.Y, stdSize, stdSize));
             }
             task.drawRect = ValidateRect(task.drawRect);
             if (src.Channels() == 3)
@@ -14303,7 +14305,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             Cv2.Rectangle(dst2, task.drawRect, Scalar.White, task.lineWidth);
             if (task.heartBeat)
             {
-                strOut = $"Click anywhere to measure the entropy with rect(pt.x, pt.y, {stdSize}, {stdSize})\n\n" +
+                strOut = $"Click anywhere to measure the entropy with cv.Rect(pt.x, pt.y, {stdSize}, {stdSize})\n\n" +
                          $"Total entropy = {entropy.entropyVal.ToString(fmt1)}\n{entropy.strOut}";
             }
             SetTrueText(strOut, 3);
@@ -14312,7 +14314,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Entropy_Highest : CS_Parent
     {
         Entropy_Rectangle entropy = new Entropy_Rectangle();
-        public Rect eMaxRect;
+        public cv.Rect eMaxRect;
         AddWeighted_Basics addw = new AddWeighted_Basics();
         public CS_Entropy_Highest(VBtask task) : base(task)
         {
@@ -14329,7 +14331,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             for (int i = 0; i < task.gridList.Count; i++)
             {
-                Rect roi = task.gridList[i];
+                cv.Rect roi = task.gridList[i];
                 entropy.Run(src[roi]);
                 entropyMap[roi].SetTo(entropy.entropyVal);
                 if (entropy.entropyVal > maxEntropy || task.optionsChanged)
@@ -14404,7 +14406,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 if (task.drawRect.Width == 0 || task.drawRect.Height == 0)
                 {
-                    task.drawRect = new Rect(10, 10, 50, 50); // arbitrary template to match
+                    task.drawRect = new cv.Rect(10, 10, 50, 50); // arbitrary template to match
                 }
                 src = src[task.drawRect];
             }
@@ -14423,15 +14425,15 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         Entropy_Rectangle entropy = new Entropy_Rectangle();
         List<List<float>> entropies = new List<List<float>>();
-        List<List<Rect>> eROI = new List<List<Rect>>();
-        public List<Rect> roiList = new List<Rect>();
+        List<List<cv.Rect>> eROI = new List<List<cv.Rect>>();
+        public List<cv.Rect> roiList = new List<cv.Rect>();
         public CS_Entropy_SubDivisions(VBtask task) : base(task)
         {
             labels[2] = "The top entropy values in each subdivision";
             for (int i = 0; i < task.subDivisionCount; i++)
             {
                 entropies.Add(new List<float>()); // 4 quadrants
-                eROI.Add(new List<Rect>()); // 4 quadrants
+                eROI.Add(new List<cv.Rect>()); // 4 quadrants
             }
             desc = "Find the highest entropy in each quadrant";
         }
@@ -14449,7 +14451,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             Mat hist = new Mat();
             for (int i = 0; i < task.gridList.Count; i++)
             {
-                Rect roi = task.gridList[i];
+                cv.Rect roi = task.gridList[i];
                 Cv2.CalcHist(new Mat[] { dst1[roi] }, new int[] { 0 }, null, hist, 1, dimensions, ranges);
                 hist = hist.Normalize(0, hist.Rows, NormTypes.MinMax);
                 float nextEntropy = entropy.channelEntropy((int)dst1[roi].Total(), hist) * 1000;
@@ -14462,7 +14464,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 var eList = entropies[i];
                 float maxEntropy = eList.Max();
-                Rect roi = eROI[i][eList.IndexOf(maxEntropy)];
+                cv.Rect roi = eROI[i][eList.IndexOf(maxEntropy)];
                 roiList.Add(roi);
                 Cv2.Rectangle(dst2, roi, Scalar.White);
             }
@@ -14708,8 +14710,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             options.RunVB();
             optTrans.RunVB();
-            Rect rectLeft = new Rect(options.leftCorner - optTrans.leftTrans, options.topCorner, dst2.Width - 2 * options.leftCorner, dst2.Height - 2 * options.topCorner);
-            Rect rectRight = new Rect(options.rightCorner - optTrans.rightTrans, options.topCorner, dst2.Width - 2 * options.rightCorner, dst2.Height - 2 * options.topCorner);
+            cv.Rect rectLeft = new cv.Rect(options.leftCorner - optTrans.leftTrans, options.topCorner, dst2.Width - 2 * options.leftCorner, dst2.Height - 2 * options.topCorner);
+            cv.Rect rectRight = new cv.Rect(options.rightCorner - optTrans.rightTrans, options.topCorner, dst2.Width - 2 * options.rightCorner, dst2.Height - 2 * options.topCorner);
             addw.src2 = task.leftView[rectLeft].Resize(dst2.Size());
             addw.Run(src);
             dst2 = addw.dst2.Clone();
@@ -14760,9 +14762,9 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Feature_Basics : CS_Parent
     {
         List<Mat> matList = new List<Mat>();
-        List<Point2f> ptList = new List<Point2f>();
+        List<cv.Point2f> ptList = new List<cv.Point2f>();
         KNN_Core knn = new KNN_Core();
-        List<Point2f> ptLost = new List<Point2f>();
+        List<cv.Point2f> ptLost = new List<cv.Point2f>();
         Feature_Gather gather = new Feature_Gather();
         List<Mat> featureMat = new List<Mat>();
         public Options_Features options = new Options_Features();
@@ -14788,7 +14790,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             for (int i = 0; i < Math.Min(featureMat.Count, task.features.Count); i++)
             {
                 Point2f pt = task.features[i];
-                Rect rect = ValidateRect(new Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), featureMat[i].Width, featureMat[i].Height));
+                cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), featureMat[i].Width, featureMat[i].Height));
                 if (!gather.ptList.Contains(new cv.Point((int)pt.X, (int)pt.Y)))
                 {
                     Cv2.MatchTemplate(src.SubMat(rect), featureMat[i], correlationMat, TemplateMatchModes.CCoeffNormed);
@@ -14803,7 +14805,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 ptList.Add(pt);
             }
             featureMat = new List<Mat>(matList);
-            task.features = new List<Point2f>(ptList);
+            task.features = new List<cv.Point2f>(ptList);
             float extra = 1 + (1 - options.resyncThreshold);
             task.featureMotion = true;
             if (task.features.Count < gather.features.Count * options.resyncThreshold || task.features.Count > extra * gather.features.Count)
@@ -14813,7 +14815,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 task.features.Clear();
                 foreach (Point2f pt in gather.features)
                 {
-                    Rect rect = ValidateRect(new Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
+                    cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
                     featureMat.Add(src.SubMat(rect));
                     task.features.Add(pt);
                 }
@@ -14828,7 +14830,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     for (int i = 0; i < knn.queries.Count; i++)
                     {
                         Point2f pt = knn.queries[i];
-                        Rect rect = ValidateRect(new Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
+                        cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
                         featureMat.Add(src.SubMat(rect));
                         task.features.Add(knn.trainInput[knn.result[i, 0]]);
                     }
@@ -14878,7 +14880,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Feature_KNN : CS_Parent
     {
         KNN_Core knn = new KNN_Core();
-        public List<Point2f> featurePoints = new List<Point2f>();
+        public List<cv.Point2f> featurePoints = new List<cv.Point2f>();
         public Feature_Basics feat = new Feature_Basics();
         public CS_Feature_KNN(VBtask task) : base(task)
         {
@@ -14888,8 +14890,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             feat.Run(src);
-            knn.queries = new List<Point2f>(task.features);
-            if (task.FirstPass) knn.trainInput = new List<Point2f>(knn.queries);
+            knn.queries = new List<cv.Point2f>(task.features);
+            if (task.FirstPass) knn.trainInput = new List<cv.Point2f>(knn.queries);
             knn.Run(null);
             for (int i = 0; i < knn.neighbors.Count; i++)
             {
@@ -14898,7 +14900,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 Point2f qPt = task.features[i];
                 if (pt.DistanceTo(qPt) > feat.options.minDistance) knn.trainInput[trainIndex] = task.features[i];
             }
-            featurePoints = new List<Point2f>(knn.trainInput);
+            featurePoints = new List<cv.Point2f>(knn.trainInput);
             src.CopyTo(dst2);
             dst3.SetTo(0);
             foreach (Point2f pt in featurePoints)
@@ -14935,7 +14937,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Feature_MultiPass : CS_Parent
     {
         Feature_Basics feat = new Feature_Basics();
-        public List<Point2f> featurePoints = new List<Point2f>();
+        public List<cv.Point2f> featurePoints = new List<cv.Point2f>();
         PhotoShop_SharpenDetail sharpen = new PhotoShop_SharpenDetail();
         public CS_Feature_MultiPass(VBtask task) : base(task)
         {
@@ -14947,7 +14949,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             feat.Run(task.color);
             dst2 = src.Clone();
-            featurePoints = new List<Point2f>(task.features);
+            featurePoints = new List<cv.Point2f>(task.features);
             string passCounts = $"{featurePoints.Count}/";
             feat.Run(src);
             foreach (var pt in task.features)
@@ -14999,7 +15001,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 foreach (var pt in task.features)
                 {
                     mPoints.ptx.Add(pt);
-                    Rect rect = ValidateRect(new Rect((int)(pt.X - templatePad), (int)(pt.Y - templatePad), templateSize, templateSize));
+                    cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - templatePad), (int)(pt.Y - templatePad), templateSize, templateSize));
                 }
                 strOut = "Restart tracking -----------------------------------------------------------------------------\n";
             }
@@ -15163,7 +15165,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Feature_TraceDelaunay : CS_Parent
     {
         Feature_Delaunay features = new Feature_Delaunay();
-        public List<List<Point2f>> goodList = new List<List<Point2f>>(); // stable points only
+        public List<List<cv.Point2f>> goodList = new List<List<cv.Point2f>>(); // stable points only
         public CS_Feature_TraceDelaunay(VBtask task) : base(task)
         {
             labels = new string[] { "Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points" };
@@ -15175,7 +15177,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst3 = features.dst2;
             if (task.optionsChanged)
                 goodList.Clear();
-            List<Point2f> ptList = new List<Point2f>(task.features);
+            List<cv.Point2f> ptList = new List<cv.Point2f>(task.features);
             goodList.Add(ptList);
             if (goodList.Count >= task.frameHistoryCount)
                 goodList.RemoveAt(0);
@@ -15360,24 +15362,24 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         Feature_Basics feat = new Feature_Basics();
         Feature_BasicsNoFrills noFrill = new Feature_BasicsNoFrills();
-        List<Point2f> saveLFeatures = new List<Point2f>();
-        List<Point2f> saveRFeatures = new List<Point2f>();
+        List<cv.Point2f> saveLFeatures = new List<cv.Point2f>();
+        List<cv.Point2f> saveRFeatures = new List<cv.Point2f>();
         public CS_Feature_Compare(VBtask task) : base(task)
         {
             desc = "Prepare features for the left and right views";
         }
         public void RunCS(Mat src)
         {
-            task.features = new List<Point2f>(saveLFeatures);
+            task.features = new List<cv.Point2f>(saveLFeatures);
             feat.Run(src.Clone());
             dst2 = feat.dst2;
             labels[2] = feat.labels[2];
-            saveLFeatures = new List<Point2f>(task.features);
-            task.features = new List<Point2f>(saveRFeatures);
+            saveLFeatures = new List<cv.Point2f>(task.features);
+            task.features = new List<cv.Point2f>(saveRFeatures);
             noFrill.Run(src.Clone());
             dst3 = noFrill.dst2;
             labels[3] = "With no correlation coefficients " + noFrill.labels[2];
-            saveRFeatures = new List<Point2f>(task.features);
+            saveRFeatures = new List<cv.Point2f>(task.features);
         }
     }
     public class CS_Feature_Gather : CS_Parent
@@ -15385,7 +15387,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         Corners_HarrisDetector harris = new Corners_HarrisDetector();
         Corners_Basics FAST = new Corners_Basics();
         Options_FeatureGather myOptions = new Options_FeatureGather();
-        public List<Point2f> features = new List<Point2f>();
+        public List<cv.Point2f> features = new List<cv.Point2f>();
         public List<cv.Point> ptList = new List<cv.Point>();
         BRISK_Basics brisk = new BRISK_Basics();
         public Options_Features options = new Options_Features();
@@ -15405,7 +15407,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             switch (myOptions.featureSource)
             {
                 case FeatureSrc.goodFeaturesFull:
-                    features = new List<Point2f>(Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, null,
+                    features = new List<cv.Point2f>(Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, null,
                                                           options.blockSize, true, options.k));
                     labels[2] = $"GoodFeatures produced {features.Count} features";
                     break;
@@ -15415,7 +15417,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     for (int i = 0; i < task.gridList.Count; i++)
                     {
                         var roi = task.gridList[i];
-                        var tmpFeatures = new List<Point2f>(Cv2.GoodFeaturesToTrack(src.SubMat(roi), options.featurePoints, options.quality, options.minDistance, null,
+                        var tmpFeatures = new List<cv.Point2f>(Cv2.GoodFeaturesToTrack(src.SubMat(roi), options.featurePoints, options.quality, options.minDistance, null,
                                                                      options.blockSize, true, options.k));
                         for (int j = 0; j < tmpFeatures.Count; j++)
                         {
@@ -15437,7 +15439,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                         dst2 = src;
                     for (int i = 0; i < ptMat.Rows; i++)
                     {
-                        Point2f pt = ptMat.Get<Point2f>(i, 0);
+                        Point2f pt = ptMat.Get<cv.Point2f>(i, 0);
                         features.Add(pt);
                         if (standaloneTest())
                             DrawCircle(dst2, pt, task.DotSize, Scalar.White);
@@ -15503,11 +15505,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
             int pad = feat.options.templatePad, size = feat.options.templateSize;
             foreach (cv.Point p1 in prevFeatures)
             {
-                Rect rect = ValidateRect(new Rect(p1.X - pad, p1.Y - pad, size, size));
+                cv.Rect rect = ValidateRect(new cv.Rect(p1.X - pad, p1.Y - pad, size, size));
                 List<float> correlations = new List<float>();
                 foreach (cv.Point p2 in currFeatures)
                 {
-                    Rect r = ValidateRect(new Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)));
+                    cv.Rect r = ValidateRect(new cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)));
                     Cv2.MatchTemplate(dst2[rect], dst3[r], correlationmat, TemplateMatchModes.CCoeffNormed);
                     correlations.Add(correlationmat.Get<float>(0, 0));
                 }
@@ -15584,8 +15586,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_FeatureFlow_LucasKanade : CS_Parent
     {
-        public List<Point2f> features = new List<Point2f>();
-        public List<Point2f> lastFeatures = new List<Point2f>();
+        public List<cv.Point2f> features = new List<cv.Point2f>();
+        public List<cv.Point2f> lastFeatures = new List<cv.Point2f>();
         public Feature_Basics feat = new Feature_Basics();
         public Options_OpticalFlowSparse options = new Options_OpticalFlowSparse();
         public CS_FeatureFlow_LucasKanade(VBtask task) : base(task)
@@ -15608,14 +15610,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
             cv.Size winSize = new cv.Size(3, 3);
             cv.TermCriteria term = new cv.TermCriteria((cv.CriteriaTypes)((int)cv.CriteriaTypes.Eps + (int)cv.CriteriaTypes.Count), 10, 1.0);
             Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag);
-            features = new List<Point2f>();
+            features = new List<cv.Point2f>();
             lastFeatures.Clear();
             for (int i = 0; i < status.Rows; i++)
             {
                 if (status.Get<byte>(i, 0) != 0)
                 {
-                    Point2f pt1 = features1.Get<Point2f>(i, 0);
-                    Point2f pt2 = features2.Get<Point2f>(i, 0);
+                    Point2f pt1 = features1.Get<cv.Point2f>(i, 0);
+                    Point2f pt2 = features2.Get<cv.Point2f>(i, 0);
                     float length = (float)Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y));
                     if (length < 30)
                     {
@@ -15874,7 +15876,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             ClickPoint = new cv.Point((int)pt.X, (int)pt.Y);
             picTag = _pictag;
-            task.drawRect = new Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
+            task.drawRect = new cv.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
             task.drawRectUpdated = true;
         }
         public void RunCS(Mat src)
@@ -15908,8 +15910,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                         i = j;
                         break;
                     }
-                    Rect r1 = ValidateRect(new Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
-                    Rect r2 = ValidateRect(new Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
+                    cv.Rect r1 = ValidateRect(new cv.Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
+                    cv.Rect r2 = ValidateRect(new cv.Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
                     Cv2.MatchTemplate(task.leftView[r1], task.rightView[r2], correlationmat, TemplateMatchModes.CCoeffNormed);
                     correlations.Add(correlationmat.Get<float>(0, 0));
                     tmpList.Add(mp);
@@ -15977,8 +15979,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public Feature_Basics rFeat = new Feature_Basics();
         public List<cv.Point> leftFeatures = new List<cv.Point>();
         public List<cv.Point> rightFeatures = new List<cv.Point>();
-        public List<Point2f> saveLFeatures = new List<Point2f>();
-        public List<Point2f> saveRFeatures = new List<Point2f>();
+        public List<cv.Point2f> saveLFeatures = new List<cv.Point2f>();
+        public List<cv.Point2f> saveRFeatures = new List<cv.Point2f>();
         public CS_FeatureLeftRight_LeftRightPrep(VBtask task) : base(task)
         {
             desc = "Prepare features for the left and right views";
@@ -16045,7 +16047,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             ClickPoint = new cv.Point(pt.X, pt.Y);
             picTag = _pictag;
-            task.drawRect = new Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
+            task.drawRect = new cv.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
             task.drawRectUpdated = true;
         }
         public void RunCS(Mat src)
@@ -16080,8 +16082,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                         i = j;
                         break;
                     }
-                    Rect r1 = ValidateRect(new Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
-                    Rect r2 = ValidateRect(new Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
+                    cv.Rect r1 = ValidateRect(new cv.Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
+                    cv.Rect r2 = ValidateRect(new cv.Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
                     Cv2.MatchTemplate(task.leftView[r1], task.rightView[r2], correlationmat, TemplateMatchModes.CCoeffNormed);
                     correlations.Add(correlationmat.Get<float>(0, 0));
                     tmpList.Add(mp);
@@ -16388,7 +16390,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (task.optionsChanged || correlationTest || lineDisp.maskCount / lineDisp.distance < linePercentThreshold || lineDisp.distance < distanceThreshold)
             {
                 int templatePad = options.templatePad;
-                lines.subsetRect = new Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
+                lines.subsetRect = new cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
                 lines.Run(src.Clone());
                 if (lines.mpList.Count == 0)
                 {
@@ -16446,7 +16448,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             options.RunVB();
 
             int templatePad = options.templatePad;
-            // gLines.lines.subsetRect = new Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
+            // gLines.lines.subsetRect = new cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
             gLines.Run(src);
             var vertRadio = FindRadio("Vertical lines");
             var sortedLines = vertRadio.Checked ? gLines.sortedVerticals : gLines.sortedHorizontals;
@@ -16507,14 +16509,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
             lines.Run(src);
             dst2 = lines.dst2;
             var raw2D = new List<PointPair>();
-            var raw3D = new List<Point3f>();
+            var raw3D = new List<cv.Point3f>();
             foreach (var lp in lines.lpList)
             {
                 if (task.pcSplit[2].Get<float>((int)lp.p1.Y, (int)lp.p1.X) > 0 && task.pcSplit[2].Get<float>((int)lp.p2.Y, (int)lp.p2.X) > 0)
                 {
                     raw2D.Add(lp);
-                    raw3D.Add(task.pointCloud.Get<Point3f>((int)lp.p1.Y, (int)lp.p1.X));
-                    raw3D.Add(task.pointCloud.Get<Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                    raw3D.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                    raw3D.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
                 }
             }
             dst3 = src.Clone();
@@ -16544,14 +16546,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
             lines.Run(src);
             dst2 = lines.dst2;
             var raw2D = new List<PointPair>();
-            var raw3D = new List<Point3f>();
+            var raw3D = new List<cv.Point3f>();
             foreach (var lp in lines.lpList)
             {
                 Point3f pt1 = new cv.Point3f(), pt2 = new cv.Point3f();
                 for (int j = 0; j < 2; j++)
                 {
                     cv.Point pt = (j == 0) ? new cv.Point(lp.p1.X, lp.p1.Y) : new cv.Point(lp.p2.X, lp.p2.Y);
-                    Rect rect = ValidateRect(new Rect(pt.X - options.kSize, pt.Y - options.kSize, options.kernelSize, options.kernelSize));
+                    cv.Rect rect = ValidateRect(new cv.Rect(pt.X - options.kSize, pt.Y - options.kSize, options.kernelSize, options.kernelSize));
                     Scalar val = task.pointCloud.SubMat(rect).Mean(task.depthMask.SubMat(rect));
                     if (j == 0)
                         pt1 = new Point3f((float)val[0], (float)val[1], (float)val[2]);
@@ -16561,8 +16563,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 if (pt1.Z > 0 && pt2.Z > 0)
                 {
                     raw2D.Add(lp);
-                    raw3D.Add(task.pointCloud.Get<Point3f>((int)lp.p1.Y, (int)lp.p1.X));
-                    raw3D.Add(task.pointCloud.Get<Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                    raw3D.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                    raw3D.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
                 }
             }
             dst3 = src.Clone();
@@ -16722,8 +16724,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_FeatureLine_Finder : CS_Parent
     {
         Line_Basics lines = new Line_Basics();
-        public List<Point2f> lines2D = new List<Point2f>();
-        public List<Point3f> lines3D = new List<Point3f>();
+        public List<cv.Point2f> lines2D = new List<cv.Point2f>();
+        public List<cv.Point3f> lines3D = new List<cv.Point3f>();
         public SortedList<float, int> sorted2DV = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
         public SortedList<float, int> sortedVerticals = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
         public SortedList<float, int> sortedHorizontals = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
@@ -16745,14 +16747,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
             lines.Run(src);
             dst2 = lines.dst2;
             List<PointPair> raw2D = new List<PointPair>();
-            List<Point3f> raw3D = new List<Point3f>();
+            List<cv.Point3f> raw3D = new List<cv.Point3f>();
             foreach (var lp in lines.lpList)
             {
                 Point3f pt1 = new Point3f(), pt2 = new Point3f();
                 for (int j = 0; j < 2; j++)
                 {
                     cv.Point2f pt = (j == 0) ? lp.p1 : lp.p2;
-                    Rect rect = ValidateRect(new Rect((int)(pt.X - options.kSize), (int)(pt.Y - options.kSize), options.kernelSize, options.kernelSize));
+                    cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.kSize), (int)(pt.Y - options.kSize), options.kernelSize, options.kernelSize));
                     Scalar val = task.pointCloud[rect].Mean(task.depthMask[rect]);
                     if (j == 0)
                         pt1 = new Point3f((float)val[0], (float)val[1], (float)val[2]);
@@ -16775,8 +16777,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 Mat matLines3D = new Mat(raw3D.Count, 3, MatType.CV_32F, raw3D.ToArray()) * task.gMatrix;
                 for (int i = 0; i < raw2D.Count - 1; i += 2)
                 {
-                    Point3f pt1 = matLines3D.Get<Point3f>(i, 0);
-                    Point3f pt2 = matLines3D.Get<Point3f>(i + 1, 0);
+                    Point3f pt1 = matLines3D.Get<cv.Point3f>(i, 0);
+                    Point3f pt2 = matLines3D.Get<cv.Point3f>(i + 1, 0);
                     float len3D = distance3D(pt1, pt2);
                     double arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958);
                     if (Math.Abs(arcY - 90) < options.tolerance)
@@ -16952,7 +16954,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             p1 = knn.lastPair.p1;
             p2 = knn.lastPair.p2;
             gline = glines.updateGLine(src, gline, new cv.Point(p1.X, p1.Y), new cv.Point(p2.X, p2.Y));
-            Rect rect = ValidateRect(new Rect((int)Math.Min(p1.X, p2.X), (int)Math.Min(p1.Y, p2.Y), (int)Math.Abs(p1.X - p2.X) + 2, (int)Math.Abs(p1.Y - p2.Y)));
+            cv.Rect rect = ValidateRect(new cv.Rect((int)Math.Min(p1.X, p2.X), (int)Math.Min(p1.Y, p2.Y), (int)Math.Abs(p1.X - p2.X) + 2, (int)Math.Abs(p1.Y - p2.Y)));
             match.template = new Mat(src, rect);
             match.Run(src);
             if (match.correlation >= options.correlationMin)
@@ -16961,7 +16963,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawLine(dst2, p1, p2, task.HighlightColor, task.lineWidth);
                 DrawCircle(dst2, p1, task.DotSize, task.HighlightColor);
                 DrawCircle(dst2, p2, task.DotSize, task.HighlightColor);
-                rect = ValidateRect(new Rect((int)(Math.Min(p1.X, p2.X)), (int)(Math.Min(p1.Y, p2.Y)), (int)(Math.Abs(p1.X - p2.X) + 2), (int)(Math.Abs(p1.Y - p2.Y))));
+                rect = ValidateRect(new cv.Rect((int)(Math.Min(p1.X, p2.X)), (int)(Math.Min(p1.Y, p2.Y)), (int)(Math.Abs(p1.X - p2.X) + 2), (int)(Math.Abs(p1.Y - p2.Y))));
                 match.template = new Mat(src, rect).Clone();
             }
             else
@@ -16997,10 +16999,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 knn.Run(src.Clone());
                 p1 = knn.lastPair.p1;
-                Rect r1 = ValidateRect(new Rect((int)(p1.X - templatePad), (int)(p1.Y - templatePad), templateSize, templateSize));
+                cv.Rect r1 = ValidateRect(new cv.Rect((int)(p1.X - templatePad), (int)(p1.Y - templatePad), templateSize, templateSize));
                 match1.template = new Mat(src, r1).Clone();
                 p2 = knn.lastPair.p2;
-                Rect r2 = ValidateRect(new Rect((int)(p2.X - templatePad), (int)(p2.Y - templatePad), templateSize, templateSize));
+                cv.Rect r2 = ValidateRect(new cv.Rect((int)(p2.X - templatePad), (int)(p2.Y - templatePad), templateSize, templateSize));
                 match2.template = new Mat(src, r2).Clone();
             }
             match1.Run(src);
@@ -17042,7 +17044,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             topFeatures.Run(src);
             dst2 = topFeatures.dst2;
-            sides.currPoly = new List<Point2f>(topFeatures.poly);
+            sides.currPoly = new List<cv.Point2f>(topFeatures.poly);
             if (sides.currPoly.Count < task.polyCount) return;
             sides.Run(src);
             dst3 = sides.dst2;
@@ -17087,7 +17089,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             causes += "\n";
             if (resync || sides.prevPoly.Count != task.polyCount || task.optionsChanged)
             {
-                sides.prevPoly = new List<Point2f>(sides.currPoly);
+                sides.prevPoly = new List<cv.Point2f>(sides.currPoly);
                 sides.prevLengths = new List<float>(sides.currLengths);
                 sides.prevSideIndex = sides.prevLengths.IndexOf(sides.prevLengths.Max());
                 sides.prevImage = src.Clone();
@@ -17113,12 +17115,12 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_FeaturePoly_Sides : CS_Parent
     {
-        public List<Point2f> currPoly = new List<Point2f>();
+        public List<cv.Point2f> currPoly = new List<cv.Point2f>();
         public int currSideIndex;
         public List<float> currLengths = new List<float>();
         public float currFLineLen;
         public PointPair mpCurr;
-        public List<Point2f> prevPoly = new List<Point2f>();
+        public List<cv.Point2f> prevPoly = new List<cv.Point2f>();
         public int prevSideIndex;
         public List<float> prevLengths = new List<float>();
         public float prevFLineLen;
@@ -17130,7 +17132,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public Options_FPoly options = new Options_FPoly();
         Line_Nearest near = new Line_Nearest();
         public Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
-        List<Point2f> newPoly;
+        List<cv.Point2f> newPoly;
         Random_Basics random = new Random_Basics();
         public CS_FeaturePoly_Sides(VBtask task) : base(task)
         {
@@ -17145,7 +17147,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (standaloneTest() && task.heartBeat)
             {
                 random.Run(empty);
-                currPoly = new List<Point2f>(random.PointList);
+                currPoly = new List<cv.Point2f>(random.PointList);
             }
             dst2.SetTo(0);
             currLengths.Clear();
@@ -17156,7 +17158,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             currSideIndex = currLengths.IndexOf(currLengths.Max());
             if (task.FirstPass)
             {
-                prevPoly = new List<Point2f>(currPoly);
+                prevPoly = new List<cv.Point2f>(currPoly);
                 prevLengths = new List<float>(currLengths);
                 prevSideIndex = prevLengths.IndexOf(prevLengths.Max());
             }
@@ -17180,7 +17182,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 rotateCenter = mpPrev.p2;
                 newNear = new PointPair(mpPrev.p1, mpCurr.p1);
             }
-            List<Point2f> transPoly = new List<Point2f>();
+            List<cv.Point2f> transPoly = new List<cv.Point2f>();
             for (int i = 0; i < currPoly.Count; i++)
             {
                 transPoly.Add(new Point2f(currPoly[i].X - centerShift.X, currPoly[i].Y - centerShift.Y));
@@ -17214,9 +17216,9 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 rotatePoly.Run(empty);
                 if (Distance(near.nearPoint, rotatePoly.poly[0]) > Distance(newNear.p1, rotatePoly.poly[0])) rotateAngle *= -1;
                 rotatePoly.rotateAngle = rotateAngle;
-                rotatePoly.poly = new List<Point2f>(transPoly);
+                rotatePoly.poly = new List<cv.Point2f>(transPoly);
                 rotatePoly.Run(empty);
-                newPoly = new List<Point2f>(rotatePoly.poly);
+                newPoly = new List<cv.Point2f>(rotatePoly.poly);
             }
             DrawFPoly(ref dst2, prevPoly, Scalar.White);
             DrawFPoly(ref dst2, currPoly, Scalar.Yellow);
@@ -17256,7 +17258,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             topFeatures.Run(src);
             dst2 = topFeatures.dst2;
             dst1 = topFeatures.dst3;
-            fPD.currPoly = new List<Point2f>(topFeatures.poly);
+            fPD.currPoly = new List<cv.Point2f>(topFeatures.poly);
             if (task.optionsChanged) fPD = new fPolyData(fPD.currPoly);
             if (fPD.currPoly.Count < task.polyCount) return;
             fPD.computeCurrLengths();
@@ -17450,7 +17452,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             Mat syncImage = src.Clone();
             if (fGrid.startAnchor == fGrid.anchor) syncImage = src.Clone();
             cv.Point shift = new cv.Point(fGrid.startAnchor.X - fGrid.anchor.X, fGrid.startAnchor.Y - fGrid.anchor.Y);
-            Rect rect = new Rect();
+            cv.Rect rect = new cv.Rect();
             if (shift.X < 0) rect.X = 0; else rect.X = shift.X;
             if (shift.Y < 0) rect.Y = 0; else rect.Y = shift.Y;
             rect.Width = dst1.Width - Math.Abs(shift.X);
@@ -17460,7 +17462,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst1[rect] = syncImage[rect];
             DrawLine(dst1, fGrid.startAnchor, fGrid.anchor, new cv.Scalar(255), 2);
             DrawCircle(dst1, fGrid.anchor, 5, new cv.Scalar(255), -1);
-            Rect r = new Rect(0, 0, rect.Width, rect.Height);
+            cv.Rect r = new cv.Rect(0, 0, rect.Width, rect.Height);
             if (fGrid.anchor.X > fGrid.startAnchor.X) r.X = (int)(fGrid.anchor.X - fGrid.startAnchor.X);
             if (fGrid.anchor.Y > fGrid.startAnchor.Y) r.Y = (int)(fGrid.anchor.Y - fGrid.startAnchor.Y);
 
@@ -17470,8 +17472,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_FeaturePoly_StartPoints : CS_Parent
     {
-        public List<Point> startPoints;
-        public List<Point> goodPoints;
+        public List<cv.Point> startPoints;
+        public List<cv.Point> goodPoints;
         public FeaturePoly_Core fGrid = new FeaturePoly_Core();
         System.Windows.Forms.TrackBar resyncSlider;
         public CS_FeaturePoly_StartPoints(VBtask task) : base(task)
@@ -17489,7 +17491,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             double maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold;
             fGrid.Run(src);
             dst2 = fGrid.dst3;
-            List<List<Point>> facets = new List<List<Point>>();
+            List<List<cv.Point>> facets = new List<List<cv.Point>>();
             Mat lastPoints = dst0.Clone();
             if (fGrid.startAnchor == fGrid.anchor || goodPoints.Count < 5)
             {
@@ -17498,17 +17500,17 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     startPoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
                 }
-                facets = new List<List<Point>>(fGrid.goodFacets);
+                facets = new List<List<cv.Point>>(fGrid.goodFacets);
             }
             dst0.SetTo(new cv.Scalar(255));
             if (standaloneTest()) dst1.SetTo(new cv.Scalar(0));
             List<PointPair> mpList = new List<PointPair>();
-            goodPoints = new List<Point>();
+            goodPoints = new List<cv.Point>();
             foreach (var pt in fGrid.goodPoints)
             {
                 goodPoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
             }
-            List<Point> facet = new List<Point>();
+            List<cv.Point> facet = new List<cv.Point>();
             List<int> usedGood = new List<int>();
             for (int i = 0; i < goodPoints.Count; i++)
             {
@@ -17545,7 +17547,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             fGrid.Run(src);
             dst2 = fGrid.dst2;
-            triangle.srcPoints = new List<Point2f>();
+            triangle.srcPoints = new List<cv.Point2f>();
             foreach (var pt in fGrid.goodPoints)
             {
                 triangle.srcPoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
@@ -17557,7 +17559,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_FeaturePoly_TopFeatures : CS_Parent
     {
         Stable_BasicsCount stable = new Stable_BasicsCount();
-        List<Point2f> poly = new List<Point2f>();
+        List<cv.Point2f> poly = new List<cv.Point2f>();
         Options_FPoly options = new Options_FPoly();
         public CS_FeaturePoly_TopFeatures(VBtask task) : base(task)
         {
@@ -17597,8 +17599,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             fPoly.Run(src);
-            List<Point2f> polyPrev = fPoly.fPD.prevPoly;
-            List<Point2f> poly = new List<Point2f>(fPoly.fPD.currPoly);
+            List<cv.Point2f> polyPrev = fPoly.fPD.prevPoly;
+            List<cv.Point2f> poly = new List<cv.Point2f>(fPoly.fPD.currPoly);
             dst2.SetTo(new cv.Scalar(0));
             dst3.SetTo(new cv.Scalar(0));
             DrawFPoly(ref dst2, polyPrev, new cv.Scalar(255));
@@ -17608,15 +17610,15 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst3 = warp.dst2;
             rotatePoly.rotateAngle = fPoly.fPD.rotateAngle;
             rotatePoly.rotateCenter = fPoly.fPD.rotateCenter;
-            rotatePoly.poly = new List<Point2f>(poly);
+            rotatePoly.poly = new List<cv.Point2f>(poly);
             rotatePoly.Run(null);
             if (fPoly.fPD.polyPrevSideIndex >= rotatePoly.poly.Count) fPoly.fPD.polyPrevSideIndex = 0;
             cv.Point offset = new cv.Point(rotatePoly.poly[fPoly.fPD.polyPrevSideIndex].X - polyPrev[fPoly.fPD.polyPrevSideIndex].X,
                                      rotatePoly.poly[fPoly.fPD.polyPrevSideIndex].Y - polyPrev[fPoly.fPD.polyPrevSideIndex].Y);
-            Rect r1 = new Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y));
+            cv.Rect r1 = new cv.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y));
             if (offset.X < 0) r1.X = 0;
             if (offset.Y < 0) r1.Y = 0;
-            Rect r2 = new Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height);
+            cv.Rect r2 = new cv.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height);
             if (offset.X > 0) r2.X = 0;
             if (offset.Y > 0) r2.Y = 0;
 
@@ -17631,8 +17633,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_FeaturePoly_RotatePoints : CS_Parent
     {
         Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
-        public List<Point> poly;
-        public List<Point2f> polyPrev;
+        public List<cv.Point> poly;
+        public List<cv.Point2f> polyPrev;
         public float rotateAngle;
         public cv.Point rotateCenter;
         public int polyPrevSideIndex;
@@ -17643,11 +17645,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
                   "Feature polygons with rotation and shift - should be aligned" };
             desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics";
         }
-        public cv.Point shiftPoly(List<Point2f> polyPrev, List<Point> poly)
+        public cv.Point shiftPoly(List<cv.Point2f> polyPrev, List<cv.Point> poly)
         {
             rotatePoly.rotateAngle = rotateAngle;
             rotatePoly.rotateCenter = rotateCenter;
-            rotatePoly.poly = new List<Point2f>();
+            rotatePoly.poly = new List<cv.Point2f>();
             foreach (var pt in poly)
             {
                 rotatePoly.poly.Add(new cv.Point2f(pt.X, pt.Y));
@@ -17666,7 +17668,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             }
             dst2.SetTo(new cv.Scalar(0));
             dst3.SetTo(new cv.Scalar(0));
-            List<Point2f> rotateAndShift = new List<Point2f>();
+            List<cv.Point2f> rotateAndShift = new List<cv.Point2f>();
             centerShift = shiftPoly(polyPrev, poly);
             DrawFPoly(ref dst2, polyPrev, new cv.Scalar(255));
             DrawFPoly(ref dst2, rotatePoly.poly, new cv.Scalar(255, 255, 0));
@@ -17707,10 +17709,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst2 = warp.dst2;
             dst1 = fPoly.dst1;
             cv.Point2f offset = fPoly.fPD.centerShift;
-            Rect r1 = new Rect((int)offset.X, (int)offset.Y, (int)(dst2.Width - Math.Abs(offset.X)), (int)(dst2.Height - Math.Abs(offset.Y)));
+            cv.Rect r1 = new cv.Rect((int)offset.X, (int)offset.Y, (int)(dst2.Width - Math.Abs(offset.X)), (int)(dst2.Height - Math.Abs(offset.Y)));
             if (offset.X < 0) r1.X = 0;
             if (offset.Y < 0) r1.Y = 0;
-            Rect r2 = new Rect((int)Math.Abs(offset.X), (int)Math.Abs(offset.Y), r1.Width, r1.Height);
+            cv.Rect r2 = new cv.Rect((int)Math.Abs(offset.X), (int)Math.Abs(offset.Y), r1.Width, r1.Height);
             if (offset.X > 0) r2.X = 0;
             if (offset.Y > 0) r2.Y = 0;
             dst3[r1] = dst2[r2];
@@ -17765,7 +17767,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             perp2.p2 = fPD.prevPoly[(fPD.polyPrevSideIndex + 1) % task.polyCount];
             perp2.Run(empty);
             DrawLine(dst2, perp2.r1, perp2.r2, Scalar.White, task.lineWidth);
-            fPD.rotateCenter = IntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, new Rect(0, 0, src.Width, src.Height));
+            fPD.rotateCenter = IntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, new cv.Rect(0, 0, src.Width, src.Height));
             if (fPD.rotateCenter == new Point2f())
             {
                 fPD.rotateAngle = 0;
@@ -17854,11 +17856,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     rotate.Run(fpoly.resyncImage);
                     dst0 = rotate.dst2;
                     Point2f offset = fpoly.fPD.centerShift;
-                    Rect r1 = new Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
+                    cv.Rect r1 = new cv.Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
                     r1 = ValidateRect(r1);
                     if (offset.X < 0) r1.X = 0;
                     if (offset.Y < 0) r1.Y = 0;
-                    Rect r2 = new Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
+                    cv.Rect r2 = new cv.Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
                     r2.Width = r1.Width;
                     r2.Height = r1.Height;
                     if (r2.X < 0 || r2.X >= dst2.Width) return; // wedged...
@@ -17964,7 +17966,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
         Line_Nearest near = new Line_Nearest();
         public fPolyData fPD;
-        List<Point2f> newPoly;
+        List<cv.Point2f> newPoly;
         public CS_FeaturePoly_Center(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
@@ -18002,7 +18004,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 fPD.rotateCenter = mp1.p2;
                 newNear = new PointPair(mp1.p1, mp2.p1);
             }
-            var transPoly = new List<Point2f>();
+            var transPoly = new List<cv.Point2f>();
             foreach (var point in fPD.currPoly)
             {
                 transPoly.Add(new Point2f(point.X - fPD.centerShift.X, point.Y - fPD.centerShift.Y));
@@ -18039,9 +18041,9 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 rotatePoly.Run(new Mat());
                 if (near.nearPoint.DistanceTo(rotatePoly.poly[0]) > newNear.p1.DistanceTo(rotatePoly.poly[0])) fPD.rotateAngle *= -1;
                 rotatePoly.rotateAngle = fPD.rotateAngle;
-                rotatePoly.poly = new List<Point2f>(transPoly);
+                rotatePoly.poly = new List<cv.Point2f>(transPoly);
                 rotatePoly.Run(new Mat());
-                newPoly = new List<Point2f>(rotatePoly.poly);
+                newPoly = new List<cv.Point2f>(rotatePoly.poly);
             }
             dst3.SetTo(0);
             fPD.DrawPolys(dst3, fPD.currPoly, this);
@@ -18092,10 +18094,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 rotate.Run(fpoly.sides.prevImage);
                 dst0 = rotate.dst2;
                 Point2f offset = fpoly.sides.centerShift;
-                Rect r1 = new Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
+                cv.Rect r1 = new cv.Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
                 if (offset.X < 0) r1.X = 0;
                 if (offset.Y < 0) r1.Y = 0;
-                Rect r2 = new Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
+                cv.Rect r2 = new cv.Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
                 if (offset.X > 0) r2.X = 0;
                 if (offset.Y > 0) r2.Y = 0;
                 Mat mask2 = new Mat(dst2.Size(), MatType.CV_8U, 255);
@@ -18154,8 +18156,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public Stable_GoodFeatures stable = new Stable_GoodFeatures();
         public Point2f anchor;
         public Point2f startAnchor;
-        public List<Point2f> goodPoints = new List<Point2f>();
-        public List<List<Point>> goodFacets = new List<List<Point>>();
+        public List<cv.Point2f> goodPoints = new List<cv.Point2f>();
+        public List<List<cv.Point>> goodFacets = new List<List<cv.Point>>();
         Options_FPoly options = new Options_FPoly();
         Options_FPolyCore optionsCore = new Options_FPolyCore();
         public CS_FeaturePoly_Core(VBtask task) : base(task)
@@ -18184,7 +18186,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             cv.Vec3b white = new cv.Vec3b(255, 255, 255);
             for (int i = 0; i < stable.basics.facetGen.facet.facetList.Count; i++)
             {
-                List<Point> facet = stable.basics.facetGen.facet.facetList[i];
+                List<cv.Point> facet = stable.basics.facetGen.facet.facetList[i];
                 Point2f pt = stable.basics.ptList[i];
                 double d = anchor.DistanceTo(pt);
                 dst0.FillConvexPoly(facet, d, task.lineType);
@@ -18212,7 +18214,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_FeatureROI_Basics : CS_Parent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
-        public List<Rect> rects = new List<Rect>();
+        public List<cv.Rect> rects = new List<cv.Rect>();
         public List<float> meanList = new List<float>();
         public List<float> stdevList = new List<float>();
         public float stdevAverage;
@@ -18320,9 +18322,9 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_FeatureROI_Sorted : CS_Parent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
-        public SortedList<float, Rect> sortedStd = new SortedList<float, Rect>(new compareAllowIdenticalSingle());
+        public SortedList<float, cv.Rect> sortedStd = new SortedList<float, cv.Rect>(new compareAllowIdenticalSingle());
         public List<Vec3b> bgrList = new List<Vec3b>();
-        public List<Rect> roiList = new List<Rect>();
+        public List<cv.Rect> roiList = new List<cv.Rect>();
         public int[] categories;
         public Options_StdevGrid options = new Options_StdevGrid();
         public int maskVal = 255;
@@ -18390,7 +18392,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 float nextStdev = sortedStd.ElementAt(i).Key;
                 if (nextStdev < avg)
                 {
-                    Rect roi = sortedStd.ElementAt(i).Value;
+                    cv.Rect roi = sortedStd.ElementAt(i).Value;
                     dst2[roi].SetTo(maskVal);
                     count++;
                 }
@@ -18418,7 +18420,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             devGrid.Run(src);
             for (int i = 0; i < devGrid.bgrList.Count; i++)
             {
-                Rect roi = devGrid.roiList[i];
+                cv.Rect roi = devGrid.roiList[i];
                 Vec3b color = devGrid.bgrList[i];
                 dst2[roi].SetTo(color);
             }
@@ -18462,7 +18464,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             int motionCount = 0;
             for (int i = 0; i < gather.stdevList.Count; i++)
             {
-                Rect roi = task.gridList[i];
+                cv.Rect roi = task.gridList[i];
                 if (gather.stdevList[i] >= gather.stdevAverage)
                 {
                     Cv2.MatchTemplate(dst1[roi], lastImage[roi], correlationMat, TemplateMatchModes.CCoeffNormed);
@@ -18481,7 +18483,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_FeatureROI_LowStdev : CS_Parent
     {
-        public List<Rect> rects = new List<Rect>();
+        public List<cv.Rect> rects = new List<cv.Rect>();
         public FeatureROI_Basics gather = new FeatureROI_Basics();
         public CS_FeatureROI_LowStdev(VBtask task) : base(task)
         {
@@ -18495,7 +18497,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             rects.Clear();
             for (int i = 0; i < gather.stdevList.Count; i++)
             {
-                Rect roi = task.gridList[i];
+                cv.Rect roi = task.gridList[i];
                 if (gather.stdevList[i] < gather.stdevAverage)
                 {
                     rects.Add(roi);
@@ -18513,7 +18515,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public List<float> saveStdev = new List<float>();
         Mat lastImage;
         List<float> saveCorrs;
-        List<Rect> saveRects;
+        List<cv.Rect> saveRects;
         public CS_FeatureROI_LowStdevCorrelation(VBtask task) : base(task)
         {
             FindSlider("Feature Correlation Threshold").Value = 50;
@@ -18528,7 +18530,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (task.FirstPass) lastImage = dst1.Clone();
             Mat correlationMat = new Mat();
             correlations.Clear();
-            foreach (Rect roi in gather.rects)
+            foreach (cv.Rect roi in gather.rects)
             {
                 Cv2.MatchTemplate(dst1[roi], lastImage[roi], correlationMat, TemplateMatchModes.CCoeffNormed);
                 float corr = correlationMat.Get<float>(0, 0);
@@ -18537,7 +18539,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (task.heartBeat)
             {
                 saveCorrs = new List<float>(correlations);
-                saveRects = new List<Rect>(gather.rects);
+                saveRects = new List<cv.Rect>(gather.rects);
                 saveStdev.Clear();
                 Scalar mean, stdev;
                 for (int i = 0; i < saveRects.Count; i++)
@@ -18587,7 +18589,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[2] = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image.";
             desc = "Capture the above average standard deviation roi's for the left and right images.";
         }
-        public void setClickPoint(Point pt, int _pictag)
+        public void setClickPoint(cv.Point pt, int _pictag)
         {
             ClickPoint = pt;
             picTag = _pictag;
@@ -18610,14 +18612,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (ClickPoint == new cv.Point()) setClickPoint(gather.rects[gather.rects.Count / 2].TopLeft, 2);
 
             int gridIndex = task.gridMap.Get<int>(ClickPoint.Y, ClickPoint.X);
-            Rect roi = task.gridList[gridIndex];
+            cv.Rect roi = task.gridList[gridIndex];
             dst2.Rectangle(roi, Scalar.White, task.lineWidth);
 
             Mat correlationMat = new Mat();
             List<float> corr = new List<float>();
             for (int j = 0; j < roi.X; j++)
             {
-                Rect r = new Rect(j, roi.Y, roi.Width, roi.Height);
+                cv.Rect r = new cv.Rect(j, roi.Y, roi.Width, roi.Height);
                 Cv2.MatchTemplate(src[roi], task.rightView[r], correlationMat, TemplateMatchModes.CCoeffNormed);
                 corr.Add(correlationMat.Get<float>(0, 0));
             }
@@ -18635,7 +18637,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 else
                 {
                     int index = corr.IndexOf(maxCorr);
-                    Rect rectRight = new Rect(index, roi.Y, roi.Width, roi.Height);
+                    cv.Rect rectRight = new cv.Rect(index, roi.Y, roi.Width, roi.Height);
                     int offset = roi.TopLeft.X - rectRight.TopLeft.X;
                     if (task.heartBeat)
                     {
@@ -18663,7 +18665,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public FeatureROI_Basics gather = new FeatureROI_Basics();
         public Options_Features options = new Options_Features();
-        public SortedList<float, Rect> sortedRects = new SortedList<float, Rect>(new compareAllowIdenticalSingleInverted());
+        public SortedList<float, cv.Rect> sortedRects = new SortedList<float, cv.Rect>(new compareAllowIdenticalSingleInverted());
         public CS_FeatureROI_LRAll(VBtask task) : base(task)
         {
             task.gOptions.setGridSize(16);
@@ -18682,16 +18684,16 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (gather.rects.Count == 0) return;
             Mat correlationMat = new Mat();
             sortedRects.Clear();
-            foreach (Rect roi in gather.rects)
+            foreach (cv.Rect roi in gather.rects)
             {
                 if (roi.X == 0) continue;
-                Rect r = new Rect(0, roi.Y, roi.X, roi.Height);
+                cv.Rect r = new cv.Rect(0, roi.Y, roi.X, roi.Height);
                 Cv2.MatchTemplate(src[roi], task.rightView[r], correlationMat, TemplateMatchModes.CCoeffNormed);
                 mmData mm = GetMinMax(correlationMat);
-                if (mm.maxVal >= options.correlationMin) sortedRects.Add((float)mm.maxVal, new Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height));
+                if (mm.maxVal >= options.correlationMin) sortedRects.Add((float)mm.maxVal, new cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height));
             }
             labels[2] = sortedRects.Count + " roi's had left/right correlation higher than " + options.correlationMin.ToString("F3");
-            foreach (Rect roi in sortedRects.Values)
+            foreach (cv.Rect roi in sortedRects.Values)
             {
                 dst3.Rectangle(roi, task.HighlightColor, task.lineWidth);
             }
@@ -18905,7 +18907,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_FitEllipse_Basics : CS_Parent
     {
         Options_MinArea options = new Options_MinArea();
-        public List<Point2f> inputPoints = new List<Point2f>();
+        public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
         public RotatedRect box;
         public Point2f[] vertices;
         public CS_FitEllipse_Basics(VBtask task) : base(task)
@@ -18943,7 +18945,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_FitEllipse_AMS_CPP : CS_Parent
     {
         Options_MinArea options = new Options_MinArea();
-        public List<Point2f> inputPoints = new List<Point2f>();
+        public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
         public CS_FitEllipse_AMS_CPP(VBtask task) : base(task)
         {
             labels[2] = "CS_FitEllipse_AMS_CPP C++ ";
@@ -19043,7 +19045,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         Options_FitLine options = new Options_FitLine();
         public Draw_Lines draw = new Draw_Lines();
-        public List<Point> lines = new List<Point>(); // there are always an even number - 2 points define the line.
+        public List<cv.Point> lines = new List<cv.Point>(); // there are always an even number - 2 points define the line.
         public CS_FitLine_Basics(VBtask task) : base(task)
         {
             FindSlider("DrawCount").Value = 2;
@@ -19064,11 +19066,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 lines.Clear();
             }
-            Point[][] contours = Cv2.FindContoursAsArray(dst3, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+            cv.Point[][] contours = Cv2.FindContoursAsArray(dst3, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
             for (int i = 0; i < contours.Length; i++)
             {
-                Point[] tour = contours[i];
-                Line2D line2d = Cv2.FitLine(tour, DistanceTypes.L2, 0, options.radiusAccuracy, options.angleAccuracy);
+                cv.Point[] tour = contours[i];
+                Line2D line2d = Cv2.FitLine(tour.ToArray(), DistanceTypes.L2, 0, options.radiusAccuracy, options.angleAccuracy);
                 double slope = line2d.Vy / line2d.Vx;
                 int leftY = (int)Math.Round(-line2d.X1 * slope + line2d.Y1);
                 int rightY = (int)Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1);
@@ -19115,7 +19117,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 Mat depth = task.pcSplit[2][roi];
                 Mat fMask = mask[roi];
-                List<Point3f> points = new List<Point3f>();
+                List<cv.Point3f> points = new List<cv.Point3f>();
                 int rows = src.Rows, cols = src.Cols;
                 for (int y = 0; y < roi.Height; y++)
                 {
@@ -19238,7 +19240,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 float[] distances;
                 for (int i = 0; i < options.queryCount; i++)
                 {
-                    var pt1 = queries.Get<Point2f>(i);
+                    var pt1 = queries.Get<cv.Point2f>(i);
                     var query = new Mat(1, 2, MatType.CV_32F);
                     query.Set<float>(0, 0, pt1.X);
                     query.Set<float>(0, 1, pt1.Y);
@@ -19444,7 +19446,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         Flood_Basics flood = new Flood_Basics();
         List<rcData> redCells = new List<rcData>();
         Mat cellMap = new Mat();
-        List<Point2f> maxDists = new List<Point2f>();
+        List<cv.Point2f> maxDists = new List<cv.Point2f>();
         List<int> maxIndex = new List<int>();
         public CS_Flood_Motion(VBtask task) : base(task)
         {
@@ -19492,7 +19494,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         Flood_Basics flood = new Flood_Basics();
         Motion_Basics motion = new Motion_Basics();
         List<rcData> redCells = new List<rcData>();
-        List<Point2f> maxDists = new List<Point2f>();
+        List<cv.Point2f> maxDists = new List<cv.Point2f>();
         List<int> maxIndex = new List<int>();
         public CS_Flood_Motion1(VBtask task) : base(task)
         {
@@ -19960,7 +19962,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Fractal_MandelbrotZoom : CS_Parent
     {
         public Fractal_Mandelbrot mandel = new Fractal_Mandelbrot();
-        Rect saveDrawRect = new Rect(1, 1, 1, 1);
+        cv.Rect saveDrawRect = new cv.Rect(1, 1, 1, 1);
         public CS_Fractal_MandelbrotZoom(VBtask task) : base(task)
         {
             desc = "Run the classic Mandalbrot algorithm and allow zooming in";
@@ -20111,13 +20113,13 @@ public class CS_ApproxPoly_Basics : CS_Parent
             redC.Run(src);
             dst2 = redC.dst2;
             dst3.SetTo(0);
-            cv.Rect rect = new Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height);
+            cv.Rect rect = new cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height);
             if (task.optionsChanged || task.mouseClickFlag)
             {
-                rect = new Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height);
+                rect = new cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height);
             }
             if (task.rc.rect.Width == 0 || task.rc.rect.Height == 0) return;
-            task.rc.mask.CopyTo(dst3[new Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)]);
+            task.rc.mask.CopyTo(dst3[new cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)]);
             if (rect.Width < rect.Height) rect.Width = rect.Height; else rect.Height = rect.Width;
             dst3.Rectangle(rect, Scalar.White, task.lineWidth, task.lineType);
         }
@@ -20244,7 +20246,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Options_Contours options = new Options_Contours();
-        public Point[][] contours;
+        public cv.Point[][] contours;
         public SortedList<int, Vec2i> sortContours = new SortedList<int, Vec2i>(new compareAllowIdenticalIntegerInverted());
         public CS_Fuzzy_Basics(VBtask task) : base(task)
         {
@@ -20317,7 +20319,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         Mat kernel;
         Reduction_Basics reduction = new Reduction_Basics();
-        public Point[][] contours;
+        public cv.Point[][] contours;
         public SortedList<int, Vec2i> sortContours = new SortedList<int, Vec2i>(new compareAllowIdenticalIntegerInverted());
         Options_Contours options = new Options_Contours();
         public CS_Fuzzy_Filter(VBtask task) : base(task)
@@ -20419,7 +20421,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                                 if (val != 0) maskID = val;
                                 if (maskID != 0 && val != 0 && maskID != val)
                                 {
-                                    MessageBox.Show("Proof has failed!  There is more than one mask ID identified by this contour point.");
+                                    System.Windows.Forms.MessageBox.Show("Proof has failed!  There is more than one mask ID identified by this contour point.");
                                     proofFailed = true;
                                     return;
                                 }
@@ -20434,11 +20436,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Fuzzy_TrackerDepth : CS_Parent
     {
         public Fuzzy_Basics fuzzy = new Fuzzy_Basics();
-        public List<Point> centroids = new List<Point>();
-        public List<Rect> rects = new List<Rect>();
+        public List<cv.Point> centroids = new List<cv.Point>();
+        public List<cv.Rect> rects = new List<cv.Rect>();
         public List<int> layoutColor = new List<int>();
         public cv.Point highlightPoint;
-        public Rect highlightRect;
+        public cv.Rect highlightRect;
         public int highlightRegion = -1;
         Options_TrackerDepth options = new Options_TrackerDepth();
         public CS_Fuzzy_TrackerDepth(VBtask task) : base(task)
@@ -20462,10 +20464,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 points = new Mat(contours.Length, 2, MatType.CV_32S, contours);
                 points.Col(0).MinMaxIdx(out minX, out maxX);
                 points.Col(1).MinMaxIdx(out minY, out maxY);
-                var rect = new Rect((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
+                var rect = new cv.Rect((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
                 if (rect.Width * rect.Height > options.minRectSize)
                 {
-                    var centroid = new Point((int)(center[0] / contours.Length), (int)(center[1] / contours.Length));
+                    var centroid = new cv.Point((int)(center[0] / contours.Length), (int)(center[1] / contours.Length));
                     centroids.Add(centroid);
                     rects.Add(rect);
                     layoutColor.Add(vec[1]);
@@ -20484,7 +20486,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public Fuzzy_TrackerDepth tracker = new Fuzzy_TrackerDepth();
         public cv.Point highlightPoint;
-        public Rect highlightRect;
+        public cv.Rect highlightRect;
         public int highlightRegion = -1;
         public Mat regionMask;
         public CS_Fuzzy_TrackerDepthClick(VBtask task) : base(task)
@@ -20542,13 +20544,13 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst0 = new Mat(dst0.Size(), MatType.CV_8U, (double)GrabCutClasses.PR_BGD);
             dst0.SetTo((double)GrabCutClasses.FGD, fore.fg);
             dst0.SetTo((double)GrabCutClasses.BGD, fore.bg);
-            // Cv2.GrabCut(src, dst0, new Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
+            // Cv2.GrabCut(src, dst0, new cv.Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
             fore.bg = ~fore.fg;
             if (Cv2.CountNonZero(fore.fg) > 0)
             {
                 if (fgFineTune != null) dst0.SetTo((double)GrabCutClasses.FGD, fgFineTune);
                 if (bgFineTune != null) dst0.SetTo((double)GrabCutClasses.BGD, bgFineTune);
-                Cv2.GrabCut(src, dst0, new Rect(), bgModel, fgModel, 1, GrabCutModes.Eval);
+                Cv2.GrabCut(src, dst0, new cv.Rect(), bgModel, fgModel, 1, GrabCutModes.Eval);
             }
             dst3.SetTo(0);
             src.CopyTo(dst3, dst0);
@@ -20561,10 +20563,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
         Mat image;
         Mat bgModel = new Mat();
         Mat fgModel = new Mat();
-        Rect bgRect1 = new Rect(482, 0, 128, 640);
-        Rect bgRect2 = new Rect(0, 0, 162, 320);
-        Rect fgRect1 = new Rect(196, 134, 212, 344);
-        Rect fgRect2 = new Rect(133, 420, 284, 60);
+        cv.Rect bgRect1 = new cv.Rect(482, 0, 128, 640);
+        cv.Rect bgRect2 = new cv.Rect(0, 0, 162, 320);
+        cv.Rect fgRect1 = new cv.Rect(196, 134, 212, 344);
+        cv.Rect fgRect2 = new cv.Rect(133, 420, 284, 60);
         public CS_GrabCut_ImageRect(VBtask task) : base(task)
         {
             var fileInputName = new FileInfo(task.HomeDir + "data/cat.jpg");
@@ -20586,7 +20588,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 Cv2.GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, GrabCutModes.InitWithRect);
                 Cv2.GrabCut(dst2, dst0, fgRect2, bgModel, fgModel, 1, GrabCutModes.InitWithRect);
             }
-            var rect = new Rect();
+            var rect = new cv.Rect();
             Cv2.GrabCut(dst2, dst0, rect, bgModel, fgModel, 1, GrabCutModes.Eval);
             dst3.SetTo(0);
             dst2.CopyTo(dst3, dst0 + 1);
@@ -20610,11 +20612,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, ThresholdTypes.Binary);
                 dst1 = new Mat(dst2.Size(), MatType.CV_8U, (double)GrabCutClasses.PR_BGD);
                 dst1.SetTo((double)GrabCutClasses.FGD, dst0);
-                Cv2.GrabCut(dst2, dst1, new Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
+                Cv2.GrabCut(dst2, dst1, new cv.Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
             }
             else
             {
-                Cv2.GrabCut(dst2, dst1, new Rect(), bgModel, fgModel, 5, GrabCutModes.Eval);
+                Cv2.GrabCut(dst2, dst1, new cv.Rect(), bgModel, fgModel, 5, GrabCutModes.Eval);
             }
             dst3.SetTo(0);
             dst2.CopyTo(dst3, dst1 + 1);
@@ -20760,7 +20762,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Gravity_Basics : CS_Parent
     {
-        public List<Point> points = new List<Point>();
+        public List<cv.Point> points = new List<cv.Point>();
         int resizeRatio = 1;
         public PointPair vec = new PointPair();
         public bool autoDisplay;
@@ -20994,7 +20996,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Grid_Basics : CS_Parent
     {
-        public List<Rect> gridList = new List<Rect>();
+        public List<cv.Rect> gridList = new List<cv.Rect>();
         public bool updateTaskGridList = true;
         public CS_Grid_Basics(VBtask task) : base(task)
         {
@@ -21020,7 +21022,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     for (int x = 0; x < src.Width; x += task.gridSize)
                     {
-                        var roi = ValidateRect(new Rect(x, y, task.gridSize, task.gridSize));
+                        var roi = ValidateRect(new cv.Rect(x, y, task.gridSize, task.gridSize));
                         if (roi.Width > 0 && roi.Height > 0)
                         {
                             if (x == 0) task.gridRows += 1;
@@ -21174,13 +21176,13 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     str += thread.Id + " state = " + thread.ThreadState + ", ";
                     threadCount++;
                     if (threadCount % 5 == 0) str += "\n";
-                    if (thread.ThreadState != ThreadState.Wait) notIdle++;
+                    if (thread.ThreadState != System.Diagnostics.ThreadState.Wait) notIdle++;
                 }
                 SetTrueText("There were " + threadCount + " threads in OpenCVB with " + notIdle + " of them not idle when traversing the gridList" + "\n" + str);
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                System.Windows.Forms.MessageBox.Show(e.Message);
             }
         }
     }
@@ -21207,7 +21209,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     for (int x = 0; x < dst2.Width; x += options.width)
                     {
-                        var roi = new Rect(x, y, options.width, options.height);
+                        var roi = new cv.Rect(x, y, options.width, options.height);
                         if (x + roi.Width >= dst2.Width) roi.Width = dst2.Width - x;
                         if (y + roi.Height >= dst2.Height) roi.Height = dst2.Height - y;
                         if (roi.Width > 0 && roi.Height > 0)
@@ -21322,7 +21324,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public int gridWidth = 10;
         public int gridHeight = 10;
-        public List<Rect> gridList = new List<Rect>();
+        public List<cv.Rect> gridList = new List<cv.Rect>();
         public int gridRows;
         public int gridCols;
         public Mat gridMask;
@@ -21346,7 +21348,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     for (int x = 0; x < dst2.Width; x += gridWidth)
                     {
-                        var roi = new Rect(x, y, gridWidth, gridHeight);
+                        var roi = new cv.Rect(x, y, gridWidth, gridHeight);
                         if (x + roi.Width >= dst2.Width) roi.Width = dst2.Width - x;
                         if (y + roi.Height >= dst2.Height) roi.Height = dst2.Height - y;
                         if (roi.Width > 0 && roi.Height > 0)
@@ -21420,7 +21422,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Grid_QuarterRes : CS_Parent
     {
-        public List<Rect> gridList = new List<Rect>();
+        public List<cv.Rect> gridList = new List<cv.Rect>();
         Grid_Basics grid = new Grid_Basics();
         Mat inputSrc;
         public CS_Grid_QuarterRes(VBtask task) : base(task)
@@ -21493,7 +21495,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             }
             int templatePad = match.options.templatePad;
             int templateSize = match.options.templateSize;
-            match.searchRect = ValidateRect(new Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize));
+            match.searchRect = ValidateRect(new cv.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize));
             match.Run(src);
             center = match.matchCenter;
             if (standaloneTest())
@@ -21531,14 +21533,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
             sideMap = new Mat(dst2.Size(), MatType.CV_8U, 0);
             desc = "Correlate the hot points with the previous generation using a Map";
         }
-        void runMap(List<Rect> rectList, int dstindex, Mat map)
+        void runMap(List<cv.Rect> rectList, int dstindex, Mat map)
         {
-            var sortRects = new SortedList<int, Rect>(new compareAllowIdenticalIntegerInverted());
-            foreach (var r in rectList)
+            var sortRects = new SortedList<int, cv.Rect>(new compareAllowIdenticalIntegerInverted());
+            foreach (cv.Rect r in rectList)
             {
                 sortRects.Add(r.Width * r.Height, r);
             }
-            var ptList = new List<Point>();
+            var ptList = new List<cv.Point>();
             var indices = new List<int>();
             foreach (var r in sortRects.Values)
             {
@@ -21580,14 +21582,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             desc = "Correlate the hot points with the previous generation to ID each object";
         }
-        void runKNN(KNN_Core knn, List<Rect> rectList, Mat dst, int dstindex)
+        void runKNN(KNN_Core knn, List<cv.Rect> rectList, Mat dst, int dstindex)
         {
             knn.queries.Clear();
             foreach (var r in rectList)
             {
                 knn.queries.Add(new Point2f((float)(r.X + r.Width / 2), (float)(r.Y + r.Height / 2)));
             }
-            if (task.FirstPass) knn.trainInput = new List<Point2f>(knn.queries);
+            if (task.FirstPass) knn.trainInput = new List<cv.Point2f>(knn.queries);
             knn.Run(empty);
             for (int i = 0; i < knn.queries.Count; i++)
             {
@@ -21603,7 +21605,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     SetTrueText(index.ToString(), pt, dstindex);
                 }
             }
-            knn.trainInput = new List<Point2f>(knn.queries);
+            knn.trainInput = new List<cv.Point2f>(knn.queries);
         }
         public void RunCS(Mat src)
         {
@@ -21620,38 +21622,38 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public Projection_HistTop histTop = new Projection_HistTop();
         public Projection_HistSide histSide = new Projection_HistSide();
-        public List<Rect> topRects = new List<Rect>();
-        public List<Rect> sideRects = new List<Rect>();
-        Rect floodRect;
+        public List<cv.Rect> topRects = new List<cv.Rect>();
+        public List<cv.Rect> sideRects = new List<cv.Rect>();
+        cv.Rect floodRect;
         Mat mask;
         public CS_GuidedBP_HotPoints(VBtask task) : base(task)
         {
-            floodRect = new Rect(1, 1, dst2.Width - 2, dst2.Height - 2);
+            floodRect = new cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2);
             mask = new Mat(new cv.Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U);
             task.useXYRange = false;
             desc = "Use floodfill to identify all the objects in both the top and side views.";
         }
-        List<Rect> hotPoints(ref Mat view)
+        List<cv.Rect> hotPoints(ref Mat view)
         {
-            Rect rect = new Rect();
+            cv.Rect rect = new cv.Rect();
             var points = view.FindNonZero();
-            var viewList = new SortedList<int, Point>(new compareAllowIdenticalIntegerInverted());
+            var viewList = new SortedList<int, cv.Point>(new compareAllowIdenticalIntegerInverted());
             mask.SetTo(0);
             for (int i = 0; i < points.Rows; i++)
             {
-                var pt = points.At<Point>(i, 0);
+                var pt = points.At<cv.Point>(i, 0);
                 int maskOnly = (int)FloodFillFlags.MaskOnly;
                 int count = view.FloodFill(mask, pt, 0, out rect, 0, 0, (cv.FloodFillFlags)(4 | maskOnly | (255 << 8)));
                 if (count > 0) viewList.Add(count, pt);
             }
             mask.SetTo(0);
-            var rectList = new List<Rect>();
+            var rectList = new List<cv.Rect>();
             for (int i = 0; i < Math.Min(viewList.Count, 10); i++)
             {
                 var pt = viewList.ElementAt(i).Value;
                 int fixedRange = (int)FloodFillFlags.FixedRange;
                 view.FloodFill(mask, pt, 0, out rect, 0, 0, (cv.FloodFillFlags)(4 | fixedRange | ((i + 1) << 8)));
-                rectList.Add(new Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height));
+                rectList.Add(new cv.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height));
             }
             mask[floodRect].CopyTo(view);
             return rectList;
@@ -21719,8 +21721,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public GuidedBP_Basics hotPoints = new GuidedBP_Basics();
         public int classCount;
         public cv.Point selectedPoint;
-        public List<Rect> topRects = new List<Rect>();
-        public List<Rect> sideRects = new List<Rect>();
+        public List<cv.Rect> topRects = new List<cv.Rect>();
+        public List<cv.Rect> sideRects = new List<cv.Rect>();
         public Mat histogramTop = new Mat();
         public Mat histogramSide = new Mat();
         public Mat backP = new Mat();
@@ -21733,8 +21735,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
             hotPoints.Run(src);
             hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, MatType.CV_32F);
             Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, histogramTop, backP, task.rangesTop);
-            topRects = new List<Rect>(hotPoints.ptHot.topRects);
-            sideRects = new List<Rect>(hotPoints.ptHot.sideRects);
+            topRects = new List<cv.Rect>(hotPoints.ptHot.topRects);
+            sideRects = new List<cv.Rect>(hotPoints.ptHot.sideRects);
             dst2 = ShowPalette(backP * 255 / topRects.Count);
             hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, MatType.CV_32F);
             Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsSide, histogramSide, dst3, task.rangesSide);
@@ -22106,8 +22108,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 histNormalized[i] = hist.Normalize(0, hist.Rows, NormTypes.MinMax);
                 if (standaloneTest() || plotRequested)
                 {
-                    List<Point> points = new List<Point>();
-                    List<List<Point>> listOfPoints = new List<List<Point>>();
+                    List<cv.Point> points = new List<cv.Point>();
+                    List<List<cv.Point>> listOfPoints = new List<List<cv.Point>>();
                     for (int j = 0; j < task.histogramBins; j++)
                     {
                         points.Add(new cv.Point((int)(j * plotWidth), dst2.Rows - dst2.Rows * histRaw[i].Get<float>(j, 0) / mm.maxVal));
@@ -22268,7 +22270,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             src.CopyTo(tmp, mask);
             dst2 = tmp.Threshold(0, 255, ThresholdTypes.Binary);
             labels[2] = "BackProjection of most frequent gray pixel";
-            Cv2.Rectangle(dst3, new Rect(brickWidth * histindex, 0, brickWidth, dst2.Height), Scalar.Yellow, 1);
+            Cv2.Rectangle(dst3, new cv.Rect(brickWidth * histindex, 0, brickWidth, dst2.Height), Scalar.Yellow, 1);
         }
     }
     public class CS_Hist_PeakFinder : CS_Parent
@@ -22357,7 +22359,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 int index = sortedPeaks.ElementAt(i).Value;
                 histogramPeaks.Add(index);
                 int h = (int)(hCount[index] * dst2.Height / mm.maxVal);
-                Cv2.Rectangle(dst2, new Rect(index * brickWidth, dst2.Height - h, brickWidth, h), Scalar.Yellow, task.lineWidth);
+                Cv2.Rectangle(dst2, new cv.Rect(index * brickWidth, dst2.Height - h, brickWidth, h), Scalar.Yellow, task.lineWidth);
             }
             if (allPCounts.Count > 100)
             {
@@ -22831,7 +22833,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst0.Col(0).SetTo(0); // too many zero depth points...
             dst0 = GetNormalize32f(dst0);
             dst0.ConvertTo(dst0, MatType.CV_8UC1);
-            Rect r = new Rect(0, 0, dst2.Height, dst2.Height);
+            cv.Rect r = new cv.Rect(0, 0, dst2.Height, dst2.Height);
             dst2[r] = dst0.Resize(new cv.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
             dst3 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
         }
@@ -22853,7 +22855,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst0.Row(0).SetTo(0); // too many zero depth points...
             dst0 = GetNormalize32f(dst0);
             dst0.ConvertTo(dst0, MatType.CV_8UC1);
-            Rect r = new Rect(0, 0, dst2.Height, dst2.Height);
+            cv.Rect r = new cv.Rect(0, 0, dst2.Height, dst2.Height);
             dst2[r] = dst0.Resize(new cv.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
             dst3 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
         }
@@ -23108,10 +23110,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             rangesY = new Rangef[] { new Rangef(-task.yRange, task.yRange), new Rangef(0, task.MaxZmeters) };
             int[] sizesX = new int[] { options.xBins, options.zBins };
             Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 2 }, new Mat(), dst2, 2, sizesX, rangesX);
-            dst2.Set<Point3f>(dst2.Height / 2, 0, new Point3f());
+            dst2.Set<cv.Point3f>(dst2.Height / 2, 0, new Point3f());
             int[] sizesY = new int[] { options.yBins, options.zBins };
             Cv2.CalcHist(new Mat[] { src }, new int[] { 1, 2 }, new Mat(), dst3, 2, sizesY, rangesY);
-            dst3.Set<Point3f>(dst3.Height / 2, 0, new Point3f());
+            dst3.Set<cv.Point3f>(dst3.Height / 2, 0, new Point3f());
         }
     }
     public class CS_Hist_Kalman : CS_Parent
@@ -23865,7 +23867,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Hist3Dcolor_UniqueRGBPixels : CS_Parent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
-        public List<Point3f> pixels = new List<Point3f>();
+        public List<cv.Point3f> pixels = new List<cv.Point3f>();
         public List<int> counts = new List<int>();
         public CS_Hist3Dcolor_UniqueRGBPixels(VBtask task) : base(task)
         {
@@ -23898,7 +23900,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Hist3Dcolor_TopXColors : CS_Parent
     {
         Hist3Dcolor_UniqueRGBPixels unique = new Hist3Dcolor_UniqueRGBPixels();
-        public List<Point3i> topXPixels = new List<Point3i>();
+        public List<cv.Point3i> topXPixels = new List<cv.Point3i>();
         public int mapTopX = 16;
         public CS_Hist3Dcolor_TopXColors(VBtask task) : base(task)
         {
@@ -24279,7 +24281,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (task.heartBeat)
             {
                 auto.Run(histogram);
-                delaunay.inputPoints = new List<Point2f>(auto.clusterPoints);
+                delaunay.inputPoints = new List<cv.Point2f>(auto.clusterPoints);
                 delaunay.Run(src);
                 dst1 = auto.dst2;
                 dst3 = delaunay.dst2;
@@ -24883,7 +24885,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                         color = task.scalarColors[colorIndex % 256];
                     }
                 }
-                Cv2.Rectangle(dst2, new Rect(i * (int)barWidth, dst2.Height - h, (int)barWidth, h), color, -1);
+                Cv2.Rectangle(dst2, new cv.Rect(i * (int)barWidth, dst2.Height - h, (int)barWidth, h), color, -1);
                 depthRegions.Add(colorIndex);
             }
             cv.Point2f lastPoint = trends.resultingPoints[0];
@@ -25098,13 +25100,13 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (Image == null) Image = Cv2.ImRead(task.HomeDir + "Data/Asahiyama.jpg", ImreadModes.Color);
             dst3 = Image.Resize(dst3.Size());
         }
-        void drawFoundRectangles(cv.Mat dst2, Rect[] found)
+        void drawFoundRectangles(cv.Mat dst2, cv.Rect[] found)
         {
-            foreach (Rect rect in found)
+            foreach (cv.Rect rect in found)
             {
                 // the HOG detector returns slightly larger rectangles than the real objects.
                 // so we slightly shrink the rectangles to get a nicer output.
-                Rect r = new Rect
+                cv.Rect r = new cv.Rect
                 {
                     X = rect.X + (int)Math.Truncate(Math.Round(rect.Width * 0.1)),
                     Y = rect.Y + (int)Math.Truncate(Math.Round(rect.Height * 0.1)),
@@ -25125,7 +25127,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             // (and more false alarms, respectively), decrease the hitThreshold and
             // groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
             if (src.Height == 94) src = src.Resize(new cv.Size(src.Width * 2, src.Height * 2));
-            Rect[] found = hog.DetectMultiScale(src, options.thresholdHOG, new cv.Size(options.strideHOG, options.strideHOG), new cv.Size(24, 16), options.scaleHOG, 2);
+            cv.Rect[] found = hog.DetectMultiScale(src, options.thresholdHOG, new cv.Size(options.strideHOG, options.strideHOG), new cv.Size(24, 16), options.scaleHOG, 2);
             labels[2] = string.Format("{0} region(s) found", found.Length);
             if (dst2.Height == 94) dst2 = src.Resize(dst2.Size()); else src.CopyTo(dst2);
             drawFoundRectangles(dst2, found);
@@ -25148,8 +25150,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Homography_Basics : CS_Parent
     {
-        public List<Point2d> corners1 = new List<Point2d>();
-        public List<Point2d> corners2 = new List<Point2d>();
+        public List<cv.Point2d> corners1 = new List<cv.Point2d>();
+        public List<cv.Point2d> corners2 = new List<cv.Point2d>();
         Random_Point2d random = new Random_Point2d();
         Options_Homography options = new Options_Homography();
         public CS_Homography_Basics(VBtask task) : base(task)
@@ -25162,9 +25164,9 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (standaloneTest() && task.heartBeat && (cv.HomographyMethods) options.hMethod == HomographyMethods.None)
             {
                 random.Run(empty);
-                corners1 = new List<Point2d>(random.PointList);
+                corners1 = new List<cv.Point2d>(random.PointList);
                 random.Run(empty);
-                corners2 = new List<Point2d>(random.PointList);
+                corners2 = new List<cv.Point2d>(random.PointList);
             }
             // cannot find a homography when less than 4...
             if (corners1.Count() >= 4 || corners2.Count() >= 4)
@@ -25205,7 +25207,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Horizon_Basics : CS_Parent
     {
-        public List<Point> points = new List<Point>();
+        public List<cv.Point> points = new List<cv.Point>();
         int resizeRatio = 1;
         public PointPair vec;
         public bool vecPresent;
@@ -25222,7 +25224,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 if (p1.Y >= 1 && p1.Y <= dst2.Height - 1) strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n";
             }
             dst2.SetTo(new cv.Scalar(0));
-            foreach (Point pt in points)
+            foreach (cv.Point pt in points)
             {
                 cv.Point pX = new cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio);
                 DrawCircle(dst2, pX, task.DotSize, new cv.Scalar(255), -1);
@@ -25232,7 +25234,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             if (src.Type() != MatType.CV_32F) dst0 = PrepareDepthInput(1); else dst0 = src;
-            Size resolution = task.quarterRes;
+            cv.Size resolution = task.quarterRes;
             if (dst0.Size() != resolution)
             {
                 dst0 = dst0.Resize(resolution, 0, 0, cv.InterpolationFlags.Linear);
@@ -25373,10 +25375,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 dst2.SetTo(new cv.Scalar(0));
                 List<int> xVals = new List<int>();
-                List<Point2f> points = new List<Point2f>();
+                List<cv.Point2f> points = new List<cv.Point2f>();
                 for (int i = 0; i < pointsMat.Rows; i++)
                 {
-                    cv.Point pt = pointsMat.Get<Point>(i, 0);
+                    cv.Point pt = pointsMat.Get<cv.Point>(i, 0);
                     xVals.Add(pt.X);
                     points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
                 }
@@ -25393,10 +25395,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (pointsMat.Rows > 0)
             {
                 List<int> yVals = new List<int>();
-                List<Point2f> points = new List<Point2f>();
+                List<cv.Point2f> points = new List<cv.Point2f>();
                 for (int i = 0; i < pointsMat.Rows; i++)
                 {
-                    cv.Point pt = pointsMat.Get<Point>(i, 0);
+                    cv.Point pt = pointsMat.Get<cv.Point>(i, 0);
                     yVals.Add(pt.Y);
                     points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
                 }
@@ -25501,10 +25503,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 dst2.SetTo(new cv.Scalar(0));
                 List<int> xVals = new List<int>();
-                List<Point2f> points = new List<Point2f>();
+                List<cv.Point2f> points = new List<cv.Point2f>();
                 for (int i = 0; i < pointsMat.Rows; i++)
                 {
-                    cv.Point pt = pointsMat.Get<Point>(i, 0);
+                    cv.Point pt = pointsMat.Get<cv.Point>(i, 0);
                     xVals.Add(pt.X);
                     points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
                 }
@@ -25524,10 +25526,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (pointsMat.Rows > 0)
             {
                 List<int> yVals = new List<int>();
-                List<Point2f> points = new List<Point2f>();
+                List<cv.Point2f> points = new List<cv.Point2f>();
                 for (int i = 0; i < pointsMat.Rows; i++)
                 {
-                    cv.Point pt = pointsMat.Get<Point>(i, 0);
+                    cv.Point pt = pointsMat.Get<cv.Point>(i, 0);
                     yVals.Add(pt.Y);
                     points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
                 }
@@ -25567,18 +25569,18 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 ptLeft = task.gravityVec.p1;
                 ptRight = task.gravityVec.p2;
-                Rect r = ValidateRect(new Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
+                cv.Rect r = ValidateRect(new cv.Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
                 leftTemplate = new Mat(src, r);
-                r = ValidateRect(new Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
+                r = ValidateRect(new cv.Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
                 rightTemplate = new Mat(src, r);
             }
             else
             {
-                Rect r = ValidateRect(new Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
+                cv.Rect r = ValidateRect(new cv.Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
                 match.template = leftTemplate;
                 match.Run(src);
                 ptLeft = match.matchCenter;
-                r = ValidateRect(new Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
+                r = ValidateRect(new cv.Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
                 match.template = leftTemplate;
                 match.Run(src);
                 ptLeft = match.matchCenter;
@@ -25596,7 +25598,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             horizon.Run(src);
-            foreach (Point point in horizon.points)
+            foreach (cv.Point point in horizon.points)
             {
                 regress.x.Add(point.X);
                 regress.y.Add(point.Y);
@@ -25811,7 +25813,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 var tl = new cv.Point(w * 0.4, h * 0.6);
                 var br = new cv.Point(w * 0.95, h * 0.95);
                 var tr = new cv.Point(w * 0.6, h * 0.6);
-                var pList = new Point[] { bl, tl, tr, br };
+                cv.Point[] pList = new cv.Point[] { bl, tl, tr, br };
                 mask = new Mat(new cv.Size(w, h), MatType.CV_8U, 0);
                 mask.FillConvexPoly(pList, Scalar.White, task.lineType);
             }
@@ -25853,18 +25855,18 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Hull_Basics : CS_Parent
     {
         Random_Basics random = new Random_Basics();
-        public List<Point2f> inputPoints = new List<Point2f>();
-        public List<Point> hull = new List<Point>();
+        public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
+        public List<cv.Point> hull = new List<cv.Point>();
         public bool useRandomPoints;
         public CS_Hull_Basics(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Input Points - draw a rectangle anywhere.  Enclosing rectangle in yellow.", "" };
-            if (standaloneTest()) random.range = new Rect(100, 100, 50, 50);
+            if (standaloneTest()) random.range = new cv.Rect(100, 100, 50, 50);
             desc = "Given a list of points, create a hull that encloses them.";
         }
-        List<Point> vbFloat2Int(List<Point2f> ptList2f)
+        List<cv.Point> vbFloat2Int(List<cv.Point2f> ptList2f)
         {
-            List<Point> ptList = new List<Point>();
+            List<cv.Point> ptList = new List<cv.Point>();
             foreach (var pt in ptList2f)
             {
                 ptList.Add(new cv.Point((int)pt.X, (int)pt.Y));
@@ -25881,7 +25883,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     DrawCircle(dst2, pt, task.DotSize, Scalar.White);
                 }
-                inputPoints = new List<Point2f>(random.PointList);
+                inputPoints = new List<cv.Point2f>(random.PointList);
             }
             var hull2f = Cv2.ConvexHull(inputPoints, true);
             hull = vbFloat2Int(hull2f.ToList());
@@ -25902,7 +25904,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[2] = redC.labels[2];
             dst3.SetTo(0);
             var rc = task.rc;
-            List<Point> jumpList = new List<Point>();
+            List<cv.Point> jumpList = new List<cv.Point>();
             for (int i = 1; i < rc.contour.Count(); i++)
             {
                 var p1 = rc.contour[i - 1];
@@ -25938,7 +25940,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     newSize = new cv.Size(dst2.Width, dst2.Width * src.Height / src.Width);
                 }
                 dst2.SetTo(0);
-                dst2[new Rect(0, 0, newSize.Width, newSize.Height)] = src.Resize(newSize);
+                dst2[new cv.Rect(0, 0, newSize.Width, newSize.Height)] = src.Resize(newSize);
             }
             else
             {
@@ -27428,7 +27430,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         float radius;
         cv.Point calcPoint(Point2f center, double R, double angle)
         {
-            return new Point((int)(center.X + Math.Cos(angle)), (int)(center.Y - Math.Sin(angle)) * R);
+            return new cv.Point((int)(center.X + Math.Cos(angle)), (int)(center.Y - Math.Sin(angle)) * R);
         }
         void drawCross(Mat dst2, cv.Point center, Scalar color)
         {
@@ -27550,7 +27552,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     rx[i] = output.Get<float>(i, 0);
                 }
                 dst2 = src;
-                Rect rect = new Rect((int)rx[0], (int)rx[1], (int)rx[2], (int)rx[3]);
+                cv.Rect rect = new cv.Rect((int)rx[0], (int)rx[1], (int)rx[2], (int)rx[3]);
                 rect = ValidateRect(rect);
                 if (task.FirstPass) lastRect = rect;
                 if (lastRect == rect)
@@ -27851,7 +27853,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     if (status.Get<byte>(i) != 0)
                     {
-                        options.inputPoints[k] = outputMat.Get<Point2f>(i);
+                        options.inputPoints[k] = outputMat.Get<cv.Point2f>(i);
                         k++;
                     }
                 }
@@ -27859,7 +27861,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             }
             for (int i = 0; i < outputMat.Rows; i++)
             {
-                Point2f pt = outputMat.Get<Point2f>(i);
+                Point2f pt = outputMat.Get<cv.Point2f>(i);
                 if (pt.X >= 0 && pt.X <= src.Cols && pt.Y >= 0 && pt.Y <= src.Rows)
                 {
                     if (status.Get<byte>(i) != 0)
@@ -28377,9 +28379,9 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_KNN_Basics : CS_Parent
     {
         public List<PointPair> matches = new List<PointPair>();
-        public List<Point2f> noMatch = new List<Point2f>();
+        public List<cv.Point2f> noMatch = new List<cv.Point2f>();
         public KNN_Core knn = new KNN_Core();
-        public List<Point2f> queries = new List<Point2f>();
+        public List<cv.Point2f> queries = new List<cv.Point2f>();
         public List<int> neighbors = new List<int>();
         Random_Basics random = new Random_Basics();
         public CS_KNN_Basics(VBtask task) : base(task)
@@ -28395,10 +28397,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 if (task.heartBeat)
                 {
                     random.Run(empty);
-                    knn.trainInput = new List<Point2f>(random.PointList);
+                    knn.trainInput = new List<cv.Point2f>(random.PointList);
                 }
                 random.Run(empty);
-                queries = new List<Point2f>(random.PointList);
+                queries = new List<cv.Point2f>(random.PointList);
             }
             if (queries.Count() == 0)
             {
@@ -28452,14 +28454,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     DrawLine(dst3, nn, pt, Scalar.White);
                 }
             }
-            if (!standaloneTest()) knn.trainInput = new List<Point2f>(queries);
+            if (!standaloneTest()) knn.trainInput = new List<cv.Point2f>(queries);
         }
     }
     public class CS_CS_KNN_Core : CS_Parent
     {
         public KNearest knn;
-        public List<Point2f> trainInput = new List<Point2f>(); // put training data here
-        public List<Point2f> queries = new List<Point2f>(); // put Query data here
+        public List<cv.Point2f> trainInput = new List<cv.Point2f>(); // put training data here
+        public List<cv.Point2f> queries = new List<cv.Point2f>(); // put Query data here
         public List<List<int>> neighbors = new List<List<int>>();
         public int[,] result; // Get results here...
         public int desiredMatches = -1; // -1 indicates it is to use the number of queries.
@@ -28496,10 +28498,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 if (task.heartBeat)
                 {
                     random.Run(empty);
-                    trainInput = new List<Point2f>(random.PointList);
+                    trainInput = new List<cv.Point2f>(random.PointList);
                 }
                 random.Run(empty);
-                queries = new List<Point2f>(random.PointList);
+                queries = new List<cv.Point2f>(random.PointList);
             }
             var queryMat = new Mat(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
             if (queryMat.Rows == 0)
@@ -28507,7 +28509,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
-            if (trainInput.Count() == 0) trainInput = new List<Point2f>(queries); // first pass, just match the queries.
+            if (trainInput.Count() == 0) trainInput = new List<cv.Point2f>(queries); // first pass, just match the queries.
             var trainData = new Mat(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
             var response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
@@ -28579,10 +28581,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 dst3.SetTo(0);
                 random.Run(empty);
-                knn.trainInput = new List<Point2f>(random.PointList);
+                knn.trainInput = new List<cv.Point2f>(random.PointList);
             }
             random.Run(empty);
-            knn.queries = new List<Point2f>(random.PointList);
+            knn.queries = new List<cv.Point2f>(random.PointList);
             knn.Run(empty);
             knn.displayResults();
             dst2 = knn.dst2;
@@ -28593,8 +28595,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_CS_KNN_Core3D : CS_Parent
     {
         public KNearest knn;
-        public List<Point3f> trainInput = new List<Point3f>(); // put training data here
-        public List<Point3f> queries = new List<Point3f>(); // put Query data here
+        public List<cv.Point3f> trainInput = new List<cv.Point3f>(); // put training data here
+        public List<cv.Point3f> queries = new List<cv.Point3f>(); // put Query data here
         public int[,] result; // Get results here...
         public CS_CS_KNN_Core3D(VBtask task) : base(task)
         {
@@ -28615,7 +28617,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
-            if (trainInput.Count() == 0) trainInput = new List<Point3f>(queries); // first pass, just match the queries.
+            if (trainInput.Count() == 0) trainInput = new List<cv.Point3f>(queries); // first pass, just match the queries.
             var trainData = new Mat(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
             var response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
@@ -28707,7 +28709,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 if (!messageSent)
                 {
-                    MessageBox.Show("The KNN dimension needs to be set for the general purpose KNN_Core to start");
+                    System.Windows.Forms.MessageBox.Show("The KNN dimension needs to be set for the general purpose KNN_Core to start");
                     messageSent = true;
                 }
                 return;
@@ -28756,7 +28758,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 random.Run(empty);
                 foreach (var pt in random.PointList)
                 {
-                    var vec = task.pointCloud.Get<Point3f>((int)pt.Y, (int)pt.X);
+                    var vec = task.pointCloud.Get<cv.Point3f>((int)pt.Y, (int)pt.X);
                     if (knn.trainInput.Count() == 10)
                     {
                         if (vec.Z != 0)
@@ -28911,12 +28913,12 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             em.Run(src);
             random.Run(empty);
-            knn.queries = new List<Point2f>(em.centers);
+            knn.queries = new List<cv.Point2f>(em.centers);
             knn.Run(src);
             dst2 = em.dst2 + knn.dst2;
             knn.displayResults();
             dst3 = knn.dst2;
-            knn.trainInput = new List<Point2f>(knn.queries);
+            knn.trainInput = new List<cv.Point2f>(knn.queries);
         }
     }
     public class CS_KNN_TrackMean : CS_Parent
@@ -28927,7 +28929,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         const int maxDistance = 50;
         public float shiftX;
         public float shiftY;
-        List<Point2f> motionTrack = new List<Point2f>();
+        List<cv.Point2f> motionTrack = new List<cv.Point2f>();
         Mat lastImage;
         System.Windows.Forms.TrackBar dotSlider;
         Options_KNN options = new Options_KNN();
@@ -28974,7 +28976,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (task.FirstPass) lastImage = src.Clone();
             int multiplier = dotSlider.Value;
             feat.Run(src);
-            knn.queries = new List<Point2f>(task.features);
+            knn.queries = new List<cv.Point2f>(task.features);
             knn.Run(src);
             List<int> diffX = new List<int>();
             List<int> diffY = new List<int>();
@@ -28983,8 +28985,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
             var sz = task.gridSize;
             foreach (var mps in knn.matches)
             {
-                var currRect = ValidateRect(new Rect((int)(mps.p1.X - sz), (int)(mps.p1.Y - sz), sz * 2, sz * 2));
-                var prevRect = ValidateRect(new Rect((int)(mps.p2.X - sz), (int)(mps.p2.Y - sz), currRect.Width, currRect.Height));
+                var currRect = ValidateRect(new cv.Rect((int)(mps.p1.X - sz), (int)(mps.p1.Y - sz), sz * 2, sz * 2));
+                var prevRect = ValidateRect(new cv.Rect((int)(mps.p2.X - sz), (int)(mps.p2.Y - sz), currRect.Width, currRect.Height));
                 Cv2.MatchTemplate(lastImage[prevRect], src[currRect], correlationMat, feat.options.matchOption);
                 float corrNext = correlationMat.Get<float>(0, 0);
                 DrawCircle(dst2, mps.p1, task.DotSize, task.HighlightColor);
@@ -29016,7 +29018,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public Line_Basics lines = new Line_Basics();
         public PointPair lastPair = new PointPair();
-        public List<Point2f> trainInput = new List<Point2f>();
+        public List<cv.Point2f> trainInput = new List<cv.Point2f>();
         List<float> minDistances = new List<float>();
         public CS_KNN_ClosestTracker(VBtask task) : base(task)
         {
@@ -29092,7 +29094,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public Point2f lastP1;
         public Point2f lastP2;
         public int lastIndex;
-        public List<Point2f> trainInput = new List<Point2f>();
+        public List<cv.Point2f> trainInput = new List<cv.Point2f>();
         List<float> minDistances;
         public CS_KNN_ClosestLine(VBtask task) : base(task)
         {
@@ -29177,9 +29179,9 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_KNN_BasicsOld : CS_Parent
     {
         public List<PointPair> matches = new List<PointPair>();
-        public List<Point> noMatch = new List<Point>();
+        public List<cv.Point> noMatch = new List<cv.Point>();
         public KNN_Core knn = new KNN_Core();
-        public List<Point2f> queries = new List<Point2f>();
+        public List<cv.Point2f> queries = new List<cv.Point2f>();
         Random_Basics random = new Random_Basics();
         public CS_KNN_BasicsOld(VBtask task) : base(task)
         {
@@ -29194,10 +29196,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 if (task.heartBeat)
                 {
                     random.Run(empty);
-                    knn.trainInput = new List<Point2f>(random.PointList);
+                    knn.trainInput = new List<cv.Point2f>(random.PointList);
                 }
                 random.Run(empty);
-                queries = new List<Point2f>(random.PointList);
+                queries = new List<cv.Point2f>(random.PointList);
             }
             if (queries.Count() == 0)
             {
@@ -29269,7 +29271,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     }
                 }
             }
-            if (!standaloneTest()) knn.trainInput = new List<Point2f>(queries);
+            if (!standaloneTest()) knn.trainInput = new List<cv.Point2f>(queries);
         }
     }
     public class CS_KNN_Farthest : CS_Parent
@@ -29289,8 +29291,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 if (task.heartBeat)
                 {
                     random.Run(empty);
-                    knn.trainInput = new List<Point2f>(random.PointList);
-                    knn.queries = new List<Point2f>(knn.trainInput);
+                    knn.trainInput = new List<cv.Point2f>(random.PointList);
+                    knn.queries = new List<cv.Point2f>(knn.trainInput);
                 }
             }
             knn.Run(empty);
@@ -29331,7 +29333,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             var minDistance = feat.options.minDistance;
             if (!task.motionFlag || task.optionsChanged) minDistance = 2;
             feat.Run(src);
-            knn.queries = new List<Point2f>(task.features);
+            knn.queries = new List<cv.Point2f>(task.features);
             knn.Run(src);
             var tracker = new List<PointPair>();
             dst2 = src.Clone();
@@ -29432,7 +29434,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_LaneFinder_ROI : CS_Parent
     {
         LaneFinder_HLSColor hls = new LaneFinder_HLSColor();
-        Point[][] pListList = new Point[1][];
+        cv.Point[][] pListList = new cv.Point[1][];
         public CS_LaneFinder_ROI(VBtask task) : base(task)
         {
             labels = new string[] { "Original input", "Mask showing ROI", "HLS version with ROI outline", "HLS Mask with ROI outline" };
@@ -29449,7 +29451,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 var tl = new cv.Point(w * 0.4, h * 0.6);
                 var br = new cv.Point(w * 0.95, h * 0.95);
                 var tr = new cv.Point(w * 0.6, h * 0.6);
-                var pList = new Point[] { bl, tl, tr, br };
+                var pList = new cv.Point[] { bl, tl, tr, br };
                 dst1 = new Mat(new cv.Size(w, h), MatType.CV_8U, 0);
                 dst1.FillConvexPoly(pList, Scalar.White, task.lineType);
                 pListList[0] = pList;
@@ -29622,8 +29624,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             options.RunVB();
-            Rect r1 = new Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight);
-            Rect r2 = new Rect(0, 25, task.leftView.Width, options.sliceHeight);
+            cv.Rect r1 = new cv.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight);
+            cv.Rect r2 = new cv.Rect(0, 25, task.leftView.Width, options.sliceHeight);
             dst2.SetTo(0);
             task.leftView[r1].CopyTo(dst2[r2]);
             r2.Y += options.sliceHeight;
@@ -29932,12 +29934,12 @@ public class CS_ApproxPoly_Basics : CS_Parent
         cv.XImgProc.FastLineDetector ld;
         public SortedList<float, PointPair> sortByLen = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
         public List<PointPair> mpList = new List<PointPair>();
-        public List<Point2f> ptList = new List<Point2f>();
-        public Rect subsetRect;
+        public List<cv.Point2f> ptList = new List<cv.Point2f>();
+        public cv.Rect subsetRect;
         public Scalar lineColor = Scalar.White;
         public CS_Line_SubsetRect(VBtask task) : base(task)
         {
-            subsetRect = new Rect(0, 0, dst2.Width, dst2.Height);
+            subsetRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
             ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector();
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
             desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
@@ -30050,8 +30052,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public LongLine_Extend extended = new LongLine_Extend();
         public Line_Basics lines = new Line_Basics();
-        public List<Point2f> p1List = new List<Point2f>();
-        public List<Point2f> p2List = new List<Point2f>();
+        public List<cv.Point2f> p1List = new List<cv.Point2f>();
+        public List<cv.Point2f> p2List = new List<cv.Point2f>();
         LongLine_Basics longLine = new LongLine_Basics();
         public Options_Intercepts options = new Options_Intercepts();
         public SortedList<int, int> intercept = new SortedList<int, int>(new compareAllowIdenticalInteger());
@@ -30163,10 +30165,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Line_InDepthAndBGR : CS_Parent
     {
         Line_Basics lines = new Line_Basics();
-        public List<Point2f> p1List = new List<Point2f>();
-        public List<Point2f> p2List = new List<Point2f>();
-        public List<Point3f> z1List = new List<Point3f>(); // the point cloud values corresponding to p1 and p2
-        public List<Point3f> z2List = new List<Point3f>();
+        public List<cv.Point2f> p1List = new List<cv.Point2f>();
+        public List<cv.Point2f> p2List = new List<cv.Point2f>();
+        public List<cv.Point3f> z1List = new List<cv.Point3f>(); // the point cloud values corresponding to p1 and p2
+        public List<cv.Point3f> z2List = new List<cv.Point3f>();
         public CS_Line_InDepthAndBGR(VBtask task) : base(task)
         {
             labels[2] = "Lines defined in BGR";
@@ -30178,7 +30180,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             lines.Run(src);
             dst2 = lines.dst2;
             if (lines.lpList.Count() == 0) return;
-            var lineList = new List<Rect>();
+            var lineList = new List<cv.Rect>();
             if (task.motionFlag || task.optionsChanged) dst3.SetTo(0);
             p1List.Clear();
             p2List.Clear();
@@ -30190,7 +30192,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 var minYY = Math.Min(lp.p1.Y, lp.p2.Y);
                 var w = Math.Abs(lp.p1.X - lp.p2.X);
                 var h = Math.Abs(lp.p1.Y - lp.p2.Y);
-                var r = new Rect((int)minXX, (int)minYY, (int)(w > 0 ? w : 2), (int)(h > 0 ? h : 2));
+                var r = new cv.Rect((int)minXX, (int)minYY, (int)(w > 0 ? w : 2), (int)(h > 0 ? h : 2));
                 var mask = new Mat(new cv.Size(w, h), MatType.CV_8U, 0);
                 mask.Line(new cv.Point((int)(lp.p1.X - r.X), (int)(lp.p1.Y - r.Y)), new cv.Point((int)(lp.p2.X - r.X), (int)(lp.p2.Y - r.Y)), 255, task.lineWidth, LineTypes.Link4);
                 var mean = task.pointCloud[r].Mean(mask);
@@ -30215,8 +30217,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                         DrawLine(dst3, lp.p1, lp.p2, Scalar.Yellow);
                         p1List.Add(lp.p1);
                         p2List.Add(lp.p2);
-                        z1List.Add(task.pointCloud.Get<Point3f>((int)lp.p1.Y, (int)lp.p1.X));
-                        z2List.Add(task.pointCloud.Get<Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                        z1List.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                        z2List.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
                     }
                 }
             }
@@ -30750,14 +30752,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 int radius = (int)(cellSlider.Value / 2);
                 lines.Run(src.Clone());
                 if (lines.lpList.Count() == 0) return; // nothing to work with...
-                var lines2 = new List<Point2f>();
-                var lines3 = new List<Point3f>();
+                var lines2 = new List<cv.Point2f>();
+                var lines3 = new List<cv.Point3f>();
                 foreach (var lp in lines.lpList)
                 {
                     lines2.Add(new Point2f(lp.p1.X, lp.p1.Y));
                     lines2.Add(new Point2f(lp.p2.X, lp.p2.Y));
-                    lines3.Add(task.pointCloud.Get<Point3f>((int)lp.p1.Y, (int)lp.p1.X));
-                    lines3.Add(task.pointCloud.Get<Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                    lines3.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                    lines3.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
                 }
                 dst2 = src.Clone();
                 gMat.Run(empty);
@@ -30769,8 +30771,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     gravityLine vert = new gravityLine();
                     vert.tc1.center = lines2[i];
                     vert.tc2.center = lines2[i + 1];
-                    vert.pt1 = gPoints.Get<Point3f>(i + 0, 0);
-                    vert.pt2 = gPoints.Get<Point3f>(i + 1, 0);
+                    vert.pt1 = gPoints.Get<cv.Point3f>(i + 0, 0);
+                    vert.pt2 = gPoints.Get<cv.Point3f>(i + 1, 0);
                     vert.len3D = distance3D(vert.pt1, vert.pt2);
                     double arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958;
                     double arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958;
@@ -30810,8 +30812,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     }
                 }
                 dst2 = src.Clone();
-                List<Point2f> lines2 = new List<Point2f>();
-                List<Point3f> lines3 = new List<Point3f>();
+                List<cv.Point2f> lines2 = new List<cv.Point2f>();
+                List<cv.Point3f> lines3 = new List<cv.Point3f>();
                 List<gravityLine> newVerts = new List<gravityLine>();
                 for (int i = 0; i < verticals.Count(); i++)
                 {
@@ -30827,8 +30829,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     {
                         lines2.Add(vert.tc1.center);
                         lines2.Add(vert.tc2.center);
-                        lines3.Add(task.pointCloud.Get<Point3f>((int)vert.tc1.center.Y, (int)vert.tc1.center.X));
-                        lines3.Add(task.pointCloud.Get<Point3f>((int)vert.tc2.center.Y, (int)vert.tc2.center.X));
+                        lines3.Add(task.pointCloud.Get<cv.Point3f>((int)vert.tc1.center.Y, (int)vert.tc1.center.X));
+                        lines3.Add(task.pointCloud.Get<cv.Point3f>((int)vert.tc2.center.Y, (int)vert.tc2.center.X));
                     }
                     newVerts.Add(vert);
                 }
@@ -30841,8 +30843,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     for (int i = 0; i < gPoints.Rows; i += 2)
                     {
                         var vert = newVerts[i / 2];
-                        vert.pt1 = gPoints.Get<Point3f>(i + 0, 0);
-                        vert.pt2 = gPoints.Get<Point3f>(i + 1, 0);
+                        vert.pt1 = gPoints.Get<cv.Point3f>(i + 0, 0);
+                        vert.pt2 = gPoints.Get<cv.Point3f>(i + 1, 0);
                         vert.len3D = distance3D(vert.pt1, vert.pt2);
                         float arcX = (float)(Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958);
                         float arcZ = (float)(Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958);
@@ -30938,7 +30940,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     p3 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                     p4 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                 }
-                intersectionPoint = IntersectTest(p1, p2, p3, p4, new Rect(0, 0, src.Width, src.Height));
+                intersectionPoint = IntersectTest(p1, p2, p3, p4, new cv.Rect(0, 0, src.Width, src.Height));
                 dst2.SetTo(0);
                 DrawLine(dst2, p1, p2, Scalar.Yellow, task.lineWidth + 1);
                 DrawLine(dst2, p3, p4, Scalar.Yellow, task.lineWidth + 1);
@@ -30976,7 +30978,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, Scalar.White);
                 foreach (var lp in lines.lpList)
                 {
-                    Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, new Rect(0, 0, src.Width, src.Height));
+                    Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, new cv.Rect(0, 0, src.Width, src.Height));
                     if (ptInter.X >= 0 && ptInter.X < dst2.Width && ptInter.Y >= 0 && ptInter.Y < dst2.Height) continue;
                     nearest.pt = lp.p1;
                     nearest.Run(null);
@@ -30993,7 +30995,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 nearest.lp = task.horizonVec;
                 foreach (var lp in lines.lpList)
                 {
-                    Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, new Rect(0, 0, src.Width, src.Height));
+                    Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, new cv.Rect(0, 0, src.Width, src.Height));
                     if (ptInter.X >= 0 && ptInter.X < dst2.Width && ptInter.Y >= 0 && ptInter.Y < dst2.Height) continue;
                     nearest.pt = lp.p1;
                     nearest.Run(null);
@@ -31032,7 +31034,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     swarm.knn.queries.Add(lp.p2);
                     DrawLine(dst3, lp.p1, lp.p2, 255);
                 }
-                swarm.knn.trainInput = new List<Point2f>(swarm.knn.queries);
+                swarm.knn.trainInput = new List<cv.Point2f>(swarm.knn.queries);
                 swarm.knn.Run(empty);
                 swarm.DrawLines(dst3);
                 labels[2] = lines.labels[2];
@@ -31085,11 +31087,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst1.SetTo(0);
             task.pcSplit[0].CopyTo(dst1, dst0);
             var points = dst1.FindNonZero();
-            var nextList = new List<Point3f>();
+            var nextList = new List<cv.Point3f>();
             for (int i = 0; i < points.Rows; i++)
             {
-                var pt = points.At<Point>(i, 0);
-                nextList.Add(task.pointCloud.At<Point3f>(pt.Y, pt.X));
+                var pt = points.At<cv.Point>(i, 0);
+                nextList.Add(task.pointCloud.At<cv.Point3f>(pt.Y, pt.X));
             }
             if (nextList.Count() == 0) return; // line is completely in area with no depth.
             var pts = new Mat(nextList.Count(), 1, MatType.CV_32FC3, nextList.ToArray());
@@ -31106,7 +31108,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Line3D_Checks : CS_Parent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
-        public List<Point3f> pcLines = new List<Point3f>();
+        public List<cv.Point3f> pcLines = new List<cv.Point3f>();
         public CS_Line3D_Checks(VBtask task) : base(task)
         {
             desc = "Use the first and last points in the sequence to build a single line and then check it against the rest of the sequence.";
@@ -31118,10 +31120,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             pcLines.Clear();
             for (int y = 0; y < task.gridRows; y++)
             {
-                var vecList = new List<Point3f>();
+                var vecList = new List<cv.Point3f>();
                 for (int x = 0; x < task.gridCols; x++)
                 {
-                    var vec = pts.dst3.At<Point3f>(y, x);
+                    var vec = pts.dst3.At<cv.Point3f>(y, x);
                     if (vec.Z > 0)
                     {
                         vecList.Add(vec);
@@ -31143,7 +31145,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Line3D_CandidatesFirstLast : CS_Parent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
-        public List<Point3f> pcLines = new List<Point3f>();
+        public List<cv.Point3f> pcLines = new List<cv.Point3f>();
         public Mat pcLinesMat;
         public int actualCount;
         public CS_Line3D_CandidatesFirstLast(VBtask task) : base(task)
@@ -31151,7 +31153,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
             desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line in the sequence";
         }
-        void addLines(List<List<Point3f>> nextList, List<List<Point>> xyList)
+        void addLines(List<List<cv.Point3f>> nextList, List<List<cv.Point>> xyList)
         {
             var white32 = new Point3f(1, 1, 1);
             for (int i = 0; i < nextList.Count(); i++)
@@ -31181,7 +31183,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Line3D_CandidatesAll : CS_Parent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
-        public List<Point3f> pcLines = new List<Point3f>();
+        public List<cv.Point3f> pcLines = new List<cv.Point3f>();
         public Mat pcLinesMat;
         public int actualCount;
         Point3f white32 = new Point3f(1, 1, 1);
@@ -31190,7 +31192,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
             desc = "Get a list of points from PointCloud_Basics.  Identify all the lines in the sequence";
         }
-        void addLines(List<List<Point3f>> nextList, List<List<Point>> xyList)
+        void addLines(List<List<cv.Point3f>> nextList, List<List<cv.Point>> xyList)
         {
             for (int i = 0; i < nextList.Count(); i++)
             {
@@ -31316,8 +31318,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
         }
         public List<PointPair> findLines(List<List<PointPair>> lpLists)
         {
-            var p1List = new List<Point>();
-            var p2List = new List<Point>();
+            var p1List = new List<cv.Point>();
+            var p2List = new List<cv.Point>();
             var ptCounts = new List<int>();
             PointPair lp;
             foreach (var lpList in lpLists)
@@ -31451,7 +31453,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     int xint2 = (int)((dst2.Height - b) / lp.slope);
                     int yint1 = (int)b;
                     int yint2 = (int)(lp.slope * dst2.Width + b);
-                    List<Point> points = new List<Point>();
+                    List<cv.Point> points = new List<cv.Point>();
                     if (xint1 >= 0 && xint1 <= dst2.Width) points.Add(new cv.Point(xint1, 0));
                     if (xint2 >= 0 && xint2 <= dst2.Width) points.Add(new cv.Point(xint2, dst2.Height));
                     if (yint1 >= 0 && yint1 <= dst2.Height) points.Add(new cv.Point(0, yint1));
@@ -31615,7 +31617,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             var x2 = Math.Max(lp.p1.X + options.pad, lp.p2.X + options.pad);
             var y1 = Math.Min(lp.p1.Y - options.pad, lp.p2.Y - options.pad);
             var y2 = Math.Max(lp.p1.Y + options.pad, lp.p2.Y + options.pad);
-            var rect = ValidateRect(new Rect((int)Math.Min(x1, x2), (int) Math.Min(y1, y2), (int)Math.Abs(x1 - x2), (int)Math.Abs(y1 - y2)));
+            var rect = ValidateRect(new cv.Rect((int)Math.Min(x1, x2), (int) Math.Min(y1, y2), (int)Math.Abs(x1 - x2), (int)Math.Abs(y1 - y2)));
             dst2.Rectangle(rect, task.HighlightColor, task.lineWidth);
             if (task.FirstPass) template = src[rect].Clone();
             Cv2.MatchTemplate(template, src, dst0, TemplateMatchModes.CCoeffNormed);
@@ -31624,7 +31626,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             DrawCircle(dst2, mm.maxLoc, task.DotSize, Scalar.Red);
             dst3.SetTo(0);
             dst0 = dst0.Normalize(0, 255, NormTypes.MinMax);
-            dst0.CopyTo(dst3[new Rect((dst3.Width - dst0.Width) / 2, (dst3.Height - dst0.Height) / 2, dst0.Width, dst0.Height)]);
+            dst0.CopyTo(dst3[new cv.Rect((dst3.Width - dst0.Width) / 2, (dst3.Height - dst0.Height) / 2, dst0.Width, dst0.Height)]);
             DrawCircle(dst3, mm.maxLoc, task.DotSize, 255);
             template = src[rect].Clone();
         }
@@ -31694,12 +31696,12 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 knn.queries.Add(new Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2));
             }
-            knn.trainInput = new List<Point2f>(knn.queries);
+            knn.trainInput = new List<cv.Point2f>(knn.queries);
             if (knn.queries.Count() == 0) return; // no input...possible in a dark room...
             knn.Run(empty);
             dst2 = src.Clone();
             parList.Clear();
-            var checkList = new List<Point>();
+            var checkList = new List<cv.Point>();
             for (int i = 0; i <= knn.result.GetUpperBound(0) - 1; i++)
             {
                 for (int j = 0; j < knn.queries.Count(); j++)
@@ -32093,7 +32095,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public CS_Magnify_Basics(VBtask task) : base(task)
         {
-            task.drawRect = new Rect(10, 10, 50, 50);
+            task.drawRect = new cv.Rect(10, 10, 50, 50);
             desc = "Magnify the drawn rectangle on dst2 and put it in dst3.";
         }
         public void RunCS(Mat src)
@@ -32199,7 +32201,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             var mat = src.Resize(new cv.Size(src.Height, src.Height));
-            var roi = new Rect(0, 0, mat.Width, mat.Height);
+            var roi = new cv.Rect(0, 0, mat.Width, mat.Height);
             dst2[roi] = mat;
             dst3[roi] = mat.Transpose();
         }
@@ -32293,8 +32295,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             var nSize = new cv.Size(task.WorkingRes.Width, task.WorkingRes.Height / 2);
-            var roiTop = new Rect(0, 0, nSize.Width, nSize.Height);
-            var roibot = new Rect(0, nSize.Height, nSize.Width, nSize.Height);
+            var roiTop = new cv.Rect(0, 0, nSize.Width, nSize.Height);
+            var roibot = new cv.Rect(0, nSize.Height, nSize.Width, nSize.Height);
             if (standaloneTest())
             {
                 mat1 = src;
@@ -32332,7 +32334,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             histTop.Run(src);
             autoX.Run(histTop.histogram);
             dst2 = histTop.histogram.Threshold(task.projectionThreshold, 255, ThresholdTypes.Binary).ConvertScaleAbs();
-            var ptList = new List<Point>();
+            var ptList = new List<cv.Point>();
             if (task.gOptions.getDebugCheckBox())
             {
                 for (int y = 0; y < dst2.Height; y++)
@@ -32348,7 +32350,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 var points = dst2.FindNonZero();
                 for (int i = 0; i < points.Rows; i++)
                 {
-                    ptList.Add(points.At<Point>(i, 0));
+                    ptList.Add(points.At<cv.Point>(i, 0));
                 }
             }
             labels[2] = "There were " + ptList.Count().ToString() + " points identified";
@@ -32448,7 +32450,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 img[i] = nextColor;
             }
-            var rect = new Rect(autoRand.Next(0, src.Width - 50), autoRand.Next(0, src.Height - 50), 50, 50);
+            var rect = new cv.Rect(autoRand.Next(0, src.Width - 50), autoRand.Next(0, src.Height - 50), 50, 50);
             dst2[rect].SetTo(0);
         }
     }
@@ -32567,14 +32569,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             cv.Size nSize = new cv.Size(dst2.Width / 2, dst2.Height / 2);
-            Rect roiTopLeft = new Rect(0, 0, nSize.Width, nSize.Height);
-            Rect roiTopRight = new Rect(nSize.Width, 0, nSize.Width, nSize.Height);
-            Rect roibotLeft = new Rect(0, nSize.Height, nSize.Width, nSize.Height);
-            Rect roibotRight = new Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height);
+            cv.Rect roiTopLeft = new cv.Rect(0, 0, nSize.Width, nSize.Height);
+            cv.Rect roiTopRight = new cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height);
+            cv.Rect roibotLeft = new cv.Rect(0, nSize.Height, nSize.Width, nSize.Height);
+            cv.Rect roibotRight = new cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height);
             if (standalone) defaultMats(src);
 
             dst2 = new Mat(dst2.Size(), MatType.CV_8UC3);
-            Rect roi = new Rect(0, 0, 0, 0);
+            cv.Rect roi = new cv.Rect(0, 0, 0, 0);
             for (int i = 0; i < 4; i++)
             {
                 Mat tmp = mat[i].Clone();
@@ -32592,6 +32594,679 @@ public class CS_ApproxPoly_Basics : CS_Parent
             }
         }
     }
+    public class CS_Match_Basics : CS_Parent
+    {
+        public Mat template;
+        public mmData mmData;
+        public float correlation;
+        public Options_Features options = new Options_Features();
+        public cv.Point matchCenter;
+        public cv.Rect matchRect = new cv.Rect();
+        public cv.Rect searchRect = new cv.Rect();
+        public CS_Match_Basics(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDebugCheckBox(true);
+            labels[2] = standaloneTest() ? "Draw anywhere to define a new target" : "Both drawRect must be provided by the caller.";
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, 0);
+            desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standalone)
+            {
+                if (task.gOptions.getDebugCheckBox())
+                {
+                    task.gOptions.setDebugCheckBox(false);
+                    var inputRect = task.FirstPass ? new cv.Rect(25, 25, 25, 25) : ValidateRect(task.drawRect);
+                    template = src[inputRect];
+                }
+            }
+            if (searchRect.Width == 0)
+            {
+                Cv2.MatchTemplate(template, src, dst0, options.matchOption);
+            }
+            else
+            {
+                Cv2.MatchTemplate(template, src[searchRect], dst0, options.matchOption);
+            }
+            mmData = GetMinMax(dst0);
+            correlation = (float)mmData.maxVal;
+            labels[2] = "Correlation = " + correlation.ToString("#,##0.000");
+            var w = template.Width;
+            var h = template.Height;
+            if (searchRect.Width == 0)
+            {
+                matchCenter = new cv.Point(mmData.maxLoc.X + w / 2, mmData.maxLoc.Y + h / 2);
+                matchRect = new cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h);
+            }
+            else
+            {
+                matchCenter = new cv.Point(searchRect.X + mmData.maxLoc.X + w / 2, searchRect.Y + mmData.maxLoc.Y + h / 2);
+                matchRect = new cv.Rect(searchRect.X + mmData.maxLoc.X, searchRect.Y + mmData.maxLoc.Y, w, h);
+            }
+            if (standalone)
+            {
+                dst2 = src;
+                DrawCircle(dst2, matchCenter, task.DotSize, Scalar.White);
+                dst3 = dst0.Normalize(0, 255, NormTypes.MinMax);
+            }
+        }
+    }
+    public class CS_Match_BasicsTest : CS_Parent
+    {
+        public Match_Basics match = new Match_Basics();
+        public CS_Match_BasicsTest(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest point below" };
+            desc = "Test the Match_Basics algorithm";
+        }
+        public void RunCS(Mat src)
+        {
+            if ((task.FirstPass || (task.mouseClickFlag && task.drawRect.Width != 0)) && standaloneTest())
+            {
+                var r = task.FirstPass ? new cv.Rect(25, 25, 25, 25) : ValidateRect(task.drawRect);
+                match.template = src[r];
+                task.drawRectClear = true;
+            }
+            match.Run(src);
+            if (standaloneTest())
+            {
+                dst2 = src;
+                DrawCircle(dst2, match.matchCenter, task.DotSize, Scalar.White);
+                dst3 = match.dst0.Normalize(0, 255, NormTypes.MinMax);
+                SetTrueText(match.correlation.ToString(fmt3), match.matchCenter);
+            }
+        }
+    }
+    public class CS_Match_RandomTest : CS_Parent
+    {
+        Font_FlowText flow = new Font_FlowText();
+        public Mat template;
+        public Mat correlationMat = new Mat();
+        public float correlation;
+        public mmData mm;
+        public float minCorrelation = float.MaxValue;
+        public float maxCorrelation = float.MinValue;
+        public Options_Features options = new Options_Features();
+        int saveSampleCount = -1;
+        public CS_Match_RandomTest(VBtask task) : base(task)
+        {
+            flow.parentData = this;
+            desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest())
+            {
+                if (saveSampleCount != options.featurePoints)
+                {
+                    saveSampleCount = options.featurePoints;
+                    maxCorrelation = float.MinValue;
+                    minCorrelation = float.MaxValue;
+                }
+                template = new Mat(new cv.Size(options.featurePoints, 1), MatType.CV_32FC1);
+                src = new Mat(new cv.Size(options.featurePoints, 1), MatType.CV_32FC1);
+                Cv2.Randn(template, 100, 25);
+                Cv2.Randn(src, 0, 25);
+            }
+            Cv2.MatchTemplate(template, src, correlationMat, options.matchOption);
+            mm = GetMinMax(correlationMat);
+            mm.maxLoc = new cv.Point(mm.maxLoc.X + template.Width / 2, mm.maxLoc.Y + template.Height / 2);
+            correlation = (float)mm.maxVal;
+            if (correlation < minCorrelation) minCorrelation = correlation;
+            if (correlation > maxCorrelation) maxCorrelation = correlation;
+            labels[2] = "Correlation = " + correlation.ToString("#,##0.000");
+            if (standaloneTest())
+            {
+                dst2.SetTo(0);
+                labels[2] = options.matchText + " for " + template.Cols + " random test samples = " + correlation.ToString("#,##0.00");
+                flow.nextMsg = options.matchText + " = " + correlation.ToString("#,##0.00");
+                flow.Run(empty);
+                SetTrueText("The expectation is that the " + template.Cols + " random test samples should produce" + "\r\n" +
+                            " a correlation coefficient near zero" + "\r\n" +
+                            "The larger the sample size, the closer to zero the correlation will be - See 'Sample Size' slider nearby." + "\r\n" +
+                            "There should also be symmetry in the min and max around zero." + "\r\n" + "\r\n" +
+                            "Min Correlation = " + minCorrelation.ToString(fmt3) + "\r\n" +
+                            "Max Correlation = " + maxCorrelation.ToString(fmt3), 3);
+            }
+        }
+    }
+    public class CS_Match_BestEntropy : CS_Parent
+    {
+        Entropy_Highest entropy = new Entropy_Highest();
+        Match_DrawRect match = new Match_DrawRect();
+        public CS_Match_BestEntropy(VBtask task) : base(task)
+        {
+            match.showOutput = true;
+            labels[2] = "Probabilities that the template matches image";
+            labels[3] = "Red is the best template to match (highest entropy)";
+            desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                entropy.Run(src);
+                task.drawRect = entropy.eMaxRect;
+            }
+            match.Run(src);
+            dst2 = match.dst2;
+            dst3 = match.dst3;
+            dst2.SetTo(Scalar.White, task.gridMask);
+        }
+    }
+
+    public class CS_Match_Lines : CS_Parent
+    {
+        KNN_Core4D knn = new KNN_Core4D();
+        Line_Basics lines = new Line_Basics();
+        List<PointPair> lastPt = new List<PointPair>();
+        public CS_Match_Lines(VBtask task) : base(task)
+        {
+            labels[2] = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected.";
+            desc = "Use the 2 points from a line as input to a 4-dimension KNN";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst2 = lines.dst2;
+            if (task.FirstPass) lastPt = new List<PointPair>(lines.lpList);
+            knn.queries.Clear();
+            foreach (var lp in lines.lpList)
+            {
+                knn.queries.Add(new Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y));
+            }
+            if (task.optionsChanged) knn.trainInput = new List<Vec4f>(knn.queries);
+            knn.Run(empty);
+            if (knn.queries.Count() == 0) return;
+            foreach (var i in knn.result)
+            {
+                if (i >= lines.lpList.Count()) continue;
+                var lp = lines.lpList[i];
+                var index = knn.result[i, 0];
+                if (index >= 0 && index < lastPt.Count())
+                {
+                    var lastMP = lastPt[index];
+                    DrawLine(dst2, lp.p1, lastMP.p2, Scalar.Red);
+                }
+            }
+            knn.trainInput = new List<Vec4f>(knn.queries);
+            lastPt = new List<PointPair>(lines.lpList);
+        }
+    }
+    public class CS_Match_PointSlope : CS_Parent
+    {
+        Line_PointSlope lines = new Line_PointSlope();
+        bool updateLines = true;
+        public List<matchRect> matches = new List<matchRect>();
+        List<Mat> templates = new List<Mat>();
+        Mat_4to1 mats = new Mat_4to1();
+        string strOut1;
+        string strOut2;
+        public CS_Match_PointSlope(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new[] { "", "Output of Lines_PointSlope", "Matched lines", "correlationMats" };
+            desc = "Initialize with the best lines in the image and track them using matchTemplate.  Reinitialize when correlations drop.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.Clone();
+            var w = task.gridSize;
+            var h = w;
+            if (updateLines)
+            {
+                updateLines = false;
+                templates.Clear();
+                lines.Run(src);
+                dst1 = src.Clone();
+                foreach (var pts in lines.bestLines)
+                {
+                    var rect = ValidateRect(new cv.Rect((int)(pts.p1.X - w), (int)(pts.p1.Y - h), w * 2, h * 2));
+                    templates.Add(src[rect]);
+                    dst1.Rectangle(rect, Scalar.White, task.lineWidth);
+                    rect = ValidateRect(new cv.Rect((int)(pts.p2.X - w), (int)(pts.p2.Y - h), w * 2, h * 2));
+                    templates.Add(src[rect]);
+                    dst1.Rectangle(rect, Scalar.White, task.lineWidth);
+                    DrawLine(dst1, pts.p1, pts.p2, task.HighlightColor);
+                }
+            }
+            var correlationMat = new Mat();
+            mmData mm;
+            matches.Clear();
+            var newTemplates = new List<Mat>();
+            for (int i = 0; i < lines.bestLines.Count(); i++)
+            {
+                var ptS = lines.bestLines[i];
+                matchRect mr = new matchRect();
+                for (int j = 0; j <= 1; j++)
+                {
+                    var pt = (j == 0) ? ptS.p1 : ptS.p2;
+                    Cv2.MatchTemplate(templates[i * 2 + j], src, correlationMat, TemplateMatchModes.CCoeffNormed);
+                    mm = GetMinMax(correlationMat);
+                    if (i < 4) // only 4 mats can be displayed in the Mat_4to1 algorithm...
+                    {
+                        mats.mat[i].SetTo(0);
+                        correlationMat = GetNormalize32f(correlationMat);
+                        var r = new cv.Rect((dst2.Width - correlationMat.Width) / 2, (dst2.Height - correlationMat.Height) / 2, correlationMat.Width, correlationMat.Height);
+                        correlationMat.CopyTo(mats.mat[i][r]);
+                    }
+                    if (j == 0)
+                    {
+                        mr.p1 = new cv.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h);
+                        mr.correlation1 = (float)mm.maxVal;
+                        var rect = ValidateRect(new cv.Rect(mr.p1.X - w, mr.p1.Y - h, w * 2, h * 2));
+                        newTemplates.Add(src[rect]);
+                    }
+                    else
+                    {
+                        mr.p2 = new cv.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h);
+                        mr.correlation2 = (float)mm.maxVal;
+                        var rect = ValidateRect(new cv.Rect(mr.p2.X - w, mr.p2.Y - h, w * 2, h * 2));
+                        newTemplates.Add(src[rect]);
+                    }
+                }
+                matches.Add(mr);
+            }
+            mats.Run(empty);
+            dst3 = mats.dst2;
+            int incorrectCount = 0;
+            foreach (var mr in matches)
+            {
+                if (mr.correlation1 < 0.5 || mr.correlation2 < 0.5) incorrectCount++;
+                DrawLine(dst2, mr.p1, mr.p2, task.HighlightColor);
+                DrawCircle(dst2, mr.p1, task.DotSize, task.HighlightColor);
+                DrawCircle(dst2, mr.p2, task.DotSize, task.HighlightColor);
+                if (task.heartBeat)
+                {
+                    strOut1 = string.Format("{0:F3}", mr.correlation1);
+                    strOut2 = string.Format("{0:F3}", mr.correlation2);
+                }
+                SetTrueText(strOut1, mr.p1, 2);
+                SetTrueText(strOut2, mr.p2, 2);
+            }
+            labels[2] = (matches.Count() - incorrectCount).ToString() + " lines were confirmed with correlations";
+            if (incorrectCount > 0) updateLines = true;
+        }
+    }
+    public class CS_Match_TraceRedC : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        List<Mat> frameList = new List<Mat>();
+        public CS_Match_TraceRedC(VBtask task) : base(task)
+        {
+            dst0 = new Mat(dst0.Size(), MatType.CV_32S, 0);
+            dst1 = new Mat(dst1.Size(), MatType.CV_32S, 0);
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat || !task.cameraStable) dst2.SetTo(0);
+            redC.Run(src);
+            if (task.optionsChanged) frameList.Clear();
+            dst0.SetTo(0);
+            var points = new List<cv.Point>();
+            foreach (var rc in task.redCells)
+            {
+                dst0.Set<Byte>(rc.maxDist.Y, rc.maxDist.X, 1);
+            }
+            labels[2] = task.redCells.Count().ToString() + " cells added";
+            frameList.Add(dst0.Clone());
+            if (frameList.Count() >= task.frameHistoryCount)
+            {
+                dst1 = dst1.Subtract(frameList[0]);
+                frameList.RemoveAt(0);
+            }
+            dst1 = dst1.Add(dst0);
+            dst1.ConvertTo(dst2, MatType.CV_8U);
+            dst2 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            dst3 = redC.dst2;
+        }
+    }
+    public class CS_Match_DrawRect : CS_Parent
+    {
+        Match_Basics match = new Match_Basics();
+        public cv.Rect inputRect;
+        public bool showOutput;
+        Mat lastImage = new cv.Mat();
+        public CS_Match_DrawRect(VBtask task) : base(task)
+        {
+            inputRect = new cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40); // arbitrary template to match
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, 0);
+            if (standaloneTest()) labels[3] = "Probabilities (draw rectangle to test again)";
+            labels[2] = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again.";
+            desc = "Find the requested template in task.drawrect in an image";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass) lastImage = src.Clone();
+            if (task.mouseClickFlag && task.drawRect.Width != 0)
+            {
+                inputRect = ValidateRect(task.drawRect);
+                match.template = src[inputRect].Clone();
+            }
+            else
+            {
+                if (task.FirstPass) match.template = lastImage[inputRect].Clone();
+            }
+            match.Run(src);
+            if (standaloneTest() || showOutput)
+            {
+                dst0 = match.dst0.Normalize(0, 255, NormTypes.MinMax);
+                dst3.SetTo(0);
+                dst0.CopyTo(dst3[new cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)]);
+                dst3.Rectangle(inputRect, Scalar.White, task.lineWidth, task.lineType);
+                dst2 = src;
+            }
+            SetTrueText("maxLoc = " + match.matchCenter.X + ", " + match.matchCenter.Y, new cv.Point(1, 1), 3);
+            if (standaloneTest())
+            {
+                DrawCircle(dst2, match.matchCenter, task.DotSize, Scalar.Red);
+                SetTrueText(string.Format("{0:F3}", match.correlation), match.matchCenter, 2);
+            }
+            lastImage = src;
+        }
+    }
+    public class CS_Match_tCell : CS_Parent
+    {
+        public List<tCell> tCells = new List<tCell>();
+        System.Windows.Forms.TrackBar cellSlider;
+        Options_Features options = new Options_Features();
+        Line_DisplayInfo lineDisp = new Line_DisplayInfo();
+        public CS_Match_tCell(VBtask task) : base(task)
+        {
+            tCell tc = new tCell();
+            tCells.Add(tc);
+            cellSlider = FindSlider("MatchTemplate Cell Size");
+            desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided.";
+        }
+        public tCell createCell(Mat src, float correlation, Point2f pt)
+        {
+            var rSize = cellSlider.Value;
+            tCell tc = new tCell();
+            tc.rect = ValidateRect(new cv.Rect((int)(pt.X - rSize), (int)(pt.Y - rSize), rSize * 2, rSize * 2));
+            tc.correlation = correlation;
+            tc.depth = (float)task.pcSplit[2][tc.rect].Mean(task.depthMask[tc.rect])[0] / 1000;
+            tc.center = pt;
+            tc.searchRect = ValidateRect(new cv.Rect((int)(tc.center.X - rSize * 3), (int)(tc.center.Y - rSize * 3), 
+                                         rSize * 6, rSize * 6));
+            if (tc.template == null) tc.template = src[tc.rect].Clone();
+            return tc;
+        }
+        public void RunCS(Mat src)
+        {
+            var rSize = cellSlider.Value;
+            if (standaloneTest() && task.heartBeat)
+            {
+                options.RunVB();
+                tCells.Clear();
+                tCells.Add(createCell(src, 0, new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))));
+                tCells.Add(createCell(src, 0, new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))));
+            }
+            for (int i = 0; i < tCells.Count(); i++)
+            {
+                var tc = tCells[i];
+                var input = src[tc.searchRect];
+                Cv2.MatchTemplate(tc.template, input, dst0, TemplateMatchModes.CCoeffNormed);
+                mmData mm = GetMinMax(dst0);
+                tc.center = new Point2f(tc.searchRect.X + mm.maxLoc.X + rSize, tc.searchRect.Y + mm.maxLoc.Y + rSize);
+                tc.searchRect = ValidateRect(new cv.Rect((int)(tc.center.X - rSize * 3), (int)(tc.center.Y - rSize * 3), 
+                                             rSize * 6, rSize * 6));
+                tc.rect = ValidateRect(new cv.Rect((int)(tc.center.X - rSize), (int)(tc.center.Y - rSize), rSize * 2, 
+                                       rSize * 2));
+                tc.correlation = (float)mm.maxVal;
+                tc.depth = (float)task.pcSplit[2][tc.rect].Mean(task.depthMask[tc.rect])[0] / 1000;
+                tc.strOut = string.Format("{0:F2}\n{1:F2}m", tc.correlation, tc.depth);
+                tCells[i] = tc;
+            }
+            if (standaloneTest())
+            {
+                lineDisp.tcells = tCells;
+                lineDisp.Run(src);
+                dst2 = lineDisp.dst2;
+            }
+        }
+    }
+    public class CS_Match_LinePairTest : CS_Parent
+    {
+        public Point2f[] ptx = new Point2f[2];
+        public Mat[] target = new Mat[2];
+        public float[] correlation = new float[2];
+        Options_Features options = new Options_Features();
+        System.Windows.Forms.TrackBar cellSlider;
+        System.Windows.Forms.TrackBar corrSlider;
+        public CS_Match_LinePairTest(VBtask task) : base(task)
+        {
+            cellSlider = FindSlider("MatchTemplate Cell Size");
+            corrSlider = FindSlider("Feature Correlation Threshold");
+            desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            float minCorrelation = corrSlider.Value / 100f;
+            int rSize = cellSlider.Value;
+            int radius = rSize / 2;
+            cv.Rect rect;
+            if (target[0] != null && correlation[0] < minCorrelation) target[0] = null;
+            if (task.mouseClickFlag)
+            {
+                ptx[0] = task.ClickPoint;
+                ptx[1] = new Point2f(msRNG.Next(rSize, dst2.Width - 2 * rSize), msRNG.Next(rSize, dst2.Height - 2 * rSize));
+                rect = ValidateRect(new cv.Rect((int)(ptx[0].X - radius), (int)(ptx[0].Y - radius), rSize, rSize));
+                target[0] = src[rect];
+                rect = ValidateRect(new cv.Rect((int)(ptx[1].X - radius), (int)(ptx[1].Y - radius), rSize, rSize));
+                target[1] = src[rect];
+            }
+            if (target[0] == null || target[1] == null)
+            {
+                dst3 = src;
+                SetTrueText("Click anywhere in the image to start the algorithm.");
+                return;
+            }
+            dst3 = src.Clone();
+            dst2 = new Mat(dst2.Size(), MatType.CV_32FC1, 0);
+            for (int i = 0; i < ptx.Length; i++)
+            {
+                rect = ValidateRect(new cv.Rect((int)(ptx[i].X - radius), (int)(ptx[i].Y - radius), rSize, rSize));
+                cv.Rect searchRect = ValidateRect(new cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3));
+                Cv2.MatchTemplate(target[i], src[searchRect], dst0, TemplateMatchModes.CCoeffNormed);
+                var mmData = GetMinMax(dst0);
+                correlation[i] = (float)mmData.maxVal;
+                if (i == 0)
+                {
+                    dst0.CopyTo(dst2[new cv.Rect(0, 0, dst0.Width, dst0.Height)]);
+                    dst2 = dst2.Threshold(minCorrelation, 255, ThresholdTypes.Binary);
+                }
+                ptx[i] = new Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius);
+                DrawCircle(dst3, ptx[i], task.DotSize, task.HighlightColor);
+                dst3.Rectangle(searchRect, Scalar.Yellow, 1);
+                rect = ValidateRect(new cv.Rect((int)(ptx[i].X - radius), (int)(ptx[i].Y - radius), rSize, rSize));
+                target[i] = task.color[rect];
+            }
+            labels[3] = "p1 = " + ptx[0].X + "," + ptx[0].Y + " p2 = " + ptx[1].X + "," + ptx[1].Y;
+            labels[2] = "Correlation = " + correlation[0].ToString("F3") + " Search result is " + dst0.Width + "X" + dst0.Height;
+        }
+    }
+    public class CS_Match_GoodFeatureKNN : CS_Parent
+    {
+        public KNN_Basics knn = new KNN_Basics();
+        public Feature_Basics feat = new Feature_Basics();
+        List<Mat> frameList = new List<Mat>();
+        Options_Match options = new Options_Match();
+        public CS_Match_GoodFeatureKNN(VBtask task) : base(task)
+        {
+            dst0 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            labels[3] = "Shake camera to see tracking of the highlighted features";
+            desc = "Track the GoodFeatures with KNN";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            feat.Run(src);
+            knn.queries = new List<cv.Point2f>(task.features);
+            knn.Run(empty);
+            if (task.optionsChanged)
+            {
+                frameList.Clear();
+                dst1.SetTo(0);
+            }
+            dst0.SetTo(0);
+            foreach (var mp in knn.matches)
+            {
+                if (mp.p1.DistanceTo(mp.p2) <= options.maxDistance)
+                    DrawLine(dst0, mp.p1, mp.p2, 255, task.lineWidth + 2);
+            }
+            frameList.Add(dst0.Clone());
+            if (frameList.Count() >= task.frameHistoryCount)
+            {
+                dst1 = dst1.Subtract(frameList[0]);
+                frameList.RemoveAt(0);
+            }
+            dst1 += dst0;
+            dst2 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            dst3 = src;
+            dst3.SetTo(task.HighlightColor, dst2);
+        }
+    }
+    public class CS_Match_Point : CS_Parent
+    {
+        public Point2f pt;
+        public Mat target;
+        public float correlation;
+        public int radius;
+        public cv.Rect searchRect;
+        Options_Features options = new Options_Features();
+        System.Windows.Forms.TrackBar cellSlider;
+        public CS_Match_Point(VBtask task) : base(task)
+        {
+            cellSlider = FindSlider("MatchTemplate Cell Size");
+            labels[2] = "Rectangle shown is the search rectangle.";
+            desc = "Track the selected point";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                SetTrueText("Set the target mat and the pt then run to track an individual point." +
+                            "\nAfter running, the pt is updated with the new location and correlation with the updated correlation." +
+                            "\nThere is no output when run standaloneTest()");
+                return;
+            }
+            int rSize = cellSlider.Value;
+            int radius = rSize / 2;
+            cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - radius), (int)(pt.Y - radius), rSize, rSize));
+            searchRect = ValidateRect(new cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3));
+            Cv2.MatchTemplate(target[rect], src[searchRect], dst0, TemplateMatchModes.CCoeffNormed);
+            var mmData = GetMinMax(dst0);
+            correlation = (float)mmData.maxVal;
+            pt = new Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius);
+            DrawCircle(src, pt, task.DotSize, Scalar.White);
+            src.Rectangle(searchRect, Scalar.Yellow, 1);
+        }
+    }
+    public class CS_Match_Points : CS_Parent
+    {
+        public List<cv.Point2f> ptx = new List<cv.Point2f>();
+        public List<float> correlation = new List<float>();
+        public Match_Point mPoint = new Match_Point();
+        Feature_Basics feat = new Feature_Basics();
+        public CS_Match_Points(VBtask task) : base(task)
+        {
+            labels[2] = "Rectangle shown is the search rectangle.";
+            desc = "Track the selected points";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass) mPoint.target = src.Clone();
+            if (standaloneTest())
+            {
+                feat.Run(src);
+                ptx = new List<cv.Point2f>(task.features);
+                SetTrueText("Move camera around to watch the point being tracked", 3);
+            }
+            dst2 = src.Clone();
+            correlation.Clear();
+            for (int i = 0; i < ptx.Count(); i++)
+            {
+                mPoint.pt = ptx[i];
+                mPoint.Run(src);
+                correlation.Add(mPoint.correlation);
+                ptx[i] = mPoint.pt;
+                DrawPolkaDot(ptx[i], dst2);
+            }
+            mPoint.target = src.Clone();
+        }
+    }
+    public class CS_Match_Motion : CS_Parent
+    {
+        Options_Features options = new Options_Features();
+        public Mat mask;
+        Options_Match optionsMatch = new Options_Match();
+        System.Windows.Forms.TrackBar correlationSlider;
+        Mat lastFrame = new cv.Mat();
+        public CS_Match_Motion(VBtask task) : base(task)
+        {
+            correlationSlider = FindSlider("Feature Correlation Threshold");
+            mask = new Mat(dst2.Size(), MatType.CV_8U);
+            dst3 = mask.Clone();
+            desc = "Assign each segment a correlation coefficient and stdev to the previous frame";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            optionsMatch.RunVB();
+            float CCthreshold = (float)correlationSlider.Value / correlationSlider.Maximum;
+            dst2 = src.Clone();
+            if (dst2.Channels() == 3) dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (task.FirstPass) lastFrame = dst2.Clone();
+            Mat saveFrame = dst2.Clone();
+            int updateCount = 0;
+            mask.SetTo(0);
+            // Parallel.ForEach(task.gridList,
+            // roi =>
+            foreach (var roi in task.gridList)
+            {
+                Mat correlation = new Mat();
+                cv.Scalar mean, stdev;
+                Cv2.MeanStdDev(dst2[roi], out mean, out stdev);
+                if (stdev[0] > optionsMatch.stdevThreshold)
+                {
+                    Cv2.MatchTemplate(dst2[roi], lastFrame[roi], correlation, options.matchOption);
+                    cv.Point pt = new cv.Point(roi.X + 2, roi.Y + 10);
+                    if (correlation.Get<float>(0, 0) < CCthreshold)
+                    {
+                        Interlocked.Increment(ref updateCount);
+                    }
+                    else
+                    {
+                        mask[roi].SetTo(255);
+                        dst2[roi].SetTo(0);
+                    }
+                    SetTrueText(correlation.Get<float>(0, 0).ToString(fmt2), pt, 2);
+                }
+                else
+                {
+                    Interlocked.Increment(ref updateCount);
+                }
+            }
+            // End Sub)
+            dst2.SetTo(255, task.gridMask);
+            dst3.SetTo(0);
+            saveFrame.CopyTo(dst3, mask);
+            lastFrame = saveFrame;
+            string corrPercent = string.Format("{0:0.0%} correlation", (float)correlationSlider.Value / 100);
+            labels[2] = "Correlation value for each cell is shown. " + updateCount + " of " + task.gridList.Count() + " with < " + corrPercent +
+                        " or stdev < " + string.Format(fmt0, optionsMatch.stdevThreshold);
+            labels[3] = (task.gridList.Count() - updateCount) + " segments out of " + task.gridList.Count() + " had > " + corrPercent;
+        }
+    }
 
 
 
@@ -32603,5 +33278,6 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
 
 }
+
 
 

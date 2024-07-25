@@ -560,7 +560,7 @@ Public Class VB_Parent : Implements IDisposable
     Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar)
         dst.Circle(pt, radius, color, -1, task.lineType)
     End Sub
-    Public Sub drawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
+    Public Sub DrawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
         dst.Circle(pt, task.DotSize + 2, cv.Scalar.White, -1, task.lineType)
         DrawCircle(dst, pt, task.DotSize, cv.Scalar.Black)
     End Sub

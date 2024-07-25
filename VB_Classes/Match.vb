@@ -182,17 +182,17 @@ End Class
 Public Class Match_Motion : Inherits VB_Parent
     Dim options As New Options_Features
     Public mask As cv.Mat
+    Dim optionsMatch As New Options_Match
+    Dim correlationSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Stdev Threshold", 0, 100, 10)
+        correlationSlider = FindSlider("Feature Correlation Threshold")
         mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         dst3 = mask.Clone
         desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
-        Static stdevSlider = FindSlider("Stdev Threshold")
-        Static correlationSlider = FindSlider("Feature Correlation Threshold")
-        Dim stdevThreshold = CSng(stdevSlider.Value)
+        optionsMatch.RunVB()
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
         dst2 = src.Clone
@@ -208,7 +208,7 @@ Public Class Match_Motion : Inherits VB_Parent
         For Each roi In task.gridList
             Dim correlation As New cv.Mat, mean As Single, stdev As Single
             cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
-            If stdev > stdevThreshold Then
+            If stdev > optionsMatch.stdevThreshold Then
                 cv.Cv2.MatchTemplate(dst2(roi), lastFrame(roi), correlation, options.matchOption)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
@@ -229,7 +229,7 @@ Public Class Match_Motion : Inherits VB_Parent
         lastFrame = saveFrame
         Dim corrPercent = Format(correlationSlider.Value / 100, "0.0%") + " correlation"
         labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " + CStr(task.gridList.Count) + " with < " + corrPercent +
-                    " or stdev < " + Format(stdevThreshold, fmt0)
+                    " or stdev < " + Format(optionsMatch.stdevThreshold, fmt0)
         labels(3) = CStr(task.gridList.Count - updateCount) + " segments out of " + CStr(task.gridList.Count) + " had > " + corrPercent
     End Sub
 End Class
@@ -717,7 +717,7 @@ Public Class Match_Points : Inherits VB_Parent
             mPoint.Run(src)
             correlation.Add(mPoint.correlation)
             ptx(i) = mPoint.pt
-            drawPolkaDot(ptx(i), dst2)
+            DrawPolkaDot(ptx(i), dst2)
         Next
         mPoint.target = src.Clone
     End Sub

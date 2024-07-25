@@ -6477,3 +6477,24 @@ Public Class Options_Mat : Inherits VB_Parent
         Next
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_Match : Inherits VB_Parent
+    Public maxDistance As Integer
+    Public stdevThreshold As Integer
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then
+            sliders.setupTrackBar("Maximum travel distance per frame", 1, 20, 5)
+            sliders.setupTrackBar("Stdev Threshold", 0, 100, 10)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static distSlider = FindSlider("Maximum travel distance per frame")
+        Static stdevSlider = FindSlider("Stdev Threshold")
+        stdevThreshold = CSng(stdevSlider.Value)
+        maxDistance = distSlider.Value
+    End Sub
+End Class
