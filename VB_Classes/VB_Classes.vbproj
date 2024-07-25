@@ -350,7 +350,6 @@
     <Compile Include="LUT.vb" />
     <Compile Include="Mat.vb" />
     <Compile Include="Math.vb" />
-    <Compile Include="MatrixInverse.vb" />
     <Compile Include="MeanShift.vb" />
     <Compile Include="MeanSubtraction.vb" />
     <Compile Include="ML.vb" />

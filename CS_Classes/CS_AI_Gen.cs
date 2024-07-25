@@ -6949,106 +6949,6 @@ public class CS_ApproxPoly_Basics : CS_Parent
             DrawCircle(dst2, center, radius, Scalar.White);
         }
     }
-
-    public class CS_Mat_4Click : CS_Parent
-    {
-        public CS_Mat_4to1 mats;
-        public Mat[] mat;
-        public int quadrant = RESULT_DST3;
-
-        public CS_Mat_4Click(VBtask task) : base(task)
-        {
-            mats = new CS_Mat_4to1(task);
-            mat = mats.mat;
-            labels[3] = "Click a quadrant in dst2 to view it in dst3";
-            desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3";
-        }
-
-        public void RunCS(Mat src)
-        {
-            mat = mats.mat;
-            mats.RunAndMeasure(Mat.Zeros(src.Size(), MatType.CV_8UC3), mats);
-            dst2 = mats.dst2.Clone();
-            if (standalone) mats.defaultMats(src);
-            if (task.FirstPass)
-            {
-                task.ClickPoint = new cv.Point(0, 0);
-                task.mousePicTag = RESULT_DST2;
-            }
-
-            if (task.mouseClickFlag && task.mousePicTag == RESULT_DST2)
-            {
-                if (task.ClickPoint.Y < dst2.Rows / 2)
-                {
-                    quadrant = (task.ClickPoint.X < task.WorkingRes.Width / 2) ? RESULT_DST0 : RESULT_DST1;
-                }
-                else
-                {
-                    quadrant = (task.ClickPoint.X < task.WorkingRes.Width / 2) ? RESULT_DST2 : RESULT_DST3;
-                }
-            }
-            mats.RunAndMeasure(Mat.Zeros(src.Size(), MatType.CV_8UC3), mats);
-            dst2 = mats.dst2.Clone();
-            dst3 = mats.mat[quadrant].Clone();
-        }
-    }
-
-
-    public class CS_Mat_4to1 : CS_Parent
-    {
-        public Mat[] mat = new Mat[4];
-        public bool lineSeparators = true; // if they want lines or not...
-        public int quadrant = 0;
-
-        public CS_Mat_4to1(VBtask task) : base(task)
-        {
-            for (int i = 0; i < mat.Length; i++)
-            {
-                mat[i] = dst2.Clone();
-            }
-            labels[2] = "Combining 4 images into one";
-            labels[3] = "Click any quadrant at left to view it below";
-            desc = "Use one Mat for up to 4 images";
-        }
-
-        public void defaultMats(Mat src)
-        {
-            Mat tmpLeft = (task.leftView.Channels() == 1) ? task.leftView.CvtColor(ColorConversionCodes.GRAY2BGR) : task.leftView;
-            Mat tmpRight = (task.rightView.Channels() == 1) ? task.rightView.CvtColor(ColorConversionCodes.GRAY2BGR) : task.rightView;
-            mat = new Mat[] { task.color.Clone(), task.depthRGB.Clone(), tmpLeft, tmpRight };
-        }
-
-        public void RunCS(Mat src)
-        {
-            cv.Size nSize = new cv.Size(dst2.Width / 2, dst2.Height / 2);
-            Rect roiTopLeft = new Rect(0, 0, nSize.Width, nSize.Height);
-            Rect roiTopRight = new Rect(nSize.Width, 0, nSize.Width, nSize.Height);
-            Rect roibotLeft = new Rect(0, nSize.Height, nSize.Width, nSize.Height);
-            Rect roibotRight = new Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height);
-            if (standalone) defaultMats(src);
-
-            dst2 = new Mat(dst2.Size(), MatType.CV_8UC3);
-            Rect roi = new Rect(0, 0, 0, 0);
-            for (int i = 0; i < 4; i++)
-            {
-                Mat tmp = mat[i].Clone();
-                if (tmp.Channels() == 1) tmp = mat[i].CvtColor(ColorConversionCodes.GRAY2BGR);
-                if (i == 0) roi = roiTopLeft;
-                if (i == 1) roi = roiTopRight;
-                if (i == 2) roi = roibotLeft;
-                if (i == 3) roi = roibotRight;
-                dst2[roi] = tmp.Resize(nSize);
-            }
-            if (lineSeparators)
-            {
-                dst2.Line(new cv.Point(0, dst2.Height / 2), new cv.Point(dst2.Width, dst2.Height / 2), Scalar.White, task.lineWidth + 1);
-                dst2.Line(new cv.Point(dst2.Width / 2, 0), new cv.Point(dst2.Width / 2, dst2.Height), Scalar.White, task.lineWidth + 1);
-            }
-        }
-    }
-
-
-
     public class CS_Cluster_Basics : CS_Parent
     {
         KNN_Core knn = new KNN_Core();
@@ -32272,11 +32172,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
         }
         public void RunCS(Mat src)
         {
-            var points = new Vec3b[src.Total() - 1];
+            var points = new Vec3b[src.Total()];
             Vec3b vec = new Vec3b();
             int index = 0;
-            var m3b = src.Clone();
-            var indexer = m3b.GetGenericIndexer<Vec3b>();
+            var indexer = src.GetGenericIndexer<Vec3b>();
             for (int y = 0; y < src.Rows; y++)
             {
                 for (int x = 0; x < src.Cols; x++)
@@ -32324,34 +32223,34 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
     public class CS_Mat_MultiplyReview : CS_Parent
     {
-        Font_FlowText flow = new Font_FlowText();
         public CS_Mat_MultiplyReview(VBtask task) : base(task)
         {
-            flow.parentData = this;
             desc = "Review matrix multiplication";
         }
         public void RunCS(Mat src)
         {
             int[,] a = { { 1, 4, 2 }, { 2, 5, 1 } };
             int[,] b = { { 3, 4, 2 }, { 3, 5, 7 }, { 1, 2, 1 } };
-            flow.nextMsg = "Matrix a";
+            string strOut = "Matrix a" + "\n";
             for (int i = 0; i < a.GetLength(0); i++)
             {
                 for (int j = 0; j < a.GetLength(1); j++)
                 {
-                    flow.nextMsg += a[i, j].ToString() + "\t";
+                    strOut += a[i, j].ToString() + "\t";
                 }
+                strOut += "\n";
             }
-            flow.nextMsg += "Matrix b";
+            strOut += "Matrix b" + "\n";
             for (int i = 0; i < b.GetLength(0); i++)
             {
                 for (int j = 0; j < b.GetLength(1); j++)
                 {
-                    flow.nextMsg += b[i, j].ToString() + "\t";
+                    strOut += b[i, j].ToString() + "\t";
                 }
+                strOut += "\n";
             }
             int[,] c = new int[a.GetLength(0), b.GetLength(1)];
-            string[,] input = new string[c.GetLength(0), c.GetLength(1)];
+            string[,] input = new string[a.GetLength(0), b.GetLength(1)];
             for (int i = 0; i < c.GetLength(0); i++)
             {
                 for (int j = 0; j < c.GetLength(1); j++)
@@ -32364,17 +32263,19 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     }
                 }
             }
-            flow.nextMsg += "Matrix c = a X b";
+            strOut += "Matrix c = a X b" + "\n";
             for (int i = 0; i < a.GetLength(0); i++)
             {
-                for (int j = 0; j < a.GetLength(1); j++)
+                for (int j = 0; j < b.GetLength(1); j++)
                 {
-                    flow.nextMsg += c[i, j].ToString() + " = " + input[i, j];
+                    strOut += c[i, j].ToString() + " = " + input[i, j];
                 }
+                strOut += "\n";
             }
-            flow.Run(empty);
+            SetTrueText(strOut, RESULT_DST2);
         }
     }
+
     public class CS_Mat_2to1 : CS_Parent
     {
         Mat mat1;
@@ -32509,48 +32410,188 @@ public class CS_ApproxPoly_Basics : CS_Parent
         }
     }
 
-    //public class CS_Mat_Transpose : CS_Parent
-    //{
-    //    public CS_Mat_Transpose(VBtask task) : base(task)
-    //    {
-    //        desc = "Transpose a Mat and show results.";
-    //        labels[2] = "Color Image Transposed";
-    //        labels[3] = "Color Image Transposed back (artifacts)";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        var trColor = src.Transpose();
-    //        dst2 = trColor.ToMat().Resize(new cv.Size(src.Cols, src.Rows));
-    //        var trBack = dst2.Transpose();
-    //        dst3 = trBack.ToMat().Resize(src.Size());
-    //    }
-    //}
-    //public class CS_Mat_Managed : CS_Parent
-    //{
-    //    Random autoRand = new Random();
-    //    Vec3b[] img = new Vec3b[dst2.Total()];
-    //    Vec3b nextColor = new Vec3b();
-    //    public CS_Mat_Managed(VBtask task) : base(task)
-    //    {
-    //        labels[2] = "Color change is in the managed cv.vec3b array";
-    //        desc = "There is a limited ability to use Mat data in Managed code directly.";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, img);
-    //        if (task.heartBeat)
-    //        {
-    //            nextColor = nextColor == new Vec3b(0, 0, 255) ? new Vec3b(0, 255, 0) : new Vec3b(0, 0, 255);
-    //        }
-    //        for (int i = 0; i < img.Length; i++)
-    //        {
-    //            img[i] = nextColor;
-    //        }
-    //        var rect = new Rect(autoRand.Next(0, src.Width - 50), autoRand.Next(0, src.Height - 50), 50, 50);
-    //        dst2[rect].SetTo(0);
-    //    }
-    //}
+    public class CS_Mat_Transpose : CS_Parent
+    {
+        public CS_Mat_Transpose(VBtask task) : base(task)
+        {
+            desc = "Transpose a Mat and show results.";
+            labels[2] = "Color Image Transposed";
+            labels[3] = "Color Image Transposed back (artifacts)";
+        }
+        public void RunCS(Mat src)
+        {
+            var trColor = src.T();
+            dst2 = trColor.ToMat().Resize(new cv.Size(src.Cols, src.Rows));
+            var trBack = dst2.T();
+            dst3 = trBack.ToMat().Resize(src.Size());
+        }
+    }
+    public class CS_Mat_Managed : CS_Parent
+    {
+        Random autoRand = new Random();
+        Vec3b[] img;
+        Vec3b nextColor = new Vec3b();
+        public CS_Mat_Managed(VBtask task) : base(task)
+        {
+            img = new Vec3b[dst2.Total()];
+            labels[2] = "Color change is in the managed cv.vec3b array";
+            desc = "There is a limited ability to use Mat data in Managed code directly.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, img);
+            if (task.heartBeat)
+            {
+                nextColor = nextColor == new Vec3b(0, 0, 255) ? new Vec3b(0, 255, 0) : new Vec3b(0, 0, 255);
+            }
+            for (int i = 0; i < img.Length; i++)
+            {
+                img[i] = nextColor;
+            }
+            var rect = new Rect(autoRand.Next(0, src.Width - 50), autoRand.Next(0, src.Height - 50), 50, 50);
+            dst2[rect].SetTo(0);
+        }
+    }
+    public class CS_Mat_Inverse_4D : CS_Parent
+    {
+        double[,] defaultInput = new double[,] { { 3, 7, 2, 5 }, { 4, 0, 1, 1 }, { 1, 6, 3, 0 }, { 2, 8, 4, 3 } };
+        public Mat input;
+        public CS_Mat_Inverse_4D(VBtask task) : base(task)
+        {
+            input = new Mat(4, 4, MatType.CV_64F, defaultInput);
+            desc = "Use OpenCV to invert a matrix";
+        }
+        string printMatrixResults(Mat src, Mat dst2)
+        {
+            string outstr = "Original Matrix " + "\n";
+            for (int y = 0; y < src.Rows; y++)
+            {
+                for (int x = 0; x < src.Cols; x++)
+                {
+                    outstr += string.Format("{0}\t", src.At<double>(y, x).ToString("F4"));
+                }
+                outstr += "\n";
+            }
+            outstr += "\nMatrix Inverse" + "\n";
+            for (int y = 0; y < src.Rows; y++)
+            {
+                for (int x = 0; x < src.Cols; x++)
+                {
+                    outstr += string.Format("{0}\t", dst2.At<double>(y, x).ToString("F4"));
+                }
+                outstr += "\n";
+            }
+            return outstr;
+        }
+        public void RunCS(Mat src)
+        {
+            if (input.Width != input.Height)
+            {
+                SetTrueText("The input matrix must be square!");
+                return;
+            }
+            Mat result = new Mat();
+            Cv2.Invert(input, result, DecompTypes.LU);
+            string outstr = printMatrixResults(input, result);
+            SetTrueText(outstr);
+        }
+    }
+    public class CS_Mat_4Click : CS_Parent
+    {
+        public CS_Mat_4to1 mats;
+        public Mat[] mat;
+        public int quadrant = RESULT_DST3;
 
+        public CS_Mat_4Click(VBtask task) : base(task)
+        {
+            mats = new CS_Mat_4to1(task);
+            mat = mats.mat;
+            labels[3] = "Click a quadrant in dst2 to view it in dst3";
+            desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3";
+        }
+
+        public void RunCS(Mat src)
+        {
+            mat = mats.mat;
+            mats.RunAndMeasure(Mat.Zeros(src.Size(), MatType.CV_8UC3), mats);
+            dst2 = mats.dst2.Clone();
+            if (standalone) mats.defaultMats(src);
+            if (task.FirstPass)
+            {
+                task.ClickPoint = new cv.Point(0, 0);
+                task.mousePicTag = RESULT_DST2;
+            }
+
+            if (task.mouseClickFlag && task.mousePicTag == RESULT_DST2)
+            {
+                if (task.ClickPoint.Y < dst2.Rows / 2)
+                {
+                    quadrant = (task.ClickPoint.X < task.WorkingRes.Width / 2) ? RESULT_DST0 : RESULT_DST1;
+                }
+                else
+                {
+                    quadrant = (task.ClickPoint.X < task.WorkingRes.Width / 2) ? RESULT_DST2 : RESULT_DST3;
+                }
+            }
+            mats.RunAndMeasure(Mat.Zeros(src.Size(), MatType.CV_8UC3), mats);
+            dst2 = mats.dst2.Clone();
+            dst3 = mats.mat[quadrant].Clone();
+        }
+    }
+
+
+    public class CS_Mat_4to1 : CS_Parent
+    {
+        public Mat[] mat = new Mat[4];
+        public bool lineSeparators = true; // if they want lines or not...
+        public int quadrant = 0;
+
+        public CS_Mat_4to1(VBtask task) : base(task)
+        {
+            for (int i = 0; i < mat.Length; i++)
+            {
+                mat[i] = dst2.Clone();
+            }
+            labels[2] = "Combining 4 images into one";
+            labels[3] = "Click any quadrant at left to view it below";
+            desc = "Use one Mat for up to 4 images";
+        }
+
+        public void defaultMats(Mat src)
+        {
+            Mat tmpLeft = (task.leftView.Channels() == 1) ? task.leftView.CvtColor(ColorConversionCodes.GRAY2BGR) : task.leftView;
+            Mat tmpRight = (task.rightView.Channels() == 1) ? task.rightView.CvtColor(ColorConversionCodes.GRAY2BGR) : task.rightView;
+            mat = new Mat[] { task.color.Clone(), task.depthRGB.Clone(), tmpLeft, tmpRight };
+        }
+
+        public void RunCS(Mat src)
+        {
+            cv.Size nSize = new cv.Size(dst2.Width / 2, dst2.Height / 2);
+            Rect roiTopLeft = new Rect(0, 0, nSize.Width, nSize.Height);
+            Rect roiTopRight = new Rect(nSize.Width, 0, nSize.Width, nSize.Height);
+            Rect roibotLeft = new Rect(0, nSize.Height, nSize.Width, nSize.Height);
+            Rect roibotRight = new Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height);
+            if (standalone) defaultMats(src);
+
+            dst2 = new Mat(dst2.Size(), MatType.CV_8UC3);
+            Rect roi = new Rect(0, 0, 0, 0);
+            for (int i = 0; i < 4; i++)
+            {
+                Mat tmp = mat[i].Clone();
+                if (tmp.Channels() == 1) tmp = mat[i].CvtColor(ColorConversionCodes.GRAY2BGR);
+                if (i == 0) roi = roiTopLeft;
+                if (i == 1) roi = roiTopRight;
+                if (i == 2) roi = roibotLeft;
+                if (i == 3) roi = roibotRight;
+                dst2[roi] = tmp.Resize(nSize);
+            }
+            if (lineSeparators)
+            {
+                dst2.Line(new cv.Point(0, dst2.Height / 2), new cv.Point(dst2.Width, dst2.Height / 2), Scalar.White, task.lineWidth + 1);
+                dst2.Line(new cv.Point(dst2.Width / 2, 0), new cv.Point(dst2.Width / 2, dst2.Height), Scalar.White, task.lineWidth + 1);
+            }
+        }
+    }
 
 
 

@@ -137,7 +137,7 @@ End Class
 
 Public Class Mat_Managed : Inherits VB_Parent
     Dim autoRand As New Random()
-    Dim img(dst2.Total) As cv.Vec3b
+    Dim img(dst2.Total - 1) As cv.Vec3b
     Dim nextColor As cv.Vec3b
     Public Sub New()
         labels(2) = "Color change is in the managed cv.vec3b array"
@@ -162,26 +162,26 @@ End Class
 
 
 Public Class Mat_MultiplyReview : Inherits VB_Parent
-    Dim flow As New Font_FlowText
     Public Sub New()
-        flow.parentData = Me
         desc = "Review matrix multiplication"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
-        flow.nextMsg = "Matrix a"
+        strOut = "Matrix a" + vbCrLf
         For i = 0 To a.GetLength(0) - 1
             For j = 0 To a.GetLength(1) - 1
-                flow.nextMsg += CStr(a(i, j)) + vbTab
+                strOut += CStr(a(i, j)) + vbTab
             Next
+            strOut += vbCrLf
         Next
 
-        flow.nextMsg += "Matrix b"
+        strOut += "Matrix b" + vbCrLf
         For i = 0 To b.GetLength(0) - 1
             For j = 0 To b.GetLength(1) - 1
-                flow.nextMsg += CStr(b(i, j)) + vbTab
+                strOut += CStr(b(i, j)) + vbTab
             Next
+            strOut += vbCrLf
         Next
 
         Dim c(a.GetLength(0) - 1, a.GetLength(1) - 1) As Integer
@@ -197,14 +197,15 @@ Public Class Mat_MultiplyReview : Inherits VB_Parent
         Next
 
 
-        flow.nextMsg += "Matrix c = a X b"
+        strOut += "Matrix c = a X b" + vbCrLf
         For i = 0 To a.GetLength(0) - 1
             For j = 0 To a.GetLength(1) - 1
-                flow.nextMsg += CStr(c(i, j)) + " = " + input(i, j)
+                strOut += CStr(c(i, j)) + " = " + input(i, j)
             Next
+            strOut += vbCrLf
         Next
 
-        flow.Run(empty)
+        SetTrueText(strOut, RESULT_DST2)
     End Sub
 End Class
 
@@ -265,6 +266,47 @@ Public Class Mat_Inverse : Inherits VB_Parent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Mat_Inverse_4D : Inherits VB_Parent
+    Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
+    Public input As cv.Mat
+    Public Sub New()
+        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
+        desc = "Use OpenCV to invert a matrix"
+    End Sub
+    Private Function printMatrixResults(src As cv.Mat, dst2 As cv.Mat) As String
+        Dim outstr As String = "Original Matrix " + vbCrLf
+        For y = 0 To src.Rows - 1
+            For x = 0 To src.Cols - 1
+                outstr += Format(src.Get(Of Double)(y, x), fmt4) + vbTab
+            Next
+            outstr += vbCrLf
+        Next
+        outstr += vbCrLf + "Matrix Inverse" + vbCrLf
+        For y = 0 To src.Rows - 1
+            For x = 0 To src.Cols - 1
+                outstr += Format(dst2.Get(Of Double)(y, x), fmt4) + vbTab
+            Next
+            outstr += vbCrLf
+        Next
+        Return outstr
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        If input.Width <> input.Height Then
+            SetTrueText("The input matrix must be square!")
+            Exit Sub
+        End If
+
+        Dim result As New cv.Mat
+        cv.Cv2.Invert(input, result, cv.DecompTypes.LU)
+        Dim outstr = printMatrixResults(input, result)
+        SetTrueText(outstr)
+    End Sub
+End Class
 
 
 

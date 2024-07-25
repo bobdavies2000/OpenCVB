@@ -867,12 +867,15 @@ namespace CS_Classes
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);
 			if (algorithmName == "CS_Mat_Inverse") return new CS_Mat_Inverse(task);
+			if (algorithmName == "CS_Mat_Inverse_4D") return new CS_Mat_Inverse_4D(task);
+			if (algorithmName == "CS_Mat_Managed") return new CS_Mat_Managed(task);
 			if (algorithmName == "CS_Mat_MatToPoint") return new CS_Mat_MatToPoint(task);
 			if (algorithmName == "CS_Mat_MultiplyReview") return new CS_Mat_MultiplyReview(task);
 			if (algorithmName == "CS_Mat_PointToMat") return new CS_Mat_PointToMat(task);
 			if (algorithmName == "CS_Mat_Repeat") return new CS_Mat_Repeat(task);
 			if (algorithmName == "CS_Mat_RowColRange") return new CS_Mat_RowColRange(task);
 			if (algorithmName == "CS_Mat_ToList") return new CS_Mat_ToList(task);
+			if (algorithmName == "CS_Mat_Transpose") return new CS_Mat_Transpose(task);
 			if (algorithmName == "CS_Mat_Tricks") return new CS_Mat_Tricks(task);
 			if (algorithmName == "CS_MatrixInverse") return new CS_MatrixInverse(task);
 			if (algorithmName == "CS_OEX_Sobel_Demo") return new CS_OEX_Sobel_Demo(task);
