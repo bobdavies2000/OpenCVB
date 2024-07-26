@@ -34011,5 +34011,136 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[3] = (task.gridList.Count() - updateCount).ToString() + " out of " + task.gridList.Count().ToString() + " had stdev > " + stdevSlider.Value.ToString("0.0");
         }
     }
+    public class CS_MeanShift_Basics : CS_Parent
+    {
+        public int rectangleEdgeWidth = 2;
+        public cv.Rect trackbox = new cv.Rect();
+        Mat histogram = new Mat();
+        public CS_MeanShift_Basics(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            labels[2] = "Draw anywhere to start mean shift tracking.";
+            desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.";
+        }
+        public void RunCS(Mat src)
+        {
+            var roi = task.drawRect.Width > 0 ? task.drawRect : new cv.Rect(0, 0, dst2.Width, dst2.Height);
+            var hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV);
+            int[] ch = { 0, 1, 2 };
+            int[] hsize = { 16, 16, 16 };
+            Rangef[] ranges = { new Rangef(0, 180) };
+            if (task.optionsChanged)
+            {
+                trackbox = task.drawRect;
+                var maskROI = hsv[roi].InRange(new Scalar(0, 60, 32), new Scalar(180, 255, 255));
+                Cv2.CalcHist(new Mat[] { hsv[roi] }, ch, maskROI, histogram, 1, hsize, ranges);
+                histogram = histogram.Normalize(0, 255, NormTypes.MinMax);
+            }
+            Cv2.CalcBackProject(new Mat[] { hsv }, ch, histogram, dst1, ranges);
+            dst2 = src;
+            if (trackbox.Width != 0)
+            {
+                Cv2.MeanShift(dst1, ref trackbox, new TermCriteria(CriteriaTypes.Count | CriteriaTypes.Eps, 10, 1));
+                dst2.Rectangle(trackbox, Scalar.Red, rectangleEdgeWidth, task.lineType);
+                dst3 = Show_HSV_Hist(histogram);
+                dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR);
+            }
+        }
+    }
+    public class CS_MeanShift_Depth : CS_Parent
+    {
+        MeanShift_Basics meanShift = new MeanShift_Basics();
+        public CS_MeanShift_Depth(VBtask task) : base(task)
+        {
+            labels[2] = "Draw anywhere to start mean shift tracking.";
+            desc = "Use depth to start mean shift algorithm.";
+        }
+        public void RunCS(Mat src)
+        {
+            meanShift.Run(task.depthRGB);
+            dst2 = meanShift.dst2;
+            dst3 = meanShift.dst1;
+        }
+    }
+    public class CS_Mesh_Basics : CS_Parent
+    {
+        KNN_Core knn = new KNN_Core();
+        public List<Point2f> ptList = new List<Point2f>();
+        Options_Mesh options = new Options_Mesh();
+        public CS_Mesh_Basics(VBtask task) : base(task)
+        {
+            desc = "Build triangles from the ptList input of points.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src;
+            if (task.heartBeat && standaloneTest())
+            {
+                var feat = new Feature_Basics();
+                feat.Run(src);
+                ptList = task.features;
+            }
+            if (ptList.Count() <= 3) return;
+            knn.queries = ptList;
+            knn.trainInput = knn.queries;
+            knn.Run(empty);
+            for (int i = 0; i < knn.queries.Count(); i++)
+            {
+                var ptLast = knn.queries[i];
+                for (int j = 1; j < options.nabeCount; j++)
+                {
+                    var pt = knn.queries[knn.result[i, j]];
+                    DrawLine(dst2, ptLast, pt, cv.Scalar.White);
+                    ptLast = pt;
+                }
+            }
+            dst3.SetTo(0);
+            for (int i = 0; i < knn.queries.Count(); i++)
+            {
+                DrawCircle(dst2, knn.queries[i], task.DotSize, Scalar.Red);
+                DrawCircle(dst3, knn.queries[i], task.DotSize, task.HighlightColor);
+            }
+            labels[2] = "Triangles built each input point and its " + options.nabeCount.ToString() + " nearest neighbors.";
+        }
+    }
+    public class CS_Mesh_Features : CS_Parent
+    {
+        Feature_Basics feat = new Feature_Basics();
+        Mesh_Basics mesh = new Mesh_Basics();
+        public CS_Mesh_Features(VBtask task) : base(task)
+        {
+            FindSlider("Min Distance to next").Value = 10;
+            labels[2] = "Triangles built with each feature point and the specified number of nearest neighbors.";
+            UpdateAdvice(traceName + ": Use 'Options_Features' to update results.");
+            desc = "Build triangles from feature points";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            if (task.features.Count() < 3) return;
+            mesh.ptList = task.features;
+            mesh.Run(src);
+            dst2 = mesh.dst2;
+            dst3 = mesh.dst3;
+            var pad = feat.options.templatePad;
+            var size = feat.options.templateSize;
+            int depthMiss = 0;
+            foreach (var pt in task.features)
+            {
+                var depth = task.pcSplit[2].Get<float>((int)pt.Y, (int)pt.X);
+                if (depth == 0)
+                {
+                    var r = ValidateRect(new cv.Rect((int)(pt.X - pad), (int)(pt.Y - pad), size, size));
+                    depth = (float)task.pcSplit[2][r].Mean(task.depthMask[r])[0];
+                    depthMiss++;
+                }
+                // SetTrueText(string.Format("{0}m ", depth), pt);
+            }
+            labels[2] = mesh.labels[2];
+            labels[3] = depthMiss.ToString() + " of " + mesh.ptList.Count().ToString() + " features had no depth at that location.  Depth is an average around it for those missing depth.";
+        }
+    }
+
 
 }

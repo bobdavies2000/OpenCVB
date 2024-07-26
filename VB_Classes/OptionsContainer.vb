@@ -14,7 +14,7 @@ Public Class OptionsContainer
         Me.Height = GetSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", task.mainFormLocation.Height)
     End Sub
     Private Sub Options_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", Me.Left)
+        SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", Math.Abs(Me.Left))
         SaveSetting("OpenCVB", "gOptionsTop", "gOptionsTop", Me.Top)
         SaveSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", Me.Width)
         SaveSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", Me.Height)

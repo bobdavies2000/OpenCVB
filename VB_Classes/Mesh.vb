@@ -2,13 +2,13 @@
 Public Class Mesh_Basics : Inherits VB_Parent
     Dim knn As New KNN_Core
     Public ptList As New List(Of cv.Point2f)
+    Dim options As New Options_Mesh
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of nearest neighbors", 1, 10, 2)
         desc = "Build triangles from the ptList input of points."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static nabeSlider = FindSlider("Number of nearest neighbors")
-        Dim nabeCount = nabeSlider.value
+        options.RunVB()
+
         dst2 = src
         If task.heartBeat And standaloneTest() Then
             Dim feat As New Feature_Basics
@@ -24,7 +24,7 @@ Public Class Mesh_Basics : Inherits VB_Parent
 
         For i = 0 To knn.queries.Count - 1
             Dim ptLast = knn.queries(i)
-            For j = 1 To nabeCount - 1
+            For j = 1 To options.nabeCount - 1
                 Dim pt = knn.queries(knn.result(i, j))
                 DrawLine(dst2, ptLast, pt, white)
                 ptLast = pt
@@ -33,10 +33,10 @@ Public Class Mesh_Basics : Inherits VB_Parent
 
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
-            DrawCircle(dst2,knn.queries(i), task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst3,knn.queries(i), task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst3, knn.queries(i), task.DotSize, task.HighlightColor)
         Next
-        labels(2) = "Triangles built each input point and its " + CStr(nabeCount) + " nearest neighbors."
+        labels(2) = "Triangles built each input point and its " + CStr(options.nabeCount) + " nearest neighbors."
     End Sub
 End Class
 

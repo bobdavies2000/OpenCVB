@@ -912,7 +912,11 @@ namespace CS_Classes
 			if (algorithmName == "CS_Math_StdevBoundary") return new CS_Math_StdevBoundary(task);
 			if (algorithmName == "CS_Math_Subtract") return new CS_Math_Subtract(task);
 			if (algorithmName == "CS_Math_Template") return new CS_Math_Template(task);
-			if (algorithmName == "CS_MatrixInverse") return new CS_MatrixInverse(task);
+			if (algorithmName == "CS_MeanShift_Basics") return new CS_MeanShift_Basics(task);
+			if (algorithmName == "CS_MeanShift_Depth") return new CS_MeanShift_Depth(task);
+			if (algorithmName == "CS_MeanSubtraction_Basics") return new CS_MeanSubtraction_Basics(task);
+			if (algorithmName == "CS_Mesh_Basics") return new CS_Mesh_Basics(task);
+			if (algorithmName == "CS_Mesh_Features") return new CS_Mesh_Features(task);
 			if (algorithmName == "CS_OEX_Sobel_Demo") return new CS_OEX_Sobel_Demo(task);
 			if (algorithmName == "CS_OilPaint_Cartoon") return new CS_OilPaint_Cartoon(task);
 			if (algorithmName == "CS_OilPaint_Manual") return new CS_OilPaint_Manual(task);

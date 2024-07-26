@@ -428,65 +428,6 @@ namespace CS_Classes
             labels[2] = options.useBFMatcher ? "BF Matcher output" : "Flann Matcher output";
         }
     }
-
-
-
-    public class CS_MatrixInverse : CS_Parent
-    {
-        public MatrixInverse matrix = new MatrixInverse(); // NOTE: C# class
-        double[,] defaultInput = { { 3, 7, 2, 5 }, { 4, 0, 1, 1 }, { 1, 6, 3, 0 }, { 2, 8, 4, 3 } };
-        double[] defaultBVector = { 12, 7, 7, 13 };
-        Mat input;
-
-        public CS_MatrixInverse(VBtask task) : base(task)
-        {
-            input = new Mat(4, 4, MatType.CV_64F, defaultInput);
-            desc = "Manually invert a matrix";
-        }
-        public void RunCS(Mat src)
-        {
-            if (input.Width != input.Height)
-            {
-                SetTrueText("The src matrix must be square!");
-                return;
-            }
-
-            if (standaloneTest())
-            {
-                matrix.bVector = defaultBVector;
-            }
-
-            var result = matrix.RunCS(input); // C# class Run - see MatrixInverse.cs file...
-
-            StringBuilder outstr = new StringBuilder("Original Matrix \n");
-            string fmt4 = "0.0000"; // Assuming fmt4 is a format string for double
-
-            for (int y = 0; y < input.Rows; y++)
-            {
-                for (int x = 0; x < input.Cols; x++)
-                {
-                    outstr.AppendFormat("{0}\t", input.At<double>(y, x).ToString(fmt4));
-                }
-                outstr.AppendLine();
-            }
-
-            outstr.AppendLine("\nMatrix Inverse");
-            for (int y = 0; y < input.Rows; y++)
-            {
-                for (int x = 0; x < input.Cols; x++)
-                {
-                    outstr.AppendFormat("{0}\t", result.At<double>(y, x).ToString(fmt4));
-                }
-                outstr.AppendLine();
-            }
-
-            SetTrueText(outstr + Environment.NewLine + "Intermediate results are optionally available in the console log.");
-        }
-    }
-
-
-
-
     // https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
     public class CS_Feature_SURF : CS_Parent
     {
@@ -1775,12 +1716,19 @@ namespace CS_Classes
             dst2 = img3.Resize(dst2.Size());
         }
     }
-
-
-
-
-
-
-
+    public class CS_MeanSubtraction_Basics : CS_Parent
+    {
+        Options_MeanSubtraction options = new Options_MeanSubtraction();
+        public CS_MeanSubtraction_Basics(VBtask task) : base(task)
+        {
+            desc = "Subtract the mean from the image with a scaling factor";
+        }
+        public void RunCS(Mat src)
+        {
+            Scalar mean = Cv2.Mean(src);
+            Cv2.Subtract(mean, src, dst2);
+            dst2 *= (float)(100 / options.scaleVal);
+        }
+    }
 
 }

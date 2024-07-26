@@ -6521,3 +6521,35 @@ Public Class Options_Math : Inherits VB_Parent
         showStdev = stdevCheck.checked
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_MeanSubtraction : Inherits VB_Parent
+    Public scaleVal As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Scaling Factor = mean/scaling factor X100", 1, 500, 100)
+    End Sub
+    Public Sub RunVB()
+        Static scaleSlider = FindSlider("Scaling Factor = mean/scaling factor X100")
+        scaleVal = scaleSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Mesh : Inherits VB_Parent
+    Public nabeCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of nearest neighbors", 1, 10, 2)
+    End Sub
+    Public Sub RunVB()
+        Static nabeSlider = FindSlider("Number of nearest neighbors")
+        nabeCount = nabeSlider.value
+    End Sub
+End Class
