@@ -4304,7 +4304,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             Scalar mean, stdev;
             Cv2.MeanStdDev(dst2, out mean, out stdev);
-            SetTrueText("Blur variance is " + (stdev.Val0 * stdev.Val0).ToString("F3"), 3);
+            SetTrueText("Blur variance is " + (stdev.Val0 * stdev.Val0).ToString(fmt3), 3);
 
             if (standaloneTest()) dst2.Rectangle(r, Scalar.White, task.lineWidth);
         }
@@ -18469,7 +18469,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     Cv2.MatchTemplate(dst1[roi], lastImage[roi], correlationMat, TemplateMatchModes.CCoeffNormed);
                     float corr = correlationMat.Get<float>(0, 0);
-                    if (corr < options.correlationMin) SetTrueText(corr.ToString("F3"), roi.TopLeft);
+                    if (corr < options.correlationMin) SetTrueText(corr.ToString(fmt3), roi.TopLeft);
                     if (corr < options.correlationMin) motionCount++;
                 }
             }
@@ -18501,10 +18501,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 if (gather.stdevList[i] < gather.stdevAverage)
                 {
                     rects.Add(roi);
-                    SetTrueText(gather.stdevList[i].ToString("F3"), roi.TopLeft, 3);
+                    SetTrueText(gather.stdevList[i].ToString(fmt3), roi.TopLeft, 3);
                 }
             }
-            if (task.heartBeat) labels = new string[] { "", "", (task.gridList.Count - gather.rects.Count).ToString() + " roi's had low standard deviation ", "Stdev average = " + gather.stdevList.Average().ToString("F3") };
+            if (task.heartBeat) labels = new string[] { "", "", (task.gridList.Count - gather.rects.Count).ToString() + " roi's had low standard deviation ", "Stdev average = " + gather.stdevList.Average().ToString(fmt3) };
         }
     }
     public class CS_FeatureROI_LowStdevCorrelation : CS_Parent
@@ -18550,8 +18550,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
             }
             for (int i = 0; i < saveRects.Count; i++)
             {
-                if (saveCorrs[i] < options.correlationMin) SetTrueText(saveCorrs[i].ToString("F3"), saveRects[i].TopLeft);
-                if (saveCorrs[i] < options.correlationMin) SetTrueText(saveStdev[i].ToString("F3"), saveRects[i].TopLeft, 3);
+                if (saveCorrs[i] < options.correlationMin) SetTrueText(saveCorrs[i].ToString(fmt3), saveRects[i].TopLeft);
+                if (saveCorrs[i] < options.correlationMin) SetTrueText(saveStdev[i].ToString(fmt3), saveRects[i].TopLeft, 3);
             }
             lastImage = dst1.Clone();
         }
@@ -18632,7 +18632,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 float maxCorr = corr.Max();
                 if (maxCorr < options.correlationMin)
                 {
-                    SetTrueText("Correlation " + maxCorr.ToString("F3") + " is less than " + options.correlationMin.ToString("F3"), 1);
+                    SetTrueText("Correlation " + maxCorr.ToString(fmt3) + " is less than " + options.correlationMin.ToString(fmt3), 1);
                 }
                 else
                 {
@@ -18641,11 +18641,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     int offset = roi.TopLeft.X - rectRight.TopLeft.X;
                     if (task.heartBeat)
                     {
-                        strOut = "CoeffNormed max correlation = " + maxCorr.ToString("F3") + "\n";
-                        strOut += "Left Mean = " + gather.meanList[gridIndex].ToString("F3") + " Left stdev = " + gather.stdevList[gridIndex].ToString("F3") + "\n";
+                        strOut = "CoeffNormed max correlation = " + maxCorr.ToString(fmt3) + "\n";
+                        strOut += "Left Mean = " + gather.meanList[gridIndex].ToString(fmt3) + " Left stdev = " + gather.stdevList[gridIndex].ToString(fmt3) + "\n";
                         Scalar mean, stdev;
                         Cv2.MeanStdDev(dst3[rectRight], out mean, out stdev);
-                        strOut += "Right Mean = " + mean[0].ToString("F3") + " Right stdev = " + stdev[0].ToString("F3") + "\n";
+                        strOut += "Right Mean = " + mean[0].ToString(fmt3) + " Right stdev = " + stdev[0].ToString(fmt3) + "\n";
                         strOut += "Right rectangle is offset " + offset.ToString() + " pixels from the left image rectangle";
                     }
                     dst3.Rectangle(rectRight, task.HighlightColor, task.lineWidth);
@@ -18656,7 +18656,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     cv.Point pt = new cv.Point(rectRight.X, roi.Y + 5);
                     SetTrueText((offset + " pixel offset" + "\n" + "Larger = Right").ToString(), pt, 1);
                     SetTrueText(strOut, 1);
-                    labels[3] = "Corresponding roi highlighted in yellow.  Average stdev = " + gather.stdevAverage.ToString("F3");
+                    labels[3] = "Corresponding roi highlighted in yellow.  Average stdev = " + gather.stdevAverage.ToString(fmt3);
                 }
             }
         }
@@ -18692,7 +18692,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 mmData mm = GetMinMax(correlationMat);
                 if (mm.maxVal >= options.correlationMin) sortedRects.Add((float)mm.maxVal, new cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height));
             }
-            labels[2] = sortedRects.Count + " roi's had left/right correlation higher than " + options.correlationMin.ToString("F3");
+            labels[2] = sortedRects.Count + " roi's had left/right correlation higher than " + options.correlationMin.ToString(fmt3);
             foreach (cv.Rect roi in sortedRects.Values)
             {
                 dst3.Rectangle(roi, task.HighlightColor, task.lineWidth);
@@ -22568,7 +22568,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 double Comparison = Cv2.CompareHist(histNorm, lastHistNorm, options.compareMethod);
                 if (double.IsNaN(Comparison)) Comparison = 0;
-                labels[3] = "CompareHist output = " + Comparison.ToString("F3") + " using " + options.compareName + " method";
+                labels[3] = "CompareHist output = " + Comparison.ToString(fmt3) + " using " + options.compareName + " method";
                 trueData = histK.hist.plot.trueData.ToList();
                 SetTrueText(labels[3], 2);
             }
@@ -31102,7 +31102,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             plot.Run(empty);
             dst2 = plot.dst2;
             dst3 = plot.dst3;
-            labels[3] = "using " + nextList.Count() + " points, the correlation of X to Z = " + c1.ToString("F3") + " (blue), correlation of Y to Z = " + c2.ToString("F3") + " (green)";
+            labels[3] = "using " + nextList.Count() + " points, the correlation of X to Z = " + c1.ToString(fmt3) + " (blue), correlation of Y to Z = " + c2.ToString(fmt3) + " (green)";
         }
     }
     public class CS_Line3D_Checks : CS_Parent
@@ -33089,7 +33089,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 target[i] = task.color[rect];
             }
             labels[3] = "p1 = " + ptx[0].X + "," + ptx[0].Y + " p2 = " + ptx[1].X + "," + ptx[1].Y;
-            labels[2] = "Correlation = " + correlation[0].ToString("F3") + " Search result is " + dst0.Width + "X" + dst0.Height;
+            labels[2] = "Correlation = " + correlation[0].ToString(fmt3) + " Search result is " + dst0.Width + "X" + dst0.Height;
         }
     }
     public class CS_Match_GoodFeatureKNN : CS_Parent
@@ -33673,6 +33673,342 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 var matchVal = Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption);
                 if (matchVal < options.matchThreshold) DrawContour(dst3[rc.rect], rc.contour, Scalar.White, -1);
             }
+        }
+    }
+    public class CS_Math_Subtract : CS_Parent
+    {
+        Options_Colors options = new Options_Colors();
+        public CS_Math_Subtract(VBtask task) : base(task)
+        {
+            desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var bgr = new Scalar(options.blueS, options.greenS, options.redS);
+            Cv2.Subtract(bgr, src, dst2); // or dst2 = bgr - src
+            dst3 = src - bgr;
+            var scalar = $"({bgr[0]},{bgr[1]},{bgr[2]})";
+            labels[2] = "Subtract Mat from scalar " + scalar;
+            labels[3] = "Subtract scalar " + scalar + " from Mat ";
+        }
+    }
+    public static class Math_Functions
+    {
+        public static double computeMedian(Mat src, Mat mask, int totalPixels, int bins, float rangeMin, float rangeMax)
+        {
+            var hist = new Mat();
+            Cv2.CalcHist(new[] { src }, new[] { 0 }, mask, hist, 1, new[] { bins }, new[] { new Rangef(rangeMin, rangeMax) });
+            var halfPixels = totalPixels / 2;
+            double median = 0;
+            double cdfVal = hist.Get<float>(0);
+            for (int i = 1; i < bins - 1; i++)
+            {
+                cdfVal += hist.Get<float>(i);
+                if (cdfVal >= halfPixels)
+                {
+                    median = (rangeMax - rangeMin) * i / bins;
+                    break;
+                }
+            }
+            return median;
+        }
+    }
+    public class CS_Math_Median_CDF : CS_Parent
+    {
+        public double medianVal;
+        public int rangeMin = 0;
+        public int rangeMax = 255;
+        public CS_Math_Median_CDF(VBtask task) : base(task)
+        {
+            desc = "Compute the src image median";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            medianVal = Math_Functions.computeMedian(src, new Mat(), (int)src.Total(), task.histogramBins, rangeMin, rangeMax);
+            if (standaloneTest())
+            {
+                var mask = new Mat();
+                mask = src.GreaterThan(medianVal);
+                dst2.SetTo(0);
+                src.CopyTo(dst2, mask);
+                labels[2] = "Grayscale pixels > " + medianVal.ToString(fmt1);
+                dst3.SetTo(0);
+                src.CopyTo(dst3, ~mask); // show the other half.
+                labels[3] = "Grayscale pixels < " + medianVal.ToString(fmt1);
+            }
+        }
+    }
+    public class CS_Math_DepthMeanStdev : CS_Parent
+    {
+        Depth_NotMissing minMax = new Depth_NotMissing();
+        public CS_Math_DepthMeanStdev(VBtask task) : base(task)
+        {
+            desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement";
+        }
+        public void RunCS(Mat src)
+        {
+            minMax.Run(src);
+            cv.Scalar mean = 0, stdev = 0;
+            var mask = minMax.dst3; // the mask for stable depth.
+            dst3.SetTo(0);
+            task.depthRGB.CopyTo(dst3, mask);
+            if (mask.Type() != MatType.CV_8U) mask = mask.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Cv2.MeanStdDev(task.pcSplit[2], out mean, out stdev, mask);
+            labels[3] = "stablized depth mean=" + mean[0].ToString(fmt1) + " stdev=" + stdev[0].ToString(fmt1);
+            dst2 = task.depthRGB;
+            Cv2.MeanStdDev(task.pcSplit[2], out mean, out stdev);
+            labels[2] = "raw depth mean=" + mean[0].ToString(fmt1) + " stdev=" + stdev[0].ToString(fmt1);
+        }
+    }
+    public class CS_Math_RGBCorrelation : CS_Parent
+    {
+        Font_FlowText flow = new Font_FlowText();
+        Match_Basics match = new Match_Basics();
+        public CS_Math_RGBCorrelation(VBtask task) : base(task)
+        {
+            flow.parentData = this;
+            desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue";
+        }
+        public void RunCS(Mat src)
+        {
+            var split = src.Split();
+            match.template = split[0];
+            match.Run(split[1]);
+            var blueGreenCorrelation = "Blue-Green " + match.labels[2];
+            match.template = split[2];
+            match.Run(split[1]);
+            var redGreenCorrelation = "Red-Green " + match.labels[2];
+            match.template = split[2];
+            match.Run(split[0]);
+            var redBlueCorrelation = "Red-Blue " + match.labels[2];
+            flow.nextMsg = blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation;
+            flow.Run(empty);
+            labels[2] = "Log of " + match.options.matchText;
+        }
+    }
+    public class CS_Math_StdevBoundary : CS_Parent
+    {
+        Math_Stdev stdev = new Math_Stdev();
+        System.Windows.Forms.TrackBar stdevSlider;
+        public CS_Math_StdevBoundary(VBtask task) : base(task)
+        {
+            stdevSlider = FindSlider("Stdev Threshold");
+            labels[2] = "Low stdev regions.  Gaps filled with OTSU results";
+            labels[3] = "High stdev segments after the first pass";
+            desc = "Explore how to get a better boundary on the low stdev mask";
+        }
+        public void RunCS(Mat src)
+        {
+            stdev.Run(src);
+            dst2 = stdev.dst2;
+            stdev.saveFrame.CopyTo(dst3);
+            float stdevThreshold = (float)stdevSlider.Value;
+            foreach (var roi in task.gridList)
+            {
+                if (roi.X + roi.Width < dst3.Width)
+                {
+                    var m1 = dst2.Get<byte>(roi.Y, roi.X);
+                    var m2 = dst2.Get<byte>(roi.Y, roi.X + roi.Width);
+                    if (m1 == 0 && m2 != 0)
+                    {
+                        var meanScalar = Cv2.Mean(dst3[roi]);
+                        dst3[roi].CopyTo(dst2[roi], dst3[roi].Threshold(meanScalar[0], 255, ThresholdTypes.Otsu));
+                    }
+                    if (m1 > 0 && m2 == 0)
+                    {
+                        var newROI = new cv.Rect(roi.X + roi.Width, roi.Y, roi.Width, roi.Height);
+                        if (newROI.X + newROI.Width >= dst2.Width) newROI.Width = dst2.Width - newROI.X - 1;
+                        if (newROI.Y + newROI.Height >= dst2.Height) newROI.Height = dst2.Height - newROI.Y - 1;
+                        var meanScalar = Cv2.Mean(dst3[newROI]);
+                        dst3[newROI].CopyTo(dst2[newROI], dst3[newROI].Threshold(meanScalar[0], 255, ThresholdTypes.Otsu));
+                    }
+                }
+                if (roi.Y + roi.Height < dst3.Height)
+                {
+                    var m1 = dst2.Get<byte>(roi.Y, roi.X);
+                    var m2 = dst2.Get<byte>(roi.Y + roi.Height, roi.X);
+                    if (m1 == 0 && m2 != 0)
+                    {
+                        var meanScalar = Cv2.Mean(dst3[roi]);
+                        dst3[roi].CopyTo(dst2[roi], dst3[roi].Threshold(meanScalar[0], 255, ThresholdTypes.Otsu));
+                    }
+                    if (m1 > 0 && m2 == 0)
+                    {
+                        var newROI = new cv.Rect(roi.X, roi.Y + roi.Height, roi.Width, roi.Height);
+                        if (newROI.Y + newROI.Height >= dst3.Height) newROI.Height = dst3.Height - newROI.Y;
+                        var meanScalar = Cv2.Mean(dst3[newROI]);
+                        dst3[newROI].CopyTo(dst2[newROI], dst3[newROI].Threshold(meanScalar[0], 255, ThresholdTypes.Otsu));
+                    }
+                }
+            }
+            dst3.SetTo(0, stdev.lowStdevMask);
+        }
+    }
+    public class CS_Math_Template : CS_Parent
+    {
+        public CS_Math_Template(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_32F, 0);
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, 0);
+            labels = new[] { "", "", "Input Template showing columns", "Input Template showing rows" };
+            desc = "Build a template for use with computing the point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            for (int i = 0; i < dst2.Width; i++)
+            {
+                dst2.Set<float>(0, i, i);
+            }
+            for (int i = 1; i < dst2.Height; i++)
+            {
+                dst2.Row(0).CopyTo(dst2.Row(i));
+            }
+            for (int i = 0; i < dst2.Height; i++)
+            {
+                dst3.Set<float>(i, 0, i);
+            }
+            for (int i = 1; i < dst2.Width; i++)
+            {
+                dst3.Col(0).CopyTo(dst3.Col(i));
+            }
+            dst2 -= task.calibData.ppx;
+            dst3 -= task.calibData.ppy;
+        }
+    }
+    public class CS_Math_ImageAverage : CS_Parent
+    {
+        List<Mat> images = new List<Mat>();
+        public CS_Math_ImageAverage(VBtask task) : base(task)
+        {
+            desc = "Create an image that is the mean of x number of previous images.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged) images.Clear();
+            dst3 = src.Clone();
+            if (dst3.Type() != MatType.CV_32F)
+            {
+                if (dst3.Channels() != 1) dst3.ConvertTo(dst3, MatType.CV_32FC3);
+                else dst3.ConvertTo(dst3, MatType.CV_32F);
+            }
+            Cv2.Multiply(dst3, cv.Scalar.All(1.0 / (images.Count() + 1)), dst3);
+            images.Add(dst3.Clone());
+            if (images.Count() > task.frameHistoryCount) images.RemoveAt(0);
+            dst3.SetTo(0);
+            foreach (Mat img in images)
+            {
+                dst3 += img;
+            }
+            if (dst3.Type() != src.Type()) dst3.ConvertTo(dst2, src.Type()); else dst2 = dst3.Clone();
+            dst3 = GetNormalize32f(dst3);
+            labels[2] = "Average image over previous " + task.frameHistoryCount.ToString() + " images";
+        }
+    }
+    public class CS_Math_ImageMaskedAverage : CS_Parent
+    {
+        List<Mat> images = new List<Mat>();
+        public CS_Math_ImageMaskedAverage(VBtask task) : base(task)
+        {
+            desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged) images.Clear();
+            Mat nextImage = new Mat();
+            if (src.Type() != MatType.CV_32F) src.ConvertTo(nextImage, MatType.CV_32F); else nextImage = src;
+            Cv2.Multiply(nextImage, cv.Scalar.All(1.0 / task.frameHistoryCount), nextImage);
+            images.Add(nextImage.Clone());
+            if (images.Count() > task.frameHistoryCount) images.RemoveAt(0);
+            nextImage.SetTo(0);
+            foreach (var img in images)
+            {
+                nextImage += img;
+            }
+            if (nextImage.Type() != src.Type()) nextImage.ConvertTo(dst2, src.Type());
+            else dst2 = nextImage;
+            labels[2] = "Average image over previous " + task.frameHistoryCount.ToString() + " images";
+        }
+    }
+    public class CS_Math_ParallelTest : CS_Parent
+    {
+        public Point3f v1 = new Point3f(1, 0, 0);
+        public Point3f v2 = new Point3f(5, 0, 0);
+        public bool showWork = true;
+        public CS_Math_ParallelTest(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Parallel Test Output", "" };
+            desc = "Test if 2 vectors are parallel";
+        }
+        public void RunCS(Mat src)
+        {
+            v1 *= 1 / Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z); // normalize the input
+            v2 *= 1 / Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z);
+            float n1 = dotProduct3D(v1, v2);
+            if (showWork)
+            {
+                strOut = "Input: " + "\n";
+                strOut += "normalized v1" + " = " + v1.X.ToString(fmt3) + ", " + v1.Y.ToString(fmt3) + ", " + v1.Z.ToString(fmt3) + "\n";
+                strOut += "normalized v2" + " = " + v2.X.ToString(fmt3) + ", " + v2.Y.ToString(fmt3) + ", " + v2.Z.ToString(fmt3) + "\n";
+                strOut += "Dot Product = " + n1.ToString(fmt3) + " - if close to 1, the vectors are parallel" + "\n";
+                SetTrueText(strOut, 2);
+            }
+        }
+    }
+    public class CS_Math_Stdev : CS_Parent
+    {
+        public Mat highStdevMask;
+        public Mat lowStdevMask;
+        public Mat saveFrame;
+        Options_Math options = new Options_Math();
+        Options_Match optionsMatch = new Options_Match();
+        System.Windows.Forms.TrackBar stdevSlider = new System.Windows.Forms.TrackBar();
+        Mat lastFrame = new cv.Mat();
+        public CS_Math_Stdev(VBtask task) : base(task)
+        {
+            stdevSlider = FindSlider("Stdev Threshold");
+            task.gOptions.setGridSize(16);
+            highStdevMask = new Mat(dst2.Size(), MatType.CV_8U);
+            lowStdevMask = new Mat(dst2.Size(), MatType.CV_8U);
+            desc = "Compute the standard deviation in each segment";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int updateCount = 0;
+            lowStdevMask.SetTo(0);
+            highStdevMask.SetTo(0);
+            dst2 = src.Clone();
+            if (dst2.Channels() == 3) dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (task.FirstPass) lastFrame = dst2.Clone();
+            saveFrame = dst2.Clone();
+            Parallel.ForEach(task.gridList,
+            (roi) =>
+            {
+                cv.Scalar mean, stdev;
+                Cv2.MeanStdDev(dst2[roi], out mean, out stdev);
+                if (stdev[0] < optionsMatch.stdevThreshold)
+                {
+                    Interlocked.Increment(ref updateCount);
+                    var pt = new cv.Point(roi.X + 2, roi.Y + 10);
+                    if (options.showMean) SetTrueText(mean[0].ToString(fmt0), pt, 2);
+                    if (options.showStdev) SetTrueText(stdev[0].ToString(fmt2), pt, 2);
+                    lowStdevMask[roi].SetTo(255);
+                }
+                else
+                {
+                    highStdevMask[roi].SetTo(255);
+                    dst2[roi].SetTo(0);
+                }
+            });
+            if (task.gOptions.getShowGrid()) dst2.SetTo(255, task.gridMask);
+            dst3.SetTo(0);
+            saveFrame.CopyTo(dst3, highStdevMask);
+            lastFrame = saveFrame;
+            string stdevPercent = " stdev " + stdevSlider.Value.ToString("0.0");
+            labels[2] = updateCount.ToString() + " of " + task.gridList.Count().ToString() + " segments with < " + stdevPercent;
+            labels[3] = (task.gridList.Count() - updateCount).ToString() + " out of " + task.gridList.Count().ToString() + " had stdev > " + stdevSlider.Value.ToString("0.0");
         }
     }
 

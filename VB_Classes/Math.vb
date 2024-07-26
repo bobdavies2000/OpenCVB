@@ -134,75 +134,6 @@ End Class
 
 
 
-
-Public Class Math_Stdev : Inherits VB_Parent
-    Public highStdevMask As cv.Mat
-    Public lowStdevMask As cv.Mat
-    Public saveFrame As cv.Mat
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Stdev Threshold", 0, 100, 10)
-        task.gOptions.setGridSize(16)
-
-        If check.Setup(traceName) Then
-            check.addCheckBox("Show mean")
-            check.addCheckBox("Show Stdev")
-            check.addCheckBox("Show Grid Mask")
-        End If
-
-        highStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        lowStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        desc = "Compute the standard deviation in each segment"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static stdevSlider = FindSlider("Stdev Threshold")
-        Static meanCheck = FindCheckBox("Show mean")
-        Static stdevCheck = FindCheckBox("Show Stdev")
-        Static gridCheck = FindCheckBox("Show Grid Mask")
-        Dim stdevThreshold = CSng(stdevSlider.Value)
-
-        Dim updateCount As Integer
-        lowStdevMask.SetTo(0)
-        highStdevMask.SetTo(0)
-
-        dst2 = src.Clone
-        If dst2.Channels() = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-
-        Dim showMean = meanCheck.checked
-        Dim showStdev = stdevCheck.checked
-        Static lastFrame As cv.Mat = dst2.Clone()
-        saveFrame = dst2.Clone
-        Parallel.ForEach(task.gridList,
-        Sub(roi)
-            Dim mean As Single, stdev As Single
-            cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
-            If stdev < stdevThreshold Then
-                Interlocked.Increment(updateCount)
-                Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                If showMean Then SetTrueText(Format(mean, fmt0), pt, 2)
-                If showStdev Then SetTrueText(Format(stdev, fmt2), pt, 2)
-                lowStdevMask(roi).SetTo(255)
-            Else
-                highStdevMask(roi).SetTo(255)
-                dst2(roi).SetTo(0)
-            End If
-        End Sub)
-        If gridCheck.checked Then dst2.SetTo(255, task.gridMask)
-        dst3.SetTo(0)
-        saveFrame.CopyTo(dst3, highStdevMask)
-        lastFrame = saveFrame
-        Dim stdevPercent = " stdev " + Format(stdevSlider.Value, "0.0")
-        labels(2) = CStr(updateCount) + " of " + CStr(task.gridList.Count) + " segments with < " + stdevPercent
-        labels(3) = CStr(task.gridList.Count - updateCount) + " out of " + CStr(task.gridList.Count) + " had stdev > " + Format(stdevSlider.Value, "0.0")
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Math_StdevBoundary : Inherits VB_Parent
     Dim stdev As New Math_Stdev
     Public Sub New()
@@ -328,33 +259,22 @@ End Class
 Public Class Math_ImageMaskedAverage : Inherits VB_Parent
     Dim images As New List(Of cv.Mat)
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Average - number of input images", 1, 100, 10)
-            sliders.setupTrackBar("Pixel value difference threshold", 1, 50, 10)
-        End If
         desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static avgSlider = FindSlider("Average - number of input images")
-        Static diffSlider = FindSlider("Pixel value difference threshold")
-
-        Static saveImageCount = avgSlider.Value
-        If avgSlider.Value <> saveImageCount Then
-            saveImageCount = avgSlider.Value
-            images.Clear()
-        End If
+    Public Sub RunVB(src As cv.Mat)
+        If task.optionsChanged Then images.Clear()
         Dim nextImage As New cv.Mat
         If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(nextImage, cv.MatType.CV_32F) Else nextImage = src
-        cv.Cv2.Multiply(nextImage, cv.Scalar.All(1 / saveImageCount), nextImage)
+        cv.Cv2.Multiply(nextImage, cv.Scalar.All(1 / task.frameHistoryCount), nextImage)
         images.Add(nextImage.Clone())
-        If images.Count > saveImageCount Then images.RemoveAt(0)
+        If images.Count > task.frameHistoryCount Then images.RemoveAt(0)
 
         nextImage.SetTo(0)
         For Each img In images
             nextImage += img
         Next
         If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst2, src.Type) Else dst2 = nextImage
-        labels(2) = "Average image over previous " + CStr(avgSlider.Value) + " images"
+        labels(2) = "Average image over previous " + CStr(task.frameHistoryCount) + " images"
     End Sub
 End Class
 
@@ -379,7 +299,7 @@ Public Class Math_ParallelTest : Inherits VB_Parent
         labels = {"", "", "Parallel Test Output", ""}
         desc = "Test if 2 vectors are parallel"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         v1 *= 1 / Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z) ' normalize the input
         v2 *= 1 / Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z)
         Dim n1 = dotProduct3D(v1, v2)
@@ -392,5 +312,62 @@ Public Class Math_ParallelTest : Inherits VB_Parent
             strOut += "Dot Product = " + Format(n1, fmt3) + " - if close to 1, the vectors are parallel" + vbCrLf
             SetTrueText(strOut, 2)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Math_Stdev : Inherits VB_Parent
+    Public highStdevMask As cv.Mat
+    Public lowStdevMask As cv.Mat
+    Public saveFrame As cv.Mat
+    Dim options As New Options_Math
+    Dim optionsMatch As New Options_Match
+    Dim stdevSlider As New System.Windows.Forms.TrackBar
+    Public Sub New()
+        stdevSlider = FindSlider("Stdev Threshold")
+        task.gOptions.setGridSize(16)
+
+        highStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        lowStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        desc = "Compute the standard deviation in each segment"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim updateCount As Integer
+        lowStdevMask.SetTo(0)
+        highStdevMask.SetTo(0)
+
+        dst2 = src.Clone
+        If dst2.Channels() = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static lastFrame As cv.Mat = dst2.Clone()
+        saveFrame = dst2.Clone
+        Parallel.ForEach(task.gridList,
+        Sub(roi)
+            Dim mean As Single, stdev As Single
+            cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
+            If stdev < optionsMatch.stdevThreshold Then
+                Interlocked.Increment(updateCount)
+                Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
+                If options.showMean Then SetTrueText(Format(mean, fmt0), pt, 2)
+                If options.showStdev Then SetTrueText(Format(stdev, fmt2), pt, 2)
+                lowStdevMask(roi).SetTo(255)
+            Else
+                highStdevMask(roi).SetTo(255)
+                dst2(roi).SetTo(0)
+            End If
+        End Sub)
+        If task.gOptions.getShowGrid() Then dst2.SetTo(255, task.gridMask)
+        dst3.SetTo(0)
+        saveFrame.CopyTo(dst3, highStdevMask)
+        lastFrame = saveFrame
+        Dim stdevPercent = " stdev " + Format(stdevSlider.Value, "0.0")
+        labels(2) = CStr(updateCount) + " of " + CStr(task.gridList.Count) + " segments with < " + stdevPercent
+        labels(3) = CStr(task.gridList.Count - updateCount) + " out of " + CStr(task.gridList.Count) + " had stdev > " + Format(stdevSlider.Value, "0.0")
     End Sub
 End Class

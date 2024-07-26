@@ -1427,6 +1427,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_Match" Then return new Options_Match
 	if algorithmName = "Options_MatchCell" Then return new Options_MatchCell
 	if algorithmName = "Options_MatchShapes" Then return new Options_MatchShapes
+	if algorithmName = "Options_Math" Then return new Options_Math
 	if algorithmName = "Options_MinArea" Then return new Options_MinArea
 	if algorithmName = "Options_MinMaxNone" Then return new Options_MinMaxNone
 	if algorithmName = "Options_Morphology" Then return new Options_Morphology

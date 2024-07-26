@@ -337,6 +337,9 @@ Public Class OptionsGlobal
     Public Sub setShowGrid(val As Boolean)
         ShowGrid.Checked = val
     End Sub
+    Public Function getShowGrid() As Boolean
+        Return ShowGrid.Checked
+    End Function
     Public Sub setGridSize(val As Integer)
         GridSlider.Value = val
     End Sub

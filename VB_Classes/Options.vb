@@ -6498,3 +6498,26 @@ Public Class Options_Match : Inherits VB_Parent
         maxDistance = distSlider.Value
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Options_Math : Inherits VB_Parent
+    Public showMean As Boolean
+    Public showStdev As Boolean
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Show mean")
+            check.addCheckBox("Show Stdev")
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static meanCheck = FindCheckBox("Show mean")
+        Static stdevCheck = FindCheckBox("Show Stdev")
+        showMean = meanCheck.checked
+        showStdev = stdevCheck.checked
+    End Sub
+End Class
