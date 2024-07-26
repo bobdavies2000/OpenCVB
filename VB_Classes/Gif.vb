@@ -147,10 +147,10 @@ Public Class Gif_OpenCVB : Inherits VB_Parent
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)
                 Case gifTypes.openGLwindow
                     Dim rect As RECT
-                    GetWindowRect(openGL_hwnd, rect)
+                    GetWindowRect(task.openGL_hwnd, rect)
                     Dim r = New cv.Rect(0, 0, rect.Right - rect.Left + 330, rect.Bottom - rect.Top + 200)
                     nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format24bppRgb)
-                    Dim snapshot As Bitmap = GetWindowImage(openGL_hwnd, r)
+                    Dim snapshot As Bitmap = GetWindowImage(task.openGL_hwnd, r)
                     Dim snap = cvext.BitmapConverter.ToMat(snapshot)
                     snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)

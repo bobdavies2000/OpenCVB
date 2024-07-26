@@ -833,7 +833,7 @@ End Class
 
 
 Public Class Options_OpenGLFunctions : Inherits VB_Parent
-    Public moveAmount As cv.Point3f
+    Public moveAmount As cv.Scalar
     Public FOV As Single = 75
     Public yaw As Single = -3
     Public pitch As Single = 3

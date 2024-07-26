@@ -51,12 +51,12 @@ Public Class OpenGL_Basics : Inherits VB_Parent
         memMapWriter.WriteArray(Of Double)(0, memMap, 0, memMap.Length)
     End Sub
     Private Sub StartOpenGLWindow()
-        task.pipeName = "OpenCVBImages" + CStr(pipeCount)
+        task.pipeName = "OpenCVBImages" + CStr(task.pipeCount)
         Try
-            openGLPipe = New NamedPipeServerStream(task.pipeName, PipeDirection.InOut, 1)
+            task.openGLPipe = New NamedPipeServerStream(task.pipeName, PipeDirection.InOut, 1)
         Catch ex As Exception
         End Try
-        pipeCount += 1
+        task.pipeCount += 1
 
         Dim memMap = memMapFill()
         Dim memMapbufferSize = 8 * memMap.Length
@@ -73,16 +73,14 @@ Public Class OpenGL_Basics : Inherits VB_Parent
         Dim memMapFile As MemoryMappedFile = MemoryMappedFile.CreateOrOpen("OpenCVBControl", memMapbufferSize)
         memMapWriter = memMapFile.CreateViewAccessor(0, memMapbufferSize)
 
-        openGLPipe.WaitForConnection()
+        task.openGLPipe.WaitForConnection()
 
         While (1)
-            openGL_hwnd = FindWindow(Nothing, task.OpenGLTitle)
-            If openGL_hwnd Then Exit While
+            task.openGL_hwnd = FindWindow(Nothing, task.OpenGLTitle)
+            If task.openGL_hwnd Then Exit While
         End While
-        Dim Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
-        Dim Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
-        task.oglRect = New cv.Rect(Left, Top, windowWidth, windowHeight)
-        MoveWindow(openGL_hwnd, Left, Top, task.oglRect.Width, task.oglRect.Height, True)
+        task.oglRect = New cv.Rect(task.OpenGL_Left, task.OpenGL_Top, windowWidth, windowHeight)
+        MoveWindow(task.openGL_hwnd, task.OpenGL_Left, task.OpenGL_Top, task.oglRect.Width, task.oglRect.Height, True)
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then pointCloudInput = task.pointCloud
@@ -110,8 +108,8 @@ Public Class OpenGL_Basics : Inherits VB_Parent
             StartOpenGLWindow()
         Else
             Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
-            If openGLPipe IsNot Nothing Then
-                Dim bytesRead = openGLPipe.Read(readPipe, 0, 4)
+            If task.openGLPipe IsNot Nothing Then
+                Dim bytesRead = task.openGLPipe.Read(readPipe, 0, 4)
                 If bytesRead = 0 Then SetTrueText("The OpenGL process appears to have stopped.", New cv.Point(20, 100))
             End If
         End If
@@ -123,16 +121,16 @@ Public Class OpenGL_Basics : Inherits VB_Parent
         If pointCloudInput.Width > 0 Then Marshal.Copy(pointCloudInput.Data, pointCloudBuffer, 0, pointCloudInput.Total * pointCloudInput.ElemSize)
 
         Try
-            If src.Width > 0 Then openGLPipe.Write(rgbBuffer, 0, rgbBuffer.Length)
-            If dataInput.Width > 0 Then openGLPipe.Write(dataBuffer, 0, dataBuffer.Length)
-            If pointCloudInput.Width > 0 Then openGLPipe.Write(pointCloudBuffer, 0, pointCloudBuffer.Length)
+            If src.Width > 0 Then task.openGLPipe.Write(rgbBuffer, 0, rgbBuffer.Length)
+            If dataInput.Width > 0 Then task.openGLPipe.Write(dataBuffer, 0, dataBuffer.Length)
+            If pointCloudInput.Width > 0 Then task.openGLPipe.Write(pointCloudBuffer, 0, pointCloudBuffer.Length)
 
             Dim buff = System.Text.Encoding.UTF8.GetBytes(task.OpenGLTitle)
-            openGLPipe.Write(buff, 0, task.OpenGLTitle.Length)
+            task.openGLPipe.Write(buff, 0, task.OpenGLTitle.Length)
 
             ' lose a lot of performance doing this!
             If task.gOptions.OpenGLCapture.Checked Then
-                Dim snapshot As Bitmap = GetWindowImage(openGL_hwnd, New cv.Rect(0, 0, task.oglRect.Width * 1.4, task.oglRect.Height * 1.4))
+                Dim snapshot As Bitmap = GetWindowImage(task.openGL_hwnd, New cv.Rect(0, 0, task.oglRect.Width * 1.4, task.oglRect.Height * 1.4))
                 Dim snap = cvext.BitmapConverter.ToMat(snapshot)
                 snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                 dst3 = snap.Resize(New cv.Size(dst2.Width, dst2.Height), 0, 0, cv.InterpolationFlags.Nearest)
@@ -911,7 +909,8 @@ Public Class OpenGL_DrawHulls : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Dim shift = options.moveAmount
+        Dim ptM = options.moveAmount
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         hulls.Run(src)
         dst2 = hulls.dst2
@@ -970,7 +969,8 @@ Public Class OpenGL_Contours : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Dim shift = options.moveAmount
+        Dim ptM = options.moveAmount
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         options2.RunVB()
 

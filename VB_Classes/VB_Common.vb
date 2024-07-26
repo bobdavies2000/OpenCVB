@@ -6,8 +6,6 @@ Imports System.Runtime.InteropServices
 Module VB_Common
     Public task As VBtask
     Public allOptions As OptionsContainer
-    Public openGL_hwnd As IntPtr
-    Public openGLPipe As NamedPipeServerStream
     Public recordedData As Replay_Play
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"

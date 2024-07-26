@@ -610,6 +610,8 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
         dst1.SetTo(0)
         dst3.SetTo(0)
         Dim vec As cv.Scalar
+        Dim ptM = options.moveAmount
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
         For Each roi In task.gridList
             Dim c = dst2.Get(Of cv.Vec3b)(roi.Y, roi.X)
             If standaloneTest() Then dst3(roi).SetTo(c)
@@ -618,16 +620,16 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
             oglData.Add(New cv.Vec3f(c(2) / 255, c(1) / 255, c(0) / 255))
 
             Dim v = task.pointCloud(roi).Mean(task.depthMask(roi))
-            vec = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, v(2))) + options.moveAmount
+            vec = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, v(2))) + shift
             oglData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
 
-            vec = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y, v(2))) + options.moveAmount
+            vec = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y, v(2))) + shift
             oglData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
 
-            vec = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, v(2))) + options.moveAmount
+            vec = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, v(2))) + shift
             oglData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
 
-            vec = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y + roi.Height, v(2))) + options.moveAmount
+            vec = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y + roi.Height, v(2))) + shift
             oglData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
             If standaloneTest() Then dst1(roi).SetTo(v)
         Next

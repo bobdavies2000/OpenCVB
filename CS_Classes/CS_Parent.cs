@@ -6,6 +6,7 @@ using cv = OpenCvSharp;
 using OpenCvSharp;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.IO.Pipes;
 
 namespace CS_Classes
 {
@@ -13,7 +14,7 @@ namespace CS_Classes
     {
         public VBtask task;
         public IntPtr cPtr;
-        public bool standalone;
+        public bool standalone; 
         public string desc = "";
         public cv.Mat dst0, dst1, dst2, dst3, empty;
         public string traceName;
@@ -41,6 +42,7 @@ namespace CS_Classes
         public Vec3b green = new Vec3b(0, 255, 0);
         public Vec3b blue = new Vec3b(255, 0, 0);
         string callStack = "";
+
         public CS_Parent(VBtask _task)
         {
             this.task = _task;

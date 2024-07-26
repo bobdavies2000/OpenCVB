@@ -26,7 +26,8 @@ Public Class Tessallate_Basics : Inherits VB_Parent
     End Function
     Public Sub RunVB(src As cv.Mat)
         oglOptions.RunVB()
-        Dim shift = oglOptions.moveAmount
+        Dim ptM = oglOptions.moveAmount
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         hulls.Run(src)
         dst2 = hulls.dst2
@@ -107,7 +108,8 @@ Public Class Tessallate_QuadSimple : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         oglOptions.RunVB()
-        Dim shift = oglOptions.moveAmount
+        Dim ptM = oglOptions.moveAmount
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         redC.Run(src)
         dst2 = redC.dst2
@@ -156,7 +158,8 @@ Public Class Tessallate_QuadHulls : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         oglOptions.RunVB()
-        Dim shift = oglOptions.moveAmount
+        Dim ptM = oglOptions.moveAmount
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         hulls.Run(src)
         dst2 = hulls.dst2
@@ -234,7 +237,8 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Parent
         dst2 = redC.dst2
 
         oglOptions.RunVB()
-        Dim shift = oglOptions.moveAmount
+        Dim ptM = oglOptions.moveAmount
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         If task.optionsChanged Then
             depthList1 = New List(Of List(Of Single))
@@ -335,7 +339,8 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
         End If
 
         options.RunVB()
-        Dim shift = options.moveAmount
+        Dim ptM = options.moveAmount
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         oglData.Clear()
         hulls.Run(src)

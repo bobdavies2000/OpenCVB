@@ -223,6 +223,11 @@ Public Class VBtask : Implements IDisposable
     Public gifImages As New List(Of Bitmap)
     Public gifBuild As Boolean
     Public gifCaptureIndex As Integer
+
+    Public openGL_hwnd As IntPtr
+    Public openGLPipe As NamedPipeServerStream
+    Public pipeCount As Integer
+
     Public Enum gifTypes
         gifdst0 = 0
         gifdst1 = 1
@@ -259,6 +264,8 @@ Public Class VBtask : Implements IDisposable
     Public yRangeDefault As Single
     Public MaxZmeters As Single
     Public metersPerPixel As Single
+    Public OpenGL_Left As Integer
+    Public OpenGL_Top As Integer
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat
@@ -366,6 +373,9 @@ Public Class VBtask : Implements IDisposable
         WorkingRes = parms.WorkingRes ' gets referenced a lot
         resolutionIndex = If(WorkingRes.Width = 640, 2, 3)
         displayRes = parms.displayRes
+
+        OpenGL_Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
+        OpenGL_Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
 
         buildColors()
         pythonTaskName = HomeDir + "Python_Classes\" + algName

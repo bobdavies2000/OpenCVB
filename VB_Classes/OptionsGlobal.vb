@@ -1,5 +1,4 @@
-﻿Imports System.ComponentModel
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class OptionsGlobal
     Public imu_Alpha As Single
     Public maxDepth As Integer
@@ -334,6 +333,12 @@ Public Class OptionsGlobal
     Public Sub setPixelDifference(val As Integer)
         PixelDiffBar.Value = val
     End Sub
+    Public Function getPixelDifference() As Integer
+        Return PixelDiffBar.Value
+    End Function
+    Public Function getPixelDifferenceMax() As Integer
+        Return PixelDiffBar.Maximum
+    End Function
     Public Sub setShowGrid(val As Boolean)
         ShowGrid.Checked = val
     End Sub
@@ -360,6 +365,9 @@ Public Class OptionsGlobal
     End Sub
     Public Function getDebugCheckBox() As Boolean
         Return DebugCheckBox.Checked
+    End Function
+    Public Function getOpenGLCapture() As Boolean
+        Return OpenGLCapture.Checked
     End Function
     Public Sub setGravityUsage(val As Boolean)
         gravityPointCloud.Checked = val

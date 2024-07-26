@@ -1007,6 +1007,17 @@ namespace CS_Classes
 			if (algorithmName == "CS_OEX_Threshold_Inrange") return new CS_OEX_Threshold_Inrange(task);
 			if (algorithmName == "CS_OilPaint_Cartoon") return new CS_OilPaint_Cartoon(task);
 			if (algorithmName == "CS_OilPaint_Manual") return new CS_OilPaint_Manual(task);
+			if (algorithmName == "CS_OilPaint_ManualVB") return new CS_OilPaint_ManualVB(task);
+			if (algorithmName == "CS_OilPaint_Pointilism") return new CS_OilPaint_Pointilism(task);
+			if (algorithmName == "CS_OpAuto_FloorCeiling") return new CS_OpAuto_FloorCeiling(task);
+			if (algorithmName == "CS_OpAuto_MSER") return new CS_OpAuto_MSER(task);
+			if (algorithmName == "CS_OpAuto_Peaks2D") return new CS_OpAuto_Peaks2D(task);
+			if (algorithmName == "CS_OpAuto_Peaks2DGrid") return new CS_OpAuto_Peaks2DGrid(task);
+			if (algorithmName == "CS_OpAuto_PixelDifference") return new CS_OpAuto_PixelDifference(task);
+			if (algorithmName == "CS_OpAuto_Valley") return new CS_OpAuto_Valley(task);
+			if (algorithmName == "CS_OpAuto_XRange") return new CS_OpAuto_XRange(task);
+			if (algorithmName == "CS_OpAuto_YRange") return new CS_OpAuto_YRange(task);
+			if (algorithmName == "CS_OpenGL_Basics") return new CS_OpenGL_Basics(task);
 			if (algorithmName == "CS_Pixel_Unstable") return new CS_Pixel_Unstable(task);
 			if (algorithmName == "CS_Random_Basics") return new CS_Random_Basics(task);
 			if (algorithmName == "CS_Sieve_Basics") return new CS_Sieve_Basics(task);

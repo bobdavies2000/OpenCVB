@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 Imports System.Drawing
 Imports OpenCvSharp
+Imports System.IO.Pipes
 
 Public Class trueText
     Public text As String
@@ -41,8 +42,6 @@ Public Class VB_Parent : Implements IDisposable
     Public strOut As String
     Dim retryCount As Integer
     Public Const depthListMaxCount As Integer = 10
-
-    Public pipeCount As Integer
 
     Public Const RESULT_DST0 = 0 ' 0=rgb 1=depth 2=dst1 3=dst2
     Public Const RESULT_DST1 = 1 ' 0=rgb 1=depth 2=dst1 3=dst2

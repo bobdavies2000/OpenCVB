@@ -353,6 +353,16 @@ Public Class OptionsRedCloud
     Public Sub setYRangeSlider(val As Integer)
         YRangeSlider.Value = val
     End Sub
+    Public Function getYRangeSlider() As Integer
+        Return YRangeSlider.Value
+    End Function
+
+    Public Sub setXRangeSlider(val As Integer)
+        XRangeBar.Value = val
+    End Sub
+    Public Function getXRangeSlider() As Integer
+        Return XRangeBar.Value
+    End Function
     Public Function getProjection() As Integer
         Return ProjectionThresholdBar.Value
     End Function
