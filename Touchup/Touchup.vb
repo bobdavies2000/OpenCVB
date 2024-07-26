@@ -73,9 +73,8 @@ Public Class Touchup
                 inline = Replace(inline, "Cv8u", "CV_8U")
                 inline = Replace(inline, "Environment.NewLine", """\n""")
                 inline = Replace(inline, "CvPoint", "cv.Point")
-                If inline.Contains(" Rect") Then
-                    inline = inline.Replace(" Rect", " cv.Rect")
-                End If
+                inline = inline.Replace(" Rect", " cv.Rect")
+                inline = inline.Replace("<Rect", "<cv.Rect")
 
                 inline = Replace(inline, "()(", "(")
                 inline = Replace(inline, "()()", "()")

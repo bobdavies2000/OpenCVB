@@ -63,7 +63,7 @@ Public Class Area_MinMotionRect : Inherits VB_Parent
         For i = 0 To contours.Length - 1
             Dim minRect = cv.Cv2.MinAreaRect(contours(i))
             Dim nextColor = New cv.Scalar(colors(i Mod 256)(0), colors(i Mod 256)(1), colors(i Mod 256)(2))
-            DrawRotatedRectangle(minRect, gray, nextColor)
+            DrawRotatedRect(minRect, gray, nextColor)
         Next
         Return gray
     End Function

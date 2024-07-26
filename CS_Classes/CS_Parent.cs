@@ -102,7 +102,7 @@ namespace CS_Classes
             return new cv.Scalar(v.Item0, v.Item1, v.Item2);
         }
 
-        public void DrawRotatedRectangle(cv.RotatedRect rotatedRect, cv.Mat dst, cv.Scalar color)
+        public void DrawRotatedRect(cv.RotatedRect rotatedRect, cv.Mat dst, cv.Scalar color)
         {
             cv.Point2f[] vertices2f = rotatedRect.Points();
             cv.Point[] vertices = new cv.Point[vertices2f.Length];

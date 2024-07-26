@@ -65,80 +65,6 @@ End Class
 
 
 
-Public Class MSER_Regions : Inherits VB_Parent
-    Dim detect As New MSER_Detect
-    Public mserCells As New List(Of rcData)
-    'Dim matchCell As New RedCloud_MatchCell
-    Public cellMap As cv.Mat
-    Public useOpAuto As Boolean = True
-    Public Sub New()
-        cellMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        labels(3) = "Latest frame only - no accumulation"
-        desc = "Tag and track the MSER (Maximally Stable Extremal Region) regions"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        'If useOpAuto Then
-        '    Static opAuto As New OpAuto_MSER
-        '    opAuto.classCount = mserCells.Count
-        '    opAuto.Run(src)
-        'End If
-
-        'detect.Run(src)
-
-        'Dim redCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        'For i = 0 To detect.boxes.Count - 1
-        '    Dim rc As New rcData
-        '    rc.rect = detect.boxes(i)
-        '    rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, 0)
-        '    rc.floodPoint = detect.regions(i)(0)
-        '    For Each pt In detect.regions(i)
-        '        rc.mask.Set(Of Byte)(pt.Y - rc.rect.Y, pt.X - rc.rect.X, i Mod 256)
-        '    Next
-        '    redCells.Add(detect.regions(i).Count, rc)
-        'Next
-
-        'If task.optionsChanged Then
-        '    cellMap.SetTo(0)
-        '    matchCell.lastCells.Clear()
-        'End If
-
-        'matchCell.lastCellMap = cellMap.Clone
-        'matchCell.lastCells = New List(Of rcData)(mserCells)
-        'matchCell.usedColors.Clear()
-        'matchCell.usedColors.Add(black)
-
-        'mserCells.Clear()
-        'cellMap.SetTo(0)
-        'Dim lastDst2 = dst2.Clone
-        'If task.heartBeat Then dst2.SetTo(0)
-        'dst3.SetTo(0)
-        'For Each key In redCells
-        '    matchCell.rc = key.Value
-        '    matchCell.rc.index = mserCells.Count
-        '    matchCell.Run(empty)
-
-        '    Dim rc = matchCell.rc
-
-        '    Dim color = lastDst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-        '    If color = black Then rc.color = randomCellColor() Else rc.color = color
-        '    mserCells.Add(rc)
-
-        '    cellMap(rc.rect).SetTo(rc.index, rc.mask)
-        '    dst2(rc.rect).SetTo(rc.color, rc.mask)
-        '    dst3(rc.rect).SetTo(rc.color, rc.mask)
-        '    If mserCells.Count = 255 Then Exit For
-        'Next
-
-        'labels(2) = "Cells identified " + CStr(mserCells.Count)
-    End Sub
-End Class
-
-
-
-
-
-
-
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Detect : Inherits VB_Parent
     Public boxes() As cv.Rect
@@ -390,66 +316,7 @@ End Class
 
 
 
-
-
-Public Class MSER_RegionLeft : Inherits VB_Parent
-    Dim regions As New MSER_Regions
-    Public Sub New()
-        desc = "Identify the region using the left image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        regions.Run(task.leftView)
-        dst2 = regions.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class MSER_RegionRight : Inherits VB_Parent
-    Dim regions As New MSER_Regions
-    Public Sub New()
-        desc = "Identify the region using the right image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        regions.Run(task.rightView)
-        dst2 = regions.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class MSER_RegionLeftRight : Inherits VB_Parent
-    Dim left As New MSER_RegionLeft
-    Dim right As New MSER_RegionRight
-    Public Sub New()
-        desc = "Identify the region using both left and right images"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        left.Run(task.leftView)
-        dst2 = left.dst2
-
-        right.Run(task.rightView)
-        dst3 = right.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
+'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_rr.cpp
 Public Class MSER_ROI : Inherits VB_Parent
     Public containers As New List(Of cv.Rect)
     Dim options As New Options_MSER

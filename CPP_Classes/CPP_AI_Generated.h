@@ -1529,7 +1529,7 @@ public:
                 Rect r = Rect(nPoint.x, nPoint.y, width, height);
 
                 if (options_drawRotated) {
-                    task->DrawRotatedRectangle(rr, dst2, nextColor);
+                    task->DrawRotatedRect(rr, dst2, nextColor);
                 }
                 else {
                     rectangle(dst2, r, nextColor, options_drawFilled ? -1 : 1);

@@ -20,24 +20,6 @@ End Class
 
 
 
-Public Class Motion_BasicsNew : Inherits VB_Parent
-    Public bgSub As New BGSubtract_MOG2
-    Dim motion As New Motion_Basics_QT
-    Public Sub New()
-        desc = "Track motion through the previous X frames."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        bgSub.Run(src)
-
-        dst2 = motion.dst2
-        labels(2) = motion.labels(2)
-    End Sub
-End Class
-
-
-
-
-
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Simple : Inherits VB_Parent
     Public diff As New Diff_Basics
@@ -234,10 +216,6 @@ Public Class Motion_DepthReconstructed : Inherits VB_Parent
         task.pointCloud(task.motionRect).CopyTo(dst3(task.motionRect))
     End Sub
 End Class
-
-
-
-
 
 
 
@@ -885,7 +863,7 @@ Public Class Motion_MinRect : Inherits VB_Parent
 
             mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
             mRect.Run(empty)
-            DrawRotatedRectangle(mRect.minRect, dst3, cv.Scalar.White)
+            DrawRotatedRect(mRect.minRect, dst3, cv.Scalar.White)
         End If
     End Sub
 End Class

@@ -141,7 +141,7 @@ Public Class VB_Parent : Implements IDisposable
     Public Function vecToScalar(v As cv.Vec3b) As cv.Scalar
         Return New cv.Scalar(v(0), v(1), v(2))
     End Function
-    Public Sub DrawRotatedRectangle(rotatedRect As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
+    Public Sub DrawRotatedRect(rotatedRect As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
         Dim vertices2f = rotatedRect.Points()
         Dim vertices(vertices2f.Length - 1) As cv.Point
         For j = 0 To vertices2f.Length - 1

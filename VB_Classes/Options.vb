@@ -2785,7 +2785,7 @@ Public Class Options_KMeans : Inherits VB_Parent
             sliders.setupTrackBar("Dimension", 1, 6, 1)
         End If
 
-            If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use PpCenters")
             radio.addRadio("Use RandomCenters")
@@ -3145,7 +3145,7 @@ Public Class Options_MSER : Inherits VB_Parent
     Public areaThreshold As Single = 1.01
     Public minMargin As Single = 0.003
     Public edgeBlurSize As Integer = 5
-    Public pass2Setting As Boolean
+    Public pass2Setting As Integer
     Public graySetting As Boolean
     Public Sub New()
         Select Case task.WorkingRes.Width
@@ -4463,8 +4463,14 @@ Public Class Options_MotionDetect : Inherits VB_Parent
     Public radioChoices As cv.Vec3i()
     Public threadData As cv.Vec3i
     Public CCthreshold As Single
+    Public pad As Integer
+    Public stdevThreshold As Integer
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980)
+            sliders.setupTrackBar("Stdev threshold for using correlation", 0, 100, 15)
+            sliders.setupTrackBar("Pad size in pixels for the search area", 0, 100, 20)
+        End If
         If radio.Setup(traceName) Then
             For i = 0 To 7 - 1
                 radio.addRadio(CStr(2 ^ i) + " threads")
@@ -4482,9 +4488,12 @@ Public Class Options_MotionDetect : Inherits VB_Parent
     Public Sub RunVB()
         Static correlationSlider = FindSlider("Correlation Threshold")
         Static frm = FindFrm(traceName + " Radio Buttons")
+        Static padSlider = FindSlider("Pad size in pixels for the search area")
+        Static stdevSlider = FindSlider("Stdev threshold for using correlation")
         CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         threadData = radioChoices(findRadioIndex(frm.check))
-
+        pad = padSlider.Value
+        stdevThreshold = stdevSlider.Value
     End Sub
 End Class
 
@@ -6553,3 +6562,4 @@ Public Class Options_Mesh : Inherits VB_Parent
         nabeCount = nabeSlider.value
     End Sub
 End Class
+

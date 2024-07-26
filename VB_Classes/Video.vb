@@ -147,7 +147,7 @@ Public Class Video_MinRect : Inherits VB_Parent
             If standaloneTest() Then
                 For i = 0 To contours.Length - 1
                     Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-                    DrawRotatedRectangle(minRect, dst2, cv.Scalar.Red)
+                    DrawRotatedRect(minRect, dst2, cv.Scalar.Red)
                 Next
             End If
             dst3 = video.dst2

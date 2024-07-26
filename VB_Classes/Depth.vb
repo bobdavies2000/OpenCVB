@@ -103,7 +103,7 @@ Public Class Depth_HolesRect : Inherits VB_Parent
             Dim contour = sortContours.ElementAt(i).Value
             Dim minRect = cv.Cv2.MinAreaRect(contour)
             Dim nextColor = New cv.Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
-            DrawRotatedRectangle(minRect, dst2, nextColor)
+            DrawRotatedRect(minRect, dst2, nextColor)
             DrawContour(dst3, contour.ToList, cv.Scalar.White, task.lineWidth)
         Next
         cv.Cv2.AddWeighted(dst2, 0.5, task.depthRGB, 0.5, 0, dst2)

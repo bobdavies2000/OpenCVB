@@ -23,7 +23,7 @@ Public Class Rectangle_Basics : Inherits VB_Parent
                 Dim rr = New cv.RotatedRect(nPoint, eSize, angle)
                 Dim r = New cv.Rect(nPoint.X, nPoint.Y, width, height)
                 If options.drawRotated Then
-                    DrawRotatedRectangle(rr, dst2, nextColor)
+                    DrawRotatedRect(rr, dst2, nextColor)
                 Else
                     cv.Cv2.Rectangle(dst2, r, nextColor, options.drawFilled)
                 End If

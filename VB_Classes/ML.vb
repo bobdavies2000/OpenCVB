@@ -1,13 +1,12 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Threading
 Public Class ML_Basics : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
         desc = "Predict depth from color to fill in the depth shadow areas"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim noDepthCount(task.gridList.Count - 1) As Integer
         Dim roiColor(task.gridList.Count - 1) As cv.Vec3b
 
@@ -185,14 +184,13 @@ Public Class ML_DepthFromColor : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Dim resizer As New Resize_Smaller
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Prediction Max Depth", 1000, 5000, 1500)
         FindSlider("Resize Percentage (%)").Value = 2 ' 2% of the image.
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static depthSlider = FindSlider("Prediction Max Depth")
-        mats.mat(1) = task.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        mats.mat(1) = task.noDepthMask.Clone
 
         Dim color32f As New cv.Mat
         resizer.Run(src)
@@ -203,19 +201,19 @@ Public Class ML_DepthFromColor : Inherits VB_Parent
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth = task.pcSplit(2).Resize(color32f.Size())
 
-        Dim mask = depth.Threshold(depthSlider.Value / 1000, depthSlider.Value / 1000, cv.ThresholdTypes.Binary)
+        Dim mask = depth.Threshold(task.gOptions.maxDepth, task.gOptions.maxDepth, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
-        mats.mat(2) = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mats.mat(2) = mask
 
         mask = Not mask
-        depth.SetTo(depthSlider.Value / 1000, mask)
+        depth.SetTo(task.gOptions.maxDepth, mask)
 
         colorizer.Run(depth)
         mats.mat(3) = colorizer.dst2.Clone()
 
         mask = depth.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         Dim maskCount = mask.CountNonZero
-        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = mask
 
         Dim learnInput = color32f.Reshape(1, color32f.Total)
         Dim depthResponse = depth.Reshape(1, depth.Total)
@@ -235,7 +233,7 @@ Public Class ML_DepthFromColor : Inherits VB_Parent
 
         mats.Run(empty)
         dst2 = mats.dst2
-        labels(2) = "prediction, shadow, Depth Mask < " + CStr(depthSlider.Value) + ", Learn Input"
+        labels(2) = "prediction, shadow, Depth Mask < " + CStr(task.gOptions.maxDepth) + ", Learn Input"
         dst3 = mats.dst3
     End Sub
 End Class
@@ -248,13 +246,11 @@ Public Class ML_DepthFromXYColor : Inherits VB_Parent
     Dim resizer As New Resize_Smaller
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Prediction Max Depth", 1000, 5000, 1500)
         FindSlider("Resize Percentage (%)").Value = 2 ' 2% of the image.
         labels(2) = "Predicted Depth"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static depthSlider = FindSlider("Prediction Max Depth")
         shadow.Run(src)
         mats.mat(0) = shadow.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -268,13 +264,13 @@ Public Class ML_DepthFromXYColor : Inherits VB_Parent
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = task.pcSplit(2).Resize(color32f.Size())
 
-        Dim mask = depth32f.Threshold(depthSlider.Value, depthSlider.Value, cv.ThresholdTypes.BinaryInv)
+        Dim mask = depth32f.Threshold(task.gOptions.maxDepth, task.gOptions.maxDepth, cv.ThresholdTypes.BinaryInv)
         mask.SetTo(0, shadowSmall) ' remove the unknown depth...
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         mats.mat(2) = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         mask = Not mask
-        depth32f.SetTo(depthSlider.Value, mask)
+        depth32f.SetTo(task.gOptions.maxDepth, mask)
 
         colorizer.Run(depth32f)
         mats.mat(3) = colorizer.dst2.Clone()
@@ -317,7 +313,7 @@ Public Class ML_DepthFromXYColor : Inherits VB_Parent
 
         mats.Run(empty)
         dst3 = mats.dst2
-        labels(3) = "shadow, empty, Depth Mask < " + CStr(depthSlider.Value) + ", Learn Input"
+        labels(3) = "shadow, empty, Depth Mask < " + CStr(task.gOptions.maxDepth) + ", Learn Input"
     End Sub
 End Class
 
@@ -465,13 +461,12 @@ End Class
 
 Public Class ML_RemoveDups_CPP : Inherits VB_Parent
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for sort input", 0, 255, 127)
         cPtr = ML_RemoveDups_Open()
-        labels = {"", "", "BGR input below is converted to BGRA and sorted as integers - use slider to adjust", ""}
+        labels = {"", "", "BGR input below is converted to BGRA and sorted as integers", ""}
         desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Threshold for sort input")
+
         If src.Type = cv.MatType.CV_8UC3 Then
             dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, src.CvtColor(cv.ColorConversionCodes.BGR2BGRA).Data)
         Else

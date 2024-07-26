@@ -405,7 +405,7 @@ public:
         return Rect(dist(gen), dist(gen), dist(gen), dist(gen));
     }
 
-    void DrawRotatedRectangle(RotatedRect rr, Mat dst2, const Scalar color) {
+    void DrawRotatedRect(RotatedRect rr, Mat dst2, const Scalar color) {
         vector<Point2f> vertices2f;
         rr.points(vertices2f);
         vector<Point> vertices(vertices2f.size());

@@ -395,7 +395,8 @@ Public Class VBtask : Implements IDisposable
         task.redOptions.Show()
         task.gOptions.Show()
         palette = New Palette_LoadColorMap
-        If algName.StartsWith("OpenGL_") Or algName.EndsWith("_OpenGL") Or algName.StartsWith("Model_") Then
+        If algName.StartsWith("OpenGL_") Or algName.EndsWith("_OpenGL") Or algName.StartsWith("Model_") Or
+           algName.StartsWith("CS_Model_") Or algName.StartsWith("CS_OpenGL_") Then
             ogl = New OpenGL_Basics
         End If
 

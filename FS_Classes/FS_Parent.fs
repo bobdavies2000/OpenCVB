@@ -76,7 +76,7 @@ module FS_Classes =
 //    member this.vecToScalar(v: Vec3b) =
 //        new Scalar(float v.Item0, float v.Item1, float v.Item2)
 
-//    member this.DrawRotatedRectangle(rotatedRect: RotatedRect, dst: Mat, color: Scalar) =
+//    member this.DrawRotatedRect(rotatedRect: RotatedRect, dst: Mat, color: Scalar) =
 //        let vertices2f = rotatedRect.Points()
 //        let vertices = 
 //            vertices2f 
