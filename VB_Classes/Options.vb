@@ -6563,3 +6563,32 @@ Public Class Options_Mesh : Inherits VB_Parent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Options_OEX : Inherits VB_Parent
+    Public lows As cv.Scalar
+    Public highs As cv.Scalar
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Hue low", 0, 180, 90)
+            sliders.setupTrackBar("Hue high", 0, 180, 180)
+            sliders.setupTrackBar("Saturation low", 0, 255, 50)
+            sliders.setupTrackBar("Saturation high", 0, 255, 150)
+            sliders.setupTrackBar("Value low", 0, 255, 50)
+            sliders.setupTrackBar("Value high", 0, 255, 150)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static hueLowSlider = FindSlider("Hue low")
+        Static hueHighSlider = FindSlider("Hue high")
+        Static satLowSlider = FindSlider("Saturation low")
+        Static satHighSlider = FindSlider("Saturation high")
+        Static valLowSlider = FindSlider("Value low")
+        Static valHighSlider = FindSlider("Value high")
+        lows = New cv.Scalar(hueLowSlider.value, satLowSlider.value, valLowSlider.value)
+        highs = New cv.Scalar(hueHighSlider.value, satHighSlider.value, valHighSlider.value)
+    End Sub
+End Class

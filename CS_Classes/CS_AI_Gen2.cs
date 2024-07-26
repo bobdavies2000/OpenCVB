@@ -1601,5 +1601,868 @@ namespace CS_Classes
             MSER_Close(cPtr);
         }
     }
+    public class CS_MultiDimensionScaling_Cities : CS_Parent
+    {
+        double[] CityDistance = { // 10x10 array of distances for 10 cities
+        0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,       // Atlanta
+        587, 0, 920, 940, 1745, 1188, 713, 1858, 1737, 597,       // Chicago
+        1212, 920, 0, 879, 831, 1726, 1631, 949, 1021, 1494,      // Denver
+        701, 940, 879, 0, 1734, 968, 1420, 1645, 1891, 1220,      // Houston
+        1936, 1745, 831, 1734, 0, 2339, 2451, 347, 959, 2300,     // Los Angeles
+        604, 1188, 1726, 968, 2339, 0, 1092, 2594, 2734, 923,     // Miami
+        748, 713, 1631, 1420, 2451, 1092, 0, 2571, 2408, 205,     // New York
+        2139, 1858, 949, 1645, 347, 2594, 2571, 0, 678, 2442,     // San Francisco
+        2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    // Seattle
+        543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0};      // Washington D.C.
+        public CS_MultiDimensionScaling_Cities(VBtask task) : base(task)
+        {
+            labels[2] = "Resulting solution using cv.Eigen";
+            desc = "Use OpenCV's Eigen function to solve a system of equations";
+        }
+        double Torgerson(Mat src)
+        {
+            int rows = src.Rows;
+            mmData mm = GetMinMax(src);
+            double c1 = 0;
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < rows; j++)
+                {
+                    for (int k = 0; k < rows; k++)
+                    {
+                        double v = src.At<double>(i, k) - src.At<double>(i, j) - src.At<double>(j, k);
+                        if (v > c1) c1 = v;
+                    }
+                }
+            }
+            return Math.Max(Math.Max(c1, mm.maxVal), 0);
+        }
+        Mat CenteringMatrix(int n)
+        {
+            return Mat.Eye(n, n, MatType.CV_64F) - 1.0 / n;
+        }
+        public void RunCS(Mat src)
+        {
+            int size = 10; // we are working with 10 cities.
+            Mat cityMat = new Mat(size, size, MatType.CV_64FC1, CityDistance);
+            cityMat += Torgerson(cityMat);
+            cityMat = cityMat.Mul(cityMat);
+            Mat g = CenteringMatrix(size);
+            // calculates the inner product matrix b
+            Mat b = g * cityMat * g.Transpose() * -0.5;
+            Mat vectors = new Mat(size, size, MatType.CV_64F);
+            Mat values = new Mat(size, 1, MatType.CV_64F);
+            Cv2.Eigen(b, values, vectors);
+            values.Threshold(0, 0, ThresholdTypes.Tozero);
+            Mat result = vectors.RowRange(0, 2);
+            var at = result.GetGenericIndexer<double>();
+            for (int r = 0; r < result.Rows; r++)
+            {
+                for (int c = 0; c < result.Cols; c++)
+                {
+                    at[r, c] *= Math.Sqrt(values.At<double>(r));
+                }
+            }
+            result.Normalize(0, 800, NormTypes.MinMax);
+            at = result.GetGenericIndexer<double>();
+            double maxX = 0, maxY = 0, minX = double.MaxValue, minY = double.MaxValue;
+            for (int c = 0; c < size; c++)
+            {
+                double x = -at[0, c];
+                double y = at[1, c];
+                if (maxX < x) maxX = x;
+                if (maxY < y) maxY = y;
+                if (minX > x) minX = x;
+                if (minY > y) minY = y;
+            }
+            int w = dst2.Width;
+            int h = dst2.Height;
+            dst2.SetTo(0);
+            string cityName = "Atlanta";
+            for (int c = 0; c < size; c++)
+            {
+                double x = -at[0, c];
+                double y = at[1, c];
+                x = w * 0.1 + 0.7 * w * (x - minX) / (maxX - minX);
+                y = h * 0.1 + 0.7 * h * (y - minY) / (maxY - minY);
+                DrawCircle(dst2, new cv.Point(x, y), task.DotSize + 3, Scalar.Red);
+                cv.Point textPos = new cv.Point(x + 5, y + 10);
+                if (c == 1) cityName = "Chicago";
+                if (c == 2) cityName = "Denver";
+                if (c == 3) cityName = "Houston";
+                if (c == 4) cityName = "Los Angeles";
+                if (c == 5) cityName = "Miami";
+                if (c == 6) cityName = "New York";
+                if (c == 7) cityName = "San Francisco";
+                if (c == 8) cityName = "Seattle";
+                if (c == 9) cityName = "Washington D.C.";
+                SetTrueText(cityName, textPos, 2);
+            }
+        }
+    }
+    public class CS_Neighbors_Basics : CS_Parent
+    {
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        KNN_Core knn = new KNN_Core();
+        public bool runRedCloud = false;
+        public Options_XNeighbors options = new Options_XNeighbors();
+        public CS_Neighbors_Basics(VBtask task) : base(task)
+        {
+            desc = "Find all the neighbors with KNN";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standalone || runRedCloud)
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                labels = redC.labels;
+            }
+            knn.queries.Clear();
+            foreach (var rc in task.redCells)
+            {
+                knn.queries.Add(rc.maxDStable);
+            }
+            knn.trainInput = new List<Point2f>(knn.queries);
+            knn.Run(src);
+            for (int i = 0; i < task.redCells.Count(); i++)
+            {
+                var rc = task.redCells[i];
+                rc.nabs = knn.neighbors[i];
+            }
+            if (standalone)
+            {
+                task.setSelectedContour();
+                dst3.SetTo(0);
+                int ptCount = 0;
+                foreach (var index in task.rc.nabs)
+                {
+                    var pt = task.redCells[index].maxDStable;
+                    if (pt == task.rc.maxDStable)
+                    {
+                        DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black);
+                    }
+                    else
+                    {
+                        DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+                        ptCount++;
+                        if (ptCount > options.xNeighbors) break;
+                    }
+                }
+            }
+        }
+    }
+    public class CS_Neighbors_Intersects : CS_Parent
+    {
+        public List<Point> nPoints = new List<Point>();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Neighbors_Intersects(VBtask task) : base(task)
+        {
+            desc = "Find the corner points where multiple cells intersect.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest() || src.Type() != MatType.CV_8U)
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                src = task.cellMap;
+                labels[2] = redC.labels[2];
+            }
+            byte[] samples = new byte[src.Total()];
+            Marshal.Copy(src.Data, samples, 0, samples.Length);
+            int w = dst2.Width;
+            nPoints.Clear();
+            int kSize = 2;
+            for (int y = 0; y <= dst1.Height - kSize; y++)
+            {
+                for (int x = 0; x <= dst1.Width - kSize; x++)
+                {
+                    var nabs = new SortedList<byte, byte>();
+                    for (int yy = y; yy < y + kSize; yy++)
+                    {
+                        for (int xx = x; xx < x + kSize; xx++)
+                        {
+                            byte val = samples[yy * w + xx];
+                            if (val == 0 && removeZeroNeighbors) continue;
+                            if (!nabs.ContainsKey(val)) nabs.Add(val, 0);
+                        }
+                    }
+                    if (nabs.Count() > 2)
+                    {
+                        nPoints.Add(new cv.Point(x, y));
+                    }
+                }
+            }
+            if (standaloneTest())
+            {
+                dst3 = task.color.Clone();
+                foreach (var pt in nPoints)
+                {
+                    DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+                    DrawCircle(dst3, pt, task.DotSize, Scalar.Yellow);
+                }
+            }
+            labels[3] = nPoints.Count().ToString() + " intersections with 3 or more cells were found";
+        }
+    }
+    public class CS_Neighbors_ColorOnly : CS_Parent
+    {
+        Neighbors_Intersects corners = new Neighbors_Intersects();
+        RedCloud_Cells redC = new RedCloud_Cells();
+        public CS_Neighbors_ColorOnly(VBtask task) : base(task)
+        {
+            desc = "Find neighbors in a color only RedCloud cellMap";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            corners.Run(task.cellMap.Clone());
+            foreach (var pt in corners.nPoints)
+            {
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+            }
+            labels[2] = redC.labels[2] + " and " + corners.nPoints.Count().ToString() + " cell intersections";
+        }
+    }
+    public class CS_Neighbors_Precise : CS_Parent
+    {
+        public List<List<int>> nabList = new List<List<int>>();
+        Cell_Basics stats = new Cell_Basics();
+        public List<rcData> redCells;
+        public bool runRedCloud = false;
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Neighbors_Precise(VBtask task) : base(task)
+        {
+            cPtr = Neighbors_Open();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Find the neighbors in a selected RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest() || runRedCloud)
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                labels = redC.labels;
+                src = task.cellMap;
+                redCells = task.redCells;
+            }
+            byte[] mapData = new byte[src.Total()];
+            Marshal.Copy(src.Data, mapData, 0, mapData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(mapData, GCHandleType.Pinned);
+            int nabCount = Neighbors_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
+            handleSrc.Free();
+            SetTrueText("Review the neighbors_Precise algorithm");
+            //if (nabCount > 0)
+            //{
+            //    var nabData = new Mat(nabCount, 1, MatType.CV_32SC2, Neighbors_NabList(cPtr));
+            //    nabList.Clear();
+            //    for (int i = 0; i < redCells.Count(); i++)
+            //    {
+            //        nabList.Add(new List<int>());
+            //    }
+            //    redCells[i].nab = nabList.Min();
+            //    for (int i = 0; i < nabCount; i++)
+            //    {
+            //        var pt = nabData.Get<Point>(i, 0);
+            //        if (!nabList[pt.X].Contains(pt.Y) && pt.Y != 0)
+            //        {
+            //            nabList[pt.X].Add(pt.Y);
+            //            redCells[pt.X].nabs.Add(pt.Y);
+            //        }
+            //        if (!nabList[pt.Y].Contains(pt.X) && pt.X != 0)
+            //        {
+            //            nabList[pt.Y].Add(pt.X);
+            //            redCells[pt.Y].nabs.Add(pt.X);
+            //        }
+            //    }
+            //    nabList[0].Clear(); // neighbors to zero are not interesting (yet?)
+            //    redCells[0].nabs.Clear(); // not interesting.
+            //    if (task.heartBeat && standaloneTest())
+            //    {
+            //        stats.Run(task.color);
+            //        strOut = stats.strOut;
+            //        if (nabList[task.rc.index].Count() > 0)
+            //        {
+            //            strOut += "Neighbors: ";
+            //            dst1.SetTo(0);
+            //            dst1[task.rc.rect].SetTo(task.rc.color, task.rc.mask);
+            //            foreach (var index in nabList[task.rc.index])
+            //            {
+            //                var rc = redCells[index];
+            //                dst1[rc.rect].SetTo(rc.color, rc.mask);
+            //                strOut += index.ToString() + ",";
+            //            }
+            //            strOut += "\n";
+            //        }
+            //    }
+            //    SetTrueText(strOut, 3);
+            //}
+            labels[3] = nabCount.ToString() + " neighbor pairs were found.";
+        }
+        public void Close()
+        {
+            Neighbors_Close(cPtr);
+        }
+    }
+    public class CS_OEX_CalcBackProject_Demo1 : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public int classCount;
+        public CS_OEX_CalcBackProject_Demo1(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "BackProjection of Hue channel", "Plot of Hue histogram" };
+            UpdateAdvice(traceName + ": <place advice here on any options that are useful>");
+            desc = "OpenCV Sample CalcBackProject_Demo1";
+        }
+        public void RunCS(Mat src)
+        {
+            Rangef[] ranges = new Rangef[] { new Rangef(0, 180) };
+            Mat hsv = task.color.CvtColor(ColorConversionCodes.BGR2HSV);
+            Cv2.CalcHist(new Mat[] { hsv }, new int[] { 0 }, new Mat(), histogram, 1, new int[] { task.histogramBins }, ranges);
+            classCount = Cv2.CountNonZero(histogram);
+            dst0 = histogram.Normalize(0, classCount, NormTypes.MinMax); // for the backprojection.
+            float[] histArray = new float[histogram.Total()];
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+            float peakValue = histArray.ToList().Max();
+            histogram = histogram.Normalize(0, 1, NormTypes.MinMax);
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+            Cv2.CalcBackProject(new Mat[] { hsv }, new int[] { 0 }, dst0, dst2, ranges);
+            dst3.SetTo(Scalar.Red);
+            int binW = dst2.Width / task.histogramBins;
+            int bins = dst2.Width / binW;
+            for (int i = 0; i < bins; i++)
+            {
+                int h = (int)(dst2.Height * histArray[i]);
+                cv.Rect r = new cv.Rect(i * binW, dst2.Height - h, binW, h);
+                dst3.Rectangle(r, Scalar.Black, -1);
+            }
+            if (task.heartBeat) labels[3] = $"The max value below is {peakValue}";
+        }
+    }
+    public class CS_OEX_CalcBackProject_Demo2 : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public int classCount = 10; // initial value is just a guess.  It is refined after the first pass.
+        public CS_OEX_CalcBackProject_Demo2(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            task.gOptions.setHistogramBins(6);
+            labels = new string[] { "", "Mask for isolated region", "Backprojection of the hsv 2D histogram", "Mask in image context" };
+            desc = "OpenCV Sample CalcBackProject_Demo2";
+        }
+        public void RunCS(Mat src)
+        {
+            int count = 0;
+            if (task.ClickPoint != new cv.Point())
+            {
+                int connectivity = 8;
+                int flags = connectivity | (255 << 8) | (int)FloodFillFlags.FixedRange | (int)FloodFillFlags.MaskOnly;
+                Mat mask2 = new Mat(src.Rows + 2, src.Cols + 2, MatType.CV_8U, 0);
+                // the delta between each regions value is 255 / classcount. no low or high bound needed.
+                int delta = (int)(255 / classCount) - 1;
+                Scalar bounds = new Scalar(delta, delta, delta);
+                count = Cv2.FloodFill(dst2, mask2, task.ClickPoint, 255, out _, bounds, bounds, (cv.FloodFillFlags)flags);
+                if (count != src.Total()) dst1 = mask2[new Range(1, mask2.Rows - 1), new Range(1, mask2.Cols - 1)];
+            }
+            Rangef[] ranges = new Rangef[] { new Rangef(0, 180), new Rangef(0, 256) };
+            Mat hsv = task.color.CvtColor(ColorConversionCodes.BGR2HSV);
+            Cv2.CalcHist(new Mat[] { hsv }, new int[] { 0, 1 }, new Mat(), histogram, 2, new int[] { task.histogramBins, task.histogramBins }, ranges);
+            classCount = Cv2.CountNonZero(histogram);
+            histogram = histogram.Normalize(0, 255, NormTypes.MinMax);
+            Cv2.CalcBackProject(new Mat[] { hsv }, new int[] { 0, 1 }, histogram, dst2, ranges);
+            dst3 = src;
+            dst3.SetTo(Scalar.White, dst1);
+            SetTrueText("Click anywhere to isolate that region.", 1);
+        }
+    }
+    public class CS_OEX_bgfg_segm : CS_Parent
+    {
+        BGSubtract_Basics bgSub = new BGSubtract_Basics();
+        public CS_OEX_bgfg_segm(VBtask task) : base(task)
+        {
+            desc = "OpenCV example bgfg_segm - existing BGSubtract_Basics is the same.";
+        }
+        public void RunCS(Mat src)
+        {
+            bgSub.Run(src);
+            dst2 = bgSub.dst2;
+            labels[2] = bgSub.labels[2];
+        }
+    }
+    public class CS_OEX_bgSub : CS_Parent
+    {
+        BackgroundSubtractor pBackSub;
+        Options_BGSubtract options = new Options_BGSubtract();
+        public CS_OEX_bgSub(VBtask task) : base(task)
+        {
+            desc = "OpenCV example bgSub";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.optionsChanged)
+            {
+                switch (options.methodDesc)
+                {
+                    case "GMG":
+                        pBackSub = BackgroundSubtractorGMG.Create();
+                        break;
+                    case "KNN":
+                        pBackSub = BackgroundSubtractorKNN.Create();
+                        break;
+                    case "MOG":
+                        pBackSub = BackgroundSubtractorMOG.Create();
+                        break;
+                    default: // MOG2 is the default.  Other choices map to MOG2 because OpenCVSharp doesn't support them.
+                        pBackSub = BackgroundSubtractorMOG2.Create();
+                        break;
+                }
+            }
+            pBackSub.Apply(src, dst2, options.learnRate);
+        }
+    }
+    public class CS_OEX_BasicLinearTransforms : CS_Parent
+    {
+        Options_BrightnessContrast options = new Options_BrightnessContrast();
+        public CS_OEX_BasicLinearTransforms(VBtask task) : base(task)
+        {
+            desc = "OpenCV Example BasicLinearTransforms - NOTE: much faster than BasicLinearTransformTrackBar";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            src.ConvertTo(dst2, -1, options.brightness, options.contrast);
+        }
+    }
+    public class CS_OEX_BasicLinearTransformsTrackBar : CS_Parent
+    {
+        Options_BrightnessContrast options = new Options_BrightnessContrast();
+        public CS_OEX_BasicLinearTransformsTrackBar(VBtask task) : base(task)
+        {
+            desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than OEX_BasicLinearTransforms";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Cols >= 640)
+            {
+                src = src.Resize(task.lowRes);
+                dst2 = dst2.Resize(task.lowRes);
+            }
+            for (int y = 0; y < src.Rows; y++)
+            {
+                for (int x = 0; x < src.Cols; x++)
+                {
+                    Vec3b vec = src.Get<Vec3b>(y, x);
+                    vec[0] = (byte)Math.Max(Math.Min(vec[0] * options.brightness + options.contrast, 255), 0);
+                    vec[1] = (byte)Math.Max(Math.Min(vec[1] * options.brightness + options.contrast, 255), 0);
+                    vec[2] = (byte)Math.Max(Math.Min(vec[2] * options.brightness + options.contrast, 255), 0);
+                    dst2.Set<Vec3b>(y, x, vec);
+                }
+            }
+        }
+    }
+    public class CS_OEX_delaunay2 : CS_Parent
+    {
+        Scalar active_facet_color = new Scalar(0, 0, 255);
+        Scalar delaunay_color = new Scalar(255, 255, 255);
+        List<Point2f> points = new List<Point2f>();
+        Subdiv2D subdiv;
+        public CS_OEX_delaunay2(VBtask task) : base(task)
+       {
+            subdiv = new Subdiv2D(new cv.Rect(0, 0, dst2.Width, dst2.Height));
+            if (standalone) task.gOptions.setDisplay1();
+            labels = new string[] { "", "", "Next triangle list being built.  Latest entry is in red.", "The completed voronoi facets" };
+            desc = "OpenCV Example delaunay2";
+        }
+        public void locatePoint(Mat img, Subdiv2D subdiv, cv.Point pt, Scalar activeColor)
+        {
+            int e0 = 0;
+            int vertex = 0;
+            subdiv.Locate(pt, out e0, out vertex);
+            if (e0 > 0)
+            {
+                int e = e0;
+                do
+                {
+                    cv.Point2f org, dst;
+                    if (subdiv.EdgeOrg(e, out org) > 0 && subdiv.EdgeDst(e, out dst) > 0)
+                    {
+                        DrawLine(img, org, dst, activeColor, task.lineWidth + 3);
+                    }
+                    e = subdiv.GetEdge(e, (cv.NextEdgeType)Subdiv2D.NEXT_AROUND_LEFT);
+                } while (e != e0);
+            }
+            DrawCircle(img, pt, task.DotSize, activeColor);
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.quarterBeat)
+            {
+                if (points.Count() < 10)
+                {
+                    dst2.SetTo(0);
+                    Point2f pt = new Point2f(msRNG.Next(0, dst2.Width - 10) + 5, msRNG.Next(0, dst2.Height - 10) + 5);
+                    points.Add(pt);
+                    locatePoint(dst2, subdiv, new cv.Point((int)pt.X, (int)pt.Y), active_facet_color);
+                    subdiv.Insert(pt);
+                    var triangleList = subdiv.GetTriangleList();
+                    Point[] pts = new Point[3];
+                    foreach (var tri in triangleList)
+                    {
+                        pts[0] = new cv.Point(Math.Round(tri[0]), Math.Round(tri[1]));
+                        pts[1] = new cv.Point(Math.Round(tri[2]), Math.Round(tri[3]));
+                        pts[2] = new cv.Point(Math.Round(tri[4]), Math.Round(tri[5]));
+                        DrawLine(dst2, pts[0], pts[1], delaunay_color);
+                        DrawLine(dst2, pts[1], pts[2], delaunay_color);
+                        DrawLine(dst2, pts[2], pts[0], delaunay_color);
+                    }
+                }
+                else
+                {
+                    dst1 = dst2.Clone();
+                    Point2f[][] facets = new Point2f[1][];
+                    Point2f[] centers;
+                    subdiv.GetVoronoiFacetList(new List<int>(), out facets, out centers);
+                    List<Point> ifacet = new List<Point>();
+                    List<List<Point>> ifacets = new List<List<Point>> { ifacet };
+                    for (int i = 0; i < facets.Length; i++)
+                    {
+                        ifacet.Clear();
+                        ifacet.AddRange(facets[i].Select(p => new cv.Point(p.X, p.Y)));
+                        Scalar color = vecToScalar(task.vecColors[i % 256]);
+                        dst3.FillConvexPoly(ifacet, color, cv.LineTypes.Link8, 0);
+                        ifacets[0] = ifacet;
+                        Cv2.Polylines(dst3, ifacets, true, new cv.Scalar(), task.lineWidth, task.lineType);
+                        DrawCircle(dst3, centers[i], 3, new cv.Scalar());
+                    }
+                    points.Clear();
+                    subdiv = new Subdiv2D(new cv.Rect(0, 0, dst2.Width, dst2.Height));
+                }
+            }
+        }
+    }
+    public class CS_OEX_MeanShift : CS_Parent
+    {
+        TermCriteria term_crit = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.Count, 10, 1.0);
+        Rangef[] ranges = new Rangef[] { new Rangef(0, 180) };
+        public Mat histogram = new Mat();
+        cv.Rect trackWindow;
+        public CS_OEX_MeanShift(VBtask task) : base(task)
+        {
+            labels[3] = "Draw a rectangle around the region of interest";
+            desc = "OpenCV Example MeanShift";
+        }
+        public void RunCS(Mat src)
+        {
+            cv.Rect roi = task.drawRect.Width > 0 ? task.drawRect : new cv.Rect(0, 0, dst2.Width, dst2.Height);
+            Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
+            dst2 = src;
+            if (task.optionsChanged)
+            {
+                trackWindow = roi;
+                Mat mask = new Mat();
+                Cv2.InRange(hsv, new Scalar(0, 60, 32), new Scalar(180, 255, 255), mask);
+                Cv2.CalcHist(new Mat[] { hsv[roi] }, new int[] { 0 }, new Mat(), histogram, 1, new int[] { task.histogramBins }, ranges);
+                histogram = histogram.Normalize(0, 255, NormTypes.MinMax);
+            }
+            Cv2.CalcBackProject(new Mat[] { hsv }, new int[] { 0 }, histogram, dst3, ranges);
+            if (trackWindow.Width != 0)
+            {
+                Cv2.MeanShift(dst3, ref trackWindow, TermCriteria.Both(10, 1));
+                src.Rectangle(trackWindow, Scalar.White, task.lineWidth, task.lineType);
+            }
+        }
+    }
+    public class CS_OEX_PointPolygon : CS_Parent
+    {
+        Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
+        public CS_OEX_PointPolygon(VBtask task) : base(task)
+        {
+            desc = "PointPolygonTest will decide what is inside and what is outside.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                rotatedRect.Run(src);
+                src = rotatedRect.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            }
+            dst2 = src.Clone();
+            Point[][] contours;
+            Cv2.FindContours(src, out contours, out _, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+            dst1 = new Mat(dst1.Size(), MatType.CV_32F, 0);
+            for (int i = 0; i < dst1.Rows; i++)
+            {
+                for (int j = 0; j < dst1.Cols; j++)
+                {
+                    double distance = Cv2.PointPolygonTest(contours[0], new cv.Point(j, i), true);
+                    dst1.Set(i, j, distance);
+                }
+            }
+            var mm = GetMinMax(dst1);
+            mm.minVal = Math.Abs(mm.minVal);
+            mm.maxVal = Math.Abs(mm.maxVal);
+            Vec3b blue = new Vec3b(0, 0, 0);
+            Vec3b red = new Vec3b(0, 0, 0);
+            for (int i = 0; i < src.Rows; i++)
+            {
+                for (int j = 0; j < src.Cols; j++)
+                {
+                    float val = dst1.Get<float>(i, j);
+                    if (val < 0)
+                    {
+                        blue[0] = (byte)(255 - Math.Abs(val) * 255 / mm.minVal);
+                        dst3.Set(i, j, blue);
+                    }
+                    else if (val > 0)
+                    {
+                        red[2] = (byte)(255 - val * 255 / mm.maxVal);
+                        dst3.Set(i, j, red);
+                    }
+                    else
+                    {
+                        dst3.Set(i, j, white);
+                    }
+                }
+            }
+        }
+    }
+    public class CS_OEX_PointPolygon_demo : CS_Parent
+    {
+        OEX_PointPolygon pointPoly = new OEX_PointPolygon();
+        public CS_OEX_PointPolygon_demo(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "OpenCV Example PointPolygonTest_demo - it became PointPolygonTest_Basics.";
+        }
+        public void RunCS(Mat src)
+        {
+            int r = dst2.Height / 4;
+            List<Point> vert = new List<Point>
+        {
+            new cv.Point(3 * r / 2 + dst2.Width / 4, (int)(1.34 * r)),
+            new cv.Point(r + dst2.Width / 4, 2 * r),
+            new cv.Point(3 * r / 2 + dst2.Width / 4, (int)(2.866 * r)),
+            new cv.Point(5 * r / 2 + dst2.Width / 4, (int)(2.866 * r)),
+            new cv.Point(3 * r + dst2.Width / 4, 2 * r),
+            new cv.Point(5 * r / 2 + dst2.Width / 4, (int)(1.34 * r))
+        };
+            dst2.SetTo(0);
+            for (int i = 0; i < vert.Count(); i++)
+            {
+                DrawLine(dst2, vert[i], vert[(i + 1) % 6], Scalar.White);
+            }
+            pointPoly.Run(dst2);
+            dst3 = pointPoly.dst3;
+        }
+    }
+    public class CS_OEX_Remap : CS_Parent
+    {
+        Remap_Basics remap = new Remap_Basics();
+        public CS_OEX_Remap(VBtask task) : base(task)
+        {
+            desc = "The OpenCV Remap example became the Remap_Basics algorithm.";
+        }
+        public void RunCS(Mat src)
+        {
+            remap.Run(src);
+            dst2 = remap.dst2;
+            labels[2] = remap.labels[2];
+        }
+    }
+    public class CS_OEX_Threshold : CS_Parent
+    {
+        Threshold_Basics threshold = new Threshold_Basics();
+        public CS_OEX_Threshold(VBtask task) : base(task)
+        {
+            desc = "OpenCV Example Threshold became Threshold_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            threshold.Run(src);
+            dst2 = threshold.dst2;
+            dst3 = threshold.dst3;
+            labels = threshold.labels;
+        }
+    }
+    public class CS_OEX_Threshold_Inrange : CS_Parent
+    {
+        Options_OEX options = new Options_OEX();
+        public CS_OEX_Threshold_Inrange(VBtask task) : base(task)
+        {
+            desc = "OpenCV Example Threshold_Inrange";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
+            dst2 = hsv.InRange(options.lows, options.highs);
+        }
+    }
+    public class CS_OEX_Points_Classifier : CS_Parent
+    {
+        Classifier_Basics basics = new Classifier_Basics();
+        public CS_OEX_Points_Classifier(VBtask task) : base(task)
+        {
+            desc = "OpenCV Example Points_Classifier became Classifier_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            basics.Run(src);
+            dst2 = basics.dst2;
+            dst3 = basics.dst3;
+            labels = basics.labels;
+            SetTrueText("Click the global DebugCheckBox to get another set of points.", 2);
+        }
+    }
+    public class CS_OEX_GoodFeaturesToTrackDemo : CS_Parent
+    {
+        Feature_Basics feat = new Feature_Basics();
+        public CS_OEX_GoodFeaturesToTrackDemo(VBtask task) : base(task)
+        {
+            desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            dst2 = feat.dst2;
+            labels[2] = feat.labels[2];
+        }
+    }
+    public class CS_OEX_Core_Reduce : CS_Parent
+    {
+        public CS_OEX_Core_Reduce(VBtask task) : base(task)
+        {
+            desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                Mat m = new Mat(3, 2, MatType.CV_32F, new float[] { 1, 2, 3, 4, 5, 6 });
+                Mat col_sum = new Mat(), row_sum = new Mat();
+                Cv2.Reduce(m, col_sum, 0, ReduceTypes.Sum, MatType.CV_32F);
+                Cv2.Reduce(m, row_sum, (cv.ReduceDimension) 1, ReduceTypes.Sum, MatType.CV_32F);
+                strOut = "Original Mat" + "\n";
+                for (int y = 0; y < m.Rows; y++)
+                {
+                    for (int x = 0; x < m.Cols; x++)
+                    {
+                        strOut += m.Get<float>(y, x) + ", ";
+                    }
+                    strOut += "\n";
+                }
+                strOut += "\n" + "col_sum" + "\n";
+                for (int i = 0; i < m.Cols; i++)
+                {
+                    strOut += col_sum.Get<float>(0, i) + ", ";
+                }
+                strOut += "\n" + "row_sum" + "\n";
+                for (int i = 0; i < m.Rows; i++)
+                {
+                    strOut += row_sum.Get<float>(0, i) + ", ";
+                }
+                Mat col_average = new Mat(), row_average = new Mat(), col_min = new Mat();
+                Mat col_max = new Mat(), row_min = new Mat(), row_max = new Mat();
+                Cv2.Reduce(m, col_average, 0, ReduceTypes.Avg, MatType.CV_32F);
+                Cv2.Reduce(m, row_average, (cv.ReduceDimension) 1, ReduceTypes.Avg, MatType.CV_32F);
+                Cv2.Reduce(m, col_min, 0, ReduceTypes.Min, MatType.CV_32F);
+                Cv2.Reduce(m, row_min, (cv.ReduceDimension)1, ReduceTypes.Min, MatType.CV_32F);
+                Cv2.Reduce(m, col_max, 0, ReduceTypes.Max, MatType.CV_32F);
+                Cv2.Reduce(m, row_max, (cv.ReduceDimension)1, ReduceTypes.Max, MatType.CV_32F);
+            }
+            SetTrueText(strOut, 2);
+        }
+    }
+    public class CS_OEX_Core_Split : CS_Parent
+    {
+        public CS_OEX_Core_Split(VBtask task) : base(task)
+        {
+            desc = "OpenCV Example Core_Split";
+        }
+        public void RunCS(Mat src)
+        {
+            var d = new Mat(2, 2, MatType.CV_8UC3, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            var channels = d.Split();
+            var samples = new byte[d.Total() * d.ElemSize()];
+            Marshal.Copy(d.Data, samples, 0, samples.Length);
+            strOut = "Original 2x2 Mat";
+            for (int i = 0; i < samples.Length; i++)
+            {
+                strOut += samples[i].ToString() + ", ";
+            }
+            strOut += "\n";
+            for (int i = 0; i < 3; i++)
+            {
+                strOut += "Channels " + i.ToString() + "\n";
+                for (int y = 0; y < channels[i].Rows; y++)
+                {
+                    for (int x = 0; x < channels[i].Cols; x++)
+                    {
+                        strOut += channels[i].Get<byte>(y, x).ToString() + ", ";
+                    }
+                    strOut += "\n";
+                }
+            }
+            SetTrueText(strOut, 2);
+        }
+    }
+    public class CS_OEX_Filter2D : CS_Parent
+    {
+        MatType ddepth = MatType.CV_8UC3;
+        cv.Point anchor = new cv.Point(-1, -1);
+        int kernelSize = 3, ind = 0;
+        public CS_OEX_Filter2D(VBtask task) : base(task)
+        {
+            desc = "OpenCV Example Filter2D demo - Use a varying kernel to show the impact.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat) ind++;
+            kernelSize = 3 + 2 * (ind % 5);
+            var kernel = new Mat(kernelSize, kernelSize, MatType.CV_32F, 1.0 / (kernelSize * kernelSize));
+            dst2 = src.Filter2D(ddepth, kernel, anchor, 0, BorderTypes.Default);
+            SetTrueText("Kernel size = " + kernelSize.ToString(), 3);
+        }
+    }
+    public class CS_OEX_FitEllipse : CS_Parent
+    {
+        Mat img;
+        Options_FitEllipse options = new Options_FitEllipse();
+        public CS_OEX_FitEllipse(VBtask task) : base(task)
+        {
+            var fileInputName = new FileInfo(task.HomeDir + "opencv/samples/data/ellipses.jpg");
+            img = Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            cPtr = OEX_FitEllipse_Open();
+            desc = "OEX Example fitellipse";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var cppData = new byte[img.Total() * img.ElemSize()];
+            Marshal.Copy(img.Data, cppData, 0, cppData.Length);
+            var handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            var imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
+                                                 options.threshold, options.fitType);
+            handleSrc.Free();
+            dst2 = new Mat(img.Rows + 4, img.Cols + 4, MatType.CV_8UC3, imagePtr).Clone();
+        }
+        public void Close()
+        {
+            OEX_FitEllipse_Close(cPtr);
+        }
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr OEX_FitEllipse_Open();
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void OEX_FitEllipse_Close(IntPtr cPtr);
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr OEX_FitEllipse_RunCPP(IntPtr cPtr, IntPtr dataPtr, int rows, int cols,
+                                                           int threshold, int fitType);
+    }
 
 }

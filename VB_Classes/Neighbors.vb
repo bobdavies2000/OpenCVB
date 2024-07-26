@@ -134,36 +134,6 @@ End Class
 
 
 
-
-
-Public Class Neighbors_PreciseTest : Inherits VB_Parent
-    Dim nabs As New Neighbors_Precise
-    Public Sub New()
-        nabs.runRedCloud = True
-        desc = "Test Neighbors_Precise to show how to use it."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        SetTrueText("Review the neighbors_Precise algorithm")
-        'nabs.Run(src)
-        'dst2 = nabs.dst2
-        'labels(2) = nabs.labels(2)
-        'If nabs.redCells.Count <= 1 Then Exit Sub
-
-        'dst3.SetTo(0)
-        'dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
-        'For Each index In nabs.nabList(task.rc.index)
-        '    Dim rc = nabs.redCells(index)
-        '    dst3(rc.rect).SetTo(rc.color, rc.mask)
-        'Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Neighbors_Precise : Inherits VB_Parent
     Public nabList As New List(Of List(Of Integer))
     Dim stats As New Cell_Basics
