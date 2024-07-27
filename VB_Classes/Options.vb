@@ -2036,7 +2036,12 @@ Public Class Options_Sort : Inherits VB_Parent
     Public radio3 As Windows.Forms.RadioButton
     Public radio4 As Windows.Forms.RadioButton
     Public radio5 As Windows.Forms.RadioButton
+    Public sortThreshold As Integer
     Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Threshold for sort input", 0, 255, 127)
+        End If
+
         If radio.Setup(traceName) Then
             radio.addRadio("EveryColumn, Ascending")
             radio.addRadio("EveryColumn, Descending")
@@ -2055,9 +2060,11 @@ Public Class Options_Sort : Inherits VB_Parent
         radio5 = FindRadio("Sort all pixels descending")
     End Sub
     Public Sub RunVB()
+        Static sortSlider = FindSlider("Threshold for sort input")
         If radio1.Checked Then sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Descending
         If radio2.Checked Then sortOption = cv.SortFlags.EveryRow + cv.SortFlags.Ascending
         If radio3.Checked Then sortOption = cv.SortFlags.EveryRow + cv.SortFlags.Descending
+        sortThreshold = sortSlider.value
     End Sub
 End Class
 
