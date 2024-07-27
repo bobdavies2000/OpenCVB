@@ -1106,6 +1106,17 @@ namespace CS_Classes
 			if (algorithmName == "CS_Palette_RGBDepth") return new CS_Palette_RGBDepth(task);
 			if (algorithmName == "CS_Palette_TaskColors") return new CS_Palette_TaskColors(task);
 			if (algorithmName == "CS_Palette_Variable") return new CS_Palette_Variable(task);
+			if (algorithmName == "CS_ParticleFilter_Example") return new CS_ParticleFilter_Example(task);
+			if (algorithmName == "CS_PCA_Basics") return new CS_PCA_Basics(task);
+			if (algorithmName == "CS_PCA_CellMask") return new CS_PCA_CellMask(task);
+			if (algorithmName == "CS_PCA_Depth") return new CS_PCA_Depth(task);
+			if (algorithmName == "CS_PCA_DrawImage") return new CS_PCA_DrawImage(task);
+			if (algorithmName == "CS_PCA_NColor") return new CS_PCA_NColor(task);
+			if (algorithmName == "CS_PCA_NColor_CPP") return new CS_PCA_NColor_CPP(task);
+			if (algorithmName == "CS_PCA_NColorPalettize") return new CS_PCA_NColorPalettize(task);
+			if (algorithmName == "CS_PCA_Palettize") return new CS_PCA_Palettize(task);
+			if (algorithmName == "CS_PCA_Prep_CPP") return new CS_PCA_Prep_CPP(task);
+			if (algorithmName == "CS_PCA_Reconstruct") return new CS_PCA_Reconstruct(task);
 			if (algorithmName == "CS_Pixel_Unstable") return new CS_Pixel_Unstable(task);
 			if (algorithmName == "CS_Random_Basics") return new CS_Random_Basics(task);
 			if (algorithmName == "CS_Sieve_Basics") return new CS_Sieve_Basics(task);

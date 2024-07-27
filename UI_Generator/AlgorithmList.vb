@@ -1442,6 +1442,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_OpticalFlowSparse" Then return new Options_OpticalFlowSparse
 	if algorithmName = "Options_ORB" Then return new Options_ORB
 	if algorithmName = "Options_Palette" Then return new Options_Palette
+	if algorithmName = "Options_PCA" Then return new Options_PCA
 	if algorithmName = "Options_PCA_NColor" Then return new Options_PCA_NColor
 	if algorithmName = "Options_Photoshop" Then return new Options_Photoshop
 	if algorithmName = "Options_Plane" Then return new Options_Plane

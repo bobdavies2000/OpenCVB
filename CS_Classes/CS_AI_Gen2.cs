@@ -5229,5 +5229,891 @@ namespace CS_Classes
             Cv2.ApplyColorMap(src, dst2, ColorMap);
         }
     }
+    public class CS_ParticleFilter_Example : CS_Parent
+    {
+        int imageFrame = 12;
+        public CS_ParticleFilter_Example(VBtask task) : base(task)
+        {
+            cPtr = ParticleFilterTest_Open(task.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols);
+            desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL.";
+        }
+        public void RunCS(Mat src)
+        {
+            imageFrame += 1;
+            if (imageFrame % 45 == 0)
+            {
+                imageFrame = 13;
+                ParticleFilterTest_Close(cPtr);
+                cPtr = ParticleFilterTest_Open(task.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols);
+            }
+            var nextFile = new FileInfo(task.HomeDir + "Data/ballSequence/color_" + imageFrame.ToString() + ".png");
+            dst3 = Cv2.ImRead(nextFile.FullName).Resize(dst2.Size());
+            IntPtr imagePtr = ParticleFilterTest_Run(cPtr);
+            dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr).Clone();
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = ParticleFilterTest_Close(cPtr);
+        }
+    }
+    public class CS_PCA_Prep_CPP : CS_Parent
+    {
+        public Mat inputData = new Mat();
+        public CS_PCA_Prep_CPP(VBtask task) : base(task)
+        {
+            cPtr = PCA_Prep_Open();
+            desc = "Take some pointcloud data and return the non-zero points in a point3f vector";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = PCA_Prep_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
+            handleSrc.Free();
+            int count = PCA_Prep_GetCount(cPtr);
+            inputData = new Mat(count, 3, MatType.CV_32F, imagePtr).Clone();
+            SetTrueText("Data has been prepared and resides in inputData public");
+        }
+        public void Close()
+        {
+            PCA_Prep_Close(cPtr);
+        }
+    }
+    public static class PCA_NColor_CPP_Module
+    {
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr PCA_NColor_Open();
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void PCA_NColor_Close(IntPtr cPtr);
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr PCA_NColor_RunCPP(IntPtr cPtr, IntPtr imagePtr, IntPtr palettePtr, int rows, int cols, int desiredNcolors);
+    }
+    public class CS_PCA_Palettize : CS_Parent
+    {
+        public byte[] palette;
+        public byte[] rgb;
+        public byte[] buff;
+        Palette_CustomColorMap custom = new Palette_CustomColorMap();
+        public byte[] paletteImage;
+        public CS_PCA_NColor nColor;
+        public Options_PCA_NColor options = new Options_PCA_NColor();
+        public CS_PCA_Palettize(VBtask task) : base(task)
+        {
+            nColor = new CS_PCA_NColor(task);
+            FindSlider("Desired number of colors").Value = 256;
+            desc = "Create a palette for the input image but don't use it.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            rgb = new byte[src.Total() * src.ElemSize()];
+            buff = new byte[rgb.Length];
+            Marshal.Copy(src.Data, rgb, 0, rgb.Length);
+            Marshal.Copy(src.Data, buff, 0, buff.Length);
+            palette = nColor.MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors);
+            if (standaloneTest())
+            {
+                paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors);
+                Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, 0);
+                Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length);
+                custom.colorMap = new Mat(256, 1, MatType.CV_8UC3, palette);
+                custom.Run(img8u);
+                dst2 = custom.dst2;
+            }
+            labels[2] = "The palette found from the current image (repeated across the image) with " + options.desiredNcolors.ToString() + " entries";
+        }
+    }
+    public class CS_PCA_Basics : CS_Parent
+    {
+        PCA_Prep_CPP prep = new PCA_Prep_CPP();
+        public PCA pca_analysis = new PCA();
+        public bool runRedCloud;
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_PCA_Basics(VBtask task) : base(task)
+        {
+            desc = "Find the Principal Component Analysis vector for the 3D points in a RedCloud cell contour.";
+        }
+        public string displayResults()
+        {
+            string pcaStr = "EigenVector 3X3 matrix from PCA_Analysis of cell point cloud data at contour points:\n";
+            for (int y = 0; y < pca_analysis.Eigenvectors.Rows; y++)
+            {
+                for (int x = 0; x < pca_analysis.Eigenvectors.Cols; x++)
+                {
+                    float val = pca_analysis.Eigenvectors.Get<float>(y, x);
+                    pcaStr += string.Format("{0}\t", val.ToString("F3"));
+                }
+                pcaStr += "\n";
+            }
+            List<float> valList = new List<float>();
+            pcaStr += "EigenValues (PCA)\t";
+            for (int i = 0; i < pca_analysis.Eigenvalues.Rows; i++)
+            {
+                float val = pca_analysis.Eigenvalues.Get<float>(i, 0);
+                pcaStr += string.Format("{0}\t", val.ToString("F3"));
+                valList.Add(val);
+            }
+            if (valList.Count() == 0) return pcaStr;
+            float best = valList.Min();
+            int index = valList.IndexOf(best);
+            pcaStr += "Min EigenValue = " + best.ToString("F3") + " at index = " + index.ToString() + "\n";
+            pcaStr += "Principal Component Vector\t";
+            for (int j = 0; j < pca_analysis.Eigenvectors.Cols; j++)
+            {
+                float val = pca_analysis.Eigenvectors.Get<float>(index, j);
+                pcaStr += string.Format("{0}\t", val.ToString("F3"));
+            }
+            pcaStr += "\n";
+            return pcaStr;
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest() || runRedCloud)
+            {
+                if (task.FirstPass) task.redOptions.setUseColorOnly(true);
+                redC.Run(src);
+                dst2 = redC.dst2;
+                labels[2] = redC.labels[2];
+            }
+            var rc = task.rc;
+            List<Point3f> inputPoints = new List<Point3f>();
+            foreach (var pt in rc.contour)
+            {
+                var vec = task.pointCloud[rc.rect].Get<Point3f>(pt.Y, pt.X);
+                if (vec.Z > 0) inputPoints.Add(vec);
+            }
+            if (inputPoints.Count() > 0)
+            {
+                Mat inputMat = new Mat(inputPoints.Count(), 3, MatType.CV_32F, inputPoints.ToArray());
+                pca_analysis = new PCA(inputMat, new Mat(), PCA.Flags.DataAsRow);
+                strOut = displayResults();
+                SetTrueText(strOut, 3);
+            }
+            else
+            {
+                SetTrueText("Select a cell to compute the eigenvector");
+            }
+        }
+    }
+    public class CS_PCA_CellMask : CS_Parent
+    {
+        PCA_Basics pca = new PCA_Basics();
+        PCA_Prep_CPP pcaPrep = new PCA_Prep_CPP();
+        public CS_PCA_CellMask(VBtask task) : base(task)
+        {
+            pca.runRedCloud = true;
+            desc = "Find the Principal Component Analysis vector for all the 3D points in a RedCloud cell.";
+        }
+        public void RunCS(Mat src)
+        {
+            pca.Run(src);
+            dst2 = pca.dst2;
+            labels[2] = pca.labels[2];
+            var rc = task.rc;
+            if (rc.maxVec.Z > 0)
+            {
+                pcaPrep.Run(task.pointCloud[rc.rect].Clone());
+                if (pcaPrep.inputData.Rows > 0)
+                {
+                    pca.pca_analysis = new PCA(pcaPrep.inputData, new Mat(), PCA.Flags.DataAsRow);
+                    strOut = pca.displayResults();
+                }
+            }
+            else
+            {
+                strOut = "Selected cell has no 3D data.";
+                pca.pca_analysis = null;
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_PCA_Reconstruct : CS_Parent
+    {
+        Mat[] images = new Mat[8];
+        Mat[] images32f = new Mat[8];
+        Options_PCA options = new Options_PCA();
+        public CS_PCA_Reconstruct(VBtask task) : base(task)
+        {
+            desc = "Reconstruct a video stream as a composite of X images.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            int index = task.frameCount % images.Length;
+            images[index] = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Mat gray32f = new Mat();
+            images[index].ConvertTo(gray32f, MatType.CV_32F);
+            gray32f = gray32f.Normalize(0, 255, NormTypes.MinMax);
+            images32f[index] = gray32f.Reshape(1, 1);
+            if (task.frameCount >= images.Length)
+            {
+                Mat data = new Mat(images.Length, src.Rows * src.Cols, MatType.CV_32F);
+                for (int i = 0; i < images.Length; i++)
+                {
+                    images32f[i].CopyTo(data.Row(i));
+                }
+                PCA pca = new PCA(data, new Mat(), PCA.Flags.DataAsRow, options.retainedVariance);
+                Mat point = pca.Project(data.Row(0));
+                Mat reconstruction = pca.BackProject(point);
+                reconstruction = reconstruction.Reshape(images[0].Channels(), images[0].Rows);
+                reconstruction.ConvertTo(dst2, MatType.CV_8UC1);
+            }
+        }
+    }
+    public class CS_PCA_Depth : CS_Parent
+    {
+        PCA_Reconstruct pca = new PCA_Reconstruct();
+        public CS_PCA_Depth(VBtask task) : base(task)
+        {
+            desc = "Reconstruct a depth stream as a composite of X images.";
+        }
+        public void RunCS(Mat src)
+        {
+            pca.Run(task.depthRGB);
+            dst2 = pca.dst2;
+        }
+    }
+    public class CS_PCA_DrawImage : CS_Parent
+    {
+        PCA_Reconstruct pca = new PCA_Reconstruct();
+        Mat image = new Mat();
+        public CS_PCA_DrawImage(VBtask task) : base(task)
+        {
+            image = Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/pca_test1.jpg");
+            desc = "Use PCA to find the principal direction of an object.";
+            labels[2] = "Original image";
+            labels[3] = "PCA Output";
+        }
+        void drawAxis(Mat img, cv.Point p, cv.Point q, Scalar color, float scale)
+        {
+            double angle = Math.Atan2(p.Y - q.Y, p.X - q.X);
+            double hypotenuse = Math.Sqrt((p.Y - q.Y) * (p.Y - q.Y) + (p.X - q.X) * (p.X - q.X));
+            q.X = (int)(p.X - scale * hypotenuse * Math.Cos(angle));
+            q.Y = (int)(p.Y - scale * hypotenuse * Math.Sin(angle));
+            img.Line(p, q, color, task.lineWidth, task.lineType);
+            p.X = (int)(q.X + 9 * Math.Cos(angle + Math.PI / 4));
+            p.Y = (int)(q.Y + 9 * Math.Sin(angle + Math.PI / 4));
+            img.Line(p, q, color, task.lineWidth, task.lineType);
+            p.X = (int)(q.X + 9 * Math.Cos(angle - Math.PI / 4));
+            p.Y = (int)(q.Y + 9 * Math.Sin(angle - Math.PI / 4));
+            img.Line(p, q, color, task.lineWidth, task.lineType);
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = image.Resize(dst2.Size());
+            Mat gray = dst2.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(50, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
+            HierarchyIndex[] hierarchy;
+            cv.Point[][] contours;
+            Cv2.FindContours(gray, out contours, out hierarchy, RetrievalModes.List, ContourApproximationModes.ApproxNone);
+            dst3.SetTo(0);
+            for (int i = 0; i < contours.Length; i++)
+            {
+                double area = Cv2.ContourArea(contours[i]);
+                if (area < 100 || area > 100000) continue;
+                Cv2.DrawContours(dst3, contours, i, Scalar.Red, task.lineWidth, task.lineType);
+                int sz = contours[i].Length;
+                Mat data_pts = new Mat(sz, 2, MatType.CV_64FC1);
+                for (int j = 0; j < data_pts.Rows; j++)
+                {
+                    data_pts.Set<double>(j, 0, contours[i][j].X);
+                    data_pts.Set<double>(j, 1, contours[i][j].Y);
+                }
+                PCA pca_analysis = new PCA(data_pts, new Mat(), PCA.Flags.DataAsRow);
+                cv.Point cntr = new cv.Point((int)pca_analysis.Mean.Get<double>(0, 0), (int)pca_analysis.Mean.Get<double>(0, 1));
+                Point2d[] eigen_vecs = new Point2d[2];
+                double[] eigen_val = new double[2];
+                for (int j = 0; j < 2; j++)
+                {
+                    eigen_vecs[j] = new Point2d(pca_analysis.Eigenvectors.Get<double>(j, 0), pca_analysis.Eigenvectors.Get<double>(j, 1));
+                    eigen_val[j] = pca_analysis.Eigenvalues.Get<double>(0, j);
+                }
+                DrawCircle(dst3, cntr, task.DotSize + 1, Scalar.BlueViolet);
+                float factor = 0.02f;
+                cv.Point ept1 = new cv.Point(cntr.X + (int)(factor * eigen_vecs[0].X * eigen_val[0]), cntr.Y + (int)(factor * eigen_vecs[0].Y * eigen_val[0]));
+                cv.Point ept2 = new cv.Point(cntr.X - (int)(factor * eigen_vecs[1].X * eigen_val[1]), cntr.Y - (int)(factor * eigen_vecs[1].Y * eigen_val[1]));
+                drawAxis(dst3, cntr, ept1, Scalar.Red, 1);
+                drawAxis(dst3, cntr, ept2, Scalar.BlueViolet, 5);
+            }
+        }
+    }
+    public class CS_PCA_NColor : CS_Parent
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct paletteEntry
+        {
+            public int start;
+            public int nCount;
+            public byte red;
+            public byte green;
+            public byte blue;
+            public double ErrorVal;
+        }
+        public double CDiff(byte[] a, int start, byte[] b, int startPal)
+        {
+            return (a[start + 0] - b[startPal + 0]) * (a[start + 0] - b[startPal + 0]) * 5 +
+                   (a[start + 1] - b[startPal + 1]) * (a[start + 1] - b[startPal + 1]) * 8 +
+                   (a[start + 2] - b[startPal + 2]) * (a[start + 2] - b[startPal + 2]) * 2;
+        }
+        public byte[] RgbToIndex(byte[] rgb, int width, int height, byte[] pal, int nColor)
+        {
+            byte[] answer = new byte[width * height];
+            for (int i = 0; i < width * height; i++)
+            {
+                double best = CDiff(rgb, i * 3, pal, 0);
+                int bestii = 0;
+                for (int ii = 1; ii < nColor; ii++)
+                {
+                    double nextError = CDiff(rgb, i * 3, pal, ii * 3);
+                    if (nextError < best)
+                    {
+                        best = nextError;
+                        bestii = ii;
+                    }
+                }
+                answer[i] = (byte)bestii;
+            }
+            return answer;
+        }
+        public byte[] MakePalette(byte[] rgb, int width, int height, int nColors)
+        {
+            byte[] buff = new byte[width * height * 3];
+            paletteEntry[] entry = new paletteEntry[nColors];
+            double best;
+            int bestii;
+            int i, ii;
+            byte[] pal = new byte[256 * 3];
+            Array.Copy(rgb, buff, width * height * 3);
+            entry[0].start = 0;
+            entry[0].nCount = width * height;
+            CalcError(ref entry[0], ref buff);
+            for (i = 1; i < nColors; i++)
+            {
+                best = entry[0].ErrorVal;
+                bestii = 0;
+                for (ii = 0; ii < i; ii++)
+                {
+                    if (entry[ii].ErrorVal > best)
+                    {
+                        best = entry[ii].ErrorVal;
+                        bestii = ii;
+                    }
+                }
+                SplitPCA(ref entry[bestii], ref entry[i], ref buff);
+            }
+            for (i = 0; i < nColors; i++)
+            {
+                pal[i * 3] = entry[i].red;
+                pal[i * 3 + 1] = entry[i].green;
+                pal[i * 3 + 2] = entry[i].blue;
+            }
+            return pal;
+        }
+        public void CalcError(ref paletteEntry entry, ref byte[] buff)
+        {
+            entry.red = (byte)MeanColor(buff, entry.start * 3, entry.nCount, 0);
+            entry.green = (byte)MeanColor(buff, entry.start * 3, entry.nCount, 1);
+            entry.blue = (byte)MeanColor(buff, entry.start * 3, entry.nCount, 2);
+            entry.ErrorVal = 0;
+            for (int i = 0; i < entry.nCount; i++)
+            {
+                entry.ErrorVal += Math.Abs(buff[(entry.start + i) * 3] - entry.red);
+                entry.ErrorVal += Math.Abs(buff[(entry.start + i) * 3 + 1] - entry.green);
+                entry.ErrorVal += Math.Abs(buff[(entry.start + i) * 3 + 2] - entry.blue);
+            }
+        }
+        public double MeanColor(byte[] rgb, int start, int nnCount, int index)
+        {
+            if (nnCount == 0) return 0;
+            double answer = 0;
+            for (int i = 0; i < nnCount; i++)
+            {
+                answer += rgb[start + i * 3 + index];
+            }
+            return answer / nnCount;
+        }
+        public void PCA(ref double[] ret, byte[] pixels, int start, int nnCount)
+        {
+            double[,] cov = new double[3, 3];
+            double[] mu = new double[3];
+            int i, j, k;
+            double var;
+            double[] d = new double[3];
+            double[,] v = new double[3, 3];
+            for (i = 0; i < 3; i++)
+            {
+                mu[i] = MeanColor(pixels, start, nnCount, i);
+            }
+            for (i = 0; i < 3; i++)
+            {
+                for (j = 0; j <= i; j++)
+                {
+                    var = 0;
+                    for (k = 0; k < nnCount; k++)
+                    {
+                        var += (pixels[start + k * 3 + i] - mu[i]) * (pixels[start + k * 3 + j] - mu[j]);
+                    }
+                    cov[i, j] = var / nnCount;
+                    cov[j, i] = var / nnCount;
+                }
+            }
+            EigenDecomposition(cov, ref v, ref d);
+            ret[0] = v[0, 2];
+            ret[1] = v[1, 2];
+            ret[2] = v[2, 2];
+        }
+        public int Project(byte[] rgb, int start, double[] comp)
+        {
+            return (int)(rgb[start] * comp[0] + rgb[start + 1] * comp[1] + rgb[start + 2] * comp[2]);
+        }
+        public void SplitPCA(ref paletteEntry entry, ref paletteEntry split, ref byte[] buff)
+        {
+            int low = 0;
+            int high = entry.nCount - 1;
+            int cut;
+            double[] comp = new double[3];
+            byte temp;
+            int i;
+            PCA(ref comp, buff, (entry.start * 3), entry.nCount);
+            cut = GetOtsuThreshold2(buff, (entry.start * 3), entry.nCount, comp);
+            while (low < high)
+            {
+                while (low < high && Project(buff, ((entry.start + low) * 3), comp) < cut)
+                {
+                    low += 1;
+                }
+                while (low < high && Project(buff, ((entry.start + high) * 3), comp) >= cut)
+                {
+                    high -= 1;
+                }
+                if (low < high)
+                {
+                    for (i = 0; i < 3; i++)
+                    {
+                        temp = buff[(entry.start + low) * 3 + i];
+                        buff[(entry.start + low) * 3 + i] = buff[(entry.start + high) * 3 + i];
+                        buff[(entry.start + high) * 3 + i] = temp;
+                    }
+                }
+                low += 1;
+                high -= 1;
+            }
+            split.start = entry.start + low;
+            split.nCount = entry.nCount - low;
+            entry.nCount = low;
+            CalcError(ref entry, ref buff);
+            CalcError(ref split, ref buff);
+        }
+        public int GetOtsuThreshold2(byte[] rgb, int start, int N, double[] remap)
+        {
+            int[] hist = new int[1024];
+            int wB = 0;
+            int wF;
+            float mB, mF;
+            float sum = 0;
+            float sumB = 0;
+            float varBetween;
+            float varMax = 0.0F;
+            int answer = 0;
+            for (int i = 0; i < N; i++)
+            {
+                int nc = (int)(rgb[start + i * 3] * remap[0] + rgb[start + i * 3 + 1] * remap[1] + rgb[start + i * 3 + 2] * remap[2]);
+                hist[512 + nc] += 1;
+            }
+            for (int k = 0; k < 1024; k++)
+            {
+                sum += k * hist[k];
+            }
+            for (int k = 0; k < 1024; k++)
+            {
+                wB += hist[k];
+                if (wB == 0)
+                {
+                    continue;
+                }
+                wF = N - wB;
+                if (wF == 0)
+                {
+                    break;
+                }
+                sumB += k * hist[k];
+                mB = sumB / wB;
+                mF = (sum - sumB) / wF;
+                varBetween = wB * wF * (mB - mF) * (mB - mF);
+                if (varBetween > varMax)
+                {
+                    varMax = varBetween;
+                    answer = k;
+                }
+            }
+            return answer - 512;
+        }
+        public void EigenDecomposition(double[,] A, ref double[,] V, ref double[] d)
+        {
+            int bufLen = A.GetLength(0);
+            double[] e = new double[bufLen];
+            for (int i = 0; i < bufLen; i++)
+            {
+                for (int j = 0; j < bufLen; j++)
+                {
+                    V[i, j] = A[i, j];
+                }
+            }
+            Tred2(ref V, ref d, ref e);
+            Tql2(ref V, ref d, ref e);
+        }
+        public void Tred2(ref double[,] V, ref double[] d, ref double[] e)
+        {
+            int dLen = d.Length;
+            int i, j, k;
+            for (j = 0; j < dLen; j++)
+            {
+                d[j] = V[dLen - 1, j];
+            }
+            for (i = dLen - 1; i > 0; i--)
+            {
+                double scale = 0.0;
+                double h = 0.0;
+                for (k = 0; k < i; k++)
+                {
+                    scale += Math.Abs(d[k]);
+                }
+                if (scale == 0.0)
+                {
+                    e[i] = d[i - 1];
+                    for (j = 0; j < i; j++)
+                    {
+                        d[j] = V[i - 1, j];
+                        V[i, j] = 0.0;
+                        V[j, i] = 0.0;
+                    }
+                }
+                else
+                {
+                    double f, g;
+                    double hh;
+                    for (k = 0; k < i; k++)
+                    {
+                        d[k] /= scale;
+                        h += d[k] * d[k];
+                    }
+                    f = d[i - 1];
+                    g = Math.Sqrt(h);
+                    if (f > 0)
+                    {
+                        g = -g;
+                    }
+                    e[i] = scale * g;
+                    h = h - f * g;
+                    d[i - 1] = f - g;
+                    for (j = 0; j < i; j++)
+                    {
+                        e[j] = 0.0;
+                    }
+                    for (j = 0; j < i; j++)
+                    {
+                        f = d[j];
+                        V[j, i] = f;
+                        g = e[j] + V[j, j] * f;
+                        for (k = j + 1; k < i; k++)
+                        {
+                            g += V[k, j] * d[k];
+                            e[k] += V[k, j] * f;
+                        }
+                        e[j] = g;
+                    }
+                    f = 0.0;
+                    for (j = 0; j < i; j++)
+                    {
+                        e[j] /= h;
+                        f += e[j] * d[j];
+                    }
+                    hh = f / (h + h);
+                    for (j = 0; j < i; j++)
+                    {
+                        e[j] -= hh * d[j];
+                    }
+                    for (j = 0; j < i; j++)
+                    {
+                        f = d[j];
+                        g = e[j];
+                        for (k = j; k < i; k++)
+                        {
+                            V[k, j] -= (f * e[k] + g * d[k]);
+                        }
+                        d[j] = V[i - 1, j];
+                        V[i, j] = 0.0;
+                    }
+                }
+                d[i] = h;
+            }
+            for (i = 0; i < dLen - 1; i++)
+            {
+                double h = d[i + 1];
+                V[dLen - 1, i] = V[i, i];
+                V[i, i] = 1.0;
+                if (h != 0.0)
+                {
+                    for (k = 0; k <= i; k++)
+                    {
+                        d[k] = V[k, i + 1] / h;
+                    }
+                    for (j = 0; j <= i; j++)
+                    {
+                        double g = 0.0;
+                        for (k = 0; k <= i; k++)
+                        {
+                            g += V[k, i + 1] * V[k, j];
+                        }
+                        for (k = 0; k <= i; k++)
+                        {
+                            V[k, j] -= g * d[k];
+                        }
+                    }
+                }
+                for (k = 0; k <= i; k++)
+                {
+                    V[k, i + 1] = 0.0;
+                }
+            }
+            for (j = 0; j < dLen; j++)
+            {
+                d[j] = V[dLen - 1, j];
+                V[dLen - 1, j] = 0.0;
+            }
+            V[dLen - 1, dLen - 1] = 1.0;
+            e[0] = 0.0;
+        }
+        public void Tql2(ref double[,] V, ref double[] d, ref double[] e)
+        {
+            int dLen = d.Length;
+            int i, j, k, l;
+            double f, tst1, eps;
+            for (i = 1; i < dLen; i++)
+            {
+                e[i - 1] = e[i];
+            }
+            e[dLen - 1] = 0.0;
+            f = 0.0;
+            tst1 = 0.0;
+            eps = Math.Pow(2.0, -52.0);
+            for (l = 0; l < dLen; l++)
+            {
+                tst1 = Math.Max(tst1, Math.Abs(d[l]) + Math.Abs(e[l]));
+                int m = l;
+                while (m < dLen)
+                {
+                    if (Math.Abs(e[m]) <= eps * tst1)
+                    {
+                        break;
+                    }
+                    m++;
+                }
+                if (m > l)
+                {
+                    int iter = 0;
+                    do
+                    {
+                        double g, p, r;
+                        double dl1;
+                        double h;
+                        double c;
+                        double c2;
+                        double c3;
+                        double el1;
+                        double s;
+                        double s2;
+                        iter++;
+                        g = d[l];
+                        p = (d[l + 1] - g) / (2.0 * e[l]);
+                        r = Hypot(p, 1.0);
+                        if (p < 0)
+                        {
+                            r = -r;
+                        }
+                        d[l] = e[l] / (p + r);
+                        d[l + 1] = e[l] * (p + r);
+                        dl1 = d[l + 1];
+                        h = g - d[l];
+                        for (i = l + 2; i < dLen; i++)
+                        {
+                            d[i] -= h;
+                        }
+                        f += h;
+                        p = d[m];
+                        c = 1.0;
+                        c2 = c;
+                        c3 = c;
+                        el1 = e[l + 1];
+                        s = 0.0;
+                        s2 = 0.0;
+                        for (i = m - 1; i >= l; i--)
+                        {
+                            c3 = c2;
+                            c2 = c;
+                            s2 = s;
+                            g = c * e[i];
+                            h = c * p;
+                            r = Hypot(p, e[i]);
+                            e[i + 1] = s * r;
+                            s = e[i] / r;
+                            c = p / r;
+                            p = c * d[i] - s * g;
+                            d[i + 1] = h + s * (c * g + s * d[i]);
+                            for (k = 0; k < dLen; k++)
+                            {
+                                h = V[k, i + 1];
+                                V[k, i + 1] = s * V[k, i] + c * h;
+                                V[k, i] = c * V[k, i] - s * h;
+                            }
+                        }
+                        p = -s * s2 * c3 * el1 * e[l] / dl1;
+                        e[l] = s * p;
+                        d[l] = c * p;
+                    } while (Math.Abs(e[l]) > eps * tst1);
+                }
+                d[l] += f;
+                e[l] = 0.0;
+            }
+            for (i = 0; i < dLen - 1; i++)
+            {
+                int k1 = i;
+                double p = d[i];
+                for (j = i + 1; j < dLen; j++)
+                {
+                    if (d[j] < p)
+                    {
+                        k1 = j;
+                        p = d[j];
+                    }
+                }
+                if (k1 != i)
+                {
+                    d[k1] = d[i];
+                    d[i] = p;
+                    for (j = 0; j < dLen; j++)
+                    {
+                        p = V[j, i];
+                        V[j, i] = V[j, k1];
+                        V[j, k1] = p;
+                    }
+                }
+            }
+        }
+        public double Hypot(double a, double b)
+        {
+            return Math.Sqrt(a * a + b * b);
+        }
+        public Palette_CustomColorMap custom = new Palette_CustomColorMap();
+        public Options_PCA_NColor options = new Options_PCA_NColor();
+        public byte[] palette = new byte[256 * 3];
+        public byte[] rgb;
+        public byte[] buff;
+        public byte[] answer;
+        public CS_PCA_NColor(VBtask task) : base(task)
+        {
+            rgb = new byte[dst2.Total() * dst2.ElemSize()];
+            buff = new byte[rgb.Length];
+            answer = new byte[rgb.Length];
+            custom.colorMap = new Mat(256, 1, MatType.CV_8UC3);
+            desc = "Use PCA to build a palettized CV_8U image from the input using a palette.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Marshal.Copy(src.Data, rgb, 0, rgb.Length);
+            Marshal.Copy(src.Data, buff, 0, buff.Length);
+            palette = MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors);
+            byte[] paletteImage = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors);
+            Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length);
+            Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length);
+            custom.Run(img8u);
+            dst2 = custom.dst2;
+            Mat tmp = new Mat(256, 1, MatType.CV_8UC3, palette);
+            int paletteCount = tmp.CvtColor(ColorConversionCodes.BGR2GRAY).CountNonZero();
+            if (standaloneTest())
+            {
+                task.palette.Run(img8u * 256 / options.desiredNcolors);
+                dst3 = task.palette.dst2;
+                labels[3] = "dst2 is palettized using global palette option: " + task.gOptions.getPalette();
+            }
+            labels[2] = "The image above is mapped to " + paletteCount.ToString() + " colors below.  ";
+        }
+    }
+    public class CS_PCA_NColor_CPP : CS_Parent
+    {
+        Palette_CustomColorMap custom = new Palette_CustomColorMap();
+        PCA_Palettize palettize = new PCA_Palettize();
+        public byte[] rgb;
+        public int classCount;
+        public CS_PCA_NColor_CPP(VBtask task) : base(task)
+        {
+            cPtr = PCA_NColor_Open();
+            FindSlider("Desired number of colors").Value = 8;
+            UpdateAdvice(traceName + ": Adjust the 'Desired number of colors' between 1 and 256");
+            labels = new string[] { "", "", "Palettized (CV_8U) version of color image.", "" };
+            desc = "Create a faster version of the PCA_NColor algorithm.";
+            rgb = new byte[dst1.Total() * dst1.ElemSize()];
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat) palettize.Run(src); // get the palette in C#
+            Marshal.Copy(src.Data, rgb, 0, rgb.Length);
+            classCount = palettize.options.desiredNcolors;
+            GCHandle handleSrc = GCHandle.Alloc(rgb, GCHandleType.Pinned);
+            GCHandle handlePalette = GCHandle.Alloc(palettize.palette, GCHandleType.Pinned);
+            IntPtr imagePtr = PCA_NColor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handlePalette.AddrOfPinnedObject(), src.Rows, src.Cols, classCount);
+            handlePalette.Free();
+            handleSrc.Free();
+            dst2 = new Mat(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
+            custom.colorMap = new Mat(256, 1, MatType.CV_8UC3, palettize.palette);
+            custom.Run(dst2);
+            dst3 = custom.dst2;
+            labels[2] = "The CV_8U image is below.  Values range from 0 to " + classCount.ToString();
+            labels[3] = "The upper left image is mapped to " + classCount.ToString() + " colors below.";
+        }
+        public void Close()
+        {
+            PCA_NColor_Close(cPtr);
+        }
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr PCA_NColor_Open();
+
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void PCA_NColor_Close(IntPtr cPtr);
+
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr PCA_NColor_RunCPP(IntPtr cPtr, IntPtr imagePtr, IntPtr palettePtr, int rows, int cols, int desiredNcolors);
+    }
+    public class CS_PCA_NColorPalettize : CS_Parent
+    {
+        Palette_CustomColorMap custom = new Palette_CustomColorMap();
+        PCA_Palettize palettize = new PCA_Palettize();
+        public byte[] answer;
+        CS_PCA_NColor nColor;
+        public byte[] rgb;
+        public CS_PCA_NColorPalettize(VBtask task) : base(task)
+        {
+            nColor = new CS_PCA_NColor(task);
+            FindSlider("Desired number of colors").Value = 8;
+            desc = "Create a faster version of the PCA_NColor algorithm.";
+            answer = new byte[dst2.Width * dst2.Height];
+            rgb = new byte[dst1.Total() * dst1.ElemSize()];
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat) palettize.Run(src); // get the palette in C# which is very fast.
+            Marshal.Copy(src.Data, rgb, 0, rgb.Length);
+            var paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palettize.palette, palettize.options.desiredNcolors);
+            Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length);
+            custom.colorMap = new Mat(256, 1, MatType.CV_8UC3, palettize.palette);
+            custom.Run(img8u);
+            dst2 = custom.dst2;
+        }
+    }
 
 }

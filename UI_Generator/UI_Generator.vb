@@ -360,6 +360,11 @@ Module UI_GeneratorMain
                 If codeline.Trim.StartsWith("//") Then Continue While
                 If codeline.Contains("public class CS_") Then
                     Dim split = codeline.Split(" \W+")
+                    If CSnames.Keys.Contains(split(2)) Then
+                        MsgBox("There is a duplicate name in the C# code!" + vbCrLf + "Duplicate is " + split(2) +
+                               vbCrLf + "Terminating the generation of the UI...")
+                        End
+                    End If
                     CSnames.Add(split(2), split(2))
                 End If
                 Dim lcaseLine = " " + LCase(codeline)

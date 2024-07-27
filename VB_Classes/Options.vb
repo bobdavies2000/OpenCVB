@@ -6653,3 +6653,19 @@ Public Class Options_Palette : Inherits VB_Parent
         radius = radiusSlider.Value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_PCA : Inherits VB_Parent
+    Public retainedVariance As Double
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Retained Variance X100", 1, 100, 95)
+    End Sub
+    Public Sub RunVB()
+        Static retainSlider = FindSlider("Retained Variance X100")
+        retainedVariance = retainSlider.value / 100
+    End Sub
+End Class
