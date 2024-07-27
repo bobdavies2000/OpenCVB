@@ -180,7 +180,7 @@ Public Class Gravity_Horizon : Inherits VB_Parent
         horizon.RunVB(src)
         If task.FirstPass Then lastVec = horizon.vec
         If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
-        If horizon.vec.p1.Y = 0 Then horizon.vec = lastVec
+        If lastVec IsNot Nothing And horizon.vec.p1.Y = 0 Then horizon.vec = lastVec
 
         task.horizonVec = horizon.vec
         If standaloneTest() Then

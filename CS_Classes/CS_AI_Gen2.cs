@@ -8,19 +8,14 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 using static CS_Classes.CS_Externs;
-using OpenCvSharp.XImgProc;
 using System.IO;
-using System.Security.Cryptography;
-using System.Numerics;
 using System.Diagnostics;
-using OpenCvSharp.ML;
 using System.Threading;
-using System.Windows.Controls;
 using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.IO.Pipes;
+using System.Windows.Controls;
 
 namespace CS_Classes
 {
@@ -3118,6 +3113,2121 @@ namespace CS_Classes
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+    }
+
+
+
+
+
+
+
+  
+    public class CS_OpenGL_BasicsSliders : CS_Parent
+    {
+        Options_OpenGL options = new Options_OpenGL();
+        public Mat pointCloudInput;
+        public CS_OpenGL_BasicsSliders(VBtask task) : base(task)
+        {
+            task.OpenGLTitle = "OpenGL_Basics";
+            FindSlider("OpenGL FOV").Value = 150;
+            desc = "Show the OpenGL point cloud with sliders support.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            task.ogl.pointCloudInput = standaloneTest() ? task.pointCloud : pointCloudInput;
+            // update all the options from the slider values.
+            task.ogl.options.FOV = options.FOV;
+            task.ogl.options.yaw = options.yaw;
+            task.ogl.options.pitch = options.pitch;
+            task.ogl.options.roll = options.roll;
+            task.ogl.options.zNear = options.zNear;
+            task.ogl.options.zFar = options.zFar;
+            task.ogl.options.PointSizeSlider.Value = options.pointSize;
+            task.ogl.options.zTrans = options.zTrans;
+            task.ogl.options.eye = options.eye;
+            task.ogl.options.scaleXYZ = options.scaleXYZ;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_BasicsMouse : CS_Parent
+    {
+        public CS_OpenGL_BasicsMouse(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Show the OpenGL point cloud with mouse support.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.testAllRunning) return; // seems to not like it when running overnight but it runs fine.
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_ReducedXYZ : CS_Parent
+    {
+        readonly Reduction_XYZ reduction = new Reduction_XYZ();
+        public CS_OpenGL_ReducedXYZ(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Display the pointCloud after reduction in X, Y, or Z dimensions.";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst2 = reduction.dst3;
+            task.ogl.pointCloudInput = reduction.dst3;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_Reduction : CS_Parent
+    {
+        readonly Reduction_PointCloud reduction;
+        public CS_OpenGL_Reduction(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            reduction = new Reduction_PointCloud();
+            desc = "Use the reduced depth pointcloud in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst2 = reduction.dst2;
+            task.ogl.pointCloudInput = reduction.dst3;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_ReducedSideView : CS_Parent
+    {
+        readonly PointCloud_ReducedSideView sideView = new PointCloud_ReducedSideView();
+        public CS_OpenGL_ReducedSideView(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common";
+        }
+        public void RunCS(Mat src)
+        {
+            sideView.Run(src);
+            dst2 = sideView.dst2;
+            task.ogl.pointCloudInput = sideView.dst3;
+            task.ogl.Run(task.color);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            labels[2] = sideView.labels[2];
+        }
+    }
+
+    public class CS_OpenGL_Rebuilt : CS_Parent
+    {
+        readonly Structured_Rebuild rebuild = new Structured_Rebuild();
+        public CS_OpenGL_Rebuilt(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Review the rebuilt point cloud from Structured_Rebuild";
+        }
+        public void RunCS(Mat src)
+        {
+            rebuild.Run(src);
+            dst2 = rebuild.dst2;
+            task.ogl.pointCloudInput = rebuild.pointcloud;
+            task.ogl.Run(task.color);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_VerticalSingle : CS_Parent
+    {
+        readonly FeatureLine_LongestV_Tutorial2 vLine = new FeatureLine_LongestV_Tutorial2();
+        public CS_OpenGL_VerticalSingle(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.verticalLines;
+            desc = "Visualize the vertical line found with FeatureLine_LongestV_Tutorial";
+        }
+        public void RunCS(Mat src)
+        {
+            vLine.Run(src);
+            dst2 = vLine.dst2;
+            dst3 = vLine.dst3;
+            var pt1 = vLine.pt1;
+            var pt2 = vLine.pt2;
+            var linePairs3D = new List<Point3f>
+                {
+                    new Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2),
+                    new Point3f(pt1.X, pt2.Y, pt1.Z)
+                };
+            task.ogl.dataInput = new Mat(linePairs3D.Count(), 1, MatType.CV_32FC3, linePairs3D.ToArray());
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(task.color);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+
+    public class CS_OpenGL_Pyramid : CS_Parent
+    {
+        public CS_OpenGL_Pyramid(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.drawPyramid; // all the work is done inside the switch statement in OpenGL_Functions.
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Draw the traditional OpenGL pyramid";
+        }
+        public void RunCS(Mat src)
+        {
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_DrawCube : CS_Parent
+    {
+        public CS_OpenGL_DrawCube(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.drawCube;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Draw the traditional OpenGL cube";
+        }
+        public void RunCS(Mat src)
+        {
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_QuadSimple : CS_Parent
+    {
+        readonly Tessallate_QuadSimple tess = new Tessallate_QuadSimple();
+        public CS_OpenGL_QuadSimple(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.simplePlane;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Create a simple plane in each roi of the RedCloud data";
+        }
+        public void RunCS(Mat src)
+        {
+            tess.Run(src);
+            dst2 = tess.dst2;
+            dst3 = tess.dst3;
+            labels = tess.labels;
+            task.ogl.dataInput = new Mat(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(dst3);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_QuadHulls : CS_Parent
+    {
+        readonly Tessallate_QuadHulls tess = new Tessallate_QuadHulls();
+        public CS_OpenGL_QuadHulls(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.simplePlane;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Create a simple plane in each roi of the RedCloud data";
+        }
+        public void RunCS(Mat src)
+        {
+            tess.Run(src);
+            dst2 = tess.dst2;
+            dst3 = tess.dst3;
+            labels = tess.labels;
+            task.ogl.dataInput = new Mat(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(dst3);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_QuadMinMax : CS_Parent
+    {
+        readonly Tessallate_QuadMinMax tess = new Tessallate_QuadMinMax();
+        public CS_OpenGL_QuadMinMax(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.simplePlane;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Reflect the min and max for each roi of the RedCloud data";
+        }
+        public void RunCS(Mat src)
+        {
+            tess.Run(src);
+            dst2 = tess.dst2;
+            dst3 = tess.dst3;
+            labels = tess.labels;
+            task.ogl.dataInput = new Mat(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(dst3);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_Bricks : CS_Parent
+    {
+        readonly Tessallate_Bricks tess = new Tessallate_Bricks();
+        public CS_OpenGL_Bricks(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.minMaxBlocks;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Create blocks in each roi using the min and max depth values";
+        }
+        public void RunCS(Mat src)
+        {
+            tess.Run(src);
+            task.ogl.dataInput = new Mat(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            dst2 = tess.dst3;
+            dst3 = tess.hulls.dst3;
+            int index = 0;
+            foreach (var roi in task.gridList)
+            {
+                if (index < tess.depths.Count())
+                {
+                    SetTrueText(tess.depths[index].ToString(fmt1) + "\n" + tess.depths[index + 1].ToString(fmt1), 
+                                new cv.Point(roi.X, roi.Y), 2);
+                }
+                index += 2;
+            }
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_StructuredCloud : CS_Parent
+    {
+        readonly Structured_Cloud sCloud = new Structured_Cloud();
+        readonly RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_OpenGL_StructuredCloud(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            labels[2] = "Structured cloud 32fC3 data";
+            desc = "Visualize the Structured_Cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            sCloud.Run(src);
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels = redC.labels;
+            task.ogl.pointCloudInput = sCloud.dst2;
+            task.ogl.Run(dst2);
+            task.ogl.options.PointSizeSlider.Value = task.gridSize;
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_Tiles : CS_Parent
+    {
+        Structured_Tiles sCloud = new Structured_Tiles();
+        public CS_OpenGL_Tiles(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.drawTiles;
+            task.OpenGLTitle = "OpenGL_Functions";
+            labels = new string[] { "", "", "Input from Structured_Tiles", "" };
+            desc = "Display the quads built by Structured_Tiles in OpenGL - uses OpenGL's point size";
+        }
+        public void RunCS(Mat src)
+        {
+            sCloud.Run(src);
+            dst2 = sCloud.dst2;
+            dst3 = sCloud.dst3;
+            task.ogl.dataInput = new Mat(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            task.ogl.options.PointSizeSlider.Value = task.gridSize;
+        }
+    }
+    public class CS_OpenGL_TilesQuad : CS_Parent
+    {
+        Structured_TilesQuad sCloud = new Structured_TilesQuad();
+        public CS_OpenGL_TilesQuad(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.simplePlane;
+            task.OpenGLTitle = "OpenGL_Functions";
+            labels = new string[] { "", "", "Input from Structured_Tiles", "" };
+            desc = "Display the quads built by Structured_TilesQuad in OpenGL - does NOT use OpenGL's point size";
+        }
+        public void RunCS(Mat src)
+        {
+            sCloud.Run(src);
+            dst2 = sCloud.dst2;
+            task.ogl.dataInput = new Mat(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_OnlyPlanes : CS_Parent
+    {
+        readonly Plane_OnlyPlanes planes = new Plane_OnlyPlanes();
+        public CS_OpenGL_OnlyPlanes(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            labels = new string[] { "", "", "RedCloud Cells", "Planes built in the point cloud" };
+            desc = "Display the pointCloud as a set of RedCloud cell planes";
+        }
+        public void RunCS(Mat src)
+        {
+            planes.Run(src);
+            dst2 = planes.dst2;
+            dst3 = planes.dst3;
+            task.ogl.pointCloudInput = planes.dst3;
+            task.ogl.Run(task.color);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_FlatStudy1 : CS_Parent
+    {
+        readonly Structured_LinearizeFloor plane = new Structured_LinearizeFloor();
+        public CS_OpenGL_FlatStudy1(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            labels = new string[] { "", "", "Side view of point cloud - use mouse to highlight the floor", "Highlight the floor in BGR image" };
+            desc = "Convert depth cloud floor to a plane and visualize it with OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            plane.Run(src);
+            dst2 = plane.dst3;
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(plane.dst2);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_FlatStudy2 : CS_Parent
+    {
+        public Structured_LinearizeFloor plane = new Structured_LinearizeFloor();
+        public CS_OpenGL_FlatStudy2(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.drawFloor;
+            desc = "Show the floor in the pointcloud as a plane";
+        }
+        public void RunCS(Mat src)
+        {
+            plane.Run(src);
+            dst2 = plane.dst3;
+            List<float> oglData = new List<float>();
+            var floorColor = task.color.Mean(plane.sliceMask);
+            oglData.Add((float)floorColor[0]);
+            oglData.Add((float)floorColor[1]);
+            oglData.Add((float)floorColor[2]);
+            oglData.Add(plane.floorYPlane);
+            task.ogl.dataInput = new Mat(4, 1, MatType.CV_32F, oglData.ToArray());
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(plane.dst2);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_FlatStudy3 : CS_Parent
+    {
+        Plane_FloorStudy plane = new Plane_FloorStudy();
+        TrackBar cushionSlider;
+        public CS_OpenGL_FlatStudy3(VBtask task) : base(task)
+        {
+            cushionSlider = FindSlider("Structured Depth slice thickness in pixels");
+            task.ogl.oglFunction = (int)oCase.floorStudy;
+            task.OpenGLTitle = "OpenGL_Functions";
+            labels = new string[] { "", "", "", "" };
+            desc = "Create an OpenGL display where the floor is built as a quad";
+        }
+        public void RunCS(Mat src)
+        {
+            plane.Run(src);
+            dst2 = plane.dst2;
+            labels[2] = plane.labels[2];
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.dataInput = new Mat(1, 1, MatType.CV_32F, new float[] { plane.planeY });
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_FlatFloor : CS_Parent
+    {
+        Model_FlatSurfaces flatness = new Model_FlatSurfaces();
+        public CS_OpenGL_FlatFloor(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.floorStudy;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Using minimal cost, create an OpenGL display where the floor is built as a quad";
+        }
+        public void RunCS(Mat src)
+        {
+            flatness.Run(src);
+            SetTrueText(flatness.labels[2], 3);
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.dataInput = new Mat(1, 1, MatType.CV_32F, new float[] { task.pcFloor });
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            labels[2] = flatness.labels[2];
+            labels[3] = flatness.labels[3];
+        }
+    }
+    public class CS_OpenGL_FlatCeiling : CS_Parent
+    {
+        Model_FlatSurfaces flatness = new Model_FlatSurfaces();
+        public CS_OpenGL_FlatCeiling(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.floorStudy;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Using minimal cost, create an OpenGL display where the ceiling is built as a quad";
+        }
+        public void RunCS(Mat src)
+        {
+            flatness.Run(src);
+            SetTrueText(flatness.labels[2], 3);
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.dataInput = new Mat(1, 1, MatType.CV_32F, new float[] { task.pcCeiling });
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            labels[2] = flatness.labels[2];
+            labels[3] = flatness.labels[3];
+        }
+    }
+    public class CS_OpenGL_PeakFlat : CS_Parent
+    {
+        Plane_Histogram peak = new Plane_Histogram();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_OpenGL_PeakFlat(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.floorStudy;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Display the peak flat level in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            peak.Run(src);
+            dst2 = peak.dst2;
+            labels[2] = peak.labels[3];
+            kalman.kInput = new float[] { peak.peakFloor, peak.peakCeiling };
+            kalman.Run(empty);
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.dataInput = new Mat(2, 1, MatType.CV_32F, new float[] { kalman.kOutput[0], kalman.kOutput[1] });
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_DrawHull : CS_Parent
+    {
+        RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_OpenGL_DrawHull(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.drawCell;
+            task.OpenGLTitle = "OpenGL_Functions";
+            labels = new string[] { "", "", "RedCloud output", "" };
+            desc = "Select a cell and display its hull in OpenGL as a polygon.";
+        }
+        public void RunCS(Mat src)
+        {
+            hulls.Run(src);
+            dst2 = hulls.dst2;
+            List<Point3f> oglData = new List<Point3f>();
+            var rc = task.rc;
+            List<Point3f> hull = new List<Point3f>();
+            if (rc.hull != null)
+            {
+                foreach (var pt in rc.hull)
+                {
+                    hull.Add(task.pointCloud[rc.rect].Get<Point3f>(pt.Y, pt.X));
+                }
+                for (int i = 0; i < hull.Count(); i += 3)
+                {
+                    oglData.Add(hull[i % hull.Count()]);
+                    oglData.Add(hull[(i + 1) % hull.Count()]);
+                    oglData.Add(hull[(i + 2) % hull.Count()]);
+                }
+            }
+            task.ogl.dataInput = new Mat(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_FPolyCloud : CS_Parent
+    {
+        FeaturePoly_PointCloud fpolyPC = new FeaturePoly_PointCloud();
+        public CS_OpenGL_FPolyCloud(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Display the pointcloud after FeaturePoly_PointCloud identifies the changes depth pixels";
+        }
+        public void RunCS(Mat src)
+        {
+            fpolyPC.Run(src);
+            dst1 = fpolyPC.dst1;
+            dst2 = fpolyPC.dst2;
+            dst3 = fpolyPC.dst3;
+            SetTrueText(fpolyPC.fMask.fImage.strOut, 1);
+            labels = fpolyPC.labels;
+            task.ogl.pointCloudInput = fpolyPC.fPolyCloud;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_Sierpinski : CS_Parent
+    {
+        public CS_OpenGL_Sierpinski(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.sierpinski;
+            task.OpenGLTitle = "OpenGL_Functions";
+            //FindSlider("OpenGL cv.Point Size").Value = 3;
+            desc = "Draw the Sierpinski triangle pattern in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_DrawHulls : CS_Parent
+    {
+        public Options_OpenGLFunctions options = new Options_OpenGLFunctions();
+        public RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_OpenGL_DrawHulls(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.drawCells;
+            task.OpenGLTitle = "OpenGL_Functions";
+            labels = new string[] { "", "", "", "" };
+            desc = "Draw all the hulls in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var ptM = options.moveAmount;
+            var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
+            hulls.Run(src);
+            dst2 = hulls.dst2;
+            var rcx = task.rc;
+            List<Point3f> oglData = new List<Point3f>();
+            oglData.Add(new Point3f());
+            int polygonCount = 0;
+            foreach (var rc in task.redCells)
+            {
+                if (rc.hull == null) continue;
+                int hullIndex = oglData.Count();
+                oglData.Add(new Point3f(rc.hull.Count(), 0, 0));
+                if (rc.index == rcx.index)
+                {
+                    oglData.Add(new Point3f(1, 1, 1));
+                }
+                else
+                {
+                    oglData.Add(new Point3f(rc.color[2] / 255f, rc.color[1] / 255f, rc.color[0] / 255f));
+                }
+                int hullPoints = 0;
+                foreach (var pt in rc.hull)
+                {
+                    var ptNew = pt;
+                    if (pt.X > rc.rect.Width) ptNew.X = rc.rect.Width - 1;
+                    if (pt.Y > rc.rect.Height) ptNew.Y = rc.rect.Height - 1;
+                    var v = task.pointCloud[rc.rect].Get<Point3f>(ptNew.Y, ptNew.X);
+                    if (v.Z > 0)
+                    {
+                        hullPoints++;
+                        oglData.Add(new Point3f(v.X + shift.X, v.Y + shift.Y, v.Z + shift.Z));
+                    }
+                }
+                oglData[hullIndex] = new Point3f(hullPoints, 0, 0);
+                polygonCount++;
+            }
+            oglData[0] = new Point3f(polygonCount, 0, 0);
+            task.ogl.dataInput = new Mat(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
+            task.ogl.Run(dst2);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst2;
+            SetTrueText(polygonCount.ToString() + " polygons were sent to OpenGL", 2);
+        }
+    }
+    public class CS_OpenGL_Contours : CS_Parent
+    {
+        Options_OpenGL_Contours options2 = new Options_OpenGL_Contours();
+        public Options_OpenGLFunctions options = new Options_OpenGLFunctions();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_OpenGL_Contours(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.drawCells;
+            task.OpenGLTitle = "OpenGL_Functions";
+            FindSlider("OpenGL shift fwd/back (Z-axis)").Value = -150;
+            labels = new string[] { "", "", "Output of RedCloud", "OpenGL snapshot" };
+            desc = "Draw all the RedCloud contours in OpenGL with various settings.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var ptM = options.moveAmount;
+            var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
+            options2.RunVB();
+            redC.Run(src);
+            dst2 = redC.dst2;
+            var rcx = task.rc;
+            int polygonCount = 0;
+            var oglData = new List<Point3f>();
+            Scalar lastDepth;
+            oglData.Add(new Point3f());
+            foreach (var rc in task.redCells)
+            {
+                var d = rc.depthMean[2];
+                if (d == 0) continue;
+                int dataIndex = oglData.Count();
+                oglData.Add(new Point3f(rc.contour.Count(), 0, 0));
+                if (rc.index == rcx.index)
+                {
+                    oglData.Add(new Point3f(1, 1, 1));
+                }
+                else
+                {
+                    oglData.Add(new Point3f(rc.color[2] / 255f, rc.color[1] / 255f, rc.color[0] / 255f));
+                }
+                lastDepth = rc.depthMean;
+                foreach (var pt in rc.contour)
+                {
+                    var ptNew = pt;
+                    if (pt.X > rc.rect.Width) ptNew.X = rc.rect.Width - 1;
+                    if (pt.Y > rc.rect.Height) ptNew.Y = rc.rect.Height - 1;
+                    var v = task.pointCloud[rc.rect].Get<Point3f>(ptNew.Y, ptNew.X);
+                    if (options2.depthPointStyle == (int)pointStyle.flattened || 
+                        options2.depthPointStyle == (int)pointStyle.flattenedAndFiltered) v.Z = (float)d;
+                    if (options2.depthPointStyle == (int)pointStyle.filtered || 
+                        options2.depthPointStyle == (int)pointStyle.flattenedAndFiltered)
+                    {
+                        if (Math.Abs(v.X - lastDepth[0]) > options2.filterThreshold) v.X = (float)lastDepth[0];
+                        if (Math.Abs(v.Y - lastDepth[1]) > options2.filterThreshold) v.Y = (float)lastDepth[1];
+                        if (Math.Abs(v.Z - lastDepth[2]) > options2.filterThreshold) v.Z = (float)lastDepth[2];
+                    }
+                    oglData.Add(new Point3f(v.X + shift.X, v.Y + shift.Y, v.Z + shift.Z));
+                    lastDepth = new cv.Scalar(v.X, v.Y, v.Z);
+                }
+                oglData[dataIndex] = new Point3f(rc.contour.Count(), 0, 0);
+                polygonCount++;
+            }
+            oglData[0] = new Point3f(polygonCount, 0, 0);
+            task.ogl.dataInput = new Mat(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
+            task.ogl.Run(new Mat());
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_PCLineCandidates : CS_Parent
+    {
+        PointCloud_Basics pts = new PointCloud_Basics();
+        public CS_OpenGL_PCLineCandidates(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pcPointsAlone;
+            task.OpenGLTitle = "OpenGL_Functions";
+            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            desc = "Display the output of the PointCloud_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            pts.Run(src);
+            dst2 = pts.dst2;
+            task.ogl.dataInput = new Mat(pts.allPointsH.Count(), 1, MatType.CV_32FC3, pts.allPointsH.ToArray());
+            task.ogl.Run(new Mat());
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            labels[2] = "Point cloud points found = " + (pts.actualCount / 2).ToString();
+        }
+    }
+    public class CS_OpenGL_PClinesFirstLast : CS_Parent
+    {
+        Line3D_CandidatesFirstLast lines = new Line3D_CandidatesFirstLast();
+        public CS_OpenGL_PClinesFirstLast(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pcLines;
+            task.OpenGLTitle = "OpenGL_Functions";
+            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            desc = "Draw the 3D lines found from the PCpoints";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst2 = lines.dst2;
+            task.ogl.dataInput = lines.pcLinesMat.Rows == 0 ? new Mat() : lines.pcLinesMat;
+            task.ogl.Run(new Mat());
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            labels[2] = "OpenGL_PClines found " + (lines.pcLinesMat.Rows / 3).ToString() + " lines";
+        }
+    }
+    public class CS_OpenGL_PClinesAll : CS_Parent
+    {
+        Line3D_CandidatesAll lines = new Line3D_CandidatesAll();
+        public CS_OpenGL_PClinesAll(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pcLines;
+            task.OpenGLTitle = "OpenGL_Functions";
+            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            desc = "Draw the 3D lines found from the PCpoints";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst2 = lines.dst2;
+            task.ogl.dataInput = lines.pcLinesMat.Rows == 0 ? new Mat() : lines.pcLinesMat;
+            task.ogl.Run(new Mat());
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            labels[2] = "OpenGL_PClines found " + (lines.pcLinesMat.Rows / 3).ToString() + " lines";
+        }
+    }
+    public class CS_OpenGL_PatchHorizontal : CS_Parent
+    {
+        Pixel_NeighborsPatchNeighbors patch = new Pixel_NeighborsPatchNeighbors();
+        public CS_OpenGL_PatchHorizontal(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Draw the point cloud after patching z-values that are similar";
+        }
+        public void RunCS(Mat src)
+        {
+            patch.Run(src);
+            dst2 = patch.dst3;
+            task.ogl.pointCloudInput = dst2;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_PCpoints : CS_Parent
+    {
+        PointCloud_PCPoints pts = new PointCloud_PCPoints();
+        public CS_OpenGL_PCpoints(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pcPoints;
+            task.OpenGLTitle = "OpenGL_Functions";
+            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            desc = "Display the output of the PointCloud_Points";
+        }
+        public void RunCS(Mat src)
+        {
+            pts.Run(src);
+            dst2 = pts.dst2;
+            task.ogl.dataInput = new Mat(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
+            task.ogl.Run(new Mat());
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            labels[2] = "Point cloud points found = " + (pts.pcPoints.Count() / 2).ToString();
+        }
+    }
+    public class CS_OpenGL_PCpointsPlane : CS_Parent
+    {
+        PointCloud_PCPointsPlane pts = new PointCloud_PCPointsPlane();
+        public CS_OpenGL_PCpointsPlane(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pcPoints;
+            task.OpenGLTitle = "OpenGL_Functions";
+            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            desc = "Display the points that are likely to be in a plane - found by both the vertical and horizontal searches";
+        }
+        public void RunCS(Mat src)
+        {
+            pts.Run(src);
+            task.ogl.dataInput = new Mat(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
+            task.ogl.Run(new Mat());
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            labels[2] = "Point cloud points found = " + pts.pcPoints.Count() / 2;
+        }
+    }
+    public class CS_OpenGL_PlaneClusters3D : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Plane_Equation eq = new Plane_Equation();
+        public CS_OpenGL_PlaneClusters3D(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pcPoints;
+            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            labels[3] = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis";
+            desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            dst3 = redC.dst3;
+            List<Point3f> pcPoints = new List<Point3f>();
+            Point3f blue = new Point3f(0, 0, 1), red = new Point3f(1, 0, 0), green = new Point3f(0, 1, 0);
+            foreach (var rc in task.redCells)
+            {
+                rcData rcNew = rc;
+                if (rc.maxVec.Z > 0)
+                {
+                    eq.rc = rc;
+                    eq.Run(src);
+                    rcNew = eq.rc;
+                }
+                if (rcNew.eq == new Vec4f()) continue;
+                if (rcNew.eq.Item0 > rcNew.eq.Item1 && rcNew.eq.Item0 > rcNew.eq.Item2) pcPoints.Add(red);
+                if (rcNew.eq.Item1 > rcNew.eq.Item0 && rcNew.eq.Item1 > rcNew.eq.Item2) pcPoints.Add(green);
+                if (rcNew.eq.Item2 > rcNew.eq.Item0 && rcNew.eq.Item2 > rcNew.eq.Item1) pcPoints.Add(blue);
+                pcPoints.Add(new Point3f(rcNew.eq.Item0 * 0.5f, rcNew.eq.Item1 * 0.5f, rcNew.eq.Item2 * 0.5f));
+            }
+            task.ogl.dataInput = new Mat(pcPoints.Count(), 1, MatType.CV_32FC3, pcPoints.ToArray());
+            task.ogl.Run(new Mat());
+        }
+    }
+    public class CS_OpenGL_Profile : CS_Parent
+    {
+        public Profile_Basics sides = new Profile_Basics();
+        public Profile_Rotation rotate = new Profile_Rotation();
+        HeatMap_Basics heat = new HeatMap_Basics();
+        public CS_OpenGL_Profile(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setGravityUsage(false);
+            task.ogl.oglFunction = (int)oCase.pcPointsAlone;
+            labels[3] = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)";
+            desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders";
+        }
+        public void RunCS(Mat src)
+        {
+            sides.Run(src);
+            dst2 = sides.dst2;
+            var rc = task.rc;
+            var contourMat = new Mat(rc.contour.Count(), 1, MatType.CV_32SC2, rc.contour.ToArray());
+            if (rc.contour.Count() == 0) return;
+            var split = contourMat.Split();
+            var mm = GetMinMax(split[0]);
+            var p1 = rc.contour.ElementAt(mm.minLoc.Y);
+            var p2 = rc.contour.ElementAt(mm.maxLoc.Y);
+            dst3.SetTo(0);
+            DrawContour(dst3[rc.rect], rc.contour, Scalar.Yellow);
+            DrawCircle(dst3, new cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.DotSize + 2, Scalar.Blue);
+            DrawCircle(dst3, new cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, Scalar.Red);
+            if (rc.contour3D.Count() > 0)
+            {
+                var vecMat = new Mat(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
+                rotate.Run(empty);
+                Mat output = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix;
+                vecMat = output.Reshape(3, vecMat.Rows);
+                task.ogl.pointCloudInput = new Mat();
+                task.ogl.dataInput = vecMat;
+                heat.Run(vecMat);
+                dst1 = heat.dst0.Threshold(0, 255, ThresholdTypes.Binary);
+            } 
+            task.ogl.Run(new Mat());
+        }
+    }
+    public class CS_OpenGL_ProfileSweep : CS_Parent
+    {
+        OpenGL_Profile visuals = new OpenGL_Profile();
+        Options_IMU options = new Options_IMU();
+        int testCase = 0;
+        TrackBar xRotateSlider;
+        TrackBar yRotateSlider;
+        TrackBar zRotateSlider;
+        public CS_OpenGL_ProfileSweep(VBtask task) : base(task)
+        {
+            xRotateSlider = FindSlider("Rotate pointcloud around X-axis (degrees)");
+            yRotateSlider = FindSlider("Rotate pointcloud around Y-axis (degrees)");
+            zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)");
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Test the X-, Y-, and Z-axis rotation in sequence";
+        }
+        public void RunCS(Mat src)
+        {
+            task.gOptions.setGravityUsage(false);
+            if (task.frameCount % 100 == 0)
+            {
+                testCase++;
+                if (testCase >= 3) testCase = 0;
+                options.RunVB();
+                options.rotateX = -45;
+                options.rotateY = -45;
+                options.rotateZ = -45;
+            }
+            int bump = 1;
+            switch (testCase)
+            {
+                case 0:
+                    zRotateSlider.Value += bump;
+                    if (zRotateSlider.Value >= 45) zRotateSlider.Value = -45;
+                    labels[3] = "Rotating around X-axis with " + zRotateSlider.Value + " degrees";
+                    break;
+                case 1:
+                    yRotateSlider.Value += bump;
+                    if (yRotateSlider.Value >= 45) yRotateSlider.Value = -45;
+                    labels[3] = "Rotating around Y-axis with " + yRotateSlider.Value + " degrees";
+                    break;
+                case 2:
+                    xRotateSlider.Value += bump;
+                    if (xRotateSlider.Value >= 45) xRotateSlider.Value = -45;
+                    labels[3] = "Rotating around Z-axis with " + xRotateSlider.Value + " degrees";
+                    break;
+            }
+            SetTrueText("Top down view: " + labels[3], 1);
+            visuals.Run(src);
+            dst1 = visuals.dst1;
+            dst2 = visuals.dst2;
+            dst3 = visuals.dst3;
+        }
+    }
+    public class CS_OpenGL_FlatSurfaces : CS_Parent
+    {
+        RedCloud_LikelyFlatSurfaces flat = new RedCloud_LikelyFlatSurfaces();
+        public CS_OpenGL_FlatSurfaces(VBtask task) : base(task)
+        {
+            labels[2] = "Display the point cloud pixels that appear to be vertical and horizontal regions.";
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Review the vertical and horizontal regions from Plane_Basics.";
+        }
+        public void RunCS(Mat src)
+        {
+            flat.Run(src);
+            task.pointCloud.CopyTo(dst2, flat.dst2);
+            task.ogl.pointCloudInput = dst2;
+            task.ogl.Run(src);
+        }
+    }
+    public class CS_OpenGL_GradientPhase : CS_Parent
+    {
+        Gradient_Depth gradient = new Gradient_Depth();
+        public CS_OpenGL_GradientPhase(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Show the depth gradient Phase in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            gradient.Run(src);
+            dst2 = gradient.dst2;
+            dst3 = gradient.dst3;
+            dst1 = GetNormalize32f(gradient.dst3);
+            labels = gradient.labels;
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(dst1);
+        }
+    }
+    public class CS_OpenGL_GravityTransform : CS_Parent
+    {
+        public CS_OpenGL_GravityTransform(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer";
+        }
+        public void RunCS(Mat src)
+        {
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_GravityAverage : CS_Parent
+    {
+        readonly IMU_Average imuAvg = new IMU_Average();
+        readonly IMU_Basics imu = new IMU_Basics();
+        public CS_OpenGL_GravityAverage(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            strOut = "To remove the point cloud averaging, set the global option 'Frame History' to 1.\n" +
+                        "Or, even alternatively, run the 'OpenGL_GravityTransform' algorithm.\n\n" +
+                        "Before Averaging: Average IMU acceleration: X = " + string.Format(fmt3, task.IMU_RawAcceleration.X) + ", Y = " + string.Format(fmt3, task.IMU_RawAcceleration.Y) +
+                        ", Z = " + string.Format(fmt3, task.IMU_RawAcceleration.Z) + "\n";
+            imuAvg.Run(src);
+            task.IMU_RawAcceleration = task.IMU_AverageAcceleration;
+            imu.Run(src);
+            task.accRadians.Z += (float)Cv2.PI / 2;
+            strOut += "After Averaging: Average IMU accerlation: X = " + string.Format(fmt3, task.IMU_Acceleration.X) + ", Y = " + string.Format(fmt3, task.IMU_Acceleration.Y) +
+                        ", Z = " + string.Format(fmt3, task.IMU_Acceleration.Z) + "\n";
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_OpenGL_GravityKalman : CS_Parent
+    {
+        readonly IMU_Kalman imuKalman = new IMU_Kalman();
+        readonly IMU_Basics imu = new IMU_Basics();
+        public CS_OpenGL_GravityKalman(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            strOut = "To remove the point cloud averaging, set the global option 'Frame History' to 1.\n" +
+                        "Or, even alternatively, run the 'OpenGL_GravityTransform' algorithm.\n\n" +
+                        "Before Kalman: IMU acceleration: X = " + string.Format(fmt3, task.IMU_RawAcceleration.X) + ", Y = " + string.Format(fmt3, task.IMU_RawAcceleration.Y) +
+                        ", Z = " + string.Format(fmt3, task.IMU_RawAcceleration.Z) + "\n";
+            imuKalman.Run(src);
+            task.IMU_RawAcceleration = task.IMU_Acceleration;
+            imu.Run(src);
+            task.accRadians.Z += (float)Cv2.PI / 2;
+            strOut += "After Kalman: IMU acceleration: X = " + string.Format(fmt3, task.IMU_Acceleration.X) + ", Y = " + string.Format(fmt3, task.IMU_Acceleration.Y) +
+                        ", Z = " + string.Format(fmt3, task.IMU_Acceleration.Z) + "\n";
+            task.IMU_Acceleration = task.kalmanIMUacc;
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_OpenGL_StableMinMax : CS_Parent
+    {
+        readonly Depth_MinMaxNone minmax = new Depth_MinMaxNone();
+        public CS_OpenGL_StableMinMax(VBtask task) : base(task)
+        {
+            task.gOptions.setUnfiltered(true);
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            labels = new string[] { "", "", "Pointcloud Max", "Pointcloud Min" };
+            desc = "display the Pointcloud Min or Max in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            minmax.Run(task.pointCloud);
+            dst2 = minmax.dst2;
+            if (minmax.options.useMax || minmax.options.useMin) task.ogl.pointCloudInput = dst2;
+            else task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(task.color);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            labels[2] = minmax.labels[2];
+        }
+    }
+    public class CS_OpenGL_DiffDepth : CS_Parent
+    {
+        Diff_Depth32S diff = new Diff_Depth32S();
+        public CS_OpenGL_DiffDepth(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            labels = new string[] { "", "", "Point cloud after filtering for consistent depth", "" };
+            desc = "Run OpenGL with a point cloud with consistent depth data (defined with slider in Motion_PixelDiff)";
+        }
+        public void RunCS(Mat src)
+        {
+            diff.Run(src);
+            dst2 = diff.dst2;
+            if (!task.gOptions.debugChecked) task.pointCloud.SetTo(0, dst2);
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(src);
+            labels = diff.labels;
+        }
+    }
+    public class CS_OpenGL_CloudMisses : CS_Parent
+    {
+        History_Basics frames = new History_Basics();
+        public CS_OpenGL_CloudMisses(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            labels = new string[] { "", "", "Point cloud after over the last X frames", "" };
+            desc = "Run OpenGL removing all pixels not present for all X frames";
+        }
+        public void RunCS(Mat src)
+        {
+            frames.Run(task.depthMask / 255);
+            dst2 = frames.dst2;
+            dst2 = dst2.Threshold(frames.saveFrames.Count() - 1, 255, ThresholdTypes.Binary);
+            task.ogl.pointCloudInput.SetTo(0);
+            task.pointCloud.CopyTo(task.ogl.pointCloudInput, dst2);
+            task.ogl.Run(src);
+        }
+    }
+    public class CS_OpenGL_CloudHistory : CS_Parent
+    {
+        History_Cloud hCloud = new History_Cloud();
+        public CS_OpenGL_CloudHistory(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            labels = new string[] { "", "", "Point cloud after over the last X frames", "Mask to remove partially missing pixels" };
+            desc = "Run OpenGL with a masked point cloud averaged over the last X frames.";
+        }
+        public void RunCS(Mat src)
+        {
+            hCloud.Run(task.pointCloud);
+            dst2 = hCloud.dst2;
+            task.ogl.pointCloudInput = dst2;
+            task.ogl.Run(src);
+        }
+    }
+    public class CS_OpenGL_TessellateCell : CS_Parent
+    {
+        Triangle_Basics tess = new Triangle_Basics();
+        public CS_OpenGL_TessellateCell(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.tessalateTriangles;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Display a tessellated representation of the point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            tess.Run(src);
+            dst2 = tess.dst2;
+            dst3 = tess.dst3;
+            task.ogl.dataInput = new Mat(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(tess.dst2);
+            labels = tess.labels;
+        }
+    }
+    public class CS_OpenGL_Tessellate : CS_Parent
+    {
+        Triangle_RedCloud tess = new Triangle_RedCloud();
+        public CS_OpenGL_Tessellate(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.tessalateTriangles;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Display a tessellated representation of the point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            tess.Run(src);
+            dst2 = tess.dst2;
+            dst3 = tess.dst3;
+            task.ogl.dataInput = new Mat(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(tess.dst2);
+            labels = tess.labels;
+        }
+    }
+    public class CS_OpenGL_TessellateRGB : CS_Parent
+    {
+        Triangle_RedCloud tess = new Triangle_RedCloud();
+        public CS_OpenGL_TessellateRGB(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.tessalateTriangles;
+            task.OpenGLTitle = "OpenGL_Functions";
+            desc = "Display a tessellated representation of the point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            tess.Run(src);
+            dst2 = tess.dst2;
+            dst3 = tess.dst3;
+            task.ogl.dataInput = new Mat(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(src);
+            labels = tess.labels;
+        }
+    }
+    public class CS_OpenGL_RedTrack : CS_Parent
+    {
+        RedTrack_Basics redCC = new RedTrack_Basics();
+        public CS_OpenGL_RedTrack(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Display all the RedCC cells in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            redCC.Run(src);
+            dst2 = redCC.dst2;
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(dst2);
+            SetTrueText(redCC.strOut, 3);
+        }
+    }
+    public class CS_OpenGL_Density2D : CS_Parent
+    {
+        Density_Basics dense = new Density_Basics();
+        public CS_OpenGL_Density2D(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, 0);
+            desc = "Create a mask showing which pixels are close to each other and display the results.";
+        }
+        public void RunCS(Mat src)
+        {
+            dense.Run(src);
+            dst2.SetTo(0);
+            task.pointCloud.CopyTo(dst2, dense.dst2);
+            task.ogl.pointCloudInput = dst2;
+            task.ogl.Run(new Mat(dst2.Size(), MatType.CV_8UC3, Scalar.White));
+        }
+    }
+    public class CS_OpenGL_ViewObjects : CS_Parent
+    {
+        GuidedBP_Points bpDoctor = new GuidedBP_Points();
+        public CS_OpenGL_ViewObjects(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Identify the objects in the scene and display them in OpenGL with their respective colors.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst1 = task.pointCloud.Clone();
+            bpDoctor.Run(src);
+            dst2 = bpDoctor.dst2;
+            dst0 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(0, 255, ThresholdTypes.Binary);
+            dst1.SetTo(0, ~dst0);
+            task.ogl.pointCloudInput = dst1;
+            task.ogl.Run(dst2);
+        }
+    }
+    public class CS_OpenGL_NoSolo : CS_Parent
+    {
+        BackProject_SoloTop hotTop = new BackProject_SoloTop();
+        BackProject_SoloSide hotSide = new BackProject_SoloSide();
+        public CS_OpenGL_NoSolo(VBtask task) : base(task)
+        {
+            task.useXYRange = false;
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            labels[2] = "The points below were identified as solo points in the point cloud";
+            desc = "Display point cloud without solo points";
+        }
+        public void RunCS(Mat src)
+        {
+            hotTop.Run(src);
+            dst2 = hotTop.dst3;
+            hotSide.Run(src);
+            dst2 = dst2 | hotSide.dst3;
+            if (!task.gOptions.debugChecked)
+                task.pointCloud.SetTo(0, dst2);
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(src);
+            SetTrueText("Toggle the solo points on and off using the 'DebugCheckBox' global option.", 3);
+        }
+    }
+    public class CS_OpenGL_RedCloud : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_OpenGL_RedCloud(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Display all the RedCloud cells in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(dst2);
+        }
+    }
+    public class CS_OpenGL_RedCloudSpectrum : CS_Parent
+    {
+        Spectrum_RedCloud redS = new Spectrum_RedCloud();
+        public CS_OpenGL_RedCloudSpectrum(VBtask task) : base(task)
+        {
+            task.redOptions.setUseDepth(true);
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Display all the RedCloud cells after Spectrum filtering.";
+        }
+        public void RunCS(Mat src)
+        {
+            redS.Run(src);
+            dst2 = redS.dst3;
+            task.pointCloud.SetTo(0, dst2.InRange(0, 0));
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(dst2);
+        }
+    }
+    public class CS_OpenGL_RedCloudCell : CS_Parent
+    {
+        Spectrum_Z specZ = new Spectrum_Z();
+        Spectrum_Breakdown breakdown = new Spectrum_Breakdown();
+        public CS_OpenGL_RedCloudCell(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Isolate a RedCloud cell - after filtering by Spectrum_Depth - in an OpenGL display";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = specZ.options.runRedCloud(ref labels[2]);
+            specZ.Run(src);
+            SetTrueText(specZ.strOut, 3);
+            if (task.ClickPoint == new cv.Point() && task.redCells.Count() > 1)
+            {
+                task.rc = task.redCells[1]; // pick the largest cell
+                task.ClickPoint = task.rc.maxDist;
+            }
+            breakdown.Run(src);
+            task.ogl.pointCloudInput.SetTo(0);
+            task.pointCloud[task.rc.rect].CopyTo(task.ogl.pointCloudInput[task.rc.rect], task.rc.mask);
+            task.ogl.Run(dst2);
+            if (task.gOptions.getOpenGLCapture())
+                dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_FilteredSideView : CS_Parent
+    {
+        BackProject2D_FilterSide filter = new BackProject2D_FilterSide();
+        public CS_OpenGL_FilteredSideView(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D";
+        }
+        public void RunCS(Mat src)
+        {
+            filter.Run(src);
+            dst2 = filter.dst2;
+            task.ogl.pointCloudInput = dst2;
+            task.ogl.Run(src);
+        }
+    }
+    public class CS_OpenGL_FilteredTopView : CS_Parent
+    {
+        BackProject2D_FilterTop filter = new BackProject2D_FilterTop();
+        public CS_OpenGL_FilteredTopView(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D";
+        }
+        public void RunCS(Mat src)
+        {
+            filter.Run(src);
+            dst2 = filter.dst2;
+            task.ogl.pointCloudInput = dst2;
+            task.ogl.Run(src);
+        }
+    }
+    public class CS_OpenGL_FilteredBoth : CS_Parent
+    {
+        BackProject2D_FilterBoth filter = new BackProject2D_FilterBoth();
+        public CS_OpenGL_FilteredBoth(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D";
+        }
+        public void RunCS(Mat src)
+        {
+            filter.Run(src);
+            dst2 = filter.dst2;
+            task.ogl.pointCloudInput = dst2;
+            task.ogl.Run(src);
+        }
+    }
+    public class CS_OpenGL_Filtered3D : CS_Parent
+    {
+        Hist3Dcloud_BP_Filter filter = new Hist3Dcloud_BP_Filter();
+        public CS_OpenGL_Filtered3D(VBtask task) : base(task)
+        {
+            task.gOptions.setOpenGLCapture(true);
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D";
+        }
+        public void RunCS(Mat src)
+        {
+            filter.Run(src);
+            dst2 = filter.dst3;
+            task.ogl.pointCloudInput = dst2;
+            task.ogl.Run(src);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_HistNorm3D : CS_Parent
+    {
+        public CS_OpenGL_HistNorm3D(VBtask task) : base(task)
+        {
+            task.OpenGLTitle = "OpenGL_Functions";
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Create an OpenGL plot using the BGR data normalized to between 0 and 1.";
+        }
+        public void RunCS(Mat src)
+        {
+            src.ConvertTo(src, MatType.CV_32FC3);
+            task.ogl.pointCloudInput = src.Normalize(0, 1, NormTypes.MinMax);
+            task.ogl.Run(new Mat());
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_HistDepth3D : CS_Parent
+    {
+        Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
+        public CS_OpenGL_HistDepth3D(VBtask task) : base(task)
+        {
+            task.ogl.oglFunction = (int)oCase.Histogram3D;
+            task.OpenGLTitle = "OpenGL_Functions";
+            task.ogl.options.PointSizeSlider.Value = 10;
+            desc = "Display the 3D histogram of the depth in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            hcloud.Run(src);
+            Mat histogram = new Mat(task.redOptions.histBins3D, 1, MatType.CV_32F, hcloud.histogram.Data);
+            task.ogl.dataInput = histogram;
+            task.ogl.pointCloudInput = new Mat();
+            task.ogl.Run(new Mat());
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+            SetTrueText("Use the sliders for X/Y/Z histogram bins to add more points");
+        }
+    }
+    public class CS_OpenGL_SoloPointsRemoved : CS_Parent
+    {
+        Area_SoloPoints solos = new Area_SoloPoints();
+        public CS_OpenGL_SoloPointsRemoved(VBtask task) : base(task)
+        {
+            task.gOptions.setUnfiltered(true); // show all the unfiltered points so removing the points is obvious.
+            task.OpenGLTitle = "OpenGL_Functions";
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            desc = "Remove the solo points and display the pointcloud";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.toggleOnOff)
+            {
+                solos.Run(src);
+                dst2 = solos.dst2;
+                task.pointCloud.SetTo(0, dst2);
+            }
+            else
+            {
+                dst2.SetTo(0);
+            }
+            task.ogl.pointCloudInput = task.pointCloud;
+            task.ogl.Run(src);
+            SetTrueText("You should see the difference in the OpenGL window as the solo points are toggled on an off.", 3);
+        }
+    }
+
+    public class CS_OpenGL_Duster : CS_Parent
+    {
+        Duster_Basics duster = new Duster_Basics();
+        Options_OpenGL_Duster options = new Options_OpenGL_Duster();
+        public CS_OpenGL_Duster(VBtask task) : base(task)
+        {
+            desc = "Show a dusted version point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            duster.Run(src);
+            dst2 = duster.dst3;
+            task.ogl.pointCloudInput = options.useTaskPointCloud ? task.pointCloud : duster.dst2;
+            task.ogl.Run(options.useClusterColors == false ? task.color : dst2);
+        }
+    }
+    public class CS_OpenGL_DusterY : CS_Parent
+    {
+        Duster_BasicsY duster = new Duster_BasicsY();
+        Options_OpenGL_Duster options = new Options_OpenGL_Duster();
+        public CS_OpenGL_DusterY(VBtask task) : base(task)
+        {
+            desc = "Show a dusted version point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            duster.Run(src);
+            dst2 = duster.dst3;
+            task.ogl.pointCloudInput = options.useTaskPointCloud ? task.pointCloud : duster.dst2;
+            task.ogl.Run(options.useClusterColors == false ? task.color : dst2);
+        }
+    }
+    public class CS_OpenGL_Color3D : CS_Parent
+    {
+        Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+        public CS_OpenGL_Color3D(VBtask task) : base(task)
+        {
+            task.OpenGLTitle = "OpenGL_Functions";
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            task.ogl.options.PointSizeSlider.Value = 10;
+            desc = "Plot the results of a 3D histogram of the BGR data ";
+        }
+        public void RunCS(Mat src)
+        {
+            hColor.Run(src);
+            dst2 = hColor.dst3;
+            labels[2] = hColor.labels[2];
+            dst2.ConvertTo(dst1, MatType.CV_32FC3);
+            dst1 = dst1.Normalize(0, 1, NormTypes.MinMax);
+            var split = dst1.Split();
+            split[1] *= -1;
+            Cv2.Merge(split, task.ogl.pointCloudInput);
+            task.ogl.Run(dst2);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_ColorReduced3D : CS_Parent
+    {
+        Color8U_Basics colorClass = new Color8U_Basics();
+        public CS_OpenGL_ColorReduced3D(VBtask task) : base(task)
+        {
+            task.OpenGLTitle = "OpenGL_Functions";
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            FindSlider("OpenGL cv.Point Size").Value = 20;
+            desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)";
+        }
+        public void RunCS(Mat src)
+        {
+            colorClass.Run(src);
+            dst2 = colorClass.dst3;
+            dst2.ConvertTo(dst1, MatType.CV_32FC3);
+            labels[2] = "There are " + colorClass.classCount.ToString() + " classes for " + task.redOptions.colorInputName;
+            dst1 = dst1.Normalize(0, 1, NormTypes.MinMax);
+            var split = dst1.Split();
+            split[1] *= -1;
+            Cv2.Merge(split, task.ogl.pointCloudInput);
+            task.ogl.Run(dst2);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_ColorRaw : CS_Parent
+    {
+        public CS_OpenGL_ColorRaw(VBtask task) : base(task)
+        {
+            task.OpenGLTitle = "OpenGL_Functions";
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            task.ogl.options.PointSizeSlider.Value = 10;
+            desc = "Plot the results of a 3D histogram of the BGR data";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src;
+            src.ConvertTo(dst1, MatType.CV_32FC3);
+            dst1 = dst1.Normalize(0, 1, NormTypes.MinMax);
+            var split = dst1.Split();
+            split[1] *= -1;
+            Cv2.Merge(split, task.ogl.pointCloudInput);
+            task.ogl.Run(dst2);
+            if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
+        }
+    }
+    public class CS_OpenGL_ColorBin4Way : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_OpenGL_ColorBin4Way(VBtask task) : base(task)
+        {
+            task.OpenGLTitle = "OpenGL_Functions";
+            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            task.ogl.options.PointSizeSlider.Value = 10;
+            dst0 = new Mat(dst0.Size(), MatType.CV_8UC3, Scalar.White);
+            desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            dst1.SetTo(0);
+            task.color[task.rc.rect].CopyTo(dst1[task.rc.rect], task.rc.mask);
+            dst1.ConvertTo(dst3, MatType.CV_32FC3);
+            dst3 = dst3.Normalize(0, 1, NormTypes.MinMax);
+            var split = dst3.Split();
+            split[1] *= -1;
+            Cv2.Merge(split, task.ogl.pointCloudInput);
+            task.ogl.Run(dst0);
+        }
+    }
+    public class CS_ORB_Basics : CS_Parent
+    {
+        public KeyPoint[] keypoints;
+        ORB orb;
+        Options_ORB options = new Options_ORB();    
+        public CS_ORB_Basics(VBtask task) : base(task)
+        {
+            desc = "Find keypoints using ORB - Oriented Fast and Rotated BRIEF";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (src.Channels() == 3)
+                src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            orb = ORB.Create(options.desiredCount);
+            keypoints = orb.Detect(src);
+            dst2 = src.Clone();
+            foreach (KeyPoint kpt in keypoints)
+            {
+                DrawCircle(dst2, kpt.Pt, task.DotSize + 1, Scalar.Yellow);
+            }
+            labels[2] = keypoints.Length + " key points were identified";
+        }
+    }
+    public class CS_Palette_Basics : CS_Parent
+    {
+        public bool whitebackground;
+        public CS_Palette_Basics(VBtask task) : base(task)
+        {
+            desc = "Apply the different color maps in OpenCV";
+        }
+        public void RunCS(Mat src)
+        {
+            labels[2] = "ColorMap = " + task.gOptions.getPalette();
+            if (src.Type() == MatType.CV_32F)
+            {
+                src = GetNormalize32f(src);
+                src.ConvertTo(src, MatType.CV_8U);
+            }
+            var mapIndex = ColormapTypes.Autumn;
+            if (task.paletteIndex == 1) mapIndex = ColormapTypes.Bone;
+            if (task.paletteIndex == 2) mapIndex = ColormapTypes.Cividis;
+            if (task.paletteIndex == 3) mapIndex = ColormapTypes.Cool;
+            if (task.paletteIndex == 4) mapIndex = ColormapTypes.Hot;
+            if (task.paletteIndex == 5) mapIndex = ColormapTypes.Hsv;
+            if (task.paletteIndex == 6) mapIndex = ColormapTypes.Inferno;
+            if (task.paletteIndex == 7) mapIndex = ColormapTypes.Jet;
+            if (task.paletteIndex == 8) mapIndex = ColormapTypes.Magma;
+            if (task.paletteIndex == 9) mapIndex = ColormapTypes.Ocean;
+            if (task.paletteIndex == 10) mapIndex = ColormapTypes.Parula;
+            if (task.paletteIndex == 11) mapIndex = ColormapTypes.Pink;
+            if (task.paletteIndex == 12) mapIndex = ColormapTypes.Plasma;
+            if (task.paletteIndex == 13) mapIndex = ColormapTypes.Rainbow;
+            if (task.paletteIndex == 14) mapIndex = ColormapTypes.Spring;
+            if (task.paletteIndex == 15) mapIndex = ColormapTypes.Summer;
+            if (task.paletteIndex == 16) mapIndex = ColormapTypes.Twilight;
+            if (task.paletteIndex == 17) mapIndex = ColormapTypes.TwilightShifted;
+            if (task.paletteIndex == 18) mapIndex = ColormapTypes.Viridis;
+            if (task.paletteIndex == 19) mapIndex = ColormapTypes.Winter;
+            Cv2.ApplyColorMap(src, dst2, mapIndex);
+        }
+    }
+    public class CS_Palette_Color : CS_Parent
+    {
+        Options_Colors options = new Options_Colors();
+        public CS_Palette_Color(VBtask task) : base(task)
+        {
+            desc = "Define a color Using sliders.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2.SetTo(new Scalar(options.blueS, options.greenS, options.redS));
+            dst3.SetTo(new Scalar(255 - options.blueS, 255 - options.greenS, 255 - options.redS));
+            labels[2] = "Color (RGB) = " + options.blueS + " " + options.greenS + " " + options.redS;
+            labels[3] = "Color (255 - RGB) = " + (255 - options.blueS) + " " + (255 - options.greenS) + " " +
+                         (255 - options.redS);
+        }
+    }
+    public class CS_Palette_LinearPolar : CS_Parent
+    {
+        public Options_Resize rotateOptions = new Options_Resize();
+        Point2f pt;
+        TrackBar radiusSlider;
+        Options_Palette options = new Options_Palette();    
+        public CS_Palette_LinearPolar(VBtask task) : base(task)
+        {
+            radiusSlider = FindSlider("LinearPolar radius");
+            pt = new Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1));
+            desc = "Use LinearPolar To create gradient image";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2.SetTo(0);
+            for (int i = 0; i < dst2.Rows; i++)
+            {
+                var c = i * 255 / dst2.Rows;
+                dst2.Row(i).SetTo(new Scalar(c, c, c));
+            }
+            rotateOptions.RunVB();
+            dst3.SetTo(0);
+            if (rotateOptions.warpFlag == InterpolationFlags.WarpInverseMap) 
+                radiusSlider.Value = radiusSlider.Maximum;
+            Cv2.LinearPolar(dst2, dst2, pt, options.radius, rotateOptions.warpFlag);
+            Cv2.LinearPolar(src, dst3, pt, options.radius, rotateOptions.warpFlag);
+        }
+    }
+    public class CS_Palette_Reduction : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        public CS_Palette_Reduction(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": redOptions 'Reduction' to control results.");
+            desc = "Map colors To different palette";
+            labels[2] = "Reduced Colors";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst3 = reduction.dst2;
+            dst2 = ShowPalette(dst3 * 255 / reduction.classCount);
+        }
+    }
+    public class CS_Palette_DrawTest : CS_Parent
+    {
+        Draw_Shapes draw = new Draw_Shapes();
+        public CS_Palette_DrawTest(VBtask task) : base(task)
+        {
+            desc = "Experiment With palette Using a drawn image";
+        }
+        public void RunCS(Mat src)
+        {
+            draw.Run(src);
+            dst2 = ShowPalette(draw.dst2);
+        }
+    }
+    public class CS_Palette_Gradient : CS_Parent
+    {
+        public Scalar color1;
+        public Scalar color2;
+        public CS_Palette_Gradient(VBtask task) : base(task)
+        {
+            labels[3] = "From And To colors";
+            desc = "Create gradient image";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                if (standaloneTest())
+                {
+                    color1 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
+                    color2 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
+                    dst3.SetTo(color1);
+                    dst3[new cv.Rect(0, 0, dst3.Width, dst3.Height / 2)].SetTo(color2);
+                }
+                var dst1 = new Mat(255, 1, MatType.CV_8UC3);
+                double f = 1.0;
+                for (int i = 0; i < dst1.Rows; i++)
+                {
+                    dst1.Set<Vec3b>(i, 0, new Vec3b((byte)(f * color2[0] + (1 - f) * color1[0]), 
+                                                    (byte)(f * color2[1] + (1 - f) * color1[1]), 
+                                                    (byte)(f * color2[2] + (1 - f) * color1[2])));
+                    f -= 1 / (double)dst1.Rows;
+                }
+            }
+            if (standaloneTest()) dst2 = dst1.Resize(dst2.Size());
+        }
+    }
+    public class CS_Palette_DepthColorMap : CS_Parent
+    {
+        public Mat gradientColorMap = new Mat();
+        Gradient_Color gColor = new Gradient_Color();
+        Options_Palette options = new Options_Palette();        
+        public CS_Palette_DepthColorMap(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": adjust color with 'Convert and Scale' slider");
+            labels[3] = "Palette used To color left image";
+            desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (task.optionsChanged)
+            {
+                gColor.color1 = Scalar.Yellow;
+                gColor.color2 = Scalar.Red;
+                var gradMat = new Mat();
+                gColor.gradientWidth = dst1.Width;
+                gColor.Run(empty);
+                gradientColorMap = gColor.gradient;
+                gColor.color2 = gColor.color1;
+                gColor.color1 = Scalar.Blue;
+                gColor.Run(empty);
+                Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap);
+                gradientColorMap = gradientColorMap.Resize(new cv.Size(255, 1));
+                if (standaloneTest())
+                {
+                    if (dst3.Width < 255) dst3 = new Mat(dst3.Height, 255, MatType.CV_8UC3, 0);
+                    var r = new cv.Rect(0, 0, 255, 1);
+                    for (int i = 0; i < dst3.Height; i++)
+                    {
+                        r.Y = i;
+                        dst3[r] = gradientColorMap;
+                    }
+                }
+            }
+            var depth8u = task.pcSplit[2].ConvertScaleAbs(options.convertScale);
+            var ColorMap = new Mat(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
+            Cv2.ApplyColorMap(depth8u, dst2, ColorMap);
+            dst2.SetTo(0, task.noDepthMask);
+        }
+    }
+    public class CS_Palette_RGBDepth : CS_Parent
+    {
+        Mat gradientColorMap = new Mat();
+        Gradient_Color gColor = new Gradient_Color();
+        public CS_Palette_RGBDepth(VBtask task) : base(task)
+        {
+            desc = "Build a colormap that best shows the depth.  NOTE: duplicate of Palette_DepthColorMap but no slider.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged)
+            {
+                gColor.color1 = Scalar.Yellow;
+                gColor.color2 = Scalar.Red;
+                var gradMat = new Mat();
+                gColor.gradientWidth = dst1.Width;
+                gColor.Run(empty);
+                gradientColorMap = gColor.gradient;
+                gColor.color2 = gColor.color1;
+                gColor.color1 = Scalar.Blue;
+                gColor.Run(empty);
+                Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap);
+                gradientColorMap = gradientColorMap.Resize(new cv.Size(255, 1));
+            }
+            var sliderVal = (task.cameraName == "Intel(R) RealSense(TM) Depth Camera 435i") ? 50 : 80;
+            var depth8u = task.pcSplit[2].ConvertScaleAbs(sliderVal);
+            var ColorMap = new Mat(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
+            Cv2.ApplyColorMap(depth8u, dst2, ColorMap);
+        }
+    }
+    public class CS_Palette_Layout2D : CS_Parent
+    {
+        public CS_Palette_Layout2D(VBtask task) : base(task)
+        {
+            desc = "Layout the available colors in a 2D grid";
+        }
+        public void RunCS(Mat src)
+        {
+            int index = 0;
+            foreach (var r in task.gridList)
+            {
+                dst2[r].SetTo(task.scalarColors[index % 256]);
+                index++;
+            }
+            labels[2] = "CS_Palette_Layout2D - " + task.gridList.Count().ToString() + " regions";
+        }
+    }
+    public class CS_Palette_LeftRightImages : CS_Parent
+    {
+        public CS_Palette_LeftRightImages(VBtask task) : base(task)
+        {
+            desc = "Use a palette with the left and right images.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = ShowPalette(task.leftView.ConvertScaleAbs());
+            dst3 = ShowPalette(task.rightView.ConvertScaleAbs());
+        }
+    }
+    public class CS_Palette_TaskColors : CS_Parent
+    {
+        int direction = 1;
+        public CS_Palette_TaskColors(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "ScalarColors", "VecColors" };
+            desc = "Display that task.scalarColors and task.vecColors";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.gridSize <= 10) direction *= -1;
+            if (task.gridSize >= 100) direction *= -1;
+            task.gridSize -= direction * 1;
+            task.grid.Run(src);
+            for (int i = 0; i < task.gridList.Count(); i++)
+            {
+                var roi = task.gridList[i];
+                dst2[roi].SetTo(task.scalarColors[i % 256]);
+                dst3[roi].SetTo(task.vecColors[i % 256]);
+            }
+        }
+    }
+    public class CS_Palette_Create : CS_Parent
+    {
+        Mat colorGrad = new Mat();
+        string activeSchemeName = "";
+        int saveColorTransitionCount = -1;
+        Options_Palette options = new Options_Palette();
+        public CS_Palette_Create(VBtask task) : base(task)
+        {
+            desc = "Create a new palette";
+        }
+        Mat colorTransition(Scalar color1, Scalar color2, int width)
+        {
+            double f = 1.0;
+            var gradientColors = new Mat(1, width, MatType.CV_64FC3);
+            for (int i = 0; i < width; i++)
+            {
+                gradientColors.Set(0, i, new Scalar(f * color2[0] + (1 - f) * color1[0], f * color2[1] + (1 - f) * color1[1],
+                    f * color2[2] + (1 - f) * color1[2]));
+                f -= 1.0 / width;
+            }
+            var result = new Mat(1, width, MatType.CV_8UC3);
+            for (int i = 0; i < width; i++)
+            {
+                result.Col(i).SetTo(gradientColors.Get<Scalar>(0, i));
+            }
+            return result;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (activeSchemeName !=options.schemeName || options.transitions != saveColorTransitionCount)
+            {
+                activeSchemeName = options.schemeName;
+                saveColorTransitionCount = options.transitions;
+                if (activeSchemeName == "schemeRandom")
+                {
+                    var msRNG = new Random();
+                    var color1 = new Scalar(0, 0, 0);
+                    var color2 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
+                    Mat gradMat = new Mat();
+                    for (int i = 0; i <= options.transitions; i++)
+                    {
+                        gradMat = colorTransition(color1, color2, 255);
+                        color1 = color2;
+                        color2 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
+                        if (i == 0) colorGrad = gradMat; else Cv2.HConcat(colorGrad, gradMat, colorGrad);
+                    }
+                    colorGrad = colorGrad.Resize(new cv.Size(256, 1));
+                    Cv2.ImWrite(task.HomeDir + "data\\nextScheme.jpg", colorGrad); // use this to create new color schemes.
+                }
+                else
+                {
+                    colorGrad = Cv2.ImRead(options.schemeName).Row(0).Clone();
+                }
+            }
+            SetTrueText("Use the 'Color Transitions' slider and radio buttons to change the color ranges.", 3);
+            var depth8u = task.pcSplit[2].ConvertScaleAbs(options.transitions);
+            var colorMap = new Mat(256, 1, MatType.CV_8UC3, colorGrad.Data);
+            Cv2.ApplyColorMap(depth8u, dst2, colorMap);
+            dst2.SetTo(0, task.noDepthMask);
+        }
+    }
+    public class CS_Palette_Random : CS_Parent
+    {
+        public Mat colorMap;
+        public CS_Palette_Random(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": There are no options\nJust produces a colorMap filled with random vec3b's.");
+            colorMap = new Mat(256, 1, MatType.CV_8UC3, 0);
+            for (int i = 0; i <= 255; i++)
+            {
+                colorMap.Set<Vec3b>(i, 0, randomCellColor());
+            }
+            desc = "Build a random colorGrad - no smooth transitions.";
+        }
+        public void RunCS(Mat src)
+        {
+            Cv2.ApplyColorMap(src, dst2, colorMap);
+        }
+    }
+    public class CS_Palette_Variable : CS_Parent
+    {
+        public Mat colorGrad;
+        public Mat originalColorMap;
+        public List<Vec3b> colors = new List<Vec3b>();
+        public CS_Palette_Variable(VBtask task) : base(task)
+        {
+            colorGrad = new Mat(1, 256, MatType.CV_8UC3, 0);
+            for (int i = 0; i <= 255; i++)
+            {
+                colorGrad.Set<Vec3b>(0, i, randomCellColor());
+            }
+            originalColorMap = colorGrad.Clone();
+            desc = "Build a new palette for every frame.";
+        }
+        public void RunCS(Mat src)
+        {
+            for (int i = 0; i < colors.Count(); i++)
+            {
+                colorGrad.Set<Vec3b>(0, i, colors[i]);
+            }
+            var colorMap = new Mat(256, 1, MatType.CV_8UC3, colorGrad.Data);
+            Cv2.ApplyColorMap(src, dst2, colorMap);
+        }
+    }
+    public class CS_Palette_RandomColorMap : CS_Parent
+    {
+        public Mat gradientColorMap = new Mat();
+        public int transitionCount = -1;
+        Gradient_Color gColor = new Gradient_Color();
+        Options_Palette options = new Options_Palette();
+        public CS_Palette_RandomColorMap(VBtask task) : base(task)
+        {
+            labels[3] = "Generated colormap";
+            desc = "Build a random colormap that smoothly transitions colors";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+          
+            if (transitionCount != options.transitions)
+            {
+                transitionCount = options.transitions;
+                gColor.color1 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
+                gColor.color2 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
+                for (int i = 0; i < transitionCount; i++)
+                {
+                    gColor.gradientWidth = dst2.Width;
+                    gColor.Run(empty);
+                    gColor.color2 = gColor.color1;
+                    gColor.color1 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
+                    if (i == 0) gradientColorMap = gColor.gradient; else Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap);
+                }
+                gradientColorMap = gradientColorMap.Resize(new cv.Size(256, 1));
+                if (standaloneTest()) dst3 = gradientColorMap;
+                gradientColorMap.Set<Vec3b>(0, 0, new Vec3b()); // black is black!
+            }
+            var ColorMap = new Mat(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
+            Cv2.ApplyColorMap(src, dst2, ColorMap);
+        }
+    }
+    public class CS_Palette_LoadColorMap : CS_Parent
+    {
+        public bool whitebackground;
+        public Mat colorMap = new Mat();
+        DirectoryInfo cMapDir;
+        public CS_Palette_LoadColorMap(VBtask task) : base(task)
+        {
+            cMapDir = new DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps");
+            desc = "Apply the different color maps in OpenCV";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged || colorMap.Rows != 256)
+            {
+                labels[2] = "ColorMap = " + task.gOptions.getPalette();
+                var str = cMapDir.FullName + "/colorscale_" + task.gOptions.getPalette() + ".jpg";
+                var mapFile = new FileInfo(str);
+                var tmp = Cv2.ImRead(mapFile.FullName);
+                tmp.Col(0).SetTo(whitebackground ? Scalar.White : Scalar.Black);
+                tmp = tmp.Row(0);
+                colorMap = new Mat(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
+            }
+            if (src.Type() == MatType.CV_32F)
+            {
+                src = GetNormalize32f(src);
+                src.ConvertTo(src, MatType.CV_8U);
+            }
+            Cv2.ApplyColorMap(src, dst2, colorMap);
+            if (standalone) dst3 = colorMap.Resize(dst3.Size());
+        }
+    }
+    public class CS_Palette_CustomColorMap : CS_Parent
+    {
+        public Mat colorMap;
+        public CS_Palette_CustomColorMap(VBtask task) : base(task)
+        {
+            labels[2] = "ColorMap = " + task.gOptions.getPalette();
+            if (standalone)
+            {
+                var cMapDir = new DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps");
+                var str = cMapDir.FullName + "/colorscale_" + task.gOptions.getPalette() + ".jpg";
+                var mapFile = new FileInfo(str);
+                var tmp = Cv2.ImRead(mapFile.FullName);
+                colorMap = new Mat(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
+            }
+            desc = "Apply the provided color map to the input image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (colorMap == null)
+            {
+                SetTrueText("With " + traceName + " the colorMap must be provided.  Update the ColorMap Mat and then call Run(src)...");
+                return;
+            }
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (src.Type() == MatType.CV_32F)
+            {
+                src = GetNormalize32f(src);
+                src.ConvertTo(src, MatType.CV_8U);
+            }
+            Cv2.ApplyColorMap(src, dst2, colorMap);
+            if (standalone) dst3 = colorMap.Resize(dst3.Size());
+        }
+    }
+    public class CS_Palette_GrayToColor : CS_Parent
+    {
+        public CS_Palette_GrayToColor(VBtask task) : base(task)
+        {
+            desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            var pixels = new List<byte>();
+            var colors = new SortedList<byte, Vec3b>();
+            for (int y = 0; y < dst2.Height; y++)
+            {
+                for (int x = 0; x < dst2.Width; x++)
+                {
+                    var val = dst2.Get<byte>(y, x);
+                    var color = src.Get<Vec3b>(y, x);
+                    if (!pixels.Contains(val))
+                    {
+                        pixels.Add(val);
+                        colors.Add(val, color);
+                    }
+                    else
+                    {
+                        var sum = color[0] + color[1] + color[2];
+                        var index = colors.Keys.IndexOf(val);
+                        var lastColor = colors.ElementAt(index).Value;
+                        var lastSum = lastColor[0] + lastColor[1] + lastColor[2];
+                        if (sum > lastSum)
+                        {
+                            colors.RemoveAt(index);
+                            colors.Add(val, color);
+                        }
+                    }
+                }
+            }
+            var ColorMap = new Mat(256, 1, MatType.CV_8UC3, colors.Values.ToArray());
+            Cv2.ApplyColorMap(src, dst2, ColorMap);
+        }
     }
 
 }

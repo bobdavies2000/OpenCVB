@@ -6592,3 +6592,57 @@ Public Class Options_OEX : Inherits VB_Parent
         highs = New cv.Scalar(hueHighSlider.value, satHighSlider.value, valHighSlider.value)
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_ORB : Inherits VB_Parent
+    Public desiredCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("ORB - desired point count", 10, 2000, 100)
+    End Sub
+    Public Sub RunVB()
+        Static countSlider = FindSlider("ORB - desired point count")
+        desiredCount = countSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Palette : Inherits VB_Parent
+    Public schemes() As FileInfo
+    Public schemeName As String
+    Public transitions As Integer
+    Public convertScale As Integer
+    Public radius As Integer
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then
+            sliders.setupTrackBar("Color transitions", 1, 255, 7)
+            sliders.setupTrackBar("Convert And Scale", 0, 100, 45)
+            sliders.setupTrackBar("LinearPolar radius", 0, dst2.Cols, dst2.Cols / 2)
+        End If
+        Dim dirInfo = New DirectoryInfo(task.HomeDir + "Data")
+        schemes = dirInfo.GetFiles("scheme*.jpg")
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            For i = 0 To schemes.Length - 1
+                radio.addRadio(schemes(i).Name.Substring(0, schemes(i).Name.Length - 4))
+                If schemes(i).Name = "schemeRandom" Then radio.check(i).Checked = True
+            Next
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static paletteSlider = FindSlider("Color transitions")
+        Static cvtScaleSlider = FindSlider("Convert And Scale")
+        Static radiusSlider = FindSlider("LinearPolar radius")
+        transitions = paletteSlider.value
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        schemeName = schemes(findRadioIndex(frm.check)).FullName
+        convertScale = cvtScaleSlider.value
+        radius = radiusSlider.Value
+    End Sub
+End Class

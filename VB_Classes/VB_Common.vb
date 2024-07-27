@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Drawing
-Imports System.IO.Pipes
 Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
 Module VB_Common
@@ -108,6 +107,39 @@ Module VB_Common
     End Sub
 End Module
 
+
+
+Public Enum pointStyle
+    unFiltered = 0
+    filtered = 1
+    flattened = 2
+    flattenedAndFiltered = 3
+End Enum
+
+
+
+
+Public Enum oCase
+    pointCloudAndRGB = 0
+    verticalLines = 1
+    drawFloor = 2
+    tessalateTriangles = 3
+    drawPyramid = 4
+    drawCube = 5
+    simplePlane = 6
+    minMaxBlocks = 7
+    drawTiles = 8
+    drawCell = 9
+    drawCells = 10
+    floorStudy = 11
+    data3D = 12
+    sierpinski = 13
+    polygonCell = 14
+    Histogram3D = 15
+    pcPoints = 16
+    pcLines = 17
+    pcPointsAlone = 18
+End Enum
 
 
 

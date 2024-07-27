@@ -363,12 +363,22 @@ Public Class OptionsGlobal
     Public Sub setDebugCheckBox(val As Boolean)
         DebugCheckBox.Checked = val
     End Sub
-    Public Function getDebugCheckBox() As Boolean
-        Return DebugCheckBox.Checked
+    Public Function getPalette() As String
+        Return Palettes.Text
     End Function
+    Public Sub setPalette(val As String)
+        Palettes.SelectedItem() = val
+    End Sub
     Public Function getOpenGLCapture() As Boolean
         Return OpenGLCapture.Checked
     End Function
+    Public Sub setOpenGLCapture(val As Boolean)
+        OpenGLCapture.Checked = val
+    End Sub
+    Public Function getDebugCheckBox() As Boolean
+        Return DebugCheckBox.Checked
+    End Function
+
     Public Sub setGravityUsage(val As Boolean)
         gravityPointCloud.Checked = val
     End Sub
@@ -381,6 +391,9 @@ Public Class OptionsGlobal
     Public Sub setUnfiltered(val As Boolean)
         unFiltered.Checked = val
     End Sub
+    Public Function getUnfiltered() As Boolean
+        Return unFiltered.Checked
+    End Function
     Public Sub SetUseKalman(val As Boolean)
         UseKalman.Checked = val
     End Sub

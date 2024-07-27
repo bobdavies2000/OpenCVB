@@ -375,4 +375,10 @@ Public Class OptionsRedCloud
     Public Sub setHistBins3D(val As Integer)
         HistBinBar3D.Value = val
     End Sub
+    Public Function getUseDepth() As Boolean
+        Return UseDepth.Checked
+    End Function
+    Public Sub setUseDepth(val As Boolean)
+        UseDepth.Checked = val
+    End Sub
 End Class
