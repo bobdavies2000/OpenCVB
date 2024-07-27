@@ -6711,3 +6711,73 @@ Public Class Options_PhaseCorrelate : Inherits VB_Parent
         shiftThreshold = thresholdSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_PlaneFloor : Inherits VB_Parent
+    Public countThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Count threshold that indicates floor", 1, 100, 10)
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = FindSlider("Pixel Count threshold that indicates floor")
+        countThreshold = thresholdSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_PlyFormat : Inherits VB_Parent
+    Public fileNameForm As OptionsFileName
+    Public fileName As String
+    Public playButton As String
+    Public allOptionsLeft As Integer
+    Public saveFileName As String = ""
+    Public Sub New()
+        fileNameForm = New OptionsFileName
+        fileNameForm.OpenFileDialog1.InitialDirectory = "c:\tmp"
+        fileNameForm.OpenFileDialog1.FileName = "*.*"
+        fileNameForm.OpenFileDialog1.CheckFileExists = False
+        fileNameForm.OpenFileDialog1.Filter = "ply (*.ply)|*.ply|All files (*.*)|*.*"
+        fileNameForm.OpenFileDialog1.FilterIndex = 1
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "plyFileName", "plyFileName", "c:\tmp\pointcloud.ply")
+        fileNameForm.Text = "Select ply output file"
+        fileNameForm.FileNameLabel.Text = "Select ply output file"
+        fileNameForm.PlayButton.Text = "Save"
+        fileNameForm.TrackBar1.Visible = False
+        fileNameForm.Setup(traceName)
+        fileNameForm.Show()
+    End Sub
+    Public Sub RunVB()
+        If task.FirstPass Then fileNameForm.Left = allOptions.Width / 3
+        playButton = fileNameForm.PlayButton.Text
+        fileName = fileNameForm.filename.Text
+
+        If saveFileName <> fileName Then
+            SaveSetting("OpenCVB", "plyFileName", "plyFileName", saveFileName)
+            saveFileName = fileName
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_PointCloud : Inherits VB_Parent
+    Public deltaThreshold As Single
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Delta Z threshold (cm)", 0, 100, 5)
+    End Sub
+    Public Sub RunVB()
+        Static deltaSlider = FindSlider("Delta Z threshold (cm)")
+        deltaThreshold = deltaSlider.value / 100
+    End Sub
+End Class

@@ -381,4 +381,7 @@ Public Class OptionsRedCloud
     Public Sub setUseDepth(val As Boolean)
         UseDepth.Checked = val
     End Sub
+    Public Sub setXYReduction(val As Boolean)
+        XYReduction.Checked = val
+    End Sub
 End Class

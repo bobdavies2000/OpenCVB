@@ -1,10 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.ML.DTrees
 
 Public Class PointCloud_Basics : Inherits VB_Parent
     Public actualCount As Integer
-    Dim deltaThreshold As Single
 
     Public allPointsH As New List(Of cv.Point3f)
     Public allPointsV As New List(Of cv.Point3f)
@@ -14,9 +12,9 @@ Public Class PointCloud_Basics : Inherits VB_Parent
 
     Public vList As New List(Of List(Of cv.Point3f))
     Public xyVList As New List(Of List(Of cv.Point))
+    Dim options As New Options_PointCloud()
     Public Sub New()
         setPointCloudGrid()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta Z threshold (cm)", 0, 100, 5)
         desc = "Reduce the point cloud to a manageable number points in 3D"
     End Sub
     Public Function findHorizontalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
@@ -29,9 +27,9 @@ Public Class PointCloud_Basics : Inherits VB_Parent
                 Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
                 Dim jumpZ As Boolean = False
                 If vec.Z > 0 Then
-                    If (Math.Abs(lastVec.Z - vec.Z) < deltaThreshold And lastVec.X < vec.X) Or lastVec.Z = 0 Then
+                    If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.X < vec.X) Or lastVec.Z = 0 Then
                         actualCount += 1
-                        DrawCircle(dst2,New cv.Point(x, y), task.DotSize, cv.Scalar.White)
+                        DrawCircle(dst2, New cv.Point(x, y), task.DotSize, cv.Scalar.White)
                         vecList.Add(vec)
                         xyVec.Add(New cv.Point(x, y))
                     Else
@@ -61,9 +59,9 @@ Public Class PointCloud_Basics : Inherits VB_Parent
                 Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
                 Dim jumpZ As Boolean = False
                 If vec.Z > 0 Then
-                    If (Math.Abs(lastVec.Z - vec.Z) < deltaThreshold And lastVec.Y < vec.Y) Or lastVec.Z = 0 Then
+                    If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.Y < vec.Y) Or lastVec.Z = 0 Then
                         actualCount += 1
-                        DrawCircle(dst2,New cv.Point(x, y), task.DotSize, cv.Scalar.White)
+                        DrawCircle(dst2, New cv.Point(x, y), task.DotSize, cv.Scalar.White)
                         vecList.Add(vec)
                         xyVec.Add(New cv.Point(x, y))
                     Else
@@ -85,8 +83,7 @@ Public Class PointCloud_Basics : Inherits VB_Parent
     End Function
 
     Public Sub RunVB(src As cv.Mat)
-        Static deltaSlider = FindSlider("Delta Z threshold (cm)")
-        deltaThreshold = deltaSlider.value / 100
+        options.RunVB()
 
         dst2 = src
         actualCount = 0
@@ -261,8 +258,6 @@ End Class
 ' https://www.mynteye.com/pages/mynt-eye-d
 Public Class PointCloud_SetupSide : Inherits VB_Parent
     Dim arcSize As Integer
-    Public xCheckbox As Windows.Forms.CheckBox
-    Public zCheckbox As Windows.Forms.CheckBox
     Public Sub New()
         arcSize = dst2.Width / 15
         labels(2) = "Layout markers for side view"
@@ -283,7 +278,6 @@ Public Class PointCloud_SetupSide : Inherits VB_Parent
         Dim cam = task.sideCameraPoint
         Dim marker As New cv.Point2f(dst2.Width / (task.MaxZmeters * distanceRatio), 0)
         marker.Y = marker.X * Math.Tan((task.vFov / 2) * cv.Cv2.PI / 180)
-        Dim topLen = marker.X * Math.Tan((task.hFov / 2) * cv.Cv2.PI / 180)
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
@@ -438,7 +432,6 @@ End Class
 
 
 Public Class PointCloud_Raw : Inherits VB_Parent
-    Dim depthBytes() As Byte
     Public Sub New()
         labels(2) = "Top View"
         labels(3) = "Side View"

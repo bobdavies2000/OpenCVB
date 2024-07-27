@@ -44,7 +44,7 @@ Public Class Touchup
                 inline = inline.Replace("CvInvoke.", "cv.")
                 inline = inline.Replace(" Point ", " cv.Point ")
                 inline = inline.Replace(" Point(", " cv.Point(")
-                inline = inline.Replace("<Point(", "<cv.Point(")
+                inline = inline.Replace("<Point", "<cv.Point")
                 inline = inline.Replace(" Size(", " cv.Size(")
                 inline = inline.Replace(".Rect(", ".Rectangle(")
                 inline = inline.Replace("Cv2.Line(", "DrawLine(")

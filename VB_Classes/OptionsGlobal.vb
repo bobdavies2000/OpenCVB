@@ -330,6 +330,13 @@ Public Class OptionsGlobal
     Public Sub setHistogramBins(val As Integer)
         HistBinBar.Value = val
     End Sub
+    Public Sub setHistBinBarMax(val As Integer)
+        HistBinBar.Maximum = val
+    End Sub
+    Public Function getHistBinBarMax() As Integer
+        Return HistBinBar.Maximum
+    End Function
+
     Public Sub setPixelDifference(val As Integer)
         PixelDiffBar.Value = val
     End Sub

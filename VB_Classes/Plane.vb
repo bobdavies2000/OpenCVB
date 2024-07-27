@@ -576,14 +576,15 @@ Public Class Plane_FloorStudy : Inherits VB_Parent
     Public slice As New Structured_SliceH
     Dim yList As New List(Of Single)
     Public planeY As Single
+    Dim options = New Options_PlaneFloor()
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Count threshold that indicates floor", 1, 100, 10)
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "", ""}
         desc = "Find the floor plane (if present)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Pixel Count threshold that indicates floor")
+        options.RunVB()
+
         slice.Run(src)
         dst1 = slice.dst3
 
@@ -592,7 +593,7 @@ Public Class Plane_FloorStudy : Inherits VB_Parent
         For y = dst0.Height - 2 To 0 Step -1
             rect = New cv.Rect(0, y, dst0.Width - 1, 1)
             Dim count = dst0(rect).CountNonZero
-            If count > thresholdSlider.Value Then
+            If count > options.countThreshold Then
                 nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs / 2.5 ' narrow it down to about 1 cm
                 labels(2) = "Y = " + Format(planeY, fmt3) + " separates the floor."
                 SetTrueText(labels(2), 3)

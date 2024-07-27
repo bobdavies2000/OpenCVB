@@ -18,6 +18,7 @@ using System.IO.Pipes;
 using System.Windows.Controls;
 using System.Windows;
 using OpenCvSharp.Flann;
+using System.Text.RegularExpressions;
 
 namespace CS_Classes
 {
@@ -6940,5 +6941,1530 @@ namespace CS_Classes
             task.color.SetTo(Scalar.White, dst0);
         }
     }
+    public class CS_Plane_FloorStudy : CS_Parent
+    {
+        public Structured_SliceH slice = new Structured_SliceH();
+        List<float> yList = new List<float>();
+        public float planeY;
+        Options_PlaneFloor options = new Options_PlaneFloor();
+        public CS_Plane_FloorStudy(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "", "", "" };
+            desc = "Find the floor plane (if present)";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            slice.Run(src);
+            dst1 = slice.dst3;
+            dst0 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            float thicknessCMs = task.metersPerPixel * 1000 / 100, nextY = 0;
+            cv.Rect rect = new cv.Rect();
+            for (int y = dst0.Height - 2; y >= 0; y--)
+            {
+                rect = new cv.Rect(0, y, dst0.Width - 1, 1);
+                int count = dst0[rect].CountNonZero();
+                if (count > options.countThreshold)
+                {
+                    nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs / 2.5f; // narrow it down to about 1 cm
+                    labels[2] = "Y = " + string.Format(fmt3, planeY) + " separates the floor.";
+                    SetTrueText(labels[2], 3);
+                    Mat sliceMask = task.pcSplit[1].InRange(new Scalar(planeY), new Scalar(3.0));
+                    dst2 = src;
+                    dst2.SetTo(new Scalar(255, 255, 255), sliceMask);
+                    break;
+                }
+            }
+            yList.Add(nextY);
+            planeY = yList.Average();
+            if (yList.Count() > 20) yList.RemoveAt(0);
+            dst1.Line(new cv.Point(0, rect.Y), new cv.Point(dst2.Width, rect.Y), Scalar.Yellow, slice.options.sliceSize, task.lineType);
+        }
+    }
 
-}
+    public class CS_Plot_Basics : CS_Parent
+    {
+        CS_Plot_Basics_CPP plot;
+        Hist_Graph hist = new Hist_Graph();
+        public int plotCount = 3;
+        public CS_Plot_Basics(VBtask task) : base(task)
+        {
+            plot = new CS_Plot_Basics_CPP(task);
+            hist.plotRequested = true;
+            labels[2] = "Plot of grayscale histogram";
+            labels[3] = "Same Data but using OpenCV C++ plot";
+            desc = "Plot data provided in src Mat";
+        }
+        public void RunCS(Mat src)
+        {
+            hist.plotColors[0] = Scalar.White;
+            hist.Run(src);
+            dst2 = hist.dst2;
+            for (int i = 0; i < hist.histRaw[0].Rows; i++)
+            {
+                plot.srcX.Add(i);
+                plot.srcY.Add(hist.histRaw[0].At<float>(i, 0));
+            }
+            plot.RunCS(empty);
+            dst3 = plot.dst2;
+            labels[2] = hist.labels[2];
+        }
+    }
+    public class CS_Plot_Histogram : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public float[] histArray;
+        public float minRange = 0;
+        public float maxRange = 255;
+        public Scalar backColor = Scalar.Red;
+        public float maxValue;
+        public float minValue;
+        public float plotCenter;
+        public float barWidth;
+        public bool addLabels = true;
+        public bool removeZeroEntry = true;
+        public bool createHistogram = false;
+        public mmData mm;
+        public CS_Plot_Histogram(VBtask task) : base(task)
+        {
+            desc = "Plot histogram data with a stable scale at the left of the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest() || createHistogram)
+            {
+                if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+                Rangef[] ranges = new Rangef[1] { new Rangef(minRange, maxRange) };
+                Cv2.CalcHist(new Mat[] { src }, new int[] { 0 }, new Mat(), histogram, 1, 
+                             new int[] { task.histogramBins }, ranges);
+            }
+            else
+            {
+                histogram = src;
+            }
+            if (removeZeroEntry) histogram.Set<float>(0, 0, 0); // let's not plot the values at zero...
+            dst2.SetTo(backColor);
+            barWidth = dst2.Width / histogram.Rows;
+            plotCenter = barWidth * histogram.Rows / 2 + barWidth / 2;
+            histArray = new float[histogram.Rows];
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+            mm = GetMinMax(histogram);
+            if (mm.maxVal > 0 && histogram.Rows > 0)
+            {
+                float incr = 255f / histogram.Rows;
+                for (int i = 0; i < histArray.Length; i++)
+                {
+                    if (float.IsNaN(histArray[i])) histArray[i] = 0;
+                    if (histArray[i] > 0)
+                    {
+                        int h = (int)(histArray[i] * dst2.Height / mm.maxVal);
+                        float sIncr = (i % 256) * incr;
+                        Scalar color = new Scalar(sIncr, sIncr, sIncr);
+                        if (histogram.Rows > 255) color = Scalar.Black;
+                        Cv2.Rectangle(dst2, new cv.Rect((int)(i * barWidth), dst2.Height - h, (int)Math.Max(1, barWidth), h), 
+                                      color, -1);
+                    }
+                }
+                if (addLabels) AddPlotScale(dst2, mm.minVal, mm.maxVal);
+            }
+        }
+    }
+    public class CS_Plot_Depth : CS_Parent
+    {
+        Plot_Basics_CPP plotDepth = new Plot_Basics_CPP();
+        Hist_Basics hist = new Hist_Basics();
+        public CS_Plot_Depth(VBtask task) : base(task)
+        {
+            desc = "Show depth using OpenCV's plot format with variable bins.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
+            hist.Run(src);
+            plotDepth.srcX.Clear();
+            plotDepth.srcY.Clear();
+            for (int i = 0; i < task.histogramBins; i++)
+            {
+                plotDepth.srcX.Add(i * task.MaxZmeters / task.histogramBins);
+                plotDepth.srcY.Add(hist.histogram.At<float>(i, 0));
+            }
+            plotDepth.Run(empty);
+            dst2 = plotDepth.dst2;
+            if (task.heartBeat) labels[2] = plotDepth.labels[2];
+            var split = Regex.Split(labels[2], @"\W+");
+            int lineCount = int.Parse(split[4]);
+            if (lineCount > 0)
+            {
+                int meterDepth = src.Width / lineCount;
+                for (int i = 1; i <= lineCount; i++)
+                {
+                    int x = i * meterDepth;
+                    DrawLine(dst2, new cv.Point(x, 0), new cv.Point(x, src.Height), Scalar.White);
+                    SetTrueText($"{i}m", new cv.Point(x + 4, src.Height - 10));
+                }
+            }
+        }
+    }
+    public class CS_Plot_Histogram2D : CS_Parent
+    {
+        public Color_Basics colorFmt = new Color_Basics();
+        public CS_Plot_Histogram2D(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "2D Histogram", "" };
+            desc = "Plot a 2D histogram from the input Mat";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat histogram = src.Clone();
+            if (standaloneTest())
+            {
+                colorFmt.Run(src);
+                src = colorFmt.dst2;
+                int bins = task.histogramBins;
+                Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1 }, new Mat(), histogram, 2, new int[] { bins, bins }, task.redOptions.rangesBGR);
+            }
+            dst2 = histogram.Resize(dst2.Size(), 0, 0, InterpolationFlags.Nearest);
+            if (standaloneTest()) dst3 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
+        }
+    }
+    public class CS_Plot_OverTimeSingle : CS_Parent
+    {
+        public float plotData;
+        public Scalar backColor = Scalar.DarkGray;
+        public float max, min, avg;
+        public string fmt;
+        public Scalar plotColor = Scalar.Blue;
+        List<float> inputList = new List<float>();
+        public CS_Plot_OverTimeSingle(VBtask task) : base(task)
+        {
+            labels[2] = "Plot_OverTime ";
+            desc = "Plot an input variable over time";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = dst2.Resize(task.quarterRes);
+            if (standaloneTest()) plotData = (float)task.color.Mean(task.depthMask)[0];
+            if (inputList.Count() >= dst2.Width) inputList.RemoveAt(0);
+            inputList.Add(plotData);
+            dst2.ColRange(new Range(0, inputList.Count())).SetTo(backColor);
+            max = inputList.Max();
+            min = inputList.Min();
+            for (int i = 0; i < inputList.Count(); i++)
+            {
+                float y = 1 - (inputList[i] - min) / (max - min);
+                y *= dst2.Height - 1;
+                cv.Point c = new cv.Point(i, y);
+                if (c.X < 1) c.X = 1;
+                DrawCircle(dst2, c, 1, plotColor);
+            }
+            if (inputList.Count() > dst2.Width / 8)
+            {
+                float diff = max - min;
+                fmt = diff > 10 ? fmt0 : (diff > 2 ? fmt1 : (diff > 0.5 ? fmt2 : fmt3));
+                for (int i = 0; i < 3; i++)
+                {
+                    string nextText = max.ToString(fmt);
+                    if (i == 1) nextText = inputList.Average().ToString(fmt);
+                    if (i == 2) nextText = min.ToString(fmt);
+                    cv.Point pt = new cv.Point(0, 10);
+                    if (i == 1) pt = new cv.Point(0, dst2.Height / 2 - 5);
+                    if (i == 2) pt = new cv.Point(0, dst2.Height - 3);
+                    Cv2.PutText(dst2, nextText, pt, HersheyFonts.HersheyPlain, 0.7, Scalar.White, 1, task.lineType);
+                }
+            }
+            cv.Point p1 = new cv.Point(0, dst2.Height / 2);
+            cv.Point p2 = new cv.Point(dst2.Width, dst2.Height / 2);
+            dst2.Line(p1, p2, Scalar.White, task.cvFontThickness);
+            if (standaloneTest()) SetTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3);
+        }
+    }
+    public class CS_Plot_OverTimeScalar : CS_Parent
+    {
+        public Scalar plotData;
+        public int plotCount = 3;
+        public List<Plot_OverTimeSingle> plotList = new List<Plot_OverTimeSingle>();
+        Mat_4Click mats = new Mat_4Click();
+        public CS_Plot_OverTimeScalar(VBtask task) : base(task)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                plotList.Add(new Plot_OverTimeSingle());
+                if (i == 0) plotList[i].plotColor = Scalar.Blue;
+                if (i == 1) plotList[i].plotColor = Scalar.Green;
+                if (i == 2) plotList[i].plotColor = Scalar.Red;
+                if (i == 3) plotList[i].plotColor = Scalar.Yellow;
+            }
+            desc = "Plot the requested number of entries in the cv.scalar input";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest()) plotData = task.color.Mean();
+            for (int i = 0; i < Math.Min(plotCount, 4); i++)
+            {
+                plotList[i].plotData = (float)plotData[i];
+                plotList[i].Run(src);
+                mats.mat[i] = plotList[i].dst2;
+            }
+            mats.Run(empty);
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+        }
+    }
+    public class CS_Plot_OverTime : CS_Parent
+    {
+        public Scalar plotData;
+        public int plotCount = 3;
+        public Scalar[] plotColors = { Scalar.Blue, Scalar.LawnGreen, Scalar.Red, Scalar.White };
+        public Scalar backColor = Scalar.DarkGray;
+        public int minScale = 50;
+        public int maxScale = 200;
+        public int plotTriggerRescale = 50;
+        public int columnIndex;
+        public int offChartCount;
+        public List<Scalar> lastXdelta = new List<Scalar>();
+        public bool controlScale; // Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
+        public CS_Plot_OverTime(VBtask task) : base(task)
+        {
+            desc = "Plot an input variable over time";
+            switch (task.WorkingRes.Width)
+            {
+                case 1920:
+                    task.gOptions.setLineWidth(10);
+                    break;
+                case 1280:
+                    task.gOptions.setLineWidth(7);
+                    break;
+                case 640:
+                    task.gOptions.setLineWidth(4);
+                    break;
+                case 320:
+                    task.gOptions.setLineWidth(2);
+                    break;
+                default:
+                    task.gOptions.setLineWidth(1);
+                    break;
+            }
+            task.gOptions.SetDotSize(task.lineWidth);
+        }
+        public void RunCS(Mat src)
+        {
+            const int plotSeriesCount = 100;
+            lastXdelta.Add(plotData);
+            if (columnIndex + task.DotSize >= dst2.Width)
+            {
+                dst2.ColRange(columnIndex, dst2.Width).SetTo(backColor);
+                columnIndex = 1;
+            }
+            dst2.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor);
+            if (standaloneTest()) plotData = task.color.Mean();
+            for (int i = 0; i < plotCount; i++)
+            {
+                if (Math.Floor(plotData[i]) < minScale || Math.Ceiling(plotData[i]) > maxScale)
+                {
+                    offChartCount++;
+                    break;
+                }
+            }
+            // if enough points are off the charted area or if manually requested, then redo the scale.
+            if (offChartCount > plotTriggerRescale && lastXdelta.Count() >= plotSeriesCount && !controlScale)
+            {
+                if (!task.FirstPass)
+                {
+                    maxScale = int.MinValue;
+                    minScale = int.MaxValue;
+                    for (int i = 0; i < lastXdelta.Count(); i++)
+                    {
+                        var nextVal = lastXdelta[i];
+                        for (int j = 0; j < plotCount; j++)
+                        {
+                            if (Math.Floor(nextVal[j]) < minScale) minScale = (int)Math.Floor(nextVal[j]);
+                            if (Math.Floor(nextVal[j]) > maxScale) maxScale = (int)Math.Ceiling(nextVal[j]);
+                        }
+                    }
+                }
+                lastXdelta.Clear();
+                offChartCount = 0;
+                columnIndex = 1; // restart at the left side of the chart
+            }
+            if (lastXdelta.Count() >= plotSeriesCount) lastXdelta.RemoveAt(0);
+            for (int i = 0; i < plotCount; i++)
+            {
+                var y = 1 - (plotData[i] - minScale) / (maxScale - minScale);
+                y *= dst2.Height - 1;
+                var c = new cv.Point(columnIndex - task.DotSize, y - task.DotSize);
+                if (c.X < 1) c.X = 1;
+                DrawCircle(dst2, c, task.DotSize, plotColors[i]);
+            }
+            if (task.heartBeat)
+            {
+                dst2.Line(new cv.Point(columnIndex, 0), new cv.Point(columnIndex, dst2.Height), Scalar.White, 1);
+            }
+            columnIndex += task.DotSize;
+            dst2.Col(columnIndex).SetTo(0);
+            if (standaloneTest()) labels[2] = "RGB Means: blue = " + string.Format(fmt1, plotData[0]) + " green = " + string.Format(fmt1, plotData[1]) + " red = " + string.Format(fmt1, plotData[2]);
+            var lineCount = (int)(maxScale - minScale - 1);
+            if (lineCount > 3 || lineCount < 0) lineCount = 3;
+            AddPlotScale(dst2, minScale, maxScale, lineCount);
+        }
+    }
+    public class CS_Plot_OverTimeFixedScale : CS_Parent
+    {
+        public Scalar plotData;
+        public int plotCount = 3;
+        public Scalar[] plotColors = { Scalar.Blue, Scalar.Green, Scalar.Red, Scalar.White };
+        public Scalar backColor = Scalar.DarkGray;
+        public int minScale = 50;
+        public int maxScale = 200;
+        public int plotTriggerRescale = 50;
+        public int columnIndex;
+        public int offChartCount;
+        public List<Scalar> lastXdelta = new List<Scalar>();
+        public bool controlScale; // Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
+        public bool showScale = true;
+        public bool fixedScale;
+        Mat plotOutput;
+        public CS_Plot_OverTimeFixedScale(VBtask task) : base(task)
+        {
+            plotOutput = new Mat(new cv.Size(320, 180), MatType.CV_8UC3, 0);
+            desc = "Plot an input variable over time";
+            task.gOptions.setLineWidth(1);
+            task.gOptions.SetDotSize(2);
+        }
+        public void RunCS(Mat src)
+        {
+            const int plotSeriesCount = 100;
+            lastXdelta.Add(plotData);
+            if (columnIndex + task.DotSize >= plotOutput.Width)
+            {
+                plotOutput.ColRange(columnIndex, plotOutput.Width).SetTo(backColor);
+                columnIndex = 1;
+            }
+            plotOutput.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor);
+            if (standaloneTest()) plotData = task.color.Mean();
+            for (int i = 0; i < plotCount; i++)
+            {
+                if (Math.Floor(plotData[i]) < minScale || Math.Ceiling(plotData[i]) > maxScale)
+                {
+                    offChartCount++;
+                    break;
+                }
+            }
+            if (!fixedScale)
+            {
+                // if enough points are off the charted area or if manually requested, then redo the scale.
+                if (offChartCount > plotTriggerRescale && lastXdelta.Count() >= plotSeriesCount && !controlScale)
+                {
+                    if (!task.FirstPass)
+                    {
+                        maxScale = int.MinValue;
+                        minScale = int.MaxValue;
+                        for (int i = 0; i < lastXdelta.Count(); i++)
+                        {
+                            var nextVal = lastXdelta[i];
+                            for (int j = 0; j < plotCount; j++)
+                            {
+                                if (Math.Floor(nextVal[j]) < minScale) minScale = (int)Math.Floor(nextVal[j]);
+                                if (Math.Floor(nextVal[j]) > maxScale) maxScale = (int)Math.Ceiling(nextVal[j]);
+                            }
+                        }
+                    }
+                    lastXdelta.Clear();
+                    offChartCount = 0;
+                    columnIndex = 1; // restart at the left side of the chart
+                }
+            }
+            if (lastXdelta.Count() >= plotSeriesCount) lastXdelta.RemoveAt(0);
+            if (task.heartBeat)
+            {
+                plotOutput.Line(new cv.Point(columnIndex, 0), new cv.Point(columnIndex, plotOutput.Height), Scalar.White, task.lineWidth);
+            }
+            for (int i = 0; i < plotCount; i++)
+            {
+                if (plotData[i] != 0)
+                {
+                    var y = 1 - (plotData[i] - minScale) / (maxScale - minScale);
+                    y *= plotOutput.Height - 1;
+                    var c = new cv.Point(columnIndex - task.DotSize, y - task.DotSize);
+                    if (c.X < 1) c.X = 1;
+                    DrawCircle(plotOutput, c, task.DotSize, plotColors[i]);
+                }
+            }
+            columnIndex += 1;
+            plotOutput.Col(columnIndex).SetTo(0);
+            labels[2] = "Blue = " + string.Format(fmt1, plotData[0]) + " Green = " + string.Format(fmt1, plotData[1]) +
+                        " Red = " + string.Format(fmt1, plotData[2]) + " Yellow = " + string.Format(fmt1, plotData[3]);
+            strOut = "Blue = " + string.Format(fmt1, plotData[0]) + "\n";
+            strOut += "Green = " + string.Format(fmt1, plotData[1]) + "\n";
+            strOut += "Red = " + string.Format(fmt1, plotData[2]) + "\n";
+            strOut += "White = " + string.Format(fmt1, plotData[3]) + "\n";
+            SetTrueText(strOut, 3);
+            var lineCount = (int)(maxScale - minScale - 1);
+            if (lineCount > 3 || lineCount < 0) lineCount = 3;
+            if (showScale) AddPlotScale(plotOutput, minScale, maxScale, lineCount);
+            dst2 = plotOutput.Resize(task.WorkingRes);
+        }
+    }
+    public class CS_Plot_Beats : CS_Parent
+    {
+        Plot_OverTimeFixedScale plot = new Plot_OverTimeFixedScale();
+        public CS_Plot_Beats(VBtask task) : base(task)
+        {
+            plot.plotCount = 4;
+            plot.showScale = false;
+            plot.fixedScale = true;
+            plot.minScale = 0;
+            plot.maxScale = 5;
+            desc = "Plot the beats.";
+        }
+        public void RunCS(Mat src)
+        {
+            plot.plotData[0] = task.heartBeat ? 1 : -1;
+            plot.plotData[1] = task.midHeartBeat ? 2 : -1;
+            plot.plotData[2] = task.quarterBeat ? 3 : -1;
+            plot.plotData[3] = task.almostHeartBeat ? 4 : -1;
+            plot.Run(src);
+            dst2 = plot.dst2;
+            strOut = "task.heartBeat (blue) = " + plot.plotData[0] + "\n";
+            strOut += "task.midHeartBeat (green) = " + plot.plotData[1] + "\n";
+            strOut += "task.quarterBeat (red) = " + plot.plotData[2] + "\n";
+            strOut += "task.almostHeartBeat (white) = " + plot.plotData[3] + "\n";
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Plot_Basics_CPP : CS_Parent
+    {
+        public List<double> srcX = new List<double>();
+        public List<double> srcY = new List<double>();
+        public CS_Plot_Basics_CPP(VBtask task) : base(task)
+        {
+            for (int i = 0; i <= (int)task.MaxZmeters; i++) // something to plot if standaloneTest().
+            {
+                srcX.Add(i);
+                srcY.Add(i * i * i);
+            }
+            cPtr = PlotOpenCV_Open();
+            desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)";
+        }
+        public void RunCS(Mat src)
+        {
+            GCHandle handleX = GCHandle.Alloc(srcX.ToArray(), GCHandleType.Pinned);
+            GCHandle handleY = GCHandle.Alloc(srcY.ToArray(), GCHandleType.Pinned);
+            var imagePtr = PlotOpenCV_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), srcX.Count(),
+                                          dst2.Rows, dst2.Cols);
+            handleX.Free();
+            handleY.Free();
+
+            dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr);
+            var maxX = srcX.Max();
+            var minX = srcX.Min();
+            var maxY = srcY.Max();
+            var minY = srcY.Min();
+            labels[2] = "x-Axis: " + minX + " to " + maxX + ", y-axis: " + minY + " to " + maxY;
+        }
+        public void Close()
+        {
+            if (cPtr != (IntPtr)0) cPtr = PlotOpenCV_Close(cPtr);
+        }
+    }
+    public class CS_Plot_Dots : CS_Parent
+    {
+        public List<double> srcX = new List<double>();
+        public List<double> srcY = new List<double>();
+        public Scalar plotColor = Scalar.Yellow;
+        public bool wipeSlate = true;
+        public CS_Plot_Dots(VBtask task) : base(task)
+        {
+            for (int i = 0; i <= 50; i++) // something to plot if standaloneTest().
+            {
+                srcX.Add(i);
+                srcY.Add(i * i * i);
+            }
+            desc = "Plot the requested points...";
+        }
+        public void RunCS(Mat src)
+        {
+            var maxX = srcX.Max();
+            var minX = srcX.Min();
+            var maxY = srcY.Max();
+            var minY = srcY.Min();
+            if (wipeSlate) dst2.SetTo(0);
+            for (int i = 0; i < srcX.Count(); i++)
+            {
+                var pt = new cv.Point(dst2.Width * srcX[i] / maxX, dst2.Height - dst2.Height * srcY[i] / maxY);
+                DrawCircle(dst2, pt, task.DotSize, plotColor);
+            }
+            labels[2] = "x-Axis: " + minX + " to " + maxX + ", y-axis: " + minY + " to " + maxY;
+        }
+    }
+    public class CS_PlyFormat_Basics : CS_Parent
+    {
+        public Options_PlyFormat options = new Options_PlyFormat();
+        string saveFileName;
+        public CS_PlyFormat_Basics(VBtask task) : base(task)
+        {
+            desc = "Create a .ply format file with the pointcloud.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var fileInfo = new FileInfo(options.fileName);
+            if (saveFileName != fileInfo.FullName)
+            {
+                using (var sw = new StreamWriter(fileInfo.FullName))
+                {
+                    saveFileName = fileInfo.FullName;
+                    sw.WriteLine("ply");
+                    sw.WriteLine("format ascii 1.0");
+                    sw.WriteLine("element vertex " + task.pointCloud.Total());
+                    sw.WriteLine("property float x");
+                    sw.WriteLine("property float y");
+                    sw.WriteLine("property float z");
+                    sw.WriteLine("end_header");
+                    for (int y = 0; y < task.pointCloud.Height; y++)
+                    {
+                        for (int x = 0; x < task.pointCloud.Width; x++)
+                        {
+                            var vec = task.pointCloud.Get<Vec3f>(y, x);
+                            sw.WriteLine($"{vec[0]:F3} {vec[1]:F3} {vec[2]:F3}");
+                        }
+                    }
+                }
+            }
+            SetTrueText(".ply format file saved in " + options.fileName);
+        }
+    }
+    public class CS_PlyFormat_PlusRGB : CS_Parent
+    {
+        public Options_PlyFormat options = new Options_PlyFormat();
+        string saveFileName;
+        public CS_PlyFormat_PlusRGB(VBtask task) : base(task)
+        {
+            desc = "Save the pointcloud in .ply format and include the RGB data.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var fileInfo = new FileInfo(options.fileName);
+            if (saveFileName != fileInfo.FullName)
+            {
+                using (var sw = new StreamWriter(fileInfo.FullName))
+                {
+                    saveFileName = fileInfo.FullName;
+                    sw.WriteLine("ply");
+                    sw.WriteLine("format ascii 1.0");
+                    sw.WriteLine("element vertex " + task.pointCloud.Total());
+                    sw.WriteLine("property float x");
+                    sw.WriteLine("property float y");
+                    sw.WriteLine("property float z");
+                    sw.WriteLine("property uchar red");
+                    sw.WriteLine("property uchar green");
+                    sw.WriteLine("property uchar blue");
+                    sw.WriteLine("end_header");
+                    for (int y = 0; y < task.pointCloud.Height; y++)
+                    {
+                        for (int x = 0; x < task.pointCloud.Width; x++)
+                        {
+                            var vec = task.pointCloud.Get<Vec3f>(y, x);
+                            var bgr = src.Get<Vec3b>(y, x);
+                            sw.WriteLine($"{vec[0]:F3} {vec[1]:F3} {vec[2]:F3} {bgr[2]} {bgr[1]} {bgr[0]}");
+                        }
+                    }
+                }
+            }
+            SetTrueText(".ply format file saved in " + options.fileName);
+        }
+    }
+    public class CS_PointCloud_Basics : CS_Parent
+    {
+        Options_PointCloud options = new Options_PointCloud();
+        public int actualCount;
+        public List<cv.Point3f> allPointsH = new List<cv.Point3f>();
+        public List<cv.Point3f> allPointsV = new List<cv.Point3f>();
+        public List<List<cv.Point3f>> hList = new List<List<cv.Point3f>>();
+        public List<List<cv.Point>> xyHList = new List<List<cv.Point>>();
+        public List<List<cv.Point3f>> vList = new List<List<cv.Point3f>>();
+        public List<List<cv.Point>> xyVList = new List<List<cv.Point>>();
+        public CS_PointCloud_Basics(VBtask task) : base(task)
+        {
+            setPointCloudGrid();
+            desc = "Reduce the point cloud to a manageable number points in 3D";
+        }
+        public List<List<cv.Point3f>> findHorizontalPoints(ref List<List<cv.Point>> xyList)
+        {
+            var ptlist = new List<List<cv.Point3f>>();
+            var lastVec = new cv.Point3f();
+            for (int y = 0; y < task.pointCloud.Height; y += task.gridList[0].Height - 1)
+            {
+                var vecList = new List<cv.Point3f>();
+                var xyVec = new List<cv.Point>();
+                for (int x = 0; x < task.pointCloud.Width; x += task.gridList[0].Width - 1)
+                {
+                    var vec = task.pointCloud.Get<cv.Point3f>(y, x);
+                    bool jumpZ = false;
+                    if (vec.Z > 0)
+                    {
+                        if ((Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold && lastVec.X < vec.X) || lastVec.Z == 0)
+                        {
+                            actualCount++;
+                            DrawCircle(dst2, new cv.Point(x, y), task.DotSize, Scalar.White);
+                            vecList.Add(vec);
+                            xyVec.Add(new cv.Point(x, y));
+                        }
+                        else
+                        {
+                            jumpZ = true;
+                        }
+                    }
+                    if (vec.Z == 0 || jumpZ)
+                    {
+                        if (vecList.Count() > 1)
+                        {
+                            ptlist.Add(new List<cv.Point3f>(vecList));
+                            xyList.Add(new List<cv.Point>(xyVec));
+                        }
+                        vecList.Clear();
+                        xyVec.Clear();
+                    }
+                    lastVec = vec;
+                }
+            }
+            return ptlist;
+        }
+        public List<List<cv.Point3f>> findVerticalPoints(ref List<List<cv.Point>> xyList)
+        {
+            var ptlist = new List<List<Point3f>>();
+            var lastVec = new Point3f();
+            for (int x = 0; x < task.pointCloud.Width; x += task.gridList[0].Width - 1)
+            {
+                var vecList = new List<Point3f>();
+                var xyVec = new List<cv.Point>();
+                for (int y = 0; y < task.pointCloud.Height; y += task.gridList[0].Height - 1)
+                {
+                    var vec = task.pointCloud.Get<Point3f>(y, x);
+                    bool jumpZ = false;
+                    if (vec.Z > 0)
+                    {
+                        if ((Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold && lastVec.Y < vec.Y) || lastVec.Z == 0)
+                        {
+                            actualCount++;
+                            DrawCircle(dst2, new cv.Point(x, y), task.DotSize, Scalar.White);
+                            vecList.Add(vec);
+                            xyVec.Add(new cv.Point(x, y));
+                        }
+                        else
+                        {
+                            jumpZ = true;
+                        }
+                    }
+                    if (vec.Z == 0 || jumpZ)
+                    {
+                        if (vecList.Count() > 1)
+                        {
+                            ptlist.Add(new List<cv.Point3f>(vecList));
+                            xyList.Add(new List<cv.Point>(xyVec));
+                        }
+                        vecList.Clear();
+                        xyVec.Clear();
+                    }
+                    lastVec = vec;
+                }
+            }
+            return ptlist;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            dst2 = src;
+            actualCount = 0;
+            xyHList.Clear();
+            hList = findHorizontalPoints(ref xyHList);
+            allPointsH.Clear();
+            foreach (var h in hList)
+            {
+                foreach (var pt in h)
+                {
+                    allPointsH.Add(pt);
+                }
+            }
+            xyVList.Clear();
+            vList = findVerticalPoints(ref xyVList);
+            allPointsV.Clear();
+            foreach (var v in vList)
+            {
+                foreach (var pt in v)
+                {
+                    allPointsV.Add(pt);
+                }
+            }
+            labels[2] = "Point series found = " + (hList.Count() + vList.Count()).ToString();
+        }
+    }
+    public class CS_PointCloud_Point3f : CS_Parent
+    {
+        public CS_PointCloud_Point3f(VBtask task) : base(task)
+        {
+            desc = "Display the point cloud CV_32FC3 format";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = task.pointCloud;
+        }
+    }
+    public class CS_PointCloud_Spin2 : CS_Parent
+        {
+            PointCloud_Spin spin = new PointCloud_Spin();
+            RedCloud_Basics redC = new RedCloud_Basics();
+            RedCloud_Basics redCSpin = new RedCloud_Basics();
+            public CS_PointCloud_Spin2(VBtask task) : base(task)
+            {
+                labels = new string[] { "", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes." };
+                desc = "Spin the RedCloud output exercise";
+            }
+            public void RunCS(Mat src)
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                spin.Run(src);
+                task.pointCloud = spin.dst2;
+                redCSpin.Run(src);
+                dst3 = redCSpin.dst2;
+            }
+        }
+        public class CS_PointCloud_SetupSide : CS_Parent
+        {
+            int arcSize;
+            public CS_PointCloud_SetupSide(VBtask task) : base(task)
+            {
+                arcSize = dst2.Width / 15;
+                labels[2] = "Layout markers for side view";
+                desc = "Create the colorized mat used for side projections";
+            }
+            public void RunCS(Mat src)
+            {
+                float distanceRatio = 1;
+                if (src.Channels() != 3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
+                if (standaloneTest()) dst2.SetTo(0); else src.CopyTo(dst2);
+                DrawCircle(dst2, task.sideCameraPoint, task.DotSize, Scalar.BlueViolet);
+                for (int i = 1; i <= task.MaxZmeters; i++)
+                {
+                    int xmeter = (int)(dst2.Width * i / task.MaxZmeters * distanceRatio);
+                    dst2.Line(new cv.Point(xmeter, 0), new cv.Point(xmeter, dst2.Height), Scalar.AliceBlue, 1);
+                    SetTrueText(i.ToString() + "m", new cv.Point(xmeter - src.Width / 24, dst2.Height - 10));
+                }
+                var cam = task.sideCameraPoint;
+                var marker = new Point2f(dst2.Width / (task.MaxZmeters * distanceRatio), 0);
+                marker.Y = (float)(marker.X * Math.Tan((task.vFov / 2) * Cv2.PI / 180));
+                var markerLeft = new cv.Point(marker.X, cam.Y - marker.Y);
+                var markerRight = new cv.Point(marker.X, cam.Y + marker.Y);
+                int offset = (int)(Math.Sin(task.accRadians.X) * marker.Y);
+                if (task.useGravityPointcloud)
+                {
+                    if (task.accRadians.X > 0)
+                    {
+                        markerLeft.Y -= offset;
+                        markerRight.Y += offset;
+                    }
+                    else
+                    {
+                        markerLeft.Y += offset;
+                        markerRight.Y -= offset;
+                    }
+                    markerLeft = new cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y);
+                    markerLeft = new cv.Point(markerLeft.X * Math.Cos(task.accRadians.Z) - markerLeft.Y * Math.Sin(task.accRadians.Z),
+                                            markerLeft.Y * Math.Cos(task.accRadians.Z) + markerLeft.X * Math.Sin(task.accRadians.Z));
+                    markerLeft = new cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y);
+                    markerRight = new cv.Point((markerRight.X - cam.X) * Math.Cos(task.accRadians.Z) - (markerRight.Y - cam.Y) * Math.Sin(task.accRadians.Z) + cam.X,
+                                            (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y);
+                }
+                if (!standaloneTest())
+                {
+                    DrawCircle(dst2, markerLeft, task.DotSize, Scalar.Red);
+                    DrawCircle(dst2, markerRight, task.DotSize, Scalar.Red);
+                }
+                float startAngle = (180 - task.vFov) / 2;
+                float y = (float)(dst2.Width / Math.Tan(startAngle * Cv2.PI / 180));
+                var fovTop = new cv.Point(dst2.Width, cam.Y - y);
+                var fovBot = new cv.Point(dst2.Width, cam.Y + y);
+                dst2.Line(cam, fovTop, Scalar.White, 1, task.lineType);
+                dst2.Line(cam, fovBot, Scalar.White, 1, task.lineType);
+                DrawCircle(dst2, markerLeft, task.DotSize + 3, Scalar.Red);
+                DrawCircle(dst2, markerRight, task.DotSize + 3, Scalar.Red);
+                dst2.Line(cam, markerLeft, Scalar.Red, 1, task.lineType);
+                dst2.Line(cam, markerRight, Scalar.Red, 1, task.lineType);
+                var labelLocation = new cv.Point(src.Width * 0.02, src.Height * 7 / 8);
+                SetTrueText("vFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new cv.Point(4, dst2.Height * 3 / 4));
+            }
+        }
+        public class CS_PointCloud_SetupTop : CS_Parent
+        {
+            int arcSize;
+            public CS_PointCloud_SetupTop(VBtask task) : base(task)
+            {
+                arcSize = dst2.Width / 15;
+                labels[2] = "Layout markers for top view";
+                desc = "Create the colorize the mat for a topdown projections";
+            }
+            public void RunCS(Mat src)
+            {
+                float distanceRatio = 1;
+                if (src.Channels() != 3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
+                if (standaloneTest()) dst2.SetTo(0); else src.CopyTo(dst2);
+                DrawCircle(dst2, task.topCameraPoint, task.DotSize, Scalar.BlueViolet);
+                for (int i = 1; i <= task.MaxZmeters; i++)
+                {
+                    int ymeter = (int)(dst2.Height - dst2.Height * i / (task.MaxZmeters * distanceRatio));
+                    dst2.Line(new cv.Point(0, ymeter), new cv.Point(dst2.Width, ymeter), Scalar.AliceBlue, 1);
+                    SetTrueText(i.ToString() + "m", new cv.Point(10, ymeter));
+                }
+                var cam = task.topCameraPoint;
+                var marker = new Point2f(cam.X, dst2.Height / task.MaxZmeters);
+                float topLen = (float)(marker.Y * Math.Tan((task.hFov / 2) * Cv2.PI / 180));
+                float sideLen = (float)(marker.Y * Math.Tan((task.vFov / 2) * Cv2.PI / 180));
+                var markerLeft = new cv.Point(cam.X - topLen, marker.Y);
+                var markerRight = new cv.Point(cam.X + topLen, marker.Y);
+                float offset = (float)Math.Sin(task.accRadians.Z) * topLen;
+                if (task.useGravityPointcloud)
+                {
+                    if (task.accRadians.Z > 0)
+                    {
+                        markerLeft.X -= (int)offset;
+                        markerRight.X += (int)offset;
+                    }
+                    else
+                    {
+                        markerLeft.X += (int)offset;
+                        markerRight.X -= (int)offset;
+                    }
+                }
+                float startAngle = (180 - task.hFov) / 2;
+                float x = (float)(dst2.Height / Math.Tan(startAngle * Cv2.PI / 180));
+                var fovRight = new cv.Point(task.topCameraPoint.X + x, 0);
+                var fovLeft = new cv.Point(task.topCameraPoint.X - x, fovRight.Y);
+                dst2.Line(task.topCameraPoint, fovLeft, Scalar.White, 1, task.lineType);
+                DrawCircle(dst2, markerLeft, task.DotSize + 3, Scalar.Red);
+                DrawCircle(dst2, markerRight, task.DotSize + 3, Scalar.Red);
+                dst2.Line(cam, markerLeft, Scalar.Red, 1, task.lineType);
+                dst2.Line(cam, markerRight, Scalar.Red, 1, task.lineType);
+                float shift = (src.Width - src.Height) / 2;
+                var labelLocation = new cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16);
+                SetTrueText("hFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new cv.Point(4, dst2.Height * 7 / 8));
+                DrawLine(dst2, task.topCameraPoint, fovRight, Scalar.White);
+            }
+        }
+        public class CS_PointCloud_Raw_CPP : CS_Parent
+        {
+            byte[] depthBytes;
+            public CS_PointCloud_Raw_CPP(VBtask task) : base(task)
+            {
+                labels[2] = "Top View";
+                labels[3] = "Side View";
+                desc = "Project the depth data onto a top view And side view.";
+                cPtr = SimpleProjectionOpen();
+            }
+            public void RunCS(Mat src)
+            {
+                if (task.FirstPass) Array.Resize(ref depthBytes, (int)(task.pcSplit[2].Total() * task.pcSplit[2].ElemSize()));
+                Marshal.Copy(task.pcSplit[2].Data, depthBytes, 0, depthBytes.Length);
+                var handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned);
+                IntPtr imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject(), 0, task.MaxZmeters, task.pcSplit[2].Height, task.pcSplit[2].Width);
+                dst2 = new Mat(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, imagePtr).CvtColor(ColorConversionCodes.GRAY2BGR);
+                dst3 = new Mat(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(ColorConversionCodes.GRAY2BGR);
+                handleDepth.Free();
+                labels[2] = "Top View (looking down)";
+                labels[3] = "Side View";
+            }
+            public void Close()
+            {
+                SimpleProjectionClose(cPtr);
+            }
+        }
+        public class CS_PointCloud_Raw : CS_Parent
+        {
+            public CS_PointCloud_Raw(VBtask task) : base(task)
+            {
+                labels[2] = "Top View";
+                labels[3] = "Side View";
+                desc = "Project the depth data onto a top view And side view - Using only VB code (too slow.)";
+                cPtr = SimpleProjectionOpen();
+            }
+            public void RunCS(Mat src)
+            {
+                float range = task.MaxZmeters;
+                dst2 = src.EmptyClone().SetTo(Scalar.White);
+                dst3 = dst2.Clone();
+                var black = new Vec3b(0, 0, 0);
+                Parallel.ForEach(task.gridList, roi =>
+                {
+                    for (int y = roi.Y; y < roi.Y + roi.Height; y++)
+                    {
+                        for (int x = roi.X; x < roi.X + roi.Width; x++)
+                        {
+                            byte m = task.depthMask.Get<byte>(y, x);
+                            if (m > 0)
+                            {
+                                float depth = task.pcSplit[2].Get<float>(y, x);
+                                int dy = (int)(src.Height * depth / range);
+                                if (dy < src.Height && dy > 0) dst2.Set<Vec3b>(src.Height - dy, x, black);
+                                int dx = (int)(src.Width * depth / range);
+                                if (dx < src.Width && dx > 0) dst3.Set<Vec3b>(y, dx, black);
+                            }
+                        }
+                    }
+                });
+                labels[2] = "Top View (looking down)";
+                labels[3] = "Side View";
+            }
+            public void Close()
+            {
+                SimpleProjectionClose(cPtr);
+            }
+        }
+        public class CS_PointCloud_Solo : CS_Parent
+        {
+            public HeatMap_Basics heat = new HeatMap_Basics();
+            public CS_PointCloud_Solo(VBtask task) : base(task)
+            {
+                FindCheckBox("Top View (Unchecked Side View)").Checked = true;
+                labels[2] = "Top down view after inrange sampling";
+                labels[3] = "Histogram after filtering For Single-only histogram bins";
+                desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample";
+            }
+            public void RunCS(Mat src)
+            {
+                heat.Run(src);
+                dst2 = heat.dst0.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs();
+                dst3 = heat.dst1.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs();
+            }
+        }
+        public class CS_PointCloud_SoloRegions : CS_Parent
+        {
+            public PointCloud_Solo solo = new PointCloud_Solo();
+            Dilate_Basics dilate = new Dilate_Basics();
+            public CS_PointCloud_SoloRegions(VBtask task) : base(task)
+            {
+                labels[2] = "Top down view before inrange sampling";
+                labels[3] = "Histogram after filtering For Single-only histogram bins";
+                desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample";
+            }
+            public void RunCS(Mat src)
+            {
+                solo.Run(src);
+                dst2 = solo.dst2;
+                dst3 = solo.dst3;
+                dilate.Run(dst3.Clone());
+                dst3 = dilate.dst2;
+            }
+        }
+        public class CS_PointCloud_SurfaceH_CPP : CS_Parent
+        {
+            public HeatMap_Basics heat = new HeatMap_Basics();
+            public Plot_Basics_CPP plot = new Plot_Basics_CPP();
+            public int topRow;
+            public int botRow;
+            public int peakRow;
+            public CS_PointCloud_SurfaceH_CPP(VBtask task) : base(task)
+            {
+                desc = "Find the horizontal surfaces With a projects Of the SideView histogram.";
+            }
+            public void RunCS(Mat src)
+            {
+                heat.Run(src);
+                dst2 = heat.dst3;
+                topRow = 0;
+                botRow = 0;
+                peakRow = 0;
+                int peakVal = 0;
+                for (int i = 0; i < dst2.Height; i++)
+                {
+                    plot.srcX.Add(i);
+                    if (dst2.Channels() == 1) plot.srcY.Add(dst2.Row(i).CountNonZero());
+                    else plot.srcY.Add(dst2.Row(i).CvtColor(ColorConversionCodes.BGR2GRAY).CountNonZero());
+                    if (peakVal < plot.srcY[i])
+                    {
+                        peakVal = (int)plot.srcY[i];
+                        peakRow = i;
+                    }
+                    if (topRow == 0 && plot.srcY[i] > 10) topRow = i;
+                }
+                for (int i = plot.srcY.Count() - 1; i >= 0; i--)
+                {
+                    if (botRow == 0 && plot.srcY[i] > 10) botRow = i;
+                }
+                plot.Run(empty);
+                dst3 = plot.dst2.Transpose();
+                dst3 = dst3.Flip(FlipMode.Y);
+                labels[2] = "Top row = " + topRow.ToString() + " peak row = " + peakRow.ToString() + " bottom row = " + botRow.ToString();
+            }
+        }
+        public class CS_PointCloud_SurfaceH : CS_Parent
+        {
+            public HeatMap_Basics heat = new HeatMap_Basics();
+            public Plot_Histogram plot = new Plot_Histogram();
+            public int topRow;
+            public int botRow;
+            public int peakRow;
+            public CS_PointCloud_SurfaceH(VBtask task) : base(task)
+            {
+                FindCheckBox("Top View (Unchecked Side View)").Checked = true;
+                labels[3] = "Histogram Of Each Of " + task.histogramBins.ToString() + " bins aligned With the sideview";
+                desc = "Find the horizontal surfaces With a projects Of the SideView histogram.";
+            }
+            public void RunCS(Mat src)
+            {
+                heat.Run(src);
+                dst2 = heat.dst2;
+                var hist = new Mat(dst2.Height, 1, MatType.CV_32F, 0);
+                var indexer = hist.GetGenericIndexer<float>();
+                topRow = 0;
+                botRow = 0;
+                peakRow = 0;
+                int peakVal = 0;
+                if (dst2.Channels() != 1) dst1 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+                for (int i = 0; i < dst1.Height; i++)
+                {
+                    indexer[i] = dst1.Row(i).CountNonZero();
+                    if (peakVal < indexer[i])
+                    {
+                        peakVal = (int)indexer[i];
+                        peakRow = i;
+                    }
+                    if (topRow == 0 && indexer[i] > 10) topRow = i;
+                }
+                plot.maxValue = (float)(Math.Floor((double)(peakVal / 100 + 1) * 100));
+                for (int i = hist.Rows - 1; i >= 0; i--)
+                {
+                    if (botRow == 0 && indexer[i] > 10) botRow = i;
+                }
+                plot.Run(hist);
+                dst3 = plot.dst2.Transpose();
+                dst3 = dst3.Flip(FlipMode.Y)[new cv.Rect(0, 0, dst0.Height, dst0.Height)].Resize(dst0.Size());
+                labels[2] = "Top row = " + topRow.ToString() + " peak row = " + peakRow.ToString() + " bottom row = " + botRow.ToString();
+                var ratio = task.mouseMovePoint.Y / (double)dst2.Height;
+                var offset = ratio * dst3.Height;
+                DrawLine(dst2, new cv.Point(0, task.mouseMovePoint.Y), new cv.Point(dst2.Width, task.mouseMovePoint.Y), Scalar.Yellow);
+                dst3.Line(new cv.Point(0, offset), new cv.Point(dst3.Width, offset), Scalar.Yellow, task.lineWidth);
+            }
+        }
+        public class CS_PointCloud_NeighborV : CS_Parent
+        {
+            Options_Neighbors options = new Options_Neighbors();
+            public CS_PointCloud_NeighborV(VBtask task) : base(task)
+            {
+                desc = "Show where vertical neighbor depth values are within Y mm's";
+            }
+            public void RunCS(Mat src)
+            {
+                options.RunVB();
+                if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
+                var tmp32f = new Mat(dst2.Size(), MatType.CV_32F, 0);
+                var r1 = new cv.Rect(options.pixels, 0, dst2.Width - options.pixels, dst2.Height);
+                var r2 = new cv.Rect(0, 0, dst2.Width - options.pixels, dst2.Height);
+                Cv2.Absdiff(src[r1], src[r2], tmp32f[r1]);
+                tmp32f = tmp32f.Threshold(options.threshold, 255, ThresholdTypes.BinaryInv);
+                dst2 = tmp32f.ConvertScaleAbs(255);
+                dst2.SetTo(0, task.noDepthMask);
+                dst2[new cv.Rect(0, dst2.Height - options.pixels, dst2.Width, options.pixels)].SetTo(0);
+                labels[2] = "White: z is within " + (options.threshold * 1000).ToString(fmt0) + " mm's with Y pixel offset " + options.pixels.ToString();
+            }
+        }
+        public class CS_PointCloud_Visualize : CS_Parent
+        {
+            public CS_PointCloud_Visualize(VBtask task) : base(task)
+            {
+                labels = new string[] { "", "", "Pointcloud visualized", "" };
+                desc = "Display the pointcloud as a BGR image.";
+            }
+            public void RunCS(Mat src)
+            {
+                var pcSplit = new Mat[] { task.pcSplit[0].ConvertScaleAbs(255), task.pcSplit[1].ConvertScaleAbs(255), task.pcSplit[2].ConvertScaleAbs(255) };
+                Cv2.Merge(pcSplit, dst2);
+            }
+        }
+        public class CS_PointCloud_PCpointsMask : CS_Parent
+        {
+            public Mat pcPoints;
+            public int actualCount;
+            public CS_PointCloud_PCpointsMask(VBtask task) : base(task)
+            {
+                setPointCloudGrid();
+                dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+                desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi.";
+            }
+            public void RunCS(Mat src)
+            {
+                if (task.optionsChanged) pcPoints = new Mat(task.gridRows, task.gridCols, MatType.CV_32FC3, 0);
+                dst2.SetTo(0);
+                actualCount = 0;
+                float lastMeanZ = 0;
+                for (int y = 0; y < task.gridRows; y++)
+                {
+                    for (int x = 0; x < task.gridCols; x++)
+                    {
+                        var roi = task.gridList[y * task.gridCols + x];
+                        var mean = task.pointCloud[roi].Mean(task.depthMask[roi]);
+                        bool depthPresent = task.depthMask[roi].CountNonZero() > roi.Width * roi.Height / 2;
+                        if ((depthPresent && mean[2] > 0 && Math.Abs(lastMeanZ - mean[2]) < 0.2 && mean[2] < task.MaxZmeters) || (lastMeanZ == 0 && mean[2] > 0))
+                        {
+                            pcPoints.Set<Point3f>(y, x, new Point3f((float)mean[0], (float)mean[1], (float)mean[2]));
+                            actualCount++;
+                            DrawCircle(dst2, new cv.Point(roi.X, roi.Y),  (int)(task.DotSize * Math.Max(mean[2], 1)), 
+                                       Scalar.White);
+                        }
+                        lastMeanZ = (float)mean[2];
+                    }
+                }
+                labels[2] = "PointCloud cv.Point Points found = " + actualCount.ToString();
+            }
+        }
+        public class CS_PointCloud_PCPoints : CS_Parent
+        {
+            public List<Point3f> pcPoints = new List<Point3f>();
+            public CS_PointCloud_PCPoints(VBtask task) : base(task)
+            {
+                setPointCloudGrid();
+                desc = "Reduce the point cloud to a manageable number points in 3D using the mean value";
+            }
+            public void RunCS(Mat src)
+            {
+                int rw = task.gridList[0].Width / 2, rh = task.gridList[0].Height / 2;
+                cv.Scalar red32 = new cv.Scalar(0, 0, 1);
+                cv.Scalar blue32 = new cv.Scalar(1, 0, 0);
+                cv.Scalar white32 = new cv.Scalar(1, 1, 1);
+                cv.Scalar red = Scalar.Red;
+                cv.Scalar blue = Scalar.Blue;
+                cv.Scalar white = Scalar.White;
+                pcPoints.Clear();
+                dst2 = src;
+                foreach (var roi in task.gridList)
+                {
+                    var pt = new cv.Point(roi.X + rw, roi.Y + rh);
+                    var mean = task.pointCloud[roi].Mean(task.depthMask[roi]);
+                    if (mean[2] > 0)
+                    {
+                        if (pt.Y % 3 == 0) pcPoints.Add(new cv.Point3f((float)red32[0], (float) red32[1], (float)red32[2]));
+                        if (pt.Y % 3 == 1) pcPoints.Add(new cv.Point3f((float)blue32[0], (float)blue32[1], (float)blue32[2]));
+                        if (pt.Y % 3 == 2) pcPoints.Add(new cv.Point3f((float)white32[0], (float)white32[1], (float)white32[2]));
+                        pcPoints.Add(new cv.Point3f((float)mean[0], (float)mean[1], (float)mean[2]));
+                        if (pt.Y % 3 == 0) DrawCircle(dst2, pt, task.DotSize, red);
+                        if (pt.Y % 3 == 1) DrawCircle(dst2, pt, task.DotSize, blue);
+                        if (pt.Y % 3 == 2) DrawCircle(dst2, pt, task.DotSize, white);
+                    }
+                }
+                labels[2] = "PointCloud cv.Point Points found = " + (pcPoints.Count() / 2).ToString();
+            }
+        }
+        public class CS_PointCloud_PCPointsPlane : CS_Parent
+        {
+            PointCloud_Basics pcBasics = new PointCloud_Basics();
+            public List<cv.Point3f> pcPoints = new List<cv.Point3f>();
+            public List<cv.Point> xyList = new List<cv.Point>();
+            cv.Point3f white32 = new cv.Point3f(1, 1, 1);
+            public CS_PointCloud_PCPointsPlane(VBtask task) : base(task)
+            {
+                setPointCloudGrid();
+                desc = "Find planes using a reduced set of 3D points and the intersection of vertical and horizontal lines through those points.";
+            }
+            public void RunCS(Mat src)
+            {
+                pcBasics.Run(src);
+                pcPoints.Clear();
+                // points in both the vertical and horizontal lists are likely to designate a plane
+                foreach (var pt in pcBasics.allPointsH)
+                {
+                    if (pcBasics.allPointsV.Contains(pt))
+                    {
+                        pcPoints.Add(white32);
+                        pcPoints.Add(pt);
+                    }
+                }
+                labels[2] = "Point series found = " + (pcPoints.Count() / 2).ToString();
+            }
+        }
+        public class CS_PointCloud_Inspector : CS_Parent
+        {
+            public CS_PointCloud_Inspector(VBtask task) : base(task)
+            {
+                dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+                task.mouseMovePoint.X = dst2.Width / 2;
+                desc = "Inspect x, y, and z values in a row or column";
+            }
+            public void RunCS(Mat src)
+            {
+                int yLines = 20;
+                int cLine = task.mouseMovePoint.X;
+                Mat input = src;
+                if (input.Type() != MatType.CV_32F) input = task.pcSplit[2];
+                Point2f topPt = new Point2f(cLine, 0);
+                Point2f botPt = new Point2f(cLine, dst2.Height);
+                dst2 = task.depthRGB;
+                DrawLine(dst2, topPt, botPt, 255);
+                double stepY = dst2.Height / yLines;
+                SetTrueText("\t   X\t  Y\t  Z", 3);
+                for (int i = 1; i < yLines - 1; i++)
+                {
+                    Point2f pt1 = new Point2f(dst2.Width, (float)(i * stepY));
+                    Point2f pt2 = new Point2f(0, (float)(i * stepY));
+                    DrawLine(dst2, pt1, pt2, Scalar.White);
+                    Point2f pt = new Point2f(cLine, (float)(i * stepY));
+                    Vec3f xyz = task.pointCloud.Get<Vec3f>((int) pt.Y, (int) pt.X);
+                    SetTrueText("Row " + i.ToString() + "\t" + xyz[0].ToString(fmt2) + "\t" + xyz[1].ToString(fmt2) + 
+                                "\t" + xyz[2].ToString(fmt2), new cv.Point(5, (int)pt.Y), 3);
+                }
+                labels[2] = "Values displayed are the point cloud X, Y, and Z values for column " + cLine.ToString();
+                labels[3] = "Move mouse in the image at left to see the point cloud X, Y, and Z values.";
+            }
+        }
+        public class CS_PointCloud_Average : CS_Parent
+        {
+            List<Mat> pcHistory = new List<Mat>();
+            public CS_PointCloud_Average(VBtask task) : base(task)
+            {
+                dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+                desc = "Average all 3 elements of the point cloud - not just depth.";
+            }
+            public void RunCS(Mat src)
+            {
+                pcHistory.Add(task.pointCloud);
+                if (pcHistory.Count() >= task.frameHistoryCount) pcHistory.RemoveAt(0);
+                dst3.SetTo(0);
+                foreach (var m in pcHistory)
+                {
+                    dst3 += m;
+                }
+                dst3 *= 1.0 / pcHistory.Count();
+            }
+        }
+        public class CS_PointCloud_FrustrumTop : CS_Parent
+        {
+            Draw_Frustrum frustrum = new Draw_Frustrum();
+            HeatMap_Basics heat = new HeatMap_Basics();
+            PointCloud_SetupTop setupTop = new PointCloud_SetupTop();
+            public CS_PointCloud_FrustrumTop(VBtask task) : base(task)
+            {
+                task.gOptions.setGravityUsage(false);
+                FindCheckBox("Top View (Unchecked Side View)").Checked = true;
+                labels[3] = "Draw the frustrum from the top view";
+                desc = "Draw the top view of the frustrum";
+            }
+            public void RunCS(Mat src)
+            {
+                frustrum.Run(src);
+                heat.Run(frustrum.dst3.Resize(dst2.Size()));
+                setupTop.Run(heat.dst2);
+                dst2 = setupTop.dst2;
+            }
+        }
+        public class CS_PointCloud_FrustrumSide : CS_Parent
+        {
+            Draw_Frustrum frustrum = new Draw_Frustrum();
+            HeatMap_Basics heat = new HeatMap_Basics();
+            PointCloud_SetupSide setupSide = new PointCloud_SetupSide();
+            public CS_PointCloud_FrustrumSide(VBtask task) : base(task)
+            {
+                task.gOptions.setGravityUsage(false);
+                FindCheckBox("Top View (Unchecked Side View)").Checked = false;
+                labels[2] = "Draw the frustrum from the side view";
+                desc = "Draw the side view of the frustrum";
+            }
+            public void RunCS(Mat src)
+            {
+                frustrum.Run(src);
+                heat.Run(frustrum.dst3.Resize(dst2.Size()));
+                setupSide.Run(heat.dst3);
+                dst2 = setupSide.dst2;
+            }
+        }
+        public class CS_PointCloud_Histograms : CS_Parent
+        {
+            Plot_Histogram2D plot2D = new Plot_Histogram2D();
+            Plot_Histogram plot = new Plot_Histogram();
+            Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
+            Grid_Basics grid = new Grid_Basics();
+            public Mat histogram = new Mat();
+            public CS_PointCloud_Histograms(VBtask task) : base(task)
+            {
+                task.gOptions.setHistogramBins(9);
+                task.redOptions.setXYReduction(true);
+                labels = new string[] { "", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram" };
+                desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options.";
+            }
+            public void RunCS(Mat src)
+            {
+                task.redOptions.Sync(); // make sure settings are consistent
+                Cv2.CalcHist(new Mat[] { task.pointCloud }, task.redOptions.channels, new Mat(), histogram, task.redOptions.channelCount,
+                              task.redOptions.histBinList, task.redOptions.ranges);
+                switch (task.redOptions.PointCloudReduction)
+                {
+                    case 0:
+                    case 1:
+                    case 2: // "X Reduction", "Y Reduction", "Z Reduction"
+                        plot.Run(histogram);
+                        dst2 = plot.histogram;
+                        labels[2] = "2D plot of 1D histogram.";
+                        break;
+                    case 3:
+                    case 4:
+                    case 5: // "XY Reduction", "XZ Reduction", "YZ Reduction"
+                        plot2D.Run(histogram);
+                        dst2 = plot2D.dst2;
+                        labels[2] = "2D plot of 2D histogram.";
+                        break;
+                    case 6: // "XYZ Reduction"
+                        if (dst2.Type() != MatType.CV_8U) dst2 = new Mat(dst2.Size(), MatType.CV_8U);
+                        hcloud.Run(task.pointCloud);
+                        histogram = hcloud.histogram;
+                        float[] histData = new float[histogram.Total()];
+                        Marshal.Copy(histogram.Data, histData, 0, histData.Length);
+                        if (histData.Length > 255 && task.histogramBins > 3)
+                        {
+                            task.histogramBins -= 1;
+                        }
+                        if (histData.Length < 128 && task.histogramBins < task.gOptions.getHistBinBarMax())
+                        {
+                            task.histogramBins += 1;
+                        }
+                        if (task.gridList.Count() < histData.Length && task.gridSize > 2)
+                        {
+                            task.gridSize -= 1;
+                            grid.Run(src);
+                            dst2.SetTo(0);
+                        }
+                        histData[0] = 0; // count of zero pixels - distorts results..
+                        float maxVal = histData.Max();
+                        for (int i = 0; i < task.gridList.Count(); i++)
+                        {
+                            var roi = task.gridList[i];
+                            if (i >= histData.Length)
+                            {
+                                dst2[roi].SetTo(0);
+                            }
+                            else
+                            {
+                                dst2[roi].SetTo(255 * histData[i] / maxVal);
+                            }
+                        }
+                        labels[2] = "2D plot of the resulting 3D histogram.";
+                        break;
+                }
+                var mm = GetMinMax(dst2);
+                dst3 = ShowPalette(dst2 * 255 / mm.maxVal);
+            }
+        }
+        public class CS_PointCloud_ReduceSplit2 : CS_Parent
+        {
+            Reduction_Basics reduction = new Reduction_Basics();
+            public CS_PointCloud_ReduceSplit2(VBtask task) : base(task)
+            {
+                UpdateAdvice(traceName + ": redOptions 'X/Y-Range X100' sliders to test further.");
+                desc = "Reduce the task.pcSplit[2] for use in several algorithms.";
+            }
+            public void RunCS(Mat src)
+            {
+                dst2 = task.pcSplit[2] * 1000;
+                dst2.ConvertTo(dst2, MatType.CV_32S);
+                reduction.Run(dst2);
+                reduction.dst2.ConvertTo(dst1, MatType.CV_32F);
+                dst1 *= 0.001;
+                if (standaloneTest())
+                {
+                    dst3 = task.pointCloud;
+                }
+                else
+                {
+                    var mm = GetMinMax(dst1);
+                    dst1 *= task.MaxZmeters / mm.maxVal;
+                    Cv2.Merge(new Mat[] { task.pcSplit[0], task.pcSplit[1], dst1 }, dst3);
+                }
+            }
+        }
+        public class CS_PointCloud_ReducedTopView : CS_Parent
+        {
+            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+            public CS_PointCloud_ReducedTopView(VBtask task) : base(task)
+            {
+                UpdateAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.");
+                desc = "Create a stable side view of the point cloud";
+            }
+            public void RunCS(Mat src)
+            {
+                split2.Run(task.pointCloud);
+                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsTop, new Mat(), dst1, 2, task.bins2D, task.rangesTop);
+                dst1 = dst1.Flip(FlipMode.X);
+                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+                dst1.ConvertTo(dst2, MatType.CV_8UC1);
+            }
+        }
+        public class CS_PointCloud_ReducedSideView : CS_Parent
+        {
+            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+            public CS_PointCloud_ReducedSideView(VBtask task) : base(task)
+            {
+                desc = "Show where vertical neighbor depth values are within X mm's";
+            }
+            public void RunCS(Mat src)
+            {
+                split2.Run(null);
+                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsSide, new Mat(), dst1, 2, task.bins2D, task.rangesSide);
+                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+                dst1.ConvertTo(dst2, MatType.CV_8UC1);
+            }
+        }
+        public class CS_PointCloud_ReducedViews : CS_Parent
+        {
+            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+            public CS_PointCloud_ReducedViews(VBtask task) : base(task)
+            {
+                labels = new string[] { "", "", "Reduced side view", "Reduced top view" };
+                desc = "Show where vertical neighbor depth values are within X mm's";
+            }
+            public void RunCS(Mat src)
+            {
+                split2.Run(null);
+                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsSide, new Mat(), dst1, 2, task.bins2D, task.rangesSide);
+                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+                dst1.ConvertTo(dst2, MatType.CV_8UC1);
+                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsTop, new Mat(), dst1, 2, task.bins2D, task.rangesTop);
+                dst1 = dst1.Flip(FlipMode.X);
+                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+                dst1.ConvertTo(dst3, MatType.CV_8UC1);
+            }
+        }
+        public class CS_PointCloud_XRangeTest : CS_Parent
+        {
+            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+            public CS_PointCloud_XRangeTest(VBtask task) : base(task)
+            {
+                UpdateAdvice(traceName + ": redOptions 'X-Range X100' slider has high impact.");
+                desc = "Test adjusting the X-Range value to squeeze a histogram into dst2.";
+            }
+            public void RunCS(Mat src)
+            {
+                split2.Run(src);
+                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsTop, new Mat(), dst1, 2, task.bins2D, task.rangesTop);
+                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+                dst1 = dst1.Flip(FlipMode.X);
+                dst1.ConvertTo(dst2, MatType.CV_8UC1);
+            }
+        }
+        public class CS_PointCloud_YRangeTest : CS_Parent
+        {
+            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+            public CS_PointCloud_YRangeTest(VBtask task) : base(task)
+            {
+                UpdateAdvice(traceName + ": redOptions 'Y-Range X100' slider has high impact.");
+                desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2.";
+            }
+            public void RunCS(Mat src)
+            {
+                split2.Run(src);
+                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsSide, new Mat(), dst1, 2, task.bins2D, task.rangesSide);
+                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+                dst1.ConvertTo(dst2, MatType.CV_8UC1);
+            }
+        }
+
+
+    }
