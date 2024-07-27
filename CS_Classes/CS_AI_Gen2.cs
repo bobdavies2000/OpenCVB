@@ -3662,7 +3662,7 @@ namespace CS_Classes
         {
             task.ogl.oglFunction = (int)oCase.sierpinski;
             task.OpenGLTitle = "OpenGL_Functions";
-            //FindSlider("OpenGL cv.Point Size").Value = 3;
+            FindSlider("OpenGL Point Size").Value = 3;
             desc = "Draw the Sierpinski triangle pattern in OpenGL";
         }
         public void RunCS(Mat src)
@@ -3805,7 +3805,7 @@ namespace CS_Classes
         {
             task.ogl.oglFunction = (int)oCase.pcPointsAlone;
             task.OpenGLTitle = "OpenGL_Functions";
-            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            FindSlider("OpenGL Point Size").Value = 10;
             desc = "Display the output of the PointCloud_Basics";
         }
         public void RunCS(Mat src)
@@ -3825,7 +3825,7 @@ namespace CS_Classes
         {
             task.ogl.oglFunction = (int)oCase.pcLines;
             task.OpenGLTitle = "OpenGL_Functions";
-            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            FindSlider("OpenGL Point Size").Value = 10;
             desc = "Draw the 3D lines found from the PCpoints";
         }
         public void RunCS(Mat src)
@@ -3845,7 +3845,7 @@ namespace CS_Classes
         {
             task.ogl.oglFunction = (int)oCase.pcLines;
             task.OpenGLTitle = "OpenGL_Functions";
-            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            FindSlider("OpenGL Point Size").Value = 10;
             desc = "Draw the 3D lines found from the PCpoints";
         }
         public void RunCS(Mat src)
@@ -3883,7 +3883,7 @@ namespace CS_Classes
         {
             task.ogl.oglFunction = (int)oCase.pcPoints;
             task.OpenGLTitle = "OpenGL_Functions";
-            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            FindSlider("OpenGL Point Size").Value = 10;
             desc = "Display the output of the PointCloud_Points";
         }
         public void RunCS(Mat src)
@@ -3903,7 +3903,7 @@ namespace CS_Classes
         {
             task.ogl.oglFunction = (int)oCase.pcPoints;
             task.OpenGLTitle = "OpenGL_Functions";
-            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            FindSlider("OpenGL Point Size").Value = 10;
             desc = "Display the points that are likely to be in a plane - found by both the vertical and horizontal searches";
         }
         public void RunCS(Mat src)
@@ -3922,7 +3922,7 @@ namespace CS_Classes
         public CS_OpenGL_PlaneClusters3D(VBtask task) : base(task)
         {
             task.ogl.oglFunction = (int)oCase.pcPoints;
-            //FindSlider("OpenGL cv.Point Size").Value = 10;
+            FindSlider("OpenGL Point Size").Value = 10;
             labels[3] = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis";
             desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL";
         }
@@ -4624,7 +4624,7 @@ namespace CS_Classes
         {
             task.OpenGLTitle = "OpenGL_Functions";
             task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
-            FindSlider("OpenGL cv.Point Size").Value = 20;
+            FindSlider("OpenGL Point Size").Value = 20;
             desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)";
         }
         public void RunCS(Mat src)
