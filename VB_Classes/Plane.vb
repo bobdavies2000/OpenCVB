@@ -131,55 +131,6 @@ End Class
 
 
 
-
-
-Public Class Plane_FloorStudy : Inherits VB_Parent
-    Public slice As New Structured_SliceH
-    Dim yList As New List(Of Single)
-    Public planeY As Single
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Count threshold that indicates floor", 1, 100, 10)
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        labels = {"", "", "", ""}
-        desc = "Find the floor plane (if present)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Pixel Count threshold that indicates floor")
-        slice.Run(src)
-        dst1 = slice.dst3
-
-        dst0 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim thicknessCMs = task.metersPerPixel * 1000 / 100, rect As cv.Rect, nextY As Single
-        For y = dst0.Height - 2 To 0 Step -1
-            rect = New cv.Rect(0, y, dst0.Width - 1, 1)
-            Dim count = dst0(rect).CountNonZero
-            If count > thresholdSlider.Value Then
-                nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs / 2.5 ' narrow it down to about 1 cm
-                labels(2) = "Y = " + Format(planeY, fmt3) + " separates the floor."
-                SetTrueText(labels(2), 3)
-                Dim sliceMask = task.pcSplit(1).InRange(cv.Scalar.All(planeY), cv.Scalar.All(3.0))
-                dst2 = src
-                dst2.SetTo(cv.Scalar.White, sliceMask)
-                Exit For
-            End If
-        Next
-
-        yList.Add(nextY)
-        planeY = yList.Average()
-        If yList.Count > 20 Then yList.RemoveAt(0)
-        dst1.Line(New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow, slice.options.sliceSize, task.lineType)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 Public Class Plane_OnlyPlanes : Inherits VB_Parent
     Public plane As New Plane_CellColor
@@ -610,5 +561,51 @@ Public Class Plane_Horizontals : Inherits VB_Parent
         dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst2.ConvertTo(dst0, cv.MatType.CV_8U)
         task.color.SetTo(cv.Scalar.White, dst0)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Plane_FloorStudy : Inherits VB_Parent
+    Public slice As New Structured_SliceH
+    Dim yList As New List(Of Single)
+    Public planeY As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Count threshold that indicates floor", 1, 100, 10)
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        labels = {"", "", "", ""}
+        desc = "Find the floor plane (if present)"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static thresholdSlider = FindSlider("Pixel Count threshold that indicates floor")
+        slice.Run(src)
+        dst1 = slice.dst3
+
+        dst0 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim thicknessCMs = task.metersPerPixel * 1000 / 100, rect As cv.Rect, nextY As Single
+        For y = dst0.Height - 2 To 0 Step -1
+            rect = New cv.Rect(0, y, dst0.Width - 1, 1)
+            Dim count = dst0(rect).CountNonZero
+            If count > thresholdSlider.Value Then
+                nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs / 2.5 ' narrow it down to about 1 cm
+                labels(2) = "Y = " + Format(planeY, fmt3) + " separates the floor."
+                SetTrueText(labels(2), 3)
+                Dim sliceMask = task.pcSplit(1).InRange(cv.Scalar.All(planeY), cv.Scalar.All(3.0))
+                dst2 = src
+                dst2.SetTo(cv.Scalar.White, sliceMask)
+                Exit For
+            End If
+        Next
+
+        yList.Add(nextY)
+        planeY = yList.Average()
+        If yList.Count > 20 Then yList.RemoveAt(0)
+        dst1.Line(New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow, slice.options.sliceSize, task.lineType)
     End Sub
 End Class

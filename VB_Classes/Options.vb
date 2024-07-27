@@ -6669,3 +6669,45 @@ Public Class Options_PCA : Inherits VB_Parent
         retainedVariance = retainSlider.value / 100
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_Pendulum : Inherits VB_Parent
+    Public initialize As Boolean
+    Public fps As Integer
+    Public Sub New()
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Reset initial conditions")
+        End If
+
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pendulum FPS", 10, 1000, 300)
+    End Sub
+    Public Sub RunVB()
+        Static initCheck = FindCheckBox("Reset initial conditions")
+        Static timeSlider = FindSlider("Pendulum FPS")
+        If initCheck.checked Then initCheck.checked = False
+        If task.FirstPass Then check.Box(0).Checked = True
+        fps = timeSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_PhaseCorrelate : Inherits VB_Parent
+    Public shiftThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Threshold shift to cause reset of lastFrame", 0, 100, 30)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = FindSlider("Threshold shift to cause reset of lastFrame")
+        shiftThreshold = thresholdSlider.value
+    End Sub
+End Class

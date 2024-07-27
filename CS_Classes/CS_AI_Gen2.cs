@@ -16,6 +16,8 @@ using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.IO.Pipes;
 using System.Windows.Controls;
+using System.Windows;
+using OpenCvSharp.Flann;
 
 namespace CS_Classes
 {
@@ -6113,6 +6115,829 @@ namespace CS_Classes
             custom.colorMap = new Mat(256, 1, MatType.CV_8UC3, palettize.palette);
             custom.Run(img8u);
             dst2 = custom.dst2;
+        }
+    }
+    public class CS_Pendulum_Basics : CS_Parent
+    {
+        float l1 = 150, l2 = 150, m1 = 10, m2 = 10;
+        float o1 = (float)(2 * Cv2.PI / 2);
+        float o2 = (float)(2 * Cv2.PI / 3);
+        float w1, w2;
+        float g = 9.81f;
+        float dw = 2, dh = 4;
+        Point2f center;
+        float fps = 300;
+        Options_Pendulum options = new Options_Pendulum();
+    public CS_Pendulum_Basics(VBtask task) : base(task)
+        {
+            center = new Point2f(dst2.Width / 2, 0);
+            labels = new string[] { "", "", "A double pendulum representation", "Trace of the pendulum end points (p1 and p2)" };
+            desc = "Build a double pendulum";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            float accumulator = 0;
+            if (task.frameCount % 1000 == 0 || task.optionsChanged)
+            {
+                dst2.SetTo(0);
+                dst3.SetTo(0);
+            }
+            if (options.initialize)
+            {
+                l1 = msRNG.Next(50, 300);
+                l2 = msRNG.Next(50, 300);
+                dw = msRNG.Next(2, 4);
+                dh = 2 * dw;
+            }
+            fps = options.fps;
+            float dt = 1 / fps;
+            float alfa1 = (float)((-g * (2 * m1 + m2) * Math.Sin(o1) - g * m2 * Math.Sin(o1 - 2 * o2) - 2 * m2 * Math.Sin(o1 - o2) * (w2 * w2 * l2 + w1 * w1 * l1 * Math.Cos(o1 - o2))) / (l1 * (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2))));
+            float alfa2 = (float)((2 * Math.Sin(o1 - o2)) * (w1 * w1 * l1 * (m1 + m2) + g * (m1 + m2) * Math.Cos(o1) + w2 * w2 * l2 * m2 * Math.Cos(o1 - o2)) / l2 / (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2)));
+            w1 += 10 * dt * alfa1;
+            w2 += 10 * dt * alfa2;
+            o1 += 10 * dt * w1;
+            o2 += 10 * dt * w2;
+            accumulator += dt;
+            Point2f p1 = new Point2f((float)(dst2.Width / 2 + Math.Sin(o1) * l1 + dw * 0.5f) / dw, 
+                                     (float)(dst2.Height - (Math.Cos(o1) * l1 + dh * 0.5f) / dh + dst2.Height / dh / 2));
+            // adjust to fit in the image better
+            p1 = new Point2f(p1.X * 2, p1.Y * 0.5f);
+            Point2f p2 = new Point2f((float)(p1.X + (Math.Sin(o2) * l2 + dw * 0.5f) / dw), 
+                                     (float)(p1.Y - (Math.Cos(o2) * l2 + dh * 0.5f) / dh));
+            DrawLine(dst2, center, p1, task.scalarColors[task.frameCount % 255]);
+            DrawLine(dst2, p1, p2, task.scalarColors[task.frameCount % 255]);
+            DrawCircle(dst3, p1, task.DotSize, task.scalarColors[task.frameCount % 255]);
+            DrawCircle(dst3, p2, task.DotSize, task.scalarColors[task.frameCount % 255]);
+        }
+    }
+
+    public class CS_PhaseCorrelate_Basics : CS_Parent
+    {
+        Mat hanning = new Mat();
+        public cv.Rect stableRect;
+        public cv.Rect srcRect;
+        public cv.Point center;
+        public float radius;
+        public Point2d shift;
+        public Mat lastFrame;
+        public double response;
+        public bool resetLastFrame;
+        Options_PhaseCorrelate options = new Options_PhaseCorrelate();  
+        public CS_PhaseCorrelate_Basics(VBtask task) : base(task)
+        {
+            Cv2.CreateHanningWindow(hanning, dst2.Size(), MatType.CV_64F);
+            desc = "Look for a shift between the current frame and the previous";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            Mat input = src;
+            if (input.Channels() != 1) input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            Mat input64 = new Mat();
+            input.ConvertTo(input64, MatType.CV_64F);
+            if (lastFrame == null) lastFrame = input64.Clone();
+            shift = Cv2.PhaseCorrelate(lastFrame, input64, hanning, out response);
+            if (double.IsNaN(response))
+            {
+                SetTrueText("CS_PhaseCorrelate_Basics has detected NaN's in the input image.", 3);
+            }
+            else
+            {
+                radius = (float)Math.Sqrt(shift.X * shift.X + shift.Y * shift.Y);
+                resetLastFrame = false;
+                if (options.shiftThreshold < radius) resetLastFrame = true;
+                int x1 = shift.X < 0 ? Math.Abs((int)shift.X) : 0;
+                int y1 = shift.Y < 0 ? Math.Abs((int)shift.Y) : 0;
+                stableRect = new cv.Rect(x1, y1, src.Width - Math.Abs((int)shift.X), src.Height - Math.Abs((int)shift.Y));
+                stableRect = ValidateRect(stableRect);
+                if (stableRect.Width > 0 && stableRect.Height > 0)
+                {
+                    int x2 = shift.X < 0 ? 0 : (int)shift.X;
+                    int y2 = shift.Y < 0 ? 0 : (int)shift.Y;
+                    srcRect = ValidateRect(new cv.Rect(x2, y2, stableRect.Width, stableRect.Height));
+                    center = new cv.Point(input64.Cols / 2, input64.Rows / 2);
+                    if (src.Channels() == 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                    dst2 = src.Clone();
+                    DrawCircle(dst2, center, (int)radius, Scalar.Yellow, task.lineWidth + 2);
+                    DrawLine(dst2, center, new cv.Point(center.X + shift.X, center.Y + shift.Y), Scalar.Red, task.lineWidth + 1);
+                    src[srcRect].CopyTo(dst3[stableRect]);
+                    if (radius > 5)
+                    {
+                        DrawCircle(dst3, center, (int) radius, Scalar.Yellow, task.lineWidth + 2);
+                        DrawLine(dst3, center, new cv.Point(center.X + shift.X, center.Y + shift.Y), Scalar.Red, task.lineWidth + 1);
+                    }
+                }
+                else
+                {
+                    resetLastFrame = true;
+                }
+            }
+            labels[3] = resetLastFrame ? "lastFrame Reset" : "Restored lastFrame";
+            if (resetLastFrame) lastFrame = input64;
+            labels[2] = "Shift = (" + shift.X.ToString(fmt2) + "," + shift.Y.ToString(fmt2) + ") with radius = " + radius.ToString(fmt2);
+        }
+    }
+    public class CS_PhaseCorrelate_BasicsTest : CS_Parent
+    {
+        Stabilizer_BasicsRandomInput random = new Stabilizer_BasicsRandomInput();
+        PhaseCorrelate_Basics stable = new PhaseCorrelate_Basics();
+        public CS_PhaseCorrelate_BasicsTest(VBtask task) : base(task)
+        {
+            labels[2] = "Unstable input to PhaseCorrelate_Basics";
+            labels[3] = "Stabilized output from Phase_Correlate_Basics";
+            desc = "Test the PhaseCorrelate_Basics with random movement";
+        }
+        public void RunCS(Mat src)
+        {
+            random.Run(src);
+            stable.Run(random.dst3.Clone());
+            dst2 = stable.dst2;
+            dst3 = stable.dst3;
+            labels[3] = stable.labels[3];
+        }
+    }
+    public class CS_PhaseCorrelate_Depth : CS_Parent
+    {
+        PhaseCorrelate_Basics phaseC = new PhaseCorrelate_Basics();
+        Mat lastFrame;
+        public CS_PhaseCorrelate_Depth(VBtask task) : base(task)
+        {
+            desc = "Use phase correlation on the depth data";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass) lastFrame = task.pcSplit[2].Clone();
+            phaseC.Run(task.pcSplit[2]);
+            dst2 = task.pcSplit[2];
+            Mat tmp = new Mat(dst2.Size(), MatType.CV_32F, 0);
+            if (phaseC.resetLastFrame) task.pcSplit[2].CopyTo(lastFrame);
+            if (double.IsNaN(phaseC.response))
+            {
+                SetTrueText("PhaseCorrelate_Basics has detected NaN's in the input image.", 3);
+            }
+            if (phaseC.srcRect.Width == phaseC.stableRect.Width && phaseC.srcRect.Width != 0)
+            {
+                lastFrame[phaseC.srcRect].CopyTo(tmp[phaseC.stableRect]);
+                labels[2] = phaseC.labels[2];
+                labels[3] = phaseC.labels[3];
+                tmp = tmp.Normalize(0, 255, NormTypes.MinMax);
+                tmp.ConvertTo(dst3, MatType.CV_8UC1);
+                DrawCircle(dst3, phaseC.center, (int)phaseC.radius, Scalar.Yellow, task.lineWidth + 2);
+                DrawLine(dst3, phaseC.center, new cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), Scalar.Red, task.lineWidth + 1);
+            }
+            lastFrame = task.pcSplit[2].Clone();
+        }
+    }
+    public class CS_PhaseCorrelate_HanningWindow : CS_Parent
+    {
+        public CS_PhaseCorrelate_HanningWindow(VBtask task) : base(task)
+        {
+            labels[2] = "Looking down on a bell curve in 2 dimensions";
+            desc = "Show what a Hanning window looks like";
+        }
+        public void RunCS(Mat src)
+        {
+            Cv2.CreateHanningWindow(dst2, src.Size(), MatType.CV_32F);
+        }
+    }
+    public class CS_Photon_Basics : CS_Parent
+    {
+        Hist_Basics hist = new Hist_Basics();
+        Mat lastImage = new cv.Mat();
+        public CS_Photon_Basics(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences" };
+            desc = "With no motion the camera values will show the random photon differences.  Are they random?";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass) lastImage = src;
+            Cv2.Absdiff(src, lastImage, dst1);
+            dst0 = dst1.Reshape(1, dst1.Rows * 3);
+            dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            if (Cv2.CountNonZero(dst0) > 0)
+            {
+                dst2 = dst1.Clone();
+                hist.Run(dst0);
+                dst3 = hist.dst2;
+            }
+            lastImage = src;
+        }
+    }
+    public class CS_Photon_Test : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        List<int>[] counts = new List<int>[4];
+        Mat_4to1 mats = new Mat_4to1();
+        public CS_Photon_Test(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            for (int i = 0; i < counts.Length; i++)
+            {
+                counts[i] = new List<int>();
+            }
+            labels = new string[] { "", "", "5 color levels from reduction (black not shown)", "Selected distribution" };
+            desc = "";
+        }
+        public void RunCS(Mat src)
+        {
+            task.redOptions.setSimpleReductionBar(64); // for now...
+            int reduce = 64;
+            reduction.Run(src);
+            dst1 = reduction.dst2;
+            int testCount = dst2.Width - 1;
+            string strOut = "";
+            for (int i = 0; i < counts.Length; i++)
+            {
+                mats.mat[i] = dst1.InRange(new Scalar(reduce * i), new Scalar(reduce * i));
+                counts[i].Add(Cv2.CountNonZero(mats.mat[i]));
+                if (counts[i].Count() > testCount) counts[i].RemoveAt(0);
+                strOut += "for " + (i * reduce).ToString() + " average = " + counts[i].Average().ToString("###,##0") + " min = " + counts[i].Min().ToString("###,##0.0") + " max = " +
+                          counts[i].Max().ToString("###,##0.0") + "\n";
+            }
+            SetTrueText(strOut, 3);
+            mats.Run(empty);
+            dst2 = mats.dst2;
+            int colWidth = dst2.Width / testCount;
+            dst3.SetTo(0);
+            for (int i = 0; i < counts[0].Count(); i++)
+            {
+                int colTop = 0;
+                for (int j = 0; j < counts.Length; j++)
+                {
+                    int h = (int)((dst2.Height - 1) * (counts[j][i] / dst2.Total())); // extra parens to avoid overflow at high res.
+                    cv.Rect r = new cv.Rect(colWidth * i, colTop, colWidth, h);
+                    if (h > 0)
+                    {
+                        if (j == 0) dst3[r].SetTo(Scalar.Red);
+                        if (j == 1) dst3[r].SetTo(Scalar.LightGreen);
+                        if (j == 2) dst3[r].SetTo(Scalar.Blue);
+                        if (j == 3) dst3[r].SetTo(Scalar.Yellow);
+                    }
+                    colTop += h;
+                }
+            }
+        }
+    }
+    public class CS_Photon_Subtraction : CS_Parent
+    {
+        Hist_Basics hist = new Hist_Basics();
+        Mat lastImage = new cv.Mat();
+        public CS_Photon_Subtraction(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Points where B, G, or R differ", "Histogram showing distribution of differences" };
+            desc = "Same as Photon_Basics but without ignoring sign.";
+        }
+        public void RunCS(Mat src)
+        {
+            src = src.Reshape(1, src.Rows * 3);
+            src.ConvertTo(src, MatType.CV_32F);
+            if (task.FirstPass) lastImage = src.Clone();
+            Mat subOutput = new Mat();
+            Cv2.Subtract(src, lastImage, subOutput);
+            Mat histInput = subOutput.Add(new Scalar(100)).ToMat();
+            hist.Run(histInput);
+            dst2 = hist.dst2;
+            subOutput = subOutput.Reshape(3, dst2.Height);
+            dst1 = subOutput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, ThresholdTypes.Binary);
+            if (Cv2.CountNonZero(dst1) > 0) dst3 = dst1.Clone(); // occasionally the image returned is identical to the last.  hmmm...
+            lastImage = src.Clone();
+        }
+    }
+    public class CS_Plane_Basics : CS_Parent
+    {
+        History_Basics frames = new History_Basics();
+        public CS_Plane_Basics(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions" };
+            desc = "Find the regions that are mostly vertical and mostly horizontal.";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat topHist = new Mat(), sideHist = new Mat(), topBackP = new Mat(), sideBackP = new Mat();
+            Cv2.CalcHist(new Mat[] { task.pointCloud }, task.channelsTop, new Mat(), topHist, 2,
+                          new int[] { dst2.Height, dst2.Width }, task.rangesTop);
+            topHist.Row(0).SetTo(0);
+            Cv2.InRange(topHist, task.projectionThreshold, topHist.Total(), dst1);
+            dst1.ConvertTo(dst1, MatType.CV_32F);
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, dst1, topBackP, task.rangesTop);
+            frames.Run(topBackP);
+            frames.dst2.ConvertTo(dst2, MatType.CV_8U);
+            dst3 = ~dst2;
+            dst3.SetTo(0, task.noDepthMask);
+        }
+    }
+    public class CS_Plane_From3Points : CS_Parent
+    {
+        public Point3f[] input = new Point3f[3];
+        public bool showWork = true;
+        public Point3f cross;
+        public float k;
+        public CS_Plane_From3Points(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Plane Equation", "" };
+            input = new Point3f[] { new Point3f(2, 1, -1), new Point3f(0, -2, 0), new Point3f(1, -1, 2) };
+            desc = "Build a plane equation from 3 points in 3-dimensional space";
+        }
+        public string vbFormatEquation(Vec4f eq)
+        {
+            string s1 = eq.Item1 < 0 ? " - " : " +";
+            string s2 = eq.Item2 < 0 ? " - " : " +";
+            return (eq.Item0 < 0 ? "-" : " ") + Math.Abs(eq.Item0).ToString(fmt3) + "*x " + s1 +
+                   Math.Abs(eq.Item1).ToString(fmt3) + "*y " + s2 +
+                   Math.Abs(eq.Item2).ToString(fmt3) + "*z = " +
+                   eq.Item3.ToString(fmt3) + "\n";
+        }
+        public void RunCS(Mat src)
+        {
+            Point3f v1 = input[1] - input[0];
+            Point3f v2 = input[1] - input[2];
+            cross = crossProduct(v1, v2);
+            k = -cross.X * input[0].X - cross.Y * input[0].Y - cross.Z * input[0].Z;
+            strOut = "Input: " + "\n";
+            for (int i = 0; i < input.Length; i++)
+            {
+                strOut += "p" + i + " = " + input[i].X.ToString(fmt3) + ", " + input[i].Y.ToString(fmt3) + ", " + input[i].Z.ToString(fmt3) + "\n";
+            }
+            strOut += "First " + "\t" + "difference = " + v1.X.ToString(fmt3) + ", " + v1.Y.ToString(fmt3) + ", " + v1.Z.ToString(fmt3) + "\n";
+            strOut += "Second " + "\t" + "difference = " + v2.X.ToString(fmt3) + ", " + v2.Y.ToString(fmt3) + ", " + v2.Z.ToString(fmt3) + "\n";
+            strOut += "Cross Product = " + cross.X.ToString(fmt3) + ", " + cross.Y.ToString(fmt3) + ", " + cross.Z.ToString(fmt3) + "\n";
+            strOut += "k = " + k.ToString() + "\n";
+            strOut += vbFormatEquation(new Vec4f(cross.X, cross.Y, cross.Z, k));
+            string s1 = cross.Y < 0 ? " - " : " + ";
+            string s2 = cross.Z < 0 ? " - " : " + ";
+            strOut += "Plane equation: " + cross.X.ToString(fmt3) + "x" + s1 + Math.Abs(cross.Y).ToString(fmt3) + "y" + s2 +
+                       Math.Abs(cross.Z).ToString(fmt3) + "z + " + (-k).ToString(fmt3) + "\n";
+            if (showWork) SetTrueText(strOut, 2);
+        }
+    }
+    public class CS_Plane_FlatSurfaces : CS_Parent
+    {
+        AddWeighted_Basics addW = new AddWeighted_Basics();
+        Plane_CellColor plane = new Plane_CellColor();
+        public CS_Plane_FlatSurfaces(VBtask task) : base(task)
+        {
+            labels = new string[] { "RedCloud Cell contours", "", "RedCloud cells", "" };
+            addW.src2 = dst2.Clone();
+            desc = "Find all the cells from a RedCloud_Basics output that are likely to be flat";
+        }
+        public void RunCS(Mat src)
+        {
+            plane.Run(src);
+            dst2 = plane.dst2;
+            if (!task.cameraStable || task.heartBeat) addW.src2.SetTo(0);
+            int flatCount = 0;
+            foreach (var rc in task.redCells)
+            {
+                if (rc.depthMean[2] < 1.0) continue; // close objects look like planes.
+                double RMSerror = 0;
+                int pixelCount = 0;
+                for (int y = 0; y < rc.rect.Height; y++)
+                {
+                    for (int x = 0; x < rc.rect.Width; x++)
+                    {
+                        byte val = rc.mask.Get<byte>(y, x);
+                        if (val > 0)
+                        {
+                            if (msRNG.Next(100) < 10)
+                            {
+                                Point3f pt = task.pointCloud[rc.rect].Get<Point3f>(y, x);
+                                // a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
+                                double depth = -(rc.eq[0] * pt.X + rc.eq[1] * pt.Y + rc.eq[3]) / rc.eq[2];
+                                RMSerror += Math.Abs(pt.Z - depth);
+                                pt.Z = (float)depth;
+                                pixelCount++;
+                            }
+                        }
+                    }
+                }
+                if (RMSerror / pixelCount <= plane.options.rmsThreshold)
+                {
+                    addW.src2[rc.rect].SetTo(Scalar.White, rc.mask);
+                    flatCount++;
+                }
+            }
+            addW.Run(task.color);
+            dst3 = addW.dst2;
+            labels[3] = "There were " + flatCount + " RedCloud Cells with an average RMSerror per pixel less than " + (plane.options.rmsThreshold * 100).ToString(fmt0) + " cm";
+        }
+    }
+    public class CS_Plane_OnlyPlanes : CS_Parent
+    {
+        public Plane_CellColor plane = new Plane_CellColor();
+        public List<cv.Point> contours;
+        public CS_Plane_OnlyPlanes(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            labels = new string[] { "", "", "RedCloud Cells", "gCloud reworked with planes instead of depth data" };
+            desc = "Replace the gCloud with planes in every RedCloud cell";
+        }
+        public void buildCloudPlane(rcData rc)
+        {
+            for (int y = 0; y < rc.rect.Height; y++)
+            {
+                for (int x = 0; x < rc.rect.Width; x++)
+                {
+                    if (rc.mask.Get<byte>(y, x) > 0)
+                    {
+                        Point3f pt = task.pointCloud[rc.rect].Get<Point3f>(y, x);
+                        // a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
+                        pt.Z = -(rc.eq[0] * pt.X + rc.eq[1] * pt.Y + rc.eq[3]) / rc.eq[2];
+                        if (rc.minVec.Z <= pt.Z && rc.maxVec.Z >= pt.Z) dst3[rc.rect].Set<Point3f>(y, x, pt);
+                    }
+                }
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            plane.Run(src);
+            dst2 = plane.dst2;
+            dst3.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                if (!plane.options.reuseRawDepthData) buildCloudPlane(rc);
+            }
+            if (plane.options.reuseRawDepthData) dst3 = task.pointCloud;
+            var rcX = task.rc;
+        }
+    }
+    public class CS_Plane_EqCorrelation : CS_Parent
+    {
+        Plane_Points plane = new Plane_Points();
+        public List<float> correlations = new List<float>();
+        public List<Vec4f> equations = new List<Vec4f>();
+        public List<List<cv.Point>> ptList2D = new List<List<cv.Point>>();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_Plane_EqCorrelation(VBtask task) : base(task)
+        {
+            desc = "Classify equations based on the correlation of their coefficients";
+        }
+        public void RunCS(Mat src)
+        {
+            plane.Run(src);
+            dst2 = plane.dst2;
+            if (plane.equations.Count() == 0)
+            {
+                dst0 = src;
+                SetTrueText("Select a RedCloud cell to analyze.", 3);
+                return;
+            }
+            equations = new List<Vec4f>(plane.equations);
+            ptList2D = new List<List<cv.Point>>(plane.ptList2D);
+            correlations.Clear();
+            Mat correlationMat = new Mat();
+            int[] count = new int[plane.equations.Count()];
+            for (int i = 0; i < equations.Count(); i++)
+            {
+                Vec4f p1 = equations[i];
+                Mat data1 = new Mat(4, 1, MatType.CV_32F, new float[] { p1.Item0, p1.Item1, p1.Item2, p1.Item3 });
+                for (int j = i + 1; j < equations.Count(); j++)
+                {
+                    Vec4f p2 = equations[j];
+                    Mat data2 = new Mat(4, 1, MatType.CV_32F, new float[] { p2.Item0, p2.Item1, p2.Item2, p2.Item3 });
+                    Cv2.MatchTemplate(data1, data2, correlationMat, TemplateMatchModes.CCoeffNormed);
+                    float correlation = correlationMat.At<float>(0, 0);
+                    correlations.Add(correlation);
+                    if (correlation >= 0.999) count[i]++;
+                }
+            }
+            List<int> countList = new List<int>(count);
+            int index = countList.IndexOf(countList.Max());
+            Vec4f pt = equations[index];
+            string s1 = pt.Item1 < 0 ? " - " : " + ";
+            string s2 = pt.Item2 < 0 ? " - " : " + ";
+            if (count[index] > plane.equations.Count() / 4)
+            {
+                kalman.kInput = new float[] { pt.Item0, pt.Item1, pt.Item2, pt.Item3 };
+                kalman.Run(empty);
+                strOut = "Normalized Plane equation: " + string.Format(fmt3, kalman.kOutput[0]) + "x" + s1 + string.Format(fmt3, Math.Abs(kalman.kOutput[1])) + "y" + s2 +
+                         string.Format(fmt3, Math.Abs(kalman.kOutput[2])) + "z = " + string.Format(fmt3, -kalman.kOutput[3]) + " with " + count[index] +
+                         " closely matching plane equations." + "\n";
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Plane_CellColor : CS_Parent
+    {
+        public Options_Plane options = new Options_Plane();
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Plane_CellColor(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis" };
+            desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal";
+        }
+        public List<Point3f> buildContourPoints(rcData rc)
+        {
+            List<Point3f> fitPoints = new List<Point3f>();
+            foreach (var pt in rc.contour)
+            {
+                if (pt.X >= rc.rect.Width || pt.Y >= rc.rect.Height) continue;
+                if (rc.mask.At<byte>(pt.Y, pt.X) == 0) continue;
+                fitPoints.Add(task.pointCloud[rc.rect].At<Point3f>(pt.Y, pt.X)); // each contour point is guaranteed to be in the mask and have depth.
+            }
+            return fitPoints;
+        }
+        public List<Point3f> buildMaskPointEq(rcData rc)
+        {
+            List<Point3f> fitPoints = new List<Point3f>();
+            for (int y = 0; y < rc.rect.Height; y++)
+            {
+                for (int x = 0; x < rc.rect.Width; x++)
+                {
+                    if (rc.mask.At<byte>(y, x) != 0) fitPoints.Add(task.pointCloud[rc.rect].At<Point3f>(y, x));
+                }
+            }
+            return fitPoints;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            redC.Run(src);
+            dst2 = redC.dst2;
+            dst3.SetTo(0);
+            List<rcData> newCells = new List<rcData>();
+            var rcX = task.rc;
+            foreach (var rc in task.redCells)
+            {
+                rc.eq = new Vec4f();
+                if (options.useMaskPoints)
+                {
+                    rc.eq = fitDepthPlane(buildMaskPointEq(rc));
+                }
+                else if (options.useContourPoints)
+                {
+                    rc.eq = fitDepthPlane(buildContourPoints(rc));
+                }
+                else if (options.use3Points)
+                {
+                    rc.eq = build3PointEquation(rc);
+                }
+                newCells.Add(rc);
+                dst3[rc.rect].SetTo(new Scalar(Math.Abs(255 * rc.eq.Item0),
+                                                Math.Abs(255 * rc.eq.Item1),
+                                                Math.Abs(255 * rc.eq.Item2)), rc.mask);
+            }
+            task.redCells = new List<rcData>(newCells);
+        }
+    }
+    public class CS_Plane_Points : CS_Parent
+    {
+        Plane_From3Points plane = new Plane_From3Points();
+        public List<Vec4f> equations = new List<Vec4f>();
+        public List<Point3f> ptList = new List<Point3f>();
+        public List<List<cv.Point>> ptList2D = new List<List<cv.Point>>();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        bool needOutput = false;
+        public CS_Plane_Points(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud Basics output - click to highlight a cell", "" };
+            desc = "Detect if a some or all points in a RedCloud cell are in a plane.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            var rc = task.rc;
+            labels[2] = "Selected cell has " + rc.contour.Count() + " points.";
+            // this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
+            rc.contour = contourBuild(rc.mask, ContourApproximationModes.ApproxNone);
+            Point3f pt;
+            List<cv.Point> list2D = new List<cv.Point>();
+            ptList.Clear();
+            for (int i = 0; i < rc.contour.Count(); i++)
+            {
+                pt = task.pointCloud.Get<Point3f>(rc.contour[i].Y, rc.contour[i].X);
+                if (pt.Z > 0)
+                {
+                    ptList.Add(pt);
+                    list2D.Add(rc.contour[i]);
+                    if (ptList.Count() > 100) break;
+                }
+            }
+            if (task.heartBeat || needOutput)
+            {
+                ptList2D.Clear();
+                equations.Clear();
+                needOutput = false;
+                strOut = "";
+                if (ptList.Count() < 3)
+                {
+                    needOutput = true;
+                    strOut = "There weren't enough points in that cell contour with depth.  Select another cell.";
+                }
+                else
+                {
+                    int c = ptList.Count();
+                    for (int i = 0; i < ptList.Count(); i++)
+                    {
+                        List<cv.Point> list2Dinput = new List<cv.Point>();
+                        for (int j = 0; j < 3; j++)
+                        {
+                            int ptIndex = i;
+                            if (j == 1) ptIndex = (i + c / 3) % c;
+                            if (j == 2) ptIndex = (i + 2 * c / 3) % c;
+                            plane.input[j] = ptList[ptIndex];
+                            list2Dinput.Add(list2D[ptIndex]);
+                        }
+                        plane.Run(empty);
+                        strOut += plane.vbFormatEquation(new Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k));
+                        equations.Add(new Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k));
+                        ptList2D.Add(list2Dinput);
+                    }
+                }
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Plane_Histogram : CS_Parent
+    {
+        PointCloud_Solo solo = new PointCloud_Solo();
+        Hist_Basics hist = new Hist_Basics();
+        public double peakCeiling;
+        public double peakFloor;
+        public double ceilingPop;
+        public double floorPop;
+        public CS_Plane_Histogram(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Histogram of Y-Values of the point cloud after masking", "Mask used to isolate histogram input" };
+            desc = "Create a histogram plot of the Y-values in the backprojection of solo points.";
+        }
+        public void RunCS(Mat src)
+        {
+            solo.Run(src);
+            dst3 = solo.dst3;
+            Mat points = dst3.FindNonZero();
+            List<float> yList = new List<float>();
+            for (int i = 0; i < points.Rows; i++)
+            {
+                cv.Point pt = points.At<cv.Point>(i, 0);
+                float yVal = task.pcSplit[1].At<float>(pt.Y, pt.X);
+                if (yVal != 0) yList.Add(yVal);
+            }
+            if (yList.Count() == 0) return;
+            hist.mm.minVal = yList.Min();
+            hist.mm.maxVal = yList.Max();
+            hist.Run(new Mat(yList.Count(), 1, MatType.CV_32F, yList.ToArray()));
+            dst2 = hist.dst2;
+            double binWidth = dst2.Width / task.histogramBins;
+            double rangePerBin = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins;
+            int midHist = task.histogramBins / 2;
+            mmData mm = GetMinMax(hist.histogram[new cv.Rect(0, midHist, 1, midHist)]);
+            floorPop = mm.maxVal;
+            double peak = hist.mm.minVal + (midHist + mm.maxLoc.Y + 1) * rangePerBin;
+            int rX = (midHist + mm.maxLoc.Y) * (int)binWidth;
+            dst2.Rectangle(new cv.Rect(rX, 0, (int)binWidth, dst2.Height), Scalar.Black, task.lineWidth);
+            if (Math.Abs(peak - peakCeiling) > rangePerBin) peakCeiling = peak;
+            mm = GetMinMax(hist.histogram[new cv.Rect(0, 0, 1, midHist)]);
+            ceilingPop = mm.maxVal;
+            peak = hist.mm.minVal + (mm.maxLoc.Y + 1) * rangePerBin;
+            rX = mm.maxLoc.Y * (int)binWidth;
+            dst2.Rectangle(new cv.Rect(rX, 0, (int)binWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            if (Math.Abs(peak - peakFloor) > rangePerBin * 2) peakFloor = peak;
+            labels[3] = "Peak Ceiling = " + string.Format(fmt3, peakCeiling) + " and Peak Floor = " + string.Format(fmt3, peakFloor);
+            SetTrueText("Yellow rectangle is likely floor and black is likely ceiling.");
+        }
+    }
+    public class CS_Plane_Equation : CS_Parent
+    {
+        public rcData rc = new rcData();
+        public string justEquation;
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Plane_Equation(VBtask task) : base(task)
+        {
+            desc = "Compute the coefficients for an estimated plane equation given the rc contour";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                rc = task.rc;
+                if (rc.index == 0) SetTrueText("Select a cell in the image at left.");
+            }
+            int offset = (int)(rc.contour.Count() / 4) - 1;
+            List<float> xList = new List<float>();
+            List<float> yList = new List<float>();
+            List<float> zList = new List<float>();
+            List<float> kList = new List<float>();
+            List<float> dotlist = new List<float>();
+            for (int j = 0; j <= offset - 1; j++)
+            {
+                var p1 = rc.contour[j + offset * 0];
+                var p2 = rc.contour[j + offset * 1];
+                var p3 = rc.contour[j + offset * 2];
+                var p4 = rc.contour[j + offset * 3];
+                var v1 = task.pointCloud[rc.rect].Get<cv.Point3f>(p1.Y, p1.X);
+                var v2 = task.pointCloud[rc.rect].Get<cv.Point3f>(p2.Y, p2.X);
+                var v3 = task.pointCloud[rc.rect].Get<cv.Point3f>(p3.Y, p3.X);
+                var v4 = task.pointCloud[rc.rect].Get<cv.Point3f>(p4.Y, p4.X);
+                var cross1 = crossProduct(v1 - v2, v2 - v3);
+                var cross2 = crossProduct(v1 - v4, v4 - v3);
+                float dot = dotProduct3D(cross1, cross2);
+                dotlist.Add(dot);
+                float k = -cross1.X * v1.X - cross1.Y * v1.Y - cross1.Z * v1.Z;
+                xList.Add(cross1.X);
+                yList.Add(cross1.Y);
+                zList.Add(cross1.Z);
+                kList.Add(k);
+            }
+            if (dotlist.Count() > 0)
+            {
+                int dotIndex = dotlist.IndexOf(dotlist.Max());
+                rc.eq = new Vec4f(xList[dotIndex], yList[dotIndex], zList[dotIndex], kList[dotIndex]);
+            }
+            if (dotlist.Count() > 0)
+            {
+                if (task.heartBeat)
+                {
+                    justEquation = string.Format("{0}*X + {1}*Y + {2}*Z + {3}\n",
+                        rc.eq.Item0.ToString("F3"), rc.eq.Item1.ToString("F3"),
+                        rc.eq.Item2.ToString("F3"), rc.eq.Item3.ToString("F3"));
+                    if (xList.Count() > 0)
+                    {
+                        strOut = "The rc.contour has " + rc.contour.Count() + " points\n";
+                        strOut += "Estimated 3D plane equation:\n";
+                        strOut += justEquation + "\n";
+                    }
+                    else
+                    {
+                        if (!strOut.Contains("Insufficient points"))
+                        {
+                            strOut += "\nInsufficient points or best dot product too low at " + dotlist.Max().ToString("0.00");
+                        }
+                    }
+                    strOut += xList.Count() + " 3D plane equations were tested with an average dot product = " +
+                              dotlist.Average().ToString("0.00");
+                }
+            }
+            if (standaloneTest())
+            {
+                SetTrueText(strOut, 3);
+                dst3.SetTo(0);
+                DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+            }
+        }
+    }
+    public class CS_Plane_Verticals : CS_Parent
+    {
+        PointCloud_Solo solo = new PointCloud_Solo();
+        History_Basics frames = new History_Basics();
+        public CS_Plane_Verticals(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] {
+            "RGB image with highlights for likely vertical surfaces over X frames.",
+            "Heatmap top view", "Single frame backprojection of red areas in the heatmap",
+            "Thresholded heatmap top view mask"
+        };
+            desc = "Use a heatmap to isolate vertical walls - incomplete!";
+        }
+        public void RunCS(Mat src)
+        {
+            solo.Run(src);
+            dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total());
+            dst1 = new Mat(dst1.Size(), MatType.CV_32FC1, 0);
+            solo.heat.dst0.CopyTo(dst1, dst3);
+            dst1.ConvertTo(dst1, MatType.CV_32FC1);
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, dst1, dst2, task.rangesTop);
+            frames.Run(dst2);
+            frames.dst2.ConvertTo(dst2, MatType.CV_8U);
+            dst2 = frames.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            dst2.ConvertTo(dst0, MatType.CV_8U);
+            task.color.SetTo(Scalar.White, dst0);
+        }
+    }
+    public class CS_Plane_Horizontals : CS_Parent
+    {
+        PointCloud_Solo solo = new PointCloud_Solo();
+        History_Basics frames = new History_Basics();
+        public CS_Plane_Horizontals(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] {
+            "RGB image with highlights for likely floor or ceiling over X frames.",
+            "Heatmap side view", "Single frame backprojection areas in the heatmap",
+            "Thresholded heatmap side view mask"
+        };
+            desc = "Use the solo points to isolate horizontal surfaces - floor or ceiling or table tops.";
+        }
+        public void RunCS(Mat src)
+        {
+            solo.Run(src);
+            dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total());
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
+            solo.heat.dst1.CopyTo(dst1, dst3);
+            dst1.ConvertTo(dst1, MatType.CV_32FC1);
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsSide, dst1, dst2, task.rangesSide);
+            frames.Run(dst2);
+            frames.dst2.ConvertTo(dst2, MatType.CV_8U);
+            dst2 = frames.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            dst2.ConvertTo(dst0, MatType.CV_8U);
+            task.color.SetTo(Scalar.White, dst0);
         }
     }
 

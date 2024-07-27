@@ -8,20 +8,13 @@ Public Class Pendulum_Basics : Inherits VB_Parent
     Dim dw As Single = 2, dh As Single = 4
     Dim center = New cv.Point2f(dst2.Width / 2, 0)
     Dim fps As Single = 300
+    Dim options = New Options_Pendulum()
     Public Sub New()
-        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Reset initial conditions")
-            check.Box(0).Checked = True
-        End If
-
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pendulum FPS", 10, 1000, 300)
         labels = {"", "", "A double pendulum representation", "Trace of the pendulum end points (p1 and p2)"}
         desc = "Build a double pendulum"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static initCheck = FindCheckBox("Reset initial conditions")
-        Static timeSlider = FindSlider("Pendulum FPS")
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         Dim accumulator As Single
 
@@ -30,15 +23,14 @@ Public Class Pendulum_Basics : Inherits VB_Parent
             dst3.SetTo(0)
         End If
 
-        If initCheck.checked Then
+        If options.initialize Then
             l1 = msRNG.Next(50, 300)
             l2 = msRNG.Next(50, 300)
             dw = msRNG.Next(2, 4)
             dh = 2 * dw
-            initCheck.checked = False
         End If
 
-        fps = timeSlider.Value
+        fps = options.fps
         Dim dt = 1 / fps
 
         Dim alfa1 = (-g * (2 * m1 + m2) * Math.Sin(o1) - g * m2 * Math.Sin(o1 - 2 * o2) - 2 * m2 * Math.Sin(o1 - o2) * (w2 * w2 * l2 + w1 * w1 * l1 * Math.Cos(o1 - o2))) / (l1 * (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2)))
@@ -56,10 +48,10 @@ Public Class Pendulum_Basics : Inherits VB_Parent
         p1 = New cv.Point2f(p1.X * 2, p1.Y * 0.5)
         Dim p2 = New cv.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5) / dh)
 
-        DrawLine(dst2, center, p1, task.HighlightColor)
-        DrawLine(dst2, p1, p2, task.HighlightColor)
+        DrawLine(dst2, center, p1, task.scalarColors(task.frameCount Mod 255))
+        DrawLine(dst2, p1, p2, task.scalarColors(task.frameCount Mod 255))
 
-        DrawCircle(dst3,p1, task.DotSize, task.HighlightColor)
-        DrawCircle(dst3,p2, task.DotSize, task.HighlightColor)
+        DrawCircle(dst3, p1, task.DotSize, task.scalarColors(task.frameCount Mod 255))
+        DrawCircle(dst3, p2, task.DotSize, task.scalarColors(task.frameCount Mod 255))
     End Sub
 End Class

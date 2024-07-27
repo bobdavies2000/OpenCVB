@@ -124,11 +124,12 @@ Public Class PhaseCorrelate_Depth : Inherits VB_Parent
 
             tmp = tmp.Normalize(0, 255, cv.NormTypes.MinMax)
             tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
-            dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             dst3.Circle(phaseC.center, phaseC.radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
             dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
         End If
+
+        lastFrame = task.pcSplit(2).Clone
     End Sub
 End Class
 
