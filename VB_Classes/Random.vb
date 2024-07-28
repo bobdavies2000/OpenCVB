@@ -221,27 +221,15 @@ End Class
 
 
 Public Class Random_NormalDist : Inherits VB_Parent
+    Dim options As New Options_NormalDist
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Random_NormalDist Blue Mean", 0, 255, 125)
-            sliders.setupTrackBar("Random_NormalDist Green Mean", 0, 255, 25)
-            sliders.setupTrackBar("Random_NormalDist Red Mean", 0, 255, 180)
-            sliders.setupTrackBar("Random_NormalDist Stdev", 0, 255, 50)
-        End If
-
-        If check.Setup(traceName) Then check.addCheckBox("Use Grayscale image")
-
         desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blueSlider = FindSlider("Random_NormalDist Blue Mean")
-        Static greenSlider = FindSlider("Random_NormalDist Green Mean")
-        Static redSlider = FindSlider("Random_NormalDist Red Mean")
-        Static stdevSlider = FindSlider("Random_NormalDist Stdev")
+        options.RunVB()
 
-        Static grayCheck = FindCheckBox("Use Grayscale image")
-        If grayCheck.checked And dst2.Channels() <> 1 Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        cv.Cv2.Randn(dst2, New cv.Scalar(blueSlider.Value, greenSlider.Value, redSlider.Value), cv.Scalar.All(stdevSlider.Value))
+        If options.grayChecked And dst2.Channels() <> 1 Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        cv.Cv2.Randn(dst2, New cv.Scalar(options.blueVal, options.greenVal, options.redVal), cv.Scalar.All(options.stdev))
     End Sub
 End Class
 
@@ -397,22 +385,22 @@ End Class
 ' https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/custom-distribution-of-random-numbers
 Public Class Random_MonteCarlo : Inherits VB_Parent
     Public plot As New Plot_Histogram
+    Dim options As New Options_MonteCarlo
     Public outputRandom = New cv.Mat(New cv.Size(1, 4000), cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New()
         plot.maxValue = 100
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of bins", 1, 255, 91)
         desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static binSlider = FindSlider("Number of bins")
-        Dim dimension = binSlider.Value
-        Dim histogram = New cv.Mat(dimension, 1, cv.MatType.CV_32F, 0)
+        options.RunVB()
+
+        Dim histogram = New cv.Mat(options.dimension, 1, cv.MatType.CV_32F, 0)
         For i = 0 To outputRandom.rows - 1
             While (1)
                 Dim r1 = msRNG.NextDouble()
                 Dim r2 = msRNG.NextDouble()
                 If r2 < r1 Then
-                    Dim index = CInt(dimension * r1)
+                    Dim index = CInt(options.dimension * r1)
                     histogram.Set(Of Single)(index, 0, histogram.Get(Of Single)(index, 0) + 1)
                     outputRandom.set(Of Integer)(i, 0, index)
                     Exit While
@@ -470,31 +458,24 @@ End Class
 
 ' https://github.com/spmallick/learnopencv/tree/master/
 Public Class Random_StaticTV : Inherits VB_Parent
+    Dim options As New Options_StaticTV
     Public Sub New()
-
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Range of noise to apply (from 0 to this value)", 0, 255, 50)
-            sliders.setupTrackBar("Percentage of pixels to include noise", 0, 100, 20)
-        End If
-
         task.drawRect = New cv.Rect(10, 10, 50, 50)
         labels(2) = "Draw anywhere to select a test region"
         labels(3) = "Resized selection rectangle in dst2"
         desc = "Imitate an old TV appearance using randomness."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static valSlider = FindSlider("Range of noise to apply (from 0 to this value)")
-        Static threshSlider = FindSlider("Percentage of pixels to include noise")
-        Dim val = valSlider.Value
-        Dim thresh = threshSlider.Value
+        options.RunVB()
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst3 = dst2(task.drawRect)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
-                If 255 * Rnd() <= thresh Then
+                If 255 * Rnd() <= options.thresh Then
                     Dim v = dst3.Get(Of Byte)(y, x)
-                    dst3.Set(Of Byte)(y, x, If(2 * Rnd() = 0, Math.Min(v + (val + 1) * Rnd(), 255), Math.Max(v - (val + 1) * Rnd(), 0)))
+                    dst3.Set(Of Byte)(y, x, If(2 * Rnd() = 0, Math.Min(v + (options.val + 1) * Rnd(), 255),
+                                                              Math.Max(v - (options.val + 1) * Rnd(), 0)))
                 End If
             Next
         Next
@@ -644,18 +625,10 @@ End Class
 
 
 Public Class Random_Clusters : Inherits VB_Parent
-    Public numClusters = 3
-    Public numPoints
-    Public stdev As Single
     Public clusterLabels As New List(Of List(Of Integer))
     Public clusters As New List(Of List(Of cv.Point2f))
+    Dim options As New Options_Clusters
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number of Clusters", 1, 10, 9)
-            sliders.setupTrackBar("Number of points per cluster", 1, 100, 20)
-            sliders.setupTrackBar("Cluster stdev", 0, 100, 10)
-        End If
-
         task.scalarColors(0) = cv.Scalar.Yellow
         task.scalarColors(1) = cv.Scalar.Blue
         task.scalarColors(2) = cv.Scalar.Red
@@ -664,30 +637,24 @@ Public Class Random_Clusters : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If Not task.heartBeat Then Exit Sub
-
-        Static clustSlider = FindSlider("Number of Clusters")
-        Static numSlider = FindSlider("Number of points per cluster")
-        Static stdevSlider = FindSlider("Cluster stdev")
-        numClusters = clustSlider.Value
-        numPoints = numSlider.Value
-        stdev = stdevSlider.Value
+        options.RunVB()
 
         Dim ptMat As cv.Mat = New cv.Mat(1, 1, cv.MatType.CV_32FC2)
         dst2.SetTo(0)
         clusters.Clear()
         clusterLabels.Clear()
-        For i = 0 To numClusters - 1
+        For i = 0 To options.numClusters - 1
             Dim mean = New cv.Scalar(msRNG.Next(dst2.Width / 8, dst2.Width * 7 / 8), msRNG.Next(dst2.Height / 8, dst2.Height * 7 / 8), 0)
             Dim cList As New List(Of cv.Point2f)
             Dim labelList As New List(Of Integer)
-            For j = 0 To numPoints - 1
-                cv.Cv2.Randn(ptMat, mean, cv.Scalar.All(stdev))
+            For j = 0 To options.numPoints - 1
+                cv.Cv2.Randn(ptMat, mean, cv.Scalar.All(options.stdev))
                 Dim pt = ptMat.Get(Of cv.Point2f)(0, 0)
                 If pt.X < 0 Then pt.X = 0
                 If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y >= dst2.Height Then pt.Y = dst2.Height - 1
-                DrawCircle(dst2,pt, task.DotSize, task.scalarColors(i Mod 256))
+                DrawCircle(dst2, pt, task.DotSize, task.scalarColors(i Mod 256))
 
                 cList.Add(pt)
                 labelList.Add(i)

@@ -15,11 +15,9 @@ using System.Threading;
 using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.IO.Pipes;
-using System.Windows.Controls;
-using System.Windows;
-using OpenCvSharp.Flann;
 using System.Text.RegularExpressions;
 using System.Numerics;
+using System.Windows.Controls;
 
 namespace CS_Classes
 {
@@ -9707,7 +9705,3264 @@ namespace CS_Classes
                          string.Format("{0:F3}", diffq.Z) + "\t");
         }
     }
+    public class CS_Random_Basics : CS_Parent
+    {
+        public List<cv.Point2f> PointList = new List<cv.Point2f>();
+        public cv.Rect range;
+        public Options_Random options = new Options_Random();
 
+        public CS_Random_Basics(VBtask task) : base(task)
+        {
+            range = new cv.Rect(0, 0, dst2.Cols, dst2.Rows);
+            desc = "Create a uniform random mask with a specified number of pixels.";
+        }
 
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            int sizeRequest = options.count;
+            if (!task.paused)
+            {
+                PointList.Clear();
+                Random msRNG = new Random();
+                while (PointList.Count < sizeRequest)
+                {
+                    PointList.Add(new cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
+                                              msRNG.Next(range.Y, range.Y + range.Height)));
+                }
+                if (standaloneTest())
+                {
+                    dst2.SetTo(0);
+                    foreach (var pt in PointList)
+                    {
+                        DrawCircle(dst2, pt, task.DotSize, Scalar.Yellow);
+                    }
+                }
+            }
+        }
+    }
+    public class CS_Random_Point2d : CS_Parent
+    {
+        public List<cv.Point2d> PointList { get; } = new List<cv.Point2d>();
+        public cv.Rect range;
+        Options_Random options = new Options_Random();
+        public CS_Random_Point2d(VBtask task) : base(task)
+        {
+            range = new cv.Rect(0, 0, dst2.Cols, dst2.Rows);
+            desc = "Create a uniform random mask with a specificied number of pixels.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            PointList.Clear();
+            if (!task.paused)
+            {
+                for (int i = 0; i < options.count; i++)
+                {
+                    PointList.Add(new Point2d(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)));
+                }
+                if (standaloneTest())
+                {
+                    dst2.SetTo(0);
+                    foreach (var pt in PointList)
+                    {
+                        DrawCircle(dst2, new cv.Point2f((float)pt.X, (float)pt.Y), task.DotSize, Scalar.Yellow, -1);
+                    }
+                }
+            }
+        }
+    }
+    public class CS_Random_Enumerable : CS_Parent
+    {
+        public Options_Random options = new Options_Random();
+        public Point2f[] points;
+        public CS_Random_Enumerable(VBtask task) : base(task)
+        {
+            FindSlider("Random Pixel Count").Value = 100;
+            desc = "Create an enumerable list of points using a lambda function";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            points = Enumerable.Range(0, options.count).Select(i =>
+                new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))).ToArray();
+            dst2.SetTo(0);
+            foreach (var pt in points)
+            {
+                DrawCircle(dst2, pt, task.DotSize, Scalar.Yellow);
+            }
+        }
+    }
+    public class CS_Random_Basics3D : CS_Parent
+    {
+        public Point3f[] Points3f;
+        Options_Random options = new Options_Random();
+        public List<cv.Point3f> PointList { get; } = new List<cv.Point3f>();
+        public float[] ranges;
+        public CS_Random_Basics3D(VBtask task) : base(task)
+        {
+            ranges = new float[] { 0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters, 0, task.MaxZmeters };
+            FindSlider("Random Pixel Count").Value = 20;
+            FindSlider("Random Pixel Count").Maximum = dst2.Cols * dst2.Rows;
+            desc = "Create a uniform random mask with a specificied number of pixels.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            PointList.Clear();
+            if (!task.paused)
+            {
+                for (int i = 0; i < options.count; i++)
+                {
+                    PointList.Add(new Point3f(msRNG.Next((int)ranges[0], (int)ranges[1]),
+                                                          msRNG.Next((int)ranges[2], (int)ranges[3]),
+                                                          msRNG.Next((int)ranges[4], (int)ranges[5])));
+                }
+                if (standaloneTest())
+                {
+                    dst2.SetTo(0);
+                    foreach (var pt in PointList)
+                    {
+                        DrawCircle(dst2, new Point2f(pt.X, pt.Y), task.DotSize, Scalar.Yellow);
+                    }
+                }
+                Points3f = PointList.ToArray();
+            }
+        }
+    }
+    public class CS_Random_Basics4D : CS_Parent
+    {
+        public Vec4f[] vec4f;
+        public List<Vec4f> PointList { get; } = new List<Vec4f>();
+        public float[] ranges;
+        Options_Random options = new Options_Random();
+        System.Windows.Forms.TrackBar countSlider;
+        public CS_Random_Basics4D(VBtask task) : base(task)
+        {
+            ranges = new float[] { 0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters, 0, task.MaxZmeters };
+            desc = "Create a uniform random mask with a specificied number of pixels.";
+            countSlider = FindSlider("Random Pixel Count");
+        }
+        public void RunCS(Mat src)
+        {
+            PointList.Clear();
+            var count = countSlider.Value;
+            if (!task.paused)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    PointList.Add(new Vec4f(msRNG.Next((int)ranges[0], (int)ranges[1]),
+                                                 msRNG.Next((int)ranges[2], (int)ranges[3]),
+                                                 msRNG.Next((int)ranges[4], (int)ranges[5]),
+                                                 msRNG.Next((int)ranges[6], (int)ranges[7])));
+                }
+                if (standaloneTest())
+                {
+                    dst2.SetTo(0);
+                    foreach (var v in PointList)
+                    {
+                        DrawCircle(dst2, new Point2f(v[0], v[1]), task.DotSize, Scalar.Yellow);
+                    }
+                }
+                vec4f = PointList.ToArray();
+            }
+        }
+    }
+    public class CS_Random_Shuffle : CS_Parent
+    {
+        RNG myRNG = new RNG();
+        public CS_Random_Shuffle(VBtask task) : base(task)
+        {
+            desc = "Use randomShuffle to reorder an image.";
+        }
+        public void RunCS(Mat src)
+        {
+            src.CopyTo(dst2);
+            Cv2.RandShuffle(dst2, 1.0, ref myRNG); // don't remove that myRNG!  It will fail in RandShuffle.
+            labels[2] = "Random_shuffle - wave at camera";
+        }
+    }
+    public class CS_Random_LUTMask : CS_Parent
+    {
+        Random_Basics random = new Random_Basics();
+        KMeans_Image km = new KMeans_Image();
+        Mat lutMat;
+        public CS_Random_LUTMask(VBtask task) : base(task)
+        {
+            desc = "Use a random Look-Up-Table to modify few colors in a kmeans image.";
+            labels[3] = "kmeans run to get colors";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat || task.frameCount < 10)
+            {
+                random.Run(empty);
+                lutMat = new Mat(new cv.Size(1, 256), MatType.CV_8UC3, 0);
+                int lutIndex = 0;
+                km.Run(src);
+                dst2 = km.dst2;
+                foreach (var pt in random.PointList)
+                {
+                    lutMat.Set(lutIndex, 0, dst2.Get<Vec3b>((int)pt.Y, (int)pt.X));
+                    lutIndex++;
+                    if (lutIndex >= lutMat.Rows) break;
+                }
+            }
+            dst3 = src.LUT(lutMat);
+            labels[2] = "Using kmeans colors with interpolation";
+        }
+    }
+    public class CS_Random_UniformDist : CS_Parent
+    {
+        double minVal = 0, maxVal = 255;
+        public CS_Random_UniformDist(VBtask task) : base(task)
+        {
+            desc = "Create a uniform distribution.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            Cv2.Randu(dst2, minVal, maxVal);
+        }
+    }
+    public class CS_Random_NormalDist : CS_Parent
+    {
+        Options_NormalDist options = new Options_NormalDist();
+        public CS_Random_NormalDist(VBtask task) : base(task)
+        {
+            desc = "Create a normal distribution in all 3 colors with a variable standard deviation.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.grayChecked && dst2.Channels() != 1) dst2 = new Mat(dst2.Size(), MatType.CV_8U);
+            Cv2.Randn(dst2, new Scalar(options.blueVal, options.greenVal, options.redVal), Scalar.All(options.stdev));
+        }
+    }
+    public class CS_Random_CheckUniformSmoothed : CS_Parent
+    {
+        Hist_Basics histogram = new Hist_Basics();
+        Random_UniformDist rUniform = new Random_UniformDist();
+        public CS_Random_CheckUniformSmoothed(VBtask task) : base(task)
+        {
+            desc = "Display the smoothed histogram for a uniform distribution.";
+        }
+        public void RunCS(Mat src)
+        {
+            rUniform.Run(src);
+            dst2 = rUniform.dst2;
+            histogram.plot.maxRange = 255;
+            histogram.Run(dst2);
+            dst3 = histogram.dst2;
+        }
+    }
+    public class CS_Random_CheckUniformDist : CS_Parent
+    {
+        Hist_Graph histogram = new Hist_Graph();
+        Random_UniformDist rUniform = new Random_UniformDist();
+        public CS_Random_CheckUniformDist(VBtask task) : base(task)
+        {
+            desc = "Display the histogram for a uniform distribution.";
+        }
+        public void RunCS(Mat src)
+        {
+            rUniform.Run(src);
+            dst2 = rUniform.dst2;
+            histogram.plotRequested = true;
+            histogram.Run(dst2);
+            dst3 = histogram.dst2;
+        }
+    }
+    public class CS_Random_CheckNormalDist : CS_Parent
+    {
+        Hist_Graph histogram = new Hist_Graph();
+        Random_NormalDist normalDist = new Random_NormalDist();
+        public CS_Random_CheckNormalDist(VBtask task) : base(task)
+        {
+            desc = "Display the histogram for a Normal distribution.";
+        }
+        public void RunCS(Mat src)
+        {
+            normalDist.Run(src);
+            dst3 = normalDist.dst2;
+            histogram.plotRequested = true;
+            histogram.Run(dst3);
+            dst2 = histogram.dst2;
+        }
+    }
+    public class CS_Random_CheckNormalDistSmoothed : CS_Parent
+    {
+        Hist_Basics histogram = new Hist_Basics();
+        Random_NormalDist normalDist = new Random_NormalDist();
+        public CS_Random_CheckNormalDistSmoothed(VBtask task) : base(task)
+        {
+            histogram.plot.minRange = 1;
+            desc = "Display the histogram for a Normal distribution.";
+        }
+        public void RunCS(Mat src)
+        {
+            normalDist.Run(src);
+            dst3 = normalDist.dst2;
+            histogram.Run(dst3);
+            dst2 = histogram.dst2;
+        }
+    }
+    public class CS_Random_PatternGenerator_CPP : CS_Parent
+    {
+        public CS_Random_PatternGenerator_CPP(VBtask task) : base(task)
+        {
+            cPtr = Random_PatternGenerator_Open();
+            desc = "Generate random patterns for use with 'Random Pattern Calibration'";
+        }
+        public void RunCS(Mat src)
+        {
+            byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+            IntPtr imagePtr = Random_PatternGenerator_Run(cPtr, src.Rows, src.Cols);
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = Random_PatternGenerator_Close(cPtr);
+        }
+    }
+    public class CS_Random_CustomDistribution : CS_Parent
+    {
+        public Mat inputCDF; // place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
+        public Mat outputRandom = new Mat(10000, 1, MatType.CV_32S, 0); // allocate the desired number of random numbers - size can be just one to get the next random value
+        public Mat outputHistogram;
+        public Plot_Histogram plot = new Plot_Histogram();
+        public CS_Random_CustomDistribution(VBtask task) : base(task)
+        {
+            float[] loadedDice = { 1, 3, 0.5f, 0.5f, 0.75f, 0.25f };
+            inputCDF = new Mat(loadedDice.Length, 1, MatType.CV_32F, loadedDice);
+            desc = "Create a custom random number distribution from any histogram";
+        }
+        public void RunCS(Mat src)
+        {
+            float lastValue = inputCDF.At<float>(inputCDF.Rows - 1, 0);
+            if (!(lastValue > 0.99 && lastValue <= 1.0)) // convert the input histogram to a cdf.
+            {
+                inputCDF *= 1 / (inputCDF.Sum()[0]);
+                for (int i = 1; i < inputCDF.Rows; i++)
+                {
+                    inputCDF.Set<float>(i, 0, inputCDF.At<float>(i - 1, 0) + inputCDF.At<float>(i, 0));
+                }
+            }
+            outputHistogram = new Mat(inputCDF.Size(), MatType.CV_32F, 0);
+            int size = outputHistogram.Rows;
+            for (int i = 0; i < outputRandom.Rows; i++)
+            {
+                double uniformR1 = msRNG.NextDouble();
+                for (int j = 0; j < size; j++)
+                {
+                    if (uniformR1 < inputCDF.At<float>(j, 0))
+                    {
+                        outputHistogram.Set<float>(j, 0, outputHistogram.At<float>(j, 0) + 1);
+                        outputRandom.Set<int>(i, 0, j); // the output is an integer reflecting a bin in the histogram.
+                        break;
+                    }
+                }
+            }
+            plot.Run(outputHistogram);
+            dst2 = plot.dst2;
+        }
+    }
+    public class CS_Random_MonteCarlo : CS_Parent
+    {
+        public Plot_Histogram plot = new Plot_Histogram();
+        Options_MonteCarlo options = new Options_MonteCarlo();
+        public Mat outputRandom = new Mat(new cv.Size(1, 4000), MatType.CV_32S, 0); // allocate the desired number of random numbers - size can be just one to get the next random value
+        public CS_Random_MonteCarlo(VBtask task) : base(task)
+        {
+            plot.maxValue = 100;
+            desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Mat histogram = new Mat(options.dimension, 1, MatType.CV_32F, 0);
+            for (int i = 0; i < outputRandom.Rows; i++)
+            {
+                while (true)
+                {
+                    double r1 = msRNG.NextDouble();
+                    double r2 = msRNG.NextDouble();
+                    if (r2 < r1)
+                    {
+                        int index = (int)(options.dimension * r1);
+                        histogram.Set<float>(index, 0, histogram.At<float>(index, 0) + 1);
+                        outputRandom.Set<int>(i, 0, index);
+                        break;
+                    }
+                }
+            }
+            if (standaloneTest())
+            {
+                plot.Run(histogram);
+                dst2 = plot.dst2;
+            }
+        }
+    }
+    public class CS_Random_CustomHistogram : CS_Parent
+    {
+        public Random_CustomDistribution random = new Random_CustomDistribution();
+        public Hist_Simple hist = new Hist_Simple();
+        public Mat saveHist;
+        public CS_Random_CustomHistogram(VBtask task) : base(task)
+        {
+            random.outputRandom = new Mat(1000, 1, MatType.CV_32S, 0);
+            labels[2] = "Histogram of the grayscale image";
+            labels[3] = "Custom random distribution that reflects dst2 image";
+            desc = "Create a random number distribution that reflects histogram of a grayscale image";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            hist.plot.maxValue = 0; // we are sharing the plot with the code below...
+            hist.Run(src);
+            dst2 = hist.dst2.Clone();
+            saveHist = hist.plot.histogram.Clone();
+            random.inputCDF = saveHist; // it will convert the histogram into a cdf where the last value must be near one.
+            random.Run(src);
+            if (standaloneTest())
+            {
+                hist.plot.maxValue = 100;
+                hist.plot.Run(random.outputHistogram);
+                dst3 = hist.plot.dst2;
+            }
+        }
+    }
+    public class CS_Random_StaticTV : CS_Parent
+    {
+        Options_StaticTV options = new Options_StaticTV();
+        public CS_Random_StaticTV(VBtask task) : base(task)
+        {
+            task.drawRect = new cv.Rect(10, 10, 50, 50);
+            labels[2] = "Draw anywhere to select a test region";
+            labels[3] = "Resized selection rectangle in dst2";
+            desc = "Imitate an old TV appearance using randomness.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst3 = dst2[task.drawRect];
+            for (int y = 0; y < dst3.Height; y++)
+            {
+                for (int x = 0; x < dst3.Width; x++)
+                {
+                    if (255 * msRNG.NextDouble() <= options.thresh)
+                    {
+                        byte v = dst3.At<byte>(y, x);
+                        dst3.Set<byte>(y, x, (byte)(msRNG.NextDouble() * 2 == 0 ? Math.Min(v + 
+                             (options.val + 1) * msRNG.NextDouble(), 255) : Math.Max(v - (options.val + 1) * msRNG.NextDouble(), 0)));
+                    }
+                }
+            }
+        }
+    }
+    public class CS_Random_StaticTVFaster : CS_Parent
+    {
+        Random_UniformDist random = new Random_UniformDist();
+        Mat_4to1 mats = new Mat_4to1();
+        Random_StaticTV options = new Random_StaticTV();
+        TrackBar valSlider;
+        TrackBar percentSlider;
+        public CS_Random_StaticTVFaster(VBtask task) : base(task)
+        {
+            valSlider = FindSlider("Range of noise to apply (from 0 to this value)");
+            percentSlider = FindSlider("Percentage of pixels to include noise");
+            labels[3] = "Changed pixels, add/sub mask, plusMask, minusMask";
+            desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            random.Run(src);
+            mats.mat[0] = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, ThresholdTypes.Binary);
+            Mat nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, ThresholdTypes.BinaryInv);
+            Mat valMat = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            Cv2.Randu(valMat, 0, valSlider.Value);
+            valMat.SetTo(0, nochangeMask);
+            random.Run(src);
+            Mat plusMask = random.dst2.Threshold(128, 255, ThresholdTypes.Binary);
+            Mat minusMask = random.dst2.Threshold(128, 255, ThresholdTypes.BinaryInv);
+            mats.mat[2] = plusMask;
+            mats.mat[3] = minusMask;
+            mats.mat[1] = (plusMask + minusMask).ToMat().SetTo(0, nochangeMask);
+            Cv2.Add(dst2, valMat, dst2, plusMask);
+            Cv2.Subtract(dst2, valMat, dst2, minusMask);
+            mats.Run(empty);
+            dst3 = mats.dst2;
+        }
+    }
+    public class CS_Random_StaticTVFastSimple : CS_Parent
+    {
+        Random_UniformDist random = new Random_UniformDist();
+        Random_StaticTV options = new Random_StaticTV();
+        TrackBar valSlider;
+        TrackBar percentSlider;
+        public CS_Random_StaticTVFastSimple(VBtask task) : base(task)
+        {
+            valSlider = FindSlider("Range of noise to apply (from 0 to this value)");
+            percentSlider = FindSlider("Percentage of pixels to include noise");
+            desc = "Remove diagnostics from the faster algorithm to simplify code.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            random.Run(src);
+            var nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, ThresholdTypes.BinaryInv);
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U);
+            Cv2.Randu(dst3, 0, valSlider.Value);
+            dst3.SetTo(0, nochangeMask);
+            var tmp = new Mat(dst2.Size(), MatType.CV_8U);
+            Cv2.Randu(tmp, 0, 255);
+            var plusMask = tmp.Threshold(128, 255, ThresholdTypes.Binary);
+            var minusMask = tmp.Threshold(128, 255, ThresholdTypes.BinaryInv);
+            Cv2.Add(dst2, dst3, dst2, plusMask);
+            Cv2.Subtract(dst2, dst3, dst2, minusMask);
+            labels[3] = "Mat of random values < " + valSlider.Value.ToString();
+        }
+    }
+    public class CS_Random_KalmanPoints : CS_Parent
+    {
+        Random_Basics random = new Random_Basics();
+        Kalman_Basics kalman = new Kalman_Basics();
+        List<cv.Point2f> targetSet = new List<cv.Point2f>();
+        List<cv.Point2f> currSet = new List<cv.Point2f>();
+        bool refreshPoints = true;
+        public CS_Random_KalmanPoints(VBtask task) : base(task)
+        {
+            var offset = dst2.Width / 5;
+            random.range = new cv.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2));
+            FindSlider("Random Pixel Count").Value = 10;
+            desc = "Smoothly transition a random point from location to location.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (refreshPoints)
+            {
+                random.Run(empty);
+                targetSet = new List<cv.Point2f>(random.PointList);
+                currSet = new List<cv.Point2f>(random.PointList); // just to get the updated size
+                refreshPoints = false;
+                if (targetSet.Count() * 2 != kalman.kInput.Length)
+                    Array.Resize(ref kalman.kInput, targetSet.Count() * 2);
+            }
+            for (int i = 0; i < targetSet.Count(); i++)
+            {
+                var pt = targetSet[i];
+                kalman.kInput[i * 2] = pt.X;
+                kalman.kInput[i * 2 + 1] = pt.Y;
+            }
+            kalman.Run(src);
+            for (int i = 0; i < kalman.kOutput.Count(); i += 2)
+            {
+                currSet[i / 2] = new cv.Point(kalman.kOutput[i], kalman.kOutput[i + 1]);
+            }
+            dst2.SetTo(0);
+            for (int i = 0; i < currSet.Count(); i++)
+            {
+                DrawCircle(dst2, currSet[i], task.DotSize + 2, Scalar.Yellow);
+                DrawCircle(dst2, targetSet[i], task.DotSize + 2, Scalar.Red);
+            }
+            bool noChanges = true;
+            for (int i = 0; i < currSet.Count(); i++)
+            {
+                var pt = currSet[i];
+                if (Math.Abs(targetSet[i].X - pt.X) > 1 && Math.Abs(targetSet[i].Y - pt.Y) > 1)
+                    noChanges = false;
+            }
+            if (noChanges) refreshPoints = true;
+        }
+    }
+    public class CS_Random_Clusters : CS_Parent
+    {
+        public List<List<int>> clusterLabels = new List<List<int>>();
+        public List<List<cv.Point2f>> clusters = new List<List<cv.Point2f>>();
+        Options_Clusters options = new Options_Clusters();
+        public CS_Random_Clusters(VBtask task) : base(task)
+        {
+            task.scalarColors[0] = Scalar.Yellow;
+            task.scalarColors[1] = Scalar.Blue;
+            task.scalarColors[2] = Scalar.Red;
+            labels = new string[] { "", "", "Colorized sets", "" };
+            desc = "Use OpenCV's randN API to create a cluster around a random mean with a requested stdev";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            options.RunVB();
+            var ptMat = new Mat(1, 1, MatType.CV_32FC2);
+            dst2.SetTo(0);
+            clusters.Clear();
+            clusterLabels.Clear();
+            for (int i = 0; i < options.numClusters; i++)
+            {
+                var mean = new Scalar(msRNG.Next(dst2.Width / 8, dst2.Width * 7 / 8), msRNG.Next(dst2.Height / 8, dst2.Height * 7 / 8), 0);
+                var cList = new List<cv.Point2f>();
+                var labelList = new List<int>();
+                for (int j = 0; j < options.numPoints; j++)
+                {
+                    Cv2.Randn(ptMat, mean, Scalar.All(options.stdev));
+                    var pt = ptMat.Get<cv.Point2f>(0, 0);
+                    if (pt.X < 0) pt.X = 0;
+                    if (pt.X >= dst2.Width) pt.X = dst2.Width - 1;
+                    if (pt.Y < 0) pt.Y = 0;
+                    if (pt.Y >= dst2.Height) pt.Y = dst2.Height - 1;
+                    DrawCircle(dst2, pt, task.DotSize, task.scalarColors[i % 256]);
+                    cList.Add(pt);
+                    labelList.Add(i);
+                }
+                clusterLabels.Add(labelList);
+                clusters.Add(cList);
+            }
+        }
+    }
+    public class CS_Rectangle_Basics : CS_Parent
+    {
+        public List<cv.Rect> rectangles = new List<cv.Rect>();
+        public List<RotatedRect> rotatedRectangles = new List<RotatedRect>();
+        public Options_Draw options = new Options_Draw();
+        public CS_Rectangle_Basics(VBtask task) : base(task)
+        {
+            desc = "Draw the requested number of rectangles.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.heartBeat)
+            {
+                dst2.SetTo(Scalar.Black);
+                rectangles.Clear();
+                rotatedRectangles.Clear();
+                for (int i = 0; i < options.drawCount; i++)
+                {
+                    var nPoint = new Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height));
+                    var width = msRNG.Next(0, src.Cols - (int)nPoint.X - 1);
+                    var height = msRNG.Next(0, src.Rows - (int)nPoint.Y - 1);
+                    var eSize = new Size2f((float)msRNG.Next(0, src.Cols - (int)nPoint.X - 1), (float)msRNG.Next(0, src.Rows - (int)nPoint.Y - 1));
+                    var angle = 180.0f * (float)(msRNG.Next(0, 1000) / 1000.0);
+                    var nextColor = new Scalar(task.vecColors[i][0], task.vecColors[i][1], task.vecColors[i][2]);
+                    var rr = new RotatedRect(nPoint, eSize, angle);
+                    var r = new cv.Rect((int)nPoint.X, (int)nPoint.Y, width, height);
+                    if (options.drawRotated)
+                    {
+                        DrawRotatedRect(rr, dst2, nextColor);
+                    }
+                    else
+                    {
+                        Cv2.Rectangle(dst2, r, nextColor, options.drawFilled);
+                    }
+                    rotatedRectangles.Add(rr);
+                    rectangles.Add(r);
+                }
+            }
+        }
+    }
+    public class CS_Rectangle_Rotated : CS_Parent
+    {
+        public Rectangle_Basics rectangle = new Rectangle_Basics();
+        public CS_Rectangle_Rotated(VBtask task) : base(task)
+        {
+            FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = true;
+            desc = "Draw the requested number of rectangles.";
+        }
+        public void RunCS(Mat src)
+        {
+            rectangle.Run(src);
+            dst2 = rectangle.dst2;
+        }
+    }
+    public class CS_Rectangle_Overlap : CS_Parent
+    {
+        public cv.Rect rect1;
+        public cv.Rect rect2;
+        public cv.Rect enclosingRect;
+        Rectangle_Basics draw = new Rectangle_Basics();
+        public CS_Rectangle_Overlap(VBtask task) : base(task)
+        {
+            FindSlider("DrawCount").Value = 2;
+            desc = "Test if 2 rectangles overlap";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            if (standaloneTest())
+            {
+                draw.Run(src);
+                dst2 = draw.dst2;
+            }
+            dst3.SetTo(0);
+            if (draw.options.drawRotated)
+            {
+                var r1 = draw.rotatedRectangles[0];
+                var r2 = draw.rotatedRectangles[1];
+                rect1 = r1.BoundingRect();
+                rect2 = r2.BoundingRect();
+                DrawRotatedOutline(r1, dst3, Scalar.Yellow);
+                DrawRotatedOutline(r2, dst3, Scalar.Yellow);
+            }
+            else
+            {
+                rect1 = draw.rectangles[0];
+                rect2 = draw.rectangles[1];
+            }
+            enclosingRect = new cv.Rect();
+            if (rect1.IntersectsWith(rect2))
+            {
+                enclosingRect = rect1.Union(rect2);
+                dst3.Rectangle(enclosingRect, Scalar.White, 4);
+                labels[3] = "Rectangles intersect - red marks overlapping rectangle";
+                dst3.Rectangle(rect1.Intersect(rect2), Scalar.Red, -1);
+            }
+            else
+            {
+                labels[3] = "Rectangles don't intersect";
+            }
+            dst3.Rectangle(rect1, Scalar.Yellow, 2);
+            dst3.Rectangle(rect2, Scalar.Yellow, 2);
+        }
+    }
+
+    public class CS_Rectangle_Union : CS_Parent
+    {
+        Rectangle_Basics draw = new Rectangle_Basics();
+        public List<cv.Rect> inputRects = new List<cv.Rect>();
+        public cv.Rect allRect; // a rectangle covering all the input
+        public CS_Rectangle_Union(VBtask task) : base(task)
+        {
+            desc = "Create a rectangle that contains all the input rectangles";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                var countSlider = FindSlider("DrawCount");
+                var rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)");
+                rotatedCheck.Enabled = false;
+                countSlider.Value = msRNG.Next(2, 10);
+                labels[2] = "Input rectangles = " + draw.rectangles.Count();
+                draw.Run(src);
+                dst2 = draw.dst2;
+                inputRects = new List<cv.Rect>(draw.rectangles);
+            }
+            else
+            {
+                dst2.SetTo(0);
+                foreach (var r in inputRects)
+                {
+                    dst2.Rectangle(r, Scalar.Yellow, 1);
+                }
+                labels[2] = "Input rectangles = " + inputRects.Count();
+            }
+            if (inputRects.Count() == 0) return;
+            allRect = inputRects[0];
+            for (int i = 1; i < inputRects.Count(); i++)
+            {
+                var r = inputRects[i];
+                if (r.X < 0) r.X = 0;
+                if (r.Y < 0) r.Y = 0;
+                if (allRect.Width > 0 && allRect.Height > 0)
+                {
+                    allRect = r.Union(allRect);
+                    if (allRect.X + allRect.Width >= dst2.Width) allRect.Width = dst2.Width - allRect.X;
+                    if (allRect.Height >= dst2.Height) allRect.Height = dst2.Height - allRect.Y;
+                }
+            }
+            if (allRect.X + allRect.Width >= dst2.Width) allRect.Width = dst2.Width - allRect.X;
+            if (allRect.Y + allRect.Height >= dst2.Height) allRect.Height = dst2.Height - allRect.Y;
+            dst2.Rectangle(allRect, Scalar.Red, 2);
+        }
+    }
+    public class CS_Rectangle_MultiOverlap : CS_Parent
+    {
+        public List<cv.Rect> inputRects = new List<cv.Rect>();
+        public List<cv.Rect> outputRects = new List<cv.Rect>();
+        Rectangle_Basics draw = new Rectangle_Basics();
+        System.Windows.Forms.CheckBox rotatedCheck;
+        TrackBar countSlider;
+        public CS_Rectangle_MultiOverlap(VBtask task) : base(task)
+        {
+            rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)");
+            countSlider = FindSlider("DrawCount");
+            desc = "Given a group of rectangles, merge all the rectangles that overlap";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                rotatedCheck.Enabled = task.toggleOnOff;
+                countSlider.Value = msRNG.Next(2, 10);
+                labels[2] = "Input rectangles = " + countSlider.Value.ToString();
+                draw.Run(src);
+                dst2 = draw.dst2;
+                inputRects = draw.rectangles;
+            }
+            bool unionAdded;
+            do
+            {
+                unionAdded = false;
+                for (int i = 0; i < inputRects.Count(); i++)
+                {
+                    var r1 = inputRects[i];
+                    int rectCount = inputRects.Count();
+                    for (int j = i + 1; j < inputRects.Count(); j++)
+                    {
+                        var r2 = inputRects[j];
+                        if (r1.IntersectsWith(r2))
+                        {
+                            inputRects.RemoveAt(j);
+                            inputRects.RemoveAt(i);
+                            inputRects.Add(r1.Union(r2));
+                            unionAdded = true;
+                            break;
+                        }
+                    }
+                    if (rectCount != inputRects.Count()) break;
+                }
+            } while (unionAdded);
+            outputRects = inputRects;
+            if (standaloneTest())
+            {
+                dst3.SetTo(0);
+                foreach (var r in outputRects)
+                {
+                    dst3.Rectangle(r, Scalar.Yellow, 2);
+                }
+                dst3 = dst2 * 0.5 + dst3;
+                labels[3] = outputRects.Count().ToString() + " output rectangles";
+            }
+        }
+    }
+    public class CS_Rectangle_EnclosingPoints : CS_Parent
+    {
+        public List<cv.Point2f> pointList = new List<cv.Point2f>();
+        public CS_Rectangle_EnclosingPoints(VBtask task) : base(task)
+        {
+            desc = "Build an enclosing rectangle for the supplied pointlist";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                pointList = QuickRandomPoints(20);
+                dst2.SetTo(0);
+                foreach (var pt in pointList)
+                {
+                    DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+                }
+            }
+            var minRect = Cv2.MinAreaRect(pointList.ToArray());
+            DrawRotatedOutline(minRect, dst2, Scalar.Yellow);
+        }
+    }
+    public class CS_Rectangle_Intersection : CS_Parent
+    {
+        public List<cv.Rect> inputRects = new List<cv.Rect>();
+        Rectangle_Basics draw = new Rectangle_Basics();
+        public List<cv.Rect> enclosingRects = new List<cv.Rect>();
+        List<cv.Rect> otherRects = new List<cv.Rect>();
+        System.Windows.Forms.CheckBox rotatedCheck;
+        TrackBar countSlider;
+        public CS_Rectangle_Intersection(VBtask task) : base(task)
+        {
+            rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)");
+            countSlider = FindSlider("DrawCount");
+            desc = "Test if any number of rectangles intersect.";
+        }
+        cv.Rect findEnclosingRect(List<cv.Rect> rects, int proximity)
+        {
+            cv.Rect enclosing = rects[0];
+            List<cv.Rect> newOther = new List<cv.Rect>();
+            for (int i = 1; i < rects.Count(); i++)
+            {
+                cv.Rect r1 = rects[i];
+                if (enclosing.IntersectsWith(r1) || Math.Abs(r1.X - enclosing.X) < proximity)
+                {
+                    enclosing = enclosing.Union(r1);
+                }
+                else
+                {
+                    newOther.Add(r1);
+                }
+            }
+            otherRects = new List<cv.Rect>(newOther);
+            return enclosing;
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                if (task.heartBeat)
+                {
+                    rotatedCheck.Checked = task.toggleOnOff;
+                    countSlider.Value = msRNG.Next(2, 10);
+                    labels[2] = "Input rectangles = " + countSlider.Value.ToString();
+                    draw.Run(src);
+                    dst2 = draw.dst2;
+                    inputRects = new List<cv.Rect>(draw.rectangles);
+                }
+            }
+            else
+            {
+                dst2.SetTo(0);
+                foreach (Rect r in inputRects)
+                {
+                    dst2.Rectangle(r, Scalar.Yellow, 1);
+                }
+            }
+            SortedList<float, cv.Rect> sortedRect = new SortedList<float, cv.Rect>(new compareAllowIdenticalSingleInverted());
+            foreach (Rect r in inputRects)
+            {
+                sortedRect.Add(r.Width * r.Height, r);
+            }
+            otherRects = new List<cv.Rect>(sortedRect.Values);
+            enclosingRects.Clear();
+            while (otherRects.Count() > 0)
+            {
+                cv.Rect enclosing = findEnclosingRect(otherRects, draw.options.proximity);
+                enclosingRects.Add(enclosing);
+            }
+            labels[3] = enclosingRects.Count().ToString() + " enclosing rectangles were found";
+            dst3.SetTo(0);
+            foreach (Rect r in enclosingRects)
+            {
+                dst3.Rectangle(r, Scalar.Yellow, 2);
+            }
+            dst3 = dst2 * 0.5 + dst3;
+        }
+    }
+    public class CS_RecursiveBilateralFilter_CPP : CS_Parent
+    {
+        byte[] dataSrc = new byte[1];
+        Options_RBF options = new Options_RBF();
+        public CS_RecursiveBilateralFilter_CPP(VBtask task) : base(task)
+        {
+            cPtr = RecursiveBilateralFilter_Open();
+            desc = "Apply the recursive bilateral filter - edge-preserving but faster.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (dataSrc.Length != src.Total() * src.ElemSize())
+                Array.Resize(ref dataSrc, (int)(src.Total() * src.ElemSize()));
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            IntPtr imagePtr = RecursiveBilateralFilter_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                                            options.RBFCount);
+            handleSrc.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero)
+                cPtr = RecursiveBilateralFilter_Close(cPtr);
+        }
+    }
+    public class CS_RedCloud_Basics : CS_Parent
+    {
+        public Cell_Generate genCells = new Cell_Generate();
+        RedCloud_CPP redCPP = new RedCloud_CPP();
+        public Mat inputMask = new Mat();
+        Color8U_Basics color;
+        public CS_RedCloud_Basics(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            inputMask = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            UpdateAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + "\n" +
+                         "It is behind the global options (which affect most algorithms.)");
+            desc = "Find cells and then match them to the previous generation with minimum boundary";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1)
+            {
+                if (color == null) color = new Color8U_Basics();
+                color.Run(src);
+                src = color.dst2;
+            }
+            redCPP.inputMask = inputMask;
+            redCPP.Run(src);
+            if (redCPP.classCount == 0) return; // no data to process.
+            genCells.classCount = redCPP.classCount;
+            genCells.rectList = redCPP.rectList;
+            genCells.floodPoints = redCPP.floodPoints;
+            genCells.Run(redCPP.dst2);
+            dst2 = genCells.dst2;
+            labels[2] = genCells.labels[2];
+            dst3.SetTo(0);
+            var smallCellThreshold = src.Total() / 1000;
+            int cellCount = 0;
+            foreach (var rc in task.redCells)
+            {
+                if (rc.pixels > smallCellThreshold)
+                {
+                    DrawCircle(dst3, rc.maxDist, task.DotSize, task.HighlightColor);
+                    cellCount++;
+                }
+            }
+            labels[3] = cellCount.ToString() + " RedCloud cells with more than " + smallCellThreshold + " pixels.  " + task.redCells.Count() + " cells present.";
+        }
+    }
+    public class CS_RedCloud_Reduction : CS_Parent
+    {
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_Reduction(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            task.redOptions.setColorSource("Reduction_Basics");
+            task.gOptions.setHistogramBins(20);
+            desc = "Segment the image based on both the reduced color";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst3 = task.cellMap;
+            dst2 = redC.dst2;
+            labels = redC.labels;
+        }
+    }
+    public class CS_RedCloud_Hulls : CS_Parent
+    {
+        Convex_RedCloudDefects convex = new Convex_RedCloudDefects();
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_Hulls(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "Cells where convexity defects failed", "", "Improved contour results using OpenCV's ConvexityDefects" };
+            desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            dst3.SetTo(0);
+            int defectCount = 0;
+            task.cellMap.SetTo(0);
+            var redCells = new List<rcData>();
+            foreach (var rc in task.redCells)
+            {
+                if (rc.contour.Count() >= 5)
+                {
+                    rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
+                    var hullIndices = Cv2.ConvexHullIndices(rc.hull.ToArray(), false);
+                    try
+                    {
+                        var defects = Cv2.ConvexityDefects(rc.contour, hullIndices);
+                        rc.contour = convex.betterContour(rc.contour, defects);
+                    }
+                    catch (Exception)
+                    {
+                        defectCount++;
+                    }
+                    DrawContour(dst3[rc.rect], rc.hull, vecToScalar(rc.color), -1);
+                    DrawContour(task.cellMap[rc.rect], rc.hull, rc.index, -1);
+                }
+                redCells.Add(rc);
+            }
+            task.redCells = new List<rcData>(redCells);
+            labels[2] = task.redCells.Count() + " hulls identified below.  " + defectCount + " hulls failed to build the defect list.";
+        }
+    }
+    public class CS_RedCloud_FindCells : CS_Parent
+    {
+        public List<int> cellList = new List<int>();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_FindCells(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            task.gOptions.pixelDiffThreshold = 25;
+            cPtr = RedCloud_FindCells_Open();
+            desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle";
+        }
+        public void RunCS(Mat src)
+        {
+            cellList = new List<int>();
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            int count = 0;
+            dst3.SetTo(0);
+            if (task.motionDetected)
+            {
+                dst1 = task.cellMap[task.motionRect].Clone();
+                var cppData = new byte[dst1.Total() - 1];
+                Marshal.Copy(dst1.Data, cppData, 0, cppData.Length);
+                var handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+                var imagePtr = RedCloud_FindCells_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols);
+                handleSrc.Free();
+                count = RedCloud_FindCells_TotalCount(cPtr);
+                if (count == 0) return;
+                var cellsFound = new int[count];
+                Marshal.Copy(imagePtr, cellsFound, 0, cellsFound.Length);
+                cellList = new List<int>(cellsFound);
+                dst0 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+                dst0 = dst0.Threshold(0, 255, ThresholdTypes.BinaryInv);
+                foreach (var index in cellList)
+                {
+                    if (task.redCells.Count() <= index) continue;
+                    var rc = task.redCells[index];
+                    DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                    if (task.redOptions.getNaturalColor())
+                        dst3[rc.rect].SetTo(rc.naturalColor, rc.mask);
+                    else
+                        dst3[rc.rect].SetTo(Scalar.White, rc.mask);
+                }
+                dst2.Rectangle(task.motionRect, Scalar.White, task.lineWidth);
+            }
+            labels[3] = count + " cells were found using the motion mask";
+        }
+        public void Close()
+        {
+            RedCloud_FindCells_Close(cPtr);
+        }
+    }
+    public class CS_RedCloud_Planes : CS_Parent
+    {
+        public RedCloud_PlaneColor planes = new RedCloud_PlaneColor();
+        public CS_RedCloud_Planes(VBtask task) : base(task)
+        {
+            desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal";
+        }
+        public void RunCS(Mat src)
+        {
+            planes.Run(src);
+            dst2 = planes.dst2;
+            dst3 = planes.dst3;
+            labels = planes.labels;
+        }
+    }
+    public class CS_RedCloud_Equations : CS_Parent
+    {
+        Plane_Equation eq = new Plane_Equation();
+        public List<rcData> redCells = new List<rcData>();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_Equations(VBtask task) : base(task)
+        {
+            labels[3] = "The estimated plane equations for the largest 20 RedCloud cells.";
+            desc = "Show the estimated plane equations for all the cells.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                redCells = new List<rcData>(task.redCells);
+            }
+            var newCells = new List<rcData>();
+            foreach (var rc in redCells)
+            {
+                if (rc.contour.Count() > 4)
+                {
+                    eq.rc = rc;
+                    eq.Run(empty);
+                    newCells.Add(eq.rc);
+                }
+            }
+            redCells = new List<rcData>(newCells);
+            if (task.heartBeat)
+            {
+                int index = 0;
+                strOut = "";
+                foreach (var rc in redCells)
+                {
+                    if (rc.contour.Count() > 4)
+                    {
+                        var justEquation = $"{rc.eq[0]:fmt3}*X + {rc.eq[1]:fmt3}*Y + " +
+                                           $"{rc.eq[2]:fmt3}*Z + {rc.eq[3]:fmt3}" + "\n";
+                        strOut += justEquation;
+                        index++;
+                        if (index >= 20) break;
+                    }
+                }
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_RedCloud_CellsAtDepth : CS_Parent
+    {
+        Plot_Histogram plot = new Plot_Histogram();
+        Kalman_Basics kalman = new Kalman_Basics();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_CellsAtDepth(VBtask task) : base(task)
+        {
+            plot.removeZeroEntry = false;
+            labels[3] = "Histogram of depth weighted by the size of the cell.";
+            desc = "Create a histogram of depth using RedCloud cells";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            int histBins = task.histogramBins;
+            List<int>[] slotList = new List<int>[histBins];
+            for (int i = 0; i < slotList.Length; i++)
+            {
+                slotList[i] = new List<int>();
+            }
+            float[] hist = new float[histBins];
+            foreach (var rc in task.redCells)
+            {
+                int slot;
+                if (rc.depthMean[2] > task.MaxZmeters) rc.depthMean[2] = task.MaxZmeters;
+                slot = (int)((rc.depthMean[2] / task.MaxZmeters) * histBins);
+                if (slot >= hist.Length) slot = hist.Length - 1;
+                slotList[slot].Add(rc.index);
+                hist[slot] += rc.pixels;
+            }
+            kalman.kInput = hist;
+            kalman.Run(src);
+            Mat histMat = new Mat(histBins, 1, MatType.CV_32F, kalman.kOutput);
+            plot.Run(histMat);
+            dst3 = plot.dst2;
+            float barWidth = dst3.Width / histBins;
+            int histIndex = (int)Math.Floor(task.mouseMovePoint.X / barWidth);
+            dst3.Rectangle(new cv.Rect((int)(histIndex * barWidth), 0, (int)barWidth, dst3.Height), Scalar.Yellow, task.lineWidth);
+            for (int i = 0; i < slotList[histIndex].Count(); i++)
+            {
+                var rc = task.redCells[slotList[histIndex][i]];
+                DrawContour(dst2[rc.rect], rc.contour, Scalar.Yellow);
+                DrawContour(task.color[rc.rect], rc.contour, Scalar.Yellow);
+            }
+        }
+    }
+    public class CS_RedCloud_ShapeCorrelation : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_ShapeCorrelation(VBtask task) : base(task)
+        {
+            desc = "A shape correlation is between each x and y in list of contours points.  It allows classification based on angle and shape.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            var rc = task.rc;
+            if (rc.contour.Count() > 0)
+            {
+                float shape = shapeCorrelation(rc.contour);
+                strOut = "Contour correlation for selected cell contour X to Y = " + shape.ToString("F3") + "\n" + "\n" +
+                         "Select different cells and notice the pattern for the correlation of the contour.X to contour.Y values:" + "\n" +
+                         "(The contour correlation - contour.x to contour.y - Is computed above.)" + "\n" + "\n" +
+                         "If shape leans left, correlation Is positive And proportional to the lean." + "\n" +
+                         "If shape leans right, correlation Is negative And proportional to the lean. " + "\n" +
+                         "If shape Is symmetric (i.e. rectangle Or circle), correlation Is near zero." + "\n" +
+                         "(Remember that Y increases from the top of the image to the bottom.)";
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_RedCloud_FPS : CS_Parent
+    {
+        Grid_FPS fps = new Grid_FPS();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_FPS(VBtask task) : base(task)
+        {
+            task.gOptions.setDisplay1();
+            task.gOptions.setDisplay1();
+            desc = "Display RedCloud output at a fixed frame rate";
+        }
+        public void RunCS(Mat src)
+        {
+            fps.Run(empty);
+            if (fps.heartBeat)
+            {
+                redC.Run(src);
+                dst0 = task.color.Clone();
+                dst1 = task.depthRGB.Clone();
+                dst2 = redC.dst2.Clone();
+            }
+            labels[2] = redC.labels[2] + " " + fps.strOut;
+        }
+    }
+    public class CS_RedCloud_PlaneColor : CS_Parent
+    {
+        public Options_Plane options = new Options_Plane();
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_PlaneFromMask planeMask = new RedCloud_PlaneFromMask();
+        RedCloud_PlaneFromContour planeContour = new RedCloud_PlaneFromContour();
+        Plane_CellColor planeCells = new Plane_CellColor();
+        public CS_RedCloud_PlaneColor(VBtask task) : base(task)
+        {
+            labels[3] = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis";
+            desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.motionDetected) return;
+            options.RunVB();
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            dst3.SetTo(0);
+            List<cv.Point3f> fitPoints = new List<cv.Point3f>();
+            foreach (var rc in task.redCells)
+            {
+                if (rc.eq == new Vec4f())
+                {
+                    rc.eq = new Vec4f();
+                    if (options.useMaskPoints)
+                    {
+                        rc.eq = fitDepthPlane(planeCells.buildMaskPointEq(rc));
+                    }
+                    else if (options.useContourPoints)
+                    {
+                        rc.eq = fitDepthPlane(planeCells.buildContourPoints(rc));
+                    }
+                    else if (options.use3Points)
+                    {
+                        rc.eq = build3PointEquation(rc);
+                    }
+                }
+                dst3[rc.rect].SetTo(new Scalar(Math.Abs(255 * rc.eq.Item0),
+                                                Math.Abs(255 * rc.eq.Item1),
+                                                Math.Abs(255 * rc.eq.Item2)), rc.mask);
+            }
+        }
+    }
+    public class CS_RedCloud_PlaneFromContour : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_PlaneFromContour(VBtask task) : base(task)
+        {
+            labels[3] = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis";
+            desc = "Create a plane equation each cell's contour";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                labels[2] = redC.labels[2];
+            }
+            var rc = task.rc;
+            List<cv.Point3f> fitPoints = new List<cv.Point3f>();
+            foreach (var pt in rc.contour)
+            {
+                if (pt.X >= rc.rect.Width || pt.Y >= rc.rect.Height) continue;
+                if (rc.mask.Get<byte>(pt.Y, pt.X) == 0) continue;
+                fitPoints.Add(task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X));
+            }
+            rc.eq = fitDepthPlane(fitPoints);
+            if (standaloneTest())
+            {
+                dst3.SetTo(0);
+                dst3[rc.rect].SetTo(new Scalar(Math.Abs(255 * rc.eq.Item0), Math.Abs(255 * rc.eq.Item1), Math.Abs(255 * rc.eq.Item2)), rc.mask);
+            }
+        }
+    }
+    public class CS_RedCloud_PlaneFromMask : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_PlaneFromMask(VBtask task) : base(task)
+        {
+            labels[3] = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis";
+            desc = "Create a plane equation from the pointcloud samples in a RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                labels[2] = redC.labels[2];
+            }
+            var rc = task.rc;
+            var fitPoints = new List<cv.Point3f>();
+            for (int y = 0; y < rc.rect.Height; y++)
+            {
+                for (int x = 0; x < rc.rect.Width; x++)
+                {
+                    if (rc.mask.Get<byte>(y, x) != 0)
+                    {
+                        fitPoints.Add(task.pointCloud[rc.rect].Get<cv.Point3f>(y, x));
+                    }
+                }
+            }
+            rc.eq = fitDepthPlane(fitPoints);
+            if (standaloneTest())
+            {
+                dst3.SetTo(0);
+                dst3[rc.rect].SetTo(new Scalar(Math.Abs(255 * rc.eq[0]), Math.Abs(255 * rc.eq[1]), Math.Abs(255 * rc.eq[2])), rc.mask);
+            }
+        }
+    }
+    public class CS_RedCloud_BProject3D : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
+        public CS_RedCloud_BProject3D(VBtask task) : base(task)
+        {
+            desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection";
+        }
+        public void RunCS(Mat src)
+        {
+            hcloud.Run(src);
+            dst3 = hcloud.dst2;
+            dst3.ConvertTo(dst0, MatType.CV_8U);
+            redC.Run(dst0);
+            dst2 = redC.dst2;
+        }
+    }
+    public class CS_RedCloud_YZ : CS_Parent
+    {
+        Cell_Basics stats = new Cell_Basics();
+        public CS_RedCloud_YZ(VBtask task) : base(task)
+        {
+            stats.runRedCloud = true;
+            desc = "Build horizontal RedCloud cells";
+        }
+        public void RunCS(Mat src)
+        {
+            task.redOptions.setYZReduction(true);
+            stats.Run(src);
+            dst0 = stats.dst0;
+            dst1 = stats.dst1;
+            dst2 = stats.dst2;
+            SetTrueText(stats.strOut, 3);
+        }
+    }
+    public class CS_RedCloud_XZ : CS_Parent
+    {
+        Cell_Basics stats = new Cell_Basics();
+        public CS_RedCloud_XZ(VBtask task) : base(task)
+        {
+            stats.runRedCloud = true;
+            desc = "Build vertical RedCloud cells.";
+        }
+        public void RunCS(Mat src)
+        {
+            task.redOptions.setXZReduction(true);
+            stats.Run(src);
+            dst0 = stats.dst0;
+            dst1 = stats.dst1;
+            dst2 = stats.dst2;
+            SetTrueText(stats.strOut, 3);
+        }
+    }
+    public class CS_RedCloud_World : CS_Parent
+    {
+        RedCloud_Reduce redC = new RedCloud_Reduce();
+        Depth_World world = new Depth_World();
+        public CS_RedCloud_World(VBtask task) : base(task)
+        {
+            labels[3] = "Generated pointcloud";
+            desc = "Display the output of a generated pointcloud as RedCloud cells";
+        }
+        public void RunCS(Mat src)
+        {
+            world.Run(src);
+            task.pointCloud = world.dst2;
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            if (task.FirstPass) FindSlider("RedCloud_Reduce Reduction").Value = 1000;
+        }
+    }
+    public class CS_RedCloud_KMeans : CS_Parent
+    {
+        KMeans_MultiChannel km = new KMeans_MultiChannel();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_KMeans(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "KMeans_MultiChannel output", "RedCloud_Basics output" };
+            desc = "Use RedCloud to identify the regions created by kMeans";
+        }
+        public void RunCS(Mat src)
+        {
+            km.Run(src);
+            dst3 = km.dst2;
+            redC.Run(km.dst3);
+            dst2 = redC.dst2;
+        }
+    }
+    public class CS_RedCloud_Diff : CS_Parent
+    {
+        Diff_RGBAccum diff = new Diff_RGBAccum();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_Diff(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Diff output, RedCloud input", "RedCloud output" };
+            desc = "Isolate blobs in the diff output with RedCloud";
+        }
+        public void RunCS(Mat src)
+        {
+            SetTrueText("Wave at the camera to see the segmentation of the motion.", 3);
+            diff.Run(src);
+            dst3 = diff.dst2;
+            redC.Run(dst3);
+            dst2.SetTo(0);
+            redC.dst2.CopyTo(dst2, dst3);
+            labels[3] = task.redCells.Count() + " objects identified in the diff output";
+        }
+    }
+    public class CS_RedCloud_ProjectCell : CS_Parent
+    {
+        Hist_ShapeTop topView = new Hist_ShapeTop();
+        Hist_ShapeSide sideView = new Hist_ShapeSide();
+        Mat_4Click mats = new Mat_4Click();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_ProjectCell(VBtask task) : base(task)
+        {
+            task.gOptions.setDisplay1();
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            labels[3] = "Top: XZ values and mask, Bottom: ZY values and mask";
+            desc = "Visualize the top and side projection of a RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            // The commented code is omitted for clarity
+        }
+    }
+    public class CS_RedCloud_LikelyFlatSurfaces : CS_Parent
+    {
+        Plane_Basics verts = new Plane_Basics();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public List<rcData> vCells = new List<rcData>();
+        public List<rcData> hCells = new List<rcData>();
+        public CS_RedCloud_LikelyFlatSurfaces(VBtask task) : base(task)
+        {
+            labels[1] = "RedCloud output";
+            desc = "Use the mask for vertical surfaces to identify RedCloud cells that appear to be flat.";
+        }
+        public void RunCS(Mat src)
+        {
+            verts.Run(src);
+            redC.Run(src);
+            dst2.SetTo(0);
+            dst3.SetTo(0);
+            vCells.Clear();
+            hCells.Clear();
+            foreach (var rc in task.redCells)
+            {
+                if (rc.depthMean[2] >= task.MaxZmeters) continue;
+                Mat tmp = verts.dst2[rc.rect] & rc.mask;
+                if (rc.pixels == 0) continue;
+                if (tmp.CountNonZero() / rc.pixels > 0.5)
+                {
+                    DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                    vCells.Add(rc);
+                }
+                tmp = verts.dst3[rc.rect] & rc.mask;
+                int count = tmp.CountNonZero();
+                if (count / rc.pixels > 0.5)
+                {
+                    DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                    hCells.Add(rc);
+                }
+            }
+            var rcX = task.rc;
+            SetTrueText("mean depth = " + rcX.depthMean[2].ToString("0.0"), 3);
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_RedCloud_PlaneEq3D : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Plane_Equation eq = new Plane_Equation();
+        public CS_RedCloud_PlaneEq3D(VBtask task) : base(task)
+        {
+            desc = "If a RedColor cell contains depth then build a plane equation";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            var rc = task.rc;
+            if (rc.maxVec.Z != 0)
+            {
+                eq.rc = rc;
+                eq.Run(empty);
+                rc = eq.rc;
+            }
+            dst3.SetTo(0);
+            DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+            SetTrueText(eq.strOut, 3);
+        }
+    }
+    public class CS_RedCloud_DelaunayGuidedFeatures : CS_Parent
+    {
+        Feature_Delaunay features = new Feature_Delaunay();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        List<List<cv.Point2f>> goodList = new List<List<cv.Point2f>>();
+        public CS_RedCloud_DelaunayGuidedFeatures(VBtask task) : base(task)
+        {
+            labels = new[] { "", "Format CV_8U of Delaunay data", "RedCloud output", "RedCloud Output of GoodFeature points" };
+            desc = "Track the GoodFeatures points using RedCloud.";
+        }
+        public void RunCS(Mat src)
+        {
+            features.Run(src);
+            dst1 = features.dst3;
+            redC.Run(dst1);
+            dst2 = redC.dst2;
+            if (task.heartBeat) goodList.Clear();
+            var nextGood = new List<cv.Point2f>(task.features);
+            goodList.Add(nextGood);
+            if (goodList.Count() >= task.frameHistoryCount) goodList.RemoveAt(0);
+            dst3.SetTo(0);
+            foreach (var ptList in goodList)
+            {
+                foreach (var pt in ptList)
+                {
+                    var c = dst2.Get<Vec3b>((int)pt.Y, (int)pt.X);
+                    DrawCircle(dst3, pt, task.DotSize, vecToScalar(c));
+                }
+            }
+        }
+    }
+    public class CS_RedCloud_UnstableCells : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        List<cv.Point> prevList = new List<cv.Point>();
+        public CS_RedCloud_UnstableCells(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing" };
+            desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            if (task.heartBeat || task.frameCount == 2)
+            {
+                dst1 = dst2.Clone();
+                dst3.SetTo(0);
+            }
+            var currList = new List<cv.Point>();
+            foreach (var rc in task.redCells)
+            {
+                if (!prevList.Contains(rc.maxDStable))
+                {
+                    DrawContour(dst1[rc.rect], rc.contour, Scalar.White, -1);
+                    DrawContour(dst1[rc.rect], rc.contour, Scalar.Black);
+                    DrawContour(dst3[rc.rect], rc.contour, Scalar.White, -1);
+                }
+                currList.Add(rc.maxDStable);
+            }
+            prevList = new List<cv.Point>(currList);
+        }
+    }
+    public class CS_RedCloud_UnstableHulls : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        List<cv.Point> prevList = new List<cv.Point>();
+        public CS_RedCloud_UnstableHulls(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing" };
+            desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            if (task.heartBeat || task.frameCount == 2)
+            {
+                dst1 = dst2.Clone();
+                dst3.SetTo(0);
+            }
+            var currList = new List<cv.Point>();
+            foreach (var rc in task.redCells)
+            {
+                rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
+                if (!prevList.Contains(rc.maxDStable))
+                {
+                    DrawContour(dst1[rc.rect], rc.hull, Scalar.White, -1);
+                    DrawContour(dst1[rc.rect], rc.hull, Scalar.Black);
+                    DrawContour(dst3[rc.rect], rc.hull, Scalar.White, -1);
+                }
+                currList.Add(rc.maxDStable);
+            }
+            prevList = new List<cv.Point>(currList);
+        }
+    }
+    public class CS_RedCloud_CellChanges : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Mat dst2Last;
+        public CS_RedCloud_CellChanges(VBtask task) : base(task)
+        {
+            dst2Last = dst2.Clone();
+            if (standaloneTest()) redC = new RedCloud_Basics();
+            desc = "Count the cells that have changed in a RedCloud generation";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            dst3 = (dst2 - dst2Last).ToMat();
+            int changedPixels = dst3.CvtColor(ColorConversionCodes.BGR2GRAY).CountNonZero();
+            int changedCells = 0;
+            foreach (var rc in task.redCells)
+            {
+                if (rc.indexLast == 0) changedCells++;
+            }
+            dst2Last = dst2.Clone();
+            if (task.heartBeat)
+            {
+                labels[2] = "Changed cells = " + changedCells.ToString("000") + " cells or " + (changedCells / task.redCells.Count()).ToString("0%");
+                labels[3] = "Changed pixel total = " + (changedPixels / 1000.0).ToString("0.0") + "k or " + (changedPixels / dst2.Total()).ToString("0%");
+            }
+        }
+    }
+    public class CS_RedCloud_FloodPoint : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Cell_Basics stats = new Cell_Basics();
+        public CS_RedCloud_FloodPoint(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Verify that floodpoints correctly determine if depth is present.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            dst1 = task.depthRGB;
+            foreach (var rc in task.redCells)
+            {
+                DrawCircle(dst1, rc.floodPoint, task.DotSize, Scalar.White);
+                DrawCircle(dst2, rc.floodPoint, task.DotSize, Scalar.Yellow);
+            }
+            stats.Run(src);
+            SetTrueText(stats.strOut, 3);
+        }
+    }
+    public class CS_RedCloud_CellStatsPlot : CS_Parent
+    {
+        Cell_BasicsPlot cells = new Cell_BasicsPlot();
+        public CS_RedCloud_CellStatsPlot(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            cells.runRedCloud = true;
+            desc = "Display the stats for the requested cell";
+        }
+        public void RunCS(Mat src)
+        {
+            cells.Run(src);
+            dst1 = cells.dst1;
+            dst2 = cells.dst2;
+            labels[2] = cells.labels[2];
+            SetTrueText(cells.strOut, 3);
+        }
+    }
+    public class CS_RedCloud_MostlyColor : CS_Parent
+    {
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_MostlyColor(VBtask task) : base(task)
+        {
+            labels[3] = "Cells that have no depth data.";
+            desc = "Identify cells that have no depth";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            dst3.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                if (rc.depthPixels > 0) dst3[rc.rect].SetTo(rc.color, rc.mask);
+            }
+        }
+    }
+    public class CS_RedCloud_OutlineColor : CS_Parent
+    {
+        Depth_Outline outline = new Depth_Outline();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Color8U_Basics colorClass = new Color8U_Basics();
+        public CS_RedCloud_OutlineColor(VBtask task) : base(task)
+        {
+            labels[3] = "Color input to RedCloud_Basics with depth boundary blocking color connections.";
+            desc = "Use the depth outline as input to RedCloud_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            outline.Run(task.depthMask);
+            colorClass.Run(src);
+            dst1 = colorClass.dst2 + 1;
+            dst1.SetTo(0, outline.dst2);
+            dst3 = ShowPalette(dst1 * 255 / colorClass.classCount);
+            redC.Run(dst1);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_RedCloud_DepthOutline : CS_Parent
+    {
+        Depth_Outline outline = new Depth_Outline();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_DepthOutline(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            task.redOptions.setUseColorOnly(true);
+            desc = "Use the Depth_Outline output over time to isolate high quality cells";
+        }
+        public void RunCS(Mat src)
+        {
+            outline.Run(task.depthMask);
+            if (task.heartBeat) dst3.SetTo(0);
+            dst3 = dst3 | outline.dst2;
+            dst1.SetTo(0);
+            src.CopyTo(dst1, ~dst3);
+            redC.Run(dst1);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_RedCloud_MeterByMeter : CS_Parent
+    {
+        BackProject_MeterByMeter meter = new BackProject_MeterByMeter();
+        public CS_RedCloud_MeterByMeter(VBtask task) : base(task)
+        {
+            desc = "Run RedCloud meter by meter";
+        }
+        public void RunCS(Mat src)
+        {
+            meter.Run(src);
+            dst2 = meter.dst3;
+            labels[2] = meter.labels[3];
+            for (int i = 0; i <= task.MaxZmeters; i++)
+            {
+            }
+        }
+    }
+    public class CS_RedCloud_FourColor : CS_Parent
+    {
+        Bin4Way_Regions binar4 = new Bin4Way_Regions();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_FourColor(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            task.redOptions.setUseColorOnly(true);
+            labels[3] = "A 4-way split of the input grayscale image based on brightness";
+            desc = "Use RedCloud on a 4-way split based on light to dark in the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            binar4.Run(src);
+            dst3 = ShowPalette(binar4.dst2 * 255 / 5);
+            redC.Run(binar4.dst2);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[3];
+        }
+    }
+    public class CS_RedCloud_CCompColor : CS_Parent
+    {
+        CComp_Both ccomp = new CComp_Both();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_CCompColor(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            desc = "Identify each Connected component as a RedCloud Cell.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            ccomp.Run(src);
+            dst3 = GetNormalize32f(ccomp.dst1);
+            labels[3] = ccomp.labels[2];
+            redC.Run(dst3);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[3];
+        }
+    }
+    public class CS_RedCloud_Cells : CS_Parent
+    {
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        public Mat cellmap = new Mat();
+        public List<rcData> redCells = new List<rcData>();
+        public CS_RedCloud_Cells(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            desc = "Create RedCloud output using only color";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            cellmap = task.cellMap;
+            redCells = task.redCells;
+        }
+    }
+    public class CS_RedCloud_Flippers : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Mat lastMap;
+        public CS_RedCloud_Flippers(VBtask task) : base(task)
+        {
+            lastMap = task.cellMap.Clone();
+            task.redOptions.setIdentifyCells(true);
+            task.redOptions.setUseColorOnly(true);
+            labels[3] = "Highlighted below are the cells which flipped in color from the previous frame.";
+            desc = "Identify the 4-way split cells that are flipping between brightness boundaries.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst3 = redC.dst3;
+            labels[3] = redC.labels[2];
+            dst2.SetTo(0);
+            int unMatched = 0;
+            int unMatchedPixels = 0;
+            foreach (var cell in task.redCells)
+            {
+                var lastColor = lastMap.Get<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
+                if (lastColor != cell.color)
+                {
+                    dst2[cell.rect].SetTo(cell.color, cell.mask);
+                    unMatched++;
+                    unMatchedPixels += cell.pixels;
+                }
+            }
+            lastMap = redC.dst3.Clone();
+            if (task.heartBeat)
+            {
+                labels[3] = "Unmatched to previous frame: " + unMatched + " totaling " + unMatchedPixels + " pixels.";
+            }
+        }
+    }
+    public class CS_RedCloud_Overlaps : CS_Parent
+    {
+        public List<rcData> redCells = new List<rcData>();
+        public Mat cellMap;
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_Overlaps(VBtask task) : base(task)
+        {
+            cellMap = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Remove the overlapping cells.  Keep the largest.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels = redC.labels;
+            List<int> overlappingCells = new List<int>();
+            cellMap.SetTo(0);
+            redCells.Clear();
+            foreach (var rc in task.redCells)
+            {
+                var valMap = cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
+                cellMap[rc.rect].SetTo(rc.index, rc.mask);
+                redCells.Add(rc);
+            }
+            dst3.SetTo(0);
+            for (int i = overlappingCells.Count() - 1; i >= 0; i--)
+            {
+                var rc = redCells[overlappingCells[i]];
+                dst3[rc.rect].SetTo(rc.color, rc.mask);
+                redCells.RemoveAt(overlappingCells[i]);
+            }
+            labels[3] = "Before removing overlapping cells: " + task.redCells.Count().ToString() + ". After: " + redCells.Count().ToString();
+        }
+    }
+    public class CS_RedCloud_OnlyColorHist3D : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+        public CS_RedCloud_OnlyColorHist3D(VBtask task) : base(task)
+        {
+            desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_Basics.";
+        }
+        public void RunCS(Mat src)
+        {
+            hColor.Run(src);
+            dst2 = hColor.dst3;
+            labels[2] = hColor.labels[3];
+            redC.Run(dst2);
+            dst3 = task.cellMap;
+            dst3.SetTo(0, task.noDepthMask);
+            labels[3] = redC.labels[2];
+        }
+    }
+    public class CS_RedCloud_OnlyColorAlt : CS_Parent
+    {
+        public RedCloud_Basics redMasks = new RedCloud_Basics();
+        public CS_RedCloud_OnlyColorAlt(VBtask task) : base(task)
+        {
+            desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
+        }
+        public void RunCS(Mat src)
+        {
+            redMasks.Run(src);
+            List<rcData> lastCells = new List<rcData>(task.redCells);
+            Mat lastMap = task.cellMap.Clone();
+            Mat lastColors = dst3.Clone();
+            List<rcData> newCells = new List<rcData>();
+            task.cellMap.SetTo(0);
+            dst3.SetTo(0);
+            List<Vec3b> usedColors = new List<Vec3b> { black };
+            int unmatched = 0;
+            foreach (var cell in task.redCells)
+            {
+                int index = lastMap.Get<byte>(cell.maxDist.Y, cell.maxDist.X);
+                if (index < lastCells.Count())
+                {
+                    cell.color = lastColors.Get<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
+                }
+                else
+                {
+                    unmatched++;
+                }
+                if (usedColors.Contains(cell.color))
+                {
+                    unmatched++;
+                    cell.color = randomCellColor();
+                }
+                usedColors.Add(cell.color);
+                if (task.cellMap.Get<byte>(cell.maxDist.Y, cell.maxDist.X) == 0)
+                {
+                    cell.index = task.redCells.Count();
+                    newCells.Add(cell);
+                    task.cellMap[cell.rect].SetTo(cell.index, cell.mask);
+                    dst3[cell.rect].SetTo(cell.color, cell.mask);
+                }
+            }
+            task.redCells = new List<rcData>(newCells);
+            labels[3] = task.redCells.Count().ToString() + " cells were identified.  The top " + 
+                task.redOptions.getIdentifyCount().ToString() + " are numbered";
+            labels[2] = redMasks.labels[3] + " " + unmatched.ToString() + " cells were not matched to previous frame.";
+            if (task.redCells.Count() > 0) dst2 = ShowPalette(lastMap * 255 / task.redCells.Count());
+        }
+    }
+    public class CS_RedCloud_Gaps : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        History_Basics frames = new History_Basics();
+        public CS_RedCloud_Gaps(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Find the gaps that are different in the RedCloud_Basics results.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[3];
+            frames.Run(task.cellMap.InRange(0, 0));
+            dst3 = frames.dst2;
+            if (task.redCells.Count() > 0)
+            {
+                dst2[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+            }
+            if (task.redCells.Count() > 0)
+            {
+                var rc = task.redCells[0]; // index can now be zero.
+                dst3[rc.rect].SetTo(0, rc.mask);
+            }
+            int count = dst3.CountNonZero();
+            labels[3] = "Unclassified pixel count = " + count.ToString() + " or " + (count / src.Total()).ToString("0%");
+        }
+    }
+    public class CS_RedCloud_SizeOrder : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_SizeOrder(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            UpdateAdvice(traceName + ": Use the goptions 'DebugSlider' to select which cell is isolated.");
+            task.gOptions.setDebugSlider(0);
+            desc = "Select blobs by size using the DebugSlider in the global options";
+        }
+        public void RunCS(Mat src)
+        {
+            SetTrueText("Use the goptions 'DebugSlider' to select cells by size." + "\n" + "Size order changes frequently.", 3);
+            redC.Run(src);
+            dst2 = redC.dst3;
+            labels[2] = redC.labels[3];
+            int index = task.gOptions.getDebugSlider();
+            if (index < task.redCells.Count())
+            {
+                dst3.SetTo(0);
+                var cell = task.redCells[index];
+                dst3[cell.rect].SetTo(cell.color, cell.mask);
+            }
+        }
+    }
+    public class CS_RedCloud_StructuredH : CS_Parent
+    {
+        RedCloud_MotionBGsubtract motion = new RedCloud_MotionBGsubtract();
+        Structured_TransformH transform = new Structured_TransformH();
+        Projection_HistTop histTop = new Projection_HistTop();
+        public CS_RedCloud_StructuredH(VBtask task) : base(task)
+        {
+            if (standalone)
+            {
+                task.redOptions.setIdentifyCells(false);
+                task.gOptions.setDisplay1();
+                task.gOptions.setDisplay1();
+            }
+            desc = "Display the RedCloud cells found with a horizontal slice through the cellMap.";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat sliceMask = transform.createSliceMaskH();
+            dst0 = src;
+            motion.Run(sliceMask.Clone());
+            if (task.heartBeat) dst1.SetTo(0);
+            dst1.SetTo(Scalar.White, sliceMask);
+            labels = motion.labels;
+            dst2.SetTo(0);
+            foreach (var rc in motion.redCells)
+            {
+                if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+            }
+            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, 0);
+            task.pointCloud.CopyTo(pc, dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
+            histTop.Run(pc);
+            dst3 = histTop.dst2;
+            dst2.SetTo(Scalar.White, sliceMask);
+            dst0.SetTo(Scalar.White, sliceMask);
+        }
+    }
+    public class CS_RedCloud_StructuredV : CS_Parent
+    {
+        RedCloud_MotionBGsubtract motion = new RedCloud_MotionBGsubtract();
+        Structured_TransformV transform = new Structured_TransformV();
+        Projection_HistSide histSide = new Projection_HistSide();
+        public CS_RedCloud_StructuredV(VBtask task) : base(task)
+        {
+            if (standalone)
+            {
+                task.redOptions.setIdentifyCells(false);
+                task.gOptions.setDisplay1();
+                task.gOptions.setDisplay1();
+            }
+            desc = "Display the RedCloud cells found with a vertical slice through the cellMap.";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat sliceMask = transform.createSliceMaskV();
+            dst0 = src;
+            motion.Run(sliceMask.Clone());
+            if (task.heartBeat) dst1.SetTo(0);
+            dst1.SetTo(Scalar.White, sliceMask);
+            labels = motion.labels;
+            SetTrueText("Move mouse in image to see impact.", 3);
+            dst2.SetTo(0);
+            foreach (var rc in motion.redCells)
+            {
+                if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+            }
+            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, 0);
+            task.pointCloud.CopyTo(pc, dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
+            histSide.Run(pc);
+            dst3 = histSide.dst2;
+            dst2.SetTo(Scalar.White, sliceMask);
+            dst0.SetTo(Scalar.White, sliceMask);
+        }
+    }
+    public class CS_RedCloud_MotionBasics : CS_Parent
+    {
+        public RedCloud_Basics redMasks = new RedCloud_Basics();
+        public List<rcData> redCells = new List<rcData>();
+        public RedCloud_MotionBGsubtract rMotion = new RedCloud_MotionBGsubtract();
+        Mat lastColors;
+        Mat lastMap;
+        public CS_RedCloud_MotionBasics(VBtask task) : base(task)
+        {
+            lastColors = dst3.Clone();
+            lastMap = dst2.Clone();
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            labels = new string[] { "", "Mask of active RedCloud cells", "CV_8U representation of redCells", "" };
+            desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
+        }
+        public void RunCS(Mat src)
+        {
+            redMasks.Run(src);
+            rMotion.Run(task.color.Clone());
+            List<rcData> lastCells = new List<rcData>(redCells);
+            redCells.Clear();
+            dst2.SetTo(0);
+            dst3.SetTo(0);
+            List<Vec3b> usedColors = new List<Vec3b> { black };
+            int motionCount = 0;
+            foreach (var nextCell in rMotion.redCells)
+            {
+                rcData cell = nextCell;
+                int index = lastMap.At<byte>(cell.maxDist.Y, cell.maxDist.X);
+                if (!cell.motionFlag)
+                {
+                    if (index > 0 && index < lastCells.Count()) cell = lastCells[index - 1];
+                }
+                else
+                {
+                    motionCount++;
+                }
+                if (index > 0 && index < lastCells.Count())
+                {
+                    cell.color = lastColors.At<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
+                }
+                if (usedColors.Contains(cell.color)) cell.color = randomCellColor();
+                usedColors.Add(cell.color);
+                if (dst2.At<byte>(cell.maxDist.Y, cell.maxDist.X) == 0)
+                {
+                    cell.index = redCells.Count() + 1;
+                    redCells.Add(cell);
+                    dst2[cell.rect].SetTo(cell.index, cell.mask);
+                    dst3[cell.rect].SetTo(cell.color, cell.mask);
+                    SetTrueText(cell.index.ToString(), cell.maxDist, 2);
+                    SetTrueText(cell.index.ToString(), cell.maxDist, 3);
+                }
+            }
+            labels[3] = "There were " + redCells.Count() + " collected cells and " + motionCount +
+                        " cells removed because of motion.  ";
+            lastColors = dst3.Clone();
+            lastMap = dst2.Clone();
+            if (redCells.Count() > 0) dst1 = ShowPalette(lastMap * 255 / redCells.Count());
+        }
+    }
+    public class CS_RedCloud_ContourVsFeatureLess : CS_Parent
+    {
+        RedCloud_Basics redMasks = new RedCloud_Basics();
+        Contour_WholeImage contour = new Contour_WholeImage();
+        FeatureLess_Basics fLess = new FeatureLess_Basics();
+        System.Windows.Forms.RadioButton useContours;
+        public CS_RedCloud_ContourVsFeatureLess(VBtask task) : base(task)
+        {
+            useContours = FindRadio("Use Contour_WholeImage");
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Contour_WholeImage Input", "RedCloud_Basics - toggling between Contour and Featureless inputs", "FeatureLess_Basics Input" };
+            desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            contour.Run(src);
+            dst1 = contour.dst2;
+            fLess.Run(src);
+            dst3 = fLess.dst2;
+            if (task.toggleOnOff) redMasks.Run(dst3);
+            else redMasks.Run(dst1);
+            dst2 = redMasks.dst3;
+        }
+    }
+    public class CS_RedCloud_UnmatchedCount : CS_Parent
+    {
+        public List<rcData> redCells = new List<rcData>();
+        int myFrameCount;
+        List<int> changedCellCounts = new List<int>();
+        List<int> framecounts = new List<int>();
+        List<cv.Point> frameLoc = new List<cv.Point>();
+        public CS_RedCloud_UnmatchedCount(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Count the unmatched cells and display them.";
+        }
+        public void RunCS(Mat src)
+        {
+            myFrameCount++;
+            if (standaloneTest())
+            {
+                SetTrueText("CS_RedCloud_UnmatchedCount has no output when run standaloneTest()." + "\n" +
+                            "It requires redCells and RedCloud_Basics is the only way to create redCells." + "\n" +
+                            "Since RedCloud_Basics calls CS_RedCloud_UnmatchedCount, it would be circular and never finish the initialize.");
+                return;
+            }
+            int unMatchedCells = 0;
+            int mostlyColor = 0;
+            for (int i = 0; i < redCells.Count(); i++)
+            {
+                var rc = redCells[i];
+                if (redCells[i].depthPixels / redCells[i].pixels < 0.5) mostlyColor++;
+                if (rc.indexLast != 0)
+                {
+                    byte val = dst3.At<byte>(rc.maxDist.Y, rc.maxDist.X);
+                    if (val == 0)
+                    {
+                        dst3[rc.rect].SetTo(255, rc.mask);
+                        unMatchedCells++;
+                        frameLoc.Add(rc.maxDist);
+                        framecounts.Add(myFrameCount);
+                    }
+                }
+            }
+            if (ShowIntermediate())
+            {
+                for (int i = 0; i < framecounts.Count(); i++)
+                {
+                    SetTrueText(framecounts[i].ToString(), frameLoc[i], 2);
+                }
+            }
+            changedCellCounts.Add(unMatchedCells);
+            if (task.heartBeat)
+            {
+                dst3.SetTo(0);
+                framecounts.Clear();
+                frameLoc.Clear();
+                myFrameCount = 0;
+                int sum = changedCellCounts.Sum();
+                double avg = changedCellCounts.Count() > 0 ? changedCellCounts.Average() : 0;
+                labels[3] = sum + " new/moved cells in the last second " + string.Format(fmt1, avg) + " changed per frame";
+                labels[2] = redCells.Count() + " cells, unmatched cells = " + unMatchedCells + "   " +
+                            mostlyColor + " cells were mostly color and " + (redCells.Count() - mostlyColor) + " had depth.";
+                changedCellCounts.Clear();
+            }
+        }
+    }
+    public class CS_RedCloud_ContourUpdate : CS_Parent
+    {
+        public List<rcData> redCells = new List<rcData>();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_ContourUpdate(VBtask task) : base(task)
+        {
+            desc = "For each cell, add a contour if its count is zero.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                labels = redC.labels;
+                redCells = task.redCells;
+            }
+            dst3.SetTo(0);
+            for (int i = 1; i < redCells.Count(); i++)
+            {
+                var rc = redCells[i];
+                rc.contour = contourBuild(rc.mask, ContourApproximationModes.ApproxNone);
+                DrawContour(rc.mask, rc.contour, 255, -1);
+                redCells[i] = rc;
+                DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+            }
+        }
+    }
+    public class CS_RedCloud_MaxDist : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_ContourUpdate addTour = new RedCloud_ContourUpdate();
+        public CS_RedCloud_MaxDist(VBtask task) : base(task)
+        {
+            desc = "Show the maxdist before and after updating the mask with the contour.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels = redC.labels;
+            foreach (var rc in task.redCells)
+            {
+                DrawCircle(dst2, rc.maxDist, task.DotSize, task.HighlightColor);
+            }
+            addTour.redCells = task.redCells;
+            addTour.Run(src);
+            dst3 = addTour.dst3;
+            for (int i = 1; i < addTour.redCells.Count(); i++)
+            {
+                var rc = addTour.redCells[i];
+                rc.maxDist = GetMaxDist(ref rc);
+                DrawCircle(dst3, rc.maxDist, task.DotSize, task.HighlightColor);
+            }
+        }
+    }
+    public class CS_RedCloud_Tiers : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Depth_TiersZ tiers = new Depth_TiersZ();
+        Bin4Way_Regions binar4 = new Bin4Way_Regions();
+        public CS_RedCloud_Tiers(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            desc = "Use the Depth_TiersZ algorithm to create a color-based RedCloud";
+        }
+        public void RunCS(Mat src)
+        {
+            binar4.Run(src);
+            dst1 = ShowPalette((binar4.dst2 * 255 / binar4.classCount).ToMat());
+            tiers.Run(src);
+            dst3 = tiers.dst3;
+            dst0 = tiers.dst2 + binar4.dst2;
+            redC.Run(dst0);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_RedCloud_TiersBinarize : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Depth_TiersZ tiers = new Depth_TiersZ();
+        Bin4Way_Regions binar4 = new Bin4Way_Regions();
+        public CS_RedCloud_TiersBinarize(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            desc = "Use the Depth_TiersZ with Bin4Way_Regions algorithm to create a color-based RedCloud";
+        }
+        public void RunCS(Mat src)
+        {
+            binar4.Run(src);
+            tiers.Run(src);
+            dst2 = tiers.dst2 + binar4.dst2;
+            redC.Run(dst2);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_RedCloud_Combine : CS_Parent
+    {
+        public Color8U_Basics colorClass = new Color8U_Basics();
+        public GuidedBP_Depth guided = new GuidedBP_Depth();
+        public RedCloud_Basics redMasks = new RedCloud_Basics();
+        public List<rcData> combinedCells = new List<rcData>();
+        Depth_MaxMask maxDepth = new Depth_MaxMask();
+        RedCloud_Reduce prep = new RedCloud_Reduce();
+        public CS_RedCloud_Combine(VBtask task) : base(task)
+        {
+            desc = "Combined the color and cloud as indicated in the RedOptions panel.";
+        }
+        public void RunCS(Mat src)
+        {
+            maxDepth.Run(src);
+            if (task.redOptions.getUseColorOnly() || task.redOptions.getUseGuidedProjection())
+            {
+                redMasks.inputMask.SetTo(0);
+                if (src.Channels() == 3)
+                {
+                    colorClass.Run(src);
+                    dst2 = colorClass.dst2.Clone();
+                }
+                else
+                {
+                    dst2 = src;
+                }
+            }
+            else
+            {
+                redMasks.inputMask = task.noDepthMask;
+                dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            }
+            if (task.redOptions.getUseDepth() || task.redOptions.getUseGuidedProjection())
+            {
+                switch (task.redOptions.depthInputIndex)
+                {
+                    case 0: // "GuidedBP_Depth"
+                        guided.Run(src);
+                        if (colorClass.classCount > 0) guided.dst2 += colorClass.classCount;
+                        guided.dst2.CopyTo(dst2, task.depthMask);
+                        break;
+                    case 1: // "RedCloud_Reduce"
+                        prep.Run(task.pointCloud);
+                        if (colorClass.classCount > 0) prep.dst2 += colorClass.classCount;
+                        prep.dst2.CopyTo(dst2, task.depthMask);
+                        break;
+                }
+            }
+            redMasks.Run(dst2);
+            dst2 = redMasks.dst2;
+            dst3 = redMasks.dst3;
+            combinedCells.Clear();
+            bool drawRectOnlyRun = task.drawRect.Width * task.drawRect.Height > 10;
+            foreach (var rc in task.redCells)
+            {
+                if (drawRectOnlyRun && !task.drawRect.Contains(rc.floodPoint)) continue;
+                combinedCells.Add(rc);
+            }
+        }
+    }
+
+    public class CS_RedCloud_TopX : CS_Parent
+    {
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        public Options_TopX options = new Options_TopX();
+        public CS_RedCloud_TopX(VBtask task) : base(task)
+        {
+            desc = "Show only the top X cells";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            redC.Run(src);
+            dst2.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                dst2[rc.rect].SetTo(rc.color, rc.mask);
+                if (rc.index > options.topX) break;
+            }
+            labels[2] = $"The top {options.topX} RedCloud cells by size.";
+        }
+    }
+    public class CS_RedCloud_TopXNeighbors : CS_Parent
+    {
+        Options_TopX options = new Options_TopX();
+        Neighbors_Precise nab = new Neighbors_Precise();
+        public CS_RedCloud_TopXNeighbors(VBtask task) : base(task)
+        {
+            nab.runRedCloud = true;
+            desc = "Add unused neighbors to each of the top X cells";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            nab.Run(src);
+            SetTrueText("Review the neighbors_Precise algorithm");
+            // The commented code has been omitted for brevity
+        }
+    }
+    public class CS_RedCloud_TopXHulls : CS_Parent
+    {
+        RedCloud_TopX topX = new RedCloud_TopX();
+        public CS_RedCloud_TopXHulls(VBtask task) : base(task)
+        {
+            desc = "Build the hulls for the top X RedCloud cells";
+        }
+        public void RunCS(Mat src)
+        {
+            topX.Run(src);
+            labels = topX.redC.labels;
+            var newCells = new List<rcData>();
+            task.cellMap.SetTo(0);
+            dst2.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                if (rc.contour.Count() >= 5)
+                {
+                    rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
+                    DrawContour(dst2[rc.rect], rc.hull, vecToScalar(rc.color), -1);
+                    DrawContour(rc.mask, rc.hull, 255, -1);
+                    task.cellMap[rc.rect].SetTo(rc.index, rc.mask);
+                }
+                newCells.Add(rc);
+                if (rc.index > topX.options.topX) break;
+            }
+            task.redCells = new List<rcData>(newCells);
+            task.setSelectedContour();
+        }
+    }
+    public class CS_RedCloud_Hue : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Color8U_Hue hue = new Color8U_Hue();
+        public CS_RedCloud_Hue(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            desc = "Run RedCloud on just the red hue regions.";
+        }
+        public void RunCS(Mat src)
+        {
+            hue.Run(src);
+            dst3 = hue.dst2;
+            redC.inputMask = ~dst3;
+            redC.Run(src);
+            dst2 = redC.dst2;
+        }
+    }
+    public class CS_RedCloud_GenCellContains : CS_Parent
+    {
+        Flood_Basics flood = new Flood_Basics();
+        Flood_ContainedCells contains = new Flood_ContainedCells();
+        public CS_RedCloud_GenCellContains(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            desc = "Merge cells contained in the top X cells and remove all other cells.";
+        }
+        public void RunCS(Mat src)
+        {
+            flood.Run(src);
+            dst3 = flood.dst2;
+            if (task.heartBeat) return;
+            labels[2] = flood.labels[2];
+            contains.Run(src);
+            dst2.SetTo(0);
+            int count = Math.Min(task.redOptions.identifyCount, task.redCells.Count());
+            for (int i = 0; i < count; i++)
+            {
+                var rc = task.redCells[i];
+                dst2[rc.rect].SetTo(rc.color, rc.mask);
+                dst2.Rectangle(rc.rect, task.HighlightColor, task.lineWidth);
+            }
+            for (int i = task.redOptions.identifyCount; i < task.redCells.Count(); i++)
+            {
+                var rc = task.redCells[i];
+                dst2[rc.rect].SetTo(task.redCells[rc.container].color, rc.mask);
+            }
+        }
+    }
+    public class CS_RedCloud_PlusTiers : CS_Parent
+    {
+        Depth_TiersZ tiers = new Depth_TiersZ();
+        Bin4Way_Regions binar4 = new Bin4Way_Regions();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_PlusTiers(VBtask task) : base(task)
+        {
+            desc = "Add the depth tiers to the input for RedCloud_Basics.";
+        }
+        public void RunCS(Mat src)
+        {
+            tiers.Run(src);
+            binar4.Run(src);
+            redC.Run(binar4.dst2 + tiers.dst2);
+            dst2 = redC.dst2;
+            labels = redC.labels;
+        }
+    }
+
+    public class CS_RedCloud_Depth : CS_Parent
+    {
+        Flood_Basics flood = new Flood_Basics();
+        public CS_RedCloud_Depth(VBtask task) : base(task)
+        {
+            task.redOptions.setUseDepth(true);
+            desc = "Create RedCloud output using only depth.";
+        }
+        public void RunCS(Mat src)
+        {
+            flood.Run(src);
+            dst2 = flood.dst2;
+            labels[2] = flood.labels[2];
+        }
+    }
+    public class CS_RedCloud_Consistent1 : CS_Parent
+    {
+        Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
+        Diff_Basics diff = new Diff_Basics();
+        List<Mat> cellmaps = new List<Mat>();
+        List<List<rcData>> cellLists = new List<List<rcData>>();
+        List<Mat> diffs = new List<Mat>();
+        public CS_RedCloud_Consistent1(VBtask task) : base(task)
+        {
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
+            task.gOptions.pixelDiffThreshold = 1;
+            desc = "Remove RedCloud results that are inconsistent with the previous frame.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            diff.Run(task.cellMap);
+            dst1 = diff.dst2;
+            cellLists.Add(new List<rcData>(task.redCells));
+            cellmaps.Add(task.cellMap & ~dst1);
+            diffs.Add(dst1.Clone());
+            task.redCells.Clear();
+            task.redCells.Add(new rcData());
+            for (int i = 0; i < cellLists.Count(); i++)
+            {
+                foreach (var rc in cellLists[i])
+                {
+                    bool present = true;
+                    for (int j = 0; j < cellmaps.Count(); j++)
+                    {
+                        var val = cellmaps[i].At<byte>(rc.maxDist.Y, rc.maxDist.X);
+                        if (val == 0)
+                        {
+                            present = false;
+                            break;
+                        }
+                    }
+                    if (present)
+                    {
+                        rc.index = task.redCells.Count();
+                        task.redCells.Add(rc);
+                    }
+                }
+            }
+            dst2.SetTo(0);
+            task.cellMap.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                dst2[rc.rect].SetTo(rc.color, rc.mask);
+                task.cellMap[rc.rect].SetTo(rc.index, rc.mask);
+            }
+            foreach (var mat in diffs)
+            {
+                dst2.SetTo(0, mat);
+            }
+            if (cellmaps.Count() > task.frameHistoryCount)
+            {
+                cellmaps.RemoveAt(0);
+                cellLists.RemoveAt(0);
+                diffs.RemoveAt(0);
+            }
+        }
+    }
+    public class CS_RedCloud_Consistent2 : CS_Parent
+    {
+        Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
+        Diff_Basics diff = new Diff_Basics();
+        List<Mat> cellmaps = new List<Mat>();
+        List<List<rcData>> cellLists = new List<List<rcData>>();
+        List<Mat> diffs = new List<Mat>();
+        public CS_RedCloud_Consistent2(VBtask task) : base(task)
+        {
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
+            task.gOptions.pixelDiffThreshold = 1;
+            desc = "Remove RedCloud results that are inconsistent with the previous frame.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            diff.Run(task.cellMap);
+            dst1 = diff.dst2;
+            cellLists.Add(new List<rcData>(task.redCells));
+            cellmaps.Add(task.cellMap & ~dst1);
+            diffs.Add(dst1.Clone());
+            task.redCells.Clear();
+            task.redCells.Add(new rcData());
+            for (int i = 0; i < cellLists.Count(); i++)
+            {
+                foreach (var rc in cellLists[i])
+                {
+                    bool present = true;
+                    for (int j = 0; j < cellmaps.Count(); j++)
+                    {
+                        var val = cellmaps[i].At<byte>(rc.maxDist.Y, rc.maxDist.X);
+                        if (val == 0)
+                        {
+                            present = false;
+                            break;
+                        }
+                    }
+                    if (present)
+                    {
+                        rc.index = task.redCells.Count();
+                        task.redCells.Add(rc);
+                    }
+                }
+            }
+            dst2.SetTo(0);
+            task.cellMap.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                dst2[rc.rect].SetTo(rc.color, rc.mask);
+                task.cellMap[rc.rect].SetTo(rc.index, rc.mask);
+            }
+            foreach (var mat in diffs)
+            {
+                dst2.SetTo(0, mat);
+            }
+            if (cellmaps.Count() > task.frameHistoryCount)
+            {
+                cellmaps.RemoveAt(0);
+                cellLists.RemoveAt(0);
+                diffs.RemoveAt(0);
+            }
+        }
+    }
+    public class CS_RedCloud_Consistent : CS_Parent
+    {
+        Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
+        List<Mat> cellmaps = new List<Mat>();
+        List<List<rcData>> cellLists = new List<List<rcData>>();
+        Mat lastImage;
+        public CS_RedCloud_Consistent(VBtask task) : base(task)
+        {
+            lastImage = redC.dst2.Clone();
+            desc = "Remove RedCloud results that are inconsistent with the previous frame(s).";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            cellLists.Add(new List<rcData>(task.redCells));
+            cellmaps.Add(task.cellMap.Clone());
+            List<rcData> newCells = new List<rcData>();
+            newCells.Add(new rcData());
+            foreach (var rc in task.redCells)
+            {
+                var maxDStable = rc.maxDStable;
+                int count = 0;
+                List<int> sizes = new List<int>();
+                List<rcData> redData = new List<rcData>();
+                for (int i = 0; i < cellmaps.Count(); i++)
+                {
+                    int index = cellmaps[i].Get<Byte>(rc.maxDStable.Y, rc.maxDStable.X);
+                    if (cellLists[i][index].maxDStable == maxDStable)
+                    {
+                        count++;
+                        sizes.Add(cellLists[i][index].pixels);
+                        redData.Add(cellLists[i][index]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (count == cellmaps.Count())
+                {
+                    int index = sizes.IndexOf(sizes.Max());
+                    rcData rcNext = rc;
+                    rcNext = redData[index];
+                    var color = lastImage.Get<Vec3b>(rcNext.maxDStable.Y, rcNext.maxDStable.X);
+                    if (color != black) rcNext.color = color;
+                    rcNext.index = newCells.Count();
+                    newCells.Add(rcNext);
+                }
+            }
+            task.redCells = new List<rcData>(newCells);
+            dst2 = DisplayCells();
+            lastImage = dst2.Clone();
+            if (cellmaps.Count() > task.frameHistoryCount)
+            {
+                cellmaps.RemoveAt(0);
+                cellLists.RemoveAt(0);
+            }
+        }
+    }
+    public class CS_RedCloud_NaturalColor : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_NaturalColor(VBtask task) : base(task)
+        {
+            desc = "Display the RedCloud results with the mean color of the cell";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            labels[2] = redC.labels[2];
+            dst2 = DisplayCells();
+        }
+    }
+
+    public class CS_RedCloud_MotionBGsubtract : CS_Parent
+    {
+        public BGSubtract_Basics bgSub = new BGSubtract_Basics();
+        public List<rcData> redCells = new List<rcData>();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedCloud_MotionBGsubtract(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            task.gOptions.pixelDiffThreshold = 25;
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Use absDiff to build a mask of cells that changed.";
+        }
+        public void RunCS(Mat src)
+        {
+            bgSub.Run(src);
+            dst3 = bgSub.dst2;
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[3];
+            redCells.Clear();
+            dst1.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                Mat tmp = rc.mask & bgSub.dst2[rc.rect];
+                if (tmp.CountNonZero() > 0)
+                {
+                    dst1[rc.rect].SetTo(rc.color, rc.mask);
+                    rc.motionFlag = true;
+                }
+                redCells.Add(rc);
+            }
+        }
+    }
+    public class CS_RedCloud_JoinCells : CS_Parent
+    {
+        FeatureLess_RedCloud fLess = new FeatureLess_RedCloud();
+        public CS_RedCloud_JoinCells(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(20);
+            labels = new string[] { "", "FeatureLess_RedCloud output.", "RedCloud_Basics output", "RedCloud_Basics cells joined by using the color from the FeatureLess_RedCloud cellMap" };
+            desc = "Run RedCloud_Basics and use FeatureLess_RedCloud to join cells that are in the same featureless regions.";
+        }
+        public void RunCS(Mat src)
+        {
+            fLess.Run(src);
+            dst2 = fLess.dst2;
+            labels[2] = fLess.labels[2];
+            dst3.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                var color = fLess.dst2.Get<Vec3b>(rc.maxDist.Y, rc.maxDist.X);
+                dst3[rc.rect].SetTo(color, rc.mask);
+            }
+        }
+    }
+    public class CS_RedCloud_LeftRight : CS_Parent
+    {
+        Flood_LeftRight redC = new Flood_LeftRight();
+        public CS_RedCloud_LeftRight(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            desc = "Placeholder to make it easier to find where left and right images are floodfilled.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst1 = redC.dst1;
+            dst2 = redC.dst2;
+            dst3 = redC.dst3;
+            labels = redC.labels;
+        }
+    }
+    public class CS_RedCloud_ColorAndDepth : CS_Parent
+    {
+        Flood_Basics flood = new Flood_Basics();
+        Flood_Basics floodPC = new Flood_Basics();
+        List<rcData> colorCells = new List<rcData>();
+        Mat colorMap;
+        List<rcData> depthCells = new List<rcData>();
+        Mat depthMap;
+        int mousePicTag;
+        public CS_RedCloud_ColorAndDepth(VBtask task) : base(task)
+        {
+            colorMap = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            depthMap = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            mousePicTag = task.mousePicTag;
+            task.redOptions.setIdentifyCells(false);
+            desc = "Run Flood_Basics and use the cells to map the depth cells";
+        }
+        public void RunCS(Mat src)
+        {
+            task.redOptions.setUseColorOnly(true);
+            task.redCells = new List<rcData>(colorCells);
+            task.cellMap = colorMap.Clone();
+            flood.Run(src);
+            dst2 = flood.dst2;
+            colorCells = new List<rcData>(task.redCells);
+            colorMap = task.cellMap.Clone();
+            labels[2] = flood.labels[2];
+            task.redOptions.setUseDepth(true);
+            task.redCells = new List<rcData>(depthCells);
+            task.cellMap = depthMap.Clone();
+            floodPC.Run(src);
+            dst3 = floodPC.dst2;
+            depthCells = new List<rcData>(task.redCells);
+            depthMap = task.cellMap.Clone();
+            labels[3] = floodPC.labels[2];
+            if (task.mouseClickFlag) mousePicTag = task.mousePicTag;
+            switch (mousePicTag)
+            {
+                case 1:
+                    // setSelectedContour();
+                    break;
+                case 2:
+                    task.setSelectedContour(ref colorCells, ref colorMap);
+                    break;
+                case 3:
+                    task.setSelectedContour(ref depthCells, ref depthMap);
+                    break;
+            }
+            dst2.Rectangle(task.rc.rect, task.HighlightColor, task.lineWidth);
+            dst3[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+        }
+    }
+    public class CS_RedCloud_Delaunay : CS_Parent
+    {
+        RedCloud_CPP redCPP = new RedCloud_CPP();
+        Feature_Delaunay delaunay = new Feature_Delaunay();
+        Color8U_Basics color;
+        public CS_RedCloud_Delaunay(VBtask task) : base(task)
+        {
+            desc = "Test Feature_Delaunay points after Delaunay contours have been added.";
+        }
+        public void RunCS(Mat src)
+        {
+            delaunay.Run(src);
+            dst1 = delaunay.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (src.Channels() != 1)
+            {
+                if (color == null) color = new Color8U_Basics();
+                color.Run(src);
+                src = color.dst2;
+            }
+            redCPP.inputMask = dst1;
+            redCPP.Run(src);
+            dst2 = redCPP.dst2;
+            labels[2] = redCPP.labels[2];
+        }
+    }
+    public class CS_RedCloud_CPP : CS_Parent
+    {
+        public Mat inputMask;
+        public int classCount;
+        public List<cv.Rect> rectList = new List<cv.Rect>();
+        public List<cv.Point> floodPoints = new List<cv.Point>();
+        Color8U_Basics color;
+        public CS_RedCloud_CPP(VBtask task) : base(task)
+        {
+            inputMask = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            cPtr = RedCloud_Open();
+            desc = "Run the C++ RedCloud interface with or without a mask";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1)
+            {
+                if (color == null) color = new Color8U_Basics();
+                color.Run(src);
+                src = color.dst2;
+            }
+            IntPtr imagePtr;
+            byte[] inputData = new byte[src.Total()];
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length);
+            GCHandle handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned);
+            byte[] maskData = new byte[inputMask.Total()];
+            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length);
+            GCHandle handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned);
+            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols);
+            handleMask.Free();
+            handleInput.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            classCount = RedCloud_Count(cPtr);
+            if (classCount == 0) return; // no data to process.
+            Mat rectData = new Mat(classCount, 1, MatType.CV_32SC4, RedCloud_Rects(cPtr));
+            Mat floodPointData = new Mat(classCount, 1, MatType.CV_32SC2, RedCloud_FloodPoints(cPtr));
+            int[] rects = new int[classCount * 4];
+            Marshal.Copy(rectData.Data, rects, 0, rects.Length);
+            int[] ptList = new int[classCount * 2];
+            Marshal.Copy(floodPointData.Data, ptList, 0, ptList.Length);
+            rectList.Clear();
+            for (int i = 0; i < rects.Length - 4; i += 4)
+            {
+                rectList.Add(new cv.Rect(rects[i], rects[i + 1], rects[i + 2], rects[i + 3]));
+            }
+            floodPoints.Clear();
+            for (int i = 0; i < ptList.Length - 2; i += 2)
+            {
+                floodPoints.Add(new cv.Point(ptList[i], ptList[i + 1]));
+            }
+            if (standalone) dst3 = ShowPalette(dst2 * 255 / classCount);
+            if (task.heartBeat) labels[2] = "CV_8U result with " + classCount.ToString() + " regions.";
+            if (task.heartBeat) labels[3] = "Palette version of the data in dst2 with " + classCount.ToString() + " regions.";
+        }
+        public void Close()
+        {
+            if (cPtr != (IntPtr)0) cPtr = RedCloud_Close(cPtr);
+        }
+    }
+    public class CS_RedCloud_MaxDist_CPP : CS_Parent
+    {
+        public int classCount;
+        public List<cv.Rect> RectList = new List<cv.Rect>();
+        public List<cv.Point> floodPoints = new List<cv.Point>();
+        public List<int> maxList = new List<int>();
+        Color8U_Basics color = new Color8U_Basics();
+        public CS_RedCloud_MaxDist_CPP(VBtask task) : base(task)
+        {
+            cPtr = RedCloudMaxDist_Open();
+            desc = "Run the C++ RedCloudMaxDist interface without a mask";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1)
+            {
+                color.Run(src);
+                src = color.dst2;
+            }
+            if (task.heartBeat) maxList.Clear(); // reevaluate all cells.
+            int[] maxArray = maxList.ToArray();
+            GCHandle handleMaxList = GCHandle.Alloc(maxArray, GCHandleType.Pinned);
+            RedCloudMaxDist_SetPoints(cPtr, maxList.Count() / 2, handleMaxList.AddrOfPinnedObject());
+            handleMaxList.Free();
+            IntPtr imagePtr;
+            byte[] inputData = new byte[src.Total()];
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length);
+            GCHandle handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned);
+            imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), (IntPtr)0, src.Rows, src.Cols);
+            handleInput.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst3 = ShowPalette(dst2);
+            classCount = RedCloudMaxDist_Count(cPtr);
+            labels[2] = "CV_8U version with " + classCount.ToString() + " cells.";
+            if (classCount == 0) return; // no data to process.
+            Mat rectData = new Mat(classCount, 1, MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr));
+            Mat floodPointData = new Mat(classCount, 1, MatType.CV_32SC2, RedCloudMaxDist_FloodPoints(cPtr));
+            int[] rects = new int[classCount * 4];
+            Marshal.Copy(rectData.Data, rects, 0, rects.Length);
+            int[] ptList = new int[classCount * 2];
+            Marshal.Copy(floodPointData.Data, ptList, 0, ptList.Length);
+            for (int i = 0; i < rects.Length - 4; i += 4)
+            {
+                RectList.Add(new cv.Rect(rects[i], rects[i + 1], rects[i + 2], rects[i + 3]));
+            }
+            for (int i = 0; i < ptList.Length - 2; i += 2)
+            {
+                floodPoints.Add(new cv.Point(ptList[i], ptList[i + 1]));
+            }
+        }
+        public void Close()
+        {
+            if (cPtr != (IntPtr)0) cPtr = RedCloudMaxDist_Close(cPtr);
+        }
+    }
+
+    public class CS_RedCloud_Reduce : CS_Parent
+    {
+        public int classCount;
+        Options_RedCloudOther options = new Options_RedCloudOther();
+        public CS_RedCloud_Reduce(VBtask task) : base(task)
+        {
+            desc = "Reduction transform for the point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            task.pointCloud.ConvertTo(dst0, MatType.CV_32S, 1000 / options.reduceAmt);
+            var split = dst0.Split();
+            switch (task.redOptions.PointCloudReduction)
+            {
+                case 0: // "X Reduction"
+                    dst0 = (split[0] * options.reduceAmt).ToMat();
+                    break;
+                case 1: // "Y Reduction"
+                    dst0 = (split[1] * options.reduceAmt).ToMat();
+                    break;
+                case 2: // "Z Reduction"
+                    dst0 = (split[2] * options.reduceAmt).ToMat();
+                    break;
+                case 3: // "XY Reduction"
+                    dst0 = (split[0] * options.reduceAmt + split[1] * options.reduceAmt).ToMat();
+                    break;
+                case 4: // "XZ Reduction"
+                    dst0 = (split[0] * options.reduceAmt + split[2] * options.reduceAmt).ToMat();
+                    break;
+                case 5: // "YZ Reduction"
+                    dst0 = (split[1] * options.reduceAmt + split[2] * options.reduceAmt).ToMat();
+                    break;
+                case 6: // "XYZ Reduction"
+                    dst0 = (split[0] * options.reduceAmt + split[1] * options.reduceAmt + split[2] * options.reduceAmt).ToMat();
+                    break;
+            }
+            var mm = GetMinMax(dst0);
+            dst2 = (dst0 - mm.minVal);
+            dst2 = dst2 * 255 / (mm.maxVal - mm.minVal);
+            dst2.ConvertTo(dst2, MatType.CV_8U);
+            labels[2] = "Reduced Pointcloud - reduction factor = " + options.reduceAmt.ToString() + " produced " + classCount.ToString() + " regions";
+        }
+    }
+    public class CS_RedCloud_NaturalGray : CS_Parent
+    {
+        RedCloud_Consistent redC = new RedCloud_Consistent();
+        Options_RedCloudOther options = new Options_RedCloudOther();
+        public CS_RedCloud_NaturalGray(VBtask task) : base(task)
+        {
+            desc = "Display the RedCloud results with the mean grayscale value of the cell +- delta";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            var rc = task.rc;
+            var val = (int)(0.299 * rc.colorMean[0] + 0.587 * rc.colorMean[1] + 0.114 * rc.colorMean[2]);
+            dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst0 = dst1.InRange(val - options.range, val + options.range);
+            var color = new Vec3b((byte)rc.colorMean[0], (byte)rc.colorMean[1], (byte)rc.colorMean[2]);
+            dst3.SetTo(0);
+            dst3.SetTo(Scalar.White, dst0);
+        }
+    }
+    public class CS_RedCloud_FeatureLessReduce : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        FeatureROI_Basics devGrid = new FeatureROI_Basics();
+        public List<rcData> redCells = new List<rcData>();
+        public Mat cellMap;
+        AddWeighted_Basics addw = new AddWeighted_Basics();
+        Options_RedCloudOther options = new Options_RedCloudOther();
+        public CS_RedCloud_FeatureLessReduce(VBtask task) : base(task)
+        {
+            cellMap = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Remove any cells which are in a featureless region - they are part of the neighboring (and often surrounding) region.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            devGrid.Run(src);
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            dst3.SetTo(0);
+            redCells.Clear();
+            foreach (var rc in task.redCells)
+            {
+                var tmp = new Mat(rc.mask.Size(), MatType.CV_8U, 0);
+                devGrid.dst3[rc.rect].CopyTo(tmp, rc.mask);
+                var count = tmp.CountNonZero();
+                if (count == 0 || rc.pixels == 0) continue;
+                if (count / rc.pixels < options.threshold)
+                {
+                    dst3[rc.rect].SetTo(rc.color, rc.mask);
+                    rc.index = redCells.Count();
+                    redCells.Add(rc);
+                    cellMap[rc.rect].SetTo(rc.index, rc.mask);
+                }
+            }
+            addw.src2 = devGrid.dst3.CvtColor(ColorConversionCodes.GRAY2BGR);
+            addw.Run(dst2);
+            dst2 = addw.dst2;
+            labels[3] = $"{redCells.Count()} cells after removing featureless cells that were part of their surrounding.  " +
+                        $"{task.redCells.Count() - redCells.Count()} were removed.";
+            task.setSelectedContour();
+        }
+    }
+    public class CS_RedCloud_Features : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Options_RedCloudFeatures options = new Options_RedCloudFeatures();
+        public CS_RedCloud_Features(VBtask task) : base(task)
+        {
+            desc = "Display And validate the keyPoints for each RedCloud cell";
+        }
+        Vec3b vbNearFar(float factor)
+        {
+            var nearYellow = new Vec3b(255, 0, 0);
+            var farBlue = new Vec3b(0, 255, 255);
+            if (float.IsNaN(factor)) return new Vec3b();
+            if (factor > 1) factor = 1;
+            if (factor < 0) factor = 0;
+            return new Vec3b((byte)((1 - factor) * farBlue.Item0 + factor * nearYellow.Item0),
+                             (byte)((1 - factor) * farBlue.Item1 + factor * nearYellow.Item1),
+                             (byte)((1 - factor) * farBlue.Item2 + factor * nearYellow.Item2));
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            redC.Run(src);
+            dst2 = redC.dst2;
+            var rc = task.rc;
+            dst0 = task.color;
+            var correlationMat = new Mat();
+            float correlationXtoZ = 0.0f, correlationYtoZ = 0.0f;
+            dst3.SetTo(0);
+            switch (options.selection)
+            {
+                case 0:
+                    var pt = rc.maxDist;
+                    dst2.Circle(pt, task.DotSize, task.HighlightColor, -1, LineTypes.AntiAlias);
+                    labels[3] = "maxDist Is at (" + pt.X + ", " + pt.Y + ")";
+                    break;
+                case 1:
+                    dst3[rc.rect].SetTo(vbNearFar((float)((rc.depthMean[2]) / task.MaxZmeters)), rc.mask);
+                    labels[3] = "rc.depthMean(2) Is highlighted in dst2";
+                    labels[3] = "Mean depth for the cell Is " + rc.depthMean[2].ToString("F3");
+                    break;
+                case 2:
+                    Cv2.MatchTemplate(task.pcSplit[0][rc.rect], task.pcSplit[2][rc.rect], correlationMat, TemplateMatchModes.CCoeffNormed, rc.mask);
+                    correlationXtoZ = correlationMat.Get<float>(0, 0);
+                    labels[3] = "High correlation X to Z Is yellow, low correlation X to Z Is blue";
+                    break;
+                case 3:
+                    Cv2.MatchTemplate(task.pcSplit[1][rc.rect], task.pcSplit[2][rc.rect], correlationMat, TemplateMatchModes.CCoeffNormed, rc.mask);
+                    correlationYtoZ = correlationMat.Get<float>(0, 0);
+                    labels[3] = "High correlation Y to Z Is yellow, low correlation Y to Z Is blue";
+                    break;
+            }
+            if (options.selection == 2 || options.selection == 3)
+            {
+                dst3[rc.rect].SetTo(vbNearFar((options.selection == 2 ? correlationXtoZ : correlationYtoZ) + 1), rc.mask);
+                SetTrueText("(" + correlationXtoZ.ToString("F3") + ", " + correlationYtoZ.ToString("F3") + ")", new cv.Point(rc.rect.X, rc.rect.Y), 3);
+            }
+            DrawContour(dst0[rc.rect], rc.contour, Scalar.Yellow);
+            SetTrueText(labels[3], 3);
+            labels[2] = "Highlighted feature = " + options.labelName;
+        }
+    }
 
 }

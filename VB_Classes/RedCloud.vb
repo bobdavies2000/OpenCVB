@@ -299,85 +299,6 @@ End Class
 
 
 
-
-
-Public Class RedCloud_Features : Inherits VB_Parent
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("MaxDist Location")
-            radio.addRadio("Depth mean")
-            radio.addRadio("Correlation X to Z")
-            radio.addRadio("Correlation Y to Z")
-            radio.check(3).Checked = True
-        End If
-
-        desc = "Display And validate the keyPoints for each RedCloud cell"
-    End Sub
-    Private Function vbNearFar(factor As Single) As cv.Vec3b
-        Dim nearYellow As New cv.Vec3b(255, 0, 0)
-        Dim farBlue As New cv.Vec3b(0, 255, 255)
-        If Single.IsNaN(factor) Then Return New cv.Vec3b
-        If factor > 1 Then factor = 1
-        If factor < 0 Then factor = 0
-        Return New cv.Vec3b(((1 - factor) * farBlue(0) + factor * nearYellow(0)),
-                            ((1 - factor) * farBlue(1) + factor * nearYellow(1)),
-                            ((1 - factor) * farBlue(2) + factor * nearYellow(2)))
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        Static frm = FindFrm(traceName + " Radio Buttons")
-        Dim selection As Integer
-        Dim labelName As String
-        For selection = 0 To frm.check.Count - 1
-            If frm.check(selection).Checked Then
-                labelName = frm.check(selection).text
-                Exit For
-            End If
-        Next
-
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        Dim rc = task.rc
-
-        dst0 = task.color
-        Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
-        dst3.SetTo(0)
-        Select Case selection
-            Case 0
-                Dim pt = rc.maxDist
-                dst2.Circle(pt, task.DotSize, task.HighlightColor, -1, cv.LineTypes.AntiAlias)
-                labels(3) = "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
-            Case 1
-                dst3(rc.rect).SetTo(vbNearFar((rc.depthMean(2)) / task.MaxZmeters), rc.mask)
-                labels(3) = "rc.depthMean(2) Is highlighted in dst2"
-                labels(3) = "Mean depth for the cell Is " + Format(rc.depthMean(2), fmt3)
-            Case 2
-                cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
-                correlationXtoZ = correlationMat.Get(Of Single)(0, 0)
-                labels(3) = "High correlation X to Z Is yellow, low correlation X to Z Is blue"
-            Case 3
-                cv.Cv2.MatchTemplate(task.pcSplit(1)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
-                correlationYtoZ = correlationMat.Get(Of Single)(0, 0)
-                labels(3) = "High correlation Y to Z Is yellow, low correlation Y to Z Is blue"
-        End Select
-        If selection = 2 Or selection = 3 Then
-            dst3(rc.rect).SetTo(vbNearFar(If(selection = 2, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
-            SetTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")", New cv.Point(rc.rect.X, rc.rect.Y), 3)
-        End If
-        DrawContour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
-        SetTrueText(labels(3), 3)
-        labels(2) = "Highlighted feature = " + labelName
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class RedCloud_ShapeCorrelation : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -1672,7 +1593,7 @@ Public Class RedCloud_UnmatchedCount : Inherits VB_Parent
                 End If
             End If
         Next
-        If showIntermediate() Then
+        If ShowIntermediate() Then
             For i = 0 To framecounts.Count - 1
                 SetTrueText(CStr(framecounts(i)), frameLoc(i), 2)
             Next
@@ -1876,55 +1797,6 @@ End Class
 
 
 
-Public Class RedCloud_FeatureLessReduce : Inherits VB_Parent
-    Dim redC As New RedCloud_Basics
-    Dim devGrid As New FeatureROI_Basics
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-    Dim addw As New AddWeighted_Basics
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent featureLess threshold", 1, 100, 95)
-        desc = "Remove any cells which are in a featureless region - they are part of the neighboring (and often surrounding) region."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Percent featureLess threshold")
-        Dim threshold = thresholdSlider.value / 100
-        devGrid.Run(src)
-
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        dst3.SetTo(0)
-        redCells.Clear()
-        For Each rc In task.redCells
-            Dim tmp = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, 0)
-            devGrid.dst3(rc.rect).CopyTo(tmp, rc.mask)
-            Dim count = tmp.CountNonZero
-            If count / rc.pixels < threshold Then
-                dst3(rc.rect).SetTo(rc.color, rc.mask)
-                rc.index = redCells.Count
-                redCells.Add(rc)
-                cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            End If
-        Next
-
-        addw.src2 = devGrid.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run(dst2)
-        dst2 = addw.dst2
-
-        labels(3) = $"{redCells.Count} cells after removing featureless cells that were part of their surrounding.  " +
-                    $"{task.redCells.Count - redCells.Count} were removed."
-
-        task.setSelectedContour()
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class RedCloud_TopX : Inherits VB_Parent
@@ -2117,50 +1989,6 @@ Public Class RedCloud_PlusTiers : Inherits VB_Parent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedCloud_Reduce : Inherits VB_Parent
-    Public classCount As Integer
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("RedCloud_Reduce Reduction", 1, 2500, 250)
-        desc = "Reduction transform for the point cloud"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static reductionSlider = FindSlider("RedCloud_Reduce Reduction")
-        Dim reduceAmt = reductionSlider.value
-        task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
-
-        Dim split = dst0.Split()
-
-        Select Case task.redOptions.PointCloudReduction
-            Case 0 ' "X Reduction"
-                dst0 = (split(0) * reduceAmt).toMat
-            Case 1 ' "Y Reduction"
-                dst0 = (split(1) * reduceAmt).toMat
-            Case 2 ' "Z Reduction"
-                dst0 = (split(2) * reduceAmt).toMat
-            Case 3 ' "XY Reduction"
-                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).toMat
-            Case 4 ' "XZ Reduction"
-                dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).toMat
-            Case 5 ' "YZ Reduction"
-                dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).toMat
-            Case 6 ' "XYZ Reduction"
-                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).toMat
-        End Select
-
-        Dim mm As mmData = GetMinMax(dst0)
-        dst2 = (dst0 - mm.minVal)
-        dst2 = dst2 * 255 / (mm.maxVal - mm.minVal)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
-        labels(2) = "Reduced Pointcloud - reduction factor = " + CStr(reduceAmt) + " produced " + CStr(classCount) + " regions"
-    End Sub
-End Class
 
 
 
@@ -2395,38 +2223,6 @@ Public Class RedCloud_NaturalColor : Inherits VB_Parent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class RedCloud_NaturalGray : Inherits VB_Parent
-    Dim redC As New RedCloud_Consistent
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Grayscale range around mean", 0, 100, 30)
-        desc = "Display the RedCloud results with the mean grayscale value of the cell +- delta"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static rangeSlider = FindSlider("Grayscale range around mean")
-        Dim range = rangeSlider.value
-
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        Dim rc = task.rc
-        Dim val = CInt(0.299 * rc.colorMean(0) + 0.587 * rc.colorMean(1) + 0.114 * rc.colorMean(2))
-
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst0 = dst1.InRange(val - range, val + range)
-
-        Dim color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
-        dst3.SetTo(0)
-        dst3.SetTo(cv.Scalar.White, dst0)
-    End Sub
-End Class
 
 
 
@@ -2721,5 +2517,195 @@ Public Class RedCloud_MaxDist_CPP : Inherits VB_Parent
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Reduce : Inherits VB_Parent
+    Public classCount As Integer
+    Dim options As New Options_RedCloudOther
+    Public Sub New()
+        desc = "Reduction transform for the point cloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / options.reduceAmt)
+
+        Dim split = dst0.Split()
+
+        Select Case task.redOptions.PointCloudReduction
+            Case 0 ' "X Reduction"
+                dst0 = (split(0) * options.reduceAmt).ToMat
+            Case 1 ' "Y Reduction"
+                dst0 = (split(1) * options.reduceAmt).ToMat
+            Case 2 ' "Z Reduction"
+                dst0 = (split(2) * options.reduceAmt).ToMat
+            Case 3 ' "XY Reduction"
+                dst0 = (split(0) * options.reduceAmt + split(1) * options.reduceAmt).ToMat
+            Case 4 ' "XZ Reduction"
+                dst0 = (split(0) * options.reduceAmt + split(2) * options.reduceAmt).ToMat
+            Case 5 ' "YZ Reduction"
+                dst0 = (split(1) * options.reduceAmt + split(2) * options.reduceAmt).ToMat
+            Case 6 ' "XYZ Reduction"
+                dst0 = (split(0) * options.reduceAmt + split(1) * options.reduceAmt + split(2) * options.reduceAmt).ToMat
+        End Select
+
+        Dim mm As mmData = GetMinMax(dst0)
+        dst2 = (dst0 - mm.minVal)
+        dst2 = dst2 * 255 / (mm.maxVal - mm.minVal)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        labels(2) = "Reduced Pointcloud - reduction factor = " + CStr(options.reduceAmt) + " produced " + CStr(classCount) + " regions"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_NaturalGray : Inherits VB_Parent
+    Dim redC As New RedCloud_Consistent
+    Dim options As New Options_RedCloudOther
+    Public Sub New()
+        desc = "Display the RedCloud results with the mean grayscale value of the cell +- delta"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        Dim rc = task.rc
+        Dim val = CInt(0.299 * rc.colorMean(0) + 0.587 * rc.colorMean(1) + 0.114 * rc.colorMean(2))
+
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = dst1.InRange(val - options.range, val + options.range)
+
+        Dim color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+        dst3.SetTo(0)
+        dst3.SetTo(cv.Scalar.White, dst0)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_FeatureLessReduce : Inherits VB_Parent
+    Dim redC As New RedCloud_Basics
+    Dim devGrid As New FeatureROI_Basics
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+    Dim addw As New AddWeighted_Basics
+    Dim options As New Options_RedCloudOther
+    Public Sub New()
+        desc = "Remove any cells which are in a featureless region - they are part of the neighboring (and often surrounding) region."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        devGrid.Run(src)
+
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        redCells.Clear()
+        For Each rc In task.redCells
+            Dim tmp = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, 0)
+            devGrid.dst3(rc.rect).CopyTo(tmp, rc.mask)
+            Dim count = tmp.CountNonZero
+            If count / rc.pixels < options.threshold Then
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                rc.index = redCells.Count
+                redCells.Add(rc)
+                cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            End If
+        Next
+
+        addw.src2 = devGrid.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        addw.Run(dst2)
+        dst2 = addw.dst2
+
+        labels(3) = $"{redCells.Count} cells after removing featureless cells that were part of their surrounding.  " +
+                    $"{task.redCells.Count - redCells.Count} were removed."
+
+        task.setSelectedContour()
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_Features : Inherits VB_Parent
+    Dim redC As New RedCloud_Basics
+    Dim options As New Options_RedCloudFeatures
+    Public Sub New()
+        desc = "Display And validate the keyPoints for each RedCloud cell"
+    End Sub
+    Private Function vbNearFar(factor As Single) As cv.Vec3b
+        Dim nearYellow As New cv.Vec3b(255, 0, 0)
+        Dim farBlue As New cv.Vec3b(0, 255, 255)
+        If Single.IsNaN(factor) Then Return New cv.Vec3b
+        If factor > 1 Then factor = 1
+        If factor < 0 Then factor = 0
+        Return New cv.Vec3b(((1 - factor) * farBlue(0) + factor * nearYellow(0)),
+                            ((1 - factor) * farBlue(1) + factor * nearYellow(1)),
+                            ((1 - factor) * farBlue(2) + factor * nearYellow(2)))
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        Dim rc = task.rc
+
+        dst0 = task.color
+        Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
+        dst3.SetTo(0)
+        Select Case options.selection
+            Case 0
+                Dim pt = rc.maxDist
+                dst2.Circle(pt, task.DotSize, task.HighlightColor, -1, cv.LineTypes.AntiAlias)
+                labels(3) = "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
+            Case 1
+                dst3(rc.rect).SetTo(vbNearFar((rc.depthMean(2)) / task.MaxZmeters), rc.mask)
+                labels(3) = "rc.depthMean(2) Is highlighted in dst2"
+                labels(3) = "Mean depth for the cell Is " + Format(rc.depthMean(2), fmt3)
+            Case 2
+                cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                correlationXtoZ = correlationMat.Get(Of Single)(0, 0)
+                labels(3) = "High correlation X to Z Is yellow, low correlation X to Z Is blue"
+            Case 3
+                cv.Cv2.MatchTemplate(task.pcSplit(1)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                correlationYtoZ = correlationMat.Get(Of Single)(0, 0)
+                labels(3) = "High correlation Y to Z Is yellow, low correlation Y to Z Is blue"
+        End Select
+        If options.selection = 2 Or options.selection = 3 Then
+            dst3(rc.rect).SetTo(vbNearFar(If(options.selection = 2, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
+            SetTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")", New cv.Point(rc.rect.X, rc.rect.Y), 3)
+        End If
+        DrawContour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
+        SetTrueText(labels(3), 3)
+        labels(2) = "Highlighted feature = " + options.labelName
     End Sub
 End Class

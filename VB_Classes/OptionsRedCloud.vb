@@ -323,6 +323,12 @@ Public Class OptionsRedCloud
     Public Sub setUseColorOnly(newVal As Boolean)
         UseColorOnly.Checked = newVal
     End Sub
+    Public Function getUseColorOnly() As Boolean
+        Return UseColorOnly.Checked
+    End Function
+    Public Function getUseGuidedProjection() As Boolean
+        Return UseGuidedProjection.Checked
+    End Function
     Public Sub setSimpleReductionBar(newVal As Integer)
         SimpleReductionBar.Value = newVal
     End Sub
@@ -347,6 +353,12 @@ Public Class OptionsRedCloud
     Public Sub setIdentifyCells(val As Boolean)
         IdentifyCells.Checked = val
     End Sub
+    Public Function getIdentifyCells() As Boolean
+        Return IdentifyCells.Checked
+    End Function
+    Public Function getIdentifyCount() As Boolean
+        Return IdentifyCountBar.Value
+    End Function
     Public Sub setProjection(val As Integer)
         ProjectionThresholdBar.Value = val
     End Sub
@@ -356,7 +368,18 @@ Public Class OptionsRedCloud
     Public Function getYRangeSlider() As Integer
         Return YRangeSlider.Value
     End Function
-
+    Public Sub setXZReduction(val As Boolean)
+        XZReduction.Checked = val
+    End Sub
+    Public Sub setNaturalColor(val As Boolean)
+        NaturalColor.Checked = val
+    End Sub
+    Public Function getNaturalColor() As Boolean
+        Return NaturalColor.Checked
+    End Function
+    Public Sub setYZReduction(val As Boolean)
+        YZReduction.Checked = val
+    End Sub
     Public Sub setXRangeSlider(val As Integer)
         XRangeBar.Value = val
     End Sub
@@ -365,9 +388,6 @@ Public Class OptionsRedCloud
     End Function
     Public Function getProjection() As Integer
         Return ProjectionThresholdBar.Value
-    End Function
-    Public Function getIdentifyCells() As Boolean
-        Return IdentifyCells.Checked
     End Function
     Public Function getHistBins3D() As Integer
         Return histBins3D

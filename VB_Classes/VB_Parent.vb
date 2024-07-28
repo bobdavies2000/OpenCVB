@@ -528,7 +528,7 @@ Public Class VB_Parent : Implements IDisposable
         trueData.Add(str)
     End Sub
     Public Function standaloneTest() As Boolean
-        If standalone Or showIntermediate() Then Return True
+        If standalone Or ShowIntermediate() Then Return True
         Return False
     End Function
     Public Sub UpdateAdvice(advice As String)
@@ -574,7 +574,7 @@ Public Class VB_Parent : Implements IDisposable
         task.palette.Run(input)
         Return task.palette.dst2.Clone
     End Function
-    Public Function showIntermediate() As Boolean
+    Public Function ShowIntermediate() As Boolean
         If task.intermediateObject Is Nothing Then Return False
         If task.intermediateObject.traceName = traceName Then Return True
         Return False

@@ -372,9 +372,9 @@ module FS_Classes =
 //        dst
 
 //    let standaloneTest() =
-//        standalone || showIntermediate()
+//        standalone || ShowIntermediate()
 
-//    let showIntermediate() =
+//    let ShowIntermediate() =
 //        false
 
 //    let initRandomRect (margin: int) =

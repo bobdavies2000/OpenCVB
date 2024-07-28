@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Rectangle_Basics : Inherits VB_Parent
     Public rectangles As New List(Of cv.Rect)
     Public rotatedRectangles As New List(Of cv.RotatedRect)
-    Dim options As New Options_Draw
+    Public options As New Options_Draw
     Public Sub New()
         desc = "Draw the requested number of rectangles."
     End Sub
@@ -112,11 +112,11 @@ Public Class Rectangle_Intersection : Inherits VB_Parent
     Dim draw As New Rectangle_Basics
     Public enclosingRects As New List(Of cv.Rect)
     Dim otherRects As New List(Of cv.Rect)
+    Dim rotatedCheck As System.Windows.Forms.CheckBox
+    Dim countSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Merge rectangles within X pixels", 0, dst2.Width, If(dst2.Width = 1280, 500, 250))
-        End If
-
+        rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+        countSlider = FindSlider("DrawCount")
         desc = "Test if any number of rectangles intersect."
     End Sub
     Private Function findEnclosingRect(rects As List(Of cv.Rect), proximity As Integer) As cv.Rect
@@ -134,14 +134,9 @@ Public Class Rectangle_Intersection : Inherits VB_Parent
         Return enclosing
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static mergeSlider = FindSlider("Merge rectangles within X pixels")
-
         If standaloneTest() Then
             If task.heartBeat Then
-                Static rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-                Static countSlider = FindSlider("DrawCount")
-
-                rotatedCheck.Enabled = False
+                rotatedCheck.Enabled = task.toggleOnOff
                 countSlider.Value = msRNG.Next(2, 10)
                 labels(2) = "Input rectangles = " + CStr(countSlider.Value)
 
@@ -163,10 +158,9 @@ Public Class Rectangle_Intersection : Inherits VB_Parent
 
         otherRects = New List(Of cv.Rect)(sortedRect.Values)
 
-        Dim proximity = mergeSlider.Value
         enclosingRects.Clear()
         While otherRects.Count
-            Dim enclosing = findEnclosingRect(otherRects, proximity)
+            Dim enclosing = findEnclosingRect(otherRects, draw.options.proximity)
             enclosingRects.Add(enclosing)
         End While
         labels(3) = CStr(enclosingRects.Count) + " enclosing rectangles were found"

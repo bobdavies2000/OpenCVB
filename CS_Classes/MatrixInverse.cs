@@ -11,17 +11,17 @@ namespace CS_Classes
         cv.Mat inverse;
         public cv.Mat RunCS(cv::Mat m)
         {
-            bool showIntermediate = false; // turn this on if further detail is needed.
+            bool ShowIntermediate = false; // turn this on if further detail is needed.
             double d = MatDeterminant(m);
             if (Math.Abs(d) < 1.0e-5)
-                if (showIntermediate) Console.WriteLine("\nMatrix has no inverse");
+                if (ShowIntermediate) Console.WriteLine("\nMatrix has no inverse");
                 else
-                if (showIntermediate) Console.WriteLine("\nDet(m) = " + d.ToString("F4"));
+                if (ShowIntermediate) Console.WriteLine("\nDet(m) = " + d.ToString("F4"));
 
             inverse = MatInverse(m);
 
             cv.Mat prod = MatProduct(m, inverse);
-            if (showIntermediate)
+            if (ShowIntermediate)
             {
                 Console.WriteLine("\nThe product of m * inv is ");
                 MatShow(prod, 1, 6);
@@ -30,7 +30,7 @@ namespace CS_Classes
             cv.Mat lum;
             int[] perm;
             int toggle = MatDecompose(m, out lum, out perm);
-            if (showIntermediate)
+            if (ShowIntermediate)
             {
                 Console.WriteLine("\nThe combined lower-upper decomposition of m is");
                 MatShow(lum, 4, 8);
@@ -39,7 +39,7 @@ namespace CS_Classes
             cv.Mat lower = ExtractLower(lum);
             cv.Mat upper = ExtractUpper(lum);
 
-            if (showIntermediate)
+            if (ShowIntermediate)
             {
                 solution = MatVecProd(inverse, bVector);  // (1, 0, 2, 1)
                 Console.WriteLine("\nThe lower part of LUM is");

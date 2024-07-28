@@ -79,6 +79,7 @@ Public Class Touchup
 
                 inline = Replace(inline, "()(", "(")
                 inline = Replace(inline, "()()", "()")
+                inline = Replace(inline, "cv.Rectangle", "Rectangle")
             Else
                 If line.StartsWith("Public Class CS_") Then
                     inline = inline.Replace("Public Class CS_", "Public Class VB_")

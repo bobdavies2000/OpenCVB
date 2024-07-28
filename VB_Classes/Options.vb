@@ -155,32 +155,6 @@ End Class
 
 
 
-
-Public Class Options_Draw : Inherits VB_Parent
-    Public drawCount As Integer = 3
-    Public drawFilled As Integer = 2
-    Public drawRotated As Boolean = False
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("DrawCount", 0, 20, drawCount)
-
-        If check.Setup(traceName) Then
-            check.addCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-            check.addCheckBox("Draw filled (unchecked draw an outline)")
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static countSlider = FindSlider("DrawCount")
-        Static fillCheck = FindCheckBox("Draw filled (unchecked draw an outline)")
-        Static rotateCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        drawCount = countSlider.Value
-        drawFilled = If(fillCheck.checked, -1, 2)
-        drawRotated = rotateCheck.checked
-    End Sub
-End Class
-
-
-
-
 ' https://answers.opencv.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
 Public Class Options_Encode : Inherits VB_Parent
     Public qualityLevel As Integer = 1
@@ -6889,5 +6863,213 @@ Public Class Options_PyrFilter : Inherits VB_Parent
         radius = radiusSlider.value
         color = colorSlider.value
         maxPyramid = maxSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_NormalDist : Inherits VB_Parent
+    Public redVal As Integer
+    Public greenVal As Integer
+    Public blueVal As Integer
+    Public stdev As Integer
+    Public grayChecked As Boolean
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Random_NormalDist Blue Mean", 0, 255, 125)
+            sliders.setupTrackBar("Random_NormalDist Green Mean", 0, 255, 25)
+            sliders.setupTrackBar("Random_NormalDist Red Mean", 0, 255, 180)
+            sliders.setupTrackBar("Random_NormalDist Stdev", 0, 255, 50)
+        End If
+
+        If check.Setup(traceName) Then check.addCheckBox("Use Grayscale image")
+    End Sub
+    Public Sub RunVB()
+        Static blueSlider = FindSlider("Random_NormalDist Blue Mean")
+        Static greenSlider = FindSlider("Random_NormalDist Green Mean")
+        Static redSlider = FindSlider("Random_NormalDist Red Mean")
+        Static stdevSlider = FindSlider("Random_NormalDist Stdev")
+        redVal = redSlider.value
+        greenVal = greenSlider.value
+        blueVal = blueSlider.value
+        stdev = stdevSlider.value
+
+        Static grayCheck = FindCheckBox("Use Grayscale image")
+        grayChecked = grayCheck.checked
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_MonteCarlo : Inherits VB_Parent
+    Public dimension As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of bins", 1, 255, 91)
+    End Sub
+    Public Sub RunVB()
+        Static binSlider = FindSlider("Number of bins")
+        dimension = binSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_StaticTV : Inherits VB_Parent
+    Public val As Integer
+    Public thresh As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Range of noise to apply (from 0 to this value)", 0, 255, 50)
+            sliders.setupTrackBar("Percentage of pixels to include noise", 0, 100, 20)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static valSlider = FindSlider("Range of noise to apply (from 0 to this value)")
+        Static threshSlider = FindSlider("Percentage of pixels to include noise")
+        val = valSlider.Value
+        thresh = threshSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_Clusters : Inherits VB_Parent
+    Public numClusters As Integer = 3
+    Public numPoints As Integer
+    Public stdev As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Number of Clusters", 1, 10, 9)
+            sliders.setupTrackBar("Number of points per cluster", 1, 100, 20)
+            sliders.setupTrackBar("Cluster stdev", 0, 100, 10)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static clustSlider = FindSlider("Number of Clusters")
+        Static numSlider = FindSlider("Number of points per cluster")
+        Static stdevSlider = FindSlider("Cluster stdev")
+        numClusters = clustSlider.Value
+        numPoints = numSlider.Value
+        stdev = stdevSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Draw : Inherits VB_Parent
+    Public proximity As Integer
+    Public drawCount As Integer = 3
+    Public drawFilled As Integer = 2
+    Public drawRotated As Boolean = False
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("DrawCount", 0, 20, drawCount)
+            sliders.setupTrackBar("Merge rectangles within X pixels", 0, dst2.Width, If(dst2.Width = 1280, 500, 250))
+        End If
+
+        If check.Setup(traceName) Then
+            check.addCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+            check.addCheckBox("Draw filled (unchecked draw an outline)")
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static mergeSlider = FindSlider("Merge rectangles within X pixels")
+        Static countSlider = FindSlider("DrawCount")
+        Static fillCheck = FindCheckBox("Draw filled (unchecked draw an outline)")
+        Static rotateCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+        drawCount = countSlider.Value
+        drawFilled = If(fillCheck.checked, -1, 2)
+        drawRotated = rotateCheck.checked
+        proximity = mergeSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_RBF : Inherits VB_Parent
+    Public RBFCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("RBF Recursion count", 1, 20, 2)
+    End Sub
+    Public Sub RunVB()
+        Static countSlider = FindSlider("RBF Recursion count")
+        RBFCount = countSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_RedCloudOther : Inherits VB_Parent
+    Public range As Integer
+    Public reduceAmt As Integer
+    Public threshold As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Grayscale range around mean", 0, 100, 30)
+            sliders.setupTrackBar("RedCloud_Reduce Reduction", 1, 2500, 250)
+            sliders.setupTrackBar("Percent featureLess threshold", 1, 100, 95)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static rangeSlider = FindSlider("Grayscale range around mean")
+        Static reductionSlider = FindSlider("RedCloud_Reduce Reduction")
+        Static thresholdSlider = FindSlider("Percent featureLess threshold")
+        threshold = thresholdSlider.Value / 100.0
+        reduceAmt = reductionSlider.value
+        range = rangeSlider.value
+
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_RedCloudFeatures : Inherits VB_Parent
+    Public selection As Integer
+    Public labelName As String
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("MaxDist Location")
+            radio.addRadio("Depth mean")
+            radio.addRadio("Correlation X to Z")
+            radio.addRadio("Correlation Y to Z")
+            radio.check(3).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        selection = 0
+        labelName = ""
+        For selection = 0 To frm.check.Count - 1
+            If frm.check(selection).Checked Then
+                labelName = frm.check(selection).text
+                Exit For
+            End If
+        Next
+
     End Sub
 End Class
