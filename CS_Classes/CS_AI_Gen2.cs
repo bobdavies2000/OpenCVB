@@ -5284,15 +5284,6 @@ namespace CS_Classes
             PCA_Prep_Close(cPtr);
         }
     }
-    public static class PCA_NColor_CPP_Module
-    {
-        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr PCA_NColor_Open();
-        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void PCA_NColor_Close(IntPtr cPtr);
-        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr PCA_NColor_RunCPP(IntPtr cPtr, IntPtr imagePtr, IntPtr palettePtr, int rows, int cols, int desiredNcolors);
-    }
     public class CS_PCA_Palettize : CS_Parent
     {
         public byte[] palette;
@@ -7508,30 +7499,33 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            var fileInfo = new FileInfo(options.fileName);
-            if (saveFileName != fileInfo.FullName)
+            if (options.fileName.Length != 0)
             {
-                using (var sw = new StreamWriter(fileInfo.FullName))
+                var fileInfo = new FileInfo(options.fileName);
+                if (saveFileName != fileInfo.FullName)
                 {
-                    saveFileName = fileInfo.FullName;
-                    sw.WriteLine("ply");
-                    sw.WriteLine("format ascii 1.0");
-                    sw.WriteLine("element vertex " + task.pointCloud.Total());
-                    sw.WriteLine("property float x");
-                    sw.WriteLine("property float y");
-                    sw.WriteLine("property float z");
-                    sw.WriteLine("end_header");
-                    for (int y = 0; y < task.pointCloud.Height; y++)
+                    using (var sw = new StreamWriter(fileInfo.FullName))
                     {
-                        for (int x = 0; x < task.pointCloud.Width; x++)
+                        saveFileName = fileInfo.FullName;
+                        sw.WriteLine("ply");
+                        sw.WriteLine("format ascii 1.0");
+                        sw.WriteLine("element vertex " + task.pointCloud.Total());
+                        sw.WriteLine("property float x");
+                        sw.WriteLine("property float y");
+                        sw.WriteLine("property float z");
+                        sw.WriteLine("end_header");
+                        for (int y = 0; y < task.pointCloud.Height; y++)
                         {
-                            var vec = task.pointCloud.Get<Vec3f>(y, x);
-                            sw.WriteLine($"{vec[0]:F3} {vec[1]:F3} {vec[2]:F3}");
+                            for (int x = 0; x < task.pointCloud.Width; x++)
+                            {
+                                var vec = task.pointCloud.Get<Vec3f>(y, x);
+                                sw.WriteLine($"{vec[0]:F3} {vec[1]:F3} {vec[2]:F3}");
+                            }
                         }
                     }
                 }
+                SetTrueText(".ply format file saved in " + options.fileName);
             }
-            SetTrueText(".ply format file saved in " + options.fileName);
         }
     }
     public class CS_PlyFormat_PlusRGB : CS_Parent
@@ -7545,34 +7539,37 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            var fileInfo = new FileInfo(options.fileName);
-            if (saveFileName != fileInfo.FullName)
+            if (options.fileName.Length != 0)
             {
-                using (var sw = new StreamWriter(fileInfo.FullName))
+                var fileInfo = new FileInfo(options.fileName);
+                if (saveFileName != fileInfo.FullName)
                 {
-                    saveFileName = fileInfo.FullName;
-                    sw.WriteLine("ply");
-                    sw.WriteLine("format ascii 1.0");
-                    sw.WriteLine("element vertex " + task.pointCloud.Total());
-                    sw.WriteLine("property float x");
-                    sw.WriteLine("property float y");
-                    sw.WriteLine("property float z");
-                    sw.WriteLine("property uchar red");
-                    sw.WriteLine("property uchar green");
-                    sw.WriteLine("property uchar blue");
-                    sw.WriteLine("end_header");
-                    for (int y = 0; y < task.pointCloud.Height; y++)
+                    using (var sw = new StreamWriter(fileInfo.FullName))
                     {
-                        for (int x = 0; x < task.pointCloud.Width; x++)
+                        saveFileName = fileInfo.FullName;
+                        sw.WriteLine("ply");
+                        sw.WriteLine("format ascii 1.0");
+                        sw.WriteLine("element vertex " + task.pointCloud.Total());
+                        sw.WriteLine("property float x");
+                        sw.WriteLine("property float y");
+                        sw.WriteLine("property float z");
+                        sw.WriteLine("property uchar red");
+                        sw.WriteLine("property uchar green");
+                        sw.WriteLine("property uchar blue");
+                        sw.WriteLine("end_header");
+                        for (int y = 0; y < task.pointCloud.Height; y++)
                         {
-                            var vec = task.pointCloud.Get<Vec3f>(y, x);
-                            var bgr = src.Get<Vec3b>(y, x);
-                            sw.WriteLine($"{vec[0]:F3} {vec[1]:F3} {vec[2]:F3} {bgr[2]} {bgr[1]} {bgr[0]}");
+                            for (int x = 0; x < task.pointCloud.Width; x++)
+                            {
+                                var vec = task.pointCloud.Get<Vec3f>(y, x);
+                                var bgr = src.Get<Vec3b>(y, x);
+                                sw.WriteLine($"{vec[0]:F3} {vec[1]:F3} {vec[2]:F3} {bgr[2]} {bgr[1]} {bgr[0]}");
+                            }
                         }
                     }
                 }
+                SetTrueText(".ply format file saved in " + options.fileName);
             }
-            SetTrueText(".ply format file saved in " + options.fileName);
         }
     }
     public class CS_PointCloud_Basics : CS_Parent

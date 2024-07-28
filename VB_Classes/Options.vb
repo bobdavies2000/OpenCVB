@@ -6758,8 +6758,8 @@ Public Class Options_PlyFormat : Inherits VB_Parent
         playButton = fileNameForm.PlayButton.Text
         fileName = fileNameForm.filename.Text
 
-        If saveFileName <> fileName Then
-            SaveSetting("OpenCVB", "plyFileName", "plyFileName", saveFileName)
+        If saveFileName <> fileName and filename.Length > 0 Then
+            SaveSetting("OpenCVB", "plyFileName", "plyFileName", fileName)
             saveFileName = fileName
         End If
     End Sub
