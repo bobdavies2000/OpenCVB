@@ -1,18 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class Polylines_IEnumerableExample : Inherits VB_Parent
+    Dim options As New Options_PolyLines
     Public Sub New()
-        If check.Setup(traceName) Then
-            check.addCheckBox("Polyline closed if checked")
-            check.Box(0).Checked = True
-        End If
-
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Polyline Count", 2, 500, 100)
         desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static countSlider = FindSlider("Polyline Count")
-        Static closeCheck = FindCheckBox("Polyline closed if checked")
-        Dim points = Enumerable.Range(0, countSlider.Value).Select(Of cv.Point)(
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim points = Enumerable.Range(0, options.polyCount).Select(Of cv.Point)(
             Function(i)
                 Return New cv.Point(CInt(msRNG.Next(0, src.Width)), CInt(msRNG.Next(0, src.Height)))
             End Function).ToList
@@ -21,7 +16,7 @@ Public Class Polylines_IEnumerableExample : Inherits VB_Parent
 
         dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' NOTE: when there are 2 points, there will be 1 line.
-        dst2.Polylines(pts, closeCheck.Checked, cv.Scalar.White, task.lineWidth, task.lineType)
+        dst2.Polylines(pts, options.polyClosed, cv.Scalar.White, task.lineWidth, task.lineType)
     End Sub
 End Class
 

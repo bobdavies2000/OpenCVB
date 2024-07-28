@@ -385,6 +385,9 @@ Public Class OptionsGlobal
     Public Function getDebugCheckBox() As Boolean
         Return DebugCheckBox.Checked
     End Function
+    Public Function getDebugSlider() As Integer
+        Return DebugSlider.Value
+    End Function
 
     Public Sub setGravityUsage(val As Boolean)
         gravityPointCloud.Checked = val

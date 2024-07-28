@@ -273,7 +273,7 @@ Public Class Profile_ConcentrationTop : Inherits VB_Parent
             peakRotation = ySlider.Value
         End If
 
-        plot.plotData = New cv.Scalar(count, 0, 0)
+        plot.plotData = count
         plot.Run(empty)
         dst3 = plot.dst2
 

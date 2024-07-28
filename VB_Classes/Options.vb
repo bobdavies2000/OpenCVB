@@ -6781,3 +6781,50 @@ Public Class Options_PointCloud : Inherits VB_Parent
         deltaThreshold = deltaSlider.value / 100
     End Sub
 End Class
+
+
+
+
+Public Class Options_PolyLines : Inherits VB_Parent
+    Public polyCount As Integer
+    Public polyClosed As Boolean
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Polyline closed if checked")
+            check.Box(0).Checked = True
+        End If
+
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Polyline Count", 2, 500, 100)
+    End Sub
+    Public Sub RunVB()
+        Static countSlider = FindSlider("Polyline Count")
+        Static closeCheck = FindCheckBox("Polyline closed if checked")
+        polyCount = countSlider.value
+        polyClosed = closeCheck.checked
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Projection : Inherits VB_Parent
+    Public topCheck As Boolean
+    Public projectionThreshold As Integer
+    Public index As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Index of object", 0, 100, 0) ' zero is the largest object present.
+            sliders.setupTrackBar("Concentration threshold", 0, 100, 2)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = FindSlider("Concentration threshold")
+        Static topCheckBox = FindCheckBox("Top View (Unchecked Side View)")
+        Static objSlider = FindSlider("Index of object")
+        index = objSlider.value
+        If topCheckBox IsNot Nothing Then topCheck = topCheckBox.checked
+        projectionThreshold = thresholdSlider.value
+    End Sub
+End Class

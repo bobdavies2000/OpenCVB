@@ -7713,758 +7713,1432 @@ namespace CS_Classes
         }
     }
     public class CS_PointCloud_Spin2 : CS_Parent
+    {
+        PointCloud_Spin spin = new PointCloud_Spin();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Basics redCSpin = new RedCloud_Basics();
+        public CS_PointCloud_Spin2(VBtask task) : base(task)
         {
-            PointCloud_Spin spin = new PointCloud_Spin();
-            RedCloud_Basics redC = new RedCloud_Basics();
-            RedCloud_Basics redCSpin = new RedCloud_Basics();
-            public CS_PointCloud_Spin2(VBtask task) : base(task)
-            {
-                labels = new string[] { "", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes." };
-                desc = "Spin the RedCloud output exercise";
-            }
-            public void RunCS(Mat src)
-            {
-                redC.Run(src);
-                dst2 = redC.dst2;
-                spin.Run(src);
-                task.pointCloud = spin.dst2;
-                redCSpin.Run(src);
-                dst3 = redCSpin.dst2;
-            }
+            labels = new string[] { "", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes." };
+            desc = "Spin the RedCloud output exercise";
         }
-        public class CS_PointCloud_SetupSide : CS_Parent
+        public void RunCS(Mat src)
         {
-            int arcSize;
-            public CS_PointCloud_SetupSide(VBtask task) : base(task)
+            redC.Run(src);
+            dst2 = redC.dst2;
+            spin.Run(src);
+            task.pointCloud = spin.dst2;
+            redCSpin.Run(src);
+            dst3 = redCSpin.dst2;
+        }
+    }
+    public class CS_PointCloud_SetupSide : CS_Parent
+    {
+        int arcSize;
+        public CS_PointCloud_SetupSide(VBtask task) : base(task)
+        {
+            arcSize = dst2.Width / 15;
+            labels[2] = "Layout markers for side view";
+            desc = "Create the colorized mat used for side projections";
+        }
+        public void RunCS(Mat src)
+        {
+            float distanceRatio = 1;
+            if (src.Channels() != 3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
+            if (standaloneTest()) dst2.SetTo(0); else src.CopyTo(dst2);
+            DrawCircle(dst2, task.sideCameraPoint, task.DotSize, Scalar.BlueViolet);
+            for (int i = 1; i <= task.MaxZmeters; i++)
             {
-                arcSize = dst2.Width / 15;
-                labels[2] = "Layout markers for side view";
-                desc = "Create the colorized mat used for side projections";
+                int xmeter = (int)(dst2.Width * i / task.MaxZmeters * distanceRatio);
+                dst2.Line(new cv.Point(xmeter, 0), new cv.Point(xmeter, dst2.Height), Scalar.AliceBlue, 1);
+                SetTrueText(i.ToString() + "m", new cv.Point(xmeter - src.Width / 24, dst2.Height - 10));
             }
-            public void RunCS(Mat src)
+            var cam = task.sideCameraPoint;
+            var marker = new Point2f(dst2.Width / (task.MaxZmeters * distanceRatio), 0);
+            marker.Y = (float)(marker.X * Math.Tan((task.vFov / 2) * Cv2.PI / 180));
+            var markerLeft = new cv.Point(marker.X, cam.Y - marker.Y);
+            var markerRight = new cv.Point(marker.X, cam.Y + marker.Y);
+            int offset = (int)(Math.Sin(task.accRadians.X) * marker.Y);
+            if (task.useGravityPointcloud)
             {
-                float distanceRatio = 1;
-                if (src.Channels() != 3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
-                if (standaloneTest()) dst2.SetTo(0); else src.CopyTo(dst2);
-                DrawCircle(dst2, task.sideCameraPoint, task.DotSize, Scalar.BlueViolet);
-                for (int i = 1; i <= task.MaxZmeters; i++)
+                if (task.accRadians.X > 0)
                 {
-                    int xmeter = (int)(dst2.Width * i / task.MaxZmeters * distanceRatio);
-                    dst2.Line(new cv.Point(xmeter, 0), new cv.Point(xmeter, dst2.Height), Scalar.AliceBlue, 1);
-                    SetTrueText(i.ToString() + "m", new cv.Point(xmeter - src.Width / 24, dst2.Height - 10));
-                }
-                var cam = task.sideCameraPoint;
-                var marker = new Point2f(dst2.Width / (task.MaxZmeters * distanceRatio), 0);
-                marker.Y = (float)(marker.X * Math.Tan((task.vFov / 2) * Cv2.PI / 180));
-                var markerLeft = new cv.Point(marker.X, cam.Y - marker.Y);
-                var markerRight = new cv.Point(marker.X, cam.Y + marker.Y);
-                int offset = (int)(Math.Sin(task.accRadians.X) * marker.Y);
-                if (task.useGravityPointcloud)
-                {
-                    if (task.accRadians.X > 0)
-                    {
-                        markerLeft.Y -= offset;
-                        markerRight.Y += offset;
-                    }
-                    else
-                    {
-                        markerLeft.Y += offset;
-                        markerRight.Y -= offset;
-                    }
-                    markerLeft = new cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y);
-                    markerLeft = new cv.Point(markerLeft.X * Math.Cos(task.accRadians.Z) - markerLeft.Y * Math.Sin(task.accRadians.Z),
-                                            markerLeft.Y * Math.Cos(task.accRadians.Z) + markerLeft.X * Math.Sin(task.accRadians.Z));
-                    markerLeft = new cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y);
-                    markerRight = new cv.Point((markerRight.X - cam.X) * Math.Cos(task.accRadians.Z) - (markerRight.Y - cam.Y) * Math.Sin(task.accRadians.Z) + cam.X,
-                                            (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y);
-                }
-                if (!standaloneTest())
-                {
-                    DrawCircle(dst2, markerLeft, task.DotSize, Scalar.Red);
-                    DrawCircle(dst2, markerRight, task.DotSize, Scalar.Red);
-                }
-                float startAngle = (180 - task.vFov) / 2;
-                float y = (float)(dst2.Width / Math.Tan(startAngle * Cv2.PI / 180));
-                var fovTop = new cv.Point(dst2.Width, cam.Y - y);
-                var fovBot = new cv.Point(dst2.Width, cam.Y + y);
-                dst2.Line(cam, fovTop, Scalar.White, 1, task.lineType);
-                dst2.Line(cam, fovBot, Scalar.White, 1, task.lineType);
-                DrawCircle(dst2, markerLeft, task.DotSize + 3, Scalar.Red);
-                DrawCircle(dst2, markerRight, task.DotSize + 3, Scalar.Red);
-                dst2.Line(cam, markerLeft, Scalar.Red, 1, task.lineType);
-                dst2.Line(cam, markerRight, Scalar.Red, 1, task.lineType);
-                var labelLocation = new cv.Point(src.Width * 0.02, src.Height * 7 / 8);
-                SetTrueText("vFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new cv.Point(4, dst2.Height * 3 / 4));
-            }
-        }
-        public class CS_PointCloud_SetupTop : CS_Parent
-        {
-            int arcSize;
-            public CS_PointCloud_SetupTop(VBtask task) : base(task)
-            {
-                arcSize = dst2.Width / 15;
-                labels[2] = "Layout markers for top view";
-                desc = "Create the colorize the mat for a topdown projections";
-            }
-            public void RunCS(Mat src)
-            {
-                float distanceRatio = 1;
-                if (src.Channels() != 3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
-                if (standaloneTest()) dst2.SetTo(0); else src.CopyTo(dst2);
-                DrawCircle(dst2, task.topCameraPoint, task.DotSize, Scalar.BlueViolet);
-                for (int i = 1; i <= task.MaxZmeters; i++)
-                {
-                    int ymeter = (int)(dst2.Height - dst2.Height * i / (task.MaxZmeters * distanceRatio));
-                    dst2.Line(new cv.Point(0, ymeter), new cv.Point(dst2.Width, ymeter), Scalar.AliceBlue, 1);
-                    SetTrueText(i.ToString() + "m", new cv.Point(10, ymeter));
-                }
-                var cam = task.topCameraPoint;
-                var marker = new Point2f(cam.X, dst2.Height / task.MaxZmeters);
-                float topLen = (float)(marker.Y * Math.Tan((task.hFov / 2) * Cv2.PI / 180));
-                float sideLen = (float)(marker.Y * Math.Tan((task.vFov / 2) * Cv2.PI / 180));
-                var markerLeft = new cv.Point(cam.X - topLen, marker.Y);
-                var markerRight = new cv.Point(cam.X + topLen, marker.Y);
-                float offset = (float)Math.Sin(task.accRadians.Z) * topLen;
-                if (task.useGravityPointcloud)
-                {
-                    if (task.accRadians.Z > 0)
-                    {
-                        markerLeft.X -= (int)offset;
-                        markerRight.X += (int)offset;
-                    }
-                    else
-                    {
-                        markerLeft.X += (int)offset;
-                        markerRight.X -= (int)offset;
-                    }
-                }
-                float startAngle = (180 - task.hFov) / 2;
-                float x = (float)(dst2.Height / Math.Tan(startAngle * Cv2.PI / 180));
-                var fovRight = new cv.Point(task.topCameraPoint.X + x, 0);
-                var fovLeft = new cv.Point(task.topCameraPoint.X - x, fovRight.Y);
-                dst2.Line(task.topCameraPoint, fovLeft, Scalar.White, 1, task.lineType);
-                DrawCircle(dst2, markerLeft, task.DotSize + 3, Scalar.Red);
-                DrawCircle(dst2, markerRight, task.DotSize + 3, Scalar.Red);
-                dst2.Line(cam, markerLeft, Scalar.Red, 1, task.lineType);
-                dst2.Line(cam, markerRight, Scalar.Red, 1, task.lineType);
-                float shift = (src.Width - src.Height) / 2;
-                var labelLocation = new cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16);
-                SetTrueText("hFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new cv.Point(4, dst2.Height * 7 / 8));
-                DrawLine(dst2, task.topCameraPoint, fovRight, Scalar.White);
-            }
-        }
-        public class CS_PointCloud_Raw_CPP : CS_Parent
-        {
-            byte[] depthBytes;
-            public CS_PointCloud_Raw_CPP(VBtask task) : base(task)
-            {
-                labels[2] = "Top View";
-                labels[3] = "Side View";
-                desc = "Project the depth data onto a top view And side view.";
-                cPtr = SimpleProjectionOpen();
-            }
-            public void RunCS(Mat src)
-            {
-                if (task.FirstPass) Array.Resize(ref depthBytes, (int)(task.pcSplit[2].Total() * task.pcSplit[2].ElemSize()));
-                Marshal.Copy(task.pcSplit[2].Data, depthBytes, 0, depthBytes.Length);
-                var handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned);
-                IntPtr imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject(), 0, task.MaxZmeters, task.pcSplit[2].Height, task.pcSplit[2].Width);
-                dst2 = new Mat(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, imagePtr).CvtColor(ColorConversionCodes.GRAY2BGR);
-                dst3 = new Mat(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(ColorConversionCodes.GRAY2BGR);
-                handleDepth.Free();
-                labels[2] = "Top View (looking down)";
-                labels[3] = "Side View";
-            }
-            public void Close()
-            {
-                SimpleProjectionClose(cPtr);
-            }
-        }
-        public class CS_PointCloud_Raw : CS_Parent
-        {
-            public CS_PointCloud_Raw(VBtask task) : base(task)
-            {
-                labels[2] = "Top View";
-                labels[3] = "Side View";
-                desc = "Project the depth data onto a top view And side view - Using only VB code (too slow.)";
-                cPtr = SimpleProjectionOpen();
-            }
-            public void RunCS(Mat src)
-            {
-                float range = task.MaxZmeters;
-                dst2 = src.EmptyClone().SetTo(Scalar.White);
-                dst3 = dst2.Clone();
-                var black = new Vec3b(0, 0, 0);
-                Parallel.ForEach(task.gridList, roi =>
-                {
-                    for (int y = roi.Y; y < roi.Y + roi.Height; y++)
-                    {
-                        for (int x = roi.X; x < roi.X + roi.Width; x++)
-                        {
-                            byte m = task.depthMask.Get<byte>(y, x);
-                            if (m > 0)
-                            {
-                                float depth = task.pcSplit[2].Get<float>(y, x);
-                                int dy = (int)(src.Height * depth / range);
-                                if (dy < src.Height && dy > 0) dst2.Set<Vec3b>(src.Height - dy, x, black);
-                                int dx = (int)(src.Width * depth / range);
-                                if (dx < src.Width && dx > 0) dst3.Set<Vec3b>(y, dx, black);
-                            }
-                        }
-                    }
-                });
-                labels[2] = "Top View (looking down)";
-                labels[3] = "Side View";
-            }
-            public void Close()
-            {
-                SimpleProjectionClose(cPtr);
-            }
-        }
-        public class CS_PointCloud_Solo : CS_Parent
-        {
-            public HeatMap_Basics heat = new HeatMap_Basics();
-            public CS_PointCloud_Solo(VBtask task) : base(task)
-            {
-                FindCheckBox("Top View (Unchecked Side View)").Checked = true;
-                labels[2] = "Top down view after inrange sampling";
-                labels[3] = "Histogram after filtering For Single-only histogram bins";
-                desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample";
-            }
-            public void RunCS(Mat src)
-            {
-                heat.Run(src);
-                dst2 = heat.dst0.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs();
-                dst3 = heat.dst1.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs();
-            }
-        }
-        public class CS_PointCloud_SoloRegions : CS_Parent
-        {
-            public PointCloud_Solo solo = new PointCloud_Solo();
-            Dilate_Basics dilate = new Dilate_Basics();
-            public CS_PointCloud_SoloRegions(VBtask task) : base(task)
-            {
-                labels[2] = "Top down view before inrange sampling";
-                labels[3] = "Histogram after filtering For Single-only histogram bins";
-                desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample";
-            }
-            public void RunCS(Mat src)
-            {
-                solo.Run(src);
-                dst2 = solo.dst2;
-                dst3 = solo.dst3;
-                dilate.Run(dst3.Clone());
-                dst3 = dilate.dst2;
-            }
-        }
-        public class CS_PointCloud_SurfaceH_CPP : CS_Parent
-        {
-            public HeatMap_Basics heat = new HeatMap_Basics();
-            public Plot_Basics_CPP plot = new Plot_Basics_CPP();
-            public int topRow;
-            public int botRow;
-            public int peakRow;
-            public CS_PointCloud_SurfaceH_CPP(VBtask task) : base(task)
-            {
-                desc = "Find the horizontal surfaces With a projects Of the SideView histogram.";
-            }
-            public void RunCS(Mat src)
-            {
-                heat.Run(src);
-                dst2 = heat.dst3;
-                topRow = 0;
-                botRow = 0;
-                peakRow = 0;
-                int peakVal = 0;
-                for (int i = 0; i < dst2.Height; i++)
-                {
-                    plot.srcX.Add(i);
-                    if (dst2.Channels() == 1) plot.srcY.Add(dst2.Row(i).CountNonZero());
-                    else plot.srcY.Add(dst2.Row(i).CvtColor(ColorConversionCodes.BGR2GRAY).CountNonZero());
-                    if (peakVal < plot.srcY[i])
-                    {
-                        peakVal = (int)plot.srcY[i];
-                        peakRow = i;
-                    }
-                    if (topRow == 0 && plot.srcY[i] > 10) topRow = i;
-                }
-                for (int i = plot.srcY.Count() - 1; i >= 0; i--)
-                {
-                    if (botRow == 0 && plot.srcY[i] > 10) botRow = i;
-                }
-                plot.Run(empty);
-                dst3 = plot.dst2.Transpose();
-                dst3 = dst3.Flip(FlipMode.Y);
-                labels[2] = "Top row = " + topRow.ToString() + " peak row = " + peakRow.ToString() + " bottom row = " + botRow.ToString();
-            }
-        }
-        public class CS_PointCloud_SurfaceH : CS_Parent
-        {
-            public HeatMap_Basics heat = new HeatMap_Basics();
-            public Plot_Histogram plot = new Plot_Histogram();
-            public int topRow;
-            public int botRow;
-            public int peakRow;
-            public CS_PointCloud_SurfaceH(VBtask task) : base(task)
-            {
-                FindCheckBox("Top View (Unchecked Side View)").Checked = true;
-                labels[3] = "Histogram Of Each Of " + task.histogramBins.ToString() + " bins aligned With the sideview";
-                desc = "Find the horizontal surfaces With a projects Of the SideView histogram.";
-            }
-            public void RunCS(Mat src)
-            {
-                heat.Run(src);
-                dst2 = heat.dst2;
-                var hist = new Mat(dst2.Height, 1, MatType.CV_32F, 0);
-                var indexer = hist.GetGenericIndexer<float>();
-                topRow = 0;
-                botRow = 0;
-                peakRow = 0;
-                int peakVal = 0;
-                if (dst2.Channels() != 1) dst1 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
-                for (int i = 0; i < dst1.Height; i++)
-                {
-                    indexer[i] = dst1.Row(i).CountNonZero();
-                    if (peakVal < indexer[i])
-                    {
-                        peakVal = (int)indexer[i];
-                        peakRow = i;
-                    }
-                    if (topRow == 0 && indexer[i] > 10) topRow = i;
-                }
-                plot.maxValue = (float)(Math.Floor((double)(peakVal / 100 + 1) * 100));
-                for (int i = hist.Rows - 1; i >= 0; i--)
-                {
-                    if (botRow == 0 && indexer[i] > 10) botRow = i;
-                }
-                plot.Run(hist);
-                dst3 = plot.dst2.Transpose();
-                dst3 = dst3.Flip(FlipMode.Y)[new cv.Rect(0, 0, dst0.Height, dst0.Height)].Resize(dst0.Size());
-                labels[2] = "Top row = " + topRow.ToString() + " peak row = " + peakRow.ToString() + " bottom row = " + botRow.ToString();
-                var ratio = task.mouseMovePoint.Y / (double)dst2.Height;
-                var offset = ratio * dst3.Height;
-                DrawLine(dst2, new cv.Point(0, task.mouseMovePoint.Y), new cv.Point(dst2.Width, task.mouseMovePoint.Y), Scalar.Yellow);
-                dst3.Line(new cv.Point(0, offset), new cv.Point(dst3.Width, offset), Scalar.Yellow, task.lineWidth);
-            }
-        }
-        public class CS_PointCloud_NeighborV : CS_Parent
-        {
-            Options_Neighbors options = new Options_Neighbors();
-            public CS_PointCloud_NeighborV(VBtask task) : base(task)
-            {
-                desc = "Show where vertical neighbor depth values are within Y mm's";
-            }
-            public void RunCS(Mat src)
-            {
-                options.RunVB();
-                if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
-                var tmp32f = new Mat(dst2.Size(), MatType.CV_32F, 0);
-                var r1 = new cv.Rect(options.pixels, 0, dst2.Width - options.pixels, dst2.Height);
-                var r2 = new cv.Rect(0, 0, dst2.Width - options.pixels, dst2.Height);
-                Cv2.Absdiff(src[r1], src[r2], tmp32f[r1]);
-                tmp32f = tmp32f.Threshold(options.threshold, 255, ThresholdTypes.BinaryInv);
-                dst2 = tmp32f.ConvertScaleAbs(255);
-                dst2.SetTo(0, task.noDepthMask);
-                dst2[new cv.Rect(0, dst2.Height - options.pixels, dst2.Width, options.pixels)].SetTo(0);
-                labels[2] = "White: z is within " + (options.threshold * 1000).ToString(fmt0) + " mm's with Y pixel offset " + options.pixels.ToString();
-            }
-        }
-        public class CS_PointCloud_Visualize : CS_Parent
-        {
-            public CS_PointCloud_Visualize(VBtask task) : base(task)
-            {
-                labels = new string[] { "", "", "Pointcloud visualized", "" };
-                desc = "Display the pointcloud as a BGR image.";
-            }
-            public void RunCS(Mat src)
-            {
-                var pcSplit = new Mat[] { task.pcSplit[0].ConvertScaleAbs(255), task.pcSplit[1].ConvertScaleAbs(255), task.pcSplit[2].ConvertScaleAbs(255) };
-                Cv2.Merge(pcSplit, dst2);
-            }
-        }
-        public class CS_PointCloud_PCpointsMask : CS_Parent
-        {
-            public Mat pcPoints;
-            public int actualCount;
-            public CS_PointCloud_PCpointsMask(VBtask task) : base(task)
-            {
-                setPointCloudGrid();
-                dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
-                desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi.";
-            }
-            public void RunCS(Mat src)
-            {
-                if (task.optionsChanged) pcPoints = new Mat(task.gridRows, task.gridCols, MatType.CV_32FC3, 0);
-                dst2.SetTo(0);
-                actualCount = 0;
-                float lastMeanZ = 0;
-                for (int y = 0; y < task.gridRows; y++)
-                {
-                    for (int x = 0; x < task.gridCols; x++)
-                    {
-                        var roi = task.gridList[y * task.gridCols + x];
-                        var mean = task.pointCloud[roi].Mean(task.depthMask[roi]);
-                        bool depthPresent = task.depthMask[roi].CountNonZero() > roi.Width * roi.Height / 2;
-                        if ((depthPresent && mean[2] > 0 && Math.Abs(lastMeanZ - mean[2]) < 0.2 && mean[2] < task.MaxZmeters) || (lastMeanZ == 0 && mean[2] > 0))
-                        {
-                            pcPoints.Set<Point3f>(y, x, new Point3f((float)mean[0], (float)mean[1], (float)mean[2]));
-                            actualCount++;
-                            DrawCircle(dst2, new cv.Point(roi.X, roi.Y),  (int)(task.DotSize * Math.Max(mean[2], 1)), 
-                                       Scalar.White);
-                        }
-                        lastMeanZ = (float)mean[2];
-                    }
-                }
-                labels[2] = "PointCloud cv.Point Points found = " + actualCount.ToString();
-            }
-        }
-        public class CS_PointCloud_PCPoints : CS_Parent
-        {
-            public List<Point3f> pcPoints = new List<Point3f>();
-            public CS_PointCloud_PCPoints(VBtask task) : base(task)
-            {
-                setPointCloudGrid();
-                desc = "Reduce the point cloud to a manageable number points in 3D using the mean value";
-            }
-            public void RunCS(Mat src)
-            {
-                int rw = task.gridList[0].Width / 2, rh = task.gridList[0].Height / 2;
-                cv.Scalar red32 = new cv.Scalar(0, 0, 1);
-                cv.Scalar blue32 = new cv.Scalar(1, 0, 0);
-                cv.Scalar white32 = new cv.Scalar(1, 1, 1);
-                cv.Scalar red = Scalar.Red;
-                cv.Scalar blue = Scalar.Blue;
-                cv.Scalar white = Scalar.White;
-                pcPoints.Clear();
-                dst2 = src;
-                foreach (var roi in task.gridList)
-                {
-                    var pt = new cv.Point(roi.X + rw, roi.Y + rh);
-                    var mean = task.pointCloud[roi].Mean(task.depthMask[roi]);
-                    if (mean[2] > 0)
-                    {
-                        if (pt.Y % 3 == 0) pcPoints.Add(new cv.Point3f((float)red32[0], (float) red32[1], (float)red32[2]));
-                        if (pt.Y % 3 == 1) pcPoints.Add(new cv.Point3f((float)blue32[0], (float)blue32[1], (float)blue32[2]));
-                        if (pt.Y % 3 == 2) pcPoints.Add(new cv.Point3f((float)white32[0], (float)white32[1], (float)white32[2]));
-                        pcPoints.Add(new cv.Point3f((float)mean[0], (float)mean[1], (float)mean[2]));
-                        if (pt.Y % 3 == 0) DrawCircle(dst2, pt, task.DotSize, red);
-                        if (pt.Y % 3 == 1) DrawCircle(dst2, pt, task.DotSize, blue);
-                        if (pt.Y % 3 == 2) DrawCircle(dst2, pt, task.DotSize, white);
-                    }
-                }
-                labels[2] = "PointCloud cv.Point Points found = " + (pcPoints.Count() / 2).ToString();
-            }
-        }
-        public class CS_PointCloud_PCPointsPlane : CS_Parent
-        {
-            PointCloud_Basics pcBasics = new PointCloud_Basics();
-            public List<cv.Point3f> pcPoints = new List<cv.Point3f>();
-            public List<cv.Point> xyList = new List<cv.Point>();
-            cv.Point3f white32 = new cv.Point3f(1, 1, 1);
-            public CS_PointCloud_PCPointsPlane(VBtask task) : base(task)
-            {
-                setPointCloudGrid();
-                desc = "Find planes using a reduced set of 3D points and the intersection of vertical and horizontal lines through those points.";
-            }
-            public void RunCS(Mat src)
-            {
-                pcBasics.Run(src);
-                pcPoints.Clear();
-                // points in both the vertical and horizontal lists are likely to designate a plane
-                foreach (var pt in pcBasics.allPointsH)
-                {
-                    if (pcBasics.allPointsV.Contains(pt))
-                    {
-                        pcPoints.Add(white32);
-                        pcPoints.Add(pt);
-                    }
-                }
-                labels[2] = "Point series found = " + (pcPoints.Count() / 2).ToString();
-            }
-        }
-        public class CS_PointCloud_Inspector : CS_Parent
-        {
-            public CS_PointCloud_Inspector(VBtask task) : base(task)
-            {
-                dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
-                task.mouseMovePoint.X = dst2.Width / 2;
-                desc = "Inspect x, y, and z values in a row or column";
-            }
-            public void RunCS(Mat src)
-            {
-                int yLines = 20;
-                int cLine = task.mouseMovePoint.X;
-                Mat input = src;
-                if (input.Type() != MatType.CV_32F) input = task.pcSplit[2];
-                Point2f topPt = new Point2f(cLine, 0);
-                Point2f botPt = new Point2f(cLine, dst2.Height);
-                dst2 = task.depthRGB;
-                DrawLine(dst2, topPt, botPt, 255);
-                double stepY = dst2.Height / yLines;
-                SetTrueText("\t   X\t  Y\t  Z", 3);
-                for (int i = 1; i < yLines - 1; i++)
-                {
-                    Point2f pt1 = new Point2f(dst2.Width, (float)(i * stepY));
-                    Point2f pt2 = new Point2f(0, (float)(i * stepY));
-                    DrawLine(dst2, pt1, pt2, Scalar.White);
-                    Point2f pt = new Point2f(cLine, (float)(i * stepY));
-                    Vec3f xyz = task.pointCloud.Get<Vec3f>((int) pt.Y, (int) pt.X);
-                    SetTrueText("Row " + i.ToString() + "\t" + xyz[0].ToString(fmt2) + "\t" + xyz[1].ToString(fmt2) + 
-                                "\t" + xyz[2].ToString(fmt2), new cv.Point(5, (int)pt.Y), 3);
-                }
-                labels[2] = "Values displayed are the point cloud X, Y, and Z values for column " + cLine.ToString();
-                labels[3] = "Move mouse in the image at left to see the point cloud X, Y, and Z values.";
-            }
-        }
-        public class CS_PointCloud_Average : CS_Parent
-        {
-            List<Mat> pcHistory = new List<Mat>();
-            public CS_PointCloud_Average(VBtask task) : base(task)
-            {
-                dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
-                desc = "Average all 3 elements of the point cloud - not just depth.";
-            }
-            public void RunCS(Mat src)
-            {
-                pcHistory.Add(task.pointCloud);
-                if (pcHistory.Count() >= task.frameHistoryCount) pcHistory.RemoveAt(0);
-                dst3.SetTo(0);
-                foreach (var m in pcHistory)
-                {
-                    dst3 += m;
-                }
-                dst3 *= 1.0 / pcHistory.Count();
-            }
-        }
-        public class CS_PointCloud_FrustrumTop : CS_Parent
-        {
-            Draw_Frustrum frustrum = new Draw_Frustrum();
-            HeatMap_Basics heat = new HeatMap_Basics();
-            PointCloud_SetupTop setupTop = new PointCloud_SetupTop();
-            public CS_PointCloud_FrustrumTop(VBtask task) : base(task)
-            {
-                task.gOptions.setGravityUsage(false);
-                FindCheckBox("Top View (Unchecked Side View)").Checked = true;
-                labels[3] = "Draw the frustrum from the top view";
-                desc = "Draw the top view of the frustrum";
-            }
-            public void RunCS(Mat src)
-            {
-                frustrum.Run(src);
-                heat.Run(frustrum.dst3.Resize(dst2.Size()));
-                setupTop.Run(heat.dst2);
-                dst2 = setupTop.dst2;
-            }
-        }
-        public class CS_PointCloud_FrustrumSide : CS_Parent
-        {
-            Draw_Frustrum frustrum = new Draw_Frustrum();
-            HeatMap_Basics heat = new HeatMap_Basics();
-            PointCloud_SetupSide setupSide = new PointCloud_SetupSide();
-            public CS_PointCloud_FrustrumSide(VBtask task) : base(task)
-            {
-                task.gOptions.setGravityUsage(false);
-                FindCheckBox("Top View (Unchecked Side View)").Checked = false;
-                labels[2] = "Draw the frustrum from the side view";
-                desc = "Draw the side view of the frustrum";
-            }
-            public void RunCS(Mat src)
-            {
-                frustrum.Run(src);
-                heat.Run(frustrum.dst3.Resize(dst2.Size()));
-                setupSide.Run(heat.dst3);
-                dst2 = setupSide.dst2;
-            }
-        }
-        public class CS_PointCloud_Histograms : CS_Parent
-        {
-            Plot_Histogram2D plot2D = new Plot_Histogram2D();
-            Plot_Histogram plot = new Plot_Histogram();
-            Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
-            Grid_Basics grid = new Grid_Basics();
-            public Mat histogram = new Mat();
-            public CS_PointCloud_Histograms(VBtask task) : base(task)
-            {
-                task.gOptions.setHistogramBins(9);
-                task.redOptions.setXYReduction(true);
-                labels = new string[] { "", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram" };
-                desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options.";
-            }
-            public void RunCS(Mat src)
-            {
-                task.redOptions.Sync(); // make sure settings are consistent
-                Cv2.CalcHist(new Mat[] { task.pointCloud }, task.redOptions.channels, new Mat(), histogram, task.redOptions.channelCount,
-                              task.redOptions.histBinList, task.redOptions.ranges);
-                switch (task.redOptions.PointCloudReduction)
-                {
-                    case 0:
-                    case 1:
-                    case 2: // "X Reduction", "Y Reduction", "Z Reduction"
-                        plot.Run(histogram);
-                        dst2 = plot.histogram;
-                        labels[2] = "2D plot of 1D histogram.";
-                        break;
-                    case 3:
-                    case 4:
-                    case 5: // "XY Reduction", "XZ Reduction", "YZ Reduction"
-                        plot2D.Run(histogram);
-                        dst2 = plot2D.dst2;
-                        labels[2] = "2D plot of 2D histogram.";
-                        break;
-                    case 6: // "XYZ Reduction"
-                        if (dst2.Type() != MatType.CV_8U) dst2 = new Mat(dst2.Size(), MatType.CV_8U);
-                        hcloud.Run(task.pointCloud);
-                        histogram = hcloud.histogram;
-                        float[] histData = new float[histogram.Total()];
-                        Marshal.Copy(histogram.Data, histData, 0, histData.Length);
-                        if (histData.Length > 255 && task.histogramBins > 3)
-                        {
-                            task.histogramBins -= 1;
-                        }
-                        if (histData.Length < 128 && task.histogramBins < task.gOptions.getHistBinBarMax())
-                        {
-                            task.histogramBins += 1;
-                        }
-                        if (task.gridList.Count() < histData.Length && task.gridSize > 2)
-                        {
-                            task.gridSize -= 1;
-                            grid.Run(src);
-                            dst2.SetTo(0);
-                        }
-                        histData[0] = 0; // count of zero pixels - distorts results..
-                        float maxVal = histData.Max();
-                        for (int i = 0; i < task.gridList.Count(); i++)
-                        {
-                            var roi = task.gridList[i];
-                            if (i >= histData.Length)
-                            {
-                                dst2[roi].SetTo(0);
-                            }
-                            else
-                            {
-                                dst2[roi].SetTo(255 * histData[i] / maxVal);
-                            }
-                        }
-                        labels[2] = "2D plot of the resulting 3D histogram.";
-                        break;
-                }
-                var mm = GetMinMax(dst2);
-                dst3 = ShowPalette(dst2 * 255 / mm.maxVal);
-            }
-        }
-        public class CS_PointCloud_ReduceSplit2 : CS_Parent
-        {
-            Reduction_Basics reduction = new Reduction_Basics();
-            public CS_PointCloud_ReduceSplit2(VBtask task) : base(task)
-            {
-                UpdateAdvice(traceName + ": redOptions 'X/Y-Range X100' sliders to test further.");
-                desc = "Reduce the task.pcSplit[2] for use in several algorithms.";
-            }
-            public void RunCS(Mat src)
-            {
-                dst2 = task.pcSplit[2] * 1000;
-                dst2.ConvertTo(dst2, MatType.CV_32S);
-                reduction.Run(dst2);
-                reduction.dst2.ConvertTo(dst1, MatType.CV_32F);
-                dst1 *= 0.001;
-                if (standaloneTest())
-                {
-                    dst3 = task.pointCloud;
+                    markerLeft.Y -= offset;
+                    markerRight.Y += offset;
                 }
                 else
                 {
-                    var mm = GetMinMax(dst1);
-                    dst1 *= task.MaxZmeters / mm.maxVal;
-                    Cv2.Merge(new Mat[] { task.pcSplit[0], task.pcSplit[1], dst1 }, dst3);
+                    markerLeft.Y += offset;
+                    markerRight.Y -= offset;
+                }
+                markerLeft = new cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y);
+                markerLeft = new cv.Point(markerLeft.X * Math.Cos(task.accRadians.Z) - markerLeft.Y * Math.Sin(task.accRadians.Z),
+                                        markerLeft.Y * Math.Cos(task.accRadians.Z) + markerLeft.X * Math.Sin(task.accRadians.Z));
+                markerLeft = new cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y);
+                markerRight = new cv.Point((markerRight.X - cam.X) * Math.Cos(task.accRadians.Z) - (markerRight.Y - cam.Y) * Math.Sin(task.accRadians.Z) + cam.X,
+                                        (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y);
+            }
+            if (!standaloneTest())
+            {
+                DrawCircle(dst2, markerLeft, task.DotSize, Scalar.Red);
+                DrawCircle(dst2, markerRight, task.DotSize, Scalar.Red);
+            }
+            float startAngle = (180 - task.vFov) / 2;
+            float y = (float)(dst2.Width / Math.Tan(startAngle * Cv2.PI / 180));
+            var fovTop = new cv.Point(dst2.Width, cam.Y - y);
+            var fovBot = new cv.Point(dst2.Width, cam.Y + y);
+            dst2.Line(cam, fovTop, Scalar.White, 1, task.lineType);
+            dst2.Line(cam, fovBot, Scalar.White, 1, task.lineType);
+            DrawCircle(dst2, markerLeft, task.DotSize + 3, Scalar.Red);
+            DrawCircle(dst2, markerRight, task.DotSize + 3, Scalar.Red);
+            dst2.Line(cam, markerLeft, Scalar.Red, 1, task.lineType);
+            dst2.Line(cam, markerRight, Scalar.Red, 1, task.lineType);
+            var labelLocation = new cv.Point(src.Width * 0.02, src.Height * 7 / 8);
+            SetTrueText("vFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new cv.Point(4, dst2.Height * 3 / 4));
+        }
+    }
+    public class CS_PointCloud_SetupTop : CS_Parent
+    {
+        int arcSize;
+        public CS_PointCloud_SetupTop(VBtask task) : base(task)
+        {
+            arcSize = dst2.Width / 15;
+            labels[2] = "Layout markers for top view";
+            desc = "Create the colorize the mat for a topdown projections";
+        }
+        public void RunCS(Mat src)
+        {
+            float distanceRatio = 1;
+            if (src.Channels() != 3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
+            if (standaloneTest()) dst2.SetTo(0); else src.CopyTo(dst2);
+            DrawCircle(dst2, task.topCameraPoint, task.DotSize, Scalar.BlueViolet);
+            for (int i = 1; i <= task.MaxZmeters; i++)
+            {
+                int ymeter = (int)(dst2.Height - dst2.Height * i / (task.MaxZmeters * distanceRatio));
+                dst2.Line(new cv.Point(0, ymeter), new cv.Point(dst2.Width, ymeter), Scalar.AliceBlue, 1);
+                SetTrueText(i.ToString() + "m", new cv.Point(10, ymeter));
+            }
+            var cam = task.topCameraPoint;
+            var marker = new Point2f(cam.X, dst2.Height / task.MaxZmeters);
+            float topLen = (float)(marker.Y * Math.Tan((task.hFov / 2) * Cv2.PI / 180));
+            float sideLen = (float)(marker.Y * Math.Tan((task.vFov / 2) * Cv2.PI / 180));
+            var markerLeft = new cv.Point(cam.X - topLen, marker.Y);
+            var markerRight = new cv.Point(cam.X + topLen, marker.Y);
+            float offset = (float)Math.Sin(task.accRadians.Z) * topLen;
+            if (task.useGravityPointcloud)
+            {
+                if (task.accRadians.Z > 0)
+                {
+                    markerLeft.X -= (int)offset;
+                    markerRight.X += (int)offset;
+                }
+                else
+                {
+                    markerLeft.X += (int)offset;
+                    markerRight.X -= (int)offset;
                 }
             }
+            float startAngle = (180 - task.hFov) / 2;
+            float x = (float)(dst2.Height / Math.Tan(startAngle * Cv2.PI / 180));
+            var fovRight = new cv.Point(task.topCameraPoint.X + x, 0);
+            var fovLeft = new cv.Point(task.topCameraPoint.X - x, fovRight.Y);
+            dst2.Line(task.topCameraPoint, fovLeft, Scalar.White, 1, task.lineType);
+            DrawCircle(dst2, markerLeft, task.DotSize + 3, Scalar.Red);
+            DrawCircle(dst2, markerRight, task.DotSize + 3, Scalar.Red);
+            dst2.Line(cam, markerLeft, Scalar.Red, 1, task.lineType);
+            dst2.Line(cam, markerRight, Scalar.Red, 1, task.lineType);
+            float shift = (src.Width - src.Height) / 2;
+            var labelLocation = new cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16);
+            SetTrueText("hFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new cv.Point(4, dst2.Height * 7 / 8));
+            DrawLine(dst2, task.topCameraPoint, fovRight, Scalar.White);
         }
-        public class CS_PointCloud_ReducedTopView : CS_Parent
-        {
-            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
-            public CS_PointCloud_ReducedTopView(VBtask task) : base(task)
-            {
-                UpdateAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.");
-                desc = "Create a stable side view of the point cloud";
-            }
-            public void RunCS(Mat src)
-            {
-                split2.Run(task.pointCloud);
-                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsTop, new Mat(), dst1, 2, task.bins2D, task.rangesTop);
-                dst1 = dst1.Flip(FlipMode.X);
-                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
-                dst1.ConvertTo(dst2, MatType.CV_8UC1);
-            }
-        }
-        public class CS_PointCloud_ReducedSideView : CS_Parent
-        {
-            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
-            public CS_PointCloud_ReducedSideView(VBtask task) : base(task)
-            {
-                desc = "Show where vertical neighbor depth values are within X mm's";
-            }
-            public void RunCS(Mat src)
-            {
-                split2.Run(null);
-                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsSide, new Mat(), dst1, 2, task.bins2D, task.rangesSide);
-                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
-                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
-                dst1.ConvertTo(dst2, MatType.CV_8UC1);
-            }
-        }
-        public class CS_PointCloud_ReducedViews : CS_Parent
-        {
-            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
-            public CS_PointCloud_ReducedViews(VBtask task) : base(task)
-            {
-                labels = new string[] { "", "", "Reduced side view", "Reduced top view" };
-                desc = "Show where vertical neighbor depth values are within X mm's";
-            }
-            public void RunCS(Mat src)
-            {
-                split2.Run(null);
-                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsSide, new Mat(), dst1, 2, task.bins2D, task.rangesSide);
-                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
-                dst1.ConvertTo(dst2, MatType.CV_8UC1);
-                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsTop, new Mat(), dst1, 2, task.bins2D, task.rangesTop);
-                dst1 = dst1.Flip(FlipMode.X);
-                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
-                dst1.ConvertTo(dst3, MatType.CV_8UC1);
-            }
-        }
-        public class CS_PointCloud_XRangeTest : CS_Parent
-        {
-            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
-            public CS_PointCloud_XRangeTest(VBtask task) : base(task)
-            {
-                UpdateAdvice(traceName + ": redOptions 'X-Range X100' slider has high impact.");
-                desc = "Test adjusting the X-Range value to squeeze a histogram into dst2.";
-            }
-            public void RunCS(Mat src)
-            {
-                split2.Run(src);
-                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsTop, new Mat(), dst1, 2, task.bins2D, task.rangesTop);
-                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
-                dst1 = dst1.Flip(FlipMode.X);
-                dst1.ConvertTo(dst2, MatType.CV_8UC1);
-            }
-        }
-        public class CS_PointCloud_YRangeTest : CS_Parent
-        {
-            PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
-            public CS_PointCloud_YRangeTest(VBtask task) : base(task)
-            {
-                UpdateAdvice(traceName + ": redOptions 'Y-Range X100' slider has high impact.");
-                desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2.";
-            }
-            public void RunCS(Mat src)
-            {
-                split2.Run(src);
-                Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsSide, new Mat(), dst1, 2, task.bins2D, task.rangesSide);
-                dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
-                dst1.ConvertTo(dst2, MatType.CV_8UC1);
-            }
-        }
-
-
     }
+    public class CS_PointCloud_Raw_CPP : CS_Parent
+    {
+        byte[] depthBytes;
+        public CS_PointCloud_Raw_CPP(VBtask task) : base(task)
+        {
+            labels[2] = "Top View";
+            labels[3] = "Side View";
+            desc = "Project the depth data onto a top view And side view.";
+            cPtr = SimpleProjectionOpen();
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass) Array.Resize(ref depthBytes, (int)(task.pcSplit[2].Total() * task.pcSplit[2].ElemSize()));
+            Marshal.Copy(task.pcSplit[2].Data, depthBytes, 0, depthBytes.Length);
+            var handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned);
+            IntPtr imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject(), 0, task.MaxZmeters, task.pcSplit[2].Height, task.pcSplit[2].Width);
+            dst2 = new Mat(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, imagePtr).CvtColor(ColorConversionCodes.GRAY2BGR);
+            dst3 = new Mat(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(ColorConversionCodes.GRAY2BGR);
+            handleDepth.Free();
+            labels[2] = "Top View (looking down)";
+            labels[3] = "Side View";
+        }
+        public void Close()
+        {
+            SimpleProjectionClose(cPtr);
+        }
+    }
+    public class CS_PointCloud_Raw : CS_Parent
+    {
+        public CS_PointCloud_Raw(VBtask task) : base(task)
+        {
+            labels[2] = "Top View";
+            labels[3] = "Side View";
+            desc = "Project the depth data onto a top view And side view - Using only VB code (too slow.)";
+            cPtr = SimpleProjectionOpen();
+        }
+        public void RunCS(Mat src)
+        {
+            float range = task.MaxZmeters;
+            dst2 = src.EmptyClone().SetTo(Scalar.White);
+            dst3 = dst2.Clone();
+            var black = new Vec3b(0, 0, 0);
+            Parallel.ForEach(task.gridList, roi =>
+            {
+                for (int y = roi.Y; y < roi.Y + roi.Height; y++)
+                {
+                    for (int x = roi.X; x < roi.X + roi.Width; x++)
+                    {
+                        byte m = task.depthMask.Get<byte>(y, x);
+                        if (m > 0)
+                        {
+                            float depth = task.pcSplit[2].Get<float>(y, x);
+                            int dy = (int)(src.Height * depth / range);
+                            if (dy < src.Height && dy > 0) dst2.Set<Vec3b>(src.Height - dy, x, black);
+                            int dx = (int)(src.Width * depth / range);
+                            if (dx < src.Width && dx > 0) dst3.Set<Vec3b>(y, dx, black);
+                        }
+                    }
+                }
+            });
+            labels[2] = "Top View (looking down)";
+            labels[3] = "Side View";
+        }
+        public void Close()
+        {
+            SimpleProjectionClose(cPtr);
+        }
+    }
+    public class CS_PointCloud_Solo : CS_Parent
+    {
+        public HeatMap_Basics heat = new HeatMap_Basics();
+        public CS_PointCloud_Solo(VBtask task) : base(task)
+        {
+            FindCheckBox("Top View (Unchecked Side View)").Checked = true;
+            labels[2] = "Top down view after inrange sampling";
+            labels[3] = "Histogram after filtering For Single-only histogram bins";
+            desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample";
+        }
+        public void RunCS(Mat src)
+        {
+            heat.Run(src);
+            dst2 = heat.dst0.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs();
+            dst3 = heat.dst1.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs();
+        }
+    }
+    public class CS_PointCloud_SoloRegions : CS_Parent
+    {
+        public PointCloud_Solo solo = new PointCloud_Solo();
+        Dilate_Basics dilate = new Dilate_Basics();
+        public CS_PointCloud_SoloRegions(VBtask task) : base(task)
+        {
+            labels[2] = "Top down view before inrange sampling";
+            labels[3] = "Histogram after filtering For Single-only histogram bins";
+            desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample";
+        }
+        public void RunCS(Mat src)
+        {
+            solo.Run(src);
+            dst2 = solo.dst2;
+            dst3 = solo.dst3;
+            dilate.Run(dst3.Clone());
+            dst3 = dilate.dst2;
+        }
+    }
+    public class CS_PointCloud_SurfaceH_CPP : CS_Parent
+    {
+        public HeatMap_Basics heat = new HeatMap_Basics();
+        public Plot_Basics_CPP plot = new Plot_Basics_CPP();
+        public int topRow;
+        public int botRow;
+        public int peakRow;
+        public CS_PointCloud_SurfaceH_CPP(VBtask task) : base(task)
+        {
+            desc = "Find the horizontal surfaces With a projects Of the SideView histogram.";
+        }
+        public void RunCS(Mat src)
+        {
+            heat.Run(src);
+            dst2 = heat.dst3;
+            topRow = 0;
+            botRow = 0;
+            peakRow = 0;
+            int peakVal = 0;
+            for (int i = 0; i < dst2.Height; i++)
+            {
+                plot.srcX.Add(i);
+                if (dst2.Channels() == 1) plot.srcY.Add(dst2.Row(i).CountNonZero());
+                else plot.srcY.Add(dst2.Row(i).CvtColor(ColorConversionCodes.BGR2GRAY).CountNonZero());
+                if (peakVal < plot.srcY[i])
+                {
+                    peakVal = (int)plot.srcY[i];
+                    peakRow = i;
+                }
+                if (topRow == 0 && plot.srcY[i] > 10) topRow = i;
+            }
+            for (int i = plot.srcY.Count() - 1; i >= 0; i--)
+            {
+                if (botRow == 0 && plot.srcY[i] > 10) botRow = i;
+            }
+            plot.Run(empty);
+            dst3 = plot.dst2.Transpose();
+            dst3 = dst3.Flip(FlipMode.Y);
+            labels[2] = "Top row = " + topRow.ToString() + " peak row = " + peakRow.ToString() + " bottom row = " + botRow.ToString();
+        }
+    }
+    public class CS_PointCloud_SurfaceH : CS_Parent
+    {
+        public HeatMap_Basics heat = new HeatMap_Basics();
+        public Plot_Histogram plot = new Plot_Histogram();
+        public int topRow;
+        public int botRow;
+        public int peakRow;
+        public CS_PointCloud_SurfaceH(VBtask task) : base(task)
+        {
+            FindCheckBox("Top View (Unchecked Side View)").Checked = true;
+            labels[3] = "Histogram Of Each Of " + task.histogramBins.ToString() + " bins aligned With the sideview";
+            desc = "Find the horizontal surfaces With a projects Of the SideView histogram.";
+        }
+        public void RunCS(Mat src)
+        {
+            heat.Run(src);
+            dst2 = heat.dst2;
+            var hist = new Mat(dst2.Height, 1, MatType.CV_32F, 0);
+            var indexer = hist.GetGenericIndexer<float>();
+            topRow = 0;
+            botRow = 0;
+            peakRow = 0;
+            int peakVal = 0;
+            if (dst2.Channels() != 1) dst1 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            for (int i = 0; i < dst1.Height; i++)
+            {
+                indexer[i] = dst1.Row(i).CountNonZero();
+                if (peakVal < indexer[i])
+                {
+                    peakVal = (int)indexer[i];
+                    peakRow = i;
+                }
+                if (topRow == 0 && indexer[i] > 10) topRow = i;
+            }
+            plot.maxValue = (float)(Math.Floor((double)(peakVal / 100 + 1) * 100));
+            for (int i = hist.Rows - 1; i >= 0; i--)
+            {
+                if (botRow == 0 && indexer[i] > 10) botRow = i;
+            }
+            plot.Run(hist);
+            dst3 = plot.dst2.Transpose();
+            dst3 = dst3.Flip(FlipMode.Y)[new cv.Rect(0, 0, dst0.Height, dst0.Height)].Resize(dst0.Size());
+            labels[2] = "Top row = " + topRow.ToString() + " peak row = " + peakRow.ToString() + " bottom row = " + botRow.ToString();
+            var ratio = task.mouseMovePoint.Y / (double)dst2.Height;
+            var offset = ratio * dst3.Height;
+            DrawLine(dst2, new cv.Point(0, task.mouseMovePoint.Y), new cv.Point(dst2.Width, task.mouseMovePoint.Y), Scalar.Yellow);
+            dst3.Line(new cv.Point(0, offset), new cv.Point(dst3.Width, offset), Scalar.Yellow, task.lineWidth);
+        }
+    }
+    public class CS_PointCloud_NeighborV : CS_Parent
+    {
+        Options_Neighbors options = new Options_Neighbors();
+        public CS_PointCloud_NeighborV(VBtask task) : base(task)
+        {
+            desc = "Show where vertical neighbor depth values are within Y mm's";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
+            var tmp32f = new Mat(dst2.Size(), MatType.CV_32F, 0);
+            var r1 = new cv.Rect(options.pixels, 0, dst2.Width - options.pixels, dst2.Height);
+            var r2 = new cv.Rect(0, 0, dst2.Width - options.pixels, dst2.Height);
+            Cv2.Absdiff(src[r1], src[r2], tmp32f[r1]);
+            tmp32f = tmp32f.Threshold(options.threshold, 255, ThresholdTypes.BinaryInv);
+            dst2 = tmp32f.ConvertScaleAbs(255);
+            dst2.SetTo(0, task.noDepthMask);
+            dst2[new cv.Rect(0, dst2.Height - options.pixels, dst2.Width, options.pixels)].SetTo(0);
+            labels[2] = "White: z is within " + (options.threshold * 1000).ToString(fmt0) + " mm's with Y pixel offset " + options.pixels.ToString();
+        }
+    }
+    public class CS_PointCloud_Visualize : CS_Parent
+    {
+        public CS_PointCloud_Visualize(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Pointcloud visualized", "" };
+            desc = "Display the pointcloud as a BGR image.";
+        }
+        public void RunCS(Mat src)
+        {
+            var pcSplit = new Mat[] { task.pcSplit[0].ConvertScaleAbs(255), task.pcSplit[1].ConvertScaleAbs(255), task.pcSplit[2].ConvertScaleAbs(255) };
+            Cv2.Merge(pcSplit, dst2);
+        }
+    }
+    public class CS_PointCloud_PCpointsMask : CS_Parent
+    {
+        public Mat pcPoints;
+        public int actualCount;
+        public CS_PointCloud_PCpointsMask(VBtask task) : base(task)
+        {
+            setPointCloudGrid();
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged) pcPoints = new Mat(task.gridRows, task.gridCols, MatType.CV_32FC3, 0);
+            dst2.SetTo(0);
+            actualCount = 0;
+            float lastMeanZ = 0;
+            for (int y = 0; y < task.gridRows; y++)
+            {
+                for (int x = 0; x < task.gridCols; x++)
+                {
+                    var roi = task.gridList[y * task.gridCols + x];
+                    var mean = task.pointCloud[roi].Mean(task.depthMask[roi]);
+                    bool depthPresent = task.depthMask[roi].CountNonZero() > roi.Width * roi.Height / 2;
+                    if ((depthPresent && mean[2] > 0 && Math.Abs(lastMeanZ - mean[2]) < 0.2 && mean[2] < task.MaxZmeters) || (lastMeanZ == 0 && mean[2] > 0))
+                    {
+                        pcPoints.Set<Point3f>(y, x, new Point3f((float)mean[0], (float)mean[1], (float)mean[2]));
+                        actualCount++;
+                        DrawCircle(dst2, new cv.Point(roi.X, roi.Y),  (int)(task.DotSize * Math.Max(mean[2], 1)), 
+                                    Scalar.White);
+                    }
+                    lastMeanZ = (float)mean[2];
+                }
+            }
+            labels[2] = "PointCloud cv.Point Points found = " + actualCount.ToString();
+        }
+    }
+    public class CS_PointCloud_PCPoints : CS_Parent
+    {
+        public List<Point3f> pcPoints = new List<Point3f>();
+        public CS_PointCloud_PCPoints(VBtask task) : base(task)
+        {
+            setPointCloudGrid();
+            desc = "Reduce the point cloud to a manageable number points in 3D using the mean value";
+        }
+        public void RunCS(Mat src)
+        {
+            int rw = task.gridList[0].Width / 2, rh = task.gridList[0].Height / 2;
+            cv.Scalar red32 = new cv.Scalar(0, 0, 1);
+            cv.Scalar blue32 = new cv.Scalar(1, 0, 0);
+            cv.Scalar white32 = new cv.Scalar(1, 1, 1);
+            cv.Scalar red = Scalar.Red;
+            cv.Scalar blue = Scalar.Blue;
+            cv.Scalar white = Scalar.White;
+            pcPoints.Clear();
+            dst2 = src;
+            foreach (var roi in task.gridList)
+            {
+                var pt = new cv.Point(roi.X + rw, roi.Y + rh);
+                var mean = task.pointCloud[roi].Mean(task.depthMask[roi]);
+                if (mean[2] > 0)
+                {
+                    if (pt.Y % 3 == 0) pcPoints.Add(new cv.Point3f((float)red32[0], (float) red32[1], (float)red32[2]));
+                    if (pt.Y % 3 == 1) pcPoints.Add(new cv.Point3f((float)blue32[0], (float)blue32[1], (float)blue32[2]));
+                    if (pt.Y % 3 == 2) pcPoints.Add(new cv.Point3f((float)white32[0], (float)white32[1], (float)white32[2]));
+                    pcPoints.Add(new cv.Point3f((float)mean[0], (float)mean[1], (float)mean[2]));
+                    if (pt.Y % 3 == 0) DrawCircle(dst2, pt, task.DotSize, red);
+                    if (pt.Y % 3 == 1) DrawCircle(dst2, pt, task.DotSize, blue);
+                    if (pt.Y % 3 == 2) DrawCircle(dst2, pt, task.DotSize, white);
+                }
+            }
+            labels[2] = "PointCloud cv.Point Points found = " + (pcPoints.Count() / 2).ToString();
+        }
+    }
+    public class CS_PointCloud_PCPointsPlane : CS_Parent
+    {
+        PointCloud_Basics pcBasics = new PointCloud_Basics();
+        public List<cv.Point3f> pcPoints = new List<cv.Point3f>();
+        public List<cv.Point> xyList = new List<cv.Point>();
+        cv.Point3f white32 = new cv.Point3f(1, 1, 1);
+        public CS_PointCloud_PCPointsPlane(VBtask task) : base(task)
+        {
+            setPointCloudGrid();
+            desc = "Find planes using a reduced set of 3D points and the intersection of vertical and horizontal lines through those points.";
+        }
+        public void RunCS(Mat src)
+        {
+            pcBasics.Run(src);
+            pcPoints.Clear();
+            // points in both the vertical and horizontal lists are likely to designate a plane
+            foreach (var pt in pcBasics.allPointsH)
+            {
+                if (pcBasics.allPointsV.Contains(pt))
+                {
+                    pcPoints.Add(white32);
+                    pcPoints.Add(pt);
+                }
+            }
+            labels[2] = "Point series found = " + (pcPoints.Count() / 2).ToString();
+        }
+    }
+    public class CS_PointCloud_Inspector : CS_Parent
+    {
+        public CS_PointCloud_Inspector(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            task.mouseMovePoint.X = dst2.Width / 2;
+            desc = "Inspect x, y, and z values in a row or column";
+        }
+        public void RunCS(Mat src)
+        {
+            int yLines = 20;
+            int cLine = task.mouseMovePoint.X;
+            Mat input = src;
+            if (input.Type() != MatType.CV_32F) input = task.pcSplit[2];
+            Point2f topPt = new Point2f(cLine, 0);
+            Point2f botPt = new Point2f(cLine, dst2.Height);
+            dst2 = task.depthRGB;
+            DrawLine(dst2, topPt, botPt, 255);
+            double stepY = dst2.Height / yLines;
+            SetTrueText("\t   X\t  Y\t  Z", 3);
+            for (int i = 1; i < yLines - 1; i++)
+            {
+                Point2f pt1 = new Point2f(dst2.Width, (float)(i * stepY));
+                Point2f pt2 = new Point2f(0, (float)(i * stepY));
+                DrawLine(dst2, pt1, pt2, Scalar.White);
+                Point2f pt = new Point2f(cLine, (float)(i * stepY));
+                Vec3f xyz = task.pointCloud.Get<Vec3f>((int) pt.Y, (int) pt.X);
+                SetTrueText("Row " + i.ToString() + "\t" + xyz[0].ToString(fmt2) + "\t" + xyz[1].ToString(fmt2) + 
+                            "\t" + xyz[2].ToString(fmt2), new cv.Point(5, (int)pt.Y), 3);
+            }
+            labels[2] = "Values displayed are the point cloud X, Y, and Z values for column " + cLine.ToString();
+            labels[3] = "Move mouse in the image at left to see the point cloud X, Y, and Z values.";
+        }
+    }
+    public class CS_PointCloud_Average : CS_Parent
+    {
+        List<Mat> pcHistory = new List<Mat>();
+        public CS_PointCloud_Average(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            desc = "Average all 3 elements of the point cloud - not just depth.";
+        }
+        public void RunCS(Mat src)
+        {
+            pcHistory.Add(task.pointCloud);
+            if (pcHistory.Count() >= task.frameHistoryCount) pcHistory.RemoveAt(0);
+            dst3.SetTo(0);
+            foreach (var m in pcHistory)
+            {
+                dst3 += m;
+            }
+            dst3 *= 1.0 / pcHistory.Count();
+        }
+    }
+    public class CS_PointCloud_FrustrumTop : CS_Parent
+    {
+        Draw_Frustrum frustrum = new Draw_Frustrum();
+        HeatMap_Basics heat = new HeatMap_Basics();
+        PointCloud_SetupTop setupTop = new PointCloud_SetupTop();
+        public CS_PointCloud_FrustrumTop(VBtask task) : base(task)
+        {
+            task.gOptions.setGravityUsage(false);
+            FindCheckBox("Top View (Unchecked Side View)").Checked = true;
+            labels[3] = "Draw the frustrum from the top view";
+            desc = "Draw the top view of the frustrum";
+        }
+        public void RunCS(Mat src)
+        {
+            frustrum.Run(src);
+            heat.Run(frustrum.dst3.Resize(dst2.Size()));
+            setupTop.Run(heat.dst2);
+            dst2 = setupTop.dst2;
+        }
+    }
+    public class CS_PointCloud_FrustrumSide : CS_Parent
+    {
+        Draw_Frustrum frustrum = new Draw_Frustrum();
+        HeatMap_Basics heat = new HeatMap_Basics();
+        PointCloud_SetupSide setupSide = new PointCloud_SetupSide();
+        public CS_PointCloud_FrustrumSide(VBtask task) : base(task)
+        {
+            task.gOptions.setGravityUsage(false);
+            FindCheckBox("Top View (Unchecked Side View)").Checked = false;
+            labels[2] = "Draw the frustrum from the side view";
+            desc = "Draw the side view of the frustrum";
+        }
+        public void RunCS(Mat src)
+        {
+            frustrum.Run(src);
+            heat.Run(frustrum.dst3.Resize(dst2.Size()));
+            setupSide.Run(heat.dst3);
+            dst2 = setupSide.dst2;
+        }
+    }
+    public class CS_PointCloud_Histograms : CS_Parent
+    {
+        Plot_Histogram2D plot2D = new Plot_Histogram2D();
+        Plot_Histogram plot = new Plot_Histogram();
+        Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
+        Grid_Basics grid = new Grid_Basics();
+        public Mat histogram = new Mat();
+        public CS_PointCloud_Histograms(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(9);
+            task.redOptions.setXYReduction(true);
+            labels = new string[] { "", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram" };
+            desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options.";
+        }
+        public void RunCS(Mat src)
+        {
+            task.redOptions.Sync(); // make sure settings are consistent
+            Cv2.CalcHist(new Mat[] { task.pointCloud }, task.redOptions.channels, new Mat(), histogram, task.redOptions.channelCount,
+                            task.redOptions.histBinList, task.redOptions.ranges);
+            switch (task.redOptions.PointCloudReduction)
+            {
+                case 0:
+                case 1:
+                case 2: // "X Reduction", "Y Reduction", "Z Reduction"
+                    plot.Run(histogram);
+                    dst2 = plot.histogram;
+                    labels[2] = "2D plot of 1D histogram.";
+                    break;
+                case 3:
+                case 4:
+                case 5: // "XY Reduction", "XZ Reduction", "YZ Reduction"
+                    plot2D.Run(histogram);
+                    dst2 = plot2D.dst2;
+                    labels[2] = "2D plot of 2D histogram.";
+                    break;
+                case 6: // "XYZ Reduction"
+                    if (dst2.Type() != MatType.CV_8U) dst2 = new Mat(dst2.Size(), MatType.CV_8U);
+                    hcloud.Run(task.pointCloud);
+                    histogram = hcloud.histogram;
+                    float[] histData = new float[histogram.Total()];
+                    Marshal.Copy(histogram.Data, histData, 0, histData.Length);
+                    if (histData.Length > 255 && task.histogramBins > 3)
+                    {
+                        task.histogramBins -= 1;
+                    }
+                    if (histData.Length < 128 && task.histogramBins < task.gOptions.getHistBinBarMax())
+                    {
+                        task.histogramBins += 1;
+                    }
+                    if (task.gridList.Count() < histData.Length && task.gridSize > 2)
+                    {
+                        task.gridSize -= 1;
+                        grid.Run(src);
+                        dst2.SetTo(0);
+                    }
+                    histData[0] = 0; // count of zero pixels - distorts results..
+                    float maxVal = histData.Max();
+                    for (int i = 0; i < task.gridList.Count(); i++)
+                    {
+                        var roi = task.gridList[i];
+                        if (i >= histData.Length)
+                        {
+                            dst2[roi].SetTo(0);
+                        }
+                        else
+                        {
+                            dst2[roi].SetTo(255 * histData[i] / maxVal);
+                        }
+                    }
+                    labels[2] = "2D plot of the resulting 3D histogram.";
+                    break;
+            }
+            var mm = GetMinMax(dst2);
+            dst3 = ShowPalette(dst2 * 255 / mm.maxVal);
+        }
+    }
+    public class CS_PointCloud_ReduceSplit2 : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        public CS_PointCloud_ReduceSplit2(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": redOptions 'X/Y-Range X100' sliders to test further.");
+            desc = "Reduce the task.pcSplit[2] for use in several algorithms.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = task.pcSplit[2] * 1000;
+            dst2.ConvertTo(dst2, MatType.CV_32S);
+            reduction.Run(dst2);
+            reduction.dst2.ConvertTo(dst1, MatType.CV_32F);
+            dst1 *= 0.001;
+            if (standaloneTest())
+            {
+                dst3 = task.pointCloud;
+            }
+            else
+            {
+                var mm = GetMinMax(dst1);
+                dst1 *= task.MaxZmeters / mm.maxVal;
+                Cv2.Merge(new Mat[] { task.pcSplit[0], task.pcSplit[1], dst1 }, dst3);
+            }
+        }
+    }
+    public class CS_PointCloud_ReducedTopView : CS_Parent
+    {
+        PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+        public CS_PointCloud_ReducedTopView(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.");
+            desc = "Create a stable side view of the point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            split2.Run(task.pointCloud);
+            Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsTop, new Mat(), dst1, 2, task.bins2D, task.rangesTop);
+            dst1 = dst1.Flip(FlipMode.X);
+            dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            dst1.ConvertTo(dst2, MatType.CV_8UC1);
+        }
+    }
+    public class CS_PointCloud_ReducedSideView : CS_Parent
+    {
+        PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+        public CS_PointCloud_ReducedSideView(VBtask task) : base(task)
+        {
+            desc = "Show where vertical neighbor depth values are within X mm's";
+        }
+        public void RunCS(Mat src)
+        {
+            split2.Run(null);
+            Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsSide, new Mat(), dst1, 2, task.bins2D, task.rangesSide);
+            dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            dst1.ConvertTo(dst2, MatType.CV_8UC1);
+        }
+    }
+    public class CS_PointCloud_ReducedViews : CS_Parent
+    {
+        PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+        public CS_PointCloud_ReducedViews(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Reduced side view", "Reduced top view" };
+            desc = "Show where vertical neighbor depth values are within X mm's";
+        }
+        public void RunCS(Mat src)
+        {
+            split2.Run(null);
+            Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsSide, new Mat(), dst1, 2, task.bins2D, task.rangesSide);
+            dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            dst1.ConvertTo(dst2, MatType.CV_8UC1);
+            Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsTop, new Mat(), dst1, 2, task.bins2D, task.rangesTop);
+            dst1 = dst1.Flip(FlipMode.X);
+            dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            dst1.ConvertTo(dst3, MatType.CV_8UC1);
+        }
+    }
+    public class CS_PointCloud_XRangeTest : CS_Parent
+    {
+        PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+        public CS_PointCloud_XRangeTest(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": redOptions 'X-Range X100' slider has high impact.");
+            desc = "Test adjusting the X-Range value to squeeze a histogram into dst2.";
+        }
+        public void RunCS(Mat src)
+        {
+            split2.Run(src);
+            Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsTop, new Mat(), dst1, 2, task.bins2D, task.rangesTop);
+            dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            dst1 = dst1.Flip(FlipMode.X);
+            dst1.ConvertTo(dst2, MatType.CV_8UC1);
+        }
+    }
+    public class CS_PointCloud_YRangeTest : CS_Parent
+    {
+        PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
+        public CS_PointCloud_YRangeTest(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": redOptions 'Y-Range X100' slider has high impact.");
+            desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2.";
+        }
+        public void RunCS(Mat src)
+        {
+            split2.Run(src);
+            Cv2.CalcHist(new Mat[] { split2.dst3 }, task.channelsSide, new Mat(), dst1, 2, task.bins2D, task.rangesSide);
+            dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            dst1.ConvertTo(dst2, MatType.CV_8UC1);
+        }
+    }
+    public class CS_Polylines_IEnumerableExample : CS_Parent
+    {
+        Options_PolyLines options = new Options_PolyLines();
+        public CS_Polylines_IEnumerableExample(VBtask task) : base(task)
+        {
+            desc = "Manually create an IEnumerable<IEnumerable<cv.Point>>.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var points = Enumerable.Range(0, options.polyCount).Select(i =>
+                new cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))).ToList();
+            var pts = new List<List<cv.Point>> { points };
+            dst2 = new Mat(src.Size(), MatType.CV_8U, 0);
+            // NOTE: when there are 2 points, there will be 1 line.
+            Cv2.Polylines(dst2, pts, options.polyClosed, Scalar.White, task.lineWidth, task.lineType);
+        }
+    }
+    // C# implementation of the browse example in OpenCV.
+    // https://github.com/opencv/opencv/blob/master/samples/python/browse.py
+    public class CS_Polylines_Random : CS_Parent
+    {
+        Pixel_Zoom zoom = new Pixel_Zoom();
+        public CS_Polylines_Random(VBtask task) : base(task)
+        {
+            labels[2] = "To zoom move the mouse over the image";
+            desc = "Create a random procedural image";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.frameCount % (task.fpsRate * 3) == 0) // every x frames.
+            {
+                int h = src.Height, w = src.Width;
+                Random autorand = new Random();
+                Point2f[] points2f = new Point2f[10000];
+                var pts = new List<List<cv.Point>>();
+                var points = new List<cv.Point>();
+                points2f[0] = new Point2f((float)(autorand.NextDouble() - 0.5), (float)(autorand.NextDouble() - 0.5));
+                for (int i = 1; i < points2f.Length; i++)
+                {
+                    points2f[i] = new Point2f((float)(autorand.NextDouble() - 0.5 + points2f[i - 1].X),
+                                               (float)(autorand.NextDouble() - 0.5 + points2f[i - 1].Y));
+                    points.Add(new cv.Point((int)(points2f[i].X * 10 + w / 2), (int)(points2f[i].Y * 10 + h / 2)));
+                }
+                pts.Add(points);
+                dst2 = new Mat(src.Size(), MatType.CV_8U, 0);
+                Cv2.Polylines(dst2, pts, false, Scalar.White, task.lineWidth, task.lineType);
+                dst2 = dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
+            }
+            zoom.Run(dst2);
+            dst3 = zoom.dst2;
+        }
+    }
+    public class CS_PongWars_Basics : CS_Parent
+    {
+        int sqWidth = 25;
+        int sqHeight;
+        int numSquaresX;
+        int numSquaresY;
+        const int DAY_COLOR = 1, DAY_BALL_COLOR = 2, NIGHT_COLOR = 3, NIGHT_BALL_COLOR = 4;
+        int[,] squares;
+        cv.Point p1;
+        Point2f d1;
+        cv.Point p2;
+        Point2f d2;
+        int iteration = 0;
+        cv.Point p1Last = new cv.Point();
+        cv.Point p2Last = new cv.Point();
+        public CS_PongWars_Basics(VBtask task) : base(task)
+        {
+            sqHeight = 25 * task.WorkingRes.Height / task.WorkingRes.Width;
+            numSquaresX = task.WorkingRes.Width / sqWidth;
+            numSquaresY = task.WorkingRes.Height / sqHeight;
+            squares = new int[numSquaresX, numSquaresY];
+            p1 = new cv.Point(task.WorkingRes.Width / 4, task.WorkingRes.Height / 2);
+            d1 = new Point2f(12.5f, -12.5f);
+            p2 = new cv.Point((task.WorkingRes.Width / 4) * 3, task.WorkingRes.Height / 2);
+            d2 = new Point2f(-12.5f, 12.5f);
+            for (int i = 0; i < numSquaresX; i++)
+            {
+                for (int j = 0; j < numSquaresY; j++)
+                {
+                    squares[i, j] = (i < numSquaresX / 2) ? DAY_COLOR : NIGHT_COLOR;
+                }
+            }
+            p1 = new cv.Point(msRNG.Next(0, dst2.Width / 4), msRNG.Next(0, dst2.Height / 2));
+            p2 = new cv.Point(msRNG.Next(dst2.Width / 2, dst2.Width), msRNG.Next(dst2.Height / 4, dst2.Height));
+            UpdateAdvice(traceName + ": <place advice here on any options that are useful>");
+            desc = "Pong as war between the forces of light and darkness.";
+        }
+        Point2f UpdateSquareAndBounce(cv.Point pt, Point2f dxy, int sqClass)
+        {
+            for (double angle = 0; angle <= Math.PI * 2; angle += Math.PI / 4)
+            {
+                double checkX = pt.X + Math.Cos(angle) * (sqWidth / 2);
+                double checkY = pt.Y + Math.Sin(angle) * (sqHeight / 2);
+                int i = (int)Math.Floor(checkX / sqWidth);
+                int j = (int)Math.Floor(checkY / sqHeight);
+                if (i >= 0 && i < numSquaresX && j >= 0 && j < numSquaresY)
+                {
+                    if (squares[i, j] != sqClass)
+                    {
+                        squares[i, j] = sqClass;
+                        if (Math.Abs(Math.Cos(angle)) > Math.Abs(Math.Sin(angle)))
+                        {
+                            dxy.X = -dxy.X;
+                        }
+                        else
+                        {
+                            dxy.Y = -dxy.Y;
+                        }
+                    }
+                }
+            }
+            return dxy;
+        }
+        Point2f CheckBoundaryCollision(cv.Point pt, Point2f dxy)
+        {
+            if (pt.X + dxy.X > dst2.Width - sqWidth / 2 || pt.X + dxy.X < sqWidth / 2) dxy.X = -dxy.X;
+            if (pt.Y + dxy.Y > dst2.Height - sqHeight / 2 || pt.Y + dxy.Y < sqHeight / 2) dxy.Y = -dxy.Y;
+            return dxy;
+        }
+        void UpdateScoreElement()
+        {
+            int dayScore = 0;
+            int nightScore = 0;
+            for (int i = 0; i < numSquaresX; i++)
+            {
+                for (int j = 0; j < numSquaresY; j++)
+                {
+                    if (squares[i, j] == DAY_COLOR)
+                    {
+                        dayScore += 1;
+                    }
+                    else if (squares[i, j] == NIGHT_COLOR)
+                    {
+                        nightScore += 1;
+                    }
+                }
+            }
+            if (task.heartBeat) labels[2] = $"Pong War: day {dayScore} | night {nightScore}";
+        }
+        public void RunCS(Mat src)
+        {
+            iteration += 1;
+            if (iteration % 1000 == 0)
+            {
+                Console.WriteLine("iteration " + iteration);
+            }
+            d1 = UpdateSquareAndBounce(p1, d1, DAY_COLOR);
+            d2 = UpdateSquareAndBounce(p2, d2, NIGHT_COLOR);
+            d1 = CheckBoundaryCollision(p1, d1);
+            d2 = CheckBoundaryCollision(p2, d2);
+            p1.X += (int) d1.X;
+            p1.Y += (int) d1.Y;
+            p2.X += (int) d2.X;
+            p2.Y += (int) d2.Y;
+            if (p1Last == p1) p1 = new cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2));
+            p1Last = p1;
+            if (p2Last == p2) p2 = new cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2));
+            p2Last = p2;
+            UpdateScoreElement();
+            dst2.SetTo(0);
+            for (int i = 0; i < numSquaresX; i++)
+            {
+                for (int j = 0; j < numSquaresY; j++)
+                {
+                    var rect = new cv.Rect(i * sqWidth, j * sqHeight, sqWidth, sqHeight);
+                    int index = squares[i, j];
+                    dst2.Rectangle(rect, task.scalarColors[index], -1);
+                }
+            }
+            var pt = new cv.Point((int)(p1.X - sqWidth / 2), (int)(p1.Y - sqHeight / 2));
+            DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors[DAY_BALL_COLOR]);
+            pt = new cv.Point((int)(p2.X - sqWidth / 2), (int)(p2.Y - sqHeight / 2));
+            DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors[NIGHT_BALL_COLOR]);
+        }
+    }
+    public class CS_PongWars_Two : CS_Parent
+    {
+        PongWars_Basics pong1 = new PongWars_Basics();
+        PongWars_Basics pong2 = new PongWars_Basics();
+        public CS_PongWars_Two(VBtask task) : base(task)
+        {
+            desc = "Running 2 pong wars at once.  Randomness inserted with starting location.";
+        }
+        public void RunCS(Mat src)
+        {
+            pong1.Run(src);
+            dst2 = pong1.dst2.Clone();
+            labels[2] = pong1.labels[2];
+            pong2.Run(src);
+            dst3 = pong2.dst2.Clone();
+            labels[3] = pong2.labels[2];
+        }
+    }
+    public class CS_ProCon_Basics : CS_Parent
+    {
+        readonly object _lockObject = new object();
+        public Thread p;
+        public Thread c;
+        public int head = -1;
+        public int tail = -1;
+        public int frameCount = 1;
+        public Font_FlowText flow = new Font_FlowText();
+        public bool terminateConsumer;
+        public bool terminateProducer;
+        public Options_ProCon options = new Options_ProCon();
+        public CS_ProCon_Basics(VBtask task) : base(task)
+        {
+            flow.parentData = this;
+            p = new Thread(Producer);
+            p.Name = "Producer";
+            p.Start();
+            c = new Thread(Consumer);
+            c.Name = "Consumer";
+            c.Start();
+            desc = "DijKstra's Producer/Consumer 'Cooperating Sequential Process'.  Consumer must see every item produced.";
+        }
+        public int success(int index)
+        {
+            return (index + 1) % options.buffer.Length;
+        }
+        public void Consumer()
+        {
+            while (true)
+            {
+                lock (_lockObject)
+                {
+                    head = success(head);
+                    var item = options.buffer[head];
+                    if (item != -1)
+                    {
+                        flow.nextMsg = "Consumer: = " + item.ToString();
+                        options.buffer[head] = -1;
+                    }
+                }
+                if (terminateConsumer) break;
+                cv.Cv2.WaitKey();
+            }
+        }
+        void Producer()
+        {
+            while (true)
+            {
+                lock (_lockObject)
+                {
+                    tail = success(tail);
+                    if (options.buffer[tail] == -1)
+                    {
+                        flow.nextMsg = "producer: = " + frameCount.ToString();
+                        options.buffer[tail] = frameCount;
+                        frameCount += 1;
+                    }
+                }
+                if (terminateProducer) break;
+                cv.Cv2.WaitKey();
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.buffer.Length != options.bufferSize)
+            {
+                lock (_lockObject)
+                {
+                    options.buffer = new int[options.bufferSize];
+                    options.buffer = Enumerable.Repeat(-1, options.buffer.Length).ToArray();
+                    frameCount = 0;
+                    head = -1;
+                    tail = -1;
+                };
+            }
+            lock (_lockObject)
+            {
+                flow.Run(empty);
+            }
+        }
+        public void Close()
+        {
+            terminateProducer = true;
+            terminateConsumer = true;
+        }
+    }
+    public class CS_ProCon_Variation : CS_Parent
+    {
+        readonly object _lockObject = new object();
+        ProCon_Basics procon;
+        int frameCount;
+        public CS_ProCon_Variation(VBtask task) : base(task)
+        {
+            procon = new ProCon_Basics();
+            procon.terminateProducer = true; // we don't need a 2 producer task.  RunVB below provides the second thread.
+            desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread.";
+        }
+        public void RunCS(Mat src)
+        {
+            lock (_lockObject)
+            {
+                procon.tail = procon.success((int)procon.tail);
+                if (procon.options.buffer[(int)procon.tail] == -1)
+                {
+                    procon.flow.nextMsg = "producer: = " + frameCount.ToString();
+                    procon.options.buffer[(int)procon.tail] = frameCount;
+                    frameCount += 1;
+                }
+            }
+
+            procon.Run(src);
+        }
+        public void Close()
+        {
+            procon.terminateConsumer = true;
+            procon.terminateProducer = true;
+        }
+    }
+    public class CS_Profile_Basics : CS_Parent
+    {
+        public Point3f ptLeft, ptRight, ptTop, ptBot, ptFront, ptBack;
+        public List<string> cornerNames = new List<string> { "   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
+                                                           "   Bottom (white)", "   Front (yellow)", "   Back (blue)" };
+        public List<Scalar> cornerColors = new List<Scalar> { Scalar.White, Scalar.LightBlue, Scalar.Red, Scalar.Green,
+                                                             Scalar.White, Scalar.Yellow, Scalar.Blue };
+        public List<cv.Point3f> corners3D = new List<cv.Point3f>();
+        public List<cv.Point> corners = new List<cv.Point>();
+        public List<cv.Point> cornersRaw = new List<cv.Point>();
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Profile_Basics(VBtask task) : base(task)
+        {
+            desc = "Find the left/right, top/bottom, and near/far sides of a cell";
+        }
+        string point3fToString(Point3f v)
+        {
+            return string.Format("{0}\t{1}\t{2}", v.X.ToString(fmt3), v.Y.ToString(fmt3), v.Z.ToString(fmt3));
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            var rc = task.rc;
+            if (rc.depthPixels == 0)
+            {
+                strOut = "There is no depth data for that cell.";
+                return;
+            }
+            if (rc.contour.Count() < 4) return;
+            dst3.SetTo(0);
+            DrawContour(dst3[rc.rect], rc.contour, Scalar.Yellow);
+            var sortLeft = new SortedList<int, int>(new compareAllowIdenticalInteger());
+            var sortTop = new SortedList<int, int>(new compareAllowIdenticalInteger());
+            var sortFront = new SortedList<int, int>(new compareAllowIdenticalInteger());
+            var sort2Dleft = new SortedList<int, int>(new compareAllowIdenticalInteger());
+            var sort2Dtop = new SortedList<int, int>(new compareAllowIdenticalInteger());
+            rc.contour3D = new List<cv.Point3f>();
+            for (int i = 0; i < rc.contour.Count(); i++)
+            {
+                var pt = rc.contour[i];
+                var vec = task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X);
+                if (float.IsNaN(vec.Z) || float.IsInfinity(vec.Z)) continue;
+                if (vec.Z > 0)
+                {
+                    sortLeft.Add(pt.X, i);
+                    sortTop.Add(pt.Y, i);
+                    sortFront.Add((int)(vec.Z * 1000), i);
+                    rc.contour3D.Add(vec);
+                }
+                else
+                {
+                    sort2Dleft.Add(pt.X, i);
+                    sort2Dtop.Add(pt.Y, i);
+                }
+            }
+            if (sortLeft.Count() == 0)
+            {
+                sortLeft = sort2Dleft;
+                sortTop = sort2Dtop;
+            }
+            corners3D.Clear();
+            corners.Clear();
+            cornersRaw.Clear();
+            corners.Add(new cv.Point(rc.rect.X + rc.contour[0].X, rc.rect.Y + rc.contour[0].Y)); // show the first contour point...
+            cornersRaw.Add(rc.contour[0]); // show the first contour point...
+            corners3D.Add(task.pointCloud.Get<cv.Point3f>(rc.rect.Y + rc.contour[0].Y, rc.rect.X + rc.contour[0].X));
+            for (int i = 0; i < 6; i++)
+            {
+                int index = 0;
+                if (i == 1) index = sortLeft.Count() - 1;
+                if (i == 2) index = 0;
+                if (i == 3) index = sortFront.Count() - 1;
+                var ptList = sortLeft;
+                if (i == 1) ptList = sortLeft;
+                if (i == 2) ptList = sortTop;
+                if (i == 3) ptList = sortTop;
+                if (i == 4) ptList = sortFront;
+                if (i == 5) ptList = sortFront;
+                if (ptList.Count() > 0)
+                {
+                    var pt = rc.contour[ptList.ElementAt(index).Value];
+                    cornersRaw.Add(pt);
+                    corners.Add(new cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y));
+                    corners3D.Add(task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X));
+                }
+            }
+            for (int i = 0; i < corners.Count(); i++)
+            {
+                DrawCircle(dst3, corners[i], task.DotSize + 2, cornerColors[i]);
+            }
+            if (task.heartBeat)
+            {
+                strOut = "X\tY\tZ\tunits=meters\n";
+                var w = task.gridSize;
+                for (int i = 0; i < corners.Count(); i++)
+                {
+                    strOut += point3fToString(corners3D[i]) + "\t" + cornerNames[i] + "\n";
+                }
+                strOut += "\nThe contour may show points further away but they don't have depth.";
+                if (sortFront.Count() == 0) strOut += "\nNone of the contour points had depth.";
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Profile_Rotation : CS_Parent
+    {
+        public IMU_GMatrix gMat = new IMU_GMatrix();
+        public string strMsg = "Then use the 'Options_IMU' sliders to rotate the cell\n" +
+                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders";
+        Options_IMU options = new Options_IMU();
+        TrackBar ySlider;
+        public CS_Profile_Rotation(VBtask task) : base(task)
+        {
+            ySlider = FindSlider("Rotate pointcloud around Y-axis");
+            if (standaloneTest()) task.gOptions.setGravityUsage(false);
+            labels[2] = "Top matrix is the current gMatrix while the bottom one includes the Y-axis rotation.";
+            desc = "Build the rotation matrix around the Y-axis";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                ySlider.Value += 1;
+                if (ySlider.Value == ySlider.Maximum) ySlider.Value = ySlider.Minimum;
+                SetTrueText("When running standaloneTest(), the Y-axis slider is rotating from -90 to 90.", 3);
+            }
+            gMat.Run(src);
+            if (standaloneTest())
+            {
+                options.RunVB();
+                strOut = "Gravity-oriented gMatrix\n";
+                strOut += task.gMat.strOut + "\n";
+                strOut += "\nNew gMatrix from sliders\n";
+                strOut += gMatrixToStr(gMat.gMatrix) + "\n\n";
+                strOut += "Angle X = " + options.rotateX.ToString(fmt1) + "\n";
+                strOut += "Angle Y = " + options.rotateY.ToString(fmt1) + "\n";
+                strOut += "Angle Z = " + options.rotateZ.ToString(fmt1) + "\n";
+                SetTrueText(strOut + "\n\n" + strMsg);
+            }
+        }
+    }
+    public class CS_Profile_Derivative : CS_Parent
+    {
+        public Profile_Basics sides = new Profile_Basics();
+        List<trueText> saveTrueText = new List<trueText>();
+        public CS_Profile_Derivative(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth" };
+            desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            sides.Run(src);
+            dst2 = sides.dst2;
+            var rc = task.rc;
+            int offset = 30;
+            float rsizeX = (dst2.Width - offset * 2) / (float)rc.rect.Width;
+            float rsizeY = (dst2.Height - offset * 2) / (float)rc.rect.Height;
+            saveTrueText.Clear();
+            task.trueData.Clear();
+            dst3.SetTo(0);
+            Scalar color, near = Scalar.Yellow, far = Scalar.Blue;
+            if (rc.index > 0)
+            {
+                for (int i = 0; i < rc.contour.Count(); i++)
+                {
+                    var pt = rc.contour[i];
+                    var vec = task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X);
+                    pt = new cv.Point(pt.X * rsizeX + offset, pt.Y * rsizeY + offset);
+                    float t = (rc.maxVec.Z == 0) ? 0 : (vec.Z - rc.minVec.Z) / (rc.maxVec.Z - rc.minVec.Z);
+                    if (vec.Z > 0 && t > 0)
+                    {
+                        byte b = (byte)((1 - t) * near[0] + t * far[0]);
+                        byte g = (byte)((1 - t) * near[1] + t * far[1]);
+                        byte r = (byte)((1 - t) * near[2] + t * far[2]);
+                        color = new Scalar(b, g, r);
+                    }
+                    else
+                    {
+                        color = Scalar.White;
+                    }
+                    DrawCircle(dst3, pt, task.DotSize, color);
+                    if (sides.cornersRaw.Contains(rc.contour[i]))
+                    {
+                        int index = sides.cornersRaw.IndexOf(rc.contour[i]);
+                        DrawCircle(dst1, pt, task.DotSize + 5, Scalar.White);
+                        DrawCircle(dst1, pt, task.DotSize + 3, sides.cornerColors[index]);
+                        SetTrueText(sides.cornerNames[index], pt, 3);
+                    }
+                }
+            }
+            strOut = "Points are presented clockwise starting at White dot (leftmost top point)\n" +
+                     "yellow = closer, blue = farther,\n\n" + sides.strOut;
+            dst1 = sides.dst3.Clone();
+            for (int i = 0; i < sides.corners.Count(); i++)
+            {
+                color = sides.cornerColors[i];
+                SetTrueText(sides.cornerNames[i], sides.corners[i], 1);
+                DrawCircle(dst1, sides.corners[i], task.DotSize, color);
+            }
+            SetTrueText(strOut, 1);
+            saveTrueText = new List<trueText>(trueData);
+            if (saveTrueText != null) trueData = new List<trueText>(saveTrueText);
+        }
+    }
+    public class CS_Profile_ConcentrationSide : CS_Parent
+    {
+        Profile_ConcentrationTop profile = new Profile_ConcentrationTop();
+        public CS_Profile_ConcentrationSide(VBtask task) : base(task)
+        {
+            FindCheckBox("Top View (Unchecked Side View)").Checked = false;
+            labels = new string[] { "", "The outline of the selected RedCloud cell", traceName + " - click any RedCloud cell to visualize it's side view in the upper right image.", "" };
+            desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls";
+        }
+        public void RunCS(Mat src)
+        {
+            profile.Run(src);
+            dst1 = profile.dst1;
+            dst2 = profile.dst2;
+            dst3 = profile.dst3;
+            labels[3] = profile.labels[3];
+        }
+    }
+    public class CS_Profile_ConcentrationTop : CS_Parent
+    {
+        Plot_OverTimeSingle plot = new Plot_OverTimeSingle();
+        Profile_Rotation rotate = new Profile_Rotation();
+        public Profile_Basics sides = new Profile_Basics();
+        HeatMap_Basics heat = new HeatMap_Basics();
+        Options_HeatMap options = new Options_HeatMap();
+        float maxAverage;
+        int peakRotation;
+        TrackBar ySlider;
+        public CS_Profile_ConcentrationTop(VBtask task) : base(task)
+        {
+            ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)");
+            task.gOptions.setGravityUsage(false);
+            task.gOptions.setDisplay1();
+            desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            sides.Run(src);
+            dst2 = sides.dst2;
+            var rc = task.rc;
+            if (rc.contour3D.Count() == 0)
+            {
+                SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1);
+                return;
+            }
+            var vecMat = new Mat(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
+            ySlider.Value += 1;
+            rotate.Run(empty);
+            Mat output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix);  // <<< this is the XYZ-axis rotation...
+            vecMat = output.Reshape(3, vecMat.Rows);
+            heat.Run(vecMat);
+            if (options.topView)
+            {
+                dst1 = heat.dst0.Threshold(0, 255, ThresholdTypes.Binary);
+            }
+            else
+            {
+                dst1 = heat.dst1.Threshold(0, 255, ThresholdTypes.Binary);
+            }
+            var count = dst1.CountNonZero();
+            if (maxAverage < count)
+            {
+                maxAverage = count;
+                peakRotation = ySlider.Value;
+            }
+            plot.plotData = count;
+            plot.Run(empty);
+            dst3 = plot.dst2;
+            if (ySlider.Value >= 45)
+            {
+                maxAverage = 0;
+                peakRotation = -45;
+                ySlider.Value = -45;
+            }
+            labels[3] = "Peak cell concentration in the histogram = " + ((int)maxAverage).ToString() + " at " + peakRotation.ToString() + " degrees";
+        }
+    }
+    public class CS_Profile_OpenGL : CS_Parent
+    {
+        Profile_Basics sides = new Profile_Basics();
+        public Profile_Rotation rotate = new Profile_Rotation();
+        HeatMap_Basics heat = new HeatMap_Basics();
+        public CS_Profile_OpenGL(VBtask task) : base(task)
+        {
+            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, 0);
+            if (standaloneTest()) task.gOptions.setGravityUsage(false);
+            task.ogl.options.PointSizeSlider.Value = 10;
+            task.ogl.oglFunction = (int)oCase.pcPointsAlone;
+            desc = "Visualize just the RedCloud cell contour in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            sides.Run(src);
+            dst2 = sides.dst2;
+            dst3 = sides.dst3;
+            var rc = task.rc;
+            if (rc.contour3D.Count() > 0)
+            {
+                Mat vecMat = new Mat(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
+                rotate.Run(empty);
+                Mat output = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix;  // <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
+                task.ogl.dataInput = output.Reshape(3, vecMat.Rows);
+                task.ogl.pointCloudInput = new Mat();
+                task.ogl.Run(new Mat());
+                heat.Run(vecMat);
+                dst1 = heat.dst0.Threshold(0, 255, ThresholdTypes.Binary);
+            }
+            SetTrueText("Select a RedCloud Cell to display the contour in OpenGL." + "\n" + rotate.strMsg, 3);
+        }
+    }
+    public class CS_Profile_Kalman : CS_Parent
+    {
+        Profile_Basics sides = new Profile_Basics();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_Profile_Kalman(VBtask task) : base(task)
+        {
+            kalman.kInput = new float[12];
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman" };
+            desc = "Use Kalman to smooth the results of the contour key points";
+        }
+        public void RunCS(Mat src)
+        {
+            sides.Run(src);
+            dst0 = sides.redC.dst0;
+            dst1 = sides.dst2;
+            dst2 = sides.dst3;
+            var rc = task.rc;
+            if (kalman.kInput.Length != sides.corners.Count() * 2) Array.Resize(ref kalman.kInput, sides.corners.Count() * 2);
+            for (int i = 0; i < sides.corners.Count(); i++)
+            {
+                kalman.kInput[i * 2] = sides.corners[i].X;
+                kalman.kInput[i * 2 + 1] = sides.corners[i].Y;
+            }
+            kalman.Run(empty);
+            if (rc.index > 0)
+            {
+                dst3.SetTo(0);
+                DrawContour(dst3[rc.rect], rc.contour, Scalar.Yellow);
+                for (int i = 0; i < sides.corners.Count(); i++)
+                {
+                    var pt = new cv.Point((int)kalman.kOutput[i * 2], (int)kalman.kOutput[i * 2 + 1]);
+                    DrawCircle(dst3, pt, task.DotSize + 2, sides.cornerColors[i]);
+                }
+            }
+            SetTrueText(sides.strOut, 3);
+            SetTrueText("Select a cell in the upper right image", 2);
+        }
+    }
+
+
+}

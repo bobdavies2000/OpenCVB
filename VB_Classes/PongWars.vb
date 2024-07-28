@@ -96,19 +96,20 @@ Public Class PongWars_Basics : Inherits VB_Parent
 
         UpdateScoreElement()
 
+        dst2.SetTo(0)
         For i As Integer = 0 To numSquaresX - 1
             For j As Integer = 0 To numSquaresY - 1
                 Dim rect = New cv.Rect(i * sqWidth, j * sqHeight, sqWidth, sqHeight)
                 Dim index = squares(i, j)
-                dst2.Rectangle(rect, task.scalarColors(index))
+                dst2.Rectangle(rect, task.scalarColors(index), -1)
             Next
         Next
 
         Dim pt = New cv.Point(CInt(p1.x - sqWidth / 2), CInt(p1.y - sqHeight / 2))
-        DrawCircle(dst2,pt, task.DotSize + 5, task.scalarColors(DAY_BALL_COLOR))
+        DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors(DAY_BALL_COLOR))
 
         pt = New cv.Point(CInt(p2.x - sqWidth / 2), CInt(p2.y - sqHeight / 2))
-        DrawCircle(dst2,pt, task.DotSize + 5, task.scalarColors(NIGHT_BALL_COLOR))
+        DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors(NIGHT_BALL_COLOR))
     End Sub
 End Class
 

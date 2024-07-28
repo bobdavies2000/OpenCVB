@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Windows.Forms
 Public Class Projection_Basics : Inherits VB_Parent
     Public redCellInput As New List(Of rcData)
     Public redCells As New List(Of rcData)
@@ -147,23 +148,23 @@ End Class
 Public Class Projection_Lines : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim lines As New Line_Basics
+    Dim options As New Options_Projection
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Concentration threshold", 0, 100, 2)
         FindCheckBox("Top View (Unchecked Side View)").Checked = False
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells"}
         desc = "Search for surfaces among the FeatureLess regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Concentration threshold")
-        Static topCheck = FindCheckBox("Top View (Unchecked Side View)")
+        options.RunVB()
+
         If task.heartBeat Then
             dst1.SetTo(0)
             dst3.SetTo(0)
         End If
         heat.Run(src)
-        If topCheck.checked Then dst2 = heat.dst2 Else dst2 = heat.dst3
-        dst1 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+        If options.topCheck Then dst2 = heat.dst2 Else dst2 = heat.dst3
+        dst1 = dst2.Threshold(options.projectionThreshold, 255, cv.ThresholdTypes.Binary)
 
         lines.Run(dst1)
         dst3 += lines.dst3
@@ -257,7 +258,7 @@ Public Class Projection_Side : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         objects.viewType = "Side"
         desc = "Find all the masks, rects, and counts in the side view."
     End Sub
@@ -287,24 +288,22 @@ End Class
 Public Class Projection_ObjectIsolate : Inherits VB_Parent
     Public top As New Projection_Top
     Public side As New Projection_Side
+    Dim options As New Options_Projection
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Index of object", 0, 100, 0) ' zero is the largest object present.
-
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         side.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static objSlider = FindSlider("Index of object")
-        Dim index = objSlider.value
+        options.RunVB()
 
         top.Run(src)
         dst3 = top.dst2
         labels(3) = top.labels(2)
 
-        If index < top.objects.objectList.Count Then
-            Dim lower = New cv.Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
-            Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
+        If options.index < top.objects.objectList.Count Then
+            Dim lower = New cv.Scalar(top.objects.objectList(options.index)(0), -100, top.objects.objectList(options.index)(2))
+            Dim upper = New cv.Scalar(top.objects.objectList(options.index)(1), +100, top.objects.objectList(options.index)(3))
             dst0 = task.pointCloud.InRange(lower, upper)
 
             dst1.SetTo(0)
@@ -312,7 +311,6 @@ Public Class Projection_ObjectIsolate : Inherits VB_Parent
             side.Run(dst1)
             dst2 = side.histSide.dst3
             labels(2) = side.labels(2)
-
         End If
     End Sub
 End Class
@@ -365,11 +363,12 @@ End Class
 
 Public Class Projection_Floor : Inherits VB_Parent
     Dim isolate As New Projection_ObjectIsolate
+    Dim objSlider As TrackBar
     Public Sub New()
+        objSlider = FindSlider("Index of object")
         desc = "Isolate just the floor."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static objSlider = FindSlider("Index of object")
         isolate.Run(src)
         dst2 = isolate.dst2
         dst3 = isolate.dst3
