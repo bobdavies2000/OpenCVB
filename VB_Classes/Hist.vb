@@ -455,7 +455,7 @@ Public Class Hist_PeaksRGB : Inherits VB_Parent
 
         If task.optionsChanged Then
             task.mouseClickFlag = True
-            task.mousePicTag = RESULT_DST2
+            task.mousePicTag = 2
         End If
 
         mats.Run(empty)

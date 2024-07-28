@@ -227,6 +227,7 @@ Public Class VBtask : Implements IDisposable
     Public openGL_hwnd As IntPtr
     Public openGLPipe As NamedPipeServerStream
     Public pipeCount As Integer
+    Public pythonPipeIndex As Integer ' increment this for each algorithm to avoid any conflicts with other Python apps.
 
     Public Enum gifTypes
         gifdst0 = 0

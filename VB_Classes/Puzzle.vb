@@ -46,21 +46,16 @@ Public Class Puzzle_Solver : Inherits VB_Parent
     Dim match As New Match_Basics
     Public grayMat As cv.Mat
     Dim puzzleIndex As Integer
+    Dim options As New Options_Puzzle
     Public Sub New()
         If standaloneTest() Then task.gOptions.setGridSize(8)
-        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Start another puzzle")
-            check.Box(0).Checked = True
-        End If
-
         labels = {"", "", "Puzzle Input", "Puzzle Solver Output - missing pieces can result from identical cells (usually bright white)"}
         desc = "Solve the puzzle using matchTemplate"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static startBox = FindCheckBox("Start another puzzle")
-        If task.optionsChanged Or startBox.checked Then
-            startBox.checked = False
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If task.optionsChanged Or options.startPuzzle Then
             puzzle.Run(src)
             dst2 = puzzle.dst2
             dst3.SetTo(0)

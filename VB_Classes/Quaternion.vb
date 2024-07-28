@@ -1,24 +1,12 @@
 Imports cv = OpenCvSharp
 Imports System.Numerics
-
-Module Quaternion_module
-    Public Function quaternion_exp(v As cv.Point3f) As Quaternion
-        v *= 0.5
-        Dim theta2 = v.X * v.X + v.Y * v.Y + v.Z * v.Z
-        Dim theta = Math.Sqrt(theta2)
-        Dim c = Math.Cos(theta)
-        Dim s = If(theta2 < Math.Sqrt(120 * Single.Epsilon), 1 - theta2 / 6, Math.Sin(theta) / theta2)
-        Return New Quaternion(s * v.X, s * v.Y, s * v.Z, c)
-    End Function
-End Module
-
 Public Class Quaterion_Basics : Inherits VB_Parent
     Dim options As New Options_Quaternion
     Public Sub New()
         desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         Dim quatmul = Quaternion.Multiply(options.q1, options.q2)
         SetTrueText("q1 = " + options.q1.ToString() + vbCrLf + "q2 = " + options.q2.ToString() + vbCrLf +
                     "Multiply q1 * q2" + quatmul.ToString())
@@ -36,6 +24,14 @@ Public Class Quaterion_IMUPrediction : Inherits VB_Parent
         labels(3) = ""
         desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
     End Sub
+    Public Function quaternion_exp(v As cv.Point3f) As Quaternion
+        v *= 0.5
+        Dim theta2 = v.X * v.X + v.Y * v.Y + v.Z * v.Z
+        Dim theta = Math.Sqrt(theta2)
+        Dim c = Math.Cos(theta)
+        Dim s = If(theta2 < Math.Sqrt(120 * Single.Epsilon), 1 - theta2 / 6, Math.Sin(theta) / theta2)
+        Return New Quaternion(s * v.X, s * v.Y, s * v.Z, c)
+    End Function
     Public Sub RunVB(src as cv.Mat)
         host.Run(src)
 

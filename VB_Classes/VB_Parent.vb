@@ -43,13 +43,8 @@ Public Class VB_Parent : Implements IDisposable
     Dim retryCount As Integer
     Public Const depthListMaxCount As Integer = 10
 
-    Public Const RESULT_DST0 = 0 ' 0=rgb 1=depth 2=dst1 3=dst2
-    Public Const RESULT_DST1 = 1 ' 0=rgb 1=depth 2=dst1 3=dst2
-    Public Const RESULT_DST2 = 2 ' 0=rgb 1=depth 2=dst1 3=dst2
-    Public Const RESULT_DST3 = 3 ' 0=rgb 1=depth 2=dst1 3=dst2
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
 
-    Public pythonPipeIndex As Integer ' increment this for each algorithm to avoid any conflicts with other Python apps.
     Dim callStack = ""
     Public Sub New()
         algorithm = Me

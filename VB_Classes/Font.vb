@@ -27,7 +27,7 @@ End Class
 
 Public Class Font_FlowTextOld : Inherits VB_Parent
     Public msgs As New List(Of String)
-    Public dst As Integer = RESULT_DST2
+    Public dst As Integer = 2
     Public Sub New()
         desc = "Show TrueType text flowing through an image."
     End Sub
@@ -74,7 +74,7 @@ Public Class Font_FlowText : Inherits VB_Parent
     Public flowText As New List(Of String)
     Public nextMsg As String
     Public maxLines As Integer = 23
-    Public dst As Integer = RESULT_DST2
+    Public dst As Integer = 2
     Public textResult As New List(Of trueText)
     Public parentData As Object
     Public Sub New()

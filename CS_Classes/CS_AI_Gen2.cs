@@ -19,6 +19,7 @@ using System.Windows.Controls;
 using System.Windows;
 using OpenCvSharp.Flann;
 using System.Text.RegularExpressions;
+using System.Numerics;
 
 namespace CS_Classes
 {
@@ -9136,6 +9137,577 @@ namespace CS_Classes
             SetTrueText("Select a cell in the upper right image", 2);
         }
     }
+    public class CS_Puzzle_Basics : CS_Parent
+    {
+        public List<cv.Rect> scrambled = new List<cv.Rect>(); // this is every roi regardless of size.
+        public List<cv.Rect> unscrambled = new List<cv.Rect>(); // this is every roi regardless of size.
+        public Mat image = new Mat();
+        public CS_Puzzle_Basics(VBtask task) : base(task)
+        {
+            desc = "Create the puzzle pieces to solve with correlation.";
+        }
+        public List<T> Shuffle<T>(IEnumerable<T> collection)
+        {
+            Random r = new Random();
+            return collection.OrderBy(a => r.Next()).ToList();
+        }
+        public void RunCS(Mat src)
+        {
+            unscrambled.Clear();
+            List<cv.Rect> inputROI = new List<cv.Rect>();
+            for (int j = 0; j < task.gridList.Count(); j++)
+            {
+                var roi = task.gridList[j];
+                if (roi.Width == task.gridSize && roi.Height == task.gridSize)
+                    inputROI.Add(task.gridList[j]);
+            }
+            scrambled = Shuffle(inputROI);
+            image = src.Clone();
+            // display image with shuffled roi's
+            for (int i = 0; i < scrambled.Count(); i++)
+            {
+                var roi = task.gridList[i];
+                var roi2 = scrambled[i];
+                if (roi.Width == task.gridSize && roi.Height == task.gridSize &&
+                    roi2.Width == task.gridSize && roi2.Height == task.gridSize)
+                    dst2[roi2] = src[roi];
+            }
+        }
+    }
+    public class CS_Puzzle_Solver : CS_Parent
+    {
+        public Puzzle_Basics puzzle = new Puzzle_Basics();
+        List<cv.Rect> solution = new List<cv.Rect>();
+        Match_Basics match = new Match_Basics();
+        public Mat grayMat;
+        int puzzleIndex;
+        Options_Puzzle options = new Options_Puzzle();
+        public CS_Puzzle_Solver(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setGridSize(8);
+            labels = new string[] { "", "", "Puzzle Input", "Puzzle Solver Output - missing pieces can result from identical cells (usually bright white)" };
+            desc = "Solve the puzzle using matchTemplate";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.optionsChanged || options.startPuzzle)
+            {
+                puzzle.Run(src);
+                dst2 = puzzle.dst2;
+                dst3.SetTo(0);
+                grayMat = puzzle.image.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                puzzleIndex = 0;
+            }
+            if (puzzle.scrambled.Count() > puzzle.unscrambled.Count())
+            {
+                // find one piece of the puzzle on each iteration.
+                var rect = puzzle.scrambled[puzzleIndex];
+                match.template = grayMat[rect];
+                match.Run(grayMat);
+                var bestRect = ValidateRect(new cv.Rect(match.matchCenter.X, match.matchCenter.Y, rect.Width, rect.Height));
+                puzzle.unscrambled.Add(bestRect);
+                puzzleIndex++;
+                dst3[bestRect] = puzzle.image[bestRect];
+            }
+        }
+    }
+    public class CS_Puzzle_SolverDynamic : CS_Parent
+    {
+        Puzzle_Solver puzzle = new Puzzle_Solver();
+        public CS_Puzzle_SolverDynamic(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setGridSize(8);
+            labels = new string[] { "", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical." };
+            desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera.";
+        }
+        public void RunCS(Mat src)
+        {
+            puzzle.puzzle.image = src.Clone();
+            puzzle.grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            puzzle.Run(src);
+            dst2 = puzzle.dst2;
+            dst3 = puzzle.dst3;
+        }
+    }
+    public class CS_Pyramid_Basics : CS_Parent
+    {
+        Options_Pyramid options = new Options_Pyramid();
+        public CS_Pyramid_Basics(VBtask task) : base(task)
+        {
+            desc = "Use pyrup and pyrdown to zoom in and out of an image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.zoom != 0)
+            {
+                if (options.zoom < 0)
+                {
+                    var tmp = src.PyrDown(new cv.Size(src.Cols / 2, src.Rows / 2));
+                    var roi = new cv.Rect((src.Cols - tmp.Cols) / 2, (src.Rows - tmp.Rows) / 2, tmp.Width, tmp.Height);
+                    dst2[roi] = tmp;
+                }
+                else
+                {
+                    var tmp = src.PyrUp(new cv.Size(src.Cols * 2, src.Rows * 2));
+                    var roi = new cv.Rect((tmp.Cols - src.Cols) / 2, (tmp.Rows - src.Rows) / 2, src.Width, src.Height);
+                    dst2 = tmp[roi];
+                }
+            }
+            else
+            {
+                src.CopyTo(dst2);
+            }
+        }
+    }
+    public class CS_Pyramid_Filter : CS_Parent
+    {
+        Laplacian_PyramidFilter laplace = new Laplacian_PyramidFilter();
+        public CS_Pyramid_Filter(VBtask task) : base(task)
+        {
+            desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively";
+        }
+        public void RunCS(Mat src)
+        {
+            laplace.Run(src);
+            dst2 = laplace.dst2;
+        }
+    }
+    public class CS_PyrFilter_Basics : CS_Parent
+    {
+        Options_PyrFilter options = new Options_PyrFilter();
+        public CS_PyrFilter_Basics(VBtask task) : base(task)
+        {
+            desc = "Use PyrMeanShiftFiltering to segment an image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Cv2.PyrMeanShiftFiltering(src, dst2, options.radius, options.color, options.maxPyramid);
+        }
+    }
+    public class CS_PyrFilter_RedCloud : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Reduction_Basics reduction = new Reduction_Basics();
+        PyrFilter_Basics pyr = new PyrFilter_Basics();
+        public CS_PyrFilter_RedCloud(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud_Basics output", "PyrFilter output before reduction" };
+            desc = "Use RedColor to segment the output of PyrFilter";
+        }
+        public void RunCS(Mat src)
+        {
+            pyr.Run(src);
+            dst3 = pyr.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            reduction.Run(dst3);
+            redC.Run(reduction.dst2);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_Python_Basics : CS_Parent
+    {
+        public bool StartPython(string arguments)
+        {
+            var pythonApp = new FileInfo(task.pythonTaskName);
+            if (pythonApp.Exists)
+            {
+                task.pythonProcess = new Process();
+                task.pythonProcess.StartInfo.FileName = "python";
+                task.pythonProcess.StartInfo.WorkingDirectory = pythonApp.DirectoryName;
+                if (string.IsNullOrEmpty(arguments))
+                {
+                    task.pythonProcess.StartInfo.Arguments = "\"" + pythonApp.Name + "\"";
+                }
+                else
+                {
+                    task.pythonProcess.StartInfo.Arguments = "\"" + pythonApp.Name + "\" " + arguments;
+                }
+                Console.WriteLine("Starting Python with the following command:\n" + task.pythonProcess.StartInfo.Arguments + "\n");
+                if (!task.showConsoleLog) task.pythonProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                try
+                {
+                    task.pythonProcess.Start();
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.Forms.MessageBox.Show("The python algorithm " + pythonApp.Name + 
+                                                         " failed with " + ex.Message + ".  Is python in the path?");
+                }
+            }
+            else
+            {
+                if (pythonApp.Name.EndsWith("Python_MemMap") || pythonApp.Name.EndsWith("Python_Run"))
+                {
+                    strOut = pythonApp.Name + " is a support algorithm for PyStream apps.";
+                }
+                else
+                {
+                    strOut = pythonApp.FullName + " is missing.";
+                }
+                return false;
+            }
+            return true;
+        }
+        public CS_Python_Basics(VBtask task) : base(task)
+        {
+            desc = "Access Python from OpenCVB - contains the startPython interface";
+        }
+        public void RunCS(Mat src)
+        {
+            SetTrueText("There is no output from " + traceName + ".  It contains the interface to python.");
+        }
+    }
+    public class CS_Python_Run : CS_Parent
+    {
+        Python_Basics python = new Python_Basics();
+        public Python_Stream pyStream;
+        FileInfo pythonApp;
+        bool testPyStreamOakD = false; // set this to true to test the PyStream problem with the OakD Python camera
+        public void OakDPipeIssue()
+        {
+            SetTrueText("Python Stream ('_PS.py') algorithms don't work reliably when using the Oak-D Python camera interface.\n" +
+                        "They both use named pipes to communicate between OpenCVB and the external processes (a camera and a Python algorithm.)\n" +
+                        "To experiment with Python Stream algorithms, any of the other supported cameras work fine.\n" +
+                        "To see the problem: comment out the camera test in RunVB below to test any '_PS.py' algorithm.  It may work but\n" +
+                        "if you move the algorithm window (separate from OpenCVB), the algorithm will hang.  More importantly,\n" +
+                        "several of the algorithms just hang without moving the window.  Any suggestions would be gratefully received.\n" +
+                        "Using another camera is the best option to observe all the Python Stream algorithms.");
+        }
+        public CS_Python_Run(VBtask task) : base(task)
+        {
+            pythonApp = new FileInfo(task.pythonTaskName);
+            if (pythonApp.Name.EndsWith("_PS.py"))
+            {
+                if (testPyStreamOakD)
+                {
+                    pyStream = new Python_Stream();
+                }
+                else
+                {
+                    if (task.cameraName != "Oak-D camera") pyStream = new Python_Stream();
+                }
+            }
+            else
+            {
+                python.StartPython("");
+                if (!string.IsNullOrEmpty(python.strOut)) SetTrueText(python.strOut);
+            }
+            desc = "Run Python app: " + pythonApp.Name;
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.cameraName == "Oak-D camera" && pythonApp.Name.EndsWith("_PS.py") && !testPyStreamOakD)
+            {
+                OakDPipeIssue();
+            }
+            else
+            {
+                if (pyStream != null)
+                {
+                    pyStream.Run(src);
+                    dst2 = pyStream.dst2;
+                    dst3 = pyStream.dst3;
+                    labels[2] = "Output of Python Backend";
+                    labels[3] = "Second Output of Python Backend";
+                }
+                else
+                {
+                    if (pythonApp.Name == "PyStream.py")
+                    {
+                        SetTrueText("The PyStream.py algorithm is used by a wide variety of apps but has no output when run by itself.");
+                    }
+                }
+            }
+        }
+    }
+    public class CS_Python_MemMap : CS_Parent
+    {
+        Python_Basics python = new Python_Basics();
+        MemoryMappedViewAccessor memMapWriter;
+        MemoryMappedFile memMapFile;
+        IntPtr memMapPtr;
+        public double[] memMapValues = new double[50]; // more than we need - buffer for growth.  PyStream assumes 400 bytes length!  Do not change without changing everywhere.
+        public int memMapbufferSize;
+        public CS_Python_MemMap(VBtask task) : base(task)
+        {
+            memMapbufferSize = Marshal.SizeOf(typeof(double)) * memMapValues.Length;
+            memMapPtr = Marshal.AllocHGlobal(memMapbufferSize);
+            memMapFile = MemoryMappedFile.CreateOrOpen("CS_Python_MemMap", memMapbufferSize);
+            memMapWriter = memMapFile.CreateViewAccessor(0, memMapbufferSize);
+            Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length);
+            memMapWriter.WriteArray(0, memMapValues, 0, memMapValues.Length);
+            if (standaloneTest())
+            {
+                if (!task.externalPythonInvocation)
+                {
+                    python.StartPython("--MemMapLength=" + memMapbufferSize.ToString());
+                    if (!string.IsNullOrEmpty(python.strOut)) SetTrueText(python.strOut);
+                }
+                var pythonApp = new FileInfo(task.pythonTaskName);
+                SetTrueText("No output for CS_Python_MemMap - see Python console log (see Options/'Show Console Log for external processes' in the main form)");
+                desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python.";
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                SetTrueText(traceName + " has no output when run standaloneTest().");
+                return;
+            }
+            memMapValues[0] = task.frameCount;
+            Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length);
+            memMapWriter.WriteArray(0, memMapValues, 0, memMapValues.Length);
+        }
+    }
+    public class CS_Python_Stream : CS_Parent
+    {
+        Python_Basics python = new Python_Basics();
+        byte[] rgbBuffer = new byte[2];
+        byte[] depthBuffer = new byte[2];
+        byte[] dst1Buffer = new byte[2];
+        byte[] dst2Buffer = new byte[2];
+        Python_MemMap memMap;
+        public CS_Python_Stream(VBtask task) : base(task)
+        {
+            task.pipeName = "PyStream2Way" + task.pythonPipeIndex.ToString();
+            task.pythonPipeIndex++;
+            try
+            {
+                task.pythonPipeOut = new NamedPipeServerStream(task.pipeName, PipeDirection.Out);
+            }
+            catch (Exception ex)
+            {
+                SetTrueText("CS_Python_Stream: pipeOut NamedPipeServerStream failed to open.  Error: " + ex.Message);
+                return;
+            }
+            task.pythonPipeIn = new NamedPipeServerStream(task.pipeName + "Results", PipeDirection.In);
+            // Was this class invoked standaloneTest()?  Then just run something that works with BGR and depth...
+            if (task.pythonTaskName.EndsWith("CS_Python_Stream"))
+            {
+                task.pythonTaskName = task.HomeDir + "Python_Classes/CS_Python_Stream_PS.py";
+            }
+            memMap = new Python_MemMap();
+            if (task.externalPythonInvocation)
+            {
+                task.pythonReady = true; // python was already running and invoked OpenCVB.
+            }
+            else
+            {
+                task.pythonReady = python.StartPython("--MemMapLength=" + memMap.memMapbufferSize + " --pipeName=" + task.pipeName);
+                if (!string.IsNullOrEmpty(python.strOut)) SetTrueText(python.strOut);
+            }
+            if (task.pythonReady)
+            {
+                task.pythonPipeOut.WaitForConnection();
+                task.pythonPipeIn.WaitForConnection();
+            }
+            labels[2] = "Output of Python Backend";
+            desc = "General purpose class to pipe BGR and Depth to Python scripts.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                SetTrueText(traceName + " has no output when run standaloneTest().");
+                return;
+            }
+            if (task.pythonReady && task.pcSplit[2].Width > 0)
+            {
+                Mat depth32f = task.pcSplit[2] * 1000;
+                double[] vals = new double[] {task.frameCount, src.Total() * src.ElemSize(),
+                                              (double)(depth32f.Total() * depth32f.ElemSize()), src.Rows, src.Cols,
+                                              task.drawRect.X, task.drawRect.Y, task.drawRect.Width,
+                                              task.drawRect.Height};
+                    for (int i = 0; i < memMap.memMapValues.Length; i++)
+                {
+                    memMap.memMapValues[i] = vals[i];
+                }
+                memMap.Run(src);
+                if (rgbBuffer.Length != src.Total() * src.ElemSize()) Array.Resize(ref rgbBuffer, (int)(src.Total() * src.ElemSize()));
+                if (depthBuffer.Length != depth32f.Total() * depth32f.ElemSize()) Array.Resize(ref depthBuffer, (int)(depth32f.Total() * depth32f.ElemSize()));
+                if (dst1Buffer.Length != dst2.Total() * dst2.ElemSize()) Array.Resize(ref dst1Buffer, (int)(dst2.Total() * dst2.ElemSize()));
+                if (dst2Buffer.Length != dst3.Total() * dst3.ElemSize()) Array.Resize(ref dst2Buffer, (int)(dst3.Total() * dst3.ElemSize()));
+                Marshal.Copy(src.Data, rgbBuffer, 0, (int)(src.Total() * src.ElemSize()));
+                Marshal.Copy(depth32f.Data, depthBuffer, 0, depthBuffer.Length);
+                if (task.pythonPipeOut.IsConnected)
+                {
+                    try
+                    {
+                        task.pythonPipeOut.Write(rgbBuffer, 0, rgbBuffer.Length);
+                        task.pythonPipeOut.Write(depthBuffer, 0, depthBuffer.Length);
+                        task.pythonPipeIn.Read(dst1Buffer, 0, dst1Buffer.Length);
+                        task.pythonPipeIn.Read(dst2Buffer, 0, dst2Buffer.Length);
+                        Marshal.Copy(dst1Buffer, 0, dst2.Data, dst1Buffer.Length);
+                        Marshal.Copy(dst2Buffer, 0, dst3.Data, dst2Buffer.Length);
+                    }
+                    catch { }
+                }
+            }
+        }
+        public void Close()
+        {
+            if (task.pythonPipeOut != null) task.pythonPipeOut.Close();
+            if (task.pythonPipeIn != null) task.pythonPipeIn.Close();
+        } 
+    }
+    public class CS_QRcode_Basics : CS_Parent
+    {
+        QRCodeDetector qrDecoder = new QRCodeDetector();
+        Mat qrInput1 = new Mat();
+        Mat qrInput2 = new Mat();
+        public CS_QRcode_Basics(VBtask task) : base(task)
+        {
+            var fileInfo = new FileInfo(task.HomeDir + "data/QRcode1.png");
+            if (fileInfo.Exists) qrInput1 = Cv2.ImRead(fileInfo.FullName);
+            fileInfo = new FileInfo(task.HomeDir + "Data/QRCode2.png");
+            if (fileInfo.Exists) qrInput2 = Cv2.ImRead(fileInfo.FullName);
+            if (dst2.Width < 480) // for the smallest configurations the default size can be too big!
+            {
+                qrInput1 = qrInput1.Resize(new cv.Size(120, 160));
+                qrInput2 = qrInput2.Resize(new cv.Size(120, 160));
+            }
+            desc = "Read a QR code";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Height < 240)
+            {
+                SetTrueText("This QR Code test does not run at low resolutions");
+                return;
+            }
+            var x = msRNG.Next(0, src.Width - Math.Max(qrInput1.Width, qrInput2.Width));
+            var y = msRNG.Next(0, src.Height - Math.Max(qrInput1.Height, qrInput2.Height));
+            if ((task.frameCount / 50) % 2 == 0)
+            {
+                var roi = new cv.Rect(x, y, qrInput1.Width, qrInput1.Height);
+                src[roi] = qrInput1;
+            }
+            else
+            {
+                var roi = new cv.Rect(x, y, qrInput2.Width, qrInput2.Height);
+                src[roi] = qrInput2;
+            }
+            Point2f[] box;
+            var rectifiedImage = new Mat();
+            var refersTo = qrDecoder.DetectAndDecode(src, out box, rectifiedImage);
+            src.CopyTo(dst2);
+            for (int i = 0; i < box.Length; i++)
+            {
+                DrawLine(dst2, box[i], box[(i + 1) % 4], Scalar.Red, task.lineWidth + 2);
+            }
+            if (!string.IsNullOrEmpty(refersTo)) labels[2] = refersTo;
+        }
+    }
+    public class CS_Quadrant_Basics : CS_Parent
+    {
+        cv.Point p1 = new cv.Point();
+        cv.Point p2;
+        cv.Point p3;
+        cv.Point p4;
+        cv.Rect rect = new cv.Rect();
+        Mat mask = new Mat();
+        public CS_Quadrant_Basics(VBtask task) : base(task)
+        {
+            p2 = new cv.Point(dst2.Width - 1, 0);
+            p3 = new cv.Point(0, dst2.Height - 1);
+            p4 = new cv.Point(dst2.Width - 1, dst2.Height - 1);
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
+            labels[2] = "dst1 contains a map defining the quadrant value for each pixel";
+            desc = "Divide the color and depth images into 4 quadrants based on the horizon and gravity vectors";
+        }
+        public void RunCS(Mat src)
+        {
+            dst1.SetTo(0);
+            DrawLine(dst1, task.gravityVec.p1, task.gravityVec.p2, 255, 1);
+            DrawLine(dst1, task.horizonVec.p1, task.horizonVec.p2, 255, 1);
+            var flags = FloodFillFlags.FixedRange | (FloodFillFlags)(255 << 8);
+            if (dst1.At<byte>(p1.Y, p1.X) == 0) Cv2.FloodFill(dst1, new Mat(), p1, 1 * 255 / 4, out rect, 0, 0, flags);
+            if (dst1.At<byte>(p2.Y, p2.X) == 0) Cv2.FloodFill(dst1, new Mat(), p2, 2 * 255 / 4, out rect, 0, 0, flags);
+            if (dst1.At<byte>(p3.Y, p3.X) == 0) Cv2.FloodFill(dst1, new Mat(), p3, 3 * 255 / 4, out rect, 0, 0, flags);
+            if (dst1.At<byte>(p4.Y, p4.X) == 0) Cv2.FloodFill(dst1, new Mat(), p4, 4 * 255 / 4, out rect, 0, 0, flags);
+            dst2 = ShowPalette(dst1);
+        }
+    }
+    public class CS_Quaterion_Basics : CS_Parent
+    {
+        Options_Quaternion options = new Options_Quaternion();
+        public CS_Quaterion_Basics(VBtask task) : base(task)
+        {
+            desc = "Use the quaternion values to multiply and compute conjugate";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var quatmul = Quaternion.Multiply(options.q1, options.q2);
+            SetTrueText("q1 = " + options.q1.ToString() + "\n" + "q2 = " + options.q2.ToString() + "\n" +
+                        "Multiply q1 * q2" + quatmul.ToString());
+        }
+    }
+    public class CS_Quaterion_IMUPrediction : CS_Parent
+    {
+        IMU_PlotHostFrameTimes host = new IMU_PlotHostFrameTimes();
+        public CS_Quaterion_IMUPrediction(VBtask task) : base(task)
+        {
+            labels[2] = "Quaternion_IMUPrediction";
+            labels[3] = "";
+            desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data.";
+        }
+        public Quaternion quaternion_exp(Point3f v)
+        {
+            v *= 0.5f;
+            var theta2 = v.X * v.X + v.Y * v.Y + v.Z * v.Z;
+            var theta = Math.Sqrt(theta2);
+            var c = Math.Cos(theta);
+            var s = (theta2 < Math.Sqrt(120 * Single.Epsilon)) ? 1 - theta2 / 6 : Math.Sin(theta) / theta2;
+            return new Quaternion((float)(s * v.X), (float)(s * v.Y), (float)(s * v.Z), (float)c);
+        }
+        public void RunCS(Mat src)
+        {
+            host.Run(src);
+            var dt = host.HostInterruptDelayEstimate;
+            var t = task.IMU_Translation;
+            var predictedTranslation = new Point3f(
+                (float)(dt * (dt / 2 * task.IMU_Acceleration.X + task.IMU_AngularVelocity.X) + t.X),
+                (float)(dt * (dt / 2 * task.IMU_Acceleration.Y + task.IMU_AngularVelocity.Y) + t.Y),
+                (float)(dt * (dt / 2 * task.IMU_Acceleration.Z + task.IMU_AngularVelocity.Z) + t.Z));
+            var predictedW = new Point3f(
+                (float)(dt * (dt / 2 * task.IMU_AngularAcceleration.X + task.IMU_AngularVelocity.X)),
+                (float)(dt * (dt / 2 * task.IMU_AngularAcceleration.Y + task.IMU_AngularVelocity.Y)),
+                (float)(dt * (dt / 2 * task.IMU_AngularAcceleration.Z + task.IMU_AngularVelocity.Z)));
+            Quaternion predictedRotation = Quaternion.Multiply(quaternion_exp(predictedW), task.IMU_Rotation);
+            var diffq = Quaternion.Subtract(task.IMU_Rotation, predictedRotation);
+            SetTrueText("IMU_Acceleration = " + "\t" +
+                         string.Format("{0:F3}", task.IMU_Acceleration.X) + "\t" +
+                         string.Format("{0:F3}", task.IMU_Acceleration.Y) + "\t" +
+                         string.Format("{0:F3}", task.IMU_Acceleration.Z) + "\t" + "\n" +
+                         "IMU_AngularAccel. = " + "\t" +
+                         string.Format("{0:F3}", task.IMU_AngularAcceleration.X) + "\t" +
+                         string.Format("{0:F3}", task.IMU_AngularAcceleration.Y) + "\t" +
+                         string.Format("{0:F3}", task.IMU_AngularAcceleration.Z) + "\t" + "\n" +
+                         "IMU_AngularVelocity = " + "\t" +
+                         string.Format("{0:F3}", task.IMU_AngularVelocity.X) + "\t" +
+                         string.Format("{0:F3}", task.IMU_AngularVelocity.Y) + "\t" +
+                         string.Format("{0:F3}", task.IMU_AngularVelocity.Z) + "\t" + "\n" + "\n" +
+                         "dt = " + dt.ToString() + "\n" + "\n" +
+                         "Pose quaternion = " + "\t" +
+                         string.Format("{0:F3}", task.IMU_Rotation.X) + "\t" +
+                         string.Format("{0:F3}", task.IMU_Rotation.Y) + "\t" +
+                         string.Format("{0:F3}", task.IMU_Rotation.Z) + "\t" + "\n" +
+                         "Prediction Rotation = " + "\t" +
+                         string.Format("{0:F3}", predictedRotation.X) + "\t" +
+                         string.Format("{0:F3}", predictedRotation.Y) + "\t" +
+                         string.Format("{0:F3}", predictedRotation.Z) + "\t" + "\n" +
+                         "difference = " + "\t" + "\t" +
+                         string.Format("{0:F3}", diffq.X) + "\t" +
+                         string.Format("{0:F3}", diffq.Y) + "\t" +
+                         string.Format("{0:F3}", diffq.Z) + "\t");
+        }
+    }
+
 
 
 }

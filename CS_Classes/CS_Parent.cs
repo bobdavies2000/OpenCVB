@@ -28,10 +28,6 @@ namespace CS_Classes
         public string strOut;
         public const string fmt4 = "0.0000";
         public VB_Controls_CSharp controls = new VB_Controls_CSharp();
-        public const int RESULT_DST0 = 0;
-        public const int RESULT_DST1 = 1;
-        public const int RESULT_DST2 = 2;
-        public const int RESULT_DST3 = 3;
         public Vec3b black = new Vec3b(0, 0, 0);
         public Vec3b white = new Vec3b(255, 255, 255);
         public Vec3b grayColor = new Vec3b(127, 127, 127);
@@ -664,8 +660,7 @@ namespace CS_Classes
         public void SetTrueText(string text)
         {
             cv.Point pt = new cv.Point(0, 0);
-            int picTag = 2;
-            trueText str = new trueText(text, pt, picTag);
+            trueText str = new trueText(text, pt, 2);
             trueData.Add(str);
         }
 

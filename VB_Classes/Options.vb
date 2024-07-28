@@ -6828,3 +6828,66 @@ Public Class Options_Projection : Inherits VB_Parent
         projectionThreshold = thresholdSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_Puzzle : Inherits VB_Parent
+    Public startPuzzle As Boolean
+    Public Sub New()
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Start another puzzle")
+            check.Box(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static startBox = FindCheckBox("Start another puzzle")
+        startPuzzle = startBox.checked
+        startBox.checked = False
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Pyramid : Inherits VB_Parent
+    Public zoom As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom in and out", -1, 1, 0)
+    End Sub
+    Public Sub RunVB()
+        Static zoomSlider = FindSlider("Zoom in and out")
+        zoom = zoomSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_PyrFilter : Inherits VB_Parent
+    Public radius As Integer
+    Public color As Integer
+    Public maxPyramid As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("MeanShift Spatial Radius", 1, 100, 1)
+            sliders.setupTrackBar("MeanShift color Radius", 1, 100, 20)
+            sliders.setupTrackBar("MeanShift Max Pyramid level", 1, 8, 3)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static radiusSlider = FindSlider("MeanShift Spatial Radius")
+        Static colorSlider = FindSlider("MeanShift color Radius")
+        Static maxSlider = FindSlider("MeanShift Max Pyramid level")
+        radius = radiusSlider.value
+        color = colorSlider.value
+        maxPyramid = maxSlider.value
+    End Sub
+End Class

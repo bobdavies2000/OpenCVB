@@ -1,15 +1,15 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/d6/d73/Pyramids_8cpp-example.html
 Public Class Pyramid_Basics : Inherits VB_Parent
+    Dim options As New Options_Pyramid
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom in and out", -1, 1, 0)
         desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static zoomSlider = FindSlider("Zoom in and out")
-        Dim zoom = zoomSlider.Value
-        If zoom <> 0 Then
-            If zoom < 0 Then
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If options.zoom <> 0 Then
+            If options.zoom < 0 Then
                 Dim tmp = src.PyrDown(New cv.Size(src.Cols / 2, src.Rows / 2))
                 Dim roi = New cv.Rect((src.Cols - tmp.Cols) / 2, (src.Rows - tmp.Rows) / 2, tmp.Width, tmp.Height)
                 dst2(roi) = tmp

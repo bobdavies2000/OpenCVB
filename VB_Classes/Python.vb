@@ -151,8 +151,8 @@ Public Class Python_Stream : Inherits VB_Parent
     Dim dst2Buffer(1) As Byte
     Dim memMap As Python_MemMap
     Public Sub New()
-        task.pipeName = "PyStream2Way" + CStr(pythonPipeIndex)
-        pythonPipeIndex += 1
+        task.pipeName = "PyStream2Way" + CStr(task.pythonPipeIndex)
+        task.pythonPipeIndex += 1
         Try
             task.pythonPipeOut = New NamedPipeServerStream(task.pipeName, PipeDirection.Out)
         Catch ex As Exception

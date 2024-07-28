@@ -205,7 +205,7 @@ Public Class Mat_MultiplyReview : Inherits VB_Parent
             strOut += vbCrLf
         Next
 
-        SetTrueText(strOut, RESULT_DST2)
+        SetTrueText(strOut, 2)
     End Sub
 End Class
 
@@ -262,7 +262,7 @@ Public Class Mat_Inverse : Inherits VB_Parent
             strOut += vbCrLf
         End If
 
-        SetTrueText(strOut, RESULT_DST2)
+        SetTrueText(strOut, 2)
     End Sub
 End Class
 
@@ -417,7 +417,7 @@ End Class
 Public Class Mat_4Click : Inherits VB_Parent
     Public mats As New Mat_4to1
     Public mat() As cv.Mat
-    Public quadrant As Integer = RESULT_DST3
+    Public quadrant As Integer = 3
     Public Sub New()
         mat = mats.mat
         labels(3) = "Click a quadrant in dst2 to view it in dst3"
@@ -430,14 +430,14 @@ Public Class Mat_4Click : Inherits VB_Parent
         If standalone Then mats.defaultMats(src)
         If task.FirstPass Then
             task.ClickPoint = New cv.Point(0, 0)
-            task.mousePicTag = RESULT_DST2
+            task.mousePicTag = 2
         End If
 
-        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then
+        If task.mouseClickFlag And task.mousePicTag = 2 Then
             If task.ClickPoint.Y < dst2.Rows / 2 Then
-                quadrant = If(task.ClickPoint.X < task.WorkingRes.Width / 2, RESULT_DST0, RESULT_DST1)
+                quadrant = If(task.ClickPoint.X < task.WorkingRes.Width / 2, 0, 1)
             Else
-                quadrant = If(task.ClickPoint.X < task.WorkingRes.Width / 2, RESULT_DST2, RESULT_DST3)
+                quadrant = If(task.ClickPoint.X < task.WorkingRes.Width / 2, 2, 3)
             End If
         End If
         mats.Run(empty)

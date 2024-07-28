@@ -77,6 +77,7 @@ Module UI_GeneratorMain
         Dim CSAlgorithms = File.ReadAllLines(CSInput.FullName)
         For Each algline In CSAlgorithms
             algline = Trim(algline)
+            If algline = "{" Or algline = "}" Then Continue For
             If algline.StartsWith("//") Then Continue For
             If algline.Length = 0 Then Continue For
             csLines += 1

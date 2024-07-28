@@ -29,10 +29,10 @@ module FS_Classes =
 //    let mutable strOut = ""
 //    let fmt4 = "0.0000"
 //    let controls = new VB_Controls_CSharp()
-//    let RESULT_DST0 = 0
-//    let RESULT_DST1 = 1
-//    let RESULT_DST2 = 2
-//    let RESULT_DST3 = 3
+//    let 0 = 0
+//    let 1 = 1
+//    let 2 = 2
+//    let 3 = 3
 //    let black = new Vec3b(0uy, 0uy, 0uy)
 //    let mutable callStack = ""
 

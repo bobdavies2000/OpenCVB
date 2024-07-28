@@ -2823,10 +2823,6 @@ public:
 };
 
 
-#define RESULT_DST0 0
-#define RESULT_DST1 1
-#define RESULT_DST2 2
-#define RESULT_DST3 3
 class CPP_Mat_4Click : public algorithmCPP {
 public:
     CPP_Mat_4to1* mats;
@@ -2842,14 +2838,14 @@ public:
         if (task->FirstPass) {
             task->mouseClickFlag = true;
             task->ClickPoint = Point(0, 0);
-            task->mousePicTag = RESULT_DST2;
+            task->mousePicTag = 2;
         }
-        if (task->mouseClickFlag && task->mousePicTag == RESULT_DST2) {
+        if (task->mouseClickFlag && task->mousePicTag == 2) {
             if (task->ClickPoint.y < task->WorkingRes.height / 2) {
-                quadrant = (task->ClickPoint.x < task->WorkingRes.width / 2) ? RESULT_DST0 : RESULT_DST1;
+                quadrant = (task->ClickPoint.x < task->WorkingRes.width / 2) ? 0 : 1;
             }
             else {
-                quadrant = (task->ClickPoint.x < task->WorkingRes.width / 2) ? RESULT_DST2 : RESULT_DST3;
+                quadrant = (task->ClickPoint.x < task->WorkingRes.width / 2) ? 2 : 3;
             }
         }
         mats->Run(empty);
