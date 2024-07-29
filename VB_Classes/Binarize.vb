@@ -205,7 +205,7 @@ Public Class Binarize_DepthTiers : Inherits VB_Parent
     Dim binar4 As New Bin4Way_Regions
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Add the Depth_TiersZ and Bin4Way_Regions output in preparation for RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)

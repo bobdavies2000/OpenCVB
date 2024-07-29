@@ -45,7 +45,7 @@ Public Class Photon_Test : Inherits VB_Parent
         desc = ""
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        task.redOptions.SimpleReductionBar.Value = 64 ' for now...
+        task.redOptions.setBitReductionBar(64) ' for now...
         Dim reduce = 64
 
         reduction.Run(src)

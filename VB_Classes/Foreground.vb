@@ -156,8 +156,8 @@ Public Class Foreground_CellsFore : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = False
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setIdentifyCells(False)
+        task.redOptions.setUseColorOnly(True)
         desc = "Get the foreground cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -181,8 +181,8 @@ Public Class Foreground_CellsBack : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = False
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setIdentifyCells(False)
+        task.redOptions.setUseColorOnly(True)
         desc = "Get the background cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)

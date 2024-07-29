@@ -233,7 +233,7 @@ Public Class KMeans_Edges : Inherits VB_Parent
     Public classCount As Integer
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         labels(3) = "KMeans with edges output"
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
     End Sub

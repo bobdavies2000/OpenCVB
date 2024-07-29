@@ -94,18 +94,18 @@ Public Class OptionsRedCloud
         Next
         ColorSource.SelectedItem() = "Bin4Way_Regions"
 
-        task.redOptions.SimpleReductionBar.Value = 40
+        task.redOptions.setBitReductionBar(40)
         Select Case task.cameraName
             Case "Azure Kinect 4K"
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
             Case "Intel(R) RealSense(TM) Depth Camera 455"
             Case "Oak-D camera"
-                task.redOptions.SimpleReductionBar.Value = 80
+                task.redOptions.setBitReductionBar(80)
             Case "StereoLabs ZED 2/2i"
             Case "MYNT-EYE-D1000"
         End Select
 
-        task.redOptions.BitwiseReductionBar.Value = 5
+        task.redOptions.setBitReductionBar(5)
 
         Me.Left = 0
         Me.Top = 0
@@ -310,7 +310,7 @@ Public Class OptionsRedCloud
 
     Private Sub DisplayCellStats_CheckedChanged(sender As Object, e As EventArgs) Handles DisplayCellStats.CheckedChanged
         task.gOptions.displayDst1.Checked = DisplayCellStats.Checked
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged
@@ -335,6 +335,9 @@ Public Class OptionsRedCloud
     Public Sub setHistBinBar3D(newVal As Integer)
         HistBinBar3D.Value = newVal
     End Sub
+    Public Function getSimpleReductionBar() As Integer
+        Return SimpleReductionBar.Value
+    End Function
     Public Function getHistBinBar3D() As Integer
         Return HistBinBar3D.Value
     End Function
@@ -342,8 +345,12 @@ Public Class OptionsRedCloud
         UseSimpleReduction.Checked = newVal
     End Sub
     Public Sub setBitReductionBar(newVal As Integer)
+        If newVal > BitwiseReductionBar.Maximum Then BitwiseReductionBar.Maximum = newVal
         BitwiseReductionBar.Value = newVal
     End Sub
+    Public Function getBitReductionBar() As Integer
+        Return BitwiseReductionBar.Value
+    End Function
     Public Sub checkBitReduction(newVal As Boolean)
         BitwiseReduction.Checked = newVal
     End Sub
@@ -403,5 +410,14 @@ Public Class OptionsRedCloud
     End Sub
     Public Sub setXYReduction(val As Boolean)
         XYReduction.Checked = val
+    End Sub
+    Public Sub enableReductionTypeGroup(val As Boolean)
+        ReductionTypeGroup.Enabled = val
+    End Sub
+    Public Sub enableReductionSliders(val As Boolean)
+        ReductionSliders.Enabled = val
+    End Sub
+    Public Sub setSimpleReductionBarMax(val As Integer)
+        SimpleReductionBar.Maximum = val
     End Sub
 End Class

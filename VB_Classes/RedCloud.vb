@@ -6,7 +6,7 @@ Public Class RedCloud_Basics : Inherits VB_Parent
     Public inputMask As New cv.Mat
     Dim color As Color8U_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         UpdateAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
                         "It is behind the global options (which affect most algorithms.)")
@@ -52,7 +52,7 @@ End Class
 Public Class RedCloud_Reduction : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
         task.gOptions.setHistogramBins(20)
         desc = "Segment the image based on both the reduced color"
@@ -118,7 +118,7 @@ Public Class RedCloud_FindCells : Inherits VB_Parent
     Public cellList As New List(Of Integer)
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         task.gOptions.pixelDiffThreshold = 25
         cPtr = RedCloud_FindCells_Open()
         desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
@@ -955,7 +955,7 @@ End Class
 Public Class RedCloud_CellStatsPlot : Inherits VB_Parent
     Dim cells As New Cell_BasicsPlot
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         If standaloneTest() Then task.gOptions.setDisplay1()
         cells.runRedCloud = True
         desc = "Display the stats for the requested cell"
@@ -1034,7 +1034,7 @@ Public Class RedCloud_DepthOutline : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Use the Depth_Outline output over time to isolate high quality cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1087,8 +1087,8 @@ Public Class RedCloud_FourColor : Inherits VB_Parent
     Dim binar4 As New Bin4Way_Regions
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setIdentifyCells(True)
+        task.redOptions.setUseColorOnly(True)
         labels(3) = "A 4-way split of the input grayscale image based on brightness"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
     End Sub
@@ -1115,7 +1115,7 @@ Public Class RedCloud_CCompColor : Inherits VB_Parent
     Dim ccomp As New CComp_Both
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Identify each Connected component as a RedCloud Cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1144,7 +1144,7 @@ Public Class RedCloud_Cells : Inherits VB_Parent
     Public cellmap As New cv.Mat
     Public redCells As New List(Of rcData)
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Create RedCloud output using only color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1168,8 +1168,8 @@ End Class
 Public Class RedCloud_Flippers : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setIdentifyCells(True)
+        task.redOptions.setUseColorOnly(True)
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
     End Sub
@@ -1353,7 +1353,7 @@ End Class
 Public Class RedCloud_SizeOrder : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         UpdateAdvice(traceName + ": Use the goptions 'DebugSlider' to select which cell is isolated.")
         task.gOptions.setDebugSlider(0)
         desc = "Select blobs by size using the DebugSlider in the global options"
@@ -1384,7 +1384,7 @@ Public Class RedCloud_StructuredH : Inherits VB_Parent
     Dim histTop As New Projection_HistTop
     Public Sub New()
         If standalone Then
-            task.redOptions.IdentifyCells.Checked = False
+            task.redOptions.setIdentifyCells(False)
             task.gOptions.setDisplay1()
             task.gOptions.setDisplay1()
         End If
@@ -1426,7 +1426,7 @@ Public Class RedCloud_StructuredV : Inherits VB_Parent
     Dim histSide As New Projection_HistSide
     Public Sub New()
         If standalone Then
-            task.redOptions.IdentifyCells.Checked = False
+            task.redOptions.setIdentifyCells(False)
             task.gOptions.setDisplay1()
             task.gOptions.setDisplay1()
         End If
@@ -1692,7 +1692,7 @@ Public Class RedCloud_Tiers : Inherits VB_Parent
     Dim tiers As New Depth_TiersZ
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Use the Depth_TiersZ algorithm to create a color-based RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1717,7 +1717,7 @@ Public Class RedCloud_TiersBinarize : Inherits VB_Parent
     Dim tiers As New Depth_TiersZ
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Use the Depth_TiersZ with Bin4Way_Regions algorithm to create a color-based RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1918,7 +1918,7 @@ Public Class RedCloud_Hue : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim hue As New Color8U_Hue
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Run RedCloud on just the red hue regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1941,7 +1941,7 @@ Public Class RedCloud_GenCellContains : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim contains As New Flood_ContainedCells
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         desc = "Merge cells contained in the top X cells and remove all other cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -2325,11 +2325,11 @@ Public Class RedCloud_ColorAndDepth : Inherits VB_Parent
     Dim depthMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
     Dim mousePicTag = task.mousePicTag
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = False
+        task.redOptions.setIdentifyCells(False)
         desc = "Run Flood_Basics and use the cells to map the depth cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         task.redCells = New List(Of rcData)(colorCells)
         task.cellMap = colorMap.Clone
         flood.Run(src)

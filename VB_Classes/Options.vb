@@ -7073,3 +7073,45 @@ Public Class Options_RedCloudFeatures : Inherits VB_Parent
 
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Options_RedTrack : Inherits VB_Parent
+    Public maxDistance As Integer
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
+    End Sub
+    Public Sub RunVB()
+        Static distSlider = FindSlider("Max feature travel distance")
+        maxDistance = distSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_Reduction : Inherits VB_Parent
+    Public reduceXYZ(2) As Boolean
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Reduce point cloud in X direction")
+            check.addCheckBox("Reduce point cloud in Y direction")
+            check.addCheckBox("Reduce point cloud in Z direction")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+            check.Box(2).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        For i = 0 To 2
+            reduceXYZ(i) = check.Box(i).Checked
+        Next
+    End Sub
+End Class

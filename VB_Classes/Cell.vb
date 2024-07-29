@@ -284,7 +284,7 @@ Public Class Cell_BasicsPlot : Inherits VB_Parent
     Dim stats As New Cell_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         If standalone Then task.gOptions.setDisplay1()
         If standalone Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."

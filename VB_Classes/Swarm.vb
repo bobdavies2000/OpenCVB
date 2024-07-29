@@ -192,7 +192,7 @@ Public Class Swarm_Flood : Inherits VB_Parent
     Public flood As New Flood_BasicsMask
     Dim cvt As New Color8U_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -221,7 +221,7 @@ Public Class Swarm_Flood2 : Inherits VB_Parent
     Public flood As New Flood_BasicsMask
     Public cvt As New Color8U_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         flood.genCells.removeContour = False
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub

@@ -12964,5 +12964,596 @@ namespace CS_Classes
             labels[2] = "Highlighted feature = " + options.labelName;
         }
     }
+    public class CS_RedTrack_Basics : CS_Parent
+    {
+        Cell_Basics stats = new Cell_Basics();
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedTrack_Basics(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (task.WorkingRes != new cv.Size(168, 94)) task.frameHistoryCount = 1;
+            desc = "Get stats on each RedCloud cell.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            stats.Run(src);
+            labels = stats.labels;
+            dst2.SetTo(0);
+            foreach (rcData rc in task.redCells)
+            {
+                DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                if (rc.index == task.rc.index) DrawContour(dst2[rc.rect], rc.contour, Scalar.White, -1);
+            }
+            strOut = stats.strOut;
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_RedTrack_Lines : CS_Parent
+    {
+        Line_Basics lines = new Line_Basics();
+        RedTrack_Basics track = new RedTrack_Basics();
+        public CS_RedTrack_Lines(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Identify and track the lines in an image as RedCloud Cells";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            if (task.heartBeat || task.motionFlag) dst3.SetTo(0);
+            int index = 0;
+            foreach (var lp in lines.lpList)
+            {
+                DrawLine(dst3, lp.p1, lp.p2, 255);
+                index++;
+                if (index > 10) break;
+            }
+            track.Run(dst3.Clone());
+            dst0 = track.redC.dst0;
+            dst1 = track.redC.dst1;
+            dst2 = track.dst2;
+        }
+    }
+    public class CS_RedTrack_LineSingle : CS_Parent
+    {
+        RedTrack_Basics track = new RedTrack_Basics();
+        int leftMost, rightmost;
+        cv.Point leftCenter, rightCenter;
+        public CS_RedTrack_LineSingle(VBtask task) : base(task)
+        {
+            desc = "Create a line between the rightmost and leftmost good feature to show camera motion";
+        }
+        int findNearest(cv.Point pt)
+        {
+            float bestDistance = float.MaxValue;
+            int bestIndex = 0;
+            foreach (var rc in task.redCells)
+            {
+                float d = (float)pt.DistanceTo(rc.maxDist);
+                if (d < bestDistance)
+                {
+                    bestDistance = d;
+                    bestIndex = rc.index;
+                }
+            }
+            return bestIndex;
+        }
+        public void RunCS(Mat src)
+        {
+            track.Run(src);
+            dst0 = track.redC.dst0;
+            dst1 = track.redC.dst1;
+            dst2 = track.dst2;
+            if (task.redCells.Count() == 0)
+            {
+                SetTrueText("No lines found to track.", 3);
+                return;
+            }
+            var xList = new SortedList<int, int>(new CompareAllowIdenticalIntegerInverted());
+            foreach (var rc in task.redCells)
+            {
+                if (rc.index == 0) continue;
+                xList.Add(rc.rect.X, rc.index);
+            }
+            int minLeft = xList.Count() / 4;
+            int minRight = (xList.Count() - minLeft);
+            if (leftMost == 0 || rightmost == 0 || leftMost == rightmost)
+            {
+                leftCenter = rightCenter; // force iteration...
+                int iterations = 0;
+                while (leftCenter.DistanceTo(rightCenter) < dst2.Width / 4)
+                {
+                    leftMost = msRNG.Next(minLeft, minRight);
+                    rightmost = msRNG.Next(minLeft, minRight);
+                    leftCenter = task.redCells[leftMost].maxDist;
+                    rightCenter = task.redCells[rightmost].maxDist;
+                    iterations++;
+                    if (iterations > 10) return;
+                }
+            }
+            leftMost = findNearest(leftCenter);
+            leftCenter = task.redCells[leftMost].maxDist;
+            rightmost = findNearest(rightCenter);
+            rightCenter = task.redCells[rightmost].maxDist;
+            DrawLine(dst2, leftCenter, rightCenter, Scalar.White);
+            labels[2] = track.redC.labels[2];
+        }
+    }
+    public class CS_RedTrack_FeaturesKNN : CS_Parent
+    {
+        public KNN_Core knn = new KNN_Core();
+        public Feature_Basics feat = new Feature_Basics();
+        public CS_RedTrack_FeaturesKNN(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Output of Feature_Basics", "Grid of points to measure motion." };
+            desc = "Use KNN with the good features in the image to create a grid of points";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            dst2 = feat.dst2;
+            knn.queries = new List<cv.Point2f>(task.features);
+            knn.Run(empty);
+            dst3 = src.Clone();
+            for (int i = 0; i < knn.neighbors.Count(); i++)
+            {
+                Point2f p1 = knn.queries[i];
+                int index = knn.neighbors[i][knn.neighbors[i].Count() - 1];
+                Point2f p2 = knn.trainInput[index];
+                DrawCircle(dst3, p1, task.DotSize, Scalar.Yellow);
+                DrawCircle(dst3, p2, task.DotSize, Scalar.Yellow);
+                DrawLine(dst3, p1, p2, Scalar.White);
+            }
+            knn.trainInput = new List<cv.Point2f>(knn.queries);
+        }
+    }
+    public class CS_RedTrack_GoodCell : CS_Parent
+    {
+        RedTrack_GoodCellInput good = new RedTrack_GoodCellInput();
+        RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_RedTrack_GoodCell(VBtask task) : base(task)
+        {
+            FindSlider("Feature Sample Size").Value = 100;
+            desc = "Track the cells that have good features";
+        }
+        public void RunCS(Mat src)
+        {
+            hulls.Run(src);
+            dst2 = hulls.dst2;
+            good.Run(src);
+            dst3.SetTo(0);
+            foreach (var pt in good.featureList)
+            {
+                DrawCircle(dst3, pt, task.DotSize, Scalar.White);
+            }
+        }
+    }
+    public class CS_RedTrack_GoodCells : CS_Parent
+    {
+        RedTrack_GoodCellInput good = new RedTrack_GoodCellInput();
+        RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_RedTrack_GoodCells(VBtask task) : base(task)
+        {
+            desc = "Track the cells that have good features";
+        }
+        public void RunCS(Mat src)
+        {
+            hulls.Run(src);
+            dst2 = hulls.dst2.Clone();
+            good.Run(src);
+            dst3.SetTo(0);
+            dst0 = src;
+            var trackCells = new List<rcData>();
+            var trackIndex = new List<int>();
+            foreach (var pt in good.featureList)
+            {
+                int index = task.cellMap.Get<byte>((int)pt.Y, (int)pt.X);
+                if (!trackIndex.Contains(index))
+                {
+                    var rc = task.redCells[index];
+                    if (rc.hull == null) continue;
+                    DrawContour(dst2[rc.rect], rc.hull, Scalar.White, -1);
+                    trackIndex.Add(index);
+                    DrawCircle(dst0, pt, task.DotSize, task.HighlightColor);
+                    DrawCircle(dst3, pt, task.DotSize, Scalar.White);
+                    trackCells.Add(rc);
+                }
+            }
+            labels[3] = "There were " + trackCells.Count() + " cells that could be tracked.";
+        }
+    }
+    public class CS_RedTrack_GoodCellInput : CS_Parent
+    {
+        public KNN_Core knn = new KNN_Core();
+        public Feature_Basics feat = new Feature_Basics();
+        public List<cv.Point2f> featureList = new List<cv.Point2f>();
+        Options_RedTrack options = new Options_RedTrack();
+        public CS_RedTrack_GoodCellInput(VBtask task) : base(task)
+        {
+            desc = "Use KNN to find good features to track";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            feat.Run(src);
+            dst2 = feat.dst2;
+            knn.queries = new List<cv.Point2f>(task.features);
+            knn.Run(empty);
+            featureList.Clear();
+            for (int i = 0; i < knn.neighbors.Count(); i++)
+            {
+                var p1 = knn.queries[i];
+                var index = knn.neighbors[i][0]; // find nearest
+                var p2 = knn.trainInput[index];
+                if (p1.DistanceTo(p2) < options.maxDistance) featureList.Add(p1);
+            }
+            knn.trainInput = new List<cv.Point2f>(knn.queries);
+        }
+    }
+    public class CS_RedTrack_Points : CS_Parent
+    {
+        Line_Basics lines = new Line_Basics();
+        RedTrack_Basics track = new RedTrack_Basics();
+        public CS_RedTrack_Points(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            labels = new string[] { "", "", "RedCloudX_Track output", "Input to RedCloudX_Track" };
+            desc = "Identify and track the end points of lines in an image of RedCloud Cells";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst3.SetTo(0);
+            int index = 0;
+            foreach (var lp in lines.lpList)
+            {
+                DrawCircle(dst3, lp.p1, task.DotSize, 255);
+                DrawCircle(dst3, lp.p2, task.DotSize, 255);
+                index++;
+                if (index >= 10) break;
+            }
+            track.Run(dst3);
+            dst0 = track.redC.dst0;
+            dst1 = track.redC.dst1;
+            dst2 = track.dst2;
+        }
+    }
+    public class CS_RedTrack_Features : CS_Parent
+    {
+        Options_Flood options = new Options_Flood();
+        Feature_Basics feat = new Feature_Basics();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_RedTrack_Features(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            labels = new string[] { "", "", "Output of Feature_Basics - input to RedCloud",
+                                "Value Is correlation of x to y in contour points (0 indicates circular.)" };
+            desc = "Similar to RedTrack_KNNPoints";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            if (task.heartBeat) dst2.SetTo(0);
+            foreach (var pt in task.features)
+            {
+                DrawCircle(dst2, pt, task.DotSize, 255);
+            }
+            redC.Run(dst2);
+            dst3.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                if (rc.rect.X == 0 && rc.rect.Y == 0) continue;
+                DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                if (rc.contour.Count() > 0) SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), new cv.Point(rc.rect.X, rc.rect.Y), 3);
+            }
+            SetTrueText("Move camera to see the value of this algorithm", 2);
+            SetTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3);
+        }
+    }
+    public class CS_Reduction_Basics : CS_Parent
+    {
+        public int classCount;
+        public CS_Reduction_Basics(VBtask task) : base(task)
+        {
+            task.redOptions.enableReductionTypeGroup(true);
+            task.redOptions.enableReductionSliders(true);
+            desc = "Reduction: a simpler way to KMeans by reducing color resolution";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) 
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (task.redOptions.reductionType == "Use Bitwise Reduction")
+            {
+                var bits = task.redOptions.getBitReductionBar();
+                classCount = (int)(255 / Math.Pow(2, bits));
+                var zeroBits = Math.Pow(2, bits) - 1;
+                dst2 = src & new Mat(src.Size(), src.Type(), Scalar.All(255 - zeroBits));
+                dst2 = dst2 / zeroBits;
+            }
+            else if (task.redOptions.reductionType == "Use Simple Reduction")
+            {
+                var reductionVal = task.redOptions.getSimpleReductionBar();
+                classCount = (int)Math.Ceiling((double)(255 / reductionVal));
+                dst2 = src / reductionVal;
+                labels[2] = "Reduced image - factor = " + task.redOptions.getSimpleReductionBar().ToString();
+            }
+            else
+            {
+                dst2 = src;
+                labels[2] = "No reduction requested";
+            }
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+            labels[2] = classCount.ToString() + " colors after reduction";
+        }
+    }
+    public class CS_Reduction_Floodfill : CS_Parent
+    {
+        public Reduction_Basics reduction = new Reduction_Basics();
+        public RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Reduction_Floodfill(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            task.redOptions.setUseColorOnly(true);
+            labels[2] = "Reduced input to floodfill";
+            task.redOptions.setBitReductionBar(32);
+            desc = "Use the reduction output as input to floodfill to get masks of cells.";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount);
+            redC.Run(reduction.dst2);
+            dst3 = redC.dst2;
+            labels[3] = redC.labels[3];
+        }
+    }
+    public class CS_Reduction_HeatMapLines : CS_Parent
+    {
+        HeatMap_Basics heat = new HeatMap_Basics();
+        public Line_Basics lines = new Line_Basics();
+        public PointCloud_SetupSide setupSide = new PointCloud_SetupSide();
+        public PointCloud_SetupTop setupTop = new PointCloud_SetupTop();
+        Reduction_PointCloud reduction = new Reduction_PointCloud();
+        public CS_Reduction_HeatMapLines(VBtask task) : base(task)
+        {
+            labels[2] = "Gravity rotated Side View with detected lines";
+            labels[3] = "Gravity rotated Top View width detected lines";
+            desc = "Present both the top and side view to minimize pixel counts.";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            heat.Run(src);
+            lines.Run(heat.dst2);
+            setupTop.Run(heat.dst2);
+            dst2 = setupTop.dst2;
+            dst2.SetTo(Scalar.White, lines.dst3);
+            lines.Run(heat.dst3);
+            setupSide.Run(heat.dst3);
+            dst3 = setupSide.dst2;
+            dst3.SetTo(Scalar.White, lines.dst3);
+        }
+    }
+    public class CS_Reduction_PointCloud : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        public CS_Reduction_PointCloud(VBtask task) : base(task)
+        {
+            task.redOptions.checkSimpleReduction(true);;
+            task.redOptions.setBitReductionBar(20);
+            labels = new string[] { "", "", "8-bit reduced depth", "Palettized output of the different depth levels found" };
+            desc = "Use reduction to smooth depth data";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pcSplit[2];
+            src *= 255 / task.MaxZmeters;
+            src.ConvertTo(dst0, MatType.CV_32S);
+            reduction.Run(dst0);
+            reduction.dst2.ConvertTo(dst2, MatType.CV_32F);
+            dst2.ConvertTo(dst2, MatType.CV_8U);
+            dst3 = ShowPalette(dst2 * 255 / reduction.classCount);
+        }
+    }
+    public class CS_Reduction_XYZ : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        Options_Reduction options = new Options_Reduction(); 
+        public CS_Reduction_XYZ(VBtask task) : base(task)
+        {
+            task.redOptions.setSimpleReductionBarMax(1000);
+            task.redOptions.setBitReductionBar(400);
+            desc = "Use reduction to slice the point cloud in 3 dimensions";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            Mat[] split = src.Split();
+            for (int i = 0; i < split.Length; i++)
+            {
+                if (options.reduceXYZ[i])
+                {
+                    split[i] *= 1000;
+                    split[i].ConvertTo(dst0, MatType.CV_32S);
+                    reduction.Run(dst0);
+                    mmData mm = GetMinMax(reduction.dst2);
+                    reduction.dst2.ConvertTo(split[i], MatType.CV_32F);
+                }
+            }
+            Cv2.Merge(split, dst3);
+            dst3.SetTo(0, task.noDepthMask);
+            SetTrueText("Task.PointCloud (or 32fc3 input) has been reduced and is in dst3");
+        }
+    }
+    public class CS_Reduction_Edges : CS_Parent
+    {
+        Edge_Laplacian edges = new Edge_Laplacian();
+        Reduction_Basics reduction = new Reduction_Basics();
+        public CS_Reduction_Edges(VBtask task) : base(task)
+        {
+            task.redOptions.checkSimpleReduction(true);;
+            desc = "Get the edges after reducing the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst2 = reduction.dst2 * 255 / reduction.classCount;
+            bool reductionRequested = true;
+            if (task.redOptions.reductionType == "No Reduction") reductionRequested = false;
+            labels[2] = reductionRequested ? "Reduced image" : "Original image";
+            labels[3] = reductionRequested ? "Laplacian edges of reduced image" : "Laplacian edges of original image";
+            edges.Run(dst2);
+            dst3 = edges.dst2;
+        }
+    }
+    public class CS_Reduction_Histogram : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        Plot_Histogram plot = new Plot_Histogram();
+        public CS_Reduction_Histogram(VBtask task) : base(task)
+        {
+            plot.createHistogram = true;
+            plot.removeZeroEntry = false;
+            labels = new string[] { "", "", "Reduction image", "Histogram of the reduction" };
+            desc = "Visualize a reduction with a histogram";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst2 = reduction.dst2 * 255 / reduction.classCount;
+            plot.Run(dst2);
+            dst3 = plot.dst2;
+            labels[2] = "ClassCount = " + reduction.classCount.ToString();
+        }
+    }
+    public class CS_Reduction_BGR : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        Mat_4Click mats = new Mat_4Click();
+        public CS_Reduction_BGR(VBtask task) : base(task)
+        {
+            desc = "Reduce BGR image in parallel";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat[] split = src.Split();
+            for (int i = 0; i <= 2; i++)
+            {
+                reduction.Run(split[i]);
+                if (standaloneTest()) mats.mat[i] = ShowPalette(reduction.dst2 * 255 / reduction.classCount);
+                split[0] = reduction.dst2.Clone();
+            }
+            if (standaloneTest())
+            {
+                mats.mat[3] = (mats.mat[0] + mats.mat[1] + mats.mat[2]);
+                mats.Run(empty);
+                dst3 = mats.dst2;
+            }
+            Cv2.Merge(split, dst2);
+        }
+    }
+    public class CS_Remap_Basics : CS_Parent
+    {
+        public int direction = 3; // default to remap horizontally and vertically
+        Mat mapx1, mapx2, mapx3;
+        Mat mapy1, mapy2, mapy3;
+        public CS_Remap_Basics(VBtask task) : base(task)
+        {
+            mapx1 = new Mat(dst2.Size(), MatType.CV_32F);
+            mapy1 = new Mat(dst2.Size(), MatType.CV_32F);
+            mapx2 = new Mat(dst2.Size(), MatType.CV_32F);
+            mapy2 = new Mat(dst2.Size(), MatType.CV_32F);
+            mapx3 = new Mat(dst2.Size(), MatType.CV_32F);
+            mapy3 = new Mat(dst2.Size(), MatType.CV_32F);
+            for (int j = 0; j < mapx1.Rows; j++)
+            {
+                for (int i = 0; i < mapx1.Cols; i++)
+                {
+                    mapx1.Set<float>(j, i, i);
+                    mapy1.Set<float>(j, i, dst2.Rows - j);
+                    mapx2.Set<float>(j, i, dst2.Cols - i);
+                    mapy2.Set<float>(j, i, j);
+                    mapx3.Set<float>(j, i, dst2.Cols - i);
+                    mapy3.Set<float>(j, i, dst2.Rows - j);
+                }
+            }
+            desc = "Use remap to reflect an image in 4 directions.";
+        }
+        public void RunCS(Mat src)
+        {
+            labels[2] = new[] { "CS_Remap_Basics - original", "Remap vertically", "Remap horizontally", "Remap horizontally and vertically" }[direction];
+            switch (direction)
+            {
+                case 0:
+                    dst2 = src;
+                    break;
+                case 1:
+                    Cv2.Remap(src, dst2, mapx1, mapy1, InterpolationFlags.Nearest);
+                    break;
+                case 2:
+                    Cv2.Remap(src, dst2, mapx2, mapy2, InterpolationFlags.Nearest);
+                    break;
+                case 3:
+                    Cv2.Remap(src, dst2, mapx3, mapy3, InterpolationFlags.Nearest);
+                    break;
+            }
+            if (task.heartBeat)
+            {
+                direction += 1;
+                direction %= 4;
+            }
+        }
+    }
+    public class CS_Remap_Flip : CS_Parent
+    {
+        public int direction = 0;
+        public CS_Remap_Flip(VBtask task) : base(task)
+        {
+            desc = "Use flip to remap an image.";
+        }
+        public void RunCS(Mat src)
+        {
+            labels[2] = new[] { "CS_Remap_Flip - original", "CS_Remap_Flip - flip horizontal", "CS_Remap_Flip - flip vertical", "CS_Remap_Flip - flip horizontal and vertical" }[direction];
+            switch (direction)
+            {
+                case 0: // do nothing!
+                    src.CopyTo(dst2);
+                    break;
+                case 1: // flip vertically
+                    Cv2.Flip(src, dst2, FlipMode.Y);
+                    break;
+                case 2: // flip horizontally
+                    Cv2.Flip(src, dst2, FlipMode.X);
+                    break;
+                case 3: // flip horizontally and vertically
+                    Cv2.Flip(src, dst2, FlipMode.XY);
+                    break;
+            }
+            if (task.heartBeat)
+            {
+                direction += 1;
+                direction %= 4;
+            }
+        }
+    }
+    public class CS_Flip_Basics : CS_Parent
+    {
+        Remap_Flip flip = new Remap_Flip();
+        public CS_Flip_Basics(VBtask task) : base(task)
+        {
+            desc = "Placeholder to make it easy to remember 'Remap'.";
+        }
+        public void RunCS(Mat src)
+        {
+            flip.RunVB(src);
+            dst2 = flip.dst2;
+            labels = flip.labels;
+        }
+    }
 
 }

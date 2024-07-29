@@ -91,7 +91,7 @@ Public Class Image_CellStats : Inherits VB_Parent
         images.images.images.options.imageSeries = False
         If standaloneTest() Then task.gOptions.setDisplay0()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Display the statistics for the selected cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -918,7 +918,7 @@ Public Class Line_RegionsVB : Inherits VB_Parent
     Const lineMatch = 254
     Public Sub New()
         task.redOptions.BitwiseReduction.Checked = True
-        task.redOptions.BitwiseReductionBar.Value = 6
+        task.redOptions.setBitReductionBar(6)
 
         If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)

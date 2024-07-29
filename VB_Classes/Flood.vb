@@ -4,7 +4,7 @@ Public Class Flood_Basics : Inherits VB_Parent
     Public genCells As New Cell_Generate
     Dim color As Color8U_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         desc = "Build the RedCloud cells with the grayscale input."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -45,7 +45,7 @@ Public Class Flood_CellStatsPlot : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim stats As New Cell_BasicsPlot
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.setHistogramBins(1000)
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
@@ -78,7 +78,7 @@ End Class
 Public Class Flood_ContainedCells : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -127,7 +127,7 @@ Public Class Flood_BasicsMask : Inherits VB_Parent
     Public showSelected As Boolean = True
     Dim cvt As New Color8U_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         labels(3) = "The inputMask used to limit how much of the image is processed."
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
@@ -165,7 +165,7 @@ Public Class Flood_Tiers : Inherits VB_Parent
     Dim tiers As New Depth_TiersZ
     Dim cvt As New Color8U_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         desc = "Subdivide the Flood_Basics cells using depth tiers."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -300,7 +300,7 @@ Public Class Flood_LeftRight : Inherits VB_Parent
     Public cellsLeft As New List(Of rcData)
     Public cellsRight As New List(Of rcData)
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = False
+        task.redOptions.setIdentifyCells(False)
         If standalone Then task.gOptions.setDisplay1()
         desc = "Floodfill left and right images."
     End Sub
@@ -354,7 +354,7 @@ Public Class Flood_MaxDistPoints : Inherits VB_Parent
     Public genCells As New Cell_Generate
     Dim cvt As New Color8U_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
     End Sub

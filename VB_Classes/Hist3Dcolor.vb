@@ -114,7 +114,7 @@ Public Class Hist3Dcolor_Reduction : Inherits VB_Parent
     Public classCount As Integer
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        task.redOptions.SimpleReductionBar.Value = 45
+        task.redOptions.setBitReductionBar(45)
         desc = "Backproject the 3D histogram for RGB after reduction"
     End Sub
     Public Sub RunVB(src As cv.Mat)

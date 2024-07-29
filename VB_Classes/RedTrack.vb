@@ -317,7 +317,7 @@ Public Class RedTrack_Features : Inherits VB_Parent
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
             DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-            If rc.contour.Count > 0 Then SetTrueText(Format(shapeCorrelation(rc.contour), fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
+            If rc.contour.Count > 0 Then SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
         Next
         SetTrueText("Move camera to see the value of this algorithm", 2)
         SetTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3)

@@ -654,7 +654,7 @@ Public Class Pixel_Vector3D : Inherits VB_Parent
     Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.HistBinBar3D.Value = 3
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
@@ -698,7 +698,7 @@ End Class
 
 Public Class Pixel_Unique_CPP : Inherits VB_Parent
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         cPtr = Pixels_Vector_Open()
         desc = "Create the list of pixels in a RedCloud Cell"
     End Sub

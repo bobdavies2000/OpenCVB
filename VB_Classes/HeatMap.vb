@@ -152,7 +152,7 @@ Public Class HeatMap_Cell : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim heat As New HeatMap_Hot
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         If standalone Then task.gOptions.setDisplay1()
         desc = "Display the heat map for the selected cell"
     End Sub

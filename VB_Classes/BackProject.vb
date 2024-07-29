@@ -88,7 +88,7 @@ Public Class BackProject_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim backP As New BackProject_Basics
     Public Sub New()
-        task.redOptions.UseSimpleReduction.Checked = True
+        task.redOptions.checkSimpleReduction(True)
         labels(3) = "Backprojection of highlighted histogram bin"
         desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
     End Sub
@@ -98,7 +98,7 @@ Public Class BackProject_Reduction : Inherits VB_Parent
         backP.Run(reduction.dst2)
         dst2 = backP.dst2
         dst3 = backP.dst3
-        labels(2) = "Reduction = " + CStr(task.redOptions.SimpleReductionBar.Value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(task.redOptions.getSimpleReductionBar()) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
@@ -124,7 +124,7 @@ Public Class BackProject_FeatureLess : Inherits VB_Parent
         backP.Run(reduction.dst2)
         dst2 = backP.dst2
         dst3 = backP.dst3
-        labels(2) = "Reduction = " + CStr(task.redOptions.SimpleReductionBar.Value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(task.redOptions.getSimpleReductionBar()) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 

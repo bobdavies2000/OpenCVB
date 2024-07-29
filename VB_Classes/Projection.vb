@@ -226,7 +226,7 @@ Public Class Projection_Top : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.setIdentifyCells(True)
         desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -455,7 +455,7 @@ Public Class MSER_Mask_CPP : Inherits VB_Parent
     Dim redC As New RedCloud_Cells
     Public classCount As Integer
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         FindCheckBox("Use grayscale input").Checked = False
         options.RunVB()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,

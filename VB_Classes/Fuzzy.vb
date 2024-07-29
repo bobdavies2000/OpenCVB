@@ -9,7 +9,7 @@ Public Class Fuzzy_Basics : Inherits VB_Parent
         Dim floodRadio = FindRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
         If standaloneTest() Then task.gOptions.setDisplay1()
-        task.redOptions.SimpleReductionBar.Value = 32
+        task.redOptions.setBitReductionBar(32)
         cPtr = Fuzzy_Open()
         FindRadio("CComp").Checked = True
         labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}

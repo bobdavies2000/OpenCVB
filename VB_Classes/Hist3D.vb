@@ -92,7 +92,7 @@ Public Class Hist3D_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim hist3D As New Hist3D_Basics
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -117,8 +117,8 @@ Public Class Hist3D_RedColor : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = True
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setIdentifyCells(True)
+        task.redOptions.setUseColorOnly(True)
         desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -264,7 +264,7 @@ Public Class Hist3D_PixelDiffMask : Inherits VB_Parent
     Dim pixel As New Hist3D_Pixel
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)

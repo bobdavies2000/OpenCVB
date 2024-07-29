@@ -113,7 +113,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim nabs As New Neighbors_Precise
     Public Sub New()
-        task.redOptions.UseColorOnly.Checked = True
+        task.redOptions.setUseColorOnly(True)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output"}
         If standalone Then task.gOptions.setDisplay1()
