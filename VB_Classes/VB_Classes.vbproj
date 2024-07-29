@@ -145,7 +145,6 @@
     <Compile Include="Bin4Way.vb" />
     <Compile Include="Quadrant.vb" />
     <Compile Include="FeatureROI.vb" />
-    <Compile Include="Surf.vb" />
     <Compile Include="Swarm.vb" />
     <Compile Include="VB_Common.vb" />
     <Compile Include="VB_Externs.vb" />

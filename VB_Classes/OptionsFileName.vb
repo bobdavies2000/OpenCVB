@@ -1,6 +1,7 @@
 ﻿Imports System.Windows.Forms
 Public Class OptionsFileName
     Public fileStarted As Boolean
+    Public fileNameFull As String
     Public Sub PlayButton_Click(sender As Object, e As EventArgs) Handles PlayButton.Click
         If PlayButton.Text = "Start" Then
             PlayButton.Text = "Stop"
@@ -30,4 +31,7 @@ Public Class OptionsFileName
     Public Sub setFileName(filespec As String)
         filename.Text = filespec
     End Sub
+    Public Function getFileName() As String
+        Return filename.Text
+    End Function
 End Class

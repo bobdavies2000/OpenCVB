@@ -66,8 +66,8 @@ Public Class SuperRes_Input : Inherits VB_Parent
     Public video As New Video_Basics
     Public inputFileName As String
     Public Sub New()
-        video.fileNameForm.filename.Text = task.HomeDir + "Data/testdata_superres_car.avi"
-        inputFileName = video.fileNameForm.filename.Text
+        video.fileNameForm.setFileName(task.HomeDir + "Data/testdata_superres_car.avi")
+        inputFileName = video.fileNameForm.getFileName()
         desc = "Input data for the superres testing"
     End Sub
     Public Sub RunVB(src As cv.Mat)

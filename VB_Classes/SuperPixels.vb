@@ -24,30 +24,17 @@ End Class
 Public Class SuperPixel_Basics_CPP : Inherits VB_Parent
     Public wireGrid As cv.Mat
     Public gridColor = cv.Scalar.White
-    Dim numSuperPixels As Integer
-    Dim numIterations As Integer
-    Dim prior As Integer
+    Dim options As New Options_SuperPixels
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number of SuperPixels", 1, 1000, 400)
-            sliders.setupTrackBar("SuperPixel Iterations", 0, 10, 4)
-            sliders.setupTrackBar("Prior", 1, 10, 2)
-        End If
-
         labels(3) = "Superpixel label data (0-255)"
         desc = "Sub-divide the image into super pixels."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static countSlider = FindSlider("Number of SuperPixels")
-        Static iterSlider = FindSlider("SuperPixel Iterations")
-        Static priorSlider = FindSlider("Prior")
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
-        If numSuperPixels <> countSlider.Value Or numIterations <> iterSlider.Value Or prior <> priorSlider.Value Then
-            numSuperPixels = countSlider.Value
-            numIterations = iterSlider.Value
-            prior = priorSlider.Value
+        If task.optionsChanged Then
             If cPtr <> 0 Then SuperPixel_Close(cPtr)
-            cPtr = SuperPixel_Open(src.Width, src.Height, numSuperPixels, numIterations, prior)
+            cPtr = SuperPixel_Open(src.Width, src.Height, options.numSuperPixels, options.numIterations, options.prior)
         End If
 
         Dim input = src
@@ -65,7 +52,7 @@ Public Class SuperPixel_Basics_CPP : Inherits VB_Parent
         Dim labelPtr = SuperPixel_GetLabels(cPtr)
         Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
         Dim labels = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_32S, labelData)
-        If numSuperPixels < 255 Then labels *= 255 / numSuperPixels
+        If options.numSuperPixels < 255 Then labels *= 255 / options.numSuperPixels
         labels.ConvertTo(dst3, cv.MatType.CV_8U)
     End Sub
     Public Sub Close()
@@ -79,8 +66,8 @@ End Class
 
 
 Public Class SuperPixel_BinarizedImage : Inherits VB_Parent
-    ReadOnly pixels As New SuperPixel_Basics_CPP
-    ReadOnly binarize As Binarize_Basics
+    Dim pixels As New SuperPixel_Basics_CPP
+    Dim binarize As Binarize_Basics
     Public Sub New()
         binarize = New Binarize_Basics()
         pixels.gridColor = cv.Scalar.Red
@@ -120,8 +107,8 @@ End Class
 
 
 Public Class SuperPixel_WithCanny : Inherits VB_Parent
-    ReadOnly pixels As New SuperPixel_Basics_CPP
-    ReadOnly edges As New Edge_Canny
+    Dim pixels As New SuperPixel_Basics_CPP
+    Dim edges As New Edge_Canny
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
@@ -143,8 +130,8 @@ End Class
 
 
 Public Class SuperPixel_WithLineDetector : Inherits VB_Parent
-    ReadOnly pixels As New SuperPixel_Basics_CPP
-    ReadOnly lines As New Line_Basics
+    Dim pixels As New SuperPixel_Basics_CPP
+    Dim lines As New Line_Basics
     Public Sub New()
         labels(3) = "Input to superpixel basics."
         desc = "Create SuperPixels using RGBDepth image."

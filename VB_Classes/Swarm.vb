@@ -24,11 +24,11 @@ Public Class Swarm_Basics : Inherits VB_Parent
             Dim pt = queries(i)
             For j = 0 To Math.Min(nabList.Count, options.ptCount)
                 Dim ptNew = trainInput(nabList(j))
-                dst.Line(pt, ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
-                If ptNew.X < options.border Then dst.Line(New cv.Point2f(0, ptNew.Y), ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
-                If ptNew.Y < options.border Then dst.Line(New cv.Point2f(ptNew.X, 0), ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
-                If ptNew.X > dst.Width - options.border Then dst.Line(New cv.Point2f(dst.Width, ptNew.Y), ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
-                If ptNew.Y > dst.Height - options.border Then dst.Line(New cv.Point2f(ptNew.X, dst.Height), ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
+                DrawLine(dst, pt, ptNew, cv.Scalar.White, task.lineWidth)
+                If ptNew.X < options.border Then DrawLine(dst, New cv.Point2f(0, ptNew.Y), ptNew, cv.Scalar.White, task.lineWidth)
+                If ptNew.Y < options.border Then DrawLine(dst, New cv.Point2f(ptNew.X, 0), ptNew, cv.Scalar.White, task.lineWidth)
+                If ptNew.X > dst.Width - options.border Then DrawLine(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, cv.Scalar.White, task.lineWidth)
+                If ptNew.Y > dst.Height - options.border Then DrawLine(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, cv.Scalar.White, task.lineWidth)
             Next
         Next
     End Sub
@@ -157,13 +157,12 @@ End Class
 
 Public Class Swarm_Percentage : Inherits VB_Parent
     Dim swarm As New Swarm_Flood
+    Dim options As New Options_SwarmPercent
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, 80)
         desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static percentSlider = FindSlider("Cells map X percent")
-        Dim percent = percentSlider.value / 100
+        options.RunVB()
 
         swarm.Run(src)
         dst2 = swarm.dst2
@@ -175,9 +174,9 @@ Public Class Swarm_Percentage : Inherits VB_Parent
             dst3(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
             pixels += rc.pixels
             count += 1
-            If pixels / src.Total >= percent Then Exit For
+            If pixels / src.Total >= options.percent Then Exit For
         Next
-        labels(3) = "The top " + CStr(count) + " cells by size = " + Format(percent, "0%") + " of the pixels"
+        labels(3) = "The top " + CStr(count) + " cells by size = " + Format(options.percent, "0%") + " of the pixels"
     End Sub
 End Class
 

@@ -16959,6 +16959,866 @@ namespace CS_Classes
             }
         }
     }
+    public class CS_SuperPixel_Basics : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_SuperPixel_Basics(VBtask task) : base(task)
+        {
+            labels[2] = "Super Pixel cells";
+            desc = "A Better superpixel algorithm";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            dst3 = src;
+            foreach (var rc in task.redCells)
+            {
+                DrawContour(dst3[rc.rect], rc.contour, Scalar.White, task.lineWidth);
+            }
+        }
+    }
+    public class CS_SuperPixel_Basics_CPP : CS_Parent
+    {
+        public Mat wireGrid;
+        public Scalar gridColor = Scalar.White;
+        Options_SuperPixels options = new Options_SuperPixels();
+        public CS_SuperPixel_Basics_CPP(VBtask task) : base(task)
+        {
+            labels[3] = "Superpixel label data (0-255)";
+            desc = "Sub-divide the image into super pixels.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.optionsChanged)
+            {
+                if (cPtr != (IntPtr)0) SuperPixel_Close(cPtr);
+                cPtr = SuperPixel_Open(src.Width, src.Height, options.numSuperPixels, options.numIterations, options.prior);
+            }
+            var input = src;
+            if (input.Channels() == 1) input = input.CvtColor(ColorConversionCodes.GRAY2BGR);
+            var dataSrc = new byte[input.Total() * input.ElemSize()];
+            Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
+            var handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            var imagePtr = SuperPixel_Run(cPtr, handleSrc.AddrOfPinnedObject());
+            handleSrc.Free();
+            dst2 = input;
+            dst2.SetTo(gridColor, new Mat(input.Rows, input.Cols, MatType.CV_8UC1, imagePtr));
+            var labelData = new byte[input.Total() * 4]; // labels are 32-bit integers.
+            var labelPtr = SuperPixel_GetLabels(cPtr);
+            Marshal.Copy(labelPtr, labelData, 0, labelData.Length);
+            var labels = new Mat(input.Rows, input.Cols, MatType.CV_32S, labelData);
+            if (options.numSuperPixels < 255) labels *= 255 / options.numSuperPixels;
+            labels.ConvertTo(dst3, MatType.CV_8U);
+        }
+        public void Close()
+        {
+            if (cPtr != (IntPtr)0) cPtr = SuperPixel_Close(cPtr);
+        }
+    }
+    public class CS_SuperPixel_BinarizedImage : CS_Parent
+    {
+        SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
+        Binarize_Basics binarize;
+        public CS_SuperPixel_BinarizedImage(VBtask task) : base(task)
+        {
+            binarize = new Binarize_Basics();
+            pixels.gridColor = Scalar.Red;
+            FindSlider("Number of SuperPixels").Value = 20; // find the top 20 super pixels.
+            desc = "Create SuperPixels from a binary image.";
+        }
+        public void RunCS(Mat src)
+        {
+            binarize.Run(src);
+            pixels.Run(binarize.dst2);
+            dst2 = pixels.dst2;
+            dst3 = pixels.dst3;
+            dst3.SetTo(Scalar.White, pixels.wireGrid);
+        }
+    }
+    public class CS_SuperPixel_Depth : CS_Parent
+    {
+        SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
+        public CS_SuperPixel_Depth(VBtask task) : base(task)
+        {
+            desc = "Create SuperPixels using RGBDepth image.";
+        }
+        public void RunCS(Mat src)
+        {
+            pixels.Run(task.depthRGB);
+            dst2 = pixels.dst2;
+            dst3 = pixels.dst3;
+        }
+    }
+    public class CS_SuperPixel_WithCanny : CS_Parent
+    {
+        SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
+        Edge_Canny edges = new Edge_Canny();
+        public CS_SuperPixel_WithCanny(VBtask task) : base(task)
+        {
+            desc = "Create SuperPixels using RGBDepth image.";
+        }
+        public void RunCS(Mat src)
+        {
+            edges.Run(src);
+            src = task.color.Clone();
+            src.SetTo(Scalar.White, edges.dst2);
+            pixels.Run(src);
+            dst2 = pixels.dst2;
+            dst3 = pixels.dst3.CvtColor(ColorConversionCodes.GRAY2BGR);
+            dst3.SetTo(Scalar.Red, edges.dst2);
+            labels[3] = "Edges provided by Canny in red";
+        }
+    }
+    public class CS_SuperPixel_WithLineDetector : CS_Parent
+    {
+        SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
+        Line_Basics lines = new Line_Basics();
+        public CS_SuperPixel_WithLineDetector(VBtask task) : base(task)
+        {
+            labels[3] = "Input to superpixel basics.";
+            desc = "Create SuperPixels using RGBDepth image.";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst3 = lines.dst2;
+            pixels.Run(dst3);
+            dst2 = pixels.dst2;
+        }
+    }
+    public class CS_SuperRes_Basics : CS_Parent
+    {
+        SuperRes_Input video = new SuperRes_Input();
+        Options_SuperRes options = new Options_SuperRes();
+        DenseOpticalFlowExt optFlow;
+        SuperResolution superres;
+        int warningMessage = 10;
+        public CS_SuperRes_Basics(VBtask task) : base(task)
+        {
+            labels[2] = "Original Input video";
+            labels[3] = "SuperRes output";
+            desc = "Create superres version of the video input";
+        }
+        public void RunCS(Mat src)
+        {
+            if (warningMessage > 0)
+            {
+                SetTrueText("The first frame takes a while when iterations are over 50 or so");
+                warningMessage -= 1;
+                return;
+            }
+            options.RunVB();
+            if (options.restartWithNewOptions)
+            {
+                warningMessage = 10;
+                optFlow = null; // start over...
+                video = new SuperRes_Input();
+                return;
+            }
+            video.Run(empty);
+            dst2 = video.dst2;
+            if (optFlow == null)
+            {
+                switch (options.method) // only one method available with OpenCVSharp...
+                {
+                    case "farneback":
+                        optFlow = FarnebackOpticalFlow.CreateFarneback();
+                        break;
+                    case "brox":
+                        optFlow = BroxOpticalFlow.CreateFarneback();
+                        break;
+                    case "tvl1":
+                        optFlow = DualTVL1OpticalFlow.CreateDualTVL1();
+                        break;
+                    case "pyrlk":
+                        optFlow = PyrLKOpticalFlow.CreateFarneback();
+                        break;
+                }
+                if (optFlow == null) return;
+                superres = SuperResolution.CreateBTVL1();
+                superres.Iterations = options.iterations;
+                superres.Scale = 4;
+                superres.TemporalAreaRadius = 4;
+                superres.SetInput(FrameSource.CreateFrameSource_Video(video.inputFileName));
+            }
+            superres.NextFrame(dst3);
+            if (dst3.Width == 0)
+            {
+                dst3 = dst2.Clone();
+                optFlow = null; // start over...
+            }
+        }
+    }
+    public class CS_SuperRes_Input : CS_Parent
+    {
+        public Video_Basics video = new Video_Basics();
+        public string inputFileName;
+        public CS_SuperRes_Input(VBtask task) : base(task)
+        {
+            video.fileNameForm.setFileName(task.HomeDir + "Data/testdata_superres_car.avi");
+            inputFileName = video.fileNameForm.getFileName();
+            desc = "Input data for the superres testing";
+        }
+        public void RunCS(Mat src)
+        {
+            video.Run(empty);
+            dst2 = video.dst2;
+        }
+    }
+    public class CS_SuperRes_SubPixelZoom : CS_Parent
+    {
+        Pixel_SubPixel zoom = new Pixel_SubPixel();
+        SuperRes_Input video = new SuperRes_Input();
+        public CS_SuperRes_SubPixelZoom(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Is SuperRes better than just zoom with sub-pixel accuracy?";
+        }
+        public void RunCS(Mat src)
+        {
+            task.mouseMovePoint = new cv.Point(45, 60);
+            video.Run(empty);
+            if (video.video.captureVideo.PosFrames > 30) return;
+            dst1 = video.dst2;
+            zoom.Run(video.dst2);
+            dst2 = zoom.dst2;
+            dst3 = zoom.dst3;
+            labels = zoom.labels;
+        }
+    }
+    public class CS_SVD_Example : CS_Parent
+    {
+        public CS_SVD_Example(VBtask task) : base(task)
+        {
+            desc = "SVD example";
+        }
+        public void RunCS(Mat src)
+        {
+            float[] inputData = {
+            1, 2, 3, 4, 5,
+            1, 2, 3, 4, 5,
+            1, 2, 3, 4, 5,
+            1, 2, 3, 4, 5,
+            1, 2, 3, 4, 5
+        };
+            src = new Mat(5, 5, MatType.CV_32F, inputData);
+            Mat W = new Mat(), U = new Mat(), VT = new Mat();
+            Cv2.SVDecomp(src, W, U, VT, SVD.Flags.FullUV);
+            Mat WD = new Mat(5, 5, MatType.CV_32F, 0);
+            W.CopyTo(WD.Diag());
+            Mat rec = VT.Transpose() * WD * U.Transpose();
+            strOut = "";
+            for (int i = 0; i < rec.Rows; i++)
+            {
+                for (int j = 0; j < rec.Cols; j++)
+                {
+                    strOut += string.Format("{0}, ", rec.Get<float>(i, j));
+                }
+                strOut += "\n";
+            }
+            SetTrueText(strOut);
+        }
+    }
+    public class CS_SVD_Example2 : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_SVD_Example2(VBtask task) : base(task)
+        {
+            desc = "Compute the mean and tangent of a RedCloud Cell";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            var rc = task.rc;
+            if (task.heartBeat)
+            {
+                var m = Cv2.Moments(rc.mask, true);
+                var center = new Point2f((float)(m.M10 / rc.pixels), (float)(m.M01 / rc.pixels));
+                DrawCircle(task.color[rc.rect], center, task.DotSize, task.HighlightColor);
+                Mat mArea = new Mat(4, 1, MatType.CV_32F, new float[] 
+                            { (float)(m.M20 / rc.pixels), (float)(m.Mu11 / rc.pixels), 
+                              (float)(m.Mu11 / rc.pixels), (float)(m.Mu02 / rc.pixels) });
+                Mat U = new Mat();
+                Cv2.SVDecomp(mArea, new Mat(), U, new Mat(), SVD.Flags.FullUV);
+                strOut = "The U Mat: \n";
+                for (int j = 0; j < U.Rows; j++)
+                {
+                    for (int i = 0; i < U.Cols; i++)
+                    {
+                        strOut += string.Format("{0}, ", U.Get<float>(j, i));
+                    }
+                    strOut += "\n";
+                }
+                strOut += "\n";
+                strOut += "The tangent: \n";
+                for (int i = 0; i < U.Cols; i++)
+                {
+                    strOut += string.Format("{0}, ", U.Get<float>(0, i));
+                }
+                strOut += "\n";
+                double angle = Math.Atan2(U.Get<float>(0, 1), U.Get<float>(0, 0));
+                strOut += "Angle = " + string.Format("{0} radians\n", angle);
+                strOut += "Center.X = " + string.Format("{0} Center.Y = {1}\n", center.X, center.Y);
+                strOut += "Rect is at (" + rc.rect.X + ", " + rc.rect.Y + ") with width/height = " + rc.rect.Width + "/" + rc.rect.Height + "\n";
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_SVD_Gaussian : CS_Parent
+    {
+        Covariance_Images covar = new Covariance_Images();
+        public CS_SVD_Gaussian(VBtask task) : base(task)
+        {
+            desc = "Compute the SVD for the covariance of 2 images - only close to working...";
+        }
+        public void RunCS(Mat src)
+        {
+            covar.Run(src);
+            dst2 = src;
+            Mat U = new Mat(), W = new Mat(), VT = new Mat();
+            Cv2.SVDecomp(covar.covariance, W, U, VT, SVD.Flags.FullUV);
+            strOut = "The Covariance Mat: \n";
+            for (int j = 0; j < covar.covariance.Rows; j++)
+            {
+                for (int i = 0; i < covar.covariance.Cols; i++)
+                {
+                    strOut += string.Format("{0}, ", covar.covariance.Get<double>(j, i));
+                }
+                strOut += "\n";
+            }
+            strOut += "\n";
+            strOut += "The W Mat: \n";
+            for (int j = 0; j < W.Rows; j++)
+            {
+                for (int i = 0; i < W.Cols; i++)
+                {
+                    strOut += string.Format("{0}, ", W.Get<double>(j, i));
+                }
+                strOut += "\n";
+            }
+            strOut += "\n";
+            strOut += "The U Mat: \n";
+            for (int j = 0; j < U.Rows; j++)
+            {
+                for (int i = 0; i < U.Cols; i++)
+                {
+                    strOut += string.Format("{0}, ", U.Get<double>(j, i));
+                }
+                strOut += "\n";
+            }
+            strOut += "\n";
+            double angle = -Math.Atan2(U.Get<double>(0, 1), U.Get<double>(0, 0)) * (180 / Cv2.PI);
+            strOut += "Angle = " + string.Format("{0} radians\n", angle);
+            W = W.Sqrt() * 3;
+            Size2f size = new Size2f(10, 100);
+            Point2f pt = new Point2f((float)covar.mean.Get<double>(0, 0), (float)covar.mean.Get<double>(0, 1));
+            RotatedRect rrect = new RotatedRect(pt, size, (float)angle);
+            dst2.Ellipse(rrect, task.HighlightColor, task.lineWidth, task.lineType);
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_SVM_Basics : CS_Parent
+    {
+        public Options_SVM options = new Options_SVM();
+        SVM_SampleData sampleData = new SVM_SampleData();
+        public List<cv.Point2f> points = new List<cv.Point2f>();
+        public List<int> response = new List<int>();
+        cv.ML.SVM svm;
+        public CS_SVM_Basics(VBtask task) : base(task)
+        {
+            desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data.";
+            if (standaloneTest()) task.gOptions.setGridSize(8);
+            labels = new string[] { "", "", "CS_SVM_Basics input data", "Results - white line is ground truth" };
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB(); // update any options specified in the interface.
+            if (standaloneTest())
+            {
+                sampleData.Run(src);
+                dst2 = sampleData.dst2;
+                points = sampleData.points;
+                response = sampleData.responses;
+            }
+            var dataMat = new Mat(options.sampleCount, 2, MatType.CV_32FC1, points.ToArray());
+            var resMat = new Mat(options.sampleCount, 1, MatType.CV_32SC1, response.ToArray());
+            dataMat *= 1 / src.Height;
+            if (task.optionsChanged) svm = options.createSVM();
+            svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat);
+            dst3.SetTo(0);
+            foreach (var roi in task.gridList)
+            {
+                if (roi.X > src.Height) continue; // working only with square - not rectangles.
+                float[] samples = { roi.X / src.Height, roi.Y / src.Height };
+                if (svm.Predict(new Mat(1, 2, MatType.CV_32F, samples)) == 1)
+                {
+                    dst3[roi].SetTo(Scalar.Red);
+                }
+                else
+                {
+                    dst3[roi].SetTo(Scalar.GreenYellow);
+                }
+            }
+            if (standaloneTest())
+            {
+                // draw the function in both plots to show ground truth.
+                for (int x = 1; x < src.Height; x++)
+                {
+                    int y1 = (int)sampleData.inputFunction(x - 1);
+                    int y2 = (int)sampleData.inputFunction(x);
+                    DrawLine(dst3, new Point2f(x - 1, y1), new Point2f(x, y2), Scalar.White);
+                }
+            }
+        }
+    }
+    public class CS_SVM_SampleData : CS_Parent
+    {
+        readonly Options_SVM options = new Options_SVM();
+        public List<cv.Point2f> points = new List<cv.Point2f>();
+        public List<int> responses = new List<int>();
+        public CS_SVM_SampleData(VBtask task) : base(task)
+        {
+            desc = "Create sample data for a sample SVM application.";
+        }
+        public double inputFunction(double x)
+        {
+            return x + 50 * Math.Sin(x / 15.0);
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2.SetTo(0);
+            points.Clear();
+            responses.Clear();
+            for (int i = 0; i < options.sampleCount; i++)
+            {
+                int x = msRNG.Next(0, src.Height - 1);
+                int y = msRNG.Next(0, src.Height - 1);
+                points.Add(new Point2f(x, y));
+                if (y > inputFunction(x))
+                {
+                    responses.Add(1);
+                    DrawCircle(dst2, new cv.Point(x, y), 2, Scalar.Red);
+                }
+                else
+                {
+                    responses.Add(-1);
+                    DrawCircle(dst2, new cv.Point(x, y), 3, Scalar.GreenYellow);
+                }
+            }
+        }
+    }
+    public class CS_SVM_TestCase : CS_Parent
+    {
+        Options_SVM options = new Options_SVM();
+        List<cv.Point2f> points = new List<cv.Point2f>();
+        List<int> responses = new List<int>();
+        cv.ML.SVM svm;
+        public CS_SVM_TestCase(VBtask task) : base(task)
+        {
+            FindSlider("Granularity").Value = 15;
+            labels = new string[] { "", "", "Input points - color is the category label", "Predictions" };
+            desc = "Text book example on SVM";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2.SetTo(Scalar.White);
+            dst3.SetTo(0);
+            int labeled = 1;
+            int nonlabel = -1;
+            if (task.heartBeat)
+            {
+                points.Clear();
+                responses.Clear();
+                int[] choices = new int[]{labeled, nonlabel, nonlabel, nonlabel}; 
+                for (int i = 0; i < 4; i++)
+                {
+                    points.Add(new Point2f(msRNG.Next(0, src.Width - 1), msRNG.Next(0, src.Height - 1)));
+                    responses.Add(choices[i]);
+                }
+            }
+            var trainMat = new Mat(4, 2, MatType.CV_32F, points.ToArray());
+            var labelsMat = new Mat(4, 1, MatType.CV_32SC1, responses.ToArray());
+            var dataMat = trainMat * 1 / src.Height;
+            if (task.optionsChanged) svm = options.createSVM();
+            svm.Train(dataMat, cv.ML.SampleTypes.RowSample, labelsMat);
+            var sampleMat = new Mat(1, 2, MatType.CV_32F);
+            for (int y = 0; y < dst2.Height; y += options.granularity)
+            {
+                for (int x = 0; x < dst2.Width; x += options.granularity)
+                {
+                    sampleMat.Set<float>(0, 0, x / src.Height);
+                    sampleMat.Set<float>(0, 1, y / src.Height);
+                    var response = svm.Predict(sampleMat);
+                    var color = response >= 0 ? Scalar.Blue : Scalar.Red;
+                    DrawCircle(dst3, new cv.Point((int)x, (int)y), task.DotSize + 1, color);
+                }
+            }
+            for (int i = 0; i < trainMat.Rows; i++)
+            {
+                var color = labelsMat.Get<int>(i) == 1 ? Scalar.Blue : Scalar.Red;
+                var pt = new cv.Point(trainMat.Get<float>(i, 0), trainMat.Get<float>(i, 1));
+                DrawCircle(dst2, pt, task.DotSize + 2, color);
+                DrawCircle(dst3, pt, task.DotSize + 2, color);
+            }
+        }
+    }
+    public class CS_SVM_ReuseBasics : CS_Parent
+    {
+        SVM_Basics svm = new SVM_Basics();
+        List<cv.Point2f> points = new List<cv.Point2f>();
+        List<int> responses = new List<int>();
+        public CS_SVM_ReuseBasics(VBtask task) : base(task)
+        {
+            FindSlider("Granularity").Value = 15;
+            FindSlider("SVM Sample Count").Value = 4;
+            labels = new string[] { "", "", "Input points", "Predictions" };
+            desc = "Text book example on SVM";
+        }
+        public void RunCS(Mat src)
+        {
+            int labeled = 1;
+            int nonlabel = -1;
+            int[] choices = new int[] { labeled, nonlabel, nonlabel, nonlabel };
+            if (task.heartBeat)
+            {
+                points.Clear();
+                responses.Clear();
+                for (int i = 0; i < 4; i++)
+                {
+                    points.Add(new Point2f(msRNG.Next(0, src.Height - 1), msRNG.Next(0, src.Height - 1))); // note: working with a square, not a rectangle
+                    responses.Add(choices[i]);
+                }
+            }
+            svm.points.Clear();
+            svm.response.Clear();
+            for (int i = 0; i < points.Count(); i++)
+            {
+                svm.points.Add(points[i]);
+                svm.response.Add(choices[i]);
+            }
+            svm.Run(src);
+            dst3 = svm.dst3;
+            dst2.SetTo(Scalar.White);
+            for (int i = 0; i < svm.points.Count(); i++)
+            {
+                var color = svm.response[i] == 1 ? Scalar.Blue : Scalar.Red;
+                DrawCircle(dst2, svm.points[i], task.DotSize, color);
+                DrawCircle(dst3, svm.points[i], task.DotSize, color);
+            }
+        }
+    }
+    public class CS_SVM_ReuseRandom : CS_Parent
+    {
+        readonly SVM_Basics svm = new SVM_Basics();
+        int blueCount;
+        public CS_SVM_ReuseRandom(VBtask task) : base(task)
+        {
+            FindSlider("Granularity").Value = 15;
+            task.drawRect = new cv.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2);
+            labels[2] = "SVM Training data - draw a rectangle anywhere to test further.";
+            desc = "Use SVM to classify random points - testing if height must equal width - needs more work";
+        }
+        public void RunCS(Mat src)
+        {
+            svm.options.RunVB();
+            var rect = task.drawRect;
+            var contour = new List<cv.Point>();
+            contour.Clear();
+            contour.Add(new cv.Point(rect.X, rect.Y));
+            contour.Add(new cv.Point(rect.X, rect.Y + rect.Height));
+            contour.Add(new cv.Point(rect.X + rect.Width, rect.Y + rect.Height));
+            contour.Add(new cv.Point(rect.X + rect.Width, rect.Y));
+            int width = src.Width;
+            if (svm.options.kernelType == cv.ML.SVM.KernelTypes.Linear)
+            {
+                width = src.Height;
+                rect.X = 0;
+                rect.Y = src.Height - rect.Height;
+                rect.Width = width;
+            }
+            if (task.heartBeat)
+            {
+                dst2.SetTo(0);
+                blueCount = 0;
+                svm.points.Clear();
+                svm.response.Clear();
+                for (int i = 0; i < svm.options.sampleCount; i++)
+                {
+                    var pt = new Point2f(msRNG.Next(0, width - 1), msRNG.Next(0, src.Height - 1));
+                    svm.points.Add(pt);
+                    int res = 0;
+                    if (svm.options.kernelType == cv.ML.SVM.KernelTypes.Linear)
+                    {
+                        res = pt.X >= pt.Y ? 1 : -1;
+                    }
+                    else
+                    {
+                        res = Cv2.PointPolygonTest(contour, pt, false) >= 0 ? 1 : -1;
+                    }
+                    svm.response.Add(res);
+                    if (res > 0) blueCount++;
+                    DrawCircle(dst2, pt, task.DotSize, res == 1 ? Scalar.Blue : Scalar.Green);
+                }
+                svm.Run(src);
+                dst3 = svm.dst3;
+            }
+            labels[3] = "There were " + blueCount + " blue points out of " + svm.options.sampleCount;
+            if (svm.options.kernelType != cv.ML.SVM.KernelTypes.Linear)
+            {
+                dst2.Rectangle(rect, Scalar.Black, 2);
+                dst3.Rectangle(rect, Scalar.Black, 2);
+            }
+        }
+    }
+    public class CS_Swarm_Basics : CS_Parent
+    {
+        public KNN_Core knn = new KNN_Core();
+        Feature_Basics feat = new Feature_Basics();
+        public List<PointPair> mpList = new List<PointPair>();
+        public float distanceAvg;
+        public float directionAvg;
+        public float distanceMax;
+        public Options_Swarm options = new Options_Swarm();
+        List<List<cv.Point2f>> cornerHistory = new List<List<cv.Point2f>>();
+        public CS_Swarm_Basics(VBtask task) : base(task)
+        {
+            FindSlider("Feature Sample Size").Value = 1000;
+            FindSlider("Blocksize").Value = 1;
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history.";
+        }
+        public void DrawLines(ref Mat dst)
+        {
+            var queries = knn.queries;
+            var trainInput = knn.trainInput;
+            var neighbors = knn.neighbors;
+            for (int i = 0; i < queries.Count(); i++)
+            {
+                var nabList = neighbors[i];
+                var pt = queries[i];
+                for (int j = 0; j < Math.Min(nabList.Count(), options.ptCount); j++)
+                {
+                    var ptNew = trainInput[nabList[j]];
+                    DrawLine(dst, pt, ptNew, Scalar.White, task.lineWidth);
+                    if (ptNew.X < options.border) DrawLine(dst, new Point2f(0, ptNew.Y), ptNew, Scalar.White, task.lineWidth);
+                    if (ptNew.Y < options.border) DrawLine(dst, new Point2f(ptNew.X, 0), ptNew, Scalar.White, task.lineWidth);
+                    if (ptNew.X > dst.Width - options.border) DrawLine(dst, new Point2f(dst.Width, ptNew.Y), ptNew, Scalar.White, task.lineWidth);
+                    if (ptNew.Y > dst.Height - options.border) DrawLine(dst, new Point2f(ptNew.X, dst.Height), ptNew, Scalar.White, task.lineWidth);
+                }
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            feat.Run(src);
+            dst3 = feat.dst2;
+            if (task.optionsChanged) cornerHistory.Clear();
+            int histCount = task.frameHistoryCount;
+            cornerHistory.Add(new List<cv.Point2f>(task.features));
+            int lastIndex = cornerHistory.Count() - 1;
+            knn.trainInput = new List<cv.Point2f>(cornerHistory.ElementAt(0));
+            knn.queries = new List<cv.Point2f>(cornerHistory.ElementAt(lastIndex));
+            knn.Run(empty);
+            dst2.SetTo(0);
+            mpList.Clear();
+            var disList = new List<float>();
+            var dirList = new List<float>(); // angle in radians
+            for (int i = 0; i < knn.queries.Count(); i++)
+            {
+                var nabList = knn.neighbors[i];
+                int trainIndex = nabList[0]; // index of the matched train input
+                var pt = knn.queries[i];
+                var ptNew = knn.trainInput[trainIndex];
+                double nextDist = pt.DistanceTo(ptNew);
+                DrawLine(dst2, pt, ptNew, Scalar.White);
+                disList.Add((float)nextDist);
+                mpList.Add(new PointPair(pt, ptNew));
+                if (nextDist > 0)
+                {
+                    if (pt.Y != ptNew.Y)
+                    {
+                        float nextDirection = (float)Math.Atan((pt.X - ptNew.X) / (pt.Y - ptNew.Y));
+                        dirList.Add(nextDirection);
+                    }
+                }
+            }
+            DrawLines(ref dst2);
+            labels[3] = $"{mpList.Count()} points were matched to the previous set of features.";
+            distanceAvg = 0;
+            if (task.heartBeat) distanceMax = 0;
+            if (disList.Count() > 10)
+            {
+                distanceAvg = disList.Average();
+                distanceMax = Math.Max(distanceMax, disList.Max());
+                labels[2] = $"Avg distance = {distanceAvg:F1}\nMax Distance = {distanceMax:F1} (all units in pixels) ";
+            }
+            if (dirList.Count() > 0)
+            {
+                directionAvg = dirList.Average();
+                labels[3] = $"{directionAvg:F1} average direction (radians)";
+            }
+            if (cornerHistory.Count() >= histCount) cornerHistory.RemoveAt(0);
+        }
+    }
+    public class CS_Swarm_LeftRightFeatures : CS_Parent
+    {
+        public List<cv.Point2f> leftList = new List<cv.Point2f>();
+        public List<cv.Point2f> rightList = new List<cv.Point2f>();
+        Feature_Basics feat = new Feature_Basics();
+        public CS_Swarm_LeftRightFeatures(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Left view feature points", "Right view feature points" };
+            desc = "Double the votes on motion by collecting features for both left and right images.";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(task.leftView);
+            leftList = new List<cv.Point2f>(task.features);
+            dst2 = feat.dst2.Clone();
+            feat.Run(task.rightView);
+            rightList = new List<cv.Point2f>(task.features);
+            dst3 = feat.dst2.Clone();
+        }
+    }
+    public class CS_Swarm_LeftRight : CS_Parent
+    {
+        public float leftDistance;
+        public float leftDirection;
+        public float leftMax;
+        public float rightDistance;
+        public float rightDirection;
+        public float rightMax;
+        Swarm_Basics swarm = new Swarm_Basics();
+        public CS_Swarm_LeftRight(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            labels = new[] { "", "", "Left view feature points", "Right view feature points" };
+            desc = "Get direction and distance from the left and right images.";
+        }
+        public void RunCS(Mat src)
+        {
+            swarm.Run(task.leftView);
+            leftDistance = swarm.distanceAvg;
+            leftDirection = swarm.directionAvg;
+            leftMax = swarm.distanceMax;
+            dst2 = task.leftView;
+            swarm.DrawLines(dst2);
+            swarm.Run(task.rightView);
+            rightDistance = swarm.distanceAvg;
+            rightDirection = swarm.directionAvg;
+            rightMax = swarm.distanceMax;
+            dst3 = task.rightView;
+            swarm.DrawLines(dst3);
+            strOut = swarm.labels[2] + "\n" + swarm.labels[3];
+            SetTrueText(strOut, 1);
+        }
+    }
+
+    public class CS_Swarm_Flood : CS_Parent
+    {
+        Swarm_Basics swarm = new Swarm_Basics();
+        public Flood_BasicsMask flood = new Flood_BasicsMask();
+        Color8U_Basics cvt = new Color8U_Basics();
+        public CS_Swarm_Flood(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            desc = "Floodfill the color image using the swarm outline as a mask";
+        }
+        public void RunCS(Mat src)
+        {
+            swarm.Run(src);
+            cvt.Run(src);
+            flood.genCells.removeContour = false;
+            flood.inputMask = swarm.dst2;
+            flood.Run(cvt.dst2);
+            dst2 = flood.dst2;
+            task.setSelectedContour();
+            labels[2] = flood.genCells.labels[2];
+        }
+    }
+    public class CS_Swarm_Percentage : CS_Parent
+    {
+        Swarm_Flood swarm = new Swarm_Flood();
+        Options_SwarmPercent options = new Options_SwarmPercent();
+        public CS_Swarm_Percentage(VBtask task) : base(task)
+        {
+            desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            swarm.Run(src);
+            dst2 = swarm.dst2;
+            dst3.SetTo(0);
+            int pixels = 0;
+            int count = 0;
+            foreach (var rc in task.redCells)
+            {
+                if (task.redOptions.getNaturalColor()) 
+                    dst3[rc.rect].SetTo(rc.naturalColor, rc.mask); 
+                else 
+                    dst3[rc.rect].SetTo(rc.color, rc.mask);
+
+                pixels += rc.pixels;
+                count++;
+                if ((double)pixels / src.Total() >= options.percent) break;
+            }
+            labels[3] = "The top " + count.ToString() + " cells by size = " + options.percent.ToString("0%") + " of the pixels";
+        }
+    }
+
+    public class CS_Swarm_Flood2 : CS_Parent
+    {
+        public Line_KNN lines = new Line_KNN();
+        public Flood_BasicsMask flood = new Flood_BasicsMask();
+        public Color8U_Basics cvt = new Color8U_Basics();
+        public CS_Swarm_Flood2(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            flood.genCells.removeContour = false;
+            desc = "Floodfill the color image using the swarm outline as a mask";
+        }
+        public Mat runRedCloud(Mat src)
+        {
+            lines.Run(src);
+            cvt.Run(src);
+            flood.inputMask = lines.dst3;
+            flood.Run(cvt.dst2);
+            return flood.dst2;
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            dst2 = runRedCloud(src).Clone();
+            dst3 = lines.dst3.Clone();
+            task.setSelectedContour();
+            labels[2] = flood.genCells.labels[2];
+            labels[3] = lines.labels[2];
+        }
+    }
+    public class CS_Swarm_Flood3 : CS_Parent
+    {
+        Swarm_Flood2 swarm = new Swarm_Flood2();
+        public CS_Swarm_Flood3(VBtask task) : base(task)
+        {
+            desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
+        }
+        public void RunCS(Mat src)
+        {
+            swarm.Run(src);
+            dst2 = swarm.dst2;
+            labels[2] = swarm.labels[2];
+            dst3 = swarm.runRedCloud(src);
+            labels[3] = swarm.labels[2];
+        }
+    }
 
 
 

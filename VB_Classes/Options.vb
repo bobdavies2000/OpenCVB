@@ -549,7 +549,7 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class Options_SVM : Inherits VB_Parent
-    Public kernelType = cv.ML.SVM.KernelTypes.Poly
+    Public kernelType As cv.ML.SVM.KernelTypes = cv.ML.SVM.KernelTypes.Poly
     Public granularity As Integer = 5
     Public svmDegree As Single = 1
     Public gamma As Integer = 1
@@ -4148,26 +4148,6 @@ End Class
 
 
 
-Public Class Options_Swarm : Inherits VB_Parent
-    Public ptCount As Integer
-    Public border As Integer
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Connect X KNN points", 1, 10, 2)
-            sliders.setupTrackBar("Distance to image border", 1, 10, 5)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static ptSlider = FindSlider("Connect X KNN points")
-        Static borderSlider = FindSlider("Distance to image border")
-        ptCount = ptSlider.value
-        border = borderSlider.value
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Options_AddWeightedAccum : Inherits VB_Parent
@@ -7402,5 +7382,67 @@ Public Class Options_Structured : Inherits VB_Parent
         rebuilt = rebuiltRadio.checked
         sliceSize = sliceSlider.Value
         stepSize = stepSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_SuperPixels : Inherits VB_Parent
+    Public numSuperPixels As Integer
+    Public numIterations As Integer
+    Public prior As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Number of SuperPixels", 1, 1000, 400)
+            sliders.setupTrackBar("SuperPixel Iterations", 0, 10, 4)
+            sliders.setupTrackBar("Prior", 1, 10, 2)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static countSlider = FindSlider("Number of SuperPixels")
+        Static iterSlider = FindSlider("SuperPixel Iterations")
+        Static priorSlider = FindSlider("Prior")
+        numSuperPixels = countSlider.value
+        numIterations = iterSlider.value
+        prior = priorSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Swarm : Inherits VB_Parent
+    Public ptCount As Integer
+    Public border As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Connect X KNN points", 1, 10, 2)
+            sliders.setupTrackBar("Distance to image border", 1, 10, 5)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static ptSlider = FindSlider("Connect X KNN points")
+        Static borderSlider = FindSlider("Distance to image border")
+        ptCount = ptSlider.value
+        border = borderSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_SwarmPercent : Inherits VB_Parent
+    Public percent As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, 80)
+    End Sub
+    Public Sub RunVB()
+        Static percentSlider = FindSlider("Cells map X percent")
+        percent = percentSlider.value / 100
     End Sub
 End Class
