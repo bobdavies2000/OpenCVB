@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Numerics;
 using System.Windows.Controls;
 using System.Security.Cryptography;
+using System.Windows.Media.Animation;
 
 namespace CS_Classes
 {
@@ -15558,5 +15559,1408 @@ namespace CS_Classes
             dst3 = input;
         }
     }
+    public class CS_Stable_Basics : CS_Parent
+    {
+        public Delaunay_Generations facetGen = new Delaunay_Generations();
+        public List<cv.Point2f> ptList = new List<cv.Point2f>();
+        public Point2f anchorPoint;
+        Feature_KNN good = new Feature_KNN();
+        public CS_Stable_Basics(VBtask task) : base(task)
+        {
+            desc = "Maintain the generation counts around the feature points.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                good.Run(src);
+                facetGen.inputPoints = new List<cv.Point2f>(good.featurePoints);
+            }
+            facetGen.Run(src);
+            if (facetGen.inputPoints.Count() == 0) return; // nothing to work on ...
+            ptList.Clear();
+            List<int> generations = new List<int>();
+            foreach (var pt in facetGen.inputPoints)
+            {
+                int fIndex = facetGen.facet.facet32s.Get<int>((int)pt.Y, (int)pt.X);
+                if (fIndex >= facetGen.facet.facetList.Count()) continue; // new point
+                int g = facetGen.dst0.Get<int>((int)pt.Y, (int)pt.X);
+                generations.Add(g);
+                ptList.Add(pt);
+                SetTrueText(g.ToString(), pt);
+            }
+            int maxGens = generations.Max();
+            int index = generations.IndexOf(maxGens);
+            anchorPoint = ptList[index];
+            if (index < facetGen.facet.facetList.Count())
+            {
+                var bestFacet = facetGen.facet.facetList[index];
+                dst2.FillConvexPoly(bestFacet, Scalar.Black, task.lineType);
+                DrawContour(dst2, bestFacet, task.HighlightColor);
+            }
+            dst2 = facetGen.dst2;
+            dst3 = src.Clone();
+            for (int i = 0; i < ptList.Count(); i++)
+            {
+                var pt = ptList[i];
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+                DrawCircle(dst3, pt, task.DotSize, task.HighlightColor);
+            }
+            labels[2] = $"{ptList.Count()} stable points were identified with {maxGens} generations at the anchor point";
+        }
+    }
+    public class CS_Stable_BasicsCount : CS_Parent
+    {
+        public Stable_Basics basics = new Stable_Basics();
+        public Feature_Basics feat = new Feature_Basics();
+        public SortedList<int, int> goodCounts = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
+        public CS_Stable_BasicsCount(VBtask task) : base(task)
+        {
+            desc = "Track the stable good features found in the BGR image.";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            basics.facetGen.inputPoints = new List<cv.Point2f>(task.features);
+            basics.Run(src);
+            dst2 = basics.dst2;
+            dst3 = basics.dst3;
+            goodCounts.Clear();
+            int g;
+            for (int i = 0; i < basics.ptList.Count(); i++)
+            {
+                var pt = basics.ptList[i];
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+                g = basics.facetGen.dst0.Get<int>((int)pt.Y, (int)pt.X);
+                goodCounts.Add(g, i);
+                SetTrueText(g.ToString(), pt);
+            }
+            labels[2] = $"{task.features.Count()} good features were found and {basics.ptList.Count()} were stable";
+        }
+    }
+    public class CS_Stable_Lines : CS_Parent
+    {
+        public Stable_Basics basics = new Stable_Basics();
+        Line_Basics lines = new Line_Basics();
+        public CS_Stable_Lines(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Track the line end points found in the BGR image and keep those that are stable.";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            basics.facetGen.inputPoints.Clear();
+            dst1 = src.Clone();
+            foreach (var lp in lines.lpList)
+            {
+                basics.facetGen.inputPoints.Add(lp.p1);
+                basics.facetGen.inputPoints.Add(lp.p2);
+                DrawLine(dst1, lp.p1, lp.p2, task.HighlightColor);
+            }
+            basics.Run(src);
+            dst2 = basics.dst2;
+            dst3 = basics.dst3;
+            foreach (var pt in basics.ptList)
+            {
+                DrawCircle(dst2, pt, task.DotSize + 1, task.HighlightColor);
+                if (standaloneTest())
+                {
+                    int g = basics.facetGen.dst0.Get<int>((int)pt.Y, (int)pt.X);
+                    SetTrueText(g.ToString(), pt);
+                }
+            }
+            labels[2] = basics.labels[2];
+            labels[3] = $"{lines.lpList.Count()} line end points were found and {basics.ptList.Count()} were stable";
+        }
+    }
+    public class CS_Stable_FAST : CS_Parent
+    {
+        public Stable_Basics basics = new Stable_Basics();
+        readonly Corners_Basics fast = new Corners_Basics();
+        public CS_Stable_FAST(VBtask task) : base(task)
+        {
+            FindSlider("FAST Threshold").Value = 100;
+            desc = "Track the FAST feature points found in the BGR image and track those that appear stable.";
+        }
+        public void RunCS(Mat src)
+        {
+            fast.Run(src);
+            basics.facetGen.inputPoints.Clear();
+            basics.facetGen.inputPoints = new List<cv.Point2f>(fast.features);
+            basics.Run(src);
+            dst3 = basics.dst3;
+            dst2 = basics.dst2;
+            foreach (var pt in basics.ptList)
+            {
+                DrawCircle(dst2, pt, task.DotSize + 1, task.HighlightColor);
+                if (standaloneTest())
+                {
+                    int g = basics.facetGen.dst0.Get<int>((int)pt.Y, (int)pt.X);
+                    SetTrueText(g.ToString(), pt);
+                }
+            }
+            labels[2] = basics.labels[2];
+            labels[3] = $"{fast.features.Count()} features were found and {basics.ptList.Count()} were stable";
+        }
+    }
+    public class CS_Stable_GoodFeatures : CS_Parent
+    {
+        public Stable_Basics basics = new Stable_Basics();
+        public Feature_Basics feat = new Feature_Basics();
+        public SortedList<int, int> genSorted = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
+        public CS_Stable_GoodFeatures(VBtask task) : base(task)
+        {
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
+            desc = "Track the stable good features found in the BGR image.";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            dst3 = basics.dst3;
+            if (task.features.Count() == 0) return; // nothing to work on...
+            basics.facetGen.inputPoints = new List<cv.Point2f>(task.features);
+            basics.Run(src);
+            dst2 = basics.dst2;
+            dst1.SetTo(0);
+            genSorted.Clear();
+            for (int i = 0; i < basics.ptList.Count(); i++)
+            {
+                var pt = basics.ptList[i];
+                if (standaloneTest()) DrawCircle(dst2, pt, task.DotSize + 1, Scalar.Yellow);
+                dst1.Set<byte>((int)pt.Y, (int)pt.X, 255);
+                int g = basics.facetGen.dst0.Get<int>((int)pt.Y, (int)pt.X);
+                genSorted.Add(g, i);
+                SetTrueText(g.ToString(), pt);
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+            }
+            labels[2] = basics.labels[2];
+            labels[3] = $"{task.features.Count()} good features were found and {basics.ptList.Count()} were stable";
+        }
+    }
+    public class CS_Stitch_Basics : CS_Parent
+    {
+        Options_Stitch options = new Options_Stitch();
+        public CS_Stitch_Basics(VBtask task) : base(task)
+        {
+            desc = "Stitch together random parts of a color image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            List<Mat> mats = new List<Mat>();
+            dst2 = src.Clone();
+            for (int i = 0; i < options.imageCount; i++)
+            {
+                int x1 = (int)msRNG.Next(0, src.Width - options.width);
+                int x2 = (int)msRNG.Next(0, src.Height - options.height);
+                cv.Rect rect = new cv.Rect(x1, x2, options.width, options.height);
+                dst2.Rectangle(rect, Scalar.Red, 2);
+                mats.Add(src[rect].Clone());
+            }
+            if (task.testAllRunning)
+            {
+                // It runs fine but after several runs during 'Test All', it will fail with an external exception.  Only happens on 'Test All' runs.
+                SetTrueText("CS_Stitch_Basics only fails when running 'Test All'.\n" +
+                            "Skipping it during a 'Test All' just so all the other tests can be exercised.", new cv.Point(10, 100), 3);
+                return;
+            }
+            var stitcher = Stitcher.Create(Stitcher.Mode.Scans);
+            Mat pano = new Mat();
+            // stitcher may fail with an external exception if you make width and height too small.
+            if (pano.Cols == 0) return;
+            var status = stitcher.Stitch(mats, pano);
+            dst3.SetTo(0);
+            if (status == Stitcher.Status.OK)
+            {
+                int w = pano.Width, h = pano.Height;
+                if (w > dst2.Width) w = dst2.Width;
+                if (h > dst2.Height) h = dst2.Height;
+                pano.CopyTo(dst3[new cv.Rect(0, 0, w, h)]);
+            }
+            else
+            {
+                if (status == Stitcher.Status.ErrorNeedMoreImgs) SetTrueText("Need more images", 3);
+            }
+        }
+    }
+    public class CS_Structured_LinearizeFloor : CS_Parent
+    {
+        public Structured_FloorCeiling floor = new Structured_FloorCeiling();
+        Kalman_VB_Basics kalman = new Kalman_VB_Basics();
+        public Mat sliceMask;
+        public float floorYPlane;
+        Options_StructuredFloor options = new Options_StructuredFloor();
+        public CS_Structured_LinearizeFloor(VBtask task) : base(task)
+        {
+            desc = "Using the mask for the floor create a better representation of the floor plane";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            floor.Run(src);
+            dst2 = floor.dst2;
+            dst3 = floor.dst3;
+            sliceMask = floor.slice.sliceMask;
+            Mat imuPC = task.pointCloud.Clone();
+            imuPC.SetTo(0, ~sliceMask);
+            if (Cv2.CountNonZero(sliceMask) > 0)
+            {
+                Mat[] split = imuPC.Split();
+                if (options.xCheck)
+                {
+                    mmData mm = GetMinMax(split[0], sliceMask);
+                    int firstCol = 0, lastCol = 0;
+                    for (firstCol = 0; firstCol < sliceMask.Width; firstCol++)
+                    {
+                        if (Cv2.CountNonZero(sliceMask.Col(firstCol)) > 0) break;
+                    }
+                    for (lastCol = sliceMask.Width - 1; lastCol >= 0; lastCol--)
+                    {
+                        if (Cv2.CountNonZero(sliceMask.Col(lastCol)) > 0) break;
+                    }
+                    float xIncr = (float)((mm.maxVal - mm.minVal) / (lastCol - firstCol));
+                    for (int i = firstCol; i <= lastCol; i++)
+                    {
+                        Mat maskCol = sliceMask.Col(i);
+                        if (Cv2.CountNonZero(maskCol) > 0)
+                            split[0].Col(i).SetTo(mm.minVal + xIncr * i, maskCol);
+                    }
+                }
+                if (options.yCheck)
+                {
+                    mmData mm = GetMinMax(split[1], sliceMask);
+                    kalman.kInput = (float)((mm.minVal + mm.maxVal) / 2);
+                    kalman.Run(src);
+                    floorYPlane = kalman.kAverage;
+                    split[1].SetTo(floorYPlane, sliceMask);
+                }
+                if (options.zCheck)
+                {
+                    int firstRow = 0, lastRow = 0;
+                    for (firstRow = 0; firstRow < sliceMask.Height; firstRow++)
+                    {
+                        if (Cv2.CountNonZero(sliceMask.Row(firstRow)) > 20) break;
+                    }
+                    for (lastRow = sliceMask.Height - 1; lastRow >= 0; lastRow--)
+                    {
+                        if (Cv2.CountNonZero(sliceMask.Row(lastRow)) > 20) break;
+                    }
+                    if (lastRow >= 0 && firstRow < sliceMask.Height)
+                    {
+                        Scalar meanMin = split[2].Row(lastRow).Mean(sliceMask.Row(lastRow));
+                        Scalar meanMax = split[2].Row(firstRow).Mean(sliceMask.Row(firstRow));
+                        float zIncr = (float)(meanMax[0] - meanMin[0]) / Math.Abs(lastRow - firstRow);
+                        for (int i = firstRow; i <= lastRow; i++)
+                        {
+                            Mat maskRow = sliceMask.Row(i);
+                            Scalar mean = split[2].Row(i).Mean(maskRow);
+                            if (Cv2.CountNonZero(maskRow) > 0)
+                            {
+                                split[2].Row(i).SetTo(mean[0]);
+                            }
+                        }
+                        DrawLine(dst2, new cv.Point(0, firstRow), new cv.Point(dst2.Width, firstRow), Scalar.Yellow, task.lineWidth + 1);
+                        DrawLine(dst2, new cv.Point(0, lastRow), new cv.Point(dst2.Width, lastRow), Scalar.Yellow, task.lineWidth + 1);
+                    }
+                }
+                Cv2.Merge(split, imuPC);
+                imuPC.CopyTo(task.pointCloud, sliceMask);
+            }
+        }
+    }
+    public class CS_Structured_MultiSlice : CS_Parent
+    {
+        public HeatMap_Basics heat = new HeatMap_Basics();
+        public Mat sliceMask;
+        public Mat[] split;
+        public Options_Structured options = new Options_Structured();
+        public CS_Structured_MultiSlice(VBtask task) : base(task)
+        {
+            desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int stepSize = options.stepSize;
+            heat.Run(src);
+            split = task.pointCloud.Split();
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            for (int xCoordinate = 0; xCoordinate < src.Width; xCoordinate += stepSize)
+            {
+                float planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X;
+                if (xCoordinate > task.topCameraPoint.X) planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X);
+                Mat depthMask = new Mat();
+                double minVal, maxVal;
+                minVal = planeX - task.metersPerPixel;
+                maxVal = planeX + task.metersPerPixel;
+                Cv2.InRange(split[0].Clone(), minVal, maxVal, depthMask);
+                sliceMask = depthMask;
+                if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, task.noDepthMask);
+                dst3.SetTo(255, sliceMask);
+            }
+            for (int yCoordinate = 0; yCoordinate < src.Height; yCoordinate += stepSize)
+            {
+                float planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y;
+                if (yCoordinate > task.sideCameraPoint.Y) planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y);
+                Mat depthMask = new Mat();
+                double minVal, maxVal;
+                minVal = planeY - task.metersPerPixel;
+                maxVal = planeY + task.metersPerPixel;
+                Cv2.InRange(split[1].Clone(), minVal, maxVal, depthMask);
+                Mat tmp = depthMask;
+                sliceMask = tmp | sliceMask;
+                dst3.SetTo(255, sliceMask);
+            }
+            dst2 = task.color.Clone();
+            dst2.SetTo(Scalar.White, dst3);
+        }
+    }
+    public class CS_Structured_MultiSliceLines : CS_Parent
+    {
+        Structured_MultiSlice multi = new Structured_MultiSlice();
+        public Line_Basics lines = new Line_Basics();
+        public CS_Structured_MultiSliceLines(VBtask task) : base(task)
+        {
+            desc = "Detect lines in the multiSlice output";
+        }
+        public void RunCS(Mat src)
+        {
+            multi.Run(src);
+            dst3 = multi.dst3;
+            lines.Run(dst3);
+            dst2 = lines.dst2;
+        }
+    }
+    public class CS_Structured_Depth : CS_Parent
+    {
+        Structured_SliceH sliceH = new Structured_SliceH();
+        public CS_Structured_Depth(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "", "Use mouse to explore slices", "Top down view of the highlighted slice (at left)" };
+            desc = "Use the structured depth to enhance the depth away from the centerline.";
+        }
+        public void RunCS(Mat src)
+        {
+            sliceH.Run(src);
+            dst0 = sliceH.dst3;
+            dst2 = sliceH.dst2;
+            Mat mask = sliceH.sliceMask;
+            float perMeter = dst3.Height / task.MaxZmeters;
+            dst3.SetTo(0);
+            Vec3b white = new Vec3b(255, 255, 255);
+            for (int y = 0; y < mask.Height; y++)
+            {
+                for (int x = 0; x < mask.Width; x++)
+                {
+                    byte val = mask.Get<byte>(y, x);
+                    if (val > 0)
+                    {
+                        float depth = task.pcSplit[2].Get<float>(y, x);
+                        int row = dst1.Height - (int)(depth * perMeter);
+                        dst3.Set<Vec3b>(row < 0 ? 0 : row, x, white);
+                    }
+                }
+            }
+        }
+    }
+    public class CS_Structured_Rebuild : CS_Parent
+    {
+        HeatMap_Basics heat = new HeatMap_Basics();
+        Options_Structured options = new Options_Structured();
+        float thickness;
+        public Mat pointcloud = new Mat();
+        public CS_Structured_Rebuild(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "X values in point cloud", "Y values in point cloud" };
+            desc = "Rebuild the point cloud using inrange - not useful yet";
+        }
+        Mat rebuildX(Mat viewX)
+        {
+            Mat output = new Mat(task.pcSplit[1].Size(), MatType.CV_32F, 0);
+            int firstCol;
+            for (firstCol = 0; firstCol < viewX.Width; firstCol++)
+            {
+                if (viewX.Col(firstCol).CountNonZero() > 0) break;
+            }
+            int lastCol;
+            for (lastCol = viewX.Height - 1; lastCol >= 0; lastCol--)
+            {
+                if (viewX.Row(lastCol).CountNonZero() > 0) break;
+            }
+            Mat sliceMask = new Mat();
+            for (int i = firstCol; i <= lastCol; i++)
+            {
+                float planeX = -task.xRange * (task.topCameraPoint.X - i) / task.topCameraPoint.X;
+                if (i > task.topCameraPoint.X) planeX = task.xRange * (i - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X);
+                Cv2.InRange(task.pcSplit[0], planeX - thickness, planeX + thickness, sliceMask);
+                output.SetTo(planeX, sliceMask);
+            }
+            return output;
+        }
+        Mat rebuildY(Mat viewY)
+        {
+            Mat output = new Mat(task.pcSplit[1].Size(), MatType.CV_32F, 0);
+            int firstLine;
+            for (firstLine = 0; firstLine < viewY.Height; firstLine++)
+            {
+                if (viewY.Row(firstLine).CountNonZero() > 0) break;
+            }
+            int lastLine;
+            for (lastLine = viewY.Height - 1; lastLine >= 0; lastLine--)
+            {
+                if (viewY.Row(lastLine).CountNonZero() > 0) break;
+            }
+            Mat sliceMask = new Mat();
+            for (int i = firstLine; i <= lastLine; i++)
+            {
+                float planeY = -task.yRange * (task.sideCameraPoint.Y - i) / task.sideCameraPoint.Y;
+                if (i > task.sideCameraPoint.Y) planeY = task.yRange * (i - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y);
+                Cv2.InRange(task.pcSplit[1], planeY - thickness, planeY + thickness, sliceMask);
+                output.SetTo(planeY, sliceMask);
+            }
+            return output;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            float metersPerPixel = task.MaxZmeters / dst3.Height;
+            thickness = options.sliceSize * metersPerPixel;
+            heat.Run(src);
+            if (options.rebuilt)
+            {
+                task.pcSplit[0] = rebuildX(heat.dst3.CvtColor(ColorConversionCodes.BGR2GRAY));
+                task.pcSplit[1] = rebuildY(heat.dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
+                Cv2.Merge(task.pcSplit, pointcloud);
+            }
+            else
+            {
+                task.pcSplit = task.pointCloud.Split();
+                pointcloud = task.pointCloud;
+            }
+            dst2 = GetNormalize32f(task.pcSplit[0]);
+            dst3 = GetNormalize32f(task.pcSplit[1]);
+            dst2.SetTo(0, task.noDepthMask);
+            dst3.SetTo(0, task.noDepthMask);
+        }
+    }
+    public class CS_Structured_Cloud2 : CS_Parent
+    {
+        Pixel_Measure mmPixel = new Pixel_Measure();
+        Options_StructuredCloud options = new Options_StructuredCloud();
+        public CS_Structured_Cloud2(VBtask task) : base(task)
+        {
+            desc = "Attempt to impose a structure on the point cloud data.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Mat input = src;
+            if (input.Type() != MatType.CV_32F) input = task.pcSplit[2];
+            float stepX = dst2.Width / options.xLines;
+            float stepY = dst2.Height / options.yLines;
+            dst3 = new Mat(dst2.Size(), MatType.CV_32FC3, 0);
+            float midX = dst2.Width / 2;
+            float midY = dst2.Height / 2;
+            float halfStepX = stepX / 2;
+            float halfStepy = stepY / 2;
+            for (int y = 1; y < options.yLines - 1; y++)
+            {
+                for (int x = 1; x < options.xLines - 1; x++)
+                {
+                    Point2f p1 = new Point2f(x * stepX, y * stepY);
+                    Point2f p2 = new Point2f((x + 1) * stepX, y * stepY);
+                    float d1 = task.pcSplit[2].Get<float>((int)p1.Y, (int)p1.X);
+                    float d2 = task.pcSplit[2].Get<float>((int)p2.Y, (int)p2.X);
+                    if (stepX * options.threshold > Math.Abs(d1 - d2) && d1 > 0 && d2 > 0)
+                    {
+                        Vec3f p = task.pointCloud.Get<Vec3f>((int)p1.Y, (int)p1.X);
+                        float mmPP = mmPixel.Compute(d1);
+                        if (options.xConstraint)
+                        {
+                            p[0] = (p1.X - midX) * mmPP;
+                            if (p1.X == midX) p[0] = mmPP;
+                        }
+                        if (options.yConstraint)
+                        {
+                            p[1] = (p1.Y - midY) * mmPP;
+                            if (p1.Y == midY) p[1] = mmPP;
+                        }
+                        cv.Rect r = new cv.Rect((int)(p1.X - halfStepX), (int)(p1.Y - halfStepy), (int)stepX, (int)stepY);
+                        Scalar meanVal = Cv2.Mean(task.pcSplit[2][r], task.depthMask[r]);
+                        p[2] = (d1 + d2) / 2;
+                        dst3.Set<Vec3f>(y, x, p);
+                    }
+                }
+            }
+            dst2 = dst3[new cv.Rect(0, 0, options.xLines, options.yLines)].Resize(dst2.Size(), 0, 0, InterpolationFlags.Nearest);
+        }
+    }
+    public class CS_Structured_Cloud : CS_Parent
+    {
+        public Options_StructuredCloud options = new Options_StructuredCloud();
+        public CS_Structured_Cloud(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(10);
+            desc = "Attempt to impose a linear structure on the pointcloud.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int yLines = (int)(options.xLines * dst2.Height / dst2.Width);
+            float stepX = dst3.Width / options.xLines;
+            float stepY = dst3.Height / yLines;
+            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            for (int y = 0; y < yLines; y++)
+            {
+                for (int x = 0; x < options.xLines; x++)
+                {
+                    cv.Rect r = new cv.Rect((int)(x * stepX), (int)(y * stepY), (int)(stepX - 1), (int)(stepY - 1));
+                    cv.Point p1 = new cv.Point(r.X, r.Y);
+                    cv.Point p2 = new cv.Point(r.X + r.Width, r.Y + r.Height);
+                    Vec3f vec1 = task.pointCloud.Get<Vec3f>(p1.Y, p1.X);
+                    Vec3f vec2 = task.pointCloud.Get<Vec3f>(p2.Y, p2.X);
+                    if (vec1[2] > 0 && vec2[2] > 0) dst2[r].SetTo(vec1);
+                }
+            }
+            labels[2] = "CS_Structured_Cloud with " + yLines.ToString() + " rows " + options.xLines.ToString() + " columns";
+        }
+    }
+    public class CS_Structured_ROI : CS_Parent
+    {
+        public Mat data = new Mat();
+        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public CS_Structured_ROI(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(10);
+            desc = "Simplify the point cloud so it can be represented as quads in OpenGL";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            foreach (var roi in task.gridList)
+            {
+                Scalar d = task.pointCloud[roi].Mean(task.depthMask[roi]);
+                Vec3f depth = new Vec3f((float)d.Val0, (float)d.Val1, (float)d.Val2);
+                cv.Point pt = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
+                Vec3f vec = task.pointCloud.Get<Vec3f>(pt.Y, pt.X);
+                if (vec[2] > 0) dst2[roi].SetTo(depth);
+            }
+            labels[2] = traceName + " with " + task.gridList.Count().ToString() + " regions was created";
+        }
+    }
+    public class CS_Structured_Tiles : CS_Parent
+    {
+        public List<Vec3f> oglData = new List<Vec3f>();
+        RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_Structured_Tiles(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(10);
+            desc = "Use the OpenGL point size to represent the point cloud as data";
+        }
+        public void RunCS(Mat src)
+        {
+            hulls.Run(src);
+            dst2 = hulls.dst3;
+            dst3.SetTo(0);
+            oglData.Clear();
+            foreach (var roi in task.gridList)
+            {
+                Vec3b c = dst2.Get<Vec3b>(roi.Y, roi.X);
+                if (c == black) continue;
+                oglData.Add(new Vec3f(c[2] / 255f, c[1] / 255f, c[0] / 255f));
+                Scalar v = task.pointCloud[roi].Mean(task.depthMask[roi]);
+                oglData.Add(new Vec3f((float)v.Val0, (float)v.Val1, (float)v.Val2));
+                dst3[roi].SetTo(c);
+            }
+            labels[2] = traceName + " with " + task.gridList.Count().ToString() + " regions was created";
+        }
+    }
+    public class CS_Structured_CountTop : CS_Parent
+    {
+        Structured_SliceV slice = new Structured_SliceV();
+        Plot_Histogram plot = new Plot_Histogram();
+        List<float> counts = new List<float>();
+        public CS_Structured_CountTop(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice" };
+            desc = "Count the number of pixels found in each slice of the point cloud data.";
+        }
+        Mat makeXSlice(int index)
+        {
+            Mat sliceMask = new Mat();
+            double planeX = -task.xRange * (task.topCameraPoint.X - index) / task.topCameraPoint.X;
+            if (index > task.topCameraPoint.X) planeX = task.xRange * (index - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X);
+            double minVal = planeX - task.metersPerPixel;
+            double maxVal = planeX + task.metersPerPixel;
+            Cv2.InRange(task.pcSplit[0].Clone(), minVal, maxVal, sliceMask);
+            if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, task.noDepthMask); // don't include zero depth locations
+            counts.Add(sliceMask.CountNonZero());
+            return sliceMask;
+        }
+        public void RunCS(Mat src)
+        {
+            slice.Run(src);
+            dst1 = slice.dst3.Clone();
+            counts.Clear();
+            for (int i = 0; i <= dst2.Width - 1; i++)
+            {
+                makeXSlice(i);
+            }
+            float max = counts.Max();
+            int index = counts.IndexOf(max);
+            dst0 = makeXSlice(index);
+            dst2 = task.color.Clone();
+            dst2.SetTo(Scalar.White, dst0);
+            dst1.Line(new cv.Point(index, 0), new cv.Point(index, dst1.Height), Scalar.Red, slice.options.sliceSize);
+            Mat hist = new Mat(dst0.Width, 1, MatType.CV_32F, counts.ToArray());
+            plot.Run(hist);
+            dst3 = plot.dst2;
+        }
+    }
+
+    public class CS_Structured_FeatureLines : CS_Parent
+    {
+        Structured_MultiSlice mStruct = new Structured_MultiSlice();
+        FeatureLine_Finder lines = new FeatureLine_Finder();
+        public CS_Structured_FeatureLines(VBtask task) : base(task)
+        {
+            desc = "Find the lines in the Structured_MultiSlice algorithm output";
+        }
+        public void RunCS(Mat src)
+        {
+            mStruct.Run(src);
+            dst2 = mStruct.dst2;
+            lines.Run(mStruct.dst2);
+            dst3 = src.Clone();
+            for (int i = 0; i <= lines.lines2D.Count() - 1; i += 2)
+            {
+                cv.Point2f p1 = lines.lines2D[i];
+                cv.Point2f p2 = lines.lines2D[i + 1];
+                DrawLine(dst3, p1, p2, Scalar.Yellow, task.lineWidth);
+            }
+        }
+    }
+    public class CS_Structured_FloorCeiling : CS_Parent
+    {
+        public Structured_SliceEither slice = new Structured_SliceEither();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_Structured_FloorCeiling(VBtask task) : base(task)
+        {
+            Array.Resize(ref kalman.kInput, 2);
+            FindCheckBox("Top View (Unchecked Side View)").Checked = false;
+            desc = "Find the floor or ceiling plane";
+        }
+        public void RunCS(Mat src)
+        {
+            slice.Run(src);
+            dst2 = slice.heat.dst3;
+            double floorMax = 0;
+            int floorY = 0;
+            int floorBuffer = dst2.Height / 4;
+            for (int i = dst2.Height - 1; i >= 0; i--)
+            {
+                double nextSum = slice.heat.dst3.Row(i).Sum()[0];
+                if (nextSum > 0) floorBuffer -= 1;
+                if (floorBuffer == 0) break;
+                if (nextSum > floorMax)
+                {
+                    floorMax = nextSum;
+                    floorY = i;
+                }
+            }
+            double ceilingMax = 0;
+            int ceilingY = 0;
+            int ceilingBuffer = dst2.Height / 4;
+            for (int i = 0; i < dst3.Height; i++)
+            {
+                double nextSum = slice.heat.dst3.Row(i).Sum()[0];
+                if (nextSum > 0) ceilingBuffer -= 1;
+                if (ceilingBuffer == 0) break;
+                if (nextSum > ceilingMax)
+                {
+                    ceilingMax = nextSum;
+                    ceilingY = i;
+                }
+            }
+            kalman.kInput[0] = floorY;
+            kalman.kInput[1] = ceilingY;
+            kalman.Run(src);
+            labels[2] = "Current slice is at row =" + task.mouseMovePoint.Y.ToString();
+            labels[3] = "Ceiling is at row =" + ((int)kalman.kOutput[1]).ToString() + " floor at y=" + ((int)kalman.kOutput[0]).ToString();
+            DrawLine(dst2, new cv.Point(0, floorY), new cv.Point(dst2.Width, floorY), Scalar.Yellow);
+            SetTrueText("floor", new cv.Point(10, floorY + task.DotSize), 3);
+            cv.Rect rect = new cv.Rect(0, Math.Max(ceilingY - 5, 0), dst2.Width, 10);
+            Mat mask = slice.heat.dst3[rect];
+            Scalar mean, stdev;
+            Cv2.MeanStdDev(mask, out mean, out stdev);
+            if (mean[0] < mean[2])
+            {
+                DrawLine(dst2, new cv.Point(0, ceilingY), new cv.Point(dst2.Width, ceilingY), Scalar.Yellow);
+                SetTrueText("ceiling", new cv.Point(10, ceilingY + task.DotSize), 3);
+            }
+            else
+            {
+                SetTrueText("Ceiling does not appear to be present", 3);
+            }
+        }
+    }
+    public class CS_Structured_MultiSliceH : CS_Parent
+    {
+        public HeatMap_Basics heat = new HeatMap_Basics();
+        public Mat sliceMask;
+        Options_Structured options = new Options_Structured();
+        public CS_Structured_MultiSliceH(VBtask task) : base(task)
+        {
+            FindCheckBox("Top View (Unchecked Side View)").Checked = false;
+            desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int stepsize = options.stepSize;
+            heat.Run(src);
+            dst3 = heat.dst3;
+            sliceMask = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            for (int yCoordinate = 0; yCoordinate <= src.Height - 1; yCoordinate += stepsize)
+            {
+                double planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y;
+                if (yCoordinate > task.sideCameraPoint.Y) planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y);
+                Mat depthMask = new Mat();
+                double minVal, maxVal;
+                minVal = planeY - task.metersPerPixel;
+                maxVal = planeY + task.metersPerPixel;
+                Cv2.InRange(task.pcSplit[1].Clone(), minVal, maxVal, depthMask);
+                sliceMask.SetTo(255, depthMask);
+                if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, task.noDepthMask);
+            }
+            dst2 = task.color.Clone();
+            dst2.SetTo(Scalar.White, sliceMask);
+            labels[3] = heat.labels[3];
+        }
+    }
+    public class CS_Structured_MultiSliceV : CS_Parent
+    {
+        public HeatMap_Basics heat = new HeatMap_Basics();
+        Options_Structured options = new Options_Structured();
+        public CS_Structured_MultiSliceV(VBtask task) : base(task)
+        {
+            FindCheckBox("Top View (Unchecked Side View)").Checked = true;
+            desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int stepsize = options.stepSize;
+            heat.Run(src);
+            dst3 = heat.dst2;
+            Mat sliceMask = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            for (int xCoordinate = 0; xCoordinate <= src.Width - 1; xCoordinate += stepsize)
+            {
+                double planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X;
+                if (xCoordinate > task.topCameraPoint.X) planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X);
+                Mat depthMask = new Mat();
+                double minVal, maxVal;
+                minVal = planeX - task.metersPerPixel;
+                maxVal = planeX + task.metersPerPixel;
+                Cv2.InRange(task.pcSplit[0].Clone(), minVal, maxVal, depthMask);
+                sliceMask.SetTo(255, depthMask);
+                if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, task.noDepthMask);
+            }
+            dst2 = task.color.Clone();
+            dst2.SetTo(Scalar.White, sliceMask);
+            labels[3] = heat.labels[3];
+        }
+    }
+    public class CS_Structured_SliceXPlot : CS_Parent
+    {
+        Structured_MultiSlice multi = new Structured_MultiSlice();
+        Options_Structured options = new Options_Structured();
+        public CS_Structured_SliceXPlot(VBtask task) : base(task)
+        {
+            desc = "Find any plane around a peak value in the top-down histogram";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            multi.Run(src);
+            dst3 = multi.heat.dst2;
+            int col = (task.mouseMovePoint.X == 0) ? dst2.Width / 2 : task.mouseMovePoint.X;
+            cv.Rect rect = new cv.Rect(col, 0, (col + options.sliceSize >= dst3.Width) ? dst3.Width - col : options.sliceSize, dst3.Height - 1);
+            mmData mm = GetMinMax(multi.heat.topframes.dst2[rect]);
+            DrawCircle(dst3, new cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, Scalar.Yellow);
+            dst2 = task.color.Clone();
+            double filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters;
+            if (filterZ > 0)
+            {
+                Mat depthMask = multi.split[2].InRange(filterZ - 0.05, filterZ + 0.05); // a 10 cm buffer surrounding the z value
+                depthMask = multi.sliceMask & depthMask;
+                dst2.SetTo(Scalar.White, depthMask);
+            }
+            labels[3] = "Peak histogram count (" + mm.maxVal.ToString("F0") + ") at " + filterZ.ToString("F2") + " meters +-" + (5 / dst2.Height / task.MaxZmeters).ToString("F2") + " m";
+            SetTrueText("Use the mouse to move the yellow dot above.", new cv.Point(10, dst2.Height * 7 / 8), 3);
+        }
+    }
+    public class CS_Structured_SliceYPlot : CS_Parent
+    {
+        Structured_MultiSlice multi = new Structured_MultiSlice();
+        Options_Structured options = new Options_Structured();
+        public CS_Structured_SliceYPlot(VBtask task) : base(task)
+        {
+            desc = "Find any plane around a peak value in the side view histogram";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            multi.Run(src);
+            dst3 = multi.heat.dst3;
+            int row = task.mouseMovePoint.Y == 0 ? dst2.Height / 2 : task.mouseMovePoint.Y;
+            cv.Rect rect = new cv.Rect(0, row, dst3.Width - 1, row + options.sliceSize >= dst3.Height ? dst3.Height - row : options.sliceSize);
+            mmData mm = GetMinMax(multi.heat.sideframes.dst2[rect]);
+            if (mm.maxVal > 0)
+            {
+                DrawCircle(dst3, new cv.Point(mm.maxLoc.X, row), task.DotSize + 3, Scalar.Yellow);
+                // dst3.Line(new cv.Point(mm.maxLoc.X, 0), new cv.Point(mm.maxLoc.X, dst3.Height), task.HighlightColor, task.lineWidth, task.lineType);
+                double filterZ = mm.maxLoc.X / (double)dst3.Width * task.MaxZmeters;
+                Mat depthMask = multi.split[2].InRange(filterZ - 0.05, filterZ + 0.05); // a 10 cm buffer surrounding the z value
+                dst2 = task.color.Clone();
+                dst2.SetTo(Scalar.White, depthMask);
+                double pixelsPerMeter = (double)dst2.Width / task.MaxZmeters;
+                labels[3] = $"Peak histogram count ({mm.maxVal.ToString(fmt0)}) at {filterZ.ToString(fmt2)} meters ±{(5 / pixelsPerMeter).ToString(fmt2)} m";
+            }
+            SetTrueText("Use the mouse to move the yellow dot above.", new cv.Point(10, dst2.Height * 7 / 8), 3);
+        }
+    }
+    public class CS_Structured_MouseSlice : CS_Parent
+    {
+        Structured_SliceEither slice = new Structured_SliceEither();
+        Line_Basics lines = new Line_Basics();
+        public CS_Structured_MouseSlice(VBtask task) : base(task)
+        {
+            labels[2] = "Center Slice in yellow";
+            labels[3] = "White = SliceV output, Red Dot is avgPt";
+            desc = "Find the vertical center line with accurate depth data.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.mouseMovePoint == new cv.Point()) task.mouseMovePoint = new cv.Point(dst2.Width / 2, dst2.Height);
+            slice.Run(src);
+            lines.Run(slice.sliceMask);
+            List<int> tops = new List<int>();
+            List<int> bots = new List<int>();
+            List<cv.Point> topsList = new List<cv.Point>();
+            List<cv.Point> botsList = new List<cv.Point>();
+            if (lines.lpList.Count() > 0)
+            {
+                dst3 = lines.dst2;
+                foreach (var lp in lines.lpList)
+                {
+                    DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor, task.lineWidth + 3);
+                    if (lp.p1.Y < lp.p2.Y) tops.Add((int)lp.p1.Y); else tops.Add((int)lp.p2.Y);
+                    if (lp.p1.Y > lp.p2.Y) bots.Add((int)lp.p1.Y); else bots.Add((int)lp.p2.Y);
+                    topsList.Add(new cv.Point(lp.p1.X, lp.p1.Y));
+                    botsList.Add(new cv.Point(lp.p2.X, lp.p2.Y));
+                }
+            }
+            if (standaloneTest())
+            {
+                dst2 = src;
+                dst2.SetTo(Scalar.White, dst3);
+            }
+        }
+    }
+    public class CS_Structured_SliceEither : CS_Parent
+    {
+        public HeatMap_Basics heat = new HeatMap_Basics();
+        public Mat sliceMask = new Mat();
+        Options_Structured options = new Options_Structured();
+        public CS_Structured_SliceEither(VBtask task) : base(task)
+        {
+            FindCheckBox("Top View (Unchecked Side View)").Checked = false;
+            desc = "Create slices in top and side views";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            bool topView = FindCheckBox("Top View (Unchecked Side View)").Checked;
+            int sliceVal = topView ? task.mouseMovePoint.X : task.mouseMovePoint.Y;
+            heat.Run(src);
+            double minVal, maxVal;
+            if (topView)
+            {
+                double planeX = -task.xRange * (task.topCameraPoint.X - sliceVal) / task.topCameraPoint.X;
+                if (sliceVal > task.topCameraPoint.X) planeX = task.xRange * (sliceVal - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X);
+                minVal = planeX - task.metersPerPixel;
+                maxVal = planeX + task.metersPerPixel;
+                sliceMask = task.pcSplit[0].InRange(minVal, maxVal);
+            }
+            else
+            {
+                double planeY = -task.yRange * (task.sideCameraPoint.Y - sliceVal) / task.sideCameraPoint.Y;
+                if (sliceVal > task.sideCameraPoint.Y) planeY = task.yRange * (sliceVal - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y);
+                minVal = planeY - task.metersPerPixel;
+                maxVal = planeY + task.metersPerPixel;
+                sliceMask = task.pcSplit[1].InRange(minVal, maxVal);
+            }
+            if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, task.noDepthMask);
+            double w = Math.Abs(maxVal - minVal) * 100;
+            labels[2] = $"At offset {sliceVal} x = {((maxVal + minVal) / 2).ToString(fmt2)} with {w.ToString(fmt2)} cm width";
+            labels[3] = heat.labels[3];
+            dst3 = heat.dst3;
+            DrawCircle(dst3, new cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize, Scalar.Yellow);
+            if (topView)
+            {
+                dst3.Line(new cv.Point(sliceVal, 0), new cv.Point(sliceVal, dst3.Height), Scalar.Yellow, task.lineWidth);
+            }
+            else
+            {
+                int yPlaneOffset = sliceVal < dst3.Height - options.sliceSize ? sliceVal : dst3.Height - options.sliceSize - 1;
+                dst3.Line(new cv.Point(0, yPlaneOffset), new cv.Point(dst3.Width, yPlaneOffset), Scalar.Yellow, options.sliceSize);
+            }
+            if (standaloneTest())
+            {
+                dst2 = src;
+                dst2.SetTo(Scalar.White, sliceMask);
+            }
+        }
+    }
+    public class CS_Structured_TransformH : CS_Parent
+    {
+        Options_Structured options = new Options_Structured();
+        Projection_HistTop histTop = new Projection_HistTop();
+        public CS_Structured_TransformH(VBtask task) : base(task)
+        {
+            labels[3] = "Top down view of the slice of the point cloud";
+            desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram.";
+        }
+        public Mat createSliceMaskH()
+        {
+            options.RunVB();
+            Mat sliceMask = new Mat();
+            int ycoordinate = task.mouseMovePoint.Y == 0 ? dst2.Height / 2 : task.mouseMovePoint.Y;
+            double planeY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y;
+            if (ycoordinate > task.sideCameraPoint.Y) planeY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y);
+            double thicknessMeters = options.sliceSize * task.metersPerPixel;
+            double minVal = planeY - thicknessMeters;
+            double maxVal = planeY + thicknessMeters;
+            Cv2.InRange(task.pcSplit[1], minVal, maxVal, sliceMask);
+            double w = Math.Abs(maxVal - minVal) * 100;
+            labels[2] = $"At offset {ycoordinate} y = {((maxVal + minVal) / 2).ToString(fmt2)} with {w.ToString(fmt2)} cm width";
+            if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, task.noDepthMask);
+            return sliceMask;
+        }
+        public void RunCS(Mat src)
+        {
+            Mat sliceMask = createSliceMaskH();
+            histTop.Run(task.pointCloud.SetTo(0, ~sliceMask));
+            dst3 = histTop.dst2;
+            if (standaloneTest())
+            {
+                dst2 = src;
+                dst2.SetTo(Scalar.White, sliceMask);
+            }
+        }
+    }
+    public class CS_Structured_TransformV : CS_Parent
+    {
+        Options_Structured options = new Options_Structured();
+        Projection_HistSide histSide = new Projection_HistSide();
+        public CS_Structured_TransformV(VBtask task) : base(task)
+        {
+            labels[3] = "Side view of the slice of the point cloud";
+            desc = "Find and isolate planes using the top view histogram data";
+        }
+        public Mat createSliceMaskV()
+        {
+            options.RunVB();
+            Mat sliceMask = new Mat();
+            if (task.mouseMovePoint == new cv.Point()) task.mouseMovePoint = new cv.Point(dst2.Width / 2, dst2.Height);
+            int xCoordinate = task.mouseMovePoint.X == 0 ? dst2.Width / 2 : task.mouseMovePoint.X;
+            double planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X;
+            if (xCoordinate > task.topCameraPoint.X) planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X);
+            double thicknessMeters = options.sliceSize * task.metersPerPixel;
+            double minVal = planeX - thicknessMeters;
+            double maxVal = planeX + thicknessMeters;
+            Cv2.InRange(task.pcSplit[0], minVal, maxVal, sliceMask);
+            double w = Math.Abs(maxVal - minVal) * 100;
+            labels[2] = $"At offset {xCoordinate} x = {((maxVal + minVal) / 2).ToString(fmt2)} with {w.ToString(fmt2)} cm width";
+            if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, task.noDepthMask);
+            return sliceMask;
+        }
+        public void RunCS(Mat src)
+        {
+            Mat sliceMask = createSliceMaskV();
+            histSide.Run(task.pointCloud.SetTo(0, ~sliceMask));
+            dst3 = histSide.dst2;
+            if (standaloneTest())
+            {
+                dst2 = src;
+                dst2.SetTo(Scalar.White, sliceMask);
+            }
+        }
+    }
+    public class CS_Structured_CountSide : CS_Parent
+    {
+        Structured_SliceH slice = new Structured_SliceH();
+        Plot_Histogram plot = new Plot_Histogram();
+        Rotate_Basics rotate = new Rotate_Basics();
+        public List<float> counts = new List<float>();
+        public int maxCountIndex;
+        public List<float> yValues = new List<float>();
+        public CS_Structured_CountSide(VBtask task) : base(task)
+        {
+            rotate.rotateCenter = new cv.Point((int)(dst2.Width / 2), (int)(dst2.Width / 2));
+            rotate.rotateAngle = -90;
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice" };
+            desc = "Count the number of pixels found in each slice of the point cloud data.";
+        }
+        public void RunCS(Mat src)
+        {
+            slice.Run(src);
+            dst2 = slice.dst3;
+            counts.Clear();
+            yValues.Clear();
+            for (int i = 0; i <= dst2.Height - 1; i++)
+            {
+                float planeY = task.yRange * (i - task.sideCameraPoint.Y) / task.sideCameraPoint.Y;
+                float minVal = planeY - task.metersPerPixel, maxVal = planeY + task.metersPerPixel;
+                Mat sliceMask = task.pcSplit[1].InRange(minVal, maxVal);
+                if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, task.noDepthMask); // don't include zero depth locations
+                counts.Add(sliceMask.CountNonZero());
+                yValues.Add(planeY);
+            }
+            float max = counts.Max();
+            maxCountIndex = counts.IndexOf(max);
+            dst2.Line(new cv.Point(0, maxCountIndex), new cv.Point(dst2.Width, maxCountIndex), Scalar.Red, slice.options.sliceSize);
+            Mat hist = new Mat(dst0.Height, 1, MatType.CV_32F, counts.ToArray());
+            plot.dst2 = new Mat(dst2.Height, dst2.Height, MatType.CV_8UC3, 0);
+            plot.Run(hist);
+            dst3 = plot.dst2;
+            dst3 = dst3.Resize(new cv.Size(dst2.Width, dst2.Width));
+            rotate.Run(dst3);
+            dst3 = rotate.dst2;
+            SetTrueText("Max flat surface at: " + "\n" + string.Format(fmt3, yValues[maxCountIndex]), 2);
+        }
+    }
+    public class CS_Structured_CountSideSum : CS_Parent
+    {
+        public List<float> counts = new List<float>();
+        public int maxCountIndex;
+        public List<float> yValues = new List<float>();
+        public CS_Structured_CountSideSum(VBtask task) : base(task)
+        {
+            task.redOptions.setProjection(task.redOptions.getProjection() + 50); // to get the point cloud into the histogram.
+            labels = new string[] { "", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice" };
+            desc = "Count the number of points found in each slice of the point cloud data.";
+        }
+        public void RunCS(Mat src)
+        {
+            Cv2.CalcHist(new Mat[] { task.pointCloud }, task.channelsSide, new Mat(), dst2, 2, task.bins2D, task.rangesSide);
+            dst2.Col(0).SetTo(0);
+            counts.Clear();
+            yValues.Clear();
+            float ratio = task.yRange / task.yRangeDefault;
+            for (int i = 0; i <= dst2.Height - 1; i++)
+            {
+                float planeY = task.yRange * (i - task.sideCameraPoint.Y) / task.sideCameraPoint.Y;
+                counts.Add((float)dst2.Row(i).Sum()[0]);
+                yValues.Add(planeY * ratio);
+            }
+            dst2 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            float max = counts.Max();
+            if (max == 0) return;
+            List<float> surfaces = new List<float>();
+            for (int i = 0; i < counts.Count(); i++)
+            {
+                if (counts[i] >= max / 2)
+                {
+                    DrawLine(dst2, new cv.Point(0, i), new cv.Point(dst2.Width, i), Scalar.White);
+                    surfaces.Add(yValues[i]);
+                }
+            }
+            if (task.heartBeat)
+            {
+                strOut = "Flat surface at: ";
+                for (int i = 0; i < surfaces.Count(); i++)
+                {
+                    strOut += string.Format(fmt3, surfaces[i]) + ", ";
+                    if (i % 10 == 0 && i > 0) strOut += "\n";
+                }
+            }
+            SetTrueText(strOut, 2);
+            dst3.SetTo(Scalar.Red);
+            float barHeight = dst2.Height / counts.Count();
+            for (int i = 0; i < counts.Count(); i++)
+            {
+                float w = dst2.Width * counts[i] / max;
+                Cv2.Rectangle(dst3, new cv.Rect(0, (int)(i * barHeight), (int)w, (int)barHeight), Scalar.Black, -1);
+            }
+        }
+    }
+    public class CS_Structured_SliceV : CS_Parent
+    {
+        public HeatMap_Basics heat = new HeatMap_Basics();
+        public Mat sliceMask = new Mat();
+        public Options_Structured options = new Options_Structured();
+        public CS_Structured_SliceV(VBtask task) : base(task)
+        {
+            FindCheckBox("Top View (Unchecked Side View)").Checked = true;
+            desc = "Find and isolate planes using the top view histogram data";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.mouseMovePoint == new cv.Point()) task.mouseMovePoint = new cv.Point(dst2.Width / 2, dst2.Height);
+            int xCoordinate = (task.mouseMovePoint.X == 0) ? dst2.Width / 2 : task.mouseMovePoint.X;
+            heat.Run(src);
+            float planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X;
+            if (xCoordinate > task.topCameraPoint.X) planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X);
+            float thicknessMeters = options.sliceSize * task.metersPerPixel;
+            float minVal = planeX - thicknessMeters;
+            float maxVal = planeX + thicknessMeters;
+            Cv2.InRange(task.pcSplit[0], minVal, maxVal, sliceMask);
+            if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, task.noDepthMask);
+            labels[2] = "At offset " + xCoordinate + " x = " + string.Format(fmt2, (maxVal + minVal) / 2) +
+                        " with " + string.Format(fmt2, Math.Abs(maxVal - minVal) * 100) + " cm width";
+            labels[3] = heat.labels[3];
+            dst3 = heat.dst2;
+            DrawCircle(dst3, new cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.HighlightColor);
+            dst3.Line(new cv.Point(xCoordinate, 0), new cv.Point(xCoordinate, dst3.Height), task.HighlightColor, options.sliceSize);
+            if (standaloneTest())
+            {
+                dst2 = src;
+                dst2.SetTo(Scalar.White, sliceMask);
+            }
+        }
+    }
+    public class CS_Structured_SliceH : CS_Parent
+    {
+        public HeatMap_Basics heat = new HeatMap_Basics();
+        public Mat sliceMask = new Mat();
+        public Options_Structured options = new Options_Structured();
+        public int ycoordinate;
+        public CS_Structured_SliceH(VBtask task) : base(task)
+        {
+            desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            heat.Run(src);
+            if (standaloneTest()) ycoordinate = (task.mouseMovePoint.Y == 0) ? dst2.Height / 2 : task.mouseMovePoint.Y;
+            float sliceY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y;
+            if (ycoordinate > task.sideCameraPoint.Y) sliceY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y);
+            float thicknessMeters = options.sliceSize * task.metersPerPixel;
+            float minVal = sliceY - thicknessMeters;
+            float maxVal = sliceY + thicknessMeters;
+            Cv2.InRange(task.pcSplit[1], minVal, maxVal, sliceMask);
+            labels[2] = "At offset " + ycoordinate + " y = " + string.Format(fmt2, (maxVal + minVal) / 2) +
+                        " with " + string.Format(fmt2, Math.Abs(maxVal - minVal) * 100) + " cm width";
+            if (minVal <= 0 && maxVal >= 0) sliceMask.SetTo(0, task.noDepthMask);
+            labels[3] = heat.labels[2];
+            dst3 = heat.dst3;
+            int yPlaneOffset = (ycoordinate < dst3.Height - options.sliceSize) ? ycoordinate : dst3.Height - options.sliceSize - 1;
+            DrawCircle(dst3, new cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.HighlightColor);
+            dst3.Line(new cv.Point(0, yPlaneOffset), new cv.Point(dst3.Width, yPlaneOffset), task.HighlightColor, options.sliceSize);
+            if (standaloneTest())
+            {
+                dst2 = src;
+                dst2.SetTo(Scalar.White, sliceMask);
+            }
+        }
+    }
+    public class CS_Structured_SurveyH : CS_Parent
+    {
+        public CS_Structured_SurveyH(VBtask task) : base(task)
+        {
+            task.redOptions.setYRangeSlider(300);
+            UpdateAdvice(traceName + ": use Y-Range slider in RedCloud options.");
+            labels[2] = "Each slice represents point cloud pixels with the same Y-Range";
+            labels[3] = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice.";
+            desc = "Mark each horizontal slice with a separate color.  Y-Range determines how thick the slice is.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            Cv2.CalcHist(new Mat[] { src }, task.channelsSide, new Mat(), dst3, 2, task.bins2D, task.rangesSide);
+            dst3.Col(0).SetTo(0);
+            dst3 = dst3.Threshold(0, 255, ThresholdTypes.Binary);
+            dst3.ConvertTo(dst3, MatType.CV_8U);
+            int topRow;
+            for (topRow = 0; topRow <= dst2.Height - 1; topRow++)
+            {
+                if (dst3.Row(topRow).CountNonZero() > 0) break;
+            }
+            int botRow;
+            for (botRow = dst2.Height - 1; botRow >= 0; botRow--)
+            {
+                if (dst3.Row(botRow).CountNonZero() > 0) break;
+            }
+            int index = 0;
+            dst2.SetTo(0);
+            for (int y = topRow; y <= botRow; y++)
+            {
+                float sliceY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y;
+                if (y > task.sideCameraPoint.Y) sliceY = task.yRange * (y - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y);
+                float minVal = sliceY - task.metersPerPixel;
+                float maxVal = sliceY + task.metersPerPixel;
+                if (minVal < 0 && maxVal > 0) continue;
+                dst0 = task.pcSplit[1].InRange(minVal, maxVal);
+                dst2.SetTo(task.scalarColors[index % 256], dst0);
+                index++;
+            }
+        }
+    }
+    public class CS_Structured_SurveyV : CS_Parent
+    {
+        public CS_Structured_SurveyV(VBtask task) : base(task)
+        {
+            task.redOptions.setXRangeSlider(250);
+            UpdateAdvice(traceName + ": use X-Range slider in RedCloud options.");
+            labels[2] = "Each slice represents point cloud pixels with the same X-Range";
+            labels[3] = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice.";
+            desc = "Mark each vertical slice with a separate color.  X-Range determines how thick the slice is.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            Cv2.CalcHist(new Mat[] { src }, task.channelsTop, new Mat(), dst3, 2, task.bins2D, task.rangesTop);
+            dst3.Row(0).SetTo(0);
+            dst3 = dst3.Threshold(0, 255, ThresholdTypes.Binary);
+            dst3.ConvertTo(dst3, MatType.CV_8U);
+            int column;
+            for (column = 0; column < dst2.Width; column++)
+            {
+                if (dst3.Col(column).CountNonZero() > 0) break;
+            }
+            int lastColumn;
+            for (lastColumn = dst2.Width - 1; lastColumn >= 0; lastColumn--)
+            {
+                if (dst3.Col(lastColumn).CountNonZero() > 0) break;
+            }
+            int index = 0;
+            dst2.SetTo(0);
+            for (int x = column; x <= lastColumn; x++)
+            {
+                float sliceX = -task.xRange * (task.topCameraPoint.X - x) / task.topCameraPoint.X;
+                if (x > task.topCameraPoint.X) sliceX = task.xRange * (x - task.topCameraPoint.X) / (dst3.Height - task.topCameraPoint.X);
+                float minVal = sliceX - task.metersPerPixel;
+                float maxVal = sliceX + task.metersPerPixel;
+                if (minVal < 0 && maxVal > 0) continue;
+                dst0 = task.pcSplit[0].InRange(minVal, maxVal);
+                dst2.SetTo(task.scalarColors[index % 256], dst0);
+                index++;
+            }
+        }
+    }
+    public class CS_Structured_MultiSlicePolygon : CS_Parent
+    {
+        Structured_MultiSlice multi = new Structured_MultiSlice();
+        Options_StructuredMulti options = new Options_StructuredMulti();
+        public CS_Structured_MultiSlicePolygon(VBtask task) : base(task)
+        {
+            labels[2] = "Input to FindContours";
+            labels[3] = "ApproxPolyDP 4-corner object from FindContours input";
+            desc = "Detect polygons in the multiSlice output";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            multi.Run(src);
+            dst2 = ~multi.dst3;
+            cv.Point[][] rawContours = Cv2.FindContoursAsArray(dst2, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+            cv.Point[][] contours = new cv.Point[rawContours.Length][];
+            for (int j = 0; j < rawContours.Length; j++)
+            {
+                contours[j] = Cv2.ApproxPolyDP(rawContours[j], 3, true);
+            }
+            dst3.SetTo(0);
+            for (int i = 0; i < contours.Length; i++)
+            {
+                if (contours[i].Length == 2) continue;
+                if (contours[i].Length <= options.maxSides)
+                {
+                    Cv2.DrawContours(dst3, contours, i, new Scalar(0, 255, 255), task.lineWidth + 1, task.lineType);
+                }
+            }
+        }
+    }
+    public class CS_Structured_Crosshairs : CS_Parent
+    {
+        Structured_Cloud sCloud = new Structured_Cloud();
+        double minX, maxX, minY, maxY;
+        public CS_Structured_Crosshairs(VBtask task) : base(task)
+        {
+            desc = "Connect vertical and horizontal dots that are in the same column and row.";
+        }
+        public void RunCS(Mat src)
+        {
+            int xLines = sCloud.options.indexX;
+            int yLines = (int)(xLines * dst2.Width / dst2.Height);
+            if (sCloud.options.indexX > xLines) sCloud.options.indexX = xLines - 1;
+            if (sCloud.options.indexY > yLines) sCloud.options.indexY = yLines - 1;
+            sCloud.Run(src);
+            Mat[] split = Cv2.Split(sCloud.dst2);
+            var mmX = GetMinMax(split[0]);
+            var mmY = GetMinMax(split[1]);
+            minX = Math.Min(minX, mmX.minVal);
+            minY = Math.Min(minY, mmY.minVal);
+            maxX = Math.Max(maxX, mmX.maxVal);
+            maxY = Math.Max(maxY, mmY.maxVal);
+            SetTrueText("mmx min/max = " + minX.ToString("0.00") + "/" + maxX.ToString("0.00") + " mmy min/max " + minY.ToString("0.00") +
+                        "/" + maxY.ToString("0.00"), 3);
+            dst2.SetTo(0);
+            Vec3b white = new Vec3b(255, 255, 255);
+            Mat pointX = new Mat(sCloud.dst2.Size(), MatType.CV_32S, 0);
+            Mat pointY = new Mat(sCloud.dst2.Size(), MatType.CV_32S, 0);
+            int yy, xx;
+            for (int y = 1; y < sCloud.dst2.Height - 1; y++)
+            {
+                for (int x = 1; x < sCloud.dst2.Width - 1; x++)
+                {
+                    Vec3f p = sCloud.dst2.Get<Vec3f>(y, x);
+                    if (p[2] > 0)
+                    {
+                        if (float.IsNaN(p[0]) || float.IsNaN(p[1]) || float.IsNaN(p[2])) continue;
+                        xx = (int)(dst2.Width * (maxX - p[0]) / (maxX - minX));
+                        yy = (int)(dst2.Height * (maxY - p[1]) / (maxY - minY));
+                        if (xx < 0) xx = 0;
+                        if (yy < 0) yy = 0;
+                        if (xx >= dst2.Width) xx = dst2.Width - 1;
+                        if (yy >= dst2.Height) yy = dst2.Height - 1;
+                        yy = dst2.Height - yy - 1;
+                        xx = dst2.Width - xx - 1;
+                        dst2.Set<Vec3b>(yy, xx, white);
+                        pointX.Set<int>(y, x, xx);
+                        pointY.Set<int>(y, x, yy);
+                        if (x == sCloud.options.indexX)
+                        {
+                            cv.Point p1 = new cv.Point(pointX.Get<int>(y - 1, x), pointY.Get<int>(y - 1, x));
+                            if (p1.X > 0)
+                            {
+                                cv.Point p2 = new cv.Point(xx, yy);
+                                dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType);
+                            }
+                        }
+                        if (y == sCloud.options.indexY)
+                        {
+                            cv.Point p1 = new cv.Point(pointX.Get<int>(y, x - 1), pointY.Get<int>(y, x - 1));
+                            if (p1.X > 0)
+                            {
+                                cv.Point p2 = new cv.Point(xx, yy);
+                                dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
 }

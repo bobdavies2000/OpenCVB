@@ -472,27 +472,6 @@ End Class
 
 
 
-Public Class Options_Structured : Inherits VB_Parent
-    Public sliceSize As Integer = 1
-    Public stepSize As Integer = 20
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Structured Depth slice thickness in pixels", 1, 10, sliceSize)
-            sliders.setupTrackBar("Slice step size in pixels (multi-slice option only)", 1, 100, stepSize)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static sliceSlider = FindSlider("Structured Depth slice thickness in pixels")
-        Static stepSlider = FindSlider("Slice step size in pixels (multi-slice option only)")
-        sliceSize = sliceSlider.Value
-        stepSize = stepSlider.Value
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -7269,5 +7248,159 @@ Public Class Options_Stabilizer : Inherits VB_Parent
         corrThreshold = thresholdSlider.value / 1000
         width = widthSlider.value
         height = heightSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_Stitch : Inherits VB_Parent
+    Public imageCount As Integer
+    Public width As Integer
+    Public height As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Number of random images", 10, 50, 10)
+            sliders.setupTrackBar("Rectangle width", task.WorkingRes.Width / 4, task.WorkingRes.Width - 1, task.WorkingRes.Width / 2)
+            sliders.setupTrackBar("Rectangle height", task.WorkingRes.Height / 4, task.WorkingRes.Height - 1, task.WorkingRes.Height / 2)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static countSlider = FindSlider("Number of random images")
+        Static widthSlider = FindSlider("Rectangle width")
+        Static heightSlider = FindSlider("Rectangle height")
+        imageCount = countSlider.Value
+        width = widthSlider.Value
+        height = heightSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_StructuredFloor : Inherits VB_Parent
+    Public xCheck As Boolean
+    Public yCheck As Boolean
+    Public zCheck As Boolean
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Smooth in X-direction")
+            check.addCheckBox("Smooth in Y-direction")
+            check.addCheckBox("Smooth in Z-direction")
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static xCheckbox = FindCheckBox("Smooth in X-direction")
+        Static yCheckbox = FindCheckBox("Smooth in Y-direction")
+        Static zCheckbox = FindCheckBox("Smooth in Z-direction")
+        xCheck = xCheckbox.checked
+        yCheck = yCheckbox.checked
+        zCheck = zCheckbox.checked
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_StructuredCloud : Inherits VB_Parent
+    Public xLines As Integer
+    Public yLines As Integer
+    Public indexX As Integer
+    Public indexY As Integer
+    Public threshold As Integer
+    Public xConstraint As Boolean
+    Public yConstraint As Boolean
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Lines in X-Direction", 0, 200, 50)
+            sliders.setupTrackBar("Lines in Y-Direction", 0, 200, 50)
+            sliders.setupTrackBar("Continuity threshold in mm", 0, 100, 10)
+            sliders.setupTrackBar("Slice index X", 1, 200, 50)
+            sliders.setupTrackBar("Slice index Y", 1, 200, 50)
+        End If
+
+        If check.Setup(traceName) Then
+            check.addCheckBox("Impose constraints on X")
+            check.addCheckBox("Impose constraints on Y")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static xLineSlider = FindSlider("Lines in X-Direction")
+        Static yLineSlider = FindSlider("Lines in Y-Direction")
+        Static thresholdSlider = FindSlider("Continuity threshold in mm")
+        Static xSlider = FindSlider("Slice index X")
+        Static ySlider = FindSlider("Slice index Y")
+
+        Static xCheck = FindCheckBox("Impose constraints on X")
+        Static yCheck = FindCheckBox("Impose constraints on Y")
+
+        xLines = xLineSlider.Value
+        yLines = yLineSlider.Value
+        threshold = thresholdSlider.Value
+
+        xConstraint = xCheck.checked
+        yConstraint = yCheck.checked
+
+        indexX = xSlider.value
+        indexy = ySlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_StructuredMulti : Inherits VB_Parent
+    Public maxSides As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Max number of sides in the identified polygons", 3, 100, 4)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static sidesSlider = FindSlider("Max number of sides in the identified polygons")
+        maxSides = sidesSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Structured : Inherits VB_Parent
+    Public rebuilt As Boolean
+    Public sliceSize As Integer = 1
+    Public stepSize As Integer = 20
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Structured Depth slice thickness in pixels", 1, 10, sliceSize)
+            sliders.setupTrackBar("Slice step size in pixels (multi-slice option only)", 1, 100, stepSize)
+        End If
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Show original data")
+            radio.addRadio("Show rebuilt data")
+            radio.check(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static sliceSlider = FindSlider("Structured Depth slice thickness in pixels")
+        Static stepSlider = FindSlider("Slice step size in pixels (multi-slice option only)")
+        Static rebuiltRadio = FindRadio("Show rebuilt data")
+        rebuilt = rebuiltRadio.checked
+        sliceSize = sliceSlider.Value
+        stepSize = stepSlider.Value
     End Sub
 End Class

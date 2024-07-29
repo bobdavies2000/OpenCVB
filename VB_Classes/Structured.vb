@@ -4,19 +4,13 @@ Public Class Structured_LinearizeFloor : Inherits VB_Parent
     Dim kalman As New Kalman_VB_Basics
     Public sliceMask As cv.Mat
     Public floorYPlane As Single
+    Dim options As New Options_StructuredFloor
     Public Sub New()
-        If check.Setup(traceName) Then
-            check.addCheckBox("Smooth in X-direction")
-            check.addCheckBox("Smooth in Y-direction")
-            check.addCheckBox("Smooth in Z-direction")
-            check.Box(1).Checked = True
-        End If
         desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static xCheck = FindCheckBox("Smooth in X-direction")
-        Static yCheck = FindCheckBox("Smooth in Y-direction")
-        Static zCheck = FindCheckBox("Smooth in Z-direction")
+        options.RunVB()
+
         floor.Run(src)
         dst2 = floor.dst2
         dst3 = floor.dst3
@@ -27,7 +21,7 @@ Public Class Structured_LinearizeFloor : Inherits VB_Parent
 
         If sliceMask.CountNonZero > 0 Then
             Dim split = imuPC.Split()
-            If xCheck.Checked Then
+            If options.xCheck Then
                 Dim mm As mmData = GetMinMax(split(0), sliceMask)
 
                 Dim firstCol As Integer, lastCol As Integer
@@ -45,7 +39,7 @@ Public Class Structured_LinearizeFloor : Inherits VB_Parent
                 Next
             End If
 
-            If yCheck.Checked Then
+            If options.yCheck Then
                 Dim mm As mmData = GetMinMax(split(1), sliceMask)
                 kalman.kInput = (mm.minVal + mm.maxVal) / 2
                 kalman.Run(src)
@@ -53,7 +47,7 @@ Public Class Structured_LinearizeFloor : Inherits VB_Parent
                 split(1).SetTo(floorYPlane, sliceMask)
             End If
 
-            If zCheck.Checked Then
+            If options.zCheck Then
                 Dim firstRow As Integer, lastRow As Integer
                 For firstRow = 0 To sliceMask.Height - 1
                     If sliceMask.Row(firstRow).CountNonZero > 20 Then Exit For
@@ -167,45 +161,6 @@ End Class
 
 
 
-
-Public Class Structured_MultiSlicePolygon : Inherits VB_Parent
-    Dim multi As New Structured_MultiSlice
-    Public Sub New()
-        labels(2) = "Input to FindContours"
-        labels(3) = "ApproxPolyDP 4-corner object from FindContours input"
-
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Max number of sides in the identified polygons", 3, 100, 4)
-        End If
-        desc = "Detect polygons in the multiSlice output"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static sidesSlider = FindSlider("Max number of sides in the identified polygons")
-        Dim maxSides = sidesSlider.Value
-
-        multi.Run(src)
-        dst2 = Not multi.dst3
-
-        Dim rawContours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Dim contours(rawContours.Length - 1)() As cv.Point
-        For j = 0 To rawContours.Length - 1
-            contours(j) = cv.Cv2.ApproxPolyDP(rawContours(j), 3, True)
-        Next
-
-        dst3.SetTo(0)
-        For i = 0 To contours.Length - 1
-            If contours(i).Length = 2 Then Continue For
-            If contours(i).Length <= maxSides Then
-                cv.Cv2.DrawContours(dst3, contours, i, New cv.Scalar(0, 255, 255), task.lineWidth + 1, task.lineType)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
 Public Class Structured_Depth : Inherits VB_Parent
     Dim sliceH As New Structured_SliceH
     Public Sub New()
@@ -247,13 +202,6 @@ Public Class Structured_Rebuild : Inherits VB_Parent
     Dim thickness As Single
     Public pointcloud As New cv.Mat
     Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Show original data")
-            radio.addRadio("Show rebuilt data")
-            radio.check(1).Checked = True
-        End If
-
         labels = {"", "", "X values in point cloud", "Y values in point cloud"}
         desc = "Rebuild the point cloud using inrange - not useful yet"
     End Sub
@@ -302,19 +250,17 @@ Public Class Structured_Rebuild : Inherits VB_Parent
         Return output
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static rebuiltRadio = FindRadio("Show rebuilt data")
-        Static originalRadio = FindRadio("Show original data")
-
         options.RunVB()
+
         Dim metersPerPixel = task.MaxZmeters / dst3.Height
         thickness = options.sliceSize * metersPerPixel
         heat.Run(src)
 
-        If rebuiltRadio.checked Then
+        If options.rebuilt Then
             task.pcSplit(0) = rebuildX(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             task.pcSplit(1) = rebuildY(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             cv.Cv2.Merge(task.pcSplit, pointcloud)
-        ElseIf originalRadio.checked Then
+        Else
             task.pcSplit = task.pointCloud.Split()
             pointcloud = task.pointCloud
         End If
@@ -335,61 +281,37 @@ End Class
 
 Public Class Structured_Cloud2 : Inherits VB_Parent
     Dim mmPixel As New Pixel_Measure
+    Dim options As New Options_StructuredCloud
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Lines in X-Direction", 0, 200, 50)
-            sliders.setupTrackBar("Lines in Y-Direction", 0, 200, 50)
-            sliders.setupTrackBar("Continuity threshold in mm", 0, 100, 10)
-        End If
-
-        If check.Setup(traceName) Then
-            check.addCheckBox("Impose constraints on X")
-            check.addCheckBox("Impose constraints on Y")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
-
         desc = "Attempt to impose a structure on the point cloud data."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static xLineSlider = FindSlider("Lines in X-Direction")
-        Static yLineSlider = FindSlider("Lines in Y-Direction")
-        Static thresholdSlider = FindSlider("Continuity threshold in mm")
-
-        Static xCheck = FindCheckBox("Impose constraints on X")
-        Static yCheck = FindCheckBox("Impose constraints on Y")
-
-        Dim xLines = xLineSlider.Value
-        Dim yLines = yLineSlider.Value
-        Dim threshold = thresholdSlider.Value
-
-        Dim xconstraint = xCheck.checked
-        Dim yconstraint = yCheck.checked
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
-        Dim stepX = dst2.Width / xLines
-        Dim stepY = dst2.Height / yLines
+        Dim stepX = dst2.Width / options.xLines
+        Dim stepY = dst2.Height / options.yLines
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         Dim midX = dst2.Width / 2
         Dim midY = dst2.Height / 2
         Dim halfStepX = stepX / 2
         Dim halfStepy = stepY / 2
-        For y = 1 To yLines - 2
-            For x = 1 To xLines - 2
+        For y = 1 To options.yLines - 2
+            For x = 1 To options.xLines - 2
                 Dim p1 = New cv.Point2f(x * stepX, y * stepY)
                 Dim p2 = New cv.Point2f((x + 1) * stepX, y * stepY)
                 Dim d1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
                 Dim d2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
-                If stepX * threshold > Math.Abs(d1 - d2) And d1 > 0 And d2 > 0 Then
+                If stepX * options.threshold > Math.Abs(d1 - d2) And d1 > 0 And d2 > 0 Then
                     Dim p = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
                     Dim mmPP = mmPixel.Compute(d1)
-                    If xconstraint Then
+                    If options.xConstraint Then
                         p(0) = (p1.X - midX) * mmPP
                         If p1.X = midX Then p(0) = mmPP
                     End If
-                    If yconstraint Then
+                    If options.yConstraint Then
                         p(1) = (p1.Y - midY) * mmPP
                         If p1.Y = midY Then p(1) = mmPP
                     End If
@@ -400,90 +322,11 @@ Public Class Structured_Cloud2 : Inherits VB_Parent
                 End If
             Next
         Next
-        dst2 = dst3(New cv.Rect(0, 0, xLines, yLines)).Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+        dst2 = dst3(New cv.Rect(0, 0, options.xLines, options.yLines)).Resize(dst2.Size(), 0, 0,
+                                                                              cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class Structured_Crosshairs : Inherits VB_Parent
-    Dim sCloud As New Structured_Cloud
-    Dim minX As Single, maxX As Single, minY As Single, maxY As Single
-    Public Sub New()
-        desc = "Connect vertical and horizontal dots that are in the same column and row."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static sliceSlider = FindSlider("Number of slices")
-        Static xSlider = FindSlider("Slice index X")
-        Static ySlider = FindSlider("Slice index Y")
-        Dim xLines = sliceSlider.Value
-        Dim yLines = CInt(xLines * dst2.Width / dst2.Height)
-        Dim indexX = xSlider.Value
-        Dim indexY = ySlider.Value
-        If indexX > xLines Then indexX = xLines - 1
-        If indexY > yLines Then indexY = yLines - 1
-
-        sCloud.Run(src)
-        Dim split = cv.Cv2.Split(sCloud.dst2)
-
-        Dim mmX = GetMinMax(split(0))
-        Dim mmY = GetMinMax(split(1))
-
-        minX = If(minX > mmX.minVal, mmX.minVal, minX)
-        minY = If(minY > mmY.minVal, mmY.minVal, minY)
-        maxX = If(maxX < mmX.maxVal, mmX.maxVal, maxX)
-        maxY = If(maxY < mmY.maxVal, mmY.maxVal, maxY)
-
-        SetTrueText("mmx min/max = " + Format(minX, "0.00") + "/" + Format(maxX, "0.00") + " mmy min/max " + Format(minY, "0.00") +
-                    "/" + Format(maxY, "0.00"), 3)
-
-        dst2.SetTo(0)
-        Dim white = New cv.Vec3b(255, 255, 255)
-        Dim pointX As New cv.Mat(sCloud.dst2.Size(), cv.MatType.CV_32S, 0)
-        Dim pointY As New cv.Mat(sCloud.dst2.Size(), cv.MatType.CV_32S, 0)
-        Dim yy As Integer, xx As Integer
-        For y = 1 To sCloud.dst2.Height - 1
-            For x = 1 To sCloud.dst2.Width - 1
-                Dim p = sCloud.dst2.Get(Of cv.Vec3f)(y, x)
-                If p(2) > 0 Then
-                    If Single.IsNaN(p(0)) Or Single.IsNaN(p(1)) Or Single.IsNaN(p(2)) Then Continue For
-                    xx = dst2.Width * (maxX - p(0)) / (maxX - minX)
-                    yy = dst2.Height * (maxY - p(1)) / (maxY - minY)
-                    If xx < 0 Then xx = 0
-                    If yy < 0 Then yy = 0
-                    If xx >= dst2.Width Then xx = dst2.Width - 1
-                    If yy >= dst2.Height Then yy = dst2.Height - 1
-                    yy = dst2.Height - yy - 1
-                    xx = dst2.Width - xx - 1
-                    dst2.Set(Of cv.Vec3b)(yy, xx, white)
-
-                    pointX.Set(Of Integer)(y, x, xx)
-                    pointY.Set(Of Integer)(y, x, yy)
-                    If x = indexX Then
-                        Dim p1 = New cv.Point(pointX.Get(Of Integer)(y - 1, x), pointY.Get(Of Integer)(y - 1, x))
-                        If p1.X > 0 Then
-                            Dim p2 = New cv.Point(xx, yy)
-                            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
-                        End If
-                    End If
-                    If y = indexY Then
-                        Dim p1 = New cv.Point(pointX.Get(Of Integer)(y, x - 1), pointY.Get(Of Integer)(y, x - 1))
-                        If p1.X > 0 Then
-                            Dim p2 = New cv.Point(xx, yy)
-                            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
-                        End If
-                    End If
-                End If
-            Next
-        Next
-    End Sub
-End Class
 
 
 
@@ -492,26 +335,21 @@ End Class
 
 
 Public Class Structured_Cloud : Inherits VB_Parent
+    public options As New Options_StructuredCloud
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number of slices", 0, 200, 35)
-            sliders.setupTrackBar("Slice index X", 1, 200, 50)
-            sliders.setupTrackBar("Slice index Y", 1, 200, 50)
-        End If
-
         task.gOptions.setGridSize(10)
         desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static sliceSlider = FindSlider("Number of slices")
-        Dim xLines = sliceSlider.Value
-        Dim yLines = CInt(xLines * dst2.Height / dst2.Width)
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
-        Dim stepX = dst3.Width / xLines
+        Dim yLines = CInt(options.xLines * dst2.Height / dst2.Width)
+
+        Dim stepX = dst3.Width / options.xLines
         Dim stepY = dst3.Height / yLines
         dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         For y = 0 To yLines - 1
-            For x = 0 To xLines - 1
+            For x = 0 To options.xLines - 1
                 Dim r = New cv.Rect(x * stepX, y * stepY, stepX - 1, stepY - 1)
                 Dim p1 = New cv.Point(r.X, r.Y)
                 Dim p2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
@@ -520,7 +358,7 @@ Public Class Structured_Cloud : Inherits VB_Parent
                 If vec1(2) > 0 And vec2(2) > 0 Then dst2(r).SetTo(vec1)
             Next
         Next
-        labels(2) = "Structured_Cloud with " + CStr(yLines) + " rows " + CStr(xLines) + " columns"
+        labels(2) = "Structured_Cloud with " + CStr(yLines) + " rows " + CStr(options.xLines) + " columns"
     End Sub
 End Class
 
@@ -1394,7 +1232,7 @@ End Class
 
 Public Class Structured_SurveyV : Inherits VB_Parent
     Public Sub New()
-        task.redOptions.XRangeBar.Value = 250
+        task.redOptions.setXRangeSlider(250)
         UpdateAdvice(traceName + ": use X-Range slider in RedCloud options.")
         labels(2) = "Each slice represents point cloud pixels with the same X-Range"
         labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."
@@ -1429,6 +1267,118 @@ Public Class Structured_SurveyV : Inherits VB_Parent
             dst0 = task.pcSplit(0).InRange(minVal, maxVal)
             dst2.SetTo(task.scalarColors(index Mod 256), dst0)
             index += 1
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_MultiSlicePolygon : Inherits VB_Parent
+    Dim multi As New Structured_MultiSlice
+    Dim options As New Options_StructuredMulti
+    Public Sub New()
+        labels(2) = "Input to FindContours"
+        labels(3) = "ApproxPolyDP 4-corner object from FindContours input"
+        desc = "Detect polygons in the multiSlice output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        multi.Run(src)
+        dst2 = Not multi.dst3
+
+        Dim rawContours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim contours(rawContours.Length - 1)() As cv.Point
+        For j = 0 To rawContours.Length - 1
+            contours(j) = cv.Cv2.ApproxPolyDP(rawContours(j), 3, True)
+        Next
+
+        dst3.SetTo(0)
+        For i = 0 To contours.Length - 1
+            If contours(i).Length = 2 Then Continue For
+            If contours(i).Length <= options.maxSides Then
+                cv.Cv2.DrawContours(dst3, contours, i, New cv.Scalar(0, 255, 255), task.lineWidth + 1, task.lineType)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_Crosshairs : Inherits VB_Parent
+    Dim sCloud As New Structured_Cloud
+    Dim minX As Single, maxX As Single, minY As Single, maxY As Single
+    Public Sub New()
+        desc = "Connect vertical and horizontal dots that are in the same column and row."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim xLines = sCloud.options.indexX
+        Dim yLines = CInt(xLines * dst2.Width / dst2.Height)
+        If sCloud.options.indexX > xLines Then sCloud.options.indexX = xLines - 1
+        If sCloud.options.indexY > yLines Then sCloud.options.indexY = yLines - 1
+
+        sCloud.Run(src)
+        Dim split = cv.Cv2.Split(sCloud.dst2)
+
+        Dim mmX = GetMinMax(split(0))
+        Dim mmY = GetMinMax(split(1))
+
+        minX = If(minX > mmX.minVal, mmX.minVal, minX)
+        minY = If(minY > mmY.minVal, mmY.minVal, minY)
+        maxX = If(maxX < mmX.maxVal, mmX.maxVal, maxX)
+        maxY = If(maxY < mmY.maxVal, mmY.maxVal, maxY)
+
+        SetTrueText("mmx min/max = " + Format(minX, "0.00") + "/" + Format(maxX, "0.00") + " mmy min/max " + Format(minY, "0.00") +
+                    "/" + Format(maxY, "0.00"), 3)
+
+        dst2.SetTo(0)
+        Dim white = New cv.Vec3b(255, 255, 255)
+        Dim pointX As New cv.Mat(sCloud.dst2.Size(), cv.MatType.CV_32S, 0)
+        Dim pointY As New cv.Mat(sCloud.dst2.Size(), cv.MatType.CV_32S, 0)
+        Dim yy As Integer, xx As Integer
+        For y = 1 To sCloud.dst2.Height - 1
+            For x = 1 To sCloud.dst2.Width - 1
+                Dim p = sCloud.dst2.Get(Of cv.Vec3f)(y, x)
+                If p(2) > 0 Then
+                    If Single.IsNaN(p(0)) Or Single.IsNaN(p(1)) Or Single.IsNaN(p(2)) Then Continue For
+                    xx = dst2.Width * (maxX - p(0)) / (maxX - minX)
+                    yy = dst2.Height * (maxY - p(1)) / (maxY - minY)
+                    If xx < 0 Then xx = 0
+                    If yy < 0 Then yy = 0
+                    If xx >= dst2.Width Then xx = dst2.Width - 1
+                    If yy >= dst2.Height Then yy = dst2.Height - 1
+                    yy = dst2.Height - yy - 1
+                    xx = dst2.Width - xx - 1
+                    dst2.Set(Of cv.Vec3b)(yy, xx, white)
+
+                    pointX.Set(Of Integer)(y, x, xx)
+                    pointY.Set(Of Integer)(y, x, yy)
+                    If x = sCloud.options.indexX Then
+                        Dim p1 = New cv.Point(pointX.Get(Of Integer)(y - 1, x), pointY.Get(Of Integer)(y - 1, x))
+                        If p1.X > 0 Then
+                            Dim p2 = New cv.Point(xx, yy)
+                            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+                        End If
+                    End If
+                    If y = sCloud.options.indexY Then
+                        Dim p1 = New cv.Point(pointX.Get(Of Integer)(y, x - 1), pointY.Get(Of Integer)(y, x - 1))
+                        If p1.X > 0 Then
+                            Dim p2 = New cv.Point(xx, yy)
+                            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+                        End If
+                    End If
+                End If
+            Next
         Next
     End Sub
 End Class
