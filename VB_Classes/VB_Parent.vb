@@ -666,7 +666,7 @@ Public Class VB_Parent : Implements IDisposable
         listOfPoints.Add(contour)
         cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
     End Sub
-    Public Sub drawPoly(result As cv.Mat, polyPoints As List(Of cv.Point), color As cv.Scalar)
+    Public Sub DrawPoly(result As cv.Mat, polyPoints As List(Of cv.Point), color As cv.Scalar)
         If polyPoints.Count < 3 Then Exit Sub
         Dim listOfPoints = New List(Of List(Of cv.Point))({polyPoints})
         cv.Cv2.DrawContours(result, listOfPoints, 0, color, 2)

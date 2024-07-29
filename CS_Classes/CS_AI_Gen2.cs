@@ -18,6 +18,7 @@ using System.IO.Pipes;
 using System.Text.RegularExpressions;
 using System.Numerics;
 using System.Windows.Controls;
+using System.Security.Cryptography;
 
 namespace CS_Classes
 {
@@ -13553,6 +13554,2008 @@ namespace CS_Classes
             flip.RunVB(src);
             dst2 = flip.dst2;
             labels = flip.labels;
+        }
+    }
+    public class CS_Resize_Basics : CS_Parent
+    {
+        public cv.Size newSize;
+        public Options_Resize options = new Options_Resize();
+        public CS_Resize_Basics(VBtask task) : base(task)
+        {
+            if (standaloneTest())
+                task.drawRect = new cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2);
+            desc = "Resize with different options and compare them";
+            labels[2] = "Rectangle highlight above resized";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.drawRect.Width != 0)
+            {
+                src = src[task.drawRect];
+                newSize = task.drawRect.Size;
+            }
+            dst2 = src.Resize(newSize, 0, 0, options.warpFlag);
+        }
+    }
+    public class CS_Resize_Smaller : CS_Parent
+    {
+        public Options_Resize options = new Options_Resize();
+        public cv.Size newSize;
+        public CS_Resize_Smaller(VBtask task) : base(task)
+        {
+            desc = "Resize by a percentage of the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            newSize = new cv.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
+            dst2 = src.Resize(newSize, 0, 0, options.warpFlag);
+            labels[2] = "Image after resizing to: " + newSize.Width + "X" + newSize.Height;
+        }
+    }
+    public class CS_Resize_Preserve : CS_Parent
+    {
+        public Options_Resize options = new Options_Resize();
+        public cv.Size newSize;
+        public CS_Resize_Preserve(VBtask task) : base(task)
+        {
+            FindSlider("Resize Percentage (%)").Maximum = 200;
+            FindSlider("Resize Percentage (%)").Value = 120;
+            FindSlider("Resize Percentage (%)").Minimum = 100;
+            desc = "Decrease the size but preserve the full image size.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            newSize = new cv.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
+            dst0 = src.Resize(newSize, 0, 0, InterpolationFlags.Nearest).SetTo(0);
+            var rect = new cv.Rect(options.topLeftOffset, options.topLeftOffset, dst2.Width, dst2.Height);
+            src.CopyTo(dst0[rect]);
+            dst2 = dst0.Resize(dst2.Size(), 0, 0, options.warpFlag);
+            labels[2] = "Image after resizing to: " + newSize.Width + "X" + newSize.Height;
+        }
+    }
+    public class CS_Resize_Proportional : CS_Parent
+    {
+        Options_Spectrum options = new Options_Spectrum();
+        public CS_Resize_Proportional(VBtask task) : base(task)
+        {
+            desc = "Resize the input but keep the results proportional to the original.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                options.RunVB();
+                dst2 = options.runRedCloud(ref labels[2]);
+                src = src[task.rc.rect];
+                Cv2.ImShow("src", src);
+            }
+            cv.Size newSize;
+            if (dst0.Width / (double)dst0.Height < src.Width / (double)src.Height)
+            {
+                newSize = new cv.Size(dst2.Width, dst2.Height * dst0.Height / dst0.Width);
+            }
+            else
+            {
+                newSize = new cv.Size(dst2.Width * dst0.Height / dst0.Width, dst2.Height);
+            }
+            src = src.Resize(newSize, 0, 0, InterpolationFlags.Nearest);
+            var newRect = new cv.Rect(0, 0, newSize.Width, newSize.Height);
+            dst3.SetTo(0);
+            src.CopyTo(dst3[newRect]);
+        }
+    }
+    public class CS_Retina_Basics_CPP : CS_Parent
+    {
+        ProcessStartInfo startInfo = new ProcessStartInfo();
+        byte[] magnoData = new byte[1];
+        byte[] dataSrc = new byte[1];
+        float samplingFactor = -1; // force open
+        Options_Retina options = new Options_Retina();
+        bool saveUseLogSampling;
+        public CS_Retina_Basics_CPP(VBtask task) : base(task)
+        {
+            labels[2] = "Retina Parvo";
+            labels[3] = "Retina Magno";
+            desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.xmlCheck)
+            {
+                var fileinfo = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), "RetinaDefaultParameters.xml"));
+                if (fileinfo.Exists)
+                {
+                    File.Copy(Path.Combine(Directory.GetCurrentDirectory(), "RetinaDefaultParameters.xml"), Path.Combine(task.HomeDir, "data/RetinaDefaultParameters.xml"), true);
+                    startInfo.FileName = "wordpad.exe";
+                    startInfo.Arguments = Path.Combine(task.HomeDir, "Data/RetinaDefaultParameters.xml");
+                    Process.Start(startInfo);
+                }
+                else
+                {
+                    MessageBox.Show("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?");
+                }
+            }
+            if (saveUseLogSampling != options.useLogSampling || samplingFactor != options.sampleCount)
+            {
+                if (cPtr != (IntPtr) 0) Retina_Basics_Close(cPtr);
+                Array.Resize(ref magnoData, (int)(src.Total() - 1));
+                Array.Resize(ref dataSrc, (int)(src.Total() * src.ElemSize() - 1));
+                saveUseLogSampling = options.useLogSampling;
+                samplingFactor = options.sampleCount;
+                if (!task.testAllRunning) cPtr = Retina_Basics_Open(src.Rows, src.Cols, options.useLogSampling, samplingFactor);
+            }
+            GCHandle handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned);
+            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            IntPtr imagePtr = IntPtr.Zero;
+            if (!task.testAllRunning)
+            {
+                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+                int logSampling = options.useLogSampling ? 1 : 0;   
+                imagePtr = Retina_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                             handleMagno.AddrOfPinnedObject(), logSampling); 
+            }
+            else
+            {
+                SetTrueText("CS_Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.");
+                dst3 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            }
+            handleSrc.Free();
+            handleMagno.Free();
+            if (imagePtr != IntPtr.Zero)
+            {
+                float nextFactor = samplingFactor;
+                if (!options.useLogSampling) nextFactor = 1;
+                dst2 = new Mat(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone();
+                dst3 = new Mat(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8U, magnoData).Resize(src.Size());
+            }
+        }
+        public void Close()
+        {
+            if (cPtr != (IntPtr) 0) cPtr = Retina_Basics_Close(cPtr);
+        }
+    }
+    public class CS_Retina_Depth : CS_Parent
+    {
+        Retina_Basics_CPP retina = new Retina_Basics_CPP();
+        Mat lastMotion = new Mat();
+        public CS_Retina_Depth(VBtask task) : base(task)
+        {
+            desc = "Use the bio-inspired retina algorithm with the depth data.";
+            labels[2] = "Last result || current result";
+            labels[3] = "Current depth motion result";
+        }
+        public void RunCS(Mat src)
+        {
+            retina.Run(task.depthRGB);
+            dst3 = retina.dst3;
+            if (lastMotion.Width == 0) lastMotion = retina.dst3;
+            dst2 = lastMotion | retina.dst3;
+            lastMotion = retina.dst3;
+        }
+    }
+    public class CS_ROI_Basics : CS_Parent
+    {
+        public Diff_Basics diff = new Diff_Basics();
+        public cv.Rect aoiRect;
+        public CS_ROI_Basics(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Enclosing rectangle of all pixels that have changed", "" };
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            task.gOptions.pixelDiffThreshold = 30;
+            desc = "Find the motion ROI in the latest image.";
+        }
+        public void RunCS(Mat src)
+        {
+            diff.Run(src);
+            dst2 = diff.dst2;
+            var split = diff.dst2.FindNonZero().Split();
+            if (split.Length == 0) return;
+            var mm0 = GetMinMax(split[0]);
+            var mm1 = GetMinMax(split[1]);
+            aoiRect = new cv.Rect((int)mm0.minVal, (int)mm1.minVal, (int)(mm0.maxVal - mm0.minVal), (int)(mm1.maxVal - mm1.minVal));
+            if (aoiRect.Width > 0 && aoiRect.Height > 0)
+            {
+                task.color.Rectangle(aoiRect, Scalar.Yellow, task.lineWidth);
+                dst2.Rectangle(aoiRect, Scalar.White, task.lineWidth);
+            }
+        }
+    }
+    public class CS_ROI_FindNonZeroNoSingle : CS_Parent
+    {
+        public Diff_Basics diff = new Diff_Basics();
+        public cv.Rect aoiRect;
+        public CS_ROI_FindNonZeroNoSingle(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Enclosing rectangle of all changed pixels (after removing single pixels)", "" };
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            task.gOptions.pixelDiffThreshold = 30;
+            desc = "Find the motion ROI in just the latest image - eliminate single pixels";
+        }
+        public void RunCS(Mat src)
+        {
+            diff.Run(src);
+            dst2 = diff.dst2;
+            var tmp = diff.dst2.FindNonZero();
+            if (tmp.Rows == 0) return;
+            int minX = int.MaxValue, maxX = int.MinValue, minY = int.MaxValue, maxY = int.MinValue;
+            for (int i = 0; i < tmp.Rows; i++)
+            {
+                var pt = tmp.Get<cv.Point>(i, 0);
+                // eliminate single pixel differences.
+                var r = new cv.Rect(pt.X - 1, pt.Y - 1, 3, 3);
+                if (r.X < 0) r.X = 0;
+                if (r.Y < 0) r.Y = 0;
+                if (r.X + r.Width < dst2.Width && r.Y + r.Height < dst2.Height)
+                {
+                    if (dst2[r].CountNonZero() > 1)
+                    {
+                        if (minX > pt.X) minX = pt.X;
+                        if (maxX < pt.X) maxX = pt.X;
+                        if (minY > pt.Y) minY = pt.Y;
+                        if (maxY < pt.Y) maxY = pt.Y;
+                    }
+                }
+            }
+            if (minX != int.MaxValue)
+            {
+                aoiRect = new cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1);
+                task.color.Rectangle(aoiRect, Scalar.Yellow, task.lineWidth);
+                dst2.Rectangle(aoiRect, Scalar.White, task.lineWidth);
+            }
+        }
+    }
+    public class CS_ROI_AccumulateOld : CS_Parent
+    {
+        public Diff_Basics diff = new Diff_Basics();
+        public cv.Rect aoiRect;
+        public int minX = int.MaxValue, maxX = int.MinValue, minY = int.MaxValue, maxY = int.MinValue;
+        Options_ROI options = new Options_ROI();
+        public CS_ROI_AccumulateOld(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "", "Area of Interest", "" };
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            task.gOptions.pixelDiffThreshold = 30;
+            desc = "Accumulate pixels in a motion ROI - all pixels that are different by X";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (aoiRect.Width * aoiRect.Height > src.Total() * options.roiPercent || task.optionsChanged)
+            {
+                dst0 = task.color;
+                dst1.SetTo(0);
+                aoiRect = new cv.Rect();
+                minX = int.MaxValue;
+                maxX = int.MinValue;
+                minY = int.MaxValue;
+                maxY = int.MinValue;
+            }
+            diff.Run(src);
+            dst3 = diff.dst2;
+            Cv2.BitwiseOr(dst3, dst1, dst1);
+            var tmp = dst3.FindNonZero();
+            if (aoiRect != new cv.Rect())
+            {
+                task.color[aoiRect].CopyTo(dst0[aoiRect]);
+                dst0.Rectangle(aoiRect, Scalar.Yellow, task.lineWidth);
+                dst2.Rectangle(aoiRect, Scalar.White, task.lineWidth);
+            }
+            if (tmp.Rows == 0) return;
+            for (int i = 0; i < tmp.Rows; i++)
+            {
+                var pt = tmp.Get<cv.Point>(i, 0);
+                if (minX > pt.X) minX = pt.X;
+                if (maxX < pt.X) maxX = pt.X;
+                if (minY > pt.Y) minY = pt.Y;
+                if (maxY < pt.Y) maxY = pt.Y;
+            }
+            aoiRect = new cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1);
+            dst1.CopyTo(dst2);
+            dst2.Rectangle(aoiRect, Scalar.White, task.lineWidth);
+        }
+    }
+    public class CS_ROI_Accumulate : CS_Parent
+    {
+        public Diff_Basics diff = new Diff_Basics();
+        cv.Rect roiRect;
+        Options_ROI options = new Options_ROI();
+        public CS_ROI_Accumulate(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Area of Interest", "" };
+            dst2 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            task.gOptions.pixelDiffThreshold = 30;
+            desc = "Accumulate pixels in a motion ROI until the size is x% of the total image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            SetTrueText(traceName + " is the same as CS_ROI_AccumulateOld but simpler.", 3);
+            if (roiRect.Width * roiRect.Height > src.Total() * options.roiPercent || task.optionsChanged)
+            {
+                dst2.SetTo(0);
+                roiRect = new cv.Rect();
+            }
+            diff.Run(src);
+            var split = diff.dst2.FindNonZero().Split();
+            if (split.Length > 0)
+            {
+                var mm0 = GetMinMax(split[0]);
+                var mm1 = GetMinMax(split[1]);
+                var motionRect = new cv.Rect((int)mm0.minVal, (int)mm1.minVal, (int)(mm0.maxVal - mm0.minVal),
+                                             (int)(mm1.maxVal - mm1.minVal));
+                if (motionRect.Width != 0 && motionRect.Height != 0)
+                {
+                    if (roiRect.X > 0 || roiRect.Y > 0) roiRect = motionRect.Union(roiRect);
+                    else roiRect = motionRect;
+                    Cv2.BitwiseOr(diff.dst2, dst2, dst2);
+                }
+            }
+            dst2.Rectangle(roiRect, Scalar.White, task.lineWidth);
+            task.color.Rectangle(roiRect, task.HighlightColor, task.lineWidth);
+        }
+    }
+    public class CS_Rotate_Basics : CS_Parent
+    {
+        public Mat M;
+        public Mat Mflip;
+        public Options_Resize options = new Options_Resize();
+        public float rotateAngle = 1000;
+        public Point2f rotateCenter;
+        Options_Rotate optionsRotate = new Options_Rotate();
+        public CS_Rotate_Basics(VBtask task) : base(task)
+        {
+            rotateCenter = new Point2f(dst2.Width / 2, dst2.Height / 2);
+            desc = "Rotate a rectangle by a specified angle";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            optionsRotate.RunVB();
+            rotateAngle = optionsRotate.rotateAngle;
+            M = Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1);
+            dst2 = src.WarpAffine(M, src.Size(), options.warpFlag);
+            if (options.warpFlag == InterpolationFlags.WarpInverseMap)
+            {
+                Mflip = Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle, 1);
+            }
+        }
+    }
+
+    public class CS_Rotate_BasicsQT : CS_Parent
+    {
+        public float rotateAngle = 24;
+        public Point2f rotateCenter;
+        public CS_Rotate_BasicsQT(VBtask task) : base(task)
+        {
+            rotateCenter = new Point2f(dst2.Width / 2, dst2.Height / 2);
+            desc = "Rotate a rectangle by a specified angle";
+        }
+        public void RunCS(Mat src)
+        {
+            var M = Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1);
+            dst2 = src.WarpAffine(M, src.Size(), InterpolationFlags.Nearest);
+        }
+    }
+    public class CS_Rotate_Box : CS_Parent
+    {
+        readonly Rotate_Basics rotation = new Rotate_Basics();
+        public CS_Rotate_Box(VBtask task) : base(task)
+        {
+            task.drawRect = new cv.Rect(100, 100, 100, 100);
+            labels[2] = "Original Rectangle in the original perspective";
+            labels[3] = "Same Rectangle in the new warped perspective";
+            desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere.";
+        }
+        public void RunCS(Mat src)
+        {
+            rotation.Run(src);
+            dst3 = dst2.Clone();
+            var r = task.drawRect;
+            dst2 = src.Clone();
+            dst2.Rectangle(r, Scalar.White, 1);
+            var center = new Point2f(r.X + r.Width / 2, r.Y + r.Height / 2);
+            var drawBox = new RotatedRect(center, new Size2f(r.Width, r.Height), 0);
+            var boxPoints = Cv2.BoxPoints(drawBox);
+            var srcPoints = new Mat(1, 4, MatType.CV_32FC2, boxPoints);
+            var dstpoints = new Mat();
+            if (rotation.options.warpFlag != InterpolationFlags.WarpInverseMap)
+            {
+                Cv2.Transform(srcPoints, dstpoints, rotation.M);
+            }
+            else
+            {
+                Cv2.Transform(srcPoints, dstpoints, rotation.Mflip);
+            }
+            for (int i = 0; i < dstpoints.Width - 1; i++)
+            {
+                var p1 = dstpoints.Get<cv.Point2f>(0, i);
+                var p2 = dstpoints.Get<cv.Point2f>(0, (i + 1) % 4);
+                DrawLine(dst3, p1, p2, Scalar.White, task.lineWidth + 1);
+            }
+        }
+    }
+    public class CS_Rotate_Poly : CS_Parent
+    {
+        Options_FPoly optionsFPoly = new Options_FPoly();
+        public Options_RotatePoly options = new Options_RotatePoly();
+        public Rotate_PolyQT rotateQT = new Rotate_PolyQT();
+        List<cv.Point2f> rPoly = new List<cv.Point2f>();
+        public CS_Rotate_Poly(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Triangle before rotation", "Triangle after rotation" };
+            desc = "Rotate a triangle around a center of rotation";
+        }
+        public void RunCS(Mat src)
+        {
+            optionsFPoly.RunVB();
+            if (options.changeCheck.Checked || task.FirstPass)
+            {
+                rPoly.Clear();
+                for (int i = 0; i < task.polyCount; i++)
+                {
+                    rPoly.Add(new Point2f(msRNG.Next(dst2.Width / 4, dst2.Width * 3 / 4), msRNG.Next(dst2.Height / 4, dst2.Height * 3 / 4)));
+                }
+                rotateQT.rotateCenter = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                options.changeCheck.Checked = false;
+            }
+            rotateQT.poly = new List<cv.Point2f>(rPoly);
+            rotateQT.rotateAngle = options.angleSlider.Value;
+            rotateQT.Run(src);
+            dst2 = rotateQT.dst3;
+            DrawCircle(dst2, rotateQT.rotateCenter, task.DotSize + 2, Scalar.Yellow);
+            SetTrueText("center of rotation", rotateQT.rotateCenter);
+            labels[3] = rotateQT.labels[3];
+        }
+    }
+    public class CS_Rotate_PolyQT : CS_Parent
+    {
+        public List<cv.Point2f> poly = new List<cv.Point2f>();
+        public Point2f rotateCenter;
+        public float rotateAngle;
+        public CS_Rotate_PolyQT(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Polygon before rotation", "" };
+            desc = "Rotate a triangle around a center of rotation";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                dst2.SetTo(0);
+                dst3.SetTo(0);
+            }
+            if (standaloneTest())
+            {
+                SetTrueText(traceName + " has no output when run standaloneTest().");
+                return;
+            }
+            DrawFPoly(ref dst2, poly, Scalar.Red);
+            labels[3] = "White is the original polygon, yellow has been rotated " + (rotateAngle * 57.2958).ToString() + " degrees";
+            // translate so the center of rotation is 0,0
+            List<cv.Point2f> translated = new List<cv.Point2f>();
+            for (int i = 0; i < poly.Count(); i++)
+            {
+                Point2f pt = poly[i];
+                translated.Add(new Point2f(poly[i].X - rotateCenter.X, poly[i].Y - rotateCenter.Y));
+            }
+            List<cv.Point2f> rotated = new List<cv.Point2f>();
+            for (int i = 0; i < poly.Count(); i++)
+            {
+                Point2f pt = translated[i];
+                float x = pt.X * (float)Math.Cos(rotateAngle) - pt.Y * (float)Math.Sin(rotateAngle);
+                float y = pt.Y * (float)Math.Cos(rotateAngle) + pt.X * (float)Math.Sin(rotateAngle);
+                rotated.Add(new Point2f(x, y));
+            }
+            DrawFPoly(ref dst3, poly, Scalar.White);
+            poly.Clear();
+            foreach (Point2f pt in rotated)
+            {
+                poly.Add(new Point2f(pt.X + rotateCenter.X, pt.Y + rotateCenter.Y));
+            }
+            DrawFPoly(ref dst3, poly, Scalar.Yellow);
+        }
+    }
+    public class CS_Rotate_Example : CS_Parent
+    {
+        Rotate_Basics rotate = new Rotate_Basics();
+        public CS_Rotate_Example(VBtask task) : base(task)
+        {
+            rotate.rotateCenter = new cv.Point(dst2.Height / 2, dst2.Height / 2);
+            rotate.rotateAngle = -90;
+            desc = "Reminder on how to rotate an image and keep all the pixels.";
+        }
+        public void RunCS(Mat src)
+        {
+            cv.Rect r = new cv.Rect(0, 0, src.Height, src.Height);
+            dst2[r] = src.Resize(new cv.Size(src.Height, src.Height));
+            rotate.Run(dst2);
+            dst3[r] = rotate.dst2[new cv.Rect(0, 0, src.Height, src.Height)];
+        }
+    }
+    public class CS_Rotate_Horizon : CS_Parent
+    {
+        Rotate_Basics rotate = new Rotate_Basics();
+        CameraMotion_WithRotation edges = new CameraMotion_WithRotation();
+        public CS_Rotate_Horizon(VBtask task) : base(task)
+        {
+            FindSlider("Rotation Angle in degrees").Value = 3;
+            labels[2] = "White is the current horizon vector of the camera.  Highlighted color is the rotated horizon vector.";
+            desc = "Rotate the horizon independently from the rotation of the image to validate the Edge_CameraMotion algorithm.";
+        }
+        Point2f RotatePoint(Point2f point, Point2f center, double angle)
+        {
+            double radians = angle * (Math.PI / 180.0);
+            double sinAngle = Math.Sin(radians);
+            double cosAngle = Math.Cos(radians);
+            double x = point.X - center.X;
+            double y = point.Y - center.Y;
+            double xNew = x * cosAngle - y * sinAngle;
+            double yNew = x * sinAngle + y * cosAngle;
+            xNew += center.X;
+            yNew += center.Y;
+            return new Point2f((float)xNew, (float)yNew);
+        }
+        public void RunCS(Mat src)
+        {
+            rotate.Run(src);
+            dst2 = rotate.dst2.Clone();
+            dst1 = dst2.Clone();
+            PointPair horizonVec = new PointPair(task.horizonVec.p1, task.horizonVec.p2);
+            horizonVec.p1 = RotatePoint(task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle);
+            horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle);
+            DrawLine(dst2, horizonVec.p1, horizonVec.p2, task.HighlightColor);
+            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, Scalar.White);
+            double y1 = horizonVec.p1.Y - task.horizonVec.p1.Y;
+            double y2 = horizonVec.p2.Y - task.horizonVec.p2.Y;
+            edges.translateRotateY((int)y1, (int)y2);
+            rotate.rotateAngle = edges.rotationY;
+            rotate.rotateCenter = new cv.Point(edges.centerY.X, edges.centerY.Y);
+            rotate.Run(dst1);
+            dst3 = rotate.dst2.Clone();
+            strOut = edges.strOut;
+        }
+    }
+    public class CS_Salience_Basics_CPP : CS_Parent
+    {
+        byte[] grayData = new byte[1];
+        public Options_Salience options = new Options_Salience();
+        public CS_Salience_Basics_CPP(VBtask task) : base(task)
+        {
+            cPtr = Salience_Open();
+            desc = "Show results of Salience algorithm when using C++";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (src.Total() != grayData.Length) Array.Resize(ref grayData, (int)src.Total());
+            GCHandle grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned);
+            Marshal.Copy(src.Data, grayData, 0, grayData.Length);
+            IntPtr imagePtr = Salience_Run(cPtr, options.numScales, grayHandle.AddrOfPinnedObject(), src.Height, src.Width);
+            grayHandle.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = Salience_Close(cPtr);
+        }
+    }
+    public class CS_Salience_Basics_MT : CS_Parent
+    {
+        Salience_Basics_CPP salience = new Salience_Basics_CPP();
+        public CS_Salience_Basics_MT(VBtask task) : base(task)
+        {
+            FindSlider("Salience numScales").Value = 2;
+            desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            int threads = 32;
+            int h = src.Height / threads;
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            Parallel.For(0, threads, i =>
+            {
+                cv.Rect roi = new cv.Rect(0, i * h, src.Width, Math.Min(h, src.Height - i * h));
+                if (roi.Height <= 0) return;
+                IntPtr cPtr = Salience_Open();
+                Mat input = src[roi].Clone();
+                byte[] grayData = new byte[input.Total()];
+                GCHandle grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned);
+                Marshal.Copy(input.Data, grayData, 0, grayData.Length);
+                IntPtr imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject(), roi.Height, roi.Width);
+                grayHandle.Free();
+                dst2[roi] = new Mat(roi.Height, roi.Width, MatType.CV_8U, imagePtr).Clone();
+                if (cPtr != IntPtr.Zero) cPtr = Salience_Close(cPtr);
+            });
+        }
+    }
+    public class CS_Sides_Basics : CS_Parent
+    {
+        public Profile_Basics sides = new Profile_Basics();
+        public Contour_RedCloudCorners corners = new Contour_RedCloudCorners();
+        public CS_Sides_Basics(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud output", "Selected Cell showing the various extrema." };
+            desc = "Find the 6 extrema and the 4 farthest points in each quadrant for the selected RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            sides.Run(src);
+            dst2 = sides.dst2;
+            dst3 = sides.dst3;
+            var cornersList = sides.corners.ToList();
+            for (int i = 0; i < cornersList.Count(); i++)
+            {
+                var nextColor = sides.cornerColors[i];
+                var nextLabel = sides.cornerNames[i];
+                DrawLine(dst3, task.rc.maxDist, cornersList[i], Scalar.White);
+                SetTrueText(nextLabel, new cv.Point(cornersList[i].X, cornersList[i].Y), 3);
+            }
+            if (cornersList.Count() > 0)
+                SetTrueText(sides.strOut, 3);
+            else
+                SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Sides_Profile : CS_Parent
+    {
+        Contour_SidePoints sides = new Contour_SidePoints();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Sides_Profile(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud_Basics Output", "Selected Cell" };
+            desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            sides.Run(src);
+            dst3 = sides.dst3;
+            SetTrueText(sides.strOut, 3);
+        }
+    }
+    public class CS_Sides_Corner : CS_Parent
+    {
+        Contour_RedCloudCorners sides = new Contour_RedCloudCorners();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Sides_Corner(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud_Basics output", "" };
+            desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            sides.Run(src);
+            dst3 = sides.dst3;
+            SetTrueText("Center point is rcSelect.maxDist", 3);
+        }
+    }
+    public class CS_Sides_ColorC : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Sides_Basics sides = new Sides_Basics();
+        public CS_Sides_ColorC(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedColor Output", "Cell Extrema" };
+            desc = "Find the extrema - top/bottom, left/right, near/far - points for a RedColor Cell";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            sides.Run(src);
+            dst3 = sides.dst3;
+        }
+    }
+    public class CS_Sieve_Image : CS_Parent
+    {
+        Pixel_Zoom zoom = new Pixel_Zoom();
+        byte[] numArray;
+        Dictionary<int, int> referenceResults = new Dictionary<int, int>
+        {
+            {10, 4}, {100, 25}, {1000, 168}, {10000, 1229}, {100000, 9592}, {1000000, 78498}, 
+            {10000000, 664579}, {100000000, 5761455}
+        };
+        public CS_Sieve_Image(VBtask task) : base(task)
+        {
+            numArray = new byte[dst2.Total() - 1];
+            labels[2] = "NonZero pixels are primes";
+            labels[3] = "Zoom output";
+            desc = "Create an image marking primes";
+        }
+        public void RunCS(Mat src)
+        {
+            int numCeiling = numArray.Length - 1;
+            Array.Resize(ref numArray, numCeiling + 1);
+            numArray[0] = 255;
+            numArray[1] = 255;
+            for (int i = 2; i <= numCeiling / 2 - 1; i++)
+            {
+                for (int j = i + i; j <= numCeiling; j += i)
+                {
+                    if (numArray[j] != 255) numArray[j] = 255;
+                }
+            }
+            int countPrimes = 0;
+            for (int i = 2; i <= numCeiling; i++)
+            {
+                if (numArray[i] == 0) countPrimes++;
+            }
+            if (referenceResults.ContainsKey(numCeiling))
+            {
+                if (referenceResults[numCeiling] != countPrimes) SetTrueText("Invalid prime count - check this...");
+            }
+            dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_8U, numArray);
+            dst2 = ~dst2;
+            zoom.Run(dst2);
+            dst3 = zoom.dst2;
+        }
+    }
+    public class CS_SLR_Data : CS_Parent
+    {
+        Plot_Basics_CPP plot = new Plot_Basics_CPP();
+        public List<double> dataX = new List<double>();
+        public List<double> dataY = new List<double>();
+        public CS_SLR_Data(VBtask task) : base(task)
+        {
+            using (var sr = new StreamReader(task.HomeDir + "/Data/real_data.txt"))
+            {
+                string code = sr.ReadToEnd();
+                var lines = code.Split('\n');
+                foreach (var line in lines)
+                {
+                    var split = line.Split(' ');
+                    if (split.Length > 1)
+                    {
+                        dataX.Add(double.Parse(split[0]));
+                        dataY.Add(double.Parse(split[1]));
+                    }
+                }
+            }
+            desc = "Plot the data used in SLR_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            plot.srcX = dataX;
+            plot.srcY = dataY;
+            plot.Run(src);
+            dst2 = plot.dst2;
+        }
+    }
+    public class CS_SLR_SurfaceH : CS_Parent
+    {
+        PointCloud_SurfaceH surface = new PointCloud_SurfaceH();
+        public CS_SLR_SurfaceH(VBtask task) : base(task)
+        {
+            desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks.";
+        }
+        public void RunCS(Mat src)
+        {
+            surface.Run(src);
+            dst2 = surface.dst3;
+        }
+    }
+    public class CS_SLR_Trends : CS_Parent
+    {
+        public Hist_KalmanAuto hist = new Hist_KalmanAuto();
+        List<float> valList = new List<float>();
+        float barMidPoint;
+        Point2f lastPoint;
+        public List<cv.Point2f> resultingPoints = new List<cv.Point2f>();
+        public List<float> resultingValues = new List<float>();
+        public CS_SLR_Trends(VBtask task) : base(task)
+        {
+            desc = "Find trends by filling in short histogram gaps in the given image's histogram.";
+        }
+        public void connectLine(int i, cv.Mat dst)
+        {
+            float x = barMidPoint + dst.Width * i / valList.Count();
+            float y = dst.Height - dst.Height * valList[i] / hist.plot.maxValue;
+            Point2f p1 = new Point2f(x, y);
+            resultingPoints.Add(p1);
+            resultingValues.Add(p1.Y);
+            DrawLine(dst, lastPoint, p1, Scalar.Yellow, task.lineWidth + 1);
+            lastPoint = p1;
+        }
+        public void RunCS(Mat src)
+        {
+            labels[2] = "Grayscale histogram - yellow line shows trend";
+            hist.plot.backColor = Scalar.Red;
+            hist.Run(src);
+            dst2 = hist.dst2;
+            var indexer = hist.histogram.GetGenericIndexer<float>();
+            valList = new List<float>();
+            for (int i = 0; i < hist.histogram.Rows; i++)
+            {
+                valList.Add(indexer[i]);
+            }
+            barMidPoint = dst2.Width / valList.Count() / 2;
+            if (valList.Count() < 2) return;
+            hist.plot.maxValue = valList.Max();
+            lastPoint = new Point2f(barMidPoint, dst2.Height - dst2.Height * valList[0] / hist.plot.maxValue);
+            resultingPoints.Clear();
+            resultingValues.Clear();
+            resultingPoints.Add(lastPoint);
+            resultingValues.Add(lastPoint.Y);
+            for (int i = 1; i < valList.Count() - 1; i++)
+            {
+                if (valList[i - 1] > valList[i] && valList[i + 1] > valList[i])
+                {
+                    valList[i] = (valList[i - 1] + valList[i + 1]) / 2;
+                }
+                connectLine(i, dst2);
+            }
+            connectLine(valList.Count() - 1, dst2);
+        }
+    }
+    public class CS_SLR_TrendImages : CS_Parent
+    {
+        SLR_Trends trends = new SLR_Trends();
+        Options_SLRImages options = new Options_SLRImages();
+        public CS_SLR_TrendImages(VBtask task) : base(task)
+        {
+            desc = "Find trends by filling in short histogram gaps for depth or 1-channel images";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Mat[] split = src.Split();
+            trends.hist.plot.maxRange = 255;
+            trends.hist.plot.removeZeroEntry = false; // default is to look at element 0....
+            int splitIndex = 0;
+            switch (options.radioText)
+            {
+                case "pcSplit(2) input":
+                    trends.hist.plot.maxRange = task.MaxZmeters;
+                    trends.hist.plot.removeZeroEntry = true; // not interested in the undefined depth areas...
+                    trends.Run(task.pcSplit[2]);
+                    labels[2] = "CS_SLR_TrendImages - pcSplit(2)";
+                    break;
+                case "Grayscale input":
+                    trends.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY));
+                    labels[2] = "CS_SLR_TrendImages - grayscale";
+                    break;
+                case "Blue input":
+                    labels[2] = "CS_SLR_TrendImages - Blue channel";
+                    splitIndex = 0;
+                    break;
+                case "Green input":
+                    labels[2] = "CS_SLR_TrendImages - Green channel";
+                    splitIndex = 1;
+                    break;
+                case "Red input":
+                    labels[2] = "CS_SLR_TrendImages - Red channel";
+                    splitIndex = 2;
+                    break;
+            }
+            trends.Run(split[splitIndex]);
+            dst2 = trends.dst2;
+        }
+    }
+    public class CS_Smoothing_Exterior : CS_Parent
+    {
+        Convex_Basics hull = new Convex_Basics();
+        public List<cv.Point> inputPoints { get; set; }
+        public List<cv.Point> smoothPoints { get; set; }
+        public Scalar plotColor = Scalar.Yellow;
+        Options_Smoothing smOptions = new Options_Smoothing();
+        List<cv.Point> getSplineInterpolationCatmullRom(List<cv.Point> points, int nrOfInterpolatedPoints)
+        {
+            List<cv.Point> spline = new List<cv.Point>();
+            List<cv.Point> spoints = new List<cv.Point>(points);
+            cv.Point startPt = (spoints[1] + spoints[0]) * 0.5;
+            spoints.Insert(0, startPt);
+            cv.Point endPt = (spoints[spoints.Count() - 1] + spoints[spoints.Count() - 2]) * 0.5;
+            spoints.Add(endPt);
+            double t;
+            cv.Point spoint;
+            for (int i = 0; i <= spoints.Count() - 4; i++)
+            {
+                spoint = new cv.Point();
+                for (int j = 0; j < nrOfInterpolatedPoints; j++)
+                {
+                    cv.Point x0 = spoints[i % spoints.Count()];
+                    cv.Point x1 = spoints[(i + 1) % spoints.Count()];
+                    cv.Point x2 = spoints[(i + 2) % spoints.Count()];
+                    cv.Point x3 = spoints[(i + 3) % spoints.Count()];
+                    t = 1.0 / nrOfInterpolatedPoints * j;
+                    spoint.X = (int)(0.5 * (2 * x1.X + (-1 * x0.X + x2.X) * t + (2 * x0.X - 5 * x1.X + 4 * x2.X - x3.X) * t * t +
+                                      (-1 * x0.X + 3 * x1.X - 3 * x2.X + x3.X) * t * t * t));
+                    spoint.Y = (int)(0.5 * (2 * x1.Y + (-1 * x0.Y + x2.Y) * t + (2 * x0.Y - 5 * x1.Y + 4 * x2.Y - x3.Y) * t * t +
+                                      (-1 * x0.Y + 3 * x1.Y - 3 * x2.Y + x3.Y) * t * t * t));
+                    spline.Add(spoint);
+                }
+            }
+            spline.Add(spoints[spoints.Count() - 2]);
+            return spline;
+        }
+        public CS_Smoothing_Exterior(VBtask task) : base(task)
+        {
+            labels[2] = "Original Points (white) Smoothed (yellow)";
+            labels[3] = "";
+            desc = "Smoothing the line connecting a series of points.";
+        }
+        public void RunCS(Mat src)
+        {
+            smOptions.RunVB();
+            if (standaloneTest())
+            {
+                if (task.heartBeat && !task.paused)
+                {
+                    List<cv.Point> hullList = hull.buildRandomHullPoints();
+                    dst2.SetTo(0);
+                    hull.Run(src);
+                    cv.Point[] nextHull = Cv2.ConvexHull(hullList.ToArray(), true);
+                    inputPoints = new List<cv.Point>(nextHull);
+                    DrawPoly(dst2, inputPoints, Scalar.White);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                dst2.SetTo(0);
+            }
+            if (inputPoints.Count() > 1)
+            {
+                smoothPoints = getSplineInterpolationCatmullRom(inputPoints, smOptions.iterations);
+                DrawPoly(dst2, smoothPoints, plotColor);
+            }
+        }
+    }
+    public class CS_Smoothing_Interior : CS_Parent
+    {
+        Convex_Basics hull = new Convex_Basics();
+        public List<cv.Point> inputPoints { get; set; }
+        public List<cv.Point> smoothPoints { get; set; }
+        public Scalar plotColor = Scalar.Yellow;
+        Options_Smoothing smOptions = new Options_Smoothing();
+        List<cv.Point2d> getCurveSmoothingChaikin(List<cv.Point> points, double tension, int nrOfIterations)
+        {
+            double cutdist = 0.05 + (tension * 0.4);
+            List<cv.Point2d> nl = new List<cv.Point2d>();
+            for (int i = 0; i < points.Count(); i++)
+            {
+                nl.Add(new Point2d(points[i].X, points[i].Y));
+            }
+            for (int i = 1; i <= nrOfIterations; i++)
+            {
+                if (nl.Count() > 0) nl = getSmootherChaikin(nl, cutdist);
+            }
+            return nl;
+        }
+        List<cv.Point2d> getSmootherChaikin(List<cv.Point2d> points, double cuttingDist)
+        {
+            List<cv.Point2d> nl = new List<cv.Point2d>();
+            nl.Add(points[0]);
+            for (int i = 0; i < points.Count() - 1; i++)
+            {
+                Point2d pt1 = new Point2d((1 - cuttingDist) * points[i].X, (1 - cuttingDist) * points[i].Y);
+                Point2d pt2 = new Point2d(cuttingDist * points[i + 1].X, cuttingDist * points[i + 1].Y);
+                nl.Add(pt1 + pt2);
+                pt1 = new Point2d(cuttingDist * points[i].X, cuttingDist * points[i].Y);
+                pt2 = new Point2d((1 - cuttingDist) * points[i + 1].X, (1 - cuttingDist) * points[i + 1].Y);
+                nl.Add(pt1 + pt2);
+            }
+            nl.Add(points[points.Count() - 1]);
+            return nl;
+        }
+        public CS_Smoothing_Interior(VBtask task) : base(task)
+        {
+            if (standaloneTest()) FindSlider("Hull random points").Value = 16;
+            labels[2] = "Original Points (white) Smoothed (yellow)";
+            labels[3] = "";
+            desc = "Smoothing the line connecting a series of points staying inside the outline.";
+        }
+        public void RunCS(Mat src)
+        {
+            smOptions.RunVB();
+            if (standaloneTest())
+            {
+                if (task.heartBeat && !task.paused)
+                {
+                    List<cv.Point> hullList = hull.buildRandomHullPoints();
+                    dst2.SetTo(0);
+                    hull.Run(src);
+                    cv.Point[] nextHull = Cv2.ConvexHull(hullList.ToArray(), true);
+                    inputPoints = new List<cv.Point>(nextHull);
+                    DrawPoly(dst2, nextHull.ToList(), Scalar.White);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                dst2.SetTo(0);
+            }
+            List<cv.Point2d> smoothPoints2d = getCurveSmoothingChaikin(inputPoints, smOptions.interiorTension, smOptions.iterations);
+            smoothPoints = new List<cv.Point>();
+            for (int i = 0; i < smoothPoints2d.Count(); i += smOptions.stepSize)
+            {
+                smoothPoints.Add(new cv.Point((int)smoothPoints2d[i].X, (int)smoothPoints2d[i].Y));
+            }
+            if (smoothPoints.Count() > 0) DrawPoly(dst2, smoothPoints, plotColor);
+        }
+    }
+
+    public class CS_Solve_ByMat : CS_Parent
+    {
+        public CS_Solve_ByMat(VBtask task) : base(task)
+        {
+            desc = "Solve a set of equations with OpenCV's Solve API.";
+        }
+        public void RunCS(Mat src)
+        {
+            // x + y = 10
+            // 2x + 3y = 26
+            // (x=4, y=6)
+            double[,] av = { { 1, 1 }, { 2, 3 } };
+            double[] yv = { 10, 26 };
+            Mat a = new Mat(2, 2, MatType.CV_64FC1, av);
+            Mat y = new Mat(2, 1, MatType.CV_64FC1, yv);
+            Mat x = new Mat();
+            Cv2.Solve(a, y, x, DecompTypes.LU);
+            SetTrueText("Solution ByMat: X1 = " + x.At<double>(0, 0) + "\tX2 = " + x.At<double>(0, 1), new cv.Point(10, 125));
+        }
+    }
+    public class CS_Solve_ByArray : CS_Parent
+    {
+        public CS_Solve_ByArray(VBtask task) : base(task)
+        {
+            desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  ";
+        }
+        public void RunCS(Mat src)
+        {
+            // x + y = 10
+            // 2x + 3y = 26
+            // (x=4, y=6)
+            double[,] av = { { 1, 1 }, { 2, 3 } };
+            double[] yv = { 10, 26 };
+            Mat x = new Mat();
+            Cv2.Solve(InputArray.Create(av), InputArray.Create(yv), x, DecompTypes.LU);
+            SetTrueText("Solution ByArray: X1 = " + x.At<double>(0, 0) + "\tX2 = " + x.At<double>(0, 1), new cv.Point(10, 125));
+        }
+    }
+    public class CS_Sort_Basics : CS_Parent
+    {
+        Options_Sort options = new Options_Sort();
+        public CS_Sort_Basics(VBtask task) : base(task)
+        {
+            desc = "Sort the pixels of a grayscale image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.radio5.Checked)
+            {
+                src = src.Reshape(1, src.Rows * src.Cols);
+                options.sortOption = SortFlags.EveryColumn | SortFlags.Descending;
+            }
+            if (options.radio4.Checked)
+            {
+                src = src.Reshape(1, src.Rows * src.Cols);
+                options.sortOption = SortFlags.EveryColumn | SortFlags.Ascending;
+            }
+            if (src.Channels() == 3) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            dst2 = src.Sort(options.sortOption);
+            if (options.radio4.Checked || options.radio5.Checked) dst2 = dst2.Reshape(1, dst0.Rows);
+        }
+    }
+    public class CS_Sort_RectAndMask : CS_Parent
+    {
+        Sort_Basics sort = new Sort_Basics();
+        public Mat mask;
+        public cv.Rect rect;
+        public CS_Sort_RectAndMask(VBtask task) : base(task)
+        {
+            labels[3] = "Original input to sort";
+            if (standaloneTest()) task.drawRect = new cv.Rect(10, 10, 50, 5);
+            desc = "Sort the grayscale image portion in a rect while allowing for a mask.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            var tmpRect = rect == new cv.Rect() ? task.drawRect : rect;
+            dst1 = src[tmpRect].Clone();
+            if (mask != null)
+            {
+                mask = mask.Threshold(0, 255, ThresholdTypes.BinaryInv);
+                dst1.SetTo(0, mask);
+            }
+            sort.Run(dst1);
+            dst2 = sort.dst2.Reshape(1, dst1.Rows);
+            dst2 = dst2.Resize(dst3.Size());
+            if (standaloneTest()) dst3 = src[tmpRect].Resize(dst3.Size());
+        }
+    }
+    public class CS_Sort_MLPrepTest_CPP : CS_Parent
+    {
+        public Reduction_Basics reduction = new Reduction_Basics();
+        public Mat MLTestData = new Mat();
+        public CS_Sort_MLPrepTest_CPP(VBtask task) : base(task)
+        {
+            cPtr = Sort_MLPrepTest_Open();
+            desc = "Prepare the grayscale image and row to predict depth";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            reduction.Run(src);
+            byte[] dataSrc = new byte[reduction.dst2.Total() * reduction.dst2.ElemSize()];
+            Marshal.Copy(reduction.dst2.Data, dataSrc, 0, dataSrc.Length);
+            var handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            var imagePtr = Sort_MLPrepTest_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
+            handleSrc.Free();
+            MLTestData = new Mat(src.Rows, src.Cols, MatType.CV_32FC2, imagePtr).Clone();
+            var split = MLTestData.Split();
+            dst2 = split[0];
+            dst3 = split[1];
+        }
+        public void Close()
+        {
+            if (cPtr != (IntPtr)0) cPtr = Sort_MLPrepTest_Close(cPtr);
+        }
+    }
+    public class CS_Sort_1Channel : CS_Parent
+    {
+        Sort_Basics sort = new Sort_Basics();
+        ML_RemoveDups_CPP dups = new ML_RemoveDups_CPP();
+        public List<int> rangeStart = new List<int>();
+        public List<int> rangeEnd = new List<int>();
+        TrackBar thresholdSlider;
+        public CS_Sort_1Channel(VBtask task) : base(task)
+        {
+            thresholdSlider = FindSlider("Threshold for sort input");
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            FindRadio("Sort all pixels descending").Checked = true;
+            if (standaloneTest()) task.gOptions.setGridSize(10);
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            labels = new[] { "", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates" };
+            desc = "Take some 1-channel input, sort it, and provide the list of unique elements";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            dst1 = src.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
+            dst2.SetTo(0);
+            src.CopyTo(dst2, dst1);
+            sort.Run(dst2);
+            var pixelsPerBlock = (int)(dst3.Total() / dst2.Rows);
+            var sq = Math.Sqrt(pixelsPerBlock);
+            task.gOptions.setGridSize((int)Math.Min(sq, 10));
+            dst0 = sort.dst2.Reshape(1, dst2.Rows);
+            dups.Run(dst0);
+            dst3.SetTo(255);
+            var inputCount = dups.dst3.CountNonZero();
+            var testVals = new List<int>();
+            for (int i = 0; i < Math.Min(inputCount, task.gridList.Count()); i++)
+            {
+                var roi = task.gridList[i];
+                var val = (int)dups.dst3.Get<byte>(0, i);
+                testVals.Add(val);
+                dst3[roi].SetTo(val);
+            }
+            if (testVals.Count() == 0) return;
+            rangeStart.Clear();
+            rangeEnd.Clear();
+            rangeStart.Add(testVals[0]);
+            for (int i = 0; i < testVals.Count() - 1; i++)
+            {
+                if (Math.Abs(testVals[i] - testVals[i + 1]) > 1)
+                {
+                    rangeEnd.Add(testVals[i]);
+                    rangeStart.Add(testVals[i + 1]);
+                }
+            }
+            rangeEnd.Add(testVals[testVals.Count() - 1]);
+            labels[3] = " The number of unique entries = " + inputCount + " were spread across " + rangeStart.Count() + " ranges";
+        }
+    }
+    public class CS_Sort_3Channel : CS_Parent
+    {
+        Sort_Basics sort = new Sort_Basics();
+        ML_RemoveDups_CPP dups = new ML_RemoveDups_CPP();
+        Mat bgra;
+        TrackBar thresholdSlider;
+        public CS_Sort_3Channel(VBtask task) : base(task)
+        {
+            thresholdSlider = FindSlider("Threshold for sort input");
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            FindRadio("Sort all pixels descending").Checked = true;
+            labels = new[] { "", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data" };
+            desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements";
+        }
+        public void RunCS(Mat src)
+        {
+            var inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (standaloneTest()) inputMask = inputMask.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
+            bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA);
+            dst1 = new Mat(dst1.Rows, dst1.Cols, MatType.CV_32S, bgra.Data);
+            dst0 = new Mat(dst0.Size(), MatType.CV_32S, 0);
+            dst1.CopyTo(dst0, inputMask);
+            sort.Run(dst0);
+            dst2 = sort.dst2.Reshape(1, dst2.Rows);
+            var tmp = new Mat(src.Rows, src.Cols, MatType.CV_8UC4, dst2.Data);
+            dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR);
+            //dups.Run(dst2);
+            //dst2 = dups.dst2;
+        }
+    }
+    public class CS_Sort_FeatureLess : CS_Parent
+    {
+        public FeatureROI_Basics devGrid = new FeatureROI_Basics();
+        public Sort_Basics sort = new Sort_Basics();
+        Plot_Histogram plot = new Plot_Histogram();
+        public CS_Sort_FeatureLess(VBtask task) : base(task)
+        {
+            plot.createHistogram = true;
+            task.gOptions.setHistogramBins(256);
+            task.gOptions.setGridSize(8);
+            desc = "Sort all the featureless grayscale pixels.";
+        }
+        public void RunCS(Mat src)
+        {
+            devGrid.Run(src);
+            dst2 = devGrid.dst2;
+            dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst1.SetTo(0, ~devGrid.dst3);
+            sort.Run(dst1);
+            // dst3 = sort.dst2;
+            byte[] samples = new byte[sort.dst2.Total()];
+            Marshal.Copy(sort.dst2.Data, samples, 0, samples.Length);
+            plot.Run(sort.dst2);
+            dst3 = plot.dst2;
+        }
+    }
+    public class CS_Sort_Integer : CS_Parent
+    {
+        Sort_Basics sort = new Sort_Basics();
+        public int[] data;
+        public List<int> vecList = new List<int>();
+        public CS_Sort_Integer(VBtask task) : base(task)
+        {
+            data = new int[dst2.Total()];
+            FindRadio("Sort all pixels ascending").Checked = true;
+            labels = new string[] { "", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates" };
+            desc = "Take some 1-channel input, sort it, and provide the list of unique elements";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standalone)
+            {
+                Mat[] split = src.Split();
+                Mat zero = new Mat(split[0].Size(), MatType.CV_8U, 0);
+                Cv2.Merge(new Mat[] { split[0], split[1], split[2], zero }, src);
+                Marshal.Copy(src.Data, data, 0, data.Length);
+                src = new Mat(src.Size(), MatType.CV_32S, 0);
+                Marshal.Copy(data, 0, src.Data, data.Length);
+            }
+            sort.Run(src);
+            Marshal.Copy(sort.dst2.Data, data, 0, data.Length);
+            vecList.Clear();
+            vecList.Add(data[0]);
+            for (int i = 1; i < data.Length; i++)
+            {
+                if (data[i - 1] != data[i]) vecList.Add(data[i]);
+            }
+            labels[2] = "There were " + vecList.Count().ToString() + " unique 8UC3 pixels in the input.";
+        }
+    }
+    public class CS_Sort_GrayScale1 : CS_Parent
+    {
+        Sort_Integer sort = new Sort_Integer();
+        byte[][] pixels = new byte[3][];
+        public CS_Sort_GrayScale1(VBtask task) : base(task)
+        {
+            desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            byte[] gray = new byte[dst1.Total()];
+            Marshal.Copy(dst1.Data, gray, 0, gray.Length);
+            Mat[] split = src.Split();
+            for (int i = 0; i < 3; i++)
+            {
+                if (task.FirstPass) pixels[i] = new byte[src.Total()];
+                Marshal.Copy(split[i].Data, pixels[i], 0, pixels[i].Length);
+            }
+            uint[] input = new uint[gray.Length];
+            for (int i = 0; i < gray.Length; i++)
+            {
+                input[i] = (uint)(pixels[0][i] * 65536 + pixels[1][i] * 256 + pixels[2][i]);
+            }
+            sort.Run(new Mat(gray.Length, 1, MatType.CV_32S, input));
+            List<uint> unique = new List<uint>();
+            unique.Add((uint)sort.data[0]);
+            for (int i = 1; i < sort.data.Length; i++)
+            {
+                if (sort.data[i - 1] != sort.data[i]) unique.Add((uint)sort.data[i]);
+            }
+            labels[2] = "There were " + unique.Count().ToString() + " distinct pixels in the image.";
+        }
+    }
+    public class CS_Sort_GrayScale : CS_Parent
+    {
+        Plot_Histogram plot = new Plot_Histogram();
+        byte[][] pixels = new byte[3][];
+        public CS_Sort_GrayScale(VBtask task) : base(task)
+        {
+            desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry.";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat[] split = src.Split();
+            for (int i = 0; i < 3; i++)
+            {
+                if (task.FirstPass) pixels[i] = new byte[src.Total()];
+                Marshal.Copy(split[i].Data, pixels[i], 0, pixels[i].Length);
+            }
+            float[] totals = new float[256];
+            Vec3b[] lut = new Vec3b[256];
+            for (int i = 0; i < src.Total(); i++)
+            {
+                int index = (int)(0.299 * pixels[2][i] + 0.587 * pixels[1][i] + 0.114 * pixels[0][i]);
+                totals[index] += 1;
+                if (totals[index] == 1) lut[index] = new Vec3b(pixels[0][i], pixels[1][i], pixels[2][i]);
+            }
+            Mat histogram = new Mat(256, 1, MatType.CV_32F, totals);
+            plot.Run(histogram);
+            dst2 = plot.dst2;
+        }
+    }
+    public class CS_Spectrum_Basics : CS_Parent
+    {
+        Spectrum_Z dSpec = new Spectrum_Z();
+        Spectrum_Gray gSpec = new Spectrum_Gray();
+        public Options_Spectrum options = new Options_Spectrum();
+        public CS_Spectrum_Basics(VBtask task) : base(task)
+        {
+            desc = "Given a RedCloud cell, create a spectrum that contains the ranges of the depth and color.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = options.runRedCloud(ref labels[2]);
+            dSpec.Run(src);
+            gSpec.Run(src);
+            if (task.heartBeat && task.rc.index > 0)
+            {
+                strOut = dSpec.strOut + "\n\n" + gSpec.strOut;
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Spectrum_X : CS_Parent
+    {
+        public Options_Spectrum options = new Options_Spectrum();
+        public CS_Spectrum_X(VBtask task) : base(task)
+        {
+            desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
+            if (task.heartBeat && task.rc.index > 0)
+            {
+                var ranges = options.buildDepthRanges(task.pcSplit[0][task.rc.rect].Clone(), " pointcloud X ");
+                strOut = options.strOut;
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Spectrum_Y : CS_Parent
+    {
+        public Options_Spectrum options = new Options_Spectrum();
+        public CS_Spectrum_Y(VBtask task) : base(task)
+        {
+            desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
+            if (task.heartBeat && task.rc.index > 0)
+            {
+                var ranges = options.buildDepthRanges(task.pcSplit[1][task.rc.rect].Clone(), " pointcloud Y ");
+                strOut = options.strOut;
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Spectrum_Z : CS_Parent
+    {
+        public Options_Spectrum options = new Options_Spectrum();
+        public CS_Spectrum_Z(VBtask task) : base(task)
+        {
+            desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
+            if (task.heartBeat && task.rc.index > 0)
+            {
+                var ranges = options.buildDepthRanges(task.pcSplit[2][task.rc.rect].Clone(), " pointcloud Z ");
+                strOut = options.strOut;
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Spectrum_Cloud : CS_Parent
+    {
+        public Options_Spectrum options = new Options_Spectrum();
+        Spectrum_X specX = new Spectrum_X();
+        Spectrum_Y specY = new Spectrum_Y();
+        Spectrum_Z specZ = new Spectrum_Z();
+        public CS_Spectrum_Cloud(VBtask task) : base(task)
+        {
+            desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
+            if (task.heartBeat)
+            {
+                specX.Run(src);
+                strOut = specX.strOut + "\n";
+                specY.Run(src);
+                strOut += specY.strOut + "\n";
+                specZ.Run(src);
+                strOut += specZ.strOut;
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Spectrum_GrayAndCloud : CS_Parent
+    {
+        Options_Spectrum options = new Options_Spectrum();
+        Spectrum_Gray gSpec = new Spectrum_Gray();
+        Spectrum_Cloud sCloud = new Spectrum_Cloud();
+        public CS_Spectrum_GrayAndCloud(VBtask task) : base(task)
+        {
+            desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
+            if (task.heartBeat)
+            {
+                sCloud.Run(src);
+                strOut = sCloud.strOut + "\n";
+                gSpec.Run(src);
+                strOut += gSpec.strOut;
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Spectrum_RGB : CS_Parent
+    {
+        Options_Spectrum options = new Options_Spectrum();
+        Spectrum_Gray gSpec = new Spectrum_Gray();
+        public CS_Spectrum_RGB(VBtask task) : base(task)
+        {
+            desc = "Create a spectrum of the RGB values for a given RedCloud cell.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
+            var split = src.Split();
+            gSpec.typeSpec = " blue ";
+            gSpec.Run(split[0]);
+            if (task.heartBeat) strOut = gSpec.strOut + "\n";
+            gSpec.typeSpec = " green ";
+            gSpec.Run(split[1]);
+            if (task.heartBeat) strOut += gSpec.strOut + "\n";
+            gSpec.typeSpec = " red ";
+            gSpec.Run(split[2]);
+            if (task.heartBeat) strOut += gSpec.strOut;
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Spectrum_CellZoom : CS_Parent
+    {
+        Resize_Proportional proportion = new Resize_Proportional();
+        Spectrum_Breakdown breakdown = new Spectrum_Breakdown();
+        public CS_Spectrum_CellZoom(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "Cell trimming information", "", "White is after trimming, gray is before trim, black is outside the cell mask." };
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering.";
+        }
+        public void RunCS(Mat src)
+        {
+            breakdown.options.RunVB();
+            dst2 = breakdown.options.runRedCloud(ref labels[2]);
+            if (task.heartBeat)
+            {
+                breakdown.Run(src);
+                SetTrueText(breakdown.strOut, 1);
+                proportion.Run(breakdown.dst3);
+                dst3 = proportion.dst2;
+                strOut = breakdown.options.strOut;
+            }
+            SetTrueText(strOut, 1);
+        }
+    }
+    public class CS_Spectrum_Breakdown : CS_Parent
+    {
+        public Options_Spectrum options = new Options_Spectrum();
+        public bool buildMaskOnly;
+        Resize_Proportional proportion = new Resize_Proportional();
+        public CS_Spectrum_Breakdown(VBtask task) : base(task)
+        {
+            desc = "Breakdown a cell if possible.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                options.RunVB();
+                dst2 = options.runRedCloud(ref labels[2]);
+            }
+            var rc = task.rc;
+            List<rangeData> ranges;
+            Mat input;
+            if (rc.pixels == 0) return;
+            if (rc.depthPixels / rc.pixels < 0.5)
+            {
+                input = new Mat(rc.mask.Size(), MatType.CV_8U, 0);
+                src[rc.rect].CopyTo(input, rc.mask);
+                input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            }
+            else
+            {
+                input = new Mat(rc.mask.Size(), MatType.CV_32F, 0);
+                task.pcSplit[2][rc.rect].CopyTo(input, rc.mask);
+            }
+            ranges = options.buildColorRanges(input, "GrayScale");
+            if (ranges.Count() == 0) return; // all the counts were too small - rare but it happens.
+            rangeData maxRange = null;
+            int maxPixels = 0;
+            foreach (var r in ranges)
+            {
+                if (r.pixels > maxPixels)
+                {
+                    maxPixels = r.pixels;
+                    maxRange = r;
+                }
+            }
+            Mat rangeClip = new Mat(input.Size(), MatType.CV_8U, 0);
+            if (input.Type() == MatType.CV_8U)
+            {
+                rangeClip = input.InRange(maxRange.start, maxRange.ending);
+                rangeClip = rangeClip.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            }
+            else
+            {
+                rangeClip = new Mat(rc.mask.Size(), MatType.CV_32F, 0);
+                input.CopyTo(rangeClip, rc.mask);
+                rangeClip = rangeClip.InRange(maxRange.start / 100, maxRange.ending / 100);
+                rangeClip = rangeClip.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            }
+            if (!buildMaskOnly)
+            {
+                dst3 = rc.mask.Threshold(0, 128, ThresholdTypes.Binary);
+                dst3.SetTo(255, rangeClip);
+            }
+            if (standaloneTest())
+            {
+                proportion.Run(dst3);
+                dst3 = proportion.dst2;
+            }
+            rc.mask = rc.mask.Threshold(0, 255, ThresholdTypes.Binary);
+            task.rc = rc;
+        }
+    }
+    public class CS_Spectrum_RedCloud : CS_Parent
+    {
+        Spectrum_Breakdown breakdown = new Spectrum_Breakdown();
+        public List<rcData> redCells = new List<rcData>();
+        public CS_Spectrum_RedCloud(VBtask task) : base(task)
+        {
+            desc = "Breakdown each cell in redCells.";
+        }
+        public void RunCS(Mat src)
+        {
+            breakdown.options.RunVB();
+            dst2 = breakdown.options.runRedCloud(ref labels[2]);
+            redCells.Clear();
+            dst3.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                task.rc = rc;
+                breakdown.Run(src);
+                var rcNew = task.rc;
+                redCells.Add(rcNew);
+                dst3[rcNew.rect].SetTo(rcNew.color, rcNew.mask);
+            }
+            breakdown.Run(src);
+        }
+    }
+    public class CS_Spectrum_Mask : CS_Parent
+    {
+        Spectrum_Gray gSpec = new Spectrum_Gray();
+        public CS_Spectrum_Mask(VBtask task) : base(task)
+        {
+            if (standaloneTest()) strOut = "Select a cell to see its depth spectrum";
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Create a mask from the Spectrum ranges";
+        }
+        public void RunCS(Mat src)
+        {
+            gSpec.Run(src);
+            dst1 = gSpec.dst2;
+            labels[2] = gSpec.labels[2];
+            if (task.heartBeat) strOut = gSpec.strOut;
+        }
+    }
+    public class CS_Spectrum_Gray : CS_Parent
+    {
+        Options_Spectrum options = new Options_Spectrum();
+        public string typeSpec = "GrayScale";
+        public CS_Spectrum_Gray(VBtask task) : base(task)
+        {
+            desc = "Given a RedCloud cell, create a spectrum that contains the color ranges.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
+            var input = src[task.rc.rect];
+            if (input.Type() != MatType.CV_8U) input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            var ranges = options.buildColorRanges(input, typeSpec);
+            strOut = options.strOut;
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Stabilizer_Basics : CS_Parent
+    {
+        Match_Basics match = new Match_Basics();
+        public int shiftX;
+        public int shiftY;
+        public cv.Rect templateRect;
+        public cv.Rect searchRect;
+        public cv.Rect stableRect;
+        Options_Stabilizer options = new Options_Stabilizer();
+        Mat lastFrame;
+        public CS_Stabilizer_Basics(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            labels[2] = "Current frame - rectangle input to matchTemplate";
+            desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            bool resetImage = false;
+            templateRect = new cv.Rect(src.Width / 2 - options.width / 2, src.Height / 2 - options.height / 2,
+                                       options.width, options.height);
+            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (task.FirstPass) lastFrame = src.Clone();
+            dst2 = src.Clone();
+            Scalar mean;
+            Scalar stdev;
+            Cv2.MeanStdDev(dst2[templateRect], out mean, out stdev);
+            if (stdev[0] > options.minStdev)
+            {
+                var t = templateRect;
+                int w = t.Width + options.pad * 2;
+                int h = t.Height + options.pad * 2;
+                int x = Math.Abs(t.X - options.pad);
+                int y = Math.Abs(t.Y - options.pad);
+                searchRect = new cv.Rect(x, y, Math.Min(w, lastFrame.Width - x - 1), Math.Min(h, lastFrame.Height - y - 1));
+                match.template = lastFrame[searchRect];
+                match.Run(src[templateRect]);
+                if (match.correlation > options.corrThreshold)
+                {
+                    var maxLoc = new cv.Point(match.matchCenter.X, match.matchCenter.Y);
+                    shiftX = templateRect.X - maxLoc.X - searchRect.X;
+                    shiftY = templateRect.Y - maxLoc.Y - searchRect.Y;
+                    int x1 = shiftX < 0 ? Math.Abs(shiftX) : 0;
+                    int y1 = shiftY < 0 ? Math.Abs(shiftY) : 0;
+                    dst3.SetTo(0);
+                    int x2 = shiftX < 0 ? 0 : shiftX;
+                    int y2 = shiftY < 0 ? 0 : shiftY;
+                    stableRect = new cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY));
+                    var srcRect = new cv.Rect(x2, y2, stableRect.Width, stableRect.Height);
+                    stableRect = new cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY));
+                    src[srcRect].CopyTo(dst3[stableRect]);
+                    double nonZero = Cv2.CountNonZero(dst3) / (dst3.Width * dst3.Height);
+                    if (nonZero < (1 - options.lostMax))
+                    {
+                        labels[3] = "Lost pixels = " + string.Format("{0:00%}", 1 - nonZero);
+                        resetImage = true;
+                    }
+                    labels[3] = "Offset (x, y) = (" + shiftX + "," + shiftY + "), " + string.Format("{0:00%}", nonZero) + " preserved, cc=" + string.Format("{0}", match.correlation);
+                }
+                else
+                {
+                    labels[3] = "Below correlation threshold " + string.Format("{0}", options.corrThreshold) + " with " +
+                                string.Format("{0}", match.correlation);
+                    resetImage = true;
+                }
+            }
+            else
+            {
+                labels[3] = "Correlation rectangle stdev is " + string.Format("{0:00}", stdev[0]) + " - too low";
+                resetImage = true;
+            }
+            if (resetImage)
+            {
+                src.CopyTo(lastFrame);
+                dst3 = lastFrame.Clone();
+            }
+            if (standaloneTest()) dst3.Rectangle(templateRect, Scalar.White, 1); // when not standaloneTest(), traceName doesn't want artificial rectangle.
+        }
+    }
+
+
+    public class CS_Stabilizer_BasicsTest : CS_Parent
+    {
+        Stabilizer_BasicsRandomInput random = new Stabilizer_BasicsRandomInput();
+        Stabilizer_Basics stable = new Stabilizer_Basics();
+        public CS_Stabilizer_BasicsTest(VBtask task) : base(task)
+        {
+            labels[2] = "Unstable input to Stabilizer_Basics";
+            desc = "Test the Stabilizer_Basics with random movement";
+        }
+        public void RunCS(Mat src)
+        {
+            random.Run(src);
+            stable.Run(random.dst3.Clone());
+            dst2 = stable.dst2;
+            dst3 = stable.dst3;
+            if (standaloneTest()) dst3.Rectangle(stable.templateRect, Scalar.White, 1);
+            labels[3] = stable.labels[3];
+        }
+    }
+    public class CS_Stabilizer_OpticalFlow : CS_Parent
+    {
+        public Feature_Basics feat = new Feature_Basics();
+        public List<cv.Point2f> inputFeat = new List<cv.Point2f>();
+        public int borderCrop = 30;
+        Mat sumScale, sScale, features1;
+        Mat errScale, qScale, rScale;
+        Mat lastFrame;
+
+        public CS_Stabilizer_OpticalFlow(VBtask task) : base(task)
+        {
+            desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!";
+            labels[2] = "Stabilized Image";
+        }
+        public void RunCS(Mat src)
+        {
+            double vert_Border = borderCrop * src.Rows / src.Cols;
+            if (task.optionsChanged)
+            {
+                errScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 1);
+                qScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 0.004);
+                rScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 0.5);
+                sumScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 0);
+                sScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 0);
+            }
+            dst2 = src;
+            if (src.Channels() == 3) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (task.FirstPass) lastFrame = src.Clone();
+            feat.Run(src);
+            inputFeat = new List<cv.Point2f>(task.features);
+            features1 = new Mat(inputFeat.Count(), 1, MatType.CV_32FC2, inputFeat.ToArray());
+            if (task.frameCount > 0)
+            {
+                Mat features2 = new Mat();
+                Mat status = new Mat();
+                Mat err = new Mat();
+                cv.Size winSize = new cv.Size(3, 3);
+                TermCriteria term = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.Count, 10, 1.0);
+                Cv2.CalcOpticalFlowPyrLK(src, lastFrame, features1, features2, status, err, winSize, 3, term, OpticalFlowFlags.None);
+                lastFrame = src.Clone();
+                List<cv.Point2f> commonPoints = new List<cv.Point2f>();
+                List<cv.Point2f> lastFeatures = new List<cv.Point2f>();
+                for (int i = 0; i < status.Rows; i++)
+                {
+                    if (status.Get<byte>(i, 0) != 0)
+                    {
+                        Point2f pt1 = features1.Get<cv.Point2f>(i, 0);
+                        Point2f pt2 = features2.Get<cv.Point2f>(i, 0);
+                        double length = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y));
+                        if (length < 10)
+                        {
+                            commonPoints.Add(pt1);
+                            lastFeatures.Add(pt2);
+                        }
+                    }
+                }
+                Mat affine = Cv2.GetAffineTransform(commonPoints.ToArray(), lastFeatures.ToArray());
+                double dx = affine.Get<double>(0, 2);
+                double dy = affine.Get<double>(1, 2);
+                double da = Math.Atan2(affine.Get<double>(1, 0), affine.Get<double>(0, 0));
+                double ds_x = affine.Get<double>(0, 0) / Math.Cos(da);
+                double ds_y = affine.Get<double>(1, 1) / Math.Cos(da);
+                double saveDX = dx, saveDY = dy, saveDA = da;
+                string text = "Original dx = " + dx.ToString(fmt2) + "\n" + " dy = " + dy.ToString(fmt2) + "\n" + " da = " + da.ToString(fmt2);
+                SetTrueText(text);
+                double sx = ds_x, sy = ds_y;
+                Mat delta = new Mat(5, 1, MatType.CV_64F, new double[] { ds_x, ds_y, da, dx, dy });
+                Cv2.Add(sumScale, delta, sumScale);
+                Mat diff = new Mat();
+                Cv2.Subtract(sScale, sumScale, diff);
+                da += diff.Get<double>(2, 0);
+                dx += diff.Get<double>(3, 0);
+                dy += diff.Get<double>(4, 0);
+                if (Math.Abs(dx) > 50) dx = saveDX;
+                if (Math.Abs(dy) > 50) dy = saveDY;
+                if (Math.Abs(da) > 50) da = saveDA;
+                text = "dx = " + dx.ToString(fmt2) + "\n" + " dy = " + dy.ToString(fmt2) + "\n" + " da = " + da.ToString(fmt2);
+                SetTrueText(text, new cv.Point(10, 100));
+                Mat smoothedMat = new Mat(2, 3, MatType.CV_64F);
+                smoothedMat.Set<double>(0, 0, sx * Math.Cos(da));
+                smoothedMat.Set<double>(0, 1, sx * -Math.Sin(da));
+                smoothedMat.Set<double>(1, 0, sy * Math.Sin(da));
+                smoothedMat.Set<double>(1, 1, sy * Math.Cos(da));
+                smoothedMat.Set<double>(0, 2, dx);
+                smoothedMat.Set<double>(1, 2, dy);
+                Mat smoothedFrame = task.color.WarpAffine(smoothedMat, src.Size());
+                smoothedFrame = smoothedFrame[new Range((int)vert_Border, (int)(smoothedFrame.Rows - vert_Border)), 
+                                              new Range(borderCrop, smoothedFrame.Cols - borderCrop)];
+                dst3 = smoothedFrame.Resize(src.Size());
+                for (int i = 0; i < commonPoints.Count(); i++)
+                {
+                    DrawCircle(dst2, commonPoints[i], task.DotSize + 3, Scalar.Red);
+                    DrawCircle(dst2, lastFeatures[i], task.DotSize + 1, Scalar.Blue);
+                }
+            }
+            inputFeat = null; // show that we consumed the current set of features.
+        }
+    }
+    public class CS_Stabilizer_VerticalIMU : CS_Parent
+    {
+        public bool stableTest;
+        public string stableStr;
+        List<float> angleXValue = new List<float>();
+        List<float> angleYValue = new List<float>();
+        List<int> stableCount = new List<int>();
+        float lastAngleX, lastAngleY;
+        public CS_Stabilizer_VerticalIMU(VBtask task) : base(task)
+        {
+            desc = "Use the IMU angular velocity to determine if the camera is moving or stable.";
+        }
+        public void RunCS(Mat src)
+        {
+            angleXValue.Add(task.accRadians.X);
+            angleYValue.Add(task.accRadians.Y);
+            strOut = "IMU X" + "\t" + "IMU Y" + "\t" + "IMU Z" + "\n";
+            strOut += (task.accRadians.X * 57.2958).ToString(fmt3) + "\t" + (task.accRadians.Y * 57.2958).ToString(fmt3) + "\t" +
+                      (task.accRadians.Z * 57.2958).ToString(fmt3) + "\n";
+            float avgX = angleXValue.Average();
+            float avgY = angleYValue.Average();
+            if (task.FirstPass)
+            {
+                lastAngleX = avgX;
+                lastAngleY = avgY;
+            }
+            strOut += "Angle X" + "\t" + "Angle Y" + "\n";
+            strOut += avgX.ToString(fmt3) + "\t" + avgY.ToString(fmt3) + "\n";
+            float angle = 90 - avgY * 57.2958f;
+            if (avgX < 0) angle *= -1;
+            labels[2] = "stabilizer_Vertical Angle = " + angle.ToString(fmt1);
+            stableTest = Math.Abs(lastAngleX - avgX) < 0.001f && Math.Abs(lastAngleY - avgY) < 0.01f;
+            stableCount.Add(stableTest ? 1 : 0);
+            if (task.heartBeat)
+            {
+                float avgStable = (float)stableCount.Average();
+                stableStr = "IMU stable = " + avgStable.ToString("0.0%") + " of the time";
+                stableCount.Clear();
+            }
+            SetTrueText(strOut + "\n" + stableStr, 2);
+            lastAngleX = avgX;
+            lastAngleY = avgY;
+            if (angleXValue.Count() >= task.frameHistoryCount) angleXValue.RemoveAt(0);
+            if (angleYValue.Count() >= task.frameHistoryCount) angleYValue.RemoveAt(0);
+        }
+    }
+    public class CS_Stabilizer_CornerPoints : CS_Parent
+    {
+        public Stable_Basics basics = new Stable_Basics();
+        public List<cv.Point2f> features = new List<cv.Point2f>();
+        cv.Rect ul, ur, ll, lr;
+        Options_StabilizerOther options = new Options_StabilizerOther();  
+        public CS_Stabilizer_CornerPoints(VBtask task) : base(task)
+        {
+            desc = "Track the FAST feature points found in the corners of the BGR image.";
+        }
+        void getKeyPoints(Mat src, cv.Rect r)
+        {
+            KeyPoint[] kpoints = Cv2.FAST(src[r], options.fastThreshold, true);
+            foreach (var kp in kpoints)
+            {
+                features.Add(new Point2f(kp.Pt.X + r.X, kp.Pt.Y + r.Y));
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (task.optionsChanged)
+            {
+                int size = task.gridSize;
+                ul = new cv.Rect(0, 0, size, size);
+                ur = new cv.Rect(dst2.Width - size, 0, size, size);
+                ll = new cv.Rect(0, dst2.Height - size, size, size);
+                lr = new cv.Rect(dst2.Width - size, dst2.Height - size, size, size);
+            }
+            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            features.Clear();
+            getKeyPoints(src, ul);
+            getKeyPoints(src, ur);
+            getKeyPoints(src, ll);
+            getKeyPoints(src, lr);
+            dst2.SetTo(0);
+            foreach (var pt in features)
+            {
+                DrawCircle(dst2, pt, task.DotSize, Scalar.Yellow);
+            }
+            labels[2] = "There were " + features.Count().ToString() + " key points detected";
+        }
+    }
+    public class CS_Stabilizer_BasicsRandomInput : CS_Parent
+    {
+        Options_StabilizerOther options = new Options_StabilizerOther();
+        int lastShiftX;
+        int lastShiftY;
+        public CS_Stabilizer_BasicsRandomInput(VBtask task) : base(task)
+        {
+            labels[2] = "Current frame (before)";
+            labels[3] = "Image after shift";
+            desc = "Generate images that have been arbitrarily shifted";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Mat input = src;
+            if (input.Channels() != 1) input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            int shiftX = msRNG.Next(-options.range, options.range);
+            int shiftY = msRNG.Next(-options.range, options.range);
+            if (task.FirstPass)
+            {
+                lastShiftX = shiftX;
+                lastShiftY = shiftY;
+            }
+            if (task.frameCount % 2 == 0)
+            {
+                shiftX = lastShiftX;
+                shiftY = lastShiftY;
+            }
+            lastShiftX = shiftX;
+            lastShiftY = shiftY;
+            dst2 = input.Clone();
+            if (shiftX != 0 || shiftY != 0)
+            {
+                int x = shiftX < 0 ? Math.Abs(shiftX) : 0;
+                int y = shiftY < 0 ? Math.Abs(shiftY) : 0;
+                int x2 = shiftX < 0 ? 0 : shiftX;
+                int y2 = shiftY < 0 ? 0 : shiftY;
+                cv.Rect srcRect = new cv.Rect(x, y, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY));
+                cv.Rect dstRect = new cv.Rect(x2, y2, srcRect.Width, srcRect.Height);
+                dst2[srcRect].CopyTo(input[dstRect]);
+            }
+            dst3 = input;
         }
     }
 

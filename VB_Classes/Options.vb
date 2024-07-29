@@ -2003,7 +2003,7 @@ End Class
 
 
 Public Class Options_Sort : Inherits VB_Parent
-    Public sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Ascending
+    Public sortOption As cv.SortFlags = cv.SortFlags.EveryColumn + cv.SortFlags.Ascending
     Public radio0 As Windows.Forms.RadioButton
     Public radio1 As Windows.Forms.RadioButton
     Public radio2 As Windows.Forms.RadioButton
@@ -3300,7 +3300,7 @@ Public Class Options_Spectrum : Inherits VB_Parent
         strOut += " found while " + CStr(trimCount) + " pixels were tossed as they were in clusters with size < " + CStr(sampleThreshold) + vbCrLf
         Return ranges
     End Function
-    Public Function buildColorRanges(input As cv.Mat, typespec As String)
+    Public Function buildColorRanges(input As cv.Mat, typespec As String) As List(Of rangeData)
         Dim ranges As New List(Of rangeData)
         Dim sorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger) ' the spectrum of the values 
         Dim pixels As New List(Of Integer)
@@ -7113,5 +7113,161 @@ Public Class Options_Reduction : Inherits VB_Parent
         For i = 0 To 2
             reduceXYZ(i) = check.Box(i).Checked
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Retina : Inherits VB_Parent
+    Public xmlCheck As Boolean
+    Public useLogSampling As Boolean
+    Public sampleCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Retina Sample Factor", 1, 10, 2)
+        If check.Setup(traceName) Then
+            check.addCheckBox("Use log sampling")
+            check.addCheckBox("Open resulting xml file")
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static sampleSlider = FindSlider("Retina Sample Factor")
+        Static logCheckbox = FindCheckBox("Use log sampling")
+        Static xmlCheckbox = FindCheckBox("Open resulting xml file")
+        useLogSampling = logCheckbox.Checked
+        If xmlCheckbox.checked Then xmlCheckbox.checked = False
+        xmlCheck = xmlCheckbox.checked
+        sampleCount = sampleSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_ROI : Inherits VB_Parent
+    Public roiPercent As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, 25)
+    End Sub
+    Public Sub RunVB()
+        Static roiSlider = FindSlider("Max size area of interest %")
+        roiPercent = roiSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Rotate : Inherits VB_Parent
+    Public rotateAngle As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees", -180, 180, 24)
+    End Sub
+    Public Sub RunVB()
+        Static angleSlider = FindSlider("Rotation Angle in degrees")
+        rotateAngle = angleSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Salience : Inherits VB_Parent
+    Public numScales As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Salience numScales", 1, 6, 6)
+    End Sub
+    Public Sub RunVB()
+        Static scaleSlider = FindSlider("Salience numScales")
+        numScales = scaleSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_SLRImages : Inherits VB_Parent
+    Public radioText As String
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("pcSplit(2) input")
+            radio.addRadio("Grayscale input")
+            radio.addRadio("Blue input")
+            radio.addRadio("Green input")
+            radio.addRadio("Red input")
+            radio.check(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        For Each rad In frm.check
+            If rad.checked Then radioText = rad.text
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_StabilizerOther : Inherits VB_Parent
+    Public fastThreshold As Integer
+    Public range As Integer
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then
+            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
+            sliders.setupTrackBar("Range of random motion introduced (absolute value in pixels)", 0, 30, 8)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = FindSlider("FAST Threshold")
+        Static rangeSlider = FindSlider("Range of random motion introduced (absolute value in pixels)")
+        Range = rangeSlider.Value
+        fastThreshold = thresholdSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Stabilizer : Inherits VB_Parent
+    Public lostMax As Integer
+    Public width As Integer
+    Public height As Integer
+    Public minStdev As Double
+    Public corrThreshold As Double
+    Public pad As Integer = 20
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Max % of lost pixels before reseting image", 0, 100, 10)
+            sliders.setupTrackBar("Stabilizer Correlation Threshold X1000", 0, 1000, 950)
+            sliders.setupTrackBar("Width of input to matchtemplate", 10, dst2.Width - pad, 128)
+            sliders.setupTrackBar("Height of input to matchtemplate", 10, dst2.Height - pad, 96)
+            sliders.setupTrackBar("Min stdev in correlation rect", 1, 50, 10)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static widthSlider = FindSlider("Width of input to matchtemplate")
+        Static heightSlider = FindSlider("Height of input to matchtemplate")
+        Static netSlider = FindSlider("Max % of lost pixels before reseting image")
+        Static stdevSlider = FindSlider("Min stdev in correlation rect")
+        Static thresholdSlider = FindSlider("Stabilizer Correlation Threshold X1000")
+        lostMax = netSlider.value / 100
+        minStdev = stdevSlider.value
+        corrThreshold = thresholdSlider.value / 1000
+        width = widthSlider.value
+        height = heightSlider.value
     End Sub
 End Class

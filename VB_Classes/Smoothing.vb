@@ -55,7 +55,7 @@ Public Class Smoothing_Exterior : Inherits VB_Parent
                 hull.Run(src)
                 Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
                 inputPoints = nextHull.ToList
-                drawPoly(dst2, inputPoints, cv.Scalar.White)
+                DrawPoly(dst2, inputPoints, cv.Scalar.White)
             Else
                 Exit Sub
             End If
@@ -64,7 +64,7 @@ Public Class Smoothing_Exterior : Inherits VB_Parent
         End If
         If inputPoints.Count > 1 Then
             smoothPoints = getSplineInterpolationCatmullRom(inputPoints, smOptions.iterations)
-            drawPoly(dst2, smoothPoints, plotColor)
+            DrawPoly(dst2, smoothPoints, plotColor)
         End If
     End Sub
 End Class
@@ -79,7 +79,7 @@ Public Class Smoothing_Interior : Inherits VB_Parent
     Public inputPoints As List(Of cv.Point)
     Public smoothPoints As List(Of cv.Point)
     Public plotColor = cv.Scalar.Yellow
-    Dim smOptions As New Options_Smoothing
+    Dim options As New Options_Smoothing
     Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of cv.Point2d)
         'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
         'the opposite corner will be cut by the inverse (i.e. 1-cutting distance) to keep symmetry
@@ -124,8 +124,8 @@ Public Class Smoothing_Interior : Inherits VB_Parent
         labels(3) = ""
         desc = "Smoothing the line connecting a series of points staying inside the outline."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        smOptions.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If standaloneTest() Then
             If task.heartBeat And task.paused = False Then
                 Dim hullList = hull.buildRandomHullPoints()
@@ -133,18 +133,18 @@ Public Class Smoothing_Interior : Inherits VB_Parent
                 hull.Run(src)
                 Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
                 inputPoints = nextHull.ToList
-                drawPoly(dst2, nextHull.ToList, cv.Scalar.White)
+                DrawPoly(dst2, nextHull.ToList, cv.Scalar.White)
             Else
                 Exit Sub
             End If
         Else
             dst2.SetTo(0)
         End If
-        Dim smoothPoints2d = getCurveSmoothingChaikin(inputPoints, smOptions.interiorTension, smOptions.iterations)
+        Dim smoothPoints2d = getCurveSmoothingChaikin(inputPoints, options.interiorTension, options.iterations)
         smoothPoints = New List(Of cv.Point)
-        For i = 0 To smoothPoints2d.Count - 1 Step smOptions.stepSize
+        For i = 0 To smoothPoints2d.Count - 1 Step options.stepSize
             smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
         Next
-        If smoothPoints.Count > 0 Then drawPoly(dst2, smoothPoints, plotColor)
+        If smoothPoints.Count > 0 Then DrawPoly(dst2, smoothPoints, plotColor)
     End Sub
 End Class

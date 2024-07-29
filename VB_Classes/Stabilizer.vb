@@ -1,3 +1,4 @@
+Imports OpenCvSharp.Features2D
 Imports cv = OpenCvSharp
 Public Class Stabilizer_Basics : Inherits VB_Parent
     Dim match As New Match_Basics
@@ -6,51 +7,40 @@ Public Class Stabilizer_Basics : Inherits VB_Parent
     Public templateRect As cv.Rect
     Public searchRect As cv.Rect
     Public stableRect As cv.Rect
-    Dim pad = 20
+    Dim options As New Options_Stabilizer
+    Dim lastFrame As cv.Mat
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Max % of lost pixels before reseting image", 0, 100, 10)
-            sliders.setupTrackBar("Stabilizer Correlation Threshold X1000", 0, 1000, 950)
-            sliders.setupTrackBar("Width of input to matchtemplate", 10, dst2.Width - pad, 128)
-            sliders.setupTrackBar("Height of input to matchtemplate", 10, dst2.Height - pad, 96)
-            sliders.setupTrackBar("Min stdev in correlation rect", 1, 50, 10)
-        End If
-
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels(2) = "Current frame - rectangle input to matchTemplate"
         desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static widthSlider = FindSlider("Width of input to matchtemplate")
-        Static heightSlider = FindSlider("Height of input to matchtemplate")
-        Static netSlider = FindSlider("Max % of lost pixels before reseting image")
-        Static stdevSlider = FindSlider("Min stdev in correlation rect")
-        Static thresholdSlider = FindSlider("Stabilizer Correlation Threshold X1000")
-        Dim lostMax = netSlider.Value / 100
+        options.RunVB()
 
         Dim resetImage As Boolean
-        templateRect = New cv.Rect(src.Width / 2 - widthSlider.Value / 2, src.Height / 2 - heightSlider.Value / 2, widthSlider.Value, heightSlider.Value)
+        templateRect = New cv.Rect(src.Width / 2 - options.width / 2, src.Height / 2 - options.height / 2,
+                                   options.width, options.height)
 
-        Dim input = src
-        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.FirstPass Then lastFrame = src.Clone()
 
-        Static lastFrame = input
-        dst2 = input
+        dst2 = src.Clone
 
-        Dim mean As Single, stdev As Single
+        Dim mean As cv.Scalar
+        Dim stdev As cv.Scalar
         cv.Cv2.MeanStdDev(dst2(templateRect), mean, stdev)
 
-        If stdev > stdevSlider.Value Then
+        If stdev > options.minStdev Then
             Dim t = templateRect
-            Dim w = t.Width + pad * 2
-            Dim h = t.Height + pad * 2
-            Dim x = Math.Abs(t.X - pad)
-            Dim y = Math.Abs(t.Y - pad)
+            Dim w = t.Width + options.pad * 2
+            Dim h = t.Height + options.pad * 2
+            Dim x = Math.Abs(t.X - options.pad)
+            Dim y = Math.Abs(t.Y - options.pad)
             searchRect = New cv.Rect(x, y, If(w < lastFrame.width, w, lastFrame.width - x - 1), If(h < lastFrame.height, h, lastFrame.height - y - 1))
             match.template = lastFrame(searchRect)
-            match.Run(input(templateRect))
+            match.Run(src(templateRect))
 
-            If match.correlation > thresholdSlider.Value / thresholdSlider.maximum Then
+            If match.correlation > options.corrThreshold Then
                 Dim maxLoc = New cv.Point(match.matchCenter.X, match.matchCenter.Y)
                 shiftX = templateRect.X - maxLoc.X - searchRect.X
                 shiftY = templateRect.Y - maxLoc.Y - searchRect.Y
@@ -64,15 +54,16 @@ Public Class Stabilizer_Basics : Inherits VB_Parent
                 stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
                 Dim srcRect = New cv.Rect(x2, y2, stableRect.Width, stableRect.Height)
                 stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
-                input(srcRect).CopyTo(dst3(stableRect))
+                src(srcRect).CopyTo(dst3(stableRect))
                 Dim nonZero = dst3.CountNonZero / (dst3.Width * dst3.Height)
-                If nonZero < (1 - lostMax) Then
+                If nonZero < (1 - options.lostMax) Then
                     labels(3) = "Lost pixels = " + Format(1 - nonZero, "00%")
                     resetImage = True
                 End If
                 labels(3) = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), " + Format(nonZero, "00%") + " preserved, cc=" + Format(match.correlation, fmt2)
             Else
-                labels(3) = "Below correlation threshold " + Format(thresholdSlider.Value, fmt2) + " with " + Format(match.correlation, fmt2)
+                labels(3) = "Below correlation threshold " + Format(options.corrThreshold, fmt2) + " with " +
+                            Format(match.correlation, fmt2)
                 resetImage = True
             End If
         Else
@@ -81,7 +72,7 @@ Public Class Stabilizer_Basics : Inherits VB_Parent
         End If
 
         If resetImage Then
-            input.CopyTo(lastFrame)
+            src.CopyTo(lastFrame)
             dst3 = lastFrame.clone
         End If
         If standaloneTest() Then dst3.Rectangle(templateRect, cv.Scalar.White, 1) ' when not standaloneTest(), traceName doesn't want artificial rectangle.
@@ -97,24 +88,28 @@ End Class
 
 
 Public Class Stabilizer_BasicsRandomInput : Inherits VB_Parent
+    Dim options As New Options_StabilizerOther
+    Dim lastShiftX As Integer
+    Dim lastShiftY As Integer
+
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Range of random motion introduced (absolute value in pixels)", 0, 30, 8)
         labels(2) = "Current frame (before)"
         labels(3) = "Image after shift"
         desc = "Generate images that have been arbitrarily shifted"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static rangeSlider = FindSlider("Range of random motion introduced (absolute value in pixels)")
-        Dim range = rangeSlider.Value
+        options.RunVB()
 
         Dim input = src
         If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim shiftX = msRNG.Next(-range, range)
-        Dim shiftY = msRNG.Next(-range, range)
+        Dim shiftX = msRNG.Next(-options.range, options.range)
+        Dim shiftY = msRNG.Next(-options.range, options.range)
 
-        Static lastShiftX = shiftX
-        Static lastShiftY = shiftY
+        If task.FirstPass Then
+            lastShiftX = shiftX
+            lastShiftY = shiftY
+        End If
         If task.frameCount Mod 2 = 0 Then
             shiftX = lastShiftX
             shiftY = lastShiftY

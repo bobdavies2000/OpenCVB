@@ -241,16 +241,14 @@ Public Class Spectrum_Breakdown : Inherits VB_Parent
         End If
 
         Dim rc = task.rc
-        Dim ranges As List(Of rangeData), input As cv.Mat, typeSpec As String
+        Dim ranges As List(Of rangeData), input As cv.Mat
         If rc.depthPixels / rc.pixels < 0.5 Then
             input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, 0)
             src(rc.rect).CopyTo(input, rc.mask)
             input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            typeSpec = " grayscale "
         Else
             input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, 0)
             task.pcSplit(2)(rc.rect).CopyTo(input, rc.mask)
-            typeSpec = " pointcloud Z "
         End If
         ranges = options.buildColorRanges(input, "GrayScale")
 

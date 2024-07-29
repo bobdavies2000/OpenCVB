@@ -7,23 +7,17 @@ Public Class Retina_Basics_CPP : Inherits VB_Parent
     Dim magnoData(0) As Byte
     Dim dataSrc(0) As Byte
     Dim samplingFactor As Single = -1 ' force open
+    Dim options As New Options_Retina
+    Dim saveUseLogSampling As Boolean
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Retina Sample Factor", 1, 10, 2)
-        If check.Setup(traceName) Then
-            check.addCheckBox("Use log sampling")
-            check.addCheckBox("Open resulting xml file")
-        End If
-
         labels(2) = "Retina Parvo"
         labels(3) = "Retina Magno"
         desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static sampleSlider = FindSlider("Retina Sample Factor")
-        Static logCheck = FindCheckBox("Use log sampling")
-        Static xmlCheck = FindCheckBox("Open resulting xml file")
-        If xmlCheck.Checked Then
-            xmlCheck.Checked = False
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If options.xmlCheck Then
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
             If fileinfo.Exists Then
                 FileCopy(CurDir() + "/RetinaDefaultParameters.xml", task.HomeDir + "data/RetinaDefaultParameters.xml")
@@ -34,21 +28,21 @@ Public Class Retina_Basics_CPP : Inherits VB_Parent
                 MsgBox("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
             End If
         End If
-        Static useLogSampling As Integer = logCheck.Checked
-        If useLogSampling <> logCheck.Checked Or samplingFactor <> sampleSlider.Value Then
+        If saveUseLogSampling <> options.useLogSampling Or samplingFactor <> options.sampleCount Then
             If cPtr <> 0 Then Retina_Basics_Close(cPtr)
             ReDim magnoData(src.Total - 1)
             ReDim dataSrc(src.Total * src.ElemSize - 1)
-            useLogSampling = logCheck.Checked
-            samplingFactor = sampleSlider.Value
-            If task.testAllRunning = False Then cPtr = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
+            saveUseLogSampling = options.useLogSampling
+            samplingFactor = options.sampleCount
+            If task.testAllRunning = False Then cPtr = Retina_Basics_Open(src.Rows, src.Cols, options.useLogSampling, samplingFactor)
         End If
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim imagePtr As IntPtr = 0
         If task.testAllRunning = False Then
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-            imagePtr = Retina_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
+            imagePtr = Retina_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                         handleMagno.AddrOfPinnedObject(), options.useLogSampling)
         Else
             SetTrueText("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.")
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
@@ -58,7 +52,7 @@ Public Class Retina_Basics_CPP : Inherits VB_Parent
 
         If imagePtr <> 0 Then
             Dim nextFactor = samplingFactor
-            If useLogSampling = False Then nextFactor = 1
+            If options.useLogSampling = False Then nextFactor = 1
             dst2 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone
             dst3 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData).Resize(src.Size())
         End If

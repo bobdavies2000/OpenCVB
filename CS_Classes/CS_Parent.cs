@@ -608,6 +608,12 @@ namespace CS_Classes
 
             Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType); // Assuming 'task' has 'lineType' property
         }
+        public void DrawPoly(Mat result, List<cv.Point> polyPoints, Scalar color)
+        {
+            if (polyPoints.Count < 3) return;
+            var listOfPoints = new List<List<cv.Point>> { polyPoints };
+            Cv2.DrawContours(result, listOfPoints, 0, color, 2);
+        }
         public void DrawPolkaDot(cv.Point2f pt, Mat dst)
         {
             DrawCircle(dst, pt, task.DotSize + 2, Scalar.White, -1);

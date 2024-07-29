@@ -2,19 +2,19 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Salience_Basics_CPP : Inherits VB_Parent
     Dim grayData(0) As Byte
-    Dim numScales As Integer
+    Public options As New Options_Salience
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Salience numScales", 1, 6, 6)
         cPtr = Salience_Open()
         desc = "Show results of Salience algorithm when using C++"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static numSlider = FindSlider("Salience numScales")
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        options.RunVB()
+
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
         Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, grayData, 0, grayData.Length)
-        Dim imagePtr = Salience_Run(cPtr, numSlider.Value, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
+        Dim imagePtr = Salience_Run(cPtr, options.numScales, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
         grayHandle.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
@@ -33,9 +33,7 @@ Public Class Salience_Basics_MT : Inherits VB_Parent
         desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static scaleSlider = FindSlider("Salience numScales")
-        Dim numScales = scaleSlider.Value
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim threads = 32
         Dim h = CInt(src.Height / threads)
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
@@ -49,7 +47,7 @@ Public Class Salience_Basics_MT : Inherits VB_Parent
                 Dim grayData(input.Total - 1) As Byte
                 Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
                 Marshal.Copy(input.Data, grayData, 0, grayData.Length)
-                Dim imagePtr = Salience_Run(cPtr, numScales, grayHandle.AddrOfPinnedObject, roi.Height, roi.Width)
+                Dim imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject, roi.Height, roi.Width)
                 grayHandle.Free()
 
                 dst2(roi) = New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8U, imagePtr).Clone

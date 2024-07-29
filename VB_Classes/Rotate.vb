@@ -7,16 +7,16 @@ Public Class Rotate_Basics : Inherits VB_Parent
     Public options As New Options_Resize
     Public rotateAngle As Single = 1000
     Public rotateCenter As cv.Point
+    Dim optionsRotate As New Options_Rotate
     Public Sub New()
         rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees", -180, 180, 24)
         desc = "Rotate a rectangle by a specified angle"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static angleSlider = FindSlider("Rotation Angle in degrees")
-        rotateAngle = angleSlider.Value
         options.RunVB()
+        optionsRotate.RunVB()
 
+        rotateAngle = optionsRotate.rotateAngle
         M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
         dst2 = src.WarpAffine(M, src.Size(), options.warpFlag)
         If options.warpFlag = cv.InterpolationFlags.WarpInverseMap Then
@@ -189,7 +189,7 @@ End Class
 Public Class Rotate_Example : Inherits VB_Parent
     Dim rotate As New Rotate_Basics
     Public Sub New()
-        rotate.rotateCenter = New cv.Point2f(dst2.Height / 2, dst2.Height / 2)
+        rotate.rotateCenter = New cv.Point(dst2.Height / 2, dst2.Height / 2)
         rotate.rotateAngle = -90
         desc = "Reminder on how to rotate an image and keep all the pixels."
     End Sub
@@ -232,9 +232,6 @@ Public Class Rotate_Horizon : Inherits VB_Parent
         Return New cv.Point2f(xNew, yNew)
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static angleSlider = FindSlider("Rotation Angle in degrees")
-        rotate.rotateAngle = angleSlider.Value
-
         rotate.Run(src)
         dst2 = rotate.dst2.Clone
         dst1 = dst2.Clone

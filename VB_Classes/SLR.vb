@@ -35,27 +35,19 @@ End Class
 
 Public Class SLR_TrendImages : Inherits VB_Parent
     Dim trends As New SLR_Trends
+    Dim options As New Options_SLRImages
     Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("pcSplit(2) input")
-            radio.addRadio("Grayscale input")
-            radio.addRadio("Blue input")
-            radio.addRadio("Green input")
-            radio.addRadio("Red input")
-            radio.check(1).Checked = True
-        End If
-
         desc = "Find trends by filling in short histogram gaps for depth or 1-channel images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         Dim split = src.Split()
         trends.hist.plot.maxRange = 255
         trends.hist.plot.removeZeroEntry = False ' default is to look at element 0....
 
         Dim splitIndex = 0
-        Static frm = FindFrm(traceName + " Radio Buttons")
-        Select Case findRadioText(frm.check)
+        Select Case options.radioText
             Case "pcSplit(2) input"
                 trends.hist.plot.maxRange = task.MaxZmeters
                 trends.hist.plot.removeZeroEntry = True ' not interested in the undefined depth areas...

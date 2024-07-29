@@ -79,18 +79,17 @@ Public Class ROI_AccumulateOld : Inherits VB_Parent
     Public diff As New Diff_Basics
     Public aoiRect As cv.Rect
     Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
+    Dim options As New Options_ROI
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Area of Interest", ""}
         dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         task.gOptions.pixelDiffThreshold = 30
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, 25)
         desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim aoiSlider = FindSlider("Max size area of interest %")
-        Dim aoiPercent = aoiSlider.Value / 100
-        If aoiRect.Width * aoiRect.Height > src.Total * aoiPercent Or task.optionsChanged Then
+        options.RunVB()
+        If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
             dst0 = task.color
             dst1.SetTo(0)
             aoiRect = New cv.Rect
@@ -132,18 +131,18 @@ End Class
 Public Class ROI_Accumulate : Inherits VB_Parent
     Public diff As New Diff_Basics
     Dim roiRect As cv.Rect
+    Dim options As New Options_ROI
     Public Sub New()
         labels = {"", "", "Area of Interest", ""}
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         task.gOptions.pixelDiffThreshold = 30
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, 25)
         desc = "Accumulate pixels in a motion ROI until the size is x% of the total image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         SetTrueText(traceName + " is the same as ROI_AccumulateOld but simpler.", 3)
-        Dim roiSlider = FindSlider("Max size area of interest %")
-        Dim roiPercent = roiSlider.Value / 100
-        If roiRect.Width * roiRect.Height > src.Total * roiPercent Or task.optionsChanged Then
+        If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
             dst2.SetTo(0)
             roiRect = New cv.Rect
         End If

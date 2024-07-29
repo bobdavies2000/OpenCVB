@@ -76,6 +76,8 @@ Public Class Touchup
                 inline = Replace(inline, "CvPoint", "cv.Point")
                 inline = inline.Replace(" Rect", " cv.Rect")
                 inline = inline.Replace("<Rect", "<cv.Rect")
+                inline = Replace(inline, "ColorConversion.BgraToBgr", "cv.ColorConversionCodes.BGRA2BGR")
+                inline = Replace(inline, "ColorConversion.BgrToBgra", "cv.ColorConversionCodes.BGR2BGRA")
 
                 inline = Replace(inline, "()(", "(")
                 inline = Replace(inline, "()()", "()")
