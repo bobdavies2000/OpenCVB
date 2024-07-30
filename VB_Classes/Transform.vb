@@ -1,15 +1,15 @@
 Imports cv = OpenCvSharp
 Public Class Transform_Resize : Inherits VB_Parent
+    Dim options As New Options_Transform
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Resize Percent", 50, 1000, 50)
         desc = "Resize an image based on the slider value."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static percentSlider = FindSlider("Resize Percent")
-        Dim resizeFactor = percentSlider.Value / 100
-        Dim w = CInt(resizeFactor * src.Width)
-        Dim h = CInt(resizeFactor * src.Height)
-        If resizeFactor > 1 Then
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim w = CInt(options.resizeFactor * src.Width)
+        Dim h = CInt(options.resizeFactor * src.Height)
+        If options.resizeFactor > 1 Then
             Dim tmp As New cv.Mat
             tmp = src.Resize(New cv.Size(w, h), 0)
             Dim roi = New cv.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height)
@@ -30,32 +30,29 @@ Public Class Transform_Affine3D : Inherits VB_Parent
     Dim pc1 As cv.Mat
     Dim pc2 As cv.Mat
     Dim affineTransform As cv.Mat
+    Dim options As New Options_Transform
     Public Sub New()
-        If check.Setup(traceName) Then
-            check.addCheckBox("Check to snap the first point cloud")
-            check.addCheckBox("Check to snap the second point cloud")
-        End If
         desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static firstCheck = FindCheckBox("Check to snap the first point cloud")
-        Static secondCheck = FindCheckBox("Check to snap the second point cloud")
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
 
         If task.testAllRunning Then
-            If task.frameCount = 30 Then firstCheck.Checked = True
-            If task.frameCount = 60 Then secondCheck.Checked = True
+            If task.frameCount = 30 Then options.firstCheck = True
+            If task.frameCount = 60 Then options.secondCheck = True
         End If
 
-        If firstCheck.Checked Then
+        If options.firstCheck Then
             pc1 = task.pointCloud.Clone()
-            firstCheck.Checked = False
+            options.firstCheck = False
             output += "First point cloud captured" + vbCrLf
         End If
 
-        If secondCheck.Checked Then
+        If options.secondCheck Then
             pc2 = task.pointCloud.Clone()
-            secondCheck.Checked = False
+            options.secondCheck = False
             output += "Second point cloud captured" + vbCrLf
         End If
 
@@ -95,28 +92,17 @@ End Class
 
 Public Class Transform_Rotate : Inherits VB_Parent
     Public imageCenter As cv.Point2f
-    Public angleSlider As Windows.Forms.TrackBar
-    Public scaleSlider As Windows.Forms.TrackBar
-    Public centerXSlider As Windows.Forms.TrackBar
-    Public centerYSlider As Windows.Forms.TrackBar
+    Dim options As New Options_Transform
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Angle", -180, 180, 30)
-            sliders.setupTrackBar("Scale Factor% (100% means no scaling)", 1, 100, 100)
-            sliders.setupTrackBar("Rotation center X", 1, dst2.Width, dst2.Width / 2)
-            sliders.setupTrackBar("Rotation center Y", 1, dst2.Height, dst2.Height / 2)
-        End If
-        angleSlider = FindSlider("Angle")
-        scaleSlider = FindSlider("Scale Factor% (100% means no scaling)")
-        centerXSlider = FindSlider("Rotation center X")
-        centerYSlider = FindSlider("Rotation center Y")
         desc = "Rotate and scale and image based on the slider values."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        imageCenter = New cv.Point2f(centerXSlider.Value, centerYSlider.Value)
-        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, angleSlider.Value, scaleSlider.Value / 100)
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        imageCenter = New cv.Point2f(options.centerX, options.centerY)
+        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale)
         cv.Cv2.WarpAffine(src, dst2, rotationMat, New cv.Size())
-        DrawCircle(dst2,imageCenter, task.DotSize * 2, cv.Scalar.Yellow)
-        DrawCircle(dst2,imageCenter, task.DotSize, cv.Scalar.Blue)
+        DrawCircle(dst2, imageCenter, task.DotSize * 2, cv.Scalar.Yellow)
+        DrawCircle(dst2, imageCenter, task.DotSize, cv.Scalar.Blue)
     End Sub
 End Class

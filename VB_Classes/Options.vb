@@ -7490,3 +7490,97 @@ Public Class Options_ThresholdDef : Inherits VB_Parent
         threshold = truncateSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_Tracker : Inherits VB_Parent
+    Public trackType As Integer
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("Boosting")
+            radio.addRadio("MIL")
+            radio.addRadio("KCF - appears to not work...")
+            radio.addRadio("TLD")
+            radio.addRadio("MedianFlow")
+            radio.addRadio("GoTurn - appears to not work...")
+            radio.addRadio("Mosse")
+            radio.addRadio("TrackerCSRT - Channel and Spatial Reliability Tracker")
+            radio.check(1).Checked = True
+            radio.check(2).Enabled = False
+            radio.check(5).Enabled = False
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked = True Then
+                labels(2) = "Method: " + radio.check(i).Text
+                trackType = i
+                Exit For
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Transform : Inherits VB_Parent
+    Public resizeFactor As Double
+    Public firstCheck As Boolean
+    Public secondCheck As Boolean
+    Public angle As Integer
+    Public centerX As Integer
+    Public centerY As Integer
+    Public scale As Double
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Resize Percent", 50, 1000, 50)
+            sliders.setupTrackBar("Angle", -180, 180, 30)
+            sliders.setupTrackBar("Scale Factor% (100% means no scaling)", 1, 100, 100)
+            sliders.setupTrackBar("Rotation center X", 1, dst2.Width, dst2.Width / 2)
+            sliders.setupTrackBar("Rotation center Y", 1, dst2.Height, dst2.Height / 2)
+        End If
+        If check.Setup(traceName) Then
+            check.addCheckBox("Check to snap the first point cloud")
+            check.addCheckBox("Check to snap the second point cloud")
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static angleSlider = FindSlider("Angle")
+        Static scaleSlider = FindSlider("Scale Factor% (100% means no scaling)")
+        Static centerXSlider = FindSlider("Rotation center X")
+        Static centerYSlider = FindSlider("Rotation center Y")
+        Static firstCheckBox = FindCheckBox("Check to snap the first point cloud")
+        Static secondCheckBox = FindCheckBox("Check to snap the second point cloud")
+        Static percentSlider = FindSlider("Resize Percent")
+        resizeFactor = percentSlider.Value / 100
+        firstCheck = firstCheckBox.checked
+        secondCheck = secondCheckBox.checked
+
+        angle = angleSlider.value
+        scale = scaleSlider.value / 100
+        centerX = centerXSlider.value
+        centerY = centerYSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_TransformationMatrix : Inherits VB_Parent
+    Public mul As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("TMatrix Top View multiplier", 1, 1000, 500)
+    End Sub
+    Public Sub RunVB()
+        Static multSlider = FindSlider("TMatrix Top View multiplier")
+        mul = multSlider.value
+    End Sub
+End Class

@@ -1477,6 +1477,17 @@ namespace CS_Classes
 			if (algorithmName == "CS_Threshold_ByChannels") return new CS_Threshold_ByChannels(task);
 			if (algorithmName == "CS_Threshold_ColorSource") return new CS_Threshold_ColorSource(task);
 			if (algorithmName == "CS_Threshold_Definitions") return new CS_Threshold_Definitions(task);
+			if (algorithmName == "CS_Tracker_Basics") return new CS_Tracker_Basics(task);
+			if (algorithmName == "CS_Transform_Affine3D") return new CS_Transform_Affine3D(task);
+			if (algorithmName == "CS_Transform_Resize") return new CS_Transform_Resize(task);
+			if (algorithmName == "CS_Transform_Rotate") return new CS_Transform_Rotate(task);
+			if (algorithmName == "CS_TransformationMatrix_Basics") return new CS_TransformationMatrix_Basics(task);
+			if (algorithmName == "CS_Triangle_Basics") return new CS_Triangle_Basics(task);
+			if (algorithmName == "CS_Triangle_Cell") return new CS_Triangle_Cell(task);
+			if (algorithmName == "CS_Triangle_HullContour") return new CS_Triangle_HullContour(task);
+			if (algorithmName == "CS_Triangle_Mask") return new CS_Triangle_Mask(task);
+			if (algorithmName == "CS_Triangle_RedCloud") return new CS_Triangle_RedCloud(task);
+			if (algorithmName == "CS_VectorMagnitude") return new CS_VectorMagnitude(task);
 			if (algorithmName == "CS_Voronoi_Basics") return new CS_Voronoi_Basics(task);
 			if (algorithmName == "CS_Voronoi_Compare") return new CS_Voronoi_Compare(task);
 			if (algorithmName == "CS_Voronoi_CPP") return new CS_Voronoi_CPP(task);

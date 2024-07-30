@@ -3,41 +3,20 @@ Imports System.Runtime.InteropServices
 ' https://learnopencv.com/object-tracking-using-opencv-cpp-python/
 Public Class Tracker_Basics : Inherits VB_Parent
     Public tRect As cv.Rect
-    Dim trackType As Integer
     Dim saveRect As New cv.Rect
-    Dim saveTrackerType = -1
+    Dim options As New Options_Tracker
     Public Sub New()
-        If radio.Setup(traceName) Then
-            radio.addRadio("Boosting")
-            radio.addRadio("MIL")
-            radio.addRadio("KCF")
-            radio.addRadio("TLD")
-            radio.addRadio("MedianFlow")
-            radio.addRadio("GoTurn")
-            radio.addRadio("Mosse")
-            radio.addRadio("TrackerCSRT - Channel and Spatial Reliability Tracker")
-            radio.check(1).Checked = True
-        End If
-
         If task.testAllRunning Then task.drawRect = New cv.Rect(25, 25, 25, 25)
         desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static frm = FindFrm(traceName + " Radio Buttons")
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).Checked = True Then
-                labels(2) = "Method: " + radio.check(i).Text
-                trackType = i
-                Exit For
-            End If
-        Next
+        options.RunVB()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If task.drawRect <> saveRect Or saveTrackerType <> trackType Then
+        If task.drawRect <> saveRect Or task.optionsChanged Then
             If cPtr <> 0 Then Tracker_Basics_Close(cPtr)
-            cPtr = Tracker_Basics_Open(trackType)
-            saveTrackerType = trackType
+            cPtr = Tracker_Basics_Open(options.trackType)
             saveRect = task.drawRect
         End If
 

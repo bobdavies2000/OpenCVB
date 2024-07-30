@@ -18589,6 +18589,439 @@ namespace CS_Classes
             labels = byChan.labels;
         }
     }
+    public class CS_Tracker_Basics : CS_Parent
+    {
+        public cv.Rect tRect;
+        cv.Rect saveRect = new cv.Rect();
+        Options_Tracker options = new Options_Tracker();
+        public CS_Tracker_Basics(VBtask task) : base(task)
+        {
+            if (task.testAllRunning) task.drawRect = new cv.Rect(25, 25, 25, 25);
+            desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (task.drawRect != saveRect || task.optionsChanged)
+            {
+                if (cPtr != (IntPtr)0) Tracker_Basics_Close(cPtr);
+                cPtr = Tracker_Basics_Open(options.trackType);
+                saveRect = task.drawRect;
+            }
+            if (saveRect.Width != 0)
+            {
+                byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+                GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+                cv.Rect r = saveRect;
+                IntPtr imagePtr = Tracker_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, r.X, r.Y, r.Width, r.Height);
+                handleSrc.Free();
+                dst2 = src;
+                int[] rectData = new int[4];
+                Marshal.Copy(imagePtr, rectData, 0, rectData.Length);
+                tRect = new cv.Rect(rectData[0], rectData[1], rectData[2], rectData[3]);
+                dst2.Rectangle(tRect, Scalar.White, task.lineWidth);
+            }
+            else
+            {
+                SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", new cv.Point(10, 140));
+            }
+        }
+        public void Close()
+        {
+            if (cPtr != (IntPtr)0) cPtr = Tracker_Basics_Close(cPtr);
+        }
+    }
+    public class CS_Transform_Resize : CS_Parent
+    {
+        Options_Transform options = new Options_Transform();
+        public CS_Transform_Resize(VBtask task) : base(task)
+        {
+            desc = "Resize an image based on the slider value.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int w = (int)(options.resizeFactor * src.Width);
+            int h = (int)(options.resizeFactor * src.Height);
+            if (options.resizeFactor > 1)
+            {
+                Mat tmp = new Mat();
+                tmp = src.Resize(new cv.Size(w, h), 0);
+                cv.Rect roi = new cv.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height);
+                tmp[roi].CopyTo(dst2);
+            }
+            else
+            {
+                dst2.SetTo(0);
+                cv.Rect roi = new cv.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h);
+                dst2[roi] = src.Resize(new cv.Size(w, h), 0);
+            }
+        }
+    }
+    public class CS_Transform_Affine3D : CS_Parent
+    {
+        Mat pc1;
+        Mat pc2;
+        Mat affineTransform;
+        Options_Transform options = new Options_Transform();
+        public CS_Transform_Affine3D(VBtask task) : base(task)
+        {
+            desc = "Using 2 point clouds compute the 3D affine transform between them";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            string output = "Use the check boxes to snapshot the different point clouds" + "\n";
+            if (task.testAllRunning)
+            {
+                if (task.frameCount == 30) options.firstCheck = true;
+                if (task.frameCount == 60) options.secondCheck = true;
+            }
+            if (options.firstCheck)
+            {
+                pc1 = task.pointCloud.Clone();
+                options.firstCheck = false;
+                output += "First point cloud captured" + "\n";
+            }
+            if (options.secondCheck)
+            {
+                pc2 = task.pointCloud.Clone();
+                options.secondCheck = false;
+                output += "Second point cloud captured" + "\n";
+            }
+            if (pc1 != null)
+            {
+                if (pc2 != null)
+                {
+                    Mat inliers = new Mat();
+                    affineTransform = new Mat(3, 4, MatType.CV_64F);
+                    pc1 = pc1.Reshape(3, pc1.Rows * pc1.Cols);
+                    pc2 = pc2.Reshape(3, pc2.Rows * pc2.Cols);
+                    Cv2.EstimateAffine3D(pc1, pc2, affineTransform, inliers);
+                    pc1 = null;
+                    pc2 = null;
+                }
+            }
+            if (affineTransform != null)
+            {
+                output += "Affine Transform 3D results:" + "\n";
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 4; j++)
+                    {
+                        output += string.Format("{0}\t", affineTransform.At<double>(i, j));
+                    }
+                    output += "\n";
+                }
+                output += "0\t0\t0\t1" + "\n";
+            }
+            SetTrueText(output);
+        }
+    }
+    public class CS_Transform_Rotate : CS_Parent
+    {
+        public Point2f imageCenter;
+        Options_Transform options = new Options_Transform();
+        public CS_Transform_Rotate(VBtask task) : base(task)
+        {
+            desc = "Rotate and scale and image based on the slider values.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            imageCenter = new Point2f(options.centerX, options.centerY);
+            Mat rotationMat = Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale);
+            Cv2.WarpAffine(src, dst2, rotationMat, new cv.Size());
+            DrawCircle(dst2, imageCenter, task.DotSize * 2, Scalar.Yellow);
+            DrawCircle(dst2, imageCenter, task.DotSize, Scalar.Blue);
+        }
+    }
+    public class CS_TransformationMatrix_Basics : CS_Parent
+    {
+        List<cv.Point3d> topLocations = new List<cv.Point3d>();
+        Options_TransformationMatrix options = new Options_TransformationMatrix();
+        public CS_TransformationMatrix_Basics(VBtask task) : base(task)
+        {
+            if (task.cameraName == "StereoLabs ZED 2/2i")
+            {
+                FindSlider("TMatrix Top View multiplier").Value = 1; // need a smaller multiplier for this camera...
+            }
+            labels = new string[] { "", "", "View from above the camera", "View from side of the camera" };
+            desc = "Show the contents of the transformation matrix";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.transformationMatrix != null)
+            {
+                var t = task.transformationMatrix;
+                topLocations.Add(new Point3d(-t[12] * options.mul + dst2.Width / 2,
+                                               -t[13] * options.mul + dst2.Height / 2,
+                                               t[14] * options.mul + dst2.Height / 2));
+                for (int i = 0; i < topLocations.Count(); i++)
+                {
+                    var pt = topLocations[i];
+                    if (pt.X > 0 && pt.X < dst2.Width && pt.Z > 0 && pt.Z < src.Height)
+                    {
+                        DrawCircle(dst2, new cv.Point(pt.X, pt.Z), task.DotSize + 2, Scalar.Yellow);
+                    }
+                    if (pt.Z > 0 && pt.Z < dst2.Width && pt.Y > 0 && pt.Y < src.Height)
+                    {
+                        DrawCircle(dst3, new cv.Point(pt.Z, pt.Y), task.DotSize + 2, Scalar.Yellow);
+                    }
+                }
+                if (topLocations.Count() > 20) topLocations.RemoveAt(0); // just show the last x points
+            }
+            else
+            {
+                SetTrueText("The transformation matrix for the current camera has not been set", new cv.Point(10, 125));
+            }
+        }
+    }
+    public class CS_Triangle_Basics : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public List<cv.Point3f> triangles = new List<cv.Point3f>();
+        public CS_Triangle_Basics(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth" };
+            desc = "Given a contour, convert that contour to a series of triangles";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            if (task.redCells.Count() <= 1) return;
+            var rc = task.rc;
+            if (rc.index == 0) return;
+            dst3.SetTo(0);
+            var pt3D = new List<cv.Point3f>();
+            foreach (var pt in rc.contour)
+            {
+                var point = new cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
+                var vec = task.pointCloud.Get<cv.Point3f>(point.Y, point.X);
+                DrawCircle(dst3, point, task.DotSize, Scalar.Yellow);
+                pt3D.Add(vec);
+            }
+            var c3D = task.pointCloud.Get<cv.Point3f>(rc.maxDist.Y, rc.maxDist.X);
+            triangles.Clear();
+            var color3D = new Point3f(rc.color.Item2 / 255f, rc.color.Item1 / 255f, rc.color.Item0 / 255f);
+            for (int i = 0; i < pt3D.Count(); i++)
+            {
+                triangles.Add(color3D);
+                triangles.Add(c3D);
+                triangles.Add(pt3D[i]);
+                triangles.Add(pt3D[(i + 1) % pt3D.Count()]);
+            }
+        }
+    }
+    public class CS_Triangle_HullContour : CS_Parent
+    {
+        RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_Triangle_HullContour(VBtask task) : base(task)
+        {
+            task.gOptions.setDisplay1();
+            labels = new string[] { "", "Selected cell", "RedCloud_Basics output", "Selected contour" };
+            desc = "Given a contour, convert that contour to a series of triangles";
+        }
+        public void RunCS(Mat src)
+        {
+            hulls.Run(src);
+            dst2 = hulls.dst2;
+            if (task.redCells.Count() <= 1) return;
+            var rc = task.rc;
+            rc.contour = contourBuild(rc.mask, ContourApproximationModes.ApproxTC89L1);
+            dst3.SetTo(0);
+            foreach (var pt in rc.contour)
+            {
+                var point = new cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
+                DrawCircle(dst3, point, task.DotSize, Scalar.Yellow);
+            }
+            dst1.SetTo(0);
+            foreach (var pt in rc.hull)
+            {
+                var point = new cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
+                DrawCircle(dst1, point, task.DotSize, Scalar.Yellow);
+            }
+        }
+    }
+    public class CS_Triangle_RedCloud : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public List<cv.Point3f> triangles = new List<cv.Point3f>();
+        public CS_Triangle_RedCloud(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud_Basics output", "Selected contour - each pixel has depth" };
+            desc = "Given a contour, convert that contour to a series of triangles";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst0 = redC.dst0;
+            dst1 = redC.dst1;
+            dst2 = redC.dst2;
+            if (task.redCells.Count() <= 1) return;
+            if (task.rc.index == 0) return;
+            triangles.Clear();
+            foreach (rcData rc in task.redCells)
+            {
+                var pt3D = new List<cv.Point3f>();
+                foreach (var pt in rc.contour)
+                {
+                    var point = new cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
+                    var vec = task.pointCloud.Get<cv.Point3f>(point.Y, point.X);
+                    if (vec.Z > 0) pt3D.Add(vec);
+                }
+                var c3D = task.pointCloud.Get<cv.Point3f>(rc.maxDist.Y, rc.maxDist.X);
+                var color3D = new Point3f(rc.color.Item2 / 255f, rc.color.Item1 / 255f, rc.color.Item0 / 255f);
+                for (int i = 0; i < pt3D.Count(); i++)
+                {
+                    triangles.Add(color3D);
+                    triangles.Add(c3D);
+                    triangles.Add(pt3D[i]);
+                    triangles.Add(pt3D[(i + 1) % pt3D.Count()]);
+                }
+            }
+        }
+    }
+    public class CS_Triangle_Cell : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public List<cv.Point3f> triangles = new List<cv.Point3f>();
+        public CS_Triangle_Cell(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud_Basics output", "Selected contour - each pixel has depth" };
+            desc = "Given a contour, convert that contour to a series of triangles";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            if (task.redCells.Count() <= 1) return;
+            var rc = task.rc;
+            if (rc.index == 0) return;
+            dst3.SetTo(0);
+            var pt3D = new List<cv.Point3f>();
+            float aspectRect = (float)rc.rect.Width / rc.rect.Height, aspect = (float)dst2.Width / dst2.Height;
+            cv.Rect cellRect;
+            float xFactor, yFactor;
+            if (aspectRect > aspect)
+            {
+                cellRect = new cv.Rect(0, 0, dst2.Width, (int)(rc.rect.Height * dst2.Width / rc.rect.Width));
+                xFactor = dst2.Width;
+                yFactor = (float)(rc.rect.Height * dst2.Width / rc.rect.Width);
+            }
+            else
+            {
+                cellRect = new cv.Rect(0, 0, (int)(rc.rect.Width * dst2.Height / rc.rect.Height), dst2.Height);
+                xFactor = (float)(rc.rect.Width * dst2.Height / rc.rect.Height);
+                yFactor = dst2.Height;
+            }
+            dst3.Rectangle(cellRect, Scalar.White, task.lineWidth);
+            foreach (var pt in rc.contour)
+            {
+                var vec = task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X);
+                var point = new cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height);
+                DrawCircle(dst3, point, task.DotSize, Scalar.Yellow);
+                pt3D.Add(vec);
+            }
+            var c3D = task.pointCloud.Get<cv.Point3f>(rc.maxDist.Y, rc.maxDist.X);
+            triangles.Clear();
+            var color3D = new Point3f(rc.color.Item2 / 255f, rc.color.Item1 / 255f, rc.color.Item0 / 255f);
+            for (int i = 0; i < pt3D.Count(); i++)
+            {
+                triangles.Add(color3D);
+                triangles.Add(c3D);
+                triangles.Add(pt3D[i]);
+                triangles.Add(pt3D[(i + 1) % pt3D.Count()]);
+            }
+        }
+    }
+    public class CS_Triangle_Mask : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public List<cv.Point3f> triangles = new List<cv.Point3f>();
+        public CS_Triangle_Mask(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "RedCloud_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist." };
+            desc = "Given a RedCloud cell, resize it and show the points with depth.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            if (task.redCells.Count() <= 1) return;
+            var rc = task.rc;
+            if (rc.index == 0) return;
+            dst3.SetTo(0);
+            var pt3D = new List<cv.Point3f>();
+            float aspectRect = (float)rc.rect.Width / rc.rect.Height, aspect = (float)dst2.Width / dst2.Height;
+            cv.Rect cellRect;
+            float xFactor, yFactor;
+            if (aspectRect > aspect)
+            {
+                cellRect = new cv.Rect(0, 0, dst2.Width, (int)(rc.rect.Height * dst2.Width / rc.rect.Width));
+                xFactor = dst2.Width;
+                yFactor = (float)(rc.rect.Height * dst2.Width / rc.rect.Width);
+            }
+            else
+            {
+                cellRect = new cv.Rect(0, 0, (int)(rc.rect.Width * dst2.Height / rc.rect.Height), dst2.Height);
+                xFactor = (float)(rc.rect.Width * dst2.Height / rc.rect.Height);
+                yFactor = dst2.Height;
+            }
+            dst3.Rectangle(cellRect, Scalar.White, task.lineWidth);
+            triangles.Clear();
+            for (int y = 0; y < rc.rect.Height; y++)
+            {
+                for (int x = 0; x < rc.rect.Width; x++)
+                {
+                    if (rc.mask.Get<byte>(y, x) == 0) continue;
+                    var vec = task.pointCloud[rc.rect].Get<cv.Point3f>(y, x);
+                    var point = new Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height);
+                    DrawCircle(dst3, point, task.DotSize, Scalar.Yellow);
+                    pt3D.Add(vec);
+                }
+            }
+            var newMaxDist = new Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
+                                          yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height);
+            DrawCircle(dst3, newMaxDist, task.DotSize + 2, Scalar.Red);
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_VectorMagnitude : CS_Parent
+    {
+        public CS_VectorMagnitude(VBtask task) : base(task)
+        {
+            desc = "Compute Euclidian and Manhattan Distance on a single vector.";
+            labels[2] = "Vector Magnitude";
+        }
+        public void RunCS(Mat src)
+        {
+            float[] cVector = { 1, 4, 4, 8 };
+            strOut = $"p1 = ({cVector[0]}, {cVector[1]})\t p2 = ({cVector[2]}, {cVector[3]})\n\n";
+            Mat coordinates = new Mat(1, 4, MatType.CV_32F, cVector);
+            Mat diff_x = coordinates.Col(0) - coordinates.Col(2);
+            Mat diff_y = coordinates.Col(1) - coordinates.Col(3);
+            // sqrt((x2 - x1)^2 + (y2 - y1)^2)
+            Mat euclidean_distance = new Mat();
+            Cv2.Magnitude(diff_x, diff_y, euclidean_distance);
+            strOut += $"euclidean_distance = {euclidean_distance.At<float>(0, 0)}\n\n";
+            Mat manhattan_distance = Cv2.Abs(diff_x) + Cv2.Abs(diff_y);
+            strOut += $"manhattan_distance = {manhattan_distance.At<float>(0, 0)}\n\n";
+            // Another way to compute L1 distance, with Absdiff
+            // abs(x2 - x1) + abs(y2 - y1)
+            Mat points1 = coordinates[new Range(0, 1), new Range(0, 2)];
+            Mat points2 = coordinates[new Range(0, 1), new Range(2, 4)];
+            Mat other_manhattan_distance = new Mat();
+            Cv2.Absdiff(points1, points2, other_manhattan_distance);
+            other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1);
+            strOut += $"other_manhattan_distance = {other_manhattan_distance.At<float>(0, 0)}";
+            SetTrueText(strOut);
+        }
+    }
 
 
 

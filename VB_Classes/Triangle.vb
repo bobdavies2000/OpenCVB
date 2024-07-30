@@ -90,8 +90,7 @@ Public Class Triangle_RedCloud : Inherits VB_Parent
         dst2 = redC.dst2
 
         If task.redCells.Count <= 1 Then Exit Sub
-        Dim rc = task.rc
-        If rc.index = 0 Then Exit Sub
+        If task.rc.index = 0 Then Exit Sub
 
         triangles.Clear()
         For Each rc In task.redCells
