@@ -1702,8 +1702,11 @@ Public Class OpenCVB
             End While
 
             Console.WriteLine(parms.algName + " ending.  Thread closing...")
+            task.frameCount = -1
+            Application.DoEvents()
             task.Dispose()
         End SyncLock
+
         frameCount = 0
     End Sub
 End Class

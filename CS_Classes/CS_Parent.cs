@@ -38,6 +38,7 @@ namespace CS_Classes
         public Vec3b green = new Vec3b(0, 255, 0);
         public Vec3b blue = new Vec3b(255, 0, 0);
         string callStack = "";
+        public int depthListMaxCount = 10;
 
         public CS_Parent(VBtask _task)
         {
@@ -143,6 +144,10 @@ namespace CS_Classes
             cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
             cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
             dst.Line(pt1, pt2, color, lineWidth);
+        }
+        public void DrawLine(cv.Mat dst, cv.Point p1, cv.Point p2, cv.Scalar color)
+        {
+            dst.Line(p1, p2, color, task.lineWidth);
         }
         public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color)
         {

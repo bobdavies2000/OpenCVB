@@ -47,31 +47,21 @@ End Class
 
 
 Public Class Texture_Flow : Inherits VB_Parent
+    Dim options As New Options_Texture
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Texture Flow Delta", 2, 100, 30)
-            sliders.setupTrackBar("Texture Eigen BlockSize", 1, 100, 50)
-            sliders.setupTrackBar("Texture Eigen Ksize", 1, 15, 1)
-        End If
-
         desc = "Find and mark the texture flow in an image - see texture_flow.py"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static deltaSlider = FindSlider("Texture Flow Delta")
-        Static blockSlider = FindSlider("Texture Eigen BlockSize")
-        Static ksizeSlider = FindSlider("Texture Eigen Ksize")
+        options.RunVB()
 
-        Dim TFdelta = deltaSlider.Value
-        Dim TFblockSize = blockSlider.Value * 2 + 1
-        Dim TFksize = ksizeSlider.Value * 2 + 1
         dst2 = src.Clone
         If src.Channels() <> 1 Then src = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2Gray)
-        Dim eigen = src.CornerEigenValsAndVecs(TFblockSize, TFksize)
+        Dim eigen = src.CornerEigenValsAndVecs(options.TFblockSize, options.TFksize)
         Dim split = eigen.Split()
-        Dim d2 = TFdelta / 2
+        Dim d2 = options.TFdelta / 2
         For y = d2 To dst2.Height - 1 Step d2
             For x = d2 To dst2.Width - 1 Step d2
-                Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * TFdelta
+                Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * options.TFdelta
                 Dim p1 = New cv.Point(CInt(x - delta.X), CInt(y - delta.Y))
                 Dim p2 = New cv.Point(CInt(x + delta.X), CInt(y + delta.Y))
                 DrawLine(dst2, p1, p2, task.HighlightColor)

@@ -12,6 +12,7 @@ Public Class Threading_Test : Inherits VB_Parent
     End Sub
     Private Sub runThread(id As Integer)
         While 1
+            If task.frameCount < 0 Then Exit While
             If task.srcThread IsNot Nothing Then
                 If id = 1 Then
                     horizon.autoDisplay = True
@@ -62,6 +63,7 @@ Public Class Threading_Test1 : Inherits VB_Parent
     End Sub
     Private Sub runThread()
         While 1
+            If task.frameCount < 0 Then Exit While
             If task.srcThread IsNot Nothing Then
                 gravity.autoDisplay = True
                 gravity.Run(task.srcThread)

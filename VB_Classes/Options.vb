@@ -3707,7 +3707,7 @@ End Class
 Public Class Options_Threshold : Inherits VB_Parent
     Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
     Public thresholdName As String
-    Public threshold As Integer = 255
+    Public threshold As Integer = 128
     Public gradient As New Gradient_Color
     Public inputGray As Boolean
     Public otsuOption As Boolean
@@ -3757,7 +3757,7 @@ End Class
 
 
 
-Public Class Options_Threshold_Adaptive : Inherits VB_Parent
+Public Class Options_AdaptiveThreshold : Inherits VB_Parent
     Public method As cv.AdaptiveThresholdTypes
     Public blockSize As Integer = 5
     Public constantVal As Integer
@@ -7444,5 +7444,49 @@ Public Class Options_SwarmPercent : Inherits VB_Parent
     Public Sub RunVB()
         Static percentSlider = FindSlider("Cells map X percent")
         percent = percentSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Texture : Inherits VB_Parent
+    Public TFdelta As Integer
+    Public TFblockSize As Integer
+    Public TFksize As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Texture Flow Delta", 2, 100, 30)
+            sliders.setupTrackBar("Texture Eigen BlockSize", 1, 100, 50)
+            sliders.setupTrackBar("Texture Eigen Ksize", 1, 15, 1)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static deltaSlider = FindSlider("Texture Flow Delta")
+        Static blockSlider = FindSlider("Texture Eigen BlockSize")
+        Static ksizeSlider = FindSlider("Texture Eigen Ksize")
+
+        TFdelta = deltaSlider.Value
+        TFblockSize = blockSlider.Value * 2 + 1
+        TFksize = ksizeSlider.Value * 2 + 1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_ThresholdDef : Inherits VB_Parent
+    Public threshold As Integer
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Threshold", 0, 255, 127)
+    End Sub
+    Public Sub RunVB()
+        Static truncateSlider = FindSlider("Threshold")
+        threshold = truncateSlider.value
     End Sub
 End Class

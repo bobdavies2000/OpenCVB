@@ -17819,6 +17819,777 @@ namespace CS_Classes
             labels[3] = swarm.labels[2];
         }
     }
+    public class CS_Tessallate_Basics : CS_Parent
+    {
+        public List<cv.Point3f> points = new List<cv.Point3f>();
+        public List<Scalar> colors = new List<Scalar>();
+        public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
+        public RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_Tessallate_Basics(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(30);
+            desc = "Prepare the list of 2D triangles";
+        }
+        List<cv.Point> addTriangle(cv.Point c1, cv.Point c2, cv.Point center, rcData rc, Point3f shift)
+        {
+            var pt1 = getWorldCoordinates(new Point3f(c1.X, c1.Y, (float) rc.depthMean[2]));
+            var ptCenter = getWorldCoordinates(new Point3f(center.X, center.Y, (float)rc.depthMean[2]));
+            var pt2 = getWorldCoordinates(new Point3f(c2.X, c2.Y, (float)rc.depthMean[2]));
+            colors.Add(vecToScalar(rc.color));
+            points.Add(new Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z));
+            points.Add(new Point3f(ptCenter.X + shift.X, ptCenter.Y + shift.Y, ptCenter.Z + shift.Z));
+            points.Add(new Point3f(pt2.X + shift.X, pt2.Y + shift.Y, pt2.Z + shift.Z));
+            var points2d = new List<cv.Point> { c1, center, c2 };
+            return points2d;
+        }
+        public void RunCS(Mat src)
+        {
+            oglOptions.RunVB();
+            var ptM = oglOptions.moveAmount;
+            var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
+            hulls.Run(src);
+            dst2 = hulls.dst2;
+            points.Clear();
+            colors.Clear();
+            var listOfPoints = new List<List<cv.Point>>();
+            foreach (var rc in task.redCells)
+            {
+                if (rc.contour == null || rc.contour.Count() < 5) continue;
+                cv.Point[] corners = new cv.Point[4];
+                for (int i = 0; i < corners.Length; i++)
+                {
+                    var pt = rc.contour[i * rc.contour.Count() / 4];
+                    corners[i] = new cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y);
+                }
+                var center = new cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2);
+                DrawLine(dst2, corners[0], center, Scalar.White);
+                DrawLine(dst2, corners[1], center, Scalar.White);
+                DrawLine(dst2, corners[2], center, Scalar.White);
+                DrawLine(dst2, corners[3], center, Scalar.White);
+                listOfPoints.Add(addTriangle(corners[0], corners[3], center, rc, shift));
+                listOfPoints.Add(addTriangle(corners[1], corners[0], center, rc, shift));
+                listOfPoints.Add(addTriangle(corners[2], corners[1], center, rc, shift));
+                listOfPoints.Add(addTriangle(corners[3], corners[2], center, rc, shift));
+            }
+            dst3.SetTo(0);
+            for (int i = 0; i < colors.Count(); i++)
+            {
+                Cv2.DrawContours(dst3, listOfPoints, i, colors[i], -1);
+            }
+            labels[2] = colors.Count().ToString() + " triangles from " + task.redCells.Count().ToString() + " RedCloud cells";
+        }
+    }
+    public class CS_Tessallate_Triangles : CS_Parent
+    {
+        public Tessallate_Basics basics = new Tessallate_Basics();
+        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public CS_Tessallate_Triangles(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "", "" };
+            desc = "Prepare colors and triangles for use in OpenGL Triangle presentation.";
+        }
+        public void RunCS(Mat src)
+        {
+            basics.Run(src);
+            dst2 = basics.dst2;
+            dst3 = basics.dst3;
+            oglData.Clear();
+            for (int i = 0; i < basics.colors.Count(); i++)
+            {
+                oglData.Add(new Point3f((float)(basics.colors[i][2] / 255),
+                                        (float)(basics.colors[i][1] / 255),
+                                        (float)(basics.colors[i][0] / 255))); // BGR to RGB
+                for (int j = 0; j < 3; j++)
+                {
+                    oglData.Add(basics.points[i * 3 + j]);
+                }
+            }
+            labels = basics.labels;
+        }
+    }
+    public class CS_Tessallate_QuadSimple : CS_Parent
+    {
+        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Tessallate_QuadSimple(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(20);
+            desc = "Prepare to tessellate the point cloud with RedCloud data";
+        }
+        public void RunCS(Mat src)
+        {
+            oglOptions.RunVB();
+            var ptM = oglOptions.moveAmount;
+            var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
+            redC.Run(src);
+            dst2 = redC.dst2;
+            oglData.Clear();
+            dst3.SetTo(0);
+            for (int i = 0; i < task.gridList.Count(); i++)
+            {
+                var roi = task.gridList[i];
+                var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
+                var index = task.cellMap.Get<byte>(center.Y, center.X);
+                if (index <= 0) continue;
+                var rc = task.redCells[index];
+                dst3[roi].SetTo(rc.color);
+                SetTrueText(rc.depthMean[2].ToString(fmt1), new cv.Point(roi.X, roi.Y));
+                var topLeft = getWorldCoordinates(new Point3f(roi.X, roi.Y, (float)rc.depthMean[2]));
+                var botRight = getWorldCoordinates(new Point3f(roi.X + roi.Width, roi.Y + roi.Height, (float)rc.depthMean[2]));
+                oglData.Add(new Point3f(rc.color[2] / 255, rc.color[1] / 255, rc.color[0] / 255));
+                oglData.Add(new Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, (float)(rc.depthMean[2] + shift.Z)));
+                oglData.Add(new Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, (float)(rc.depthMean[2] + shift.Z)));
+                oglData.Add(new Point3f(botRight.X + shift.X, botRight.Y + shift.Y, (float)(rc.depthMean[2] + shift.Z)));
+                oglData.Add(new Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, (float)(rc.depthMean[2] + shift.Z)));
+            }
+            labels = new string[] { "", "", traceName + " completed with " + (oglData.Count() / 5).ToString(fmt0) + " quad sets (with a 5th element for color)", "Output of CS_Tessallate_QuadSimple" };
+        }
+    }
+    public class CS_Tessallate_QuadHulls : CS_Parent
+    {
+        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public List<List<double>> depthList = new List<List<double>>();
+        public List<Vec3b> colorList = new List<Vec3b>();
+        public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
+        RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_Tessallate_QuadHulls(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(20);
+            desc = "Prepare to tessellate the point cloud with RedCloud data";
+        }
+        public void RunCS(Mat src)
+        {
+            oglOptions.RunVB();
+            var ptM = oglOptions.moveAmount;
+            var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
+            hulls.Run(src);
+            dst2 = hulls.dst2;
+            if (task.optionsChanged)
+            {
+                depthList = new List<List<double>>();
+                for (int i = 0; i < task.gridList.Count(); i++)
+                {
+                    depthList.Add(new List<double>());
+                    colorList.Add(black);
+                }
+            }
+            oglData.Clear();
+            dst3.SetTo(0);
+            for (int i = 0; i < task.gridList.Count(); i++)
+            {
+                var roi = task.gridList[i];
+                var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
+                var index = task.cellMap.Get<byte>(center.Y, center.X);
+                if (index <= 0)
+                {
+                    depthList[i].Clear();
+                    colorList[i] = black;
+                    continue;
+                }
+                var rc = task.redCells[index];
+                if (rc.depthMean[2] == 0) continue;
+                if (colorList[i] != rc.color) depthList[i].Clear();
+                depthList[i].Add(rc.depthMean[2]);
+                colorList[i] = rc.color;
+                if (depthList[i].Count() > 0)
+                {
+                    dst3[roi].SetTo(colorList[i]);
+                    var depth = depthList[i].Average();
+                    var topLeft = getWorldCoordinates(new Point3f(roi.X, roi.Y, (float)depth));
+                    var botRight = getWorldCoordinates(new Point3f(roi.X + roi.Width, roi.Y + roi.Height, (float)depth));
+                    oglData.Add(new Point3f(rc.color[2] / 255, rc.color[1] / 255, rc.color[0] / 255));
+                    oglData.Add(new Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, (float)(depth + shift.Z)));
+                    oglData.Add(new Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, (float)(depth + shift.Z)));
+                    oglData.Add(new Point3f(botRight.X + shift.X, botRight.Y + shift.Y, (float)(depth + shift.Z)));
+                    oglData.Add(new Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, (float)(depth + shift.Z)));
+                    if (depthList[i].Count() >= depthListMaxCount) depthList[i].RemoveAt(0);
+                }
+            }
+            labels[2] = traceName + " completed with " + (oglData.Count() / 5).ToString(fmt0) + " quad sets (with a 5th element for color)";
+        }
+    }
+    public class CS_Tessallate_QuadMinMax : CS_Parent
+    {
+        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public List<List<double>> depthList1 = new List<List<double>>();
+        public List<List<double>> depthList2 = new List<List<double>>();
+        public List<Vec3b> colorList = new List<Vec3b>();
+        public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Tessallate_QuadMinMax(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(20);
+            desc = "Prepare to tessellate the point cloud with RedCloud data";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            oglOptions.RunVB();
+            var ptM = oglOptions.moveAmount;
+            var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
+            if (task.optionsChanged)
+            {
+                depthList1 = new List<List<double>>();
+                depthList2 = new List<List<double>>();
+                for (int i = 0; i <= task.gridList.Count(); i++)
+                {
+                    depthList1.Add(new List<double>());
+                    depthList2.Add(new List<double>());
+                    colorList.Add(black);
+                }
+            }
+            oglData.Clear();
+            dst3.SetTo(0);
+            Mat depth32f = task.pcSplit[2] * 1000, depth32s = new Mat();
+            depth32f.ConvertTo(depth32s, MatType.CV_32S);
+            for (int i = 0; i < task.gridList.Count(); i++)
+            {
+                var roi = task.gridList[i];
+                var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
+                var index = task.cellMap.Get<byte>(center.Y, center.X);
+                if (index <= 0)
+                {
+                    depthList1[i].Clear();
+                    depthList2[i].Clear();
+                    colorList[i] = black;
+                    continue;
+                }
+                var rc = task.redCells[index];
+                if (rc.depthMean[2] == 0) continue;
+                if (colorList[i] != rc.color)
+                {
+                    depthList1[i].Clear();
+                    depthList2[i].Clear();
+                }
+                double depthMin, depthMax;
+                cv.Point minLoc, maxLoc;
+                Cv2.MinMaxLoc(depth32s[roi], out depthMin, out depthMax, out minLoc, out maxLoc, task.depthMask[roi]);
+                depthMax /= 1000;
+                depthMin /= 1000;
+                if (depthMax > rc.depthMean[2] + rc.depthStdev[2] * 3) depthMax = rc.depthMean[2] + 3 * rc.depthStdev[2];
+                depthList1[i].Add(depthMin);
+                depthList2[i].Add(depthMax);
+                colorList[i] = rc.color;
+                var d1 = depthList1[i].Average();
+                var d2 = depthList2[i].Average();
+                int depthCount = (d1 == d2) ? 1 : 2;
+                for (int j = 0; j < depthCount; j++)
+                {
+                    var depth = (j == 0) ? d1 : d2;
+                    var topLeft = getWorldCoordinates(new Point3f(roi.X, roi.Y, (float)depth));
+                    var botRight = getWorldCoordinates(new Point3f(roi.X + roi.Width, roi.Y + roi.Height, (float)depth));
+                    var color = rc.color;
+                    dst3[roi].SetTo(color);
+                    oglData.Add(new Point3f(color[2] / 255f, color[1] / 255f, color[0] / 255f));
+                    oglData.Add(new Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, (float)(depth + shift.Z)));
+                    oglData.Add(new Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, (float)(depth + shift.Z)));
+                    oglData.Add(new Point3f(botRight.X + shift.X, botRight.Y + shift.Y, (float)(depth + shift.Z)));
+                    oglData.Add(new Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, (float)(depth + shift.Z)));
+                }
+                SetTrueText(string.Format("{0}\n{1}", d1.ToString(fmt1), d2.ToString(fmt1)), new cv.Point(roi.X, roi.Y), 3);
+                if (depthList1[i].Count() >= depthListMaxCount) depthList1[i].RemoveAt(0);
+                if (depthList2[i].Count() >= depthListMaxCount) depthList2[i].RemoveAt(0);
+            }
+            labels[2] = traceName + " completed with " + (oglData.Count() / 5).ToString(fmt0) + " quad sets (with a 5th element for color)";
+        }
+    }
+    public class CS_Tessallate_Bricks : CS_Parent
+    {
+        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public List<double> depths = new List<double>();
+        public Options_OpenGLFunctions options = new Options_OpenGLFunctions();
+        public RedCloud_Hulls hulls = new RedCloud_Hulls();
+        List<List<double>> depthMinList = new List<List<double>>();
+        List<List<double>> depthMaxList = new List<List<double>>();
+        int myListMax = 10;
+        public CS_Tessallate_Bricks(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(20);
+            desc = "Tessellate each quad in point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged)
+            {
+                depthMinList.Clear();
+                depthMaxList.Clear();
+                for (int i = 0; i < task.gridList.Count(); i++)
+                {
+                    depthMinList.Add(new List<double>());
+                    depthMaxList.Add(new List<double>());
+                }
+            }
+            options.RunVB();
+            var ptM = options.moveAmount;
+            var shift = new Point3f((float)ptM[0], (float)ptM[1], (float) ptM[2]);
+            oglData.Clear();
+            hulls.Run(src);
+            dst2 = hulls.dst2;
+            Point3f[] min = new Point3f[4];
+            Point3f[] max = new Point3f[4];
+            depths.Clear();
+            for (int i = 0; i < task.gridList.Count(); i++)
+            {
+                var roi = task.gridList[i];
+                var center = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
+                var index = task.cellMap.Get<byte>(center.Y, center.X);
+                double depthMin = 0, depthMax = 0;
+                cv.Point minLoc, maxLoc;
+                if (index >= 0)
+                {
+                    Cv2.MinMaxLoc(task.pcSplit[2][roi], out depthMin, out depthMax, out minLoc, out maxLoc, task.depthMask[roi]);
+                    var rc = task.redCells[index];
+                    depthMin = (depthMax > rc.depthMean[2]) ? rc.depthMean[2] : depthMin;
+                    var test = depthMin + rc.depthStdev[2] * 3;
+                    if (test < depthMax) depthMax = test;
+                    if (depthMin > 0 && depthMax > 0 && depthMax < task.MaxZmeters)
+                    {
+                        depthMinList[i].Add(depthMin);
+                        depthMaxList[i].Add(depthMax);
+                        depthMin = depthMinList[i].Average();
+                        var avg = depthMaxList[i].Average() - depthMin;
+                        depthMax = depthMin + (avg < 0.2 ? avg : 0.2); // trim the max depth - often unreliable 
+                        var color = rc.color;
+                        oglData.Add(new Point3f(color[2] / 255f, color[1] / 255f, color[0] / 255f));
+                        for (int j = 0; j < 4; j++)
+                        {
+                            var x = (j == 0) ? roi.X : (j == 1) ? roi.X + roi.Width : (j == 2) ? roi.X + roi.Width : roi.X;
+                            var y = (j == 0) ? roi.Y : (j == 1) ? roi.Y : (j == 2) ? roi.Y + roi.Height : roi.Y + roi.Height;
+                            min[j] = getWorldCoordinates(new Point3f(x, y, (float)depthMin));
+                            min[j] += shift;
+                            oglData.Add(min[j]);
+                        }
+                        for (int j = 0; j < 4; j++)
+                        {
+                            max[j] += shift;
+                            oglData.Add(max[j]);
+                        }
+                        oglData.Add(max[0]);
+                        oglData.Add(min[0]);
+                        oglData.Add(min[1]);
+                        oglData.Add(max[1]);
+                        oglData.Add(max[0]);
+                        oglData.Add(min[0]);
+                        oglData.Add(min[3]);
+                        oglData.Add(max[3]);
+                        oglData.Add(max[1]);
+                        oglData.Add(min[1]);
+                        oglData.Add(min[2]);
+                        oglData.Add(max[2]);
+                        oglData.Add(max[2]);
+                        oglData.Add(min[2]);
+                        oglData.Add(min[3]);
+                        oglData.Add(max[3]);
+                        SetTrueText(string.Format("{0}\n{1}", depthMin.ToString(fmt1), depthMax.ToString(fmt1)), new cv.Point(roi.X, roi.Y));
+                        if (depthMinList[i].Count() >= myListMax) depthMinList[i].RemoveAt(0);
+                        if (depthMaxList[i].Count() >= myListMax) depthMaxList[i].RemoveAt(0);
+                    }
+                }
+                depths.Add(depthMin);
+                depths.Add(depthMax);
+            }
+            labels[2] = traceName + " completed: " + task.gridList.Count().ToString(fmt0) + " ROI's produced " + (oglData.Count() / 25).ToString(fmt0) + " six sided bricks with color";
+            SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3);
+        }
+    }
+    public class CS_Texture_Basics : CS_Parent
+    {
+        Draw_Ellipses ellipse = new Draw_Ellipses();
+        public Mat texture = new Mat();
+        public cv.Rect tRect;
+        int texturePop;
+        public bool tChange; // if the texture hasn't changed this will be false.
+        public CS_Texture_Basics(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize((int)(dst2.Width / 8));
+            desc = "find the best sample 256x256 texture of a mask";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest() || src.Channels() != 1)
+            {
+                ellipse.Run(src);
+                dst2 = ellipse.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+                dst2 = dst2.ConvertScaleAbs(255);
+                dst3 = ellipse.dst2.Clone();
+                dst3.SetTo(Scalar.Yellow, task.gridMask);
+            }
+            else
+            {
+                dst2 = src;
+            }
+            tChange = true;
+            if (texturePop > 0)
+            {
+                var nextCount = dst2[tRect].CountNonZero();
+                if (nextCount >= texturePop * 0.95) tChange = false;
+            }
+            if (tChange)
+            {
+                var sortcounts = new SortedList<int, cv.Rect>(new compareAllowIdenticalIntegerInverted());
+                foreach (var roi in task.gridList)
+                {
+                    sortcounts.Add(dst2[roi].CountNonZero(), roi);
+                }
+                if (standaloneTest()) dst3.Rectangle(sortcounts.Values[0], Scalar.White, 2);
+                tRect = sortcounts.Values[0];
+                texture = task.color[tRect];
+                texturePop = dst2[tRect].CountNonZero();
+            }
+            if (standaloneTest()) dst3.Rectangle(tRect, Scalar.White, 2);
+        }
+    }
+    public class CS_Texture_Flow : CS_Parent
+    {
+        Options_Texture options = new Options_Texture();
+        public CS_Texture_Flow(VBtask task) : base(task)
+        {
+            desc = "Find and mark the texture flow in an image - see texture_flow.py";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.Clone();
+            if (src.Channels() != 1)
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            var eigen = src.CornerEigenValsAndVecs(options.TFblockSize, options.TFksize);
+            var split = eigen.Split();
+            float d2 = options.TFdelta / 2;
+            for (int y = (int)d2; y < dst2.Height - 1; y += (int)d2)
+            {
+                for (int x = (int)d2; x < dst2.Width - 1; x += (int)d2)
+                {
+                    var delta = new Point2f(split[4].Get<float>(y, x), split[5].Get<float>(y, x)) * options.TFdelta;
+                    var p1 = new cv.Point((int)(x - delta.X), (int)(y - delta.Y));
+                    var p2 = new cv.Point((int)(x + delta.X), (int)(y + delta.Y));
+                    DrawLine(dst2, p1, p2, task.HighlightColor);
+                }
+            }
+        }
+    }
+
+    public class CS_Texture_Flow_Depth : CS_Parent
+    {
+        Texture_Flow texture;
+        public CS_Texture_Flow_Depth(VBtask task) : base(task)
+        {
+            texture = new Texture_Flow();
+            desc = "Display texture flow in the depth data";
+        }
+        public void RunCS(Mat src)
+        {
+            texture.Run(task.depthRGB);
+            dst2 = texture.dst2;
+        }
+    }
+    public class CS_Texture_Flow_Reduction : CS_Parent
+    {
+        Texture_Flow texture;
+        Reduction_Basics reduction = new Reduction_Basics();
+        public CS_Texture_Flow_Reduction(VBtask task) : base(task)
+        {
+            texture = new Texture_Flow();
+            desc = "Display texture flow in the reduced color image";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst2 = reduction.dst2;
+            texture.Run(reduction.dst2.CvtColor(ColorConversionCodes.GRAY2BGR));
+            dst3 = texture.dst2;
+        }
+    }
+    public class CS_OpenGL_TextureShuffle : CS_Parent
+    {
+        Random_Shuffle shuffle = new Random_Shuffle();
+        OpenGL_FlatStudy2 floor = new OpenGL_FlatStudy2();
+        Texture_Basics texture;
+        public cv.Rect tRect;
+        public Mat rgbaTexture = new Mat();
+        public CS_OpenGL_TextureShuffle(VBtask task) : base(task)
+        {
+            texture = new Texture_Basics();
+            desc = "Use random shuffling to homogenize a texture sample of what the floor looks like.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                if (dst2.Width == 320)
+                {
+                    SetTrueText("Texture_Shuffle is not supported at the 320x240 resolution.  It needs at least 256 rows in the output.");
+                    return;
+                }
+                floor.plane.Run(src);
+                dst3.SetTo(0);
+                src.CopyTo(dst3, floor.plane.sliceMask);
+                dst2 = floor.plane.dst2;
+                src = floor.plane.sliceMask;
+            }
+            texture.Run(src);
+            dst2 = texture.dst3;
+            dst3.Rectangle(texture.tRect, Scalar.White, task.lineWidth);
+            shuffle.Run(texture.texture);
+            tRect = new cv.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4);
+            dst2[tRect] = shuffle.dst2.Repeat(4, 4);
+            var split = dst2[tRect].Split();
+            var alpha = new Mat(split[0].Size(), MatType.CV_8U, 1);
+            var merged = new Mat[] { split[2], split[1], split[0], alpha };
+            Cv2.Merge(merged, rgbaTexture);
+            SetTrueText("Use mouse movement over the image to display results.", 3);
+        }
+    }
+    public class CS_Thickness_Basics : CS_Parent
+    {
+        public rcData rc = new rcData();
+        public Volume_Basics volZ = new Volume_Basics();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Thickness_Basics(VBtask task) : base(task)
+        {
+            desc = "Determine the thickness of a RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                rc = task.rc;
+            }
+            volZ.rc = rc;
+            volZ.Run(src);
+            dst3 = volZ.dst3;
+            SetTrueText(volZ.strOut, 3);
+        }
+    }
+    public class CS_Threading_Test : CS_Parent
+    {
+        Thread thread1;
+        Thread thread2;
+        Horizon_Basics horizon = new Horizon_Basics();
+        Gravity_Basics gravity = new Gravity_Basics();
+        public CS_Threading_Test(VBtask task) : base(task)
+        {
+            task.recordTimings = false;
+            labels = new string[] { "", "", "Output of thread 1 - horizon thread", "Output of thread 2 - gravity thread" };
+            desc = "Test using the threading in C#";
+        }
+        void runThread(int id)
+        {
+            while (true)
+            {
+                if (task.frameCount < 0) break;
+                if (task.srcThread != null)
+                {
+                    if (id == 1)
+                    {
+                        horizon.autoDisplay = true;
+                        horizon.Run(task.srcThread);
+                        dst2 = horizon.dst2;
+                    }
+                    else
+                    {
+                        gravity.autoDisplay = true;
+                        gravity.Run(task.srcThread);
+                        dst3 = gravity.dst2;
+                    }
+                    task.srcThread = null;
+                }
+                else
+                {
+                    Thread.Sleep(10);
+                }
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            if (thread1 == null)
+            {
+                thread1 = new Thread(() => runThread(1));
+                thread1.Name = "CS_Threading_Test1";
+                thread1.Start();
+            }
+            if (thread2 == null)
+            {
+                thread2 = new Thread(() => runThread(2));
+                thread2.Name = "CS_Threading_Test2";
+                thread2.Start();
+            }
+            if (task.srcThread == null) task.srcThread = src.Clone();
+        }
+        public void Close()
+        {
+            thread1.Abort();
+            thread2.Abort();
+        }
+    }
+    public class CS_Threading_Test1 : CS_Parent
+    {
+        Gravity_Basics gravity = new Gravity_Basics();
+        Thread thread;
+        public CS_Threading_Test1(VBtask task) : base(task)
+        {
+            desc = "Test using the threading in C# - this test works because there are no options with Gravity_Basics.";
+        }
+        void runThread()
+        {
+            while (true)
+            {
+                if (task.frameCount < 0) break;
+                if (task.srcThread != null)
+                {
+                    gravity.autoDisplay = true;
+                    gravity.Run(task.srcThread);
+                    dst2 = gravity.dst2;
+                    task.srcThread = null;
+                }
+                else
+                {
+                    Thread.Sleep(10);
+                }
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            if (thread == null)
+            {
+                thread = new Thread(runThread);
+                thread.Name = "Threading_Test";
+                thread.Start();
+            }
+            if (task.srcThread == null) task.srcThread = src.Clone();
+        }
+        public void Close()
+        {
+            thread.Abort();
+        }
+    }
+    //public class CS_Threshold_Basics : CS_Parent
+    //{
+    //    public Options_Threshold options = new Options_Threshold();
+    //    public CS_Threshold_Basics(VBtask task) : base(task)
+    //    {
+    //        labels[2] = "Original image";
+    //        desc = "Demonstrate the use of OpenCV's threshold and all its options";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        options.RunVB();
+    //        labels[3] = "Image after thresholding with threshold = " + options.threshold.ToString();
+    //        dst2 = src;
+    //        if (options.inputGray) dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+    //        if (options.otsuOption) options.thresholdMethod |= ThresholdTypes.Otsu;
+    //        if ((options.otsuOption || options.thresholdMethod == ThresholdTypes.Triangle) && dst2.Channels() != 1)
+    //        {
+    //            dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+    //        }
+    //        dst3 = dst2.Threshold(options.threshold, 255, options.thresholdMethod);
+    //    }
+    //}
+    //public class CS_Threshold_Adaptive : CS_Parent
+    //{
+    //    Options_Threshold options = new Options_Threshold();
+    //    Options_AdaptiveThreshold options1 = new Options_AdaptiveThreshold();
+    //    public CS_Threshold_Adaptive(VBtask task) : base(task)
+    //    {
+    //        labels = new string[] { "", "", "Original input", "Output of AdaptiveThreshold" };
+    //        desc = "Explore what adaptive threshold can do.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        options.RunVB();
+    //        options1.RunVB();
+    //        dst2 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src;
+    //        dst3 = dst2.AdaptiveThreshold(255, options1.method, options.thresholdMethod,
+    //                                           options1.blockSize, options1.constantVal);
+    //    }
+    //}
+    public class CS_Threshold_Definitions : CS_Parent
+    {
+        Gradient_Color gradient = new Gradient_Color();
+        Mat_4Click mats = new Mat_4Click();
+        Options_ThresholdDef options = new Options_ThresholdDef();
+        public CS_Threshold_Definitions(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection" };
+            desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            gradient.Run(empty);
+            dst0 = gradient.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst1 = dst0.Threshold(options.threshold, 255, ThresholdTypes.Binary);
+            mats.mat[0] = dst0.Threshold(options.threshold, 255, ThresholdTypes.BinaryInv);
+            mats.mat[1] = dst0.Threshold(options.threshold, 255, ThresholdTypes.Trunc);
+            mats.mat[2] = dst0.Threshold(options.threshold, 255, ThresholdTypes.Tozero);
+            mats.mat[3] = dst0.Threshold(options.threshold, 255, ThresholdTypes.TozeroInv);
+            mats.Run(empty);
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+            SetTrueText("Input Gradient Image", 0);
+            SetTrueText("Binary", new cv.Point(dst2.Width / 2 + 5, 10), 1);
+            SetTrueText("BinaryInv", 2);
+            SetTrueText("Trunc", new cv.Point(dst2.Width / 2 + 5, 10), 2);
+            SetTrueText("ToZero", new cv.Point(10, dst2.Height / 2 + 10), 2);
+            SetTrueText("ToZeroInv", new cv.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2);
+            SetTrueText("Current selection from grid at left", 3);
+        }
+    }
+    public class CS_Threshold_ByChannels : CS_Parent
+    {
+        Options_Colors optionsColor = new Options_Colors();
+        Options_Threshold options = new Options_Threshold();
+        public CS_Threshold_ByChannels(VBtask task) : base(task)
+        {
+            labels[3] = "Threshold Inverse";
+            UpdateAdvice(traceName + ": see local options.");
+            desc = "Threshold by channel - use red threshold slider to impact grayscale results.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            optionsColor.RunVB();
+            if (options.inputGray)
+            {
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+                dst2 = src.Threshold(optionsColor.redS, 255, options.thresholdMethod);
+            }
+            else
+            {
+                Mat[] split = src.Split();
+                split[0] = split[0].Threshold(optionsColor.blueS, 255, options.thresholdMethod);
+                split[1] = split[1].Threshold(optionsColor.greenS, 255, options.thresholdMethod);
+                split[2] = split[2].Threshold(optionsColor.redS, 255, options.thresholdMethod);
+                Cv2.Merge(split, dst2);
+            }
+            dst3 = ~dst2;
+            labels[2] = "Threshold method: " + options.thresholdName;
+        }
+    }
+    public class CS_Threshold_ColorSource : CS_Parent
+    {
+        Color8U_Basics colorClass = new Color8U_Basics();
+        Threshold_ByChannels byChan = new Threshold_ByChannels();
+        public CS_Threshold_ColorSource(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.");
+            desc = "Use all the alternative color sources as input to Threshold_ByChannels.";
+        }
+        public void RunCS(Mat src)
+        {
+            colorClass.Run(src);
+            byChan.Run(colorClass.dst3);
+            dst2 = byChan.dst2;
+            dst3 = byChan.dst3;
+            labels = byChan.labels;
+        }
+    }
 
 
 

@@ -32,16 +32,16 @@ End Class
 ' https://www.tutorialspoint.com/opencv/opencv_adaptive_threshold.htm
 Public Class Threshold_Adaptive : Inherits VB_Parent
     Dim options As New Options_Threshold
-    Dim optionsAdaptive As New Options_Threshold_Adaptive
+    Dim optionsAdaptive As New Options_AdaptiveThreshold
     Public Sub New()
         labels = {"", "", "Original input", "Output of AdaptiveThreshold"}
         desc = "Explore what adaptive threshold can do."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         optionsAdaptive.RunVB()
 
-        If src.Channels() <> 1 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray) Else dst2 = src
+        If src.Channels() <> 1 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
         dst3 = dst2.AdaptiveThreshold(255, optionsAdaptive.method, options.thresholdMethod,
                                       optionsAdaptive.blockSize, optionsAdaptive.constantVal)
     End Sub
@@ -57,23 +57,23 @@ End Class
 Public Class Threshold_Definitions : Inherits VB_Parent
     Dim gradient As New Gradient_Color
     Dim mats As New Mat_4Click
+    Dim options As New Options_ThresholdDef
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold", 0, 255, 127)
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection"}
         desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static truncateSlider = FindSlider("Threshold")
-        Dim threshold = truncateSlider.value
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         gradient.Run(empty)
-        dst0 = gradient.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        dst1 = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
-        mats.mat(0) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.BinaryInv)
-        mats.mat(1) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Trunc)
-        mats.mat(2) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Tozero)
-        mats.mat(3) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.TozeroInv)
+        dst0 = gradient.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
+        mats.mat(0) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv)
+        mats.mat(1) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Trunc)
+        mats.mat(2) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Tozero)
+        mats.mat(3) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.TozeroInv)
         mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
