@@ -87,16 +87,16 @@
   <ItemGroup>
     <Compile Include="AddAlgorithm.cs" />
     <Compile Include="createAlgorithms.cs" />
-    <Compile Include="CS_AI_Gen2.cs" />
+    <Compile Include="AI_Gen2.cs" />
     <Compile Include="CS_Externs.cs" />
-    <Compile Include="CS_AI_Gen.cs" />
+    <Compile Include="AI_Gen1.cs" />
     <Compile Include="Aruco.cs" />
     <Compile Include="CS_Parent.cs" />
     <Compile Include="DNN.cs" />
     <Compile Include="KNN.cs" />
     <Compile Include="MatrixInverse.cs" />
     <Compile Include="OilPaint.cs" />
-    <Compile Include="CS_Non_AI.cs" />
+    <Compile Include="Non_AI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sieve.cs" />
     <Compile Include="SLR.cs" />

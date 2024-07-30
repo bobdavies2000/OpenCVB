@@ -30,6 +30,7 @@ Module VB_EditorMain
         Return False
     End Function
     Sub Main()
+#If 0 Then
         ' Regular expression are great but can be too complicated.  This app is just a simpler way to make global changes that 
         ' would normally be accomplished with regular expressions.
         ' There are 3 operations - delete a line, change a line, or insertline.
@@ -109,6 +110,30 @@ Module VB_EditorMain
                 'sw.Close()
             Next
         End If
-
+#Else
+        Dim CScodeDir As New DirectoryInfo(CurDir() + "/../../CS_Classes")
+        Dim fileEntries As String() = Directory.GetFiles(CScodeDir.FullName)
+        For Each filename In fileEntries
+            If filename.Contains("AI_Gen") Then
+                Dim input = My.Computer.FileSystem.ReadAllText(filename)
+                Dim lines = input.Split(vbCrLf)
+                For Each line In lines
+                    Dim testLine = line.Trim()
+                    If testLine.StartsWith("public class CS_") Then
+                        Dim split = line.Split(" ")
+                        Dim classname = split(2).Substring(3)
+                        line = line.Replace("CS_" + classname, classname + "_CS")
+                        Console.WriteLine(line)
+                    End If
+                    If testLine.StartsWith("public CS_") Then
+                        Dim split = line.Split(" ")
+                        Dim classname = split(2).Substring(3)
+                        line = line.Replace("CS_" + classname, classname + "_CS")
+                        Console.WriteLine(line)
+                    End If
+                Next
+            End If
+        Next
+#End If
     End Sub
 End Module
