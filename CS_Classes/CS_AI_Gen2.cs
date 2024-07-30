@@ -19293,6 +19293,392 @@ namespace CS_Classes
             dst3 = devignet.dst3;
         }
     }
+    public class CS_Volume_Basics : CS_Parent
+    {
+        public rcData rc = new rcData();
+        public float volume;
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Volume_Basics(VBtask task) : base(task)
+        {
+            desc = "Build a box containing all the 3D points of a RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                redC.Run(src);
+                dst2 = redC.dst2;
+                rc = task.rc;
+            }
+            List<float> xList = new List<float>();
+            List<float> yList = new List<float>();
+            List<float> zList = new List<float>();
+            foreach (var pt in rc.contour)
+            {
+                var vec = task.pointCloud.Get<Vec3f>(pt.Y, pt.X);
+                if (vec.Item0 != 0) xList.Add(vec.Item0);
+                if (vec.Item1 != 0) yList.Add(vec.Item1);
+                if (vec.Item2 != 0) zList.Add(vec.Item2);
+            }
+            float minX = 0, maxX = 0, minY = 0, maxY = 0, minZ = 0, maxZ = 0;
+            if (xList.Count() > 0) minX = xList.Min();
+            if (yList.Count() > 0) minY = yList.Min();
+            if (zList.Count() > 0) minZ = zList.Min();
+            if (xList.Count() > 0) maxX = xList.Max();
+            if (yList.Count() > 0) maxY = yList.Max();
+            if (zList.Count() > 0) maxZ = zList.Max();
+            int meterFactor = 100;
+            string mString = meterFactor == 100 ? "centimeters" : (meterFactor == 1 ? "meters" : "decimeters");
+            volume = (maxX - minX) * (maxY - minY) * (maxZ - minZ) * meterFactor * meterFactor * meterFactor;
+            if (task.heartBeat)
+            {
+                strOut = "Volume = " + volume.ToString("F0") + " cubic " + mString + "\n" + "\n";
+                strOut += "Min " + "\t" + "Max " + "\t" + "Range " + "\t" + " units=" + mString + "\n";
+                strOut += (minX * meterFactor).ToString("F0") + "\t" + (maxX * meterFactor).ToString("F0") + "\t" + ((maxX - minX) * meterFactor).ToString("F0") + "\t" + " X dimension" + "\n";
+                strOut += (minY * meterFactor).ToString("F0") + "\t" + (maxY * meterFactor).ToString("F0") + "\t" + ((maxY - minY) * meterFactor).ToString("F0") + "\t" + " Y dimension" + "\n";
+                strOut += (minZ * meterFactor).ToString("F0") + "\t" + (maxZ * meterFactor).ToString("F0") + "\t" + ((maxZ - minZ) * meterFactor).ToString("F0") + "\t" + " Z dimension" + "\n";
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_WarpAffine_Basics : CS_Parent
+    {
+        public Options_Resize options = new Options_Resize();
+        Options_WarpAffine optionsWarp = new Options_WarpAffine();
+        public Point2f rotateCenter;
+        public float rotateAngle; // in degrees
+        CS_WarpAffine_BasicsQT warpQT;
+        public CS_WarpAffine_Basics(VBtask task) : base(task)
+        {
+            warpQT = new CS_WarpAffine_BasicsQT(task);
+            desc = "Use WarpAffine to transform input images.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            optionsWarp.RunVB();
+
+            if (standaloneTest() && task.heartBeat)
+            {
+                rotateAngle = optionsWarp.angle;
+                rotateCenter.X = msRNG.Next(0, dst2.Width);
+                rotateCenter.Y = msRNG.Next(0, dst2.Height);
+            }
+            warpQT.rotateCenter = rotateCenter;
+            warpQT.rotateAngle = rotateAngle;
+            warpQT.RunCS(src);
+            labels = warpQT.labels;
+            dst2 = warpQT.dst2;
+        }
+    }
+    public class CS_WarpAffine_BasicsQT : CS_Parent
+    {
+        public Point2f rotateCenter;
+        public float rotateAngle; // in degrees
+        public CS_WarpAffine_BasicsQT(VBtask task) : base(task)
+        {
+            desc = "Use WarpAffine to transform input images with no options.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest() && task.heartBeat)
+            {
+                SetTrueText("There is no output for the " + traceName + " algorithm.  Use WarpAffine_Basics to test.", 3);
+                return;
+            }
+            var rotationMatrix = Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle, 1.0);
+            Cv2.WarpAffine(src, dst2, rotationMatrix, src.Size(), InterpolationFlags.Nearest);
+            labels[2] = "Rotated around yellow point " + rotateCenter.X.ToString(fmt0) + ", " + rotateCenter.Y.ToString(fmt0) +
+                        " with Warpaffine with angle: " + rotateAngle.ToString();
+        }
+    }
+    public class CS_WarpAffine_Captcha : CS_Parent
+    {
+        const int charHeight = 40;
+        const int charWidth = 30;
+        const int captchaLength = 8;
+        Random rng = new Random();
+        public CS_WarpAffine_Captcha(VBtask task) : base(task)
+        {
+            desc = "Use OpenCV to build a captcha Turing test.";
+        }
+        void addNoise(Mat image)
+        {
+            for (int n = 0; n <= 100; n++)
+            {
+                int i = rng.Next(0, image.Cols - 1);
+                int j = rng.Next(0, image.Rows - 1);
+                var center = new cv.Point(i, j);
+                var c = new Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255));
+                DrawCircle(image, center, rng.Next(1, 3), c);
+            }
+        }
+        void addLines(ref Mat image)
+        {
+            for (int i = 0; i < captchaLength; i++)
+            {
+                int startX = rng.Next(0, image.Cols - 1);
+                int endX = rng.Next(0, image.Cols - 1);
+                int startY = rng.Next(0, image.Rows - 1);
+                int endY = rng.Next(0, image.Rows - 1);
+                var c = new Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255));
+                image.Line(new cv.Point(startX, startY), new cv.Point(endX, endY), c, rng.Next(1, 3), task.lineType);
+            }
+        }
+        void scaleImg(Mat input, ref Mat output)
+        {
+            int height = rng.Next(0, 19) * -1 + charHeight;
+            int width = rng.Next(0, 19) * -1 + charWidth;
+            var s = new cv.Size(width, height);
+            output = input.Resize(s);
+        }
+        void rotateImg(Mat input, ref Mat output)
+        {
+            int sign = (int)rng.NextDouble();
+            if (sign == 0) sign = -1;
+            int angle = rng.Next(0, 29) * sign; // between -30 and 30
+            var center = new Point2f(input.Cols / 2, input.Rows / 2);
+            var rotationMatrix = Cv2.GetRotationMatrix2D(center, angle, 1);
+            Cv2.WarpAffine(input, output, rotationMatrix, input.Size(), InterpolationFlags.Linear, BorderTypes.Constant, Scalar.White);
+        }
+        void transformPerspective(ref Mat charImage)
+        {
+            Point2f[] srcPt = { new Point2f(0, 0), new Point2f(0, charHeight), new Point2f(charWidth, 0), new Point2f(charWidth, charHeight) };
+            float varWidth = charWidth / 2;
+            float varHeight = charHeight / 2.0f;
+            float widthWarp = charHeight - varWidth + (float)(rng.NextDouble() * varWidth);
+            float heightWarp = charHeight - varHeight + (float)(rng.NextDouble() * varHeight);
+            Point2f[] dstPt = { new Point2f(0, 0), new Point2f(0, charHeight), new Point2f(charWidth, 0), new Point2f(widthWarp, heightWarp) };
+            var perspectiveTranx = Cv2.GetPerspectiveTransform(srcPt, dstPt);
+            Cv2.WarpPerspective(charImage, charImage, perspectiveTranx, new cv.Size(charImage.Cols, charImage.Rows), InterpolationFlags.Cubic,
+                                 BorderTypes.Constant, Scalar.White);
+        }
+        public void RunCS(Mat src)
+        {
+            string[] characters = { "a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            int charactersSize = characters.Length / characters[0].Length;
+            Mat outImage = new Mat(charHeight, charWidth * captchaLength, MatType.CV_8UC3, Scalar.White);
+            for (int i = 0; i < captchaLength; i++)
+            {
+                Mat charImage = new Mat(charHeight, charWidth, MatType.CV_8UC3, Scalar.White);
+                string c = characters[rng.Next(0, characters.Length - 1)];
+                Cv2.PutText(charImage, c, new cv.Point(10, charHeight - 10), (cv.HersheyFonts) msRNG.Next(1, 6), msRNG.Next(3, 4),
+                            task.scalarColors[i], msRNG.Next(1, 5), LineTypes.AntiAlias);
+                transformPerspective(ref charImage);
+                rotateImg(charImage, ref charImage);
+                scaleImg(charImage, ref charImage);
+                charImage.CopyTo(outImage[new cv.Rect(charWidth * i, 0, charImage.Cols, charImage.Rows)]);
+            }
+            addLines(ref outImage);
+            addNoise(outImage);
+            var roi = new cv.Rect(0, src.Height / 2 - charHeight / 2, dst2.Cols, charHeight);
+            dst2[roi] = outImage.Resize(new cv.Size(dst2.Cols, charHeight));
+        }
+    }
+    public class CS_WarpAffine_3Points : CS_Parent
+    {
+        Area_MinTriangle_CPP triangle = new Area_MinTriangle_CPP();
+        Mat M = new Mat();
+        public CS_WarpAffine_3Points(VBtask task) : base(task)
+        {
+            desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image.";
+            labels[2] = "Triangles define the affine transform";
+            labels[3] = "Image with affine transform applied";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                Mat[] triangles = new Mat[2];
+                triangle.Run(src);
+                triangles[0] = triangle.triangle.Clone();
+                var srcPoints1 = new List<cv.Point2f>(triangle.options.srcPoints);
+                triangle.Run(src);
+                triangles[1] = triangle.triangle.Clone();
+                var srcPoints2 = new List<cv.Point2f>(triangle.options.srcPoints);
+                var tOriginal = new Mat(3, 1, MatType.CV_32FC2, new float[] { 0, 0, 0, src.Height, src.Width, src.Height });
+                M = Cv2.GetAffineTransform(tOriginal, triangles[1]);
+                Mat wideMat = new Mat(src.Rows, src.Cols * 2, MatType.CV_8UC3, 0);
+                cv.Scalar[] choices = { Scalar.Red, Scalar.White, Scalar.Yellow };
+                for (int j = 0; j <= 1; j++)
+                {
+                    for (int i = 0; i < triangles[j].Rows; i++)
+                    {
+                        var p1 = triangles[j].Get<cv.Point2f>(i) + new Point2f(j * src.Width, 0);
+                        var p2 = triangles[j].Get<cv.Point2f>((i + 1) % 3) + new Point2f(j * src.Width, 0);
+                        var color = choices[i];
+                        DrawLine(wideMat, p1, p2, color, task.lineWidth + 3);
+                        if (j == 0)
+                        {
+                            var p3 = triangles[j + 1].Get<cv.Point2f>(i) + new Point2f(src.Width, 0);
+                            DrawLine(wideMat, p1, p3, Scalar.White);
+                        }
+                    }
+                }
+                var corner = triangles[0].Get<cv.Point2f>(0);
+                DrawCircle(wideMat, corner, task.DotSize + 5, Scalar.Yellow);
+                corner = new Point2f((float)M.Get<double>(0, 2) + src.Width, (float)M.Get<double>(1, 2));
+                DrawCircle(wideMat, corner, task.DotSize + 5, Scalar.Yellow);
+                dst2 = wideMat[new cv.Rect(0, 0, src.Width, src.Height)];
+                dst3 = wideMat[new cv.Rect(src.Width, 0, src.Width, src.Height)];
+                cv.Point pt;
+                for (int i = 0; i < srcPoints1.Count(); i++)
+                {
+                    pt = new cv.Point((int)srcPoints1[i].X, (int)srcPoints1[i].Y);
+                    DrawCircle(dst2, pt, task.DotSize + 2, Scalar.White);
+                    pt = new cv.Point((int)srcPoints2[i].X, (int)srcPoints2[i].Y);
+                    DrawCircle(dst3, pt, task.DotSize + 2, Scalar.White);
+                }
+            }
+            SetTrueText("M defined as: " + "\n" +
+                         M.Get<double>(0, 0).ToString(fmt2) + "\t" +
+                         M.Get<double>(0, 1).ToString(fmt2) + "\t" +
+                         M.Get<double>(0, 2).ToString(fmt2) + "\n" +
+                         M.Get<double>(1, 0).ToString(fmt2) + "\t" +
+                         M.Get<double>(1, 1).ToString(fmt2) + "\t" +
+                         M.Get<double>(1, 2).ToString(fmt2));
+        }
+    }
+    public class CS_WarpAffine_4Points : CS_Parent
+    {
+        Area_MinRect mRect = new Area_MinRect();
+        Options_MinArea options = new Options_MinArea();
+        Mat M = new Mat();
+        public CS_WarpAffine_4Points(VBtask task) : base(task)
+        {
+            desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image.";
+            labels[2] = "Color image with perspective transform applied";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                options.RunVB();
+                mRect.inputPoints = options.srcPoints;
+                var roi = new cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6);
+                var smallImage = src.Resize(new cv.Size(roi.Width, roi.Height));
+                RotatedRect[] rectangles = new RotatedRect[2];
+                mRect.Run(src);
+                rectangles[1] = mRect.minRect;
+                rectangles[1].Center.X = src.Width - rectangles[0].Center.X - roi.Width;
+                rectangles[0] = new RotatedRect(new Point2f(src.Width / 2, src.Height / 2), new Size2f(src.Width, src.Height), 0);
+                M = Cv2.GetPerspectiveTransform(rectangles[0].Points(), rectangles[1].Points());
+                Cv2.WarpPerspective(src, dst2, M, src.Size());
+                dst2[roi] = smallImage;
+                cv.Scalar[] choices = { Scalar.Red, Scalar.White, Scalar.Yellow, Scalar.Green, Scalar.White };
+                for (int j = 0; j <= 1; j++)
+                {
+                    for (int i = 0; i < rectangles[j].Points().Length; i++)
+                    {
+                        var p1 = rectangles[j].Points()[i];
+                        var p2 = rectangles[j].Points()[(i + 1) % rectangles[j].Points().Length];
+                        if (j == 0)
+                        {
+                            var p3 = rectangles[1].Points()[i];
+                            DrawLine(dst2, p1, p3, Scalar.White);
+                        }
+                        cv.Scalar color = choices[i];
+                        DrawLine(dst2, p1, p2, color, task.lineWidth + 3);
+                    }
+                }
+            }
+            SetTrueText("M defined as: " + "\n" +
+                          $"{M.At<double>(0, 0)}\t{M.At<double>(0, 1)}\t{M.At<double>(0, 2)}" + "\n" +
+                          $"{M.At<double>(1, 0)}\t{M.At<double>(1, 1)}\t{M.At<double>(1, 2)}" + "\n" +
+                          $"{M.At<double>(2, 0)}\t{M.At<double>(2, 1)}\t{M.At<double>(2, 2)}" + "\n");
+            var center = new Point2f((float)M.At<double>(0, 2), (float)M.At<double>(1, 2));
+            DrawCircle(dst2, center, task.DotSize + 5, Scalar.Yellow);
+            center = new Point2f(50, src.Height / 2);
+            DrawCircle(dst2, center, task.DotSize + 5, Scalar.Yellow);
+        }
+    }
+    public class CS_WarpAffine_Repeated : CS_Parent
+    {
+        public CS_WarpAffine_Repeated(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Rotated repeatedly 45 degrees - note the blur", "Rotated repeatedly 90 degrees" };
+            desc = "Compare an image before and after repeated and equivalent in degrees rotations.";
+        }
+        public void RunCS(Mat src)
+        {
+            var rect = new cv.Rect(0, 0, dst2.Height, dst2.Height);
+            dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst2 = dst1.Clone();
+            dst3 = dst1.Clone();
+            var center = new cv.Point(rect.Width / 2, rect.Height / 2);
+            int angle45 = 45, angle90 = 90;
+            double scale = 1.0;
+            int h = rect.Height, w = rect.Width;
+            var m1 = Cv2.GetRotationMatrix2D(center, angle45, scale);
+            var m2 = Cv2.GetRotationMatrix2D(center, angle90, scale);
+            double abs_cos = Math.Abs(m2.At<double>(0, 0));
+            double abs_sin = Math.Abs(m2.At<double>(0, 1));
+            int bound_w = (int)(h * abs_sin + w * abs_cos);
+            int bound_h = (int)(h * abs_cos + w * abs_sin);
+            double val = m1.At<double>(0, 2);
+            m1.Set<double>(0, 2, val + bound_w / 2 - center.X);
+            val = m1.At<double>(1, 2);
+            m1.Set<double>(1, 2, val + bound_h / 2 - center.Y);
+            val = m2.At<double>(0, 2);
+            m2.Set<double>(0, 2, val + bound_w / 2 - center.X);
+            val = m2.At<double>(1, 2);
+            m2.Set<double>(1, 2, val + bound_h / 2 - center.Y);
+            Cv2.WarpAffine(dst1[rect], dst2[rect], m1, new cv.Size(bound_w, bound_h));
+            for (int i = 0; i <= 6; i++)
+            {
+                Cv2.WarpAffine(dst2[rect], dst2[rect], m1, new cv.Size(bound_w, bound_h));
+            }
+            Cv2.WarpAffine(dst1[rect], dst3[rect], m2, new cv.Size(bound_w, bound_h));
+            for (int i = 0; i <= 2; i++)
+            {
+                Cv2.WarpAffine(dst3[rect], dst3[rect], m2, new cv.Size(bound_w, bound_h));
+            }
+            dst2.Rectangle(rect, Scalar.White, task.lineWidth, task.lineType);
+            dst3.Rectangle(rect, Scalar.White, task.lineWidth, task.lineType);
+        }
+    }
+    public class CS_WarpAffine_RepeatedExample8 : CS_Parent
+    {
+        public CS_WarpAffine_RepeatedExample8(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Rotated repeatedly 45 degrees", "Rotated repeatedly 90 degrees" };
+            desc = "Compare an image before and after repeated rotations.";
+        }
+        public void RunCS(Mat src)
+        {
+            var input = Cv2.ImRead(task.HomeDir + "Data/8.jpg", ImreadModes.Color);
+            var center = new cv.Point(input.Width / 2, input.Height / 2);
+            int angle45 = 45, angle90 = 90;
+            double scale = 1.0;
+            int h = input.Height, w = input.Width;
+            var m1 = Cv2.GetRotationMatrix2D(center, angle45, scale);
+            var m2 = Cv2.GetRotationMatrix2D(center, angle90, scale);
+            double abs_cos = Math.Abs(m2.At<double>(0, 0));
+            double abs_sin = Math.Abs(m2.At<double>(0, 1));
+            int bound_w = (int)(h * abs_sin + w * abs_cos);
+            int bound_h = (int)(h * abs_cos + w * abs_sin);
+            double val = m1.At<double>(0, 2);
+            m1.Set<double>(0, 2, val + bound_w / 2 - center.X);
+            val = m1.At<double>(1, 2);
+            m1.Set<double>(1, 2, val + bound_h / 2 - center.Y);
+            val = m2.At<double>(0, 2);
+            m2.Set<double>(0, 2, val + bound_w / 2 - center.X);
+            val = m2.At<double>(1, 2);
+            m2.Set<double>(1, 2, val + bound_h / 2 - center.Y);
+            Cv2.WarpAffine(input, dst2, m1, new cv.Size(bound_w, bound_h));
+            for (int i = 0; i <= 6; i++)
+            {
+                Cv2.WarpAffine(dst2, dst2, m1, new cv.Size(bound_w, bound_h));
+            }
+            Cv2.WarpAffine(input, dst3, m2, new cv.Size(bound_w, bound_h));
+            for (int i = 0; i <= 2; i++)
+            {
+                Cv2.WarpAffine(dst3, dst3, m2, new cv.Size(bound_w, bound_h));
+            }
+        }
+    }
+
+
 
 
 

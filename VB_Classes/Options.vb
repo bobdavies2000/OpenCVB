@@ -7641,3 +7641,19 @@ Public Class Options_Video : Inherits VB_Parent
         fileNameForm.TrackBar1.Value = currFrame
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_WarpAffine : Inherits VB_Parent
+    Public angle As New Integer
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Angle", 0, 360, 10)
+    End Sub
+    Public Sub RunVB()
+        Static angleSlider = FindSlider("Angle")
+        angle = angleSlider.value
+    End Sub
+End Class

@@ -1522,6 +1522,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_Video" Then return new Options_Video
 	if algorithmName = "Options_Vignetting" Then return new Options_Vignetting
 	if algorithmName = "Options_Warp" Then return new Options_Warp
+	if algorithmName = "Options_WarpAffine" Then return new Options_WarpAffine
 	if algorithmName = "Options_WarpModel" Then return new Options_WarpModel
 	if algorithmName = "Options_WarpModel2" Then return new Options_WarpModel2
 	if algorithmName = "Options_Wavelet" Then return new Options_Wavelet

@@ -1497,9 +1497,17 @@ namespace CS_Classes
 			if (algorithmName == "CS_Vignetting_Devignetting") return new CS_Vignetting_Devignetting(task);
 			if (algorithmName == "CS_Vignetting_Removal") return new CS_Vignetting_Removal(task);
 			if (algorithmName == "CS_Vignetting_VB") return new CS_Vignetting_VB(task);
+			if (algorithmName == "CS_Volume_Basics") return new CS_Volume_Basics(task);
 			if (algorithmName == "CS_Voronoi_Basics") return new CS_Voronoi_Basics(task);
 			if (algorithmName == "CS_Voronoi_Compare") return new CS_Voronoi_Compare(task);
 			if (algorithmName == "CS_Voronoi_CPP") return new CS_Voronoi_CPP(task);
+			if (algorithmName == "CS_WarpAffine_3Points") return new CS_WarpAffine_3Points(task);
+			if (algorithmName == "CS_WarpAffine_4Points") return new CS_WarpAffine_4Points(task);
+			if (algorithmName == "CS_WarpAffine_Basics") return new CS_WarpAffine_Basics(task);
+			if (algorithmName == "CS_WarpAffine_BasicsQT") return new CS_WarpAffine_BasicsQT(task);
+			if (algorithmName == "CS_WarpAffine_Captcha") return new CS_WarpAffine_Captcha(task);
+			if (algorithmName == "CS_WarpAffine_Repeated") return new CS_WarpAffine_Repeated(task);
+			if (algorithmName == "CS_WarpAffine_RepeatedExample8") return new CS_WarpAffine_RepeatedExample8(task);
 			return new CS_AddWeighted_Basics(task);
 		}
 	}

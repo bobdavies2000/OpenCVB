@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Basics : Inherits VB_Parent
     Public options As New Options_Resize
+    Public optionsWarp As New Options_WarpAffine
     Public rotateCenter As cv.Point2f
     Public rotateAngle As Single ' in degrees
     Dim warpQT As New WarpAffine_BasicsQT
@@ -11,10 +12,10 @@ Public Class WarpAffine_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
+        optionsWarp.RunVB()
 
         If standaloneTest() And task.heartBeat Then
-            Static angleSlider = FindSlider("Angle")
-            rotateAngle = angleSlider.Value
+            rotateAngle = optionsWarp.angle
             rotateCenter.X = msRNG.Next(0, dst2.Width)
             rotateCenter.Y = msRNG.Next(0, dst2.Height)
         End If
