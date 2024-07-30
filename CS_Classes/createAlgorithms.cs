@@ -1508,6 +1508,20 @@ namespace CS_Classes
 			if (algorithmName == "CS_WarpAffine_Captcha") return new CS_WarpAffine_Captcha(task);
 			if (algorithmName == "CS_WarpAffine_Repeated") return new CS_WarpAffine_Repeated(task);
 			if (algorithmName == "CS_WarpAffine_RepeatedExample8") return new CS_WarpAffine_RepeatedExample8(task);
+			if (algorithmName == "CS_WarpModel_Basics") return new CS_WarpModel_Basics(task);
+			if (algorithmName == "CS_WarpModel_ECC") return new CS_WarpModel_ECC(task);
+			if (algorithmName == "CS_WarpModel_Input") return new CS_WarpModel_Input(task);
+			if (algorithmName == "CS_WarpPerspective_Basics") return new CS_WarpPerspective_Basics(task);
+			if (algorithmName == "CS_WarpPerspective_WidthHeight") return new CS_WarpPerspective_WidthHeight(task);
+			if (algorithmName == "CS_Watershed_Basics") return new CS_Watershed_Basics(task);
+			if (algorithmName == "CS_Watershed_DepthAuto") return new CS_Watershed_DepthAuto(task);
+			if (algorithmName == "CS_Watershed_DepthReduction") return new CS_Watershed_DepthReduction(task);
+			if (algorithmName == "CS_XFeatures2D_StarDetector") return new CS_XFeatures2D_StarDetector(task);
+			if (algorithmName == "CS_XPhoto_Bm3dDenoise") return new CS_XPhoto_Bm3dDenoise(task);
+			if (algorithmName == "CS_XPhoto_Bm3dDenoiseDepthImage") return new CS_XPhoto_Bm3dDenoiseDepthImage(task);
+			if (algorithmName == "CS_XPhoto_Inpaint") return new CS_XPhoto_Inpaint(task);
+			if (algorithmName == "CS_XPhoto_Inpaint_CPP") return new CS_XPhoto_Inpaint_CPP(task);
+			if (algorithmName == "CS_XPhoto_OilPaint_CPP") return new CS_XPhoto_OilPaint_CPP(task);
 			return new CS_AddWeighted_Basics(task);
 		}
 	}

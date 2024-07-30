@@ -7657,3 +7657,53 @@ Public Class Options_WarpAffine : Inherits VB_Parent
         angle = angleSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_WarpPerspective : Inherits VB_Parent
+    Public width As Integer
+    Public height As Integer
+    Public angle As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Warped Width", 0, dst2.Cols, dst2.Cols - 50)
+            sliders.setupTrackBar("Warped Height", 0, dst2.Rows, dst2.Rows - 50)
+            sliders.setupTrackBar("Warped Angle", 0, 360, 0)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static wSlider = FindSlider("Warped Width")
+        Static hSlider = FindSlider("Warped Height")
+        Static angleSlider = FindSlider("Warped Angle")
+        width = wSlider.value
+        height = hSlider.value
+        angle = angleSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_XPhotoInpaint : Inherits VB_Parent
+    Public FSRFast As Boolean
+    Public shiftMap As Boolean
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("FSR_Best")
+            radio.addRadio("FSR_Fast")
+            radio.addRadio("ShiftMap")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static radioFast = FindRadio("FSR_Fast")
+        Static radioSMap = FindRadio("ShiftMap")
+        FSRFast = radioFast.checked
+        shiftMap = radioSMap.checked
+    End Sub
+End Class

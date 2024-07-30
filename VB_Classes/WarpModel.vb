@@ -4,21 +4,23 @@ Imports System.Runtime.InteropServices
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_Basics : Inherits VB_Parent
     ReadOnly ecc As New WarpModel_ECC
+    Dim options As New Options_WarpModel
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image"}
         desc = "Align the BGR inputs raw images from the Prokudin examples."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static gradientCheck = FindCheckBox("Use Gradient in WarpInput")
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         If standaloneTest() Then ecc.warpInput.Run(src)
         dst0 = ecc.warpInput.rgb(0).Clone
         dst1 = ecc.warpInput.rgb(1).Clone
         dst2 = ecc.warpInput.rgb(2).Clone
         Dim aligned() = {New cv.Mat, New cv.Mat}
         For i = 0 To 1
-            If gradientCheck.Checked Then
+            If options.useGradient Then
                 src = ecc.warpInput.gradient(0)
                 ecc.src2 = Choose(i + 1, ecc.warpInput.gradient(1), ecc.warpInput.gradient(2))
             Else

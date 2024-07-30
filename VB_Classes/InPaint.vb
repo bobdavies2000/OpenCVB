@@ -8,7 +8,7 @@ Public Class InPaint_Basics : Inherits VB_Parent
         desc = "Create a flaw in an image and then use inPaint to mask it."
         labels(3) = "Repaired Image"
     End Sub
-    Public Function drawRandomLine(dst As cv.Mat)
+    Public Function drawRandomLine(dst As cv.Mat) As cv.Mat
         Dim p1 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
         DrawLine(dst2, p1, p2, New cv.Scalar(0, 0, 0))

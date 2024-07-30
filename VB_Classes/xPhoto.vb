@@ -79,21 +79,15 @@ End Class
 
 Public Class XPhoto_Inpaint : Inherits VB_Parent
     Public basics As New InPaint_Basics
+    Public options As New Options_XPhotoInpaint
     Public Sub New()
-        If radio.Setup(traceName) Then
-            radio.addRadio("FSR_Best")
-            radio.addRadio("FSR_Fast")
-            radio.addRadio("ShiftMap")
-            radio.check(0).Checked = True
-        End If
-
         labels(2) = "RGB input to xPhoto Inpaint"
         labels(3) = "Repaired result..."
         desc = "Use the xPhoto inpaint to fill in the depth holes"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static radioFast = FindRadio("FSR_Fast")
-        Static radioSMap = FindRadio("ShiftMap")
+        options.RunVB()
+
         dst2 = src
         Dim mask = basics.drawRandomLine(dst2)
         'Dim iType = InpaintTypes.FSR_BEST
@@ -116,12 +110,12 @@ Public Class XPhoto_Inpaint_CPP : Inherits VB_Parent
         labels = {"", "Mask for inpainted repair", "output with inpainted data repaired", "Input to the inpaint C++ algorithm - not working!!!"}
         desc = "Use the xPhoto Oil Painting transform"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static radioFast = FindRadio("FSR_Fast")
-        Static radioSMap = FindRadio("ShiftMap")
+    Public Sub RunVB(src As cv.Mat)
+        inpVB.options.RunVB()
+
         Dim iType = InpaintTypes.FSR_BEST
-        If radioFast.checked Then iType = InpaintTypes.FSR_FAST
-        If radioSMap.checked Then iType = InpaintTypes.SHIFTMAP
+        If inpVB.options.FSRFast Then iType = InpaintTypes.FSR_FAST
+        If inpVB.options.shiftMap Then iType = InpaintTypes.SHIFTMAP
 
         dst1 = inpVB.basics.drawRandomLine(src)
         dst3 = src.Clone

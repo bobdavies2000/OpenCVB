@@ -21,28 +21,22 @@ End Class
 
 ' http://opencvexamples.blogspot.com/
 Public Class WarpPerspective_WidthHeight : Inherits VB_Parent
+    Dim options As New Options_WarpPerspective
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Warped Width", 0, dst2.Cols, dst2.Cols - 50)
-            sliders.setupTrackBar("Warped Height", 0, dst2.Rows, dst2.Rows - 50)
-            sliders.setupTrackBar("Warped Angle", 0, 360, 0)
-        End If
         desc = "Use WarpPerspective to transform input images."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static wSlider = FindSlider("Warped Width")
-        Static hSlider = FindSlider("Warped Height")
-        Static angleSlider = FindSlider("Warped Angle")
+        options.RunVB()
 
         Dim srcPt() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(src.Width, src.Height)}
         Dim pts() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0),
-                     New cv.Point2f(wSlider.Value, hSlider.Value)}
+                     New cv.Point2f(options.width, options.height)}
 
         Dim perpectiveTranx = cv.Cv2.GetPerspectiveTransform(srcPt, pts)
         cv.Cv2.WarpPerspective(src, dst2, perpectiveTranx, New cv.Size(src.Cols, src.Rows), cv.InterpolationFlags.Cubic, cv.BorderTypes.Constant, cv.Scalar.White)
 
         Dim center = New cv.Point2f(src.Cols / 2, src.Rows / 2)
-        Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(center, angleSlider.Value, 1.0)
+        Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(center, options.angle, 1.0)
         cv.Cv2.WarpAffine(dst2, dst3, rotationMatrix, src.Size(), cv.InterpolationFlags.Nearest)
     End Sub
 End Class

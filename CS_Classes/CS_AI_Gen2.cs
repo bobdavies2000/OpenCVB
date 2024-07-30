@@ -20,6 +20,8 @@ using System.Numerics;
 using System.Windows.Controls;
 using System.Security.Cryptography;
 using System.Windows.Media.Animation;
+using OpenCvSharp.XFeatures2D;
+using OpenCvSharp.XPhoto;
 
 namespace CS_Classes
 {
@@ -19677,10 +19679,451 @@ namespace CS_Classes
             }
         }
     }
-
-
-
-
-
-
+    public class CS_WarpModel_Basics : CS_Parent
+    {
+        readonly WarpModel_ECC ecc = new WarpModel_ECC();
+        Options_WarpModel options = new Options_WarpModel();
+        public CS_WarpModel_Basics(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new[] { "Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image" };
+            desc = "Align the BGR inputs raw images from the Prokudin examples.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest()) ecc.warpInput.Run(src);
+            dst0 = ecc.warpInput.rgb[0].Clone();
+            dst1 = ecc.warpInput.rgb[1].Clone();
+            dst2 = ecc.warpInput.rgb[2].Clone();
+            Mat[] aligned = { new Mat(), new Mat() };
+            for (int i = 0; i <= 1; i++)
+            {
+                if (options.useGradient)
+                {
+                    src = ecc.warpInput.gradient[0];
+                    ecc.src2 = (i + 1 == 1) ? ecc.warpInput.gradient[1] : ecc.warpInput.gradient[2];
+                }
+                else
+                {
+                    src = ecc.warpInput.rgb[0];
+                    ecc.src2 = (i + 1 == 1) ? ecc.warpInput.rgb[1] : ecc.warpInput.rgb[2];
+                }
+                ecc.Run(src);
+                aligned[i] = ecc.aligned.Clone();
+            }
+            Mat[] mergeInput = { src, aligned[0], aligned[1] };
+            Mat merged = new Mat();
+            Cv2.Merge(mergeInput, merged);
+            dst3.SetTo(0);
+            dst3[new cv.Rect(0, 0, merged.Width, merged.Height)] = merged;
+            SetTrueText("Note small displacement of" + "\n" + "the image when gradient is used." + "\n" +
+                         "Other than that, images look the same." + "\n" +
+                         "Displacement increases with Sobel" + "\n" + "kernel size", new cv.Point(merged.Width + 10, 40), 3);
+        }
+    }
+    public class CS_WarpModel_ECC : CS_Parent
+    {
+        public WarpModel_Input warpInput = new WarpModel_Input();
+        public float[] warpMatrix;
+        public Mat src2 = new Mat();
+        public Mat aligned = new Mat();
+        public cv.Rect outputRect;
+        readonly Options_WarpModel options = new Options_WarpModel();
+        public CS_WarpModel_ECC(VBtask task) : base(task)
+        {
+            cPtr = WarpModel_Open();
+            labels[2] = "Src image (align to this image)";
+            labels[3] = "Src2 image aligned to src image";
+            desc = "Use FindTransformECC to align 2 images";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest())
+            {
+                warpInput.Run(src);
+                if (options.useGradient)
+                {
+                    src = warpInput.gradient[0];
+                    src2 = warpInput.gradient[1];
+                }
+                else
+                {
+                    src = warpInput.rgb[0];
+                    src2 = warpInput.rgb[1];
+                }
+            }
+            byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+            byte[] src2Data = new byte[src2.Total() * src2.ElemSize()];
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+            Marshal.Copy(src2.Data, src2Data, 0, src2Data.Length);
+            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            GCHandle handleSrc2 = GCHandle.Alloc(src2Data, GCHandleType.Pinned);
+            IntPtr imagePtr = WarpModel_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleSrc2.AddrOfPinnedObject(), src.Rows, src.Cols, 1, options.warpMode);
+            handleSrc.Free();
+            handleSrc2.Free();
+            if (options.warpMode != 3)
+            {
+                warpMatrix = new float[2 * 3];
+            }
+            else
+            {
+                warpMatrix = new float[3 * 3];
+            }
+            Marshal.Copy(imagePtr, warpMatrix, 0, warpMatrix.Length);
+            if (options.warpMode != 3)
+            {
+                Mat warpMat = new Mat(2, 3, MatType.CV_32F, warpMatrix);
+                Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), InterpolationFlags.Linear | InterpolationFlags.WarpInverseMap);
+            }
+            else
+            {
+                Mat warpMat = new Mat(3, 3, MatType.CV_32F, warpMatrix);
+                Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), InterpolationFlags.Linear | InterpolationFlags.WarpInverseMap);
+            }
+            dst2 = new Mat(task.WorkingRes, MatType.CV_8U, 0);
+            dst3 = new Mat(task.WorkingRes, MatType.CV_8U, 0);
+            outputRect = new cv.Rect(0, 0, src.Width, src.Height);
+            dst2[outputRect] = src;
+            dst3[outputRect] = src2;
+            string outStr = "The warp matrix is:" + "\n";
+            for (int i = 0; i < warpMatrix.Length; i++)
+            {
+                if (i % 3 == 0) outStr += "\n";
+                outStr += string.Format("{0:#0.000}", warpMatrix[i]) + "\t";
+            }
+            if (options.useWarpAffine || options.useWarpHomography)
+            {
+                outStr += "\nNOTE: Gradients may give better results.";
+            }
+            SetTrueText(outStr, new cv.Point(aligned.Width + 10, 220));
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = WarpModel_Close(cPtr);
+        }
+    }
+    public class CS_WarpModel_Input : CS_Parent
+    {
+        public Mat[] rgb = new Mat[3];
+        public Mat[] gradient = new Mat[3];
+        readonly Edge_Sobel_Old sobel = new Edge_Sobel_Old();
+        readonly Options_WarpModel options = new Options_WarpModel();
+        public CS_WarpModel_Input(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new[] { "Original Blue plane", "Original Green plane", "Original Red plane", "Naively Aligned image" };
+            desc = "Import the misaligned input.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            cv.Rect[] r = {
+            new cv.Rect(0, 0, options.pkImage.Width, options.pkImage.Height / 3),
+            new cv.Rect(0, options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3),
+            new cv.Rect(0, 2 * options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3)
+        };
+            for (int i = 0; i < r.Length; i++)
+            {
+                if (options.useGradient)
+                {
+                    sobel.Run(options.pkImage[r[i]]);
+                    gradient[i] = sobel.dst2.Clone();
+                }
+                rgb[i] = options.pkImage[r[i]];
+            }
+            if (src.Width < rgb[0].Width || src.Height < rgb[0].Height)
+            {
+                for (int i = 0; i < rgb.Length; i++)
+                {
+                    cv.Size sz = new cv.Size(src.Width * rgb[i].Height / rgb[i].Width, src.Height);
+                    r[i] = new cv.Rect(0, 0, sz.Width, sz.Height);
+                    rgb[i] = rgb[i].Resize(sz);
+                }
+            }
+            dst0 = rgb[0];
+            dst1 = rgb[1];
+            dst2 = rgb[2];
+            Mat merged = new Mat();
+            Cv2.Merge(rgb, merged);
+            dst3.SetTo(0);
+            dst3[r[0]] = merged;
+        }
+    }
+    public class CS_WarpPerspective_Basics : CS_Parent
+    {
+        public Options_Warp options = new Options_Warp();
+        public CS_WarpPerspective_Basics(VBtask task) : base(task)
+        {
+            desc = "Essentials of the rotation matrix of WarpPerspective";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.EmptyClone();
+            Cv2.WarpPerspective(src, dst2, options.transformMatrix, dst2.Size(), InterpolationFlags.Cubic | InterpolationFlags.WarpInverseMap);
+            SetTrueText("Use sliders to understand impact of WarpPerspective", 3);
+        }
+    }
+    public class CS_WarpPerspective_WidthHeight : CS_Parent
+    {
+        Options_WarpPerspective options = new Options_WarpPerspective();
+        public CS_WarpPerspective_WidthHeight(VBtask task) : base(task)
+        {
+            desc = "Use WarpPerspective to transform input images.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Point2f[] srcPt = { new Point2f(0, 0), new Point2f(0, src.Height), new Point2f(src.Width, 0), new Point2f(src.Width, src.Height) };
+            Point2f[] pts = { new Point2f(0, 0), new Point2f(0, src.Height), new Point2f(src.Width, 0),
+                          new Point2f(options.width, options.height) };
+            Mat perpectiveTranx = Cv2.GetPerspectiveTransform(srcPt, pts);
+            Cv2.WarpPerspective(src, dst2, perpectiveTranx, new cv.Size(src.Cols, src.Rows), InterpolationFlags.Cubic, BorderTypes.Constant, Scalar.White);
+            Point2f center = new Point2f(src.Cols / 2, src.Rows / 2);
+            Mat rotationMatrix = Cv2.GetRotationMatrix2D(center, options.angle, 1.0);
+            Cv2.WarpAffine(dst2, dst3, rotationMatrix, src.Size(), InterpolationFlags.Nearest);
+        }
+    }
+    public class CS_Watershed_Basics : CS_Parent
+    {
+        AddWeighted_Basics addW = new AddWeighted_Basics();
+        List<cv.Rect> rects = new List<cv.Rect>();
+        public bool UseCorners { get; set; }
+        public CS_Watershed_Basics(VBtask task) : base(task)
+        {
+            labels[2] = "Draw rectangle to add another marker";
+            labels[3] = "Mask for watershed (selected regions).";
+            desc = "Watershed API experiment.  Draw on the image to test.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.drawRect.Width > 0 && task.drawRect.Height > 0)
+                rects.Add(task.drawRect);
+            if ((standaloneTest() || UseCorners) && task.optionsChanged)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    cv.Rect r = new cv.Rect(0, 0, src.Width / 10, src.Height / 10);
+                    switch (i)
+                    {
+                        case 1:
+                            r.X = src.Width - src.Width / 10;
+                            break;
+                        case 2:
+                            r.X = src.Width - src.Width / 10;
+                            r.Y = src.Height - src.Height / 10;
+                            break;
+                        case 3:
+                            r.Y = src.Height - src.Height / 10;
+                            break;
+                    }
+                    rects.Add(r);
+                }
+            }
+            if (rects.Count() > 0)
+            {
+                Mat markers = new Mat(src.Size(), MatType.CV_32S, 0);
+                for (int i = 0; i < rects.Count(); i++)
+                {
+                    markers.Rectangle(rects[i], Scalar.All(i + 1), -1);
+                }
+                Cv2.Watershed(src, markers);
+                markers *= (int)(255 / rects.Count());
+                Mat tmp = new Mat();
+                markers.ConvertTo(tmp, MatType.CV_8U);
+                dst3 = ShowPalette(tmp);
+                addW.src2 = task.palette.dst2;
+                addW.Run(src);
+                dst2 = addW.dst2;
+            }
+            else
+            {
+                dst2 = src;
+            }
+            task.drawRect = new cv.Rect();
+            labels[2] = "There were " + rects.Count().ToString() + " regions defined as input";
+        }
+    }
+    public class CS_Watershed_DepthReduction : CS_Parent
+    {
+        Watershed_Basics watershed = new Watershed_Basics();
+        Reduction_Basics reduction = new Reduction_Basics();
+        public CS_Watershed_DepthReduction(VBtask task) : base(task)
+        {
+            watershed.UseCorners = true;
+            labels[3] = "Reduction input to WaterShed";
+            desc = "Watershed the depth image using shadow, close, and far points.";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(task.depthRGB);
+            dst3 = reduction.dst3;
+            watershed.Run(dst3);
+            dst2 = watershed.dst2;
+            labels[2] = watershed.labels[2];
+            SetTrueText("Draw anywhere in dst2 to add regions.", 3);
+        }
+    }
+    public class CS_Watershed_DepthAuto : CS_Parent
+    {
+        Watershed_Basics watershed = new Watershed_Basics();
+        public CS_Watershed_DepthAuto(VBtask task) : base(task)
+        {
+            watershed.UseCorners = true;
+            desc = "Watershed the four corners of the depth image.";
+        }
+        public void RunCS(Mat src)
+        {
+            watershed.Run(task.depthRGB);
+            dst2 = watershed.dst2;
+            labels[2] = watershed.labels[2];
+        }
+    }
+    public class CS_XFeatures2D_StarDetector : CS_Parent
+    {
+        public CS_XFeatures2D_StarDetector(VBtask task) : base(task)
+        {
+            desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.Clone();
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            var detector = StarDetector.Create();
+            KeyPoint[] keypoints = detector.Detect(src);
+            if (keypoints != null)
+            {
+                foreach (KeyPoint kpt in keypoints)
+                {
+                    float r = kpt.Size / 2;
+                    DrawCircle(dst2, kpt.Pt, (int)Math.Truncate(r), new Scalar(0, 255, 0));
+                    dst2.Line(new cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), new cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), new Scalar(0, 255, 0), task.lineWidth, LineTypes.Link8, 0);
+                    dst2.Line(new cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), new cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), new Scalar(0, 255, 0), task.lineWidth, LineTypes.Link8, 0);
+                }
+            }
+        }
+    }
+    public class CS_XPhoto_Bm3dDenoise : CS_Parent
+    {
+        public CS_XPhoto_Bm3dDenoise(VBtask task) : base(task)
+        {
+            desc = "Denoise image with block matching and filtering.";
+            labels[2] = "Bm3dDenoising";
+            labels[3] = "Difference from Input";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Cv2.EqualizeHist(src, src);
+            CvXPhoto.Bm3dDenoising(src, dst2);
+            Cv2.Subtract(dst2, src, dst3);
+            mmData mm = GetMinMax(dst3);
+            labels[3] = "Diff from input - max change=" + mm.maxVal.ToString();
+            dst3 = dst3.Normalize(0, 255, NormTypes.MinMax);
+        }
+    }
+    public class CS_XPhoto_Bm3dDenoiseDepthImage : CS_Parent
+    {
+        public CS_XPhoto_Bm3dDenoiseDepthImage(VBtask task) : base(task)
+        {
+            desc = "Denoise the depth image with block matching and filtering.";
+            labels[3] = "Difference from Input";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat test = new Mat(src.Size(), MatType.CV_8U);
+            Mat gray = task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Cv2.EqualizeHist(gray, gray);
+            CvXPhoto.Bm3dDenoising(gray, dst2);
+            Cv2.Subtract(dst2, gray, dst3);
+            mmData mm = GetMinMax(dst3);
+            labels[3] = "Diff from input - max change=" + mm.maxVal.ToString();
+            dst3 = dst3.Normalize(0, 255, NormTypes.MinMax);
+        }
+    }
+    public class CS_XPhoto_OilPaint_CPP : CS_Parent
+    {
+        readonly Options_XPhoto options = new Options_XPhoto();
+        public CS_XPhoto_OilPaint_CPP(VBtask task) : base(task)
+        {
+            cPtr = xPhoto_OilPaint_Open();
+            desc = "Use the xPhoto Oil Painting transform";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            IntPtr imagePtr = xPhoto_OilPaint_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                                    options.blockSize, options.dynamicRatio, options.colorCode);
+            handleSrc.Free();
+            if (imagePtr != IntPtr.Zero) dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = xPhoto_OilPaint_Close(cPtr);
+        }
+    }
+    public class CS_XPhoto_Inpaint : CS_Parent
+    {
+        public InPaint_Basics basics = new InPaint_Basics();
+        public Options_XPhotoInpaint options = new Options_XPhotoInpaint();
+        public CS_XPhoto_Inpaint(VBtask task) : base(task)
+        {
+            labels[2] = "RGB input to xPhoto Inpaint";
+            labels[3] = "Repaired result...";
+            desc = "Use the xPhoto inpaint to fill in the depth holes";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src;
+            Mat mask = basics.drawRandomLine(dst2);
+            //InpaintTypes iType = InpaintTypes.FSR_BEST;
+            //if (radioFast.Checked) iType = InpaintTypes.FSR_FAST;
+            //if (radioSMap.Checked) iType = InpaintTypes.SHIFTMAP;
+            //CvXPhoto.Inpaint(dst2, mask, dst3, InpaintTypes.FSR_BEST);
+            SetTrueText("This C# interface for xPhoto Inpaint does not work...  Uncomment the lines above this msg to test.", 3);
+        }
+    }
+    public class CS_XPhoto_Inpaint_CPP : CS_Parent
+    {
+        readonly XPhoto_Inpaint inpVB = new XPhoto_Inpaint();
+        public CS_XPhoto_Inpaint_CPP(VBtask task) : base(task)
+        {
+            cPtr = xPhoto_Inpaint_Open();
+            labels = new string[] { "", "Mask for inpainted repair", "output with inpainted data repaired", "Input to the inpaint C++ algorithm - not working!!!" };
+            desc = "Use the xPhoto Oil Painting transform";
+        }
+        public void RunCS(Mat src)
+        {
+            inpVB.options.RunVB();
+            InpaintTypes iType = InpaintTypes.FSR_BEST;
+            if (inpVB.options.FSRFast) iType = InpaintTypes.FSR_FAST;
+            if (inpVB.options.shiftMap) iType = InpaintTypes.SHIFTMAP;
+            dst1 = inpVB.basics.drawRandomLine(src);
+            dst3 = src.Clone();
+            dst3.SetTo(0, dst1);
+            byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+            byte[] maskData = new byte[dst1.Total() * dst1.ElemSize()];
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+            Marshal.Copy(dst1.Data, maskData, 0, maskData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            GCHandle handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned);
+            IntPtr imagePtr = xPhoto_Inpaint_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, (int)iType);
+            handleSrc.Free();
+            handleMask.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+            SetTrueText("The xPhoto Inpaint call hangs." + "\n" + "Uncomment the C++ line - see XPhoto.cpp - to test", 1);
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = xPhoto_Inpaint_Close(cPtr);
+        }
+    }
 }
