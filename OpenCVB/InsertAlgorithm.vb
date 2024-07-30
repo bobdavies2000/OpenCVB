@@ -271,7 +271,7 @@ Public Class InsertAlgorithm
     Private Sub AddCSharp_Click(sender As Object, e As EventArgs) Handles AddCSharp.Click
         If nextAlgorithm(algType.addCS) = False Then Exit Sub
 
-        Dim ret = MsgBox("The algorithm " + AlgorithmName.Text + " will be added to CS_Non_AI.cs" + vbCrLf + vbCrLf +
+        Dim ret = MsgBox("The algorithm " + AlgorithmName.Text + " will be added to Non_AI.cs" + vbCrLf + vbCrLf +
                          "Is this OK?", MsgBoxStyle.OkCancel)
         If ret = MsgBoxResult.Cancel Then Exit Sub
         sw = New StreamWriter(CSOutputName.FullName, True)
@@ -279,11 +279,7 @@ Public Class InsertAlgorithm
         For i = 0 To CSSnippet.Count - 1
             Dim line = CSSnippet(i)
             If InStr(line, "public") Then trigger = True
-            If AlgorithmName.Text.StartsWith("CS_") Then
-                If InStr(line, "CS_AnyName_Basics") Then line = line.Replace("CS_AnyName_Basics", AlgorithmName.Text)
-            Else
-                If InStr(line, "CS_AnyName_Basics") Then line = line.Replace("AnyName_Basics", AlgorithmName.Text)
-            End If
+            line = line.Replace("AnyName_Basics_CS", AlgorithmName.Text)
             If InStr(line, "End Class") Then
                 sw.Write(line)
                 Exit For

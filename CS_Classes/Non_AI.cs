@@ -17,12 +17,13 @@ using OpenCvSharp.DnnSuperres;
 using System.IO;
 using System.Net;
 using System.Windows.Controls;
+using System.Security.Cryptography;
 
 namespace CS_Classes
 {
-    public class CS_BitmapToMat : CS_Parent
+    public class BitmapToMat_CS : CS_Parent
     {
-        public CS_BitmapToMat(VBtask task) : base(task)
+        public BitmapToMat_CS(VBtask task) : base(task)
         {
             labels[2] = "Convert color bitmap to Mat";
             labels[3] = "Convert Mat to bitmap and then back to Mat";
@@ -42,11 +43,11 @@ namespace CS_Classes
 
 
 
-    public class CS_Blur_Gaussian : CS_Parent
+    public class Blur_Gaussian_CS : CS_Parent
     {
         TrackBar blurSlider;
         public Options_Blur options = new Options_Blur();
-        public CS_Blur_Gaussian(VBtask task) : base(task)
+        public Blur_Gaussian_CS(VBtask task) : base(task)
         {
             blurSlider = FindSlider("Blur Kernel Size");
             desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
@@ -63,10 +64,10 @@ namespace CS_Classes
 
 
 
-    public class CS_Feature_Kaze : CS_Parent
+    public class Feature_Kaze_CS : CS_Parent
     {
         public KeyPoint[] kazeKeyPoints = null;
-        public CS_Feature_Kaze(VBtask task) : base(task)
+        public Feature_Kaze_CS(VBtask task) : base(task)
         {
             labels[2] = "KAZE key points";
             desc = "Find keypoints using KAZE algorithm.";
@@ -90,10 +91,10 @@ namespace CS_Classes
 
 
 
-    public class CS_Feature_AKaze : CS_Parent
+    public class Feature_AKaze_CS : CS_Parent
     {
         KeyPoint[] kazeKeyPoints = null;
-        public CS_Feature_AKaze(VBtask task) : base(task)
+        public Feature_AKaze_CS(VBtask task) : base(task)
         {
             labels[2] = "AKAZE key points";
             desc = "Find keypoints using AKAZE algorithm.";
@@ -101,7 +102,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             dst2 = src.Clone();
-            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY); 
+            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             var kaze = AKAZE.Create();
             var kazeDescriptors = new Mat();
             kaze.DetectAndCompute(src, null, out kazeKeyPoints, kazeDescriptors);
@@ -118,17 +119,17 @@ namespace CS_Classes
 
 
 
-    public class CS_Feature_LeftRight : CS_Parent
+    public class Feature_LeftRight_CS : CS_Parent
     {
         Options_Kaze options;
-        CS_Feature_Kaze KazeLeft;
-        CS_Feature_Kaze KazeRight;
-        public CS_Feature_LeftRight(VBtask task) : base(task)
+        Feature_Kaze_CS KazeLeft;
+        Feature_Kaze_CS KazeRight;
+        public Feature_LeftRight_CS(VBtask task) : base(task)
         {
             options = new Options_Kaze();
-            KazeLeft = new CS_Feature_Kaze(task);
-            KazeRight = new CS_Feature_Kaze(task);
-            labels = new string[] { "", "", "Left Image", "Right image with matches shown.  Blue is left view and Red is right view."};
+            KazeLeft = new Feature_Kaze_CS(task);
+            KazeRight = new Feature_Kaze_CS(task);
+            labels = new string[] { "", "", "Left Image", "Right image with matches shown.  Blue is left view and Red is right view." };
             desc = "Find keypoints in the left and right images using KAZE algorithm.";
         }
         public void RunCS(Mat src)
@@ -180,16 +181,16 @@ namespace CS_Classes
 
 
 
-    public class CS_Edge_Sobel : CS_Parent
+    public class Edge_Sobel_CS : CS_Parent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
         Options_Sobel options;
-        CS_Blur_Gaussian blur;
+        Blur_Gaussian_CS blur;
 
-        public CS_Edge_Sobel(VBtask task) : base(task)
+        public Edge_Sobel_CS(VBtask task) : base(task)
         {
             options = new Options_Sobel();
-            blur = new CS_Blur_Gaussian(task);
+            blur = new Blur_Gaussian_CS(task);
             labels = new string[] { "", "", "Horizontal + Vertical derivative - use global 'Add Weighted' slider to see impact.", "Blur output" };
             desc = "Show Sobel edge detection with varying kernel sizes.";
         }
@@ -229,12 +230,12 @@ namespace CS_Classes
 
 
 
-    public class CS_Blob_Basics : CS_Parent
+    public class Blob_Basics_CS : CS_Parent
     {
         Blob_Input input;
         Options_Blob options;
 
-        public CS_Blob_Basics(VBtask task) : base(task)
+        public Blob_Basics_CS(VBtask task) : base(task)
         {
             options = new Options_Blob();
             input = new Blob_Input();
@@ -273,11 +274,11 @@ namespace CS_Classes
 
 
 
-    public class CS_Feature_SiftLeftRight: CS_Parent
+    public class Feature_SiftLeftRight_CS : CS_Parent
     {
         public Options_Sift options;
         KeyPoint[] keypoints1, keypoints2;
-        public CS_Feature_SiftLeftRight(VBtask task) : base(task)
+        public Feature_SiftLeftRight_CS(VBtask task) : base(task)
         {
             options = new Options_Sift();
             desc = "Compare 2 images to get a homography.  We will use left and right images.";
@@ -319,13 +320,13 @@ namespace CS_Classes
 
 
 
-    public class CS_Feature_Sift : CS_Parent
+    public class Feature_Sift_CS : CS_Parent
     {
         Options_Sift options;
         public List<cv.Point> stablePoints = new List<cv.Point>();
         List<List<cv.Point>> history = new List<List<cv.Point>>();
         public KeyPoint[] keypoints;
-        public CS_Feature_Sift(VBtask task) : base(task)
+        public Feature_Sift_CS(VBtask task) : base(task)
         {
             options = new Options_Sift();
             desc = "Keypoints found in SIFT";
@@ -378,11 +379,11 @@ namespace CS_Classes
 
 
     // https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-    public class CS_Feature_SiftSlices : CS_Parent
+    public class Feature_Sift_CSSlices : CS_Parent
     {
         Options_Sift options;
 
-        public CS_Feature_SiftSlices(VBtask task) : base(task)
+        public Feature_Sift_CSSlices(VBtask task) : base(task)
         {
             options = new Options_Sift();
             FindSlider("Points to Match").Value = 1;
@@ -429,14 +430,14 @@ namespace CS_Classes
         }
     }
     // https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-    public class CS_Feature_SURF : CS_Parent
+    public class Feature_SURF_CS : CS_Parent
     {
         public Options_SURF options;
         public bool drawPoints = true;
         public List<cv.Point> stablePoints = new List<cv.Point>();
         List<List<cv.Point>> history = new List<List<cv.Point>>();
         public KeyPoint[] keypoints1, keypoints2;
-        public CS_Feature_SURF(VBtask task) : base(task)
+        public Feature_SURF_CS(VBtask task) : base(task)
         {
             options = new Options_SURF();
             desc = "Keypoints found in SIFT";
@@ -481,13 +482,13 @@ namespace CS_Classes
 
 
     // https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-     public class CS_Feature_SURF_Draw : CS_Parent
+    public class Feature_SURF_CS_Draw : CS_Parent
     {
-        CS_Feature_SURF surf;
+        Feature_SURF_CS surf;
 
-        public CS_Feature_SURF_Draw(VBtask task) : base(task)
+        public Feature_SURF_CS_Draw(VBtask task) : base(task)
         {
-            surf = new CS_Feature_SURF(task);
+            surf = new Feature_SURF_CS(task);
             surf.drawPoints = false;
             desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices.";
         }
@@ -496,7 +497,7 @@ namespace CS_Classes
         {
             dst2 = task.leftView.Channels() == 1 ? task.leftView.CvtColor(ColorConversionCodes.GRAY2BGR) : task.leftView;
             dst3 = task.rightView.Channels() == 1 ? task.rightView.CvtColor(ColorConversionCodes.GRAY2BGR) : task.rightView;
-            
+
             surf.RunAndMeasure(src, surf);
 
             KeyPoint[] keys1 = surf.keypoints1;
@@ -541,12 +542,12 @@ namespace CS_Classes
 
 
 
-    public class CS_OilPaint_Manual : CS_Parent
+    public class OilPaint_Manual_CS : CS_Parent
     {
         CS_Classes.OilPaintManual oilPaint = new CS_Classes.OilPaintManual();
         public Options_OilPaint options = new Options_OilPaint();
 
-        public CS_OilPaint_Manual(VBtask task) : base(task)
+        public OilPaint_Manual_CS(VBtask task) : base(task)
         {
             task.drawRect = new Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8);
             labels[3] = "Selected area only";
@@ -568,14 +569,14 @@ namespace CS_Classes
 
 
 
-    public class CS_OilPaint_Cartoon : CS_Parent
+    public class OilPaint_Cartoon_CS : CS_Parent
     {
-        CS_OilPaint_Manual oil;
+        OilPaint_Manual_CS oil;
         Edge_Laplacian Laplacian = new Edge_Laplacian();
 
-        public CS_OilPaint_Cartoon(VBtask task) : base(task)
+        public OilPaint_Cartoon_CS(VBtask task) : base(task)
         {
-            oil = new CS_OilPaint_Manual(task);
+            oil = new OilPaint_Manual_CS(task);
             task.drawRect = new Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8);
             labels[2] = "OilPaint_Cartoon";
             labels[3] = "Laplacian Edges";
@@ -607,13 +608,13 @@ namespace CS_Classes
 
 
 
-    public class CS_SLR_Basics : CS_Parent
+    public class SLR_Basics_CS : CS_Parent
     {
         public SLR_Data slrInput;
         SLR slr = new SLR();
         Plot_Basics_CPP plot;
         Options_SLR options;
-        public CS_SLR_Basics(VBtask task) : base(task)
+        public SLR_Basics_CS(VBtask task) : base(task)
         {
             options = new Options_SLR();
             plot = new Plot_Basics_CPP();
@@ -663,15 +664,15 @@ namespace CS_Classes
 
 
 
-    public class CS_SLR_DepthHist : CS_Parent
+    public class SLR_DepthHist_CS : CS_Parent
     {
-        public CS_SLR_Basics slr;
+        public SLR_Basics_CS slr;
         public Hist_Kalman kalman;
 
-        public CS_SLR_DepthHist(VBtask task) : base(task)
+        public SLR_DepthHist_CS(VBtask task) : base(task)
         {
             task.gOptions.setHistogramBins(32);
-            slr = new CS_SLR_Basics(task);
+            slr = new SLR_Basics_CS(task);
             kalman = new Hist_Kalman();
             labels = new string[] { "", "", "Original data", "Segmented Linear Regression (SLR) version of the same data.  Red line is zero." };
             desc = "Run Segmented Linear Regression on depth data";
@@ -694,13 +695,13 @@ namespace CS_Classes
 
 
 
-    public class CS_OEX_Sobel_Demo : CS_Parent
+    public class OEX_Sobel_Demo_CS : CS_Parent
     {
-        CS_Edge_Sobel sobel;
+        Edge_Sobel_CS sobel;
 
-        public CS_OEX_Sobel_Demo(VBtask task) : base(task)
+        public OEX_Sobel_Demo_CS(VBtask task) : base(task)
         {
-            sobel = new CS_Edge_Sobel(task);
+            sobel = new Edge_Sobel_CS(task);
             desc = "OpenCV Example Sobel_Demo became Edge_Sobel algorithm.";
         }
 
@@ -716,14 +717,14 @@ namespace CS_Classes
 
 
     // https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-    public class CS_Voronoi_Basics : CS_Parent
+    public class Voronoi_Basics_CS : CS_Parent
     {
         public VoronoiDemo vDemo = new VoronoiDemo();
-        public CS_Random_Basics random;
+        public Random_Basics_CS random;
 
-        public CS_Voronoi_Basics(VBtask task) : base(task)
+        public Voronoi_Basics_CS(VBtask task) : base(task)
         {
-            random = new CS_Random_Basics(task);
+            random = new Random_Basics_CS(task);
             labels[2] = "Ordered list output for Voronoi algorithm";
             FindSlider("Random Pixel Count").Maximum = 100;
             desc = "Use the ordered list method to find the Voronoi segments";
@@ -749,14 +750,14 @@ namespace CS_Classes
     }
 
     // https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-    public class CS_Voronoi_Compare : CS_Parent
+    public class Voronoi_Compare_CS : CS_Parent
     {
-        CS_Voronoi_Basics basics;
+        Voronoi_Basics_CS basics;
         public Random_Basics random = new Random_Basics();
 
-        public CS_Voronoi_Compare(VBtask task) : base(task)
+        public Voronoi_Compare_CS(VBtask task) : base(task)
         {
-            basics = new CS_Voronoi_Basics(task);
+            basics = new Voronoi_Basics_CS(task);
             FindSlider("Random Pixel Count").Maximum = 150;
             FindSlider("Random Pixel Count").Value = 150;
             labels = new string[] { "", "", "Brute Force method - check log timings", "Ordered List method - check log for timing" };
@@ -775,7 +776,7 @@ namespace CS_Classes
     }
 
     // https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-    public class CS_Voronoi_CPP : CS_Parent
+    public class Voronoi_CS : CS_Parent
     {
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr VoronoiDemo_Open(string matlabFileName, int rows, int cols);
@@ -786,10 +787,10 @@ namespace CS_Classes
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr VoronoiDemo_Run(IntPtr pfPtr, IntPtr Input, int pointCount, int width, int height);
 
-        CS_Voronoi_Basics vDemo;
-        public CS_Voronoi_CPP(VBtask task) : base(task)
+        Voronoi_Basics_CS vDemo;
+        public Voronoi_CS(VBtask task) : base(task)
         {
-            vDemo = new CS_Voronoi_Basics(task);
+            vDemo = new Voronoi_Basics_CS(task);
             cPtr = VoronoiDemo_Open(task.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols);
             desc = "Use the C++ version of the Voronoi code";
         }
@@ -818,14 +819,14 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Edge_Motion : CS_Parent
+    public class Edge_Motion_CS : CS_Parent
     {
         Diff_Basics diff = new Diff_Basics();
-        CS_Edge_Sobel edges;
+        Edge_Sobel_CS edges;
 
-        public CS_Edge_Motion(VBtask task) : base(task)
+        public Edge_Motion_CS(VBtask task) : base(task)
         {
-            edges = new CS_Edge_Sobel(task);
+            edges = new Edge_Sobel_CS(task);
             labels[2] = "Wave at camera to see impact or move camera.";
             desc = "Measure camera motion using Sobel and Diff from last frame.";
         }
@@ -842,14 +843,14 @@ namespace CS_Classes
     }
 
 
-    public class CS_Edge_NoDepth : CS_Parent
+    public class Edge_NoDepth_CS : CS_Parent
     {
-        CS_Edge_Sobel edges;
-        CS_Blur_Basics blur;
-        public CS_Edge_NoDepth(VBtask task) : base(task)
+        Edge_Sobel_CS edges;
+        Blur_Basics_CS blur;
+        public Edge_NoDepth_CS(VBtask task) : base(task)
         {
-            edges = new CS_Edge_Sobel(task);
-            blur = new CS_Blur_Basics(task);
+            edges = new Edge_Sobel_CS(task);
+            blur = new Blur_Basics_CS(task);
             labels[2] = "Edges found in the regions with no depth";
             labels[3] = "Mask of regions with no depth - blurred to expand slightly.";
             desc = "Find the edges in regions without depth.";
@@ -875,12 +876,12 @@ namespace CS_Classes
 
 
 
-    public class CS_Sieve_Basics : CS_Parent
+    public class Sieve_Basics_CS : CS_Parent
     {
         Sieve_BasicsVB printer = new Sieve_BasicsVB();
         Sieve sieve = new Sieve();
 
-        public CS_Sieve_Basics(VBtask task) : base(task)
+        public Sieve_Basics_CS(VBtask task) : base(task)
         {
             desc = "Implement the Sieve of Eratothenes in C#";
         }
@@ -895,15 +896,15 @@ namespace CS_Classes
 
 
     // https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
-    public class CS_SLR_Image : CS_Parent
+    public class SLR_Image_CS : CS_Parent
     {
-        public CS_SLR_Basics slr;
+        public SLR_Basics_CS slr;
         public Hist_Basics hist = new Hist_Basics();
 
-        public CS_SLR_Image(VBtask task) : base(task)
+        public SLR_Image_CS(VBtask task) : base(task)
         {
             task.gOptions.setHistogramBins(32);
-            slr = new CS_SLR_Basics(task);
+            slr = new SLR_Basics_CS(task);
             labels[2] = "Original data";
             desc = "Run Segmented Linear Regression on grayscale image data - just an experiment";
         }
@@ -924,17 +925,17 @@ namespace CS_Classes
     }
 
 
-    public class CS_SLR_TrendCompare : CS_Parent
+    public class SLR_TrendCompare_CS : CS_Parent
     {
-        public CS_SLR_Image slr;
+        public SLR_Image_CS slr;
         List<float> valList = new List<float>();
         int barMidPoint;
         Point2f lastPoint;
         public List<Point2f> resultingPoints = new List<Point2f>();
 
-        public CS_SLR_TrendCompare(VBtask task) : base(task)
+        public SLR_TrendCompare_CS(VBtask task) : base(task)
         {
-            slr = new CS_SLR_Image(task);
+            slr = new SLR_Image_CS(task);
             desc = "Find trends by filling in short histogram gaps in the given image's histogram.";
         }
 
@@ -942,7 +943,7 @@ namespace CS_Classes
         {
             var p1 = new Point2f(barMidPoint + dst2.Width * i / valList.Count, dst2.Height - dst2.Height * valList[i] / slr.hist.plot.maxValue);
             resultingPoints.Add(p1);
-            Cv2.Line(dst2, (int) lastPoint.X, (int) lastPoint.Y, (int)p1.X, (int)p1.Y, Scalar.Yellow, task.lineWidth + 1, task.lineType);
+            Cv2.Line(dst2, (int)lastPoint.X, (int)lastPoint.Y, (int)p1.X, (int)p1.Y, Scalar.Yellow, task.lineWidth + 1, task.lineType);
             lastPoint = p1;
         }
 
@@ -978,12 +979,12 @@ namespace CS_Classes
     }
 
 
-    public class CS_Feature_SURFMatch : CS_Parent
+    public class Feature_SURF_CSMatch : CS_Parent
     {
-        CS_Feature_SURF surf;
-        public CS_Feature_SURFMatch(VBtask task) : base(task)
+        Feature_SURF_CS surf;
+        public Feature_SURF_CSMatch(VBtask task) : base(task)
         {
-            surf = new CS_Feature_SURF(task);
+            surf = new Feature_SURF_CS(task);
             surf.drawPoints = false;
             desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices.";
         }
@@ -1032,10 +1033,10 @@ namespace CS_Classes
         }
     }
 
-    public class CS_DNN_Caffe : CS_Parent
+    public class DNN_Caffe_CS : CS_Parent
     {
         DNN caffeCS = new DNN();
-        public CS_DNN_Caffe(VBtask task) : base(task)
+        public DNN_Caffe_CS(VBtask task) : base(task)
         {
             labels[3] = "Input Image";
             desc = "Download and use a Caffe database";
@@ -1049,17 +1050,17 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             Mat image = Cv2.ImRead(task.HomeDir + "Data/space_shuttle.jpg");
-            string str = caffeCS.RunCS (image);
+            string str = caffeCS.RunCS(image);
             dst3 = image.Resize(dst3.Size());
             SetTrueText(str);
         }
     }
 
-    public class CS_Dither_Basics : CS_Parent
+    public class Dither_Basics_CS : CS_Parent
     {
         Options_Dither options = new Options_Dither();
 
-        public CS_Dither_Basics(VBtask task) : base(task)
+        public Dither_Basics_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Dither applied to the BGR image", "Dither applied to the Depth image" };
             UpdateAdvice(traceName + ": use local options to control which method is used.");
@@ -1244,11 +1245,11 @@ namespace CS_Classes
 
 
 
-    public class CS_DNN_Test : CS_Parent
+    public class DNN_Test_CS : CS_Parent
     {
         Net net;
         string[] classnames;
-        public CS_DNN_Test(VBtask task) : base(task)
+        public DNN_Test_CS(VBtask task) : base(task)
         {
             var modelFile = new FileInfo(task.HomeDir + "Data/bvlc_googlenet.caffemodel");
             if (!File.Exists(modelFile.FullName))
@@ -1283,7 +1284,7 @@ namespace CS_Classes
                         $"{mm.maxVal:0.00%}", new cv.Point(40, 200));
         }
     }
-    public class CS_DNN_Basics : CS_Parent
+    public class DNN_Basics_CS : CS_Parent
     {
 
         Net net;
@@ -1296,7 +1297,7 @@ namespace CS_Classes
         Options_DNN options = new Options_DNN();
         string[] classNames = { "background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor" };
-        public CS_DNN_Basics(VBtask task) : base(task)
+        public DNN_Basics_CS(VBtask task) : base(task)
         {
             kalman = new Kalman_Basics[10];
             for (int i = 0; i < kalman.Length; i++)
@@ -1407,13 +1408,13 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_DNN_SuperRes : CS_Parent
+    public class DNN_SuperRes_CS : CS_Parent
     {
         public Options_DNN options = new Options_DNN();
         public DnnSuperResImpl dnn;
         string saveModelFile;
         int multiplier;
-        public CS_DNN_SuperRes(VBtask task) : base(task)
+        public DNN_SuperRes_CS(VBtask task) : base(task)
         {
             task.drawRect = new Rect(10, 10, 20, 20);
             labels[2] = "Output of a resize using OpenCV";
@@ -1449,10 +1450,10 @@ namespace CS_Classes
             labels[3] = $"{multiplier}X resize of selected area using DNN super resolution";
         }
     }
-    //public class CS_DNN_SuperResize : CS_Parent
+    //public class DNN_SuperRes_CSize : CS_Parent
     //{
     //    DNN_SuperRes super;
-    //    public CS_DNN_SuperResize(VBtask task) : base(task)
+    //    public DNN_SuperRes_CSize(VBtask task) : base(task)
     //    {
     //        labels[2] = "Super Res resized back to original size";
     //        labels[3] = "dst3 = dst2 - src or no difference - honors original";
@@ -1473,11 +1474,11 @@ namespace CS_Classes
 
 
 
-    public class CS_Feature_Sample : CS_Parent
+    public class Feature_Sample_CS : CS_Parent
     {
         public Mat img1, img2;
         KeyPoint[] keypoints1, keypoints2;
-        public CS_Feature_Sample(VBtask task) : base(task)
+        public Feature_Sample_CS(VBtask task) : base(task)
         {
             img1 = cv.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/box.png", cv.ImreadModes.Color);
             img2 = cv.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/box_in_scene.png", cv.ImreadModes.Color);
@@ -1716,10 +1717,10 @@ namespace CS_Classes
             dst2 = img3.Resize(dst2.Size());
         }
     }
-    public class CS_MeanSubtraction_Basics : CS_Parent
+    public class MeanSubtraction_Basics_CS : CS_Parent
     {
         Options_MeanSubtraction options = new Options_MeanSubtraction();
-        public CS_MeanSubtraction_Basics(VBtask task) : base(task)
+        public MeanSubtraction_Basics_CS(VBtask task) : base(task)
         {
             desc = "Subtract the mean from the image with a scaling factor";
         }
@@ -1732,3 +1733,4 @@ namespace CS_Classes
     }
 
 }
+

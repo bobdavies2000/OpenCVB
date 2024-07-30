@@ -22,13 +22,15 @@ Public Class Touchup
                 End If
                 If inline.Contains("string desc;") Then Continue For
                 If inline.Contains("IntPtr cPtr;") Then Continue For
-                If inline.Contains(className) Then inline = inline.Replace(className, "CS_" + className)
+                If inline.Contains(className) Then inline = inline.Replace(className, className + "_CS")
                 If inline.Contains("VB_Parent") Then inline = inline.Replace("VB_Parent", "CS_Parent")
                 If inline.Contains("RunVB(Mat") Then inline = inline.Replace("RunVB(Mat", "RunCS(Mat")
                 If inline.Contains("RunVB(cv.Mat") Then inline = inline.Replace("RunVB(cv.Mat", "RunCS(Mat")
                 If inline.Contains(".GetSubRect(") Then inline = inline.Replace(".GetSubRect(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' .Get(
                 If inline.Contains(".Get(") Then inline = inline.Replace(".Get(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' 
-                If inline.Contains("public CS_") And inline.EndsWith("()") Then inline = inline.Replace("()", "(VBtask task) : base(task)")
+                If inline.Contains("public " + className + "_CS") And inline.EndsWith("()") Then
+                    inline = inline.Replace("()", "(VBtask task) : base(task)")
+                End If
                 inline = inline.Replace("private ", "")
                 inline = inline.Replace(" Run(Mat ", " RunCS(Mat ")
                 inline = inline.Replace("RunCSharp(Mat ", "RunCS(Mat ")
@@ -86,10 +88,10 @@ Public Class Touchup
                 inline = Replace(inline, "cv.Rectangle", "Rectangle")
             Else
                 If line.StartsWith("Public Class CS_") Then
-                    inline = inline.Replace("Public Class CS_", "Public Class VB_")
+                    inline = inline.Replace("Public Class " + className + "_CS", "Public Class VB_")
                     inline = inline + " : Inherits VB_Parent"
                     Dim split = inline.Split(" ")
-                    className = split(2)
+                    className = "VB_" + split(2)
                 End If
                 If inline.Contains("Inherits CS_Parent") Then Continue For
                 If inline.Contains("MyBase.New(task)") Then Continue For

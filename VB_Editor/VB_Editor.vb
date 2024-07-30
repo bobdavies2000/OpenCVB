@@ -113,25 +113,43 @@ Module VB_EditorMain
 #Else
         Dim CScodeDir As New DirectoryInfo(CurDir() + "/../../CS_Classes")
         Dim fileEntries As String() = Directory.GetFiles(CScodeDir.FullName)
+        Dim lines() As String
+        Dim classnames As New List(Of String)
         For Each filename In fileEntries
-            If filename.Contains("AI_Gen") Then
+            If filename.Contains("AI_Gen") Or filename.Contains("Non_AI") Then
                 Dim input = My.Computer.FileSystem.ReadAllText(filename)
-                Dim lines = input.Split(vbCrLf)
-                For Each line In lines
-                    Dim testLine = line.Trim()
+                lines = input.Split(vbCrLf)
+                For i = 0 To lines.Count - 1
+                    Dim testLine = lines(i).Trim()
                     If testLine.StartsWith("public class CS_") Then
-                        Dim split = line.Split(" ")
-                        Dim classname = split(2).Substring(3)
-                        line = line.Replace("CS_" + classname, classname + "_CS")
-                        Console.WriteLine(line)
-                    End If
-                    If testLine.StartsWith("public CS_") Then
-                        Dim split = line.Split(" ")
-                        Dim classname = split(2).Substring(3)
-                        line = line.Replace("CS_" + classname, classname + "_CS")
-                        Console.WriteLine(line)
+                        Dim split = testLine.Split(" ")
+                        classnames.Add(split(2).Substring(3))
                     End If
                 Next
+            End If
+        Next
+        For Each filename In fileEntries
+            If filename.Contains("Non_AI") Then
+                Dim input = My.Computer.FileSystem.ReadAllText(filename)
+                lines = input.Split(vbCrLf)
+                For i = 0 To lines.Count - 1
+                    Dim testLine = lines(i).Trim()
+                    If testLine.StartsWith("public class CS_") Then
+                        Dim split = testLine.Split(" ")
+                        Dim classname = split(2).Substring(3)
+                    End If
+
+                    For Each className In classnames
+                        lines(i) = lines(i).Replace("CS_" + className, className + "_CS")
+                    Next
+                    If lines(i) = vbLf Then
+                        lines(i) = " "
+                    Else
+                        If lines(i).StartsWith(vbLf) Then lines(i) = lines(i).Substring(1)
+                    End If
+                Next
+
+                File.WriteAllLines(filename.Substring(0, filename.Length - 3) + "_test.cs", lines)
             End If
         Next
 #End If

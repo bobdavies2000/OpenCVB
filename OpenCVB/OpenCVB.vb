@@ -700,12 +700,6 @@ Public Class OpenCVB
         lastNameSplit = nameSplit(0)
         AvailableAlgorithms.Items.Add(nextName)
     End Sub
-    Private Sub addNextCSplitAlgorithm(nextName As String, ByRef lastNameSplit As String)
-        Dim nameSplit = nextName.Split("_")
-        If nameSplit(0) + "_" + nameSplit(1) <> lastNameSplit And lastNameSplit <> "" Then AvailableAlgorithms.Items.Add("")
-        lastNameSplit = nameSplit(0) + "_" + nameSplit(1)
-        AvailableAlgorithms.Items.Add(nextName)
-    End Sub
     Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupName.SelectedIndexChanged
         If GroupName.Text = "" Then
             Dim incr = 1
@@ -729,12 +723,7 @@ Public Class OpenCVB
                 infoLine = sr.ReadLine
                 infoLine = UCase(Mid(infoLine, 1, 1)) + Mid(infoLine, 2)
                 If infoLine.StartsWith("Options_") = False Then
-                    If infoLine.StartsWith("CS_") Then
-                        addNextCSplitAlgorithm(infoLine, lastNameSplit)
-                    Else
-                        addNextAlgorithm(infoLine, lastNameSplit)
-                    End If
-
+                    addNextAlgorithm(infoLine, lastNameSplit)
                 End If
             End While
             sr.Close()
@@ -747,11 +736,7 @@ Public Class OpenCVB
 
             For i = 1 To split.Length - 1
                 If split(i).StartsWith("Options_") = False Then
-                    If split(i).StartsWith("CS_") Then
-                        addNextCSplitAlgorithm(split(i), lastNameSplit)
-                    Else
-                        addNextAlgorithm(split(i), lastNameSplit)
-                    End If
+                    addNextAlgorithm(split(i), lastNameSplit)
                 End If
             Next
             AvailableAlgorithms.Enabled = True
@@ -1622,7 +1607,7 @@ Public Class OpenCVB
                 Dim spanWait = New TimeSpan(elapsedWaitTicks)
                 task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
                 Dim updatedDrawRect = task.drawRect
-                If parms.algName.StartsWith("CS_") Then
+                If parms.algName.EndsWith("_CS") Then
                     Static findCSharp = New CS_Classes.CSAlgorithmList()
                     If task.csAlgorithmObject Is Nothing Then
                         task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)

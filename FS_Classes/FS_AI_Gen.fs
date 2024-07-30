@@ -9,7 +9,7 @@ namespace FS_Classes
 //    member val AddWeighted = 0.0f with get, set
 //    member this.RunVB() = ()
 
-//type CS_AddWeighted_Basics(task: VBtask) =
+//type AddWeighted_Basics_FS(task: VBtask) =
 //    inherit FS_Parent(task)
 
 //    let mutable weight = 0.0f

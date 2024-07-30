@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Runtime.InteropServices.ComTypes
 Imports System.Text.RegularExpressions
+Imports System.Windows
 Module UI_GeneratorMain
     Private Function trimQuotes(line As String)
         While InStr(line, """")
@@ -41,12 +42,16 @@ Module UI_GeneratorMain
 
         Dim cppAlgorithmInput = New FileInfo("../CPP_Classes/CPP_Algorithms.h")
         Dim CPPIncludeOnly = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
-        Dim CSInput = New FileInfo("../CS_Classes/CS_AI_Gen.cs")
+        Dim CSInputs = {New FileInfo("../CS_Classes/AI_Gen1.cs").FullName,
+                        New FileInfo("../CS_Classes/AI_Gen2.cs").FullName,
+                        New FileInfo("../CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../VB_classes/")
         If cppAlgorithmInput.Exists = False Then
             cppAlgorithmInput = New FileInfo("../../CPP_Classes/CPP_Algorithms.h")
             CPPIncludeOnly = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
-            CSInput = New FileInfo("../../CS_Classes/CS_AI_Gen.cs")
+            CSInputs = {New FileInfo("../../CS_Classes/AI_Gen1.cs").FullName,
+                        New FileInfo("../../CS_Classes/AI_Gen2.cs").FullName,
+                        New FileInfo("../../CS_Classes/Non_AI.cs").FullName}
             VBcodeDir = New DirectoryInfo(CurDir() + "/../../VB_classes/")
         End If
         Dim HomeDir As New DirectoryInfo(VBcodeDir.FullName + "/../")
@@ -74,13 +79,15 @@ Module UI_GeneratorMain
             cppLines += 1
         Next
 
-        Dim CSAlgorithms = File.ReadAllLines(CSInput.FullName)
-        For Each algline In CSAlgorithms
-            algline = Trim(algline)
-            If algline = "{" Or algline = "}" Then Continue For
-            If algline.StartsWith("//") Then Continue For
-            If algline.Length = 0 Then Continue For
-            csLines += 1
+        For Each csFile In CSInputs
+            Dim CSAlgorithms = File.ReadAllLines(csFile)
+            For Each algline In CSAlgorithms
+                algline = Trim(algline)
+                If algline = "{" Or algline = "}" Then Continue For
+                If algline.StartsWith("//") Then Continue For
+                If algline.Length = 0 Then Continue For
+                csLines += 1
+            Next
         Next
 
         ' first read all the cpp functions that are present in the project
@@ -142,7 +149,7 @@ Module UI_GeneratorMain
                 sIndex += 1
                 fileName = fileinfo.FullName
             Else
-                If fileName.EndsWith("VB_Parent.vb") = False Then
+                If fileName.EndsWith("VB_Parent.vb") = False And fileName.EndsWith("createalgorithms.cs") = False Then
                     Dim nextFile As New System.IO.StreamReader(fileName)
                     While nextFile.Peek() <> -1
                         Dim fileline = Trim(nextFile.ReadLine())
@@ -175,7 +182,7 @@ Module UI_GeneratorMain
         For Each csFile As String In csFiles
             csFileNames.Add(csFile)
         Next
-        For Each fileName In csFileNames
+        For Each fileName In CSInputs
             If fileName.EndsWith("CS_Parent.cs") = False Then
                 Dim csName As String = ""
                 Dim nextFile As New System.IO.StreamReader(fileName)
@@ -231,7 +238,7 @@ Module UI_GeneratorMain
         For Each csName In csSortedNames.Keys
             sw.WriteLine(vbTab + vbTab + vbTab + "if (algorithmName == """ + csName + """) return new " + csName + "(task);")
         Next
-        sw.WriteLine(vbTab + vbTab + vbTab + "return new CS_AddWeighted_Basics(task);")
+        sw.WriteLine(vbTab + vbTab + vbTab + "return new AddWeighted_Basics_CS(task);")
         sw.WriteLine(vbTab + vbTab + "}")
         sw.WriteLine(vbTab + "}")
         sw.WriteLine("}")
@@ -359,14 +366,16 @@ Module UI_GeneratorMain
             While nextFile.Peek() <> -1
                 Dim codeline = Trim(nextFile.ReadLine())
                 If codeline.Trim.StartsWith("//") Then Continue While
-                If codeline.Contains("public class CS_") Then
-                    Dim split = codeline.Split(" \W+")
-                    If CSnames.Keys.Contains(split(2)) Then
-                        MsgBox("There is a duplicate name in the C# code!" + vbCrLf + "Duplicate is " + split(2) +
+                If codeline.Contains("_CS ") Then
+                    If codeline.Contains("public class ") Then
+                        Dim split = codeline.Split(" \W+")
+                        If CSnames.Keys.Contains(split(2)) Then
+                            MsgBox("There is a duplicate name in the C# code!" + vbCrLf + "Duplicate is " + split(2) +
                                vbCrLf + "Terminating the generation of the UI...")
-                        End
+                            End
+                        End If
+                        CSnames.Add(split(2), split(2))
                     End If
-                    CSnames.Add(split(2), split(2))
                 End If
                 Dim lcaseLine = " " + LCase(codeline)
                 If codeline = "" Or Trim(codeline).StartsWith("'") Or Trim(codeline).StartsWith("#") Then Continue While

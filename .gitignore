@@ -389,4 +389,3 @@ OrbbecSDK
 zed-sdk/
 *.json
 CS_Classes\createAlgorithms.cs
-/CS_Classes/CS_AI_Gen.cs

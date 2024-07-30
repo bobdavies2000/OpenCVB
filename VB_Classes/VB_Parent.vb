@@ -76,7 +76,7 @@ Public Class VB_Parent : Implements IDisposable
         If traceName <> "Controls_Basics" Then
             standalone = callTrace(0) = traceName + "\" ' only the first is standaloneTest() (the primary algorithm.)
             If traceName = "Python_Run" Then standalone = True
-            If task.algName.StartsWith("CS_") Then callStack = callTrace(0) + callStack
+            If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
             If standalone = False And callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
         End If
         dst0 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, 0)
