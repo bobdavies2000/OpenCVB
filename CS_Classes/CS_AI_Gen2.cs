@@ -13631,7 +13631,6 @@ namespace CS_Classes
                 options.RunVB();
                 dst2 = options.runRedCloud(ref labels[2]);
                 src = src[task.rc.rect];
-                Cv2.ImShow("src", src);
             }
             cv.Size newSize;
             if (dst0.Width / (double)dst0.Height < src.Width / (double)src.Height)

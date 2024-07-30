@@ -88,7 +88,6 @@ Public Class Resize_Proportional : Inherits VB_Parent
             options.RunVB()
             dst2 = options.runRedCloud(labels(2))
             src = src(task.rc.rect)
-            cv.Cv2.ImShow("src", src)
         End If
 
         Dim newSize As cv.Size
