@@ -25,7 +25,7 @@ using OpenCvSharp.XPhoto;
 
 namespace CS_Classes
 {
-    public class CS_Moments_Basics : CS_Parent
+	public class CS_Moments_Basics : CS_Parent
     {
         public Point2f centroid;
         Foreground_KMeans2 foreground = new Foreground_KMeans2();
@@ -62,7 +62,11 @@ namespace CS_Classes
             centroid = new Point2f(scaleFactor * (offsetPt.X + center.X), scaleFactor * (offsetPt.Y + center.Y));
         }
     }
-    public class CS_Moments_CentroidKalman : CS_Parent
+    
+
+
+
+	public class CS_Moments_CentroidKalman : CS_Parent
     {
         Foreground_KMeans2 foreground = new Foreground_KMeans2();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -86,7 +90,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Motion_Basics : CS_Parent
+    
+
+
+
+	public class CS_Motion_Basics : CS_Parent
     {
         public BGSubtract_MOG2 bgSub = new BGSubtract_MOG2();
         CS_Motion_Basics_QT motion;
@@ -104,7 +112,11 @@ namespace CS_Classes
             labels[2] = motion.labels[2];
         }
     }
-    public class CS_Motion_Simple : CS_Parent
+    
+
+
+
+	public class CS_Motion_Simple : CS_Parent
     {
         public Diff_Basics diff = new Diff_Basics();
         public int cumulativePixels;
@@ -145,7 +157,11 @@ namespace CS_Classes
             labels[2] = strOut + "Current cumulative pixels changed = " + (cumulativePixels / 1000).ToString() + "k";
         }
     }
-    public class CS_Motion_ThruCorrelation : CS_Parent
+    
+
+
+
+	public class CS_Motion_ThruCorrelation : CS_Parent
     {
         Options_MotionDetect options = new Options_MotionDetect();
         Mat lastFrame = new cv.Mat();
@@ -195,7 +211,11 @@ namespace CS_Classes
             else src.CopyTo(dst2, dst3);
         }
     }
-    public class CS_Motion_CCmerge : CS_Parent
+    
+
+
+
+	public class CS_Motion_CCmerge : CS_Parent
     {
         Mat lastFrame = new cv.Mat();
         Motion_ThruCorrelation motionCC = new Motion_ThruCorrelation();
@@ -217,7 +237,11 @@ namespace CS_Classes
             dst3 = motionCC.dst3;
         }
     }
-    public class CS_Motion_PixelDiff : CS_Parent
+    
+
+
+
+	public class CS_Motion_PixelDiff : CS_Parent
     {
         public int changedPixels;
         int changeCount, frames;
@@ -248,7 +272,11 @@ namespace CS_Classes
             if (task.motionFlag) lastFrame = src.Clone();
         }
     }
-    public class CS_Motion_DepthReconstructed : CS_Parent
+    
+
+
+
+	public class CS_Motion_DepthReconstructed : CS_Parent
     {
         public Motion_Basics motion = new Motion_Basics();
         public CS_Motion_DepthReconstructed(VBtask task) : base(task)
@@ -275,7 +303,11 @@ namespace CS_Classes
             task.pointCloud[task.motionRect].CopyTo(dst3[task.motionRect]);
         }
     }
-    public class CS_Motion_Contours : CS_Parent
+    
+
+
+
+	public class CS_Motion_Contours : CS_Parent
     {
         public Motion_MinRect motion = new Motion_MinRect();
         Contour_Largest contours = new Contour_Largest();
@@ -300,7 +332,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Motion_Grid_MP : CS_Parent
+    
+
+
+
+	public class CS_Motion_Grid_MP : CS_Parent
     {
         Options_MotionDetect options = new Options_MotionDetect();
         public CS_Motion_Grid_MP(VBtask task) : base(task)
@@ -331,7 +367,11 @@ namespace CS_Classes
                          (options.CCthreshold).ToString("0.0%") + " correlation.";
         }
     }
-    public class CS_Motion_Grid : CS_Parent
+    
+
+
+
+	public class CS_Motion_Grid : CS_Parent
     {
         Options_MotionDetect options = new Options_MotionDetect();  
         public CS_Motion_Grid(VBtask task) : base(task)
@@ -367,7 +407,11 @@ namespace CS_Classes
                          (options.CCthreshold).ToString("0.0%") + " correlation.";
         }
     }
-    public class CS_Motion_Intersect : CS_Parent
+    
+
+
+
+	public class CS_Motion_Intersect : CS_Parent
     {
         BGSubtract_Basics bgSub = new BGSubtract_Basics();
         int minCount = 4;
@@ -471,7 +515,11 @@ namespace CS_Classes
             lastMotionRect = task.motionRect;
         }
     }
-    public class CS_Motion_RectTest : CS_Parent
+    
+
+
+
+	public class CS_Motion_RectTest : CS_Parent
     {
         Motion_Enclosing motion = new Motion_Enclosing();
         Diff_Basics diff = new Diff_Basics();
@@ -517,7 +565,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Motion_HistoryTest : CS_Parent
+    
+
+
+
+	public class CS_Motion_HistoryTest : CS_Parent
     {
         Diff_Basics diff = new Diff_Basics();
         History_Basics frames = new History_Basics();
@@ -537,7 +589,11 @@ namespace CS_Classes
             labels[2] = "Cumulative diff for the last " + task.frameHistoryCount + " frames";
         }
     }
-    public class CS_Motion_History : CS_Parent
+    
+
+
+
+	public class CS_Motion_History : CS_Parent
     {
         public Motion_Simple motionCore = new Motion_Simple();
         History_Basics frames = new History_Basics();
@@ -554,7 +610,11 @@ namespace CS_Classes
             dst3 = frames.dst2;
         }
     }
-    public class CS_Motion_Enclosing : CS_Parent
+    
+
+
+
+	public class CS_Motion_Enclosing : CS_Parent
     {
         RedCloud_Basics redMasks = new RedCloud_Basics();
         double learnRate;
@@ -595,7 +655,11 @@ namespace CS_Classes
             if (cPtr != (IntPtr)0) cPtr = BGSubtract_BGFG_Close(cPtr);
         }
     }
-    public class CS_Motion_Depth : CS_Parent
+    
+
+
+
+	public class CS_Motion_Depth : CS_Parent
     {
         Diff_Depth32f diff = new Diff_Depth32f();
         public CS_Motion_Depth(VBtask task) : base(task)
@@ -617,7 +681,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Motion_Grayscale : CS_Parent
+    
+
+
+
+	public class CS_Motion_Grayscale : CS_Parent
     {
         Diff_Basics diff = new Diff_Basics();
         public CS_Motion_Grayscale(VBtask task) : base(task)
@@ -651,7 +719,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Motion_Basics_QT : CS_Parent
+    
+
+
+
+	public class CS_Motion_Basics_QT : CS_Parent
     {
         RedCloud_Basics redMasks = new RedCloud_Basics();
         public BGSubtract_MOG2 bgSub = new BGSubtract_MOG2();
@@ -724,7 +796,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Motion_PointCloud : CS_Parent
+    
+
+
+
+	public class CS_Motion_PointCloud : CS_Parent
     {
         Diff_Depth32f diff = new Diff_Depth32f();
         public CS_Motion_PointCloud(VBtask task) : base(task)
@@ -745,7 +821,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Motion_Color : CS_Parent
+    
+
+
+
+	public class CS_Motion_Color : CS_Parent
     {
         public CS_Motion_Color(VBtask task) : base(task)
         {
@@ -758,7 +838,11 @@ namespace CS_Classes
             if (standaloneTest() && task.motionDetected) dst2.Rectangle(task.motionRect, Scalar.White, task.lineWidth);
         }
     }
-    public class CS_Motion_BasicsQuarterRes : CS_Parent
+    
+
+
+
+	public class CS_Motion_BasicsQuarterRes : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public BGSubtract_MOG2_QT bgSub = new BGSubtract_MOG2_QT();
@@ -852,7 +936,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Motion_Diff : CS_Parent
+    
+
+
+
+	public class CS_Motion_Diff : CS_Parent
     {
         public CS_Motion_Diff(VBtask task) : base(task)
         {
@@ -872,7 +960,11 @@ namespace CS_Classes
             dst2 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
         }
     }
-    public class CS_Motion_MinRect : CS_Parent
+    
+
+
+
+	public class CS_Motion_MinRect : CS_Parent
     {
         public Motion_Diff motion = new Motion_Diff();
         Area_MinRect mRect = new Area_MinRect();
@@ -909,7 +1001,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Motion_RedCloud : CS_Parent
+    
+
+
+
+	public class CS_Motion_RedCloud : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_Motion_RedCloud(VBtask task) : base(task)
@@ -929,7 +1025,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Mouse_Basics : CS_Parent
+    
+
+
+
+	public class CS_Mouse_Basics : CS_Parent
     {
         cv.Point lastPoint = new cv.Point();
         int colorIndex;
@@ -950,7 +1050,11 @@ namespace CS_Classes
             if (colorIndex >= task.scalarColors.Count()) colorIndex = 0;
         }
     }
-    public class CS_Mouse_LeftClickZoom : CS_Parent
+    
+
+
+
+	public class CS_Mouse_LeftClickZoom : CS_Parent
     {
         public CS_Mouse_LeftClickZoom(VBtask task) : base(task)
         {
@@ -967,7 +1071,11 @@ namespace CS_Classes
                 dst3 = src[task.drawRect].Resize(dst3.Size());
         }
     }
-    public class CS_Mouse_ClickPointUsage : CS_Parent
+    
+
+
+
+	public class CS_Mouse_ClickPointUsage : CS_Parent
     {
         Feature_Basics feat = new Feature_Basics();
         public CS_Mouse_ClickPointUsage(VBtask task) : base(task)
@@ -988,7 +1096,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_MSER_Basics : CS_Parent
+    
+
+
+
+	public class CS_MSER_Basics : CS_Parent
     {
         MSER_CPP detect = new MSER_CPP();
         public List<rcData> mserCells = new List<rcData>();
@@ -1046,7 +1158,11 @@ namespace CS_Classes
             labels[2] = task.redCells.Count().ToString() + " cells were identified and " + matched.Count().ToString() + " were matched.";
         }
     }
-    public class CS_MSER_Detect : CS_Parent
+    
+
+
+
+	public class CS_MSER_Detect : CS_Parent
     {
         public cv.Rect[] boxes;
         public cv.Point[][] regions;
@@ -1076,7 +1192,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_MSER_SyntheticInput : CS_Parent
+    
+
+
+
+	public class CS_MSER_SyntheticInput : CS_Parent
     {
         void addNestedRectangles(Mat img, cv.Point p0, int[] width, int[] color, int n)
         {
@@ -1115,7 +1235,11 @@ namespace CS_Classes
             dst2[new cv.Rect(0, 0, src.Rows, src.Rows)] = img.CvtColor(ColorConversionCodes.GRAY2BGR);
         }
     }
-    public class CS_MSER_LeftRight : CS_Parent
+    
+
+
+
+	public class CS_MSER_LeftRight : CS_Parent
     {
         MSER_Left left = new MSER_Left();
         MSER_Right right = new MSER_Right();
@@ -1134,7 +1258,11 @@ namespace CS_Classes
             labels[3] = right.labels[2];
         }
     }
-    public class CS_MSER_Left : CS_Parent
+    
+
+
+
+	public class CS_MSER_Left : CS_Parent
     {
         MSER_Basics mBase = new MSER_Basics();
         public CS_MSER_Left(VBtask task) : base(task)
@@ -1150,7 +1278,11 @@ namespace CS_Classes
             labels[2] = mBase.labels[2];
         }
     }
-    public class CS_MSER_Right : CS_Parent
+    
+
+
+
+	public class CS_MSER_Right : CS_Parent
     {
         MSER_Basics mBase = new MSER_Basics();
         public CS_MSER_Right(VBtask task) : base(task)
@@ -1166,7 +1298,11 @@ namespace CS_Classes
             labels[2] = mBase.labels[2];
         }
     }
-    public class CS_MSER_Hulls : CS_Parent
+    
+
+
+
+	public class CS_MSER_Hulls : CS_Parent
     {
         Options_MSER options = new Options_MSER();
         MSER_Basics mBase = new MSER_Basics();
@@ -1191,7 +1327,11 @@ namespace CS_Classes
                 (pixels / mBase.mserCells.Count()).ToString() : "0");
         }
     }
-    public class CS_MSER_TestSynthetic : CS_Parent
+    
+
+
+
+	public class CS_MSER_TestSynthetic : CS_Parent
     {
         Options_MSER options = new Options_MSER();
         MSER_SyntheticInput synth = new MSER_SyntheticInput();
@@ -1211,7 +1351,11 @@ namespace CS_Classes
             dst3 = mBase.dst3;
         }
     }
-    public class CS_MSER_Grayscale : CS_Parent
+    
+
+
+
+	public class CS_MSER_Grayscale : CS_Parent
     {
         MSER_Basics mBase = new MSER_Basics();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -1228,7 +1372,11 @@ namespace CS_Classes
             labels[2] = mBase.labels[2];
         }
     }
-    public class CS_MSER_ReducedRGB : CS_Parent
+    
+
+
+
+	public class CS_MSER_ReducedRGB : CS_Parent
     {
         MSER_Basics mBase = new MSER_Basics();
         Reduction_BGR reduction = new Reduction_BGR();
@@ -1245,7 +1393,11 @@ namespace CS_Classes
             labels[2] = mBase.labels[2];
         }
     }
-    public class CS_MSER_ROI : CS_Parent
+    
+
+
+
+	public class CS_MSER_ROI : CS_Parent
     {
         public List<cv.Rect> containers = new List<cv.Rect>();
         Options_MSER options = new Options_MSER();
@@ -1299,7 +1451,11 @@ namespace CS_Classes
             labels[3] = sortedBoxes.Count().ToString() + " total rectangles found with MSER";
         }
     }
-    public class CS_MSER_TestExample : CS_Parent
+    
+
+
+
+	public class CS_MSER_TestExample : CS_Parent
     {
         Mat image;
         MSER mser;
@@ -1345,7 +1501,11 @@ namespace CS_Classes
             labels[2] = boxes.Length.ToString() + " regions were found using MSER";
         }
     }
-    public class CS_MSER_RedCloud : CS_Parent
+    
+
+
+
+	public class CS_MSER_RedCloud : CS_Parent
     {
         MSER_Basics mBase = new MSER_Basics();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -1361,7 +1521,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2];
         }
     }
-    public class CS_MSER_Mask_CPP : CS_Parent
+    
+
+
+
+	public class CS_MSER_Mask_CPP : CS_Parent
     {
         Options_MSER options = new Options_MSER();
         RedCloud_Cells redC = new RedCloud_Cells();
@@ -1410,7 +1574,11 @@ namespace CS_Classes
             MSER_Close(cPtr);
         }
     }
-    public class CS_MSER_Binarize : CS_Parent
+    
+
+
+
+	public class CS_MSER_Binarize : CS_Parent
     {
         MSER_Basics mser = new MSER_Basics();
         Bin4Way_Regions bin4 = new Bin4Way_Regions();
@@ -1427,7 +1595,11 @@ namespace CS_Classes
             labels[3] = mser.labels[2];
         }
     }
-    public class CS_MSER_Basics1 : CS_Parent
+    
+
+
+
+	public class CS_MSER_Basics1 : CS_Parent
     {
         MSER_CPP detect = new MSER_CPP();
         RedCloud_Basics flood = new RedCloud_Basics();
@@ -1444,7 +1616,11 @@ namespace CS_Classes
             labels[2] = flood.labels[2];
         }
     }
-    public class CS_MSER_BasicsNew : CS_Parent
+    
+
+
+
+	public class CS_MSER_BasicsNew : CS_Parent
     {
         MSER_CPP detect = new MSER_CPP();
         int displaycount;
@@ -1476,7 +1652,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_MSER_Basics2 : CS_Parent
+    
+
+
+
+	public class CS_MSER_Basics2 : CS_Parent
     {
         MSER_CPP detect = new MSER_CPP();
         Mat cellMap;
@@ -1531,7 +1711,11 @@ namespace CS_Classes
             if (task.heartBeat) labels[2] = detect.labels[2] + " and " + matchCount + " were matched to the previous frame";
         }
     }
-    public class CS_MSER_CPP : CS_Parent
+    
+
+
+
+	public class CS_MSER_CPP : CS_Parent
     {
         Options_MSER options = new Options_MSER();
         public List<cv.Rect> boxes = new List<cv.Rect>();
@@ -1605,7 +1789,11 @@ namespace CS_Classes
             MSER_Close(cPtr);
         }
     }
-    public class CS_MultiDimensionScaling_Cities : CS_Parent
+    
+
+
+
+	public class CS_MultiDimensionScaling_Cities : CS_Parent
     {
         double[] CityDistance = { // 10x10 array of distances for 10 cities
         0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,       // Atlanta
@@ -1704,7 +1892,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Neighbors_Basics : CS_Parent
+    
+
+
+
+	public class CS_Neighbors_Basics : CS_Parent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         KNN_Core knn = new KNN_Core();
@@ -1757,7 +1949,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Neighbors_Intersects : CS_Parent
+    
+
+
+
+	public class CS_Neighbors_Intersects : CS_Parent
     {
         public List<cv.Point> nPoints = new List<cv.Point>();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -1811,7 +2007,11 @@ namespace CS_Classes
             labels[3] = nPoints.Count().ToString() + " intersections with 3 or more cells were found";
         }
     }
-    public class CS_Neighbors_ColorOnly : CS_Parent
+    
+
+
+
+	public class CS_Neighbors_ColorOnly : CS_Parent
     {
         Neighbors_Intersects corners = new Neighbors_Intersects();
         RedCloud_Cells redC = new RedCloud_Cells();
@@ -1831,7 +2031,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2] + " and " + corners.nPoints.Count().ToString() + " cell intersections";
         }
     }
-    public class CS_Neighbors_Precise : CS_Parent
+    
+
+
+
+	public class CS_Neighbors_Precise : CS_Parent
     {
         public List<List<int>> nabList = new List<List<int>>();
         Cell_Basics stats = new Cell_Basics();
@@ -1912,7 +2116,11 @@ namespace CS_Classes
             Neighbors_Close(cPtr);
         }
     }
-    public class CS_OEX_CalcBackProject_Demo1 : CS_Parent
+    
+
+
+
+	public class CS_OEX_CalcBackProject_Demo1 : CS_Parent
     {
         public Mat histogram = new Mat();
         public int classCount;
@@ -1947,7 +2155,11 @@ namespace CS_Classes
             if (task.heartBeat) labels[3] = $"The max value below is {peakValue}";
         }
     }
-    public class CS_OEX_CalcBackProject_Demo2 : CS_Parent
+    
+
+
+
+	public class CS_OEX_CalcBackProject_Demo2 : CS_Parent
     {
         public Mat histogram = new Mat();
         public int classCount = 10; // initial value is just a guess.  It is refined after the first pass.
@@ -1983,7 +2195,11 @@ namespace CS_Classes
             SetTrueText("Click anywhere to isolate that region.", 1);
         }
     }
-    public class CS_OEX_bgfg_segm : CS_Parent
+    
+
+
+
+	public class CS_OEX_bgfg_segm : CS_Parent
     {
         BGSubtract_Basics bgSub = new BGSubtract_Basics();
         public CS_OEX_bgfg_segm(VBtask task) : base(task)
@@ -1997,7 +2213,11 @@ namespace CS_Classes
             labels[2] = bgSub.labels[2];
         }
     }
-    public class CS_OEX_bgSub : CS_Parent
+    
+
+
+
+	public class CS_OEX_bgSub : CS_Parent
     {
         BackgroundSubtractor pBackSub;
         Options_BGSubtract options = new Options_BGSubtract();
@@ -2029,7 +2249,11 @@ namespace CS_Classes
             pBackSub.Apply(src, dst2, options.learnRate);
         }
     }
-    public class CS_OEX_BasicLinearTransforms : CS_Parent
+    
+
+
+
+	public class CS_OEX_BasicLinearTransforms : CS_Parent
     {
         Options_BrightnessContrast options = new Options_BrightnessContrast();
         public CS_OEX_BasicLinearTransforms(VBtask task) : base(task)
@@ -2042,7 +2266,11 @@ namespace CS_Classes
             src.ConvertTo(dst2, -1, options.brightness, options.contrast);
         }
     }
-    public class CS_OEX_BasicLinearTransformsTrackBar : CS_Parent
+    
+
+
+
+	public class CS_OEX_BasicLinearTransformsTrackBar : CS_Parent
     {
         Options_BrightnessContrast options = new Options_BrightnessContrast();
         public CS_OEX_BasicLinearTransformsTrackBar(VBtask task) : base(task)
@@ -2070,7 +2298,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_OEX_delaunay2 : CS_Parent
+    
+
+
+
+	public class CS_OEX_delaunay2 : CS_Parent
     {
         Scalar active_facet_color = new Scalar(0, 0, 255);
         Scalar delaunay_color = new Scalar(255, 255, 255);
@@ -2150,7 +2382,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_OEX_MeanShift : CS_Parent
+    
+
+
+
+	public class CS_OEX_MeanShift : CS_Parent
     {
         TermCriteria term_crit = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.Count, 10, 1.0);
         Rangef[] ranges = new Rangef[] { new Rangef(0, 180) };
@@ -2182,7 +2418,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_OEX_PointPolygon : CS_Parent
+    
+
+
+
+	public class CS_OEX_PointPolygon : CS_Parent
     {
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
         public CS_OEX_PointPolygon(VBtask task) : base(task)
@@ -2236,7 +2476,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_OEX_PointPolygon_demo : CS_Parent
+    
+
+
+
+	public class CS_OEX_PointPolygon_demo : CS_Parent
     {
         OEX_PointPolygon pointPoly = new OEX_PointPolygon();
         public CS_OEX_PointPolygon_demo(VBtask task) : base(task)
@@ -2265,7 +2509,11 @@ namespace CS_Classes
             dst3 = pointPoly.dst3;
         }
     }
-    public class CS_OEX_Remap : CS_Parent
+    
+
+
+
+	public class CS_OEX_Remap : CS_Parent
     {
         Remap_Basics remap = new Remap_Basics();
         public CS_OEX_Remap(VBtask task) : base(task)
@@ -2279,7 +2527,11 @@ namespace CS_Classes
             labels[2] = remap.labels[2];
         }
     }
-    public class CS_OEX_Threshold : CS_Parent
+    
+
+
+
+	public class CS_OEX_Threshold : CS_Parent
     {
         Threshold_Basics threshold = new Threshold_Basics();
         public CS_OEX_Threshold(VBtask task) : base(task)
@@ -2294,7 +2546,11 @@ namespace CS_Classes
             labels = threshold.labels;
         }
     }
-    public class CS_OEX_Threshold_Inrange : CS_Parent
+    
+
+
+
+	public class CS_OEX_Threshold_Inrange : CS_Parent
     {
         Options_OEX options = new Options_OEX();
         public CS_OEX_Threshold_Inrange(VBtask task) : base(task)
@@ -2308,7 +2564,11 @@ namespace CS_Classes
             dst2 = hsv.InRange(options.lows, options.highs);
         }
     }
-    public class CS_OEX_Points_Classifier : CS_Parent
+    
+
+
+
+	public class CS_OEX_Points_Classifier : CS_Parent
     {
         Classifier_Basics basics = new Classifier_Basics();
         public CS_OEX_Points_Classifier(VBtask task) : base(task)
@@ -2324,7 +2584,11 @@ namespace CS_Classes
             SetTrueText("Click the global DebugCheckBox to get another set of points.", 2);
         }
     }
-    public class CS_OEX_GoodFeaturesToTrackDemo : CS_Parent
+    
+
+
+
+	public class CS_OEX_GoodFeaturesToTrackDemo : CS_Parent
     {
         Feature_Basics feat = new Feature_Basics();
         public CS_OEX_GoodFeaturesToTrackDemo(VBtask task) : base(task)
@@ -2338,7 +2602,11 @@ namespace CS_Classes
             labels[2] = feat.labels[2];
         }
     }
-    public class CS_OEX_Core_Reduce : CS_Parent
+    
+
+
+
+	public class CS_OEX_Core_Reduce : CS_Parent
     {
         public CS_OEX_Core_Reduce(VBtask task) : base(task)
         {
@@ -2383,7 +2651,11 @@ namespace CS_Classes
             SetTrueText(strOut, 2);
         }
     }
-    public class CS_OEX_Core_Split : CS_Parent
+    
+
+
+
+	public class CS_OEX_Core_Split : CS_Parent
     {
         public CS_OEX_Core_Split(VBtask task) : base(task)
         {
@@ -2416,7 +2688,11 @@ namespace CS_Classes
             SetTrueText(strOut, 2);
         }
     }
-    public class CS_OEX_Filter2D : CS_Parent
+    
+
+
+
+	public class CS_OEX_Filter2D : CS_Parent
     {
         MatType ddepth = MatType.CV_8UC3;
         cv.Point anchor = new cv.Point(-1, -1);
@@ -2434,7 +2710,11 @@ namespace CS_Classes
             SetTrueText("Kernel size = " + kernelSize.ToString(), 3);
         }
     }
-    public class CS_OEX_FitEllipse : CS_Parent
+    
+
+
+
+	public class CS_OEX_FitEllipse : CS_Parent
     {
         Mat img;
         Options_FitEllipse options = new Options_FitEllipse();
@@ -2468,7 +2748,11 @@ namespace CS_Classes
         public static extern IntPtr OEX_FitEllipse_RunCPP(IntPtr cPtr, IntPtr dataPtr, int rows, int cols,
                                                            int threshold, int fitType);
     }
-    public class CS_OilPaint_Pointilism : CS_Parent
+    
+
+
+
+	public class CS_OilPaint_Pointilism : CS_Parent
     {
         Mat randomMask;
         RNG myRNG = new RNG();
@@ -2536,7 +2820,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_OilPaint_ManualVB : CS_Parent
+    
+
+
+
+	public class CS_OilPaint_ManualVB : CS_Parent
     {
         public Options_OilPaint options = new Options_OilPaint();
         public CS_OilPaint_ManualVB(VBtask task) : base(task)
@@ -2589,7 +2877,11 @@ namespace CS_Classes
             result1.CopyTo(dst2[roi]);
         }
     }
-    public class CS_OpAuto_XRange : CS_Parent
+    
+
+
+
+	public class CS_OpAuto_XRange : CS_Parent
     {
         public Mat histogram = new Mat();
         int adjustedCount = 0;
@@ -2635,7 +2927,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_OpAuto_YRange : CS_Parent
+    
+
+
+
+	public class CS_OpAuto_YRange : CS_Parent
     {
         public Mat histogram = new Mat();
         int adjustedCount = 0;
@@ -2681,7 +2977,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_OpAuto_FloorCeiling : CS_Parent
+    
+
+
+
+	public class CS_OpAuto_FloorCeiling : CS_Parent
     {
         public BackProject_LineSide bpLine = new BackProject_LineSide();
         public List<float> yList = new List<float>();
@@ -2728,7 +3028,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_OpAuto_Valley : CS_Parent
+    
+
+
+
+	public class CS_OpAuto_Valley : CS_Parent
     {
         public SortedList<int, int> valleyOrder = new SortedList<int, int>(new CompareAllowIdenticalInteger());
         public Options_Boundary options = new Options_Boundary();
@@ -2793,7 +3097,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_OpAuto_Peaks2D : CS_Parent
+    
+
+
+
+	public class CS_OpAuto_Peaks2D : CS_Parent
     {
         public Options_Boundary options = new Options_Boundary();
         public List<Point2f> clusterPoints = new List<Point2f>();
@@ -2832,7 +3140,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_OpAuto_Peaks2DGrid : CS_Parent
+    
+
+
+
+	public class CS_OpAuto_Peaks2DGrid : CS_Parent
     {
         public List<Point2f> clusterPoints = new List<Point2f>();
         Options_Boundary options = new Options_Boundary();
@@ -2880,7 +3192,11 @@ namespace CS_Classes
             labels[3] = pointPop.Count().ToString() + " grid samples trimmed to " + clusterPoints.Count().ToString();
         }
     }
-    public class CS_OpAuto_PixelDifference : CS_Parent
+    
+
+
+
+	public class CS_OpAuto_PixelDifference : CS_Parent
     {
         Diff_Basics diff = new Diff_Basics();
         public CS_OpAuto_PixelDifference(VBtask task) : base(task)
@@ -2911,7 +3227,11 @@ namespace CS_Classes
             dst2 = src;
         }
     }
-    public class CS_OpAuto_MSER : CS_Parent
+    
+
+
+
+	public class CS_OpAuto_MSER : CS_Parent
     {
         MSER_Basics mBase = new MSER_Basics();
         public int classCount;
@@ -2964,7 +3284,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_OpenGL_Basics : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Basics : CS_Parent
     {
         MemoryMappedViewAccessor memMapWriter;
         readonly ProcessStartInfo startInfo = new ProcessStartInfo();
@@ -3128,7 +3452,11 @@ namespace CS_Classes
 
 
   
-    public class CS_OpenGL_BasicsSliders : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_BasicsSliders : CS_Parent
     {
         Options_OpenGL options = new Options_OpenGL();
         public Mat pointCloudInput;
@@ -3157,7 +3485,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_BasicsMouse : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_BasicsMouse : CS_Parent
     {
         public CS_OpenGL_BasicsMouse(VBtask task) : base(task)
         {
@@ -3172,7 +3504,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_ReducedXYZ : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_ReducedXYZ : CS_Parent
     {
         readonly Reduction_XYZ reduction = new Reduction_XYZ();
         public CS_OpenGL_ReducedXYZ(VBtask task) : base(task)
@@ -3189,7 +3525,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_Reduction : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Reduction : CS_Parent
     {
         readonly Reduction_PointCloud reduction;
         public CS_OpenGL_Reduction(VBtask task) : base(task)
@@ -3207,7 +3547,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_ReducedSideView : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_ReducedSideView : CS_Parent
     {
         readonly PointCloud_ReducedSideView sideView = new PointCloud_ReducedSideView();
         public CS_OpenGL_ReducedSideView(VBtask task) : base(task)
@@ -3226,7 +3570,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_OpenGL_Rebuilt : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Rebuilt : CS_Parent
     {
         readonly Structured_Rebuild rebuild = new Structured_Rebuild();
         public CS_OpenGL_Rebuilt(VBtask task) : base(task)
@@ -3243,7 +3591,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_VerticalSingle : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_VerticalSingle : CS_Parent
     {
         readonly FeatureLine_LongestV_Tutorial2 vLine = new FeatureLine_LongestV_Tutorial2();
         public CS_OpenGL_VerticalSingle(VBtask task) : base(task)
@@ -3270,7 +3622,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_OpenGL_Pyramid : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Pyramid : CS_Parent
     {
         public CS_OpenGL_Pyramid(VBtask task) : base(task)
         {
@@ -3285,7 +3641,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_DrawCube : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_DrawCube : CS_Parent
     {
         public CS_OpenGL_DrawCube(VBtask task) : base(task)
         {
@@ -3300,7 +3660,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_QuadSimple : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_QuadSimple : CS_Parent
     {
         readonly Tessallate_QuadSimple tess = new Tessallate_QuadSimple();
         public CS_OpenGL_QuadSimple(VBtask task) : base(task)
@@ -3321,7 +3685,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_QuadHulls : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_QuadHulls : CS_Parent
     {
         readonly Tessallate_QuadHulls tess = new Tessallate_QuadHulls();
         public CS_OpenGL_QuadHulls(VBtask task) : base(task)
@@ -3342,7 +3710,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_QuadMinMax : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_QuadMinMax : CS_Parent
     {
         readonly Tessallate_QuadMinMax tess = new Tessallate_QuadMinMax();
         public CS_OpenGL_QuadMinMax(VBtask task) : base(task)
@@ -3363,7 +3735,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_Bricks : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Bricks : CS_Parent
     {
         readonly Tessallate_Bricks tess = new Tessallate_Bricks();
         public CS_OpenGL_Bricks(VBtask task) : base(task)
@@ -3393,7 +3769,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_StructuredCloud : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_StructuredCloud : CS_Parent
     {
         readonly Structured_Cloud sCloud = new Structured_Cloud();
         readonly RedCloud_Basics redC = new RedCloud_Basics();
@@ -3415,7 +3795,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_Tiles : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Tiles : CS_Parent
     {
         Structured_Tiles sCloud = new Structured_Tiles();
         public CS_OpenGL_Tiles(VBtask task) : base(task)
@@ -3436,7 +3820,11 @@ namespace CS_Classes
             task.ogl.options.PointSizeSlider.Value = task.gridSize;
         }
     }
-    public class CS_OpenGL_TilesQuad : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_TilesQuad : CS_Parent
     {
         Structured_TilesQuad sCloud = new Structured_TilesQuad();
         public CS_OpenGL_TilesQuad(VBtask task) : base(task)
@@ -3455,7 +3843,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_OnlyPlanes : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_OnlyPlanes : CS_Parent
     {
         readonly Plane_OnlyPlanes planes = new Plane_OnlyPlanes();
         public CS_OpenGL_OnlyPlanes(VBtask task) : base(task)
@@ -3474,7 +3866,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_FlatStudy1 : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FlatStudy1 : CS_Parent
     {
         readonly Structured_LinearizeFloor plane = new Structured_LinearizeFloor();
         public CS_OpenGL_FlatStudy1(VBtask task) : base(task)
@@ -3492,7 +3888,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_FlatStudy2 : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FlatStudy2 : CS_Parent
     {
         public Structured_LinearizeFloor plane = new Structured_LinearizeFloor();
         public CS_OpenGL_FlatStudy2(VBtask task) : base(task)
@@ -3516,7 +3916,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_FlatStudy3 : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FlatStudy3 : CS_Parent
     {
         Plane_FloorStudy plane = new Plane_FloorStudy();
         TrackBar cushionSlider;
@@ -3539,7 +3943,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_FlatFloor : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FlatFloor : CS_Parent
     {
         Model_FlatSurfaces flatness = new Model_FlatSurfaces();
         public CS_OpenGL_FlatFloor(VBtask task) : base(task)
@@ -3560,7 +3968,11 @@ namespace CS_Classes
             labels[3] = flatness.labels[3];
         }
     }
-    public class CS_OpenGL_FlatCeiling : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FlatCeiling : CS_Parent
     {
         Model_FlatSurfaces flatness = new Model_FlatSurfaces();
         public CS_OpenGL_FlatCeiling(VBtask task) : base(task)
@@ -3581,7 +3993,11 @@ namespace CS_Classes
             labels[3] = flatness.labels[3];
         }
     }
-    public class CS_OpenGL_PeakFlat : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_PeakFlat : CS_Parent
     {
         Plane_Histogram peak = new Plane_Histogram();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -3604,7 +4020,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_DrawHull : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_DrawHull : CS_Parent
     {
         RedCloud_Hulls hulls = new RedCloud_Hulls();
         public CS_OpenGL_DrawHull(VBtask task) : base(task)
@@ -3639,7 +4059,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_FPolyCloud : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FPolyCloud : CS_Parent
     {
         FeaturePoly_PointCloud fpolyPC = new FeaturePoly_PointCloud();
         public CS_OpenGL_FPolyCloud(VBtask task) : base(task)
@@ -3662,7 +4086,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_Sierpinski : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Sierpinski : CS_Parent
     {
         public CS_OpenGL_Sierpinski(VBtask task) : base(task)
         {
@@ -3678,7 +4106,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_DrawHulls : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_DrawHulls : CS_Parent
     {
         public Options_OpenGLFunctions options = new Options_OpenGLFunctions();
         public RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -3736,7 +4168,11 @@ namespace CS_Classes
             SetTrueText(polygonCount.ToString() + " polygons were sent to OpenGL", 2);
         }
     }
-    public class CS_OpenGL_Contours : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Contours : CS_Parent
     {
         Options_OpenGL_Contours options2 = new Options_OpenGL_Contours();
         public Options_OpenGLFunctions options = new Options_OpenGLFunctions();
@@ -3804,7 +4240,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_PCLineCandidates : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_PCLineCandidates : CS_Parent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
         public CS_OpenGL_PCLineCandidates(VBtask task) : base(task)
@@ -3824,7 +4264,11 @@ namespace CS_Classes
             labels[2] = "Point cloud points found = " + (pts.actualCount / 2).ToString();
         }
     }
-    public class CS_OpenGL_PClinesFirstLast : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_PClinesFirstLast : CS_Parent
     {
         Line3D_CandidatesFirstLast lines = new Line3D_CandidatesFirstLast();
         public CS_OpenGL_PClinesFirstLast(VBtask task) : base(task)
@@ -3844,7 +4288,11 @@ namespace CS_Classes
             labels[2] = "OpenGL_PClines found " + (lines.pcLinesMat.Rows / 3).ToString() + " lines";
         }
     }
-    public class CS_OpenGL_PClinesAll : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_PClinesAll : CS_Parent
     {
         Line3D_CandidatesAll lines = new Line3D_CandidatesAll();
         public CS_OpenGL_PClinesAll(VBtask task) : base(task)
@@ -3864,7 +4312,11 @@ namespace CS_Classes
             labels[2] = "OpenGL_PClines found " + (lines.pcLinesMat.Rows / 3).ToString() + " lines";
         }
     }
-    public class CS_OpenGL_PatchHorizontal : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_PatchHorizontal : CS_Parent
     {
         Pixel_NeighborsPatchNeighbors patch = new Pixel_NeighborsPatchNeighbors();
         public CS_OpenGL_PatchHorizontal(VBtask task) : base(task)
@@ -3882,7 +4334,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_PCpoints : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_PCpoints : CS_Parent
     {
         PointCloud_PCPoints pts = new PointCloud_PCPoints();
         public CS_OpenGL_PCpoints(VBtask task) : base(task)
@@ -3902,7 +4358,11 @@ namespace CS_Classes
             labels[2] = "Point cloud points found = " + (pts.pcPoints.Count() / 2).ToString();
         }
     }
-    public class CS_OpenGL_PCpointsPlane : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_PCpointsPlane : CS_Parent
     {
         PointCloud_PCPointsPlane pts = new PointCloud_PCPointsPlane();
         public CS_OpenGL_PCpointsPlane(VBtask task) : base(task)
@@ -3921,7 +4381,11 @@ namespace CS_Classes
             labels[2] = "Point cloud points found = " + pts.pcPoints.Count() / 2;
         }
     }
-    public class CS_OpenGL_PlaneClusters3D : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_PlaneClusters3D : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Plane_Equation eq = new Plane_Equation();
@@ -3958,7 +4422,11 @@ namespace CS_Classes
             task.ogl.Run(new Mat());
         }
     }
-    public class CS_OpenGL_Profile : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Profile : CS_Parent
     {
         public Profile_Basics sides = new Profile_Basics();
         public Profile_Rotation rotate = new Profile_Rotation();
@@ -4000,7 +4468,11 @@ namespace CS_Classes
             task.ogl.Run(new Mat());
         }
     }
-    public class CS_OpenGL_ProfileSweep : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_ProfileSweep : CS_Parent
     {
         OpenGL_Profile visuals = new OpenGL_Profile();
         Options_IMU options = new Options_IMU();
@@ -4054,7 +4526,11 @@ namespace CS_Classes
             dst3 = visuals.dst3;
         }
     }
-    public class CS_OpenGL_FlatSurfaces : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FlatSurfaces : CS_Parent
     {
         RedCloud_LikelyFlatSurfaces flat = new RedCloud_LikelyFlatSurfaces();
         public CS_OpenGL_FlatSurfaces(VBtask task) : base(task)
@@ -4071,7 +4547,11 @@ namespace CS_Classes
             task.ogl.Run(src);
         }
     }
-    public class CS_OpenGL_GradientPhase : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_GradientPhase : CS_Parent
     {
         Gradient_Depth gradient = new Gradient_Depth();
         public CS_OpenGL_GradientPhase(VBtask task) : base(task)
@@ -4090,7 +4570,11 @@ namespace CS_Classes
             task.ogl.Run(dst1);
         }
     }
-    public class CS_OpenGL_GravityTransform : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_GravityTransform : CS_Parent
     {
         public CS_OpenGL_GravityTransform(VBtask task) : base(task)
         {
@@ -4104,7 +4588,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_GravityAverage : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_GravityAverage : CS_Parent
     {
         readonly IMU_Average imuAvg = new IMU_Average();
         readonly IMU_Basics imu = new IMU_Basics();
@@ -4131,7 +4619,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_OpenGL_GravityKalman : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_GravityKalman : CS_Parent
     {
         readonly IMU_Kalman imuKalman = new IMU_Kalman();
         readonly IMU_Basics imu = new IMU_Basics();
@@ -4159,7 +4651,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_OpenGL_StableMinMax : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_StableMinMax : CS_Parent
     {
         readonly Depth_MinMaxNone minmax = new Depth_MinMaxNone();
         public CS_OpenGL_StableMinMax(VBtask task) : base(task)
@@ -4180,7 +4676,11 @@ namespace CS_Classes
             labels[2] = minmax.labels[2];
         }
     }
-    public class CS_OpenGL_DiffDepth : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_DiffDepth : CS_Parent
     {
         Diff_Depth32S diff = new Diff_Depth32S();
         public CS_OpenGL_DiffDepth(VBtask task) : base(task)
@@ -4199,7 +4699,11 @@ namespace CS_Classes
             labels = diff.labels;
         }
     }
-    public class CS_OpenGL_CloudMisses : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_CloudMisses : CS_Parent
     {
         History_Basics frames = new History_Basics();
         public CS_OpenGL_CloudMisses(VBtask task) : base(task)
@@ -4218,7 +4722,11 @@ namespace CS_Classes
             task.ogl.Run(src);
         }
     }
-    public class CS_OpenGL_CloudHistory : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_CloudHistory : CS_Parent
     {
         History_Cloud hCloud = new History_Cloud();
         public CS_OpenGL_CloudHistory(VBtask task) : base(task)
@@ -4235,7 +4743,11 @@ namespace CS_Classes
             task.ogl.Run(src);
         }
     }
-    public class CS_OpenGL_TessellateCell : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_TessellateCell : CS_Parent
     {
         Triangle_Basics tess = new Triangle_Basics();
         public CS_OpenGL_TessellateCell(VBtask task) : base(task)
@@ -4255,7 +4767,11 @@ namespace CS_Classes
             labels = tess.labels;
         }
     }
-    public class CS_OpenGL_Tessellate : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Tessellate : CS_Parent
     {
         Triangle_RedCloud tess = new Triangle_RedCloud();
         public CS_OpenGL_Tessellate(VBtask task) : base(task)
@@ -4275,7 +4791,11 @@ namespace CS_Classes
             labels = tess.labels;
         }
     }
-    public class CS_OpenGL_TessellateRGB : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_TessellateRGB : CS_Parent
     {
         Triangle_RedCloud tess = new Triangle_RedCloud();
         public CS_OpenGL_TessellateRGB(VBtask task) : base(task)
@@ -4295,7 +4815,11 @@ namespace CS_Classes
             labels = tess.labels;
         }
     }
-    public class CS_OpenGL_RedTrack : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_RedTrack : CS_Parent
     {
         RedTrack_Basics redCC = new RedTrack_Basics();
         public CS_OpenGL_RedTrack(VBtask task) : base(task)
@@ -4312,7 +4836,11 @@ namespace CS_Classes
             SetTrueText(redCC.strOut, 3);
         }
     }
-    public class CS_OpenGL_Density2D : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Density2D : CS_Parent
     {
         Density_Basics dense = new Density_Basics();
         public CS_OpenGL_Density2D(VBtask task) : base(task)
@@ -4330,7 +4858,11 @@ namespace CS_Classes
             task.ogl.Run(new Mat(dst2.Size(), MatType.CV_8UC3, Scalar.White));
         }
     }
-    public class CS_OpenGL_ViewObjects : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_ViewObjects : CS_Parent
     {
         GuidedBP_Points bpDoctor = new GuidedBP_Points();
         public CS_OpenGL_ViewObjects(VBtask task) : base(task)
@@ -4349,7 +4881,11 @@ namespace CS_Classes
             task.ogl.Run(dst2);
         }
     }
-    public class CS_OpenGL_NoSolo : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_NoSolo : CS_Parent
     {
         BackProject_SoloTop hotTop = new BackProject_SoloTop();
         BackProject_SoloSide hotSide = new BackProject_SoloSide();
@@ -4373,7 +4909,11 @@ namespace CS_Classes
             SetTrueText("Toggle the solo points on and off using the 'DebugCheckBox' global option.", 3);
         }
     }
-    public class CS_OpenGL_RedCloud : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_RedCloud : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_OpenGL_RedCloud(VBtask task) : base(task)
@@ -4389,7 +4929,11 @@ namespace CS_Classes
             task.ogl.Run(dst2);
         }
     }
-    public class CS_OpenGL_RedCloudSpectrum : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_RedCloudSpectrum : CS_Parent
     {
         Spectrum_RedCloud redS = new Spectrum_RedCloud();
         public CS_OpenGL_RedCloudSpectrum(VBtask task) : base(task)
@@ -4407,7 +4951,11 @@ namespace CS_Classes
             task.ogl.Run(dst2);
         }
     }
-    public class CS_OpenGL_RedCloudCell : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_RedCloudCell : CS_Parent
     {
         Spectrum_Z specZ = new Spectrum_Z();
         Spectrum_Breakdown breakdown = new Spectrum_Breakdown();
@@ -4434,7 +4982,11 @@ namespace CS_Classes
                 dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_FilteredSideView : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FilteredSideView : CS_Parent
     {
         BackProject2D_FilterSide filter = new BackProject2D_FilterSide();
         public CS_OpenGL_FilteredSideView(VBtask task) : base(task)
@@ -4450,7 +5002,11 @@ namespace CS_Classes
             task.ogl.Run(src);
         }
     }
-    public class CS_OpenGL_FilteredTopView : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FilteredTopView : CS_Parent
     {
         BackProject2D_FilterTop filter = new BackProject2D_FilterTop();
         public CS_OpenGL_FilteredTopView(VBtask task) : base(task)
@@ -4466,7 +5022,11 @@ namespace CS_Classes
             task.ogl.Run(src);
         }
     }
-    public class CS_OpenGL_FilteredBoth : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_FilteredBoth : CS_Parent
     {
         BackProject2D_FilterBoth filter = new BackProject2D_FilterBoth();
         public CS_OpenGL_FilteredBoth(VBtask task) : base(task)
@@ -4482,7 +5042,11 @@ namespace CS_Classes
             task.ogl.Run(src);
         }
     }
-    public class CS_OpenGL_Filtered3D : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Filtered3D : CS_Parent
     {
         Hist3Dcloud_BP_Filter filter = new Hist3Dcloud_BP_Filter();
         public CS_OpenGL_Filtered3D(VBtask task) : base(task)
@@ -4500,7 +5064,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_HistNorm3D : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_HistNorm3D : CS_Parent
     {
         public CS_OpenGL_HistNorm3D(VBtask task) : base(task)
         {
@@ -4516,7 +5084,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_HistDepth3D : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_HistDepth3D : CS_Parent
     {
         Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
         public CS_OpenGL_HistDepth3D(VBtask task) : base(task)
@@ -4537,7 +5109,11 @@ namespace CS_Classes
             SetTrueText("Use the sliders for X/Y/Z histogram bins to add more points");
         }
     }
-    public class CS_OpenGL_SoloPointsRemoved : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_SoloPointsRemoved : CS_Parent
     {
         Area_SoloPoints solos = new Area_SoloPoints();
         public CS_OpenGL_SoloPointsRemoved(VBtask task) : base(task)
@@ -4565,7 +5141,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_OpenGL_Duster : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Duster : CS_Parent
     {
         Duster_Basics duster = new Duster_Basics();
         Options_OpenGL_Duster options = new Options_OpenGL_Duster();
@@ -4582,7 +5162,11 @@ namespace CS_Classes
             task.ogl.Run(options.useClusterColors == false ? task.color : dst2);
         }
     }
-    public class CS_OpenGL_DusterY : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_DusterY : CS_Parent
     {
         Duster_BasicsY duster = new Duster_BasicsY();
         Options_OpenGL_Duster options = new Options_OpenGL_Duster();
@@ -4599,7 +5183,11 @@ namespace CS_Classes
             task.ogl.Run(options.useClusterColors == false ? task.color : dst2);
         }
     }
-    public class CS_OpenGL_Color3D : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_Color3D : CS_Parent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         public CS_OpenGL_Color3D(VBtask task) : base(task)
@@ -4623,7 +5211,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_ColorReduced3D : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_ColorReduced3D : CS_Parent
     {
         Color8U_Basics colorClass = new Color8U_Basics();
         public CS_OpenGL_ColorReduced3D(VBtask task) : base(task)
@@ -4647,7 +5239,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_ColorRaw : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_ColorRaw : CS_Parent
     {
         public CS_OpenGL_ColorRaw(VBtask task) : base(task)
         {
@@ -4668,7 +5264,11 @@ namespace CS_Classes
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
     }
-    public class CS_OpenGL_ColorBin4Way : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_ColorBin4Way : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_OpenGL_ColorBin4Way(VBtask task) : base(task)
@@ -4693,7 +5293,11 @@ namespace CS_Classes
             task.ogl.Run(dst0);
         }
     }
-    public class CS_ORB_Basics : CS_Parent
+    
+
+
+
+	public class CS_ORB_Basics : CS_Parent
     {
         public KeyPoint[] keypoints;
         ORB orb;
@@ -4718,7 +5322,11 @@ namespace CS_Classes
             labels[2] = keypoints.Length + " key points were identified";
         }
     }
-    public class CS_Palette_Basics : CS_Parent
+    
+
+
+
+	public class CS_Palette_Basics : CS_Parent
     {
         public bool whitebackground;
         public CS_Palette_Basics(VBtask task) : base(task)
@@ -4756,7 +5364,11 @@ namespace CS_Classes
             Cv2.ApplyColorMap(src, dst2, mapIndex);
         }
     }
-    public class CS_Palette_Color : CS_Parent
+    
+
+
+
+	public class CS_Palette_Color : CS_Parent
     {
         Options_Colors options = new Options_Colors();
         public CS_Palette_Color(VBtask task) : base(task)
@@ -4773,7 +5385,11 @@ namespace CS_Classes
                          (255 - options.redS);
         }
     }
-    public class CS_Palette_LinearPolar : CS_Parent
+    
+
+
+
+	public class CS_Palette_LinearPolar : CS_Parent
     {
         public Options_Resize rotateOptions = new Options_Resize();
         Point2f pt;
@@ -4801,7 +5417,11 @@ namespace CS_Classes
             Cv2.LinearPolar(src, dst3, pt, options.radius, rotateOptions.warpFlag);
         }
     }
-    public class CS_Palette_Reduction : CS_Parent
+    
+
+
+
+	public class CS_Palette_Reduction : CS_Parent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         public CS_Palette_Reduction(VBtask task) : base(task)
@@ -4817,7 +5437,11 @@ namespace CS_Classes
             dst2 = ShowPalette(dst3 * 255 / reduction.classCount);
         }
     }
-    public class CS_Palette_DrawTest : CS_Parent
+    
+
+
+
+	public class CS_Palette_DrawTest : CS_Parent
     {
         Draw_Shapes draw = new Draw_Shapes();
         public CS_Palette_DrawTest(VBtask task) : base(task)
@@ -4830,7 +5454,11 @@ namespace CS_Classes
             dst2 = ShowPalette(draw.dst2);
         }
     }
-    public class CS_Palette_Gradient : CS_Parent
+    
+
+
+
+	public class CS_Palette_Gradient : CS_Parent
     {
         public Scalar color1;
         public Scalar color2;
@@ -4863,7 +5491,11 @@ namespace CS_Classes
             if (standaloneTest()) dst2 = dst1.Resize(dst2.Size());
         }
     }
-    public class CS_Palette_DepthColorMap : CS_Parent
+    
+
+
+
+	public class CS_Palette_DepthColorMap : CS_Parent
     {
         public Mat gradientColorMap = new Mat();
         Gradient_Color gColor = new Gradient_Color();
@@ -4908,7 +5540,11 @@ namespace CS_Classes
             dst2.SetTo(0, task.noDepthMask);
         }
     }
-    public class CS_Palette_RGBDepth : CS_Parent
+    
+
+
+
+	public class CS_Palette_RGBDepth : CS_Parent
     {
         Mat gradientColorMap = new Mat();
         Gradient_Color gColor = new Gradient_Color();
@@ -4938,7 +5574,11 @@ namespace CS_Classes
             Cv2.ApplyColorMap(depth8u, dst2, ColorMap);
         }
     }
-    public class CS_Palette_Layout2D : CS_Parent
+    
+
+
+
+	public class CS_Palette_Layout2D : CS_Parent
     {
         public CS_Palette_Layout2D(VBtask task) : base(task)
         {
@@ -4955,7 +5595,11 @@ namespace CS_Classes
             labels[2] = "CS_Palette_Layout2D - " + task.gridList.Count().ToString() + " regions";
         }
     }
-    public class CS_Palette_LeftRightImages : CS_Parent
+    
+
+
+
+	public class CS_Palette_LeftRightImages : CS_Parent
     {
         public CS_Palette_LeftRightImages(VBtask task) : base(task)
         {
@@ -4967,7 +5611,11 @@ namespace CS_Classes
             dst3 = ShowPalette(task.rightView.ConvertScaleAbs());
         }
     }
-    public class CS_Palette_TaskColors : CS_Parent
+    
+
+
+
+	public class CS_Palette_TaskColors : CS_Parent
     {
         int direction = 1;
         public CS_Palette_TaskColors(VBtask task) : base(task)
@@ -4989,7 +5637,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Palette_Create : CS_Parent
+    
+
+
+
+	public class CS_Palette_Create : CS_Parent
     {
         Mat colorGrad = new Mat();
         string activeSchemeName = "";
@@ -5052,7 +5704,11 @@ namespace CS_Classes
             dst2.SetTo(0, task.noDepthMask);
         }
     }
-    public class CS_Palette_Random : CS_Parent
+    
+
+
+
+	public class CS_Palette_Random : CS_Parent
     {
         public Mat colorMap;
         public CS_Palette_Random(VBtask task) : base(task)
@@ -5070,7 +5726,11 @@ namespace CS_Classes
             Cv2.ApplyColorMap(src, dst2, colorMap);
         }
     }
-    public class CS_Palette_Variable : CS_Parent
+    
+
+
+
+	public class CS_Palette_Variable : CS_Parent
     {
         public Mat colorGrad;
         public Mat originalColorMap;
@@ -5095,7 +5755,11 @@ namespace CS_Classes
             Cv2.ApplyColorMap(src, dst2, colorMap);
         }
     }
-    public class CS_Palette_RandomColorMap : CS_Parent
+    
+
+
+
+	public class CS_Palette_RandomColorMap : CS_Parent
     {
         public Mat gradientColorMap = new Mat();
         public int transitionCount = -1;
@@ -5131,7 +5795,11 @@ namespace CS_Classes
             Cv2.ApplyColorMap(src, dst2, ColorMap);
         }
     }
-    public class CS_Palette_LoadColorMap : CS_Parent
+    
+
+
+
+	public class CS_Palette_LoadColorMap : CS_Parent
     {
         public bool whitebackground;
         public Mat colorMap = new Mat();
@@ -5162,7 +5830,11 @@ namespace CS_Classes
             if (standalone) dst3 = colorMap.Resize(dst3.Size());
         }
     }
-    public class CS_Palette_CustomColorMap : CS_Parent
+    
+
+
+
+	public class CS_Palette_CustomColorMap : CS_Parent
     {
         public Mat colorMap;
         public CS_Palette_CustomColorMap(VBtask task) : base(task)
@@ -5195,7 +5867,11 @@ namespace CS_Classes
             if (standalone) dst3 = colorMap.Resize(dst3.Size());
         }
     }
-    public class CS_Palette_GrayToColor : CS_Parent
+    
+
+
+
+	public class CS_Palette_GrayToColor : CS_Parent
     {
         public CS_Palette_GrayToColor(VBtask task) : base(task)
         {
@@ -5235,7 +5911,11 @@ namespace CS_Classes
             Cv2.ApplyColorMap(src, dst2, ColorMap);
         }
     }
-    public class CS_ParticleFilter_Example : CS_Parent
+    
+
+
+
+	public class CS_ParticleFilter_Example : CS_Parent
     {
         int imageFrame = 12;
         public CS_ParticleFilter_Example(VBtask task) : base(task)
@@ -5262,7 +5942,11 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = ParticleFilterTest_Close(cPtr);
         }
     }
-    public class CS_PCA_Prep_CPP : CS_Parent
+    
+
+
+
+	public class CS_PCA_Prep_CPP : CS_Parent
     {
         public Mat inputData = new Mat();
         public CS_PCA_Prep_CPP(VBtask task) : base(task)
@@ -5287,7 +5971,11 @@ namespace CS_Classes
             PCA_Prep_Close(cPtr);
         }
     }
-    public class CS_PCA_Palettize : CS_Parent
+    
+
+
+
+	public class CS_PCA_Palettize : CS_Parent
     {
         public byte[] palette;
         public byte[] rgb;
@@ -5322,7 +6010,11 @@ namespace CS_Classes
             labels[2] = "The palette found from the current image (repeated across the image) with " + options.desiredNcolors.ToString() + " entries";
         }
     }
-    public class CS_PCA_Basics : CS_Parent
+    
+
+
+
+	public class CS_PCA_Basics : CS_Parent
     {
         PCA_Prep_CPP prep = new PCA_Prep_CPP();
         public PCA pca_analysis = new PCA();
@@ -5394,7 +6086,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_PCA_CellMask : CS_Parent
+    
+
+
+
+	public class CS_PCA_CellMask : CS_Parent
     {
         PCA_Basics pca = new PCA_Basics();
         PCA_Prep_CPP pcaPrep = new PCA_Prep_CPP();
@@ -5426,7 +6122,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_PCA_Reconstruct : CS_Parent
+    
+
+
+
+	public class CS_PCA_Reconstruct : CS_Parent
     {
         Mat[] images = new Mat[8];
         Mat[] images32f = new Mat[8];
@@ -5460,7 +6160,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_PCA_Depth : CS_Parent
+    
+
+
+
+	public class CS_PCA_Depth : CS_Parent
     {
         PCA_Reconstruct pca = new PCA_Reconstruct();
         public CS_PCA_Depth(VBtask task) : base(task)
@@ -5473,7 +6177,11 @@ namespace CS_Classes
             dst2 = pca.dst2;
         }
     }
-    public class CS_PCA_DrawImage : CS_Parent
+    
+
+
+
+	public class CS_PCA_DrawImage : CS_Parent
     {
         PCA_Reconstruct pca = new PCA_Reconstruct();
         Mat image = new Mat();
@@ -5536,7 +6244,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_PCA_NColor : CS_Parent
+    
+
+
+
+	public class CS_PCA_NColor : CS_Parent
     {
         [StructLayout(LayoutKind.Sequential)]
         public struct paletteEntry
@@ -6040,7 +6752,11 @@ namespace CS_Classes
             labels[2] = "The image above is mapped to " + paletteCount.ToString() + " colors below.  ";
         }
     }
-    public class CS_PCA_NColor_CPP : CS_Parent
+    
+
+
+
+	public class CS_PCA_NColor_CPP : CS_Parent
     {
         Palette_CustomColorMap custom = new Palette_CustomColorMap();
         PCA_Palettize palettize = new PCA_Palettize();
@@ -6085,7 +6801,11 @@ namespace CS_Classes
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr PCA_NColor_RunCPP(IntPtr cPtr, IntPtr imagePtr, IntPtr palettePtr, int rows, int cols, int desiredNcolors);
     }
-    public class CS_PCA_NColorPalettize : CS_Parent
+    
+
+
+
+	public class CS_PCA_NColorPalettize : CS_Parent
     {
         Palette_CustomColorMap custom = new Palette_CustomColorMap();
         PCA_Palettize palettize = new PCA_Palettize();
@@ -6112,7 +6832,11 @@ namespace CS_Classes
             dst2 = custom.dst2;
         }
     }
-    public class CS_Pendulum_Basics : CS_Parent
+    
+
+
+
+	public class CS_Pendulum_Basics : CS_Parent
     {
         float l1 = 150, l2 = 150, m1 = 10, m2 = 10;
         float o1 = (float)(2 * Cv2.PI / 2);
@@ -6167,7 +6891,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_PhaseCorrelate_Basics : CS_Parent
+    
+
+
+
+	public class CS_PhaseCorrelate_Basics : CS_Parent
     {
         Mat hanning = new Mat();
         public cv.Rect stableRect;
@@ -6234,7 +6962,11 @@ namespace CS_Classes
             labels[2] = "Shift = (" + shift.X.ToString(fmt2) + "," + shift.Y.ToString(fmt2) + ") with radius = " + radius.ToString(fmt2);
         }
     }
-    public class CS_PhaseCorrelate_BasicsTest : CS_Parent
+    
+
+
+
+	public class CS_PhaseCorrelate_BasicsTest : CS_Parent
     {
         Stabilizer_BasicsRandomInput random = new Stabilizer_BasicsRandomInput();
         PhaseCorrelate_Basics stable = new PhaseCorrelate_Basics();
@@ -6253,7 +6985,11 @@ namespace CS_Classes
             labels[3] = stable.labels[3];
         }
     }
-    public class CS_PhaseCorrelate_Depth : CS_Parent
+    
+
+
+
+	public class CS_PhaseCorrelate_Depth : CS_Parent
     {
         PhaseCorrelate_Basics phaseC = new PhaseCorrelate_Basics();
         Mat lastFrame;
@@ -6285,7 +7021,11 @@ namespace CS_Classes
             lastFrame = task.pcSplit[2].Clone();
         }
     }
-    public class CS_PhaseCorrelate_HanningWindow : CS_Parent
+    
+
+
+
+	public class CS_PhaseCorrelate_HanningWindow : CS_Parent
     {
         public CS_PhaseCorrelate_HanningWindow(VBtask task) : base(task)
         {
@@ -6297,7 +7037,11 @@ namespace CS_Classes
             Cv2.CreateHanningWindow(dst2, src.Size(), MatType.CV_32F);
         }
     }
-    public class CS_Photon_Basics : CS_Parent
+    
+
+
+
+	public class CS_Photon_Basics : CS_Parent
     {
         Hist_Basics hist = new Hist_Basics();
         Mat lastImage = new cv.Mat();
@@ -6322,7 +7066,11 @@ namespace CS_Classes
             lastImage = src;
         }
     }
-    public class CS_Photon_Test : CS_Parent
+    
+
+
+
+	public class CS_Photon_Test : CS_Parent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         List<int>[] counts = new List<int>[4];
@@ -6377,7 +7125,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Photon_Subtraction : CS_Parent
+    
+
+
+
+	public class CS_Photon_Subtraction : CS_Parent
     {
         Hist_Basics hist = new Hist_Basics();
         Mat lastImage = new cv.Mat();
@@ -6402,7 +7154,11 @@ namespace CS_Classes
             lastImage = src.Clone();
         }
     }
-    public class CS_Plane_Basics : CS_Parent
+    
+
+
+
+	public class CS_Plane_Basics : CS_Parent
     {
         History_Basics frames = new History_Basics();
         public CS_Plane_Basics(VBtask task) : base(task)
@@ -6425,7 +7181,11 @@ namespace CS_Classes
             dst3.SetTo(0, task.noDepthMask);
         }
     }
-    public class CS_Plane_From3Points : CS_Parent
+    
+
+
+
+	public class CS_Plane_From3Points : CS_Parent
     {
         public Point3f[] input = new Point3f[3];
         public bool showWork = true;
@@ -6469,7 +7229,11 @@ namespace CS_Classes
             if (showWork) SetTrueText(strOut, 2);
         }
     }
-    public class CS_Plane_FlatSurfaces : CS_Parent
+    
+
+
+
+	public class CS_Plane_FlatSurfaces : CS_Parent
     {
         AddWeighted_Basics addW = new AddWeighted_Basics();
         Plane_CellColor plane = new Plane_CellColor();
@@ -6520,7 +7284,11 @@ namespace CS_Classes
             labels[3] = "There were " + flatCount + " RedCloud Cells with an average RMSerror per pixel less than " + (plane.options.rmsThreshold * 100).ToString(fmt0) + " cm";
         }
     }
-    public class CS_Plane_OnlyPlanes : CS_Parent
+    
+
+
+
+	public class CS_Plane_OnlyPlanes : CS_Parent
     {
         public Plane_CellColor plane = new Plane_CellColor();
         public List<cv.Point> contours;
@@ -6559,7 +7327,11 @@ namespace CS_Classes
             var rcX = task.rc;
         }
     }
-    public class CS_Plane_EqCorrelation : CS_Parent
+    
+
+
+
+	public class CS_Plane_EqCorrelation : CS_Parent
     {
         Plane_Points plane = new Plane_Points();
         public List<float> correlations = new List<float>();
@@ -6615,7 +7387,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Plane_CellColor : CS_Parent
+    
+
+
+
+	public class CS_Plane_CellColor : CS_Parent
     {
         public Options_Plane options = new Options_Plane();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -6678,7 +7454,11 @@ namespace CS_Classes
             task.redCells = new List<rcData>(newCells);
         }
     }
-    public class CS_Plane_Points : CS_Parent
+    
+
+
+
+	public class CS_Plane_Points : CS_Parent
     {
         Plane_From3Points plane = new Plane_From3Points();
         public List<Vec4f> equations = new List<Vec4f>();
@@ -6747,7 +7527,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Plane_Histogram : CS_Parent
+    
+
+
+
+	public class CS_Plane_Histogram : CS_Parent
     {
         PointCloud_Solo solo = new PointCloud_Solo();
         Hist_Basics hist = new Hist_Basics();
@@ -6796,7 +7580,11 @@ namespace CS_Classes
             SetTrueText("Yellow rectangle is likely floor and black is likely ceiling.");
         }
     }
-    public class CS_Plane_Equation : CS_Parent
+    
+
+
+
+	public class CS_Plane_Equation : CS_Parent
     {
         public rcData rc = new rcData();
         public string justEquation;
@@ -6877,7 +7665,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Plane_Verticals : CS_Parent
+    
+
+
+
+	public class CS_Plane_Verticals : CS_Parent
     {
         PointCloud_Solo solo = new PointCloud_Solo();
         History_Basics frames = new History_Basics();
@@ -6906,7 +7698,11 @@ namespace CS_Classes
             task.color.SetTo(Scalar.White, dst0);
         }
     }
-    public class CS_Plane_Horizontals : CS_Parent
+    
+
+
+
+	public class CS_Plane_Horizontals : CS_Parent
     {
         PointCloud_Solo solo = new PointCloud_Solo();
         History_Basics frames = new History_Basics();
@@ -6935,7 +7731,11 @@ namespace CS_Classes
             task.color.SetTo(Scalar.White, dst0);
         }
     }
-    public class CS_Plane_FloorStudy : CS_Parent
+    
+
+
+
+	public class CS_Plane_FloorStudy : CS_Parent
     {
         public Structured_SliceH slice = new Structured_SliceH();
         List<float> yList = new List<float>();
@@ -6977,7 +7777,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Plot_Basics : CS_Parent
+    
+
+
+
+	public class CS_Plot_Basics : CS_Parent
     {
         CS_Plot_Basics_CPP plot;
         Hist_Graph hist = new Hist_Graph();
@@ -7005,7 +7809,11 @@ namespace CS_Classes
             labels[2] = hist.labels[2];
         }
     }
-    public class CS_Plot_Histogram : CS_Parent
+    
+
+
+
+	public class CS_Plot_Histogram : CS_Parent
     {
         public Mat histogram = new Mat();
         public float[] histArray;
@@ -7064,7 +7872,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Plot_Depth : CS_Parent
+    
+
+
+
+	public class CS_Plot_Depth : CS_Parent
     {
         Plot_Basics_CPP plotDepth = new Plot_Basics_CPP();
         Hist_Basics hist = new Hist_Basics();
@@ -7100,7 +7912,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Plot_Histogram2D : CS_Parent
+    
+
+
+
+	public class CS_Plot_Histogram2D : CS_Parent
     {
         public Color_Basics colorFmt = new Color_Basics();
         public CS_Plot_Histogram2D(VBtask task) : base(task)
@@ -7122,7 +7938,11 @@ namespace CS_Classes
             if (standaloneTest()) dst3 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
         }
     }
-    public class CS_Plot_OverTimeSingle : CS_Parent
+    
+
+
+
+	public class CS_Plot_OverTimeSingle : CS_Parent
     {
         public float plotData;
         public Scalar backColor = Scalar.DarkGray;
@@ -7173,7 +7993,11 @@ namespace CS_Classes
             if (standaloneTest()) SetTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3);
         }
     }
-    public class CS_Plot_OverTimeScalar : CS_Parent
+    
+
+
+
+	public class CS_Plot_OverTimeScalar : CS_Parent
     {
         public Scalar plotData;
         public int plotCount = 3;
@@ -7205,7 +8029,11 @@ namespace CS_Classes
             dst3 = mats.dst3;
         }
     }
-    public class CS_Plot_OverTime : CS_Parent
+    
+
+
+
+	public class CS_Plot_OverTime : CS_Parent
     {
         public Scalar plotData;
         public int plotCount = 3;
@@ -7302,7 +8130,11 @@ namespace CS_Classes
             AddPlotScale(dst2, minScale, maxScale, lineCount);
         }
     }
-    public class CS_Plot_OverTimeFixedScale : CS_Parent
+    
+
+
+
+	public class CS_Plot_OverTimeFixedScale : CS_Parent
     {
         public Scalar plotData;
         public int plotCount = 3;
@@ -7399,7 +8231,11 @@ namespace CS_Classes
             dst2 = plotOutput.Resize(task.WorkingRes);
         }
     }
-    public class CS_Plot_Beats : CS_Parent
+    
+
+
+
+	public class CS_Plot_Beats : CS_Parent
     {
         Plot_OverTimeFixedScale plot = new Plot_OverTimeFixedScale();
         public CS_Plot_Beats(VBtask task) : base(task)
@@ -7426,7 +8262,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Plot_Basics_CPP : CS_Parent
+    
+
+
+
+	public class CS_Plot_Basics_CPP : CS_Parent
     {
         public List<double> srcX = new List<double>();
         public List<double> srcY = new List<double>();
@@ -7461,7 +8301,11 @@ namespace CS_Classes
             if (cPtr != (IntPtr)0) cPtr = PlotOpenCV_Close(cPtr);
         }
     }
-    public class CS_Plot_Dots : CS_Parent
+    
+
+
+
+	public class CS_Plot_Dots : CS_Parent
     {
         public List<double> srcX = new List<double>();
         public List<double> srcY = new List<double>();
@@ -7491,7 +8335,11 @@ namespace CS_Classes
             labels[2] = "x-Axis: " + minX + " to " + maxX + ", y-axis: " + minY + " to " + maxY;
         }
     }
-    public class CS_PlyFormat_Basics : CS_Parent
+    
+
+
+
+	public class CS_PlyFormat_Basics : CS_Parent
     {
         public Options_PlyFormat options = new Options_PlyFormat();
         string saveFileName;
@@ -7531,7 +8379,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_PlyFormat_PlusRGB : CS_Parent
+    
+
+
+
+	public class CS_PlyFormat_PlusRGB : CS_Parent
     {
         public Options_PlyFormat options = new Options_PlyFormat();
         string saveFileName;
@@ -7575,7 +8427,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_PointCloud_Basics : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Basics : CS_Parent
     {
         Options_PointCloud options = new Options_PointCloud();
         public int actualCount;
@@ -7701,7 +8557,11 @@ namespace CS_Classes
             labels[2] = "Point series found = " + (hList.Count() + vList.Count()).ToString();
         }
     }
-    public class CS_PointCloud_Point3f : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Point3f : CS_Parent
     {
         public CS_PointCloud_Point3f(VBtask task) : base(task)
         {
@@ -7712,7 +8572,11 @@ namespace CS_Classes
             dst2 = task.pointCloud;
         }
     }
-    public class CS_PointCloud_Spin2 : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Spin2 : CS_Parent
     {
         PointCloud_Spin spin = new PointCloud_Spin();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -7732,7 +8596,11 @@ namespace CS_Classes
             dst3 = redCSpin.dst2;
         }
     }
-    public class CS_PointCloud_SetupSide : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_SetupSide : CS_Parent
     {
         int arcSize;
         public CS_PointCloud_SetupSide(VBtask task) : base(task)
@@ -7797,7 +8665,11 @@ namespace CS_Classes
             SetTrueText("vFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new cv.Point(4, dst2.Height * 3 / 4));
         }
     }
-    public class CS_PointCloud_SetupTop : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_SetupTop : CS_Parent
     {
         int arcSize;
         public CS_PointCloud_SetupTop(VBtask task) : base(task)
@@ -7853,7 +8725,11 @@ namespace CS_Classes
             DrawLine(dst2, task.topCameraPoint, fovRight, Scalar.White);
         }
     }
-    public class CS_PointCloud_Raw_CPP : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Raw_CPP : CS_Parent
     {
         byte[] depthBytes;
         public CS_PointCloud_Raw_CPP(VBtask task) : base(task)
@@ -7880,7 +8756,11 @@ namespace CS_Classes
             SimpleProjectionClose(cPtr);
         }
     }
-    public class CS_PointCloud_Raw : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Raw : CS_Parent
     {
         public CS_PointCloud_Raw(VBtask task) : base(task)
         {
@@ -7921,7 +8801,11 @@ namespace CS_Classes
             SimpleProjectionClose(cPtr);
         }
     }
-    public class CS_PointCloud_Solo : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Solo : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public CS_PointCloud_Solo(VBtask task) : base(task)
@@ -7938,7 +8822,11 @@ namespace CS_Classes
             dst3 = heat.dst1.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs();
         }
     }
-    public class CS_PointCloud_SoloRegions : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_SoloRegions : CS_Parent
     {
         public PointCloud_Solo solo = new PointCloud_Solo();
         Dilate_Basics dilate = new Dilate_Basics();
@@ -7957,7 +8845,11 @@ namespace CS_Classes
             dst3 = dilate.dst2;
         }
     }
-    public class CS_PointCloud_SurfaceH_CPP : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_SurfaceH_CPP : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Plot_Basics_CPP plot = new Plot_Basics_CPP();
@@ -7998,7 +8890,11 @@ namespace CS_Classes
             labels[2] = "Top row = " + topRow.ToString() + " peak row = " + peakRow.ToString() + " bottom row = " + botRow.ToString();
         }
     }
-    public class CS_PointCloud_SurfaceH : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_SurfaceH : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Plot_Histogram plot = new Plot_Histogram();
@@ -8047,7 +8943,11 @@ namespace CS_Classes
             dst3.Line(new cv.Point(0, offset), new cv.Point(dst3.Width, offset), Scalar.Yellow, task.lineWidth);
         }
     }
-    public class CS_PointCloud_NeighborV : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_NeighborV : CS_Parent
     {
         Options_Neighbors options = new Options_Neighbors();
         public CS_PointCloud_NeighborV(VBtask task) : base(task)
@@ -8069,7 +8969,11 @@ namespace CS_Classes
             labels[2] = "White: z is within " + (options.threshold * 1000).ToString(fmt0) + " mm's with Y pixel offset " + options.pixels.ToString();
         }
     }
-    public class CS_PointCloud_Visualize : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Visualize : CS_Parent
     {
         public CS_PointCloud_Visualize(VBtask task) : base(task)
         {
@@ -8082,7 +8986,11 @@ namespace CS_Classes
             Cv2.Merge(pcSplit, dst2);
         }
     }
-    public class CS_PointCloud_PCpointsMask : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_PCpointsMask : CS_Parent
     {
         public Mat pcPoints;
         public int actualCount;
@@ -8118,7 +9026,11 @@ namespace CS_Classes
             labels[2] = "PointCloud cv.Point Points found = " + actualCount.ToString();
         }
     }
-    public class CS_PointCloud_PCPoints : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_PCPoints : CS_Parent
     {
         public List<Point3f> pcPoints = new List<Point3f>();
         public CS_PointCloud_PCPoints(VBtask task) : base(task)
@@ -8155,7 +9067,11 @@ namespace CS_Classes
             labels[2] = "PointCloud cv.Point Points found = " + (pcPoints.Count() / 2).ToString();
         }
     }
-    public class CS_PointCloud_PCPointsPlane : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_PCPointsPlane : CS_Parent
     {
         PointCloud_Basics pcBasics = new PointCloud_Basics();
         public List<cv.Point3f> pcPoints = new List<cv.Point3f>();
@@ -8182,7 +9098,11 @@ namespace CS_Classes
             labels[2] = "Point series found = " + (pcPoints.Count() / 2).ToString();
         }
     }
-    public class CS_PointCloud_Inspector : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Inspector : CS_Parent
     {
         public CS_PointCloud_Inspector(VBtask task) : base(task)
         {
@@ -8216,7 +9136,11 @@ namespace CS_Classes
             labels[3] = "Move mouse in the image at left to see the point cloud X, Y, and Z values.";
         }
     }
-    public class CS_PointCloud_Average : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Average : CS_Parent
     {
         List<Mat> pcHistory = new List<Mat>();
         public CS_PointCloud_Average(VBtask task) : base(task)
@@ -8236,7 +9160,11 @@ namespace CS_Classes
             dst3 *= 1.0 / pcHistory.Count();
         }
     }
-    public class CS_PointCloud_FrustrumTop : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_FrustrumTop : CS_Parent
     {
         Draw_Frustrum frustrum = new Draw_Frustrum();
         HeatMap_Basics heat = new HeatMap_Basics();
@@ -8256,7 +9184,11 @@ namespace CS_Classes
             dst2 = setupTop.dst2;
         }
     }
-    public class CS_PointCloud_FrustrumSide : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_FrustrumSide : CS_Parent
     {
         Draw_Frustrum frustrum = new Draw_Frustrum();
         HeatMap_Basics heat = new HeatMap_Basics();
@@ -8276,7 +9208,11 @@ namespace CS_Classes
             dst2 = setupSide.dst2;
         }
     }
-    public class CS_PointCloud_Histograms : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_Histograms : CS_Parent
     {
         Plot_Histogram2D plot2D = new Plot_Histogram2D();
         Plot_Histogram plot = new Plot_Histogram();
@@ -8352,7 +9288,11 @@ namespace CS_Classes
             dst3 = ShowPalette(dst2 * 255 / mm.maxVal);
         }
     }
-    public class CS_PointCloud_ReduceSplit2 : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_ReduceSplit2 : CS_Parent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         public CS_PointCloud_ReduceSplit2(VBtask task) : base(task)
@@ -8379,7 +9319,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_PointCloud_ReducedTopView : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_ReducedTopView : CS_Parent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public CS_PointCloud_ReducedTopView(VBtask task) : base(task)
@@ -8396,7 +9340,11 @@ namespace CS_Classes
             dst1.ConvertTo(dst2, MatType.CV_8UC1);
         }
     }
-    public class CS_PointCloud_ReducedSideView : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_ReducedSideView : CS_Parent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public CS_PointCloud_ReducedSideView(VBtask task) : base(task)
@@ -8412,7 +9360,11 @@ namespace CS_Classes
             dst1.ConvertTo(dst2, MatType.CV_8UC1);
         }
     }
-    public class CS_PointCloud_ReducedViews : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_ReducedViews : CS_Parent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public CS_PointCloud_ReducedViews(VBtask task) : base(task)
@@ -8432,7 +9384,11 @@ namespace CS_Classes
             dst1.ConvertTo(dst3, MatType.CV_8UC1);
         }
     }
-    public class CS_PointCloud_XRangeTest : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_XRangeTest : CS_Parent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public CS_PointCloud_XRangeTest(VBtask task) : base(task)
@@ -8449,7 +9405,11 @@ namespace CS_Classes
             dst1.ConvertTo(dst2, MatType.CV_8UC1);
         }
     }
-    public class CS_PointCloud_YRangeTest : CS_Parent
+    
+
+
+
+	public class CS_PointCloud_YRangeTest : CS_Parent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public CS_PointCloud_YRangeTest(VBtask task) : base(task)
@@ -8465,7 +9425,11 @@ namespace CS_Classes
             dst1.ConvertTo(dst2, MatType.CV_8UC1);
         }
     }
-    public class CS_Polylines_IEnumerableExample : CS_Parent
+    
+
+
+
+	public class CS_Polylines_IEnumerableExample : CS_Parent
     {
         Options_PolyLines options = new Options_PolyLines();
         public CS_Polylines_IEnumerableExample(VBtask task) : base(task)
@@ -8485,7 +9449,11 @@ namespace CS_Classes
     }
     // C# implementation of the browse example in OpenCV.
     // https://github.com/opencv/opencv/blob/master/samples/python/browse.py
-    public class CS_Polylines_Random : CS_Parent
+    
+
+
+
+	public class CS_Polylines_Random : CS_Parent
     {
         Pixel_Zoom zoom = new Pixel_Zoom();
         public CS_Polylines_Random(VBtask task) : base(task)
@@ -8518,7 +9486,11 @@ namespace CS_Classes
             dst3 = zoom.dst2;
         }
     }
-    public class CS_PongWars_Basics : CS_Parent
+    
+
+
+
+	public class CS_PongWars_Basics : CS_Parent
     {
         int sqWidth = 25;
         int sqHeight;
@@ -8643,7 +9615,11 @@ namespace CS_Classes
             DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors[NIGHT_BALL_COLOR]);
         }
     }
-    public class CS_PongWars_Two : CS_Parent
+    
+
+
+
+	public class CS_PongWars_Two : CS_Parent
     {
         PongWars_Basics pong1 = new PongWars_Basics();
         PongWars_Basics pong2 = new PongWars_Basics();
@@ -8661,7 +9637,11 @@ namespace CS_Classes
             labels[3] = pong2.labels[2];
         }
     }
-    public class CS_ProCon_Basics : CS_Parent
+    
+
+
+
+	public class CS_ProCon_Basics : CS_Parent
     {
         readonly object _lockObject = new object();
         public Thread p;
@@ -8749,7 +9729,11 @@ namespace CS_Classes
             terminateConsumer = true;
         }
     }
-    public class CS_ProCon_Variation : CS_Parent
+    
+
+
+
+	public class CS_ProCon_Variation : CS_Parent
     {
         readonly object _lockObject = new object();
         ProCon_Basics procon;
@@ -8781,7 +9765,11 @@ namespace CS_Classes
             procon.terminateProducer = true;
         }
     }
-    public class CS_Profile_Basics : CS_Parent
+    
+
+
+
+	public class CS_Profile_Basics : CS_Parent
     {
         public Point3f ptLeft, ptRight, ptTop, ptBot, ptFront, ptBack;
         public List<string> cornerNames = new List<string> { "   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
@@ -8887,7 +9875,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Profile_Rotation : CS_Parent
+    
+
+
+
+	public class CS_Profile_Rotation : CS_Parent
     {
         public IMU_GMatrix gMat = new IMU_GMatrix();
         public string strMsg = "Then use the 'Options_IMU' sliders to rotate the cell\n" +
@@ -8924,7 +9916,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Profile_Derivative : CS_Parent
+    
+
+
+
+	public class CS_Profile_Derivative : CS_Parent
     {
         public Profile_Basics sides = new Profile_Basics();
         List<trueText> saveTrueText = new List<trueText>();
@@ -8989,7 +9985,11 @@ namespace CS_Classes
             if (saveTrueText != null) trueData = new List<trueText>(saveTrueText);
         }
     }
-    public class CS_Profile_ConcentrationSide : CS_Parent
+    
+
+
+
+	public class CS_Profile_ConcentrationSide : CS_Parent
     {
         Profile_ConcentrationTop profile = new Profile_ConcentrationTop();
         public CS_Profile_ConcentrationSide(VBtask task) : base(task)
@@ -9007,7 +10007,11 @@ namespace CS_Classes
             labels[3] = profile.labels[3];
         }
     }
-    public class CS_Profile_ConcentrationTop : CS_Parent
+    
+
+
+
+	public class CS_Profile_ConcentrationTop : CS_Parent
     {
         Plot_OverTimeSingle plot = new Plot_OverTimeSingle();
         Profile_Rotation rotate = new Profile_Rotation();
@@ -9067,7 +10071,11 @@ namespace CS_Classes
             labels[3] = "Peak cell concentration in the histogram = " + ((int)maxAverage).ToString() + " at " + peakRotation.ToString() + " degrees";
         }
     }
-    public class CS_Profile_OpenGL : CS_Parent
+    
+
+
+
+	public class CS_Profile_OpenGL : CS_Parent
     {
         Profile_Basics sides = new Profile_Basics();
         public Profile_Rotation rotate = new Profile_Rotation();
@@ -9100,7 +10108,11 @@ namespace CS_Classes
             SetTrueText("Select a RedCloud Cell to display the contour in OpenGL." + "\n" + rotate.strMsg, 3);
         }
     }
-    public class CS_Profile_Kalman : CS_Parent
+    
+
+
+
+	public class CS_Profile_Kalman : CS_Parent
     {
         Profile_Basics sides = new Profile_Basics();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -9139,7 +10151,11 @@ namespace CS_Classes
             SetTrueText("Select a cell in the upper right image", 2);
         }
     }
-    public class CS_Puzzle_Basics : CS_Parent
+    
+
+
+
+	public class CS_Puzzle_Basics : CS_Parent
     {
         public List<cv.Rect> scrambled = new List<cv.Rect>(); // this is every roi regardless of size.
         public List<cv.Rect> unscrambled = new List<cv.Rect>(); // this is every roi regardless of size.
@@ -9176,7 +10192,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Puzzle_Solver : CS_Parent
+    
+
+
+
+	public class CS_Puzzle_Solver : CS_Parent
     {
         public Puzzle_Basics puzzle = new Puzzle_Basics();
         List<cv.Rect> solution = new List<cv.Rect>();
@@ -9214,7 +10234,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Puzzle_SolverDynamic : CS_Parent
+    
+
+
+
+	public class CS_Puzzle_SolverDynamic : CS_Parent
     {
         Puzzle_Solver puzzle = new Puzzle_Solver();
         public CS_Puzzle_SolverDynamic(VBtask task) : base(task)
@@ -9232,7 +10256,11 @@ namespace CS_Classes
             dst3 = puzzle.dst3;
         }
     }
-    public class CS_Pyramid_Basics : CS_Parent
+    
+
+
+
+	public class CS_Pyramid_Basics : CS_Parent
     {
         Options_Pyramid options = new Options_Pyramid();
         public CS_Pyramid_Basics(VBtask task) : base(task)
@@ -9263,7 +10291,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Pyramid_Filter : CS_Parent
+    
+
+
+
+	public class CS_Pyramid_Filter : CS_Parent
     {
         Laplacian_PyramidFilter laplace = new Laplacian_PyramidFilter();
         public CS_Pyramid_Filter(VBtask task) : base(task)
@@ -9276,7 +10308,11 @@ namespace CS_Classes
             dst2 = laplace.dst2;
         }
     }
-    public class CS_PyrFilter_Basics : CS_Parent
+    
+
+
+
+	public class CS_PyrFilter_Basics : CS_Parent
     {
         Options_PyrFilter options = new Options_PyrFilter();
         public CS_PyrFilter_Basics(VBtask task) : base(task)
@@ -9289,7 +10325,11 @@ namespace CS_Classes
             Cv2.PyrMeanShiftFiltering(src, dst2, options.radius, options.color, options.maxPyramid);
         }
     }
-    public class CS_PyrFilter_RedCloud : CS_Parent
+    
+
+
+
+	public class CS_PyrFilter_RedCloud : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -9309,7 +10349,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2];
         }
     }
-    public class CS_Python_Basics : CS_Parent
+    
+
+
+
+	public class CS_Python_Basics : CS_Parent
     {
         public bool StartPython(string arguments)
         {
@@ -9362,7 +10406,11 @@ namespace CS_Classes
             SetTrueText("There is no output from " + traceName + ".  It contains the interface to python.");
         }
     }
-    public class CS_Python_Run : CS_Parent
+    
+
+
+
+	public class CS_Python_Run : CS_Parent
     {
         Python_Basics python = new Python_Basics();
         public Python_Stream pyStream;
@@ -9425,7 +10473,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Python_MemMap : CS_Parent
+    
+
+
+
+	public class CS_Python_MemMap : CS_Parent
     {
         Python_Basics python = new Python_Basics();
         MemoryMappedViewAccessor memMapWriter;
@@ -9465,7 +10517,11 @@ namespace CS_Classes
             memMapWriter.WriteArray(0, memMapValues, 0, memMapValues.Length);
         }
     }
-    public class CS_Python_Stream : CS_Parent
+    
+
+
+
+	public class CS_Python_Stream : CS_Parent
     {
         Python_Basics python = new Python_Basics();
         byte[] rgbBuffer = new byte[2];
@@ -9556,7 +10612,11 @@ namespace CS_Classes
             if (task.pythonPipeIn != null) task.pythonPipeIn.Close();
         } 
     }
-    public class CS_QRcode_Basics : CS_Parent
+    
+
+
+
+	public class CS_QRcode_Basics : CS_Parent
     {
         QRCodeDetector qrDecoder = new QRCodeDetector();
         Mat qrInput1 = new Mat();
@@ -9604,7 +10664,11 @@ namespace CS_Classes
             if (!string.IsNullOrEmpty(refersTo)) labels[2] = refersTo;
         }
     }
-    public class CS_Quadrant_Basics : CS_Parent
+    
+
+
+
+	public class CS_Quadrant_Basics : CS_Parent
     {
         cv.Point p1 = new cv.Point();
         cv.Point p2;
@@ -9634,7 +10698,11 @@ namespace CS_Classes
             dst2 = ShowPalette(dst1);
         }
     }
-    public class CS_Quaterion_Basics : CS_Parent
+    
+
+
+
+	public class CS_Quaterion_Basics : CS_Parent
     {
         Options_Quaternion options = new Options_Quaternion();
         public CS_Quaterion_Basics(VBtask task) : base(task)
@@ -9649,7 +10717,11 @@ namespace CS_Classes
                         "Multiply q1 * q2" + quatmul.ToString());
         }
     }
-    public class CS_Quaterion_IMUPrediction : CS_Parent
+    
+
+
+
+	public class CS_Quaterion_IMUPrediction : CS_Parent
     {
         IMU_PlotHostFrameTimes host = new IMU_PlotHostFrameTimes();
         public CS_Quaterion_IMUPrediction(VBtask task) : base(task)
@@ -9709,7 +10781,11 @@ namespace CS_Classes
                          string.Format("{0:F3}", diffq.Z) + "\t");
         }
     }
-    public class CS_Random_Basics : CS_Parent
+    
+
+
+
+	public class CS_Random_Basics : CS_Parent
     {
         public List<cv.Point2f> PointList = new List<cv.Point2f>();
         public cv.Rect range;
@@ -9746,7 +10822,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Random_Point2d : CS_Parent
+    
+
+
+
+	public class CS_Random_Point2d : CS_Parent
     {
         public List<cv.Point2d> PointList { get; } = new List<cv.Point2d>();
         public cv.Rect range;
@@ -9777,7 +10857,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Random_Enumerable : CS_Parent
+    
+
+
+
+	public class CS_Random_Enumerable : CS_Parent
     {
         public Options_Random options = new Options_Random();
         public Point2f[] points;
@@ -9798,7 +10882,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Random_Basics3D : CS_Parent
+    
+
+
+
+	public class CS_Random_Basics3D : CS_Parent
     {
         public Point3f[] Points3f;
         Options_Random options = new Options_Random();
@@ -9835,7 +10923,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Random_Basics4D : CS_Parent
+    
+
+
+
+	public class CS_Random_Basics4D : CS_Parent
     {
         public Vec4f[] vec4f;
         public List<Vec4f> PointList { get; } = new List<Vec4f>();
@@ -9873,7 +10965,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Random_Shuffle : CS_Parent
+    
+
+
+
+	public class CS_Random_Shuffle : CS_Parent
     {
         RNG myRNG = new RNG();
         public CS_Random_Shuffle(VBtask task) : base(task)
@@ -9887,7 +10983,11 @@ namespace CS_Classes
             labels[2] = "Random_shuffle - wave at camera";
         }
     }
-    public class CS_Random_LUTMask : CS_Parent
+    
+
+
+
+	public class CS_Random_LUTMask : CS_Parent
     {
         Random_Basics random = new Random_Basics();
         KMeans_Image km = new KMeans_Image();
@@ -9917,7 +11017,11 @@ namespace CS_Classes
             labels[2] = "Using kmeans colors with interpolation";
         }
     }
-    public class CS_Random_UniformDist : CS_Parent
+    
+
+
+
+	public class CS_Random_UniformDist : CS_Parent
     {
         double minVal = 0, maxVal = 255;
         public CS_Random_UniformDist(VBtask task) : base(task)
@@ -9930,7 +11034,11 @@ namespace CS_Classes
             Cv2.Randu(dst2, minVal, maxVal);
         }
     }
-    public class CS_Random_NormalDist : CS_Parent
+    
+
+
+
+	public class CS_Random_NormalDist : CS_Parent
     {
         Options_NormalDist options = new Options_NormalDist();
         public CS_Random_NormalDist(VBtask task) : base(task)
@@ -9944,7 +11052,11 @@ namespace CS_Classes
             Cv2.Randn(dst2, new Scalar(options.blueVal, options.greenVal, options.redVal), Scalar.All(options.stdev));
         }
     }
-    public class CS_Random_CheckUniformSmoothed : CS_Parent
+    
+
+
+
+	public class CS_Random_CheckUniformSmoothed : CS_Parent
     {
         Hist_Basics histogram = new Hist_Basics();
         Random_UniformDist rUniform = new Random_UniformDist();
@@ -9961,7 +11073,11 @@ namespace CS_Classes
             dst3 = histogram.dst2;
         }
     }
-    public class CS_Random_CheckUniformDist : CS_Parent
+    
+
+
+
+	public class CS_Random_CheckUniformDist : CS_Parent
     {
         Hist_Graph histogram = new Hist_Graph();
         Random_UniformDist rUniform = new Random_UniformDist();
@@ -9978,7 +11094,11 @@ namespace CS_Classes
             dst3 = histogram.dst2;
         }
     }
-    public class CS_Random_CheckNormalDist : CS_Parent
+    
+
+
+
+	public class CS_Random_CheckNormalDist : CS_Parent
     {
         Hist_Graph histogram = new Hist_Graph();
         Random_NormalDist normalDist = new Random_NormalDist();
@@ -9995,7 +11115,11 @@ namespace CS_Classes
             dst2 = histogram.dst2;
         }
     }
-    public class CS_Random_CheckNormalDistSmoothed : CS_Parent
+    
+
+
+
+	public class CS_Random_CheckNormalDistSmoothed : CS_Parent
     {
         Hist_Basics histogram = new Hist_Basics();
         Random_NormalDist normalDist = new Random_NormalDist();
@@ -10012,7 +11136,11 @@ namespace CS_Classes
             dst2 = histogram.dst2;
         }
     }
-    public class CS_Random_PatternGenerator_CPP : CS_Parent
+    
+
+
+
+	public class CS_Random_PatternGenerator_CPP : CS_Parent
     {
         public CS_Random_PatternGenerator_CPP(VBtask task) : base(task)
         {
@@ -10031,7 +11159,11 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = Random_PatternGenerator_Close(cPtr);
         }
     }
-    public class CS_Random_CustomDistribution : CS_Parent
+    
+
+
+
+	public class CS_Random_CustomDistribution : CS_Parent
     {
         public Mat inputCDF; // place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
         public Mat outputRandom = new Mat(10000, 1, MatType.CV_32S, 0); // allocate the desired number of random numbers - size can be just one to get the next random value
@@ -10073,7 +11205,11 @@ namespace CS_Classes
             dst2 = plot.dst2;
         }
     }
-    public class CS_Random_MonteCarlo : CS_Parent
+    
+
+
+
+	public class CS_Random_MonteCarlo : CS_Parent
     {
         public Plot_Histogram plot = new Plot_Histogram();
         Options_MonteCarlo options = new Options_MonteCarlo();
@@ -10109,7 +11245,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Random_CustomHistogram : CS_Parent
+    
+
+
+
+	public class CS_Random_CustomHistogram : CS_Parent
     {
         public Random_CustomDistribution random = new Random_CustomDistribution();
         public Hist_Simple hist = new Hist_Simple();
@@ -10138,7 +11278,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Random_StaticTV : CS_Parent
+    
+
+
+
+	public class CS_Random_StaticTV : CS_Parent
     {
         Options_StaticTV options = new Options_StaticTV();
         public CS_Random_StaticTV(VBtask task) : base(task)
@@ -10167,7 +11311,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Random_StaticTVFaster : CS_Parent
+    
+
+
+
+	public class CS_Random_StaticTVFaster : CS_Parent
     {
         Random_UniformDist random = new Random_UniformDist();
         Mat_4to1 mats = new Mat_4to1();
@@ -10202,7 +11350,11 @@ namespace CS_Classes
             dst3 = mats.dst2;
         }
     }
-    public class CS_Random_StaticTVFastSimple : CS_Parent
+    
+
+
+
+	public class CS_Random_StaticTVFastSimple : CS_Parent
     {
         Random_UniformDist random = new Random_UniformDist();
         Random_StaticTV options = new Random_StaticTV();
@@ -10231,7 +11383,11 @@ namespace CS_Classes
             labels[3] = "Mat of random values < " + valSlider.Value.ToString();
         }
     }
-    public class CS_Random_KalmanPoints : CS_Parent
+    
+
+
+
+	public class CS_Random_KalmanPoints : CS_Parent
     {
         Random_Basics random = new Random_Basics();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -10283,7 +11439,11 @@ namespace CS_Classes
             if (noChanges) refreshPoints = true;
         }
     }
-    public class CS_Random_Clusters : CS_Parent
+    
+
+
+
+	public class CS_Random_Clusters : CS_Parent
     {
         public List<List<int>> clusterLabels = new List<List<int>>();
         public List<List<cv.Point2f>> clusters = new List<List<cv.Point2f>>();
@@ -10326,7 +11486,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Rectangle_Basics : CS_Parent
+    
+
+
+
+	public class CS_Rectangle_Basics : CS_Parent
     {
         public List<cv.Rect> rectangles = new List<cv.Rect>();
         public List<RotatedRect> rotatedRectangles = new List<RotatedRect>();
@@ -10367,7 +11531,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Rectangle_Rotated : CS_Parent
+    
+
+
+
+	public class CS_Rectangle_Rotated : CS_Parent
     {
         public Rectangle_Basics rectangle = new Rectangle_Basics();
         public CS_Rectangle_Rotated(VBtask task) : base(task)
@@ -10381,7 +11549,11 @@ namespace CS_Classes
             dst2 = rectangle.dst2;
         }
     }
-    public class CS_Rectangle_Overlap : CS_Parent
+    
+
+
+
+	public class CS_Rectangle_Overlap : CS_Parent
     {
         public cv.Rect rect1;
         public cv.Rect rect2;
@@ -10432,7 +11604,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Rectangle_Union : CS_Parent
+    
+
+
+
+	public class CS_Rectangle_Union : CS_Parent
     {
         Rectangle_Basics draw = new Rectangle_Basics();
         public List<cv.Rect> inputRects = new List<cv.Rect>();
@@ -10482,7 +11658,11 @@ namespace CS_Classes
             dst2.Rectangle(allRect, Scalar.Red, 2);
         }
     }
-    public class CS_Rectangle_MultiOverlap : CS_Parent
+    
+
+
+
+	public class CS_Rectangle_MultiOverlap : CS_Parent
     {
         public List<cv.Rect> inputRects = new List<cv.Rect>();
         public List<cv.Rect> outputRects = new List<cv.Rect>();
@@ -10542,7 +11722,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Rectangle_EnclosingPoints : CS_Parent
+    
+
+
+
+	public class CS_Rectangle_EnclosingPoints : CS_Parent
     {
         public List<cv.Point2f> pointList = new List<cv.Point2f>();
         public CS_Rectangle_EnclosingPoints(VBtask task) : base(task)
@@ -10564,7 +11748,11 @@ namespace CS_Classes
             DrawRotatedOutline(minRect, dst2, Scalar.Yellow);
         }
     }
-    public class CS_Rectangle_Intersection : CS_Parent
+    
+
+
+
+	public class CS_Rectangle_Intersection : CS_Parent
     {
         public List<cv.Rect> inputRects = new List<cv.Rect>();
         Rectangle_Basics draw = new Rectangle_Basics();
@@ -10640,7 +11828,11 @@ namespace CS_Classes
             dst3 = dst2 * 0.5 + dst3;
         }
     }
-    public class CS_RecursiveBilateralFilter_CPP : CS_Parent
+    
+
+
+
+	public class CS_RecursiveBilateralFilter_CPP : CS_Parent
     {
         byte[] dataSrc = new byte[1];
         Options_RBF options = new Options_RBF();
@@ -10667,7 +11859,11 @@ namespace CS_Classes
                 cPtr = RecursiveBilateralFilter_Close(cPtr);
         }
     }
-    public class CS_RedCloud_Basics : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Basics : CS_Parent
     {
         public Cell_Generate genCells = new Cell_Generate();
         RedCloud_CPP redCPP = new RedCloud_CPP();
@@ -10712,7 +11908,11 @@ namespace CS_Classes
             labels[3] = cellCount.ToString() + " RedCloud cells with more than " + smallCellThreshold + " pixels.  " + task.redCells.Count() + " cells present.";
         }
     }
-    public class CS_RedCloud_Reduction : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Reduction : CS_Parent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public CS_RedCloud_Reduction(VBtask task) : base(task)
@@ -10730,7 +11930,11 @@ namespace CS_Classes
             labels = redC.labels;
         }
     }
-    public class CS_RedCloud_Hulls : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Hulls : CS_Parent
     {
         Convex_RedCloudDefects convex = new Convex_RedCloudDefects();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -10771,7 +11975,11 @@ namespace CS_Classes
             labels[2] = task.redCells.Count() + " hulls identified below.  " + defectCount + " hulls failed to build the defect list.";
         }
     }
-    public class CS_RedCloud_FindCells : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_FindCells : CS_Parent
     {
         public List<int> cellList = new List<int>();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -10824,7 +12032,11 @@ namespace CS_Classes
             RedCloud_FindCells_Close(cPtr);
         }
     }
-    public class CS_RedCloud_Planes : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Planes : CS_Parent
     {
         public RedCloud_PlaneColor planes = new RedCloud_PlaneColor();
         public CS_RedCloud_Planes(VBtask task) : base(task)
@@ -10839,7 +12051,11 @@ namespace CS_Classes
             labels = planes.labels;
         }
     }
-    public class CS_RedCloud_Equations : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Equations : CS_Parent
     {
         Plane_Equation eq = new Plane_Equation();
         public List<rcData> redCells = new List<rcData>();
@@ -10887,7 +12103,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_RedCloud_CellsAtDepth : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_CellsAtDepth : CS_Parent
     {
         Plot_Histogram plot = new Plot_Histogram();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -10935,7 +12155,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_ShapeCorrelation : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_ShapeCorrelation : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_RedCloud_ShapeCorrelation(VBtask task) : base(task)
@@ -10962,7 +12186,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_RedCloud_FPS : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_FPS : CS_Parent
     {
         Grid_FPS fps = new Grid_FPS();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -10985,7 +12213,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2] + " " + fps.strOut;
         }
     }
-    public class CS_RedCloud_PlaneColor : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_PlaneColor : CS_Parent
     {
         public Options_Plane options = new Options_Plane();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -11030,7 +12262,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_PlaneFromContour : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_PlaneFromContour : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_RedCloud_PlaneFromContour(VBtask task) : base(task)
@@ -11062,7 +12298,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_PlaneFromMask : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_PlaneFromMask : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_RedCloud_PlaneFromMask(VBtask task) : base(task)
@@ -11098,7 +12338,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_BProject3D : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_BProject3D : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
@@ -11115,7 +12359,11 @@ namespace CS_Classes
             dst2 = redC.dst2;
         }
     }
-    public class CS_RedCloud_YZ : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_YZ : CS_Parent
     {
         Cell_Basics stats = new Cell_Basics();
         public CS_RedCloud_YZ(VBtask task) : base(task)
@@ -11133,7 +12381,11 @@ namespace CS_Classes
             SetTrueText(stats.strOut, 3);
         }
     }
-    public class CS_RedCloud_XZ : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_XZ : CS_Parent
     {
         Cell_Basics stats = new Cell_Basics();
         public CS_RedCloud_XZ(VBtask task) : base(task)
@@ -11151,7 +12403,11 @@ namespace CS_Classes
             SetTrueText(stats.strOut, 3);
         }
     }
-    public class CS_RedCloud_World : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_World : CS_Parent
     {
         RedCloud_Reduce redC = new RedCloud_Reduce();
         Depth_World world = new Depth_World();
@@ -11170,7 +12426,11 @@ namespace CS_Classes
             if (task.FirstPass) FindSlider("RedCloud_Reduce Reduction").Value = 1000;
         }
     }
-    public class CS_RedCloud_KMeans : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_KMeans : CS_Parent
     {
         KMeans_MultiChannel km = new KMeans_MultiChannel();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -11187,7 +12447,11 @@ namespace CS_Classes
             dst2 = redC.dst2;
         }
     }
-    public class CS_RedCloud_Diff : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Diff : CS_Parent
     {
         Diff_RGBAccum diff = new Diff_RGBAccum();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -11207,7 +12471,11 @@ namespace CS_Classes
             labels[3] = task.redCells.Count() + " objects identified in the diff output";
         }
     }
-    public class CS_RedCloud_ProjectCell : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_ProjectCell : CS_Parent
     {
         Hist_ShapeTop topView = new Hist_ShapeTop();
         Hist_ShapeSide sideView = new Hist_ShapeSide();
@@ -11227,7 +12495,11 @@ namespace CS_Classes
             // The commented code is omitted for clarity
         }
     }
-    public class CS_RedCloud_LikelyFlatSurfaces : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_LikelyFlatSurfaces : CS_Parent
     {
         Plane_Basics verts = new Plane_Basics();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -11269,7 +12541,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2];
         }
     }
-    public class CS_RedCloud_PlaneEq3D : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_PlaneEq3D : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Plane_Equation eq = new Plane_Equation();
@@ -11294,7 +12570,11 @@ namespace CS_Classes
             SetTrueText(eq.strOut, 3);
         }
     }
-    public class CS_RedCloud_DelaunayGuidedFeatures : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_DelaunayGuidedFeatures : CS_Parent
     {
         Feature_Delaunay features = new Feature_Delaunay();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -11325,7 +12605,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_UnstableCells : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_UnstableCells : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         List<cv.Point> prevList = new List<cv.Point>();
@@ -11358,7 +12642,11 @@ namespace CS_Classes
             prevList = new List<cv.Point>(currList);
         }
     }
-    public class CS_RedCloud_UnstableHulls : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_UnstableHulls : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         List<cv.Point> prevList = new List<cv.Point>();
@@ -11392,7 +12680,11 @@ namespace CS_Classes
             prevList = new List<cv.Point>(currList);
         }
     }
-    public class CS_RedCloud_CellChanges : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_CellChanges : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Mat dst2Last;
@@ -11421,7 +12713,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_FloodPoint : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_FloodPoint : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Cell_Basics stats = new Cell_Basics();
@@ -11445,7 +12741,11 @@ namespace CS_Classes
             SetTrueText(stats.strOut, 3);
         }
     }
-    public class CS_RedCloud_CellStatsPlot : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_CellStatsPlot : CS_Parent
     {
         Cell_BasicsPlot cells = new Cell_BasicsPlot();
         public CS_RedCloud_CellStatsPlot(VBtask task) : base(task)
@@ -11464,7 +12764,11 @@ namespace CS_Classes
             SetTrueText(cells.strOut, 3);
         }
     }
-    public class CS_RedCloud_MostlyColor : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_MostlyColor : CS_Parent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public CS_RedCloud_MostlyColor(VBtask task) : base(task)
@@ -11484,7 +12788,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_OutlineColor : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_OutlineColor : CS_Parent
     {
         Depth_Outline outline = new Depth_Outline();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -11506,7 +12814,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2];
         }
     }
-    public class CS_RedCloud_DepthOutline : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_DepthOutline : CS_Parent
     {
         Depth_Outline outline = new Depth_Outline();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -11528,7 +12840,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2];
         }
     }
-    public class CS_RedCloud_MeterByMeter : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_MeterByMeter : CS_Parent
     {
         BackProject_MeterByMeter meter = new BackProject_MeterByMeter();
         public CS_RedCloud_MeterByMeter(VBtask task) : base(task)
@@ -11545,7 +12861,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_FourColor : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_FourColor : CS_Parent
     {
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -11565,7 +12885,11 @@ namespace CS_Classes
             labels[2] = redC.labels[3];
         }
     }
-    public class CS_RedCloud_CCompColor : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_CCompColor : CS_Parent
     {
         CComp_Both ccomp = new CComp_Both();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -11585,7 +12909,11 @@ namespace CS_Classes
             labels[2] = redC.labels[3];
         }
     }
-    public class CS_RedCloud_Cells : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Cells : CS_Parent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public Mat cellmap = new Mat();
@@ -11604,7 +12932,11 @@ namespace CS_Classes
             redCells = task.redCells;
         }
     }
-    public class CS_RedCloud_Flippers : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Flippers : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Mat lastMap;
@@ -11641,7 +12973,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_Overlaps : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Overlaps : CS_Parent
     {
         public List<rcData> redCells = new List<rcData>();
         public Mat cellMap;
@@ -11675,7 +13011,11 @@ namespace CS_Classes
             labels[3] = "Before removing overlapping cells: " + task.redCells.Count().ToString() + ". After: " + redCells.Count().ToString();
         }
     }
-    public class CS_RedCloud_OnlyColorHist3D : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_OnlyColorHist3D : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
@@ -11694,7 +13034,11 @@ namespace CS_Classes
             labels[3] = redC.labels[2];
         }
     }
-    public class CS_RedCloud_OnlyColorAlt : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_OnlyColorAlt : CS_Parent
     {
         public RedCloud_Basics redMasks = new RedCloud_Basics();
         public CS_RedCloud_OnlyColorAlt(VBtask task) : base(task)
@@ -11744,7 +13088,11 @@ namespace CS_Classes
             if (task.redCells.Count() > 0) dst2 = ShowPalette(lastMap * 255 / task.redCells.Count());
         }
     }
-    public class CS_RedCloud_Gaps : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Gaps : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         History_Basics frames = new History_Basics();
@@ -11773,7 +13121,11 @@ namespace CS_Classes
             labels[3] = "Unclassified pixel count = " + count.ToString() + " or " + (count / src.Total()).ToString("0%");
         }
     }
-    public class CS_RedCloud_SizeOrder : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_SizeOrder : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_RedCloud_SizeOrder(VBtask task) : base(task)
@@ -11798,7 +13150,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_StructuredH : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_StructuredH : CS_Parent
     {
         RedCloud_MotionBGsubtract motion = new RedCloud_MotionBGsubtract();
         Structured_TransformH transform = new Structured_TransformH();
@@ -11834,7 +13190,11 @@ namespace CS_Classes
             dst0.SetTo(Scalar.White, sliceMask);
         }
     }
-    public class CS_RedCloud_StructuredV : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_StructuredV : CS_Parent
     {
         RedCloud_MotionBGsubtract motion = new RedCloud_MotionBGsubtract();
         Structured_TransformV transform = new Structured_TransformV();
@@ -11871,7 +13231,11 @@ namespace CS_Classes
             dst0.SetTo(Scalar.White, sliceMask);
         }
     }
-    public class CS_RedCloud_MotionBasics : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_MotionBasics : CS_Parent
     {
         public RedCloud_Basics redMasks = new RedCloud_Basics();
         public List<rcData> redCells = new List<rcData>();
@@ -11931,7 +13295,11 @@ namespace CS_Classes
             if (redCells.Count() > 0) dst1 = ShowPalette(lastMap * 255 / redCells.Count());
         }
     }
-    public class CS_RedCloud_ContourVsFeatureLess : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_ContourVsFeatureLess : CS_Parent
     {
         RedCloud_Basics redMasks = new RedCloud_Basics();
         Contour_WholeImage contour = new Contour_WholeImage();
@@ -11955,7 +13323,11 @@ namespace CS_Classes
             dst2 = redMasks.dst3;
         }
     }
-    public class CS_RedCloud_UnmatchedCount : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_UnmatchedCount : CS_Parent
     {
         public List<rcData> redCells = new List<rcData>();
         int myFrameCount;
@@ -12018,7 +13390,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_ContourUpdate : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_ContourUpdate : CS_Parent
     {
         public List<rcData> redCells = new List<rcData>();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -12046,7 +13422,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_MaxDist : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_MaxDist : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         RedCloud_ContourUpdate addTour = new RedCloud_ContourUpdate();
@@ -12074,7 +13454,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_Tiers : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Tiers : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Depth_TiersZ tiers = new Depth_TiersZ();
@@ -12096,7 +13480,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2];
         }
     }
-    public class CS_RedCloud_TiersBinarize : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_TiersBinarize : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Depth_TiersZ tiers = new Depth_TiersZ();
@@ -12116,7 +13504,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2];
         }
     }
-    public class CS_RedCloud_Combine : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Combine : CS_Parent
     {
         public Color8U_Basics colorClass = new Color8U_Basics();
         public GuidedBP_Depth guided = new GuidedBP_Depth();
@@ -12178,7 +13570,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_RedCloud_TopX : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_TopX : CS_Parent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public Options_TopX options = new Options_TopX();
@@ -12199,7 +13595,11 @@ namespace CS_Classes
             labels[2] = $"The top {options.topX} RedCloud cells by size.";
         }
     }
-    public class CS_RedCloud_TopXNeighbors : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_TopXNeighbors : CS_Parent
     {
         Options_TopX options = new Options_TopX();
         Neighbors_Precise nab = new Neighbors_Precise();
@@ -12216,7 +13616,11 @@ namespace CS_Classes
             // The commented code has been omitted for brevity
         }
     }
-    public class CS_RedCloud_TopXHulls : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_TopXHulls : CS_Parent
     {
         RedCloud_TopX topX = new RedCloud_TopX();
         public CS_RedCloud_TopXHulls(VBtask task) : base(task)
@@ -12246,7 +13650,11 @@ namespace CS_Classes
             task.setSelectedContour();
         }
     }
-    public class CS_RedCloud_Hue : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Hue : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Color8U_Hue hue = new Color8U_Hue();
@@ -12264,7 +13672,11 @@ namespace CS_Classes
             dst2 = redC.dst2;
         }
     }
-    public class CS_RedCloud_GenCellContains : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_GenCellContains : CS_Parent
     {
         Flood_Basics flood = new Flood_Basics();
         Flood_ContainedCells contains = new Flood_ContainedCells();
@@ -12295,7 +13707,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_PlusTiers : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_PlusTiers : CS_Parent
     {
         Depth_TiersZ tiers = new Depth_TiersZ();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
@@ -12314,7 +13730,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_RedCloud_Depth : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Depth : CS_Parent
     {
         Flood_Basics flood = new Flood_Basics();
         public CS_RedCloud_Depth(VBtask task) : base(task)
@@ -12329,7 +13749,11 @@ namespace CS_Classes
             labels[2] = flood.labels[2];
         }
     }
-    public class CS_RedCloud_Consistent1 : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Consistent1 : CS_Parent
     {
         Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
         Diff_Basics diff = new Diff_Basics();
@@ -12393,7 +13817,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_Consistent2 : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Consistent2 : CS_Parent
     {
         Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
         Diff_Basics diff = new Diff_Basics();
@@ -12457,7 +13885,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_Consistent : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Consistent : CS_Parent
     {
         Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
         List<Mat> cellmaps = new List<Mat>();
@@ -12516,7 +13948,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_NaturalColor : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_NaturalColor : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_RedCloud_NaturalColor(VBtask task) : base(task)
@@ -12531,7 +13967,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_RedCloud_MotionBGsubtract : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_MotionBGsubtract : CS_Parent
     {
         public BGSubtract_Basics bgSub = new BGSubtract_Basics();
         public List<rcData> redCells = new List<rcData>();
@@ -12564,7 +14004,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_JoinCells : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_JoinCells : CS_Parent
     {
         FeatureLess_RedCloud fLess = new FeatureLess_RedCloud();
         public CS_RedCloud_JoinCells(VBtask task) : base(task)
@@ -12586,7 +14030,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedCloud_LeftRight : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_LeftRight : CS_Parent
     {
         Flood_LeftRight redC = new Flood_LeftRight();
         public CS_RedCloud_LeftRight(VBtask task) : base(task)
@@ -12603,7 +14051,11 @@ namespace CS_Classes
             labels = redC.labels;
         }
     }
-    public class CS_RedCloud_ColorAndDepth : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_ColorAndDepth : CS_Parent
     {
         Flood_Basics flood = new Flood_Basics();
         Flood_Basics floodPC = new Flood_Basics();
@@ -12655,7 +14107,11 @@ namespace CS_Classes
             dst3[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
         }
     }
-    public class CS_RedCloud_Delaunay : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Delaunay : CS_Parent
     {
         RedCloud_CPP redCPP = new RedCloud_CPP();
         Feature_Delaunay delaunay = new Feature_Delaunay();
@@ -12680,7 +14136,11 @@ namespace CS_Classes
             labels[2] = redCPP.labels[2];
         }
     }
-    public class CS_RedCloud_CPP : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_CPP : CS_Parent
     {
         public Mat inputMask;
         public int classCount;
@@ -12739,7 +14199,11 @@ namespace CS_Classes
             if (cPtr != (IntPtr)0) cPtr = RedCloud_Close(cPtr);
         }
     }
-    public class CS_RedCloud_MaxDist_CPP : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_MaxDist_CPP : CS_Parent
     {
         public int classCount;
         public List<cv.Rect> RectList = new List<cv.Rect>();
@@ -12795,7 +14259,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_RedCloud_Reduce : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Reduce : CS_Parent
     {
         public int classCount;
         Options_RedCloudOther options = new Options_RedCloudOther();
@@ -12839,7 +14307,11 @@ namespace CS_Classes
             labels[2] = "Reduced Pointcloud - reduction factor = " + options.reduceAmt.ToString() + " produced " + classCount.ToString() + " regions";
         }
     }
-    public class CS_RedCloud_NaturalGray : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_NaturalGray : CS_Parent
     {
         RedCloud_Consistent redC = new RedCloud_Consistent();
         Options_RedCloudOther options = new Options_RedCloudOther();
@@ -12862,7 +14334,11 @@ namespace CS_Classes
             dst3.SetTo(Scalar.White, dst0);
         }
     }
-    public class CS_RedCloud_FeatureLessReduce : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_FeatureLessReduce : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         FeatureROI_Basics devGrid = new FeatureROI_Basics();
@@ -12906,7 +14382,11 @@ namespace CS_Classes
             task.setSelectedContour();
         }
     }
-    public class CS_RedCloud_Features : CS_Parent
+    
+
+
+
+	public class CS_RedCloud_Features : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Options_RedCloudFeatures options = new Options_RedCloudFeatures();
@@ -12968,7 +14448,11 @@ namespace CS_Classes
             labels[2] = "Highlighted feature = " + options.labelName;
         }
     }
-    public class CS_RedTrack_Basics : CS_Parent
+    
+
+
+
+	public class CS_RedTrack_Basics : CS_Parent
     {
         Cell_Basics stats = new Cell_Basics();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -12993,7 +14477,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_RedTrack_Lines : CS_Parent
+    
+
+
+
+	public class CS_RedTrack_Lines : CS_Parent
     {
         Line_Basics lines = new Line_Basics();
         RedTrack_Basics track = new RedTrack_Basics();
@@ -13019,7 +14507,11 @@ namespace CS_Classes
             dst2 = track.dst2;
         }
     }
-    public class CS_RedTrack_LineSingle : CS_Parent
+    
+
+
+
+	public class CS_RedTrack_LineSingle : CS_Parent
     {
         RedTrack_Basics track = new RedTrack_Basics();
         int leftMost, rightmost;
@@ -13084,7 +14576,11 @@ namespace CS_Classes
             labels[2] = track.redC.labels[2];
         }
     }
-    public class CS_RedTrack_FeaturesKNN : CS_Parent
+    
+
+
+
+	public class CS_RedTrack_FeaturesKNN : CS_Parent
     {
         public KNN_Core knn = new KNN_Core();
         public Feature_Basics feat = new Feature_Basics();
@@ -13112,7 +14608,11 @@ namespace CS_Classes
             knn.trainInput = new List<cv.Point2f>(knn.queries);
         }
     }
-    public class CS_RedTrack_GoodCell : CS_Parent
+    
+
+
+
+	public class CS_RedTrack_GoodCell : CS_Parent
     {
         RedTrack_GoodCellInput good = new RedTrack_GoodCellInput();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -13133,7 +14633,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_RedTrack_GoodCells : CS_Parent
+    
+
+
+
+	public class CS_RedTrack_GoodCells : CS_Parent
     {
         RedTrack_GoodCellInput good = new RedTrack_GoodCellInput();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -13167,7 +14671,11 @@ namespace CS_Classes
             labels[3] = "There were " + trackCells.Count() + " cells that could be tracked.";
         }
     }
-    public class CS_RedTrack_GoodCellInput : CS_Parent
+    
+
+
+
+	public class CS_RedTrack_GoodCellInput : CS_Parent
     {
         public KNN_Core knn = new KNN_Core();
         public Feature_Basics feat = new Feature_Basics();
@@ -13196,7 +14704,11 @@ namespace CS_Classes
             knn.trainInput = new List<cv.Point2f>(knn.queries);
         }
     }
-    public class CS_RedTrack_Points : CS_Parent
+    
+
+
+
+	public class CS_RedTrack_Points : CS_Parent
     {
         Line_Basics lines = new Line_Basics();
         RedTrack_Basics track = new RedTrack_Basics();
@@ -13224,7 +14736,11 @@ namespace CS_Classes
             dst2 = track.dst2;
         }
     }
-    public class CS_RedTrack_Features : CS_Parent
+    
+
+
+
+	public class CS_RedTrack_Features : CS_Parent
     {
         Options_Flood options = new Options_Flood();
         Feature_Basics feat = new Feature_Basics();
@@ -13256,7 +14772,11 @@ namespace CS_Classes
             SetTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3);
         }
     }
-    public class CS_Reduction_Basics : CS_Parent
+    
+
+
+
+	public class CS_Reduction_Basics : CS_Parent
     {
         public int classCount;
         public CS_Reduction_Basics(VBtask task) : base(task)
@@ -13293,7 +14813,11 @@ namespace CS_Classes
             labels[2] = classCount.ToString() + " colors after reduction";
         }
     }
-    public class CS_Reduction_Floodfill : CS_Parent
+    
+
+
+
+	public class CS_Reduction_Floodfill : CS_Parent
     {
         public Reduction_Basics reduction = new Reduction_Basics();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -13314,7 +14838,11 @@ namespace CS_Classes
             labels[3] = redC.labels[3];
         }
     }
-    public class CS_Reduction_HeatMapLines : CS_Parent
+    
+
+
+
+	public class CS_Reduction_HeatMapLines : CS_Parent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
         public Line_Basics lines = new Line_Basics();
@@ -13341,7 +14869,11 @@ namespace CS_Classes
             dst3.SetTo(Scalar.White, lines.dst3);
         }
     }
-    public class CS_Reduction_PointCloud : CS_Parent
+    
+
+
+
+	public class CS_Reduction_PointCloud : CS_Parent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         public CS_Reduction_PointCloud(VBtask task) : base(task)
@@ -13362,7 +14894,11 @@ namespace CS_Classes
             dst3 = ShowPalette(dst2 * 255 / reduction.classCount);
         }
     }
-    public class CS_Reduction_XYZ : CS_Parent
+    
+
+
+
+	public class CS_Reduction_XYZ : CS_Parent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Options_Reduction options = new Options_Reduction(); 
@@ -13394,7 +14930,11 @@ namespace CS_Classes
             SetTrueText("Task.PointCloud (or 32fc3 input) has been reduced and is in dst3");
         }
     }
-    public class CS_Reduction_Edges : CS_Parent
+    
+
+
+
+	public class CS_Reduction_Edges : CS_Parent
     {
         Edge_Laplacian edges = new Edge_Laplacian();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -13415,7 +14955,11 @@ namespace CS_Classes
             dst3 = edges.dst2;
         }
     }
-    public class CS_Reduction_Histogram : CS_Parent
+    
+
+
+
+	public class CS_Reduction_Histogram : CS_Parent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Plot_Histogram plot = new Plot_Histogram();
@@ -13435,7 +14979,11 @@ namespace CS_Classes
             labels[2] = "ClassCount = " + reduction.classCount.ToString();
         }
     }
-    public class CS_Reduction_BGR : CS_Parent
+    
+
+
+
+	public class CS_Reduction_BGR : CS_Parent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Mat_4Click mats = new Mat_4Click();
@@ -13461,7 +15009,11 @@ namespace CS_Classes
             Cv2.Merge(split, dst2);
         }
     }
-    public class CS_Remap_Basics : CS_Parent
+    
+
+
+
+	public class CS_Remap_Basics : CS_Parent
     {
         public int direction = 3; // default to remap horizontally and vertically
         Mat mapx1, mapx2, mapx3;
@@ -13513,7 +15065,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Remap_Flip : CS_Parent
+    
+
+
+
+	public class CS_Remap_Flip : CS_Parent
     {
         public int direction = 0;
         public CS_Remap_Flip(VBtask task) : base(task)
@@ -13545,7 +15101,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Flip_Basics : CS_Parent
+    
+
+
+
+	public class CS_Flip_Basics : CS_Parent
     {
         Remap_Flip flip = new Remap_Flip();
         public CS_Flip_Basics(VBtask task) : base(task)
@@ -13559,7 +15119,11 @@ namespace CS_Classes
             labels = flip.labels;
         }
     }
-    public class CS_Resize_Basics : CS_Parent
+    
+
+
+
+	public class CS_Resize_Basics : CS_Parent
     {
         public cv.Size newSize;
         public Options_Resize options = new Options_Resize();
@@ -13581,7 +15145,11 @@ namespace CS_Classes
             dst2 = src.Resize(newSize, 0, 0, options.warpFlag);
         }
     }
-    public class CS_Resize_Smaller : CS_Parent
+    
+
+
+
+	public class CS_Resize_Smaller : CS_Parent
     {
         public Options_Resize options = new Options_Resize();
         public cv.Size newSize;
@@ -13597,7 +15165,11 @@ namespace CS_Classes
             labels[2] = "Image after resizing to: " + newSize.Width + "X" + newSize.Height;
         }
     }
-    public class CS_Resize_Preserve : CS_Parent
+    
+
+
+
+	public class CS_Resize_Preserve : CS_Parent
     {
         public Options_Resize options = new Options_Resize();
         public cv.Size newSize;
@@ -13619,7 +15191,11 @@ namespace CS_Classes
             labels[2] = "Image after resizing to: " + newSize.Width + "X" + newSize.Height;
         }
     }
-    public class CS_Resize_Proportional : CS_Parent
+    
+
+
+
+	public class CS_Resize_Proportional : CS_Parent
     {
         Options_Spectrum options = new Options_Spectrum();
         public CS_Resize_Proportional(VBtask task) : base(task)
@@ -13649,7 +15225,11 @@ namespace CS_Classes
             src.CopyTo(dst3[newRect]);
         }
     }
-    public class CS_Retina_Basics_CPP : CS_Parent
+    
+
+
+
+	public class CS_Retina_Basics_CPP : CS_Parent
     {
         ProcessStartInfo startInfo = new ProcessStartInfo();
         byte[] magnoData = new byte[1];
@@ -13720,7 +15300,11 @@ namespace CS_Classes
             if (cPtr != (IntPtr) 0) cPtr = Retina_Basics_Close(cPtr);
         }
     }
-    public class CS_Retina_Depth : CS_Parent
+    
+
+
+
+	public class CS_Retina_Depth : CS_Parent
     {
         Retina_Basics_CPP retina = new Retina_Basics_CPP();
         Mat lastMotion = new Mat();
@@ -13739,7 +15323,11 @@ namespace CS_Classes
             lastMotion = retina.dst3;
         }
     }
-    public class CS_ROI_Basics : CS_Parent
+    
+
+
+
+	public class CS_ROI_Basics : CS_Parent
     {
         public Diff_Basics diff = new Diff_Basics();
         public cv.Rect aoiRect;
@@ -13766,7 +15354,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_ROI_FindNonZeroNoSingle : CS_Parent
+    
+
+
+
+	public class CS_ROI_FindNonZeroNoSingle : CS_Parent
     {
         public Diff_Basics diff = new Diff_Basics();
         public cv.Rect aoiRect;
@@ -13810,7 +15402,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_ROI_AccumulateOld : CS_Parent
+    
+
+
+
+	public class CS_ROI_AccumulateOld : CS_Parent
     {
         public Diff_Basics diff = new Diff_Basics();
         public cv.Rect aoiRect;
@@ -13861,7 +15457,11 @@ namespace CS_Classes
             dst2.Rectangle(aoiRect, Scalar.White, task.lineWidth);
         }
     }
-    public class CS_ROI_Accumulate : CS_Parent
+    
+
+
+
+	public class CS_ROI_Accumulate : CS_Parent
     {
         public Diff_Basics diff = new Diff_Basics();
         cv.Rect roiRect;
@@ -13901,7 +15501,11 @@ namespace CS_Classes
             task.color.Rectangle(roiRect, task.HighlightColor, task.lineWidth);
         }
     }
-    public class CS_Rotate_Basics : CS_Parent
+    
+
+
+
+	public class CS_Rotate_Basics : CS_Parent
     {
         public Mat M;
         public Mat Mflip;
@@ -13928,7 +15532,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Rotate_BasicsQT : CS_Parent
+    
+
+
+
+	public class CS_Rotate_BasicsQT : CS_Parent
     {
         public float rotateAngle = 24;
         public Point2f rotateCenter;
@@ -13943,7 +15551,11 @@ namespace CS_Classes
             dst2 = src.WarpAffine(M, src.Size(), InterpolationFlags.Nearest);
         }
     }
-    public class CS_Rotate_Box : CS_Parent
+    
+
+
+
+	public class CS_Rotate_Box : CS_Parent
     {
         readonly Rotate_Basics rotation = new Rotate_Basics();
         public CS_Rotate_Box(VBtask task) : base(task)
@@ -13981,7 +15593,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Rotate_Poly : CS_Parent
+    
+
+
+
+	public class CS_Rotate_Poly : CS_Parent
     {
         Options_FPoly optionsFPoly = new Options_FPoly();
         public Options_RotatePoly options = new Options_RotatePoly();
@@ -14014,7 +15630,11 @@ namespace CS_Classes
             labels[3] = rotateQT.labels[3];
         }
     }
-    public class CS_Rotate_PolyQT : CS_Parent
+    
+
+
+
+	public class CS_Rotate_PolyQT : CS_Parent
     {
         public List<cv.Point2f> poly = new List<cv.Point2f>();
         public Point2f rotateCenter;
@@ -14062,7 +15682,11 @@ namespace CS_Classes
             DrawFPoly(ref dst3, poly, Scalar.Yellow);
         }
     }
-    public class CS_Rotate_Example : CS_Parent
+    
+
+
+
+	public class CS_Rotate_Example : CS_Parent
     {
         Rotate_Basics rotate = new Rotate_Basics();
         public CS_Rotate_Example(VBtask task) : base(task)
@@ -14079,7 +15703,11 @@ namespace CS_Classes
             dst3[r] = rotate.dst2[new cv.Rect(0, 0, src.Height, src.Height)];
         }
     }
-    public class CS_Rotate_Horizon : CS_Parent
+    
+
+
+
+	public class CS_Rotate_Horizon : CS_Parent
     {
         Rotate_Basics rotate = new Rotate_Basics();
         CameraMotion_WithRotation edges = new CameraMotion_WithRotation();
@@ -14122,7 +15750,11 @@ namespace CS_Classes
             strOut = edges.strOut;
         }
     }
-    public class CS_Salience_Basics_CPP : CS_Parent
+    
+
+
+
+	public class CS_Salience_Basics_CPP : CS_Parent
     {
         byte[] grayData = new byte[1];
         public Options_Salience options = new Options_Salience();
@@ -14147,7 +15779,11 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = Salience_Close(cPtr);
         }
     }
-    public class CS_Salience_Basics_MT : CS_Parent
+    
+
+
+
+	public class CS_Salience_Basics_MT : CS_Parent
     {
         Salience_Basics_CPP salience = new Salience_Basics_CPP();
         public CS_Salience_Basics_MT(VBtask task) : base(task)
@@ -14177,7 +15813,11 @@ namespace CS_Classes
             });
         }
     }
-    public class CS_Sides_Basics : CS_Parent
+    
+
+
+
+	public class CS_Sides_Basics : CS_Parent
     {
         public Profile_Basics sides = new Profile_Basics();
         public Contour_RedCloudCorners corners = new Contour_RedCloudCorners();
@@ -14205,7 +15845,11 @@ namespace CS_Classes
                 SetTrueText(strOut, 3);
         }
     }
-    public class CS_Sides_Profile : CS_Parent
+    
+
+
+
+	public class CS_Sides_Profile : CS_Parent
     {
         Contour_SidePoints sides = new Contour_SidePoints();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -14223,7 +15867,11 @@ namespace CS_Classes
             SetTrueText(sides.strOut, 3);
         }
     }
-    public class CS_Sides_Corner : CS_Parent
+    
+
+
+
+	public class CS_Sides_Corner : CS_Parent
     {
         Contour_RedCloudCorners sides = new Contour_RedCloudCorners();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -14241,7 +15889,11 @@ namespace CS_Classes
             SetTrueText("Center point is rcSelect.maxDist", 3);
         }
     }
-    public class CS_Sides_ColorC : CS_Parent
+    
+
+
+
+	public class CS_Sides_ColorC : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Sides_Basics sides = new Sides_Basics();
@@ -14258,7 +15910,11 @@ namespace CS_Classes
             dst3 = sides.dst3;
         }
     }
-    public class CS_Sieve_Image : CS_Parent
+    
+
+
+
+	public class CS_Sieve_Image : CS_Parent
     {
         Pixel_Zoom zoom = new Pixel_Zoom();
         byte[] numArray;
@@ -14302,7 +15958,11 @@ namespace CS_Classes
             dst3 = zoom.dst2;
         }
     }
-    public class CS_SLR_Data : CS_Parent
+    
+
+
+
+	public class CS_SLR_Data : CS_Parent
     {
         Plot_Basics_CPP plot = new Plot_Basics_CPP();
         public List<double> dataX = new List<double>();
@@ -14333,7 +15993,11 @@ namespace CS_Classes
             dst2 = plot.dst2;
         }
     }
-    public class CS_SLR_SurfaceH : CS_Parent
+    
+
+
+
+	public class CS_SLR_SurfaceH : CS_Parent
     {
         PointCloud_SurfaceH surface = new PointCloud_SurfaceH();
         public CS_SLR_SurfaceH(VBtask task) : base(task)
@@ -14346,7 +16010,11 @@ namespace CS_Classes
             dst2 = surface.dst3;
         }
     }
-    public class CS_SLR_Trends : CS_Parent
+    
+
+
+
+	public class CS_SLR_Trends : CS_Parent
     {
         public Hist_KalmanAuto hist = new Hist_KalmanAuto();
         List<float> valList = new List<float>();
@@ -14399,7 +16067,11 @@ namespace CS_Classes
             connectLine(valList.Count() - 1, dst2);
         }
     }
-    public class CS_SLR_TrendImages : CS_Parent
+    
+
+
+
+	public class CS_SLR_TrendImages : CS_Parent
     {
         SLR_Trends trends = new SLR_Trends();
         Options_SLRImages options = new Options_SLRImages();
@@ -14443,7 +16115,11 @@ namespace CS_Classes
             dst2 = trends.dst2;
         }
     }
-    public class CS_Smoothing_Exterior : CS_Parent
+    
+
+
+
+	public class CS_Smoothing_Exterior : CS_Parent
     {
         Convex_Basics hull = new Convex_Basics();
         public List<cv.Point> inputPoints { get; set; }
@@ -14516,7 +16192,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Smoothing_Interior : CS_Parent
+    
+
+
+
+	public class CS_Smoothing_Interior : CS_Parent
     {
         Convex_Basics hull = new Convex_Basics();
         public List<cv.Point> inputPoints { get; set; }
@@ -14593,7 +16273,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Solve_ByMat : CS_Parent
+    
+
+
+
+	public class CS_Solve_ByMat : CS_Parent
     {
         public CS_Solve_ByMat(VBtask task) : base(task)
         {
@@ -14613,7 +16297,11 @@ namespace CS_Classes
             SetTrueText("Solution ByMat: X1 = " + x.At<double>(0, 0) + "\tX2 = " + x.At<double>(0, 1), new cv.Point(10, 125));
         }
     }
-    public class CS_Solve_ByArray : CS_Parent
+    
+
+
+
+	public class CS_Solve_ByArray : CS_Parent
     {
         public CS_Solve_ByArray(VBtask task) : base(task)
         {
@@ -14631,7 +16319,11 @@ namespace CS_Classes
             SetTrueText("Solution ByArray: X1 = " + x.At<double>(0, 0) + "\tX2 = " + x.At<double>(0, 1), new cv.Point(10, 125));
         }
     }
-    public class CS_Sort_Basics : CS_Parent
+    
+
+
+
+	public class CS_Sort_Basics : CS_Parent
     {
         Options_Sort options = new Options_Sort();
         public CS_Sort_Basics(VBtask task) : base(task)
@@ -14656,7 +16348,11 @@ namespace CS_Classes
             if (options.radio4.Checked || options.radio5.Checked) dst2 = dst2.Reshape(1, dst0.Rows);
         }
     }
-    public class CS_Sort_RectAndMask : CS_Parent
+    
+
+
+
+	public class CS_Sort_RectAndMask : CS_Parent
     {
         Sort_Basics sort = new Sort_Basics();
         public Mat mask;
@@ -14683,7 +16379,11 @@ namespace CS_Classes
             if (standaloneTest()) dst3 = src[tmpRect].Resize(dst3.Size());
         }
     }
-    public class CS_Sort_MLPrepTest_CPP : CS_Parent
+    
+
+
+
+	public class CS_Sort_MLPrepTest_CPP : CS_Parent
     {
         public Reduction_Basics reduction = new Reduction_Basics();
         public Mat MLTestData = new Mat();
@@ -14711,7 +16411,11 @@ namespace CS_Classes
             if (cPtr != (IntPtr)0) cPtr = Sort_MLPrepTest_Close(cPtr);
         }
     }
-    public class CS_Sort_1Channel : CS_Parent
+    
+
+
+
+	public class CS_Sort_1Channel : CS_Parent
     {
         Sort_Basics sort = new Sort_Basics();
         ML_RemoveDups_CPP dups = new ML_RemoveDups_CPP();
@@ -14766,7 +16470,11 @@ namespace CS_Classes
             labels[3] = " The number of unique entries = " + inputCount + " were spread across " + rangeStart.Count() + " ranges";
         }
     }
-    public class CS_Sort_3Channel : CS_Parent
+    
+
+
+
+	public class CS_Sort_3Channel : CS_Parent
     {
         Sort_Basics sort = new Sort_Basics();
         ML_RemoveDups_CPP dups = new ML_RemoveDups_CPP();
@@ -14796,7 +16504,11 @@ namespace CS_Classes
             //dst2 = dups.dst2;
         }
     }
-    public class CS_Sort_FeatureLess : CS_Parent
+    
+
+
+
+	public class CS_Sort_FeatureLess : CS_Parent
     {
         public FeatureROI_Basics devGrid = new FeatureROI_Basics();
         public Sort_Basics sort = new Sort_Basics();
@@ -14822,7 +16534,11 @@ namespace CS_Classes
             dst3 = plot.dst2;
         }
     }
-    public class CS_Sort_Integer : CS_Parent
+    
+
+
+
+	public class CS_Sort_Integer : CS_Parent
     {
         Sort_Basics sort = new Sort_Basics();
         public int[] data;
@@ -14856,7 +16572,11 @@ namespace CS_Classes
             labels[2] = "There were " + vecList.Count().ToString() + " unique 8UC3 pixels in the input.";
         }
     }
-    public class CS_Sort_GrayScale1 : CS_Parent
+    
+
+
+
+	public class CS_Sort_GrayScale1 : CS_Parent
     {
         Sort_Integer sort = new Sort_Integer();
         byte[][] pixels = new byte[3][];
@@ -14890,7 +16610,11 @@ namespace CS_Classes
             labels[2] = "There were " + unique.Count().ToString() + " distinct pixels in the image.";
         }
     }
-    public class CS_Sort_GrayScale : CS_Parent
+    
+
+
+
+	public class CS_Sort_GrayScale : CS_Parent
     {
         Plot_Histogram plot = new Plot_Histogram();
         byte[][] pixels = new byte[3][];
@@ -14919,7 +16643,11 @@ namespace CS_Classes
             dst2 = plot.dst2;
         }
     }
-    public class CS_Spectrum_Basics : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_Basics : CS_Parent
     {
         Spectrum_Z dSpec = new Spectrum_Z();
         Spectrum_Gray gSpec = new Spectrum_Gray();
@@ -14940,7 +16668,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Spectrum_X : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_X : CS_Parent
     {
         public Options_Spectrum options = new Options_Spectrum();
         public CS_Spectrum_X(VBtask task) : base(task)
@@ -14959,7 +16691,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Spectrum_Y : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_Y : CS_Parent
     {
         public Options_Spectrum options = new Options_Spectrum();
         public CS_Spectrum_Y(VBtask task) : base(task)
@@ -14978,7 +16714,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Spectrum_Z : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_Z : CS_Parent
     {
         public Options_Spectrum options = new Options_Spectrum();
         public CS_Spectrum_Z(VBtask task) : base(task)
@@ -14997,7 +16737,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Spectrum_Cloud : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_Cloud : CS_Parent
     {
         public Options_Spectrum options = new Options_Spectrum();
         Spectrum_X specX = new Spectrum_X();
@@ -15023,7 +16767,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Spectrum_GrayAndCloud : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_GrayAndCloud : CS_Parent
     {
         Options_Spectrum options = new Options_Spectrum();
         Spectrum_Gray gSpec = new Spectrum_Gray();
@@ -15046,7 +16794,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Spectrum_RGB : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_RGB : CS_Parent
     {
         Options_Spectrum options = new Options_Spectrum();
         Spectrum_Gray gSpec = new Spectrum_Gray();
@@ -15071,7 +16823,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Spectrum_CellZoom : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_CellZoom : CS_Parent
     {
         Resize_Proportional proportion = new Resize_Proportional();
         Spectrum_Breakdown breakdown = new Spectrum_Breakdown();
@@ -15096,7 +16852,11 @@ namespace CS_Classes
             SetTrueText(strOut, 1);
         }
     }
-    public class CS_Spectrum_Breakdown : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_Breakdown : CS_Parent
     {
         public Options_Spectrum options = new Options_Spectrum();
         public bool buildMaskOnly;
@@ -15166,7 +16926,11 @@ namespace CS_Classes
             task.rc = rc;
         }
     }
-    public class CS_Spectrum_RedCloud : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_RedCloud : CS_Parent
     {
         Spectrum_Breakdown breakdown = new Spectrum_Breakdown();
         public List<rcData> redCells = new List<rcData>();
@@ -15191,7 +16955,11 @@ namespace CS_Classes
             breakdown.Run(src);
         }
     }
-    public class CS_Spectrum_Mask : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_Mask : CS_Parent
     {
         Spectrum_Gray gSpec = new Spectrum_Gray();
         public CS_Spectrum_Mask(VBtask task) : base(task)
@@ -15208,7 +16976,11 @@ namespace CS_Classes
             if (task.heartBeat) strOut = gSpec.strOut;
         }
     }
-    public class CS_Spectrum_Gray : CS_Parent
+    
+
+
+
+	public class CS_Spectrum_Gray : CS_Parent
     {
         Options_Spectrum options = new Options_Spectrum();
         public string typeSpec = "GrayScale";
@@ -15227,7 +16999,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_Stabilizer_Basics : CS_Parent
+    
+
+
+
+	public class CS_Stabilizer_Basics : CS_Parent
     {
         Match_Basics match = new Match_Basics();
         public int shiftX;
@@ -15309,7 +17085,11 @@ namespace CS_Classes
     }
 
 
-    public class CS_Stabilizer_BasicsTest : CS_Parent
+    
+
+
+
+	public class CS_Stabilizer_BasicsTest : CS_Parent
     {
         Stabilizer_BasicsRandomInput random = new Stabilizer_BasicsRandomInput();
         Stabilizer_Basics stable = new Stabilizer_Basics();
@@ -15328,7 +17108,11 @@ namespace CS_Classes
             labels[3] = stable.labels[3];
         }
     }
-    public class CS_Stabilizer_OpticalFlow : CS_Parent
+    
+
+
+
+	public class CS_Stabilizer_OpticalFlow : CS_Parent
     {
         public Feature_Basics feat = new Feature_Basics();
         public List<cv.Point2f> inputFeat = new List<cv.Point2f>();
@@ -15426,7 +17210,11 @@ namespace CS_Classes
             inputFeat = null; // show that we consumed the current set of features.
         }
     }
-    public class CS_Stabilizer_VerticalIMU : CS_Parent
+    
+
+
+
+	public class CS_Stabilizer_VerticalIMU : CS_Parent
     {
         public bool stableTest;
         public string stableStr;
@@ -15472,7 +17260,11 @@ namespace CS_Classes
             if (angleYValue.Count() >= task.frameHistoryCount) angleYValue.RemoveAt(0);
         }
     }
-    public class CS_Stabilizer_CornerPoints : CS_Parent
+    
+
+
+
+	public class CS_Stabilizer_CornerPoints : CS_Parent
     {
         public Stable_Basics basics = new Stable_Basics();
         public List<cv.Point2f> features = new List<cv.Point2f>();
@@ -15516,7 +17308,11 @@ namespace CS_Classes
             labels[2] = "There were " + features.Count().ToString() + " key points detected";
         }
     }
-    public class CS_Stabilizer_BasicsRandomInput : CS_Parent
+    
+
+
+
+	public class CS_Stabilizer_BasicsRandomInput : CS_Parent
     {
         Options_StabilizerOther options = new Options_StabilizerOther();
         int lastShiftX;
@@ -15560,7 +17356,11 @@ namespace CS_Classes
             dst3 = input;
         }
     }
-    public class CS_Stable_Basics : CS_Parent
+    
+
+
+
+	public class CS_Stable_Basics : CS_Parent
     {
         public Delaunay_Generations facetGen = new Delaunay_Generations();
         public List<cv.Point2f> ptList = new List<cv.Point2f>();
@@ -15610,7 +17410,11 @@ namespace CS_Classes
             labels[2] = $"{ptList.Count()} stable points were identified with {maxGens} generations at the anchor point";
         }
     }
-    public class CS_Stable_BasicsCount : CS_Parent
+    
+
+
+
+	public class CS_Stable_BasicsCount : CS_Parent
     {
         public Stable_Basics basics = new Stable_Basics();
         public Feature_Basics feat = new Feature_Basics();
@@ -15639,7 +17443,11 @@ namespace CS_Classes
             labels[2] = $"{task.features.Count()} good features were found and {basics.ptList.Count()} were stable";
         }
     }
-    public class CS_Stable_Lines : CS_Parent
+    
+
+
+
+	public class CS_Stable_Lines : CS_Parent
     {
         public Stable_Basics basics = new Stable_Basics();
         Line_Basics lines = new Line_Basics();
@@ -15675,7 +17483,11 @@ namespace CS_Classes
             labels[3] = $"{lines.lpList.Count()} line end points were found and {basics.ptList.Count()} were stable";
         }
     }
-    public class CS_Stable_FAST : CS_Parent
+    
+
+
+
+	public class CS_Stable_FAST : CS_Parent
     {
         public Stable_Basics basics = new Stable_Basics();
         readonly Corners_Basics fast = new Corners_Basics();
@@ -15705,7 +17517,11 @@ namespace CS_Classes
             labels[3] = $"{fast.features.Count()} features were found and {basics.ptList.Count()} were stable";
         }
     }
-    public class CS_Stable_GoodFeatures : CS_Parent
+    
+
+
+
+	public class CS_Stable_GoodFeatures : CS_Parent
     {
         public Stable_Basics basics = new Stable_Basics();
         public Feature_Basics feat = new Feature_Basics();
@@ -15739,7 +17555,11 @@ namespace CS_Classes
             labels[3] = $"{task.features.Count()} good features were found and {basics.ptList.Count()} were stable";
         }
     }
-    public class CS_Stitch_Basics : CS_Parent
+    
+
+
+
+	public class CS_Stitch_Basics : CS_Parent
     {
         Options_Stitch options = new Options_Stitch();
         public CS_Stitch_Basics(VBtask task) : base(task)
@@ -15785,7 +17605,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_LinearizeFloor : CS_Parent
+    
+
+
+
+	public class CS_Structured_LinearizeFloor : CS_Parent
     {
         public Structured_FloorCeiling floor = new Structured_FloorCeiling();
         Kalman_VB_Basics kalman = new Kalman_VB_Basics();
@@ -15870,7 +17694,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_MultiSlice : CS_Parent
+    
+
+
+
+	public class CS_Structured_MultiSlice : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask;
@@ -15917,7 +17745,11 @@ namespace CS_Classes
             dst2.SetTo(Scalar.White, dst3);
         }
     }
-    public class CS_Structured_MultiSliceLines : CS_Parent
+    
+
+
+
+	public class CS_Structured_MultiSliceLines : CS_Parent
     {
         Structured_MultiSlice multi = new Structured_MultiSlice();
         public Line_Basics lines = new Line_Basics();
@@ -15933,7 +17765,11 @@ namespace CS_Classes
             dst2 = lines.dst2;
         }
     }
-    public class CS_Structured_Depth : CS_Parent
+    
+
+
+
+	public class CS_Structured_Depth : CS_Parent
     {
         Structured_SliceH sliceH = new Structured_SliceH();
         public CS_Structured_Depth(VBtask task) : base(task)
@@ -15966,7 +17802,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_Rebuild : CS_Parent
+    
+
+
+
+	public class CS_Structured_Rebuild : CS_Parent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
         Options_Structured options = new Options_Structured();
@@ -16046,7 +17886,11 @@ namespace CS_Classes
             dst3.SetTo(0, task.noDepthMask);
         }
     }
-    public class CS_Structured_Cloud2 : CS_Parent
+    
+
+
+
+	public class CS_Structured_Cloud2 : CS_Parent
     {
         Pixel_Measure mmPixel = new Pixel_Measure();
         Options_StructuredCloud options = new Options_StructuredCloud();
@@ -16098,7 +17942,11 @@ namespace CS_Classes
             dst2 = dst3[new cv.Rect(0, 0, options.xLines, options.yLines)].Resize(dst2.Size(), 0, 0, InterpolationFlags.Nearest);
         }
     }
-    public class CS_Structured_Cloud : CS_Parent
+    
+
+
+
+	public class CS_Structured_Cloud : CS_Parent
     {
         public Options_StructuredCloud options = new Options_StructuredCloud();
         public CS_Structured_Cloud(VBtask task) : base(task)
@@ -16128,7 +17976,11 @@ namespace CS_Classes
             labels[2] = "CS_Structured_Cloud with " + yLines.ToString() + " rows " + options.xLines.ToString() + " columns";
         }
     }
-    public class CS_Structured_ROI : CS_Parent
+    
+
+
+
+	public class CS_Structured_ROI : CS_Parent
     {
         public Mat data = new Mat();
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
@@ -16151,7 +18003,11 @@ namespace CS_Classes
             labels[2] = traceName + " with " + task.gridList.Count().ToString() + " regions was created";
         }
     }
-    public class CS_Structured_Tiles : CS_Parent
+    
+
+
+
+	public class CS_Structured_Tiles : CS_Parent
     {
         public List<Vec3f> oglData = new List<Vec3f>();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -16178,7 +18034,11 @@ namespace CS_Classes
             labels[2] = traceName + " with " + task.gridList.Count().ToString() + " regions was created";
         }
     }
-    public class CS_Structured_CountTop : CS_Parent
+    
+
+
+
+	public class CS_Structured_CountTop : CS_Parent
     {
         Structured_SliceV slice = new Structured_SliceV();
         Plot_Histogram plot = new Plot_Histogram();
@@ -16222,7 +18082,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Structured_FeatureLines : CS_Parent
+    
+
+
+
+	public class CS_Structured_FeatureLines : CS_Parent
     {
         Structured_MultiSlice mStruct = new Structured_MultiSlice();
         FeatureLine_Finder lines = new FeatureLine_Finder();
@@ -16244,7 +18108,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_FloorCeiling : CS_Parent
+    
+
+
+
+	public class CS_Structured_FloorCeiling : CS_Parent
     {
         public Structured_SliceEither slice = new Structured_SliceEither();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -16308,7 +18176,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_MultiSliceH : CS_Parent
+    
+
+
+
+	public class CS_Structured_MultiSliceH : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask;
@@ -16342,7 +18214,11 @@ namespace CS_Classes
             labels[3] = heat.labels[3];
         }
     }
-    public class CS_Structured_MultiSliceV : CS_Parent
+    
+
+
+
+	public class CS_Structured_MultiSliceV : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         Options_Structured options = new Options_Structured();
@@ -16375,7 +18251,11 @@ namespace CS_Classes
             labels[3] = heat.labels[3];
         }
     }
-    public class CS_Structured_SliceXPlot : CS_Parent
+    
+
+
+
+	public class CS_Structured_SliceXPlot : CS_Parent
     {
         Structured_MultiSlice multi = new Structured_MultiSlice();
         Options_Structured options = new Options_Structured();
@@ -16404,7 +18284,11 @@ namespace CS_Classes
             SetTrueText("Use the mouse to move the yellow dot above.", new cv.Point(10, dst2.Height * 7 / 8), 3);
         }
     }
-    public class CS_Structured_SliceYPlot : CS_Parent
+    
+
+
+
+	public class CS_Structured_SliceYPlot : CS_Parent
     {
         Structured_MultiSlice multi = new Structured_MultiSlice();
         Options_Structured options = new Options_Structured();
@@ -16434,7 +18318,11 @@ namespace CS_Classes
             SetTrueText("Use the mouse to move the yellow dot above.", new cv.Point(10, dst2.Height * 7 / 8), 3);
         }
     }
-    public class CS_Structured_MouseSlice : CS_Parent
+    
+
+
+
+	public class CS_Structured_MouseSlice : CS_Parent
     {
         Structured_SliceEither slice = new Structured_SliceEither();
         Line_Basics lines = new Line_Basics();
@@ -16472,7 +18360,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_SliceEither : CS_Parent
+    
+
+
+
+	public class CS_Structured_SliceEither : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask = new Mat();
@@ -16527,7 +18419,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_TransformH : CS_Parent
+    
+
+
+
+	public class CS_Structured_TransformH : CS_Parent
     {
         Options_Structured options = new Options_Structured();
         Projection_HistTop histTop = new Projection_HistTop();
@@ -16564,7 +18460,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_TransformV : CS_Parent
+    
+
+
+
+	public class CS_Structured_TransformV : CS_Parent
     {
         Options_Structured options = new Options_Structured();
         Projection_HistSide histSide = new Projection_HistSide();
@@ -16602,7 +18502,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_CountSide : CS_Parent
+    
+
+
+
+	public class CS_Structured_CountSide : CS_Parent
     {
         Structured_SliceH slice = new Structured_SliceH();
         Plot_Histogram plot = new Plot_Histogram();
@@ -16646,7 +18550,11 @@ namespace CS_Classes
             SetTrueText("Max flat surface at: " + "\n" + string.Format(fmt3, yValues[maxCountIndex]), 2);
         }
     }
-    public class CS_Structured_CountSideSum : CS_Parent
+    
+
+
+
+	public class CS_Structured_CountSideSum : CS_Parent
     {
         public List<float> counts = new List<float>();
         public int maxCountIndex;
@@ -16701,7 +18609,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_SliceV : CS_Parent
+    
+
+
+
+	public class CS_Structured_SliceV : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask = new Mat();
@@ -16737,7 +18649,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_SliceH : CS_Parent
+    
+
+
+
+	public class CS_Structured_SliceH : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask = new Mat();
@@ -16773,7 +18689,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_SurveyH : CS_Parent
+    
+
+
+
+	public class CS_Structured_SurveyH : CS_Parent
     {
         public CS_Structured_SurveyH(VBtask task) : base(task)
         {
@@ -16815,7 +18735,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_SurveyV : CS_Parent
+    
+
+
+
+	public class CS_Structured_SurveyV : CS_Parent
     {
         public CS_Structured_SurveyV(VBtask task) : base(task)
         {
@@ -16857,7 +18781,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_MultiSlicePolygon : CS_Parent
+    
+
+
+
+	public class CS_Structured_MultiSlicePolygon : CS_Parent
     {
         Structured_MultiSlice multi = new Structured_MultiSlice();
         Options_StructuredMulti options = new Options_StructuredMulti();
@@ -16889,7 +18817,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Structured_Crosshairs : CS_Parent
+    
+
+
+
+	public class CS_Structured_Crosshairs : CS_Parent
     {
         Structured_Cloud sCloud = new Structured_Cloud();
         double minX, maxX, minY, maxY;
@@ -16960,7 +18892,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_SuperPixel_Basics : CS_Parent
+    
+
+
+
+	public class CS_SuperPixel_Basics : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_SuperPixel_Basics(VBtask task) : base(task)
@@ -16979,7 +18915,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_SuperPixel_Basics_CPP : CS_Parent
+    
+
+
+
+	public class CS_SuperPixel_Basics_CPP : CS_Parent
     {
         public Mat wireGrid;
         public Scalar gridColor = Scalar.White;
@@ -17018,7 +18958,11 @@ namespace CS_Classes
             if (cPtr != (IntPtr)0) cPtr = SuperPixel_Close(cPtr);
         }
     }
-    public class CS_SuperPixel_BinarizedImage : CS_Parent
+    
+
+
+
+	public class CS_SuperPixel_BinarizedImage : CS_Parent
     {
         SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
         Binarize_Basics binarize;
@@ -17038,7 +18982,11 @@ namespace CS_Classes
             dst3.SetTo(Scalar.White, pixels.wireGrid);
         }
     }
-    public class CS_SuperPixel_Depth : CS_Parent
+    
+
+
+
+	public class CS_SuperPixel_Depth : CS_Parent
     {
         SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
         public CS_SuperPixel_Depth(VBtask task) : base(task)
@@ -17052,7 +19000,11 @@ namespace CS_Classes
             dst3 = pixels.dst3;
         }
     }
-    public class CS_SuperPixel_WithCanny : CS_Parent
+    
+
+
+
+	public class CS_SuperPixel_WithCanny : CS_Parent
     {
         SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
         Edge_Canny edges = new Edge_Canny();
@@ -17072,7 +19024,11 @@ namespace CS_Classes
             labels[3] = "Edges provided by Canny in red";
         }
     }
-    public class CS_SuperPixel_WithLineDetector : CS_Parent
+    
+
+
+
+	public class CS_SuperPixel_WithLineDetector : CS_Parent
     {
         SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
         Line_Basics lines = new Line_Basics();
@@ -17089,7 +19045,11 @@ namespace CS_Classes
             dst2 = pixels.dst2;
         }
     }
-    public class CS_SuperRes_Basics : CS_Parent
+    
+
+
+
+	public class CS_SuperRes_Basics : CS_Parent
     {
         SuperRes_Input video = new SuperRes_Input();
         Options_SuperRes options = new Options_SuperRes();
@@ -17152,7 +19112,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_SuperRes_Input : CS_Parent
+    
+
+
+
+	public class CS_SuperRes_Input : CS_Parent
     {
         public Video_Basics video = new Video_Basics();
         public string inputFileName;
@@ -17168,7 +19132,11 @@ namespace CS_Classes
             dst2 = video.dst2;
         }
     }
-    public class CS_SuperRes_SubPixelZoom : CS_Parent
+    
+
+
+
+	public class CS_SuperRes_SubPixelZoom : CS_Parent
     {
         Pixel_SubPixel zoom = new Pixel_SubPixel();
         SuperRes_Input video = new SuperRes_Input();
@@ -17189,7 +19157,11 @@ namespace CS_Classes
             labels = zoom.labels;
         }
     }
-    public class CS_SVD_Example : CS_Parent
+    
+
+
+
+	public class CS_SVD_Example : CS_Parent
     {
         public CS_SVD_Example(VBtask task) : base(task)
         {
@@ -17222,7 +19194,11 @@ namespace CS_Classes
             SetTrueText(strOut);
         }
     }
-    public class CS_SVD_Example2 : CS_Parent
+    
+
+
+
+	public class CS_SVD_Example2 : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public CS_SVD_Example2(VBtask task) : base(task)
@@ -17268,7 +19244,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_SVD_Gaussian : CS_Parent
+    
+
+
+
+	public class CS_SVD_Gaussian : CS_Parent
     {
         Covariance_Images covar = new Covariance_Images();
         public CS_SVD_Gaussian(VBtask task) : base(task)
@@ -17321,7 +19301,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_SVM_Basics : CS_Parent
+    
+
+
+
+	public class CS_SVM_Basics : CS_Parent
     {
         public Options_SVM options = new Options_SVM();
         SVM_SampleData sampleData = new SVM_SampleData();
@@ -17375,7 +19359,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_SVM_SampleData : CS_Parent
+    
+
+
+
+	public class CS_SVM_SampleData : CS_Parent
     {
         readonly Options_SVM options = new Options_SVM();
         public List<cv.Point2f> points = new List<cv.Point2f>();
@@ -17412,7 +19400,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_SVM_TestCase : CS_Parent
+    
+
+
+
+	public class CS_SVM_TestCase : CS_Parent
     {
         Options_SVM options = new Options_SVM();
         List<cv.Point2f> points = new List<cv.Point2f>();
@@ -17468,7 +19460,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_SVM_ReuseBasics : CS_Parent
+    
+
+
+
+	public class CS_SVM_ReuseBasics : CS_Parent
     {
         SVM_Basics svm = new SVM_Basics();
         List<cv.Point2f> points = new List<cv.Point2f>();
@@ -17513,7 +19509,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_SVM_ReuseRandom : CS_Parent
+    
+
+
+
+	public class CS_SVM_ReuseRandom : CS_Parent
     {
         readonly SVM_Basics svm = new SVM_Basics();
         int blueCount;
@@ -17576,7 +19576,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Swarm_Basics : CS_Parent
+    
+
+
+
+	public class CS_Swarm_Basics : CS_Parent
     {
         public KNN_Core knn = new KNN_Core();
         Feature_Basics feat = new Feature_Basics();
@@ -17668,7 +19672,11 @@ namespace CS_Classes
             if (cornerHistory.Count() >= histCount) cornerHistory.RemoveAt(0);
         }
     }
-    public class CS_Swarm_LeftRightFeatures : CS_Parent
+    
+
+
+
+	public class CS_Swarm_LeftRightFeatures : CS_Parent
     {
         public List<cv.Point2f> leftList = new List<cv.Point2f>();
         public List<cv.Point2f> rightList = new List<cv.Point2f>();
@@ -17688,7 +19696,11 @@ namespace CS_Classes
             dst3 = feat.dst2.Clone();
         }
     }
-    public class CS_Swarm_LeftRight : CS_Parent
+    
+
+
+
+	public class CS_Swarm_LeftRight : CS_Parent
     {
         public float leftDistance;
         public float leftDirection;
@@ -17722,7 +19734,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Swarm_Flood : CS_Parent
+    
+
+
+
+	public class CS_Swarm_Flood : CS_Parent
     {
         Swarm_Basics swarm = new Swarm_Basics();
         public Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -17744,7 +19760,11 @@ namespace CS_Classes
             labels[2] = flood.genCells.labels[2];
         }
     }
-    public class CS_Swarm_Percentage : CS_Parent
+    
+
+
+
+	public class CS_Swarm_Percentage : CS_Parent
     {
         Swarm_Flood swarm = new Swarm_Flood();
         Options_SwarmPercent options = new Options_SwarmPercent();
@@ -17775,7 +19795,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Swarm_Flood2 : CS_Parent
+    
+
+
+
+	public class CS_Swarm_Flood2 : CS_Parent
     {
         public Line_KNN lines = new Line_KNN();
         public Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -17804,7 +19828,11 @@ namespace CS_Classes
             labels[3] = lines.labels[2];
         }
     }
-    public class CS_Swarm_Flood3 : CS_Parent
+    
+
+
+
+	public class CS_Swarm_Flood3 : CS_Parent
     {
         Swarm_Flood2 swarm = new Swarm_Flood2();
         public CS_Swarm_Flood3(VBtask task) : base(task)
@@ -17820,7 +19848,11 @@ namespace CS_Classes
             labels[3] = swarm.labels[2];
         }
     }
-    public class CS_Tessallate_Basics : CS_Parent
+    
+
+
+
+	public class CS_Tessallate_Basics : CS_Parent
     {
         public List<cv.Point3f> points = new List<cv.Point3f>();
         public List<Scalar> colors = new List<Scalar>();
@@ -17880,7 +19912,11 @@ namespace CS_Classes
             labels[2] = colors.Count().ToString() + " triangles from " + task.redCells.Count().ToString() + " RedCloud cells";
         }
     }
-    public class CS_Tessallate_Triangles : CS_Parent
+    
+
+
+
+	public class CS_Tessallate_Triangles : CS_Parent
     {
         public Tessallate_Basics basics = new Tessallate_Basics();
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
@@ -17908,7 +19944,11 @@ namespace CS_Classes
             labels = basics.labels;
         }
     }
-    public class CS_Tessallate_QuadSimple : CS_Parent
+    
+
+
+
+	public class CS_Tessallate_QuadSimple : CS_Parent
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
@@ -17947,7 +19987,11 @@ namespace CS_Classes
             labels = new string[] { "", "", traceName + " completed with " + (oglData.Count() / 5).ToString(fmt0) + " quad sets (with a 5th element for color)", "Output of CS_Tessallate_QuadSimple" };
         }
     }
-    public class CS_Tessallate_QuadHulls : CS_Parent
+    
+
+
+
+	public class CS_Tessallate_QuadHulls : CS_Parent
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public List<List<double>> depthList = new List<List<double>>();
@@ -18010,7 +20054,11 @@ namespace CS_Classes
             labels[2] = traceName + " completed with " + (oglData.Count() / 5).ToString(fmt0) + " quad sets (with a 5th element for color)";
         }
     }
-    public class CS_Tessallate_QuadMinMax : CS_Parent
+    
+
+
+
+	public class CS_Tessallate_QuadMinMax : CS_Parent
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public List<List<double>> depthList1 = new List<List<double>>();
@@ -18096,7 +20144,11 @@ namespace CS_Classes
             labels[2] = traceName + " completed with " + (oglData.Count() / 5).ToString(fmt0) + " quad sets (with a 5th element for color)";
         }
     }
-    public class CS_Tessallate_Bricks : CS_Parent
+    
+
+
+
+	public class CS_Tessallate_Bricks : CS_Parent
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public List<double> depths = new List<double>();
@@ -18195,7 +20247,11 @@ namespace CS_Classes
             SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3);
         }
     }
-    public class CS_Texture_Basics : CS_Parent
+    
+
+
+
+	public class CS_Texture_Basics : CS_Parent
     {
         Draw_Ellipses ellipse = new Draw_Ellipses();
         public Mat texture = new Mat();
@@ -18242,7 +20298,11 @@ namespace CS_Classes
             if (standaloneTest()) dst3.Rectangle(tRect, Scalar.White, 2);
         }
     }
-    public class CS_Texture_Flow : CS_Parent
+    
+
+
+
+	public class CS_Texture_Flow : CS_Parent
     {
         Options_Texture options = new Options_Texture();
         public CS_Texture_Flow(VBtask task) : base(task)
@@ -18271,7 +20331,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Texture_Flow_Depth : CS_Parent
+    
+
+
+
+	public class CS_Texture_Flow_Depth : CS_Parent
     {
         Texture_Flow texture;
         public CS_Texture_Flow_Depth(VBtask task) : base(task)
@@ -18285,7 +20349,11 @@ namespace CS_Classes
             dst2 = texture.dst2;
         }
     }
-    public class CS_Texture_Flow_Reduction : CS_Parent
+    
+
+
+
+	public class CS_Texture_Flow_Reduction : CS_Parent
     {
         Texture_Flow texture;
         Reduction_Basics reduction = new Reduction_Basics();
@@ -18302,7 +20370,11 @@ namespace CS_Classes
             dst3 = texture.dst2;
         }
     }
-    public class CS_OpenGL_TextureShuffle : CS_Parent
+    
+
+
+
+	public class CS_OpenGL_TextureShuffle : CS_Parent
     {
         Random_Shuffle shuffle = new Random_Shuffle();
         OpenGL_FlatStudy2 floor = new OpenGL_FlatStudy2();
@@ -18342,7 +20414,11 @@ namespace CS_Classes
             SetTrueText("Use mouse movement over the image to display results.", 3);
         }
     }
-    public class CS_Thickness_Basics : CS_Parent
+    
+
+
+
+	public class CS_Thickness_Basics : CS_Parent
     {
         public rcData rc = new rcData();
         public Volume_Basics volZ = new Volume_Basics();
@@ -18365,7 +20441,11 @@ namespace CS_Classes
             SetTrueText(volZ.strOut, 3);
         }
     }
-    public class CS_Threading_Test : CS_Parent
+    
+
+
+
+	public class CS_Threading_Test : CS_Parent
     {
         Thread thread1;
         Thread thread2;
@@ -18426,7 +20506,11 @@ namespace CS_Classes
             thread2.Abort();
         }
     }
-    public class CS_Threading_Test1 : CS_Parent
+    
+
+
+
+	public class CS_Threading_Test1 : CS_Parent
     {
         Gravity_Basics gravity = new Gravity_Basics();
         Thread thread;
@@ -18467,7 +20551,11 @@ namespace CS_Classes
             thread.Abort();
         }
     }
-    //public class CS_Threshold_Basics : CS_Parent
+    //
+
+
+
+    //	public class CS_Threshold_Basics : CS_Parent
     //{
     //    public Options_Threshold options = new Options_Threshold();
     //    public CS_Threshold_Basics(VBtask task) : base(task)
@@ -18489,7 +20577,11 @@ namespace CS_Classes
     //        dst3 = dst2.Threshold(options.threshold, 255, options.thresholdMethod);
     //    }
     //}
-    //public class CS_Threshold_Adaptive : CS_Parent
+    //
+
+
+
+    //	public class CS_Threshold_Adaptive : CS_Parent
     //{
     //    Options_Threshold options = new Options_Threshold();
     //    Options_AdaptiveThreshold options1 = new Options_AdaptiveThreshold();
@@ -18507,7 +20599,11 @@ namespace CS_Classes
     //                                           options1.blockSize, options1.constantVal);
     //    }
     //}
-    public class CS_Threshold_Definitions : CS_Parent
+    
+
+
+
+	public class CS_Threshold_Definitions : CS_Parent
     {
         Gradient_Color gradient = new Gradient_Color();
         Mat_4Click mats = new Mat_4Click();
@@ -18542,7 +20638,11 @@ namespace CS_Classes
             SetTrueText("Current selection from grid at left", 3);
         }
     }
-    public class CS_Threshold_ByChannels : CS_Parent
+    
+
+
+
+	public class CS_Threshold_ByChannels : CS_Parent
     {
         Options_Colors optionsColor = new Options_Colors();
         Options_Threshold options = new Options_Threshold();
@@ -18573,7 +20673,11 @@ namespace CS_Classes
             labels[2] = "Threshold method: " + options.thresholdName;
         }
     }
-    public class CS_Threshold_ColorSource : CS_Parent
+    
+
+
+
+	public class CS_Threshold_ColorSource : CS_Parent
     {
         Color8U_Basics colorClass = new Color8U_Basics();
         Threshold_ByChannels byChan = new Threshold_ByChannels();
@@ -18591,7 +20695,11 @@ namespace CS_Classes
             labels = byChan.labels;
         }
     }
-    public class CS_Tracker_Basics : CS_Parent
+    
+
+
+
+	public class CS_Tracker_Basics : CS_Parent
     {
         public cv.Rect tRect;
         cv.Rect saveRect = new cv.Rect();
@@ -18635,7 +20743,11 @@ namespace CS_Classes
             if (cPtr != (IntPtr)0) cPtr = Tracker_Basics_Close(cPtr);
         }
     }
-    public class CS_Transform_Resize : CS_Parent
+    
+
+
+
+	public class CS_Transform_Resize : CS_Parent
     {
         Options_Transform options = new Options_Transform();
         public CS_Transform_Resize(VBtask task) : base(task)
@@ -18662,7 +20774,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Transform_Affine3D : CS_Parent
+    
+
+
+
+	public class CS_Transform_Affine3D : CS_Parent
     {
         Mat pc1;
         Mat pc2;
@@ -18722,7 +20838,11 @@ namespace CS_Classes
             SetTrueText(output);
         }
     }
-    public class CS_Transform_Rotate : CS_Parent
+    
+
+
+
+	public class CS_Transform_Rotate : CS_Parent
     {
         public Point2f imageCenter;
         Options_Transform options = new Options_Transform();
@@ -18740,7 +20860,11 @@ namespace CS_Classes
             DrawCircle(dst2, imageCenter, task.DotSize, Scalar.Blue);
         }
     }
-    public class CS_TransformationMatrix_Basics : CS_Parent
+    
+
+
+
+	public class CS_TransformationMatrix_Basics : CS_Parent
     {
         List<cv.Point3d> topLocations = new List<cv.Point3d>();
         Options_TransformationMatrix options = new Options_TransformationMatrix();
@@ -18782,7 +20906,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Triangle_Basics : CS_Parent
+    
+
+
+
+	public class CS_Triangle_Basics : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
@@ -18819,7 +20947,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Triangle_HullContour : CS_Parent
+    
+
+
+
+	public class CS_Triangle_HullContour : CS_Parent
     {
         RedCloud_Hulls hulls = new RedCloud_Hulls();
         public CS_Triangle_HullContour(VBtask task) : base(task)
@@ -18849,7 +20981,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Triangle_RedCloud : CS_Parent
+    
+
+
+
+	public class CS_Triangle_RedCloud : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
@@ -18888,7 +21024,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Triangle_Cell : CS_Parent
+    
+
+
+
+	public class CS_Triangle_Cell : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
@@ -18941,7 +21081,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Triangle_Mask : CS_Parent
+    
+
+
+
+	public class CS_Triangle_Mask : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
@@ -18993,7 +21137,11 @@ namespace CS_Classes
             labels[2] = redC.labels[2];
         }
     }
-    public class CS_VectorMagnitude : CS_Parent
+    
+
+
+
+	public class CS_VectorMagnitude : CS_Parent
     {
         public CS_VectorMagnitude(VBtask task) : base(task)
         {
@@ -19024,7 +21172,11 @@ namespace CS_Classes
             SetTrueText(strOut);
         }
     }
-    public class CS_Video_Basics : CS_Parent
+    
+
+
+
+	public class CS_Video_Basics : CS_Parent
     {
         public VideoCapture captureVideo = new VideoCapture();
         public Options_Video options = new Options_Video();
@@ -19053,7 +21205,11 @@ namespace CS_Classes
             dst2 = dst1.Resize(dst1.Size());
         }
     }
-    public class CS_Video_CarCounting : CS_Parent
+    
+
+
+
+	public class CS_Video_CarCounting : CS_Parent
     {
         Font_FlowText flow = new Font_FlowText();
         Video_Basics video = new Video_Basics();
@@ -19099,7 +21255,11 @@ namespace CS_Classes
             dst2 = dst2 | tmp;
         }
     }
-    public class CS_Video_CarCComp : CS_Parent
+    
+
+
+
+	public class CS_Video_CarCComp : CS_Parent
     {
         CComp_Both cc = new CComp_Both();
         Video_Basics video = new Video_Basics();
@@ -19120,7 +21280,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Video_MinRect : CS_Parent
+    
+
+
+
+	public class CS_Video_MinRect : CS_Parent
     {
         public Video_Basics video = new Video_Basics();
         public BGSubtract_MOG bgSub = new BGSubtract_MOG();
@@ -19151,7 +21315,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Video_MinCircle : CS_Parent
+    
+
+
+
+	public class CS_Video_MinCircle : CS_Parent
     {
         Video_MinRect video = new Video_MinRect();
         public CS_Video_MinCircle(VBtask task) : base(task)
@@ -19176,7 +21344,11 @@ namespace CS_Classes
         }
     }
 
-    public class CS_Vignetting_Basics : CS_Parent
+    
+
+
+
+	public class CS_Vignetting_Basics : CS_Parent
     {
         public bool removeVig;
         cv.Point center;
@@ -19205,7 +21377,11 @@ namespace CS_Classes
                 cPtr = Vignetting_Close(cPtr);
         }
     }
-    public class CS_Vignetting_VB : CS_Parent
+    
+
+
+
+	public class CS_Vignetting_VB : CS_Parent
     {
         public bool removeVig;
         cv.Point center;
@@ -19251,7 +21427,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_Vignetting_Removal : CS_Parent
+    
+
+
+
+	public class CS_Vignetting_Removal : CS_Parent
     {
         Vignetting_Basics basics = new Vignetting_Basics();
         Mat defaultImage;
@@ -19278,7 +21458,11 @@ namespace CS_Classes
             dst3 = basics.dst2;
         }
     }
-    public class CS_Vignetting_Devignetting : CS_Parent
+    
+
+
+
+	public class CS_Vignetting_Devignetting : CS_Parent
     {
         Vignetting_Removal devignet = new Vignetting_Removal();
         Vignetting_Basics basics = new Vignetting_Basics();
@@ -19295,7 +21479,11 @@ namespace CS_Classes
             dst3 = devignet.dst3;
         }
     }
-    public class CS_Volume_Basics : CS_Parent
+    
+
+
+
+	public class CS_Volume_Basics : CS_Parent
     {
         public rcData rc = new rcData();
         public float volume;
@@ -19343,7 +21531,11 @@ namespace CS_Classes
             SetTrueText(strOut, 3);
         }
     }
-    public class CS_WarpAffine_Basics : CS_Parent
+    
+
+
+
+	public class CS_WarpAffine_Basics : CS_Parent
     {
         public Options_Resize options = new Options_Resize();
         Options_WarpAffine optionsWarp = new Options_WarpAffine();
@@ -19373,7 +21565,11 @@ namespace CS_Classes
             dst2 = warpQT.dst2;
         }
     }
-    public class CS_WarpAffine_BasicsQT : CS_Parent
+    
+
+
+
+	public class CS_WarpAffine_BasicsQT : CS_Parent
     {
         public Point2f rotateCenter;
         public float rotateAngle; // in degrees
@@ -19394,7 +21590,11 @@ namespace CS_Classes
                         " with Warpaffine with angle: " + rotateAngle.ToString();
         }
     }
-    public class CS_WarpAffine_Captcha : CS_Parent
+    
+
+
+
+	public class CS_WarpAffine_Captcha : CS_Parent
     {
         const int charHeight = 40;
         const int charWidth = 30;
@@ -19477,7 +21677,11 @@ namespace CS_Classes
             dst2[roi] = outImage.Resize(new cv.Size(dst2.Cols, charHeight));
         }
     }
-    public class CS_WarpAffine_3Points : CS_Parent
+    
+
+
+
+	public class CS_WarpAffine_3Points : CS_Parent
     {
         Area_MinTriangle_CPP triangle = new Area_MinTriangle_CPP();
         Mat M = new Mat();
@@ -19541,7 +21745,11 @@ namespace CS_Classes
                          M.Get<double>(1, 2).ToString(fmt2));
         }
     }
-    public class CS_WarpAffine_4Points : CS_Parent
+    
+
+
+
+	public class CS_WarpAffine_4Points : CS_Parent
     {
         Area_MinRect mRect = new Area_MinRect();
         Options_MinArea options = new Options_MinArea();
@@ -19594,7 +21802,11 @@ namespace CS_Classes
             DrawCircle(dst2, center, task.DotSize + 5, Scalar.Yellow);
         }
     }
-    public class CS_WarpAffine_Repeated : CS_Parent
+    
+
+
+
+	public class CS_WarpAffine_Repeated : CS_Parent
     {
         public CS_WarpAffine_Repeated(VBtask task) : base(task)
         {
@@ -19639,7 +21851,11 @@ namespace CS_Classes
             dst3.Rectangle(rect, Scalar.White, task.lineWidth, task.lineType);
         }
     }
-    public class CS_WarpAffine_RepeatedExample8 : CS_Parent
+    
+
+
+
+	public class CS_WarpAffine_RepeatedExample8 : CS_Parent
     {
         public CS_WarpAffine_RepeatedExample8(VBtask task) : base(task)
         {
@@ -19679,7 +21895,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_WarpModel_Basics : CS_Parent
+    
+
+
+
+	public class CS_WarpModel_Basics : CS_Parent
     {
         readonly WarpModel_ECC ecc = new WarpModel_ECC();
         Options_WarpModel options = new Options_WarpModel();
@@ -19723,7 +21943,11 @@ namespace CS_Classes
                          "Displacement increases with Sobel" + "\n" + "kernel size", new cv.Point(merged.Width + 10, 40), 3);
         }
     }
-    public class CS_WarpModel_ECC : CS_Parent
+    
+
+
+
+	public class CS_WarpModel_ECC : CS_Parent
     {
         public WarpModel_Input warpInput = new WarpModel_Input();
         public float[] warpMatrix;
@@ -19805,7 +22029,11 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = WarpModel_Close(cPtr);
         }
     }
-    public class CS_WarpModel_Input : CS_Parent
+    
+
+
+
+	public class CS_WarpModel_Input : CS_Parent
     {
         public Mat[] rgb = new Mat[3];
         public Mat[] gradient = new Mat[3];
@@ -19853,7 +22081,11 @@ namespace CS_Classes
             dst3[r[0]] = merged;
         }
     }
-    public class CS_WarpPerspective_Basics : CS_Parent
+    
+
+
+
+	public class CS_WarpPerspective_Basics : CS_Parent
     {
         public Options_Warp options = new Options_Warp();
         public CS_WarpPerspective_Basics(VBtask task) : base(task)
@@ -19868,7 +22100,11 @@ namespace CS_Classes
             SetTrueText("Use sliders to understand impact of WarpPerspective", 3);
         }
     }
-    public class CS_WarpPerspective_WidthHeight : CS_Parent
+    
+
+
+
+	public class CS_WarpPerspective_WidthHeight : CS_Parent
     {
         Options_WarpPerspective options = new Options_WarpPerspective();
         public CS_WarpPerspective_WidthHeight(VBtask task) : base(task)
@@ -19888,7 +22124,11 @@ namespace CS_Classes
             Cv2.WarpAffine(dst2, dst3, rotationMatrix, src.Size(), InterpolationFlags.Nearest);
         }
     }
-    public class CS_Watershed_Basics : CS_Parent
+    
+
+
+
+	public class CS_Watershed_Basics : CS_Parent
     {
         AddWeighted_Basics addW = new AddWeighted_Basics();
         List<cv.Rect> rects = new List<cv.Rect>();
@@ -19948,7 +22188,11 @@ namespace CS_Classes
             labels[2] = "There were " + rects.Count().ToString() + " regions defined as input";
         }
     }
-    public class CS_Watershed_DepthReduction : CS_Parent
+    
+
+
+
+	public class CS_Watershed_DepthReduction : CS_Parent
     {
         Watershed_Basics watershed = new Watershed_Basics();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -19968,7 +22212,11 @@ namespace CS_Classes
             SetTrueText("Draw anywhere in dst2 to add regions.", 3);
         }
     }
-    public class CS_Watershed_DepthAuto : CS_Parent
+    
+
+
+
+	public class CS_Watershed_DepthAuto : CS_Parent
     {
         Watershed_Basics watershed = new Watershed_Basics();
         public CS_Watershed_DepthAuto(VBtask task) : base(task)
@@ -19983,7 +22231,11 @@ namespace CS_Classes
             labels[2] = watershed.labels[2];
         }
     }
-    public class CS_XFeatures2D_StarDetector : CS_Parent
+    
+
+
+
+	public class CS_XFeatures2D_StarDetector : CS_Parent
     {
         public CS_XFeatures2D_StarDetector(VBtask task) : base(task)
         {
@@ -20007,7 +22259,11 @@ namespace CS_Classes
             }
         }
     }
-    public class CS_XPhoto_Bm3dDenoise : CS_Parent
+    
+
+
+
+	public class CS_XPhoto_Bm3dDenoise : CS_Parent
     {
         public CS_XPhoto_Bm3dDenoise(VBtask task) : base(task)
         {
@@ -20026,7 +22282,11 @@ namespace CS_Classes
             dst3 = dst3.Normalize(0, 255, NormTypes.MinMax);
         }
     }
-    public class CS_XPhoto_Bm3dDenoiseDepthImage : CS_Parent
+    
+
+
+
+	public class CS_XPhoto_Bm3dDenoiseDepthImage : CS_Parent
     {
         public CS_XPhoto_Bm3dDenoiseDepthImage(VBtask task) : base(task)
         {
@@ -20045,7 +22305,11 @@ namespace CS_Classes
             dst3 = dst3.Normalize(0, 255, NormTypes.MinMax);
         }
     }
-    public class CS_XPhoto_OilPaint_CPP : CS_Parent
+    
+
+
+
+	public class CS_XPhoto_OilPaint_CPP : CS_Parent
     {
         readonly Options_XPhoto options = new Options_XPhoto();
         public CS_XPhoto_OilPaint_CPP(VBtask task) : base(task)
@@ -20069,7 +22333,11 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = xPhoto_OilPaint_Close(cPtr);
         }
     }
-    public class CS_XPhoto_Inpaint : CS_Parent
+    
+
+
+
+	public class CS_XPhoto_Inpaint : CS_Parent
     {
         public InPaint_Basics basics = new InPaint_Basics();
         public Options_XPhotoInpaint options = new Options_XPhotoInpaint();
@@ -20091,7 +22359,11 @@ namespace CS_Classes
             SetTrueText("This C# interface for xPhoto Inpaint does not work...  Uncomment the lines above this msg to test.", 3);
         }
     }
-    public class CS_XPhoto_Inpaint_CPP : CS_Parent
+    
+
+
+
+	public class CS_XPhoto_Inpaint_CPP : CS_Parent
     {
         readonly XPhoto_Inpaint inpVB = new XPhoto_Inpaint();
         public CS_XPhoto_Inpaint_CPP(VBtask task) : base(task)
