@@ -1488,6 +1488,15 @@ namespace CS_Classes
 			if (algorithmName == "CS_Triangle_Mask") return new CS_Triangle_Mask(task);
 			if (algorithmName == "CS_Triangle_RedCloud") return new CS_Triangle_RedCloud(task);
 			if (algorithmName == "CS_VectorMagnitude") return new CS_VectorMagnitude(task);
+			if (algorithmName == "CS_Video_Basics") return new CS_Video_Basics(task);
+			if (algorithmName == "CS_Video_CarCComp") return new CS_Video_CarCComp(task);
+			if (algorithmName == "CS_Video_CarCounting") return new CS_Video_CarCounting(task);
+			if (algorithmName == "CS_Video_MinCircle") return new CS_Video_MinCircle(task);
+			if (algorithmName == "CS_Video_MinRect") return new CS_Video_MinRect(task);
+			if (algorithmName == "CS_Vignetting_Basics") return new CS_Vignetting_Basics(task);
+			if (algorithmName == "CS_Vignetting_Devignetting") return new CS_Vignetting_Devignetting(task);
+			if (algorithmName == "CS_Vignetting_Removal") return new CS_Vignetting_Removal(task);
+			if (algorithmName == "CS_Vignetting_VB") return new CS_Vignetting_VB(task);
 			if (algorithmName == "CS_Voronoi_Basics") return new CS_Voronoi_Basics(task);
 			if (algorithmName == "CS_Voronoi_Compare") return new CS_Voronoi_Compare(task);
 			if (algorithmName == "CS_Voronoi_CPP") return new CS_Voronoi_CPP(task);

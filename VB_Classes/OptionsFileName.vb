@@ -1,7 +1,7 @@
 ﻿Imports System.Windows.Forms
 Public Class OptionsFileName
     Public fileStarted As Boolean
-    Public fileNameFull As String
+    Public newFileName As Boolean
     Public Sub PlayButton_Click(sender As Object, e As EventArgs) Handles PlayButton.Click
         If PlayButton.Text = "Start" Then
             PlayButton.Text = "Stop"
@@ -17,6 +17,7 @@ Public Class OptionsFileName
             filename.Text = OpenFileDialog1.FileName
             task.optionsChanged = True
         End If
+        newFileName = True
     End Sub
     Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
         Get

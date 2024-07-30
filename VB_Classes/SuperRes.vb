@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.IO
 ' https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
 Public Class SuperRes_Basics : Inherits VB_Parent
     Dim video As New SuperRes_Input
@@ -66,8 +67,8 @@ Public Class SuperRes_Input : Inherits VB_Parent
     Public video As New Video_Basics
     Public inputFileName As String
     Public Sub New()
-        video.fileNameForm.setFileName(task.HomeDir + "Data/testdata_superres_car.avi")
-        inputFileName = video.fileNameForm.getFileName()
+        video.options.fileInfo = New FileInfo(task.HomeDir + "Data/testdata_superres_car.avi")
+        inputFileName = video.options.fileInfo.FullName
         desc = "Input data for the superres testing"
     End Sub
     Public Sub RunVB(src As cv.Mat)

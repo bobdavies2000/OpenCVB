@@ -1,5 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.IO
+
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics : Inherits VB_Parent
     Public options As New Options_BGSubtract
@@ -253,7 +255,7 @@ Public Class BGSubtract_Video : Inherits VB_Parent
     Dim bgSub As New BGSubtract_Basics
     Dim video As New Video_Basics
     Public Sub New()
-        video.srcVideo = task.HomeDir + "opencv/Samples/Data/vtest.avi"
+        video.options.fileInfo = New FileInfo(task.HomeDir + "opencv/Samples/Data/vtest.avi")
         desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -2,49 +2,29 @@ Imports cv = OpenCvSharp
 Imports  System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_Basics : Inherits VB_Parent
-    Public srcVideo As String
     Public captureVideo As New cv.VideoCapture
-    Public fileNameForm As OptionsFileName
-    Dim fileInfo As FileInfo
+    Public options As New Options_Video
     Public Sub New()
-        fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.HomeDir + "Data\"
-        fileNameForm.OpenFileDialog1.FileName = "*.*"
-        fileNameForm.OpenFileDialog1.CheckFileExists = False
-        fileNameForm.OpenFileDialog1.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
-        fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", task.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
-        fileNameForm.Text = "Select a video file for input"
-        fileNameForm.FileNameLabel.Text = "Select a video file for input"
-        fileNameForm.PlayButton.Hide()
-        fileNameForm.Setup(traceName)
-        fileNameForm.Show()
-
-        fileInfo = New FileInfo(fileNameForm.filename.Text)
-        srcVideo = fileInfo.FullName
-
-        captureVideo = New cv.VideoCapture(fileInfo.FullName)
-        labels(2) = fileInfo.Name
+        captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
+        labels(2) = options.fileInfo.Name
         desc = "Show a video file"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If srcVideo <> fileNameForm.filename.Text Then
-            If fileInfo.Exists = False Then
-                SetTrueText("File not found: " + fileInfo.FullName, New cv.Point(10, 125))
-                Exit Sub
-            End If
-            srcVideo = fileNameForm.filename.Text
-            captureVideo = New cv.VideoCapture(fileNameForm.filename.Text)
+        options.RunVB()
+
+        If task.optionsChanged Then
+            captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
         End If
+
         captureVideo.Read(dst1)
         If dst1.Empty() Then
             captureVideo.Dispose()
-            captureVideo = New cv.VideoCapture(fileNameForm.filename.Text)
+            captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
             captureVideo.Read(dst1)
         End If
 
-        fileNameForm.TrackBar1.Maximum = captureVideo.FrameCount
-        fileNameForm.TrackBar1.Value = captureVideo.PosFrames
+        options.maxFrames = captureVideo.FrameCount
+        options.currFrame = captureVideo.PosFrames
         dst2 = dst1.Resize(dst1.Size())
     End Sub
 End Class
@@ -133,7 +113,7 @@ Public Class Video_MinRect : Inherits VB_Parent
     Public bgSub As New BGSubtract_MOG
     Public contours As cv.Point()()
     Public Sub New()
-        video.srcVideo = task.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
+        video.options.fileInfo = New FileInfo(task.HomeDir + "Data/CarsDrivingUnderBridge.mp4")
         video.Run(dst2)
         desc = "Find area of car outline - example of using minAreaRect"
     End Sub

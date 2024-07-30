@@ -17156,8 +17156,8 @@ namespace CS_Classes
         public string inputFileName;
         public CS_SuperRes_Input(VBtask task) : base(task)
         {
-            video.fileNameForm.setFileName(task.HomeDir + "Data/testdata_superres_car.avi");
-            inputFileName = video.fileNameForm.getFileName();
+            video.options.fileInfo = new FileInfo(task.HomeDir + "Data/testdata_superres_car.avi");
+            inputFileName = video.options.fileInfo.FullName;
             desc = "Input data for the superres testing";
         }
         public void RunCS(Mat src)
@@ -19020,6 +19020,277 @@ namespace CS_Classes
             other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1);
             strOut += $"other_manhattan_distance = {other_manhattan_distance.At<float>(0, 0)}";
             SetTrueText(strOut);
+        }
+    }
+    public class CS_Video_Basics : CS_Parent
+    {
+        public VideoCapture captureVideo = new VideoCapture();
+        public Options_Video options = new Options_Video();
+        public CS_Video_Basics(VBtask task) : base(task)
+        {
+            captureVideo = new VideoCapture(options.fileInfo.FullName);
+            labels[2] = options.fileInfo.Name;
+            desc = "Show a video file";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.optionsChanged)
+            {
+                captureVideo = new VideoCapture(options.fileInfo.FullName);
+            }
+            captureVideo.Read(dst1);
+            if (dst1.Empty())
+            {
+                captureVideo.Dispose();
+                captureVideo = new VideoCapture(options.fileInfo.FullName);
+                captureVideo.Read(dst1);
+            }
+            options.maxFrames = captureVideo.FrameCount;
+            options.currFrame = captureVideo.PosFrames;
+            dst2 = dst1.Resize(dst1.Size());
+        }
+    }
+    public class CS_Video_CarCounting : CS_Parent
+    {
+        Font_FlowText flow = new Font_FlowText();
+        Video_Basics video = new Video_Basics();
+        BGSubtract_MOG bgSub = new BGSubtract_MOG();
+        bool[] activeState = new bool[6];
+        int carCount = 0;
+        public CS_Video_CarCounting(VBtask task) : base(task)
+        {
+            flow.parentData = this;
+            desc = "Count cars in a video file";
+        }
+        public void RunCS(Mat src)
+        {
+            video.Run(src);
+            dst2.SetTo(0);
+            bgSub.Run(video.dst1);
+            var videoImage = bgSub.dst2;
+            dst3 = video.dst2;
+            int activeHeight = 30;
+            int finishLine = bgSub.dst2.Height - activeHeight * 8;
+            int[] choices = { 230, 460, 680, 900, 1110 };
+            for (int i = 0; i < choices.Length; i++)
+            {
+                var lane = new cv.Rect(choices[i], finishLine, 40, activeHeight);
+                int cellCount = videoImage[lane].CountNonZero();
+                if (cellCount > 0)
+                {
+                    activeState[i] = true;
+                    videoImage.Rectangle(lane, Scalar.Red, -1);
+                    dst3.Rectangle(lane, Scalar.Red, -1);
+                }
+                if (cellCount == 0 && activeState[i])
+                {
+                    activeState[i] = false;
+                    carCount++;
+                }
+                dst3.Rectangle(lane, Scalar.White, 2);
+            }
+            var tmp = videoImage.Resize(src.Size());
+            if (tmp.Channels() != dst2.Channels()) tmp = tmp.CvtColor(ColorConversionCodes.GRAY2BGR);
+            flow.nextMsg = "  Cars " + carCount.ToString();
+            flow.Run(empty);
+            dst2 = dst2 | tmp;
+        }
+    }
+    public class CS_Video_CarCComp : CS_Parent
+    {
+        CComp_Both cc = new CComp_Both();
+        Video_Basics video = new Video_Basics();
+        BGSubtract_MOG bgSub = new BGSubtract_MOG();
+        public CS_Video_CarCComp(VBtask task) : base(task)
+        {
+            desc = "Outline cars with a rectangle";
+        }
+        public void RunCS(Mat src)
+        {
+            video.Run(src);
+            if (!video.dst2.Empty())
+            {
+                bgSub.Run(video.dst2);
+                cc.Run(bgSub.dst2);
+                dst2 = cc.dst3;
+                dst3 = cc.dst2;
+            }
+        }
+    }
+    public class CS_Video_MinRect : CS_Parent
+    {
+        public Video_Basics video = new Video_Basics();
+        public BGSubtract_MOG bgSub = new BGSubtract_MOG();
+        public cv.Point[][] contours;
+        public CS_Video_MinRect(VBtask task) : base(task)
+        {
+            video.options.fileInfo = new FileInfo(task.HomeDir + "Data/CarsDrivingUnderBridge.mp4");
+            video.Run(dst2);
+            desc = "Find area of car outline - example of using minAreaRect";
+        }
+        public void RunCS(Mat src)
+        {
+            video.Run(src);
+            if (!video.dst2.Empty())
+            {
+                bgSub.Run(video.dst2);
+                contours = Cv2.FindContoursAsArray(bgSub.dst2, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+                dst2 = bgSub.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
+                if (standaloneTest())
+                {
+                    for (int i = 0; i < contours.Length; i++)
+                    {
+                        var minRect = Cv2.MinAreaRect(contours[i]);
+                        DrawRotatedRect(minRect, dst2, Scalar.Red);
+                    }
+                }
+                dst3 = video.dst2;
+            }
+        }
+    }
+    public class CS_Video_MinCircle : CS_Parent
+    {
+        Video_MinRect video = new Video_MinRect();
+        public CS_Video_MinCircle(VBtask task) : base(task)
+        {
+            desc = "Find area of car outline - example of using MinEnclosingCircle";
+        }
+        public void RunCS(Mat src)
+        {
+            video.Run(src);
+            dst2 = video.dst2;
+            dst3 = video.dst3;
+            Point2f center = new Point2f();
+            float radius = 10;
+            if (video.contours != null)
+            {
+                for (int i = 0; i < video.contours.Length; i++)
+                {
+                    Cv2.MinEnclosingCircle(video.contours[i], out center, out radius);
+                    DrawCircle(dst2, center, (int)radius, Scalar.White);
+                }
+            }
+        }
+    }
+
+    public class CS_Vignetting_Basics : CS_Parent
+    {
+        public bool removeVig;
+        cv.Point center;
+        Options_Vignetting options = new Options_Vignetting();
+    public CS_Vignetting_Basics(VBtask task) : base(task)
+        {
+            center = new cv.Point(dst2.Width / 2, dst2.Height / 2);
+            cPtr = Vignetting_Open();
+            desc = "C++ version of vignetting for comparison with the VB version.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.ClickPoint != new cv.Point())
+                center = task.ClickPoint;
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = Vignetting_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.radius, center.X, center.Y, removeVig);
+            handleSrc.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
+        }
+        public void Close()
+        {
+            if (cPtr != (IntPtr)0)
+                cPtr = Vignetting_Close(cPtr);
+        }
+    }
+    public class CS_Vignetting_VB : CS_Parent
+    {
+        public bool removeVig;
+        cv.Point center;
+        Options_Vignetting options = new Options_Vignetting();
+        public CS_Vignetting_VB(VBtask task) : base(task)
+        {
+            center = new cv.Point(dst2.Width / 2, dst2.Height / 2);
+            labels = new string[] { "", "", "Resulting vignetting.  Click where the center should be located for vignetting", "" };
+            desc = "Create a stream of images that have been vignetted.";
+        }
+        public double fastCos(double x)
+        {
+            x += Cv2.PI / 2;
+            if (x > Cv2.PI) x -= 2 * Cv2.PI;
+            if (x < 0) return 1.27323954 * x + 0.405284735 * x * x;
+            return 1.27323954 * x - 0.405284735 * x * x;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.ClickPoint != new cv.Point())
+                center = task.ClickPoint;
+            double maxDist = new cv.Point(0, 0).DistanceTo(center) * options.radius;
+            double tmp;
+            for (int y = 0; y < src.Height; y++)
+            {
+                for (int x = 0; x < src.Width; x++)
+                {
+                    cv.Point pt = new cv.Point(x, y);
+                    double cos = fastCos(pt.DistanceTo(center) / maxDist);
+                    cos *= cos;
+                    Vec3b val = src.Get<Vec3b>(y, x);
+                    for (int i = 0; i <= 2; i++)
+                    {
+                        if (removeVig)
+                            tmp = Math.Floor(val[i] / cos);
+                        else
+                            tmp = Math.Floor(val[i] * cos);
+                        val[i] = (byte)(tmp > 255 ? 255 : tmp);
+                    }
+                    dst2.Set<Vec3b>(y, x, val);
+                }
+            }
+        }
+    }
+    public class CS_Vignetting_Removal : CS_Parent
+    {
+        Vignetting_Basics basics = new Vignetting_Basics();
+        Mat defaultImage;
+        public CS_Vignetting_Removal(VBtask task) : base(task)
+        {
+            basics.removeVig = true;
+            labels = new string[] { "", "", "Vignetted input - click anywhere to adjust the center of the vignetting.", "The devignetted output - brighter, more vivid colors." };
+            desc = "Demonstrate devignetting";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest() && defaultImage == null)
+            {
+                FileInfo fileInfo = new FileInfo(task.HomeDir + "data/nature.jpg");
+                if (fileInfo.Exists)
+                    defaultImage = Cv2.ImRead(fileInfo.FullName);
+                defaultImage = defaultImage.Resize(dst3.Size());
+                dst2 = defaultImage.Clone();
+            }
+            if (standaloneTest())
+                basics.Run(defaultImage);
+            else
+                basics.Run(src);
+            dst3 = basics.dst2;
+        }
+    }
+    public class CS_Vignetting_Devignetting : CS_Parent
+    {
+        Vignetting_Removal devignet = new Vignetting_Removal();
+        Vignetting_Basics basics = new Vignetting_Basics();
+        public CS_Vignetting_Devignetting(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Vignetted image", "Devignetted image" };
+            desc = "Inject vignetting into the image and then remove it to test devignetting.  Click to relocate the center";
+        }
+        public void RunCS(Mat src)
+        {
+            basics.Run(src);
+            dst2 = basics.dst2;
+            devignet.Run(dst2);
+            dst3 = devignet.dst3;
         }
     }
 

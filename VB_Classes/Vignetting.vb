@@ -4,20 +4,20 @@ Imports System.Runtime.InteropServices
 Public Class Vignetting_Basics : Inherits VB_Parent
     Public removeVig As Boolean
     Dim center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
+    Dim options As New Options_Vignetting
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, 80)
         cPtr = Vignetting_Open()
         desc = "C++ version of vignetting for comparison with the VB version."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static radiusSlider = FindSlider("Vignette radius X100")
+        options.RunVB()
 
         If task.ClickPoint <> New cv.Point Then center = task.ClickPoint
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Vignetting_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, radiusSlider.Value / 100, center.X, center.Y, removeVig)
+        Dim imagePtr = Vignetting_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.radius, center.X, center.Y, removeVig)
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
@@ -35,8 +35,8 @@ End Class
 Public Class Vignetting_VB : Inherits VB_Parent
     Public removeVig As Boolean
     Dim center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
+    Dim options As New Options_Vignetting
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, 80)
         labels = {"", "", "Resulting vignetting.  Click where the center should be located for vignetting", ""}
         desc = "Create a stream of images that have been vignetted."
     End Sub
@@ -46,11 +46,11 @@ Public Class Vignetting_VB : Inherits VB_Parent
         If x < 0 Then Return 1.27323954 * x + 0.405284735 * x * x
         Return 1.27323954 * x - 0.405284735 * x * x
     End Function
-    Public Sub RunVB(src as cv.Mat)
-        Static factorSlider = FindSlider("Vignette radius X100")
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         If task.ClickPoint <> New cv.Point Then center = task.ClickPoint
-        Dim maxDist = New cv.Point(0, 0).DistanceTo(center) * factorSlider.Value / 100
+        Dim maxDist = New cv.Point(0, 0).DistanceTo(center) * options.radius
         Dim tmp As Double
         For y = 0 To src.Height - 1
             For x = 0 To src.Width - 1

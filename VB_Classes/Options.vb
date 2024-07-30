@@ -6290,6 +6290,7 @@ Public Class Options_LaneFinder : Inherits VB_Parent
             radio.addRadio("solidYellowLeft.mp4")
             radio.check(0).Checked = True
         End If
+        inputfile = New FileInfo(task.HomeDir + "/Data/challenge.mp4")
     End Sub
     Public Sub RunVB()
         Static frm = FindFrm(traceName + " Radio Buttons")
@@ -7582,5 +7583,61 @@ Public Class Options_TransformationMatrix : Inherits VB_Parent
     Public Sub RunVB()
         Static multSlider = FindSlider("TMatrix Top View multiplier")
         mul = multSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Vignetting : Inherits VB_Parent
+    Public radius As Double
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, 80)
+    End Sub
+    Public Sub RunVB()
+        Static radiusSlider = FindSlider("Vignette radius X100")
+        radius = radiusSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Video : Inherits VB_Parent
+    Public fileNameForm As OptionsFileName
+    Public fileInfo As FileInfo
+    Public maxFrames As Integer = 1000
+    Public currFrame As Integer = 0
+    Public Sub New()
+        fileInfo = New FileInfo(task.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
+        fileNameForm = New OptionsFileName
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.HomeDir + "Data\"
+        fileNameForm.OpenFileDialog1.FileName = "*.mp4"
+        fileNameForm.OpenFileDialog1.CheckFileExists = False
+        fileNameForm.OpenFileDialog1.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
+        fileNameForm.OpenFileDialog1.FilterIndex = 1
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", fileInfo.FullName)
+        fileNameForm.Text = "Select a video file for input"
+        fileNameForm.FileNameLabel.Text = "Select a video file for input"
+        fileNameForm.PlayButton.Hide()
+        fileNameForm.Setup(traceName)
+        fileNameForm.Show()
+
+        fileNameForm.filename.Text = fileInfo.FullName
+    End Sub
+    Public Sub RunVB()
+        If task.optionsChanged Then
+            maxFrames = 1000
+            currFrame = 0
+            If fileNameForm.newFileName Then fileInfo = New FileInfo(fileNameForm.filename.Text)
+            If fileInfo.Exists = False Then
+                SetTrueText("File not found: " + fileInfo.FullName, New cv.Point(10, 125))
+                Exit Sub
+            End If
+        End If
+        fileNameForm.TrackBar1.Maximum = maxFrames
+        fileNameForm.TrackBar1.Value = currFrame
     End Sub
 End Class
