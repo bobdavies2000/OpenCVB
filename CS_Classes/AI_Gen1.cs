@@ -1023,16 +1023,15 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Basics_CSKeyboard : CS_Parent
+    public class BackProject_BasicsKeyboard_CS : CS_Parent
     {
         Keyboard_Basics keys = new Keyboard_Basics();
         BackProject_Image backP = new BackProject_Image();
-        public BackProject_Basics_CSKeyboard(VBtask task) : base(task)
+        public BackProject_BasicsKeyboard_CS(VBtask task) : base(task)
         {
             labels[2] = "Move the mouse away from OpenCVB and use the left and right arrows to move between histogram bins.";
             desc = "Move the mouse off of OpenCVB and then use the left and right arrow keys move around in the backprojection histogram";
         }
-
         public void RunCS(Mat src)
         {
             keys.Run(src);
@@ -1078,12 +1077,12 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Full_CSLines : CS_Parent
+    public class BackProject_FullLines_CS : CS_Parent
     {
         BackProject_Full backP = new BackProject_Full();
         Line_Basics lines = new Line_Basics();
 
-        public BackProject_Full_CSLines(VBtask task) : base(task)
+        public BackProject_FullLines_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Lines found in the back projection", "Backprojection results" };
             desc = "Find lines in the back projection";
@@ -1182,12 +1181,12 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Full_CSEqualized : CS_Parent
+    public class BackProject_FullEqualized_CS : CS_Parent
     {
         BackProject_Full backP = new BackProject_Full();
         Hist_EqualizeColor equalize = new Hist_EqualizeColor();
 
-        public BackProject_Full_CSEqualized(VBtask task) : base(task)
+        public BackProject_FullEqualized_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "BackProject_Full output without equalization", "BackProject_Full with equalization" };
             desc = "Create a histogram from the equalized color and then backproject it.";
@@ -1823,10 +1822,10 @@ namespace CS_Classes
 
 
 
-    public class Benford_NormalizedImage_CS99 : CS_Parent
+    public class Benford_NormalizedImage99_CS : CS_Parent
     {
         public Benford_Basics benford = new Benford_Basics();
-        public Benford_NormalizedImage_CS99(VBtask task) : base(task)
+        public Benford_NormalizedImage99_CS(VBtask task) : base(task)
         {
             benford.setup99();
             desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1";
@@ -2079,11 +2078,11 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_Basics_CS_QT : CS_Parent
+    public class BGSubtract_Basics_QT_CS : CS_Parent
     {
         double learnRate;
 
-        public BGSubtract_Basics_CS_QT(VBtask task) : base(task)
+        public BGSubtract_Basics_QT_CS(VBtask task) : base(task)
         {
             learnRate = (dst2.Width >= 1280) ? 0.5 : 0.1; // learn faster with large images (slower frame rate)
             cPtr = BGSubtract_BGFG_Open(4); // MOG2 is the default method when running in QT mode.
@@ -2139,11 +2138,11 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_MOG2_CS_QT : CS_Parent
+    public class BGSubtract_MOG2_QT_CS : CS_Parent
     {
         BackgroundSubtractorMOG2 MOG2;
 
-        public BGSubtract_MOG2_CS_QT(VBtask task) : base(task)
+        public BGSubtract_MOG2_QT_CS(VBtask task) : base(task)
         {
             MOG2 = BackgroundSubtractorMOG2.Create();
             desc = "Subtract background using a mixture of Gaussians - the QT version";
@@ -2217,13 +2216,13 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_MOG_CS_RGBDepth : CS_Parent
+    public class BGSubtract_MOG_RGBDepth_CS : CS_Parent
     {
         public Mat grayMat = new Mat();
         Options_BGSubtract options = new Options_BGSubtract();
         BackgroundSubtractorMOG MOGDepth;
         BackgroundSubtractorMOG MOGRGB;
-        public BGSubtract_MOG_CS_RGBDepth(VBtask task) : base(task)
+        public BGSubtract_MOG_RGBDepth_CS(VBtask task) : base(task)
         {
             MOGDepth = BackgroundSubtractorMOG.Create();
             MOGRGB = BackgroundSubtractorMOG.Create();
@@ -2334,12 +2333,12 @@ namespace CS_Classes
 
 
 
-    public class Benford_JPEG_CS99 : CS_Parent
+    public class Benford_JPEG99_CS : CS_Parent
     {
         public Benford_Basics benford = new Benford_Basics();
         public Options_JpegQuality options = new Options_JpegQuality();
 
-        public Benford_JPEG_CS99(VBtask task) : base(task)
+        public Benford_JPEG99_CS(VBtask task) : base(task)
         {
             benford.setup99();
             desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image.";
@@ -2390,12 +2389,12 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_MOG_CS_Retina : CS_Parent
+    public class BGSubtract_MOG_Retina_CS : CS_Parent
     {
         BGSubtract_MOG_CS bgSub;
         Retina_Basics_CPP retina = new Retina_Basics_CPP();
 
-        public BGSubtract_MOG_CS_Retina(VBtask task) : base(task)
+        public BGSubtract_MOG_Retina_CS(VBtask task) : base(task)
         {
             bgSub = new BGSubtract_MOG_CS(task);
             labels = new string[] { "", "", "MOG results of depth motion", "Difference from retina depth motion." };
@@ -2460,60 +2459,21 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_Synthetic_CPP_CS : CS_Parent
-    {
-        Options_BGSubtractSynthetic options = new Options_BGSubtractSynthetic();
-
-        public BGSubtract_Synthetic_CPP_CS(VBtask task) : base(task)
-        {
-            labels[2] = "Synthetic background/foreground image.";
-            desc = "Generate a synthetic input to background subtraction method";
-        }
-
-        public void RunCS(Mat src)
-        {
-            options.RunVB();
-            if (task.optionsChanged)
-            {
-                if (!task.FirstPass) BGSubtract_Synthetic_Close(cPtr);
-
-                byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
-                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
-                GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
-
-                cPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                                 task.HomeDir + "opencv/Samples/Data/baboon.jpg",
-                                                 options.amplitude / 100, options.magnitude, options.waveSpeed / 100, options.objectSpeed);
-                handleSrc.Free();
-            }
-            IntPtr imagePtr = BGSubtract_Synthetic_Run(cPtr);
-            if (imagePtr != IntPtr.Zero) dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr).Clone();
-        }
-
-        public void Close()
-        {
-            if (cPtr != IntPtr.Zero) cPtr = BGSubtract_Synthetic_Close(cPtr);
-        }
-    }
-
-
-
 
     public class BGSubtract_Synthetic_CS : CS_Parent
     {
         BGSubtract_Basics_CS bgSub;
-        BGSubtract_Synthetic_CS synth;
+        BGSubtract_Synthetic synth = new BGSubtract_Synthetic();
 
         public BGSubtract_Synthetic_CS(VBtask task) : base(task)
         {
-            synth = new BGSubtract_Synthetic_CS(task);
             bgSub = new BGSubtract_Basics_CS(task);
             desc = "Demonstrate background subtraction algorithms with synthetic images";
         }
 
         public void RunCS(Mat src)
         {
-            synth.RunAndMeasure(src, synth);
+            synth.Run(src);
             dst3 = synth.dst2;
             bgSub.RunAndMeasure(dst3, bgSub);
             dst2 = bgSub.dst2;
@@ -3485,13 +3445,13 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_UnstablePixels_CS1 : CS_Parent
+    public class Bin4Way_UnstablePixels1_CS : CS_Parent
     {
         Hist_Basics hist = new Hist_Basics();
         Bin4Way_UnstableEdges unstable = new Bin4Way_UnstableEdges();
         public List<byte> gapValues = new List<byte>();
 
-        public Bin4Way_UnstablePixels_CS1(VBtask task) : base(task)
+        public Bin4Way_UnstablePixels1_CS(VBtask task) : base(task)
         {
             task.gOptions.setHistogramBins(256);
             desc = "Identify the unstable grayscale pixel values ";
@@ -5202,12 +5162,12 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_Filter_CSSide : CS_Parent
+    public class BackProject2D_FilterSide_CS : CS_Parent
     {
         public BackProject2D_Filter filter = new BackProject2D_Filter();
         Options_HistXD options = new Options_HistXD();
 
-        public BackProject2D_Filter_CSSide(VBtask task) : base(task)
+        public BackProject2D_FilterSide_CS(VBtask task) : base(task)
         {
             desc = "Backproject the output of the Side View after removing low sample bins.";
         }
@@ -5235,12 +5195,12 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_Filter_CSTop : CS_Parent
+    public class BackProject2D_FilterTop_CS : CS_Parent
     {
         BackProject2D_Filter filter = new BackProject2D_Filter();
         Options_HistXD options = new Options_HistXD();
 
-        public BackProject2D_Filter_CSTop(VBtask task) : base(task)
+        public BackProject2D_FilterTop_CS(VBtask task) : base(task)
         {
             desc = "Backproject the output of the Side View after removing low sample bins.";
         }
@@ -5268,12 +5228,12 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_Filter_CSBoth : CS_Parent
+    public class BackProject2D_FilterBoth_CS : CS_Parent
     {
         BackProject2D_FilterSide filterSide = new BackProject2D_FilterSide();
         BackProject2D_FilterTop filterTop = new BackProject2D_FilterTop();
 
-        public BackProject2D_Filter_CSBoth(VBtask task) : base(task)
+        public BackProject2D_FilterBoth_CS(VBtask task) : base(task)
         {
             desc = "Backproject the output of the both the top and side views after removing low sample bins.";
         }
@@ -6177,13 +6137,13 @@ namespace CS_Classes
 
 
 
-    public class Cell_Basics_CSPlot : CS_Parent
+    public class Cell_BasicsPlot_CS : CS_Parent
     {
         Hist_Depth plot = new Hist_Depth();
         public bool runRedCloud;
         Cell_Basics stats = new Cell_Basics();
         RedCloud_Basics redC = new RedCloud_Basics();
-        public Cell_Basics_CSPlot(VBtask task) : base(task)
+        public Cell_BasicsPlot_CS(VBtask task) : base(task)
         {
             task.redOptions.setIdentifyCells(true);
             if (standalone)
@@ -6537,10 +6497,10 @@ namespace CS_Classes
 
 
 
-    public class CellularAutomata_Life_CSColor : CS_Parent
+    public class CellularAutomata_LifeColor_CS : CS_Parent
     {
         CellularAutomata_Life_CS game;
-        public CellularAutomata_Life_CSColor(VBtask task) : base(task)
+        public CellularAutomata_LifeColor_CS(VBtask task) : base(task)
         {
             game = new CellularAutomata_Life_CS(task);
             game.backColor = Scalar.White;
@@ -6572,11 +6532,11 @@ namespace CS_Classes
 
 
 
-    public class CellularAutomata_Life_CSPopulation : CS_Parent
+    public class CellularAutomata_LifePopulation_CS : CS_Parent
     {
         Plot_OverTimeSingle plot = new Plot_OverTimeSingle();
         CellularAutomata_Life_CS game;
-        public CellularAutomata_Life_CSPopulation(VBtask task) : base(task)
+        public CellularAutomata_LifePopulation_CS(VBtask task) : base(task)
         {
             game = new CellularAutomata_Life_CS(task);
             desc = "Show Game of Life display with plot of population";
@@ -6831,7 +6791,7 @@ namespace CS_Classes
 
 
 
-    public class Classifier_Bayesian_CSTest : CS_Parent
+    public class Classifier_BayesianTest_CS : CS_Parent
     {
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr Classifier_Bayesian_Open();
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void Classifier_Bayesian_Close(IntPtr cPtr);
@@ -6841,7 +6801,7 @@ namespace CS_Classes
         RedCloud_Basics redC = new RedCloud_Basics();
         Neighbors_Precise nabs = new Neighbors_Precise();
 
-        public Classifier_Bayesian_CSTest(VBtask task) : base(task)
+        public Classifier_BayesianTest_CS(VBtask task) : base(task)
         {
             task.redOptions.useColorOnlyChecked = true;
             dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
@@ -7631,12 +7591,12 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Complementary_CSTest : CS_Parent
+    public class Color8U_ComplementaryTest_CS : CS_Parent
     {
         Image_Basics images = new Image_Basics();
         Color8U_Complementary comp = new Color8U_Complementary();
 
-        public Color8U_Complementary_CSTest(VBtask task) : base(task)
+        public Color8U_ComplementaryTest_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Original Image", "Color_Complementary version looks identical to the correct version at the link above " };
             desc = "Create the complementary images for Gilles Tran's 'Glasses' image for comparison";
@@ -8283,14 +8243,14 @@ namespace CS_Classes
 
 
 
-    public class Contour_General_CSWithOptions : CS_Parent
+    public class Contour_GeneralWithOptions_CS : CS_Parent
     {
         public List<cv.Point[]> contourlist = new List<cv.Point[]>();
         public cv.Point[][] allContours;
         public Options_Contours options = new Options_Contours();
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
         int minLengthContour = 4; // use any contour With enough points To make a contour!
-        public Contour_General_CSWithOptions(VBtask task) : base(task)
+        public Contour_GeneralWithOptions_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "FindContour input", "Draw contour output" };
             desc = "General purpose contour finder";
@@ -9253,12 +9213,12 @@ namespace CS_Classes
 
 
 
-    public class Convex_RedCloud_CSDefects : CS_Parent
+    public class Convex_RedCloudDefects_CS : CS_Parent
     {
         Convex_RedCloud_CS convex;
         Contour_Largest_CS contours;
 
-        public Convex_RedCloud_CSDefects(VBtask task) : base(task)
+        public Convex_RedCloudDefects_CS(VBtask task) : base(task)
         {
             convex = new Convex_RedCloud_CS(task);
             contours = new Contour_Largest_CS(task);
@@ -9505,12 +9465,12 @@ namespace CS_Classes
 
 
 
-    public class Corners_Basics_CSCentroid : CS_Parent
+    public class Corners_BasicsCentroid_CS : CS_Parent
     {
         public Corners_Basics fast = new Corners_Basics();
         public Kalman_Basics kalman = new Kalman_Basics();
 
-        public Corners_Basics_CSCentroid(VBtask task) : base(task)
+        public Corners_BasicsCentroid_CS(VBtask task) : base(task)
         {
             kalman.kInput = new float[2];
             desc = "Find interesting points with the FAST and smooth the centroid with kalman";
@@ -9540,12 +9500,12 @@ namespace CS_Classes
 
 
 
-    public class Corners_Basics_CSStablePoints : CS_Parent
+    public class Corners_BasicsStablePoints_CS : CS_Parent
     {
         public List<cv.Point> features = new List<cv.Point>();
         public Corners_Basics fast = new Corners_Basics();
 
-        public Corners_Basics_CSStablePoints(VBtask task) : base(task)
+        public Corners_BasicsStablePoints_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "", "FAST stable points without context" };
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, new Scalar(0));
@@ -9586,12 +9546,12 @@ namespace CS_Classes
 
 
 
-    public class Corners_Basics_CSCentroids : CS_Parent
+    public class Corners_BasicsCentroids_CS : CS_Parent
     {
         public Corners_Basics fast = new Corners_Basics();
         public Point2f[] fastCenters;
 
-        public Corners_Basics_CSCentroids(VBtask task) : base(task)
+        public Corners_BasicsCentroids_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setGridSize(16);
             desc = "Use a thread grid to find the centroids in each grid element";
@@ -11982,14 +11942,14 @@ namespace CS_Classes
 
 
 
-    public class Depth_PunchBlob_CSNew : CS_Parent
+    public class Depth_PunchBlobNew_CS : CS_Parent
     {
         Depth_PunchDecreasing depthDec = new Depth_PunchDecreasing();
         Depth_PunchIncreasing depthInc = new Depth_PunchIncreasing();
         Contour_General contours = new Contour_General();
         Mat lastColor;
         Options_Depth options = new Options_Depth();
-        public Depth_PunchBlob_CSNew(VBtask task) : base(task)
+        public Depth_PunchBlobNew_CS(VBtask task) : base(task)
         {
             desc = "Identify a punch using both depth and color";
         }
@@ -12233,14 +12193,14 @@ namespace CS_Classes
 
 
 
-    public class Depth_StableMin_CSMax : CS_Parent
+    public class Depth_StableMinMax_CS : CS_Parent
     {
         Depth_Colorizer_CPP colorize = new Depth_Colorizer_CPP();
         Depth_StableMin dMin = new Depth_StableMin();
         Depth_StableMax dMax = new Depth_StableMax();
         Options_MinMaxNone options = new Options_MinMaxNone();
 
-        public Depth_StableMin_CSMax(VBtask task) : base(task)
+        public Depth_StableMinMax_CS(VBtask task) : base(task)
         {
             task.gOptions.setUnfiltered(true);
             labels[2] = "Depth map colorized";
@@ -14134,10 +14094,10 @@ namespace CS_Classes
 
 
 
-    public class Draw_Line_CSTest : CS_Parent
+    public class Draw_LineTest_CS : CS_Parent
     {
         Draw_Line line = new Draw_Line();
-        public Draw_Line_CSTest(VBtask task) : base(task)
+        public Draw_LineTest_CS(VBtask task) : base(task)
         {
             desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line...";
         }
@@ -14273,10 +14233,10 @@ namespace CS_Classes
 
 
 
-    public class Duster_Basics_CSY : CS_Parent
+    public class Duster_BasicsY_CS : CS_Parent
     {
         Duster_MaskZ dust = new Duster_MaskZ();
-        public Duster_Basics_CSY(VBtask task) : base(task)
+        public Duster_BasicsY_CS(VBtask task) : base(task)
         {
             desc = "Removed blowback in the pointcloud";
         }
@@ -15824,11 +15784,11 @@ namespace CS_Classes
 
 
 
-    public class Feature_Basics_CSNoFrills : CS_Parent
+    public class Feature_BasicsNoFrills_CS : CS_Parent
     {
         public Options_Features options = new Options_Features();
         Feature_Gather gather = new Feature_Gather();
-        public Feature_Basics_CSNoFrills(VBtask task) : base(task)
+        public Feature_BasicsNoFrills_CS(VBtask task) : base(task)
         {
             UpdateAdvice(traceName + ": Use 'Options_Features' to control output.");
             desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results.";
@@ -16174,11 +16134,11 @@ namespace CS_Classes
 
 
 
-    public class Feature_Trace_CSDelaunay : CS_Parent
+    public class Feature_TraceDelaunay_CS : CS_Parent
     {
         Feature_Delaunay features = new Feature_Delaunay();
         public List<List<cv.Point2f>> goodList = new List<List<cv.Point2f>>(); // stable points only
-        public Feature_Trace_CSDelaunay(VBtask task) : base(task)
+        public Feature_TraceDelaunay_CS(VBtask task) : base(task)
         {
             labels = new string[] { "Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points" };
             desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching.";
@@ -18414,7 +18374,7 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Basics_CSOriginal : CS_Parent
+    public class FeaturePoly_BasicsOriginal_CS : CS_Parent
     {
         public fPolyData fPD = new fPolyData();
         public Mat resyncImage;
@@ -18425,7 +18385,7 @@ namespace CS_Classes
         FeaturePoly_TopFeatures topFeatures = new FeaturePoly_TopFeatures();
         public Options_FPoly options = new Options_FPoly();
         public object center;
-        public FeaturePoly_Basics_CSOriginal(VBtask task) : base(task)
+        public FeaturePoly_BasicsOriginal_CS(VBtask task) : base(task)
         {
             center = new FeaturePoly_Center(); // FeaturePoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
             FindSlider("Feature Sample Size").Value = 30;
@@ -18587,13 +18547,13 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Plot_CSWeighted : CS_Parent
+    public class FeaturePoly_PlotWeighted_CS : CS_Parent
     {
         public FeaturePoly_Plot fPlot = new FeaturePoly_Plot();
         Plot_Histogram plot = new Plot_Histogram();
         AddWeighted_Basics addw = new AddWeighted_Basics();
         Kalman_Basics kalman = new Kalman_Basics();
-        public FeaturePoly_Plot_CSWeighted(VBtask task) : base(task)
+        public FeaturePoly_PlotWeighted_CS(VBtask task) : base(task)
         {
             plot.minRange = 0;
             plot.removeZeroEntry = false;
@@ -19020,11 +18980,11 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Perpendiculars_CSTest : CS_Parent
+    public class FeaturePoly_PerpendicularsTest_CS : CS_Parent
     {
         FeaturePoly_Perpendiculars center = new FeaturePoly_Perpendiculars();
         FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
-        public FeaturePoly_Perpendiculars_CSTest(VBtask task) : base(task)
+        public FeaturePoly_PerpendicularsTest_CS(VBtask task) : base(task)
         {
             fPoly.center = center;
             if (standaloneTest()) task.gOptions.setDisplay1();
@@ -19042,11 +19002,11 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Perpendiculars_CSImage : CS_Parent
+    public class FeaturePoly_PerpendicularsImage_CS : CS_Parent
     {
         FeaturePoly_Perpendiculars center = new FeaturePoly_Perpendiculars();
         FeaturePoly_Image fImage = new FeaturePoly_Image();
-        public FeaturePoly_Perpendiculars_CSImage(VBtask task) : base(task)
+        public FeaturePoly_PerpendicularsImage_CS(VBtask task) : base(task)
         {
             fImage.fpoly.center = center;
             if (standaloneTest()) task.gOptions.setDisplay1();
@@ -19134,10 +19094,10 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Image_CSMask : CS_Parent
+    public class FeaturePoly_ImageMask_CS : CS_Parent
     {
         public FeaturePoly_Image fImage = new FeaturePoly_Image();
-        public FeaturePoly_Image_CSMask(VBtask task) : base(task)
+        public FeaturePoly_ImageMask_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
             task.gOptions.pixelDiffThreshold = 10;
@@ -19328,12 +19288,12 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Image_CSNew : CS_Parent
+    public class FeaturePoly_ImageNew_CS : CS_Parent
     {
         public FeaturePoly_Basics fpoly = new FeaturePoly_Basics();
         Rotate_BasicsQT rotate = new Rotate_BasicsQT();
         public bool resync;
-        public FeaturePoly_Image_CSNew(VBtask task) : base(task)
+        public FeaturePoly_ImageNew_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
             labels = new string[] { "", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
@@ -19694,10 +19654,10 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_Color_CSSplit : CS_Parent
+    public class FeatureROI_ColorSplit_CS : CS_Parent
     {
         FeatureROI_Sorted devGrid = new FeatureROI_Sorted();
-        public FeatureROI_Color_CSSplit(VBtask task) : base(task)
+        public FeatureROI_ColorSplit_CS(VBtask task) : base(task)
         {
             devGrid.maskVal = 255;
             task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
@@ -19807,7 +19767,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_LowStdev_CSCorrelation : CS_Parent
+    public class FeatureROI_LowStdevCorrelation_CS : CS_Parent
     {
         public FeatureROI_LowStdev gather = new FeatureROI_LowStdev();
         public List<float> correlations = new List<float>();
@@ -19816,7 +19776,7 @@ namespace CS_Classes
         Mat lastImage;
         List<float> saveCorrs;
         List<cv.Rect> saveRects;
-        public FeatureROI_LowStdev_CSCorrelation(VBtask task) : base(task)
+        public FeatureROI_LowStdevCorrelation_CS(VBtask task) : base(task)
         {
             FindSlider("Feature Correlation Threshold").Value = 50;
             desc = "Display the correlation coefficients for roi's with low standard deviation.";
@@ -19882,13 +19842,13 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_LR_CSClick : CS_Parent
+    public class FeatureROI_LRClick_CS : CS_Parent
     {
         public FeatureROI_Basics gather = new FeatureROI_Basics();
         public cv.Point ClickPoint = new cv.Point();
         public int picTag = 0;
         public Options_Features options = new Options_Features();
-        public FeatureROI_LR_CSClick(VBtask task) : base(task)
+        public FeatureROI_LRClick_CS(VBtask task) : base(task)
         {
             task.gOptions.setGridSize(16);
             FindSlider("Feature Correlation Threshold").Value = 80;
@@ -19973,12 +19933,12 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_LR_CSAll : CS_Parent
+    public class FeatureROI_LRAll_CS : CS_Parent
     {
         public FeatureROI_Basics gather = new FeatureROI_Basics();
         public Options_Features options = new Options_Features();
         public SortedList<float, cv.Rect> sortedRects = new SortedList<float, cv.Rect>(new compareAllowIdenticalSingleInverted());
-        public FeatureROI_LR_CSAll(VBtask task) : base(task)
+        public FeatureROI_LRAll_CS(VBtask task) : base(task)
         {
             task.gOptions.setGridSize(16);
             FindSlider("Feature Correlation Threshold").Value = 95;
@@ -20461,10 +20421,10 @@ namespace CS_Classes
 
 
 
-    public class FitLine_Basics_CS3D : CS_Parent
+    public class FitLine_Basics3D_CS : CS_Parent
     {
         Hough_Lines_MT hlines = new Hough_Lines_MT();
-        public FitLine_Basics_CS3D(VBtask task) : base(task)
+        public FitLine_Basics3D_CS(VBtask task) : base(task)
         {
             desc = "Use visual lines to find 3D lines.  This algorithm is NOT working.";
             labels[3] = "White is featureless RGB, blue depth shadow";
@@ -20773,7 +20733,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_Basics_CSMask : CS_Parent
+    public class Flood_BasicsMask_CS : CS_Parent
     {
         public Mat binarizedImage;
         public Mat inputMask;
@@ -20782,7 +20742,7 @@ namespace CS_Classes
         public bool buildInputMask;
         public bool showSelected = true;
         Color8U_Basics cvt = new Color8U_Basics();
-        public Flood_Basics_CSMask(VBtask task) : base(task)
+        public Flood_BasicsMask_CS(VBtask task) : base(task)
         {
             task.redOptions.setIdentifyCells(true);
             labels[3] = "The inputMask used to limit how much of the image is processed.";
@@ -20901,14 +20861,14 @@ namespace CS_Classes
 
 
 
-    public class Flood_Motion_CS1 : CS_Parent
+    public class Flood_Motion1_CS : CS_Parent
     {
         Flood_Basics flood = new Flood_Basics();
         Motion_Basics motion = new Motion_Basics();
         List<rcData> redCells = new List<rcData>();
         List<cv.Point2f> maxDists = new List<cv.Point2f>();
         List<int> maxIndex = new List<int>();
-        public Flood_Motion_CS1(VBtask task) : base(task)
+        public Flood_Motion1_CS(VBtask task) : base(task)
         {
             desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
         }
@@ -21427,11 +21387,11 @@ namespace CS_Classes
 
 
 
-    public class Fractal_Mandelbrot_CSZoom : CS_Parent
+    public class Fractal_MandelbrotZoom_CS : CS_Parent
     {
         public Fractal_Mandelbrot mandel = new Fractal_Mandelbrot();
         cv.Rect saveDrawRect = new cv.Rect(1, 1, 1, 1);
-        public Fractal_Mandelbrot_CSZoom(VBtask task) : base(task)
+        public Fractal_MandelbrotZoom_CS(VBtask task) : base(task)
         {
             desc = "Run the classic Mandalbrot algorithm and allow zooming in";
         }
@@ -21464,10 +21424,10 @@ namespace CS_Classes
 
 
 
-    public class Fractal_Mandelbrot_CSZoomColor : CS_Parent
+    public class Fractal_MandelbrotZoomColor_CS : CS_Parent
     {
         public Fractal_MandelbrotZoom zoom = new Fractal_MandelbrotZoom();
-        public Fractal_Mandelbrot_CSZoomColor(VBtask task) : base(task)
+        public Fractal_MandelbrotZoomColor_CS(VBtask task) : base(task)
         {
             desc = "Classic Mandelbrot in color";
         }
@@ -21655,12 +21615,12 @@ namespace CS_Classes
 
 
 
-    public class FrameRate_Basics_CSGray : CS_Parent
+    public class FrameRate_BasicsGray_CS : CS_Parent
     {
         Mat_4to1 mats = new Mat_4to1();
         int[] frameCounts = new int[4];
         Mat[] lastImages;
-        public FrameRate_Basics_CSGray(VBtask task) : base(task)
+        public FrameRate_BasicsGray_CS(VBtask task) : base(task)
         {
             desc = "Compare each frame to its last to figure out which frames really changed for each invocation.";
         }
@@ -21998,14 +21958,14 @@ namespace CS_Classes
 
 
 
-    public class Fuzzy_TrackerDepth_CSClick : CS_Parent
+    public class Fuzzy_TrackerDepthClick_CS : CS_Parent
     {
         public Fuzzy_TrackerDepth tracker = new Fuzzy_TrackerDepth();
         public cv.Point highlightPoint;
         public cv.Rect highlightRect;
         public int highlightRegion = -1;
         public Mat regionMask;
-        public Fuzzy_TrackerDepth_CSClick(VBtask task) : base(task)
+        public Fuzzy_TrackerDepthClick_CS(VBtask task) : base(task)
         {
             desc = "Create centroids and rect's for solid regions and track them - tracker";
         }
@@ -22400,10 +22360,10 @@ namespace CS_Classes
 
 
 
-    public class Gravity_Basics_CSOriginal : CS_Parent
+    public class Gravity_BasicsOriginal_CS : CS_Parent
     {
         public PointPair vec = new PointPair();
-        public Gravity_Basics_CSOriginal(VBtask task) : base(task)
+        public Gravity_BasicsOriginal_CS(VBtask task) : base(task)
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
             desc = "Search for the transition from positive to negative to find the gravity vector.";
@@ -22704,9 +22664,9 @@ namespace CS_Classes
 
 
 
-    public class Grid_Basics_CSTest : CS_Parent
+    public class Grid_BasicsTest_CS : CS_Parent
     {
-        public Grid_Basics_CSTest(VBtask task) : base(task)
+        public Grid_BasicsTest_CS(VBtask task) : base(task)
         {
             labels = new[] { "", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi." };
             if (standaloneTest()) desc = "Validation test for Grid_Basics algorithm";
@@ -24699,9 +24659,9 @@ namespace CS_Classes
 
 
 
-    public class Hist_Gotcha_CSFixed_CPP : CS_Parent
+    public class Hist_GotchaFixed_CPP_CS : CS_Parent
     {
-        public Hist_Gotcha_CSFixed_CPP(VBtask task) : base(task)
+        public Hist_GotchaFixed_CPP_CS(VBtask task) : base(task)
         {
             cPtr = Hist_1D_Open();
             desc = "Testing the C++ CalcHist to investigate gotcha with sample counts";
@@ -25400,11 +25360,11 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_Pixel_CSCells : CS_Parent
+    public class Hist3D_PixelCells_CS : CS_Parent
     {
         Hist3D_Pixel pixel = new Hist3D_Pixel();
         Flood_Basics redC = new Flood_Basics();
-        public Hist3D_Pixel_CSCells(VBtask task) : base(task)
+        public Hist3D_PixelCells_CS(VBtask task) : base(task)
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
             labels = new string[] { "", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2" };
@@ -25425,11 +25385,11 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_Pixel_CSClassify : CS_Parent
+    public class Hist3D_PixelClassify_CS : CS_Parent
     {
         Hist3D_Pixel pixel = new Hist3D_Pixel();
         RedCloud_Basics redC = new RedCloud_Basics();
-        public Hist3D_Pixel_CSClassify(VBtask task) : base(task)
+        public Hist3D_PixelClassify_CS(VBtask task) : base(task)
         {
             desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_Basics on the output.";
         }
@@ -25449,12 +25409,12 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_Pixel_CSDiffMask : CS_Parent
+    public class Hist3D_PixelDiffMask_CS : CS_Parent
     {
         Hist3D_Pixel pixel = new Hist3D_Pixel();
         RedCloud_Basics redC = new RedCloud_Basics();
         Mat lastImage = new cv.Mat();
-        public Hist3D_Pixel_CSDiffMask(VBtask task) : base(task)
+        public Hist3D_PixelDiffMask_CS(VBtask task) : base(task)
         {
             task.redOptions.setUseColorOnly(true);
             desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection";
@@ -25472,11 +25432,11 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_RedCloud_CSGrid : CS_Parent
+    public class Hist3D_RedCloudGrid_CS : CS_Parent
     {
         Pixel_Vectors pixels = new Pixel_Vectors();
         Hist3Dcolor_Vector hVector = new Hist3Dcolor_Vector();
-        public Hist3D_RedCloud_CSGrid(VBtask task) : base(task)
+        public Hist3D_RedCloudGrid_CS(VBtask task) : base(task)
         {
             task.gOptions.setGridSize(8);
             desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors.";
@@ -25980,14 +25940,14 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_Basics_CS_CPP : CS_Parent
+    public class Hist3Dcolor_Basics_CPP_CS : CS_Parent
     {
         public Mat histogram = new Mat();
         public bool prepareImage = true;
         public Mat histogram1D = new Mat();
         public Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
         public int classCount;
-        public Hist3Dcolor_Basics_CS_CPP(VBtask task) : base(task)
+        public Hist3Dcolor_Basics_CPP_CS(VBtask task) : base(task)
         {
             desc = "Build a 3D histogram from the BGR image and sort it by histogram entry size.";
         }
@@ -26172,10 +26132,10 @@ namespace CS_Classes
 
 
 
-    public class History_Basics_CSNoSaturation : CS_Parent
+    public class History_BasicsNoSaturation_CS : CS_Parent
     {
         public List<Mat> saveFrames = new List<Mat>();
-        public History_Basics_CSNoSaturation(VBtask task) : base(task)
+        public History_BasicsNoSaturation_CS(VBtask task) : base(task)
         {
             desc = "Create a frame history and sum the last X frames (without saturation!)";
         }
@@ -26209,11 +26169,11 @@ namespace CS_Classes
 
 
 
-    public class History_Basics_CSDiff : CS_Parent
+    public class History_BasicsDiff_CS : CS_Parent
     {
         History_BasicsNoSaturation frames = new History_BasicsNoSaturation();
         Diff_Basics diff = new Diff_Basics();
-        public History_Basics_CSDiff(VBtask task) : base(task)
+        public History_BasicsDiff_CS(VBtask task) : base(task)
         {
             task.gOptions.pixelDiffThreshold = 0;
             desc = "Find the floodfill trouble spots.";
@@ -26715,11 +26675,11 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Depth_CS1 : CS_Parent
+    public class HistValley_Depth1_CS : CS_Parent
     {
         public HistValley_OptionsAuto valley = new HistValley_OptionsAuto();
         public SortedList<int, int> valleyOrder = new SortedList<int, int>(new compareAllowIdenticalInteger());
-        public HistValley_Depth_CS1(VBtask task) : base(task)
+        public HistValley_Depth1_CS(VBtask task) : base(task)
         {
             desc = "Find the valleys in the depth histogram.";
         }
@@ -27363,10 +27323,10 @@ namespace CS_Classes
 
 
 
-    public class Horizon_Basics_CSAlt : CS_Parent
+    public class Horizon_BasicsAlt_CS : CS_Parent
     {
         public Mat cloudY;
-        public Horizon_Basics_CSAlt(VBtask task) : base(task)
+        public Horizon_BasicsAlt_CS(VBtask task) : base(task)
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
             desc = "Search for the transition from positive to negative to find the horizon.";
@@ -27565,9 +27525,9 @@ namespace CS_Classes
 
 
 
-    public class Horizon_FindNonZero_CSOld : CS_Parent
+    public class Horizon_FindNonZeroOld_CS : CS_Parent
     {
-        public Horizon_FindNonZero_CSOld(VBtask task) : base(task)
+        public Horizon_FindNonZeroOld_CS(VBtask task) : base(task)
         {
             task.gOptions.setGravityUsage(false);
             task.redOptions.setYRangeSlider(3);
@@ -28310,11 +28270,11 @@ namespace CS_Classes
 
 
 
-    public class IMU_Basics_CSKalman : CS_Parent
+    public class IMU_BasicsKalman_CS : CS_Parent
     {
         double lastTimeStamp;
         Kalman_Basics kalman = new Kalman_Basics();
-        public IMU_Basics_CSKalman(VBtask task) : base(task)
+        public IMU_BasicsKalman_CS(VBtask task) : base(task)
         {
             desc = "Read and display the IMU coordinates";
         }
@@ -28357,11 +28317,11 @@ namespace CS_Classes
 
 
 
-    public class IMU_Basics_CSWithOptions : CS_Parent
+    public class IMU_BasicsWithOptions_CS : CS_Parent
     {
         double lastTimeStamp;
         Options_IMU options = new Options_IMU();
-        public IMU_Basics_CSWithOptions(VBtask task) : base(task)
+        public IMU_BasicsWithOptions_CS(VBtask task) : base(task)
         {
             desc = "Read and display the IMU coordinates";
         }
@@ -29142,7 +29102,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_GMatrix_CSWithOptions : CS_Parent
+    public class IMU_GMatrixWithOptions_CS : CS_Parent
     {
         public float cx = 1, sx = 0, cy = 1, sy = 0, cz = 1, sz = 0;
         public Mat gMatrix;
@@ -29150,7 +29110,7 @@ namespace CS_Classes
         TrackBar ySlider;
         TrackBar zSlider;
         Options_IMU options = new Options_IMU();
-        public IMU_GMatrix_CSWithOptions(VBtask task) : base(task)
+        public IMU_GMatrixWithOptions_CS(VBtask task) : base(task)
         {
             desc = "Find the angle of tilt for the camera with respect to gravity.";
         }
@@ -30885,7 +30845,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core_CS_CS : CS_Parent
+    public class KNN_Core_CS : CS_Parent
     {
         public KNearest knn;
         public List<cv.Point2f> trainInput = new List<cv.Point2f>(); // put training data here
@@ -30894,7 +30854,7 @@ namespace CS_Classes
         public int[,] result; // Get results here...
         public int desiredMatches = -1; // -1 indicates it is to use the number of queries.
         Random_Basics random = new Random_Basics();
-        public KNN_Core_CS_CS(VBtask task) : base(task)
+        public KNN_Core_CS(VBtask task) : base(task)
         {
             knn = KNearest.Create();
             labels[2] = "Red=TrainingData, yellow = queries";
@@ -30981,11 +30941,11 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core_CS_CS2DTest : CS_Parent
+    public class KNN_Core2DTest_CS : CS_Parent
     {
         public KNN_Core knn = new KNN_Core();
         Random_Basics random = new Random_Basics();
-        public KNN_Core_CS_CS2DTest(VBtask task) : base(task)
+        public KNN_Core2DTest_CS(VBtask task) : base(task)
         {
             FindSlider("Random Pixel Count").Value = 10;
             desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors.";
@@ -31028,13 +30988,13 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core_CS_CS3D : CS_Parent
+    public class KNN_Core3D_CS : CS_Parent
     {
         public KNearest knn;
         public List<cv.Point3f> trainInput = new List<cv.Point3f>(); // put training data here
         public List<cv.Point3f> queries = new List<cv.Point3f>(); // put Query data here
         public int[,] result; // Get results here...
-        public KNN_Core_CS_CS3D(VBtask task) : base(task)
+        public KNN_Core3D_CS(VBtask task) : base(task)
         {
             knn = KNearest.Create();
             desc = "Use knn with the input 3D points in the image.  Find the nearest neighbors.";
@@ -31253,12 +31213,12 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core4D_CSTest : CS_Parent
+    public class KNN_Core4DTest_CS : CS_Parent
     {
         KNN_Core4D knn = new KNN_Core4D();
         Distance_Point4D dist = new Distance_Point4D();
         Random_Basics4D random = new Random_Basics4D();
-        public KNN_Core4D_CSTest(VBtask task) : base(task)
+        public KNN_Core4DTest_CS(VBtask task) : base(task)
         {
             labels[2] = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point";
             FindSlider("Random Pixel Count").Value = 5;
@@ -31304,10 +31264,10 @@ namespace CS_Classes
 
 
 
-    public class KNN_CoreN_CSTest : CS_Parent
+    public class KNN_CoreNTest_CS : CS_Parent
     {
         KNN_CoreN knn = new KNN_CoreN();
-        public KNN_CoreN_CSTest(VBtask task) : base(task)
+        public KNN_CoreNTest_CS(VBtask task) : base(task)
         {
             labels[2] = "Highlight color (Yellow) is query.  The red dots are the training set.";
             desc = "Test the use of the general form KNN_CoreN algorithm";
@@ -31656,17 +31616,17 @@ namespace CS_Classes
 
 
 
-    public class KNN_Basics_CSOld : CS_Parent
+    public class KNN_BasicsOld_CS : CS_Parent
     {
         public List<PointPair> matches = new List<PointPair>();
         public List<cv.Point> noMatch = new List<cv.Point>();
         public KNN_Core knn = new KNN_Core();
         public List<cv.Point2f> queries = new List<cv.Point2f>();
         Random_Basics random = new Random_Basics();
-        public KNN_Basics_CSOld(VBtask task) : base(task)
+        public KNN_BasicsOld_CS(VBtask task) : base(task)
         {
             labels[2] = "KNN_Core output with many-to-one results";
-            labels[3] = "KNN_Basics_CSOld output with just the closest match.  Red = training data, yellow = queries.";
+            labels[3] = "KNN_BasicsOld_CS output with just the closest match.  Red = training data, yellow = queries.";
             desc = "Map points 1:1 with losses.  When duplicates are found, toss the farthest.  Too hard to follow.  Trying a better approach.";
         }
         public void RunCS(Mat src)
@@ -32310,10 +32270,10 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_Markers_CS1 : CS_Parent
+    public class LeftRight_Markers1_CS : CS_Parent
     {
         LeftRight_Reduction redView = new LeftRight_Reduction();
-        public LeftRight_Markers_CS1(VBtask task) : base(task)
+        public LeftRight_Markers1_CS(VBtask task) : base(task)
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
@@ -35318,11 +35278,11 @@ namespace CS_Classes
 
 
 
-    public class Mat_Inverse_CS_4D : CS_Parent
+    public class Mat_Inverse_4D_CS : CS_Parent
     {
         double[,] defaultInput = new double[,] { { 3, 7, 2, 5 }, { 4, 0, 1, 1 }, { 1, 6, 3, 0 }, { 2, 8, 4, 3 } };
         public Mat input;
-        public Mat_Inverse_CS_4D(VBtask task) : base(task)
+        public Mat_Inverse_4D_CS(VBtask task) : base(task)
         {
             input = new Mat(4, 4, MatType.CV_64F, defaultInput);
             desc = "Use OpenCV to invert a matrix";
@@ -35533,10 +35493,10 @@ namespace CS_Classes
 
 
 
-    public class Match_Basics_CSTest : CS_Parent
+    public class Match_BasicsTest_CS : CS_Parent
     {
         public Match_Basics match = new Match_Basics();
-        public Match_Basics_CSTest(VBtask task) : base(task)
+        public Match_BasicsTest_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest point below" };
             desc = "Test the Match_Basics algorithm";
@@ -36095,13 +36055,13 @@ namespace CS_Classes
 
 
 
-    public class Match_Point_CSs : CS_Parent
+    public class Match_Points_CS : CS_Parent
     {
         public List<cv.Point2f> ptx = new List<cv.Point2f>();
         public List<float> correlation = new List<float>();
         public Match_Point mPoint = new Match_Point();
         Feature_Basics feat = new Feature_Basics();
-        public Match_Point_CSs(VBtask task) : base(task)
+        public Match_Points_CS(VBtask task) : base(task)
         {
             labels[2] = "Rectangle shown is the search rectangle.";
             desc = "Track the selected points";
@@ -37258,13 +37218,13 @@ namespace CS_Classes
 
 
 
-    public class MiniCloud_Rotate_CSAngle : CS_Parent
+    public class MiniCloud_RotateAngle_CS : CS_Parent
     {
         TrackBar ySlider;
         readonly MiniCloud_Rotate peak = new MiniCloud_Rotate();
         Mat_4to1 mats = new Mat_4to1();
         public Plot_OverTimeSingle plot = new Plot_OverTimeSingle();
-        public MiniCloud_Rotate_CSAngle(VBtask task) : base(task)
+        public MiniCloud_RotateAngle_CS(VBtask task) : base(task)
         {
             ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)");
             task.accRadians.Y = (float)-Cv2.PI / 2;
@@ -37300,11 +37260,11 @@ namespace CS_Classes
 
 
 
-    public class MiniCloud_Rotate_CSSinglePass : CS_Parent
+    public class MiniCloud_RotateSinglePass_CS : CS_Parent
     {
         MiniCloud_Rotate peak = new MiniCloud_Rotate();
         TrackBar ySlider;
-        public MiniCloud_Rotate_CSSinglePass(VBtask task) : base(task)
+        public MiniCloud_RotateSinglePass_CS(VBtask task) : base(task)
         {
             ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)");
             task.accRadians.Y = (float)-Cv2.PI;
@@ -38364,5 +38324,6 @@ namespace CS_Classes
         }
     }
 }
+
 
 

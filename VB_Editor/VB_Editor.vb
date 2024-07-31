@@ -114,44 +114,52 @@ Module VB_EditorMain
         Dim CScodeDir As New DirectoryInfo(CurDir() + "/../../CS_Classes")
         Dim fileEntries As String() = Directory.GetFiles(CScodeDir.FullName)
         Dim lines() As String
-        Dim classnames As New List(Of String)
+        Dim count As Integer
         For Each filename In fileEntries
             If filename.Contains("AI_Gen") Or filename.Contains("Non_AI") Then
                 Dim input = My.Computer.FileSystem.ReadAllText(filename)
                 lines = input.Split(vbCrLf)
                 For i = 0 To lines.Count - 1
                     Dim testLine = lines(i).Trim()
-                    If testLine.StartsWith("public class CS_") Then
-                        Dim split = testLine.Split(" ")
-                        classnames.Add(split(2).Substring(3))
+                    If testLine.StartsWith("public class ") Then
+                        If testLine.Contains("_CS") And testLine.Contains("_CS ") = False Then
+                            Dim split = testLine.Split(" ")
+                            Dim className = split(2)
+                            testLine = lines(i).Replace(split(2), className.Replace("_CS", "") + "_CS")
+                            Console.WriteLine(testLine)
+                            count += 1
+                        End If
                     End If
-                Next
-            End If
-        Next
-        For Each filename In fileEntries
-            If filename.Contains("Non_AI") Then
-                Dim input = My.Computer.FileSystem.ReadAllText(filename)
-                lines = input.Split(vbCrLf)
-                For i = 0 To lines.Count - 1
-                    Dim testLine = lines(i).Trim()
-                    If testLine.StartsWith("public class CS_") Then
-                        Dim split = testLine.Split(" ")
-                        Dim classname = split(2).Substring(3)
-                    End If
-
-                    For Each className In classnames
-                        lines(i) = lines(i).Replace("CS_" + className, className + "_CS")
-                    Next
                     If lines(i) = vbLf Then
                         lines(i) = " "
                     Else
                         If lines(i).StartsWith(vbLf) Then lines(i) = lines(i).Substring(1)
                     End If
                 Next
-
-                File.WriteAllLines(filename.Substring(0, filename.Length - 3) + "_test.cs", lines)
+                ' File.WriteAllLines(filename.Substring(0, filename.Length - 3) + "_test.cs", lines)
             End If
         Next
+        Dim k = 0
+        'For Each filename In fileEntries
+        '    If filename.Contains("Non_AI") Then
+        '        Dim input = My.Computer.FileSystem.ReadAllText(filename)
+        '        lines = input.Split(vbCrLf)
+        '        For i = 0 To lines.Count - 1
+        '            Dim testLine = lines(i).Trim()
+        '            If testLine.StartsWith("public class CS_") Then
+        '                Dim split = testLine.Split(" ")
+        '                Dim classname = split(2).Substring(3)
+        '            End If
+
+        '            For Each className In classnames
+        '                lines(i) = lines(i).Replace("CS_" + className, className + "_CS")
+        '            Next
+
+        '        Next
+
+        '        File.WriteAllLines(filename.Substring(0, filename.Length - 3) + "_test.cs", lines)
+        '    End If
+        'Next
 #End If
     End Sub
 End Module
