@@ -8,7 +8,6 @@ Imports cvext = OpenCvSharp.Extensions
 Imports System.Management
 Imports System.Runtime.InteropServices
 Imports VB_Classes
-Imports FS_Classes
 Module opencv_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
     Public callTraceLock As New Mutex(True, "callTraceLock")
@@ -127,8 +126,6 @@ Public Class OpenCVB
     Public Sub jsonRead()
         jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
         settings = jsonfs.Load()(0)
-
-        Dim greeting = FS_Classes.FS_Classes.greet
 
         cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
         With settings

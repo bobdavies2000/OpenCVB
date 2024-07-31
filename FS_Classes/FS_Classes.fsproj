@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <Compile Include="FS_Parent.fs" />
-    <Compile Include="FS_AI_Gen.fs" />
+    <Compile Include="AI_Gen.fs" />
     <None Include="Script.fsx" />
   </ItemGroup>
 

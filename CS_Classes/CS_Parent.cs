@@ -138,24 +138,29 @@ namespace CS_Classes
             cv.Cv2.PutText(dst, nextText, p1, cv.HersheyFonts.HersheyPlain, task.cvFontSize, cv.Scalar.White, task.cvFontThickness, task.lineType);
         }
     }
-
-        public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color, int lineWidth)
-        {
-            cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
-            cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
-            dst.Line(pt1, pt2, color, lineWidth);
-        }
-        public void DrawLine(cv.Mat dst, cv.Point p1, cv.Point p2, cv.Scalar color)
-        {
-            dst.Line(p1, p2, color, task.lineWidth);
-        }
-        public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color)
-        {
-            cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
-            cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
-            dst.Line(pt1, pt2, color, task.lineWidth);
-        }
-        public Rangef[] GetHist2Dminmax(Mat input, int chan1, int chan2)
+    public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color, int lineWidth)
+    {
+        cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
+        cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
+        dst.Line(pt1, pt2, color, lineWidth);
+    }
+    public void DrawLine(cv.Mat dst, cv.Point2d p1, cv.Point2d p2, cv.Scalar color)
+    {
+        cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
+        cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
+        dst.Line(pt1, pt2, color, task.lineWidth);
+    }
+    public void DrawLine(cv.Mat dst, cv.Point p1, cv.Point p2, cv.Scalar color)
+    {
+        dst.Line(p1, p2, color, task.lineWidth);
+    }
+    public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color)
+    {
+        cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
+        cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
+        dst.Line(pt1, pt2, color, task.lineWidth);
+    }
+    public Rangef[] GetHist2Dminmax(Mat input, int chan1, int chan2)
     {
         float histDelta = 0.00001f;
         if (input.Type() == MatType.CV_8UC3)
@@ -627,6 +632,11 @@ namespace CS_Classes
         public void DrawCircle(Mat dst, cv.Point2f p1, int radius, Scalar color, int lineWidth = -1)
         {
             var pt = new cv.Point(p1.X, p1.Y);
+            dst.Circle(pt, radius, color, lineWidth, task.lineType);
+        }
+        public void DrawCircle(Mat dst, cv.Point2d p1, int radius, Scalar color, int lineWidth = -1)
+        {
+            var pt = new cv.Point((int)p1.X, (int)p1.Y);
             dst.Circle(pt, radius, color, lineWidth, task.lineType);
         }
         public void DrawCircle(Mat dst, cv.Point pt, int radius, Scalar color, int lineWidth = -1)

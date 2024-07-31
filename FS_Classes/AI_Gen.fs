@@ -56,3 +56,30 @@ namespace FS_Classes
 //        base.Labels.[2] <- sprintf "Depth %%: %.0f BGR %%: %d" (100.0 - float weight * 100.0) (int (weight * 100.0f))
 
         
+    type AddWeighted_Basics_FS(task: VBtask) =
+    inherit CS_Parent(task)
+
+    let mutable weight: float32 = 0.0f
+    let mutable src2: Mat = null
+    let options = Options_AddWeighted()
+
+    do
+        desc <- "Add 2 images with specified weights."
+
+    member this.RunCS(src: Mat) =
+        options.RunVB()
+        weight <- options.addWeighted
+
+        let mutable srcPlus = src2
+        // algorithm user normally provides src2! 
+        if standaloneTest() || isNull src2 then srcPlus <- task.depthRGB
+        if srcPlus.Type() <> src.Type() then
+            if src.Type() <> MatType.CV_8UC3 || srcPlus.Type() <> MatType.CV_8UC3 then
+                if src.Type() = MatType.CV_32FC1 then src <- GetNormalize32f(src)
+                if srcPlus.Type() = MatType.CV_32FC1 then srcPlus <- GetNormalize32f(srcPlus)
+                if src.Type() <> MatType.CV_8UC3 then src <- src.CvtColor(ColorConversionCodes.GRAY2BGR)
+                if srcPlus.Type() <> MatType.CV_8UC3 then srcPlus <- srcPlus.CvtColor(ColorConversionCodes.GRAY2BGR)
+        Cv2.AddWeighted(src, weight, srcPlus, 1.0 - weight, 0.0, dst2)
+        labels.[2] <- sprintf "Depth %%: %d BGR %%: %d" (100 - int (weight * 100.0f)) (int (weight * 100.0f))
+
+

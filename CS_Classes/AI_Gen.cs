@@ -25,81 +25,6 @@ using System.IO.Pipes;
 
 namespace CS_Classes
 {
-    public class CompareAllowIdenticalDoubleInverted : IComparer<double>
-    {
-        public int Compare(double a, double b)
-        {
-            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            if (a <= b) return 1;
-            return -1;
-        }
-    }
-    public class CompareAllowIdenticalDouble : IComparer<double>
-    {
-        public int Compare(double a, double b)
-        {
-            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            if (a >= b) return 1;
-            return -1;
-        }
-    }
-    public class CompareAllowIdenticalSingleInverted : IComparer<float>
-    {
-        public int Compare(float a, float b)
-        {
-            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            if (a <= b) return 1;
-            return -1;
-        }
-    }
-    public class CompareAllowIdenticalSingle : IComparer<float>
-    {
-        public int Compare(float a, float b)
-        {
-            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            if (a >= b) return 1;
-            return -1;
-        }
-    }
-    public class CompareAllowIdenticalIntegerInverted : IComparer<int>
-    {
-        public int Compare(int a, int b)
-        {
-            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            if (a <= b) return 1;
-            return -1;
-        }
-    }
-    public class CompareByte : IComparer<byte>
-    {
-        public int Compare(byte a, byte b)
-        {
-            if (a <= b) return -1;
-            return 1;
-        }
-    }
-    public class CompareAllowIdenticalInteger : IComparer<int>
-    {
-        public int Compare(int a, int b)
-        {
-            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            if (a >= b) return 1;
-            return -1;
-        }
-    }
-
-    public class CompareMaskSize : IComparer<int>
-    {
-        public int Compare(int a, int b)
-        {
-            if (a <= b) return 1;
-            return -1;
-        }
-    }
-
-
-
-
     public class AddWeighted_Basics_CS : CS_Parent
     {
         public Single weight;
@@ -215,6 +140,79 @@ namespace CS_Classes
             addw.src2 = dst1;
             addw.RunAndMeasure(task.depthRGB, addw);
             dst2 = addw.dst2.Clone();
+        }
+    }
+
+
+    public class CompareAllowIdenticalDoubleInverted : IComparer<double>
+    {
+        public int Compare(double a, double b)
+        {
+            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            if (a <= b) return 1;
+            return -1;
+        }
+    }
+    public class CompareAllowIdenticalDouble : IComparer<double>
+    {
+        public int Compare(double a, double b)
+        {
+            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            if (a >= b) return 1;
+            return -1;
+        }
+    }
+    public class CompareAllowIdenticalSingleInverted : IComparer<float>
+    {
+        public int Compare(float a, float b)
+        {
+            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            if (a <= b) return 1;
+            return -1;
+        }
+    }
+    public class CompareAllowIdenticalSingle : IComparer<float>
+    {
+        public int Compare(float a, float b)
+        {
+            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            if (a >= b) return 1;
+            return -1;
+        }
+    }
+    public class CompareAllowIdenticalIntegerInverted : IComparer<int>
+    {
+        public int Compare(int a, int b)
+        {
+            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            if (a <= b) return 1;
+            return -1;
+        }
+    }
+    public class CompareByte : IComparer<byte>
+    {
+        public int Compare(byte a, byte b)
+        {
+            if (a <= b) return -1;
+            return 1;
+        }
+    }
+    public class CompareAllowIdenticalInteger : IComparer<int>
+    {
+        public int Compare(int a, int b)
+        {
+            // why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            if (a >= b) return 1;
+            return -1;
+        }
+    }
+
+    public class CompareMaskSize : IComparer<int>
+    {
+        public int Compare(int a, int b)
+        {
+            if (a <= b) return 1;
+            return -1;
         }
     }
 
@@ -420,10 +418,10 @@ namespace CS_Classes
     public class Annealing_Basics_CS : CS_Parent
     {
         public int numberOfCities = 25;
-        public Point2f[] cityPositions;
+        public Point2d[] cityPositions;
         public int[] cityOrder;
-        public float energy;
-        public float energyLast;
+        public double energy;
+        public double energyLast;
         public bool circularPattern = true;
 
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -440,7 +438,7 @@ namespace CS_Classes
             for (int i = 0; i < cityOrder.Length; i++)
             {
                 DrawCircle(dst2, cityPositions[i], task.DotSize, Scalar.White);
-                DrawLine(dst2, cityPositions[i], cityPositions[cityOrder[i]], Scalar.White, task.lineWidth);
+                DrawLine(dst2, cityPositions[i], cityPositions[cityOrder[i]], Scalar.White);
             }
             SetTrueText("Energy" + "\n" + energy.ToString(fmt0), new cv.Point(10, 100), 2);
         }
@@ -453,12 +451,12 @@ namespace CS_Classes
             cv.Point center = new cv.Point(dst2.Cols / 2, dst2.Rows / 2);
             if (circularPattern)
             {
-                cityPositions = new cv.Point2f[numberOfCities];
+                cityPositions = new cv.Point2d[numberOfCities];
                 for (int i = 0; i < cityPositions.Length; i++)
                 {
                     double theta = msRNG.Next(0, 360);
-                    cityPositions[i].X = (float)(radius * Math.Cos(theta) + center.X);
-                    cityPositions[i].Y = (float)(radius * Math.Sin(theta) + center.Y);
+                    cityPositions[i].X = radius * Math.Cos(theta) + center.X;
+                    cityPositions[i].Y = radius * Math.Sin(theta) + center.Y;
                     cityOrder[i] = (i + 1) % numberOfCities;
                 }
             }
@@ -533,7 +531,7 @@ namespace CS_Classes
             {
                 anneal[i] = new Annealing_Basics_CS(task);
                 anneal[i].numberOfCities = options.cityCount;
-                anneal[i].cityPositions = random.PointList.ToArray();
+                anneal[i].cityPositions = random.PointList2d.ToArray();
                 anneal[i].circularPattern = options.circularFlag;
                 anneal[i].setup();
                 anneal[i].Open(); // this will initialize the C++ copy of the city positions.
@@ -568,7 +566,7 @@ namespace CS_Classes
             });
 
             // find the best result and start all the others with it.
-            SortedList<float, int> bestList = new SortedList<float, int>(new compareAllowIdenticalSingle());
+            SortedList<double, int> bestList = new SortedList<double, int>(new compareAllowIdenticalDouble());
             strOut = "";
             for (int i = 0; i < anneal.Length; i++)
             {
@@ -49017,6 +49015,7 @@ namespace CS_Classes
     public class Random_Basics_CS : CS_Parent
     {
         public List<cv.Point2f> PointList = new List<cv.Point2f>();
+        public List<cv.Point2d> PointList2d = new List<cv.Point2d>();
         public cv.Rect range;
         public Options_Random options = new Options_Random();
 
@@ -49038,7 +49037,9 @@ namespace CS_Classes
                 while (PointList.Count < sizeRequest)
                 {
                     PointList.Add(new cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
-                                                msRNG.Next(range.Y, range.Y + range.Height)));
+                                                 msRNG.Next(range.Y, range.Y + range.Height)));
+                    PointList2d.Add(new cv.Point2d(msRNG.Next(range.X, range.X + range.Width),
+                                                   msRNG.Next(range.Y, range.Y + range.Height)));
                 }
                 if (standaloneTest())
                 {
