@@ -382,12 +382,10 @@ Module UI_GeneratorMain
                     className = split(2) ' public class <classname>
                     If className.StartsWith("Python_") Then PYnames.Add(className, className)
                     If className.EndsWith("_PS.py") Then PYStreamNames.Add(className, className)
-                    If className.StartsWith("OpenGL") Then OpenGLnames.Add(className, className)
-                    If className.StartsWith("OpenCVGL") Then OpenGLnames.Add(className, className)
+                    If className.Contains("OpenGL") Then OpenGLnames.Add(className, className)
                     Continue While
                 End If
                 If className <> "" Then
-                    If codeline.Contains("New OpenGL") And className.StartsWith("OpenGL") = False Then OpenGLnames.Add(className, className)
                     For i = 0 To apiList.Count - 1
                         Dim index = InStr(lcaseLine, apiListLCase(i))
                         If index > 0 Then
@@ -395,7 +393,7 @@ Module UI_GeneratorMain
                                 If tokens(i) Is Nothing Then
                                     tokens(i) = className
                                 Else
-                                    If tokens(i).Contains(classname) = False Then tokens(i) += "," + classname
+                                    If tokens(i).Contains(className) = False Then tokens(i) += "," + className
                                 End If
                             End If
                         End If
@@ -454,6 +452,25 @@ Module UI_GeneratorMain
         Next
         sw.WriteLine()
 
+
+        sw.Write("<All C++ (" + CStr(cppNames.Count) + ")>")
+        For i = 0 To cppNames.Count - 1
+            sw.Write("," + cppNames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<All OpenGL (" + CStr(OpenGLnames.Count) + ")>")
+        For i = 0 To OpenGLnames.Count - 1
+            sw.Write("," + OpenGLnames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<All PyStream(" + CStr(PYStreamNames.Count) + ">")
+        For i = 0 To PYStreamNames.Count - 1
+            sw.Write("," + PYStreamNames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
         sw.Write("<All Python (" + CStr(PYnames.Count) + ")>")
         For i = 0 To PYnames.Count - 1
             sw.Write("," + PYnames.ElementAt(i).Key)
@@ -467,24 +484,6 @@ Module UI_GeneratorMain
         sw.WriteLine()
 
         'sw.WriteLine("<All using recorded data>")
-
-        sw.Write("<All C++ (" + CStr(cppNames.Count) + ")>")
-        For i = 0 To cppNames.Count - 1
-            sw.Write("," + cppNames.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
-
-        sw.Write("<OpenGL>")
-        For i = 0 To OpenGLnames.Count - 1
-            sw.Write("," + OpenGLnames.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
-
-        sw.Write("<PyStream>")
-        For i = 0 To PYStreamNames.Count - 1
-            sw.Write("," + PYStreamNames.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
 
         For i = 0 To sortedAPIs.Count - 1
             Dim token = sortedAPIs.ElementAt(i)

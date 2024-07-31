@@ -67,7 +67,7 @@ Public Class Gif_OpenGL : Inherits VB_Parent
         Dim r = New cv.Rect(0, 0, dst2.Height, dst2.Height)
         gifC.Run(dst2(r))
 
-        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options'" + vbCrLf +
+        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options')" + vbCrLf +
                     "Click the check box for each frame to be included" + vbCrLf + "Then click 'Build GIF file...' when done." +
                     vbCrLf + vbCrLf + "To adjust the GIF size, change the working size in the OpenCVB options.", 3)
         labels(2) = gifC.labels(2)
@@ -98,7 +98,7 @@ Public Class Gif_OpenGLwithColor : Inherits VB_Parent
 
         gifC.Run(tmp)
 
-        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options'" + vbCrLf +
+        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options')" + vbCrLf +
                     "Click the check box for each frame to be included" + vbCrLf + "Then click 'Build GIF file...' when done.", 3)
         labels(2) = gifC.labels(2)
     End Sub
