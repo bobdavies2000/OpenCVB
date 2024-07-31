@@ -51,12 +51,14 @@ namespace CS_Classes
 			if (algorithmName == "BackProject_Unstable_CS") return new BackProject_Unstable_CS(task);
 			if (algorithmName == "BackProject_Vertical_CS") return new BackProject_Vertical_CS(task);
 			if (algorithmName == "BackProject2D_Basics_CS") return new BackProject2D_Basics_CS(task);
+			if (algorithmName == "BackProject2D_BasicsOld_CS") return new BackProject2D_BasicsOld_CS(task);
 			if (algorithmName == "BackProject2D_Compare_CS") return new BackProject2D_Compare_CS(task);
 			if (algorithmName == "BackProject2D_Filter_CS") return new BackProject2D_Filter_CS(task);
 			if (algorithmName == "BackProject2D_FilterBoth_CS") return new BackProject2D_FilterBoth_CS(task);
 			if (algorithmName == "BackProject2D_FilterSide_CS") return new BackProject2D_FilterSide_CS(task);
 			if (algorithmName == "BackProject2D_FilterTop_CS") return new BackProject2D_FilterTop_CS(task);
 			if (algorithmName == "BackProject2D_Full_CS") return new BackProject2D_Full_CS(task);
+			if (algorithmName == "BackProject2D_RowCol_CS") return new BackProject2D_RowCol_CS(task);
 			if (algorithmName == "BackProject2D_Side_CS") return new BackProject2D_Side_CS(task);
 			if (algorithmName == "BackProject2D_Top_CS") return new BackProject2D_Top_CS(task);
 			if (algorithmName == "Benford_Basics_CS") return new Benford_Basics_CS(task);
@@ -98,6 +100,8 @@ namespace CS_Classes
 			if (algorithmName == "Bin3Way_RedCloudLightest_CS") return new Bin3Way_RedCloudLightest_CS(task);
 			if (algorithmName == "Bin3Way_RedCloudOther_CS") return new Bin3Way_RedCloudOther_CS(task);
 			if (algorithmName == "Bin4Way_Basics_CS") return new Bin4Way_Basics_CS(task);
+			if (algorithmName == "Bin4Way_BasicsColors_CS") return new Bin4Way_BasicsColors_CS(task);
+			if (algorithmName == "Bin4Way_BasicsRed_CS") return new Bin4Way_BasicsRed_CS(task);
 			if (algorithmName == "Bin4Way_Canny_CS") return new Bin4Way_Canny_CS(task);
 			if (algorithmName == "Bin4Way_RedCloud_CS") return new Bin4Way_RedCloud_CS(task);
 			if (algorithmName == "Bin4Way_Regions_CS") return new Bin4Way_Regions_CS(task);
@@ -106,7 +110,10 @@ namespace CS_Classes
 			if (algorithmName == "Bin4Way_Sobel_CS") return new Bin4Way_Sobel_CS(task);
 			if (algorithmName == "Bin4Way_SplitGaps_CS") return new Bin4Way_SplitGaps_CS(task);
 			if (algorithmName == "Bin4Way_SplitMean_CS") return new Bin4Way_SplitMean_CS(task);
+			if (algorithmName == "Bin4Way_SplitMean1_CS") return new Bin4Way_SplitMean1_CS(task);
+			if (algorithmName == "Bin4Way_SplitMean2_CS") return new Bin4Way_SplitMean2_CS(task);
 			if (algorithmName == "Bin4Way_SplitValley_CS") return new Bin4Way_SplitValley_CS(task);
+			if (algorithmName == "Bin4Way_Unstable_CS") return new Bin4Way_Unstable_CS(task);
 			if (algorithmName == "Bin4Way_Unstable1_CS") return new Bin4Way_Unstable1_CS(task);
 			if (algorithmName == "Bin4Way_UnstableEdges_CS") return new Bin4Way_UnstableEdges_CS(task);
 			if (algorithmName == "Bin4Way_UnstablePixels_CS") return new Bin4Way_UnstablePixels_CS(task);

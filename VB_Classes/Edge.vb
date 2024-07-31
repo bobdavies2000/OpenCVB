@@ -1,6 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
+Imports OpenCvSharp
+Imports System.Security.Cryptography
 Public Class Edge_All : Inherits VB_Parent
     Dim options As New Options_Edges_All
     Public Sub New()

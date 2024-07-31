@@ -3186,6 +3186,205 @@ namespace CS_Classes
 
 
 
+    public class Bin4Way_SplitMean1_CS : CS_Parent
+    {
+        Binarize_Simple binary = new Binarize_Simple();
+        public Mat_4Click mats = new Mat_4Click();
+        Scalar botColor, midColor, topColor;
+        public Bin4Way_SplitMean1_CS(VBtask task) : base(task)
+        {
+            labels[2] = "A 4-way split - darkest (upper left) to lightest (lower right)";
+            desc = "Binarize an image and split it into quartiles using peaks.";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat gray = src.Channels() == 1 ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            binary.Run(gray);
+            Mat mask = binary.dst2.Clone();
+            if (task.heartBeat)
+            {
+                midColor = binary.meanScalar[0];
+                topColor = Cv2.Mean(gray, mask)[0];
+                botColor = Cv2.Mean(gray, ~mask)[0];
+            }
+            mats.mat[0] = gray.InRange(0, botColor[0] / 2);
+            mats.mat[1] = gray.InRange(botColor[0] / 2, (botColor[0] + midColor[0]) / 2);
+            mats.mat[2] = gray.InRange((botColor[0] + midColor[0]) / 2, (midColor[0] + topColor[0]) / 2);
+            mats.mat[3] = gray.InRange((midColor[0] + topColor[0]) / 2, 255);
+            mats.Run(empty);
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+            labels[3] = mats.labels[3];
+        }
+    }
+    
+    
+    
+    public class Bin4Way_SplitMean2_CS : CS_Parent
+    {
+        Binarize_Simple binary = new Binarize_Simple();
+        Hist_Basics hist = new Hist_Basics();
+        public Mat_4Click mats = new Mat_4Click();
+        Scalar botColor, midColor, topColor;
+        public Bin4Way_SplitMean2_CS(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(256);
+            labels[2] = "A 4-way split - darkest (upper left) to lightest (lower right)";
+            desc = "Binarize an image and split it into quartiles finding the minimum between peaks.";
+        }
+        int findMin(int start, int finish)
+        {
+            int minIndex = 0;
+            int minVal = int.MaxValue;
+            for (int i = start; i < finish; i++)
+            {
+                if (hist.histArray[i] < minVal)
+                {
+                    minVal = (int)hist.histArray[i];
+                    minIndex = i;
+                }
+            }
+            return minIndex;
+        }
+        public void RunCS(Mat src)
+        {
+            Mat gray = src.Channels() == 1 ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            hist.Run(gray);
+            binary.Run(gray);
+            Mat mask = binary.dst2.Clone();
+            if (task.heartBeat)
+            {
+                midColor = binary.meanScalar[0];
+                topColor = Cv2.Mean(gray, mask)[0];
+                botColor = Cv2.Mean(gray, ~mask)[0];
+            }
+            int botmin = findMin(5, (int)botColor[0]);
+            mats.mat[0] = gray.InRange(0, botmin);
+            int midMin = findMin((int)botColor[0], (int)midColor[0]);
+            mats.mat[1] = gray.InRange(botmin, midMin);
+            int topMin = findMin((int)midColor[0], (int)topColor[0]);
+            mats.mat[2] = gray.InRange(midMin, topMin);
+            mats.mat[3] = gray.InRange(topMin, 255);
+            mats.Run(empty);
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+            labels[3] = mats.labels[3];
+        }
+    }
+
+
+
+
+
+    public class Bin4Way_BasicsColors_CS : CS_Parent
+    {
+        Bin4Way_Basics quart = new Bin4Way_Basics();
+        Color8U_Basics color = new Color8U_Basics();
+        public Bin4Way_BasicsColors_CS(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            desc = "Test Bin4Way_Basics with different src inputs.";
+        }
+        public void RunCS(Mat src)
+        {
+            color.Run(src);
+            quart.Run(color.dst3.CvtColor(ColorConversionCodes.BGR2GRAY));
+            dst1 = quart.dst1;
+            dst2 = quart.dst2;
+            dst3 = quart.dst3;
+            labels = quart.labels;
+            trueData = quart.trueData;
+        }
+    }
+
+
+
+
+
+    public class Bin4Way_Unstable_CS : CS_Parent
+    {
+        Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
+        Diff_Basics[] diff = new Diff_Basics[4];
+        public Bin4Way_Unstable_CS(VBtask task) : base(task)
+        {
+            for (int i = 0; i < diff.Length; i++)
+            {
+                diff[i] = new Diff_Basics();
+            }
+            labels[2] = "Image separated into 4 levels - darkest to lightest";
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Find the unstable pixels in the binary image";
+        }
+        public void RunCS(Mat src)
+        {
+            binary.Run(src);
+            dst2 = binary.dst2;
+            dst3.SetTo(0);
+            for (int i = 0; i < diff.Length; i++)
+            {
+                diff[i].Run(binary.mats.mat[i]);
+                dst3 = dst3 | diff[i].dst2;
+            }
+            if (task.heartBeat) labels[3] = "There are " + dst3.CountNonZero() + " unstable pixels";
+        }
+    }
+
+
+
+
+    public class Bin4Way_BasicsRed_CS : CS_Parent
+    {
+        public Mat_4to1 mats = new Mat_4to1();
+        Hist_Basics hist = new Hist_Basics();
+        public Bin4Way_BasicsRed_CS(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(255);
+            labels[3] = "Grayscale histogram of the image with markers showing where each quarter of the samples are.";
+            desc = "Implement a 4-way split similar to the Bin3Way_Basics algorithm.";
+        }
+        public void RunCS(Mat src)
+        {
+            int bins = task.histogramBins;
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            hist.Run(src);
+            dst3 = hist.dst2;
+            List<float> histArray = new List<float>(hist.histArray);
+            int fraction = (int)(dst2.Total() / 4);
+            List<int> accums = new List<int> { 0, 0, 0, 0 };
+            List<int> quartiles = new List<int> { 0, 0, 0, 0 };
+            int index = 0;
+            for (int i = 0; i < histArray.Count; i++)
+            {
+                accums[index] += (int)histArray[i];
+                if (accums[index] >= fraction)
+                {
+                    quartiles[index] = i;
+                    index++;
+                }
+            }
+            for (int i = 0; i < quartiles.Count(); i++)
+            {
+                int offset = quartiles[i] / bins * dst3.Width;
+                DrawLine(dst3, new cv.Point(offset, 0), new cv.Point(offset, dst3.Height), Scalar.White);
+            }
+            mats.mat[0] = src.InRange(0, quartiles[0] - 1);
+            mats.mat[1] = src.InRange(quartiles[0], quartiles[1] - 1);
+            mats.mat[2] = src.InRange(quartiles[1], quartiles[2] - 1);
+            mats.mat[3] = src.InRange(quartiles[2], 255);
+            if (standaloneTest())
+            {
+                mats.Run(empty);
+                dst2 = mats.dst2;
+            }
+        }
+    }
+
+
+
+
+
+
+
 
     public class Bin4Way_Canny_CS : CS_Parent
     {
@@ -5045,6 +5244,108 @@ namespace CS_Classes
                         new cv.Point(10, dst3.Height - 20), 3);
         }
     }
+
+
+
+
+
+    public class BackProject2D_BasicsOld_CS : CS_Parent
+    {
+        public Hist2D_Basics hist2d = new Hist2D_Basics();
+        public int xRange = 255;
+        public int yRange = 255;
+        public float minX, maxX, minY, maxY;
+        public Color_Basics colorFmt = new Color_Basics();
+        public int bpCol, bpRow;
+        public BackProject2D_BasicsOld_CS(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setGridSize(5);
+            UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.");
+            desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed.";
+        }
+        public void RunCS(Mat src)
+        {
+            bpCol = (int)Math.Floor((double)(task.mouseMovePoint.X / task.gridCols));
+            bpRow = (int)Math.Floor((double)(task.mouseMovePoint.Y / task.gridRows));
+            colorFmt.Run(src);
+            hist2d.Run(colorFmt.dst2);
+            dst2 = hist2d.dst2;
+            minX = bpRow * xRange / task.gridSize;
+            maxX = (bpRow + 1) * xRange / task.gridSize;
+            minY = bpCol * yRange / task.gridSize;
+            maxY = (bpCol + 1) * yRange / task.gridSize;
+            Rangef[] ranges = new Rangef[] { new Rangef(minX, maxX), new Rangef(minY, maxY) };
+            Cv2.CalcBackProject(new Mat[] { src }, task.redOptions.channels, hist2d.histogram, dst0, ranges);
+            float bpCount = hist2d.histogram.Get<float>(bpRow, bpCol);
+            dst3.SetTo(0);
+            dst3.SetTo(Scalar.Yellow, dst0);
+            if (task.heartBeat)
+            {
+                labels[2] = colorFmt.options.colorFormat + ": Cell minX/maxX " + minX.ToString("0") + "/" + maxX.ToString("0") + " minY/maxY " +
+                            minY.ToString("0") + "/" + maxY.ToString("0");
+                int c1 = task.redOptions.channels[0], c2 = task.redOptions.channels[1];
+                labels[3] = "That combination of channel " + c1.ToString() + "/" + c2.ToString() + " has " + bpCount.ToString() +
+                            " pixels while image total is " + dst0.Total().ToString("0");
+            }
+            SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control the 2D histogram at left",
+                        new cv.Point(10, dst3.Height - 20), 3);
+        }
+    }
+
+
+
+
+    public class BackProject2D_RowCol_CS : CS_Parent
+    {
+        BackProject2D_Basics backp = new BackProject2D_Basics();
+        Options_BackProject2D options = new Options_BackProject2D();
+        public BackProject2D_RowCol_CS(VBtask task) : base(task)
+        {
+            FindRadio("HSV").Checked = true;
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            task.gOptions.setGridSize(10);
+            desc = "Backproject the whole row or column of the 2D histogram";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst0 = src.Clone();
+            var selection = options.backProjectRow ? "Row" : "Col";
+            labels[2] = "Histogram 2D with Backprojection by " + selection;
+            backp.Run(src);
+            dst2 = GetNormalize32f(backp.dst2) * 255;
+            var roi = task.gridList[task.gridMap.Get<int>(task.mouseMovePoint.Y, task.mouseMovePoint.X)];
+            cv.Rect rect;
+            if (options.backProjectRow)
+            {
+                rect = new cv.Rect(0, roi.Y, dst2.Width, roi.Height);
+            }
+            else
+            {
+                rect = new cv.Rect(roi.X, 0, roi.Width, dst2.Height);
+            }
+            dst2.Rectangle(rect, task.HighlightColor, task.lineWidth);
+            Mat histData = new Mat(backp.hist2d.histogram.Size(), MatType.CV_32F, 0);
+            backp.hist2d.histogram[rect].CopyTo(histData[rect]);
+            var ranges = backp.hist2d.ranges;
+            Cv2.CalcBackProject(new Mat[] { src }, backp.hist2d.channels, histData, dst1, ranges);
+            dst3.SetTo(0);
+            dst3.SetTo(Scalar.Yellow, dst1);
+            dst0.SetTo(0, dst1);
+            if (task.heartBeat)
+            {
+                var count = histData[rect].Sum();
+                labels[3] = "Selected " + selection + " = " + histData[rect].CountNonZero() + " non-zero histogram entries representing total pixels of " + count;
+            }
+            if (task.heartBeat)
+            {
+                strOut = "Use Global Algorithm Option 'Grid Square Size' to control the 2D histogram." + "\n" +
+                         "Move mouse in 2D histogram to select a row or column to backproject.";
+            }
+            SetTrueText(strOut, 1);
+        }
+    }
+
 
 
 
@@ -8400,7 +8701,7 @@ namespace CS_Classes
         public Contour_Edges_CS(VBtask task) : base(task)
         {
             lastImage = new Mat(task.WorkingRes, MatType.CV_8UC3, 0);
-            desc = "Create contours for Edge_MotionAccum";
+            desc = "Create contours for motion";
         }
 
         public void RunCS(Mat src)

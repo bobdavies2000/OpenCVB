@@ -435,10 +435,13 @@ Module UI_GeneratorMain
         Next
 
         Dim count As Integer
+        Dim testKeys = New List(Of String)
         For Each nm In CSnames.Keys
-            Dim testName = nm.Substring(0, nm.Length - 3)
-            If VBNames.Keys.Contains(testName) = False Then
-                Console.WriteLine("missing " + testName)
+            testKeys.Add(nm.Substring(0, nm.Length - 3))
+        Next
+        For Each nm In VBNames.Keys
+            If testKeys.Contains(nm) = False And nm.StartsWith("Options_") = False Then
+                Console.WriteLine("missing from C# code: " + nm)
                 count += 1
             End If
         Next

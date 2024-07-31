@@ -58,7 +58,7 @@ Public Class Touchup
                 inline = Replace(inline, "ColorConversion.BgrToGray", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
                 inline = Replace(inline, "ColorConversion.GrayToBgr", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
                 inline = Replace(inline, "ColorConversion.BgrToHsv", "cv.ColorConversionCodes.BGR2HSV", 1, -1, vbTextCompare)
-                inline = Replace(inline, "Options.", "options.")
+                inline = Replace(inline, " Options.", " options.")
 
                 inline = Replace(inline, "task.pcSplit(2)", "task.pcSplit[2]")
                 inline = Replace(inline, "task.pcSplit(1)", "task.pcSplit[1]")
