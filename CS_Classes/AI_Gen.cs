@@ -7493,6 +7493,34 @@ namespace CS_Classes
     }
 
 
+    public class Cluster_RedCloud_CS : CS_Parent
+    {
+        Cluster_Basics cluster = new Cluster_Basics();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public Cluster_RedCloud_CS(VBtask task) : base(task)
+        {
+            desc = "Cluster the center points of the RedCloud cells";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            cluster.ptInput.Clear();
+            var smallCellThreshold = src.Total() / 1000;
+            foreach (var rc in task.redCells)
+            {
+                if (rc.pixels < smallCellThreshold && rc.pixels > 0) break;
+                if (rc.exactMatch) cluster.ptInput.Add(rc.maxDist);
+            }
+            cluster.Run(src);
+            dst3 = cluster.dst2;
+            if (task.heartBeat) labels[3] = cluster.labels[2];
+        }
+    }
+
+
+
 
 
     public class Cluster_Hulls_CS : CS_Parent
@@ -8598,6 +8626,136 @@ namespace CS_Classes
             {
                 DrawContour(dst3, ctr.ToList(), Scalar.Yellow);
             }
+        }
+    }
+
+
+
+
+    public class Contour_RedCloudEdges_CS : CS_Parent
+    {
+        RedCloud_Cells redC = new RedCloud_Cells();
+        EdgeDraw_Basics edges = new EdgeDraw_Basics();
+        public Contour_RedCloudEdges_CS(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            labels = new string[] { "", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges." };
+            desc = "Intersect the cell contours and the edges in the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            labels[2] = redC.redC.labels[2] + " - Contours only.  Click anywhere to select a cell";
+            dst2.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                DrawContour(dst2[rc.rect], rc.contour, 255, task.lineWidth);
+            }
+            edges.Run(src);
+            dst1 = edges.dst2;
+            dst3 = dst1 & dst2;
+        }
+    }
+    public class Contour_RedCloud_CS : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public Contour_RedCloud_CS(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Show all the contours found in the RedCloud output";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            dst3.SetTo(0);
+            foreach (var rc in task.redCells)
+            {
+                DrawContour(dst3[rc.rect], rc.contour, 255, task.lineWidth);
+            }
+        }
+    }
+    public class Contour_CompareToFeatureless_CS : CS_Parent
+    {
+        Contour_WholeImage contour = new Contour_WholeImage();
+        FeatureLess_Basics fLess = new FeatureLess_Basics();
+        public Contour_CompareToFeatureless_CS(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Contour_WholeImage output", "FeatureLess_Basics output" };
+            desc = "Compare Contour_WholeImage and FeatureLess_Basics.";
+        }
+        public void RunCS(Mat src)
+        {
+            contour.Run(src);
+            dst2 = contour.dst2;
+            fLess.Run(src);
+            dst3 = fLess.dst2;
+        }
+    }
+    public class Contour_Smoothing_CS : CS_Parent
+    {
+        Options_Contours2 options = new Options_Contours2();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public Contour_Smoothing_CS(VBtask task) : base(task)
+        {
+            labels[3] = "The white outline is the truest contour while the red is the selected approximation.";
+            desc = "Compare contours of the selected cell. Cells are offset to help comparison.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            var rc = task.rc;
+            dst1.SetTo(0);
+            dst3.SetTo(0);
+            var bestContour = contourBuild(rc.mask, ContourApproximationModes.ApproxNone);
+            DrawContour(dst3[rc.rect], bestContour, Scalar.White, task.lineWidth + 3);
+            var approxContour = contourBuild(rc.mask, options.ApproximationMode);
+            DrawContour(dst3[rc.rect], approxContour, Scalar.Red);
+            if (task.heartBeat) labels[2] = "Contour points count reduced from " + bestContour.Count() +
+                                               " to " + approxContour.Count();
+        }
+    }
+    public class Contour_RC_AddContour_CS : CS_Parent
+    {
+        public List<cv.Point> contour = new List<cv.Point>();
+        public Options_Contours options = new Options_Contours();
+        int myFrameCount = 0;
+        Reduction_Basics reduction = new Reduction_Basics();
+        public Contour_RC_AddContour_CS(VBtask task) : base(task)
+        {
+            desc = "Find the contour for the src.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (myFrameCount != task.frameCount)
+            {
+                options.RunVB(); // avoid running options more than once per frame.
+                myFrameCount = task.frameCount;
+            }
+            if (standalone)
+            {
+                reduction.Run(src);
+                src = reduction.dst2;
+            }
+            cv.Point[][] allContours;
+            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            Cv2.FindContours(src, out allContours, out _, RetrievalModes.External, options.ApproximationMode);
+            int maxCount = 0, maxIndex = 0;
+            for (int i = 0; i < allContours.Length; i++)
+            {
+                int len = allContours[i].Length;
+                if (len > maxCount)
+                {
+                    maxCount = len;
+                    maxIndex = i;
+                }
+            }
+            dst2 = src;
+            if (allContours.Length == 0) return;
+            var contour = new List<cv.Point>(allContours[maxIndex]);
+            DrawContour(dst2, contour, 255, task.lineWidth);
         }
     }
 
@@ -11197,6 +11355,112 @@ namespace CS_Classes
             dst1 = task.pointCloud;
             dst2 = task.depthMask;
             dst3 = task.noDepthMask;
+        }
+    }
+
+
+
+
+    public class Density_Basics_CS : CS_Parent
+    {
+        Options_Density options = new Options_Density();
+        public Density_Basics_CS(VBtask task) : base(task)
+        {
+            cPtr = Density_2D_Open();
+            UpdateAdvice(traceName + ": use local options to control separation of points in 3D.");
+            desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = Density_2D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.distance);
+            handleSrc.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+        }
+        public void Close()
+        {
+            Density_2D_Close(cPtr);
+        }
+    }
+    public class Density_Phase_CS : CS_Parent
+    {
+        Density_Basics dense = new Density_Basics();
+        Gradient_Depth gradient = new Gradient_Depth();
+        public Density_Phase_CS(VBtask task) : base(task)
+        {
+            desc = "Display gradient phase and 2D density side by side.";
+        }
+        public void RunCS(Mat src)
+        {
+            gradient.Run(empty);
+            dst3 = GetNormalize32f(gradient.dst3);
+            dense.Run(src);
+            dst2 = dense.dst2;
+        }
+    }
+    public class Density_Count_CPP_CS : CS_Parent
+    {
+        Options_Density options = new Options_Density();
+        public Density_Count_CPP_CS(VBtask task) : base(task)
+        {
+            cPtr = Density_Count_Open();
+            desc = "Isolate points in 3D by counting 8 neighboring Z points in the pointcloud";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = Density_Count_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.zCount);
+            handleSrc.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+        }
+        public void Close()
+        {
+            Density_Count_Close(cPtr);
+        }
+    }
+    public class Density_Mask_CS : CS_Parent
+    {
+        public List<cv.Point> pointList = new List<cv.Point>();
+        public Density_Mask_CS(VBtask task) : base(task)
+        {
+            desc = "Measure a mask's size in any image and track the biggest regions.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            src.SetTo(0, task.noDepthMask);
+            var threshold = task.gridSize * task.gridSize / 2;
+            bool[] activeList = new bool[task.gridList.Count()];
+            dst3.SetTo(0);
+            Parallel.For(0, task.gridList.Count(), i =>
+            {
+                var roi = task.gridList[i];
+                var count = src[roi].CountNonZero();
+                if (count > threshold)
+                {
+                    dst3[roi].SetTo(Scalar.White);
+                    activeList[i] = true;
+                }
+            });
+            pointList.Clear();
+            for (int i = 0; i < activeList.Length; i++)
+            {
+                if (activeList[i])
+                {
+                    var roi = task.gridList[i];
+                    pointList.Add(new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2));
+                }
+            }
         }
     }
 

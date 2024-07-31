@@ -1,22 +1,21 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Density_Basics : Inherits VB_Parent
+    Dim options = New Options_Density
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Distance in meters X10000", 1, 2000, task.densityMetric)
         cPtr = Density_2D_Open()
         UpdateAdvice(traceName + ": use local options to control separation of points in 3D.")
         desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static distSlider = FindSlider("Distance in meters X10000")
-        Dim distance As Single = distSlider.value / 10000
+        options.RunVB()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Density_2D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distance)
+        Dim imagePtr = Density_2D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.distance)
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
@@ -52,21 +51,20 @@ End Class
 
 
 Public Class Density_Count_CPP : Inherits VB_Parent
+    Dim options = New Options_Density
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Neighboring Z count", 0, 8, 3)
         cPtr = Density_Count_Open()
         desc = "Isolate points in 3D by counting 8 neighboring Z points in the pointcloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static distSlider = FindSlider("Neighboring Z count")
-        Dim zCount As Integer = distSlider.value
+        options.RunVB()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Density_Count_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, zCount)
+        Dim imagePtr = Density_Count_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.zCount)
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone

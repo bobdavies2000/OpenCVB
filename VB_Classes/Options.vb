@@ -75,7 +75,7 @@ End Class
 
 
 Public Class Options_Contours2 : Inherits VB_Parent
-    Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
+    Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
     Dim radioChoices = {cv.ContourApproximationModes.ApproxNone, cv.ContourApproximationModes.ApproxSimple,
                         cv.ContourApproximationModes.ApproxTC89KCOS, cv.ContourApproximationModes.ApproxTC89L1}
     Public Sub New()
@@ -7705,5 +7705,27 @@ Public Class Options_XPhotoInpaint : Inherits VB_Parent
         Static radioSMap = FindRadio("ShiftMap")
         FSRFast = radioFast.checked
         shiftMap = radioSMap.checked
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Density : Inherits VB_Parent
+    Public zCount As Integer
+    Public distance As Double
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Distance in meters X10000", 1, 2000, task.densityMetric)
+            sliders.setupTrackBar("Neighboring Z count", 0, 8, 3)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static distSlider = FindSlider("Distance in meters X10000")
+        Static neighborSlider = FindSlider("Neighboring Z count")
+        zCount = neighborSlider.value
+        distance = distSlider.value / 10000
     End Sub
 End Class

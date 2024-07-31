@@ -188,6 +188,7 @@ namespace CS_Classes
 			if (algorithmName == "Clone_TextureFlattening_CS") return new Clone_TextureFlattening_CS(task);
 			if (algorithmName == "Cluster_Basics_CS") return new Cluster_Basics_CS(task);
 			if (algorithmName == "Cluster_Hulls_CS") return new Cluster_Hulls_CS(task);
+			if (algorithmName == "Cluster_RedCloud_CS") return new Cluster_RedCloud_CS(task);
 			if (algorithmName == "Coherence_Basics_CS") return new Coherence_Basics_CS(task);
 			if (algorithmName == "Coherence_Depth_CS") return new Coherence_Depth_CS(task);
 			if (algorithmName == "Color_Basics_CS") return new Color_Basics_CS(task);
@@ -213,6 +214,7 @@ namespace CS_Classes
 			if (algorithmName == "Concat_Basics_CS") return new Concat_Basics_CS(task);
 			if (algorithmName == "Contour_Basics_CS") return new Contour_Basics_CS(task);
 			if (algorithmName == "Contour_Compare_CS") return new Contour_Compare_CS(task);
+			if (algorithmName == "Contour_CompareToFeatureless_CS") return new Contour_CompareToFeatureless_CS(task);
 			if (algorithmName == "Contour_DepthTiers_CS") return new Contour_DepthTiers_CS(task);
 			if (algorithmName == "Contour_Edges_CS") return new Contour_Edges_CS(task);
 			if (algorithmName == "Contour_Foreground_CS") return new Contour_Foreground_CS(task);
@@ -222,10 +224,14 @@ namespace CS_Classes
 			if (algorithmName == "Contour_Gray_CS") return new Contour_Gray_CS(task);
 			if (algorithmName == "Contour_Largest_CS") return new Contour_Largest_CS(task);
 			if (algorithmName == "Contour_Outline_CS") return new Contour_Outline_CS(task);
+			if (algorithmName == "Contour_RC_AddContour_CS") return new Contour_RC_AddContour_CS(task);
+			if (algorithmName == "Contour_RedCloud_CS") return new Contour_RedCloud_CS(task);
 			if (algorithmName == "Contour_RedCloudCorners_CS") return new Contour_RedCloudCorners_CS(task);
+			if (algorithmName == "Contour_RedCloudEdges_CS") return new Contour_RedCloudEdges_CS(task);
 			if (algorithmName == "Contour_RotatedRects_CS") return new Contour_RotatedRects_CS(task);
 			if (algorithmName == "Contour_SelfIntersect_CS") return new Contour_SelfIntersect_CS(task);
 			if (algorithmName == "Contour_SidePoints_CS") return new Contour_SidePoints_CS(task);
+			if (algorithmName == "Contour_Smoothing_CS") return new Contour_Smoothing_CS(task);
 			if (algorithmName == "Contour_Sorted_CS") return new Contour_Sorted_CS(task);
 			if (algorithmName == "Contour_WholeImage_CS") return new Contour_WholeImage_CS(task);
 			if (algorithmName == "Contrast_Basics_CS") return new Contrast_Basics_CS(task);
@@ -265,6 +271,10 @@ namespace CS_Classes
 			if (algorithmName == "Delaunay_Subdiv2D_CS") return new Delaunay_Subdiv2D_CS(task);
 			if (algorithmName == "Denoise_Basics_CPP_CS") return new Denoise_Basics_CPP_CS(task);
 			if (algorithmName == "Denoise_Pixels_CPP_CS") return new Denoise_Pixels_CPP_CS(task);
+			if (algorithmName == "Density_Basics_CS") return new Density_Basics_CS(task);
+			if (algorithmName == "Density_Count_CPP_CS") return new Density_Count_CPP_CS(task);
+			if (algorithmName == "Density_Mask_CS") return new Density_Mask_CS(task);
+			if (algorithmName == "Density_Phase_CS") return new Density_Phase_CS(task);
 			if (algorithmName == "Depth_Averaging_CS") return new Depth_Averaging_CS(task);
 			if (algorithmName == "Depth_Basics_CS") return new Depth_Basics_CS(task);
 			if (algorithmName == "Depth_BGSubtract_CS") return new Depth_BGSubtract_CS(task);

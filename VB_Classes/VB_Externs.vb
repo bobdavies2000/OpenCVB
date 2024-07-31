@@ -212,7 +212,7 @@ Module VB_Externs
     Public Sub Density_2D_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Density_2D_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, distance As Single) As IntPtr
+    Public Function Density_2D_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, distance As Double) As IntPtr
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>

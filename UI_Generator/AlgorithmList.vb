@@ -1337,6 +1337,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_Databases" Then return new Options_Databases
 	if algorithmName = "Options_DCT" Then return new Options_DCT
 	if algorithmName = "Options_Denoise" Then return new Options_Denoise
+	if algorithmName = "Options_Density" Then return new Options_Density
 	if algorithmName = "Options_Depth" Then return new Options_Depth
 	if algorithmName = "Options_DepthColor" Then return new Options_DepthColor
 	if algorithmName = "Options_DepthEdges" Then return new Options_DepthEdges

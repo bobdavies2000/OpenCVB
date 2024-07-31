@@ -230,7 +230,7 @@ namespace CS_Classes
         public static extern void Density_2D_Close(IntPtr cPtr);
 
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr Density_2D_RunCPP(IntPtr cPtr, IntPtr dataPtr, int rows, int cols, float distance);
+        public static extern IntPtr Density_2D_RunCPP(IntPtr cPtr, IntPtr dataPtr, int rows, int cols, double distance);
 
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Density_Count_Open();

@@ -805,7 +805,7 @@ void Density_2D_Close(Density_2D * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Density_2D_RunCPP(Density_2D * cPtr, int* dataPtr, int rows, int cols, float zDistance)
+int* Density_2D_RunCPP(Density_2D * cPtr, int* dataPtr, int rows, int cols, double zDistance)
 {
 	cPtr->dst = Mat(rows, cols, CV_8U);
 	cPtr->src = Mat(rows, cols, CV_32F, dataPtr);

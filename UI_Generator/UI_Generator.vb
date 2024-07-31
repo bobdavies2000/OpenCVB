@@ -434,17 +434,17 @@ Module UI_GeneratorMain
             End If
         Next
 
-        Dim count As Integer
-        Dim testKeys = New List(Of String)
-        For Each nm In CSnames.Keys
-            testKeys.Add(nm.Substring(0, nm.Length - 3))
-        Next
-        For Each nm In VBNames.Keys
-            If testKeys.Contains(nm) = False And nm.StartsWith("Options_") = False Then
-                Console.WriteLine("missing from C# code: " + nm)
-                count += 1
-            End If
-        Next
+        'Dim count As Integer
+        'Dim testKeys = New List(Of String)
+        'For Each nm In CSnames.Keys
+        '    testKeys.Add(nm.Substring(0, nm.Length - 3))
+        'Next
+        'For Each nm In VBNames.Keys
+        '    If testKeys.Contains(nm) = False And nm.StartsWith("Options_") = False Then
+        '        Console.WriteLine("missing from C# code: " + nm)
+        '        count += 1
+        '    End If
+        'Next
 
         Dim dataDir As New FileInfo(HomeDir.FullName + "/Data/")
         sw = New StreamWriter(dataDir.FullName + "AlgorithmGroupNames.txt")
