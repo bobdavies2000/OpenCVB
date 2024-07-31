@@ -22,6 +22,7 @@ using OpenCvSharp.XPhoto;
 using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.IO.Pipes;
+using System.Windows.Controls;
 
 namespace CS_Classes
 {
@@ -11339,6 +11340,111 @@ namespace CS_Classes
 
 
 
+    public class Depth_MinMaxToVoronoi_CS : CS_Parent
+    {
+        Kalman_Basics kalman = new Kalman_Basics();
+        public Depth_MinMaxToVoronoi_CS(VBtask task) : base(task)
+        {
+            kalman.kInput = new float[task.gridList.Count() * 4];
+            labels = new string[] { "", "", "Red is min distance, blue is max distance", "Voronoi representation of min and max points for each cell." };
+            desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points.";
+        }
+        Point2f ValidatePoint2f(Point2f p)
+        {
+            if (p.X < 0) p.X = 0;
+            if (p.Y < 0) p.Y = 0;
+            if (p.X >= dst2.Width) p.X = dst2.Width - 1;
+            if (p.Y >= dst2.Height) p.Y = dst2.Height - 1;
+            return p;
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged) kalman.kInput = new float[task.gridList.Count() * 4];
+            dst2 = src.Clone();
+            dst2.SetTo(Scalar.White, task.gridMask);
+            Mat depthmask = task.depthMask;
+            Parallel.For(0, task.gridList.Count(), i =>
+            {
+                var roi = task.gridList[i];
+                mmData mm = GetMinMax(task.pcSplit[2][roi], depthmask[roi]);
+                if (mm.minLoc.X < 0 || mm.minLoc.Y < 0) mm.minLoc = new cv.Point(0, 0);
+                kalman.kInput[i * 4] = mm.minLoc.X;
+                kalman.kInput[i * 4 + 1] = mm.minLoc.Y;
+                kalman.kInput[i * 4 + 2] = mm.maxLoc.X;
+                kalman.kInput[i * 4 + 3] = mm.maxLoc.Y;
+            });
+            kalman.Run(src);
+            Subdiv2D subdiv = new Subdiv2D(new cv.Rect(0, 0, src.Width, src.Height));
+            for (int i = 0; i < task.gridList.Count(); i++)
+            {
+                var roi = task.gridList[i];
+                Point2f ptmin = new Point2f(kalman.kOutput[i * 4] + roi.X, kalman.kOutput[i * 4 + 1] + roi.Y);
+                Point2f ptmax = new Point2f(kalman.kOutput[i * 4 + 2] + roi.X, kalman.kOutput[i * 4 + 3] + roi.Y);
+                ptmin = ValidatePoint2f(ptmin);
+                ptmax = ValidatePoint2f(ptmax);
+                subdiv.Insert(ptmin);
+                DrawCircle(dst2, ptmin, task.DotSize, Scalar.Red);
+                DrawCircle(dst2, ptmax, task.DotSize, Scalar.Blue);
+            }
+            cv.Point2f[][] facets = new Point2f[1][];
+            cv.Point2f[] centers;
+            subdiv.GetVoronoiFacetList(new List<int>(), out facets, out centers);
+            cv.Point[] ifacet;
+            cv.Point[][] ifacets = new cv.Point[1][];
+            for (int i = 0; i < facets.Length; i++)
+            {
+                ifacet = new cv.Point[facets[i].Length];
+                for (int j = 0; j < facets[i].Length; j++)
+                {
+                    ifacet[j] = new cv.Point((int)Math.Round(facets[i][j].X), (int)Math.Round(facets[i][j].Y));
+                }
+                ifacets[0] = ifacet;
+                dst3.FillConvexPoly(ifacet, task.scalarColors[i % task.scalarColors.Length], task.lineType);
+                Cv2.Polylines(dst3, ifacets, true, Scalar.Black, task.lineWidth, task.lineType, 0);
+            }
+        }
+    }
+    public class Depth_ColorMap_CS : CS_Parent
+    {
+        Options_DepthColor options = new Options_DepthColor();
+        public Depth_ColorMap_CS(VBtask task) : base(task)
+        {
+            desc = "Display the depth as a color map";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Cv2.ConvertScaleAbs(task.pcSplit[2] * 1000, dst1, options.alpha, options.beta);
+            dst1 += 1;
+            dst2 = ShowPalette(dst1);
+            dst2.SetTo(0, task.noDepthMask);
+            dst3 = task.palette.dst3;
+        }
+    }
+    public class Depth_NotMissing_CS : CS_Parent
+    {
+        public BGSubtract_Basics bgSub = new BGSubtract_Basics();
+        public Depth_NotMissing_CS(VBtask task) : base(task)
+        {
+            labels[3] = "Stable (non-zero) Depth";
+            desc = "Collect X frames, compute stable depth using the BGR and Depth image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest()) src = task.depthRGB;
+            bgSub.Run(src);
+            dst2 = bgSub.dst2;
+            dst3 = ~bgSub.dst2;
+            labels[2] = "Unstable Depth using " + bgSub.options.methodDesc + " method";
+            dst3.SetTo(0, task.noDepthMask);
+        }
+    }
+
+
+
+
+
+
     public class Depth_Display_CS : CS_Parent
     {
         public Depth_Display_CS(VBtask task) : base(task)
@@ -14851,8 +14957,6 @@ namespace CS_Classes
 
 
 
-
-
     public class Edge_All_CS : CS_Parent
     {
         Options_Edges_All options = new Options_Edges_All();
@@ -14863,16 +14967,11 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-
             options.RunEdges(src);
             dst2 = options.dst2.Channels() == 1 ? options.dst2 : options.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
             labels[2] = traceName + " - selection = " + options.edgeSelection;
         }
     }
-
-
-
-
     public class Edge_DepthAndColor_CS : CS_Parent
     {
         Depth_Holes shadow = new Depth_Holes();
@@ -14898,10 +14997,6 @@ namespace CS_Classes
             dst2 = dilate.dst2;
         }
     }
-
-
-
-
     public class Edge_Scharr_CS : CS_Parent
     {
         Options_Edges options = new Options_Edges();
@@ -14913,17 +15008,13 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            Mat gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            Mat xField = gray.Scharr(MatType.CV_32FC1, 1, 0);
-            Mat yField = gray.Scharr(MatType.CV_32FC1, 0, 1);
+            var gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            var xField = gray.Scharr(MatType.CV_32FC1, 1, 0);
+            var yField = gray.Scharr(MatType.CV_32FC1, 0, 1);
             Cv2.Add(xField, yField, dst3);
             dst3.ConvertTo(dst2, MatType.CV_8U, options.scharrMultiplier);
         }
     }
-
-
-
-
     public class Edge_Preserving_CS : CS_Parent
     {
         Options_Edges options = new Options_Edges();
@@ -14953,10 +15044,6 @@ namespace CS_Classes
             }
         }
     }
-
-
-
-
     public class Edge_RandomForest_CPP_CS : CS_Parent
     {
         byte[] rgbData;
@@ -14974,28 +15061,24 @@ namespace CS_Classes
                 SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", new cv.Point(10, 100));
             if (task.frameCount == 5)
             {
-                FileInfo modelInfo = new FileInfo(Path.Combine(task.HomeDir, "Data/model.yml.gz"));
+                var modelInfo = new FileInfo(task.HomeDir + "Data/model.yml.gz");
                 cPtr = Edge_RandomForest_Open(modelInfo.FullName);
             }
             if (task.frameCount > 5)
             {
                 Marshal.Copy(src.Data, rgbData, 0, rgbData.Length);
-                GCHandle handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned);
-                IntPtr imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols);
+                var handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned);
+                var imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols);
                 handleRGB.Free();
                 dst3 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, ThresholdTypes.Binary);
             }
         }
         public void Close()
         {
-            if (cPtr != IntPtr.Zero)
+            if (cPtr != (IntPtr)0)
                 cPtr = Edge_RandomForest_Close(cPtr);
         }
     }
-
-
-
-
     public class Edge_DCTfrequency_CS : CS_Parent
     {
         Options_Edges2 options = new Options_Edges2();
@@ -15007,24 +15090,19 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            Mat gray = task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
-            Mat frequencies = new Mat();
-            Mat src32f = new Mat();
-            gray.ConvertTo(src32f, MatType.CV_32F, 1.0 / 255);
+            var gray = task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
+            var frequencies = new Mat();
+            var src32f = new Mat();
+            gray.ConvertTo(src32f, MatType.CV_32F, 1 / 255.0);
             Cv2.Dct(src32f, frequencies, DctFlags.None);
-            cv.Rect roi = new cv.Rect(0, 0, options.removeFrequencies, src32f.Height);
-            if (roi.Width > 0)
-                frequencies.SubMat(roi).SetTo(0);
-            labels[2] = $"Highest {options.removeFrequencies} frequencies removed from RGBDepth";
+            var roi = new cv.Rect(0, 0, options.removeFrequencies, src32f.Height);
+            if (roi.Width > 0) frequencies[roi].SetTo(0);
+            labels[2] = "Highest " + options.removeFrequencies + " frequencies removed from RGBDepth";
             Cv2.Dct(frequencies, src32f, DctFlags.Inverse);
             src32f.ConvertTo(dst2, MatType.CV_8UC1, 255);
             dst3 = dst2.Threshold(options.dctThreshold, 255, ThresholdTypes.Binary);
         }
     }
-
-
-
-
     public class Edge_Deriche_CPP_CS : CS_Parent
     {
         Options_Edges3 options = new Options_Edges3();
@@ -15037,25 +15115,21 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+            var dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
-            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
-            IntPtr imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega);
+            var handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            var imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega);
             handleSrc.Free();
-            if (imagePtr != IntPtr.Zero)
+            if (imagePtr != (IntPtr)0)
                 dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
             dst3 = src | dst2;
         }
         public void Close()
         {
-            if (cPtr != IntPtr.Zero)
+            if (cPtr != (IntPtr)0)
                 cPtr = Edge_Deriche_Close(cPtr);
         }
     }
-
-
-
-
     public class Edge_DCTinput_CS : CS_Parent
     {
         Edge_Canny edges = new Edge_Canny();
@@ -15071,11 +15145,976 @@ namespace CS_Classes
             edges.Run(src);
             dst2 = edges.dst2.Clone();
             dct.Run(src);
-            Mat tmp = src.SetTo(Scalar.White, dct.dst2);
+            var tmp = src.SetTo(Scalar.White, dct.dst2);
             edges.Run(tmp);
             dst3 = edges.dst2;
         }
     }
+    public class Edge_Consistent_CS : CS_Parent
+    {
+        Bin4Way_Sobel edges = new Bin4Way_Sobel();
+        List<Mat> saveFrames = new List<Mat>();
+        public Edge_Consistent_CS(VBtask task) : base(task)
+        {
+            FindSlider("Sobel kernel Size").Value = 5;
+            desc = "Edges that are consistent for x number of frames";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged) saveFrames = new List<Mat>();
+            edges.Run(src);
+            Mat tmp = edges.dst2.Channels() == 1 ? edges.dst2.Clone() : edges.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            saveFrames.Add(tmp);
+            if (saveFrames.Count() > task.frameHistoryCount) saveFrames.RemoveAt(0);
+            dst2 = saveFrames[0];
+            for (int i = 1; i < saveFrames.Count(); i++)
+            {
+                dst2 = saveFrames[i] & dst2;
+            }
+            dst3.SetTo(0);
+            src.CopyTo(dst3, ~edges.dst3);
+        }
+    }
+    public class Edge_BinarizedReduction_CS : CS_Parent
+    {
+        Bin4Way_Sobel edges = new Bin4Way_Sobel();
+        Reduction_Basics reduction = new Reduction_Basics();
+        public Edge_BinarizedReduction_CS(VBtask task) : base(task)
+        {
+            desc = "Visualize the impact of reduction on Edge_BinarizeSobel";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst3 = reduction.dst2;
+            edges.Run(dst3);
+            dst2 = edges.dst2;
+        }
+    }
+    public class Edge_BinarizedBrightness_CS : CS_Parent
+    {
+        Edge_All edges = new Edge_All();
+        Brightness_Basics bright = new Brightness_Basics();
+        public Edge_BinarizedBrightness_CS(VBtask task) : base(task)
+        {
+            FindRadio("Binarized Sobel").Checked = true;
+            desc = "Visualize the impact of brightness on Bin4Way_Sobel";
+        }
+        public void RunCS(Mat src)
+        {
+            bright.Run(src);
+            dst2 = bright.dst3;
+            edges.Run(bright.dst3);
+            dst3 = edges.dst2;
+            labels[3] = edges.labels[2];
+        }
+    }
+    public class Edge_SobelLRBinarized_CS : CS_Parent
+    {
+        Bin4Way_Sobel edges = new Bin4Way_Sobel();
+        AddWeighted_Basics addw = new AddWeighted_Basics();
+        public Edge_SobelLRBinarized_CS(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View" };
+            desc = "Isolate edges in the left and right views.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.mouseClickFlag) task.mouseClickFlag = false; // preempt use of quadrants.
+            edges.Run(task.rightView);
+            if (standaloneTest())
+            {
+                addw.src2 = edges.dst3;
+                addw.Run(task.rightView);
+                dst3 = addw.dst2.Clone();
+            }
+            else
+            {
+                dst3 = edges.dst3.Clone();
+            }
+            edges.Run(task.leftView);
+            if (standaloneTest())
+            {
+                addw.src2 = edges.dst3;
+                addw.Run(task.leftView);
+                dst2 = addw.dst2;
+            }
+            else
+            {
+                dst2 = edges.dst3;
+            }
+        }
+    }
+    public class Edge_Matching_CS : CS_Parent
+    {
+        Match_Basics match = new Match_Basics();
+        List<int> redRects = new List<int>();
+        Options_EdgeMatching options = new Options_EdgeMatching();
+        public Edge_Matching_CS(VBtask task) : base(task)
+        {
+            desc = "Match edges in the left and right views to determine distance";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = task.leftView;
+            dst3 = task.rightView;
+            int[] maxLocs = new int[task.gridList.Count()];
+            List<int> highlights = new List<int>();
+            for (int i = 0; i < task.gridList.Count(); i++)
+            {
+                var roi = task.gridList[i];
+                int width = roi.X + roi.Width + options.searchDepth < dst2.Width ? roi.Width + options.searchDepth : dst2.Width - roi.X - 1;
+                var searchROI = new cv.Rect(roi.X, roi.Y, width, roi.Height);
+                match.template = dst3[roi];
+                match.Run(dst2[searchROI]);
+                maxLocs[i] = match.matchRect.X;
+                if (match.correlation > options.threshold || redRects.Contains(i))
+                {
+                    highlights.Add(i);
+                    SetTrueText(match.correlation.ToString("F2"), new cv.Point(roi.X, roi.Y), 3);
+                }
+            }
+            if (options.overlayChecked)
+            {
+                dst2.SetTo(255, task.gridMask);
+                dst3.SetTo(255, task.gridMask);
+            }
+            dst2 = dst2.Channels() == 3 ? dst2 : dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
+            dst3 = dst3.Channels() == 3 ? dst3 : dst3.CvtColor(ColorConversionCodes.GRAY2BGR);
+            if (options.highlightChecked)
+            {
+                labels[2] = "Matched grid segments in dst3 with disparity";
+                foreach (var i in highlights)
+                {
+                    var roi = task.gridList[i];
+                    dst3.Rectangle(roi, Scalar.Red, 2);
+                    roi.X += maxLocs[i];
+                    dst2.Rectangle(roi, Scalar.Red, 2);
+                    SetTrueText(maxLocs[i].ToString(), new cv.Point(roi.X, roi.Y), 2);
+                }
+            }
+            else
+            {
+                labels[2] = "Click in dst3 to highlight segment in dst2";
+                if (options.clearChecked)
+                {
+                    redRects.Clear();
+                    task.gridROIclicked = 0;
+                    options.clearChecked = false;
+                }
+                if (task.gridROIclicked > 0)
+                {
+                    if (!redRects.Contains(task.gridROIclicked)) redRects.Add(task.gridROIclicked);
+                    foreach (var i in redRects)
+                    {
+                        var roi = task.gridList[i];
+                        dst3.Rectangle(roi, Scalar.Red, 2);
+                        roi.X += maxLocs[i];
+                        dst2.Rectangle(roi, Scalar.Red, 2);
+                        SetTrueText(maxLocs[i].ToString(), new cv.Point(roi.X, roi.Y), 2);
+                    }
+                }
+            }
+            labels[3] = "Grid segments > " + options.threshold.ToString("P0") + " correlation coefficient";
+        }
+    }
+    public class Edge_RGB_CS : CS_Parent
+    {
+        Edge_Sobel_Old sobel = new Edge_Sobel_Old();
+        public Edge_RGB_CS(VBtask task) : base(task)
+        {
+            desc = "Combine the edges from all 3 channels";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat img32f = new Mat();
+            src.ConvertTo(img32f, MatType.CV_32FC3);
+            var split = img32f.Split();
+            for (int i = 0; i < 3; i++)
+            {
+                split[i] = split[i].Normalize(0, 255, NormTypes.MinMax);
+            }
+            Cv2.Merge(split, img32f);
+            img32f.ConvertTo(dst2, MatType.CV_8UC3);
+            for (int i = 0; i < 3; i++)
+            {
+                sobel.Run(split[i]);
+                split[i] = 255 - sobel.dst2;
+            }
+            Cv2.Merge(split, dst2);
+        }
+    }
+    public class Edge_HSV_CS : CS_Parent
+    {
+        Edge_RGB edges = new Edge_RGB();
+        public Edge_HSV_CS(VBtask task) : base(task)
+        {
+            desc = "Combine the edges from all 3 HSV channels";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
+            edges.Run(hsv);
+            dst2 = edges.dst2;
+        }
+    }
+    public class Edge_SobelLR_CS : CS_Parent
+    {
+        Edge_Sobel_Old sobel = new Edge_Sobel_Old();
+        public Edge_SobelLR_CS(VBtask task) : base(task)
+        {
+            FindSlider("Sobel kernel Size").Value = 3;
+            desc = "Find the edges in the LeftViewimages.";
+            labels = new string[] { "", "", "Edges in Left Image", "Edges in Right Image (except on Kinect 4 Azure)" };
+        }
+        public void RunCS(Mat src)
+        {
+            sobel.Run(task.rightView);
+            dst3 = sobel.dst2.Clone();
+            sobel.Run(task.leftView);
+            dst2 = sobel.dst2;
+        }
+    }
+    public class Edge_ColorGap_CPP_CS : CS_Parent
+    {
+        Edge_ColorGap_VB gap = new Edge_ColorGap_VB();
+        TrackBar distanceSlider;
+        TrackBar diffSlider;
+        public Edge_ColorGap_CPP_CS(VBtask task) : base(task)
+        {
+            distanceSlider = FindSlider("Input pixel distance");
+            diffSlider = FindSlider("Input pixel difference");
+            cPtr = Edge_ColorGap_Open();
+            desc = "Using grayscale image to identify color gaps which imply an edge - C++ version";
+        }
+        public void RunCS(Mat src)
+        {
+            int diff = diffSlider.Value;
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            IntPtr imagePtr = Edge_ColorGap_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distanceSlider.Value & 254, diff);
+            handleSrc.Free();
+            if (imagePtr != IntPtr.Zero) dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst3.SetTo(0);
+            src.CopyTo(dst3, ~dst2);
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = Edge_ColorGap_Close(cPtr);
+        }
+    }
+    public class Edge_ColorGap_CS : CS_Parent
+    {
+        Options_Edges3 options = new Options_Edges3();
+        public Edge_ColorGap_CS(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges" };
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Using grayscale image to identify color gaps which imply an edge - C# edition";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            dst2.SetTo(0);
+            int half = options.gapDistance / 2;
+            int pix1, pix2;
+            for (int y = 0; y < dst1.Height; y++)
+            {
+                for (int x = options.gapDistance; x < dst1.Width - options.gapDistance; x++)
+                {
+                    pix1 = src.At<byte>(y, x);
+                    pix2 = src.At<byte>(y, x + options.gapDistance);
+                    if (Math.Abs(pix1 - pix2) >= options.gapdiff) dst2.Set<byte>(y, x + half, 255);
+                }
+            }
+            dst3.SetTo(0);
+            for (int y = options.gapDistance; y < dst1.Height - options.gapDistance; y++)
+            {
+                for (int x = 0; x < dst1.Width; x++)
+                {
+                    pix1 = src.At<byte>(y, x);
+                    pix2 = src.At<byte>(y + options.gapDistance, x);
+                    if (Math.Abs(pix1 - pix2) >= options.gapdiff) dst3.Set<byte>(y + half, x, 255);
+                }
+            }
+            dst1 = dst2 | dst3;
+        }
+    }
+    public class Edge_DepthGap_Native_CS : CS_Parent
+    {
+        Options_DepthEdges options = new Options_DepthEdges();
+        public Edge_DepthGap_Native_CS(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges" };
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Using depth image to identify gaps which imply an edge";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() != 1) src = task.pcSplit[2];
+            dst2.SetTo(0);
+            int half = options.depthDist / 2;
+            float pix1, pix2;
+            for (int y = 0; y < src.Height; y++)
+            {
+                for (int x = options.depthDist; x < src.Width - options.depthDist; x++)
+                {
+                    pix1 = src.At<float>(y, x);
+                    pix2 = src.At<float>(y, x + options.depthDist);
+                    if (Math.Abs(pix1 - pix2) >= options.mmDepthDiff) dst2.Set<byte>(y, x + half, 255);
+                }
+            }
+            dst3.SetTo(0);
+            for (int y = options.depthDist; y < src.Height - options.depthDist; y++)
+            {
+                for (int x = 0; x < src.Width; x++)
+                {
+                    pix1 = src.At<float>(y, x);
+                    pix2 = src.At<float>(y + options.depthDist, x);
+                    if (Math.Abs(pix1 - pix2) >= options.mmDepthDiff) dst3.Set<byte>(y + half, x, 255);
+                }
+            }
+            dst1 = dst2 | dst3;
+        }
+    }
+    public class Edge_DepthGap_CPP_CS : CS_Parent
+    {
+        Options_DepthEdges options = new Options_DepthEdges();
+        public Edge_DepthGap_CPP_CS(VBtask task) : base(task)
+        {
+            cPtr = Edge_DepthGap_Open();
+            desc = "Create edges wherever depth differences are greater than x";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Type() != MatType.CV_32FC1) src = task.pcSplit[2];
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = Edge_DepthGap_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.mmDepthDiff);
+            handleSrc.Free();
+            if (imagePtr != IntPtr.Zero) dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = Edge_DepthGap_Close(cPtr);
+        }
+    }
+    public class Edge_CannyMin_CS : CS_Parent
+    {
+        Edge_Canny canny = new Edge_Canny();
+        public Edge_CannyMin_CS(VBtask task) : base(task)
+        {
+            FindSlider("Canny threshold1").Value = 200;
+            FindSlider("Canny threshold2").Value = 200;
+            desc = "Set the max thresholds for Canny to get the minimum number of edge pixels";
+            labels[2] = "Essential lines in the image - minimum number of pixels in Canny output";
+        }
+        public void RunCS(Mat src)
+        {
+            canny.Run(src);
+            dst2 = canny.dst2;
+        }
+    }
+    public class Edge_CannyLeftRight_CS : CS_Parent
+    {
+        Edge_Canny canny = new Edge_Canny();
+        public Edge_CannyLeftRight_CS(VBtask task) : base(task)
+        {
+            FindSlider("Canny threshold1").Value = 200;
+            FindSlider("Canny threshold2").Value = 200;
+            labels = new string[] { "", "", "Essential lines in the left image", "Essential lines in the right image" };
+            desc = "Set the max thresholds for Canny to get the minimum number of edge pixels for the left and right images.";
+        }
+        public void RunCS(Mat src)
+        {
+            canny.Run(task.leftView);
+            dst2 = canny.dst2.Clone();
+            canny.Run(task.rightView);
+            dst3 = canny.dst2;
+        }
+    }
+    public class Edge_Reduction_CS : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        Edge_Canny edge = new Edge_Canny();
+        public Edge_Reduction_CS(VBtask task) : base(task)
+        {
+            task.redOptions.setSimpleReductionBar(1);
+            labels = new string[] { "", "", "Edges in the Reduction output", "Reduction_Basics output" };
+            desc = "Find edges in the reduction image.";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst3 = reduction.dst2;
+            edge.Run(dst3);
+            dst2 = edge.dst2;
+        }
+    }
+    public class Edge_Regions_CS : CS_Parent
+    {
+        Depth_TiersZ tiers = new Depth_TiersZ();
+        Edge_Canny edge = new Edge_Canny();
+        public Edge_Regions_CS(VBtask task) : base(task)
+        {
+            FindSlider("Canny threshold2").Value = 30;
+            labels = new string[] { "", "", "Edge_Canny output for the depth regions", "Identified regions " };
+            desc = "Find the edges for the depth tiers.";
+        }
+        public void RunCS(Mat src)
+        {
+            tiers.Run(src);
+            dst3 = tiers.dst3;
+            edge.Run(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY));
+            dst2 = edge.dst2;
+        }
+    }
+    public class Edge_Canny_CS : CS_Parent
+    {
+        Options_Canny options = new Options_Canny();
+        public Edge_Canny_CS(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Canny using L1 Norm", "Canny using L2 Norm" };
+            desc = "Show canny edge detection with varying thresholds";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (src.Type() != MatType.CV_8U) src.ConvertTo(src, MatType.CV_8U);
+            dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, true);
+            // dst3 = src.Canny(options.threshold1, options.threshold2, options.aperture, false);
+        }
+    }
+    public class Edge_CannyHistory_CS : CS_Parent
+    {
+        Options_Canny options = new Options_Canny();
+        List<Mat> frameList = new List<Mat>();
+    public Edge_CannyHistory_CS(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Canny using L1 Norm", "" };
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Show canny edge over the last X frame (see global option 'FrameHistory')";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, true);
+            if (task.optionsChanged) frameList.Clear();
+            frameList.Add(dst2);
+            dst3.SetTo(0);
+            foreach (var m in frameList)
+            {
+                dst3 = dst3 | m;
+            }
+            if (frameList.Count() >= task.frameHistoryCount) frameList.RemoveAt(0);
+        }
+    }
+    public class Edge_ResizeAdd_CS : CS_Parent
+    {
+        Options_Edges4 options = new Options_Edges4();
+        public Edge_ResizeAdd_CS(VBtask task) : base(task)
+        {
+            desc = "Find edges using a resize, subtract, and threshold.";
+            labels[2] = "Edges found with just resizing";
+            labels[3] = "Found edges added to grayscale image source.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Mat gray = src;
+            if (src.Channels() == 3) gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Mat newFrame = gray[new Range(options.vertPixels, gray.Rows - options.vertPixels),
+                                 new Range(options.horizPixels, gray.Cols - options.horizPixels)];
+            newFrame = newFrame.Resize(gray.Size(), 0, 0, InterpolationFlags.Nearest);
+            Cv2.Absdiff(gray, newFrame, dst2);
+            dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
+            Cv2.Add(gray, dst2, dst3);
+        }
+    }
+    public class Edge_CannyCombined_CS : CS_Parent
+    {
+        Edge_CannyHistory canny = new Edge_CannyHistory();
+        Edge_ResizeAdd edges = new Edge_ResizeAdd();
+        public Edge_CannyCombined_CS(VBtask task) : base(task)
+        {
+            desc = "Combine the results of Edge_ResizeAdd and Canny";
+        }
+        public void RunCS(Mat src)
+        {
+            canny.Run(src);
+            edges.Run(canny.dst2);
+            dst2 = canny.dst2 | edges.dst2;
+        }
+    }
+    public class Edge_SobelCustomV_CS : CS_Parent
+    {
+        public Edge_SobelCustomV_CS(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Sobel Custom 1", "Sobel Custom 2" };
+            desc = "Show Sobel edge detection a custom vertical kernel";
+        }
+        public void RunCS(Mat src)
+        {
+            dst1 = src.Filter2D(MatType.CV_32F, new Mat(3, 3, MatType.CV_32FC1, new float[] { 1, 0, -1, 2, 0, -2, 1, 0, -1 }));
+            dst1.ConvertTo(dst2, src.Type());
+            dst1 = src.Filter2D(MatType.CV_32F, new Mat(3, 3, MatType.CV_32FC1, new float[] { 3, 0, -3, 10, 0, -10, 3, 0, -3 }));
+            dst1.ConvertTo(dst3, src.Type());
+        }
+    }
+    public class Edge_SobelCustomH_CS : CS_Parent
+    {
+        public Edge_SobelCustomH_CS(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Sobel Custom 1", "Sobel Custom 2" };
+            desc = "Show Sobel edge detection a custom horizontal kernel";
+        }
+        public void RunCS(Mat src)
+        {
+            dst1 = src.Filter2D(MatType.CV_32F, new Mat(3, 3, MatType.CV_32FC1, new float[] { 1, 2, 1, 0, 0, 0, -1, -2, -1 }));
+            dst1.ConvertTo(dst2, src.Type());
+            dst1 = src.Filter2D(MatType.CV_32F, new Mat(3, 3, MatType.CV_32FC1, new float[] { 3, 10, 3, 0, 0, 0, -3, -10, -3 }));
+            dst1.ConvertTo(dst3, src.Type());
+        }
+    }
+    public class Edge_SobelCustom_CS : CS_Parent
+    {
+        AddWeighted_Basics addw = new AddWeighted_Basics();
+        Edge_SobelCustomV edgesV = new Edge_SobelCustomV();
+        Edge_SobelCustomH edgesH = new Edge_SobelCustomH();
+        Options_Edges4 options = new Options_Edges4();
+        public Edge_SobelCustom_CS(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Sobel Custom 1", "Sobel Custom 2" };
+            desc = "Show Sobel edge detection with custom horizont and vertical kernels";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.horizonCheck)
+            {
+                edgesH.Run(src);
+                dst2 = edgesH.dst2;
+                dst3 = edgesH.dst3;
+            }
+            if (options.verticalCheck) edgesV.Run(src);
+            if (options.horizonCheck && options.verticalCheck)
+            {
+                addw.src2 = edgesV.dst2;
+                addw.Run(dst2);
+                dst2 = addw.dst2;
+                addw.src2 = edgesV.dst3;
+                addw.Run(dst3);
+                dst3 = addw.dst2;
+            }
+            else if (options.verticalCheck)
+            {
+                dst2 = edgesV.dst2.Clone();
+                dst3 = edgesV.dst3.Clone();
+            }
+        }
+    }
+    public class Edge_SobelCustomLeftRight_CS : CS_Parent
+    {
+        Edge_SobelCustom custom = new Edge_SobelCustom();
+        public Edge_SobelCustomLeftRight_CS(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2" };
+            desc = "Show Sobel edge detection for both left and right images";
+        }
+        public void RunCS(Mat src)
+        {
+            custom.Run(task.leftView);
+            dst0 = custom.dst2.Clone();
+            dst1 = custom.dst3.Clone();
+            custom.Run(task.rightView);
+            dst2 = custom.dst2;
+            dst3 = custom.dst3;
+        }
+    }
+    public class Edge_BackProjection_CS : CS_Parent
+    {
+        HistValley_OptionsAuto valley = new HistValley_OptionsAuto();
+        Edge_Canny canny = new Edge_Canny();
+        public Edge_BackProjection_CS(VBtask task) : base(task)
+        {
+            labels[3] = "Canny edges in grayscale (red) and edges in back projection (blue)";
+            desc = "Find the edges in the HistValley_FromPeaks backprojection";
+        }
+        public void RunCS(Mat src)
+        {
+            canny.Run(src);
+            dst1 = canny.dst2.Clone();
+            valley.Run(src);
+            dst2 = valley.dst1;
+            canny.Run(valley.dst1);
+            int offset = 1;
+            cv.Rect r1 = new cv.Rect(offset, offset, dst2.Width - offset - 1, dst2.Height - offset - 1);
+            cv.Rect r2 = new cv.Rect(0, 0, dst2.Width - offset - 1, dst2.Height - offset - 1);
+            dst3.SetTo(Scalar.White);
+            dst3[r1].SetTo(Scalar.Blue, canny.dst2[r2]);
+            dst3.SetTo(Scalar.Red, dst1);
+            labels[2] = valley.labels[3];
+        }
+    }
+    public class Edge_Sobel_Old_CS : CS_Parent
+    {
+        public AddWeighted_Basics addw = new AddWeighted_Basics();
+        Options_Sobel options = new Options_Sobel();
+        public Edge_Sobel_Old_CS(VBtask task) : base(task)
+        {
+            desc = "Show Sobel edge detection with varying kernel sizes";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst0 = src.Sobel(MatType.CV_32F, 1, 0, options.kernelSize);
+            if (options.horizontalDerivative && options.verticalDerivative)
+            {
+                dst1 = src.Sobel(MatType.CV_32F, 0, 1, options.kernelSize);
+                if (standaloneTest())
+                {
+                    addw.src2 = dst1;
+                    addw.Run(dst0);
+                    dst2 = addw.dst2.ConvertScaleAbs();
+                }
+                else
+                {
+                    Mat tmp = dst1 + dst0;
+                    dst2 = tmp.ConvertScaleAbs();
+                }
+            }
+            else
+            {
+                dst2 = dst0.ConvertScaleAbs();
+            }
+        }
+    }
+    public class Edge_Laplacian_CS : CS_Parent
+    {
+        Options_LaplacianKernels options = new Options_LaplacianKernels();
+        public Edge_Laplacian_CS(VBtask task) : base(task)
+        {
+            labels[3] = "Laplacian of DepthRGB";
+            desc = "Show Laplacian edge detection with varying kernel sizes";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.GaussianBlur(new cv.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize), 0, 0);
+            dst2 = dst2.Laplacian(MatType.CV_8U, options.LaplaciankernelSize, 1, 0);
+            dst2 = dst2.ConvertScaleAbs();
+            dst3 = task.depthRGB.GaussianBlur(new cv.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize), 0, 0);
+            dst3 = dst3.Laplacian(MatType.CV_8U, options.LaplaciankernelSize, 1, 0);
+            dst3 = dst3.ConvertScaleAbs();
+        }
+    }
+    public class Edge_SobelHorizontal_CS : CS_Parent
+    {
+        Edge_Sobel_Old edges = new Edge_Sobel_Old();
+        TrackBar thresholdSlider;
+        public Edge_SobelHorizontal_CS(VBtask task) : base(task)
+        {
+            thresholdSlider = FindSlider("Threshold to zero pixels below this value");
+            FindCheckBox("Vertical Derivative").Checked = false;
+            FindCheckBox("Horizontal Derivative").Checked = true;
+            desc = "Find edges with Sobel only in the horizontal direction";
+        }
+        public void RunCS(Mat src)
+        {
+            edges.Run(src);
+            dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
+        }
+    }
+    public class Edge_MotionFrames_CS : CS_Parent
+    {
+        Edge_Canny edges = new Edge_Canny();
+        History_Basics frames = new History_Basics();
+        public Edge_MotionFrames_CS(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only" };
+            FindSlider("Canny threshold1").Value = 50;
+            FindSlider("Canny threshold2").Value = 50;
+            desc = "Collect edges over several frames controlled with global frame history";
+        }
+        public void RunCS(Mat src)
+        {
+            edges.Run(src);
+            dst3 = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            frames.Run(edges.dst2);
+            dst2 = frames.dst2;
+        }
+    }
+    public class Edge_MotionOverlay_CS : CS_Parent
+    {
+        Options_EdgeOverlay options = new Options_EdgeOverlay();
+        Mat offsetImage = new cv.Mat();
+        public Edge_MotionOverlay_CS(VBtask task) : base(task)
+        {
+            labels[3] = "AbsDiff output of offset with original";
+            desc = "Find edges by displacing the current BGR image in any direction and diff it with the original.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() != 1)
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (task.FirstPass) offsetImage = src.Clone();
+            var rect1 = new cv.Rect(options.xDisp, options.yDisp, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1);
+            var rect2 = new cv.Rect(0, 0, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1);
+            offsetImage[rect2] = src[rect1].Clone();
+            Cv2.Absdiff(src, offsetImage, dst0);
+            dst2 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
+            labels[2] = "Src offset (x,y) = (" + options.xDisp.ToString() + "," + options.yDisp.ToString() + ")";
+            offsetImage = src.Clone();
+        }
+    }
+
+
+
+
+
+
+
+    //public class Edge_All_CS : CS_Parent
+    //{
+    //    Options_Edges_All options = new Options_Edges_All();
+    //    public Edge_All_CS(VBtask task) : base(task)
+    //    {
+    //        desc = "Use Radio Buttons to select the different edge algorithms.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        options.RunVB();
+
+    //        options.RunEdges(src);
+    //        dst2 = options.dst2.Channels() == 1 ? options.dst2 : options.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+    //        labels[2] = traceName + " - selection = " + options.edgeSelection;
+    //    }
+    //}
+
+
+
+
+    //public class Edge_DepthAndColor_CS : CS_Parent
+    //{
+    //    Depth_Holes shadow = new Depth_Holes();
+    //    Edge_Canny canny = new Edge_Canny();
+    //    Dilate_Basics dilate = new Dilate_Basics();
+    //    public Edge_DepthAndColor_CS(VBtask task) : base(task)
+    //    {
+    //        FindRadio("Dilate shape: Rect").Checked = true;
+    //        FindSlider("Canny threshold1").Value = 100;
+    //        FindSlider("Canny threshold2").Value = 100;
+    //        desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow.";
+    //        labels[2] = "Edges in color and depth after dilate";
+    //        labels[3] = "Edges in color and depth no dilate";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        canny.Run(src);
+    //        shadow.Run(src);
+    //        dst3 = shadow.dst3.Channels() != 1 ? shadow.dst3.CvtColor(ColorConversionCodes.BGR2GRAY) : shadow.dst3;
+    //        dst3 += canny.dst2.Threshold(1, 255, ThresholdTypes.Binary);
+    //        dilate.Run(dst3);
+    //        dilate.dst2.SetTo(0, shadow.dst2);
+    //        dst2 = dilate.dst2;
+    //    }
+    //}
+
+
+
+
+    //public class Edge_Scharr_CS : CS_Parent
+    //{
+    //    Options_Edges options = new Options_Edges();
+    //    public Edge_Scharr_CS(VBtask task) : base(task)
+    //    {
+    //        labels[3] = "x field + y field in CV_32F format";
+    //        desc = "Scharr is most accurate with 3x3 kernel.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        options.RunVB();
+    //        Mat gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+    //        Mat xField = gray.Scharr(MatType.CV_32FC1, 1, 0);
+    //        Mat yField = gray.Scharr(MatType.CV_32FC1, 0, 1);
+    //        Cv2.Add(xField, yField, dst3);
+    //        dst3.ConvertTo(dst2, MatType.CV_8U, options.scharrMultiplier);
+    //    }
+    //}
+
+
+
+
+    //public class Edge_Preserving_CS : CS_Parent
+    //{
+    //    Options_Edges options = new Options_Edges();
+    //    public Edge_Preserving_CS(VBtask task) : base(task)
+    //    {
+    //        labels[3] = "Edge preserving blur for BGR depth image above";
+    //        desc = "OpenCV's edge preserving filter.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        options.RunVB();
+    //        if (options.recurseCheck)
+    //        {
+    //            Cv2.EdgePreservingFilter(src, dst2, EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r);
+    //        }
+    //        else
+    //        {
+    //            Cv2.EdgePreservingFilter(src, dst2, EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r);
+    //        }
+    //        if (options.recurseCheck)
+    //        {
+    //            Cv2.EdgePreservingFilter(task.depthRGB, dst3, EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r);
+    //        }
+    //        else
+    //        {
+    //            Cv2.EdgePreservingFilter(task.depthRGB, dst3, EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r);
+    //        }
+    //    }
+    //}
+
+
+
+
+    //public class Edge_RandomForest_CPP_CS : CS_Parent
+    //{
+    //    byte[] rgbData;
+    //    Options_Edges2 options = new Options_Edges2();
+    //    public Edge_RandomForest_CPP_CS(VBtask task) : base(task)
+    //    {
+    //        desc = "Detect edges using structured forests - Opencv Contrib";
+    //        rgbData = new byte[dst2.Total() * dst2.ElemSize()];
+    //        labels[3] = "Thresholded Edge Mask (use slider to adjust)";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        options.RunVB();
+    //        if (task.frameCount < 100)
+    //            SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", new cv.Point(10, 100));
+    //        if (task.frameCount == 5)
+    //        {
+    //            FileInfo modelInfo = new FileInfo(Path.Combine(task.HomeDir, "Data/model.yml.gz"));
+    //            cPtr = Edge_RandomForest_Open(modelInfo.FullName);
+    //        }
+    //        if (task.frameCount > 5)
+    //        {
+    //            Marshal.Copy(src.Data, rgbData, 0, rgbData.Length);
+    //            GCHandle handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned);
+    //            IntPtr imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols);
+    //            handleRGB.Free();
+    //            dst3 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, ThresholdTypes.Binary);
+    //        }
+    //    }
+    //    public void Close()
+    //    {
+    //        if (cPtr != IntPtr.Zero)
+    //            cPtr = Edge_RandomForest_Close(cPtr);
+    //    }
+    //}
+
+
+
+
+    //public class Edge_DCTfrequency_CS : CS_Parent
+    //{
+    //    Options_Edges2 options = new Options_Edges2();
+    //    public Edge_DCTfrequency_CS(VBtask task) : base(task)
+    //    {
+    //        labels[3] = "Mask for the isolated frequencies";
+    //        desc = "Find edges by removing all the highest frequencies.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        options.RunVB();
+    //        Mat gray = task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
+    //        Mat frequencies = new Mat();
+    //        Mat src32f = new Mat();
+    //        gray.ConvertTo(src32f, MatType.CV_32F, 1.0 / 255);
+    //        Cv2.Dct(src32f, frequencies, DctFlags.None);
+    //        cv.Rect roi = new cv.Rect(0, 0, options.removeFrequencies, src32f.Height);
+    //        if (roi.Width > 0)
+    //            frequencies.SubMat(roi).SetTo(0);
+    //        labels[2] = $"Highest {options.removeFrequencies} frequencies removed from RGBDepth";
+    //        Cv2.Dct(frequencies, src32f, DctFlags.Inverse);
+    //        src32f.ConvertTo(dst2, MatType.CV_8UC1, 255);
+    //        dst3 = dst2.Threshold(options.dctThreshold, 255, ThresholdTypes.Binary);
+    //    }
+    //}
+
+
+
+
+    //public class Edge_Deriche_CPP_CS : CS_Parent
+    //{
+    //    Options_Edges3 options = new Options_Edges3();
+    //    public Edge_Deriche_CPP_CS(VBtask task) : base(task)
+    //    {
+    //        cPtr = Edge_Deriche_Open();
+    //        labels[3] = "Image enhanced with Deriche results";
+    //        desc = "Edge detection using the Deriche X and Y gradients";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        options.RunVB();
+    //        byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+    //        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+    //        GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+    //        IntPtr imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega);
+    //        handleSrc.Free();
+    //        if (imagePtr != IntPtr.Zero)
+    //            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+    //        dst3 = src | dst2;
+    //    }
+    //    public void Close()
+    //    {
+    //        if (cPtr != IntPtr.Zero)
+    //            cPtr = Edge_Deriche_Close(cPtr);
+    //    }
+    //}
+
+
+
+
+    //public class Edge_DCTinput_CS : CS_Parent
+    //{
+    //    Edge_Canny edges = new Edge_Canny();
+    //    DCT_FeatureLess dct = new DCT_FeatureLess();
+    //    public Edge_DCTinput_CS(VBtask task) : base(task)
+    //    {
+    //        labels[2] = "Canny edges produced from original grayscale image";
+    //        labels[3] = "Edges produced with featureless regions cleared";
+    //        desc = "Use the featureless regions to enhance the edge detection";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        edges.Run(src);
+    //        dst2 = edges.dst2.Clone();
+    //        dct.Run(src);
+    //        Mat tmp = src.SetTo(Scalar.White, dct.dst2);
+    //        edges.Run(tmp);
+    //        dst3 = edges.dst2;
+    //    }
+    //}
 
 
 
