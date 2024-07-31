@@ -1473,6 +1473,8 @@ namespace CS_Classes
 			if (algorithmName == "Thickness_Basics_CS") return new Thickness_Basics_CS(task);
 			if (algorithmName == "Threading_Test_CS") return new Threading_Test_CS(task);
 			if (algorithmName == "Threading_Test1_CS") return new Threading_Test1_CS(task);
+			if (algorithmName == "Threshold_Adaptive_CS") return new Threshold_Adaptive_CS(task);
+			if (algorithmName == "Threshold_Basics_CS") return new Threshold_Basics_CS(task);
 			if (algorithmName == "Threshold_ByChannels_CS") return new Threshold_ByChannels_CS(task);
 			if (algorithmName == "Threshold_ColorSource_CS") return new Threshold_ColorSource_CS(task);
 			if (algorithmName == "Threshold_Definitions_CS") return new Threshold_Definitions_CS(task);

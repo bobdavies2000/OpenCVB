@@ -58780,54 +58780,54 @@ namespace CS_Classes
             thread.Abort();
         }
     }
-    //
 
 
 
-    //	public class Threshold_Basics_CS : CS_Parent
-    //{
-    //    public Options_Threshold options = new Options_Threshold();
-    //    public Threshold_Basics_CS(VBtask task) : base(task)
-    //    {
-    //        labels[2] = "Original image";
-    //        desc = "Demonstrate the use of OpenCV's threshold and all its options";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        options.RunVB();
-    //        labels[3] = "Image after thresholding with threshold = " + options.threshold.ToString();
-    //        dst2 = src;
-    //        if (options.inputGray) dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
-    //        if (options.otsuOption) options.thresholdMethod |= ThresholdTypes.Otsu;
-    //        if ((options.otsuOption || options.thresholdMethod == ThresholdTypes.Triangle) && dst2.Channels() != 1)
-    //        {
-    //            dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
-    //        }
-    //        dst3 = dst2.Threshold(options.threshold, 255, options.thresholdMethod);
-    //    }
-    //}
-    //
+
+    public class Threshold_Basics_CS : CS_Parent
+    {
+        public Options_Threshold options = new Options_Threshold();
+        public Threshold_Basics_CS(VBtask task) : base(task)
+        {
+            labels[2] = "Original image";
+            desc = "Demonstrate the use of OpenCV's threshold and all its options";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            labels[3] = "Image after thresholding with threshold = " + options.threshold.ToString();
+            dst2 = src;
+            if (options.inputGray) dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (options.otsuOption) options.thresholdMethod |= ThresholdTypes.Otsu;
+            if ((options.otsuOption || options.thresholdMethod == ThresholdTypes.Triangle) && dst2.Channels() != 1)
+            {
+                dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            }
+            dst3 = dst2.Threshold(options.threshold, 255, options.thresholdMethod);
+        }
+    }
 
 
 
-    //	public class Threshold_Adaptive_CS : CS_Parent
-    //{
-    //    Options_Threshold options = new Options_Threshold();
-    //    Options_AdaptiveThreshold options1 = new Options_AdaptiveThreshold();
-    //    public Threshold_Adaptive_CS(VBtask task) : base(task)
-    //    {
-    //        labels = new string[] { "", "", "Original input", "Output of AdaptiveThreshold" };
-    //        desc = "Explore what adaptive threshold can do.";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        options.RunVB();
-    //        options1.RunVB();
-    //        dst2 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src;
-    //        dst3 = dst2.AdaptiveThreshold(255, options1.method, options.thresholdMethod,
-    //                                           options1.blockSize, options1.constantVal);
-    //    }
-    //}
+
+    public class Threshold_Adaptive_CS : CS_Parent
+    {
+        Options_Threshold options = new Options_Threshold();
+        Options_AdaptiveThreshold options1 = new Options_AdaptiveThreshold();
+        public Threshold_Adaptive_CS(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Original input", "Output of AdaptiveThreshold" };
+            desc = "Explore what adaptive threshold can do.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            options1.RunVB();
+            dst2 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src;
+            dst3 = dst2.AdaptiveThreshold(255, options1.method, options.thresholdMethod,
+                                               options1.blockSize, options1.constantVal);
+        }
+    }
 
 
 
