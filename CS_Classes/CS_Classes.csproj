@@ -87,9 +87,8 @@
   <ItemGroup>
     <Compile Include="AddAlgorithm.cs" />
     <Compile Include="createAlgorithms.cs" />
-    <Compile Include="AI_Gen2.cs" />
     <Compile Include="CS_Externs.cs" />
-    <Compile Include="AI_Gen1.cs" />
+    <Compile Include="AI_Gen.cs" />
     <Compile Include="Aruco.cs" />
     <Compile Include="CS_Parent.cs" />
     <Compile Include="DNN.cs" />

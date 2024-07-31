@@ -67,7 +67,7 @@ Partial Class Touchup
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(472, 20)
         Me.Label3.TabIndex = 3
-        Me.Label3.Text = "Step 3: Paste code to AI_Gen1.cs or AI_Gen2.cs class in CS_Classes project"
+        Me.Label3.Text = "Step 3: Paste code to AI_Gen.cs class in CS_Classes project"
         '
         'rtb
         '

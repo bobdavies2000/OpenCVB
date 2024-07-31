@@ -198,9 +198,9 @@ Partial Class OpenCVB
         'AlgorithmDesc
         '
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(1218, 38)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(1290, 38)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
-        Me.AlgorithmDesc.Size = New System.Drawing.Size(556, 51)
+        Me.AlgorithmDesc.Size = New System.Drawing.Size(484, 51)
         Me.AlgorithmDesc.TabIndex = 0
         Me.AlgorithmDesc.Text = "Algorithm Desc"
         '
@@ -209,7 +209,7 @@ Partial Class OpenCVB
         Me.GroupName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.GroupName.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupName.FormattingEnabled = True
-        Me.GroupName.Location = New System.Drawing.Point(941, 38)
+        Me.GroupName.Location = New System.Drawing.Point(1013, 38)
         Me.GroupName.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.GroupName.Name = "GroupName"
         Me.GroupName.Size = New System.Drawing.Size(271, 34)
@@ -225,7 +225,7 @@ Partial Class OpenCVB
         Me.AvailableAlgorithms.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.AvailableAlgorithms.MaxDropDownItems = 25
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
-        Me.AvailableAlgorithms.Size = New System.Drawing.Size(371, 34)
+        Me.AvailableAlgorithms.Size = New System.Drawing.Size(443, 34)
         Me.AvailableAlgorithms.TabIndex = 0
         Me.ToolTip1.SetToolTip(Me.AvailableAlgorithms, "Select an algorithm from the list")
         '

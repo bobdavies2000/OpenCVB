@@ -42,15 +42,13 @@ Module UI_GeneratorMain
 
         Dim cppAlgorithmInput = New FileInfo("../CPP_Classes/CPP_Algorithms.h")
         Dim CPPIncludeOnly = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
-        Dim CSInputs = {New FileInfo("../CS_Classes/AI_Gen1.cs").FullName,
-                        New FileInfo("../CS_Classes/AI_Gen2.cs").FullName,
+        Dim CSInputs = {New FileInfo("../CS_Classes/AI_Gen.cs").FullName,
                         New FileInfo("../CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../VB_classes/")
         If cppAlgorithmInput.Exists = False Then
             cppAlgorithmInput = New FileInfo("../../CPP_Classes/CPP_Algorithms.h")
             CPPIncludeOnly = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
-            CSInputs = {New FileInfo("../../CS_Classes/AI_Gen1.cs").FullName,
-                        New FileInfo("../../CS_Classes/AI_Gen2.cs").FullName,
+            CSInputs = {New FileInfo("../../CS_Classes/AI_Gen.cs").FullName,
                         New FileInfo("../../CS_Classes/Non_AI.cs").FullName}
             VBcodeDir = New DirectoryInfo(CurDir() + "/../../VB_classes/")
         End If
