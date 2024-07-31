@@ -1,3 +1,5 @@
+Imports OpenCvSharp
+Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
 Public Class Blur_Basics : Inherits VB_Parent
     Public Options As New Options_Blur
@@ -189,6 +191,21 @@ Public Class Blur_Depth : Inherits VB_Parent
 
         blur.Run(dst3)
         dst2 = blur.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class Blur_Gaussian : Inherits VB_Parent
+    Public options As New Options_Blur()
+    Public Sub New()
+        desc = "Smooth each pixel with a Gaussian kernel of different sizes."
+    End Sub
+    Public Sub RunCS(src As Mat)
+        options.RunVB()
+        Cv2.GaussianBlur(src, dst2, New Size(options.kernelSize, options.kernelSize), 0, 0)
     End Sub
 End Class
 

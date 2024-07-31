@@ -490,7 +490,7 @@ End Class
 
 
 Public Class Feature_ShiTomasi : Inherits VB_Parent
-    Dim harris As New Corners_HarrisDetector
+    Dim harris As New Corners_HarrisDetector_CPP
     Dim shiTomasi As New Corners_ShiTomasi_CPP
     Dim options As New Options_ShiTomasi
     Public Sub New()
@@ -686,7 +686,7 @@ End Class
 
 
 Public Class Feature_Gather : Inherits VB_Parent
-    Dim harris As New Corners_HarrisDetector
+    Dim harris As New Corners_HarrisDetector_CPP
     Dim FAST As New Corners_Basics
     Dim myOptions As New Options_FeatureGather
     Public features As New List(Of cv.Point2f)

@@ -1,8 +1,9 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.Dnn
 Imports System.Net
-Imports  System.IO
+Imports System.IO
 Imports OpenCvSharp.DnnSuperres
+Imports OpenCvSharp
 
 Public Class DNN_Test : Inherits VB_Parent
     Dim net As Net
@@ -23,14 +24,14 @@ Public Class DNN_Test : Inherits VB_Parent
         net = CvDnn.ReadNetFromCaffe(protoTxt, modelFile.FullName)
         Dim synsetWords = task.HomeDir + "Data/synset_words.txt"
         classnames = File.ReadAllLines(synsetWords) ' .Select(line >= line.Split(' ').Last()).ToArray()
-        For i = 0 To classNames.Count - 1
-            classNames(i) = classNames(i).Split(" ").Last
+        For i = 0 To classnames.Count - 1
+            classnames(i) = classnames(i).Split(" ").Last
         Next
 
         labels(3) = "Input Image"
         desc = "Download and use a Caffe database"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
 
         Dim image = cv.Cv2.ImRead(task.HomeDir + "Data/space_shuttle.jpg")
         dst3 = image.Resize(dst3.Size())
@@ -38,7 +39,7 @@ Public Class DNN_Test : Inherits VB_Parent
         net.SetInput(inputBlob, "data")
         Dim prob = net.Forward("prob")
 
-        Dim mm as mmData = GetMinMax(prob.Reshape(1, 1))
+        Dim mm As mmData = GetMinMax(prob.Reshape(1, 1))
         SetTrueText("Best classification: index = " + CStr(mm.maxLoc.X) + " which is for '" + classnames(mm.maxLoc.X) + "' with Probability " +
                     Format(mm.maxVal, "#0.00%"), New cv.Point(40, 200))
     End Sub
@@ -180,7 +181,7 @@ Public Class DNN_SuperRes : Inherits VB_Parent
         labels(2) = "Output of a resize using OpenCV"
         desc = "Get better super-resolution through a DNN"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If saveModelFile <> options.superResModelFileName Then
             saveModelFile = options.superResModelFileName
@@ -220,7 +221,7 @@ Public Class DNN_SuperResize : Inherits VB_Parent
         labels(3) = "dst3 = dst2 - src or no difference - honors original"
         desc = "Compare superRes reduced to original size"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         super.Run(src)
         Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Dim tmp As New cv.Mat
@@ -229,3 +230,4 @@ Public Class DNN_SuperResize : Inherits VB_Parent
         dst3 = dst2 - src
     End Sub
 End Class
+

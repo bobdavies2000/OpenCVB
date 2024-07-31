@@ -12,8 +12,8 @@ namespace CS_Classes
 			if (algorithmName == "AddWeighted_ImageAccumulate_CS") return new AddWeighted_ImageAccumulate_CS(task);
 			if (algorithmName == "AddWeighted_InfraRed_CS") return new AddWeighted_InfraRed_CS(task);
 			if (algorithmName == "AlphaChannel_Basics_CS") return new AlphaChannel_Basics_CS(task);
-			if (algorithmName == "Annealing_Basics_CS") return new Annealing_Basics_CS(task);
-			if (algorithmName == "Annealing_MultiThreaded_CS") return new Annealing_MultiThreaded_CS(task);
+			if (algorithmName == "Annealing_Basics_CPP_CS") return new Annealing_Basics_CPP_CS(task);
+			if (algorithmName == "Annealing_MT_CPP_CS") return new Annealing_MT_CPP_CS(task);
 			if (algorithmName == "ApproxPoly_Basics_CS") return new ApproxPoly_Basics_CS(task);
 			if (algorithmName == "ApproxPoly_FindandDraw_CS") return new ApproxPoly_FindandDraw_CS(task);
 			if (algorithmName == "ApproxPoly_Hull_CS") return new ApproxPoly_Hull_CS(task);
@@ -120,7 +120,7 @@ namespace CS_Classes
 			if (algorithmName == "Binarize_OTSU_CS") return new Binarize_OTSU_CS(task);
 			if (algorithmName == "Binarize_Simple_CS") return new Binarize_Simple_CS(task);
 			if (algorithmName == "Binarize_Wolf_Nick_CS") return new Binarize_Wolf_Nick_CS(task);
-			if (algorithmName == "BitmapToMat_CS") return new BitmapToMat_CS(task);
+			if (algorithmName == "Bitmap_ToMat_CS") return new Bitmap_ToMat_CS(task);
 			if (algorithmName == "Blob_Basics_CS") return new Blob_Basics_CS(task);
 			if (algorithmName == "Blob_Input_CS") return new Blob_Input_CS(task);
 			if (algorithmName == "Blob_RenderBlobs_CS") return new Blob_RenderBlobs_CS(task);

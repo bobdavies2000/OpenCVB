@@ -1,4 +1,47 @@
+Imports OpenCvSharp
+Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
+
+Public Class Blob_Basics : Inherits VB_Parent
+    Dim options As Options_Blob
+    Dim input As Blob_Input
+
+    Public Sub New()
+        options = New Options_Blob
+        input = New Blob_Input
+        UpdateAdvice(traceName & ": click 'Show All' to see all the available options.")
+        desc = "Isolate and list blobs with specified options"
+    End Sub
+
+    Public Sub RunVB(src As Mat)
+        options.RunVB()
+
+        If standaloneTest() Then
+            input.Run(src)
+            dst2 = input.dst2
+        Else
+            dst2 = src
+        End If
+
+        Dim binaryImage = dst2.CvtColor(ColorConversionCodes.BGR2GRAY)
+        Cv2.Threshold(binaryImage, binaryImage, thresh:=0, maxval:=255, type:=ThresholdTypes.Binary)
+
+        Dim simpleBlob = SimpleBlobDetector.Create(CType(options.blobParams, SimpleBlobDetector.Params))
+        Dim keypoint = simpleBlob.Detect(dst2)
+
+        Cv2.DrawKeypoints(
+            image:=binaryImage,
+            keypoints:=keypoint,
+            outImage:=dst3,
+            color:=Scalar.FromRgb(255, 0, 0),
+            flags:=DrawMatchesFlags.DrawRichKeypoints)
+    End Sub
+End Class
+
+
+
+
+
 ' https://stackoverflow.com/questions/14770756/opencv-simpleblobdetector-filterbyinertia-meaning
 Public Class Blob_Input : Inherits VB_Parent
     Dim rotatedRect As New Rectangle_Rotated
@@ -45,7 +88,7 @@ Public Class Blob_RenderBlobs : Inherits VB_Parent
         labels(3) = "Largest blob, centroid in yellow"
         desc = "Use connected components to find blobs."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.frameCount Mod input.updateFrequency = 0 Then
             input.Run(src)
             dst2 = input.dst2

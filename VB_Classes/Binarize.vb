@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class Binarize_Niblack_Sauvola1 : Inherits VB_Parent
+Public Class Binarize_Niblack_Sauvola : Inherits VB_Parent
     Dim options As New Options_BinarizeNiBlack
     Public Sub New()
         desc = "Binarize an image using Niblack and Sauvola"
@@ -87,7 +87,7 @@ Public Class Binarize_Niblack_Sauvola1 : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
         dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR)
         CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)

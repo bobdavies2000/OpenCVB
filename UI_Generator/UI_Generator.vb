@@ -124,7 +124,9 @@ Module UI_GeneratorMain
                     vbline = Mid(vbline, startname)
                     Dim endName = InStr(vbline, """")
                     vbline = Mid(vbline, 1, endName - 1)
-                    If vbline.Contains("AlgorithmList.vb") = False And vbline.Contains("My Project") = False Then fileNames.Add(VBcodeDir.FullName + vbline)
+                    If vbline.Contains("AlgorithmList.vb") = False And vbline.Contains("My Project") = False Then
+                        fileNames.Add(VBcodeDir.FullName + vbline)
+                    End If
                 End If
             End If
         End While
@@ -139,12 +141,10 @@ Module UI_GeneratorMain
         Dim className As String = ""
         Dim CodeLineCount As Integer = cppLines + csLines ' now adding in the C++ and C# lines...
         Dim sortedNames As New SortedList(Of String, Integer)
-        Dim sIndex As Integer
         For Each fileName In fileNames
             If fileName.EndsWith(".py") And fileName.Contains("__init") = False Then
                 Dim fileinfo As New FileInfo(fileName)
-                If sortedNames.Keys.Contains(fileinfo.Name) = False Then sortedNames.Add(fileinfo.Name, sIndex)
-                sIndex += 1
+                If sortedNames.Keys.Contains(fileinfo.Name) = False Then sortedNames.Add(fileinfo.Name, sortedNames.Count)
                 fileName = fileinfo.FullName
             Else
                 If fileName.EndsWith("VB_Parent.vb") = False And fileName.EndsWith("createalgorithms.cs") = False Then
@@ -159,9 +159,9 @@ Module UI_GeneratorMain
                                     Dim split As String() = Regex.Split(fileline, "\W+")
                                     If fileline.EndsWith(" : Inherits VB_Parent") Then className = split(2)
                                 End If
-                                If LCase(fileline).StartsWith("public sub new(") And sortedNames.ContainsKey(className) = False Then
-                                    If sortedNames.Keys.Contains(className) = False Then sortedNames.Add(className, sIndex)
-                                    sIndex += 1
+                                If LCase(fileline).StartsWith("public sub new(") And
+                                    sortedNames.ContainsKey(className) = False Then
+                                    If sortedNames.Keys.Contains(className) = False Then sortedNames.Add(className, sortedNames.Count)
                                 End If
                             End If
                         End If
@@ -171,7 +171,6 @@ Module UI_GeneratorMain
         Next
 
         Dim csSortedNames As New SortedList(Of String, Integer)
-        Dim csIndex As Integer
         Dim csFileNames As New List(Of String)
         Dim csAdds As New List(Of String)
         ' we only want python files that are included in the Python_Classes Project.  Other Python files may be support modules or just experiments.
@@ -200,10 +199,9 @@ Module UI_GeneratorMain
                                     End If
                                 End If
                             End If
-                            If LCase(csline).StartsWith("public ") And csSortedNames.ContainsKey(csName) = False And csName <> "" Then
-                                csSortedNames.Add(csName, csIndex)
-                                If csName.Contains("CSharp") Then Dim k = 0
-                                csIndex += 1
+                            If LCase(csline).StartsWith("public ") And csSortedNames.ContainsKey(csName) = False And
+                                csName <> "" Then
+                                csSortedNames.Add(csName, csSortedNames.Count)
                             End If
                         End If
                     End If
@@ -326,6 +324,7 @@ Module UI_GeneratorMain
                         cleanNames(i).Contains("CPP_Basics") = False Then
                         If cleanNames(i).StartsWith("CPP_") Or cleanNames(i).EndsWith("_CPP") Then
                             cppNames.Add(cleanNames(i), cleanNames(i))
+                            If cleanNames(i).EndsWith("_CPP") Then VBNames.Add(cleanNames(i), cleanNames(i))
                         Else
                             VBNames.Add(cleanNames(i), cleanNames(i))
                             apiList.Add(cleanNames(i))
@@ -432,6 +431,15 @@ Module UI_GeneratorMain
                     If apiList(i).StartsWith("min") Then apiList(i) += "(OpenCV version)"
                 End If
                 sortedAPIs.Add(apiList(i), finalEntry)
+            End If
+        Next
+
+        Dim count As Integer
+        For Each nm In CSnames.Keys
+            Dim testName = nm.Substring(0, nm.Length - 3)
+            If VBNames.Keys.Contains(testName) = False Then
+                Console.WriteLine("missing " + testName)
+                count += 1
             End If
         Next
 

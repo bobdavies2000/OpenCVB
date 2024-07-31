@@ -415,7 +415,7 @@ namespace CS_Classes
 
 
 
-    public class Annealing_Basics_CS : CS_Parent
+    public class Annealing_Basics_CPP_CS : CS_Parent
     {
         public int numberOfCities = 25;
         public Point2d[] cityPositions;
@@ -474,7 +474,7 @@ namespace CS_Classes
             hCityPosition.Free();
         }
 
-        public Annealing_Basics_CS(VBtask task) : base(task)
+        public Annealing_Basics_CPP_CS(VBtask task) : base(task)
         {
             energy = -1;
             setup();
@@ -515,11 +515,11 @@ namespace CS_Classes
 
 
 
-    public class Annealing_MultiThreaded_CS : CS_Parent
+    public class Annealing_MT_CPP_CS : CS_Parent
     {
         Options_Annealing options = new Options_Annealing();
         Random_Basics_CS random;
-        Annealing_Basics_CS[] anneal;
+        Annealing_Basics_CPP_CS[] anneal;
         Mat_4to1_CS mats;
         DateTime startTime;
         void setup()
@@ -529,7 +529,7 @@ namespace CS_Classes
 
             for (int i = 0; i < anneal.Length; i++)
             {
-                anneal[i] = new Annealing_Basics_CS(task);
+                anneal[i] = new Annealing_Basics_CPP_CS(task);
                 anneal[i].numberOfCities = options.cityCount;
                 anneal[i].cityPositions = random.PointList2d.ToArray();
                 anneal[i].circularPattern = options.circularFlag;
@@ -545,11 +545,11 @@ namespace CS_Classes
             startTime = DateTime.Now;
         }
 
-        public Annealing_MultiThreaded_CS(VBtask task) : base(task)
+        public Annealing_MT_CPP_CS(VBtask task) : base(task)
         {
             mats = new Mat_4to1_CS(task);
             random = new Random_Basics_CS(task);
-            anneal = new Annealing_Basics_CS[Environment.ProcessorCount / 2];
+            anneal = new Annealing_Basics_CPP_CS[Environment.ProcessorCount / 2];
             labels = new string[] { "", "", "Top 2 are best solutions, bottom 2 are worst.", "Log of Annealing progress" };
             desc = "Setup and control finding the optimal route for a traveling salesman";
         }
@@ -1991,7 +1991,7 @@ namespace CS_Classes
 
     public class BGRPattern_Basics_CS : CS_Parent
     {
-        Denoise_Pixels denoise = new Denoise_Pixels();
+        Denoise_Pixels_CPP denoise = new Denoise_Pixels_CPP();
         Color_Basics colorFmt = new Color_Basics();
         public int classCount;
 
@@ -7754,7 +7754,7 @@ namespace CS_Classes
 
     public class Color8U_Denoise_CS : CS_Parent
     {
-        Denoise_Pixels denoise = new Denoise_Pixels();
+        Denoise_Pixels_CPP denoise = new Denoise_Pixels_CPP();
 
         public Color8U_Denoise_CS(VBtask task) : base(task)
         {
@@ -16175,7 +16175,7 @@ namespace CS_Classes
 
     public class Feature_ShiTomasi_CS : CS_Parent
     {
-        Corners_HarrisDetector harris = new Corners_HarrisDetector();
+        Corners_HarrisDetector_CPP harris = new Corners_HarrisDetector_CPP();
         Corners_ShiTomasi_CPP shiTomasi = new Corners_ShiTomasi_CPP();
         Options_ShiTomasi options = new Options_ShiTomasi();
         public Feature_ShiTomasi_CS(VBtask task) : base(task)
@@ -16383,7 +16383,7 @@ namespace CS_Classes
 
     public class Feature_Gather_CPP_CS : CS_Parent
     {
-        Corners_HarrisDetector harris = new Corners_HarrisDetector();
+        Corners_HarrisDetector_CPP harris = new Corners_HarrisDetector_CPP();
         Corners_Basics FAST = new Corners_Basics();
         Options_FeatureGather myOptions = new Options_FeatureGather();
         public List<cv.Point2f> features = new List<cv.Point2f>();

@@ -287,7 +287,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Corners_HarrisDetector : Inherits VB_Parent
+Public Class Corners_HarrisDetector_CPP : Inherits VB_Parent
     Public features As New List(Of cv.Point2f)
     Dim options As New Options_Features
     Public Sub New()

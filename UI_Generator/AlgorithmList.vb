@@ -85,7 +85,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "AddWeighted_InfraRed" Then return new AddWeighted_InfraRed
 	if algorithmName = "AlphaChannel_Basics" Then return new AlphaChannel_Basics
 	if algorithmName = "Annealing_Basics_CPP" Then return new Annealing_Basics_CPP
-	if algorithmName = "Annealing_MultiThreaded_CPP" Then return new Annealing_MultiThreaded_CPP
+	if algorithmName = "Annealing_MT_CPP" Then return new Annealing_MT_CPP
 	if algorithmName = "ApproxPoly_Basics" Then return new ApproxPoly_Basics
 	if algorithmName = "ApproxPoly_FindandDraw" Then return new ApproxPoly_FindandDraw
 	if algorithmName = "ApproxPoly_Hull" Then return new ApproxPoly_Hull
@@ -196,11 +196,12 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Binarize_FourPixelFlips" Then return new Binarize_FourPixelFlips
 	if algorithmName = "Binarize_KMeansMasks" Then return new Binarize_KMeansMasks
 	if algorithmName = "Binarize_KMeansRGB" Then return new Binarize_KMeansRGB
-	if algorithmName = "Binarize_Niblack_Sauvola1" Then return new Binarize_Niblack_Sauvola1
+	if algorithmName = "Binarize_Niblack_Sauvola" Then return new Binarize_Niblack_Sauvola
 	if algorithmName = "Binarize_OTSU" Then return new Binarize_OTSU
 	if algorithmName = "Binarize_Simple" Then return new Binarize_Simple
 	if algorithmName = "Binarize_Wolf_Nick" Then return new Binarize_Wolf_Nick
 	if algorithmName = "Bitmap_ToMat" Then return new Bitmap_ToMat
+	if algorithmName = "Blob_Basics" Then return new Blob_Basics
 	if algorithmName = "Blob_Input" Then return new Blob_Input
 	if algorithmName = "Blob_RenderBlobs" Then return new Blob_RenderBlobs
 	if algorithmName = "BlockMatching_Basics" Then return new BlockMatching_Basics
@@ -208,6 +209,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Blur_Bilateral" Then return new Blur_Bilateral
 	if algorithmName = "Blur_Depth" Then return new Blur_Depth
 	if algorithmName = "Blur_Detection" Then return new Blur_Detection
+	if algorithmName = "Blur_Gaussian" Then return new Blur_Gaussian
 	if algorithmName = "Blur_Homogeneous" Then return new Blur_Homogeneous
 	if algorithmName = "Blur_Median" Then return new Blur_Median
 	if algorithmName = "Blur_PlusHistogram" Then return new Blur_PlusHistogram
@@ -265,7 +267,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Color_Basics" Then return new Color_Basics
 	if algorithmName = "Color8U_Basics" Then return new Color8U_Basics
 	if algorithmName = "Color8U_BlackAndWhite" Then return new Color8U_BlackAndWhite
-	if algorithmName = "Color8U_Common_VB" Then return new Color8U_Common_VB
+	if algorithmName = "Color8U_Common" Then return new Color8U_Common
 	if algorithmName = "Color8U_Complementary" Then return new Color8U_Complementary
 	if algorithmName = "Color8U_ComplementaryTest" Then return new Color8U_ComplementaryTest
 	if algorithmName = "Color8U_Denoise" Then return new Color8U_Denoise
@@ -277,7 +279,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Color8U_MotionFiltered" Then return new Color8U_MotionFiltered
 	if algorithmName = "Color8U_RedHue" Then return new Color8U_RedHue
 	if algorithmName = "Color8U_Smoothing" Then return new Color8U_Smoothing
-	if algorithmName = "Color8U_TopX_VB" Then return new Color8U_TopX_VB
+	if algorithmName = "Color8U_TopX" Then return new Color8U_TopX
 	if algorithmName = "Complexity_Basics" Then return new Complexity_Basics
 	if algorithmName = "Complexity_Dots" Then return new Complexity_Dots
 	if algorithmName = "Complexity_PlotOpenCV" Then return new Complexity_PlotOpenCV
@@ -318,7 +320,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Corners_BasicsStablePoints" Then return new Corners_BasicsStablePoints
 	if algorithmName = "Corners_Harris" Then return new Corners_Harris
 	if algorithmName = "Corners_Harris_CPP" Then return new Corners_Harris_CPP
-	if algorithmName = "Corners_HarrisDetector" Then return new Corners_HarrisDetector
+	if algorithmName = "Corners_HarrisDetector_CPP" Then return new Corners_HarrisDetector_CPP
 	if algorithmName = "Corners_PreCornerDetect" Then return new Corners_PreCornerDetect
 	if algorithmName = "Corners_RedCloud" Then return new Corners_RedCloud
 	if algorithmName = "Corners_ShiTomasi_CPP" Then return new Corners_ShiTomasi_CPP
@@ -418,7 +420,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Delaunay_SubDiv" Then return new Delaunay_SubDiv
 	if algorithmName = "Delaunay_Subdiv2D" Then return new Delaunay_Subdiv2D
 	if algorithmName = "Denoise_Basics_CPP" Then return new Denoise_Basics_CPP
-	if algorithmName = "Denoise_Pixels" Then return new Denoise_Pixels
+	if algorithmName = "Denoise_Pixels_CPP" Then return new Denoise_Pixels_CPP
 	if algorithmName = "Density_Basics" Then return new Density_Basics
 	if algorithmName = "Density_Count_CPP" Then return new Density_Count_CPP
 	if algorithmName = "Density_Mask" Then return new Density_Mask

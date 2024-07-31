@@ -2,28 +2,23 @@
 using System.Drawing;
 using OpenCvSharp.Extensions;
 using OpenCvSharp;
-using VB_Classes;
-using System.Windows.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using OpenCvSharp.Features2D;
 using OpenCvSharp.XFeatures2D;
-using System.Text;
-using System.Threading.Tasks;
 using OpenCvSharp.Dnn;
 using OpenCvSharp.DnnSuperres;
 using System.IO;
 using System.Net;
-using System.Windows.Controls;
-using System.Security.Cryptography;
+using VB_Classes;
 
 namespace CS_Classes
 {
-    public class BitmapToMat_CS : CS_Parent
+    public class Bitmap_ToMat_CS : CS_Parent
     {
-        public BitmapToMat_CS(VBtask task) : base(task)
+        public Bitmap_ToMat_CS(VBtask task) : base(task)
         {
             labels[2] = "Convert color bitmap to Mat";
             labels[3] = "Convert Mat to bitmap and then back to Mat";
@@ -45,14 +40,11 @@ namespace CS_Classes
 
     public class Blur_Gaussian_CS : CS_Parent
     {
-        TrackBar blurSlider;
         public Options_Blur options = new Options_Blur();
         public Blur_Gaussian_CS(VBtask task) : base(task)
         {
-            blurSlider = FindSlider("Blur Kernel Size");
             desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
         }
-
         public void RunCS(Mat src)
         {
             options.RunVB();

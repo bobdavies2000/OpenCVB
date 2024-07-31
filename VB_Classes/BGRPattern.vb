@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class BGRPattern_Basics : Inherits VB_Parent
-    Dim denoise As New Denoise_Pixels
+    Dim denoise As New Denoise_Pixels_CPP
     Public colorFmt As New Color_Basics
     Public classCount As Integer
     Public Sub New()

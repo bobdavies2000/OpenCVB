@@ -235,7 +235,7 @@ End Class
 
 
 
-Public Class Color8U_TopX_VB : Inherits VB_Parent
+Public Class Color8U_TopX : Inherits VB_Parent
     Dim topX As New Hist3Dcolor_TopXColors
     Dim options As New Options_Color8UTopX
     Public Sub New()
@@ -278,7 +278,7 @@ End Class
 
 
 ' https://github.com/AjinkyaChavan9/RGB-Color-Classifier-with-Deep-Learning-using-Keras-and-Tensorflow
-Public Class Color8U_Common_VB : Inherits VB_Parent
+Public Class Color8U_Common : Inherits VB_Parent
     Dim common As New List(Of cv.Vec3b)
     Dim commonScalar As List(Of cv.Scalar) = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.Yellow, cv.Scalar.Pink, cv.Scalar.Purple, cv.Scalar.Brown,
                                               cv.Scalar.Gray, cv.Scalar.Black, cv.Scalar.White}.ToList
@@ -331,7 +331,7 @@ End Class
 
 
 Public Class Color8U_Denoise : Inherits VB_Parent
-    Dim denoise As New Denoise_Pixels
+    Dim denoise As New Denoise_Pixels_CPP
     Public Sub New()
         denoise.standalone = True
         desc = "Remove single pixels between identical pixels for all color classifiers."
