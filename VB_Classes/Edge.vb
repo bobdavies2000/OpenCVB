@@ -104,7 +104,7 @@ End Class
 
 
 '  https://docs.opencv.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
-Public Class Edge_RandomForest_CPP : Inherits VB_Parent
+Public Class Edge_RandomForest_CPP_VB : Inherits VB_Parent
     Dim rgbData() As Byte
     Dim options As New Options_Edges2
     Public Sub New()
@@ -175,7 +175,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
-Public Class Edge_Deriche_CPP : Inherits VB_Parent
+Public Class Edge_Deriche_CPP_VB : Inherits VB_Parent
     Dim options As New Options_Edges3
     Public Sub New()
         cPtr = Edge_Deriche_Open()
@@ -492,7 +492,7 @@ End Class
 
 
 
-Public Class Edge_ColorGap_CPP : Inherits VB_Parent
+Public Class Edge_ColorGap_CPP_VB : Inherits VB_Parent
     Dim gap As New Edge_ColorGap_VB
     Public Sub New()
         cPtr = Edge_ColorGap_Open()
@@ -618,7 +618,7 @@ End Class
 
 
 
-Public Class Edge_DepthGap_CPP : Inherits VB_Parent
+Public Class Edge_DepthGap_CPP_VB : Inherits VB_Parent
     Dim options As New Options_DepthEdges
     Public Sub New()
         cPtr = Edge_DepthGap_Open()

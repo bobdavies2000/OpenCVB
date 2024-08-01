@@ -2,8 +2,9 @@
 Public Class Color8U_Basics : Inherits VB_Parent
     Public classCount As Integer
     Public classifier As Object
-    Dim colorMethods() As Object = {New BackProject_Full, New BackProject2D_Full, New Bin4Way_Regions, New Binarize_DepthTiers, New FeatureLess_Groups,
-                                    New Hist3Dcolor_Basics, New KMeans_Basics, New LUT_Basics, New Reduction_Basics, New PCA_NColor_CPP}
+    Dim colorMethods() As Object = {New BackProject_Full, New BackProject2D_Full, New Bin4Way_Regions, New Binarize_DepthTiers,
+                                    New FeatureLess_Groups, New Hist3Dcolor_Basics, New KMeans_Basics, New LUT_Basics,
+                                    New Reduction_Basics, New PCA_NColor_CPP_VB}
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         labels(3) = "vbPalette output of dst2 at left"
@@ -331,7 +332,7 @@ End Class
 
 
 Public Class Color8U_Denoise : Inherits VB_Parent
-    Dim denoise As New Denoise_Pixels_CPP
+    Dim denoise As New Denoise_Pixels_CPP_VB
     Public Sub New()
         denoise.standalone = True
         desc = "Remove single pixels between identical pixels for all color classifiers."

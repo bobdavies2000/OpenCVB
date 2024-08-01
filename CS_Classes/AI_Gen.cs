@@ -1002,7 +1002,7 @@ namespace CS_Classes
     {
         BackProject_Basics backP = new BackProject_Basics();
         Reduction_Basics reduction = new Reduction_Basics();
-        Edge_ColorGap_CPP edges = new Edge_ColorGap_CPP();
+        Edge_ColorGap_CPP_VB edges = new Edge_ColorGap_CPP_VB();
 
         public BackProject_FeatureLess_CS(VBtask task) : base(task)
         {
@@ -1992,7 +1992,7 @@ namespace CS_Classes
 
     public class BGRPattern_Basics_CS : CS_Parent
     {
-        Denoise_Pixels_CPP denoise = new Denoise_Pixels_CPP();
+        Denoise_Pixels_CPP_VB denoise = new Denoise_Pixels_CPP_VB();
         Color_Basics colorFmt = new Color_Basics();
         public int classCount;
 
@@ -2396,7 +2396,7 @@ namespace CS_Classes
     public class BGSubtract_MOG_Retina_CS : CS_Parent
     {
         BGSubtract_MOG_CS bgSub;
-        Retina_Basics_CPP retina = new Retina_Basics_CPP();
+        Retina_Basics_CPP_VB retina = new Retina_Basics_CPP_VB();
 
         public BGSubtract_MOG_Retina_CS(VBtask task) : base(task)
         {
@@ -4377,7 +4377,7 @@ namespace CS_Classes
 
     public class BlockMatching_Basics_CS : CS_Parent
     {
-        Depth_Colorizer_CPP colorizer = new Depth_Colorizer_CPP();
+        Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
         Options_BlockMatching options = new Options_BlockMatching();
 
         public BlockMatching_Basics_CS(VBtask task) : base(task)
@@ -4838,7 +4838,7 @@ namespace CS_Classes
 
     public class Boundary_Basics_CS : CS_Parent
     {
-        public RedCloud_CPP redCPP = new RedCloud_CPP();
+        public RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public List<cv.Rect> rects = new List<cv.Rect>();
         public List<Mat> masks = new List<Mat>();
         public List<List<cv.Point>> contours = new List<List<cv.Point>>();
@@ -6534,7 +6534,7 @@ namespace CS_Classes
         Diff_Basics diffRight = new Diff_Basics();
         public bool useLeftImage = true;
         Boundary_RemovedRects bounds = new Boundary_RemovedRects();
-        RedCloud_CPP redCPP;
+        RedCloud_CPP_VB redCPP;
         int saveRetained = -1;
         public Cell_Generate_CS(VBtask task) : base(task)
         {
@@ -8084,7 +8084,7 @@ namespace CS_Classes
 
     public class Color8U_Denoise_CS : CS_Parent
     {
-        Denoise_Pixels_CPP denoise = new Denoise_Pixels_CPP();
+        Denoise_Pixels_CPP_VB denoise = new Denoise_Pixels_CPP_VB();
 
         public Color8U_Denoise_CS(VBtask task) : base(task)
         {
@@ -8232,7 +8232,7 @@ namespace CS_Classes
 
     public class Complexity_PlotOpenCV_CS : CS_Parent
     {
-        public Plot_Basics_CPP plot = new Plot_Basics_CPP();
+        public Plot_Basics_CPP_VB plot = new Plot_Basics_CPP_VB();
         public int maxFrameCount;
         public SortedList<int, int> sortData = new SortedList<int, int>(new compareAllowIdenticalInteger());
         public Options_Complexity options = new Options_Complexity();
@@ -11310,7 +11310,7 @@ namespace CS_Classes
 
     public class Depth_Basics_CS : CS_Parent
     {
-        Depth_Colorizer_CPP colorizer = new Depth_Colorizer_CPP();
+        Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
 
         public Depth_Basics_CS(VBtask task) : base(task)
         {
@@ -11769,7 +11769,7 @@ namespace CS_Classes
 
     public class Depth_Uncertainty_CS : CS_Parent
     {
-        Retina_Basics_CPP retina = new Retina_Basics_CPP();
+        Retina_Basics_CPP_VB retina = new Retina_Basics_CPP_VB();
         Options_Uncertainty options = new Options_Uncertainty();
 
         public Depth_Uncertainty_CS(VBtask task) : base(task)
@@ -12180,7 +12180,7 @@ namespace CS_Classes
     public class Depth_Averaging_CS : CS_Parent
     {
         Math_ImageAverage avg = new Math_ImageAverage();
-        Depth_Colorizer_CPP colorize = new Depth_Colorizer_CPP();
+        Depth_Colorizer_CPP_VB colorize = new Depth_Colorizer_CPP_VB();
         public Depth_Averaging_CS(VBtask task) : base(task)
         {
             labels[3] = "32-bit format depth data";
@@ -12794,7 +12794,7 @@ namespace CS_Classes
     public class Depth_StableMin_CS : CS_Parent
     {
         Mat stableMin;
-        Depth_Colorizer_CPP colorize = new Depth_Colorizer_CPP();
+        Depth_Colorizer_CPP_VB colorize = new Depth_Colorizer_CPP_VB();
 
         public Depth_StableMin_CS(VBtask task) : base(task)
         {
@@ -12832,7 +12832,7 @@ namespace CS_Classes
     public class Depth_StableMax_CS : CS_Parent
     {
         Mat stableMax;
-        Depth_Colorizer_CPP colorize = new Depth_Colorizer_CPP();
+        Depth_Colorizer_CPP_VB colorize = new Depth_Colorizer_CPP_VB();
 
         public Depth_StableMax_CS(VBtask task) : base(task)
         {
@@ -12869,7 +12869,7 @@ namespace CS_Classes
 
     public class Depth_StableMinMax_CS : CS_Parent
     {
-        Depth_Colorizer_CPP colorize = new Depth_Colorizer_CPP();
+        Depth_Colorizer_CPP_VB colorize = new Depth_Colorizer_CPP_VB();
         Depth_StableMin dMin = new Depth_StableMin();
         Depth_StableMax dMax = new Depth_StableMax();
         Options_MinMaxNone options = new Options_MinMaxNone();
@@ -13030,7 +13030,7 @@ namespace CS_Classes
 
             if (standaloneTest())
             {
-                var colorizer = new Depth_Colorizer_CPP();
+                var colorizer = new Depth_Colorizer_CPP_VB();
                 colorizer.Run(dst2);
                 dst2 = colorizer.dst2;
             }
@@ -17779,8 +17779,8 @@ namespace CS_Classes
 
     public class Feature_ShiTomasi_CS : CS_Parent
     {
-        Corners_HarrisDetector_CPP harris = new Corners_HarrisDetector_CPP();
-        Corners_ShiTomasi_CPP shiTomasi = new Corners_ShiTomasi_CPP();
+        Corners_HarrisDetector_CPP_VB harris = new Corners_HarrisDetector_CPP_VB();
+        Corners_ShiTomasi_CPP_VB shiTomasi = new Corners_ShiTomasi_CPP_VB();
         Options_ShiTomasi options = new Options_ShiTomasi();
         public Feature_ShiTomasi_CS(VBtask task) : base(task)
         {
@@ -17987,7 +17987,7 @@ namespace CS_Classes
 
     public class Feature_Gather_CPP_CS : CS_Parent
     {
-        Corners_HarrisDetector_CPP harris = new Corners_HarrisDetector_CPP();
+        Corners_HarrisDetector_CPP_VB harris = new Corners_HarrisDetector_CPP_VB();
         Corners_Basics FAST = new Corners_Basics();
         Options_FeatureGather myOptions = new Options_FeatureGather();
         public List<cv.Point2f> features = new List<cv.Point2f>();
@@ -19031,7 +19031,7 @@ namespace CS_Classes
 
     public class FeatureLess_Groups_CS : CS_Parent
     {
-        RedCloud_CPP redCPP = new RedCloud_CPP();
+        RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         FeatureLess_Basics fless = new FeatureLess_Basics();
         public int classCount;
         public FeatureLess_Groups_CS(VBtask task) : base(task)
@@ -20308,7 +20308,7 @@ namespace CS_Classes
 
     public class FeaturePoly_Triangle_CS : CS_Parent
     {
-        Area_MinTriangle_CPP triangle = new Area_MinTriangle_CPP();
+        Area_MinTriangle_CPP_VB triangle = new Area_MinTriangle_CPP_VB();
         FeaturePoly_Core fGrid = new FeaturePoly_Core();
         public FeaturePoly_Triangle_CS(VBtask task) : base(task)
         {
@@ -22227,7 +22227,7 @@ namespace CS_Classes
 
     public class Flood_Basics_CS : CS_Parent
     {
-        RedCloud_CPP redCPP = new RedCloud_CPP();
+        RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public Cell_Generate genCells = new Cell_Generate();
         Color8U_Basics color;
         public Flood_Basics_CS(VBtask task) : base(task)
@@ -22345,7 +22345,7 @@ namespace CS_Classes
         public Mat binarizedImage;
         public Mat inputMask;
         public Cell_Generate genCells = new Cell_Generate();
-        RedCloud_CPP redCPP = new RedCloud_CPP();
+        RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public bool buildInputMask;
         public bool showSelected = true;
         Color8U_Basics cvt = new Color8U_Basics();
@@ -22575,7 +22575,7 @@ namespace CS_Classes
     public class Flood_MaxDistPoints_CS : CS_Parent
     {
         Boundary_RemovedRects bounds = new Boundary_RemovedRects();
-        RedCloud_MaxDist_CPP redCPP = new RedCloud_MaxDist_CPP();
+        RedCloud_MaxDist_CPP_VB redCPP = new RedCloud_MaxDist_CPP_VB();
         public Cell_Generate genCells = new Cell_Generate();
         Color8U_Basics cvt = new Color8U_Basics();
         public Flood_MaxDistPoints_CS(VBtask task) : base(task)
@@ -34186,8 +34186,8 @@ namespace CS_Classes
             }
             else
             {
-                var m = (center.Y - p1.Y) / (center.X - p1.X);
-                var b = p1.Y - p1.X * m;
+                double m = (center.Y - p1.Y) / (center.X - p1.X);
+                double b = p1.Y - p1.X * m;
                 if (color[0] == 0) p2 = new cv.Point(-b / m, 0); // red zone
                 if (color[0] == 1) p2 = new cv.Point((dst3.Height - b) / m, dst3.Height); // green
                 if (color[0] == 2) p2 = new cv.Point(dst3.Width, dst3.Width * m + b); // yellow
@@ -39059,7 +39059,7 @@ namespace CS_Classes
     public class ML_FillRGBDepth_MT_CS : CS_Parent
     {
         Depth_Holes shadow = new Depth_Holes();
-        Depth_Colorizer_CPP colorizer = new Depth_Colorizer_CPP();
+        Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
         public ML_FillRGBDepth_MT_CS(VBtask task) : base(task)
         {
             task.gOptions.setGridMaximum(dst2.Cols / 2);
@@ -39085,7 +39085,7 @@ namespace CS_Classes
 
     public class ML_DepthFromColor_CS : CS_Parent
     {
-        Depth_Colorizer_CPP colorizer = new Depth_Colorizer_CPP();
+        Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
         Mat_4Click mats = new Mat_4Click();
         Resize_Smaller resizer = new Resize_Smaller();
         public ML_DepthFromColor_CS(VBtask task) : base(task)
@@ -39141,7 +39141,7 @@ namespace CS_Classes
         Mat_4to1 mats = new Mat_4to1();
         Depth_Holes shadow = new Depth_Holes();
         Resize_Smaller resizer = new Resize_Smaller();
-        Depth_Colorizer_CPP colorizer = new Depth_Colorizer_CPP();
+        Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
         public ML_DepthFromXYColor_CS(VBtask task) : base(task)
         {
             FindSlider("Resize Percentage (%)").Value = 2; // 2% of the image.
@@ -41007,7 +41007,7 @@ namespace CS_Classes
 
     public class MSER_Basics_CS : CS_Parent
     {
-        MSER_CPP detect = new MSER_CPP();
+        MSER_CPP_VB detect = new MSER_CPP_VB();
         public List<rcData> mserCells = new List<rcData>();
         public List<cv.Point> floodPoints = new List<cv.Point>();
         public MSER_Basics_CS(VBtask task) : base(task)
@@ -41506,7 +41506,7 @@ namespace CS_Classes
 
     public class MSER_Basics1_CS : CS_Parent
     {
-        MSER_CPP detect = new MSER_CPP();
+        MSER_CPP_VB detect = new MSER_CPP_VB();
         RedCloud_Basics flood = new RedCloud_Basics();
         public MSER_Basics1_CS(VBtask task) : base(task)
         {
@@ -41527,7 +41527,7 @@ namespace CS_Classes
 
     public class MSER_BasicsNew_CS : CS_Parent
     {
-        MSER_CPP detect = new MSER_CPP();
+        MSER_CPP_VB detect = new MSER_CPP_VB();
         int displaycount;
         public MSER_BasicsNew_CS(VBtask task) : base(task)
         {
@@ -41563,7 +41563,7 @@ namespace CS_Classes
 
     public class MSER_Basics2_CS : CS_Parent
     {
-        MSER_CPP detect = new MSER_CPP();
+        MSER_CPP_VB detect = new MSER_CPP_VB();
         Mat cellMap;
         public MSER_Basics2_CS(VBtask task) : base(task)
         {
@@ -45907,7 +45907,7 @@ namespace CS_Classes
 
     public class PCA_Basics_CS : CS_Parent
     {
-        PCA_Prep_CPP prep = new PCA_Prep_CPP();
+        PCA_Prep_CPP_VB prep = new PCA_Prep_CPP_VB();
         public PCA pca_analysis = new PCA();
         public bool runRedCloud;
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -45984,7 +45984,7 @@ namespace CS_Classes
     public class PCA_CellMask_CS : CS_Parent
     {
         PCA_Basics pca = new PCA_Basics();
-        PCA_Prep_CPP pcaPrep = new PCA_Prep_CPP();
+        PCA_Prep_CPP_VB pcaPrep = new PCA_Prep_CPP_VB();
         public PCA_CellMask_CS(VBtask task) : base(task)
         {
             pca.runRedCloud = true;
@@ -47764,7 +47764,7 @@ namespace CS_Classes
 
     public class Plot_Depth_CS : CS_Parent
     {
-        Plot_Basics_CPP plotDepth = new Plot_Basics_CPP();
+        Plot_Basics_CPP_VB plotDepth = new Plot_Basics_CPP_VB();
         Hist_Basics hist = new Hist_Basics();
         public Plot_Depth_CS(VBtask task) : base(task)
         {
@@ -48736,7 +48736,7 @@ namespace CS_Classes
     public class PointCloud_SurfaceH_CS : CS_Parent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
-        public Plot_Basics_CPP plot = new Plot_Basics_CPP();
+        public Plot_Basics_CPP_VB plot = new Plot_Basics_CPP_VB();
         public int topRow;
         public int botRow;
         public int peakRow;
@@ -51700,7 +51700,7 @@ namespace CS_Classes
     public class RedCloud_Basics_CS : CS_Parent
     {
         public Cell_Generate genCells = new Cell_Generate();
-        RedCloud_CPP redCPP = new RedCloud_CPP();
+        RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public Mat inputMask = new Mat();
         Color8U_Basics color;
         public RedCloud_Basics_CS(VBtask task) : base(task)
@@ -53947,7 +53947,7 @@ namespace CS_Classes
 
     public class RedCloud_Delaunay_CS : CS_Parent
     {
-        RedCloud_CPP redCPP = new RedCloud_CPP();
+        RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         Feature_Delaunay delaunay = new Feature_Delaunay();
         Color8U_Basics color;
         public RedCloud_Delaunay_CS(VBtask task) : base(task)
@@ -55140,7 +55140,7 @@ namespace CS_Classes
 
     public class Retina_Depth_CS : CS_Parent
     {
-        Retina_Basics_CPP retina = new Retina_Basics_CPP();
+        Retina_Basics_CPP_VB retina = new Retina_Basics_CPP_VB();
         Mat lastMotion = new Mat();
         public Retina_Depth_CS(VBtask task) : base(task)
         {
@@ -55619,7 +55619,7 @@ namespace CS_Classes
 
     public class Salience_Basics_MT_CPP_CS : CS_Parent
     {
-        Salience_Basics_CPP salience = new Salience_Basics_CPP();
+        Salience_Basics_CPP_VB salience = new Salience_Basics_CPP_VB();
         public Salience_Basics_MT_CPP_CS(VBtask task) : base(task)
         {
             FindSlider("Salience numScales").Value = 2;
@@ -55798,7 +55798,7 @@ namespace CS_Classes
 
     public class SLR_Data_CS : CS_Parent
     {
-        Plot_Basics_CPP plot = new Plot_Basics_CPP();
+        Plot_Basics_CPP_VB plot = new Plot_Basics_CPP_VB();
         public List<double> dataX = new List<double>();
         public List<double> dataY = new List<double>();
         public SLR_Data_CS(VBtask task) : base(task)
@@ -56252,7 +56252,7 @@ namespace CS_Classes
     public class Sort_1Channel_CS : CS_Parent
     {
         Sort_Basics sort = new Sort_Basics();
-        ML_RemoveDups_CPP dups = new ML_RemoveDups_CPP();
+        ML_RemoveDups_CPP_VB dups = new ML_RemoveDups_CPP_VB();
         public List<int> rangeStart = new List<int>();
         public List<int> rangeEnd = new List<int>();
         TrackBar thresholdSlider;
@@ -56311,7 +56311,7 @@ namespace CS_Classes
     public class Sort_3Channel_CS : CS_Parent
     {
         Sort_Basics sort = new Sort_Basics();
-        ML_RemoveDups_CPP dups = new ML_RemoveDups_CPP();
+        ML_RemoveDups_CPP_VB dups = new ML_RemoveDups_CPP_VB();
         Mat bgra;
         TrackBar thresholdSlider;
         public Sort_3Channel_CS(VBtask task) : base(task)
@@ -58798,7 +58798,7 @@ namespace CS_Classes
 
     public class SuperPixel_BinarizedImage_CS : CS_Parent
     {
-        SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
+        SuperPixel_Basics_CPP_VB pixels = new SuperPixel_Basics_CPP_VB();
         Binarize_Basics binarize;
         public SuperPixel_BinarizedImage_CS(VBtask task) : base(task)
         {
@@ -58822,7 +58822,7 @@ namespace CS_Classes
 
     public class SuperPixel_Depth_CS : CS_Parent
     {
-        SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
+        SuperPixel_Basics_CPP_VB pixels = new SuperPixel_Basics_CPP_VB();
         public SuperPixel_Depth_CS(VBtask task) : base(task)
         {
             desc = "Create SuperPixels using RGBDepth image.";
@@ -58840,7 +58840,7 @@ namespace CS_Classes
 
     public class SuperPixel_WithCanny_CS : CS_Parent
     {
-        SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
+        SuperPixel_Basics_CPP_VB pixels = new SuperPixel_Basics_CPP_VB();
         Edge_Canny edges = new Edge_Canny();
         public SuperPixel_WithCanny_CS(VBtask task) : base(task)
         {
@@ -58864,7 +58864,7 @@ namespace CS_Classes
 
     public class SuperPixel_WithLineDetector_CS : CS_Parent
     {
-        SuperPixel_Basics_CPP pixels = new SuperPixel_Basics_CPP();
+        SuperPixel_Basics_CPP_VB pixels = new SuperPixel_Basics_CPP_VB();
         Line_Basics lines = new Line_Basics();
         public SuperPixel_WithLineDetector_CS(VBtask task) : base(task)
         {
@@ -61517,7 +61517,7 @@ namespace CS_Classes
 
     public class WarpAffine_3Points_CS : CS_Parent
     {
-        Area_MinTriangle_CPP triangle = new Area_MinTriangle_CPP();
+        Area_MinTriangle_CPP_VB triangle = new Area_MinTriangle_CPP_VB();
         Mat M = new Mat();
         public WarpAffine_3Points_CS(VBtask task) : base(task)
         {

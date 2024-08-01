@@ -248,7 +248,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Parent
+Public Class Hist3Dcolor_Basics_CPP_VB : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public prepareImage As Boolean = True
     Public histogram1D As New cv.Mat

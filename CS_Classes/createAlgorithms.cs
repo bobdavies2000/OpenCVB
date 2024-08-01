@@ -462,11 +462,11 @@ namespace CS_Classes
 			if (algorithmName == "Feature_Sample_CS") return new Feature_Sample_CS(task);
 			if (algorithmName == "Feature_ShiTomasi_CS") return new Feature_ShiTomasi_CS(task);
 			if (algorithmName == "Feature_Sift_CS") return new Feature_Sift_CS(task);
-			if (algorithmName == "Feature_Sift_CSSlices") return new Feature_Sift_CSSlices(task);
 			if (algorithmName == "Feature_SiftLeftRight_CS") return new Feature_SiftLeftRight_CS(task);
+			if (algorithmName == "Feature_SiftSlices_CS") return new Feature_SiftSlices_CS(task);
 			if (algorithmName == "Feature_SURF_CS") return new Feature_SURF_CS(task);
-			if (algorithmName == "Feature_SURF_CS_Draw") return new Feature_SURF_CS_Draw(task);
-			if (algorithmName == "Feature_SURF_CSMatch") return new Feature_SURF_CSMatch(task);
+			if (algorithmName == "Feature_SURF_Draw_CS") return new Feature_SURF_Draw_CS(task);
+			if (algorithmName == "Feature_SURFMatch_CS") return new Feature_SURFMatch_CS(task);
 			if (algorithmName == "Feature_Trace_CS") return new Feature_Trace_CS(task);
 			if (algorithmName == "Feature_TraceDelaunay_CS") return new Feature_TraceDelaunay_CS(task);
 			if (algorithmName == "FeatureFlow_Basics_CS") return new FeatureFlow_Basics_CS(task);

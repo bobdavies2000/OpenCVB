@@ -696,7 +696,7 @@ End Class
 
 
 
-Public Class Pixel_Unique_CPP : Inherits VB_Parent
+Public Class Pixel_Unique_CPP_VB : Inherits VB_Parent
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         cPtr = Pixels_Vector_Open()

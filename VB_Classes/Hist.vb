@@ -1034,7 +1034,7 @@ End Class
 
 
 
-Public Class Hist_GotchaFixed_CPP : Inherits VB_Parent
+Public Class Hist_GotchaFixed_CPP_VB : Inherits VB_Parent
     Public Sub New()
         cPtr = Hist_1D_Open()
         desc = "Testing the C++ CalcHist to investigate gotcha with sample counts"
@@ -1067,7 +1067,7 @@ End Class
 
 
 
-Public Class Hist_Byte_CPP : Inherits VB_Parent
+Public Class Hist_Byte_CPP_VB : Inherits VB_Parent
     Public plot As New Plot_Histogram
     Public Sub New()
         cPtr = Hist_1D_Open()

@@ -368,7 +368,7 @@ Public Class Cell_Generate : Inherits VB_Parent
     Dim diffRight As New Diff_Basics
     Public useLeftImage As Boolean = True
     Dim bounds As New Boundary_RemovedRects
-    Dim redCPP As RedCloud_CPP
+    Dim redCPP As RedCloud_CPP_VB
     Public Sub New()
         task.cellMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         task.redCells = New List(Of rcData)

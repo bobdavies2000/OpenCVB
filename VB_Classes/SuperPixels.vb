@@ -21,7 +21,7 @@ End Class
 
 
 
-Public Class SuperPixel_Basics_CPP : Inherits VB_Parent
+Public Class SuperPixel_Basics_CPP_VB : Inherits VB_Parent
     Public wireGrid As cv.Mat
     Public gridColor = cv.Scalar.White
     Dim options As New Options_SuperPixels
@@ -66,7 +66,7 @@ End Class
 
 
 Public Class SuperPixel_BinarizedImage : Inherits VB_Parent
-    Dim pixels As New SuperPixel_Basics_CPP
+    Dim pixels As New SuperPixel_Basics_CPP_VB
     Dim binarize As Binarize_Basics
     Public Sub New()
         binarize = New Binarize_Basics()
@@ -90,7 +90,7 @@ End Class
 
 
 Public Class SuperPixel_Depth : Inherits VB_Parent
-    Dim pixels As New SuperPixel_Basics_CPP
+    Dim pixels As New SuperPixel_Basics_CPP_VB
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
@@ -107,7 +107,7 @@ End Class
 
 
 Public Class SuperPixel_WithCanny : Inherits VB_Parent
-    Dim pixels As New SuperPixel_Basics_CPP
+    Dim pixels As New SuperPixel_Basics_CPP_VB
     Dim edges As New Edge_Canny
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
@@ -130,7 +130,7 @@ End Class
 
 
 Public Class SuperPixel_WithLineDetector : Inherits VB_Parent
-    Dim pixels As New SuperPixel_Basics_CPP
+    Dim pixels As New SuperPixel_Basics_CPP_VB
     Dim lines As New Line_Basics
     Public Sub New()
         labels(3) = "Input to superpixel basics."

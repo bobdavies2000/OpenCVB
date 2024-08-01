@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits VB_Parent
     Public genCells As New Cell_Generate
-    Dim redCPP As New RedCloud_CPP
+    Dim redCPP As New RedCloud_CPP_VB
     Public inputMask As New cv.Mat
     Dim color As Color8U_Basics
     Public Sub New()
@@ -2368,7 +2368,7 @@ End Class
 
 
 Public Class RedCloud_Delaunay : Inherits VB_Parent
-    Dim redCPP As New RedCloud_CPP
+    Dim redCPP As New RedCloud_CPP_VB
     Dim delaunay As New Feature_Delaunay
     Dim color As Color8U_Basics
     Public Sub New()
@@ -2397,7 +2397,7 @@ End Class
 
 
 
-Public Class RedCloud_CPP : Inherits VB_Parent
+Public Class RedCloud_CPP_VB : Inherits VB_Parent
     Public inputMask As cv.Mat
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
@@ -2463,7 +2463,7 @@ End Class
 
 
 
-Public Class RedCloud_MaxDist_CPP : Inherits VB_Parent
+Public Class RedCloud_MaxDist_CPP_VB : Inherits VB_Parent
     Public classCount As Integer
     Public RectList As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)

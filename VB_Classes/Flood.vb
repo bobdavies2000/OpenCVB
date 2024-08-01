@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Parent
-    Dim redCPP As New RedCloud_CPP
+    Dim redCPP As New RedCloud_CPP_VB
     Public genCells As New Cell_Generate
     Dim color As Color8U_Basics
     Public Sub New()
@@ -122,7 +122,7 @@ Public Class Flood_BasicsMask : Inherits VB_Parent
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
     Public genCells As New Cell_Generate
-    Dim redCPP As New RedCloud_CPP
+    Dim redCPP As New RedCloud_CPP_VB
     Public buildInputMask As Boolean
     Public showSelected As Boolean = True
     Dim cvt As New Color8U_Basics
@@ -350,7 +350,7 @@ End Class
 
 Public Class Flood_MaxDistPoints : Inherits VB_Parent
     Dim bounds As New Boundary_RemovedRects
-    Dim redCPP As New RedCloud_MaxDist_CPP
+    Dim redCPP As New RedCloud_MaxDist_CPP_VB
     Public genCells As New Cell_Generate
     Dim cvt As New Color8U_Basics
     Public Sub New()

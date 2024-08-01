@@ -55,7 +55,7 @@ End Class
 
 
 
-Public Class Sort_MLPrepTest_CPP : Inherits VB_Parent
+Public Class Sort_MLPrepTest_CPP_VB : Inherits VB_Parent
     Public reduction As New Reduction_Basics
     Public MLTestData As New cv.Mat
     Public Sub New()
@@ -94,7 +94,7 @@ End Class
 
 Public Class Sort_1Channel : Inherits VB_Parent
     Dim sort As New Sort_Basics
-    Dim dups As New ML_RemoveDups_CPP
+    Dim dups As New ML_RemoveDups_CPP_VB
     Public rangeStart As New List(Of Integer)
     Public rangeEnd As New List(Of Integer)
     Public Sub New()
@@ -155,7 +155,7 @@ End Class
 
 Public Class Sort_3Channel : Inherits VB_Parent
     Dim sort As New Sort_Basics
-    Dim dups As New ML_RemoveDups_CPP
+    Dim dups As New ML_RemoveDups_CPP_VB
     Dim bgra As cv.Mat
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()

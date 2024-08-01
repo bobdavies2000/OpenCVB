@@ -3457,8 +3457,8 @@ Public Class Options_Edges_All : Inherits VB_Parent
     Dim scharr As New Edge_Scharr
     Dim binRed As New Edge_BinarizedReduction
     Dim binSobel As New Bin4Way_Sobel
-    Dim colorGap As New Edge_ColorGap_CPP
-    Dim deriche As New Edge_Deriche_CPP
+    Dim colorGap As New Edge_ColorGap_CPP_VB
+    Dim deriche As New Edge_Deriche_CPP_VB
     Dim Laplacian As New Edge_Laplacian
     Dim resizeAdd As New Edge_ResizeAdd
     Dim regions As New Edge_Regions

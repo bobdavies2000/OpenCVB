@@ -3,7 +3,7 @@ Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits VB_Parent
-    Dim detect As New MSER_CPP
+    Dim detect As New MSER_CPP_VB
     Public mserCells As New List(Of rcData)
     Public floodPoints As New List(Of cv.Point)
 
@@ -450,7 +450,7 @@ End Class
 
 
 
-Public Class MSER_Mask_CPP : Inherits VB_Parent
+Public Class MSER_Mask_CPP_VB : Inherits VB_Parent
     Dim options As New Options_MSER
     Dim redC As New RedCloud_Cells
     Public classCount As Integer
@@ -521,7 +521,7 @@ End Class
 
 
 Public Class MSER_Basics1 : Inherits VB_Parent
-    Dim detect As New MSER_CPP
+    Dim detect As New MSER_CPP_VB
     Dim flood As New RedCloud_Basics
     Public Sub New()
         desc = "Create cells for each region in MSER output"
@@ -540,7 +540,7 @@ End Class
 
 
 Public Class MSER_BasicsNew : Inherits VB_Parent
-    Dim detect As New MSER_CPP
+    Dim detect As New MSER_CPP_VB
     Dim displaycount As Integer
     Public Sub New()
         desc = "Create cells for each region in MSER output"
@@ -575,7 +575,7 @@ End Class
 
 
 Public Class MSER_Basics2 : Inherits VB_Parent
-    Dim detect As New MSER_CPP
+    Dim detect As New MSER_CPP_VB
     Dim cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
@@ -632,7 +632,7 @@ End Class
 
 
 
-Public Class MSER_CPP : Inherits VB_Parent
+Public Class MSER_CPP_VB : Inherits VB_Parent
     Dim options As New Options_MSER
     Public boxes As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)

@@ -490,8 +490,8 @@ End Class
 
 
 Public Class Feature_ShiTomasi : Inherits VB_Parent
-    Dim harris As New Corners_HarrisDetector_CPP
-    Dim shiTomasi As New Corners_ShiTomasi_CPP
+    Dim harris As New Corners_HarrisDetector_CPP_VB
+    Dim shiTomasi As New Corners_ShiTomasi_CPP_VB
     Dim options As New Options_ShiTomasi
     Public Sub New()
         FindSlider("Corner normalize threshold").Value = 15
@@ -686,7 +686,7 @@ End Class
 
 
 Public Class Feature_Gather : Inherits VB_Parent
-    Dim harris As New Corners_HarrisDetector_CPP
+    Dim harris As New Corners_HarrisDetector_CPP_VB
     Dim FAST As New Corners_Basics
     Dim myOptions As New Options_FeatureGather
     Public features As New List(Of cv.Point2f)

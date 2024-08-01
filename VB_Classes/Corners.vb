@@ -116,7 +116,7 @@ End Class
 
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_ShiTomasi_CPP : Inherits VB_Parent
+Public Class Corners_ShiTomasi_CPP_VB : Inherits VB_Parent
     Dim options As New Options_ShiTomasi
     Public Sub New()
         desc = "Find corners using Eigen values and vectors"
@@ -250,7 +250,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Corners_Harris_CPP : Inherits VB_Parent
+Public Class Corners_Harris_CPP_VB : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Dim options As New Options_Harris
     Public Sub New()
@@ -287,7 +287,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Corners_HarrisDetector_CPP : Inherits VB_Parent
+Public Class Corners_HarrisDetector_CPP_VB : Inherits VB_Parent
     Public features As New List(Of cv.Point2f)
     Dim options As New Options_Features
     Public Sub New()

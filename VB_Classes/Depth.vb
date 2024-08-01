@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_Basics : Inherits VB_Parent
-    Dim colorizer As New Depth_Colorizer_CPP
+    Dim colorizer As New Depth_Colorizer_CPP_VB
     Public Sub New()
         UpdateAdvice(traceName + ": use global option to control 'Max Depth'.")
         desc = "Colorize the depth data into task.depthRGB"
@@ -219,7 +219,7 @@ End Class
 
 
 Public Class Depth_Uncertainty : Inherits VB_Parent
-    Dim retina As New Retina_Basics_CPP
+    Dim retina As New Retina_Basics_CPP_VB
     Dim options As New Options_Uncertainty
     Public Sub New()
         labels(3) = "Mask of areas with stable depth"
@@ -265,7 +265,7 @@ End Class
 
 
 
-Public Class Depth_Colorizer_CPP : Inherits VB_Parent
+Public Class Depth_Colorizer_CPP_VB : Inherits VB_Parent
     Public Sub New()
         cPtr = Depth_Colorizer_Open()
         desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
@@ -711,7 +711,7 @@ End Class
 
 Public Class Depth_Averaging : Inherits VB_Parent
     Public avg As New Math_ImageAverage
-    Public colorize As New Depth_Colorizer_CPP
+    Public colorize As New Depth_Colorizer_CPP_VB
     Public Sub New()
         labels(3) = "32-bit format depth data"
         desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
@@ -1284,7 +1284,7 @@ End Class
 
 Public Class Depth_StableMin : Inherits VB_Parent
     Public stableMin As cv.Mat
-    Dim colorize As New Depth_Colorizer_CPP
+    Dim colorize As New Depth_Colorizer_CPP_VB
     Public Sub New()
         task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
@@ -1315,7 +1315,7 @@ End Class
 
 Public Class Depth_StableMax : Inherits VB_Parent
     Public stableMax As cv.Mat
-    Dim colorize As New Depth_Colorizer_CPP
+    Dim colorize As New Depth_Colorizer_CPP_VB
     Public Sub New()
         task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
@@ -1346,7 +1346,7 @@ End Class
 
 
 Public Class Depth_StableMinMax : Inherits VB_Parent
-    Dim colorize As New Depth_Colorizer_CPP
+    Dim colorize As New Depth_Colorizer_CPP_VB
     Public dMin As New Depth_StableMin
     Public dMax As New Depth_StableMax
     Public options As New Options_MinMaxNone
@@ -1476,7 +1476,7 @@ Public Class Depth_World : Inherits VB_Parent
 
         cv.Cv2.Merge({dst0, dst1, src}, dst2)
         If standaloneTest() Then
-            Static colorizer As New Depth_Colorizer_CPP
+            Static colorizer As New Depth_Colorizer_CPP_VB
             colorizer.Run(dst2)
             dst2 = colorizer.dst2
         End If

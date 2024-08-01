@@ -64,7 +64,7 @@ Public Class VBtask : Implements IDisposable
 
     ' add any global algorithms here
     Public PixelViewer As Pixel_Viewer
-    Public colorizer As Depth_Colorizer_CPP
+    Public colorizer As Depth_Colorizer_CPP_VB
     Public hCloud As History_Cloud
     Public motionCloud As Motion_PointCloud
     Public motionColor As Motion_Color
@@ -392,7 +392,7 @@ Public Class VBtask : Implements IDisposable
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
 
-        colorizer = New Depth_Colorizer_CPP
+        colorizer = New Depth_Colorizer_CPP_VB
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
         'hCloud = New History_Cloud

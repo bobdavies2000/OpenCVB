@@ -1,8 +1,8 @@
-﻿Imports System.ComponentModel
+﻿Imports System.Threading
+Imports System.ComponentModel
 Imports System.Globalization
 Imports System.IO
 Imports System.Text.RegularExpressions
-Imports System.Threading
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Imports System.Management
@@ -24,6 +24,7 @@ Module opencv_module
 End Module
 Public Class OpenCVB
 #Region "Globals"
+    Dim threadStartTime As DateTime
     Dim mbuf(2 - 1) As VB_Classes.VBtask.inBuffer
     Dim mbIndex As Integer
 
@@ -281,6 +282,8 @@ Public Class OpenCVB
         jsonfs.Save(setlist)
     End Sub
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        threadStartTime = DateTime.Now
+
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
         Dim args() = Environment.GetCommandLineArgs()
 
@@ -952,6 +955,14 @@ Public Class OpenCVB
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
 
+        'Dim processThreads As ProcessThreadCollection = Process.GetCurrentProcess().Threads
+        'Dim threadCount As Integer
+        'For Each thread As ProcessThread In processThreads
+        '    If thread.StartTime > threadStartTime Then threadCount += 1
+        'Next
+
+        'Console.WriteLine("Thread count = " + CStr(threadCount))
+
         If TreeButton.Checked And activateTreeView And activateBlocked = False Then
             TreeViewDialog.Activate()
             Me.Activate()
@@ -981,9 +992,9 @@ Public Class OpenCVB
             cameraName = cameraName.Replace(" Camera", "")
             cameraName = cameraName.Replace("Intel(R) RealSense(TM) Depth ", "Intel D")
 
-            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " + CStr(CInt(CodeLineCount / AlgorithmCount)) +
-                      " lines each (avg) - " + cameraName + " - " + Format(cameraFPS, "0.0") +
-                      "/" + Format(algorithmFPS, "0.0")
+            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " +
+                      CStr(CInt(CodeLineCount / AlgorithmCount)) + " lines each (avg) - " + cameraName +
+                      " - " + Format(cameraFPS, "0.0") + "/" + Format(algorithmFPS, "0.0")
         End If
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated

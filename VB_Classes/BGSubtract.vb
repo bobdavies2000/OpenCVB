@@ -215,7 +215,7 @@ End Class
 
 Public Class BGSubtract_MOG_Retina : Inherits VB_Parent
     Dim bgSub As New BGSubtract_MOG
-    Dim retina As New Retina_Basics_CPP
+    Dim retina As New Retina_Basics_CPP_VB
     Public Sub New()
         labels = {"", "", "MOG results of depth motion", "Difference from retina depth motion."}
         desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
@@ -274,7 +274,7 @@ End Class
 
 
 
-Public Class BGSubtract_Synthetic_CPP : Inherits VB_Parent
+Public Class BGSubtract_Synthetic_CPP_VB : Inherits VB_Parent
     Dim options As New Options_BGSubtractSynthetic
     Public Sub New()
         labels(2) = "Synthetic background/foreground image."
@@ -309,7 +309,7 @@ End Class
 
 Public Class BGSubtract_Synthetic : Inherits VB_Parent
     Dim bgSub As New BGSubtract_Basics
-    Dim synth As New BGSubtract_Synthetic_CPP
+    Dim synth As New BGSubtract_Synthetic_CPP_VB
     Public Sub New()
         desc = "Demonstrate background subtraction algorithms with synthetic images"
     End Sub

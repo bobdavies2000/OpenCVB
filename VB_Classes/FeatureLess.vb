@@ -198,7 +198,7 @@ End Class
 
 
 
-Public Class FeatureLess_Edge_CPP : Inherits VB_Parent
+Public Class FeatureLess_Edge_CPP_VB : Inherits VB_Parent
     Dim cpp As New CPP_Basics
     Public Sub New()
         cpp.updateFunction(AlgorithmList.cppFunctionNames._CPP_EdgeDraw_Basics)
@@ -261,7 +261,7 @@ End Class
 
 
 Public Class FeatureLess_Groups : Inherits VB_Parent
-    Dim redCPP As New RedCloud_CPP
+    Dim redCPP As New RedCloud_CPP_VB
     Dim fless As New FeatureLess_Basics
     Public classCount As Integer
     Public Sub New()

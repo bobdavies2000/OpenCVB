@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Area_MinTriangle_CPP : Inherits VB_Parent
+Public Class Area_MinTriangle_CPP_VB : Inherits VB_Parent
     Public triangle As cv.Mat
     Public options As New Options_MinArea
     Public srcPoints As List(Of cv.Point2f)

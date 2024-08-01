@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports  System.IO
 'https://docs.opencv.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
-Public Class Retina_Basics_CPP : Inherits VB_Parent
+Public Class Retina_Basics_CPP_VB : Inherits VB_Parent
     Dim startInfo As New ProcessStartInfo
     Dim magnoData(0) As Byte
     Dim dataSrc(0) As Byte
@@ -68,7 +68,7 @@ End Class
 
 
 Public Class Retina_Depth : Inherits VB_Parent
-    Dim retina As New Retina_Basics_CPP
+    Dim retina As New Retina_Basics_CPP_VB
     Dim lastMotion As New cv.Mat
     Public Sub New()
         desc = "Use the bio-inspired retina algorithm with the depth data."

@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports  System.IO
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
 Public Class SLR_Data : Inherits VB_Parent
-    Dim plot As New Plot_Basics_CPP
+    Dim plot As New Plot_Basics_CPP_VB
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
     Public Sub New()

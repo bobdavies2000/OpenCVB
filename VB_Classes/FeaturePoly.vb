@@ -560,7 +560,7 @@ End Class
 
 
 Public Class FeaturePoly_Triangle : Inherits VB_Parent
-    Dim triangle As New Area_MinTriangle_CPP
+    Dim triangle As New Area_MinTriangle_CPP_VB
     Dim fGrid As New FeaturePoly_Core
     Public Sub New()
         desc = "Find the minimum triangle that contains the feature grid"

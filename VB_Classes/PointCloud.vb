@@ -399,7 +399,7 @@ End Class
 
 
 
-Public Class PointCloud_Raw_CPP : Inherits VB_Parent
+Public Class PointCloud_Raw_CPP_VB : Inherits VB_Parent
     Dim depthBytes() As Byte
     Public Sub New()
         labels(2) = "Top View"
@@ -518,9 +518,9 @@ End Class
 
 
 
-Public Class PointCloud_SurfaceH_CPP : Inherits VB_Parent
+Public Class PointCloud_SurfaceH_CPP_VB : Inherits VB_Parent
     Public heat As New HeatMap_Basics
-    Public plot As New Plot_Basics_CPP
+    Public plot As New Plot_Basics_CPP_VB
     Public topRow As Integer
     Public botRow As Integer
     Public peakRow As Integer

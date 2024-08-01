@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
-Public Class Annealing_Basics_CPP : Inherits VB_Parent
+Public Class Annealing_Basics_CPP_VB : Inherits VB_Parent
     Public numberOfCities As Integer = 25
     Public cityPositions() As cv.Point2f
     Public cityOrder() As Integer
@@ -78,9 +78,9 @@ End Class
 
 
 
-Public Class Annealing_MT_CPP : Inherits VB_Parent
+Public Class Annealing_MT_CPP_VB : Inherits VB_Parent
     Dim random As New Random_Basics
-    Dim anneal() As Annealing_Basics_CPP
+    Dim anneal() As Annealing_Basics_CPP_VB
     Dim mats As New Mat_4to1
     Dim options As New Options_Annealing
     Dim startTime As DateTime
@@ -89,7 +89,7 @@ Public Class Annealing_MT_CPP : Inherits VB_Parent
         random.Run(empty) ' get the city positions (may or may not be used below.)
 
         For i = 0 To anneal.Length - 1
-            anneal(i) = New Annealing_Basics_CPP()
+            anneal(i) = New Annealing_Basics_CPP_VB()
             anneal(i).numberOfCities = options.cityCount
             anneal(i).cityPositions = random.PointList.ToArray
             anneal(i).circularPattern = options.circularFlag

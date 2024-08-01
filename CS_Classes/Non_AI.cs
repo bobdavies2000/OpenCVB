@@ -371,11 +371,11 @@ namespace CS_Classes
 
 
     // https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-    public class Feature_Sift_CSSlices : CS_Parent
+    public class Feature_SiftSlices_CS : CS_Parent
     {
         Options_Sift options;
 
-        public Feature_Sift_CSSlices(VBtask task) : base(task)
+        public Feature_SiftSlices_CS(VBtask task) : base(task)
         {
             options = new Options_Sift();
             FindSlider("Points to Match").Value = 1;
@@ -474,11 +474,11 @@ namespace CS_Classes
 
 
     // https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-    public class Feature_SURF_CS_Draw : CS_Parent
+    public class Feature_SURF_Draw_CS : CS_Parent
     {
         Feature_SURF_CS surf;
 
-        public Feature_SURF_CS_Draw(VBtask task) : base(task)
+        public Feature_SURF_Draw_CS(VBtask task) : base(task)
         {
             surf = new Feature_SURF_CS(task);
             surf.drawPoints = false;
@@ -602,15 +602,12 @@ namespace CS_Classes
 
     public class SLR_Basics_CS : CS_Parent
     {
-        public SLR_Data slrInput;
+        public SLR_Data slrInput = new SLR_Data();
         SLR slr = new SLR();
-        Plot_Basics_CPP plot;
-        Options_SLR options;
+        Plot_Basics_CPP_VB plot = new Plot_Basics_CPP_VB();
+        Options_SLR options = new Options_SLR();
         public SLR_Basics_CS(VBtask task) : base(task)
         {
-            options = new Options_SLR();
-            plot = new Plot_Basics_CPP();
-            slrInput = new SLR_Data();
             desc = "Segmented Linear Regression example";
         }
         public void RunCS(Mat src)
@@ -971,10 +968,10 @@ namespace CS_Classes
     }
 
 
-    public class Feature_SURF_CSMatch : CS_Parent
+    public class Feature_SURFMatch_CS : CS_Parent
     {
         Feature_SURF_CS surf;
-        public Feature_SURF_CSMatch(VBtask task) : base(task)
+        public Feature_SURFMatch_CS(VBtask task) : base(task)
         {
             surf = new Feature_SURF_CS(task);
             surf.drawPoints = false;

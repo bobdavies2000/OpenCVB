@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Salience_Basics_CPP : Inherits VB_Parent
+Public Class Salience_Basics_CPP_VB : Inherits VB_Parent
     Dim grayData(0) As Byte
     Public options As New Options_Salience
     Public Sub New()
@@ -27,7 +27,7 @@ End Class
 
 
 Public Class Salience_Basics_MT : Inherits VB_Parent
-    Dim salience As New Salience_Basics_CPP
+    Dim salience As New Salience_Basics_CPP_VB
     Public Sub New()
         FindSlider("Salience numScales").Value = 2
         desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
