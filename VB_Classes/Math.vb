@@ -21,6 +21,9 @@ Public Class Math_Subtract : Inherits VB_Parent
     End Sub
 End Class
 Module Math_Functions
+    Public Sub CPP_Test()
+        MsgBox("testing")
+    End Sub
     Public Function computeMedian(src As cv.Mat, mask As cv.Mat, totalPixels As Integer, bins As Integer, rangeMin As Single, rangeMax As Single) As Double
         Dim hist As New cv.Mat()
         cv.Cv2.CalcHist({src}, {0}, mask, hist, 1, {bins}, {New cv.Rangef(rangeMin, rangeMax)})
