@@ -1,20 +1,21 @@
-# Recent Changes – July 2024
+# Recent Changes – August 2024
 
--   Over 2400 algorithms are included, averaging 31 lines of code per algorithm.
+-   Over 3700 algorithms are included, averaging 37 lines of code per algorithm.
 -   Please Note: the June version of OpenCVSharp has compile-time issues in VB.Net.
     -   It will be addressed soon and it is only a problem to VB.Net.
     -   In the meantime, please use the January version: 4.9.0.20240103
     -   The January version is present by default but if you upgrade to June…
 -   The jump in algorithm count is due to the addition of AI-generated C\# algorithms.
-    -   Only about 400 of the 1800 VB.Net algorithms have been converted to C\#.
-    -   The remaining algorithms will continue to be translated in future releases.
+    -   Almost all the VB.Net algorithms have been converted to C\#.
+        -   Fewer C\# algorithms than VB.Net because Options are VB-only.
+    -   The average lines per algorithm jumped as well from 31 lines.
 -   Microsoft’s CodeConverter.ai translated the VB.Net algorithms to C\#.
-    -   With such small algorithms, AI translation is much more feasible.
+    -   With such small algorithms, AI translation is feasible.
     -   The VB.Net code was improved because of translation to C\#.
 -   C\# is now a peer to VB.Net when developing algorithms in OpenCVB.
     -   A new snippet version for C\# is equivalent to the VB.Net snippet.
     -   Performance measurement for C\# works the same as that for VB.Net
-    -   All existing manually created C\# algorithms are in CS_Non_AI.cs.
+    -   Existing manually created C\# algorithms are in CS_Non_AI.cs.
 -   Existing VB.Net infrastructure is reused for C\# algorithms.
 -   OpenCVB’s Touchup.exe simplifies necessary small changes after AI translation.
     -   The Touchup application is invoked from OpenCVB’s main toolbar.
@@ -25,13 +26,13 @@
 
 ![A screenshot of a computer Description automatically generated](media/5dd47a048cd220e4dd856894c3d6bac7.png)
 
-**CS_AddWeighted_Basics:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms start with “CS_” to distinguish them from the VB.Net version.*
+**AddWeighted_Basics_CS:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms end with “_CS” to distinguish them from the VB.Net version. If the algorithm uses both C++ and C\#, the name ends with “_CPP_CS”. The existing “_CPP” algorithms now end in “_CPP_VB” to distinguish them from C\# versions and future C++ algorithms.*
 
-![A screenshot of a computer program Description automatically generated](media/498a747eed8b64cf8e4aab79d498d0c7.png)
+![A screenshot of a computer program Description automatically generated](media/cb0b14073ca049ecd641450e21bb739e.png)
 
-![A screenshot of a computer Description automatically generated](media/62511f56cfdd66446f8e3e6adcfbe50f.png)
+![A screenshot of a computer program Description automatically generated](media/b2dafcc91cee598b2abfca8ce921a5b4.png)
 
-**Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
+**Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP_VB. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
 
 # 
 
@@ -1414,3 +1415,34 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A room with a white door and a blue line Description automatically generated](media/0f3868fe21a923bc219e81fb71aaabec.gif)
 
 **OpenGL_Basics:** *This output shows the Orbbec Gemini 335L camera while toggling the checkbox to adjust the 3D point cloud with and without correcting for gravity. The same algorithm to adjust for gravity works with all the cameras supported by OpenCVB. Similarly, all 2000+ algorithms in OpenCVB work for the 335L camera after adding an interface to the Orbbec SDK.*
+
+# Recent Changes – July 2024
+
+-   Over 2400 algorithms are included, averaging 31 lines of code per algorithm.
+-   Please Note: the June version of OpenCVSharp has compile-time issues in VB.Net.
+    -   It will be addressed soon and it is only a problem to VB.Net.
+    -   In the meantime, please use the January version: 4.9.0.20240103
+    -   The January version is present by default but if you upgrade to June…
+-   The jump in algorithm count is due to the addition of AI-generated C\# algorithms.
+    -   Only about 400 of the 1800 VB.Net algorithms have been converted to C\#.
+    -   The remaining algorithms will continue to be translated in future releases.
+-   Microsoft’s CodeConverter.ai translated the VB.Net algorithms to C\#.
+    -   With such small algorithms, AI translation is feasible.
+    -   The VB.Net code was improved because of translation to C\#.
+-   C\# is now a peer to VB.Net when developing algorithms in OpenCVB.
+    -   A new snippet version for C\# is equivalent to the VB.Net snippet.
+    -   Performance measurement for C\# works the same as that for VB.Net
+    -   All existing manually created C\# algorithms are in CS_Non_AI.cs.
+-   Existing VB.Net infrastructure is reused for C\# algorithms.
+-   OpenCVB’s Touchup.exe simplifies necessary small changes after AI translation.
+    -   The Touchup application is invoked from OpenCVB’s main toolbar.
+    -   Most algorithms were converted to C\# in a few minutes.
+    -   Longer conversions required the improved VB.Net infrastructure.
+-   Previous Releases had a discontinued C++ AI translation process. It will return.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer Description automatically generated](media/5dd47a048cd220e4dd856894c3d6bac7.png)
+
+**CS_AddWeighted_Basics:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms start with “CS_” to distinguish them from the VB.Net version.*
+
+![A screenshot of a computer program Description automatically generated](media/498a747eed8b64cf8e4aab79d498d0c7.png)

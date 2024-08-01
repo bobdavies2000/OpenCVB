@@ -419,9 +419,9 @@ namespace CS_Classes
     public class Annealing_Basics_CPP_CS : CS_Parent
     {
         public int numberOfCities = 25;
-        public Point2d[] cityPositions;
+        public Point2f[] cityPositions;
         public int[] cityOrder;
-        public double energy;
+        public float energy;
         public double energyLast;
         public bool circularPattern = true;
 
@@ -452,12 +452,12 @@ namespace CS_Classes
             cv.Point center = new cv.Point(dst2.Cols / 2, dst2.Rows / 2);
             if (circularPattern)
             {
-                cityPositions = new cv.Point2d[numberOfCities];
+                cityPositions = new cv.Point2f[numberOfCities];
                 for (int i = 0; i < cityPositions.Length; i++)
                 {
-                    double theta = msRNG.Next(0, 360);
-                    cityPositions[i].X = radius * Math.Cos(theta) + center.X;
-                    cityPositions[i].Y = radius * Math.Sin(theta) + center.Y;
+                    float theta = msRNG.Next(0, 360);
+                    cityPositions[i].X = (float)(radius * Math.Cos(theta) + center.X);
+                    cityPositions[i].Y = (float)(radius * Math.Sin(theta) + center.Y);
                     cityOrder[i] = (i + 1) % numberOfCities;
                 }
             }
@@ -532,7 +532,7 @@ namespace CS_Classes
             {
                 anneal[i] = new Annealing_Basics_CPP_CS(task);
                 anneal[i].numberOfCities = options.cityCount;
-                anneal[i].cityPositions = random.PointList2d.ToArray();
+                anneal[i].cityPositions = random.PointList.ToArray();
                 anneal[i].circularPattern = options.circularFlag;
                 anneal[i].setup();
                 anneal[i].Open(); // this will initialize the C++ copy of the city positions.
