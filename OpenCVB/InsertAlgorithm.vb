@@ -21,29 +21,36 @@ Public Class InsertAlgorithm
     End Enum
     Private Function nextAlgorithm(algorithmType As algType) As Boolean
         If InStr(AlgorithmName.Text, "_") = False Then
-            MsgBox("The algorithm name must be of the form 'ModuleName_ClassName', i.e. TEE_Basics")
+            MsgBox("The algorithm name must be of the form 'ModuleName_ClassName', i.e. AddWeighted_Basics")
             Return False
         End If
+
         Dim split = AlgorithmName.Text.Split("_")
-        If split.Count > 3 Then
-            MsgBox("It can be changed later but only 3 '_' (underscores) are supported in this interface.")
-            Return False
-        End If
 
         Dim ret As MsgBoxResult
         Select Case algorithmType
             Case algType.addVB
-                VBoutputName = New FileInfo("..\..\VB_Classes\" + split(0) + ".vb")
+                VBoutputName = New FileInfo("..\..\VB_Classes\" + Split(0) + ".vb")
+
                 ret = MsgBox("Would you like to add the algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
                              " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name, MsgBoxStyle.OkCancel)
 
             Case algType.addCPP
-                VBoutputName = New FileInfo("..\..\VB_Classes\" + split(0) + ".vb")
+                VBoutputName = New FileInfo("..\..\VB_Classes\" + Split(0) + ".vb")
+
                 CPPoutputName = New FileInfo("..\..\CPP_Classes\CPP_Algorithms.h")
 
-                ret = MsgBox("Would you like to add the C++ algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
-                             " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name + vbCrLf + vbCrLf +
-                             " and to:" + vbCrLf + vbCrLf + CPPoutputName.Name, MsgBoxStyle.OkCancel)
+                ret = MsgBox("Would you like to add the C++ algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + "_VB" +
+                             vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name +
+                             vbCrLf + vbCrLf + " and to:" + vbCrLf + vbCrLf + CPPoutputName.Name, MsgBoxStyle.OkCancel)
+
+            Case algType.addOpenGL
+                VBoutputName = New FileInfo("..\..\VB_Classes\OpenGL.vb")
+                OpenGLOutputName = New FileInfo("..\..\OpenGL\OpenGLFunction\OpenGLFunction.cpp")
+                ret = MsgBox("Would you like to add the algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + "_VB" +
+                             vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "OpenGL C++ File: " + 
+                             OpenGLOutputName.Name + vbCrLf + vbCrLf + " and to:" + vbCrLf + vbCrLf + 
+                             VBoutputName.Name, MsgBoxStyle.OkCancel)
 
             Case algType.addCS
                 CSOutputName = New FileInfo("..\..\CS_Classes\CS_Non_AI.cs")
@@ -57,13 +64,6 @@ Public Class InsertAlgorithm
                 ret = MsgBox("Would you like to add the PyStream algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
                              " to: " + vbCrLf + vbCrLf + "Python File: " + PyStreamOutputName.Name, MsgBoxStyle.OkCancel)
 
-            Case algType.addOpenGL
-                VBoutputName = New FileInfo("..\..\VB_Classes\OpenGL.vb")
-                OpenGLOutputName = New FileInfo("..\..\OpenGL\OpenGLFunction\OpenGLFunction.cpp")
-
-                ret = MsgBox("Would you like to add the algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
-                             " to: " + vbCrLf + vbCrLf + "OpenGL C++ File: " + OpenGLOutputName.Name + vbCrLf + vbCrLf +
-                             " and to:" + vbCrLf + vbCrLf + VBoutputName.Name, MsgBoxStyle.OkCancel)
         End Select
 
         If ret = MsgBoxResult.Cancel Then Return False
@@ -71,7 +71,7 @@ Public Class InsertAlgorithm
         Return True
     End Function
     Private Sub AddVB_Click(sender As Object, e As EventArgs) Handles AddVB.Click
-        If nextAlgorithm(algType.addCS) = False Then Exit Sub
+        If nextAlgorithm(algType.addVB) = False Then Exit Sub
 
         Dim createVBfile As Boolean
         If VBoutputName.Exists = False Then
