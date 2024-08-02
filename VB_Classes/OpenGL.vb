@@ -12,11 +12,12 @@ Public Class OpenGL_Basics : Inherits VB_Parent
     Public dataInput As New cv.Mat
     Public pointCloudInput As cv.Mat
     Public oglFunction As Integer = 0 ' the default function is to display a point cloud.
-    Public options As New Options_OpenGLFunctions
+    Public options As Options_OpenGLFunctions
     Dim rgbBuffer(0) As Byte
     Dim dataBuffer(0) As Byte
     Dim pointCloudBuffer(0) As Byte
     Public Sub New()
+        If task.algName.Contains("OpenGL") Or task.algName.Contains("Model") Then options = New Options_OpenGLFunctions
         task.OpenGLTitle = "OpenGL_Functions"
         UpdateAdvice(traceName + ": 'Show All' to see all the OpenGL options.")
         pointCloudInput = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)

@@ -887,6 +887,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Horizon_ExternalTest" Then return new Horizon_ExternalTest
 	if algorithmName = "Horizon_FindNonZero" Then return new Horizon_FindNonZero
 	if algorithmName = "Horizon_FindNonZeroOld" Then return new Horizon_FindNonZeroOld
+	if algorithmName = "Horizon_Perpendicular" Then return new Horizon_Perpendicular
 	if algorithmName = "Horizon_Regress" Then return new Horizon_Regress
 	if algorithmName = "Horizon_UnstableResults" Then return new Horizon_UnstableResults
 	if algorithmName = "Horizon_Validate" Then return new Horizon_Validate

@@ -63,11 +63,43 @@ Public Class Horizon_Basics : Inherits VB_Parent
             Dim lp = New PointPair(p1, p2)
             vec = lp.edgeToEdgeLine(dst2.Size)
             vecPresent = True
-            If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
+            If standaloneTest() Or autoDisplay Then
+                displayResults(p1, p2)
+                displayResults(New cv.Point(-p1.Y, p1.X), New cv.Point(p2.Y, -p2.X))
+            End If
         End If
         SetTrueText(strOut, 3)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Horizon_Perpendicular : Inherits VB_Parent
+    Dim perp As New Line_Perpendicular
+    Public Sub New()
+        labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
+        desc = "Find the gravity vector using the perpendicular to the horizon."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
+
+        perp.p1 = task.horizonVec.p1
+        perp.p2 = task.horizonVec.p2
+        perp.Run(src)
+        DrawLine(dst2, perp.r1, perp.r2, cv.Scalar.Yellow)
+
+        Dim gVec = task.gravityVec
+        gVec.p1.X += 10
+        gVec.p2.X += 10
+        DrawLine(dst2, gVec.p1, gVec.p2, cv.Scalar.White)
+    End Sub
+End Class
+
 
 
 
