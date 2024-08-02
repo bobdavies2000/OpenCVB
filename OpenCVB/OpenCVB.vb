@@ -1493,7 +1493,6 @@ Public Class OpenCVB
             While 1
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.
-                task.resolutionRatio = task.WorkingRes.Width / camPic(0).Width
                 While 1
                     ' camera has exited or resolution is changed.
                     If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or

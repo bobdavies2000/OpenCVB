@@ -35,7 +35,6 @@ namespace fs = std::filesystem;
 
 cppTask* task;
 
-
 class CPP_AddWeighted_Basics : public algorithmCPP {
 public:
     Mat src2;

@@ -85,7 +85,7 @@ Public Class OptionsDialog
             WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
         If cameraName.StartsWith("Orbbec Gemini 335L") Then
-            WorkingResRadio(resolutionList.IndexOf("1280x720 - Full resolution")).Checked = True
+            WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load

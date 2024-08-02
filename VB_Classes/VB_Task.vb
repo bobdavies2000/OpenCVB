@@ -9,15 +9,88 @@ Public Class VBtask : Implements IDisposable
     Public TaskTimer As New System.Timers.Timer(1000)
     Public algoList As New AlgorithmList
 
+    Public dst0 As cv.Mat
+    Public dst1 As cv.Mat
+    Public dst2 As cv.Mat
+    Public dst3 As cv.Mat
+
     Public vbAlgorithmObject As Object
     Public csAlgorithmObject As Object
+    Public myStopWatch As Stopwatch
+    Public mbuf(2 - 1) As inBuffer
+    Public mbIndex As Integer
+    Public lowRes As cv.Size
+    Public quarterRes As cv.Size
+    Public displayRes As cv.Size
+
+    Public Enum gifTypes
+        gifdst0 = 0
+        gifdst1 = 1
+        gifdst2 = 2
+        gifdst3 = 3
+        openCVBwindow = 4
+        openGLwindow = 5
+    End Enum
+    Public cvFontSize As Single = 0.8
+    Public cvFontThickness As Integer = 1
+
+    Public color As cv.Mat
+    Public leftView As cv.Mat
+    Public rightView As cv.Mat
+    Public pointCloud As cv.Mat
+    Public pcSplit() As cv.Mat
+    Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
+    Public WorkingRes As cv.Size
+    Public motionRect As cv.Rect
+    Public noDepthMask As New cv.Mat
+    Public depthMask As New cv.Mat
+    Public paletteGradient As cv.Mat
+    Public maxDepthMask As New cv.Mat
+    Public depthRGB As New cv.Mat
+    Public srcThread As cv.Mat
+
+    ' add any global algorithms here
+    Public cMotion As CameraMotion_Basics
+    Public gravityHorizon As Gravity_Horizon
+    Public PixelViewer As Pixel_Viewer
+    Public colorizer As Depth_Colorizer_CPP_VB
+    Public hCloud As History_Cloud
+    Public motionCloud As Motion_PointCloud
+    Public motionColor As Motion_Color
+    Public rgbFilter As Object
+    Public gMat As IMU_GMatrix
+    Public IMUBasics As IMU_Basics
+    Public IMU_Rotation As System.Numerics.Quaternion
+    Public cellStats As Cell_Basics
+    Public imuStabilityTest As Stabilizer_VerticalIMU
+    Public grid As Grid_Basics
+    Public ogl As OpenGL_Basics
+    Public palette As Palette_LoadColorMap
+
+    Public pythonPipeIn As NamedPipeServerStream
+    Public pythonPipeOut As NamedPipeServerStream
+    Public pythonTaskName As String
+    Public pythonProcess As Process
+    Public pythonReady As Boolean
+
+    Public openGL_hwnd As IntPtr
+    Public openGLPipe As NamedPipeServerStream
+    Public pipeCount As Integer
+    Public pythonPipeIndex As Integer ' increment this for each algorithm to avoid any conflicts with other Python apps.
+
+    Public gifCreator As Gif_OpenCVB
+    Public gifImages As New List(Of Bitmap)
+    Public gifBuild As Boolean
+    Public gifCaptureIndex As Integer
+
+    Public transformationMatrix() As Single
+
     Public frameCount As Integer = 0
     Public heartBeat As Boolean
     Public quarterBeat As Boolean
     Public quarter(4) As Boolean
     Public midHeartBeat As Boolean
     Public almostHeartBeat As Boolean
-    Public myStopWatch As Stopwatch
     Public msWatch As Integer
     Public msLast As Integer
     Public FirstPass As Boolean
@@ -27,51 +100,22 @@ Public Class VBtask : Implements IDisposable
     Public paused As Boolean
     Public showAllOptions As Boolean ' show all options when initializing the options for all algorithms.
 
-    Public dst0 As cv.Mat
-    Public dst1 As cv.Mat
-    Public dst2 As cv.Mat
-    Public dst3 As cv.Mat
-
-    Public mbuf(2 - 1) As inBuffer
-    Public mbIndex As Integer
-
-    Public color As cv.Mat
-    Public leftView As cv.Mat
-    Public rightView As cv.Mat
-    Public pointCloud As cv.Mat
-
-    Public pcSplit() As cv.Mat
     Public pcFloor As Single ' y-value for floor...
     Public pcCeiling As Single ' y-value for ceiling...
 
     Public debugSyncUI As Boolean
 
-    Public WorkingRes As cv.Size
-    Public resolutionRatio As Single ' mousepoints/drawrects need the ratio of the display to the working resolution.
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
-    Public motionRect As cv.Rect
     Public motionFlag As Boolean
     Public motionDetected As Boolean
 
-    Public gravityHorizon As Gravity_Horizon
     Public gravityVec As New PointPair
     Public horizonVec As New PointPair
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
-    Public cMotion As CameraMotion_Basics
 
-    ' add any global algorithms here
-    Public PixelViewer As Pixel_Viewer
-    Public colorizer As Depth_Colorizer_CPP_VB
-    Public hCloud As History_Cloud
-    Public motionCloud As Motion_PointCloud
-    Public motionColor As Motion_Color
-    Public rgbFilter As Object
-
-    Public gMat As IMU_GMatrix
-    Public IMUBasics As IMU_Basics
     Public IMU_RawAcceleration As cv.Point3f
     Public IMU_Acceleration As cv.Point3f
     Public IMU_AverageAcceleration As cv.Point3f
@@ -80,7 +124,6 @@ Public Class VBtask : Implements IDisposable
     Public kalmanIMUacc As cv.Point3f
     Public kalmanIMUvelocity As cv.Point3f
     Public IMU_TimeStamp As Double
-    Public IMU_Rotation As System.Numerics.Quaternion
     Public IMU_Translation As cv.Point3f
     Public IMU_AngularAcceleration As cv.Point3f
     Public IMU_FrameTime As Double
@@ -93,21 +136,11 @@ Public Class VBtask : Implements IDisposable
     Public yaw As Single
     Public roll As Single
 
-    Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public useGravityPointcloud As Boolean
 
-    Public cellStats As Cell_Basics
-    Public imuStabilityTest As Stabilizer_VerticalIMU
     Public cameraStable As Boolean
     Public cameraStableString As String
 
-    Public noDepthMask As New cv.Mat
-    Public depthMask As New cv.Mat
-
-    Public maxDepthMask As New cv.Mat
-    Public depthRGB As New cv.Mat
-
-    Public srcThread As cv.Mat
     Public recordTimings As Boolean = True
 
     Public HighlightColor As cv.Scalar ' color to use to highlight objects in an image.
@@ -115,7 +148,6 @@ Public Class VBtask : Implements IDisposable
 
     Public histogramBins As Integer
 
-    Public grid As Grid_Basics
     Public gridSize As Integer
     Public gridRows As Integer
     Public gridCols As Integer
@@ -127,13 +159,10 @@ Public Class VBtask : Implements IDisposable
     Public gridMap As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridROIclicked As Integer
-    Public ogl As OpenGL_Basics
 
     Public gOptions As New OptionsGlobal
     Public redOptions As New OptionsRedCloud
 
-    Public palette As Palette_LoadColorMap
-    Public paletteGradient As cv.Mat
     Public paletteIndex As Integer
 
     Public mouseClickFlag As Boolean
@@ -145,10 +174,6 @@ Public Class VBtask : Implements IDisposable
     Public DotSize As Integer
     Public lineWidth As Integer
     Public lineType As cv.LineTypes
-    Public resolutionIndex As Integer
-    Public lowRes As cv.Size
-    Public quarterRes As cv.Size
-    Public displayRes As cv.Size
 
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
@@ -162,12 +187,6 @@ Public Class VBtask : Implements IDisposable
 
     Public pipeName As String
 
-    Public pythonPipeIn As NamedPipeServerStream
-    Public pythonPipeOut As NamedPipeServerStream
-    Public pythonTaskName As String
-    Public pythonProcess As Process
-    Public pythonReady As Boolean
-
     Public labels(4 - 1) As String
     Public desc As String
     Public advice As String = ""
@@ -176,7 +195,6 @@ Public Class VBtask : Implements IDisposable
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
 
-    Public transformationMatrix() As Single
 
     Public scalarColors(255) As cv.Scalar
     Public vecColors(255) As cv.Vec3b
@@ -219,26 +237,6 @@ Public Class VBtask : Implements IDisposable
     Public oglRect As cv.Rect
     Public polyCount As Integer
 
-    Public gifCreator As Gif_OpenCVB
-    Public gifImages As New List(Of Bitmap)
-    Public gifBuild As Boolean
-    Public gifCaptureIndex As Integer
-
-    Public openGL_hwnd As IntPtr
-    Public openGLPipe As NamedPipeServerStream
-    Public pipeCount As Integer
-    Public pythonPipeIndex As Integer ' increment this for each algorithm to avoid any conflicts with other Python apps.
-
-    Public Enum gifTypes
-        gifdst0 = 0
-        gifdst1 = 1
-        gifdst2 = 2
-        gifdst3 = 3
-        openCVBwindow = 4
-        openGLwindow = 5
-    End Enum
-    Public cvFontSize As Single = 0.8
-    Public cvFontThickness As Integer = 1
 
     Public rangesTop() As cv.Rangef
     Public rangesSide() As cv.Rangef
@@ -372,7 +370,6 @@ Public Class VBtask : Implements IDisposable
 
         mainFormLocation = parms.mainFormLocation
         WorkingRes = parms.WorkingRes ' gets referenced a lot
-        resolutionIndex = If(WorkingRes.Width = 640, 2, 3)
         displayRes = parms.displayRes
 
         OpenGL_Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
