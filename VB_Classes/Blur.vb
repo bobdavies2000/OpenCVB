@@ -203,7 +203,7 @@ Public Class Blur_Gaussian : Inherits VB_Parent
     Public Sub New()
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
-    Public Sub RunCS(src As Mat)
+    Public Sub RunVB(src As Mat)
         options.RunVB()
         Cv2.GaussianBlur(src, dst2, New Size(options.kernelSize, options.kernelSize), 0, 0)
     End Sub
