@@ -46,7 +46,7 @@ End Class
 
 
 Public Class FeatureLess_Sobel : Inherits VB_Parent
-    Dim edges As New Edge_Sobel_Old
+    Dim edges As New Edge_Sobel
     Dim options As New Options_Sobel()
     Public Sub New()
         desc = "Use Sobel edges to define featureless regions."

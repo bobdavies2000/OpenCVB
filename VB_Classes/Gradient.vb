@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Gradient_Basics : Inherits VB_Parent
-    Public sobel As New Edge_Sobel_Old
+    Public sobel As New Edge_Sobel
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         labels = {"", "", "Gradient_Basics - Sobel output", "Phase Output"}
@@ -17,7 +17,7 @@ End Class
 
 
 Public Class Gradient_Depth : Inherits VB_Parent
-    Dim sobel as new Edge_Sobel_Old
+    Dim sobel As New Edge_Sobel
     Public Sub New()
         labels(3) = "Phase Output"
         desc = "Use phase to compute gradient on depth image"

@@ -1347,7 +1347,7 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        ' don't start another test all algorithm until the current one has finished.
+        ' don't start another algorithm until the current one has finished 
         If algorithmQueueCount <> 0 Then
             Console.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
             While 1

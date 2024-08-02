@@ -423,7 +423,7 @@ End Class
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
 Public Class Edge_RGB : Inherits VB_Parent
-    Dim sobel As New Edge_Sobel_Old
+    Dim sobel As New Edge_Sobel
     Public Sub New()
         desc = "Combine the edges from all 3 channels"
     End Sub
@@ -471,7 +471,7 @@ End Class
 
 
 Public Class Edge_SobelLR : Inherits VB_Parent
-    Dim sobel As New Edge_Sobel_Old
+    Dim sobel As New Edge_Sobel
     Public Sub New()
         FindSlider("Sobel kernel Size").Value = 3
         desc = "Find the edges in the LeftViewimages."
@@ -984,7 +984,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_Sobel_Old : Inherits VB_Parent
+Public Class Edge_Sobel : Inherits VB_Parent
     Public addw As New AddWeighted_Basics
     Dim options As New Options_Sobel
     Public Sub New()
@@ -1040,7 +1040,7 @@ End Class
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edge_SobelHorizontal : Inherits VB_Parent
-    Dim edges As New Edge_Sobel_Old
+    Dim edges As New Edge_Sobel
     Public Sub New()
         FindCheckBox("Vertical Derivative").Checked = False
         FindCheckBox("Horizontal Derivative").Checked = True

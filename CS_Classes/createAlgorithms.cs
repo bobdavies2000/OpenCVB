@@ -405,7 +405,6 @@ namespace CS_Classes
 			if (algorithmName == "Edge_RGB_CS") return new Edge_RGB_CS(task);
 			if (algorithmName == "Edge_Scharr_CS") return new Edge_Scharr_CS(task);
 			if (algorithmName == "Edge_Sobel_CS") return new Edge_Sobel_CS(task);
-			if (algorithmName == "Edge_Sobel_Old_CS") return new Edge_Sobel_Old_CS(task);
 			if (algorithmName == "Edge_SobelCustom_CS") return new Edge_SobelCustom_CS(task);
 			if (algorithmName == "Edge_SobelCustomH_CS") return new Edge_SobelCustomH_CS(task);
 			if (algorithmName == "Edge_SobelCustomLeftRight_CS") return new Edge_SobelCustomLeftRight_CS(task);
@@ -1196,7 +1195,7 @@ namespace CS_Classes
 			if (algorithmName == "Plot_Depth_CS") return new Plot_Depth_CS(task);
 			if (algorithmName == "Plot_Dots_CS") return new Plot_Dots_CS(task);
 			if (algorithmName == "Plot_Histogram_CS") return new Plot_Histogram_CS(task);
-			if (algorithmName == "Plot_Histogram_CS2D") return new Plot_Histogram_CS2D(task);
+			if (algorithmName == "Plot_Histogram2D_CS") return new Plot_Histogram2D_CS(task);
 			if (algorithmName == "Plot_OverTime_CS") return new Plot_OverTime_CS(task);
 			if (algorithmName == "Plot_OverTimeFixedScale_CS") return new Plot_OverTimeFixedScale_CS(task);
 			if (algorithmName == "Plot_OverTimeScalar_CS") return new Plot_OverTimeScalar_CS(task);
@@ -1223,7 +1222,7 @@ namespace CS_Classes
 			if (algorithmName == "PointCloud_SetupSide_CS") return new PointCloud_SetupSide_CS(task);
 			if (algorithmName == "PointCloud_SetupTop_CS") return new PointCloud_SetupTop_CS(task);
 			if (algorithmName == "PointCloud_Solo_CS") return new PointCloud_Solo_CS(task);
-			if (algorithmName == "PointCloud_Solo_CSRegions") return new PointCloud_Solo_CSRegions(task);
+			if (algorithmName == "PointCloud_SoloRegions_CS") return new PointCloud_SoloRegions_CS(task);
 			if (algorithmName == "PointCloud_Spin2_CS") return new PointCloud_Spin2_CS(task);
 			if (algorithmName == "PointCloud_SurfaceH_CS") return new PointCloud_SurfaceH_CS(task);
 			if (algorithmName == "PointCloud_Visualize_CS") return new PointCloud_Visualize_CS(task);

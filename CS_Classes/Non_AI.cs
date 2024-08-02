@@ -173,55 +173,6 @@ namespace CS_Classes
 
 
 
-    public class Edge_Sobel_CS : CS_Parent
-    {
-        AddWeighted_Basics addw = new AddWeighted_Basics();
-        Options_Sobel options;
-        Blur_Gaussian_CS blur;
-
-        public Edge_Sobel_CS(VBtask task) : base(task)
-        {
-            options = new Options_Sobel();
-            blur = new Blur_Gaussian_CS(task);
-            labels = new string[] { "", "", "Horizontal + Vertical derivative - use global 'Add Weighted' slider to see impact.", "Blur output" };
-            desc = "Show Sobel edge detection with varying kernel sizes.";
-        }
-
-        public void RunCS(Mat src)
-        {
-            options.RunVB();
-
-            Mat dst3;
-            if (options.useBlur)
-            {
-                blur.RunAndMeasure(src, blur);
-                dst3 = blur.dst2;
-            }
-            else { dst3 = src; }
-
-            Mat dst1 = dst3.Channels() == 3 ? dst3.CvtColor(ColorConversionCodes.BGR2GRAY) : dst3;
-
-            if (options.horizontalDerivative)
-            {
-                dst2 = dst1.Sobel(MatType.CV_32F, 1, 0, options.kernelSize);
-            }
-
-            if (options.verticalDerivative)
-            {
-                dst0 = dst1.Sobel(MatType.CV_32F, 0, 1, options.kernelSize);
-            }
-
-            dst2 = dst2.ConvertScaleAbs();
-            dst0 = dst0.ConvertScaleAbs();
-
-            addw.src2 = dst0;
-            addw.Run(dst2);
-            dst2 = addw.dst2;
-        }
-    }
-
-
-
     public class Blob_Basics_CS : CS_Parent
     {
         Blob_Input input;

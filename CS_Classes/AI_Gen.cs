@@ -3435,7 +3435,7 @@ namespace CS_Classes
 
     public class Bin4Way_Sobel_CS : CS_Parent
     {
-        Edge_Sobel_Old edges = new Edge_Sobel_Old();
+        Edge_Sobel edges = new Edge_Sobel();
         Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
         public Mat_4Click mats = new Mat_4Click();
 
@@ -15321,7 +15321,7 @@ namespace CS_Classes
     }
     public class Edge_RGB_CS : CS_Parent
     {
-        Edge_Sobel_Old sobel = new Edge_Sobel_Old();
+        Edge_Sobel sobel = new Edge_Sobel();
         public Edge_RGB_CS(VBtask task) : base(task)
         {
             desc = "Combine the edges from all 3 channels";
@@ -15361,7 +15361,7 @@ namespace CS_Classes
     }
     public class Edge_SobelLR_CS : CS_Parent
     {
-        Edge_Sobel_Old sobel = new Edge_Sobel_Old();
+        Edge_Sobel sobel = new Edge_Sobel();
         public Edge_SobelLR_CS(VBtask task) : base(task)
         {
             FindSlider("Sobel kernel Size").Value = 3;
@@ -15772,11 +15772,11 @@ namespace CS_Classes
             labels[2] = valley.labels[3];
         }
     }
-    public class Edge_Sobel_Old_CS : CS_Parent
+    public class Edge_Sobel_CS : CS_Parent
     {
         public AddWeighted_Basics addw = new AddWeighted_Basics();
         Options_Sobel options = new Options_Sobel();
-        public Edge_Sobel_Old_CS(VBtask task) : base(task)
+        public Edge_Sobel_CS(VBtask task) : base(task)
         {
             desc = "Show Sobel edge detection with varying kernel sizes";
         }
@@ -15827,7 +15827,7 @@ namespace CS_Classes
     }
     public class Edge_SobelHorizontal_CS : CS_Parent
     {
-        Edge_Sobel_Old edges = new Edge_Sobel_Old();
+        Edge_Sobel edges = new Edge_Sobel();
         TrackBar thresholdSlider;
         public Edge_SobelHorizontal_CS(VBtask task) : base(task)
         {
@@ -18840,7 +18840,7 @@ namespace CS_Classes
 
     public class FeatureLess_Sobel_CS : CS_Parent
     {
-        Edge_Sobel_Old edges = new Edge_Sobel_Old();
+        Edge_Sobel edges = new Edge_Sobel();
         Options_Sobel options = new Options_Sobel();
         public FeatureLess_Sobel_CS(VBtask task) : base(task)
         {
@@ -23779,7 +23779,7 @@ namespace CS_Classes
 
     public class Gradient_Basics_CS : CS_Parent
     {
-        public Edge_Sobel_Old sobel = new Edge_Sobel_Old();
+        public Edge_Sobel sobel = new Edge_Sobel();
         public Gradient_Basics_CS(VBtask task) : base(task)
         {
             dst3 = new Mat(dst2.Size(), MatType.CV_32F, 0);
@@ -23799,7 +23799,7 @@ namespace CS_Classes
 
     public class Gradient_Depth_CS : CS_Parent
     {
-        Edge_Sobel_Old sobel = new Edge_Sobel_Old();
+        Edge_Sobel sobel = new Edge_Sobel();
         public Gradient_Depth_CS(VBtask task) : base(task)
         {
             labels[3] = "Phase Output";
@@ -47802,10 +47802,10 @@ namespace CS_Classes
 
 
 
-    public class Plot_Histogram_CS2D : CS_Parent
+    public class Plot_Histogram2D_CS : CS_Parent
     {
         public Color_Basics colorFmt = new Color_Basics();
-        public Plot_Histogram_CS2D(VBtask task) : base(task)
+        public Plot_Histogram2D_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "2D Histogram", "" };
             desc = "Plot a 2D histogram from the input Mat";
@@ -48710,11 +48710,11 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Solo_CSRegions : CS_Parent
+    public class PointCloud_SoloRegions_CS : CS_Parent
     {
         public PointCloud_Solo solo = new PointCloud_Solo();
         Dilate_Basics dilate = new Dilate_Basics();
-        public PointCloud_Solo_CSRegions(VBtask task) : base(task)
+        public PointCloud_SoloRegions_CS(VBtask task) : base(task)
         {
             labels[2] = "Top down view before inrange sampling";
             labels[3] = "Histogram after filtering For Single-only histogram bins";
@@ -61871,8 +61871,8 @@ namespace CS_Classes
     {
         public Mat[] rgb = new Mat[3];
         public Mat[] gradient = new Mat[3];
-        readonly Edge_Sobel_Old sobel = new Edge_Sobel_Old();
-        readonly Options_WarpModel options = new Options_WarpModel();
+        Edge_Sobel sobel = new Edge_Sobel();
+        Options_WarpModel options = new Options_WarpModel();
         public WarpModel_Input_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();

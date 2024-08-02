@@ -138,7 +138,7 @@ End Class
 Public Class WarpModel_Input : Inherits VB_Parent
     Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
-    ReadOnly sobel as new Edge_Sobel_Old
+    ReadOnly sobel as new Edge_Sobel
     ReadOnly options As New Options_WarpModel
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
