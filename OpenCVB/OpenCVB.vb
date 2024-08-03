@@ -1352,7 +1352,7 @@ Public Class OpenCVB
             Console.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
             While 1
                 If algorithmQueueCount = 0 Then Exit While
-                Console.Write(".")
+                'Console.Write(".")
                 Application.DoEvents()
             End While
         End If

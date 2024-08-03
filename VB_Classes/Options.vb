@@ -6680,8 +6680,7 @@ Public Class Options_PlyFormat : Inherits VB_Parent
         fileNameForm.OpenFileDialog1.Filter = "ply (*.ply)|*.ply|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
         fileNameForm.filename.Text = GetSetting("OpenCVB", "plyFileName", "plyFileName", task.HomeDir + "temp\pointcloud.ply")
-        Dim testDir = New FileInfo(fileNameForm.filename.Text)
-        If testDir.Directory.Exists = False Then fileNameForm.filename.Text = task.HomeDir + "temp\pointcloud.ply"
+
         fileNameForm.Text = "Select ply output file"
         fileNameForm.FileNameLabel.Text = "Select ply output file"
         fileNameForm.PlayButton.Text = "Save"
@@ -6693,6 +6692,12 @@ Public Class Options_PlyFormat : Inherits VB_Parent
         If task.FirstPass Then fileNameForm.Left = allOptions.Width / 3
         playButton = fileNameForm.PlayButton.Text
         fileName = fileNameForm.filename.Text
+
+        Dim testDir = New FileInfo(fileNameForm.filename.Text)
+        If testDir.Directory.Exists = False Then
+            fileNameForm.filename.Text = task.HomeDir + "Temp\pointcloud.ply"
+            If testDir.Directory.Name = "Temp" Then MkDir(testDir.Directory.FullName)
+        End If
 
         If saveFileName <> fileName and filename.Length > 0 Then
             SaveSetting("OpenCVB", "plyFileName", "plyFileName", fileName)
