@@ -106,19 +106,19 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="OpenCvSharp4">
-      <Version>4.9.0.20240103</Version>
+      <Version>4.10.0.20240616</Version>
     </PackageReference>
     <PackageReference Include="OpenCvSharp4.Extensions">
-      <Version>4.9.0.20240103</Version>
+      <Version>4.10.0.20240616</Version>
     </PackageReference>
     <PackageReference Include="OpenCvSharp4.runtime.win">
-      <Version>4.9.0.20240103</Version>
+      <Version>4.10.0.20240616</Version>
     </PackageReference>
     <PackageReference Include="System.Buffers">
       <Version>4.5.1</Version>
     </PackageReference>
     <PackageReference Include="System.Drawing.Common">
-      <Version>9.0.0-preview.5.24306.5</Version>
+      <Version>9.0.0-preview.6.24327.6</Version>
     </PackageReference>
     <PackageReference Include="System.Memory">
       <Version>4.5.5</Version>

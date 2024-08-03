@@ -749,7 +749,7 @@ namespace CS_Classes
             var imagePtr = VoronoiDemo_Run(cPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst2.Width, dst2.Height);
             handleSrc.Free();
 
-            dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_32F, imagePtr).Clone();
+            dst2 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_32F, imagePtr).Clone();
             vDemo.vDisplay(ref dst2, vDemo.random.PointList, Scalar.Yellow);
         }
 
