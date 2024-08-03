@@ -29,6 +29,7 @@ Public Class ProCon_Basics : Inherits VB_Parent
     End Function
     Public Sub Consumer()
         While 1
+            If task.frameCount < 0 Then Exit While
             SyncLock mutex
                 head = success(head)
                 Dim item = options.buffer(head)
@@ -43,6 +44,7 @@ Public Class ProCon_Basics : Inherits VB_Parent
     End Sub
     Private Sub Producer()
         While 1
+            If task.frameCount < 0 Then Exit While
             SyncLock mutex
                 tail = success(tail)
                 If options.buffer(tail) = -1 Then

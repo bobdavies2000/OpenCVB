@@ -23,6 +23,7 @@ using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.IO.Pipes;
 using System.Windows.Controls;
+using CS_Classes;
 
 namespace CS_Classes
 {
@@ -62236,3 +62237,25 @@ namespace CS_Classes
 
 
 
+public class Horizon_Perpendicular_CS : CS_Parent
+{
+    Line_Perpendicular perp = new Line_Perpendicular();
+    public Horizon_Perpendicular_CS(VBtask task) : base(task)
+    {
+        labels[2] = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU.";
+        desc = "Find the gravity vector using the perpendicular to the horizon.";
+    }
+    public void RunCS(Mat src)
+    {
+        dst2 = src;
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, Scalar.White);
+        perp.p1 = task.horizonVec.p1;
+        perp.p2 = task.horizonVec.p2;
+        perp.Run(src);
+        DrawLine(dst2, perp.r1, perp.r2, Scalar.Yellow);
+        var gVec = task.gravityVec;
+        gVec.p1.X += 10;
+        gVec.p2.X += 10;
+        DrawLine(dst2, gVec.p1, gVec.p2, Scalar.White);
+    }
+}

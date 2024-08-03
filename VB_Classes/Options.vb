@@ -6674,12 +6674,12 @@ Public Class Options_PlyFormat : Inherits VB_Parent
     Public saveFileName As String = ""
     Public Sub New()
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = "c:\tmp"
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.HomeDir + "temp"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "ply (*.ply)|*.ply|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB", "plyFileName", "plyFileName", "c:\tmp\pointcloud.ply")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "plyFileName", "plyFileName", task.HomeDir + "temp\pointcloud.ply")
         fileNameForm.Text = "Select ply output file"
         fileNameForm.FileNameLabel.Text = "Select ply output file"
         fileNameForm.PlayButton.Text = "Save"

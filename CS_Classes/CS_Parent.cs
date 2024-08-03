@@ -140,25 +140,15 @@ namespace CS_Classes
     }
     public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color, int lineWidth)
     {
-        cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
-        cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
-        dst.Line(pt1, pt2, color, lineWidth);
-    }
-    public void DrawLine(cv.Mat dst, cv.Point2d p1, cv.Point2d p2, cv.Scalar color)
-    {
-        cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
-        cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
-        dst.Line(pt1, pt2, color, task.lineWidth);
-    }
-    public void DrawLine(cv.Mat dst, cv.Point p1, cv.Point p2, cv.Scalar color)
-    {
-        dst.Line(p1, p2, color, task.lineWidth);
+        cv.Point pt1 = new cv.Point(p1.X, p1.Y);
+        cv.Point pt2 = new cv.Point(p2.X, p2.Y);
+        dst.Line(pt1, pt2, color, lineWidth, task.lineType);
     }
     public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color)
     {
-        cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
-        cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
-        dst.Line(pt1, pt2, color, task.lineWidth);
+        cv.Point pt1 = new cv.Point(p1.X, p1.Y);
+        cv.Point pt2 = new cv.Point(p2.X, p2.Y);
+        dst.Line(pt1, pt2, color, task.lineWidth, task.lineType);
     }
     public Rangef[] GetHist2Dminmax(Mat input, int chan1, int chan2)
     {

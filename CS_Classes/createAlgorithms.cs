@@ -734,6 +734,7 @@ namespace CS_Classes
 			if (algorithmName == "Horizon_ExternalTest_CS") return new Horizon_ExternalTest_CS(task);
 			if (algorithmName == "Horizon_FindNonZero_CS") return new Horizon_FindNonZero_CS(task);
 			if (algorithmName == "Horizon_FindNonZeroOld_CS") return new Horizon_FindNonZeroOld_CS(task);
+			if (algorithmName == "Horizon_Perpendicular_CS") return new Horizon_Perpendicular_CS(task);
 			if (algorithmName == "Horizon_Regress_CS") return new Horizon_Regress_CS(task);
 			if (algorithmName == "Horizon_UnstableResults_CS") return new Horizon_UnstableResults_CS(task);
 			if (algorithmName == "Horizon_Validate_CS") return new Horizon_Validate_CS(task);

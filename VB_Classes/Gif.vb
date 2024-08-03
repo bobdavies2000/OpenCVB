@@ -173,6 +173,6 @@ Public Class Gif_OpenCVB : Inherits VB_Parent
         gifC.Run(dst2)
 
         labels(2) = "Images captured: " + CStr(task.gifImages.Count)
-        labels(3) = "After 'Build GIF file...' was clicked, resulting gif will be in 'c:/temp/myGIF.gif'"
+        labels(3) = "After 'Build GIF file...' was clicked, resulting gif will be in '" + task.HomeDir + "/temp/myGIF.gif'"
     End Sub
 End Class
