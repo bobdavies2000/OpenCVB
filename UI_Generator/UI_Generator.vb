@@ -460,7 +460,7 @@ Module UI_GeneratorMain
 
         Dim cppNames As New List(Of String)
         For Each nm In allButPython.Keys
-            If nm.Contains("CPP_") Then cppNames.Add(nm)
+            If nm.Contains("_CPP") Then cppNames.Add(nm)
         Next
 
         sw.Write("<All C++ (" + CStr(cppNames.Count) + ")>")

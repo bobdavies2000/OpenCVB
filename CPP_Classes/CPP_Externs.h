@@ -1,8 +1,8 @@
 #pragma once
 #include "CPP_AI_Generated.h"
 
-CPP_Grid_Basics* gridBasics;
-CPP_Hist_RedOptions* redOptions;
+Grid_Basics_CPP* gridBasics;
+Hist_RedOptions_CPP* redOptions;
 
 extern "C" __declspec(dllexport)
 int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWeighted, 
@@ -33,156 +33,156 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 
     switch (function)
     {
-    case _CPP_AddWeighted_Basics :
-    {task->alg = new CPP_AddWeighted_Basics(); break; } 
-    case _CPP_RedCloud_BasicsNative:
-    {task->alg = new CPP_RedCloud_BasicsNative(); break; }
-    case _CPP_RedCloud_Basics:
-    {task->alg = new CPP_RedCloud_Basics(); break; }
-    case _CPP_BGSubtract_Basics :
-	{task->alg = new CPP_BGSubtract_Basics(); break; }
-	case _CPP_Feature_StableSorted :
-	{task->alg = new CPP_Feature_StableSorted(); break; }
-    case _CPP_Plot_Histogram2D:
-    {task->alg = new CPP_Plot_Histogram2D(); break; }
-    case _CPP_Hist_RedOptions:
-    {task->alg = new CPP_Hist_RedOptions(); break; }
-    case _CPP_Palette_Random :
-	{task->alg = new CPP_Palette_Random(); break; }
-	case _CPP_Blur_Basics :
-	{task->alg = new CPP_Blur_Basics(); break; }
-	case _CPP_Color_Basics :
-	{task->alg = new CPP_Color_Basics(); break; }
-	case _CPP_Bin4Way_RegionsCombine :
-	{task->alg = new CPP_Bin4Way_RegionsCombine(); break; }
-	case _CPP_Bin4Way_Regions :
-	{task->alg = new CPP_Bin4Way_Regions(); break; }
-	case _CPP_Mat_4Click :
-	{task->alg = new CPP_Mat_4Click(); break; }
-	case _CPP_Area_MinRect :
-	{task->alg = new CPP_Area_MinRect(); break; }
-	case _CPP_Mesh_Features :
-	{task->alg = new CPP_Mesh_Features(); break; }
-	case _CPP_Mesh_Agast:
-	{task->alg = new CPP_Mesh_Agast(); break; }
-	case _CPP_Mesh_Basics :
-	{task->alg = new CPP_Mesh_Basics(); break; }
-	case _CPP_RedColor_FeatureLess :
-	{task->alg = new CPP_RedColor_FeatureLess(); break; }
-	case _CPP_RedColor_FeatureLessCore :
-	{task->alg = new CPP_RedColor_FeatureLessCore(); break; }
-	case _CPP_Palette_Basics :
-	{task->alg = new CPP_Palette_Basics(); break; }
-	case _CPP_FeatureLess_History :
-	{task->alg = new CPP_FeatureLess_History(); break; }
-	case _CPP_Line_BasicsOld :
-	{task->alg = new CPP_Line_BasicsOld(); break; }
-	case _CPP_Convex_Basics :
-	{task->alg = new CPP_Convex_Basics(); break; }
-	case _CPP_Resize_Preserve :
-	{task->alg = new CPP_Resize_Preserve(); break; } 
-	case _CPP_History_Basics :
-	{task->alg = new CPP_History_Basics(); break; }
-	case _CPP_Motion_Simple :
-	{task->alg = new CPP_Motion_Simple(); break; }
-	case _CPP_Hist_Kalman :
-	{task->alg = new CPP_Hist_Kalman(); break; }
-	case _CPP_Kalman_Basics :
-	{task->alg = new CPP_Kalman_Basics(); break; }
-	case _CPP_RedCloud_Reduce :
-	{task->alg = new CPP_RedCloud_Reduce(); break; }
-	case _CPP_FPoly_TopFeatures :
-	{task->alg = new CPP_FPoly_TopFeatures(); break; }
-	case _CPP_Random_Enumerable :
-	{task->alg = new CPP_Random_Enumerable(); break; }
-    case _CPP_Bezier_Basics :
-    {task->alg = new CPP_Bezier_Basics(); break; }
-    case _CPP_Feature_Agast :
-    {task->alg = new CPP_Feature_Agast();break;}
-    case _CPP_Resize_Basics :
-    {task->alg = new CPP_Resize_Basics();break;}
-    case _CPP_Delaunay_Basics :
-    {task->alg = new CPP_Delaunay_Basics();break;}
-    case _CPP_Delaunay_GenerationsNoKNN :
-    {task->alg = new CPP_Delaunay_GenerationsNoKNN();break;}
-    case _CPP_KNN_Core :
-    {task->alg = new CPP_KNN_Core(); break; }
-    case _CPP_Random_Basics :
-    {task->alg = new CPP_Random_Basics();break;}
-    case _CPP_KNN_Basics :
-    {task->alg = new CPP_KNN_Basics();break;}
-    case _CPP_Delaunay_Generations :
-    {task->alg = new CPP_Delaunay_Generations();break;}
-    case _CPP_Stable_Basics :
-    {task->alg = new CPP_Stable_Basics();break;}
-    case _CPP_Feature_Basics :
-    {task->alg = new CPP_Feature_Basics();break;}
-	case _CPP_Stable_BasicsCount :
-	{task->alg = new CPP_Stable_BasicsCount();break;}
-	case _CPP_Remap_Basics :
-	{task->alg = new CPP_Remap_Basics();break;}
-	case _CPP_Edge_Canny :
-	{task->alg = new CPP_Edge_Canny();break;}
-	case _CPP_Edge_Sobel :
-	{task->alg = new CPP_Edge_Sobel();break;}
-	case _CPP_Edge_Scharr :
-	{task->alg = new CPP_Edge_Scharr();break;}
-	case _CPP_Mat_4to1 :
-	{task->alg = new CPP_Mat_4to1();break;}
-	case _CPP_Grid_Basics :
-	{task->alg = new CPP_Grid_Basics();break;}
-	case _CPP_Depth_Colorizer :
-	{task->alg = new CPP_Depth_Colorizer();break;}
-	case _CPP_RedCloud_Flood :
-	{task->alg = new CPP_RedCloud_Flood();break;}
-	case _CPP_Depth_PointCloud :
-	{task->alg = new CPP_Depth_PointCloud();break;}
-	case _CPP_IMU_GMatrix :
-	{task->alg = new CPP_IMU_GMatrix();break;}
-	case _CPP_IMU_GMatrix_QT :
-	{task->alg = new CPP_IMU_GMatrix_QT();break;}
-	case _CPP_Depth_PointCloud_IMU :
-	{task->alg = new CPP_Depth_PointCloud_IMU();break;}
-	case _CPP_Binarize_Simple :
-	{task->alg = new CPP_Binarize_Simple();break;}
-	case _CPP_Plot_Histogram :
-	{task->alg = new CPP_Plot_Histogram();break;}
-	case _CPP_Hist_Basics :
-	{task->alg = new CPP_Hist_Basics();break;}
-	case _CPP_BackProject_Basics :
-	{task->alg = new CPP_BackProject_Basics();break;}
-	case _CPP_Rectangle_Basics :
-	{task->alg = new CPP_Rectangle_Basics();break;}
-	case _CPP_Rectangle_Rotated :
-	{task->alg = new CPP_Rectangle_Rotated();break;}
-	case _CPP_Contour_Largest :
-	{task->alg = new CPP_Contour_Largest();break;}
-	case _CPP_Diff_Basics :
-	{task->alg = new CPP_Diff_Basics();break;}
-	case _CPP_ApproxPoly_FindandDraw :
-	{task->alg = new CPP_ApproxPoly_FindandDraw();break;}
-	case _CPP_ApproxPoly_Basics :
-	{task->alg = new CPP_ApproxPoly_Basics();break;}
-	case _CPP_Hull_Basics :
-	{task->alg = new CPP_Hull_Basics();break;}
-	case _CPP_ApproxPoly_Hull :
-	{task->alg = new CPP_ApproxPoly_Hull();break;}
-	case _CPP_Edge_Segments :
-	{task->alg = new CPP_Edge_Segments();break;}
-	case _CPP_Motion_Basics :
-	{task->alg = new CPP_Motion_Basics();break;}
-	case _CPP_Edge_MotionFrames :
-	{task->alg = new CPP_Edge_MotionFrames();break;}
-	case _CPP_Edge_Preserving:
-	{task->alg = new CPP_Edge_Preserving();break;}
-	case _CPP_EdgeDraw_Basics :
-	{task->alg = new CPP_EdgeDraw_Basics();break;}
-	case _CPP_Distance_Basics :
-	{task->alg = new CPP_Distance_Basics();break;}
-	case _CPP_FeatureLess_Basics :
-	{task->alg = new CPP_FeatureLess_Basics();break;}
-	case _CPP_FeatureLess_Edge :
-	{task->alg = new CPP_FeatureLess_Edge();break;}
+    case _AddWeighted_Basics_CPP :
+    {task->alg = new AddWeighted_Basics_CPP(); break; }  
+    case _RedCloud_BasicsNative_CPP :
+    {task->alg = new RedCloud_BasicsNative_CPP(); break; } 
+    case _RedCloud_Basics_CPP :
+    {task->alg = new RedCloud_Basics_CPP(); break; } 
+    case _BGSubtract_Basics_CPP :
+	{task->alg = new BGSubtract_Basics_CPP(); break; } 
+	case _Feature_StableSorted_CPP :
+	{task->alg = new Feature_StableSorted_CPP(); break; } 
+    case _Plot_Histogram2D_CPP :
+    {task->alg = new Plot_Histogram2D_CPP(); break; } 
+    case _Hist_RedOptions_CPP :
+    {task->alg = new Hist_RedOptions_CPP(); break; } 
+    case _Palette_Random_CPP :
+	{task->alg = new Palette_Random_CPP(); break; } 
+	case _Blur_Basics_CPP :
+	{task->alg = new Blur_Basics_CPP(); break; } 
+	case _Color_Basics_CPP :
+	{task->alg = new Color_Basics_CPP(); break; } 
+	case _Bin4Way_RegionsCombine_CPP :
+	{task->alg = new Bin4Way_RegionsCombine_CPP(); break; } 
+	case _Bin4Way_Regions_CPP :
+	{task->alg = new Bin4Way_Regions_CPP(); break; } 
+	case _Mat_4Click_CPP :
+	{task->alg = new Mat_4Click_CPP(); break; } 
+	case _Area_MinRect_CPP :
+	{task->alg = new Area_MinRect_CPP(); break; } 
+	case _Mesh_Features_CPP :
+	{task->alg = new Mesh_Features_CPP(); break; } 
+	case _Mesh_Agast_CPP :
+	{task->alg = new Mesh_Agast_CPP(); break; } 
+	case _Mesh_Basics_CPP :
+	{task->alg = new Mesh_Basics_CPP(); break; } 
+	case _RedColor_FeatureLess_CPP :
+	{task->alg = new RedColor_FeatureLess_CPP(); break; } 
+	case _RedColor_FeatureLessCore_CPP :
+	{task->alg = new RedColor_FeatureLessCore_CPP(); break; } 
+	case _Palette_Basics_CPP :
+	{task->alg = new Palette_Basics_CPP(); break; } 
+	case _FeatureLess_History_CPP :
+	{task->alg = new FeatureLess_History_CPP(); break; } 
+	case _Line_BasicsOld_CPP :
+	{task->alg = new Line_BasicsOld_CPP(); break; } 
+	case _Convex_Basics_CPP :
+	{task->alg = new Convex_Basics_CPP(); break; } 
+	case _Resize_Preserve_CPP :
+	{task->alg = new Resize_Preserve_CPP(); break; }  
+	case _History_Basics_CPP :
+	{task->alg = new History_Basics_CPP(); break; } 
+	case _Motion_Simple_CPP :
+	{task->alg = new Motion_Simple_CPP(); break; } 
+	case _Hist_Kalman_CPP :
+	{task->alg = new Hist_Kalman_CPP(); break; } 
+	case _Kalman_Basics_CPP :
+	{task->alg = new Kalman_Basics_CPP(); break; } 
+	case _RedCloud_Reduce_CPP :
+	{task->alg = new RedCloud_Reduce_CPP(); break; } 
+	case _FPoly_TopFeatures_CPP :
+	{task->alg = new FPoly_TopFeatures_CPP(); break; } 
+	case _Random_Enumerable_CPP :
+	{task->alg = new Random_Enumerable_CPP(); break; } 
+    case _Bezier_Basics_CPP :
+    {task->alg = new Bezier_Basics_CPP(); break; } 
+    case _Feature_Agast_CPP :
+    {task->alg = new Feature_Agast_CPP();break;}
+    case _Resize_Basics_CPP :
+    {task->alg = new Resize_Basics_CPP();break;}
+    case _Delaunay_Basics_CPP :
+    {task->alg = new Delaunay_Basics_CPP();break;}
+    case _Delaunay_GenerationsNoKNN_CPP :
+    {task->alg = new Delaunay_GenerationsNoKNN_CPP();break;}
+    case _KNN_Core_CPP :
+    {task->alg = new KNN_Core_CPP(); break; } 
+    case _Random_Basics_CPP :
+    {task->alg = new Random_Basics_CPP();break;}
+    case _KNN_Basics_CPP :
+    {task->alg = new KNN_Basics_CPP();break;}
+    case _Delaunay_Generations_CPP :
+    {task->alg = new Delaunay_Generations_CPP();break;}
+    case _Stable_Basics_CPP :
+    {task->alg = new Stable_Basics_CPP();break;}
+    case _Feature_Basics_CPP :
+    {task->alg = new Feature_Basics_CPP();break;}
+	case _Stable_BasicsCount_CPP :
+	{task->alg = new Stable_BasicsCount_CPP();break;}
+	case _Remap_Basics_CPP :
+	{task->alg = new Remap_Basics_CPP();break;}
+	case _Edge_Canny_CPP :
+	{task->alg = new Edge_Canny_CPP();break;}
+	case _Edge_Sobel_CPP :
+	{task->alg = new Edge_Sobel_CPP();break;}
+	case _Edge_Scharr_CPP :
+	{task->alg = new Edge_Scharr_CPP();break;}
+	case _Mat_4to1_CPP :
+	{task->alg = new Mat_4to1_CPP();break;}
+	case _Grid_Basics_CPP :
+	{task->alg = new Grid_Basics_CPP();break;}
+	case _Depth_Colorizer_CPP :
+	{task->alg = new Depth_Colorizer_CPP();break;}
+	case _RedCloud_Flood_CPP :
+	{task->alg = new RedCloud_Flood_CPP();break;}
+	case _Depth_PointCloud_CPP :
+	{task->alg = new Depth_PointCloud_CPP();break;}
+	case _IMU_GMatrix_CPP :
+	{task->alg = new IMU_GMatrix_CPP();break;}
+	case _IMU_GMatrix_QT_CPP :
+	{task->alg = new IMU_GMatrix_QT_CPP();break;}
+	case _Depth_PointCloud_IMU_CPP :
+	{task->alg = new Depth_PointCloud_IMU_CPP();break;}
+	case _Binarize_Simple_CPP :
+	{task->alg = new Binarize_Simple_CPP();break;}
+	case _Plot_Histogram_CPP :
+	{task->alg = new Plot_Histogram_CPP();break;}
+	case _Hist_Basics_CPP :
+	{task->alg = new Hist_Basics_CPP();break;}
+	case _BackProject_Basics_CPP :
+	{task->alg = new BackProject_Basics_CPP();break;}
+	case _Rectangle_Basics_CPP :
+	{task->alg = new Rectangle_Basics_CPP();break;}
+	case _Rectangle_Rotated_CPP :
+	{task->alg = new Rectangle_Rotated_CPP();break;}
+	case _Contour_Largest_CPP :
+	{task->alg = new Contour_Largest_CPP();break;}
+	case _Diff_Basics_CPP :
+	{task->alg = new Diff_Basics_CPP();break;}
+	case _ApproxPoly_FindandDraw_CPP :
+	{task->alg = new ApproxPoly_FindandDraw_CPP();break;}
+	case _ApproxPoly_Basics_CPP :
+	{task->alg = new ApproxPoly_Basics_CPP();break;}
+	case _Hull_Basics_CPP :
+	{task->alg = new Hull_Basics_CPP();break;}
+	case _ApproxPoly_Hull_CPP :
+	{task->alg = new ApproxPoly_Hull_CPP();break;}
+	case _Edge_Segments_CPP :
+	{task->alg = new Edge_Segments_CPP();break;}
+	case _Motion_Basics_CPP :
+	{task->alg = new Motion_Basics_CPP();break;}
+	case _Edge_MotionFrames_CPP :
+	{task->alg = new Edge_MotionFrames_CPP();break;}
+	case _Edge_Preserving_CPP :
+	{task->alg = new Edge_Preserving_CPP();break;}
+	case _EdgeDraw_Basics_CPP :
+	{task->alg = new EdgeDraw_Basics_CPP();break;}
+	case _Distance_Basics_CPP :
+	{task->alg = new Distance_Basics_CPP();break;}
+	case _FeatureLess_Basics_CPP :
+	{task->alg = new FeatureLess_Basics_CPP();break;}
+	case _FeatureLess_Edge_CPP :
+	{task->alg = new FeatureLess_Edge_CPP();break;}
     // end of switch - don't remove...
     }
 
@@ -190,8 +190,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     task->font = FONT_HERSHEY_SIMPLEX; // fontSize is set below...
     task->fontColor = Scalar(255, 255, 255);
     task->cppFunction = function;
-    gridBasics = new CPP_Grid_Basics();
-    redOptions = new CPP_Hist_RedOptions();
+    gridBasics = new Grid_Basics_CPP();
+    redOptions = new Hist_RedOptions_CPP();
 
     return (int *) task;
 }
@@ -280,7 +280,7 @@ extern "C" __declspec(dllexport)
 int* cppTask_Close(cppTask * task)
 {
     if (task == (cppTask*)0) return (int*)0;
-    if (task->cppFunction != _CPP_Delaunay_GenerationsNoKNN) delete task;  // why does fDelaunay_GenerationsNoKNN fail.  Skipping it for now.
+    if (task->cppFunction != _Delaunay_GenerationsNoKNN_CPP) delete task;  // why does fDelaunay_GenerationsNoKNN fail.  Skipping it for now.
     return (int*)0;
 }
 
@@ -300,7 +300,7 @@ int* cppTask_PointCloud(cppTask * task, int* dataPtr, int rows, int cols)
     threshold(task->pcSplit[2], task->maxDepthMask, task->MaxZmeters, 255, THRESH_BINARY);  
     task->maxDepthMask.convertTo(task->maxDepthMask, CV_8U);
 
-    static CPP_Depth_PointCloud_IMU* pCloud = new CPP_Depth_PointCloud_IMU();
+    static Depth_PointCloud_IMU_CPP* pCloud = new Depth_PointCloud_IMU_CPP();
     pCloud->Run(task->pointCloud); // build the task->gCloud - oriented toward gravity.
 
     return (int*)task->depthRGB.data;
