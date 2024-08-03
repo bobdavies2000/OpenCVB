@@ -35,7 +35,6 @@ Module UI_GeneratorMain
         Dim OpenGLnames As New SortedList(Of String, String)
         Dim PYnames As New SortedList(Of String, String)
         Dim VBNames As New SortedList(Of String, String)
-        Dim cppNames As New SortedList(Of String, String)
         Dim allButPython As New SortedList(Of String, String)
         Dim PYStreamNames As New SortedList(Of String, String)
         Dim LastEdits As New SortedList(Of String, String)
@@ -322,14 +321,9 @@ Module UI_GeneratorMain
                 If cleanNames(i) <> "" Then
                     If cleanNames(i).Contains("Python_Stream") = False And cleanNames(i).Contains("Python") = False And
                         cleanNames(i).Contains("CPP_Basics") = False Then
-                        If cleanNames(i).StartsWith("CPP_") Or cleanNames(i).EndsWith("_CPP") Then
-                            cppNames.Add(cleanNames(i), cleanNames(i))
-                            If cleanNames(i).EndsWith("_CPP") Then VBNames.Add(cleanNames(i), cleanNames(i))
-                        Else
-                            VBNames.Add(cleanNames(i), cleanNames(i))
-                            apiList.Add(cleanNames(i))
-                            apiListLCase.Add(LCase(cleanNames(i)))
-                        End If
+                        VBNames.Add(cleanNames(i), cleanNames(i))
+                        apiList.Add(cleanNames(i))
+                        apiListLCase.Add(LCase(cleanNames(i)))
                         allButPython.Add(cleanNames(i), cleanNames(i))
                     End If
                 End If
@@ -464,9 +458,14 @@ Module UI_GeneratorMain
         sw.WriteLine()
 
 
+        Dim cppNames As New List(Of String)
+        For Each nm In allButPython.Keys
+            If nm.Contains("CPP_") Then cppNames.Add(nm)
+        Next
+
         sw.Write("<All C++ (" + CStr(cppNames.Count) + ")>")
         For i = 0 To cppNames.Count - 1
-            sw.Write("," + cppNames.ElementAt(i).Key)
+            sw.Write("," + cppNames(i))
         Next
         sw.WriteLine()
 
