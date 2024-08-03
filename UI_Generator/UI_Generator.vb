@@ -429,14 +429,16 @@ Module UI_GeneratorMain
         Next
 
         'Dim count As Integer
-        'Dim testKeys = New List(Of String)
+        'Dim testkeys = New List(Of String)
         'For Each nm In CSnames.Keys
-        '    testKeys.Add(nm.Substring(0, nm.Length - 3))
+        '    testkeys.Add(nm.Substring(0, nm.Length - 3))
         'Next
         'For Each nm In VBNames.Keys
-        '    If testKeys.Contains(nm) = False And nm.StartsWith("Options_") = False Then
-        '        Console.WriteLine("missing from C# code: " + nm)
-        '        count += 1
+        '    If testkeys.Contains(nm) = False And nm.StartsWith("options_") = False Then
+        '        If nm.EndsWith("_CPP_VB") = False And nm.StartsWith("Options_") = False Then
+        '            Console.WriteLine("missing from c# code: " + nm)
+        '            count += 1
+        '        End If
         '    End If
         'Next
 
