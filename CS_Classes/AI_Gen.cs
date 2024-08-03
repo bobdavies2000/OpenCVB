@@ -8795,58 +8795,65 @@ namespace CS_Classes
         }
     }
 
-    //
 
 
+    public class Contour_RemoveLines_CS : CS_Parent
+    {
+        Options_Morphology options = new Options_Morphology();
+        Mat image;
+        public Contour_RemoveLines_CS(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": use the local options in 'Morphology width/height to show impact'");
+            labels = new string[] { "", "", "Identified horizontal lines - why is scale factor necessary?", "Identified vertical lines" };
+            image = Cv2.ImRead(task.HomeDir + "Data/invoice.jpg");
+            var dstSize = new cv.Size(dst2.Height * dst2.Width / image.Height, dst2.Height);
+            var dstRect = new cv.Rect(0, 0, image.Width, dst2.Height);
+            image = image.Resize(dstSize);
+            desc = "Remove the lines from an invoice image";
+        }
+        cv.Point[][] scaleTour(cv.Point[][] tour)
+        {
+            for (int i = 0; i < tour.Length; i++)
+            {
+                var tmpTour = new List<cv.Point>();
+                foreach (var pt in tour[i])
+                {
+                    tmpTour.Add(new cv.Point(pt.X * options.scaleFactor, pt.Y));
+                }
+                tour[i] = tmpTour.ToArray();
+            }
+            return tour;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = image.Resize(dst2.Size());
+            dst3 = dst2.Clone();
+            var gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            var thresh = gray.Threshold(0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
+            // remove horizontal lines
+            var hkernel = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(options.widthHeight, 1));
+            var removedH = new Mat();
+            Cv2.MorphologyEx(thresh, removedH, MorphTypes.Open, hkernel, iterations: options.iterations);
+            var tour = Cv2.FindContoursAsArray(removedH, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+            tour = scaleTour(tour);
+            for (int i = 0; i < tour.Length; i++)
+            {
+                Cv2.DrawContours(dst2, tour, i, Scalar.Black, task.lineWidth);
+            }
+            var vkernel = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(1, options.widthHeight));
+            var removedV = new Mat();
+            thresh = gray.Threshold(0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
+            Cv2.MorphologyEx(thresh, removedV, MorphTypes.Open, vkernel, iterations: options.iterations);
+            tour = Cv2.FindContoursAsArray(removedV, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+            tour = scaleTour(tour);
+            for (int i = 0; i < tour.Length; i++)
+            {
+                Cv2.DrawContours(dst3, tour, i, Scalar.Black, task.lineWidth);
+            }
+        }
+    }
 
-    //	public class CS_Contour_RemoveLines : CS_Parent
-    //{
-    //    Options_Morphology options = new Options_Morphology();
-    //    public CS_Contour_RemoveLines(VBtask task) : base(task)
-    //    {
-    //        labels[2] = "Original image";
-    //        labels[3] = "Original with horizontal/vertical lines removed";
-    //        desc = "Remove the lines from an invoice image";
-    //    }
-
-    //    public void RunCS(Mat src)
-    //    {
-    //        options.RunVB();
-
-    //        Mat input = FeatureSrc;
-    //        Mat tmp = Cv2.ImRead(task.HomeDir + "Data/invoice.jpg");
-    //        float height = src.Height;
-    //        float factor = (float)(src.Height / tmp.Height);
-    //        cv.Size dstSize = new cv.Size(factor * src.Width), src.Height);
-    //        cv.Rect dstRect = new cv.Rect(0, 0, dstSize.Width, src.Height);
-    //        tmp = tmp.Resize(dstSize);
-    //        dst2 = tmp.Resize(dst2.Size());
-    //        Mat gray = tmp.CvtColor(ColorConversionCodes.BGR2GRAY);
-    //        Mat thresh = gray.Threshold(0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
-
-    //        // remove horizontal lines
-    //        Mat hkernel = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(options.widthHeight, 1));
-    //        Mat removedH = new Mat();
-    //        Cv2.MorphologyEx(thresh, removedH, MorphTypes.Open, hkernel, iterations: options.iterations);
-    //        cv.Point[][] cnts = Cv2.FindContoursAsArray(removedH, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
-    //        for (int i = 0; i < cnts.Length; i++)
-    //        {
-    //            Cv2.DrawContours(tmp, cnts, i, Scalar.White, task.lineWidth);
-    //        }
-
-    //        Mat vkernel = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(1, options.widthHeight));
-    //        Mat removedV = new Mat();
-    //        Cv2.MorphologyEx(thresh, removedV, MorphTypes.Open, vkernel, iterations: options.iterations);
-    //        cnts = Cv2.FindContoursAsArray(removedV, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
-    //        for (int i = 0; i < cnts.Length; i++)
-    //        {
-    //            Cv2.DrawContours(tmp, cnts, i, Scalar.White, task.lineWidth);
-    //        }
-
-    //        dst3 = tmp.Resize(dst3.Size());
-    //        Cv2.ImShow("Altered image at original resolution", tmp);
-    //    }
-    //}
 
 
 

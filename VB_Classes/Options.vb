@@ -5151,17 +5151,21 @@ End Class
 Public Class Options_Morphology : Inherits VB_Parent
     Public widthHeight As Integer
     Public iterations As Integer
+    Public scaleFactor As Double
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Morphology width/height", 1, 100, 20)
             sliders.setupTrackBar("MorphologyEx iterations", 1, 5, 1)
+            sliders.setupTrackBar("MorphologyEx Scale factor X1000", 1, 500, 70)
         End If
     End Sub
     Public Sub RunVB()
         Static morphSlider = FindSlider("Morphology width/height")
         Static morphExSlider = FindSlider("MorphologyEx iterations")
+        Static scaleSlider = FindSlider("MorphologyEx Scale factor X1000")
         widthHeight = morphSlider.value
         iterations = morphExSlider.value
+        scaleFactor = 1 + scaleSlider.value / 1000
     End Sub
 End Class
 

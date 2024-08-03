@@ -173,45 +173,56 @@ End Class
 
 
 
-
 ' https://github.com/SciSharp/SharpCV/blob/master/src/SharpCV.Examples/Program.cs
 Public Class Contour_RemoveLines : Inherits VB_Parent
     Dim options As New Options_Morphology
+    Dim image As cv.Mat
     Public Sub New()
-        labels(2) = "Original image"
-        labels(3) = "Original with horizontal/vertical lines removed"
+        UpdateAdvice(traceName + ": use the local options in 'Morphology width/height to show impact'")
+        labels = {"", "", "Identified horizontal lines - why is scale factor necessary?", "Identified vertical lines"}
+        image = cv.Cv2.ImRead(task.HomeDir + "Data/invoice.jpg")
+        Dim dstSize = New cv.Size(dst2.Height * dst2.Width / image.Height, dst2.Height)
+        Dim dstRect = New cv.Rect(0, 0, image.Width, dst2.Height)
+        image = image.Resize(dstSize)
         desc = "Remove the lines from an invoice image"
     End Sub
+    Private Function scaleTour(tour()() As cv.Point) As cv.Point()()
+        For i = 0 To tour.Count - 1
+            Dim tmpTour = New List(Of cv.Point)
+            For Each pt In tour(i)
+                tmpTour.Add(New cv.Point(pt.X * options.scaleFactor, pt.Y))
+            Next
+            tour(i) = tmpTour.ToArray
+        Next
+        Return tour
+    End Function
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim tmp = cv.Cv2.ImRead(task.HomeDir + "Data/invoice.jpg")
-        Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
-        Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
-        tmp = tmp.Resize(dstSize)
-        dst2 = tmp.Resize(dst2.Size)
-        Dim gray = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = image.Resize(dst2.Size)
+        dst3 = dst2.Clone
+        Dim gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim thresh = gray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv Or cv.ThresholdTypes.Otsu)
 
         ' remove horizontal lines
         Dim hkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(options.widthHeight, 1))
         Dim removedH As New cv.Mat
         cv.Cv2.MorphologyEx(thresh, removedH, cv.MorphTypes.Open, hkernel,, options.iterations)
-        Dim cnts = cv.Cv2.FindContoursAsArray(removedH, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
-        For i = 0 To cnts.Count - 1
-            cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, task.lineWidth)
+        Dim tour = cv.Cv2.FindContoursAsArray(removedH, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+        tour = scaleTour(tour)
+        For i = 0 To tour.Count - 1
+            cv.Cv2.DrawContours(dst2, tour, i, cv.Scalar.Black, task.lineWidth)
         Next
 
         Dim vkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(1, options.widthHeight))
         Dim removedV As New cv.Mat
+        thresh = gray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv Or cv.ThresholdTypes.Otsu)
         cv.Cv2.MorphologyEx(thresh, removedV, cv.MorphTypes.Open, vkernel,, options.iterations)
-        cnts = cv.Cv2.FindContoursAsArray(removedV, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
-        For i = 0 To cnts.Count - 1
-            cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, task.lineWidth)
+        tour = cv.Cv2.FindContoursAsArray(removedV, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+        tour = scaleTour(tour)
+        For i = 0 To tour.Count - 1
+            cv.Cv2.DrawContours(dst3, tour, i, cv.Scalar.Black, task.lineWidth)
         Next
-
-        dst3 = tmp.Resize(dst3.Size)
-        cv.Cv2.ImShow("Altered image at original resolution", tmp)
     End Sub
 End Class
 

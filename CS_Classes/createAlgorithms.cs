@@ -228,6 +228,7 @@ namespace CS_Classes
 			if (algorithmName == "Contour_RedCloud_CS") return new Contour_RedCloud_CS(task);
 			if (algorithmName == "Contour_RedCloudCorners_CS") return new Contour_RedCloudCorners_CS(task);
 			if (algorithmName == "Contour_RedCloudEdges_CS") return new Contour_RedCloudEdges_CS(task);
+			if (algorithmName == "Contour_RemoveLines_CS") return new Contour_RemoveLines_CS(task);
 			if (algorithmName == "Contour_RotatedRects_CS") return new Contour_RotatedRects_CS(task);
 			if (algorithmName == "Contour_SelfIntersect_CS") return new Contour_SelfIntersect_CS(task);
 			if (algorithmName == "Contour_SidePoints_CS") return new Contour_SidePoints_CS(task);
