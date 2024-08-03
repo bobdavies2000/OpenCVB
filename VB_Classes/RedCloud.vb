@@ -792,7 +792,7 @@ End Class
 Public Class RedCloud_FeatureLess : Inherits VB_Parent
     Dim cpp As New CPP_Basics
     Public Sub New()
-        cpp.updateFunction(AlgorithmList.cppFunctionNames._CPP_RedColor_FeatureLess)
+        cpp.updateFunction(AlgorithmList.cppFunctionNames._RedColor_FeatureLess_CPP)
         desc = "This is a duplicate of FeatureLess_RedCloud to make it easier to find."
     End Sub
     Public Sub RunVB(src As cv.Mat)
