@@ -6680,6 +6680,8 @@ Public Class Options_PlyFormat : Inherits VB_Parent
         fileNameForm.OpenFileDialog1.Filter = "ply (*.ply)|*.ply|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
         fileNameForm.filename.Text = GetSetting("OpenCVB", "plyFileName", "plyFileName", task.HomeDir + "temp\pointcloud.ply")
+        Dim testDir = New FileInfo(fileNameForm.filename.Text)
+        If testDir.Directory.Exists = False Then fileNameForm.filename.Text = task.HomeDir + "temp\pointcloud.ply"
         fileNameForm.Text = "Select ply output file"
         fileNameForm.FileNameLabel.Text = "Select ply output file"
         fileNameForm.PlayButton.Text = "Save"

@@ -389,3 +389,4 @@ OrbbecSDK
 zed-sdk/
 *.json
 CS_Classes\createAlgorithms.cs
+Temp/*.ply
