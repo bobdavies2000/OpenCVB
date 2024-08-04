@@ -23,7 +23,7 @@ Public Class KLT_Basics : Inherits VB_Parent
                 options.inputPoints = cv.Cv2.CornerSubPix(src, options.inputPoints, options.subPixWinSize, New cv.Size(-1, -1), term)
             End If
             outputMat = cv.Mat.FromPixelData(options.inputPoints.Length, 1, cv.MatType.CV_32FC2, options.inputPoints)
-            status = cv.Mat.FromPixelData(outputMat.Rows, outputMat.Cols, cv.MatType.CV_8U, 1)
+            status = New cv.Mat(outputMat.Rows, outputMat.Cols, cv.MatType.CV_8U, cv.Scalar.All(1))
         ElseIf options.inputPoints.Length > 0 Then
             Dim err As New cv.Mat
             ' convert the point2f vector to an inputarray (cv.Mat)
