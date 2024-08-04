@@ -597,7 +597,7 @@ Public Class OEX_Filter2D : Inherits VB_Parent
 
         If task.heartBeat Then ind += 1
         kernelSize = 3 + 2 * (ind Mod 5)
-        Dim kernel As cv.Mat = cv.Mat.FromPixelData(kernelSize, kernelSize, cv.MatType.CV_32F, 1 / (kernelSize * kernelSize))
+        Dim kernel As cv.Mat = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F, cv.Scalar.All(1 / (kernelSize * kernelSize)))
 
         dst2 = src.Filter2D(ddepth, kernel, anchor, 0, cv.BorderTypes.Default)
         SetTrueText("Kernel size = " + CStr(kernelSize), 3)

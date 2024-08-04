@@ -343,7 +343,7 @@ End Class
 
 Public Class Random_CustomDistribution : Inherits VB_Parent
     Public inputCDF As cv.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
-    Public outputRandom = cv.Mat.FromPixelData(10000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
+    Public outputRandom = New cv.Mat(10000, 1, cv.MatType.CV_32S, cv.Scalar.All(0)) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public outputHistogram As cv.Mat
     Public plot As New Plot_Histogram
     Public Sub New()
@@ -507,7 +507,7 @@ Public Class Random_StaticTVFaster : Inherits VB_Parent
         Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim valMat As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        cv.Cv2.Randu(valMat, 0, valSlider.Value)
+        cv.Cv2.Randu(valMat, cv.Scalar.All(0), cv.Scalar.All(valSlider.Value))
         valMat.SetTo(0, nochangeMask)
 
         random.Run(src)
@@ -548,7 +548,7 @@ Public Class Random_StaticTVFastSimple : Inherits VB_Parent
         Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        cv.Cv2.Randu(dst3, 0, valSlider.Value)
+        cv.Cv2.Randu(dst3, cv.Scalar.All(0), cv.Scalar.All(valSlider.Value))
         dst3.SetTo(0, nochangeMask)
 
         Dim tmp As New cv.Mat(dst2.Size(), cv.MatType.CV_8U)

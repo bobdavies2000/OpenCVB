@@ -279,7 +279,7 @@ Public Class PhotoShop_Emboss : Inherits VB_Parent
         desc = "Use the video stream to make it appear like an embossed paper image."
     End Sub
     Public Function kernelGenerator(size As Integer) As cv.Mat
-        Dim kernel As cv.Mat = cv.Mat.FromPixelData(size, size, cv.MatType.CV_8S, 0)
+        Dim kernel As cv.Mat = New cv.Mat(size, size, cv.MatType.CV_8S, cv.Scalar.All(0))
         For i = 0 To size - 1
             For j = 0 To size - 1
                 If i < j Then kernel.Set(Of SByte)(j, i, -1) Else If i > j Then kernel.Set(Of SByte)(j, i, 1)

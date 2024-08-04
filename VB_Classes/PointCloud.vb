@@ -668,7 +668,7 @@ Public Class PointCloud_PCpointsMask : Inherits VB_Parent
         desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Then pcPoints = cv.Mat.FromPixelData(task.gridRows, task.gridCols, cv.MatType.CV_32FC3, 0)
+        If task.optionsChanged Then pcPoints = New cv.Mat(task.gridRows, task.gridCols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
 
         dst2.SetTo(0)
         actualCount = 0
