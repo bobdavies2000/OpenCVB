@@ -57,7 +57,7 @@ Public Class FitEllipse_AMS_CPP_VB : Inherits VB_Parent
             DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
         Next
 
-        Dim input As New cv.Mat(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
+        Dim input As cv.Mat = cv.Mat.FromPixelData(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
         Dim dataSrc(inputPoints.Count * 2 - 1) As Single
         Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
 
@@ -100,7 +100,7 @@ Public Class FitEllipse_Direct_CPP_VB : Inherits VB_Parent
             DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
         Next
 
-        Dim input As New cv.Mat(options.srcPoints.Count, 1, cv.MatType.CV_32FC2, options.srcPoints.ToArray)
+        Dim input As cv.Mat = cv.Mat.FromPixelData(options.srcPoints.Count, 1, cv.MatType.CV_32FC2, options.srcPoints.ToArray)
         Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
 
         Dim srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)

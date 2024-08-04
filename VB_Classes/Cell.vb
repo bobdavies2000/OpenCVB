@@ -42,7 +42,7 @@ Public Class Cell_Basics : Inherits VB_Parent
             strOut += "Color Stdev RGB: " + vbTab + Format(rc.colorStdev(0), fmt1) + vbTab + Format(rc.colorStdev(1), fmt1) + vbTab
             strOut += Format(rc.colorStdev(2), fmt1) + vbCrLf
 
-            Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, 0)
+            Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
             plot.rc = task.rc
             plot.Run(tmp)
@@ -123,7 +123,7 @@ Public Class Cell_ValidateColorCells : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -172,8 +172,8 @@ Public Class Cell_Distance : Inherits VB_Parent
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         If standalone Then task.gOptions.setDisplay1()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
         desc = "Measure the color distance of each cell to the selected cell."
     End Sub
@@ -216,8 +216,8 @@ Public Class Cell_Binarize : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Binarized image", "", "Relative gray image"}
         desc = "Separate the image into light and dark using RedCloud cells"
     End Sub
@@ -290,7 +290,7 @@ Public Class Cell_BasicsPlot : Inherits VB_Parent
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
-        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, 0)
+        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
         task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
         plot.rc = task.rc
         plot.Run(tmp)
@@ -370,7 +370,7 @@ Public Class Cell_Generate : Inherits VB_Parent
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As RedCloud_CPP_VB
     Public Sub New()
-        task.cellMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        task.cellMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.redCells = New List(Of rcData)
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub

@@ -178,7 +178,7 @@ Public Class Palette_DepthColorMap : Inherits VB_Parent
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
 
             If standaloneTest() Then
-                If dst3.Width < 255 Then dst3 = New cv.Mat(dst3.Height, 255, cv.MatType.CV_8UC3, 0)
+                If dst3.Width < 255 Then dst3 = New cv.Mat(dst3.Height, 255, cv.MatType.CV_8UC3, cv.Scalar.All(0))
                 Dim r As New cv.Rect(0, 0, 255, 1)
                 For i = 0 To dst3.Height - 1
                     r.Y = i
@@ -188,7 +188,7 @@ Public Class Palette_DepthColorMap : Inherits VB_Parent
         End If
 
         Dim depth8u = task.pcSplit(2).ConvertScaleAbs(cvtScaleSlider.Value)
-        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
+        Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
         cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
         dst2.SetTo(0, task.noDepthMask)
     End Sub
@@ -226,7 +226,7 @@ Public Class Palette_RGBDepth : Inherits VB_Parent
 
         Dim sliderVal = If(task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
         Dim depth8u = task.pcSplit(2).ConvertScaleAbs(sliderVal)
-        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
+        Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
         cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
     End Sub
 End Class
@@ -358,7 +358,7 @@ Public Class Palette_Create : Inherits VB_Parent
 
         SetTrueText("Use the 'Color Transitions' slider and radio buttons to change the color ranges.", 3)
         Dim depth8u = task.pcSplit(2).ConvertScaleAbs(colorTransitionCount)
-        Dim colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
+        Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
         cv.Cv2.ApplyColorMap(depth8u, dst2, colorMap)
         dst2.SetTo(0, task.noDepthMask)
     End Sub
@@ -372,7 +372,7 @@ Public Class Palette_Random : Inherits VB_Parent
     Public colorMap As cv.Mat
     Public Sub New()
         UpdateAdvice(traceName + ": There are no options" + vbCrLf + "Just produces a colorMap filled with random vec3b's.")
-        colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
+        colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         For i = 0 To 255
             colorMap.Set(Of cv.Vec3b)(i, 0, randomCellColor())
         Next
@@ -393,7 +393,7 @@ Public Class Palette_Variable : Inherits VB_Parent
     Public originalColorMap As cv.Mat
     Public colors As New List(Of cv.Vec3b)
     Public Sub New()
-        colorGrad = New cv.Mat(1, 256, cv.MatType.CV_8UC3, 0)
+        colorGrad = New cv.Mat(1, 256, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         For i = 0 To 255
             colorGrad.Set(Of cv.Vec3b)(0, i, randomCellColor())
         Next
@@ -404,7 +404,7 @@ Public Class Palette_Variable : Inherits VB_Parent
         For i = 0 To colors.Count - 1
             colorGrad.Set(Of cv.Vec3b)(0, i, colors(i))
         Next
-        Dim colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
+        Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
         cv.Cv2.ApplyColorMap(src, dst2, colorMap)
     End Sub
 End Class
@@ -440,7 +440,7 @@ Public Class Palette_RandomColorMap : Inherits VB_Parent
             If standaloneTest() Then dst3 = gradientColorMap
             gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
         End If
-        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
+        Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
         cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
     End Sub
 End Class
@@ -469,7 +469,7 @@ Public Class Palette_LoadColorMap : Inherits VB_Parent
 
             tmp.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
             tmp = tmp.Row(0)
-            colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
+            colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
         End If
 
         If src.Type = cv.MatType.CV_32F Then
@@ -497,7 +497,7 @@ Public Class Palette_CustomColorMap : Inherits VB_Parent
             Dim mapFile As New FileInfo(str)
             Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
 
-            colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
+            colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
         End If
         desc = "Apply the provided color map to the input image."
     End Sub
@@ -551,7 +551,7 @@ Public Class Palette_GrayToColor : Inherits VB_Parent
             Next
         Next
 
-        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colors.Values.ToArray)
+        Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors.Values.ToArray)
         cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
     End Sub
 End Class

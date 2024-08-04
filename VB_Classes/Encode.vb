@@ -13,7 +13,7 @@ Public Class Encode_Basics : Inherits VB_Parent
 
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
         Dim buf() = src.ImEncode(".jpg", encodeParams)
-        Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
+        Dim image = cv.Mat.FromPixelData(buf.Count, 1, cv.MatType.CV_8U, buf)
         dst3 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
 
         Dim output As New cv.Mat
@@ -41,7 +41,7 @@ Public Class Encode_Scaling : Inherits VB_Parent
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
 
         Dim buf() = src.ImEncode(".jpg", encodeParams)
-        Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
+        Dim image = cv.Mat.FromPixelData(buf.Count, 1, cv.MatType.CV_8U, buf)
         dst3 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
 
         Dim output As New cv.Mat

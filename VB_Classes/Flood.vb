@@ -295,8 +295,8 @@ End Class
 Public Class Flood_LeftRight : Inherits VB_Parent
     Dim redLeft As New RedCloud_Basics
     Dim redRight As New RedCloud_Basics
-    Public mapLeft As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-    Public mapRight As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+    Public mapLeft As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+    Public mapRight As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
     Public cellsLeft As New List(Of rcData)
     Public cellsRight As New List(Of rcData)
     Public Sub New()

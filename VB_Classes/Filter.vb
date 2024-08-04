@@ -9,7 +9,7 @@ Public Class Filter_Laplacian : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Dim imgLaplacian = src.Filter2D(cv.MatType.CV_32F,
-                                        New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
+                                        cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
         src.ConvertTo(dst1, cv.MatType.CV_32F)
         dst0 = (dst1 - imgLaplacian).ToMat
         dst0.ConvertTo(dst2, src.Type)

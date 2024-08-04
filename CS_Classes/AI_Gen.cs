@@ -388,14 +388,14 @@ namespace CS_Classes
 
             dst2.SetTo(Scalar.White);
 
-            Mat input = new Mat(srcPoints.Count, 1, MatType.CV_32FC2, srcPoints.ToArray());
+            Mat input = cv.Mat.FromPixelData(srcPoints.Count, 1, MatType.CV_32FC2, srcPoints.ToArray());
             Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
             GCHandle srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             GCHandle dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned);
             MinTriangle_Run(srcHandle.AddrOfPinnedObject(), srcPoints.Count, dstHandle.AddrOfPinnedObject());
             srcHandle.Free();
             dstHandle.Free();
-            triangle = new Mat(3, 1, MatType.CV_32FC2, dstData);
+            triangle = cv.Mat.FromPixelData(3, 1, MatType.CV_32FC2, dstData);
 
             for (int i = 0; i <= 2; i++)
             {
@@ -1668,7 +1668,7 @@ namespace CS_Classes
                     histData.Add((float)Math.Round(i * incr));
                 }
 
-                histogram = new Mat(task.histogramBins, 1, MatType.CV_32F, histData.ToArray());
+                histogram = cv.Mat.FromPixelData(task.histogramBins, 1, MatType.CV_32F, histData.ToArray());
             }
             var ranges = new[] { new Rangef(0, task.MaxZmeters) };
             Cv2.CalcBackProject(new[] { task.pcSplit[2] }, new[] { 0 }, histogram, dst1, ranges);
@@ -1777,7 +1777,7 @@ namespace CS_Classes
                 }
             }
 
-            Mat hist = new Mat(counts.Length, 1, MatType.CV_32F, counts);
+            Mat hist = cv.Mat.FromPixelData(counts.Length, 1, MatType.CV_32F, counts);
             plot.backColor = Scalar.Blue;
             plot.Run(hist);
             dst3 = plot.dst2.Clone();
@@ -1786,7 +1786,7 @@ namespace CS_Classes
                 counts[i] = src.Rows * expectedDistribution[i];
             }
 
-            hist = new Mat(counts.Length, 1, MatType.CV_32F, counts);
+            hist = cv.Mat.FromPixelData(counts.Length, 1, MatType.CV_32F, counts);
             plot.backColor = Scalar.Gray;
             plot.Run(hist);
 
@@ -1888,7 +1888,7 @@ namespace CS_Classes
                 sieve.Run(src); // only need to compute this once...
             SetTrueText($"Primes found: {sieve.primes.Count}", 3);
 
-            var tmp = new Mat(sieve.primes.Count, 1, MatType.CV_32S, sieve.primes.ToArray());
+            var tmp = cv.Mat.FromPixelData(sieve.primes.Count, 1, MatType.CV_32S, sieve.primes.ToArray());
             tmp.ConvertTo(tmp, MatType.CV_32F);
             benford.RunAndMeasure(tmp, benford);
             dst2 = benford.dst2;
@@ -2015,7 +2015,7 @@ namespace CS_Classes
             IntPtr imagePtr = BGRPattern_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleSrc.Free();
 
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
 
             classCount = BGRPattern_ClassCount(cPtr);
             denoise.classCount = classCount;
@@ -2065,7 +2065,7 @@ namespace CS_Classes
             IntPtr imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels(), options.learnRate);
             handleSrc.Free();
 
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
             labels[2] = options.methodDesc;
         }
 
@@ -2102,7 +2102,7 @@ namespace CS_Classes
             IntPtr imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels(), learnRate);
             handleSrc.Free();
 
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
         }
 
         public void Close()
@@ -2325,8 +2325,8 @@ namespace CS_Classes
             options.RunVB();
 
             byte[] jpeg = src.ImEncode(".jpg", new int[] { (int)OpenCvSharp.ImwriteFlags.JpegQuality, options.quality });
-            var tmp = new OpenCvSharp.Mat(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
-            dst3 = OpenCvSharp.Cv2.ImDecode(tmp, OpenCvSharp.ImreadModes.Color);
+            Mat tmp = cv.Mat.FromPixelData(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
+            dst3 = cv.Cv2.ImDecode(tmp, OpenCvSharp.ImreadModes.Color);
             benford.Run(tmp);
             dst2 = benford.dst2;
             labels[2] = benford.labels[3];
@@ -2354,7 +2354,7 @@ namespace CS_Classes
             options.RunVB();
 
             byte[] jpeg = src.ImEncode(".jpg", new int[] { (int)OpenCvSharp.ImwriteFlags.JpegQuality, options.quality });
-            var tmp = new OpenCvSharp.Mat(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
+            var tmp = cv.Mat.FromPixelData(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
             dst3 = OpenCvSharp.Cv2.ImDecode(tmp, OpenCvSharp.ImreadModes.Color);
             benford.Run(tmp);
             dst2 = benford.dst2;
@@ -2382,7 +2382,7 @@ namespace CS_Classes
             options.RunVB();
 
             byte[] png = src.ImEncode(".png", new int[] { (int)OpenCvSharp.ImwriteFlags.PngCompression, options.compression });
-            var tmp = new OpenCvSharp.Mat(png.Length, 1, OpenCvSharp.MatType.CV_8U, png);
+            var tmp = cv.Mat.FromPixelData(png.Length, 1, OpenCvSharp.MatType.CV_8U, png);
             dst3 = OpenCvSharp.Cv2.ImDecode(tmp, OpenCvSharp.ImreadModes.Color);
             benford.Run(tmp);
             dst2 = benford.dst2;
@@ -3205,9 +3205,9 @@ namespace CS_Classes
             Mat mask = binary.dst2.Clone();
             if (task.heartBeat)
             {
-                midColor = binary.meanScalar[0];
-                topColor = Cv2.Mean(gray, mask)[0];
-                botColor = Cv2.Mean(gray, ~mask)[0];
+                midColor = cv.Scalar.All(binary.meanScalar[0]);
+                topColor = cv.Scalar.All(Cv2.Mean(gray, mask)[0]);
+                botColor = cv.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
             }
             mats.mat[0] = gray.InRange(0, botColor[0] / 2);
             mats.mat[1] = gray.InRange(botColor[0] / 2, (botColor[0] + midColor[0]) / 2);
@@ -3256,9 +3256,9 @@ namespace CS_Classes
             Mat mask = binary.dst2.Clone();
             if (task.heartBeat)
             {
-                midColor = binary.meanScalar[0];
-                topColor = Cv2.Mean(gray, mask)[0];
-                botColor = Cv2.Mean(gray, ~mask)[0];
+                midColor = cv.Scalar.All(binary.meanScalar[0]);
+                topColor = cv.Scalar.All(Cv2.Mean(gray, mask)[0]);
+                botColor = cv.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
             }
             int botmin = findMin(5, (int)botColor[0]);
             mats.mat[0] = gray.InRange(0, botmin);
@@ -3937,7 +3937,7 @@ namespace CS_Classes
             dst2 = new Mat(task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
             for (int i = 0; i < binary.mats.mat.Count(); i++)
             {
-                binary.mats.mat[i] = new Mat(task.WorkingRes, MatType.CV_8UC1, 0);
+                binary.mats.mat[i] = new Mat(task.WorkingRes, MatType.CV_8UC1, cv.Scalar.All(0));
             }
         }
 
@@ -3982,9 +3982,9 @@ namespace CS_Classes
 
             if (task.heartBeat)
             {
-                midColor = binary.meanScalar[0];
-                topColor = Cv2.Mean(gray, mask)[0];
-                botColor = Cv2.Mean(gray, ~mask)[0];
+                midColor = cv.Scalar.All(binary.meanScalar[0]);
+                topColor = cv.Scalar.All(Cv2.Mean(gray, mask)[0]);
+                botColor = cv.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
             }
 
             mats.mat[0] = gray.InRange(new Scalar(0), botColor);
@@ -4013,7 +4013,7 @@ namespace CS_Classes
 
         public Binarize_Basics_CS(VBtask task) : base(task)
         {
-            mask = new Mat(dst2.Size(), MatType.CV_8U, 255);
+            mask = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(255));
             UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.");
             desc = "Binarize an image using Threshold with OTSU.";
         }
@@ -4716,7 +4716,7 @@ namespace CS_Classes
             planes = Cv2.Split(complexI);
             var denom = new Mat();
             Cv2.Pow(Cv2.Abs(planes[0]), 2, denom);
-            denom += nsr;
+            denom += cv.Scalar.All(nsr);
             var output_G = new Mat();
             Cv2.Divide(planes[0], denom, output_G);
             return output_G;
@@ -4892,7 +4892,7 @@ namespace CS_Classes
                     var rect = redCPP.rectList[i - 1];
                     var mask = redCPP.dst2[rect].InRange(i, i);
                     var contour = ContourBuild(mask, ContourApproximationModes.ApproxNone);
-                    DrawContour(dst2[rect], contour, 255, task.lineWidth);
+                    DrawContour(dst2[rect], contour, cv.Scalar.All(255), task.lineWidth);
                     rects.Add(rect);
                     masks.Add(mask);
                     contours.Add(contour);
@@ -4927,7 +4927,7 @@ namespace CS_Classes
             dst2.SetTo(0);
             foreach (var tour in contours.contourlist)
             {
-                DrawContour(dst2, tour.ToList(), 255, 2);
+                DrawContour(dst2, tour.ToList(), cv.Scalar.All(255), 2);
             }
             labels[2] = $"{contours.contourlist.Count} depth tiers were found.";
             labels[3] = cells.labels[2];
@@ -5066,8 +5066,8 @@ namespace CS_Classes
                         dst2.SetTo(0);
                         int c1 = tour.Count;
                         int c2 = bounds.contours[j].Count;
-                        DrawContour(dst2[rect], tour, 127, task.lineWidth);
-                        DrawContour(dst2[r], bounds.contours[j], 255, task.lineWidth);
+                        DrawContour(dst2[rect], tour, cv.Scalar.All(127), task.lineWidth);
+                        DrawContour(dst2[r], bounds.contours[j], cv.Scalar.All(255), task.lineWidth);
                         int count = dst2.CountNonZero();
                         if (count != c1 + c2)
                         {
@@ -5448,7 +5448,7 @@ namespace CS_Classes
 
         public BackProject2D_Filter_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, 0);
+            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             task.gOptions.setHistogramBins(100); // extra bins to help isolate the stragglers.
             desc = "Filter a 2D histogram for the backprojection.";
         }
@@ -6614,9 +6614,9 @@ namespace CS_Classes
                 if (!rc.exactMatch)
                 {
                     rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone); // .ApproxTC89L1
-                    DrawContour(rc.mask, rc.contour, 255, -1);
+                    DrawContour(rc.mask, rc.contour, cv.Scalar.All(255), -1);
                     if (removeContour)
-                        DrawContour(rc.mask, rc.contour, 0, 2); // no overlap with neighbors.
+                        DrawContour(rc.mask, rc.contour, cv.Scalar.All(0), 2); // no overlap with neighbors.
                     rc.maxDStable = rc.maxDist; // assume it has to use the latest.
                     rc.indexLast = task.cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
                     if (rc.indexLast > 0 && rc.indexLast < task.redCells.Count)
@@ -7036,12 +7036,12 @@ namespace CS_Classes
             IntPtr imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
                                                            task.gOptions.getDebugCheckBox() ? 1 : 0);
             task.gOptions.setDebugCheckBox(false);
-            dst1 = Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_32S, imagePtr);
+            dst1 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_32S, imagePtr);
 
             dst1.ConvertTo(dst0, MatType.CV_8U);
             dst2 = ShowPalette(dst0 * 255 / 2);
             imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize);
-            dst3 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr);
+            dst3 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr);
 
             SetTrueText("Click the global DebugCheckBox to get another set of points.", 3);
         }
@@ -7087,7 +7087,7 @@ namespace CS_Classes
             IntPtr imagePtr = OEX_Points_Classifier_RunCPP(cPtr, sampleCount, methodIndex, dst2.Rows, dst2.Cols,
                                                            task.gOptions.getDebugCheckBox() ? 1 : 0);
             task.gOptions.setDebugCheckBox(false);
-            dst1 = Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr);
+            dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr);
             dst1.ConvertTo(dst0, MatType.CV_8U);
             dst2 = ShowPalette(dst0 * 255 / 2);
             imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize);
@@ -7915,7 +7915,7 @@ namespace CS_Classes
         {
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             Mat[] split = hsv.Split();
-            split[0] += 90 % 180;
+            split[0] += cv.Scalar.All(90 % 180);
             Cv2.Merge(split, dst3);
             dst2 = dst3.CvtColor(ColorConversionCodes.HSV2BGR);
         }
@@ -8652,7 +8652,7 @@ namespace CS_Classes
             dst2.SetTo(0);
             foreach (var rc in task.redCells)
             {
-                DrawContour(dst2[rc.rect], rc.contour, 255, task.lineWidth);
+                DrawContour(dst2[rc.rect], rc.contour, cv.Scalar.All(255), task.lineWidth);
             }
             edges.Run(src);
             dst1 = edges.dst2;
@@ -8674,7 +8674,7 @@ namespace CS_Classes
             dst3.SetTo(0);
             foreach (var rc in task.redCells)
             {
-                DrawContour(dst3[rc.rect], rc.contour, 255, task.lineWidth);
+                DrawContour(dst3[rc.rect], rc.contour, cv.Scalar.All(255), task.lineWidth);
             }
         }
     }
@@ -8757,7 +8757,7 @@ namespace CS_Classes
             dst2 = src;
             if (allContours.Length == 0) return;
             var contour = new List<cv.Point>(allContours[maxIndex]);
-            DrawContour(dst2, contour, 255, task.lineWidth);
+            DrawContour(dst2, contour, cv.Scalar.All(255), task.lineWidth);
         }
     }
 
@@ -9384,7 +9384,7 @@ namespace CS_Classes
             for (int i = 0; i < sortedContours.Count; i++)
             {
                 var tour = sortedContours.ElementAt(i).Value;
-                DrawContour(dst2, tour, 255, task.lineWidth);
+                DrawContour(dst2, tour, cv.Scalar.All(255), task.lineWidth);
             }
         }
     }
@@ -9441,7 +9441,7 @@ namespace CS_Classes
                 {
                     int index = dst1.Get<int>(tour[0].Y, tour[0].X);
                     contourlist.Add(tour);
-                    DrawContour(dst2, tour.ToList(), index, -1);
+                    DrawContour(dst2, tour.ToList(), cv.Scalar.All(index), -1);
                 }
             }
 
@@ -9599,7 +9599,7 @@ namespace CS_Classes
 
             dst2.SetTo(0);
 
-            using (var pMat = new Mat(hull.Length, 1, MatType.CV_32SC2, hull))
+            using (var pMat = cv.Mat.FromPixelData(hull.Length, 1, MatType.CV_32SC2, hull))
             {
                 Scalar sum = pMat.Sum();
                 DrawContour(dst2, hullList, Scalar.White, -1);
@@ -9922,7 +9922,7 @@ namespace CS_Classes
             IntPtr imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject(), src.Rows, src.Cols, options.blocksize, options.aperture);
             handle.Free();
 
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr).Clone();
 
             dst3 = GetNormalize32f(dst2);
             dst3 = dst3.Threshold(options.threshold, 255, ThresholdTypes.Binary);
@@ -10081,7 +10081,7 @@ namespace CS_Classes
                                                   (short)options.neighborhood, (short)options.aperture, options.harrisParm);
             handleSrc.Free();
 
-            Mat gray32f = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr);
+            Mat gray32f = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr);
             // gray32f = GetNormalize32f(gray32f);
             gray32f.ConvertTo(dst2, MatType.CV_8U);
             addw.src2 = dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
@@ -10135,7 +10135,7 @@ namespace CS_Classes
             int ptCount = Harris_Detector_Count(cPtr);
             if (ptCount > 1)
             {
-                Mat ptMat = Mat.FromPixelData(ptCount, 2, MatType.CV_32S, imagePtr).Clone();
+                Mat ptMat = cv.Mat.FromPixelData(ptCount, 2, MatType.CV_32S, imagePtr).Clone();
                 features.Clear();
                 for (int i = 0; i < ptCount; i++)
                 {
@@ -10331,7 +10331,7 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 random.RunAndMeasure(empty, random);
-                src = new Mat(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
+                src = cv.Mat.FromPixelData(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
                 for (int i = 0; i < random.PointList.Count; i++)
                 {
                     DrawCircle(dst3, random.PointList[i], 3, Scalar.White);
@@ -10385,7 +10385,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             double[] testInput = { 1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9 };
-            Mat samples = new Mat(10, 2, MatType.CV_64F, testInput);
+            Mat samples = cv.Mat.FromPixelData(10, 2, MatType.CV_64F, testInput);
             covar.Run(samples);
             SetTrueText(covar.strOut, new cv.Point(20, 60));
             SetTrueText("Results should be a symmetric array with 2.1 and -2.1", new cv.Point(20, 150));
@@ -10833,7 +10833,7 @@ namespace CS_Classes
                     ptList.Add(new cv.Point(facets[i][j].X, facets[i][j].Y));
                 }
 
-                facet32s.FillConvexPoly(ptList.ToArray(), i, task.lineType);
+                facet32s.FillConvexPoly(ptList.ToArray(), cv.Scalar.All(i), task.lineType);
                 facetList.Add(ptList);
             }
             facet32s.ConvertTo(dst3, MatType.CV_8U);
@@ -10927,7 +10927,7 @@ namespace CS_Classes
 
             foreach (var p in points)
             {
-                DrawCircle(dst2, p, task.DotSize + 1, 255, -1);
+                DrawCircle(dst2, p, task.DotSize + 1, cv.Scalar.All(255), -1);
             }
             dst3 = dst2.Clone();
 
@@ -11010,7 +11010,7 @@ namespace CS_Classes
                         g++;
                     }
                 }
-                dst3.FillConvexPoly(nextFacet.ToArray(), g, task.lineType);
+                dst3.FillConvexPoly(nextFacet.ToArray(), cv.Scalar.All(g), task.lineType);
                 usedG.Add(g);
                 SetTrueText(g.ToString(), new cv.Point((int)pt.X, (int)pt.Y), 2);
             }
@@ -11031,7 +11031,7 @@ namespace CS_Classes
 
         public Delaunay_Generations_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst0.Size(), MatType.CV_32S, 0);
+            dst0 = new Mat(dst0.Size(), MatType.CV_32S, cv.Scalar.All(0));
             labels = new string[] { "", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region", "Generation counts in CV_32SC1 format" };
             FindSlider("Random Pixel Count").Value = 10;
             desc = "Create a region in an image for each cv.Point provided";
@@ -11077,7 +11077,7 @@ namespace CS_Classes
                         g++;
                     }
                 }
-                dst0.FillConvexPoly(nextFacet.ToArray(), g, task.lineType);
+                dst0.FillConvexPoly(nextFacet.ToArray(), cv.Scalar.All(g), task.lineType);
                 usedG.Add(g);
                 SetTrueText(g.ToString(), new cv.Point(mp.p2.X, mp.p2.Y), 2);
             }
@@ -11099,7 +11099,7 @@ namespace CS_Classes
         public Delaunay_ConsistentColor_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
-            facet32s = new Mat(dst2.Size(), MatType.CV_32SC1, 0);
+            facet32s = new Mat(dst2.Size(), MatType.CV_32SC1, cv.Scalar.All(0));
             UpdateAdvice(traceName + ": use local options to control the number of points");
             labels[1] = "Input points to subdiv";
             labels[3] = "Inconsistent colors in dst2 are duplicate randomCellColor output.";
@@ -11141,7 +11141,7 @@ namespace CS_Classes
                 usedColors.Add(nextColor);
 
                 dst2.FillConvexPoly(nextFacet.ToArray(), vecToScalar(nextColor));
-                facet32s.FillConvexPoly(nextFacet.ToArray(), i, task.lineType);
+                facet32s.FillConvexPoly(nextFacet.ToArray(), cv.Scalar.All(i), task.lineType);
                 facetList.Add(nextFacet);
             }
             dst3 = dst2.Clone();
@@ -11195,7 +11195,7 @@ namespace CS_Classes
                     ptList.Add(new cv.Point(facets[i][j].X, facets[i][j].Y));
                 }
 
-                DrawContour(dst2, ptList, 255, 1);
+                DrawContour(dst2, ptList, cv.Scalar.All(255), 1);
             }
             labels[2] = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present.";
         }
@@ -11220,7 +11220,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             if (src.Channels() != 1)
-                src = src.CvtColor(ColorConversionCodes.BGR2GRAY) - 1;
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY) - cv.Scalar.All(1);
 
             byte[] dataSrc = new byte[src.Total()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
@@ -11230,7 +11230,7 @@ namespace CS_Classes
 
             if (imagePtr != IntPtr.Zero)
             {
-                dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
                 diff.Run(dst2);
                 dst3 = diff.dst2;
             }
@@ -11281,7 +11281,7 @@ namespace CS_Classes
                 GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
                 IntPtr imagePtr = Denoise_Pixels_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
                 handleSrc.Free();
-                dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
             }
             else
             {
@@ -11423,7 +11423,7 @@ namespace CS_Classes
         {
             options.RunVB();
             Cv2.ConvertScaleAbs(task.pcSplit[2] * 1000, dst1, options.alpha, options.beta);
-            dst1 += 1;
+            dst1 += cv.Scalar.All(1);
             dst2 = ShowPalette(dst1);
             dst2.SetTo(0, task.noDepthMask);
             dst3 = task.palette.dst3;
@@ -11494,7 +11494,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Density_2D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.distance);
             handleSrc.Free();
-            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
         }
         public void Close()
         {
@@ -11535,7 +11535,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Density_Count_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.zCount);
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
         }
         public void Close()
         {
@@ -11665,15 +11665,15 @@ namespace CS_Classes
 
         public Depth_MeanStdev_MT_CS(VBtask task) : base(task)
         {
-            dst2 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = Mat.FromPixelData(dst3.Rows, dst3.Cols, MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new cv.Mat(dst2.Rows, dst2.Cols, MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new cv.Mat(dst3.Rows, dst3.Cols, MatType.CV_8U, cv.Scalar.All(0));
             desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable.";
         }
 
         public void RunCS(Mat src)
         {
             if (task.optionsChanged)
-                meanSeries = Mat.FromPixelData(task.gridList.Count, task.frameHistoryCount, MatType.CV_32F, cv.Scalar.All(0));
+                meanSeries = new cv.Mat(task.gridList.Count, task.frameHistoryCount, MatType.CV_32F, cv.Scalar.All(0));
 
             int index = task.frameCount % task.frameHistoryCount;
             float[] meanValues = new float[task.gridList.Count];
@@ -11694,8 +11694,8 @@ namespace CS_Classes
 
             if (task.frameCount >= task.frameHistoryCount)
             {
-                var means = Mat.FromPixelData(task.gridList.Count, 1, MatType.CV_32F, meanValues);
-                var stdevs = Mat.FromPixelData(task.gridList.Count, 1, MatType.CV_32F, stdValues);
+                var means = cv.Mat.FromPixelData(task.gridList.Count, 1, MatType.CV_32F, meanValues);
+                var stdevs = cv.Mat.FromPixelData(task.gridList.Count, 1, MatType.CV_32F, stdValues);
                 var meanmask = means.Threshold(1, task.MaxZmeters, ThresholdTypes.Binary).ConvertScaleAbs();
                 var mm = GetMinMax(means, meanmask);
                 var stdMask = stdevs.Threshold(0.001, task.MaxZmeters, ThresholdTypes.Binary).ConvertScaleAbs();
@@ -11819,7 +11819,7 @@ namespace CS_Classes
             double mult = 255 / task.MaxZmeters;
             Mat depthNorm = (task.pcSplit[2] * mult).ToMat();
             depthNorm.ConvertTo(depthNorm, MatType.CV_8U);
-            Mat ColorMap = Mat.FromPixelData(256, 1, MatType.CV_8UC3, customColorMap.Data);
+            Mat ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, customColorMap.Data);
             Cv2.ApplyColorMap(src, dst2, ColorMap);
         }
     }
@@ -11848,7 +11848,7 @@ namespace CS_Classes
             handleSrc.Free();
 
             if (imagePtr != IntPtr.Zero)
-                dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
+                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
         }
 
         public void Close()
@@ -13177,7 +13177,7 @@ namespace CS_Classes
                     index++;
                 }
             }
-            histogram = new Mat(plot.histArray.Length, 1, MatType.CV_32F, plot.histArray.ToArray());
+            histogram = cv.Mat.FromPixelData(plot.histArray.Length, 1, MatType.CV_32F, plot.histArray.ToArray());
 
             int brickWidth = dst2.Width / task.histogramBins;
             int histIndex = (int)(task.mouseMovePoint.X / brickWidth);
@@ -14816,7 +14816,7 @@ namespace CS_Classes
             cv.Rect fRect = new cv.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height);
             for (int i = 0; i <= src.Height / 2; i++)
             {
-                Cv2.Rectangle(dst2[fRect], new cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), i * zIncr, 1);
+                Cv2.Rectangle(dst2[fRect], new cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1);
             }
             xyzDepth.Run(dst2);
             dst3 = xyzDepth.dst2.Resize(task.WorkingRes);
@@ -15078,7 +15078,7 @@ namespace CS_Classes
                 var handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned);
                 var imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols);
                 handleRGB.Free();
-                dst3 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, ThresholdTypes.Binary);
+                dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, ThresholdTypes.Binary);
             }
         }
         public void Close()
@@ -15129,7 +15129,7 @@ namespace CS_Classes
             var imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega);
             handleSrc.Free();
             if (imagePtr != (IntPtr)0)
-                dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
             dst3 = src | dst2;
         }
         public void Close()
@@ -15348,7 +15348,7 @@ namespace CS_Classes
             for (int i = 0; i < 3; i++)
             {
                 sobel.Run(split[i]);
-                split[i] = 255 - sobel.dst2;
+                split[i] = cv.Scalar.All(255) - sobel.dst2;
             }
             Cv2.Merge(split, dst2);
         }
@@ -15405,7 +15405,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             IntPtr imagePtr = Edge_ColorGap_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distanceSlider.Value & 254, diff);
             handleSrc.Free();
-            if (imagePtr != IntPtr.Zero) dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            if (imagePtr != IntPtr.Zero) dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
             dst3.SetTo(0);
             src.CopyTo(dst3, ~dst2);
         }
@@ -15511,7 +15511,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Edge_DepthGap_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.mmDepthDiff);
             handleSrc.Free();
-            if (imagePtr != IntPtr.Zero) dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+            if (imagePtr != IntPtr.Zero) dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
         }
         public void Close()
         {
@@ -15677,9 +15677,9 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            dst1 = src.Filter2D(MatType.CV_32F, new Mat(3, 3, MatType.CV_32FC1, new float[] { 1, 0, -1, 2, 0, -2, 1, 0, -1 }));
+            dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 0, -1, 2, 0, -2, 1, 0, -1 }));
             dst1.ConvertTo(dst2, src.Type());
-            dst1 = src.Filter2D(MatType.CV_32F, new Mat(3, 3, MatType.CV_32FC1, new float[] { 3, 0, -3, 10, 0, -10, 3, 0, -3 }));
+            dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 3, 0, -3, 10, 0, -10, 3, 0, -3 }));
             dst1.ConvertTo(dst3, src.Type());
         }
     }
@@ -15692,9 +15692,9 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            dst1 = src.Filter2D(MatType.CV_32F, new Mat(3, 3, MatType.CV_32FC1, new float[] { 1, 2, 1, 0, 0, 0, -1, -2, -1 }));
+            dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 2, 1, 0, 0, 0, -1, -2, -1 }));
             dst1.ConvertTo(dst2, src.Type());
-            dst1 = src.Filter2D(MatType.CV_32F, new Mat(3, 3, MatType.CV_32FC1, new float[] { 3, 10, 3, 0, 0, 0, -3, -10, -3 }));
+            dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 3, 10, 3, 0, 0, 0, -3, -10, -3 }));
             dst1.ConvertTo(dst3, src.Type());
         }
     }
@@ -16146,7 +16146,7 @@ namespace CS_Classes
             IntPtr imagePtr = EdgeDraw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth);
             handleSrc.Free();
             if (imagePtr != IntPtr.Zero)
-                dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
             Cv2.Rectangle(dst2, new cv.Rect(0, 0, dst2.Width, dst2.Height), new Scalar(255), task.lineWidth);
         }
         public void Close()
@@ -16178,7 +16178,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr vecPtr = EdgeDraw_Lines_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth);
             handleSrc.Free();
-            Mat ptData = new Mat(EdgeDraw_Lines_Count(cPtr), 2, MatType.CV_32FC2, vecPtr).Clone();
+            Mat ptData = cv.Mat.FromPixelData(EdgeDraw_Lines_Count(cPtr), 2, MatType.CV_32FC2, vecPtr).Clone();
             dst2.SetTo(new Scalar(0));
             if (task.heartBeat)
                 dst3.SetTo(new Scalar(0));
@@ -16220,7 +16220,7 @@ namespace CS_Classes
                        -0.47, -6.39, 4.17, -1.51, 2.67,
                        -7.2, 1.5, -1.51, 5.7, 1.8,
                        -0.65, -6.34, 2.67, 1.8, -7.1 };
-            Mat mat = new Mat(5, 5, MatType.CV_64FC1, a);
+            Mat mat = cv.Mat.FromPixelData(5, 5, MatType.CV_64FC1, a);
             Mat eigenVal = new Mat();
             Mat eigenVec = new Mat();
             Cv2.Eigen(mat, eigenVal, eigenVec);
@@ -16359,7 +16359,7 @@ namespace CS_Classes
             cv.Point p1 = new cv.Point(0, bb);
             cv.Point p2 = new cv.Point(width, m * width + bb);
             Cv2.Line(dst2, p1, p2, Scalar.Red, 20, LineTypes.Link8);
-            Mat pointMat = new Mat(noisyLine.options.randomCount, 1, MatType.CV_32FC2, noisyLine.points.ToArray());
+            Mat pointMat = cv.Mat.FromPixelData(noisyLine.options.randomCount, 1, MatType.CV_32FC2, noisyLine.points.ToArray());
             Scalar mean = Cv2.Mean(pointMat);
             Mat[] split = Cv2.Split(pointMat);
             var mmX = GetMinMax(split[0]);
@@ -16379,7 +16379,7 @@ namespace CS_Classes
             new Point2f(eigenInput[0], eigenInput[1]),
             new Point2f(eigenInput[1], eigenInput[3])
         };
-            Mat D = new Mat(2, 2, MatType.CV_32FC1, vec4f.ToArray());
+            Mat D = cv.Mat.FromPixelData(2, 2, MatType.CV_32FC1, vec4f.ToArray());
             Cv2.Eigen(D, eigenVal, eigenVec);
             theta = (float)Math.Atan2(eigenVec.Get<float>(1, 0), eigenVec.Get<float>(0, 0));
             len = (float)Math.Sqrt(Math.Pow(mmX.maxVal - mmX.minVal, 2) + Math.Pow(mmY.maxVal - mmY.minVal, 2));
@@ -16449,7 +16449,7 @@ namespace CS_Classes
                                        dst2.Rows, dst2.Cols, regionCount, options.predictionStepSize, (int)options.covarianceType);
             handleLabels.Free();
             handleSrc.Free();
-            dst1 = Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr).Clone();
+            dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr).Clone();
             dst1.ConvertTo(dst0, MatType.CV_8U);
             if (options.consistentcolors)
             {
@@ -16705,7 +16705,7 @@ namespace CS_Classes
 
             int[] encodeParams = { (int)options.encodeOption, options.qualityLevel };
             byte[] buf = src.ImEncode(".jpg", encodeParams);
-            Mat image = new Mat(buf.Length, 1, MatType.CV_8U, buf);
+            Mat image = cv.Mat.FromPixelData(buf.Length, 1, MatType.CV_8U, buf);
             dst3 = Cv2.ImDecode(image, ImreadModes.AnyColor);
             Mat output = new Mat();
             Cv2.Absdiff(src, dst3, output);
@@ -16732,7 +16732,7 @@ namespace CS_Classes
 
             int[] encodeParams = { (int)options.encodeOption, options.qualityLevel };
             byte[] buf = src.ImEncode(".jpg", encodeParams);
-            Mat image = new Mat(buf.Length, 1, MatType.CV_8U, buf);
+            Mat image = cv.Mat.FromPixelData(buf.Length, 1, MatType.CV_8U, buf);
             dst3 = Cv2.ImDecode(image, ImreadModes.AnyColor);
             Mat output = new Mat();
             Cv2.Absdiff(src, dst3, output);
@@ -17056,11 +17056,11 @@ namespace CS_Classes
             dst1 = ~erodeMask.dst2;
             dilate.Run(task.pcSplit[0]);
             var mm = GetMinMax(dilate.dst2, erodeMask.dst2);
-            dst2 = (dilate.dst2 - mm.minVal) / (mm.maxVal - mm.minVal);
+            dst2 = (dilate.dst2 - cv.Scalar.All(mm.minVal)) / (mm.maxVal - mm.minVal);
             dst2.SetTo(0, dst1);
             erode.Run(task.pcSplit[1]);
             mm = GetMinMax(dilate.dst2, erodeMask.dst2);
-            dst3 = (erode.dst2 - mm.minVal) / (mm.maxVal - mm.minVal);
+            dst3 = (erode.dst2 - cv.Scalar.All(mm.minVal)) / (mm.maxVal - mm.minVal);
             dst3.SetTo(0, dst1);
         }
     }
@@ -18044,7 +18044,7 @@ namespace CS_Classes
                     GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
                     IntPtr imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold);
                     handleSrc.Free();
-                    Mat ptMat = Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone();
+                    Mat ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone();
                     features.Clear();
                     if (standaloneTest())
                         dst2 = src;
@@ -18184,7 +18184,7 @@ namespace CS_Classes
             Mat angle = new Mat();
             Cv2.CartToPolar(flowVec[0], flowVec[1], magnitude, angle);
             angle.ConvertTo(hsv0, MatType.CV_8UC1, 180 / Math.PI / 2);
-            Cv2.Normalize(magnitude, hsv2, 0, 255, NormTypes.MinMax, MatType.CV_8UC1);
+            Cv2.Normalize(magnitude, hsv2, 0, 255, NormTypes.MinMax, (int)MatType.CV_8UC1);
 
             Mat[] hsvVec = { hsv0, hsv1, hsv2 };
             Cv2.Merge(hsvVec, hsv);
@@ -18226,7 +18226,7 @@ namespace CS_Classes
             Mat lastGray = src.Clone();
             feat.Run(src);
             features = task.features.ToList();
-            Mat features1 = new Mat(features.Count, 1, MatType.CV_32FC2, features.ToArray());
+            Mat features1 = cv.Mat.FromPixelData(features.Count, 1, MatType.CV_32FC2, features.ToArray());
             Mat features2 = new Mat();
             Mat status = new Mat();
             Mat err = new Mat();
@@ -18951,7 +18951,7 @@ namespace CS_Classes
                     if (mask.Get<byte>(y, x) == 255)
                     {
                         cv.Point pt = new cv.Point(x, y);
-                        int floodCount = mask.FloodFill(pt, regionCount);
+                        int floodCount = mask.FloodFill(pt, cv.Scalar.All(regionCount));
                         objectSize.Add(floodCount);
                         regionCount++;
                     }
@@ -19299,7 +19299,7 @@ namespace CS_Classes
             {
                 gMat.Run(empty);
                 task.gMatrix = gMat.gMatrix;
-                Mat matLines3D = new Mat(raw3D.Count, 3, MatType.CV_32F, raw3D.ToArray()) * task.gMatrix;
+                Mat matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, MatType.CV_32F, raw3D.ToArray()) * task.gMatrix;
             }
         }
     }
@@ -19505,7 +19505,7 @@ namespace CS_Classes
             }
             else
             {
-                Mat matLines3D = new Mat(raw3D.Count, 3, MatType.CV_32F, raw3D.ToArray()) * task.gMatrix;
+                Mat matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, MatType.CV_32F, raw3D.ToArray()) * task.gMatrix;
                 for (int i = 0; i < raw2D.Count - 1; i += 2)
                 {
                     Point3f pt1 = matLines3D.Get<cv.Point3f>(i, 0);
@@ -20150,7 +20150,7 @@ namespace CS_Classes
             var hlist = hist.ToList();
             float peak = hlist.Max();
             int peakIndex = hlist.IndexOf(peak);
-            Mat histMat = new Mat(hist.Length, 1, MatType.CV_32F, hist);
+            Mat histMat = cv.Mat.FromPixelData(hist.Length, 1, MatType.CV_32F, hist);
             plot.maxValue = fGrid.stable.basics.ptList.Count;
             plot.Run(histMat);
             dst2 = plot.dst2;
@@ -20187,7 +20187,7 @@ namespace CS_Classes
             var hlist = fPlot.hist.ToList();
             float peak = hlist.Max();
             int peakIndex = hlist.IndexOf(peak);
-            Mat histMat = new Mat(fPlot.hist.Length, 1, MatType.CV_32F, fPlot.hist);
+            Mat histMat = cv.Mat.FromPixelData(fPlot.hist.Length, 1, MatType.CV_32F, fPlot.hist);
             plot.maxValue = fPlot.fGrid.stable.basics.ptList.Count;
             plot.Run(histMat);
             addw.src2 = plot.dst2;
@@ -20255,7 +20255,7 @@ namespace CS_Classes
         {
             resyncSlider = FindSlider("Resync if feature moves > X pixels");
 
-            dst0 = new Mat(dst0.Rows, dst0.Cols, MatType.CV_8U, 1);
+            dst0 = new Mat(dst0.Rows, dst0.Cols, MatType.CV_8U, cv.Scalar.All(1));
             dst0.SetTo(new cv.Scalar(255));
             if (standaloneTest()) task.gOptions.setDisplay1();
             desc = "Track the feature grid points back to the last sync point";
@@ -20296,7 +20296,7 @@ namespace CS_Classes
                 {
                     usedGood.Add(startPoint);
                     facet = facets[startPoint];
-                    dst0.FillConvexPoly(facet.ToArray(), startPoint, cv.LineTypes.Link4);
+                    dst0.FillConvexPoly(facet.ToArray(), cv.Scalar.All(startPoint), cv.LineTypes.Link4);
                     if (standaloneTest()) dst1.FillConvexPoly(facet.ToArray(), task.scalarColors[startPoint], task.lineType);
                     mpList.Add(new PointPair(startPoints[startPoint], pt));
                 }
@@ -20678,7 +20678,7 @@ namespace CS_Classes
                     if (r2.Y < 0 || r2.Y >= dst2.Height) return; // wedged...
                     if (offset.X > 0) r2.X = 0;
                     if (offset.Y > 0) r2.Y = 0;
-                    Mat mask2 = new Mat(dst2.Size(), MatType.CV_8U, 255);
+                    Mat mask2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(255));
                     rotate.Run(mask2);
                     mask2 = rotate.dst2;
                     Mat mask = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -21032,7 +21032,7 @@ namespace CS_Classes
                 List<cv.Point> facet = stable.basics.facetGen.facet.facetList[i];
                 Point2f pt = stable.basics.ptList[i];
                 double d = anchor.DistanceTo(pt);
-                dst0.FillConvexPoly(facet, d, task.lineType);
+                dst0.FillConvexPoly(facet, cv.Scalar.All(d), task.lineType);
                 float lastd = lastDistance.Get<float>((int)pt.Y, (int)pt.X);
                 double absDiff = Math.Abs(lastd - d);
                 if (absDiff < optionsCore.resyncThreshold)
@@ -21671,7 +21671,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             Mat imgLaplacian = src.Filter2D(MatType.CV_32F,
-                new Mat(3, 3, MatType.CV_32FC1, new float[] { 1, 1, 1, 1, -8, 1, 1, 1, 1 }));
+                cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 1, 1, 1, -8, 1, 1, 1, 1 }));
             src.ConvertTo(dst1, MatType.CV_32F);
             dst0 = (dst1 - imgLaplacian).ToMat();
             dst0.ConvertTo(dst2, src.Type());
@@ -21899,7 +21899,7 @@ namespace CS_Classes
             {
                 DrawCircle(dst2, pt, task.DotSize, Scalar.White, -1);
             }
-            Mat input = new Mat(inputPoints.Count, 1, MatType.CV_32FC2, inputPoints.ToArray());
+            Mat input = cv.Mat.FromPixelData(inputPoints.Count, 1, MatType.CV_32FC2, inputPoints.ToArray());
             float[] dataSrc = new float[inputPoints.Count * 2];
             Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
             GCHandle srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
@@ -21937,7 +21937,7 @@ namespace CS_Classes
             {
                 DrawCircle(dst2, pt, task.DotSize, Scalar.White, -1);
             }
-            Mat input = new Mat(options.srcPoints.Count, 1, MatType.CV_32FC2, options.srcPoints.ToArray());
+            Mat input = cv.Mat.FromPixelData(options.srcPoints.Count, 1, MatType.CV_32FC2, options.srcPoints.ToArray());
             Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
             GCHandle srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             IntPtr boxPtr = FitEllipse_Direct(srcHandle.AddrOfPinnedObject(), options.srcPoints.Count);
@@ -22176,7 +22176,7 @@ namespace CS_Classes
             options.RunVB();
             if (options.reuseData == false || task.frameCount < 2 || task.mouseClickFlag)
                 random.Run(empty); // fill result1 with random points in x and y range of the image.
-            var features = new Mat(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
+            var features = cv.Mat.FromPixelData(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
             int matchCount = Math.Min(options.matchCount, random.PointList.Count - 1);
             dst2.SetTo(Scalar.White);
             for (int i = 0; i < features.Rows; i++)
@@ -22192,7 +22192,7 @@ namespace CS_Classes
                     qArray[i] = new Point2f(new Random().Next(0, src.Width), new Random().Next(0, src.Height));
                 }
             }
-            var queries = new Mat(options.queryCount, 2, MatType.CV_32F, qArray);
+            var queries = cv.Mat.FromPixelData(options.queryCount, 2, MatType.CV_32F, qArray);
             using (var nnIndex = new cv.Flann.Index(features, new cv.Flann.KDTreeIndexParams(matchCount)))
             {
                 int[] indices;
@@ -23128,7 +23128,7 @@ namespace CS_Classes
         public double dimension(Mat Input)
         {
             Mat tmp64f = new Mat();
-            Input.ConvertTo(tmp64f, MatType.CV_64F, 0, cv.Scalar.All(0));
+            Input.ConvertTo(tmp64f, MatType.CV_64F, 0, 0);
             int G = 256;
             double d = 0;
             for (int j = 2; j < Input.Width / 2 - 1; j++)
@@ -23341,7 +23341,7 @@ namespace CS_Classes
             var handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             var imagePtr = Fuzzy_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst0.Rows, dst0.Cols);
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_8UC1, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_8UC1, imagePtr).Clone();
             dst3 = dst2.Threshold(0, 255, ThresholdTypes.BinaryInv);
             Mat tmp = new Mat();
             if (options.retrievalMode == RetrievalModes.CComp || options.retrievalMode == RetrievalModes.FloodFill)
@@ -23400,7 +23400,7 @@ namespace CS_Classes
         public Fuzzy_Filter_CS(VBtask task) : base(task)
         {
             float[] array = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-            kernel = new Mat(3, 3, MatType.CV_32F, array);
+            kernel = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, array);
             kernel *= 1 / 9.0;
             desc = "Use a 2D filter to find smooth areas";
         }
@@ -23546,9 +23546,9 @@ namespace CS_Classes
             foreach (var vec in fuzzy.sortContours.Values)
             {
                 var contours = fuzzy.contours[vec[0]];
-                var points = new Mat(contours.Length, 1, MatType.CV_32SC2, contours);
+                var points = cv.Mat.FromPixelData(contours.Length, 1, MatType.CV_32SC2, contours);
                 var center = points.Sum();
-                points = new Mat(contours.Length, 2, MatType.CV_32S, contours);
+                points = cv.Mat.FromPixelData(contours.Length, 2, MatType.CV_32S, contours);
                 points.Col(0).MinMaxIdx(out minX, out maxX);
                 points.Col(1).MinMaxIdx(out minY, out maxY);
                 var rect = new cv.Rect((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
@@ -23640,7 +23640,7 @@ namespace CS_Classes
             fore.Run(src);
             dst2 = fore.dst2;
             dst3 = fore.dst3;
-            dst0 = new Mat(dst0.Size(), MatType.CV_8U, (double)GrabCutClasses.PR_BGD);
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, cv.Scalar.All((double)GrabCutClasses.PR_BGD));
             dst0.SetTo((double)GrabCutClasses.FGD, fore.fg);
             dst0.SetTo((double)GrabCutClasses.BGD, fore.bg);
             // Cv2.GrabCut(src, dst0, new cv.Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
@@ -23679,7 +23679,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             dst2 = image;
-            dst0 = new Mat(image.Size(), MatType.CV_8U, (double)GrabCutClasses.PR_BGD);
+            dst0 = new Mat(image.Size(), MatType.CV_8U, cv.Scalar.All((double)GrabCutClasses.PR_BGD));
             dst0[bgRect1].SetTo((double)GrabCutClasses.BGD);
             dst0[bgRect2].SetTo((double)GrabCutClasses.BGD);
             dst0[fgRect1].SetTo((double)GrabCutClasses.FGD);
@@ -23694,7 +23694,7 @@ namespace CS_Classes
             var rect = new cv.Rect();
             Cv2.GrabCut(dst2, dst0, rect, bgModel, fgModel, 1, GrabCutModes.Eval);
             dst3.SetTo(0);
-            dst2.CopyTo(dst3, dst0 + 1);
+            dst2.CopyTo(dst3, dst0 + cv.Scalar.All(1));
         }
     }
 
@@ -23717,7 +23717,7 @@ namespace CS_Classes
             {
                 dst2 = image;
                 dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, ThresholdTypes.Binary);
-                dst1 = new Mat(dst2.Size(), MatType.CV_8U, (double)GrabCutClasses.PR_BGD);
+                dst1 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All((double)GrabCutClasses.PR_BGD));
                 dst1.SetTo((double)GrabCutClasses.FGD, dst0);
                 Cv2.GrabCut(dst2, dst1, new cv.Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
             }
@@ -23726,7 +23726,7 @@ namespace CS_Classes
                 Cv2.GrabCut(dst2, dst1, new cv.Rect(), bgModel, fgModel, 5, GrabCutModes.Eval);
             }
             dst3.SetTo(0);
-            dst2.CopyTo(dst3, dst1 + 1);
+            dst2.CopyTo(dst3, dst1 + cv.Scalar.All(1));
         }
     }
 
@@ -24026,7 +24026,7 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 dst2.SetTo(0);
-                DrawLine(dst2, vec.p1, vec.p2, 255, task.lineWidth);
+                DrawLine(dst2, vec.p1, vec.p2, cv.Scalar.All(255), task.lineWidth);
             }
         }
     }
@@ -24137,7 +24137,7 @@ namespace CS_Classes
                 else lastColor = colors[i];
             }
             dst1 = task.rightView;
-            Mat colorMap = new Mat(256, 1, MatType.CV_8UC3, colors);
+            Mat colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colors);
             Cv2.ApplyColorMap(task.leftView, dst3, colorMap);
         }
     }
@@ -24163,7 +24163,7 @@ namespace CS_Classes
             {
                 task.gridSize = task.gOptions.getGridSize();
                 task.gridMask = new Mat(src.Size(), MatType.CV_8U);
-                task.gridMap = new Mat(src.Size(), MatType.CV_32S, 255);
+                task.gridMap = new Mat(src.Size(), MatType.CV_32S, cv.Scalar.All(255));
                 gridList.Clear();
                 task.gridIndex.Clear();
                 task.gridRows = 0;
@@ -24193,18 +24193,18 @@ namespace CS_Classes
                     {
                         var p1 = new cv.Point(x, 0);
                         var p2 = new cv.Point(x, src.Height);
-                        task.gridMask.Line(p1, p2, 255, task.lineWidth);
+                        task.gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
                     }
                     for (int y = task.gridSize; y < src.Height; y += task.gridSize)
                     {
                         var p1 = new cv.Point(0, y);
                         var p2 = new cv.Point(src.Width, y);
-                        task.gridMask.Line(p1, p2, 255, task.lineWidth);
+                        task.gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
                     }
                     for (int i = 0; i < gridList.Count; i++)
                     {
-                        var roi = gridList[i];
-                        task.gridMap.Rectangle(roi, i, -1);
+                        cv.Rect roi = gridList[i];
+                        task.gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
                     }
                     task.gridNeighbors.Clear();
                     int xx = 0, yy = 0;
@@ -24388,18 +24388,18 @@ namespace CS_Classes
                 {
                     var p1 = new cv.Point(x, 0);
                     var p2 = new cv.Point(x, dst2.Height);
-                    task.gridMask.Line(p1, p2, 255, task.lineWidth);
+                    task.gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
                 }
                 for (int y = options.height; y < dst2.Height; y += options.height)
                 {
                     var p1 = new cv.Point(0, y);
                     var p2 = new cv.Point(dst2.Width, y);
-                    task.gridMask.Line(p1, p2, 255, task.lineWidth);
+                    task.gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
                 }
                 for (int i = 0; i < task.gridList.Count; i++)
                 {
                     var roi = task.gridList[i];
-                    task.gridMap.Rectangle(roi, i, -1);
+                    task.gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
                 }
             }
             if (standaloneTest())
@@ -24539,18 +24539,18 @@ namespace CS_Classes
                 {
                     var p1 = new cv.Point(x, 0);
                     var p2 = new cv.Point(x, dst2.Height);
-                    gridMask.Line(p1, p2, 255, task.lineWidth);
+                    gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
                 }
                 for (int y = gridHeight; y < dst2.Height; y += gridHeight)
                 {
                     var p1 = new cv.Point(0, y);
                     var p2 = new cv.Point(dst2.Width, y);
-                    gridMask.Line(p1, p2, 255, task.lineWidth);
+                    gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
                 }
                 for (int i = 0; i < task.gridList.Count; i++)
                 {
                     var roi = gridList[i];
-                    gridMap.Rectangle(roi, i, -1);
+                    gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
                 }
                 gridNeighbors.Clear();
                 foreach (var roi in gridList)
@@ -24753,7 +24753,7 @@ namespace CS_Classes
             {
                 var pt = new cv.Point((int)(r.X + r.Width / 2), (int)(r.Y + r.Height / 2));
                 var index = indices[ptList.IndexOf(pt)];
-                map.Rectangle(r, index, -1);
+                map.Rectangle(r, cv.Scalar.All(index), -1);
                 SetTrueText(index.ToString(), pt, dstindex);
             }
         }
@@ -24846,7 +24846,7 @@ namespace CS_Classes
             {
                 var pt = points.At<cv.Point>(i, 0);
                 int maskOnly = (int)FloodFillFlags.MaskOnly;
-                int count = view.FloodFill(mask, pt, 0, out rect, 0, 0, (cv.FloodFillFlags)(4 | maskOnly | (255 << 8)));
+                int count = view.FloodFill(mask, pt, cv.Scalar.All(0), out rect, cv.Scalar.All(0), cv.Scalar.All(0), (cv.FloodFillFlags)(4 | maskOnly | (255 << 8)));
                 if (count > 0) viewList.Add(count, pt);
             }
             mask.SetTo(0);
@@ -24855,7 +24855,7 @@ namespace CS_Classes
             {
                 var pt = viewList.ElementAt(i).Value;
                 int fixedRange = (int)FloodFillFlags.FixedRange;
-                view.FloodFill(mask, pt, 0, out rect, 0, 0, (cv.FloodFillFlags)(4 | fixedRange | ((i + 1) << 8)));
+                view.FloodFill(mask, pt, cv.Scalar.All(0), out rect, cv.Scalar.All(0), cv.Scalar.All(0), (cv.FloodFillFlags)(4 | fixedRange | ((i + 1) << 8)));
                 rectList.Add(new cv.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height));
             }
             mask[floodRect].CopyTo(view);
@@ -25021,7 +25021,7 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 labels[3] = "Note that colors are shifting because this is before any matching.";
-                dst2 += 1;
+                dst2 += cv.Scalar.All(1);
                 dst2.SetTo(0, task.noDepthMask);
                 myPalette.Run(dst2);
                 dst3 = myPalette.dst2;
@@ -25787,7 +25787,7 @@ namespace CS_Classes
                 kalman.kInput[i] = histogram.Get<float>(i, 0);
             }
             kalman.Run(src);
-            histogram = new Mat(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
+            histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
             if (standaloneTest())
             {
                 if (splitIndex == 0)
@@ -26140,7 +26140,7 @@ namespace CS_Classes
             if (saveMaxVal < mm.maxVal) saveMaxVal = (float)mm.maxVal;
             cloudY.Set<float>(mm.minLoc.Y, mm.minLoc.X, -saveMinVal);
             cloudY.Set<float>(mm.maxLoc.Y, mm.maxLoc.X, saveMaxVal);
-            cloudY -= saveMinVal;
+            cloudY -= cv.Scalar.All(saveMinVal);
             cloudY = cloudY.ConvertScaleAbs(255 / (-saveMinVal + saveMaxVal));
             mm = GetMinMax(cloudY);
             cloudY.SetTo(0, task.noDepthMask);
@@ -26326,7 +26326,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Hist_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins);
             handleSrc.Free();
-            Mat histogram = Mat.FromPixelData(task.histogramBins, 1, MatType.CV_32F, imagePtr);
+            Mat histogram = cv.Mat.FromPixelData(task.histogramBins, 1, MatType.CV_32F, imagePtr);
             plot.Run(histogram);
             dst2 = plot.dst2;
             SetTrueText(strOut, 2);
@@ -26523,7 +26523,7 @@ namespace CS_Classes
                 kalman.kInput[i] = hist.histogram.Get<float>(i, 0);
             }
             kalman.Run(src);
-            hist.histogram = new Mat(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
+            hist.histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
             hist.plot.Run(hist.histogram);
             dst2 = hist.dst2;
         }
@@ -26548,7 +26548,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Guess_Depth_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, imagePtr).Clone();
             if (standaloneTest()) dst3 = task.pointCloud;
         }
         public void Close()
@@ -26584,7 +26584,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Guess_ImageEdges_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.MaxDistance);
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, cppData).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, cppData).Clone();
             if (standaloneTest()) dst3 = task.pointCloud;
         }
         public void Close()
@@ -26600,7 +26600,7 @@ namespace CS_Classes
     {
         public int[] histRowsCols;
         public Rangef[] ranges;
-        public Mat histogram = Mat.FromPixelData();
+        public Mat histogram = new cv.Mat();
         public int[] channels = { 0, 2 };
         public Hist2D_Basics_CS(VBtask task) : base(task)
         {
@@ -26790,7 +26790,7 @@ namespace CS_Classes
             hColor.Run(src);
             dst2 = hColor.dst2;
             hCloud.Run(src);
-            hCloud.dst2 += hColor.classCount + 1;
+            hCloud.dst2 += cv.Scalar.All(hColor.classCount + 1);
             hCloud.dst2.SetTo(0, task.noDepthMask);
             if (options.addCloud)
                 dst2 += hCloud.dst2;
@@ -26847,7 +26847,7 @@ namespace CS_Classes
             int minClass = (int)(histArray.Min() - 1);
             if (minClass != 0)
             {
-                src -= minClass;
+                src -= cv.Scalar.All(minClass);
                 for (int i = 0; i < histArray.Length; i++)
                 {
                     histArray[i] -= minClass;
@@ -27148,9 +27148,9 @@ namespace CS_Classes
                 if (histArray[i] > threshold) break;
                 histArray[i] = 0;
             }
-            histogram = new Mat(histArray.Length, 1, MatType.CV_32F, histArray);
+            histogram = cv.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
             simK.Run(histogram);
-            histogram = new Mat(histArray.Length, 1, MatType.CV_32F, simK.histArray);
+            histogram = cv.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, simK.histArray);
             classCount = simK.classCount;
             Cv2.CalcBackProject(new Mat[] { src }, new int[] { 2 }, histogram, dst2, new Rangef[] { task.redOptions.rangesCloud[task.redOptions.rangesCloud.Count() - 1] });
             dst2 = dst2.ConvertScaleAbs();
@@ -27225,7 +27225,7 @@ namespace CS_Classes
             IntPtr dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
                                              rx[0], ry[0], rz[0], rx[1], ry[1], rz[1]);
             handleInput.Free();
-            histogram = new Mat(task.redOptions.histBins3D, 1, MatType.CV_32F, dstPtr);
+            histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, dstPtr);
             ranges = new Rangef[] { new Rangef(rx[0], rx[1]), new Rangef(ry[0], ry[1]), new Rangef(rz[0], rz[1]) };
             float[] samples = new float[histogram.Total()];
             Marshal.Copy(histogram.Data, samples, 0, samples.Length);
@@ -27278,7 +27278,7 @@ namespace CS_Classes
             IntPtr imagePtr = BackProjectCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins, options.threshold3D,
                                              rx[0], ry[0], rz[0], rx[1], ry[1], rz[1]);
             handleInput.Free();
-            dst2 = Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
+            dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
             dst2.SetTo(0, task.noDepthMask);
             dst3.SetTo(0);
             task.pointCloud.CopyTo(dst3, dst2);
@@ -27307,7 +27307,7 @@ namespace CS_Classes
             hcloud.Run(src);
             histArray = new float[hcloud.histogram.Total()];
             Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length);
-            histogram = new Mat(histArray.Length, 1, MatType.CV_32F, histArray);
+            histogram = cv.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
             plot.Run(histogram);
             dst2 = plot.dst2;
             simK.Run(histogram);
@@ -27340,7 +27340,7 @@ namespace CS_Classes
                 Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1, 2 }, inputMask, histogram, 3, new int[] { bins, bins, bins }, task.redOptions.rangesBGR);
                 histArray = new float[histogram.Total()];
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
-                histogram1D = new Mat((int)histogram.Total(), 1, MatType.CV_32F, histogram.Data);
+                histogram1D = cv.Mat.FromPixelData((int)histogram.Total(), 1, MatType.CV_32F, histogram.Data);
                 simK.Run(histogram1D);
                 histogram = simK.dst2;
                 classCount = simK.classCount;
@@ -27574,12 +27574,12 @@ namespace CS_Classes
             int bins = task.redOptions.getHistBinBar3D();
             IntPtr imagePtr = Hist3Dcolor_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins);
             handleInput.Free();
-            histogram = Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, imagePtr);
+            histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, imagePtr);
             if (prepareImage)
             {
                 float[] histArray = new float[histogram.Total()];
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
-                histogram1D = Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
+                histogram1D = cv.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
                 simK.Run(histogram);
                 histogram = simK.dst2;
                 classCount = simK.classCount;
@@ -27896,7 +27896,7 @@ namespace CS_Classes
             histTop.Run(src);
             dst1 = histTop.histogram.InRange(0, 0).ConvertScaleAbs();
             var mm = GetMinMax(histTop.histogram);
-            dst3 = new Mat(dst3.Size(), MatType.CV_32F, mm.maxVal);
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, cv.Scalar.All(mm.maxVal));
             dst3 -= histTop.histogram;
             dst3.SetTo(0, dst1);
             peak.histogram = histTop.histogram;
@@ -28281,7 +28281,7 @@ namespace CS_Classes
                 }
                 histogram = valley.peak.hist.histogram;
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length);
-                histogram += 1; // shift away from 0
+                histogram += cv.Scalar.All(1); // shift away from 0
             }
             if (standaloneTest()) valley.updatePlot(dst2, task.histogramBins);
         }
@@ -28414,7 +28414,7 @@ namespace CS_Classes
                     DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth);
                 }
             }
-            if (src.Type() == MatType.CV_32F) histogram += 1;
+            if (src.Type() == MatType.CV_32F) histogram += cv.Scalar.All(1);
             Cv2.CalcBackProject(new Mat[] { src }, new int[] { 0 }, histogram, dst1, kalman.hist.ranges);
             if (dst1.Type() != MatType.CV_8U)
             {
@@ -28712,7 +28712,7 @@ namespace CS_Classes
             handleSrc.Free();
             if (imagePtr != IntPtr.Zero)
             {
-                dst2 = Mat.FromPixelData(src.Rows, src.Cols, src.Channels() == 3 ? MatType.CV_8UC3 : MatType.CV_8UC1, imagePtr).Clone();
+                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, src.Channels() == 3 ? MatType.CV_8UC3 : MatType.CV_8UC1, imagePtr).Clone();
             }
         }
         public void Close()
@@ -28996,8 +28996,8 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 dst2.SetTo(0);
-                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255, task.lineWidth);
-                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255, task.lineWidth);
+                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.All(255), task.lineWidth);
+                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.All(255), task.lineWidth);
             }
         }
     }
@@ -30019,7 +30019,7 @@ namespace CS_Classes
             float g8 = gArray[2, 0] * 0 + gArray[2, 1] * 1 + gArray[2, 2] * 0;
             float g9 = gArray[2, 0] * -sy + gArray[2, 1] * 0 + gArray[2, 2] * cy;
             float[] tmp = new float[] { g1, g2, g3, g4, g5, g6, g7, g8, g9 };
-            gMatrix = new Mat(3, 3, MatType.CV_32F, tmp);
+            gMatrix = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, tmp);
         }
         public void RunCS(Mat src)
         {
@@ -30076,7 +30076,7 @@ namespace CS_Classes
             dx = kalman.kOutput[0];
             dy = kalman.kOutput[1];
             dz = kalman.kOutput[2];
-            Mat smoothedMat = new Mat(2, 3, MatType.CV_64F, new double[] {
+            Mat smoothedMat = cv.Mat.FromPixelData(2, 3, MatType.CV_64F, new double[] {
             sx * Math.Cos(dz), sx * -Math.Sin(dz), dx,
             sy * Math.Sin(dz), sy * Math.Cos(dz), dy });
             Mat smoothedFrame = src.WarpAffine(smoothedMat, src.Size());
@@ -30426,7 +30426,7 @@ namespace CS_Classes
         {
             if (task.optionsChanged) accList.Clear();
             accList.Add(new cv.Scalar(task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z));
-            var accMat = new Mat(accList.Count(), 1, MatType.CV_64FC4, accList.ToArray());
+            var accMat = cv.Mat.FromPixelData(accList.Count(), 1, MatType.CV_64FC4, accList.ToArray());
             var imuMean = accMat.Mean();
             task.IMU_AverageAcceleration = new Point3f((float)imuMean[0], (float)imuMean[1], (float)imuMean[2]);
             if (accList.Count() >= task.frameHistoryCount) accList.RemoveAt(0);
@@ -30749,7 +30749,7 @@ namespace CS_Classes
             { sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz },
             { 0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz }
             };
-            Mat tmpGMatrix = new Mat(3, 3, MatType.CV_32F, new float[]
+            Mat tmpGMatrix = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, new float[]
             {
             gArray[0, 0] * cy + gArray[0, 1] * 0 + gArray[0, 2] * sy,
             gArray[0, 0] * 0 + gArray[0, 1] * 1 + gArray[0, 2] * 0,
@@ -31329,7 +31329,7 @@ namespace CS_Classes
         {
             labels[2] = "Estimate Yellow < Real Red (if working)";
             Cv2.Randn(kState, new Scalar(0), Scalar.All(0.1));
-            kf.TransitionMatrix = new Mat(2, 2, MatType.CV_32F, new float[] { 1, 1, 0, 1 });
+            kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, MatType.CV_32F, new float[] { 1, 1, 0, 1 });
             Cv2.SetIdentity(kf.MeasurementMatrix);
             Cv2.SetIdentity(kf.ProcessNoiseCov, Scalar.All(0.00001));
             Cv2.SetIdentity(kf.MeasurementNoiseCov, Scalar.All(0.1));
@@ -31454,7 +31454,7 @@ namespace CS_Classes
                 {
                     var r = InitRandomRect(25);
                     float[] array = { r.X, r.Y, r.Width, r.Height };
-                    input = new Mat(4, 1, MatType.CV_32F, array);
+                    input = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, array);
                 }
                 dst2.Rectangle(rect, Scalar.Red, 2);
                 lastRect = rect;
@@ -31561,11 +31561,11 @@ namespace CS_Classes
         public Kalman_Single_CS(VBtask task) : base(task)
         {
             float[] tMatrix = { 1, 1, 0, 1 };
-            kf.TransitionMatrix = new Mat(2, 2, MatType.CV_32F, tMatrix);
-            kf.MeasurementMatrix.SetIdentity(1);
-            kf.ProcessNoiseCov.SetIdentity(0.00001);
-            kf.MeasurementNoiseCov.SetIdentity(0.1);
-            kf.ErrorCovPost.SetIdentity(1);
+            kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, MatType.CV_32F, tMatrix);
+            kf.MeasurementMatrix.SetIdentity(cv.Scalar.All(1));
+            kf.ProcessNoiseCov.SetIdentity(cv.Scalar.All(0.00001));
+            kf.MeasurementNoiseCov.SetIdentity(cv.Scalar.All(0.1));
+            kf.ErrorCovPost.SetIdentity(cv.Scalar.All(1));
             plot.plotCount = 2;
             desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image.";
         }
@@ -31608,11 +31608,11 @@ namespace CS_Classes
         public bool newTMatrix = true;
         public void updateTMatrix()
         {
-            kf.TransitionMatrix = new Mat(2, 2, MatType.CV_32F, transitionMatrix);
-            kf.MeasurementMatrix.SetIdentity(1);
-            kf.ProcessNoiseCov.SetIdentity(0.00001);
-            kf.MeasurementNoiseCov.SetIdentity(0.1);
-            kf.ErrorCovPost.SetIdentity(1);
+            kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, MatType.CV_32F, transitionMatrix);
+            kf.MeasurementMatrix.SetIdentity(cv.Scalar.All(1));
+            kf.ProcessNoiseCov.SetIdentity(cv.Scalar.All(0.00001));
+            kf.MeasurementNoiseCov.SetIdentity(cv.Scalar.All(0.1));
+            kf.ErrorCovPost.SetIdentity(cv.Scalar.All(1));
         }
         public Kalman_Simple_CS()
         {
@@ -31705,7 +31705,7 @@ namespace CS_Classes
                 }
             }
             matrix[task.frameCount % saveAvgCount] = kInput;
-            kAverage = (float)(new Mat(saveAvgCount, 1, MatType.CV_32F, matrix.ToArray())).Mean()[0];
+            kAverage = (float)(cv.Mat.FromPixelData(saveAvgCount, 1, MatType.CV_32F, matrix.ToArray())).Mean()[0];
             if (task.gOptions.GetUseKalman())
             {
                 // The Kalman Filter code comes from:
@@ -31761,14 +31761,14 @@ namespace CS_Classes
                 {
                     options.inputPoints = Cv2.CornerSubPix(src, options.inputPoints, options.subPixWinSize, new cv.Size(-1, -1), term);
                 }
-                outputMat = new Mat(options.inputPoints.Length, 1, MatType.CV_32FC2, options.inputPoints);
-                status = new Mat(outputMat.Rows, outputMat.Cols, MatType.CV_8U, 1);
+                outputMat = cv.Mat.FromPixelData(options.inputPoints.Length, 1, MatType.CV_32FC2, options.inputPoints);
+                status = new Mat(outputMat.Rows, outputMat.Cols, MatType.CV_8U, cv.Scalar.All(1));
             }
             else if (options.inputPoints.Length > 0)
             {
                 Mat err = new Mat();
                 // convert the point2f vector to an inputarray (cv.Mat)
-                Mat inputMat = new Mat(options.inputPoints.Length, 1, MatType.CV_32FC2, options.inputPoints);
+                Mat inputMat = cv.Mat.FromPixelData(options.inputPoints.Length, 1, MatType.CV_32FC2, options.inputPoints);
                 outputMat = inputMat.Clone();
                 Cv2.CalcOpticalFlowPyrLK(lastGray, src, inputMat, outputMat, status, err, options.winSize, 3, term, OpticalFlowFlags.None);
                 int k = 0;
@@ -31983,7 +31983,7 @@ namespace CS_Classes
         {
             IntPtr imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols);
             if (imagePtr != IntPtr.Zero && task.heartBeat)
-                dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -32022,7 +32022,7 @@ namespace CS_Classes
                     input.Add(pt.X);
                     input.Add(pt.Y);
                 }
-                dst0 = new Mat(input.Count(), 1, MatType.CV_32F, input.ToArray());
+                dst0 = cv.Mat.FromPixelData(input.Count(), 1, MatType.CV_32F, input.ToArray());
             }
             km.Run(dst0);
             dst2 = ShowPalette(km.dst2 * 255 / km.classCount);
@@ -32049,7 +32049,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Kmeans_Simple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, (float)mm.minVal, task.gOptions.getMaxDepthBar());
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
             SetTrueText("Use 'Max Depth' in the global options to set the boundary between blue and yellow.", 3);
         }
         public void Close()
@@ -32079,7 +32079,7 @@ namespace CS_Classes
             edges.Run(src);
             src.SetTo(Scalar.White, edges.dst2);
             km.Run(src);
-            dst3 = km.dst2 + 1;
+            dst3 = km.dst2 + cv.Scalar.All(1);
             classCount = km.classCount;
             redC.Run(dst3);
             dst2 = redC.dst2;
@@ -32256,7 +32256,7 @@ namespace CS_Classes
             km.Run(merge);
             labels[2] = "Dimension = " + dimSlider.Value.ToString();
             labels[3] = labels[2];
-            dst2 = km.dst2 + 1;
+            dst2 = km.dst2 + cv.Scalar.All(1);
             dst3 = ShowPalette(dst2 * 255 / km.classCount);
         }
     }
@@ -32281,7 +32281,7 @@ namespace CS_Classes
             kSlider.Value = tiers.classCount;
             int kMeansK = kSlider.Value;
             km.Run(task.pcSplit[2]);
-            dst2 = km.dst2 + 1;
+            dst2 = km.dst2 + cv.Scalar.All(1);
             dst3 = ShowPalette(dst2 * 255 / tiers.classCount);
             dst3.SetTo(0, task.noDepthMask);
         }
@@ -32303,7 +32303,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             km.Run(task.pcSplit[2]);
-            dst2 = km.dst2 + 1;
+            dst2 = km.dst2 + cv.Scalar.All(1);
             dst2.SetTo(0, task.noDepthMask);
             classCount = km.classCount;
             dst3 = ShowPalette(dst2 * 255 / classCount);
@@ -32506,15 +32506,15 @@ namespace CS_Classes
                 random.Run(empty);
                 queries = new List<cv.Point2f>(random.PointList);
             }
-            var queryMat = new Mat(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
+            var queryMat = cv.Mat.FromPixelData(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
             if (queryMat.Rows == 0)
             {
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
             if (trainInput.Count() == 0) trainInput = new List<cv.Point2f>(queries); // first pass, just match the queries.
-            var trainData = new Mat(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
-            var response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            var trainData = cv.Mat.FromPixelData(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
+            var response = cv.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
             var neighborMat = new Mat();
             int dm = desiredMatches < 0 ? trainInput.Count() : desiredMatches;
@@ -32622,15 +32622,15 @@ namespace CS_Classes
                 return;
             }
             int KNNdimension = 3;
-            var queryMat = new Mat(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
+            var queryMat = cv.Mat.FromPixelData(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
             if (queryMat.Rows == 0)
             {
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
             if (trainInput.Count() == 0) trainInput = new List<cv.Point3f>(queries); // first pass, just match the queries.
-            var trainData = new Mat(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
-            var response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            var trainData = cv.Mat.FromPixelData(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
+            var response = cv.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
             var neighbors = new Mat();
             int dm = trainInput.Count();
@@ -32672,15 +32672,15 @@ namespace CS_Classes
                 return;
             }
             int KNNdimension = 4;
-            Mat queryMat = new Mat(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
+            Mat queryMat = cv.Mat.FromPixelData(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
             if (queryMat.Rows == 0)
             {
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
             if (trainInput.Count() == 0) trainInput = new List<Vec4f>(queries); // first pass, just match the queries.
-            Mat trainData = new Mat(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
-            Mat response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            Mat trainData = cv.Mat.FromPixelData(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
+            Mat response = cv.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
             Mat neighbors = new Mat();
             int dm = trainInput.Count();
@@ -32739,9 +32739,9 @@ namespace CS_Classes
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
-            Mat queryMat = new Mat(qRows, options.knnDimension, MatType.CV_32F, queries.ToArray());
-            Mat trainData = new Mat((int)(trainInput.Count() / options.knnDimension), options.knnDimension, MatType.CV_32F, trainInput.ToArray());
-            Mat response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            Mat queryMat = cv.Mat.FromPixelData(qRows, options.knnDimension, MatType.CV_32F, queries.ToArray());
+            Mat trainData = cv.Mat.FromPixelData((int)(trainInput.Count() / options.knnDimension), options.knnDimension, MatType.CV_32F, trainInput.ToArray());
+            Mat response = cv.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
             Mat neighbors = new Mat();
             int dm = trainInput.Count();
@@ -32996,7 +32996,7 @@ namespace CS_Classes
                 if (diffPlus < 0) diffPlus = 0;
                 hist[diffPlus] += 1;
             }
-            plot.Run(new Mat(hist.Length, 1, MatType.CV_32F, hist));
+            plot.Run(cv.Mat.FromPixelData(hist.Length, 1, MatType.CV_32F, hist));
             var histList = hist.ToList();
             float maxVal = histList.Max();
             int maxIndex = histList.IndexOf(maxVal);
@@ -33593,15 +33593,15 @@ namespace CS_Classes
                     rightWeight.Add((float)line.P1.DistanceTo(line.P2));
                 }
             }
-            var mat1 = new Mat(leftWeight.Count(), 1, MatType.CV_32F, leftWeight.ToArray());
-            var mat2 = new Mat(leftSlope.Count(), 1, MatType.CV_32F, leftSlope.ToArray());
-            var mat3 = new Mat(leftIntercept.Count(), 1, MatType.CV_32F, leftIntercept.ToArray());
+            var mat1 = cv.Mat.FromPixelData(leftWeight.Count(), 1, MatType.CV_32F, leftWeight.ToArray());
+            var mat2 = cv.Mat.FromPixelData(leftSlope.Count(), 1, MatType.CV_32F, leftSlope.ToArray());
+            var mat3 = cv.Mat.FromPixelData(leftIntercept.Count(), 1, MatType.CV_32F, leftIntercept.ToArray());
             var weight = leftWeight.Sum();
             leftLaneIntercept = (float)(mat1.Dot(mat3) / weight);
             leftAvgSlope = (float)(mat1.Dot(mat2) / weight);
-            mat1 = new Mat(rightWeight.Count(), 1, MatType.CV_32F, rightWeight.ToArray());
-            mat2 = new Mat(rightSlope.Count(), 1, MatType.CV_32F, rightSlope.ToArray());
-            mat3 = new Mat(rightIntercept.Count(), 1, MatType.CV_32F, rightIntercept.ToArray());
+            mat1 = cv.Mat.FromPixelData(rightWeight.Count(), 1, MatType.CV_32F, rightWeight.ToArray());
+            mat2 = cv.Mat.FromPixelData(rightSlope.Count(), 1, MatType.CV_32F, rightSlope.ToArray());
+            mat3 = cv.Mat.FromPixelData(rightIntercept.Count(), 1, MatType.CV_32F, rightIntercept.ToArray());
             weight = rightWeight.Sum();
             rightLaneIntercept = (float)(mat1.Dot(mat3) / weight);
             rightAvgSlope = (float)(mat1.Dot(mat2) / weight);
@@ -34079,7 +34079,7 @@ namespace CS_Classes
             {
                 lpList.Add(lp);
                 DrawLine(dst2, lp.p1, lp.p2, lineColor);
-                DrawLine(dst3, lp.p1, lp.p2, 255);
+                DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.All(255));
             }
             labels[2] = lpList.Count().ToString() + " lines were detected in the current frame";
         }
@@ -34134,7 +34134,7 @@ namespace CS_Classes
             foreach (var lp in sortByLen.Values)
             {
                 DrawLine(dst2, lp.p1, lp.p2, lineColor);
-                DrawLine(dst3, lp.p1, lp.p2, 255);
+                DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.All(255));
             }
             labels[2] = mpList.Count().ToString() + " lines were detected in the current frame";
         }
@@ -34176,13 +34176,13 @@ namespace CS_Classes
             var mask = new Mat(new cv.Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, cv.Scalar.All(0));
             var pt = new cv.Point(center.X, center.Y - 30);
             cv.Rect r;
-            Cv2.FloodFill(dst3, mask, pt, red, out r, 1, 1, FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
+            Cv2.FloodFill(dst3, mask, pt, red, out r, cv.Scalar.All(1), cv.Scalar.All(1), FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
             pt = new cv.Point(center.X, center.Y + 30);
-            Cv2.FloodFill(dst3, mask, pt, green, out r, 1, 1, FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
+            Cv2.FloodFill(dst3, mask, pt, green, out r, cv.Scalar.All(1), cv.Scalar.All(1), FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
             pt = new cv.Point(center.X - 30, center.Y);
-            Cv2.FloodFill(dst3, mask, pt, blue, out r, 1, 1, FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
+            Cv2.FloodFill(dst3, mask, pt, blue, out r, cv.Scalar.All(1), cv.Scalar.All(1), FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
             pt = new cv.Point(center.X + 30, center.Y);
-            Cv2.FloodFill(dst3, mask, pt, yellow, out r, 1, 1, FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
+            Cv2.FloodFill(dst3, mask, pt, yellow, out r, cv.Scalar.All(1), cv.Scalar.All(1), FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
             var color = dst3.Get<Vec3b>(task.mouseMovePoint.Y, task.mouseMovePoint.X);
             var p1 = task.mouseMovePoint;
             if (p1.X == center.X)
@@ -34369,7 +34369,8 @@ namespace CS_Classes
                 var h = Math.Abs(lp.p1.Y - lp.p2.Y);
                 var r = new cv.Rect((int)minXX, (int)minYY, (int)(w > 0 ? w : 2), (int)(h > 0 ? h : 2));
                 var mask = new Mat(new cv.Size(w, h), MatType.CV_8U, cv.Scalar.All(0));
-                mask.Line(new cv.Point((int)(lp.p1.X - r.X), (int)(lp.p1.Y - r.Y)), new cv.Point((int)(lp.p2.X - r.X), (int)(lp.p2.Y - r.Y)), 255, task.lineWidth, LineTypes.Link4);
+                DrawLine(mask, new cv.Point((int)(lp.p1.X - r.X), (int)(lp.p1.Y - r.Y)), 
+                               new cv.Point((int)(lp.p2.X - r.X), (int)(lp.p2.Y - r.Y)), cv.Scalar.All(255), task.lineWidth);
                 var mean = task.pointCloud[r].Mean(mask);
                 if (mean != new Scalar())
                 {
@@ -34647,7 +34648,7 @@ namespace CS_Classes
             dst1.SetTo(0);
             cv.Point2f p1 = tcells[0].center;
             cv.Point2f p2 = tcells[1].center;
-            DrawLine(dst1, p1, p2, 255);
+            DrawLine(dst1, p1, p2, cv.Scalar.All(255));
             dst3.SetTo(0);
             blur.dst2.Threshold(1, 255, ThresholdTypes.Binary).CopyTo(dst3, dst1);
             distance = (int)p1.DistanceTo(p2);
@@ -34998,7 +34999,7 @@ namespace CS_Classes
             }
             dst2 = src.Clone();
             gMat.Run(empty);
-            var points = new Mat(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
+            var points = cv.Mat.FromPixelData(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
             var gPoints = (points * gMat.gMatrix).ToMat();
             verticals.Clear();
             for (int i = 0; i < gPoints.Rows; i += 2)
@@ -35076,7 +35077,7 @@ namespace CS_Classes
             if (lines3.Count() > 0)
             {
                 gMat.Run(empty);
-                Mat points = new Mat(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
+                Mat points = cv.Mat.FromPixelData(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
                 Mat gPoints = (points * gMat.gMatrix).ToMat();
                 verticals.Clear();
                 for (int i = 0; i < gPoints.Rows; i += 2)
@@ -35287,7 +35288,7 @@ namespace CS_Classes
             {
                 swarm.knn.queries.Add(lp.p1);
                 swarm.knn.queries.Add(lp.p2);
-                DrawLine(dst3, lp.p1, lp.p2, 255);
+                DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.All(255));
             }
             swarm.knn.trainInput = new List<cv.Point2f>(swarm.knn.queries);
             swarm.knn.Run(empty);
@@ -35342,7 +35343,7 @@ namespace CS_Classes
             dst1 = src;
             DrawLine(dst1, p1, p2, task.HighlightColor);
             dst0.SetTo(0);
-            DrawLine(dst0, p1, p2, 255);
+            DrawLine(dst0, p1, p2, cv.Scalar.All(255));
             dst1.SetTo(0);
             task.pcSplit[0].CopyTo(dst1, dst0);
             var points = dst1.FindNonZero();
@@ -35353,7 +35354,7 @@ namespace CS_Classes
                 nextList.Add(task.pointCloud.At<cv.Point3f>(pt.Y, pt.X));
             }
             if (nextList.Count() == 0) return; // line is completely in area with no depth.
-            var pts = new Mat(nextList.Count(), 1, MatType.CV_32FC3, nextList.ToArray());
+            var pts = cv.Mat.FromPixelData(nextList.Count(), 1, MatType.CV_32FC3, nextList.ToArray());
             var zSplit = pts.Split();
             var c1 = findCorrelation(zSplit[0], zSplit[2]);
             var c2 = findCorrelation(zSplit[1], zSplit[2]);
@@ -35443,7 +35444,7 @@ namespace CS_Classes
             pcLines.Clear();
             addLines(pts.hList, pts.xyHList);
             addLines(pts.vList, pts.xyVList);
-            pcLinesMat = new Mat(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
+            pcLinesMat = cv.Mat.FromPixelData(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
             labels[2] = "Point series found = " + (pts.hList.Count() + pts.vList.Count());
         }
     }
@@ -35491,7 +35492,7 @@ namespace CS_Classes
             pcLines.Clear();
             addLines(pts.hList, pts.xyHList);
             addLines(pts.vList, pts.xyVList);
-            pcLinesMat = new Mat(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
+            pcLinesMat = cv.Mat.FromPixelData(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
             labels[2] = "Point series found = " + (pts.hList.Count() + pts.vList.Count());
         }
     }
@@ -35641,7 +35642,7 @@ namespace CS_Classes
             {
                 if (ptCounts[i] >= task.frameHistoryCount)
                 {
-                    DrawLine(dst2, p1List[i], p2List[i], 255);
+                    DrawLine(dst2, p1List[i], p2List[i], cv.Scalar.All(255));
                     lpList.Add(new PointPair(p1List[i], p2List[i]));
                 }
             }
@@ -35829,7 +35830,7 @@ namespace CS_Classes
             dst1 = src;
             DrawLine(dst1, longLine.ptLong.p1, longLine.ptLong.p2, Scalar.Yellow, task.lineWidth + 2);
             dst0.SetTo(0);
-            DrawLine(dst0, longLine.ptLong.p1, longLine.ptLong.p2, 255, 3);
+            DrawLine(dst0, longLine.ptLong.p1, longLine.ptLong.p2, cv.Scalar.All(255), 3);
             dst0.SetTo(0, task.noDepthMask);
             var mm = GetMinMax(task.pcSplit[2], dst0);
             kalman.kInput = new float[] { mm.minLoc.X, mm.minLoc.Y, mm.maxLoc.X, mm.maxLoc.Y };
@@ -35946,7 +35947,7 @@ namespace CS_Classes
             dst3.SetTo(0);
             dst0 = dst0.Normalize(0, 255, NormTypes.MinMax);
             dst0.CopyTo(dst3[new cv.Rect((dst3.Width - dst0.Width) / 2, (dst3.Height - dst0.Height) / 2, dst0.Width, dst0.Height)]);
-            DrawCircle(dst3, mm.maxLoc, task.DotSize, 255);
+            DrawCircle(dst3, mm.maxLoc, task.DotSize, cv.Scalar.All(255));
             template = src[rect].Clone();
         }
     }
@@ -36221,7 +36222,7 @@ namespace CS_Classes
                 {
                     segment[i] = 255;
                 }
-                myLut = new Mat(1, 256, MatType.CV_8U, segment);
+                myLut = cv.Mat.FromPixelData(1, 256, MatType.CV_8U, segment);
             }
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst2 = src.LUT(myLut) * classCount / 255;
@@ -36470,7 +36471,7 @@ namespace CS_Classes
                 lut[i] = new Vec3b((byte)lutI[i].Item0, (byte)lutI[i].Item1, (byte)lutI[i].Item2);
             }
             dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
-            Mat myLut = new Mat(1, 256, MatType.CV_8UC3, lut);
+            Mat myLut = cv.Mat.FromPixelData(1, 256, MatType.CV_8UC3, lut);
             // dst3 = dst2.LUT(myLut); // Not clear why this is failing!
         }
     }
@@ -36554,7 +36555,7 @@ namespace CS_Classes
                 DrawCircle(dst2, pt, task.DotSize, Scalar.Yellow);
             }
             var rows = random.PointList.Count();
-            var pMat = new Mat(rows, 1, MatType.CV_32FC2, random.PointList.ToArray());
+            var pMat = cv.Mat.FromPixelData(rows, 1, MatType.CV_32FC2, random.PointList.ToArray());
             var indexer = pMat.GetGenericIndexer<Vec2f>();
             dst3.SetTo(0);
             var white = new Vec3b(255, 255, 255);
@@ -36590,7 +36591,7 @@ namespace CS_Classes
                     index++;
                 }
             }
-            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, points);
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, points);
         }
     }
 
@@ -36705,7 +36706,7 @@ namespace CS_Classes
         public bool lineSeparators = true; // if they want lines or not...
         public Mat_2to1_CS(VBtask task) : base(task)
         {
-            mat1 = new Mat(new cv.Size(dst2.Rows, dst2.Cols), MatType.CV_8UC3, 0);
+            mat1 = new Mat(new cv.Size(dst2.Rows, dst2.Cols), MatType.CV_8UC3, cv.Scalar.All(0));
             mat2 = mat1.Clone();
             mat = new Mat[] { mat1, mat2 };
             labels[2] = "";
@@ -36809,7 +36810,7 @@ namespace CS_Classes
                 }
                 strOut += "\n";
             }
-            var input = new Mat(3, 3, MatType.CV_32F, matrix);
+            var input = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, matrix);
             Cv2.Invert(input, inverse, options.decompType);
             if (standaloneTest() || validateInverse)
             {
@@ -36876,7 +36877,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, img);
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, img);
             if (task.heartBeat)
             {
                 nextColor = nextColor == new Vec3b(0, 0, 255) ? new Vec3b(0, 255, 0) : new Vec3b(0, 0, 255);
@@ -36899,7 +36900,7 @@ namespace CS_Classes
         public Mat input;
         public Mat_Inverse_4D_CS(VBtask task) : base(task)
         {
-            input = new Mat(4, 4, MatType.CV_64F, defaultInput);
+            input = cv.Mat.FromPixelData(4, 4, MatType.CV_64F, defaultInput);
             desc = "Use OpenCV to invert a matrix";
         }
         string printMatrixResults(Mat src, Mat dst2)
@@ -37372,8 +37373,8 @@ namespace CS_Classes
         List<Mat> frameList = new List<Mat>();
         public Match_TraceRedC_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst0.Size(), MatType.CV_32S, 0);
-            dst1 = new Mat(dst1.Size(), MatType.CV_32S, 0);
+            dst0 = new Mat(dst0.Size(), MatType.CV_32S, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_32S, cv.Scalar.All(0));
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2.";
         }
@@ -37556,7 +37557,7 @@ namespace CS_Classes
                 return;
             }
             dst3 = src.Clone();
-            dst2 = new Mat(dst2.Size(), MatType.CV_32FC1, 0);
+            dst2 = new Mat(dst2.Size(), MatType.CV_32FC1, cv.Scalar.All(0));
             for (int i = 0; i < ptx.Length; i++)
             {
                 rect = ValidateRect(new cv.Rect((int)(ptx[i].X - radius), (int)(ptx[i].Y - radius), rSize, rSize));
@@ -37591,8 +37592,8 @@ namespace CS_Classes
         Options_Match options = new Options_Match();
         public Match_GoodFeatureKNN_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
-            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            dst0 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
             labels[3] = "Shake camera to see tracking of the highlighted features";
             desc = "Track the GoodFeatures with KNN";
         }
@@ -37612,7 +37613,7 @@ namespace CS_Classes
             foreach (var mp in knn.matches)
             {
                 if (mp.p1.DistanceTo(mp.p2) <= options.maxDistance)
-                    DrawLine(dst0, mp.p1, mp.p2, 255, task.lineWidth + 2);
+                    DrawLine(dst0, mp.p1, mp.p2, cv.Scalar.All(255), task.lineWidth + 2);
             }
             frameList.Add(dst0.Clone());
             if (frameList.Count() >= task.frameHistoryCount)
@@ -38309,7 +38310,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             minMax.Run(src);
-            cv.Scalar mean = 0, stdev = 0;
+            cv.Scalar mean = cv.Scalar.All(0), stdev = cv.Scalar.All(0);
             var mask = minMax.dst3; // the mask for stable depth.
             dst3.SetTo(0);
             task.depthRGB.CopyTo(dst3, mask);
@@ -38444,8 +38445,8 @@ namespace CS_Classes
             {
                 dst3.Col(0).CopyTo(dst3.Col(i));
             }
-            dst2 -= task.calibData.ppx;
-            dst3 -= task.calibData.ppy;
+            dst2 -= cv.Scalar.All(task.calibData.ppx);
+            dst3 -= cv.Scalar.All(task.calibData.ppy);
         }
     }
 
@@ -38816,7 +38817,7 @@ namespace CS_Classes
                  (float)(gM[2, 0] * 0 + gM[2, 1] * 1 + gM[2, 2] * 0),
                  (float)(gM[2, 0] * -sy + gM[2, 1] * 0 + gM[2, 2] * cy)}};
 
-            var gMat = new Mat(3, 3, MatType.CV_32F, gM);
+            var gMat = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, gM);
             var gInput = input.Reshape(1, input.Rows * input.Cols);
             var gOutput = (gInput * gMat).ToMat();
             input = gOutput.Reshape(3, input.Rows);
@@ -38959,8 +38960,8 @@ namespace CS_Classes
                 SetTrueText(strOut, 3);
                 return;
             }
-            Mat mLearn = new Mat(mlInput.Count(), 5, MatType.CV_32F, mlInput.ToArray());
-            Mat response = new Mat(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
+            Mat mLearn = cv.Mat.FromPixelData(mlInput.Count(), 5, MatType.CV_32F, mlInput.ToArray());
+            Mat response = cv.Mat.FromPixelData(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
             rtree.Train(mLearn, SampleTypes.RowSample, response);
             var predictList = new List<mlData>();
             var colors = new List<Vec3b>();
@@ -38982,8 +38983,8 @@ namespace CS_Classes
                 colors.Add(c);
                 saveRoi.Add(roi);
             }
-            Mat predMat = new Mat(predictList.Count(), 5, MatType.CV_32F, predictList.ToArray());
-            Mat output = new Mat(predictList.Count(), MatType.CV_32FC1, 0);
+            Mat predMat = cv.Mat.FromPixelData(predictList.Count(), 5, MatType.CV_32F, predictList.ToArray());
+            Mat output = new Mat(predictList.Count(), 1, MatType.CV_32FC1, cv.Scalar.All(0));
             rtree.Predict(predMat, output);
             dst1 = task.pcSplit[2];
             dst3.SetTo(0);
@@ -39036,8 +39037,8 @@ namespace CS_Classes
                         }
                     }
                 }
-                Mat learnInput = new Mat(learnData.Count(), 3, MatType.CV_32F, learnInputList.ToArray());
-                Mat depthResponse = new Mat(learnData.Count(), 1, MatType.CV_32F, responseInputList.ToArray());
+                Mat learnInput = cv.Mat.FromPixelData(learnData.Count(), 3, MatType.CV_32F, learnInputList.ToArray());
+                Mat depthResponse = cv.Mat.FromPixelData(learnData.Count(), 1, MatType.CV_32F, responseInputList.ToArray());
                 // now learn what depths are associated with which colors.
                 var rtree = RTrees.Create();
                 rtree.Train(learnInput, SampleTypes.RowSample, depthResponse);
@@ -39268,11 +39269,11 @@ namespace CS_Classes
                 SetTrueText("No learning data was found or provided.  Exit...", 3);
                 return;
             }
-            Mat mLearn = new Mat(mlInput.Count(), 3, MatType.CV_32F, mlInput.ToArray());
-            Mat response = new Mat(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
+            Mat mLearn = cv.Mat.FromPixelData(mlInput.Count(), 3, MatType.CV_32F, mlInput.ToArray());
+            Mat response = cv.Mat.FromPixelData(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
             rtree.Train(mLearn, SampleTypes.RowSample, response);
-            Mat predMat = new Mat(predictList.Count(), 3, MatType.CV_32F, predictList.ToArray());
-            Mat output = new Mat(predictList.Count(), MatType.CV_32FC1, 0);
+            Mat predMat = cv.Mat.FromPixelData(predictList.Count(), 3, MatType.CV_32F, predictList.ToArray());
+            Mat output = new cv.Mat(predictList.Count(), 1, MatType.CV_32FC1, cv.Scalar.All(0));
             rtree.Predict(predMat, output);
             dst3 = task.pcSplit[2].Clone();
             for (int i = 0; i < predictList.Count(); i++)
@@ -39339,11 +39340,11 @@ namespace CS_Classes
                 SetTrueText("No learning data was found or provided.  Exit...", 3);
                 return;
             }
-            Mat mLearn = new Mat(mlInput.Count(), 3, MatType.CV_32F, mlInput.ToArray());
-            Mat response = new Mat(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
+            Mat mLearn = cv.Mat.FromPixelData(mlInput.Count(), 3, MatType.CV_32F, mlInput.ToArray());
+            Mat response = cv.Mat.FromPixelData(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
             rtree.Train(mLearn, SampleTypes.RowSample, response);
-            Mat predMat = new Mat(predictList.Count(), 3, MatType.CV_32F, predictList.ToArray());
-            Mat output = new Mat(predictList.Count(), MatType.CV_32FC1, 0);
+            Mat predMat = cv.Mat.FromPixelData(predictList.Count(), 3, MatType.CV_32F, predictList.ToArray());
+            Mat output = new Mat(predictList.Count(), 1, MatType.CV_32FC1, cv.Scalar.All(0));
             rtree.Predict(predMat, output);
             dst3 = task.pcSplit[2].Clone();
             for (int i = 0; i < predictList.Count(); i++)
@@ -39371,7 +39372,7 @@ namespace CS_Classes
         {
             if (src.Type() == MatType.CV_8UC3)
             {
-                dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, src.CvtColor(ColorConversionCodes.BGR2BGRA).Data);
+                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, src.CvtColor(ColorConversionCodes.BGR2BGRA).Data);
             }
             else
             {
@@ -39380,18 +39381,18 @@ namespace CS_Classes
             byte[] dataSrc = new byte[dst2.Total() * dst2.ElemSize()];
             Marshal.Copy(dst2.Data, dataSrc, 0, dataSrc.Length);
             GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
-            IntPtr imagePtr = ML_RemoveDups_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols, dst2.Type());
+            IntPtr imagePtr = ML_RemoveDups_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols, (int)dst2.Type());
             handleSrc.Free();
             int compressedCount = ML_RemoveDups_GetCount(cPtr);
             if (src.Type() == MatType.CV_32S)
             {
-                dst3 = Mat.FromPixelData(dst2.Rows, dst2.Cols, dst2.Type(), imagePtr).Clone();
-                Mat tmp = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC4, dst3.Data);
+                dst3 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, dst2.Type(), imagePtr).Clone();
+                Mat tmp = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC4, dst3.Data);
                 dst3 = tmp.CvtColor(ColorConversionCodes.BGRA2BGR);
             }
             else
             {
-                dst3 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+                dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
             }
             labels[3] = "The BGR data in dst2 after removing duplicate BGR entries.  Input count = " + dst2.Total() + " output = " + compressedCount;
         }
@@ -39751,7 +39752,7 @@ namespace CS_Classes
         RedCloud_Basics redC = new RedCloud_Basics();
         public Projection_Cell_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, 0);
+            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             if (standaloneTest()) task.gOptions.setDisplay1();
             task.gOptions.setUnfiltered(true);
             labels = new string[] { "", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell" };
@@ -39844,7 +39845,7 @@ namespace CS_Classes
         Options_Projection options = new Options_Projection();
         public Projection_ObjectIsolate_CS(VBtask task) : base(task)
         {
-            dst1 = new Mat(dst1.Size(), MatType.CV_32FC3, 0);
+            dst1 = new Mat(dst1.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             side.objects.showRectangles = false;
             desc = "Using the top down view, create a histogram for Y-values of the largest object.";
         }
@@ -39879,7 +39880,7 @@ namespace CS_Classes
         {
             task.gOptions.setDebugSlider(0); // pick the biggest object...
             dst0 = new Mat(dst0.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst1 = new Mat(dst1.Size(), MatType.CV_32FC3, 0);
+            dst1 = new Mat(dst1.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             top.objects.showRectangles = false;
             desc = "Using the top down view, create a histogram for Y-values of the largest object.";
         }
@@ -40195,7 +40196,7 @@ namespace CS_Classes
         public Motion_DepthReconstructed_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
-            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             labels[2] = "The yellow rectangle indicates where the motion is and only that portion of the point cloud and depth mask is updated.";
             desc = "Rebuild the point cloud based on the BGR motion history.";
         }
@@ -40359,7 +40360,8 @@ namespace CS_Classes
             {
                 if (motionMat.At<byte>(pt.Y, pt.X) == 0 && matPoints.At<byte>(pt.Y, pt.X) != 0)
                 {
-                    int count = matPoints.FloodFill(motionMat, pt, 255, out rect, 0, 0, flags | (FloodFillFlags)(255 << 8));
+                    int count = matPoints.FloodFill(motionMat, pt, cv.Scalar.All(255), out rect, cv.Scalar.All(0), 
+                                                    cv.Scalar.All(0), flags | (FloodFillFlags)(255 << 8));
                     if (count <= minCount) continue;
                     rectList.Add(new cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1));
                 }
@@ -40546,7 +40548,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             IntPtr imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels(), learnRate);
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Threshold(0, 255, ThresholdTypes.Binary);
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Threshold(0, 255, ThresholdTypes.Binary);
             redMasks.inputMask = ~dst2;
             redMasks.Run(dst2);
             motionRect = new cv.Rect();
@@ -40561,7 +40563,7 @@ namespace CS_Classes
             {
                 motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
             }
-            dst2.Rectangle(motionRect, 255, task.lineWidth, task.lineType);
+            dst2.Rectangle(motionRect, cv.Scalar.All(255), task.lineWidth, task.lineType);
         }
         public void Close()
         {
@@ -40589,7 +40591,7 @@ namespace CS_Classes
                 if (diff.lastDepth32f.Width == 0) diff.lastDepth32f = task.pcSplit[2].Clone();
                 diff.Run(task.pcSplit[2]);
                 dst3 = diff.dst2;
-                dst3.Rectangle(task.motionRect, 255, task.lineWidth);
+                dst3.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
                 diff.lastDepth32f = task.pcSplit[2];
             }
         }
@@ -40627,7 +40629,7 @@ namespace CS_Classes
                 if (diff.lastFrame.Width == 0) diff.lastFrame = dst2.Clone();
                 diff.Run(src);
                 dst3 = diff.dst2;
-                dst3.Rectangle(task.motionRect, 255, task.lineWidth);
+                dst3.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
                 diff.lastFrame = src.Clone();
             }
         }
@@ -40692,7 +40694,7 @@ namespace CS_Classes
             }
             if (standaloneTest())
             {
-                dst2.Rectangle(task.motionRect, 255, task.lineWidth);
+                dst2.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
                 if (task.redCells.Count() > 1)
                 {
                     labels[2] = task.redCells.Count().ToString() + " RedMask cells had motion";
@@ -40729,7 +40731,7 @@ namespace CS_Classes
                 if (diff.lastDepth32f.Width == 0) diff.lastDepth32f = task.pcSplit[2].Clone();
                 diff.Run(task.pcSplit[2]);
                 dst3 = diff.dst2;
-                dst3.Rectangle(task.motionRect, 255, task.lineWidth);
+                dst3.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
                 diff.lastDepth32f = task.pcSplit[2];
             }
         }
@@ -40817,7 +40819,7 @@ namespace CS_Classes
             }
             if (standaloneTest())
             {
-                dst2.Rectangle(task.motionRect, 255, task.lineWidth);
+                dst2.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
                 if (task.redCells.Count() > 1)
                 {
                     labels[2] = task.redCells.Count().ToString() + " RedMask cells had motion";
@@ -40840,12 +40842,12 @@ namespace CS_Classes
             }
             if (task.motionRect.Width < dst2.Width)
             {
-                dst2.Rectangle(task.motionRect, 255, task.lineWidth);
+                dst2.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
                 int pad = dst2.Width / 20;
                 cv.Rect r = task.motionRect;
                 r = new cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2);
                 task.motionRect = ValidateRect(r, ratio);
-                dst2.Rectangle(task.motionRect, 255, task.lineWidth + 1);
+                dst2.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth + 1);
             }
         }
     }
@@ -41045,7 +41047,7 @@ namespace CS_Classes
                 rc.mask = dst0[rc.rect].InRange(val, val);
                 rc.pixels = detect.maskCounts[index];
                 rc.contour = contourBuild(rc.mask, ContourApproximationModes.ApproxNone);
-                DrawContour(rc.mask, rc.contour, 255, -1);
+                DrawContour(rc.mask, rc.contour, cv.Scalar.All(255), -1);
                 rc.floodPoint = floodPoints[index];
                 rc.maxDist = GetMaxDist(ref rc);
                 rc.indexLast = task.cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
@@ -41115,17 +41117,17 @@ namespace CS_Classes
         {
             for (int i = 0; i < n; i++)
             {
-                img.Rectangle(new cv.Rect(p0.X, p0.Y, width[i], width[i]), color[i], 1);
+                img.Rectangle(new cv.Rect(p0.X, p0.Y, width[i], width[i]), cv.Scalar.All(color[i]), 1);
                 p0 += new cv.Point((width[i] - width[i + 1]) / 2, (width[i] - width[i + 1]) / 2);
-                img.FloodFill(p0, color[i]);
+                img.FloodFill(p0, cv.Scalar.All(color[i]));
             }
         }
         void addNestedCircles(Mat img, cv.Point p0, int[] width, int[] color, int n)
         {
             for (int i = 0; i < n; i++)
             {
-                DrawCircle(img, p0, width[i] / 2, color[i]);
-                img.FloodFill(p0, color[i]);
+                DrawCircle(img, p0, width[i] / 2, cv.Scalar.All(color[i]));
+                img.FloodFill(p0, cv.Scalar.All(color[i]));
             }
         }
         public MSER_SyntheticInput_CS(VBtask task) : base(task)
@@ -41474,7 +41476,7 @@ namespace CS_Classes
                 handleSrc.Free();
                 classCount = MSER_Count(cPtr);
                 if (classCount == 0) return;
-                dst3 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).InRange(255, 255);
+                dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).InRange(255, 255);
             }
             labels[3] = classCount.ToString() + " regions identified";
             src.SetTo(Scalar.White, dst3);
@@ -41660,12 +41662,12 @@ namespace CS_Classes
             var handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             var imagePtr = MSER_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels());
             handleSrc.Free();
-            dst0 = new Mat(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+            dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
             classcount = MSER_Count(cPtr);
             if (classcount == 0) return;
-            var ptData = new Mat(classcount, 1, MatType.CV_32SC2, MSER_FloodPoints(cPtr));
-            var maskData = new Mat(classcount, 1, MatType.CV_32S, MSER_MaskCounts(cPtr));
-            var rectData = new Mat(classcount, 1, MatType.CV_32SC4, MSER_Rects(cPtr));
+            var ptData = cv.Mat.FromPixelData(classcount, 1, MatType.CV_32SC2, MSER_FloodPoints(cPtr));
+            var maskData = cv.Mat.FromPixelData(classcount, 1, MatType.CV_32S, MSER_MaskCounts(cPtr));
+            var rectData = cv.Mat.FromPixelData(classcount, 1, MatType.CV_32SC4, MSER_Rects(cPtr));
             var sortedBoxes = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
             var rects = new List<cv.Rect>();
             for (int i = 0; i < classcount; i++)
@@ -41744,13 +41746,13 @@ namespace CS_Classes
         }
         Mat CenteringMatrix(int n)
         {
-            return Mat.Eye(n, n, MatType.CV_64F) - 1.0 / n;
+            return Mat.Eye(n, n, MatType.CV_64F) - cv.Scalar.All(1.0 / n);
         }
         public void RunCS(Mat src)
         {
             int size = 10; // we are working with 10 cities.
-            Mat cityMat = new Mat(size, size, MatType.CV_64FC1, CityDistance);
-            cityMat += Torgerson(cityMat);
+            Mat cityMat = cv.Mat.FromPixelData(size, size, MatType.CV_64FC1, CityDistance);
+            cityMat += cv.Scalar.All(Torgerson(cityMat));
             cityMat = cityMat.Mul(cityMat);
             Mat g = CenteringMatrix(size);
             // calculates the inner product matrix b
@@ -42094,7 +42096,7 @@ namespace CS_Classes
                 // the delta between each regions value is 255 / classcount. no low or high bound needed.
                 int delta = (int)(255 / classCount) - 1;
                 Scalar bounds = new Scalar(delta, delta, delta);
-                count = Cv2.FloodFill(dst2, mask2, task.ClickPoint, 255, out _, bounds, bounds, (cv.FloodFillFlags)flags);
+                count = Cv2.FloodFill(dst2, mask2, task.ClickPoint, cv.Scalar.All(255), out _, bounds, bounds, (cv.FloodFillFlags)flags);
                 if (count != src.Total()) dst1 = mask2[new Range(1, mask2.Rows - 1), new Range(1, mask2.Cols - 1)];
             }
             Rangef[] ranges = new Rangef[] { new Rangef(0, 180), new Rangef(0, 256) };
@@ -42529,7 +42531,7 @@ namespace CS_Classes
         {
             if (task.heartBeat)
             {
-                Mat m = new Mat(3, 2, MatType.CV_32F, new float[] { 1, 2, 3, 4, 5, 6 });
+                Mat m = cv.Mat.FromPixelData(3, 2, MatType.CV_32F, new float[] { 1, 2, 3, 4, 5, 6 });
                 Mat col_sum = new Mat(), row_sum = new Mat();
                 Cv2.Reduce(m, col_sum, 0, ReduceTypes.Sum, MatType.CV_32F);
                 Cv2.Reduce(m, row_sum, (cv.ReduceDimension)1, ReduceTypes.Sum, MatType.CV_32F);
@@ -42576,7 +42578,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            var d = new Mat(2, 2, MatType.CV_8UC3, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            var d = cv.Mat.FromPixelData(2, 2, MatType.CV_8UC3, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
             var channels = d.Split();
             var samples = new byte[d.Total() * d.ElemSize()];
             Marshal.Copy(d.Data, samples, 0, samples.Length);
@@ -42618,7 +42620,7 @@ namespace CS_Classes
         {
             if (task.heartBeat) ind++;
             kernelSize = 3 + 2 * (ind % 5);
-            var kernel = new Mat(kernelSize, kernelSize, MatType.CV_32F, 1.0 / (kernelSize * kernelSize));
+            var kernel = new Mat(kernelSize, kernelSize, MatType.CV_32F, cv.Scalar.All(1.0 / (kernelSize * kernelSize)));
             dst2 = src.Filter2D(ddepth, kernel, anchor, 0, BorderTypes.Default);
             SetTrueText("Kernel size = " + kernelSize.ToString(), 3);
         }
@@ -42647,7 +42649,7 @@ namespace CS_Classes
             var imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
                                                     options.threshold, options.fitType);
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(img.Rows + 4, img.Cols + 4, MatType.CV_8UC3, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(img.Rows + 4, img.Cols + 4, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -43043,7 +43045,7 @@ namespace CS_Classes
             {
                 var mm = GetMinMax(src);
                 if (!clusterPoints.Contains(mm.maxLoc)) clusterPoints.Add(mm.maxLoc);
-                DrawCircle(src, mm.maxLoc, peakDistance, 0);
+                DrawCircle(src, mm.maxLoc, peakDistance, cv.Scalar.All(0));
             }
             if (!standaloneTest()) dst2.SetTo(0);
             for (int i = 0; i < clusterPoints.Count(); i++)
@@ -43217,7 +43219,7 @@ namespace CS_Classes
         {
             task.OpenGLTitle = "OpenGL_Functions";
             UpdateAdvice(traceName + ": 'Show All' to see all the OpenGL options.");
-            pointCloudInput = new Mat(dst2.Size(), MatType.CV_32FC3, 0);
+            pointCloudInput = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             desc = "Create an OpenGL window and update it with images";
         }
         double[] memMapFill()
@@ -43528,7 +43530,7 @@ namespace CS_Classes
                 new Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2),
                 new Point3f(pt1.X, pt2.Y, pt1.Z)
             };
-            task.ogl.dataInput = new Mat(linePairs3D.Count(), 1, MatType.CV_32FC3, linePairs3D.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(linePairs3D.Count(), 1, MatType.CV_32FC3, linePairs3D.ToArray());
             task.ogl.pointCloudInput = task.pointCloud;
             task.ogl.Run(task.color);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43592,7 +43594,7 @@ namespace CS_Classes
             dst2 = tess.dst2;
             dst3 = tess.dst3;
             labels = tess.labels;
-            task.ogl.dataInput = new Mat(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(dst3);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43617,7 +43619,7 @@ namespace CS_Classes
             dst2 = tess.dst2;
             dst3 = tess.dst3;
             labels = tess.labels;
-            task.ogl.dataInput = new Mat(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(dst3);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43642,7 +43644,7 @@ namespace CS_Classes
             dst2 = tess.dst2;
             dst3 = tess.dst3;
             labels = tess.labels;
-            task.ogl.dataInput = new Mat(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(dst3);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43664,7 +43666,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             tess.Run(src);
-            task.ogl.dataInput = new Mat(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
             dst2 = tess.dst3;
             dst3 = tess.hulls.dst3;
             int index = 0;
@@ -43727,7 +43729,7 @@ namespace CS_Classes
             sCloud.Run(src);
             dst2 = sCloud.dst2;
             dst3 = sCloud.dst3;
-            task.ogl.dataInput = new Mat(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             task.ogl.options.PointSizeSlider.Value = task.gridSize;
@@ -43751,7 +43753,7 @@ namespace CS_Classes
         {
             sCloud.Run(src);
             dst2 = sCloud.dst2;
-            task.ogl.dataInput = new Mat(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -43823,7 +43825,7 @@ namespace CS_Classes
             oglData.Add((float)floorColor[1]);
             oglData.Add((float)floorColor[2]);
             oglData.Add(plane.floorYPlane);
-            task.ogl.dataInput = new Mat(4, 1, MatType.CV_32F, oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, oglData.ToArray());
             task.ogl.pointCloudInput = task.pointCloud;
             task.ogl.Run(plane.dst2);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43851,7 +43853,7 @@ namespace CS_Classes
             dst2 = plane.dst2;
             labels[2] = plane.labels[2];
             task.ogl.pointCloudInput = task.pointCloud;
-            task.ogl.dataInput = new Mat(1, 1, MatType.CV_32F, new float[] { plane.planeY });
+            task.ogl.dataInput = cv.Mat.FromPixelData(1, 1, MatType.CV_32F, new float[] { plane.planeY });
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -43874,7 +43876,7 @@ namespace CS_Classes
             flatness.Run(src);
             SetTrueText(flatness.labels[2], 3);
             task.ogl.pointCloudInput = task.pointCloud;
-            task.ogl.dataInput = new Mat(1, 1, MatType.CV_32F, new float[] { task.pcFloor });
+            task.ogl.dataInput = cv.Mat.FromPixelData(1, 1, MatType.CV_32F, new float[] { task.pcFloor });
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = flatness.labels[2];
@@ -43899,7 +43901,7 @@ namespace CS_Classes
             flatness.Run(src);
             SetTrueText(flatness.labels[2], 3);
             task.ogl.pointCloudInput = task.pointCloud;
-            task.ogl.dataInput = new Mat(1, 1, MatType.CV_32F, new float[] { task.pcCeiling });
+            task.ogl.dataInput = cv.Mat.FromPixelData(1, 1, MatType.CV_32F, new float[] { task.pcCeiling });
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = flatness.labels[2];
@@ -43928,7 +43930,7 @@ namespace CS_Classes
             kalman.kInput = new float[] { peak.peakFloor, peak.peakCeiling };
             kalman.Run(empty);
             task.ogl.pointCloudInput = task.pointCloud;
-            task.ogl.dataInput = new Mat(2, 1, MatType.CV_32F, new float[] { kalman.kOutput[0], kalman.kOutput[1] });
+            task.ogl.dataInput = cv.Mat.FromPixelData(2, 1, MatType.CV_32F, new float[] { kalman.kOutput[0], kalman.kOutput[1] });
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -43967,7 +43969,7 @@ namespace CS_Classes
                     oglData.Add(hull[(i + 2) % hull.Count()]);
                 }
             }
-            task.ogl.dataInput = new Mat(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -44075,7 +44077,7 @@ namespace CS_Classes
                 polygonCount++;
             }
             oglData[0] = new Point3f(polygonCount, 0, 0);
-            task.ogl.dataInput = new Mat(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
             task.ogl.Run(dst2);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst2;
             SetTrueText(polygonCount.ToString() + " polygons were sent to OpenGL", 2);
@@ -44148,7 +44150,7 @@ namespace CS_Classes
                 polygonCount++;
             }
             oglData[0] = new Point3f(polygonCount, 0, 0);
-            task.ogl.dataInput = new Mat(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
             task.ogl.Run(new Mat());
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -44171,7 +44173,7 @@ namespace CS_Classes
         {
             pts.Run(src);
             dst2 = pts.dst2;
-            task.ogl.dataInput = new Mat(pts.allPointsH.Count(), 1, MatType.CV_32FC3, pts.allPointsH.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(pts.allPointsH.Count(), 1, MatType.CV_32FC3, pts.allPointsH.ToArray());
             task.ogl.Run(new Mat());
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = "Point cloud points found = " + (pts.actualCount / 2).ToString();
@@ -44265,7 +44267,7 @@ namespace CS_Classes
         {
             pts.Run(src);
             dst2 = pts.dst2;
-            task.ogl.dataInput = new Mat(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
             task.ogl.Run(new Mat());
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = "Point cloud points found = " + (pts.pcPoints.Count() / 2).ToString();
@@ -44288,7 +44290,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             pts.Run(src);
-            task.ogl.dataInput = new Mat(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
             task.ogl.Run(new Mat());
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = "Point cloud points found = " + pts.pcPoints.Count() / 2;
@@ -44331,7 +44333,7 @@ namespace CS_Classes
                 if (rcNew.eq.Item2 > rcNew.eq.Item0 && rcNew.eq.Item2 > rcNew.eq.Item1) pcPoints.Add(blue);
                 pcPoints.Add(new Point3f(rcNew.eq.Item0 * 0.5f, rcNew.eq.Item1 * 0.5f, rcNew.eq.Item2 * 0.5f));
             }
-            task.ogl.dataInput = new Mat(pcPoints.Count(), 1, MatType.CV_32FC3, pcPoints.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(pcPoints.Count(), 1, MatType.CV_32FC3, pcPoints.ToArray());
             task.ogl.Run(new Mat());
         }
     }
@@ -44357,7 +44359,7 @@ namespace CS_Classes
             sides.Run(src);
             dst2 = sides.dst2;
             var rc = task.rc;
-            var contourMat = new Mat(rc.contour.Count(), 1, MatType.CV_32SC2, rc.contour.ToArray());
+            var contourMat = cv.Mat.FromPixelData(rc.contour.Count(), 1, MatType.CV_32SC2, rc.contour.ToArray());
             if (rc.contour.Count() == 0) return;
             var split = contourMat.Split();
             var mm = GetMinMax(split[0]);
@@ -44369,7 +44371,7 @@ namespace CS_Classes
             DrawCircle(dst3, new cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, Scalar.Red);
             if (rc.contour3D.Count() > 0)
             {
-                var vecMat = new Mat(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
+                var vecMat = cv.Mat.FromPixelData(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
                 rotate.Run(empty);
                 Mat output = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix;
                 vecMat = output.Reshape(3, vecMat.Rows);
@@ -44674,7 +44676,7 @@ namespace CS_Classes
             tess.Run(src);
             dst2 = tess.dst2;
             dst3 = tess.dst3;
-            task.ogl.dataInput = new Mat(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(tess.dst2);
             labels = tess.labels;
@@ -44698,7 +44700,7 @@ namespace CS_Classes
             tess.Run(src);
             dst2 = tess.dst2;
             dst3 = tess.dst3;
-            task.ogl.dataInput = new Mat(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(tess.dst2);
             labels = tess.labels;
@@ -44722,7 +44724,7 @@ namespace CS_Classes
             tess.Run(src);
             dst2 = tess.dst2;
             dst3 = tess.dst3;
-            task.ogl.dataInput = new Mat(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
+            task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(src);
             labels = tess.labels;
@@ -44759,7 +44761,7 @@ namespace CS_Classes
         public OpenGL_Density2D_CS(VBtask task) : base(task)
         {
             task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
-            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, 0);
+            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             desc = "Create a mask showing which pixels are close to each other and display the results.";
         }
         public void RunCS(Mat src)
@@ -45014,7 +45016,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             hcloud.Run(src);
-            Mat histogram = new Mat(task.redOptions.histBins3D, 1, MatType.CV_32F, hcloud.histogram.Data);
+            Mat histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, hcloud.histogram.Data);
             task.ogl.dataInput = histogram;
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(new Mat());
@@ -45424,7 +45426,7 @@ namespace CS_Classes
                 gradientColorMap = gradientColorMap.Resize(new cv.Size(255, 1));
                 if (standaloneTest())
                 {
-                    if (dst3.Width < 255) dst3 = new Mat(dst3.Height, 255, MatType.CV_8UC3, 0);
+                    if (dst3.Width < 255) dst3 = new Mat(dst3.Height, 255, MatType.CV_8UC3, cv.Scalar.All(0));
                     var r = new cv.Rect(0, 0, 255, 1);
                     for (int i = 0; i < dst3.Height; i++)
                     {
@@ -45434,7 +45436,7 @@ namespace CS_Classes
                 }
             }
             var depth8u = task.pcSplit[2].ConvertScaleAbs(options.convertScale);
-            var ColorMap = new Mat(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
+            var ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
             Cv2.ApplyColorMap(depth8u, dst2, ColorMap);
             dst2.SetTo(0, task.noDepthMask);
         }
@@ -45469,7 +45471,7 @@ namespace CS_Classes
             }
             var sliderVal = (task.cameraName == "Intel(R) RealSense(TM) Depth Camera 435i") ? 50 : 80;
             var depth8u = task.pcSplit[2].ConvertScaleAbs(sliderVal);
-            var ColorMap = new Mat(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
+            var ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
             Cv2.ApplyColorMap(depth8u, dst2, ColorMap);
         }
     }
@@ -45598,7 +45600,7 @@ namespace CS_Classes
             }
             SetTrueText("Use the 'Color Transitions' slider and radio buttons to change the color ranges.", 3);
             var depth8u = task.pcSplit[2].ConvertScaleAbs(options.transitions);
-            var colorMap = new Mat(256, 1, MatType.CV_8UC3, colorGrad.Data);
+            var colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colorGrad.Data);
             Cv2.ApplyColorMap(depth8u, dst2, colorMap);
             dst2.SetTo(0, task.noDepthMask);
         }
@@ -45613,7 +45615,7 @@ namespace CS_Classes
         public Palette_Random_CS(VBtask task) : base(task)
         {
             UpdateAdvice(traceName + ": There are no options\nJust produces a colorMap filled with random vec3b's.");
-            colorMap = new Mat(256, 1, MatType.CV_8UC3, 0);
+            colorMap = new Mat(256, 1, MatType.CV_8UC3, cv.Scalar.All(0));
             for (int i = 0; i <= 255; i++)
             {
                 colorMap.Set<Vec3b>(i, 0, randomCellColor());
@@ -45636,7 +45638,7 @@ namespace CS_Classes
         public List<Vec3b> colors = new List<Vec3b>();
         public Palette_Variable_CS(VBtask task) : base(task)
         {
-            colorGrad = new Mat(1, 256, MatType.CV_8UC3, 0);
+            colorGrad = new Mat(1, 256, MatType.CV_8UC3, cv.Scalar.All(0));
             for (int i = 0; i <= 255; i++)
             {
                 colorGrad.Set<Vec3b>(0, i, randomCellColor());
@@ -45650,7 +45652,7 @@ namespace CS_Classes
             {
                 colorGrad.Set<Vec3b>(0, i, colors[i]);
             }
-            var colorMap = new Mat(256, 1, MatType.CV_8UC3, colorGrad.Data);
+            var colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colorGrad.Data);
             Cv2.ApplyColorMap(src, dst2, colorMap);
         }
     }
@@ -45690,7 +45692,7 @@ namespace CS_Classes
                 if (standaloneTest()) dst3 = gradientColorMap;
                 gradientColorMap.Set<Vec3b>(0, 0, new Vec3b()); // black is black!
             }
-            var ColorMap = new Mat(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
+            var ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
             Cv2.ApplyColorMap(src, dst2, ColorMap);
         }
     }
@@ -45718,7 +45720,7 @@ namespace CS_Classes
                 var tmp = Cv2.ImRead(mapFile.FullName);
                 tmp.Col(0).SetTo(whitebackground ? Scalar.White : Scalar.Black);
                 tmp = tmp.Row(0);
-                colorMap = new Mat(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
+                colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
             }
             if (src.Type() == MatType.CV_32F)
             {
@@ -45745,7 +45747,7 @@ namespace CS_Classes
                 var str = cMapDir.FullName + "/colorscale_" + task.gOptions.getPalette() + ".jpg";
                 var mapFile = new FileInfo(str);
                 var tmp = Cv2.ImRead(mapFile.FullName);
-                colorMap = new Mat(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
+                colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
             }
             desc = "Apply the provided color map to the input image.";
         }
@@ -45806,7 +45808,7 @@ namespace CS_Classes
                     }
                 }
             }
-            var ColorMap = new Mat(256, 1, MatType.CV_8UC3, colors.Values.ToArray());
+            var ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colors.Values.ToArray());
             Cv2.ApplyColorMap(src, dst2, ColorMap);
         }
     }
@@ -45834,7 +45836,7 @@ namespace CS_Classes
             var nextFile = new FileInfo(task.HomeDir + "Data/ballSequence/color_" + imageFrame.ToString() + ".png");
             dst3 = Cv2.ImRead(nextFile.FullName).Resize(dst2.Size());
             IntPtr imagePtr = ParticleFilterTest_Run(cPtr);
-            dst2 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -45862,7 +45864,7 @@ namespace CS_Classes
             IntPtr imagePtr = PCA_Prep_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleSrc.Free();
             int count = PCA_Prep_GetCount(cPtr);
-            inputData = Mat.FromPixelData(count, 3, MatType.CV_32F, imagePtr).Clone();
+            inputData = cv.Mat.FromPixelData(count, 3, MatType.CV_32F, imagePtr).Clone();
             SetTrueText("Data has been prepared and resides in inputData public");
         }
         public void Close()
@@ -45902,7 +45904,7 @@ namespace CS_Classes
                 paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors);
                 Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
                 Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length);
-                custom.colorMap = new Mat(256, 1, MatType.CV_8UC3, palette);
+                custom.colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palette);
                 custom.Run(img8u);
                 dst2 = custom.dst2;
             }
@@ -45974,7 +45976,7 @@ namespace CS_Classes
             }
             if (inputPoints.Count() > 0)
             {
-                Mat inputMat = new Mat(inputPoints.Count(), 3, MatType.CV_32F, inputPoints.ToArray());
+                Mat inputMat = cv.Mat.FromPixelData(inputPoints.Count(), 3, MatType.CV_32F, inputPoints.ToArray());
                 pca_analysis = new PCA(inputMat, new Mat(), PCA.Flags.DataAsRow);
                 strOut = displayResults();
                 SetTrueText(strOut, 3);
@@ -46640,7 +46642,7 @@ namespace CS_Classes
             Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length);
             custom.Run(img8u);
             dst2 = custom.dst2;
-            Mat tmp = new Mat(256, 1, MatType.CV_8UC3, palette);
+            Mat tmp = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palette);
             int paletteCount = tmp.CvtColor(ColorConversionCodes.BGR2GRAY).CountNonZero();
             if (standaloneTest())
             {
@@ -46680,8 +46682,8 @@ namespace CS_Classes
             IntPtr imagePtr = PCA_NColor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handlePalette.AddrOfPinnedObject(), src.Rows, src.Cols, classCount);
             handlePalette.Free();
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
-            custom.colorMap = Mat.FromPixelData(256, 1, MatType.CV_8UC3, palettize.palette);
+            dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
+            custom.colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palettize.palette);
             custom.Run(dst2);
             dst3 = custom.dst2;
             labels[2] = "The CV_8U image is below.  Values range from 0 to " + classCount.ToString();
@@ -46726,7 +46728,7 @@ namespace CS_Classes
             var paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palettize.palette, palettize.options.desiredNcolors);
             Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length);
-            custom.colorMap = new Mat(256, 1, MatType.CV_8UC3, palettize.palette);
+            custom.colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palettize.palette);
             custom.Run(img8u);
             dst2 = custom.dst2;
         }
@@ -47188,7 +47190,7 @@ namespace CS_Classes
         public List<cv.Point> contours;
         public Plane_OnlyPlanes_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             labels = new string[] { "", "", "RedCloud Cells", "gCloud reworked with planes instead of depth data" };
             desc = "Replace the gCloud with planes in every RedCloud cell";
         }
@@ -47254,11 +47256,11 @@ namespace CS_Classes
             for (int i = 0; i < equations.Count(); i++)
             {
                 Vec4f p1 = equations[i];
-                Mat data1 = new Mat(4, 1, MatType.CV_32F, new float[] { p1.Item0, p1.Item1, p1.Item2, p1.Item3 });
+                Mat data1 = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, new float[] { p1.Item0, p1.Item1, p1.Item2, p1.Item3 });
                 for (int j = i + 1; j < equations.Count(); j++)
                 {
                     Vec4f p2 = equations[j];
-                    Mat data2 = new Mat(4, 1, MatType.CV_32F, new float[] { p2.Item0, p2.Item1, p2.Item2, p2.Item3 });
+                    Mat data2 = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, new float[] { p2.Item0, p2.Item1, p2.Item2, p2.Item3 });
                     Cv2.MatchTemplate(data1, data2, correlationMat, TemplateMatchModes.CCoeffNormed);
                     float correlation = correlationMat.At<float>(0, 0);
                     correlations.Add(correlation);
@@ -47453,7 +47455,7 @@ namespace CS_Classes
             if (yList.Count() == 0) return;
             hist.mm.minVal = yList.Min();
             hist.mm.maxVal = yList.Max();
-            hist.Run(new Mat(yList.Count(), 1, MatType.CV_32F, yList.ToArray()));
+            hist.Run(cv.Mat.FromPixelData(yList.Count(), 1, MatType.CV_32F, yList.ToArray()));
             dst2 = hist.dst2;
             double binWidth = dst2.Width / task.histogramBins;
             double rangePerBin = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins;
@@ -47581,7 +47583,7 @@ namespace CS_Classes
         {
             solo.Run(src);
             dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total());
-            dst1 = new Mat(dst1.Size(), MatType.CV_32FC1, 0);
+            dst1 = new Mat(dst1.Size(), MatType.CV_32FC1, cv.Scalar.All(0));
             solo.heat.dst0.CopyTo(dst1, dst3);
             dst1.ConvertTo(dst1, MatType.CV_32FC1);
             Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, dst1, dst2, task.rangesTop);
@@ -48044,7 +48046,7 @@ namespace CS_Classes
         Mat plotOutput;
         public Plot_OverTimeFixedScale_CS(VBtask task) : base(task)
         {
-            plotOutput = new Mat(new cv.Size(320, 180), MatType.CV_8UC3, 0);
+            plotOutput = new Mat(new cv.Size(320, 180), MatType.CV_8UC3, cv.Scalar.All(0));
             desc = "Plot an input variable over time";
             task.gOptions.setLineWidth(1);
             task.gOptions.SetDotSize(2);
@@ -48181,7 +48183,7 @@ namespace CS_Classes
             handleX.Free();
             handleY.Free();
 
-            dst2 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr);
+            dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr);
             var maxX = srcX.Max();
             var minX = srcX.Min();
             var maxY = srcY.Max();
@@ -48637,8 +48639,8 @@ namespace CS_Classes
             Marshal.Copy(task.pcSplit[2].Data, depthBytes, 0, depthBytes.Length);
             var handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned);
             IntPtr imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject(), 0, task.MaxZmeters, task.pcSplit[2].Height, task.pcSplit[2].Width);
-            dst2 = Mat.FromPixelData(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, imagePtr).CvtColor(ColorConversionCodes.GRAY2BGR);
-            dst3 = Mat.FromPixelData(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(ColorConversionCodes.GRAY2BGR);
+            dst2 = cv.Mat.FromPixelData(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, imagePtr).CvtColor(ColorConversionCodes.GRAY2BGR);
+            dst3 = cv.Mat.FromPixelData(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(ColorConversionCodes.GRAY2BGR);
             handleDepth.Free();
             labels[2] = "Top View (looking down)";
             labels[3] = "Side View";
@@ -48841,7 +48843,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            if (task.optionsChanged) pcPoints = new Mat(task.gridRows, task.gridCols, MatType.CV_32FC3, 0);
+            if (task.optionsChanged) pcPoints = new Mat(task.gridRows, task.gridCols, MatType.CV_32FC3, cv.Scalar.All(0));
             dst2.SetTo(0);
             actualCount = 0;
             float lastMeanZ = 0;
@@ -48958,7 +48960,7 @@ namespace CS_Classes
             Point2f topPt = new Point2f(cLine, 0);
             Point2f botPt = new Point2f(cLine, dst2.Height);
             dst2 = task.depthRGB;
-            DrawLine(dst2, topPt, botPt, 255);
+            DrawLine(dst2, topPt, botPt, cv.Scalar.All(255));
             double stepY = dst2.Height / yLines;
             SetTrueText("\t   X\t  Y\t  Z", 3);
             for (int i = 1; i < yLines - 1; i++)
@@ -48984,7 +48986,7 @@ namespace CS_Classes
         List<Mat> pcHistory = new List<Mat>();
         public PointCloud_Average_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             desc = "Average all 3 elements of the point cloud - not just depth.";
         }
         public void RunCS(Mat src)
@@ -49878,7 +49880,7 @@ namespace CS_Classes
                 SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1);
                 return;
             }
-            var vecMat = new Mat(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
+            var vecMat = cv.Mat.FromPixelData(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
             ySlider.Value += 1;
             rotate.Run(empty);
             Mat output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix);  // <<< this is the XYZ-axis rotation...
@@ -49921,7 +49923,7 @@ namespace CS_Classes
         HeatMap_Basics heat = new HeatMap_Basics();
         public Profile_OpenGL_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, 0);
+            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             if (standaloneTest()) task.gOptions.setGravityUsage(false);
             task.ogl.options.PointSizeSlider.Value = 10;
             task.ogl.oglFunction = (int)oCase.pcPointsAlone;
@@ -49935,7 +49937,7 @@ namespace CS_Classes
             var rc = task.rc;
             if (rc.contour3D.Count() > 0)
             {
-                Mat vecMat = new Mat(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
+                Mat vecMat = cv.Mat.FromPixelData(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
                 rotate.Run(empty);
                 Mat output = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix;  // <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
                 task.ogl.dataInput = output.Reshape(3, vecMat.Rows);
@@ -50527,13 +50529,17 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             dst1.SetTo(0);
-            DrawLine(dst1, task.gravityVec.p1, task.gravityVec.p2, 255, 1);
-            DrawLine(dst1, task.horizonVec.p1, task.horizonVec.p2, 255, 1);
+            DrawLine(dst1, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.All(255), 1);
+            DrawLine(dst1, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.All(255), 1);
             var flags = FloodFillFlags.FixedRange | (FloodFillFlags)(255 << 8);
-            if (dst1.At<byte>(p1.Y, p1.X) == 0) Cv2.FloodFill(dst1, new Mat(), p1, 1 * 255 / 4, out rect, 0, 0, flags);
-            if (dst1.At<byte>(p2.Y, p2.X) == 0) Cv2.FloodFill(dst1, new Mat(), p2, 2 * 255 / 4, out rect, 0, 0, flags);
-            if (dst1.At<byte>(p3.Y, p3.X) == 0) Cv2.FloodFill(dst1, new Mat(), p3, 3 * 255 / 4, out rect, 0, 0, flags);
-            if (dst1.At<byte>(p4.Y, p4.X) == 0) Cv2.FloodFill(dst1, new Mat(), p4, 4 * 255 / 4, out rect, 0, 0, flags);
+            if (dst1.At<byte>(p1.Y, p1.X) == 0) 
+                Cv2.FloodFill(dst1, new Mat(), p1, cv.Scalar.All(1 * 255 / 4), out rect, cv.Scalar.All(0), cv.Scalar.All(0), flags);
+            if (dst1.At<byte>(p2.Y, p2.X) == 0) 
+                Cv2.FloodFill(dst1, new Mat(), p2, cv.Scalar.All(2 * 255 / 4), out rect, cv.Scalar.All(0), cv.Scalar.All(0), flags);
+            if (dst1.At<byte>(p3.Y, p3.X) == 0) 
+                Cv2.FloodFill(dst1, new Mat(), p3, cv.Scalar.All(3 * 255 / 4), out rect, cv.Scalar.All(0), cv.Scalar.All(0), flags);
+            if (dst1.At<byte>(p4.Y, p4.X) == 0) 
+                Cv2.FloodFill(dst1, new Mat(), p4, cv.Scalar.All(4 * 255 / 4), out rect, cv.Scalar.All(0), cv.Scalar.All(0), flags);
             dst2 = ShowPalette(dst1);
         }
     }
@@ -50844,7 +50850,7 @@ namespace CS_Classes
             if (task.heartBeat || task.frameCount < 10)
             {
                 random.Run(empty);
-                lutMat = new Mat(new cv.Size(1, 256), MatType.CV_8UC3, 0);
+                lutMat = new Mat(new cv.Size(1, 256), MatType.CV_8UC3, cv.Scalar.All(0));
                 int lutIndex = 0;
                 km.Run(src);
                 dst2 = km.dst2;
@@ -50994,7 +51000,7 @@ namespace CS_Classes
             byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
             IntPtr imagePtr = Random_PatternGenerator_Run(cPtr, src.Rows, src.Cols);
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
         }
         public void Close()
         {
@@ -51008,13 +51014,13 @@ namespace CS_Classes
     public class Random_CustomDistribution_CS : CS_Parent
     {
         public Mat inputCDF; // place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
-        public Mat outputRandom = new Mat(10000, 1, MatType.CV_32S, 0); // allocate the desired number of random numbers - size can be just one to get the next random value
+        public Mat outputRandom = new Mat(10000, 1, MatType.CV_32S, cv.Scalar.All(0)); // allocate the desired number of random numbers - size can be just one to get the next random value
         public Mat outputHistogram;
         public Plot_Histogram plot = new Plot_Histogram();
         public Random_CustomDistribution_CS(VBtask task) : base(task)
         {
             float[] loadedDice = { 1, 3, 0.5f, 0.5f, 0.75f, 0.25f };
-            inputCDF = new Mat(loadedDice.Length, 1, MatType.CV_32F, loadedDice);
+            inputCDF = cv.Mat.FromPixelData(loadedDice.Length, 1, MatType.CV_32F, loadedDice);
             desc = "Create a custom random number distribution from any histogram";
         }
         public void RunCS(Mat src)
@@ -51055,7 +51061,7 @@ namespace CS_Classes
     {
         public Plot_Histogram plot = new Plot_Histogram();
         Options_MonteCarlo options = new Options_MonteCarlo();
-        public Mat outputRandom = new Mat(new cv.Size(1, 4000), MatType.CV_32S, 0); // allocate the desired number of random numbers - size can be just one to get the next random value
+        public Mat outputRandom = new Mat(new cv.Size(1, 4000), MatType.CV_32S, cv.Scalar.All(0)); // allocate the desired number of random numbers - size can be just one to get the next random value
         public Random_MonteCarlo_CS(VBtask task) : base(task)
         {
             plot.maxValue = 100;
@@ -51098,7 +51104,7 @@ namespace CS_Classes
         public Mat saveHist;
         public Random_CustomHistogram_CS(VBtask task) : base(task)
         {
-            random.outputRandom = new Mat(1000, 1, MatType.CV_32S, 0);
+            random.outputRandom = new Mat(1000, 1, MatType.CV_32S, cv.Scalar.All(0));
             labels[2] = "Histogram of the grayscale image";
             labels[3] = "Custom random distribution that reflects dst2 image";
             desc = "Create a random number distribution that reflects histogram of a grayscale image";
@@ -51693,7 +51699,7 @@ namespace CS_Classes
             IntPtr imagePtr = RecursiveBilateralFilter_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                                             options.RBFCount);
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -51809,7 +51815,7 @@ namespace CS_Classes
                         defectCount++;
                     }
                     DrawContour(dst3[rc.rect], rc.hull, vecToScalar(rc.color), -1);
-                    DrawContour(task.cellMap[rc.rect], rc.hull, rc.index, -1);
+                    DrawContour(task.cellMap[rc.rect], rc.hull, cv.Scalar.All(rc.index), -1);
                 }
                 redCells.Add(rc);
             }
@@ -51983,7 +51989,7 @@ namespace CS_Classes
             }
             kalman.kInput = hist;
             kalman.Run(src);
-            Mat histMat = new Mat(histBins, 1, MatType.CV_32F, kalman.kOutput);
+            Mat histMat = cv.Mat.FromPixelData(histBins, 1, MatType.CV_32F, kalman.kOutput);
             plot.Run(histMat);
             dst3 = plot.dst2;
             float barWidth = dst3.Width / histBins;
@@ -52648,7 +52654,7 @@ namespace CS_Classes
         {
             outline.Run(task.depthMask);
             colorClass.Run(src);
-            dst1 = colorClass.dst2 + 1;
+            dst1 = colorClass.dst2 + cv.Scalar.All(1);
             dst1.SetTo(0, outline.dst2);
             dst3 = ShowPalette(dst1 * 255 / colorClass.classCount);
             redC.Run(dst1);
@@ -53024,7 +53030,7 @@ namespace CS_Classes
             {
                 if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
             }
-            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, 0);
+            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             task.pointCloud.CopyTo(pc, dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
             histTop.Run(pc);
             dst3 = histTop.dst2;
@@ -53065,7 +53071,7 @@ namespace CS_Classes
             {
                 if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
             }
-            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, 0);
+            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             task.pointCloud.CopyTo(pc, dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
             histSide.Run(pc);
             dst3 = histSide.dst2;
@@ -53258,7 +53264,7 @@ namespace CS_Classes
             {
                 var rc = redCells[i];
                 rc.contour = contourBuild(rc.mask, ContourApproximationModes.ApproxNone);
-                DrawContour(rc.mask, rc.contour, 255, -1);
+                DrawContour(rc.mask, rc.contour, cv.Scalar.All(255), -1);
                 redCells[i] = rc;
                 DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
             }
@@ -53389,12 +53395,12 @@ namespace CS_Classes
                 {
                     case 0: // "GuidedBP_Depth"
                         guided.Run(src);
-                        if (colorClass.classCount > 0) guided.dst2 += colorClass.classCount;
+                        if (colorClass.classCount > 0) guided.dst2 += cv.Scalar.All(colorClass.classCount);
                         guided.dst2.CopyTo(dst2, task.depthMask);
                         break;
                     case 1: // "RedCloud_Reduce"
                         prep.Run(task.pointCloud);
-                        if (colorClass.classCount > 0) prep.dst2 += colorClass.classCount;
+                        if (colorClass.classCount > 0) prep.dst2 += cv.Scalar.All(colorClass.classCount);
                         prep.dst2.CopyTo(dst2, task.depthMask);
                         break;
                 }
@@ -53482,7 +53488,7 @@ namespace CS_Classes
                 {
                     rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
                     DrawContour(dst2[rc.rect], rc.hull, vecToScalar(rc.color), -1);
-                    DrawContour(rc.mask, rc.hull, 255, -1);
+                    DrawContour(rc.mask, rc.hull, cv.Scalar.All(255), -1);
                     task.cellMap[rc.rect].SetTo(rc.index, rc.mask);
                 }
                 newCells.Add(rc);
@@ -54013,11 +54019,11 @@ namespace CS_Classes
             imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleMask.Free();
             handleInput.Free();
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
             classCount = RedCloud_Count(cPtr);
             if (classCount == 0) return; // no data to process.
-            Mat rectData = Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloud_Rects(cPtr));
-            Mat floodPointData = Mat.FromPixelData(classCount, 1, MatType.CV_32SC2, RedCloud_FloodPoints(cPtr));
+            Mat rectData = cv.Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloud_Rects(cPtr));
+            Mat floodPointData = cv.Mat.FromPixelData(classCount, 1, MatType.CV_32SC2, RedCloud_FloodPoints(cPtr));
             int[] rects = new int[classCount * 4];
             Marshal.Copy(rectData.Data, rects, 0, rects.Length);
             int[] ptList = new int[classCount * 2];
@@ -54075,13 +54081,13 @@ namespace CS_Classes
             GCHandle handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned);
             imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), (IntPtr)0, src.Rows, src.Cols);
             handleInput.Free();
-            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
             dst3 = ShowPalette(dst2);
             classCount = RedCloudMaxDist_Count(cPtr);
             labels[2] = "CV_8U version with " + classCount.ToString() + " cells.";
             if (classCount == 0) return; // no data to process.
-            Mat rectData = new Mat(classCount, 1, MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr));
-            Mat floodPointData = new Mat(classCount, 1, MatType.CV_32SC2, RedCloudMaxDist_FloodPoints(cPtr));
+            Mat rectData = cv.Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr));
+            Mat floodPointData = cv.Mat.FromPixelData(classCount, 1, MatType.CV_32SC2, RedCloudMaxDist_FloodPoints(cPtr));
             int[] rects = new int[classCount * 4];
             Marshal.Copy(rectData.Data, rects, 0, rects.Length);
             int[] ptList = new int[classCount * 2];
@@ -54143,7 +54149,7 @@ namespace CS_Classes
                     break;
             }
             var mm = GetMinMax(dst0);
-            dst2 = (dst0 - mm.minVal);
+            dst2 = dst0 - cv.Scalar.All(mm.minVal);
             dst2 = dst2 * 255 / (mm.maxVal - mm.minVal);
             dst2.ConvertTo(dst2, MatType.CV_8U);
             labels[2] = "Reduced Pointcloud - reduction factor = " + options.reduceAmt.ToString() + " produced " + classCount.ToString() + " regions";
@@ -54339,7 +54345,7 @@ namespace CS_Classes
             int index = 0;
             foreach (var lp in lines.lpList)
             {
-                DrawLine(dst3, lp.p1, lp.p2, 255);
+                DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.All(255));
                 index++;
                 if (index > 10) break;
             }
@@ -54567,8 +54573,8 @@ namespace CS_Classes
             int index = 0;
             foreach (var lp in lines.lpList)
             {
-                DrawCircle(dst3, lp.p1, task.DotSize, 255);
-                DrawCircle(dst3, lp.p2, task.DotSize, 255);
+                DrawCircle(dst3, lp.p1, task.DotSize, cv.Scalar.All(255));
+                DrawCircle(dst3, lp.p2, task.DotSize, cv.Scalar.All(255));
                 index++;
                 if (index >= 10) break;
             }
@@ -54600,7 +54606,7 @@ namespace CS_Classes
             if (task.heartBeat) dst2.SetTo(0);
             foreach (var pt in task.features)
             {
-                DrawCircle(dst2, pt, task.DotSize, 255);
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.All(255));
             }
             redC.Run(dst2);
             dst3.SetTo(0);
@@ -55125,7 +55131,7 @@ namespace CS_Classes
             else
             {
                 SetTrueText("Retina_Basics_CS runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.");
-                dst3 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC1, 0);
+                dst3= new cv.Mat(dst2.Rows, dst2.Cols, MatType.CV_8UC1, cv.Scalar.All(0));
             }
             handleSrc.Free();
             handleMagno.Free();
@@ -55133,8 +55139,8 @@ namespace CS_Classes
             {
                 float nextFactor = samplingFactor;
                 if (!options.useLogSampling) nextFactor = 1;
-                dst2 = Mat.FromPixelData(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone();
-                dst3 = Mat.FromPixelData(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8U, magnoData).Resize(src.Size());
+                dst2 = cv.Mat.FromPixelData(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone();
+                dst3 = cv.Mat.FromPixelData(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8U, magnoData).Resize(src.Size());
             }
         }
         public void Close()
@@ -55176,7 +55182,7 @@ namespace CS_Classes
         public ROI_Basics_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Enclosing rectangle of all pixels that have changed", "" };
-            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 30;
             desc = "Find the motion ROI in the latest image.";
         }
@@ -55207,7 +55213,7 @@ namespace CS_Classes
         public ROI_FindNonZeroNoSingle_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Enclosing rectangle of all changed pixels (after removing single pixels)", "" };
-            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 30;
             desc = "Find the motion ROI in just the latest image - eliminate single pixels";
         }
@@ -55258,7 +55264,7 @@ namespace CS_Classes
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
             labels = new string[] { "", "", "Area of Interest", "" };
-            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 30;
             desc = "Accumulate pixels in a motion ROI - all pixels that are different by X";
         }
@@ -55311,7 +55317,7 @@ namespace CS_Classes
         public ROI_Accumulate_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Area of Interest", "" };
-            dst2 = new Mat(dst2.Size(), MatType.CV_8UC1, 0);
+            dst2 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 30;
             desc = "Accumulate pixels in a motion ROI until the size is x% of the total image.";
         }
@@ -55417,7 +55423,7 @@ namespace CS_Classes
             var center = new Point2f(r.X + r.Width / 2, r.Y + r.Height / 2);
             var drawBox = new RotatedRect(center, new Size2f(r.Width, r.Height), 0);
             var boxPoints = Cv2.BoxPoints(drawBox);
-            var srcPoints = new Mat(1, 4, MatType.CV_32FC2, boxPoints);
+            var srcPoints = cv.Mat.FromPixelData(1, 4, MatType.CV_32FC2, boxPoints);
             var dstpoints = new Mat();
             if (rotation.options.warpFlag != InterpolationFlags.WarpInverseMap)
             {
@@ -55614,7 +55620,7 @@ namespace CS_Classes
             Marshal.Copy(src.Data, grayData, 0, grayData.Length);
             IntPtr imagePtr = Salience_Run(cPtr, options.numScales, grayHandle.AddrOfPinnedObject(), src.Height, src.Width);
             grayHandle.Free();
-            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
         }
         public void Close()
         {
@@ -55650,7 +55656,7 @@ namespace CS_Classes
                 Marshal.Copy(input.Data, grayData, 0, grayData.Length);
                 IntPtr imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject(), roi.Height, roi.Width);
                 grayHandle.Free();
-                dst2[roi] = Mat.FromPixelData(roi.Height, roi.Width, cv.MatType.CV_8U, imagePtr).Clone();
+                dst2[roi] = cv.Mat.FromPixelData(roi.Height, roi.Width, cv.MatType.CV_8U, imagePtr).Clone();
                 if (cPtr != IntPtr.Zero) cPtr = Salience_Close(cPtr);
             });
         }
@@ -55794,7 +55800,7 @@ namespace CS_Classes
             {
                 if (referenceResults[numCeiling] != countPrimes) SetTrueText("Invalid prime count - check this...");
             }
-            dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_8U, numArray);
+            dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8U, numArray);
             dst2 = ~dst2;
             zoom.Run(dst2);
             dst3 = zoom.dst2;
@@ -56132,8 +56138,8 @@ namespace CS_Classes
             // (x=4, y=6)
             double[,] av = { { 1, 1 }, { 2, 3 } };
             double[] yv = { 10, 26 };
-            Mat a = new Mat(2, 2, MatType.CV_64FC1, av);
-            Mat y = new Mat(2, 1, MatType.CV_64FC1, yv);
+            Mat a = cv.Mat.FromPixelData(2, 2, MatType.CV_64FC1, av);
+            Mat y = cv.Mat.FromPixelData(2, 1, MatType.CV_64FC1, yv);
             Mat x = new Mat();
             Cv2.Solve(a, y, x, DecompTypes.LU);
             SetTrueText("Solution ByMat: X1 = " + x.At<double>(0, 0) + "\tX2 = " + x.At<double>(0, 1), new cv.Point(10, 125));
@@ -56243,7 +56249,7 @@ namespace CS_Classes
             var handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             var imagePtr = Sort_MLPrepTest_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleSrc.Free();
-            MLTestData = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC2, imagePtr).Clone();
+            MLTestData = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC2, imagePtr).Clone();
             var split = MLTestData.Split();
             dst2 = split[0];
             dst3 = split[1];
@@ -56335,12 +56341,12 @@ namespace CS_Classes
             var inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             if (standaloneTest()) inputMask = inputMask.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
             bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA);
-            dst1 = new Mat(dst1.Rows, dst1.Cols, MatType.CV_32S, bgra.Data);
-            dst0 = new Mat(dst0.Size(), MatType.CV_32S, 0);
+            dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, bgra.Data);
+            dst0 = new Mat(dst0.Size(), MatType.CV_32S, cv.Scalar.All(0));
             dst1.CopyTo(dst0, inputMask);
             sort.Run(dst0);
             dst2 = sort.dst2.Reshape(1, dst2.Rows);
-            var tmp = new Mat(src.Rows, src.Cols, MatType.CV_8UC4, dst2.Data);
+            var tmp = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC4, dst2.Data);
             dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR);
             //dups.Run(dst2);
             //dst2 = dups.dst2;
@@ -56400,7 +56406,7 @@ namespace CS_Classes
                 Mat zero = new Mat(split[0].Size(), MatType.CV_8U, cv.Scalar.All(0));
                 Cv2.Merge(new Mat[] { split[0], split[1], split[2], zero }, src);
                 Marshal.Copy(src.Data, data, 0, data.Length);
-                src = new Mat(src.Size(), MatType.CV_32S, 0);
+                src = new Mat(src.Size(), MatType.CV_32S, cv.Scalar.All(0));
                 Marshal.Copy(data, 0, src.Data, data.Length);
             }
             sort.Run(src);
@@ -56442,7 +56448,7 @@ namespace CS_Classes
             {
                 input[i] = (uint)(pixels[0][i] * 65536 + pixels[1][i] * 256 + pixels[2][i]);
             }
-            sort.Run(new Mat(gray.Length, 1, MatType.CV_32S, input));
+            sort.Run(cv.Mat.FromPixelData(gray.Length, 1, MatType.CV_32S, input));
             List<uint> unique = new List<uint>();
             unique.Add((uint)sort.data[0]);
             for (int i = 1; i < sort.data.Length; i++)
@@ -56480,7 +56486,7 @@ namespace CS_Classes
                 totals[index] += 1;
                 if (totals[index] == 1) lut[index] = new Vec3b(pixels[0][i], pixels[1][i], pixels[2][i]);
             }
-            Mat histogram = new Mat(256, 1, MatType.CV_32F, totals);
+            Mat histogram = cv.Mat.FromPixelData(256, 1, MatType.CV_32F, totals);
             plot.Run(histogram);
             dst2 = plot.dst2;
         }
@@ -56973,18 +56979,18 @@ namespace CS_Classes
             double vert_Border = borderCrop * src.Rows / src.Cols;
             if (task.optionsChanged)
             {
-                errScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 1);
-                qScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 0.004);
-                rScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 0.5);
-                sumScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 0);
-                sScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, 0);
+                errScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(1));
+                qScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(0.004));
+                rScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(0.5));
+                sumScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(0));
+                sScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(0));
             }
             dst2 = src;
             if (src.Channels() == 3) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             if (task.FirstPass) lastFrame = src.Clone();
             feat.Run(src);
             inputFeat = new List<cv.Point2f>(task.features);
-            features1 = new Mat(inputFeat.Count(), 1, MatType.CV_32FC2, inputFeat.ToArray());
+            features1 = cv.Mat.FromPixelData(inputFeat.Count(), 1, MatType.CV_32FC2, inputFeat.ToArray());
             if (task.frameCount > 0)
             {
                 Mat features2 = new Mat();
@@ -57020,7 +57026,7 @@ namespace CS_Classes
                 string text = "Original dx = " + dx.ToString(fmt2) + "\n" + " dy = " + dy.ToString(fmt2) + "\n" + " da = " + da.ToString(fmt2);
                 SetTrueText(text);
                 double sx = ds_x, sy = ds_y;
-                Mat delta = new Mat(5, 1, MatType.CV_64F, new double[] { ds_x, ds_y, da, dx, dy });
+                Mat delta = cv.Mat.FromPixelData(5, 1, MatType.CV_64F, new double[] { ds_x, ds_y, da, dx, dy });
                 Cv2.Add(sumScale, delta, sumScale);
                 Mat diff = new Mat();
                 Cv2.Subtract(sScale, sumScale, diff);
@@ -57747,7 +57753,7 @@ namespace CS_Classes
             if (input.Type() != MatType.CV_32F) input = task.pcSplit[2];
             float stepX = dst2.Width / options.xLines;
             float stepY = dst2.Height / options.yLines;
-            dst3 = new Mat(dst2.Size(), MatType.CV_32FC3, 0);
+            dst3 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             float midX = dst2.Width / 2;
             float midY = dst2.Height / 2;
             float halfStepX = stepX / 2;
@@ -57802,7 +57808,7 @@ namespace CS_Classes
             int yLines = (int)(options.xLines * dst2.Height / dst2.Width);
             float stepX = dst3.Width / options.xLines;
             float stepY = dst3.Height / yLines;
-            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             for (int y = 0; y < yLines; y++)
             {
                 for (int x = 0; x < options.xLines; x++)
@@ -57833,7 +57839,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             foreach (var roi in task.gridList)
             {
                 Scalar d = task.pointCloud[roi].Mean(task.depthMask[roi]);
@@ -57918,7 +57924,7 @@ namespace CS_Classes
             dst2 = task.color.Clone();
             dst2.SetTo(Scalar.White, dst0);
             dst1.Line(new cv.Point(index, 0), new cv.Point(index, dst1.Height), Scalar.Red, slice.options.sliceSize);
-            Mat hist = new Mat(dst0.Width, 1, MatType.CV_32F, counts.ToArray());
+            Mat hist = cv.Mat.FromPixelData(dst0.Width, 1, MatType.CV_32F, counts.ToArray());
             plot.Run(hist);
             dst3 = plot.dst2;
         }
@@ -58382,8 +58388,8 @@ namespace CS_Classes
             float max = counts.Max();
             maxCountIndex = counts.IndexOf(max);
             dst2.Line(new cv.Point(0, maxCountIndex), new cv.Point(dst2.Width, maxCountIndex), Scalar.Red, slice.options.sliceSize);
-            Mat hist = new Mat(dst0.Height, 1, MatType.CV_32F, counts.ToArray());
-            plot.dst2 = new Mat(dst2.Height, dst2.Height, MatType.CV_8UC3, 0);
+            Mat hist = cv.Mat.FromPixelData(dst0.Height, 1, MatType.CV_32F, counts.ToArray());
+            plot.dst2 = new Mat(dst2.Height, dst2.Height, MatType.CV_8UC3, cv.Scalar.All(0));
             plot.Run(hist);
             dst3 = plot.dst2;
             dst3 = dst3.Resize(new cv.Size(dst2.Width, dst2.Width));
@@ -58689,8 +58695,8 @@ namespace CS_Classes
                         "/" + maxY.ToString("0.00"), 3);
             dst2.SetTo(0);
             Vec3b white = new Vec3b(255, 255, 255);
-            Mat pointX = new Mat(sCloud.dst2.Size(), MatType.CV_32S, 0);
-            Mat pointY = new Mat(sCloud.dst2.Size(), MatType.CV_32S, 0);
+            Mat pointX = new Mat(sCloud.dst2.Size(), MatType.CV_32S, cv.Scalar.All(0));
+            Mat pointY = new Mat(sCloud.dst2.Size(), MatType.CV_32S, cv.Scalar.All(0));
             int yy, xx;
             for (int y = 1; y < sCloud.dst2.Height - 1; y++)
             {
@@ -58787,11 +58793,11 @@ namespace CS_Classes
             var imagePtr = SuperPixel_Run(cPtr, handleSrc.AddrOfPinnedObject());
             handleSrc.Free();
             dst2 = input;
-            dst2.SetTo(gridColor, Mat.FromPixelData(input.Rows, input.Cols, MatType.CV_8UC1, imagePtr));
+            dst2.SetTo(gridColor, cv.Mat.FromPixelData(input.Rows, input.Cols, MatType.CV_8UC1, imagePtr));
             var labelData = new byte[input.Total() * 4]; // labels are 32-bit integers.
             var labelPtr = SuperPixel_GetLabels(cPtr);
             Marshal.Copy(labelPtr, labelData, 0, labelData.Length);
-            var labels = new Mat(input.Rows, input.Cols, MatType.CV_32S, labelData);
+            var labels = cv.Mat.FromPixelData(input.Rows, input.Cols, MatType.CV_32S, labelData);
             if (options.numSuperPixels < 255) labels *= 255 / options.numSuperPixels;
             labels.ConvertTo(dst3, MatType.CV_8U);
         }
@@ -59018,7 +59024,7 @@ namespace CS_Classes
         1, 2, 3, 4, 5,
         1, 2, 3, 4, 5
     };
-            src = new Mat(5, 5, MatType.CV_32F, inputData);
+            src = cv.Mat.FromPixelData(5, 5, MatType.CV_32F, inputData);
             Mat W = new Mat(), U = new Mat(), VT = new Mat();
             Cv2.SVDecomp(src, W, U, VT, SVD.Flags.FullUV);
             Mat WD = new Mat(5, 5, MatType.CV_32F, cv.Scalar.All(0));
@@ -59057,7 +59063,7 @@ namespace CS_Classes
                 var m = Cv2.Moments(rc.mask, true);
                 var center = new Point2f((float)(m.M10 / rc.pixels), (float)(m.M01 / rc.pixels));
                 DrawCircle(task.color[rc.rect], center, task.DotSize, task.HighlightColor);
-                Mat mArea = new Mat(4, 1, MatType.CV_32F, new float[]
+                Mat mArea = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, new float[]
                             { (float)(m.M20 / rc.pixels), (float)(m.Mu11 / rc.pixels),
                             (float)(m.Mu11 / rc.pixels), (float)(m.Mu02 / rc.pixels) });
                 Mat U = new Mat();
@@ -59170,8 +59176,8 @@ namespace CS_Classes
                 points = sampleData.points;
                 response = sampleData.responses;
             }
-            var dataMat = new Mat(options.sampleCount, 2, MatType.CV_32FC1, points.ToArray());
-            var resMat = new Mat(options.sampleCount, 1, MatType.CV_32SC1, response.ToArray());
+            var dataMat = cv.Mat.FromPixelData(options.sampleCount, 2, MatType.CV_32FC1, points.ToArray());
+            var resMat = cv.Mat.FromPixelData(options.sampleCount, 1, MatType.CV_32SC1, response.ToArray());
             dataMat *= 1 / src.Height;
             if (task.optionsChanged) svm = options.createSVM();
             svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat);
@@ -59180,7 +59186,7 @@ namespace CS_Classes
             {
                 if (roi.X > src.Height) continue; // working only with square - not rectangles.
                 float[] samples = { roi.X / src.Height, roi.Y / src.Height };
-                if (svm.Predict(new Mat(1, 2, MatType.CV_32F, samples)) == 1)
+                if (svm.Predict(cv.Mat.FromPixelData(1, 2, MatType.CV_32F, samples)) == 1)
                 {
                     dst3[roi].SetTo(Scalar.Red);
                 }
@@ -59276,8 +59282,8 @@ namespace CS_Classes
                     responses.Add(choices[i]);
                 }
             }
-            var trainMat = new Mat(4, 2, MatType.CV_32F, points.ToArray());
-            var labelsMat = new Mat(4, 1, MatType.CV_32SC1, responses.ToArray());
+            var trainMat = cv.Mat.FromPixelData(4, 2, MatType.CV_32F, points.ToArray());
+            var labelsMat = cv.Mat.FromPixelData(4, 1, MatType.CV_32SC1, responses.ToArray());
             var dataMat = trainMat * 1 / src.Height;
             if (task.optionsChanged) svm = options.createSVM();
             svm.Train(dataMat, cv.ML.SampleTypes.RowSample, labelsMat);
@@ -60250,7 +60256,7 @@ namespace CS_Classes
             tRect = new cv.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4);
             dst2[tRect] = shuffle.dst2.Repeat(4, 4);
             var split = dst2[tRect].Split();
-            var alpha = new Mat(split[0].Size(), MatType.CV_8U, 1);
+            var alpha = new Mat(split[0].Size(), MatType.CV_8U, cv.Scalar.All(1));
             var merged = new Mat[] { split[2], split[1], split[0], alpha };
             Cv2.Merge(merged, rgbaTexture);
             SetTrueText("Use mouse movement over the image to display results.", 3);
@@ -60994,7 +61000,7 @@ namespace CS_Classes
         {
             float[] cVector = { 1, 4, 4, 8 };
             strOut = $"p1 = ({cVector[0]}, {cVector[1]})\t p2 = ({cVector[2]}, {cVector[3]})\n\n";
-            Mat coordinates = new Mat(1, 4, MatType.CV_32F, cVector);
+            Mat coordinates = cv.Mat.FromPixelData(1, 4, MatType.CV_32F, cVector);
             Mat diff_x = coordinates.Col(0) - coordinates.Col(2);
             Mat diff_y = coordinates.Col(1) - coordinates.Col(3);
             // sqrt((x2 - x1)^2 + (y2 - y1)^2)
@@ -61211,7 +61217,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Vignetting_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.radius, center.X, center.Y, removeVig);
             handleSrc.Free();
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
         }
         public void Close()
         {
@@ -61544,9 +61550,9 @@ namespace CS_Classes
                 triangle.Run(src);
                 triangles[1] = triangle.triangle.Clone();
                 var srcPoints2 = new List<cv.Point2f>(triangle.options.srcPoints);
-                var tOriginal = new Mat(3, 1, MatType.CV_32FC2, new float[] { 0, 0, 0, src.Height, src.Width, src.Height });
+                var tOriginal = cv.Mat.FromPixelData(3, 1, MatType.CV_32FC2, new float[] { 0, 0, 0, src.Height, src.Width, src.Height });
                 M = Cv2.GetAffineTransform(tOriginal, triangles[1]);
-                Mat wideMat = new Mat(src.Rows, src.Cols * 2, MatType.CV_8UC3, 0);
+                Mat wideMat = new Mat(src.Rows, src.Cols * 2, MatType.CV_8UC3, cv.Scalar.All(0));
                 cv.Scalar[] choices = { Scalar.Red, Scalar.White, Scalar.Yellow };
                 for (int j = 0; j <= 1; j++)
                 {
@@ -61841,12 +61847,12 @@ namespace CS_Classes
             Marshal.Copy(imagePtr, warpMatrix, 0, warpMatrix.Length);
             if (options.warpMode != 3)
             {
-                Mat warpMat = new Mat(2, 3, MatType.CV_32F, warpMatrix);
+                Mat warpMat = cv.Mat.FromPixelData(2, 3, MatType.CV_32F, warpMatrix);
                 Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), InterpolationFlags.Linear | InterpolationFlags.WarpInverseMap);
             }
             else
             {
-                Mat warpMat = new Mat(3, 3, MatType.CV_32F, warpMatrix);
+                Mat warpMat = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, warpMatrix);
                 Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), InterpolationFlags.Linear | InterpolationFlags.WarpInverseMap);
             }
             dst2 = new Mat(task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
@@ -62008,7 +62014,7 @@ namespace CS_Classes
             }
             if (rects.Count() > 0)
             {
-                Mat markers = new Mat(src.Size(), MatType.CV_32S, 0);
+                Mat markers = new Mat(src.Size(), MatType.CV_32S, cv.Scalar.All(0));
                 for (int i = 0; i < rects.Count(); i++)
                 {
                     markers.Rectangle(rects[i], Scalar.All(i + 1), -1);
@@ -62168,7 +62174,7 @@ namespace CS_Classes
             IntPtr imagePtr = xPhoto_OilPaint_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                                     options.blockSize, options.dynamicRatio, options.colorCode);
             handleSrc.Free();
-            if (imagePtr != IntPtr.Zero) dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+            if (imagePtr != IntPtr.Zero) dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -62232,7 +62238,7 @@ namespace CS_Classes
             IntPtr imagePtr = xPhoto_Inpaint_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, (int)iType);
             handleSrc.Free();
             handleMask.Free();
-            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
             SetTrueText("The xPhoto Inpaint call hangs." + "\n" + "Uncomment the C++ line - see XPhoto.cpp - to test", 1);
         }
         public void Close()

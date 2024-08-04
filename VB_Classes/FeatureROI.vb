@@ -10,7 +10,7 @@ Public Class FeatureROI_Basics : Inherits VB_Parent
     Public stdevAverage As Single
     Public Sub New()
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -59,7 +59,7 @@ Public Class FeatureROI_Color : Inherits VB_Parent
     Public Sub New()
         FindSlider("Add Weighted %").Value = 70
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -130,7 +130,7 @@ Public Class FeatureROI_Sorted : Inherits VB_Parent
     Public options As New Options_StdevGrid
     Public maskVal As Integer = 255
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         If standalone = False Then maskVal = 1
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."

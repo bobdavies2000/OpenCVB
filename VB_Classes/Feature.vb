@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Public Class Feature_Basics : Inherits VB_Parent
     Dim nextMatList As New List(Of cv.Mat)
     Dim ptList As New List(Of cv.Point2f)
@@ -140,7 +141,7 @@ Public Class Feature_KNN : Inherits VB_Parent
     Public featurePoints As New List(Of cv.Point2f)
     Public feat As New Feature_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -627,7 +628,7 @@ End Class
 Public Class Feature_GridPopulation : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."
         desc = "Find the feature population for each cell."
     End Sub
@@ -730,7 +731,7 @@ Public Class Feature_Gather : Inherits VB_Parent
                 Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
                 handleSrc.Free()
 
-                Dim ptMat = New cv.Mat(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
+                Dim ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
                 features.Clear()
                 If standaloneTest() Then dst2 = src
 

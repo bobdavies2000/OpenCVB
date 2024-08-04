@@ -19,7 +19,7 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Parent
 
             ReDim histArray(histogram.Total - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-            histogram1D = New cv.Mat(histogram.Total, 1, cv.MatType.CV_32F, histArray)
+            histogram1D = cv.Mat.FromPixelData(histogram.Total, 1, cv.MatType.CV_32F, histArray)
 
             simK.Run(histogram1D)
             histogram = simK.dst2
@@ -266,11 +266,11 @@ Public Class Hist3Dcolor_Basics_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Hist3Dcolor_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins)
         handleInput.Free()
 
-        histogram = New cv.Mat(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, imagePtr)
+        histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, imagePtr)
         If prepareImage Then
             Dim histArray(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-            histogram1D = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+            histogram1D = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, histArray)
 
             simK.Run(histogram)
             histogram = simK.dst2
@@ -298,7 +298,7 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Public Sub New()
         task.gOptions.pixelDiffThreshold = 0
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)

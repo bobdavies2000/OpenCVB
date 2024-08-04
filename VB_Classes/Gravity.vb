@@ -5,7 +5,7 @@ Public Class Gravity_Basics : Inherits VB_Parent
     Public vec As New PointPair
     Public autoDisplay As Boolean
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find all the points where depth X-component transitions from positive to negative"
     End Sub
     Public Sub displayResults(p1 As cv.Point, p2 As cv.Point)
@@ -76,7 +76,7 @@ End Class
 Public Class Gravity_BasicsOriginal : Inherits VB_Parent
     Public vec As New PointPair
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Search for the transition from positive to negative to find the gravity vector."
     End Sub
     Private Function findTransition(startRow As Integer, stopRow As Integer, stepRow As Integer) As cv.Point2f

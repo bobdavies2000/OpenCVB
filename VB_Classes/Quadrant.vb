@@ -3,7 +3,7 @@ Public Class Quadrant_Basics : Inherits VB_Parent
     Dim p1 As New cv.Point, p2 As New cv.Point(dst2.Width - 1, 0), p3 As New cv.Point(0, dst2.Height - 1)
     Dim p4 As New cv.Point(dst2.Width - 1, dst2.Height - 1), rect As New cv.Rect, mask As New cv.Mat
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "dst1 contains a map defining the quadrant value for each pixel"
         desc = "Divide the color and depth images into 4 quadrants based on the horizon and gravity vectors"
     End Sub

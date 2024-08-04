@@ -352,7 +352,7 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Parent
     Public fixedScale As Boolean
     Dim plotOutput As cv.Mat
     Public Sub New()
-        plotOutput = New cv.Mat(New cv.Size(320, 180), cv.MatType.CV_8UC3, 0)
+        plotOutput = New cv.Mat(New cv.Size(320, 180), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         desc = "Plot an input variable over time"
         task.gOptions.LineWidth.Value = 1
         task.gOptions.DotSizeSlider.Value = 2
@@ -479,7 +479,7 @@ Public Class Plot_Basics_CPP_VB : Inherits VB_Parent
         Dim imagePtr = PlotOpenCV_Run(cPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Count,
                                       dst2.Rows, dst2.Cols)
 
-        dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
+        dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
         handleX.Free()
         handleY.Free()
 

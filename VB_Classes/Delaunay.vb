@@ -281,7 +281,7 @@ Public Class Delaunay_ConsistentColor : Inherits VB_Parent
 
         Dim usedColors As New List(Of cv.Vec3b)
         facetList.Clear()
-        Static lastColor = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, 0)
+        Static lastColor = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         For i = 0 To facets.Length - 1
             Dim nextFacet As New List(Of cv.Point)
             For j = 0 To facets(i).Length - 1
@@ -315,7 +315,7 @@ Public Class Delaunay_Contours : Inherits VB_Parent
     Dim randEnum As New Random_Enumerable
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub

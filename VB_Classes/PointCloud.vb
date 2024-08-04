@@ -220,8 +220,8 @@ Public Class PointCloud_Continuous_VB : Inherits VB_Parent
             sliders.setupTrackBar("Threshold of continuity in mm", 0, 1000, 10)
         End If
 
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show where the pointcloud is continuous"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -415,8 +415,8 @@ Public Class PointCloud_Raw_CPP_VB : Inherits VB_Parent
 
         Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, 0, task.MaxZmeters, task.pcSplit(2).Height, task.pcSplit(2).Width)
 
-        dst2 = New cv.Mat(task.pcSplit(2).Rows, task.pcSplit(2).Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = New cv.Mat(task.pcSplit(2).Rows, task.pcSplit(2).Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = cv.Mat.FromPixelData(task.pcSplit(2).Rows, task.pcSplit(2).Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = cv.Mat.FromPixelData(task.pcSplit(2).Rows, task.pcSplit(2).Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         handleDepth.Free()
         labels(2) = "Top View (looking down)"
@@ -575,7 +575,7 @@ Public Class PointCloud_SurfaceH : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst2
-        Dim hist = New cv.Mat(dst2.Height, 1, cv.MatType.CV_32F, 0)
+        Dim hist = New cv.Mat(dst2.Height, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim indexer = hist.GetGenericIndexer(Of Single)()
 
         topRow = 0
@@ -625,7 +625,7 @@ Public Class PointCloud_NeighborV : Inherits VB_Parent
         options.RunVB()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
+        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim r1 = New cv.Rect(options.pixels, 0, dst2.Width - options.pixels, dst2.Height)
         Dim r2 = New cv.Rect(0, 0, dst2.Width - options.pixels, dst2.Height)
         cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
@@ -664,11 +664,11 @@ Public Class PointCloud_PCpointsMask : Inherits VB_Parent
     Public actualCount As Integer
     Public Sub New()
         setPointCloudGrid()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Then pcPoints = New cv.Mat(task.gridRows, task.gridCols, cv.MatType.CV_32FC3, 0)
+        If task.optionsChanged Then pcPoints = cv.Mat.FromPixelData(task.gridRows, task.gridCols, cv.MatType.CV_32FC3, 0)
 
         dst2.SetTo(0)
         actualCount = 0
@@ -766,7 +766,7 @@ End Class
 
 Public Class PointCloud_Inspector : Inherits VB_Parent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.mouseMovePoint.X = dst2.Width / 2
         desc = "Inspect x, y, and z values in a row or column"
     End Sub

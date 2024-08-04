@@ -34,7 +34,7 @@ Public Class Mat_PointToMat : Inherits VB_Parent
         Next
 
         Dim rows = random.PointList.Count
-        Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32FC2, random.PointList.ToArray)
+        Dim pMat = cv.Mat.FromPixelData(rows, 1, cv.MatType.CV_32FC2, random.PointList.ToArray)
         Dim indexer = pMat.GetGenericIndexer(Of cv.Vec2f)()
         dst3.SetTo(0)
         Dim white = New cv.Vec3b(255, 255, 255)
@@ -67,7 +67,7 @@ Public Class Mat_MatToPoint : Inherits VB_Parent
                 index += 1
             Next
         Next
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, points)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, points)
     End Sub
 End Class
 
@@ -144,7 +144,7 @@ Public Class Mat_Managed : Inherits VB_Parent
         desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
         If task.heartBeat Then
             If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
         End If
@@ -237,7 +237,7 @@ Public Class Mat_Inverse : Inherits VB_Parent
             strOut += vbCrLf
         End If
 
-        Dim input = New cv.Mat(3, 3, cv.MatType.CV_32F, matrix)
+        Dim input = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, matrix)
         cv.Cv2.Invert(input, inverse, options.decompType)
 
         If standaloneTest() Or validateInverse Then
@@ -275,7 +275,7 @@ Public Class Mat_Inverse_4D : Inherits VB_Parent
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Public input As cv.Mat
     Public Sub New()
-        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
+        input = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, defaultInput)
         desc = "Use OpenCV to invert a matrix"
     End Sub
     Private Function printMatrixResults(src As cv.Mat, dst2 As cv.Mat) As String
@@ -351,7 +351,7 @@ End Class
 '    Public Sub RunVB(src as cv.Mat)
 
 '        If dGray IsNot Nothing Then
-'            dst2 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U, 0)
+'            dst2 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U, cv.Scalar.All(0))
 '            Marshal.Copy(dGray.ToBytes, 0, dst2.Data, dst2.Total)
 '        End If
 
@@ -375,7 +375,7 @@ Public Class Mat_2to1 : Inherits VB_Parent
     Public mat() As cv.Mat = {mat1, mat2}
     Public lineSeparators = True ' if they want lines or not...
     Public Sub New()
-        mat1 = New cv.Mat(New cv.Size(dst2.Rows, dst2.Cols), cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(New cv.Size(dst2.Rows, dst2.Cols), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
 

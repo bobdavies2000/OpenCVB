@@ -18,7 +18,7 @@ Public Class HMM_Example_CPP_VB : Inherits VB_Parent
         Dim imagePtr = HMM_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels() = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, IIf(src.Channels() = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = HMM_Close(cPtr)

@@ -238,7 +238,7 @@ End Class
 Public Class Contour_Edges : Inherits VB_Parent
     Dim edges As New Edge_ResizeAdd
     Dim contour As New Contour_General
-    Dim lastImage = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, 0)
+    Dim lastImage = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
     Public Sub New()
         desc = "Create contours for Edge_MotionAccum"
     End Sub
@@ -331,7 +331,7 @@ Public Class Contour_Foreground : Inherits VB_Parent
     Dim km As New Foreground_KMeans2
     Dim contour As New Contour_General
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Kmeans foreground output", "Contour of foreground"}
         desc = "Build a contour for the foreground"
     End Sub
@@ -368,7 +368,7 @@ Public Class Contour_Sorted : Inherits VB_Parent
     Dim dilate As New Dilate_Basics
     Dim options As New Options_Contours
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Contours in the detected motion", "Diff output - detected motion"}
         task.gOptions.pixelDiffThreshold = 25
@@ -632,7 +632,7 @@ Public Class Contour_RedCloudEdges : Inherits VB_Parent
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
     End Sub
@@ -660,7 +660,7 @@ End Class
 Public Class Contour_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show all the contours found in the RedCloud output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -824,7 +824,7 @@ Public Class Contour_WholeImage : Inherits VB_Parent
     Dim contour As New Contour_Basics
     Public Sub New()
         FindSlider("Max contours").Value = 20
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the top X contours by size and display them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -853,7 +853,7 @@ Public Class Contour_DepthTiers : Inherits VB_Parent
     Public classCount As Integer
     Public contourlist As New List(Of cv.Point())
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         FindRadio("FloodFill").Checked = True
         UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}
@@ -905,7 +905,7 @@ Public Class Contour_FromPoints : Inherits VB_Parent
     Dim random As New Random_Basics
     Public Sub New()
         FindSlider("Random Pixel Count").Value = 3
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a contour from some random points"
     End Sub
     Public Sub RunVB(src As cv.Mat)

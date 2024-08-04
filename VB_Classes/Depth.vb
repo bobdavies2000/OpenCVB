@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_Basics : Inherits VB_Parent
@@ -121,12 +122,12 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Parent
     Dim meanSeries As New cv.Mat
     Dim maxMeanVal As Single, maxStdevVal As Single
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Rows, dst3.Cols, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Rows, dst3.Cols, cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Then meanSeries = New cv.Mat(task.gridList.Count, task.frameHistoryCount, cv.MatType.CV_32F, 0)
+        If task.optionsChanged Then meanSeries = New cv.Mat(task.gridList.Count, task.frameHistoryCount, cv.MatType.CV_32F, cv.Scalar.All(0))
 
         Dim index = task.frameCount Mod task.frameHistoryCount
         Dim meanValues(task.gridList.Count - 1) As Single
@@ -145,8 +146,8 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Parent
         End Sub)
 
         If task.frameCount >= task.frameHistoryCount Then
-            Dim means As New cv.Mat(task.gridList.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
-            Dim stdevs As New cv.Mat(task.gridList.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
+            Dim means As cv.Mat = cv.Mat.FromPixelData(task.gridList.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
+            Dim stdevs As cv.Mat = cv.Mat.FromPixelData(task.gridList.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
             Dim meanmask = means.Threshold(1, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             Dim mm As mmData = GetMinMax(means, meanmask)
             Dim stdMask = stdevs.Threshold(0.001, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
@@ -253,7 +254,7 @@ Public Class Depth_Palette : Inherits VB_Parent
         Dim mult = 255 / task.MaxZmeters
         Dim depthNorm = (task.pcSplit(2) * mult).ToMat
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, customColorMap.Data())
+        Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, customColorMap.Data())
         cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
     End Sub
 End Class
@@ -279,7 +280,7 @@ Public Class Depth_Colorizer_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
@@ -544,8 +545,8 @@ End Class
 Public Class Depth_HolesOverTime : Inherits VB_Parent
     Dim images As New List(Of cv.Mat)
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(3) = "Latest hole mask"
         desc = "Integrate memory holes over time to identify unstable depth"
     End Sub
@@ -768,8 +769,8 @@ Public Class Depth_ForegroundOverTime : Inherits VB_Parent
     Dim lastFrames As New List(Of cv.Mat)
     Public Sub New()
         labels = {"", "", "Foreground objects", "Edges for the Foreground Objects"}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.frameHistoryCount = 5
         desc = "Create a fused foreground mask over x number of frames (task.frameHistoryCount)"
     End Sub
@@ -861,8 +862,8 @@ Public Class Depth_Foreground : Inherits VB_Parent
     Dim contours As New Contour_Largest
     Public Sub New()
         labels(2) = "Foreground objects"
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask for the objects in the foreground"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -937,7 +938,7 @@ Public Class Depth_InRange : Inherits VB_Parent
             If i = 0 Then regMats(0).SetTo(0, task.noDepthMask)
         Next
 
-        dst2 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3.SetTo(0)
         classCount = 1
         For i = 0 To regMats.Count - 1
@@ -1010,7 +1011,7 @@ Public Class Depth_Colorizer_VB : Inherits VB_Parent
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         If src.Size <> task.lowRes Then src = src.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-        dst2 = New cv.Mat(task.lowRes, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(task.lowRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
                 Dim pixel = src.Get(Of Single)(y, x)
@@ -1056,7 +1057,7 @@ Public Class Depth_PunchDecreasing : Inherits VB_Parent
     Dim fore As New Depth_Foreground
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold in millimeters", 0, 1000, 8)
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Identify where depth is decreasing - coming toward the camera."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1163,7 +1164,7 @@ End Class
 Public Class Depth_Contour : Inherits VB_Parent
     Dim contour As New Contour_General
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "task.depthMask contour"
         desc = "Create and display the task.depthMask output as a contour."
     End Sub
@@ -1188,8 +1189,8 @@ End Class
 Public Class Depth_Outline : Inherits VB_Parent
     Dim contour As New Contour_General
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "Contour separating depth from no depth"
         desc = "Provide a line that separates depth from no depth throughout the image."
     End Sub

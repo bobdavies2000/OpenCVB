@@ -20,7 +20,7 @@ Public Class Vignetting_Basics : Inherits VB_Parent
         Dim imagePtr = Vignetting_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.radius, center.X, center.Y, removeVig)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Vignetting_Close(cPtr)

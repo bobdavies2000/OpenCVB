@@ -122,7 +122,7 @@ Public Class MSER_SyntheticInput : Inherits VB_Parent
         desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
+        Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, cv.Scalar.All(0))
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
         Dim color2() = {81, 181, 161, 141, 121, 101, 91, 111, 171, 151, 141, 101, 221}
@@ -481,7 +481,7 @@ Public Class MSER_Mask_CPP_VB : Inherits VB_Parent
             classCount = MSER_Count(cPtr)
             If classCount = 0 Then Exit Sub
 
-            dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).InRange(255, 255)
+            dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).InRange(255, 255)
         End If
         labels(3) = CStr(classCount) + " regions identified"
 
@@ -576,9 +576,9 @@ End Class
 
 Public Class MSER_Basics2 : Inherits VB_Parent
     Dim detect As New MSER_CPP_VB
-    Dim cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+    Dim cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create cells for each region in MSER output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -660,14 +660,14 @@ Public Class MSER_CPP_VB : Inherits VB_Parent
         Dim imagePtr = MSER_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        dst0 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
 
         classcount = MSER_Count(cPtr)
         If classcount = 0 Then Exit Sub
 
-        Dim ptData = New cv.Mat(classcount, 1, cv.MatType.CV_32SC2, MSER_FloodPoints(cPtr))
-        Dim maskData = New cv.Mat(classcount, 1, cv.MatType.CV_32S, MSER_MaskCounts(cPtr))
-        Dim rectData = New cv.Mat(classcount, 1, cv.MatType.CV_32SC4, MSER_Rects(cPtr))
+        Dim ptData = cv.Mat.FromPixelData(classcount, 1, cv.MatType.CV_32SC2, MSER_FloodPoints(cPtr))
+        Dim maskData = cv.Mat.FromPixelData(classcount, 1, cv.MatType.CV_32S, MSER_MaskCounts(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classcount, 1, cv.MatType.CV_32SC4, MSER_Rects(cPtr))
 
         Dim sortedBoxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Dim rects As New List(Of cv.Rect)

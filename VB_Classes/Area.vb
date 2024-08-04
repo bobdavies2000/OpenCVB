@@ -20,14 +20,14 @@ Public Class Area_MinTriangle_CPP_VB : Inherits VB_Parent
 
         dst2.SetTo(cv.Scalar.White)
 
-        Dim input As New cv.Mat(1, srcPoints.Count, cv.MatType.CV_32FC2, srcPoints.ToArray)
+        Dim input As cv.Mat = cv.Mat.FromPixelData(1, srcPoints.Count, cv.MatType.CV_32FC2, srcPoints.ToArray)
         Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
         Dim srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned)
         MinTriangle_Run(srcHandle.AddrOfPinnedObject(), srcPoints.Count, dstHandle.AddrOfPinnedObject)
         srcHandle.Free()
         dstHandle.Free()
-        triangle = New cv.Mat(3, 1, cv.MatType.CV_32FC2, dstData)
+        triangle = cv.Mat.FromPixelData(3, 1, cv.MatType.CV_32FC2, dstData)
 
         For i = 0 To 2
             Dim pt = triangle.Get(Of cv.Point2f)(i)
@@ -91,7 +91,7 @@ Public Class Area_FindNonZero : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            src = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            src = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Dim srcPoints(100 - 1) As cv.Point ' doesn't really matter how many there are.
             For i = 0 To srcPoints.Length - 1
                 srcPoints(i).X = msRNG.Next(0, src.Width)
@@ -102,7 +102,7 @@ Public Class Area_FindNonZero : Inherits VB_Parent
 
         nonZero = src.FindNonZero()
 
-        dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         ' mark the points so they are visible...
         For i = 0 To nonZero.Rows - 1
             DrawCircle(dst3, nonZero.Get(Of cv.Point)(0, i), task.DotSize, cv.Scalar.White)

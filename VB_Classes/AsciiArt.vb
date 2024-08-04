@@ -31,7 +31,7 @@ End Class
 
 Public Class AsciiArt_Color : Inherits VB_Parent
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "A palette'd version of the ascii art data"
     End Sub
     Public Sub RunVB(src As cv.Mat)

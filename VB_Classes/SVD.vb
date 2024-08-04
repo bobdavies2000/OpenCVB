@@ -13,12 +13,12 @@ Public Class SVD_Example : Inherits VB_Parent
             1, 2, 3, 4, 5
         }
 
-        src = New cv.Mat(5, 5, cv.MatType.CV_32F, inputData)
+        src = cv.Mat.FromPixelData(5, 5, cv.MatType.CV_32F, inputData)
         Dim W As New cv.Mat, U As New cv.Mat, VT As New cv.Mat
 
         cv.Cv2.SVDecomp(src, W, U, VT, cv.SVD.Flags.FullUV)
 
-        Dim WD As New cv.Mat(5, 5, cv.MatType.CV_32F, 0)
+        Dim WD As New cv.Mat(5, 5, cv.MatType.CV_32F, cv.Scalar.All(0))
         W.CopyTo(WD.Diag)
 
         Dim rec As cv.Mat = VT.T * WD * U.T
@@ -58,7 +58,7 @@ Public Class SVD_Example2 : Inherits VB_Parent
             Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
             DrawCircle(task.color(rc.rect), center, task.DotSize, task.HighlightColor)
 
-            Dim mArea = New cv.Mat(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
+            Dim mArea = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
             Dim U As New cv.Mat
             cv.Cv2.SVDecomp(mArea, New cv.Mat, U, New cv.Mat, cv.SVD.Flags.FullUV)
 

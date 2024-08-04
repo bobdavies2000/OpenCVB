@@ -1,12 +1,13 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Public Class Guess_Depth_CPP_VB : Inherits VB_Parent
     Public Sub New()
         cPtr = Guess_Depth_Open()
         labels = {"", "", "Updated point cloud (holes filled)", "Original point cloud"}
         desc = "Fill single pixel holes in the point cloud."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -15,10 +16,10 @@ Public Class Guess_Depth_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Guess_Depth_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32FC3, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC3, imagePtr).Clone
         If standaloneTest() Then dst3 = task.pointCloud
     End Sub
-    Public Sub Close() 
+    Public Sub Close()
         Guess_Depth_Close(cPtr)
     End Sub
 End Class
@@ -52,7 +53,7 @@ Public Class Guess_ImageEdges_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Guess_ImageEdges_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distSlider.value)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32FC3, cppData).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC3, cppData).Clone
         If standaloneTest() Then dst3 = task.pointCloud
     End Sub
     Public Sub Close()

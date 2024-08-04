@@ -27,7 +27,7 @@ Public Class Projection_Basics : Inherits VB_Parent
         Dim check2 As Integer
         For i = 0 To redCellInput.Count - 1
             Dim rc = redCellInput(i)
-            Dim tmp = New cv.Mat(rc.rect.Size(), cv.MatType.CV_32F, 0)
+            Dim tmp = New cv.Mat(rc.rect.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             src(rc.rect).CopyTo(tmp, rc.mask)
             rc.pixels = tmp.Sum()
             sortedCells.Add(rc.pixels, rc)
@@ -151,7 +151,7 @@ Public Class Projection_Lines : Inherits VB_Parent
     Dim options As New Options_Projection
     Public Sub New()
         FindCheckBox("Top View (Unchecked Side View)").Checked = False
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells"}
         desc = "Search for surfaces among the FeatureLess regions"
     End Sub
@@ -326,7 +326,7 @@ Public Class Projection_Object : Inherits VB_Parent
     Dim side As New Projection_Side
     Public Sub New()
         task.gOptions.setDebugSlider(0) ' pick the biggest object...
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         top.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."

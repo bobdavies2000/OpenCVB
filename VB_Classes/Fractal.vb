@@ -10,7 +10,7 @@ Public Class Fractal_Mandelbrot : Inherits VB_Parent
     Dim incrY As Single
     Public options As New Options_Fractal
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "Use the iteration slider to see the impact of the number of iterations."
         desc = "Run the classic Mandalbrot algorithm"
     End Sub
@@ -136,7 +136,7 @@ Public Class Fractal_Julia : Inherits VB_Parent
             Dim detail = 1
             Dim depth = 100
             Dim r = 2
-            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Dim m = mandel.zoom.mandel
             rt = m.startX + (m.endX - m.startX) * task.mouseMovePoint.X / src.Width
             mt = m.startY + (m.endY - m.startY) * task.mouseMovePoint.Y / src.Height
@@ -163,7 +163,7 @@ End Class
 Public Class Fractal_Dimension : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub

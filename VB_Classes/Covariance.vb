@@ -11,7 +11,7 @@ Public Class Covariance_Basics : Inherits VB_Parent
         dst3.SetTo(0)
         If standaloneTest() Then
             random.Run(empty)
-            src = New cv.Mat(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
+            src = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
             For i = 0 To random.PointList.Count - 1
                 DrawCircle(dst3,random.PointList(i), 3, cv.Scalar.White)
             Next
@@ -54,7 +54,7 @@ Public Class Covariance_Test : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}
-        Dim samples = New cv.Mat(10, 2, cv.MatType.CV_64F, testInput)
+        Dim samples = cv.Mat.FromPixelData(10, 2, cv.MatType.CV_64F, testInput)
         covar.Run(samples)
         SetTrueText(covar.strOut, New cv.Point(20, 60))
         SetTrueText("Results should be a symmetric array with 2.1 and -2.1", New cv.Point(20, 150))

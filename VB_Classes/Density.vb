@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Density_Basics : Inherits VB_Parent
     Dim options = New Options_Density
@@ -18,7 +19,7 @@ Public Class Density_Basics : Inherits VB_Parent
         Dim imagePtr = Density_2D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.distance)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
     End Sub
     Public Sub Close()
         Density_2D_Close(cPtr)
@@ -67,7 +68,7 @@ Public Class Density_Count_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Density_Count_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.zCount)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
     End Sub
     Public Sub Close()
         Density_Count_Close(cPtr)

@@ -7,8 +7,8 @@ Public Class Line3D_Draw : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         plot.plotCount = 2
 
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
 
         p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -49,7 +49,7 @@ Public Class Line3D_Draw : Inherits VB_Parent
         Next
         If nextList.Count = 0 Then Exit Sub ' line is completely in area with no depth.
 
-        Dim pts As New cv.Mat(nextList.Count, 1, cv.MatType.CV_32FC3, nextList.ToArray)
+        Dim pts As cv.Mat = cv.Mat.FromPixelData(nextList.Count, 1, cv.MatType.CV_32FC3, nextList.ToArray)
         Dim zSplit = pts.Split()
         Dim c1 = findCorrelation(zSplit(0), zSplit(2))
         Dim c2 = findCorrelation(zSplit(1), zSplit(2))
@@ -115,7 +115,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits VB_Parent
     Public pcLinesMat As cv.Mat
     Public actualCount As Integer
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line in the sequence"
     End Sub
     Private Sub addLines(nextList As List(Of List(Of cv.Point3f)), xyList As List(Of List(Of cv.Point)))
@@ -140,7 +140,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits VB_Parent
         addLines(pts.hList, pts.xyHList)
         addLines(pts.vList, pts.xyVList)
 
-        pcLinesMat = New cv.Mat(pcLines.Count, 1, cv.MatType.CV_32FC3, pcLines.ToArray)
+        pcLinesMat = cv.Mat.FromPixelData(pcLines.Count, 1, cv.MatType.CV_32FC3, pcLines.ToArray)
         labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
     End Sub
 End Class
@@ -159,7 +159,7 @@ Public Class Line3D_CandidatesAll : Inherits VB_Parent
     Public actualCount As Integer
     Dim white32 As New cv.Point3f(1, 1, 1)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Get a list of points from PointCloud_Basics.  Identify all the lines in the sequence"
     End Sub
     Private Sub addLines(nextList As List(Of List(Of cv.Point3f)), xyList As List(Of List(Of cv.Point)))
@@ -187,7 +187,7 @@ Public Class Line3D_CandidatesAll : Inherits VB_Parent
         addLines(pts.hList, pts.xyHList)
         addLines(pts.vList, pts.xyVList)
 
-        pcLinesMat = New cv.Mat(pcLines.Count, 1, cv.MatType.CV_32FC3, pcLines.ToArray)
+        pcLinesMat = cv.Mat.FromPixelData(pcLines.Count, 1, cv.MatType.CV_32FC3, pcLines.ToArray)
         labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
     End Sub
 End Class

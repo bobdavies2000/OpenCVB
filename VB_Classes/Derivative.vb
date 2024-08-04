@@ -30,7 +30,7 @@ Public Class Derivative_Basics : Inherits VB_Parent
                 index += 1
             End If
         Next
-        histogram = New cv.Mat(plot.histArray.Count, 1, cv.MatType.CV_32F, plot.histArray)
+        histogram = cv.Mat.FromPixelData(plot.histArray.Count, 1, cv.MatType.CV_32F, plot.histArray)
 
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)

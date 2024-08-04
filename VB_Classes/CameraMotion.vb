@@ -6,8 +6,8 @@ Public Class CameraMotion_Basics : Inherits VB_Parent
     Public secondOpinion As Boolean
     Dim feat As New Swarm_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gOptions.setDebugSlider(3)
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
@@ -94,8 +94,8 @@ Public Class CameraMotion_WithRotation : Inherits VB_Parent
     Dim gravityVec As PointPair
     Dim horizonVec As PointPair
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Merge with previous image using rotation AND translation of the camera motion - not as good as translation alone."
     End Sub
     Public Sub translateRotateX(x1 As Integer, x2 As Integer)

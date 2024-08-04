@@ -1403,7 +1403,7 @@ Public Class Options_FilterNorm : Inherits VB_Parent
         Static alphaSlider = FindSlider("Normalize alpha X10")
 
         Dim normType = cv.NormTypes.L1
-        kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
+        kernel = cv.Mat.FromPixelData(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
@@ -2113,13 +2113,13 @@ Public Class Options_Warp : Inherits VB_Parent
                               {0, f, dst2.Height / 2, 0},
                               {0, 0, 1, 0}}
 
-        Dim a1 = New cv.Mat(4, 3, cv.MatType.CV_64F, a)
-        Dim rx = New cv.Mat(4, 4, cv.MatType.CV_64F, x)
-        Dim ry = New cv.Mat(4, 4, cv.MatType.CV_64F, y)
-        Dim rz = New cv.Mat(4, 4, cv.MatType.CV_64F, z)
+        Dim a1 = cv.Mat.FromPixelData(4, 3, cv.MatType.CV_64F, a)
+        Dim rx = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, x)
+        Dim ry = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, y)
+        Dim rz = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, z)
 
-        Dim tt = New cv.Mat(4, 4, cv.MatType.CV_64F, t)
-        Dim a2 = New cv.Mat(3, 4, cv.MatType.CV_64F, b)
+        Dim tt = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, t)
+        Dim a2 = cv.Mat.FromPixelData(3, 4, cv.MatType.CV_64F, b)
 
         Dim r = rx * ry * rz
         transformMatrix = a2 * (tt * (r * a1))
@@ -6226,7 +6226,7 @@ Public Class Options_Kalman_VB : Inherits VB_Parent
         If matrix.Count > 0 Then
             Const MAX_INPUT = 20
             matrix(task.frameCount Mod MAX_INPUT) = kalmanInput
-            Dim AverageOutput = (New cv.Mat(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
+            Dim AverageOutput = (cv.Mat.FromPixelData(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
 
             If AverageOutput < 0 Then AverageOutput = 0
             If AverageOutput > pointSlider.Maximum Then AverageOutput = pointSlider.Maximum

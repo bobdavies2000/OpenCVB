@@ -85,7 +85,7 @@ Public Class LongLine_Depth : Inherits VB_Parent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         plot.dst2 = dst3
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
@@ -201,7 +201,7 @@ Public Class LongLine_Match : Inherits VB_Parent
     Dim longest As New LongLine_Consistent
     Dim options As New Options_LongLine
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Find the longest line from last image and use matchTemplate to find the line in the latest image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -409,7 +409,7 @@ End Class
 Public Class LongLine_NoDepth : Inherits VB_Parent
     Dim lineHist As New LineCoin_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find any lines in regions without depth."
     End Sub
     Public Sub RunVB(src As cv.Mat)

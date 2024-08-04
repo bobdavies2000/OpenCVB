@@ -200,11 +200,11 @@ Public Class Plane_EqCorrelation : Inherits VB_Parent
         Dim count(plane.equations.Count - 1) As Integer
         For i = 0 To equations.Count - 1
             Dim p1 = equations(i)
-            Dim data1 = New cv.Mat(4, 1, cv.MatType.CV_32F, {p1(0), p1(1), p1(2), p1(3)})
+            Dim data1 = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {p1(0), p1(1), p1(2), p1(3)})
 
             For j = i + 1 To equations.Count - 1
                 Dim p2 = equations(j)
-                Dim data2 = New cv.Mat(4, 1, cv.MatType.CV_32F, {p2(0), p2(1), p2(2), p2(3)})
+                Dim data2 = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {p2(0), p2(1), p2(2), p2(3)})
                 cv.Cv2.MatchTemplate(data1, data2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim correlation = correlationMat.Get(Of Single)(0, 0)
                 correlations.Add(correlation)
@@ -393,7 +393,7 @@ Public Class Plane_Histogram : Inherits VB_Parent
         If yList.Count = 0 Then Exit Sub
         hist.mm.minVal = yList.Min
         hist.mm.maxVal = yList.Max
-        hist.Run(New cv.Mat(yList.Count, 1, cv.MatType.CV_32F, yList.ToArray))
+        hist.Run(cv.Mat.FromPixelData(yList.Count, 1, cv.MatType.CV_32F, yList.ToArray))
         dst2 = hist.dst2
         Dim binWidth As Single = dst2.Width / task.histogramBins
         Dim rangePerBin = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
@@ -550,7 +550,7 @@ Public Class Plane_Horizontals : Inherits VB_Parent
         solo.Run(src)
         dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         solo.heat.dst1.CopyTo(dst1, dst3)
         dst1.ConvertTo(dst1, cv.MatType.CV_32FC1)
 

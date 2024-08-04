@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Public Class Hist3Dcloud_Basics : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public histogram1D As New cv.Mat
@@ -26,10 +27,10 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Parent
             If histArray(i) > threshold Then Exit For
             histArray(i) = 0
         Next
-        histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+        histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, histArray)
 
         simK.Run(histogram)
-        histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
+        histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
         classCount = simK.classCount
 
         cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {task.redOptions.rangesCloud(task.redOptions.rangesCloud.Count - 1)})
@@ -115,7 +116,7 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
                                      rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        histogram = New cv.Mat(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, dstPtr)
+        histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, dstPtr)
 
         ranges = New cv.Rangef() {New cv.Rangef(rx(0), rx(1)), New cv.Rangef(ry(0), ry(1)), New cv.Rangef(rz(0), rz(1))}
 
@@ -179,7 +180,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Parent
                                             rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        dst2 = New cv.Mat(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
+        dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
         dst2.SetTo(0, task.noDepthMask)
         dst3.SetTo(0)
         task.pointCloud.CopyTo(dst3, dst2)
@@ -210,7 +211,7 @@ Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Parent
         ReDim histArray(hcloud.histogram.Total - 1)
         Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length)
 
-        histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+        histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, histArray)
         plot.Run(histogram)
         dst2 = plot.dst2
 

@@ -18,7 +18,7 @@ Public Class RecursiveBilateralFilter_CPP_VB : Inherits VB_Parent
                                                     options.RBFCount)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RecursiveBilateralFilter_Close(cPtr)

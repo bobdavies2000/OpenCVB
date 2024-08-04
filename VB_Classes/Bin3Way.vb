@@ -90,7 +90,7 @@ End Class
 Public Class Bin3Way_Color : Inherits VB_Parent
     Dim bin3 As New Bin3Way_KMeans
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Build the palette input that best separates the light and dark regions of an image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -154,7 +154,7 @@ Public Class Bin3Way_RedCloudOther : Inherits VB_Parent
     Dim flood As New Flood_BasicsMask
     Dim color As New Color8U_Basics
     Public Sub New()
-        flood.inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        flood.inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use RedCloud with the regions that are neither lightest or darkest"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -189,7 +189,7 @@ Public Class Bin3Way_RedCloud1 : Inherits VB_Parent
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
-                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
         End If
 
@@ -246,7 +246,7 @@ Public Class Bin3Way_RedCloud : Inherits VB_Parent
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
-                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
         End If
 

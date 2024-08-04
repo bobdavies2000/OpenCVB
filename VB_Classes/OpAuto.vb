@@ -104,7 +104,7 @@ Public Class OpAuto_FloorCeiling : Inherits VB_Parent
     Public floorY As Single
     Public ceilingY As Single
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Automatically find the Y values that best describes the floor and ceiling (if present)"
     End Sub
     Private Sub rebuildMask(maskLabel As String, min As Single, max As Single)

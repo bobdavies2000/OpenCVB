@@ -169,10 +169,10 @@ Public Class WarpAffine_3Points : Inherits VB_Parent
             triangles(1) = triangle.triangle.Clone()
             Dim srcPoints2 As New List(Of cv.Point2f)(triangle.options.srcPoints)
 
-            Dim tOriginal = New cv.Mat(3, 1, cv.MatType.CV_32FC2, New Single() {0, 0, 0, src.Height, src.Width, src.Height})
+            Dim tOriginal = cv.Mat.FromPixelData(3, 1, cv.MatType.CV_32FC2, New Single() {0, 0, 0, src.Height, src.Width, src.Height})
             M = cv.Cv2.GetAffineTransform(tOriginal, triangles(1))
 
-            Dim wideMat = New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3, 0)
+            Dim wideMat = New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
             ' uncomment this line to see original pose of the left triangle
             ' triangles(0) = tOriginal
             For j = 0 To 1

@@ -5,7 +5,7 @@ Public Class Line_Basics : Inherits VB_Parent
     Public lineColor = cv.Scalar.White
     Public Sub New()
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -52,7 +52,7 @@ Public Class Line_SubsetRect : Inherits VB_Parent
     Public Sub New()
         subsetRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -122,7 +122,7 @@ Public Class Line_InterceptsUI : Inherits VB_Parent
         dst3.Line(New cv.Point(0, dst2.Height), center, blue, task.lineWidth, cv.LineTypes.Link4)
         dst3.Line(New cv.Point(dst2.Width, dst2.Height), center, yellow, task.lineWidth, cv.LineTypes.Link4)
 
-        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, cv.Scalar.All(0))
         Dim pt = New cv.Point(center.X, center.Y - 30)
         cv.Cv2.FloodFill(dst3, mask, pt, red, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
 
@@ -316,7 +316,7 @@ Public Class Line_InDepthAndBGR : Inherits VB_Parent
             Dim w = Math.Abs(lp.p1.X - lp.p2.X)
             Dim h = Math.Abs(lp.p1.Y - lp.p2.Y)
             Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
-            Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
+            Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, cv.Scalar.All(0))
             mask.Line(New cv.Point(CInt(lp.p1.X - r.X), CInt(lp.p1.Y - r.Y)), New cv.Point(CInt(lp.p2.X - r.X), CInt(lp.p2.Y - r.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
             Dim mean = task.pointCloud(r).Mean(mask)
 
@@ -556,8 +556,8 @@ Public Class Line_DisplayInfo : Inherits VB_Parent
     Public maskCount As Integer
     Dim myCurrentFrame As Integer = -1
     Public Sub New()
-        dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "When running standaloneTest(), a pair of random points is used to test the algorithm."
         desc = "Display the line provided in mp"
     End Sub
@@ -876,7 +876,7 @@ Public Class Line_TimeView : Inherits VB_Parent
     Public pixelcount As Integer
     Public mpList As New List(Of PointPair)
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Collect lines over time"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1050,7 +1050,7 @@ Public Class Line_Verticals : Inherits VB_Parent
 
         gMat.Run(empty)
 
-        Dim points As New cv.Mat(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
+        Dim points As cv.Mat = cv.Mat.FromPixelData(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
         Dim gPoints As cv.Mat = (points * gMat.gMatrix).ToMat
 
         verticals.Clear()
@@ -1127,7 +1127,7 @@ Public Class Line_Verts : Inherits VB_Parent
         If lines3.Count Then
             gMat.Run(empty)
 
-            Dim points As New cv.Mat(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
+            Dim points As cv.Mat = cv.Mat.FromPixelData(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
             Dim gPoints As cv.Mat = (points * gMat.gMatrix).ToMat
 
             verticals.Clear()
@@ -1324,7 +1324,7 @@ Public Class Line_KNN : Inherits VB_Parent
     Dim swarm As New Swarm_Basics
     Public Sub New()
         FindSlider("Connect X KNN points").Value = 1
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use KNN to find the other line end points nearest to each endpoint and connect them with a line."
     End Sub
     Public Sub RunVB(src As cv.Mat)

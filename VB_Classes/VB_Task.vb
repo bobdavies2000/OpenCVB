@@ -384,7 +384,7 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add("Options_XYRanges") ' so calltrace is not nothing on initial call...
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
-        task.cellMap = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
+        task.cellMap = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, cv.Scalar.All(0))
 
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
@@ -671,8 +671,8 @@ Public Class VBtask : Implements IDisposable
         ' If the WorkingRes changes, the previous generation of images needs to be reset.
         If task.pointCloud.Size <> task.WorkingRes Or task.color.Size <> task.WorkingRes Then
             task.pointCloud = New cv.Mat(task.WorkingRes, cv.MatType.CV_32FC3, 0)
-            task.noDepthMask = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
-            task.depthMask = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
+            task.noDepthMask = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, cv.Scalar.All(0))
+            task.depthMask = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, cv.Scalar.All(0))
         End If
 
         allOptions.TopMost = task.activateTaskRequest

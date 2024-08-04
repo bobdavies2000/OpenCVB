@@ -112,7 +112,7 @@ Public Class PhaseCorrelate_Depth : Inherits VB_Parent
         Static lastFrame = task.pcSplit(2).Clone
         phaseC.Run(task.pcSplit(2))
         dst2 = task.pcSplit(2)
-        Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
+        Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         If phaseC.resetLastFrame Then task.pcSplit(2).CopyTo(lastFrame)
         If Double.IsNaN(phaseC.response) Then
             SetTrueText("PhaseCorrelate_Basics has detected NaN's in the input image.", 3)

@@ -230,7 +230,7 @@ Public Class FeatureLine_Tutorial2 : Inherits VB_Parent
         Else
             gMat.Run(empty)
             task.gMatrix = gMat.gMatrix
-            Dim matLines3D As cv.Mat = (New cv.Mat(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * task.gMatrix
+            Dim matLines3D As cv.Mat = (cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * task.gMatrix
         End If
     End Sub
 End Class
@@ -430,7 +430,7 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
         If raw3D.Count = 0 Then
             SetTrueText("No vertical or horizontal lines were found")
         Else
-            Dim matLines3D As cv.Mat = (New cv.Mat(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * task.gMatrix
+            Dim matLines3D As cv.Mat = (cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * task.gMatrix
 
             For i = 0 To raw2D.Count - 2 Step 2
                 Dim pt1 = matLines3D.Get(Of cv.Point3f)(i, 0)

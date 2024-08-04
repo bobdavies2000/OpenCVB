@@ -60,7 +60,7 @@ Public Class Color8U_Grayscale : Inherits VB_Parent
         If options.useOpenCV Then
             dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Parallel.For(0, src.Rows,
                 Sub(y)
                     For x = 0 To src.Cols - 1

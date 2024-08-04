@@ -15,7 +15,7 @@ Public Class MiniCloud_Basics : Inherits VB_Parent
         split(2).SetTo(0, task.noDepthMask.Resize(split(2).Size))
         rect = New cv.Rect(0, 0, resize.dst2.Width, resize.dst2.Height)
         If rect.Height < dst2.Height / 2 Then rect.Y = dst2.Height / 4 ' move it below the dst2 caption
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst2(rect) = split(2).ConvertScaleAbs(255)
         dst2.Rectangle(rect, cv.Scalar.White, 1)
         cv.Cv2.Merge(split, dst3)
@@ -34,7 +34,7 @@ Public Class MiniCloud_Rotate : Inherits VB_Parent
     Public mini As New MiniCloud_Basics
     Public histogram As New cv.Mat
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(3) = "Side view after resize percentage - use Y-Axis slider to rotate image."
         desc = "Create a histogram for the mini point cloud"
     End Sub
@@ -59,7 +59,7 @@ Public Class MiniCloud_Rotate : Inherits VB_Parent
               {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
               {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
 
-        Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gM)
+        Dim gMat = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, gM)
         Dim gInput = input.Reshape(1, input.Rows * input.Cols)
         Dim gOutput = (gInput * gMat).ToMat
         input = gOutput.Reshape(3, input.Rows)

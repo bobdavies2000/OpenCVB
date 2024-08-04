@@ -120,15 +120,15 @@ Public Class KNN_Core : Inherits VB_Parent
             queries = New List(Of cv.Point2f)(random.PointList)
         End If
 
-        Dim queryMat = New cv.Mat(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
+        Dim queryMat = cv.Mat.FromPixelData(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
         If queryMat.Rows = 0 Then
             SetTrueText("There were no queries provided.  There is nothing to do...")
             Exit Sub
         End If
 
         If trainInput.Count = 0 Then trainInput = New List(Of cv.Point2f)(queries) ' first pass, just match the queries.
-        Dim trainData = New cv.Mat(trainInput.Count, KNNdimension, cv.MatType.CV_32F, trainInput.ToArray)
-        Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
+        Dim trainData = cv.Mat.FromPixelData(trainInput.Count, KNNdimension, cv.MatType.CV_32F, trainInput.ToArray)
+        Dim response = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         Dim neighborMat As New cv.Mat
 
@@ -234,15 +234,15 @@ Public Class KNN_Core3D : Inherits VB_Parent
         End If
 
         Dim KNNdimension = 3
-        Dim queryMat = New cv.Mat(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
+        Dim queryMat = cv.Mat.FromPixelData(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
         If queryMat.Rows = 0 Then
             SetTrueText("There were no queries provided.  There is nothing to do...")
             Exit Sub
         End If
 
         If trainInput.Count = 0 Then trainInput = New List(Of cv.Point3f)(queries) ' first pass, just match the queries.
-        Dim trainData = New cv.Mat(trainInput.Count, KNNdimension, cv.MatType.CV_32F, trainInput.ToArray)
-        Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
+        Dim trainData = cv.Mat.FromPixelData(trainInput.Count, KNNdimension, cv.MatType.CV_32F, trainInput.ToArray)
+        Dim response = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         Dim neighbors As New cv.Mat
         Dim dm = trainInput.Count
@@ -283,15 +283,15 @@ Public Class KNN_Core4D : Inherits VB_Parent
         End If
 
         Dim KNNdimension = 4
-        Dim queryMat = New cv.Mat(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
+        Dim queryMat = cv.Mat.FromPixelData(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
         If queryMat.Rows = 0 Then
             SetTrueText("There were no queries provided.  There is nothing to do...")
             Exit Sub
         End If
 
         If trainInput.Count = 0 Then trainInput = New List(Of cv.Vec4f)(queries) ' first pass, just match the queries.
-        Dim trainData = New cv.Mat(trainInput.Count, KNNdimension, cv.MatType.CV_32F, trainInput.ToArray)
-        Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
+        Dim trainData = cv.Mat.FromPixelData(trainInput.Count, KNNdimension, cv.MatType.CV_32F, trainInput.ToArray)
+        Dim response = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         Dim neighbors As New cv.Mat
         Dim dm = trainInput.Count
@@ -345,10 +345,10 @@ Public Class KNN_CoreN : Inherits VB_Parent
             SetTrueText("There were no queries provided.  There is nothing to do...")
             Exit Sub
         End If
-        Dim queryMat = New cv.Mat(qRows, options.knnDimension, cv.MatType.CV_32F, queries.ToArray)
+        Dim queryMat = cv.Mat.FromPixelData(qRows, options.knnDimension, cv.MatType.CV_32F, queries.ToArray)
 
-        Dim trainData = New cv.Mat(CInt(trainInput.Count / options.knnDimension), options.knnDimension, cv.MatType.CV_32F, trainInput.ToArray)
-        Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
+        Dim trainData = cv.Mat.FromPixelData(CInt(trainInput.Count / options.knnDimension), options.knnDimension, cv.MatType.CV_32F, trainInput.ToArray)
+        Dim response = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         Dim neighbors As New cv.Mat
         Dim dm = trainInput.Count
@@ -593,7 +593,7 @@ Public Class KNN_TrackMean : Inherits VB_Parent
             If diff < 0 Then diff = 0
             hist(diff) += 1
         Next
-        plot.Run(New cv.Mat(hist.Count, 1, cv.MatType.CV_32F, hist.ToArray))
+        plot.Run(cv.Mat.FromPixelData(hist.Count, 1, cv.MatType.CV_32F, hist.ToArray))
         Dim histList = hist.ToList
         Dim maxVal = histList.Max
         Dim maxIndex = histList.IndexOf(maxVal)

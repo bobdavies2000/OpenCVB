@@ -69,7 +69,7 @@ Public Class Rotate_Box : Inherits VB_Parent
         Dim center = New cv.Point2f(r.X + r.Width / 2, r.Y + r.Height / 2)
         Dim drawBox = New cv.RotatedRect(center, New cv.Size2f(r.Width, r.Height), 0)
         Dim boxPoints = cv.Cv2.BoxPoints(drawBox)
-        Dim srcPoints = New cv.Mat(1, 4, cv.MatType.CV_32FC2, boxPoints)
+        Dim srcPoints = cv.Mat.FromPixelData(1, 4, cv.MatType.CV_32FC2, boxPoints)
         Dim dstpoints As New cv.Mat
 
         If rotation.options.warpFlag <> cv.InterpolationFlags.WarpInverseMap Then

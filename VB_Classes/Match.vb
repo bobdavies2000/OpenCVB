@@ -11,7 +11,7 @@ Public Class Match_Basics : Inherits VB_Parent
     Public Sub New()
         If standalone Then task.gOptions.DebugChecked = True
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -391,7 +391,7 @@ Public Class Match_TraceRedC : Inherits VB_Parent
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32S, 0)
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -433,7 +433,7 @@ Public Class Match_DrawRect : Inherits VB_Parent
     Public showOutput As Boolean
     Public Sub New()
         inputRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40) ' arbitrary template to match
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         If standaloneTest() Then labels(3) = "Probabilities (draw rectangle to test again)"
         labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
         desc = "Find the requested template in task.drawrect in an image"

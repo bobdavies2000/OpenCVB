@@ -7,7 +7,7 @@ Public Class Bin4Way_Basics : Inherits VB_Parent
     Dim labelStr(3) As String, points(3) As cv.Point
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         For i = 0 To diff.Count - 1
             diff(i) = New Diff_Basics
         Next
@@ -25,8 +25,8 @@ Public Class Bin4Way_Basics : Inherits VB_Parent
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim matList(3) As cv.Mat
         For i = 0 To matList.Count - 1
-            mats.mat(i) = New cv.Mat(mats.mat(i).Size(), cv.MatType.CV_8U, 0)
-            binary.mats.mat(i) = New cv.Mat(binary.mats.mat(i).Size(), cv.MatType.CV_8U, 0)
+            mats.mat(i) = New cv.Mat(mats.mat(i).Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            binary.mats.mat(i) = New cv.Mat(binary.mats.mat(i).Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         Next
 
         Dim quadrant As Integer
@@ -411,10 +411,10 @@ Public Class Bin4Way_SplitGaps : Inherits VB_Parent
     Public Sub New()
         For i = 0 To diff.Count - 1
             diff(i) = New Diff_Basics
-            mats.mat(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+            mats.mat(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         Next
         If standalone Then task.gOptions.setDisplay1()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
         desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values"
     End Sub
@@ -453,8 +453,8 @@ Public Class Bin4Way_RegionsLeftRight : Inherits VB_Parent
     Dim binaryRight As New Bin4Way_SplitGaps
     Public classCount = 4 ' 4-way split
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Left in in 4 colors", "Right image in 4 colors"}
         desc = "Add the 4-way split of left and right views."
     End Sub
@@ -641,7 +641,7 @@ Public Class Bin4Way_Unstable : Inherits VB_Parent
             diff(i) = New Diff_Basics
         Next
         labels(2) = "Image separated into 4 levels - darkest to lightest"
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the unstable pixels in the binary image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -727,7 +727,7 @@ Public Class Bin4Way_RedCloud : Inherits VB_Parent
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
-                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
         End If
 
@@ -768,7 +768,7 @@ Public Class Bin4Way_Regions : Inherits VB_Parent
         desc = "Add the 4-way split of images to define the different regions."
     End Sub
     Private Sub rebuildMats()
-        dst2 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, cv.Scalar.All(0))
         For i = 0 To binary.mats.mat.Count - 1
             binary.mats.mat(i) = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC1, 0)
         Next
@@ -777,7 +777,7 @@ Public Class Bin4Way_Regions : Inherits VB_Parent
         binary.Run(src)
         If dst2.Width <> binary.mats.mat(0).Width Then rebuildMats()
 
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst2.SetTo(1, binary.mats.mat(0))
         dst2.SetTo(2, binary.mats.mat(1))
         dst2.SetTo(3, binary.mats.mat(2))

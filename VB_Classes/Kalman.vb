@@ -111,7 +111,7 @@ Public Class Kalman_RotatingPoint : Inherits VB_Parent
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim kState As New cv.Mat(2, 1, cv.MatType.CV_32F)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
-    Dim measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
+    Dim measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
     Dim center As cv.Point2f, statePt As cv.Point2f
     Dim radius As Single
     Private Function calcPoint(center As cv.Point2f, R As Double, angle As Double) As cv.Point
@@ -126,7 +126,7 @@ Public Class Kalman_RotatingPoint : Inherits VB_Parent
         labels(2) = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
-        kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
+        kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
 
         cv.Cv2.SetIdentity(kf.MeasurementMatrix)
         cv.Cv2.SetIdentity(kf.ProcessNoiseCov, cv.Scalar.All(0.00001))
@@ -208,7 +208,7 @@ Public Class Kalman_CVMat : Inherits VB_Parent
     Dim saveDimension = -1
     Public Sub New()
         ReDim basics.kInput(4 - 1)
-        input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
+        input = New cv.Mat(4, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         If standaloneTest() Then labels(2) = "Rectangle moves smoothly to random locations"
         desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
@@ -226,7 +226,7 @@ Public Class Kalman_CVMat : Inherits VB_Parent
             For i = 0 To input.Rows - 1
                 kalman(i) = New Kalman_Simple
             Next
-            output = New cv.Mat(input.Rows, 1, cv.MatType.CV_32F, 0)
+            output = New cv.Mat(input.Rows, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         End If
 
         If task.gOptions.UseKalman.Checked Then
@@ -252,7 +252,7 @@ Public Class Kalman_CVMat : Inherits VB_Parent
             If lastRect = rect Then
                 Dim r = InitRandomRect(25)
                 Dim array() As Single = {r.X, r.Y, r.Width, r.Height}
-                input = New cv.Mat(4, 1, cv.MatType.CV_32F, array)
+                input = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, array)
             End If
             dst2.Rectangle(rect, cv.Scalar.Red, 2)
             lastRect = rect
@@ -352,7 +352,7 @@ Public Class Kalman_Single : Inherits VB_Parent
     Dim plot As New Plot_OverTimeScalar
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
-    Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
+    Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
     Public inputReal As Single
     Public stateResult As Single
     Public ProcessNoiseCov As Single = 0.00001
@@ -362,7 +362,7 @@ Public Class Kalman_Single : Inherits VB_Parent
     Public newTransmissionMatrix As Boolean = True
     Public Sub New()
         Dim tMatrix() As Single = {1, 1, 0, 1}
-        kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, tMatrix)
+        kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32F, tMatrix)
         kf.MeasurementMatrix.SetIdentity(1)
         kf.ProcessNoiseCov.SetIdentity(0.00001)
         kf.MeasurementNoiseCov.SetIdentity(0.1)
@@ -399,7 +399,7 @@ End Class
 Public Class Kalman_Simple : Implements IDisposable
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
-    Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
+    Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
     Public inputReal As Single
     Public stateResult As Single
     Public ProcessNoiseCov As Single = 0.00001
@@ -408,7 +408,7 @@ Public Class Kalman_Simple : Implements IDisposable
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
     Public newTMatrix As Boolean = True
     Public Sub updateTMatrix()
-        kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, transitionMatrix)
+        kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32F, transitionMatrix)
         kf.MeasurementMatrix.SetIdentity(1)
         kf.ProcessNoiseCov.SetIdentity(0.00001)
         kf.MeasurementNoiseCov.SetIdentity(0.1)
@@ -576,7 +576,7 @@ Public Class Kalman_VB_Basics : Inherits VB_Parent
         End If
 
         matrix(task.frameCount Mod saveAvgCount) = kInput
-        kAverage = (New cv.Mat(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
+        kAverage = (cv.Mat.FromPixelData(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
 
         If task.gOptions.UseKalman.Checked Then
             'The Kalman Filter code comes from:

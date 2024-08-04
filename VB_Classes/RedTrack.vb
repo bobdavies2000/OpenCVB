@@ -31,7 +31,7 @@ Public Class RedTrack_Lines : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -265,7 +265,7 @@ Public Class RedTrack_Points : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
     End Sub
@@ -299,7 +299,7 @@ Public Class RedTrack_Features : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Output of Feature_Basics - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
         desc = "Similar to RedTrack_KNNPoints"

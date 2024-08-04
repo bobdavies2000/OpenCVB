@@ -195,8 +195,8 @@ End Class
 
 Public Class Math_Template : Inherits VB_Parent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         labels = {"", "", "Input Template showing columns", "Input Template showing rows"}
         desc = "Build a template for use with computing the point cloud"
     End Sub

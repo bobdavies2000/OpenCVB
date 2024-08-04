@@ -1710,14 +1710,14 @@ public:
         }
         contour->Run(dst2);
         dst2 = contour->dst2;
-        if (!contour->allContours.empty()) {
+        if (contour->allContours.size()) {
             vector<Point> nextContour;
             approxPolyDP(contour->bestContour, nextContour, epsilon, closedPoly);
             dst3 = Mat::zeros(dst2.size(), CV_8UC1);
             task->drawContour(dst3, nextContour, Scalar(0, 255, 255));
         }
         else {
-            task->SetTrueText("No contours found", dst2);
+            // task->SetTrueText("No contours found", dst2);
         }
     }
 };
@@ -1747,6 +1747,7 @@ public:
         Mat hull2f;
         convexHull(inputPoints, hull2f);
         hull = task->convert2f2i(hull2f);
+        dst2.setTo(0);
         task->drawContour(dst2, hull, Scalar(0, 255, 255));
     }
 };

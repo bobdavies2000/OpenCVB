@@ -396,7 +396,7 @@ Public Class FeaturePoly_Plot : Inherits VB_Parent
         Dim peak = hlist.Max
         Dim peakIndex = hlist.IndexOf(peak)
 
-        Dim histMat = New cv.Mat(hist.Length, 1, cv.MatType.CV_32F, hist.ToArray)
+        Dim histMat = cv.Mat.FromPixelData(hist.Length, 1, cv.MatType.CV_32F, hist.ToArray)
         plot.maxValue = fGrid.stable.basics.ptList.Count
         plot.Run(histMat)
         dst2 = plot.dst2
@@ -438,7 +438,7 @@ Public Class FeaturePoly_PlotWeighted : Inherits VB_Parent
         Dim hlist = fPlot.hist.ToList
         Dim peak = hlist.Max
         Dim peakIndex = hlist.IndexOf(peak)
-        Dim histMat = New cv.Mat(fPlot.hist.Length, 1, cv.MatType.CV_32F, fPlot.hist)
+        Dim histMat = cv.Mat.FromPixelData(fPlot.hist.Length, 1, cv.MatType.CV_32F, fPlot.hist)
         plot.maxValue = fPlot.fGrid.stable.basics.ptList.Count
         plot.Run(histMat)
         addw.src2 = plot.dst2
@@ -953,7 +953,7 @@ Public Class FeaturePoly_Image : Inherits VB_Parent
                 rotate.Run(mask2)
                 mask2 = rotate.dst2
 
-                Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+                Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 mask(r1).SetTo(255)
                 mask(r1) = mask2(r2)
                 mask = Not mask
@@ -1039,7 +1039,7 @@ End Class
 Public Class FeaturePoly_ResyncCheck : Inherits VB_Parent
     Dim fPoly As New FeaturePoly_BasicsOriginal
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1237,7 +1237,7 @@ Public Class FeaturePoly_ImageNew : Inherits VB_Parent
             rotate.Run(mask2)
             mask2 = rotate.dst2
 
-            Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+            Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             mask(r1).SetTo(255)
             mask(r1) = mask2(r2)
             mask = Not mask
@@ -1307,7 +1307,7 @@ Public Class FeaturePoly_Core : Inherits VB_Parent
     Dim options As New Options_FPoly
     Dim optionsCore As New Options_FPolyCore
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         FindSlider("Feature Sample Size").Value = 20
         labels = {"", "Distance change from previous frame", "", "Feature Grid with anchor"}
         desc = "Feature Grid: compute distances between good features from frame to frame"

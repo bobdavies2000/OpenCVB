@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
+Imports OpenCvSharp
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics : Inherits VB_Parent
@@ -24,7 +25,7 @@ Public Class BGSubtract_Basics : Inherits VB_Parent
         Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, options.learnRate)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         labels(2) = options.methodDesc
     End Sub
     Public Sub Close()
@@ -51,7 +52,7 @@ Public Class BGSubtract_Basics_QT : Inherits VB_Parent
         Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, learnRate)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
@@ -72,7 +73,7 @@ Public Class BGSubtract_MOG2 : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG2.Apply(src, dst2, options.learnRate)
     End Sub
 End Class
@@ -89,7 +90,7 @@ Public Class BGSubtract_MOG2_QT : Inherits VB_Parent
         desc = "Subtract background using a mixture of Gaussians - the QT version"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
         MOG2.Apply(src, dst2, learnRate)
     End Sub
@@ -151,7 +152,7 @@ Public Class BGSubtract_MOG : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG.Apply(src, dst2, options.learnRate)
     End Sub
 End Class
@@ -178,7 +179,7 @@ Public Class BGSubtract_GMG_KNN : Inherits VB_Parent
             SetTrueText("")
         End If
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         gmg.Apply(dst2, dst2, options.learnRate)
         knn.Apply(dst2, dst2, options.learnRate)
     End Sub
@@ -202,11 +203,11 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        grayMat = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        grayMat = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(grayMat, grayMat, options.learnRate)
         dst2 = grayMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGRGB.Apply(src, dst3, options.learnRate)
     End Sub
 End Class
@@ -240,7 +241,7 @@ Public Class BGSubtract_DepthOrColorMotion : Inherits VB_Parent
         motion.Run(src)
         dst2 = motion.dst2
         dst3 = motion.dst3
-        Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray).ConvertScaleAbs()
+        Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs()
         src.CopyTo(dst3, Not mask)
         labels(3) = "Image with instability filled with color data"
     End Sub
@@ -295,7 +296,7 @@ Public Class BGSubtract_Synthetic_CPP_VB : Inherits VB_Parent
             handleSrc.Free()
         End If
         Dim imagePtr = BGSubtract_Synthetic_Run(cPtr)
-        If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = BGSubtract_Synthetic_Close(cPtr)

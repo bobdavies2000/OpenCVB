@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Public Class Denoise_Basics_CPP_VB : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -16,7 +17,7 @@ Public Class Denoise_Basics_CPP_VB : Inherits VB_Parent
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
             diff.Run(dst2)
             dst3 = diff.dst2
         End If
@@ -56,7 +57,7 @@ Public Class Denoise_Pixels_CPP_VB : Inherits VB_Parent
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Denoise_Pixels_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()
-            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
         Else
             dst2 = src
         End If

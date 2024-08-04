@@ -22,12 +22,12 @@ Public Class KLT_Basics : Inherits VB_Parent
             If options.inputPoints.Length > 0 Then
                 options.inputPoints = cv.Cv2.CornerSubPix(src, options.inputPoints, options.subPixWinSize, New cv.Size(-1, -1), term)
             End If
-            outputMat = New cv.Mat(options.inputPoints.Length, 1, cv.MatType.CV_32FC2, options.inputPoints)
-            status = New cv.Mat(outputMat.Rows, outputMat.Cols, cv.MatType.CV_8U, 1)
+            outputMat = cv.Mat.FromPixelData(options.inputPoints.Length, 1, cv.MatType.CV_32FC2, options.inputPoints)
+            status = cv.Mat.FromPixelData(outputMat.Rows, outputMat.Cols, cv.MatType.CV_8U, 1)
         ElseIf options.inputPoints.Length > 0 Then
             Dim err As New cv.Mat
             ' convert the point2f vector to an inputarray (cv.Mat)
-            Dim inputMat = New cv.Mat(options.inputPoints.Length, 1, cv.MatType.CV_32FC2, options.inputPoints)
+            Dim inputMat = cv.Mat.FromPixelData(options.inputPoints.Length, 1, cv.MatType.CV_32FC2, options.inputPoints)
             outputMat = inputMat.Clone()
             cv.Cv2.CalcOpticalFlowPyrLK(lastGray, src, inputMat, outputMat, status, err, options.winSize, 3, term, cv.OpticalFlowFlags.None)
 

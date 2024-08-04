@@ -10,7 +10,7 @@ Public Class Stabilizer_Basics : Inherits VB_Parent
     Dim options As New Options_Stabilizer
     Dim lastFrame As cv.Mat
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "Current frame - rectangle input to matchTemplate"
         desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
@@ -191,7 +191,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         feat.Run(src)
         inputFeat = New List(Of cv.Point2f)(task.features)
-        features1 = New cv.Mat(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
+        features1 = cv.Mat.FromPixelData(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
 
         Static lastFrame As cv.Mat = src.Clone()
         If task.frameCount > 0 Then
@@ -229,7 +229,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
 
             Dim sx = ds_x, sy = ds_y
 
-            Dim delta As New cv.Mat(5, 1, cv.MatType.CV_64F, New Double() {ds_x, ds_y, da, dx, dy})
+            Dim delta As cv.Mat = cv.Mat.FromPixelData(5, 1, cv.MatType.CV_64F, New Double() {ds_x, ds_y, da, dx, dy})
             cv.Cv2.Add(sumScale, delta, sumScale)
 
             Dim diff As New cv.Mat

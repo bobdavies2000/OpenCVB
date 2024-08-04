@@ -212,7 +212,7 @@ Public Class Hist3D_PixelCells : Inherits VB_Parent
     Dim pixel As New Hist3D_Pixel
     Dim redC As New Flood_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2"}
         desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
     End Sub

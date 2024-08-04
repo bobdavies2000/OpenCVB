@@ -101,7 +101,7 @@ Public Class Structured_MultiSlice : Inherits VB_Parent
 
         split = task.pointCloud.Split()
 
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         For xCoordinate = 0 To src.Width - 1 Step stepSize
             Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
@@ -206,7 +206,7 @@ Public Class Structured_Rebuild : Inherits VB_Parent
         desc = "Rebuild the point cloud using inrange - not useful yet"
     End Sub
     Private Function rebuildX(viewX As cv.Mat) As cv.Mat
-        Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, 0)
+        Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim firstCol As Integer
         For firstCol = 0 To viewX.Width - 1
             If viewX.Col(firstCol).CountNonZero > 0 Then Exit For
@@ -228,7 +228,7 @@ Public Class Structured_Rebuild : Inherits VB_Parent
         Return output
     End Function
     Private Function rebuildY(viewY As cv.Mat) As cv.Mat
-        Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, 0)
+        Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim firstLine As Integer
         For firstLine = 0 To viewY.Height - 1
             If viewY.Row(firstLine).CountNonZero > 0 Then Exit For
@@ -518,7 +518,7 @@ Public Class Structured_CountTop : Inherits VB_Parent
         dst2.SetTo(cv.Scalar.White, dst0)
         dst1.Line(New cv.Point(index, 0), New cv.Point(index, dst1.Height), cv.Scalar.Red, slice.options.sliceSize)
 
-        Dim hist As New cv.Mat(dst0.Width, 1, cv.MatType.CV_32F, counts.ToArray)
+        Dim hist As cv.Mat = cv.Mat.FromPixelData(dst0.Width, 1, cv.MatType.CV_32F, counts.ToArray)
         plot.Run(hist)
 
         dst3 = plot.dst2
@@ -636,7 +636,7 @@ Public Class Structured_MultiSliceH : Inherits VB_Parent
         heat.Run(src)
         dst3 = heat.dst3
 
-        sliceMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        sliceMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         For yCoordinate = 0 To src.Height - 1 Step stepsize
             Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
             If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
@@ -674,7 +674,7 @@ Public Class Structured_MultiSliceV : Inherits VB_Parent
         heat.Run(src)
         dst3 = heat.dst2
 
-        Dim sliceMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        Dim sliceMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         For xCoordinate = 0 To src.Width - 1 Step stepsize
             Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
@@ -1016,8 +1016,8 @@ Public Class Structured_CountSide : Inherits VB_Parent
         maxCountIndex = counts.IndexOf(max)
         dst2.Line(New cv.Point(0, maxCountIndex), New cv.Point(dst2.Width, maxCountIndex), cv.Scalar.Red, slice.options.sliceSize)
 
-        Dim hist As New cv.Mat(dst0.Height, 1, cv.MatType.CV_32F, counts.ToArray)
-        plot.dst2 = New cv.Mat(dst2.Height, dst2.Height, cv.MatType.CV_8UC3, 0)
+        Dim hist As cv.Mat = cv.Mat.FromPixelData(dst0.Height, 1, cv.MatType.CV_32F, counts.ToArray)
+        plot.dst2 = New cv.Mat(dst2.Height, dst2.Height, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         plot.Run(hist)
         dst3 = plot.dst2
 

@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
+Imports OpenCvSharp
 
 Public Class CPP_Basics : Inherits VB_Parent
     Public cppFunction As Integer
@@ -89,22 +90,22 @@ Public Class CPP_Basics : Inherits VB_Parent
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
         cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
                        task.accRadians.X, task.accRadians.Y, task.accRadians.Z, task.optionsChanged, task.heartBeat,
-                       task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked, task.gOptions.DebugChecked)
+                       task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked, task.gOptions.debugChecked)
         handleInput.Free()
         getOptions()
 
         Dim channels As Integer, dstPtr As IntPtr
         dstPtr = cppTask_GetDst(cPtr, 0, channels)
-        dst0 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
 
         dstPtr = cppTask_GetDst(cPtr, 1, channels)
-        dst1 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
 
         dstPtr = cppTask_GetDst(cPtr, 2, channels)
-        dst2 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
 
         dstPtr = cppTask_GetDst(cPtr, 3, channels)
-        dst3 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = cppTask_Close(cPtr)

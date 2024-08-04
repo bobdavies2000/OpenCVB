@@ -73,7 +73,7 @@ Public Class Sort_MLPrepTest_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Sort_MLPrepTest_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
-        MLTestData = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32FC2, imagePtr).Clone
+        MLTestData = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC2, imagePtr).Clone
         Dim split = MLTestData.Split()
         dst2 = split(0)
         dst3 = split(1)
@@ -101,7 +101,7 @@ Public Class Sort_1Channel : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         FindRadio("Sort all pixels descending").Checked = True
         If standaloneTest() Then task.gOptions.setGridSize(10)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
     End Sub
@@ -169,13 +169,13 @@ Public Class Sort_3Channel : Inherits VB_Parent
         If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
         bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
-        dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, bgra.Data)
+        dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, bgra.Data)
 
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
         dst1.CopyTo(dst0, inputMask)
         sort.Run(dst0)
         dst2 = sort.dst2.Reshape(1, dst2.Rows)
-        Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC4, dst2.Data)
+        Dim tmp = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC4, dst2.Data)
         dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
         'dups.Run(dst2)
@@ -237,7 +237,7 @@ Public Class Sort_Integer : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Dim split = src.Split()
-            Dim zero As New cv.Mat(split(0).Size(), cv.MatType.CV_8U, 0)
+            Dim zero As New cv.Mat(split(0).Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             cv.Cv2.Merge({split(0), split(1), split(2), zero}, src)
             Marshal.Copy(src.Data, data, 0, data.Length)
             src = New cv.Mat(src.Size(), cv.MatType.CV_32S, 0)
@@ -283,7 +283,7 @@ Public Class Sort_GrayScale1 : Inherits VB_Parent
             input(i) = pixels(0)(i) * 65536 + pixels(1)(i) * 256 + pixels(2)(i)
         Next
 
-        sort.Run(New cv.Mat(gray.Length, 1, cv.MatType.CV_32S, input))
+        sort.Run(cv.Mat.FromPixelData(gray.Length, 1, cv.MatType.CV_32S, input))
 
         Dim sorted(gray.Length - 1) As UInteger
 
@@ -322,7 +322,7 @@ Public Class Sort_GrayScale : Inherits VB_Parent
             If totals(index) = 1 Then lut(index) = New cv.Vec3b(pixels(0)(i), pixels(1)(i), pixels(2)(i))
         Next
 
-        Dim histogram As New cv.Mat(256, 1, cv.MatType.CV_32F, totals)
+        Dim histogram As cv.Mat = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_32F, totals)
         plot.Run(histogram)
         dst2 = plot.dst2
     End Sub

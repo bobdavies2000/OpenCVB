@@ -43,8 +43,8 @@ Public Class ML_Basics : Inherits VB_Parent
             Exit Sub
         End If
 
-        Dim mLearn As cv.Mat = New cv.Mat(mlInput.Count, 5, cv.MatType.CV_32F, mlInput.ToArray)
-        Dim response As cv.Mat = New cv.Mat(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
+        Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 5, cv.MatType.CV_32F, mlInput.ToArray)
+        Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
         rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
 
         Dim predictList As New List(Of mlData)
@@ -67,8 +67,8 @@ Public Class ML_Basics : Inherits VB_Parent
             saveRoi.Add(roi)
         Next
 
-        Dim predMat = New cv.Mat(predictList.Count, 5, cv.MatType.CV_32F, predictList.ToArray)
-        Dim output = New cv.Mat(predictList.Count, cv.MatType.CV_32FC1, 0)
+        Dim predMat = cv.Mat.FromPixelData(predictList.Count, 5, cv.MatType.CV_32F, predictList.ToArray)
+        Dim output = New cv.Mat(predictList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
         rtree.Predict(predMat, output)
 
         dst1 = task.pcSplit(2)
@@ -122,8 +122,8 @@ Module ML__Exports
                 Next
             Next
 
-            Dim learnInput As New cv.Mat(learnData.Count, 3, cv.MatType.CV_32F, learnInputList.ToArray())
-            Dim depthResponse As New cv.Mat(learnData.Count, 1, cv.MatType.CV_32F, responseInputList.ToArray())
+            Dim learnInput As cv.Mat = cv.Mat.FromPixelData(learnData.Count, 3, cv.MatType.CV_32F, learnInputList.ToArray())
+            Dim depthResponse As cv.Mat = cv.Mat.FromPixelData(learnData.Count, 1, cv.MatType.CV_32F, responseInputList.ToArray())
 
             ' now learn what depths are associated with which colors.
             Dim rtree = cv.ML.RTrees.Create()
@@ -282,7 +282,7 @@ Public Class ML_DepthFromXYColor : Inherits VB_Parent
         Dim c = color32f.Reshape(1, color32f.Total)
         Dim depthResponse = depth32f.Reshape(1, depth32f.Total)
 
-        Dim learnInput As New cv.Mat(c.Rows, 6, cv.MatType.CV_32F, 0)
+        Dim learnInput As New cv.Mat(c.Rows, 6, cv.MatType.CV_32F, cv.Scalar.All(0))
         For y = 0 To c.Rows - 1
             For x = 0 To c.Cols - 1
                 Dim v6 = New cv.Vec6f(c.Get(Of Single)(y, x), c.Get(Of Single)(y, x + 1), c.Get(Of Single)(y, x + 2), x, y, 0)
@@ -296,7 +296,7 @@ Public Class ML_DepthFromXYColor : Inherits VB_Parent
 
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim allC = color32f.Reshape(1, color32f.Total) ' test the entire original image.
-        Dim input As New cv.Mat(allC.Rows, 6, cv.MatType.CV_32F, 0)
+        Dim input As New cv.Mat(allC.Rows, 6, cv.MatType.CV_32F, cv.Scalar.All(0))
         For y = 0 To allC.Rows - 1
             For x = 0 To allC.Cols - 1
                 Dim v6 = New cv.Vec6f(allC.Get(Of Single)(y, x), allC.Get(Of Single)(y, x + 1), allC.Get(Of Single)(y, x + 2), x, y, 0)
@@ -367,12 +367,12 @@ Public Class ML_Color2Depth : Inherits VB_Parent
             Exit Sub
         End If
 
-        Dim mLearn As cv.Mat = New cv.Mat(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
-        Dim response As cv.Mat = New cv.Mat(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
+        Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
+        Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
         rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
 
-        Dim predMat = New cv.Mat(predictList.Count, 3, cv.MatType.CV_32F, predictList.ToArray)
-        Dim output = New cv.Mat(predictList.Count, cv.MatType.CV_32FC1, 0)
+        Dim predMat = cv.Mat.FromPixelData(predictList.Count, 3, cv.MatType.CV_32F, predictList.ToArray)
+        Dim output = New cv.Mat(predictList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
         rtree.Predict(predMat, output)
 
         dst3 = task.pcSplit(2).Clone
@@ -434,11 +434,11 @@ Public Class ML_ColorInTier2Depth : Inherits VB_Parent
             Exit Sub
         End If
 
-        Dim mLearn As cv.Mat = New cv.Mat(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
-        Dim response As cv.Mat = New cv.Mat(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
+        Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
+        Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
         rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
 
-        Dim predMat = New cv.Mat(predictList.Count, 3, cv.MatType.CV_32F, predictList.ToArray)
+        Dim predMat = cv.Mat.FromPixelData(predictList.Count, 3, cv.MatType.CV_32F, predictList.ToArray)
         Dim output = New cv.Mat(predictList.Count, cv.MatType.CV_32FC1, 0)
         rtree.Predict(predMat, output)
 
@@ -468,7 +468,7 @@ Public Class ML_RemoveDups_CPP_VB : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
 
         If src.Type = cv.MatType.CV_8UC3 Then
-            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, src.CvtColor(cv.ColorConversionCodes.BGR2BGRA).Data)
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, src.CvtColor(cv.ColorConversionCodes.BGR2BGRA).Data)
         Else
             dst2 = src.Clone
         End If
@@ -481,11 +481,11 @@ Public Class ML_RemoveDups_CPP_VB : Inherits VB_Parent
 
         Dim compressedCount = ML_RemoveDups_GetCount(cPtr)
         If src.Type = cv.MatType.CV_32S Then
-            dst3 = New cv.Mat(dst2.Rows, dst2.Cols, dst2.Type, imagePtr).Clone
-            Dim tmp = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC4, dst3.Data)
+            dst3 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, dst2.Type, imagePtr).Clone
+            Dim tmp = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC4, dst3.Data)
             dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
         Else
-            dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+            dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         End If
 
         labels(3) = "The BGR data in dst2 after removing duplicate BGR entries.  Input count = " + CStr(dst2.Total) + " output = " + CStr(compressedCount)

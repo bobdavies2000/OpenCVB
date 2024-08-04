@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Public Class Fuzzy_Basics : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_Contours
@@ -15,7 +16,7 @@ Public Class Fuzzy_Basics : Inherits VB_Parent
         labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}
         desc = "That which is not solid is fuzzy"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
         reduction.Run(src)
@@ -28,7 +29,7 @@ Public Class Fuzzy_Basics : Inherits VB_Parent
         Dim imagePtr = Fuzzy_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst0.Rows, dst0.Cols)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(dst0.Rows, dst0.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
         dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim tmp As New cv.Mat
@@ -81,7 +82,7 @@ Public Class Fuzzy_Filter : Inherits VB_Parent
     Dim options As New Options_Contours
     Public Sub New()
         Dim array() As Single = {1, 1, 1, 1, 1, 1, 1, 1, 1}
-        kernel = New cv.Mat(3, 3, cv.MatType.CV_32F, array)
+        kernel = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, array)
         kernel *= 1 / 9
         desc = "Use a 2D filter to find smooth areas"
     End Sub
@@ -139,11 +140,11 @@ End Class
 
 
 Public Class Fuzzy_ContoursDepth : Inherits VB_Parent
-    Public fuzzyD as New Fuzzy_Basics
+    Public fuzzyD As New Fuzzy_Basics
     Public Sub New()
         desc = "Use contours to outline solids in the depth data"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         fuzzyD.Run(task.depthRGB)
         dst2 = fuzzyD.dst1
     End Sub
@@ -157,7 +158,7 @@ End Class
 
 
 Public Class Fuzzy_NeighborProof : Inherits VB_Parent
-    Dim fuzzy as New Fuzzy_Basics
+    Dim fuzzy As New Fuzzy_Basics
     Dim proofFailed As Boolean = False
     Public Sub New()
         desc = "Prove that every contour point has at one and only one neighbor with the mask ID and that the rest are zero"
@@ -222,9 +223,9 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
         Dim minY As Double, maxY As Double
         For Each vec In fuzzy.sortContours.Values
             Dim contours = fuzzy.contours(vec(0))
-            Dim points = New cv.Mat(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
+            Dim points = cv.Mat.FromPixelData(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
             Dim center = points.Sum()
-            points = New cv.Mat(contours.Length, 2, cv.MatType.CV_32S, contours.ToArray)
+            points = cv.Mat.FromPixelData(contours.Length, 2, cv.MatType.CV_32S, contours.ToArray)
             points.Col(0).MinMaxIdx(minX, maxX)
             points.Col(1).MinMaxIdx(minY, maxY)
 

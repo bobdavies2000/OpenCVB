@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class Corners_Basics : Inherits VB_Parent
     Public features As New List(Of cv.Point2f)
@@ -53,7 +54,7 @@ Public Class Corners_Harris : Inherits VB_Parent
 
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mc = New cv.Mat(gray.Size(), cv.MatType.CV_32FC1, 0)
-        dst2 = New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(gray.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         cv.Cv2.CornerEigenValsAndVecs(gray, dst2, options.blockSize, options.aperture, cv.BorderTypes.Default)
 
         For y = 0 To gray.Rows - 1
@@ -133,7 +134,7 @@ Public Class Corners_ShiTomasi_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols, options.blocksize, options.aperture)
         handle.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr).Clone
 
         dst3 = GetNormalize32f(dst2)
         dst3 = dst3.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
@@ -179,7 +180,7 @@ Public Class Corners_BasicsStablePoints : Inherits VB_Parent
     Dim fast As New Corners_Basics
     Public Sub New()
         labels = {"", "", "", "FAST stable points without context"}
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find and save only the stable points in the FAST output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -268,7 +269,7 @@ Public Class Corners_Harris_CPP_VB : Inherits VB_Parent
                                            options.neighborhood, options.aperture, options.harrisParm)
         handleSrc.Free()
 
-        Dim gray32f = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
+        Dim gray32f = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
         '  gray32f = GetNormalize32f(gray32f)
         gray32f.ConvertTo(dst2, cv.MatType.CV_8U)
         addw.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -308,7 +309,7 @@ Public Class Corners_HarrisDetector_CPP_VB : Inherits VB_Parent
         handleSrc.Free()
         Dim ptCount = Harris_Detector_Count(cPtr)
         If ptCount > 1 Then
-            Dim ptMat = New cv.Mat(ptCount, 2, cv.MatType.CV_32S, imagePtr).Clone
+            Dim ptMat = cv.Mat.FromPixelData(ptCount, 2, cv.MatType.CV_32S, imagePtr).Clone
             features.Clear()
             For i = 0 To ptCount - 1
                 features.Add(New cv.Point2f(ptMat.Get(Of Integer)(i, 0), ptMat.Get(Of Integer)(i, 1)))

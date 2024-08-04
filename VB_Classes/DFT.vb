@@ -40,7 +40,7 @@ Public Class DFT_Basics : Inherits VB_Parent
         cv.Cv2.CopyMakeBorder(grayMat, padded, 0, rows - grayMat.Rows, 0, cols - grayMat.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
         Dim padded32 As New cv.Mat
         padded.ConvertTo(padded32, cv.MatType.CV_32F)
-        Dim planes() = {padded32, New cv.Mat(padded.Size(), cv.MatType.CV_32F, 0)}
+        Dim planes() = {padded32, New cv.Mat(padded.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
         cv.Cv2.Merge(planes, complexImage)
         cv.Cv2.Dft(complexImage, complexImage)
 
@@ -87,7 +87,7 @@ Public Class DFT_Inverse : Inherits VB_Parent
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim gray32f As New cv.Mat
         src.ConvertTo(gray32f, cv.MatType.CV_32F)
-        Dim planes() = {gray32f, New cv.Mat(gray32f.Size(), cv.MatType.CV_32F, 0)}
+        Dim planes() = {gray32f, New cv.Mat(gray32f.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
         Dim complex As New cv.Mat, complexImage As New cv.Mat
         cv.Cv2.Merge(planes, complex)
         cv.Cv2.Dft(complex, complexImage)
@@ -132,7 +132,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits VB_Parent
             Sub(k)
                 Dim r = options.radius / (k + 1), rNext As Double
                 options.butterworthFilter(k) = New cv.Mat(dft.complexImage.Size(), cv.MatType.CV_32FC2)
-                Dim tmp As New cv.Mat(options.butterworthFilter(k).Size(), cv.MatType.CV_32F, 0)
+                Dim tmp As New cv.Mat(options.butterworthFilter(k).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
                 Dim center As New cv.Point(options.butterworthFilter(k).Rows / 2, options.butterworthFilter(k).Cols / 2)
                 For i = 0 To options.butterworthFilter(k).Rows - 1
                     For j = 0 To options.butterworthFilter(k).Cols - 1
@@ -227,7 +227,7 @@ Public Class DFT_Shapes : Inherits VB_Parent
                 dst2 = symShapes.dst2
             Case "Draw Point"
                 If task.heartBeat Then
-                    dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+                    dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                     Dim pt1 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
                     Dim pt2 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
                     dst2.Set(Of Byte)(pt1.Y, pt1.X, 255)

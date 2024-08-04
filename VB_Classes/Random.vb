@@ -183,7 +183,7 @@ Public Class Random_LUTMask : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If task.heartBeat Or task.frameCount < 10 Then
             random.Run(empty)
-            lutMat = New cv.Mat(New cv.Size(1, 256), cv.MatType.CV_8UC3, 0)
+            lutMat = New cv.Mat(New cv.Size(1, 256), cv.MatType.CV_8UC3, cv.Scalar.All(0))
             Dim lutIndex = 0
             km.Run(src)
             dst2 = km.dst2
@@ -210,7 +210,7 @@ Public Class Random_UniformDist : Inherits VB_Parent
         desc = "Create a uniform distribution."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         cv.Cv2.Randu(dst2, minVal, maxVal)
     End Sub
 End Class
@@ -327,7 +327,7 @@ Public Class Random_PatternGenerator_CPP_VB : Inherits VB_Parent
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim imagePtr = Random_PatternGenerator_Run(cPtr, src.Rows, src.Cols)
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Random_PatternGenerator_Close(cPtr)
@@ -343,12 +343,12 @@ End Class
 
 Public Class Random_CustomDistribution : Inherits VB_Parent
     Public inputCDF As cv.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
-    Public outputRandom = New cv.Mat(10000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
+    Public outputRandom = cv.Mat.FromPixelData(10000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public outputHistogram As cv.Mat
     Public plot As New Plot_Histogram
     Public Sub New()
         Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.75, 0.25}
-        inputCDF = New cv.Mat(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
+        inputCDF = cv.Mat.FromPixelData(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
         desc = "Create a custom random number distribution from any histogram"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -359,7 +359,7 @@ Public Class Random_CustomDistribution : Inherits VB_Parent
                 inputCDF.Set(Of Single)(i, 0, inputCDF.Get(Of Single)(i - 1, 0) + inputCDF.Get(Of Single)(i, 0))
             Next
         End If
-        outputHistogram = New cv.Mat(inputCDF.Size(), cv.MatType.CV_32F, 0)
+        outputHistogram = New cv.Mat(inputCDF.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim size = outputHistogram.Rows
         For i = 0 To outputRandom.rows - 1
             Dim uniformR1 = msRNG.NextDouble()
@@ -394,7 +394,7 @@ Public Class Random_MonteCarlo : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim histogram = New cv.Mat(options.dimension, 1, cv.MatType.CV_32F, 0)
+        Dim histogram = New cv.Mat(options.dimension, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         For i = 0 To outputRandom.rows - 1
             While (1)
                 Dim r1 = msRNG.NextDouble()
@@ -425,7 +425,7 @@ Public Class Random_CustomHistogram : Inherits VB_Parent
     Public hist As New Hist_Simple
     Public saveHist As cv.Mat
     Public Sub New()
-        random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
+        random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, cv.Scalar.All(0))
 
         labels(2) = "Histogram of the grayscale image"
         labels(3) = "Custom random distribution that reflects dst2 image"
@@ -506,7 +506,7 @@ Public Class Random_StaticTVFaster : Inherits VB_Parent
         mats.mat(0) = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.Binary)
         Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
-        Dim valMat As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        Dim valMat As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         cv.Cv2.Randu(valMat, 0, valSlider.Value)
         valMat.SetTo(0, nochangeMask)
 

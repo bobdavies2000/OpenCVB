@@ -101,7 +101,7 @@ Public Class FeatureFlow_LucasKanade : Inherits VB_Parent
         Static lastGray As cv.Mat = src.Clone
         feat.Run(src)
         features = task.features
-        Dim features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
+        Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat
         Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)
         cv.Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)

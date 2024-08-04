@@ -218,8 +218,8 @@ Public Class BackProject_PointCloud : Inherits VB_Parent
         dst0 = hist.dst2.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
         dst1 = hist.dst3.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
 
-        dst2 = New cv.Mat(hist.dst2.Size(), cv.MatType.CV_32F, 0)
-        dst3 = New cv.Mat(hist.dst3.Size(), cv.MatType.CV_32F, 0)
+        dst2 = New cv.Mat(hist.dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        dst3 = New cv.Mat(hist.dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
 
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({task.pointCloud}, {0, 2}, dst0, mask, hist.rangesX)
@@ -320,7 +320,7 @@ Public Class BackProject_MaskLines : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
                   "Yellow is backProjection, lines detected are highlighted"}
         desc = "Inspect the lines from individual backprojection masks from a histogram"
@@ -537,7 +537,7 @@ End Class
 Public Class BackProject_LineTop : Inherits VB_Parent
     Dim line As New Line_ViewTop
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Backproject the lines found in the top view."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -568,7 +568,7 @@ Public Class BackProject_LineSide : Inherits VB_Parent
     Dim line As New Line_ViewSide
     Public lpList As New List(Of PointPair)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Backproject the lines found in the side view."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -639,7 +639,7 @@ Public Class BackProject_Image : Inherits VB_Parent
             maxRange = New cv.Scalar(255)
         End If
         If useInrange Then
-            If histIndex = 0 And hist.plot.removeZeroEntry Then mask = New cv.Mat(input.Size(), cv.MatType.CV_8U, 0) Else mask = input.InRange(minRange, maxRange)
+            If histIndex = 0 And hist.plot.removeZeroEntry Then mask = New cv.Mat(input.Size(), cv.MatType.CV_8U, cv.Scalar.All(0)) Else mask = input.InRange(minRange, maxRange)
         Else
             Dim bRange = New cv.Rangef(minRange(0), maxRange(0))
             Dim ranges() = New cv.Rangef() {bRange}
@@ -710,7 +710,7 @@ Public Class BackProject_MeterByMeter : Inherits VB_Parent
                 histData.Add(Math.Round(i * incr))
             Next
 
-            histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, histData.ToArray)
+            histogram = cv.Mat.FromPixelData(task.histogramBins, 1, cv.MatType.CV_32F, histData.ToArray)
         End If
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.MaxZmeters)}
         cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst1, ranges)

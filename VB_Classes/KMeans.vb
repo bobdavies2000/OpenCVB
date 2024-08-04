@@ -147,7 +147,7 @@ Public Class KMeans_MultiGaussian_CPP_VB : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols)
-        If imagePtr <> 0 And task.heartBeat Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
+        If imagePtr <> 0 And task.heartBeat Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = KMeans_MultiGaussian_Close(cPtr)
@@ -181,7 +181,7 @@ Public Class KMeans_CustomData : Inherits VB_Parent
                 input.Add(pt.x)
                 input.Add(pt.y)
             Next
-            dst0 = New cv.Mat(input.Count, 1, cv.MatType.CV_32F, input.ToArray)
+            dst0 = cv.Mat.FromPixelData(input.Count, 1, cv.MatType.CV_32F, input.ToArray)
         End If
 
         km.Run(dst0)
@@ -212,7 +212,7 @@ Public Class KMeans_Simple_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Kmeans_Simple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, CSng(mm.minVal), task.gOptions.MaxDepthBar.Value)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
         SetTrueText("Use 'Max Depth' in the global options to set the boundary between blue and yellow.", 3)
     End Sub
     Public Sub Close()
@@ -357,7 +357,7 @@ Public Class KMeans_DepthPlusGray : Inherits VB_Parent
     Public Sub New()
         km.buildPaletteOutput = False
         labels(3) = "KMeans 8-bit results"
-        grayPlus(0) = New cv.Mat(task.WorkingRes, cv.MatType.CV_32F, 0)
+        grayPlus(0) = New cv.Mat(task.WorkingRes, cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Cluster the rgb+depth image pixels using kMeans"
     End Sub
     Public Sub RunVB(src As cv.Mat)

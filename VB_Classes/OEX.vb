@@ -61,7 +61,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Parent
         If task.ClickPoint <> New cv.Point Then
             Dim connectivity As Integer = 8
             Dim flags = connectivity Or (255 << 8) Or cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly
-            Dim mask2 As New cv.Mat(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, 0)
+            Dim mask2 As New cv.Mat(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, cv.Scalar.All(0))
 
             ' the delta between each regions value is 255 / classcount. no low or high bound needed.
             Dim delta = CInt(255 / classCount) - 1
@@ -319,7 +319,7 @@ Public Class OEX_PointPolygon : Inherits VB_Parent
         Dim contours As cv.Point()()
         cv.Cv2.FindContours(src, contours, Nothing, RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         For i = 0 To dst1.Rows - 1
             For j = 0 To dst1.Cols - 1
                 Dim distance = cv.Cv2.PointPolygonTest(contours(0), New cv.Point(j, i), True)
@@ -358,7 +358,7 @@ End Class
 Public Class OEX_PointPolygon_demo : Inherits VB_Parent
     Dim pointPoly As New OEX_PointPolygon
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "OpenCV Example PointPolygonTest_demo - it became PointPolygonTest_Basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -494,7 +494,7 @@ Public Class OEX_Core_Reduce : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.heartBeat Then
-            Dim m As New cv.Mat(3, 2, cv.MatType.CV_32F, New Single() {1, 2, 3, 4, 5, 6})
+            Dim m As cv.Mat = cv.Mat.FromPixelData(3, 2, cv.MatType.CV_32F, New Single() {1, 2, 3, 4, 5, 6})
             Dim col_sum As New cv.Mat, row_sum As New cv.Mat
             cv.Cv2.Reduce(m, col_sum, 0, cv.ReduceTypes.Sum, cv.MatType.CV_32F)
             cv.Cv2.Reduce(m, row_sum, 1, cv.ReduceTypes.Sum, cv.MatType.CV_32F)
@@ -557,7 +557,7 @@ Public Class OEX_Core_Split : Inherits VB_Parent
         desc = "OpenCV Example Core_Split"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim d As New cv.Mat(2, 2, cv.MatType.CV_8UC3, New Byte() {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12})
+        Dim d As cv.Mat = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_8UC3, New Byte() {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12})
 
         Dim channels = d.Split()
 
@@ -597,7 +597,7 @@ Public Class OEX_Filter2D : Inherits VB_Parent
 
         If task.heartBeat Then ind += 1
         kernelSize = 3 + 2 * (ind Mod 5)
-        Dim kernel As cv.Mat = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F, 1 / (kernelSize * kernelSize))
+        Dim kernel As cv.Mat = cv.Mat.FromPixelData(kernelSize, kernelSize, cv.MatType.CV_32F, 1 / (kernelSize * kernelSize))
 
         dst2 = src.Filter2D(ddepth, kernel, anchor, 0, cv.BorderTypes.Default)
         SetTrueText("Kernel size = " + CStr(kernelSize), 3)
@@ -628,7 +628,7 @@ Public Class OEX_FitEllipse : Inherits VB_Parent
                                              options.threshold, options.fitType)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(img.Rows + 4, img.Cols + 4, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(img.Rows + 4, img.Cols + 4, cv.MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Public Sub Close()
         OEX_FitEllipse_Close(cPtr)

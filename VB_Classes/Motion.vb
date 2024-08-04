@@ -26,7 +26,7 @@ Public Class Motion_Simple : Inherits VB_Parent
     Public cumulativePixels As Integer
     Public options As New Options_Motion
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(3) = "Accumulated changed pixels from the last heartbeat"
         desc = "Accumulate differences from the previous BGR image."
     End Sub
@@ -71,7 +71,7 @@ Public Class Motion_ThruCorrelation : Inherits VB_Parent
             sliders.setupTrackBar("Pad size in pixels for the search area", 0, 100, 20)
         End If
 
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Detect motion through the correlation coefficient"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -325,7 +325,7 @@ Public Class Motion_Intersect : Inherits VB_Parent
     Dim reconstructedRGB As Integer
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
         desc = "Track the max rectangle that covers all the motion until there is no motion in it."
     End Sub
@@ -342,7 +342,7 @@ Public Class Motion_Intersect : Inherits VB_Parent
 
         Dim flags = 4 Or cv.FloodFillFlags.MaskOnly Or cv.FloodFillFlags.FixedRange
         Dim rect As cv.Rect
-        Dim motionMat = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        Dim motionMat = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         Dim matPoints = dst1(New cv.Rect(1, 1, motionMat.Width - 2, motionMat.Height - 2))
         For Each pt In pointList
             If motionMat.Get(Of Byte)(pt.Y, pt.X) = 0 And matPoints.Get(Of Byte)(pt.Y, pt.X) <> 0 Then
@@ -465,7 +465,7 @@ Public Class Motion_HistoryTest : Inherits VB_Parent
     Dim frames As New History_Basics
     Public Sub New()
         task.gOptions.pixelDiffThreshold = 10
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Detect motion using the last X images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -525,7 +525,7 @@ Public Class Motion_Enclosing : Inherits VB_Parent
         Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, learnRate)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         redMasks.inputMask = Not dst2
         redMasks.Run(dst2)
@@ -808,7 +808,7 @@ End Class
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Diff : Inherits VB_Parent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Unstable mask", "Pixel difference"}
         desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot"
     End Sub
@@ -837,7 +837,7 @@ Public Class Motion_MinRect : Inherits VB_Parent
     Public motion As New Motion_Diff
     Dim mRect As New Area_MinRect
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the nonzero points of motion and fit an rotated rectangle to them."
     End Sub
     Public Sub RunVB(src As cv.Mat)

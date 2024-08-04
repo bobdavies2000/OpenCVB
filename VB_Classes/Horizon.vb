@@ -6,7 +6,7 @@ Public Class Horizon_Basics : Inherits VB_Parent
     Public vecPresent As Boolean
     Public autoDisplay As Boolean
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find all the points where depth Y-component transitions from positive to negative"
     End Sub
     Public Sub displayResults(p1 As cv.Point2f, p2 As cv.Point2f)
@@ -109,7 +109,7 @@ End Class
 Public Class Horizon_BasicsAlt : Inherits VB_Parent
     Public cloudY As cv.Mat
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Search for the transition from positive to negative to find the horizon."
     End Sub
     Private Function findTransition(startCol As Integer, stopCol As Integer, stepCol As Integer) As cv.Point2f
@@ -170,7 +170,7 @@ Public Class Horizon_FindNonZero : Inherits VB_Parent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.setDisplay1()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gravityVec = New PointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
         task.horizonVec = New PointPair(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
@@ -243,7 +243,7 @@ End Class
 Public Class Horizon_UnstableResults : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -303,7 +303,7 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
         task.gOptions.setGravityUsage(False)
         task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.setDisplay1()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gravityVec = New PointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
         task.horizonVec = New PointPair(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}

@@ -126,7 +126,7 @@ Public Class Hough_Featureless : Inherits VB_Parent
 
         edges.Run(src)
 
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         Dim regionCount As Integer
         ReDim noDepthCount(task.gridList.Count - 1)
         ReDim roiColor(task.gridList.Count - 1)
@@ -229,13 +229,13 @@ Public Class Hough_LaneFinder : Inherits VB_Parent
             Dim tr = New cv.Point(w * 0.6, h * 0.6)
 
             Dim pList() As cv.Point = {bl, tl, tr, br}
-            mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
+            mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, cv.Scalar.All(0))
             mask.FillConvexPoly(pList, cv.Scalar.White, task.lineType)
         End If
         dst1 = mask.Clone
 
         dst0 = hls.dst0
-        dst2 = New cv.Mat(mask.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         hls.dst3.CopyTo(dst2, mask)
 
         Dim rho = 1
@@ -244,7 +244,7 @@ Public Class Hough_LaneFinder : Inherits VB_Parent
         Dim minLineLength = 20
         Dim maxLineGap = 300
         segments = cv.Cv2.HoughLinesP(dst2.Clone, rho, theta, threshold, minLineLength, maxLineGap)
-        dst3 = New cv.Mat(mask.Size(), cv.MatType.CV_8UC3, 0)
+        dst3 = New cv.Mat(mask.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         laneLineMinY = dst2.Height
         For i = 0 To segments.Length - 1
             If laneLineMinY > segments(i).P1.Y Then laneLineMinY = segments(i).P1.Y

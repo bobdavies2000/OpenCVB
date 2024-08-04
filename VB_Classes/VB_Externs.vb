@@ -683,7 +683,7 @@ Module VB_Externs
 
         Dim hsv As New cv.Mat
         Dim hsv0 As New cv.Mat
-        Dim hsv1 As New cv.Mat(gray.Rows, gray.Cols, cv.MatType.CV_8UC1, 255)
+        Dim hsv1 As New cv.Mat(gray.Rows, gray.Cols, cv.MatType.CV_8UC1, cv.Scalar.All(255))
         Dim hsv2 As New cv.Mat
 
         Dim magnitude As New cv.Mat
@@ -1008,7 +1008,7 @@ Module VB_Externs
 
 
     Public Function shapeCorrelation(points As List(Of cv.Point)) As Single
-        Dim pts As New cv.Mat(points.Count, 1, cv.MatType.CV_32SC2, points.ToArray)
+        Dim pts As cv.Mat = cv.Mat.FromPixelData(points.Count, 1, cv.MatType.CV_32SC2, points.ToArray)
         Dim pts32f As New cv.Mat
         pts.ConvertTo(pts32f, cv.MatType.CV_32FC2)
         Dim split = pts32f.Split()

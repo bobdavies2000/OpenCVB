@@ -77,9 +77,9 @@ Public Class Sound_Basics : Inherits VB_Parent
             If bpSample = 16 And channels = 1 Then mattype = cv.MatType.CV_16SC1
             Dim input As New cv.Mat
             If bpSample = 16 Then
-                input = New cv.Mat(pcmData16.Length / channels, 1, mattype, pcmData16)
+                input = cv.Mat.FromPixelData(pcmData16.Length / channels, 1, mattype, pcmData16)
             Else
-                input = New cv.Mat(pcmData8.Length, 1, mattype, pcmData8)
+                input = cv.Mat.FromPixelData(pcmData8.Length, 1, mattype, pcmData8)
             End If
             input.ConvertTo(pcm32f, cv.MatType.CV_32F)
             startTime = Now
@@ -184,7 +184,7 @@ Public Class Sound_SignalGenerator : Inherits VB_Parent
             End If
 
             Dim count = wGen.Read(pcmData, 0, pcmData.Length)
-            pcm32f = New cv.Mat(pcmData.Length, 1, cv.MatType.CV_32F, pcmData)
+            pcm32f = cv.Mat.FromPixelData(pcmData.Length, 1, cv.MatType.CV_32F, pcmData)
             player.Play()
         End If
         SetTrueText("Requested sound data is in the pcm32f cv.Mat")

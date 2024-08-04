@@ -399,7 +399,7 @@ Public Class Grid_QuarterRes : Inherits VB_Parent
         desc = "Provide the grid list for the lowest resolution of the current stream."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static inputSrc As New cv.Mat(task.quarterRes, cv.MatType.CV_8U, 0)
+        Static inputSrc As New cv.Mat(task.quarterRes, cv.MatType.CV_8U, cv.Scalar.All(0))
         grid.Run(inputSrc)
         gridList = grid.gridList
         If standaloneTest() Then dst2 = task.gridMask

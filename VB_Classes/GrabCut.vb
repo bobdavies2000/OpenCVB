@@ -5,7 +5,8 @@ Public Class GrabCut_Basics : Inherits VB_Parent
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
     Public fore As New Foreground_Basics
-    Dim bgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0), fgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0)
+    Dim bgModel As cv.Mat = cv.Mat.FromPixelData(1, 65, cv.MatType.CV_64F, 0)
+    Dim fgModel As cv.Mat = cv.Mat.FromPixelData(1, 65, cv.MatType.CV_64F, 0)
     Public Sub New()
         desc = "Use Foreground_Basics to define the foreground for use in GrabCut."
     End Sub
@@ -56,8 +57,8 @@ Public Class GrabCut_FineTune : Inherits VB_Parent
         options.RunVB()
 
         If options.clearAll Or basics.fgFineTune Is Nothing Then
-            basics.fgFineTune = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-            basics.bgFineTune = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            basics.fgFineTune = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            basics.bgFineTune = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         End If
 
         If saveRadio <> options.fineTuning Then

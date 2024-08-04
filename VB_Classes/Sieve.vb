@@ -81,7 +81,7 @@ Public Class Sieve_Image : Inherits VB_Parent
         If referenceResults.containskey(numCeiling) Then
             If referenceResults(numCeiling) <> countPrimes Then SetTrueText("Invalid prime count - check this...")
         End If
-        dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, numArray.ToArray)
+        dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, numArray.ToArray)
         dst2 = Not dst2
         zoom.Run(dst2)
         dst3 = zoom.dst2

@@ -123,7 +123,7 @@ Public Class Complexity_Dots : Inherits VB_Parent
     Public options As New Options_Complexity
     Public initialize As Boolean = True, maxTime As Single, fileName As String
     Public plotColor As cv.Scalar
-    Dim dst As New cv.Mat(New cv.Size(task.lowRes.Width * 2, task.lowRes.Height * 2), cv.MatType.CV_8UC3, 0)
+    Dim dst As New cv.Mat(New cv.Size(task.lowRes.Width * 2, task.lowRes.Height * 2), cv.MatType.CV_8UC3, cv.Scalar.All(0))
     Public Sub New()
         desc = "Plot the results of multiple runs at various resolutions."
     End Sub

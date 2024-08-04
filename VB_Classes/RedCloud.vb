@@ -7,7 +7,7 @@ Public Class RedCloud_Basics : Inherits VB_Parent
     Dim color As Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
-        inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         UpdateAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
                         "It is behind the global options (which affect most algorithms.)")
         desc = "Find cells and then match them to the previous generation with minimum boundary"
@@ -277,7 +277,7 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Parent
         kalman.kInput = hist
         kalman.Run(src)
 
-        Dim histMat = New cv.Mat(histBins, 1, cv.MatType.CV_32F, kalman.kOutput)
+        Dim histMat = cv.Mat.FromPixelData(histBins, 1, cv.MatType.CV_32F, kalman.kOutput)
         plot.Run(histMat)
         dst3 = plot.dst2
 
@@ -625,7 +625,7 @@ Public Class RedCloud_ProjectCell : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.setDisplay1()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(3) = "Top: XZ values and mask, Bottom: ZY values and mask"
         desc = "Visualize the top and side projection of a RedCloud cell"
     End Sub
@@ -1033,7 +1033,7 @@ Public Class RedCloud_DepthOutline : Inherits VB_Parent
     Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.redOptions.setUseColorOnly(True)
         desc = "Use the Depth_Outline output over time to isolate high quality cells"
     End Sub
@@ -1206,7 +1206,7 @@ End Class
 
 Public Class RedCloud_Overlaps : Inherits VB_Parent
     Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+    Public cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Remove the overlapping cells.  Keep the largest."
@@ -1320,7 +1320,7 @@ Public Class RedCloud_Gaps : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim frames As New History_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the gaps that are different in the RedCloud_Basics results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1364,7 +1364,7 @@ Public Class RedCloud_SizeOrder : Inherits VB_Parent
         dst2 = redC.dst3
         labels(2) = redC.labels(3)
 
-        Dim index = task.gOptions.debugSliderValue
+        Dim index = task.gOptions.DebugSliderValue
         If index < task.redCells.Count Then
             dst3.SetTo(0)
             Dim cell = task.redCells(index)
@@ -1470,7 +1470,7 @@ Public Class RedCloud_MotionBasics : Inherits VB_Parent
     Dim lastColors = dst3.Clone
     Dim lastMap As cv.Mat = dst2.Clone
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask of active RedCloud cells", "CV_8U representation of redCells", ""}
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
@@ -1566,7 +1566,7 @@ Public Class RedCloud_UnmatchedCount : Inherits VB_Parent
     Dim framecounts As New List(Of Integer)
     Dim frameLoc As New List(Of cv.Point)
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Count the unmatched cells and display them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1761,7 +1761,7 @@ Public Class RedCloud_Combine : Inherits VB_Parent
             End If
         Else
             redMasks.inputMask = task.noDepthMask
-            dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+            dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         End If
 
         If task.redOptions.UseDepth.Checked Or task.redOptions.UseGuidedProjection.Checked Then
@@ -1840,7 +1840,7 @@ Public Class RedCloud_TopXNeighbors : Inherits VB_Parent
 
         'If task.heartBeat Then dst2.SetTo(0)
         'cellMap.SetTo(0)
-        'Dim tmpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        'Dim tmpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         'redCells.Clear()
         'redCells.Add(nab.redCells(0)) ' placeholder for zero.
         'For i = 1 To options.topX - 1
@@ -1859,7 +1859,7 @@ Public Class RedCloud_TopXNeighbors : Inherits VB_Parent
         '            End If
         '        End If
         '    Next
-        '    rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, 0)
+        '    rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, cv.Scalar.All(0))
         '    rc.mask = tmpMap(rc.rect).InRange(rc.index, rc.index)
         '    cellMap(rc.rect).SetTo(rc.index, rc.mask)
         '    dst2(rc.rect).SetTo(rc.color, rc.mask)
@@ -2024,7 +2024,7 @@ Public Class RedCloud_Consistent1 : Inherits VB_Parent
     Dim cellLists As New List(Of List(Of rcData))
     Dim diffs As New List(Of cv.Mat)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gOptions.pixelDiffThreshold = 1
         desc = "Remove RedCloud results that are inconsistent with the previous frame."
     End Sub
@@ -2092,7 +2092,7 @@ Public Class RedCloud_Consistent2 : Inherits VB_Parent
     Dim cellLists As New List(Of List(Of rcData))
     Dim diffs As New List(Of cv.Mat)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gOptions.pixelDiffThreshold = 1
         desc = "Remove RedCloud results that are inconsistent with the previous frame."
     End Sub
@@ -2238,7 +2238,7 @@ Public Class RedCloud_MotionBGsubtract : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.pixelDiffThreshold = 25
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use absDiff to build a mask of cells that changed."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -2320,9 +2320,9 @@ Public Class RedCloud_ColorAndDepth : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim floodPC As New Flood_Basics
     Dim colorCells As New List(Of rcData)
-    Dim colorMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+    Dim colorMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
     Dim depthCells As New List(Of rcData)
-    Dim depthMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+    Dim depthMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
     Dim mousePicTag = task.mousePicTag
     Public Sub New()
         task.redOptions.setIdentifyCells(False)
@@ -2404,7 +2404,7 @@ Public Class RedCloud_CPP_VB : Inherits VB_Parent
     Public floodPoints As New List(Of cv.Point)
     Dim color As Color8U_Basics
     Public Sub New()
-        inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         cPtr = RedCloud_Open()
         desc = "Run the C++ RedCloud interface with or without a mask"
     End Sub
@@ -2426,13 +2426,13 @@ Public Class RedCloud_CPP_VB : Inherits VB_Parent
         imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleMask.Free()
         handleInput.Free()
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
         classCount = RedCloud_Count(cPtr)
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        Dim floodPointData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
 
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
@@ -2492,7 +2492,7 @@ Public Class RedCloud_MaxDist_CPP_VB : Inherits VB_Parent
 
         imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols)
         handleInput.Free()
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst3 = ShowPalette(dst2)
 
         classCount = RedCloudMaxDist_Count(cPtr)
@@ -2500,8 +2500,8 @@ Public Class RedCloud_MaxDist_CPP_VB : Inherits VB_Parent
 
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))
-        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloudMaxDist_FloodPoints(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))
+        Dim floodPointData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC2, RedCloudMaxDist_FloodPoints(cPtr))
 
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
@@ -2509,7 +2509,7 @@ Public Class RedCloud_MaxDist_CPP_VB : Inherits VB_Parent
         Marshal.Copy(floodPointData.Data, ptList, 0, ptList.Length)
 
         For i = 0 To rects.Length - 4 Step 4
-            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
+            RectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
         Next
         For i = 0 To ptList.Length - 2 Step 2
             floodPoints.Add(New cv.Point(ptList(i), ptList(i + 1)))
@@ -2607,7 +2607,7 @@ Public Class RedCloud_FeatureLessReduce : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim devGrid As New FeatureROI_Basics
     Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+    Public cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
     Dim addw As New AddWeighted_Basics
     Dim options As New Options_RedCloudOther
     Public Sub New()
@@ -2625,7 +2625,7 @@ Public Class RedCloud_FeatureLessReduce : Inherits VB_Parent
         dst3.SetTo(0)
         redCells.Clear()
         For Each rc In task.redCells
-            Dim tmp = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, 0)
+            Dim tmp = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             devGrid.dst3(rc.rect).CopyTo(tmp, rc.mask)
             Dim count = tmp.CountNonZero
             If count / rc.pixels < options.threshold Then

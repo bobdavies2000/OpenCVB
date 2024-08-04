@@ -53,8 +53,8 @@ Public Class Retina_Basics_CPP_VB : Inherits VB_Parent
         If imagePtr <> 0 Then
             Dim nextFactor = samplingFactor
             If options.useLogSampling = False Then nextFactor = 1
-            dst2 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone
-            dst3 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData).Resize(src.Size())
+            dst2 = cv.Mat.FromPixelData(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone
+            dst3 = cv.Mat.FromPixelData(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData).Resize(src.Size())
         End If
     End Sub
     Public Sub Close()

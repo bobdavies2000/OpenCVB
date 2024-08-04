@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
+Imports OpenCvSharp
 Public Class Edge_All : Inherits VB_Parent
     Dim options As New Options_Edges_All
     Public Sub New()
@@ -128,7 +129,7 @@ Public Class Edge_RandomForest_CPP_VB : Inherits VB_Parent
             Dim imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleRGB.Free()
 
-            dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, cv.ThresholdTypes.Binary)
+            dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
     Public Sub Close()
@@ -191,7 +192,7 @@ Public Class Edge_Deriche_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         dst3 = src Or dst2
     End Sub
     Public Sub Close()
@@ -511,7 +512,7 @@ Public Class Edge_ColorGap_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Edge_ColorGap_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distanceSlider.Value And 254, diff)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst3.SetTo(0)
         src.CopyTo(dst3, Not dst2)
     End Sub
@@ -535,8 +536,8 @@ Public Class Edge_ColorGap_VB : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
 
         labels = {"", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges"}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Using grayscale image to identify color gaps which imply an edge - VB edition"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -579,8 +580,8 @@ Public Class Edge_DepthGap_Native : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
 
         labels = {"", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges"}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Using dpeth image to identify gaps which imply an edge"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -635,7 +636,7 @@ Public Class Edge_DepthGap_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Edge_DepthGap_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.mmDepthDiff)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Edge_DepthGap_Close(cPtr)
@@ -772,8 +773,8 @@ Public Class Edge_CannyHistory : Inherits VB_Parent
     Dim options As New Options_Canny
     Public Sub New()
         labels = {"", "", "Canny using L1 Norm", ""}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show canny edge over the last X frame (see global option 'FrameHistory')"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -848,9 +849,9 @@ Public Class Edge_SobelCustomV : Inherits VB_Parent
         desc = "Show Sobel edge detection a custom vertical kernel"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 0, -1, 2, 0, -2, 1, 0, -1}))
+        dst1 = src.Filter2D(cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 0, -1, 2, 0, -2, 1, 0, -1}))
         dst1.ConvertTo(dst2, src.Type)
-        dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {3, 0, -3, 10, 0, -10, 3, 0, -3}))
+        dst1 = src.Filter2D(cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {3, 0, -3, 10, 0, -10, 3, 0, -3}))
         dst1.ConvertTo(dst3, src.Type)
     End Sub
 End Class
@@ -867,9 +868,9 @@ Public Class Edge_SobelCustomH : Inherits VB_Parent
         desc = "Show Sobel edge detection a custom horizontal kernel"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 2, 1, 0, 0, 0, -1, -2, -1}))
+        dst1 = src.Filter2D(cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 2, 1, 0, 0, 0, -1, -2, -1}))
         dst1.ConvertTo(dst2, src.Type)
-        dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {3, 10, 3, 0, 0, 0, -3, -10, -3}))
+        dst1 = src.Filter2D(cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {3, 10, 3, 0, 0, 0, -3, -10, -3}))
         dst1.ConvertTo(dst3, src.Type)
     End Sub
 End Class

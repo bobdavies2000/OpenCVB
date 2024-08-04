@@ -36,7 +36,7 @@ Public Class Convex_Basics : Inherits VB_Parent
 
         dst2.SetTo(0)
 
-        Dim pMat As New cv.Mat(hull.Count, 1, cv.MatType.CV_32SC2, hull)
+        Dim pMat As cv.Mat = cv.Mat.FromPixelData(hull.Count, 1, cv.MatType.CV_32SC2, hull)
         Dim sum = pMat.Sum()
         DrawContour(dst2, hullList, cv.Scalar.White, -1)
 

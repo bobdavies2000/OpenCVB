@@ -93,18 +93,18 @@ Public Class CameraKinect : Inherits Camera
             If cPtr = 0 Then Exit Sub
 
             SyncLock cameraLock
-                mbuf(mbIndex).color = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, K4AColor(cPtr)).Clone
+                mbuf(mbIndex).color = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, K4AColor(cPtr)).Clone
 
                 ' so depth data fits into 0-255 (approximately)
-                mbuf(mbIndex).leftView = (New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_16U,
+                mbuf(mbIndex).leftView = (cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_16U,
                                           K4ALeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone
                 mbuf(mbIndex).rightView = mbuf(mbIndex).leftView
                 If captureRes <> WorkingRes Then
-                    Dim tmp = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_16SC3,
+                    Dim tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_16SC3,
                                      K4APointCloud(cPtr)).Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
                     tmp.ConvertTo(mbuf(mbIndex).pointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
                 Else
-                    Dim tmp = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_16SC3, K4APointCloud(cPtr))
+                    Dim tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_16SC3, K4APointCloud(cPtr))
                     tmp.ConvertTo(mbuf(mbIndex).pointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
                 End If
             End SyncLock

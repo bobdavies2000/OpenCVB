@@ -204,7 +204,7 @@ namespace CS_Classes
             if (aCols != bRows)
                 throw new Exception("Non-conformable matrices");
 
-            cv.Mat result = new cv.Mat(aRows, bCols, cv.MatType.CV_64F, 0);
+            cv.Mat result = new cv.Mat(aRows, bCols, cv.MatType.CV_64F, cv.Scalar.All(0));
 
             for (int i = 0; i < aRows; ++i) // each row of A
                 for (int j = 0; j < bCols; ++j) // each col of B

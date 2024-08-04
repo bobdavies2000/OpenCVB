@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Gradient_Basics : Inherits VB_Parent
     Public sobel As New Edge_Sobel
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         labels = {"", "", "Gradient_Basics - Sobel output", "Phase Output"}
         desc = "Use phase to compute gradient"
     End Sub

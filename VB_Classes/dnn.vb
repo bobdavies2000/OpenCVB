@@ -99,7 +99,7 @@ Public Class DNN_Basics : Inherits VB_Parent
             net.SetInput(inputBlob, "data")
 
             Dim detection = net.Forward("detection_out")
-            Dim detectionMat = New cv.Mat(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
+            Dim detectionMat = cv.Mat.FromPixelData(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
 
             Dim rows = src(crop).Rows
             Dim cols = src(crop).Cols

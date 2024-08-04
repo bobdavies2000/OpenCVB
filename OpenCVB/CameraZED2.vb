@@ -69,13 +69,13 @@ Public Class CameraZED2 : Inherits Camera
         Zed2GetData(cPtr, WorkingRes.Width, WorkingRes.Height)
 
         SyncLock cameraLock
-            mbuf(mbIndex).color = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3,
+            mbuf(mbIndex).color = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3,
                                              Zed2Color(cPtr)).Clone
-            mbuf(mbIndex).rightView = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3,
+            mbuf(mbIndex).rightView = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3,
                                                  Zed2RightView(cPtr)).Clone
             mbuf(mbIndex).leftView = mbuf(mbIndex).color.Clone
 
-            mbuf(mbIndex).pointCloud = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_32FC3,
+            mbuf(mbIndex).pointCloud = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_32FC3,
                                                       Zed2PointCloud(cPtr)).Clone
             Dim acc = Zed2Acceleration(cPtr)
             IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)

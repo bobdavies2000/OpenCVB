@@ -308,7 +308,7 @@ Public Class OpenGL_VerticalSingle : Inherits VB_Parent
         Dim pt1 = vLine.pt1
         Dim pt2 = vLine.pt2
         Dim linePairs3D As New List(Of cv.Point3f)({New cv.Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2), New cv.Point3f(pt1.X, pt2.Y, pt1.Z)})
-        task.ogl.dataInput = New cv.Mat(linePairs3D.Count, 1, cv.MatType.CV_32FC3, linePairs3D.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(linePairs3D.Count, 1, cv.MatType.CV_32FC3, linePairs3D.ToArray)
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(task.color)
@@ -370,7 +370,7 @@ Public Class OpenGL_QuadSimple : Inherits VB_Parent
         dst2 = tess.dst2
         dst3 = tess.dst3
         labels = tess.labels
-        task.ogl.dataInput = New cv.Mat(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
@@ -396,7 +396,7 @@ Public Class OpenGL_QuadHulls : Inherits VB_Parent
         dst2 = tess.dst2
         dst3 = tess.dst3
         labels = tess.labels
-        task.ogl.dataInput = New cv.Mat(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
@@ -422,7 +422,7 @@ Public Class OpenGL_QuadMinMax : Inherits VB_Parent
         dst2 = tess.dst2
         dst3 = tess.dst3
         labels = tess.labels
-        task.ogl.dataInput = New cv.Mat(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
@@ -443,7 +443,7 @@ Public Class OpenGL_Bricks : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         tess.Run(src)
-        task.ogl.dataInput = New cv.Mat(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
         dst2 = tess.dst3
         dst3 = tess.hulls.dst3
 
@@ -506,7 +506,7 @@ Public Class OpenGL_Tiles : Inherits VB_Parent
         dst2 = sCloud.dst2
         dst3 = sCloud.dst3
 
-        task.ogl.dataInput = New cv.Mat(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         task.ogl.options.PointSizeSlider.Value = task.gridSize
@@ -529,7 +529,7 @@ Public Class OpenGL_TilesQuad : Inherits VB_Parent
         sCloud.Run(src)
         dst2 = sCloud.dst2
 
-        task.ogl.dataInput = New cv.Mat(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
@@ -609,7 +609,7 @@ Public Class OpenGL_FlatStudy2 : Inherits VB_Parent
         oglData.Add(floorColor(1))
         oglData.Add(floorColor(2))
         oglData.Add(plane.floorYPlane)
-        task.ogl.dataInput = New cv.Mat(4, 1, cv.MatType.CV_32F, oglData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, oglData.ToArray)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(plane.dst2)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -637,7 +637,7 @@ Public Class OpenGL_FlatStudy3 : Inherits VB_Parent
         labels(2) = plane.labels(2)
 
         task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.dataInput = New cv.Mat(1, 1, cv.MatType.CV_32F, {plane.planeY})
+        task.ogl.dataInput = cv.Mat.FromPixelData(1, 1, cv.MatType.CV_32F, {plane.planeY})
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
@@ -660,7 +660,7 @@ Public Class OpenGL_FlatFloor : Inherits VB_Parent
         SetTrueText(flatness.labels(2), 3)
 
         task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.dataInput = New cv.Mat(1, 1, cv.MatType.CV_32F, {task.pcFloor})
+        task.ogl.dataInput = cv.Mat.FromPixelData(1, 1, cv.MatType.CV_32F, {task.pcFloor})
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = flatness.labels(2)
@@ -685,7 +685,7 @@ Public Class OpenGL_FlatCeiling : Inherits VB_Parent
         SetTrueText(flatness.labels(2), 3)
 
         task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.dataInput = New cv.Mat(1, 1, cv.MatType.CV_32F, {task.pcCeiling})
+        task.ogl.dataInput = cv.Mat.FromPixelData(1, 1, cv.MatType.CV_32F, {task.pcCeiling})
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = flatness.labels(2)
@@ -718,7 +718,7 @@ Public Class OpenGL_PeakFlat : Inherits VB_Parent
         kalman.Run(empty)
 
         task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.dataInput = New cv.Mat(2, 1, cv.MatType.CV_32F, {kalman.kOutput(0), kalman.kOutput(1)})
+        task.ogl.dataInput = cv.Mat.FromPixelData(2, 1, cv.MatType.CV_32F, {kalman.kOutput(0), kalman.kOutput(1)})
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
@@ -756,7 +756,7 @@ Public Class OpenGL_DrawHull : Inherits VB_Parent
             Next
         End If
 
-        task.ogl.dataInput = New cv.Mat(oglData.Count, 1, cv.MatType.CV_32FC3, oglData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(oglData.Count, 1, cv.MatType.CV_32FC3, oglData.ToArray)
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
@@ -867,7 +867,7 @@ Public Class OpenGL_DrawHulls : Inherits VB_Parent
         Next
 
         oglData(0) = New cv.Point3f(polygonCount, 0, 0)
-        ogl.dataInput = New cv.Mat(oglData.Count, 1, cv.MatType.CV_32FC3, oglData.ToArray)
+        ogl.dataInput = cv.Mat.FromPixelData(oglData.Count, 1, cv.MatType.CV_32FC3, oglData.ToArray)
         ogl.Run(dst2)
         If task.gOptions.getOpenGLCapture() Then dst3 = ogl.dst2
         SetTrueText(CStr(polygonCount) + " polygons were sent to OpenGL", 2)
@@ -936,7 +936,7 @@ Public Class OpenGL_Contours : Inherits VB_Parent
         Next
 
         oglData(0) = New cv.Point3f(polygonCount, 0, 0)
-        task.ogl.dataInput = New cv.Mat(oglData.Count, 1, cv.MatType.CV_32FC3, oglData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(oglData.Count, 1, cv.MatType.CV_32FC3, oglData.ToArray)
         task.ogl.Run(New cv.Mat)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
@@ -961,7 +961,7 @@ Public Class OpenGL_PCLineCandidates : Inherits VB_Parent
         pts.Run(src)
         dst2 = pts.dst2
 
-        task.ogl.dataInput = New cv.Mat(pts.allPointsH.Count, 1, cv.MatType.CV_32FC3, pts.allPointsH.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(pts.allPointsH.Count, 1, cv.MatType.CV_32FC3, pts.allPointsH.ToArray)
         task.ogl.Run(New cv.Mat)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = "Point cloud points found = " + CStr(pts.actualCount / 2)
@@ -1061,7 +1061,7 @@ Public Class OpenGL_PCpoints : Inherits VB_Parent
         pts.Run(src)
         dst2 = pts.dst2
 
-        task.ogl.dataInput = New cv.Mat(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
         task.ogl.Run(New cv.Mat)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = "Point cloud points found = " + CStr(pts.pcPoints.Count / 2)
@@ -1087,7 +1087,7 @@ Public Class OpenGL_PCpointsPlane : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         pts.Run(src)
 
-        task.ogl.dataInput = New cv.Mat(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
         task.ogl.Run(New cv.Mat)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = "Point cloud points found = " + CStr(pts.pcPoints.Count / 2)
@@ -1130,7 +1130,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits VB_Parent
             pcPoints.Add(New cv.Point3f(rc.eq.Item0 * 0.5, rc.eq.Item1 * 0.5, rc.eq.Item2 * 0.5))
         Next
 
-        task.ogl.dataInput = New cv.Mat(pcPoints.Count, 1, cv.MatType.CV_32FC3, pcPoints.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(pcPoints.Count, 1, cv.MatType.CV_32FC3, pcPoints.ToArray)
         task.ogl.Run(New cv.Mat)
     End Sub
 End Class
@@ -1157,7 +1157,7 @@ Public Class OpenGL_Profile : Inherits VB_Parent
         dst2 = sides.dst2
 
         Dim rc = task.rc
-        Dim contourMat As New cv.Mat(rc.contour.Count, 1, cv.MatType.CV_32SC2, rc.contour.ToArray)
+        Dim contourMat As cv.Mat = cv.Mat.FromPixelData(rc.contour.Count, 1, cv.MatType.CV_32SC2, rc.contour.ToArray)
         If rc.contour.Count = 0 Then Exit Sub
         Dim split = contourMat.Split()
         Dim mm As mmData = GetMinMax(split(0))
@@ -1169,7 +1169,7 @@ Public Class OpenGL_Profile : Inherits VB_Parent
         DrawCircle(dst3, New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Blue)
         DrawCircle(dst3, New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Red)
         If rc.contour3D.Count > 0 Then
-            Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
+            Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
             rotate.Run(empty)
             Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
@@ -1492,7 +1492,7 @@ Public Class OpenGL_TessellateCell : Inherits VB_Parent
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
-        task.ogl.dataInput = New cv.Mat(tess.triangles.Count, 1, cv.MatType.CV_32FC3, tess.triangles.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3, tess.triangles.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(tess.dst2)
@@ -1516,7 +1516,7 @@ Public Class OpenGL_Tessellate : Inherits VB_Parent
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
-        task.ogl.dataInput = New cv.Mat(tess.triangles.Count, 1, cv.MatType.CV_32FC3, tess.triangles.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3, tess.triangles.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(tess.dst2)
@@ -1540,7 +1540,7 @@ Public Class OpenGL_TessellateRGB : Inherits VB_Parent
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
-        task.ogl.dataInput = New cv.Mat(tess.triangles.Count, 1, cv.MatType.CV_32FC3, tess.triangles.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3, tess.triangles.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(src)
@@ -1851,7 +1851,7 @@ Public Class OpenGL_HistDepth3D : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hcloud.Run(src)
-        Dim histogram = New cv.Mat(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
+        Dim histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
         task.ogl.dataInput = histogram
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)
@@ -2126,7 +2126,7 @@ Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Parent
             lines3D.Add(vLine.lines3D(index))
             lines3D.Add(vLine.lines3D(index + 1))
         Next
-        task.ogl.dataInput = New cv.Mat(lines3D.Count, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(lines3D.Count, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
         task.ogl.Run(task.color)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub

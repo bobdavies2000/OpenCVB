@@ -41,7 +41,7 @@ Public Class EMax_Basics : Inherits VB_Parent
         handleLabels.Free()
         handleSrc.Free()
 
-        dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr).Clone
+        dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr).Clone
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
 
         If options.consistentcolors Then
@@ -183,12 +183,12 @@ Public Class EMax_VB_Failing : Inherits VB_Parent
         em_model.ClustersNumber = regionCount
         em_model.CovarianceMatrixType = cv.EMTypes.CovMatSpherical
         em_model.TermCriteria = New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 300, 1.0)
-        Dim samples = New cv.Mat(eSamples.Count, 2, cv.MatType.CV_32FC1, eSamples.ToArray)
-        Dim eLabelsMat = New cv.Mat(eLabels.Count, 1, cv.MatType.CV_32S, eLabels.ToArray)
+        Dim samples = cv.Mat.FromPixelData(eSamples.Count, 2, cv.MatType.CV_32FC1, eSamples.ToArray)
+        Dim eLabelsMat = cv.Mat.FromPixelData(eLabels.Count, 1, cv.MatType.CV_32S, eLabels.ToArray)
         em_model.TrainEM(samples, Nothing, eLabelsMat, Nothing)
 
         ' now classify every image pixel based on the samples.
-        Dim sample As New cv.Mat(1, 2, cv.MatType.CV_32FC1, 0)  ' tried doubles but it fails as well...
+        Dim sample As cv.Mat = cv.Mat.FromPixelData(1, 2, cv.MatType.CV_32FC1, 0)  ' tried doubles but it fails as well...
         For i = 0 To dst2.Rows - 1
             For j = 0 To dst2.Cols - 1
                 sample.Set(Of Single)(0, 0, CSng(j))

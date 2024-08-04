@@ -26,7 +26,7 @@ Public Class LUT_Basics : Inherits VB_Parent
             For i = incr * classCount To 255
                 segment(i) = 255
             Next
-            myLut = New cv.Mat(1, 256, cv.MatType.CV_8U, segment)
+            myLut = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, segment)
         End If
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.LUT(myLut) * classCount / 255
@@ -72,7 +72,7 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class LUT_Reduction : Inherits VB_Parent
     Public reduction As New Reduction_Basics
-    Dim vector = New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
+    Dim vector = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
     Public Sub New()
         For i = 0 To 255
             vector.Set(Of cv.Vec3b)(i, 0, randomCellColor())
@@ -286,7 +286,7 @@ Public Class LUT_Create : Inherits VB_Parent
         Next
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U, lut)
+        Dim myLut As cv.Mat = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, lut)
         dst3 = dst2.LUT(myLut)
     End Sub
 End Class

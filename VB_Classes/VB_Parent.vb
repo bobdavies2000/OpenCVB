@@ -79,10 +79,10 @@ Public Class VB_Parent : Implements IDisposable
             If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
             If standalone = False And callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
         End If
-        dst0 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, 0)
-        dst3 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, 0)
+        dst0 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        dst1 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        dst2 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        dst3 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         task.activeObjects.Add(Me)
 
         If task.recordTimings Then
@@ -271,7 +271,7 @@ Public Class VB_Parent : Implements IDisposable
         Return New cv.Vec4f(cross.X, cross.Y, cross.Z, k)
     End Function
     Public Function fitDepthPlane(fitDepth As List(Of cv.Point3f)) As cv.Vec4f
-        Dim wDepth = New cv.Mat(fitDepth.Count, 1, cv.MatType.CV_32FC3, fitDepth.ToArray)
+        Dim wDepth = cv.Mat.FromPixelData(fitDepth.Count, 1, cv.MatType.CV_32FC3, fitDepth.ToArray)
         Dim columnSum = wDepth.Sum()
         Dim count = CDbl(fitDepth.Count)
         Dim plane As New cv.Vec4f
@@ -451,7 +451,7 @@ Public Class VB_Parent : Implements IDisposable
         Return DisplayCells()
     End Function
     Public Function DisplayCells() As cv.Mat
-        Dim dst As New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, 0)
+        Dim dst As New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         task.cellMap.SetTo(0)
         For Each rc In task.redCells
             dst(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
@@ -460,7 +460,7 @@ Public Class VB_Parent : Implements IDisposable
         Return dst
     End Function
     Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
-        Dim img As New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, 0)
+        Dim img As New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         Dim binCount = hist.Height
         Dim binWidth = img.Width / hist.Height
         Dim mm As mmData = GetMinMax(hist)

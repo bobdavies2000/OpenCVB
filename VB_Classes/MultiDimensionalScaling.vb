@@ -35,7 +35,7 @@ Public Class MultiDimensionScaling_Cities : Inherits VB_Parent
     End Function
     Public Sub RunVB(src as cv.Mat)
         Dim size = 10 ' we are working with 10 cities.
-        Dim cityMat = New cv.Mat(size, size, cv.MatType.CV_64FC1, CityDistance)
+        Dim cityMat = cv.Mat.FromPixelData(size, size, cv.MatType.CV_64FC1, CityDistance)
         cityMat += Torgerson(cityMat)
         cityMat = cityMat.Mul(cityMat)
         Dim g = CenteringMatrix(size)

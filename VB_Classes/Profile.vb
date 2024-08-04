@@ -253,7 +253,7 @@ Public Class Profile_ConcentrationTop : Inherits VB_Parent
             SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1)
             Exit Sub
         End If
-        Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
+        Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
         ySlider.Value += 1
         rotate.Run(empty)
@@ -311,7 +311,7 @@ Public Class Profile_OpenGL : Inherits VB_Parent
         Dim rc = task.rc
 
         If rc.contour3D.Count > 0 Then
-            Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
+            Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
             rotate.Run(empty)
             Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
             task.ogl.dataInput = output.Reshape(3, vecMat.Rows)

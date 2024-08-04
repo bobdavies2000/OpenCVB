@@ -186,16 +186,16 @@ Public Class Replay_Play : Inherits VB_Parent
             Dim maxBytes = recordingFilename.Length
             If playbackActive Then
                 colorBytes = binRead.ReadBytes(bytesPerColor)
-                Dim tmpMat = New cv.Mat(fh.colorHeight, fh.colorWidth, cv.MatType.CV_8UC3, colorBytes)
+                Dim tmpMat = cv.Mat.FromPixelData(fh.colorHeight, fh.colorWidth, cv.MatType.CV_8UC3, colorBytes)
                 task.color = tmpMat.Resize(task.WorkingRes)
                 bytesTotal += colorBytes.Length
 
                 depth32fBytes = binRead.ReadBytes(bytesPerdepth32f)
-                tmpMat = New cv.Mat(fh.depthHeight, fh.depthWidth, cv.MatType.CV_16U, depth32fBytes)
+                tmpMat = cv.Mat.FromPixelData(fh.depthHeight, fh.depthWidth, cv.MatType.CV_16U, depth32fBytes)
                 bytesTotal += depth32fBytes.Length
 
                 cloudBytes = binRead.ReadBytes(bytesPerCloud)
-                task.pointCloud = New cv.Mat(fh.cloudHeight, fh.cloudWidth, cv.MatType.CV_32FC3, cloudBytes)  ' we cannot resize the point cloud.
+                task.pointCloud = cv.Mat.FromPixelData(fh.cloudHeight, fh.cloudWidth, cv.MatType.CV_32FC3, cloudBytes)  ' we cannot resize the point cloud.
                 bytesTotal += cloudBytes.Length
 
                 ' restart the video at the beginning.

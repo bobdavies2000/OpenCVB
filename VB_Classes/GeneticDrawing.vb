@@ -106,7 +106,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Parent
         If task.drawRect.Width > 0 Then r = task.drawRect
         If restartRequested Then
             restartRequested = False
-            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             imgStage = dst3.Clone
             generation = 0
             stage = 0

@@ -173,7 +173,7 @@ Public Class Stable_GoodFeatures : Inherits VB_Parent
     Public feat As New Feature_Basics
     Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the stable good features found in the BGR image."
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -8,7 +8,7 @@ Public Class Vector_Magnitude : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Dim cVector() As Single = {1, 4, 4, 8}
         strOut = "p1 = (" + CStr(cVector(0)) + ", " + CStr(cVector(1)) + ")" + vbTab + " p2 = (" + CStr(cVector(2)) + ", " + CStr(cVector(3)) + ")" + vbCrLf + vbCrLf
-        Dim coordinates As New cv.Mat(1, 4, cv.MatType.CV_32F, cVector)
+        Dim coordinates As cv.Mat = cv.Mat.FromPixelData(1, 4, cv.MatType.CV_32F, cVector)
         Dim diff_x = coordinates.Col(0) - coordinates.Col(2)
         Dim diff_y = coordinates.Col(1) - coordinates.Col(3)
 

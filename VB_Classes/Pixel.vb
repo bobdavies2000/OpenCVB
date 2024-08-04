@@ -20,8 +20,8 @@ Public Class Pixel_Viewer : Inherits VB_Parent
         If standaloneTest() Then
             task.dst0 = task.color.Clone
             task.dst1 = task.depthRGB.Clone
-            task.dst2 = New cv.Mat(task.dst1.Size(), cv.MatType.CV_8UC3, 0)
-            task.dst3 = New cv.Mat(task.dst1.Size(), cv.MatType.CV_8UC3, 0)
+            task.dst2 = New cv.Mat(task.dst1.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+            task.dst3 = New cv.Mat(task.dst1.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         End If
 
         Dim dst = Choose(task.mousePicTag + 1, task.dst0, task.dst1, task.dst2, task.dst3)
@@ -226,7 +226,7 @@ Public Class Pixel_GetSet : Inherits VB_Parent
         For i = 0 To colorArray.Length - 3 Step 3
             colorArray(i).SwapWith(colorArray(i + 2))
         Next
-        mats.mat(2) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, colorArray)
+        mats.mat(2) = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorArray)
         watch.Stop()
         output += "Marshal Copy took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf
 
@@ -529,7 +529,7 @@ Public Class Pixel_NeighborsMaskH : Inherits VB_Parent
         options.RunVB()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
+        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
         Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
         cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
@@ -556,7 +556,7 @@ Public Class Pixel_NeighborsMaskV : Inherits VB_Parent
         options.RunVB()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
+        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
         Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
         cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
@@ -711,7 +711,7 @@ Public Class Pixel_Unique_CPP_VB : Inherits VB_Parent
         handleSrc.Free()
 
         If classCount = 0 Then Exit Sub
-        Dim pixelData = New cv.Mat(classCount, 1, cv.MatType.CV_8UC3, Pixels_Vector_Pixels(cPtr))
+        Dim pixelData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_8UC3, Pixels_Vector_Pixels(cPtr))
         SetTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
                     "Or " + Format(classCount / src.Total, "0%") + " of the input.")
     End Sub
@@ -756,7 +756,7 @@ End Class
 
 
 Public Class Pixel_Mapper : Inherits VB_Parent
-    Public colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
+    Public colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
     Public Sub New()
         desc = "Resize the input to a small image, convert to gray, and map gray to color"
     End Sub

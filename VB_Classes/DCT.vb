@@ -169,7 +169,7 @@ Public Class DCT_Surfaces_debug : Inherits VB_Parent
             If roiCounts(i) > roiCounts(maxIndex) Then maxIndex = i
         Next
 
-        mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
+        mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         src(task.gridList(maxIndex)).CopyTo(mats.mat(3)(task.gridList(maxIndex)), mask(task.gridList(maxIndex)))
         mats.Run(empty)
         dst3 = mats.dst2

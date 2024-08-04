@@ -848,7 +848,7 @@ namespace CS_Classes
 
         public static float shapeCorrelation(List<Point> points)
         {
-            Mat pts = new Mat(points.Count, 1, MatType.CV_32SC2, points.ToArray());
+            Mat pts = Mat.FromPixelData(points.Count, 1, MatType.CV_32SC2, points.ToArray());
             Mat pts32f = new Mat();
             pts.ConvertTo(pts32f, MatType.CV_32FC2);
             Mat[] split = pts32f.Split();

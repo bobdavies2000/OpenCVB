@@ -73,7 +73,7 @@ Public Class PCA_Basics : Inherits VB_Parent
         Next
 
         If inputPoints.Count > 0 Then
-            Dim inputMat = New cv.Mat(inputPoints.Count, 3, cv.MatType.CV_32F, inputPoints.ToArray)
+            Dim inputMat = cv.Mat.FromPixelData(inputPoints.Count, 3, cv.MatType.CV_32F, inputPoints.ToArray)
             pca_analysis = New cv.PCA(inputMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
 
             strOut = displayResults()
@@ -260,7 +260,7 @@ Public Class PCA_Prep_CPP_VB : Inherits VB_Parent
         Dim imagePtr = PCA_Prep_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
         Dim count = PCA_Prep_GetCount(cPtr)
-        inputData = New cv.Mat(count, 3, cv.MatType.CV_32F, imagePtr).Clone
+        inputData = cv.Mat.FromPixelData(count, 3, cv.MatType.CV_32F, imagePtr).Clone
         SetTrueText("Data has been prepared and resides in inputData public")
     End Sub
     Public Sub Close()
@@ -312,10 +312,10 @@ Public Class PCA_Palettize : Inherits VB_Parent
         If standaloneTest() Then
             paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
 
-            Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, cv.Scalar.All(0))
             Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
 
-            custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, palette)
+            custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palette)
             custom.Run(img8u)
             dst2 = custom.dst2
         End If
@@ -842,14 +842,14 @@ Public Class PCA_NColor : Inherits VB_Parent
         palette = MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors)
         Dim paletteImage = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
 
-        Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, cv.Scalar.All(0))
         Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
 
         Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length)
         custom.Run(img8u)
         dst2 = custom.dst2
 
-        Dim tmp = New cv.Mat(256, 1, cv.MatType.CV_8UC3, palette)
+        Dim tmp = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palette)
         Dim paletteCount = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
 
         If standaloneTest() Then
@@ -891,8 +891,8 @@ Public Class PCA_NColor_CPP_VB : Inherits VB_Parent
         handlePalette.Free()
         handleSrc.Free()
 
-        dst2 = New cv.Mat(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
-        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, palettize.palette)
+        dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
+        custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palettize.palette)
 
         custom.Run(dst2)
         dst3 = custom.dst2
@@ -926,10 +926,10 @@ Public Class PCA_NColorPalettize : Inherits VB_Parent
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
         Dim paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palettize.palette, palettize.options.desiredNcolors)
 
-        Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, cv.Scalar.All(0))
         Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
 
-        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, palettize.palette)
+        custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palettize.palette)
 
         custom.Run(img8u)
         dst2 = custom.dst2

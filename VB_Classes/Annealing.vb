@@ -33,7 +33,7 @@ Public Class Annealing_Basics_CPP_VB : Inherits VB_Parent
         For i = 0 To cityOrder.Length - 1
             cityOrder(i) = (i + 1) Mod numberOfCities
         Next
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
     End Sub
     Public Sub Open()
         Dim hCityPosition = GCHandle.Alloc(cityPositions, GCHandleType.Pinned)

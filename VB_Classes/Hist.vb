@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Hist_Basics : Inherits VB_Parent
     Public histogram As New cv.Mat
@@ -297,7 +298,7 @@ Public Class Hist_PeakMax : Inherits VB_Parent
         Dim pixelMax = CInt((histindex + 1) * brickRange)
 
         Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         src.CopyTo(tmp, mask)
         dst2 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
@@ -540,7 +541,7 @@ Public Class Hist_KalmanAuto : Inherits VB_Parent
             kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
         Next
         kalman.Run(src)
-        histogram = New cv.Mat(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
+        histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
 
         Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
         If standaloneTest() Then plot.backColor = splitColors(splitIndex)
@@ -742,8 +743,8 @@ Public Class Hist_CompareEMD_hsv : Inherits VB_Parent
         cv.Cv2.CalcHist({lastHSV}, {0, 1}, New cv.Mat, histB, 2, {hBins, sBins}, ranges)
         Dim histNormB As cv.Mat = histB.Normalize(0, 1, cv.NormTypes.MinMax)
 
-        Dim sig1 = New cv.Mat(sBins * hBins, 3, cv.MatType.CV_32F, 0)
-        Dim sig2 = New cv.Mat(sBins * hBins, 3, cv.MatType.CV_32F, 0)
+        Dim sig1 = New cv.Mat(sBins * hBins, 3, cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim sig2 = New cv.Mat(sBins * hBins, 3, cv.MatType.CV_32F, cv.Scalar.All(0))
         For h = 0 To hBins - 1
             For s = 0 To sBins - 1
                 sig1.Set(Of Single)(h * sBins + s, 0, histNormA.Get(Of Single)(h, s))
@@ -1082,7 +1083,7 @@ Public Class Hist_Byte_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Hist_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
         handleSrc.Free()
 
-        Dim histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, imagePtr)
+        Dim histogram = cv.Mat.FromPixelData(task.histogramBins, 1, cv.MatType.CV_32F, imagePtr)
         plot.Run(histogram)
         dst2 = plot.dst2
 
@@ -1218,7 +1219,7 @@ Public Class Hist_Cell : Inherits VB_Parent
     Dim hist As New Hist_Depth
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}
         desc = "Review depth data for a RedCloud Cell"
     End Sub
@@ -1282,7 +1283,7 @@ Public Class Hist_Kalman : Inherits VB_Parent
         hist.Run(src)
         dst3 = hist.dst2.Clone
 
-        If hist.histogram.Rows = 0 Then hist.histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, 0)
+        If hist.histogram.Rows = 0 Then hist.histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
 
         If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
         For i = 0 To task.histogramBins - 1
@@ -1290,7 +1291,7 @@ Public Class Hist_Kalman : Inherits VB_Parent
         Next
         kalman.Run(src)
 
-        hist.histogram = New cv.Mat(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
+        hist.histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
         hist.plot.Run(hist.histogram)
         dst2 = hist.dst2
     End Sub

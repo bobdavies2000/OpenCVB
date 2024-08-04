@@ -749,7 +749,7 @@ namespace CS_Classes
             var imagePtr = VoronoiDemo_Run(cPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst2.Width, dst2.Height);
             handleSrc.Free();
 
-            dst2 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_32F, imagePtr).Clone();
+            dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_32F, imagePtr).Clone();
             vDemo.vDisplay(ref dst2, vDemo.random.PointList, Scalar.Yellow);
         }
 
@@ -1100,11 +1100,11 @@ namespace CS_Classes
 
                 if (i == 0)
                 {
-                    dst2 = new Mat(src.Height, src.Width, MatType.CV_8UC3, pixels).Clone();
+                    dst2 = cv.Mat.FromPixelData(src.Height, src.Width, MatType.CV_8UC3, pixels).Clone();
                 }
                 else
                 {
-                    dst3 = new Mat(src.Height, src.Width, MatType.CV_8UC3, pixels).Clone();
+                    dst3 = cv.Mat.FromPixelData(src.Height, src.Width, MatType.CV_8UC3, pixels).Clone();
                 }
             }
 
@@ -1273,7 +1273,8 @@ namespace CS_Classes
             if (dnnPrepared)
             {
                 var inScaleFactor = options.ScaleFactor / options.scaleMax; // should be 0.0078 by default...
-                var inputBlob = CvDnn.BlobFromImage(src, inScaleFactor, new OpenCvSharp.Size(300, 300), options.meanValue, false);
+                var inputBlob = CvDnn.BlobFromImage(src, inScaleFactor, new OpenCvSharp.Size(300, 300), 
+                                                    cv.Scalar.All(options.meanValue), false);
                 src.CopyTo(dst3);
                 src[crop].CopyTo(dst2[crop]);
                 net.SetInput(inputBlob, "data");
@@ -1430,7 +1431,7 @@ namespace CS_Classes
         }
         static Point2d[] MyPerspectiveTransform1(Point2f[] yourData, Mat transformationMatrix)
         {
-            using (Mat src = new Mat(yourData.Length, 1, MatType.CV_32FC2, yourData))
+            using (Mat src = cv.Mat.FromPixelData(yourData.Length, 1, MatType.CV_32FC2, yourData))
             using (Mat output = new Mat())
             {
                 Cv2.PerspectiveTransform(src, output, transformationMatrix);
@@ -1466,7 +1467,7 @@ namespace CS_Classes
             int nonZeroCount = 0;
             byte[] maskMat = new byte[mask.Rows];
             GCHandle maskHandle = GCHandle.Alloc(maskMat, GCHandleType.Pinned);
-            using (Mat m = new Mat(mask.Rows, 1, MatType.CV_8U, maskHandle.AddrOfPinnedObject()))
+            using (Mat m = cv.Mat.FromPixelData(mask.Rows, 1, MatType.CV_8U, maskHandle.AddrOfPinnedObject()))
             {
                 mask.CopyTo(m);
                 List<float> logScale = new List<float>();
@@ -1497,8 +1498,8 @@ namespace CS_Classes
                     scaleBinSize = 2;
                 float[] scaleRanges = { (float)minS, (float)(minS + scaleBinSize + Math.Log10(scaleIncrement)) };
 
-                using (var scalesMat = new Mat<float>(rows: logScale.Count, cols: 1, data: logScale.ToArray()))
-                using (var rotationsMat = new Mat<float>(rows: rotations.Count, cols: 1, data: rotations.ToArray()))
+                using (var scalesMat = cv.Mat.FromPixelData(rows: logScale.Count, cols: 1, cv.MatType.CV_32F, data: logScale.ToArray()))
+                using (var rotationsMat = cv.Mat.FromPixelData(rows: rotations.Count, cols: 1, cv.MatType.CV_32F, data: rotations.ToArray()))
                 using (var flagsMat = new Mat<float>(logScale.Count, 1))
                 using (Mat hist = new Mat())
                 {
@@ -1549,7 +1550,7 @@ namespace CS_Classes
         {
             byte[] maskData = new byte[matches.Length];
             GCHandle maskHandle = GCHandle.Alloc(maskData, GCHandleType.Pinned);
-            using (Mat m = new Mat(matches.Length, 1, MatType.CV_8U, maskHandle.AddrOfPinnedObject()))
+            using (Mat m = cv.Mat.FromPixelData(matches.Length, 1, MatType.CV_8U, maskHandle.AddrOfPinnedObject()))
             {
                 mask.CopyTo(m);
                 for (int i = 0; i < matches.Length; i++)

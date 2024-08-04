@@ -10,8 +10,8 @@ Public Class Solve_ByMat : Inherits VB_Parent
         ' (x=4, y=6)
         Dim av(,) As Double = {{1, 1}, {2, 3}}
         Dim yv() As Double = {10, 26}
-        Dim a = New cv.Mat(2, 2, cv.MatType.CV_64FC1, av)
-        Dim y = New cv.Mat(2, 1, cv.MatType.CV_64FC1, yv)
+        Dim a = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_64FC1, av)
+        Dim y = cv.Mat.FromPixelData(2, 1, cv.MatType.CV_64FC1, yv)
         Dim x As New cv.Mat
         cv.Cv2.Solve(a, y, x, cv.DecompTypes.LU)
 

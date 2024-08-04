@@ -185,7 +185,7 @@ Public Class IMU_GMatrix : Inherits VB_Parent
                                    {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                                    {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-        gMatrix = New cv.Mat(3, 3, cv.MatType.CV_32F, {
+        gMatrix = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, {
                   {gArray(0, 0) * cy + gArray(0, 1) * 0 + gArray(0, 2) * sy},
                   {gArray(0, 0) * 0 + gArray(0, 1) * 1 + gArray(0, 2) * 0},
                   {gArray(0, 0) * -sy + gArray(0, 1) * 0 + gArray(0, 2) * cy},
@@ -612,7 +612,7 @@ Public Class IMU_Average : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Then accList.Clear()
         accList.Add(task.IMU_RawAcceleration)
-        Dim accMat = New cv.Mat(accList.Count, 1, cv.MatType.CV_64FC4, accList.ToArray)
+        Dim accMat = cv.Mat.FromPixelData(accList.Count, 1, cv.MatType.CV_64FC4, accList.ToArray)
         Dim imuMean = accMat.Mean()
         task.IMU_AverageAcceleration = New cv.Point3f(imuMean(0), imuMean(1), imuMean(2))
         If accList.Count >= task.frameHistoryCount Then accList.RemoveAt(0)
@@ -951,7 +951,7 @@ Public Class IMU_GMatrixWithOptions : Inherits VB_Parent
                                    {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                                    {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-        Dim tmpGMatrix = New cv.Mat(3, 3, cv.MatType.CV_32F, {
+        Dim tmpGMatrix = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, {
                   {gArray(0, 0) * cy + gArray(0, 1) * 0 + gArray(0, 2) * sy},
                   {gArray(0, 0) * 0 + gArray(0, 1) * 1 + gArray(0, 2) * 0},
                   {gArray(0, 0) * -sy + gArray(0, 1) * 0 + gArray(0, 2) * cy},

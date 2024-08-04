@@ -3031,6 +3031,7 @@ public:
     }
 
     void Run(Mat src) {
+		if (range.width == 0 || range.height == 0) range = Rect(0, 0, dst2.cols, dst2.rows);
         pointList.clear();
 		while (pointList.size() < sizeRequest) {
 			pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));

@@ -18,9 +18,9 @@ Public Class Correlation_Basics : Inherits VB_Parent
         If row = 0 Then SetTrueText("Move mouse across image to see the relationship between X and Z" + vbCrLf +
                                     "A linear relationship is a useful correlation", New cv.Point(0, 10), 3)
 
-        Dim dataX As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, 0)
-        Dim dataY As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, 0)
-        Dim dataZ As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, 0)
+        Dim dataX As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim dataY As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim dataZ As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
 
         Dim mask = kFlood.dst3.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         task.pcSplit(0).CopyTo(dataX, mask)

@@ -10,7 +10,7 @@ Public Class Boundary_Basics : Inherits VB_Parent
     Dim guided As New GuidedBP_Depth
     Public Sub New()
         task.redOptions.setColorSource("Bin4Way_Regions")
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -58,7 +58,7 @@ Public Class Boundary_Tiers : Inherits VB_Parent
     Dim cells As New Boundary_Basics
     Dim contours As New Contour_DepthTiers
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Add the depth tiers to the cell boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -173,7 +173,7 @@ End Class
 Public Class Boundary_Overlap : Inherits VB_Parent
     Dim bounds As New Boundary_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Determine if 2 contours overlap"
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -81,7 +81,7 @@ Public Class Diff_RGBAccum : Inherits VB_Parent
     Dim history As New List(Of cv.Mat)
     Public Sub New()
         labels = {"", "", "Accumulated BGR image", "Mask of changed pixels"}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Run Diff_Basics and accumulate BGR diff data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -131,7 +131,7 @@ End Class
 Public Class Diff_Heartbeat : Inherits VB_Parent
     Public cumulativePixels As Integer
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Unstable mask", "Pixel difference"}
         desc = "Diff an image with one from the last heartbeat."
     End Sub

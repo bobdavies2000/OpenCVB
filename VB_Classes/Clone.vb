@@ -13,7 +13,7 @@ Public Class Clone_Basics : Inherits VB_Parent
         task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         If task.drawRect = New cv.Rect Then
             mask.SetTo(255)
         Else

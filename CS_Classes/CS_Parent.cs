@@ -181,7 +181,7 @@ namespace CS_Classes
     {
         using (var mask = rc.mask.Clone())
         {
-            mask.Rectangle(new OpenCvSharp.Rect(0, 0, mask.Width, mask.Height), 0, 1);
+            mask.Rectangle(new OpenCvSharp.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1);
             using (cv.Mat distance32f = mask.DistanceTransform(OpenCvSharp.DistanceTypes.L1, 0))
             {
                     mmData mm;
@@ -383,7 +383,7 @@ namespace CS_Classes
 
     public cv.Vec4f fitDepthPlane(List<cv.Point3f> fitDepth)
     {
-        cv.Mat wDepth = new cv.Mat(fitDepth.Count, 1, cv.MatType.CV_32FC3, fitDepth.ToArray());
+        cv.Mat wDepth = cv.Mat.FromPixelData(fitDepth.Count, 1, cv.MatType.CV_32FC3, fitDepth.ToArray());
         cv.Scalar columnSum = wDepth.Sum();
         double count = (double)fitDepth.Count;
         cv.Vec4f plane = new cv.Vec4f();

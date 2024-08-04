@@ -67,20 +67,20 @@ Public Class CameraMyntD : Inherits Camera
             SyncLock cameraLock
                 If captureRes <> WorkingRes Then
                     Dim tmp As cv.Mat
-                    tmp = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, imagePtr)
+                    tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, imagePtr)
                     mbuf(mbIndex).color = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
                     mbuf(mbIndex).leftView = mbuf(mbIndex).color
 
-                    tmp = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                    tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                     mbuf(mbIndex).rightView = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-                    tmp = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcPtr)
+                    tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcPtr)
                     mbuf(mbIndex).pointCloud = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
                 Else
-                    mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, imagePtr).Clone
+                    mbuf(mbIndex).color = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, imagePtr).Clone
                     mbuf(mbIndex).leftView = mbuf(mbIndex).color
-                    mbuf(mbIndex).rightView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, rightPtr).Clone
-                    mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcPtr).Clone
+                    mbuf(mbIndex).rightView = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, rightPtr).Clone
+                    mbuf(mbIndex).pointCloud = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcPtr).Clone
                 End If
             End SyncLock
             MyBase.GetNextFrameCounts(IMU_FrameTime)

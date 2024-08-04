@@ -243,11 +243,11 @@ Public Class Spectrum_Breakdown : Inherits VB_Parent
         Dim rc = task.rc
         Dim ranges As List(Of rangeData), input As cv.Mat
         If rc.depthPixels / rc.pixels < 0.5 Then
-            input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, 0)
+            input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             src(rc.rect).CopyTo(input, rc.mask)
             input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, 0)
+            input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(rc.rect).CopyTo(input, rc.mask)
         End If
         ranges = options.buildColorRanges(input, "GrayScale")
@@ -262,12 +262,12 @@ Public Class Spectrum_Breakdown : Inherits VB_Parent
             End If
         Next
 
-        Dim rangeClip As New cv.Mat(input.Size(), cv.MatType.CV_8U, 0)
+        Dim rangeClip As New cv.Mat(input.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         If input.Type = cv.MatType.CV_8U Then
             rangeClip = input.InRange(maxRange.start, maxRange.ending)
             rangeClip = rangeClip.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         Else
-            rangeClip = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, 0)
+            rangeClip = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             input.CopyTo(rangeClip, rc.mask)
 
             rangeClip = rangeClip.InRange(maxRange.start / 100, maxRange.ending / 100)

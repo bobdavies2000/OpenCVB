@@ -72,16 +72,16 @@ Public Class CameraRS2 : Inherits Camera
 
         SyncLock cameraLock
             Dim cols = WorkingRes.Width, rows = WorkingRes.Height
-            mbuf(mbIndex).color = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone
-            Dim tmp As cv.Mat = New cv.Mat(rows, cols, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mbuf(mbIndex).color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone
+            Dim tmp As cv.Mat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mbuf(mbIndex).leftView = tmp * 4 - 35 ' improved brightness specific to RealSense
-            tmp = New cv.Mat(rows, cols, cv.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            tmp = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mbuf(mbIndex).rightView = tmp * 4 - 35 ' improved brightness specific to RealSense
             If captureRes <> WorkingRes Then
-                Dim pc = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr))
+                Dim pc = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr))
                 mbuf(mbIndex).pointCloud = pc.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
             Else
-                mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr)).Clone
+                mbuf(mbIndex).pointCloud = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr)).Clone
             End If
         End SyncLock
         MyBase.GetNextFrameCounts(IMU_FrameTime)

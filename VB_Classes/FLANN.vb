@@ -61,7 +61,7 @@ Public Class FLANN_Basics : Inherits VB_Parent
         options.RunVB()
 
         If options.reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(empty) ' fill result1 with random points in x and y range of the image.
-        Dim features As New cv.Mat(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
+        Dim features As cv.Mat = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
 
         Dim matchCount = Math.Min(options.matchCount, random.PointList.Count - 1)
         dst2.SetTo(cv.Scalar.White)
@@ -76,7 +76,7 @@ Public Class FLANN_Basics : Inherits VB_Parent
                 qArray(i) = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
             Next
         End If
-        Dim queries As New cv.Mat(options.queryCount, 2, cv.MatType.CV_32F, qArray)
+        Dim queries As cv.Mat = cv.Mat.FromPixelData(options.queryCount, 2, cv.MatType.CV_32F, qArray)
 
         Using nnIndex As New cv.Flann.Index(features, New cv.Flann.KDTreeIndexParams(matchCount))
             Dim indices() As Integer

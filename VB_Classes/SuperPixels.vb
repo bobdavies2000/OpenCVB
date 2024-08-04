@@ -46,12 +46,12 @@ Public Class SuperPixel_Basics_CPP_VB : Inherits VB_Parent
         handleSrc.Free()
 
         dst2 = input
-        dst2.SetTo(gridColor, New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_8UC1, imagePtr))
+        dst2.SetTo(gridColor, cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_8UC1, imagePtr))
 
         Dim labelData(input.Total * 4 - 1) As Byte ' labels are 32-bit integers.
         Dim labelPtr = SuperPixel_GetLabels(cPtr)
         Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
-        Dim labels = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_32S, labelData)
+        Dim labels = cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_32S, labelData)
         If options.numSuperPixels < 255 Then labels *= 255 / options.numSuperPixels
         labels.ConvertTo(dst3, cv.MatType.CV_8U)
     End Sub

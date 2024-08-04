@@ -29,7 +29,7 @@ Public Class GrayToColor_Palette : Inherits VB_Parent
         Next
 
         dst1 = task.rightView
-        Dim colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colors.ToArray)
+        Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors.ToArray)
         cv.Cv2.ApplyColorMap(task.leftView, dst3, colorMap)
     End Sub
 End Class

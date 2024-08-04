@@ -12,7 +12,7 @@ Public Class Eigen_Basics : Inherits VB_Parent
                              -0.47, -6.39, 4.17, -1.51, 2.67,
                              -7.2, 1.5, -1.51, 5.7, 1.8,
                              -0.65, -6.34, 2.67, 1.8, -7.1}
-        Dim mat As New cv.Mat(5, 5, cv.MatType.CV_64FC1, a)
+        Dim mat As cv.Mat = cv.Mat.FromPixelData(5, 5, cv.MatType.CV_64FC1, a)
         Dim eigenVal As New cv.Mat, eigenVec As New cv.Mat
         cv.Cv2.Eigen(mat, eigenVal, eigenVec)
         Dim solution(mat.Cols) As Double
@@ -120,7 +120,7 @@ End Class
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
 Public Class Eigen_Fitline : Inherits VB_Parent
     Dim noisyLine As New Eigen_FitLineInput
-    Dim eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)
+    Dim eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0)), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0))
     Dim theta As Single
     Dim len As Single
     Dim m2 As Single
@@ -146,7 +146,7 @@ Public Class Eigen_Fitline : Inherits VB_Parent
         Dim p2 = New cv.Point(width, m * width + bb)
         dst2.Line(p1, p2, cv.Scalar.Red, 20, task.lineType)
 
-        Dim pointMat = New cv.Mat(noisyLine.options.randomCount, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
+        Dim pointMat = cv.Mat.FromPixelData(noisyLine.options.randomCount, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
         Dim mean = pointMat.Mean()
         Dim split() = pointMat.Split()
         Dim mmX = GetMinMax(split(0))
@@ -167,7 +167,7 @@ Public Class Eigen_Fitline : Inherits VB_Parent
         vec4f.Add(New cv.Point2f(eigenInput(0), eigenInput(1)))
         vec4f.Add(New cv.Point2f(eigenInput(1), eigenInput(3)))
 
-        Dim D = New cv.Mat(2, 2, cv.MatType.CV_32FC1, vec4f.ToArray)
+        Dim D = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32FC1, vec4f.ToArray)
         cv.Cv2.Eigen(D, eigenVal, eigenVec)
         theta = Math.Atan2(eigenVec.Get(Of Single)(1, 0), eigenVec.Get(Of Single)(0, 0))
 

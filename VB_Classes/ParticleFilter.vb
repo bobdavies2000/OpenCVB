@@ -14,7 +14,7 @@ Imports System.IO
 '        Dim matSize = 21 ' must be odd
 '        Dim halfsize = 10
 '        If histogram.Rows <> matSize Then
-'            histogram = New cv.Mat(matSize, matSize, cv.MatType.CV_32F, 0)
+'            histogram = New cv.Mat(matSize, matSize, cv.MatType.CV_32F, cv.Scalar.All(0))
 '            task.gOptions.HistBinSlider.Value = matSize
 '        End If
 
@@ -70,7 +70,7 @@ Public Class ParticleFilter_Example : Inherits VB_Parent
         Dim nextFile As New FileInfo(task.HomeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
         dst3 = cv.Cv2.ImRead(nextFile.FullName).Resize(dst2.Size)
         Dim imagePtr = ParticleFilterTest_Run(cPtr)
-        dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = ParticleFilterTest_Close(cPtr)

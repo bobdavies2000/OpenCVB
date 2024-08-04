@@ -14,7 +14,7 @@ Public Class BlurMotion_Basics : Inherits VB_Parent
         If standaloneTest() Then
             blurAngleSlider.Value = If(blurAngleSlider.Value < blurAngleSlider.Maximum, blurAngleSlider.Value + 1, blurAngleSlider.Minimum)
         End If
-        kernel = New cv.Mat(options.kernelSize, options.kernelSize, cv.MatType.CV_32F, 0)
+        kernel = New cv.Mat(options.kernelSize, options.kernelSize, cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim pt1 = New cv.Point(0, (options.kernelSize - 1) / 2)
         Dim pt2 = New cv.Point(options.kernelSize * Math.Cos(options.theta) + pt1.X, options.kernelSize * Math.Sin(options.theta) + pt1.Y)
         kernel.Line(pt1, pt2, New cv.Scalar(1 / options.kernelSize))
@@ -32,7 +32,7 @@ End Class
 Public Class BlurMotion_Deblur : Inherits VB_Parent
     ReadOnly mblur As New BlurMotion_Basics
     Private Function calcPSF(filterSize As cv.Size, len As Integer, theta As Double) As cv.Mat
-        Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, 0)
+        Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim pt = New cv.Point(filterSize.Width / 2, filterSize.Height / 2)
         h.Ellipse(pt, New cv.Size(0, CInt(len / 2)), 90 - theta, 0, 360, New cv.Scalar(255), -1)
         Dim summa = h.Sum()
@@ -40,7 +40,7 @@ Public Class BlurMotion_Deblur : Inherits VB_Parent
     End Function
     Private Function calcWeinerFilter(input_h_PSF As cv.Mat, nsr As Double) As cv.Mat
         Dim h_PSF_shifted = fftShift(input_h_PSF)
-        Dim planes() = {h_PSF_shifted.Clone(), New cv.Mat(h_PSF_shifted.Size(), cv.MatType.CV_32F, 0)}
+        Dim planes() = {h_PSF_shifted.Clone(), New cv.Mat(h_PSF_shifted.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
         Dim complexI As New cv.Mat
         cv.Cv2.Merge(planes, complexI)
         cv.Cv2.Dft(complexI, complexI)
@@ -71,8 +71,8 @@ Public Class BlurMotion_Deblur : Inherits VB_Parent
     Private Function edgeTaper(inputImg As cv.Mat, gamma As Double, beta As Double) As cv.Mat
         Dim nx = inputImg.Width
         Dim ny = inputImg.Height
-        Dim w1 As New cv.Mat(1, nx, cv.MatType.CV_32F, 0)
-        Dim w2 As New cv.Mat(ny, 1, cv.MatType.CV_32F, 0)
+        Dim w1 As New cv.Mat(1, nx, cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim w2 As New cv.Mat(ny, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
 
         Dim dx = CSng(2.0 * Math.PI / nx)
         Dim x = CSng(-Math.PI)
@@ -93,11 +93,11 @@ Public Class BlurMotion_Deblur : Inherits VB_Parent
         Return outputImg
     End Function
     Private Function filter2DFreq(inputImg As cv.Mat, H As cv.Mat) As cv.Mat
-        Dim planes() = {inputImg.Clone(), New cv.Mat(inputImg.Size(), cv.MatType.CV_32F, 0)}
+        Dim planes() = {inputImg.Clone(), New cv.Mat(inputImg.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
         Dim complexI As New cv.Mat
         cv.Cv2.Merge(planes, complexI)
         cv.Cv2.Dft(complexI, complexI, cv.DftFlags.Scale)
-        Dim planesH() = {H.Clone(), New cv.Mat(H.Size(), cv.MatType.CV_32F, 0)}
+        Dim planesH() = {H.Clone(), New cv.Mat(H.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
         Dim complexH As New cv.Mat
         cv.Cv2.Merge(planesH, complexH)
         Dim complexIH As New cv.Mat

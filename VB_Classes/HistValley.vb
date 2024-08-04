@@ -467,7 +467,7 @@ Public Class HistValley_Tiers : Inherits VB_Parent
     Dim valleys As New HistValley_FromPeaks
     Public Sub New()
         labels = {"", "", "CV_8U tier map with values ranging from 0 to the desired valley count", "vbPalette output of dst2."}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth."
     End Sub
     Public Sub RunVB(src As cv.Mat)

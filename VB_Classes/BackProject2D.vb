@@ -25,7 +25,7 @@ Public Class BackProject2D_Basics : Inherits VB_Parent
         If backProjectByGrid Then
             task.gridMap.ConvertTo(histogram, cv.MatType.CV_32F)
         Else
-            histogram = New cv.Mat(hist2d.histogram.Size, cv.MatType.CV_32F, 0)
+            histogram = New cv.Mat(hist2d.histogram.Size, cv.MatType.CV_32F, cv.Scalar.All(0))
             hist2d.histogram(roi).CopyTo(histogram(roi))
         End If
         cv.Cv2.CalcBackProject({colorFmt.dst2}, hist2d.channels, histogram, dst0, hist2d.ranges)
@@ -341,7 +341,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Parent
             rect = New cv.Rect(roi.X, 0, roi.Width, dst2.Height)
         End If
         dst2.Rectangle(rect, task.HighlightColor, task.lineWidth)
-        Dim histData As New cv.Mat(backp.hist2d.histogram.Size, cv.MatType.CV_32F, 0)
+        Dim histData As New cv.Mat(backp.hist2d.histogram.Size, cv.MatType.CV_32F, cv.Scalar.All(0))
         backp.hist2d.histogram(rect).CopyTo(histData(rect))
 
         Dim ranges() = backp.hist2d.ranges

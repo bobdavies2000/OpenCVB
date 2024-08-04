@@ -68,7 +68,7 @@ Public Class Benford_Basics : Inherits VB_Parent
             Next
         End If
 
-        Dim hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
+        Dim hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
         plot.backColor = cv.Scalar.Blue
         plot.Run(hist)
         dst3 = plot.dst2.Clone
@@ -76,7 +76,7 @@ Public Class Benford_Basics : Inherits VB_Parent
             counts(i) = src.Rows * expectedDistribution(i)
         Next
 
-        hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
+        hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
         plot.backColor = cv.Scalar.Gray
         plot.Run(hist)
 
@@ -153,7 +153,7 @@ Public Class Benford_JPEG : Inherits VB_Parent
         options.RunVB()
 
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
-        Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
+        Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
@@ -179,7 +179,7 @@ Public Class Benford_JPEG99 : Inherits VB_Parent
         options.RunVB()
 
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
-        Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
+        Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
@@ -205,7 +205,7 @@ Public Class Benford_PNG : Inherits VB_Parent
         options.RunVB()
 
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, options.compression})
-        Dim tmp = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
+        Dim tmp = cv.Mat.FromPixelData(png.Count, 1, cv.MatType.CV_8U, png)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
@@ -251,7 +251,7 @@ Public Class Benford_Primes : Inherits VB_Parent
         If task.optionsChanged Then sieve.Run(src) ' only need to compute this once...
         SetTrueText($"Primes found: {sieve.primes.Count}", 3)
 
-        Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
+        Dim tmp = cv.Mat.FromPixelData(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
         tmp.ConvertTo(tmp, cv.MatType.CV_32F)
         benford.Run(tmp)
         dst2 = benford.dst2

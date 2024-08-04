@@ -64,7 +64,7 @@ Public Class XPhoto_OilPaint_CPP_VB : Inherits VB_Parent
                                            options.blockSize, options.dynamicRatio, options.colorCode)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = xPhoto_OilPaint_Close(cPtr)
@@ -131,7 +131,7 @@ Public Class XPhoto_Inpaint_CPP_VB : Inherits VB_Parent
         handleSrc.Free()
         handleMask.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         SetTrueText("The xPhoto Inpaint call hangs." + vbCrLf + "Uncomment the C++ line - see XPhoto.cpp - to test", 1)
     End Sub
     Public Sub Close()

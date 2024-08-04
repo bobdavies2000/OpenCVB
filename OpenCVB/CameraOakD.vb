@@ -100,24 +100,24 @@ Public Class CameraOakD : Inherits Camera
         IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
 
         Dim depth32f As New cv.Mat
-        Dim depth16 = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_16U, OakDRawDepth(cPtr))
+        Dim depth16 = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_16U, OakDRawDepth(cPtr))
         depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
 
         SyncLock cameraLock
             If captureRes <> WorkingRes Then
                 Dim tmp As cv.Mat
-                tmp = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr))
+                tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr))
                 mbuf(mbIndex).color = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-                tmp = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr))
+                tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr))
                 mbuf(mbIndex).leftView = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-                tmp = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr))
+                tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr))
                 mbuf(mbIndex).rightView = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Else
-                mbuf(mbIndex).color = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr)).Clone
-                mbuf(mbIndex).leftView = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                mbuf(mbIndex).rightView = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                mbuf(mbIndex).color = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr)).Clone
+                mbuf(mbIndex).leftView = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                mbuf(mbIndex).rightView = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End If
 
             ' the Oak-D cameras do not produce a point cloud - update if that changes.

@@ -113,7 +113,7 @@ Public Class PhotoShop_WhiteBalance : Inherits VB_Parent
         Dim imagePtr = WhiteBalance_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         If standaloneTest() Then
             Dim diff = dst2 - src
             diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -246,7 +246,7 @@ Public Class PhotoShop_Sepia : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
-        Dim tMatrix = New cv.Mat(3, 3, cv.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
+        Dim tMatrix = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
         dst2 = dst2.Transform(tMatrix).Threshold(255, 255, cv.ThresholdTypes.Trunc)
     End Sub
 End Class
@@ -279,7 +279,7 @@ Public Class PhotoShop_Emboss : Inherits VB_Parent
         desc = "Use the video stream to make it appear like an embossed paper image."
     End Sub
     Public Function kernelGenerator(size As Integer) As cv.Mat
-        Dim kernel As New cv.Mat(size, size, cv.MatType.CV_8S, 0)
+        Dim kernel As cv.Mat = cv.Mat.FromPixelData(size, size, cv.MatType.CV_8S, 0)
         For i = 0 To size - 1
             For j = 0 To size - 1
                 If i < j Then kernel.Set(Of SByte)(j, i, -1) Else If i > j Then kernel.Set(Of SByte)(j, i, 1)

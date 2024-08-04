@@ -5,8 +5,8 @@ Public Class GuidedBP_Basics : Inherits VB_Parent
     Dim topMap As New cv.Mat
     Dim sideMap As New cv.Mat
     Public Sub New()
-        topMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        sideMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        topMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        sideMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Correlate the hot points with the previous generation using a Map"
     End Sub
     Private Sub runMap(rectList As List(Of cv.Rect), dstindex As Integer, map As cv.Mat)

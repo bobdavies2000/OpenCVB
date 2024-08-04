@@ -170,7 +170,7 @@ Public Class Bin2Way_RedCloud : Inherits VB_Parent
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
-                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
         End If
 

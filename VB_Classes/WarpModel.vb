@@ -97,15 +97,15 @@ Public Class WarpModel_ECC : Inherits VB_Parent
         Marshal.Copy(imagePtr, warpMatrix, 0, warpMatrix.Length)
 
         If options.warpMode <> 3 Then
-            Dim warpMat = New cv.Mat(2, 3, cv.MatType.CV_32F, warpMatrix)
+            Dim warpMat = cv.Mat.FromPixelData(2, 3, cv.MatType.CV_32F, warpMatrix)
             cv.Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         Else
-            Dim warpMat = New cv.Mat(3, 3, cv.MatType.CV_32F, warpMatrix)
+            Dim warpMat = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, warpMatrix)
             cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
 
-        dst2 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, cv.Scalar.All(0))
 
         outputRect = New cv.Rect(0, 0, src.Width, src.Height)
         dst2(outputRect) = src

@@ -20,8 +20,8 @@ Public Class SVM_Basics : Inherits VB_Parent
             response = sampleData.responses
         End If
 
-        Dim dataMat = New cv.Mat(options.sampleCount, 2, cv.MatType.CV_32FC1, points.ToArray)
-        Dim resMat = New cv.Mat(options.sampleCount, 1, cv.MatType.CV_32SC1, response.ToArray)
+        Dim dataMat = cv.Mat.FromPixelData(options.sampleCount, 2, cv.MatType.CV_32FC1, points.ToArray)
+        Dim resMat = cv.Mat.FromPixelData(options.sampleCount, 1, cv.MatType.CV_32SC1, response.ToArray)
         dataMat *= 1 / src.Height
 
         If task.optionsChanged Then svm = options.createSVM()
@@ -31,7 +31,7 @@ Public Class SVM_Basics : Inherits VB_Parent
         For Each roi In task.gridList
             If roi.X > src.Height Then Continue For ' working only with square - not rectangles.
             Dim samples() As Single = {roi.X / src.Height, roi.Y / src.Height}
-            If svm.Predict(New cv.Mat(1, 2, cv.MatType.CV_32F, samples)) = 1 Then
+            If svm.Predict(cv.Mat.FromPixelData(1, 2, cv.MatType.CV_32F, samples)) = 1 Then
                 dst3(roi).SetTo(cv.Scalar.Red)
             Else
                 dst3(roi).SetTo(cv.Scalar.GreenYellow)
@@ -120,8 +120,8 @@ Public Class SVM_TestCase : Inherits VB_Parent
             Next
         End If
 
-        Dim trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, points.ToArray)
-        Dim labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, responses.ToArray)
+        Dim trainMat = cv.Mat.FromPixelData(4, 2, cv.MatType.CV_32F, points.ToArray)
+        Dim labelsMat = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32SC1, responses.ToArray)
         Dim dataMat = trainMat * 1 / src.Height
 
         If task.optionsChanged Then svm = options.createSVM()

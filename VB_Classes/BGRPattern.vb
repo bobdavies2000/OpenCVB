@@ -1,4 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class BGRPattern_Basics : Inherits VB_Parent
     Dim denoise As New Denoise_Pixels_CPP_VB
@@ -20,7 +21,7 @@ Public Class BGRPattern_Basics : Inherits VB_Parent
                                          src.Rows, src.Cols)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
 
         classCount = BGRPattern_ClassCount(cPtr)
         denoise.classCount = classCount

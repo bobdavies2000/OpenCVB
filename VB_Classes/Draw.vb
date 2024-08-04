@@ -424,7 +424,7 @@ Public Class Draw_Frustrum : Inherits VB_Parent
         desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        src = New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+        src = New cv.Mat(task.workingRes, cv.MatType.CV_32F, cv.Scalar.All(0))
 
         Dim mid = src.Height / 2
         Dim zIncr = task.maxZmeters / mid

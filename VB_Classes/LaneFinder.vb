@@ -114,7 +114,7 @@ Public Class LaneFinder_ROI : Inherits VB_Parent
             Dim tr = New cv.Point(w * 0.6, h * 0.6)
 
             Dim pList() As cv.Point = {bl, tl, tr, br}
-            dst1 = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst1.FillConvexPoly(pList, cv.Scalar.White, task.lineType)
             pListList(0) = pList
         End If
@@ -167,16 +167,16 @@ Public Class LaneFinder_SlopeIntercept : Inherits VB_Parent
                 rightWeight.Add(line.P1.DistanceTo(line.P2))
             End If
         Next
-        Dim mat1 = New cv.Mat(leftWeight.Count, 1, cv.MatType.CV_32F, leftWeight.ToArray)
-        Dim mat2 = New cv.Mat(leftSlope.Count, 1, cv.MatType.CV_32F, leftSlope.ToArray)
-        Dim mat3 = New cv.Mat(leftIntercept.Count, 1, cv.MatType.CV_32F, leftIntercept.ToArray)
+        Dim mat1 = cv.Mat.FromPixelData(leftWeight.Count, 1, cv.MatType.CV_32F, leftWeight.ToArray)
+        Dim mat2 = cv.Mat.FromPixelData(leftSlope.Count, 1, cv.MatType.CV_32F, leftSlope.ToArray)
+        Dim mat3 = cv.Mat.FromPixelData(leftIntercept.Count, 1, cv.MatType.CV_32F, leftIntercept.ToArray)
         Dim weight = leftWeight.Sum()
         leftLaneIntercept = mat1.Dot(mat3) / weight
         leftAvgSlope = mat1.Dot(mat2) / weight
 
-        mat1 = New cv.Mat(rightWeight.Count, 1, cv.MatType.CV_32F, rightWeight.ToArray)
-        mat2 = New cv.Mat(rightSlope.Count, 1, cv.MatType.CV_32F, rightSlope.ToArray)
-        mat3 = New cv.Mat(rightIntercept.Count, 1, cv.MatType.CV_32F, rightIntercept.ToArray)
+        mat1 = cv.Mat.FromPixelData(rightWeight.Count, 1, cv.MatType.CV_32F, rightWeight.ToArray)
+        mat2 = cv.Mat.FromPixelData(rightSlope.Count, 1, cv.MatType.CV_32F, rightSlope.ToArray)
+        mat3 = cv.Mat.FromPixelData(rightIntercept.Count, 1, cv.MatType.CV_32F, rightIntercept.ToArray)
         weight = rightWeight.Sum()
         rightLaneIntercept = mat1.Dot(mat3) / weight
         rightAvgSlope = mat1.Dot(mat2) / weight

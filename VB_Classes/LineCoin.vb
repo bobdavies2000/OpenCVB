@@ -4,7 +4,7 @@ Public Class LineCoin_Basics : Inherits VB_Parent
     Public lpList As New List(Of PointPair)
     Dim lpLists As New List(Of List(Of PointPair))
     Public Sub New()
-        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the coincident lines in the image and measure their value."
     End Sub
     Public Function findLines(lpLists As List(Of List(Of PointPair))) As List(Of PointPair)
@@ -68,7 +68,7 @@ Public Class LineCoin_HistoryIntercept : Inherits VB_Parent
     Public lpList As New List(Of PointPair)
     Dim mpLists As New List(Of List(Of PointPair))
     Public Sub New()
-        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "find lines with coincident slopes and intercepts."
     End Sub
     Public Sub RunVB(src As cv.Mat)

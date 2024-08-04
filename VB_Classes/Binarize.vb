@@ -127,7 +127,7 @@ Public Class Binarize_KMeansMasks : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Ordered from dark to light, top left darkest, bottom right lightest "
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Display the top 4 masks from the BGR kmeans output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -162,7 +162,7 @@ Public Class Binarize_KMeansRGB : Inherits VB_Parent
         km.Run(src)
         dst1.SetTo(0)
         For i = 0 To km.masks.Count - 1
-            mats.mat(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, 0)
+            mats.mat(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
             src.CopyTo(mats.mat(i), km.masks(i))
             If i >= 3 Then Exit For
         Next
