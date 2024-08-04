@@ -703,6 +703,7 @@ Public Class Pixel_Unique_CPP_VB : Inherits VB_Parent
         desc = "Create the list of pixels in a RedCloud Cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        src = src.Resize(task.lowRes)
         If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -712,8 +713,8 @@ Public Class Pixel_Unique_CPP_VB : Inherits VB_Parent
 
         If classCount = 0 Then Exit Sub
         Dim pixelData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_8UC3, Pixels_Vector_Pixels(cPtr))
-        SetTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
-                    "Or " + Format(classCount / src.Total, "0%") + " of the input.")
+        SetTrueText(CStr(classCount) + " unique BGR pixels were found in the src after resizing to low resolution." + vbCrLf +
+                    "Or " + Format(classCount / src.Total, "0%") + " of the input were unique pixels.")
     End Sub
     Public Sub Close()
         Pixels_Vector_Close(cPtr)
