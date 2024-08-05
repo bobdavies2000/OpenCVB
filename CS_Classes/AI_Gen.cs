@@ -94,7 +94,7 @@ namespace CS_Classes
 
     public class AddWeighted_ImageAccumulate_CS : CS_Parent
     {
-        Options_AddWeightedAccum options = new Options_AddWeightedAccum();
+        Options_AddWeighted options = new Options_AddWeighted();
         public AddWeighted_ImageAccumulate_CS(VBtask task) : base(task)
         {
             desc = "Update a running average of the image";
@@ -107,7 +107,7 @@ namespace CS_Classes
             {
                 dst2 = task.pcSplit[2] * 1000;
             }
-            cv.Cv2.AccumulateWeighted(task.pcSplit[2] * 1000, dst2, options.addWeighted, new cv.Mat());
+            cv.Cv2.AccumulateWeighted(task.pcSplit[2] * 1000, dst2, options.accumWeighted, new cv.Mat());
         }
     }
 
@@ -33463,7 +33463,8 @@ namespace CS_Classes
 
             if (task.optionsChanged)
             {
-                if (options.inputfile.Exists) video.options.fileInfo = new FileInfo(options.inputfile.FullName);
+                FileInfo inputFile = new FileInfo(task.HomeDir + options.inputName);
+                if (inputFile.Exists) video.options.fileInfo = new FileInfo(inputFile.FullName);
             }
             video.Run(empty);
             dst2 = video.dst2;

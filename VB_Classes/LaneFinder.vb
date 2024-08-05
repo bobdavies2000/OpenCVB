@@ -28,14 +28,16 @@ Public Class LaneFinder_Videos : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
 
-        video.options.fileInfo = New FileInfo(options.inputfile.FullName)
+        Dim inputfile = New FileInfo(task.HomeDir + options.inputName)
+        video.options.fileInfo = New FileInfo(inputfile.FullName)
         desc = "Read in the videos showing road conditions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
         If task.optionsChanged Then
-            If options.inputfile.Exists Then video.options.fileInfo = New FileInfo(options.inputfile.FullName)
+            Dim inputfile = New FileInfo(task.HomeDir + options.inputName)
+            If inputfile.Exists Then video.options.fileInfo = New FileInfo(inputfile.FullName)
         End If
 
         video.Run(empty)

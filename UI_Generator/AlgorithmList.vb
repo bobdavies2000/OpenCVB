@@ -1298,7 +1298,6 @@ if algorithmName = "Stable_BasicsCount_CPP" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "OpenGL_World" Then return new OpenGL_World
 	if algorithmName = "Options_AdaptiveThreshold" Then return new Options_AdaptiveThreshold
 	if algorithmName = "Options_AddWeighted" Then return new Options_AddWeighted
-	if algorithmName = "Options_AddWeightedAccum" Then return new Options_AddWeightedAccum
 	if algorithmName = "Options_Annealing" Then return new Options_Annealing
 	if algorithmName = "Options_ApproxPoly" Then return new Options_ApproxPoly
 	if algorithmName = "Options_AsciiArt" Then return new Options_AsciiArt

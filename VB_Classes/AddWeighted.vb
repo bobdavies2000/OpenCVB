@@ -56,7 +56,7 @@ End Class
 
 
 Public Class AddWeighted_ImageAccumulate : Inherits VB_Parent
-    Dim options As New Options_AddWeightedAccum()
+    Dim options As New Options_AddWeighted
     Public Sub New()
         desc = "Update a running average of the image"
     End Sub
@@ -64,7 +64,7 @@ Public Class AddWeighted_ImageAccumulate : Inherits VB_Parent
         options.RunVB()
 
         If task.optionsChanged Then dst2 = task.pcSplit(2) * 1000
-        cv.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.addWeighted, New cv.Mat)
+        cv.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New cv.Mat)
     End Sub
 End Class
 
