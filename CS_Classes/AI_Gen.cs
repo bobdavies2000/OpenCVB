@@ -50163,7 +50163,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            Cv2.PyrMeanShiftFiltering(src, dst2, options.radius, options.color, options.maxPyramid);
+            Cv2.PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid);
         }
     }
 
@@ -51149,11 +51149,11 @@ namespace CS_Classes
             {
                 for (int x = 0; x < dst3.Width; x++)
                 {
-                    if (255 * msRNG.NextDouble() <= options.thresh)
+                    if (255 * msRNG.NextDouble() <= options.threshPercent)
                     {
                         byte v = dst3.At<byte>(y, x);
                         dst3.Set<byte>(y, x, (byte)(msRNG.NextDouble() * 2 == 0 ? Math.Min(v +
-                                (options.val + 1) * msRNG.NextDouble(), 255) : Math.Max(v - (options.val + 1) * msRNG.NextDouble(), 0)));
+                                (options.rangeVal + 1) * msRNG.NextDouble(), 255) : Math.Max(v - (options.rangeVal + 1) * msRNG.NextDouble(), 0)));
                     }
                 }
             }
@@ -55109,13 +55109,13 @@ namespace CS_Classes
                     MessageBox.Show("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?");
                 }
             }
-            if (saveUseLogSampling != options.useLogSampling || samplingFactor != options.sampleCount)
+            if (saveUseLogSampling != options.useLogSampling || samplingFactor != options.sampleFactor)
             {
                 if (cPtr != (IntPtr)0) Retina_Basics_Close(cPtr);
                 Array.Resize(ref magnoData, (int)(src.Total() - 1));
                 Array.Resize(ref dataSrc, (int)(src.Total() * src.ElemSize() - 1));
                 saveUseLogSampling = options.useLogSampling;
-                samplingFactor = options.sampleCount;
+                samplingFactor = options.sampleFactor;
                 if (!task.testAllRunning) cPtr = Retina_Basics_Open(src.Rows, src.Cols, options.useLogSampling, samplingFactor);
             }
             GCHandle handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned);

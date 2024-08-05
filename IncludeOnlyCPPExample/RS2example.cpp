@@ -6,9 +6,8 @@
 #include <fstream>
 #include <algorithm>
 #include <cstring>
-#include "CPP_IncludeOnly.h"
+#include "CPP_IncludeOnly.cpp"
 #include "CPP_Externs.h"
-#include "CPP_Names.h"
 
 void render_slider(rect location, float& clipping_dist);
 void remove_background(rs2::video_frame& other, const rs2::depth_frame& depth_frame, float depth_scale, float clipping_dist);

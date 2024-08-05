@@ -472,10 +472,10 @@ Public Class Random_StaticTV : Inherits VB_Parent
         dst3 = dst2(task.drawRect)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
-                If 255 * Rnd() <= options.thresh Then
+                If 255 * Rnd() <= options.threshPercent Then
                     Dim v = dst3.Get(Of Byte)(y, x)
-                    dst3.Set(Of Byte)(y, x, If(2 * Rnd() = 0, Math.Min(v + (options.val + 1) * Rnd(), 255),
-                                                              Math.Max(v - (options.val + 1) * Rnd(), 0)))
+                    dst3.Set(Of Byte)(y, x, If(2 * Rnd() = 0, Math.Min(v + (options.rangeVal + 1) * Rnd(), 255),
+                                                              Math.Max(v - (options.rangeVal + 1) * Rnd(), 0)))
                 End If
             Next
         Next

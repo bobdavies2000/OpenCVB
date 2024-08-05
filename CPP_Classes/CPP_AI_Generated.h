@@ -21,13 +21,11 @@
 #include <vector>
 #include <random>
 #include "opencv2/video/tracking.hpp"
-#include <filesystem> 
 
 using namespace std;
 using namespace cv;
 using namespace ximgproc;
 using namespace ml;
-namespace fs = std::filesystem;
 
 #include "../CPP_Classes/PragmaLibs.h"
 #include "CPP_Task.h"

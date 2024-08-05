@@ -7,7 +7,7 @@ Public Class PyrFilter_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        cv.Cv2.PyrMeanShiftFiltering(src, dst2, options.radius, options.color, options.maxPyramid)
+        cv.Cv2.PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid)
     End Sub
 End Class
 

@@ -3014,9 +3014,8 @@ End Class
 Public Class Options_HeatMap : Inherits VB_Parent
     Public redThreshold As Integer = 20
     Public viewName As String = "vertical"
-    Public showHistory As Boolean
     Public topView As Boolean = True
-    Public sideView As Boolean
+    Public sideView As Boolean = False
     Public Sub New()
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
@@ -6780,7 +6779,7 @@ End Class
 
 
 Public Class Options_Puzzle : Inherits VB_Parent
-    Public startPuzzle As Boolean
+    Public startPuzzle As Boolean = True
     Public Sub New()
         If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
@@ -6801,9 +6800,9 @@ End Class
 
 
 Public Class Options_Pyramid : Inherits VB_Parent
-    Public zoom As Integer
+    Public zoom As Integer = 0
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom in and out", -1, 1, 0)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom in and out", -1, 1, zoom)
     End Sub
     Public Sub RunVB()
         Static zoomSlider = FindSlider("Zoom in and out")
@@ -6817,22 +6816,22 @@ End Class
 
 
 Public Class Options_PyrFilter : Inherits VB_Parent
-    Public radius As Integer
-    Public color As Integer
-    Public maxPyramid As Integer
+    Public spatialRadius As Integer = 1
+    Public colorRadius As Integer = 20
+    Public maxPyramid As Integer = 3
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("MeanShift Spatial Radius", 1, 100, 1)
-            sliders.setupTrackBar("MeanShift color Radius", 1, 100, 20)
-            sliders.setupTrackBar("MeanShift Max Pyramid level", 1, 8, 3)
+            sliders.setupTrackBar("MeanShift Spatial Radius", 1, 100, Spatialradius)
+            sliders.setupTrackBar("MeanShift color Radius", 1, 100, colorRadius)
+            sliders.setupTrackBar("MeanShift Max Pyramid level", 1, 8, maxPyramid)
         End If
     End Sub
     Public Sub RunVB()
         Static radiusSlider = FindSlider("MeanShift Spatial Radius")
         Static colorSlider = FindSlider("MeanShift color Radius")
         Static maxSlider = FindSlider("MeanShift Max Pyramid level")
-        radius = radiusSlider.value
-        color = colorSlider.value
+        Spatialradius = radiusSlider.value
+        colorRadius = colorSlider.value
         maxPyramid = maxSlider.value
     End Sub
 End Class
@@ -6842,17 +6841,17 @@ End Class
 
 
 Public Class Options_NormalDist : Inherits VB_Parent
-    Public redVal As Integer
-    Public greenVal As Integer
-    Public blueVal As Integer
-    Public stdev As Integer
-    Public grayChecked As Boolean
+    Public blueVal As Integer = 125
+    Public greenVal As Integer = 25
+    Public redVal As Integer = 180
+    Public stdev As Integer = 50
+    Public grayChecked As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Random_NormalDist Blue Mean", 0, 255, 125)
-            sliders.setupTrackBar("Random_NormalDist Green Mean", 0, 255, 25)
-            sliders.setupTrackBar("Random_NormalDist Red Mean", 0, 255, 180)
-            sliders.setupTrackBar("Random_NormalDist Stdev", 0, 255, 50)
+            sliders.setupTrackBar("Random_NormalDist Blue Mean", 0, 255, blueVal)
+            sliders.setupTrackBar("Random_NormalDist Green Mean", 0, 255, greenVal)
+            sliders.setupTrackBar("Random_NormalDist Red Mean", 0, 255, redVal)
+            sliders.setupTrackBar("Random_NormalDist Stdev", 0, 255, stdev)
         End If
 
         If check.Setup(traceName) Then check.addCheckBox("Use Grayscale image")
@@ -6878,9 +6877,9 @@ End Class
 
 
 Public Class Options_MonteCarlo : Inherits VB_Parent
-    Public dimension As Integer
+    Public dimension As Integer = 91
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of bins", 1, 255, 91)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of bins", 1, 255, dimension)
     End Sub
     Public Sub RunVB()
         Static binSlider = FindSlider("Number of bins")
@@ -6893,19 +6892,19 @@ End Class
 
 
 Public Class Options_StaticTV : Inherits VB_Parent
-    Public val As Integer
-    Public thresh As Integer
+    Public rangeVal As Integer = 50
+    Public threshPercent As Single = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Range of noise to apply (from 0 to this value)", 0, 255, 50)
-            sliders.setupTrackBar("Percentage of pixels to include noise", 0, 100, 20)
+            sliders.setupTrackBar("Range of noise to apply (from 0 to this value)", 0, 255, rangeVal)
+            sliders.setupTrackBar("Percentage of pixels to include noise", 0, 100, threshPercent)
         End If
     End Sub
     Public Sub RunVB()
         Static valSlider = FindSlider("Range of noise to apply (from 0 to this value)")
         Static threshSlider = FindSlider("Percentage of pixels to include noise")
-        val = valSlider.Value
-        thresh = threshSlider.Value
+        rangeVal = valSlider.Value
+        threshPercent = threshSlider.Value
     End Sub
 End Class
 
@@ -6916,14 +6915,14 @@ End Class
 
 
 Public Class Options_Clusters : Inherits VB_Parent
-    Public numClusters As Integer = 3
-    Public numPoints As Integer
-    Public stdev As Single
+    Public numClusters As Integer = 9
+    Public numPoints As Integer = 20
+    Public stdev As Single = 10
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number of Clusters", 1, 10, 9)
-            sliders.setupTrackBar("Number of points per cluster", 1, 100, 20)
-            sliders.setupTrackBar("Cluster stdev", 0, 100, 10)
+            sliders.setupTrackBar("Number of Clusters", 1, 10, numClusters)
+            sliders.setupTrackBar("Number of points per cluster", 1, 100, numPoints)
+            sliders.setupTrackBar("Cluster stdev", 0, 100, stdev)
         End If
     End Sub
     Public Sub RunVB()
@@ -6942,14 +6941,14 @@ End Class
 
 
 Public Class Options_Draw : Inherits VB_Parent
-    Public proximity As Integer
+    Public proximity As Integer = 250
     Public drawCount As Integer = 3
     Public drawFilled As Integer = 2
     Public drawRotated As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("DrawCount", 0, 20, drawCount)
-            sliders.setupTrackBar("Merge rectangles within X pixels", 0, dst2.Width, If(dst2.Width = 1280, 500, 250))
+            sliders.setupTrackBar("Merge rectangles within X pixels", 0, dst2.Width, If(dst2.Width = 1280, proximity * 2, proximity))
         End If
 
         If check.Setup(traceName) Then
@@ -6975,9 +6974,9 @@ End Class
 
 
 Public Class Options_RBF : Inherits VB_Parent
-    Public RBFCount As Integer
+    Public RBFCount As Integer = 2
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("RBF Recursion count", 1, 20, 2)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("RBF Recursion count", 1, 20, RBFCount)
     End Sub
     Public Sub RunVB()
         Static countSlider = FindSlider("RBF Recursion count")
@@ -6992,14 +6991,14 @@ End Class
 
 
 Public Class Options_RedCloudOther : Inherits VB_Parent
-    Public range As Integer
-    Public reduceAmt As Integer
-    Public threshold As Single
+    Public range As Integer = 30
+    Public reduceAmt As Integer = 250
+    Public threshold As Single = 95 / 100
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Grayscale range around mean", 0, 100, 30)
-            sliders.setupTrackBar("RedCloud_Reduce Reduction", 1, 2500, 250)
-            sliders.setupTrackBar("Percent featureLess threshold", 1, 100, 95)
+            sliders.setupTrackBar("Grayscale range around mean", 0, 100, range)
+            sliders.setupTrackBar("RedCloud_Reduce Reduction", 1, 2500, reduceAmt)
+            sliders.setupTrackBar("Percent featureLess threshold", 1, 100, threshold * 100)
         End If
     End Sub
     Public Sub RunVB()
@@ -7009,7 +7008,6 @@ Public Class Options_RedCloudOther : Inherits VB_Parent
         threshold = thresholdSlider.Value / 100.0
         reduceAmt = reductionSlider.value
         range = rangeSlider.value
-
     End Sub
 End Class
 
@@ -7019,8 +7017,8 @@ End Class
 
 
 Public Class Options_RedCloudFeatures : Inherits VB_Parent
-    Public selection As Integer
-    Public labelName As String
+    Public selection As Integer = 3
+    Public labelName As String = "Correlation Y to Z"
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -7052,9 +7050,9 @@ End Class
 
 
 Public Class Options_RedTrack : Inherits VB_Parent
-    Public maxDistance As Integer
+    Public maxDistance As Integer = 10
     Public Sub New()
-        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, maxDistance)
     End Sub
     Public Sub RunVB()
         Static distSlider = FindSlider("Max feature travel distance")
@@ -7069,7 +7067,7 @@ End Class
 
 
 Public Class Options_Reduction : Inherits VB_Parent
-    Public reduceXYZ(2) As Boolean
+    Public reduceXYZ() As Boolean = {True, True, True}
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Reduce point cloud in X direction")
@@ -7092,11 +7090,11 @@ End Class
 
 
 Public Class Options_Retina : Inherits VB_Parent
-    Public xmlCheck As Boolean
-    Public useLogSampling As Boolean
-    Public sampleCount As Integer
+    Public useLogSampling As Boolean = False
+    Public sampleFactor As Integer = 2
+    Public xmlCheck As Boolean = False
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Retina Sample Factor", 1, 10, 2)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Retina Sample Factor", 1, 10, sampleFactor)
         If check.Setup(traceName) Then
             check.addCheckBox("Use log sampling")
             check.addCheckBox("Open resulting xml file")
@@ -7109,7 +7107,7 @@ Public Class Options_Retina : Inherits VB_Parent
         useLogSampling = logCheckbox.Checked
         If xmlCheckbox.checked Then xmlCheckbox.checked = False
         xmlCheck = xmlCheckbox.checked
-        sampleCount = sampleSlider.value
+        sampleFactor = sampleSlider.value
     End Sub
 End Class
 
@@ -7119,9 +7117,9 @@ End Class
 
 
 Public Class Options_ROI : Inherits VB_Parent
-    Public roiPercent As Single
+    Public roiPercent As Single = 25 / 100
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, 25)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, roiPercent * 100)
     End Sub
     Public Sub RunVB()
         Static roiSlider = FindSlider("Max size area of interest %")
@@ -7135,9 +7133,9 @@ End Class
 
 
 Public Class Options_Rotate : Inherits VB_Parent
-    Public rotateAngle As Single
+    Public rotateAngle As Single = 24
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees", -180, 180, 24)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees", -180, 180, rotateAngle)
     End Sub
     Public Sub RunVB()
         Static angleSlider = FindSlider("Rotation Angle in degrees")
@@ -7150,9 +7148,9 @@ End Class
 
 
 Public Class Options_Salience : Inherits VB_Parent
-    Public numScales As Integer
+    Public numScales As Integer = 6
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Salience numScales", 1, 6, 6)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Salience numScales", 1, 6, numScales)
     End Sub
     Public Sub RunVB()
         Static scaleSlider = FindSlider("Salience numScales")
@@ -7167,7 +7165,7 @@ End Class
 
 
 Public Class Options_SLRImages : Inherits VB_Parent
-    Public radioText As String
+    Public radioText As String = "Grayscale input"
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -7194,11 +7192,12 @@ End Class
 
 Public Class Options_StabilizerOther : Inherits VB_Parent
     Public fastThreshold As Integer
-    Public range As Integer
+    Public range As Integer = 8
     Public Sub New()
+        fastThreshold = task.FASTthreshold
         If (sliders.Setup(traceName)) Then
-            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
-            sliders.setupTrackBar("Range of random motion introduced (absolute value in pixels)", 0, 30, 8)
+            sliders.setupTrackBar("FAST Threshold", 0, 200, fastThreshold)
+            sliders.setupTrackBar("Range of random motion introduced (absolute value in pixels)", 0, 30, fastThreshold)
         End If
     End Sub
     Public Sub RunVB()
@@ -7214,19 +7213,19 @@ End Class
 
 
 Public Class Options_Stabilizer : Inherits VB_Parent
-    Public lostMax As Integer
-    Public width As Integer
-    Public height As Integer
-    Public minStdev As Double
-    Public corrThreshold As Double
+    Public lostMax As Double = 10 / 100
+    Public width As Integer = 128
+    Public height As Integer = 96
+    Public minStdev As Double = 10
+    Public corrThreshold As Double = 950 / 1000
     Public pad As Integer = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Max % of lost pixels before reseting image", 0, 100, 10)
-            sliders.setupTrackBar("Stabilizer Correlation Threshold X1000", 0, 1000, 950)
-            sliders.setupTrackBar("Width of input to matchtemplate", 10, dst2.Width - pad, 128)
-            sliders.setupTrackBar("Height of input to matchtemplate", 10, dst2.Height - pad, 96)
-            sliders.setupTrackBar("Min stdev in correlation rect", 1, 50, 10)
+            sliders.setupTrackBar("Max % of lost pixels before reseting image", 0, 100, lostMax * 100)
+            sliders.setupTrackBar("Width of input to matchtemplate", 10, dst2.Width - pad, width)
+            sliders.setupTrackBar("Height of input to matchtemplate", 10, dst2.Height - pad, height)
+            sliders.setupTrackBar("Min stdev in correlation rect", 1, 50, minStdev)
+            sliders.setupTrackBar("Stabilizer Correlation Threshold X1000", 0, 1000, corrThreshold * 1000)
         End If
     End Sub
     Public Sub RunVB()
@@ -7250,14 +7249,16 @@ End Class
 
 
 Public Class Options_Stitch : Inherits VB_Parent
-    Public imageCount As Integer
+    Public imageCount As Integer = 10
     Public width As Integer
     Public height As Integer
     Public Sub New()
+        width = task.WorkingRes.Width / 2
+        height = task.WorkingRes.Height / 2
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Number of random images", 10, 50, 10)
-            sliders.setupTrackBar("Rectangle width", task.WorkingRes.Width / 4, task.WorkingRes.Width - 1, task.WorkingRes.Width / 2)
-            sliders.setupTrackBar("Rectangle height", task.WorkingRes.Height / 4, task.WorkingRes.Height - 1, task.WorkingRes.Height / 2)
+            sliders.setupTrackBar("Rectangle width", task.WorkingRes.Width / 4, task.WorkingRes.Width - 1, width)
+            sliders.setupTrackBar("Rectangle height", task.WorkingRes.Height / 4, task.WorkingRes.Height - 1, height)
         End If
     End Sub
     Public Sub RunVB()
@@ -7276,9 +7277,9 @@ End Class
 
 
 Public Class Options_StructuredFloor : Inherits VB_Parent
-    Public xCheck As Boolean
-    Public yCheck As Boolean
-    Public zCheck As Boolean
+    Public xCheck As Boolean = False
+    Public yCheck As Boolean = True
+    Public zCheck As Boolean = False
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Smooth in X-direction")
@@ -7304,27 +7305,27 @@ End Class
 
 
 Public Class Options_StructuredCloud : Inherits VB_Parent
-    Public xLines As Integer
-    Public yLines As Integer
-    Public indexX As Integer
-    Public indexY As Integer
-    Public threshold As Integer
-    Public xConstraint As Boolean
-    Public yConstraint As Boolean
-    Public Sub New()
+    Public xLines As Integer = 50
+    Public yLines As Integer = 50
+    Public indexX As Integer = 50
+    Public indexY As Integer = 50
+    Public threshold As Integer = 10
+    Public xConstraint As Boolean = True
+    Public yConstraint As Boolean = True
+    Public Sub New() 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Lines in X-Direction", 0, 200, 50)
-            sliders.setupTrackBar("Lines in Y-Direction", 0, 200, 50)
-            sliders.setupTrackBar("Continuity threshold in mm", 0, 100, 10)
-            sliders.setupTrackBar("Slice index X", 1, 200, 50)
-            sliders.setupTrackBar("Slice index Y", 1, 200, 50)
+            sliders.setupTrackBar("Lines in X-Direction", 0, 200, xLines)
+            sliders.setupTrackBar("Lines in Y-Direction", 0, 200, yLines)
+            sliders.setupTrackBar("Slice index X", 1, 200, indexX)
+            sliders.setupTrackBar("Slice index Y", 1, 200, indexY)
+            sliders.setupTrackBar("Continuity threshold in mm", 0, 100, threshold)
         End If
 
         If check.Setup(traceName) Then
             check.addCheckBox("Impose constraints on X")
             check.addCheckBox("Impose constraints on Y")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
+            check.Box(0).Checked = xConstraint
+            check.Box(1).Checked = yConstraint
         End If
     End Sub
     Public Sub RunVB()
@@ -7355,10 +7356,10 @@ End Class
 
 
 Public Class Options_StructuredMulti : Inherits VB_Parent
-    Public maxSides As Integer
+    Public maxSides As Integer = 4
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Max number of sides in the identified polygons", 3, 100, 4)
+            sliders.setupTrackBar("Max number of sides in the identified polygons", 3, 100, maxSides)
         End If
     End Sub
     Public Sub RunVB()
@@ -7372,7 +7373,7 @@ End Class
 
 
 Public Class Options_Structured : Inherits VB_Parent
-    Public rebuilt As Boolean
+    Public rebuilt As Boolean = True
     Public sliceSize As Integer = 1
     Public stepSize As Integer = 20
     Public Sub New()
@@ -7403,14 +7404,14 @@ End Class
 
 
 Public Class Options_SuperPixels : Inherits VB_Parent
-    Public numSuperPixels As Integer
-    Public numIterations As Integer
-    Public prior As Integer
+    Public numSuperPixels As Integer = 400
+    Public numIterations As Integer = 4
+    Public prior As Integer = 2
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number of SuperPixels", 1, 1000, 400)
-            sliders.setupTrackBar("SuperPixel Iterations", 0, 10, 4)
-            sliders.setupTrackBar("Prior", 1, 10, 2)
+            sliders.setupTrackBar("Number of SuperPixels", 1, 1000, numSuperPixels)
+            sliders.setupTrackBar("SuperPixel Iterations", 0, 10, numIterations)
+            sliders.setupTrackBar("Prior", 1, 10, prior)
         End If
     End Sub
     Public Sub RunVB()
@@ -7428,12 +7429,12 @@ End Class
 
 
 Public Class Options_Swarm : Inherits VB_Parent
-    Public ptCount As Integer
-    Public border As Integer
+    Public ptCount As Integer = 2
+    Public border As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Connect X KNN points", 1, 10, 2)
-            sliders.setupTrackBar("Distance to image border", 1, 10, 5)
+            sliders.setupTrackBar("Connect X KNN points", 1, 10, ptCount)
+            sliders.setupTrackBar("Distance to image border", 1, 10, border)
         End If
     End Sub
     Public Sub RunVB()
@@ -7449,9 +7450,9 @@ End Class
 
 
 Public Class Options_SwarmPercent : Inherits VB_Parent
-    Public percent As Single
+    Public percent As Single = 80 / 100
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, 80)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, percent * 100)
     End Sub
     Public Sub RunVB()
         Static percentSlider = FindSlider("Cells map X percent")
@@ -7465,14 +7466,14 @@ End Class
 
 
 Public Class Options_Texture : Inherits VB_Parent
-    Public TFdelta As Integer
-    Public TFblockSize As Integer
-    Public TFksize As Integer
+    Public TFdelta As Integer = 30
+    Public TFblockSize As Integer = 50
+    Public TFksize As Integer = 1
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Texture Flow Delta", 2, 100, 30)
-            sliders.setupTrackBar("Texture Eigen BlockSize", 1, 100, 50)
-            sliders.setupTrackBar("Texture Eigen Ksize", 1, 15, 1)
+            sliders.setupTrackBar("Texture Flow Delta", 2, 100, TFdelta)
+            sliders.setupTrackBar("Texture Eigen BlockSize", 1, 100, TFblockSize)
+            sliders.setupTrackBar("Texture Eigen Ksize", 1, 15, TFksize)
         End If
     End Sub
     Public Sub RunVB()
@@ -7493,9 +7494,9 @@ End Class
 
 
 Public Class Options_ThresholdDef : Inherits VB_Parent
-    Public threshold As Integer
+    Public threshold As Integer = 127
     Public Sub New()
-        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Threshold", 0, 255, 127)
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Threshold", 0, 255, threshold)
     End Sub
     Public Sub RunVB()
         Static truncateSlider = FindSlider("Threshold")
@@ -7508,7 +7509,7 @@ End Class
 
 
 Public Class Options_Tracker : Inherits VB_Parent
-    Public trackType As Integer
+    Public trackType As Integer = 1
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Boosting")
@@ -7519,7 +7520,7 @@ Public Class Options_Tracker : Inherits VB_Parent
             radio.addRadio("GoTurn - appears to not work...")
             radio.addRadio("Mosse")
             radio.addRadio("TrackerCSRT - Channel and Spatial Reliability Tracker")
-            radio.check(1).Checked = True
+            radio.check(trackType).Checked = True
             radio.check(2).Enabled = False
             radio.check(5).Enabled = False
         End If
@@ -7542,18 +7543,18 @@ End Class
 
 
 Public Class Options_Transform : Inherits VB_Parent
-    Public resizeFactor As Double
-    Public firstCheck As Boolean
-    Public secondCheck As Boolean
-    Public angle As Integer
+    Public resizeFactor As Double = 50 / 100
+    Public angle As Integer = 30
+    Public scale As Double = 1
+    Public firstCheck As Boolean = False
+    Public secondCheck As Boolean = False
     Public centerX As Integer
     Public centerY As Integer
-    Public scale As Double
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Resize Percent", 50, 1000, 50)
-            sliders.setupTrackBar("Angle", -180, 180, 30)
-            sliders.setupTrackBar("Scale Factor% (100% means no scaling)", 1, 100, 100)
+            sliders.setupTrackBar("Resize Percent", 50, 1000, resizeFactor * 100)
+            sliders.setupTrackBar("Angle", -180, 180, angle)
+            sliders.setupTrackBar("Scale Factor% (100% means no scaling)", 1, 100, scale * 100)
             sliders.setupTrackBar("Rotation center X", 1, dst2.Width, dst2.Width / 2)
             sliders.setupTrackBar("Rotation center Y", 1, dst2.Height, dst2.Height / 2)
         End If
@@ -7587,9 +7588,9 @@ End Class
 
 
 Public Class Options_TransformationMatrix : Inherits VB_Parent
-    Public mul As Integer
+    Public mul As Integer = 500
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("TMatrix Top View multiplier", 1, 1000, 500)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("TMatrix Top View multiplier", 1, 1000, mul)
     End Sub
     Public Sub RunVB()
         Static multSlider = FindSlider("TMatrix Top View multiplier")
@@ -7602,9 +7603,9 @@ End Class
 
 
 Public Class Options_Vignetting : Inherits VB_Parent
-    Public radius As Double
+    Public radius As Double = 80
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, 80)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, radius)
     End Sub
     Public Sub RunVB()
         Static radiusSlider = FindSlider("Vignette radius X100")
@@ -7659,9 +7660,9 @@ End Class
 
 
 Public Class Options_WarpAffine : Inherits VB_Parent
-    Public angle As New Integer
+    Public angle As Integer = 10
     Public Sub New()
-        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Angle", 0, 360, 10)
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Angle", 0, 360, angle)
     End Sub
     Public Sub RunVB()
         Static angleSlider = FindSlider("Angle")
@@ -7677,12 +7678,15 @@ End Class
 Public Class Options_WarpPerspective : Inherits VB_Parent
     Public width As Integer
     Public height As Integer
-    Public angle As Integer
+    Public angle As Integer = 0
     Public Sub New()
+        width = dst2.Cols - 50
+        height = dst2.Rows - 50
+        angle = 0
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Warped Width", 0, dst2.Cols, dst2.Cols - 50)
-            sliders.setupTrackBar("Warped Height", 0, dst2.Rows, dst2.Rows - 50)
-            sliders.setupTrackBar("Warped Angle", 0, 360, 0)
+            sliders.setupTrackBar("Warped Width", 0, dst2.Cols, width)
+            sliders.setupTrackBar("Warped Height", 0, dst2.Rows, height)
+            sliders.setupTrackBar("Warped Angle", 0, 360, angle)
         End If
     End Sub
     Public Sub RunVB()
@@ -7701,8 +7705,8 @@ End Class
 
 
 Public Class Options_XPhotoInpaint : Inherits VB_Parent
-    Public FSRFast As Boolean
-    Public shiftMap As Boolean
+    Public FSRFast As Boolean = False
+    Public shiftMap As Boolean = False
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("FSR_Best")
@@ -7725,13 +7729,14 @@ End Class
 
 
 Public Class Options_Density : Inherits VB_Parent
-    Public zCount As Integer
+    Public zCount As Integer = 3
     Public distance As Double
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Distance in meters X10000", 1, 2000, task.densityMetric)
-            sliders.setupTrackBar("Neighboring Z count", 0, 8, 3)
+            sliders.setupTrackBar("Neighboring Z count", 0, 8, zCount)
         End If
+        distance = task.densityMetric
     End Sub
     Public Sub RunVB()
         Static distSlider = FindSlider("Distance in meters X10000")

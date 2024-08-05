@@ -28,12 +28,12 @@ Public Class Retina_Basics_CPP_VB : Inherits VB_Parent
                 MsgBox("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
             End If
         End If
-        If saveUseLogSampling <> options.useLogSampling Or samplingFactor <> options.sampleCount Then
+        If saveUseLogSampling <> options.useLogSampling Or samplingFactor <> options.sampleFactor Then
             If cPtr <> 0 Then Retina_Basics_Close(cPtr)
             ReDim magnoData(src.Total - 1)
             ReDim dataSrc(src.Total * src.ElemSize - 1)
             saveUseLogSampling = options.useLogSampling
-            samplingFactor = options.sampleCount
+            samplingFactor = options.sampleFactor
             If task.testAllRunning = False Then cPtr = Retina_Basics_Open(src.Rows, src.Cols, options.useLogSampling, samplingFactor)
         End If
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)

@@ -1068,7 +1068,7 @@ public:
 			{
 				Point3f pt = xyz.at<Point3f>(y, x);
 				float d = pt.z;
-				if (d > 0 and d < maxZ)
+				if (d > 0 && d < maxZ)
 				{
 					float fx = pt.x;
 					int x = int(range * (zHalf + fx) / maxZ + shift); // maintain a 1:1 aspect ratio
