@@ -747,6 +747,7 @@ if algorithmName = "Stable_BasicsCount_CPP" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "GrabCut_FineTune" Then return new GrabCut_FineTune
 	if algorithmName = "GrabCut_ImageMask" Then return new GrabCut_ImageMask
 	if algorithmName = "GrabCut_ImageRect" Then return new GrabCut_ImageRect
+	if algorithmName = "GrabCut_RedCloud" Then return new GrabCut_RedCloud
 	if algorithmName = "Gradient_Basics" Then return new Gradient_Basics
 	if algorithmName = "Gradient_CartToPolar" Then return new Gradient_CartToPolar
 	if algorithmName = "Gradient_Color" Then return new Gradient_Color

@@ -15,6 +15,7 @@
         -   For “_CPP” the call to C++ is from the VB.Net infrastructure.
         -   A deprecated AI-generated mechanism was used to build these.
         -   This interface will be reworked soon to make it more general.
+    -   Python examples end in .py. PyStream algorithms end in …_PS.py.
 -   The jump in algorithm count is due to the addition of AI-generated C\# algorithms.
     -   Almost all the VB.Net algorithms have been converted to C\#.
         -   Fewer C\# algorithms than VB.Net because Options are VB-only.
@@ -48,13 +49,13 @@
 
 # Introduction
 
-There is no better documentation of an algorithm than a working example, especially in computer vision where the output is often self-explanatory. Imagine having access to over 2000 OpenCV examples in a single app, where each algorithm is less than a page of code and written in a familiar language. Each algorithm is designed to be reused in other algorithms, so variations can be easily built. [Moreover, each algorithm is free from any baggage from a user interface or environment.](https://microsoft.github.io/computervision-recipes/)
+There is no better documentation of an algorithm than a working example, especially in computer vision where the output is often self-explanatory. Imagine having 1000’s of OpenCV examples in a single app, where each algorithm is less than a page of code and written in a familiar language. Each algorithm is designed to be reused in other algorithms, so variations can be easily built. [Moreover, each algorithm is free from any baggage from a user interface or environment.](https://microsoft.github.io/computervision-recipes/)
 
-A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the seven RGBZ cameras listed below.
+A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the RGBZ cameras listed below.
 
-However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized by running it. The output is often self-documenting or a natural representation of the algorithm’s intent.
+However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized. The output is often self-documenting or a natural representation of the algorithm’s intent.
 
-The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<All\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
+The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<Al but Python\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
 
 # OpenCVB Layout
 
@@ -62,13 +63,11 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 **OpenCVB Layout:** *The layout of the OpenCVB application shows the RGB camera output in the upper left, the colorized depth data in the upper right, and the algorithm outputs in the bottom left and right. This algorithm (Segmented Linear Regression or SLR_Trends) has only one output in the lower left.*
 
-![](media/3935db6a9c06ec926e80dfefbf8fe383.png)
+![](media/e4adab4252112acc87b50e007e22ac2f.png)
 
-**OpenCVB ToolBar:** *The first combo box selects the algorithm – here “SLR_Trends” while the second combo box selects the group of algorithms – here “\<All but Python\>” which controls what algorithms are available in the first combo box. The “\<All but Python\>” group includes all the C\#, C++, and VB.Net algorithms and excludes the Python algorithms.*
+**OpenCVB ToolBar:** *The first combo box selects the algorithm – here “SLR_Trends” while the second combo box selects the group of algorithms – here “\<All but Python\>” which controls what algorithms are available in the first combo box. The “\<All but Python\>” group includes all the C\#, C++, and VB.Net algorithms and excludes the Python algorithms.  It includes a count of algorithms in that group as well.*
 
-![](media/3935db6a9c06ec926e80dfefbf8fe383.png)
-
-**Navigation Buttons:** *The ![](media/015b3a399d0988a17ea3e25e416a4fdd.png)buttons navigate between algorithms. Use these arrows to jump between algorithms. The “File” menu entry will present a list of previous algorithms to allow jumping to algorithms other than the previous or next.*
+**Navigation Buttons:** *The ![](media/015b3a399d0988a17ea3e25e416a4fdd.png)buttons navigate between algorithms. Use these arrows to jump between algorithms. The “Recent” button will present a list of previous algorithms to allow jumping to algorithms other than the previous or next.*
 
 **Run and Pause:** *The ![](media/8a0dfa720460a53afbcd56d30b78e238.png)button will start and pause the algorithm.*
 
@@ -82,7 +81,7 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 **Create Algorithm:** *The ![](media/850a870af3b7ca340674f12fb84dd90e.png) button will open a dialog box that guides the user to create a new algorithm. The different types of algorithms that may be created are VB.Net, C++, OpenGL, C\#, or Python.*
 
-**Complexity Evaluation:** *The ![](media/a5052fbe863b1a080812ce60d9b4644f.png) button will run the current algorithm across a variety of resolutions to evaluate the complexity of the algorithm. Complexity if often designated as O(n), hence the O.*
+**Complexity Evaluation:** *The ![](media/a5052fbe863b1a080812ce60d9b4644f.png) button will run the current algorithm across a variety of resolutions to evaluate the complexity of the algorithm. Complexity if often designated as O(n), hence the ![](media/a5052fbe863b1a080812ce60d9b4644f.png) icon.*
 
 **Algorithm Translation:** *The ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button invokes the Touchup.exe application that guides the translation of VB.Net algorithms to C\#.*
 
@@ -127,7 +126,7 @@ Here are the pre-install requirements:
     -   Mynt Eye D 1000
     -   Intel RealSense D455 – the latest in the series of Intel RealSense cameras
     -   Luxonis Oak-D Pro or Oak-D Series 2. (Oak-D Lite will work but has no IMU.)
-    -   Orbbec 335L
+    -   Orbbec Gemini 335L
 
 All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft Kinect for Azure has the best depth accuracy but requires more power and is not as portable as StereoLabs or Intel cameras. All the cameras use USB-C to provide data to the host platform.
 
@@ -151,7 +150,7 @@ Installation is not as simple as opening the OpenCVB.sln file but it is not much
     -   <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
 -   Download and install the OrbbecSDK proprietary binaries.
     -   https://github.com/orbbec/OrbbecSDK/releases
--   Open the OpenCVB.sln and set the “OpenCVB” project as the “Startup Project” if not already set.
+-   Open the OpenCVB.sln.
 -   The “Update_All.bat” script can be used to update each component downloaded by OpenCVB:
     -   Remove **“\<OpenCVB Dir\>/OakD/Build”** to update the Oak-D camera support
     -   Remove **“\<OpenCVB Dir\>/librealsense”** to update the Realsense camera support
@@ -202,11 +201,11 @@ Code snippets are installed using the Tools/Code Snippets Manager menu entry. Fo
 
 \<OpenCVB HomeDir\>/OpenCVB.snippets \>
 
-For C++ and VB.Net writing a new experiment requires a new class to be added in the “VB_Classes” project. OpenCVB will automatically detect the new class and present it in the user interface. The UI_Generator project is invoked in a pre-compile step for the VB_Classes project and the CS_Classes project. Just add code for a new algorithm and it will automatically appear in the user interface. Similarly, for C\# algorithms, add a code snippet to the “CS_Non_AI.cs” file and the recompile will add the algorithm to the user interface.
+For C++ and VB.Net writing a new experiment requires a new class to be added in the “VB_Classes” project. OpenCVB will automatically detect the new class and present it in the user interface. The UI_Generator project is invoked in a pre-compile step for the VB_Classes project and the CS_Classes project. Just add code for a new algorithm and it will automatically appear in the user interface. Similarly, for C\# algorithms, add a code snippet to the “Non_AI.cs” file and the recompile will add the algorithm to the user interface. If you are using CodeConvert.ai to translate a VB.Net algorithm to C\#, place the translated C\# version in “AI_Gen.cs”.
 
-Python examples don’t even require a VB.Net wrapper. But they do need to be added to the VB_Classes Project. Python algorithms, once added to the Python_Classes project, will appear in the user interface.
+Python examples don’t even require a VB.Net wrapper. But they do need to be added to the Python_Classes Project. Python algorithms, once added to the Python_Classes project, will appear in the user interface.
 
-There are several VB.Net examples that demonstrate how to move images to Python and get results back into the OpenCVB user interface (see “z_AddWeighted_PS.py” as an example that is only a few lines of code.)
+There are several VB.Net examples that demonstrate how to move images to Python and get results back into the OpenCVB user interface (see “AddWeighted_PS.py” as an example that is only a few lines of code.)
 
 To install OpenCVB’s snippets in Visual Studio:
 
@@ -220,33 +219,29 @@ An alternate way to add projects is also available in OpenCVB. To see the comple
 
 # Algorithm Groups
 
-The complete list of algorithms may be grouped into smaller subsets to study some shared API. Algorithm subsets are selected through the Subset Combo Box in the toolbar (indicated below.) The list of subsets is built from all the OpenCVB algorithm names and the OpenCV API’s. For instance, selecting “Threshold” in the Subset Combo Box, will update the Algorithm Combo Box with all the algorithms that use the OpenCV “Threshold” API.
+The complete list of algorithms may be grouped into smaller subsets to study some shared API. Algorithm subsets are selected by selecting an algorithm group through the Group ComboBox in the toolbar (indicated below.) The list of subsets is built from all the OpenCVB algorithm names and the OpenCV API’s. For instance, selecting “Threshold” in the Group ComboBox, will update the Algorithm ComboBox with all the algorithms that use the OpenCV “Threshold” API.
 
-![](media/f9431efec6cb8ae1599689669c57c1db.png)
+![](media/3248f766185f423ebb41215b2db7a2dd.png)
 
-*In the image above, the Subset Combo Box selects all algorithms that use the “Edges_Sobel” algorithm. The Algorithm Combo Box shows the “Gradient_Depth” algorithm, one of the algorithms that uses “Edges_Sobel”. When the Subset Combo Box is set to “\<All\>”, the Algorithm Combo Box will contain all the algorithms in OpenCVB.*
+*In the image above, the Group ComboBox selects all algorithms that use the “Edges_Sobel” algorithm. The Algorithm Combo Box shows the “Gradient_Depth” algorithm, one of the algorithms that uses “Edges_Sobel”. When the Group ComboBox is set to “\<All\>”, the Algorithm Combo Box will contain all the algorithms in OpenCVB.*
 
-The ability to create subsets from the hundreds of algorithms makes it easier to study examples of an OpenCV API or OpenCVB algorithm usage. In addition, the Subset Combo Box has several higher-level groupings. For example, “\<Python\>” selects all Python algorithms. Or “\<OpenGL\>” selects only the OpenGL algorithms. The “\<All\>” entry in the Subset Combo Box will restore the complete list of algorithms.
+The ability to create subsets from the hundreds of algorithms makes it easier to study examples of an OpenCV API or OpenCVB algorithm usage. In addition, the Group ComboBox has several higher-level groupings. For example, “\<Python\>” selects all Python algorithms. Or “\<OpenGL\>” selects only the OpenGL algorithms. The “\<All\>” entry in the Group ComboBox will restore the complete list of algorithms.
 
 # Regression Testing All Experiments
 
 Testing is integrated into OpenCVB. Clicking the ![](media/0e389b18960d55862708fe0bb6011cc8.png) button runs all the algorithms on all the attached depth cameras on the system at all the supported resolutions. The duration of each test can be selected in the OpenCVB Options dialog – use the ![](media/a2316a26371b257dd82180d3c120ad18.png) button.
 
-![](media/3935db6a9c06ec926e80dfefbf8fe383.png)
+When using a subset of the algorithms, the “Test All” button will test only the algorithms in the subset. This can be useful when changing an algorithm that is reused by other OpenCVB algorithms. For instance, if the Edges_Sobel algorithm is changed, select “Edges_Sobel” in the Group ComboBox, then click the regression test button to visually review each algorithm using the updated Edges_Sobel.
 
-**OpenCVB Combo Boxes**: *The first combo box shows the name of the currently running algorithm – here “SLR_Trends”. The second combo box shows the name of the current group of algorithms selected.*
-
-When using a subset of the algorithms, the “Test All” button will test only the algorithms in the subset. This can be useful when changing an algorithm that is reused by other OpenCVB algorithms. For instance, if the Edges_Sobel algorithm is changed, select “Edges_Sobel” in the Subset Combo Box, then click the regression test button to visually review each algorithm using the updated Edges_Sobel.
-
-One side benefit of the “Test All” feature is that it provides a way to visually review all the algorithms. When you can’t remember the name of an algorithm, use the subset feature to search for it. Any OpenCV API or OpenCVB algorithm name can be selected in the Subset Combo Box.
+One side benefit of the “Test All” feature is that it provides a way to visually review all the algorithms. When you can’t remember the name of an algorithm, use the subset feature to search for it. Any OpenCV API or OpenCVB algorithm name can be selected in the Group ComboBox.
 
 # Why VB.Net?
 
 VB.Net is not a language typically associated with computer vision algorithms. But the abundance of examples in OpenCVB suggests this may be an oversight. Even the seasoned developer should recognize what is obvious to the beginner: VB.Net can keep the code simple to read and write. Papers and articles on software often use pseudo-code to present an algorithm. In many respects, VB.Net code resembles pseudo-code except it is an actual working implementation of the algorithm.
 
-VB.Net provides a full-featured language just like C\# with lambda functions and multi-threading except VB.Net uses only a subset of the special keys available on the keyboard. Contrasted with Python or C++, VB.Net need make no apologies for using real words instead of the keyboard hieroglyphics defined in Python or C++. Using real words makes the VB.Net syntax easier to recall. VB.Net includes user interface tools that are flexible and complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) - options missing from OpenCV's popular HighGUI library. (All existing HighGUI interfaces are still supported in OpenCVB.)
+VB.Net provides a full-featured language just like C\# with lambda functions and multi-threading except VB.Net uses only a subset of the special keys available on the keyboard. Contrasted with Python or C++, VB.Net need make no apologies for using real words instead of the keyboard hieroglyphics defined in Python or C++. VB.Net syntax easier to recall and much easier to type in. VB.Net includes user interface tools that are flexible and complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) - options missing from OpenCV's popular HighGUI library. (All existing HighGUI interfaces are still supported in OpenCVB.)
 
-The main caution in using VB.Net is to treat it as a scripting language like Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be detailed but it will be slower than optimized C++. Usually, OpenCVB is doing most of the real work in optimized C++ through the OpenCVSharp interface. Most algorithms run reasonably fast even in Debug mode because the release version of OpenCVSharp is active when OpenCVB is in Debug mode.
+The main caution in using VB.Net is to treat it as a scripting language like Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be detailed but it will be slower than optimized C++. Usually, the VB.Net algorithm is doing most of the real work in optimized C++ through the OpenCVSharp interface. Most algorithms run reasonably fast even in Debug mode because the release version of OpenCVSharp is active when OpenCVB is in Debug mode. Review the OpenCVB setup using Visual Studio’s “Build/Configuration Manager”.
 
 Critics will point out that a Windows 10/11 app using VB.Net is not easily portable to other platforms. The entire OpenCVB application does not need to be ported to other platforms. Only individual algorithms are likely to be ported after they are debugged and polished. Most OpenCVB algorithms consist almost entirely of OpenCV APIs which are available everywhere. OpenCVB’s value lies in the ability to experiment and test an OpenCV algorithm. After the prototype is complete the algorithm can be transferred to a different platform.
 
@@ -262,7 +257,7 @@ For example, the Kinect for Azure camera support is in the cameraKinect.vb class
 
 There have been several attempts to provide OpenGL interfaces into managed code, but none is used here. OpenGL is simply run in a separate process. To accommodate running separately, a named-pipe moves the image data to the separate process and a memory-mapped file provides a control interface. The result is both robust and economical while making the OpenGL code independent of camera hardware specifics. The VB.Net code for the OpenGL interface is less than a page and does not require much memory or CPU usage.
 
-To accommodate building new OpenGL experiments, OpenCVB includes an interface shown below in the section on creating new C++ “IncludeOnly” algorithms. The interface is triggered with one of the ![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png) button in the OpenCVB toolbar. The interface can add a variety of algorithms as indicated below.
+To accommodate building new OpenGL experiments, OpenCVB includes an interface shown below in the section on creating new algorithms. The interface is triggered with one of the ![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png) button in the OpenCVB toolbar. The interface can add a variety of algorithms as indicated below.
 
 # Python Interface
 
@@ -341,7 +336,7 @@ The TreeView shows the different layers of the algorithm and how it was built fr
 
 ![A screenshot of a computer program Description automatically generated](media/c844902ab4d892dcf51d5a2d24c676f0.png)
 
-**KNN_TrackEach:** *The tree above describes how the algorithm calls KNN_Basics and how KNN_Basics calls KNN_Core on. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
+**KNN_TrackEach:** *The tree above describes how the algorithm calls KNN_Basics and how KNN_Basics calls KNN_Core. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
 
 *Play with this when running OpenCVB. It is a fun feature and helps increase understanding of the composition of increasingly complex algorithms.*
 
@@ -361,7 +356,7 @@ The plan is to continue adding more algorithms. There are numerous published alg
 
 # Acknowledgements
 
-The list of people who have made OpenCVB possible is long but starts with the OpenCV contributors – particularly Intel employees Gary Bradski, Victor Erukhimov, and Vadim Pisarevsky - and Intel’s decision to contribute the code to the open source community. Also, this code would not exist without OpenCVSharp’s managed code interface to OpenCV provided by user “shimat”. There is a further Intel contribution to this software in the form of RealSense cameras – low-cost 3D cameras for the maker community as well as robotics developers and others. RealSense developers Sterling Orsten and Leo Keselman were exceptionally helpful in educating this author. While others may disagree, there is no better platform for developing computer vision software than the one provided by Microsoft Visual Studio and VB.Net. And Microsoft’s Kinect for Azure camera is a valuable addition to the 3D camera effort. And lastly, Google’s contribution to this effort was invaluable. Thanks to all the computer vision developers who posted algorithms where Google could find them. From this author’s perspective, the work of all these individuals and organizations is like catnip and feathers to a kitten.
+The list of people who have made OpenCVB possible is long but starts with the OpenCV contributors – particularly Intel employees Gary Bradski, Victor Erukhimov, and Vadim Pisarevsky - and Intel’s decision to contribute the code to the open source community. Also, this code would not exist without OpenCVSharp’s managed code interface to OpenCV provided by user “shimat”. There is a further Intel contribution to this software in the form of RealSense cameras – low-cost 3D cameras for the maker community as well as robotics developers and others. RealSense developers Sterling Orsten and Leo Keselman were exceptionally helpful in educating this author. While others may disagree, there is no better platform for developing computer vision software than the one provided by Microsoft Visual Studio and VB.Net. And Microsoft’s Kinect for Azure camera is a valuable addition to the 3D camera effort as is CodeConverter.ai that has enabled improving the code through translating it to other languages. And lastly, Google’s contribution to this effort was invaluable. Thanks to all the computer vision developers who posted algorithms where Google could find them. From this author’s perspective, the work of all these individuals and organizations is like catnip and feathers to a kitten.
 
 # MIT License
 
