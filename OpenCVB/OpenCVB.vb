@@ -994,7 +994,7 @@ Public Class OpenCVB
 
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " +
                       CStr(CInt(CodeLineCount / AlgorithmCount)) + " lines each (avg) - " + cameraName +
-                      " - " + Format(cameraFPS, "0.0") + "/" + Format(algorithmFPS, "0.0")
+                      " - Camera FPS: " + Format(cameraFPS, "0.0") + ", task FPS: " + Format(algorithmFPS, "0.0")
         End If
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated

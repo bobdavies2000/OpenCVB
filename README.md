@@ -1,14 +1,24 @@
 # Recent Changes – August 2024
 
 -   Over 3700 algorithms are included, averaging 37 lines of code per algorithm.
--   Please Note: the June version of OpenCVSharp has compile-time issues in VB.Net.
-    -   It will be addressed soon and it is only a problem to VB.Net.
-    -   In the meantime, please use the January version: 4.9.0.20240103
-    -   The January version is present by default but if you upgrade to June…
+-   OpenCVB has been upgraded to the latest version of OpenCVSharp.
+    -   Mat’s initialized with a data pointer now use “FromPixelData”.
+    -   Mat’s initialized with a Scalar now use “cv.Scalar.All(\<value\>)”.
+    -   It was a lot of typing and testing to make this change.
+-   The breakdown of the suffix for any algorithm is as follows:
+    -   AddWeighted_Basics – no suffix means it is VB.Net code only.
+    -   AddWeighted_Basics_CS – “_CS” suffix means it is C\# code only.
+    -   AddWeighted_Basics_CPP_VB – C++ code with a VB.Net interface.
+    -   AddWeighted_Basics_CPP_CS – C++ code with a C\# interface.
+    -   AddWeighted_Basics_MT_CPP – a multi-threaded C++ algorithm.
+    -   AddWeighted_Basics_CPP – “_CPP” suffix means it is C++ code.
+        -   For “_CPP” the call to C++ is from the VB.Net infrastructure.
+        -   A deprecated AI-generated mechanism was used to build these.
+        -   This interface will be reworked soon to make it more general.
 -   The jump in algorithm count is due to the addition of AI-generated C\# algorithms.
     -   Almost all the VB.Net algorithms have been converted to C\#.
         -   Fewer C\# algorithms than VB.Net because Options are VB-only.
-    -   The average lines per algorithm jumped as well from 31 lines.
+    -   The average lines per algorithm jumped as well from 31 lines to 37.
 -   Microsoft’s CodeConverter.ai translated the VB.Net algorithms to C\#.
     -   With such small algorithms, AI translation is feasible.
     -   The VB.Net code was improved because of translation to C\#.
@@ -26,7 +36,7 @@
 
 ![A screenshot of a computer Description automatically generated](media/5dd47a048cd220e4dd856894c3d6bac7.png)
 
-**AddWeighted_Basics_CS:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms end with “_CS” to distinguish them from the VB.Net version. If the algorithm uses both C++ and C\#, the name ends with “_CPP_CS”. The existing “_CPP” algorithms now end in “_CPP_VB” to distinguish them from C\# versions and future C++ algorithms.*
+**AddWeighted_Basics_CS:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms end with “_CS” to distinguish them from the VB.Net version. If the algorithm uses both C++ and C\#, the name ends with “_CPP_CS”. The existing “_CPP” algorithms now end in “_CPP_VB” to distinguish them from C\# versions.*
 
 ![A screenshot of a computer program Description automatically generated](media/cb0b14073ca049ecd641450e21bb739e.png)
 
