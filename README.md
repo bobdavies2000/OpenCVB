@@ -35,9 +35,9 @@
 -   Previous Releases had a discontinued C++ AI translation process. It will return.
 -   A log of previous changes is included at the bottom of this document.
 
-![A screenshot of a computer Description automatically generated](media/5dd47a048cd220e4dd856894c3d6bac7.png)
+![A collage of images of a room Description automatically generated](media/5eb5c074fbaeaf5aa017addc04b8710d.png)
 
-**AddWeighted_Basics_CS:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms end with “_CS” to distinguish them from the VB.Net version. If the algorithm uses both C++ and C\#, the name ends with “_CPP_CS”. The existing “_CPP” algorithms now end in “_CPP_VB” to distinguish them from C\# versions.*
+**AddWeighted_Basics_CS:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms end with “_CS” to distinguish them from the VB.Net version. If the algorithm uses both C++ and C\#, the name ends with “_CPP_CS”.*
 
 ![A screenshot of a computer program Description automatically generated](media/cb0b14073ca049ecd641450e21bb739e.png)
 

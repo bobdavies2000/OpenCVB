@@ -67,7 +67,7 @@ Public Class Stabilizer_Basics : Inherits VB_Parent
                 resetImage = True
             End If
         Else
-            labels(3) = "Correlation rectangle stdev is " + Format(stdev, "00") + " - too low"
+            labels(3) = "Correlation rectangle stdev is " + Format(stdev.Item(0), "00") + " - too low"
             resetImage = True
         End If
 
