@@ -101,6 +101,7 @@ Public Class TreeviewForm
         tv.SelectedNode = n
     End Sub
     Private Sub TreeView_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
+        If OpenCVB.testAllRunning Then Exit Sub ' don't update the treeview when doing overnight testing.
         SyncLock callTraceLock
             If OpenCVB.callTrace Is Nothing Then Exit Sub
             If OpenCVB.callTrace.Count > 0 Then

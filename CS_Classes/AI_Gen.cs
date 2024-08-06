@@ -49514,6 +49514,7 @@ namespace CS_Classes
         {
             while (true)
             {
+                if (task.frameCount < 0) break;
                 lock (_lockObject)
                 {
                     head = success(head);
@@ -49532,6 +49533,7 @@ namespace CS_Classes
         {
             while (true)
             {
+                if (task.frameCount < 0) break;
                 lock (_lockObject)
                 {
                     tail = success(tail);
