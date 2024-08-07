@@ -33,6 +33,16 @@ using namespace ml;
 
 cppTask* task;
 
+enum FeatureSrc : uint8_t
+{
+    GoodFeaturesFull = 0,
+    GoodFeaturesGrid = 1,
+    Agast = 2,
+    BRISK = 3,
+    Harris = 4,
+    FAST = 5
+};
+
 class AddWeighted_Basics_CPP : public algorithmCPP {
 public:
     Mat src2;
@@ -693,171 +703,171 @@ public:
 
 
 
-
-class Feature_Basics_CPP : public algorithmCPP {
-private:
-    cv::Ptr<cv::BRISK> Brisk;
-public:
-    vector<cv::Point2f> featurePoints;
-    Options_Features* options = new Options_Features;
-
-    Feature_Basics_CPP() : algorithmCPP() {
-        traceName = "Feature_Basics";
-        Brisk = cv::BRISK::create();
-        desc = "Find good features to track in a BGR image.";
-    }
-
-    void Run(cv::Mat src) {
-        dst2 = src.clone();
-        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
-        featurePoints.clear();
-        int sampleSize = options->fOptions.featurePoints;
-        if (options->useBRISK) {
-            vector<cv::KeyPoint> keyPoints;
-            Brisk->detect(src, keyPoints);
-            for (const auto& kp : keyPoints) {
-                if (kp.size >= options->minDistance) featurePoints.push_back(kp.pt);
-            }
-        }
-        else {
-            cv::goodFeaturesToTrack(src, featurePoints, sampleSize, options->quality, options->minDistance);
-        }
-        cv::Scalar color = (dst2.channels() == 3) ? cv::Scalar(0, 255, 255) : cv::Scalar(255, 255, 255);
-        for (const auto& pt : featurePoints) {
-            cv::circle(dst2, pt, task->DotSize, color, -1, task->lineType);
-        }
-        labels[2] = "Found " + to_string(featurePoints.size()) + " points with quality = " + to_string(options->quality) +
-            " and minimum distance = " + to_string(options->minDistance);
-    }
-};
-
-
-
-
-
-class Stable_Basics_CPP : public algorithmCPP {
-public:
-    Delaunay_Generations_CPP* facetGen;
-    vector<Point2f> ptList;
-    Point2f anchorPoint;
-    Feature_Basics_CPP* good;
-
-    Stable_Basics_CPP() : algorithmCPP() {
-        traceName = "Stable_Basics";
-        good = new Feature_Basics_CPP();
-        facetGen = new Delaunay_Generations_CPP();
-        desc = "Maintain the generation counts around the feature points.";
-    }
-
-    void Run(Mat src) {
-        if (standalone) {
-            good->Run(src);
-            facetGen->inputPoints = good->featurePoints;
-        }
-
-        facetGen->Run(src);
-        if (facetGen->inputPoints.empty()) return; // nothing to work on
-
-        ptList.clear();
-        vector<int> generations;
-        for (const Point2f& pt : facetGen->inputPoints) {
-            int fIndex = facetGen->facet->facet32s.at<int>(pt.y, pt.x);
-            if (fIndex >= facetGen->facet->facetlist.size()) continue; // new point
-            int g = facetGen->dst3.at<int>(pt.y, pt.x);
-            generations.push_back(g);
-            ptList.push_back(pt);
-            task->SetTrueText(to_string(g), dst2, pt);
-        }
-
-        int maxGens = *max_element(generations.begin(), generations.end());
-        int index = distance(generations.begin(), find(generations.begin(), generations.end(), maxGens));
-        anchorPoint = ptList[index];
-        if (index < facetGen->facet->facetlist.size()) {
-            const vector<Point>& bestFacet = facetGen->facet->facetlist[index];
-            fillConvexPoly(dst2, bestFacet, Scalar(0, 0, 0), task->lineType);
-            drawContours(dst2, vector<vector<Point>> {bestFacet}, -1, Scalar(0, 255, 255), task->lineWidth);
-        }
-
-        dst2 = facetGen->dst2;
-        dst3 = src.clone();
-        for (const Point2f& pt : ptList) {
-            circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), task->lineWidth, task->lineType);
-            circle(dst3, pt, task->DotSize, Scalar(255, 255, 255), task->lineWidth, task->lineType);
-        }
-
-        string text = to_string(ptList.size()) + " stable points were identified with " + to_string(maxGens) + " generations at the anchor point";
-        labels[2] = text;
-    }
-};
+//
+// Feature_Basics_CPP : public algorithmCPP {
+//private:
+//    cv::Ptr<cv::BRISK> Brisk;
+//public:
+//    vector<cv::Point2f> featurePoints;
+//    Options_Features* options = new Options_Features;
+//
+//    Feature_Basics_CPP() : algorithmCPP() {
+//        traceName = "Feature_Basics";
+//        Brisk = cv::BRISK::create();
+//        desc = "Find good features to track in a BGR image.";
+//    }
+//
+//    void Run(cv::Mat src) {
+//        dst2 = src.clone();
+//        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
+//        featurePoints.clear();
+//        int sampleSize = options->featurePoints;
+//        if (options->useBRISK) {
+//            vector<cv::KeyPoint> keyPoints;
+//            Brisk->detect(src, keyPoints);
+//            for (const auto& kp : keyPoints) {
+//                if (kp.size >= options->minDistance) featurePoints.push_back(kp.pt);
+//            }
+//        }
+//        else {
+//            cv::goodFeaturesToTrack(src, featurePoints, sampleSize, options->quality, options->minDistance);
+//        }
+//        cv::Scalar color = (dst2.channels() == 3) ? cv::Scalar(0, 255, 255) : cv::Scalar(255, 255, 255);
+//        for (const auto& pt : featurePoints) {
+//            cv::circle(dst2, pt, task->DotSize, color, -1, task->lineType);
+//        }
+//        labels[2] = "Found " + to_string(featurePoints.size()) + " points with quality = " + to_string(options->quality) +
+//            " and minimum distance = " + to_string(options->minDistance);
+//    }
+//};
 
 
 
 
 
-class Stable_BasicsCount_CPP : public algorithmCPP
-{
-private:
-public:
-    Stable_Basics_CPP* basics;
-    Feature_Basics_CPP* good;
-    map<int, int, greater<float>> goodCounts;
-    Stable_BasicsCount_CPP() : algorithmCPP()
-    {
-        traceName = "Stable_BasicsCount_CPP";
-        good = new Feature_Basics_CPP();
-        basics = new Stable_Basics_CPP();
-        desc = "Track the stable good features found in the BGR image.";
-    }
-    void Run(Mat src)
-    {
-        good->Run(src);
-        basics->facetGen->inputPoints = good->featurePoints;
-        basics->Run(src);
-        dst2 = basics->dst2;
-        dst3 = basics->dst3;
+// Stable_Basics_CPP : public algorithmCPP {
+//public:
+//    Delaunay_Generations_CPP* facetGen;
+//    vector<Point2f> ptList;
+//    Point2f anchorPoint;
+//    Feature_Basics_CPP* good;
+//
+//    Stable_Basics_CPP() : algorithmCPP() {
+//        traceName = "Stable_Basics";
+//        good = new Feature_Basics_CPP();
+//        facetGen = new Delaunay_Generations_CPP();
+//        desc = "Maintain the generation counts around the feature points.";
+//    }
+//
+//    void Run(Mat src) {
+//        if (standalone) {
+//            good->Run(src);
+//            facetGen->inputPoints = good->featurePoints;
+//        }
+//
+//        facetGen->Run(src);
+//        if (facetGen->inputPoints.empty()) return; // nothing to work on
+//
+//        ptList.clear();
+//        vector<int> generations;
+//        for (const Point2f& pt : facetGen->inputPoints) {
+//            int fIndex = facetGen->facet->facet32s.at<int>(pt.y, pt.x);
+//            if (fIndex >= facetGen->facet->facetlist.size()) continue; // new point
+//            int g = facetGen->dst3.at<int>(pt.y, pt.x);
+//            generations.push_back(g);
+//            ptList.push_back(pt);
+//            task->SetTrueText(to_string(g), dst2, pt);
+//        }
+//
+//        int maxGens = *max_element(generations.begin(), generations.end());
+//        int index = distance(generations.begin(), find(generations.begin(), generations.end(), maxGens));
+//        anchorPoint = ptList[index];
+//        if (index < facetGen->facet->facetlist.size()) {
+//            const vector<Point>& bestFacet = facetGen->facet->facetlist[index];
+//            fillConvexPoly(dst2, bestFacet, Scalar(0, 0, 0), task->lineType);
+//            drawContours(dst2, vector<vector<Point>> {bestFacet}, -1, Scalar(0, 255, 255), task->lineWidth);
+//        }
+//
+//        dst2 = facetGen->dst2;
+//        dst3 = src.clone();
+//        for (const Point2f& pt : ptList) {
+//            circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), task->lineWidth, task->lineType);
+//            circle(dst3, pt, task->DotSize, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+//        }
+//
+//        string text = to_string(ptList.size()) + " stable points were identified with " + to_string(maxGens) + " generations at the anchor point";
+//        labels[2] = text;
+//    }
+//};
 
-        goodCounts.clear();
-        int g;
-        for (auto i = 0; i < basics->ptList.size(); i++)
-        {
-            Point2f pt = basics->ptList[i];
-            circle(dst2, pt, task->DotSize, YELLOW, task->lineWidth, task->lineType);
-            g = basics->facetGen->dst3.at<int>(pt.y, pt.x);
-            goodCounts[g] = i;
-            task->SetTrueText(to_string(g), dst2, pt);
-        }
-    }
-};
 
 
-class FPoly_TopFeatures_CPP : public algorithmCPP {
-public:
-    Stable_BasicsCount_CPP* stable;
-    vector<Point2f> poly;
 
-    FPoly_TopFeatures_CPP() : algorithmCPP() {
-        stable = new Stable_BasicsCount_CPP();
-        traceName = "FPoly_TopFeatures_CPP";
-        desc = "Get the top features and validate them";
-    }
 
-    void Run(Mat src) {
-        stable->Run(src);
-        dst2 = stable->dst2;
-        poly.clear();
-        for (const auto& keyVal : stable->goodCounts) {
-            const Point2f& pt = stable->basics->ptList[keyVal.second];
-            int g = stable->basics->facetGen->dst3.at<int>(pt.y, pt.x);
+// Stable_BasicsCount_CPP : public algorithmCPP
+//{
+//private:
+//public:
+//    Stable_Basics_CPP* basics;
+//    Feature_Basics_CPP* good;
+//    map<int, int, greater<float>> goodCounts;
+//    Stable_BasicsCount_CPP() : algorithmCPP()
+//    {
+//        traceName = "Stable_BasicsCount_CPP";
+//        good = new Feature_Basics_CPP();
+//        basics = new Stable_Basics_CPP();
+//        desc = "Track the stable good features found in the BGR image.";
+//    }
+//    void Run(Mat src)
+//    {
+//        good->Run(src);
+//        basics->facetGen->inputPoints = good->featurePoints;
+//        basics->Run(src);
+//        dst2 = basics->dst2;
+//        dst3 = basics->dst3;
+//
+//        goodCounts.clear();
+//        int g;
+//        for (auto i = 0; i < basics->ptList.size(); i++)
+//        {
+//            Point2f pt = basics->ptList[i];
+//            circle(dst2, pt, task->DotSize, YELLOW, task->lineWidth, task->lineType);
+//            g = basics->facetGen->dst3.at<int>(pt.y, pt.x);
+//            goodCounts[g] = i;
+//            task->SetTrueText(to_string(g), dst2, pt);
+//        }
+//    }
+//};
 
-            if (poly.size() < task->polyCount) poly.push_back(pt);
-        }
 
-        if (poly.size() > 1)
-            for (int i = 0; i < poly.size() - 1; i++) {
-                line(dst2, poly[i], poly[i + 1], Scalar(255, 255, 255), task->lineWidth, task->lineType);
-            }
-    }
-};
+// FPoly_TopFeatures_CPP : public algorithmCPP {
+//public:
+//    Stable_BasicsCount_CPP* stable;
+//    vector<Point2f> poly;
+//
+//    FPoly_TopFeatures_CPP() : algorithmCPP() {
+//        stable = new Stable_BasicsCount_CPP();
+//        traceName = "FPoly_TopFeatures_CPP";
+//        desc = "Get the top features and validate them";
+//    }
+//
+//    void Run(Mat src) {
+//        stable->Run(src);
+//        dst2 = stable->dst2;
+//        poly.clear();
+//        for (const auto& keyVal : stable->goodCounts) {
+//            const Point2f& pt = stable->basics->ptList[keyVal.second];
+//            int g = stable->basics->facetGen->dst3.at<int>(pt.y, pt.x);
+//
+//            if (poly.size() < task->polyCount) poly.push_back(pt);
+//        }
+//
+//        if (poly.size() > 1)
+//            for (int i = 0; i < poly.size() - 1; i++) {
+//                line(dst2, poly[i], poly[i + 1], Scalar(255, 255, 255), task->lineWidth, task->lineType);
+//            }
+//    }
+//};
 
 
 
@@ -2713,27 +2723,27 @@ public:
 
 
 
-class Mesh_Features_CPP : public algorithmCPP {
-public:
-    Feature_Basics_CPP* feat;
-    Mesh_Basics_CPP* mesh;
-    Mesh_Features_CPP() : algorithmCPP() {
-        traceName = "Mesh_Features_CPP";
-        feat = new Feature_Basics_CPP();
-        mesh = new Mesh_Basics_CPP();
-        labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
-        advice = "Use Options_Features to update results.";
-        desc = "Build triangles from feature points";
-    }
-    void Run(Mat src) {
-        feat->Run(src);
-        if (feat->featurePoints.size() < 3) {
-            return;
-        }
-        mesh->dst2 = src;
-        dst2 = mesh->showMesh(feat->featurePoints);
-    }
-};
+// Mesh_Features_CPP : public algorithmCPP {
+//public:
+//    Feature_Basics_CPP* feat;
+//    Mesh_Basics_CPP* mesh;
+//    Mesh_Features_CPP() : algorithmCPP() {
+//        traceName = "Mesh_Features_CPP";
+//        feat = new Feature_Basics_CPP();
+//        mesh = new Mesh_Basics_CPP();
+//        labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
+//        advice = "Use Options_Features to update results.";
+//        desc = "Build triangles from feature points";
+//    }
+//    void Run(Mat src) {
+//        feat->Run(src);
+//        if (feat->featurePoints.size() < 3) {
+//            return;
+//        }
+//        mesh->dst2 = src;
+//        dst2 = mesh->showMesh(feat->featurePoints);
+//    }
+//};
 
 
 
@@ -3132,58 +3142,58 @@ public:
 
 
 
-class Feature_StableSorted_CPP : public algorithmCPP {
-public:
-    Feature_Basics_CPP* feat;
-    int desiredCount = 200;
-    vector<Point2f> stablePoints;
-    vector<int> generations;
-    Feature_StableSorted_CPP() : algorithmCPP() {
-        traceName = "Feature_StableSorted_CPP";
-        feat = new Feature_Basics_CPP();
-        desc = "Display the top X feature points ordered by generations they were present.";
-    }
-    void Run(Mat src) {
-        feat->Run(src.clone());
-        dst3 = feat->dst2;
-        dst2 = src;
-        if (task->optionsChanged) {
-            stablePoints.clear();
-            generations.clear();
-        }
-        for (int i = 0; i < feat->featurePoints.size(); i++) {
-            Point2f pt = feat->featurePoints[i];
-            auto it = find(stablePoints.begin(), stablePoints.end(), pt);
-            if (it != stablePoints.end()) {
-                int index = distance(stablePoints.begin(), it);
-                generations[index]++;
-            }
-            else {
-                stablePoints.push_back(pt);
-                generations.push_back(1);
-            }
-        }
-        map<int, Point2f, greater<int>> sortByGen;
-        for (int i = 0; i < stablePoints.size(); i++) {
-            sortByGen[generations[i]] = stablePoints[i];
-        }
-        int displayCount = 0;
-        stablePoints.clear();
-        generations.clear();
-        for (auto it = sortByGen.begin(); it != sortByGen.end(); it++) {
-            if (displayCount >= desiredCount * 2) break;
-            Point2f pt = it->second;
-            if (displayCount < desiredCount) {
-                circle(dst2, pt, task->DotSize, Scalar(255, 255, 255), -1, task->lineType);
-                displayCount++;
-            }
-            stablePoints.push_back(pt);
-            generations.push_back(it->first);
-        }
-        labels[2] = "The most stable " + to_string(displayCount) + " are highlighted below";
-        labels[3] = "Output of Feature_Basics" + to_string(feat->featurePoints.size()) + " points found";
-    }
-};
+// Feature_StableSorted_CPP : public algorithmCPP {
+//public:
+//    Feature_Basics_CPP* feat;
+//    int desiredCount = 200;
+//    vector<Point2f> stablePoints;
+//    vector<int> generations;
+//    Feature_StableSorted_CPP() : algorithmCPP() {
+//        traceName = "Feature_StableSorted_CPP";
+//        feat = new Feature_Basics_CPP();
+//        desc = "Display the top X feature points ordered by generations they were present.";
+//    }
+//    void Run(Mat src) {
+//        feat->Run(src.clone());
+//        dst3 = feat->dst2;
+//        dst2 = src;
+//        if (task->optionsChanged) {
+//            stablePoints.clear();
+//            generations.clear();
+//        }
+//        for (int i = 0; i < feat->featurePoints.size(); i++) {
+//            Point2f pt = feat->featurePoints[i];
+//            auto it = find(stablePoints.begin(), stablePoints.end(), pt);
+//            if (it != stablePoints.end()) {
+//                int index = distance(stablePoints.begin(), it);
+//                generations[index]++;
+//            }
+//            else {
+//                stablePoints.push_back(pt);
+//                generations.push_back(1);
+//            }
+//        }
+//        map<int, Point2f, greater<int>> sortByGen;
+//        for (int i = 0; i < stablePoints.size(); i++) {
+//            sortByGen[generations[i]] = stablePoints[i];
+//        }
+//        int displayCount = 0;
+//        stablePoints.clear();
+//        generations.clear();
+//        for (auto it = sortByGen.begin(); it != sortByGen.end(); it++) {
+//            if (displayCount >= desiredCount * 2) break;
+//            Point2f pt = it->second;
+//            if (displayCount < desiredCount) {
+//                circle(dst2, pt, task->DotSize, Scalar(255, 255, 255), -1, task->lineType);
+//                displayCount++;
+//            }
+//            stablePoints.push_back(pt);
+//            generations.push_back(it->first);
+//        }
+//        labels[2] = "The most stable " + to_string(displayCount) + " are highlighted below";
+//        labels[3] = "Output of Feature_Basics" + to_string(feat->featurePoints.size()) + " points found";
+//    }
+//};
 
 
 
@@ -3204,7 +3214,7 @@ public:
             Close();
             cPtr = BGSubtract_BGFG_Open(options->currMethod);
         }
-        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int*)src.data, src.rows, src.cols, src.channels(), options->MOGlearnRate);
+        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int*)src.data, src.rows, src.cols, src.channels(), options->learnRate);
         if (imagePtr) {
             dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr).clone();
             threshold(dst2, dst3, 0, 255, THRESH_BINARY);
@@ -3238,7 +3248,7 @@ public:
             Close();
             cPtr = BGSubtract_BGFG_Open(options->currMethod);
         }
-        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int *)src.data, src.rows, src.cols, src.channels(), options->MOGlearnRate);
+        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int *)src.data, src.rows, src.cols, src.channels(), options->learnRate);
         dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
         labels[2] = options->methodDesc;
     }

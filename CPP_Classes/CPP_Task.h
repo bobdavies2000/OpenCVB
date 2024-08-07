@@ -162,8 +162,8 @@ class algorithmCPP
 public:
     Mat dst0, dst1, dst2, dst3, empty;
     bool standalone;
-    String advice = "";
-    String desc;
+    string advice = "";
+    string desc;
     int* cPtr;
     string traceName;
     vector<string> labels{ "", "", "", "" };
@@ -263,7 +263,7 @@ public:
         vec.assign((Point*)hull2i.data, (Point*)hull2i.data + hull2i.total());
         return vec;
     }
-    void SetTrueText(String text, Mat dst, Point2f pt = Point2f(10, 50))
+    void SetTrueText(string text, Mat dst, Point2f pt = Point2f(10, 50))
     {
         if (cppFunction < 0) return;
         putText(dst, text, pt, this->font, this->cvFontSize, this->fontColor);

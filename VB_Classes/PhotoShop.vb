@@ -416,7 +416,7 @@ Public Class PhotoShop_DuoTone : Inherits VB_Parent
         Next
 
         For i = 0 To split.Count - 1
-            If i = switch1 Or i = options.switch Then
+            If i = switch1 Or i = options.switchColor Then
                 split(i) = split(i).LUT(expMat)
             ElseIf duoCheck.Checked Then
                 split(i) = split(i).LUT(expDark)

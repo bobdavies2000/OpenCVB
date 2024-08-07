@@ -76,8 +76,6 @@ End Class
 
 Public Class Options_Contours2 : Inherits VB_Parent
     Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
-    Dim radioChoices = {cv.ContourApproximationModes.ApproxNone, cv.ContourApproximationModes.ApproxSimple,
-                        cv.ContourApproximationModes.ApproxTC89KCOS, cv.ContourApproximationModes.ApproxTC89L1}
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("ApproxNone")
@@ -88,6 +86,9 @@ Public Class Options_Contours2 : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
+        Static radioChoices() As cv.ContourApproximationModes = {cv.ContourApproximationModes.ApproxNone,
+                                 cv.ContourApproximationModes.ApproxSimple, cv.ContourApproximationModes.ApproxTC89KCOS,
+                                 cv.ContourApproximationModes.ApproxTC89L1}
         Static frm = FindFrm(traceName + " Radio Buttons")
         ApproximationMode = radioChoices(findRadioIndex(frm.check))
     End Sub
@@ -100,7 +101,7 @@ End Class
 Public Class Options_Contours : Inherits VB_Parent
     Public retrievalMode As cv.RetrievalModes = cv.RetrievalModes.External
     Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
-    Public epsilon As Single = 3 / 100
+    Public epsilon As Double = 3 / 100
     Public minPixels As Integer = 30
     Public cmPerTier As Integer = 50
     Public trueTextOffset As Integer = 80
@@ -216,8 +217,8 @@ End Class
 
 
 Public Class Options_GeneticDrawing : Inherits VB_Parent
-    Public stageTotal = 100
-    Public brushPercent = 1.0
+    Public stageTotal As Integer = 100
+    Public brushPercent As Double = 1.0
     Public strokeCount As Integer = 10
     Public snapCheck As Boolean = False
     Public generations As Integer = 20
@@ -258,9 +259,9 @@ End Class
 
 Public Class Options_MatchShapes : Inherits VB_Parent
     Public matchOption As cv.ShapeMatchModes = cv.ShapeMatchModes.I1
-    Public matchThreshold As Single = 0.4
-    Public maxYdelta As Single = 0.05
-    Public minSize As Single = dst2.Total / 100
+    Public matchThreshold As Double = 0.4
+    Public maxYdelta As Double = 0.05
+    Public minSize As Double = 120
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -303,11 +304,11 @@ End Class
 
 
 Public Class Options_Plane : Inherits VB_Parent
-    Public rmsThreshold As Single = 0.1
-    Public useMaskPoints As Boolean
-    Public useContourPoints As Boolean
-    Public use3Points As Boolean
-    Public reuseRawDepthData As Boolean
+    Public rmsThreshold As Double = 0.1
+    Public useMaskPoints As Boolean = False
+    Public useContourPoints As Boolean = False
+    Public use3Points As Boolean = False
+    Public reuseRawDepthData As Boolean = False
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -346,9 +347,9 @@ End Class
 
 
 Public Class Options_Neighbors : Inherits VB_Parent
-    Public threshold As Single = 0.005
+    Public threshold As Double = 0.005
     Public pixels As Integer = 6
-    Public patchZ As Boolean
+    Public patchZ As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Difference from neighbor in mm's", 0, 20, threshold * 1000)
@@ -403,8 +404,8 @@ End Class
 
 Public Class Options_Resize : Inherits VB_Parent
     Public warpFlag As cv.InterpolationFlags = cv.InterpolationFlags.Nearest
-    Public radioIndex As Integer
-    Public resizePercent As Single = 0.03
+    Public radioIndex As Integer = 0
+    Public resizePercent As Double = 0.03
     Public topLeftOffset As Integer = 10
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -449,7 +450,7 @@ End Class
 
 Public Class Options_Smoothing : Inherits VB_Parent
     Public iterations As Integer = 8
-    Public interiorTension As Single = 0.5
+    Public interiorTension As Double = 0.5
     Public stepSize As Integer = 30
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -480,8 +481,7 @@ End Class
 Public Class Options_SuperRes : Inherits VB_Parent
     Public method As String = "farneback"
     Public iterations As Integer = 10
-    Public restartWithNewOptions As Boolean
-    Dim radioChoices = {"farneback", "tvl1", "brox", "pyrlk"}
+    Public restartWithNewOptions As Boolean = False
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -495,6 +495,7 @@ Public Class Options_SuperRes : Inherits VB_Parent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("SuperRes Iterations", 10, 200, iterations)
     End Sub
     Public Sub RunVB()
+        Static radioChoices = {"farneback", "tvl1", "brox", "pyrlk"}
         Static iterSlider = FindSlider("SuperRes Iterations")
         Static frm = FindFrm(traceName + " Radio Buttons")
         method = radioChoices(findRadioIndex(frm.check))
@@ -513,7 +514,7 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class Options_SVM2 : Inherits VB_Parent
-    Public SVMType = cv.ML.SVM.Types.CSvc
+    Public SVMType As Integer = cv.ML.SVM.Types.CSvc
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("SVM Type = CSvc")
@@ -551,15 +552,14 @@ End Class
 Public Class Options_SVM : Inherits VB_Parent
     Public kernelType As cv.ML.SVM.KernelTypes = cv.ML.SVM.KernelTypes.Poly
     Public granularity As Integer = 5
-    Public svmDegree As Single = 1
+    Public svmDegree As Double = 1
     Public gamma As Integer = 1
-    Public svmCoef0 As Single = 1
-    Public svmC As Single = 1
-    Public svmNu As Single = 0.5
-    Public svmP As Single = 0
+    Public svmCoef0 As Double = 1
+    Public svmC As Double = 1
+    Public svmNu As Double = 0.5
+    Public svmP As Double = 0
     Public sampleCount As Integer = 500
     Dim options2 As New Options_SVM2
-    Dim radioChoices = {cv.ML.SVM.KernelTypes.Linear, cv.ML.SVM.KernelTypes.Poly, cv.ML.SVM.KernelTypes.Rbf, cv.ML.SVM.KernelTypes.Sigmoid}
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Granularity", 1, 50, granularity)
@@ -598,6 +598,7 @@ Public Class Options_SVM : Inherits VB_Parent
     End Function
 
     Public Sub RunVB()
+        Static radioChoices = {cv.ML.SVM.KernelTypes.Linear, cv.ML.SVM.KernelTypes.Poly, cv.ML.SVM.KernelTypes.Rbf, cv.ML.SVM.KernelTypes.Sigmoid}
         options2.RunVB()
         Static frm = FindFrm(traceName + " Radio Buttons")
         kernelType = radioChoices(findRadioIndex(frm.check))
@@ -629,11 +630,11 @@ End Class
 
 
 Public Class Options_WarpModel : Inherits VB_Parent
-    Public useGradient As Boolean
+    Public useGradient As Boolean = False
     Public pkImage As cv.Mat
-    Public warpMode As Integer
-    Public useWarpAffine As Boolean
-    Public useWarpHomography As Boolean
+    Public warpMode As Integer = 0
+    Public useWarpAffine As Boolean = False
+    Public useWarpHomography As Boolean = False
     Public options2 As New Options_WarpModel2
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -687,9 +688,9 @@ End Class
 
 
 Public Class Options_MinMaxNone : Inherits VB_Parent
-    Public useMax As Boolean
-    Public useMin As Boolean
-    Public useNone As Boolean
+    Public useMax As Boolean = False
+    Public useMin As Boolean = False
+    Public useNone As Boolean = False
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Use farthest distance")
@@ -713,16 +714,16 @@ End Class
 
 
 Public Class Options_OpenGL : Inherits VB_Parent
-    Public FOV As Single = 75
-    Public yaw As Single = -3
-    Public pitch As Single = 3
-    Public roll As Single = 0
-    Public zNear As Single = 0
-    Public zFar As Single = 20
+    Public FOV As Double = 75
+    Public yaw As Double = -3
+    Public pitch As Double = 3
+    Public roll As Double = 0
+    Public zNear As Double = 0
+    Public zFar As Double = 20
     Public pointSize As Integer = 2
-    Public zTrans As Single = 0.5
-    Public eye As New cv.Vec3f(0, 0, -40)
-    Public scaleXYZ As New cv.Vec3f(10, 10, 1)
+    Public zTrans As Double = 0.5
+    Public eye As cv.Vec3f = New cv.Vec3f(0, 0, -40)
+    Public scaleXYZ As cv.Vec3f = New cv.Vec3f(10, 10, 1)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("OpenGL yaw (degrees)", -180, 180, yaw)
@@ -786,16 +787,16 @@ End Class
 
 
 Public Class Options_OpenGLFunctions : Inherits VB_Parent
-    Public moveAmount As cv.Scalar
-    Public FOV As Single = 75
-    Public yaw As Single = -3
-    Public pitch As Single = 3
-    Public roll As Single = 0
-    Public zNear As Single = 0
-    Public zFar As Single = 20.0
-    Public zTrans As Single = 0.5
-    Public eye As New cv.Vec3f(0, 0, -40)
-    Public scaleXYZ As New cv.Vec3f(10, 10, 1)
+    Public moveAmount As cv.Scalar = New cv.Scalar(0, 0, 0)
+    Public FOV As Double = 75
+    Public yaw As Double = -3
+    Public pitch As Double = 3
+    Public roll As Double = 0
+    Public zNear As Double = 0
+    Public zFar As Double = 20.0
+    Public zTrans As Double = 0.5
+    Public eye As cv.Vec3f = New cv.Vec3f(0, 0, -40)
+    Public scaleXYZ As cv.Vec3f = New cv.Vec3f(10, 10, 1)
     Public PointSizeSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -858,7 +859,7 @@ End Class
 
 
 Public Class Options_DCT : Inherits VB_Parent
-    Public dctFlag As cv.DctFlags
+    Public dctFlag As cv.DctFlags = New cv.DctFlags
     Public runLengthMin As Integer = 15
     Public removeFrequency As Integer = 1
     Public Sub New()
@@ -894,8 +895,8 @@ End Class
 
 
 Public Class Options_Eigen : Inherits VB_Parent
-    Public highlight As Boolean
-    Public recompute As Boolean
+    Public highlight As Boolean = False
+    Public recompute As Boolean = False
     Public randomCount As Integer = 100
     Public linePairCount As Integer = 20
     Public noiseOffset As Integer = 10
@@ -976,10 +977,10 @@ End Class
 
 
 Public Class Options_ProCon : Inherits VB_Parent
-    Public buffer(10 - 1) As Integer
+    Public buffer(9) As Integer 
     Public pduration As Integer = 1
     Public cduration As Integer = 1
-    Public bufferSize As Integer
+    Public bufferSize As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Buffer Size", 1, 100, buffer.Length)
@@ -1076,7 +1077,7 @@ Public Class Options_MotionBlur : Inherits VB_Parent
     Public showDirection As Boolean = True
     Public redoCheckBox As Windows.Forms.CheckBox
     Public kernelSize As Integer = 51
-    Public theta As Single
+    Public theta As Double = 0
     Public restoreLen As Integer = 10
     Public SNR As Integer = 700
     Public gamma As Integer = 5
@@ -1123,10 +1124,10 @@ End Class
 
 Public Class Options_BinarizeNiBlack : Inherits VB_Parent
     Public kernelSize As Integer = 51
-    Public niBlackK As Single = -200 / 1000
-    Public nickK As Single = 100 / 1000
-    Public sauvolaK As Single = 100 / 1000
-    Public sauvolaR As Single = 64
+    Public niBlackK As Double = -200 / 1000
+    Public nickK As Double = 100 / 1000
+    Public sauvolaK As Double = 100 / 1000
+    Public sauvolaR As Double = 64
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Kernel Size", 3, 500, kernelSize)
@@ -1240,7 +1241,7 @@ End Class
 
 
 Public Class Options_Dither : Inherits VB_Parent
-    Public radioIndex As Integer
+    Public radioIndex As Integer = 0
     Public bppIndex As Integer = 1
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -1284,16 +1285,16 @@ End Class
 
 
 Public Class Options_SymmetricalShapes : Inherits VB_Parent
-    Public rotateAngle As Single = 0
-    Public fillColor As cv.Scalar = cv.Scalar.Red
-    Public numPoints As Integer
-    Public nGenPer As Integer
-    Public radius1 As Integer
-    Public radius2 As Integer
-    Public dTheta As Single
-    Public symmetricRipple As Boolean
-    Public reverseInOut As Boolean
-    Public fillRequest As Boolean
+    Public rotateAngle As Double = 0
+    Public fillColor As cv.Scalar = New cv.Scalar(0, 0, 255)
+    Public numPoints As Integer = 0
+    Public nGenPer As Integer = 0
+    Public radius1 As Integer = 0
+    Public radius2 As Integer = 0
+    Public dTheta As Double = 0
+    Public symmetricRipple As Boolean = False
+    Public reverseInOut As Boolean = False
+    Public fillRequest As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Sample Size", 200, 1000, 500)
@@ -1354,9 +1355,9 @@ End Class
 
 
 Public Class Options_DrawArc : Inherits VB_Parent
-    Public saveMargin As Integer = task.WorkingRes.Width / 16
-    Public drawFull As Boolean
-    Public drawFill As Boolean
+    Public saveMargin As Integer = 32
+    Public drawFull As Boolean = False
+    Public drawFill As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Clearance from image edge (margin size)", 5, dst2.Width / 8, saveMargin * 16)
@@ -1423,8 +1424,8 @@ End Class
 Public Class Options_SepFilter2D : Inherits VB_Parent
     Public xDim As Integer = 5
     Public yDim As Integer = 11
-    Public sigma As Single = 17
-    Public diffCheck As Boolean
+    Public sigma As Double = 17
+    Public diffCheck As Boolean = False
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Show Difference SepFilter2D and Gaussian")
@@ -1481,14 +1482,14 @@ End Class
 
 
 Public Class Options_KLT : Inherits VB_Parent
-    Public inputPoints() As cv.Point2f
+    Public ptInput() As cv.Point2f
     Public maxCorners As Integer = 100
-    Public qualityLevel As Single = 0.01
+    Public qualityLevel As Double = 0.01
     Public minDistance As Integer = 7
     Public blockSize As Integer = 7
-    Public nightMode As Boolean
-    Public subPixWinSize As New cv.Size(10, 10)
-    Public winSize As New cv.Size(3, 3)
+    Public nightMode As Boolean = False
+    Public subPixWinSize As cv.Size = New cv.Size(10, 10)
+    Public winSize As cv.Size = New cv.Size(3, 3)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("KLT - MaxCorners", 1, 200, maxCorners)
@@ -1511,7 +1512,7 @@ Public Class Options_KLT : Inherits VB_Parent
         Static deleteCheck = FindCheckBox("KLT - delete all Points")
 
         If deleteCheck.Checked Or task.heartBeat Then
-            inputPoints = Nothing ' just delete all points and start again.
+            ptInput = Nothing ' just delete all points and start again.
             deleteCheck.Checked = False
         End If
 
@@ -1530,11 +1531,11 @@ End Class
 
 
 Public Class Options_Laplacian : Inherits VB_Parent
-    Public kernel As New cv.Size(3, 3)
-    Public scale As Single = 1
-    Public delta As Single = 0
-    Public gaussianBlur As Boolean
-    Public boxFilterBlur As Boolean
+    Public kernel As cv.Size = New cv.Size(3, 3)
+    Public scale As Double = 1
+    Public delta As Double = 0
+    Public gaussianBlur As Boolean = False
+    Public boxFilterBlur As Boolean = False
     Public threshold As Integer = 15
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -1576,14 +1577,14 @@ End Class
 
 
 Public Class Options_OpticalFlow : Inherits VB_Parent
-    Public pyrScale As Single = 35 / 100
+    Public pyrScale As Double = 35 / 100
     Public levels As Integer = 1
     Public winSize As Integer = 1
     Public iterations As Integer = 1
-    Public polyN As Single
-    Public polySigma As Single
-    Public OpticalFlowFlags As cv.OpticalFlowFlags
-    Public outputScaling As Integer
+    Public polyN As Double = 0
+    Public polySigma As Double = 0
+    Public OpticalFlowFlags As cv.OpticalFlowFlags = cv.OpticalFlowFlags.FarnebackGaussian
+    Public outputScaling As Integer = 0
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("FarnebackGaussian")
@@ -1637,7 +1638,7 @@ End Class
 
 
 Public Class Options_OpticalFlowSparse : Inherits VB_Parent
-    Public OpticalFlowFlag As cv.OpticalFlowFlags
+    Public OpticalFlowFlag As cv.OpticalFlowFlags = cv.OpticalFlowFlags.FarnebackGaussian
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("FarnebackGaussian")
@@ -1667,49 +1668,11 @@ End Class
 
 
 
-Public Class Options_Quaternion : Inherits VB_Parent
-    Public q1 As Quaternion
-    Public q2 As Quaternion
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("quaternion A.x X100", -100, 100, -50)
-            sliders.setupTrackBar("quaternion A.y X100", -100, 100, 10)
-            sliders.setupTrackBar("quaternion A.z X100", -100, 100, 20)
-            sliders.setupTrackBar("quaternion A Theta X100", -100, 100, 100)
-
-            sliders.setupTrackBar("quaternion B.x X100", -100, 100, -10)
-            sliders.setupTrackBar("quaternion B.y X100", -100, 100, -10)
-            sliders.setupTrackBar("quaternion B.z X100", -100, 100, -10)
-            sliders.setupTrackBar("quaternion B Theta X100", -100, 100, 100)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static axSlider = FindSlider("quaternion A.x X100")
-        Static aySlider = FindSlider("quaternion A.y X100")
-        Static azSlider = FindSlider("quaternion A.z X100")
-        Static athetaSlider = FindSlider("quaternion A Theta X100")
-
-        Static bxSlider = FindSlider("quaternion B.x X100")
-        Static bySlider = FindSlider("quaternion B.y X100")
-        Static bzSlider = FindSlider("quaternion B.z X100")
-        Static bthetaSlider = FindSlider("quaternion B Theta X100")
-
-        q1 = New Quaternion(CSng(axSlider.Value / 100), CSng(aySlider.Value / 100),
-                                CSng(azSlider.Value / 100), CSng(athetaSlider.Value / 100))
-        q2 = New Quaternion(CSng(bxSlider.Value / 100), CSng(bySlider.Value / 100),
-                                    CSng(bzSlider.Value / 100), CSng(bthetaSlider.Value / 100))
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Options_XPhoto : Inherits VB_Parent
     Public colorCode As Integer = cv.ColorConversionCodes.BGR2GRAY
-    Public dynamicRatio As Integer
-    Public blockSize As Integer
+    Public dynamicRatio As Integer = 0
+    Public blockSize As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("XPhoto Dynamic Ratio", 1, 127, 7)
@@ -1747,7 +1710,7 @@ End Class
 
 
 Public Class Options_InPaint : Inherits VB_Parent
-    Public telea As Boolean
+    Public telea As Boolean = False
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("TELEA")
@@ -1877,7 +1840,7 @@ End Class
 
 
 Public Class Options_Random : Inherits VB_Parent
-    Public count As Integer
+    Public count As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Pixel Count", 1, dst2.Cols * dst2.Rows, 20)
     End Sub
@@ -1896,10 +1859,10 @@ End Class
 
 Public Class Options_Hough : Inherits VB_Parent
     Public rho As Integer = 1
-    Public theta As Single = 1000 * Math.PI / 180
+    Public theta As Double = 1000 * Math.PI / 180
     Public threshold As Integer = 3
     Public lineCount As Integer = 25
-    Public relativeIntensity As Single = 90 / 1000
+    Public relativeIntensity As Double = 90 / 1000
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Relative Intensity (Accord)", 1, 100, relativeIntensity * 1000)
@@ -1960,7 +1923,7 @@ End Class
 
 
 Public Class Options_ColorMatch : Inherits VB_Parent
-    Public maxDistanceCheck As Boolean
+    Public maxDistanceCheck As Boolean = False
     Public Sub New()
         If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
@@ -1989,7 +1952,7 @@ Public Class Options_Sort : Inherits VB_Parent
     Public radio3 As Windows.Forms.RadioButton
     Public radio4 As Windows.Forms.RadioButton
     Public radio5 As Windows.Forms.RadioButton
-    Public sortThreshold As Integer
+    Public sortThreshold As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Threshold for sort input", 0, 255, 127)
@@ -2027,7 +1990,7 @@ End Class
 
 
 Public Class Options_Distance : Inherits VB_Parent
-    Public distanceType As cv.DistanceTypes
+    Public distanceType As cv.DistanceTypes = cv.DistanceTypes.L1
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -2056,11 +2019,11 @@ End Class
 
 
 Public Class Options_Warp : Inherits VB_Parent
-    Public alpha As Double
-    Public beta As Double
-    Public gamma As Double
-    Public f As Double
-    Public distance As Double
+    Public alpha As Double = 0
+    Public beta As Double = 0
+    Public gamma As Double = 0
+    Public f As Double = 0
+    Public distance As Double = 0
     Public transformMatrix As cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -2135,7 +2098,7 @@ End Class
 
 Public Class Options_HistCompare : Inherits VB_Parent
     Public compareMethod As cv.HistCompMethods = cv.HistCompMethods.Correl
-    Public compareName As String
+    Public compareName As String = "Chi Square Alt"
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -2188,7 +2151,7 @@ End Class
 
 
 Public Class Options_MatchCell : Inherits VB_Parent
-    Public overlapPercent As Single = 0.5
+    Public overlapPercent As Double = 0.5
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent overlap", 0, 100, overlapPercent * 100)
     End Sub
@@ -2206,9 +2169,9 @@ End Class
 
 
 Public Class Options_Extrinsics : Inherits VB_Parent
-    Public leftCorner As Integer
-    Public rightCorner As Integer
-    Public topCorner As Integer
+    Public leftCorner As Integer = 0
+    Public rightCorner As Integer = 0
+    Public topCorner As Integer = 0
     Public Sub New()
         Dim leftVal As Integer = 15
         Dim rightVal As Integer = 15
@@ -2246,8 +2209,8 @@ End Class
 
 
 Public Class Options_Translation : Inherits VB_Parent
-    Public leftTrans As Integer
-    Public rightTrans As Integer
+    Public leftTrans As Integer = 0
+    Public rightTrans As Integer = 0
     Public Sub New()
         Dim rightShift As Integer = 4
         Dim leftShift As Integer = 5
@@ -2280,8 +2243,8 @@ End Class
 
 
 Public Class Options_OpenGL_Contours : Inherits VB_Parent
-    Public depthPointStyle As Integer
-    Public filterThreshold As Single = 0.3
+    Public depthPointStyle As Integer = 0
+    Public filterThreshold As Double = 0.3
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -2323,8 +2286,8 @@ End Class
 
 
 Public Class Options_Motion : Inherits VB_Parent
-    Public motionThreshold As Integer
-    Public cumulativePercentThreshold As Single = 0.1
+    Public motionThreshold As Integer = 0
+    Public cumulativePercentThreshold As Double = 0.1
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Single frame motion threshold", 1, dst2.Total / 4, dst2.Total / 16)
@@ -2348,7 +2311,7 @@ End Class
 
 Public Class Options_Emax : Inherits VB_Parent
     Public predictionStepSize As Integer = 5
-    Public consistentcolors As Boolean
+    Public consistentcolors As Boolean = False
     Public covarianceType = cv.EMTypes.CovMatDefault
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("EMax Prediction Step Size", 1, 20, predictionStepSize)
@@ -2391,8 +2354,8 @@ End Class
 
 Public Class Options_Intercepts : Inherits VB_Parent
     Public interceptRange As Integer = 10
-    Public mouseMovePoint As Integer
-    Public selectedIntercept As Integer
+    Public mouseMovePoint As Integer = 0
+    Public selectedIntercept As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Intercept width range in pixels", 1, 50, interceptRange)
         If radio.Setup(traceName) Then
@@ -2455,7 +2418,7 @@ End Class
 Public Class Options_ForeGround : Inherits VB_Parent
     Public maxForegroundDepthInMeters As Single = 1500 / 1000
     Public minSizeContour As Integer = 100
-    Public depthPerRegion As Single
+    Public depthPerRegion As Double = 0
     Public numberOfRegions As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -2513,7 +2476,7 @@ End Class
 
 
 Public Class Options_ShapeDetect : Inherits VB_Parent
-    Public fileName As String
+    Public fileName As String = ""
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -2539,7 +2502,7 @@ End Class
 
 Public Class Options_Blur : Inherits VB_Parent
     Public kernelSize As Integer = 3
-    Public sigma As Single = 1.5
+    Public sigma As Double = 1.5
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Blur Kernel Size", 0, 32, kernelSize)
@@ -2593,7 +2556,7 @@ End Class
 
 Public Class Options_SOM : Inherits VB_Parent
     Public iterations As Integer = 3000
-    Public learningRate As Single = 0.1
+    Public learningRate As Double = 0.1
     Public radius As Integer = 15
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -2694,7 +2657,7 @@ End Class
 Public Class Options_Dilate : Inherits VB_Parent
     Public kernelSize As Integer = 3
     Public iterations As Integer = 1
-    Public morphShape As cv.MorphShapes
+    Public morphShape As cv.MorphShapes = cv.MorphShapes.Cross
     Public element As cv.Mat
     Public noshape As Boolean = False
     Public Sub New()
@@ -2737,7 +2700,7 @@ End Class
 
 
 Public Class Options_KMeans : Inherits VB_Parent
-    Public kMeansFlag As cv.KMeansFlags
+    Public kMeansFlag As cv.KMeansFlags = cv.KMeansFlags.RandomCenters
     Public kMeansK As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -2780,8 +2743,8 @@ End Class
 
 Public Class Options_LUT : Inherits VB_Parent
     Public lutSegments As Integer = 10
-    Public splits() As Integer
-    Public vals() As Integer
+    Public splits(4) As Integer
+    Public vals(4) As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Number of LUT Segments", 2, 255, lutSegments)
@@ -2853,22 +2816,22 @@ End Class
 
 ' https://github.com/spmallick/learnopencv/tree/master/
 Public Class Options_Photoshop : Inherits VB_Parent
-    Public switch As Integer = 3
+    Public switchColor As Integer = 3
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Second DuoTone Blue")
             radio.addRadio("Second DuoTone Green")
             radio.addRadio("Second DuoTone Red")
             radio.addRadio("Second DuoTone None")
-            radio.check(switch).Checked = True
+            radio.check(switchColor).Checked = True
         End If
 
         desc = "More options for the DuoTone image"
     End Sub
     Public Sub RunVB()
         Static frm = FindFrm(traceName + " Radio Buttons")
-        For switch = 0 To frm.check.Count - 1
-            If frm.check(switch).Checked Then Exit For
+        For switchColor = 0 To frm.check.Count - 1
+            If frm.check(switchColor).Checked Then Exit For
         Next
     End Sub
 End Class
@@ -2952,7 +2915,7 @@ Public Class Options_IMU : Inherits VB_Parent
     Public rotateX As Integer = 0
     Public rotateY As Integer = 0
     Public rotateZ As Integer = 0
-    Public stableThreshold As Single = 0.02
+    Public stableThreshold As Double = 0.02
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Rotate pointcloud around X-axis (degrees)", -90, 90, rotateX)
@@ -3047,7 +3010,7 @@ End Class
 
 Public Class Options_Boundary : Inherits VB_Parent
     Public desiredBoundaries As Integer = 15
-    Public peakDistance As Integer = task.WorkingRes.Width / 20
+    Public peakDistance As Integer = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Desired boundary count", 2, 100, desiredBoundaries)
@@ -3096,16 +3059,16 @@ End Class
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class Options_MSER : Inherits VB_Parent
     Public delta As Integer = 9
-    Public minArea As Integer
-    Public maxArea As Integer
-    Public maxVariation As Single = 0.25
-    Public minDiversity As Single = 0.2
+    Public minArea As Integer = 0
+    Public maxArea As Integer = 0
+    Public maxVariation As Double = 0.25
+    Public minDiversity As Double = 0.2
     Public maxEvolution As Integer = 200
-    Public areaThreshold As Single = 1.01
-    Public minMargin As Single = 0.003
+    Public areaThreshold As Double = 1.01
+    Public minMargin As Double = 0.003
     Public edgeBlurSize As Integer = 5
-    Public pass2Setting As Integer
-    Public graySetting As Boolean
+    Public pass2Setting As Integer = 0
+    Public graySetting As Boolean = False
     Public Sub New()
         Select Case task.WorkingRes.Width
             Case 1920
@@ -3230,7 +3193,7 @@ Public Class Options_Spectrum : Inherits VB_Parent
             Next
         Next
 
-        Dim totalCount As Integer
+        Dim totalCount As Integer = 0
         For i = 0 To pixels.Count - 1
             sorted.Add(pixels(i), counts(i))
             totalCount += counts(i)
@@ -3246,7 +3209,7 @@ Public Class Options_Spectrum : Inherits VB_Parent
         Dim rStart As Integer = sorted.ElementAt(0).Key
         Dim rEnd As Integer = rStart
         Dim count As Integer = sorted.ElementAt(0).Value
-        Dim trimCount As Integer
+        Dim trimCount As Integer = 0
         For i = 0 To sorted.Count - 2
             If sorted.ElementAt(i + 1).Key - sorted.ElementAt(i).Key > gapDepth Then
                 rEnd = sorted.ElementAt(i).Key
@@ -3307,7 +3270,7 @@ Public Class Options_Spectrum : Inherits VB_Parent
             Return ranges
         End If
 
-        Dim totalCount As Integer
+        Dim totalCount As Integer = 0
         For i = 0 To pixels.Count - 1
             sorted.Add(pixels(i), counts(i))
             totalCount += counts(i)
@@ -3318,7 +3281,7 @@ Public Class Options_Spectrum : Inherits VB_Parent
         Dim rStart As Integer = sorted.ElementAt(0).Key
         Dim rEnd As Integer = rStart
         Dim count As Integer = sorted.ElementAt(0).Value
-        Dim trimCount As Integer
+        Dim trimCount As Integer = 0
         For i = 0 To sorted.Count - 2
             If sorted.ElementAt(i + 1).Key - sorted.ElementAt(i).Key > gapGray Then
                 rEnd = sorted.ElementAt(i).Key
@@ -3400,7 +3363,7 @@ End Class
 Public Class Options_Complexity : Inherits VB_Parent
     Public filename As FileInfo
     Public filenames As List(Of String)
-    Public plotColor As cv.Scalar = cv.Scalar.Yellow
+    Public plotColor As cv.Scalar = New cv.Scalar(255, 255, 0)
     Public Sub New()
         Dim fnames = Directory.GetFiles(task.HomeDir + "Complexity")
         filenames = fnames.ToList
@@ -3409,7 +3372,7 @@ Public Class Options_Complexity : Inherits VB_Parent
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
 
-            Dim saveIndex As Integer
+            Dim saveIndex As Integer = 0
             For i = 0 To filenames.Count - 1
                 Dim filename = New FileInfo(filenames(i))
                 If filename.FullName = latestFile Then saveIndex = i
@@ -3420,7 +3383,7 @@ Public Class Options_Complexity : Inherits VB_Parent
     End Sub
     Public Function setPlotColor() As cv.Scalar
         Static frm = FindFrm(traceName + " Radio Buttons")
-        Dim index As Integer
+        Dim index As Integer = 0
         For index = 0 To filenames.Count - 1
             If filename.FullName = filenames(index) Then Exit For
         Next
@@ -3560,7 +3523,7 @@ End Class
 
 
 Public Class Options_BGSubtract : Inherits VB_Parent
-    Public learnRate As Single = 100 / 1000
+    Public learnRate As Double = 100 / 1000
     Public methodDesc As String = "MOG2"
     Public currMethod As Integer = 4
     Public Sub New()
@@ -3646,10 +3609,10 @@ End Class
 
 
 Public Class Options_Derivative : Inherits VB_Parent
-    Public channel As Integer = 0 ' assume X Dimension
+    Public channel As Integer = 0
     Dim options As New Options_Sobel
-    Public kernelSize As Integer = options.kernelSize
-    Public derivativeRange As Single = 0.1
+    Public kernelSize As Integer = 3
+    Public derivativeRange As Double = 0.1
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -3704,13 +3667,11 @@ End Class
 
 Public Class Options_Threshold : Inherits VB_Parent
     Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
-    Public thresholdName As String
+    Public thresholdName As String = ""
     Public threshold As Integer = 128
     Public gradient As New Gradient_Color
     Public inputGray As Boolean = False
     Public otsuOption As Boolean = False
-    Dim radioChoices = {cv.ThresholdTypes.Binary, cv.ThresholdTypes.BinaryInv, cv.ThresholdTypes.Tozero,
-                        cv.ThresholdTypes.TozeroInv, cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold value", 0, 255, threshold)
 
@@ -3734,6 +3695,8 @@ Public Class Options_Threshold : Inherits VB_Parent
         dst2 = gradient.dst2
     End Sub
     Public Sub RunVB()
+        Static radioChoices = {cv.ThresholdTypes.Binary, cv.ThresholdTypes.BinaryInv, cv.ThresholdTypes.Tozero,
+                               cv.ThresholdTypes.TozeroInv, cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
         Static frm = FindFrm(traceName + " Radio Buttons")
         Dim index = findRadioIndex(frm.check)
         thresholdMethod = radioChoices(index)
@@ -3756,7 +3719,7 @@ End Class
 
 
 Public Class Options_AdaptiveThreshold : Inherits VB_Parent
-    Public method As cv.AdaptiveThresholdTypes
+    Public method As cv.AdaptiveThresholdTypes = cv.AdaptiveThresholdTypes.GaussianC
     Public blockSize As Integer = 5
     Public constantVal As Integer = 0
     Public Sub New()
@@ -3822,7 +3785,7 @@ End Class
 
 
 Public Class Options_Threshold_AdaptiveMin : Inherits VB_Parent
-    Public adaptiveMethod As cv.AdaptiveThresholdTypes
+    Public adaptiveMethod As cv.AdaptiveThresholdTypes = cv.AdaptiveThresholdTypes.GaussianC
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -3847,15 +3810,13 @@ End Class
 Public Class Options_ThresholdAll : Inherits VB_Parent
     Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
     Public blockSize As Integer = 5
-    Public constantVal As Integer
+    Public constantVal As Integer = 0
     Public maxVal As Integer = 255
     Public threshold As Integer = 100
     Public gradient As New Gradient_Color
     Public inputGray As Boolean = False
     Public otsuOption As Boolean = False
-    Public adaptiveMethod As cv.AdaptiveThresholdTypes
-    Dim radioChoices = {cv.ThresholdTypes.Binary, cv.ThresholdTypes.BinaryInv, cv.ThresholdTypes.Tozero,
-                        cv.ThresholdTypes.TozeroInv, cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
+    Public adaptiveMethod As cv.AdaptiveThresholdTypes = cv.AdaptiveThresholdTypes.GaussianC
     Dim options As New Options_Threshold_AdaptiveMin
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -3885,6 +3846,8 @@ Public Class Options_ThresholdAll : Inherits VB_Parent
         dst2 = gradient.dst2
     End Sub
     Public Sub RunVB()
+        Dim radioChoices = {cv.ThresholdTypes.Binary, cv.ThresholdTypes.BinaryInv, cv.ThresholdTypes.Tozero,
+                        cv.ThresholdTypes.TozeroInv, cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
         options.RunVB()
         adaptiveMethod = options.adaptiveMethod
 
@@ -3941,10 +3904,10 @@ End Class
 
 
 Public Class Options_DFT : Inherits VB_Parent
-    Public radius As Integer = dst2.Rows
+    Public radius As Integer = 120
     Public order As Integer = 2
     Public butterworthFilter(1) As cv.Mat
-    Public dftFlag As cv.DctFlags
+    Public dftFlag As cv.DftFlags = cv.DftFlags.ComplexOutput
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("DFT B Filter - Radius", 1, dst2.Rows, radius)
@@ -4079,10 +4042,10 @@ Public Class Options_Sobel : Inherits VB_Parent
     Public kernelSize As Integer = 3
     Public threshold As Integer = 50
     Public distanceThreshold As Integer = 10
-    Public derivativeRange As Single = 0.1
+    Public derivativeRange As Double = 0.1
     Public horizontalDerivative As Boolean = True
     Public verticalDerivative As Boolean = True
-    Public useBlur As Boolean
+    Public useBlur As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
@@ -4149,8 +4112,8 @@ End Class
 
 
 Public Class Options_AddWeighted : Inherits VB_Parent
-    Public addWeighted As Single = 50 / 100
-    Public accumWeighted As Single = 10 / 100
+    Public addWeighted As Double = 50 / 100
+    Public accumWeighted As Double = 10 / 100
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Add Weighted %", 0, 100, addWeighted * 100)
@@ -4198,8 +4161,8 @@ End Class
 
 
 Public Class Options_Bin3WayRedCloud : Inherits VB_Parent
-    Public startRegion As Integer
-    Public endRegion As Integer
+    Public startRegion As Integer = 0
+    Public endRegion As Integer = 0
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -4239,8 +4202,8 @@ End Class
 
 
 Public Class Options_Bin2WayRedCloud : Inherits VB_Parent
-    Public startRegion As Integer
-    Public endRegion As Integer
+    Public startRegion As Integer = 0
+    Public endRegion As Integer = 0
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -4281,7 +4244,7 @@ End Class
 
 Public Class Options_GuidedBPDepth : Inherits VB_Parent
     Public bins As Integer = 1000
-    Public maxClusters As Single = 5
+    Public maxClusters As Double = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Histogram Bins for depth data", 3, 5000, bins)
@@ -4322,19 +4285,8 @@ End Class
 
 
 
-
-Public Enum FeatureSrc
-    goodFeaturesFull = 0
-    goodFeaturesGrid = 1
-    Agast = 2
-    BRISK = 3
-    Harris = 4
-    FAST = 5
-End Enum
-
-
 Public Class Options_FeatureGather : Inherits VB_Parent
-    Public featureSource As FeatureSrc = FeatureSrc.goodFeaturesFull
+    Public featureSource As Integer = 0
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -4351,7 +4303,7 @@ Public Class Options_FeatureGather : Inherits VB_Parent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                featureSource = Choose(i + 1, FeatureSrc.goodFeaturesFull, FeatureSrc.goodFeaturesGrid, FeatureSrc.Agast,
+                featureSource = Choose(i + 1, FeatureSrc.GoodFeaturesFull, FeatureSrc.GoodFeaturesGrid, FeatureSrc.Agast,
                                        FeatureSrc.BRISK, FeatureSrc.Harris, FeatureSrc.FAST)
                 Exit For
             End If
@@ -4365,9 +4317,9 @@ End Class
 
 
 Public Class Options_AsciiArt : Inherits VB_Parent
-    Public hStep As Single = 31
-    Public wStep As Single = 55
-    Public size As New cv.Size
+    Public hStep As Double = 31
+    Public wStep As Double = 55
+    Public size As cv.Size = New cv.Size(wStep, hStep)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Character height in pixels", 20, 100, hStep)
@@ -4390,11 +4342,10 @@ End Class
 
 
 Public Class Options_MotionDetect : Inherits VB_Parent
-    Public radioChoices As cv.Vec3i()
-    Public threadData As cv.Vec3i
-    Public CCthreshold As Single
-    Public pad As Integer
-    Public stdevThreshold As Integer
+    Public threadData As cv.Vec3i = New cv.Vec3i(0, 0, 0)
+    Public CCthreshold As Double = 0
+    Public pad As Integer = 0
+    Public stdevThreshold As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980)
@@ -4407,15 +4358,16 @@ Public Class Options_MotionDetect : Inherits VB_Parent
             Next
             radio.check(5).Checked = True
         End If
+    End Sub
+    Public Sub RunVB()
         Dim w = dst2.Width
         Dim h = dst2.Height
-        radioChoices = {New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
+        Static radioChoices() As cv.Vec3i = {New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
                         New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
                         New cv.Vec3i(32, w / 8, h / 8), New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
                         New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
                         New cv.Vec3i(32, w / 8, h / 8)}
-    End Sub
-    Public Sub RunVB()
+
         Static correlationSlider = FindSlider("Correlation Threshold")
         Static frm = FindFrm(traceName + " Radio Buttons")
         Static padSlider = FindSlider("Pad size in pixels for the search area")
@@ -4485,11 +4437,11 @@ End Class
 
 
 Public Class Options_BlurTopo : Inherits VB_Parent
-    Public savePercent As Single
-    Public nextPercent As Single = 20
+    Public savePercent As Double = 0
+    Public nextPercent As Double = 20
     Public reduction As Integer = 20
     Public frameCycle As Integer = 50 / 100
-    Public kernelSize As Single = dst2.Width * nextPercent / 100 Or 1
+    Public kernelSize As Double = 101
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Percent of Blurring", 0, 100, nextPercent)
@@ -4519,7 +4471,7 @@ End Class
 
 
 Public Class Options_BoundaryRect : Inherits VB_Parent
-    Public percentRect As Single = 25
+    Public percentRect As Double = 25
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired percent of rectangles", 0, 100, percentRect)
     End Sub
@@ -4538,9 +4490,9 @@ End Class
 
 Public Class Options_BrightnessContrast : Inherits VB_Parent
     Public contrast As Integer = 500
-    Public brightness As Single = -100
-    Public hsvBrightness As Single = 100
-    Public exponent As Single = 30 / 100
+    Public brightness As Double = -100
+    Public hsvBrightness As Double = 100
+    Public exponent As Double = 30 / 100
     Public Sub New()
         Dim alphaDefault = 2000
         Dim betaDefault = -100
@@ -4618,10 +4570,10 @@ End Class
 
 
 Public Class Options_Harris : Inherits VB_Parent
-    Public threshold As Single = 1 / 10000
+    Public threshold As Double = 1 / 10000
     Public neighborhood As Integer = 3
     Public aperture As Integer = 21
-    Public harrisParm As Single = 1
+    Public harrisParm As Double = 1
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Harris Threshold", 1, 100, threshold * 10000)
@@ -4676,9 +4628,9 @@ End Class
 
 
 Public Class Options_Databases : Inherits VB_Parent
-    Public linkAddress As String
-    Dim downloadActive As Boolean
-    Dim downloadIndex As Integer
+    Public linkAddress As String = ""
+    Dim downloadActive As Boolean = False
+    Dim downloadIndex As Integer = 0
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Download the 1.7 Gb 300 Faces In-The-Wild database")
@@ -4737,7 +4689,7 @@ End Class
 
 Public Class Options_EdgeMatching : Inherits VB_Parent '
     Public searchDepth As Integer = 256
-    Public threshold As Single = 80
+    Public threshold As Double = 80
     Public overlayChecked As Boolean = False
     Public highlightChecked As Boolean = True
     Public clearChecked As Boolean = False
@@ -4797,7 +4749,7 @@ End Class
 Public Class Options_CComp : Inherits VB_Parent
     Public light As Integer = 127
     Public dark As Integer = 50
-    Public threshold As Integer
+    Public threshold As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Threshold for lighter input", 1, 255, light)
@@ -4882,7 +4834,7 @@ End Class
 
 Public Class Options_Blob : Inherits VB_Parent
     Dim blob As New Blob_Input
-    Public blobParams = New cv.SimpleBlobDetector.Params
+    Public blobParams As cv.SimpleBlobDetector.Params = New cv.SimpleBlobDetector.Params
     Public Sub New()
         If standaloneTest() Then blob.updateFrequency = 30
 
@@ -4936,7 +4888,7 @@ End Class
 
 
 Public Class Options_SLR : Inherits VB_Parent
-    Public tolerance As Single = 30 / 100
+    Public tolerance As Double = 30 / 100
     Public halfLength As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -4988,14 +4940,14 @@ End Class
 
 
 Public Class Options_Clone : Inherits VB_Parent
-    Public alpha As Single = 2 / 10
-    Public beta As Single = 2 / 10
+    Public alpha As Double = 2 / 10
+    Public beta As Double = 2 / 10
     Public lowThreshold As Integer = 10
     Public highThreshold As Integer = 50
-    Public blueChange As Single = 5 / 10
-    Public greenChange As Single = 5 / 10
-    Public redChange As Single = 15 / 10
-    Public cloneFlag As New cv.SeamlessCloneMethods
+    Public blueChange As Double = 5 / 10
+    Public greenChange As Double = 5 / 10
+    Public redChange As Double = 15 / 10
+    Public cloneFlag As cv.SeamlessCloneMethods = cv.SeamlessCloneMethods.MixedClone
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Alpha", 0, 20, alpha * 10)
@@ -5047,7 +4999,7 @@ End Class
 
 Public Class Options_Coherence : Inherits VB_Parent
     Public sigma As Integer = 9
-    Public blend As Single = 10
+    Public blend As Double = 10
     Public str_sigma As Integer = 155
     Public eigenkernelsize As Integer = 1
     Public Sub New()
@@ -5252,7 +5204,7 @@ End Class
 
 
 Public Class Options_FlatLand : Inherits VB_Parent
-    Public reductionFactor As Single = 10
+    Public reductionFactor As Double = 10
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Region Count", 1, 250, reductionFactor)
     End Sub
@@ -5333,8 +5285,8 @@ End Class
 
 
 Public Class Options_DepthColor : Inherits VB_Parent
-    Public alpha As Single = 5 / 100
-    Public beta As Single = 3
+    Public alpha As Double = 5 / 100
+    Public beta As Double = 3
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Depth ColorMap Alpha X100", 1, 100, alpha * 100)
@@ -5355,13 +5307,13 @@ End Class
 
 
 Public Class Options_DNN : Inherits VB_Parent
-    Public superResModelFileName As String
-    Public shortModelName As String
-    Public superResMultiplier As Integer
-    Public ScaleFactor As Single = 78
-    Public scaleMax As Single = 255
-    Public meanValue As Single = 127
-    Public confidenceThreshold As Single = 80 / 100
+    Public superResModelFileName As String = ""
+    Public shortModelName As String = ""
+    Public superResMultiplier As Integer = 0
+    Public ScaleFactor As Double = 78
+    Public scaleMax As Double = 255
+    Public meanValue As Double = 127
+    Public confidenceThreshold As Double = 80 / 100
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("DNN Scale Factor", 1, 10000, ScaleFactor)
@@ -5441,9 +5393,9 @@ End Class
 
 
 Public Class Options_Edges : Inherits VB_Parent
-    Public scharrMultiplier As Single = 50
-    Public EP_Sigma_s As Single = 10
-    Public EP_Sigma_r As Single = 40
+    Public scharrMultiplier As Double = 50
+    Public EP_Sigma_s As Double = 10
+    Public EP_Sigma_r As Double = 40
     Public recurseCheck As Boolean = True
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -5501,8 +5453,8 @@ End Class
 
 
 Public Class Options_Edges3 : Inherits VB_Parent
-    Public alpha As Single = 100
-    Public omega As Single = 100
+    Public alpha As Double = 100
+    Public omega As Double = 100
     Public gapDistance As Integer = 5
     Public gapdiff As Integer = 10
     Public Sub New()
@@ -5534,7 +5486,7 @@ End Class
 
 Public Class Options_DepthEdges : Inherits VB_Parent
     Public depthDiff As Integer = 200
-    Public depthOffset As Single = 1 / 1000
+    Public depthOffset As Double = 1 / 1000
     Public depthDist As Integer = 5
     Public mmDepthDiff As Integer = 1000 / 1000
     Public Sub New()
@@ -5605,10 +5557,10 @@ End Class
 Public Class Options_Erode : Inherits VB_Parent
     Public kernelSize As Integer = 3
     Public iterations As Integer = 1
-    Public morphShape As cv.MorphShapes
+    Public morphShape As cv.MorphShapes = cv.MorphShapes.Cross
     Public element As cv.Mat
     Public noshape As Boolean = False
-    Public flatDepth As Single = 100
+    Public flatDepth As Double = 100
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Erode Kernel Size", 1, 32, kernelSize)
@@ -5648,8 +5600,8 @@ End Class
 
 
 Public Class Options_Etch_ASketch : Inherits VB_Parent
-    Public demoMode As Boolean
-    Public cleanMode As Boolean
+    Public demoMode As Boolean = False
+    Public cleanMode As Boolean = False
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Etch_ASketch clean slate")
@@ -5685,11 +5637,11 @@ Public Class Options_Features : Inherits VB_Parent
 
     Public featurePoints As Integer = 400
     Public templatePad As Integer = 10
-    Public templateSize As Integer
-    Public correlationMin As Single = 0.75
-    Public resyncThreshold As Single = 0.95
+    Public templateSize As Integer = 0
+    Public correlationMin As Double = 0.75
+    Public resyncThreshold As Double = 0.95
     Public agastThreshold As Integer = 20
-    Public useVertical As Boolean
+    Public useVertical As Boolean = False
     Public Sub New()
         correlationMin = If(dst2.Width > 336, 0.8, 0.9)
         templatePad = If(dst2.Width > 336, 20, 10)
@@ -5817,12 +5769,12 @@ End Class
 
 
 Public Class Options_FLANN : Inherits VB_Parent
-    Public reuseData As Boolean
-    Public matchCount As Integer
-    Public queryCount As Integer
-    Public searchCheck As Integer
-    Public eps As Single
-    Public sorted As Boolean
+    Public reuseData As Boolean = False
+    Public matchCount As Integer = 0
+    Public queryCount As Integer = 0
+    Public searchCheck As Integer = 0
+    Public eps As Double = 0
+    Public sorted As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Query count", 1, 100, 1)
@@ -5947,7 +5899,7 @@ End Class
 
 
 Public Class Options_Gradient : Inherits VB_Parent
-    Public exponent As Single = 30
+    Public exponent As Double = 30
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Contrast exponent to use X100", 0, 200, exponent)
@@ -6054,7 +6006,7 @@ End Class
 Public Class Options_HOG : Inherits VB_Parent
     Public thresholdHOG As Integer = 0
     Public strideHOG As Integer = 1
-    Public scaleHOG As Single = 300 / 1000
+    Public scaleHOG As Double = 300 / 1000
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("HOG Threshold", 0, 100, thresholdHOG)
@@ -6079,12 +6031,12 @@ End Class
 
 
 Public Class Options_Images : Inherits VB_Parent
-    Public fileNameForm As OptionsFileName
-    Public fileIndex As Integer
+    Public fileNameForm As New OptionsFileName
+    Public fileIndex As Integer = 0
     Public fileNameList As New List(Of String)
     Public fileInputName As FileInfo
-    Public dirName As String
-    Public imageSeries As Boolean
+    Public dirName As String = ""
+    Public imageSeries As Boolean = False
     Public fullsizeImage As cv.Mat
     Public Sub New()
         fileNameForm = New OptionsFileName
@@ -6180,11 +6132,10 @@ End Class
 
 
 Public Class Options_Kalman_VB : Inherits VB_Parent
-    Public kalmanInput As Single
-    Public matrix As New List(Of Single)
-    Public noisyInput As Integer
-    Dim oRand As System.Random
-    Public angle As Single
+    Public kalmanInput As Double = 0
+    Public noisyInput As Integer = 0
+    Dim oRand As New System.Random
+    Public angle As Double = 0
     Public Sub New()
         oRand = New System.Random(DateTime.Now.Millisecond)
         If sliders.Setup(traceName) Then
@@ -6200,6 +6151,7 @@ Public Class Options_Kalman_VB : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
+        Static matrix As New List(Of Double)
         Static inputSlider = FindSlider("Move this to see results")
         Static noisyInputSlider = FindSlider("Input with Noise")
         Static pointSlider = FindSlider("20 point average of output")
@@ -6212,7 +6164,7 @@ Public Class Options_Kalman_VB : Inherits VB_Parent
 
         kalmanInput = inputSlider.Value
 
-        Dim scalefactor As Single = (scaleSlider.Value / 100) + 1 'This should be between 1 and 2
+        Dim scalefactor As Double = (scaleSlider.Value / 100) + 1 'This should be between 1 and 2
         Dim iRand = oRand.Next(0, noiseSlider.Value)
         noisyInput = CInt((kalmanInput * scalefactor) + biasSlider.Value + iRand - (noiseSlider.Value / 2))
 
@@ -6233,7 +6185,7 @@ Public Class Options_Kalman_VB : Inherits VB_Parent
             If AverageDiff > avgSlider.Maximum Then AverageDiff = avgSlider.Maximum
             avgSlider.Value = AverageDiff
 
-            Dim KalmanOutput As Single = angle
+            Dim KalmanOutput As Double = angle
 
             If KalmanOutput < 0 Then KalmanOutput = 0
             If KalmanOutput > outputSlider.Maximum Then KalmanOutput = outputSlider.Maximum
@@ -6252,9 +6204,9 @@ End Class
 
 
 Public Class Options_Kalman : Inherits VB_Parent
-    Public delta As Single = 5 / 100
-    Public pdotEntry As Single = 300 / 1000
-    Public processCovar As Single = 10 / 10000
+    Public delta As Double = 5 / 100
+    Public pdotEntry As Double = 300 / 1000
+    Public processCovar As Double = 10 / 10000
     Public averageInputCount As Integer = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -6478,7 +6430,7 @@ End Class
 
 
 Public Class Options_MeanSubtraction : Inherits VB_Parent
-    Public scaleVal As Single = 1
+    Public scaleVal As Double = 1
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Scaling Factor = mean/scaling factor X100", 1, 500, scaleVal * 100)
@@ -6512,8 +6464,8 @@ End Class
 
 
 Public Class Options_OEX : Inherits VB_Parent
-    Public lows As New cv.Scalar(90, 50, 50)
-    Public highs As New cv.Scalar(180, 150, 150)
+    Public lows As cv.Scalar = New cv.Scalar(90, 50, 50)
+    Public highs As cv.Scalar = New cv.Scalar(180, 150, 150)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Hue low", 0, 180, lows(0))
@@ -6560,7 +6512,7 @@ Public Class Options_Palette : Inherits VB_Parent
     Public transitions As Integer = 7
     Public convertScale As Integer = 45
     Public schemeName As String = "schemeRandom"
-    Public radius As Integer
+    Public radius As Integer = 0
     Public schemes() As FileInfo
     Public Sub New()
         radius = dst2.Cols / 2
@@ -6672,10 +6624,10 @@ End Class
 
 
 Public Class Options_PlyFormat : Inherits VB_Parent
-    Public fileNameForm As OptionsFileName
-    Public fileName As String
-    Public playButton As String
-    Public allOptionsLeft As Integer
+    Public fileNameForm As New OptionsFileName
+    Public fileName As String = ""
+    Public playButton As String = ""
+    Public allOptionsLeft As Integer = 0
     Public saveFileName As String = ""
     Public Sub New()
         fileNameForm = New OptionsFileName
@@ -6704,7 +6656,7 @@ Public Class Options_PlyFormat : Inherits VB_Parent
             If testDir.Directory.Name = "Temp" Then MkDir(testDir.Directory.FullName)
         End If
 
-        If saveFileName <> fileName and filename.Length > 0 Then
+        If saveFileName <> fileName And fileName.Length > 0 Then
             SaveSetting("OpenCVB", "plyFileName", "plyFileName", fileName)
             saveFileName = fileName
         End If
@@ -6718,7 +6670,7 @@ End Class
 
 
 Public Class Options_PointCloud : Inherits VB_Parent
-    Public deltaThreshold As Single = 5
+    Public deltaThreshold As Double = 5
     Public Sub New()
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Delta Z threshold (cm)", 0, 100, deltaThreshold)
     End Sub
@@ -6823,7 +6775,7 @@ Public Class Options_PyrFilter : Inherits VB_Parent
     Public maxPyramid As Integer = 3
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("MeanShift Spatial Radius", 1, 100, Spatialradius)
+            sliders.setupTrackBar("MeanShift Spatial Radius", 1, 100, spatialRadius)
             sliders.setupTrackBar("MeanShift color Radius", 1, 100, colorRadius)
             sliders.setupTrackBar("MeanShift Max Pyramid level", 1, 8, maxPyramid)
         End If
@@ -6832,7 +6784,7 @@ Public Class Options_PyrFilter : Inherits VB_Parent
         Static radiusSlider = FindSlider("MeanShift Spatial Radius")
         Static colorSlider = FindSlider("MeanShift color Radius")
         Static maxSlider = FindSlider("MeanShift Max Pyramid level")
-        Spatialradius = radiusSlider.value
+        spatialRadius = radiusSlider.value
         colorRadius = colorSlider.value
         maxPyramid = maxSlider.value
     End Sub
@@ -6895,7 +6847,7 @@ End Class
 
 Public Class Options_StaticTV : Inherits VB_Parent
     Public rangeVal As Integer = 50
-    Public threshPercent As Single = 20
+    Public threshPercent As Double = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Range of noise to apply (from 0 to this value)", 0, 255, rangeVal)
@@ -6919,7 +6871,7 @@ End Class
 Public Class Options_Clusters : Inherits VB_Parent
     Public numClusters As Integer = 9
     Public numPoints As Integer = 20
-    Public stdev As Single = 10
+    Public stdev As Double = 10
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Number of Clusters", 1, 10, numClusters)
@@ -6995,7 +6947,7 @@ End Class
 Public Class Options_RedCloudOther : Inherits VB_Parent
     Public range As Integer = 30
     Public reduceAmt As Integer = 250
-    Public threshold As Single = 95 / 100
+    Public threshold As Double = 95 / 100
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Grayscale range around mean", 0, 100, range)
@@ -7119,7 +7071,7 @@ End Class
 
 
 Public Class Options_ROI : Inherits VB_Parent
-    Public roiPercent As Single = 25 / 100
+    Public roiPercent As Double = 25 / 100
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, roiPercent * 100)
     End Sub
@@ -7135,7 +7087,7 @@ End Class
 
 
 Public Class Options_Rotate : Inherits VB_Parent
-    Public rotateAngle As Single = 24
+    Public rotateAngle As Double = 24
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees", -180, 180, rotateAngle)
     End Sub
@@ -7193,7 +7145,7 @@ End Class
 
 
 Public Class Options_StabilizerOther : Inherits VB_Parent
-    Public fastThreshold As Integer
+    Public fastThreshold As Integer = 0
     Public range As Integer = 8
     Public Sub New()
         fastThreshold = task.FASTthreshold
@@ -7205,7 +7157,7 @@ Public Class Options_StabilizerOther : Inherits VB_Parent
     Public Sub RunVB()
         Static thresholdSlider = FindSlider("FAST Threshold")
         Static rangeSlider = FindSlider("Range of random motion introduced (absolute value in pixels)")
-        Range = rangeSlider.Value
+        range = rangeSlider.Value
         fastThreshold = thresholdSlider.value
     End Sub
 End Class
@@ -7252,8 +7204,8 @@ End Class
 
 Public Class Options_Stitch : Inherits VB_Parent
     Public imageCount As Integer = 10
-    Public width As Integer
-    Public height As Integer
+    Public width As Integer = 0
+    Public height As Integer = 0
     Public Sub New()
         width = task.WorkingRes.Width / 2
         height = task.WorkingRes.Height / 2
@@ -7314,7 +7266,7 @@ Public Class Options_StructuredCloud : Inherits VB_Parent
     Public threshold As Integer = 10
     Public xConstraint As Boolean = True
     Public yConstraint As Boolean = True
-    Public Sub New() 
+    Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Lines in X-Direction", 0, 200, xLines)
             sliders.setupTrackBar("Lines in Y-Direction", 0, 200, yLines)
@@ -7348,7 +7300,7 @@ Public Class Options_StructuredCloud : Inherits VB_Parent
         yConstraint = yCheck.checked
 
         indexX = xSlider.value
-        indexy = ySlider.value
+        indexY = ySlider.value
     End Sub
 End Class
 
@@ -7452,7 +7404,7 @@ End Class
 
 
 Public Class Options_SwarmPercent : Inherits VB_Parent
-    Public percent As Single = 80 / 100
+    Public percent As Double = 80 / 100
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, percent * 100)
     End Sub
@@ -7550,8 +7502,8 @@ Public Class Options_Transform : Inherits VB_Parent
     Public scale As Double = 1
     Public firstCheck As Boolean = False
     Public secondCheck As Boolean = False
-    Public centerX As Integer
-    Public centerY As Integer
+    Public centerX As Integer = 0
+    Public centerY As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Resize Percent", 50, 1000, resizeFactor * 100)
@@ -7620,7 +7572,7 @@ End Class
 
 
 Public Class Options_Video : Inherits VB_Parent
-    Public fileNameForm As OptionsFileName
+    Public fileNameForm As New OptionsFileName
     Public fileInfo As FileInfo
     Public maxFrames As Integer = 1000
     Public currFrame As Integer = 0
@@ -7678,8 +7630,8 @@ End Class
 
 
 Public Class Options_WarpPerspective : Inherits VB_Parent
-    Public width As Integer
-    Public height As Integer
+    Public width As Integer = 0
+    Public height As Integer = 0
     Public angle As Integer = 0
     Public Sub New()
         width = dst2.Cols - 50
@@ -7732,7 +7684,7 @@ End Class
 
 Public Class Options_Density : Inherits VB_Parent
     Public zCount As Integer = 3
-    Public distance As Double
+    Public distance As Double = 0
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Distance in meters X10000", 1, 2000, task.densityMetric)

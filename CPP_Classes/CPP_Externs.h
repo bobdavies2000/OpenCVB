@@ -41,8 +41,6 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {task->alg = new RedCloud_Basics_CPP(); break; } 
     case _BGSubtract_Basics_CPP :
 	{task->alg = new BGSubtract_Basics_CPP(); break; } 
-	case _Feature_StableSorted_CPP :
-	{task->alg = new Feature_StableSorted_CPP(); break; } 
     case _Plot_Histogram2D_CPP :
     {task->alg = new Plot_Histogram2D_CPP(); break; } 
     case _Hist_RedOptions_CPP :
@@ -61,8 +59,6 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new Mat_4Click_CPP(); break; } 
 	case _Area_MinRect_CPP :
 	{task->alg = new Area_MinRect_CPP(); break; } 
-	case _Mesh_Features_CPP :
-	{task->alg = new Mesh_Features_CPP(); break; } 
 	case _Mesh_Agast_CPP :
 	{task->alg = new Mesh_Agast_CPP(); break; } 
 	case _Mesh_Basics_CPP :
@@ -91,8 +87,6 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new Kalman_Basics_CPP(); break; } 
 	case _RedCloud_Reduce_CPP :
 	{task->alg = new RedCloud_Reduce_CPP(); break; } 
-	case _FPoly_TopFeatures_CPP :
-	{task->alg = new FPoly_TopFeatures_CPP(); break; } 
 	case _Random_Enumerable_CPP :
 	{task->alg = new Random_Enumerable_CPP(); break; } 
     case _Bezier_Basics_CPP :
@@ -113,12 +107,6 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {task->alg = new KNN_Basics_CPP();break;}
     case _Delaunay_Generations_CPP :
     {task->alg = new Delaunay_Generations_CPP();break;}
-    case _Stable_Basics_CPP :
-    {task->alg = new Stable_Basics_CPP();break;}
-    case _Feature_Basics_CPP :
-    {task->alg = new Feature_Basics_CPP();break;}
-	case _Stable_BasicsCount_CPP :
-	{task->alg = new Stable_BasicsCount_CPP();break;}
 	case _Remap_Basics_CPP :
 	{task->alg = new Remap_Basics_CPP();break;}
 	case _Edge_Canny_CPP :

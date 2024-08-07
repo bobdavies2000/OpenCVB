@@ -706,11 +706,11 @@ Public Class Feature_Gather : Inherits VB_Parent
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Select Case myOptions.featureSource
-            Case FeatureSrc.goodFeaturesFull
+            Case FeatureSrc.GoodFeaturesFull
                 features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.goodFeaturesGrid
+            Case FeatureSrc.GoodFeaturesGrid
                 options.featurePoints = 4
                 features.Clear()
                 For i = 0 To task.gridList.Count - 1

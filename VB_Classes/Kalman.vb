@@ -450,9 +450,6 @@ Public Class Kalman_VB : Inherits VB_Parent
     Dim options As New Options_Kalman_VB
     Public Sub New()
         oRand = New Random(DateTime.Now.Millisecond)
-        For i = 0 To MAX_INPUT - 1
-            options.matrix.Add(0)
-        Next
         desc = "A native VB Kalman filter"
     End Sub
     Public Sub State_Update(ByVal q_m As Single)

@@ -46,6 +46,14 @@ Public Class VB_Parent : Implements IDisposable
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
 
     Dim callStack = ""
+    Public Enum FeatureSrc
+        GoodFeaturesFull = 0
+        GoodFeaturesGrid = 1
+        Agast = 2
+        BRISK = 3
+        Harris = 4
+        FAST = 5
+    End Enum
     Public Sub New()
         algorithm = Me
         traceName = Me.GetType.Name

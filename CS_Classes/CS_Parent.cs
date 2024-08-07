@@ -40,6 +40,15 @@ namespace CS_Classes
         string callStack = "";
         public int depthListMaxCount = 10;
 
+        public enum FeatureSrc
+        {
+            GoodFeaturesFull = 0,
+            GoodFeaturesGrid = 1,
+            Agast = 2,
+            BRISK = 3,
+            Harris = 4,
+            FAST = 5
+        }
         public CS_Parent(VBtask _task)
         {
             this.task = _task;
@@ -92,9 +101,9 @@ namespace CS_Classes
                 }
                 img.ReleaseHdc();
             }
-
             return b;
         }
+
 
         public cv.Scalar vecToScalar(cv.Vec3b v)
         {

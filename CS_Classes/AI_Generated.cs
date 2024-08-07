@@ -29,7 +29,7 @@ namespace CS_Classes
 {
     public class AddWeighted_Basics_CS : CS_Parent
     {
-        public Single weight;
+        public double weight;
         public Mat src2;
         public Options_AddWeighted options = new Options_AddWeighted();
 
@@ -1794,7 +1794,7 @@ namespace CS_Classes
             addW.RunAndMeasure(dst3, addW);
             dst2 = addW.dst2;
 
-            float wt = addW.weight;
+            double wt = addW.weight;
             labels[2] = "AddWeighted: " + wt.ToString("0.0") + " actual vs. " + (1 - wt).ToString("0.0") + " Benford distribution";
         }
     }
@@ -7262,7 +7262,7 @@ namespace CS_Classes
             options.RunVB();
 
             clone.cloneSpec = 0;
-            clone.colorChangeValues = new Vec3f(options.blueChange, options.greenChange, options.redChange);
+            clone.colorChangeValues = new Vec3f((float)options.blueChange, (float)options.greenChange, (float)options.redChange);
             clone.Run(src);
             dst2 = clone.dst2;
             dst3 = clone.dst3;
@@ -7289,7 +7289,7 @@ namespace CS_Classes
             options.RunVB();
 
             clone.cloneSpec = 1;
-            clone.illuminationChangeValues = new Vec2f(options.alpha, options.beta);
+            clone.illuminationChangeValues = new Vec2f((float)options.alpha, (float)options.beta);
             clone.Run(src);
             dst2 = clone.dst2;
             dst3 = clone.dst3;
@@ -10077,8 +10077,8 @@ namespace CS_Classes
             byte[] dataSrc = new byte[src.Total() * src.Channels()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
             GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
-            IntPtr imagePtr = Harris_Features_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.threshold,
-                                                  (short)options.neighborhood, (short)options.aperture, options.harrisParm);
+            IntPtr imagePtr = Harris_Features_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, (float)options.threshold,
+                                                  (short)options.neighborhood, (short)options.aperture, (float)options.harrisParm);
             handleSrc.Free();
 
             Mat gray32f = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr);
@@ -13160,7 +13160,7 @@ namespace CS_Classes
                 src = task.pcSplit[options.channel].Sobel(MatType.CV_32F, 1, 0, options.kernelSize);
             }
 
-            Rangef[] ranges = { new Rangef(-options.derivativeRange, options.derivativeRange) };
+            Rangef[] ranges = { new Rangef((float)-options.derivativeRange, (float)options.derivativeRange) };
             Mat histogram = new Mat();
             Cv2.CalcHist(new[] { src }, new[] { 0 }, task.depthMask, histogram, 1, new[] { task.histogramBins }, ranges);
 
@@ -15036,19 +15036,23 @@ namespace CS_Classes
             options.RunVB();
             if (options.recurseCheck)
             {
-                Cv2.EdgePreservingFilter(src, dst2, EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r);
+                Cv2.EdgePreservingFilter(src, dst2, EdgePreservingMethods.RecursFilter, (float)options.EP_Sigma_s,
+                                        (float)options.EP_Sigma_r);
             }
             else
             {
-                Cv2.EdgePreservingFilter(src, dst2, EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r);
+                Cv2.EdgePreservingFilter(src, dst2, EdgePreservingMethods.NormconvFilter, (float)options.EP_Sigma_s,
+                                        (float)options.EP_Sigma_r);
             }
             if (options.recurseCheck)
             {
-                Cv2.EdgePreservingFilter(task.depthRGB, dst3, EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r);
+                Cv2.EdgePreservingFilter(task.depthRGB, dst3, EdgePreservingMethods.RecursFilter, (float)options.EP_Sigma_s,
+                                        (float)options.EP_Sigma_r);
             }
             else
             {
-                Cv2.EdgePreservingFilter(task.depthRGB, dst3, EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r);
+                Cv2.EdgePreservingFilter(task.depthRGB, dst3, EdgePreservingMethods.NormconvFilter, (float)options.EP_Sigma_s,
+                                        (float)options.EP_Sigma_r);
             }
         }
     }
@@ -15126,7 +15130,8 @@ namespace CS_Classes
             var dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
             var handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
-            var imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega);
+            var imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                           (float)options.alpha, (float)options.omega);
             handleSrc.Free();
             if (imagePtr != (IntPtr)0)
                 dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
@@ -17349,9 +17354,10 @@ namespace CS_Classes
             }
             featureMat = new List<Mat>(matList);
             task.features = new List<cv.Point2f>(ptList);
-            float extra = 1 + (1 - options.resyncThreshold);
+            double extra = 1 + (1 - options.resyncThreshold);
             task.featureMotion = true;
-            if (task.features.Count < gather.features.Count * options.resyncThreshold || task.features.Count > extra * gather.features.Count)
+            if (task.features.Count < gather.features.Count * options.resyncThreshold || 
+                task.features.Count > extra * gather.features.Count)
             {
                 ptLost.Clear();
                 featureMat.Clear();
@@ -18017,12 +18023,12 @@ namespace CS_Classes
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             switch (myOptions.featureSource)
             {
-                case FeatureSrc.goodFeaturesFull:
+                case (int) FeatureSrc.GoodFeaturesFull:
                     features = new List<cv.Point2f>(Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, null,
                                                           options.blockSize, true, options.k));
                     labels[2] = $"GoodFeatures produced {features.Count} features";
                     break;
-                case FeatureSrc.goodFeaturesGrid:
+                case (int) FeatureSrc.GoodFeaturesGrid:
                     options.featurePoints = 4;
                     features.Clear();
                     for (int i = 0; i < task.gridList.Count; i++)
@@ -18037,7 +18043,7 @@ namespace CS_Classes
                     }
                     labels[2] = $"GoodFeatures produced {features.Count} features";
                     break;
-                case FeatureSrc.Agast:
+                case (int) FeatureSrc.Agast:
                     src = task.color.Clone();
                     byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
                     Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
@@ -18057,17 +18063,17 @@ namespace CS_Classes
                     }
                     labels[2] = $"GoodFeatures produced {features.Count} features";
                     break;
-                case FeatureSrc.BRISK:
+                case (int) FeatureSrc.BRISK:
                     brisk.Run(src);
                     features = brisk.features;
                     labels[2] = $"GoodFeatures produced {features.Count} features";
                     break;
-                case FeatureSrc.Harris:
+                case (int) FeatureSrc.Harris:
                     harris.Run(src);
                     features = harris.features;
                     labels[2] = $"Harris Detector produced {features.Count} features";
                     break;
-                case FeatureSrc.FAST:
+                case (int) FeatureSrc.FAST:
                     FAST.Run(src);
                     features = FAST.features;
                     labels[2] = $"FAST produced {features.Count} features";
@@ -18113,7 +18119,7 @@ namespace CS_Classes
         }
         public void buildCorrelations(List<cv.Point> prevFeatures, List<cv.Point> currFeatures)
         {
-            float correlationMin = feat.options.correlationMin;
+            double correlationMin = feat.options.correlationMin;
             Mat correlationmat = new Mat();
             mpList.Clear();
             mpCorrelation.Clear();
@@ -18195,8 +18201,8 @@ namespace CS_Classes
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             options.RunVB();
             Mat lastGray = src.Clone();
-            Mat hsv = opticalFlow_Dense(lastGray, src, options.pyrScale, options.levels, options.winSize, options.iterations, options.polyN,
-                                        options.polySigma, options.OpticalFlowFlags);
+            Mat hsv = opticalFlow_Dense(lastGray, src, (float)options.pyrScale, options.levels, options.winSize, 
+                                        options.iterations, (float)options.polyN, (float)options.polySigma, options.OpticalFlowFlags);
             dst2 = hsv.CvtColor(ColorConversionCodes.HSV2RGB);
             dst2 = dst2.ConvertScaleAbs(options.outputScaling);
             dst3 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -19738,7 +19744,7 @@ namespace CS_Classes
         {
             options.RunVB();
             dst2 = src.Clone();
-            float correlationMin = match1.options.correlationMin;
+            double correlationMin = match1.options.correlationMin;
             int templatePad = match1.options.templatePad;
             int templateSize = match1.options.templateSize;
             cv.Point2f p1 = new cv.Point(), p2 = new cv.Point();
@@ -22203,7 +22209,8 @@ namespace CS_Classes
                     var query = new Mat(1, 2, MatType.CV_32F);
                     query.Set<float>(0, 0, pt1.X);
                     query.Set<float>(0, 1, pt1.Y);
-                    nnIndex.KnnSearch(query, out indices, out distances, matchCount, new cv.Flann.SearchParams(options.searchCheck, options.eps, options.sorted));
+                    nnIndex.KnnSearch(query, out indices, out distances, matchCount, 
+                                      new cv.Flann.SearchParams(options.searchCheck, (float)options.eps, options.sorted));
                     for (int j = 0; j < matchCount; j++)
                     {
                         int index = indices[j];
@@ -31663,14 +31670,14 @@ namespace CS_Classes
         public void State_Update(float q_m)
         {
             float unbias = q_m - q_bias; // Unbias our gyro
-            float[] Pdot = new float[] { processCovar - P[0, 1] - P[1, 0], -P[1, 1], -P[1, 1], options.pdotEntry };
-            kOutput += unbias * options.delta;
+            float[] Pdot = new float[] { processCovar - P[0, 1] - P[1, 0], -P[1, 1], -P[1, 1], (float)options.pdotEntry };
+            kOutput += (float)(unbias * options.delta);
             plot.plotCount = 3;
             // Update the covariance matrix
-            P[0, 0] += Pdot[0] * options.delta;
-            P[0, 1] += Pdot[1] * options.delta;
-            P[1, 0] += Pdot[2] * options.delta;
-            P[1, 1] += Pdot[3] * options.delta;
+            P[0, 0] += (float)(Pdot[0] * options.delta);
+            P[0, 1] += (float)(Pdot[1] * options.delta);
+            P[1, 0] += (float)(Pdot[2] * options.delta);
+            P[1, 1] += (float)(Pdot[3] * options.delta);
         }
         public void Kalman_Update()
         {
@@ -31753,34 +31760,34 @@ namespace CS_Classes
             if (src.Channels() == 3)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             TermCriteria term = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.Count, 10, 1.0);
-            if (options.inputPoints == null)
+            if (options.ptInput == null)
             {
-                options.inputPoints = Cv2.GoodFeaturesToTrack(src, options.maxCorners, options.qualityLevel,
+                options.ptInput = Cv2.GoodFeaturesToTrack(src, options.maxCorners, options.qualityLevel,
                                                               options.minDistance, new Mat(), options.blockSize, false, 0);
-                if (options.inputPoints.Length > 0)
+                if (options.ptInput.Length > 0)
                 {
-                    options.inputPoints = Cv2.CornerSubPix(src, options.inputPoints, options.subPixWinSize, new cv.Size(-1, -1), term);
+                    options.ptInput = Cv2.CornerSubPix(src, options.ptInput, options.subPixWinSize, new cv.Size(-1, -1), term);
                 }
-                outputMat = cv.Mat.FromPixelData(options.inputPoints.Length, 1, MatType.CV_32FC2, options.inputPoints);
+                outputMat = cv.Mat.FromPixelData(options.ptInput.Length, 1, MatType.CV_32FC2, options.ptInput);
                 status = new Mat(outputMat.Rows, outputMat.Cols, MatType.CV_8U, cv.Scalar.All(1));
             }
-            else if (options.inputPoints.Length > 0)
+            else if (options.ptInput.Length > 0)
             {
                 Mat err = new Mat();
                 // convert the point2f vector to an inputarray (cv.Mat)
-                Mat inputMat = cv.Mat.FromPixelData(options.inputPoints.Length, 1, MatType.CV_32FC2, options.inputPoints);
+                Mat inputMat = cv.Mat.FromPixelData(options.ptInput.Length, 1, MatType.CV_32FC2, options.ptInput);
                 outputMat = inputMat.Clone();
                 Cv2.CalcOpticalFlowPyrLK(lastGray, src, inputMat, outputMat, status, err, options.winSize, 3, term, OpticalFlowFlags.None);
                 int k = 0;
-                for (int i = 0; i < options.inputPoints.Length; i++)
+                for (int i = 0; i < options.ptInput.Length; i++)
                 {
                     if (status.Get<byte>(i) != 0)
                     {
-                        options.inputPoints[k] = outputMat.Get<cv.Point2f>(i);
+                        options.ptInput[k] = outputMat.Get<cv.Point2f>(i);
                         k++;
                     }
                 }
-                Array.Resize(ref options.inputPoints, k);
+                Array.Resize(ref options.ptInput, k);
             }
             for (int i = 0; i < outputMat.Rows; i++)
             {
@@ -31798,7 +31805,7 @@ namespace CS_Classes
                 }
             }
             lastGray = src.Clone();
-            labels[2] = "KLT Basics - " + (options.inputPoints == null ? "0" : options.inputPoints.Length.ToString()) + " points";
+            labels[2] = "KLT Basics - " + (options.ptInput == null ? "0" : options.ptInput.Length.ToString()) + " points";
         }
     }
 
@@ -31816,22 +31823,22 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             klt.Run(src);
-            if (task.frameCount > 0 && lastpoints != null && klt.options.inputPoints != null)
+            if (task.frameCount > 0 && lastpoints != null && klt.ptInput != null)
             {
                 dst2 = klt.dst2;
                 src.CopyTo(dst3);
-                for (int i = 0; i < klt.options.inputPoints.Length; i++)
+                for (int i = 0; i < klt.ptInput.Length; i++)
                 {
-                    if (klt.status.Get<byte>(i) != 0 && i < lastpoints.Length && i < klt.options.inputPoints.Length)
+                    if (klt.status.Get<byte>(i) != 0 && i < lastpoints.Length && i < klt.ptInput.Length)
                     {
-                        // DrawLine(dst2, lastpoints[i], klt.inputPoints[i], Scalar.Yellow, task.lineWidth + 1, task.lineType);
-                        // static Point2f[] lastFlowPoints = klt.inputPoints;
-                        // DrawLine(dst3, lastFlowPoints[i], klt.inputPoints[i], Scalar.Yellow, task.lineWidth + 1, task.lineType);
-                        // if (task.heartBeat) lastFlowPoints = klt.inputPoints;
+                        // DrawLine(dst2, lastpoints[i], klt.ptInput[i], Scalar.Yellow, task.lineWidth + 1, task.lineType);
+                        // static Point2f[] lastFlowPoints = klt.ptInput;
+                        // DrawLine(dst3, lastFlowPoints[i], klt.ptInput[i], Scalar.Yellow, task.lineWidth + 1, task.lineType);
+                        // if (task.heartBeat) lastFlowPoints = klt.ptInput;
                     }
                 }
             }
-            lastpoints = klt.options.inputPoints;
+            lastpoints = klt.ptInput;
         }
     }
 
@@ -35065,7 +35072,7 @@ namespace CS_Classes
                 match.Run(src);
                 vert.tc1 = match.tCells[0];
                 vert.tc2 = match.tCells[1];
-                float correlationMin = verts.options.correlationMin;
+                double correlationMin = verts.options.correlationMin;
                 if (vert.tc1.correlation >= correlationMin && vert.tc2.correlation >= correlationMin)
                 {
                     lines2.Add(vert.tc1.center);
@@ -41451,9 +41458,9 @@ namespace CS_Classes
             task.redOptions.setUseColorOnly(true);
             FindCheckBox("Use grayscale input").Checked = false;
             options.RunVB();
-            cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
-                                options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize,
-                                options.pass2Setting);
+            cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, (float)options.maxVariation,
+                             (float)options.minDiversity, options.maxEvolution, (float)options.areaThreshold,
+                              (float)options.minMargin, options.edgeBlurSize, options.pass2Setting);
             desc = "MSER in a nutshell: intensity threshold, stability, maximize region, adaptive threshold.";
         }
         public void RunCS(Mat src)
@@ -41462,9 +41469,9 @@ namespace CS_Classes
             if (task.optionsChanged)
             {
                 MSER_Close(cPtr);
-                cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
-                                    options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize,
-                                    options.pass2Setting);
+                cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, (float)options.maxVariation,
+                                 (float)options.minDiversity, options.maxEvolution, (float)options.areaThreshold,
+                                 (float)options.minMargin, options.edgeBlurSize, options.pass2Setting);
             }
             if (options.graySetting && src.Channels() == 3)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -41642,9 +41649,9 @@ namespace CS_Classes
         {
             FindCheckBox("Use grayscale input").Checked = false;
             options.RunVB();
-            cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
-                                options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize,
-                                (int)options.pass2Setting);
+            cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, (float)options.maxVariation,
+                             (float)options.minDiversity, options.maxEvolution, (float)options.areaThreshold,
+                              (float)options.minMargin, options.edgeBlurSize, (int)options.pass2Setting);
             desc = "C++ version of MSER basics.";
         }
         public void RunCS(Mat src)
@@ -41653,9 +41660,9 @@ namespace CS_Classes
             if (task.optionsChanged)
             {
                 MSER_Close(cPtr);
-                cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
-                                    options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize,
-                                    options.pass2Setting);
+                cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, (float)options.maxVariation,
+                                 (float)options.minDiversity, options.maxEvolution, (float)options.areaThreshold,
+                                  (float)options.minMargin, options.edgeBlurSize, options.pass2Setting);
             }
             if (options.graySetting && src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
@@ -55361,7 +55368,7 @@ namespace CS_Classes
         public Mat M;
         public Mat Mflip;
         public Options_Resize options = new Options_Resize();
-        public float rotateAngle = 1000;
+        public double rotateAngle = 1000;
         public Point2f rotateCenter;
         Options_Rotate optionsRotate = new Options_Rotate();
         public Rotate_Basics_CS(VBtask task) : base(task)
