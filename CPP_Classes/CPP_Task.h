@@ -157,7 +157,7 @@ vector<Scalar> HighlightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
 
 Size WorkingRes;
 
-class algorithmCPP
+class CPP_Parent
 {
 public:
     Mat dst0, dst1, dst2, dst3, empty;
@@ -167,7 +167,7 @@ public:
     int* cPtr;
     string traceName;
     vector<string> labels{ "", "", "", "" };
-    algorithmCPP()
+    CPP_Parent()
     {
         dst0 = Mat(WorkingRes.height, WorkingRes.width, CV_8UC3);
         dst0.setTo(0);
@@ -192,7 +192,7 @@ class cppTask
 {
 private:
 public:
-    algorithmCPP* alg;
+    CPP_Parent* alg;
     Mat color, depthRGB, depth32f, pointCloud, gCloud, leftView, rightView;
     int cppFunction; int lineWidth; int lineType;
     int gridRows, gridCols;

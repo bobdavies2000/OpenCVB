@@ -3019,13 +3019,13 @@ int* xPhoto_Inpaint_Run(xPhoto_Inpaint * cPtr, int* imagePtr, int* maskPtr, int 
 
 
 
-class Random_Basics : public algorithmCPP {
+class Random_Basics : public CPP_Parent {
 public:
     vector<Point2f> pointList;
     Rect range;
     int sizeRequest = 10;
 
-	Random_Basics() : algorithmCPP() {
+	Random_Basics() : CPP_Parent() {
         traceName = "Random_Basics";
         desc = "Create a uniform random mask with a specified number of pixels.";
     }
