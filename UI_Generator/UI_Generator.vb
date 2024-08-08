@@ -249,19 +249,21 @@ Module UI_GeneratorMain
 
         Dim cppAlgorithmInput = New FileInfo("../CPP_Classes/CPP_Algorithms.h")
         Dim CPPIncludeOnly = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
-        Dim CSInputs = {New FileInfo("../CS_Classes/AI_Generated.cs").FullName,
+        Dim CSInputs = {New FileInfo("../CS_Classes/CS_AI_Generated.cs").FullName,
                         New FileInfo("../CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../VB_classes/")
         If cppAlgorithmInput.Exists = False Then
             cppAlgorithmInput = New FileInfo("../../CPP_Classes/CPP_Algorithms.h")
             CPPIncludeOnly = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
-            CSInputs = {New FileInfo("../../CS_Classes/AI_Generated.cs").FullName,
+            CSInputs = {New FileInfo("../../CS_Classes/CS_AI_Generated.cs").FullName,
                         New FileInfo("../../CS_Classes/Non_AI.cs").FullName}
             VBcodeDir = New DirectoryInfo(CurDir() + "/../../VB_classes/")
         End If
         Dim HomeDir As New DirectoryInfo(VBcodeDir.FullName + "/../")
         Dim OptionsFile = New FileInfo(VBcodeDir.FullName + "Options.vb")
 
+        Dim includeOptions = New FileInfo(VBcodeDir.FullName + "/../CPP_Classes/Options.h")
+        includeOptions.Delete()
         ConvertOptionsToCPP(OptionsFile)
 
         Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/AlgorithmGroupNames.txt")

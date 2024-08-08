@@ -4,7 +4,7 @@ Imports System.Text
 Imports OpenCvSharp
 
 Public Class CPP_Basics : Inherits VB_Parent
-    Public cppFunction As Integer
+    Dim cppFunction As Integer
     Public result As cv.Mat
     Public neighbors As New List(Of cv.Point2f)
     Public neighborIndexToTrain As List(Of Integer)

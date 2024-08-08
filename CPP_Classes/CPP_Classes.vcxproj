@@ -22,7 +22,7 @@
     <ClInclude Include="CPP_Algorithms.h" />
     <ClInclude Include="CPP_Externs.h" />
     <ClInclude Include="CPP_FunctionNames.h" />
-    <ClInclude Include="CPP_Task.h" />
+    <ClInclude Include="CPP_Parent.h" />
     <ClInclude Include="CPP_AI_Generated.h" />
     <ClInclude Include="CvHMM.h" />
     <ClInclude Include="Options.h" />

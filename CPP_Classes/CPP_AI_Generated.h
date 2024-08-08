@@ -28,8 +28,9 @@ using namespace ximgproc;
 using namespace ml;
 
 #include "../CPP_Classes/PragmaLibs.h"
-#include "CPP_Task.h"
+#include "CPP_Parent.h"
 #include "CPP_Algorithms.h"
+#include "Options.h"
 
 cppTask* task;
 
@@ -43,37 +44,41 @@ enum FeatureSrc : uint8_t
     FAST = 5
 };
 
-class AddWeighted_Basics_CPP : public CPP_Parent {
+
+
+
+
+
+class AddWeighted_Basics_CPP : public CPP_Parent
+{
 public:
-    Mat src2;
-    AddWeighted_Basics_CPP() : CPP_Parent() {
-        traceName = "AddWeighted_Basics_CPP";
+    double weight;
+    cv::Mat src2;
+    Options_AddWeighted* options = new Options_AddWeighted();
+    AddWeighted_Basics_CPP() : CPP_Parent()
+    {
+        task->UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'");
         desc = "Add 2 images with specified weights.";
     }
-    void Run(Mat src) {
-        Mat srcPlus = src2;
-        if (standalone || src2.empty()) {
-            srcPlus = task->depthRGB;
-        }
-        if (srcPlus.type() != src.type()) {
-            if (src.type() != CV_8UC3 || srcPlus.type() != CV_8UC3) {
-                if (src.type() == CV_32FC1) {
-                    normalize(src, src, 0, 255, NORM_MINMAX);
-                }
-                if (srcPlus.type() == CV_32FC1) {
-                    normalize(srcPlus, srcPlus, 0, 255, NORM_MINMAX);
-                }
-                if (src.type() != CV_8UC3) {
-                    cvtColor(src, src, COLOR_GRAY2BGR);
-                }
-                if (srcPlus.type() != CV_8UC3) {
-                    cvtColor(srcPlus, srcPlus, COLOR_GRAY2BGR);
-                }
+    void Run(cv::Mat src)
+    {
+        options->RunVB();
+        weight = options->addWeighted;
+        cv::Mat srcPlus = src2;
+        // algorithm user normally provides src2! 
+        if (standalone || src2.empty()) srcPlus = task->depthRGB;
+        if (srcPlus.type() != src.type())
+        {
+            if (src.type() != CV_8UC3 || srcPlus.type() != CV_8UC3)
+            {
+                if (src.type() == CV_32FC1) normalize(src, src, 0, 255, NORM_MINMAX);
+                if (srcPlus.type() == CV_32FC1) normalize(srcPlus, srcPlus, 0, 255, NORM_MINMAX);
+                if (src.type() != CV_8UC3) cv::cvtColor(src, src, cv::COLOR_GRAY2BGR);
+                if (srcPlus.type() != CV_8UC3) cv::cvtColor(srcPlus, srcPlus, cv::COLOR_GRAY2BGR);
             }
         }
-        double wt = task->AddWeighted;
-        addWeighted(src, wt, srcPlus, 1.0 - wt, 0, dst2);
-        labels[2] = "depth " + to_string((int)((1 - wt) * 100)) + " BGR " + to_string((int)(wt * 100));
+        cv::addWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2);
+        labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
     }
 };
 
@@ -90,7 +95,6 @@ public:
     int sizeRequest = 10;
 
     Random_Basics_CPP() : CPP_Parent() {
-        traceName = "Random_Basics_CPP";
         range = Rect(0, 0, dst2.cols, dst2.rows);
         desc = "Create a uniform random mask with a specified number of pixels.";
     }
@@ -112,10 +116,6 @@ public:
 
 
 
-#include "Options.h"
-
-
-
 
 class Resize_Basics_CPP : public CPP_Parent {
 public:
@@ -123,7 +123,6 @@ public:
     float resizePercent = 0.5;
 
     Resize_Basics_CPP() : CPP_Parent() {
-        traceName = "Resize_Basics_CPP";
         if (standalone) {
             task->drawRect = Rect(dst2.cols / 4, dst2.rows / 4, dst2.cols / 2, dst2.rows / 2);
         }
@@ -152,7 +151,6 @@ public:
     Mat mapx1, mapx2, mapx3, mapy1, mapy2, mapy3;
 
     Remap_Basics_CPP() : CPP_Parent() {
-        traceName = "Remap_Basics_CPP";
         // Initialize map matrices with appropriate size and type
         mapx1 = Mat::zeros(dst2.size(), CV_32FC1);
         mapy1 = Mat::zeros(dst2.size(), CV_32FC1);
@@ -215,7 +213,6 @@ public:
     vector<Point2f> points;
 
     Random_Enumerable_CPP() : CPP_Parent() {
-        traceName = "Random_Enumerable_CPP";
         desc = "Create an enumerable list of points using a lambda function";
     }
 
@@ -239,66 +236,60 @@ public:
 
 
 
+
+
+
 class Delaunay_Basics_CPP : public CPP_Parent {
 public:
-    vector<Point2f> inputPoints;
-    Mat facet32s;
+    std::vector<cv::Point2f> inputPoints;
+    cv::Mat facet32s;
     Random_Enumerable_CPP* randEnum;
-    Subdiv2D subdiv;
-    vector<vector<Point>> facetlist;
-
+    cv::Subdiv2D subdiv;
+    std::vector<std::vector<cv::Point>> facetlist;
     Delaunay_Basics_CPP() : CPP_Parent() {
-        traceName = "Delaunay_Basics";
         randEnum = new Random_Enumerable_CPP();
-        facet32s = Mat::zeros(dst2.size(), CV_32SC1);
+        facet32s = cv::Mat::zeros(dst2.size(), CV_32SC1);
         desc = "Subdivide an image based on the points provided.";
     }
-    void randomInput(Mat src)
-    {
+    void randomInput(cv::Mat src) {
         randEnum->Run(src);
         inputPoints = randEnum->points;
     }
-    void Run(Mat src) {
+    void Run(cv::Mat src) {
         if (task->heartBeat && standalone) {
             randEnum->Run(src);
             inputPoints = randEnum->points;
             dst3 = randEnum->dst2;
         }
-
-        subdiv.initDelaunay(Rect(0, 0, dst2.cols, dst2.rows));
+        subdiv.initDelaunay(cv::Rect(0, 0, dst2.cols, dst2.rows));
         subdiv.insert(inputPoints);
-
-        vector<vector<Point2f>> facets;
-        vector<Point2f> centers;
-        subdiv.getVoronoiFacetList(vector<int>(), facets, centers);
-
-        vector<Vec3b> usedColors;
+        std::vector<std::vector<cv::Point2f>> facets;
+        std::vector<cv::Point2f> centers;
+        subdiv.getVoronoiFacetList(std::vector<int>(), facets, centers);
+        std::vector<cv::Vec3b> usedColors;
         facetlist.clear();
-        static Mat lastColor = Mat::zeros(dst2.size(), CV_8UC3);
-        for (int i = 0; i < facets.size(); i++) {
-            vector<Point> nextFacet;
-            for (int j = 0; j < facets[i].size(); j++) {
-                nextFacet.push_back(Point(facets[i][j].x, facets[i][j].y));
+        static cv::Mat lastColor = cv::Mat::zeros(dst2.size(), CV_8UC3);
+        for (size_t i = 0; i < facets.size(); i++) {
+            std::vector<cv::Point> nextFacet;
+            for (size_t j = 0; j < facets[i].size(); j++) {
+                nextFacet.push_back(cv::Point(facets[i][j].x, facets[i][j].y));
             }
-
-            Point2f pt = inputPoints[i];
-            Vec3b nextColor = lastColor.at<Vec3b>(pt);
-            if (find(usedColors.begin(), usedColors.end(), nextColor) != usedColors.end()) {
+            cv::Point2f pt = inputPoints[i];
+            cv::Vec3b nextColor = lastColor.at<cv::Vec3b>(pt.y, pt.x);
+            if (std::find(usedColors.begin(), usedColors.end(), nextColor) != usedColors.end()) {
                 nextColor = task->randomCellColor();
             }
             usedColors.push_back(nextColor);
-
-            fillConvexPoly(dst2, nextFacet, Scalar(nextColor[0], nextColor[1], nextColor[2]));
-
-            fillConvexPoly(facet32s, nextFacet, i, task->lineType);
+            cv::fillConvexPoly(dst2, nextFacet, cv::Scalar(nextColor[0], nextColor[1], nextColor[2]));
+            cv::fillConvexPoly(facet32s, nextFacet, i, task->lineType);
             facetlist.push_back(nextFacet);
         }
         facet32s.convertTo(dst1, CV_8U);
-
         lastColor = dst2.clone();
-        labels[2] = traceName + ": " + to_string(inputPoints.size()) + " cells were present.";
+        labels[2] = traceName + ": " + std::to_string(inputPoints.size()) + " cells were present.";
     }
 };
+
 
 
 
@@ -311,7 +302,6 @@ public:
     Delaunay_Basics_CPP* facet;
     Mat generationMap;
     Delaunay_GenerationsNoKNN_CPP() : CPP_Parent() {
-        traceName = "Delaunay_GenerationsNoKNN_CPP";
         facet = new Delaunay_Basics_CPP();
         random = new Random_Basics();
         generationMap = Mat::zeros(dst3.size(), CV_32S);
@@ -364,7 +354,6 @@ public:
 class Grid_Basics_CPP : public CPP_Parent {
 public:
     Grid_Basics_CPP() : CPP_Parent() {
-        traceName = "Grid_Basics_CPP";
         desc = "Create a grid of squares covering the entire image.";
     }
 
@@ -451,7 +440,6 @@ public:
     
     KNN_Core_CPP() : CPP_Parent()
     {
-        traceName = "KNN_Core_CPP";
         random = new Random_Basics();
         labels[2] = "Red=TrainingData, yellow = queries";
         desc = "Train a KNN model and map each query to the nearest training neighbor.";
@@ -559,7 +547,6 @@ public:
     Random_Basics* random;
 
     KNN_Basics_CPP() : CPP_Parent() {
-        traceName = "KNN_Basics_CPP";
         basics = new KNN_Core_CPP();
         random = new Random_Basics();
         desc = "Map points 1:1 with losses. Toss any duplicates that are farther.";
@@ -652,7 +639,6 @@ public:
 
     Delaunay_Generations_CPP() : CPP_Parent()
     {
-        traceName = "Delaunay_Generations";
         generationMap = Mat::zeros(dst3.size(), CV_32S);
         knn = new KNN_Basics_CPP();
         facet = new Delaunay_Basics_CPP();
@@ -703,171 +689,167 @@ public:
 
 
 
-//
-// Feature_Basics_CPP : public CPP_Parent {
-//private:
-//    cv::Ptr<cv::BRISK> Brisk;
-//public:
-//    vector<cv::Point2f> featurePoints;
-//    Options_Features* options = new Options_Features;
-//
-//    Feature_Basics_CPP() : CPP_Parent() {
-//        traceName = "Feature_Basics";
-//        Brisk = cv::BRISK::create();
-//        desc = "Find good features to track in a BGR image.";
-//    }
-//
-//    void Run(cv::Mat src) {
-//        dst2 = src.clone();
-//        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
-//        featurePoints.clear();
-//        int sampleSize = options->featurePoints;
-//        if (options->useBRISK) {
-//            vector<cv::KeyPoint> keyPoints;
-//            Brisk->detect(src, keyPoints);
-//            for (const auto& kp : keyPoints) {
-//                if (kp.size >= options->minDistance) featurePoints.push_back(kp.pt);
-//            }
-//        }
-//        else {
-//            cv::goodFeaturesToTrack(src, featurePoints, sampleSize, options->quality, options->minDistance);
-//        }
-//        cv::Scalar color = (dst2.channels() == 3) ? cv::Scalar(0, 255, 255) : cv::Scalar(255, 255, 255);
-//        for (const auto& pt : featurePoints) {
-//            cv::circle(dst2, pt, task->DotSize, color, -1, task->lineType);
-//        }
-//        labels[2] = "Found " + to_string(featurePoints.size()) + " points with quality = " + to_string(options->quality) +
-//            " and minimum distance = " + to_string(options->minDistance);
-//    }
-//};
+
+class Feature_Basics_CPP : public CPP_Parent {
+private:
+    cv::Ptr<cv::BRISK> Brisk;
+public:
+    vector<cv::Point2f> featurePoints;
+    Options_Features* options = new Options_Features;
+
+    Feature_Basics_CPP() : CPP_Parent() {
+        Brisk = cv::BRISK::create();
+        desc = "Find good features to track in a BGR image.";
+    }
+
+    void Run(cv::Mat src) {
+        dst2 = src.clone();
+        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
+        featurePoints.clear();
+        int sampleSize = options->featurePoints;
+        if (options->useBRISK) {
+            vector<cv::KeyPoint> keyPoints;
+            Brisk->detect(src, keyPoints);
+            for (const auto& kp : keyPoints) {
+                if (kp.size >= options->minDistance) featurePoints.push_back(kp.pt);
+            }
+        }
+        else {
+            cv::goodFeaturesToTrack(src, featurePoints, sampleSize, options->quality, options->minDistance);
+        }
+        cv::Scalar color = (dst2.channels() == 3) ? cv::Scalar(0, 255, 255) : cv::Scalar(255, 255, 255);
+        for (const auto& pt : featurePoints) {
+            cv::circle(dst2, pt, task->DotSize, color, -1, task->lineType);
+        }
+        labels[2] = "Found " + to_string(featurePoints.size()) + " points with quality = " + to_string(options->quality) +
+            " and minimum distance = " + to_string(options->minDistance);
+    }
+};
 
 
 
 
 
-// Stable_Basics_CPP : public CPP_Parent {
-//public:
-//    Delaunay_Generations_CPP* facetGen;
-//    vector<Point2f> ptList;
-//    Point2f anchorPoint;
-//    Feature_Basics_CPP* good;
-//
-//    Stable_Basics_CPP() : CPP_Parent() {
-//        traceName = "Stable_Basics";
-//        good = new Feature_Basics_CPP();
-//        facetGen = new Delaunay_Generations_CPP();
-//        desc = "Maintain the generation counts around the feature points.";
-//    }
-//
-//    void Run(Mat src) {
-//        if (standalone) {
-//            good->Run(src);
-//            facetGen->inputPoints = good->featurePoints;
-//        }
-//
-//        facetGen->Run(src);
-//        if (facetGen->inputPoints.empty()) return; // nothing to work on
-//
-//        ptList.clear();
-//        vector<int> generations;
-//        for (const Point2f& pt : facetGen->inputPoints) {
-//            int fIndex = facetGen->facet->facet32s.at<int>(pt.y, pt.x);
-//            if (fIndex >= facetGen->facet->facetlist.size()) continue; // new point
-//            int g = facetGen->dst3.at<int>(pt.y, pt.x);
-//            generations.push_back(g);
-//            ptList.push_back(pt);
-//            task->SetTrueText(to_string(g), dst2, pt);
-//        }
-//
-//        int maxGens = *max_element(generations.begin(), generations.end());
-//        int index = distance(generations.begin(), find(generations.begin(), generations.end(), maxGens));
-//        anchorPoint = ptList[index];
-//        if (index < facetGen->facet->facetlist.size()) {
-//            const vector<Point>& bestFacet = facetGen->facet->facetlist[index];
-//            fillConvexPoly(dst2, bestFacet, Scalar(0, 0, 0), task->lineType);
-//            drawContours(dst2, vector<vector<Point>> {bestFacet}, -1, Scalar(0, 255, 255), task->lineWidth);
-//        }
-//
-//        dst2 = facetGen->dst2;
-//        dst3 = src.clone();
-//        for (const Point2f& pt : ptList) {
-//            circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), task->lineWidth, task->lineType);
-//            circle(dst3, pt, task->DotSize, Scalar(255, 255, 255), task->lineWidth, task->lineType);
-//        }
-//
-//        string text = to_string(ptList.size()) + " stable points were identified with " + to_string(maxGens) + " generations at the anchor point";
-//        labels[2] = text;
-//    }
-//};
+class Stable_Basics_CPP : public CPP_Parent {
+public:
+    Delaunay_Generations_CPP* facetGen;
+    vector<Point2f> ptList;
+    Point2f anchorPoint;
+    Feature_Basics_CPP* good;
+
+    Stable_Basics_CPP() : CPP_Parent() {
+        good = new Feature_Basics_CPP();
+        facetGen = new Delaunay_Generations_CPP();
+        desc = "Maintain the generation counts around the feature points.";
+    }
+
+    void Run(Mat src) {
+        if (standalone) {
+            good->Run(src);
+            facetGen->inputPoints = good->featurePoints;
+        }
+
+        facetGen->Run(src);
+        if (facetGen->inputPoints.empty()) return; // nothing to work on
+
+        ptList.clear();
+        vector<int> generations;
+        for (const Point2f& pt : facetGen->inputPoints) {
+            int fIndex = facetGen->facet->facet32s.at<int>(pt.y, pt.x);
+            if (fIndex >= facetGen->facet->facetlist.size()) continue; // new point
+            int g = facetGen->dst3.at<int>(pt.y, pt.x);
+            generations.push_back(g);
+            ptList.push_back(pt);
+            task->SetTrueText(to_string(g), dst2, pt);
+        }
+
+        int maxGens = *max_element(generations.begin(), generations.end());
+        int index = distance(generations.begin(), find(generations.begin(), generations.end(), maxGens));
+        anchorPoint = ptList[index];
+        if (index < facetGen->facet->facetlist.size()) {
+            const vector<Point>& bestFacet = facetGen->facet->facetlist[index];
+            fillConvexPoly(dst2, bestFacet, Scalar(0, 0, 0), task->lineType);
+            drawContours(dst2, vector<vector<Point>> {bestFacet}, -1, Scalar(0, 255, 255), task->lineWidth);
+        }
+
+        dst2 = facetGen->dst2;
+        dst3 = src.clone();
+        for (const Point2f& pt : ptList) {
+            circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), task->lineWidth, task->lineType);
+            circle(dst3, pt, task->DotSize, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+        }
+
+        string text = to_string(ptList.size()) + " stable points were identified with " + to_string(maxGens) + " generations at the anchor point";
+        labels[2] = text;
+    }
+};
 
 
 
 
 
-// Stable_BasicsCount_CPP : public CPP_Parent
-//{
-//private:
-//public:
-//    Stable_Basics_CPP* basics;
-//    Feature_Basics_CPP* good;
-//    map<int, int, greater<float>> goodCounts;
-//    Stable_BasicsCount_CPP() : CPP_Parent()
-//    {
-//        traceName = "Stable_BasicsCount_CPP";
-//        good = new Feature_Basics_CPP();
-//        basics = new Stable_Basics_CPP();
-//        desc = "Track the stable good features found in the BGR image.";
-//    }
-//    void Run(Mat src)
-//    {
-//        good->Run(src);
-//        basics->facetGen->inputPoints = good->featurePoints;
-//        basics->Run(src);
-//        dst2 = basics->dst2;
-//        dst3 = basics->dst3;
-//
-//        goodCounts.clear();
-//        int g;
-//        for (auto i = 0; i < basics->ptList.size(); i++)
-//        {
-//            Point2f pt = basics->ptList[i];
-//            circle(dst2, pt, task->DotSize, YELLOW, task->lineWidth, task->lineType);
-//            g = basics->facetGen->dst3.at<int>(pt.y, pt.x);
-//            goodCounts[g] = i;
-//            task->SetTrueText(to_string(g), dst2, pt);
-//        }
-//    }
-//};
+class Stable_BasicsCount_CPP : public CPP_Parent
+{
+private:
+public:
+    Stable_Basics_CPP* basics;
+    Feature_Basics_CPP* good;
+    map<int, int, greater<float>> goodCounts;
+    Stable_BasicsCount_CPP() : CPP_Parent()
+    {
+        good = new Feature_Basics_CPP();
+        basics = new Stable_Basics_CPP();
+        desc = "Track the stable good features found in the BGR image.";
+    }
+    void Run(Mat src)
+    {
+        good->Run(src);
+        basics->facetGen->inputPoints = good->featurePoints;
+        basics->Run(src);
+        dst2 = basics->dst2;
+        dst3 = basics->dst3;
+
+        goodCounts.clear();
+        int g;
+        for (auto i = 0; i < basics->ptList.size(); i++)
+        {
+            Point2f pt = basics->ptList[i];
+            circle(dst2, pt, task->DotSize, YELLOW, task->lineWidth, task->lineType);
+            g = basics->facetGen->dst3.at<int>(pt.y, pt.x);
+            goodCounts[g] = i;
+            task->SetTrueText(to_string(g), dst2, pt);
+        }
+    }
+};
 
 
-// FPoly_TopFeatures_CPP : public CPP_Parent {
-//public:
-//    Stable_BasicsCount_CPP* stable;
-//    vector<Point2f> poly;
-//
-//    FPoly_TopFeatures_CPP() : CPP_Parent() {
-//        stable = new Stable_BasicsCount_CPP();
-//        traceName = "FPoly_TopFeatures_CPP";
-//        desc = "Get the top features and validate them";
-//    }
-//
-//    void Run(Mat src) {
-//        stable->Run(src);
-//        dst2 = stable->dst2;
-//        poly.clear();
-//        for (const auto& keyVal : stable->goodCounts) {
-//            const Point2f& pt = stable->basics->ptList[keyVal.second];
-//            int g = stable->basics->facetGen->dst3.at<int>(pt.y, pt.x);
-//
-//            if (poly.size() < task->polyCount) poly.push_back(pt);
-//        }
-//
-//        if (poly.size() > 1)
-//            for (int i = 0; i < poly.size() - 1; i++) {
-//                line(dst2, poly[i], poly[i + 1], Scalar(255, 255, 255), task->lineWidth, task->lineType);
-//            }
-//    }
-//};
+class FPoly_TopFeatures_CPP : public CPP_Parent {
+public:
+    Stable_BasicsCount_CPP* stable;
+    vector<Point2f> poly;
+
+    FPoly_TopFeatures_CPP() : CPP_Parent() {
+        stable = new Stable_BasicsCount_CPP();
+        desc = "Get the top features and validate them";
+    }
+
+    void Run(Mat src) {
+        stable->Run(src);
+        dst2 = stable->dst2;
+        poly.clear();
+        for (const auto& keyVal : stable->goodCounts) {
+            const Point2f& pt = stable->basics->ptList[keyVal.second];
+            int g = stable->basics->facetGen->dst3.at<int>(pt.y, pt.x);
+
+            if (poly.size() < task->polyCount) poly.push_back(pt);
+        }
+
+        if (poly.size() > 1)
+            for (int i = 0; i < poly.size() - 1; i++) {
+                line(dst2, poly[i], poly[i + 1], Scalar(255, 255, 255), task->lineWidth, task->lineType);
+            }
+    }
+};
 
 
 
@@ -877,7 +859,6 @@ public:
 class Edge_Scharr_CPP : public CPP_Parent {
 public:
     Edge_Scharr_CPP() : CPP_Parent() {
-        traceName = "Edge_Scharr";
         desc = "Scharr is most accurate with 3x3 kernel.";
     }
 
@@ -900,7 +881,6 @@ public:
 class Depth_Colorizer_CPP : public CPP_Parent {
 public:
     Depth_Colorizer_CPP() : CPP_Parent() {
-        traceName = "Depth_Colorizer";
         desc = "Colorize the depth based on the near and far colors.";
     }
 
@@ -936,7 +916,6 @@ public:
     int givenClassCount = 0;
     int reduceAmt = 250;
     RedCloud_Reduce_CPP() : CPP_Parent() {
-        traceName = "RedCloud_Reduce";
         //if (standalone) {
         //    task.redOptions.RedCloud_Reduce.Checked = true;
         //}
@@ -995,7 +974,6 @@ private:
 public: 
 	Depth_PointCloud_CPP() : CPP_Parent()
     {
-        traceName = "Depth_PointCloud";
         desc = "Display the contents of the point cloud as a 2D image";
     }
 	void Run(Mat src)
@@ -1025,7 +1003,6 @@ public:
     float cx = 1.0f, sx = 0.0f, cy = 1.0f, sy = 0.0f, cz = 1.0f, sz = 0.0f;
     bool usingSliders = false;
     IMU_GMatrix_QT_CPP() : CPP_Parent() {
-        traceName = "IMU_GMatrix_QT_CPP";
         desc = "Find the angle of tilt for the camera with respect to gravity without any options_";
     }
     void Run(Mat src) {
@@ -1066,7 +1043,6 @@ public:
     string strOut;
     IMU_GMatrix_QT_CPP* qt;
     IMU_GMatrix_CPP() : CPP_Parent() {
-        traceName = "IMU_GMatrix_CPP";
         qt = new IMU_GMatrix_QT_CPP();
         qt->usingSliders = true;
         desc = "Find the angle of tilt for the camera with respect to gravity.";
@@ -1097,7 +1073,6 @@ public:
     IMU_GMatrix_QT_CPP* gMatrix;
     Depth_PointCloud_CPP* cloud;
     Depth_PointCloud_IMU_CPP() : CPP_Parent() {
-        traceName = "Depth_PointCloud_IMU_CPP";
         gMatrix = new IMU_GMatrix_QT_CPP();
         cloud = new Depth_PointCloud_CPP();
         desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU.";
@@ -1129,7 +1104,6 @@ public:
     int kernelSize = 3;
     AddWeighted_Basics_CPP* addw;
     Edge_Sobel_CPP() : CPP_Parent() {
-        traceName = "Edge_Sobel";
         labels = { "", "", "Horizontal derivative", "Vertical derivative" };
         desc = "Show Sobel edge detection with varying kernel sizes and directions.";
     }
@@ -1160,7 +1134,6 @@ public:
     int injectVal = 255;
 
     Binarize_Simple_CPP() : CPP_Parent() {
-        traceName = "Binarize_Simple";
         desc = "Binarize an image using Threshold with OTSU.";
     }
 
@@ -1190,7 +1163,6 @@ public:
     bool createHistogram = false;
 
     Plot_Histogram_CPP() : CPP_Parent() {
-        traceName = "Plot_Histogram";
         desc = "Plot histogram data with a stable scale at the left of the image.";
     }
 
@@ -1260,7 +1232,6 @@ public:
     Hist_Basics_CPP() : CPP_Parent()
     {
         plot = new Plot_Histogram_CPP();
-        traceName = "Hist_Basics_CPP";
         desc = "Create a histogram (no Kalman)";
     }
 
@@ -1354,7 +1325,6 @@ public:
     int saveDimension = -1;
 
     Kalman_Basics_CPP() : CPP_Parent() {
-        traceName = "Kalman_Basics";
         desc = "Use Kalman to stabilize values (such as a Rect)";
     }
 
@@ -1408,7 +1378,6 @@ public:
     Kalman_Basics_CPP* kalman;
 
     Hist_Kalman_CPP() : CPP_Parent() {
-        traceName = "Hist_Kalman";
         kalman = new Kalman_Basics_CPP();
         hist = new Hist_Basics_CPP();
         labels = { "", "", "With Kalman", "Without Kalman" };
@@ -1449,7 +1418,6 @@ public:
 
     BackProject_Basics_CPP() : CPP_Parent() {
         histK = new Hist_Kalman_CPP();
-        traceName = "BackProject_Basics_CPP";
         labels[2] = "Move mouse to backproject a histogram column";
         desc = "Mouse over any bin to see the color histogram backprojected.";
     }
@@ -1515,7 +1483,6 @@ public:
     bool options_drawRotated = false;
 
     Rectangle_Basics_CPP() : CPP_Parent() {
-        traceName = "Rectangle_Basic_CPPs";
         desc = "Draw the requested number of rectangles.";
     }
 
@@ -1557,7 +1524,6 @@ public:
     Rectangle_Basics_CPP* rectangle;
 
     Rectangle_Rotated_CPP() : CPP_Parent() {
-        traceName = "Rectangle_Rotated_CPP";
         rectangle = new Rectangle_Basics_CPP();
         rectangle->options_drawRotated = true;
         desc = "Draw the requested number of rectangles.";
@@ -1582,7 +1548,6 @@ public:
     Rectangle_Rotated_CPP* rotatedRect;
 
     Contour_Largest_CPP() : CPP_Parent() {
-        traceName = "Contour_Largest_CPP";
         rotatedRect = new Rectangle_Rotated_CPP();
         labels = { "", "", "Input to FindContours", "Largest single contour in the input image." };
         desc = "Create a mask from the largest contour of the input.";
@@ -1638,7 +1603,6 @@ public:
     Mat lastGray;
 
     Diff_Basics_CPP() : CPP_Parent() {
-        traceName = "Diff_Basics_CPP";
         labels = {"", "", "Stable gray", "Unstable mask"};
         desc = "Capture an image and compare it to previous frame using absDiff and threshold";
     }
@@ -1671,7 +1635,6 @@ public:
     Rectangle_Rotated_CPP* rotatedRect;
     vector<vector<Point>> allContours;
     ApproxPoly_FindandDraw_CPP() : CPP_Parent() {
-        traceName = "ApproxPoly_FindandDraw_CPP";
         rotatedRect = new Rectangle_Rotated_CPP();
         labels[2] = "FindandDraw input";
         labels[3] = "FindandDraw output - note the change in line width where ApproxPoly differs from DrawContours";
@@ -1703,7 +1666,6 @@ public:
     Contour_Largest_CPP* contour;
     Rectangle_Rotated_CPP* rotatedRect;
     ApproxPoly_Basics_CPP() : CPP_Parent() {
-        traceName = "ApproxPoly_Basics_CPP";
         contour = new Contour_Largest_CPP();
         rotatedRect = new Rectangle_Rotated_CPP();
         labels = { "", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP" };
@@ -1740,7 +1702,6 @@ public:
     vector<Point> hull;
     bool useRandomPoints;
     Hull_Basics_CPP() : CPP_Parent() {
-        traceName = "Hull_Basics_CPP";
         random = new Random_Basics();
         labels = { "", "", "Input Points - draw a rectangle anywhere. Enclosing rectangle in yellow.", "" };
         if (standalone) random->range = Rect(100, 100, 50, 50);
@@ -1769,7 +1730,6 @@ public:
     Hull_Basics_CPP* hull;
     ApproxPoly_Basics_CPP* aPoly;
     ApproxPoly_Hull_CPP() : CPP_Parent() {
-        traceName = "ApproxPoly_Hull_CPP";
         hull = new Hull_Basics_CPP();
         aPoly = new ApproxPoly_Basics_CPP();
         hull->useRandomPoints = true;
@@ -1803,7 +1763,6 @@ public:
     vector<Rect>rects;
     vector<int> sizes;
     RedCloud_Flood_CPP() : CPP_Parent() {
-        traceName = "RedCloud_Flood_CPP";
         prepData = new RedCloud_Reduce_CPP();
         desc = "Perform the RedCloud low level FloodFill";
     }
@@ -1872,7 +1831,6 @@ public:
     int options_motionThreshold;
     int saveFrameCount;
     Motion_Simple_CPP() : CPP_Parent() {
-        traceName = "Motion_Simple_CPP";
         task->pixelDiffThreshold = 25;
         options_motionThreshold = dst2.rows * dst2.cols / 16;
         diff = new Diff_Basics_CPP();
@@ -1913,7 +1871,6 @@ class History_Basics_CPP : public CPP_Parent {
 public:
     vector<Mat> saveFrames;
     History_Basics_CPP() : CPP_Parent() {
-        traceName = "History_Basics_CPP";
         desc = "Create a frame history to sum the last X frames";
     }
     void Run(Mat src) override {
@@ -1952,7 +1909,6 @@ public:
 class Edge_Canny_CPP : public CPP_Parent {
 public:
     Edge_Canny_CPP() : CPP_Parent() {
-        traceName = "Edge_Canny_CPP";
         desc = "Show canny edge detection with varying thresholds";
     }
 
@@ -1984,7 +1940,6 @@ public:
     Edge_Canny_CPP* edges;
     History_Basics_CPP* frames;
     Edge_MotionFrames_CPP() : CPP_Parent() {
-        traceName = "Edge_MotionFrames_CPP";
         edges = new Edge_Canny_CPP();
         frames = new History_Basics_CPP();
         labels = { "", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only" };
@@ -2007,7 +1962,6 @@ public:
     int sigma_s = 10;
     double sigma_r = 40;
     Edge_Preserving_CPP() : CPP_Parent() {
-        traceName = "Edge_Preserving_CPP";
         task->drawRect = Rect(50, 50, 25, 25);
         labels = { "", "", "", "Edge preserving blur for BGR depth image above" };
         desc = "OpenCV's edge preserving filter.";
@@ -2032,7 +1986,6 @@ public:
     InterpolationFlags options_warpFlag = INTER_NEAREST; 
     Size newSize;
     Resize_Preserve_CPP() : CPP_Parent() {
-        traceName = "Resize_Preserve_CPP";
         desc = "Decrease the size but preserve the full image size.";
     }
     void Run(Mat src) override {
@@ -2055,7 +2008,6 @@ class Convex_Basics_CPP : public CPP_Parent {
 public: 
     vector<Point> hull;
     Convex_Basics_CPP() : CPP_Parent() {
-        traceName = "Convex_Basics_CPP";
         desc = "Surround a set of random points with a convex hull";
         labels = { "", "", "Convex Hull - red dot is center and the black dots are the input points", "" };
     }
@@ -2104,7 +2056,6 @@ public:
     DistanceTypes options_distanceType = DIST_L1;
     int options_kernelSize = 0;
     Distance_Basics_CPP() : CPP_Parent() {
-        traceName = "Distance_Basics_CPP";
         labels = { "", "", "Distance transform - create a mask with threshold", "" };
         desc = "Distance algorithm basics.";
     }
@@ -2135,7 +2086,6 @@ public:
     // vector<tCell> tCells;
     Line_BasicsOld_CPP() : CPP_Parent() {
         subsetRect = Rect(0, 0, dst2.cols, dst2.rows);
-        traceName = "Line_BasicsOld_CPP";
         dst3 = Mat::zeros(dst3.size(), CV_8U);
         ld = ximgproc::createFastLineDetector();
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
@@ -2196,7 +2146,6 @@ public:
     Ptr<EdgeDrawing> ed;
     Edge_Segments_CPP() : CPP_Parent()
     {
-        traceName = "Edge_Segments_CPP";
         labels[2] = "Lines found with the Edge Drawing Filter";
         ed = createEdgeDrawing();
         ed->params.EdgeDetectionOperator = EdgeDrawing::SOBEL;
@@ -2237,7 +2186,6 @@ class EdgeDraw_Basics_CPP : public CPP_Parent {
 public:
     EdgeDraw* cPtr;
     EdgeDraw_Basics_CPP() : CPP_Parent() {
-        traceName = "EdgeDraw_Basics_CPP";
         cPtr = new EdgeDraw;
         labels = { "", "", "EdgeDraw_Basics output", "" };
         desc = "Access EdgeDraw directly for efficiency";
@@ -2269,7 +2217,6 @@ public:
     EdgeDraw_Basics_CPP* edgeD;
     FeatureLess_Basics_CPP() : CPP_Parent()
     {
-        traceName = "FeatureLess_Basics_CPP";
         edgeD = new EdgeDraw_Basics_CPP();
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the Basics interface - more efficient";
     }
@@ -2293,7 +2240,6 @@ public:
     EdgeDraw_Basics_CPP* eDraw;
     FeatureLess_Edge_CPP() : CPP_Parent()
     {
-        traceName = "FeatureLess_Edge_CPP";
         eDraw = new EdgeDraw_Basics_CPP();
         dist = new Distance_Basics_CPP();
         labels[2] = "Edges found using the Segments and the distance function";
@@ -2320,7 +2266,6 @@ public:
     vector<Point> points;
 
     Bezier_Basics_CPP() : CPP_Parent() {
-        traceName = "Bezier_Basics_CPP";
         advice = "Update the public points array and then Run.";
         points = { Point(100, 100),
                   Point(150, 50),
@@ -2369,7 +2314,6 @@ public:
     FeatureLess_History_CPP() : CPP_Parent()
     {
         dst2 = Mat::zeros(dst2.size(), CV_8U); 
-        traceName = "FeatureLess_History_CPP";
         edgeD = new EdgeDraw_Basics_CPP();
         frames = new History_Basics_CPP();
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the Basics interface - more efficient";
@@ -2394,7 +2338,6 @@ class Palette_Basics_CPP : public CPP_Parent {
 public:
     bool whitebackground;
     Palette_Basics_CPP() : CPP_Parent() {
-        traceName = "Palette_Basics_CPP";
         desc = "Apply the different color maps in OpenCV";
     }
     void Run(Mat src) {
@@ -2448,7 +2391,6 @@ public:
     FeatureLess_Basics_CPP* fLess;
     RedCloud* cPtr;
     RedColor_FeatureLessCore_CPP() : CPP_Parent() {
-        traceName = "RedColor_FeatureLessCore_CPP";
         vbPalette(dst2);
         fLess = new FeatureLess_Basics_CPP();
         cPtr = new RedCloud();
@@ -2530,7 +2472,6 @@ public:
     Mat lastColors;
     Mat lastMap = dst2.clone();
     RedColor_FeatureLess_CPP() : CPP_Parent() {
-        traceName = "RedColor_FeatureLess_CPP";
         minCore = new RedColor_FeatureLessCore_CPP();
         advice = minCore->advice;
         dst2 = Mat::zeros(dst2.size(), CV_8U);  
@@ -2591,7 +2532,6 @@ public:
     Random_Basics* random;
     KNN_Core_CPP* knn;
     Mesh_Basics_CPP() : CPP_Parent() {
-        traceName = "Mesh_Basics_CPP";
         random = new Random_Basics();
         knn = new KNN_Core_CPP();
         labels[2] = "Triangles built with each random point and its 2 nearest neighbors.";
@@ -2641,7 +2581,6 @@ public:
     vector<Point2f> stablePoints;
     Feature_Agast_CPP() : CPP_Parent()
     {
-        traceName = "Feature_Agast_CPP";
         desc = "Use the Agast Feature Detector in the OpenCV Contrib.";
     }
     void Run(Mat src) {
@@ -2698,7 +2637,6 @@ public:
     Feature_Agast_CPP* agast;
     Mesh_Basics_CPP* mesh;
     Mesh_Agast_CPP() : CPP_Parent() {
-        traceName = "Mesh_Agast_CPP";
         agast = new Feature_Agast_CPP();
         mesh = new Mesh_Basics_CPP();
         labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
@@ -2723,27 +2661,26 @@ public:
 
 
 
-// Mesh_Features_CPP : public CPP_Parent {
-//public:
-//    Feature_Basics_CPP* feat;
-//    Mesh_Basics_CPP* mesh;
-//    Mesh_Features_CPP() : CPP_Parent() {
-//        traceName = "Mesh_Features_CPP";
-//        feat = new Feature_Basics_CPP();
-//        mesh = new Mesh_Basics_CPP();
-//        labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
-//        advice = "Use Options_Features to update results.";
-//        desc = "Build triangles from feature points";
-//    }
-//    void Run(Mat src) {
-//        feat->Run(src);
-//        if (feat->featurePoints.size() < 3) {
-//            return;
-//        }
-//        mesh->dst2 = src;
-//        dst2 = mesh->showMesh(feat->featurePoints);
-//    }
-//};
+class Mesh_Features_CPP : public CPP_Parent {
+public:
+    Feature_Basics_CPP* feat;
+    Mesh_Basics_CPP* mesh;
+    Mesh_Features_CPP() : CPP_Parent() {
+        feat = new Feature_Basics_CPP();
+        mesh = new Mesh_Basics_CPP();
+        labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
+        advice = "Use Options_Features to update results.";
+        desc = "Build triangles from feature points";
+    }
+    void Run(Mat src) {
+        feat->Run(src);
+        if (feat->featurePoints.size() < 3) {
+            return;
+        }
+        mesh->dst2 = src;
+        dst2 = mesh->showMesh(feat->featurePoints);
+    }
+};
 
 
 
@@ -2755,7 +2692,6 @@ public:
     RotatedRect minRect;
     vector<Point2f> inputPoints;
     Area_MinRect_CPP() : CPP_Parent() {
-        traceName = "Area_MinRect_CPP";
         desc = "Find minimum containing rectangle for a set of points.";
     }
     void Run(Mat src) {
@@ -2786,7 +2722,6 @@ public:
     bool lineSeparators = true;
 
     Mat_4to1_CPP() : CPP_Parent() {
-        traceName = "Mat_4to1_CPP";
         for (int i = 0; i < 4; i++) {
             mat[i] = dst2.clone();
         }
@@ -2836,7 +2771,6 @@ public:
     Mat_4to1_CPP* mats;
     int quadrant = 0;
     Mat_4Click_CPP() : CPP_Parent() {
-        traceName = "Mat_4Click_CPP";
         mats = new Mat_4to1_CPP();
         labels[3] = "Click a quadrant in dst2 to view it in dst3";
         desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3";
@@ -2872,7 +2806,6 @@ public:
     Binarize_Simple_CPP* binarize;
     Mat_4Click_CPP* mats;
     Bin4Way_Regions_CPP() : CPP_Parent() {
-        traceName = "Bin4Way_Regions_CPP";
         binarize = new Binarize_Simple_CPP();
         mats = new Mat_4Click_CPP();
         labels[2] = "A 4-way split - lightest (upper left) to darkest (lower right)";
@@ -2914,7 +2847,6 @@ public:
     int classCount = 4;
     Bin4Way_RegionsCombine_CPP() : CPP_Parent() {
         binarize = new Bin4Way_Regions_CPP();
-        traceName = "Bin4Way_RegionsCombine_CPP";
         dst1 = Mat::zeros(dst3.size(), CV_8U);
         desc = "Add the 4-way split of images to define the different regions.";
     }
@@ -2948,7 +2880,6 @@ public:
     String colorInput; 
     Bin4Way_RegionsCombine_CPP* binarize;
     Color_Basics_CPP() : CPP_Parent() {
-        traceName = "Color_Basics_CPP";
         binarize = new Bin4Way_RegionsCombine_CPP();
         desc = "Classify pixels by color using a variety of techniques";
     }
@@ -3009,7 +2940,6 @@ class Blur_Basics_CPP : public CPP_Parent {
 public:
     Options_Blur* options = new Options_Blur;
     Blur_Basics_CPP() : CPP_Parent() {
-        traceName = "Blur_Basics_CPP";
         desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
     }
     void Run(cv::Mat src) {
@@ -3028,7 +2958,6 @@ class Palette_Random_CPP : public CPP_Parent {
 public:
     Mat colorMap;
     Palette_Random_CPP() : CPP_Parent() {
-        traceName = "Palette_Random_CPP";
         colorMap = Mat(256, 1, CV_8UC3, Scalar(0, 0, 0));
         for (int i = 1; i < 256; i++) {
             colorMap.at<Vec3b>(i, 0) = task->randomCellColor();
@@ -3050,7 +2979,6 @@ public:
     std::vector<cv::Range> ranges;
     std::vector<cv::Range> rangesCloud;
     Hist_RedOptions_CPP() : CPP_Parent() {
-        traceName = "Hist_RedOptions_CPP";
         advice = "See redOption 'Histogram Channels' to control the settings here.";
         desc = "Build the channels, channel count, and ranges based on the PointCloud Reduction setting.";
     }
@@ -3119,7 +3047,6 @@ public:
 class Plot_Histogram2D_CPP : public CPP_Parent {
 public:
     Plot_Histogram2D_CPP() : CPP_Parent() {
-        traceName = "Plot_Histogram2D_CPP";
         labels = { "", "", "2D Histogram", "Threshold of all non-zero values in the plot at left." };
         desc = "Plot a 2D histogram from the input Mat";
     }
@@ -3142,58 +3069,57 @@ public:
 
 
 
-// Feature_StableSorted_CPP : public CPP_Parent {
-//public:
-//    Feature_Basics_CPP* feat;
-//    int desiredCount = 200;
-//    vector<Point2f> stablePoints;
-//    vector<int> generations;
-//    Feature_StableSorted_CPP() : CPP_Parent() {
-//        traceName = "Feature_StableSorted_CPP";
-//        feat = new Feature_Basics_CPP();
-//        desc = "Display the top X feature points ordered by generations they were present.";
-//    }
-//    void Run(Mat src) {
-//        feat->Run(src.clone());
-//        dst3 = feat->dst2;
-//        dst2 = src;
-//        if (task->optionsChanged) {
-//            stablePoints.clear();
-//            generations.clear();
-//        }
-//        for (int i = 0; i < feat->featurePoints.size(); i++) {
-//            Point2f pt = feat->featurePoints[i];
-//            auto it = find(stablePoints.begin(), stablePoints.end(), pt);
-//            if (it != stablePoints.end()) {
-//                int index = distance(stablePoints.begin(), it);
-//                generations[index]++;
-//            }
-//            else {
-//                stablePoints.push_back(pt);
-//                generations.push_back(1);
-//            }
-//        }
-//        map<int, Point2f, greater<int>> sortByGen;
-//        for (int i = 0; i < stablePoints.size(); i++) {
-//            sortByGen[generations[i]] = stablePoints[i];
-//        }
-//        int displayCount = 0;
-//        stablePoints.clear();
-//        generations.clear();
-//        for (auto it = sortByGen.begin(); it != sortByGen.end(); it++) {
-//            if (displayCount >= desiredCount * 2) break;
-//            Point2f pt = it->second;
-//            if (displayCount < desiredCount) {
-//                circle(dst2, pt, task->DotSize, Scalar(255, 255, 255), -1, task->lineType);
-//                displayCount++;
-//            }
-//            stablePoints.push_back(pt);
-//            generations.push_back(it->first);
-//        }
-//        labels[2] = "The most stable " + to_string(displayCount) + " are highlighted below";
-//        labels[3] = "Output of Feature_Basics" + to_string(feat->featurePoints.size()) + " points found";
-//    }
-//};
+class Feature_StableSorted_CPP : public CPP_Parent {
+public:
+    Feature_Basics_CPP* feat;
+    int desiredCount = 200;
+    vector<Point2f> stablePoints;
+    vector<int> generations;
+    Feature_StableSorted_CPP() : CPP_Parent() {
+        feat = new Feature_Basics_CPP();
+        desc = "Display the top X feature points ordered by generations they were present.";
+    }
+    void Run(Mat src) {
+        feat->Run(src.clone());
+        dst3 = feat->dst2;
+        dst2 = src;
+        if (task->optionsChanged) {
+            stablePoints.clear();
+            generations.clear();
+        }
+        for (int i = 0; i < feat->featurePoints.size(); i++) {
+            Point2f pt = feat->featurePoints[i];
+            auto it = find(stablePoints.begin(), stablePoints.end(), pt);
+            if (it != stablePoints.end()) {
+                int index = distance(stablePoints.begin(), it);
+                generations[index]++;
+            }
+            else {
+                stablePoints.push_back(pt);
+                generations.push_back(1);
+            }
+        }
+        map<int, Point2f, greater<int>> sortByGen;
+        for (int i = 0; i < stablePoints.size(); i++) {
+            sortByGen[generations[i]] = stablePoints[i];
+        }
+        int displayCount = 0;
+        stablePoints.clear();
+        generations.clear();
+        for (auto it = sortByGen.begin(); it != sortByGen.end(); it++) {
+            if (displayCount >= desiredCount * 2) break;
+            Point2f pt = it->second;
+            if (displayCount < desiredCount) {
+                circle(dst2, pt, task->DotSize, Scalar(255, 255, 255), -1, task->lineType);
+                displayCount++;
+            }
+            stablePoints.push_back(pt);
+            generations.push_back(it->first);
+        }
+        labels[2] = "The most stable " + to_string(displayCount) + " are highlighted below";
+        labels[3] = "Output of Feature_Basics" + to_string(feat->featurePoints.size()) + " points found";
+    }
+};
 
 
 
@@ -3206,7 +3132,6 @@ public:
     BGSubtract_BGFG* cPtr = nullptr;
     vector<string> labels = { "", "", "BGSubtract output - aging differences", "Mask for any changes" };
     BGSubtract_Basics_CPP() : CPP_Parent() {
-        traceName = "BGSubtract_Basics_CPP";
         desc = "Different background subtraction algorithms in OpenCV - some only available in C++";
     }
     void Run(Mat src) {
@@ -3239,7 +3164,6 @@ public:
     BGSubtract_BGFG* cPtr = nullptr;
     string desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
     Motion_Basics_CPP() : CPP_Parent() {
-        traceName = "Motion_Basics_CPP";
         cPtr = BGSubtract_BGFG_Open(options->currMethod);
         labels[2] = "BGSubtract output";
     }
@@ -3273,7 +3197,6 @@ public:
     Color_Basics_CPP* colorClass = new Color_Basics_CPP();
     RedCloud* cPtr;
     RedCloud_Basics_CPP() : CPP_Parent() {
-        traceName = "RedCloud_Basics_CPP";
         cPtr = new RedCloud;
         inputMask = Mat(dst2.size(), CV_8U);
         inputMask.setTo(0);
@@ -3344,7 +3267,6 @@ public:
     vector<Point> floodPoints;
     Color_Basics_CPP* colorClass = new Color_Basics_CPP();
     RedCloud_BasicsNative_CPP() : CPP_Parent() {
-        traceName = "RedCloud_BasicsNative_CPP";
         dst2 = Mat(dst2.size(), CV_8U);
         desc = "This algorithm is the same as RedCloud_Basics.  It was meant only to test if it could be faster by eliminating some moves.";
     }
@@ -3422,65 +3344,3 @@ public:
         if (task->heartBeat) labels[2] = "CV_8U format - " + to_string(classCount) + " cells were identified.";
     }
 };
-
-
-
-
-
-
-
-//class MotionRect_Basics_CPP : public CPP_Parent {
-//public:
-//    BGSubtract_Basics* bgSub;
-//    RedCloud_Basics redCPP;
-//    dst = Mat2;
-//    bool showDiff;
-//    MotionRect_Basics_CPP() : CPP_Parent() {
-//        traceName = "MotionRect_Basics_CPP";
-//        bgSub = new BGSubtract_Basics();
-//        task.redOptions.UseColor.Checked = true;
-//        redCPP.imageThresholdPercent = 1.0;
-//        redCPP.cellMinPercent = 0;
-//        desc = "Use floodfill to find all the real motion in an image.";
-//    }
-//    void Run(Mat src) {
-//        bgSub->Run(src);
-//        if (standalone || showDiff) {
-//            dst2 = bgSub->dst2;
-//        }
-//        if (!task->pcSplit) {
-//            return;
-//        }
-//        threshold(bgSub->dst2, dst2, 0, 255, THRESH_BINARY);
-//        redCPP.Run(dst2);
-//        if (redCPP.sortedCells.size() < 2) {
-//            return;
-//        }
-//        Rect nextRect = redCPP.sortedCells[1].value.rect;
-//        for (int i = 2; i < redCPP.sortedCells.size(); ++i) {
-//            auto& rc = redCPP.sortedCells[i].value;
-//            nextRect = nextRect | rc.rect;
-//        }
-//        static vector<Rect> rectList;
-//        rectList.push_back(nextRect);
-//        task->motionRect = Rect();
-//        for (const Rect& r : rectList) {
-//            task->motionRect = task->motionRect.empty() ? r : task->motionRect | r;
-//        }
-//        if (rectList.size() > task->frameHistoryCount) {
-//            rectList.erase(rectList.begin());
-//        }
-//        if (task->motionRect.width > dst2.cols / 2 && task->motionRect.height > dst2.rows / 2) {
-//            task->motionRect = Rect(0, 0, dst2.cols, dst2.rows);
-//        }
-//        if (standalone || showDiff) {
-//            rectangle(dst2, task->motionRect, Scalar(255), task->lineWidth);
-//        }
-//        labels[2] = to_string(redCPP.sortedCells.size()) + " cells were found with " +
-//            to_string(redCPP.classCount) + " flood points";
-//    }
-//};
-
-
-
-

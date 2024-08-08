@@ -200,12 +200,14 @@ public:
     int font;
     float cvFontSize;
     int cvFontThickness;
+    bool standalone;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
     Rect motionRect; rcData rcSelect; int desiredCells;
 
     bool heartBeat; bool midHeartBeat; bool quarterBeat; bool debugCheckBox; Size lowRes; 
-    
+    string advice = "";
+
     // redOptions
     int PCReduction;
     int channels[3];
@@ -246,6 +248,25 @@ public:
             vecColors[i] = Vec3b(rand() % 256, rand() % 256, rand() % 256);
             scalarColors[i] = Scalar(vecColors[i].val[0], vecColors[i].val[1], vecColors[i].val[2]);
         }
+    }
+    void UpdateAdvice(std::string advice)
+    {
+        if (advice.substr(0, 13) == "No advice for ")
+        {
+            advice.clear();
+        }
+
+        size_t pos = advice.find(':');
+        if (pos != std::string::npos)
+        {
+            std::string prefix = advice.substr(0, pos + 1);
+            if (advice.find(prefix) != std::string::npos)
+            {
+                return;
+            }
+        }
+
+        advice += advice + "\n\n";
     }
     void drawContour(Mat dst, vector<Point> contour, Scalar color, int lineWidth = -10)
     {

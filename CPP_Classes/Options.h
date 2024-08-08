@@ -1448,6 +1448,7 @@ public:
 	double resyncThreshold =  0.95;
 	int agastThreshold =  20;
 	bool useVertical =  false;
+	bool useBRISK =  false;
 	void RunVB() {}
 	Options_Features() {
 	}

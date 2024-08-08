@@ -5642,6 +5642,7 @@ Public Class Options_Features : Inherits VB_Parent
     Public resyncThreshold As Double = 0.95
     Public agastThreshold As Integer = 20
     Public useVertical As Boolean = False
+    Public useBRISK As Boolean = False
     Public Sub New()
         correlationMin = If(dst2.Width > 336, 0.8, 0.9)
         templatePad = If(dst2.Width > 336, 20, 10)

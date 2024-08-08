@@ -111,6 +111,15 @@ Public Class Touchup
                         inline = inline.Replace(" Rect", " cv.Rect")
                     End If
                 Case tmode.CSharpToCPP
+                    inline = inline.Replace("_CS : public CS_Parent", "_CPP : public CPP_Parent")
+                    inline = inline.Replace("UpdateAdvice(", "task->UpdateAdvice(")
+                    inline = inline.Replace("VBtask task) : CS_Parent(task)", ")")
+                    inline = inline.Replace("task.", "task->")
+                    inline = inline.Replace(" options;", " *options;")
+                    inline = inline.Replace("options.", "options->")
+                    inline = inline.Replace("standaloneTest()", "standalone")
+                    inline = inline.Replace("_CS()", "_CPP() : CPP_Parent()")
+                    inline = inline.Replace("RunCS(", "RunCPP(")
 
             End Select
 
