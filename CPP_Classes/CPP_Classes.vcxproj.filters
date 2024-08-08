@@ -2,23 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Non-AI.cpp" />
-    <ClCompile Include="ParticleFilter.cpp" />
-    <ClCompile Include="recursiveBilateralFilter.cpp" />
-    <ClCompile Include="Retina.cpp" />
-    <ClCompile Include="Salience.cpp" />
-    <ClCompile Include="SemiGlobalMatching.cpp" />
-    <ClCompile Include="Voronoi.cpp" />
     <ClCompile Include="CPP_IncludeOnly.cpp" />
-    <ClCompile Include="Tracker.cpp" />
-    <ClCompile Include="PCA.cpp" />
-    <ClCompile Include="HMM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_Externs.h" />
     <ClInclude Include="CPP_FunctionNames.h" />
     <ClInclude Include="CPP_Parent.h" />
     <ClInclude Include="CPP_AI_Generated.h" />
-    <ClInclude Include="ParticleFilter.h" />
     <ClInclude Include="PragmaLibs.h" />
     <ClInclude Include="CPP_Algorithms.h" />
     <ClInclude Include="Options.h" />

@@ -101,7 +101,7 @@ End Class
 Public Class Options_Contours : Inherits VB_Parent
     Public retrievalMode As cv.RetrievalModes = cv.RetrievalModes.External
     Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
-    Public epsilon As Double = 3 / 100
+    Public epsilon As Double = 0.03
     Public minPixels As Integer = 30
     Public cmPerTier As Integer = 50
     Public trueTextOffset As Integer = 80
@@ -1577,7 +1577,7 @@ End Class
 
 
 Public Class Options_OpticalFlow : Inherits VB_Parent
-    Public pyrScale As Double = 35 / 100
+    Public pyrScale As Double = 0.35
     Public levels As Integer = 1
     Public winSize As Integer = 1
     Public iterations As Integer = 1
@@ -3523,7 +3523,7 @@ End Class
 
 
 Public Class Options_BGSubtract : Inherits VB_Parent
-    Public learnRate As Double = 100 / 1000
+    Public learnRate As Double = 0.01
     Public methodDesc As String = "MOG2"
     Public currMethod As Integer = 4
     Public Sub New()
@@ -4440,7 +4440,7 @@ Public Class Options_BlurTopo : Inherits VB_Parent
     Public savePercent As Double = 0
     Public nextPercent As Double = 20
     Public reduction As Integer = 20
-    Public frameCycle As Integer = 50 / 100
+    Public frameCycle As Integer = 0.5
     Public kernelSize As Double = 101
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -4492,7 +4492,7 @@ Public Class Options_BrightnessContrast : Inherits VB_Parent
     Public contrast As Integer = 500
     Public brightness As Double = -100
     Public hsvBrightness As Double = 100
-    Public exponent As Double = 30 / 100
+    Public exponent As Double = 0.3
     Public Sub New()
         Dim alphaDefault = 2000
         Dim betaDefault = -100
@@ -4570,7 +4570,7 @@ End Class
 
 
 Public Class Options_Harris : Inherits VB_Parent
-    Public threshold As Double = 1 / 10000
+    Public threshold As Double = 0.00001
     Public neighborhood As Integer = 3
     Public aperture As Integer = 21
     Public harrisParm As Double = 1
@@ -4888,7 +4888,7 @@ End Class
 
 
 Public Class Options_SLR : Inherits VB_Parent
-    Public tolerance As Double = 30 / 100
+    Public tolerance As Double = 0.3
     Public halfLength As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -4940,13 +4940,13 @@ End Class
 
 
 Public Class Options_Clone : Inherits VB_Parent
-    Public alpha As Double = 2 / 10
-    Public beta As Double = 2 / 10
+    Public alpha As Double = 0.2
+    Public beta As Double = 0.2
     Public lowThreshold As Integer = 10
     Public highThreshold As Integer = 50
-    Public blueChange As Double = 5 / 10
-    Public greenChange As Double = 5 / 10
-    Public redChange As Double = 15 / 10
+    Public blueChange As Double = 0.5
+    Public greenChange As Double = 0.5
+    Public redChange As Double = 1.5
     Public cloneFlag As cv.SeamlessCloneMethods = cv.SeamlessCloneMethods.MixedClone
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -5285,7 +5285,7 @@ End Class
 
 
 Public Class Options_DepthColor : Inherits VB_Parent
-    Public alpha As Double = 5 / 100
+    Public alpha As Double = 0.05
     Public beta As Double = 3
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -5313,7 +5313,7 @@ Public Class Options_DNN : Inherits VB_Parent
     Public ScaleFactor As Double = 78
     Public scaleMax As Double = 255
     Public meanValue As Double = 127
-    Public confidenceThreshold As Double = 80 / 100
+    Public confidenceThreshold As Double = 0.8
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("DNN Scale Factor", 1, 10000, ScaleFactor)
@@ -5486,9 +5486,9 @@ End Class
 
 Public Class Options_DepthEdges : Inherits VB_Parent
     Public depthDiff As Integer = 200
-    Public depthOffset As Double = 1 / 1000
+    Public depthOffset As Double = 0.001
     Public depthDist As Integer = 5
-    Public mmDepthDiff As Integer = 1000 / 1000
+    Public mmDepthDiff As Integer = 1.0
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Threshold for depth difference", 0, 255, 200)
@@ -6007,7 +6007,7 @@ End Class
 Public Class Options_HOG : Inherits VB_Parent
     Public thresholdHOG As Integer = 0
     Public strideHOG As Integer = 1
-    Public scaleHOG As Double = 300 / 1000
+    Public scaleHOG As Double = 0.3
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("HOG Threshold", 0, 100, thresholdHOG)
@@ -6205,9 +6205,9 @@ End Class
 
 
 Public Class Options_Kalman : Inherits VB_Parent
-    Public delta As Double = 5 / 100
-    Public pdotEntry As Double = 300 / 1000
-    Public processCovar As Double = 10 / 10000
+    Public delta As Double = 0.05
+    Public pdotEntry As Double = 0.3
+    Public processCovar As Double = 0.0001
     Public averageInputCount As Integer = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -6550,7 +6550,7 @@ End Class
 
 
 Public Class Options_PCA : Inherits VB_Parent
-    Public retainedVariance As Double = 95 / 100
+    Public retainedVariance As Double = 0.95
     Public Sub New()
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Retained Variance X100", 1, 100, retainedVariance * 100)
     End Sub
@@ -6948,7 +6948,7 @@ End Class
 Public Class Options_RedCloudOther : Inherits VB_Parent
     Public range As Integer = 30
     Public reduceAmt As Integer = 250
-    Public threshold As Double = 95 / 100
+    Public threshold As Double = 0.95
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Grayscale range around mean", 0, 100, range)
@@ -7072,7 +7072,7 @@ End Class
 
 
 Public Class Options_ROI : Inherits VB_Parent
-    Public roiPercent As Double = 25 / 100
+    Public roiPercent As Double = 0.25
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, roiPercent * 100)
     End Sub
@@ -7168,11 +7168,11 @@ End Class
 
 
 Public Class Options_Stabilizer : Inherits VB_Parent
-    Public lostMax As Double = 10 / 100
+    Public lostMax As Double = 0.1
     Public width As Integer = 128
     Public height As Integer = 96
     Public minStdev As Double = 10
-    Public corrThreshold As Double = 950 / 1000
+    Public corrThreshold As Double = 0.95
     Public pad As Integer = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -7405,7 +7405,7 @@ End Class
 
 
 Public Class Options_SwarmPercent : Inherits VB_Parent
-    Public percent As Double = 80 / 100
+    Public percent As Double = 0.8
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, percent * 100)
     End Sub
@@ -7498,7 +7498,7 @@ End Class
 
 
 Public Class Options_Transform : Inherits VB_Parent
-    Public resizeFactor As Double = 50 / 100
+    Public resizeFactor As Double = 0.5
     Public angle As Integer = 30
     Public scale As Double = 1
     Public firstCheck As Boolean = False

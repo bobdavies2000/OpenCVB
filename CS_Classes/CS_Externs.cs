@@ -8,58 +8,6 @@ namespace CS_Classes
     public class CS_Externs
     {
 
-
-
-
-        //public static Mat Show_HSV_Hist(Mat hist, VBtask task)
-        //{
-        //    Mat img = new Mat(task.WorkingRes, MatType.CV_8UC3, Scalar.All(0));
-        //    int binCount = hist.Height;
-        //    int binWidth = img.Width / hist.Height;
-        //    mmData mm = vbMinMax(hist);
-        //    img.SetTo(Scalar.All(0));
-        //    if (mm.maxVal > 0)
-        //    {
-        //        for (int i = 0; i < binCount - 1; i++)
-        //        {
-        //            double h = img.Height * (hist.At<float>(i, 0)) / mm.maxVal;
-        //            if (h == 0) h = 5; // show the color range in the plot
-        //            Cv2.Rectangle(img, new Rect(i * binWidth, img.Height - (int)h, binWidth, (int)h),
-        //                          new Scalar(180.0 * i / binCount, 255, 255), -1);
-        //        }
-        //    }
-        //    return img;
-        //}
-
-
-
-
-        //public static cv.Rangef[] vbHist2Dminmax(cv.Mat input, int chan1, int chan2)
-        //{
-        //    if (input.Type == cv.MatType.CV_8UC3)
-        //    {
-        //        // ranges are exclusive in OpenCV 
-        //        return new cv.Rangef[] {
-        //        new cv.Rangef(-histDelta, 256),
-        //        new cv.Rangef(-histDelta, 256)
-        //    };
-        //    }
-
-        //    var xInput = input.ExtractChannel(chan1);
-        //    var yInput = input.ExtractChannel(chan2);
-
-        //    var mmX = vbMinMax(xInput);
-        //    var mmY = vbMinMax(yInput);
-
-        //    // ranges are exclusive in OpenCV 
-        //    return new cv.Rangef[] {
-        //    new cv.Rangef(mmX.minVal - histDelta, mmX.maxVal + histDelta),
-        //    new cv.Rangef(mmY.minVal - histDelta, mmY.maxVal + histDelta)
-        //};
-        //}
-
-
-
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr SemiGlobalMatching_Open(int rows, int cols, int disparityRange);
 

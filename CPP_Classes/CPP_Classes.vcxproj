@@ -26,21 +26,11 @@
     <ClInclude Include="CPP_AI_Generated.h" />
     <ClInclude Include="CvHMM.h" />
     <ClInclude Include="Options.h" />
-    <ClInclude Include="ParticleFilter.h" />
     <ClInclude Include="PragmaLibs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CPP_IncludeOnly.cpp" />
-    <ClCompile Include="HMM.cpp" />
     <ClCompile Include="Non-AI.cpp" />
-    <ClCompile Include="ParticleFilter.cpp" />
-    <ClCompile Include="PCA.cpp" />
-    <ClCompile Include="recursiveBilateralFilter.cpp" />
-    <ClCompile Include="Retina.cpp" />
-    <ClCompile Include="Salience.cpp" />
-    <ClCompile Include="SemiGlobalMatching.cpp" />
-    <ClCompile Include="Tracker.cpp" />
-    <ClCompile Include="Voronoi.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

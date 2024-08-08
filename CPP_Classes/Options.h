@@ -34,7 +34,7 @@ class Options_Contours {
 public:
 	RetrievalModes retrievalMode =  cv::RetrievalModes::RETR_EXTERNAL;
 	ContourApproximationModes ApproximationMode =  ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
-	double epsilon =  3 / 100;
+	double epsilon =  0.03;
 	int minPixels =  30;
 	int cmPerTier =  50;
 	int trueTextOffset =  80;
@@ -420,7 +420,7 @@ public:
 };
 class Options_OpticalFlow {
 public:
-	double pyrScale =  35 / 100;
+	double pyrScale =  0.35;
 	int levels =  1;
 	int winSize =  1;
 	int iterations =  1;
@@ -832,7 +832,7 @@ public:
 };
 class Options_BGSubtract {
 public:
-	double learnRate =  100 / 1000;
+	double learnRate =  0.01;
 	string methodDesc =  "MOG2";
 	int currMethod =  4;
 	void RunVB() {}
@@ -1083,7 +1083,7 @@ public:
 	double savePercent =  0;
 	double nextPercent =  20;
 	int reduction =  20;
-	int frameCycle =  50 / 100;
+	int frameCycle =  0.5;
 	double kernelSize =  101;
 	void RunVB() {}
 	Options_BlurTopo() {
@@ -1101,7 +1101,7 @@ public:
 	int contrast =  500;
 	double brightness =  -100;
 	double hsvBrightness =  100;
-	double exponent =  30 / 100;
+	double exponent =  0.3;
 	void RunVB() {}
 	Options_BrightnessContrast() {
 	}
@@ -1118,7 +1118,7 @@ public:
 };
 class Options_Harris {
 public:
-	double threshold =  1 / 10000;
+	double threshold =  0.00001;
 	int neighborhood =  3;
 	int aperture =  21;
 	double harrisParm =  1;
@@ -1204,7 +1204,7 @@ public:
 };
 class Options_SLR {
 public:
-	double tolerance =  30 / 100;
+	double tolerance =  0.3;
 	int halfLength =  10;
 	void RunVB() {}
 	Options_SLR() {
@@ -1221,13 +1221,13 @@ public:
 };
 class Options_Clone {
 public:
-	double alpha =  2 / 10;
-	double beta =  2 / 10;
+	double alpha =  0.2;
+	double beta =  0.2;
 	int lowThreshold =  10;
 	int highThreshold =  50;
-	double blueChange =  5 / 10;
-	double greenChange =  5 / 10;
-	double redChange =  15 / 10;
+	double blueChange =  0.5;
+	double greenChange =  0.5;
+	double redChange =  1.5;
 	int cloneFlag =  cv::MIXED_CLONE;
 	void RunVB() {}
 	Options_Clone() {
@@ -1338,7 +1338,7 @@ public:
 };
 class Options_DepthColor {
 public:
-	double alpha =  5 / 100;
+	double alpha =  0.05;
 	double beta =  3;
 	void RunVB() {}
 	Options_DepthColor() {
@@ -1352,7 +1352,7 @@ public:
 	double ScaleFactor =  78;
 	double scaleMax =  255;
 	double meanValue =  127;
-	double confidenceThreshold =  80 / 100;
+	double confidenceThreshold =  0.8;
 	void RunVB() {}
 	Options_DNN() {
 	}
@@ -1397,9 +1397,9 @@ public:
 class Options_DepthEdges {
 public:
 	int depthDiff =  200;
-	double depthOffset =  1 / 1000;
+	double depthOffset =  0.001;
 	int depthDist =  5;
-	int mmDepthDiff =  1000 / 1000;
+	int mmDepthDiff =  1.0;
 	void RunVB() {}
 	Options_DepthEdges() {
 	}
@@ -1560,7 +1560,7 @@ class Options_HOG {
 public:
 	int thresholdHOG =  0;
 	int strideHOG =  1;
-	double scaleHOG =  300 / 1000;
+	double scaleHOG =  0.3;
 	void RunVB() {}
 	Options_HOG() {
 	}
@@ -1601,9 +1601,9 @@ public:
 };
 class Options_Kalman {
 public:
-	double delta =  5 / 100;
-	double pdotEntry =  300 / 1000;
-	double processCovar =  10 / 10000;
+	double delta =  0.05;
+	double pdotEntry =  0.3;
+	double processCovar =  0.0001;
 	int averageInputCount =  20;
 	void RunVB() {}
 	Options_Kalman() {
@@ -1709,7 +1709,7 @@ public:
 };
 class Options_PCA {
 public:
-	double retainedVariance =  95 / 100;
+	double retainedVariance =  0.95;
 	void RunVB() {}
 	Options_PCA() {
 	}
@@ -1848,7 +1848,7 @@ class Options_RedCloudOther {
 public:
 	int range =  30;
 	int reduceAmt =  250;
-	double threshold =  95 / 100;
+	double threshold =  0.95;
 	void RunVB() {}
 	Options_RedCloudOther() {
 	}
@@ -1886,7 +1886,7 @@ public:
 };
 class Options_ROI {
 public:
-	double roiPercent =  25 / 100;
+	double roiPercent =  0.25;
 	void RunVB() {}
 	Options_ROI() {
 	}
@@ -1922,11 +1922,11 @@ public:
 };
 class Options_Stabilizer {
 public:
-	double lostMax =  10 / 100;
+	double lostMax =  0.1;
 	int width =  128;
 	int height =  96;
 	double minStdev =  10;
-	double corrThreshold =  950 / 1000;
+	double corrThreshold =  0.95;
 	int pad =  20;
 	void RunVB() {}
 	Options_Stabilizer() {
@@ -1998,7 +1998,7 @@ public:
 };
 class Options_SwarmPercent {
 public:
-	double percent =  80 / 100;
+	double percent =  0.8;
 	void RunVB() {}
 	Options_SwarmPercent() {
 	}
@@ -2028,7 +2028,7 @@ public:
 };
 class Options_Transform {
 public:
-	double resizeFactor =  50 / 100;
+	double resizeFactor =  0.5;
 	int angle =  30;
 	double scale =  1;
 	bool firstCheck =  false;
