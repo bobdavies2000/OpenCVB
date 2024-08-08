@@ -985,8 +985,8 @@ public:
 };
 class Options_AddWeighted {
 public:
-	double addWeighted =  50 / 100;
-	double accumWeighted =  10 / 100;
+	double addWeighted =  0.5;
+	double accumWeighted =  0.1;
 	void RunVB() {}
 	Options_AddWeighted() {
 	}

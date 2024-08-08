@@ -4112,8 +4112,8 @@ End Class
 
 
 Public Class Options_AddWeighted : Inherits VB_Parent
-    Public addWeighted As Double = 50 / 100
-    Public accumWeighted As Double = 10 / 100
+    Public addWeighted As Double = 0.5
+    Public accumWeighted As Double = 0.1
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Add Weighted %", 0, 100, addWeighted * 100)

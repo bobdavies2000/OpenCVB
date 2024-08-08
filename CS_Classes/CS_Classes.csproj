@@ -89,18 +89,8 @@
     <Compile Include="CS_Externs.cs" />
     <Compile Include="CS_AI_Generated.cs" />
     <Compile Include="CS_Parent.cs" />
-    <Compile Include="DNN.cs" />
-    <Compile Include="KNN.cs" />
-    <Compile Include="MatrixInverse.cs" />
-    <Compile Include="OilPaint.cs" />
     <Compile Include="Non_AI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sieve.cs" />
-    <Compile Include="SLR.cs" />
-    <Compile Include="Voronoi.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="OpenCvSharp4">
@@ -127,16 +117,6 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>7.0.0-preview.2.22152.2</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Shaders/GLSL/imgui-vertex.glsl" LogicalName="imgui-vertex.glsl" />
-    <EmbeddedResource Include="Shaders/GLSL/imgui-frag.glsl" LogicalName="imgui-frag.glsl" />
-    <EmbeddedResource Include="Shaders/HLSL/imgui-vertex.hlsl.bytes" LogicalName="imgui-vertex.hlsl.bytes" />
-    <EmbeddedResource Include="Shaders/HLSL/imgui-frag.hlsl.bytes" LogicalName="imgui-frag.hlsl.bytes" />
-    <EmbeddedResource Include="Shaders/SPIR-V/imgui-vertex.spv" LogicalName="imgui-vertex.spv" />
-    <EmbeddedResource Include="Shaders/SPIR-V/imgui-frag.spv" LogicalName="imgui-frag.spv" />
-    <EmbeddedResource Include="Shaders/Metal/imgui-vertex.metallib" LogicalName="imgui-vertex.metallib" />
-    <EmbeddedResource Include="Shaders/Metal/imgui-frag.metallib" LogicalName="imgui-frag.metallib" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj">

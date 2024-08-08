@@ -63,7 +63,6 @@ public:
     void Run(cv::Mat src)
     {
         options->RunVB();
-        weight = options->addWeighted;
         cv::Mat srcPlus = src2;
         // algorithm user normally provides src2! 
         if (standalone || src2.empty()) srcPlus = task->depthRGB;
@@ -77,6 +76,8 @@ public:
                 if (srcPlus.type() != CV_8UC3) cv::cvtColor(srcPlus, srcPlus, cv::COLOR_GRAY2BGR);
             }
         }
+
+        weight = options->addWeighted;
         cv::addWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2);
         labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
     }

@@ -31,8 +31,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CPP_IncludeOnly.cpp" />
-    <ClCompile Include="Dither.cpp" />
     <ClCompile Include="HMM.cpp" />
+    <ClCompile Include="Non-AI.cpp" />
     <ClCompile Include="ParticleFilter.cpp" />
     <ClCompile Include="PCA.cpp" />
     <ClCompile Include="recursiveBilateralFilter.cpp" />

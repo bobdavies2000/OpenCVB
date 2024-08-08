@@ -20,8 +20,10 @@ Public Class AddWeighted_Basics : Inherits VB_Parent
                 If srcPlus.Type <> cv.MatType.CV_8UC3 Then srcPlus = srcPlus.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End If
         End If
-        cv.Cv2.AddWeighted(src, options.addWeighted, srcPlus, 1.0 - options.addWeighted, 0, dst2)
-        labels(2) = $"Depth %: {100 - options.addWeighted * 100} BGR %: {CInt(options.addWeighted * 100)}"
+
+        Dim weight = options.addWeighted
+        cv.Cv2.AddWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2)
+        labels(2) = $"Depth %: {100 - weight * 100} BGR %: {CInt(weight * 100)}"
     End Sub
 End Class
 

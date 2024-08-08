@@ -42,7 +42,6 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            weight = options.addWeighted;
 
             Mat srcPlus = src2;
             // algorithm user normally provides src2! 
@@ -57,6 +56,8 @@ namespace CS_Classes
                     if (srcPlus.Type() != MatType.CV_8UC3) srcPlus = srcPlus.CvtColor(ColorConversionCodes.GRAY2BGR);
                 }
             }
+
+            weight = options.addWeighted;
             Cv2.AddWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2);
             labels[2] = $"Depth %: {100 - weight * 100} BGR %: {(int)(weight * 100)}";
         }

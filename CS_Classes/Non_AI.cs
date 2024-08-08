@@ -13,6 +13,9 @@ using OpenCvSharp.DnnSuperres;
 using System.IO;
 using System.Net;
 using VB_Classes;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CS_Classes
 {
@@ -1658,6 +1661,12 @@ namespace CS_Classes
             dst2 = img3.Resize(dst2.Size());
         }
     }
+
+
+
+
+
+
     public class MeanSubtraction_Basics_CS : CS_Parent
     {
         Options_MeanSubtraction options = new Options_MeanSubtraction();
@@ -1670,6 +1679,1597 @@ namespace CS_Classes
             Scalar mean = Cv2.Mean(src);
             Cv2.Subtract(mean, src, dst2);
             dst2 *= (float)(100 / options.scaleVal);
+        }
+    }
+
+
+
+
+
+    public class OilPaintManual
+    {
+        private static byte ClipByte(double colour)
+        {
+            return (byte)(colour > 255 ? 255 : (colour < 0 ? 0 : colour));
+        }
+
+        public void Start(cv.Mat color, cv.Mat result1, int filterSize, int levels)
+        {
+            int[] intensityBin = new int[levels];
+
+            int filterOffset = (filterSize - 1) / 2;
+            int currentIntensity = 0, maxIntensity = 0, maxIndex = 0;
+
+            for (int offsetY = filterOffset; offsetY < color.Height - filterOffset; offsetY++)
+            {
+                for (int offsetX = filterOffset; offsetX < color.Width - filterOffset; offsetX++)
+                {
+                    maxIntensity = maxIndex = 0;
+
+                    intensityBin = new int[levels];
+                    cv.Vec3i[] bins = new cv.Vec3i[levels];
+
+                    for (int y = offsetY - filterOffset; y < offsetY + filterOffset; y++)
+                    {
+                        for (int x = offsetX - filterOffset; x < offsetX + filterOffset; x++)
+                        {
+                            cv.Vec3b rgb = color.Get<cv.Vec3b>(y, x);
+                            currentIntensity = (int)(Math.Round((Double)(rgb[0] + rgb[1] + rgb[2]) / 3.0 * (levels - 1)) / 255.0);
+
+                            intensityBin[currentIntensity] += 1;
+                            bins[currentIntensity][0] += rgb[0];
+                            bins[currentIntensity][1] += rgb[1];
+                            bins[currentIntensity][2] += rgb[2];
+
+                            if (intensityBin[currentIntensity] > maxIntensity)
+                            {
+                                maxIntensity = intensityBin[currentIntensity];
+                                maxIndex = currentIntensity;
+                            }
+                        }
+                    }
+
+                    if (maxIntensity == 0) maxIntensity = 1;
+                    double blue = bins[maxIndex][0] / maxIntensity;
+                    double green = bins[maxIndex][1] / maxIntensity;
+                    double red = bins[maxIndex][2] / maxIntensity;
+
+                    result1.Set<cv.Vec3b>(offsetY, offsetX, new cv.Vec3b(ClipByte(blue), ClipByte(green), ClipByte(red)));
+                }
+            }
+        }
+    }
+
+
+
+
+
+    public class Sieve
+    {
+        public List<int> GetPrimeNumbers(int count)
+        {
+            var output = new List<int>();
+            for (int n = 2; output.Count < count; n++)
+            {
+                if (output.All(x => n % x != 0)) output.Add(n);
+            }
+            return output;
+        }
+    }
+
+
+
+
+
+    /////+////////////////////////////////////////////////////////////
+    //                                                               
+    //          Copyright Vadim Stadnik 2020.                        
+    // Distributed under the Code Project Open License (CPOL) 1.02.  
+    // (See or copy at http://www.codeproject.com/info/cpol10.aspx)  
+    //                                                               
+    /////////////////////////////////////////////////////////////////
+
+    //                                                                      
+    //  This file contains the demonstration C# code for the article        
+    //  by V. Stadnik "Segmented Linear Regression";                        
+    //                                                                      
+    //  Note that the algorithms for segmented linear regression (SLR)      
+    //  were originally written in C++. The C# variants of these algorithms 
+    //  preserve the structure of the original C++ implementation.          
+    //                                                                      
+    //  The accuracy of the approximation is basically the same.            
+    //  The differences are observed in the least significant digits of     
+    //  type <double>.                                                      
+    //                                                                      
+    //  The C# implementation of the algorithms has comparable performance  
+    //  with C++ implementation in terms of measured running time.          
+    //  The asymptotical performance is identical.                          
+    //                                                                      
+    //  The implementation assumes that the attached sample datasets are    
+    //  stored in the folder "C:\\SampleData\\" ;                           
+    //    
+    // https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
+
+    //  implemenation of algorithms          
+    //  SLR == Segmented Linear Regression ; 
+    public class SLR
+    {
+        //  type to store coefficients A and B of linear regression 
+        public class LinearRegressionParams
+        {
+            public double coef_a;
+            public double coef_b;
+
+            public LinearRegressionParams(double _a, double _b)
+            {
+                coef_a = _a;
+                coef_b = _b;
+            }
+        }
+
+
+        //  struct RangeIndex represents a semi-open range of indices [ a, b ) 
+        public class RangeIndex
+        {
+            public int idx_a;
+            public int idx_b;
+
+            public RangeIndex(int _a, int _b)
+            {
+                //  empty and reversed ranges are NOT allowed in this type 
+                if (_b <= _a)
+                    Console.WriteLine("invalid range");
+
+                //  a negative index will crash application 
+                if (_a < 0)
+                    Console.WriteLine("invalide index");
+
+                idx_a = _a;
+                idx_b = _b;
+            }
+
+            public int Length()
+            {
+                return (idx_b - idx_a);
+            }
+        }
+
+        //  RangeLengthMin() is the limit for minimum allowed length of a range ;  
+        //  a range is indivisible if its length is less than 2*RANGE_LENGTH_MIN ; 
+        static public int RangeLengthMin()
+        {
+            return 2;
+        }
+
+        //  the function to measure the accuracy of an approximation 
+        static public double ApproximationErrorY
+            (
+                List<double> data_y_orig,
+                List<double> data_y_approx
+            )
+        {
+            if (data_y_orig.Count != data_y_approx.Count)
+            {
+                Console.WriteLine("SLR: data size error");
+                return double.MaxValue;
+            }
+
+            //  the result is max value of abs differences between two matching y values 
+            double diff_max = 0.0;
+            int n_values = data_y_orig.Count;
+
+            if (n_values < 1)
+                return diff_max;
+
+            for (int i = 0; i < n_values; ++i)
+            {
+                double y_orig_i = data_y_orig[i];
+                double y_aprox_i = data_y_approx[i];
+                double diff_i = Math.Abs(y_orig_i - y_aprox_i);
+
+                if (diff_i > diff_max)
+                    diff_max = diff_i;
+            }
+
+            return diff_max;
+        }
+
+
+        //  the function LinearRegressionParameters() computes parameters of 
+        //  linear regression using values of given sums ;                   
+        //                                                                   
+        //  this function returns <false> for special cases or invalid input 
+        //  that should be processed in client code ;                        
+        static public bool LinearRegressionParameters
+            (
+                double n_values,
+                double sum_x,
+                double sum_y,
+                double sum_xx,
+                double sum_xy,
+                //  the results are                                                            
+                //  coefficients a and b of linear function: y = a + b*x ;                     
+                //                                                                             
+                //  they are solution of the two equations:  a * N     + b * sum_x  = sum_y  ; 
+                //                                           a * sum_x + b * sum_xx = sum_xy ; 
+                //                                                                             
+                LinearRegressionParams lin_regn_out
+            )
+        {
+            //  result for special cases or invalid input parameters 
+            lin_regn_out.coef_a = 0.0;
+            lin_regn_out.coef_b = 0.0;
+
+            const double TOLER = 1.0e-10;
+            //  invalid input n_values:                       
+            //      0 is UN-defined case;                     
+            //      1 causes division by zero (denom ==0.0) ; 
+            if (n_values < 1.0 + TOLER)
+                return false;
+
+            double denom = n_values * sum_xx - sum_x * sum_x;
+
+            if (Math.Abs(denom) < TOLER)
+            {
+                //  the following special cases should be processed in client code:              
+                //    1. user data represent a single point ;                                    
+                //    2. regression line is vertical: coef_a==INFINITY , coeff_b is UN-defined ; 
+                return false;
+            }
+
+            //  coefficients for the approximation line: y = a + b*x ;            
+            lin_regn_out.coef_a = (sum_y * sum_xx - sum_x * sum_xy) / denom;
+            lin_regn_out.coef_b = (n_values * sum_xy - sum_x * sum_y) / denom;
+            return true;
+        }
+
+        //  the function ComputeLinearRegression() computes parameters of 
+        //  linear regression and approximation error                     
+        //  for a given range of a given dataset ;                        
+        static public void ComputeLinearRegression
+            (
+                //  original dataset                                     
+                List<double> data_x,
+                List<double> data_y,
+                //  semi-open range [ a , b )                            
+                RangeIndex idx_range,
+                //  coefficients of linear regression in the given range 
+                LinearRegressionParams lin_regr_out,
+                //  approximation error                                  
+                ref double err_appr_out
+            )
+        {
+            if (idx_range.Length() < RangeLengthMin())
+            {
+                Console.WriteLine("SLR error: input range is too small");
+                return;
+            }
+
+            int idx_a = idx_range.idx_a;
+            int idx_b = idx_range.idx_b;
+            double n_vals = idx_range.Length();
+            double sum_x = 0.0;
+            double sum_y = 0.0;
+            double sum_xx = 0.0;
+            double sum_xy = 0.0;
+
+            //  compute the required sums: 
+            for (int it = idx_a; it < idx_b; ++it)
+            {
+                double xi = data_x[it];
+                double yi = data_y[it];
+                sum_x += xi;
+                sum_y += yi;
+                sum_xx += xi * xi;
+                sum_xy += xi * yi;
+            }
+
+            //  compute parameters of linear regression in the given range 
+            if (!LinearRegressionParameters(n_vals, sum_x, sum_y, sum_xx, sum_xy, lin_regr_out))
+            {
+                //  this is a very unusual case for real data  
+                //Console.WriteLine("SLR: special case error");
+                return;
+            }
+
+            double coef_a = lin_regr_out.coef_a;
+            double coef_b = lin_regr_out.coef_b;
+
+            //  use linear regression obtained to measure approximation error in the given range,          
+            //  the error is the maximum of absolute differences between original and approximation values 
+            double diff_max = 0.0;
+            for (int it = idx_a; it < idx_b; ++it)
+            {
+                double xi = data_x[it];
+                double yi_orig = data_y[it];
+                double yi_appr = coef_a + coef_b * xi;
+
+                double diff_i = Math.Abs(yi_orig - yi_appr);
+                if (diff_i > diff_max)
+                {
+                    diff_max = diff_i;
+                }
+            }
+
+            err_appr_out = diff_max;
+        }
+
+        //  implementation specific function-helper for better code re-use, 
+        //  it enables us to measure approximations errors in results       
+        static public void InterpolateSegments
+            (
+                List<RangeIndex> vec_ranges,
+                List<LinearRegressionParams> vec_LR_params,
+                List<double> data_x,
+                //  results 
+                List<double> data_x_interpol,
+                List<double> data_y_interpol
+            )
+        {
+            data_x_interpol.Clear();
+            data_y_interpol.Clear();
+
+            int n_ranges = vec_ranges.Count;
+            for (int i_rng = 0; i_rng < n_ranges; ++i_rng)
+            {
+                //  in the current range we only need to interpolate y-data 
+                //  using corresponding linear regression                   
+                RangeIndex range_i = vec_ranges[i_rng];
+                LinearRegressionParams lr_params_i = vec_LR_params[i_rng];
+
+                double coef_a = lr_params_i.coef_a;
+                double coef_b = lr_params_i.coef_b;
+                int i_start = range_i.idx_a;
+                int i_end = range_i.idx_b;
+                for (int i = i_start; i < i_end; ++i)
+                {
+                    double x_i = data_x[i];
+                    double y_i = coef_a + coef_b * x_i;
+
+                    data_x_interpol.Add(x_i);
+                    data_y_interpol.Add(y_i);
+                }
+            }
+        }
+
+
+        //  the function CanSplitRangeThorough()                          
+        //  makes decision whether a given range should be split or not ; 
+        //                                                                
+        //  a given range is not subdivided if the specified accuracy of  
+        //  linear regression has been achieved, otherwise, the function  
+        //  searches for the best split point in the range ;              
+        //                                                                
+        static public bool CanSplitRangeThorough
+            (
+                //  original dataset                                                
+                List<double> data_x,
+                List<double> data_y,
+                //  the limit for maximum allowed approximation error (tolerance)   
+                double devn_max_user,
+                //  input range to be split if linear regression is not acceptable  
+                RangeIndex idx_range_in,
+                //  the position of a split point, when the function returns <true> 
+                ref int idx_split_out,
+                //  the parameters of linear regression for the given range,        
+                //  when the function returns <false>                               
+                LinearRegressionParams lr_params_out
+            )
+        {
+            //  compute linear regression and approximation error for input range 
+            double error_range_in = double.MaxValue;
+            ComputeLinearRegression(data_x, data_y, idx_range_in, lr_params_out, ref error_range_in);
+
+            //  if the approximation is acceptable, input range is not subdivided 
+            if (error_range_in < devn_max_user)
+                return false;
+
+            //  approximation error for a current split 
+            double err_split = double.MaxValue;
+            //  the position (index) of a current split 
+            int idx_split = -1;
+            int idx_a = idx_range_in.idx_a;
+            int idx_b = idx_range_in.idx_b;
+            int end_offset = RangeLengthMin();
+
+            //  sequential search for the best split point in the input range 
+            for (int idx = idx_a + end_offset; idx < idx_b - end_offset; ++idx)
+            {
+                //  sub-divided ranges 
+                RangeIndex range_left = new RangeIndex(idx_a, idx);
+                RangeIndex range_right = new RangeIndex(idx, idx_b);
+
+                //  parameters of linear regression in sub-divided ranges 
+                LinearRegressionParams lin_regr_left = new LinearRegressionParams(0.0, 0.0);
+                LinearRegressionParams lin_regr_right = new LinearRegressionParams(0.0, 0.0);
+
+                //  corresponding approximation errors 
+                double err_left = double.MaxValue;
+                double err_right = double.MaxValue;
+
+                //  compute linear regression and approximation error in each range 
+                ComputeLinearRegression(data_x, data_y, range_left, lin_regr_left, ref err_left);
+                ComputeLinearRegression(data_x, data_y, range_right, lin_regr_right, ref err_right);
+
+                //  we use the worst approximation error 
+                double err_idx = Math.Max(err_left, err_right);
+                //  the smaller error the better split   
+                if (err_idx < err_split)
+                {
+                    err_split = err_idx;
+                    idx_split = idx;
+                }
+            }
+
+            //  check that sub-division is valid,                             
+            //  the case of short segment: 2 or 3 data points ;               
+            //  if (n==3) required approximation accuracy cannot be reached ; 
+            if (idx_split < 0)
+                return false;
+
+            idx_split_out = idx_split;
+            return true;
+        }
+
+
+        //  this function implements the smoothing method,           
+        //  which is known as simple moving average ;                
+        //                                                           
+        //  the implementation uses symmetric window ;               
+        //  the window length is variable in front and tail ranges ; 
+        //  the first and last values are fixed ;                    
+        static public void SimpleMovingAverage
+            (
+                List<double> data_io,
+                int half_len
+            )
+        {
+            int n_values = data_io.Count;
+
+            //  no processing is required 
+            if (half_len <= 0 || n_values < 3)
+                return;
+
+            //  smoothing window is too large 
+            if ((2 * half_len + 1) > n_values)
+                return;
+
+            int ix = 0;
+            double sum_y = 0.0;
+            List<double> data_copy = new List<double>();
+            data_copy.AddRange(data_io);
+
+            //  for better readability, where relevant the code below shows   
+            //  the symmetry of processing at a current data point,           
+            //  for example: we use ( ix + 1 + ix ) instead of ( 2*ix + 1 ) ; 
+
+            //  the first point is fixed 
+            sum_y = data_copy[0];
+            data_io[0] = sum_y / 1.0;
+
+            //  the front range:                                                      
+            //  processing accumulates sum_y using gradually increasing length window 
+            for (ix = 1; ix <= half_len; ++ix)
+            {
+                sum_y = sum_y + data_copy[2 * ix - 1] + data_copy[2 * ix];
+                data_io[ix] = sum_y / (double)(ix + 1 + ix);
+            }
+
+            //  in the middle range window length is constant 
+            for (ix = (half_len + 1); ix <= ((n_values - 1) - half_len); ++ix)
+            {
+                //  add to window new data point and remove from window the oldest data point
+                sum_y = sum_y + data_copy[ix + half_len] - data_copy[ix - half_len - 1];
+                data_io[ix] = sum_y / (double)(half_len + 1 + half_len);
+            }
+
+            //  the tail range:                                    
+            //  processing uses gradually decreasing length window 
+            for (ix = (n_values - half_len); ix < (n_values - 1); ++ix)
+            {
+                sum_y = sum_y - data_copy[n_values - 1 - 2 * half_len + 2 * (ix - (n_values - 1 - half_len)) - 2]
+                                - data_copy[n_values - 1 - 2 * half_len + 2 * (ix - (n_values - 1 - half_len)) - 1];
+
+                data_io[ix] = sum_y / (double)(n_values - 1 - ix + 1 + n_values - 1 - ix);
+            }
+
+            //  the last point is fixed 
+            data_io[n_values - 1] = data_copy[n_values - 1];
+        }
+
+
+        //                                                                           
+        //  this function detects positions (indices) of local maxima                
+        //  in a given dataset of values of type <double> ;                          
+        //                                                                           
+        //  limitations:                                                             
+        //  the implementation is potentially sensitive to numerical error,          
+        //  thus, it is not the best choice for processing perfect (no noise) data ; 
+        //  it does not support finding maximum value in a plato ;                   
+        //                                                                           
+        static public void FindLocalMaxima
+            (
+                List<double> vec_data_in,
+                List<int> vec_max_indices_res
+            )
+        {
+            vec_max_indices_res.Clear();
+
+            int n_values = vec_data_in.Count;
+
+            if (n_values < 3)
+                return;
+
+            //  the last and first values are excluded from processing 
+            for (int ix = 1; ix <= n_values - 2; ++ix)
+            {
+                double y_prev = vec_data_in[ix - 1];
+                double y_curr = vec_data_in[ix];
+                double y_next = vec_data_in[ix + 1];
+
+                bool less_prev = (y_prev < y_curr);
+                bool less_next = (y_next < y_curr);
+
+                if (less_prev && less_next)
+                {
+                    vec_max_indices_res.Add(ix);
+                    ++ix;
+                }
+            }
+        }
+
+
+        //  the function CanSplitRangeFast()                              
+        //  makes decision whether a given range should be split or not ; 
+        //                                                                
+        //  a given range is not subdivided if the specified accuracy of  
+        //  linear regression has been achieved, otherwise,               
+        //  the function selects for the best split the position of       
+        //  the greatest local maximum of absolute differences            
+        //  between original and smoothed values in a given range ;       
+        //                                                                
+        static public bool CanSplitRangeFast
+            (
+                //  original dataset                                                
+                List<double> data_x,
+                List<double> data_y,
+                //  absolute differences between original and smoothed values       
+                List<double> vec_devns_in,
+                //  positions (indices) of local maxima in vec_devns_in             
+                List<int> vec_max_ind_in,
+                //  the limit for maximum allowed approximation error (tolerance)   
+                double devn_max_user,
+                //  input range to be split if linear regression is not acceptable  
+                RangeIndex idx_range_in,
+                //  the position of a split point, when the function returns <true> 
+                ref int idx_split_out,
+                //  the parameters of linear regression for the given range,        
+                //  when the function returns <false>                               
+                LinearRegressionParams lr_params_out
+            )
+        {
+            idx_split_out = -1;
+
+            if (vec_devns_in.Count != data_x.Count)
+            {
+                Console.WriteLine("SLR: size error");
+                return false;
+            }
+
+            int end_offset = RangeLengthMin();
+            int range_len = idx_range_in.Length();
+            if (range_len < end_offset)
+            {
+                Console.WriteLine("SLR: input range is too small");
+                return false;
+            }
+
+            //  compute linear regression and approximation error for input range 
+            double err_range_in = double.MaxValue;
+            ComputeLinearRegression(data_x, data_y, idx_range_in, lr_params_out, ref err_range_in);
+
+            //  if the approximation is acceptable, input range is not subdivided 
+            if (err_range_in < devn_max_user)
+                return false;
+
+            //  check for indivisible range 
+            if (range_len < 2 * RangeLengthMin())
+                return false;
+
+            if (vec_devns_in.Count == 0)
+                return false;
+
+            //  for the main criterion of splitting here we use                 
+            //  the greatest local maximum of deviations inside the given range 
+            int idx_split_local_max = -1;
+            double devn_max = 0.0;
+            double devn_cur = 0.0;
+            int sloc_max = vec_max_ind_in.Count;
+
+            //  find inside given range local maximum with the largest deviation 
+            for (int k_max = 0; k_max < sloc_max; ++k_max)
+            {
+                int idx_max_cur = vec_max_ind_in[k_max];
+
+                //  check if the current index is inside the given range and that  
+                //  potential split will not create segment with 1 data point only 
+                if ((idx_max_cur < idx_range_in.idx_a + end_offset) ||
+                        (idx_max_cur >= idx_range_in.idx_b - end_offset))
+                    continue;
+
+                devn_cur = vec_devns_in[idx_max_cur];
+                if (devn_cur > devn_max)
+                {
+                    devn_max = devn_cur;
+                    idx_split_local_max = idx_max_cur;
+                }
+            }
+
+            //  the case of no one local maximum inside the given range 
+            if (idx_split_local_max < 0)
+                return false;
+
+            //  the case (idx_split_local_max==0) is not possible here due to (end_offset==RANGE_LENGTH_MIN), 
+            //  this is a valid result ( idx_split_local_max > 0 )                                            
+            idx_split_out = idx_split_local_max;
+
+            return true;
+        }
+
+
+        //  the function SegmentedRegressionFast() implements                   
+        //  algorithm for segmented linear (piecewise) regression,              
+        //  which uses for range splitting local maxima of                      
+        //  absolute differences between original and smoothed values ;         
+        //  the method of smoothing is simple moving average;                   
+        //                                                                      
+        //  the average performance of this algorithm is O(N logM), where       
+        //      N is the number of given values and                             
+        //      M is the number of resulting line segments ;                    
+        //  in the worst case the performace is quadratic ;                     
+        //                                                                      
+        //  return value <false> shows that the required approximation accuracy 
+        //  has not been achieved ;                                             
+        //                                                                      
+        public bool SegmentedRegressionFast
+            (
+                //  input dataset:                                                     
+                //  this function assumes that input x-data are equally spaced         
+                List<double> data_x,
+                List<double> data_y,
+                //  user specified approximation accuracy (tolerance) ;                
+                //  this parameter allows to control the total number                  
+                //  and lengths of segments detected ;                                 
+                double devn_max,
+                //  this parameter represents half length of window ( h_len+1+h_len ), 
+                //  which is used by simple moving average to create smoothed dataset  
+                int sm_half_len,
+                //  the resulting segmented linear regression                          
+                //  is interpolated to match and compare against input values          
+                List<double> data_x_res,
+                List<double> data_y_res
+            )
+        {
+            data_x_res.Clear();
+            data_y_res.Clear();
+
+            int size_x = data_x.Count;
+            int size_y = data_y.Count;
+
+            if (size_x != size_y)
+                return false;
+
+            //  check for indivisible range 
+            if (size_x < 2 * RangeLengthMin())
+                return false;
+
+            //  vector of smoothed values 
+            List<double> data_y_smooth = new List<double>();
+            data_y_smooth.AddRange(data_y);
+            SimpleMovingAverage(data_y_smooth, sm_half_len);
+
+            //  vector of deviations (as absolute differences) between original and smoothed values 
+            List<double> vec_deviations = new List<double>();
+            for (int i = 0; i < size_y; ++i)
+            {
+                vec_deviations.Add(Math.Abs(data_y_smooth[i] - data_y[i]));
+            }
+
+            //  find positions of local maxima in the vector of deviations 
+            List<int> vec_max_indices = new List<int>();
+            FindLocalMaxima(vec_deviations, vec_max_indices);
+
+            //  ranges (segments) of linear regression 
+            List<RangeIndex> vec_ranges = new List<RangeIndex>();
+            //  parameters of linear regression in each matching range 
+            List<LinearRegressionParams> vec_LR_params = new List<LinearRegressionParams>();
+
+            //  the stage of recursive top-down subvision:                    
+            //  this processing starts from the entire range of given dataset 
+            RangeIndex range_top = new RangeIndex(0, size_x);
+            //  the position (index) of a current split point                 
+            int idx_split = -1;
+            //  parameters of linear regression in a current range (segment)  
+            LinearRegressionParams lr_params = new LinearRegressionParams(0.0, 0.0);
+
+            Stack<RangeIndex> stack_ranges = new Stack<RangeIndex>();
+            stack_ranges.Push(range_top);
+
+            while (stack_ranges.Count > 0)
+            {
+                range_top = stack_ranges.Pop();
+
+                if (CanSplitRangeFast(data_x, data_y, vec_deviations, vec_max_indices,
+                                        devn_max, range_top, ref idx_split, lr_params))
+                {
+                    //  reverse order of pushing onto stack eliminates re-ordering vec_ranges 
+                    //  after this function is completed                                      
+                    stack_ranges.Push(new RangeIndex(idx_split, range_top.idx_b));
+                    stack_ranges.Push(new RangeIndex(range_top.idx_a, idx_split));
+                }
+                else
+                {
+                    //  the range is indivisible, we add it to the result 
+                    vec_ranges.Add(new RangeIndex(range_top.idx_a, range_top.idx_b));
+                    vec_LR_params.Add(new LinearRegressionParams(lr_params.coef_a, lr_params.coef_b));
+                }
+            }
+
+
+            //  interpolate the resulting segmented linear regression 
+            //  and verify the accuracy of the approximation          
+            List<double> data_x_interpol = new List<double>();
+            List<double> data_y_interpol = new List<double>();
+
+            InterpolateSegments(vec_ranges, vec_LR_params, data_x,
+                                    data_x_interpol, data_y_interpol);
+
+            double appr_error = ApproximationErrorY(data_y, data_y_interpol);
+            //if (appr_error > devn_max)
+            //    return false;
+
+            //  the result of this function when the required accuracy has been achieved 
+            data_x_res.AddRange(data_x_interpol);
+            data_y_res.AddRange(data_y_interpol);
+
+            return true;
+        }
+    }
+
+
+
+    /////////////////////////////////////////////////////////////////
+    //                                                               
+    //          Copyright Vadim Stadnik 2020.                        
+    // Distributed under the Code Project Open License (CPOL) 1.02.  
+    // (See or copy at http://www.codeproject.com/info/cpol10.aspx)  
+    //                                                               
+    //  this file contains the demonstration code for the article    
+    //  by V. Stadnik "Simple approach to Voronoi diagrams";         
+    //                                                               
+    /////////////////////////////////////////////////////////////////
+
+    //                                                                      
+    //  the namespace VoronoiDemo provides a demonstration variant of       
+    //  the nearest neighbor search in an ordered dataset of                
+    //  two dimensional points;                                             
+    //  the algorithm has square root computational complexity, on average; 
+    //                                                                      
+    //  the performance test emulates the computation of                    
+    //  the distance transform; the performance of the developed            
+    //  algorithm can be compared with the performance of                   
+    //  the brute force algorithm;                                          
+    //                                                                      
+    //  the code of the namespace VoronoiDemo has been written              
+    //  to avoid complications associated with numeric errors of            
+    //  floating data types in comparison operations;                       
+    //  the code uses integer type for X and Y coordinates of               
+    //  two dimensional points; in addition to this, instead of             
+    //  distance between two points, it calculates squared distance,        
+    //  which also takes advantage of the exact integer value;              
+    //                                                                      
+
+    public class VoronoiDemo
+    {
+
+        //  class Point represents a two dimensional point 
+        public class Point
+        {
+            protected int x;
+            protected int y;
+
+            public Point(int _x, int _y)
+            {
+                x = _x;
+                y = _y;
+            }
+
+            public int X() { return x; }
+            public int Y() { return y; }
+
+            public bool IsEqual(Point that)
+            {
+                return (this.X() == that.X() &&
+                         this.Y() == that.Y());
+            }
+
+            public bool NotEqual(Point that)
+            {
+                return (!this.IsEqual(that));
+            }
+
+            static public uint DistanceSquared(Point pnt_a, Point pnt_b)
+            {
+                int x = pnt_b.X() - pnt_a.X();
+                int y = pnt_b.Y() - pnt_a.Y();
+                uint d = (uint)(x * x + y * y);
+                return d;
+            }
+        }
+
+
+        //  the comparison operation to order a given list or an array for search, 
+        //  which is more efficient than straightforward sequential search         
+        public class PointComparer : IComparer<Point>
+        {
+            //  compare coordinates in X then Y order 
+            public int Compare(Point pnt_a, Point pnt_b)
+            {
+                if (pnt_a.X().CompareTo(pnt_b.X()) != 0)
+                {
+                    return pnt_a.X().CompareTo(pnt_b.X());
+                }
+                else if (pnt_a.Y().CompareTo(pnt_b.Y()) != 0)
+                {
+                    return pnt_a.Y().CompareTo(pnt_b.Y());
+                }
+                else
+                    return 0;
+            }
+        }
+
+        //  the comparison operation to remove duplicates from a given dataset 
+        class PointEquality : IEqualityComparer<Point>
+        {
+            public bool Equals(Point pnt_a, Point pnt_b)
+            {
+                if (pnt_a.IsEqual(pnt_b))
+                    return true;
+                else
+                    return false;
+            }
+
+            public int GetHashCode(Point pnt)
+            {
+                int hCode = pnt.X() ^ pnt.Y();
+                return hCode.GetHashCode();
+            }
+        }
+
+
+        //  implementation of the algorithm using sequential search 
+        class AlgoBruteForce
+        {
+            //  the function MinDistanceBruteForce() implements 
+            //  the brute force sequential search algorithm;    
+            //  a dataset can be either ordered or unordered;   
+            //                                                  
+            //  computational complexity - O(N),                
+            //  where N is the number of points in a container; 
+            static public uint MinDistanceBruteForce
+                (
+                    Point point_in,
+                    List<Point> points
+                )
+            {
+                uint dist_min = uint.MaxValue;
+                uint dist_cur = dist_min;
+                int n_points = points.Count;
+
+                for (int i = 0; i < n_points; ++i)
+                {
+                    dist_cur = Point.DistanceSquared(point_in, points[i]);
+
+                    if (dist_cur < dist_min)
+                        dist_min = dist_cur;
+                }
+
+                return dist_min;
+            }
+
+            //  the function TestPerformance() measures the running time of  
+            //  the nearest neighbor search in an ordered dataset of points; 
+            //                                                               
+            //  the test emulates the computation of the distance transform; 
+            //  it calculates the minimum distance from each point in        
+            //  the given rectangle to a point in the input dataset;         
+            static public cv.Mat TestPerformance
+                (
+                    int rect_width,
+                    int rect_height,
+                    List<Point> test_points
+                )
+            {
+                cv.Mat dist = new cv.Mat(rect_height, rect_width, cv.MatType.CV_32F);
+                PointComparer pnt_comparer = new PointComparer();
+                test_points.Sort(pnt_comparer);
+
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+
+                for (int x = 0; x < rect_width; ++x)
+                {
+                    for (int y = 0; y < rect_height; ++y)
+                    {
+                        float nextVal = MinDistanceBruteForce(new Point(x, y), test_points);
+                        dist.Set<float>(y, x, nextVal);
+                    }
+                }
+
+                watch.Stop();
+                Console.WriteLine("execution time of AlgoBruteForce algorithm = {0} ms ;", watch.ElapsedMilliseconds);
+
+                return dist;
+            }
+
+        }   //  class AlgoBruteForce ; 
+
+
+        //  implementation of the algorithm using efficient search 
+        //  on ordered dataset                                     
+        class AlgoOrderedList
+        {
+            //  the function LowerBound() implements a binary search,   
+            //  which in terms of operator < returns the first position 
+            //  that satisfies the following condition:                 
+            //      ! ( points_ordered[pos] < point_in ) == true ;      
+            //                                                          
+            //  the computational complexity is O(log N),               
+            //  where N is the number of points in a dataset;           
+            static protected int LowerBound
+                (
+                    List<Point> points_ordered,
+                    PointComparer pnt_comparer_in,
+                    Point point_in
+                )
+            {
+                int i_low = 0;
+                int i_high = points_ordered.Count;
+                int i_mid = 0;
+
+                while (i_low < i_high)
+                {
+                    i_mid = (i_low + i_high) / 2;
+
+                    if (pnt_comparer_in.Compare(points_ordered[i_mid], point_in) < 0)
+                    {
+                        i_low = i_mid + 1;
+                    }
+                    else
+                    {
+                        i_high = i_mid;
+                    }
+                }
+
+                return i_low;
+            }
+
+            //  the function FindForward() is a helper   
+            //  for the function MinDistanceOrderedSet() 
+            static protected void FindForward
+                (
+                    Point point_in,
+                    int i_low_bound,
+                    int i_end,
+                    List<Point> points_ordered,
+                    ref uint dist_min_io
+                )
+            {
+                uint dist_cur = 0;
+                uint dist_x = 0;
+
+                for (int i = i_low_bound; i < i_end; ++i)
+                {
+                    dist_cur = Point.DistanceSquared(points_ordered[i], point_in);
+                    dist_x = (uint)(points_ordered[i].X() - point_in.X()) *
+                               (uint)(points_ordered[i].X() - point_in.X());
+
+                    if (dist_cur < dist_min_io)
+                        dist_min_io = dist_cur;
+
+                    if (dist_x > dist_min_io)
+                        break;
+                }
+            }
+
+            //  the function FindBackward() is a helper  
+            //  for the function MinDistanceOrderedSet() 
+            static protected void FindBackward
+                (
+                    Point point_in,
+                    int i_low_bound,
+                    int i_start,
+                    List<Point> points_ordered,
+                    ref uint dist_min_io
+                )
+            {
+                uint dist_cur = 0;
+                uint dist_x = 0;
+
+                for (int i = i_low_bound - 1; i >= 0; --i)
+                {
+                    dist_cur = Point.DistanceSquared(points_ordered[i], point_in);
+                    dist_x = (uint)(points_ordered[i].X() - point_in.X()) *
+                               (uint)(points_ordered[i].X() - point_in.X());
+
+                    if (dist_cur < dist_min_io)
+                        dist_min_io = dist_cur;
+
+                    if (dist_x > dist_min_io)
+                        break;
+                }
+            }
+
+
+            //  the function MinDistanceOrderedSet() implements          
+            //  the nearest neighbor search in an ordered set of points; 
+            //  its average computational complexity - O ( sqrt(N) ) ,   
+            //  where N is the number of points in the set;              
+            static protected uint MinDistanceOrderedSet
+                (
+                    Point point_in,
+                    PointComparer pnt_comparer_in,
+                    List<Point> points_ordered
+                )
+            {
+                uint dist_min = uint.MaxValue;
+                int i_start = 0;
+                int i_end = points_ordered.Count;
+                int i_low_bound = 0;
+
+                i_low_bound = LowerBound(points_ordered, pnt_comparer_in, point_in);
+
+                FindForward(point_in, i_low_bound, i_end, points_ordered, ref dist_min);
+                FindBackward(point_in, i_low_bound, i_start, points_ordered, ref dist_min);
+
+                return dist_min;
+            }
+
+
+            //  the function TestPerformance() measures the running time of  
+            //  the nearest neighbor search in an ordered dataset of points; 
+            //                                                               
+            //  the test emulates the computation of the distance transform; 
+            //  it calculates the minimum distance from each point in        
+            //  the given rectangle to a point in the input dataset;         
+            static public cv.Mat TestPerformance
+                (
+                    int rect_width,
+                    int rect_height,
+                    List<Point> test_points
+                )
+            {
+                cv.Mat dist = new cv.Mat(rect_height, rect_width, cv.MatType.CV_32F);
+                PointComparer pnt_comparer = new PointComparer();
+                test_points.Sort(pnt_comparer);
+
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+
+                for (int x = 0; x < rect_width; ++x)
+                {
+                    for (int y = 0; y < rect_height; ++y)
+                    {
+                        float nextVal = (float)MinDistanceOrderedSet(new Point(x, y), pnt_comparer, test_points);
+                        dist.Set<float>(y, x, nextVal);
+                    }
+                }
+
+                watch.Stop();
+                Console.WriteLine("execution time of ordered dataset algorithm = {0} ms ;", watch.ElapsedMilliseconds);
+
+                return dist;
+            }
+
+        }   //  class AlgoOrderedList ; 
+
+
+        //  class to generate test datasets of random points 
+        public class TestPoints
+        {
+            //  this function generates random points inside the    
+            //  specified rectangle: [ 0, width ) x [ 0, height ) ; 
+            //                                                      
+            //  the result is sorted and contains no duplicates;    
+            //  note also that  points_res.size() <= n_points  ;    
+            static public void Generate
+                (
+                    //  rectangle area to fill in 
+                    int width,
+                    int height,
+                    int n_points,
+                    List<Point> points_out
+                )
+            {
+                points_out.Clear();
+
+                Random rand_x = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
+                Thread.Sleep(20);
+                Random rand_y = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
+
+                HashSet<Point> hash_set = new HashSet<Point>(new PointEquality());
+                int n_duplicates = 0;
+
+                for (int i = 0; i < n_points; ++i)
+                {
+                    int xi = rand_x.Next(width);
+                    int yi = rand_y.Next(height);
+                    if (hash_set.Add(new Point(xi, yi)))
+                    {
+                        points_out.Add(new Point(xi, yi));
+                    }
+                    else
+                        ++n_duplicates;
+                }
+
+                //  if ( n_duplicates > 0 ) 
+                //      Console . WriteLine ( "test points: {0} duplicates removed;", n_duplicates ) ;
+
+                points_out.Sort(new PointComparer());
+            }
+        }   //  class TestPoints ; 
+
+        public void New() { }
+
+        public void RunCS(ref cv.Mat src, List<cv.Point2f> points, bool bruteForce)
+        {
+            List<Point> test_points = new List<Point>();
+            foreach (cv.Point pt in points)
+            {
+                test_points.Add(new Point(pt.X, pt.Y));
+            }
+
+            if (bruteForce == false)
+                src = AlgoOrderedList.TestPerformance(src.Width, src.Height, test_points);
+            else
+                src = AlgoBruteForce.TestPerformance(src.Width, src.Height, test_points);
+        }
+        public void RunCS(ref cv.Mat src, List<cv.Point2f> points)
+        {
+            List<Point> test_points = new List<Point>();
+            foreach (cv.Point pt in points)
+            {
+                test_points.Add(new Point(pt.X, pt.Y));
+            }
+
+            src = AlgoOrderedList.TestPerformance(src.Width, src.Height, test_points);
+        }
+    }
+
+
+
+
+
+    public class DNN
+    {
+        private string[] classNames;
+        Net net;
+        public void initialize(string protoTxt, string caffeModel, string synsetWords)
+        {
+            classNames = File.ReadAllLines(synsetWords).Select(line => line.Split(' ').Last()).ToArray();
+
+            PrepareModel(caffeModel);
+            net = CvDnn.ReadNetFromCaffe(protoTxt, caffeModel);
+            Console.WriteLine("Layer names: {0}", string.Join(", ", net.GetLayerNames()));
+            Console.WriteLine();
+            Console.WriteLine("Preparation complete");
+        }
+        public string RunCS(Mat image)
+        {
+            // Convert Mat to batch of images
+            using (var inputBlob = CvDnn.BlobFromImage(image, 1, new cv.Size(224, 224), new Scalar(104, 117, 123)))
+            {
+                net.SetInput(inputBlob, "data");
+                using (var prob = net.Forward("prob"))
+                {
+                    // find the best class
+                    GetMaxClass(prob, out int classId, out double classProb);
+                    return String.Format("Best class: #{0} '{1}' Probability: {2:P2}", classId, classNames[classId], classProb);
+                }
+            }
+        }
+
+        private static byte[] DownloadBytes(string url)
+        {
+            var client = WebRequest.CreateHttp(url);
+            using (var response = client.GetResponse())
+            using (var responseStream = response.GetResponseStream())
+            {
+                using (var memory = new MemoryStream())
+                {
+                    responseStream.CopyTo(memory);
+                    return memory.ToArray();
+                }
+            }
+        }
+
+        private static void PrepareModel(string fileName)
+        {
+            if (!File.Exists(fileName))
+            {
+                Console.Write("Downloading Caffe Model...");
+                var contents = DownloadBytes("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel");
+                File.WriteAllBytes(fileName, contents);
+            }
+        }
+
+        /// <summary>
+        /// Find best class for the blob (i. e. class with maximal probability)
+        /// </summary>
+        /// <param name="probBlob"></param>
+        /// <param name="classId"></param>
+        /// <param name="classProb"></param>
+        private static void GetMaxClass(Mat probBlob, out int classId, out double classProb)
+        {
+            // reshape the blob to 1x1000 matrix
+            using (var probMat = probBlob.Reshape(1, 1))
+            {
+                Cv2.MinMaxLoc(probMat, out _, out classProb, out _, out var classNumber);
+                classId = classNumber.X;
+            }
+        }
+    }
+
+
+
+
+
+    public class KNN
+    {
+        public List<float[]> trainingSetValues = new List<float[]>();
+        public List<float[]> testSetValues = new List<float[]>();
+
+        private int K;
+
+        public void Classify(int neighborsNumber)
+        {
+            this.K = neighborsNumber;
+
+            // create an array where we store the distance from our test data and the training data -> [0]
+            // plus the index of the training data element -> [1]
+            float[][] distances = new float[trainingSetValues.Count][];
+
+            for (int i = 0; i < trainingSetValues.Count; i++)
+                distances[i] = new float[2];
+
+            Console.WriteLine("[i] classifying...");
+
+            // start computing
+            for (var test = 0; test < this.testSetValues.Count; test++)
+            {
+                Parallel.For(0, trainingSetValues.Count, index =>
+                {
+                    var dist = EuclideanDistance(this.testSetValues[test], this.trainingSetValues[index]);
+                    distances[index][0] = dist;
+                    distances[index][1] = index;
+                }
+                );
+
+                // sort and select first K of them
+                var sortedDistances = distances.AsParallel().OrderBy(t => t[0]).Take(this.K);
+            }
+        }
+
+        private static float EuclideanDistance(float[] sampleOne, float[] sampleTwo)
+        {
+            float d = 0.0f;
+
+            for (int i = 0; i < sampleOne.Length; i++)
+            {
+                float temp = sampleOne[i] - sampleTwo[i];
+                d += temp * temp;
+            }
+            return (float)Math.Sqrt(d);
+        }
+    }
+
+
+
+
+    public class MatrixInverse
+    {
+        public double[] bVector;
+        public double[] solution;
+
+        cv.Mat inverse;
+        public cv.Mat RunCS(cv::Mat m)
+        {
+            bool ShowIntermediate = false; // turn this on if further detail is needed.
+            double d = MatDeterminant(m);
+            if (Math.Abs(d) < 1.0e-5)
+                if (ShowIntermediate) Console.WriteLine("\nMatrix has no inverse");
+                else
+                if (ShowIntermediate) Console.WriteLine("\nDet(m) = " + d.ToString("F4"));
+
+            inverse = MatInverse(m);
+
+            cv.Mat prod = MatProduct(m, inverse);
+            if (ShowIntermediate)
+            {
+                Console.WriteLine("\nThe product of m * inv is ");
+                MatShow(prod, 1, 6);
+            }
+
+            cv.Mat lum;
+            int[] perm;
+            int toggle = MatDecompose(m, out lum, out perm);
+            if (ShowIntermediate)
+            {
+                Console.WriteLine("\nThe combined lower-upper decomposition of m is");
+                MatShow(lum, 4, 8);
+            }
+
+            cv.Mat lower = ExtractLower(lum);
+            cv.Mat upper = ExtractUpper(lum);
+
+            if (ShowIntermediate)
+            {
+                solution = MatVecProd(inverse, bVector);  // (1, 0, 2, 1)
+                Console.WriteLine("\nThe lower part of LUM is");
+                MatShow(lower, 4, 8);
+
+                Console.WriteLine("\nThe upper part of LUM is");
+                MatShow(upper, 4, 8);
+
+                Console.WriteLine("\nThe perm[] array is");
+                VecShow(perm, 4);
+
+                cv.Mat lowUp = MatProduct(lower, upper);
+                Console.WriteLine("\nThe product of lower * upper is ");
+                MatShow(lowUp, 4, 8);
+
+                Console.WriteLine("\nVector b = ");
+                VecShow(bVector, 1, 8);
+
+                Console.WriteLine("\nSolving m*x = b");
+
+                Console.WriteLine("\nSolution x = ");
+                VecShow(solution, 1, 8);
+            }
+            return inverse;
+        }
+
+        static cv.Mat MatInverse(cv.Mat m)
+        {
+            // assumes determinant is not 0
+            // that is, the matrix does have an inverse
+            int n = m.Rows;
+            cv.Mat result = m.Clone();
+
+            cv.Mat lum; // combined lower & upper
+            int[] perm;  // out parameter
+            MatDecompose(m, out lum, out perm);  // ignore return
+
+            double[] b = new double[n];
+            for (int i = 0; i < n; ++i)
+            {
+                for (int j = 0; j < n; ++j)
+                    if (i == perm[j])
+                        b[j] = 1.0;
+                    else
+                        b[j] = 0.0;
+
+                double[] x = Reduce(lum, b); // 
+                for (int j = 0; j < n; ++j)
+                    result.Set<double>(j, i, x[j]);
+            }
+            return result;
+        }
+
+        static int MatDecompose(cv.Mat m, out cv.Mat lum, out int[] perm)
+        {
+            // Crout's LU decomposition for matrix determinant and inverse
+            // stores combined lower & upper in lum[][]
+            // stores row permuations into perm[]
+            // returns +1 or -1 according to even or odd number of row permutations
+            // lower gets dummy 1.0s on diagonal (0.0s above)
+            // upper gets lum values on diagonal (0.0s below)
+
+            int toggle = +1; // even (+1) or odd (-1) row permutatuions
+            int n = m.Rows;
+
+            // make a copy of m[][] into result lum[][]
+            lum = m.Clone();
+
+            // make perm[]
+            perm = new int[n];
+            for (int i = 0; i < n; ++i)
+                perm[i] = i;
+
+            for (int j = 0; j < n - 1; ++j) // process by column. note n-1 
+            {
+                double max = Math.Abs(lum.At<double>(j, j));
+                int piv = j;
+
+                for (int i = j + 1; i < n; ++i) // find pivot index
+                {
+                    double xij = Math.Abs(lum.At<double>(i, j));
+                    if (xij > max)
+                    {
+                        max = xij;
+                        piv = i;
+                    }
+                } // i
+
+                if (piv != j)
+                {
+                    cv.Mat tmp = lum.Row(piv).Clone(); // swap rows j, piv
+                    lum.Row(j).CopyTo(lum.Row(piv));
+                    tmp.CopyTo(lum.Row(j));
+
+                    int t = perm[piv]; // swap perm elements
+                    perm[piv] = perm[j];
+                    perm[j] = t;
+
+                    toggle = -toggle;
+                }
+
+                double xjj = lum.At<double>(j, j);
+                if (xjj != 0.0)
+                {
+                    for (int i = j + 1; i < n; ++i)
+                    {
+                        double xij = lum.At<double>(i, j) / xjj;
+                        lum.Set<double>(i, j, xij);
+                        for (int k = j + 1; k < n; ++k)
+                            lum.Set<double>(i, k, lum.At<double>(i, k) - xij * lum.At<double>(j, k));
+                    }
+                }
+            }
+
+            return toggle;  // for determinant
+        }
+
+        static double[] Reduce(cv.Mat luMatrix, double[] b) // helper
+        {
+            int n = luMatrix.Rows;
+            double[] x = new double[n];
+            for (int i = 0; i < n; ++i)
+                x[i] = b[i];
+
+            for (int i = 1; i < n; ++i)
+            {
+                double sum = x[i];
+                for (int j = 0; j < i; ++j)
+                    sum -= luMatrix.At<double>(i, j) * x[j];
+                x[i] = sum;
+            }
+
+            x[n - 1] /= luMatrix.At<double>(n - 1, n - 1);
+            for (int i = n - 2; i >= 0; --i)
+            {
+                double sum = x[i];
+                for (int j = i + 1; j < n; ++j)
+                    sum -= luMatrix.At<double>(i, j) * x[j];
+                x[i] = sum / luMatrix.At<double>(i, i);
+            }
+
+            return x;
+        }
+
+        static double MatDeterminant(cv.Mat m)
+        {
+            cv.Mat lum;
+            int[] perm;
+
+            double result = MatDecompose(m, out lum, out perm);  // impl. cast
+            for (int i = 0; i < lum.Rows; ++i)
+                result *= lum.At<double>(i, i);
+            return result;
+        }
+
+        static cv.Mat MatProduct(cv.Mat matA, cv.Mat matB)
+        {
+            int aRows = matA.Rows;
+            int aCols = matA.Cols;
+            int bRows = matB.Rows;
+            int bCols = matB.Cols;
+            if (aCols != bRows)
+                throw new Exception("Non-conformable matrices");
+
+            cv.Mat result = new cv.Mat(aRows, bCols, cv.MatType.CV_64F, cv.Scalar.All(0));
+
+            for (int i = 0; i < aRows; ++i) // each row of A
+                for (int j = 0; j < bCols; ++j) // each col of B
+                    for (int k = 0; k < aCols; ++k) // could use bRows
+                        result.Set<double>(i, j, result.At<double>(i, j) + matA.At<double>(i, k) * matB.At<double>(k, j));
+
+            return result;
+        }
+
+        static double[] MatVecProd(cv.Mat m, double[] v)
+        {
+            int n = v.Length;
+            if (m.Cols != n)
+                throw new Exception("non-comform in MatVecProd");
+
+            double[] result = new double[n];
+
+            for (int i = 0; i < m.Rows; ++i)
+            {
+                for (int j = 0; j < m.Cols; ++j)
+                {
+                    result[i] += m.At<double>(i, j) * v[j];
+                }
+            }
+            return result;
+        }
+
+        static cv.Mat ExtractLower(cv.Mat lum)
+        {
+            // lower part of an LU Crout's decomposition
+            // (dummy 1.0s on diagonal, 0.0s above)
+            int n = lum.Rows;
+            cv.Mat result = lum.Clone().SetTo(0);
+            for (int i = 0; i < n; ++i)
+            {
+                for (int j = 0; j < n; ++j)
+                {
+                    if (i == j)
+                        result.Set<double>(i, j, 1.0);
+                    else if (i > j)
+                        result.Set<double>(i, j, lum.At<double>(i, j));
+                }
+            }
+            return result;
+        }
+
+        static cv.Mat ExtractUpper(cv.Mat lum)
+        {
+            // upper part of an LU (lu values on diagional and above, 0.0s below)
+            int n = lum.Rows;
+            cv.Mat result = lum.Clone().SetTo(0);
+            for (int i = 0; i < n; ++i)
+            {
+                for (int j = 0; j < n; ++j)
+                {
+                    if (i <= j)
+                        result.Set<double>(i, j, lum.At<double>(i, j));
+                }
+            }
+            return result;
+        }
+
+        static void MatShow(cv.Mat m, int dec, int wid)
+        {
+            for (int i = 0; i < m.Rows; ++i)
+            {
+                for (int j = 0; j < m.Cols; ++j)
+                {
+                    double v = m.At<double>(i, j);
+                    if (Math.Abs(v) < 1.0e-5) v = 0.0;  // avoid "-0.00"
+                    Console.Write(v.ToString("F" + dec).PadLeft(wid));
+                }
+                Console.WriteLine("");
+            }
+        }
+
+        static void VecShow(int[] vec, int wid)
+        {
+            for (int i = 0; i < vec.Length; ++i)
+                Console.Write(vec[i].ToString().PadLeft(wid));
+            Console.WriteLine("");
+        }
+
+        static void VecShow(double[] vec, int dec, int wid)
+        {
+            for (int i = 0; i < vec.Length; ++i)
+            {
+                double x = vec[i];
+                if (Math.Abs(x) < 1.0e-5) x = 0.0;  // avoid "-0.00"
+                Console.Write(x.ToString("F" + dec).PadLeft(wid));
+            }
+            Console.WriteLine("");
         }
     }
 
