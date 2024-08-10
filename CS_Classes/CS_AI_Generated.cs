@@ -14964,23 +14964,6 @@ namespace CS_Classes
 
 
 
-    public class Edge_All_CS : CS_Parent
-    {
-        Edge_All edges = new Edge_All();
-        public Edge_All_CS(VBtask task) : base(task)
-        {
-            desc = "Use Radio Buttons to select the different edge algorithms.";
-        }
-        public void RunCS(Mat src)
-        {
-            edges.Run(src);
-            dst2 = edges.dst2.Channels() == 1 ? edges.dst2 : edges.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
-            labels[2] = traceName + " - selection = " + edges.options.edgeSelection;
-        }
-    }
-
-
-
 
     public class Edge_DepthAndColor_CS : CS_Parent
     {
@@ -62343,4 +62326,74 @@ namespace CS_Classes
 
 
 
+
+
+
+    public class Edge_All_CS : CS_Parent
+    {
+        Edge_Canny canny = new Edge_Canny();
+        Edge_Scharr scharr = new Edge_Scharr();
+        Edge_BinarizedReduction binRed = new Edge_BinarizedReduction();
+        Bin4Way_Sobel binSobel = new Bin4Way_Sobel();
+        Edge_ColorGap_CPP_VB colorGap = new Edge_ColorGap_CPP_VB();
+        Edge_Deriche_CPP_VB deriche = new Edge_Deriche_CPP_VB();
+        Edge_Laplacian Laplacian = new Edge_Laplacian();
+        Edge_ResizeAdd resizeAdd = new Edge_ResizeAdd();
+        Edge_Regions regions = new Edge_Regions();
+        public Options_Edges_All options = new Options_Edges_All();
+        public Edge_All_CS(VBtask task) : base(task)
+        {
+            desc = "Use Radio Buttons to select the different edge algorithms.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            switch (options.edgeSelection)
+            {
+                case "Canny":
+                    canny.Run(src);
+                    dst2 = canny.dst2;
+                    break;
+                case "Scharr":
+                    scharr.Run(src);
+                    dst2 = scharr.dst3;
+                    break;
+                case "Binarized Reduction":
+                    binRed.Run(src);
+                    dst2 = binRed.dst2;
+                    break;
+                case "Binarized Sobel":
+                    binSobel.Run(src);
+                    dst2 = binSobel.dst2;
+                    break;
+                case "Color Gap":
+                    colorGap.Run(src);
+                    dst2 = colorGap.dst2;
+                    break;
+                case "Deriche":
+                    deriche.Run(src);
+                    dst2 = deriche.dst2;
+                    break;
+                case "Laplacian":
+                    Laplacian.Run(src);
+                    dst2 = Laplacian.dst2;
+                    break;
+                case "Resize And Add":
+                    resizeAdd.Run(src);
+                    dst2 = resizeAdd.dst2;
+                    break;
+                case "Depth Region Boundaries":
+                    regions.Run(src);
+                    dst2 = regions.dst2;
+                    break;
+            }
+            if (dst2.Channels() != 1)
+                dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            labels[2] = traceName + " - selection = " + options.edgeSelection;
+        }
+    }
+
 }
+
+
+

@@ -77,6 +77,7 @@ _FeatureLess_Basics_CPP
 _FeatureLess_Edge_CPP
 _Feature_AKaze_CPP
 _AddWeighted_ImageAccumulate_CPP
+_Edge_All_CPP
 _Stable_BasicsCount_CPP
 End Enum
 Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
@@ -356,6 +357,7 @@ if algorithmName = "Depth_PointCloud_CPP" Then return new CPP_Basics(cppFunction
 if algorithmName = "Depth_PointCloud_IMU_CPP" Then return new CPP_Basics(cppFunctionNames._Depth_PointCloud_IMU_CPP)
 if algorithmName = "Diff_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Diff_Basics_CPP)
 if algorithmName = "Distance_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Distance_Basics_CPP)
+if algorithmName = "Edge_All_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_All_CPP)
 if algorithmName = "Edge_Canny_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_Canny_CPP)
 if algorithmName = "Edge_MotionFrames_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_MotionFrames_CPP)
 if algorithmName = "Edge_Preserving_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_Preserving_CPP)

@@ -5907,14 +5907,13 @@ public:
 // https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html
 class Edge_Canny_CPP : public CPP_Parent {
 public:
+    Options_Canny* options = new Options_Canny();
     Edge_Canny_CPP() : CPP_Parent() {
         desc = "Show canny edge detection with varying thresholds";
     }
 
     void Run(Mat src) {
-        int threshold1 = 50;
-        int threshold2 = 50;
-        int aperture = 3;
+        options->RunVB();
 
         if (src.channels() == 3) {
             cvtColor(src, src, COLOR_BGR2GRAY);
@@ -5924,7 +5923,7 @@ public:
             src.convertTo(src, CV_8U);
         }
 
-        Canny(src, dst2, threshold1, threshold2, aperture, true);
+        Canny(src, dst2, options->threshold1, options->threshold2, options->aperture, true);
     }
 };
 
@@ -7362,5 +7361,109 @@ public:
             dst2 = task->pcSplit[2] * 1000;
         }
         cv::accumulateWeighted(task->pcSplit[2] * 1000, dst2, (float)options->accumWeighted, cv::Mat());
+    }
+};
+
+
+
+
+
+
+//class Edge_All_CPP : public CPP_Parent
+//{
+//private:
+//    Edge_Canny canny;
+//    Edge_Scharr scharr;
+//    Edge_BinarizedReduction binRed;
+//    Bin4Way_Sobel binSobel;
+//    Edge_ColorGap_CPP_VB colorGap;
+//    Edge_Deriche_CPP_VB deriche;
+//    Edge_Laplacian Laplacian;
+//    Edge_ResizeAdd resizeAdd;
+//    Edge_Regions regions;
+//public:
+//    Options_Edges_All* options;
+//    Edge_All_CPP() : CPP_Parent()
+//    {
+//        desc = "Use Radio Buttons to select the different edge algorithms.";
+//    }
+//    void Run(cv::Mat src)
+//    {
+//        options->RunVB();
+//        std::string edgeSelection = options->edgeSelection;
+//        if (edgeSelection == "Canny")
+//        {
+//            canny.Run(src);
+//            dst2 = canny.dst2;
+//        }
+//        else if (edgeSelection == "Scharr")
+//        {
+//            scharr.Run(src);
+//            dst2 = scharr.dst3;
+//        }
+//        else if (edgeSelection == "Binarized Reduction")
+//        {
+//            binRed.Run(src);
+//            dst2 = binRed.dst2;
+//        }
+//        else if (edgeSelection == "Binarized Sobel")
+//        {
+//            binSobel.Run(src);
+//            dst2 = binSobel.dst2;
+//        }
+//        else if (edgeSelection == "Color Gap")
+//        {
+//            colorGap.Run(src);
+//            dst2 = colorGap.dst2;
+//        }
+//        else if (edgeSelection == "Deriche")
+//        {
+//            deriche.Run(src);
+//            dst2 = deriche.dst2;
+//        }
+//        else if (edgeSelection == "Laplacian")
+//        {
+//            Laplacian.Run(src);
+//            dst2 = Laplacian.dst2;
+//        }
+//        else if (edgeSelection == "Resize And Add")
+//        {
+//            resizeAdd.Run(src);
+//            dst2 = resizeAdd.dst2;
+//        }
+//        else if (edgeSelection == "Depth Region Boundaries")
+//        {
+//            regions.Run(src);
+//            dst2 = regions.dst2;
+//        }
+//        if (dst2.channels() != 1)
+//            cv::cvtColor(dst2, dst2, cv::COLOR_BGR2GRAY);
+//        labels[2] = traceName + " - selection = " + edgeSelection;
+//    }
+//};
+
+
+
+
+
+class Edge_All_CPP : public CPP_Parent
+{
+private:
+    Edge_Canny_CPP* canny = new Edge_Canny_CPP();
+    Options_Edges_All* options = new Options_Edges_All();
+public:
+    Edge_All_CPP() : CPP_Parent()
+    {
+        labels[2] = "Edge_All_CPP";
+        desc = "Use Radio Buttons to select the different edge algorithms.";
+    }
+    void Run(cv::Mat src)
+    {
+        options->RunVB();
+        canny->Run(src);
+        dst2 = canny->dst2;
+        if (dst2.channels() != 1)
+            cv::cvtColor(dst2, dst2, cv::COLOR_BGR2GRAY);
+        labels[2] = traceName + " - selection = " + options->edgeSelection;
     }
 };
