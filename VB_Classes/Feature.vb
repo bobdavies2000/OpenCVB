@@ -14,7 +14,6 @@ Public Class Feature_Basics : Inherits VB_Parent
     Dim noMotionFrames As Single
     Public Sub New()
         task.features.Clear() ' in case it was previously in use...
-        FindSlider("Min Distance to next").Value = options.templatePad ' so we don't overlap adding work without benefit.
         desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate"
     End Sub
     Public Sub RunVB(src As cv.Mat)

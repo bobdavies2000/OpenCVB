@@ -558,6 +558,7 @@ if algorithmName = "Stable_BasicsCount_CPP" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Edge_MotionOverlay" Then return new Edge_MotionOverlay
 	if algorithmName = "Edge_Preserving" Then return new Edge_Preserving
 	if algorithmName = "Edge_RandomForest_CPP_VB" Then return new Edge_RandomForest_CPP_VB
+	if algorithmName = "Edge_RedCloud" Then return new Edge_RedCloud
 	if algorithmName = "Edge_Reduction" Then return new Edge_Reduction
 	if algorithmName = "Edge_Regions" Then return new Edge_Regions
 	if algorithmName = "Edge_ResizeAdd" Then return new Edge_ResizeAdd

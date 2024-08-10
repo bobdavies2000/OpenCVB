@@ -2,9 +2,7 @@
 Public Class Color8U_Basics : Inherits VB_Parent
     Public classCount As Integer
     Public classifier As Object
-    Dim colorMethods() As Object = {New BackProject_Full, New BackProject2D_Full, New Bin4Way_Regions, New Binarize_DepthTiers,
-                                    New FeatureLess_Groups, New Hist3Dcolor_Basics, New KMeans_Basics, New LUT_Basics,
-                                    New Reduction_Basics, New PCA_NColor_CPP_VB}
+    Dim colorMethods(10) As Object
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         labels(3) = "vbPalette output of dst2 at left"
@@ -12,7 +10,32 @@ Public Class Color8U_Basics : Inherits VB_Parent
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Or classifier Is Nothing Then classifier = colorMethods(task.redOptions.colorInputIndex)
+        Dim index = task.redOptions.colorInputIndex
+        If task.optionsChanged Or classifier Is Nothing Then
+            Select Case index
+                Case 0
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
+                Case 1
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject2D_Full
+                Case 2
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New Bin4Way_Regions
+                Case 3
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New Binarize_DepthTiers
+                Case 4
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New FeatureLess_Groups
+                Case 5
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
+                Case 6
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New KMeans_Basics
+                Case 7
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New LUT_Basics
+                Case 8
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New Reduction_Basics
+                Case 9
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New PCA_NColor_CPP_VB
+            End Select
+            classifier = colorMethods(index)
+        End If
 
         If task.redOptions.colorInputName = "BackProject2D_Full" Then
             classifier.Run(src)

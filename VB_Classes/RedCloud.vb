@@ -5,6 +5,7 @@ Public Class RedCloud_Basics : Inherits VB_Parent
     Dim redCPP As New RedCloud_CPP_VB
     Public inputMask As New cv.Mat
     Dim color As Color8U_Basics
+    Public smallCellThreshold As Integer = dst2.Total / 1000
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -32,7 +33,6 @@ Public Class RedCloud_Basics : Inherits VB_Parent
         labels(2) = genCells.labels(2)
 
         dst3.SetTo(0)
-        Dim smallCellThreshold = src.Total / 1000
         Dim cellCount As Integer
         For Each rc In task.redCells
             If rc.pixels > smallCellThreshold Then

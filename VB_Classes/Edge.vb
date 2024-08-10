@@ -1141,3 +1141,42 @@ Public Class Edge_MotionOverlay : Inherits VB_Parent
         labels(2) = "Src offset (x,y) = (" + CStr(options.xDisp) + "," + CStr(options.yDisp) + ")"
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Edge_RedCloud : Inherits VB_Parent
+    Dim canny As New Edge_Canny
+    Dim redC As New RedCloud_Basics
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "Canny Edges (0), RedCloud output (1), RedCloud Edges(2), 0 And'd with 2"
+        labels(3) = "Cell boundaries that are also real edges."
+        task.redOptions.setIdentifyCells(False)
+        desc = "Identify cell boundaries that are also edges."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        canny.Run(src)
+        mats.mat(0) = canny.dst2
+
+        redC.Run(src)
+        mats.mat(1) = redC.dst2
+
+        canny.Run(redC.dst2)
+        mats.mat(2) = canny.dst2
+
+        mats.mat(3) = mats.mat(2).SetTo(0, Not mats.mat(0))
+
+        mats.Run(src)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+    End Sub
+End Class
+
+
+
+
+

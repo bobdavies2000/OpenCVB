@@ -49,7 +49,6 @@ Public Class Mesh_Features : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim mesh As New Mesh_Basics
     Public Sub New()
-        FindSlider("Min Distance to next").Value = 10
         labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
         UpdateAdvice(traceName + ": Use 'Options_Features' to update results.")
         desc = "Build triangles from feature points"
