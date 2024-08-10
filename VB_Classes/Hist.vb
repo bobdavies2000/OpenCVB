@@ -922,7 +922,7 @@ Public Class Hist_ShapeSide : Inherits VB_Parent
                         {task.histogramBins, task.histogramBins}, task.rangesSide)
         dst0.Col(0).SetTo(0) ' too many zero depth points...
 
-        dst0 = GetNormalize32f(dst0)
+        dst0 = Convert32f_To_8UC3(dst0)
         dst0.ConvertTo(dst0, cv.MatType.CV_8UC1)
 
         Dim r As New cv.Rect(0, 0, dst2.Height, dst2.Height)
@@ -951,7 +951,7 @@ Public Class Hist_ShapeTop : Inherits VB_Parent
                         {task.histogramBins, task.histogramBins}, task.rangesTop)
         dst0.Row(0).SetTo(0) ' too many zero depth points...
 
-        dst0 = GetNormalize32f(dst0)
+        dst0 = Convert32f_To_8UC3(dst0)
         dst0.ConvertTo(dst0, cv.MatType.CV_8UC1)
 
         Dim r As New cv.Rect(0, 0, dst2.Height, dst2.Height)

@@ -248,7 +248,7 @@ Public Class Math_ImageAverage : Inherits VB_Parent
             dst3 += img
         Next
         If dst3.Type <> src.Type Then dst3.ConvertTo(dst2, src.Type) Else dst2 = dst3.Clone
-        dst3 = GetNormalize32f(dst3)
+        dst3 = Convert32f_To_8UC3(dst3)
         labels(2) = "Average image over previous " + CStr(task.frameHistoryCount) + " images"
     End Sub
 End Class

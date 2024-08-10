@@ -192,7 +192,7 @@ Public Class VB_Parent : Implements IDisposable
         Dim split = pc.Split()
         Return split(index)
     End Function
-    Public Function GetNormalize32f(Input As cv.Mat) As cv.Mat
+    Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
         Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
         If Input.Channels() = 1 Then
             outMat.ConvertTo(outMat, cv.MatType.CV_8U)

@@ -29,7 +29,7 @@ Module VB_Common
         thisObj = withThisObj
         withThisObj = tempObj
     End Sub
-    Public Function GetNormalize32f(Input As cv.Mat) As cv.Mat
+    Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
         Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
         If Input.Channels() = 1 Then
             outMat.ConvertTo(outMat, cv.MatType.CV_8U)
@@ -42,14 +42,14 @@ Module VB_Common
         Dim outMat As New cv.Mat
         If input.Type = cv.MatType.CV_8UC3 Then Return input
         If input.Type = cv.MatType.CV_32F Then
-            outMat = GetNormalize32f(input)
+            outMat = Convert32f_To_8UC3(input)
         ElseIf input.Type = cv.MatType.CV_32SC1 Then
             input.ConvertTo(outMat, cv.MatType.CV_32F)
-            outMat = GetNormalize32f(outMat)
+            outMat = Convert32f_To_8UC3(outMat)
         ElseIf input.Type = cv.MatType.CV_32SC3 Then
             input.ConvertTo(outMat, cv.MatType.CV_32F)
             outMat = outMat.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            outMat = GetNormalize32f(outMat)
+            outMat = Convert32f_To_8UC3(outMat)
         ElseIf input.Type = cv.MatType.CV_32FC3 Then
             Dim split = input.Split()
             split(0) = split(0).ConvertScaleAbs(255)

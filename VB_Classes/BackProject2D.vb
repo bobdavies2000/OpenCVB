@@ -152,7 +152,7 @@ Public Class BackProject2D_Top : Inherits VB_Parent
         dst2 = heat.dst2
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst3, task.rangesTop)
-        dst3 = GetNormalize32f(dst3)
+        dst3 = Convert32f_To_8UC3(dst3)
         dst3 = ShowPalette(dst3)
     End Sub
 End Class
@@ -172,7 +172,7 @@ Public Class BackProject2D_Side : Inherits VB_Parent
         dst2 = heat.dst3
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst3, task.rangesSide)
-        dst3 = GetNormalize32f(dst3)
+        dst3 = Convert32f_To_8UC3(dst3)
         dst3 = ShowPalette(dst3)
     End Sub
 End Class
@@ -331,7 +331,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Parent
         labels(2) = "Histogram 2D with Backprojection by " + selection
 
         backp.Run(src)
-        dst2 = GetNormalize32f(backp.dst2) * 255
+        dst2 = Convert32f_To_8UC3(backp.dst2) * 255
 
         Dim roi = task.gridList(task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X))
         Dim rect As cv.Rect

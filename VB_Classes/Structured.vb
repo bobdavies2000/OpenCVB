@@ -265,8 +265,8 @@ Public Class Structured_Rebuild : Inherits VB_Parent
             pointcloud = task.pointCloud
         End If
 
-        dst2 = GetNormalize32f(task.pcSplit(0))
-        dst3 = GetNormalize32f(task.pcSplit(1))
+        dst2 = Convert32f_To_8UC3(task.pcSplit(0))
+        dst3 = Convert32f_To_8UC3(task.pcSplit(1))
         dst2.SetTo(0, task.noDepthMask)
         dst3.SetTo(0, task.noDepthMask)
     End Sub

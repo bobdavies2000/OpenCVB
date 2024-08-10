@@ -244,7 +244,7 @@ namespace CS_Classes
         return split[index];
     }
 
-    public cv.Mat GetNormalize32f(cv.Mat Input)
+    public cv.Mat Convert32f_To_8UC3(cv.Mat Input)
     {
         cv.Mat outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax);
         if (Input.Channels() == 1)

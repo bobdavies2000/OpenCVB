@@ -342,7 +342,7 @@ namespace CPP_Classes
     }
 
 
-    cv::Mat GetNormalize32f(const cv::Mat& input) {
+    cv::Mat Convert32f_To_8UC3(const cv::Mat& input) {
         cv::Mat outMat;
         cv::normalize(input, outMat, 0, 255, cv::NORM_MINMAX, CV_8U);  // Normalize to 8-bit unsigned
 
@@ -364,16 +364,16 @@ namespace CPP_Classes
         }
 
         if (input.type() == CV_32F) {
-            outMat = GetNormalize32f(input);  // Assuming this function is defined
+            outMat = Convert32f_To_8UC3(input);  // Assuming this function is defined
         }
         else if (input.type() == CV_32SC1) {
             input.convertTo(outMat, CV_32F);
-            outMat = GetNormalize32f(outMat);
+            outMat = Convert32f_To_8UC3(outMat);
         }
         else if (input.type() == CV_32SC3) {
             input.convertTo(outMat, CV_32F);
             cvtColor(outMat, outMat, COLOR_BGR2GRAY);
-            outMat = GetNormalize32f(outMat);
+            outMat = Convert32f_To_8UC3(outMat);
         }
         else if (input.type() == CV_32FC3) {
             std::vector<Mat> split;

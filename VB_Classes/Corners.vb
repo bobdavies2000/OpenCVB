@@ -136,7 +136,7 @@ Public Class Corners_ShiTomasi_CPP_VB : Inherits VB_Parent
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr).Clone
 
-        dst3 = GetNormalize32f(dst2)
+        dst3 = Convert32f_To_8UC3(dst2)
         dst3 = dst3.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
@@ -270,7 +270,7 @@ Public Class Corners_Harris_CPP_VB : Inherits VB_Parent
         handleSrc.Free()
 
         Dim gray32f = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
-        '  gray32f = GetNormalize32f(gray32f)
+        '  gray32f = Convert32f_To_8UC3(gray32f)
         gray32f.ConvertTo(dst2, cv.MatType.CV_8U)
         addw.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addw.Run(task.color)

@@ -336,7 +336,7 @@ Public Class Match_PointSlope : Inherits VB_Parent
 
                 If i < 4 Then ' only 4 mats can be displayed in the Mat_4to1 algorithm...
                     mats.mat(i).SetTo(0)
-                    correlationMat = GetNormalize32f(correlationMat)
+                    correlationMat = Convert32f_To_8UC3(correlationMat)
                     Dim r = New cv.Rect((dst2.Width - correlationMat.Width) / 2, (dst2.Height - correlationMat.Height) / 2, correlationMat.Width, correlationMat.Height)
                     correlationMat.CopyTo(mats.mat(i)(r))
                 End If

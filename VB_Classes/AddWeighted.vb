@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics : Inherits VB_Parent
-    Public src2 As cv.Mat
+    Public src2 As cv.Mat  ' user normally provides src2! 
     Public options As New Options_AddWeighted
     Public Sub New()
         UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'")
@@ -9,20 +9,18 @@ Public Class AddWeighted_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim srcPlus = src2
-        ' algorithm user normally provides src2! 
-        If standaloneTest() Or src2 Is Nothing Then srcPlus = task.depthRGB
-        If srcPlus.Type <> src.Type Then
-            If src.Type <> cv.MatType.CV_8UC3 Or srcPlus.Type <> cv.MatType.CV_8UC3 Then
-                If src.Type = cv.MatType.CV_32FC1 Then src = GetNormalize32f(src)
-                If srcPlus.Type = cv.MatType.CV_32FC1 Then srcPlus = GetNormalize32f(srcPlus)
+        If standalone Then src2 = task.depthRGB
+        If src2.Type <> src.Type Then
+            If src.Type <> cv.MatType.CV_8UC3 Or src2.Type <> cv.MatType.CV_8UC3 Then
+                If src.Type = cv.MatType.CV_32FC1 Then src = Convert32f_To_8UC3(src)
+                If src2.Type = cv.MatType.CV_32FC1 Then src2 = Convert32f_To_8UC3(src2)
                 If src.Type <> cv.MatType.CV_8UC3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                If srcPlus.Type <> cv.MatType.CV_8UC3 Then srcPlus = srcPlus.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                If src2.Type <> cv.MatType.CV_8UC3 Then src2 = src2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End If
         End If
 
         Dim weight = options.addWeighted
-        cv.Cv2.AddWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2)
+        cv.Cv2.AddWeighted(src, weight, src2, 1.0 - weight, 0, dst2)
         labels(2) = $"Depth %: {100 - weight * 100} BGR %: {CInt(weight * 100)}"
     End Sub
 End Class

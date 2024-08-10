@@ -48,8 +48,8 @@ namespace CS_Classes
             {
                 if (src.Type() != MatType.CV_8UC3 || srcPlus.Type() != MatType.CV_8UC3)
                 {
-                    if (src.Type() == MatType.CV_32FC1) src = GetNormalize32f(src);
-                    if (srcPlus.Type() == MatType.CV_32FC1) srcPlus = GetNormalize32f(srcPlus);
+                    if (src.Type() == MatType.CV_32FC1) src = Convert32f_To_8UC3(src);
+                    if (srcPlus.Type() == MatType.CV_32FC1) srcPlus = Convert32f_To_8UC3(srcPlus);
                     if (src.Type() != MatType.CV_8UC3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
                     if (srcPlus.Type() != MatType.CV_8UC3) srcPlus = srcPlus.CvtColor(ColorConversionCodes.GRAY2BGR);
                 }
@@ -5314,7 +5314,7 @@ namespace CS_Classes
             var selection = options.backProjectRow ? "Row" : "Col";
             labels[2] = "Histogram 2D with Backprojection by " + selection;
             backp.Run(src);
-            dst2 = GetNormalize32f(backp.dst2) * 255;
+            dst2 = Convert32f_To_8UC3(backp.dst2) * 255;
             var roi = task.gridList[task.gridMap.Get<int>(task.mouseMovePoint.Y, task.mouseMovePoint.X)];
             cv.Rect rect;
             if (options.backProjectRow)
@@ -5407,7 +5407,7 @@ namespace CS_Classes
             dst2 = heat.dst2;
 
             Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, heat.histogramTop, dst3, task.rangesTop);
-            dst3 = GetNormalize32f(dst3);
+            dst3 = Convert32f_To_8UC3(dst3);
             dst3 = ShowPalette(dst3);
         }
     }
@@ -5432,7 +5432,7 @@ namespace CS_Classes
             dst2 = heat.dst3;
 
             Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsSide, heat.histogramSide, dst3, task.rangesSide);
-            dst3 = GetNormalize32f(dst3);
+            dst3 = Convert32f_To_8UC3(dst3);
             dst3 = ShowPalette(dst3);
         }
     }
@@ -9923,7 +9923,7 @@ namespace CS_Classes
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr).Clone();
 
-            dst3 = GetNormalize32f(dst2);
+            dst3 = Convert32f_To_8UC3(dst2);
             dst3 = dst3.Threshold(options.threshold, 255, ThresholdTypes.Binary);
         }
 
@@ -10081,7 +10081,7 @@ namespace CS_Classes
             handleSrc.Free();
 
             Mat gray32f = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr);
-            // gray32f = GetNormalize32f(gray32f);
+            // gray32f = Convert32f_To_8UC3(gray32f);
             gray32f.ConvertTo(dst2, MatType.CV_8U);
             addw.src2 = dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
             addw.Run(task.color);
@@ -11511,7 +11511,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             gradient.Run(empty);
-            dst3 = GetNormalize32f(gradient.dst3);
+            dst3 = Convert32f_To_8UC3(gradient.dst3);
             dense.Run(src);
             dst2 = dense.dst2;
         }
@@ -14034,7 +14034,7 @@ namespace CS_Classes
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
             dst0 = src.DistanceTransform(options.distanceType, 0);
-            dst1 = GetNormalize32f(dst0);
+            dst1 = Convert32f_To_8UC3(dst0);
             dst1.ConvertTo(dst2, MatType.CV_8UC1);
         }
     }
@@ -26162,7 +26162,7 @@ namespace CS_Classes
             Cv2.CalcHist(new Mat[] { src }, task.channelsSide, new Mat(), dst0, 2,
                           new int[] { task.histogramBins, task.histogramBins }, task.rangesSide);
             dst0.Col(0).SetTo(0); // too many zero depth points...
-            dst0 = GetNormalize32f(dst0);
+            dst0 = Convert32f_To_8UC3(dst0);
             dst0.ConvertTo(dst0, MatType.CV_8UC1);
             cv.Rect r = new cv.Rect(0, 0, dst2.Height, dst2.Height);
             dst2[r] = dst0.Resize(new cv.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
@@ -26188,7 +26188,7 @@ namespace CS_Classes
             Cv2.CalcHist(new Mat[] { src }, task.channelsTop, new Mat(), dst0, 2,
                           new int[] { task.histogramBins, task.histogramBins }, task.rangesTop);
             dst0.Row(0).SetTo(0); // too many zero depth points...
-            dst0 = GetNormalize32f(dst0);
+            dst0 = Convert32f_To_8UC3(dst0);
             dst0.ConvertTo(dst0, MatType.CV_8UC1);
             cv.Rect r = new cv.Rect(0, 0, dst2.Height, dst2.Height);
             dst2[r] = dst0.Resize(new cv.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
@@ -37314,7 +37314,7 @@ namespace CS_Classes
                     if (i < 4) // only 4 mats can be displayed in the Mat_4to1 algorithm...
                     {
                         mats.mat[i].SetTo(0);
-                        correlationMat = GetNormalize32f(correlationMat);
+                        correlationMat = Convert32f_To_8UC3(correlationMat);
                         var r = new cv.Rect((dst2.Width - correlationMat.Width) / 2, (dst2.Height - correlationMat.Height) / 2, correlationMat.Width, correlationMat.Height);
                         correlationMat.CopyTo(mats.mat[i][r]);
                     }
@@ -38471,7 +38471,7 @@ namespace CS_Classes
                 dst3 += img;
             }
             if (dst3.Type() != src.Type()) dst3.ConvertTo(dst2, src.Type()); else dst2 = dst3.Clone();
-            dst3 = GetNormalize32f(dst3);
+            dst3 = Convert32f_To_8UC3(dst3);
             labels[2] = "Average image over previous " + task.frameHistoryCount.ToString() + " images";
         }
     }
@@ -44472,7 +44472,7 @@ namespace CS_Classes
             gradient.Run(src);
             dst2 = gradient.dst2;
             dst3 = gradient.dst3;
-            dst1 = GetNormalize32f(gradient.dst3);
+            dst1 = Convert32f_To_8UC3(gradient.dst3);
             labels = gradient.labels;
             task.ogl.pointCloudInput = task.pointCloud;
             task.ogl.Run(dst1);
@@ -45252,7 +45252,7 @@ namespace CS_Classes
             labels[2] = "ColorMap = " + task.gOptions.getPalette();
             if (src.Type() == MatType.CV_32F)
             {
-                src = GetNormalize32f(src);
+                src = Convert32f_To_8UC3(src);
                 src.ConvertTo(src, MatType.CV_8U);
             }
             Cv2.ApplyColorMap(src, dst2, choices[task.paletteIndex]);
@@ -45717,7 +45717,7 @@ namespace CS_Classes
             }
             if (src.Type() == MatType.CV_32F)
             {
-                src = GetNormalize32f(src);
+                src = Convert32f_To_8UC3(src);
                 src.ConvertTo(src, MatType.CV_8U);
             }
             Cv2.ApplyColorMap(src, dst2, colorMap);
@@ -45754,7 +45754,7 @@ namespace CS_Classes
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (src.Type() == MatType.CV_32F)
             {
-                src = GetNormalize32f(src);
+                src = Convert32f_To_8UC3(src);
                 src.ConvertTo(src, MatType.CV_8U);
             }
             Cv2.ApplyColorMap(src, dst2, colorMap);
@@ -52745,7 +52745,7 @@ namespace CS_Classes
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             ccomp.Run(src);
-            dst3 = GetNormalize32f(ccomp.dst1);
+            dst3 = Convert32f_To_8UC3(ccomp.dst1);
             labels[3] = ccomp.labels[2];
             redC.Run(dst3);
             dst2 = redC.dst2;
@@ -57723,8 +57723,8 @@ namespace CS_Classes
                 task.pcSplit = task.pointCloud.Split();
                 pointcloud = task.pointCloud;
             }
-            dst2 = GetNormalize32f(task.pcSplit[0]);
-            dst3 = GetNormalize32f(task.pcSplit[1]);
+            dst2 = Convert32f_To_8UC3(task.pcSplit[0]);
+            dst3 = Convert32f_To_8UC3(task.pcSplit[1]);
             dst2.SetTo(0, task.noDepthMask);
             dst3.SetTo(0, task.noDepthMask);
         }

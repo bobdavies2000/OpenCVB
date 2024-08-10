@@ -1275,7 +1275,7 @@ Public Class OpenGL_GradientPhase : Inherits VB_Parent
         gradient.Run(src)
         dst2 = gradient.dst2
         dst3 = gradient.dst3
-        dst1 = GetNormalize32f(gradient.dst3)
+        dst1 = Convert32f_To_8UC3(gradient.dst3)
         labels = gradient.labels
 
         task.ogl.pointCloudInput = task.pointCloud

@@ -1121,7 +1121,7 @@ Public Class RedCloud_CCompColor : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(src)
-        dst3 = GetNormalize32f(ccomp.dst1)
+        dst3 = Convert32f_To_8UC3(ccomp.dst1)
         labels(3) = ccomp.labels(2)
 
         redC.Run(dst3)

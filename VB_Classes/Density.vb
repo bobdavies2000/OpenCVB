@@ -38,7 +38,7 @@ Public Class Density_Phase : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         gradient.Run(empty)
-        dst3 = GetNormalize32f(gradient.dst3)
+        dst3 = Convert32f_To_8UC3(gradient.dst3)
 
         dense.Run(src)
         dst2 = dense.dst2
