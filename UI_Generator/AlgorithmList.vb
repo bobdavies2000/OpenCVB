@@ -75,6 +75,8 @@ _EdgeDraw_Basics_CPP
 _Distance_Basics_CPP
 _FeatureLess_Basics_CPP
 _FeatureLess_Edge_CPP
+_Feature_AKaze_CPP
+_AddWeighted_ImageAccumulate_CPP
 _Stable_BasicsCount_CPP
 End Enum
 Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
@@ -331,6 +333,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Covariance_Test" Then return new Covariance_Test
 	if algorithmName = "CPP_Basics" Then return new CPP_Basics
 if algorithmName = "AddWeighted_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._AddWeighted_Basics_CPP)
+if algorithmName = "AddWeighted_ImageAccumulate_CPP" Then return new CPP_Basics(cppFunctionNames._AddWeighted_ImageAccumulate_CPP)
 if algorithmName = "ApproxPoly_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._ApproxPoly_Basics_CPP)
 if algorithmName = "ApproxPoly_FindandDraw_CPP" Then return new CPP_Basics(cppFunctionNames._ApproxPoly_FindandDraw_CPP)
 if algorithmName = "ApproxPoly_Hull_CPP" Then return new CPP_Basics(cppFunctionNames._ApproxPoly_Hull_CPP)
@@ -361,6 +364,7 @@ if algorithmName = "Edge_Segments_CPP" Then return new CPP_Basics(cppFunctionNam
 if algorithmName = "Edge_Sobel_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_Sobel_CPP)
 if algorithmName = "EdgeDraw_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._EdgeDraw_Basics_CPP)
 if algorithmName = "Feature_Agast_CPP" Then return new CPP_Basics(cppFunctionNames._Feature_Agast_CPP)
+if algorithmName = "Feature_AKaze_CPP" Then return new CPP_Basics(cppFunctionNames._Feature_AKaze_CPP)
 if algorithmName = "Feature_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Feature_Basics_CPP)
 if algorithmName = "Feature_StableSorted_CPP" Then return new CPP_Basics(cppFunctionNames._Feature_StableSorted_CPP)
 if algorithmName = "FeatureLess_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._FeatureLess_Basics_CPP)
@@ -595,6 +599,8 @@ if algorithmName = "Stable_BasicsCount_CPP" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Extrinsics_Display" Then return new Extrinsics_Display
 	if algorithmName = "Face_Haar_Alt" Then return new Face_Haar_Alt
 	if algorithmName = "Face_Haar_LBP" Then return new Face_Haar_LBP
+	if algorithmName = "Feature_Agast" Then return new Feature_Agast
+	if algorithmName = "Feature_AKaze" Then return new Feature_AKaze
 	if algorithmName = "Feature_Basics" Then return new Feature_Basics
 	if algorithmName = "Feature_BasicsNoFrills" Then return new Feature_BasicsNoFrills
 	if algorithmName = "Feature_Compare" Then return new Feature_Compare

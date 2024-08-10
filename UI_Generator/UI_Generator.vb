@@ -248,13 +248,13 @@ Module UI_GeneratorMain
         Dim LastEdits As New SortedList(Of String, String)
 
         Dim cppAlgorithmInput = New FileInfo("../CPP_Classes/CPP_Algorithms.h")
-        Dim CPPIncludeOnly = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
+        Dim CPPInputs = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
         Dim CSInputs = {New FileInfo("../CS_Classes/CS_AI_Generated.cs").FullName,
                         New FileInfo("../CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../VB_classes/")
         If cppAlgorithmInput.Exists = False Then
             cppAlgorithmInput = New FileInfo("../../CPP_Classes/CPP_Algorithms.h")
-            CPPIncludeOnly = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
+            CPPInputs = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
             CSInputs = {New FileInfo("../../CS_Classes/CS_AI_Generated.cs").FullName,
                         New FileInfo("../../CS_Classes/Non_AI.cs").FullName}
             VBcodeDir = New DirectoryInfo(CurDir() + "/../../VB_classes/")
@@ -273,14 +273,16 @@ Module UI_GeneratorMain
         If indexTestFile.Exists And Not Debugger.IsAttached Then
             If checkDates(New DirectoryInfo(HomeDir.FullName + "/CS_Classes/"), indexTestFile) = False Then
                 If checkDates(New DirectoryInfo(HomeDir.FullName + "/VB_Classes/"), indexTestFile) = False Then
-                    Console.WriteLine("The user interface is already up to date.")
-                    Exit Sub ' nothing to trigger 
+                    If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Classes/"), indexTestFile) = False Then
+                        Console.WriteLine("The user interface is already up to date.")
+                        Exit Sub ' nothing to trigger 
+                    End If
                 End If
             End If
         End If
         Console.WriteLine("Starting work to generate the user interface.")
 
-        Dim includeOnly = File.ReadAllLines(CPPIncludeOnly.FullName)
+        Dim includeOnly = File.ReadAllLines(CPPInputs.FullName)
         Dim cppLines As Integer, csLines As Integer
         For Each incline In includeOnly
             incline = Trim(incline)
@@ -301,7 +303,7 @@ Module UI_GeneratorMain
         Next
 
         ' first read all the cpp functions that are present in the project
-        Dim functionInput As New FileInfo(HomeDir.FullName + "/CPP_Classes/CPP_FunctionNames.h")
+        Dim functionInput As New FileInfo(HomeDir.FullName + "/CPP_Classes/CPP_Enum.h")
         Dim srFunctions = New StreamReader(functionInput.FullName)
         Dim cppFunctionNames As New SortedList(Of String, String)
         Dim unsortedFunctions As New List(Of String)
@@ -313,9 +315,9 @@ Module UI_GeneratorMain
                     If cppline = "{" Then Continue While
                     If cppline = "};" Then Exit While
                     Dim split = cppline.Split(",")
-                    If split(0).Contains("MAX_FUNCTION") Then Continue While
-                    cppFunctionNames.Add(split(0).Substring(0), split(0))
-                    unsortedFunctions.Add(split(0).Substring(0))
+                    If split(0).Contains("MAX_FUNCTION = ") Then Continue While
+                    cppFunctionNames.Add(split(0).Substring(0).Trim(), split(0).Trim())
+                    unsortedFunctions.Add(split(0).Substring(0).Trim())
                 End While
             End If
         End While
@@ -477,9 +479,9 @@ Module UI_GeneratorMain
             If nextName.StartsWith("CPP_Basics") Then
                 For j = 0 To cppFunctionNames.Count - 1
                     Dim functionText = cppFunctionNames.ElementAt(j).Key
-                    Dim func = functionText
                     functionText = functionText.Substring(1)
-                    sw.WriteLine("if algorithmName = """ + functionText + """ Then return new CPP_Basics(cppFunctionNames." + func + ")")
+                    sw.WriteLine("if algorithmName = """ + functionText + """ Then " +
+                                 "return new CPP_Basics(cppFunctionNames._" + functionText + ")")
                 Next
             End If
         Next

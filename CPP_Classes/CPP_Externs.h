@@ -61,8 +61,6 @@ namespace CPP_Classes
         { task->alg = new Mat_4Click_CPP(); task->alg->traceName = "Mat_4Click_CPP"; break; }
         case _Area_MinRect_CPP:
         { task->alg = new Area_MinRect_CPP(); task->alg->traceName = "Area_MinRect_CPP"; break; }
-        case _Mesh_Agast_CPP:
-        { task->alg = new Mesh_Agast_CPP(); task->alg->traceName = "Mesh_Agast_CPP"; break; }
         case _Mesh_Basics_CPP:
         { task->alg = new Mesh_Basics_CPP(); task->alg->traceName = "Mesh_Basics_CPP"; break; }
         case _RedColor_FeatureLess_CPP:
@@ -183,8 +181,12 @@ namespace CPP_Classes
         { task->alg = new FPoly_TopFeatures_CPP(); task->alg->traceName = "FPoly_TopFeatures_CPP"; break; }
         case _Mesh_Features_CPP:
         { task->alg = new Mesh_Features_CPP(); task->alg->traceName = "Mesh_Features_CPP"; break; }
+        case _Feature_AKaze_CPP:
+        { task->alg = new Feature_AKaze_CPP(); task->alg->traceName = "Feature_AKaze_CPP"; break; }
         case _Feature_StableSorted_CPP:
         { task->alg = new Feature_StableSorted_CPP(); task->alg->traceName = "Feature_StableSorted_CPP"; break; }
+		case _AddWeighted_ImageAccumulate_CPP:
+		{ task->alg = new AddWeighted_ImageAccumulate_CPP(); task->alg->traceName = "AddWeighted_ImageAccumulate_CPP"; break; }
         // end of switch - don't remove...
         }
 

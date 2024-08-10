@@ -1,6 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
+Imports System.Drawing
+Imports System.Security.Cryptography
 Public Class Feature_Basics : Inherits VB_Parent
     Dim nextMatList As New List(Of cv.Mat)
     Dim ptList As New List(Of cv.Point2f)
@@ -738,7 +740,7 @@ Public Class Feature_Gather : Inherits VB_Parent
                 For i = 0 To ptMat.Rows - 1
                     Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
                     features.Add(pt)
-                    If standaloneTest() Then DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
+                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
                 Next
 
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
@@ -763,11 +765,85 @@ Public Class Feature_Gather : Inherits VB_Parent
         If standaloneTest() Then
             dst2 = task.color.Clone
             For Each pt In features
-                DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
             Next
         End If
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+Public Class Feature_Agast : Inherits VB_Parent
+    Dim stablePoints As List(Of Point2f)
+    Dim agastFD As AgastFeatureDetector
+    Dim lastPoints As List(Of Point2f)
+    Public Sub New()
+        agastFD = AgastFeatureDetector.Create(10, True, AgastFeatureDetector.DetectorType.OAST_9_16)
+        desc = "Use the Agast Feature Detector in the OpenCV Contrib."
+        stablePoints = New List(Of Point2f)()
+        lastPoints = New List(Of Point2f)()
+    End Sub
+    Public Sub RunVB(src As Mat)
+        Dim resizeFactor As Integer = 1
+        Dim input As New Mat()
+        If src.Cols >= 1280 Then
+            Cv2.Resize(src, input, New cv.Size(src.Cols \ 4, src.Rows \ 4))
+            resizeFactor = 4
+        Else
+            input = src
+        End If
+        Dim keypoints As KeyPoint() = agastFD.Detect(input)
+        If task.heartBeat OrElse lastPoints.Count < 10 Then
+            lastPoints.Clear()
+            For Each kpt As KeyPoint In keypoints
+                lastPoints.Add(New Point2f(CSng(Math.Round(kpt.Pt.X)) * resizeFactor, CSng(Math.Round(kpt.Pt.Y)) * resizeFactor))
+            Next
+        End If
+        stablePoints.Clear()
+        dst2 = src.Clone()
+        For Each pt As KeyPoint In keypoints
+            Dim p1 As New Point2f(CSng(Math.Round(pt.Pt.X * resizeFactor)), CSng(Math.Round(pt.Pt.Y * resizeFactor)))
+            If lastPoints.Contains(p1) Then
+                stablePoints.Add(p1)
+                DrawCircle(dst2, p1, task.DotSize, New Scalar(0, 0, 255))
+            End If
+        Next
+        lastPoints = New List(Of Point2f)(stablePoints)
+        If task.midHeartBeat Then
+            labels(2) = $"{keypoints.Length} features found and {stablePoints.Count} of them were stable"
+        End If
+        labels(2) = $"Found {keypoints.Length} features"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Feature_AKaze : Inherits VB_Parent
+    Dim kazeKeyPoints As KeyPoint() = Nothing
+    Public Sub New()
+        labels(2) = "AKAZE key points"
+        desc = "Find keypoints using AKAZE algorithm."
+    End Sub
+    Public Sub RunVB(src As Mat)
+        dst2 = src.Clone()
+        If src.Channels() <> 1 Then
+            src = src.CvtColor(ColorConversionCodes.BGR2GRAY)
+        End If
+        Dim kaze = AKAZE.Create()
+        Dim kazeDescriptors As New Mat()
+        kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
+        For i As Integer = 0 To kazeKeyPoints.Length - 1
+            DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.HighlightColor)
+        Next
     End Sub
 End Class

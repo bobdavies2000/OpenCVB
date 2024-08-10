@@ -17,16 +17,17 @@ Public Class Touchup
         If CSharp_To_CPP.Checked Then touchupMode = tmode.CSharpToCPP
 
         Dim className As String = ""
-        Dim outputLines As String = ""
+        Dim outputLines As New List(Of String)
         For Each inline In inputLines
-            Dim line = Trim(inline)
-            If line.Length = 0 Then Continue For
+            Dim trimLine = Trim(inline)
+            If trimLine.Length = 0 Then Continue For
+            If trimLine.StartsWith("public class") Or trimLine.StartsWith("Public Class") Then
+                Dim split = trimLine.Split(" ")
+                className = split(2)
+            End If
+
             Select Case touchupMode
-                Case tmode.CSharpToVB
-                    If line.StartsWith("public class") Then
-                        Dim split = line.Split(" ")
-                        className = split(2)
-                    End If
+                Case tmode.VBToCSharp
                     If inline.Contains("string desc;") Then Continue For
                     If inline.Contains("IntPtr cPtr;") Then Continue For
                     If inline.Contains(className) Then inline = inline.Replace(className, className + "_CS")
@@ -95,39 +96,46 @@ Public Class Touchup
                     inline = Replace(inline, "cv.Rectangle", "Rectangle")
 
                 Case tmode.CSharpToVB
-                    If line.StartsWith("Public Class CS_") Then
-                        inline = inline.Replace("Public Class " + className + "_CS", "Public Class VB_")
-                        inline = inline + " : Inherits VB_Parent"
-                        Dim split = inline.Split(" ")
-                        className = "VB_" + split(2)
+                    If trimLine.StartsWith("Public Class ") Then
+                        className = className.Replace("_CS", "")
+                        inline = "Public Class " + className + " : Inherits VB_Parent"
                     End If
-                    If inline.Contains("Inherits CS_Parent") Then Continue For
+
+                    If inline.Contains(" CS_Parent") Then Continue For
                     If inline.Contains("MyBase.New(task)") Then Continue For
-                    inline = inline.Replace("CS_Parent", "VB_Parent")
-                    inline = inline.Replace("New(task As VBtask)", "New()")
+
+                    inline = inline.Replace("task As VBtask", "")
+                    inline = inline.Replace("Round(", "Math.Round(")
+                    inline = inline.Replace("Math.Math.", "Math.")
+
                     inline = inline.Replace(" RunCS(src As Mat)", " RunVB(src As Mat)")
                     inline = inline.Replace("Private ", "Dim ")
                     If inline.Contains(" Rect") Then
                         inline = inline.Replace(" Rect", " cv.Rect")
                     End If
+                    inline = inline.Replace(" Size(", " cv.Size(")
                 Case tmode.CSharpToCPP
                     inline = inline.Replace("_CS : public CS_Parent", "_CPP : public CPP_Parent")
                     inline = inline.Replace("UpdateAdvice(", "task->UpdateAdvice(")
-                    inline = inline.Replace("VBtask task) : CS_Parent(task)", ")")
+                    inline = inline.Replace("_CS(VBtask task) : CS_Parent(task)", "_CPP() : CPP_Parent()")
+                    inline = inline.Replace("_CS(VBtask& task) : CS_Parent(task)", "_CPP() : CPP_Parent()")
                     inline = inline.Replace("task.", "task->")
                     inline = inline.Replace(" options;", " *options;")
                     inline = inline.Replace("options.", "options->")
                     inline = inline.Replace("standaloneTest()", "standalone")
                     inline = inline.Replace("_CS()", "_CPP() : CPP_Parent()")
-                    inline = inline.Replace("RunCS(", "RunCPP(")
+                    inline = inline.Replace("RunCS(", "Run(")
 
             End Select
 
-            outputLines += inline + vbCrLf
+            outputLines.Add(inline)
         Next
 
+
         rtb.Clear()
-        rtb.Text = outputLines
+        For Each line In outputLines
+            rtb.Text += line + vbCrLf
+        Next
     End Sub
     Private Sub VBtoCSharp_CheckedChanged(sender As Object, e As EventArgs) Handles VB_To_CSharp.CheckedChanged
         SaveSetting("OpenCVB", "tmode", "tmode", tmode.VBToCSharp)

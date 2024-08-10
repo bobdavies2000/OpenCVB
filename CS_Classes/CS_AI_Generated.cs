@@ -22,8 +22,6 @@ using OpenCvSharp.XPhoto;
 using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.IO.Pipes;
-using System.Windows.Controls;
-using CS_Classes;
 
 namespace CS_Classes
 {
@@ -62257,29 +62255,89 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = xPhoto_Inpaint_Close(cPtr);
         }
     }
-}
 
 
 
-public class Horizon_Perpendicular_CS : CS_Parent
-{
-    Line_Perpendicular perp = new Line_Perpendicular();
-    public Horizon_Perpendicular_CS(VBtask task) : base(task)
+    public class Horizon_Perpendicular_CS : CS_Parent
     {
-        labels[2] = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU.";
-        desc = "Find the gravity vector using the perpendicular to the horizon.";
+        Line_Perpendicular perp = new Line_Perpendicular();
+        public Horizon_Perpendicular_CS(VBtask task) : base(task)
+        {
+            labels[2] = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU.";
+            desc = "Find the gravity vector using the perpendicular to the horizon.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src;
+            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, Scalar.White);
+            perp.p1 = task.horizonVec.p1;
+            perp.p2 = task.horizonVec.p2;
+            perp.Run(src);
+            DrawLine(dst2, perp.r1, perp.r2, Scalar.Yellow);
+            var gVec = task.gravityVec;
+            gVec.p1.X += 10;
+            gVec.p2.X += 10;
+            DrawLine(dst2, gVec.p1, gVec.p2, Scalar.White);
+        }
     }
-    public void RunCS(Mat src)
+
+
+    public class Feature_Agast_CS : CS_Parent
     {
-        dst2 = src;
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, Scalar.White);
-        perp.p1 = task.horizonVec.p1;
-        perp.p2 = task.horizonVec.p2;
-        perp.Run(src);
-        DrawLine(dst2, perp.r1, perp.r2, Scalar.Yellow);
-        var gVec = task.gravityVec;
-        gVec.p1.X += 10;
-        gVec.p2.X += 10;
-        DrawLine(dst2, gVec.p1, gVec.p2, Scalar.White);
+        private List<Point2f> stablePoints;
+        private AgastFeatureDetector agastFD;
+        private List<Point2f> lastPoints;
+        public Feature_Agast_CS(VBtask task) : base(task)
+        {
+            agastFD = AgastFeatureDetector.Create(10, true, AgastFeatureDetector.DetectorType.OAST_9_16);
+            desc = "Use the Agast Feature Detector in the OpenCV Contrib.";
+            stablePoints = new List<Point2f>();
+            lastPoints = new List<Point2f>();
+        }
+        public void RunCS(Mat src)
+        {
+            int resizeFactor = 1;
+            Mat input = new cv.Mat();
+            if (src.Cols >= 1280)
+            {
+                Cv2.Resize(src, input, new cv.Size(src.Cols / 4, src.Rows / 4));
+                resizeFactor = 4;
+            }
+            else
+            {
+                input = src;
+            }
+            KeyPoint[] keypoints = agastFD.Detect(input);
+
+            if (task.heartBeat || lastPoints.Count < 10)
+            {
+                lastPoints.Clear();
+                foreach (KeyPoint kpt in keypoints)
+                {
+                    lastPoints.Add(new Point2f((float)Math.Round(kpt.Pt.X) * resizeFactor, (float)Math.Round(kpt.Pt.Y) * resizeFactor));
+                }
+            }
+            stablePoints.Clear();
+            dst2 = src.Clone();
+            foreach (KeyPoint pt in keypoints)
+            {
+                Point2f p1 = new Point2f((float)Math.Round(pt.Pt.X * resizeFactor), (float)Math.Round(pt.Pt.Y * resizeFactor));
+                if (lastPoints.Contains(p1))
+                {
+                    stablePoints.Add(p1);
+                    DrawCircle(dst2, p1, task.DotSize, new Scalar(0, 0, 255), -1);
+                }
+            }
+            lastPoints = new List<Point2f>(stablePoints);
+            if (task.midHeartBeat)
+            {
+                labels[2] = $"{keypoints.Count()} features found and {stablePoints.Count} of them were stable";
+            }
+            labels[2] = $"Found {keypoints.Count()} features";
+        }
     }
+
+
+
+
 }

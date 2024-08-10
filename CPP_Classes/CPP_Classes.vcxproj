@@ -30,7 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CPP_IncludeOnly.cpp" />
-    <ClCompile Include="Non-AI.cpp" />
+    <ClCompile Include="CPP_Non-AI.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -10,6 +10,7 @@ Public Class InsertAlgorithm
     Dim sw As StreamWriter
     Dim vbSnippet() As String
     Dim cppSnippet() As String
+    Dim cppAISnippet() As String
     Dim CSSnippet() As String
     Dim pyStream() As String
     Public Enum algType
@@ -18,6 +19,7 @@ Public Class InsertAlgorithm
         addCS = 3
         addPyStream = 4
         addOpenGL = 5
+        addCPP_AI = 6
     End Enum
     Private Function nextAlgorithm(algorithmType As algType) As Boolean
         If InStr(AlgorithmName.Text, "_") = False Then
@@ -35,8 +37,14 @@ Public Class InsertAlgorithm
                 ret = MsgBox("Would you like to add the algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
                              " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name, MsgBoxStyle.OkCancel)
 
+            Case algType.addCPP_AI
+                ret = MsgBox("Would you like to add the C++ algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text +
+                             vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "File: CPP_AI_Generated.h?",
+                             MsgBoxStyle.OkCancel)
+
+
             Case algType.addCPP
-                VBoutputName = New FileInfo("..\..\VB_Classes\" + Split(0) + ".vb")
+                VBoutputName = New FileInfo("..\..\VB_Classes\" + split(0) + ".vb")
 
                 CPPoutputName = New FileInfo("..\..\CPP_Classes\CPP_Algorithms.h")
 
@@ -108,7 +116,8 @@ Public Class InsertAlgorithm
         AlgorithmName.Text = OpenCVB.AvailableAlgorithms.Text
         vbSnippet = File.ReadAllLines("..\..\OpenCVB.snippets\VB_Class - new Class.snippet")
         cppSnippet = File.ReadAllLines("..\..\OpenCVB.snippets\CPP Class - new C++.snippet")
-        cSSnippet = File.ReadAllLines("..\..\OpenCVB.snippets\CSharp_Class - new Class.snippet")
+        cppAISnippet = File.ReadAllLines("..\..\OpenCVB.snippets\CPP Class - AI_Generated.snippet")
+        CSSnippet = File.ReadAllLines("..\..\OpenCVB.snippets\CSharp_Class - new Class.snippet")
         pyStream = File.ReadAllLines("..\..\Python_Classes\AddWeighted_PS.py")
     End Sub
     Private Sub AddCPP_Click(sender As Object, e As EventArgs) Handles AddCPP.Click
@@ -318,5 +327,59 @@ Public Class InsertAlgorithm
     End Sub
     Private Sub InsertAlgorithm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Me.Close()
+    End Sub
+
+    Private Sub Add_AI_Generated_Click(sender As Object, e As EventArgs) Handles Add_AI_Generated.Click
+        AlgorithmName.Text = AlgorithmName.Text.Replace("_CPP", "")
+        AlgorithmName.Text = AlgorithmName.Text.Replace("_CS", "")
+        AlgorithmName.Text = AlgorithmName.Text.Replace("_cpp", "")
+        AlgorithmName.Text = AlgorithmName.Text.Replace("_cs", "")
+        If AlgorithmName.Text.EndsWith("_CPP") = False Then AlgorithmName.Text = AlgorithmName.Text + "_CPP"
+        If nextAlgorithm(algType.addCPP_AI) = False Then Exit Sub
+
+        CPPoutputName = New FileInfo("..\..\CPP_Classes\CPP_AI_Generated.h")
+
+        Dim trigger As Boolean
+        sw = New StreamWriter(CPPoutputName.FullName, True)
+        sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf)
+        For i = 0 To cppAISnippet.Count - 1
+            Dim line = cppAISnippet(i)
+            If line.Trim.StartsWith("class") Then trigger = True
+            If trigger Then
+                If InStr(line, "Anyname") Then line = line.Replace("Anyname", AlgorithmName.Text)
+                sw.WriteLine(line)
+                If line.Trim.EndsWith("};") Then Exit For
+            End If
+        Next
+        sw.Close()
+
+        Dim functionNames = New FileInfo("..\..\CPP_Classes\CPP_Enum.h")
+        Dim lines = File.ReadAllLines(functionNames.FullName)
+
+        sw = New StreamWriter(functionNames.FullName, False)
+        For Each line In lines
+            If line.Contains("_Stable_BasicsCount_CPP,") Then
+                sw.WriteLine(vbTab + "_" + AlgorithmName.Text + ",")
+            End If
+            sw.WriteLine(line)
+        Next
+        sw.Close()
+
+        Dim externNames = New FileInfo("..\..\CPP_Classes\CPP_Externs.h")
+        lines = File.ReadAllLines(externNames.FullName)
+
+        sw = New StreamWriter(externNames.FullName, False)
+        For Each line In lines
+            If line.Contains("// end of switch - don't remove...") Then
+                sw.WriteLine(vbTab + vbTab + "case _" + AlgorithmName.Text + ":")
+                sw.WriteLine(vbTab + vbTab + "{ task->alg = new " + AlgorithmName.Text + "(); task->alg->traceName = " +
+                               """" + AlgorithmName.Text + """; break; }")
+            End If
+            sw.WriteLine(line)
+        Next
+        sw.Close()
+
+        MsgBox("Edit the new algorithm in CPP_AI_Generated.h")
+        Me.Close()
     End Sub
 End Class

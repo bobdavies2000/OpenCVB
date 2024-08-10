@@ -29,6 +29,7 @@ Partial Class InsertAlgorithm
         Me.AddOpenGL = New System.Windows.Forms.Button()
         Me.AddCPP = New System.Windows.Forms.Button()
         Me.AddPyStream = New System.Windows.Forms.Button()
+        Me.Add_AI_Generated = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'AlgorithmName
@@ -62,7 +63,7 @@ Partial Class InsertAlgorithm
         '
         'AddCSharp
         '
-        Me.AddCSharp.Location = New System.Drawing.Point(18, 229)
+        Me.AddCSharp.Location = New System.Drawing.Point(18, 274)
         Me.AddCSharp.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.AddCSharp.Name = "AddCSharp"
         Me.AddCSharp.Size = New System.Drawing.Size(330, 38)
@@ -72,7 +73,7 @@ Partial Class InsertAlgorithm
         '
         'AddOpenGL
         '
-        Me.AddOpenGL.Location = New System.Drawing.Point(18, 182)
+        Me.AddOpenGL.Location = New System.Drawing.Point(18, 227)
         Me.AddOpenGL.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.AddOpenGL.Name = "AddOpenGL"
         Me.AddOpenGL.Size = New System.Drawing.Size(330, 38)
@@ -82,17 +83,17 @@ Partial Class InsertAlgorithm
         '
         'AddCPP
         '
-        Me.AddCPP.Location = New System.Drawing.Point(18, 134)
+        Me.AddCPP.Location = New System.Drawing.Point(18, 180)
         Me.AddCPP.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.AddCPP.Name = "AddCPP"
         Me.AddCPP.Size = New System.Drawing.Size(330, 38)
         Me.AddCPP.TabIndex = 8
-        Me.AddCPP.Text = "Add C++ Algorithm"
+        Me.AddCPP.Text = "Add C++ Algorithm (Old Style)"
         Me.AddCPP.UseVisualStyleBackColor = True
         '
         'AddPyStream
         '
-        Me.AddPyStream.Location = New System.Drawing.Point(18, 277)
+        Me.AddPyStream.Location = New System.Drawing.Point(18, 321)
         Me.AddPyStream.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.AddPyStream.Name = "AddPyStream"
         Me.AddPyStream.Size = New System.Drawing.Size(330, 38)
@@ -100,11 +101,22 @@ Partial Class InsertAlgorithm
         Me.AddPyStream.Text = "Add PyStream Algorithm"
         Me.AddPyStream.UseVisualStyleBackColor = True
         '
+        'Add_AI_Generated
+        '
+        Me.Add_AI_Generated.Location = New System.Drawing.Point(18, 133)
+        Me.Add_AI_Generated.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.Add_AI_Generated.Name = "Add_AI_Generated"
+        Me.Add_AI_Generated.Size = New System.Drawing.Size(330, 38)
+        Me.Add_AI_Generated.TabIndex = 10
+        Me.Add_AI_Generated.Text = "Add AI-Generated C++ Algorithm"
+        Me.Add_AI_Generated.UseVisualStyleBackColor = True
+        '
         'InsertAlgorithm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(824, 348)
+        Me.ClientSize = New System.Drawing.Size(824, 403)
+        Me.Controls.Add(Me.Add_AI_Generated)
         Me.Controls.Add(Me.AddPyStream)
         Me.Controls.Add(Me.AddCPP)
         Me.Controls.Add(Me.AddOpenGL)
@@ -127,4 +139,5 @@ Partial Class InsertAlgorithm
     Friend WithEvents AddOpenGL As Button
     Friend WithEvents AddCPP As Button
     Friend WithEvents AddPyStream As Button
+    Friend WithEvents Add_AI_Generated As Button
 End Class

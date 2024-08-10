@@ -441,6 +441,7 @@ namespace CS_Classes
 			if (algorithmName == "Extrinsics_Display_CS") return new Extrinsics_Display_CS(task);
 			if (algorithmName == "Face_Haar_Alt_CS") return new Face_Haar_Alt_CS(task);
 			if (algorithmName == "Face_Haar_LBP_CS") return new Face_Haar_LBP_CS(task);
+			if (algorithmName == "Feature_Agast_CS") return new Feature_Agast_CS(task);
 			if (algorithmName == "Feature_AKaze_CS") return new Feature_AKaze_CS(task);
 			if (algorithmName == "Feature_Basics_CS") return new Feature_Basics_CS(task);
 			if (algorithmName == "Feature_BasicsNoFrills_CS") return new Feature_BasicsNoFrills_CS(task);

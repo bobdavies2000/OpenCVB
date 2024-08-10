@@ -153,7 +153,7 @@ public:
 #define GRAY Scalar(127, 127, 127)
 vector<Scalar> HighlightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
 
-#include "CPP_FunctionNames.h"
+#include "CPP_Enum.h"
 
 Size WorkingRes;
 

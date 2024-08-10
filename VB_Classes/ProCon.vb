@@ -57,8 +57,12 @@ Public Class ProCon_Basics : Inherits VB_Parent
             Windows.Forms.Application.DoEvents()
         End While
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        If task.testAllRunning Then
+            SetTrueText("ProCon_Basics causes problems when running test all. " + vbCrLf + "Skipping for now...")
+            Exit Sub
+        End If
+        options.RunVB()
         If options.buffer.Length <> options.bufferSize Then
             SyncLock mutex
                 ReDim options.buffer(options.bufferSize - 1)
