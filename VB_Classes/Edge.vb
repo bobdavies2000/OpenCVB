@@ -1,21 +1,57 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
-Imports OpenCvSharp
 Public Class Edge_All : Inherits VB_Parent
-    Dim options As New Options_Edges_All
+    Dim canny As New Edge_Canny
+    Dim scharr As New Edge_Scharr
+    Dim binRed As New Edge_BinarizedReduction
+    Dim binSobel As New Bin4Way_Sobel
+    Dim colorGap As New Edge_ColorGap_CPP_VB
+    Dim deriche As New Edge_Deriche_CPP_VB
+    Dim Laplacian As New Edge_Laplacian
+    Dim resizeAdd As New Edge_ResizeAdd
+    Dim regions As New Edge_Regions
+    Public options As New Options_Edges_All
     Public Sub New()
         desc = "Use Radio Buttons to select the different edge algorithms."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        options.RunEdges(src)
-        dst2 = If(options.dst2.Channels() = 1, options.dst2, options.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Select Case options.edgeSelection
+            Case "Canny"
+                canny.Run(src)
+                dst2 = canny.dst2
+            Case "Scharr"
+                scharr.Run(src)
+                dst2 = scharr.dst3
+            Case "Binarized Reduction"
+                binRed.Run(src)
+                dst2 = binRed.dst2
+            Case "Binarized Sobel"
+                binSobel.Run(src)
+                dst2 = binSobel.dst2
+            Case "Color Gap"
+                colorGap.Run(src)
+                dst2 = colorGap.dst2
+            Case "Deriche"
+                deriche.Run(src)
+                dst2 = deriche.dst2
+            Case "Laplacian"
+                Laplacian.Run(src)
+                dst2 = Laplacian.dst2
+            Case "Resize And Add"
+                resizeAdd.Run(src)
+                dst2 = resizeAdd.dst2
+            Case "Depth Region Boundaries"
+                regions.Run(src)
+                dst2 = regions.dst2
+        End Select
+
+        If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         labels(2) = traceName + " - selection = " + options.edgeSelection
     End Sub
 End Class
-
 
 
 

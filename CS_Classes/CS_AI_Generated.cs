@@ -14966,19 +14966,22 @@ namespace CS_Classes
 
     public class Edge_All_CS : CS_Parent
     {
-        Options_Edges_All options = new Options_Edges_All();
+        Edge_All edges = new Edge_All();
         public Edge_All_CS(VBtask task) : base(task)
         {
             desc = "Use Radio Buttons to select the different edge algorithms.";
         }
         public void RunCS(Mat src)
         {
-            options.RunVB();
-            options.RunEdges(src);
-            dst2 = options.dst2.Channels() == 1 ? options.dst2 : options.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
-            labels[2] = traceName + " - selection = " + options.edgeSelection;
+            edges.Run(src);
+            dst2 = edges.dst2.Channels() == 1 ? edges.dst2 : edges.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            labels[2] = traceName + " - selection = " + edges.options.edgeSelection;
         }
     }
+
+
+
+
     public class Edge_DepthAndColor_CS : CS_Parent
     {
         Depth_Holes shadow = new Depth_Holes();

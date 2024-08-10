@@ -3411,86 +3411,6 @@ End Class
 
 
 
-
-
-Public Class Options_Edges_All : Inherits VB_Parent
-    Dim canny As New Edge_Canny
-    Dim scharr As New Edge_Scharr
-    Dim binRed As New Edge_BinarizedReduction
-    Dim binSobel As New Bin4Way_Sobel
-    Dim colorGap As New Edge_ColorGap_CPP_VB
-    Dim deriche As New Edge_Deriche_CPP_VB
-    Dim Laplacian As New Edge_Laplacian
-    Dim resizeAdd As New Edge_ResizeAdd
-    Dim regions As New Edge_Regions
-    Public edgeSelection As String = ""
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Canny")
-            radio.addRadio("Scharr")
-            radio.addRadio("Binarized Reduction")
-            radio.addRadio("Binarized Sobel")
-            radio.addRadio("Color Gap")
-            radio.addRadio("Deriche")
-            radio.addRadio("Laplacian")
-            radio.addRadio("Resize And Add")
-            radio.addRadio("Depth Region Boundaries")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub RunEdges(src As cv.Mat)
-        Select Case edgeSelection
-            Case "Canny"
-                canny.Run(src)
-                dst2 = canny.dst2
-            Case "Scharr"
-                scharr.Run(src)
-                dst2 = scharr.dst3
-            Case "Binarized Reduction"
-                binRed.Run(src)
-                dst2 = binRed.dst2
-            Case "Binarized Sobel"
-                binSobel.Run(src)
-                dst2 = binSobel.dst2
-            Case "Color Gap"
-                colorGap.Run(src)
-                dst2 = colorGap.dst2
-            Case "Deriche"
-                deriche.Run(src)
-                dst2 = deriche.dst2
-            Case "Laplacian"
-                Laplacian.Run(src)
-                dst2 = Laplacian.dst2
-            Case "Resize And Add"
-                resizeAdd.Run(src)
-                dst2 = resizeAdd.dst2
-            Case "Depth Region Boundaries"
-                regions.Run(src)
-                dst2 = regions.dst2
-        End Select
-    End Sub
-
-    Public Sub RunVB()
-        Static frm = FindFrm(traceName + " Radio Buttons")
-        If task.FirstPass Then
-            frm.Left = task.gOptions.Width / 2
-            frm.top = task.gOptions.Height / 2
-        End If
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).checked Then
-                edgeSelection = frm.check(i).text
-                Exit For
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Options_BGSubtractSynthetic : Inherits VB_Parent
     Public amplitude As Double = 200
     Public magnitude As Double = 20
@@ -7698,5 +7618,42 @@ Public Class Options_Density : Inherits VB_Parent
         Static neighborSlider = FindSlider("Neighboring Z count")
         zCount = neighborSlider.value
         distance = distSlider.value / 10000
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Edges_All : Inherits VB_Parent
+    Public edgeSelection As String = "Canny"
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Canny")
+            radio.addRadio("Scharr")
+            radio.addRadio("Binarized Reduction")
+            radio.addRadio("Binarized Sobel")
+            radio.addRadio("Color Gap")
+            radio.addRadio("Deriche")
+            radio.addRadio("Laplacian")
+            radio.addRadio("Resize And Add")
+            radio.addRadio("Depth Region Boundaries")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        If task.FirstPass Then
+            frm.Left = task.gOptions.Width / 2
+            frm.top = task.gOptions.Height / 2
+        End If
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).checked Then
+                edgeSelection = frm.check(i).text
+                Exit For
+            End If
+        Next
     End Sub
 End Class

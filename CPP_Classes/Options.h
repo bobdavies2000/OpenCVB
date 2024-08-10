@@ -813,13 +813,6 @@ public:
 	Options_Complexity() {
 	}
 };
-class Options_Edges_All {
-public:
-	string edgeSelection =  "";
-	void RunVB() {}
-	Options_Edges_All() {
-	}
-};
 class Options_BGSubtractSynthetic {
 public:
 	double amplitude =  200;
@@ -2091,5 +2084,12 @@ public:
 	double distance =  0;
 	void RunVB() {}
 	Options_Density() {
+	}
+};
+class Options_Edges_All {
+public:
+	string edgeSelection =  "Canny";
+	void RunVB() {}
+	Options_Edges_All() {
 	}
 };

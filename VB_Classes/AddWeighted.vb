@@ -32,28 +32,6 @@ End Class
 
 
 
-Public Class AddWeighted_Edges : Inherits VB_Parent
-    Dim edges As New Edge_All
-    Dim addw As New AddWeighted_Basics
-    Public Sub New()
-        labels = {"", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image"}
-        desc = "Add in the edges separating light and dark to the color image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        edges.Run(src)
-        dst2 = edges.dst2
-        labels(2) = edges.labels(2)
-
-        addw.src2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run(src)
-        dst3 = addw.dst2
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -94,5 +72,29 @@ Public Class AddWeighted_InfraRed : Inherits VB_Parent
         addw.src2 = dst1
         addw.Run(task.depthRGB)
         dst2 = addw.dst2.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class AddWeighted_Edges : Inherits VB_Parent
+    Dim edges As New Edge_All
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        labels = {"", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image"}
+        desc = "Add in the edges separating light and dark to the color image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        edges.Run(src)
+        dst2 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        addw.src2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        addw.Run(src)
+        dst3 = addw.dst2
     End Sub
 End Class
