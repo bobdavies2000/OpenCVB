@@ -247,13 +247,11 @@ Module UI_GeneratorMain
         Dim PYStreamNames As New SortedList(Of String, String)
         Dim LastEdits As New SortedList(Of String, String)
 
-        Dim cppAlgorithmInput = New FileInfo("../CPP_Classes/CPP_Algorithms.h")
         Dim CPPInputs = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
         Dim CSInputs = {New FileInfo("../CS_Classes/CS_AI_Generated.cs").FullName,
                         New FileInfo("../CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../VB_classes/")
-        If cppAlgorithmInput.Exists = False Then
-            cppAlgorithmInput = New FileInfo("../../CPP_Classes/CPP_Algorithms.h")
+        If CPPInputs.Exists = False Then
             CPPInputs = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
             CSInputs = {New FileInfo("../../CS_Classes/CS_AI_Generated.cs").FullName,
                         New FileInfo("../../CS_Classes/Non_AI.cs").FullName}

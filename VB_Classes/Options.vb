@@ -977,7 +977,7 @@ End Class
 
 
 Public Class Options_ProCon : Inherits VB_Parent
-    Public buffer(9) As Integer 
+    Public buffer(9) As Integer
     Public pduration As Integer = 1
     Public cduration As Integer = 1
     Public bufferSize As Integer = 0

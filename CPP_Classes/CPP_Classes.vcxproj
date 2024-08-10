@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CPP_Algorithms.h" />
     <ClInclude Include="CPP_Externs.h" />
     <ClInclude Include="CPP_FunctionNames.h" />
     <ClInclude Include="CPP_Parent.h" />
