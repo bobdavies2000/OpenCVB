@@ -7645,15 +7645,40 @@ Public Class Options_Edges_All : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static frm = FindFrm(traceName + " Radio Buttons")
-        If task.FirstPass Then
-            frm.Left = task.gOptions.Width / 2
-            frm.top = task.gOptions.Height / 2
-        End If
+        If task.FirstPass Then frm.Left = task.gOptions.Width / 2
+        edgeSelection = findRadioIndex(frm.check)
         For i = 0 To frm.check.Count - 1
             If frm.check(i).checked Then
                 edgeSelection = frm.check(i).text
                 Exit For
             End If
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_ColorMethod : Inherits VB_Parent
+    Public Sub New()
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("BackProject_Full")
+            check.addCheckBox("BackProject2D_Full")
+            check.addCheckBox("Bin4Way_Regions")
+            check.addCheckBox("Binarize_DepthTiers")
+            check.addCheckBox("FeatureLess_Groups")
+            check.addCheckBox("Hist3Dcolor_Basics")
+            check.addCheckBox("KMeans_Basics")
+            check.addCheckBox("LUT_Basics")
+            check.addCheckBox("Reduction_Basics")
+            check.addCheckBox("PCA_NColor_CPP_VB")
+            check.Box(0).Checked = True
+        End If
+        Dim frmCheck = FindFrm(traceName + " CheckBoxes")
+        frmCheck.Left = task.gOptions.Width / 2
+    End Sub
+    Public Sub RunVB()
     End Sub
 End Class

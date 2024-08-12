@@ -2,15 +2,15 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 Public Class Edge_All : Inherits VB_Parent
-    Dim canny As New Edge_Canny
-    Dim scharr As New Edge_Scharr
-    Dim binRed As New Edge_BinarizedReduction
-    Dim binSobel As New Bin4Way_Sobel
-    Dim colorGap As New Edge_ColorGap_CPP_VB
-    Dim deriche As New Edge_Deriche_CPP_VB
-    Dim Laplacian As New Edge_Laplacian
-    Dim resizeAdd As New Edge_ResizeAdd
-    Dim regions As New Edge_Regions
+    Dim canny As Edge_Canny
+    Dim scharr As Edge_Scharr
+    Dim binRed As Edge_BinarizedReduction
+    Dim binSobel As Bin4Way_Sobel
+    Dim colorGap As Edge_ColorGap_CPP_VB
+    Dim deriche As Edge_Deriche_CPP_VB
+    Dim Laplacian As Edge_Laplacian
+    Dim resizeAdd As Edge_ResizeAdd
+    Dim regions As Edge_Regions
     Public options As New Options_Edges_All
     Public Sub New()
         desc = "Use Radio Buttons to select the different edge algorithms."
@@ -20,30 +20,39 @@ Public Class Edge_All : Inherits VB_Parent
 
         Select Case options.edgeSelection
             Case "Canny"
+                If canny Is Nothing Then canny = New Edge_Canny
                 canny.Run(src)
                 dst2 = canny.dst2
             Case "Scharr"
+                If scharr Is Nothing Then scharr = New Edge_Scharr
                 scharr.Run(src)
                 dst2 = scharr.dst3
             Case "Binarized Reduction"
+                If binRed Is Nothing Then binRed = New Edge_BinarizedReduction
                 binRed.Run(src)
                 dst2 = binRed.dst2
             Case "Binarized Sobel"
+                If binSobel Is Nothing Then binSobel = New Bin4Way_Sobel
                 binSobel.Run(src)
                 dst2 = binSobel.dst2
             Case "Color Gap"
+                If colorGap Is Nothing Then colorGap = New Edge_ColorGap_CPP_VB
                 colorGap.Run(src)
                 dst2 = colorGap.dst2
             Case "Deriche"
+                If deriche Is Nothing Then deriche = New Edge_Deriche_CPP_VB
                 deriche.Run(src)
                 dst2 = deriche.dst2
             Case "Laplacian"
+                If Laplacian Is Nothing Then Laplacian = New Edge_Laplacian
                 Laplacian.Run(src)
                 dst2 = Laplacian.dst2
             Case "Resize And Add"
+                If resizeAdd Is Nothing Then resizeAdd = New Edge_ResizeAdd
                 resizeAdd.Run(src)
                 dst2 = resizeAdd.dst2
             Case "Depth Region Boundaries"
+                If regions Is Nothing Then regions = New Edge_Regions
                 regions.Run(src)
                 dst2 = regions.dst2
         End Select
@@ -1180,3 +1189,42 @@ End Class
 
 
 
+
+Public Class Edge_Color8U : Inherits VB_Parent
+    Public colorMethods() As Object = {New BackProject_Full, New BackProject2D_Full, New Bin4Way_Regions,
+                                       New Binarize_DepthTiers, New FeatureLess_Groups, New Hist3Dcolor_Basics,
+                                       New KMeans_Basics, New LUT_Basics, New Reduction_Basics, New PCA_NColor_CPP_VB}
+    Dim canny As New Edge_Canny
+    Dim options As New Options_ColorMethod
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        labels = {"", "", "The 'OR' of each selected method", "The 'AND' of each selected method"}
+
+        desc = "Find edges in a variety of Color8U algorithms then find the edges common to all."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        Dim initdst3 As Boolean
+        For i = 0 To colorMethods.Count - 1
+            If options.check.Box(i).Checked Then
+                colorMethods(i).run(src)
+                If options.check.Box(i).Text = "FeatureLess_Groups" Then
+                    canny.dst2 = colorMethods(i).dst2
+                Else
+                    canny.Run(colorMethods(i).dst3)
+                End If
+                dst2 = dst2 Or canny.dst2
+                If initdst3 = False Then
+                    dst3 = canny.dst2
+                    initdst3 = True
+                Else
+                    dst3 = dst3 And canny.dst2
+                End If
+            End If
+        Next
+    End Sub
+End Class

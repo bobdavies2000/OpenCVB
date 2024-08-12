@@ -7,6 +7,7 @@ using OpenCvSharp;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.IO.Pipes;
+using System.Windows.Forms;
 
 namespace CS_Classes
 {
@@ -698,7 +699,7 @@ namespace CS_Classes
         {
             controls.CS_SetSlider(opt, val);
         }
-        public System.Windows.Forms.TrackBar FindSlider(string opt)
+        public TrackBar FindSlider(string opt)
         {
             return controls.CS_GetSlider(opt);
         }
@@ -706,10 +707,20 @@ namespace CS_Classes
         {
             return controls.CS_FindCheckBox(opt);
         }
-        public System.Windows.Forms.RadioButton FindRadio(string opt)
+        public RadioButton FindRadio(string opt)
         {
             return controls.CS_FindRadio(opt);
         }
+        public Form FindFrm(string title)
+        {
+            foreach (Form frm in Application.OpenForms)
+            {
+                if (frm.Text == title)
+                    return frm;
+            }
+            return null;
+        }
+
         public void RunAndMeasure(Mat src, Object csCode)
         {
             controls.RunFromVB(src, csCode);

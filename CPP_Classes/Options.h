@@ -2093,3 +2093,9 @@ public:
 	Options_Edges_All() {
 	}
 };
+class Options_ColorMethod {
+public:
+	void RunVB() {}
+	Options_ColorMethod() {
+	}
+};

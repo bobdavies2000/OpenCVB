@@ -15924,6 +15924,64 @@ namespace CS_Classes
 
 
 
+    public class Edge_Color8U_CS : CS_Parent
+    {
+        public object[] colorMethods = {
+        new BackProject_Full(), new BackProject2D_Full(), new Bin4Way_Regions(),
+        new Binarize_DepthTiers(), new FeatureLess_Groups(), new Hist3Dcolor_Basics(),
+        new KMeans_Basics(), new LUT_Basics(), new Reduction_Basics(), new PCA_NColor_CPP_VB()
+    };
+        Edge_Canny canny = new Edge_Canny();
+        Options_ColorMethod options = new Options_ColorMethod();
+        System.Windows.Forms.Form frmCheck;
+        public Edge_Color8U_CS(VBtask task) : base(task)
+        {
+            frmCheck = FindFrm("Options_ColorMethod CheckBoxes");
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U);
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U);
+            labels = new string[] { "", "", "The 'OR' of each selected method", "The 'AND' of each selected method" };
+            desc = "Find edges in a variety of Color8U algorithms then find the edges common to all.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (task.FirstPass)
+                frmCheck.Left = task.gOptions.Width / 2;
+            dst2.SetTo(0);
+            dst3.SetTo(0);
+            bool initdst3 = false;
+            for (int i = 0; i < colorMethods.Length; i++)
+            {
+                if (options.check.Box[i].Checked)
+                {
+                    ((dynamic)colorMethods[i]).Run(src);
+                    if (options.check.Box[i].Text == "FeatureLess_Groups")
+                    {
+                        canny.dst2 = ((dynamic)colorMethods[i]).dst2;
+                    }
+                    else
+                    {
+                        canny.Run(((dynamic)colorMethods[i]).dst3);
+                    }
+                    Cv2.BitwiseOr(dst2, canny.dst2, dst2);
+                    if (!initdst3)
+                    {
+                        canny.dst2.CopyTo(dst3);
+                        initdst3 = true;
+                    }
+                    else
+                    {
+                        Cv2.BitwiseAnd(dst3, canny.dst2, dst3);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
 
 
     //public class Edge_All_CS : CS_Parent

@@ -382,6 +382,7 @@ namespace CS_Classes
 			if (algorithmName == "Edge_CannyHistory_CS") return new Edge_CannyHistory_CS(task);
 			if (algorithmName == "Edge_CannyLeftRight_CS") return new Edge_CannyLeftRight_CS(task);
 			if (algorithmName == "Edge_CannyMin_CS") return new Edge_CannyMin_CS(task);
+			if (algorithmName == "Edge_Color8U_CS") return new Edge_Color8U_CS(task);
 			if (algorithmName == "Edge_ColorGap_CPP_CS") return new Edge_ColorGap_CPP_CS(task);
 			if (algorithmName == "Edge_ColorGap_CS") return new Edge_ColorGap_CS(task);
 			if (algorithmName == "Edge_Consistent_CS") return new Edge_Consistent_CS(task);
