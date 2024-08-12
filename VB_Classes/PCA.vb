@@ -328,6 +328,8 @@ End Class
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
 Public Class PCA_NColor : Inherits VB_Parent
+#Region "PCA_Specifics"
+
     <StructLayout(LayoutKind.Sequential)>
     Public Structure paletteEntry
         Public start As Integer
@@ -688,7 +690,6 @@ Public Class PCA_NColor : Inherits VB_Parent
     End Sub
 
     ' Symmetric tridiagonal QL algorithm.
-
     Sub Tql2(ByRef V(,) As Double, ByRef d() As Double, ByRef e() As Double)
         ' This is derived from the Algol procedures tql2, by
         ' Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
@@ -822,6 +823,7 @@ Public Class PCA_NColor : Inherits VB_Parent
     Public Function Hypot(a As Double, b As Double) As Double
         Return Math.Sqrt(a * a + b * b)
     End Function
+#End Region
 
     Dim custom As New Palette_CustomColorMap
     Public options As New Options_PCA_NColor
@@ -853,8 +855,7 @@ Public Class PCA_NColor : Inherits VB_Parent
         Dim paletteCount = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
 
         If standaloneTest() Then
-            task.palette.Run(img8u * 256 / options.desiredNcolors)
-            dst3 = task.palette.dst2
+            dst3 = ShowPalette(img8u * 256 / options.desiredNcolors)
             labels(3) = "dst2 is palettized using global palette option: " + task.gOptions.Palettes.Text
         End If
 

@@ -321,21 +321,21 @@ namespace CPP_Classes
     }
 
     extern "C" __declspec(dllexport)
-        int* cppTask_GetDst(cppTask* task, int index, int& channels)
+        int* cppTask_GetDst(cppTask* task, int index, int& type)
     {
         switch (index)
         {
         case 0:
-            channels = task->alg->dst0.channels();
+            type = task->alg->dst0.type();
             return (int*)task->alg->dst0.data;
         case 1:
-            channels = task->alg->dst1.channels();
+            type = task->alg->dst1.type();
             return (int*)task->alg->dst1.data;
         case 2:
-            channels = task->alg->dst2.channels();
+            type = task->alg->dst2.type();
             return (int*)task->alg->dst2.data;
         case 3:
-            channels = task->alg->dst3.channels();
+            type = task->alg->dst3.type();
             return (int*)task->alg->dst3.data;
         }
         return 0;
@@ -445,10 +445,10 @@ namespace CPP_Classes
         if (src.size() != task->alg->dst2.size()) resize(task->alg->dst2, task->alg->dst2, src.size());
         if (src.size() != task->alg->dst3.size()) resize(task->alg->dst3, task->alg->dst3, src.size());
 
-        if (task->alg->dst0.type() != CV_8UC3) task->alg->dst0 = MakeSureImage8uC3(task->alg->dst0);
-        if (task->alg->dst1.type() != CV_8UC3) task->alg->dst1 = MakeSureImage8uC3(task->alg->dst1);
-        if (task->alg->dst2.type() != CV_8UC3) task->alg->dst2 = MakeSureImage8uC3(task->alg->dst2);
-        if (task->alg->dst3.type() != CV_8UC3) task->alg->dst3 = MakeSureImage8uC3(task->alg->dst3);
+        //if (task->alg->dst0.type() != CV_8UC3) task->alg->dst0 = MakeSureImage8uC3(task->alg->dst0);
+        //if (task->alg->dst1.type() != CV_8UC3) task->alg->dst1 = MakeSureImage8uC3(task->alg->dst1);
+        //if (task->alg->dst2.type() != CV_8UC3) task->alg->dst2 = MakeSureImage8uC3(task->alg->dst2);
+        //if (task->alg->dst3.type() != CV_8UC3) task->alg->dst3 = MakeSureImage8uC3(task->alg->dst3);
 
         return 0;
     }

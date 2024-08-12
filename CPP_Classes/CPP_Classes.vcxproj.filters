@@ -6,7 +6,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_Externs.h" />
-    <ClInclude Include="CPP_FunctionNames.h" />
+    <ClInclude Include="CPP_Enum.h" />
     <ClInclude Include="CPP_Parent.h" />
     <ClInclude Include="CPP_AI_Generated.h" />
     <ClInclude Include="PragmaLibs.h" />

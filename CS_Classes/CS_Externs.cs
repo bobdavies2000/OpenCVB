@@ -113,9 +113,6 @@ namespace CS_Classes
                                                            IntPtr rightPtr, int rows, int cols);
 
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr cppTask_GetDst(IntPtr cPtr, int index, ref int channels);
-
-        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void cppTask_OptionsCPPtoVB(IntPtr cPtr, ref int gridSize,
                                                          ref int histogramBins,
                                                          ref int pixelDiffThreshold,

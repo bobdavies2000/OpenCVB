@@ -17,7 +17,6 @@ _Bin4Way_Regions_CPP
 _Mat_4Click_CPP
 _Area_MinRect_CPP
 _Mesh_Features_CPP
-_Mesh_Agast_CPP
 _Mesh_Basics_CPP
 _RedColor_FeatureLess_CPP
 _RedColor_FeatureLessCore_CPP
@@ -387,7 +386,6 @@ if algorithmName = "KNN_Core_CPP" Then return new CPP_Basics(cppFunctionNames._K
 if algorithmName = "Line_BasicsOld_CPP" Then return new CPP_Basics(cppFunctionNames._Line_BasicsOld_CPP)
 if algorithmName = "Mat_4Click_CPP" Then return new CPP_Basics(cppFunctionNames._Mat_4Click_CPP)
 if algorithmName = "Mat_4to1_CPP" Then return new CPP_Basics(cppFunctionNames._Mat_4to1_CPP)
-if algorithmName = "Mesh_Agast_CPP" Then return new CPP_Basics(cppFunctionNames._Mesh_Agast_CPP)
 if algorithmName = "Mesh_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Mesh_Basics_CPP)
 if algorithmName = "Mesh_Features_CPP" Then return new CPP_Basics(cppFunctionNames._Mesh_Features_CPP)
 if algorithmName = "Motion_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Motion_Basics_CPP)

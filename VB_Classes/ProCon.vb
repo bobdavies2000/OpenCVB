@@ -13,15 +13,16 @@ Public Class ProCon_Basics : Inherits VB_Parent
     Public terminateProducer As Boolean
     Public options As New Options_ProCon
     Public Sub New()
-        flow.parentData = Me
-        p = New Thread(AddressOf Producer)
-        p.Name = "Producer"
-        p.Start()
+        If task.testAllRunning = False Then
+            flow.parentData = Me
+            p = New Thread(AddressOf Producer)
+            p.Name = "Producer"
+            p.Start()
 
-        c = New Thread(AddressOf Consumer)
-        c.Name = "Consumer"
-        c.Start()
-
+            c = New Thread(AddressOf Consumer)
+            c.Name = "Consumer"
+            c.Start()
+        End If
         desc = "DijKstra's Producer/Consumer 'Cooperating Sequential Process'.  Consumer must see every item produced."
     End Sub
     Public Function success(index As Integer) As Integer

@@ -17,7 +17,6 @@ enum functions
     _Mat_4Click_CPP,
     _Area_MinRect_CPP,
     _Mesh_Features_CPP,
-    _Mesh_Agast_CPP,
     _Mesh_Basics_CPP,
     _RedColor_FeatureLess_CPP,
     _RedColor_FeatureLessCore_CPP,

@@ -5226,8 +5226,9 @@ namespace CS_Classes
             {
                 var mm = GetMinMax(dst0);
                 classCount = (int)mm.maxVal;
-                task.palette.Run(dst0 * 255 / classCount);
-                dst3 = task.palette.dst2;
+                //task.palette.Run(dst0 * 255 / classCount);
+                dst3 = ShowPalette(dst0 * 255 / classCount);
+                //dst3 = task.palette.dst2;
             }
             else
             {
@@ -7717,30 +7718,70 @@ namespace CS_Classes
     {
         public int classCount;
         public object classifier;
-        object[] colorMethods = {new BackProject_Full(), new BackProject2D_Full(), new Bin4Way_Regions(), new Binarize_DepthTiers(), new FeatureLess_Groups(),
-                                 new Hist3Dcolor_Basics(), new KMeans_Basics(), new LUT_Basics(), new Reduction_Basics() };
+        object[] colorMethods = new object[10];
         public Color8U_Basics_CS(VBtask task) : base(task)
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U);
             labels[3] = "vbPalette output of dst2 at left";
-            UpdateAdvice(traceName + ": redOptions 'Color Source' controls which color source is used.");
+            UpdateAdvice(traceName + ": redOptions 'Color Source' control which color source is used.");
             desc = "Classify pixels by color using a variety of techniques";
         }
         public void RunCS(Mat src)
         {
+            int index = task.redOptions.colorInputIndex;
             if (task.optionsChanged || classifier == null)
-                classifier = colorMethods[task.redOptions.colorInputIndex];
-
+            {
+                switch (index)
+                {
+                    case 0:
+                        if (colorMethods[index] == null) colorMethods[index] = new BackProject_Full();
+                        break;
+                    case 1:
+                        if (colorMethods[index] == null) colorMethods[index] = new BackProject2D_Full();
+                        break;
+                    case 2:
+                        if (colorMethods[index] == null) colorMethods[index] = new Bin4Way_Regions();
+                        break;
+                    case 3:
+                        if (colorMethods[index] == null) colorMethods[index] = new Binarize_DepthTiers();
+                        break;
+                    case 4:
+                        if (colorMethods[index] == null) colorMethods[index] = new FeatureLess_Groups();
+                        break;
+                    case 5:
+                        if (colorMethods[index] == null) colorMethods[index] = new Hist3Dcolor_Basics();
+                        break;
+                    case 6:
+                        if (colorMethods[index] == null) colorMethods[index] = new KMeans_Basics();
+                        break;
+                    case 7:
+                        if (colorMethods[index] == null) colorMethods[index] = new LUT_Basics();
+                        break;
+                    case 8:
+                        if (colorMethods[index] == null) colorMethods[index] = new Reduction_Basics();
+                        break;
+                    case 9:
+                        if (colorMethods[index] == null) colorMethods[index] = new PCA_NColor_CPP_VB();
+                        break;
+                }
+                classifier = colorMethods[index];
+            }
             if (task.redOptions.colorInputName == "BackProject2D_Full")
             {
                 ((dynamic)classifier).Run(src);
             }
             else
             {
-                dst1 = src.Channels() == 3 ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src;
-                ((dynamic)classifier).Run(dst1);
+                if (task.redOptions.colorInputName != "PCA_NColor_CPP")
+                {
+                    dst1 = src.Channels() == 3 ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src;
+                    ((dynamic)classifier).Run(dst1);
+                }
+                else
+                {
+                    ((dynamic)classifier).Run(src);
+                }
             }
-
             if (task.heartBeat)
             {
                 dst2 = ((dynamic)classifier).dst2.Clone();
@@ -7749,18 +7790,13 @@ namespace CS_Classes
             {
                 ((dynamic)classifier).dst2[task.motionRect].CopyTo(dst2[task.motionRect]);
             }
-
             classCount = ((dynamic)classifier).classCount;
-
-            // Commented out as in original code
-            // if (task.maxDepthMask.Rows > 0)
-            // {
-            //     classCount += 1;
-            //     dst2.SetTo(classCount, task.maxDepthMask);
-            // }
-
+            // If task.maxDepthMask.Rows > 0 Then
+            //     classCount += 1
+            //     dst2.SetTo(classCount, task.maxDepthMask)
+            // End If
             dst3 = ((dynamic)classifier).dst3;
-            labels[2] = $"Color_Basics: method = {traceName} produced {classCount} pixel classifications";
+            labels[2] = "Color_Basics: method = " + ((dynamic)classifier).traceName + " produced " + classCount.ToString() + " pixel classifications";
         }
     }
 
@@ -46144,6 +46180,7 @@ namespace CS_Classes
 
     public class PCA_NColor_CS : CS_Parent
     {
+#region "PCS_Details"
         [StructLayout(LayoutKind.Sequential)]
         public struct paletteEntry
         {
@@ -46609,6 +46646,7 @@ namespace CS_Classes
         {
             return Math.Sqrt(a * a + b * b);
         }
+#endregion
         public Palette_CustomColorMap custom = new Palette_CustomColorMap();
         public Options_PCA_NColor options = new Options_PCA_NColor();
         public byte[] palette = new byte[256 * 3];

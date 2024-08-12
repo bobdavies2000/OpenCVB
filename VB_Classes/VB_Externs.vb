@@ -139,7 +139,7 @@ Module VB_Externs
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function cppTask_GetDst(cPtr As IntPtr, index As Integer, ByRef channels As Integer) As IntPtr
+    Public Function cppTask_GetDst(cPtr As IntPtr, index As Integer, ByRef type As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub cppTask_OptionsCPPtoVB(cPtr As IntPtr, ByRef gridSize As Integer,

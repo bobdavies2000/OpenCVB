@@ -35,8 +35,7 @@ Public Class BackProject2D_Basics : Inherits VB_Parent
         If backProjectByGrid Then
             Dim mm = GetMinMax(dst0)
             classCount = mm.maxVal
-            task.palette.Run(dst0 * 255 / classCount)
-            dst3 = task.palette.dst2
+            dst3 = ShowPalette(dst0 * 255 / classCount)
         Else
             dst3.SetTo(0)
             dst3.SetTo(cv.Scalar.Yellow, dst0)

@@ -94,18 +94,18 @@ Public Class CPP_Basics : Inherits VB_Parent
         handleInput.Free()
         getOptions()
 
-        Dim channels As Integer, dstPtr As IntPtr
-        dstPtr = cppTask_GetDst(cPtr, 0, channels)
-        dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        Dim dstPtr As IntPtr, type As Integer
+        dstPtr = cppTask_GetDst(cPtr, 0, type)
+        dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr)
 
-        dstPtr = cppTask_GetDst(cPtr, 1, channels)
-        dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        dstPtr = cppTask_GetDst(cPtr, 1, type)
+        dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr)
 
-        dstPtr = cppTask_GetDst(cPtr, 2, channels)
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        dstPtr = cppTask_GetDst(cPtr, 2, type)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr)
 
-        dstPtr = cppTask_GetDst(cPtr, 3, channels)
-        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        dstPtr = cppTask_GetDst(cPtr, 3, type)
+        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = cppTask_Close(cPtr)
