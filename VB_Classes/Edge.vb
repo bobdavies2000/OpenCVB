@@ -1195,9 +1195,7 @@ End Class
 
 
 Public Class Edge_Color8U : Inherits VB_Parent
-    Public colorMethods() As Object = {New BackProject_Full, New BackProject2D_Full, New Bin4Way_Regions,
-                                       New Binarize_DepthTiers, New FeatureLess_Groups, New Hist3Dcolor_Basics,
-                                       New KMeans_Basics, New LUT_Basics, New Reduction_Basics, New PCA_NColor_CPP_VB}
+    Public colorMethods(10 - 1)
     Dim canny As New Edge_Canny
     Dim options As New Options_ColorMethod
     Public Sub New()
@@ -1213,6 +1211,35 @@ Public Class Edge_Color8U : Inherits VB_Parent
             frmCheck.Left = task.gOptions.Width / 2
         End If
         options.RunVB()
+
+        For i = 0 To colorMethods.Count - 1
+            If options.check.Box(i).Checked Then
+                If colorMethods(i) Is Nothing Then
+                    Select Case i
+                        Case 0
+                            colorMethods(i) = New BackProject_Full()
+                        Case 1
+                            colorMethods(i) = New BackProject2D_Full()
+                        Case 2
+                            colorMethods(i) = New Bin4Way_Regions()
+                        Case 3
+                            colorMethods(i) = New Binarize_DepthTiers()
+                        Case 4
+                            colorMethods(i) = New FeatureLess_Groups()
+                        Case 5
+                            colorMethods(i) = New Hist3Dcolor_Basics()
+                        Case 6
+                            colorMethods(i) = New KMeans_Basics()
+                        Case 7
+                            colorMethods(i) = New LUT_Basics()
+                        Case 8
+                            colorMethods(i) = New Reduction_Basics()
+                        Case 9
+                            colorMethods(i) = New PCA_NColor_CPP_VB()
+                    End Select
+                End If
+            End If
+        Next
 
         dst2.SetTo(0)
         dst3.SetTo(0)
