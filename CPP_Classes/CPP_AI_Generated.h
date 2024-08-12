@@ -7369,7 +7369,7 @@ public:
 
 
 
-//class Edge_All_CPP : public CPP_Parent
+//class Edge_Basics_CPP : public CPP_Parent
 //{
 //private:
 //    Edge_Canny canny;
@@ -7382,8 +7382,8 @@ public:
 //    Edge_ResizeAdd resizeAdd;
 //    Edge_Regions regions;
 //public:
-//    Options_Edges_All* options;
-//    Edge_All_CPP() : CPP_Parent()
+//    Options_Edge_Basics* options;
+//    Edge_Basics_CPP() : CPP_Parent()
 //    {
 //        desc = "Use Radio Buttons to select the different edge algorithms.";
 //    }
@@ -7446,15 +7446,15 @@ public:
 
 
 
-class Edge_All_CPP : public CPP_Parent
+class Edge_Basics_CPP : public CPP_Parent
 {
 private:
     Edge_Canny_CPP* canny = new Edge_Canny_CPP();
-    Options_Edges_All* options = new Options_Edges_All();
+    Options_Edge_Basics* options = new Options_Edge_Basics();
 public:
-    Edge_All_CPP() : CPP_Parent()
+    Edge_Basics_CPP() : CPP_Parent()
     {
-        labels[2] = "Edge_All_CPP";
+        labels[2] = "Edge_Basics_CPP";
         desc = "Use Radio Buttons to select the different edge algorithms.";
     }
     void Run(cv::Mat src)

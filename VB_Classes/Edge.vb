@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
-Public Class Edge_All : Inherits VB_Parent
+Public Class Edge_Basics : Inherits VB_Parent
     Dim canny As Edge_Canny
     Dim scharr As Edge_Scharr
     Dim binRed As Edge_BinarizedReduction
@@ -11,12 +11,16 @@ Public Class Edge_All : Inherits VB_Parent
     Dim Laplacian As Edge_Laplacian
     Dim resizeAdd As Edge_ResizeAdd
     Dim regions As Edge_Regions
-    Public options As New Options_Edges_All
+    Public options As New Options_Edge_Basics
     Public Sub New()
         desc = "Use Radio Buttons to select the different edge algorithms."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
+        If task.FirstPass Then
+            Dim frmRadio = FindFrm("Options_Edge_Basics Radio Buttons")
+            frmRadio.Left = task.gOptions.Width / 2
+        End If
 
         Select Case options.edgeSelection
             Case "Canny"
@@ -332,7 +336,7 @@ End Class
 
 
 Public Class Edge_BinarizedBrightness : Inherits VB_Parent
-    Dim edges As New Edge_All
+    Dim edges As New Edge_Basics
     Dim bright As New Brightness_Basics
     Public Sub New()
         FindRadio("Binarized Sobel").Checked = True
@@ -1204,6 +1208,10 @@ Public Class Edge_Color8U : Inherits VB_Parent
         desc = "Find edges in a variety of Color8U algorithms then find the edges common to all."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If task.FirstPass Then
+            Dim frmCheck = FindFrm("Options_ColorMethod CheckBoxes")
+            frmCheck.Left = task.gOptions.Width / 2
+        End If
         options.RunVB()
 
         dst2.SetTo(0)

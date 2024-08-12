@@ -2086,11 +2086,11 @@ public:
 	Options_Density() {
 	}
 };
-class Options_Edges_All {
+class Options_Edge_Basics {
 public:
 	string edgeSelection =  "Canny";
 	void RunVB() {}
-	Options_Edges_All() {
+	Options_Edge_Basics() {
 	}
 };
 class Options_ColorMethod {

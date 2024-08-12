@@ -7626,7 +7626,7 @@ End Class
 
 
 
-Public Class Options_Edges_All : Inherits VB_Parent
+Public Class Options_Edge_Basics : Inherits VB_Parent
     Public edgeSelection As String = "Canny"
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -7645,14 +7645,7 @@ Public Class Options_Edges_All : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static frm = FindFrm(traceName + " Radio Buttons")
-        If task.FirstPass Then frm.Left = task.gOptions.Width / 2
-        edgeSelection = findRadioIndex(frm.check)
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).checked Then
-                edgeSelection = frm.check(i).text
-                Exit For
-            End If
-        Next
+        edgeSelection = frm.check(findRadioIndex(frm.check)).text
     End Sub
 End Class
 
@@ -7676,8 +7669,6 @@ Public Class Options_ColorMethod : Inherits VB_Parent
             check.addCheckBox("PCA_NColor_CPP_VB")
             check.Box(0).Checked = True
         End If
-        Dim frmCheck = FindFrm(traceName + " CheckBoxes")
-        frmCheck.Left = task.gOptions.Width / 2
     End Sub
     Public Sub RunVB()
     End Sub

@@ -373,8 +373,8 @@ namespace CS_Classes
 			if (algorithmName == "Duster_BasicsY_CS") return new Duster_BasicsY_CS(task);
 			if (algorithmName == "Duster_MaskZ_CS") return new Duster_MaskZ_CS(task);
 			if (algorithmName == "Duster_RedCloud_CS") return new Duster_RedCloud_CS(task);
-			if (algorithmName == "Edge_All_CS") return new Edge_All_CS(task);
 			if (algorithmName == "Edge_BackProjection_CS") return new Edge_BackProjection_CS(task);
+			if (algorithmName == "Edge_Basics_CS") return new Edge_Basics_CS(task);
 			if (algorithmName == "Edge_BinarizedBrightness_CS") return new Edge_BinarizedBrightness_CS(task);
 			if (algorithmName == "Edge_BinarizedReduction_CS") return new Edge_BinarizedReduction_CS(task);
 			if (algorithmName == "Edge_Canny_CS") return new Edge_Canny_CS(task);

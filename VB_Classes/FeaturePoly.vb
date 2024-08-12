@@ -1170,7 +1170,7 @@ End Class
 
 Public Class FeaturePoly_EdgeRemoval : Inherits VB_Parent
     Dim fMask As New FeaturePoly_ImageMask
-    Dim edges As New Edge_All
+    Dim edges As New Edge_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Remove edges from the FeaturePoly_ImageMask"

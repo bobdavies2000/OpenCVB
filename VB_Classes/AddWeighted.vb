@@ -80,7 +80,7 @@ End Class
 
 
 Public Class AddWeighted_Edges : Inherits VB_Parent
-    Dim edges As New Edge_All
+    Dim edges As New Edge_Basics
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         labels = {"", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image"}

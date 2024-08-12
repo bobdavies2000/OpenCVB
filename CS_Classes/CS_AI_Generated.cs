@@ -66,7 +66,7 @@ namespace CS_Classes
 
     public class AddWeighted_Edges_CS : CS_Parent
     {
-        Edge_All edges = new Edge_All();
+        Edge_Basics edges = new Edge_Basics();
         AddWeighted_Basics_CS addw;
 
         public AddWeighted_Edges_CS(VBtask task) : base(task)
@@ -15227,7 +15227,7 @@ namespace CS_Classes
     }
     public class Edge_BinarizedBrightness_CS : CS_Parent
     {
-        Edge_All edges = new Edge_All();
+        Edge_Basics edges = new Edge_Basics();
         Brightness_Basics bright = new Brightness_Basics();
         public Edge_BinarizedBrightness_CS(VBtask task) : base(task)
         {
@@ -15978,235 +15978,6 @@ namespace CS_Classes
             }
         }
     }
-
-
-
-
-
-
-    //public class Edge_All_CS : CS_Parent
-    //{
-    //    Options_Edges_All options = new Options_Edges_All();
-    //    public Edge_All_CS(VBtask task) : base(task)
-    //    {
-    //        desc = "Use Radio Buttons to select the different edge algorithms.";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        options.RunVB();
-
-    //        options.RunEdges(src);
-    //        dst2 = options.dst2.Channels() == 1 ? options.dst2 : options.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
-    //        labels[2] = traceName + " - selection = " + options.edgeSelection;
-    //    }
-    //}
-
-
-
-
-    //public class Edge_DepthAndColor_CS : CS_Parent
-    //{
-    //    Depth_Holes shadow = new Depth_Holes();
-    //    Edge_Canny canny = new Edge_Canny();
-    //    Dilate_Basics dilate = new Dilate_Basics();
-    //    public Edge_DepthAndColor_CS(VBtask task) : base(task)
-    //    {
-    //        FindRadio("Dilate shape: Rect").Checked = true;
-    //        FindSlider("Canny threshold1").Value = 100;
-    //        FindSlider("Canny threshold2").Value = 100;
-    //        desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow.";
-    //        labels[2] = "Edges in color and depth after dilate";
-    //        labels[3] = "Edges in color and depth no dilate";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        canny.Run(src);
-    //        shadow.Run(src);
-    //        dst3 = shadow.dst3.Channels() != 1 ? shadow.dst3.CvtColor(ColorConversionCodes.BGR2GRAY) : shadow.dst3;
-    //        dst3 += canny.dst2.Threshold(1, 255, ThresholdTypes.Binary);
-    //        dilate.Run(dst3);
-    //        dilate.dst2.SetTo(0, shadow.dst2);
-    //        dst2 = dilate.dst2;
-    //    }
-    //}
-
-
-
-
-    //public class Edge_Scharr_CS : CS_Parent
-    //{
-    //    Options_Edges options = new Options_Edges();
-    //    public Edge_Scharr_CS(VBtask task) : base(task)
-    //    {
-    //        labels[3] = "x field + y field in CV_32F format";
-    //        desc = "Scharr is most accurate with 3x3 kernel.";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        options.RunVB();
-    //        Mat gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-    //        Mat xField = gray.Scharr(MatType.CV_32FC1, 1, cv.Scalar.All(0));
-    //        Mat yField = gray.Scharr(MatType.CV_32FC1, 0, 1);
-    //        Cv2.Add(xField, yField, dst3);
-    //        dst3.ConvertTo(dst2, MatType.CV_8U, options.scharrMultiplier);
-    //    }
-    //}
-
-
-
-
-    //public class Edge_Preserving_CS : CS_Parent
-    //{
-    //    Options_Edges options = new Options_Edges();
-    //    public Edge_Preserving_CS(VBtask task) : base(task)
-    //    {
-    //        labels[3] = "Edge preserving blur for BGR depth image above";
-    //        desc = "OpenCV's edge preserving filter.";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        options.RunVB();
-    //        if (options.recurseCheck)
-    //        {
-    //            Cv2.EdgePreservingFilter(src, dst2, EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r);
-    //        }
-    //        else
-    //        {
-    //            Cv2.EdgePreservingFilter(src, dst2, EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r);
-    //        }
-    //        if (options.recurseCheck)
-    //        {
-    //            Cv2.EdgePreservingFilter(task.depthRGB, dst3, EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r);
-    //        }
-    //        else
-    //        {
-    //            Cv2.EdgePreservingFilter(task.depthRGB, dst3, EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r);
-    //        }
-    //    }
-    //}
-
-
-
-
-    //public class Edge_RandomForest_CPP_CS : CS_Parent
-    //{
-    //    byte[] rgbData;
-    //    Options_Edges2 options = new Options_Edges2();
-    //    public Edge_RandomForest_CPP_CS(VBtask task) : base(task)
-    //    {
-    //        desc = "Detect edges using structured forests - Opencv Contrib";
-    //        rgbData = new byte[dst2.Total() * dst2.ElemSize()];
-    //        labels[3] = "Thresholded Edge Mask (use slider to adjust)";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        options.RunVB();
-    //        if (task.frameCount < 100)
-    //            SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", new cv.Point(10, 100));
-    //        if (task.frameCount == 5)
-    //        {
-    //            FileInfo modelInfo = new FileInfo(Path.Combine(task.HomeDir, "Data/model.yml.gz"));
-    //            cPtr = Edge_RandomForest_Open(modelInfo.FullName);
-    //        }
-    //        if (task.frameCount > 5)
-    //        {
-    //            Marshal.Copy(src.Data, rgbData, 0, rgbData.Length);
-    //            GCHandle handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned);
-    //            IntPtr imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols);
-    //            handleRGB.Free();
-    //            dst3 = new Mat(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, ThresholdTypes.Binary);
-    //        }
-    //    }
-    //    public void Close()
-    //    {
-    //        if (cPtr != IntPtr.Zero)
-    //            cPtr = Edge_RandomForest_Close(cPtr);
-    //    }
-    //}
-
-
-
-
-    //public class Edge_DCTfrequency_CS : CS_Parent
-    //{
-    //    Options_Edges2 options = new Options_Edges2();
-    //    public Edge_DCTfrequency_CS(VBtask task) : base(task)
-    //    {
-    //        labels[3] = "Mask for the isolated frequencies";
-    //        desc = "Find edges by removing all the highest frequencies.";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        options.RunVB();
-    //        Mat gray = task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
-    //        Mat frequencies = new Mat();
-    //        Mat src32f = new Mat();
-    //        gray.ConvertTo(src32f, MatType.CV_32F, 1.0 / 255);
-    //        Cv2.Dct(src32f, frequencies, DctFlags.None);
-    //        cv.Rect roi = new cv.Rect(0, 0, options.removeFrequencies, src32f.Height);
-    //        if (roi.Width > 0)
-    //            frequencies.SubMat(roi).SetTo(0);
-    //        labels[2] = $"Highest {options.removeFrequencies} frequencies removed from RGBDepth";
-    //        Cv2.Dct(frequencies, src32f, DctFlags.Inverse);
-    //        src32f.ConvertTo(dst2, MatType.CV_8UC1, 255);
-    //        dst3 = dst2.Threshold(options.dctThreshold, 255, ThresholdTypes.Binary);
-    //    }
-    //}
-
-
-
-
-    //public class Edge_Deriche_CPP_CS : CS_Parent
-    //{
-    //    Options_Edges3 options = new Options_Edges3();
-    //    public Edge_Deriche_CPP_CS(VBtask task) : base(task)
-    //    {
-    //        cPtr = Edge_Deriche_Open();
-    //        labels[3] = "Image enhanced with Deriche results";
-    //        desc = "Edge detection using the Deriche X and Y gradients";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        options.RunVB();
-    //        byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
-    //        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
-    //        GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
-    //        IntPtr imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega);
-    //        handleSrc.Free();
-    //        if (imagePtr != IntPtr.Zero)
-    //            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
-    //        dst3 = src | dst2;
-    //    }
-    //    public void Close()
-    //    {
-    //        if (cPtr != IntPtr.Zero)
-    //            cPtr = Edge_Deriche_Close(cPtr);
-    //    }
-    //}
-
-
-
-
-    //public class Edge_DCTinput_CS : CS_Parent
-    //{
-    //    Edge_Canny edges = new Edge_Canny();
-    //    DCT_FeatureLess dct = new DCT_FeatureLess();
-    //    public Edge_DCTinput_CS(VBtask task) : base(task)
-    //    {
-    //        labels[2] = "Canny edges produced from original grayscale image";
-    //        labels[3] = "Edges produced with featureless regions cleared";
-    //        desc = "Use the featureless regions to enhance the edge detection";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        edges.Run(src);
-    //        dst2 = edges.dst2.Clone();
-    //        dct.Run(src);
-    //        Mat tmp = src.SetTo(Scalar.White, dct.dst2);
-    //        edges.Run(tmp);
-    //        dst3 = edges.dst2;
-    //    }
-    //}
 
 
 
@@ -20969,7 +20740,7 @@ namespace CS_Classes
     public class FeaturePoly_EdgeRemoval_CS : CS_Parent
     {
         FeaturePoly_ImageMask fMask = new FeaturePoly_ImageMask();
-        Edge_All edges = new Edge_All();
+        Edge_Basics edges = new Edge_Basics();
         public FeaturePoly_EdgeRemoval_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
@@ -33563,7 +33334,7 @@ namespace CS_Classes
     public class LaneFinder_Edges_CS : CS_Parent
     {
         LaneFinder_Videos input = new LaneFinder_Videos();
-        Edge_All edges = new Edge_All();
+        Edge_Basics edges = new Edge_Basics();
         public LaneFinder_Edges_CS(VBtask task) : base(task)
         {
             desc = "Using the videos provided, find the lane markers.";
@@ -62425,19 +62196,19 @@ namespace CS_Classes
 
 
 
-    public class Edge_All_CS : CS_Parent
+    public class Edge_Basics_CS : CS_Parent
     {
-        Edge_Canny canny = new Edge_Canny();
-        Edge_Scharr scharr = new Edge_Scharr();
-        Edge_BinarizedReduction binRed = new Edge_BinarizedReduction();
-        Bin4Way_Sobel binSobel = new Bin4Way_Sobel();
-        Edge_ColorGap_CPP_VB colorGap = new Edge_ColorGap_CPP_VB();
-        Edge_Deriche_CPP_VB deriche = new Edge_Deriche_CPP_VB();
-        Edge_Laplacian Laplacian = new Edge_Laplacian();
-        Edge_ResizeAdd resizeAdd = new Edge_ResizeAdd();
-        Edge_Regions regions = new Edge_Regions();
-        public Options_Edges_All options = new Options_Edges_All();
-        public Edge_All_CS(VBtask task) : base(task)
+        Edge_Canny canny;
+        Edge_Scharr scharr;
+        Edge_BinarizedReduction binRed;
+        Bin4Way_Sobel binSobel;
+        Edge_ColorGap_CPP_VB colorGap;
+        Edge_Deriche_CPP_VB deriche;
+        Edge_Laplacian Laplacian;
+        Edge_ResizeAdd resizeAdd;
+        Edge_Regions regions;
+        public Options_Edge_Basics options = new Options_Edge_Basics();
+        public Edge_Basics_CS(VBtask task) : base(task)
         {
             desc = "Use Radio Buttons to select the different edge algorithms.";
         }
@@ -62447,47 +62218,56 @@ namespace CS_Classes
             switch (options.edgeSelection)
             {
                 case "Canny":
+                    if (canny == null) canny = new Edge_Canny();
                     canny.Run(src);
                     dst2 = canny.dst2;
                     break;
                 case "Scharr":
+                    if (scharr == null) scharr = new Edge_Scharr();
                     scharr.Run(src);
                     dst2 = scharr.dst3;
                     break;
                 case "Binarized Reduction":
+                    if (binRed == null) binRed = new Edge_BinarizedReduction();
                     binRed.Run(src);
                     dst2 = binRed.dst2;
                     break;
                 case "Binarized Sobel":
+                    if (binSobel == null) binSobel = new Bin4Way_Sobel();
                     binSobel.Run(src);
                     dst2 = binSobel.dst2;
                     break;
                 case "Color Gap":
+                    if (colorGap == null) colorGap = new Edge_ColorGap_CPP_VB();
                     colorGap.Run(src);
                     dst2 = colorGap.dst2;
                     break;
                 case "Deriche":
+                    if (deriche == null) deriche = new Edge_Deriche_CPP_VB();
                     deriche.Run(src);
                     dst2 = deriche.dst2;
                     break;
                 case "Laplacian":
+                    if (Laplacian == null) Laplacian = new Edge_Laplacian();
                     Laplacian.Run(src);
                     dst2 = Laplacian.dst2;
                     break;
                 case "Resize And Add":
+                    if (resizeAdd == null) resizeAdd = new Edge_ResizeAdd();
                     resizeAdd.Run(src);
                     dst2 = resizeAdd.dst2;
                     break;
                 case "Depth Region Boundaries":
+                    if (regions == null) regions = new Edge_Regions();
                     regions.Run(src);
                     dst2 = regions.dst2;
                     break;
             }
-            if (dst2.Channels() != 1)
-                dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (dst2.Channels() != 1) dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
             labels[2] = traceName + " - selection = " + options.edgeSelection;
         }
     }
+
 
 }
 

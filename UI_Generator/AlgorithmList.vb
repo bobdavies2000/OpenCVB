@@ -76,7 +76,7 @@ _FeatureLess_Basics_CPP
 _FeatureLess_Edge_CPP
 _Feature_AKaze_CPP
 _AddWeighted_ImageAccumulate_CPP
-_Edge_All_CPP
+_Edge_Basics_CPP
 _Stable_BasicsCount_CPP
 End Enum
 Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
@@ -356,7 +356,7 @@ if algorithmName = "Depth_PointCloud_CPP" Then return new CPP_Basics(cppFunction
 if algorithmName = "Depth_PointCloud_IMU_CPP" Then return new CPP_Basics(cppFunctionNames._Depth_PointCloud_IMU_CPP)
 if algorithmName = "Diff_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Diff_Basics_CPP)
 if algorithmName = "Distance_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Distance_Basics_CPP)
-if algorithmName = "Edge_All_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_All_CPP)
+if algorithmName = "Edge_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_Basics_CPP)
 if algorithmName = "Edge_Canny_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_Canny_CPP)
 if algorithmName = "Edge_MotionFrames_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_MotionFrames_CPP)
 if algorithmName = "Edge_Preserving_CPP" Then return new CPP_Basics(cppFunctionNames._Edge_Preserving_CPP)
@@ -531,8 +531,8 @@ if algorithmName = "Stable_BasicsCount_CPP" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Duster_BasicsY" Then return new Duster_BasicsY
 	if algorithmName = "Duster_MaskZ" Then return new Duster_MaskZ
 	if algorithmName = "Duster_RedCloud" Then return new Duster_RedCloud
-	if algorithmName = "Edge_All" Then return new Edge_All
 	if algorithmName = "Edge_BackProjection" Then return new Edge_BackProjection
+	if algorithmName = "Edge_Basics" Then return new Edge_Basics
 	if algorithmName = "Edge_BinarizedBrightness" Then return new Edge_BinarizedBrightness
 	if algorithmName = "Edge_BinarizedReduction" Then return new Edge_BinarizedReduction
 	if algorithmName = "Edge_Canny" Then return new Edge_Canny
@@ -1361,9 +1361,9 @@ if algorithmName = "Stable_BasicsCount_CPP" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_Draw" Then return new Options_Draw
 	if algorithmName = "Options_DrawArc" Then return new Options_DrawArc
 	if algorithmName = "Options_DrawNoise" Then return new Options_DrawNoise
+	if algorithmName = "Options_Edge_Basics" Then return new Options_Edge_Basics
 	if algorithmName = "Options_EdgeOverlay" Then return new Options_EdgeOverlay
 	if algorithmName = "Options_Edges" Then return new Options_Edges
-	if algorithmName = "Options_Edges_All" Then return new Options_Edges_All
 	if algorithmName = "Options_Edges2" Then return new Options_Edges2
 	if algorithmName = "Options_Edges3" Then return new Options_Edges3
 	if algorithmName = "Options_Edges4" Then return new Options_Edges4
