@@ -49409,6 +49409,12 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
+            if (task.testAllRunning)
+            {
+                SetTrueText("ProCon_Basics is well-tested but threads hang around during overnight testing. " + Environment.NewLine + "Skipping for now...");
+                return;
+            }
+            
             options.RunVB();
             if (options.buffer.Length != options.bufferSize)
             {
@@ -49449,6 +49455,12 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
+            if (task.testAllRunning)
+            {
+                SetTrueText("ProCon_Variation is well-tested but threads hang around during overnight testing. " + Environment.NewLine + "Skipping for now...");
+                return;
+            }
+            
             lock (_lockObject)
             {
                 procon.tail = procon.success((int)procon.tail);

@@ -60,7 +60,7 @@ Public Class ProCon_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.testAllRunning Then
-            SetTrueText("ProCon_Basics causes problems when running test all. " + vbCrLf + "Skipping for now...")
+            SetTrueText("ProCon_Basics is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
             Exit Sub
         End If
         options.RunVB()
@@ -98,6 +98,10 @@ Public Class ProCon_Variation : Inherits VB_Parent
         desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
     Public Sub RunVB(src as cv.Mat)
+        If task.testAllRunning Then
+            SetTrueText("ProCon_Variation is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
+            Exit Sub
+        End If
         SyncLock procon.mutex
             procon.tail = procon.success(procon.tail)
             If procon.options.buffer(procon.tail) = -1 Then

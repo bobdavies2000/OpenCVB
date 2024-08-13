@@ -597,13 +597,16 @@ Public Class OpenCVB
         For i = 0 To proc.Count - 1
             'procList.Add(proc(i).ProcessName, proc(i).ProcessName)
             If proc(i).ProcessName.ToLower.Contains("python") Then
-                If proc(i).HasExited = False Then
-                    proc(i).Kill()
-                    If proc(i).ProcessName.ToLower.Contains("pythonw") Then
-                        Thread.Sleep(100) ' let the camera task free resources.
-                        foundCamera = True
+                Try
+                    If proc(i).HasExited = False Then
+                        proc(i).Kill()
+                        If proc(i).ProcessName.ToLower.Contains("pythonw") Then
+                            Thread.Sleep(100) ' let the camera task free resources.
+                            foundCamera = True
+                        End If
                     End If
-                End If
+                Catch ex As Exception
+                End Try
             End If
             If proc(i).ProcessName.ToLower.Contains("touchup") Then
                 If proc(i).HasExited = False Then proc(i).Kill()
