@@ -151,7 +151,7 @@ Public Class TranslatorForm
 
     Private Sub TranslatorForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         LogMsg("++++++++++++++++++++++++++++++++++++++")
-        saveTask = InitializeAsync()
+        dim saveTask = InitializeAsync()
 
         homeDir = New DirectoryInfo(CurDir() + "../../../")
         Me.Top = 0

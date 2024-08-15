@@ -160,6 +160,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="CameraZED2.vb" />
+    <Compile Include="Translator.Designer.vb">
+      <DependentUpon>Translator.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Translator.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="TreeviewForm.Designer.vb">
       <DependentUpon>TreeviewForm.vb</DependentUpon>
     </Compile>
@@ -184,6 +190,9 @@
     <EmbeddedResource Include="OptionsDialog.resx">
       <DependentUpon>OptionsDialog.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Translator.resx">
+      <DependentUpon>Translator.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TreeviewForm.resx">
       <DependentUpon>TreeviewForm.vb</DependentUpon>
     </EmbeddedResource>
@@ -205,6 +214,9 @@
     <Folder Include="Data\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2">
+      <Version>1.0.2730-prerelease</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
     </PackageReference>
