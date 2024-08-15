@@ -608,7 +608,7 @@ Public Class OpenCVB
                 Catch ex As Exception
                 End Try
             End If
-            If proc(i).ProcessName.ToLower.Contains("touchup") Then
+            If proc(i).ProcessName.ToLower.Contains("translator") Then
                 If proc(i).HasExited = False Then proc(i).Kill()
             End If
         Next
@@ -1020,7 +1020,7 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click
-        Shell(HomeDir.FullName + "Touchup\bin\x64\Debug\Touchup.exe", AppWinStyle.NormalFocus)
+        Shell(HomeDir.FullName + "Translator\bin\x64\Debug\net8.0-windows\Translator.exe", AppWinStyle.NormalFocus)
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Text = "" Then
