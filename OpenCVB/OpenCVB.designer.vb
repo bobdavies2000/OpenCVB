@@ -41,7 +41,6 @@ Partial Class OpenCVB
         Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AlgorithmDesc = New System.Windows.Forms.Label()
         Me.GroupName = New System.Windows.Forms.ComboBox()
-        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.AvailableAlgorithms = New System.Windows.Forms.ComboBox()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.MainMenu = New System.Windows.Forms.ToolStripMenuItem()
@@ -49,7 +48,6 @@ Partial Class OpenCVB
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.ValidateTreeView = New System.Windows.Forms.Timer(Me.components)
         Me.XYloc = New System.Windows.Forms.Label()
         Me.ComplexityTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
@@ -214,7 +212,6 @@ Partial Class OpenCVB
         Me.GroupName.Name = "GroupName"
         Me.GroupName.Size = New System.Drawing.Size(271, 34)
         Me.GroupName.TabIndex = 1
-        Me.ToolTip1.SetToolTip(Me.GroupName, "Select a subset of all the algorithms")
         '
         'AvailableAlgorithms
         '
@@ -227,7 +224,6 @@ Partial Class OpenCVB
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
         Me.AvailableAlgorithms.Size = New System.Drawing.Size(443, 34)
         Me.AvailableAlgorithms.TabIndex = 0
-        Me.ToolTip1.SetToolTip(Me.AvailableAlgorithms, "Select an algorithm from the list")
         '
         'MenuStrip1
         '
@@ -269,10 +265,6 @@ Partial Class OpenCVB
         '
         Me.RefreshTimer.Enabled = True
         Me.RefreshTimer.Interval = 10
-        '
-        'ValidateTreeView
-        '
-        Me.ValidateTreeView.Interval = 500
         '
         'XYloc
         '
@@ -321,7 +313,6 @@ Partial Class OpenCVB
     Friend WithEvents OptionsButton As ToolStripButton
     Friend WithEvents PausePlayButton As ToolStripButton
     Friend WithEvents GroupName As ComboBox
-    Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents AvailableAlgorithms As ComboBox
     Friend WithEvents TreeButton As ToolStripButton
     Friend WithEvents MenuStrip1 As MenuStrip
@@ -333,7 +324,6 @@ Partial Class OpenCVB
     Friend WithEvents ToolStripButton1 As ToolStripButton
     Friend WithEvents ToolStripButton2 As ToolStripButton
     Friend WithEvents RefreshTimer As Timer
-    Friend WithEvents ValidateTreeView As Timer
     Friend WithEvents XYloc As Label
     Friend WithEvents ToolStripButton3 As ToolStripButton
     Friend WithEvents TranslateButton As ToolStripButton

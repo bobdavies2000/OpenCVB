@@ -8,11 +8,11 @@ Public Class TreeviewForm
         Me.TreeViewTimer.Enabled = False
         Dim algorithm = e.Node.Text
         Dim split = e.Node.Text.Split(" ")
-        OpenCVB_UI.intermediateReview = split(0)
+        Main.intermediateReview = split(0)
     End Sub
     Private Sub TreeviewForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Dim split() = Me.Text.Split()
-        If split(0) <> "CPP_Basics" Then OpenCVB_UI.AvailableAlgorithms.Text = split(0)
+        If split(0) <> "CPP_Basics" Then Main.AvailableAlgorithms.Text = split(0)
     End Sub
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
@@ -49,12 +49,12 @@ Public Class TreeviewForm
     End Function
     Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub updateTree()
-        If OpenCVB_UI.callTrace.Count = 0 Then Exit Sub
+        If Main.callTrace.Count = 0 Then Exit Sub
         moduleList.Clear()
 
         Dim tv = TreeView1
         tv.Nodes.Clear()
-        Dim rootcall = Trim(OpenCVB_UI.callTrace(0))
+        Dim rootcall = Trim(Main.callTrace(0))
         Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
         Me.Text = title + titleStr
         Dim n = tv.Nodes.Add(title)
@@ -64,8 +64,8 @@ Public Class TreeviewForm
         For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
             Dim alldone = True
 
-            For i = 1 To OpenCVB_UI.callTrace.Count - 1
-                Dim fullname = OpenCVB_UI.callTrace(i)
+            For i = 1 To Main.callTrace.Count - 1
+                Dim fullname = Main.callTrace(i)
                 Dim split() = fullname.Split("\")
                 If split.Count = nodeLevel + 3 Then
                     alldone = False
@@ -91,7 +91,7 @@ Public Class TreeviewForm
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
 
-        For Each sn In OpenCVB_UI.callTrace
+        For Each sn In Main.callTrace
             Dim split() = sn.Split("\")
             treeData.Add(split(split.Length - 2))
         Next
@@ -101,11 +101,11 @@ Public Class TreeviewForm
         tv.SelectedNode = n
     End Sub
     Private Sub TreeView_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
-        If OpenCVB_UI.testAllRunning Then Exit Sub ' don't update the treeview when doing overnight testing.
+        If Main.testAllRunning Then Exit Sub ' don't update the treeview when doing overnight testing.
         SyncLock callTraceLock
-            If OpenCVB_UI.callTrace Is Nothing Then Exit Sub
-            If OpenCVB_UI.callTrace.Count > 0 Then
-                Dim firstEntry = OpenCVB_UI.callTrace(0)
+            If Main.callTrace Is Nothing Then Exit Sub
+            If Main.callTrace.Count > 0 Then
+                Dim firstEntry = Main.callTrace(0)
                 If Len(firstEntry) Then
                     firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
                     If Me.Text = firstEntry + Me.titleStr = False Then Me.updateTree()
@@ -121,10 +121,10 @@ Public Class TreeviewForm
         End Function
     End Class
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        If OpenCVB_UI.testAllRunning Then Exit Sub ' may not be enough time to report valid statistics.
+        If Main.testAllRunning Then Exit Sub ' may not be enough time to report valid statistics.
         SyncLock callTraceLock
-            If OpenCVB_UI.testAllRunning = False Then
-                Dim algorithm_ms = New List(Of Single)(OpenCVB_UI.algorithm_ms)
+            If Main.testAllRunning = False Then
+                Dim algorithm_ms = New List(Of Single)(Main.algorithm_ms)
                 If algorithm_ms.Count = 0 Then
                     PercentTime.Text = ""
                     Exit Sub
@@ -140,8 +140,8 @@ Public Class TreeviewForm
                 For i = 0 To algorithm_ms.Count - 1
                     Dim percent = algorithm_ms(i) / sumTime
                     If percent < 0 Then percent = 0
-                    Dim str = Format(percent, "00.0%") + " " + OpenCVB_UI.algorithmNames(i)
-                    If OpenCVB_UI.algorithmNames(i).Contains("waitingForInput") Then
+                    Dim str = Format(percent, "00.0%") + " " + Main.algorithmNames(i)
+                    If Main.algorithmNames(i).Contains("waitingForInput") Then
                         str += "  <<<<<<<<<< "
                         saveWaitTime = str
                     End If
@@ -149,7 +149,7 @@ Public Class TreeviewForm
                 Next
 
                 PercentTime.Text = ""
-                PercentTime.Text = "Algorithm FPS = " + Format(OpenCVB_UI.algorithmFPS, "0.0") + vbCrLf
+                PercentTime.Text = "Algorithm FPS = " + Format(Main.algorithmFPS, "0.0") + vbCrLf
                 PercentTime.Text += "% = function times for algorithm task only." + vbCrLf + vbCrLf
                 Static boldFont = New Font(PercentTime.Font, FontStyle.Bold)
                 Static regularFont = New Font(PercentTime.Font, FontStyle.Regular)

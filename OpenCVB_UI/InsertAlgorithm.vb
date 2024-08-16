@@ -113,7 +113,7 @@ Public Class InsertAlgorithm
         Me.Close()
     End Sub
     Private Sub AddAlgorithm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        AlgorithmName.Text = OpenCVB_UI.AvailableAlgorithms.Text
+        AlgorithmName.Text = Main.AvailableAlgorithms.Text
         vbSnippet = File.ReadAllLines("..\..\OpenCVB.snippets\VB_Class - new Class.snippet")
         cppSnippet = File.ReadAllLines("..\..\OpenCVB.snippets\CPP Class - new C++.snippet")
         cppAISnippet = File.ReadAllLines("..\..\OpenCVB.snippets\CPP Class - AI_Generated.snippet")

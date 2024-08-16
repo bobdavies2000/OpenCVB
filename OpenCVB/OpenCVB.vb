@@ -755,7 +755,7 @@ Public Class OpenCVB
             End If
         End If
     End Sub
-    Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+     Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Keys.Up Then upArrow = True
         If e.KeyValue = Keys.Down Then downArrow = True
     End Sub

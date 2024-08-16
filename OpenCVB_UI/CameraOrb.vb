@@ -47,7 +47,6 @@ Public Class CameraORB : Inherits Camera
         If cPtr = 0 Then Exit Sub
 
         Try
-
             Dim colorData = ORBWaitForFrame(cPtr)
 
             Dim accelFrame = ORBAccel(cPtr)

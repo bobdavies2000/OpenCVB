@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class OpenCVB_UI
+Partial Class Main
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -23,7 +23,7 @@ Partial Class OpenCVB_UI
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OpenCVB_UI))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main))
         ToolStrip1 = New ToolStrip()
         ToolStripButton1 = New ToolStripButton()
         ToolStripButton2 = New ToolStripButton()
@@ -31,12 +31,12 @@ Partial Class OpenCVB_UI
         OptionsButton = New ToolStripButton()
         TestAllButton = New ToolStripButton()
         TreeButton = New ToolStripButton()
-        ToolStripButton7 = New ToolStripButton()
+        PixelViewerButton = New ToolStripButton()
         BluePlusButton = New ToolStripButton()
         ComplexityButton = New ToolStripButton()
-        ToolStripButton10 = New ToolStripButton()
+        TranslateButton = New ToolStripButton()
         Advice = New ToolStripButton()
-        ToolStripButton12 = New ToolStripButton()
+        RecentList = New ToolStripDropDownButton()
         AvailableAlgorithms = New ToolStripComboBox()
         GroupName = New ToolStripComboBox()
         AlgorithmDesc = New TextBox()
@@ -44,14 +44,20 @@ Partial Class OpenCVB_UI
         TestAllTimer = New Timer(components)
         ComplexityTimer = New Timer(components)
         XYLoc = New Label()
+        MenuStrip1 = New MenuStrip()
+        FileToolStripMenuItem = New ToolStripMenuItem()
+        ExitToolStripMenuItem = New ToolStripMenuItem()
+        AboutToolStripMenuItem = New ToolStripMenuItem()
+        RefreshTimer = New Timer(components)
         ToolStrip1.SuspendLayout()
+        MenuStrip1.SuspendLayout()
         SuspendLayout()
         ' 
         ' ToolStrip1
         ' 
         ToolStrip1.ImageScalingSize = New Size(24, 24)
-        ToolStrip1.Items.AddRange(New ToolStripItem() {ToolStripButton1, ToolStripButton2, PausePlayButton, OptionsButton, TestAllButton, TreeButton, ToolStripButton7, BluePlusButton, ComplexityButton, ToolStripButton10, Advice, ToolStripButton12, AvailableAlgorithms, GroupName})
-        ToolStrip1.Location = New Point(0, 0)
+        ToolStrip1.Items.AddRange(New ToolStripItem() {ToolStripButton1, ToolStripButton2, PausePlayButton, OptionsButton, TestAllButton, TreeButton, PixelViewerButton, BluePlusButton, ComplexityButton, TranslateButton, Advice, RecentList, AvailableAlgorithms, GroupName})
+        ToolStrip1.Location = New Point(0, 33)
         ToolStrip1.Name = "ToolStrip1"
         ToolStrip1.Size = New Size(1556, 34)
         ToolStrip1.TabIndex = 0
@@ -111,14 +117,14 @@ Partial Class OpenCVB_UI
         TreeButton.Size = New Size(34, 29)
         TreeButton.Text = "ToolStripButton6"
         ' 
-        ' ToolStripButton7
+        ' PixelViewerButton
         ' 
-        ToolStripButton7.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ToolStripButton7.Image = CType(resources.GetObject("ToolStripButton7.Image"), Image)
-        ToolStripButton7.ImageTransparentColor = Color.Magenta
-        ToolStripButton7.Name = "ToolStripButton7"
-        ToolStripButton7.Size = New Size(34, 29)
-        ToolStripButton7.Text = "ToolStripButton7"
+        PixelViewerButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+        PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), Image)
+        PixelViewerButton.ImageTransparentColor = Color.Magenta
+        PixelViewerButton.Name = "PixelViewerButton"
+        PixelViewerButton.Size = New Size(34, 29)
+        PixelViewerButton.Text = "Display pixels under the cursor."
         ' 
         ' BluePlusButton
         ' 
@@ -138,14 +144,14 @@ Partial Class OpenCVB_UI
         ComplexityButton.Size = New Size(34, 29)
         ComplexityButton.Text = "ToolStripButton9"
         ' 
-        ' ToolStripButton10
+        ' TranslateButton
         ' 
-        ToolStripButton10.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ToolStripButton10.Image = CType(resources.GetObject("ToolStripButton10.Image"), Image)
-        ToolStripButton10.ImageTransparentColor = Color.Magenta
-        ToolStripButton10.Name = "ToolStripButton10"
-        ToolStripButton10.Size = New Size(34, 29)
-        ToolStripButton10.Text = "ToolStripButton10"
+        TranslateButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+        TranslateButton.Image = CType(resources.GetObject("TranslateButton.Image"), Image)
+        TranslateButton.ImageTransparentColor = Color.Magenta
+        TranslateButton.Name = "TranslateButton"
+        TranslateButton.Size = New Size(34, 29)
+        TranslateButton.Text = "Translate algorithms to C#, C++, or VB.Net"
         ' 
         ' Advice
         ' 
@@ -156,14 +162,14 @@ Partial Class OpenCVB_UI
         Advice.Size = New Size(34, 29)
         Advice.Text = "ToolStripButton11"
         ' 
-        ' ToolStripButton12
+        ' RecentList
         ' 
-        ToolStripButton12.DisplayStyle = ToolStripItemDisplayStyle.Text
-        ToolStripButton12.Image = CType(resources.GetObject("ToolStripButton12.Image"), Image)
-        ToolStripButton12.ImageTransparentColor = Color.Magenta
-        ToolStripButton12.Name = "ToolStripButton12"
-        ToolStripButton12.Size = New Size(68, 29)
-        ToolStripButton12.Text = "Recent"
+        RecentList.DisplayStyle = ToolStripItemDisplayStyle.Text
+        RecentList.Image = CType(resources.GetObject("RecentList.Image"), Image)
+        RecentList.ImageTransparentColor = Color.Magenta
+        RecentList.Name = "RecentList"
+        RecentList.Size = New Size(82, 29)
+        RecentList.Text = "Recent"
         ' 
         ' AvailableAlgorithms
         ' 
@@ -201,18 +207,55 @@ Partial Class OpenCVB_UI
         XYLoc.TabIndex = 3
         XYLoc.Text = "XYLoc"
         ' 
+        ' MenuStrip1
+        ' 
+        MenuStrip1.ImageScalingSize = New Size(24, 24)
+        MenuStrip1.Items.AddRange(New ToolStripItem() {FileToolStripMenuItem, AboutToolStripMenuItem})
+        MenuStrip1.Location = New Point(0, 0)
+        MenuStrip1.Name = "MenuStrip1"
+        MenuStrip1.Size = New Size(1556, 33)
+        MenuStrip1.TabIndex = 4
+        MenuStrip1.Text = "MenuStrip1"
+        ' 
+        ' FileToolStripMenuItem
+        ' 
+        FileToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {ExitToolStripMenuItem})
+        FileToolStripMenuItem.Name = "FileToolStripMenuItem"
+        FileToolStripMenuItem.Size = New Size(54, 29)
+        FileToolStripMenuItem.Text = "&File"
+        ' 
+        ' ExitToolStripMenuItem
+        ' 
+        ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
+        ExitToolStripMenuItem.Size = New Size(141, 34)
+        ExitToolStripMenuItem.Text = "E&xit"
+        ' 
+        ' AboutToolStripMenuItem
+        ' 
+        AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
+        AboutToolStripMenuItem.Size = New Size(78, 29)
+        AboutToolStripMenuItem.Text = "About"
+        ' 
+        ' RefreshTimer
+        ' 
+        RefreshTimer.Interval = 10
+        ' 
         ' OpenCVB_UI
         ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleDimensions = New SizeF(10.0F, 25.0F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1556, 935)
         Controls.Add(XYLoc)
         Controls.Add(AlgorithmDesc)
         Controls.Add(ToolStrip1)
+        Controls.Add(MenuStrip1)
+        MainMenuStrip = MenuStrip1
         Name = "OpenCVB_UI"
         Text = "OpenCVB Main Form"
         ToolStrip1.ResumeLayout(False)
         ToolStrip1.PerformLayout()
+        MenuStrip1.ResumeLayout(False)
+        MenuStrip1.PerformLayout()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -224,12 +267,11 @@ Partial Class OpenCVB_UI
     Friend WithEvents OptionsButton As ToolStripButton
     Friend WithEvents TestAllButton As ToolStripButton
     Friend WithEvents TreeButton As ToolStripButton
-    Friend WithEvents ToolStripButton7 As ToolStripButton
+    Friend WithEvents PixelViewerButton As ToolStripButton
     Friend WithEvents BluePlusButton As ToolStripButton
     Friend WithEvents ComplexityButton As ToolStripButton
-    Friend WithEvents ToolStripButton10 As ToolStripButton
+    Friend WithEvents TranslateButton As ToolStripButton
     Friend WithEvents Advice As ToolStripButton
-    Friend WithEvents ToolStripButton12 As ToolStripButton
     Friend WithEvents AvailableAlgorithms As ToolStripComboBox
     Friend WithEvents GroupName As ToolStripComboBox
     Friend WithEvents AlgorithmDesc As TextBox
@@ -237,5 +279,11 @@ Partial Class OpenCVB_UI
     Friend WithEvents TestAllTimer As Timer
     Friend WithEvents ComplexityTimer As Timer
     Friend WithEvents XYLoc As Label
+    Friend WithEvents MenuStrip1 As MenuStrip
+    Friend WithEvents FileToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ExitToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents RefreshTimer As Timer
+    Friend WithEvents RecentList As ToolStripDropDownButton
 
 End Class
