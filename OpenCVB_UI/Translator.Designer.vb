@@ -22,79 +22,127 @@ Partial Class Translator
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.WebView = New System.Windows.Forms.WebBrowser()
-        Me.translate = New System.Windows.Forms.Button()
-        Me.Touchup = New System.Windows.Forms.Button()
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.SuspendLayout()
-        '
-        'WebView
-        '
-        Me.WebView.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.WebView.Location = New System.Drawing.Point(0, 120)
-        Me.WebView.MinimumSize = New System.Drawing.Size(20, 20)
-        Me.WebView.Name = "WebView"
-        Me.WebView.Size = New System.Drawing.Size(1556, 1598)
-        Me.WebView.TabIndex = 0
-        '
-        'translate
-        '
-        Me.translate.Location = New System.Drawing.Point(316, 24)
-        Me.translate.Name = "translate"
-        Me.translate.Size = New System.Drawing.Size(182, 55)
-        Me.translate.TabIndex = 1
-        Me.translate.Text = "Translate"
-        Me.translate.UseVisualStyleBackColor = True
-        '
-        'Touchup
-        '
-        Me.Touchup.Location = New System.Drawing.Point(504, 24)
-        Me.Touchup.Name = "Touchup"
-        Me.Touchup.Size = New System.Drawing.Size(182, 55)
-        Me.Touchup.TabIndex = 2
-        Me.Touchup.Text = "Touchup"
-        Me.Touchup.UseVisualStyleBackColor = True
-        '
-        'ComboBox1
-        '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(12, 51)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(280, 28)
-        Me.ComboBox1.TabIndex = 4
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 28)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(168, 20)
-        Me.Label1.TabIndex = 5
-        Me.Label1.Text = "Algorithm to Translate:"
-        '
-        'Translator
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1556, 1718)
-        Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.ComboBox1)
-        Me.Controls.Add(Me.Touchup)
-        Me.Controls.Add(Me.translate)
-        Me.Controls.Add(Me.WebView)
-        Me.MaximizeBox = False
-        Me.MinimizeBox = False
-        Me.Name = "Translator"
-        Me.Text = "Translate OpenCVB Algorithms using CodeConvert.AI"
-        Me.ResumeLayout(False)
-        Me.PerformLayout()
+        components = New ComponentModel.Container()
+        translate = New Button()
+        CopyResultsBack = New Button()
+        Algorithms = New ComboBox()
+        Label1 = New Label()
+        WebView = New Microsoft.Web.WebView2.WinForms.WebView2()
+        Timer1 = New Timer(components)
+        Timer2 = New Timer(components)
+        Timer3 = New Timer(components)
+        rtb = New RichTextBox()
+        SortAlgorithms = New ComboBox()
+        CType(WebView, ComponentModel.ISupportInitialize).BeginInit()
+        SuspendLayout()
+        ' 
+        ' translate
+        ' 
+        translate.Location = New Point(351, 30)
+        translate.Margin = New Padding(3, 4, 3, 4)
+        translate.Name = "translate"
+        translate.Size = New Size(202, 69)
+        translate.TabIndex = 1
+        translate.Text = "Translate"
+        translate.UseVisualStyleBackColor = True
+        ' 
+        ' CopyResultsBack
+        ' 
+        CopyResultsBack.Location = New Point(560, 30)
+        CopyResultsBack.Margin = New Padding(3, 4, 3, 4)
+        CopyResultsBack.Name = "CopyResultsBack"
+        CopyResultsBack.Size = New Size(202, 69)
+        CopyResultsBack.TabIndex = 2
+        CopyResultsBack.Text = "Touchup"
+        CopyResultsBack.UseVisualStyleBackColor = True
+        ' 
+        ' Algorithms
+        ' 
+        Algorithms.FormattingEnabled = True
+        Algorithms.Location = New Point(13, 64)
+        Algorithms.Margin = New Padding(3, 4, 3, 4)
+        Algorithms.Name = "Algorithms"
+        Algorithms.Size = New Size(311, 33)
+        Algorithms.TabIndex = 4
+        ' 
+        ' Label1
+        ' 
+        Label1.AutoSize = True
+        Label1.Location = New Point(13, 35)
+        Label1.Name = "Label1"
+        Label1.Size = New Size(191, 25)
+        Label1.TabIndex = 5
+        Label1.Text = "Algorithm to Translate:"
+        ' 
+        ' WebView
+        ' 
+        WebView.AllowExternalDrop = True
+        WebView.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        WebView.CreationProperties = Nothing
+        WebView.DefaultBackgroundColor = Color.White
+        WebView.Location = New Point(12, 124)
+        WebView.Name = "WebView"
+        WebView.Size = New Size(1705, 2012)
+        WebView.TabIndex = 6
+        WebView.ZoomFactor = 1R
+        ' 
+        ' Timer1
+        ' 
+        ' 
+        ' Timer2
+        ' 
+        ' 
+        ' Timer3
+        ' 
+        ' 
+        ' rtb
+        ' 
+        rtb.Location = New Point(1265, 24)
+        rtb.Name = "rtb"
+        rtb.Size = New Size(129, 54)
+        rtb.TabIndex = 7
+        rtb.Text = ""
+        ' 
+        ' SortAlgorithms
+        ' 
+        SortAlgorithms.FormattingEnabled = True
+        SortAlgorithms.Location = New Point(1414, 45)
+        SortAlgorithms.Name = "SortAlgorithms"
+        SortAlgorithms.Size = New Size(294, 33)
+        SortAlgorithms.Sorted = True
+        SortAlgorithms.TabIndex = 8
+        SortAlgorithms.Visible = False
+        ' 
+        ' Translator
+        ' 
+        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleMode = AutoScaleMode.Font
+        ClientSize = New Size(1729, 2148)
+        Controls.Add(SortAlgorithms)
+        Controls.Add(rtb)
+        Controls.Add(WebView)
+        Controls.Add(Label1)
+        Controls.Add(Algorithms)
+        Controls.Add(CopyResultsBack)
+        Controls.Add(translate)
+        Margin = New Padding(3, 4, 3, 4)
+        MaximizeBox = False
+        MinimizeBox = False
+        Name = "Translator"
+        Text = "Translate OpenCVB Algorithms using CodeConvert.AI"
+        CType(WebView, ComponentModel.ISupportInitialize).EndInit()
+        ResumeLayout(False)
+        PerformLayout()
 
     End Sub
-
-    Friend WithEvents WebView As WebBrowser
     Friend WithEvents translate As Button
-    Friend WithEvents Touchup As Button
-    Friend WithEvents ComboBox1 As ComboBox
+    Friend WithEvents CopyResultsBack As Button
+    Friend WithEvents Algorithms As ComboBox
     Friend WithEvents Label1 As Label
+    Friend WithEvents WebView As Microsoft.Web.WebView2.WinForms.WebView2
+    Friend WithEvents Timer1 As Timer
+    Friend WithEvents Timer2 As Timer
+    Friend WithEvents Timer3 As Timer
+    Friend WithEvents rtb As RichTextBox
+    Friend WithEvents SortAlgorithms As ComboBox
 End Class

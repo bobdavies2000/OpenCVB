@@ -1017,337 +1017,6 @@ Public Class Main_UI
         algorithmTaskHandle.Start(parms)
         Console.WriteLine("Start Algorithm completed.")
     End Sub
-    Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
-        If parms.algName = "" Then Exit Sub
-        algorithmQueueCount += 1
-        ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
-        SyncLock algorithmThreadLock
-            algorithmQueueCount -= 1
-            AlgorithmTestAllCount += 1
-            drawRect = New cv.Rect
-            Dim task = New VBtask(parms)
-            textDesc = task.desc
-            intermediateReview = ""
-
-            If ComplexityTimer.Enabled = False Then
-                Console.WriteLine(CStr(Now))
-                Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + vbCrLf + vbTab +
-                                  CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
-                Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
-                                  parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
-
-                Console.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
-                                  CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
-                                  CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
-            End If
-            ' Adjust drawrect for the ratio of the actual size and WorkingRes.
-            If task.drawRect <> New cv.Rect Then
-                ' relative size of algorithm size image to displayed image
-                Dim ratio = camPic(0).Width / task.WorkingRes.Width
-                drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
-                                       task.drawRect.Width * ratio, task.drawRect.Height * ratio)
-            End If
-
-            Dim saveWorkingRes = settings.WorkingRes
-            task.labels = {"", "", "", ""}
-            mousePoint = New cv.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2) ' mouse click point default = center of the image
-
-            Dim saveDrawRect As cv.Rect
-            While 1
-                Dim waitTime = Now
-                ' relative size of displayed image and algorithm size image.
-                While 1
-                    ' camera has exited or resolution is changed.
-                    If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or
-                    saveWorkingRes <> settings.WorkingRes Then Exit While
-                    If saveAlgorithmName <> task.algName Then Exit While
-                    ' switching camera resolution means stopping the current algorithm
-                    If saveWorkingRes <> settings.WorkingRes Then Exit While
-
-                    If pauseAlgorithmThread Then
-                        task.paused = True
-                        Exit While ' this is useful because the pixelviewer can be used if paused.
-                    Else
-                        task.paused = False
-                    End If
-
-                    If newCameraImages Then
-                        Dim copyTime = Now
-
-                        task.color = mbuf(mbIndex).color
-                        task.leftView = mbuf(mbIndex).leftView
-                        task.rightView = mbuf(mbIndex).rightView
-                        task.pointCloud = mbuf(mbIndex).pointCloud
-
-                        If frameCount < 10 Then
-                            Dim sizeRatio = settings.captureRes.Width / saveWorkingRes.Width
-                            task.calibData.ppx = task.WorkingRes.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
-                            task.calibData.ppy = task.WorkingRes.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
-                            task.calibData.fx = camera.cameraInfo.fx
-                            task.calibData.fy = camera.cameraInfo.fy
-                            task.calibData.v_fov = camera.cameraInfo.v_fov
-                            task.calibData.h_fov = camera.cameraInfo.h_fov
-                            task.calibData.d_fov = camera.cameraInfo.d_fov
-                        End If
-                        SyncLock cameraLock
-                            task.mbuf(mbIndex) = mbuf(mbIndex)
-                            task.mbIndex = mbIndex
-                            mbIndex += 1
-                            If mbIndex >= mbuf.Count Then mbIndex = 0
-
-                            task.transformationMatrix = camera.transformationMatrix
-                            task.IMU_TimeStamp = camera.IMU_TimeStamp
-                            task.IMU_Acceleration = camera.IMU_Acceleration
-                            task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                            task.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                            task.IMU_FrameTime = camera.IMU_FrameTime
-                            task.CPU_TimeStamp = camera.CPU_TimeStamp
-                            task.CPU_FrameTime = camera.CPU_FrameTime
-                        End SyncLock
-
-                        task.activateTaskRequest = activateTaskRequest
-                        activateTaskRequest = False
-
-                        Dim endCopyTime = Now
-                        Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
-                        Dim spanCopy = New TimeSpan(elapsedCopyTicks)
-                        task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
-
-                        If intermediateReview = task.algName Then
-                            task.intermediateName = ""
-                            intermediateReview = ""
-                        End If
-                        If intermediateReview <> "" Then task.intermediateName = intermediateReview
-
-                        newCameraImages = False
-
-                        task.pixelViewerOn = If(testAllRunning, False, settings.PixelViewerButton)
-
-                        If GrabRectangleData Then
-                            GrabRectangleData = False
-                            ' relative size of algorithm size image to displayed image
-                            Dim ratio = task.WorkingRes.Width / camPic(0).Width
-                            Dim tmpDrawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                            task.drawRect = New cv.Rect
-                            If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
-                                If saveDrawRect <> tmpDrawRect Then
-                                    task.optionsChanged = True
-                                    saveDrawRect = tmpDrawRect
-                                End If
-                                task.drawRect = tmpDrawRect
-                            End If
-                            BothFirstAndLastReady = False
-                        End If
-
-                        textAdvice = task.advice
-
-                        If task.pointCloud.Width = 0 Then Continue While Else Exit While
-                    End If
-                End While
-
-                ' camera has exited or resolution is changed.
-                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or
-                saveAlgorithmName <> task.algName Then
-                    Exit While
-                End If
-
-                If activeMouseDown = False Then
-                    SyncLock mouseLock
-                        If mousePoint.X < 0 Then mousePoint.X = 0
-                        If mousePoint.Y < 0 Then mousePoint.Y = 0
-                        If mousePoint.X >= task.WorkingRes.Width Then mousePoint.X = task.WorkingRes.Width - 1
-                        If mousePoint.Y >= task.WorkingRes.Height Then mousePoint.Y = task.WorkingRes.Height - 1
-
-                        task.mouseMovePoint = mousePoint
-                        If task.mouseMovePoint = New cv.Point(0, 0) Then
-                            task.mouseMovePoint = New cv.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2)
-                        End If
-                        task.mousePicTag = mousePicTag
-                        If mouseClickFlag Then
-                            task.mouseClickFlag = mouseClickFlag
-                            task.ClickPoint = mousePoint
-                            ClickPoint = task.ClickPoint
-                            mouseClickFlag = False
-                        End If
-                    End SyncLock
-                End If
-
-                Dim endWaitTime = Now
-                Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
-                Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
-                Dim updatedDrawRect = task.drawRect
-                If parms.algName.EndsWith("_CS") Then
-                    Static findCSharp = New CS_Classes.CSAlgorithmList()
-                    If task.csAlgorithmObject Is Nothing Then
-                        task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)
-                        task.desc = task.csAlgorithmObject.desc
-                    End If
-                End If
-
-                task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
-                textDesc = task.desc
-                picLabels = task.labels
-
-                Dim returnTime = Now
-
-                ' in case the algorithm has changed the mouse location...
-                If task.mouseMovePointUpdated Then mousePoint = task.mouseMovePoint
-                If updatedDrawRect <> task.drawRect Then
-                    drawRect = task.drawRect
-                    ' relative size of algorithm size image to displayed image
-                    Dim ratio = camPic(0).Width / task.WorkingRes.Width
-                    drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                End If
-                If task.drawRectClear Then
-                    drawRect = New cv.Rect
-                    task.drawRect = drawRect
-                    task.drawRectClear = False
-                End If
-
-                pixelViewerRect = task.pixelViewerRect
-                pixelViewTag = task.pixelViewTag
-
-                task.fpsRate = If(fpsAlgorithm = 0, 1, fpsAlgorithm)
-
-                picLabels = task.labels
-
-                If task.paused = False Then
-                    SyncLock trueData
-                        If task.trueData.Count Then
-                            trueData = New List(Of VB_Classes.trueText)(task.trueData)
-                        Else
-                            trueData = New List(Of VB_Classes.trueText)
-                        End If
-                        task.trueData.Clear()
-                    End SyncLock
-                End If
-
-                If task.algName.StartsWith("Options_") Then
-                    task.labels(2) = "Options algorithms have no output"
-                    Continue While
-                End If
-                If task.dst0 IsNot Nothing Then
-                    SyncLock cameraLock
-                        dst(0) = task.dst0.Clone
-                        dst(1) = task.dst1.Clone
-                        dst(2) = task.dst2.Clone
-                        dst(3) = task.dst3.Clone
-                    End SyncLock
-                    algorithmRefresh = True
-                End If
-
-                If frameCount Mod task.fpsRate = 0 Then
-                    SyncLock callTraceLock
-                        callTrace = New List(Of String)(task.callTraceMain)
-                        algorithm_ms = New List(Of Single)(task.algorithm_msMain)
-                        algorithmNames = New List(Of String)(task.algorithmNamesMain)
-                    End SyncLock
-                End If
-
-                Dim elapsedTicks = Now.Ticks - returnTime.Ticks
-                Dim span = New TimeSpan(elapsedTicks)
-                task.returnCopyTime = span.Ticks / TimeSpan.TicksPerMillisecond
-
-                task.mouseClickFlag = False
-                frameCount = task.frameCount
-                ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
-                ' Each image will represent the one just finished by the algorithm.
-                If task.debugSyncUI Then Thread.Sleep(100)
-            End While
-
-            Console.WriteLine(parms.algName + " ending.  Thread closing...")
-            task.frameCount = -1
-            Application.DoEvents()
-            task.Dispose()
-        End SyncLock
-
-        frameCount = 0
-    End Sub
-    Private Sub startCamera()
-        paintNewImages = False
-        newCameraImages = False
-        If cameraTaskHandle Is Nothing Then
-            cameraTaskHandle = New Thread(AddressOf CameraTask)
-            cameraTaskHandle.Name = "Camera Task"
-            cameraTaskHandle.Start()
-        End If
-    End Sub
-    Private Function getCamera() As Object
-        Select Case settings.cameraIndex
-            Case 0
-                Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case 1
-                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
-            Case 2
-                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
-            Case 3
-                Return Nothing ' special handling required.  See CameraTask...
-            Case 4
-                Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case 5
-                Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case 6
-                Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
-        End Select
-        Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
-    End Function
-    Private Sub CameraTask()
-        restartCameraRequest = True
-        Static saveWorkingRes As cv.Size
-        For i = 0 To mbuf.Count - 1
-            mbuf(i).color = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
-            mbuf(i).leftView = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
-            mbuf(i).rightView = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
-            mbuf(i).pointCloud = New cv.Mat(settings.WorkingRes, cv.MatType.CV_32FC3)
-        Next
-
-        While 1
-            If restartCameraRequest Or settings.WorkingRes <> saveWorkingRes Then
-                saveWorkingRes = settings.WorkingRes
-                If settings.cameraIndex = 3 Then
-                    ' special handling for the Oak-D camera as it cannot be restarted.
-                    ' It is my problem but I don't see how to fix it.
-                    ' The Oak-D interface cannot run any resolution other than 1280x720 in OpenCVB.
-                    ' Changing the working res is not a problem so just leave it open.
-                    ' Oak-D camera cannot be restarted without restarting OpenCVB.
-                    ' Leave it alone once it is started...
-                    settings.captureRes = New cv.Size(1280, 720)
-                    If camera Is Nothing Then camera = New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
-                Else
-                    If camera IsNot Nothing Then camera.stopCamera()
-                    camera = getCamera()
-                    newCameraImages = False
-                End If
-            End If
-            If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
-            If restartCameraRequest = False Then camera.GetNextFrame(settings.WorkingRes)
-
-            ' The first few frames from the camera are junk.  Skip them.
-            SyncLock cameraLock
-                mbuf(mbIndex) = camera.mbuf(camera.mbIndex)
-                camera.mbindex += 1
-                If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
-
-                Try
-                    If camera.mbuf(mbIndex).color.width > 0 Then
-                        paintNewImages = True ' trigger the paint 
-                        newCameraImages = True
-                    End If
-                Catch ex As Exception
-                    Console.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
-                End Try
-            End SyncLock
-            If cameraTaskHandle Is Nothing Then
-                camera.stopCamera()
-                Exit Sub
-            End If
-
-            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-            totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
-            restartCameraRequest = False
-        End While
-    End Sub
     Private Sub setupTestAll()
         testAllResolutionCount = 0
         testAllStartingRes = -1
@@ -1690,8 +1359,364 @@ Public Class Main_UI
                "is not computationally intensive but is built on many almost trivial" + vbCrLf +
                "algorithms working together." + vbCrLf)
     End Sub
-
     Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
         Me.Close()
+    End Sub
+    Private Sub ComplexityButton_Click(sender As Object, e As EventArgs) Handles ComplexityButton.Click
+        If ComplexityTimer.Enabled = False Then
+            Dim ret = MsgBox("Do you want to test the complexity of the current algorithm?" + vbCrLf +
+                             "Algorithm will run at all available resolutions until you stop it.", MsgBoxStyle.OkCancel,
+                         "Test algorithm at all resolutions.")
+            If ret = MsgBoxResult.Ok Then
+                complexityResults.Clear()
+                ComplexityTimer.Interval = 30000
+                complexityStartTime = Now
+                ComplexityTimer.Enabled = True
+                settings.WorkingResIndex = Main_UI.settings.resolutionsSupported.Count - 1 ' start smallest resolution
+                ComplexityButton.Image = stopTest
+                ComplexityTimer_Tick(sender, e)
+            End If
+        Else
+            Dim sw = New StreamWriter(HomeDir.FullName + "Complexity/" + saveAlgorithmName + ".txt")
+            For Each line In complexityResults
+                sw.WriteLine(line)
+            Next
+            sw.Close()
+
+            ComplexityButton.Image = complexityTest
+            ComplexityTimer.Enabled = False
+            complexityResults.Clear()
+        End If
+    End Sub
+    Private Sub startCamera()
+        paintNewImages = False
+        newCameraImages = False
+        If cameraTaskHandle Is Nothing Then
+            cameraTaskHandle = New Thread(AddressOf CameraTask)
+            cameraTaskHandle.Name = "Camera Task"
+            cameraTaskHandle.Start()
+        End If
+    End Sub
+    Private Function getCamera() As Object
+        Select Case settings.cameraIndex
+            Case 0
+                Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
+            Case 1
+                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
+            Case 2
+                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
+            Case 3
+                Return Nothing ' special handling required.  See CameraTask...
+            Case 4
+                Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+            Case 5
+                Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
+            Case 6
+                Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
+        End Select
+        Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
+    End Function
+    Private Sub CameraTask()
+        restartCameraRequest = True
+        Static saveWorkingRes As cv.Size
+        For i = 0 To mbuf.Count - 1
+            mbuf(i).color = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
+            mbuf(i).leftView = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
+            mbuf(i).rightView = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
+            mbuf(i).pointCloud = New cv.Mat(settings.WorkingRes, cv.MatType.CV_32FC3)
+        Next
+
+        While 1
+            If restartCameraRequest Or settings.WorkingRes <> saveWorkingRes Then
+                saveWorkingRes = settings.WorkingRes
+                If settings.cameraIndex = 3 Then
+                    ' special handling for the Oak-D camera as it cannot be restarted.
+                    ' It is my problem but I don't see how to fix it.
+                    ' The Oak-D interface cannot run any resolution other than 1280x720 in OpenCVB.
+                    ' Changing the working res is not a problem so just leave it open.
+                    ' Oak-D camera cannot be restarted without restarting OpenCVB.
+                    ' Leave it alone once it is started...
+                    settings.captureRes = New cv.Size(1280, 720)
+                    If camera Is Nothing Then camera = New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Else
+                    If camera IsNot Nothing Then camera.stopCamera()
+                    camera = getCamera()
+                    newCameraImages = False
+                End If
+            End If
+            If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
+            If restartCameraRequest = False Then camera.GetNextFrame(settings.WorkingRes)
+
+            ' The first few frames from the camera are junk.  Skip them.
+            SyncLock cameraLock
+                mbuf(mbIndex) = camera.mbuf(camera.mbIndex)
+                camera.mbindex += 1
+                If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
+
+                Try
+                    If camera.mbuf(mbIndex).color.width > 0 Then
+                        paintNewImages = True ' trigger the paint 
+                        newCameraImages = True
+                    End If
+                Catch ex As Exception
+                    Console.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
+                End Try
+            End SyncLock
+            If cameraTaskHandle Is Nothing Then
+                camera.stopCamera()
+                Exit Sub
+            End If
+
+            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+            totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
+            restartCameraRequest = False
+        End While
+    End Sub
+    Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
+        If parms.algName = "" Then Exit Sub
+        algorithmQueueCount += 1
+        ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
+        SyncLock algorithmThreadLock
+            algorithmQueueCount -= 1
+            AlgorithmTestAllCount += 1
+            drawRect = New cv.Rect
+            Dim task = New VBtask(parms)
+            textDesc = task.desc
+            intermediateReview = ""
+
+            If ComplexityTimer.Enabled = False Then
+                Console.WriteLine(CStr(Now))
+                Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + vbCrLf + vbTab +
+                                  CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
+                Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
+                                  parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
+
+                Console.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
+                                  CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
+                                  CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
+            End If
+            ' Adjust drawrect for the ratio of the actual size and WorkingRes.
+            If task.drawRect <> New cv.Rect Then
+                ' relative size of algorithm size image to displayed image
+                Dim ratio = camPic(0).Width / task.WorkingRes.Width
+                drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
+                                       task.drawRect.Width * ratio, task.drawRect.Height * ratio)
+            End If
+
+            Dim saveWorkingRes = settings.WorkingRes
+            task.labels = {"", "", "", ""}
+            mousePoint = New cv.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2) ' mouse click point default = center of the image
+
+            Dim saveDrawRect As cv.Rect
+            While 1
+                Dim waitTime = Now
+                ' relative size of displayed image and algorithm size image.
+                While 1
+                    ' camera has exited or resolution is changed.
+                    If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or
+                    saveWorkingRes <> settings.WorkingRes Then Exit While
+                    If saveAlgorithmName <> task.algName Then Exit While
+                    ' switching camera resolution means stopping the current algorithm
+                    If saveWorkingRes <> settings.WorkingRes Then Exit While
+
+                    If pauseAlgorithmThread Then
+                        task.paused = True
+                        Exit While ' this is useful because the pixelviewer can be used if paused.
+                    Else
+                        task.paused = False
+                    End If
+
+                    If newCameraImages Then
+                        Dim copyTime = Now
+
+                        task.color = mbuf(mbIndex).color
+                        task.leftView = mbuf(mbIndex).leftView
+                        task.rightView = mbuf(mbIndex).rightView
+                        task.pointCloud = mbuf(mbIndex).pointCloud
+
+                        If frameCount < 10 Then
+                            Dim sizeRatio = settings.captureRes.Width / saveWorkingRes.Width
+                            task.calibData.ppx = task.WorkingRes.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
+                            task.calibData.ppy = task.WorkingRes.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
+                            task.calibData.fx = camera.cameraInfo.fx
+                            task.calibData.fy = camera.cameraInfo.fy
+                            task.calibData.v_fov = camera.cameraInfo.v_fov
+                            task.calibData.h_fov = camera.cameraInfo.h_fov
+                            task.calibData.d_fov = camera.cameraInfo.d_fov
+                        End If
+                        SyncLock cameraLock
+                            task.mbuf(mbIndex) = mbuf(mbIndex)
+                            task.mbIndex = mbIndex
+                            mbIndex += 1
+                            If mbIndex >= mbuf.Count Then mbIndex = 0
+
+                            task.transformationMatrix = camera.transformationMatrix
+                            task.IMU_TimeStamp = camera.IMU_TimeStamp
+                            task.IMU_Acceleration = camera.IMU_Acceleration
+                            task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                            task.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                            task.IMU_FrameTime = camera.IMU_FrameTime
+                            task.CPU_TimeStamp = camera.CPU_TimeStamp
+                            task.CPU_FrameTime = camera.CPU_FrameTime
+                        End SyncLock
+
+                        task.activateTaskRequest = activateTaskRequest
+                        activateTaskRequest = False
+
+                        Dim endCopyTime = Now
+                        Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
+                        Dim spanCopy = New TimeSpan(elapsedCopyTicks)
+                        task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+
+                        If intermediateReview = task.algName Then
+                            task.intermediateName = ""
+                            intermediateReview = ""
+                        End If
+                        If intermediateReview <> "" Then task.intermediateName = intermediateReview
+
+                        newCameraImages = False
+
+                        task.pixelViewerOn = If(testAllRunning, False, settings.PixelViewerButton)
+
+                        If GrabRectangleData Then
+                            GrabRectangleData = False
+                            ' relative size of algorithm size image to displayed image
+                            Dim ratio = task.WorkingRes.Width / camPic(0).Width
+                            Dim tmpDrawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                            task.drawRect = New cv.Rect
+                            If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
+                                If saveDrawRect <> tmpDrawRect Then
+                                    task.optionsChanged = True
+                                    saveDrawRect = tmpDrawRect
+                                End If
+                                task.drawRect = tmpDrawRect
+                            End If
+                            BothFirstAndLastReady = False
+                        End If
+
+                        textAdvice = task.advice
+
+                        If task.pointCloud.Width = 0 Then Continue While Else Exit While
+                    End If
+                End While
+
+                ' camera has exited or resolution is changed.
+                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or
+                saveAlgorithmName <> task.algName Then
+                    Exit While
+                End If
+
+                If activeMouseDown = False Then
+                    SyncLock mouseLock
+                        If mousePoint.X < 0 Then mousePoint.X = 0
+                        If mousePoint.Y < 0 Then mousePoint.Y = 0
+                        If mousePoint.X >= task.WorkingRes.Width Then mousePoint.X = task.WorkingRes.Width - 1
+                        If mousePoint.Y >= task.WorkingRes.Height Then mousePoint.Y = task.WorkingRes.Height - 1
+
+                        task.mouseMovePoint = mousePoint
+                        If task.mouseMovePoint = New cv.Point(0, 0) Then
+                            task.mouseMovePoint = New cv.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2)
+                        End If
+                        task.mousePicTag = mousePicTag
+                        If mouseClickFlag Then
+                            task.mouseClickFlag = mouseClickFlag
+                            task.ClickPoint = mousePoint
+                            ClickPoint = task.ClickPoint
+                            mouseClickFlag = False
+                        End If
+                    End SyncLock
+                End If
+
+                Dim endWaitTime = Now
+                Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
+                Dim spanWait = New TimeSpan(elapsedWaitTicks)
+                task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
+                Dim updatedDrawRect = task.drawRect
+                If parms.algName.EndsWith("_CS") Then
+                    Static findCSharp = New CS_Classes.CSAlgorithmList()
+                    If task.csAlgorithmObject Is Nothing Then
+                        task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)
+                        task.desc = task.csAlgorithmObject.desc
+                    End If
+                End If
+
+                task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
+                textDesc = task.desc
+                picLabels = task.labels
+
+                Dim returnTime = Now
+
+                ' in case the algorithm has changed the mouse location...
+                If task.mouseMovePointUpdated Then mousePoint = task.mouseMovePoint
+                If updatedDrawRect <> task.drawRect Then
+                    drawRect = task.drawRect
+                    ' relative size of algorithm size image to displayed image
+                    Dim ratio = camPic(0).Width / task.WorkingRes.Width
+                    drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                End If
+                If task.drawRectClear Then
+                    drawRect = New cv.Rect
+                    task.drawRect = drawRect
+                    task.drawRectClear = False
+                End If
+
+                pixelViewerRect = task.pixelViewerRect
+                pixelViewTag = task.pixelViewTag
+
+                task.fpsRate = If(fpsAlgorithm = 0, 1, fpsAlgorithm)
+
+                picLabels = task.labels
+
+                If task.paused = False Then
+                    SyncLock trueData
+                        If task.trueData.Count Then
+                            trueData = New List(Of VB_Classes.trueText)(task.trueData)
+                        Else
+                            trueData = New List(Of VB_Classes.trueText)
+                        End If
+                        task.trueData.Clear()
+                    End SyncLock
+                End If
+
+                If task.algName.StartsWith("Options_") Then
+                    task.labels(2) = "Options algorithms have no output"
+                    Continue While
+                End If
+                If task.dst0 IsNot Nothing Then
+                    SyncLock cameraLock
+                        dst(0) = task.dst0.Clone
+                        dst(1) = task.dst1.Clone
+                        dst(2) = task.dst2.Clone
+                        dst(3) = task.dst3.Clone
+                    End SyncLock
+                    algorithmRefresh = True
+                End If
+
+                If frameCount Mod task.fpsRate = 0 Then
+                    SyncLock callTraceLock
+                        callTrace = New List(Of String)(task.callTraceMain)
+                        algorithm_ms = New List(Of Single)(task.algorithm_msMain)
+                        algorithmNames = New List(Of String)(task.algorithmNamesMain)
+                    End SyncLock
+                End If
+
+                Dim elapsedTicks = Now.Ticks - returnTime.Ticks
+                Dim span = New TimeSpan(elapsedTicks)
+                task.returnCopyTime = span.Ticks / TimeSpan.TicksPerMillisecond
+
+                task.mouseClickFlag = False
+                frameCount = task.frameCount
+                ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
+                ' Each image will represent the one just finished by the algorithm.
+                If task.debugSyncUI Then Thread.Sleep(100)
+            End While
+
+            Console.WriteLine(parms.algName + " ending.  Thread closing...")
+            task.frameCount = -1
+            Application.DoEvents()
+            task.Dispose()
+        End SyncLock
+
+        frameCount = 0
     End Sub
 End Class

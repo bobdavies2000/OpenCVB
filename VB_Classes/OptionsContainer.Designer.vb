@@ -35,7 +35,8 @@ Partial Class OptionsContainer
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1161, 25)
+        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1742, 38)
         Me.ToolStrip1.TabIndex = 1
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -45,7 +46,7 @@ Partial Class OptionsContainer
         Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
         Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(97, 22)
+        Me.ToolStripButton1.Size = New System.Drawing.Size(147, 33)
         Me.ToolStripButton1.Text = "Reorder Options"
         '
         'ToolStripButton2
@@ -54,17 +55,16 @@ Partial Class OptionsContainer
         Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
         Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(57, 22)
+        Me.ToolStripButton2.Size = New System.Drawing.Size(85, 33)
         Me.ToolStripButton2.Text = "Show All"
         '
         'OptionsContainer
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1161, 562)
+        Me.ClientSize = New System.Drawing.Size(1742, 865)
         Me.Controls.Add(Me.ToolStrip1)
         Me.IsMdiContainer = True
-        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "OptionsContainer"
         Me.Text = "OpenCVB Algorithm Options"
         Me.ToolStrip1.ResumeLayout(False)

@@ -58,8 +58,6 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Main", "OpenCVB_UI\Main.vbp
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "GifBuilder", "GifBuilder\GifBuilder.vbproj", "{72139D66-982F-473B-BBD9-3182D1B5240F}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "OpenCVB", "OpenCVB\OpenCVB.vbproj", "{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -344,22 +342,6 @@ Global
 		{72139D66-982F-473B-BBD9-3182D1B5240F}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
 		{72139D66-982F-473B-BBD9-3182D1B5240F}.RelWithDebInfo|x64.ActiveCfg = Release|x64
 		{72139D66-982F-473B-BBD9-3182D1B5240F}.RelWithDebInfo|x64.Build.0 = Release|x64
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.Debug|x64.ActiveCfg = Debug|x64
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.Debug|x64.Build.0 = Debug|x64
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.MinSizeRel|x64.ActiveCfg = Debug|x64
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.MinSizeRel|x64.Build.0 = Debug|x64
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.Release|x64.ActiveCfg = Release|x64
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.Release|x64.Build.0 = Release|x64
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.RelWithDebInfo|x64.ActiveCfg = Release|x64
-		{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}.RelWithDebInfo|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
