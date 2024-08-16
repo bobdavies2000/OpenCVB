@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Controls
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Runtime
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
