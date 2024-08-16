@@ -612,9 +612,6 @@ Public Class OpenCVB
                 If proc(i).HasExited = False Then proc(i).Kill()
             End If
         Next
-        'For Each procStr In procList.Keys
-        '    Console.WriteLine(procStr)
-        'Next
         Return foundCamera
     End Function
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing

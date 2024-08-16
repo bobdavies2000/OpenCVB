@@ -22,53 +22,55 @@ Partial Class TreeviewForm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
-        Me.TreeView1 = New System.Windows.Forms.TreeView()
-        Me.TreeViewTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.PercentTime = New System.Windows.Forms.TextBox()
-        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
-        Me.SuspendLayout()
-        '
-        'TreeView1
-        '
-        Me.TreeView1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TreeView1.Location = New System.Drawing.Point(0, 0)
-        Me.TreeView1.Name = "TreeView1"
-        Me.TreeView1.Size = New System.Drawing.Size(886, 194)
-        Me.TreeView1.TabIndex = 0
-        '
-        'TreeViewTimer
-        '
-        Me.TreeViewTimer.Enabled = True
-        '
-        'PercentTime
-        '
-        Me.PercentTime.Location = New System.Drawing.Point(514, 12)
-        Me.PercentTime.Multiline = True
-        Me.PercentTime.Name = "PercentTime"
-        Me.PercentTime.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.PercentTime.Size = New System.Drawing.Size(372, 67)
-        Me.PercentTime.TabIndex = 3
-        '
-        'Timer1
-        '
-        Me.Timer1.Enabled = True
-        Me.Timer1.Interval = 1000
-        '
-        'TreeviewForm
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(886, 194)
-        Me.Controls.Add(Me.PercentTime)
-        Me.Controls.Add(Me.TreeView1)
-        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.Name = "TreeviewForm"
-        Me.ShowInTaskbar = False
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Click any entry in the tree to view intermediate results."
-        Me.ResumeLayout(False)
-        Me.PerformLayout()
+        components = New ComponentModel.Container()
+        TreeView1 = New TreeView()
+        TreeViewTimer = New Timer(components)
+        PercentTime = New TextBox()
+        Timer1 = New Timer(components)
+        SuspendLayout()
+        ' 
+        ' TreeView1
+        ' 
+        TreeView1.Dock = DockStyle.Fill
+        TreeView1.Location = New Point(0, 0)
+        TreeView1.Margin = New Padding(3, 4, 3, 4)
+        TreeView1.Name = "TreeView1"
+        TreeView1.Size = New Size(820, 242)
+        TreeView1.TabIndex = 0
+        ' 
+        ' TreeViewTimer
+        ' 
+        TreeViewTimer.Enabled = True
+        ' 
+        ' PercentTime
+        ' 
+        PercentTime.Location = New Point(406, 13)
+        PercentTime.Margin = New Padding(3, 4, 3, 4)
+        PercentTime.Multiline = True
+        PercentTime.Name = "PercentTime"
+        PercentTime.ScrollBars = ScrollBars.Vertical
+        PercentTime.Size = New Size(413, 83)
+        PercentTime.TabIndex = 3
+        ' 
+        ' Timer1
+        ' 
+        Timer1.Enabled = True
+        Timer1.Interval = 1000
+        ' 
+        ' TreeviewForm
+        ' 
+        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleMode = AutoScaleMode.Font
+        ClientSize = New Size(820, 242)
+        Controls.Add(PercentTime)
+        Controls.Add(TreeView1)
+        Margin = New Padding(4, 6, 4, 6)
+        Name = "TreeviewForm"
+        ShowInTaskbar = False
+        StartPosition = FormStartPosition.CenterParent
+        Text = "Click any entry in the tree to view intermediate results."
+        ResumeLayout(False)
+        PerformLayout()
 
     End Sub
     Friend WithEvents TreeView1 As TreeView

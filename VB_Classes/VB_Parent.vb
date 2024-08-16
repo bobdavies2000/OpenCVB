@@ -651,14 +651,17 @@ Public Class VB_Parent : Implements IDisposable
         algorithmStack.Push(index)
     End Sub
     Public Sub measureEndRun(name As String)
-        If task.recordTimings = False Then Exit Sub
-        Dim nextTime = Now
-        Dim index = algorithmStack.Peek
-        Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
-        Dim span = New TimeSpan(elapsedTicks)
-        algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-        algorithmStack.Pop()
-        algorithmTimes(algorithmStack.Peek) = nextTime
+        Try
+            If task.recordTimings = False Then Exit Sub
+            Dim nextTime = Now
+            Dim index = algorithmStack.Peek
+            Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
+            Dim span = New TimeSpan(elapsedTicks)
+            algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+            algorithmStack.Pop()
+            algorithmTimes(algorithmStack.Peek) = nextTime
+        Catch ex As Exception
+        End Try
     End Sub
     Public Sub Run(src As cv.Mat)
         If task.testAllRunning = False Then measureStartRun(traceName)

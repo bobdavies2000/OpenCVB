@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class Main
+Partial Class Main_UI
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -23,10 +23,10 @@ Partial Class Main
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main_UI))
         ToolStrip1 = New ToolStrip()
-        ToolStripButton1 = New ToolStripButton()
-        ToolStripButton2 = New ToolStripButton()
+        BackButton = New ToolStripButton()
+        ForwardButton = New ToolStripButton()
         PausePlayButton = New ToolStripButton()
         OptionsButton = New ToolStripButton()
         TestAllButton = New ToolStripButton()
@@ -49,6 +49,7 @@ Partial Class Main
         ExitToolStripMenuItem = New ToolStripMenuItem()
         AboutToolStripMenuItem = New ToolStripMenuItem()
         RefreshTimer = New Timer(components)
+        ToolTip1 = New ToolTip(components)
         ToolStrip1.SuspendLayout()
         MenuStrip1.SuspendLayout()
         SuspendLayout()
@@ -56,30 +57,30 @@ Partial Class Main
         ' ToolStrip1
         ' 
         ToolStrip1.ImageScalingSize = New Size(24, 24)
-        ToolStrip1.Items.AddRange(New ToolStripItem() {ToolStripButton1, ToolStripButton2, PausePlayButton, OptionsButton, TestAllButton, TreeButton, PixelViewerButton, BluePlusButton, ComplexityButton, TranslateButton, Advice, RecentList, AvailableAlgorithms, GroupName})
+        ToolStrip1.Items.AddRange(New ToolStripItem() {BackButton, ForwardButton, PausePlayButton, OptionsButton, TestAllButton, TreeButton, PixelViewerButton, BluePlusButton, ComplexityButton, TranslateButton, Advice, RecentList, AvailableAlgorithms, GroupName})
         ToolStrip1.Location = New Point(0, 33)
         ToolStrip1.Name = "ToolStrip1"
         ToolStrip1.Size = New Size(1556, 34)
         ToolStrip1.TabIndex = 0
         ToolStrip1.Text = "ToolStrip1"
         ' 
-        ' ToolStripButton1
+        ' BackButton
         ' 
-        ToolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), Image)
-        ToolStripButton1.ImageTransparentColor = Color.Magenta
-        ToolStripButton1.Name = "ToolStripButton1"
-        ToolStripButton1.Size = New Size(34, 29)
-        ToolStripButton1.Text = "ToolStripButton1"
+        BackButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+        BackButton.Image = CType(resources.GetObject("BackButton.Image"), Image)
+        BackButton.ImageTransparentColor = Color.Magenta
+        BackButton.Name = "BackButton"
+        BackButton.Size = New Size(34, 29)
+        BackButton.Text = "Back to Previous Algorithm"
         ' 
-        ' ToolStripButton2
+        ' ForwardButton
         ' 
-        ToolStripButton2.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), Image)
-        ToolStripButton2.ImageTransparentColor = Color.Magenta
-        ToolStripButton2.Name = "ToolStripButton2"
-        ToolStripButton2.Size = New Size(34, 29)
-        ToolStripButton2.Text = "ToolStripButton2"
+        ForwardButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+        ForwardButton.Image = CType(resources.GetObject("ForwardButton.Image"), Image)
+        ForwardButton.ImageTransparentColor = Color.Magenta
+        ForwardButton.Name = "ForwardButton"
+        ForwardButton.Size = New Size(34, 29)
+        ForwardButton.Text = "Forward to the next algorithm"
         ' 
         ' PausePlayButton
         ' 
@@ -115,7 +116,7 @@ Partial Class Main
         TreeButton.ImageTransparentColor = Color.Magenta
         TreeButton.Name = "TreeButton"
         TreeButton.Size = New Size(34, 29)
-        TreeButton.Text = "ToolStripButton6"
+        TreeButton.Text = "Treeview to see performance and explore algorithm stack"
         ' 
         ' PixelViewerButton
         ' 
@@ -124,7 +125,7 @@ Partial Class Main
         PixelViewerButton.ImageTransparentColor = Color.Magenta
         PixelViewerButton.Name = "PixelViewerButton"
         PixelViewerButton.Size = New Size(34, 29)
-        PixelViewerButton.Text = "Display pixels under the cursor."
+        PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
         ' 
         ' BluePlusButton
         ' 
@@ -133,7 +134,7 @@ Partial Class Main
         BluePlusButton.ImageTransparentColor = Color.Magenta
         BluePlusButton.Name = "BluePlusButton"
         BluePlusButton.Size = New Size(34, 29)
-        BluePlusButton.Text = "ToolStripButton8"
+        BluePlusButton.Text = "Add new OpenGL, Python, C#, C++, or VB.Net algorithms"
         ' 
         ' ComplexityButton
         ' 
@@ -142,7 +143,7 @@ Partial Class Main
         ComplexityButton.ImageTransparentColor = Color.Magenta
         ComplexityButton.Name = "ComplexityButton"
         ComplexityButton.Size = New Size(34, 29)
-        ComplexityButton.Text = "ToolStripButton9"
+        ComplexityButton.Text = "Measure an algorithm's complexity"
         ' 
         ' TranslateButton
         ' 
@@ -160,7 +161,7 @@ Partial Class Main
         Advice.ImageTransparentColor = Color.Magenta
         Advice.Name = "Advice"
         Advice.Size = New Size(34, 29)
-        Advice.Text = "ToolStripButton11"
+        Advice.Text = "Show any advice on options for the current algorithm"
         ' 
         ' RecentList
         ' 
@@ -170,6 +171,7 @@ Partial Class Main
         RecentList.Name = "RecentList"
         RecentList.Size = New Size(82, 29)
         RecentList.Text = "Recent"
+        RecentList.ToolTipText = "The list of recently used algorithms"
         ' 
         ' AvailableAlgorithms
         ' 
@@ -186,6 +188,7 @@ Partial Class Main
         AlgorithmDesc.Location = New Point(1066, 37)
         AlgorithmDesc.Multiline = True
         AlgorithmDesc.Name = "AlgorithmDesc"
+        AlgorithmDesc.ScrollBars = ScrollBars.Vertical
         AlgorithmDesc.Size = New Size(158, 62)
         AlgorithmDesc.TabIndex = 2
         ' 
@@ -227,7 +230,7 @@ Partial Class Main
         ' ExitToolStripMenuItem
         ' 
         ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        ExitToolStripMenuItem.Size = New Size(141, 34)
+        ExitToolStripMenuItem.Size = New Size(270, 34)
         ExitToolStripMenuItem.Text = "E&xit"
         ' 
         ' AboutToolStripMenuItem
@@ -238,9 +241,10 @@ Partial Class Main
         ' 
         ' RefreshTimer
         ' 
+        RefreshTimer.Enabled = True
         RefreshTimer.Interval = 10
         ' 
-        ' OpenCVB_UI
+        ' Main_UI
         ' 
         AutoScaleDimensions = New SizeF(10.0F, 25.0F)
         AutoScaleMode = AutoScaleMode.Font
@@ -249,8 +253,9 @@ Partial Class Main
         Controls.Add(AlgorithmDesc)
         Controls.Add(ToolStrip1)
         Controls.Add(MenuStrip1)
+        KeyPreview = True
         MainMenuStrip = MenuStrip1
-        Name = "OpenCVB_UI"
+        Name = "Main_UI"
         Text = "OpenCVB Main Form"
         ToolStrip1.ResumeLayout(False)
         ToolStrip1.PerformLayout()
@@ -261,8 +266,8 @@ Partial Class Main
     End Sub
 
     Friend WithEvents ToolStrip1 As ToolStrip
-    Friend WithEvents ToolStripButton1 As ToolStripButton
-    Friend WithEvents ToolStripButton2 As ToolStripButton
+    Friend WithEvents BackButton As ToolStripButton
+    Friend WithEvents ForwardButton As ToolStripButton
     Friend WithEvents PausePlayButton As ToolStripButton
     Friend WithEvents OptionsButton As ToolStripButton
     Friend WithEvents TestAllButton As ToolStripButton
@@ -285,5 +290,6 @@ Partial Class Main
     Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RefreshTimer As Timer
     Friend WithEvents RecentList As ToolStripDropDownButton
+    Friend WithEvents ToolTip1 As ToolTip
 
 End Class

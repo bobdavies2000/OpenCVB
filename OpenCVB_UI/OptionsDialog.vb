@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsDialog
-    Public cameraRadioButton(Main.cameraNames.Count - 1) As RadioButton
+    Public cameraRadioButton(Main_UI.cameraNames.Count - 1) As RadioButton
     Public WorkingResRadio(resolutionList.Count - 1) As RadioButton
     Public cameraWorkingRes As cv.Size
     Public cameraDisplayRes As cv.Size
@@ -14,14 +14,14 @@ Public Class OptionsDialog
          "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
 
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
-        Main.settings.showConsoleLog = showConsoleLog.Checked
-        Main.settings.snap640 = Snap640.Checked
-        Main.settings.snap320 = Snap320.Checked
-        Main.settings.snapCustom = SnapCustom.Checked
+        Main_UI.settings.showConsoleLog = showConsoleLog.Checked
+        Main_UI.settings.snap640 = Snap640.Checked
+        Main_UI.settings.snap320 = Snap320.Checked
+        Main_UI.settings.snapCustom = SnapCustom.Checked
 
         For Each radio In Resolutions.Controls
             If radio.Checked Then
-                Main.settings.WorkingResIndex = radio.Tag
+                Main_UI.settings.WorkingResIndex = radio.Tag
                 Dim strRes = radio.text.split(" ")
                 Dim resText = strRes(0)
                 Dim strVals = resText.split("x")
@@ -30,47 +30,47 @@ Public Class OptionsDialog
             End If
         Next
 
-        Main.settings.WorkingRes = cameraWorkingRes
-        Main.settings.displayRes = cameraDisplayRes
+        Main_UI.settings.WorkingRes = cameraWorkingRes
+        Main_UI.settings.displayRes = cameraDisplayRes
 
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
     Public Sub defineCameraResolutions(index As Integer)
-        Select Case Main.cameraNames(index)
+        Select Case Main_UI.cameraNames(index)
             Case "Azure Kinect 4K"
-                Main.settings.resolutionsSupported = New List(Of Boolean)({True, True, True, True,
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True, True,
                                                         True, True, False, False, False, False, False, False})
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, True, True, True, False, False, False})
             Case "Intel(R) RealSense(TM) Depth Camera 455"
-                Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, True, True, True, False, False, False})
             Case "Oak-D camera"
-                Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, False, False, False, False, False, False})
             Case "StereoLabs ZED 2/2i"
-                Main.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
                                                         True, True, True, False, False, False, True, True, True})
             Case "MYNT-EYE-D1000"
-                Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, False, False, False, False, False, False})
             Case "Orbbec Gemini 335L"
-                Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, True, True, True, False, False, False})
         End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
-        Dim index = Main.cameraNames.IndexOf(sender.text)
+        Dim index = Main_UI.cameraNames.IndexOf(sender.text)
         If sender.checked = False Then Exit Sub
-        cameraName = Main.cameraNames(index)
+        cameraName = Main_UI.cameraNames(index)
         cameraIndex = index
 
         defineCameraResolutions(cameraIndex)
 
         For i = 0 To WorkingResRadio.Count - 1
-            WorkingResRadio(i).Enabled = Main.settings.resolutionsSupported(i)
+            WorkingResRadio(i).Enabled = Main_UI.settings.resolutionsSupported(i)
         Next
 
         If cameraName.StartsWith("Intel") Then
@@ -96,7 +96,7 @@ Public Class OptionsDialog
             radioButtonsPresent = True
             For i = 0 To cameraRadioButton.Count - 1
                 cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
-                                       .Enabled = Main.settings.cameraPresent(i), .Text = Main.cameraNames(i)}
+                                       .Enabled = Main_UI.settings.cameraPresent(i), .Text = Main_UI.cameraNames(i)}
                 CameraGroup.Controls.Add(cameraRadioButton(i))
                 AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             Next
@@ -104,20 +104,20 @@ Public Class OptionsDialog
             For i = 0 To WorkingResRadio.Count - 1
                 WorkingResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
                                      .AutoSize = True, .Visible = True}
-                WorkingResRadio(i).Enabled = Main.settings.resolutionsSupported(i)
+                WorkingResRadio(i).Enabled = Main_UI.settings.resolutionsSupported(i)
                 Resolutions.Controls.Add(WorkingResRadio(i))
             Next
         End If
 
-        cameraRadioButton(Main.settings.cameraIndex).Checked = True
+        cameraRadioButton(Main_UI.settings.cameraIndex).Checked = True
 
-        Snap640.Checked = Main.settings.snap640
-        Snap320.Checked = Main.settings.snap320
-        SnapCustom.Checked = Main.settings.snapCustom
+        Snap640.Checked = Main_UI.settings.snap640
+        Snap320.Checked = Main_UI.settings.snap320
+        SnapCustom.Checked = Main_UI.settings.snapCustom
 
-        TestAllDuration.Value = Main.settings.testAllDuration
-        cameraDisplayRes = Main.settings.displayRes
-        showConsoleLog.Checked = Main.settings.showConsoleLog
+        TestAllDuration.Value = Main_UI.settings.testAllDuration
+        cameraDisplayRes = Main_UI.settings.displayRes
+        showConsoleLog.Checked = Main_UI.settings.showConsoleLog
     End Sub
     Private Sub OptionsDialog_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
@@ -132,9 +132,9 @@ Public Class OptionsDialog
         testDuration = TestAllDuration.Value
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        FontDialog1.Font = Main.settings.fontInfo
+        FontDialog1.Font = Main_UI.settings.fontInfo
         If FontDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-            Main.settings.fontInfo = FontDialog1.Font
+            Main_UI.settings.fontInfo = FontDialog1.Font
         End If
     End Sub
     Public Sub Snap320_CheckedChanged(sender As Object, e As EventArgs) Handles Snap320.CheckedChanged

@@ -247,13 +247,13 @@ Partial Class OpenCVB
         'ExitCall
         '
         Me.ExitCall.Name = "ExitCall"
-        Me.ExitCall.Size = New System.Drawing.Size(141, 34)
+        Me.ExitCall.Size = New System.Drawing.Size(270, 34)
         Me.ExitCall.Text = "E&xit"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(138, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(267, 6)
         '
         'AboutToolStripMenuItem
         '

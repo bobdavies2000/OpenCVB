@@ -8,6 +8,7 @@ Imports VB_Classes
 Imports System.Management
 Imports cvext = OpenCvSharp.Extensions
 Imports System.ComponentModel
+#Region "Globals"
 Module opencv_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
     Public callTraceLock As New Mutex(True, "callTraceLock")
@@ -24,8 +25,7 @@ Module opencv_module
 End Module
 
 
-Public Class Main
-#Region "Globals"
+Public Class Main_UI
     Dim threadStartTime As DateTime
 
     Dim optionsForm As OptionsDialog
@@ -73,7 +73,8 @@ Public Class Main
     Dim myBrush = New SolidBrush(Color.White)
     Dim groupNames As New List(Of String)
     Dim TreeViewDialog As TreeviewForm
-    Public algorithmFPS As Single
+    Public fpsAlgorithm As Single
+    Public fpsCamera As Single
     Dim picLabels() = {"", "", "", ""}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Dim textDesc As String = ""
@@ -126,163 +127,6 @@ Public Class Main
     Public Shared cameraNames As List(Of String)
     Dim jsonfs As New jsonClass.FileOperations
     Dim upArrow As Boolean, downArrow As Boolean
-    Public Sub jsonRead()
-        jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
-        settings = jsonfs.Load()(0)
-
-        cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
-        With settings
-            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True}) ' Zed and Mynt updated below if supported
-            .camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True})
-            .camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False})
-            Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
-            Dim sr = New StreamReader(defines.FullName)
-            If Trim(sr.ReadLine).StartsWith("//#define STEREOLAB_INSTALLED") = False Then .cameraSupported(4) = True
-            If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then .cameraSupported(5) = True
-            sr.Close()
-
-            .cameraPresent = New List(Of Boolean)
-            For i = 0 To cameraNames.Count - 1
-                Dim present = USBenumeration(cameraNames(i))
-                If cameraNames(i).Contains("Orbbec") Then present = USBenumeration("Orbbec Gemini 335L Depth Camera")
-                If cameraNames(i).Contains("Oak-D") Then present = USBenumeration("Movidius MyriadX")
-                If cameraNames(i).Contains("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2i")
-                If present = False And cameraNames(i).Contains("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2") ' older edition.
-                .cameraPresent.Add(present <> 0)
-            Next
-
-            For i = 0 To cameraNames.Count - 1
-                If cameraNames(i).Contains(.cameraName) Then
-                    .cameraIndex = i
-                    Exit For
-                End If
-            Next
-
-            If .cameraName = "" Or .cameraPresent(.cameraIndex) = False Then
-                For i = 0 To cameraNames.Count - 1
-                    If .cameraPresent(i) And .cameraSupported(i) Then
-                        .cameraIndex = i
-                        .cameraName = cameraNames(i)
-                        Exit For
-                    End If
-                Next
-            Else
-                For i = 0 To cameraNames.Count - 1
-                    If cameraNames(i) = .cameraName Then .cameraIndex = i
-                Next
-            End If
-
-            Dim myntIndex = cameraNames.IndexOf("MYNT-EYE-D1000")
-            If .cameraPresent(myntIndex) And .cameraSupported(myntIndex) = False Then
-                'MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
-                '   "Cam_MyntD.dll has not been built." + vbCrLf + vbCrLf +
-                '   "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                '   "and run AddMynt.bat in OpenCVB's home directory.")
-            End If
-
-            Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
-            If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False Then
-                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
-                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and rebuild OpenCVB with the StereoLabs SDK.")
-            End If
-
-
-            settings.cameraFound = False
-            For i = 0 To settings.cameraPresent.Count - 1
-                If settings.cameraPresent(i) Then
-                    settings.cameraFound = True
-                    Exit For
-                End If
-            Next
-            If settings.cameraFound = False Then
-                settings.cameraName = ""
-                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf)
-            End If
-
-            If settings.testAllDuration < 5 Then settings.testAllDuration = 5
-            If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
-
-            Select Case .WorkingRes.Height
-                Case 270, 540, 1080
-                    .captureRes = New cv.Size(1920, 1080)
-                    If .camera1920x1080Support(.cameraIndex) = False Then
-                        .captureRes = New cv.Size(1280, 720)
-                        .WorkingRes = New cv.Size(320, 180)
-                    End If
-                Case 180, 360, 720
-                    .captureRes = New cv.Size(1280, 720)
-                Case 376, 188, 94
-                    .captureRes = New cv.Size(672, 376)
-                Case 120, 240, 480
-                    .captureRes = New cv.Size(640, 480)
-                    If .camera640x480Support(.cameraIndex) = False Then
-                        .captureRes = New cv.Size(1280, 720)
-                        .WorkingRes = New cv.Size(320, 180)
-                    End If
-            End Select
-
-            Dim wh = .WorkingRes.Height
-            ' desktop style is the default
-            If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True
-            If .snap640 Then
-                .locationMain.Item2 = 1321
-                .locationMain.Item3 = 858
-                If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 1096
-                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(640, 480) Else .displayRes = New cv.Size(640, 360)
-            ElseIf .snap320 Then
-                .locationMain.Item2 = 683
-                .locationMain.Item3 = 500
-                If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 616
-                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(320, 240) Else .displayRes = New cv.Size(320, 180)
-            End If
-
-            Dim border As Integer = 6
-            Dim defaultWidth = .WorkingRes.Width * 2 + border * 7
-            Dim defaultHeight = .WorkingRes.Height * 2 + ToolStrip1.Height + border * 12
-            If Me.Height < 50 Then
-                Me.Width = defaultWidth
-                Me.Height = defaultHeight
-            End If
-
-            If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
-            If settings.algorithmGroup = "" Then settings.algorithmGroup = "<All but Python"
-
-            If testAllRunning = False Then
-                Dim resStr = CStr(.WorkingRes.Width) + "x" + CStr(.WorkingRes.Height)
-                For i = 0 To OptionsDialog.resolutionList.Count - 1
-                    If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
-                        .WorkingResIndex = i
-                        Exit For
-                    End If
-                Next
-            End If
-
-            .desiredFPS = 60
-            Me.Left = .locationMain.Item0
-            Me.Top = .locationMain.Item1
-            Me.Width = .locationMain.Item2
-            Me.Height = .locationMain.Item3
-            optionsForm = New OptionsDialog
-            optionsForm.defineCameraResolutions(settings.cameraIndex)
-        End With
-    End Sub
-    Public Sub jsonWrite()
-        If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if testing all
-            settings.algorithm = AvailableAlgorithms.Text
-            settings.algorithmGroup = GroupName.Text
-        End If
-
-        settings.locationMain = New cv.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
-        settings.treeButton = TreeButton.Checked
-        settings.PixelViewerButton = False
-        settings.displayRes = New cv.Size(camPic(0).Width, camPic(0).Height) ' used only when .snapCustom is true
-
-        Dim setlist = New List(Of jsonClass.ApplicationStorage)
-        setlist.Add(settings)
-        jsonfs.Save(setlist)
-    End Sub
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         threadStartTime = DateTime.Now
 
@@ -422,14 +266,172 @@ Public Class Main
             jsonWrite()
         End If
 
+        AvailableAlgorithms.Width = 600
+        AvailableAlgorithms.ComboBox.Select()
         AlgorithmDesc.Top = ToolStrip1.Top
         AlgorithmDesc.Width = ToolStrip1.Left + ToolStrip1.Width - AlgorithmDesc.Left
-        AvailableAlgorithms.Width = 500
-        AvailableAlgorithms.ComboBox.TabIndex = 0
+        AlgorithmDesc.Height = ToolStrip1.Height
 
         RecordWindowsVersion()
         fpsTimer.Enabled = True
-        XYLoc.Text = "(x:0, y:0) last click point at: (x:0, y:0)"
+        XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
+    End Sub
+    Public Sub jsonRead()
+        jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
+        settings = jsonfs.Load()(0)
+
+        cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
+        With settings
+            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True}) ' Zed and Mynt updated below if supported
+            .camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True})
+            .camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False})
+            Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
+            Dim sr = New StreamReader(defines.FullName)
+            If Trim(sr.ReadLine).StartsWith("//#define STEREOLAB_INSTALLED") = False Then .cameraSupported(4) = True
+            If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then .cameraSupported(5) = True
+            sr.Close()
+
+            .cameraPresent = New List(Of Boolean)
+            For i = 0 To cameraNames.Count - 1
+                Dim present = USBenumeration(cameraNames(i))
+                If cameraNames(i).Contains("Orbbec") Then present = USBenumeration("Orbbec Gemini 335L Depth Camera")
+                If cameraNames(i).Contains("Oak-D") Then present = USBenumeration("Movidius MyriadX")
+                If cameraNames(i).Contains("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2i")
+                If present = False And cameraNames(i).Contains("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2") ' older edition.
+                .cameraPresent.Add(present <> 0)
+            Next
+
+            For i = 0 To cameraNames.Count - 1
+                If cameraNames(i).Contains(.cameraName) Then
+                    .cameraIndex = i
+                    Exit For
+                End If
+            Next
+
+            If .cameraName = "" Or .cameraPresent(.cameraIndex) = False Then
+                For i = 0 To cameraNames.Count - 1
+                    If .cameraPresent(i) And .cameraSupported(i) Then
+                        .cameraIndex = i
+                        .cameraName = cameraNames(i)
+                        Exit For
+                    End If
+                Next
+            Else
+                For i = 0 To cameraNames.Count - 1
+                    If cameraNames(i) = .cameraName Then .cameraIndex = i
+                Next
+            End If
+
+            Dim myntIndex = cameraNames.IndexOf("MYNT-EYE-D1000")
+            If .cameraPresent(myntIndex) And .cameraSupported(myntIndex) = False Then
+                'MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+                '   "Cam_MyntD.dll has not been built." + vbCrLf + vbCrLf +
+                '   "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                '   "and run AddMynt.bat in OpenCVB's home directory.")
+            End If
+
+            Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
+            If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False Then
+                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
+                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                       "and rebuild OpenCVB with the StereoLabs SDK.")
+            End If
+
+
+            settings.cameraFound = False
+            For i = 0 To settings.cameraPresent.Count - 1
+                If settings.cameraPresent(i) Then
+                    settings.cameraFound = True
+                    Exit For
+                End If
+            Next
+            If settings.cameraFound = False Then
+                settings.cameraName = ""
+                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf)
+            End If
+
+            If settings.testAllDuration < 5 Then settings.testAllDuration = 5
+            If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
+
+            Select Case .WorkingRes.Height
+                Case 270, 540, 1080
+                    .captureRes = New cv.Size(1920, 1080)
+                    If .camera1920x1080Support(.cameraIndex) = False Then
+                        .captureRes = New cv.Size(1280, 720)
+                        .WorkingRes = New cv.Size(320, 180)
+                    End If
+                Case 180, 360, 720
+                    .captureRes = New cv.Size(1280, 720)
+                Case 376, 188, 94
+                    .captureRes = New cv.Size(672, 376)
+                Case 120, 240, 480
+                    .captureRes = New cv.Size(640, 480)
+                    If .camera640x480Support(.cameraIndex) = False Then
+                        .captureRes = New cv.Size(1280, 720)
+                        .WorkingRes = New cv.Size(320, 180)
+                    End If
+            End Select
+
+            Dim wh = .WorkingRes.Height
+            ' desktop style is the default
+            If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True
+            If .snap640 Then
+                .locationMain.Item2 = 1321
+                .locationMain.Item3 = 870
+                If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 1096
+                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(640, 480) Else .displayRes = New cv.Size(640, 360)
+            ElseIf .snap320 Then
+                .locationMain.Item2 = 683
+                .locationMain.Item3 = 510
+                If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 616
+                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(320, 240) Else .displayRes = New cv.Size(320, 180)
+            End If
+
+            Dim border As Integer = 6
+            Dim defaultWidth = .WorkingRes.Width * 2 + border * 7
+            Dim defaultHeight = .WorkingRes.Height * 2 + ToolStrip1.Height + border * 12
+            If Me.Height < 50 Then
+                Me.Width = defaultWidth
+                Me.Height = defaultHeight
+            End If
+
+            If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
+            If settings.algorithmGroup = "" Then settings.algorithmGroup = "<All but Python"
+
+            If testAllRunning = False Then
+                Dim resStr = CStr(.WorkingRes.Width) + "x" + CStr(.WorkingRes.Height)
+                For i = 0 To OptionsDialog.resolutionList.Count - 1
+                    If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
+                        .WorkingResIndex = i
+                        Exit For
+                    End If
+                Next
+            End If
+
+            .desiredFPS = 60
+            Me.Left = .locationMain.Item0
+            Me.Top = .locationMain.Item1
+            Me.Width = .locationMain.Item2
+            Me.Height = .locationMain.Item3
+            optionsForm = New OptionsDialog
+            optionsForm.defineCameraResolutions(settings.cameraIndex)
+        End With
+    End Sub
+    Public Sub jsonWrite()
+        If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if testing all
+            settings.algorithm = AvailableAlgorithms.Text
+            settings.algorithmGroup = GroupName.Text
+        End If
+
+        settings.locationMain = New cv.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
+        settings.treeButton = TreeButton.Checked
+        settings.PixelViewerButton = False
+        settings.displayRes = New cv.Size(camPic(0).Width, camPic(0).Height) ' used only when .snapCustom is true
+
+        Dim setlist = New List(Of jsonClass.ApplicationStorage)
+        setlist.Add(settings)
+        jsonfs.Save(setlist)
     End Sub
     Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Keys.Up Then upArrow = True
@@ -568,6 +570,7 @@ Public Class Main
     End Sub
     Private Sub LineUpCamPics()
         Dim height = settings.displayRes.Height
+        Dim width As Integer
         If settings.snap640 Then Width = 640
         If settings.snap320 Then Width = 320
         If settings.snapCustom Then ' custom size - neither snap320 or snap640
@@ -590,20 +593,12 @@ Public Class Main
         camPic(2).Location = New Point(padX, camPic(0).Top + camPic(0).Height + camLabel(0).Height)
         camPic(3).Location = New Point(camPic(1).Left, camPic(2).Top)
 
-        camLabel(0).Location = New Point(padX, padY)
-        camLabel(1).Location = New Point(padX + camPic(0).Width, padY)
-        camLabel(2).Location = New Point(padX, padY + camPic(0).Height + camLabel(0).Height)
-        camLabel(3).Location = New Point(padX + camPic(0).Width, padY + camPic(0).Height + camLabel(0).Height)
-
-        'Static saveAAwidth = AvailableAlgorithms.Width
-        'Static saveKeyLeft = GroupName.Left
-        'If AvailableAlgorithms.Left + AvailableAlgorithms.Width + GroupName.Width > Me.Width Then
-        '    AvailableAlgorithms.Width = (Me.Width - AvailableAlgorithms.Left) / 2
-        '    GroupName.Left = AvailableAlgorithms.Left + AvailableAlgorithms.Width + 1
-        'ElseIf Me.Width > AvailableAlgorithms.Left + AvailableAlgorithms.Width * 2 Then
-        '    AvailableAlgorithms.Width = saveAAwidth
-        '    GroupName.Left = saveKeyLeft
-        'End If
+        If camLabel(0).Location <> New Point(padX, padY) Then
+            camLabel(0).Location = New Point(padX, padY)
+            camLabel(1).Location = New Point(padX + camPic(0).Width, padY)
+            camLabel(2).Location = New Point(padX, padY + camPic(0).Height + camLabel(0).Height)
+            camLabel(3).Location = New Point(padX + camPic(0).Width, padY + camPic(0).Height + camLabel(0).Height)
+        End If
 
         XYLoc.Location = New Point(camPic(2).Left, camPic(2).Top + camPic(2).Height)
     End Sub
@@ -632,15 +627,16 @@ Public Class Main
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If
 
+        Static fpsListA As New List(Of Single)
+        Static fpsListC As New List(Of Single)
         If pauseAlgorithmThread = False Then
-
             Dim countFrames = frameCount - lastAlgorithmFrame
             lastAlgorithmFrame = frameCount
-            algorithmFPS = countFrames / (fpsTimer.Interval / 1000)
+            fpsListA.Add(CSng(countFrames / (fpsTimer.Interval / 1000)))
 
             Dim camFrames = camera.cameraFrameCount - lastCameraFrame
             lastCameraFrame = camera.cameraFrameCount
-            Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
+            fpsListC.Add(CSng(camFrames / (fpsTimer.Interval / 1000)))
             If cameraTaskHandle Is Nothing Then Exit Sub
             Dim cameraName = settings.cameraName
             cameraName = cameraName.Replace(" 2/2i", "")
@@ -648,9 +644,17 @@ Public Class Main
             cameraName = cameraName.Replace(" Camera", "")
             cameraName = cameraName.Replace("Intel(R) RealSense(TM) Depth ", "Intel D")
 
+            fpsAlgorithm = fpsListA.Average
+            fpsCamera = fpsListC.Average
+            If fpsAlgorithm >= 100 Then fpsAlgorithm = 99
+            If fpsCamera >= 100 Then fpsCamera = 99
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " +
                       CStr(CInt(CodeLineCount / AlgorithmCount)) + " lines each (avg) - " + cameraName +
-                      " - Camera FPS: " + Format(cameraFPS, "0.0") + ", task FPS: " + Format(algorithmFPS, "0.0")
+                      " - Camera FPS: " + Format(fpsAlgorithm, "0") + ", task FPS: " + Format(fpsCamera, "0")
+            If fpsListA.Count > 5 Then
+                fpsListA.RemoveAt(0)
+                fpsListC.RemoveAt(0)
+            End If
         End If
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
@@ -868,13 +872,13 @@ Public Class Main
     End Sub
     Private Sub ComplexityTimer_Tick(sender As Object, e As EventArgs) Handles ComplexityTimer.Tick
         While 1
-            If Main.settings.resolutionsSupported(settings.WorkingResIndex) Then
+            If Main_UI.settings.resolutionsSupported(settings.WorkingResIndex) Then
                 setWorkingRes()
                 Exit While
             Else
                 settings.WorkingResIndex -= 1
                 If settings.WorkingResIndex < 0 Then
-                    settings.WorkingResIndex = Main.settings.resolutionsSupported.Count - 1
+                    settings.WorkingResIndex = Main_UI.settings.resolutionsSupported.Count - 1
                 End If
             End If
         End While
@@ -902,7 +906,7 @@ Public Class Main
 
         settings.WorkingResIndex -= 1
         If settings.WorkingResIndex < 0 Then
-            settings.WorkingResIndex = Main.settings.resolutionsSupported.Count - 1
+            settings.WorkingResIndex = Main_UI.settings.resolutionsSupported.Count - 1
         End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
@@ -1204,7 +1208,7 @@ Public Class Main
                 pixelViewerRect = task.pixelViewerRect
                 pixelViewTag = task.pixelViewTag
 
-                task.fpsRate = If(algorithmFPS = 0, 1, algorithmFPS)
+                task.fpsRate = If(fpsAlgorithm = 0, 1, fpsAlgorithm)
 
                 picLabels = task.labels
 
@@ -1475,13 +1479,15 @@ Public Class Main
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
         Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(WorkingRes.Width) + "x" + CStr(WorkingRes.Height)
-        camLabel(0).Text = "RGB"
-        If picLabels(0) <> "" Then camLabel(0).Text = picLabels(0)
-        If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
-        camLabel(2).Text = picLabels(2)
-        camLabel(3).Text = picLabels(3)
-        camLabel(0).Text += " - " + resolutionDetails
-        If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
+        If camLabel(0).Text <> "RGB - " + resolutionDetails Then
+            camLabel(0).Text = "RGB"
+            If picLabels(0) <> "" Then camLabel(0).Text = picLabels(0)
+            If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
+            camLabel(2).Text = picLabels(2)
+            camLabel(3).Text = picLabels(3)
+            camLabel(0).Text += " - " + resolutionDetails
+            If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
+        End If
         AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub jumpToAlgorithm(algName As String)
@@ -1501,7 +1507,7 @@ Public Class Main
             recentAlgorithm(item.Text)
         End If
     End Sub
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles BackButton.Click
         If arrowIndex = 0 Then
             arrowList.Clear()
             For i = 0 To algHistory.Count - 1
@@ -1511,7 +1517,7 @@ Public Class Main
         arrowIndex = Math.Min(arrowList.Count - 1, arrowIndex + 1)
         jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
     End Sub
-    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
+    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ForwardButton.Click
         If arrowIndex = 0 Then
             jumpToAlgorithm(AvailableAlgorithms.Items(Math.Min(AvailableAlgorithms.Items.Count - 1, AvailableAlgorithms.SelectedIndex + 1)))
         Else
@@ -1589,9 +1595,6 @@ Public Class Main
                 If proc(i).HasExited = False Then proc(i).Kill()
             End If
         Next
-        'For Each procStr In procList.Keys
-        '    Console.WriteLine(procStr)
-        'Next
         Return foundCamera
     End Function
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
@@ -1605,7 +1608,12 @@ Public Class Main
         saveAlgorithmName = "" ' this will close the current algorithm.
     End Sub
     Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-        If (paintNewImages Or algorithmRefresh) And saveAlgorithmName = AvailableAlgorithms.Text Then Me.Refresh()
+        If (paintNewImages Or algorithmRefresh) And AvailableAlgorithms.Text.StartsWith(saveAlgorithmName) Then
+            camPic(0).Refresh()
+            camPic(1).Refresh()
+            camPic(2).Refresh()
+            camPic(3).Refresh()
+        End If
     End Sub
     Private Sub RecordWindowsVersion()
         Dim Version = Environment.OSVersion.Version
@@ -1681,5 +1689,9 @@ Public Class Main
                "problems.  The hypothesis behind this approach is that human vision" + vbCrLf +
                "is not computationally intensive but is built on many almost trivial" + vbCrLf +
                "algorithms working together." + vbCrLf)
+    End Sub
+
+    Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
+        Me.Close()
     End Sub
 End Class
