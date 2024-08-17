@@ -338,6 +338,7 @@ namespace CS_Classes
 			if (algorithmName == "Diff_Depth32S_CS") return new Diff_Depth32S_CS(task);
 			if (algorithmName == "Diff_DepthAccum_CS") return new Diff_DepthAccum_CS(task);
 			if (algorithmName == "Diff_Heartbeat_CS") return new Diff_Heartbeat_CS(task);
+			if (algorithmName == "Diff_Identical_CS") return new Diff_Identical_CS(task);
 			if (algorithmName == "Diff_Lines_CS") return new Diff_Lines_CS(task);
 			if (algorithmName == "Diff_RGBAccum_CS") return new Diff_RGBAccum_CS(task);
 			if (algorithmName == "Diff_UnstableDepthAndColor_CS") return new Diff_UnstableDepthAndColor_CS(task);

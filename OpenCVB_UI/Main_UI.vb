@@ -421,27 +421,31 @@ Public Class Main_UI
         If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
         If camPic(2) Is Nothing Then Exit Sub ' individual pictureboxes need to be ready as well.
         LineUpCamPics()
+        If settings.snap320 Or settings.snap640 Then
+            XYLoc.Text = "To resize OpenCVB's main window, first set the global option for 'Custom' size."
+        End If
     End Sub
     Private Sub LineUpCamPics()
-        Dim height = settings.displayRes.Height
-        Dim width As Integer
-        If settings.snap640 Then width = 640
-        If settings.snap320 Then width = 320
-        If settings.snapCustom Then ' custom size - neither snap320 or snap640
-            Dim ratio = settings.WorkingRes.Height / settings.WorkingRes.Width
-            height = CInt(width * ratio)
-        End If
+        Dim imgHeight = settings.displayRes.Height
+        Dim imgWidth = settings.displayRes.Width
+        If settings.snap640 Then imgWidth = 640
+        If settings.snap320 Then imgWidth = 320
         Dim padX = 12
         Dim padY = 60
-        camPic(0).Size = New Size(width, height)
-        camPic(1).Size = New Size(width, height)
-        camPic(2).Size = New Size(width, height)
-        camPic(3).Size = New Size(width, height)
+        If settings.snapCustom Then ' custom size - neither snap320 or snap640
+            Dim ratio = settings.WorkingRes.Height / settings.WorkingRes.Width
+            imgWidth = Me.Width / 2 - padX * 2
+            imgHeight = CInt(imgWidth * ratio)
+        End If
+        camPic(0).Size = New Size(imgWidth, imgHeight)
+        camPic(1).Size = New Size(imgWidth, imgHeight)
+        camPic(2).Size = New Size(imgWidth, imgHeight)
+        camPic(3).Size = New Size(imgWidth, imgHeight)
 
-        camPic(0).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
-        camPic(1).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
-        camPic(2).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
-        camPic(3).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
+        camPic(0).Image = New Bitmap(imgWidth, imgHeight, Imaging.PixelFormat.Format24bppRgb)
+        camPic(1).Image = New Bitmap(imgWidth, imgHeight, Imaging.PixelFormat.Format24bppRgb)
+        camPic(2).Image = New Bitmap(imgWidth, imgHeight, Imaging.PixelFormat.Format24bppRgb)
+        camPic(3).Image = New Bitmap(imgWidth, imgHeight, Imaging.PixelFormat.Format24bppRgb)
         camPic(0).Location = New Point(padX, padY + camLabel(0).Height)
         camPic(1).Location = New Point(camPic(0).Left + camPic(0).Width, padY + camLabel(0).Height)
         camPic(2).Location = New Point(padX, camPic(0).Top + camPic(0).Height + camLabel(0).Height)
@@ -1109,6 +1113,7 @@ Public Class Main_UI
         AvailableAlgorithms.Width = 600
         AvailableAlgorithms.ComboBox.Select()
         AlgorithmDesc.Top = ToolStrip1.Top
+        AlgorithmDesc.Left = ToolStrip1.Left + 800
         AlgorithmDesc.Width = ToolStrip1.Left + ToolStrip1.Width - AlgorithmDesc.Left
         AlgorithmDesc.Height = ToolStrip1.Height
 
@@ -1165,7 +1170,7 @@ Public Class Main_UI
             If fpsCamera >= 100 Then fpsCamera = 99
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " +
                       CStr(CInt(CodeLineCount / AlgorithmCount)) + " lines each (avg) - " + cameraName +
-                      " - Camera FPS: " + Format(fpsAlgorithm, "0") + ", task FPS: " + Format(fpsCamera, "0")
+                      " - Camera FPS/task FPS: " + Format(fpsAlgorithm, "0") + "/" + Format(fpsCamera, "0")
             If fpsListA.Count > 5 Then
                 fpsListA.RemoveAt(0)
                 fpsListC.RemoveAt(0)

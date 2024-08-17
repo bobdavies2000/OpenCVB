@@ -748,13 +748,15 @@ End Class
 
 Public Class BackProject_MaskList : Inherits VB_Parent
     Public histList As New List(Of List(Of Single))
-    Public matList As New List(Of cv.Mat)
+    Public histogramList As New List(Of cv.Mat)
     Dim inputMatList As New List(Of cv.Mat)
-    Dim histK As New Hist_KalmanDepth
+    Dim histS As New Hist_DepthSimple
     Dim plotHist As New Plot_Histogram
     Public Sub New()
+        plotHist.addLabels = False
+        plotHist.removeZeroEntry = True
+        task.gOptions.setHistogramBins(255)
         task.gOptions.DebugSlider.Minimum = 0
-        task.gOptions.setHistogramBins(40)
         labels = {"", "", "Depth histogram of the bin selected with the debugslider", "Depth mask used to build the depth histogram at left"}
         desc = "Create masks for each histogram bin backprojection"
     End Sub
@@ -762,24 +764,22 @@ Public Class BackProject_MaskList : Inherits VB_Parent
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim bins = If(task.histogramBins <= 255, task.histogramBins - 1, 255)
         Dim incr = 255 / bins
-        If bins > task.gOptions.DebugSlider.Maximum Then
+        If bins <> task.gOptions.DebugSlider.Maximum Then
             task.gOptions.DebugSlider.Value = 0
-            task.gOptions.DebugSlider.Maximum = bins - 1
+            task.gOptions.DebugSlider.Maximum = bins
         End If
         histList.Clear()
-        matList.Clear()
+        histogramList.Clear()
         inputMatList.Clear()
-        Dim depth32f = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        histS.ranges = {New cv.Rangef(0 - 0.01, task.MaxZmeters + 0.01)}
         For i = 0 To bins - 2
             Dim minVal = i * incr
             Dim maxVal = (i + 1) * incr
-            histK.ranges = {New cv.Rangef(minVal, maxVal)}
-            histK.inputMask = gray.InRange(minVal, maxVal)
-            depth32f.SetTo(0)
-            histK.Run(task.pcSplit(2))
-            histList.Add(New List(Of Single)(histK.histList))
-            matList.Add(histK.histogram.Clone)
-            inputMatList.Add(histK.inputMask.Clone)
+            histS.inputMask = gray.InRange(minVal, maxVal)
+            histS.Run(task.pcSplit(2))
+            histList.Add(New List(Of Single)(histS.histList))
+            histogramList.Add(histS.histogram.Clone)
+            inputMatList.Add(histS.inputMask.Clone)
         Next
         Dim index = Math.Min(bins, task.gOptions.DebugSlider.Value)
         If index >= inputMatList.Count Then index = inputMatList.Count - 1
@@ -787,7 +787,7 @@ Public Class BackProject_MaskList : Inherits VB_Parent
         If task.heartBeat Then strOut = CStr(tmp.CountNonZero) + " mask pixels from " +
                                         CStr(task.pcSplit(2).CountNonZero) + " depth pixels"
         SetTrueText(strOut, 2)
-        plotHist.Run(matList(index))
+        plotHist.Run(histogramList(index))
         dst2 = plotHist.dst2
         dst3 = inputMatList(index)
     End Sub

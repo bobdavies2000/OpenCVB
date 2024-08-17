@@ -1301,36 +1301,32 @@ End Class
 
 
 
-Public Class Hist_KalmanDepth : Inherits VB_Parent
+Public Class Hist_DepthSimple : Inherits VB_Parent
     Public histList As New List(Of Single)
+    Public histArray() As Single
     Public histogram As New cv.Mat
-    Dim kalman As New Kalman_Basics
     Dim plotHist As New Plot_Histogram
     Dim mm As mmData
     Public inputMask As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
+        plotHist.addLabels = False
         desc = "Use Kalman to smooth the histogram results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             mm = GetMinMax(task.pcSplit(2))
-            ranges = {New cv.Rangef(mm.minVal - histDelta, mm.maxVal + histDelta)}
+            ranges = {New cv.Rangef(mm.minVal, mm.maxVal)}
         End If
 
         cv.Cv2.CalcHist({task.pcSplit(2)}, {0}, inputMask, histogram, 1, {task.histogramBins}, ranges)
-
-        If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
-        For i = 0 To task.histogramBins - 1
-            kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
-        Next
-        kalman.Run(src)
+        ReDim histArray(histogram.Total - 1)
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
         If standaloneTest() Then
-            histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
             plotHist.Run(histogram)
             dst2 = plotHist.dst2
         End If
-        histList = kalman.kOutput.ToList
+        histList = histArray.ToList
     End Sub
 End Class

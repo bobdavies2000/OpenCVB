@@ -175,17 +175,21 @@ Partial Class Main_UI
         ' 
         ' AvailableAlgorithms
         ' 
+        AvailableAlgorithms.AutoCompleteMode = AutoCompleteMode.SuggestAppend
+        AvailableAlgorithms.AutoCompleteSource = AutoCompleteSource.ListItems
         AvailableAlgorithms.Name = "AvailableAlgorithms"
         AvailableAlgorithms.Size = New Size(300, 34)
         ' 
         ' GroupName
         ' 
+        GroupName.AutoCompleteMode = AutoCompleteMode.Suggest
+        GroupName.AutoCompleteSource = AutoCompleteSource.ListItems
         GroupName.Name = "GroupName"
         GroupName.Size = New Size(300, 34)
         ' 
         ' AlgorithmDesc
         ' 
-        AlgorithmDesc.Location = New Point(1066, 37)
+        AlgorithmDesc.Location = New Point(1124, 36)
         AlgorithmDesc.Multiline = True
         AlgorithmDesc.Name = "AlgorithmDesc"
         AlgorithmDesc.ScrollBars = ScrollBars.Vertical
@@ -230,7 +234,7 @@ Partial Class Main_UI
         ' ExitToolStripMenuItem
         ' 
         ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        ExitToolStripMenuItem.Size = New Size(270, 34)
+        ExitToolStripMenuItem.Size = New Size(141, 34)
         ExitToolStripMenuItem.Text = "E&xit"
         ' 
         ' AboutToolStripMenuItem
@@ -246,7 +250,7 @@ Partial Class Main_UI
         ' 
         ' Main_UI
         ' 
-        AutoScaleDimensions = New SizeF(10.0F, 25.0F)
+        AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1556, 935)
         Controls.Add(XYLoc)

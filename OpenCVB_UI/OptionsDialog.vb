@@ -148,6 +148,6 @@ Public Class OptionsDialog
         cameraDisplayRes = New cv.Size(640, height)
     End Sub
     Public Sub SnapCustom_CheckedChanged(sender As Object, e As EventArgs) Handles SnapCustom.CheckedChanged
-        cameraDisplayRes = New cv.Size(0, 0) ' figure it out in OpenCVB_UI.vb resizing...
+        ' cameraDisplayRes = New cv.Size(0, 0) ' figure it out in Main_UI.vb resizing...
     End Sub
 End Class

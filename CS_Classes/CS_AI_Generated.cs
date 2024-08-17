@@ -13676,6 +13676,40 @@ namespace CS_Classes
 
 
 
+    public class Diff_Identical_CS : CS_Parent
+    {
+        Diff_Color diffColor = new Diff_Color();
+        int noMotionFrames;
+        List<string> flowText = new List<string>();
+        public Diff_Identical_CS(VBtask task) : base(task)
+        {
+            desc = "Count frames that are identical to the previous - a driver issue. The interrupt is triggered by something other than an RGB image.";
+        }
+        public void RunCS(Mat src)
+        {
+            diffColor.Run(src);
+            dst2 = diffColor.dst2;
+            if (diffColor.diff.changedPixels == 0)
+                noMotionFrames++;
+            if (task.heartBeat)
+            {
+                labels[2] = $"{noMotionFrames} frames since the last heartbeat with no motion or {noMotionFrames / task.fpsRate:P0}";
+                flowText.Add(labels[2]);
+                noMotionFrames = 0;
+                if (flowText.Count() > 20)
+                    flowText.RemoveAt(0);
+                string strOut = string.Join("\n", flowText);
+                SetTrueText(strOut, 3);
+            }
+        }
+    }
+
+
+
+
+
+
+
     public class Diff_Color_CS : CS_Parent
     {
         public Diff_Basics_CS diff;
@@ -14477,6 +14511,9 @@ namespace CS_Classes
             }
         }
     }
+
+
+
 
 
 

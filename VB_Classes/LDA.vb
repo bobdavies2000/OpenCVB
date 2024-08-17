@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
 '//contrib.hpp
 
 'Class CV_EXPORTS LDA
@@ -175,3 +176,72 @@ Public Class LDA_Test : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
     End Sub
 End Class
+
+
+
+
+Public Class LDA_FaceRecognition : Inherits VB_Parent
+    Public Sub New()
+
+        desc = "Use FisherFaceRecognizer to identify a person."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim recognizer As cv.Face.FaceRecognizer()
+
+        ' Load training data
+        Dim images As New List(Of Mat)()
+        Dim labels As New List(Of Integer)()
+        ' ... load your training images and labels
+
+        recognizer.Train(images, labels)
+
+        ' Recognize an unknown image
+        Dim unknownImage As New Mat("unknown_image.jpg")
+        Dim predictedLabel As Integer
+        Dim confidence As Double
+        recognizer.Predict(unknownImage, predictedLabel, confidence)
+
+        Console.WriteLine($"Predicted label: {predictedLabel}, Confidence: {confidence}")
+
+    End Sub
+End Class
+
+
+
+
+'Module Program
+'    Sub Main()
+'        ' Load training images
+'        Dim trainingImages As Mat() = {
+'            Cv2.ImRead("path_to_image1.jpg", ImreadModes.Grayscale),
+'            Cv2.ImRead("path_to_image2.jpg", ImreadModes.Grayscale)
+'            ' Add more images as needed
+'        }
+
+'        ' Corresponding labels for the training images
+'        Dim labels As Integer() = {0, 1} ' 0 for first person, 1 for second person, etc.
+
+'        ' Convert images to row vectors
+'        Dim trainingData As New Mat()
+'        For Each img As Mat In trainingImages
+'            Dim row As Mat = img.Reshape(1, 1)
+'            trainingData.PushBack(row)
+'        Next
+
+'        ' Create an LDA model
+'        Dim lda = Cv2.FisherFaceRecognizer.Create()
+
+'        ' Train the model
+'        lda.Train(trainingData, labels)
+
+'        ' Load a test image
+'        Dim testImage As Mat = Cv2.ImRead("path_to_test_image.jpg", ImreadModes.Grayscale)
+'        Dim testImageReshaped As Mat = testImage.Reshape(1, 1)
+
+'        ' Predict the label of the test image
+'        Dim result = lda.Predict(testImageReshaped)
+
+'        Console.WriteLine($"Predicted label: {result.Label}")
+'        Console.WriteLine($"Confidence: {result.Distance}")
+'    End Sub
+'End Module
