@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports NAudio.Gui
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Hist_Basics : Inherits VB_Parent
@@ -1294,5 +1295,42 @@ Public Class Hist_Kalman : Inherits VB_Parent
         hist.histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
         hist.plot.Run(hist.histogram)
         dst2 = hist.dst2
+    End Sub
+End Class
+
+
+
+
+Public Class Hist_KalmanDepth : Inherits VB_Parent
+    Public histList As New List(Of Single)
+    Public histogram As New cv.Mat
+    Dim kalman As New Kalman_Basics
+    Dim plotHist As New Plot_Histogram
+    Dim mm As mmData
+    Public inputMask As New cv.Mat
+    Public ranges() As cv.Rangef
+    Public Sub New()
+        desc = "Use Kalman to smooth the histogram results."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standaloneTest() Then
+            mm = GetMinMax(task.pcSplit(2))
+            ranges = {New cv.Rangef(mm.minVal - histDelta, mm.maxVal + histDelta)}
+        End If
+
+        cv.Cv2.CalcHist({task.pcSplit(2)}, {0}, inputMask, histogram, 1, {task.histogramBins}, ranges)
+
+        If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
+        For i = 0 To task.histogramBins - 1
+            kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
+        Next
+        kalman.Run(src)
+
+        If standaloneTest() Then
+            histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
+            plotHist.Run(histogram)
+            dst2 = plotHist.dst2
+        End If
+        histList = kalman.kOutput.ToList
     End Sub
 End Class

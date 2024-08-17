@@ -113,6 +113,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "BackProject_LineSide" Then return new BackProject_LineSide
 	if algorithmName = "BackProject_LineTop" Then return new BackProject_LineTop
 	if algorithmName = "BackProject_MaskLines" Then return new BackProject_MaskLines
+	if algorithmName = "BackProject_MaskList" Then return new BackProject_MaskList
 	if algorithmName = "BackProject_Masks" Then return new BackProject_Masks
 	if algorithmName = "BackProject_MeterByMeter" Then return new BackProject_MeterByMeter
 	if algorithmName = "BackProject_Mouse" Then return new BackProject_Mouse
@@ -811,6 +812,7 @@ if algorithmName = "Stable_BasicsCount_CPP" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Hist_Grayscale" Then return new Hist_Grayscale
 	if algorithmName = "Hist_Kalman" Then return new Hist_Kalman
 	if algorithmName = "Hist_KalmanAuto" Then return new Hist_KalmanAuto
+	if algorithmName = "Hist_KalmanDepth" Then return new Hist_KalmanDepth
 	if algorithmName = "Hist_Lab" Then return new Hist_Lab
 	if algorithmName = "Hist_NormalizeGray" Then return new Hist_NormalizeGray
 	if algorithmName = "Hist_PeakFinder" Then return new Hist_PeakFinder

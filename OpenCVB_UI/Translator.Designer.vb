@@ -32,7 +32,6 @@ Partial Class Translator
         Timer2 = New Timer(components)
         Timer3 = New Timer(components)
         rtb = New RichTextBox()
-        SortAlgorithms = New ComboBox()
         CType(WebView, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
@@ -77,20 +76,23 @@ Partial Class Translator
         ' WebView
         ' 
         WebView.AllowExternalDrop = True
-        WebView.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        WebView.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         WebView.CreationProperties = Nothing
         WebView.DefaultBackgroundColor = Color.White
-        WebView.Location = New Point(12, 124)
+        WebView.Location = New Point(13, 104)
         WebView.Name = "WebView"
-        WebView.Size = New Size(1705, 2012)
+        WebView.Size = New Size(1531, 1488)
         WebView.TabIndex = 6
         WebView.ZoomFactor = 1R
         ' 
         ' Timer1
         ' 
+        Timer1.Enabled = True
+        Timer1.Interval = 50
         ' 
         ' Timer2
         ' 
+        Timer2.Interval = 1000
         ' 
         ' Timer3
         ' 
@@ -103,22 +105,11 @@ Partial Class Translator
         rtb.TabIndex = 7
         rtb.Text = ""
         ' 
-        ' SortAlgorithms
-        ' 
-        SortAlgorithms.FormattingEnabled = True
-        SortAlgorithms.Location = New Point(1414, 45)
-        SortAlgorithms.Name = "SortAlgorithms"
-        SortAlgorithms.Size = New Size(294, 33)
-        SortAlgorithms.Sorted = True
-        SortAlgorithms.TabIndex = 8
-        SortAlgorithms.Visible = False
-        ' 
         ' Translator
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1729, 2148)
-        Controls.Add(SortAlgorithms)
+        ClientSize = New Size(1555, 1604)
         Controls.Add(rtb)
         Controls.Add(WebView)
         Controls.Add(Label1)
@@ -144,5 +135,4 @@ Partial Class Translator
     Friend WithEvents Timer2 As Timer
     Friend WithEvents Timer3 As Timer
     Friend WithEvents rtb As RichTextBox
-    Friend WithEvents SortAlgorithms As ComboBox
 End Class

@@ -315,86 +315,6 @@ End Class
 
 
 
-Public Class BackProject_MaskLines : Inherits VB_Parent
-    Dim masks As New BackProject_Masks
-    Dim lines As New Line_Basics
-    Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
-                  "Yellow is backProjection, lines detected are highlighted"}
-        desc = "Inspect the lines from individual backprojection masks from a histogram"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        masks.Run(src)
-        dst2 = masks.dst2
-        dst3 = src.Clone
-
-        If task.heartBeat Then dst1.SetTo(0)
-
-        lines.Run(masks.mask)
-        For Each lp In lines.lpList
-            Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, cv.Scalar.White)
-        Next
-        dst3.SetTo(cv.Scalar.Yellow, masks.mask)
-        dst3.SetTo(task.HighlightColor, dst1)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class BackProject_Masks : Inherits VB_Parent
-    Public hist As New Hist_Basics
-    Public histIndex As Integer
-    Public mask As New cv.Mat
-    Public Sub New()
-        labels(2) = "Histogram for the gray scale image.  Move mouse to see backprojection of each grayscale mask."
-        desc = "Create all the backprojection masks from a grayscale histogram"
-    End Sub
-    Public Function maskDetect(gray As cv.Mat, histIndex As Integer) As cv.Mat
-        Dim brickWidth = dst2.Width / hist.histogram.Rows
-        Dim brickRange = 255 / hist.histogram.Rows
-
-        Dim minRange = If(histIndex = hist.histogram.Rows - 1, 255 - brickRange, histIndex * brickRange)
-        Dim maxRange = If(histIndex = hist.histogram.Rows - 1, 255, (histIndex + 1) * brickRange)
-        If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
-           Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
-            SetTrueText("Input data has no values - exit " + traceName)
-            Return New cv.Mat
-        End If
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-
-        cv.Cv2.CalcBackProject({gray}, {0}, hist.histogram, mask, ranges)
-        Return mask
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        hist.Run(src)
-        dst2 = hist.dst2
-
-        Dim brickWidth = dst2.Width / task.histogramBins
-        histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
-
-        Dim gray = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst3 = task.color.Clone
-        dst1 = maskDetect(gray, histIndex)
-        If dst1.Width = 0 Then Exit Sub
-        dst3.SetTo(cv.Scalar.White, dst1)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class BackProject_Side : Inherits VB_Parent
     Dim autoY As New OpAuto_YRange
@@ -739,5 +659,136 @@ Public Class BackProject_Hue : Inherits VB_Parent
         classCount = hue.classCount
         dst2 = hue.dst2
         dst3 = ShowPalette(dst2 * 255 / classCount)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class BackProject_MaskLines : Inherits VB_Parent
+    Dim masks As New BackProject_Masks
+    Dim lines As New Line_Basics
+    Public Sub New()
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
+                  "Yellow is backProjection, lines detected are highlighted"}
+        desc = "Inspect the lines from individual backprojection masks from a histogram"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        masks.Run(src)
+        dst2 = masks.dst2
+        dst3 = src.Clone
+
+        If task.heartBeat Then dst1.SetTo(0)
+
+        lines.Run(masks.mask)
+        For Each lp In lines.lpList
+            Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, cv.Scalar.White)
+        Next
+        dst3.SetTo(cv.Scalar.Yellow, masks.mask)
+        dst3.SetTo(task.HighlightColor, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BackProject_Masks : Inherits VB_Parent
+    Public hist As New Hist_Basics
+    Public histIndex As Integer
+    Public mask As New cv.Mat
+    Public Sub New()
+        labels(2) = "Histogram for the gray scale image.  Move mouse to see backprojection of each grayscale mask."
+        desc = "Create all the backprojection masks from a grayscale histogram"
+    End Sub
+    Public Function maskDetect(gray As cv.Mat, histIndex As Integer) As cv.Mat
+        Dim brickWidth = dst2.Width / hist.histogram.Rows
+        Dim brickRange = 255 / hist.histogram.Rows
+
+        Dim minRange = If(histIndex = hist.histogram.Rows - 1, 255 - brickRange, histIndex * brickRange)
+        Dim maxRange = If(histIndex = hist.histogram.Rows - 1, 255, (histIndex + 1) * brickRange)
+        If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
+           Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
+            SetTrueText("Input data has no values - exit " + traceName)
+            Return New cv.Mat
+        End If
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+
+        cv.Cv2.CalcBackProject({gray}, {0}, hist.histogram, mask, ranges)
+        Return mask
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        hist.Run(src)
+        dst2 = hist.dst2
+
+        Dim brickWidth = dst2.Width / task.histogramBins
+        histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
+
+        Dim gray = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst3 = task.color.Clone
+        dst1 = maskDetect(gray, histIndex)
+        If dst1.Width = 0 Then Exit Sub
+        dst3.SetTo(cv.Scalar.White, dst1)
+        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+Public Class BackProject_MaskList : Inherits VB_Parent
+    Public histList As New List(Of List(Of Single))
+    Public matList As New List(Of cv.Mat)
+    Dim inputMatList As New List(Of cv.Mat)
+    Dim histK As New Hist_KalmanDepth
+    Dim plotHist As New Plot_Histogram
+    Public Sub New()
+        task.gOptions.DebugSlider.Minimum = 0
+        task.gOptions.setHistogramBins(40)
+        labels = {"", "", "Depth histogram of the bin selected with the debugslider", "Depth mask used to build the depth histogram at left"}
+        desc = "Create masks for each histogram bin backprojection"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim bins = If(task.histogramBins <= 255, task.histogramBins - 1, 255)
+        Dim incr = 255 / bins
+        If bins > task.gOptions.DebugSlider.Maximum Then
+            task.gOptions.DebugSlider.Value = 0
+            task.gOptions.DebugSlider.Maximum = bins - 1
+        End If
+        histList.Clear()
+        matList.Clear()
+        inputMatList.Clear()
+        Dim depth32f = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        For i = 0 To bins - 2
+            Dim minVal = i * incr
+            Dim maxVal = (i + 1) * incr
+            histK.ranges = {New cv.Rangef(minVal, maxVal)}
+            histK.inputMask = gray.InRange(minVal, maxVal)
+            depth32f.SetTo(0)
+            histK.Run(task.pcSplit(2))
+            histList.Add(New List(Of Single)(histK.histList))
+            matList.Add(histK.histogram.Clone)
+            inputMatList.Add(histK.inputMask.Clone)
+        Next
+        Dim index = Math.Min(bins, task.gOptions.DebugSlider.Value)
+        If index >= inputMatList.Count Then index = inputMatList.Count - 1
+        Dim tmp = inputMatList(index)
+        If task.heartBeat Then strOut = CStr(tmp.CountNonZero) + " mask pixels from " +
+                                        CStr(task.pcSplit(2).CountNonZero) + " depth pixels"
+        SetTrueText(strOut, 2)
+        plotHist.Run(matList(index))
+        dst2 = plotHist.dst2
+        dst3 = inputMatList(index)
     End Sub
 End Class

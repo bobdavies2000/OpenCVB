@@ -22,45 +22,13 @@ Public Class Translator
 
     Private Const MOUSEEVENTF_LEFTDOWN As Integer = &H2
     Private Const MOUSEEVENTF_LEFTUP As Integer = &H4
-    Dim homeDir As DirectoryInfo
     Dim saveTask As Object
     Dim clipLines As String = ""
-    Private Sub addNextAlgorithm(nextName As String, ByRef lastNameSplit As String)
-        Dim nameSplit = nextName.Split("_")
-        If nameSplit(0) <> lastNameSplit And lastNameSplit <> "" Then Algorithms.Items.Add("")
-        lastNameSplit = nameSplit(0)
-        Algorithms.Items.Add(nextName)
-    End Sub
     Private Sub loadAlgorithms()
-        Dim AlgorithmList = New FileInfo(homeDir.FullName + "Data/AlgorithmList.txt")
-        Dim sr = New StreamReader(AlgorithmList.FullName)
-
-        Dim infoLine = sr.ReadLine
-        SortAlgorithms.Items.Clear()
-        While sr.EndOfStream = False
-            infoLine = sr.ReadLine
-            infoLine = UCase(Mid(infoLine, 1, 1)) + Mid(infoLine, 2)
-            If infoLine.StartsWith("Options_") = False Then SortAlgorithms.Items.Add(infoLine)
-        End While
-        sr.Close()
-
-        Dim lastNameSplit As String = ""
-        For Each aName In SortAlgorithms.Items
-            addNextAlgorithm(aName, lastNameSplit)
+        For i = 0 To Main_UI.AvailableAlgorithms.Items.Count - 1
+            Algorithms.Items.Add(Main_UI.AvailableAlgorithms.Items(i))
         Next
-
-        Dim jsonFileName = New FileInfo(homeDir.FullName + "settings.json")
-        If jsonFileName.Exists = False Then
-            Algorithms.SelectedIndex = 0
-        Else
-            sr = New StreamReader(jsonFileName.FullName)
-            Dim line = sr.ReadLine
-            line = sr.ReadLine
-            line = sr.ReadLine
-            Dim split = line.Split("""")
-            Algorithms.SelectedItem = split(3)
-            sr.Close()
-        End If
+        Algorithms.SelectedIndex = Main_UI.AvailableAlgorithms.SelectedIndex
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         Label1.Text = "X = " + CStr(Cursor.Position.X) + ", Y = " + CStr(Cursor.Position.Y)
@@ -155,13 +123,13 @@ Public Class Translator
         Dim split = algName.Split("_")
         Dim algType As Integer = 0
         If algName.Contains("_CS") Then
-            filename = New FileInfo(homeDir.FullName + "CS_Classes/CS_AI_Generated.cs")
+            filename = New FileInfo(Main_UI.HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs")
             algType = 1
         ElseIf algName.Contains("_CPP") Then
-            filename = New FileInfo(homeDir.FullName + "CPP_Classes/CPP_AI_Generated.cpp")
+            filename = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Classes/CPP_AI_Generated.cpp")
             algType = 2
         Else
-            filename = New FileInfo(homeDir.FullName + "VB_Classes/" + split(0) + ".vb")
+            filename = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes/" + split(0) + ".vb")
             algType = 0
         End If
 

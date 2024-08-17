@@ -260,9 +260,16 @@ Module UI_GeneratorMain
         Dim HomeDir As New DirectoryInfo(VBcodeDir.FullName + "/../")
         Dim OptionsFile = New FileInfo(VBcodeDir.FullName + "Options.vb")
 
+        Dim vbOptions = New FileInfo(VBcodeDir.FullName + "/../VB_Classes/Options.vb")
         Dim includeOptions = New FileInfo(VBcodeDir.FullName + "/../CPP_Classes/Options.h")
-        includeOptions.Delete()
-        ConvertOptionsToCPP(OptionsFile)
+        Dim result As Integer
+        If includeOptions.Exists Then
+            result = DateTime.Compare(vbOptions.LastWriteTime, includeOptions.LastWriteTime)
+        End If
+        If result > 0 Then
+            includeOptions.Delete()
+            ConvertOptionsToCPP(OptionsFile)
+        End If
 
         Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/AlgorithmGroupNames.txt")
 #If DEBUG Then

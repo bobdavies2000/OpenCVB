@@ -26,6 +26,11 @@ End Module
 
 
 Public Class Main_UI
+    Public Shared settings As jsonClass.ApplicationStorage
+    Public Shared cameraNames As List(Of String)
+    Dim jsonfs As New jsonClass.FileOperations
+    Dim upArrow As Boolean, downArrow As Boolean
+
     Dim threadStartTime As DateTime
 
     Dim optionsForm As OptionsDialog
@@ -123,159 +128,7 @@ Public Class Main_UI
     Dim testAllEndingRes As Integer
     Dim windowsVersion As Integer
 #End Region
-    Public Shared settings As jsonClass.ApplicationStorage
-    Public Shared cameraNames As List(Of String)
-    Dim jsonfs As New jsonClass.FileOperations
-    Dim upArrow As Boolean, downArrow As Boolean
-    Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        threadStartTime = DateTime.Now
-
-        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
-        Dim args() = Environment.GetCommandLineArgs()
-
-        HomeDir = If(args.Length > 1, New DirectoryInfo(CurDir() + "\..\..\..\..\"), New DirectoryInfo(CurDir() + "\..\..\..\..\..\"))
-        jsonRead()
-
-        ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
-        If args.Length > 1 Then
-            Dim algorithm As String = "AddWeighted_PS.py"
-            settings.algorithmGroup = "<All >"
-            If args.Length > 2 Then ' arguments from python os.spawnv are passed as wide characters.  
-                For i = 0 To args.Length - 1
-                    algorithm += args(i)
-                Next
-            Else
-                algorithm = args(1)
-            End If
-            Console.WriteLine("'" + algorithm + "' was provided in the command line arguments to OpenCVB")
-            If algorithm = "Pyglet_Image_PS.py" Then End
-            externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
-        End If
-
-        PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
-        stopTest = New Bitmap(HomeDir.FullName + "OpenCVB/Data/StopTest.png")
-        complexityTest = New Bitmap(HomeDir.FullName + "OpenCVB/Data/complexity.jpg")
-        testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "OpenCVB/Data/testall.png")
-        runPlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButtonRun.png")
-
-        setupAlgorithmHistory()
-
-        Dim libraries = {"Cam_K4A.dll", "Cam_RS2.dll", "CPP_Classes.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
-        For i = 0 To libraries.Count - 1
-            Dim dllName = libraries(i)
-            Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
-            If dllFile.Exists Then
-                ' if the debug dll exists, then remove the Release version because Release is ahead of Debug in the path for this app.
-                Dim releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\" + dllName)
-                If releaseDLL.Exists Then
-                    If DateTime.Compare(dllFile.LastWriteTime, releaseDLL.LastWriteTime) > 0 Then releaseDLL.Delete() Else dllFile.Delete()
-                End If
-            End If
-        Next
-
-        Dim systemPath = Environment.GetEnvironmentVariable("Path")
-        pythonPresent = InStr(systemPath.ToLower, "python")
-        If pythonPresent = False Then
-            MsgBox("Python needs to be in the path in order to run all the algorithms written in python." + vbCrLf +
-                   "That is how you control which version of python is active for OpenCVB." + vbCrLf +
-                   "All Python algorithms will be disabled for now...")
-        End If
-
-        ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
-        ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
-        ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
-        updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
-        updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
-
-        Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
-        If cudaPath IsNot Nothing Then
-            updatePath(cudaPath, "Cuda - needed for StereoLabs")
-            updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
-        End If
-
-        updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
-        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
-
-        ' OpenCV needs to be in the path and the librealsense and K4A open source code needs to be in the path.
-        updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
-        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
-
-        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
-        updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
-        updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
-
-        updatePath("C:\Program Files\OrbbecSDK 1.10.5\Example\bin", "OrbbecSDK.dll")
-
-        ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
-        ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
-        ' Post an issue if this Is Not a valid assumption
-        Dim K4ADLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
-        If K4ADLL.Exists = False Then
-            MsgBox("The Microsoft installer for the Kinect 4 Azure camera proprietary portion" + vbCrLf +
-                   "was not installed in:" + vbCrLf + vbCrLf + K4ADLL.FullName + vbCrLf + vbCrLf +
-                   "Did a new Version get installed?" + vbCrLf +
-                   "Support for the K4A camera may not work until you update the code near this message.")
-            Dim k4aIndex = cameraNames.IndexOf("Azure Kinect 4K")
-            settings.cameraPresent(k4aIndex) = False ' we can't use this device
-            settings.cameraSupported(k4aIndex) = False
-        Else
-            updatePath(K4ADLL.Directory.FullName, "Kinect depth engine dll.")
-        End If
-
-        If settings.cameraFound Then
-            startCamera()
-            While camera Is Nothing ' wait for camera to start...
-            End While
-        End If
-
-        setupCamPics()
-
-        If settings.treeButton Then TreeButton_Click(sender, e)
-
-        loadAlgorithmComboBoxes()
-
-        If settings.algorithmGroup.Contains("<All ") Then
-            Dim searchStr = settings.algorithmGroup.Substring(0, InStr(settings.algorithmGroup, "("))
-            For i = 0 To Math.Min(20, groupNames.Count)
-                If groupNames(i).StartsWith(searchStr) Then
-                    GroupName.SelectedItem() = groupNames(i).Substring(0, InStr(groupNames(i), ">") - 1) + ">"
-                    Exit For
-                End If
-            Next
-        Else
-            GroupName.Text = settings.algorithmGroup
-        End If
-
-        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupNames(1)
-
-        If AvailableAlgorithms.Items.Count = 0 Then
-            MsgBox("There were no algorithms listed for the " + GroupName.Text + vbCrLf +
-                   "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
-        Else
-            If settings.algorithm Is Nothing Then
-                AvailableAlgorithms.SelectedIndex = 0
-                settings.algorithm = AvailableAlgorithms.Text
-            End If
-            If AvailableAlgorithms.Items.Contains(settings.algorithm) Then
-                AvailableAlgorithms.Text = settings.algorithm
-            Else
-                AvailableAlgorithms.SelectedIndex = 0
-            End If
-            jsonWrite()
-        End If
-
-        AvailableAlgorithms.Width = 600
-        AvailableAlgorithms.ComboBox.Select()
-        AlgorithmDesc.Top = ToolStrip1.Top
-        AlgorithmDesc.Width = ToolStrip1.Left + ToolStrip1.Width - AlgorithmDesc.Left
-        AlgorithmDesc.Height = ToolStrip1.Height
-
-        RecordWindowsVersion()
-        fpsTimer.Enabled = True
-        XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
-    End Sub
+#Region "Non-volatile"
     Public Sub jsonRead()
         jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
         settings = jsonfs.Load()(0)
@@ -571,23 +424,23 @@ Public Class Main_UI
     Private Sub LineUpCamPics()
         Dim height = settings.displayRes.Height
         Dim width As Integer
-        If settings.snap640 Then Width = 640
-        If settings.snap320 Then Width = 320
+        If settings.snap640 Then width = 640
+        If settings.snap320 Then width = 320
         If settings.snapCustom Then ' custom size - neither snap320 or snap640
             Dim ratio = settings.WorkingRes.Height / settings.WorkingRes.Width
-            height = CInt(Width * ratio)
+            height = CInt(width * ratio)
         End If
         Dim padX = 12
         Dim padY = 60
-        camPic(0).Size = New Size(Width, height)
-        camPic(1).Size = New Size(Width, height)
-        camPic(2).Size = New Size(Width, height)
-        camPic(3).Size = New Size(Width, height)
+        camPic(0).Size = New Size(width, height)
+        camPic(1).Size = New Size(width, height)
+        camPic(2).Size = New Size(width, height)
+        camPic(3).Size = New Size(width, height)
 
-        camPic(0).Image = New Bitmap(Width, height, Imaging.PixelFormat.Format24bppRgb)
-        camPic(1).Image = New Bitmap(Width, height, Imaging.PixelFormat.Format24bppRgb)
-        camPic(2).Image = New Bitmap(Width, height, Imaging.PixelFormat.Format24bppRgb)
-        camPic(3).Image = New Bitmap(Width, height, Imaging.PixelFormat.Format24bppRgb)
+        camPic(0).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
+        camPic(1).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
+        camPic(2).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
+        camPic(3).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
         camPic(0).Location = New Point(padX, padY + camLabel(0).Height)
         camPic(1).Location = New Point(camPic(0).Left + camPic(0).Width, padY + camLabel(0).Height)
         camPic(2).Location = New Point(padX, camPic(0).Top + camPic(0).Height + camLabel(0).Height)
@@ -601,61 +454,6 @@ Public Class Main_UI
         End If
 
         XYLoc.Location = New Point(camPic(2).Left, camPic(2).Top + camPic(2).Height)
-    End Sub
-    Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-        Static lastAlgorithmFrame As Integer
-        Static lastCameraFrame As Integer
-
-        'Dim processThreads As ProcessThreadCollection = Process.GetCurrentProcess().Threads
-        'Dim threadCount As Integer
-        'For Each thread As ProcessThread In processThreads
-        '    If thread.StartTime > threadStartTime Then threadCount += 1
-        'Next
-
-        'Console.WriteLine("Thread count = " + CStr(threadCount))
-
-        If TreeButton.Checked And activateTreeView And activateBlocked = False Then
-            TreeViewDialog.Activate()
-            Me.Activate()
-            activateTreeView = False
-        End If
-
-        If camera Is Nothing Then Exit Sub
-        If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
-        If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
-        If TreeViewDialog IsNot Nothing Then
-            If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
-        End If
-
-        Static fpsListA As New List(Of Single)
-        Static fpsListC As New List(Of Single)
-        If pauseAlgorithmThread = False Then
-            Dim countFrames = frameCount - lastAlgorithmFrame
-            lastAlgorithmFrame = frameCount
-            fpsListA.Add(CSng(countFrames / (fpsTimer.Interval / 1000)))
-
-            Dim camFrames = camera.cameraFrameCount - lastCameraFrame
-            lastCameraFrame = camera.cameraFrameCount
-            fpsListC.Add(CSng(camFrames / (fpsTimer.Interval / 1000)))
-            If cameraTaskHandle Is Nothing Then Exit Sub
-            Dim cameraName = settings.cameraName
-            cameraName = cameraName.Replace(" 2/2i", "")
-            cameraName = cameraName.Replace(" camera", "")
-            cameraName = cameraName.Replace(" Camera", "")
-            cameraName = cameraName.Replace("Intel(R) RealSense(TM) Depth ", "Intel D")
-
-            fpsAlgorithm = fpsListA.Average
-            fpsCamera = fpsListC.Average
-            If fpsAlgorithm >= 100 Then fpsAlgorithm = 99
-            If fpsCamera >= 100 Then fpsCamera = 99
-            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " +
-                      CStr(CInt(CodeLineCount / AlgorithmCount)) + " lines each (avg) - " + cameraName +
-                      " - Camera FPS: " + Format(fpsAlgorithm, "0") + ", task FPS: " + Format(fpsCamera, "0")
-            If fpsListA.Count > 5 Then
-                fpsListA.RemoveAt(0)
-                fpsListC.RemoveAt(0)
-            End If
-        End If
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         If activateTreeView = False And activateBlocked = False Then
@@ -709,41 +507,6 @@ Public Class Main_UI
             saveTestAllState = TestAllTimer.Enabled
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
             PausePlayButton.Image = runPlay
-        End If
-    End Sub
-    Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
-        If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
-        Dim saveCameraIndex = settings.cameraIndex
-
-        optionsForm.OptionsDialog_Load(sender, e)
-        optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
-        Dim resStr = CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height)
-        For i = 0 To OptionsDialog.resolutionList.Count - 1
-            If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
-                optionsForm.WorkingResRadio(i).Checked = True
-            End If
-        Next
-
-        Dim OKcancel = optionsForm.ShowDialog()
-
-        If OKcancel = DialogResult.OK Then
-            If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
-            restartCameraRequest = True
-            saveAlgorithmName = ""
-            settings.WorkingRes = optionsForm.cameraWorkingRes
-            settings.displayRes = optionsForm.cameraDisplayRes
-            settings.cameraName = optionsForm.cameraName
-            settings.cameraIndex = optionsForm.cameraIndex
-            settings.testAllDuration = optionsForm.testDuration
-
-            setupCamPics()
-
-            jsonWrite()
-            jsonRead() ' this will apply all the changes...
-
-            StartTask()
-        Else
-            settings.cameraIndex = saveCameraIndex
         End If
     End Sub
     Private Sub CamPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -849,7 +612,6 @@ Public Class Main_UI
         End If
         LineUpCamPics()
     End Sub
-
     Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAllToolbarBitmap)
         If TestAllButton.Text = "Test All" Then
@@ -908,114 +670,6 @@ Public Class Main_UI
         If settings.WorkingResIndex < 0 Then
             settings.WorkingResIndex = Main_UI.settings.resolutionsSupported.Count - 1
         End If
-    End Sub
-    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        ' don't start another algorithm until the current one has finished 
-        If algorithmQueueCount <> 0 Then
-            Console.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
-            While 1
-                If algorithmQueueCount = 0 Then Exit While
-                'Console.Write(".")
-                Application.DoEvents()
-            End While
-        End If
-
-        If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
-            AvailableAlgorithms.SelectedIndex = 0
-        Else
-            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
-                AvailableAlgorithms.SelectedIndex += 2
-            Else
-                AvailableAlgorithms.SelectedIndex += 1
-            End If
-        End If
-
-        TestAllTimer.Interval = settings.testAllDuration * 1000
-        Static startingAlgorithm = AvailableAlgorithms.Text
-        If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
-            If settings.WorkingResIndex > testAllEndingRes Then
-                While 1
-                    settings.cameraIndex += 1
-                    If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
-                    settings.cameraName = cameraNames(settings.cameraIndex)
-                    If settings.cameraPresent(settings.cameraIndex) Then
-                        OptionsDialog.defineCameraResolutions(settings.cameraIndex)
-                        setupTestAll()
-                        settings.WorkingResIndex = testAllStartingRes
-                        Exit While
-                    End If
-                End While
-                ' extra time for the camera to restart...
-                TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
-            End If
-
-            setWorkingRes()
-
-            jsonWrite()
-            jsonRead()
-            LineUpCamPics()
-
-            ' when switching resolution, best to reset these as the move from higher to lower res
-            ' could mean the point is no longer valid.
-            ClickPoint = New cv.Point
-            mousePoint = New cv.Point
-        End If
-
-        Static saveLastAlgorithm = AvailableAlgorithms.Text
-        If saveLastAlgorithm <> AvailableAlgorithms.Text Then
-            settings.WorkingResIndex += 1
-            saveLastAlgorithm = AvailableAlgorithms.Text
-        End If
-        StartTask()
-    End Sub
-    Private Sub StartTask()
-        Console.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
-        SyncLock callTraceLock
-            If TreeViewDialog IsNot Nothing Then
-                callTrace.Clear()
-                algorithm_ms.Clear()
-                algorithmNames.Clear()
-                TreeViewDialog.PercentTime.Text = ""
-            End If
-        End SyncLock
-        testAllRunning = TestAllButton.Text = "Stop Test"
-        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
-
-        Dim parms As New VB_Classes.VBtask.algParms
-        parms.fpsRate = settings.desiredFPS
-
-        parms.useRecordedData = GroupName.Text = "<All using recorded data>"
-        parms.testAllRunning = testAllRunning
-
-        parms.externalPythonInvocation = externalPythonInvocation
-        parms.showConsoleLog = settings.showConsoleLog
-
-        parms.HomeDir = HomeDir.FullName
-        parms.cameraName = settings.cameraName
-        parms.cameraIndex = settings.cameraIndex
-        If settings.cameraName <> "" Then parms.cameraInfo = camera.cameraInfo
-
-        parms.main_hwnd = Me.Handle
-        parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-
-        parms.WorkingRes = settings.WorkingRes
-        parms.captureRes = settings.captureRes
-        parms.displayRes = settings.displayRes
-        parms.algName = AvailableAlgorithms.Text
-
-        PausePlayButton.Image = PausePlay
-
-        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
-        ' Clicking on availablealgorithms indicates they are done with using the treeview.
-        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
-
-        Thread.CurrentThread.Priority = ThreadPriority.Lowest
-        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
-
-        algorithmTaskHandle.Name = AvailableAlgorithms.Text
-        algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
-        algorithmTaskHandle.Start(parms)
-        Console.WriteLine("Start Algorithm completed.")
     End Sub
     Private Sub setupTestAll()
         testAllResolutionCount = 0
@@ -1082,83 +736,6 @@ Public Class Main_UI
     Private Sub Advice_Click(sender As Object, e As EventArgs) Handles Advice.Click
         MsgBox(textAdvice)
     End Sub
-    Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
-        Dim g As Graphics = e.Graphics
-        Dim pic = DirectCast(sender, PictureBox)
-        Dim ratio = camPic(2).Width / settings.WorkingRes.Width
-        g.ScaleTransform(1, 1)
-        g.DrawImage(pic.Image, 0, 0)
-
-        Static myWhitePen As New Pen(Color.White)
-        Static myBlackPen As New Pen(Color.Black)
-
-        If settings.PixelViewerButton And mousePicTag = pic.Tag Then
-            Dim r = pixelViewerRect
-            Dim rect = New cv.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
-                                   CInt(r.Width * ratio), CInt(r.Height * ratio))
-            g.DrawRectangle(myWhitePen, rect.X, rect.Y, rect.Width, rect.Height)
-        End If
-
-        If drawRect.Width > 0 And drawRect.Height > 0 Then
-            g.DrawRectangle(myWhitePen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
-            If pic.Tag = 2 Then
-                g.DrawRectangle(myWhitePen, drawRect.X + camPic(0).Width, drawRect.Y, drawRect.Width, drawRect.Height)
-            End If
-
-        End If
-
-        If paintNewImages Then
-            paintNewImages = False
-            Try
-                SyncLock cameraLock
-                    If camera.mbuf(mbIndex).color IsNot Nothing Then
-                        If camera.mbuf(mbIndex).color.width > 0 And dst(0) IsNot Nothing Then
-                            Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
-                            For i = 0 To dst.Count - 1
-                                Dim tmp = dst(i).Resize(camSize)
-                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
-                            Next
-                        End If
-                    End If
-                End SyncLock
-            Catch ex As Exception
-                Console.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
-            End Try
-        End If
-
-        ' draw any TrueType font data on the image 
-        SyncLock trueData
-            Try
-                For i = 0 To trueData.Count - 1
-                    If trueData(i) Is Nothing Then Continue For
-                    Dim tt = trueData(i)
-                    If tt.text Is Nothing Then Continue For
-                    ' campic(2) has both dst2 and dst3 to assure they are in sync.
-                    If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                        g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
-                                     CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
-                    End If
-                Next
-            Catch ex As Exception
-                Console.WriteLine("Error in trueData update: " + ex.Message)
-            End Try
-        End SyncLock
-
-        Dim WorkingRes = settings.WorkingRes
-        Dim cres = settings.captureRes
-        Dim dres = settings.displayRes
-        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(WorkingRes.Width) + "x" + CStr(WorkingRes.Height)
-        If camLabel(0).Text <> "RGB - " + resolutionDetails Then
-            camLabel(0).Text = "RGB"
-            If picLabels(0) <> "" Then camLabel(0).Text = picLabels(0)
-            If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
-            camLabel(2).Text = picLabels(2)
-            camLabel(3).Text = picLabels(3)
-            camLabel(0).Text += " - " + resolutionDetails
-            If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
-        End If
-        AlgorithmDesc.Text = textDesc
-    End Sub
     Private Sub jumpToAlgorithm(algName As String)
         If AvailableAlgorithms.Items.Contains(algName) = False Then
             AvailableAlgorithms.SelectedIndex = 0
@@ -1176,7 +753,7 @@ Public Class Main_UI
             recentAlgorithm(item.Text)
         End If
     End Sub
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles BackButton.Click
+    Private Sub BackButton_Click(sender As Object, e As EventArgs) Handles BackButton.Click
         If arrowIndex = 0 Then
             arrowList.Clear()
             For i = 0 To algHistory.Count - 1
@@ -1186,7 +763,7 @@ Public Class Main_UI
         arrowIndex = Math.Min(arrowList.Count - 1, arrowIndex + 1)
         jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
     End Sub
-    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ForwardButton.Click
+    Private Sub ForwardButton_Click(sender As Object, e As EventArgs) Handles ForwardButton.Click
         If arrowIndex = 0 Then
             jumpToAlgorithm(AvailableAlgorithms.Items(Math.Min(AvailableAlgorithms.Items.Count - 1, AvailableAlgorithms.SelectedIndex + 1)))
         Else
@@ -1387,6 +964,432 @@ Public Class Main_UI
             ComplexityTimer.Enabled = False
             complexityResults.Clear()
         End If
+    End Sub
+#End Region
+    Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        threadStartTime = DateTime.Now
+
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
+        Dim args() = Environment.GetCommandLineArgs()
+
+        HomeDir = If(args.Length > 1, New DirectoryInfo(CurDir() + "\..\..\..\..\"), New DirectoryInfo(CurDir() + "\..\..\..\..\..\"))
+        jsonRead()
+
+        ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
+        If args.Length > 1 Then
+            Dim algorithm As String = "AddWeighted_PS.py"
+            settings.algorithmGroup = "<All >"
+            If args.Length > 2 Then ' arguments from python os.spawnv are passed as wide characters.  
+                For i = 0 To args.Length - 1
+                    algorithm += args(i)
+                Next
+            Else
+                algorithm = args(1)
+            End If
+            Console.WriteLine("'" + algorithm + "' was provided in the command line arguments to OpenCVB")
+            If algorithm = "Pyglet_Image_PS.py" Then End
+            externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
+        End If
+
+        PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
+        stopTest = New Bitmap(HomeDir.FullName + "OpenCVB/Data/StopTest.png")
+        complexityTest = New Bitmap(HomeDir.FullName + "OpenCVB/Data/complexity.jpg")
+        testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "OpenCVB/Data/testall.png")
+        runPlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButtonRun.png")
+
+        setupAlgorithmHistory()
+
+        Dim libraries = {"Cam_K4A.dll", "Cam_RS2.dll", "CPP_Classes.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
+        For i = 0 To libraries.Count - 1
+            Dim dllName = libraries(i)
+            Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
+            If dllFile.Exists Then
+                ' if the debug dll exists, then remove the Release version because Release is ahead of Debug in the path for this app.
+                Dim releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\" + dllName)
+                If releaseDLL.Exists Then
+                    If DateTime.Compare(dllFile.LastWriteTime, releaseDLL.LastWriteTime) > 0 Then releaseDLL.Delete() Else dllFile.Delete()
+                End If
+            End If
+        Next
+
+        Dim systemPath = Environment.GetEnvironmentVariable("Path")
+        pythonPresent = InStr(systemPath.ToLower, "python")
+        If pythonPresent = False Then
+            MsgBox("Python needs to be in the path in order to run all the algorithms written in python." + vbCrLf +
+                   "That is how you control which version of python is active for OpenCVB." + vbCrLf +
+                   "All Python algorithms will be disabled for now...")
+        End If
+
+        ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
+        ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
+        ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
+        updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
+        updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
+
+        Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
+        If cudaPath IsNot Nothing Then
+            updatePath(cudaPath, "Cuda - needed for StereoLabs")
+            updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
+        End If
+
+        updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
+
+        ' OpenCV needs to be in the path and the librealsense and K4A open source code needs to be in the path.
+        updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
+
+        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+
+        updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
+        updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
+
+        updatePath("C:\Program Files\OrbbecSDK 1.10.5\Example\bin", "OrbbecSDK.dll")
+
+        ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
+        ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
+        ' Post an issue if this Is Not a valid assumption
+        Dim K4ADLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
+        If K4ADLL.Exists = False Then
+            MsgBox("The Microsoft installer for the Kinect 4 Azure camera proprietary portion" + vbCrLf +
+                   "was not installed in:" + vbCrLf + vbCrLf + K4ADLL.FullName + vbCrLf + vbCrLf +
+                   "Did a new Version get installed?" + vbCrLf +
+                   "Support for the K4A camera may not work until you update the code near this message.")
+            Dim k4aIndex = cameraNames.IndexOf("Azure Kinect 4K")
+            settings.cameraPresent(k4aIndex) = False ' we can't use this device
+            settings.cameraSupported(k4aIndex) = False
+        Else
+            updatePath(K4ADLL.Directory.FullName, "Kinect depth engine dll.")
+        End If
+
+        If settings.cameraFound Then
+            startCamera()
+            While camera Is Nothing ' wait for camera to start...
+            End While
+        End If
+
+        setupCamPics()
+
+        If settings.treeButton Then TreeButton_Click(sender, e)
+
+        loadAlgorithmComboBoxes()
+
+        If settings.algorithmGroup.Contains("<All ") Then
+            Dim searchStr = settings.algorithmGroup.Substring(0, InStr(settings.algorithmGroup, "("))
+            For i = 0 To Math.Min(20, groupNames.Count)
+                If groupNames(i).StartsWith(searchStr) Then
+                    GroupName.SelectedItem() = groupNames(i).Substring(0, InStr(groupNames(i), ">") - 1) + ">"
+                    Exit For
+                End If
+            Next
+        Else
+            GroupName.Text = settings.algorithmGroup
+        End If
+
+        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupNames(1)
+
+        If AvailableAlgorithms.Items.Count = 0 Then
+            MsgBox("There were no algorithms listed for the " + GroupName.Text + vbCrLf +
+                   "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
+        Else
+            If settings.algorithm Is Nothing Then
+                AvailableAlgorithms.SelectedIndex = 0
+                settings.algorithm = AvailableAlgorithms.Text
+            End If
+            If AvailableAlgorithms.Items.Contains(settings.algorithm) Then
+                AvailableAlgorithms.Text = settings.algorithm
+            Else
+                AvailableAlgorithms.SelectedIndex = 0
+            End If
+            jsonWrite()
+        End If
+
+        AvailableAlgorithms.Width = 600
+        AvailableAlgorithms.ComboBox.Select()
+        AlgorithmDesc.Top = ToolStrip1.Top
+        AlgorithmDesc.Width = ToolStrip1.Left + ToolStrip1.Width - AlgorithmDesc.Left
+        AlgorithmDesc.Height = ToolStrip1.Height
+
+        RecordWindowsVersion()
+        fpsTimer.Enabled = True
+        XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
+    End Sub
+
+    Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
+        Static lastAlgorithmFrame As Integer
+        Static lastCameraFrame As Integer
+
+        'Dim processThreads As ProcessThreadCollection = Process.GetCurrentProcess().Threads
+        'Dim threadCount As Integer
+        'For Each thread As ProcessThread In processThreads
+        '    If thread.StartTime > threadStartTime Then threadCount += 1
+        'Next
+
+        'Console.WriteLine("Thread count = " + CStr(threadCount))
+
+        If TreeButton.Checked And activateTreeView And activateBlocked = False Then
+            TreeViewDialog.Activate()
+            Me.Activate()
+            activateTreeView = False
+        End If
+
+        If camera Is Nothing Then Exit Sub
+        If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
+        If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
+        If TreeViewDialog IsNot Nothing Then
+            If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
+        End If
+
+        Static fpsListA As New List(Of Single)
+        Static fpsListC As New List(Of Single)
+        If pauseAlgorithmThread = False Then
+            Dim countFrames = frameCount - lastAlgorithmFrame
+            lastAlgorithmFrame = frameCount
+            fpsListA.Add(CSng(countFrames / (fpsTimer.Interval / 1000)))
+
+            Dim camFrames = camera.cameraFrameCount - lastCameraFrame
+            lastCameraFrame = camera.cameraFrameCount
+            fpsListC.Add(CSng(camFrames / (fpsTimer.Interval / 1000)))
+            If cameraTaskHandle Is Nothing Then Exit Sub
+            Dim cameraName = settings.cameraName
+            cameraName = cameraName.Replace(" 2/2i", "")
+            cameraName = cameraName.Replace(" camera", "")
+            cameraName = cameraName.Replace(" Camera", "")
+            cameraName = cameraName.Replace("Intel(R) RealSense(TM) Depth ", "Intel D")
+
+            fpsAlgorithm = fpsListA.Average
+            fpsCamera = fpsListC.Average
+            If fpsAlgorithm >= 100 Then fpsAlgorithm = 99
+            If fpsCamera >= 100 Then fpsCamera = 99
+            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " +
+                      CStr(CInt(CodeLineCount / AlgorithmCount)) + " lines each (avg) - " + cameraName +
+                      " - Camera FPS: " + Format(fpsAlgorithm, "0") + ", task FPS: " + Format(fpsCamera, "0")
+            If fpsListA.Count > 5 Then
+                fpsListA.RemoveAt(0)
+                fpsListC.RemoveAt(0)
+            End If
+        End If
+    End Sub
+    Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
+        If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
+        Dim saveCameraIndex = settings.cameraIndex
+
+        optionsForm.OptionsDialog_Load(sender, e)
+        optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
+        Dim resStr = CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height)
+        For i = 0 To OptionsDialog.resolutionList.Count - 1
+            If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
+                optionsForm.WorkingResRadio(i).Checked = True
+            End If
+        Next
+
+        Dim OKcancel = optionsForm.ShowDialog()
+
+        If OKcancel = DialogResult.OK Then
+            If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
+            restartCameraRequest = True
+            saveAlgorithmName = ""
+            settings.WorkingRes = optionsForm.cameraWorkingRes
+            settings.displayRes = optionsForm.cameraDisplayRes
+            settings.cameraName = optionsForm.cameraName
+            settings.cameraIndex = optionsForm.cameraIndex
+            settings.testAllDuration = optionsForm.testDuration
+
+            setupCamPics()
+
+            jsonWrite()
+            jsonRead() ' this will apply all the changes...
+
+            StartTask()
+        Else
+            settings.cameraIndex = saveCameraIndex
+        End If
+    End Sub
+    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+        ' don't start another algorithm until the current one has finished 
+        If algorithmQueueCount <> 0 Then
+            Console.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
+            While 1
+                If algorithmQueueCount = 0 Then Exit While
+                'Console.Write(".")
+                Application.DoEvents()
+            End While
+        End If
+
+        If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
+            AvailableAlgorithms.SelectedIndex = 0
+        Else
+            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
+                AvailableAlgorithms.SelectedIndex += 2
+            Else
+                AvailableAlgorithms.SelectedIndex += 1
+            End If
+        End If
+
+        TestAllTimer.Interval = settings.testAllDuration * 1000
+        Static startingAlgorithm = AvailableAlgorithms.Text
+        If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
+            If settings.WorkingResIndex > testAllEndingRes Then
+                While 1
+                    settings.cameraIndex += 1
+                    If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
+                    settings.cameraName = cameraNames(settings.cameraIndex)
+                    If settings.cameraPresent(settings.cameraIndex) Then
+                        OptionsDialog.defineCameraResolutions(settings.cameraIndex)
+                        setupTestAll()
+                        settings.WorkingResIndex = testAllStartingRes
+                        Exit While
+                    End If
+                End While
+                ' extra time for the camera to restart...
+                TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
+            End If
+
+            setWorkingRes()
+
+            jsonWrite()
+            jsonRead()
+            LineUpCamPics()
+
+            ' when switching resolution, best to reset these as the move from higher to lower res
+            ' could mean the point is no longer valid.
+            ClickPoint = New cv.Point
+            mousePoint = New cv.Point
+        End If
+
+        Static saveLastAlgorithm = AvailableAlgorithms.Text
+        If saveLastAlgorithm <> AvailableAlgorithms.Text Then
+            settings.WorkingResIndex += 1
+            saveLastAlgorithm = AvailableAlgorithms.Text
+        End If
+        StartTask()
+    End Sub
+    Private Sub StartTask()
+        Console.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
+        SyncLock callTraceLock
+            If TreeViewDialog IsNot Nothing Then
+                callTrace.Clear()
+                algorithm_ms.Clear()
+                algorithmNames.Clear()
+                TreeViewDialog.PercentTime.Text = ""
+            End If
+        End SyncLock
+        testAllRunning = TestAllButton.Text = "Stop Test"
+        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
+
+        Dim parms As New VB_Classes.VBtask.algParms
+        parms.fpsRate = settings.desiredFPS
+
+        parms.useRecordedData = GroupName.Text = "<All using recorded data>"
+        parms.testAllRunning = testAllRunning
+
+        parms.externalPythonInvocation = externalPythonInvocation
+        parms.showConsoleLog = settings.showConsoleLog
+
+        parms.HomeDir = HomeDir.FullName
+        parms.cameraName = settings.cameraName
+        parms.cameraIndex = settings.cameraIndex
+        If settings.cameraName <> "" Then parms.cameraInfo = camera.cameraInfo
+
+        parms.main_hwnd = Me.Handle
+        parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
+
+        parms.WorkingRes = settings.WorkingRes
+        parms.captureRes = settings.captureRes
+        parms.displayRes = settings.displayRes
+        parms.algName = AvailableAlgorithms.Text
+
+        PausePlayButton.Image = PausePlay
+
+        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
+        ' Clicking on availablealgorithms indicates they are done with using the treeview.
+        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
+
+        Thread.CurrentThread.Priority = ThreadPriority.Lowest
+        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
+
+        algorithmTaskHandle.Name = AvailableAlgorithms.Text
+        algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
+        algorithmTaskHandle.Start(parms)
+        Console.WriteLine("Start Algorithm completed.")
+    End Sub
+    Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
+        Dim g As Graphics = e.Graphics
+        Dim pic = DirectCast(sender, PictureBox)
+        Dim ratio = camPic(2).Width / settings.WorkingRes.Width
+        g.ScaleTransform(1, 1)
+        g.DrawImage(pic.Image, 0, 0)
+
+        Static myWhitePen As New Pen(Color.White)
+        Static myBlackPen As New Pen(Color.Black)
+
+        If settings.PixelViewerButton And mousePicTag = pic.Tag Then
+            Dim r = pixelViewerRect
+            Dim rect = New cv.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
+                                   CInt(r.Width * ratio), CInt(r.Height * ratio))
+            g.DrawRectangle(myWhitePen, rect.X, rect.Y, rect.Width, rect.Height)
+        End If
+
+        If drawRect.Width > 0 And drawRect.Height > 0 Then
+            g.DrawRectangle(myWhitePen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+            If pic.Tag = 2 Then
+                g.DrawRectangle(myWhitePen, drawRect.X + camPic(0).Width, drawRect.Y, drawRect.Width, drawRect.Height)
+            End If
+
+        End If
+
+        If paintNewImages Then
+            paintNewImages = False
+            Try
+                SyncLock cameraLock
+                    If camera.mbuf(mbIndex).color IsNot Nothing Then
+                        If camera.mbuf(mbIndex).color.width > 0 And dst(0) IsNot Nothing Then
+                            Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
+                            For i = 0 To dst.Count - 1
+                                Dim tmp = dst(i).Resize(camSize)
+                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                            Next
+                        End If
+                    End If
+                End SyncLock
+            Catch ex As Exception
+                Console.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
+            End Try
+        End If
+
+        ' draw any TrueType font data on the image 
+        SyncLock trueData
+            Try
+                For i = 0 To trueData.Count - 1
+                    If trueData(i) Is Nothing Then Continue For
+                    Dim tt = trueData(i)
+                    If tt.text Is Nothing Then Continue For
+                    ' campic(2) has both dst2 and dst3 to assure they are in sync.
+                    If tt.text.Length > 0 And tt.picTag = pic.Tag Then
+                        g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
+                                     CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("Error in trueData update: " + ex.Message)
+            End Try
+        End SyncLock
+
+        Dim WorkingRes = settings.WorkingRes
+        Dim cres = settings.captureRes
+        Dim dres = settings.displayRes
+        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(WorkingRes.Width) + "x" + CStr(WorkingRes.Height)
+        If camLabel(0).Text <> "RGB - " + resolutionDetails Then
+            camLabel(0).Text = "RGB"
+            If picLabels(0) <> "" Then camLabel(0).Text = picLabels(0)
+            If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
+            camLabel(0).Text += " - " + resolutionDetails
+        End If
+        camLabel(2).Text = picLabels(2)
+        camLabel(3).Text = picLabels(3)
+        If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
+        AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub startCamera()
         paintNewImages = False
@@ -1664,8 +1667,6 @@ Public Class Main_UI
                 pixelViewTag = task.pixelViewTag
 
                 task.fpsRate = If(fpsAlgorithm = 0, 1, fpsAlgorithm)
-
-                picLabels = task.labels
 
                 If task.paused = False Then
                     SyncLock trueData
