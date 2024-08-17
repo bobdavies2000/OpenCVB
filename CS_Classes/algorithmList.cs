@@ -329,6 +329,7 @@ namespace CS_Classes
 			if (algorithmName == "Derivative_Sobel_CS") return new Derivative_Sobel_CS(task);
 			if (algorithmName == "DFT_Basics_CS") return new DFT_Basics_CS(task);
 			if (algorithmName == "DFT_ButterworthDepth_CS") return new DFT_ButterworthDepth_CS(task);
+			if (algorithmName == "DFT_ButterworthFilter_MT_CS") return new DFT_ButterworthFilter_MT_CS(task);
 			if (algorithmName == "DFT_Inverse_CS") return new DFT_Inverse_CS(task);
 			if (algorithmName == "DFT_Shapes_CS") return new DFT_Shapes_CS(task);
 			if (algorithmName == "Diff_Basics_CS") return new Diff_Basics_CS(task);

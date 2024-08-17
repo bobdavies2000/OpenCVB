@@ -13421,6 +13421,56 @@ namespace CS_Classes
 
 
 
+    public class DFT_ButterworthFilter_MT_CS : CS_Parent
+    {
+        public DFT_Basics_CS dft; 
+        Options_DFT options = new Options_DFT();
+        public DFT_ButterworthFilter_MT_CS(VBtask task) : base(task)
+        {
+            dft = new DFT_Basics_CS(task);
+            desc = "Use the Butterworth filter on a DFT image - color image input.";
+            labels[2] = "Image with Butterworth Low Pass Filter Applied";
+            labels[3] = "Same filter with radius / 2";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dft.RunCS(src);
+            if (task.optionsChanged)
+            {
+                Parallel.For(0, 2, k =>
+                {
+                    double r = options.radius / (k + 1);
+                    options.butterworthFilter[k] = new Mat(dft.complexImage.Size(), MatType.CV_32FC2);
+                    Mat tmp = new Mat(options.butterworthFilter[k].Size(), MatType.CV_32F, Scalar.All(0));
+                    cv.Point center = new cv.Point(options.butterworthFilter[k].Rows / 2, options.butterworthFilter[k].Cols / 2);
+                    for (int i = 0; i < options.butterworthFilter[k].Rows; i++)
+                    {
+                        for (int j = 0; j < options.butterworthFilter[k].Cols; j++)
+                        {
+                            double rNext = Math.Sqrt(Math.Pow(i - center.X, 2) + Math.Pow(j - center.Y, 2));
+                            tmp.Set<float>(i, j, (float)(1 / (1 + Math.Pow(rNext / r, 2 * options.order))));
+                        }
+                    }
+                    Mat[] tmpMerge = { tmp, tmp };
+                    Cv2.Merge(tmpMerge, options.butterworthFilter[k]);
+                });
+            }
+            Parallel.For(0, 2, k =>
+            {
+                Mat complex = new Mat();
+                Cv2.MulSpectrums(options.butterworthFilter[k], dft.complexImage, complex, options.dftFlag);
+                if (k == 0)
+                    dst2 = dft.InverseDFT(complex);
+                else
+                    dst3 = dft.InverseDFT(complex);
+            });
+        }
+    }
+
+
+
+
 
     public class DFT_Inverse_CS : CS_Parent
     {

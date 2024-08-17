@@ -44,9 +44,8 @@ Namespace jsonClass
 
         Public fontInfo As Font
         Public desiredFPS As Integer
-
+        Public translatorMode As String
     End Class
-
     Public Class FileOperations
         Public jsonFileName As String
         Public Sub Save(storageList As List(Of ApplicationStorage))
@@ -74,6 +73,7 @@ Namespace jsonClass
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
             emptyApp.algorithmGroup = "<All but Python ("
+            emptyApp.translatorMode = "VB.Net to C#"
             SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 30)
             SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", 30)
             SaveSetting("OpenCVB", "OpenGLtaskWidth", "OpenGLtaskWidth", 512)

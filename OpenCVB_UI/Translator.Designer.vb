@@ -26,18 +26,24 @@ Partial Class Translator
         translate = New Button()
         CopyResultsBack = New Button()
         Algorithms = New ComboBox()
-        Label1 = New Label()
+        XYLoc = New Label()
         WebView = New Microsoft.Web.WebView2.WinForms.WebView2()
         Timer1 = New Timer(components)
         Timer2 = New Timer(components)
         Timer3 = New Timer(components)
-        rtb = New RichTextBox()
+        GroupBox1 = New GroupBox()
+        CsharpToVB = New RadioButton()
+        CsharpToCPP = New RadioButton()
+        VBtoCSharp = New RadioButton()
+        Timer4 = New Timer(components)
+        Label1 = New Label()
         CType(WebView, ComponentModel.ISupportInitialize).BeginInit()
+        GroupBox1.SuspendLayout()
         SuspendLayout()
         ' 
         ' translate
         ' 
-        translate.Location = New Point(351, 30)
+        translate.Location = New Point(586, 43)
         translate.Margin = New Padding(3, 4, 3, 4)
         translate.Name = "translate"
         translate.Size = New Size(202, 69)
@@ -47,7 +53,7 @@ Partial Class Translator
         ' 
         ' CopyResultsBack
         ' 
-        CopyResultsBack.Location = New Point(560, 30)
+        CopyResultsBack.Location = New Point(795, 43)
         CopyResultsBack.Margin = New Padding(3, 4, 3, 4)
         CopyResultsBack.Name = "CopyResultsBack"
         CopyResultsBack.Size = New Size(202, 69)
@@ -58,20 +64,20 @@ Partial Class Translator
         ' Algorithms
         ' 
         Algorithms.FormattingEnabled = True
-        Algorithms.Location = New Point(13, 64)
+        Algorithms.Location = New Point(248, 77)
         Algorithms.Margin = New Padding(3, 4, 3, 4)
         Algorithms.Name = "Algorithms"
         Algorithms.Size = New Size(311, 33)
         Algorithms.TabIndex = 4
         ' 
-        ' Label1
+        ' XYLoc
         ' 
-        Label1.AutoSize = True
-        Label1.Location = New Point(13, 35)
-        Label1.Name = "Label1"
-        Label1.Size = New Size(191, 25)
-        Label1.TabIndex = 5
-        Label1.Text = "Algorithm to Translate:"
+        XYLoc.AutoSize = True
+        XYLoc.Location = New Point(12, 1575)
+        XYLoc.Name = "XYLoc"
+        XYLoc.Size = New Size(60, 25)
+        XYLoc.TabIndex = 5
+        XYLoc.Text = "XYLoc"
         ' 
         ' WebView
         ' 
@@ -79,9 +85,9 @@ Partial Class Translator
         WebView.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         WebView.CreationProperties = Nothing
         WebView.DefaultBackgroundColor = Color.White
-        WebView.Location = New Point(13, 104)
+        WebView.Location = New Point(13, 155)
         WebView.Name = "WebView"
-        WebView.Size = New Size(1531, 1488)
+        WebView.Size = New Size(1530, 1417)
         WebView.TabIndex = 6
         WebView.ZoomFactor = 1R
         ' 
@@ -97,22 +103,75 @@ Partial Class Translator
         ' Timer3
         ' 
         ' 
-        ' rtb
+        ' GroupBox1
         ' 
-        rtb.Location = New Point(1265, 24)
-        rtb.Name = "rtb"
-        rtb.Size = New Size(129, 54)
-        rtb.TabIndex = 7
-        rtb.Text = ""
+        GroupBox1.Controls.Add(CsharpToVB)
+        GroupBox1.Controls.Add(CsharpToCPP)
+        GroupBox1.Controls.Add(VBtoCSharp)
+        GroupBox1.Location = New Point(13, 1)
+        GroupBox1.Name = "GroupBox1"
+        GroupBox1.Size = New Size(221, 148)
+        GroupBox1.TabIndex = 8
+        GroupBox1.TabStop = False
+        GroupBox1.Text = "Translate"
+        GroupBox1.Visible = False
+        ' 
+        ' CsharpToVB
+        ' 
+        CsharpToVB.AutoSize = True
+        CsharpToVB.Location = New Point(17, 65)
+        CsharpToVB.Name = "CsharpToVB"
+        CsharpToVB.Size = New Size(191, 29)
+        CsharpToVB.TabIndex = 2
+        CsharpToVB.TabStop = True
+        CsharpToVB.Text = "C# to VB.Net (back)"
+        CsharpToVB.UseVisualStyleBackColor = True
+        ' 
+        ' CsharpToCPP
+        ' 
+        CsharpToCPP.AutoSize = True
+        CsharpToCPP.Location = New Point(17, 100)
+        CsharpToCPP.Name = "CsharpToCPP"
+        CsharpToCPP.Size = New Size(121, 29)
+        CsharpToCPP.TabIndex = 1
+        CsharpToCPP.TabStop = True
+        CsharpToCPP.Text = "C# to C++"
+        CsharpToCPP.UseVisualStyleBackColor = True
+        ' 
+        ' VBtoCSharp
+        ' 
+        VBtoCSharp.AutoSize = True
+        VBtoCSharp.Location = New Point(17, 30)
+        VBtoCSharp.Name = "VBtoCSharp"
+        VBtoCSharp.Size = New Size(139, 29)
+        VBtoCSharp.TabIndex = 0
+        VBtoCSharp.TabStop = True
+        VBtoCSharp.Text = "VB.Net to C#"
+        VBtoCSharp.UseVisualStyleBackColor = True
+        ' 
+        ' Timer4
+        ' 
+        Timer4.Interval = 1000
+        ' 
+        ' Label1
+        ' 
+        Label1.AutoSize = True
+        Label1.Location = New Point(252, 45)
+        Label1.Name = "Label1"
+        Label1.Size = New Size(191, 25)
+        Label1.TabIndex = 9
+        Label1.Text = "Algorithm to Translate:"
         ' 
         ' Translator
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
+        BackColor = SystemColors.ControlDark
         ClientSize = New Size(1555, 1604)
-        Controls.Add(rtb)
-        Controls.Add(WebView)
         Controls.Add(Label1)
+        Controls.Add(GroupBox1)
+        Controls.Add(WebView)
+        Controls.Add(XYLoc)
         Controls.Add(Algorithms)
         Controls.Add(CopyResultsBack)
         Controls.Add(translate)
@@ -122,6 +181,8 @@ Partial Class Translator
         Name = "Translator"
         Text = "Translate OpenCVB Algorithms using CodeConvert.AI"
         CType(WebView, ComponentModel.ISupportInitialize).EndInit()
+        GroupBox1.ResumeLayout(False)
+        GroupBox1.PerformLayout()
         ResumeLayout(False)
         PerformLayout()
 
@@ -129,10 +190,15 @@ Partial Class Translator
     Friend WithEvents translate As Button
     Friend WithEvents CopyResultsBack As Button
     Friend WithEvents Algorithms As ComboBox
-    Friend WithEvents Label1 As Label
+    Friend WithEvents XYLoc As Label
     Friend WithEvents WebView As Microsoft.Web.WebView2.WinForms.WebView2
     Friend WithEvents Timer1 As Timer
     Friend WithEvents Timer2 As Timer
     Friend WithEvents Timer3 As Timer
-    Friend WithEvents rtb As RichTextBox
+    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents CsharpToVB As RadioButton
+    Friend WithEvents CsharpToCPP As RadioButton
+    Friend WithEvents VBtoCSharp As RadioButton
+    Friend WithEvents Timer4 As Timer
+    Friend WithEvents Label1 As Label
 End Class

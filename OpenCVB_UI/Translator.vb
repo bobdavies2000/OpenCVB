@@ -12,60 +12,29 @@ Public Class Translator
     <DllImport("user32.dll")>
     Private Shared Sub mouse_event(dwFlags As Integer, dx As Integer, dy As Integer, cButtons As Integer, dwExtraInfo As Integer)
     End Sub
-    Public Enum tmode
-        VBToCSharp = 1
-        CSharpToVB = 2
-        CSharpToCPP = 3
-        'CPPToCSharp = 4
-        'CPPToVB = 5
-    End Enum
 
     Private Const MOUSEEVENTF_LEFTDOWN As Integer = &H2
     Private Const MOUSEEVENTF_LEFTUP As Integer = &H4
     Dim saveTask As Object
     Dim clipLines As String = ""
-    Private Sub loadAlgorithms()
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        XYLoc.Text = "X = " + CStr(Cursor.Position.X) + ", Y = " + CStr(Cursor.Position.Y)
+    End Sub
+    Private Sub WebView_CoreWebView2InitializationCompleted(sender As Object, e As Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs) Handles WebView.CoreWebView2InitializationCompleted
+        'subscribe to CoreWebView2 event(s) (add event handlers) 
+        AddHandler WebView.CoreWebView2.HistoryChanged, AddressOf CoreWebView2_HistoryChanged
         For i = 0 To Main_UI.AvailableAlgorithms.Items.Count - 1
             Algorithms.Items.Add(Main_UI.AvailableAlgorithms.Items(i))
         Next
         Algorithms.SelectedIndex = Main_UI.AvailableAlgorithms.SelectedIndex
     End Sub
-    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        Label1.Text = "X = " + CStr(Cursor.Position.X) + ", Y = " + CStr(Cursor.Position.Y)
-    End Sub
-    Private Sub WebView_CoreWebView2InitializationCompleted(sender As Object, e As Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs) Handles WebView.CoreWebView2InitializationCompleted
-        LogMsg("WebView_CoreWebView2InitializationCompleted")
-        LogMsg("UserDataFolder: " & WebView.CoreWebView2.Environment.UserDataFolder.ToString())
-        'subscribe to CoreWebView2 event(s) (add event handlers) 
-        AddHandler WebView.CoreWebView2.HistoryChanged, AddressOf CoreWebView2_HistoryChanged
-        collectIDs()
-        loadAlgorithms()
-    End Sub
     Private Sub CoreWebView2_HistoryChanged(sender As Object, e As Object)
-        LogMsg("CoreWebView2_HistoryChanged")
-    End Sub
-    Private Sub LogMsg(msg As String, Optional addTimestamp As Boolean = True)
-        If addTimestamp Then
-            msg = String.Format("{0} - {1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"), msg)
-        End If
-
-        Debug.WriteLine(msg)
+        Debug.WriteLine("CoreWebView2_HistoryChanged")
     End Sub
     Private Async Function InitializeAsync() As Task
         Await WebView.EnsureCoreWebView2Async()
         WebView.CoreWebView2.Navigate("https://www.codeconvert.ai/app")
     End Function
-    Private Async Sub collectIDs()
-        Dim script As String = "
-                        var ids = [];
-                        var elements = document.querySelectorAll('[id]');
-                        elements.forEach(function(element) {
-                            ids.push(element.id);
-                        });
-                        ids.join(',');
-                    "
-        Dim result = Await WebView.CoreWebView2.ExecuteScriptAsync(script)
-    End Sub
     Private Sub PerformMouseClick(ByVal clickType As String)
         Dim x As Integer = Cursor.Position.X
         Dim y As Integer = Cursor.Position.Y
@@ -78,7 +47,7 @@ Public Class Translator
         End Select
     End Sub
     Private Sub setInputLanguage(langStr As String)
-        SetCursorPos(540, 540)
+        SetCursorPos(385, 385)
         PerformMouseClick("LeftClick")
 
         SendKeys.Send(langStr)
@@ -86,35 +55,35 @@ Public Class Translator
         SendKeys.Send(vbCrLf)
     End Sub
     Private Sub setOutputLanguage(langStr As String)
-        SetCursorPos(1180, 540)
+        SetCursorPos(815, 385)
         PerformMouseClick("LeftClick")
 
         SendKeys.Send(langStr)
         Application.DoEvents()
         SendKeys.Send(vbCrLf)
     End Sub
-    Private Async Sub convert()
+    Private Async Sub Translate_Click(sender As Object, e As EventArgs) Handles translate.Click
         Dim script = "document.getElementById('convert-btn').click();"
         Await WebView.CoreWebView2.ExecuteScriptAsync(script)
     End Sub
-    Private Sub Translate_Click(sender As Object, e As EventArgs) Handles translate.Click
-        convert()
-    End Sub
     Private Sub Algorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Algorithms.SelectedIndexChanged
         ReadFileData()
+        Main_UI.AvailableAlgorithms.SelectedItem = Algorithms.Text
+        Main_UI.jsonWrite()
         Timer2.Enabled = True
     End Sub
     Private Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         Timer2.Enabled = False
-        LoadData_Click(sender, e)
+        LoadData(sender, e)
     End Sub
 #End Region
     Private Sub Translator_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim saveTask = InitializeAsync()
         Me.Top = 0
         Me.Left = 0
-        Label1.Left = 10
-        Label1.Top = WebView.Top + WebView.Height + 3
+        XYLoc.Left = 10
+        XYLoc.Top = WebView.Top + WebView.Height + 3
+        Timer4.Enabled = True
     End Sub
 
     Private Sub ReadFileData()
@@ -145,27 +114,20 @@ Public Class Translator
                             If lines(j).Trim = "End Class" Then Exit For
                         Next
                         Clipboard.SetText(clipLines)
-                        'setInputLanguage("VB")
-                        'setOutputLanguage("Csharp")
                     End If
                 Case 1
                 Case 2
             End Select
         Next
     End Sub
-    Private Sub LoadData_Click(sender As Object, e As EventArgs)
+    Private Sub LoadData(sender As Object, e As EventArgs)
         Dim testLines = My.Computer.Clipboard.GetText(System.Windows.Forms.TextDataFormat.Text)
         If testLines.Length = 0 Then Clipboard.SetText(clipLines)
-
-        rtb.Visible = False
-        LogMsg("setInputText Starting...")
 
         SetCursorPos(250, 900)
         PerformMouseClick("LeftClick")
         SendKeys.Send("^a")
         SendKeys.Send("^v")
-
-        LogMsg("setInputText attempted...")
     End Sub
     Private Sub CopyResultsBack_Click(sender As Object, e As EventArgs) Handles CopyResultsBack.Click
         SetCursorPos(900, 900)
@@ -178,12 +140,8 @@ Public Class Translator
 
     Private Sub Timer3_Tick(sender As Object, e As EventArgs) Handles Timer3.Tick
         Dim inputLines = My.Computer.Clipboard.GetText(TextDataFormat.Text).Split(vbLf)
-        If rtb.Text <> clipLines Then
+        If TranslatorResults.rtb.Text <> clipLines Then
             Timer3.Enabled = False
-
-            Dim touchupMode = tmode.VBToCSharp
-            'If CSharp_To_VB.Checked Then touchupMode = tmode.CSharpToVB
-            'If CSharp_To_CPP.Checked Then touchupMode = tmode.CSharpToCPP
 
             Dim className As String = ""
             Dim outputLines As New List(Of String)
@@ -196,8 +154,8 @@ Public Class Translator
                     className = split(2)
                 End If
 
-                Select Case touchupMode
-                    Case tmode.VBToCSharp
+                Select Case Main_UI.settings.translatorMode
+                    Case "VB.Net to C#"
                         If inline.Contains("string desc;") Then Continue For
                         If inline.Contains("IntPtr cPtr;") Then Continue For
                         If inline.Contains(className) Then inline = inline.Replace(className, className + "_CS")
@@ -265,7 +223,7 @@ Public Class Translator
                         inline = Replace(inline, "()()", "()")
                         inline = Replace(inline, "cv.Rectangle", "Rectangle")
 
-                    Case tmode.CSharpToVB
+                    Case "C# to VB.Net (back)"
                         If trimLine.StartsWith("Public Class ") Then
                             className = className.Replace("_CS", "")
                             inline = "Public Class " + className + " : Inherits VB_Parent"
@@ -284,7 +242,8 @@ Public Class Translator
                             inline = inline.Replace(" Rect", " cv.Rect")
                         End If
                         inline = inline.Replace(" Size(", " cv.Size(")
-                    Case tmode.CSharpToCPP
+
+                    Case "C# to C++"
                         inline = inline.Replace("_CS : public CS_Parent", "_CPP : public CPP_Parent")
                         inline = inline.Replace("UpdateAdvice(", "task->UpdateAdvice(")
                         inline = inline.Replace("_CS(VBtask task) : CS_Parent(task)", "_CPP() : CPP_Parent()")
@@ -301,18 +260,40 @@ Public Class Translator
                 outputLines.Add(inline)
             Next
 
-            rtb.Visible = True
-            rtb.Left = WebView.Left + WebView.Width / 2
-            rtb.Top = WebView.Top
-            rtb.Width = WebView.Width / 2
-            rtb.Height = WebView.Height
-            rtb.Clear()
+            TranslatorResults.rtb.Clear()
             For Each line In outputLines
-                rtb.Text += line + vbCrLf
+                TranslatorResults.rtb.Text += line + vbCrLf
             Next
+            TranslatorResults.Show()
         End If
     End Sub
-    Private Sub TranslatorForm_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
-        rtb.Visible = False
+    Private Sub VBtoCSharp_CheckedChanged(sender As Object, e As EventArgs) Handles VBtoCSharp.CheckedChanged
+        'setInputLanguage("VB")
+        'setOutputLanguage("Csharp")
+        Main_UI.settings.translatorMode = "VB.Net to C#"
+    End Sub
+    Private Sub CsharpToCPP_CheckedChanged(sender As Object, e As EventArgs) Handles CsharpToCPP.CheckedChanged
+        'setInputLanguage("VB")
+        'setOutputLanguage("C++")
+        Main_UI.settings.translatorMode = "C# to C++"
+    End Sub
+    Private Sub CsharpToVB_CheckedChanged(sender As Object, e As EventArgs) Handles CsharpToVB.CheckedChanged
+        'setInputLanguage("Csharp")
+        'setOutputLanguage("VB")
+        Main_UI.settings.translatorMode = "C# to VB.Net (back)"
+    End Sub
+    Private Sub Timer4_Tick(sender As Object, e As EventArgs) Handles Timer4.Tick
+        Timer4.Enabled = False
+        Select Case Main_UI.settings.translatorMode
+            Case "VB.Net to C#"
+                VBtoCSharp.Checked = True
+                VBtoCSharp_CheckedChanged(sender, e)
+            Case "C# to C++"
+                CsharpToCPP.Checked = True
+                CsharpToCPP_CheckedChanged(sender, e)
+            Case "VB.Net to C++ (back)"
+                CsharpToVB.Checked = True
+                CsharpToVB_CheckedChanged(sender, e)
+        End Select
     End Sub
 End Class

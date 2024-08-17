@@ -281,6 +281,7 @@ Public Class Main_UI
         settings.treeButton = TreeButton.Checked
         settings.PixelViewerButton = False
         settings.displayRes = New cv.Size(camPic(0).Width, camPic(0).Height) ' used only when .snapCustom is true
+        If settings.translatorMode = "" Then settings.translatorMode = "VB.Net to C#"
 
         Dim setlist = New List(Of jsonClass.ApplicationStorage)
         setlist.Add(settings)
@@ -475,7 +476,7 @@ Public Class Main_UI
         End If
     End Sub
     Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click
-        Translator.ShowDialog()
+        Translator.Show()
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Text = "" Then
