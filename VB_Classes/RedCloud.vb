@@ -7,6 +7,7 @@ Public Class RedCloud_Basics : Inherits VB_Parent
     Dim color As Color8U_Basics
     Public smallCellThreshold As Integer = dst2.Total / 1000
     Public Sub New()
+        task.gOptions.setHistogramBins(40)
         task.redOptions.setIdentifyCells(True)
         inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         UpdateAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +

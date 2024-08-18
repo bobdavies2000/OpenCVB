@@ -755,9 +755,9 @@ Public Class BackProject_MaskList : Inherits VB_Parent
     Public Sub New()
         plotHist.addLabels = False
         plotHist.removeZeroEntry = True
-        task.gOptions.setHistogramBins(255)
+        task.gOptions.setHistogramBins(40)
         task.gOptions.DebugSlider.Minimum = 0
-        labels = {"", "", "Depth histogram of the bin selected with the debugslider", "Depth mask used to build the depth histogram at left"}
+        labels(3) = "Depth mask used to build the depth histogram at left"
         desc = "Create masks for each histogram bin backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -784,9 +784,8 @@ Public Class BackProject_MaskList : Inherits VB_Parent
         Dim index = Math.Min(bins, task.gOptions.DebugSlider.Value)
         If index >= inputMatList.Count Then index = inputMatList.Count - 1
         Dim tmp = inputMatList(index)
-        If task.heartBeat Then strOut = CStr(tmp.CountNonZero) + " mask pixels from " +
-                                        CStr(task.pcSplit(2).CountNonZero) + " depth pixels"
-        SetTrueText(strOut, 2)
+        If task.heartBeat Then strOut = CStr(tmp.CountNonZero) + " mask pixels between " + CStr(incr * index) + " and " +
+                                        CStr(incr * (index + 1)) + " from " + CStr(task.pcSplit(2).CountNonZero) + " depth pixels"
         plotHist.Run(histogramList(index))
         dst2 = plotHist.dst2
         dst3 = inputMatList(index)
