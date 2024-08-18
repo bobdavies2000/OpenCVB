@@ -1310,6 +1310,7 @@ Public Class Hist_DepthSimple : Inherits VB_Parent
     Public inputMask As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
+        labels(2) = "Histogram of depth from 0 to maxZMeters."
         plotHist.addLabels = False
         desc = "Use Kalman to smooth the histogram results."
     End Sub

@@ -284,6 +284,7 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Parent
 
         Dim barWidth = dst3.Width / histBins
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
+        If histIndex >= slotList.Count() Then histIndex = slotList.Count() - 1
         dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
         For i = 0 To slotList(histIndex).Count - 1
             Dim rc = task.redCells(slotList(histIndex)(i))

@@ -189,6 +189,8 @@ namespace CPP_Classes
 		{ task->alg = new AddWeighted_ImageAccumulate_CPP(); task->alg->traceName = "AddWeighted_ImageAccumulate_CPP"; break; }
 		case _Edge_Basics_CPP:
 		{ task->alg = new Edge_Basics_CPP(); task->alg->traceName = "Edge_Basics_CPP"; break; }
+		case _Hist_DepthSimple_CPP:
+		{ task->alg = new Hist_DepthSimple_CPP(); task->alg->traceName = "Hist_DepthSimple_CPP"; break; }
         // end of switch - don't remove...
         }
 

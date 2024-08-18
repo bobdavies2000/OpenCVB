@@ -451,10 +451,10 @@ Public Class Main_UI
         camPic(2).Location = New Point(padX, camPic(0).Top + camPic(0).Height + camLabel(0).Height)
         camPic(3).Location = New Point(camPic(1).Left, camPic(2).Top)
 
-        If camLabel(0).Location <> New Point(padX, padY) Then
-            camLabel(0).Location = New Point(padX, padY)
-            camLabel(1).Location = New Point(padX + camPic(0).Width, padY)
-            camLabel(2).Location = New Point(padX, padY + camPic(0).Height + camLabel(0).Height)
+        If camLabel(0).Location <> New Point(padX, camPic(0).Top) Then
+            camLabel(0).Location = New Point(padX, camPic(0).Top - camLabel(0).Height)
+            camLabel(1).Location = New Point(padX + camPic(0).Width, camLabel(0).Location.Y)
+            camLabel(2).Location = New Point(padX, camPic(2).Top - camLabel(2).Height)
             camLabel(3).Location = New Point(padX + camPic(0).Width, padY + camPic(0).Height + camLabel(0).Height)
         End If
 
@@ -1396,6 +1396,38 @@ Public Class Main_UI
         camLabel(3).Text = picLabels(3)
         If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
         AlgorithmDesc.Text = textDesc
+    End Sub
+    Public Sub setupNewCPPalgorithm(algorithmName As String)
+        Dim functionNames = New FileInfo(HomeDir.FullName + "CPP_Classes\CPP_Enum.h")
+        Dim lines = File.ReadAllLines(functionNames.FullName)
+
+        ' is it already up to date in the CPP_Enum.h file?
+        For Each line In lines
+            If line.Contains("_" + algorithmName) Then Exit Sub
+        Next
+
+        Dim sw = New StreamWriter(functionNames.FullName, False)
+        For Each line In lines
+            If line.Contains("_Stable_BasicsCount_CPP,") Then
+                sw.WriteLine(vbTab + "_" + algorithmName + ",")
+            End If
+            sw.WriteLine(line)
+        Next
+        sw.Close()
+
+        Dim externNames = New FileInfo(HomeDir.FullName + "CPP_Classes\CPP_Externs.h")
+        lines = File.ReadAllLines(externNames.FullName)
+
+        sw = New StreamWriter(externNames.FullName, False)
+        For Each line In lines
+            If line.Contains("// end of switch - don't remove...") Then
+                sw.WriteLine(vbTab + vbTab + "case _" + algorithmName + ":")
+                sw.WriteLine(vbTab + vbTab + "{ task->alg = new " + algorithmName + "(); task->alg->traceName = " +
+                               """" + algorithmName + """; break; }")
+            End If
+            sw.WriteLine(line)
+        Next
+        sw.Close()
     End Sub
     Private Sub startCamera()
         paintNewImages = False

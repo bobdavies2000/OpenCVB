@@ -32,7 +32,7 @@ Public Class InsertAlgorithm
         Dim ret As MsgBoxResult
         Select Case algorithmType
             Case algType.addVB
-                VBoutputName = New FileInfo("..\..\VB_Classes\" + Split(0) + ".vb")
+                VBoutputName = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\" + split(0) + ".vb")
 
                 ret = MsgBox("Would you like to add the algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
                              " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name, MsgBoxStyle.OkCancel)
@@ -44,30 +44,30 @@ Public Class InsertAlgorithm
 
 
             Case algType.addCPP
-                VBoutputName = New FileInfo("..\..\VB_Classes\" + split(0) + ".vb")
+                VBoutputName = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\" + split(0) + ".vb")
 
-                CPPoutputName = New FileInfo("..\..\CPP_Classes\CPP_Algorithms.h")
+                CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Classes\CPP_Algorithms.h")
 
                 ret = MsgBox("Would you like to add the C++ algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + "_VB" +
                              vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name +
                              vbCrLf + vbCrLf + " and to:" + vbCrLf + vbCrLf + CPPoutputName.Name, MsgBoxStyle.OkCancel)
 
             Case algType.addOpenGL
-                VBoutputName = New FileInfo("..\..\VB_Classes\OpenGL.vb")
-                OpenGLOutputName = New FileInfo("..\..\OpenGL\OpenGLFunction\OpenGLFunction.cpp")
+                VBoutputName = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\OpenGL.vb")
+                OpenGLOutputName = New FileInfo(Main_UI.HomeDir.FullName + "OpenGL\OpenGLFunction\OpenGLFunction.cpp")
                 ret = MsgBox("Would you like to add the algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + "_VB" +
                              vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "OpenGL C++ File: " + 
                              OpenGLOutputName.Name + vbCrLf + vbCrLf + " and to:" + vbCrLf + vbCrLf + 
                              VBoutputName.Name, MsgBoxStyle.OkCancel)
 
             Case algType.addCS
-                CSOutputName = New FileInfo("..\..\CS_Classes\CS_Non_AI.cs")
+                CSOutputName = New FileInfo(Main_UI.HomeDir.FullName + "CS_Classes\CS_Non_AI.cs")
 
                 ret = MsgBox("Would you like to add the CSharp algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
                              " to:" + vbCrLf + vbCrLf + CSOutputName.Name, MsgBoxStyle.OkCancel)
 
             Case algType.addPyStream
-                PyStreamOutputName = New FileInfo("..\..\VB_Classes\" + AlgorithmName.Text + "_PS.py")
+                PyStreamOutputName = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\" + AlgorithmName.Text + "_PS.py")
 
                 ret = MsgBox("Would you like to add the PyStream algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
                              " to: " + vbCrLf + vbCrLf + "Python File: " + PyStreamOutputName.Name, MsgBoxStyle.OkCancel)
@@ -197,7 +197,7 @@ Public Class InsertAlgorithm
         If nextAlgorithm(algType.addOpenGL) = False Then Exit Sub
 
         Dim oglAll() As String
-        oglAll = File.ReadAllLines("..\..\OpenGL\OpenGL_Functions\OpenGL_Functions.cpp")
+        oglAll = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenGL\OpenGL_Functions\OpenGL_Functions.cpp")
 
         Dim maxCase As Integer
         For i = 0 To oglAll.Count - 1
@@ -209,7 +209,7 @@ Public Class InsertAlgorithm
         Next
 
         ' add the new case in OpenGL_Function.cpp
-        sw = New StreamWriter("..\..\OpenGL\OpenGL_Functions\OpenGL_Functions.cpp")
+        sw = New StreamWriter(Main_UI.HomeDir.FullName + "OpenGL\OpenGL_Functions\OpenGL_Functions.cpp")
         For i = 0 To oglAll.Count - 1
             Dim line = Trim(oglAll(i))
             sw.WriteLine(line)
@@ -230,7 +230,7 @@ Public Class InsertAlgorithm
         Next
         sw.Close()
 
-        VBoutputName = New FileInfo("..\..\VB_Classes\OpenGL.vb")
+        VBoutputName = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\OpenGL.vb")
         Dim sr = New System.IO.StreamReader(VBoutputName.FullName)
         Dim vbCode As New List(Of String)
         While sr.EndOfStream = False
@@ -303,7 +303,7 @@ Public Class InsertAlgorithm
     Private Sub AddPyStream_Click(sender As Object, e As EventArgs) Handles AddPyStream.Click
         If nextAlgorithm(algType.addPyStream) = False Then Exit Sub
 
-        Dim pyFile = New FileInfo("..\..\VB_Classes\" + AlgorithmName.Text + "_PS.py")
+        Dim pyFile = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\" + AlgorithmName.Text + "_PS.py")
         Dim alreadyPresent As Boolean
         If pyFile.Exists Then
             Dim ret = MsgBox(pyFile.FullName + " exists." + vbCrLf + "Do you want to overwrite it?", MsgBoxStyle.OkCancel, "Add PyStream Algorithm")
@@ -337,7 +337,7 @@ Public Class InsertAlgorithm
         If AlgorithmName.Text.EndsWith("_CPP") = False Then AlgorithmName.Text = AlgorithmName.Text + "_CPP"
         If nextAlgorithm(algType.addCPP_AI) = False Then Exit Sub
 
-        CPPoutputName = New FileInfo("..\..\CPP_Classes\CPP_AI_Generated.h")
+        CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Classes\CPP_AI_Generated.h")
 
         Dim trigger As Boolean
         sw = New StreamWriter(CPPoutputName.FullName, True)
@@ -353,31 +353,7 @@ Public Class InsertAlgorithm
         Next
         sw.Close()
 
-        Dim functionNames = New FileInfo("..\..\CPP_Classes\CPP_Enum.h")
-        Dim lines = File.ReadAllLines(functionNames.FullName)
-
-        sw = New StreamWriter(functionNames.FullName, False)
-        For Each line In lines
-            If line.Contains("_Stable_BasicsCount_CPP,") Then
-                sw.WriteLine(vbTab + "_" + AlgorithmName.Text + ",")
-            End If
-            sw.WriteLine(line)
-        Next
-        sw.Close()
-
-        Dim externNames = New FileInfo("..\..\CPP_Classes\CPP_Externs.h")
-        lines = File.ReadAllLines(externNames.FullName)
-
-        sw = New StreamWriter(externNames.FullName, False)
-        For Each line In lines
-            If line.Contains("// end of switch - don't remove...") Then
-                sw.WriteLine(vbTab + vbTab + "case _" + AlgorithmName.Text + ":")
-                sw.WriteLine(vbTab + vbTab + "{ task->alg = new " + AlgorithmName.Text + "(); task->alg->traceName = " +
-                               """" + AlgorithmName.Text + """; break; }")
-            End If
-            sw.WriteLine(line)
-        Next
-        sw.Close()
+        Main_UI.setupNewCPPalgorithm(AlgorithmName.Text)
 
         MsgBox("Edit the new algorithm in CPP_AI_Generated.h")
         Me.Close()

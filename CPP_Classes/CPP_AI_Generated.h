@@ -7467,3 +7467,48 @@ public:
         labels[2] = traceName + " - selection = " + options->edgeSelection;
     }
 };
+
+
+
+
+
+
+class Hist_DepthSimple_CPP : public CPP_Parent
+{
+public:
+    std::vector<float> histList;
+    std::vector<float> histArray;
+    cv::Mat histogram;
+    Plot_Histogram_CPP plotHist;
+    mmData mm;
+    cv::Mat inputMask;
+    float ranges[2];
+    Hist_DepthSimple_CPP() : CPP_Parent()
+    {
+        plotHist.addLabels = false;
+        desc = "Use Kalman to smooth the histogram results.";
+    }
+    void Run(cv::Mat src)
+    {
+        if (standalone)
+        {
+            mm = task->vbMinMax(task->pcSplit[2]);
+            ranges[0] = (float)mm.minVal;
+            ranges[1] = (float)mm.maxVal;
+        }
+
+        int bins[] = { task->histogramBins };
+        float hRange[] = { static_cast<float>(ranges[0]), static_cast<float>(ranges[1])};
+        const float* range[] = { hRange };
+        calcHist(&task->pcSplit[2], 1, { 0 }, Mat(), histogram, 1, bins, range, true, false);
+
+        histArray.resize(histogram.total());
+        std::memcpy(histArray.data(), histogram.ptr<float>(), histogram.total() * sizeof(float));
+        if (standalone)
+        {
+            plotHist.Run(histogram);
+            dst2 = plotHist.dst2;
+        }
+        histList = histArray;
+    }
+};

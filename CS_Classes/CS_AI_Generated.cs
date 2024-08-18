@@ -25257,6 +25257,45 @@ namespace CS_Classes
 
 
 
+
+    public class Hist_DepthSimple_CS : CS_Parent
+    {
+        public List<float> histList = new List<float>();
+        public float[] histArray;
+        public Mat histogram = new Mat();
+        Plot_Histogram plotHist = new Plot_Histogram();
+        mmData mm;
+        public Mat inputMask = new Mat();
+        public Rangef[] ranges;
+        public Hist_DepthSimple_CS(VBtask task) : base(task)
+        {
+            labels[2] = "Histogram of depth from 0 to maxZMeters.";
+            plotHist.addLabels = false;
+            desc = "Use Kalman to smooth the histogram results.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                mm = GetMinMax(task.pcSplit[2]);
+                ranges = new[] { new Rangef((float)mm.minVal, (float)mm.maxVal) };
+            }
+            Cv2.CalcHist(new[] { task.pcSplit[2] }, new[] { 0 }, inputMask, histogram, 1, new[] { task.histogramBins }, ranges);
+            histArray = new float[histogram.Total()];
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+            if (standaloneTest())
+            {
+                plotHist.Run(histogram);
+                dst2 = plotHist.dst2;
+            }
+            histList = new List<float>(histArray);
+        }
+    }
+
+
+
+
+
     public class Hist_Grayscale_CS : CS_Parent
     {
         public Hist_Basics hist = new Hist_Basics();
@@ -51916,6 +51955,7 @@ namespace CS_Classes
 
 
 
+
     public class RedCloud_CellsAtDepth_CS : CS_Parent
     {
         Plot_Histogram plot = new Plot_Histogram();
@@ -51950,15 +51990,16 @@ namespace CS_Classes
             }
             kalman.kInput = hist;
             kalman.Run(src);
-            Mat histMat = cv.Mat.FromPixelData(histBins, 1, MatType.CV_32F, kalman.kOutput);
+            Mat histMat = Mat.FromArray(kalman.kOutput);
             plot.Run(histMat);
             dst3 = plot.dst2;
-            float barWidth = dst3.Width / histBins;
-            int histIndex = (int)Math.Floor(task.mouseMovePoint.X / barWidth);
-            dst3.Rectangle(new cv.Rect((int)(histIndex * barWidth), 0, (int)barWidth, dst3.Height), Scalar.Yellow, task.lineWidth);
-            for (int i = 0; i < slotList[histIndex].Count(); i++)
+            int barWidth = dst3.Width / histBins;
+            int histIndex = (int)Math.Floor((double)(task.mouseMovePoint.X / barWidth));
+            if (histIndex >= slotList.Length) histIndex = slotList.Length - 1;
+            Cv2.Rectangle(dst3, new cv.Rect(histIndex * barWidth, 0, barWidth, dst3.Height), Scalar.Yellow, task.lineWidth);
+            foreach (int i in slotList[histIndex])
             {
-                var rc = task.redCells[slotList[histIndex][i]];
+                var rc = task.redCells[i];
                 DrawContour(dst2[rc.rect], rc.contour, Scalar.Yellow);
                 DrawContour(task.color[rc.rect], rc.contour, Scalar.Yellow);
             }

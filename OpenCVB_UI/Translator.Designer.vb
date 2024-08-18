@@ -37,34 +37,35 @@ Partial Class Translator
         VBtoCSharp = New RadioButton()
         Timer4 = New Timer(components)
         Label1 = New Label()
+        Button1 = New Button()
         CType(WebView, ComponentModel.ISupportInitialize).BeginInit()
         GroupBox1.SuspendLayout()
         SuspendLayout()
         ' 
         ' translate
         ' 
-        translate.Location = New Point(586, 43)
+        translate.Location = New Point(815, 43)
         translate.Margin = New Padding(3, 4, 3, 4)
         translate.Name = "translate"
         translate.Size = New Size(202, 69)
         translate.TabIndex = 1
-        translate.Text = "Translate"
+        translate.Text = "Step 2: Translate"
         translate.UseVisualStyleBackColor = True
         ' 
         ' CopyResultsBack
         ' 
-        CopyResultsBack.Location = New Point(795, 43)
+        CopyResultsBack.Location = New Point(1044, 43)
         CopyResultsBack.Margin = New Padding(3, 4, 3, 4)
         CopyResultsBack.Name = "CopyResultsBack"
         CopyResultsBack.Size = New Size(202, 69)
         CopyResultsBack.TabIndex = 2
-        CopyResultsBack.Text = "Touchup"
+        CopyResultsBack.Text = "Step 3: Touchup"
         CopyResultsBack.UseVisualStyleBackColor = True
         ' 
         ' Algorithms
         ' 
         Algorithms.FormattingEnabled = True
-        Algorithms.Location = New Point(248, 77)
+        Algorithms.Location = New Point(482, 79)
         Algorithms.Margin = New Padding(3, 4, 3, 4)
         Algorithms.Name = "Algorithms"
         Algorithms.Size = New Size(311, 33)
@@ -114,7 +115,6 @@ Partial Class Translator
         GroupBox1.TabIndex = 8
         GroupBox1.TabStop = False
         GroupBox1.Text = "Translate"
-        GroupBox1.Visible = False
         ' 
         ' CsharpToVB
         ' 
@@ -156,11 +156,21 @@ Partial Class Translator
         ' Label1
         ' 
         Label1.AutoSize = True
-        Label1.Location = New Point(252, 45)
+        Label1.Location = New Point(482, 50)
         Label1.Name = "Label1"
-        Label1.Size = New Size(191, 25)
+        Label1.Size = New Size(318, 25)
         Label1.TabIndex = 9
-        Label1.Text = "Algorithm to Translate:"
+        Label1.Text = "Step 1: Select an algorithm to Translate"
+        ' 
+        ' Button1
+        ' 
+        Button1.Location = New Point(251, 43)
+        Button1.Margin = New Padding(3, 4, 3, 4)
+        Button1.Name = "Button1"
+        Button1.Size = New Size(203, 69)
+        Button1.TabIndex = 10
+        Button1.Text = "Use Current Algorithm"
+        Button1.UseVisualStyleBackColor = True
         ' 
         ' Translator
         ' 
@@ -168,6 +178,7 @@ Partial Class Translator
         AutoScaleMode = AutoScaleMode.Font
         BackColor = SystemColors.ControlDark
         ClientSize = New Size(1555, 1604)
+        Controls.Add(Button1)
         Controls.Add(Label1)
         Controls.Add(GroupBox1)
         Controls.Add(WebView)
@@ -201,4 +212,5 @@ Partial Class Translator
     Friend WithEvents VBtoCSharp As RadioButton
     Friend WithEvents Timer4 As Timer
     Friend WithEvents Label1 As Label
+    Friend WithEvents Button1 As Button
 End Class

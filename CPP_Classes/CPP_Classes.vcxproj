@@ -23,7 +23,6 @@
     <ClInclude Include="CPP_Enum.h" />
     <ClInclude Include="CPP_Parent.h" />
     <ClInclude Include="CPP_AI_Generated.h" />
-    <ClInclude Include="CvHMM.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="PragmaLibs.h" />
   </ItemGroup>

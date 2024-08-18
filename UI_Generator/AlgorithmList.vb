@@ -77,6 +77,7 @@ _FeatureLess_Edge_CPP
 _Feature_AKaze_CPP
 _AddWeighted_ImageAccumulate_CPP
 _Edge_Basics_CPP
+_Hist_DepthSimple_CPP
 _Stable_BasicsCount_CPP
 End Enum
 Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
@@ -375,6 +376,7 @@ if algorithmName = "FeatureLess_History_CPP" Then return new CPP_Basics(cppFunct
 if algorithmName = "FPoly_TopFeatures_CPP" Then return new CPP_Basics(cppFunctionNames._FPoly_TopFeatures_CPP)
 if algorithmName = "Grid_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Grid_Basics_CPP)
 if algorithmName = "Hist_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._Hist_Basics_CPP)
+if algorithmName = "Hist_DepthSimple_CPP" Then return new CPP_Basics(cppFunctionNames._Hist_DepthSimple_CPP)
 if algorithmName = "Hist_Kalman_CPP" Then return new CPP_Basics(cppFunctionNames._Hist_Kalman_CPP)
 if algorithmName = "Hist_RedOptions_CPP" Then return new CPP_Basics(cppFunctionNames._Hist_RedOptions_CPP)
 if algorithmName = "History_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._History_Basics_CPP)

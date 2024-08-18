@@ -11,6 +11,5 @@
     <ClInclude Include="CPP_AI_Generated.h" />
     <ClInclude Include="PragmaLibs.h" />
     <ClInclude Include="Options.h" />
-    <ClInclude Include="CvHMM.h" />
   </ItemGroup>
 </Project>

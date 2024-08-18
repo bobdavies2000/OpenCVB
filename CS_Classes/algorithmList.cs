@@ -644,6 +644,7 @@ namespace CS_Classes
 			if (algorithmName == "Hist_CompareNumber_CS") return new Hist_CompareNumber_CS(task);
 			if (algorithmName == "Hist_ComparePlot_CS") return new Hist_ComparePlot_CS(task);
 			if (algorithmName == "Hist_Depth_CS") return new Hist_Depth_CS(task);
+			if (algorithmName == "Hist_DepthSimple_CS") return new Hist_DepthSimple_CS(task);
 			if (algorithmName == "Hist_EqualizeColor_CS") return new Hist_EqualizeColor_CS(task);
 			if (algorithmName == "Hist_EqualizeGray_CS") return new Hist_EqualizeGray_CS(task);
 			if (algorithmName == "Hist_FlatSurfaces_CS") return new Hist_FlatSurfaces_CS(task);
