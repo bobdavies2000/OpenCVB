@@ -681,7 +681,7 @@ Public Class VBtask : Implements IDisposable
         ' run any universal algorithms here
         task.IMU_RawAcceleration = task.IMU_Acceleration
         task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
-        task.IMU_AlphaFilter = task.gOptions.imu_Alpha
+        task.IMU_AlphaFilter = 0.5 '  task.gOptions.imu_Alpha
         grid.RunVB(task.color)
 
         If task.algName.StartsWith("CPP_") = False Then task.motionFlag = True

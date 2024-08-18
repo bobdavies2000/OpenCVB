@@ -23,9 +23,6 @@ Partial Class OptionsGlobal
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.MinMaxDepth = New System.Windows.Forms.GroupBox()
-        Me.IMU_Label = New System.Windows.Forms.Label()
-        Me.IMU_AlphaBar = New System.Windows.Forms.TrackBar()
-        Me.CameraMotionLabel = New System.Windows.Forms.Label()
         Me.TempSliderLabel = New System.Windows.Forms.Label()
         Me.DebugSlider = New System.Windows.Forms.TrackBar()
         Me.Label11 = New System.Windows.Forms.Label()
@@ -82,7 +79,6 @@ Partial Class OptionsGlobal
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
-        CType(Me.IMU_AlphaBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -98,9 +94,6 @@ Partial Class OptionsGlobal
         '
         'MinMaxDepth
         '
-        Me.MinMaxDepth.Controls.Add(Me.IMU_Label)
-        Me.MinMaxDepth.Controls.Add(Me.IMU_AlphaBar)
-        Me.MinMaxDepth.Controls.Add(Me.CameraMotionLabel)
         Me.MinMaxDepth.Controls.Add(Me.TempSliderLabel)
         Me.MinMaxDepth.Controls.Add(Me.DebugSlider)
         Me.MinMaxDepth.Controls.Add(Me.Label11)
@@ -120,73 +113,37 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.maxCount)
         Me.MinMaxDepth.Controls.Add(Me.MaxDepthBar)
         Me.MinMaxDepth.Controls.Add(Me.InrangeMaxLabel)
-        Me.MinMaxDepth.Location = New System.Drawing.Point(8, 32)
-        Me.MinMaxDepth.Margin = New System.Windows.Forms.Padding(2)
+        Me.MinMaxDepth.Location = New System.Drawing.Point(12, 49)
         Me.MinMaxDepth.Name = "MinMaxDepth"
-        Me.MinMaxDepth.Padding = New System.Windows.Forms.Padding(2)
-        Me.MinMaxDepth.Size = New System.Drawing.Size(560, 396)
+        Me.MinMaxDepth.Size = New System.Drawing.Size(840, 609)
         Me.MinMaxDepth.TabIndex = 0
         Me.MinMaxDepth.TabStop = False
         Me.MinMaxDepth.Text = "Global Sliders"
         '
-        'IMU_Label
-        '
-        Me.IMU_Label.AutoSize = True
-        Me.IMU_Label.Location = New System.Drawing.Point(482, 213)
-        Me.IMU_Label.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.IMU_Label.Name = "IMU_Label"
-        Me.IMU_Label.Size = New System.Drawing.Size(60, 13)
-        Me.IMU_Label.TabIndex = 59
-        Me.IMU_Label.Text = "IMU_Alpha"
-        '
-        'IMU_AlphaBar
-        '
-        Me.IMU_AlphaBar.Location = New System.Drawing.Point(141, 213)
-        Me.IMU_AlphaBar.Margin = New System.Windows.Forms.Padding(2)
-        Me.IMU_AlphaBar.Maximum = 100
-        Me.IMU_AlphaBar.Name = "IMU_AlphaBar"
-        Me.IMU_AlphaBar.Size = New System.Drawing.Size(337, 45)
-        Me.IMU_AlphaBar.TabIndex = 58
-        Me.IMU_AlphaBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.IMU_AlphaBar.Value = 50
-        '
-        'CameraMotionLabel
-        '
-        Me.CameraMotionLabel.Location = New System.Drawing.Point(5, 200)
-        Me.CameraMotionLabel.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.CameraMotionLabel.Name = "CameraMotionLabel"
-        Me.CameraMotionLabel.Size = New System.Drawing.Size(124, 45)
-        Me.CameraMotionLabel.TabIndex = 57
-        Me.CameraMotionLabel.Text = "IMU Alpha Factor - high-pass and low-pass filter of IMU acceleration"
-        Me.CameraMotionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
         'TempSliderLabel
         '
         Me.TempSliderLabel.AutoSize = True
-        Me.TempSliderLabel.Location = New System.Drawing.Point(482, 332)
-        Me.TempSliderLabel.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.TempSliderLabel.Location = New System.Drawing.Point(723, 511)
         Me.TempSliderLabel.Name = "TempSliderLabel"
-        Me.TempSliderLabel.Size = New System.Drawing.Size(67, 13)
+        Me.TempSliderLabel.Size = New System.Drawing.Size(99, 20)
         Me.TempSliderLabel.TabIndex = 56
         Me.TempSliderLabel.Text = "debug Value"
         '
         'DebugSlider
         '
-        Me.DebugSlider.Location = New System.Drawing.Point(141, 332)
-        Me.DebugSlider.Margin = New System.Windows.Forms.Padding(2)
+        Me.DebugSlider.Location = New System.Drawing.Point(212, 511)
         Me.DebugSlider.Maximum = 100
         Me.DebugSlider.Minimum = -100
         Me.DebugSlider.Name = "DebugSlider"
-        Me.DebugSlider.Size = New System.Drawing.Size(337, 45)
+        Me.DebugSlider.Size = New System.Drawing.Size(506, 69)
         Me.DebugSlider.TabIndex = 55
         Me.DebugSlider.TickStyle = System.Windows.Forms.TickStyle.None
         '
         'Label11
         '
-        Me.Label11.Location = New System.Drawing.Point(37, 332)
-        Me.Label11.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label11.Location = New System.Drawing.Point(56, 511)
         Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(91, 36)
+        Me.Label11.Size = New System.Drawing.Size(136, 55)
         Me.Label11.TabIndex = 54
         Me.Label11.Text = "DebugSlider"
         Me.Label11.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -194,31 +151,28 @@ Partial Class OptionsGlobal
         'fHist
         '
         Me.fHist.AutoSize = True
-        Me.fHist.Location = New System.Drawing.Point(482, 172)
-        Me.fHist.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.fHist.Location = New System.Drawing.Point(723, 265)
         Me.fHist.Name = "fHist"
-        Me.fHist.Size = New System.Drawing.Size(31, 13)
+        Me.fHist.Size = New System.Drawing.Size(47, 20)
         Me.fHist.TabIndex = 53
         Me.fHist.Text = "FHist"
         '
         'FrameHistory
         '
-        Me.FrameHistory.Location = New System.Drawing.Point(141, 172)
-        Me.FrameHistory.Margin = New System.Windows.Forms.Padding(2)
+        Me.FrameHistory.Location = New System.Drawing.Point(212, 265)
         Me.FrameHistory.Maximum = 30
         Me.FrameHistory.Minimum = 1
         Me.FrameHistory.Name = "FrameHistory"
-        Me.FrameHistory.Size = New System.Drawing.Size(337, 45)
+        Me.FrameHistory.Size = New System.Drawing.Size(506, 69)
         Me.FrameHistory.TabIndex = 52
         Me.FrameHistory.TickStyle = System.Windows.Forms.TickStyle.None
         Me.FrameHistory.Value = 5
         '
         'Label12
         '
-        Me.Label12.Location = New System.Drawing.Point(37, 172)
-        Me.Label12.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label12.Location = New System.Drawing.Point(56, 265)
         Me.Label12.Name = "Label12"
-        Me.Label12.Size = New System.Drawing.Size(91, 36)
+        Me.Label12.Size = New System.Drawing.Size(136, 55)
         Me.Label12.TabIndex = 51
         Me.Label12.Text = "Frame History"
         Me.Label12.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -226,40 +180,36 @@ Partial Class OptionsGlobal
         'PixelDiff
         '
         Me.PixelDiff.AutoSize = True
-        Me.PixelDiff.Location = New System.Drawing.Point(482, 132)
-        Me.PixelDiff.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.PixelDiff.Location = New System.Drawing.Point(723, 203)
         Me.PixelDiff.Name = "PixelDiff"
-        Me.PixelDiff.Size = New System.Drawing.Size(40, 13)
+        Me.PixelDiff.Size = New System.Drawing.Size(59, 20)
         Me.PixelDiff.TabIndex = 50
         Me.PixelDiff.Text = "BPbins"
         '
         'PixelDiffBar
         '
-        Me.PixelDiffBar.Location = New System.Drawing.Point(141, 132)
-        Me.PixelDiffBar.Margin = New System.Windows.Forms.Padding(2)
+        Me.PixelDiffBar.Location = New System.Drawing.Point(212, 203)
         Me.PixelDiffBar.Maximum = 50
         Me.PixelDiffBar.Name = "PixelDiffBar"
-        Me.PixelDiffBar.Size = New System.Drawing.Size(337, 45)
+        Me.PixelDiffBar.Size = New System.Drawing.Size(506, 69)
         Me.PixelDiffBar.TabIndex = 49
         Me.PixelDiffBar.TickStyle = System.Windows.Forms.TickStyle.None
         Me.PixelDiffBar.Value = 25
         '
         'Label7
         '
-        Me.Label7.Location = New System.Drawing.Point(37, 132)
-        Me.Label7.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label7.Location = New System.Drawing.Point(56, 203)
         Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(91, 36)
+        Me.Label7.Size = New System.Drawing.Size(136, 55)
         Me.Label7.TabIndex = 48
         Me.Label7.Text = "Pixel Difference Threshold"
         Me.Label7.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'DebugCheckBox
         '
-        Me.DebugCheckBox.Location = New System.Drawing.Point(69, 373)
-        Me.DebugCheckBox.Margin = New System.Windows.Forms.Padding(2)
+        Me.DebugCheckBox.Location = New System.Drawing.Point(104, 574)
         Me.DebugCheckBox.Name = "DebugCheckBox"
-        Me.DebugCheckBox.Size = New System.Drawing.Size(439, 23)
+        Me.DebugCheckBox.Size = New System.Drawing.Size(658, 35)
         Me.DebugCheckBox.TabIndex = 56
         Me.DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use anywhere as a toggle"
         Me.DebugCheckBox.UseVisualStyleBackColor = True
@@ -267,21 +217,19 @@ Partial Class OptionsGlobal
         'labelBinsCount
         '
         Me.labelBinsCount.AutoSize = True
-        Me.labelBinsCount.Location = New System.Drawing.Point(482, 92)
-        Me.labelBinsCount.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.labelBinsCount.Location = New System.Drawing.Point(723, 142)
         Me.labelBinsCount.Name = "labelBinsCount"
-        Me.labelBinsCount.Size = New System.Drawing.Size(45, 13)
+        Me.labelBinsCount.Size = New System.Drawing.Size(68, 20)
         Me.labelBinsCount.TabIndex = 44
         Me.labelBinsCount.Text = "HistBins"
         '
         'HistBinBar
         '
-        Me.HistBinBar.Location = New System.Drawing.Point(141, 92)
-        Me.HistBinBar.Margin = New System.Windows.Forms.Padding(2)
+        Me.HistBinBar.Location = New System.Drawing.Point(212, 142)
         Me.HistBinBar.Maximum = 1000
         Me.HistBinBar.Minimum = 3
         Me.HistBinBar.Name = "HistBinBar"
-        Me.HistBinBar.Size = New System.Drawing.Size(337, 45)
+        Me.HistBinBar.Size = New System.Drawing.Size(506, 69)
         Me.HistBinBar.TabIndex = 43
         Me.HistBinBar.TickStyle = System.Windows.Forms.TickStyle.None
         Me.HistBinBar.Value = 40
@@ -289,10 +237,9 @@ Partial Class OptionsGlobal
         'labelbins
         '
         Me.labelbins.AutoSize = True
-        Me.labelbins.Location = New System.Drawing.Point(51, 92)
-        Me.labelbins.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.labelbins.Location = New System.Drawing.Point(76, 142)
         Me.labelbins.Name = "labelbins"
-        Me.labelbins.Size = New System.Drawing.Size(77, 13)
+        Me.labelbins.Size = New System.Drawing.Size(117, 20)
         Me.labelbins.TabIndex = 42
         Me.labelbins.Text = "Histogram Bins"
         Me.labelbins.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -300,21 +247,19 @@ Partial Class OptionsGlobal
         'ThreadGridSize
         '
         Me.ThreadGridSize.AutoSize = True
-        Me.ThreadGridSize.Location = New System.Drawing.Point(482, 53)
-        Me.ThreadGridSize.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.ThreadGridSize.Location = New System.Drawing.Point(723, 82)
         Me.ThreadGridSize.Name = "ThreadGridSize"
-        Me.ThreadGridSize.Size = New System.Drawing.Size(27, 13)
+        Me.ThreadGridSize.Size = New System.Drawing.Size(40, 20)
         Me.ThreadGridSize.TabIndex = 32
         Me.ThreadGridSize.Text = "Size"
         '
         'GridSlider
         '
-        Me.GridSlider.Location = New System.Drawing.Point(141, 53)
-        Me.GridSlider.Margin = New System.Windows.Forms.Padding(2)
+        Me.GridSlider.Location = New System.Drawing.Point(212, 82)
         Me.GridSlider.Maximum = 300
         Me.GridSlider.Minimum = 2
         Me.GridSlider.Name = "GridSlider"
-        Me.GridSlider.Size = New System.Drawing.Size(337, 45)
+        Me.GridSlider.Size = New System.Drawing.Size(506, 69)
         Me.GridSlider.TabIndex = 31
         Me.GridSlider.TickStyle = System.Windows.Forms.TickStyle.None
         Me.GridSlider.Value = 3
@@ -322,10 +267,9 @@ Partial Class OptionsGlobal
         'Label9
         '
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(51, 53)
-        Me.Label9.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label9.Location = New System.Drawing.Point(76, 82)
         Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(86, 13)
+        Me.Label9.Size = New System.Drawing.Size(130, 20)
         Me.Label9.TabIndex = 30
         Me.Label9.Text = "Grid Square Size"
         Me.Label9.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -333,21 +277,19 @@ Partial Class OptionsGlobal
         'maxCount
         '
         Me.maxCount.AutoSize = True
-        Me.maxCount.Location = New System.Drawing.Point(482, 23)
-        Me.maxCount.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.maxCount.Location = New System.Drawing.Point(723, 35)
         Me.maxCount.Name = "maxCount"
-        Me.maxCount.Size = New System.Drawing.Size(54, 13)
+        Me.maxCount.Size = New System.Drawing.Size(81, 20)
         Me.maxCount.TabIndex = 5
         Me.maxCount.Text = "maxCount"
         '
         'MaxDepthBar
         '
-        Me.MaxDepthBar.Location = New System.Drawing.Point(141, 19)
-        Me.MaxDepthBar.Margin = New System.Windows.Forms.Padding(2)
+        Me.MaxDepthBar.Location = New System.Drawing.Point(212, 29)
         Me.MaxDepthBar.Maximum = 25
         Me.MaxDepthBar.Minimum = 1
         Me.MaxDepthBar.Name = "MaxDepthBar"
-        Me.MaxDepthBar.Size = New System.Drawing.Size(337, 45)
+        Me.MaxDepthBar.Size = New System.Drawing.Size(506, 69)
         Me.MaxDepthBar.TabIndex = 4
         Me.MaxDepthBar.TickStyle = System.Windows.Forms.TickStyle.None
         Me.MaxDepthBar.Value = 5
@@ -355,10 +297,9 @@ Partial Class OptionsGlobal
         'InrangeMaxLabel
         '
         Me.InrangeMaxLabel.AutoSize = True
-        Me.InrangeMaxLabel.Location = New System.Drawing.Point(43, 23)
-        Me.InrangeMaxLabel.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.InrangeMaxLabel.Location = New System.Drawing.Point(64, 35)
         Me.InrangeMaxLabel.Name = "InrangeMaxLabel"
-        Me.InrangeMaxLabel.Size = New System.Drawing.Size(99, 13)
+        Me.InrangeMaxLabel.Size = New System.Drawing.Size(149, 20)
         Me.InrangeMaxLabel.TabIndex = 3
         Me.InrangeMaxLabel.Text = "Max Depth (meters)"
         '
@@ -387,11 +328,9 @@ Partial Class OptionsGlobal
         Me.GroupBox2.Controls.Add(Me.displayDst0)
         Me.GroupBox2.Controls.Add(Me.GeometrySettings)
         Me.GroupBox2.Controls.Add(Me.UseKalman)
-        Me.GroupBox2.Location = New System.Drawing.Point(569, 32)
-        Me.GroupBox2.Margin = New System.Windows.Forms.Padding(2)
+        Me.GroupBox2.Location = New System.Drawing.Point(854, 49)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox2.Size = New System.Drawing.Size(559, 396)
+        Me.GroupBox2.Size = New System.Drawing.Size(838, 609)
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
@@ -399,20 +338,18 @@ Partial Class OptionsGlobal
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(272, 112)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label1.Location = New System.Drawing.Point(408, 172)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(75, 13)
+        Me.Label1.Size = New System.Drawing.Size(112, 20)
         Me.Label1.TabIndex = 73
         Me.Label1.Text = "Highlight Color"
         '
         'HighlightColor
         '
         Me.HighlightColor.FormattingEnabled = True
-        Me.HighlightColor.Location = New System.Drawing.Point(352, 109)
-        Me.HighlightColor.Margin = New System.Windows.Forms.Padding(2)
+        Me.HighlightColor.Location = New System.Drawing.Point(528, 168)
         Me.HighlightColor.Name = "HighlightColor"
-        Me.HighlightColor.Size = New System.Drawing.Size(81, 21)
+        Me.HighlightColor.Size = New System.Drawing.Size(120, 28)
         Me.HighlightColor.TabIndex = 72
         '
         'CrossHairs
@@ -420,10 +357,9 @@ Partial Class OptionsGlobal
         Me.CrossHairs.AutoSize = True
         Me.CrossHairs.Checked = True
         Me.CrossHairs.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CrossHairs.Location = New System.Drawing.Point(16, 153)
-        Me.CrossHairs.Margin = New System.Windows.Forms.Padding(2)
+        Me.CrossHairs.Location = New System.Drawing.Point(24, 235)
         Me.CrossHairs.Name = "CrossHairs"
-        Me.CrossHairs.Size = New System.Drawing.Size(103, 17)
+        Me.CrossHairs.Size = New System.Drawing.Size(151, 24)
         Me.CrossHairs.TabIndex = 71
         Me.CrossHairs.Text = "Show crosshairs"
         Me.CrossHairs.UseVisualStyleBackColor = True
@@ -431,10 +367,9 @@ Partial Class OptionsGlobal
         'ShowMotionRectangle
         '
         Me.ShowMotionRectangle.AutoSize = True
-        Me.ShowMotionRectangle.Location = New System.Drawing.Point(16, 134)
-        Me.ShowMotionRectangle.Margin = New System.Windows.Forms.Padding(2)
+        Me.ShowMotionRectangle.Location = New System.Drawing.Point(24, 206)
         Me.ShowMotionRectangle.Name = "ShowMotionRectangle"
-        Me.ShowMotionRectangle.Size = New System.Drawing.Size(186, 17)
+        Me.ShowMotionRectangle.Size = New System.Drawing.Size(275, 24)
         Me.ShowMotionRectangle.TabIndex = 70
         Me.ShowMotionRectangle.Text = "Show the motion rectangle in dst0"
         Me.ShowMotionRectangle.UseVisualStyleBackColor = True
@@ -446,11 +381,9 @@ Partial Class OptionsGlobal
         Me.GroupBox1.Controls.Add(Me.UseHistoryCloud)
         Me.GroupBox1.Controls.Add(Me.MotionFilteredCloudOnly)
         Me.GroupBox1.Controls.Add(Me.unFiltered)
-        Me.GroupBox1.Location = New System.Drawing.Point(244, 166)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(2)
+        Me.GroupBox1.Location = New System.Drawing.Point(366, 255)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox1.Size = New System.Drawing.Size(204, 121)
+        Me.GroupBox1.Size = New System.Drawing.Size(306, 186)
         Me.GroupBox1.TabIndex = 69
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Color and PointCloud Input"
@@ -458,10 +391,9 @@ Partial Class OptionsGlobal
         'MotionFilteredColorOnly
         '
         Me.MotionFilteredColorOnly.AutoSize = True
-        Me.MotionFilteredColorOnly.Location = New System.Drawing.Point(15, 54)
-        Me.MotionFilteredColorOnly.Margin = New System.Windows.Forms.Padding(2)
+        Me.MotionFilteredColorOnly.Location = New System.Drawing.Point(22, 83)
         Me.MotionFilteredColorOnly.Name = "MotionFilteredColorOnly"
-        Me.MotionFilteredColorOnly.Size = New System.Drawing.Size(145, 17)
+        Me.MotionFilteredColorOnly.Size = New System.Drawing.Size(215, 24)
         Me.MotionFilteredColorOnly.TabIndex = 4
         Me.MotionFilteredColorOnly.TabStop = True
         Me.MotionFilteredColorOnly.Text = "Motion Filtered Color Only"
@@ -470,10 +402,9 @@ Partial Class OptionsGlobal
         'MotionFilteredColorAndCloud
         '
         Me.MotionFilteredColorAndCloud.AutoSize = True
-        Me.MotionFilteredColorAndCloud.Location = New System.Drawing.Point(15, 73)
-        Me.MotionFilteredColorAndCloud.Margin = New System.Windows.Forms.Padding(2)
+        Me.MotionFilteredColorAndCloud.Location = New System.Drawing.Point(22, 112)
         Me.MotionFilteredColorAndCloud.Name = "MotionFilteredColorAndCloud"
-        Me.MotionFilteredColorAndCloud.Size = New System.Drawing.Size(172, 17)
+        Me.MotionFilteredColorAndCloud.Size = New System.Drawing.Size(256, 24)
         Me.MotionFilteredColorAndCloud.TabIndex = 3
         Me.MotionFilteredColorAndCloud.TabStop = True
         Me.MotionFilteredColorAndCloud.Text = "Motion Filtered Color and Cloud"
@@ -482,10 +413,9 @@ Partial Class OptionsGlobal
         'UseHistoryCloud
         '
         Me.UseHistoryCloud.AutoSize = True
-        Me.UseHistoryCloud.Location = New System.Drawing.Point(15, 94)
-        Me.UseHistoryCloud.Margin = New System.Windows.Forms.Padding(2)
+        Me.UseHistoryCloud.Location = New System.Drawing.Point(22, 145)
         Me.UseHistoryCloud.Name = "UseHistoryCloud"
-        Me.UseHistoryCloud.Size = New System.Drawing.Size(165, 17)
+        Me.UseHistoryCloud.Size = New System.Drawing.Size(244, 24)
         Me.UseHistoryCloud.TabIndex = 2
         Me.UseHistoryCloud.TabStop = True
         Me.UseHistoryCloud.Text = "History PointCloud (averaged)"
@@ -494,10 +424,9 @@ Partial Class OptionsGlobal
         'MotionFilteredCloudOnly
         '
         Me.MotionFilteredCloudOnly.AutoSize = True
-        Me.MotionFilteredCloudOnly.Location = New System.Drawing.Point(14, 34)
-        Me.MotionFilteredCloudOnly.Margin = New System.Windows.Forms.Padding(2)
+        Me.MotionFilteredCloudOnly.Location = New System.Drawing.Point(21, 52)
         Me.MotionFilteredCloudOnly.Name = "MotionFilteredCloudOnly"
-        Me.MotionFilteredCloudOnly.Size = New System.Drawing.Size(148, 17)
+        Me.MotionFilteredCloudOnly.Size = New System.Drawing.Size(219, 24)
         Me.MotionFilteredCloudOnly.TabIndex = 1
         Me.MotionFilteredCloudOnly.TabStop = True
         Me.MotionFilteredCloudOnly.Text = "Motion Filtered Cloud Only"
@@ -506,10 +435,9 @@ Partial Class OptionsGlobal
         'unFiltered
         '
         Me.unFiltered.AutoSize = True
-        Me.unFiltered.Location = New System.Drawing.Point(14, 15)
-        Me.unFiltered.Margin = New System.Windows.Forms.Padding(2)
+        Me.unFiltered.Location = New System.Drawing.Point(21, 23)
         Me.unFiltered.Name = "unFiltered"
-        Me.unFiltered.Size = New System.Drawing.Size(96, 17)
+        Me.unFiltered.Size = New System.Drawing.Size(142, 24)
         Me.unFiltered.TabIndex = 0
         Me.unFiltered.TabStop = True
         Me.unFiltered.Text = "Unfiltered (raw)"
@@ -518,10 +446,9 @@ Partial Class OptionsGlobal
         'ShowGrid
         '
         Me.ShowGrid.AutoSize = True
-        Me.ShowGrid.Location = New System.Drawing.Point(16, 77)
-        Me.ShowGrid.Margin = New System.Windows.Forms.Padding(2)
+        Me.ShowGrid.Location = New System.Drawing.Point(24, 118)
         Me.ShowGrid.Name = "ShowGrid"
-        Me.ShowGrid.Size = New System.Drawing.Size(138, 17)
+        Me.ShowGrid.Size = New System.Drawing.Size(200, 24)
         Me.ShowGrid.TabIndex = 67
         Me.ShowGrid.Text = "Show grid mask overlay"
         Me.ShowGrid.UseVisualStyleBackColor = True
@@ -529,10 +456,9 @@ Partial Class OptionsGlobal
         'debugSyncUI
         '
         Me.debugSyncUI.AutoSize = True
-        Me.debugSyncUI.Location = New System.Drawing.Point(16, 96)
-        Me.debugSyncUI.Margin = New System.Windows.Forms.Padding(2)
+        Me.debugSyncUI.Location = New System.Drawing.Point(24, 148)
         Me.debugSyncUI.Name = "debugSyncUI"
-        Me.debugSyncUI.Size = New System.Drawing.Size(178, 17)
+        Me.debugSyncUI.Size = New System.Drawing.Size(261, 24)
         Me.debugSyncUI.TabIndex = 66
         Me.debugSyncUI.Text = "Synchronize Debug with Display"
         Me.debugSyncUI.UseVisualStyleBackColor = True
@@ -540,10 +466,9 @@ Partial Class OptionsGlobal
         'UseMultiThreading
         '
         Me.UseMultiThreading.AutoSize = True
-        Me.UseMultiThreading.Location = New System.Drawing.Point(16, 250)
-        Me.UseMultiThreading.Margin = New System.Windows.Forms.Padding(2)
+        Me.UseMultiThreading.Location = New System.Drawing.Point(24, 385)
         Me.UseMultiThreading.Name = "UseMultiThreading"
-        Me.UseMultiThreading.Size = New System.Drawing.Size(169, 17)
+        Me.UseMultiThreading.Size = New System.Drawing.Size(253, 24)
         Me.UseMultiThreading.TabIndex = 65
         Me.UseMultiThreading.Text = "Use Multi-threading (if present)"
         Me.UseMultiThreading.UseVisualStyleBackColor = True
@@ -552,10 +477,9 @@ Partial Class OptionsGlobal
         'ShowAllOptions
         '
         Me.ShowAllOptions.AutoSize = True
-        Me.ShowAllOptions.Location = New System.Drawing.Point(16, 58)
-        Me.ShowAllOptions.Margin = New System.Windows.Forms.Padding(2)
+        Me.ShowAllOptions.Location = New System.Drawing.Point(24, 89)
         Me.ShowAllOptions.Name = "ShowAllOptions"
-        Me.ShowAllOptions.Size = New System.Drawing.Size(150, 17)
+        Me.ShowAllOptions.Size = New System.Drawing.Size(220, 24)
         Me.ShowAllOptions.TabIndex = 64
         Me.ShowAllOptions.Text = "Show All Options on Open"
         Me.ShowAllOptions.UseVisualStyleBackColor = True
@@ -563,10 +487,9 @@ Partial Class OptionsGlobal
         'OpenGLCapture
         '
         Me.OpenGLCapture.AutoSize = True
-        Me.OpenGLCapture.Location = New System.Drawing.Point(16, 270)
-        Me.OpenGLCapture.Margin = New System.Windows.Forms.Padding(2)
+        Me.OpenGLCapture.Location = New System.Drawing.Point(24, 415)
         Me.OpenGLCapture.Name = "OpenGLCapture"
-        Me.OpenGLCapture.Size = New System.Drawing.Size(142, 17)
+        Me.OpenGLCapture.Size = New System.Drawing.Size(211, 24)
         Me.OpenGLCapture.TabIndex = 58
         Me.OpenGLCapture.Text = "Capture OpenGL output "
         Me.OpenGLCapture.UseVisualStyleBackColor = True
@@ -575,19 +498,19 @@ Partial Class OptionsGlobal
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(307, 62)
+        Me.Label2.Location = New System.Drawing.Point(460, 95)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(40, 13)
+        Me.Label2.Size = New System.Drawing.Size(59, 20)
         Me.Label2.TabIndex = 55
         Me.Label2.Text = "Palette"
         '
         'CreateGif
         '
         Me.CreateGif.AutoSize = True
-        Me.CreateGif.Location = New System.Drawing.Point(16, 116)
-        Me.CreateGif.Margin = New System.Windows.Forms.Padding(2)
+        Me.CreateGif.Location = New System.Drawing.Point(24, 178)
         Me.CreateGif.Name = "CreateGif"
-        Me.CreateGif.Size = New System.Drawing.Size(170, 17)
+        Me.CreateGif.Size = New System.Drawing.Size(256, 24)
         Me.CreateGif.TabIndex = 24
         Me.CreateGif.Text = "Create GIF of current algorithm"
         Me.CreateGif.UseVisualStyleBackColor = True
@@ -595,19 +518,17 @@ Partial Class OptionsGlobal
         'Palettes
         '
         Me.Palettes.FormattingEnabled = True
-        Me.Palettes.Location = New System.Drawing.Point(352, 59)
-        Me.Palettes.Margin = New System.Windows.Forms.Padding(2)
+        Me.Palettes.Location = New System.Drawing.Point(528, 91)
         Me.Palettes.Name = "Palettes"
-        Me.Palettes.Size = New System.Drawing.Size(99, 21)
+        Me.Palettes.Size = New System.Drawing.Size(146, 28)
         Me.Palettes.TabIndex = 54
         '
         'gravityPointCloud
         '
         Me.gravityPointCloud.AutoSize = True
-        Me.gravityPointCloud.Location = New System.Drawing.Point(16, 187)
-        Me.gravityPointCloud.Margin = New System.Windows.Forms.Padding(2)
+        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 288)
         Me.gravityPointCloud.Name = "gravityPointCloud"
-        Me.gravityPointCloud.Size = New System.Drawing.Size(199, 17)
+        Me.gravityPointCloud.Size = New System.Drawing.Size(294, 24)
         Me.gravityPointCloud.TabIndex = 23
         Me.gravityPointCloud.Text = "Apply gravity transform to point cloud"
         Me.gravityPointCloud.UseVisualStyleBackColor = True
@@ -615,29 +536,26 @@ Partial Class OptionsGlobal
         'Label10
         '
         Me.Label10.AutoSize = True
-        Me.Label10.Location = New System.Drawing.Point(360, 18)
-        Me.Label10.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label10.Location = New System.Drawing.Point(540, 28)
         Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(60, 13)
+        Me.Label10.Size = New System.Drawing.Size(92, 20)
         Me.Label10.TabIndex = 20
         Me.Label10.Text = "RGB Filters"
         '
         'RGBFilterList
         '
         Me.RGBFilterList.FormattingEnabled = True
-        Me.RGBFilterList.Location = New System.Drawing.Point(352, 34)
-        Me.RGBFilterList.Margin = New System.Windows.Forms.Padding(2)
+        Me.RGBFilterList.Location = New System.Drawing.Point(528, 52)
         Me.RGBFilterList.Name = "RGBFilterList"
-        Me.RGBFilterList.Size = New System.Drawing.Size(193, 21)
+        Me.RGBFilterList.Size = New System.Drawing.Size(288, 28)
         Me.RGBFilterList.TabIndex = 19
         '
         'RGBFilterActive
         '
         Me.RGBFilterActive.AutoSize = True
-        Me.RGBFilterActive.Location = New System.Drawing.Point(254, 36)
-        Me.RGBFilterActive.Margin = New System.Windows.Forms.Padding(2)
+        Me.RGBFilterActive.Location = New System.Drawing.Point(381, 55)
         Me.RGBFilterActive.Name = "RGBFilterActive"
-        Me.RGBFilterActive.Size = New System.Drawing.Size(93, 17)
+        Me.RGBFilterActive.Size = New System.Drawing.Size(138, 24)
         Me.RGBFilterActive.TabIndex = 16
         Me.RGBFilterActive.Text = "Use RGB filter"
         Me.RGBFilterActive.UseVisualStyleBackColor = True
@@ -645,29 +563,26 @@ Partial Class OptionsGlobal
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(294, 87)
-        Me.Label5.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label5.Location = New System.Drawing.Point(441, 134)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(54, 13)
+        Me.Label5.Size = New System.Drawing.Size(77, 20)
         Me.Label5.TabIndex = 15
         Me.Label5.Text = "Line Type"
         '
         'LineType
         '
         Me.LineType.FormattingEnabled = True
-        Me.LineType.Location = New System.Drawing.Point(352, 84)
-        Me.LineType.Margin = New System.Windows.Forms.Padding(2)
+        Me.LineType.Location = New System.Drawing.Point(528, 129)
         Me.LineType.Name = "LineType"
-        Me.LineType.Size = New System.Drawing.Size(81, 21)
+        Me.LineType.Size = New System.Drawing.Size(120, 28)
         Me.LineType.TabIndex = 14
         '
         'displayDst1
         '
         Me.displayDst1.AutoSize = True
-        Me.displayDst1.Location = New System.Drawing.Point(16, 39)
-        Me.displayDst1.Margin = New System.Windows.Forms.Padding(2)
+        Me.displayDst1.Location = New System.Drawing.Point(24, 60)
         Me.displayDst1.Name = "displayDst1"
-        Me.displayDst1.Size = New System.Drawing.Size(109, 17)
+        Me.displayDst1.Size = New System.Drawing.Size(160, 24)
         Me.displayDst1.TabIndex = 4
         Me.displayDst1.Text = "Show dst1 output"
         Me.displayDst1.UseVisualStyleBackColor = True
@@ -675,10 +590,9 @@ Partial Class OptionsGlobal
         'displayDst0
         '
         Me.displayDst0.AutoSize = True
-        Me.displayDst0.Location = New System.Drawing.Point(16, 20)
-        Me.displayDst0.Margin = New System.Windows.Forms.Padding(2)
+        Me.displayDst0.Location = New System.Drawing.Point(24, 31)
         Me.displayDst0.Name = "displayDst0"
-        Me.displayDst0.Size = New System.Drawing.Size(109, 17)
+        Me.displayDst0.Size = New System.Drawing.Size(160, 24)
         Me.displayDst0.TabIndex = 3
         Me.displayDst0.Text = "Show dst0 output"
         Me.displayDst0.UseVisualStyleBackColor = True
@@ -691,11 +605,9 @@ Partial Class OptionsGlobal
         Me.GeometrySettings.Controls.Add(Me.LineThicknessAmount)
         Me.GeometrySettings.Controls.Add(Me.LineWidth)
         Me.GeometrySettings.Controls.Add(Me.LineSizeLabel)
-        Me.GeometrySettings.Location = New System.Drawing.Point(3, 291)
-        Me.GeometrySettings.Margin = New System.Windows.Forms.Padding(2)
+        Me.GeometrySettings.Location = New System.Drawing.Point(4, 448)
         Me.GeometrySettings.Name = "GeometrySettings"
-        Me.GeometrySettings.Padding = New System.Windows.Forms.Padding(2)
-        Me.GeometrySettings.Size = New System.Drawing.Size(544, 101)
+        Me.GeometrySettings.Size = New System.Drawing.Size(816, 155)
         Me.GeometrySettings.TabIndex = 2
         Me.GeometrySettings.TabStop = False
         Me.GeometrySettings.Text = "Geometry"
@@ -703,20 +615,18 @@ Partial Class OptionsGlobal
         'DotSizeLabel
         '
         Me.DotSizeLabel.AutoSize = True
-        Me.DotSizeLabel.Location = New System.Drawing.Point(476, 66)
-        Me.DotSizeLabel.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.DotSizeLabel.Location = New System.Drawing.Point(714, 102)
         Me.DotSizeLabel.Name = "DotSizeLabel"
-        Me.DotSizeLabel.Size = New System.Drawing.Size(70, 13)
+        Me.DotSizeLabel.Size = New System.Drawing.Size(105, 20)
         Me.DotSizeLabel.TabIndex = 8
         Me.DotSizeLabel.Text = "DotSizeLabel"
         '
         'DotSizeSlider
         '
-        Me.DotSizeSlider.Location = New System.Drawing.Point(138, 64)
-        Me.DotSizeSlider.Margin = New System.Windows.Forms.Padding(2)
+        Me.DotSizeSlider.Location = New System.Drawing.Point(207, 98)
         Me.DotSizeSlider.Minimum = 1
         Me.DotSizeSlider.Name = "DotSizeSlider"
-        Me.DotSizeSlider.Size = New System.Drawing.Size(337, 45)
+        Me.DotSizeSlider.Size = New System.Drawing.Size(506, 69)
         Me.DotSizeSlider.TabIndex = 7
         Me.DotSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
         Me.DotSizeSlider.Value = 1
@@ -724,30 +634,27 @@ Partial Class OptionsGlobal
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(9, 68)
-        Me.Label3.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label3.Location = New System.Drawing.Point(14, 105)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(87, 13)
+        Me.Label3.Size = New System.Drawing.Size(129, 20)
         Me.Label3.TabIndex = 6
         Me.Label3.Text = "Dot Size in pixels"
         '
         'LineThicknessAmount
         '
         Me.LineThicknessAmount.AutoSize = True
-        Me.LineThicknessAmount.Location = New System.Drawing.Point(476, 23)
-        Me.LineThicknessAmount.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.LineThicknessAmount.Location = New System.Drawing.Point(714, 35)
         Me.LineThicknessAmount.Name = "LineThicknessAmount"
-        Me.LineThicknessAmount.Size = New System.Drawing.Size(112, 13)
+        Me.LineThicknessAmount.Size = New System.Drawing.Size(166, 20)
         Me.LineThicknessAmount.TabIndex = 5
         Me.LineThicknessAmount.Text = "LineThicknessAmount"
         '
         'LineWidth
         '
-        Me.LineWidth.Location = New System.Drawing.Point(138, 16)
-        Me.LineWidth.Margin = New System.Windows.Forms.Padding(2)
+        Me.LineWidth.Location = New System.Drawing.Point(207, 25)
         Me.LineWidth.Minimum = 1
         Me.LineWidth.Name = "LineWidth"
-        Me.LineWidth.Size = New System.Drawing.Size(337, 45)
+        Me.LineWidth.Size = New System.Drawing.Size(506, 69)
         Me.LineWidth.TabIndex = 4
         Me.LineWidth.TickStyle = System.Windows.Forms.TickStyle.None
         Me.LineWidth.Value = 1
@@ -755,20 +662,18 @@ Partial Class OptionsGlobal
         'LineSizeLabel
         '
         Me.LineSizeLabel.AutoSize = True
-        Me.LineSizeLabel.Location = New System.Drawing.Point(9, 23)
-        Me.LineSizeLabel.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.LineSizeLabel.Location = New System.Drawing.Point(14, 35)
         Me.LineSizeLabel.Name = "LineSizeLabel"
-        Me.LineSizeLabel.Size = New System.Drawing.Size(115, 13)
+        Me.LineSizeLabel.Size = New System.Drawing.Size(169, 20)
         Me.LineSizeLabel.TabIndex = 3
         Me.LineSizeLabel.Text = "Line thickness in pixels"
         '
         'UseKalman
         '
         Me.UseKalman.AutoSize = True
-        Me.UseKalman.Location = New System.Drawing.Point(16, 169)
-        Me.UseKalman.Margin = New System.Windows.Forms.Padding(2)
+        Me.UseKalman.Location = New System.Drawing.Point(24, 260)
         Me.UseKalman.Name = "UseKalman"
-        Me.UseKalman.Size = New System.Drawing.Size(119, 17)
+        Me.UseKalman.Size = New System.Drawing.Size(176, 24)
         Me.UseKalman.TabIndex = 0
         Me.UseKalman.Text = "Use Kalman filtering"
         Me.UseKalman.UseVisualStyleBackColor = True
@@ -776,10 +681,9 @@ Partial Class OptionsGlobal
         'Label8
         '
         Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(12, 6)
-        Me.Label8.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label8.Location = New System.Drawing.Point(18, 9)
         Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(602, 13)
+        Me.Label8.Size = New System.Drawing.Size(895, 20)
         Me.Label8.TabIndex = 39
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
@@ -787,19 +691,17 @@ Partial Class OptionsGlobal
         '
         'OptionsGlobal
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
-        Me.ClientSize = New System.Drawing.Size(1133, 439)
+        Me.ClientSize = New System.Drawing.Size(1700, 675)
         Me.Controls.Add(Me.Label8)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.MinMaxDepth)
-        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "OptionsGlobal"
         Me.Text = "All Algorithm Options - Use gOptions variable to access"
         Me.MinMaxDepth.ResumeLayout(False)
         Me.MinMaxDepth.PerformLayout()
-        CType(Me.IMU_AlphaBar, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).EndInit()
@@ -873,9 +775,6 @@ Partial Class OptionsGlobal
     Friend WithEvents MotionFilteredColorAndCloud As Windows.Forms.RadioButton
     Friend WithEvents ShowMotionRectangle As Windows.Forms.CheckBox
     Friend WithEvents CrossHairs As Windows.Forms.CheckBox
-    Friend WithEvents IMU_Label As Windows.Forms.Label
-    Friend WithEvents IMU_AlphaBar As Windows.Forms.TrackBar
-    Friend WithEvents CameraMotionLabel As Windows.Forms.Label
     Friend WithEvents Label1 As Windows.Forms.Label
     Friend WithEvents HighlightColor As Windows.Forms.ComboBox
 End Class

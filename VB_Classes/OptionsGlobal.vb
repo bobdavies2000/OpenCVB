@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsGlobal
-    Public imu_Alpha As Single
     Public maxDepth As Integer
     Public debugChecked As Boolean
     Public DebugSliderValue As Integer
@@ -239,11 +238,6 @@ Public Class OptionsGlobal
     End Sub
     Private Sub FrameHistory_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistory.ValueChanged
         fHist.Text = CStr(FrameHistory.Value)
-        If task IsNot Nothing Then task.optionsChanged = True
-    End Sub
-    Private Sub IMU_Alpha_ValueChanged(sender As Object, e As EventArgs) Handles IMU_AlphaBar.ValueChanged
-        IMU_Label.Text = CStr(IMU_AlphaBar.Value)
-        imu_Alpha = IMU_AlphaBar.Value / 100
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged
