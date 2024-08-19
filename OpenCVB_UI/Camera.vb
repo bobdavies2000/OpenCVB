@@ -70,7 +70,7 @@ Public Class Camera
         Next
     End Sub
     Public Sub New()
-        Dim cam As VB_Classes.VBtask.cameraInfo
+        Dim cam As VBtask.cameraInfo
         cameraInfo = cam
     End Sub
     Public Function vbMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
