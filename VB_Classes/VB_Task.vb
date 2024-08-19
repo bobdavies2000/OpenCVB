@@ -144,7 +144,6 @@ Public Class VBtask : Implements IDisposable
     Public recordTimings As Boolean = True
 
     Public HighlightColor As cv.Scalar ' color to use to highlight objects in an image.
-    Public activateTaskRequest As Boolean
 
     Public histogramBins As Integer
 
@@ -611,7 +610,6 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
             task.optionsChanged = False
             TaskTimer.Enabled = False
             task.frameCount += 1
@@ -675,7 +673,6 @@ Public Class VBtask : Implements IDisposable
             task.depthMask = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, cv.Scalar.All(0))
         End If
 
-        allOptions.TopMost = task.activateTaskRequest
         Application.DoEvents()
 
         ' run any universal algorithms here

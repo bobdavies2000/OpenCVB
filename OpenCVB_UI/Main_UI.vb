@@ -102,9 +102,6 @@ Public Class Main_UI
     Dim arrowIndex As Integer
 
     Public intermediateReview As String
-    Dim activateBlocked As Boolean
-    Dim activateTaskRequest As Boolean
-    Dim activateTreeView As Boolean
     Dim pixelViewerRect As cv.Rect
     Dim pixelViewTag As Integer
 
@@ -460,12 +457,6 @@ Public Class Main_UI
 
         XYLoc.Location = New Point(camPic(2).Left, camPic(2).Top + camPic(2).Height)
     End Sub
-    Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        If activateTreeView = False And activateBlocked = False Then
-            activateTaskRequest = True
-            activateTreeView = True
-        End If
-    End Sub
     Private Sub BluePlusButton_Click(sender As Object, e As EventArgs) Handles BluePlusButton.Click
         Dim OKcancel = InsertAlgorithm.ShowDialog()
     End Sub
@@ -684,18 +675,6 @@ Public Class Main_UI
             If testAllStartingRes < 0 And settings.resolutionsSupported(i) Then testAllStartingRes = i
             If settings.resolutionsSupported(i) Then testAllEndingRes = i
         Next
-    End Sub
-    Private Sub AvailableAlgorithms_DropDown(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDown
-        activateBlocked = True
-    End Sub
-    Private Sub AvailableAlgorithms_DropDownClosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
-        activateBlocked = False
-    End Sub
-    Private Sub GroupName_DropDown(sender As Object, e As EventArgs) Handles GroupName.DropDown
-        activateBlocked = True
-    End Sub
-    Private Sub GroupName_DropDownClosed(sender As Object, e As EventArgs) Handles GroupName.DropDownClosed
-        activateBlocked = False
     End Sub
     Private Sub setWorkingRes()
         Select Case settings.WorkingResIndex
@@ -996,11 +975,11 @@ Public Class Main_UI
             externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
         End If
 
-        PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
-        stopTest = New Bitmap(HomeDir.FullName + "OpenCVB/Data/StopTest.png")
-        complexityTest = New Bitmap(HomeDir.FullName + "OpenCVB/Data/complexity.jpg")
-        testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "OpenCVB/Data/testall.png")
-        runPlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButtonRun.png")
+        PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/PauseButton.png")
+        stopTest = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/StopTest.png")
+        complexityTest = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/complexity.jpg")
+        testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/testall.png")
+        runPlay = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/PauseButtonRun.png")
 
         setupAlgorithmHistory()
 
@@ -1125,20 +1104,6 @@ Public Class Main_UI
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
-
-        'Dim processThreads As ProcessThreadCollection = Process.GetCurrentProcess().Threads
-        'Dim threadCount As Integer
-        'For Each thread As ProcessThread In processThreads
-        '    If thread.StartTime > threadStartTime Then threadCount += 1
-        'Next
-
-        'Console.WriteLine("Thread count = " + CStr(threadCount))
-
-        If TreeButton.Checked And activateTreeView And activateBlocked = False Then
-            TreeViewDialog.Activate()
-            Me.Activate()
-            activateTreeView = False
-        End If
 
         If camera Is Nothing Then Exit Sub
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
@@ -1600,9 +1565,6 @@ Public Class Main_UI
                             task.CPU_TimeStamp = camera.CPU_TimeStamp
                             task.CPU_FrameTime = camera.CPU_FrameTime
                         End SyncLock
-
-                        task.activateTaskRequest = activateTaskRequest
-                        activateTaskRequest = False
 
                         Dim endCopyTime = Now
                         Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks

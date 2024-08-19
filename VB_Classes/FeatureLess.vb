@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits VB_Parent
-    Dim edgeD As New EdgeDraw_Basics
+    Dim edges As New EdgeDraw_Basics
     Public classCount As Integer = 2
     Public Sub New()
         labels = {"", "", "EdgeDraw_Basics output", ""}
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        edgeD.Run(src)
-        dst2 = edgeD.dst2
+        edges.Run(src)
+        dst2 = edges.dst2
         If standaloneTest() Then
             dst3 = src.Clone
             dst3.SetTo(cv.Scalar.Yellow, dst2)

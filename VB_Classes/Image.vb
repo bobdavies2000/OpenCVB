@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Drawing
 Imports cv = OpenCvSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
 Public Class Image_Basics : Inherits VB_Parent
@@ -133,5 +134,31 @@ Public Class Image_MSER : Inherits VB_Parent
         dst1 = images.dst2
         core.Run(dst1)
         dst2 = core.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Image_Icon : Inherits VB_Parent
+    Dim inputImage As bitmap
+    Public Sub New()
+        inputImage = New Bitmap(task.HomeDir + "/OpenCVB_UI/Data/OpenCVB.bmp")
+        desc = "Create an icon from an image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If inputImage Is Nothing Then Exit Sub
+        Dim iconHandle As IntPtr = inputImage.GetHicon()
+        Dim icon As Icon = Icon.FromHandle(iconHandle)
+
+        ' Save the icon to a file
+        Using fs As New FileStream(task.HomeDir + "/OpenCVB_UI/Data/OpenCVB.ico", FileMode.OpenOrCreate)
+            icon.Save(fs)
+        End Using
+        inputImage = Nothing
     End Sub
 End Class

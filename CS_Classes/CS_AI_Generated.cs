@@ -43218,18 +43218,16 @@ namespace CS_Classes
             int rgbBufferSize = rgbBuffer.Length > 1 ? rgbBuffer.Length : 0;
             int dataBufferSize = dataBuffer.Length > 1 ? dataBuffer.Length : 0;
             double showXYZaxis = 1;
-            double activateTask = task.activateTaskRequest ? 1 : 0;
             double[] memMapValues = {
-            task.frameCount, dst2.Width, dst2.Height, rgbBufferSize,
-            dataBufferSize, options.FOV, options.yaw, options.pitch, options.roll,
-            options.zNear, options.zFar, options.PointSizeSlider.Value, dataInput.Width, dataInput.Height,
-            task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z,
-            task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z, task.IMU_TimeStamp,
-            1, options.eye[0] / 100, options.eye[1] / 100, options.eye[2] / 100, options.zTrans,
-            options.scaleXYZ[0] / 10, options.scaleXYZ[1] / 10, options.scaleXYZ[2] / 10, timeConversionUnits, imuAlphaFactor,
-            task.OpenGLTitle.Length, pointCloudInput.Width, pointCloudInput.Height, oglFunction,
-            activateTask, showXYZaxis
-        };
+                task.frameCount, dst2.Width, dst2.Height, rgbBufferSize,
+                dataBufferSize, options.FOV, options.yaw, options.pitch, options.roll,
+                options.zNear, options.zFar, options.PointSizeSlider.Value, dataInput.Width, dataInput.Height,
+                task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z,
+                task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z, task.IMU_TimeStamp,
+                1, options.eye[0] / 100, options.eye[1] / 100, options.eye[2] / 100, options.zTrans,
+                options.scaleXYZ[0] / 10, options.scaleXYZ[1] / 10, options.scaleXYZ[2] / 10, timeConversionUnits, imuAlphaFactor,
+                task.OpenGLTitle.Length, pointCloudInput.Width, pointCloudInput.Height, oglFunction, showXYZaxis
+            };
             return memMapValues;
         }
         void MemMapUpdate()

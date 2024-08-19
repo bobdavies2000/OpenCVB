@@ -7,7 +7,13 @@
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
     <Platforms>AnyCPU;x64</Platforms>
+    <ApplicationIcon>Data\OpenCVB.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Data\OpenCVB_Icon.bmp" />
+    <Content Include="Data\OpenCVB.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <Import Include="System.Data" />

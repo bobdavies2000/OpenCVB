@@ -257,6 +257,7 @@ Partial Class Main_UI
         Controls.Add(AlgorithmDesc)
         Controls.Add(ToolStrip1)
         Controls.Add(MenuStrip1)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
         MainMenuStrip = MenuStrip1
         Name = "Main_UI"

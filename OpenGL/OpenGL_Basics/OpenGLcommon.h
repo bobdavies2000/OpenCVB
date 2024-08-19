@@ -300,14 +300,7 @@ static void readPipeAndMemMap()
 	if (pcBufferSize > 0)
 		ReadFile(pipe, pointCloudInput, (int)pcBufferSize, &dwRead, NULL);
 
-	if ((int)sharedMem[35]) // activateTaskRequest
-	{
-		SetWindowPos(myHwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	} else {
-		SetWindowPos(myHwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	}
-
-	showAxes = (bool)sharedMem[36];
+	showAxes = (bool)sharedMem[35];
 	ReadFile(pipe, imageLabel, imageLabelBufferSize, &dwRead, NULL);
 	imageLabel[imageLabelBufferSize] = 0;
 }

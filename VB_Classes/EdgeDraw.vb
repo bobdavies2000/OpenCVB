@@ -64,3 +64,23 @@ Public Class EdgeDraw_Segments : Inherits VB_Parent
         EdgeDraw_Lines_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class EdgeDraw_LeftRight : Inherits VB_Parent
+    Dim edges As New EdgeDraw_Basics
+    Public Sub New()
+        desc = "Find edges is the left and right images using EdgeDraw..."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        edges.Run(task.leftView)
+        dst2 = edges.dst2.Clone
+
+        edges.Run(task.rightView)
+        dst3 = edges.dst2
+    End Sub
+End Class
