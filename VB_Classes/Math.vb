@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Imports System.Web.UI
 Imports VB_Classes.VBtask
 ' https://answers.opencv.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
 Public Class Math_Subtract : Inherits VB_Parent

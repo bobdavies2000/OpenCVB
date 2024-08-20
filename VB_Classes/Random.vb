@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
 Public Class Random_Basics : Inherits VB_Parent
     Public PointList As New List(Of cv.Point2f)
     Public range As cv.Rect
@@ -127,7 +128,7 @@ Public Class Random_Basics4D : Inherits VB_Parent
     Public PointList As New List(Of cv.Vec4f)
     Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters, 0, task.MaxZmeters}
     Dim options As New Options_Random
-    Dim countSlider As Windows.Forms.TrackBar
+    Dim countSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         desc = "Create a uniform random mask with a specificied number of pixels."
         countSlider = FindSlider("Random Pixel Count")

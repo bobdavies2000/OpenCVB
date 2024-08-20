@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using VB_Classes;
-using cv = OpenCvSharp;
+using CV = OpenCvSharp;
 using OpenCvSharp;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -17,7 +17,7 @@ namespace CS_Classes
         public IntPtr cPtr;
         public bool standalone; 
         public string desc = "";
-        public cv.Mat dst0, dst1, dst2, dst3, empty;
+        public CV.Mat dst0, dst1, dst2, dst3, empty;
         public string traceName;
         public string[] labels = new string[4];
         public List<trueText> trueData = new List<trueText>();
@@ -55,10 +55,10 @@ namespace CS_Classes
             this.task = _task;
             traceName = this.GetType().Name;
 
-            dst0 = new cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, Scalar.All(0));
-            dst1 = new cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, Scalar.All(0));
-            dst2 = new cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, Scalar.All(0));
-            dst3 = new cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, Scalar.All(0));
+            dst0 = new CV.Mat(task.WorkingRes, CV.MatType.CV_8UC3, Scalar.All(0));
+            dst1 = new CV.Mat(task.WorkingRes, CV.MatType.CV_8UC3, Scalar.All(0));
+            dst2 = new CV.Mat(task.WorkingRes, CV.MatType.CV_8UC3, Scalar.All(0));
+            dst3 = new CV.Mat(task.WorkingRes, CV.MatType.CV_8UC3, Scalar.All(0));
 
             traceName = this.GetType().Name;
             string[] labels = { "", "", traceName, "" };
@@ -87,7 +87,7 @@ namespace CS_Classes
         [DllImport("gdi32.dll", EntryPoint = "BitBlt")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool BitBlt(IntPtr hdc, int x, int y, int cx, int cy, IntPtr hdcSrc, int x1, int y1, uint rop);
-        public Bitmap GetWindowImage(IntPtr WindowHandle, cv.Rect rect)
+        public Bitmap GetWindowImage(IntPtr WindowHandle, CV.Rect rect)
         {
             Bitmap b = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
@@ -106,23 +106,23 @@ namespace CS_Classes
         }
 
 
-        public cv.Scalar vecToScalar(cv.Vec3b v)
+        public CV.Scalar vecToScalar(CV.Vec3b v)
         {
-            return new cv.Scalar(v.Item0, v.Item1, v.Item2);
+            return new CV.Scalar(v.Item0, v.Item1, v.Item2);
         }
 
-        public void DrawRotatedRect(cv.RotatedRect rotatedRect, cv.Mat dst, cv.Scalar color)
+        public void DrawRotatedRect(CV.RotatedRect rotatedRect, CV.Mat dst, CV.Scalar color)
         {
-            cv.Point2f[] vertices2f = rotatedRect.Points();
-            cv.Point[] vertices = new cv.Point[vertices2f.Length];
+            CV.Point2f[] vertices2f = rotatedRect.Points();
+            CV.Point[] vertices = new CV.Point[vertices2f.Length];
             for (int j = 0; j < vertices2f.Length; j++)
             {
-                vertices[j] = new cv.Point((int)vertices2f[j].X, (int)vertices2f[j].Y);
+                vertices[j] = new CV.Point((int)vertices2f[j].X, (int)vertices2f[j].Y);
             }
             dst.FillConvexPoly(vertices, color, task.lineType);
         }
 
-        public void AddPlotScale(cv.Mat dst, double minVal, double maxVal, int lineCount = 3)
+        public void AddPlotScale(CV.Mat dst, double minVal, double maxVal, int lineCount = 3)
         {
             // draw a scale along the side
             int spacer = (int)(dst.Height / (lineCount + 1));
@@ -140,24 +140,24 @@ namespace CS_Classes
             }
             for (int i = 0; i <= lineCount; i++)
             {
-                cv.Point p1 = new cv.Point(0, spacer * i);
-                cv.Point p2 = new cv.Point(dst.Width, spacer * i);
-                dst.Line(p1, p2, cv.Scalar.White, task.cvFontThickness);
+                CV.Point p1 = new CV.Point(0, spacer * i);
+                CV.Point p2 = new CV.Point(dst.Width, spacer * i);
+                dst.Line(p1, p2, CV.Scalar.White, task.cvFontThickness);
                 double nextVal = (maxVal - spaceVal * i);
                 string nextText = (maxVal > 1000) ? (nextVal / 1000).ToString() + "k" : nextVal.ToString(fmt2);
-            cv.Cv2.PutText(dst, nextText, p1, cv.HersheyFonts.HersheyPlain, task.cvFontSize, cv.Scalar.White, task.cvFontThickness, task.lineType);
+            CV.Cv2.PutText(dst, nextText, p1, CV.HersheyFonts.HersheyPlain, task.cvFontSize, CV.Scalar.White, task.cvFontThickness, task.lineType);
         }
     }
-    public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color, int lineWidth)
+    public void DrawLine(CV.Mat dst, CV.Point2f p1, CV.Point2f p2, CV.Scalar color, int lineWidth)
     {
-        cv.Point pt1 = new cv.Point(p1.X, p1.Y);
-        cv.Point pt2 = new cv.Point(p2.X, p2.Y);
+        CV.Point pt1 = new CV.Point(p1.X, p1.Y);
+        CV.Point pt2 = new CV.Point(p2.X, p2.Y);
         dst.Line(pt1, pt2, color, lineWidth, task.lineType);
     }
-    public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color)
+    public void DrawLine(CV.Mat dst, CV.Point2f p1, CV.Point2f p2, CV.Scalar color)
     {
-        cv.Point pt1 = new cv.Point(p1.X, p1.Y);
-        cv.Point pt2 = new cv.Point(p2.X, p2.Y);
+        CV.Point pt1 = new CV.Point(p1.X, p1.Y);
+        CV.Point pt2 = new CV.Point(p2.X, p2.Y);
         dst.Line(pt1, pt2, color, task.lineWidth, task.lineType);
     }
     public Rangef[] GetHist2Dminmax(Mat input, int chan1, int chan2)
@@ -191,8 +191,8 @@ namespace CS_Classes
     {
         using (var mask = rc.mask.Clone())
         {
-            mask.Rectangle(new OpenCvSharp.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1);
-            using (cv.Mat distance32f = mask.DistanceTransform(OpenCvSharp.DistanceTypes.L1, 0))
+            mask.Rectangle(new OpenCvSharp.Rect(0, 0, mask.Width, mask.Height), CV.Scalar.All(0), 1);
+            using (CV.Mat distance32f = mask.DistanceTransform(OpenCvSharp.DistanceTypes.L1, 0))
             {
                     mmData mm;
                     distance32f.MinMaxLoc(out mm.minVal, out mm.maxVal, out mm.minLoc, out mm.maxLoc);
@@ -202,7 +202,7 @@ namespace CS_Classes
             }
         }
     }
-    public mmData GetMinMax(Mat mat, cv.Mat mask = null)
+    public mmData GetMinMax(Mat mat, CV.Mat mask = null)
     {
         mmData mm;
         if (mask == null)
@@ -216,23 +216,23 @@ namespace CS_Classes
         return mm;
     }
 
-    public cv.Point2f IntersectTest(cv.Point2f p1, cv.Point2f p2, cv.Point2f p3, cv.Point2f p4, cv.Rect rect)
+    public CV.Point2f IntersectTest(CV.Point2f p1, CV.Point2f p2, CV.Point2f p3, CV.Point2f p4, CV.Rect rect)
     {
-        cv.Point2f x = p3 - p1;
-        cv.Point2f d1 = p2 - p1;
-        cv.Point2f d2 = p4 - p3;
+        CV.Point2f x = p3 - p1;
+        CV.Point2f d1 = p2 - p1;
+        CV.Point2f d2 = p4 - p3;
         float cross = d1.X * d2.Y - d1.Y * d2.X;
         if (Math.Abs(cross) < 0.000001)
         {
-            return new cv.Point2f();
+            return new CV.Point2f();
         }
         float t1 = (x.X * d2.Y - x.Y * d2.X) / cross;
-        cv.Point2f pt = p1 + d1 * t1;
-        // If pt.X >= rect.Width Or pt.Y >= rect.Height Then Return New cv.Point2f
+        CV.Point2f pt = p1 + d1 * t1;
+        // If pt.X >= rect.Width Or pt.Y >= rect.Height Then Return New CV.Point2f
         return pt;
     }
 
-    public cv.Mat PrepareDepthInput(int index)
+    public CV.Mat PrepareDepthInput(int index)
     {
         if (task.useGravityPointcloud)
         {
@@ -240,39 +240,39 @@ namespace CS_Classes
         }
 
         // rebuild the pointcloud so it is oriented to gravity.
-        cv.Mat pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat().Reshape(3, task.pointCloud.Rows);
-        cv.Mat[] split = pc.Split();
+        CV.Mat pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat().Reshape(3, task.pointCloud.Rows);
+        CV.Mat[] split = pc.Split();
         return split[index];
     }
 
-    public cv.Mat Convert32f_To_8UC3(cv.Mat Input)
+    public CV.Mat Convert32f_To_8UC3(CV.Mat Input)
     {
-        cv.Mat outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax);
+        CV.Mat outMat = Input.Normalize(0, 255, CV.NormTypes.MinMax);
         if (Input.Channels() == 1)
         {
-            outMat.ConvertTo(outMat, cv.MatType.CV_8U);
-            return outMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR);
+            outMat.ConvertTo(outMat, CV.MatType.CV_8U);
+            return outMat.CvtColor(CV.ColorConversionCodes.GRAY2BGR);
         }
-        outMat.ConvertTo(outMat, cv.MatType.CV_8UC3);
+        outMat.ConvertTo(outMat, CV.MatType.CV_8UC3);
         return outMat;
     }
 
-    public float distance3D(cv.Point3f p1, cv.Point3f p2)
+    public float distance3D(CV.Point3f p1, CV.Point3f p2)
     {
         return (float)Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y) + (p1.Z - p2.Z) * (p1.Z - p2.Z));
     }
 
-    public float distance3D(cv.Vec3b p1, cv.Vec3b p2)
+    public float distance3D(CV.Vec3b p1, CV.Vec3b p2)
     {
         return (float)Math.Sqrt((p1.Item0 - p2.Item0) * (p1.Item0 - p2.Item0) + (p1.Item1 - p2.Item1) * (p1.Item1 - p2.Item1) + (p1.Item2 - p2.Item2) * (p1.Item2 - p2.Item2));
     }
 
-    public float distance3D(cv.Point3i p1, cv.Point3i p2)
+    public float distance3D(CV.Point3i p1, CV.Point3i p2)
     {
         return (float)Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y) + (p1.Z - p2.Z) * (p1.Z - p2.Z));
     }
 
-    public float distance3D(cv.Scalar p1, cv.Scalar p2)
+    public float distance3D(CV.Scalar p1, CV.Scalar p2)
     {
         return (float)Math.Sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) + (p1[2] - p2[2]) * (p1[2] - p2[2]));
     }
@@ -286,22 +286,22 @@ namespace CS_Classes
             DrawLine(dst, p1, p2, Scalar.Black, task.lineWidth);
         }
 
-        public void DrawFPoly(ref cv.Mat dst, List<cv.Point2f> poly, cv.Scalar color)
+        public void DrawFPoly(ref CV.Mat dst, List<CV.Point2f> poly, CV.Scalar color)
     {
         int minMod = Math.Min(poly.Count, task.polyCount);
         for (int i = 0; i < minMod; i++)
         {
-                var p1 = new cv.Point((int)poly[i].X, (int)poly[i].Y);
-                var p2 = new cv.Point((int)poly[(i+1) % minMod].X, (int)poly[(i+1) % minMod].Y);
+                var p1 = new CV.Point((int)poly[i].X, (int)poly[i].Y);
+                var p2 = new CV.Point((int)poly[(i+1) % minMod].X, (int)poly[(i+1) % minMod].Y);
                 DrawLine(dst, p1, poly[(i + 1) % minMod], color, task.lineWidth);
         }
     }
 
-    public List<cv.Point> contourBuild(cv.Mat mask, cv.ContourApproximationModes approxMode)
+    public List<CV.Point> contourBuild(CV.Mat mask, CV.ContourApproximationModes approxMode)
     {
-        cv.Point[][] allContours;
-        cv.HierarchyIndex[] test;
-        cv.Cv2.FindContours(mask, out allContours, out test, cv.RetrievalModes.External, approxMode);
+        CV.Point[][] allContours;
+        CV.HierarchyIndex[] test;
+        CV.Cv2.FindContours(mask, out allContours, out test, CV.RetrievalModes.External, approxMode);
 
         int maxCount = 0, maxIndex = 0;
         for (int i = 0; i < allContours.Length; i++)
@@ -315,9 +315,9 @@ namespace CS_Classes
         }
         if (allContours.Length > 0)
         {
-            return new List<cv.Point>(allContours[maxIndex].ToList());
+            return new List<CV.Point>(allContours[maxIndex].ToList());
         }
-        return new List<cv.Point>();
+        return new List<CV.Point>();
     }
 
     public void setPointCloudGrid()
@@ -333,7 +333,7 @@ namespace CS_Classes
         }
     }
 
-    public string gMatrixToStr(cv.Mat gMatrix)
+    public string gMatrixToStr(CV.Mat gMatrix)
     {
         string outStr = "Gravity transform matrix" + "\n";
         for (int i = 0; i < gMatrix.Rows; i++)
@@ -348,12 +348,12 @@ namespace CS_Classes
         return outStr;
     }
 
-    public cv.Vec3b randomCellColor()
+    public CV.Vec3b randomCellColor()
     {
-        return new cv.Vec3b((byte)msRNG.Next(50, 240), (byte)msRNG.Next(50, 240), (byte)msRNG.Next(50, 240)); // trying to avoid extreme colors... 
+        return new CV.Vec3b((byte)msRNG.Next(50, 240), (byte)msRNG.Next(50, 240), (byte)msRNG.Next(50, 240)); // trying to avoid extreme colors... 
     }
 
-    public cv.Point validContourPoint(rcData rc, cv.Point pt, int offset)
+    public CV.Point validContourPoint(rcData rc, CV.Point pt, int offset)
     {
         if (pt.X < rc.rect.Width && pt.Y < rc.rect.Height)
         {
@@ -368,44 +368,44 @@ namespace CS_Classes
                 return pt;
             }
         }
-        return new cv.Point();
+        return new CV.Point();
     }
 
-    public cv.Vec4f build3PointEquation(rcData rc)
+    public CV.Vec4f build3PointEquation(rcData rc)
     {
         if (rc.contour.Count < 3)
         {
-            return new cv.Vec4f();
+            return new CV.Vec4f();
         }
         int offset = rc.contour.Count / 3;
-        cv.Point p1 = validContourPoint(rc, rc.contour[offset * 0], offset * 0);
-        cv.Point p2 = validContourPoint(rc, rc.contour[offset * 1], offset * 1);
-        cv.Point p3 = validContourPoint(rc, rc.contour[offset * 2], offset * 2);
+        CV.Point p1 = validContourPoint(rc, rc.contour[offset * 0], offset * 0);
+        CV.Point p2 = validContourPoint(rc, rc.contour[offset * 1], offset * 1);
+        CV.Point p3 = validContourPoint(rc, rc.contour[offset * 2], offset * 2);
 
-        cv.Point3f v1 = task.pointCloud.Get<cv.Point3f>(rc.rect.Y + p1.Y, rc.rect.X + p1.X);
-        cv.Point3f v2 = task.pointCloud.Get<cv.Point3f>(rc.rect.Y + p2.Y, rc.rect.X + p2.X);
-        cv.Point3f v3 = task.pointCloud.Get<cv.Point3f>(rc.rect.Y + p3.Y, rc.rect.X + p3.X);
+        CV.Point3f v1 = task.pointCloud.Get<CV.Point3f>(rc.rect.Y + p1.Y, rc.rect.X + p1.X);
+        CV.Point3f v2 = task.pointCloud.Get<CV.Point3f>(rc.rect.Y + p2.Y, rc.rect.X + p2.X);
+        CV.Point3f v3 = task.pointCloud.Get<CV.Point3f>(rc.rect.Y + p3.Y, rc.rect.X + p3.X);
 
-        cv.Point3f cross = crossProduct(v1 - v2, v2 - v3);
+        CV.Point3f cross = crossProduct(v1 - v2, v2 - v3);
         float k = -(v1.X * cross.X + v1.Y * cross.Y + v1.Z * cross.Z);
-        return new cv.Vec4f(cross.X, cross.Y, cross.Z, k);
+        return new CV.Vec4f(cross.X, cross.Y, cross.Z, k);
     }
 
-    public cv.Vec4f fitDepthPlane(List<cv.Point3f> fitDepth)
+    public CV.Vec4f fitDepthPlane(List<CV.Point3f> fitDepth)
     {
-        cv.Mat wDepth = cv.Mat.FromPixelData(fitDepth.Count, 1, cv.MatType.CV_32FC3, fitDepth.ToArray());
-        cv.Scalar columnSum = wDepth.Sum();
+        CV.Mat wDepth = CV.Mat.FromPixelData(fitDepth.Count, 1, CV.MatType.CV_32FC3, fitDepth.ToArray());
+        CV.Scalar columnSum = wDepth.Sum();
         double count = (double)fitDepth.Count;
-        cv.Vec4f plane = new cv.Vec4f();
-        cv.Scalar centroid = new cv.Scalar(0);
+        CV.Vec4f plane = new CV.Vec4f();
+        CV.Scalar centroid = new CV.Scalar(0);
         if (count > 0)
         {
-            centroid = new cv.Scalar((float)(columnSum[0] / count), (float)(columnSum[1] / count), (float)(columnSum[2] / count));
+            centroid = new CV.Scalar((float)(columnSum[0] / count), (float)(columnSum[1] / count), (float)(columnSum[2] / count));
             wDepth = wDepth.Subtract(centroid);
             double xx = 0, xy = 0, xz = 0, yy = 0, yz = 0, zz = 0;
             for (int i = 0; i < wDepth.Rows; i++)
             {
-                cv.Point3f tmp = wDepth.Get<cv.Point3f>(i, 0);
+                CV.Point3f tmp = wDepth.Get<CV.Point3f>(i, 0);
                 xx += tmp.X * tmp.X;
                 xy += tmp.X * tmp.Y;
                 xz += tmp.X * tmp.Z;
@@ -442,54 +442,54 @@ namespace CS_Classes
         }
 
         double magnitude = Math.Sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
-        cv.Scalar normal = new cv.Scalar((float)(plane[0] / magnitude), (float)(plane[1] / magnitude), (float)(plane[2] / magnitude));
-        return new cv.Vec4f((float)normal[0], (float)normal[1], (float)normal[2], 
+        CV.Scalar normal = new CV.Scalar((float)(plane[0] / magnitude), (float)(plane[1] / magnitude), (float)(plane[2] / magnitude));
+        return new CV.Vec4f((float)normal[0], (float)normal[1], (float)normal[2], 
                             (float)-(normal[0] * centroid[0] + normal[1] * centroid[1] + normal[2] * centroid[2]));
     }
 
     // http://james-ramsden.com/calculate-the-cross-product-c-code/
-    public cv.Point3f crossProduct(cv.Point3f v1, cv.Point3f v2)
+    public CV.Point3f crossProduct(CV.Point3f v1, CV.Point3f v2)
     {
-        cv.Point3f product = new cv.Point3f();
+        CV.Point3f product = new CV.Point3f();
         product.X = v1.Y * v2.Z - v1.Z * v2.Y;
         product.Y = v1.Z * v2.X - v1.X * v2.Z;
         product.Z = v1.X * v2.Y - v1.Y * v2.X;
 
         if (float.IsNaN(product.X) || float.IsNaN(product.Y) || float.IsNaN(product.Z))
         {
-            return new cv.Point3f(0, 0, 0);
+            return new CV.Point3f(0, 0, 0);
         }
         double magnitude = Math.Sqrt(product.X * product.X + product.Y * product.Y + product.Z * product.Z);
         if (magnitude == 0)
         {
-            return new cv.Point3f(0, 0, 0);
+            return new CV.Point3f(0, 0, 0);
         }
-        return new cv.Point3f((float)(product.X / magnitude), (float)(product.Y / magnitude), (float)(product.Z / magnitude));
+        return new CV.Point3f((float)(product.X / magnitude), (float)(product.Y / magnitude), (float)(product.Z / magnitude));
     }
 
-    public float dotProduct3D(cv.Point3f v1, cv.Point3f v2)
+    public float dotProduct3D(CV.Point3f v1, CV.Point3f v2)
     {
         return Math.Abs(v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z);
     }
 
-    public cv.Point3f getWorldCoordinates(cv.Point3f p)
+    public CV.Point3f getWorldCoordinates(CV.Point3f p)
     {
         float x = (p.X - task.calibData.ppx) / task.calibData.fx;
         float y = (p.Y - task.calibData.ppy) / task.calibData.fy;
-        return new cv.Point3f(x * p.Z, y * p.Z, p.Z);
+        return new CV.Point3f(x * p.Z, y * p.Z, p.Z);
     }
 
-    public cv.Vec6f getWorldCoordinatesD6(cv.Point3f p)
+    public CV.Vec6f getWorldCoordinatesD6(CV.Point3f p)
     {
         float x = (p.X - task.calibData.ppx) / task.calibData.fx;
         float y = (p.Y - task.calibData.ppy) / task.calibData.fy;
-        return new cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0);
+        return new CV.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0);
     }
 
     
-    public List<cv.Point> ContourBuild(Mat mask, ContourApproximationModes approxMode)
+    public List<CV.Point> ContourBuild(Mat mask, ContourApproximationModes approxMode)
         {
-            cv.Point[][] allContours;
+            CV.Point[][] allContours;
             Cv2.FindContours(mask, out allContours, out _, RetrievalModes.External, approxMode);
 
             int maxCount = 0, maxIndex = 0;
@@ -503,8 +503,8 @@ namespace CS_Classes
                 }   
             }
             if (allContours.Length > 0)
-                return new List<cv.Point>(allContours[maxIndex].ToList());
-            return new List<cv.Point>();
+                return new List<CV.Point>(allContours[maxIndex].ToList());
+            return new List<CV.Point>();
         }
         public Mat Show_HSV_Hist(Mat hist)
         {
@@ -527,7 +527,7 @@ namespace CS_Classes
             return img;
         }
 
-        public cv.Rect ValidateRect(cv.Rect r, int ratio = 1)
+        public CV.Rect ValidateRect(CV.Rect r, int ratio = 1)
         {
             if (r.Width <= 0) r.Width = 1;
             if (r.Height <= 0) r.Height = 1;
@@ -580,9 +580,9 @@ namespace CS_Classes
             //if (task.IntermediateObject.TraceName == traceName) return true;
             return false;
         }
-        public cv.Rect InitRandomRect(int margin)
+        public CV.Rect InitRandomRect(int margin)
         {
-            return new cv.Rect(
+            return new CV.Rect(
                 msRNG.Next(margin, dst2.Width - 2 * margin),
                 msRNG.Next(margin, dst2.Height - 2 * margin),
                 msRNG.Next(margin, dst2.Width - 2 * margin),
@@ -605,7 +605,7 @@ namespace CS_Classes
             task.advice += advice + Environment.NewLine + Environment.NewLine;
         }
 
-        public void DrawContour(Mat dst, List<cv.Point> contour, Scalar color, int lineWidth = -10)
+        public void DrawContour(Mat dst, List<CV.Point> contour, Scalar color, int lineWidth = -10)
         {
             if (lineWidth == -10)
             {
@@ -613,33 +613,33 @@ namespace CS_Classes
             }
             if (contour.Count < 3) return; // this is not enough to draw.
 
-            var listOfPoints = new List<List<cv.Point>>();
+            var listOfPoints = new List<List<CV.Point>>();
             listOfPoints.Add(contour);
 
             Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType); // Assuming 'task' has 'lineType' property
         }
-        public void DrawPoly(Mat result, List<cv.Point> polyPoints, Scalar color)
+        public void DrawPoly(Mat result, List<CV.Point> polyPoints, Scalar color)
         {
             if (polyPoints.Count < 3) return;
-            var listOfPoints = new List<List<cv.Point>> { polyPoints };
+            var listOfPoints = new List<List<CV.Point>> { polyPoints };
             Cv2.DrawContours(result, listOfPoints, 0, color, 2);
         }
-        public void DrawPolkaDot(cv.Point2f pt, Mat dst)
+        public void DrawPolkaDot(CV.Point2f pt, Mat dst)
         {
             DrawCircle(dst, pt, task.DotSize + 2, Scalar.White, -1);
             DrawCircle(dst, pt, task.DotSize, Scalar.Black);
         }
-        public void DrawCircle(Mat dst, cv.Point2f p1, int radius, Scalar color, int lineWidth = -1)
+        public void DrawCircle(Mat dst, CV.Point2f p1, int radius, Scalar color, int lineWidth = -1)
         {
-            var pt = new cv.Point(p1.X, p1.Y);
+            var pt = new CV.Point(p1.X, p1.Y);
             dst.Circle(pt, radius, color, lineWidth, task.lineType);
         }
-        public void DrawCircle(Mat dst, cv.Point2d p1, int radius, Scalar color, int lineWidth = -1)
+        public void DrawCircle(Mat dst, CV.Point2d p1, int radius, Scalar color, int lineWidth = -1)
         {
-            var pt = new cv.Point((int)p1.X, (int)p1.Y);
+            var pt = new CV.Point((int)p1.X, (int)p1.Y);
             dst.Circle(pt, radius, color, lineWidth, task.lineType);
         }
-        public void DrawCircle(Mat dst, cv.Point pt, int radius, Scalar color, int lineWidth = -1)
+        public void DrawCircle(Mat dst, CV.Point pt, int radius, Scalar color, int lineWidth = -1)
         {
             dst.Circle(pt, radius, color, lineWidth, task.lineType);
         }
@@ -647,11 +647,11 @@ namespace CS_Classes
         public void DrawRotatedOutline(RotatedRect rotatedRect, Mat dst2, Scalar color)
         {
             Point2f[] pts = rotatedRect.Points();
-            cv.Point lastPt = new cv.Point((int)pts[0].X, (int)pts[0].Y);
+            CV.Point lastPt = new CV.Point((int)pts[0].X, (int)pts[0].Y);
             for (int i = 1; i <= pts.Length; i++)
             {
                 int index = i % pts.Length;
-                cv.Point pt = new cv.Point((int)pts[index].X, (int)pts[index].Y);
+                CV.Point pt = new CV.Point((int)pts[index].X, (int)pts[index].Y);
                 Cv2.Line(dst2, pt, lastPt, color);
                 lastPt = pt;
             }
@@ -671,27 +671,27 @@ namespace CS_Classes
 
             return srcPoints;
         }
-        public void SetTrueText(string text, cv.Point pt, int picTag = 2)
+        public void SetTrueText(string text, CV.Point pt, int picTag = 2)
         {
             trueText str = new trueText(text, pt, picTag);
             trueData.Add(str);
         }
-        public void SetTrueText(string text, cv.Point2f pt, int picTag = 2)
+        public void SetTrueText(string text, CV.Point2f pt, int picTag = 2)
         {
-            trueText str = new trueText(text, new cv.Point(pt.X, pt.Y), picTag);
+            trueText str = new trueText(text, new CV.Point(pt.X, pt.Y), picTag);
             trueData.Add(str);
         }
 
         public void SetTrueText(string text)
         {
-            cv.Point pt = new cv.Point(0, 0);
+            CV.Point pt = new CV.Point(0, 0);
             trueText str = new trueText(text, pt, 2);
             trueData.Add(str);
         }
 
         public void SetTrueText(string text, int picTag)
         {
-            cv.Point pt = new cv.Point(0, 0);
+            CV.Point pt = new CV.Point(0, 0);
             trueText str = new trueText(text, pt, picTag);
             trueData.Add(str);
         }
@@ -725,27 +725,27 @@ namespace CS_Classes
         {
             controls.RunFromVB(src, csCode);
         }
-        public cv.Mat ShowPalette(cv.Mat input)
+        public CV.Mat ShowPalette(CV.Mat input)
         {
-            if (input.Type() == cv.MatType.CV_32SC1)
+            if (input.Type() == CV.MatType.CV_32SC1)
             {
-                input.ConvertTo(input, cv.MatType.CV_8U);
+                input.ConvertTo(input, CV.MatType.CV_8U);
             }
             task.palette.RunVB(input);
             return task.palette.dst2.Clone();
         }
 
-        public void DrawContour(ref Mat dst, List<cv.Point> contour, Scalar color, int lineWidth = -10)
+        public void DrawContour(ref Mat dst, List<CV.Point> contour, Scalar color, int lineWidth = -10)
         {
             if (lineWidth == -10) lineWidth = task.lineWidth;
             if (contour.Count < 3) return; // Not enough points to draw
-            var listOfPoints = new List<List<cv.Point>> { contour };
+            var listOfPoints = new List<List<CV.Point>> { contour };
             Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType);
         }
         public void DetectFace(ref Mat src, CascadeClassifier cascade)
         {
             Mat gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            Rect[] faces = cascade.DetectMultiScale(gray, 1.08, 3, HaarDetectionTypes.ScaleImage, new cv.Size(30, 30));
+            Rect[] faces = cascade.DetectMultiScale(gray, 1.08, 3, HaarDetectionTypes.ScaleImage, new CV.Size(30, 30));
 
             foreach (Rect fface in faces)
             {
@@ -764,8 +764,8 @@ namespace CS_Classes
                 double x = a * rho;
                 double y = b * rho;
 
-                cv.Point pt1 = new cv.Point(x + 1000 * -b, y + 1000 * a);
-                cv.Point pt2 = new cv.Point(x - 1000 * -b, y - 1000 * a);
+                CV.Point pt1 = new CV.Point(x + 1000 * -b, y + 1000 * a);
+                CV.Point pt2 = new CV.Point(x - 1000 * -b, y - 1000 * a);
                 dst.Line(pt1, pt2, Scalar.Red, task.lineWidth + 1, task.lineType, 0);
             }
         }

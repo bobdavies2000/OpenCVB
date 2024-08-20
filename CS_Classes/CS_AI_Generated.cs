@@ -1,4 +1,4 @@
-﻿using cv = OpenCvSharp;
+﻿using CV = OpenCvSharp;
 using System;
 using System.Windows.Forms;
 using VB_Classes;
@@ -22,6 +22,7 @@ using OpenCvSharp.XPhoto;
 using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.IO.Pipes;
+using System.Runtime.Versioning;
 
 namespace CS_Classes
 {
@@ -98,7 +99,7 @@ namespace CS_Classes
         {
             desc = "Update a running average of the image";
         }
-        public void RunCS(cv.Mat src)
+        public void RunCS(CV.Mat src)
         {
             options.RunVB();
 
@@ -106,7 +107,7 @@ namespace CS_Classes
             {
                 dst2 = task.pcSplit[2] * 1000;
             }
-            cv.Cv2.AccumulateWeighted(task.pcSplit[2] * 1000, dst2, options.accumWeighted, new cv.Mat());
+            CV.Cv2.AccumulateWeighted(task.pcSplit[2] * 1000, dst2, options.accumWeighted, new CV.Mat());
         }
     }
 
@@ -246,12 +247,13 @@ namespace CS_Classes
             alpha.BackgroundImage = BitmapConverter.ToBitmap(src, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
         }
     }
+
+
+
+
+
     // https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
     // https://docs.opencv.org/4.x/js_contour_features_approxPolyDP.html
-
-
-
-
     public class ApproxPoly_Basics_CS : CS_Parent
     {
         Contour_Largest contour = new Contour_Largest();
@@ -280,10 +282,10 @@ namespace CS_Classes
 
             if (contour.allContours.Count() > 0)
             {
-                cv.Point[] nextContour;
+                CV.Point[] nextContour;
                 nextContour = Cv2.ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly);
                 dst3.SetTo(Scalar.Black);
-                DrawContour(dst3, new List<cv.Point>(nextContour), Scalar.Yellow);
+                DrawContour(dst3, new List<CV.Point>(nextContour), Scalar.Yellow);
             }
             else
             {
@@ -298,7 +300,7 @@ namespace CS_Classes
     public class ApproxPoly_FindandDraw_CS : CS_Parent
     {
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
-        public cv.Point[][] allContours;
+        public CV.Point[][] allContours;
         public ApproxPoly_FindandDraw_CS(VBtask task) : base(task)
         {
             labels[2] = "FindandDraw input";
@@ -317,10 +319,10 @@ namespace CS_Classes
             Cv2.FindContours(dst1, out allContours, out _, RetrievalModes.FloodFill, ContourApproximationModes.ApproxSimple);
             dst3.SetTo(Scalar.Black);
 
-            List<cv.Point[]> contours = new List<cv.Point[]>();
+            List<CV.Point[]> contours = new List<CV.Point[]>();
             for (int i = 0; i < allContours.Length; i++)
             {
-                cv.Point[] nextContour = Cv2.ApproxPolyDP(allContours[i], 3, true);
+                CV.Point[] nextContour = Cv2.ApproxPolyDP(allContours[i], 3, true);
                 if (nextContour.Length > 2)
                 {
                     contours.Add(nextContour);
@@ -360,7 +362,7 @@ namespace CS_Classes
     {
         public Mat triangle;
         public Options_MinArea options = new Options_MinArea();
-        public List<cv.Point2f> srcPoints;
+        public List<CV.Point2f> srcPoints;
 
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void MinTriangle_Run(IntPtr inputPtr, int numberOfPoints, IntPtr outputTriangle);
@@ -375,7 +377,7 @@ namespace CS_Classes
             options.RunVB();
             if (task.heartBeat)
             {
-                srcPoints = new List<cv.Point2f>(options.srcPoints);
+                srcPoints = new List<CV.Point2f>(options.srcPoints);
             }
             else
             {
@@ -387,27 +389,27 @@ namespace CS_Classes
 
             dst2.SetTo(Scalar.White);
 
-            Mat input = cv.Mat.FromPixelData(srcPoints.Count, 1, MatType.CV_32FC2, srcPoints.ToArray());
+            Mat input = CV.Mat.FromPixelData(srcPoints.Count, 1, MatType.CV_32FC2, srcPoints.ToArray());
             Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
             GCHandle srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             GCHandle dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned);
             MinTriangle_Run(srcHandle.AddrOfPinnedObject(), srcPoints.Count, dstHandle.AddrOfPinnedObject());
             srcHandle.Free();
             dstHandle.Free();
-            triangle = cv.Mat.FromPixelData(3, 1, MatType.CV_32FC2, dstData);
+            triangle = CV.Mat.FromPixelData(3, 1, MatType.CV_32FC2, dstData);
 
             for (int i = 0; i <= 2; i++)
             {
-                cv.Point2f pt = triangle.At<cv.Point2f>(i);
-                cv.Point p1 = new cv.Point(pt.X, pt.Y);
-                pt = triangle.At<cv.Point2f>((i + 1) % 3);
-                cv.Point p2 = new cv.Point(pt.X, pt.Y);
+                CV.Point2f pt = triangle.At<CV.Point2f>(i);
+                CV.Point p1 = new CV.Point(pt.X, pt.Y);
+                pt = triangle.At<CV.Point2f>((i + 1) % 3);
+                CV.Point p2 = new CV.Point(pt.X, pt.Y);
                 DrawLine(dst2, p1, p2, Scalar.Black, task.lineWidth);
             }
 
             foreach (var ptSrc in srcPoints)
             {
-                var pt = new cv.Point(ptSrc.X, ptSrc.Y);
+                var pt = new CV.Point(ptSrc.X, ptSrc.Y);
                 DrawCircle(dst2, pt, task.DotSize + 1, Scalar.Red);
             }
         }
@@ -441,7 +443,7 @@ namespace CS_Classes
                 DrawCircle(dst2, cityPositions[i], task.DotSize, Scalar.White);
                 DrawLine(dst2, cityPositions[i], cityPositions[cityOrder[i]], Scalar.White);
             }
-            SetTrueText("Energy" + "\n" + energy.ToString(fmt0), new cv.Point(10, 100), 2);
+            SetTrueText("Energy" + "\n" + energy.ToString(fmt0), new CV.Point(10, 100), 2);
         }
 
         public void setup()
@@ -449,10 +451,10 @@ namespace CS_Classes
             cityOrder = new int[numberOfCities];
 
             double radius = dst2.Rows * 0.45;
-            cv.Point center = new cv.Point(dst2.Cols / 2, dst2.Rows / 2);
+            CV.Point center = new CV.Point(dst2.Cols / 2, dst2.Rows / 2);
             if (circularPattern)
             {
-                cityPositions = new cv.Point2f[numberOfCities];
+                cityPositions = new CV.Point2f[numberOfCities];
                 for (int i = 0; i < cityPositions.Length; i++)
                 {
                     float theta = msRNG.Next(0, 360);
@@ -555,7 +557,7 @@ namespace CS_Classes
             desc = "Setup and control finding the optimal route for a traveling salesman";
         }
 
-        public void RunCS(cv.Mat src)
+        public void RunCS(CV.Mat src)
         {
             options.RunVB();
 
@@ -581,7 +583,7 @@ namespace CS_Classes
                     strOut += "CPU=" + i.ToString("00") + " energy=" + anneal[i].energy.ToString("0") + "\n";
                 }
             }
-            SetTrueText(strOut, new cv.Point(10, 10), 3);
+            SetTrueText(strOut, new CV.Point(10, 10), 3);
 
             mats.mat[0] = anneal[bestList.ElementAt(0).Value].dst2;
             if (bestList.Count >= 2)
@@ -637,7 +639,7 @@ namespace CS_Classes
 
         Mat motionRectangles(Mat gray, Vec3b[] colors)
         {
-            cv.Point[][] contours;
+            CV.Point[][] contours;
             contours = Cv2.FindContoursAsArray(gray, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
 
             for (int i = 0; i < contours.Length; i++)
@@ -681,7 +683,7 @@ namespace CS_Classes
             if (standalone)
             {
                 src = new Mat(src.Size(), MatType.CV_8U, Scalar.All(0));
-                cv.Point[] srcPoints = new cv.Point[100]; // doesn't really matter how many there are.
+                CV.Point[] srcPoints = new CV.Point[100]; // doesn't really matter how many there are.
                 Random msRNG = new Random();
                 for (int i = 0; i < srcPoints.Length; i++)
                 {
@@ -690,21 +692,21 @@ namespace CS_Classes
                     src.Set<byte>(srcPoints[i].Y, srcPoints[i].X, 255);
                 }
             }
-            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (src.Channels() != 1) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             nonZero = src.FindNonZero();
 
             dst3 = new Mat(src.Size(), MatType.CV_8U, Scalar.All(0));
             // mark the points so they are visible...
             for (int i = 0; i < nonZero.Rows; i++)
             {
-                cv.Point pt = nonZero.At<cv.Point>(i);
+                CV.Point pt = nonZero.At<CV.Point>(i);
                 Cv2.Circle(dst3, pt, task.DotSize, Scalar.White);
             }
 
             string outstr = "Coordinates of the non-zero points (ordered by row - top to bottom): \n\n";
             for (int i = 0; i < nonZero.Rows; i++)
             {
-                cv.Point pt = nonZero.At<cv.Point>(i);
+                CV.Point pt = nonZero.At<CV.Point>(i);
                 outstr += "X = \t" + pt.X + "\t y = \t" + pt.Y + "\n";
                 if (i > 100) break; // for when there are way too many points found...
             }
@@ -720,7 +722,7 @@ namespace CS_Classes
         BackProject_SoloTop hotTop = new BackProject_SoloTop();
         BackProject_SoloSide hotSide = new BackProject_SoloSide();
         Area_FindNonZero nZero = new Area_FindNonZero();
-        public List<cv.Point> soloPoints = new List<cv.Point>();
+        public List<CV.Point> soloPoints = new List<CV.Point>();
 
         public Area_SoloPoints_CS(VBtask task) : base(task)
         {
@@ -739,7 +741,7 @@ namespace CS_Classes
             soloPoints.Clear();
             for (int i = 0; i < nZero.nonZero.Rows; i++)
             {
-                soloPoints.Add(nZero.nonZero.At<cv.Point>(i, 0));
+                soloPoints.Add(nZero.nonZero.At<CV.Point>(i, 0));
             }
 
             if (task.heartBeat)
@@ -756,7 +758,7 @@ namespace CS_Classes
     {
         public RotatedRect minRect;
         Options_MinArea options = new Options_MinArea();
-        public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
+        public List<CV.Point2f> inputPoints = new List<CV.Point2f>();
 
         public Area_MinRect_CS(VBtask task) : base(task)
         {
@@ -812,7 +814,7 @@ namespace CS_Classes
                 {
                     byte grayValue = dst3.At<byte>(y, x);
                     string asciiChar = asciiChars[grayValue * (asciiChars.Length - 1) / 255];
-                    SetTrueText(asciiChar, new cv.Point(x * options.wStep, y * options.hStep), 2);
+                    SetTrueText(asciiChar, new CV.Point(x * options.wStep, y * options.hStep), 2);
                 }
             }
             labels[2] = "Ascii version using " + (dst3.Height * dst3.Width).ToString("N0") + " characters";
@@ -834,7 +836,7 @@ namespace CS_Classes
         {
             int hStep = src.Height / 31 - 1;
             int wStep = src.Width / 55 - 1;
-            cv.Size size = new cv.Size(55, 31);
+            CV.Size size = new CV.Size(55, 31);
             dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY).Resize(size, 0, 0, InterpolationFlags.Nearest);
             double grayRatio = 12.0 / 255;
 
@@ -842,7 +844,7 @@ namespace CS_Classes
             {
                 for (int x = 0; x < dst1.Width; x++)
                 {
-                    cv.Rect r = new cv.Rect(x * wStep, y * hStep, wStep - 1, hStep - 1);
+                    CV.Rect r = new CV.Rect(x * wStep, y * hStep, wStep - 1, hStep - 1);
                     int asciiChar = (int)(dst1.At<byte>(y, x) * grayRatio);
                     dst3[r].SetTo(asciiChar);
                 }
@@ -931,7 +933,7 @@ namespace CS_Classes
             mmData histMax = GetMinMax(histK.hist.histogram);
             labels[3] = $"Backprojecting {minRange.Val0} to {maxRange.Val0} with {count} of {totalPixels} compared to " +
                         $"mask pixels = {actualCount}.  Histogram max count = {histMax.maxVal}";
-            dst2.Rectangle(new cv.Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            dst2.Rectangle(new CV.Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
         }
     }
 
@@ -1299,7 +1301,7 @@ namespace CS_Classes
             dst1 = maskDetect(gray, histIndex);
             if (dst1.Width == 0) return;
             dst3.SetTo(Scalar.White, dst1);
-            dst2.Rectangle(new cv.Rect(histIndex * brickWidth, 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            dst2.Rectangle(new CV.Rect(histIndex * brickWidth, 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
         }
     }
 
@@ -1388,7 +1390,7 @@ namespace CS_Classes
             desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces.";
         }
 
-        public void RunCS(cv.Mat src)
+        public void RunCS(CV.Mat src)
         {
             bpSide.Run(src);
             task.pointCloud.SetTo(0, bpSide.dst3);
@@ -1458,7 +1460,7 @@ namespace CS_Classes
         Line_ViewTop line = new Line_ViewTop();
         public BackProject_LineTop_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Backproject the lines found in the top view.";
         }
 
@@ -1471,8 +1473,8 @@ namespace CS_Classes
             foreach (var lp in line.lines.lpList)
             {
                 var lpNew = lp.edgeToEdgeLine(dst2.Size());
-                cv.Point p1 = new cv.Point((int)lpNew.p1.X, (int)lpNew.p1.Y);
-                cv.Point p2 = new cv.Point((int)lpNew.p2.X, (int)lpNew.p2.Y);
+                CV.Point p1 = new CV.Point((int)lpNew.p1.X, (int)lpNew.p1.Y);
+                CV.Point p2 = new CV.Point((int)lpNew.p2.X, (int)lpNew.p2.Y);
                 dst2.Line(p1, p2, Scalar.White, w, task.lineType);
             }
 
@@ -1493,7 +1495,7 @@ namespace CS_Classes
 
         public BackProject_LineSide_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Backproject the lines found in the side view.";
         }
 
@@ -1509,8 +1511,8 @@ namespace CS_Classes
                 if (Math.Abs(lp.slope) < 0.1)
                 {
                     var lpNew = lp.edgeToEdgeLine(dst2.Size());
-                    cv.Point p1 = new cv.Point((int)lpNew.p1.X, (int)lpNew.p1.Y);
-                    cv.Point p2 = new cv.Point((int)lpNew.p2.X, (int)lpNew.p2.Y);
+                    CV.Point p1 = new CV.Point((int)lpNew.p1.X, (int)lpNew.p1.Y);
+                    CV.Point p2 = new CV.Point((int)lpNew.p2.X, (int)lpNew.p2.Y);
                     dst2.Line(p1, p2, Scalar.White, w, task.lineType);
                     lpList.Add(lp);
                 }
@@ -1580,7 +1582,7 @@ namespace CS_Classes
             if (useInrange)
             {
                 if (histIndex == 0 && hist.plot.removeZeroEntry)
-                    mask = new Mat(input.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                    mask = new Mat(input.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 else
                     mask = input.InRange(minRange, maxRange);
             }
@@ -1600,7 +1602,7 @@ namespace CS_Classes
             labels[3] = "Backprojecting " + ((int)minRange.Val0).ToString() + " to " + ((int)maxRange.Val0).ToString() + " with " +
                          count.ToString() + " histogram samples and " + actualCount.ToString() + " mask count.  Histogram max count = " +
                          ((int)histMax.maxVal).ToString();
-            dst2.Rectangle(new cv.Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            dst2.Rectangle(new CV.Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
         }
     }
 
@@ -1667,7 +1669,7 @@ namespace CS_Classes
                     histData.Add((float)Math.Round(i * incr));
                 }
 
-                histogram = cv.Mat.FromPixelData(task.histogramBins, 1, MatType.CV_32F, histData.ToArray());
+                histogram = CV.Mat.FromPixelData(task.histogramBins, 1, MatType.CV_32F, histData.ToArray());
             }
             var ranges = new[] { new Rangef(0, task.MaxZmeters) };
             Cv2.CalcBackProject(new[] { task.pcSplit[2] }, new[] { 0 }, histogram, dst1, ranges);
@@ -1776,7 +1778,7 @@ namespace CS_Classes
                 }
             }
 
-            Mat hist = cv.Mat.FromPixelData(counts.Length, 1, MatType.CV_32F, counts);
+            Mat hist = CV.Mat.FromPixelData(counts.Length, 1, MatType.CV_32F, counts);
             plot.backColor = Scalar.Blue;
             plot.Run(hist);
             dst3 = plot.dst2.Clone();
@@ -1785,7 +1787,7 @@ namespace CS_Classes
                 counts[i] = src.Rows * expectedDistribution[i];
             }
 
-            hist = cv.Mat.FromPixelData(counts.Length, 1, MatType.CV_32F, counts);
+            hist = CV.Mat.FromPixelData(counts.Length, 1, MatType.CV_32F, counts);
             plot.backColor = Scalar.Gray;
             plot.Run(hist);
 
@@ -1887,7 +1889,7 @@ namespace CS_Classes
                 sieve.Run(src); // only need to compute this once...
             SetTrueText($"Primes found: {sieve.primes.Count}", 3);
 
-            var tmp = cv.Mat.FromPixelData(sieve.primes.Count, 1, MatType.CV_32S, sieve.primes.ToArray());
+            var tmp = CV.Mat.FromPixelData(sieve.primes.Count, 1, MatType.CV_32S, sieve.primes.ToArray());
             tmp.ConvertTo(tmp, MatType.CV_32F);
             benford.RunAndMeasure(tmp, benford);
             dst2 = benford.dst2;
@@ -1900,24 +1902,24 @@ namespace CS_Classes
 
     public class Bezier_Basics_CS : CS_Parent
     {
-        public cv.Point[] points;
+        public CV.Point[] points;
 
         public Bezier_Basics_CS(VBtask task) : base(task)
         {
-            points = new cv.Point[]
+            points = new CV.Point[]
             {
-            new cv.Point(100, 100),
-            new cv.Point(150, 50),
-            new cv.Point(250, 150),
-            new cv.Point(300, 100),
-            new cv.Point(350, 150),
-            new cv.Point(450, 50)
+            new CV.Point(100, 100),
+            new CV.Point(150, 50),
+            new CV.Point(250, 150),
+            new CV.Point(300, 100),
+            new CV.Point(350, 150),
+            new CV.Point(450, 50)
             };
             UpdateAdvice(traceName + ": Update the public points array variable. No exposed options.");
             desc = "Use n points to draw a Bezier curve.";
         }
 
-        public cv.Point nextPoint(cv.Point[] points, int i, float t)
+        public CV.Point nextPoint(CV.Point[] points, int i, float t)
         {
             double x = Math.Pow(1 - t, 3) * points[i].X +
                        3 * t * Math.Pow(1 - t, 2) * points[i + 1].X +
@@ -1929,17 +1931,17 @@ namespace CS_Classes
                        3 * Math.Pow(t, 2) * (1 - t) * points[i + 2].Y +
                        Math.Pow(t, 3) * points[i + 3].Y;
 
-            return new cv.Point((int)x, (int)y);
+            return new CV.Point((int)x, (int)y);
         }
 
         public void RunCS(Mat src)
         {
-            cv.Point p1 = new cv.Point();
+            CV.Point p1 = new CV.Point();
             for (int i = 0; i <= points.Length - 4; i += 3)
             {
                 for (int j = 0; j <= 100; j++)
                 {
-                    cv.Point p2 = nextPoint(points, i, j / 100f);
+                    CV.Point p2 = nextPoint(points, i, j / 100f);
                     if (j > 0) DrawLine(dst2, p1, p2, task.HighlightColor, task.lineWidth);
                     p1 = p2;
                 }
@@ -1954,13 +1956,13 @@ namespace CS_Classes
     public class Bezier_Example_CS : CS_Parent
     {
         Bezier_Basics_CS bezier;
-        public cv.Point[] points;
+        public CV.Point[] points;
 
         public Bezier_Example_CS(VBtask task) : base(task)
         {
             bezier = new Bezier_Basics_CS(task);
-            points = new cv.Point[] { new cv.Point(task.DotSize, task.DotSize), new cv.Point(dst2.Width / 6, dst2.Width / 6),
-                       new cv.Point(dst2.Width * 3 / 4, dst2.Height / 2), new cv.Point(dst2.Width - task.DotSize * 2,
+            points = new CV.Point[] { new CV.Point(task.DotSize, task.DotSize), new CV.Point(dst2.Width / 6, dst2.Width / 6),
+                       new CV.Point(dst2.Width * 3 / 4, dst2.Height / 2), new CV.Point(dst2.Width - task.DotSize * 2,
                        dst2.Height - task.DotSize * 2)};
             desc = "Draw a Bezier curve based with the 4 input points.";
         }
@@ -1968,10 +1970,10 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             dst2.SetTo(Scalar.Black);
-            cv.Point p1 = new cv.Point();
+            CV.Point p1 = new CV.Point();
             for (int i = 0; i < 100; i++)
             {
-                cv.Point p2 = bezier.nextPoint(points, 0, i / 100f);
+                CV.Point p2 = bezier.nextPoint(points, 0, i / 100f);
                 if (i > 0) DrawLine(dst2, p1, p2, task.HighlightColor, task.lineWidth);
                 p1 = p2;
             }
@@ -2014,7 +2016,7 @@ namespace CS_Classes
             IntPtr imagePtr = BGRPattern_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleSrc.Free();
 
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
 
             classCount = BGRPattern_ClassCount(cPtr);
             denoise.classCount = classCount;
@@ -2064,7 +2066,7 @@ namespace CS_Classes
             IntPtr imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels(), options.learnRate);
             handleSrc.Free();
 
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
             labels[2] = options.methodDesc;
         }
 
@@ -2101,7 +2103,7 @@ namespace CS_Classes
             IntPtr imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels(), learnRate);
             handleSrc.Free();
 
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
         }
 
         public void Close()
@@ -2281,7 +2283,7 @@ namespace CS_Classes
                 int section = i;
                 taskArray[i] = Task.Factory.StartNew(() =>
                 {
-                    cv.Rect roi = new cv.Rect((section % xfactor) * width, height * (int)Math.Floor((double)section / yfactor), width, height);
+                    CV.Rect roi = new CV.Rect((section % xfactor) * width, height * (int)Math.Floor((double)section / yfactor), width, height);
                     Mat correlation = new Mat();
                     if (roi.X + roi.Width > dst3.Width) roi.Width = dst3.Width - roi.X - 1;
                     if (roi.Y + roi.Height > dst3.Height) roi.Height = dst3.Height - roi.Y - 1;
@@ -2324,8 +2326,8 @@ namespace CS_Classes
             options.RunVB();
 
             byte[] jpeg = src.ImEncode(".jpg", new int[] { (int)OpenCvSharp.ImwriteFlags.JpegQuality, options.quality });
-            Mat tmp = cv.Mat.FromPixelData(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
-            dst3 = cv.Cv2.ImDecode(tmp, OpenCvSharp.ImreadModes.Color);
+            Mat tmp = CV.Mat.FromPixelData(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
+            dst3 = CV.Cv2.ImDecode(tmp, OpenCvSharp.ImreadModes.Color);
             benford.Run(tmp);
             dst2 = benford.dst2;
             labels[2] = benford.labels[3];
@@ -2353,7 +2355,7 @@ namespace CS_Classes
             options.RunVB();
 
             byte[] jpeg = src.ImEncode(".jpg", new int[] { (int)OpenCvSharp.ImwriteFlags.JpegQuality, options.quality });
-            var tmp = cv.Mat.FromPixelData(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
+            var tmp = CV.Mat.FromPixelData(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
             dst3 = OpenCvSharp.Cv2.ImDecode(tmp, OpenCvSharp.ImreadModes.Color);
             benford.Run(tmp);
             dst2 = benford.dst2;
@@ -2381,7 +2383,7 @@ namespace CS_Classes
             options.RunVB();
 
             byte[] png = src.ImEncode(".png", new int[] { (int)OpenCvSharp.ImwriteFlags.PngCompression, options.compression });
-            var tmp = cv.Mat.FromPixelData(png.Length, 1, OpenCvSharp.MatType.CV_8U, png);
+            var tmp = CV.Mat.FromPixelData(png.Length, 1, OpenCvSharp.MatType.CV_8U, png);
             dst3 = OpenCvSharp.Cv2.ImDecode(tmp, OpenCvSharp.ImreadModes.Color);
             benford.Run(tmp);
             dst2 = benford.dst2;
@@ -2549,7 +2551,7 @@ namespace CS_Classes
             }
 
             float offset = halfSplit / (float)bins * dst3.Width;
-            Cv2.Line(dst3, new cv.Point((int)offset, 0), new cv.Point((int)offset, dst3.Height), Scalar.White);
+            Cv2.Line(dst3, new CV.Point((int)offset, 0), new CV.Point((int)offset, dst3.Height), Scalar.White);
 
             mats.mat[0] = src.InRange(0, halfSplit - 1); // darkest
             mats.mat[1] = src.InRange(halfSplit, 255);   // lightest
@@ -2716,7 +2718,7 @@ namespace CS_Classes
                 for (int i = 0; i < redCells.Length; i++)
                 {
                     redCells[i] = new List<rcData>();
-                    cellMaps[i] = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                    cellMaps[i] = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 }
             }
 
@@ -2798,9 +2800,9 @@ namespace CS_Classes
             }
 
             double offset = firstThird / (double)bins * dst3.Width;
-            Cv2.Line(dst3, new cv.Point(offset, 0), new cv.Point(offset, dst3.Height), Scalar.White);
+            Cv2.Line(dst3, new CV.Point(offset, 0), new CV.Point(offset, dst3.Height), Scalar.White);
             offset = lastThird / (double)bins * dst3.Width;
-            Cv2.Line(dst3, new cv.Point(offset, 0), new cv.Point(offset, dst3.Height), Scalar.White);
+            Cv2.Line(dst3, new CV.Point(offset, 0), new CV.Point(offset, dst3.Height), Scalar.White);
 
             mats.mat[0] = src.InRange(0, firstThird - 1);         // darkest
             mats.mat[1] = src.InRange(lastThird, 255);            // lightest
@@ -2858,7 +2860,7 @@ namespace CS_Classes
         public Bin3Way_Color_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "CV_8U format of the image", "showPalette output of dst2" };
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Build the palette input that best separates the light and dark regions of an image";
         }
 
@@ -3077,7 +3079,7 @@ namespace CS_Classes
         Bin4Way_SplitMean_CS binary;
         Diff_Basics[] diff = new Diff_Basics[4];
         string[] labelStr = new string[4];
-        cv.Point[] points = new cv.Point[4];
+        CV.Point[] points = new CV.Point[4];
         int index = 0;
         public Bin4Way_Basics_CS(VBtask task) : base(task)
         {
@@ -3097,7 +3099,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             if (task.mousePicTag == 1) index = task.gridMap.At<int>(task.ClickPoint.Y, task.ClickPoint.X);
-            cv.Rect roiSave = index < task.gridList.Count ? task.gridList[index] : new cv.Rect();
+            CV.Rect roiSave = index < task.gridList.Count ? task.gridList[index] : new CV.Rect();
 
             if (task.optionsChanged) index = 0;
 
@@ -3128,12 +3130,12 @@ namespace CS_Classes
             List<List<int>> contourCounts = new List<List<int>>();
             List<List<float>> means = new List<List<float>>();
 
-            cv.Point[][] allContours;
+            CV.Point[][] allContours;
             for (int i = 0; i < counts.GetLength(0); i++)
             {
                 for (int j = 0; j < task.gridList.Count; j++)
                 {
-                    cv.Rect roi = task.gridList[j];
+                    CV.Rect roi = task.gridList[j];
                     Mat tmp = new Mat(matList[i], roi);
                     Cv2.FindContours(tmp, out allContours, out _, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
                     if (i == 0)
@@ -3157,17 +3159,17 @@ namespace CS_Classes
                 Mat tmpVolatile = new Mat(dst0, roiSave) & tmp;
                 tmp.SetTo(Scalar.All(255), tmpVolatile);
                 new Mat(dst0, roiSave).CopyTo(tmp, tmpVolatile);
-                cv.Rect r = new cv.Rect(0, 0, (int)(tmp.Width * ratio), (int)(tmp.Height * ratio));
-                mats.mat[i][r] = tmp.Resize(new cv.Size(r.Width, r.Height));
+                CV.Rect r = new CV.Rect(0, 0, (int)(tmp.Width * ratio), (int)(tmp.Height * ratio));
+                mats.mat[i][r] = tmp.Resize(new CV.Size(r.Width, r.Height));
 
                 if (task.heartBeat)
                 {
                     int plus = mats.mat[i][r].Width / 2;
 
-                    if (i == 0) points[i] = new cv.Point(bump + plus, bump);
-                    if (i == 1) points[i] = new cv.Point(bump + dst2.Width / 2 + plus, bump);
-                    if (i == 2) points[i] = new cv.Point(bump + plus, bump + dst2.Height / 2);
-                    if (i == 3) points[i] = new cv.Point(bump + dst2.Width / 2 + plus, bump + dst2.Height / 2);
+                    if (i == 0) points[i] = new CV.Point(bump + plus, bump);
+                    if (i == 1) points[i] = new CV.Point(bump + dst2.Width / 2 + plus, bump);
+                    if (i == 2) points[i] = new CV.Point(bump + plus, bump + dst2.Height / 2);
+                    if (i == 3) points[i] = new CV.Point(bump + dst2.Width / 2 + plus, bump + dst2.Height / 2);
                 }
             }
 
@@ -3204,9 +3206,9 @@ namespace CS_Classes
             Mat mask = binary.dst2.Clone();
             if (task.heartBeat)
             {
-                midColor = cv.Scalar.All(binary.meanScalar[0]);
-                topColor = cv.Scalar.All(Cv2.Mean(gray, mask)[0]);
-                botColor = cv.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
+                midColor = CV.Scalar.All(binary.meanScalar[0]);
+                topColor = CV.Scalar.All(Cv2.Mean(gray, mask)[0]);
+                botColor = CV.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
             }
             mats.mat[0] = gray.InRange(0, botColor[0] / 2);
             mats.mat[1] = gray.InRange(botColor[0] / 2, (botColor[0] + midColor[0]) / 2);
@@ -3255,9 +3257,9 @@ namespace CS_Classes
             Mat mask = binary.dst2.Clone();
             if (task.heartBeat)
             {
-                midColor = cv.Scalar.All(binary.meanScalar[0]);
-                topColor = cv.Scalar.All(Cv2.Mean(gray, mask)[0]);
-                botColor = cv.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
+                midColor = CV.Scalar.All(binary.meanScalar[0]);
+                topColor = CV.Scalar.All(Cv2.Mean(gray, mask)[0]);
+                botColor = CV.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
             }
             int botmin = findMin(5, (int)botColor[0]);
             mats.mat[0] = gray.InRange(0, botmin);
@@ -3313,7 +3315,7 @@ namespace CS_Classes
                 diff[i] = new Diff_Basics();
             }
             labels[2] = "Image separated into 4 levels - darkest to lightest";
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find the unstable pixels in the binary image";
         }
         public void RunCS(Mat src)
@@ -3366,7 +3368,7 @@ namespace CS_Classes
             for (int i = 0; i < quartiles.Count(); i++)
             {
                 int offset = quartiles[i] / bins * dst3.Width;
-                DrawLine(dst3, new cv.Point(offset, 0), new cv.Point(offset, dst3.Height), Scalar.White);
+                DrawLine(dst3, new CV.Point(offset, 0), new CV.Point(offset, dst3.Height), Scalar.White);
             }
             mats.mat[0] = src.InRange(0, quartiles[0] - 1);
             mats.mat[1] = src.InRange(quartiles[0], quartiles[1] - 1);
@@ -3888,7 +3890,7 @@ namespace CS_Classes
                 for (int i = 0; i < redCells.Length; i++)
                 {
                     redCells[i] = new List<rcData>();
-                    cellMaps[i] = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                    cellMaps[i] = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 }
             }
 
@@ -3933,10 +3935,10 @@ namespace CS_Classes
 
         void rebuildMats()
         {
-            dst2 = new Mat(task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(task.WorkingRes, MatType.CV_8U, CV.Scalar.All(0));
             for (int i = 0; i < binary.mats.mat.Count(); i++)
             {
-                binary.mats.mat[i] = new Mat(task.WorkingRes, MatType.CV_8UC1, cv.Scalar.All(0));
+                binary.mats.mat[i] = new Mat(task.WorkingRes, MatType.CV_8UC1, CV.Scalar.All(0));
             }
         }
 
@@ -3945,7 +3947,7 @@ namespace CS_Classes
             binary.Run(src);
             if (dst2.Width != binary.mats.mat[0].Width) rebuildMats();
 
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             dst2.SetTo(1, binary.mats.mat[0]);
             dst2.SetTo(2, binary.mats.mat[1]);
             dst2.SetTo(3, binary.mats.mat[2]);
@@ -3981,9 +3983,9 @@ namespace CS_Classes
 
             if (task.heartBeat)
             {
-                midColor = cv.Scalar.All(binary.meanScalar[0]);
-                topColor = cv.Scalar.All(Cv2.Mean(gray, mask)[0]);
-                botColor = cv.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
+                midColor = CV.Scalar.All(binary.meanScalar[0]);
+                topColor = CV.Scalar.All(Cv2.Mean(gray, mask)[0]);
+                botColor = CV.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
             }
 
             mats.mat[0] = gray.InRange(new Scalar(0), botColor);
@@ -4012,7 +4014,7 @@ namespace CS_Classes
 
         public Binarize_Basics_CS(VBtask task) : base(task)
         {
-            mask = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(255));
+            mask = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(255));
             UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.");
             desc = "Binarize an image using Threshold with OTSU.";
         }
@@ -4096,7 +4098,7 @@ namespace CS_Classes
         public Binarize_KMeansMasks_CS(VBtask task) : base(task)
         {
             labels[2] = "Ordered from dark to light, top left darkest, bottom right lightest ";
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Display the top 4 masks from the BGR kmeans output";
         }
         public void RunCS(Mat src)
@@ -4366,8 +4368,8 @@ namespace CS_Classes
                 dst3.SetTo(0);
                 cc.FilterByBlob(dst2, dst3, maxBlob);
 
-                dst3.Circle(new cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, Scalar.Blue, -1, task.lineType);
-                DrawCircle(dst3, new cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, Scalar.Yellow);
+                dst3.Circle(new CV.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, Scalar.Blue, -1, task.lineType);
+                DrawCircle(dst3, new CV.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, Scalar.Yellow);
             }
         }
     }
@@ -4404,8 +4406,8 @@ namespace CS_Classes
             var blockMatch = StereoBM.Create();
             blockMatch.BlockSize = options.blockSize;
             blockMatch.MinDisparity = 0;
-            blockMatch.ROI1 = new cv.Rect(0, 0, task.leftView.Width, task.leftView.Height);
-            blockMatch.ROI2 = new cv.Rect(0, 0, task.leftView.Width, task.leftView.Height);
+            blockMatch.ROI1 = new CV.Rect(0, 0, task.leftView.Width, task.leftView.Height);
+            blockMatch.ROI2 = new CV.Rect(0, 0, task.leftView.Width, task.leftView.Height);
             blockMatch.PreFilterCap = 31;
             blockMatch.NumDisparities = options.numDisparity;
             blockMatch.TextureThreshold = 10;
@@ -4423,7 +4425,7 @@ namespace CS_Classes
             dst1 = dst1.Threshold(0, 0, ThresholdTypes.Tozero);
 
             int topMargin = 10, sideMargin = 8;
-            cv.Rect rect = new cv.Rect(options.numDisparity + sideMargin, topMargin, src.Width - options.numDisparity - sideMargin * 2, src.Height - topMargin * 2);
+            CV.Rect rect = new CV.Rect(options.numDisparity + sideMargin, topMargin, src.Width - options.numDisparity - sideMargin * 2, src.Height - topMargin * 2);
             Cv2.Divide(options.distance, dst1[rect], dst1[rect]); // this needs much more refinement. The trackbar value is just an approximation.
             dst1[rect] = dst1[rect].Threshold(10, 10, ThresholdTypes.Trunc);
 
@@ -4447,7 +4449,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            Cv2.GaussianBlur(src, dst2, new cv.Size(options.kernelSize, options.kernelSize), options.sigma, options.sigma);
+            Cv2.GaussianBlur(src, dst2, new CV.Size(options.kernelSize, options.kernelSize), options.sigma, options.sigma);
         }
     }
 
@@ -4464,7 +4466,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            Cv2.Blur(src, dst2, new cv.Size(blur.Options.kernelSize, blur.Options.kernelSize), new cv.Point(-1, -1));
+            Cv2.Blur(src, dst2, new CV.Size(blur.Options.kernelSize, blur.Options.kernelSize), new CV.Point(-1, -1));
         }
     }
 
@@ -4554,10 +4556,10 @@ namespace CS_Classes
 
         public void RunCS(Mat src)
         {
-            cv.Rect r = new cv.Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50);
+            CV.Rect r = new CV.Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50);
             if (standaloneTest())
             {
-                if (task.drawRect != new cv.Rect()) r = task.drawRect;
+                if (task.drawRect != new CV.Rect()) r = task.drawRect;
                 if (task.frameCount % 2 == 1)
                 {
                     blur.Run(src[r]);
@@ -4623,7 +4625,7 @@ namespace CS_Classes
 
             if (options.kernelSize > 1)
             {
-                Cv2.GaussianBlur(dst2, dst3, new cv.Size(options.kernelSize, options.kernelSize), 0, 0);
+                Cv2.GaussianBlur(dst2, dst3, new CV.Size(options.kernelSize, options.kernelSize), 0, 0);
             }
             dst3 = dst3.Normalize(255);
             dst3 = dst3.ConvertScaleAbs(255);
@@ -4672,13 +4674,13 @@ namespace CS_Classes
             }
 
             kernel = new Mat(options.kernelSize, options.kernelSize, MatType.CV_32F, Scalar.All(0));
-            var pt1 = new cv.Point(0, (options.kernelSize - 1) / 2);
-            var pt2 = new cv.Point(options.kernelSize * Math.Cos(options.theta) + pt1.X, options.kernelSize * Math.Sin(options.theta) + pt1.Y);
+            var pt1 = new CV.Point(0, (options.kernelSize - 1) / 2);
+            var pt2 = new CV.Point(options.kernelSize * Math.Cos(options.theta) + pt1.X, options.kernelSize * Math.Sin(options.theta) + pt1.Y);
             kernel.Line(pt1, pt2, new Scalar(1.0 / options.kernelSize));
             dst2 = src.Filter2D(-1, kernel);
 
-            pt1 += new cv.Point(src.Width / 2, src.Height / 2);
-            pt2 += new cv.Point(src.Width / 2, src.Height / 2);
+            pt1 += new CV.Point(src.Width / 2, src.Height / 2);
+            pt2 += new CV.Point(src.Width / 2, src.Height / 2);
 
             if (options.showDirection)
             {
@@ -4696,11 +4698,11 @@ namespace CS_Classes
     {
         BlurMotion_Basics_CS mblur;
 
-        Mat calcPSF(cv.Size filterSize, int len, double theta)
+        Mat calcPSF(CV.Size filterSize, int len, double theta)
         {
             var h = new Mat(filterSize, MatType.CV_32F, Scalar.All(0));
-            var pt = new cv.Point(filterSize.Width / 2, filterSize.Height / 2);
-            h.Ellipse(pt, new cv.Size(0, len / 2), 90 - theta, 0, 360, new Scalar(255), -1);
+            var pt = new CV.Point(filterSize.Width / 2, filterSize.Height / 2);
+            h.Ellipse(pt, new CV.Size(0, len / 2), 90 - theta, 0, 360, new Scalar(255), -1);
             var summa = Cv2.Sum(h);
             return h / summa[0];
         }
@@ -4715,7 +4717,7 @@ namespace CS_Classes
             planes = Cv2.Split(complexI);
             var denom = new Mat();
             Cv2.Pow(Cv2.Abs(planes[0]), 2, denom);
-            denom += cv.Scalar.All(nsr);
+            denom += CV.Scalar.All(nsr);
             var output_G = new Mat();
             Cv2.Divide(planes[0], denom, output_G);
             return output_G;
@@ -4726,10 +4728,10 @@ namespace CS_Classes
             var outputImg = inputImg.Clone();
             int cx = outputImg.Width / 2;
             int cy = outputImg.Height / 2;
-            var q0 = new Mat(outputImg, new cv.Rect(0, 0, cx, cy));
-            var q1 = new Mat(outputImg, new cv.Rect(cx, 0, cx, cy));
-            var q2 = new Mat(outputImg, new cv.Rect(0, cy, cx, cy));
-            var q3 = new Mat(outputImg, new cv.Rect(cx, cy, cx, cy));
+            var q0 = new Mat(outputImg, new CV.Rect(0, 0, cx, cy));
+            var q1 = new Mat(outputImg, new CV.Rect(cx, 0, cx, cy));
+            var q2 = new Mat(outputImg, new CV.Rect(0, cy, cx, cy));
+            var q3 = new Mat(outputImg, new CV.Rect(cx, cy, cx, cy));
             var tmp = q0.Clone();
             q3.CopyTo(q0);
             tmp.CopyTo(q3);
@@ -4817,7 +4819,7 @@ namespace CS_Classes
 
             int width = src.Width;
             int height = src.Height;
-            var roi = new cv.Rect(0, 0, width % 2 == 0 ? width : width - 1, height % 2 == 0 ? height : height - 1);
+            var roi = new CV.Rect(0, 0, width % 2 == 0 ? width : width - 1, height % 2 == 0 ? height : height - 1);
 
             var h = calcPSF(roi.Size, mblur.options.restoreLen, mblur.options.theta);
             var hW = calcWeinerFilter(h, 1.0 / mblur.options.SNR);
@@ -4839,9 +4841,9 @@ namespace CS_Classes
     public class Boundary_Basics_CS : CS_Parent
     {
         public RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
-        public List<cv.Rect> rects = new List<cv.Rect>();
+        public List<CV.Rect> rects = new List<CV.Rect>();
         public List<Mat> masks = new List<Mat>();
-        public List<List<cv.Point>> contours = new List<List<cv.Point>>();
+        public List<List<CV.Point>> contours = new List<List<CV.Point>>();
         public bool runRedCPP = true;
         Color8U_Basics cvt;
         RedCloud_Reduce prep;
@@ -4853,7 +4855,7 @@ namespace CS_Classes
             prep = new RedCloud_Reduce();
             guided = new GuidedBP_Depth();
             task.redOptions.setColorSource("Bin4Way_Regions");
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Create a mask of the RedCloud cell boundaries";
         }
 
@@ -4891,7 +4893,7 @@ namespace CS_Classes
                     var rect = redCPP.rectList[i - 1];
                     var mask = redCPP.dst2[rect].InRange(i, i);
                     var contour = ContourBuild(mask, ContourApproximationModes.ApproxNone);
-                    DrawContour(dst2[rect], contour, cv.Scalar.All(255), task.lineWidth);
+                    DrawContour(dst2[rect], contour, CV.Scalar.All(255), task.lineWidth);
                     rects.Add(rect);
                     masks.Add(mask);
                     contours.Add(contour);
@@ -4913,7 +4915,7 @@ namespace CS_Classes
 
         public Boundary_Tiers_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Add the depth tiers to the cell boundaries";
         }
 
@@ -4926,7 +4928,7 @@ namespace CS_Classes
             dst2.SetTo(0);
             foreach (var tour in contours.contourlist)
             {
-                DrawContour(dst2, tour.ToList(), cv.Scalar.All(255), 2);
+                DrawContour(dst2, tour.ToList(), CV.Scalar.All(255), 2);
             }
             labels[2] = $"{contours.contourlist.Count} depth tiers were found.";
             labels[3] = cells.labels[2];
@@ -4940,9 +4942,9 @@ namespace CS_Classes
     public class Boundary_Rectangles_CS : CS_Parent
     {
         public Boundary_Basics bounds = new Boundary_Basics();
-        public List<cv.Rect> rects = new List<cv.Rect>();
-        public List<cv.Rect> smallRects = new List<cv.Rect>();
-        public List<List<cv.Point>> smallContours = new List<List<cv.Point>>();
+        public List<CV.Rect> rects = new List<CV.Rect>();
+        public List<CV.Rect> smallRects = new List<CV.Rect>();
+        public List<List<CV.Point>> smallContours = new List<List<CV.Point>>();
         public Options_BoundaryRect options = new Options_BoundaryRect();
         public Boundary_Rectangles_CS(VBtask task) : base(task)
         {
@@ -5044,7 +5046,7 @@ namespace CS_Classes
 
         public Boundary_Overlap_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Determine if 2 contours overlap";
         }
 
@@ -5065,8 +5067,8 @@ namespace CS_Classes
                         dst2.SetTo(0);
                         int c1 = tour.Count;
                         int c2 = bounds.contours[j].Count;
-                        DrawContour(dst2[rect], tour, cv.Scalar.All(127), task.lineWidth);
-                        DrawContour(dst2[r], bounds.contours[j], cv.Scalar.All(255), task.lineWidth);
+                        DrawContour(dst2[rect], tour, CV.Scalar.All(127), task.lineWidth);
+                        DrawContour(dst2[r], bounds.contours[j], CV.Scalar.All(255), task.lineWidth);
                         int count = dst2.CountNonZero();
                         if (count != c1 + c2)
                         {
@@ -5144,7 +5146,7 @@ namespace CS_Classes
     public class BRISK_Basics_CS : CS_Parent
     {
         BRISK brisk;
-        public List<cv.Point2f> features = new List<cv.Point2f>();
+        public List<CV.Point2f> features = new List<CV.Point2f>();
         Options_Features options = new Options_Features();
 
         public BRISK_Basics_CS(VBtask task) : base(task)
@@ -5170,7 +5172,7 @@ namespace CS_Classes
             {
                 if (pt.Size > options.minDistance)
                 {
-                    features.Add(new cv.Point2f(pt.Pt.X, pt.Pt.Y));
+                    features.Add(new CV.Point2f(pt.Pt.X, pt.Pt.Y));
                     DrawCircle(dst2, pt.Pt, task.DotSize + 1, task.HighlightColor);
                 }
             }
@@ -5215,7 +5217,7 @@ namespace CS_Classes
             }
             else
             {
-                histogram = new Mat(hist2d.histogram.Size(), MatType.CV_32F, cv.Scalar.All(0));
+                histogram = new Mat(hist2d.histogram.Size(), MatType.CV_32F, CV.Scalar.All(0));
                 hist2d.histogram[roi].CopyTo(histogram[roi]);
             }
             Cv2.CalcBackProject(new[] { colorFmt.dst2 }, hist2d.channels, histogram, dst0, hist2d.ranges);
@@ -5243,7 +5245,7 @@ namespace CS_Classes
                             " pixels while image total is " + dst0.Total().ToString("0");
             }
             SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control the 2D backprojection",
-                        new cv.Point(10, dst3.Height - 20), 3);
+                        new CV.Point(10, dst3.Height - 20), 3);
         }
     }
 
@@ -5290,7 +5292,7 @@ namespace CS_Classes
                             " pixels while image total is " + dst0.Total().ToString("0");
             }
             SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control the 2D histogram at left",
-                        new cv.Point(10, dst3.Height - 20), 3);
+                        new CV.Point(10, dst3.Height - 20), 3);
         }
     }
 
@@ -5317,17 +5319,17 @@ namespace CS_Classes
             backp.Run(src);
             dst2 = Convert32f_To_8UC3(backp.dst2) * 255;
             var roi = task.gridList[task.gridMap.Get<int>(task.mouseMovePoint.Y, task.mouseMovePoint.X)];
-            cv.Rect rect;
+            CV.Rect rect;
             if (options.backProjectRow)
             {
-                rect = new cv.Rect(0, roi.Y, dst2.Width, roi.Height);
+                rect = new CV.Rect(0, roi.Y, dst2.Width, roi.Height);
             }
             else
             {
-                rect = new cv.Rect(roi.X, 0, roi.Width, dst2.Height);
+                rect = new CV.Rect(roi.X, 0, roi.Width, dst2.Height);
             }
             dst2.Rectangle(rect, task.HighlightColor, task.lineWidth);
-            Mat histData = new Mat(backp.hist2d.histogram.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            Mat histData = new Mat(backp.hist2d.histogram.Size(), MatType.CV_32F, CV.Scalar.All(0));
             backp.hist2d.histogram[rect].CopyTo(histData[rect]);
             var ranges = backp.hist2d.ranges;
             Cv2.CalcBackProject(new Mat[] { src }, backp.hist2d.channels, histData, dst1, ranges);
@@ -5385,7 +5387,7 @@ namespace CS_Classes
             SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control this 2D histogram.\n" +
                         "Move mouse in 2D histogram to select a cell to backproject.\n" +
                         "Click any quadrant at left to display that quadrant here.\n",
-                        new cv.Point(10, dst3.Height - dst3.Height / 4), 3);
+                        new CV.Point(10, dst3.Height - dst3.Height / 4), 3);
         }
     }
 
@@ -5448,7 +5450,7 @@ namespace CS_Classes
 
         public BackProject2D_Filter_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             task.gOptions.setHistogramBins(100); // extra bins to help isolate the stragglers.
             desc = "Filter a 2D histogram for the backprojection.";
         }
@@ -5461,7 +5463,7 @@ namespace CS_Classes
             }
             dst1.Col(0).SetTo(0);
 
-            dst2 = dst1.Threshold(threshold, 255, cv.ThresholdTypes.Binary);
+            dst2 = dst1.Threshold(threshold, 255, CV.ThresholdTypes.Binary);
         }
     }
 
@@ -5594,8 +5596,8 @@ namespace CS_Classes
         PointPair horizonVec;
         public CameraMotion_Basics_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             task.gOptions.setDebugSlider(3);
             desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)";
         }
@@ -5625,7 +5627,7 @@ namespace CS_Classes
                 translationY = 0;
             }
 
-            cv.Rect r1, r2;
+            CV.Rect r1, r2;
             if (translationX == 0 && translationY == 0)
             {
                 dst2 = src;
@@ -5634,7 +5636,7 @@ namespace CS_Classes
             }
             else
             {
-                r1 = new cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
+                r1 = new CV.Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
                               Math.Min(dst2.Height - translationY * 2, dst2.Height));
                 if (r1.X < 0)
                 {
@@ -5647,7 +5649,7 @@ namespace CS_Classes
                     r1.Height += translationY * 2;
                 }
 
-                r2 = new cv.Rect(Math.Abs(translationX), Math.Abs(translationY), r1.Width, r1.Height);
+                r2 = new CV.Rect(Math.Abs(translationX), Math.Abs(translationY), r1.Width, r1.Height);
 
                 task.camMotionPixels = (float)Math.Sqrt(translationX * translationX + translationY * translationY);
                 if (translationX == 0)
@@ -5773,8 +5775,8 @@ namespace CS_Classes
             dst3.SetTo(Scalar.All(0));
             if (Math.Abs(x1 - x2) > 0.5 || Math.Abs(y1 - y2) > 0.5)
             {
-                cv.Rect r1 = new cv.Rect((int)translationX, (int)translationY, dst2.Width - (int)translationX, dst2.Height - (int)translationY);
-                cv.Rect r2 = new cv.Rect(0, 0, r1.Width, r1.Height);
+                CV.Rect r1 = new CV.Rect((int)translationX, (int)translationY, dst2.Width - (int)translationX, dst2.Height - (int)translationY);
+                CV.Rect r2 = new CV.Rect(0, 0, r1.Width, r1.Height);
                 src[r1].CopyTo(dst1[r2]);
                 rotate.rotateAngle = rotationY;
                 rotate.rotateCenter = centerY;
@@ -5823,7 +5825,7 @@ namespace CS_Classes
     {
         public RotatedRect trackBox = new RotatedRect();
         CamShift_RedHue redHue = new CamShift_RedHue();
-        cv.Rect roi = new cv.Rect();
+        CV.Rect roi = new CV.Rect();
         Mat histogram = new Mat();
         public CamShift_Basics_CS(VBtask task) : base(task)
         {
@@ -5848,7 +5850,7 @@ namespace CS_Classes
             if (histogram.Rows != 0)
             {
                 Cv2.CalcBackProject(new Mat[] { hue }, new int[] { 0 }, histogram, dst1, ranges);
-                trackBox = Cv2.CamShift(dst1 & mask, ref roi, new TermCriteria(cv.CriteriaTypes.MaxIter, 10, 1));
+                trackBox = Cv2.CamShift(dst1 & mask, ref roi, new TermCriteria(CV.CriteriaTypes.MaxIter, 10, 1));
                 dst3 = Show_HSV_Hist(histogram);
                 if (dst3.Channels() == 1) dst3 = src;
                 dst3 = dst3.CvtColor(ColorConversionCodes.HSV2BGR);
@@ -5961,13 +5963,13 @@ namespace CS_Classes
     public class CComp_Basics_CS : CS_Parent
     {
         public ConnectedComponents connectedComponents;
-        public List<cv.Rect> rects = new List<cv.Rect>();
-        public List<cv.Point2f> centroids = new List<cv.Point2f>();
+        public List<CV.Rect> rects = new List<CV.Rect>();
+        public List<CV.Point2f> centroids = new List<CV.Point2f>();
         Mat lastImage;
         Options_CComp options = new Options_CComp();
         public CComp_Basics_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             UpdateAdvice(traceName + ": only the local options for threshold is used in CComp_Basics_CS.");
             labels[2] = "Input to ConnectedComponenetsEx";
             desc = "Draw bounding boxes around BGR binarized connected Components";
@@ -6090,14 +6092,14 @@ namespace CS_Classes
     public class CComp_Stats_CS : CS_Parent
     {
         public List<Mat> masks = new List<Mat>();
-        public List<cv.Rect> rects = new List<cv.Rect>();
+        public List<CV.Rect> rects = new List<CV.Rect>();
         public List<int> areas = new List<int>();
-        public List<cv.Point> centroids = new List<cv.Point>();
+        public List<CV.Point> centroids = new List<CV.Point>();
         public int numberOfLabels;
         public Options_CComp options = new Options_CComp();
         public CComp_Stats_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Use a threshold slider on the CComp input";
         }
         public void RunCS(Mat src)
@@ -6117,15 +6119,15 @@ namespace CS_Classes
             List<Vec3b> colors = new List<Vec3b>();
             SortedList<float, int> maskOrder = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
             List<Mat> unsortedMasks = new List<Mat>();
-            List<cv.Rect> unsortedRects = new List<cv.Rect>();
-            List<cv.Point> unsortedCentroids = new List<cv.Point>();
+            List<CV.Rect> unsortedRects = new List<CV.Rect>();
+            List<CV.Point> unsortedCentroids = new List<CV.Point>();
             List<int> index = new List<int>();
             for (int i = 0; i < Math.Min(256, stats.Rows); i++)
             {
                 int area = stats.Get<int>(i, 4);
                 if (area < 10) continue;
-                cv.Rect r1 = ValidateRect(stats.Get<cv.Rect>(i, 0));
-                cv.Rect r = ValidateRect(new cv.Rect(r1.X, r1.Y, r1.Width, r1.Height));
+                CV.Rect r1 = ValidateRect(stats.Get<CV.Rect>(i, 0));
+                CV.Rect r = ValidateRect(new CV.Rect(r1.X, r1.Y, r1.Width, r1.Height));
                 if ((r.Width == dst2.Width && r.Height == dst2.Height) || (r.Width == 1 && r.Height == 1)) continue;
                 areas.Add(area);
                 unsortedRects.Add(r);
@@ -6134,7 +6136,7 @@ namespace CS_Classes
                 colors.Add(task.vecColors[colors.Count]);
                 maskOrder.Add(area, unsortedMasks.Count);
                 unsortedMasks.Add(dst1.InRange(i, i)[r]);
-                cv.Point c = new cv.Point((int)centroidRaw.Get<double>(i, 0), (int)centroidRaw.Get<double>(i, 1));
+                CV.Point c = new CV.Point((int)centroidRaw.Get<double>(i, 0), (int)centroidRaw.Get<double>(i, 1));
                 unsortedCentroids.Add(c);
             }
             masks.Clear();
@@ -6198,7 +6200,7 @@ namespace CS_Classes
                 strOut += rc.colorMean[2].ToString(fmt1) + "\r\n";
                 strOut += "Color Stdev RGB: \t" + rc.colorStdev[0].ToString(fmt1) + "\t" + rc.colorStdev[1].ToString(fmt1) + "\t";
                 strOut += rc.colorStdev[2].ToString(fmt1) + "\r\n";
-                var tmp = new Mat(task.rc.mask.Rows, task.rc.mask.Cols, MatType.CV_32F, cv.Scalar.All(0));
+                var tmp = new Mat(task.rc.mask.Rows, task.rc.mask.Cols, MatType.CV_32F, CV.Scalar.All(0));
                 task.pcSplit[2][task.rc.rect].CopyTo(tmp, task.rc.mask);
                 plot.rc = task.rc;
                 plot.Run(tmp);
@@ -6258,7 +6260,7 @@ namespace CS_Classes
                     if (rc.pixels != rc.depthPixels)
                     {
                         dst3[rc.rect].SetTo(rc.color, rc.mask);
-                        var pt = new cv.Point(rc.maxDist.X - 10, rc.maxDist.Y);
+                        var pt = new CV.Point(rc.maxDist.X - 10, rc.maxDist.Y);
                         if (task.gOptions.getDebugCheckBox())
                         {
                             strOut = rc.pixels.ToString() + "/" + rc.depthPixels.ToString();
@@ -6285,7 +6287,7 @@ namespace CS_Classes
         public Cell_ValidateColorCells_CS(VBtask task) : base(task)
         {
             labels[3] = "Cells shown below have rc.depthPixels / rc.pixels < 50%";
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Validate that all the depthCells are correctly identified.";
         }
         public void RunCS(Mat src)
@@ -6336,8 +6338,8 @@ namespace CS_Classes
         {
             if (standalone) task.gOptions.setDisplay1();
             if (standalone) task.gOptions.setDisplay1();
-            dst1 = new cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new CV.Mat(dst1.Size(), CV.MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new CV.Mat(dst3.Size(), CV.MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "Depth distance to selected cell", "", "Color distance to selected cell" };
             desc = "Measure the color distance of each cell to the selected cell.";
         }
@@ -6351,7 +6353,7 @@ namespace CS_Classes
                 labels[2] = redC.labels[2];
                 List<float> depthDistance = new List<float>();
                 List<float> colorDistance = new List<float>();
-                cv.Scalar selectedMean = src[task.rc.rect].Mean(task.rc.mask);
+                CV.Scalar selectedMean = src[task.rc.rect].Mean(task.rc.mask);
                 foreach (var rc in task.redCells)
                 {
                     colorDistance.Add(distance3D(selectedMean, new Mat(src, rc.rect).Mean(rc.mask)));
@@ -6363,8 +6365,8 @@ namespace CS_Classes
                 for (int i = 0; i < task.redCells.Count; i++)
                 {
                     var rc = task.redCells[i];
-                    dst1[rc.rect].SetTo(new cv.Scalar(255 - depthDistance[i] * 255 / task.MaxZmeters), rc.mask);
-                    dst3[rc.rect].SetTo(new cv.Scalar(255 - colorDistance[i] * 255 / maxColorDistance), rc.mask);
+                    dst1[rc.rect].SetTo(new CV.Scalar(255 - depthDistance[i] * 255 / task.MaxZmeters), rc.mask);
+                    dst3[rc.rect].SetTo(new CV.Scalar(255 - colorDistance[i] * 255 / maxColorDistance), rc.mask);
                 }
             }
         }
@@ -6382,8 +6384,8 @@ namespace CS_Classes
                 task.gOptions.setDisplay1();
             if (standaloneTest())
                 task.gOptions.setDisplay1();
-            dst1 = new cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new CV.Mat(dst3.Size(), CV.MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new CV.Mat(dst3.Size(), CV.MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "Binarized image", "", "Relative gray image" };
             desc = "Separate the image into light and dark using RedCloud cells";
         }
@@ -6396,11 +6398,11 @@ namespace CS_Classes
                 dst2 = redC.dst2;
                 labels[2] = redC.labels[2];
                 List<float> grayMeans = new List<float>();
-                cv.Mat gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                CV.Mat gray = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
                 foreach (var rc in task.redCells)
                 {
-                    cv.Scalar grayMean, grayStdev;
-                    cv.Cv2.MeanStdDev(gray[rc.rect], out grayMean, out grayStdev, rc.mask);
+                    CV.Scalar grayMean, grayStdev;
+                    CV.Cv2.MeanStdDev(gray[rc.rect], out grayMean, out grayStdev, rc.mask);
                     grayMeans.Add((float)grayMean[0]);
                 }
                 float min = grayMeans.Min();
@@ -6410,8 +6412,8 @@ namespace CS_Classes
                 foreach (var rc in task.redCells)
                 {
                     float color = (grayMeans[rc.index] - min) * 255 / (max - min);
-                    dst3[rc.rect].SetTo(new cv.Scalar(color), rc.mask);
-                    dst1[rc.rect].SetTo(grayMeans[rc.index] > avg ? new cv.Scalar(255) : new cv.Scalar(0), rc.mask);
+                    dst3[rc.rect].SetTo(new CV.Scalar(color), rc.mask);
+                    dst1[rc.rect].SetTo(grayMeans[rc.index] > avg ? new CV.Scalar(255) : new CV.Scalar(0), rc.mask);
                 }
             }
         }
@@ -6458,9 +6460,9 @@ namespace CS_Classes
                 task.gOptions.setHistogramBins(20);
             desc = "Display the statistics for the selected cell.";
         }
-        public void statsString(cv.Mat src)
+        public void statsString(CV.Mat src)
         {
-            cv.Mat tmp = new cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0));
+            CV.Mat tmp = new CV.Mat(task.rc.mask.Rows, task.rc.mask.Cols, CV.MatType.CV_32F, CV.Scalar.All(0));
             task.pcSplit[2][task.rc.rect].CopyTo(tmp, task.rc.mask);
             plot.rc = task.rc;
             plot.Run(tmp);
@@ -6475,7 +6477,7 @@ namespace CS_Classes
                 redC.Run(src);
                 dst2 = redC.dst2;
                 labels[2] = redC.labels[2];
-                if (task.ClickPoint == new cv.Point())
+                if (task.ClickPoint == new CV.Point())
                 {
                     if (task.redCells.Count > 1)
                     {
@@ -6528,8 +6530,8 @@ namespace CS_Classes
     public class Cell_Generate_CS : CS_Parent
     {
         public int classCount;
-        public List<cv.Rect> rectList = new List<cv.Rect>();
-        public List<cv.Point> floodPoints = new List<cv.Point>();
+        public List<CV.Rect> rectList = new List<CV.Rect>();
+        public List<CV.Point> floodPoints = new List<CV.Point>();
         public bool removeContour;
         Diff_Basics diffLeft = new Diff_Basics();
         Diff_Basics diffRight = new Diff_Basics();
@@ -6539,7 +6541,7 @@ namespace CS_Classes
         int saveRetained = -1;
         public Cell_Generate_CS(VBtask task) : base(task)
         {
-            task.cellMap = new cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0));
+            task.cellMap = new CV.Mat(dst2.Size(), CV.MatType.CV_8U, CV.Scalar.All(0));
             task.redCells = new List<rcData>();
             desc = "Generate the RedCloud cells from the rects, mask, and pixel counts.";
         }
@@ -6566,7 +6568,7 @@ namespace CS_Classes
             else
                 diffRight.Run(task.rightView);
             SortedList<int, rcData> sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
-            List<cv.Vec3b> usedColors = new List<cv.Vec3b> { black };
+            List<CV.Vec3b> usedColors = new List<CV.Vec3b> { black };
             int retained = 0;
             List<rcData> initList = new List<rcData> { new rcData() };
             for (int i = 1; i < classCount; i++)
@@ -6580,15 +6582,15 @@ namespace CS_Classes
                 if (task.heartBeat || rc.indexLast == 0 || rc.indexLast >= task.redCells.Count)
                 {
                     if (useLeftImage)
-                        cv.Cv2.MeanStdDev(task.color[rc.rect], out rc.colorMean, out rc.colorStdev, rc.mask);
+                        CV.Cv2.MeanStdDev(task.color[rc.rect], out rc.colorMean, out rc.colorStdev, rc.mask);
                     else
-                        cv.Cv2.MeanStdDev(task.rightView[rc.rect], out rc.colorMean, out rc.colorStdev, rc.mask);
+                        CV.Cv2.MeanStdDev(task.rightView[rc.rect], out rc.colorMean, out rc.colorStdev, rc.mask);
                 }
                 else
                 {
                     rc.colorMean = task.redCells[rc.indexLast].colorMean;
                 }
-                rc.naturalColor = new cv.Vec3b((byte)rc.colorMean[0], (byte)rc.colorMean[1], (byte)rc.colorMean[2]);
+                rc.naturalColor = new CV.Vec3b((byte)rc.colorMean[0], (byte)rc.colorMean[1], (byte)rc.colorMean[2]);
                 rc.naturalGray = (int)(rc.colorMean[2] * 0.299 + rc.colorMean[1] * 0.587 + rc.colorMean[0] * 0.114);
                 rc.maxDist = GetMaxDist(ref rc);
                 rc.indexLast = task.cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
@@ -6613,10 +6615,10 @@ namespace CS_Classes
                 var rc = initList[i];
                 if (!rc.exactMatch)
                 {
-                    rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone); // .ApproxTC89L1
-                    DrawContour(rc.mask, rc.contour, cv.Scalar.All(255), -1);
+                    rc.contour = contourBuild(rc.mask, CV.ContourApproximationModes.ApproxNone); // .ApproxTC89L1
+                    DrawContour(rc.mask, rc.contour, CV.Scalar.All(255), -1);
                     if (removeContour)
-                        DrawContour(rc.mask, rc.contour, cv.Scalar.All(0), 2); // no overlap with neighbors.
+                        DrawContour(rc.mask, rc.contour, CV.Scalar.All(0), 2); // no overlap with neighbors.
                     rc.maxDStable = rc.maxDist; // assume it has to use the latest.
                     rc.indexLast = task.cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
                     if (rc.indexLast > 0 && rc.indexLast < task.redCells.Count)
@@ -6640,7 +6642,7 @@ namespace CS_Classes
                         }
                     }
                     if (!rc.pointMatch && !rc.exactMatch)
-                        rc.color = new cv.Vec3b((byte)msRNG.Next(40, 220), (byte)msRNG.Next(40, 220), (byte)msRNG.Next(40, 220));
+                        rc.color = new CV.Vec3b((byte)msRNG.Next(40, 220), (byte)msRNG.Next(40, 220), (byte)msRNG.Next(40, 220));
                     if (usedColors.Contains(rc.color))
                         rc.color = task.vecColors[sortedCells.Count + 1];
                     usedColors.Add(rc.color);
@@ -6662,7 +6664,7 @@ namespace CS_Classes
                         task.pcSplit[2][rc.rect].MinMaxLoc(out minVal, out maxVal, out rc.minLoc, out rc.maxLoc, rc.depthMask);
                         rc.minVec.Z = (float)minVal;
                         rc.maxVec.Z = (float)maxVal;
-                        cv.Cv2.MeanStdDev(task.pointCloud[rc.rect], out rc.depthMean, out rc.depthStdev, rc.depthMask);
+                        CV.Cv2.MeanStdDev(task.pointCloud[rc.rect], out rc.depthMean, out rc.depthStdev, rc.depthMask);
                     }
                 }
                 sortedCells.Add(rc.pixels, rc);
@@ -6727,7 +6729,7 @@ namespace CS_Classes
             random = new Random_Basics_CS(task);
             grid = new Mat(dst2.Height / factor, dst2.Width / factor, MatType.CV_8UC1, Scalar.All(0));
             nextgrid = grid.Clone();
-            random.range = new cv.Rect(0, 0, grid.Width, grid.Height);
+            random.range = new CV.Rect(0, 0, grid.Width, grid.Height);
             FindSlider("Random Pixel Count").Value = (int)(grid.Width * grid.Height * 0.3); // we want about 30% of cells filled.
             desc = "Use OpenCV to implement the Game of Life";
         }
@@ -6770,7 +6772,7 @@ namespace CS_Classes
                     }
                     if (nextgrid.At<byte>(y, x) != 0)
                     {
-                        cv.Point pt = new cv.Point(x, y) * factor;
+                        CV.Point pt = new CV.Point(x, y) * factor;
                         Cv2.Circle(dst2, pt, factor / 2, nodeColor, -1);
                         population++;
                     }
@@ -6890,7 +6892,7 @@ namespace CS_Classes
         {
             if (task.heartBeat)
             {
-                cell.input = new Mat(new cv.Size(src.Width / 4, src.Height / 4), MatType.CV_8UC1, cv.Scalar.All(0));
+                cell.input = new Mat(new CV.Size(src.Width / 4, src.Height / 4), MatType.CV_8UC1, CV.Scalar.All(0));
                 cell.input.Set<byte>(0, cell.input.Width / 2, 1);
 
                 labels[2] = createOutcome(options.currentRule) + " options.currentRule = " + options.currentRule.ToString();
@@ -6927,7 +6929,7 @@ namespace CS_Classes
 
         public void RunCS(Mat src)
         {
-            Mat tmp = new Mat(new cv.Size(src.Width / 4, src.Height / 4), MatType.CV_8UC1, cv.Scalar.All(0));
+            Mat tmp = new Mat(new CV.Size(src.Width / 4, src.Height / 4), MatType.CV_8UC1, CV.Scalar.All(0));
             tmp.Set(0, val1, 1);
             tmp.Set(0, val2, 1);
             cell.RunAndMeasure(tmp, cell);
@@ -6999,7 +7001,7 @@ namespace CS_Classes
 
             if (standalone)
             {
-                input = new Mat(new cv.Size(src.Width, src.Height), MatType.CV_8UC1, Scalar.All(0));
+                input = new Mat(new CV.Size(src.Width, src.Height), MatType.CV_8UC1, Scalar.All(0));
                 input.Set<byte>(0, src.Width / 2, 1);
                 dst2 = createCells(labels[2]);
             }
@@ -7036,12 +7038,12 @@ namespace CS_Classes
             IntPtr imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
                                                            task.gOptions.getDebugCheckBox() ? 1 : 0);
             task.gOptions.setDebugCheckBox(false);
-            dst1 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_32S, imagePtr);
+            dst1 = CV.Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_32S, imagePtr);
 
             dst1.ConvertTo(dst0, MatType.CV_8U);
             dst2 = ShowPalette(dst0 * 255 / 2);
             imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize);
-            dst3 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr);
+            dst3 = CV.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr);
 
             SetTrueText("Click the global DebugCheckBox to get another set of points.", 3);
         }
@@ -7087,7 +7089,7 @@ namespace CS_Classes
             IntPtr imagePtr = OEX_Points_Classifier_RunCPP(cPtr, sampleCount, methodIndex, dst2.Rows, dst2.Cols,
                                                            task.gOptions.getDebugCheckBox() ? 1 : 0);
             task.gOptions.setDebugCheckBox(false);
-            dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr);
+            dst1 = CV.Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr);
             dst1.ConvertTo(dst0, MatType.CV_8U);
             dst2 = ShowPalette(dst0 * 255 / 2);
             imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize);
@@ -7110,7 +7112,7 @@ namespace CS_Classes
         public Classifier_BayesianTest_CS(VBtask task) : base(task)
         {
             task.redOptions.useColorOnlyChecked = true;
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output" };
             if (standalone) task.gOptions.setDisplay1();
             cPtr = Classifier_Bayesian_Open();
@@ -7211,13 +7213,13 @@ namespace CS_Classes
             labels[2] = "Clone result - draw anywhere to clone a region";
             labels[3] = "Clone Region Mask";
             desc = "Clone a portion of one image into another. Draw on any image to change selected area.";
-            task.drawRect = new cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2);
+            task.drawRect = new CV.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2);
         }
 
         public void RunCS(Mat src)
         {
             Mat mask = new Mat(src.Size(), MatType.CV_8U, Scalar.All(0));
-            if (task.drawRect == new cv.Rect())
+            if (task.drawRect == new CV.Rect())
             {
                 mask.SetTo(Scalar.All(255));
             }
@@ -7329,26 +7331,26 @@ namespace CS_Classes
     {
         Mat sourceImage;
         Mat mask;
-        cv.Rect srcROI;
-        cv.Rect maskROI;
-        cv.Point pt;
+        CV.Rect srcROI;
+        CV.Rect maskROI;
+        CV.Point pt;
         Options_Clone options = new Options_Clone();
 
         public Clone_Eagle_CS(VBtask task) : base(task)
         {
             sourceImage = Cv2.ImRead(task.HomeDir + "Data/CloneSource.png");
-            sourceImage = sourceImage.Resize(new cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720));
-            srcROI = new cv.Rect(0, 40, sourceImage.Width, sourceImage.Height);
+            sourceImage = sourceImage.Resize(new CV.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720));
+            srcROI = new CV.Rect(0, 40, sourceImage.Width, sourceImage.Height);
 
             mask = Cv2.ImRead(task.HomeDir + "Data/Clonemask.png");
-            mask = mask.Resize(new cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720));
-            maskROI = new cv.Rect(srcROI.Width, 40, mask.Width, mask.Height);
+            mask = mask.Resize(new CV.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720));
+            maskROI = new CV.Rect(srcROI.Width, 40, mask.Width, mask.Height);
 
             dst3.SetTo(0);
             dst3[srcROI] = sourceImage;
             dst3[maskROI] = mask;
 
-            pt = new cv.Point(dst2.Width / 2, dst2.Height / 2);
+            pt = new CV.Point(dst2.Width / 2, dst2.Height / 2);
             labels[2] = "Move Eagle by clicking in any location.";
             labels[3] = "Source image and source mask.";
             desc = "Clone an eagle into the video stream.";
@@ -7391,9 +7393,9 @@ namespace CS_Classes
         {
             options.RunVB();
 
-            cv.Point center = new cv.Point(src.Width / 2, src.Height / 2);
+            CV.Point center = new CV.Point(src.Width / 2, src.Height / 2);
             int radius = 100;
-            if (task.drawRect == new cv.Rect())
+            if (task.drawRect == new CV.Rect())
             {
                 dst3.SetTo(0);
                 DrawCircle(dst3, center, radius, Scalar.White);
@@ -7415,10 +7417,10 @@ namespace CS_Classes
     public class Cluster_Basics_CS : CS_Parent
     {
         KNN_Core knn = new KNN_Core();
-        public List<cv.Point> ptInput = new List<cv.Point>();
-        public List<cv.Point> ptList = new List<cv.Point>();
+        public List<CV.Point> ptInput = new List<CV.Point>();
+        public List<CV.Point> ptList = new List<CV.Point>();
         public List<int> clusterID = new List<int>();
-        public SortedList<int, List<cv.Point>> clusters = new SortedList<int, List<cv.Point>>();
+        public SortedList<int, List<CV.Point>> clusters = new SortedList<int, List<CV.Point>>();
         Feature_Basics feat = new Feature_Basics();
 
         public Cluster_Basics_CS(VBtask task) : base(task)
@@ -7448,8 +7450,8 @@ namespace CS_Classes
             int groupID;
             for (int i = 0; i < knn.queries.Count; i++)
             {
-                cv.Point p1 = new cv.Point(knn.queries[i].X, knn.queries[i].Y);
-                cv.Point p2 = new cv.Point(knn.queries[knn.result[i, 1]].X, knn.queries[knn.result[i, 1]].Y);
+                CV.Point p1 = new CV.Point(knn.queries[i].X, knn.queries[i].Y);
+                CV.Point p2 = new CV.Point(knn.queries[knn.result[i, 1]].X, knn.queries[knn.result[i, 1]].Y);
                 int index1 = ptList.IndexOf(p1);
                 int index2 = ptList.IndexOf(p2);
                 if (index1 >= 0 && index2 >= 0) continue;
@@ -7458,14 +7460,14 @@ namespace CS_Classes
                     ptList.Add(p1);
                     ptList.Add(p2);
                     groupID = clusters.Count;
-                    List<cv.Point> newList = new List<cv.Point> { p1, p2 };
+                    List<CV.Point> newList = new List<CV.Point> { p1, p2 };
                     clusters.Add(groupID, newList);
                     clusterID.Add(groupID);
                     clusterID.Add(groupID);
                 }
                 else
                 {
-                    cv.Point pt = index1 < 0 ? p1 : p2;
+                    CV.Point pt = index1 < 0 ? p1 : p2;
                     int index = index1 < 0 ? index2 : index1;
                     groupID = clusterID[index];
                     ptList.Add(pt);
@@ -7487,8 +7489,8 @@ namespace CS_Classes
             dst3.SetTo(0);
             for (int i = 0; i < knn.queries.Count; i++)
             {
-                Cv2.Circle(dst2, new cv.Point(knn.queries[i].X, knn.queries[i].Y), task.DotSize, Scalar.Red);
-                Cv2.Circle(dst3, new cv.Point(knn.queries[i].X, knn.queries[i].Y), task.DotSize, task.HighlightColor);
+                Cv2.Circle(dst2, new CV.Point(knn.queries[i].X, knn.queries[i].Y), task.DotSize, Scalar.Red);
+                Cv2.Circle(dst3, new CV.Point(knn.queries[i].X, knn.queries[i].Y), task.DotSize, task.HighlightColor);
             }
             labels[2] = $"{clusters.Count} groups built from {ptInput.Count} by combining each input point and its nearest neighbor.";
         }
@@ -7528,7 +7530,7 @@ namespace CS_Classes
     public class Cluster_Hulls_CS : CS_Parent
     {
         Cluster_Basics cluster = new Cluster_Basics();
-        public List<List<cv.Point>> hulls = new List<List<cv.Point>>();
+        public List<List<CV.Point>> hulls = new List<List<CV.Point>>();
         Feature_Basics feat = new Feature_Basics();
 
         public Cluster_Hulls_CS(VBtask task) : base(task)
@@ -7549,11 +7551,11 @@ namespace CS_Classes
             hulls.Clear();
             foreach (var group in cluster.clusters)
             {
-                cv.Point[] hullPoints = Cv2.ConvexHull(group.Value.ToArray(), true);
-                List<cv.Point> hull = new List<cv.Point>();
+                CV.Point[] hullPoints = Cv2.ConvexHull(group.Value.ToArray(), true);
+                List<CV.Point> hull = new List<CV.Point>();
                 if (hullPoints.Length > 2)
                 {
-                    hull.AddRange(hullPoints.Select(pt => new cv.Point(pt.X, pt.Y)));
+                    hull.AddRange(hullPoints.Select(pt => new CV.Point(pt.X, pt.Y)));
                 }
                 else if (hullPoints.Length == 2)
                 {
@@ -7602,7 +7604,7 @@ namespace CS_Classes
 
             int xoffset = src.Width / 2 - side / 2;
             int yoffset = src.Height / 2 - side / 2;
-            cv.Rect srcRect = new cv.Rect(xoffset, yoffset, side, side);
+            CV.Rect srcRect = new CV.Rect(xoffset, yoffset, side, side);
             if (task.drawRect.Width != 0) srcRect = task.drawRect;
 
             dst2 = src.Clone();
@@ -7823,7 +7825,7 @@ namespace CS_Classes
             }
             else
             {
-                dst2 = new Mat(src.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                dst2 = new Mat(src.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 Parallel.For(0, src.Rows, y =>
                 {
                     for (int x = 0; x < src.Cols; x++)
@@ -7950,7 +7952,7 @@ namespace CS_Classes
         {
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             Mat[] split = hsv.Split();
-            split[0] += cv.Scalar.All(90 % 180);
+            split[0] += CV.Scalar.All(90 % 180);
             Cv2.Merge(split, dst3);
             dst2 = dst3.CvtColor(ColorConversionCodes.HSV2BGR);
         }
@@ -8102,7 +8104,7 @@ namespace CS_Classes
         public Color8U_Smoothing_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Averaged BGR image over the last X frames", "" };
-            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             desc = "Merge that last X BGR frames to smooth out differences.";
         }
 
@@ -8245,8 +8247,8 @@ namespace CS_Classes
             dst3 = complex.dst2.Clone();
 
             SetTrueText(">>>>>> Increasing input data >>>>>>" + "\n" + "All available complexity runs",
-                        new cv.Point(dst2.Width / 4, 10), 3);
-            SetTrueText(" TIME " + "(Max = " + complex.maxTime.ToString(fmt0) + ")", new cv.Point(0, dst2.Height / 2), 3);
+                        new CV.Point(dst2.Width / 4, 10), 3);
+            SetTrueText(" TIME " + "(Max = " + complex.maxTime.ToString(fmt0) + ")", new CV.Point(0, dst2.Height / 2), 3);
 
             complex.initialize = true;
             complex.fileName = saveLatestFile;
@@ -8255,8 +8257,8 @@ namespace CS_Classes
             dst2 = complex.dst2;
 
             SetTrueText(" >>>>>> Increasing input data >>>>>>" + "\n" + complex.options.filename.Name,
-                        new cv.Point(dst2.Width / 4, 10));
-            SetTrueText(" TIME " + "(Max = " + complex.maxTime.ToString(fmt0) + ")", new cv.Point(0, dst2.Height / 2));
+                        new CV.Point(dst2.Width / 4, 10));
+            SetTrueText(" TIME " + "(Max = " + complex.maxTime.ToString(fmt0) + ")", new CV.Point(0, dst2.Height / 2));
             labels[2] = complex.labels[2];
             labels[3] = "Plots For all available complexity runs";
         }
@@ -8333,9 +8335,9 @@ namespace CS_Classes
 
             float maxTime = plotData(0);
 
-            SetTrueText(">>>>>> Increasing input data >>>>>>", new cv.Point(dst2.Width / 4, 10));
-            SetTrueText(" TIME", new cv.Point(0, dst2.Height / 2));
-            SetTrueText("Max Time = " + maxTime.ToString(fmt0), new cv.Point(10, 10));
+            SetTrueText(">>>>>> Increasing input data >>>>>>", new CV.Point(dst2.Width / 4, 10));
+            SetTrueText(" TIME", new CV.Point(0, dst2.Height / 2));
+            SetTrueText("Max Time = " + maxTime.ToString(fmt0), new CV.Point(10, 10));
             labels[2] = "Complexity plot for " + Path.GetFileNameWithoutExtension(options.filename.Name);
         }
     }
@@ -8353,7 +8355,7 @@ namespace CS_Classes
         Mat dst;
         public Complexity_Dots_CS(VBtask task) : base(task)
         {
-            dst = new Mat(new cv.Size(task.lowRes.Width * 2, task.lowRes.Height * 2), MatType.CV_8UC3, Scalar.Black);
+            dst = new Mat(new CV.Size(task.lowRes.Width * 2, task.lowRes.Height * 2), MatType.CV_8UC3, Scalar.Black);
             desc = "Plot the results of multiple runs at various resolutions.";
         }
         public void RunCS(Mat src)
@@ -8411,12 +8413,12 @@ namespace CS_Classes
             }
 
             double maxX = srcX.Max();
-            List<cv.Point> pointSet = new List<cv.Point>();
+            List<CV.Point> pointSet = new List<CV.Point>();
             if (initialize) dst.SetTo(Scalar.Black);
 
             for (int i = 0; i < sortData.Count; i++)
             {
-                cv.Point pt = new cv.Point(dst.Width * sortData.ElementAt(i).Key / maxX,
+                CV.Point pt = new CV.Point(dst.Width * sortData.ElementAt(i).Key / maxX,
                                      dst.Height - dst.Height * sortData.ElementAt(i).Value / maxTime);
                 Cv2.Circle(dst, pt, task.DotSize, plotColor, -1);
                 pointSet.Add(pt);
@@ -8428,8 +8430,8 @@ namespace CS_Classes
             }
 
             SetTrueText(">>>>>> Increasing input data >>>>>>" + "\n" + options.filename.Name,
-                        new cv.Point(dst2.Width / 4, 10));
-            SetTrueText(" TIME " + "(Max = " + maxTime.ToString(fmt0) + ")", new cv.Point(0, dst2.Height / 2));
+                        new CV.Point(dst2.Width / 4, 10));
+            SetTrueText(" TIME " + "(Max = " + maxTime.ToString(fmt0) + ")", new CV.Point(0, dst2.Height / 2));
             labels[2] = "Complexity plot for " + Path.GetFileNameWithoutExtension(options.filename.Name);
             dst2 = dst.Resize(dst2.Size());
         }
@@ -8499,8 +8501,8 @@ namespace CS_Classes
     public class Contour_Basics_CS : CS_Parent
     {
         Color8U_Basics colorClass = new Color8U_Basics();
-        public List<cv.Point[]> contourlist = new List<cv.Point[]>();
-        public cv.Point[][] allContours;
+        public List<CV.Point[]> contourlist = new List<CV.Point[]>();
+        public CV.Point[][] allContours;
         public Options_Contours options = new Options_Contours();
         public SortedList<int, int> sortedList = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
 
@@ -8543,7 +8545,7 @@ namespace CS_Classes
             dst2 = colorClass.dst3;
             for (int i = 0; i < sortedList.Count; i++)
             {
-                cv.Point[] tour = allContours[sortedList.ElementAt(i).Value];
+                CV.Point[] tour = allContours[sortedList.ElementAt(i).Value];
                 contourlist.Add(tour);
                 Scalar color = vecToScalar(dst2.Get<Vec3b>(tour[0].Y, tour[0].X));
                 DrawContour(dst3, tour.ToList(), color, -1);
@@ -8557,8 +8559,8 @@ namespace CS_Classes
 
     public class Contour_General_CS : CS_Parent
     {
-        public List<cv.Point[]> contourlist = new List<cv.Point[]>();
-        public cv.Point[][] allContours;
+        public List<CV.Point[]> contourlist = new List<CV.Point[]>();
+        public CV.Point[][] allContours;
         public Options_Contours options = new Options_Contours();
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
         int minLengthContour = 4; // use any contour With enough points To make a contour!
@@ -8614,8 +8616,8 @@ namespace CS_Classes
 
     public class Contour_GeneralWithOptions_CS : CS_Parent
     {
-        public List<cv.Point[]> contourlist = new List<cv.Point[]>();
-        public cv.Point[][] allContours;
+        public List<CV.Point[]> contourlist = new List<CV.Point[]>();
+        public CV.Point[][] allContours;
         public Options_Contours options = new Options_Contours();
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
         int minLengthContour = 4; // use any contour With enough points To make a contour!
@@ -8676,7 +8678,7 @@ namespace CS_Classes
         public Contour_RedCloudEdges_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges." };
             desc = "Intersect the cell contours and the edges in the image.";
         }
@@ -8687,7 +8689,7 @@ namespace CS_Classes
             dst2.SetTo(0);
             foreach (var rc in task.redCells)
             {
-                DrawContour(dst2[rc.rect], rc.contour, cv.Scalar.All(255), task.lineWidth);
+                DrawContour(dst2[rc.rect], rc.contour, CV.Scalar.All(255), task.lineWidth);
             }
             edges.Run(src);
             dst1 = edges.dst2;
@@ -8699,7 +8701,7 @@ namespace CS_Classes
         RedCloud_Basics redC = new RedCloud_Basics();
         public Contour_RedCloud_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Show all the contours found in the RedCloud output";
         }
         public void RunCS(Mat src)
@@ -8709,7 +8711,7 @@ namespace CS_Classes
             dst3.SetTo(0);
             foreach (var rc in task.redCells)
             {
-                DrawContour(dst3[rc.rect], rc.contour, cv.Scalar.All(255), task.lineWidth);
+                DrawContour(dst3[rc.rect], rc.contour, CV.Scalar.All(255), task.lineWidth);
             }
         }
     }
@@ -8756,7 +8758,7 @@ namespace CS_Classes
     }
     public class Contour_RC_AddContour_CS : CS_Parent
     {
-        public List<cv.Point> contour = new List<cv.Point>();
+        public List<CV.Point> contour = new List<CV.Point>();
         public Options_Contours options = new Options_Contours();
         int myFrameCount = 0;
         Reduction_Basics reduction = new Reduction_Basics();
@@ -8776,8 +8778,8 @@ namespace CS_Classes
                 reduction.Run(src);
                 src = reduction.dst2;
             }
-            cv.Point[][] allContours;
-            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            CV.Point[][] allContours;
+            if (src.Channels() != 1) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             Cv2.FindContours(src, out allContours, out _, RetrievalModes.External, options.ApproximationMode);
             int maxCount = 0, maxIndex = 0;
             for (int i = 0; i < allContours.Length; i++)
@@ -8791,8 +8793,8 @@ namespace CS_Classes
             }
             dst2 = src;
             if (allContours.Length == 0) return;
-            var contour = new List<cv.Point>(allContours[maxIndex]);
-            DrawContour(dst2, contour, cv.Scalar.All(255), task.lineWidth);
+            var contour = new List<CV.Point>(allContours[maxIndex]);
+            DrawContour(dst2, contour, CV.Scalar.All(255), task.lineWidth);
         }
     }
 
@@ -8841,19 +8843,19 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": use the local options in 'Morphology width/height to show impact'");
             labels = new string[] { "", "", "Identified horizontal lines - why is scale factor necessary?", "Identified vertical lines" };
             image = Cv2.ImRead(task.HomeDir + "Data/invoice.jpg");
-            var dstSize = new cv.Size(dst2.Height * dst2.Width / image.Height, dst2.Height);
-            var dstRect = new cv.Rect(0, 0, image.Width, dst2.Height);
+            var dstSize = new CV.Size(dst2.Height * dst2.Width / image.Height, dst2.Height);
+            var dstRect = new CV.Rect(0, 0, image.Width, dst2.Height);
             image = image.Resize(dstSize);
             desc = "Remove the lines from an invoice image";
         }
-        cv.Point[][] scaleTour(cv.Point[][] tour)
+        CV.Point[][] scaleTour(CV.Point[][] tour)
         {
             for (int i = 0; i < tour.Length; i++)
             {
-                var tmpTour = new List<cv.Point>();
+                var tmpTour = new List<CV.Point>();
                 foreach (var pt in tour[i])
                 {
-                    tmpTour.Add(new cv.Point(pt.X * options.scaleFactor, pt.Y));
+                    tmpTour.Add(new CV.Point(pt.X * options.scaleFactor, pt.Y));
                 }
                 tour[i] = tmpTour.ToArray();
             }
@@ -8864,10 +8866,10 @@ namespace CS_Classes
             options.RunVB();
             dst2 = image.Resize(dst2.Size());
             dst3 = dst2.Clone();
-            var gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            var gray = image.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             var thresh = gray.Threshold(0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
             // remove horizontal lines
-            var hkernel = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(options.widthHeight, 1));
+            var hkernel = Cv2.GetStructuringElement(MorphShapes.Rect, new CV.Size(options.widthHeight, 1));
             var removedH = new Mat();
             Cv2.MorphologyEx(thresh, removedH, MorphTypes.Open, hkernel, iterations: options.iterations);
             var tour = Cv2.FindContoursAsArray(removedH, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
@@ -8876,7 +8878,7 @@ namespace CS_Classes
             {
                 Cv2.DrawContours(dst2, tour, i, Scalar.Black, task.lineWidth);
             }
-            var vkernel = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(1, options.widthHeight));
+            var vkernel = Cv2.GetStructuringElement(MorphShapes.Rect, new CV.Size(1, options.widthHeight));
             var removedV = new Mat();
             thresh = gray.Threshold(0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
             Cv2.MorphologyEx(thresh, removedV, MorphTypes.Open, vkernel, iterations: options.iterations);
@@ -8902,7 +8904,7 @@ namespace CS_Classes
         int minLengthContour = 4; // use any contour With enough points To make a contour!
         public Contour_Edges_CS(VBtask task) : base(task)
         {
-            lastImage = new Mat(task.WorkingRes, MatType.CV_8UC3, cv.Scalar.All(0));
+            lastImage = new Mat(task.WorkingRes, MatType.CV_8UC3, CV.Scalar.All(0));
             desc = "Create contours for motion";
         }
 
@@ -8944,7 +8946,7 @@ namespace CS_Classes
     public class Contour_SidePoints_CS : CS_Parent
     {
         public Vec3f vecLeft, vecRight, vecTop, vecBot;
-        public cv.Point ptLeft, ptRight, ptTop, ptBot;
+        public CV.Point ptLeft, ptRight, ptTop, ptBot;
         public Profile_Basics sides = new Profile_Basics();
 
         public Contour_SidePoints_CS(VBtask task) : base(task)
@@ -9007,7 +9009,7 @@ namespace CS_Classes
 
         public Contour_Foreground_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "Kmeans foreground output", "Contour of foreground" };
             desc = "Build a contour for the foreground";
         }
@@ -9033,7 +9035,7 @@ namespace CS_Classes
     public class Contour_Sorted_CS : CS_Parent
     {
         Contour_GeneralWithOptions contours = new Contour_GeneralWithOptions();
-        SortedList<int, cv.Point[]> sortedContours = new SortedList<int, cv.Point[]>(new compareAllowIdenticalIntegerInverted());
+        SortedList<int, CV.Point[]> sortedContours = new SortedList<int, CV.Point[]>(new compareAllowIdenticalIntegerInverted());
         SortedList<int, int> sortedByArea = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
         Diff_Basics diff = new Diff_Basics();
         Erode_Basics erode = new Erode_Basics();
@@ -9042,7 +9044,7 @@ namespace CS_Classes
         int minLengthContour = 4; // use any contour With enough points To make a contour!
         public Contour_Sorted_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             if (standaloneTest()) task.gOptions.setDisplay1();
             labels = new string[] { "", "", "Contours in the detected motion", "Diff output - detected motion" };
             task.gOptions.pixelDiffThreshold = 25;
@@ -9102,14 +9104,14 @@ namespace CS_Classes
         {
             redC.Run(src);
             dst2 = redC.dst2;
-            List<cv.Point> ptList = rc.contour;
+            List<CV.Point> ptList = rc.contour;
 
             dst3.SetTo(0);
 
-            List<cv.Point> newContour = new List<cv.Point>();
+            List<CV.Point> newContour = new List<CV.Point>();
             rc = task.rc;
             if (rc.contour.Count == 0) return;
-            cv.Point p1 = new cv.Point(0, 0), p2;
+            CV.Point p1 = new CV.Point(0, 0), p2;
             newContour.Add(p1);
             for (int i = 0; i < rc.contour.Count - 1; i++)
             {
@@ -9118,7 +9120,7 @@ namespace CS_Classes
                 Cv2.Line(dst3[rc.rect], p1, p2, Scalar.White, task.lineWidth + 1);
                 newContour.Add(p2);
             }
-            rc.contour = new List<cv.Point>(newContour);
+            rc.contour = new List<CV.Point>(newContour);
             Cv2.Line(dst3[rc.rect], rc.contour[rc.contour.Count - 1], rc.contour[0], Scalar.White, task.lineWidth + 1);
 
             labels[2] = $"Input points = {rc.contour.Count}";
@@ -9146,7 +9148,7 @@ namespace CS_Classes
                 redC.Run(src);
                 dst2 = redC.dst2;
                 rc = task.rc;
-                DrawContour(dst2[rc.rect], rc.contour, cv.Scalar.White);
+                DrawContour(dst2[rc.rect], rc.contour, CV.Scalar.White);
                 labels[2] = redC.labels[2];
             }
 
@@ -9155,7 +9157,7 @@ namespace CS_Classes
             dst3 = rc.mask.CvtColor(ColorConversionCodes.GRAY2BGR);
             for (int i = 0; i < rc.contour.Count; i++)
             {
-                cv.Point pt = rc.contour[i];
+                CV.Point pt = rc.contour[i];
                 string ptStr = $"{pt.X:0000}{pt.Y:0000}";
                 if (ptSet.Contains(ptStr))
                 {
@@ -9177,8 +9179,8 @@ namespace CS_Classes
 
     public class Contour_Largest_CS : CS_Parent
     {
-        public List<cv.Point> bestContour = new List<cv.Point>();
-        public cv.Point[][] allContours;
+        public List<CV.Point> bestContour = new List<CV.Point>();
+        public CV.Point[][] allContours;
         public Options_Contours options = new Options_Contours();
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
 
@@ -9270,7 +9272,7 @@ namespace CS_Classes
 
             Mat tmp = task.rc.mask.Clone();
 
-            cv.Point[][] allContours;
+            CV.Point[][] allContours;
             if (options.retrievalMode == RetrievalModes.FloodFill)
                 tmp.ConvertTo(tmp, MatType.CV_32SC1);
 
@@ -9287,7 +9289,7 @@ namespace CS_Classes
 
     public class Contour_RedCloudCorners_CS : CS_Parent
     {
-        public cv.Point[] corners = new cv.Point[4];
+        public CV.Point[] corners = new CV.Point[4];
         public rcData rc = new rcData();
         RedCloud_Basics redC = new RedCloud_Basics();
 
@@ -9309,7 +9311,7 @@ namespace CS_Classes
 
             dst3.SetTo(0);
             Cv2.Circle(dst3, rc.maxDist, task.DotSize, Scalar.White, -1);
-            cv.Point center = new cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y);
+            CV.Point center = new CV.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y);
             float[] maxDistance = new float[4];
 
             for (int i = 0; i < corners.Length; i++)
@@ -9319,7 +9321,7 @@ namespace CS_Classes
 
             if (rc.contour == null) return;
 
-            foreach (cv.Point pt in rc.contour)
+            foreach (CV.Point pt in rc.contour)
             {
                 int quad;
                 if (pt.X - center.X >= 0 && pt.Y - center.Y <= 0) quad = 0; // upper right quadrant
@@ -9348,7 +9350,7 @@ namespace CS_Classes
 
     public class Contour_Gray_CS : CS_Parent
     {
-        public List<cv.Point> contour = new List<cv.Point>();
+        public List<CV.Point> contour = new List<CV.Point>();
         public Options_Contours options = new Options_Contours();
         int myFrameCount;
         Reduction_Basics reduction = new Reduction_Basics();
@@ -9374,7 +9376,7 @@ namespace CS_Classes
                 src = reduction.dst2;
             }
 
-            cv.Point[][] allContours;
+            CV.Point[][] allContours;
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -9402,14 +9404,14 @@ namespace CS_Classes
         public Contour_WholeImage_CS(VBtask task) : base(task)
         {
             FindSlider("Max contours").Value = 20;
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find the top X contours by size and display them.";
         }
 
         public void RunCS(Mat src)
         {
             contour.Run(src);
-            var sortedContours = new SortedList<int, List<cv.Point>>(new compareAllowIdenticalIntegerInverted());
+            var sortedContours = new SortedList<int, List<CV.Point>>(new compareAllowIdenticalIntegerInverted());
             foreach (var tour in contour.contourlist)
             {
                 sortedContours.Add(tour.Length, tour.ToList());
@@ -9419,7 +9421,7 @@ namespace CS_Classes
             for (int i = 0; i < sortedContours.Count; i++)
             {
                 var tour = sortedContours.ElementAt(i).Value;
-                DrawContour(dst2, tour, cv.Scalar.All(255), task.lineWidth);
+                DrawContour(dst2, tour, CV.Scalar.All(255), task.lineWidth);
             }
         }
     }
@@ -9432,11 +9434,11 @@ namespace CS_Classes
     {
         public Options_Contours options = new Options_Contours();
         public int classCount;
-        public List<cv.Point[]> contourlist = new List<cv.Point[]>();
+        public List<CV.Point[]> contourlist = new List<CV.Point[]>();
 
         public Contour_DepthTiers_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             FindRadio("FloodFill").Checked = true;
             UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.");
             labels = new string[] { "", "", "FindContour input", "Draw contour output" };
@@ -9449,7 +9451,7 @@ namespace CS_Classes
 
             task.pcSplit[2].ConvertTo(dst1, MatType.CV_32S, 100 / options.cmPerTier, 1);
 
-            cv.Point[][] allContours;
+            CV.Point[][] allContours;
             Cv2.FindContours(dst1, out allContours, out _, RetrievalModes.FloodFill, ContourApproximationModes.ApproxSimple);
             if (allContours.Length <= 1)
                 return;
@@ -9476,7 +9478,7 @@ namespace CS_Classes
                 {
                     int index = dst1.Get<int>(tour[0].Y, tour[0].X);
                     contourlist.Add(tour);
-                    DrawContour(dst2, tour.ToList(), cv.Scalar.All(index), -1);
+                    DrawContour(dst2, tour.ToList(), CV.Scalar.All(index), -1);
                 }
             }
 
@@ -9501,7 +9503,7 @@ namespace CS_Classes
         public Contour_FromPoints_CS(VBtask task) : base(task)
         {
             FindSlider("Random Pixel Count").Value = 3;
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Create a contour from some random points";
         }
 
@@ -9522,10 +9524,10 @@ namespace CS_Classes
 
             var hullPoints = Cv2.ConvexHull(random.PointList.ToArray(), true).ToList();
 
-            var hull = new List<cv.Point>();
+            var hull = new List<CV.Point>();
             foreach (var pt in hullPoints)
             {
-                hull.Add(new cv.Point(pt.X, pt.Y));
+                hull.Add(new CV.Point(pt.X, pt.Y));
             }
 
             dst3.SetTo(0);
@@ -9589,7 +9591,7 @@ namespace CS_Classes
 
     public class Convex_Basics_CS : CS_Parent
     {
-        public cv.Point[] hull;
+        public CV.Point[] hull;
         Options_Convex options = new Options_Convex();
 
         public Convex_Basics_CS(VBtask task) : base(task)
@@ -9599,16 +9601,16 @@ namespace CS_Classes
             labels = new string[] { "", "", "Convex Hull - red dot is center and the black dots are the input points", "" };
         }
 
-        public List<cv.Point> BuildRandomHullPoints()
+        public List<CV.Point> BuildRandomHullPoints()
         {
             int pad = 4;
             int w = dst2.Width - dst2.Width / pad;
             int h = dst2.Height - dst2.Height / pad;
 
-            var hullList = new List<cv.Point>();
+            var hullList = new List<CV.Point>();
             for (int i = 0; i < options.hullCount; i++)
             {
-                hullList.Add(new cv.Point(msRNG.Next(dst2.Width / pad, w), msRNG.Next(dst2.Height / pad, h)));
+                hullList.Add(new CV.Point(msRNG.Next(dst2.Width / pad, w), msRNG.Next(dst2.Height / pad, h)));
             }
             return hullList;
         }
@@ -9617,7 +9619,7 @@ namespace CS_Classes
         {
             options.RunVB();
 
-            List<cv.Point> hullList = task.rc.contour;
+            List<CV.Point> hullList = task.rc.contour;
             if (standaloneTest())
             {
                 if (!task.heartBeat) return;
@@ -9634,7 +9636,7 @@ namespace CS_Classes
 
             dst2.SetTo(0);
 
-            using (var pMat = cv.Mat.FromPixelData(hull.Length, 1, MatType.CV_32SC2, hull))
+            using (var pMat = CV.Mat.FromPixelData(hull.Length, 1, MatType.CV_32SC2, hull))
             {
                 Scalar sum = pMat.Sum();
                 DrawContour(dst2, hullList, Scalar.White, -1);
@@ -9672,7 +9674,7 @@ namespace CS_Classes
                 convex.RunAndMeasure(src, convex);
 
                 dst3.SetTo(0);
-                convex.dst2[new cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)].CopyTo(dst3[task.rc.rect]);
+                convex.dst2[new CV.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)].CopyTo(dst3[task.rc.rect]);
                 Cv2.Circle(dst3, task.rc.maxDist, task.DotSize, Scalar.White, -1);
             }
         }
@@ -9699,9 +9701,9 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             contours.RunAndMeasure(dst2.Clone(), contours);
-            cv.Point[] c = contours.bestContour.ToArray();
+            CV.Point[] c = contours.bestContour.ToArray();
             dst3 = dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
-            cv.Point[] hull = Cv2.ConvexHull(c, false);
+            CV.Point[] hull = Cv2.ConvexHull(c, false);
             int[] hullIndices = Cv2.ConvexHullIndices(c, false);
             DrawContour(dst3, hull.ToList(), task.HighlightColor);
 
@@ -9734,10 +9736,10 @@ namespace CS_Classes
             desc = "Find the convexityDefects in the selected RedCloud cell";
         }
 
-        public List<cv.Point> BetterContour(List<cv.Point> c, Vec4i[] defects)
+        public List<CV.Point> BetterContour(List<CV.Point> c, Vec4i[] defects)
         {
             int lastV = -1;
-            var newC = new List<cv.Point>();
+            var newC = new List<CV.Point>();
             foreach (Vec4i v in defects)
             {
                 if (v[0] != lastV && lastV >= 0)
@@ -9780,7 +9782,7 @@ namespace CS_Classes
             contours.RunAndMeasure(dst2, contours);
             var c = contours.bestContour;
 
-            cv.Point[] hull = Cv2.ConvexHull(c, false);
+            CV.Point[] hull = Cv2.ConvexHull(c, false);
             int[] hullIndices = Cv2.ConvexHullIndices(c, false);
             dst2.SetTo(0);
             DrawContour(dst2, hull.ToList(), vecToScalar(rc.color), -1);
@@ -9804,7 +9806,7 @@ namespace CS_Classes
 
     public class Corners_Basics_CS : CS_Parent
     {
-        public List<cv.Point2f> features = new List<cv.Point2f>();
+        public List<CV.Point2f> features = new List<CV.Point2f>();
         public Options_Features options = new Options_Features();
         public Options_Corners optionCorner = new Options_Corners();
 
@@ -9826,7 +9828,7 @@ namespace CS_Classes
             features.Clear();
             foreach (KeyPoint kp in kpoints)
             {
-                features.Add(new cv.Point2f(kp.Pt.X, kp.Pt.Y));
+                features.Add(new CV.Point2f(kp.Pt.X, kp.Pt.Y));
             }
 
             if (standaloneTest())
@@ -9887,7 +9889,7 @@ namespace CS_Classes
                 {
                     if (mc.Get<float>(y, x) > mm.minVal + (mm.maxVal - mm.minVal) * options.quality / options.qualityMax)
                     {
-                        Cv2.Circle(dst2, new cv.Point(x, y), task.DotSize, task.HighlightColor, -1);
+                        Cv2.Circle(dst2, new CV.Point(x, y), task.DotSize, task.HighlightColor, -1);
                         count += 1;
                     }
                 }
@@ -9957,7 +9959,7 @@ namespace CS_Classes
             IntPtr imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject(), src.Rows, src.Cols, options.blocksize, options.aperture);
             handle.Free();
 
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr).Clone();
 
             dst3 = Convert32f_To_8UC3(dst2);
             dst3 = dst3.Threshold(options.threshold, 255, ThresholdTypes.Binary);
@@ -9997,7 +9999,7 @@ namespace CS_Classes
                 kalman.kInput[0] = (float)(m.M10 / m.M00);
                 kalman.kInput[1] = (float)(m.M01 / m.M00);
                 kalman.Run(src);
-                Cv2.Circle(dst3, new cv.Point((int)kalman.kOutput[0], (int)kalman.kOutput[1]), 10, Scalar.Red, -1);
+                Cv2.Circle(dst3, new CV.Point((int)kalman.kOutput[0], (int)kalman.kOutput[1]), 10, Scalar.Red, -1);
             }
         }
     }
@@ -10008,7 +10010,7 @@ namespace CS_Classes
 
     public class Corners_BasicsStablePoints_CS : CS_Parent
     {
-        public List<cv.Point> features = new List<cv.Point>();
+        public List<CV.Point> features = new List<CV.Point>();
         public Corners_Basics fast = new Corners_Basics();
 
         public Corners_BasicsStablePoints_CS(VBtask task) : base(task)
@@ -10026,15 +10028,15 @@ namespace CS_Classes
             {
                 foreach (Point2f pt in fast.features)
                 {
-                    features.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                    features.Add(new CV.Point((int)pt.X, (int)pt.Y));
                 }
             }
-            List<cv.Point> newPts = new List<cv.Point>();
+            List<CV.Point> newPts = new List<CV.Point>();
             dst2 = src.Clone();
             dst3.SetTo(new Scalar(0));
             foreach (Point2f pt in fast.features)
             {
-                cv.Point test = new cv.Point((int)pt.X, (int)pt.Y);
+                CV.Point test = new CV.Point((int)pt.X, (int)pt.Y);
                 if (features.Contains(test))
                 {
                     Cv2.Circle(dst2, test, task.DotSize, Scalar.Yellow, -1);
@@ -10071,7 +10073,7 @@ namespace CS_Classes
             fastCenters = new Point2f[task.gridList.Count];
             for (int i = 0; i < task.gridList.Count; i++)
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 Mat tmp = fast.dst3[roi];
                 var nonZero = tmp.FindNonZero();
                 if (nonZero.Rows > 0)
@@ -10116,7 +10118,7 @@ namespace CS_Classes
                                                   (short)options.neighborhood, (short)options.aperture, (float)options.harrisParm);
             handleSrc.Free();
 
-            Mat gray32f = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr);
+            Mat gray32f = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr);
             // gray32f = Convert32f_To_8UC3(gray32f);
             gray32f.ConvertTo(dst2, MatType.CV_8U);
             addw.src2 = dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
@@ -10146,7 +10148,7 @@ namespace CS_Classes
 
     public class Corners_HarrisDetector_CPP_CS : CS_Parent
     {
-        public List<cv.Point2f> features = new List<cv.Point2f>();
+        public List<CV.Point2f> features = new List<CV.Point2f>();
         public Options_Features options = new Options_Features();
 
         public Corners_HarrisDetector_CPP_CS(VBtask task) : base(task)
@@ -10170,7 +10172,7 @@ namespace CS_Classes
             int ptCount = Harris_Detector_Count(cPtr);
             if (ptCount > 1)
             {
-                Mat ptMat = cv.Mat.FromPixelData(ptCount, 2, MatType.CV_32S, imagePtr).Clone();
+                Mat ptMat = CV.Mat.FromPixelData(ptCount, 2, MatType.CV_32S, imagePtr).Clone();
                 features.Clear();
                 for (int i = 0; i < ptCount; i++)
                 {
@@ -10254,14 +10256,14 @@ namespace CS_Classes
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
             feat.Run(src);
-            cv.TermCriteria term = new cv.TermCriteria((cv.CriteriaTypes)((int)cv.CriteriaTypes.Eps + (int)cv.CriteriaTypes.Count), 10, 1.0);
-            Cv2.CornerSubPix(src, task.features, new cv.Size(options.subpixSize, options.subpixSize), new cv.Size(-1, -1), term);
+            CV.TermCriteria term = new CV.TermCriteria((CV.CriteriaTypes)((int)CV.CriteriaTypes.Eps + (int)CV.CriteriaTypes.Count), 10, 1.0);
+            Cv2.CornerSubPix(src, task.features, new CV.Size(options.subpixSize, options.subpixSize), new CV.Size(-1, -1), term);
 
-            List<cv.Point> featurePoints = new List<cv.Point>();
+            List<CV.Point> featurePoints = new List<CV.Point>();
             for (int i = 0; i < task.features.Count; i++)
             {
                 Point2f pt = task.features[i];
-                featurePoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                featurePoints.Add(new CV.Point((int)pt.X, (int)pt.Y));
                 DrawCircle(dst2, pt, task.DotSize, task.HighlightColor, -1);
             }
         }
@@ -10293,7 +10295,7 @@ namespace CS_Classes
             int row = task.mouseMovePoint.Y;
             if (row == 0)
                 SetTrueText("Move mouse across image to see the relationship between X and Z\n" +
-                            "A linear relationship is a useful correlation", new cv.Point(0, 10), 3);
+                            "A linear relationship is a useful correlation", new CV.Point(0, 10), 3);
 
             Mat dataX = new Mat(src.Size(), MatType.CV_32F, Scalar.All(0));
             Mat dataY = new Mat(src.Size(), MatType.CV_32F, Scalar.All(0));
@@ -10306,7 +10308,7 @@ namespace CS_Classes
 
             Mat row1 = dataX.Row(row);
             Mat row2 = dataZ.Row(row);
-            Cv2.Line(dst2, new cv.Point(0, row), new cv.Point(dst2.Width, row), Scalar.Yellow, task.lineWidth + 1);
+            Cv2.Line(dst2, new CV.Point(0, row), new CV.Point(dst2.Width, row), Scalar.Yellow, task.lineWidth + 1);
 
             Mat correlationMat = new Mat();
             Cv2.MatchTemplate(row1, row2, correlationMat, options.matchOption);
@@ -10335,11 +10337,11 @@ namespace CS_Classes
                 {
                     float x = dst3.Width * (plotX[i] - minx) / (maxx - minx);
                     float y = dst3.Height * (plotZ[i] - minZ) / (maxZ - minZ);
-                    Cv2.Circle(dst3, new cv.Point(x, y), task.DotSize, Scalar.Yellow, -1);
+                    Cv2.Circle(dst3, new CV.Point(x, y), task.DotSize, Scalar.Yellow, -1);
                 }
-                SetTrueText($"Z-min {minZ:F2}", new cv.Point(10, 5), 3);
-                SetTrueText($"Z-max {maxZ:F2}\n\tX-min {minx:F2}", new cv.Point(0, dst3.Height - 20), 3);
-                SetTrueText($"X-max {maxx:F2}", new cv.Point(dst3.Width - 40, dst3.Height - 10), 3);
+                SetTrueText($"Z-min {minZ:F2}", new CV.Point(10, 5), 3);
+                SetTrueText($"Z-max {maxZ:F2}\n\tX-min {minx:F2}", new CV.Point(0, dst3.Height - 20), 3);
+                SetTrueText($"X-max {maxx:F2}", new CV.Point(dst3.Width - 40, dst3.Height - 10), 3);
             }
         }
     }
@@ -10352,7 +10354,7 @@ namespace CS_Classes
         Random_Basics_CS random;
         public Mat mean = new Mat();
         public Mat covariance = new Mat();
-        cv.Point2f lastCenter;
+        CV.Point2f lastCenter;
         public Covariance_Basics_CS(VBtask task) : base(task)
         {
             random = new Random_Basics_CS(task);
@@ -10366,7 +10368,7 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 random.RunAndMeasure(empty, random);
-                src = cv.Mat.FromPixelData(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
+                src = CV.Mat.FromPixelData(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
                 for (int i = 0; i < random.PointList.Count; i++)
                 {
                     DrawCircle(dst3, random.PointList[i], 3, Scalar.White);
@@ -10388,7 +10390,7 @@ namespace CS_Classes
             strOut += "\n";
 
             Scalar overallMean = Cv2.Mean(samples2);
-            cv.Point2f center = new Point2f((float)overallMean[0], (float)overallMean[1]);
+            CV.Point2f center = new Point2f((float)overallMean[0], (float)overallMean[1]);
             strOut += $"Mean (img1, img2) = ({center.X.ToString(fmt0)}, {center.Y.ToString(fmt0)})\n";
 
             if (standaloneTest())
@@ -10420,10 +10422,10 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             double[] testInput = { 1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9 };
-            Mat samples = cv.Mat.FromPixelData(10, 2, MatType.CV_64F, testInput);
+            Mat samples = CV.Mat.FromPixelData(10, 2, MatType.CV_64F, testInput);
             covar.Run(samples);
-            SetTrueText(covar.strOut, new cv.Point(20, 60));
-            SetTrueText("Results should be a symmetric array with 2.1 and -2.1", new cv.Point(20, 150));
+            SetTrueText(covar.strOut, new CV.Point(20, 60));
+            SetTrueText("Results should be a symmetric array with 2.1 and -2.1", new CV.Point(20, 150));
         }
     }
 
@@ -10457,7 +10459,7 @@ namespace CS_Classes
 
             last32f = gray32f;
 
-            SetTrueText(covar.strOut, new cv.Point(10, 10), 3);
+            SetTrueText(covar.strOut, new CV.Point(10, 10), 3);
 
             mean = covar.mean;
             covariance = covar.covariance;
@@ -10596,9 +10598,9 @@ namespace CS_Classes
             src.ConvertTo(src32f, MatType.CV_32F, 1.0 / 255);
 
             Mat frequencies = new Mat();
-            Cv2.Dct(src32f, frequencies, (cv.DctFlags)options.removeFrequency);
+            Cv2.Dct(src32f, frequencies, (CV.DctFlags)options.removeFrequency);
 
-            cv.Rect roi = new cv.Rect(0, 0, options.removeFrequency, src32f.Height);
+            CV.Rect roi = new CV.Rect(0, 0, options.removeFrequency, src32f.Height);
             if (roi.Width > 0)
                 frequencies[roi].SetTo(0);
             labels[2] = "Frequencies below " + options.removeFrequency.ToString() + " removed";
@@ -10638,7 +10640,7 @@ namespace CS_Classes
                 freqPlanes[i] = new Mat();
                 Cv2.Dct(src32f, freqPlanes[i], DctFlags.None);
 
-                cv.Rect roi = new cv.Rect(0, 0, dct.options.removeFrequency, src32f.Height);
+                CV.Rect roi = new CV.Rect(0, 0, dct.options.removeFrequency, src32f.Height);
                 if (roi.Width > 0)
                     freqPlanes[i][roi].SetTo(0);
 
@@ -10675,7 +10677,7 @@ namespace CS_Classes
             gray.ConvertTo(src32f, MatType.CV_32F, 1.0 / 255);
             Cv2.Dct(src32f, frequencies, dct.options.dctFlag);
 
-            cv.Rect roi = new cv.Rect(0, 0, dct.options.removeFrequency, src32f.Height);
+            CV.Rect roi = new CV.Rect(0, 0, dct.options.removeFrequency, src32f.Height);
             if (roi.Width > 0)
                 frequencies[roi].SetTo(0);
             labels[2] = dct.labels[2];
@@ -10720,7 +10722,7 @@ namespace CS_Classes
                     {
                         if (runLen > dct.options.runLengthMin)
                         {
-                            cv.Rect roi = new cv.Rect(runStart, i, runLen, 1);
+                            CV.Rect roi = new CV.Rect(runStart, i, runLen, 1);
                             dst2[roi].SetTo(255);
                         }
                         runStart = j;
@@ -10783,17 +10785,17 @@ namespace CS_Classes
                     maxIndex = i;
             }
 
-            mats.mat[3] = new Mat(src.Size(), MatType.CV_8UC3, cv.Scalar.All(0));
+            mats.mat[3] = new Mat(src.Size(), MatType.CV_8UC3, CV.Scalar.All(0));
             src[task.gridList[maxIndex]].CopyTo(mats.mat[3][task.gridList[maxIndex]], mask[task.gridList[maxIndex]]);
             mats.Run(new Mat());
             dst3 = mats.dst2;
 
-            cv.Rect roi = task.gridList[maxIndex];
+            CV.Rect roi = task.gridList[maxIndex];
             if (roi.X == task.gridList[maxIndex].X && roi.Y == task.gridList[maxIndex].Y)
             {
                 if (roiCounts[maxIndex] > roi.Width * roi.Height / 4)
                 {
-                    List<cv.Point3f> fitPoints = new List<cv.Point3f>();
+                    List<CV.Point3f> fitPoints = new List<CV.Point3f>();
                     float minDepth = float.MaxValue, maxDepth = float.MinValue;
                     for (int j = 0; j < roi.Height; j++)
                     {
@@ -10830,15 +10832,15 @@ namespace CS_Classes
 
     public class Delaunay_Basics_CS : CS_Parent
     {
-        public List<cv.Point2f> inputPoints;
-        public List<List<cv.Point>> facetList = new List<List<cv.Point>>();
+        public List<CV.Point2f> inputPoints;
+        public List<List<CV.Point>> facetList = new List<List<CV.Point>>();
         public Mat facet32s;
         Random_Enumerable randEnum = new Random_Enumerable();
         Subdiv2D subdiv = new Subdiv2D();
 
         public Delaunay_Basics_CS(VBtask task) : base(task)
         {
-            facet32s = new Mat(dst2.Size(), MatType.CV_32SC1, cv.Scalar.All(0));
+            facet32s = new Mat(dst2.Size(), MatType.CV_32SC1, CV.Scalar.All(0));
             labels[3] = "CV_8U map of Delaunay cells";
             desc = "Subdivide an image based on the points provided.";
         }
@@ -10851,10 +10853,10 @@ namespace CS_Classes
                 inputPoints = randEnum.points.ToList();
             }
 
-            subdiv.InitDelaunay(new cv.Rect(0, 0, dst2.Width, dst2.Height));
+            subdiv.InitDelaunay(new CV.Rect(0, 0, dst2.Width, dst2.Height));
             subdiv.Insert(inputPoints.ToArray());
 
-            cv.Point2f[][] facets = null;
+            CV.Point2f[][] facets = null;
             var facetIndices = new List<int>();
             var facetCenters = new Point2f[1];
             subdiv.GetVoronoiFacetList(facetIndices, out facets, out facetCenters);
@@ -10862,13 +10864,13 @@ namespace CS_Classes
             facetList.Clear();
             for (int i = 0; i < facets.GetUpperBound(0); i++)
             {
-                var ptList = new List<cv.Point>();
+                var ptList = new List<CV.Point>();
                 for (int j = 0; j < facets[i].Length - 1; j++)
                 {
-                    ptList.Add(new cv.Point(facets[i][j].X, facets[i][j].Y));
+                    ptList.Add(new CV.Point(facets[i][j].X, facets[i][j].Y));
                 }
 
-                facet32s.FillConvexPoly(ptList.ToArray(), cv.Scalar.All(i), task.lineType);
+                facet32s.FillConvexPoly(ptList.ToArray(), CV.Scalar.All(i), task.lineType);
                 facetList.Add(ptList);
             }
             facet32s.ConvertTo(dst3, MatType.CV_8U);
@@ -10898,7 +10900,7 @@ namespace CS_Classes
                 if (!task.heartBeat) return;
             }
 
-            var subdiv = new Subdiv2D(new cv.Rect(0, 0, dst2.Width, dst2.Height));
+            var subdiv = new Subdiv2D(new CV.Rect(0, 0, dst2.Width, dst2.Height));
             random.Run(null);
             dst2.SetTo(new Scalar(0));
 
@@ -10908,8 +10910,8 @@ namespace CS_Classes
                 var edgeList = subdiv.GetEdgeList();
                 foreach (var e in edgeList)
                 {
-                    var p0 = new cv.Point(Math.Round(e[0]), Math.Round(e[1]));
-                    var p1 = new cv.Point(Math.Round(e[2]), Math.Round(e[3]));
+                    var p0 = new CV.Point(Math.Round(e[0]), Math.Round(e[1]));
+                    var p1 = new CV.Point(Math.Round(e[2]), Math.Round(e[3]));
                     DrawLine(dst2, p0, p1, new Scalar(255), task.lineWidth);
                 }
             }
@@ -10919,19 +10921,19 @@ namespace CS_Classes
                 DrawCircle(dst2, pt, task.DotSize + 1, new Scalar(255, 0, 0), -1);
             }
 
-            cv.Point2f[][] facets = null;
+            CV.Point2f[][] facets = null;
             var centers = new Point2f[1];
             subdiv.GetVoronoiFacetList(null, out facets, out centers);
 
-            var ifacet = new cv.Point[1];
-            var ifacets = new cv.Point[1][];
+            var ifacet = new CV.Point[1];
+            var ifacets = new CV.Point[1][];
 
             for (int i = 0; i < facets.GetUpperBound(0); i++)
             {
                 Array.Resize(ref ifacet, facets[i].Length - 1);
                 for (int j = 0; j < facets[i].Length - 1; j++)
                 {
-                    ifacet[j] = new cv.Point(Math.Round(facets[i][j].X), Math.Round(facets[i][j].Y));
+                    ifacet[j] = new CV.Point(Math.Round(facets[i][j].X), Math.Round(facets[i][j].Y));
                 }
                 ifacets[0] = ifacet;
                 dst3.FillConvexPoly(ifacet, task.scalarColors[i % task.scalarColors.Length], task.lineType);
@@ -10962,14 +10964,14 @@ namespace CS_Classes
 
             foreach (var p in points)
             {
-                DrawCircle(dst2, p, task.DotSize + 1, cv.Scalar.All(255), -1);
+                DrawCircle(dst2, p, task.DotSize + 1, CV.Scalar.All(255), -1);
             }
             dst3 = dst2.Clone();
 
-            var subdiv = new Subdiv2D(new cv.Rect(0, 0, dst3.Width, dst3.Height));
+            var subdiv = new Subdiv2D(new CV.Rect(0, 0, dst3.Width, dst3.Height));
             subdiv.Insert(points);
 
-            cv.Point2f[][] facets = null;
+            CV.Point2f[][] facets = null;
             var facetCenters = new Point2f[1];
             subdiv.GetVoronoiFacetList(null, out facets, out facetCenters);
 
@@ -10999,16 +11001,16 @@ namespace CS_Classes
 
     public class Delaunay_GenerationsNoKNN_CS : CS_Parent
     {
-        public List<cv.Point2f> inputPoints;
+        public List<CV.Point2f> inputPoints;
         public Delaunay_Basics facet = new Delaunay_Basics();
         Random_Basics random = new Random_Basics();
 
         public Delaunay_GenerationsNoKNN_CS(VBtask task) : base(task)
         {
             FindSlider("Random Pixel Count").Value = 10;
-            dst3 = new Mat(dst3.Size(), MatType.CV_32S, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_32S, CV.Scalar.All(0));
             labels = new string[] { "", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region." };
-            desc = "Create a region in an image for each cv.Point provided without using KNN.";
+            desc = "Create a region in an image for each CV.Point provided without using KNN.";
         }
 
         public void RunCS(Mat src)
@@ -11045,9 +11047,9 @@ namespace CS_Classes
                         g++;
                     }
                 }
-                dst3.FillConvexPoly(nextFacet.ToArray(), cv.Scalar.All(g), task.lineType);
+                dst3.FillConvexPoly(nextFacet.ToArray(), CV.Scalar.All(g), task.lineType);
                 usedG.Add(g);
-                SetTrueText(g.ToString(), new cv.Point((int)pt.X, (int)pt.Y), 2);
+                SetTrueText(g.ToString(), new CV.Point((int)pt.X, (int)pt.Y), 2);
             }
             generationMap = dst3.Clone();
         }
@@ -11059,17 +11061,17 @@ namespace CS_Classes
 
     public class Delaunay_Generations_CS : CS_Parent
     {
-        public List<cv.Point2f> inputPoints;
+        public List<CV.Point2f> inputPoints;
         public Delaunay_Basics facet = new Delaunay_Basics();
         KNN_Basics knn = new KNN_Basics();
         Random_Basics random = new Random_Basics();
 
         public Delaunay_Generations_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst0.Size(), MatType.CV_32S, cv.Scalar.All(0));
+            dst0 = new Mat(dst0.Size(), MatType.CV_32S, CV.Scalar.All(0));
             labels = new string[] { "", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region", "Generation counts in CV_32SC1 format" };
             FindSlider("Random Pixel Count").Value = 10;
-            desc = "Create a region in an image for each cv.Point provided";
+            desc = "Create a region in an image for each CV.Point provided";
         }
 
         public void RunCS(Mat src)
@@ -11112,9 +11114,9 @@ namespace CS_Classes
                         g++;
                     }
                 }
-                dst0.FillConvexPoly(nextFacet.ToArray(), cv.Scalar.All(g), task.lineType);
+                dst0.FillConvexPoly(nextFacet.ToArray(), CV.Scalar.All(g), task.lineType);
                 usedG.Add(g);
-                SetTrueText(g.ToString(), new cv.Point(mp.p2.X, mp.p2.Y), 2);
+                SetTrueText(g.ToString(), new CV.Point(mp.p2.X, mp.p2.Y), 2);
             }
         }
     }
@@ -11125,8 +11127,8 @@ namespace CS_Classes
 
     public class Delaunay_ConsistentColor_CS : CS_Parent
     {
-        public List<cv.Point2f> inputPoints;
-        public List<List<cv.Point>> facetList = new List<List<cv.Point>>();
+        public List<CV.Point2f> inputPoints;
+        public List<List<CV.Point>> facetList = new List<List<CV.Point>>();
         public Mat facet32s;
         Random_Enumerable randEnum = new Random_Enumerable();
         Subdiv2D subdiv = new Subdiv2D();
@@ -11134,7 +11136,7 @@ namespace CS_Classes
         public Delaunay_ConsistentColor_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
-            facet32s = new Mat(dst2.Size(), MatType.CV_32SC1, cv.Scalar.All(0));
+            facet32s = new Mat(dst2.Size(), MatType.CV_32SC1, CV.Scalar.All(0));
             UpdateAdvice(traceName + ": use local options to control the number of points");
             labels[1] = "Input points to subdiv";
             labels[3] = "Inconsistent colors in dst2 are duplicate randomCellColor output.";
@@ -11149,10 +11151,10 @@ namespace CS_Classes
                 inputPoints = randEnum.points.ToList();
             }
 
-            subdiv.InitDelaunay(new cv.Rect(0, 0, dst2.Width, dst2.Height));
+            subdiv.InitDelaunay(new CV.Rect(0, 0, dst2.Width, dst2.Height));
             subdiv.Insert(inputPoints.ToArray());
 
-            cv.Point2f[][] facets = null;
+            CV.Point2f[][] facets = null;
             var facetCenters = new Point2f[1];
             subdiv.GetVoronoiFacetList(new List<int>(), out facets, out facetCenters);
 
@@ -11161,10 +11163,10 @@ namespace CS_Classes
             facetList.Clear();
             for (int i = 0; i < facets.GetUpperBound(0); i++)
             {
-                var nextFacet = new List<cv.Point>();
+                var nextFacet = new List<CV.Point>();
                 for (int j = 0; j < facets[i].Length - 1; j++)
                 {
-                    nextFacet.Add(new cv.Point(facets[i][j].X, facets[i][j].Y));
+                    nextFacet.Add(new CV.Point(facets[i][j].X, facets[i][j].Y));
                 }
 
                 var pt = inputPoints[i];
@@ -11176,14 +11178,14 @@ namespace CS_Classes
                 usedColors.Add(nextColor);
 
                 dst2.FillConvexPoly(nextFacet.ToArray(), vecToScalar(nextColor));
-                facet32s.FillConvexPoly(nextFacet.ToArray(), cv.Scalar.All(i), task.lineType);
+                facet32s.FillConvexPoly(nextFacet.ToArray(), CV.Scalar.All(i), task.lineType);
                 facetList.Add(nextFacet);
             }
             dst3 = dst2.Clone();
             dst1.SetTo(0);
             foreach (var pt in inputPoints)
             {
-                dst1.Circle(new cv.Point((int)pt.X, (int)pt.Y), task.DotSize, task.HighlightColor, -1, task.lineType);
+                dst1.Circle(new CV.Point((int)pt.X, (int)pt.Y), task.DotSize, task.HighlightColor, -1, task.lineType);
             }
             dst1 = dst3.Clone();
             labels[2] = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present.";
@@ -11196,13 +11198,13 @@ namespace CS_Classes
 
     public class Delaunay_Contours_CS : CS_Parent
     {
-        public List<cv.Point2f> inputPoints;
+        public List<CV.Point2f> inputPoints;
         Random_Enumerable randEnum = new Random_Enumerable();
         Subdiv2D subdiv = new Subdiv2D();
 
         public Delaunay_Contours_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels[3] = "CV_8U map of Delaunay cells";
             desc = "Subdivide an image based on the points provided.";
         }
@@ -11215,22 +11217,22 @@ namespace CS_Classes
                 inputPoints = randEnum.points.ToList();
             }
 
-            subdiv.InitDelaunay(new cv.Rect(0, 0, dst2.Width, dst2.Height));
+            subdiv.InitDelaunay(new CV.Rect(0, 0, dst2.Width, dst2.Height));
             subdiv.Insert(inputPoints.ToArray());
 
-            cv.Point2f[][] facets = null;
-            cv.Point2f[] facetCenters = null;
+            CV.Point2f[][] facets = null;
+            CV.Point2f[] facetCenters = null;
             subdiv.GetVoronoiFacetList(new List<int>(), out facets, out facetCenters);
             dst2.SetTo(0);
             for (int i = 0; i < facets.GetUpperBound(0); i++)
             {
-                var ptList = new List<cv.Point>();
+                var ptList = new List<CV.Point>();
                 for (int j = 0; j < facets[i].Length; j++)
                 {
-                    ptList.Add(new cv.Point(facets[i][j].X, facets[i][j].Y));
+                    ptList.Add(new CV.Point(facets[i][j].X, facets[i][j].Y));
                 }
 
-                DrawContour(dst2, ptList, cv.Scalar.All(255), 1);
+                DrawContour(dst2, ptList, CV.Scalar.All(255), 1);
             }
             labels[2] = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present.";
         }
@@ -11255,7 +11257,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             if (src.Channels() != 1)
-                src = src.CvtColor(ColorConversionCodes.BGR2GRAY) - cv.Scalar.All(1);
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY) - CV.Scalar.All(1);
 
             byte[] dataSrc = new byte[src.Total()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
@@ -11265,7 +11267,7 @@ namespace CS_Classes
 
             if (imagePtr != IntPtr.Zero)
             {
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+                dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
                 diff.Run(dst2);
                 dst3 = diff.dst2;
             }
@@ -11316,7 +11318,7 @@ namespace CS_Classes
                 GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
                 IntPtr imagePtr = Denoise_Pixels_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
                 handleSrc.Free();
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+                dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
             }
             else
             {
@@ -11410,14 +11412,14 @@ namespace CS_Classes
             {
                 var roi = task.gridList[i];
                 mmData mm = GetMinMax(task.pcSplit[2][roi], depthmask[roi]);
-                if (mm.minLoc.X < 0 || mm.minLoc.Y < 0) mm.minLoc = new cv.Point(0, 0);
+                if (mm.minLoc.X < 0 || mm.minLoc.Y < 0) mm.minLoc = new CV.Point(0, 0);
                 kalman.kInput[i * 4] = mm.minLoc.X;
                 kalman.kInput[i * 4 + 1] = mm.minLoc.Y;
                 kalman.kInput[i * 4 + 2] = mm.maxLoc.X;
                 kalman.kInput[i * 4 + 3] = mm.maxLoc.Y;
             });
             kalman.Run(src);
-            Subdiv2D subdiv = new Subdiv2D(new cv.Rect(0, 0, src.Width, src.Height));
+            Subdiv2D subdiv = new Subdiv2D(new CV.Rect(0, 0, src.Width, src.Height));
             for (int i = 0; i < task.gridList.Count(); i++)
             {
                 var roi = task.gridList[i];
@@ -11429,17 +11431,17 @@ namespace CS_Classes
                 DrawCircle(dst2, ptmin, task.DotSize, Scalar.Red);
                 DrawCircle(dst2, ptmax, task.DotSize, Scalar.Blue);
             }
-            cv.Point2f[][] facets = new Point2f[1][];
-            cv.Point2f[] centers;
+            CV.Point2f[][] facets = new Point2f[1][];
+            CV.Point2f[] centers;
             subdiv.GetVoronoiFacetList(new List<int>(), out facets, out centers);
-            cv.Point[] ifacet;
-            cv.Point[][] ifacets = new cv.Point[1][];
+            CV.Point[] ifacet;
+            CV.Point[][] ifacets = new CV.Point[1][];
             for (int i = 0; i < facets.Length; i++)
             {
-                ifacet = new cv.Point[facets[i].Length];
+                ifacet = new CV.Point[facets[i].Length];
                 for (int j = 0; j < facets[i].Length; j++)
                 {
-                    ifacet[j] = new cv.Point((int)Math.Round(facets[i][j].X), (int)Math.Round(facets[i][j].Y));
+                    ifacet[j] = new CV.Point((int)Math.Round(facets[i][j].X), (int)Math.Round(facets[i][j].Y));
                 }
                 ifacets[0] = ifacet;
                 dst3.FillConvexPoly(ifacet, task.scalarColors[i % task.scalarColors.Length], task.lineType);
@@ -11458,7 +11460,7 @@ namespace CS_Classes
         {
             options.RunVB();
             Cv2.ConvertScaleAbs(task.pcSplit[2] * 1000, dst1, options.alpha, options.beta);
-            dst1 += cv.Scalar.All(1);
+            dst1 += CV.Scalar.All(1);
             dst2 = ShowPalette(dst1);
             dst2.SetTo(0, task.noDepthMask);
             dst3 = task.palette.dst3;
@@ -11529,7 +11531,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Density_2D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.distance);
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
         }
         public void Close()
         {
@@ -11570,7 +11572,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Density_Count_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.zCount);
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
         }
         public void Close()
         {
@@ -11579,7 +11581,7 @@ namespace CS_Classes
     }
     public class Density_Mask_CS : CS_Parent
     {
-        public List<cv.Point> pointList = new List<cv.Point>();
+        public List<CV.Point> pointList = new List<CV.Point>();
         public Density_Mask_CS(VBtask task) : base(task)
         {
             desc = "Measure a mask's size in any image and track the biggest regions.";
@@ -11607,7 +11609,7 @@ namespace CS_Classes
                 if (activeList[i])
                 {
                     var roi = task.gridList[i];
-                    pointList.Add(new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2));
+                    pointList.Add(new CV.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2));
                 }
             }
         }
@@ -11625,7 +11627,7 @@ namespace CS_Classes
             desc = "Monitor the first and last depth distances";
         }
 
-        void identifyMinMax(cv.Point pt, string text)
+        void identifyMinMax(CV.Point pt, string text)
         {
             Cv2.Circle(dst2, pt, task.DotSize, task.HighlightColor);
             SetTrueText(text, pt, 2);
@@ -11666,12 +11668,12 @@ namespace CS_Classes
         {
             shadow.Run(src);
 
-            cv.Point[][] contours;
+            CV.Point[][] contours;
             if (shadow.dst3.Channels() == 3)
                 shadow.dst3 = shadow.dst3.CvtColor(ColorConversionCodes.BGR2GRAY);
             Cv2.FindContours(shadow.dst3, out contours, out _, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
 
-            var sortContours = new SortedList<int, List<cv.Point>>(new compareAllowIdenticalIntegerInverted());
+            var sortContours = new SortedList<int, List<CV.Point>>(new compareAllowIdenticalIntegerInverted());
             foreach (var c in contours)
             {
                 sortContours.Add(c.Length, c.ToList());
@@ -11700,15 +11702,15 @@ namespace CS_Classes
 
         public Depth_MeanStdev_MT_CS(VBtask task) : base(task)
         {
-            dst2 = new cv.Mat(dst2.Rows, dst2.Cols, MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new cv.Mat(dst3.Rows, dst3.Cols, MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new CV.Mat(dst2.Rows, dst2.Cols, MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new CV.Mat(dst3.Rows, dst3.Cols, MatType.CV_8U, CV.Scalar.All(0));
             desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable.";
         }
 
         public void RunCS(Mat src)
         {
             if (task.optionsChanged)
-                meanSeries = new cv.Mat(task.gridList.Count, task.frameHistoryCount, MatType.CV_32F, cv.Scalar.All(0));
+                meanSeries = new CV.Mat(task.gridList.Count, task.frameHistoryCount, MatType.CV_32F, CV.Scalar.All(0));
 
             int index = task.frameCount % task.frameHistoryCount;
             float[] meanValues = new float[task.gridList.Count];
@@ -11729,8 +11731,8 @@ namespace CS_Classes
 
             if (task.frameCount >= task.frameHistoryCount)
             {
-                var means = cv.Mat.FromPixelData(task.gridList.Count, 1, MatType.CV_32F, meanValues);
-                var stdevs = cv.Mat.FromPixelData(task.gridList.Count, 1, MatType.CV_32F, stdValues);
+                var means = CV.Mat.FromPixelData(task.gridList.Count, 1, MatType.CV_32F, meanValues);
+                var stdevs = CV.Mat.FromPixelData(task.gridList.Count, 1, MatType.CV_32F, stdValues);
                 var meanmask = means.Threshold(1, task.MaxZmeters, ThresholdTypes.Binary).ConvertScaleAbs();
                 var mm = GetMinMax(means, meanmask);
                 var stdMask = stdevs.Threshold(0.001, task.MaxZmeters, ThresholdTypes.Binary).ConvertScaleAbs();
@@ -11760,7 +11762,7 @@ namespace CS_Classes
                     for (int i = 0; i < task.gridList.Count; i++)
                     {
                         var roi = task.gridList[i];
-                        SetTrueText($"{meanValues[i]:F3}\n{stdValues[i]:F3}", new cv.Point(roi.X, roi.Y), 3);
+                        SetTrueText($"{meanValues[i]:F3}\n{stdValues[i]:F3}", new CV.Point(roi.X, roi.Y), 3);
                     }
                 }
 
@@ -11854,7 +11856,7 @@ namespace CS_Classes
             double mult = 255 / task.MaxZmeters;
             Mat depthNorm = (task.pcSplit[2] * mult).ToMat();
             depthNorm.ConvertTo(depthNorm, MatType.CV_8U);
-            Mat ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, customColorMap.Data);
+            Mat ColorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, customColorMap.Data);
             Cv2.ApplyColorMap(src, dst2, ColorMap);
         }
     }
@@ -11883,7 +11885,7 @@ namespace CS_Classes
             handleSrc.Free();
 
             if (imagePtr != IntPtr.Zero)
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
+                dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
         }
 
         public void Close()
@@ -11928,18 +11930,18 @@ namespace CS_Classes
 
             Parallel.For(0, task.gridList.Count, i =>
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 mmData mm = GetMinMax(task.pcSplit[2][roi], task.depthMask[roi]);
                 if (mm.minLoc.X < 0 || mm.minLoc.Y < 0)
-                    mm.minLoc = new cv.Point(0, 0);
-                minPoint[i] = new cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y);
-                maxPoint[i] = new cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y);
+                    mm.minLoc = new CV.Point(0, 0);
+                minPoint[i] = new CV.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y);
+                maxPoint[i] = new CV.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y);
 
                 Cv2.Circle(dst2[roi], mm.minLoc, task.DotSize, task.HighlightColor);
                 Cv2.Circle(dst2[roi], mm.maxLoc, task.DotSize, Scalar.Red);
 
-                cv.Point p1 = new cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y);
-                cv.Point p2 = new cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y);
+                CV.Point p1 = new CV.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y);
+                CV.Point p2 = new CV.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y);
                 Cv2.Circle(dst3, p1, task.DotSize, task.HighlightColor);
                 Cv2.Circle(dst3, p2, task.DotSize, Scalar.Red);
             });
@@ -11997,7 +11999,7 @@ namespace CS_Classes
         {
             options.RunVB();
 
-            cv.Rect rect = task.drawRect.Width != 0 ? task.drawRect : new cv.Rect(0, 0, src.Width, src.Height);
+            CV.Rect rect = task.drawRect.Width != 0 ? task.drawRect : new CV.Rect(0, 0, src.Width, src.Height);
 
             if (task.FirstPass) lastDepth = task.pcSplit[2].Clone();
             Cv2.Subtract(lastDepth, task.pcSplit[2], dst2);
@@ -12095,7 +12097,7 @@ namespace CS_Classes
         public Depth_Holes_CS(VBtask task) : base(task)
         {
             labels[3] = "Shadow Edges (use sliders to expand)";
-            element = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(5, 5));
+            element = Cv2.GetStructuringElement(MorphShapes.Rect, new CV.Size(5, 5));
             desc = "Identify holes in the depth image.";
         }
         public void RunCS(Mat src)
@@ -12160,8 +12162,8 @@ namespace CS_Classes
 
             //    kalman.kInput = new float[] { xx, yy, rectSize, rectSize };
             //    kalman.Run(src);
-            //    cv.Rect nextRect = new cv.Rect(xx, yy, rectSize, rectSize);
-            //    cv.Rect kRect = new cv.Rect((int)kalman.kOutput[0], (int)kalman.kOutput[1], (int)kalman.kOutput[2], (int)kalman.kOutput[3]);
+            //    CV.Rect nextRect = new CV.Rect(xx, yy, rectSize, rectSize);
+            //    CV.Rect kRect = new CV.Rect((int)kalman.kOutput[0], (int)kalman.kOutput[1], (int)kalman.kOutput[2], (int)kalman.kOutput[3]);
             //    dst2.Rectangle(kRect, Scalar.Red, 2);
             //    dst2.Rectangle(nextRect, Scalar.Blue, 2);
             //    if (Math.Abs(kRect.X - nextRect.X) < rectSize / 4 && Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4)
@@ -12172,7 +12174,7 @@ namespace CS_Classes
             //    }
             //}
         }
-        cv.Rect ValidateRect(cv.Rect rect)
+        CV.Rect ValidateRect(CV.Rect rect)
         {
             throw new NotImplementedException();
         }
@@ -12266,7 +12268,7 @@ namespace CS_Classes
             dst3.SetTo(Scalar.All(0));
             foreach (var c in contour.allContours)
             {
-                List<cv.Point> hull = Cv2.ConvexHull(c.ToArray(), true).ToList();
+                List<CV.Point> hull = Cv2.ConvexHull(c.ToArray(), true).ToList();
                 DrawContour(dst3, hull, Scalar.White, -1);
             }
         }
@@ -12329,7 +12331,7 @@ namespace CS_Classes
     public class Depth_ForegroundBlob_CS : CS_Parent
     {
         Options_ForeGround options = new Options_ForeGround();
-        List<cv.Point> blobLocation = new List<cv.Point>();
+        List<CV.Point> blobLocation = new List<CV.Point>();
         int maxIndex;
 
         public Depth_ForegroundBlob_CS(VBtask task) : base(task)
@@ -12355,11 +12357,11 @@ namespace CS_Classes
                     byte nextByte = dst2.At<byte>(y, x);
                     if (nextByte != 0)
                     {
-                        int count = Cv2.FloodFill(dst2, new cv.Point(x, y), cv.Scalar.All(0), out _, new Scalar(0), new Scalar(0));
+                        int count = Cv2.FloodFill(dst2, new CV.Point(x, y), CV.Scalar.All(0), out _, new Scalar(0), new Scalar(0));
                         if (count > 10)
                         {
                             blobSize.Add(count);
-                            blobLocation.Add(new cv.Point(x, y));
+                            blobLocation.Add(new CV.Point(x, y));
                         }
                     }
                 }
@@ -12369,7 +12371,7 @@ namespace CS_Classes
             {
                 int maxBlob = blobSize.Max();
                 maxIndex = blobSize.IndexOf(maxBlob);
-                Cv2.FloodFill(dst3, blobLocation[maxIndex], cv.Scalar.All(250), out _, new Scalar(0), new Scalar(0));
+                Cv2.FloodFill(dst3, blobLocation[maxIndex], CV.Scalar.All(250), out _, new Scalar(0), new Scalar(0));
                 Cv2.InRange(dst3, 250, 250, dst2);
                 Cv2.BitwiseAnd(dst2, task.noDepthMask, dst2);
                 labels[3] = "Mask of all depth pixels < " + options.maxForegroundDepthInMeters.ToString("0.0") + "m";
@@ -12398,7 +12400,7 @@ namespace CS_Classes
         {
             options.RunVB();
 
-            Cv2.Threshold(task.pcSplit[2], dst1, options.maxForegroundDepthInMeters, 255, cv.ThresholdTypes.BinaryInv);
+            Cv2.Threshold(task.pcSplit[2], dst1, options.maxForegroundDepthInMeters, 255, CV.ThresholdTypes.BinaryInv);
             dst1 = dst1.ConvertScaleAbs();
 
             Cv2.BitwiseAnd(dst1, task.noDepthMask, dst1);
@@ -12436,7 +12438,7 @@ namespace CS_Classes
             dst3 = task.pcSplit[2];
             dst2 = task.gridMask.Clone();
 
-            foreach (cv.Rect roi in task.gridList)
+            foreach (CV.Rect roi in task.gridList)
             {
                 double minVal, maxVal;
                 Cv2.MinMaxLoc(dst3[roi], out minVal, out maxVal);
@@ -12499,7 +12501,7 @@ namespace CS_Classes
             }
 
             dst0 = src.Clone();
-            dst0.SetTo(cv.Scalar.White, dst3);
+            dst0.SetTo(CV.Scalar.White, dst3);
 
             if (standaloneTest())
             {
@@ -12597,8 +12599,8 @@ namespace CS_Classes
                 dst2 = new Mat();
                 Cv2.Subtract(lastDepth, dst1, dst2);
             }
-            Cv2.Threshold(dst2, dst2, options.mmThreshold, 0, cv.ThresholdTypes.Tozero);
-            Cv2.Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary);
+            Cv2.Threshold(dst2, dst2, options.mmThreshold, 0, CV.ThresholdTypes.Tozero);
+            Cv2.Threshold(dst2, dst2, 0, 255, CV.ThresholdTypes.Binary);
             lastDepth = dst1.Clone();
         }
     }
@@ -12641,7 +12643,7 @@ namespace CS_Classes
 
             if (showMessage > 0)
             {
-                SetTrueText("Punched!!!", new cv.Point(10, 100), 3);
+                SetTrueText("Punched!!!", new CV.Point(10, 100), 3);
                 showMessage--;
             }
 
@@ -12650,7 +12652,7 @@ namespace CS_Classes
             if (showWarningInfo > 0)
             {
                 showWarningInfo--;
-                SetTrueText("Too many contours!  Reduce the Max Depth.", new cv.Point(10, 130), 3);
+                SetTrueText("Too many contours!  Reduce the Max Depth.", new CV.Point(10, 130), 3);
             }
         }
     }
@@ -12988,7 +12990,7 @@ namespace CS_Classes
                         if (xy.Z != 0)
                         {
                             Point3f xyz = getWorldCoordinates(xy);
-                            dst3.Set<cv.Point3f>(y, x, xyz);
+                            dst3.Set<CV.Point3f>(y, x, xyz);
                         }
                     }
                 }
@@ -13021,7 +13023,7 @@ namespace CS_Classes
             if (!depthUnitsMeters)
                 src = (src * 0.001).ToMat();
 
-            dst2 = new Mat(src.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst2 = new Mat(src.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             Point3f xy = new Point3f();
 
             for (xy.Y = 0; xy.Y < dst2.Height; xy.Y++)
@@ -13212,7 +13214,7 @@ namespace CS_Classes
                     index++;
                 }
             }
-            histogram = cv.Mat.FromPixelData(plot.histArray.Length, 1, MatType.CV_32F, plot.histArray.ToArray());
+            histogram = CV.Mat.FromPixelData(plot.histArray.Length, 1, MatType.CV_32F, plot.histArray.ToArray());
 
             int brickWidth = dst2.Width / task.histogramBins;
             int histIndex = (int)(task.mouseMovePoint.X / brickWidth);
@@ -13226,7 +13228,7 @@ namespace CS_Classes
             dst3 = task.color.Clone();
             dst3.SetTo(Scalar.White, mask);
             dst3.SetTo(0, task.noDepthMask);
-            Cv2.Rectangle(dst2, new cv.Rect(histIndex * brickWidth, 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            Cv2.Rectangle(dst2, new CV.Rect(histIndex * brickWidth, 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
             string deriv = string.Format(fmt2, options.derivativeRange);
             labels[2] = "Histogram of first or second derivatives.  Range -" + deriv + " to " + deriv;
             labels[3] = "Backprojection into the image for the selected histogram entry - move mouse over dst2.";
@@ -13294,7 +13296,7 @@ namespace CS_Classes
             options.RunVB();
 
             int channel = deriv.options.channel;
-            cv.Size gausskern = new cv.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize);
+            CV.Size gausskern = new CV.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize);
             dst1 = task.pcSplit[channel].GaussianBlur(gausskern, 0, 0);
             dst1 = dst1.Laplacian(MatType.CV_32F, options.LaplaciankernelSize, 1, 0);
 
@@ -13390,7 +13392,7 @@ namespace CS_Classes
             Cv2.CopyMakeBorder(grayMat, padded, 0, rows - grayMat.Rows, 0, cols - grayMat.Cols, BorderTypes.Constant, Scalar.All(0));
             Mat padded32 = new Mat();
             padded.ConvertTo(padded32, MatType.CV_32F);
-            Mat[] planes = { padded32, new Mat(padded.Size(), MatType.CV_32F, cv.Scalar.All(0)) };
+            Mat[] planes = { padded32, new Mat(padded.Size(), MatType.CV_32F, CV.Scalar.All(0)) };
             Cv2.Merge(planes, complexImage);
             Cv2.Dft(complexImage, complexImage);
 
@@ -13400,17 +13402,17 @@ namespace CS_Classes
             magnitude += Scalar.All(1);
             Cv2.Log(magnitude, magnitude);
 
-            spectrum = magnitude[new cv.Rect(0, 0, magnitude.Cols & -2, magnitude.Rows & -2)];
+            spectrum = magnitude[new CV.Rect(0, 0, magnitude.Cols & -2, magnitude.Rows & -2)];
             spectrum = spectrum.Normalize(0, 255, NormTypes.MinMax);
             spectrum.ConvertTo(padded, MatType.CV_8U);
 
             int cx = padded.Cols / 2;
             int cy = padded.Rows / 2;
 
-            mats.mat[3] = padded[new cv.Rect(0, 0, cx, cy)].Clone();
-            mats.mat[2] = padded[new cv.Rect(cx, 0, cx, cy)].Clone();
-            mats.mat[1] = padded[new cv.Rect(0, cy, cx, cy)].Clone();
-            mats.mat[0] = padded[new cv.Rect(cx, cy, cx, cy)].Clone();
+            mats.mat[3] = padded[new CV.Rect(0, 0, cx, cy)].Clone();
+            mats.mat[2] = padded[new CV.Rect(cx, 0, cx, cy)].Clone();
+            mats.mat[1] = padded[new CV.Rect(0, cy, cx, cy)].Clone();
+            mats.mat[0] = padded[new CV.Rect(cx, cy, cx, cy)].Clone();
             mats.Run(empty);
             dst3 = mats.dst2;
 
@@ -13443,7 +13445,7 @@ namespace CS_Classes
                     double r = options.radius / (k + 1);
                     options.butterworthFilter[k] = new Mat(dft.complexImage.Size(), MatType.CV_32FC2);
                     Mat tmp = new Mat(options.butterworthFilter[k].Size(), MatType.CV_32F, Scalar.All(0));
-                    cv.Point center = new cv.Point(options.butterworthFilter[k].Rows / 2, options.butterworthFilter[k].Cols / 2);
+                    CV.Point center = new CV.Point(options.butterworthFilter[k].Rows / 2, options.butterworthFilter[k].Cols / 2);
                     for (int i = 0; i < options.butterworthFilter[k].Rows; i++)
                     {
                         for (int j = 0; j < options.butterworthFilter[k].Cols; j++)
@@ -13490,7 +13492,7 @@ namespace CS_Classes
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat gray32f = new Mat();
             src.ConvertTo(gray32f, MatType.CV_32F);
-            Mat[] planes = { gray32f, new Mat(gray32f.Size(), MatType.CV_32F, cv.Scalar.All(0)) };
+            Mat[] planes = { gray32f, new Mat(gray32f.Size(), MatType.CV_32F, CV.Scalar.All(0)) };
             Mat complex = new Mat();
             Mat complexImage = new Mat();
             Cv2.Merge(planes, complex);
@@ -13600,9 +13602,9 @@ namespace CS_Classes
                 case "Draw Point":
                     if (task.heartBeat)
                     {
-                        dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-                        var pt1 = new cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10));
-                        var pt2 = new cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10));
+                        dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+                        var pt1 = new CV.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10));
+                        var pt2 = new CV.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10));
                         dst2.Set<byte>(pt1.Y, pt1.X, 255);
                         dst2.Set<byte>(pt2.Y, pt2.X, 255);
                         labels[2] = $"pt1 = ({pt1.X},{pt1.Y})  pt2 = ({pt2.X},{pt2.Y})";
@@ -13843,7 +13845,7 @@ namespace CS_Classes
 
         public Diff_Heartbeat_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "Unstable mask", "Pixel difference" };
             desc = "Diff an image with one from the last heartbeat.";
         }
@@ -14125,7 +14127,7 @@ namespace CS_Classes
             }
 
             SetTrueText(depthStr + "\n\n" + dispStr, 3);
-            SetTrueText(strOut, new cv.Point(0, dst2.Height / 3), 3);
+            SetTrueText(strOut, new CV.Point(0, dst2.Height / 3), 3);
         }
     }
 
@@ -14221,7 +14223,7 @@ namespace CS_Classes
             if (l1Radio.Checked) DistanceType = DistanceTypes.L1;
 
             src = dst3 & src;
-            Mat dist = src.DistanceTransform(DistanceType, cv.DistanceTransformMasks.Precise);
+            Mat dist = src.DistanceTransform(DistanceType, CV.DistanceTransformMasks.Precise);
             Mat dist32f = dist.Normalize(0, 255, NormTypes.MinMax);
             dist32f.ConvertTo(src, MatType.CV_8UC1);
             dst2 = src.CvtColor(ColorConversionCodes.GRAY2BGR);
@@ -14275,12 +14277,12 @@ namespace CS_Classes
                 inPoint2 = new Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000));
 
                 dst2.SetTo(0);
-                cv.Point p1 = new cv.Point((int)inPoint1.X, (int)inPoint1.Y);
-                cv.Point p2 = new cv.Point((int)inPoint2.X, (int)inPoint2.Y);
+                CV.Point p1 = new CV.Point((int)inPoint1.X, (int)inPoint1.Y);
+                CV.Point p2 = new CV.Point((int)inPoint2.X, (int)inPoint2.Y);
                 Cv2.Line(dst2, p1, p2, task.HighlightColor, task.lineWidth);
 
-                Point3f vec1 = task.pointCloud.Get<cv.Point3f>(p1.Y, p1.X);
-                Point3f vec2 = task.pointCloud.Get<cv.Point3f>(p2.Y, p2.X);
+                Point3f vec1 = task.pointCloud.Get<CV.Point3f>(p1.Y, p1.X);
+                Point3f vec2 = task.pointCloud.Get<CV.Point3f>(p2.Y, p2.X);
             }
 
             float x = inPoint1.X - inPoint2.X;
@@ -14327,7 +14329,7 @@ namespace CS_Classes
             distance = (float)Math.Sqrt(x * x + y * y + z * z + d * d);
 
             string strOut = $"{inPoint1}\n{inPoint2}\nDistance = {distance:F1}";
-            SetTrueText(strOut, new cv.Point(10, 10), 2);
+            SetTrueText(strOut, new CV.Point(10, 10), 2);
         }
     }
 
@@ -14401,7 +14403,7 @@ namespace CS_Classes
                     if (index % 6 == 5) strOut += "\n";
                     index++;
                     var rc = lastredCells[el.Value];
-                    SetTrueText(el.Value.ToString(), new cv.Point(rc.maxDist.X, rc.maxDist.Y + 10));
+                    SetTrueText(el.Value.ToString(), new CV.Point(rc.maxDist.X, rc.maxDist.Y + 10));
                 }
 
                 foreach (var el in distances)
@@ -14414,7 +14416,7 @@ namespace CS_Classes
             foreach (var el in lastDistances)
             {
                 var rp = lastredCells[el.Value];
-                SetTrueText(el.Value.ToString(), new cv.Point(rp.maxDist.X, rp.maxDist.Y + 10));
+                SetTrueText(el.Value.ToString(), new CV.Point(rp.maxDist.X, rp.maxDist.Y + 10));
             }
 
             SetTrueText(strOut, 1);
@@ -14618,11 +14620,11 @@ namespace CS_Classes
             dst3.SetTo(Scalar.Black);
             for (int i = 0; i < options.drawCount; i++)
             {
-                List<cv.Point> points = new List<cv.Point>();
-                List<List<cv.Point>> listOfPoints = new List<List<cv.Point>>();
+                List<CV.Point> points = new List<CV.Point>();
+                List<List<CV.Point>> listOfPoints = new List<List<CV.Point>>();
                 for (int j = 0; j < 11; j++)
                 {
-                    points.Add(new cv.Point(msRNG.Next(width, width * 7), msRNG.Next(height, height * 7)));
+                    points.Add(new CV.Point(msRNG.Next(width, width * 7), msRNG.Next(height, height * 7)));
                 }
                 listOfPoints.Add(points);
                 if (options.drawFilled != -1)
@@ -14633,12 +14635,12 @@ namespace CS_Classes
                 {
                     Cv2.FillPoly(dst3, listOfPoints, new Scalar(0, 0, 255));
                 }
-                cv.Point[] hull = Cv2.ConvexHull(points, true);
-                listOfPoints = new List<List<cv.Point>>();
-                points = new List<cv.Point>();
+                CV.Point[] hull = Cv2.ConvexHull(points, true);
+                listOfPoints = new List<List<CV.Point>>();
+                points = new List<CV.Point>();
                 for (int j = 0; j < hull.Length; j++)
                 {
-                    points.Add(new cv.Point(hull[j].X, hull[j].Y));
+                    points.Add(new CV.Point(hull[j].X, hull[j].Y));
                 }
                 listOfPoints.Add(points);
                 dst2.SetTo(Scalar.Black);
@@ -14662,8 +14664,8 @@ namespace CS_Classes
             dst2.SetTo(0);
             for (int i = 1; i <= 256; i++)
             {
-                cv.Point p1 = new cv.Point(thickness * i + offsetX, offsetY);
-                cv.Point p2 = new cv.Point(thickness * i + offsetX, offsetY + lineLength);
+                CV.Point p1 = new CV.Point(thickness * i + offsetX, offsetY);
+                CV.Point p2 = new CV.Point(thickness * i + offsetX, offsetY + lineLength);
                 Cv2.Line(dst2, p1, p2, new Scalar(i, i, i), thickness);
             }
             for (int i = 1; i <= 256; i++)
@@ -14672,23 +14674,23 @@ namespace CS_Classes
                 switch (msRNG.Next(0, 3))
                 {
                     case 0: // circle
-                        cv.Point center = new cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY));
+                        CV.Point center = new CV.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY));
                         int radius = msRNG.Next(1, Math.Min(offsetX, offsetY));
                         Cv2.Circle(dst2, center, radius, color, -1);
                         break;
                     case 1: // Rectangle
-                        center = new cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY));
+                        center = new CV.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY));
                         int width = msRNG.Next(1, Math.Min(offsetX, offsetY));
                         int height = msRNG.Next(1, Math.Min(offsetX, offsetY));
-                        cv.Rect rcenter = new cv.Rect(center.X - width, center.Y - height / 2, width, height);
+                        CV.Rect rcenter = new CV.Rect(center.X - width, center.Y - height / 2, width, height);
                         Cv2.Rectangle(dst2, rcenter, color, -1, LineTypes.Link8);
                         break;
                     case 2: // Ellipse
-                        center = new cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY));
+                        center = new CV.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY));
                         width = msRNG.Next(1, Math.Min(offsetX, offsetY));
                         height = msRNG.Next(1, Math.Min(offsetX, offsetY));
                         int angle = msRNG.Next(0, 180);
-                        Cv2.Ellipse(dst2, center, new cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, LineTypes.Link8);
+                        Cv2.Ellipse(dst2, center, new CV.Size(width / 2, height / 2), angle, 0, 360, color, -1, LineTypes.Link8);
                         break;
                 }
             }
@@ -14711,9 +14713,9 @@ namespace CS_Classes
             if (task.heartBeat)
             {
                 dst2.SetTo(Scalar.Black);
-                cv.Point pt = new cv.Point();
-                cv.Point center = new cv.Point(src.Width / 2, src.Height / 2);
-                List<cv.Point> points = new List<cv.Point>();
+                CV.Point pt = new CV.Point();
+                CV.Point center = new CV.Point(src.Width / 2, src.Height / 2);
+                List<CV.Point> points = new List<CV.Point>();
                 for (int i = 0; i < options.numPoints; i++)
                 {
                     double theta = i * options.dTheta;
@@ -14726,8 +14728,8 @@ namespace CS_Classes
                 }
                 for (int i = 0; i < options.numPoints; i++)
                 {
-                    cv.Point p1 = points[i];
-                    cv.Point p2 = points[(i + 1) % options.numPoints];
+                    CV.Point p1 = points[i];
+                    CV.Point p2 = points[(i + 1) % options.numPoints];
                     Cv2.Line(dst2, p1, p2, task.scalarColors[i % task.scalarColors.Count()], task.lineWidth + 1, task.lineType);
                 }
                 if (options.fillRequest) Cv2.FloodFill(dst2, center, options.fillColor);
@@ -14741,7 +14743,7 @@ namespace CS_Classes
     public class Draw_Arc_CS : CS_Parent
     {
         Kalman_Basics kalman = new Kalman_Basics();
-        cv.Rect rect;
+        CV.Rect rect;
         float angle;
         float startAngle;
         float endAngle;
@@ -14767,7 +14769,7 @@ namespace CS_Classes
             }
             kalman.kInput = new[] { rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle };
             kalman.Run(src);
-            cv.Rect r = new cv.Rect((int)kalman.kOutput[0], (int)kalman.kOutput[1], (int)kalman.kOutput[2], (int)kalman.kOutput[3]);
+            CV.Rect r = new CV.Rect((int)kalman.kOutput[0], (int)kalman.kOutput[1], (int)kalman.kOutput[2], (int)kalman.kOutput[3]);
             if (r.Width <= 5) r.Width = 5;
             if (r.Height <= 5) r.Height = 5;
             RotatedRect rr = new RotatedRect(new Point2f(r.X, r.Y), new Size2f(r.Width, r.Height), angle);
@@ -14784,8 +14786,8 @@ namespace CS_Classes
                 startAngle = kalman.kOutput[5];
                 endAngle = kalman.kOutput[6];
                 if (options.drawFill) thickness = -1;
-                cv.Rect r1 = rr.BoundingRect();
-                Cv2.Ellipse(dst2, new cv.Point(rr.Center.X, rr.Center.Y), new cv.Size(r1.Width, r1.Height),
+                CV.Rect r1 = rr.BoundingRect();
+                Cv2.Ellipse(dst2, new CV.Point(rr.Center.X, rr.Center.Y), new CV.Size(r1.Width, r1.Height),
                             angle, startAngle, endAngle, color, thickness, task.lineType);
             }
         }
@@ -14798,17 +14800,17 @@ namespace CS_Classes
     {
         Font_FlowText flow = new Font_FlowText();
         Kalman_Basics kalman = new Kalman_Basics();
-        cv.Point pt1;
-        cv.Point pt2;
-        cv.Rect rect;
+        CV.Point pt1;
+        CV.Point pt2;
+        CV.Rect rect;
         int linenum = 0;
         int hitCount = 0;
         void setup()
         {
             kalman.kInput = new float[9];
-            cv.Rect r = InitRandomRect(25);
-            pt1 = new cv.Point(r.X, r.Y);
-            pt2 = new cv.Point(r.X + r.Width, r.Y + r.Height);
+            CV.Rect r = InitRandomRect(25);
+            pt1 = new CV.Point(r.X, r.Y);
+            pt2 = new CV.Point(r.X + r.Width, r.Y + r.Height);
             rect = InitRandomRect(25);
             if (task.gOptions.GetUseKalman()) flow.flowText.Add("--------------------------- setup ---------------------------");
         }
@@ -14823,11 +14825,11 @@ namespace CS_Classes
             dst3 = src;
             kalman.kInput = new float[] { pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height };
             kalman.Run(src);
-            cv.Point p1 = new cv.Point((int)kalman.kOutput[0], (int)kalman.kOutput[1]);
-            cv.Point p2 = new cv.Point((int)kalman.kOutput[2], (int)kalman.kOutput[3]);
+            CV.Point p1 = new CV.Point((int)kalman.kOutput[0], (int)kalman.kOutput[1]);
+            CV.Point p2 = new CV.Point((int)kalman.kOutput[2], (int)kalman.kOutput[3]);
             if (kalman.kOutput[6] < 5) kalman.kOutput[6] = 5; // don't let the width/height get too small...
             if (kalman.kOutput[7] < 5) kalman.kOutput[7] = 5;
-            cv.Rect r = new cv.Rect((int)kalman.kOutput[4], (int)kalman.kOutput[5], (int)kalman.kOutput[6], (int)kalman.kOutput[7]);
+            CV.Rect r = new CV.Rect((int)kalman.kOutput[4], (int)kalman.kOutput[5], (int)kalman.kOutput[6], (int)kalman.kOutput[7]);
             bool clipped = Cv2.ClipLine(r, ref p1, ref p2); // Returns false when the line and the rectangle don't intersect.
             Cv2.Line(dst3, p1, p2, clipped ? Scalar.White : Scalar.Black, task.lineWidth + 1, task.lineType);
             Cv2.Rectangle(dst3, r, clipped ? Scalar.Yellow : Scalar.Red, task.lineWidth + 1, task.lineType);
@@ -14835,7 +14837,7 @@ namespace CS_Classes
             linenum++;
             hitCount += clipped ? 1 : 0;
             SetTrueText($"There were {hitCount:###,##0} intersects and {linenum - hitCount} misses",
-                         new cv.Point(src.Width / 2, 200));
+                         new CV.Point(src.Width / 2, 200));
             if (r == rect) setup();
             flow.Run(empty);
         }
@@ -14865,7 +14867,7 @@ namespace CS_Classes
 
     public class Draw_Line_CS : CS_Parent
     {
-        public cv.Point p1, p2;
+        public CV.Point p1, p2;
         public bool externalUse;
         public Draw_Line_CS(VBtask task) : base(task)
         {
@@ -14873,25 +14875,25 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            if (task.FirstPass) task.ClickPoint = new cv.Point();
-            if (p1 != new cv.Point() && p2 != new cv.Point() && task.ClickPoint != new cv.Point())
+            if (task.FirstPass) task.ClickPoint = new CV.Point();
+            if (p1 != new CV.Point() && p2 != new CV.Point() && task.ClickPoint != new CV.Point())
             {
-                p1 = new cv.Point();
-                p2 = new cv.Point();
+                p1 = new CV.Point();
+                p2 = new CV.Point();
             }
             dst2 = src;
-            if (task.ClickPoint != new cv.Point() || externalUse)
+            if (task.ClickPoint != new CV.Point() || externalUse)
             {
-                if (p1 == new cv.Point()) p1 = task.ClickPoint; else p2 = task.ClickPoint;
+                if (p1 == new CV.Point()) p1 = task.ClickPoint; else p2 = task.ClickPoint;
             }
-            if (p1 != new cv.Point() && p2 == new cv.Point()) Cv2.Circle(dst2, p1, task.DotSize, task.HighlightColor);
-            if (p1 != new cv.Point() && p2 != new cv.Point())
+            if (p1 != new CV.Point() && p2 == new CV.Point()) Cv2.Circle(dst2, p1, task.DotSize, task.HighlightColor);
+            if (p1 != new CV.Point() && p2 != new CV.Point())
             {
                 Cv2.Line(dst2, p1, p2, task.HighlightColor);
             }
             SetTrueText("Click twice in the image to provide the points below and they will be connected with a line\n" +
                         "P1 = " + p1.ToString() + "\nP2 = " + p2.ToString(), 3);
-            task.ClickPoint = new cv.Point();
+            task.ClickPoint = new CV.Point();
         }
     }
 
@@ -14909,8 +14911,8 @@ namespace CS_Classes
         {
             if (task.heartBeat)
             {
-                line.p1 = new cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height));
-                line.p2 = new cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height));
+                line.p1 = new CV.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height));
+                line.p2 = new CV.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height));
             }
             line.Run(src);
             dst2 = line.dst2;
@@ -14931,14 +14933,14 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            src = new Mat(task.WorkingRes, MatType.CV_32F, cv.Scalar.All(0));
+            src = new Mat(task.WorkingRes, MatType.CV_32F, CV.Scalar.All(0));
             int mid = src.Height / 2;
             float zIncr = task.MaxZmeters / mid;
             dst2 = src.Clone();
-            cv.Rect fRect = new cv.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height);
+            CV.Rect fRect = new CV.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height);
             for (int i = 0; i <= src.Height / 2; i++)
             {
-                Cv2.Rectangle(dst2[fRect], new cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1);
+                Cv2.Rectangle(dst2[fRect], new CV.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), CV.Scalar.All(i * zIncr), 1);
             }
             xyzDepth.Run(dst2);
             dst3 = xyzDepth.dst2.Resize(task.WorkingRes);
@@ -15178,7 +15180,7 @@ namespace CS_Classes
         {
             options.RunVB();
             if (task.frameCount < 100)
-                SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", new cv.Point(10, 100));
+                SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", new CV.Point(10, 100));
             if (task.frameCount == 5)
             {
                 var modelInfo = new FileInfo(task.HomeDir + "Data/model.yml.gz");
@@ -15190,7 +15192,7 @@ namespace CS_Classes
                 var handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned);
                 var imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols);
                 handleRGB.Free();
-                dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, ThresholdTypes.Binary);
+                dst3 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, ThresholdTypes.Binary);
             }
         }
         public void Close()
@@ -15215,7 +15217,7 @@ namespace CS_Classes
             var src32f = new Mat();
             gray.ConvertTo(src32f, MatType.CV_32F, 1 / 255.0);
             Cv2.Dct(src32f, frequencies, DctFlags.None);
-            var roi = new cv.Rect(0, 0, options.removeFrequencies, src32f.Height);
+            var roi = new CV.Rect(0, 0, options.removeFrequencies, src32f.Height);
             if (roi.Width > 0) frequencies[roi].SetTo(0);
             labels[2] = "Highest " + options.removeFrequencies + " frequencies removed from RGBDepth";
             Cv2.Dct(frequencies, src32f, DctFlags.Inverse);
@@ -15242,7 +15244,7 @@ namespace CS_Classes
                                            (float)options.alpha, (float)options.omega);
             handleSrc.Free();
             if (imagePtr != (IntPtr)0)
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+                dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
             dst3 = src | dst2;
         }
         public void Close()
@@ -15386,14 +15388,14 @@ namespace CS_Classes
             {
                 var roi = task.gridList[i];
                 int width = roi.X + roi.Width + options.searchDepth < dst2.Width ? roi.Width + options.searchDepth : dst2.Width - roi.X - 1;
-                var searchROI = new cv.Rect(roi.X, roi.Y, width, roi.Height);
+                var searchROI = new CV.Rect(roi.X, roi.Y, width, roi.Height);
                 match.template = dst3[roi];
                 match.Run(dst2[searchROI]);
                 maxLocs[i] = match.matchRect.X;
                 if (match.correlation > options.threshold || redRects.Contains(i))
                 {
                     highlights.Add(i);
-                    SetTrueText(match.correlation.ToString("F2"), new cv.Point(roi.X, roi.Y), 3);
+                    SetTrueText(match.correlation.ToString("F2"), new CV.Point(roi.X, roi.Y), 3);
                 }
             }
             if (options.overlayChecked)
@@ -15412,7 +15414,7 @@ namespace CS_Classes
                     dst3.Rectangle(roi, Scalar.Red, 2);
                     roi.X += maxLocs[i];
                     dst2.Rectangle(roi, Scalar.Red, 2);
-                    SetTrueText(maxLocs[i].ToString(), new cv.Point(roi.X, roi.Y), 2);
+                    SetTrueText(maxLocs[i].ToString(), new CV.Point(roi.X, roi.Y), 2);
                 }
             }
             else
@@ -15433,7 +15435,7 @@ namespace CS_Classes
                         dst3.Rectangle(roi, Scalar.Red, 2);
                         roi.X += maxLocs[i];
                         dst2.Rectangle(roi, Scalar.Red, 2);
-                        SetTrueText(maxLocs[i].ToString(), new cv.Point(roi.X, roi.Y), 2);
+                        SetTrueText(maxLocs[i].ToString(), new CV.Point(roi.X, roi.Y), 2);
                     }
                 }
             }
@@ -15461,7 +15463,7 @@ namespace CS_Classes
             for (int i = 0; i < 3; i++)
             {
                 sobel.Run(split[i]);
-                split[i] = cv.Scalar.All(255) - sobel.dst2;
+                split[i] = CV.Scalar.All(255) - sobel.dst2;
             }
             Cv2.Merge(split, dst2);
         }
@@ -15518,7 +15520,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             IntPtr imagePtr = Edge_ColorGap_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distanceSlider.Value & 254, diff);
             handleSrc.Free();
-            if (imagePtr != IntPtr.Zero) dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            if (imagePtr != IntPtr.Zero) dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
             dst3.SetTo(0);
             src.CopyTo(dst3, ~dst2);
         }
@@ -15534,14 +15536,14 @@ namespace CS_Classes
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
             labels = new string[] { "", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges" };
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Using grayscale image to identify color gaps which imply an edge - C# edition";
         }
         public void RunCS(Mat src)
         {
             options.RunVB();
-            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (src.Channels() != 1) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             dst2.SetTo(0);
             int half = options.gapDistance / 2;
             int pix1, pix2;
@@ -15574,8 +15576,8 @@ namespace CS_Classes
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
             labels = new string[] { "", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges" };
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Using depth image to identify gaps which imply an edge";
         }
         public void RunCS(Mat src)
@@ -15624,7 +15626,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Edge_DepthGap_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.mmDepthDiff);
             handleSrc.Free();
-            if (imagePtr != IntPtr.Zero) dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+            if (imagePtr != IntPtr.Zero) dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
         }
         public void Close()
         {
@@ -15697,7 +15699,7 @@ namespace CS_Classes
         {
             tiers.Run(src);
             dst3 = tiers.dst3;
-            edge.Run(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY));
+            edge.Run(dst3.CvtColor(CV.ColorConversionCodes.BGR2GRAY));
             dst2 = edge.dst2;
         }
     }
@@ -15725,8 +15727,8 @@ namespace CS_Classes
     public Edge_CannyHistory_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Canny using L1 Norm", "" };
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Show canny edge over the last X frame (see global option 'FrameHistory')";
         }
         public void RunCS(Mat src)
@@ -15758,8 +15760,8 @@ namespace CS_Classes
             options.RunVB();
             Mat gray = src;
             if (src.Channels() == 3) gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            Mat newFrame = gray[new Range(options.vertPixels, gray.Rows - options.vertPixels),
-                                 new Range(options.horizPixels, gray.Cols - options.horizPixels)];
+            Mat newFrame = gray[new CV.Range(options.vertPixels, gray.Rows - options.vertPixels),
+                                 new CV.Range(options.horizPixels, gray.Cols - options.horizPixels)];
             newFrame = newFrame.Resize(gray.Size(), 0, 0, InterpolationFlags.Nearest);
             Cv2.Absdiff(gray, newFrame, dst2);
             dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
@@ -15790,9 +15792,9 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 0, -1, 2, 0, -2, 1, 0, -1 }));
+            dst1 = src.Filter2D(MatType.CV_32F, CV.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 0, -1, 2, 0, -2, 1, 0, -1 }));
             dst1.ConvertTo(dst2, src.Type());
-            dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 3, 0, -3, 10, 0, -10, 3, 0, -3 }));
+            dst1 = src.Filter2D(MatType.CV_32F, CV.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 3, 0, -3, 10, 0, -10, 3, 0, -3 }));
             dst1.ConvertTo(dst3, src.Type());
         }
     }
@@ -15805,9 +15807,9 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 2, 1, 0, 0, 0, -1, -2, -1 }));
+            dst1 = src.Filter2D(MatType.CV_32F, CV.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 2, 1, 0, 0, 0, -1, -2, -1 }));
             dst1.ConvertTo(dst2, src.Type());
-            dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 3, 10, 3, 0, 0, 0, -3, -10, -3 }));
+            dst1 = src.Filter2D(MatType.CV_32F, CV.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 3, 10, 3, 0, 0, 0, -3, -10, -3 }));
             dst1.ConvertTo(dst3, src.Type());
         }
     }
@@ -15885,8 +15887,8 @@ namespace CS_Classes
             dst2 = valley.dst1;
             canny.Run(valley.dst1);
             int offset = 1;
-            cv.Rect r1 = new cv.Rect(offset, offset, dst2.Width - offset - 1, dst2.Height - offset - 1);
-            cv.Rect r2 = new cv.Rect(0, 0, dst2.Width - offset - 1, dst2.Height - offset - 1);
+            CV.Rect r1 = new CV.Rect(offset, offset, dst2.Width - offset - 1, dst2.Height - offset - 1);
+            CV.Rect r2 = new CV.Rect(0, 0, dst2.Width - offset - 1, dst2.Height - offset - 1);
             dst3.SetTo(Scalar.White);
             dst3[r1].SetTo(Scalar.Blue, canny.dst2[r2]);
             dst3.SetTo(Scalar.Red, dst1);
@@ -15938,10 +15940,10 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            dst2 = src.GaussianBlur(new cv.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize), 0, 0);
+            dst2 = src.GaussianBlur(new CV.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize), 0, 0);
             dst2 = dst2.Laplacian(MatType.CV_8U, options.LaplaciankernelSize, 1, 0);
             dst2 = dst2.ConvertScaleAbs();
-            dst3 = task.depthRGB.GaussianBlur(new cv.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize), 0, 0);
+            dst3 = task.depthRGB.GaussianBlur(new CV.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize), 0, 0);
             dst3 = dst3.Laplacian(MatType.CV_8U, options.LaplaciankernelSize, 1, 0);
             dst3 = dst3.ConvertScaleAbs();
         }
@@ -15985,7 +15987,7 @@ namespace CS_Classes
     public class Edge_MotionOverlay_CS : CS_Parent
     {
         Options_EdgeOverlay options = new Options_EdgeOverlay();
-        Mat offsetImage = new cv.Mat();
+        Mat offsetImage = new CV.Mat();
         public Edge_MotionOverlay_CS(VBtask task) : base(task)
         {
             labels[3] = "AbsDiff output of offset with original";
@@ -15997,8 +15999,8 @@ namespace CS_Classes
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (task.FirstPass) offsetImage = src.Clone();
-            var rect1 = new cv.Rect(options.xDisp, options.yDisp, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1);
-            var rect2 = new cv.Rect(0, 0, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1);
+            var rect1 = new CV.Rect(options.xDisp, options.yDisp, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1);
+            var rect2 = new CV.Rect(0, 0, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1);
             offsetImage[rect2] = src[rect1].Clone();
             Cv2.Absdiff(src, offsetImage, dst0);
             dst2 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
@@ -16088,8 +16090,8 @@ namespace CS_Classes
             IntPtr imagePtr = EdgeDraw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth);
             handleSrc.Free();
             if (imagePtr != IntPtr.Zero)
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
-            Cv2.Rectangle(dst2, new cv.Rect(0, 0, dst2.Width, dst2.Height), new Scalar(255), task.lineWidth);
+                dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+            Cv2.Rectangle(dst2, new CV.Rect(0, 0, dst2.Width, dst2.Height), new Scalar(255), task.lineWidth);
         }
         public void Close()
         {
@@ -16102,7 +16104,7 @@ namespace CS_Classes
 
     public class EdgeDraw_Segments_CPP_CS : CS_Parent
     {
-        public List<cv.Point2f> segPoints = new List<cv.Point2f>();
+        public List<CV.Point2f> segPoints = new List<CV.Point2f>();
         public EdgeDraw_Segments_CPP_CS(VBtask task) : base(task)
         {
             cPtr = EdgeDraw_Lines_Open();
@@ -16120,15 +16122,15 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr vecPtr = EdgeDraw_Lines_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth);
             handleSrc.Free();
-            Mat ptData = cv.Mat.FromPixelData(EdgeDraw_Lines_Count(cPtr), 2, MatType.CV_32FC2, vecPtr).Clone();
+            Mat ptData = CV.Mat.FromPixelData(EdgeDraw_Lines_Count(cPtr), 2, MatType.CV_32FC2, vecPtr).Clone();
             dst2.SetTo(new Scalar(0));
             if (task.heartBeat)
                 dst3.SetTo(new Scalar(0));
             segPoints.Clear();
             for (int i = 0; i < ptData.Rows; i += 2)
             {
-                Point2f pt1 = ptData.Get<cv.Point2f>(i, 0);
-                Point2f pt2 = ptData.Get<cv.Point2f>(i, 1);
+                Point2f pt1 = ptData.Get<CV.Point2f>(i, 0);
+                Point2f pt2 = ptData.Get<CV.Point2f>(i, 1);
                 DrawLine(dst2, pt1, pt2, Scalar.White, task.lineWidth);
                 Cv2.Add(dst3, dst2, dst3);
                 segPoints.Add(pt1);
@@ -16162,7 +16164,7 @@ namespace CS_Classes
                        -0.47, -6.39, 4.17, -1.51, 2.67,
                        -7.2, 1.5, -1.51, 5.7, 1.8,
                        -0.65, -6.34, 2.67, 1.8, -7.1 };
-            Mat mat = cv.Mat.FromPixelData(5, 5, MatType.CV_64FC1, a);
+            Mat mat = CV.Mat.FromPixelData(5, 5, MatType.CV_64FC1, a);
             Mat eigenVal = new Mat();
             Mat eigenVec = new Mat();
             Cv2.Eigen(mat, eigenVal, eigenVec);
@@ -16205,7 +16207,7 @@ namespace CS_Classes
 
     public class Eigen_FitLineInput_CS : CS_Parent
     {
-        public List<cv.Point2f> points = new List<cv.Point2f>();
+        public List<CV.Point2f> points = new List<CV.Point2f>();
         public float m;
         public float bb;
         public Options_Eigen options = new Options_Eigen();
@@ -16232,7 +16234,7 @@ namespace CS_Classes
                     pt.X = Math.Max(0, Math.Min(pt.X, width));
                     pt.Y = Math.Max(0, Math.Min(pt.Y, height));
                     points.Add(pt);
-                    Cv2.Circle(dst2, (cv.Point)points[i], task.DotSize, Scalar.White, -1);
+                    Cv2.Circle(dst2, (CV.Point)points[i], task.DotSize, Scalar.White, -1);
                 }
                 Point2f p1, p2;
                 if (rand.NextDouble() * 2 - 1 >= 0)
@@ -16256,7 +16258,7 @@ namespace CS_Classes
                 {
                     float noiseOffsetX = (float)((rand.NextDouble() * 2 - 1) * options.noiseOffset);
                     float noiseOffsetY = (float)((rand.NextDouble() * 2 - 1) * options.noiseOffset);
-                    cv.Point pt = new cv.Point(
+                    CV.Point pt = new CV.Point(
                         startx + i * incr + noiseOffsetX,
                         Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height))
                     );
@@ -16275,8 +16277,8 @@ namespace CS_Classes
     public class Eigen_Fitline_CS : CS_Parent
     {
         Eigen_FitLineInput noisyLine = new Eigen_FitLineInput();
-        Mat eigenVec = new Mat(2, 2, MatType.CV_32F, cv.Scalar.All(0));
-        Mat eigenVal = new Mat(2, 2, MatType.CV_32F, cv.Scalar.All(0));
+        Mat eigenVec = new Mat(2, 2, MatType.CV_32F, CV.Scalar.All(0));
+        Mat eigenVal = new Mat(2, 2, MatType.CV_32F, CV.Scalar.All(0));
         float theta;
         float len;
         float m2;
@@ -16298,10 +16300,10 @@ namespace CS_Classes
             Vec4f line = new Vec4f((float)nLines.Vx, (float)nLines.Vy, (float)nLines.X1, (float)nLines.Y1);
             float m = line[1] / line[0];
             float bb = line[3] - m * line[2];
-            cv.Point p1 = new cv.Point(0, bb);
-            cv.Point p2 = new cv.Point(width, m * width + bb);
+            CV.Point p1 = new CV.Point(0, bb);
+            CV.Point p2 = new CV.Point(width, m * width + bb);
             Cv2.Line(dst2, p1, p2, Scalar.Red, 20, LineTypes.Link8);
-            Mat pointMat = cv.Mat.FromPixelData(noisyLine.options.randomCount, 1, MatType.CV_32FC2, noisyLine.points.ToArray());
+            Mat pointMat = CV.Mat.FromPixelData(noisyLine.options.randomCount, 1, MatType.CV_32FC2, noisyLine.points.ToArray());
             Scalar mean = Cv2.Mean(pointMat);
             Mat[] split = Cv2.Split(pointMat);
             var mmX = GetMinMax(split[0]);
@@ -16316,31 +16318,31 @@ namespace CS_Classes
                 eigenInput[3] += y * y;
             }
             eigenInput[2] = eigenInput[1];
-            List<cv.Point2f> vec4f = new List<cv.Point2f>
+            List<CV.Point2f> vec4f = new List<CV.Point2f>
         {
             new Point2f(eigenInput[0], eigenInput[1]),
             new Point2f(eigenInput[1], eigenInput[3])
         };
-            Mat D = cv.Mat.FromPixelData(2, 2, MatType.CV_32FC1, vec4f.ToArray());
+            Mat D = CV.Mat.FromPixelData(2, 2, MatType.CV_32FC1, vec4f.ToArray());
             Cv2.Eigen(D, eigenVal, eigenVec);
             theta = (float)Math.Atan2(eigenVec.Get<float>(1, 0), eigenVec.Get<float>(0, 0));
             len = (float)Math.Sqrt(Math.Pow(mmX.maxVal - mmX.minVal, 2) + Math.Pow(mmY.maxVal - mmY.minVal, 2));
-            p1 = new cv.Point((int)(mean.Val0 - Math.Cos(theta) * len / 2), (int)(mean.Val1 - Math.Sin(theta) * len / 2));
-            p2 = new cv.Point((int)(mean.Val0 + Math.Cos(theta) * len / 2), (int)(mean.Val1 + Math.Sin(theta) * len / 2));
+            p1 = new CV.Point((int)(mean.Val0 - Math.Cos(theta) * len / 2), (int)(mean.Val1 - Math.Sin(theta) * len / 2));
+            p2 = new CV.Point((int)(mean.Val0 + Math.Cos(theta) * len / 2), (int)(mean.Val1 + Math.Sin(theta) * len / 2));
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X);
             if (Math.Abs(m2) > 1.0)
             {
-                Cv2.Line(dst2, (cv.Point)p1, (cv.Point)p2, task.HighlightColor, 10, LineTypes.Link8);
+                Cv2.Line(dst2, (CV.Point)p1, (CV.Point)p2, task.HighlightColor, 10, LineTypes.Link8);
             }
             else
             {
-                p1 = new cv.Point((int)(mean.Val0 - Math.Cos(-theta) * len / 2), (int)(mean.Val1 - Math.Sin(-theta) * len / 2));
-                p2 = new cv.Point((int)(mean.Val0 + Math.Cos(-theta) * len / 2), (int)(mean.Val1 + Math.Sin(-theta) * len / 2));
+                p1 = new CV.Point((int)(mean.Val0 - Math.Cos(-theta) * len / 2), (int)(mean.Val1 - Math.Sin(-theta) * len / 2));
+                p2 = new CV.Point((int)(mean.Val0 + Math.Cos(-theta) * len / 2), (int)(mean.Val1 + Math.Sin(-theta) * len / 2));
                 m2 = (p2.Y - p1.Y) / (p2.X - p1.X);
-                Cv2.Line(dst2, (cv.Point)p1, (cv.Point)p2, Scalar.Yellow, 10, LineTypes.Link8);
+                Cv2.Line(dst2, (CV.Point)p1, (CV.Point)p2, Scalar.Yellow, 10, LineTypes.Link8);
             }
-            p1 = new cv.Point(0, noisyLine.bb);
-            p2 = new cv.Point(width, noisyLine.m * width + noisyLine.bb);
+            p1 = new CV.Point(0, noisyLine.bb);
+            p2 = new CV.Point(width, noisyLine.m * width + noisyLine.bb);
             Cv2.Line(dst2, p1, p2, Scalar.Blue, task.lineWidth + 2, LineTypes.Link8);
             SetTrueText($"Ground Truth m = {noisyLine.m:F2} eigen m = {m2:F2}    len = {(int)len}\n" +
                         $"Confidence = {eigenVal.Get<float>(0, 0) / eigenVal.Get<float>(1, 0):F1}\n" +
@@ -16357,10 +16359,10 @@ namespace CS_Classes
     {
         public EMax_InputClusters emaxInput = new EMax_InputClusters();
         public List<int> eLabels = new List<int>();
-        public List<cv.Point2f> eSamples = new List<cv.Point2f>();
+        public List<CV.Point2f> eSamples = new List<CV.Point2f>();
         public int dimension = 2;
         public int regionCount;
-        public List<cv.Point2f> centers = new List<cv.Point2f>();
+        public List<CV.Point2f> centers = new List<CV.Point2f>();
         Options_Emax options = new Options_Emax();
         bool useInputClusters;
         Palette_Variable palette = new Palette_Variable();
@@ -16380,10 +16382,10 @@ namespace CS_Classes
                 useInputClusters = true;
                 emaxInput.Run(empty);
                 eLabels = new List<int>(emaxInput.eLabels);
-                eSamples = new List<cv.Point2f>(emaxInput.eSamples);
+                eSamples = new List<CV.Point2f>(emaxInput.eSamples);
                 regionCount = emaxInput.regionCount;
             }
-            if (centers.Count == 0) centers = new List<cv.Point2f>(emaxInput.centers);
+            if (centers.Count == 0) centers = new List<CV.Point2f>(emaxInput.centers);
             labels[2] = $"{eLabels.Count} samples provided in {regionCount} regions";
             GCHandle handleSrc = GCHandle.Alloc(eSamples.ToArray(), GCHandleType.Pinned);
             GCHandle handleLabels = GCHandle.Alloc(eLabels.ToArray(), GCHandleType.Pinned);
@@ -16391,7 +16393,7 @@ namespace CS_Classes
                                        dst2.Rows, dst2.Cols, regionCount, options.predictionStepSize, (int)options.covarianceType);
             handleLabels.Free();
             handleSrc.Free();
-            dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr).Clone();
+            dst1 = CV.Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr).Clone();
             dst1.ConvertTo(dst0, MatType.CV_8U);
             if (options.consistentcolors)
             {
@@ -16415,7 +16417,7 @@ namespace CS_Classes
                 dst0 *= 255 / regionCount;
                 dst2 = ShowPalette(dst0);
             }
-            centers = new List<cv.Point2f>(emaxInput.centers);
+            centers = new List<CV.Point2f>(emaxInput.centers);
         }
         public void Close()
         {
@@ -16438,7 +16440,7 @@ namespace CS_Classes
         {
             emax.Run(src);
             dst2 = emax.dst2;
-            List<cv.Point2f> lastCenters = new List<cv.Point2f>(emax.centers);
+            List<CV.Point2f> lastCenters = new List<CV.Point2f>(emax.centers);
             for (int i = 0; i < emax.centers.Count; i++)
             {
                 Cv2.Circle(dst2, emax.centers[i].ToPoint(), task.DotSize + 1, task.HighlightColor);
@@ -16447,7 +16449,7 @@ namespace CS_Classes
                     Cv2.Circle(dst2, lastCenters[i].ToPoint(), task.DotSize + 2, Scalar.Black);
                 }
             }
-            lastCenters = new List<cv.Point2f>(emax.centers);
+            lastCenters = new List<CV.Point2f>(emax.centers);
         }
     }
 
@@ -16458,8 +16460,8 @@ namespace CS_Classes
     {
         public int regionCount;
         public int[] eLabels;
-        public List<cv.Point2f> eSamples = new List<cv.Point2f>();
-        public List<cv.Point2f> centers = new List<cv.Point2f>();
+        public List<CV.Point2f> eSamples = new List<CV.Point2f>();
+        public List<CV.Point2f> centers = new List<CV.Point2f>();
         Options_EmaxInputClusters options = new Options_EmaxInputClusters();
         public EMax_InputClusters_CS(VBtask task) : base(task)
         {
@@ -16482,7 +16484,7 @@ namespace CS_Classes
             Mat eLabelMat = new Mat(regionCount * options.samplesPerRegion, 1, MatType.CV_32S);
             for (int i = 0; i < regionCount; i++)
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 eLabelMat.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion).SetTo(i);
                 Mat tmp = samples.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion);
                 Cv2.Randn(tmp, new Scalar(roi.X + task.gridSize / 2, roi.Y + task.gridSize / 2),
@@ -16494,7 +16496,7 @@ namespace CS_Classes
             centers.Clear();
             for (int i = 0; i < regionCount * options.samplesPerRegion; i++)
             {
-                Point2f pt = samples.Get<cv.Point2f>(i, 0);
+                Point2f pt = samples.Get<CV.Point2f>(i, 0);
                 centers.Add(pt);
                 eSamples.Add(new Point2f((int)pt.X, (int)pt.Y));
                 int label = eLabelMat.Get<int>(i);
@@ -16512,7 +16514,7 @@ namespace CS_Classes
     {
         public EMax_InputClusters emaxInput = new EMax_InputClusters();
         public List<int> eLabels = new List<int>();
-        public List<cv.Point2f> eSamples = new List<cv.Point2f>();
+        public List<CV.Point2f> eSamples = new List<CV.Point2f>();
         public int dimension = 2;
         public int regionCount;
         public EMax_VB_Failing_CS(VBtask task) : base(task)
@@ -16523,10 +16525,10 @@ namespace CS_Classes
         {
             emaxInput.Run(empty);
             eLabels = new List<int>(emaxInput.eLabels);
-            eSamples = new List<cv.Point2f>(emaxInput.eSamples);
+            eSamples = new List<CV.Point2f>(emaxInput.eSamples);
             regionCount = emaxInput.regionCount;
             SetTrueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + "\n" +
-                        "The C++ version works fine (EMax_RedCloud) and the 2 are functionally identical.", new cv.Point(20, 100));
+                        "The C++ version works fine (EMax_RedCloud) and the 2 are functionally identical.", new CV.Point(20, 100));
             return; // Comment this line to see the bug in the C# version of this Predict2 below. Any answers would be gratefully received.
             //EM em_model = EM.Create();
             //em_model.ClustersNumber = regionCount;
@@ -16544,7 +16546,7 @@ namespace CS_Classes
             //        sample.Set<float>(0, 1, (float)i);
             //        double response = Math.Round(em_model.Predict2(sample)[1]);
             //        Scalar c = task.vecColors[(int)response];
-            //        Cv2.Circle(dst2, new cv.Point(j, i), task.DotSize, c);
+            //        Cv2.Circle(dst2, new CV.Point(j, i), task.DotSize, c);
             //    }
             //}
         }
@@ -16568,11 +16570,11 @@ namespace CS_Classes
         {
             emax.Run(src);
             dst2 = emax.dst2;
-            knn.queries = new List<cv.Point2f>(emax.centers);
+            knn.queries = new List<CV.Point2f>(emax.centers);
             knn.Run(empty);
             if (task.FirstPass)
             {
-                knn.trainInput = new List<cv.Point2f>(knn.queries);
+                knn.trainInput = new List<CV.Point2f>(knn.queries);
                 return;
             }
             dst3.SetTo(0);
@@ -16584,7 +16586,7 @@ namespace CS_Classes
                 DrawCircle(dst3, p2, task.DotSize, Scalar.Red, -1);
                 DrawLine(dst3, p1, p2, Scalar.White, task.lineWidth);
             }
-            knn.trainInput = new List<cv.Point2f>(knn.queries);
+            knn.trainInput = new List<CV.Point2f>(knn.queries);
             dst2 = dst2 | emax.emaxInput.dst2;
         }
     }
@@ -16647,7 +16649,7 @@ namespace CS_Classes
 
             int[] encodeParams = { (int)options.encodeOption, options.qualityLevel };
             byte[] buf = src.ImEncode(".jpg", encodeParams);
-            Mat image = cv.Mat.FromPixelData(buf.Length, 1, MatType.CV_8U, buf);
+            Mat image = CV.Mat.FromPixelData(buf.Length, 1, MatType.CV_8U, buf);
             dst3 = Cv2.ImDecode(image, ImreadModes.AnyColor);
             Mat output = new Mat();
             Cv2.Absdiff(src, dst3, output);
@@ -16674,7 +16676,7 @@ namespace CS_Classes
 
             int[] encodeParams = { (int)options.encodeOption, options.qualityLevel };
             byte[] buf = src.ImEncode(".jpg", encodeParams);
-            Mat image = cv.Mat.FromPixelData(buf.Length, 1, MatType.CV_8U, buf);
+            Mat image = CV.Mat.FromPixelData(buf.Length, 1, MatType.CV_8U, buf);
             dst3 = Cv2.ImDecode(image, ImreadModes.AnyColor);
             Mat output = new Mat();
             Cv2.Absdiff(src, dst3, output);
@@ -16696,7 +16698,7 @@ namespace CS_Classes
             labels[2] = "Control entropy values with histogram bins slider";
             desc = "Compute the entropy in an image - a measure of contrast(iness)";
         }
-        cv.Rect ValidatePreserve(cv.Rect r)
+        CV.Rect ValidatePreserve(CV.Rect r)
         {
             if (r.Width <= 0) r.Width = 1;
             if (r.Height <= 0) r.Height = 1;
@@ -16709,13 +16711,13 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             int stdSize = 30;
-            if (task.drawRect == new cv.Rect())
+            if (task.drawRect == new CV.Rect())
             {
-                task.drawRect = new cv.Rect(30, 30, stdSize, stdSize); // arbitrary rectangle
+                task.drawRect = new CV.Rect(30, 30, stdSize, stdSize); // arbitrary rectangle
             }
             if (task.mouseClickFlag)
             {
-                task.drawRect = ValidatePreserve(new cv.Rect(task.ClickPoint.X, task.ClickPoint.Y, stdSize, stdSize));
+                task.drawRect = ValidatePreserve(new CV.Rect(task.ClickPoint.X, task.ClickPoint.Y, stdSize, stdSize));
             }
             task.drawRect = ValidateRect(task.drawRect);
             if (src.Channels() == 3)
@@ -16730,7 +16732,7 @@ namespace CS_Classes
             Cv2.Rectangle(dst2, task.drawRect, Scalar.White, task.lineWidth);
             if (task.heartBeat)
             {
-                strOut = $"Click anywhere to measure the entropy with cv.Rect(pt.x, pt.y, {stdSize}, {stdSize})\n\n" +
+                strOut = $"Click anywhere to measure the entropy with CV.Rect(pt.x, pt.y, {stdSize}, {stdSize})\n\n" +
                          $"Total entropy = {entropy.entropyVal.ToString(fmt1)}\n{entropy.strOut}";
             }
             SetTrueText(strOut, 3);
@@ -16743,7 +16745,7 @@ namespace CS_Classes
     public class Entropy_Highest_CS : CS_Parent
     {
         Entropy_Rectangle entropy = new Entropy_Rectangle();
-        public cv.Rect eMaxRect;
+        public CV.Rect eMaxRect;
         AddWeighted_Basics addw = new AddWeighted_Basics();
         public Entropy_Highest_CS(VBtask task) : base(task)
         {
@@ -16760,7 +16762,7 @@ namespace CS_Classes
             src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             for (int i = 0; i < task.gridList.Count; i++)
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 entropy.Run(src[roi]);
                 entropyMap[roi].SetTo(entropy.entropyVal);
                 if (entropy.entropyVal > maxEntropy || task.optionsChanged)
@@ -16771,7 +16773,7 @@ namespace CS_Classes
                 if (entropy.entropyVal < minEntropy) minEntropy = entropy.entropyVal;
                 if (standaloneTest())
                 {
-                    cv.Point pt = new cv.Point(roi.X, roi.Y);
+                    CV.Point pt = new CV.Point(roi.X, roi.Y);
                     SetTrueText(entropy.entropyVal.ToString(fmt2), pt, 2);
                     SetTrueText(entropy.entropyVal.ToString(fmt2), pt, 3);
                 }
@@ -16843,7 +16845,7 @@ namespace CS_Classes
             {
                 if (task.drawRect.Width == 0 || task.drawRect.Height == 0)
                 {
-                    task.drawRect = new cv.Rect(10, 10, 50, 50); // arbitrary template to match
+                    task.drawRect = new CV.Rect(10, 10, 50, 50); // arbitrary template to match
                 }
                 src = src[task.drawRect];
             }
@@ -16866,15 +16868,15 @@ namespace CS_Classes
     {
         Entropy_Rectangle entropy = new Entropy_Rectangle();
         List<List<float>> entropies = new List<List<float>>();
-        List<List<cv.Rect>> eROI = new List<List<cv.Rect>>();
-        public List<cv.Rect> roiList = new List<cv.Rect>();
+        List<List<CV.Rect>> eROI = new List<List<CV.Rect>>();
+        public List<CV.Rect> roiList = new List<CV.Rect>();
         public Entropy_SubDivisions_CS(VBtask task) : base(task)
         {
             labels[2] = "The top entropy values in each subdivision";
             for (int i = 0; i < task.subDivisionCount; i++)
             {
                 entropies.Add(new List<float>()); // 4 quadrants
-                eROI.Add(new List<cv.Rect>()); // 4 quadrants
+                eROI.Add(new List<CV.Rect>()); // 4 quadrants
             }
             desc = "Find the highest entropy in each quadrant";
         }
@@ -16892,34 +16894,34 @@ namespace CS_Classes
             Mat hist = new Mat();
             for (int i = 0; i < task.gridList.Count; i++)
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 Cv2.CalcHist(new Mat[] { dst1[roi] }, new int[] { 0 }, null, hist, 1, dimensions, ranges);
                 hist = hist.Normalize(0, hist.Rows, NormTypes.MinMax);
                 float nextEntropy = entropy.channelEntropy((int)dst1[roi].Total(), hist) * 1000;
                 entropies[task.subDivisions[i]].Add(nextEntropy);
                 eROI[task.subDivisions[i]].Add(roi);
-                if (standaloneTest()) SetTrueText(nextEntropy.ToString(fmt2), new cv.Point(roi.X, roi.Y), 3);
+                if (standaloneTest()) SetTrueText(nextEntropy.ToString(fmt2), new CV.Point(roi.X, roi.Y), 3);
             }
             roiList.Clear();
             for (int i = 0; i < task.subDivisionCount; i++)
             {
                 var eList = entropies[i];
                 float maxEntropy = eList.Max();
-                cv.Rect roi = eROI[i][eList.IndexOf(maxEntropy)];
+                CV.Rect roi = eROI[i][eList.IndexOf(maxEntropy)];
                 roiList.Add(roi);
                 Cv2.Rectangle(dst2, roi, Scalar.White);
             }
-            cv.Point p1 = new cv.Point(0, dst2.Height / 3);
-            cv.Point p2 = new cv.Point(dst2.Width, dst2.Height / 3);
+            CV.Point p1 = new CV.Point(0, dst2.Height / 3);
+            CV.Point p2 = new CV.Point(dst2.Width, dst2.Height / 3);
             DrawLine(dst2, p1, p2, Scalar.White, task.lineWidth);
-            p1 = new cv.Point(0, dst2.Height * 2 / 3);
-            p2 = new cv.Point(dst2.Width, dst2.Height * 2 / 3);
+            p1 = new CV.Point(0, dst2.Height * 2 / 3);
+            p2 = new CV.Point(dst2.Width, dst2.Height * 2 / 3);
             DrawLine(dst2, p1, p2, Scalar.White, task.lineWidth);
-            p1 = new cv.Point(dst2.Width / 3, 0);
-            p2 = new cv.Point(dst2.Width / 3, dst2.Height);
+            p1 = new CV.Point(dst2.Width / 3, 0);
+            p2 = new CV.Point(dst2.Width / 3, dst2.Height);
             DrawLine(dst2, p1, p2, Scalar.White, task.lineWidth);
-            p1 = new cv.Point(dst2.Width * 2 / 3, 0);
-            p2 = new cv.Point(dst2.Width * 2 / 3, dst2.Height);
+            p1 = new CV.Point(dst2.Width * 2 / 3, 0);
+            p2 = new CV.Point(dst2.Width * 2 / 3, dst2.Height);
             DrawLine(dst2, p1, p2, Scalar.White, task.lineWidth);
         }
     }
@@ -16998,11 +17000,11 @@ namespace CS_Classes
             dst1 = ~erodeMask.dst2;
             dilate.Run(task.pcSplit[0]);
             var mm = GetMinMax(dilate.dst2, erodeMask.dst2);
-            dst2 = (dilate.dst2 - cv.Scalar.All(mm.minVal)) / (mm.maxVal - mm.minVal);
+            dst2 = (dilate.dst2 - CV.Scalar.All(mm.minVal)) / (mm.maxVal - mm.minVal);
             dst2.SetTo(0, dst1);
             erode.Run(task.pcSplit[1]);
             mm = GetMinMax(dilate.dst2, erodeMask.dst2);
-            dst3 = (erode.dst2 - cv.Scalar.All(mm.minVal)) / (mm.maxVal - mm.minVal);
+            dst3 = (erode.dst2 - CV.Scalar.All(mm.minVal)) / (mm.maxVal - mm.minVal);
             dst3.SetTo(0, dst1);
         }
     }
@@ -17062,13 +17064,13 @@ namespace CS_Classes
     {
         Keyboard_Basics keys;
         Scalar slateColor = new Scalar(122, 122, 122);
-        cv.Point cursor;
+        CV.Point cursor;
         Random ms_rng = new Random();
         Options_Etch_ASketch options = new Options_Etch_ASketch();
-        cv.Point lastCursor;
-        cv.Point RandomCursor()
+        CV.Point lastCursor;
+        CV.Point RandomCursor()
         {
-            cv.Point nextCursor = new cv.Point(ms_rng.Next(0, dst2.Width), ms_rng.Next(0, dst2.Height));
+            CV.Point nextCursor = new CV.Point(ms_rng.Next(0, dst2.Width), ms_rng.Next(0, dst2.Height));
             lastCursor = nextCursor;
             return nextCursor;
         }
@@ -17154,7 +17156,7 @@ namespace CS_Classes
                 addw.Run(gray);
                 dst1 = addw.dst2;
             }
-            cv.Point pt = new cv.Point(dst2.Width / 2, dst2.Height / 2);
+            CV.Point pt = new CV.Point(dst2.Width / 2, dst2.Height / 2);
             if (standaloneTest())
             {
                 DrawCircle(dst2, pt, task.DotSize, Scalar.White);
@@ -17183,8 +17185,8 @@ namespace CS_Classes
         {
             options.RunVB();
             optTrans.RunVB();
-            cv.Rect rectLeft = new cv.Rect(options.leftCorner - optTrans.leftTrans, options.topCorner, dst2.Width - 2 * options.leftCorner, dst2.Height - 2 * options.topCorner);
-            cv.Rect rectRight = new cv.Rect(options.rightCorner - optTrans.rightTrans, options.topCorner, dst2.Width - 2 * options.rightCorner, dst2.Height - 2 * options.topCorner);
+            CV.Rect rectLeft = new CV.Rect(options.leftCorner - optTrans.leftTrans, options.topCorner, dst2.Width - 2 * options.leftCorner, dst2.Height - 2 * options.topCorner);
+            CV.Rect rectRight = new CV.Rect(options.rightCorner - optTrans.rightTrans, options.topCorner, dst2.Width - 2 * options.rightCorner, dst2.Height - 2 * options.topCorner);
             addw.src2 = task.leftView[rectLeft].Resize(dst2.Size());
             addw.Run(src);
             dst2 = addw.dst2.Clone();
@@ -17247,9 +17249,9 @@ namespace CS_Classes
     public class Feature_Basics_CS : CS_Parent
     {
         List<Mat> matList = new List<Mat>();
-        List<cv.Point2f> ptList = new List<cv.Point2f>();
+        List<CV.Point2f> ptList = new List<CV.Point2f>();
         KNN_Core knn = new KNN_Core();
-        List<cv.Point2f> ptLost = new List<cv.Point2f>();
+        List<CV.Point2f> ptLost = new List<CV.Point2f>();
         Feature_Gather gather = new Feature_Gather();
         List<Mat> featureMat = new List<Mat>();
         public Options_Features options = new Options_Features();
@@ -17275,8 +17277,8 @@ namespace CS_Classes
             for (int i = 0; i < Math.Min(featureMat.Count, task.features.Count); i++)
             {
                 Point2f pt = task.features[i];
-                cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), featureMat[i].Width, featureMat[i].Height));
-                if (!gather.ptList.Contains(new cv.Point((int)pt.X, (int)pt.Y)))
+                CV.Rect rect = ValidateRect(new CV.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), featureMat[i].Width, featureMat[i].Height));
+                if (!gather.ptList.Contains(new CV.Point((int)pt.X, (int)pt.Y)))
                 {
                     Cv2.MatchTemplate(src.SubMat(rect), featureMat[i], correlationMat, TemplateMatchModes.CCoeffNormed);
                     if (correlationMat.Get<float>(0, 0) < options.correlationMin)
@@ -17290,7 +17292,7 @@ namespace CS_Classes
                 ptList.Add(pt);
             }
             featureMat = new List<Mat>(matList);
-            task.features = new List<cv.Point2f>(ptList);
+            task.features = new List<CV.Point2f>(ptList);
             double extra = 1 + (1 - options.resyncThreshold);
             task.featureMotion = true;
             if (task.features.Count < gather.features.Count * options.resyncThreshold || 
@@ -17301,7 +17303,7 @@ namespace CS_Classes
                 task.features.Clear();
                 foreach (Point2f pt in gather.features)
                 {
-                    cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
+                    CV.Rect rect = ValidateRect(new CV.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
                     featureMat.Add(src.SubMat(rect));
                     task.features.Add(pt);
                 }
@@ -17316,7 +17318,7 @@ namespace CS_Classes
                     for (int i = 0; i < knn.queries.Count; i++)
                     {
                         Point2f pt = knn.queries[i];
-                        cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
+                        CV.Rect rect = ValidateRect(new CV.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
                         featureMat.Add(src.SubMat(rect));
                         task.features.Add(knn.trainInput[knn.result[i, 0]]);
                     }
@@ -17330,7 +17332,7 @@ namespace CS_Classes
             foreach (Point2f pt in task.features)
             {
                 DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
-                task.featurePoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                task.featurePoints.Add(new CV.Point((int)pt.X, (int)pt.Y));
             }
             if (task.heartBeat)
             {
@@ -17361,7 +17363,7 @@ namespace CS_Classes
             foreach (Point2f pt in gather.features)
             {
                 task.features.Add(pt);
-                task.featurePoints.Add(new cv.Point((int)pt.X, (int)pt.X));
+                task.featurePoints.Add(new CV.Point((int)pt.X, (int)pt.X));
                 DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
             }
             labels[2] = gather.labels[2];
@@ -17374,18 +17376,18 @@ namespace CS_Classes
     public class Feature_KNN_CS : CS_Parent
     {
         KNN_Core knn = new KNN_Core();
-        public List<cv.Point2f> featurePoints = new List<cv.Point2f>();
+        public List<CV.Point2f> featurePoints = new List<CV.Point2f>();
         public Feature_Basics feat = new Feature_Basics();
         public Feature_KNN_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find good features to track in a BGR image but use the same point if closer than a threshold";
         }
         public void RunCS(Mat src)
         {
             feat.Run(src);
-            knn.queries = new List<cv.Point2f>(task.features);
-            if (task.FirstPass) knn.trainInput = new List<cv.Point2f>(knn.queries);
+            knn.queries = new List<CV.Point2f>(task.features);
+            if (task.FirstPass) knn.trainInput = new List<CV.Point2f>(knn.queries);
             knn.Run(null);
             for (int i = 0; i < knn.neighbors.Count; i++)
             {
@@ -17394,7 +17396,7 @@ namespace CS_Classes
                 Point2f qPt = task.features[i];
                 if (pt.DistanceTo(qPt) > feat.options.minDistance) knn.trainInput[trainIndex] = task.features[i];
             }
-            featurePoints = new List<cv.Point2f>(knn.trainInput);
+            featurePoints = new List<CV.Point2f>(knn.trainInput);
             src.CopyTo(dst2);
             dst3.SetTo(0);
             foreach (Point2f pt in featurePoints)
@@ -17439,7 +17441,7 @@ namespace CS_Classes
     public class Feature_MultiPass_CS : CS_Parent
     {
         Feature_Basics feat = new Feature_Basics();
-        public List<cv.Point2f> featurePoints = new List<cv.Point2f>();
+        public List<CV.Point2f> featurePoints = new List<CV.Point2f>();
         PhotoShop_SharpenDetail sharpen = new PhotoShop_SharpenDetail();
         public Feature_MultiPass_CS(VBtask task) : base(task)
         {
@@ -17451,7 +17453,7 @@ namespace CS_Classes
         {
             feat.Run(task.color);
             dst2 = src.Clone();
-            featurePoints = new List<cv.Point2f>(task.features);
+            featurePoints = new List<CV.Point2f>(task.features);
             string passCounts = $"{featurePoints.Count}/";
             feat.Run(src);
             foreach (var pt in task.features)
@@ -17507,7 +17509,7 @@ namespace CS_Classes
                 foreach (var pt in task.features)
                 {
                     mPoints.ptx.Add(pt);
-                    cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - templatePad), (int)(pt.Y - templatePad), templateSize, templateSize));
+                    CV.Rect rect = ValidateRect(new CV.Rect((int)(pt.X - templatePad), (int)(pt.Y - templatePad), templateSize, templateSize));
                 }
                 strOut = "Restart tracking -----------------------------------------------------------------------------\n";
             }
@@ -17572,9 +17574,9 @@ namespace CS_Classes
     public class Feature_LucasKanade_CS : CS_Parent
     {
         FeatureFlow_LucasKanade pyr = new FeatureFlow_LucasKanade();
-        public List<cv.Point> ptList = new List<cv.Point>();
-        public List<cv.Point> ptLast = new List<cv.Point>();
-        List<List<cv.Point>> ptHist = new List<List<cv.Point>>();
+        public List<CV.Point> ptList = new List<CV.Point>();
+        public List<CV.Point> ptLast = new List<CV.Point>();
+        List<List<CV.Point>> ptHist = new List<List<CV.Point>>();
         public Feature_LucasKanade_CS(VBtask task) : base(task)
         {
             desc = "Provide a trace of the tracked features";
@@ -17589,7 +17591,7 @@ namespace CS_Classes
             int stationary = 0, motion = 0;
             for (int i = 0; i < pyr.features.Count; i++)
             {
-                cv.Point pt = new cv.Point((int)pyr.features[i].X, (int)pyr.features[i].Y);
+                CV.Point pt = new CV.Point((int)pyr.features[i].X, (int)pyr.features[i].Y);
                 ptList.Add(pt);
                 if (ptLast.Contains(pt))
                 {
@@ -17603,7 +17605,7 @@ namespace CS_Classes
                 }
             }
             if (task.heartBeat) labels[3] = $"{stationary} features were stationary and {motion} features had some motion.";
-            ptLast = new List<cv.Point>(ptList);
+            ptLast = new List<CV.Point>(ptList);
         }
     }
 
@@ -17695,7 +17697,7 @@ namespace CS_Classes
     public class Feature_TraceDelaunay_CS : CS_Parent
     {
         Feature_Delaunay features = new Feature_Delaunay();
-        public List<List<cv.Point2f>> goodList = new List<List<cv.Point2f>>(); // stable points only
+        public List<List<CV.Point2f>> goodList = new List<List<CV.Point2f>>(); // stable points only
         public Feature_TraceDelaunay_CS(VBtask task) : base(task)
         {
             labels = new string[] { "Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points" };
@@ -17707,7 +17709,7 @@ namespace CS_Classes
             dst3 = features.dst2;
             if (task.optionsChanged)
                 goodList.Clear();
-            List<cv.Point2f> ptList = new List<cv.Point2f>(task.features);
+            List<CV.Point2f> ptList = new List<CV.Point2f>(task.features);
             goodList.Add(ptList);
             if (goodList.Count >= task.frameHistoryCount)
                 goodList.RemoveAt(0);
@@ -17767,7 +17769,7 @@ namespace CS_Classes
     public class Feature_Generations_CS : CS_Parent
     {
         Feature_Basics feat = new Feature_Basics();
-        List<cv.Point> features = new List<cv.Point>();
+        List<CV.Point> features = new List<CV.Point>();
         List<int> gens = new List<int>();
         public Feature_Generations_CS(VBtask task) : base(task)
         {
@@ -17777,7 +17779,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             feat.Run(src);
-            SortedList<int, cv.Point> newfeatures = new SortedList<int, cv.Point>(new compareAllowIdenticalIntegerInverted());
+            SortedList<int, CV.Point> newfeatures = new SortedList<int, CV.Point>(new compareAllowIdenticalIntegerInverted());
             foreach (var pt in task.featurePoints)
             {
                 int index = features.IndexOf(pt);
@@ -17791,14 +17793,14 @@ namespace CS_Classes
                 features.Clear();
                 gens.Clear();
             }
-            features = new List<cv.Point>(newfeatures.Values);
+            features = new List<CV.Point>(newfeatures.Values);
             gens = new List<int>(newfeatures.Keys);
             dst2 = src;
             for (int i = 0; i < features.Count; i++)
             {
                 if (gens[i] == 1)
                     break;
-                cv.Point pt = features[i];
+                CV.Point pt = features[i];
                 DrawCircle(dst2, pt, task.DotSize, Scalar.White);
             }
             if (task.heartBeat)
@@ -17813,9 +17815,9 @@ namespace CS_Classes
 
     public class Feature_History_CS : CS_Parent
     {
-        public List<cv.Point> features = new List<cv.Point>();
+        public List<CV.Point> features = new List<CV.Point>();
         public Feature_Basics feat = new Feature_Basics();
-        List<List<cv.Point>> featureHistory = new List<List<cv.Point>>();
+        List<List<CV.Point>> featureHistory = new List<List<CV.Point>>();
         List<int> gens = new List<int>();
         public Feature_History_CS(VBtask task) : base(task)
         {
@@ -17826,8 +17828,8 @@ namespace CS_Classes
             int histCount = task.frameHistoryCount;
             feat.Run(src);
             dst2 = src.Clone();
-            featureHistory.Add(new List<cv.Point>(task.featurePoints));
-            List<cv.Point> newFeatures = new List<cv.Point>();
+            featureHistory.Add(new List<CV.Point>(task.featurePoints));
+            List<CV.Point> newFeatures = new List<CV.Point>();
             gens.Clear();
             foreach (var cList in featureHistory)
             {
@@ -17852,7 +17854,7 @@ namespace CS_Classes
             {
                 if (gens[i] > threshold)
                 {
-                    cv.Point pt = newFeatures[i];
+                    CV.Point pt = newFeatures[i];
                     features.Add(pt);
                     if (gens[i] < histCount)
                     {
@@ -17883,7 +17885,7 @@ namespace CS_Classes
         Feature_Basics feat = new Feature_Basics();
         public Feature_GridPopulation_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels[3] = "Click 'Show grid mask overlay' to see grid boundaries.";
             desc = "Find the feature population for each cell.";
         }
@@ -17912,24 +17914,24 @@ namespace CS_Classes
     {
         Feature_Basics feat = new Feature_Basics();
         Feature_BasicsNoFrills noFrill = new Feature_BasicsNoFrills();
-        List<cv.Point2f> saveLFeatures = new List<cv.Point2f>();
-        List<cv.Point2f> saveRFeatures = new List<cv.Point2f>();
+        List<CV.Point2f> saveLFeatures = new List<CV.Point2f>();
+        List<CV.Point2f> saveRFeatures = new List<CV.Point2f>();
         public Feature_Compare_CS(VBtask task) : base(task)
         {
             desc = "Prepare features for the left and right views";
         }
         public void RunCS(Mat src)
         {
-            task.features = new List<cv.Point2f>(saveLFeatures);
+            task.features = new List<CV.Point2f>(saveLFeatures);
             feat.Run(src.Clone());
             dst2 = feat.dst2;
             labels[2] = feat.labels[2];
-            saveLFeatures = new List<cv.Point2f>(task.features);
-            task.features = new List<cv.Point2f>(saveRFeatures);
+            saveLFeatures = new List<CV.Point2f>(task.features);
+            task.features = new List<CV.Point2f>(saveRFeatures);
             noFrill.Run(src.Clone());
             dst3 = noFrill.dst2;
             labels[3] = "With no correlation coefficients " + noFrill.labels[2];
-            saveRFeatures = new List<cv.Point2f>(task.features);
+            saveRFeatures = new List<CV.Point2f>(task.features);
         }
     }
 
@@ -17941,8 +17943,8 @@ namespace CS_Classes
         Corners_HarrisDetector_CPP_VB harris = new Corners_HarrisDetector_CPP_VB();
         Corners_Basics FAST = new Corners_Basics();
         Options_FeatureGather myOptions = new Options_FeatureGather();
-        public List<cv.Point2f> features = new List<cv.Point2f>();
-        public List<cv.Point> ptList = new List<cv.Point>();
+        public List<CV.Point2f> features = new List<CV.Point2f>();
+        public List<CV.Point> ptList = new List<CV.Point>();
         BRISK_Basics brisk = new BRISK_Basics();
         public Options_Features options = new Options_Features();
         public Feature_Gather_CPP_CS(VBtask task) : base(task)
@@ -17961,7 +17963,7 @@ namespace CS_Classes
             switch (myOptions.featureSource)
             {
                 case (int) FeatureSrc.GoodFeaturesFull:
-                    features = new List<cv.Point2f>(Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, null,
+                    features = new List<CV.Point2f>(Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, null,
                                                           options.blockSize, true, options.k));
                     labels[2] = $"GoodFeatures produced {features.Count} features";
                     break;
@@ -17971,7 +17973,7 @@ namespace CS_Classes
                     for (int i = 0; i < task.gridList.Count; i++)
                     {
                         var roi = task.gridList[i];
-                        var tmpFeatures = new List<cv.Point2f>(Cv2.GoodFeaturesToTrack(src.SubMat(roi), options.featurePoints, options.quality, options.minDistance, null,
+                        var tmpFeatures = new List<CV.Point2f>(Cv2.GoodFeaturesToTrack(src.SubMat(roi), options.featurePoints, options.quality, options.minDistance, null,
                                                                      options.blockSize, true, options.k));
                         for (int j = 0; j < tmpFeatures.Count; j++)
                         {
@@ -17987,13 +17989,13 @@ namespace CS_Classes
                     GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
                     IntPtr imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold);
                     handleSrc.Free();
-                    Mat ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone();
+                    Mat ptMat = CV.Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone();
                     features.Clear();
                     if (standaloneTest())
                         dst2 = src;
                     for (int i = 0; i < ptMat.Rows; i++)
                     {
-                        Point2f pt = ptMat.Get<cv.Point2f>(i, 0);
+                        Point2f pt = ptMat.Get<CV.Point2f>(i, 0);
                         features.Add(pt);
                         if (standaloneTest())
                             DrawCircle(dst2, pt, task.DotSize, Scalar.White);
@@ -18019,7 +18021,7 @@ namespace CS_Classes
             ptList.Clear();
             foreach (var pt in features)
             {
-                ptList.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                ptList.Add(new CV.Point((int)pt.X, (int)pt.Y));
             }
             if (standaloneTest())
             {
@@ -18054,20 +18056,20 @@ namespace CS_Classes
             labels[1] = "NOTE: matching right point is always to the left of the left point";
             desc = "Identify which feature in the left image corresponds to the feature in the right image.";
         }
-        public void buildCorrelations(List<cv.Point> prevFeatures, List<cv.Point> currFeatures)
+        public void buildCorrelations(List<CV.Point> prevFeatures, List<CV.Point> currFeatures)
         {
             double correlationMin = feat.options.correlationMin;
             Mat correlationmat = new Mat();
             mpList.Clear();
             mpCorrelation.Clear();
             int pad = feat.options.templatePad, size = feat.options.templateSize;
-            foreach (cv.Point p1 in prevFeatures)
+            foreach (CV.Point p1 in prevFeatures)
             {
-                cv.Rect rect = ValidateRect(new cv.Rect(p1.X - pad, p1.Y - pad, size, size));
+                CV.Rect rect = ValidateRect(new CV.Rect(p1.X - pad, p1.Y - pad, size, size));
                 List<float> correlations = new List<float>();
-                foreach (cv.Point p2 in currFeatures)
+                foreach (CV.Point p2 in currFeatures)
                 {
-                    cv.Rect r = ValidateRect(new cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)));
+                    CV.Rect r = ValidateRect(new CV.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)));
                     Cv2.MatchTemplate(dst2[rect], dst3[r], correlationmat, TemplateMatchModes.CCoeffNormed);
                     correlations.Add(correlationmat.Get<float>(0, 0));
                 }
@@ -18085,15 +18087,15 @@ namespace CS_Classes
             feat.Run(src);
             labels = feat.labels;
             dst3 = task.FirstPass ? src.Clone() : dst2.Clone();
-            List<cv.Point> prevFeatures = new List<cv.Point>(task.featurePoints);
+            List<CV.Point> prevFeatures = new List<CV.Point>(task.featurePoints);
             buildCorrelations(prevFeatures, task.featurePoints);
             SetTrueText("Click near any feature to find the corresponding pair of features.", 1);
             dst2 = src.Clone();
-            foreach (cv.Point pt in task.featurePoints)
+            foreach (CV.Point pt in task.featurePoints)
             {
                 DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
             }
-            prevFeatures = new List<cv.Point>(task.featurePoints);
+            prevFeatures = new List<CV.Point>(task.featurePoints);
         }
     }
 
@@ -18152,8 +18154,8 @@ namespace CS_Classes
 
     public class FeatureFlow_LucasKanade_CS : CS_Parent
     {
-        public List<cv.Point2f> features = new List<cv.Point2f>();
-        public List<cv.Point2f> lastFeatures = new List<cv.Point2f>();
+        public List<CV.Point2f> features = new List<CV.Point2f>();
+        public List<CV.Point2f> lastFeatures = new List<CV.Point2f>();
         public Feature_Basics feat = new Feature_Basics();
         public Options_OpticalFlowSparse options = new Options_OpticalFlowSparse();
         public FeatureFlow_LucasKanade_CS(VBtask task) : base(task)
@@ -18169,21 +18171,21 @@ namespace CS_Classes
             Mat lastGray = src.Clone();
             feat.Run(src);
             features = task.features.ToList();
-            Mat features1 = cv.Mat.FromPixelData(features.Count, 1, MatType.CV_32FC2, features.ToArray());
+            Mat features1 = CV.Mat.FromPixelData(features.Count, 1, MatType.CV_32FC2, features.ToArray());
             Mat features2 = new Mat();
             Mat status = new Mat();
             Mat err = new Mat();
-            cv.Size winSize = new cv.Size(3, 3);
-            cv.TermCriteria term = new cv.TermCriteria((cv.CriteriaTypes)((int)cv.CriteriaTypes.Eps + (int)cv.CriteriaTypes.Count), 10, 1.0);
+            CV.Size winSize = new CV.Size(3, 3);
+            CV.TermCriteria term = new CV.TermCriteria((CV.CriteriaTypes)((int)CV.CriteriaTypes.Eps + (int)CV.CriteriaTypes.Count), 10, 1.0);
             Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag);
-            features = new List<cv.Point2f>();
+            features = new List<CV.Point2f>();
             lastFeatures.Clear();
             for (int i = 0; i < status.Rows; i++)
             {
                 if (status.Get<byte>(i, 0) != 0)
                 {
-                    Point2f pt1 = features1.Get<cv.Point2f>(i, 0);
-                    Point2f pt2 = features2.Get<cv.Point2f>(i, 0);
+                    Point2f pt1 = features1.Get<CV.Point2f>(i, 0);
+                    Point2f pt2 = features2.Get<CV.Point2f>(i, 0);
                     float length = (float)Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y));
                     if (length < 30)
                     {
@@ -18208,9 +18210,9 @@ namespace CS_Classes
     {
         public FeatureFlow_LucasKanade pyrLeft = new FeatureFlow_LucasKanade();
         public FeatureFlow_LucasKanade pyrRight = new FeatureFlow_LucasKanade();
-        public List<cv.Point> ptLeft = new List<cv.Point>();
-        public List<cv.Point> ptRight = new List<cv.Point>();
-        public List<cv.Point> ptlist = new List<cv.Point>();
+        public List<CV.Point> ptLeft = new List<CV.Point>();
+        public List<CV.Point> ptRight = new List<CV.Point>();
+        public List<CV.Point> ptlist = new List<CV.Point>();
         public FeatureFlow_LeftRight1_CS(VBtask task) : base(task)
         {
             if (standalone) task.gOptions.setDisplay1();
@@ -18225,12 +18227,12 @@ namespace CS_Classes
             dst2 = task.leftView.Clone();
             for (int i = 0; i < pyrLeft.features.Count; i++)
             {
-                cv.Point pt = new cv.Point((int)pyrLeft.features[i].X, (int)pyrLeft.features[i].Y);
-                ptLeft.Add(new cv.Point(pt.X, pt.Y));
+                CV.Point pt = new CV.Point((int)pyrLeft.features[i].X, (int)pyrLeft.features[i].Y);
+                ptLeft.Add(new CV.Point(pt.X, pt.Y));
                 Cv2.Circle(dst2, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
                 leftY.Add(pt.Y);
-                pt = new cv.Point((int)pyrLeft.lastFeatures[i].X, (int)pyrLeft.lastFeatures[i].Y);
-                ptLeft.Add(new cv.Point(pt.X, pt.Y));
+                pt = new CV.Point((int)pyrLeft.lastFeatures[i].X, (int)pyrLeft.lastFeatures[i].Y);
+                ptLeft.Add(new CV.Point(pt.X, pt.Y));
                 Cv2.Circle(dst2, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
                 leftY.Add(pt.Y);
             }
@@ -18239,12 +18241,12 @@ namespace CS_Classes
             dst3 = task.rightView.Clone();
             for (int i = 0; i < pyrRight.features.Count; i++)
             {
-                cv.Point pt = new cv.Point((int)pyrRight.features[i].X, (int)pyrRight.features[i].Y);
-                ptRight.Add(new cv.Point(pt.X, pt.Y));
+                CV.Point pt = new CV.Point((int)pyrRight.features[i].X, (int)pyrRight.features[i].Y);
+                ptRight.Add(new CV.Point(pt.X, pt.Y));
                 Cv2.Circle(dst3, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
                 rightY.Add(pt.Y);
-                pt = new cv.Point((int)pyrRight.lastFeatures[i].X, (int)pyrRight.lastFeatures[i].Y);
-                ptRight.Add(new cv.Point(pt.X, pt.Y));
+                pt = new CV.Point((int)pyrRight.lastFeatures[i].X, (int)pyrRight.lastFeatures[i].Y);
+                ptRight.Add(new CV.Point(pt.X, pt.Y));
                 Cv2.Circle(dst3, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
                 rightY.Add(pt.Y);
             }
@@ -18270,15 +18272,15 @@ namespace CS_Classes
     {
         public FeatureFlow_LucasKanade pyrLeft = new FeatureFlow_LucasKanade();
         public FeatureFlow_LucasKanade pyrRight = new FeatureFlow_LucasKanade();
-        public List<cv.Point> leftFeatures = new List<cv.Point>();
-        public List<cv.Point> rightFeatures = new List<cv.Point>();
+        public List<CV.Point> leftFeatures = new List<CV.Point>();
+        public List<CV.Point> rightFeatures = new List<CV.Point>();
         public FeatureFlow_LeftRightHist_CS(VBtask task) : base(task)
         {
             desc = "Keep only the features that have been around for the specified number of frames.";
         }
-        public Mat displayFeatures(Mat dst, List<cv.Point> features)
+        public Mat displayFeatures(Mat dst, List<CV.Point> features)
         {
-            foreach (cv.Point pt in features)
+            foreach (CV.Point pt in features)
             {
                 Cv2.Circle(dst, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
             }
@@ -18287,35 +18289,35 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             pyrLeft.Run(task.leftView);
-            List<cv.Point> tmpLeft = new List<cv.Point>();
+            List<CV.Point> tmpLeft = new List<CV.Point>();
             for (int i = 0; i < pyrLeft.features.Count; i++)
             {
-                cv.Point pt = new cv.Point(pyrLeft.features[i].X, pyrLeft.features[i].Y);
-                tmpLeft.Add(new cv.Point(pt.X, pt.Y));
-                pt = new cv.Point(pyrLeft.lastFeatures[i].X, pyrLeft.lastFeatures[i].Y);
-                tmpLeft.Add(new cv.Point(pt.X, pt.Y));
+                CV.Point pt = new CV.Point(pyrLeft.features[i].X, pyrLeft.features[i].Y);
+                tmpLeft.Add(new CV.Point(pt.X, pt.Y));
+                pt = new CV.Point(pyrLeft.lastFeatures[i].X, pyrLeft.lastFeatures[i].Y);
+                tmpLeft.Add(new CV.Point(pt.X, pt.Y));
             }
             pyrRight.Run(task.rightView);
-            List<cv.Point> tmpRight = new List<cv.Point>();
+            List<CV.Point> tmpRight = new List<CV.Point>();
             for (int i = 0; i < pyrRight.features.Count; i++)
             {
-                cv.Point pt = new cv.Point(pyrRight.features[i].X, pyrRight.features[i].Y);
-                tmpRight.Add(new cv.Point(pt.X, pt.Y));
-                pt = new cv.Point(pyrRight.lastFeatures[i].X, pyrRight.lastFeatures[i].Y);
-                tmpRight.Add(new cv.Point(pt.X, pt.Y));
+                CV.Point pt = new CV.Point(pyrRight.features[i].X, pyrRight.features[i].Y);
+                tmpRight.Add(new CV.Point(pt.X, pt.Y));
+                pt = new CV.Point(pyrRight.lastFeatures[i].X, pyrRight.lastFeatures[i].Y);
+                tmpRight.Add(new CV.Point(pt.X, pt.Y));
             }
-            List<List<cv.Point>> leftHist = new List<List<cv.Point>> { tmpLeft };
-            List<List<cv.Point>> rightHist = new List<List<cv.Point>> { tmpRight };
+            List<List<CV.Point>> leftHist = new List<List<CV.Point>> { tmpLeft };
+            List<List<CV.Point>> rightHist = new List<List<CV.Point>> { tmpRight };
             if (task.optionsChanged)
             {
-                leftHist = new List<List<cv.Point>> { tmpLeft };
-                rightHist = new List<List<cv.Point>> { tmpRight };
+                leftHist = new List<List<CV.Point>> { tmpLeft };
+                rightHist = new List<List<CV.Point>> { tmpRight };
             }
             leftFeatures.Clear();
-            foreach (cv.Point pt in tmpLeft)
+            foreach (CV.Point pt in tmpLeft)
             {
                 int count = 0;
-                foreach (List<cv.Point> hist in leftHist)
+                foreach (List<CV.Point> hist in leftHist)
                 {
                     if (hist.Contains(pt)) count++;
                     else break;
@@ -18323,10 +18325,10 @@ namespace CS_Classes
                 if (count == leftHist.Count) leftFeatures.Add(pt);
             }
             rightFeatures.Clear();
-            foreach (cv.Point pt in tmpRight)
+            foreach (CV.Point pt in tmpRight)
             {
                 int count = 0;
-                foreach (List<cv.Point> hist in rightHist)
+                foreach (List<CV.Point> hist in rightHist)
                 {
                     if (hist.Contains(pt)) count++;
                     else break;
@@ -18337,12 +18339,12 @@ namespace CS_Classes
             if (leftFeatures.Count < minPoints)
             {
                 leftFeatures = tmpLeft;
-                leftHist = new List<List<cv.Point>> { tmpLeft };
+                leftHist = new List<List<CV.Point>> { tmpLeft };
             }
             if (rightFeatures.Count < minPoints)
             {
                 rightFeatures = tmpRight;
-                rightHist = new List<List<cv.Point>> { tmpRight };
+                rightHist = new List<List<CV.Point>> { tmpRight };
             }
             dst2 = displayFeatures(task.leftView.Clone(), leftFeatures);
             dst3 = displayFeatures(task.rightView.Clone(), rightFeatures);
@@ -18365,14 +18367,14 @@ namespace CS_Classes
     public class FeatureFlow_LeftRight_CS : CS_Parent
     {
         FeatureFlow_LeftRightHist_CS flowHist;
-        public List<List<cv.Point>> leftFeatures = new List<List<cv.Point>>();
-        public List<List<cv.Point>> rightFeatures = new List<List<cv.Point>>();
+        public List<List<CV.Point>> leftFeatures = new List<List<CV.Point>>();
+        public List<List<CV.Point>> rightFeatures = new List<List<CV.Point>>();
         public FeatureFlow_LeftRight_CS(VBtask task) : base(task)
         {
             flowHist = new FeatureFlow_LeftRightHist_CS(task);
             desc = "Match features in the left and right images";
         }
-        public Mat DisplayFeatures(Mat dst, List<List<cv.Point>> features)
+        public Mat DisplayFeatures(Mat dst, List<List<CV.Point>> features)
         {
             foreach (var ptlist in features)
             {
@@ -18386,8 +18388,8 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             flowHist.RunAndMeasure(src, flowHist);
-            var tmpLeft = new SortedList<int, List<cv.Point>>();
-            var tmpRight = new SortedList<int, List<cv.Point>>();
+            var tmpLeft = new SortedList<int, List<CV.Point>>();
+            var tmpRight = new SortedList<int, List<CV.Point>>();
             ProcessFeatures(flowHist.leftFeatures, tmpLeft);
             ProcessFeatures(flowHist.rightFeatures, tmpRight);
             leftFeatures.Clear();
@@ -18409,7 +18411,7 @@ namespace CS_Classes
                 labels[3] = $"{rightFeatures.Count} detected in the right image that match one or more Y-coordinates found in the left image";
             }
         }
-        void ProcessFeatures(List<cv.Point> features, SortedList<int, List<cv.Point>> tmp)
+        void ProcessFeatures(List<CV.Point> features, SortedList<int, List<CV.Point>> tmp)
         {
             foreach (var pt in features)
             {
@@ -18423,7 +18425,7 @@ namespace CS_Classes
                 }
                 else
                 {
-                    tmp.Add(pt.Y, new List<cv.Point> { pt });
+                    tmp.Add(pt.Y, new List<CV.Point> { pt });
                 }
             }
         }
@@ -18438,9 +18440,9 @@ namespace CS_Classes
         public FeatureLeftRight_LeftRightPrep prep = new FeatureLeftRight_LeftRightPrep();
         public List<PointPair> mpList = new List<PointPair>();
         public List<float> mpCorrelation = new List<float>();
-        public cv.Point selectedPoint;
+        public CV.Point selectedPoint;
         public int mpIndex;
-        public cv.Point ClickPoint;
+        public CV.Point ClickPoint;
         public int picTag;
         public Options_Features options = new Options_Features();
         public KNN_Core knn = new KNN_Core();
@@ -18456,9 +18458,9 @@ namespace CS_Classes
         }
         public void setClickPoint(Point2f pt, int _pictag)
         {
-            ClickPoint = new cv.Point((int)pt.X, (int)pt.Y);
+            ClickPoint = new CV.Point((int)pt.X, (int)pt.Y);
             picTag = _pictag;
-            task.drawRect = new cv.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
+            task.drawRect = new CV.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
             task.drawRectUpdated = true;
         }
         public void RunCS(Mat src)
@@ -18469,9 +18471,9 @@ namespace CS_Classes
             dst3 = task.rightView.Clone();
             prep.Run(src);
             List<PointPair> prepList = new List<PointPair>();
-            foreach (cv.Point p1 in prep.leftFeatures)
+            foreach (CV.Point p1 in prep.leftFeatures)
             {
-                foreach (cv.Point p2 in prep.rightFeatures)
+                foreach (CV.Point p2 in prep.rightFeatures)
                 {
                     if (p1.Y == p2.Y) prepList.Add(new PointPair(p1, p2));
                 }
@@ -18492,8 +18494,8 @@ namespace CS_Classes
                         i = j;
                         break;
                     }
-                    cv.Rect r1 = ValidateRect(new cv.Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
-                    cv.Rect r2 = ValidateRect(new cv.Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
+                    CV.Rect r1 = ValidateRect(new CV.Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
+                    CV.Rect r2 = ValidateRect(new CV.Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
                     Cv2.MatchTemplate(task.leftView[r1], task.rightView[r2], correlationmat, TemplateMatchModes.CCoeffNormed);
                     correlations.Add(correlationmat.Get<float>(0, 0));
                     tmpList.Add(mp);
@@ -18514,7 +18516,7 @@ namespace CS_Classes
             SetTrueText("Click near any feature to find the corresponding pair of features." + "\n" +
                         "The correlation values in the lower left for the correlation of the left to the right views." + "\n" +
                         "The dst2 shows features for the left view, dst3 shows features for the right view.", 1);
-            if (ClickPoint == new cv.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
+            if (ClickPoint == new CV.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
             if (mpList.Count > 0)
             {
                 knn.queries.Clear();
@@ -18540,12 +18542,12 @@ namespace CS_Classes
                 for (int i = 0; i < mpList.Count; i++)
                 {
                     Point2f pt = mpList[i].p1;
-                    SetTrueText(string.Format("{0:0%}", mpCorrelation[i]), new cv.Point((int)pt.X, (int)pt.Y));
+                    SetTrueText(string.Format("{0:0%}", mpCorrelation[i]), new CV.Point((int)pt.X, (int)pt.Y));
                 }
                 if (task.heartBeat) dst1.SetTo(Scalar.All(0));
                 DrawCircle(dst1, mp.p1, task.DotSize, task.HighlightColor, -1);
                 DrawCircle(dst1, mp.p2, task.DotSize, task.HighlightColor, -1);
-                selectedPoint = new cv.Point(mp.p1.X, mpList[mpIndex].p1.Y + 10);
+                selectedPoint = new CV.Point(mp.p1.X, mpList[mpIndex].p1.Y + 10);
                 SetTrueText(strOut, selectedPoint, 1);
                 if (task.heartBeat)
                 {
@@ -18563,23 +18565,23 @@ namespace CS_Classes
     {
         public Feature_Basics lFeat = new Feature_Basics();
         public Feature_Basics rFeat = new Feature_Basics();
-        public List<cv.Point> leftFeatures = new List<cv.Point>();
-        public List<cv.Point> rightFeatures = new List<cv.Point>();
-        public List<cv.Point2f> saveLFeatures = new List<cv.Point2f>();
-        public List<cv.Point2f> saveRFeatures = new List<cv.Point2f>();
+        public List<CV.Point> leftFeatures = new List<CV.Point>();
+        public List<CV.Point> rightFeatures = new List<CV.Point>();
+        public List<CV.Point2f> saveLFeatures = new List<CV.Point2f>();
+        public List<CV.Point2f> saveRFeatures = new List<CV.Point2f>();
         public FeatureLeftRight_LeftRightPrep_CS(VBtask task) : base(task)
         {
             desc = "Prepare features for the left and right views";
         }
         public void RunCS(Mat src)
         {
-            task.features = new List<cv.Point2f>(saveLFeatures);
+            task.features = new List<CV.Point2f>(saveLFeatures);
             lFeat.Run(task.leftView);
             dst2 = lFeat.dst2;
             labels[2] = lFeat.labels[2];
             leftFeatures = task.featurePoints.ToList();
             saveLFeatures = task.features.ToList();
-            task.features = new List<cv.Point2f>(saveRFeatures);
+            task.features = new List<CV.Point2f>(saveRFeatures);
             rFeat.Run(task.rightView);
             dst3 = rFeat.dst2;
             labels[3] = rFeat.labels[2];
@@ -18618,12 +18620,12 @@ namespace CS_Classes
 
     public class FeatureLeftRight_Input_CS : CS_Parent
     {
-        public List<cv.Point> ptLeft = new List<cv.Point>();
-        public List<cv.Point> ptRight = new List<cv.Point>();
+        public List<CV.Point> ptLeft = new List<CV.Point>();
+        public List<CV.Point> ptRight = new List<CV.Point>();
         public List<PointPair> mpList = new List<PointPair>();
         public List<float> mpCorrelation = new List<float>();
-        public cv.Point selectedPoint;
-        public cv.Point ClickPoint;
+        public CV.Point selectedPoint;
+        public CV.Point ClickPoint;
         public int picTag;
         public Options_Features options = new Options_Features();
         public KNN_Core knn = new KNN_Core();
@@ -18639,9 +18641,9 @@ namespace CS_Classes
         }
         public void setClickPoint(Point2f pt, int _pictag)
         {
-            ClickPoint = new cv.Point(pt.X, pt.Y);
+            ClickPoint = new CV.Point(pt.X, pt.Y);
             picTag = _pictag;
-            task.drawRect = new cv.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
+            task.drawRect = new CV.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
             task.drawRectUpdated = true;
         }
         public void RunCS(Mat src)
@@ -18653,9 +18655,9 @@ namespace CS_Classes
             }
             options.RunVB();
             List<PointPair> prepList = new List<PointPair>();
-            foreach (cv.Point p1 in ptLeft)
+            foreach (CV.Point p1 in ptLeft)
             {
-                foreach (cv.Point p2 in ptRight)
+                foreach (CV.Point p2 in ptRight)
                 {
                     if (p1.Y == p2.Y) prepList.Add(new PointPair(p1, p2));
                 }
@@ -18676,8 +18678,8 @@ namespace CS_Classes
                         i = j;
                         break;
                     }
-                    cv.Rect r1 = ValidateRect(new cv.Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
-                    cv.Rect r2 = ValidateRect(new cv.Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
+                    CV.Rect r1 = ValidateRect(new CV.Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
+                    CV.Rect r2 = ValidateRect(new CV.Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
                     Cv2.MatchTemplate(task.leftView[r1], task.rightView[r2], correlationmat, TemplateMatchModes.CCoeffNormed);
                     correlations.Add(correlationmat.Get<float>(0, 0));
                     tmpList.Add(mp);
@@ -18698,7 +18700,7 @@ namespace CS_Classes
             SetTrueText("Click near any feature to find the corresponding pair of features." + "\n" +
                         "The correlation values in the lower left for the correlation of the left to the right views." + "\n" +
                         "The dst2 shows features for the left view, dst3 shows features for the right view.", 1);
-            if (ClickPoint == new cv.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
+            if (ClickPoint == new CV.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
             if (mpList.Count > 0)
             {
                 knn.queries.Clear();
@@ -18707,7 +18709,7 @@ namespace CS_Classes
                 knn.trainInput.Clear();
                 foreach (PointPair mpX in mpList)
                 {
-                    cv.Point2f pt = (picTag == 2) ? mpX.p1 : mpX.p2;
+                    CV.Point2f pt = (picTag == 2) ? mpX.p1 : mpX.p2;
                     knn.trainInput.Add(new Point2f(pt.X, pt.Y));
                 }
                 knn.Run(null);
@@ -18724,12 +18726,12 @@ namespace CS_Classes
                 for (int i = 0; i < mpList.Count; i++)
                 {
                     Point2f pt = mpList[i].p1;
-                    SetTrueText(string.Format("{0:0%}", mpCorrelation[i]), new cv.Point((int)pt.X, (int)pt.Y));
+                    SetTrueText(string.Format("{0:0%}", mpCorrelation[i]), new CV.Point((int)pt.X, (int)pt.Y));
                 }
                 if (task.heartBeat) dst1.SetTo(Scalar.All(0));
                 DrawCircle(dst1, mp.p1, task.DotSize, task.HighlightColor, -1);
                 DrawCircle(dst1, mp.p2, task.DotSize, task.HighlightColor, -1);
-                selectedPoint = new cv.Point(mp.p1.X, mpList[mpIndex].p1.Y + 10);
+                selectedPoint = new CV.Point(mp.p1.X, mpList[mpIndex].p1.Y + 10);
                 SetTrueText(strOut, selectedPoint, 1);
                 if (task.heartBeat)
                 {
@@ -18893,8 +18895,8 @@ namespace CS_Classes
                 {
                     if (mask.Get<byte>(y, x) == 255)
                     {
-                        cv.Point pt = new cv.Point(x, y);
-                        int floodCount = mask.FloodFill(pt, cv.Scalar.All(regionCount));
+                        CV.Point pt = new CV.Point(x, y);
+                        int floodCount = mask.FloodFill(pt, CV.Scalar.All(regionCount));
                         objectSize.Add(floodCount);
                         regionCount++;
                     }
@@ -19032,7 +19034,7 @@ namespace CS_Classes
             if (task.optionsChanged || correlationTest || lineDisp.maskCount / lineDisp.distance < linePercentThreshold || lineDisp.distance < distanceThreshold)
             {
                 int templatePad = options.templatePad;
-                lines.subsetRect = new cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
+                lines.subsetRect = new CV.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
                 lines.Run(src.Clone());
                 if (lines.mpList.Count == 0)
                 {
@@ -19049,13 +19051,13 @@ namespace CS_Classes
                 match.tCells[0] = tcells[i];
                 match.Run(src);
                 tcells[i] = match.tCells[0];
-                SetTrueText(tcells[i].strOut, new cv.Point(tcells[i].rect.X, tcells[i].rect.Y));
-                SetTrueText(tcells[i].strOut, new cv.Point(tcells[i].rect.X, tcells[i].rect.Y), 3);
+                SetTrueText(tcells[i].strOut, new CV.Point(tcells[i].rect.X, tcells[i].rect.Y));
+                SetTrueText(tcells[i].strOut, new CV.Point(tcells[i].rect.X, tcells[i].rect.Y), 3);
             }
             lineDisp.tcells = new List<tCell>(tcells);
             lineDisp.Run(src);
             dst2 = lineDisp.dst2;
-            SetTrueText(lineDisp.strOut, new cv.Point(10, 40), 3);
+            SetTrueText(lineDisp.strOut, new CV.Point(10, 40), 3);
         }
     }
 
@@ -19098,7 +19100,7 @@ namespace CS_Classes
             options.RunVB();
 
             int templatePad = options.templatePad;
-            // gLines.lines.subsetRect = new cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
+            // gLines.lines.subsetRect = new CV.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
             gLines.Run(src);
             var vertRadio = FindRadio("Vertical lines");
             var sortedLines = vertRadio.Checked ? gLines.sortedVerticals : gLines.sortedHorizontals;
@@ -19127,8 +19129,8 @@ namespace CS_Classes
                 {
                     gc.tc1 = match.tCells[0];
                     gc.tc2 = match.tCells[1];
-                    cv.Point gc1 = new cv.Point(gc.tc1.center.X, gc.tc1.center.Y);
-                    cv.Point gc2 = new cv.Point(gc.tc2.center.X, gc.tc2.center.Y);
+                    CV.Point gc1 = new CV.Point(gc.tc1.center.X, gc.tc1.center.Y);
+                    CV.Point gc2 = new CV.Point(gc.tc2.center.X, gc.tc2.center.Y);
                     gc = gLines.updateGLine(src, gc, gc1, gc2);
                     if (gc.len3D > 0) gCells.Add(gc);
                 }
@@ -19163,14 +19165,14 @@ namespace CS_Classes
             lines.Run(src);
             dst2 = lines.dst2;
             var raw2D = new List<PointPair>();
-            var raw3D = new List<cv.Point3f>();
+            var raw3D = new List<CV.Point3f>();
             foreach (var lp in lines.lpList)
             {
                 if (task.pcSplit[2].Get<float>((int)lp.p1.Y, (int)lp.p1.X) > 0 && task.pcSplit[2].Get<float>((int)lp.p2.Y, (int)lp.p2.X) > 0)
                 {
                     raw2D.Add(lp);
-                    raw3D.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
-                    raw3D.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                    raw3D.Add(task.pointCloud.Get<CV.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                    raw3D.Add(task.pointCloud.Get<CV.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
                 }
             }
             dst3 = src.Clone();
@@ -19204,14 +19206,14 @@ namespace CS_Classes
             lines.Run(src);
             dst2 = lines.dst2;
             var raw2D = new List<PointPair>();
-            var raw3D = new List<cv.Point3f>();
+            var raw3D = new List<CV.Point3f>();
             foreach (var lp in lines.lpList)
             {
-                Point3f pt1 = new cv.Point3f(), pt2 = new cv.Point3f();
+                Point3f pt1 = new CV.Point3f(), pt2 = new CV.Point3f();
                 for (int j = 0; j < 2; j++)
                 {
-                    cv.Point pt = (j == 0) ? new cv.Point(lp.p1.X, lp.p1.Y) : new cv.Point(lp.p2.X, lp.p2.Y);
-                    cv.Rect rect = ValidateRect(new cv.Rect(pt.X - options.kSize, pt.Y - options.kSize, options.kernelSize, options.kernelSize));
+                    CV.Point pt = (j == 0) ? new CV.Point(lp.p1.X, lp.p1.Y) : new CV.Point(lp.p2.X, lp.p2.Y);
+                    CV.Rect rect = ValidateRect(new CV.Rect(pt.X - options.kSize, pt.Y - options.kSize, options.kernelSize, options.kernelSize));
                     Scalar val = task.pointCloud.SubMat(rect).Mean(task.depthMask.SubMat(rect));
                     if (j == 0)
                         pt1 = new Point3f((float)val[0], (float)val[1], (float)val[2]);
@@ -19221,8 +19223,8 @@ namespace CS_Classes
                 if (pt1.Z > 0 && pt2.Z > 0)
                 {
                     raw2D.Add(lp);
-                    raw3D.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
-                    raw3D.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                    raw3D.Add(task.pointCloud.Get<CV.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                    raw3D.Add(task.pointCloud.Get<CV.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
                 }
             }
             dst3 = src.Clone();
@@ -19242,7 +19244,7 @@ namespace CS_Classes
             {
                 gMat.Run(empty);
                 task.gMatrix = gMat.gMatrix;
-                Mat matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, MatType.CV_32F, raw3D.ToArray()) * task.gMatrix;
+                Mat matLines3D = CV.Mat.FromPixelData(raw3D.Count, 3, MatType.CV_32F, raw3D.ToArray()) * task.gMatrix;
             }
         }
     }
@@ -19284,7 +19286,7 @@ namespace CS_Classes
                 var p1 = gc.tc1.center;
                 var p2 = gc.tc2.center;
                 if (longest.knn.lastPair.compare(new PointPair())) longest.knn.lastPair = new PointPair(p1, p2);
-                var pt = new cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
+                var pt = new CV.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
                 SetTrueText($"{index}\n{gc.arcY.ToString(fmt1)}", pt, 3);
                 index++;
                 DrawLine(dst3, p1, p2, task.HighlightColor, task.lineWidth);
@@ -19331,8 +19333,8 @@ namespace CS_Classes
     {
         FeatureLine_Finder lines = new FeatureLine_Finder();
         KNN_Core4D knn = new KNN_Core4D();
-        public cv.Point3f pt1 = new cv.Point3f();
-        public cv.Point3f pt2 = new cv.Point3f();
+        public CV.Point3f pt1 = new CV.Point3f();
+        public CV.Point3f pt2 = new CV.Point3f();
         int lengthReject;
         public FeatureLine_LongestV_Tutorial2_CS(VBtask task) : base(task)
         {
@@ -19348,14 +19350,14 @@ namespace CS_Classes
                 SetTrueText("No vertical lines were found", 3);
                 return;
             }
-            var match3D = new List<cv.Point3f>();
+            var match3D = new List<CV.Point3f>();
             knn.trainInput.Clear();
             for (var i = 0; i < lines.sortedVerticals.Count; i++)
             {
                 var sIndex = lines.sortedVerticals.ElementAt(i).Value;
                 var x1 = lines.lines2D[sIndex];
                 var x2 = lines.lines2D[sIndex + 1];
-                var vec = x1.Y < x2.Y ? new cv.Vec4f(x1.X, x1.Y, x2.X, x2.Y) : new cv.Vec4f(x2.X, x2.Y, x1.X, x1.Y);
+                var vec = x1.Y < x2.Y ? new CV.Vec4f(x1.X, x1.Y, x2.X, x2.Y) : new CV.Vec4f(x2.X, x2.Y, x1.X, x1.Y);
                 if (knn.queries.Count == 0) knn.queries.Add(vec);
                 knn.trainInput.Add(vec);
                 match3D.Add(lines.lines3D[sIndex]);
@@ -19364,8 +19366,8 @@ namespace CS_Classes
             var saveVec = knn.queries[0];
             knn.Run(empty);
             var index = knn.result[0, 0];
-            var p1 = new cv.Point2f(knn.trainInput[index][0], knn.trainInput[index][1]);
-            var p2 = new cv.Point2f(knn.trainInput[index][2], knn.trainInput[index][3]);
+            var p1 = new CV.Point2f(knn.trainInput[index][0], knn.trainInput[index][1]);
+            var p2 = new CV.Point2f(knn.trainInput[index][2], knn.trainInput[index][3]);
             pt1 = match3D[index * 2];
             pt2 = match3D[index * 2 + 1];
             DrawLine(dst2, p1, p2, task.HighlightColor, task.lineWidth);
@@ -19376,7 +19378,7 @@ namespace CS_Classes
             knn.queries.Clear();
             if (lastLength > 0.5 * bestLength)
             {
-                knn.queries.Add(new cv.Vec4f(p1.X, p1.Y, p2.X, p2.Y));
+                knn.queries.Add(new CV.Vec4f(p1.X, p1.Y, p2.X, p2.Y));
                 lastLength = (float)p1.DistanceTo(p2);
             }
             else
@@ -19398,8 +19400,8 @@ namespace CS_Classes
     public class FeatureLine_Finder_CS : CS_Parent
     {
         Line_Basics lines = new Line_Basics();
-        public List<cv.Point2f> lines2D = new List<cv.Point2f>();
-        public List<cv.Point3f> lines3D = new List<cv.Point3f>();
+        public List<CV.Point2f> lines2D = new List<CV.Point2f>();
+        public List<CV.Point3f> lines3D = new List<CV.Point3f>();
         public SortedList<float, int> sorted2DV = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
         public SortedList<float, int> sortedVerticals = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
         public SortedList<float, int> sortedHorizontals = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
@@ -19421,14 +19423,14 @@ namespace CS_Classes
             lines.Run(src);
             dst2 = lines.dst2;
             List<PointPair> raw2D = new List<PointPair>();
-            List<cv.Point3f> raw3D = new List<cv.Point3f>();
+            List<CV.Point3f> raw3D = new List<CV.Point3f>();
             foreach (var lp in lines.lpList)
             {
                 Point3f pt1 = new Point3f(), pt2 = new Point3f();
                 for (int j = 0; j < 2; j++)
                 {
-                    cv.Point2f pt = (j == 0) ? lp.p1 : lp.p2;
-                    cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.kSize), (int)(pt.Y - options.kSize), options.kernelSize, options.kernelSize));
+                    CV.Point2f pt = (j == 0) ? lp.p1 : lp.p2;
+                    CV.Rect rect = ValidateRect(new CV.Rect((int)(pt.X - options.kSize), (int)(pt.Y - options.kSize), options.kernelSize, options.kernelSize));
                     Scalar val = task.pointCloud[rect].Mean(task.depthMask[rect]);
                     if (j == 0)
                         pt1 = new Point3f((float)val[0], (float)val[1], (float)val[2]);
@@ -19448,11 +19450,11 @@ namespace CS_Classes
             }
             else
             {
-                Mat matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, MatType.CV_32F, raw3D.ToArray()) * task.gMatrix;
+                Mat matLines3D = CV.Mat.FromPixelData(raw3D.Count, 3, MatType.CV_32F, raw3D.ToArray()) * task.gMatrix;
                 for (int i = 0; i < raw2D.Count - 1; i += 2)
                 {
-                    Point3f pt1 = matLines3D.Get<cv.Point3f>(i, 0);
-                    Point3f pt2 = matLines3D.Get<cv.Point3f>(i + 1, 0);
+                    Point3f pt1 = matLines3D.Get<CV.Point3f>(i, 0);
+                    Point3f pt2 = matLines3D.Get<CV.Point3f>(i + 1, 0);
                     float len3D = distance3D(pt1, pt2);
                     double arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958);
                     if (Math.Abs(arcY - 90) < options.tolerance)
@@ -19535,8 +19537,8 @@ namespace CS_Classes
             var pt2 = lines.lines3D[index + 1];
             var len3D = distance3D(pt1, pt2);
             var arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958);
-            SetTrueText($"{arcY.ToString(fmt3)}\n{len3D.ToString(fmt3)}m len\n{pt1.Z.ToString(fmt1)}m dist", new cv.Point(p1.X, p1.Y));
-            SetTrueText($"{arcY.ToString(fmt3)}\n{len3D.ToString(fmt3)}m len\n{pt1.Z.ToString(fmt1)}m distant", new cv.Point(p1.X, p1.Y), 3);
+            SetTrueText($"{arcY.ToString(fmt3)}\n{len3D.ToString(fmt3)}m len\n{pt1.Z.ToString(fmt1)}m dist", new CV.Point(p1.X, p1.Y));
+            SetTrueText($"{arcY.ToString(fmt3)}\n{len3D.ToString(fmt3)}m len\n{pt1.Z.ToString(fmt1)}m distant", new CV.Point(p1.X, p1.Y), 3);
         }
     }
 
@@ -19575,10 +19577,10 @@ namespace CS_Classes
                 for (int i = 0; i < Math.Min(10, lines.sortedVerticals.Count); i++)
                 {
                     int index = lines.sortedVerticals.ElementAt(i).Value;
-                    cv.Point2f p1 = lines.lines2D[index];
-                    cv.Point2f p2 = lines.lines2D[index + 1];
+                    CV.Point2f p1 = lines.lines2D[index];
+                    CV.Point2f p2 = lines.lines2D[index + 1];
                     DrawLine(dst2, p1, p2, task.HighlightColor, task.lineWidth);
-                    SetTrueText(i.ToString(), i % 2 == 1 ? new cv.Point(p1.X, p1.Y) : new cv.Point(p2.X, p2.Y), 2);
+                    SetTrueText(i.ToString(), i % 2 == 1 ? new CV.Point(p1.X, p1.Y) : new CV.Point(p2.X, p2.Y), 2);
                     DrawLine(dst3, p1, p2, task.HighlightColor, task.lineWidth);
                     Point3f pt1 = lines.lines3D[index];
                     Point3f pt2 = lines.lines3D[index + 1];
@@ -19627,7 +19629,7 @@ namespace CS_Classes
         public Options_Features options = new Options_Features();
         public gravityLine gline;
         public Match_Basics match = new Match_Basics();
-        cv.Point2f p1, p2;
+        CV.Point2f p1, p2;
         public FeatureLine_LongestKNN_CS(VBtask task) : base(task)
         {
             desc = "Find and track the longest line in the BGR image with a lightweight KNN.";
@@ -19639,8 +19641,8 @@ namespace CS_Classes
             knn.Run(src.Clone());
             p1 = knn.lastPair.p1;
             p2 = knn.lastPair.p2;
-            gline = glines.updateGLine(src, gline, new cv.Point(p1.X, p1.Y), new cv.Point(p2.X, p2.Y));
-            cv.Rect rect = ValidateRect(new cv.Rect((int)Math.Min(p1.X, p2.X), (int)Math.Min(p1.Y, p2.Y), (int)Math.Abs(p1.X - p2.X) + 2, (int)Math.Abs(p1.Y - p2.Y)));
+            gline = glines.updateGLine(src, gline, new CV.Point(p1.X, p1.Y), new CV.Point(p2.X, p2.Y));
+            CV.Rect rect = ValidateRect(new CV.Rect((int)Math.Min(p1.X, p2.X), (int)Math.Min(p1.Y, p2.Y), (int)Math.Abs(p1.X - p2.X) + 2, (int)Math.Abs(p1.Y - p2.Y)));
             match.template = new Mat(src, rect);
             match.Run(src);
             if (match.correlation >= options.correlationMin)
@@ -19649,7 +19651,7 @@ namespace CS_Classes
                 DrawLine(dst2, p1, p2, task.HighlightColor, task.lineWidth);
                 DrawCircle(dst2, p1, task.DotSize, task.HighlightColor);
                 DrawCircle(dst2, p2, task.DotSize, task.HighlightColor);
-                rect = ValidateRect(new cv.Rect((int)(Math.Min(p1.X, p2.X)), (int)(Math.Min(p1.Y, p2.Y)), (int)(Math.Abs(p1.X - p2.X) + 2), (int)(Math.Abs(p1.Y - p2.Y))));
+                rect = ValidateRect(new CV.Rect((int)(Math.Min(p1.X, p2.X)), (int)(Math.Min(p1.Y, p2.Y)), (int)(Math.Abs(p1.X - p2.X) + 2), (int)(Math.Abs(p1.Y - p2.Y))));
                 match.template = new Mat(src, rect).Clone();
             }
             else
@@ -19684,27 +19686,27 @@ namespace CS_Classes
             double correlationMin = match1.options.correlationMin;
             int templatePad = match1.options.templatePad;
             int templateSize = match1.options.templateSize;
-            cv.Point2f p1 = new cv.Point(), p2 = new cv.Point();
+            CV.Point2f p1 = new CV.Point(), p2 = new CV.Point();
             if (task.heartBeat || (match1.correlation < correlationMin && match2.correlation < correlationMin))
             {
                 knn.Run(src.Clone());
                 p1 = knn.lastPair.p1;
-                cv.Rect r1 = ValidateRect(new cv.Rect((int)(p1.X - templatePad), (int)(p1.Y - templatePad), templateSize, templateSize));
+                CV.Rect r1 = ValidateRect(new CV.Rect((int)(p1.X - templatePad), (int)(p1.Y - templatePad), templateSize, templateSize));
                 match1.template = new Mat(src, r1).Clone();
                 p2 = knn.lastPair.p2;
-                cv.Rect r2 = ValidateRect(new cv.Rect((int)(p2.X - templatePad), (int)(p2.Y - templatePad), templateSize, templateSize));
+                CV.Rect r2 = ValidateRect(new CV.Rect((int)(p2.X - templatePad), (int)(p2.Y - templatePad), templateSize, templateSize));
                 match2.template = new Mat(src, r2).Clone();
             }
             match1.Run(src);
             p1 = match1.matchCenter;
             match2.Run(src);
             p2 = match2.matchCenter;
-            gline = glines.updateGLine(src, gline, new cv.Point(p1.X, p1.Y), new cv.Point(p2.X, p2.Y));
+            gline = glines.updateGLine(src, gline, new CV.Point(p1.X, p1.Y), new CV.Point(p2.X, p2.Y));
             DrawLine(dst2, p1, p2, task.HighlightColor, task.lineWidth);
             DrawCircle(dst2, p1, task.DotSize, task.HighlightColor);
             DrawCircle(dst2, p2, task.DotSize, task.HighlightColor);
-            SetTrueText($"{match1.correlation:F3}", new cv.Point(p1.X, p1.Y));
-            SetTrueText($"{match2.correlation:F3}", new cv.Point(p2.X, p2.Y));
+            SetTrueText($"{match1.correlation:F3}", new CV.Point(p1.X, p1.Y));
+            SetTrueText($"{match2.correlation:F3}", new CV.Point(p2.X, p2.Y));
         }
     }
 
@@ -19738,7 +19740,7 @@ namespace CS_Classes
 
             topFeatures.Run(src);
             dst2 = topFeatures.dst2;
-            sides.currPoly = new List<cv.Point2f>(topFeatures.poly);
+            sides.currPoly = new List<CV.Point2f>(topFeatures.poly);
             if (sides.currPoly.Count < task.polyCount) return;
             sides.Run(src);
             dst3 = sides.dst2;
@@ -19783,7 +19785,7 @@ namespace CS_Classes
             causes += "\n";
             if (resync || sides.prevPoly.Count != task.polyCount || task.optionsChanged)
             {
-                sides.prevPoly = new List<cv.Point2f>(sides.currPoly);
+                sides.prevPoly = new List<CV.Point2f>(sides.currPoly);
                 sides.prevLengths = new List<float>(sides.currLengths);
                 sides.prevSideIndex = sides.prevLengths.IndexOf(sides.prevLengths.Max());
                 sides.prevImage = src.Clone();
@@ -19799,7 +19801,7 @@ namespace CS_Classes
             foreach (var keyval in topFeatures.stable.goodCounts)
             {
                 var ptmp = topFeatures.stable.basics.ptList[keyval.Value];
-                var pt = new cv.Point((int)ptmp.X, (int)ptmp.Y);
+                var pt = new CV.Point((int)ptmp.X, (int)ptmp.Y);
                 int g = topFeatures.stable.basics.facetGen.dst0.Get<int>(pt.Y, pt.X);
                 SetTrueText(g.ToString(), pt);
             }
@@ -19813,12 +19815,12 @@ namespace CS_Classes
 
     public class FeaturePoly_Sides_CS : CS_Parent
     {
-        public List<cv.Point2f> currPoly = new List<cv.Point2f>();
+        public List<CV.Point2f> currPoly = new List<CV.Point2f>();
         public int currSideIndex;
         public List<float> currLengths = new List<float>();
         public float currFLineLen;
         public PointPair mpCurr;
-        public List<cv.Point2f> prevPoly = new List<cv.Point2f>();
+        public List<CV.Point2f> prevPoly = new List<CV.Point2f>();
         public int prevSideIndex;
         public List<float> prevLengths = new List<float>();
         public float prevFLineLen;
@@ -19830,7 +19832,7 @@ namespace CS_Classes
         public Options_FPoly options = new Options_FPoly();
         Line_Nearest near = new Line_Nearest();
         public Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
-        List<cv.Point2f> newPoly;
+        List<CV.Point2f> newPoly;
         Random_Basics random = new Random_Basics();
         public FeaturePoly_Sides_CS(VBtask task) : base(task)
         {
@@ -19845,7 +19847,7 @@ namespace CS_Classes
             if (standaloneTest() && task.heartBeat)
             {
                 random.Run(empty);
-                currPoly = new List<cv.Point2f>(random.PointList);
+                currPoly = new List<CV.Point2f>(random.PointList);
             }
             dst2.SetTo(0);
             currLengths.Clear();
@@ -19856,7 +19858,7 @@ namespace CS_Classes
             currSideIndex = currLengths.IndexOf(currLengths.Max());
             if (task.FirstPass)
             {
-                prevPoly = new List<cv.Point2f>(currPoly);
+                prevPoly = new List<CV.Point2f>(currPoly);
                 prevLengths = new List<float>(currLengths);
                 prevSideIndex = prevLengths.IndexOf(prevLengths.Max());
             }
@@ -19880,7 +19882,7 @@ namespace CS_Classes
                 rotateCenter = mpPrev.p2;
                 newNear = new PointPair(mpPrev.p1, mpCurr.p1);
             }
-            List<cv.Point2f> transPoly = new List<cv.Point2f>();
+            List<CV.Point2f> transPoly = new List<CV.Point2f>();
             for (int i = 0; i < currPoly.Count; i++)
             {
                 transPoly.Add(new Point2f(currPoly[i].X - centerShift.X, currPoly[i].Y - centerShift.Y));
@@ -19914,9 +19916,9 @@ namespace CS_Classes
                 rotatePoly.Run(empty);
                 if (Distance(near.nearPoint, rotatePoly.poly[0]) > Distance(newNear.p1, rotatePoly.poly[0])) rotateAngle *= -1;
                 rotatePoly.rotateAngle = rotateAngle;
-                rotatePoly.poly = new List<cv.Point2f>(transPoly);
+                rotatePoly.poly = new List<CV.Point2f>(transPoly);
                 rotatePoly.Run(empty);
-                newPoly = new List<cv.Point2f>(rotatePoly.poly);
+                newPoly = new List<CV.Point2f>(rotatePoly.poly);
             }
             DrawFPoly(ref dst2, prevPoly, Scalar.White);
             DrawFPoly(ref dst2, currPoly, Scalar.Yellow);
@@ -19960,7 +19962,7 @@ namespace CS_Classes
             topFeatures.Run(src);
             dst2 = topFeatures.dst2;
             dst1 = topFeatures.dst3;
-            fPD.currPoly = new List<cv.Point2f>(topFeatures.poly);
+            fPD.currPoly = new List<CV.Point2f>(topFeatures.poly);
             if (task.optionsChanged) fPD = new fPolyData(fPD.currPoly);
             if (fPD.currPoly.Count < task.polyCount) return;
             fPD.computeCurrLengths();
@@ -20093,7 +20095,7 @@ namespace CS_Classes
             var hlist = hist.ToList();
             float peak = hlist.Max();
             int peakIndex = hlist.IndexOf(peak);
-            Mat histMat = cv.Mat.FromPixelData(hist.Length, 1, MatType.CV_32F, hist);
+            Mat histMat = CV.Mat.FromPixelData(hist.Length, 1, MatType.CV_32F, hist);
             plot.maxValue = fGrid.stable.basics.ptList.Count;
             plot.Run(histMat);
             dst2 = plot.dst2;
@@ -20130,7 +20132,7 @@ namespace CS_Classes
             var hlist = fPlot.hist.ToList();
             float peak = hlist.Max();
             int peakIndex = hlist.IndexOf(peak);
-            Mat histMat = cv.Mat.FromPixelData(fPlot.hist.Length, 1, MatType.CV_32F, fPlot.hist);
+            Mat histMat = CV.Mat.FromPixelData(fPlot.hist.Length, 1, MatType.CV_32F, fPlot.hist);
             plot.maxValue = fPlot.fGrid.stable.basics.ptList.Count;
             plot.Run(histMat);
             addw.src2 = plot.dst2;
@@ -20165,8 +20167,8 @@ namespace CS_Classes
             labels[3] = fGrid.labels[2];
             Mat syncImage = src.Clone();
             if (fGrid.startAnchor == fGrid.anchor) syncImage = src.Clone();
-            cv.Point shift = new cv.Point(fGrid.startAnchor.X - fGrid.anchor.X, fGrid.startAnchor.Y - fGrid.anchor.Y);
-            cv.Rect rect = new cv.Rect();
+            CV.Point shift = new CV.Point(fGrid.startAnchor.X - fGrid.anchor.X, fGrid.startAnchor.Y - fGrid.anchor.Y);
+            CV.Rect rect = new CV.Rect();
             if (shift.X < 0) rect.X = 0; else rect.X = shift.X;
             if (shift.Y < 0) rect.Y = 0; else rect.Y = shift.Y;
             rect.Width = dst1.Width - Math.Abs(shift.X);
@@ -20174,9 +20176,9 @@ namespace CS_Classes
 
             dst1.SetTo(0);
             dst1[rect] = syncImage[rect];
-            DrawLine(dst1, fGrid.startAnchor, fGrid.anchor, new cv.Scalar(255), 2);
-            DrawCircle(dst1, fGrid.anchor, 5, new cv.Scalar(255), -1);
-            cv.Rect r = new cv.Rect(0, 0, rect.Width, rect.Height);
+            DrawLine(dst1, fGrid.startAnchor, fGrid.anchor, new CV.Scalar(255), 2);
+            DrawCircle(dst1, fGrid.anchor, 5, new CV.Scalar(255), -1);
+            CV.Rect r = new CV.Rect(0, 0, rect.Width, rect.Height);
             if (fGrid.anchor.X > fGrid.startAnchor.X) r.X = (int)(fGrid.anchor.X - fGrid.startAnchor.X);
             if (fGrid.anchor.Y > fGrid.startAnchor.Y) r.Y = (int)(fGrid.anchor.Y - fGrid.startAnchor.Y);
 
@@ -20190,16 +20192,16 @@ namespace CS_Classes
 
     public class FeaturePoly_StartPoints_CS : CS_Parent
     {
-        public List<cv.Point> startPoints;
-        public List<cv.Point> goodPoints;
+        public List<CV.Point> startPoints;
+        public List<CV.Point> goodPoints;
         public FeaturePoly_Core fGrid = new FeaturePoly_Core();
         TrackBar resyncSlider;
         public FeaturePoly_StartPoints_CS(VBtask task) : base(task)
         {
             resyncSlider = FindSlider("Resync if feature moves > X pixels");
 
-            dst0 = new Mat(dst0.Rows, dst0.Cols, MatType.CV_8U, cv.Scalar.All(1));
-            dst0.SetTo(new cv.Scalar(255));
+            dst0 = new Mat(dst0.Rows, dst0.Cols, MatType.CV_8U, CV.Scalar.All(1));
+            dst0.SetTo(new CV.Scalar(255));
             if (standaloneTest()) task.gOptions.setDisplay1();
             desc = "Track the feature grid points back to the last sync point";
         }
@@ -20209,48 +20211,48 @@ namespace CS_Classes
             double maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold;
             fGrid.Run(src);
             dst2 = fGrid.dst3;
-            List<List<cv.Point>> facets = new List<List<cv.Point>>();
+            List<List<CV.Point>> facets = new List<List<CV.Point>>();
             Mat lastPoints = dst0.Clone();
             if (fGrid.startAnchor == fGrid.anchor || goodPoints.Count < 5)
             {
-                startPoints = new List<cv.Point>();
+                startPoints = new List<CV.Point>();
                 foreach (var pt in fGrid.goodPoints)
                 {
-                    startPoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                    startPoints.Add(new CV.Point((int)pt.X, (int)pt.Y));
                 }
-                facets = new List<List<cv.Point>>(fGrid.goodFacets);
+                facets = new List<List<CV.Point>>(fGrid.goodFacets);
             }
-            dst0.SetTo(new cv.Scalar(255));
-            if (standaloneTest()) dst1.SetTo(new cv.Scalar(0));
+            dst0.SetTo(new CV.Scalar(255));
+            if (standaloneTest()) dst1.SetTo(new CV.Scalar(0));
             List<PointPair> mpList = new List<PointPair>();
-            goodPoints = new List<cv.Point>();
+            goodPoints = new List<CV.Point>();
             foreach (var pt in fGrid.goodPoints)
             {
-                goodPoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                goodPoints.Add(new CV.Point((int)pt.X, (int)pt.Y));
             }
-            List<cv.Point> facet = new List<cv.Point>();
+            List<CV.Point> facet = new List<CV.Point>();
             List<int> usedGood = new List<int>();
             for (int i = 0; i < goodPoints.Count; i++)
             {
-                cv.Point pt = goodPoints[i];
+                CV.Point pt = goodPoints[i];
                 byte startPoint = lastPoints.Get<byte>(pt.Y, pt.X);
                 if (startPoint == 255 && i < 256) startPoint = (byte)i;
                 if (startPoint < startPoints.Count && !usedGood.Contains(startPoint))
                 {
                     usedGood.Add(startPoint);
                     facet = facets[startPoint];
-                    dst0.FillConvexPoly(facet.ToArray(), cv.Scalar.All(startPoint), cv.LineTypes.Link4);
+                    dst0.FillConvexPoly(facet.ToArray(), CV.Scalar.All(startPoint), CV.LineTypes.Link4);
                     if (standaloneTest()) dst1.FillConvexPoly(facet.ToArray(), task.scalarColors[startPoint], task.lineType);
                     mpList.Add(new PointPair(startPoints[startPoint], pt));
                 }
             }
-            // dst3.SetTo(new cv.Scalar(0));
+            // dst3.SetTo(new CV.Scalar(0));
             foreach (PointPair mp in mpList)
             {
-                if (mp.p1.DistanceTo(mp.p2) <= maxShift) DrawLine(dst1, mp.p1, mp.p2, new cv.Scalar(255, 255, 0), 2);
-                DrawCircle(dst1, mp.p1, task.DotSize, new cv.Scalar(255, 255, 0), -1);
+                if (mp.p1.DistanceTo(mp.p2) <= maxShift) DrawLine(dst1, mp.p1, mp.p2, new CV.Scalar(255, 255, 0), 2);
+                DrawCircle(dst1, mp.p1, task.DotSize, new CV.Scalar(255, 255, 0), -1);
             }
-            DrawLine(dst1, fGrid.anchor, fGrid.startAnchor, new cv.Scalar(255), task.lineWidth + 1);
+            DrawLine(dst1, fGrid.anchor, fGrid.startAnchor, new CV.Scalar(255), task.lineWidth + 1);
         }
     }
 
@@ -20269,10 +20271,10 @@ namespace CS_Classes
         {
             fGrid.Run(src);
             dst2 = fGrid.dst2;
-            triangle.srcPoints = new List<cv.Point2f>();
+            triangle.srcPoints = new List<CV.Point2f>();
             foreach (var pt in fGrid.goodPoints)
             {
-                triangle.srcPoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                triangle.srcPoints.Add(new CV.Point((int)pt.X, (int)pt.Y));
             }
             triangle.Run(null);
             dst3 = triangle.dst2;
@@ -20285,7 +20287,7 @@ namespace CS_Classes
     public class FeaturePoly_TopFeatures_CS : CS_Parent
     {
         Stable_BasicsCount stable = new Stable_BasicsCount();
-        List<cv.Point2f> poly = new List<cv.Point2f>();
+        List<CV.Point2f> poly = new List<CV.Point2f>();
         Options_FPoly options = new Options_FPoly();
         public FeaturePoly_TopFeatures_CS(VBtask task) : base(task)
         {
@@ -20300,14 +20302,14 @@ namespace CS_Classes
             foreach (KeyValuePair<int, int> keyVal in stable.goodCounts)
             {
                 var ptmp = stable.basics.ptList[keyVal.Value];
-                var pt = new cv.Point((int)ptmp.X, (int)ptmp.Y);
+                var pt = new CV.Point((int)ptmp.X, (int)ptmp.Y);
                 int g = stable.basics.facetGen.dst0.Get<int>(pt.Y, pt.X);
                 SetTrueText(g.ToString(), pt);
                 if (poly.Count < task.polyCount) poly.Add(pt);
             }
             for (int i = 0; i < poly.Count - 1; i++)
             {
-                DrawLine(dst2, poly[i], poly[i + 1], new cv.Scalar(255), 2);
+                DrawLine(dst2, poly[i], poly[i + 1], new CV.Scalar(255), 2);
             }
         }
     }
@@ -20329,34 +20331,34 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             fPoly.Run(src);
-            List<cv.Point2f> polyPrev = fPoly.fPD.prevPoly;
-            List<cv.Point2f> poly = new List<cv.Point2f>(fPoly.fPD.currPoly);
-            dst2.SetTo(new cv.Scalar(0));
-            dst3.SetTo(new cv.Scalar(0));
-            DrawFPoly(ref dst2, polyPrev, new cv.Scalar(255));
+            List<CV.Point2f> polyPrev = fPoly.fPD.prevPoly;
+            List<CV.Point2f> poly = new List<CV.Point2f>(fPoly.fPD.currPoly);
+            dst2.SetTo(new CV.Scalar(0));
+            dst3.SetTo(new CV.Scalar(0));
+            DrawFPoly(ref dst2, polyPrev, new CV.Scalar(255));
             warp.rotateCenter = fPoly.fPD.rotateCenter;
             warp.rotateAngle = fPoly.fPD.rotateAngle;
             warp.Run(dst2);
             dst3 = warp.dst2;
             rotatePoly.rotateAngle = fPoly.fPD.rotateAngle;
             rotatePoly.rotateCenter = fPoly.fPD.rotateCenter;
-            rotatePoly.poly = new List<cv.Point2f>(poly);
+            rotatePoly.poly = new List<CV.Point2f>(poly);
             rotatePoly.Run(null);
             if (fPoly.fPD.polyPrevSideIndex >= rotatePoly.poly.Count) fPoly.fPD.polyPrevSideIndex = 0;
-            cv.Point offset = new cv.Point(rotatePoly.poly[fPoly.fPD.polyPrevSideIndex].X - polyPrev[fPoly.fPD.polyPrevSideIndex].X,
+            CV.Point offset = new CV.Point(rotatePoly.poly[fPoly.fPD.polyPrevSideIndex].X - polyPrev[fPoly.fPD.polyPrevSideIndex].X,
                                      rotatePoly.poly[fPoly.fPD.polyPrevSideIndex].Y - polyPrev[fPoly.fPD.polyPrevSideIndex].Y);
-            cv.Rect r1 = new cv.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y));
+            CV.Rect r1 = new CV.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y));
             if (offset.X < 0) r1.X = 0;
             if (offset.Y < 0) r1.Y = 0;
-            cv.Rect r2 = new cv.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height);
+            CV.Rect r2 = new CV.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height);
             if (offset.X > 0) r2.X = 0;
             if (offset.Y > 0) r2.Y = 0;
 
             dst3[r1] = dst2[r1];
             dst3 -= dst2;
 
-            DrawFPoly(ref dst3, rotatePoly.poly, new cv.Scalar(255, 255, 0));
-            DrawFPoly(ref dst2, rotatePoly.poly, new cv.Scalar(255, 255, 0));
+            DrawFPoly(ref dst3, rotatePoly.poly, new CV.Scalar(255, 255, 0));
+            DrawFPoly(ref dst2, rotatePoly.poly, new CV.Scalar(255, 255, 0));
             SetTrueText(fPoly.strOut, 3);
         }
     }
@@ -20367,31 +20369,31 @@ namespace CS_Classes
     public class FeaturePoly_RotatePoints_CS : CS_Parent
     {
         Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
-        public List<cv.Point> poly;
-        public List<cv.Point2f> polyPrev;
+        public List<CV.Point> poly;
+        public List<CV.Point2f> polyPrev;
         public float rotateAngle;
-        public cv.Point rotateCenter;
+        public CV.Point rotateCenter;
         public int polyPrevSideIndex;
-        public cv.Point centerShift;
+        public CV.Point centerShift;
         public FeaturePoly_RotatePoints_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Feature polygon after just rotation - white (original), yellow (current)",
                   "Feature polygons with rotation and shift - should be aligned" };
             desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics";
         }
-        public cv.Point shiftPoly(List<cv.Point2f> polyPrev, List<cv.Point> poly)
+        public CV.Point shiftPoly(List<CV.Point2f> polyPrev, List<CV.Point> poly)
         {
             rotatePoly.rotateAngle = rotateAngle;
             rotatePoly.rotateCenter = rotateCenter;
-            rotatePoly.poly = new List<cv.Point2f>();
+            rotatePoly.poly = new List<CV.Point2f>();
             foreach (var pt in poly)
             {
-                rotatePoly.poly.Add(new cv.Point2f(pt.X, pt.Y));
+                rotatePoly.poly.Add(new CV.Point2f(pt.X, pt.Y));
             }
             rotatePoly.Run(null);
             int totalX = (int)(rotatePoly.poly[polyPrevSideIndex].X - polyPrev[polyPrevSideIndex].X);
             int totalY = (int)(rotatePoly.poly[polyPrevSideIndex].Y - polyPrev[polyPrevSideIndex].Y);
-            return new cv.Point(totalX, totalY);
+            return new CV.Point(totalX, totalY);
         }
         public void RunCS(Mat src)
         {
@@ -20400,22 +20402,22 @@ namespace CS_Classes
                 SetTrueText(traceName + " is meant only to run with FeaturePoly_Basics to validate the translation", 3);
                 return;
             }
-            dst2.SetTo(new cv.Scalar(0));
-            dst3.SetTo(new cv.Scalar(0));
-            List<cv.Point2f> rotateAndShift = new List<cv.Point2f>();
+            dst2.SetTo(new CV.Scalar(0));
+            dst3.SetTo(new CV.Scalar(0));
+            List<CV.Point2f> rotateAndShift = new List<CV.Point2f>();
             centerShift = shiftPoly(polyPrev, poly);
-            DrawFPoly(ref dst2, polyPrev, new cv.Scalar(255));
-            DrawFPoly(ref dst2, rotatePoly.poly, new cv.Scalar(255, 255, 0));
+            DrawFPoly(ref dst2, polyPrev, new CV.Scalar(255));
+            DrawFPoly(ref dst2, rotatePoly.poly, new CV.Scalar(255, 255, 0));
             for (int i = 0; i < polyPrev.Count; i++)
             {
-                cv.Point2f p1 = new cv.Point(rotatePoly.poly[i].X - centerShift.X, rotatePoly.poly[i].Y - centerShift.Y);
-                cv.Point p2 = new cv.Point(rotatePoly.poly[(i + 1) % task.polyCount].X - centerShift.X, rotatePoly.poly[(i + 1) % task.polyCount].Y - centerShift.Y);
+                CV.Point2f p1 = new CV.Point(rotatePoly.poly[i].X - centerShift.X, rotatePoly.poly[i].Y - centerShift.Y);
+                CV.Point p2 = new CV.Point(rotatePoly.poly[(i + 1) % task.polyCount].X - centerShift.X, rotatePoly.poly[(i + 1) % task.polyCount].Y - centerShift.Y);
                 rotateAndShift.Add(p1);
                 SetTrueText(i.ToString(), rotatePoly.poly[i], 2);
                 SetTrueText(i.ToString(), polyPrev[i], 2);
             }
-            DrawFPoly(ref dst3, polyPrev, new cv.Scalar(255));
-            DrawFPoly(ref dst3, rotateAndShift, new cv.Scalar(255, 255, 0));
+            DrawFPoly(ref dst3, polyPrev, new CV.Scalar(255));
+            DrawFPoly(ref dst3, rotateAndShift, new CV.Scalar(255, 255, 0));
             strOut = "After Rotation: " + rotatePoly.rotateAngle.ToString("F2") + " degrees " +
                      "After Translation (shift) of: " + centerShift.X.ToString("F2") + ", " + centerShift.Y.ToString("F2") + "\r\n" +
                      "Center of Rotation: " + rotateCenter.X.ToString("F2") + ", " + rotateCenter.Y.ToString("F2") + "\r\n" +
@@ -20446,11 +20448,11 @@ namespace CS_Classes
             warp.Run(fPoly.resyncImage.Clone());
             dst2 = warp.dst2;
             dst1 = fPoly.dst1;
-            cv.Point2f offset = fPoly.fPD.centerShift;
-            cv.Rect r1 = new cv.Rect((int)offset.X, (int)offset.Y, (int)(dst2.Width - Math.Abs(offset.X)), (int)(dst2.Height - Math.Abs(offset.Y)));
+            CV.Point2f offset = fPoly.fPD.centerShift;
+            CV.Rect r1 = new CV.Rect((int)offset.X, (int)offset.Y, (int)(dst2.Width - Math.Abs(offset.X)), (int)(dst2.Height - Math.Abs(offset.Y)));
             if (offset.X < 0) r1.X = 0;
             if (offset.Y < 0) r1.Y = 0;
-            cv.Rect r2 = new cv.Rect((int)Math.Abs(offset.X), (int)Math.Abs(offset.Y), r1.Width, r1.Height);
+            CV.Rect r2 = new CV.Rect((int)Math.Abs(offset.X), (int)Math.Abs(offset.Y), r1.Width, r1.Height);
             if (offset.X > 0) r2.X = 0;
             if (offset.Y > 0) r2.Y = 0;
             dst3[r1] = dst2[r2];
@@ -20509,7 +20511,7 @@ namespace CS_Classes
             perp2.p2 = fPD.prevPoly[(fPD.polyPrevSideIndex + 1) % task.polyCount];
             perp2.Run(empty);
             DrawLine(dst2, perp2.r1, perp2.r2, Scalar.White, task.lineWidth);
-            fPD.rotateCenter = IntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, new cv.Rect(0, 0, src.Width, src.Height));
+            fPD.rotateCenter = IntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, new CV.Rect(0, 0, src.Width, src.Height));
             if (fPD.rotateCenter == new Point2f())
             {
                 fPD.rotateAngle = 0;
@@ -20610,21 +20612,21 @@ namespace CS_Classes
                     rotate.Run(fpoly.resyncImage);
                     dst0 = rotate.dst2;
                     Point2f offset = fpoly.fPD.centerShift;
-                    cv.Rect r1 = new cv.Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
+                    CV.Rect r1 = new CV.Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
                     r1 = ValidateRect(r1);
                     if (offset.X < 0) r1.X = 0;
                     if (offset.Y < 0) r1.Y = 0;
-                    cv.Rect r2 = new cv.Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
+                    CV.Rect r2 = new CV.Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
                     r2.Width = r1.Width;
                     r2.Height = r1.Height;
                     if (r2.X < 0 || r2.X >= dst2.Width) return; // wedged...
                     if (r2.Y < 0 || r2.Y >= dst2.Height) return; // wedged...
                     if (offset.X > 0) r2.X = 0;
                     if (offset.Y > 0) r2.Y = 0;
-                    Mat mask2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(255));
+                    Mat mask2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(255));
                     rotate.Run(mask2);
                     mask2 = rotate.dst2;
-                    Mat mask = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                    Mat mask = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
                     mask[r1].SetTo(255);
                     mask[r1] = mask2[r2];
                     mask = ~mask;
@@ -20706,7 +20708,7 @@ namespace CS_Classes
         int lastPixelCount = 0;
         public FeaturePoly_ResyncCheck_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter.";
         }
         public void RunCS(Mat src)
@@ -20736,7 +20738,7 @@ namespace CS_Classes
         public Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
         Line_Nearest near = new Line_Nearest();
         public fPolyData fPD;
-        List<cv.Point2f> newPoly;
+        List<CV.Point2f> newPoly;
         public FeaturePoly_Center_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
@@ -20774,7 +20776,7 @@ namespace CS_Classes
                 fPD.rotateCenter = mp1.p2;
                 newNear = new PointPair(mp1.p1, mp2.p1);
             }
-            var transPoly = new List<cv.Point2f>();
+            var transPoly = new List<CV.Point2f>();
             foreach (var point in fPD.currPoly)
             {
                 transPoly.Add(new Point2f(point.X - fPD.centerShift.X, point.Y - fPD.centerShift.Y));
@@ -20811,9 +20813,9 @@ namespace CS_Classes
                 rotatePoly.Run(new Mat());
                 if (near.nearPoint.DistanceTo(rotatePoly.poly[0]) > newNear.p1.DistanceTo(rotatePoly.poly[0])) fPD.rotateAngle *= -1;
                 rotatePoly.rotateAngle = fPD.rotateAngle;
-                rotatePoly.poly = new List<cv.Point2f>(transPoly);
+                rotatePoly.poly = new List<CV.Point2f>(transPoly);
                 rotatePoly.Run(new Mat());
-                newPoly = new List<cv.Point2f>(rotatePoly.poly);
+                newPoly = new List<CV.Point2f>(rotatePoly.poly);
             }
             dst3.SetTo(0);
             fPD.DrawPolys(dst3, fPD.currPoly, this);
@@ -20872,16 +20874,16 @@ namespace CS_Classes
                 rotate.Run(fpoly.sides.prevImage);
                 dst0 = rotate.dst2;
                 Point2f offset = fpoly.sides.centerShift;
-                cv.Rect r1 = new cv.Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
+                CV.Rect r1 = new CV.Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
                 if (offset.X < 0) r1.X = 0;
                 if (offset.Y < 0) r1.Y = 0;
-                cv.Rect r2 = new cv.Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
+                CV.Rect r2 = new CV.Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
                 if (offset.X > 0) r2.X = 0;
                 if (offset.Y > 0) r2.Y = 0;
-                Mat mask2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(255));
+                Mat mask2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(255));
                 rotate.Run(mask2);
                 mask2 = rotate.dst2;
-                Mat mask = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                Mat mask = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 mask[r1].SetTo(255);
                 mask[r1] = mask2[r2];
                 Cv2.BitwiseNot(mask, mask);
@@ -20942,13 +20944,13 @@ namespace CS_Classes
         public Stable_GoodFeatures stable = new Stable_GoodFeatures();
         public Point2f anchor;
         public Point2f startAnchor;
-        public List<cv.Point2f> goodPoints = new List<cv.Point2f>();
-        public List<List<cv.Point>> goodFacets = new List<List<cv.Point>>();
+        public List<CV.Point2f> goodPoints = new List<CV.Point2f>();
+        public List<List<CV.Point>> goodFacets = new List<List<CV.Point>>();
         Options_FPoly options = new Options_FPoly();
         Options_FPolyCore optionsCore = new Options_FPolyCore();
         public FeaturePoly_Core_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst0.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            dst0 = new Mat(dst0.Size(), MatType.CV_32F, CV.Scalar.All(0));
             FindSlider("Feature Sample Size").Value = 20;
             labels = new string[] { "", "Distance change from previous frame", "", "Feature Grid with anchor" };
             desc = "Feature Grid: compute distances between good features from frame to frame";
@@ -20969,13 +20971,13 @@ namespace CS_Classes
             goodPoints.Clear();
             goodFacets.Clear();
             dst2.SetTo(0);
-            cv.Vec3b white = new cv.Vec3b(255, 255, 255);
+            CV.Vec3b white = new CV.Vec3b(255, 255, 255);
             for (int i = 0; i < stable.basics.facetGen.facet.facetList.Count; i++)
             {
-                List<cv.Point> facet = stable.basics.facetGen.facet.facetList[i];
+                List<CV.Point> facet = stable.basics.facetGen.facet.facetList[i];
                 Point2f pt = stable.basics.ptList[i];
                 double d = anchor.DistanceTo(pt);
-                dst0.FillConvexPoly(facet, cv.Scalar.All(d), task.lineType);
+                dst0.FillConvexPoly(facet, CV.Scalar.All(d), task.lineType);
                 float lastd = lastDistance.Get<float>((int)pt.Y, (int)pt.X);
                 double absDiff = Math.Abs(lastd - d);
                 if (absDiff < optionsCore.resyncThreshold)
@@ -21004,14 +21006,14 @@ namespace CS_Classes
     public class FeatureROI_Basics_CS : CS_Parent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
-        public List<cv.Rect> rects = new List<cv.Rect>();
+        public List<CV.Rect> rects = new List<CV.Rect>();
         public List<float> meanList = new List<float>();
         public List<float> stdevList = new List<float>();
         public float stdevAverage;
         public FeatureROI_Basics_CS(VBtask task) : base(task)
         {
             task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white).";
         }
         public void RunCS(Mat src)
@@ -21062,7 +21064,7 @@ namespace CS_Classes
         {
             FindSlider("Add Weighted %").Value = 70;
             task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white).";
         }
         public void RunCS(Mat src)
@@ -21124,15 +21126,15 @@ namespace CS_Classes
     public class FeatureROI_Sorted_CS : CS_Parent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
-        public SortedList<float, cv.Rect> sortedStd = new SortedList<float, cv.Rect>(new compareAllowIdenticalSingle());
+        public SortedList<float, CV.Rect> sortedStd = new SortedList<float, CV.Rect>(new compareAllowIdenticalSingle());
         public List<Vec3b> bgrList = new List<Vec3b>();
-        public List<cv.Rect> roiList = new List<cv.Rect>();
+        public List<CV.Rect> roiList = new List<CV.Rect>();
         public int[] categories;
         public Options_StdevGrid options = new Options_StdevGrid();
         public int maskVal = 255;
         public FeatureROI_Sorted_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
             if (!standalone) maskVal = 1;
             labels[2] = "Use the AddWeighted slider to observe where stdev is above average.";
@@ -21194,7 +21196,7 @@ namespace CS_Classes
                 float nextStdev = sortedStd.ElementAt(i).Key;
                 if (nextStdev < avg)
                 {
-                    cv.Rect roi = sortedStd.ElementAt(i).Value;
+                    CV.Rect roi = sortedStd.ElementAt(i).Value;
                     dst2[roi].SetTo(maskVal);
                     count++;
                 }
@@ -21226,7 +21228,7 @@ namespace CS_Classes
             devGrid.Run(src);
             for (int i = 0; i < devGrid.bgrList.Count; i++)
             {
-                cv.Rect roi = devGrid.roiList[i];
+                CV.Rect roi = devGrid.roiList[i];
                 Vec3b color = devGrid.bgrList[i];
                 dst2[roi].SetTo(color);
             }
@@ -21274,7 +21276,7 @@ namespace CS_Classes
             int motionCount = 0;
             for (int i = 0; i < gather.stdevList.Count; i++)
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 if (gather.stdevList[i] >= gather.stdevAverage)
                 {
                     Cv2.MatchTemplate(dst1[roi], lastImage[roi], correlationMat, TemplateMatchModes.CCoeffNormed);
@@ -21297,7 +21299,7 @@ namespace CS_Classes
 
     public class FeatureROI_LowStdev_CS : CS_Parent
     {
-        public List<cv.Rect> rects = new List<cv.Rect>();
+        public List<CV.Rect> rects = new List<CV.Rect>();
         public FeatureROI_Basics gather = new FeatureROI_Basics();
         public FeatureROI_LowStdev_CS(VBtask task) : base(task)
         {
@@ -21311,7 +21313,7 @@ namespace CS_Classes
             rects.Clear();
             for (int i = 0; i < gather.stdevList.Count; i++)
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 if (gather.stdevList[i] < gather.stdevAverage)
                 {
                     rects.Add(roi);
@@ -21333,7 +21335,7 @@ namespace CS_Classes
         public List<float> saveStdev = new List<float>();
         Mat lastImage;
         List<float> saveCorrs;
-        List<cv.Rect> saveRects;
+        List<CV.Rect> saveRects;
         public FeatureROI_LowStdevCorrelation_CS(VBtask task) : base(task)
         {
             FindSlider("Feature Correlation Threshold").Value = 50;
@@ -21348,7 +21350,7 @@ namespace CS_Classes
             if (task.FirstPass) lastImage = dst1.Clone();
             Mat correlationMat = new Mat();
             correlations.Clear();
-            foreach (cv.Rect roi in gather.rects)
+            foreach (CV.Rect roi in gather.rects)
             {
                 Cv2.MatchTemplate(dst1[roi], lastImage[roi], correlationMat, TemplateMatchModes.CCoeffNormed);
                 float corr = correlationMat.Get<float>(0, 0);
@@ -21357,7 +21359,7 @@ namespace CS_Classes
             if (task.heartBeat)
             {
                 saveCorrs = new List<float>(correlations);
-                saveRects = new List<cv.Rect>(gather.rects);
+                saveRects = new List<CV.Rect>(gather.rects);
                 saveStdev.Clear();
                 Scalar mean, stdev;
                 for (int i = 0; i < saveRects.Count; i++)
@@ -21403,7 +21405,7 @@ namespace CS_Classes
     public class FeatureROI_LRClick_CS : CS_Parent
     {
         public FeatureROI_Basics gather = new FeatureROI_Basics();
-        public cv.Point ClickPoint = new cv.Point();
+        public CV.Point ClickPoint = new CV.Point();
         public int picTag = 0;
         public Options_Features options = new Options_Features();
         public FeatureROI_LRClick_CS(VBtask task) : base(task)
@@ -21415,7 +21417,7 @@ namespace CS_Classes
             labels[2] = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image.";
             desc = "Capture the above average standard deviation roi's for the left and right images.";
         }
-        public void setClickPoint(cv.Point pt, int _pictag)
+        public void setClickPoint(CV.Point pt, int _pictag)
         {
             ClickPoint = pt;
             picTag = _pictag;
@@ -21435,17 +21437,17 @@ namespace CS_Classes
             labels = gather.labels;
             if (gather.rects.Count == 0) return;
             if (task.mouseClickFlag) setClickPoint(task.ClickPoint, task.mousePicTag);
-            if (ClickPoint == new cv.Point()) setClickPoint(gather.rects[gather.rects.Count / 2].TopLeft, 2);
+            if (ClickPoint == new CV.Point()) setClickPoint(gather.rects[gather.rects.Count / 2].TopLeft, 2);
 
             int gridIndex = task.gridMap.Get<int>(ClickPoint.Y, ClickPoint.X);
-            cv.Rect roi = task.gridList[gridIndex];
+            CV.Rect roi = task.gridList[gridIndex];
             dst2.Rectangle(roi, Scalar.White, task.lineWidth);
 
             Mat correlationMat = new Mat();
             List<float> corr = new List<float>();
             for (int j = 0; j < roi.X; j++)
             {
-                cv.Rect r = new cv.Rect(j, roi.Y, roi.Width, roi.Height);
+                CV.Rect r = new CV.Rect(j, roi.Y, roi.Width, roi.Height);
                 Cv2.MatchTemplate(src[roi], task.rightView[r], correlationMat, TemplateMatchModes.CCoeffNormed);
                 corr.Add(correlationMat.Get<float>(0, 0));
             }
@@ -21463,7 +21465,7 @@ namespace CS_Classes
                 else
                 {
                     int index = corr.IndexOf(maxCorr);
-                    cv.Rect rectRight = new cv.Rect(index, roi.Y, roi.Width, roi.Height);
+                    CV.Rect rectRight = new CV.Rect(index, roi.Y, roi.Width, roi.Height);
                     int offset = roi.TopLeft.X - rectRight.TopLeft.X;
                     if (task.heartBeat)
                     {
@@ -21478,8 +21480,8 @@ namespace CS_Classes
                     dst0.Rectangle(roi, task.HighlightColor, task.lineWidth);
                     dst1 = Mat.Zeros(src.Size(), src.Type());
                     Cv2.Circle(dst1, roi.TopLeft, task.DotSize, task.HighlightColor, -1);
-                    Cv2.Circle(dst1, new cv.Point(rectRight.X, roi.Y + 5), task.DotSize + 2, task.HighlightColor, -1);
-                    cv.Point pt = new cv.Point(rectRight.X, roi.Y + 5);
+                    Cv2.Circle(dst1, new CV.Point(rectRight.X, roi.Y + 5), task.DotSize + 2, task.HighlightColor, -1);
+                    CV.Point pt = new CV.Point(rectRight.X, roi.Y + 5);
                     SetTrueText((offset + " pixel offset" + "\n" + "Larger = Right").ToString(), pt, 1);
                     SetTrueText(strOut, 1);
                     labels[3] = "Corresponding roi highlighted in yellow.  Average stdev = " + gather.stdevAverage.ToString(fmt3);
@@ -21495,7 +21497,7 @@ namespace CS_Classes
     {
         public FeatureROI_Basics gather = new FeatureROI_Basics();
         public Options_Features options = new Options_Features();
-        public SortedList<float, cv.Rect> sortedRects = new SortedList<float, cv.Rect>(new compareAllowIdenticalSingleInverted());
+        public SortedList<float, CV.Rect> sortedRects = new SortedList<float, CV.Rect>(new compareAllowIdenticalSingleInverted());
         public FeatureROI_LRAll_CS(VBtask task) : base(task)
         {
             task.gOptions.setGridSize(16);
@@ -21514,16 +21516,16 @@ namespace CS_Classes
             if (gather.rects.Count == 0) return;
             Mat correlationMat = new Mat();
             sortedRects.Clear();
-            foreach (cv.Rect roi in gather.rects)
+            foreach (CV.Rect roi in gather.rects)
             {
                 if (roi.X == 0) continue;
-                cv.Rect r = new cv.Rect(0, roi.Y, roi.X, roi.Height);
+                CV.Rect r = new CV.Rect(0, roi.Y, roi.X, roi.Height);
                 Cv2.MatchTemplate(src[roi], task.rightView[r], correlationMat, TemplateMatchModes.CCoeffNormed);
                 mmData mm = GetMinMax(correlationMat);
-                if (mm.maxVal >= options.correlationMin) sortedRects.Add((float)mm.maxVal, new cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height));
+                if (mm.maxVal >= options.correlationMin) sortedRects.Add((float)mm.maxVal, new CV.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height));
             }
             labels[2] = sortedRects.Count + " roi's had left/right correlation higher than " + options.correlationMin.ToString(fmt3);
-            foreach (cv.Rect roi in sortedRects.Values)
+            foreach (CV.Rect roi in sortedRects.Values)
             {
                 dst3.Rectangle(roi, task.HighlightColor, task.lineWidth);
             }
@@ -21614,7 +21616,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             Mat imgLaplacian = src.Filter2D(MatType.CV_32F,
-                cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 1, 1, 1, -8, 1, 1, 1, 1 }));
+                CV.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 1, 1, 1, -8, 1, 1, 1, 1 }));
             src.ConvertTo(dst1, MatType.CV_32F);
             dst0 = (dst1 - imgLaplacian).ToMat();
             dst0.ConvertTo(dst2, src.Type());
@@ -21641,7 +21643,7 @@ namespace CS_Classes
                 sum += Math.Abs(options.kernel.Get<float>(0, i));
             }
             labels[2] = $"kernel sum = {sum:F3}";
-            Mat dst32f = src.Filter2D(MatType.CV_32FC1, options.kernel, anchor: new cv.Point(0, 0));
+            Mat dst32f = src.Filter2D(MatType.CV_32FC1, options.kernel, anchor: new CV.Point(0, 0));
             dst32f.ConvertTo(dst2, MatType.CV_8UC3);
         }
     }
@@ -21681,7 +21683,7 @@ namespace CS_Classes
         {
             options.RunVB();
             Mat kernel = Cv2.GetGaussianKernel(options.xDim, options.sigma);
-            dst2 = src.GaussianBlur(new cv.Size(options.xDim, options.yDim), options.sigma);
+            dst2 = src.GaussianBlur(new CV.Size(options.xDim, options.yDim), options.sigma);
             dst3 = src.SepFilter2D(MatType.CV_8UC3, kernel, kernel);
             if (options.diffCheck)
             {
@@ -21711,7 +21713,7 @@ namespace CS_Classes
         {
             options.RunVB();
             int kernelSize = standaloneTest() ? (task.frameCount % 20) + 1 : options.kernelSize;
-            Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(kernelSize, kernelSize));
+            Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new CV.Size(kernelSize, kernelSize));
             dst2 = src.Erode(element);
         }
     }
@@ -21730,7 +21732,7 @@ namespace CS_Classes
         {
             options.RunVB();
             int kernelSize = standaloneTest() ? (task.frameCount % 20) + 1 : options.kernelSize;
-            Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(kernelSize, kernelSize));
+            Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new CV.Size(kernelSize, kernelSize));
             dst2 = src.Dilate(element);
         }
     }
@@ -21781,7 +21783,7 @@ namespace CS_Classes
     public class FitEllipse_Basics_CS : CS_Parent
     {
         Options_MinArea options = new Options_MinArea();
-        public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
+        public List<CV.Point2f> inputPoints = new List<CV.Point2f>();
         public RotatedRect box;
         public Point2f[] vertices;
         public FitEllipse_Basics_CS(VBtask task) : base(task)
@@ -21823,7 +21825,7 @@ namespace CS_Classes
     public class FitEllipse_AMS_CPP_CS : CS_Parent
     {
         Options_MinArea options = new Options_MinArea();
-        public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
+        public List<CV.Point2f> inputPoints = new List<CV.Point2f>();
         public FitEllipse_AMS_CPP_CS(VBtask task) : base(task)
         {
             labels[2] = "FitEllipse_AMS_CS C++ ";
@@ -21842,7 +21844,7 @@ namespace CS_Classes
             {
                 DrawCircle(dst2, pt, task.DotSize, Scalar.White, -1);
             }
-            Mat input = cv.Mat.FromPixelData(inputPoints.Count, 1, MatType.CV_32FC2, inputPoints.ToArray());
+            Mat input = CV.Mat.FromPixelData(inputPoints.Count, 1, MatType.CV_32FC2, inputPoints.ToArray());
             float[] dataSrc = new float[inputPoints.Count * 2];
             Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
             GCHandle srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
@@ -21880,7 +21882,7 @@ namespace CS_Classes
             {
                 DrawCircle(dst2, pt, task.DotSize, Scalar.White, -1);
             }
-            Mat input = cv.Mat.FromPixelData(options.srcPoints.Count, 1, MatType.CV_32FC2, options.srcPoints.ToArray());
+            Mat input = CV.Mat.FromPixelData(options.srcPoints.Count, 1, MatType.CV_32FC2, options.srcPoints.ToArray());
             Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
             GCHandle srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             IntPtr boxPtr = FitEllipse_Direct(srcHandle.AddrOfPinnedObject(), options.srcPoints.Count);
@@ -21935,7 +21937,7 @@ namespace CS_Classes
     {
         Options_FitLine options = new Options_FitLine();
         public Draw_Lines draw = new Draw_Lines();
-        public List<cv.Point> lines = new List<cv.Point>(); // there are always an even number - 2 points define the line.
+        public List<CV.Point> lines = new List<CV.Point>(); // there are always an even number - 2 points define the line.
         public FitLine_Basics_CS(VBtask task) : base(task)
         {
             FindSlider("DrawCount").Value = 2;
@@ -21956,16 +21958,16 @@ namespace CS_Classes
             {
                 lines.Clear();
             }
-            cv.Point[][] contours = Cv2.FindContoursAsArray(dst3, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+            CV.Point[][] contours = Cv2.FindContoursAsArray(dst3, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
             for (int i = 0; i < contours.Length; i++)
             {
-                cv.Point[] tour = contours[i];
+                CV.Point[] tour = contours[i];
                 Line2D line2d = Cv2.FitLine(tour.ToArray(), DistanceTypes.L2, 0, options.radiusAccuracy, options.angleAccuracy);
                 double slope = line2d.Vy / line2d.Vx;
                 int leftY = (int)Math.Round(-line2d.X1 * slope + line2d.Y1);
                 int rightY = (int)Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1);
-                cv.Point p1 = new cv.Point(0, leftY);
-                cv.Point p2 = new cv.Point(src.Cols - 1, rightY);
+                CV.Point p1 = new CV.Point(0, leftY);
+                CV.Point p2 = new CV.Point(src.Cols - 1, rightY);
                 if (standaloneTest())
                 {
                     lines.Add(p1);
@@ -21993,8 +21995,8 @@ namespace CS_Classes
             double y = segment.Y1 * dst.Rows;
             double m = segment.Vx < 0.001 ? 0 : segment.Vy / segment.Vx; // vertical slope a no-no.
             double b = y - m * x;
-            cv.Point pt1 = new cv.Point(x, y);
-            cv.Point pt2 = m == 0 ? new cv.Point(x, dst.Rows) : new cv.Point((dst.Rows - b) / m, dst.Rows);
+            CV.Point pt1 = new CV.Point(x, y);
+            CV.Point pt2 = m == 0 ? new CV.Point(x, dst.Rows) : new CV.Point((dst.Rows - b) / m, dst.Rows);
             DrawLine(dst, pt1, pt2, Scalar.Red, task.lineWidth + 2);
         }
         public void RunCS(Mat src)
@@ -22011,7 +22013,7 @@ namespace CS_Classes
             {
                 Mat depth = task.pcSplit[2][roi];
                 Mat fMask = mask[roi];
-                List<cv.Point3f> points = new List<cv.Point3f>();
+                List<CV.Point3f> points = new List<CV.Point3f>();
                 int rows = src.Rows, cols = src.Cols;
                 for (int y = 0; y < roi.Height; y++)
                 {
@@ -22047,7 +22049,7 @@ namespace CS_Classes
             // putting this in the parallel for above causes a memory leak - could not find it...
             for (int i = 0; i < task.gridList.Count; i++)
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 houghShowLines3D(dst2[roi], lines[i]);
             }
         }
@@ -22076,12 +22078,12 @@ namespace CS_Classes
                 queries.Set<float>(0, 0, queryPoint.X);
                 queries.Set<float>(0, 1, queryPoint.Y);
                 // knnSearch
-                using (var nnIndex = new cv.Flann.Index(features, new cv.Flann.KDTreeIndexParams(4)))
+                using (var nnIndex = new CV.Flann.Index(features, new CV.Flann.KDTreeIndexParams(4)))
                 {
                     int knn = 1;
                     int[] indices;
                     float[] dists;
-                    nnIndex.KnnSearch(queries, out indices, out dists, knn, new cv.Flann.SearchParams(32));
+                    nnIndex.KnnSearch(queries, out indices, out dists, knn, new CV.Flann.SearchParams(32));
                     var output = "";
                     for (int i = 0; i < knn; i++)
                     {
@@ -22119,7 +22121,7 @@ namespace CS_Classes
             options.RunVB();
             if (options.reuseData == false || task.frameCount < 2 || task.mouseClickFlag)
                 random.Run(empty); // fill result1 with random points in x and y range of the image.
-            var features = cv.Mat.FromPixelData(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
+            var features = CV.Mat.FromPixelData(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
             int matchCount = Math.Min(options.matchCount, random.PointList.Count - 1);
             dst2.SetTo(Scalar.White);
             for (int i = 0; i < features.Rows; i++)
@@ -22135,19 +22137,19 @@ namespace CS_Classes
                     qArray[i] = new Point2f(new Random().Next(0, src.Width), new Random().Next(0, src.Height));
                 }
             }
-            var queries = cv.Mat.FromPixelData(options.queryCount, 2, MatType.CV_32F, qArray);
-            using (var nnIndex = new cv.Flann.Index(features, new cv.Flann.KDTreeIndexParams(matchCount)))
+            var queries = CV.Mat.FromPixelData(options.queryCount, 2, MatType.CV_32F, qArray);
+            using (var nnIndex = new CV.Flann.Index(features, new CV.Flann.KDTreeIndexParams(matchCount)))
             {
                 int[] indices;
                 float[] distances;
                 for (int i = 0; i < options.queryCount; i++)
                 {
-                    var pt1 = queries.Get<cv.Point2f>(i);
+                    var pt1 = queries.Get<CV.Point2f>(i);
                     var query = new Mat(1, 2, MatType.CV_32F);
                     query.Set<float>(0, 0, pt1.X);
                     query.Set<float>(0, 1, pt1.Y);
                     nnIndex.KnnSearch(query, out indices, out distances, matchCount, 
-                                      new cv.Flann.SearchParams(options.searchCheck, (float)options.eps, options.sorted));
+                                      new CV.Flann.SearchParams(options.searchCheck, (float)options.eps, options.sorted));
                     for (int j = 0; j < matchCount; j++)
                     {
                         int index = indices[j];
@@ -22168,7 +22170,7 @@ namespace CS_Classes
             output += "Play with the EPS and searchparams check count to see if that helps.\n\n";
             output += "If the 'Search check' is set to 25 and the 'Match count' is set to 4, it does appear to return to the top 4.\n";
             output += "Perhaps FLANN is only good enough to find a group of neighbors.  Use with caution.";
-            SetTrueText(output, new cv.Point(10, 50), 3);
+            SetTrueText(output, new CV.Point(10, 50), 3);
         }
     }
 
@@ -22234,7 +22236,7 @@ namespace CS_Classes
             dst1 = stats.dst1;
             dst2 = flood.dst2;
             SetTrueText(stats.strOut, 3);
-            if (task.ClickPoint == new cv.Point())
+            if (task.ClickPoint == new CV.Point())
             {
                 if (task.redCells.Count > 1)
                 {
@@ -22373,7 +22375,7 @@ namespace CS_Classes
         Flood_Basics flood = new Flood_Basics();
         List<rcData> redCells = new List<rcData>();
         Mat cellMap = new Mat();
-        List<cv.Point2f> maxDists = new List<cv.Point2f>();
+        List<CV.Point2f> maxDists = new List<CV.Point2f>();
         List<int> maxIndex = new List<int>();
         public Flood_Motion_CS(VBtask task) : base(task)
         {
@@ -22425,7 +22427,7 @@ namespace CS_Classes
         Flood_Basics flood = new Flood_Basics();
         Motion_Basics motion = new Motion_Basics();
         List<rcData> redCells = new List<rcData>();
-        List<cv.Point2f> maxDists = new List<cv.Point2f>();
+        List<CV.Point2f> maxDists = new List<CV.Point2f>();
         List<int> maxIndex = new List<int>();
         public Flood_Motion1_CS(VBtask task) : base(task)
         {
@@ -22480,8 +22482,8 @@ namespace CS_Classes
         public List<rcData> cellsRight = new List<rcData>();
         public Flood_LeftRight_CS(VBtask task) : base(task)
         {
-            mapLeft = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            mapRight = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            mapLeft = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            mapRight = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             task.redOptions.setIdentifyCells(false);
             if (standalone) task.gOptions.setDisplay1();
             desc = "Floodfill left and right images.";
@@ -22583,9 +22585,9 @@ namespace CS_Classes
             for (int i = 1; i <= 10; i++)
             {
                 double size = 1.5 - i * 0.1;
-                Cv2.PutText(dst2, $"{hersheyName} {size:F1}", new cv.Point(10, 30 + i * 30), hersheyFont, size, Scalar.White, task.lineWidth, task.lineType);
+                Cv2.PutText(dst2, $"{hersheyName} {size:F1}", new CV.Point(10, 30 + i * 30), hersheyFont, size, Scalar.White, task.lineWidth, task.lineType);
                 HersheyFonts hersheyFontItalics = hersheyFont | HersheyFonts.Italic;
-                Cv2.PutText(dst3, $"{hersheyName} {size:F1}", new cv.Point(10, 30 + i * 30), hersheyFontItalics, size, Scalar.White, task.lineWidth, task.lineType);
+                Cv2.PutText(dst3, $"{hersheyName} {size:F1}", new CV.Point(10, 30 + i * 30), hersheyFontItalics, size, Scalar.White, task.lineWidth, task.lineType);
             }
         }
     }
@@ -22684,7 +22686,7 @@ namespace CS_Classes
         public Foreground_Basics_CS(VBtask task) : base(task)
         {
             labels[3] = "Foreground - all the KMeans classes up to and including the first class over 1 meter.";
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find the first KMeans class with depth over 1 meter and use it to define foreground";
         }
         public void RunCS(Mat src)
@@ -22737,8 +22739,8 @@ namespace CS_Classes
         {
             FindSlider("KMeans k").Value = 2;
             labels = new string[] { "", "", "Foreground Mask", "Background Mask" };
-            dst2 = new Mat(task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(task.WorkingRes, MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(task.WorkingRes, MatType.CV_8U, CV.Scalar.All(0));
             desc = "Separate foreground and background using Kmeans with k=2.";
         }
         public void RunCS(Mat src)
@@ -22903,7 +22905,7 @@ namespace CS_Classes
         public Options_Fractal options = new Options_Fractal();
         public Fractal_Mandelbrot_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels[2] = "Use the iteration slider to see the impact of the number of iterations.";
             desc = "Run the classic Mandalbrot algorithm";
         }
@@ -22949,7 +22951,7 @@ namespace CS_Classes
     public class Fractal_MandelbrotZoom_CS : CS_Parent
     {
         public Fractal_Mandelbrot mandel = new Fractal_Mandelbrot();
-        cv.Rect saveDrawRect = new cv.Rect(1, 1, 1, 1);
+        CV.Rect saveDrawRect = new CV.Rect(1, 1, 1, 1);
         public Fractal_MandelbrotZoom_CS(VBtask task) : base(task)
         {
             desc = "Run the classic Mandalbrot algorithm and allow zooming in";
@@ -23007,7 +23009,7 @@ namespace CS_Classes
         Fractal_MandelbrotZoomColor mandel = new Fractal_MandelbrotZoomColor();
         double rt = 0.282;
         double mt = -0.58;
-        cv.Point savedMouse = new cv.Point(-1, -1);
+        CV.Point savedMouse = new CV.Point(-1, -1);
         System.Windows.Forms.CheckBox resetCheck;
         public Fractal_Julia_CS(VBtask task) : base(task)
         {
@@ -23038,7 +23040,7 @@ namespace CS_Classes
                 int detail = 1;
                 int depth = 100;
                 int r = 2;
-                dst2 = new Mat(src.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                dst2 = new Mat(src.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 Fractal_Mandelbrot m = mandel.zoom.mandel;
                 rt = m.startX + (m.endX - m.startX) * task.mouseMovePoint.X / src.Width;
                 mt = m.startY + (m.endY - m.startY) * task.mouseMovePoint.Y / src.Height;
@@ -23065,7 +23067,7 @@ namespace CS_Classes
         RedCloud_Basics redC = new RedCloud_Basics();
         public Fractal_Dimension_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)" };
             desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete.";
         }
@@ -23112,13 +23114,13 @@ namespace CS_Classes
             redC.Run(src);
             dst2 = redC.dst2;
             dst3.SetTo(0);
-            cv.Rect rect = new cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height);
+            CV.Rect rect = new CV.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height);
             if (task.optionsChanged || task.mouseClickFlag)
             {
-                rect = new cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height);
+                rect = new CV.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height);
             }
             if (task.rc.rect.Width == 0 || task.rc.rect.Height == 0) return;
-            task.rc.mask.CopyTo(dst3[new cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)]);
+            task.rc.mask.CopyTo(dst3[new CV.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)]);
             if (rect.Width < rect.Height) rect.Width = rect.Height; else rect.Height = rect.Width;
             dst3.Rectangle(rect, Scalar.White, task.lineWidth, task.lineType);
         }
@@ -23192,8 +23194,8 @@ namespace CS_Classes
                 if (i == 1) mats.mat[i] = task.leftView.Clone();
                 if (i == 2) mats.mat[i] = task.rightView.Clone();
                 if (i == 3) mats.mat[i] = task.depthRGB.Clone();
-                mats.mat[i] = mats.mat[i].CvtColor(cv.ColorConversionCodes.BGR2GRAY);
-                lastImages[i] = lastImages[i].CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                mats.mat[i] = mats.mat[i].CvtColor(CV.ColorConversionCodes.BGR2GRAY);
+                lastImages[i] = lastImages[i].CvtColor(CV.ColorConversionCodes.BGR2GRAY);
                 mats.mat[i] -= lastImages[i];
                 var count = mats.mat[i].CountNonZero();
                 if (count > 0) frameCounts[i]++;
@@ -23235,7 +23237,7 @@ namespace CS_Classes
         {
             orb.Run(src);
             dst1 = orb.dst2;
-            var freak = cv.XFeatures2D.FREAK.Create();
+            var freak = CV.XFeatures2D.FREAK.Create();
             Mat fdesc = new Mat();
             List<KeyPoint> keypoints = orb.keypoints.ToList();
             freak.Compute(src.CvtColor(ColorConversionCodes.BGR2GRAY), ref orb.keypoints, fdesc);
@@ -23244,8 +23246,8 @@ namespace CS_Classes
             {
                 var r = kpt.Size / 8;
                 DrawCircle(dst2, kpt.Pt, (int)r, Scalar.Green);
-                DrawLine(dst2, new cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), new cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), Scalar.Green, task.lineWidth);
-                DrawLine(dst2, new cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), new cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), Scalar.Green, task.lineWidth);
+                DrawLine(dst2, new CV.Point(kpt.Pt.X + r, kpt.Pt.Y + r), new CV.Point(kpt.Pt.X - r, kpt.Pt.Y - r), Scalar.Green, task.lineWidth);
+                DrawLine(dst2, new CV.Point(kpt.Pt.X + r, kpt.Pt.Y - r), new CV.Point(kpt.Pt.X - r, kpt.Pt.Y + r), Scalar.Green, task.lineWidth);
             }
             labels[2] = orb.keypoints.Count().ToString() + " key points were identified";
             labels[3] = orb.keypoints.Count().ToString() + " FREAK Descriptors (resized) One row = keypoint";
@@ -23261,7 +23263,7 @@ namespace CS_Classes
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Options_Contours options = new Options_Contours();
-        public cv.Point[][] contours;
+        public CV.Point[][] contours;
         public SortedList<int, Vec2i> sortContours = new SortedList<int, Vec2i>(new compareAllowIdenticalIntegerInverted());
         public Fuzzy_Basics_CPP_CS(VBtask task) : base(task)
         {
@@ -23285,7 +23287,7 @@ namespace CS_Classes
             var handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             var imagePtr = Fuzzy_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst0.Rows, dst0.Cols);
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_8UC1, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_8UC1, imagePtr).Clone();
             dst3 = dst2.Threshold(0, 255, ThresholdTypes.BinaryInv);
             Mat tmp = new Mat();
             if (options.retrievalMode == RetrievalModes.CComp || options.retrievalMode == RetrievalModes.FloodFill)
@@ -23319,7 +23321,7 @@ namespace CS_Classes
                     }
                     if (maskID != 0) break;
                 }
-                sortContours.Add(contours[i].Length, new cv.Point(i, maskID));
+                sortContours.Add(contours[i].Length, new CV.Point(i, maskID));
             }
             dst1 = ShowPalette(dst2 * 255 / reduction.classCount);
             dst1.SetTo(0, dst3);
@@ -23338,13 +23340,13 @@ namespace CS_Classes
     {
         Mat kernel;
         Reduction_Basics reduction = new Reduction_Basics();
-        public cv.Point[][] contours;
+        public CV.Point[][] contours;
         public SortedList<int, Vec2i> sortContours = new SortedList<int, Vec2i>(new compareAllowIdenticalIntegerInverted());
         Options_Contours options = new Options_Contours();
         public Fuzzy_Filter_CS(VBtask task) : base(task)
         {
             float[] array = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-            kernel = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, array);
+            kernel = CV.Mat.FromPixelData(3, 3, MatType.CV_32F, array);
             kernel *= 1 / 9.0;
             desc = "Use a 2D filter to find smooth areas";
         }
@@ -23391,7 +23393,7 @@ namespace CS_Classes
                     }
                     if (maskID != 0) break;
                 }
-                sortContours.Add(contours[i].Length, new cv.Point(i, maskID));
+                sortContours.Add(contours[i].Length, new CV.Point(i, maskID));
             }
             dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount);
             dst2.SetTo(0, dst3);
@@ -23457,7 +23459,7 @@ namespace CS_Classes
                     }
                 }
             }
-            SetTrueText("Results are valid.\nMask ID's for all contour points in each region identified only one region.", new cv.Point(10, 50), 3);
+            SetTrueText("Results are valid.\nMask ID's for all contour points in each region identified only one region.", new CV.Point(10, 50), 3);
         }
     }
 
@@ -23467,11 +23469,11 @@ namespace CS_Classes
     public class Fuzzy_TrackerDepth_CS : CS_Parent
     {
         public Fuzzy_Basics fuzzy = new Fuzzy_Basics();
-        public List<cv.Point> centroids = new List<cv.Point>();
-        public List<cv.Rect> rects = new List<cv.Rect>();
+        public List<CV.Point> centroids = new List<CV.Point>();
+        public List<CV.Rect> rects = new List<CV.Rect>();
         public List<int> layoutColor = new List<int>();
-        public cv.Point highlightPoint;
-        public cv.Rect highlightRect;
+        public CV.Point highlightPoint;
+        public CV.Rect highlightRect;
         public int highlightRegion = -1;
         Options_TrackerDepth options = new Options_TrackerDepth();
         public Fuzzy_TrackerDepth_CS(VBtask task) : base(task)
@@ -23490,15 +23492,15 @@ namespace CS_Classes
             foreach (var vec in fuzzy.sortContours.Values)
             {
                 var contours = fuzzy.contours[vec[0]];
-                var points = cv.Mat.FromPixelData(contours.Length, 1, MatType.CV_32SC2, contours);
+                var points = CV.Mat.FromPixelData(contours.Length, 1, MatType.CV_32SC2, contours);
                 var center = points.Sum();
-                points = cv.Mat.FromPixelData(contours.Length, 2, MatType.CV_32S, contours);
+                points = CV.Mat.FromPixelData(contours.Length, 2, MatType.CV_32S, contours);
                 points.Col(0).MinMaxIdx(out minX, out maxX);
                 points.Col(1).MinMaxIdx(out minY, out maxY);
-                var rect = new cv.Rect((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
+                var rect = new CV.Rect((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
                 if (rect.Width * rect.Height > options.minRectSize)
                 {
-                    var centroid = new cv.Point((int)(center[0] / contours.Length), (int)(center[1] / contours.Length));
+                    var centroid = new CV.Point((int)(center[0] / contours.Length), (int)(center[1] / contours.Length));
                     centroids.Add(centroid);
                     rects.Add(rect);
                     layoutColor.Add(vec[1]);
@@ -23520,8 +23522,8 @@ namespace CS_Classes
     public class Fuzzy_TrackerDepthClick_CS : CS_Parent
     {
         public Fuzzy_TrackerDepth tracker = new Fuzzy_TrackerDepth();
-        public cv.Point highlightPoint;
-        public cv.Rect highlightRect;
+        public CV.Point highlightPoint;
+        public CV.Rect highlightRect;
         public int highlightRegion = -1;
         public Mat regionMask;
         public Fuzzy_TrackerDepthClick_CS(VBtask task) : base(task)
@@ -23532,7 +23534,7 @@ namespace CS_Classes
         {
             tracker.Run(src);
             dst2 = tracker.dst2;
-            if (highlightRegion < 0) SetTrueText("Click any color region to get more details and track it", new cv.Point(10, 50), 3);
+            if (highlightRegion < 0) SetTrueText("Click any color region to get more details and track it", new CV.Point(10, 50), 3);
             dst3 = tracker.fuzzy.dst1;
             if (task.mouseClickFlag)
             {
@@ -23573,8 +23575,8 @@ namespace CS_Classes
         public Mat fgFineTune;
         public Mat bgFineTune;
         public Foreground_Basics fore = new Foreground_Basics();
-        Mat bgModel = new Mat(1, 65, MatType.CV_64F, cv.Scalar.All(0));
-        Mat fgModel = new Mat(1, 65, MatType.CV_64F, cv.Scalar.All(0));
+        Mat bgModel = new Mat(1, 65, MatType.CV_64F, CV.Scalar.All(0));
+        Mat fgModel = new Mat(1, 65, MatType.CV_64F, CV.Scalar.All(0));
         public GrabCut_Basics_CS(VBtask task) : base(task)
         {
             desc = "Use Foreground_Basics to define the foreground for use in GrabCut.";
@@ -23584,16 +23586,16 @@ namespace CS_Classes
             fore.Run(src);
             dst2 = fore.dst2;
             dst3 = fore.dst3;
-            dst0 = new Mat(dst0.Size(), MatType.CV_8U, cv.Scalar.All((double)GrabCutClasses.PR_BGD));
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, CV.Scalar.All((double)GrabCutClasses.PR_BGD));
             dst0.SetTo((double)GrabCutClasses.FGD, fore.fg);
             dst0.SetTo((double)GrabCutClasses.BGD, fore.bg);
-            // Cv2.GrabCut(src, dst0, new cv.Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
+            // Cv2.GrabCut(src, dst0, new CV.Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
             fore.bg = ~fore.fg;
             if (Cv2.CountNonZero(fore.fg) > 0)
             {
                 if (fgFineTune != null) dst0.SetTo((double)GrabCutClasses.FGD, fgFineTune);
                 if (bgFineTune != null) dst0.SetTo((double)GrabCutClasses.BGD, bgFineTune);
-                Cv2.GrabCut(src, dst0, new cv.Rect(), bgModel, fgModel, 1, GrabCutModes.Eval);
+                Cv2.GrabCut(src, dst0, new CV.Rect(), bgModel, fgModel, 1, GrabCutModes.Eval);
             }
             dst3.SetTo(0);
             src.CopyTo(dst3, dst0);
@@ -23610,10 +23612,10 @@ namespace CS_Classes
         Mat image;
         Mat bgModel = new Mat();
         Mat fgModel = new Mat();
-        cv.Rect bgRect1 = new cv.Rect(482, 0, 128, 640);
-        cv.Rect bgRect2 = new cv.Rect(0, 0, 162, 320);
-        cv.Rect fgRect1 = new cv.Rect(196, 134, 212, 344);
-        cv.Rect fgRect2 = new cv.Rect(133, 420, 284, 60);
+        CV.Rect bgRect1 = new CV.Rect(482, 0, 128, 640);
+        CV.Rect bgRect2 = new CV.Rect(0, 0, 162, 320);
+        CV.Rect fgRect1 = new CV.Rect(196, 134, 212, 344);
+        CV.Rect fgRect2 = new CV.Rect(133, 420, 284, 60);
         public GrabCut_ImageRect_CS(VBtask task) : base(task)
         {
             var fileInputName = new FileInfo(task.HomeDir + "data/cat.jpg");
@@ -23623,7 +23625,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             dst2 = image;
-            dst0 = new Mat(image.Size(), MatType.CV_8U, cv.Scalar.All((double)GrabCutClasses.PR_BGD));
+            dst0 = new Mat(image.Size(), MatType.CV_8U, CV.Scalar.All((double)GrabCutClasses.PR_BGD));
             dst0[bgRect1].SetTo((double)GrabCutClasses.BGD);
             dst0[bgRect2].SetTo((double)GrabCutClasses.BGD);
             dst0[fgRect1].SetTo((double)GrabCutClasses.FGD);
@@ -23635,10 +23637,10 @@ namespace CS_Classes
                 Cv2.GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, GrabCutModes.InitWithRect);
                 Cv2.GrabCut(dst2, dst0, fgRect2, bgModel, fgModel, 1, GrabCutModes.InitWithRect);
             }
-            var rect = new cv.Rect();
+            var rect = new CV.Rect();
             Cv2.GrabCut(dst2, dst0, rect, bgModel, fgModel, 1, GrabCutModes.Eval);
             dst3.SetTo(0);
-            dst2.CopyTo(dst3, dst0 + cv.Scalar.All(1));
+            dst2.CopyTo(dst3, dst0 + CV.Scalar.All(1));
         }
     }
 
@@ -23660,17 +23662,17 @@ namespace CS_Classes
             if (task.heartBeat)
             {
                 dst2 = image;
-                dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, ThresholdTypes.Binary);
-                dst1 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All((double)GrabCutClasses.PR_BGD));
+                dst0 = dst2.CvtColor(CV.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, ThresholdTypes.Binary);
+                dst1 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All((double)GrabCutClasses.PR_BGD));
                 dst1.SetTo((double)GrabCutClasses.FGD, dst0);
-                Cv2.GrabCut(dst2, dst1, new cv.Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
+                Cv2.GrabCut(dst2, dst1, new CV.Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
             }
             else
             {
-                Cv2.GrabCut(dst2, dst1, new cv.Rect(), bgModel, fgModel, 5, GrabCutModes.Eval);
+                Cv2.GrabCut(dst2, dst1, new CV.Rect(), bgModel, fgModel, 5, GrabCutModes.Eval);
             }
             dst3.SetTo(0);
-            dst2.CopyTo(dst3, dst1 + cv.Scalar.All(1));
+            dst2.CopyTo(dst3, dst1 + CV.Scalar.All(1));
         }
     }
 
@@ -23695,8 +23697,8 @@ namespace CS_Classes
             options.RunVB();
             if (options.clearAll || basics.fgFineTune == null)
             {
-                basics.fgFineTune = new Mat(src.Size(), MatType.CV_8U, cv.Scalar.All(0));
-                basics.bgFineTune = new Mat(src.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                basics.fgFineTune = new Mat(src.Size(), MatType.CV_8U, CV.Scalar.All(0));
+                basics.bgFineTune = new Mat(src.Size(), MatType.CV_8U, CV.Scalar.All(0));
             }
             if (saveRadio != options.fineTuning)
             {
@@ -23734,7 +23736,7 @@ namespace CS_Classes
         public Edge_Sobel sobel = new Edge_Sobel();
         public Gradient_Basics_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst2.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            dst3 = new Mat(dst2.Size(), MatType.CV_32F, CV.Scalar.All(0));
             labels = new string[] { "", "", "Gradient_Basics_CS - Sobel output", "Phase Output" };
             desc = "Use phase to compute gradient";
         }
@@ -23837,16 +23839,16 @@ namespace CS_Classes
 
     public class Gravity_Basics_CS : CS_Parent
     {
-        public List<cv.Point> points = new List<cv.Point>();
+        public List<CV.Point> points = new List<CV.Point>();
         int resizeRatio = 1;
         public PointPair vec = new PointPair();
         public bool autoDisplay;
         public Gravity_Basics_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find all the points where depth X-component transitions from positive to negative";
         }
-        public void displayResults(Point2f p1, cv.Point2f p2)
+        public void displayResults(Point2f p1, CV.Point2f p2)
         {
             if (task.heartBeat)
             {
@@ -23857,7 +23859,7 @@ namespace CS_Classes
             dst3.SetTo(0);
             foreach (var pt in points)
             {
-                var newPt = new cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio);
+                var newPt = new CV.Point(pt.X * resizeRatio, pt.Y * resizeRatio);
                 DrawCircle(dst2, newPt, task.DotSize, Scalar.White);
             }
             DrawLine(dst2, vec.p1, vec.p2, Scalar.White, task.lineWidth);
@@ -23887,16 +23889,16 @@ namespace CS_Classes
                     dst0.Row(i).Set<float>(mm1.minLoc.Y, mm1.minLoc.X, 10);
                     var mm2 = GetMinMax(dst0.Row(i));
                     if (mm2.minVal > 0 && Math.Abs(mm1.minLoc.X - mm2.minLoc.X) <= 1)
-                        points.Add(new cv.Point(mm1.minLoc.X, i));
+                        points.Add(new CV.Point(mm1.minLoc.X, i));
                 }
             }
             labels[2] = points.Count.ToString() + " points found. ";
-            cv.Point p1 = new cv.Point();
-            cv.Point p2 = new cv.Point();
+            CV.Point p1 = new CV.Point();
+            CV.Point p2 = new CV.Point();
             if (points.Count >= 2)
             {
-                p1 = new cv.Point(resizeRatio * points[points.Count - 1].X, resizeRatio * points[points.Count - 1].Y);
-                p2 = new cv.Point(resizeRatio * points[0].X, resizeRatio * points[0].Y);
+                p1 = new CV.Point(resizeRatio * points[points.Count - 1].X, resizeRatio * points[points.Count - 1].Y);
+                p2 = new CV.Point(resizeRatio * points[0].X, resizeRatio * points[0].Y);
             }
             var distance = p1.DistanceTo(p2);
             if (distance < 10) // enough to get a line with some credibility
@@ -23924,7 +23926,7 @@ namespace CS_Classes
         public PointPair vec = new PointPair();
         public Gravity_BasicsOriginal_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Search for the transition from positive to negative to find the gravity vector.";
         }
         Point2f findTransition(int startRow, int stopRow, int stepRow)
@@ -23949,7 +23951,7 @@ namespace CS_Classes
                     }
                 }
             }
-            return new cv.Point();
+            return new CV.Point();
         }
         public void RunCS(Mat src)
         {
@@ -23970,7 +23972,7 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 dst2.SetTo(0);
-                DrawLine(dst2, vec.p1, vec.p2, cv.Scalar.All(255), task.lineWidth);
+                DrawLine(dst2, vec.p1, vec.p2, CV.Scalar.All(255), task.lineWidth);
             }
         }
     }
@@ -24081,7 +24083,7 @@ namespace CS_Classes
                 else lastColor = colors[i];
             }
             dst1 = task.rightView;
-            Mat colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colors);
+            Mat colorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colors);
             Cv2.ApplyColorMap(task.leftView, dst3, colorMap);
         }
     }
@@ -24091,7 +24093,7 @@ namespace CS_Classes
 
     public class Grid_Basics_CS : CS_Parent
     {
-        public List<cv.Rect> gridList = new List<cv.Rect>();
+        public List<CV.Rect> gridList = new List<CV.Rect>();
         public bool updateTaskGridList = true;
         public Grid_Basics_CS(VBtask task) : base(task)
         {
@@ -24107,7 +24109,7 @@ namespace CS_Classes
             {
                 task.gridSize = task.gOptions.getGridSize();
                 task.gridMask = new Mat(src.Size(), MatType.CV_8U);
-                task.gridMap = new Mat(src.Size(), MatType.CV_32S, cv.Scalar.All(255));
+                task.gridMap = new Mat(src.Size(), MatType.CV_32S, CV.Scalar.All(255));
                 gridList.Clear();
                 task.gridIndex.Clear();
                 task.gridRows = 0;
@@ -24117,7 +24119,7 @@ namespace CS_Classes
                 {
                     for (int x = 0; x < src.Width; x += task.gridSize)
                     {
-                        var roi = ValidateRect(new cv.Rect(x, y, task.gridSize, task.gridSize));
+                        var roi = ValidateRect(new CV.Rect(x, y, task.gridSize, task.gridSize));
                         if (roi.Width > 0 && roi.Height > 0)
                         {
                             if (x == 0) task.gridRows += 1;
@@ -24135,20 +24137,20 @@ namespace CS_Classes
                     task.gridMask.SetTo(0);
                     for (int x = task.gridSize; x < src.Width; x += task.gridSize)
                     {
-                        var p1 = new cv.Point(x, 0);
-                        var p2 = new cv.Point(x, src.Height);
-                        task.gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
+                        var p1 = new CV.Point(x, 0);
+                        var p2 = new CV.Point(x, src.Height);
+                        task.gridMask.Line(p1, p2, CV.Scalar.All(255), task.lineWidth);
                     }
                     for (int y = task.gridSize; y < src.Height; y += task.gridSize)
                     {
-                        var p1 = new cv.Point(0, y);
-                        var p2 = new cv.Point(src.Width, y);
-                        task.gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
+                        var p1 = new CV.Point(0, y);
+                        var p2 = new CV.Point(src.Width, y);
+                        task.gridMask.Line(p1, p2, CV.Scalar.All(255), task.lineWidth);
                     }
                     for (int i = 0; i < gridList.Count; i++)
                     {
-                        cv.Rect roi = gridList[i];
-                        task.gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
+                        CV.Rect roi = gridList[i];
+                        task.gridMap.Rectangle(roi, CV.Scalar.All(i), -1);
                     }
                     task.gridNeighbors.Clear();
                     int xx = 0, yy = 0;
@@ -24238,7 +24240,7 @@ namespace CS_Classes
             {
                 var roi = task.gridList[i];
                 Cv2.Subtract(mean, src[roi], dst2[roi]);
-                SetTrueText(i.ToString(), new cv.Point(roi.X, roi.Y));
+                SetTrueText(i.ToString(), new CV.Point(roi.X, roi.Y));
             }
             dst2.SetTo(Scalar.White, task.gridMask);
             dst3.SetTo(0);
@@ -24246,7 +24248,7 @@ namespace CS_Classes
             {
                 var roi = task.gridList[i];
                 Cv2.Subtract(mean, src[roi], dst3[roi]);
-                DrawLine(dst3[roi], new cv.Point(0, 0), new cv.Point(roi.Width, roi.Height), Scalar.White, task.lineWidth);
+                DrawLine(dst3[roi], new CV.Point(0, 0), new CV.Point(roi.Width, roi.Height), Scalar.White, task.lineWidth);
             });
         }
     }
@@ -24316,7 +24318,7 @@ namespace CS_Classes
                 {
                     for (int x = 0; x < dst2.Width; x += options.width)
                     {
-                        var roi = new cv.Rect(x, y, options.width, options.height);
+                        var roi = new CV.Rect(x, y, options.width, options.height);
                         if (x + roi.Width >= dst2.Width) roi.Width = dst2.Width - x;
                         if (y + roi.Height >= dst2.Height) roi.Height = dst2.Height - y;
                         if (roi.Width > 0 && roi.Height > 0)
@@ -24330,20 +24332,20 @@ namespace CS_Classes
                 task.gridMask.SetTo(0);
                 for (int x = options.width; x < dst2.Width; x += options.width)
                 {
-                    var p1 = new cv.Point(x, 0);
-                    var p2 = new cv.Point(x, dst2.Height);
-                    task.gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
+                    var p1 = new CV.Point(x, 0);
+                    var p2 = new CV.Point(x, dst2.Height);
+                    task.gridMask.Line(p1, p2, CV.Scalar.All(255), task.lineWidth);
                 }
                 for (int y = options.height; y < dst2.Height; y += options.height)
                 {
-                    var p1 = new cv.Point(0, y);
-                    var p2 = new cv.Point(dst2.Width, y);
-                    task.gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
+                    var p1 = new CV.Point(0, y);
+                    var p2 = new CV.Point(dst2.Width, y);
+                    task.gridMask.Line(p1, p2, CV.Scalar.All(255), task.lineWidth);
                 }
                 for (int i = 0; i < task.gridList.Count; i++)
                 {
                     var roi = task.gridList[i];
-                    task.gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
+                    task.gridMap.Rectangle(roi, CV.Scalar.All(i), -1);
                 }
             }
             if (standaloneTest())
@@ -24417,7 +24419,7 @@ namespace CS_Classes
                 if (task.heartBeat)
                 {
                     task.mouseClickFlag = true;
-                    task.ClickPoint = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    task.ClickPoint = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                 }
             }
             SetTrueText("Click any grid entry to see its neighbors", 3);
@@ -24443,7 +24445,7 @@ namespace CS_Classes
     {
         public int gridWidth = 10;
         public int gridHeight = 10;
-        public List<cv.Rect> gridList = new List<cv.Rect>();
+        public List<CV.Rect> gridList = new List<CV.Rect>();
         public int gridRows;
         public int gridCols;
         public Mat gridMask;
@@ -24467,7 +24469,7 @@ namespace CS_Classes
                 {
                     for (int x = 0; x < dst2.Width; x += gridWidth)
                     {
-                        var roi = new cv.Rect(x, y, gridWidth, gridHeight);
+                        var roi = new CV.Rect(x, y, gridWidth, gridHeight);
                         if (x + roi.Width >= dst2.Width) roi.Width = dst2.Width - x;
                         if (y + roi.Height >= dst2.Height) roi.Height = dst2.Height - y;
                         if (roi.Width > 0 && roi.Height > 0)
@@ -24481,20 +24483,20 @@ namespace CS_Classes
                 gridMask.SetTo(0);
                 for (int x = gridWidth; x < dst2.Width; x += gridWidth)
                 {
-                    var p1 = new cv.Point(x, 0);
-                    var p2 = new cv.Point(x, dst2.Height);
-                    gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
+                    var p1 = new CV.Point(x, 0);
+                    var p2 = new CV.Point(x, dst2.Height);
+                    gridMask.Line(p1, p2, CV.Scalar.All(255), task.lineWidth);
                 }
                 for (int y = gridHeight; y < dst2.Height; y += gridHeight)
                 {
-                    var p1 = new cv.Point(0, y);
-                    var p2 = new cv.Point(dst2.Width, y);
-                    gridMask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth);
+                    var p1 = new CV.Point(0, y);
+                    var p2 = new CV.Point(dst2.Width, y);
+                    gridMask.Line(p1, p2, CV.Scalar.All(255), task.lineWidth);
                 }
                 for (int i = 0; i < task.gridList.Count; i++)
                 {
                     var roi = gridList[i];
-                    gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
+                    gridMap.Rectangle(roi, CV.Scalar.All(i), -1);
                 }
                 gridNeighbors.Clear();
                 foreach (var roi in gridList)
@@ -24545,12 +24547,12 @@ namespace CS_Classes
 
     public class Grid_QuarterRes_CS : CS_Parent
     {
-        public List<cv.Rect> gridList = new List<cv.Rect>();
+        public List<CV.Rect> gridList = new List<CV.Rect>();
         Grid_Basics grid = new Grid_Basics();
         Mat inputSrc;
         public Grid_QuarterRes_CS(VBtask task) : base(task)
         {
-            inputSrc = new Mat(task.quarterRes, MatType.CV_8U, cv.Scalar.All(0));
+            inputSrc = new Mat(task.quarterRes, MatType.CV_8U, CV.Scalar.All(0));
             grid.updateTaskGridList = false;
             desc = "Provide the grid list for the lowest resolution of the current stream.";
         }
@@ -24607,7 +24609,7 @@ namespace CS_Classes
 
     public class Grid_TrackCenter_CS : CS_Parent
     {
-        public cv.Point center;
+        public CV.Point center;
         Match_Basics match = new Match_Basics();
         public Grid_TrackCenter_CS(VBtask task) : base(task)
         {
@@ -24622,11 +24624,11 @@ namespace CS_Classes
                 int index = task.gridMap.Get<int>(dst2.Height / 2, dst2.Width / 2);
                 var roi = task.gridList[index];
                 match.template = src[roi].Clone();
-                center = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
+                center = new CV.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
             }
             int templatePad = match.options.templatePad;
             int templateSize = match.options.templateSize;
-            match.searchRect = ValidateRect(new cv.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize));
+            match.searchRect = ValidateRect(new CV.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize));
             match.Run(src);
             center = match.matchCenter;
             if (standaloneTest())
@@ -24668,22 +24670,22 @@ namespace CS_Classes
         Mat sideMap = new Mat();
         public GuidedBP_Basics_CS(VBtask task) : base(task)
         {
-            topMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            sideMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            topMap = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            sideMap = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Correlate the hot points with the previous generation using a Map";
         }
-        void runMap(List<cv.Rect> rectList, int dstindex, Mat map)
+        void runMap(List<CV.Rect> rectList, int dstindex, Mat map)
         {
-            var sortRects = new SortedList<int, cv.Rect>(new compareAllowIdenticalIntegerInverted());
-            foreach (cv.Rect r in rectList)
+            var sortRects = new SortedList<int, CV.Rect>(new compareAllowIdenticalIntegerInverted());
+            foreach (CV.Rect r in rectList)
             {
                 sortRects.Add(r.Width * r.Height, r);
             }
-            var ptList = new List<cv.Point>();
+            var ptList = new List<CV.Point>();
             var indices = new List<int>();
             foreach (var r in sortRects.Values)
             {
-                var pt = new cv.Point((int)(r.X + r.Width / 2), (int)(r.Y + r.Height / 2));
+                var pt = new CV.Point((int)(r.X + r.Width / 2), (int)(r.Y + r.Height / 2));
                 int index = (int)map.At<byte>(pt.Y, pt.X);
                 if (index == 0 || indices.Contains(index))
                 {
@@ -24695,9 +24697,9 @@ namespace CS_Classes
             map.SetTo(0);
             foreach (var r in sortRects.Values)
             {
-                var pt = new cv.Point((int)(r.X + r.Width / 2), (int)(r.Y + r.Height / 2));
+                var pt = new CV.Point((int)(r.X + r.Width / 2), (int)(r.Y + r.Height / 2));
                 var index = indices[ptList.IndexOf(pt)];
-                map.Rectangle(r, cv.Scalar.All(index), -1);
+                map.Rectangle(r, CV.Scalar.All(index), -1);
                 SetTrueText(index.ToString(), pt, dstindex);
             }
         }
@@ -24725,14 +24727,14 @@ namespace CS_Classes
         {
             desc = "Correlate the hot points with the previous generation to ID each object";
         }
-        void runKNN(KNN_Core knn, List<cv.Rect> rectList, Mat dst, int dstindex)
+        void runKNN(KNN_Core knn, List<CV.Rect> rectList, Mat dst, int dstindex)
         {
             knn.queries.Clear();
             foreach (var r in rectList)
             {
                 knn.queries.Add(new Point2f((float)(r.X + r.Width / 2), (float)(r.Y + r.Height / 2)));
             }
-            if (task.FirstPass) knn.trainInput = new List<cv.Point2f>(knn.queries);
+            if (task.FirstPass) knn.trainInput = new List<CV.Point2f>(knn.queries);
             knn.Run(empty);
             for (int i = 0; i < knn.queries.Count; i++)
             {
@@ -24744,11 +24746,11 @@ namespace CS_Classes
                 if (dist < r.Width / 2 && dist < r.Height / 2)
                 {
                     dst.Rectangle(r, Scalar.White, task.lineWidth);
-                    var pt = new cv.Point(r.X + r.Width, r.Y + r.Height);
+                    var pt = new CV.Point(r.X + r.Width, r.Y + r.Height);
                     SetTrueText(index.ToString(), pt, dstindex);
                 }
             }
-            knn.trainInput = new List<cv.Point2f>(knn.queries);
+            knn.trainInput = new List<CV.Point2f>(knn.queries);
         }
         public void RunCS(Mat src)
         {
@@ -24769,38 +24771,38 @@ namespace CS_Classes
     {
         public Projection_HistTop histTop = new Projection_HistTop();
         public Projection_HistSide histSide = new Projection_HistSide();
-        public List<cv.Rect> topRects = new List<cv.Rect>();
-        public List<cv.Rect> sideRects = new List<cv.Rect>();
-        cv.Rect floodRect;
+        public List<CV.Rect> topRects = new List<CV.Rect>();
+        public List<CV.Rect> sideRects = new List<CV.Rect>();
+        CV.Rect floodRect;
         Mat mask;
         public GuidedBP_HotPoints_CS(VBtask task) : base(task)
         {
-            floodRect = new cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2);
-            mask = new Mat(new cv.Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U);
+            floodRect = new CV.Rect(1, 1, dst2.Width - 2, dst2.Height - 2);
+            mask = new Mat(new CV.Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U);
             task.useXYRange = false;
             desc = "Use floodfill to identify all the objects in both the top and side views.";
         }
-        List<cv.Rect> hotPoints(ref Mat view)
+        List<CV.Rect> hotPoints(ref Mat view)
         {
-            cv.Rect rect = new cv.Rect();
+            CV.Rect rect = new CV.Rect();
             var points = view.FindNonZero();
-            var viewList = new SortedList<int, cv.Point>(new compareAllowIdenticalIntegerInverted());
+            var viewList = new SortedList<int, CV.Point>(new compareAllowIdenticalIntegerInverted());
             mask.SetTo(0);
             for (int i = 0; i < points.Rows; i++)
             {
-                var pt = points.At<cv.Point>(i, 0);
+                var pt = points.At<CV.Point>(i, 0);
                 int maskOnly = (int)FloodFillFlags.MaskOnly;
-                int count = view.FloodFill(mask, pt, cv.Scalar.All(0), out rect, cv.Scalar.All(0), cv.Scalar.All(0), (cv.FloodFillFlags)(4 | maskOnly | (255 << 8)));
+                int count = view.FloodFill(mask, pt, CV.Scalar.All(0), out rect, CV.Scalar.All(0), CV.Scalar.All(0), (CV.FloodFillFlags)(4 | maskOnly | (255 << 8)));
                 if (count > 0) viewList.Add(count, pt);
             }
             mask.SetTo(0);
-            var rectList = new List<cv.Rect>();
+            var rectList = new List<CV.Rect>();
             for (int i = 0; i < Math.Min(viewList.Count, 10); i++)
             {
                 var pt = viewList.ElementAt(i).Value;
                 int fixedRange = (int)FloodFillFlags.FixedRange;
-                view.FloodFill(mask, pt, cv.Scalar.All(0), out rect, cv.Scalar.All(0), cv.Scalar.All(0), (cv.FloodFillFlags)(4 | fixedRange | ((i + 1) << 8)));
-                rectList.Add(new cv.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height));
+                view.FloodFill(mask, pt, CV.Scalar.All(0), out rect, CV.Scalar.All(0), CV.Scalar.All(0), (CV.FloodFillFlags)(4 | fixedRange | ((i + 1) << 8)));
+                rectList.Add(new CV.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height));
             }
             mask[floodRect].CopyTo(view);
             return rectList;
@@ -24839,7 +24841,7 @@ namespace CS_Classes
             {
                 int x = dst2.Row(i).CountNonZero();
                 sumList.Add(x);
-                DrawLine(dst3, new cv.Point(0, i), new cv.Point(x, i), Scalar.White, task.lineWidth);
+                DrawLine(dst3, new CV.Point(0, i), new CV.Point(x, i), Scalar.White, task.lineWidth);
             }
             var flatSurfacesInRow = new List<int>();
             for (int i = 0; i < sumList.Count; i++)
@@ -24875,9 +24877,9 @@ namespace CS_Classes
     {
         public GuidedBP_Basics hotPoints = new GuidedBP_Basics();
         public int classCount;
-        public cv.Point selectedPoint;
-        public List<cv.Rect> topRects = new List<cv.Rect>();
-        public List<cv.Rect> sideRects = new List<cv.Rect>();
+        public CV.Point selectedPoint;
+        public List<CV.Rect> topRects = new List<CV.Rect>();
+        public List<CV.Rect> sideRects = new List<CV.Rect>();
         public Mat histogramTop = new Mat();
         public Mat histogramSide = new Mat();
         public Mat backP = new Mat();
@@ -24890,8 +24892,8 @@ namespace CS_Classes
             hotPoints.Run(src);
             hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, MatType.CV_32F);
             Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, histogramTop, backP, task.rangesTop);
-            topRects = new List<cv.Rect>(hotPoints.ptHot.topRects);
-            sideRects = new List<cv.Rect>(hotPoints.ptHot.sideRects);
+            topRects = new List<CV.Rect>(hotPoints.ptHot.topRects);
+            sideRects = new List<CV.Rect>(hotPoints.ptHot.sideRects);
             dst2 = ShowPalette(backP * 255 / topRects.Count);
             hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, MatType.CV_32F);
             Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsSide, histogramSide, dst3, task.rangesSide);
@@ -24911,7 +24913,7 @@ namespace CS_Classes
         GuidedBP_Basics guided = new GuidedBP_Basics();
         public GuidedBP_Lookup_CS(VBtask task) : base(task)
         {
-            task.ClickPoint = new cv.Point(dst2.Width / 2, dst2.Height / 2);
+            task.ClickPoint = new CV.Point(dst2.Width / 2, dst2.Height / 2);
             desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test.";
         }
         public void RunCS(Mat src)
@@ -24965,7 +24967,7 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 labels[3] = "Note that colors are shifting because this is before any matching.";
-                dst2 += cv.Scalar.All(1);
+                dst2 += CV.Scalar.All(1);
                 dst2.SetTo(0, task.noDepthMask);
                 myPalette.Run(dst2);
                 dst3 = myPalette.dst2;
@@ -25017,8 +25019,8 @@ namespace CS_Classes
         public HeatMap_Grid_CS(VBtask task) : base(task)
         {
             task.gOptions.setGridSize(5);
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1" };
             desc = "Apply a grid to the HeatMap_OverTime to isolate objects.";
         }
@@ -25135,7 +25137,7 @@ namespace CS_Classes
             flood.Run(src);
             dst2 = flood.dst2;
             labels[2] = flood.labels[2];
-            dst0 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst0 = new Mat(dst2.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             task.pointCloud[task.rc.rect].CopyTo(dst0[task.rc.rect], task.rc.mask);
             heat.Run(dst0);
             dst1 = heat.dst2;
@@ -25346,11 +25348,11 @@ namespace CS_Classes
                 histNormalized[i] = hist.Normalize(0, hist.Rows, NormTypes.MinMax);
                 if (standaloneTest() || plotRequested)
                 {
-                    List<cv.Point> points = new List<cv.Point>();
-                    List<List<cv.Point>> listOfPoints = new List<List<cv.Point>>();
+                    List<CV.Point> points = new List<CV.Point>();
+                    List<List<CV.Point>> listOfPoints = new List<List<CV.Point>>();
                     for (int j = 0; j < task.histogramBins; j++)
                     {
-                        points.Add(new cv.Point((int)(j * plotWidth), dst2.Rows - dst2.Rows * histRaw[i].Get<float>(j, 0) / mm.maxVal));
+                        points.Add(new CV.Point((int)(j * plotWidth), dst2.Rows - dst2.Rows * histRaw[i].Get<float>(j, 0) / mm.maxVal));
                     }
                     listOfPoints.Add(points);
                     dst2.Polylines(listOfPoints, false, plotColors[i], task.lineWidth, task.lineType);
@@ -25499,7 +25501,7 @@ namespace CS_Classes
                         "To see how these adjustments work or to add a new camera, " + "\n" +
                         "use the HeatMap_Basics algorithm." + "\n" +
                         "For new cameras, make the adjustments needed, note the value, and update " + "\n" +
-                        "the Select statement in the constructor for Options_CameraDetails.", new cv.Point(10, 80), 1);
+                        "the Select statement in the constructor for Options_CameraDetails.", new CV.Point(10, 80), 1);
         }
     }
 
@@ -25532,7 +25534,7 @@ namespace CS_Classes
             src.CopyTo(tmp, mask);
             dst2 = tmp.Threshold(0, 255, ThresholdTypes.Binary);
             labels[2] = "BackProjection of most frequent gray pixel";
-            Cv2.Rectangle(dst3, new cv.Rect(brickWidth * histindex, 0, brickWidth, dst2.Height), Scalar.Yellow, 1);
+            Cv2.Rectangle(dst3, new CV.Rect(brickWidth * histindex, 0, brickWidth, dst2.Height), Scalar.Yellow, 1);
         }
     }
 
@@ -25610,7 +25612,7 @@ namespace CS_Classes
             maxList.Add(maxIndex);
 
             peakCount = (int)allPCounts.Average();
-            SetTrueText("/t" + "Avg peaks: " + peakCount + ".  Current: " + peaks.Count + " peaks.", new cv.Point(0, 10), 3);
+            SetTrueText("/t" + "Avg peaks: " + peakCount + ".  Current: " + peaks.Count + " peaks.", new CV.Point(0, 10), 3);
             var sortedPeaks = new SortedDictionary<int, int>(new compareAllowIdenticalIntegerInverted());
             for (int i = 0; i < peakCounts.Length; i++)
             {
@@ -25625,7 +25627,7 @@ namespace CS_Classes
                 int index = sortedPeaks.ElementAt(i).Value;
                 histogramPeaks.Add(index);
                 int h = (int)(hCount[index] * dst2.Height / mm.maxVal);
-                Cv2.Rectangle(dst2, new cv.Rect(index * brickWidth, dst2.Height - h, brickWidth, h), Scalar.Yellow, task.lineWidth);
+                Cv2.Rectangle(dst2, new CV.Rect(index * brickWidth, dst2.Height - h, brickWidth, h), Scalar.Yellow, task.lineWidth);
             }
             if (allPCounts.Count > 100)
             {
@@ -25701,7 +25703,7 @@ namespace CS_Classes
 
     public class Hist_Color_CS : CS_Parent
     {
-        Mat histogram = new cv.Mat();
+        Mat histogram = new CV.Mat();
         Plot_Histogram plot = new Plot_Histogram();
         Rangef[] ranges;
         public Hist_Color_CS(VBtask task) : base(task)
@@ -25714,7 +25716,7 @@ namespace CS_Classes
             Cv2.CalcHist(new Mat[] { src }, new int[] { 1, 2 }, new Mat(), histogram, 1, new int[] { task.histogramBins, task.histogramBins }, ranges);
             Mat test = histogram.Clone();
             test.Normalize(0, 255, NormTypes.MinMax);
-            Mat input = new cv.Mat();
+            Mat input = new CV.Mat();
             src.ConvertTo(input, MatType.CV_32FC3);
             Mat mask = new Mat();
             Cv2.CalcBackProject(new Mat[] { input }, new int[] { 1, 2 }, histogram, mask, ranges);
@@ -25770,7 +25772,7 @@ namespace CS_Classes
                 kalman.kInput[i] = histogram.Get<float>(i, 0);
             }
             kalman.Run(src);
-            histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
+            histogram = CV.Mat.FromPixelData(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
             if (standaloneTest())
             {
                 if (splitIndex == 0)
@@ -25835,9 +25837,9 @@ namespace CS_Classes
         Hist_Kalman histK = new Hist_Kalman();
         Options_HistCompare options = new Options_HistCompare();
         Mat histDiff;
-        Mat histDiffAbs = new cv.Mat();
+        Mat histDiffAbs = new CV.Mat();
         Mat normHistDiff;
-        Mat normHistDiffAbs = new cv.Mat();
+        Mat normHistDiffAbs = new CV.Mat();
         Mat lastHist;
         Mat lastHistNorm;
         public Hist_CompareGray_CS(VBtask task) : base(task)
@@ -25934,7 +25936,7 @@ namespace CS_Classes
             plot.Run(new Mat());
             dst2 = plot.dst2;
             dst3 = plot.dst3;
-            SetTrueText("Upper left is the sum * 100 of the difference\nUpper right is the sum of the absolute values * 100", new cv.Point(0, dst2.Height / 2), 2);
+            SetTrueText("Upper left is the sum * 100 of the difference\nUpper right is the sum of the absolute values * 100", new CV.Point(0, dst2.Height / 2), 2);
         }
     }
 
@@ -26123,7 +26125,7 @@ namespace CS_Classes
             if (saveMaxVal < mm.maxVal) saveMaxVal = (float)mm.maxVal;
             cloudY.Set<float>(mm.minLoc.Y, mm.minLoc.X, -saveMinVal);
             cloudY.Set<float>(mm.maxLoc.Y, mm.maxLoc.X, saveMaxVal);
-            cloudY -= cv.Scalar.All(saveMinVal);
+            cloudY -= CV.Scalar.All(saveMinVal);
             cloudY = cloudY.ConvertScaleAbs(255 / (-saveMinVal + saveMaxVal));
             mm = GetMinMax(cloudY);
             cloudY.SetTo(0, task.noDepthMask);
@@ -26155,8 +26157,8 @@ namespace CS_Classes
             dst0.Col(0).SetTo(0); // too many zero depth points...
             dst0 = Convert32f_To_8UC3(dst0);
             dst0.ConvertTo(dst0, MatType.CV_8UC1);
-            cv.Rect r = new cv.Rect(0, 0, dst2.Height, dst2.Height);
-            dst2[r] = dst0.Resize(new cv.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
+            CV.Rect r = new CV.Rect(0, 0, dst2.Height, dst2.Height);
+            dst2[r] = dst0.Resize(new CV.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
             dst3 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
         }
     }
@@ -26181,8 +26183,8 @@ namespace CS_Classes
             dst0.Row(0).SetTo(0); // too many zero depth points...
             dst0 = Convert32f_To_8UC3(dst0);
             dst0.ConvertTo(dst0, MatType.CV_8UC1);
-            cv.Rect r = new cv.Rect(0, 0, dst2.Height, dst2.Height);
-            dst2[r] = dst0.Resize(new cv.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
+            CV.Rect r = new CV.Rect(0, 0, dst2.Height, dst2.Height);
+            dst2[r] = dst0.Resize(new CV.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
             dst3 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
         }
     }
@@ -26309,7 +26311,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Hist_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins);
             handleSrc.Free();
-            Mat histogram = cv.Mat.FromPixelData(task.histogramBins, 1, MatType.CV_32F, imagePtr);
+            Mat histogram = CV.Mat.FromPixelData(task.histogramBins, 1, MatType.CV_32F, imagePtr);
             plot.Run(histogram);
             dst2 = plot.dst2;
             SetTrueText(strOut, 2);
@@ -26414,7 +26416,7 @@ namespace CS_Classes
             float stepsize = dst2.Width / task.MaxZmeters;
             for (int i = 1; i < (int)task.MaxZmeters; i++)
             {
-                dst2.Line(new cv.Point(stepsize * i, 0), new cv.Point(stepsize * i, dst2.Height), Scalar.White, task.cvFontThickness);
+                dst2.Line(new CV.Point(stepsize * i, 0), new CV.Point(stepsize * i, dst2.Height), Scalar.White, task.cvFontThickness);
             }
             if (standaloneTest())
             {
@@ -26438,7 +26440,7 @@ namespace CS_Classes
         RedCloud_Basics redC = new RedCloud_Basics();
         public Hist_Cell_CS(VBtask task) : base(task)
         {
-            dst1 = new Mat(dst1.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_32F, CV.Scalar.All(0));
             labels = new string[] { "", "", "RedCloud cells", "Histogram of the depth for the selected cell." };
             desc = "Review depth data for a RedCloud Cell";
         }
@@ -26476,10 +26478,10 @@ namespace CS_Classes
             rangesY = new Rangef[] { new Rangef(-task.yRange, task.yRange), new Rangef(0, task.MaxZmeters) };
             int[] sizesX = new int[] { options.xBins, options.zBins };
             Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 2 }, new Mat(), dst2, 2, sizesX, rangesX);
-            dst2.Set<cv.Point3f>(dst2.Height / 2, 0, new Point3f());
+            dst2.Set<CV.Point3f>(dst2.Height / 2, 0, new Point3f());
             int[] sizesY = new int[] { options.yBins, options.zBins };
             Cv2.CalcHist(new Mat[] { src }, new int[] { 1, 2 }, new Mat(), dst3, 2, sizesY, rangesY);
-            dst3.Set<cv.Point3f>(dst3.Height / 2, 0, new Point3f());
+            dst3.Set<CV.Point3f>(dst3.Height / 2, 0, new Point3f());
         }
     }
 
@@ -26499,14 +26501,14 @@ namespace CS_Classes
         {
             hist.Run(src);
             dst3 = hist.dst2.Clone();
-            if (hist.histogram.Rows == 0) hist.histogram = new Mat(task.histogramBins, 1, MatType.CV_32F, cv.Scalar.All(0));
+            if (hist.histogram.Rows == 0) hist.histogram = new Mat(task.histogramBins, 1, MatType.CV_32F, CV.Scalar.All(0));
             if (kalman.kInput.Length != task.histogramBins) Array.Resize(ref kalman.kInput, task.histogramBins);
             for (int i = 0; i < task.histogramBins; i++)
             {
                 kalman.kInput[i] = hist.histogram.Get<float>(i, 0);
             }
             kalman.Run(src);
-            hist.histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
+            hist.histogram = CV.Mat.FromPixelData(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
             hist.plot.Run(hist.histogram);
             dst2 = hist.dst2;
         }
@@ -26531,7 +26533,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Guess_Depth_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, imagePtr).Clone();
             if (standaloneTest()) dst3 = task.pointCloud;
         }
         public void Close()
@@ -26567,7 +26569,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Guess_ImageEdges_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.MaxDistance);
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, cppData).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, cppData).Clone();
             if (standaloneTest()) dst3 = task.pointCloud;
         }
         public void Close()
@@ -26583,7 +26585,7 @@ namespace CS_Classes
     {
         public int[] histRowsCols;
         public Rangef[] ranges;
-        public Mat histogram = new cv.Mat();
+        public Mat histogram = new CV.Mat();
         public int[] channels = { 0, 2 };
         public Hist2D_Basics_CS(VBtask task) : base(task)
         {
@@ -26773,7 +26775,7 @@ namespace CS_Classes
             hColor.Run(src);
             dst2 = hColor.dst2;
             hCloud.Run(src);
-            hCloud.dst2 += cv.Scalar.All(hColor.classCount + 1);
+            hCloud.dst2 += CV.Scalar.All(hColor.classCount + 1);
             hCloud.dst2.SetTo(0, task.noDepthMask);
             if (options.addCloud)
                 dst2 += hCloud.dst2;
@@ -26830,7 +26832,7 @@ namespace CS_Classes
             int minClass = (int)(histArray.Min() - 1);
             if (minClass != 0)
             {
-                src -= cv.Scalar.All(minClass);
+                src -= CV.Scalar.All(minClass);
                 for (int i = 0; i < histArray.Length; i++)
                 {
                     histArray[i] -= minClass;
@@ -26964,7 +26966,7 @@ namespace CS_Classes
         Flood_Basics redC = new Flood_Basics();
         public Hist3D_PixelCells_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2" };
             desc = "After classifying each pixel, backproject each redCell using the same 3D histogram.";
         }
@@ -27011,7 +27013,7 @@ namespace CS_Classes
     {
         Hist3D_Pixel pixel = new Hist3D_Pixel();
         RedCloud_Basics redC = new RedCloud_Basics();
-        Mat lastImage = new cv.Mat();
+        Mat lastImage = new CV.Mat();
         public Hist3D_PixelDiffMask_CS(VBtask task) : base(task)
         {
             task.redOptions.setUseColorOnly(true);
@@ -27131,9 +27133,9 @@ namespace CS_Classes
                 if (histArray[i] > threshold) break;
                 histArray[i] = 0;
             }
-            histogram = cv.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
+            histogram = CV.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
             simK.Run(histogram);
-            histogram = cv.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, simK.histArray);
+            histogram = CV.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, simK.histArray);
             classCount = simK.classCount;
             Cv2.CalcBackProject(new Mat[] { src }, new int[] { 2 }, histogram, dst2, new Rangef[] { task.redOptions.rangesCloud[task.redOptions.rangesCloud.Count() - 1] });
             dst2 = dst2.ConvertScaleAbs();
@@ -27208,7 +27210,7 @@ namespace CS_Classes
             IntPtr dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
                                              rx[0], ry[0], rz[0], rx[1], ry[1], rz[1]);
             handleInput.Free();
-            histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, dstPtr);
+            histogram = CV.Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, dstPtr);
             ranges = new Rangef[] { new Rangef(rx[0], rx[1]), new Rangef(ry[0], ry[1]), new Rangef(rz[0], rz[1]) };
             float[] samples = new float[histogram.Total()];
             Marshal.Copy(histogram.Data, samples, 0, samples.Length);
@@ -27243,7 +27245,7 @@ namespace CS_Classes
         public Hist3Dcloud_BP_Filter_CPP_CS(VBtask task) : base(task)
         {
             task.redOptions.setHistBinBar3D(16);
-            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             labels[2] = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels";
             desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples.";
         }
@@ -27261,7 +27263,7 @@ namespace CS_Classes
             IntPtr imagePtr = BackProjectCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins, options.threshold3D,
                                              rx[0], ry[0], rz[0], rx[1], ry[1], rz[1]);
             handleInput.Free();
-            dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
+            dst2 = CV.Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
             dst2.SetTo(0, task.noDepthMask);
             dst3.SetTo(0);
             task.pointCloud.CopyTo(dst3, dst2);
@@ -27290,7 +27292,7 @@ namespace CS_Classes
             hcloud.Run(src);
             histArray = new float[hcloud.histogram.Total()];
             Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length);
-            histogram = cv.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
+            histogram = CV.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
             plot.Run(histogram);
             dst2 = plot.dst2;
             simK.Run(histogram);
@@ -27323,7 +27325,7 @@ namespace CS_Classes
                 Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1, 2 }, inputMask, histogram, 3, new int[] { bins, bins, bins }, task.redOptions.rangesBGR);
                 histArray = new float[histogram.Total()];
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
-                histogram1D = cv.Mat.FromPixelData((int)histogram.Total(), 1, MatType.CV_32F, histogram.Data);
+                histogram1D = CV.Mat.FromPixelData((int)histogram.Total(), 1, MatType.CV_32F, histogram.Data);
                 simK.Run(histogram1D);
                 histogram = simK.dst2;
                 classCount = simK.classCount;
@@ -27341,7 +27343,7 @@ namespace CS_Classes
     public class Hist3Dcolor_UniqueRGBPixels_CS : CS_Parent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
-        public List<cv.Point3f> pixels = new List<cv.Point3f>();
+        public List<CV.Point3f> pixels = new List<CV.Point3f>();
         public List<int> counts = new List<int>();
         public Hist3Dcolor_UniqueRGBPixels_CS(VBtask task) : base(task)
         {
@@ -27378,7 +27380,7 @@ namespace CS_Classes
     public class Hist3Dcolor_TopXColors_CS : CS_Parent
     {
         Hist3Dcolor_UniqueRGBPixels unique = new Hist3Dcolor_UniqueRGBPixels();
-        public List<cv.Point3i> topXPixels = new List<cv.Point3i>();
+        public List<CV.Point3i> topXPixels = new List<CV.Point3i>();
         public int mapTopX = 16;
         public Hist3Dcolor_TopXColors_CS(VBtask task) : base(task)
         {
@@ -27557,12 +27559,12 @@ namespace CS_Classes
             int bins = task.redOptions.getHistBinBar3D();
             IntPtr imagePtr = Hist3Dcolor_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins);
             handleInput.Free();
-            histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, imagePtr);
+            histogram = CV.Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, imagePtr);
             if (prepareImage)
             {
                 float[] histArray = new float[histogram.Total()];
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
-                histogram1D = cv.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
+                histogram1D = CV.Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray);
                 simK.Run(histogram);
                 histogram = simK.dst2;
                 classCount = simK.classCount;
@@ -27585,7 +27587,7 @@ namespace CS_Classes
         public Hist3Dcolor_Diff_CS(VBtask task) : base(task)
         {
             task.gOptions.pixelDiffThreshold = 0;
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics.";
         }
         public void RunCS(Mat src)
@@ -27712,7 +27714,7 @@ namespace CS_Classes
             if (task.optionsChanged || dst3.Type() != MatType.CV_32FC3)
             {
                 saveFrames.Clear();
-                dst3 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+                dst3 = new Mat(dst2.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             }
             if (saveFrames.Count >= task.frameHistoryCount)
             {
@@ -27741,11 +27743,11 @@ namespace CS_Classes
         {
             var input = src.Clone();
             if (input.Channels() != 1)
-                input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                input = input.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             if (input.Type() != MatType.CV_32F)
                 input.ConvertTo(input, MatType.CV_32F);
             if (dst3.Type() != input.Type() || dst3.Channels() != input.Channels())
-                dst3 = new Mat(input.Size(), input.Type(), cv.Scalar.All(0));
+                dst3 = new Mat(input.Size(), input.Type(), CV.Scalar.All(0));
             input /= 255; // input is all zeros or ones.
             if (task.optionsChanged)
             {
@@ -27811,7 +27813,7 @@ namespace CS_Classes
             if (task.heartBeat)
             {
                 auto.Run(histogram);
-                delaunay.inputPoints = new List<cv.Point2f>(auto.clusterPoints);
+                delaunay.inputPoints = new List<CV.Point2f>(auto.clusterPoints);
                 delaunay.Run(src);
                 dst1 = auto.dst2;
                 dst3 = delaunay.dst2;
@@ -27879,7 +27881,7 @@ namespace CS_Classes
             histTop.Run(src);
             dst1 = histTop.histogram.InRange(0, 0).ConvertScaleAbs();
             var mm = GetMinMax(histTop.histogram);
-            dst3 = new Mat(dst3.Size(), MatType.CV_32F, cv.Scalar.All(mm.maxVal));
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, CV.Scalar.All(mm.maxVal));
             dst3 -= histTop.histogram;
             dst3.SetTo(0, dst1);
             peak.histogram = histTop.histogram;
@@ -28063,8 +28065,8 @@ namespace CS_Classes
             var avg = hist.histogram.Mean();
             scaleList.Add((float)(dst2.Height - dst2.Height * avg[0] / hist.plot.mm.maxVal));
             float scale = scaleList.Average();
-            SetTrueText("Mean", new cv.Point(5, scale), 3);
-            dst2.Line(new cv.Point(0, scale), new cv.Point(dst2.Width, scale), Scalar.Yellow, task.lineWidth + 1);
+            SetTrueText("Mean", new CV.Point(5, scale), 3);
+            dst2.Line(new CV.Point(0, scale), new CV.Point(dst2.Width, scale), Scalar.Yellow, task.lineWidth + 1);
             if (scaleList.Count > task.frameHistoryCount) scaleList.RemoveAt(0);
             var hArray = hist.histArray;
             int quartile = (int)Math.Floor(hArray.Count() / 4.0); // note we really just want quartiles 
@@ -28088,7 +28090,7 @@ namespace CS_Classes
             for (int i = 0; i < valleys.Length; i++)
             {
                 float col = valleys[i] * wPlot;
-                dst2.Line(new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth + 1);
+                dst2.Line(new CV.Point(col, 0), new CV.Point(col, dst2.Height), Scalar.White, task.lineWidth + 1);
             }
         }
     }
@@ -28108,12 +28110,12 @@ namespace CS_Classes
             FindSlider("Desired boundary count").Value = 10;
             desc = "Use the peaks identified in HistValley_Peaks to find the valleys between the peaks.";
         }
-        public void updatePlot(cv.Mat dst, int bins)
+        public void updatePlot(CV.Mat dst, int bins)
         {
             foreach (var valley in valleyIndex)
             {
                 float col = dst.Width * valley / bins;
-                dst.Line(new cv.Point(col, dst.Height), new cv.Point(col, dst.Height * 9 / 10), Scalar.White, task.lineWidth);
+                dst.Line(new CV.Point(col, dst.Height), new CV.Point(col, dst.Height * 9 / 10), Scalar.White, task.lineWidth);
             }
         }
         public void RunCS(Mat src)
@@ -28227,7 +28229,7 @@ namespace CS_Classes
             {
                 float col = (float)dst2.Width * index / task.histogramBins;
                 peaks.Add(index);
-                DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height / 10), Scalar.White, task.lineWidth);
+                DrawLine(dst2, new CV.Point(col, 0), new CV.Point(col, dst2.Height / 10), Scalar.White, task.lineWidth);
             }
             labels[2] = (peaks.Count - 2).ToString() + " peaks (marked at top) were found in the histogram";
         }
@@ -28264,7 +28266,7 @@ namespace CS_Classes
                 }
                 histogram = valley.peak.hist.histogram;
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length);
-                histogram += cv.Scalar.All(1); // shift away from 0
+                histogram += CV.Scalar.All(1); // shift away from 0
             }
             if (standaloneTest()) valley.updatePlot(dst2, task.histogramBins);
         }
@@ -28354,7 +28356,7 @@ namespace CS_Classes
                 foreach (var entry in valleyOrder)
                 {
                     float col = (float)entry.Value * dst2.Width / task.histogramBins;
-                    DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth);
+                    DrawLine(dst2, new CV.Point(col, 0), new CV.Point(col, dst2.Height), Scalar.White, task.lineWidth);
                 }
                 SetTrueText(valleys.Count.ToString() + " valleys in histogram", 3);
             }
@@ -28394,10 +28396,10 @@ namespace CS_Classes
                         histogram.Set<float>(j, 0, index);
                     }
                     int col = dst2.Width * entry.Value / task.histogramBins;
-                    DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth);
+                    DrawLine(dst2, new CV.Point(col, 0), new CV.Point(col, dst2.Height), Scalar.White, task.lineWidth);
                 }
             }
-            if (src.Type() == MatType.CV_32F) histogram += cv.Scalar.All(1);
+            if (src.Type() == MatType.CV_32F) histogram += CV.Scalar.All(1);
             Cv2.CalcBackProject(new Mat[] { src }, new int[] { 0 }, histogram, dst1, kalman.hist.ranges);
             if (dst1.Type() != MatType.CV_8U)
             {
@@ -28487,13 +28489,13 @@ namespace CS_Classes
                         color = task.scalarColors[colorIndex % 256];
                     }
                 }
-                Cv2.Rectangle(dst2, new cv.Rect(i * (int)barWidth, dst2.Height - h, (int)barWidth, h), color, -1);
+                Cv2.Rectangle(dst2, new CV.Rect(i * (int)barWidth, dst2.Height - h, (int)barWidth, h), color, -1);
                 depthRegions.Add(colorIndex);
             }
-            cv.Point2f lastPoint = trends.resultingPoints[0];
+            CV.Point2f lastPoint = trends.resultingPoints[0];
             for (int i = 1; i < trends.resultingPoints.Count; i++)
             {
-                cv.Point2f p1 = trends.resultingPoints[i];
+                CV.Point2f p1 = trends.resultingPoints[i];
                 DrawLine(dst2, lastPoint, p1, Scalar.Yellow, task.lineWidth);
                 lastPoint = p1;
             }
@@ -28510,7 +28512,7 @@ namespace CS_Classes
         public HistValley_Tiers_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "CV_8U tier map with values ranging from 0 to the desired valley count", "vbPalette output of dst2." };
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth.";
         }
         public void RunCS(Mat src)
@@ -28566,7 +28568,7 @@ namespace CS_Classes
                     hist.hist.histogram.Set<float>(j, 0, index);
                 }
                 int col = dst2.Width * entry.Value / task.histogramBins;
-                DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth);
+                DrawLine(dst2, new CV.Point(col, 0), new CV.Point(col, dst2.Height), Scalar.White, task.lineWidth);
             }
         }
     }
@@ -28606,7 +28608,7 @@ namespace CS_Classes
                     hist.hist.histogram.Set<float>(j, 0, i);
                 }
                 int col = dst2.Width * entry / task.histogramBins;
-                DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth);
+                DrawLine(dst2, new CV.Point(col, 0), new CV.Point(col, dst2.Height), Scalar.White, task.lineWidth);
                 lastEntry = entry;
             }
         }
@@ -28632,7 +28634,7 @@ namespace CS_Classes
             for (int i = 0; i < 3; i++)
             {
                 int col = wquartile * (i + 1);
-                dst2.Line(new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.Yellow, task.lineWidth + 2);
+                dst2.Line(new CV.Point(col, 0), new CV.Point(col, dst2.Height), Scalar.Yellow, task.lineWidth + 2);
             }
             int start = 0;
             int lastentry = 0;
@@ -28665,7 +28667,7 @@ namespace CS_Classes
             for (int i = 0; i < minEntries.Length; i++)
             {
                 int col = minEntries[i] * (int)wPlot;
-                dst2.Line(new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth + 1);
+                dst2.Line(new CV.Point(col, 0), new CV.Point(col, dst2.Height), Scalar.White, task.lineWidth + 1);
             }
         }
     }
@@ -28695,7 +28697,7 @@ namespace CS_Classes
             handleSrc.Free();
             if (imagePtr != IntPtr.Zero)
             {
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, src.Channels() == 3 ? MatType.CV_8UC3 : MatType.CV_8UC1, imagePtr).Clone();
+                dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, src.Channels() == 3 ? MatType.CV_8UC3 : MatType.CV_8UC1, imagePtr).Clone();
             }
         }
         public void Close()
@@ -28726,13 +28728,13 @@ namespace CS_Classes
             if (Image == null) Image = Cv2.ImRead(task.HomeDir + "Data/Asahiyama.jpg", ImreadModes.Color);
             dst3 = Image.Resize(dst3.Size());
         }
-        void drawFoundRectangles(cv.Mat dst2, cv.Rect[] found)
+        void drawFoundRectangles(CV.Mat dst2, CV.Rect[] found)
         {
-            foreach (cv.Rect rect in found)
+            foreach (CV.Rect rect in found)
             {
                 // the HOG detector returns slightly larger rectangles than the real objects.
                 // so we slightly shrink the rectangles to get a nicer output.
-                cv.Rect r = new cv.Rect
+                CV.Rect r = new CV.Rect
                 {
                     X = rect.X + (int)Math.Truncate(Math.Round(rect.Width * 0.1)),
                     Y = rect.Y + (int)Math.Truncate(Math.Round(rect.Height * 0.1)),
@@ -28752,15 +28754,15 @@ namespace CS_Classes
             // run the detector with default parameters. to get a higher hit-rate
             // (and more false alarms, respectively), decrease the hitThreshold and
             // groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
-            if (src.Height == 94) src = src.Resize(new cv.Size(src.Width * 2, src.Height * 2));
-            cv.Rect[] found = hog.DetectMultiScale(src, options.thresholdHOG, new cv.Size(options.strideHOG, options.strideHOG), new cv.Size(24, 16), options.scaleHOG, 2);
+            if (src.Height == 94) src = src.Resize(new CV.Size(src.Width * 2, src.Height * 2));
+            CV.Rect[] found = hog.DetectMultiScale(src, options.thresholdHOG, new CV.Size(options.strideHOG, options.strideHOG), new CV.Size(24, 16), options.scaleHOG, 2);
             labels[2] = string.Format("{0} region(s) found", found.Length);
             if (dst2.Height == 94) dst2 = src.Resize(dst2.Size()); else src.CopyTo(dst2);
             drawFoundRectangles(dst2, found);
             if (!ImageProcessed)
             {
-                if (dst3.Height == 94) dst3 = dst3.Resize(new cv.Size(dst3.Width * 2, dst3.Height * 2));
-                found = hog.DetectMultiScale(dst3, options.thresholdHOG, new cv.Size(options.strideHOG, options.strideHOG), new cv.Size(24, 16), options.scaleHOG, 2);
+                if (dst3.Height == 94) dst3 = dst3.Resize(new CV.Size(dst3.Width * 2, dst3.Height * 2));
+                found = hog.DetectMultiScale(dst3, options.thresholdHOG, new CV.Size(options.strideHOG, options.strideHOG), new CV.Size(24, 16), options.scaleHOG, 2);
                 drawFoundRectangles(dst3, found);
                 if (found.Length > 0)
                 {
@@ -28780,8 +28782,8 @@ namespace CS_Classes
 
     public class Homography_Basics_CS : CS_Parent
     {
-        public List<cv.Point2d> corners1 = new List<cv.Point2d>();
-        public List<cv.Point2d> corners2 = new List<cv.Point2d>();
+        public List<CV.Point2d> corners1 = new List<CV.Point2d>();
+        public List<CV.Point2d> corners2 = new List<CV.Point2d>();
         Random_Point2d random = new Random_Point2d();
         Options_Homography options = new Options_Homography();
         public Homography_Basics_CS(VBtask task) : base(task)
@@ -28791,17 +28793,17 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            if (standaloneTest() && task.heartBeat && (cv.HomographyMethods)options.hMethod == HomographyMethods.None)
+            if (standaloneTest() && task.heartBeat && (CV.HomographyMethods)options.hMethod == HomographyMethods.None)
             {
                 random.Run(empty);
-                corners1 = new List<cv.Point2d>(random.PointList);
+                corners1 = new List<CV.Point2d>(random.PointList);
                 random.Run(empty);
-                corners2 = new List<cv.Point2d>(random.PointList);
+                corners2 = new List<CV.Point2d>(random.PointList);
             }
             // cannot find a homography when less than 4...
             if (corners1.Count() >= 4 || corners2.Count() >= 4)
             {
-                Mat H = Cv2.FindHomography(corners1, corners2, (cv.HomographyMethods)options.hMethod);
+                Mat H = Cv2.FindHomography(corners1, corners2, (CV.HomographyMethods)options.hMethod);
                 if (H.Width > 0)
                     dst2 = src.WarpPerspective(H, src.Size());
             }
@@ -28845,14 +28847,14 @@ namespace CS_Classes
 
     public class Horizon_Basics_CS : CS_Parent
     {
-        public List<cv.Point> points = new List<cv.Point>();
+        public List<CV.Point> points = new List<CV.Point>();
         int resizeRatio = 1;
         public PointPair vec;
         public bool vecPresent;
         public bool autoDisplay;
         public Horizon_Basics_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find all the points where depth Y-component transitions from positive to negative";
         }
         public void displayResults(Point2f p1, Point2f p2)
@@ -28861,21 +28863,21 @@ namespace CS_Classes
             {
                 if (p1.Y >= 1 && p1.Y <= dst2.Height - 1) strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n";
             }
-            dst2.SetTo(new cv.Scalar(0));
-            foreach (cv.Point pt in points)
+            dst2.SetTo(new CV.Scalar(0));
+            foreach (CV.Point pt in points)
             {
-                cv.Point pX = new cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio);
-                DrawCircle(dst2, pX, task.DotSize, new cv.Scalar(255), -1);
+                CV.Point pX = new CV.Point(pt.X * resizeRatio, pt.Y * resizeRatio);
+                DrawCircle(dst2, pX, task.DotSize, new CV.Scalar(255), -1);
             }
-            DrawLine(dst2, vec.p1, vec.p2, new cv.Scalar(255), 255);
+            DrawLine(dst2, vec.p1, vec.p2, new CV.Scalar(255), 255);
         }
         public void RunCS(Mat src)
         {
             if (src.Type() != MatType.CV_32F) dst0 = PrepareDepthInput(1); else dst0 = src;
-            cv.Size resolution = task.quarterRes;
+            CV.Size resolution = task.quarterRes;
             if (dst0.Size() != resolution)
             {
-                dst0 = dst0.Resize(resolution, 0, 0, cv.InterpolationFlags.Linear);
+                dst0 = dst0.Resize(resolution, 0, 0, CV.InterpolationFlags.Linear);
                 resizeRatio = dst2.Height / (int)resolution.Height;
             }
             dst0 = dst0.Abs();
@@ -28889,15 +28891,15 @@ namespace CS_Classes
                 {
                     dst0.Col(i).Set(mm1.minLoc.Y, mm1.minLoc.X, 10);
                     mmData mm2 = GetMinMax(dst0.Col(i));
-                    if (mm2.minVal > 0 && Math.Abs(mm1.minLoc.Y - mm2.minLoc.Y) <= 1) points.Add(new cv.Point(i, mm1.minLoc.Y));
+                    if (mm2.minVal > 0 && Math.Abs(mm1.minLoc.Y - mm2.minLoc.Y) <= 1) points.Add(new CV.Point(i, mm1.minLoc.Y));
                 }
             }
             labels[2] = points.Count() + " points found. ";
-            cv.Point p1 = new cv.Point(), p2 = new cv.Point();
+            CV.Point p1 = new CV.Point(), p2 = new CV.Point();
             if (points.Count() >= 2)
             {
-                p1 = new cv.Point(resizeRatio * points[points.Count() - 1].X, resizeRatio * points[points.Count() - 1].Y);
-                p2 = new cv.Point(resizeRatio * points[0].X, resizeRatio * points[0].Y);
+                p1 = new CV.Point(resizeRatio * points[points.Count() - 1].X, resizeRatio * points[points.Count() - 1].Y);
+                p2 = new CV.Point(resizeRatio * points[0].X, resizeRatio * points[0].Y);
             }
             double distance = p1.DistanceTo(p2);
             if (distance < 10) // enough to get a line with some credibility
@@ -28926,7 +28928,7 @@ namespace CS_Classes
         public Mat cloudY;
         public Horizon_BasicsAlt_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Search for the transition from positive to negative to find the horizon.";
         }
         Point2f findTransition(int startCol, int stopCol, int stepCol)
@@ -28979,8 +28981,8 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 dst2.SetTo(0);
-                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.All(255), task.lineWidth);
-                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.All(255), task.lineWidth);
+                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, CV.Scalar.All(255), task.lineWidth);
+                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, CV.Scalar.All(255), task.lineWidth);
             }
         }
     }
@@ -28995,7 +28997,7 @@ namespace CS_Classes
         {
             task.redOptions.setYRangeSlider(3);
             if (standalone) task.gOptions.setDisplay1();
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
             task.horizonVec = new PointPair(new Point2f(0, dst2.Height / 2), new Point2f(dst2.Width, dst2.Height / 2));
             labels = new string[] { "", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask" };
@@ -29016,15 +29018,15 @@ namespace CS_Classes
             dst1 = split[1].InRange(-0.05, 0.05);
             var noDepth = task.noDepthMask.Resize(task.quarterRes);
             dst1.SetTo(0, noDepth);
-            cv.Mat pointsMat = dst1.FindNonZero();
+            CV.Mat pointsMat = dst1.FindNonZero();
             if (pointsMat.Rows > 0)
             {
-                dst2.SetTo(new cv.Scalar(0));
+                dst2.SetTo(new CV.Scalar(0));
                 List<int> xVals = new List<int>();
-                List<cv.Point2f> points = new List<cv.Point2f>();
+                List<CV.Point2f> points = new List<CV.Point2f>();
                 for (int i = 0; i < pointsMat.Rows; i++)
                 {
-                    cv.Point pt = pointsMat.Get<cv.Point>(i, 0);
+                    CV.Point pt = pointsMat.Get<CV.Point>(i, 0);
                     xVals.Add(pt.X);
                     points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
                 }
@@ -29032,19 +29034,19 @@ namespace CS_Classes
                 Point2f p2 = points[xVals.IndexOf(xVals.Max())];
                 PointPair lp = new PointPair(p1, p2);
                 task.horizonVec = lp.edgeToEdgeLine(dst2.Size());
-                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, new cv.Scalar(255), task.lineWidth);
+                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, new CV.Scalar(255), task.lineWidth);
             }
             dst3 = split[0].InRange(-0.01, 0.01);
-            dst3.SetTo(new cv.Scalar(0), noDepth);
+            dst3.SetTo(new CV.Scalar(0), noDepth);
             pointsMat = new Mat();
             pointsMat = dst3.FindNonZero();
             if (pointsMat.Rows > 0)
             {
                 List<int> yVals = new List<int>();
-                List<cv.Point2f> points = new List<cv.Point2f>();
+                List<CV.Point2f> points = new List<CV.Point2f>();
                 for (int i = 0; i < pointsMat.Rows; i++)
                 {
-                    cv.Point pt = pointsMat.Get<cv.Point>(i, 0);
+                    CV.Point pt = pointsMat.Get<CV.Point>(i, 0);
                     yVals.Add(pt.Y);
                     points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
                 }
@@ -29059,7 +29061,7 @@ namespace CS_Classes
                     PointPair lp = new PointPair(p1, p2);
                     task.gravityVec = lp.edgeToEdgeLine(dst2.Size());
                 }
-                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, new cv.Scalar(255), task.lineWidth);
+                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, new CV.Scalar(255), task.lineWidth);
             }
         }
     }
@@ -29072,18 +29074,18 @@ namespace CS_Classes
         Line_Basics lines = new Line_Basics();
         public Horizon_UnstableResults_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Create lines for the gravity vector and horizon vector in the camera image";
         }
         public void RunCS(Mat src)
         {
-            if (src.Type() != cv.MatType.CV_32FC3) src = task.pointCloud;
+            if (src.Type() != CV.MatType.CV_32FC3) src = task.pointCloud;
             dst1 = task.pcSplit[1].InRange(-0.05, 0.05);
-            dst0.SetTo(new cv.Scalar(0));
-            dst0.SetTo(new cv.Scalar(255), dst1);
-            dst0.SetTo(new cv.Scalar(0), task.noDepthMask);
+            dst0.SetTo(new CV.Scalar(0));
+            dst0.SetTo(new CV.Scalar(255), dst1);
+            dst0.SetTo(new CV.Scalar(0), task.noDepthMask);
             lines.Run(dst0);
-            dst2.SetTo(new cv.Scalar(0));
+            dst2.SetTo(new CV.Scalar(0));
             if (lines.lpList.Count() > 0)
             {
                 SortedList<float, PointPair> distances = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
@@ -29095,13 +29097,13 @@ namespace CS_Classes
                 Point2f p1 = new Point2f(0, lpBest.yIntercept);
                 Point2f p2 = new Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept);
                 task.horizonVec = new PointPair(p1, p2);
-                DrawLine(dst2, p1, p2, new cv.Scalar(255), 255);
+                DrawLine(dst2, p1, p2, new CV.Scalar(255), 255);
                 labels[2] = "horizonVec slope/intercept = " + lpBest.slope.ToString("F4") + "/" + lpBest.yIntercept.ToString("F4");
             }
             dst1 = task.pcSplit[0].InRange(-0.01, 0.01);
-            dst0.SetTo(new cv.Scalar(0));
-            dst0.SetTo(new cv.Scalar(255), dst1);
-            dst0.SetTo(new cv.Scalar(0), task.noDepthMask);
+            dst0.SetTo(new CV.Scalar(0));
+            dst0.SetTo(new CV.Scalar(255), dst1);
+            dst0.SetTo(new CV.Scalar(0), task.noDepthMask);
             lines.Run(dst0);
             if (lines.lpList.Count() > 0)
             {
@@ -29114,7 +29116,7 @@ namespace CS_Classes
                 Point2f p1 = new Point2f(0, lpBest.yIntercept);
                 Point2f p2 = new Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept);
                 task.gravityVec = new PointPair(p1, p2);
-                DrawLine(dst2, p1, p2, new cv.Scalar(255), 255);
+                DrawLine(dst2, p1, p2, new CV.Scalar(255), 255);
                 labels[3] = "gravityVec slope/intercept = " + lpBest.slope.ToString("F4") + "/" + lpBest.yIntercept.ToString("F4");
             }
         }
@@ -29130,7 +29132,7 @@ namespace CS_Classes
             task.gOptions.setGravityUsage(false);
             task.redOptions.setYRangeSlider(3);
             if (standalone) task.gOptions.setDisplay1();
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
             task.horizonVec = new PointPair(new Point2f(0, dst2.Height / 2), new Point2f(dst2.Width, dst2.Height / 2));
             labels = new string[] { "", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask" };
@@ -29145,22 +29147,22 @@ namespace CS_Classes
             Mat noDepth = task.noDepthMask;
             if (splitX.Size() != task.quarterRes)
             {
-                splitX = splitX.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Linear);
-                splitY = splitY.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Linear);
-                noDepth = noDepth.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Linear);
+                splitX = splitX.Resize(task.quarterRes, 0, 0, CV.InterpolationFlags.Linear);
+                splitY = splitY.Resize(task.quarterRes, 0, 0, CV.InterpolationFlags.Linear);
+                noDepth = noDepth.Resize(task.quarterRes, 0, 0, CV.InterpolationFlags.Linear);
             }
             dst1 = splitY.InRange(-0.05, 0.05);
-            dst1.SetTo(new cv.Scalar(0), noDepth);
+            dst1.SetTo(new CV.Scalar(0), noDepth);
             Mat pointsMat = new Mat();
             pointsMat = dst1.FindNonZero();
             if (pointsMat.Rows > 0)
             {
-                dst2.SetTo(new cv.Scalar(0));
+                dst2.SetTo(new CV.Scalar(0));
                 List<int> xVals = new List<int>();
-                List<cv.Point2f> points = new List<cv.Point2f>();
+                List<CV.Point2f> points = new List<CV.Point2f>();
                 for (int i = 0; i < pointsMat.Rows; i++)
                 {
-                    cv.Point pt = pointsMat.Get<cv.Point>(i, 0);
+                    CV.Point pt = pointsMat.Get<CV.Point>(i, 0);
                     xVals.Add(pt.X);
                     points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
                 }
@@ -29168,22 +29170,22 @@ namespace CS_Classes
                 Point2f p2 = points[xVals.IndexOf(xVals.Max())];
                 PointPair lp = new PointPair(p1, p2);
                 task.horizonVec = lp.edgeToEdgeLine(dst2.Size());
-                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, new cv.Scalar(255), 255);
+                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, new CV.Scalar(255), 255);
             }
             //If task.horizonVec.originalLength < dst2.Width / 2 And task.redOptions.YRangeSlider.Value < task.redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
             //    task.redOptions.YRangeSlider.Value += 1
             //End If
             dst3 = splitX.InRange(-0.01, 0.01);
-            dst3.SetTo(new cv.Scalar(0), noDepth);
+            dst3.SetTo(new CV.Scalar(0), noDepth);
             pointsMat = new Mat();
             pointsMat = dst3.FindNonZero();
             if (pointsMat.Rows > 0)
             {
                 List<int> yVals = new List<int>();
-                List<cv.Point2f> points = new List<cv.Point2f>();
+                List<CV.Point2f> points = new List<CV.Point2f>();
                 for (int i = 0; i < pointsMat.Rows; i++)
                 {
-                    cv.Point pt = pointsMat.Get<cv.Point>(i, 0);
+                    CV.Point pt = pointsMat.Get<CV.Point>(i, 0);
                     yVals.Add(pt.Y);
                     points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
                 }
@@ -29198,7 +29200,7 @@ namespace CS_Classes
                     PointPair lp = new PointPair(p1, p2);
                     task.gravityVec = lp.edgeToEdgeLine(dst2.Size());
                 }
-                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, new cv.Scalar(255), 255);
+                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, new CV.Scalar(255), 255);
             }
             //If task.gravityVec.originalLength < dst2.Height / 2 And task.redOptions.XRangeSlider.Value < task.redOptions.XRangeSlider.Maximum Or pointsMat.Rows = 0 Then
             //    task.redOptions.XRangeSlider.Value += 1
@@ -29227,18 +29229,18 @@ namespace CS_Classes
             {
                 ptLeft = task.gravityVec.p1;
                 ptRight = task.gravityVec.p2;
-                cv.Rect r = ValidateRect(new cv.Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
+                CV.Rect r = ValidateRect(new CV.Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
                 leftTemplate = new Mat(src, r);
-                r = ValidateRect(new cv.Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
+                r = ValidateRect(new CV.Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
                 rightTemplate = new Mat(src, r);
             }
             else
             {
-                cv.Rect r = ValidateRect(new cv.Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
+                CV.Rect r = ValidateRect(new CV.Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
                 match.template = leftTemplate;
                 match.Run(src);
                 ptLeft = match.matchCenter;
-                r = ValidateRect(new cv.Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
+                r = ValidateRect(new CV.Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
                 match.template = leftTemplate;
                 match.Run(src);
                 ptLeft = match.matchCenter;
@@ -29260,7 +29262,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             horizon.Run(src);
-            foreach (cv.Point point in horizon.points)
+            foreach (CV.Point point in horizon.points)
             {
                 regress.x.Add(point.X);
                 regress.y.Add(point.Y);
@@ -29343,12 +29345,12 @@ namespace CS_Classes
             circles.Run(src);
             dst2 = circles.dst2;
             Cv2.CvtColor(dst2, dst3, ColorConversionCodes.BGR2GRAY);
-            var cFound = Cv2.HoughCircles(dst3, (cv.HoughModes)method, 1, dst2.Rows / 4, 100, 10, 1, 200);
+            var cFound = Cv2.HoughCircles(dst3, (CV.HoughModes)method, 1, dst2.Rows / 4, 100, 10, 1, 200);
             var foundColor = new Scalar(0, 0, 255);
             dst2.CopyTo(dst3);
             for (int i = 0; i < cFound.Length; i++)
             {
-                cv.Point pt = new cv.Point((int)cFound[i].Center.X, (int)cFound[i].Center.Y);
+                CV.Point pt = new CV.Point((int)cFound[i].Center.X, (int)cFound[i].Center.Y);
                 DrawCircle(dst3, pt, (int)cFound[i].Radius, foundColor, (int)task.lineType);
             }
             labels[3] = cFound.Length + " circles were identified";
@@ -29409,7 +29411,7 @@ namespace CS_Classes
         {
             options.RunVB();
             edges.Run(src);
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             int regionCount = 0;
             noDepthCount = new int[task.gridList.Count()];
             roiColor = new Vec3b[task.gridList.Count()];
@@ -29499,17 +29501,17 @@ namespace CS_Classes
             {
                 int w = hls.input.video.dst2.Width;
                 int h = hls.input.video.dst2.Height;
-                var bl = new cv.Point(w * 0.1, h * 0.95);
-                var tl = new cv.Point(w * 0.4, h * 0.6);
-                var br = new cv.Point(w * 0.95, h * 0.95);
-                var tr = new cv.Point(w * 0.6, h * 0.6);
-                cv.Point[] pList = new cv.Point[] { bl, tl, tr, br };
-                mask = new Mat(new cv.Size(w, h), MatType.CV_8U, cv.Scalar.All(0));
+                var bl = new CV.Point(w * 0.1, h * 0.95);
+                var tl = new CV.Point(w * 0.4, h * 0.6);
+                var br = new CV.Point(w * 0.95, h * 0.95);
+                var tr = new CV.Point(w * 0.6, h * 0.6);
+                CV.Point[] pList = new CV.Point[] { bl, tl, tr, br };
+                mask = new Mat(new CV.Size(w, h), MatType.CV_8U, CV.Scalar.All(0));
                 mask.FillConvexPoly(pList, Scalar.White, task.lineType);
             }
             dst1 = mask.Clone();
             dst0 = hls.dst0;
-            dst2 = new Mat(mask.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(mask.Size(), MatType.CV_8U, CV.Scalar.All(0));
             hls.dst3.CopyTo(dst2, mask);
             int rho = 1;
             double theta = Cv2.PI / 180;
@@ -29517,7 +29519,7 @@ namespace CS_Classes
             int minLineLength = 20;
             int maxLineGap = 300;
             segments = Cv2.HoughLinesP(dst2.Clone(), rho, theta, threshold, minLineLength, maxLineGap);
-            dst3 = new Mat(mask.Size(), MatType.CV_8UC3, cv.Scalar.All(0));
+            dst3 = new Mat(mask.Size(), MatType.CV_8UC3, CV.Scalar.All(0));
             laneLineMinY = dst2.Height;
             for (int i = 0; i < segments.Length; i++)
             {
@@ -29553,21 +29555,21 @@ namespace CS_Classes
     public class Hull_Basics_CS : CS_Parent
     {
         Random_Basics random = new Random_Basics();
-        public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
-        public List<cv.Point> hull = new List<cv.Point>();
+        public List<CV.Point2f> inputPoints = new List<CV.Point2f>();
+        public List<CV.Point> hull = new List<CV.Point>();
         public bool useRandomPoints;
         public Hull_Basics_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Input Points - draw a rectangle anywhere.  Enclosing rectangle in yellow.", "" };
-            if (standaloneTest()) random.range = new cv.Rect(100, 100, 50, 50);
+            if (standaloneTest()) random.range = new CV.Rect(100, 100, 50, 50);
             desc = "Given a list of points, create a hull that encloses them.";
         }
-        List<cv.Point> vbFloat2Int(List<cv.Point2f> ptList2f)
+        List<CV.Point> vbFloat2Int(List<CV.Point2f> ptList2f)
         {
-            List<cv.Point> ptList = new List<cv.Point>();
+            List<CV.Point> ptList = new List<CV.Point>();
             foreach (var pt in ptList2f)
             {
-                ptList.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                ptList.Add(new CV.Point((int)pt.X, (int)pt.Y));
             }
             return ptList;
         }
@@ -29581,7 +29583,7 @@ namespace CS_Classes
                 {
                     DrawCircle(dst2, pt, task.DotSize, Scalar.White);
                 }
-                inputPoints = new List<cv.Point2f>(random.PointList);
+                inputPoints = new List<CV.Point2f>(random.PointList);
             }
             var hull2f = Cv2.ConvexHull(inputPoints, true);
             hull = vbFloat2Int(hull2f.ToList());
@@ -29606,7 +29608,7 @@ namespace CS_Classes
             labels[2] = redC.labels[2];
             dst3.SetTo(0);
             var rc = task.rc;
-            List<cv.Point> jumpList = new List<cv.Point>();
+            List<CV.Point> jumpList = new List<CV.Point>();
             for (int i = 1; i < rc.contour.Count(); i++)
             {
                 var p1 = rc.contour[i - 1];
@@ -29640,13 +29642,13 @@ namespace CS_Classes
             src = options.fullsizeImage;
             if (src.Width != dst2.Width || src.Height != dst2.Height)
             {
-                var newSize = new cv.Size(dst2.Height * src.Width / src.Height, dst2.Height);
+                var newSize = new CV.Size(dst2.Height * src.Width / src.Height, dst2.Height);
                 if (newSize.Width > dst2.Width)
                 {
-                    newSize = new cv.Size(dst2.Width, dst2.Width * src.Height / src.Width);
+                    newSize = new CV.Size(dst2.Width, dst2.Width * src.Height / src.Width);
                 }
                 dst2.SetTo(0);
-                dst2[new cv.Rect(0, 0, newSize.Width, newSize.Height)] = src.Resize(newSize);
+                dst2[new CV.Rect(0, 0, newSize.Width, newSize.Height)] = src.Resize(newSize);
             }
             else
             {
@@ -29830,7 +29832,7 @@ namespace CS_Classes
                 lastTimeStamp = task.IMU_TimeStamp;
             }
             // NOTE: Initialize the angle around the y-axis to zero.
-            cv.Point3f g = task.IMU_RawAcceleration;
+            CV.Point3f g = task.IMU_RawAcceleration;
             task.accRadians = new Point3f((float)Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          (float)Math.Abs(Math.Atan2(g.X, g.Y)), (float)Math.Atan2(g.Y, g.Z));
             if (task.optionsChanged)
@@ -29892,7 +29894,7 @@ namespace CS_Classes
                 lastTimeStamp = task.IMU_TimeStamp;
             }
             // NOTE: Initialize the angle around the y-axis to zero.
-            cv.Point3f g = task.IMU_RawAcceleration;
+            CV.Point3f g = task.IMU_RawAcceleration;
             task.accRadians = new Point3f((float)Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          (float)Math.Abs(Math.Atan2(g.X, g.Y)), (float)Math.Atan2(g.Y, g.Z));
             kalman.kInput = new float[] { task.accRadians.X, task.accRadians.Y, task.accRadians.Z };
@@ -29941,7 +29943,7 @@ namespace CS_Classes
                 lastTimeStamp = task.IMU_TimeStamp;
             }
             // NOTE: Initialize the angle around the y-axis to zero.
-            cv.Point3f g = task.IMU_RawAcceleration;
+            CV.Point3f g = task.IMU_RawAcceleration;
             task.accRadians = new Point3f((float)Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                           (float)Math.Abs(Math.Atan2(g.X, g.Y)), (float)Math.Atan2(g.Y, g.Z));
             if (task.optionsChanged)
@@ -30002,7 +30004,7 @@ namespace CS_Classes
             float g8 = gArray[2, 0] * 0 + gArray[2, 1] * 1 + gArray[2, 2] * 0;
             float g9 = gArray[2, 0] * -sy + gArray[2, 1] * 0 + gArray[2, 2] * cy;
             float[] tmp = new float[] { g1, g2, g3, g4, g5, g6, g7, g8, g9 };
-            gMatrix = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, tmp);
+            gMatrix = CV.Mat.FromPixelData(3, 3, MatType.CV_32F, tmp);
         }
         public void RunCS(Mat src)
         {
@@ -30017,7 +30019,7 @@ namespace CS_Classes
             cx = (float)Math.Cos(task.accRadians.X);
             sx = (float)Math.Sin(task.accRadians.X);
             buildGmatrix();
-            cv.Point3f g = task.IMU_Acceleration;
+            CV.Point3f g = task.IMU_Acceleration;
             string fmt = fmt3;
             strOut = "IMU Acceleration in X-direction = " + "\t" + g.X.ToString(fmt) + "\n"
                      + "IMU Acceleration in Y-direction = " + "\t" + g.Y.ToString(fmt) + "\n"
@@ -30059,7 +30061,7 @@ namespace CS_Classes
             dx = kalman.kOutput[0];
             dy = kalman.kOutput[1];
             dz = kalman.kOutput[2];
-            Mat smoothedMat = cv.Mat.FromPixelData(2, 3, MatType.CV_64F, new double[] {
+            Mat smoothedMat = CV.Mat.FromPixelData(2, 3, MatType.CV_64F, new double[] {
             sx * Math.Cos(dz), sx * -Math.Sin(dz), dx,
             sy * Math.Sin(dz), sy * Math.Cos(dz), dy });
             Mat smoothedFrame = src.WarpAffine(smoothedMat, src.Size());
@@ -30067,7 +30069,7 @@ namespace CS_Classes
             dst2 = smoothedFrame.Resize(src.Size());
             Cv2.Subtract(src, dst2, dst3);
             string Text = "dx = " + dx.ToString(fmt2) + "\n" + "dy = " + dy.ToString(fmt2) + "\n" + "dz = " + dz.ToString(fmt2);
-            SetTrueText(Text, new cv.Point(10, 10), 3);
+            SetTrueText(Text, new CV.Point(10, 10), 3);
         }
     }
 
@@ -30349,12 +30351,12 @@ namespace CS_Classes
                 if (task.heartBeat) dst3.SetTo(0);
                 var p1 = gcell.tc1.center;
                 var p2 = gcell.tc2.center;
-                var lastP1 = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
-                var lastp2 = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
+                var lastP1 = new CV.Point(kalman.kOutput[0], kalman.kOutput[1]);
+                var lastp2 = new CV.Point(kalman.kOutput[2], kalman.kOutput[3]);
                 kalman.kInput = new float[] { p1.X, p1.Y, p2.X, p2.Y };
                 kalman.Run(empty);
-                p1 = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
-                p2 = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
+                p1 = new CV.Point(kalman.kOutput[0], kalman.kOutput[1]);
+                p2 = new CV.Point(kalman.kOutput[2], kalman.kOutput[3]);
                 DrawCircle(dst2, p1, task.DotSize, task.HighlightColor);
                 DrawCircle(dst2, p2, task.DotSize, task.HighlightColor);
                 DrawCircle(dst3, p1, task.DotSize, Scalar.White);
@@ -30408,8 +30410,8 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             if (task.optionsChanged) accList.Clear();
-            accList.Add(new cv.Scalar(task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z));
-            var accMat = cv.Mat.FromPixelData(accList.Count(), 1, MatType.CV_64FC4, accList.ToArray());
+            accList.Add(new CV.Scalar(task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z));
+            var accMat = CV.Mat.FromPixelData(accList.Count(), 1, MatType.CV_64FC4, accList.ToArray());
             var imuMean = accMat.Mean();
             task.IMU_AverageAcceleration = new Point3f((float)imuMean[0], (float)imuMean[1], (float)imuMean[2]);
             if (accList.Count() >= task.frameHistoryCount) accList.RemoveAt(0);
@@ -30732,7 +30734,7 @@ namespace CS_Classes
             { sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz },
             { 0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz }
             };
-            Mat tmpGMatrix = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, new float[]
+            Mat tmpGMatrix = CV.Mat.FromPixelData(3, 3, MatType.CV_32F, new float[]
             {
             gArray[0, 0] * cy + gArray[0, 1] * 0 + gArray[0, 2] * sy,
             gArray[0, 0] * 0 + gArray[0, 1] * 1 + gArray[0, 2] * 0,
@@ -30992,7 +30994,7 @@ namespace CS_Classes
                 saveSliderValue = iOptions.interpolationThreshold;
             }
             dst2 = src.Clone();
-            var newSize = new cv.Size((int)(dst2.Width * saveSliderValue / 100), (int)(dst2.Height * saveSliderValue / 100));
+            var newSize = new CV.Size((int)(dst2.Width * saveSliderValue / 100), (int)(dst2.Height * saveSliderValue / 100));
             dst2 = src.Resize(newSize, 0, 0, options.warpFlag);
             labels[2] = "Resize % = " + string.Format("{0:0%}", saveSliderValue / 100.0);
         }
@@ -31008,7 +31010,7 @@ namespace CS_Classes
         int updatedFrames;
         int myFrameCount;
         int heartCount;
-        Mat lastFrame = new cv.Mat();
+        Mat lastFrame = new CV.Mat();
         public Interpolate_Kalman_CS(VBtask task) : base(task)
         {
             desc = "Use Kalman to smooth the grayscale results of interpolation";
@@ -31184,10 +31186,10 @@ namespace CS_Classes
         public float[] kInput = new float[4];
         public float[] kOutput = new float[4];
         int saveDimension = -1;
-        cv.Rect lastRect = new cv.Rect(0, 0, 0, 0);
+        CV.Rect lastRect = new CV.Rect(0, 0, 0, 0);
         public Kalman_Basics_CS(VBtask task) : base(task)
         {
-            desc = "Use Kalman to stabilize values (such as a cv.rect.)";
+            desc = "Use Kalman to stabilize values (such as a CV.rect.)";
         }
         public void RunCS(Mat src)
         {
@@ -31225,7 +31227,7 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 dst2 = src;
-                cv.Rect rect = new cv.Rect((int)kOutput[0], (int)kOutput[1], (int)kOutput[2], (int)kOutput[3]);
+                CV.Rect rect = new CV.Rect((int)kOutput[0], (int)kOutput[1], (int)kOutput[2], (int)kOutput[3]);
                 rect = ValidateRect(rect);
                 if (task.FirstPass) lastRect = rect;
                 if (rect == lastRect)
@@ -31295,24 +31297,24 @@ namespace CS_Classes
         KalmanFilter kf = new KalmanFilter(2, 1, 0);
         Mat kState = new Mat(2, 1, MatType.CV_32F);
         Mat processNoise = new Mat(2, 1, MatType.CV_32F);
-        Mat measurement = new Mat(1, 1, MatType.CV_32F, cv.Scalar.All(0));
+        Mat measurement = new Mat(1, 1, MatType.CV_32F, CV.Scalar.All(0));
         Point2f center, statePt;
         float radius;
-        cv.Point calcPoint(Point2f center, double R, double angle)
+        CV.Point calcPoint(Point2f center, double R, double angle)
         {
-            return new cv.Point((int)(center.X + Math.Cos(angle)), (int)(center.Y - Math.Sin(angle)) * R);
+            return new CV.Point((int)(center.X + Math.Cos(angle)), (int)(center.Y - Math.Sin(angle)) * R);
         }
-        void drawCross(Mat dst2, cv.Point center, Scalar color)
+        void drawCross(Mat dst2, CV.Point center, Scalar color)
         {
             int d = 3;
-            DrawLine(dst2, new cv.Point(center.X - d, center.Y - d), new cv.Point(center.X + d, center.Y + d), color, task.lineWidth);
-            DrawLine(dst2, new cv.Point(center.X + d, center.Y - d), new cv.Point(center.X - d, center.Y + d), color, task.lineWidth);
+            DrawLine(dst2, new CV.Point(center.X - d, center.Y - d), new CV.Point(center.X + d, center.Y + d), color, task.lineWidth);
+            DrawLine(dst2, new CV.Point(center.X + d, center.Y - d), new CV.Point(center.X - d, center.Y + d), color, task.lineWidth);
         }
         public Kalman_RotatingPoint_CS(VBtask task) : base(task)
         {
             labels[2] = "Estimate Yellow < Real Red (if working)";
             Cv2.Randn(kState, new Scalar(0), Scalar.All(0.1));
-            kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, MatType.CV_32F, new float[] { 1, 1, 0, 1 });
+            kf.TransitionMatrix = CV.Mat.FromPixelData(2, 2, MatType.CV_32F, new float[] { 1, 1, 0, 1 });
             Cv2.SetIdentity(kf.MeasurementMatrix);
             Cv2.SetIdentity(kf.ProcessNoiseCov, Scalar.All(0.00001));
             Cv2.SetIdentity(kf.MeasurementNoiseCov, Scalar.All(0.1));
@@ -31327,14 +31329,14 @@ namespace CS_Classes
             float stateAngle = kState.Get<float>(0);
             Mat prediction = kf.Predict();
             float predictAngle = prediction.Get<float>(0);
-            cv.Point predictPt = calcPoint(center, radius, predictAngle);
+            CV.Point predictPt = calcPoint(center, radius, predictAngle);
             statePt = calcPoint(center, radius, stateAngle);
             Cv2.Randn(measurement, new Scalar(0), Scalar.All(kf.MeasurementNoiseCov.Get<float>(0)));
             measurement += kf.MeasurementMatrix * kState;
             float measAngle = measurement.Get<float>(0);
-            cv.Point measPt = calcPoint(center, radius, measAngle);
+            CV.Point measPt = calcPoint(center, radius, measAngle);
             dst2.SetTo(0);
-            drawCross(dst2, new cv.Point((int)statePt.X, (int)statePt.Y), Scalar.White);
+            drawCross(dst2, new CV.Point((int)statePt.X, (int)statePt.Y), Scalar.White);
             drawCross(dst2, measPt, Scalar.White);
             drawCross(dst2, predictPt, Scalar.White);
             DrawLine(dst2, statePt, measPt, new Scalar(0, 0, 255), task.lineWidth + 2);
@@ -31351,7 +31353,7 @@ namespace CS_Classes
     public class Kalman_MousePredict_CS : CS_Parent
     {
         Kalman_Basics kalman = new Kalman_Basics();
-        cv.Point lastRealMouse = new cv.Point(0, 0);
+        CV.Point lastRealMouse = new CV.Point(0, 0);
         public Kalman_MousePredict_CS(VBtask task) : base(task)
         {
             kalman.kInput = new float[2];
@@ -31362,11 +31364,11 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             if (task.frameCount % 300 == 0) dst2.SetTo(0);
-            cv.Point lastStateResult = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
+            CV.Point lastStateResult = new CV.Point(kalman.kOutput[0], kalman.kOutput[1]);
             if (task.FirstPass) lastRealMouse = task.mouseMovePoint;
             kalman.kInput = new float[] { task.mouseMovePoint.X, task.mouseMovePoint.Y };
             kalman.Run(src);
-            DrawLine(dst2, new cv.Point(kalman.kOutput[0], kalman.kOutput[1]), lastStateResult, cv.Scalar.White, task.lineWidth);
+            DrawLine(dst2, new CV.Point(kalman.kOutput[0], kalman.kOutput[1]), lastStateResult, CV.Scalar.White, task.lineWidth);
             dst2.Line(task.mouseMovePoint, lastRealMouse, Scalar.Red);
             lastRealMouse = task.mouseMovePoint;
         }
@@ -31382,13 +31384,13 @@ namespace CS_Classes
         Kalman_Basics basics = new Kalman_Basics();
         public Mat input;
         int saveDimension = -1;
-        cv.Rect lastRect;
+        CV.Rect lastRect;
         public Kalman_CVMat_CS(VBtask task) : base(task)
         {
             basics.kInput = new float[4];
-            input = new Mat(4, 1, MatType.CV_32F, cv.Scalar.All(0));
+            input = new Mat(4, 1, MatType.CV_32F, CV.Scalar.All(0));
             if (standaloneTest()) labels[2] = "Rectangle moves smoothly to random locations";
-            desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat";
+            desc = "Use Kalman to stabilize a set of values such as a CV.rect or CV.Mat";
         }
         public void RunCS(Mat src)
         {
@@ -31407,7 +31409,7 @@ namespace CS_Classes
                 {
                     kalman[i] = new Kalman_Simple();
                 }
-                output = new Mat(input.Rows, 1, MatType.CV_32F, cv.Scalar.All(0));
+                output = new Mat(input.Rows, 1, MatType.CV_32F, CV.Scalar.All(0));
             }
             if (task.gOptions.GetUseKalman())
             {
@@ -31430,14 +31432,14 @@ namespace CS_Classes
                     rx[i] = output.Get<float>(i, 0);
                 }
                 dst2 = src;
-                cv.Rect rect = new cv.Rect((int)rx[0], (int)rx[1], (int)rx[2], (int)rx[3]);
+                CV.Rect rect = new CV.Rect((int)rx[0], (int)rx[1], (int)rx[2], (int)rx[3]);
                 rect = ValidateRect(rect);
                 if (task.FirstPass) lastRect = rect;
                 if (lastRect == rect)
                 {
                     var r = InitRandomRect(25);
                     float[] array = { r.X, r.Y, r.Width, r.Height };
-                    input = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, array);
+                    input = CV.Mat.FromPixelData(4, 1, MatType.CV_32F, array);
                 }
                 dst2.Rectangle(rect, Scalar.Red, 2);
                 lastRect = rect;
@@ -31533,7 +31535,7 @@ namespace CS_Classes
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
         KalmanFilter kf = new KalmanFilter(2, 1, 0);
         Mat processNoise = new Mat(2, 1, MatType.CV_32F);
-        public Mat measurement = new Mat(1, 1, MatType.CV_32F, cv.Scalar.All(0));
+        public Mat measurement = new Mat(1, 1, MatType.CV_32F, CV.Scalar.All(0));
         public float inputReal;
         public float stateResult;
         public float ProcessNoiseCov = 0.00001f;
@@ -31544,11 +31546,11 @@ namespace CS_Classes
         public Kalman_Single_CS(VBtask task) : base(task)
         {
             float[] tMatrix = { 1, 1, 0, 1 };
-            kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, MatType.CV_32F, tMatrix);
-            kf.MeasurementMatrix.SetIdentity(cv.Scalar.All(1));
-            kf.ProcessNoiseCov.SetIdentity(cv.Scalar.All(0.00001));
-            kf.MeasurementNoiseCov.SetIdentity(cv.Scalar.All(0.1));
-            kf.ErrorCovPost.SetIdentity(cv.Scalar.All(1));
+            kf.TransitionMatrix = CV.Mat.FromPixelData(2, 2, MatType.CV_32F, tMatrix);
+            kf.MeasurementMatrix.SetIdentity(CV.Scalar.All(1));
+            kf.ProcessNoiseCov.SetIdentity(CV.Scalar.All(0.00001));
+            kf.MeasurementNoiseCov.SetIdentity(CV.Scalar.All(0.1));
+            kf.ErrorCovPost.SetIdentity(CV.Scalar.All(1));
             plot.plotCount = 2;
             desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image.";
         }
@@ -31581,7 +31583,7 @@ namespace CS_Classes
     {
         KalmanFilter kf = new KalmanFilter(2, 1, 0);
         Mat processNoise = new Mat(2, 1, MatType.CV_32F);
-        public Mat measurement = new Mat(1, 1, MatType.CV_32F, cv.Scalar.All(0));
+        public Mat measurement = new Mat(1, 1, MatType.CV_32F, CV.Scalar.All(0));
         public float inputReal;
         public float stateResult;
         public float ProcessNoiseCov = 0.00001f;
@@ -31591,11 +31593,11 @@ namespace CS_Classes
         public bool newTMatrix = true;
         public void updateTMatrix()
         {
-            kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, MatType.CV_32F, transitionMatrix);
-            kf.MeasurementMatrix.SetIdentity(cv.Scalar.All(1));
-            kf.ProcessNoiseCov.SetIdentity(cv.Scalar.All(0.00001));
-            kf.MeasurementNoiseCov.SetIdentity(cv.Scalar.All(0.1));
-            kf.ErrorCovPost.SetIdentity(cv.Scalar.All(1));
+            kf.TransitionMatrix = CV.Mat.FromPixelData(2, 2, MatType.CV_32F, transitionMatrix);
+            kf.MeasurementMatrix.SetIdentity(CV.Scalar.All(1));
+            kf.ProcessNoiseCov.SetIdentity(CV.Scalar.All(0.00001));
+            kf.MeasurementNoiseCov.SetIdentity(CV.Scalar.All(0.1));
+            kf.ErrorCovPost.SetIdentity(CV.Scalar.All(1));
         }
         public Kalman_Simple_CS()
         {
@@ -31677,7 +31679,7 @@ namespace CS_Classes
         {
             options.RunVB();
 
-            if (standaloneTest()) kInput = (float)src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Mean()[0];
+            if (standaloneTest()) kInput = (float)src.CvtColor(CV.ColorConversionCodes.BGR2GRAY).Mean()[0];
             if (options.averageInputCount != saveAvgCount)
             {
                 saveAvgCount = options.averageInputCount;
@@ -31688,7 +31690,7 @@ namespace CS_Classes
                 }
             }
             matrix[task.frameCount % saveAvgCount] = kInput;
-            kAverage = (float)(cv.Mat.FromPixelData(saveAvgCount, 1, MatType.CV_32F, matrix.ToArray())).Mean()[0];
+            kAverage = (float)(CV.Mat.FromPixelData(saveAvgCount, 1, MatType.CV_32F, matrix.ToArray())).Mean()[0];
             if (task.gOptions.GetUseKalman())
             {
                 // The Kalman Filter code comes from:
@@ -31742,16 +31744,16 @@ namespace CS_Classes
                                                               options.minDistance, new Mat(), options.blockSize, false, 0);
                 if (options.ptInput.Length > 0)
                 {
-                    options.ptInput = Cv2.CornerSubPix(src, options.ptInput, options.subPixWinSize, new cv.Size(-1, -1), term);
+                    options.ptInput = Cv2.CornerSubPix(src, options.ptInput, options.subPixWinSize, new CV.Size(-1, -1), term);
                 }
-                outputMat = cv.Mat.FromPixelData(options.ptInput.Length, 1, MatType.CV_32FC2, options.ptInput);
-                status = new Mat(outputMat.Rows, outputMat.Cols, MatType.CV_8U, cv.Scalar.All(1));
+                outputMat = CV.Mat.FromPixelData(options.ptInput.Length, 1, MatType.CV_32FC2, options.ptInput);
+                status = new Mat(outputMat.Rows, outputMat.Cols, MatType.CV_8U, CV.Scalar.All(1));
             }
             else if (options.ptInput.Length > 0)
             {
                 Mat err = new Mat();
-                // convert the point2f vector to an inputarray (cv.Mat)
-                Mat inputMat = cv.Mat.FromPixelData(options.ptInput.Length, 1, MatType.CV_32FC2, options.ptInput);
+                // convert the point2f vector to an inputarray (CV.Mat)
+                Mat inputMat = CV.Mat.FromPixelData(options.ptInput.Length, 1, MatType.CV_32FC2, options.ptInput);
                 outputMat = inputMat.Clone();
                 Cv2.CalcOpticalFlowPyrLK(lastGray, src, inputMat, outputMat, status, err, options.winSize, 3, term, OpticalFlowFlags.None);
                 int k = 0;
@@ -31759,7 +31761,7 @@ namespace CS_Classes
                 {
                     if (status.Get<byte>(i) != 0)
                     {
-                        options.ptInput[k] = outputMat.Get<cv.Point2f>(i);
+                        options.ptInput[k] = outputMat.Get<CV.Point2f>(i);
                         k++;
                     }
                 }
@@ -31767,7 +31769,7 @@ namespace CS_Classes
             }
             for (int i = 0; i < outputMat.Rows; i++)
             {
-                Point2f pt = outputMat.Get<cv.Point2f>(i);
+                Point2f pt = outputMat.Get<CV.Point2f>(i);
                 if (pt.X >= 0 && pt.X <= src.Cols && pt.Y >= 0 && pt.Y <= src.Rows)
                 {
                     if (status.Get<byte>(i) != 0)
@@ -31966,7 +31968,7 @@ namespace CS_Classes
         {
             IntPtr imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols);
             if (imagePtr != IntPtr.Zero && task.heartBeat)
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+                dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -32005,7 +32007,7 @@ namespace CS_Classes
                     input.Add(pt.X);
                     input.Add(pt.Y);
                 }
-                dst0 = cv.Mat.FromPixelData(input.Count(), 1, MatType.CV_32F, input.ToArray());
+                dst0 = CV.Mat.FromPixelData(input.Count(), 1, MatType.CV_32F, input.ToArray());
             }
             km.Run(dst0);
             dst2 = ShowPalette(km.dst2 * 255 / km.classCount);
@@ -32032,7 +32034,7 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Kmeans_Simple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, (float)mm.minVal, task.gOptions.getMaxDepthBar());
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
             SetTrueText("Use 'Max Depth' in the global options to set the boundary between blue and yellow.", 3);
         }
         public void Close()
@@ -32062,7 +32064,7 @@ namespace CS_Classes
             edges.Run(src);
             src.SetTo(Scalar.White, edges.dst2);
             km.Run(src);
-            dst3 = km.dst2 + cv.Scalar.All(1);
+            dst3 = km.dst2 + CV.Scalar.All(1);
             classCount = km.classCount;
             redC.Run(dst3);
             dst2 = redC.dst2;
@@ -32166,12 +32168,12 @@ namespace CS_Classes
         {
             km.buildPaletteOutput = false;
             labels[3] = "KMeans 8-bit results";
-            grayPlus[0] = new Mat(task.WorkingRes, MatType.CV_32F, cv.Scalar.All(0));
+            grayPlus[0] = new Mat(task.WorkingRes, MatType.CV_32F, CV.Scalar.All(0));
             desc = "Cluster the rgb+depth image pixels using kMeans";
         }
         public void RunCS(Mat src)
         {
-            src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(grayPlus[0], MatType.CV_32F);
+            src.CvtColor(CV.ColorConversionCodes.BGR2GRAY).ConvertTo(grayPlus[0], MatType.CV_32F);
             grayPlus[0].SetTo(0, task.noDepthMask);
             grayPlus[1] = task.pcSplit[2];
             Mat merge = new Mat();
@@ -32208,7 +32210,7 @@ namespace CS_Classes
                     }
                     else
                     {
-                        src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(merge, MatType.CV_32F);
+                        src.CvtColor(CV.ColorConversionCodes.BGR2GRAY).ConvertTo(merge, MatType.CV_32F);
                     }
                     break;
                 case 2: // pointcloud x and y
@@ -32239,7 +32241,7 @@ namespace CS_Classes
             km.Run(merge);
             labels[2] = "Dimension = " + dimSlider.Value.ToString();
             labels[3] = labels[2];
-            dst2 = km.dst2 + cv.Scalar.All(1);
+            dst2 = km.dst2 + CV.Scalar.All(1);
             dst3 = ShowPalette(dst2 * 255 / km.classCount);
         }
     }
@@ -32264,7 +32266,7 @@ namespace CS_Classes
             kSlider.Value = tiers.classCount;
             int kMeansK = kSlider.Value;
             km.Run(task.pcSplit[2]);
-            dst2 = km.dst2 + cv.Scalar.All(1);
+            dst2 = km.dst2 + CV.Scalar.All(1);
             dst3 = ShowPalette(dst2 * 255 / tiers.classCount);
             dst3.SetTo(0, task.noDepthMask);
         }
@@ -32286,7 +32288,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             km.Run(task.pcSplit[2]);
-            dst2 = km.dst2 + cv.Scalar.All(1);
+            dst2 = km.dst2 + CV.Scalar.All(1);
             dst2.SetTo(0, task.noDepthMask);
             classCount = km.classCount;
             dst3 = ShowPalette(dst2 * 255 / classCount);
@@ -32361,9 +32363,9 @@ namespace CS_Classes
     public class KNN_Basics_CS : CS_Parent
     {
         public List<PointPair> matches = new List<PointPair>();
-        public List<cv.Point2f> noMatch = new List<cv.Point2f>();
+        public List<CV.Point2f> noMatch = new List<CV.Point2f>();
         public KNN_Core knn = new KNN_Core();
-        public List<cv.Point2f> queries = new List<cv.Point2f>();
+        public List<CV.Point2f> queries = new List<CV.Point2f>();
         public List<int> neighbors = new List<int>();
         Random_Basics random = new Random_Basics();
         public KNN_Basics_CS(VBtask task) : base(task)
@@ -32379,10 +32381,10 @@ namespace CS_Classes
                 if (task.heartBeat)
                 {
                     random.Run(empty);
-                    knn.trainInput = new List<cv.Point2f>(random.PointList);
+                    knn.trainInput = new List<CV.Point2f>(random.PointList);
                 }
                 random.Run(empty);
-                queries = new List<cv.Point2f>(random.PointList);
+                queries = new List<CV.Point2f>(random.PointList);
             }
             if (queries.Count() == 0)
             {
@@ -32436,7 +32438,7 @@ namespace CS_Classes
                     DrawLine(dst3, nn, pt, Scalar.White);
                 }
             }
-            if (!standaloneTest()) knn.trainInput = new List<cv.Point2f>(queries);
+            if (!standaloneTest()) knn.trainInput = new List<CV.Point2f>(queries);
         }
     }
 
@@ -32446,8 +32448,8 @@ namespace CS_Classes
     public class KNN_Core_CS : CS_Parent
     {
         public KNearest knn;
-        public List<cv.Point2f> trainInput = new List<cv.Point2f>(); // put training data here
-        public List<cv.Point2f> queries = new List<cv.Point2f>(); // put Query data here
+        public List<CV.Point2f> trainInput = new List<CV.Point2f>(); // put training data here
+        public List<CV.Point2f> queries = new List<CV.Point2f>(); // put Query data here
         public List<List<int>> neighbors = new List<List<int>>();
         public int[,] result; // Get results here...
         public int desiredMatches = -1; // -1 indicates it is to use the number of queries.
@@ -32484,20 +32486,20 @@ namespace CS_Classes
                 if (task.heartBeat)
                 {
                     random.Run(empty);
-                    trainInput = new List<cv.Point2f>(random.PointList);
+                    trainInput = new List<CV.Point2f>(random.PointList);
                 }
                 random.Run(empty);
-                queries = new List<cv.Point2f>(random.PointList);
+                queries = new List<CV.Point2f>(random.PointList);
             }
-            var queryMat = cv.Mat.FromPixelData(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
+            var queryMat = CV.Mat.FromPixelData(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
             if (queryMat.Rows == 0)
             {
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
-            if (trainInput.Count() == 0) trainInput = new List<cv.Point2f>(queries); // first pass, just match the queries.
-            var trainData = cv.Mat.FromPixelData(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
-            var response = cv.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            if (trainInput.Count() == 0) trainInput = new List<CV.Point2f>(queries); // first pass, just match the queries.
+            var trainData = CV.Mat.FromPixelData(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
+            var response = CV.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
             var neighborMat = new Mat();
             int dm = desiredMatches < 0 ? trainInput.Count() : desiredMatches;
@@ -32571,10 +32573,10 @@ namespace CS_Classes
             {
                 dst3.SetTo(0);
                 random.Run(empty);
-                knn.trainInput = new List<cv.Point2f>(random.PointList);
+                knn.trainInput = new List<CV.Point2f>(random.PointList);
             }
             random.Run(empty);
-            knn.queries = new List<cv.Point2f>(random.PointList);
+            knn.queries = new List<CV.Point2f>(random.PointList);
             knn.Run(empty);
             knn.displayResults();
             dst2 = knn.dst2;
@@ -32589,8 +32591,8 @@ namespace CS_Classes
     public class KNN_Core3D_CS : CS_Parent
     {
         public KNearest knn;
-        public List<cv.Point3f> trainInput = new List<cv.Point3f>(); // put training data here
-        public List<cv.Point3f> queries = new List<cv.Point3f>(); // put Query data here
+        public List<CV.Point3f> trainInput = new List<CV.Point3f>(); // put training data here
+        public List<CV.Point3f> queries = new List<CV.Point3f>(); // put Query data here
         public int[,] result; // Get results here...
         public KNN_Core3D_CS(VBtask task) : base(task)
         {
@@ -32605,15 +32607,15 @@ namespace CS_Classes
                 return;
             }
             int KNNdimension = 3;
-            var queryMat = cv.Mat.FromPixelData(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
+            var queryMat = CV.Mat.FromPixelData(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
             if (queryMat.Rows == 0)
             {
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
-            if (trainInput.Count() == 0) trainInput = new List<cv.Point3f>(queries); // first pass, just match the queries.
-            var trainData = cv.Mat.FromPixelData(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
-            var response = cv.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            if (trainInput.Count() == 0) trainInput = new List<CV.Point3f>(queries); // first pass, just match the queries.
+            var trainData = CV.Mat.FromPixelData(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
+            var response = CV.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
             var neighbors = new Mat();
             int dm = trainInput.Count();
@@ -32655,15 +32657,15 @@ namespace CS_Classes
                 return;
             }
             int KNNdimension = 4;
-            Mat queryMat = cv.Mat.FromPixelData(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
+            Mat queryMat = CV.Mat.FromPixelData(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
             if (queryMat.Rows == 0)
             {
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
             if (trainInput.Count() == 0) trainInput = new List<Vec4f>(queries); // first pass, just match the queries.
-            Mat trainData = cv.Mat.FromPixelData(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
-            Mat response = cv.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            Mat trainData = CV.Mat.FromPixelData(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
+            Mat response = CV.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
             Mat neighbors = new Mat();
             int dm = trainInput.Count();
@@ -32722,9 +32724,9 @@ namespace CS_Classes
                 SetTrueText("There were no queries provided.  There is nothing to do...");
                 return;
             }
-            Mat queryMat = cv.Mat.FromPixelData(qRows, options.knnDimension, MatType.CV_32F, queries.ToArray());
-            Mat trainData = cv.Mat.FromPixelData((int)(trainInput.Count() / options.knnDimension), options.knnDimension, MatType.CV_32F, trainInput.ToArray());
-            Mat response = cv.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            Mat queryMat = CV.Mat.FromPixelData(qRows, options.knnDimension, MatType.CV_32F, queries.ToArray());
+            Mat trainData = CV.Mat.FromPixelData((int)(trainInput.Count() / options.knnDimension), options.knnDimension, MatType.CV_32F, trainInput.ToArray());
+            Mat response = CV.Mat.FromPixelData(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
             knn.Train(trainData, SampleTypes.RowSample, response);
             Mat neighbors = new Mat();
             int dm = trainInput.Count();
@@ -32764,7 +32766,7 @@ namespace CS_Classes
                 random.Run(empty);
                 foreach (var pt in random.PointList)
                 {
-                    var vec = task.pointCloud.Get<cv.Point3f>((int)pt.Y, (int)pt.X);
+                    var vec = task.pointCloud.Get<CV.Point3f>((int)pt.Y, (int)pt.X);
                     if (knn.trainInput.Count() == 10)
                     {
                         if (vec.Z != 0)
@@ -32931,12 +32933,12 @@ namespace CS_Classes
         {
             em.Run(src);
             random.Run(empty);
-            knn.queries = new List<cv.Point2f>(em.centers);
+            knn.queries = new List<CV.Point2f>(em.centers);
             knn.Run(src);
             dst2 = em.dst2 + knn.dst2;
             knn.displayResults();
             dst3 = knn.dst2;
-            knn.trainInput = new List<cv.Point2f>(knn.queries);
+            knn.trainInput = new List<CV.Point2f>(knn.queries);
         }
     }
 
@@ -32951,7 +32953,7 @@ namespace CS_Classes
         const int maxDistance = 50;
         public float shiftX;
         public float shiftY;
-        List<cv.Point2f> motionTrack = new List<cv.Point2f>();
+        List<CV.Point2f> motionTrack = new List<CV.Point2f>();
         Mat lastImage;
         TrackBar dotSlider;
         Options_KNN options = new Options_KNN();
@@ -32979,7 +32981,7 @@ namespace CS_Classes
                 if (diffPlus < 0) diffPlus = 0;
                 hist[diffPlus] += 1;
             }
-            plot.Run(cv.Mat.FromPixelData(hist.Length, 1, MatType.CV_32F, hist));
+            plot.Run(CV.Mat.FromPixelData(hist.Length, 1, MatType.CV_32F, hist));
             var histList = hist.ToList();
             float maxVal = histList.Max();
             int maxIndex = histList.IndexOf(maxVal);
@@ -32998,7 +33000,7 @@ namespace CS_Classes
             if (task.FirstPass) lastImage = src.Clone();
             int multiplier = dotSlider.Value;
             feat.Run(src);
-            knn.queries = new List<cv.Point2f>(task.features);
+            knn.queries = new List<CV.Point2f>(task.features);
             knn.Run(src);
             List<int> diffX = new List<int>();
             List<int> diffY = new List<int>();
@@ -33007,8 +33009,8 @@ namespace CS_Classes
             var sz = task.gridSize;
             foreach (var mps in knn.matches)
             {
-                var currRect = ValidateRect(new cv.Rect((int)(mps.p1.X - sz), (int)(mps.p1.Y - sz), sz * 2, sz * 2));
-                var prevRect = ValidateRect(new cv.Rect((int)(mps.p2.X - sz), (int)(mps.p2.Y - sz), currRect.Width, currRect.Height));
+                var currRect = ValidateRect(new CV.Rect((int)(mps.p1.X - sz), (int)(mps.p1.Y - sz), sz * 2, sz * 2));
+                var prevRect = ValidateRect(new CV.Rect((int)(mps.p2.X - sz), (int)(mps.p2.Y - sz), currRect.Width, currRect.Height));
                 Cv2.MatchTemplate(lastImage[prevRect], src[currRect], correlationMat, feat.options.matchOption);
                 float corrNext = correlationMat.Get<float>(0, 0);
                 DrawCircle(dst2, mps.p1, task.DotSize, task.HighlightColor);
@@ -33019,10 +33021,10 @@ namespace CS_Classes
             string xLabel = "", yLabel = "";
             shiftX = multiplier * plotDiff(diffX, " X ", 3, ref xLabel);
             dst3 = plot.dst2.Clone();
-            dst3.Line(new cv.Point(plot.plotCenter, 0), new cv.Point(plot.plotCenter, dst2.Height), Scalar.White, 1);
+            dst3.Line(new CV.Point(plot.plotCenter, 0), new CV.Point(plot.plotCenter, dst2.Height), Scalar.White, 1);
             shiftY = multiplier * plotDiff(diffY, " Y ", 1, ref yLabel);
             dst1 = plot.dst2;
-            dst1.Line(new cv.Point(plot.plotCenter, 0), new cv.Point(plot.plotCenter, dst2.Height), Scalar.White, 1);
+            dst1.Line(new CV.Point(plot.plotCenter, 0), new CV.Point(plot.plotCenter, dst2.Height), Scalar.White, 1);
             lastImage = src.Clone();
             motionTrack.Add(new Point2f(shiftX + dst2.Width / 2, shiftY + dst2.Height / 2));
             if (motionTrack.Count() > task.fpsRate) motionTrack.RemoveAt(0);
@@ -33044,7 +33046,7 @@ namespace CS_Classes
     {
         public Line_Basics lines = new Line_Basics();
         public PointPair lastPair = new PointPair();
-        public List<cv.Point2f> trainInput = new List<cv.Point2f>();
+        public List<CV.Point2f> trainInput = new List<CV.Point2f>();
         List<float> minDistances = new List<float>();
         public KNN_ClosestTracker_CS(VBtask task) : base(task)
         {
@@ -33054,7 +33056,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             dst2 = src.Clone();
-            cv.Point2f p1 = new cv.Point2f(), p2 = new cv.Point2f();
+            CV.Point2f p1 = new CV.Point2f(), p2 = new CV.Point2f();
             if (trainInput.Count() == 0)
             {
                 lines.Run(src);
@@ -33124,7 +33126,7 @@ namespace CS_Classes
         public Point2f lastP1;
         public Point2f lastP2;
         public int lastIndex;
-        public List<cv.Point2f> trainInput = new List<cv.Point2f>();
+        public List<CV.Point2f> trainInput = new List<CV.Point2f>();
         List<float> minDistances;
         public KNN_ClosestLine_CS(VBtask task) : base(task)
         {
@@ -33217,9 +33219,9 @@ namespace CS_Classes
     public class KNN_BasicsOld_CS : CS_Parent
     {
         public List<PointPair> matches = new List<PointPair>();
-        public List<cv.Point> noMatch = new List<cv.Point>();
+        public List<CV.Point> noMatch = new List<CV.Point>();
         public KNN_Core knn = new KNN_Core();
-        public List<cv.Point2f> queries = new List<cv.Point2f>();
+        public List<CV.Point2f> queries = new List<CV.Point2f>();
         Random_Basics random = new Random_Basics();
         public KNN_BasicsOld_CS(VBtask task) : base(task)
         {
@@ -33234,10 +33236,10 @@ namespace CS_Classes
                 if (task.heartBeat)
                 {
                     random.Run(empty);
-                    knn.trainInput = new List<cv.Point2f>(random.PointList);
+                    knn.trainInput = new List<CV.Point2f>(random.PointList);
                 }
                 random.Run(empty);
-                queries = new List<cv.Point2f>(random.PointList);
+                queries = new List<CV.Point2f>(random.PointList);
             }
             if (queries.Count() == 0)
             {
@@ -33297,7 +33299,7 @@ namespace CS_Classes
                 DrawCircle(dst3, pt, task.DotSize + 4, Scalar.Yellow);
                 if (nearest[i] == -1)
                 {
-                    noMatch.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                    noMatch.Add(new CV.Point((int)pt.X, (int)pt.Y));
                 }
                 else
                 {
@@ -33309,7 +33311,7 @@ namespace CS_Classes
                     }
                 }
             }
-            if (!standaloneTest()) knn.trainInput = new List<cv.Point2f>(queries);
+            if (!standaloneTest()) knn.trainInput = new List<CV.Point2f>(queries);
         }
     }
 
@@ -33333,8 +33335,8 @@ namespace CS_Classes
                 if (task.heartBeat)
                 {
                     random.Run(empty);
-                    knn.trainInput = new List<cv.Point2f>(random.PointList);
-                    knn.queries = new List<cv.Point2f>(knn.trainInput);
+                    knn.trainInput = new List<CV.Point2f>(random.PointList);
+                    knn.queries = new List<CV.Point2f>(knn.trainInput);
                 }
             }
             knn.Run(empty);
@@ -33379,7 +33381,7 @@ namespace CS_Classes
             var minDistance = feat.options.minDistance;
             if (!task.motionFlag || task.optionsChanged) minDistance = 2;
             feat.Run(src);
-            knn.queries = new List<cv.Point2f>(task.features);
+            knn.queries = new List<CV.Point2f>(task.features);
             knn.Run(src);
             var tracker = new List<PointPair>();
             dst2 = src.Clone();
@@ -33488,7 +33490,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             input.Run(empty);
-            dst0 = input.dst2.CvtColor(cv.ColorConversionCodes.BGR2HLS);
+            dst0 = input.dst2.CvtColor(CV.ColorConversionCodes.BGR2HLS);
             dst1 = dst0.InRange(new Scalar(0, 200, 0), new Scalar(255, 255, 255));
             dst2 = dst0.InRange(new Scalar(10, 0, 100), new Scalar(40, 255, 255));
             dst3 = dst1 | dst2;
@@ -33501,7 +33503,7 @@ namespace CS_Classes
     public class LaneFinder_ROI_CS : CS_Parent
     {
         LaneFinder_HLSColor hls = new LaneFinder_HLSColor();
-        cv.Point[][] pListList = new cv.Point[1][];
+        CV.Point[][] pListList = new CV.Point[1][];
         public LaneFinder_ROI_CS(VBtask task) : base(task)
         {
             labels = new string[] { "Original input", "Mask showing ROI", "HLS version with ROI outline", "HLS Mask with ROI outline" };
@@ -33514,12 +33516,12 @@ namespace CS_Classes
             {
                 var w = hls.input.video.dst2.Width;
                 var h = hls.input.video.dst2.Height;
-                var bl = new cv.Point(w * 0.1, h * 0.95);
-                var tl = new cv.Point(w * 0.4, h * 0.6);
-                var br = new cv.Point(w * 0.95, h * 0.95);
-                var tr = new cv.Point(w * 0.6, h * 0.6);
-                var pList = new cv.Point[] { bl, tl, tr, br };
-                dst1 = new Mat(new cv.Size(w, h), MatType.CV_8U, cv.Scalar.All(0));
+                var bl = new CV.Point(w * 0.1, h * 0.95);
+                var tl = new CV.Point(w * 0.4, h * 0.6);
+                var br = new CV.Point(w * 0.95, h * 0.95);
+                var tr = new CV.Point(w * 0.6, h * 0.6);
+                var pList = new CV.Point[] { bl, tl, tr, br };
+                dst1 = new Mat(new CV.Size(w, h), MatType.CV_8U, CV.Scalar.All(0));
                 dst1.FillConvexPoly(pList, Scalar.White, task.lineType);
                 pListList[0] = pList;
             }
@@ -33577,15 +33579,15 @@ namespace CS_Classes
                     rightWeight.Add((float)line.P1.DistanceTo(line.P2));
                 }
             }
-            var mat1 = cv.Mat.FromPixelData(leftWeight.Count(), 1, MatType.CV_32F, leftWeight.ToArray());
-            var mat2 = cv.Mat.FromPixelData(leftSlope.Count(), 1, MatType.CV_32F, leftSlope.ToArray());
-            var mat3 = cv.Mat.FromPixelData(leftIntercept.Count(), 1, MatType.CV_32F, leftIntercept.ToArray());
+            var mat1 = CV.Mat.FromPixelData(leftWeight.Count(), 1, MatType.CV_32F, leftWeight.ToArray());
+            var mat2 = CV.Mat.FromPixelData(leftSlope.Count(), 1, MatType.CV_32F, leftSlope.ToArray());
+            var mat3 = CV.Mat.FromPixelData(leftIntercept.Count(), 1, MatType.CV_32F, leftIntercept.ToArray());
             var weight = leftWeight.Sum();
             leftLaneIntercept = (float)(mat1.Dot(mat3) / weight);
             leftAvgSlope = (float)(mat1.Dot(mat2) / weight);
-            mat1 = cv.Mat.FromPixelData(rightWeight.Count(), 1, MatType.CV_32F, rightWeight.ToArray());
-            mat2 = cv.Mat.FromPixelData(rightSlope.Count(), 1, MatType.CV_32F, rightSlope.ToArray());
-            mat3 = cv.Mat.FromPixelData(rightIntercept.Count(), 1, MatType.CV_32F, rightIntercept.ToArray());
+            mat1 = CV.Mat.FromPixelData(rightWeight.Count(), 1, MatType.CV_32F, rightWeight.ToArray());
+            mat2 = CV.Mat.FromPixelData(rightSlope.Count(), 1, MatType.CV_32F, rightSlope.ToArray());
+            mat3 = CV.Mat.FromPixelData(rightIntercept.Count(), 1, MatType.CV_32F, rightIntercept.ToArray());
             weight = rightWeight.Sum();
             rightLaneIntercept = (float)(mat1.Dot(mat3) / weight);
             rightAvgSlope = (float)(mat1.Dot(mat2) / weight);
@@ -33594,11 +33596,11 @@ namespace CS_Classes
                         "Left slope = " + string.Format(fmt3, leftAvgSlope) +
                         " Right slope = " + string.Format(fmt3, rightAvgSlope), 3);
             var tmp = dst2.EmptyClone();
-            var p1 = new cv.Point(0, leftLaneIntercept);
-            var p2 = new cv.Point(-leftLaneIntercept / leftAvgSlope, 0);
+            var p1 = new CV.Point(0, leftLaneIntercept);
+            var p2 = new CV.Point(-leftLaneIntercept / leftAvgSlope, 0);
             tmp.Line(p1, p2, Scalar.White, task.lineWidth, task.lineType);
-            p1 = new cv.Point(0, rightLaneIntercept);
-            p2 = new cv.Point((dst0.Height - rightLaneIntercept) / rightAvgSlope, dst2.Height);
+            p1 = new CV.Point(0, rightLaneIntercept);
+            p2 = new CV.Point((dst0.Height - rightLaneIntercept) / rightAvgSlope, dst2.Height);
             tmp.Line(p1, p2, Scalar.White, task.lineWidth, task.lineType);
             tmp.CopyTo(dst2, hough.mask);
             dst2.CopyTo(dst3, dst2);
@@ -33715,8 +33717,8 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            cv.Rect r1 = new cv.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight);
-            cv.Rect r2 = new cv.Rect(0, 25, task.leftView.Width, options.sliceHeight);
+            CV.Rect r1 = new CV.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight);
+            CV.Rect r2 = new CV.Rect(0, 25, task.leftView.Width, options.sliceHeight);
             dst2.SetTo(0);
             task.leftView[r1].CopyTo(dst2[r2]);
             r2.Y += options.sliceHeight;
@@ -33816,8 +33818,8 @@ namespace CS_Classes
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
             if (standaloneTest()) task.gOptions.setDisplay1();
-            dst0 = new Mat(dst0.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "Reduced Left Image", "Reduced Right Image" };
             desc = "Use the left/right reductions to find hard markers - neighboring pixels of identical values";
         }
@@ -33874,8 +33876,8 @@ namespace CS_Classes
         LeftRight_Reduction redView = new LeftRight_Reduction();
         public LeftRight_Markers1_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "Reduced Left Image", "Reduced Right Image" };
             desc = "Use the left/right reductions to find markers - neighboring pixels of identical values";
         }
@@ -34026,13 +34028,13 @@ namespace CS_Classes
 
     public class Line_Basics_CS : CS_Parent
     {
-        cv.XImgProc.FastLineDetector ld;
+        CV.XImgProc.FastLineDetector ld;
         public List<PointPair> lpList = new List<PointPair>();
         public Scalar lineColor = Scalar.White;
         public Line_Basics_CS(VBtask task) : base(task)
         {
-            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector();
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            ld = CV.XImgProc.CvXImgProc.CreateFastLineDetector();
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
         }
         public void RunCS(Mat src)
@@ -34050,8 +34052,8 @@ namespace CS_Classes
                 if (v[0] >= 0 && v[0] <= dst2.Cols && v[1] >= 0 && v[1] <= dst2.Rows &&
                     v[2] >= 0 && v[2] <= dst2.Cols && v[3] >= 0 && v[3] <= dst2.Rows)
                 {
-                    var p1 = new cv.Point(v[0], v[1]);
-                    var p2 = new cv.Point(v[2], v[3]);
+                    var p1 = new CV.Point(v[0], v[1]);
+                    var p2 = new CV.Point(v[2], v[3]);
                     var lp = new PointPair(p1, p2);
                     sortByLen.Add(lp.length, lp);
                 }
@@ -34063,7 +34065,7 @@ namespace CS_Classes
             {
                 lpList.Add(lp);
                 DrawLine(dst2, lp.p1, lp.p2, lineColor);
-                DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.All(255));
+                DrawLine(dst3, lp.p1, lp.p2, CV.Scalar.All(255));
             }
             labels[2] = lpList.Count().ToString() + " lines were detected in the current frame";
         }
@@ -34074,17 +34076,17 @@ namespace CS_Classes
 
     public class Line_SubsetRect_CS : CS_Parent
     {
-        cv.XImgProc.FastLineDetector ld;
+        CV.XImgProc.FastLineDetector ld;
         public SortedList<float, PointPair> sortByLen = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
         public List<PointPair> mpList = new List<PointPair>();
-        public List<cv.Point2f> ptList = new List<cv.Point2f>();
-        public cv.Rect subsetRect;
+        public List<CV.Point2f> ptList = new List<CV.Point2f>();
+        public CV.Rect subsetRect;
         public Scalar lineColor = Scalar.White;
         public Line_SubsetRect_CS(VBtask task) : base(task)
         {
-            subsetRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
-            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector();
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            subsetRect = new CV.Rect(0, 0, dst2.Width, dst2.Height);
+            ld = CV.XImgProc.CvXImgProc.CreateFastLineDetector();
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
         }
         public void RunCS(Mat src)
@@ -34104,8 +34106,8 @@ namespace CS_Classes
                 if (v[0] >= 0 && v[0] <= dst2.Cols && v[1] >= 0 && v[1] <= dst2.Rows &&
                     v[2] >= 0 && v[2] <= dst2.Cols && v[3] >= 0 && v[3] <= dst2.Rows)
                 {
-                    var p1 = new cv.Point(v[0] + subsetRect.X, v[1] + subsetRect.Y);
-                    var p2 = new cv.Point(v[2] + subsetRect.X, v[3] + subsetRect.Y);
+                    var p1 = new CV.Point(v[0] + subsetRect.X, v[1] + subsetRect.Y);
+                    var p2 = new CV.Point(v[2] + subsetRect.X, v[3] + subsetRect.Y);
                     var lp = new PointPair(p1, p2);
                     mpList.Add(lp);
                     ptList.Add(p1);
@@ -34118,7 +34120,7 @@ namespace CS_Classes
             foreach (var lp in sortByLen.Values)
             {
                 DrawLine(dst2, lp.p1, lp.p2, lineColor);
-                DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.All(255));
+                DrawLine(dst3, lp.p1, lp.p2, CV.Scalar.All(255));
             }
             labels[2] = mpList.Count().ToString() + " lines were detected in the current frame";
         }
@@ -34130,7 +34132,7 @@ namespace CS_Classes
     public class Line_InterceptsUI_CS : CS_Parent
     {
         Line_Intercepts lines = new Line_Intercepts();
-        cv.Point p2;
+        CV.Point p2;
         System.Windows.Forms.RadioButton redRadio;
         System.Windows.Forms.RadioButton greenRadio;
         System.Windows.Forms.RadioButton yellowRadio;
@@ -34152,38 +34154,38 @@ namespace CS_Classes
             var green = new Scalar(1, 128, 0);
             var yellow = new Scalar(2, 255, 255);
             var blue = new Scalar(254, 0, 0);
-            var center = new cv.Point(dst3.Width / 2, dst3.Height / 2);
-            dst3.Line(new cv.Point(0, 0), center, blue, task.lineWidth, LineTypes.Link4);
-            dst3.Line(new cv.Point(dst2.Width, 0), center, red, task.lineWidth, LineTypes.Link4);
-            dst3.Line(new cv.Point(0, dst2.Height), center, blue, task.lineWidth, LineTypes.Link4);
-            dst3.Line(new cv.Point(dst2.Width, dst2.Height), center, yellow, task.lineWidth, LineTypes.Link4);
-            var mask = new Mat(new cv.Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, cv.Scalar.All(0));
-            var pt = new cv.Point(center.X, center.Y - 30);
-            cv.Rect r;
-            Cv2.FloodFill(dst3, mask, pt, red, out r, cv.Scalar.All(1), cv.Scalar.All(1), FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
-            pt = new cv.Point(center.X, center.Y + 30);
-            Cv2.FloodFill(dst3, mask, pt, green, out r, cv.Scalar.All(1), cv.Scalar.All(1), FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
-            pt = new cv.Point(center.X - 30, center.Y);
-            Cv2.FloodFill(dst3, mask, pt, blue, out r, cv.Scalar.All(1), cv.Scalar.All(1), FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
-            pt = new cv.Point(center.X + 30, center.Y);
-            Cv2.FloodFill(dst3, mask, pt, yellow, out r, cv.Scalar.All(1), cv.Scalar.All(1), FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
+            var center = new CV.Point(dst3.Width / 2, dst3.Height / 2);
+            dst3.Line(new CV.Point(0, 0), center, blue, task.lineWidth, LineTypes.Link4);
+            dst3.Line(new CV.Point(dst2.Width, 0), center, red, task.lineWidth, LineTypes.Link4);
+            dst3.Line(new CV.Point(0, dst2.Height), center, blue, task.lineWidth, LineTypes.Link4);
+            dst3.Line(new CV.Point(dst2.Width, dst2.Height), center, yellow, task.lineWidth, LineTypes.Link4);
+            var mask = new Mat(new CV.Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, CV.Scalar.All(0));
+            var pt = new CV.Point(center.X, center.Y - 30);
+            CV.Rect r;
+            Cv2.FloodFill(dst3, mask, pt, red, out r, CV.Scalar.All(1), CV.Scalar.All(1), FloodFillFlags.FixedRange | (CV.FloodFillFlags)(255 << 8));
+            pt = new CV.Point(center.X, center.Y + 30);
+            Cv2.FloodFill(dst3, mask, pt, green, out r, CV.Scalar.All(1), CV.Scalar.All(1), FloodFillFlags.FixedRange | (CV.FloodFillFlags)(255 << 8));
+            pt = new CV.Point(center.X - 30, center.Y);
+            Cv2.FloodFill(dst3, mask, pt, blue, out r, CV.Scalar.All(1), CV.Scalar.All(1), FloodFillFlags.FixedRange | (CV.FloodFillFlags)(255 << 8));
+            pt = new CV.Point(center.X + 30, center.Y);
+            Cv2.FloodFill(dst3, mask, pt, yellow, out r, CV.Scalar.All(1), CV.Scalar.All(1), FloodFillFlags.FixedRange | (CV.FloodFillFlags)(255 << 8));
             var color = dst3.Get<Vec3b>(task.mouseMovePoint.Y, task.mouseMovePoint.X);
             var p1 = task.mouseMovePoint;
             if (p1.X == center.X)
             {
                 if (p1.Y <= center.Y)
-                    p2 = new cv.Point(dst3.Width / 2, 0);
+                    p2 = new CV.Point(dst3.Width / 2, 0);
                 else
-                    p2 = new cv.Point(dst3.Width, dst3.Height);
+                    p2 = new CV.Point(dst3.Width, dst3.Height);
             }
             else
             {
                 double m = (center.Y - p1.Y) / (center.X - p1.X);
                 double b = p1.Y - p1.X * m;
-                if (color[0] == 0) p2 = new cv.Point(-b / m, 0); // red zone
-                if (color[0] == 1) p2 = new cv.Point((dst3.Height - b) / m, dst3.Height); // green
-                if (color[0] == 2) p2 = new cv.Point(dst3.Width, dst3.Width * m + b); // yellow
-                if (color[0] == 254) p2 = new cv.Point(0, b); // blue
+                if (color[0] == 0) p2 = new CV.Point(-b / m, 0); // red zone
+                if (color[0] == 1) p2 = new CV.Point((dst3.Height - b) / m, dst3.Height); // green
+                if (color[0] == 2) p2 = new CV.Point(dst3.Width, dst3.Width * m + b); // yellow
+                if (color[0] == 254) p2 = new CV.Point(0, b); // blue
                 DrawLine(dst3, center, p2, Scalar.Black);
             }
             DrawCircle(dst3, center, task.DotSize, Scalar.White);
@@ -34203,8 +34205,8 @@ namespace CS_Classes
     {
         public LongLine_Extend extended = new LongLine_Extend();
         public Line_Basics lines = new Line_Basics();
-        public List<cv.Point2f> p1List = new List<cv.Point2f>();
-        public List<cv.Point2f> p2List = new List<cv.Point2f>();
+        public List<CV.Point2f> p1List = new List<CV.Point2f>();
+        public List<CV.Point2f> p2List = new List<CV.Point2f>();
         LongLine_Basics longLine = new LongLine_Basics();
         public Options_Intercepts options = new Options_Intercepts();
         public SortedList<int, int> intercept = new SortedList<int, int>(new compareAllowIdenticalInteger());
@@ -34234,16 +34236,16 @@ namespace CS_Classes
                 switch (options.selectedIntercept)
                 {
                     case 0:
-                        dst.Line(new cv.Point(inter.Key, 0), new cv.Point(inter.Key, 10), Scalar.White, task.lineWidth);
+                        dst.Line(new CV.Point(inter.Key, 0), new CV.Point(inter.Key, 10), Scalar.White, task.lineWidth);
                         break;
                     case 1:
-                        dst.Line(new cv.Point(inter.Key, dst2.Height), new cv.Point(inter.Key, dst2.Height - 10), Scalar.White, task.lineWidth);
+                        dst.Line(new CV.Point(inter.Key, dst2.Height), new CV.Point(inter.Key, dst2.Height - 10), Scalar.White, task.lineWidth);
                         break;
                     case 2:
-                        dst.Line(new cv.Point(0, inter.Key), new cv.Point(10, inter.Key), Scalar.White, task.lineWidth);
+                        dst.Line(new CV.Point(0, inter.Key), new CV.Point(10, inter.Key), Scalar.White, task.lineWidth);
                         break;
                     case 3:
-                        dst.Line(new cv.Point(dst2.Width, inter.Key), new cv.Point(dst2.Width - 10, inter.Key), Scalar.White, task.lineWidth);
+                        dst.Line(new CV.Point(dst2.Width, inter.Key), new CV.Point(dst2.Width - 10, inter.Key), Scalar.White, task.lineWidth);
                         break;
                 }
             }
@@ -34324,10 +34326,10 @@ namespace CS_Classes
     public class Line_InDepthAndBGR_CS : CS_Parent
     {
         Line_Basics lines = new Line_Basics();
-        public List<cv.Point2f> p1List = new List<cv.Point2f>();
-        public List<cv.Point2f> p2List = new List<cv.Point2f>();
-        public List<cv.Point3f> z1List = new List<cv.Point3f>(); // the point cloud values corresponding to p1 and p2
-        public List<cv.Point3f> z2List = new List<cv.Point3f>();
+        public List<CV.Point2f> p1List = new List<CV.Point2f>();
+        public List<CV.Point2f> p2List = new List<CV.Point2f>();
+        public List<CV.Point3f> z1List = new List<CV.Point3f>(); // the point cloud values corresponding to p1 and p2
+        public List<CV.Point3f> z2List = new List<CV.Point3f>();
         public Line_InDepthAndBGR_CS(VBtask task) : base(task)
         {
             labels[2] = "Lines defined in BGR";
@@ -34339,7 +34341,7 @@ namespace CS_Classes
             lines.Run(src);
             dst2 = lines.dst2;
             if (lines.lpList.Count() == 0) return;
-            var lineList = new List<cv.Rect>();
+            var lineList = new List<CV.Rect>();
             if (task.motionFlag || task.optionsChanged) dst3.SetTo(0);
             p1List.Clear();
             p2List.Clear();
@@ -34351,10 +34353,10 @@ namespace CS_Classes
                 var minYY = Math.Min(lp.p1.Y, lp.p2.Y);
                 var w = Math.Abs(lp.p1.X - lp.p2.X);
                 var h = Math.Abs(lp.p1.Y - lp.p2.Y);
-                var r = new cv.Rect((int)minXX, (int)minYY, (int)(w > 0 ? w : 2), (int)(h > 0 ? h : 2));
-                var mask = new Mat(new cv.Size(w, h), MatType.CV_8U, cv.Scalar.All(0));
-                DrawLine(mask, new cv.Point((int)(lp.p1.X - r.X), (int)(lp.p1.Y - r.Y)), 
-                               new cv.Point((int)(lp.p2.X - r.X), (int)(lp.p2.Y - r.Y)), cv.Scalar.All(255), task.lineWidth);
+                var r = new CV.Rect((int)minXX, (int)minYY, (int)(w > 0 ? w : 2), (int)(h > 0 ? h : 2));
+                var mask = new Mat(new CV.Size(w, h), MatType.CV_8U, CV.Scalar.All(0));
+                DrawLine(mask, new CV.Point((int)(lp.p1.X - r.X), (int)(lp.p1.Y - r.Y)), 
+                               new CV.Point((int)(lp.p2.X - r.X), (int)(lp.p2.Y - r.Y)), CV.Scalar.All(255), task.lineWidth);
                 var mean = task.pointCloud[r].Mean(mask);
                 if (mean != new Scalar())
                 {
@@ -34364,21 +34366,21 @@ namespace CS_Classes
                     var len2 = mmY.minLoc.DistanceTo(mmY.maxLoc);
                     if (len1 > len2)
                     {
-                        lp.p1 = new cv.Point(mmX.minLoc.X + r.X, mmX.minLoc.Y + r.Y);
-                        lp.p2 = new cv.Point(mmX.maxLoc.X + r.X, mmX.maxLoc.Y + r.Y);
+                        lp.p1 = new CV.Point(mmX.minLoc.X + r.X, mmX.minLoc.Y + r.Y);
+                        lp.p2 = new CV.Point(mmX.maxLoc.X + r.X, mmX.maxLoc.Y + r.Y);
                     }
                     else
                     {
-                        lp.p1 = new cv.Point(mmY.minLoc.X + r.X, mmY.minLoc.Y + r.Y);
-                        lp.p2 = new cv.Point(mmY.maxLoc.X + r.X, mmY.maxLoc.Y + r.Y);
+                        lp.p1 = new CV.Point(mmY.minLoc.X + r.X, mmY.minLoc.Y + r.Y);
+                        lp.p2 = new CV.Point(mmY.maxLoc.X + r.X, mmY.maxLoc.Y + r.Y);
                     }
                     if (lp.p1.DistanceTo(lp.p2) > 1)
                     {
                         DrawLine(dst3, lp.p1, lp.p2, Scalar.Yellow);
                         p1List.Add(lp.p1);
                         p2List.Add(lp.p2);
-                        z1List.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
-                        z2List.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                        z1List.Add(task.pointCloud.Get<CV.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                        z2List.Add(task.pointCloud.Get<CV.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
                     }
                 }
             }
@@ -34475,13 +34477,13 @@ namespace CS_Classes
 
     public class Line_Movement_CS : CS_Parent
     {
-        public cv.Point p1;
-        public cv.Point p2;
+        public CV.Point p1;
+        public CV.Point p2;
         Scalar[] gradientColors = new Scalar[100];
         Kalman_Basics kalman = new Kalman_Basics();
         int frameCount;
-        cv.Point k1 = new cv.Point(0, 0);
-        cv.Point k2 = new cv.Point(0, 0);
+        CV.Point k1 = new CV.Point(0, 0);
+        CV.Point k2 = new CV.Point(0, 0);
         public Line_Movement_CS(VBtask task) : base(task)
         {
             kalman.kOutput = new float[] { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -34504,14 +34506,14 @@ namespace CS_Classes
                 if (task.FirstPass) k2 = p2;
                 if (k1.DistanceTo(p1) == 0 && k2.DistanceTo(p2) == 0)
                 {
-                    k1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
-                    k2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    k1 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    k2 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                     dst2.SetTo(0);
                 }
                 kalman.kInput = new float[] { k1.X, k1.Y, k2.X, k2.Y };
                 kalman.Run(empty);
-                p1 = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
-                p2 = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
+                p1 = new CV.Point(kalman.kOutput[0], kalman.kOutput[1]);
+                p2 = new CV.Point(kalman.kOutput[2], kalman.kOutput[3]);
             }
             frameCount += 1;
             DrawLine(dst2, p1, p2, gradientColors[frameCount % gradientColors.Length]);
@@ -34536,7 +34538,7 @@ namespace CS_Classes
             labels[2] = "Line_GCloud_CS - Blue are vertical lines using the angle thresholds.";
             desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity.";
         }
-        public gravityLine updateGLine(Mat src, gravityLine gc, cv.Point p1, cv.Point p2)
+        public gravityLine updateGLine(Mat src, gravityLine gc, CV.Point p1, CV.Point p2)
         {
             gc.tc1.center = p1;
             gc.tc2.center = p2;
@@ -34574,7 +34576,7 @@ namespace CS_Classes
             sortedHorizontals.Clear();
             foreach (var lp in lines.lpList)
             {
-                gravityLine gc = updateGLine(src, new gravityLine(), new cv.Point((int)lp.p1.X, (int)lp.p1.Y), new cv.Point((int)lp.p2.X, (int)lp.p2.Y));
+                gravityLine gc = updateGLine(src, new gravityLine(), new CV.Point((int)lp.p1.X, (int)lp.p1.Y), new CV.Point((int)lp.p2.X, (int)lp.p2.Y));
                 allLines.Add((int)lp.p1.DistanceTo(lp.p2), gc);
                 if (Math.Abs(90 - gc.arcY) < maxAngle && gc.tc1.depth > 0 && gc.tc2.depth > 0)
                 {
@@ -34604,8 +34606,8 @@ namespace CS_Classes
         int myCurrentFrame = -1;
         public Line_DisplayInfo_CS(VBtask task) : base(task)
         {
-            dst1 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels[2] = "When running standaloneTest(), a pair of random points is used to test the algorithm.";
             desc = "Display the line provided in mp";
         }
@@ -34618,7 +34620,7 @@ namespace CS_Classes
                 tcells.Clear();
                 for (int i = 0; i < 2; i++)
                 {
-                    tc.center = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    tc.center = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                     tcells.Add(tc);
                 }
             }
@@ -34630,9 +34632,9 @@ namespace CS_Classes
                 myCurrentFrame = task.frameCount;
             }
             dst1.SetTo(0);
-            cv.Point2f p1 = tcells[0].center;
-            cv.Point2f p2 = tcells[1].center;
-            DrawLine(dst1, p1, p2, cv.Scalar.All(255));
+            CV.Point2f p1 = tcells[0].center;
+            CV.Point2f p2 = tcells[1].center;
+            DrawLine(dst1, p1, p2, CV.Scalar.All(255));
             dst3.SetTo(0);
             blur.dst2.Threshold(1, 255, ThresholdTypes.Binary).CopyTo(dst3, dst1);
             distance = (int)p1.DistanceTo(p2);
@@ -34641,7 +34643,7 @@ namespace CS_Classes
             {
                 //dst2.Rectangle(tc.rect, myHighlightColor);
                 //dst2.Rectangle(tc.searchRect, Scalar.White, task.lineWidth);
-                SetTrueText(tc.strOut, new cv.Point(tc.rect.X, tc.rect.Y));
+                SetTrueText(tc.strOut, new CV.Point(tc.rect.X, tc.rect.Y));
             }
             strOut = "Mask count = " + maskCount + ", Expected count = " + distance + " or " + string.Format("{0:0%}", maskCount / (float)distance) + "\n";
             DrawLine(dst2, p1, p2, task.HighlightColor);
@@ -34673,8 +34675,8 @@ namespace CS_Classes
             {
                 if (standaloneTest())
                 {
-                    p1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
-                    p2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    p1 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    p2 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                 }
                 dst2.SetTo(0);
                 DrawLine(dst2, p1, p2, Scalar.White);
@@ -34914,7 +34916,7 @@ namespace CS_Classes
         public List<PointPair> mpList = new List<PointPair>();
         public Line_TimeView_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Collect lines over time";
         }
         public void RunCS(Mat src)
@@ -34972,18 +34974,18 @@ namespace CS_Classes
             int radius = (int)(cellSlider.Value / 2);
             lines.Run(src.Clone());
             if (lines.lpList.Count() == 0) return; // nothing to work with...
-            var lines2 = new List<cv.Point2f>();
-            var lines3 = new List<cv.Point3f>();
+            var lines2 = new List<CV.Point2f>();
+            var lines3 = new List<CV.Point3f>();
             foreach (var lp in lines.lpList)
             {
                 lines2.Add(new Point2f(lp.p1.X, lp.p1.Y));
                 lines2.Add(new Point2f(lp.p2.X, lp.p2.Y));
-                lines3.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
-                lines3.Add(task.pointCloud.Get<cv.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                lines3.Add(task.pointCloud.Get<CV.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                lines3.Add(task.pointCloud.Get<CV.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
             }
             dst2 = src.Clone();
             gMat.Run(empty);
-            var points = cv.Mat.FromPixelData(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
+            var points = CV.Mat.FromPixelData(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
             var gPoints = (points * gMat.gMatrix).ToMat();
             verticals.Clear();
             for (int i = 0; i < gPoints.Rows; i += 2)
@@ -34991,8 +34993,8 @@ namespace CS_Classes
                 gravityLine vert = new gravityLine();
                 vert.tc1.center = lines2[i];
                 vert.tc2.center = lines2[i + 1];
-                vert.pt1 = gPoints.Get<cv.Point3f>(i + 0, 0);
-                vert.pt2 = gPoints.Get<cv.Point3f>(i + 1, 0);
+                vert.pt1 = gPoints.Get<CV.Point3f>(i + 0, 0);
+                vert.pt2 = gPoints.Get<CV.Point3f>(i + 1, 0);
                 vert.len3D = distance3D(vert.pt1, vert.pt2);
                 double arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958;
                 double arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958;
@@ -35036,8 +35038,8 @@ namespace CS_Classes
                 }
             }
             dst2 = src.Clone();
-            List<cv.Point2f> lines2 = new List<cv.Point2f>();
-            List<cv.Point3f> lines3 = new List<cv.Point3f>();
+            List<CV.Point2f> lines2 = new List<CV.Point2f>();
+            List<CV.Point3f> lines3 = new List<CV.Point3f>();
             List<gravityLine> newVerts = new List<gravityLine>();
             for (int i = 0; i < verticals.Count(); i++)
             {
@@ -35053,30 +35055,30 @@ namespace CS_Classes
                 {
                     lines2.Add(vert.tc1.center);
                     lines2.Add(vert.tc2.center);
-                    lines3.Add(task.pointCloud.Get<cv.Point3f>((int)vert.tc1.center.Y, (int)vert.tc1.center.X));
-                    lines3.Add(task.pointCloud.Get<cv.Point3f>((int)vert.tc2.center.Y, (int)vert.tc2.center.X));
+                    lines3.Add(task.pointCloud.Get<CV.Point3f>((int)vert.tc1.center.Y, (int)vert.tc1.center.X));
+                    lines3.Add(task.pointCloud.Get<CV.Point3f>((int)vert.tc2.center.Y, (int)vert.tc2.center.X));
                 }
                 newVerts.Add(vert);
             }
             if (lines3.Count() > 0)
             {
                 gMat.Run(empty);
-                Mat points = cv.Mat.FromPixelData(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
+                Mat points = CV.Mat.FromPixelData(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
                 Mat gPoints = (points * gMat.gMatrix).ToMat();
                 verticals.Clear();
                 for (int i = 0; i < gPoints.Rows; i += 2)
                 {
                     var vert = newVerts[i / 2];
-                    vert.pt1 = gPoints.Get<cv.Point3f>(i + 0, 0);
-                    vert.pt2 = gPoints.Get<cv.Point3f>(i + 1, 0);
+                    vert.pt1 = gPoints.Get<CV.Point3f>(i + 0, 0);
+                    vert.pt2 = gPoints.Get<CV.Point3f>(i + 1, 0);
                     vert.len3D = distance3D(vert.pt1, vert.pt2);
                     float arcX = (float)(Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958);
                     float arcZ = (float)(Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958);
                     if (Math.Abs(arcX) <= verts.maxAngleX && Math.Abs(arcZ) <= verts.maxAngleZ)
                     {
-                        SetTrueText(vert.tc1.strOut, new cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y));
+                        SetTrueText(vert.tc1.strOut, new CV.Point(vert.tc1.rect.X, vert.tc1.rect.Y));
                         SetTrueText(vert.tc1.strOut + "\n" + string.Format(fmt1, arcX) + " X" + "\n" + string.Format(fmt1, arcZ) + " Z",
-                                    new cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y), 3);
+                                    new CV.Point(vert.tc1.rect.X, vert.tc1.rect.Y), 3);
                         DrawLine(dst2, vert.tc1.center, vert.tc2.center, task.HighlightColor);
                         verticals.Add(vert);
                     }
@@ -35172,7 +35174,7 @@ namespace CS_Classes
                 p3 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                 p4 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
             }
-            intersectionPoint = IntersectTest(p1, p2, p3, p4, new cv.Rect(0, 0, src.Width, src.Height));
+            intersectionPoint = IntersectTest(p1, p2, p3, p4, new CV.Rect(0, 0, src.Width, src.Height));
             dst2.SetTo(0);
             DrawLine(dst2, p1, p2, Scalar.Yellow, task.lineWidth + 1);
             DrawLine(dst2, p3, p4, Scalar.Yellow, task.lineWidth + 1);
@@ -35214,7 +35216,7 @@ namespace CS_Classes
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, Scalar.White);
             foreach (var lp in lines.lpList)
             {
-                Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, new cv.Rect(0, 0, src.Width, src.Height));
+                Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, new CV.Rect(0, 0, src.Width, src.Height));
                 if (ptInter.X >= 0 && ptInter.X < dst2.Width && ptInter.Y >= 0 && ptInter.Y < dst2.Height) continue;
                 nearest.pt = lp.p1;
                 nearest.Run(null);
@@ -35231,7 +35233,7 @@ namespace CS_Classes
             nearest.lp = task.horizonVec;
             foreach (var lp in lines.lpList)
             {
-                Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, new cv.Rect(0, 0, src.Width, src.Height));
+                Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, new CV.Rect(0, 0, src.Width, src.Height));
                 if (ptInter.X >= 0 && ptInter.X < dst2.Width && ptInter.Y >= 0 && ptInter.Y < dst2.Height) continue;
                 nearest.pt = lp.p1;
                 nearest.Run(null);
@@ -35258,7 +35260,7 @@ namespace CS_Classes
         public Line_KNN_CS(VBtask task) : base(task)
         {
             FindSlider("Connect X KNN points").Value = 1;
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Use KNN to find the other line end points nearest to each endpoint and connect them with a line.";
         }
         public void RunCS(Mat src)
@@ -35272,9 +35274,9 @@ namespace CS_Classes
             {
                 swarm.knn.queries.Add(lp.p1);
                 swarm.knn.queries.Add(lp.p2);
-                DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.All(255));
+                DrawLine(dst3, lp.p1, lp.p2, CV.Scalar.All(255));
             }
-            swarm.knn.trainInput = new List<cv.Point2f>(swarm.knn.queries);
+            swarm.knn.trainInput = new List<CV.Point2f>(swarm.knn.queries);
             swarm.knn.Run(empty);
             swarm.DrawLines(dst3);
             labels[2] = lines.labels[2];
@@ -35286,17 +35288,17 @@ namespace CS_Classes
 
     public class Line3D_Draw_CS : CS_Parent
     {
-        public cv.Point p1, p2;
+        public CV.Point p1, p2;
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
         bool toggleFirstSecond;
         public Line3D_Draw_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
             plot.plotCount = 2;
-            dst0 = new Mat(dst0.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst1 = new Mat(dst1.Size(), MatType.CV_32F, cv.Scalar.All(0));
-            p1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
-            p2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_32F, CV.Scalar.All(0));
+            p1 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+            p2 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
             labels[2] = "Click twice in the image below to draw a line and that line's depth is correlated in X to Z and Y to Z in the plot at right";
             desc = "Determine where a 3D line is close to the real depth data";
         }
@@ -35327,18 +35329,18 @@ namespace CS_Classes
             dst1 = src;
             DrawLine(dst1, p1, p2, task.HighlightColor);
             dst0.SetTo(0);
-            DrawLine(dst0, p1, p2, cv.Scalar.All(255));
+            DrawLine(dst0, p1, p2, CV.Scalar.All(255));
             dst1.SetTo(0);
             task.pcSplit[0].CopyTo(dst1, dst0);
             var points = dst1.FindNonZero();
-            var nextList = new List<cv.Point3f>();
+            var nextList = new List<CV.Point3f>();
             for (int i = 0; i < points.Rows; i++)
             {
-                var pt = points.At<cv.Point>(i, 0);
-                nextList.Add(task.pointCloud.At<cv.Point3f>(pt.Y, pt.X));
+                var pt = points.At<CV.Point>(i, 0);
+                nextList.Add(task.pointCloud.At<CV.Point3f>(pt.Y, pt.X));
             }
             if (nextList.Count() == 0) return; // line is completely in area with no depth.
-            var pts = cv.Mat.FromPixelData(nextList.Count(), 1, MatType.CV_32FC3, nextList.ToArray());
+            var pts = CV.Mat.FromPixelData(nextList.Count(), 1, MatType.CV_32FC3, nextList.ToArray());
             var zSplit = pts.Split();
             var c1 = findCorrelation(zSplit[0], zSplit[2]);
             var c2 = findCorrelation(zSplit[1], zSplit[2]);
@@ -35356,7 +35358,7 @@ namespace CS_Classes
     public class Line3D_Checks_CS : CS_Parent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
-        public List<cv.Point3f> pcLines = new List<cv.Point3f>();
+        public List<CV.Point3f> pcLines = new List<CV.Point3f>();
         public Line3D_Checks_CS(VBtask task) : base(task)
         {
             desc = "Use the first and last points in the sequence to build a single line and then check it against the rest of the sequence.";
@@ -35368,10 +35370,10 @@ namespace CS_Classes
             pcLines.Clear();
             for (int y = 0; y < task.gridRows; y++)
             {
-                var vecList = new List<cv.Point3f>();
+                var vecList = new List<CV.Point3f>();
                 for (int x = 0; x < task.gridCols; x++)
                 {
-                    var vec = pts.dst3.At<cv.Point3f>(y, x);
+                    var vec = pts.dst3.At<CV.Point3f>(y, x);
                     if (vec.Z > 0)
                     {
                         vecList.Add(vec);
@@ -35397,15 +35399,15 @@ namespace CS_Classes
     public class Line3D_CandidatesFirstLast_CS : CS_Parent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
-        public List<cv.Point3f> pcLines = new List<cv.Point3f>();
+        public List<CV.Point3f> pcLines = new List<CV.Point3f>();
         public Mat pcLinesMat;
         public int actualCount;
         public Line3D_CandidatesFirstLast_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line in the sequence";
         }
-        void addLines(List<List<cv.Point3f>> nextList, List<List<cv.Point>> xyList)
+        void addLines(List<List<CV.Point3f>> nextList, List<List<CV.Point>> xyList)
         {
             var white32 = new Point3f(1, 1, 1);
             for (int i = 0; i < nextList.Count(); i++)
@@ -35428,7 +35430,7 @@ namespace CS_Classes
             pcLines.Clear();
             addLines(pts.hList, pts.xyHList);
             addLines(pts.vList, pts.xyVList);
-            pcLinesMat = cv.Mat.FromPixelData(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
+            pcLinesMat = CV.Mat.FromPixelData(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
             labels[2] = "Point series found = " + (pts.hList.Count() + pts.vList.Count());
         }
     }
@@ -35439,16 +35441,16 @@ namespace CS_Classes
     public class Line3D_CandidatesAll_CS : CS_Parent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
-        public List<cv.Point3f> pcLines = new List<cv.Point3f>();
+        public List<CV.Point3f> pcLines = new List<CV.Point3f>();
         public Mat pcLinesMat;
         public int actualCount;
         Point3f white32 = new Point3f(1, 1, 1);
         public Line3D_CandidatesAll_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Get a list of points from PointCloud_Basics.  Identify all the lines in the sequence";
         }
-        void addLines(List<List<cv.Point3f>> nextList, List<List<cv.Point>> xyList)
+        void addLines(List<List<CV.Point3f>> nextList, List<List<CV.Point>> xyList)
         {
             for (int i = 0; i < nextList.Count(); i++)
             {
@@ -35476,7 +35478,7 @@ namespace CS_Classes
             pcLines.Clear();
             addLines(pts.hList, pts.xyHList);
             addLines(pts.vList, pts.xyVList);
-            pcLinesMat = cv.Mat.FromPixelData(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
+            pcLinesMat = CV.Mat.FromPixelData(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
             labels[2] = "Point series found = " + (pts.hList.Count() + pts.vList.Count());
         }
     }
@@ -35488,7 +35490,7 @@ namespace CS_Classes
     {
         public List<float> x = new List<float>();
         public List<float> y = new List<float>();
-        public cv.Point p1, p2;
+        public CV.Point p1, p2;
         public LinearRegression_Basics_CS(VBtask task) : base(task)
         {
             desc = "A simple example of using OpenCV's linear regression.";
@@ -35511,13 +35513,13 @@ namespace CS_Classes
             }
             var m = numerator / denominator;
             var c = meanY - m * meanX;
-            p1 = new cv.Point(0, (int)c);
-            p2 = new cv.Point(dst2.Width, (int)(m * dst2.Width + c));
+            p1 = new CV.Point(0, (int)c);
+            p2 = new CV.Point(dst2.Width, (int)(m * dst2.Width + c));
             dst2.SetTo(0);
             DrawLine(dst2, p1, p2, Scalar.White);
             for (int i = 0; i < x.Count(); i++)
             {
-                var pt = new cv.Point(x[i], y[i]);
+                var pt = new CV.Point(x[i], y[i]);
                 DrawCircle(dst2, pt, task.DotSize, Scalar.Red);
             }
         }
@@ -35585,13 +35587,13 @@ namespace CS_Classes
         List<List<PointPair>> lpLists = new List<List<PointPair>>();
         public LineCoin_Basics_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find the coincident lines in the image and measure their value.";
         }
         public List<PointPair> findLines(List<List<PointPair>> lpLists)
         {
-            var p1List = new List<cv.Point>();
-            var p2List = new List<cv.Point>();
+            var p1List = new List<CV.Point>();
+            var p2List = new List<CV.Point>();
             var ptCounts = new List<int>();
             PointPair lp;
             foreach (var lpList in lpLists)
@@ -35601,21 +35603,21 @@ namespace CS_Classes
                     mp.slope = (int)(mp.slope * 10) / 10;
                     if (mp.slope == 0)
                     {
-                        lp = new PointPair(new cv.Point(mp.p1.X, 0), new cv.Point(mp.p1.X, dst2.Height));
+                        lp = new PointPair(new CV.Point(mp.p1.X, 0), new CV.Point(mp.p1.X, dst2.Height));
                     }
                     else
                     {
                         lp = longLines.BuildLongLine(mp);
                     }
-                    int index = p1List.IndexOf(new cv.Point((int)lp.p1.X, (int)lp.p1.Y));
+                    int index = p1List.IndexOf(new CV.Point((int)lp.p1.X, (int)lp.p1.Y));
                     if (index >= 0)
                     {
                         ptCounts[index] += 1;
                     }
                     else
                     {
-                        p1List.Add(new cv.Point((int)lp.p1.X, (int)lp.p1.Y));
-                        p2List.Add(new cv.Point((int)lp.p2.X, (int)lp.p2.Y));
+                        p1List.Add(new CV.Point((int)lp.p1.X, (int)lp.p1.Y));
+                        p2List.Add(new CV.Point((int)lp.p2.X, (int)lp.p2.Y));
                         ptCounts.Add(1);
                     }
                 }
@@ -35626,7 +35628,7 @@ namespace CS_Classes
             {
                 if (ptCounts[i] >= task.frameHistoryCount)
                 {
-                    DrawLine(dst2, p1List[i], p2List[i], cv.Scalar.All(255));
+                    DrawLine(dst2, p1List[i], p2List[i], CV.Scalar.All(255));
                     lpList.Add(new PointPair(p1List[i], p2List[i]));
                 }
             }
@@ -35661,7 +35663,7 @@ namespace CS_Classes
         List<List<PointPair>> mpLists = new List<List<PointPair>>();
         public LineCoin_HistoryIntercept_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "find lines with coincident slopes and intercepts.";
         }
         public void RunCS(Mat src)
@@ -35729,7 +35731,7 @@ namespace CS_Classes
                 double b = lp.p1.Y - lp.p1.X * lp.slope;
                 if (lp.p1.Y == lp.p2.Y)
                 {
-                    return new PointPair(new cv.Point(0, lp.p1.Y), new cv.Point(dst2.Width, lp.p1.Y));
+                    return new PointPair(new CV.Point(0, lp.p1.Y), new CV.Point(dst2.Width, lp.p1.Y));
                 }
                 else
                 {
@@ -35737,15 +35739,15 @@ namespace CS_Classes
                     int xint2 = (int)((dst2.Height - b) / lp.slope);
                     int yint1 = (int)b;
                     int yint2 = (int)(lp.slope * dst2.Width + b);
-                    List<cv.Point> points = new List<cv.Point>();
-                    if (xint1 >= 0 && xint1 <= dst2.Width) points.Add(new cv.Point(xint1, 0));
-                    if (xint2 >= 0 && xint2 <= dst2.Width) points.Add(new cv.Point(xint2, dst2.Height));
-                    if (yint1 >= 0 && yint1 <= dst2.Height) points.Add(new cv.Point(0, yint1));
-                    if (yint2 >= 0 && yint2 <= dst2.Height) points.Add(new cv.Point(dst2.Width, yint2));
+                    List<CV.Point> points = new List<CV.Point>();
+                    if (xint1 >= 0 && xint1 <= dst2.Width) points.Add(new CV.Point(xint1, 0));
+                    if (xint2 >= 0 && xint2 <= dst2.Width) points.Add(new CV.Point(xint2, dst2.Height));
+                    if (yint1 >= 0 && yint1 <= dst2.Height) points.Add(new CV.Point(0, yint1));
+                    if (yint2 >= 0 && yint2 <= dst2.Height) points.Add(new CV.Point(dst2.Width, yint2));
                     return new PointPair(points[0], points[1]);
                 }
             }
-            return new PointPair(new cv.Point(lp.p1.X, 0), new cv.Point(lp.p1.X, dst2.Height));
+            return new PointPair(new CV.Point(lp.p1.X, 0), new CV.Point(lp.p1.X, dst2.Height));
         }
         public void RunCS(Mat src)
         {
@@ -35804,7 +35806,7 @@ namespace CS_Classes
         public LongLine_Depth_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
-            dst0 = new Mat(dst0.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, CV.Scalar.All(0));
             plot.dst2 = dst3;
             desc = "Find the longest line in BGR and use it to measure the average depth for the line";
         }
@@ -35814,19 +35816,19 @@ namespace CS_Classes
             dst1 = src;
             DrawLine(dst1, longLine.ptLong.p1, longLine.ptLong.p2, Scalar.Yellow, task.lineWidth + 2);
             dst0.SetTo(0);
-            DrawLine(dst0, longLine.ptLong.p1, longLine.ptLong.p2, cv.Scalar.All(255), 3);
+            DrawLine(dst0, longLine.ptLong.p1, longLine.ptLong.p2, CV.Scalar.All(255), 3);
             dst0.SetTo(0, task.noDepthMask);
             var mm = GetMinMax(task.pcSplit[2], dst0);
             kalman.kInput = new float[] { mm.minLoc.X, mm.minLoc.Y, mm.maxLoc.X, mm.maxLoc.Y };
             kalman.Run(empty);
-            mm.minLoc = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
-            mm.maxLoc = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
+            mm.minLoc = new CV.Point(kalman.kOutput[0], kalman.kOutput[1]);
+            mm.maxLoc = new CV.Point(kalman.kOutput[2], kalman.kOutput[3]);
             DrawCircle(dst1, mm.minLoc, task.DotSize, Scalar.Red);
             DrawCircle(dst1, mm.maxLoc, task.DotSize, Scalar.Blue);
-            SetTrueText($"{mm.minVal:F1}m", new cv.Point(mm.minLoc.X + 5, mm.minLoc.Y), 1);
-            SetTrueText($"{mm.maxVal:F1}m", new cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y), 1);
+            SetTrueText($"{mm.minVal:F1}m", new CV.Point(mm.minLoc.X + 5, mm.minLoc.Y), 1);
+            SetTrueText($"{mm.maxVal:F1}m", new CV.Point(mm.maxLoc.X + 5, mm.maxLoc.Y), 1);
             var depth = task.pcSplit[2].Mean(dst0)[0];
-            SetTrueText($"Average Depth = {depth:F1}m", new cv.Point((longLine.ptLong.p1.X + longLine.ptLong.p2.X) / 2 + 30,
+            SetTrueText($"Average Depth = {depth:F1}m", new CV.Point((longLine.ptLong.p1.X + longLine.ptLong.p2.X) / 2 + 30,
                                                                      (longLine.ptLong.p1.Y + longLine.ptLong.p2.Y) / 2), 1);
             labels[3] = $"Mean (blue)/Min (green)/Max (red) = {depth:F1}/{mm.minVal:F1}/{mm.maxVal:F1} meters ";
             plot.plotData = new Scalar(depth, mm.minVal, mm.maxVal);
@@ -35878,7 +35880,7 @@ namespace CS_Classes
     {
         LongLine_Consistent longLine = new LongLine_Consistent();
         Kalman_Basics kalman = new Kalman_Basics();
-        public cv.Point longPt;
+        public CV.Point longPt;
         public LongLine_Point_CS(VBtask task) : base(task)
         {
             desc = "Isolate the line that is consistently among the longest lines present in the image and then kalmanize the mid-point";
@@ -35890,9 +35892,9 @@ namespace CS_Classes
             var lp = longLine.ptLong;
             kalman.kInput = new float[] { lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y };
             kalman.Run(empty);
-            lp.p1 = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
-            lp.p2 = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
-            longPt = new cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2);
+            lp.p1 = new CV.Point(kalman.kOutput[0], kalman.kOutput[1]);
+            lp.p2 = new CV.Point(kalman.kOutput[2], kalman.kOutput[3]);
+            longPt = new CV.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2);
             DrawCircle(dst2, longPt, task.DotSize, Scalar.Red);
         }
     }
@@ -35903,11 +35905,11 @@ namespace CS_Classes
     public class LongLine_Match_CS : CS_Parent
     {
         LongLine_Consistent longest = new LongLine_Consistent();
-        Mat template = new cv.Mat();
+        Mat template = new CV.Mat();
         Options_LongLine options = new Options_LongLine();
         public LongLine_Match_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, CV.Scalar.All(0));
             desc = "Find the longest line from last image and use matchTemplate to find the line in the latest image";
         }
         public void RunCS(Mat src)
@@ -35921,17 +35923,17 @@ namespace CS_Classes
             var x2 = Math.Max(lp.p1.X + options.pad, lp.p2.X + options.pad);
             var y1 = Math.Min(lp.p1.Y - options.pad, lp.p2.Y - options.pad);
             var y2 = Math.Max(lp.p1.Y + options.pad, lp.p2.Y + options.pad);
-            var rect = ValidateRect(new cv.Rect((int)Math.Min(x1, x2), (int)Math.Min(y1, y2), (int)Math.Abs(x1 - x2), (int)Math.Abs(y1 - y2)));
+            var rect = ValidateRect(new CV.Rect((int)Math.Min(x1, x2), (int)Math.Min(y1, y2), (int)Math.Abs(x1 - x2), (int)Math.Abs(y1 - y2)));
             dst2.Rectangle(rect, task.HighlightColor, task.lineWidth);
             if (task.FirstPass) template = src[rect].Clone();
             Cv2.MatchTemplate(template, src, dst0, TemplateMatchModes.CCoeffNormed);
             var mm = GetMinMax(dst0);
-            mm.maxLoc = new cv.Point(mm.maxLoc.X + rect.Width / 2, mm.maxLoc.Y + rect.Height / 2);
+            mm.maxLoc = new CV.Point(mm.maxLoc.X + rect.Width / 2, mm.maxLoc.Y + rect.Height / 2);
             DrawCircle(dst2, mm.maxLoc, task.DotSize, Scalar.Red);
             dst3.SetTo(0);
             dst0 = dst0.Normalize(0, 255, NormTypes.MinMax);
-            dst0.CopyTo(dst3[new cv.Rect((dst3.Width - dst0.Width) / 2, (dst3.Height - dst0.Height) / 2, dst0.Width, dst0.Height)]);
-            DrawCircle(dst3, mm.maxLoc, task.DotSize, cv.Scalar.All(255));
+            dst0.CopyTo(dst3[new CV.Rect((dst3.Width - dst0.Width) / 2, (dst3.Height - dst0.Height) / 2, dst0.Width, dst0.Height)]);
+            DrawCircle(dst3, mm.maxLoc, task.DotSize, CV.Scalar.All(255));
             template = src[rect].Clone();
         }
     }
@@ -35951,8 +35953,8 @@ namespace CS_Classes
         {
             if (task.heartBeat)
             {
-                var p1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
-                var p2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                var p1 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                var p2 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                 var mps = new PointPair(p1, p2);
                 var emps = longLine.BuildLongLine(mps);
                 dst2 = src;
@@ -36012,12 +36014,12 @@ namespace CS_Classes
             {
                 knn.queries.Add(new Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2));
             }
-            knn.trainInput = new List<cv.Point2f>(knn.queries);
+            knn.trainInput = new List<CV.Point2f>(knn.queries);
             if (knn.queries.Count() == 0) return; // no input...possible in a dark room...
             knn.Run(empty);
             dst2 = src.Clone();
             parList.Clear();
-            var checkList = new List<cv.Point>();
+            var checkList = new List<CV.Point>();
             for (int i = 0; i <= knn.result.GetUpperBound(0) - 1; i++)
             {
                 for (int j = 0; j < knn.queries.Count(); j++)
@@ -36040,11 +36042,11 @@ namespace CS_Classes
                     {
                         var cp = new coinPoints();
                         var mps = extendAll.lines.lpList[index];
-                        cp.p1 = new cv.Point((int)mps.p1.X, (int)mps.p1.Y);
-                        cp.p2 = new cv.Point((int)mps.p2.X, (int)mps.p2.Y);
+                        cp.p1 = new CV.Point((int)mps.p1.X, (int)mps.p1.Y);
+                        cp.p2 = new CV.Point((int)mps.p2.X, (int)mps.p2.Y);
                         mps = extendAll.lines.lpList[i];
-                        cp.p3 = new cv.Point((int)mps.p1.X, (int)mps.p1.Y);
-                        cp.p4 = new cv.Point((int)mps.p2.X, (int)mps.p2.Y);
+                        cp.p3 = new CV.Point((int)mps.p1.X, (int)mps.p1.Y);
+                        cp.p4 = new CV.Point((int)mps.p2.X, (int)mps.p2.Y);
                         if (!checkList.Contains(cp.p1) && !checkList.Contains(cp.p2) && !checkList.Contains(cp.p3) && !checkList.Contains(cp.p4))
                         {
                             if ((cp.p1 == cp.p3 || cp.p1 == cp.p4) && (cp.p2 == cp.p3 || cp.p2 == cp.p4))
@@ -36076,7 +36078,7 @@ namespace CS_Classes
     public class LongLine_Extend_CS : CS_Parent
     {
         LongLine_Basics lines = new LongLine_Basics();
-        cv.Point saveP1, saveP2, p1, p2;
+        CV.Point saveP1, saveP2, p1, p2;
         public LongLine_Extend_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Original Line", "Original line Extended" };
@@ -36086,8 +36088,8 @@ namespace CS_Classes
         {
             if (standaloneTest() && task.heartBeat)
             {
-                p1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
-                p2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                p1 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                p2 = new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                 saveP1 = p1;
                 saveP2 = p2;
             }
@@ -36112,7 +36114,7 @@ namespace CS_Classes
         LineCoin_Basics lineHist = new LineCoin_Basics();
         public LongLine_NoDepth_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find any lines in regions without depth.";
         }
         public void RunCS(Mat src)
@@ -36206,7 +36208,7 @@ namespace CS_Classes
                 {
                     segment[i] = 255;
                 }
-                myLut = cv.Mat.FromPixelData(1, 256, MatType.CV_8U, segment);
+                myLut = CV.Mat.FromPixelData(1, 256, MatType.CV_8U, segment);
             }
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst2 = src.LUT(myLut) * classCount / 255;
@@ -36454,8 +36456,8 @@ namespace CS_Classes
             {
                 lut[i] = new Vec3b((byte)lutI[i].Item0, (byte)lutI[i].Item1, (byte)lutI[i].Item2);
             }
-            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
-            Mat myLut = cv.Mat.FromPixelData(1, 256, MatType.CV_8UC3, lut);
+            dst2 = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
+            Mat myLut = CV.Mat.FromPixelData(1, 256, MatType.CV_8UC3, lut);
             // dst3 = dst2.LUT(myLut); // Not clear why this is failing!
         }
     }
@@ -36467,7 +36469,7 @@ namespace CS_Classes
     {
         public Magnify_Basics_CS(VBtask task) : base(task)
         {
-            task.drawRect = new cv.Rect(10, 10, 50, 50);
+            task.drawRect = new CV.Rect(10, 10, 50, 50);
             desc = "Magnify the drawn rectangle on dst2 and put it in dst3.";
         }
         public void RunCS(Mat src)
@@ -36511,9 +36513,9 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            var small = src.Resize(new cv.Size(src.Cols / 10, src.Rows / 10));
+            var small = src.Resize(new CV.Size(src.Cols / 10, src.Rows / 10));
             dst2 = small.Repeat(10, 10);
-            small = task.depthRGB.Resize(new cv.Size(src.Cols / 10, src.Rows / 10));
+            small = task.depthRGB.Resize(new CV.Size(src.Cols / 10, src.Rows / 10));
             dst3 = small.Repeat(10, 10);
         }
     }
@@ -36539,7 +36541,7 @@ namespace CS_Classes
                 DrawCircle(dst2, pt, task.DotSize, Scalar.Yellow);
             }
             var rows = random.PointList.Count();
-            var pMat = cv.Mat.FromPixelData(rows, 1, MatType.CV_32FC2, random.PointList.ToArray());
+            var pMat = CV.Mat.FromPixelData(rows, 1, MatType.CV_32FC2, random.PointList.ToArray());
             var indexer = pMat.GetGenericIndexer<Vec2f>();
             dst3.SetTo(0);
             var white = new Vec3b(255, 255, 255);
@@ -36575,7 +36577,7 @@ namespace CS_Classes
                     index++;
                 }
             }
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, points);
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, points);
         }
     }
 
@@ -36592,8 +36594,8 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            var mat = src.Resize(new cv.Size(src.Height, src.Height));
-            var roi = new cv.Rect(0, 0, mat.Width, mat.Height);
+            var mat = src.Resize(new CV.Size(src.Height, src.Height));
+            var roi = new CV.Rect(0, 0, mat.Width, mat.Height);
             dst2[roi] = mat;
             dst3[roi] = mat.Transpose();
         }
@@ -36690,7 +36692,7 @@ namespace CS_Classes
         public bool lineSeparators = true; // if they want lines or not...
         public Mat_2to1_CS(VBtask task) : base(task)
         {
-            mat1 = new Mat(new cv.Size(dst2.Rows, dst2.Cols), MatType.CV_8UC3, cv.Scalar.All(0));
+            mat1 = new Mat(new CV.Size(dst2.Rows, dst2.Cols), MatType.CV_8UC3, CV.Scalar.All(0));
             mat2 = mat1.Clone();
             mat = new Mat[] { mat1, mat2 };
             labels[2] = "";
@@ -36698,9 +36700,9 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            var nSize = new cv.Size(task.WorkingRes.Width, task.WorkingRes.Height / 2);
-            var roiTop = new cv.Rect(0, 0, nSize.Width, nSize.Height);
-            var roibot = new cv.Rect(0, nSize.Height, nSize.Width, nSize.Height);
+            var nSize = new CV.Size(task.WorkingRes.Width, task.WorkingRes.Height / 2);
+            var roiTop = new CV.Rect(0, 0, nSize.Width, nSize.Height);
+            var roibot = new CV.Rect(0, nSize.Height, nSize.Width, nSize.Height);
             if (standaloneTest())
             {
                 mat1 = src;
@@ -36720,7 +36722,7 @@ namespace CS_Classes
                 }
                 if (lineSeparators)
                 {
-                    dst2.Line(new cv.Point(0, dst2.Height / 2), new cv.Point(dst2.Width, dst2.Height / 2), Scalar.White, task.lineWidth + 1);
+                    dst2.Line(new CV.Point(0, dst2.Height / 2), new CV.Point(dst2.Width, dst2.Height / 2), Scalar.White, task.lineWidth + 1);
                 }
             }
         }
@@ -36742,14 +36744,14 @@ namespace CS_Classes
             histTop.Run(src);
             autoX.Run(histTop.histogram);
             dst2 = histTop.histogram.Threshold(task.projectionThreshold, 255, ThresholdTypes.Binary).ConvertScaleAbs();
-            var ptList = new List<cv.Point>();
+            var ptList = new List<CV.Point>();
             if (task.gOptions.getDebugCheckBox())
             {
                 for (int y = 0; y < dst2.Height; y++)
                 {
                     for (int x = 0; x < dst2.Width; x++)
                     {
-                        if (dst2.At<byte>(y, x) != 0) ptList.Add(new cv.Point(x, y));
+                        if (dst2.At<byte>(y, x) != 0) ptList.Add(new CV.Point(x, y));
                     }
                 }
             }
@@ -36758,7 +36760,7 @@ namespace CS_Classes
                 var points = dst2.FindNonZero();
                 for (int i = 0; i < points.Rows; i++)
                 {
-                    ptList.Add(points.At<cv.Point>(i, 0));
+                    ptList.Add(points.At<CV.Point>(i, 0));
                 }
             }
             labels[2] = "There were " + ptList.Count().ToString() + " points identified";
@@ -36794,7 +36796,7 @@ namespace CS_Classes
                 }
                 strOut += "\n";
             }
-            var input = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, matrix);
+            var input = CV.Mat.FromPixelData(3, 3, MatType.CV_32F, matrix);
             Cv2.Invert(input, inverse, options.decompType);
             if (standaloneTest() || validateInverse)
             {
@@ -36839,7 +36841,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             var trColor = src.T();
-            dst2 = trColor.ToMat().Resize(new cv.Size(src.Cols, src.Rows));
+            dst2 = trColor.ToMat().Resize(new CV.Size(src.Cols, src.Rows));
             var trBack = dst2.T();
             dst3 = trBack.ToMat().Resize(src.Size());
         }
@@ -36856,12 +36858,12 @@ namespace CS_Classes
         public Mat_Managed_CS(VBtask task) : base(task)
         {
             img = new Vec3b[dst2.Total()];
-            labels[2] = "Color change is in the managed cv.vec3b array";
+            labels[2] = "Color change is in the managed CV.vec3b array";
             desc = "There is a limited ability to use Mat data in Managed code directly.";
         }
         public void RunCS(Mat src)
         {
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, img);
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, img);
             if (task.heartBeat)
             {
                 nextColor = nextColor == new Vec3b(0, 0, 255) ? new Vec3b(0, 255, 0) : new Vec3b(0, 0, 255);
@@ -36870,7 +36872,7 @@ namespace CS_Classes
             {
                 img[i] = nextColor;
             }
-            var rect = new cv.Rect(autoRand.Next(0, src.Width - 50), autoRand.Next(0, src.Height - 50), 50, 50);
+            var rect = new CV.Rect(autoRand.Next(0, src.Width - 50), autoRand.Next(0, src.Height - 50), 50, 50);
             dst2[rect].SetTo(0);
         }
     }
@@ -36884,7 +36886,7 @@ namespace CS_Classes
         public Mat input;
         public Mat_Inverse_4D_CS(VBtask task) : base(task)
         {
-            input = cv.Mat.FromPixelData(4, 4, MatType.CV_64F, defaultInput);
+            input = CV.Mat.FromPixelData(4, 4, MatType.CV_64F, defaultInput);
             desc = "Use OpenCV to invert a matrix";
         }
         string printMatrixResults(Mat src, Mat dst2)
@@ -36948,7 +36950,7 @@ namespace CS_Classes
             if (standalone) mats.defaultMats(src);
             if (task.FirstPass)
             {
-                task.ClickPoint = new cv.Point(0, 0);
+                task.ClickPoint = new CV.Point(0, 0);
                 task.mousePicTag = 2;
             }
 
@@ -37000,15 +37002,15 @@ namespace CS_Classes
 
         public void RunCS(Mat src)
         {
-            cv.Size nSize = new cv.Size(dst2.Width / 2, dst2.Height / 2);
-            cv.Rect roiTopLeft = new cv.Rect(0, 0, nSize.Width, nSize.Height);
-            cv.Rect roiTopRight = new cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height);
-            cv.Rect roibotLeft = new cv.Rect(0, nSize.Height, nSize.Width, nSize.Height);
-            cv.Rect roibotRight = new cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height);
+            CV.Size nSize = new CV.Size(dst2.Width / 2, dst2.Height / 2);
+            CV.Rect roiTopLeft = new CV.Rect(0, 0, nSize.Width, nSize.Height);
+            CV.Rect roiTopRight = new CV.Rect(nSize.Width, 0, nSize.Width, nSize.Height);
+            CV.Rect roibotLeft = new CV.Rect(0, nSize.Height, nSize.Width, nSize.Height);
+            CV.Rect roibotRight = new CV.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height);
             if (standalone) defaultMats(src);
 
             dst2 = new Mat(dst2.Size(), MatType.CV_8UC3);
-            cv.Rect roi = new cv.Rect(0, 0, 0, 0);
+            CV.Rect roi = new CV.Rect(0, 0, 0, 0);
             for (int i = 0; i < 4; i++)
             {
                 Mat tmp = mat[i].Clone();
@@ -37021,8 +37023,8 @@ namespace CS_Classes
             }
             if (lineSeparators)
             {
-                dst2.Line(new cv.Point(0, dst2.Height / 2), new cv.Point(dst2.Width, dst2.Height / 2), Scalar.White, task.lineWidth + 1);
-                dst2.Line(new cv.Point(dst2.Width / 2, 0), new cv.Point(dst2.Width / 2, dst2.Height), Scalar.White, task.lineWidth + 1);
+                dst2.Line(new CV.Point(0, dst2.Height / 2), new CV.Point(dst2.Width, dst2.Height / 2), Scalar.White, task.lineWidth + 1);
+                dst2.Line(new CV.Point(dst2.Width / 2, 0), new CV.Point(dst2.Width / 2, dst2.Height), Scalar.White, task.lineWidth + 1);
             }
         }
     }
@@ -37036,14 +37038,14 @@ namespace CS_Classes
         public mmData mmData;
         public float correlation;
         public Options_Features options = new Options_Features();
-        public cv.Point matchCenter;
-        public cv.Rect matchRect = new cv.Rect();
-        public cv.Rect searchRect = new cv.Rect();
+        public CV.Point matchCenter;
+        public CV.Rect matchRect = new CV.Rect();
+        public CV.Rect searchRect = new CV.Rect();
         public Match_Basics_CS(VBtask task) : base(task)
         {
             if (standalone) task.gOptions.setDebugCheckBox(true);
             labels[2] = standaloneTest() ? "Draw anywhere to define a new target" : "Both drawRect must be provided by the caller.";
-            dst3 = new Mat(dst3.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, CV.Scalar.All(0));
             desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)";
         }
         public void RunCS(Mat src)
@@ -37054,7 +37056,7 @@ namespace CS_Classes
                 if (task.gOptions.getDebugCheckBox())
                 {
                     task.gOptions.setDebugCheckBox(false);
-                    var inputRect = task.FirstPass ? new cv.Rect(25, 25, 25, 25) : ValidateRect(task.drawRect);
+                    var inputRect = task.FirstPass ? new CV.Rect(25, 25, 25, 25) : ValidateRect(task.drawRect);
                     template = src[inputRect];
                 }
             }
@@ -37073,13 +37075,13 @@ namespace CS_Classes
             var h = template.Height;
             if (searchRect.Width == 0)
             {
-                matchCenter = new cv.Point(mmData.maxLoc.X + w / 2, mmData.maxLoc.Y + h / 2);
-                matchRect = new cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h);
+                matchCenter = new CV.Point(mmData.maxLoc.X + w / 2, mmData.maxLoc.Y + h / 2);
+                matchRect = new CV.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h);
             }
             else
             {
-                matchCenter = new cv.Point(searchRect.X + mmData.maxLoc.X + w / 2, searchRect.Y + mmData.maxLoc.Y + h / 2);
-                matchRect = new cv.Rect(searchRect.X + mmData.maxLoc.X, searchRect.Y + mmData.maxLoc.Y, w, h);
+                matchCenter = new CV.Point(searchRect.X + mmData.maxLoc.X + w / 2, searchRect.Y + mmData.maxLoc.Y + h / 2);
+                matchRect = new CV.Rect(searchRect.X + mmData.maxLoc.X, searchRect.Y + mmData.maxLoc.Y, w, h);
             }
             if (standalone)
             {
@@ -37105,7 +37107,7 @@ namespace CS_Classes
         {
             if ((task.FirstPass || (task.mouseClickFlag && task.drawRect.Width != 0)) && standaloneTest())
             {
-                var r = task.FirstPass ? new cv.Rect(25, 25, 25, 25) : ValidateRect(task.drawRect);
+                var r = task.FirstPass ? new CV.Rect(25, 25, 25, 25) : ValidateRect(task.drawRect);
                 match.template = src[r];
                 task.drawRectClear = true;
             }
@@ -37150,14 +37152,14 @@ namespace CS_Classes
                     maxCorrelation = float.MinValue;
                     minCorrelation = float.MaxValue;
                 }
-                template = new Mat(new cv.Size(options.featurePoints, 1), MatType.CV_32FC1);
-                src = new Mat(new cv.Size(options.featurePoints, 1), MatType.CV_32FC1);
+                template = new Mat(new CV.Size(options.featurePoints, 1), MatType.CV_32FC1);
+                src = new Mat(new CV.Size(options.featurePoints, 1), MatType.CV_32FC1);
                 Cv2.Randn(template, 100, 25);
                 Cv2.Randn(src, 0, 25);
             }
             Cv2.MatchTemplate(template, src, correlationMat, options.matchOption);
             mm = GetMinMax(correlationMat);
-            mm.maxLoc = new cv.Point(mm.maxLoc.X + template.Width / 2, mm.maxLoc.Y + template.Height / 2);
+            mm.maxLoc = new CV.Point(mm.maxLoc.X + template.Width / 2, mm.maxLoc.Y + template.Height / 2);
             correlation = (float)mm.maxVal;
             if (correlation < minCorrelation) minCorrelation = correlation;
             if (correlation > maxCorrelation) maxCorrelation = correlation;
@@ -37280,10 +37282,10 @@ namespace CS_Classes
                 dst1 = src.Clone();
                 foreach (var pts in lines.bestLines)
                 {
-                    var rect = ValidateRect(new cv.Rect((int)(pts.p1.X - w), (int)(pts.p1.Y - h), w * 2, h * 2));
+                    var rect = ValidateRect(new CV.Rect((int)(pts.p1.X - w), (int)(pts.p1.Y - h), w * 2, h * 2));
                     templates.Add(src[rect]);
                     dst1.Rectangle(rect, Scalar.White, task.lineWidth);
-                    rect = ValidateRect(new cv.Rect((int)(pts.p2.X - w), (int)(pts.p2.Y - h), w * 2, h * 2));
+                    rect = ValidateRect(new CV.Rect((int)(pts.p2.X - w), (int)(pts.p2.Y - h), w * 2, h * 2));
                     templates.Add(src[rect]);
                     dst1.Rectangle(rect, Scalar.White, task.lineWidth);
                     DrawLine(dst1, pts.p1, pts.p2, task.HighlightColor);
@@ -37306,21 +37308,21 @@ namespace CS_Classes
                     {
                         mats.mat[i].SetTo(0);
                         correlationMat = Convert32f_To_8UC3(correlationMat);
-                        var r = new cv.Rect((dst2.Width - correlationMat.Width) / 2, (dst2.Height - correlationMat.Height) / 2, correlationMat.Width, correlationMat.Height);
+                        var r = new CV.Rect((dst2.Width - correlationMat.Width) / 2, (dst2.Height - correlationMat.Height) / 2, correlationMat.Width, correlationMat.Height);
                         correlationMat.CopyTo(mats.mat[i][r]);
                     }
                     if (j == 0)
                     {
-                        mr.p1 = new cv.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h);
+                        mr.p1 = new CV.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h);
                         mr.correlation1 = (float)mm.maxVal;
-                        var rect = ValidateRect(new cv.Rect(mr.p1.X - w, mr.p1.Y - h, w * 2, h * 2));
+                        var rect = ValidateRect(new CV.Rect(mr.p1.X - w, mr.p1.Y - h, w * 2, h * 2));
                         newTemplates.Add(src[rect]);
                     }
                     else
                     {
-                        mr.p2 = new cv.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h);
+                        mr.p2 = new CV.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h);
                         mr.correlation2 = (float)mm.maxVal;
-                        var rect = ValidateRect(new cv.Rect(mr.p2.X - w, mr.p2.Y - h, w * 2, h * 2));
+                        var rect = ValidateRect(new CV.Rect(mr.p2.X - w, mr.p2.Y - h, w * 2, h * 2));
                         newTemplates.Add(src[rect]);
                     }
                 }
@@ -37357,9 +37359,9 @@ namespace CS_Classes
         List<Mat> frameList = new List<Mat>();
         public Match_TraceRedC_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst0.Size(), MatType.CV_32S, cv.Scalar.All(0));
-            dst1 = new Mat(dst1.Size(), MatType.CV_32S, cv.Scalar.All(0));
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst0 = new Mat(dst0.Size(), MatType.CV_32S, CV.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_32S, CV.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2.";
         }
         public void RunCS(Mat src)
@@ -37368,7 +37370,7 @@ namespace CS_Classes
             redC.Run(src);
             if (task.optionsChanged) frameList.Clear();
             dst0.SetTo(0);
-            var points = new List<cv.Point>();
+            var points = new List<CV.Point>();
             foreach (var rc in task.redCells)
             {
                 dst0.Set<Byte>(rc.maxDist.Y, rc.maxDist.X, 1);
@@ -37393,13 +37395,13 @@ namespace CS_Classes
     public class Match_DrawRect_CS : CS_Parent
     {
         Match_Basics match = new Match_Basics();
-        public cv.Rect inputRect;
+        public CV.Rect inputRect;
         public bool showOutput;
-        Mat lastImage = new cv.Mat();
+        Mat lastImage = new CV.Mat();
         public Match_DrawRect_CS(VBtask task) : base(task)
         {
-            inputRect = new cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40); // arbitrary template to match
-            dst3 = new Mat(dst3.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            inputRect = new CV.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40); // arbitrary template to match
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, CV.Scalar.All(0));
             if (standaloneTest()) labels[3] = "Probabilities (draw rectangle to test again)";
             labels[2] = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again.";
             desc = "Find the requested template in task.drawrect in an image";
@@ -37421,11 +37423,11 @@ namespace CS_Classes
             {
                 dst0 = match.dst0.Normalize(0, 255, NormTypes.MinMax);
                 dst3.SetTo(0);
-                dst0.CopyTo(dst3[new cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)]);
+                dst0.CopyTo(dst3[new CV.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)]);
                 dst3.Rectangle(inputRect, Scalar.White, task.lineWidth, task.lineType);
                 dst2 = src;
             }
-            SetTrueText("maxLoc = " + match.matchCenter.X + ", " + match.matchCenter.Y, new cv.Point(1, 1), 3);
+            SetTrueText("maxLoc = " + match.matchCenter.X + ", " + match.matchCenter.Y, new CV.Point(1, 1), 3);
             if (standaloneTest())
             {
                 DrawCircle(dst2, match.matchCenter, task.DotSize, Scalar.Red);
@@ -37455,11 +37457,11 @@ namespace CS_Classes
         {
             var rSize = cellSlider.Value;
             tCell tc = new tCell();
-            tc.rect = ValidateRect(new cv.Rect((int)(pt.X - rSize), (int)(pt.Y - rSize), rSize * 2, rSize * 2));
+            tc.rect = ValidateRect(new CV.Rect((int)(pt.X - rSize), (int)(pt.Y - rSize), rSize * 2, rSize * 2));
             tc.correlation = correlation;
             tc.depth = (float)task.pcSplit[2][tc.rect].Mean(task.depthMask[tc.rect])[0] / 1000;
             tc.center = pt;
-            tc.searchRect = ValidateRect(new cv.Rect((int)(tc.center.X - rSize * 3), (int)(tc.center.Y - rSize * 3),
+            tc.searchRect = ValidateRect(new CV.Rect((int)(tc.center.X - rSize * 3), (int)(tc.center.Y - rSize * 3),
                                          rSize * 6, rSize * 6));
             if (tc.template == null) tc.template = src[tc.rect].Clone();
             return tc;
@@ -37471,8 +37473,8 @@ namespace CS_Classes
             {
                 options.RunVB();
                 tCells.Clear();
-                tCells.Add(createCell(src, 0, new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))));
-                tCells.Add(createCell(src, 0, new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))));
+                tCells.Add(createCell(src, 0, new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))));
+                tCells.Add(createCell(src, 0, new CV.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))));
             }
             for (int i = 0; i < tCells.Count(); i++)
             {
@@ -37481,9 +37483,9 @@ namespace CS_Classes
                 Cv2.MatchTemplate(tc.template, input, dst0, TemplateMatchModes.CCoeffNormed);
                 mmData mm = GetMinMax(dst0);
                 tc.center = new Point2f(tc.searchRect.X + mm.maxLoc.X + rSize, tc.searchRect.Y + mm.maxLoc.Y + rSize);
-                tc.searchRect = ValidateRect(new cv.Rect((int)(tc.center.X - rSize * 3), (int)(tc.center.Y - rSize * 3),
+                tc.searchRect = ValidateRect(new CV.Rect((int)(tc.center.X - rSize * 3), (int)(tc.center.Y - rSize * 3),
                                              rSize * 6, rSize * 6));
-                tc.rect = ValidateRect(new cv.Rect((int)(tc.center.X - rSize), (int)(tc.center.Y - rSize), rSize * 2,
+                tc.rect = ValidateRect(new CV.Rect((int)(tc.center.X - rSize), (int)(tc.center.Y - rSize), rSize * 2,
                                        rSize * 2));
                 tc.correlation = (float)mm.maxVal;
                 tc.depth = (float)task.pcSplit[2][tc.rect].Mean(task.depthMask[tc.rect])[0] / 1000;
@@ -37523,15 +37525,15 @@ namespace CS_Classes
             float minCorrelation = corrSlider.Value / 100f;
             int rSize = cellSlider.Value;
             int radius = rSize / 2;
-            cv.Rect rect;
+            CV.Rect rect;
             if (target[0] != null && correlation[0] < minCorrelation) target[0] = null;
             if (task.mouseClickFlag)
             {
                 ptx[0] = task.ClickPoint;
                 ptx[1] = new Point2f(msRNG.Next(rSize, dst2.Width - 2 * rSize), msRNG.Next(rSize, dst2.Height - 2 * rSize));
-                rect = ValidateRect(new cv.Rect((int)(ptx[0].X - radius), (int)(ptx[0].Y - radius), rSize, rSize));
+                rect = ValidateRect(new CV.Rect((int)(ptx[0].X - radius), (int)(ptx[0].Y - radius), rSize, rSize));
                 target[0] = src[rect];
-                rect = ValidateRect(new cv.Rect((int)(ptx[1].X - radius), (int)(ptx[1].Y - radius), rSize, rSize));
+                rect = ValidateRect(new CV.Rect((int)(ptx[1].X - radius), (int)(ptx[1].Y - radius), rSize, rSize));
                 target[1] = src[rect];
             }
             if (target[0] == null || target[1] == null)
@@ -37541,23 +37543,23 @@ namespace CS_Classes
                 return;
             }
             dst3 = src.Clone();
-            dst2 = new Mat(dst2.Size(), MatType.CV_32FC1, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_32FC1, CV.Scalar.All(0));
             for (int i = 0; i < ptx.Length; i++)
             {
-                rect = ValidateRect(new cv.Rect((int)(ptx[i].X - radius), (int)(ptx[i].Y - radius), rSize, rSize));
-                cv.Rect searchRect = ValidateRect(new cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3));
+                rect = ValidateRect(new CV.Rect((int)(ptx[i].X - radius), (int)(ptx[i].Y - radius), rSize, rSize));
+                CV.Rect searchRect = ValidateRect(new CV.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3));
                 Cv2.MatchTemplate(target[i], src[searchRect], dst0, TemplateMatchModes.CCoeffNormed);
                 var mmData = GetMinMax(dst0);
                 correlation[i] = (float)mmData.maxVal;
                 if (i == 0)
                 {
-                    dst0.CopyTo(dst2[new cv.Rect(0, 0, dst0.Width, dst0.Height)]);
+                    dst0.CopyTo(dst2[new CV.Rect(0, 0, dst0.Width, dst0.Height)]);
                     dst2 = dst2.Threshold(minCorrelation, 255, ThresholdTypes.Binary);
                 }
                 ptx[i] = new Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius);
                 DrawCircle(dst3, ptx[i], task.DotSize, task.HighlightColor);
                 dst3.Rectangle(searchRect, Scalar.Yellow, 1);
-                rect = ValidateRect(new cv.Rect((int)(ptx[i].X - radius), (int)(ptx[i].Y - radius), rSize, rSize));
+                rect = ValidateRect(new CV.Rect((int)(ptx[i].X - radius), (int)(ptx[i].Y - radius), rSize, rSize));
                 target[i] = task.color[rect];
             }
             labels[3] = "p1 = " + ptx[0].X + "," + ptx[0].Y + " p2 = " + ptx[1].X + "," + ptx[1].Y;
@@ -37576,8 +37578,8 @@ namespace CS_Classes
         Options_Match options = new Options_Match();
         public Match_GoodFeatureKNN_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
-            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
+            dst0 = new Mat(dst2.Size(), MatType.CV_8UC1, CV.Scalar.All(0));
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, CV.Scalar.All(0));
             labels[3] = "Shake camera to see tracking of the highlighted features";
             desc = "Track the GoodFeatures with KNN";
         }
@@ -37586,7 +37588,7 @@ namespace CS_Classes
             options.RunVB();
 
             feat.Run(src);
-            knn.queries = new List<cv.Point2f>(task.features);
+            knn.queries = new List<CV.Point2f>(task.features);
             knn.Run(empty);
             if (task.optionsChanged)
             {
@@ -37597,7 +37599,7 @@ namespace CS_Classes
             foreach (var mp in knn.matches)
             {
                 if (mp.p1.DistanceTo(mp.p2) <= options.maxDistance)
-                    DrawLine(dst0, mp.p1, mp.p2, cv.Scalar.All(255), task.lineWidth + 2);
+                    DrawLine(dst0, mp.p1, mp.p2, CV.Scalar.All(255), task.lineWidth + 2);
             }
             frameList.Add(dst0.Clone());
             if (frameList.Count() >= task.frameHistoryCount)
@@ -37621,7 +37623,7 @@ namespace CS_Classes
         public Mat target;
         public float correlation;
         public int radius;
-        public cv.Rect searchRect;
+        public CV.Rect searchRect;
         Options_Features options = new Options_Features();
         TrackBar cellSlider;
         public Match_Point_CS(VBtask task) : base(task)
@@ -37641,8 +37643,8 @@ namespace CS_Classes
             }
             int rSize = cellSlider.Value;
             int radius = rSize / 2;
-            cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - radius), (int)(pt.Y - radius), rSize, rSize));
-            searchRect = ValidateRect(new cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3));
+            CV.Rect rect = ValidateRect(new CV.Rect((int)(pt.X - radius), (int)(pt.Y - radius), rSize, rSize));
+            searchRect = ValidateRect(new CV.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3));
             Cv2.MatchTemplate(target[rect], src[searchRect], dst0, TemplateMatchModes.CCoeffNormed);
             var mmData = GetMinMax(dst0);
             correlation = (float)mmData.maxVal;
@@ -37657,7 +37659,7 @@ namespace CS_Classes
 
     public class Match_Points_CS : CS_Parent
     {
-        public List<cv.Point2f> ptx = new List<cv.Point2f>();
+        public List<CV.Point2f> ptx = new List<CV.Point2f>();
         public List<float> correlation = new List<float>();
         public Match_Point mPoint = new Match_Point();
         Feature_Basics feat = new Feature_Basics();
@@ -37672,7 +37674,7 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 feat.Run(src);
-                ptx = new List<cv.Point2f>(task.features);
+                ptx = new List<CV.Point2f>(task.features);
                 SetTrueText("Move camera around to watch the point being tracked", 3);
             }
             dst2 = src.Clone();
@@ -37698,7 +37700,7 @@ namespace CS_Classes
         public Mat mask;
         Options_Match optionsMatch = new Options_Match();
         TrackBar correlationSlider;
-        Mat lastFrame = new cv.Mat();
+        Mat lastFrame = new CV.Mat();
         public Match_Motion_CS(VBtask task) : base(task)
         {
             correlationSlider = FindSlider("Feature Correlation Threshold");
@@ -37712,7 +37714,7 @@ namespace CS_Classes
             optionsMatch.RunVB();
             float CCthreshold = (float)correlationSlider.Value / correlationSlider.Maximum;
             dst2 = src.Clone();
-            if (dst2.Channels() == 3) dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (dst2.Channels() == 3) dst2 = dst2.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             if (task.FirstPass) lastFrame = dst2.Clone();
             Mat saveFrame = dst2.Clone();
             int updateCount = 0;
@@ -37722,12 +37724,12 @@ namespace CS_Classes
             foreach (var roi in task.gridList)
             {
                 Mat correlation = new Mat();
-                cv.Scalar mean, stdev;
+                CV.Scalar mean, stdev;
                 Cv2.MeanStdDev(dst2[roi], out mean, out stdev);
                 if (stdev[0] > optionsMatch.stdevThreshold)
                 {
                     Cv2.MatchTemplate(dst2[roi], lastFrame[roi], correlation, options.matchOption);
-                    cv.Point pt = new cv.Point(roi.X + 2, roi.Y + 10);
+                    CV.Point pt = new CV.Point(roi.X + 2, roi.Y + 10);
                     if (correlation.Get<float>(0, 0) < CCthreshold)
                     {
                         Interlocked.Increment(ref updateCount);
@@ -37771,7 +37773,7 @@ namespace CS_Classes
         {
             desc = "Find and track a line in the BGR image.";
         }
-        Point2f cornerToPoint(int whichCorner, cv.Rect r)
+        Point2f cornerToPoint(int whichCorner, CV.Rect r)
         {
             switch (whichCorner)
             {
@@ -37796,13 +37798,13 @@ namespace CS_Classes
                     knn.Run(src.Clone());
                     lpInput = new PointPair(knn.lastPair.p1, knn.lastPair.p2);
                 }
-                var r = ValidateRect(new cv.Rect(
+                var r = ValidateRect(new CV.Rect(
                     (int)Math.Min(lpInput.p1.X, lpInput.p2.X),
                     (int)Math.Min(lpInput.p1.Y, lpInput.p2.Y),
                     (int)Math.Abs(lpInput.p1.X - lpInput.p2.X),
                     (int)Math.Abs(lpInput.p1.Y - lpInput.p2.Y)));
                 match.template = src[r].Clone();
-                var p1 = new cv.Point((int)lpInput.p1.X, (int)lpInput.p1.Y);
+                var p1 = new CV.Point((int)lpInput.p1.X, (int)lpInput.p1.Y);
                 // Determine which corner - numbering topleft = 0 clockwise, 1, 2, 3
                 if (r.TopLeft.DistanceTo(p1) <= 2)
                 {
@@ -37910,9 +37912,9 @@ namespace CS_Classes
     public class MatchRect_Basics_CS : CS_Parent
     {
         public Match_Basics match = new Match_Basics();
-        public cv.Rect rectInput = new cv.Rect();
-        public cv.Rect rectOutput = new cv.Rect();
-        cv.Rect rectSave = new cv.Rect();
+        public CV.Rect rectInput = new CV.Rect();
+        public CV.Rect rectOutput = new CV.Rect();
+        CV.Rect rectSave = new CV.Rect();
         RedCloud_Basics redC = new RedCloud_Basics();
         public MatchRect_Basics_CS(VBtask task) : base(task)
         {
@@ -37977,8 +37979,8 @@ namespace CS_Classes
 
     public class MatchShapes_Basics_CS : CS_Parent
     {
-        public cv.Point[][] hull1;
-        public cv.Point[][] hull2;
+        public CV.Point[][] hull1;
+        public CV.Point[][] hull2;
         Options_MatchShapes match = new Options_MatchShapes();
         Options_Contours options = new Options_Contours();
         public MatchShapes_Basics_CS(VBtask task) : base(task)
@@ -37986,11 +37988,11 @@ namespace CS_Classes
             FindRadio("CComp").Checked = true;
             FindRadio("FloodFill").Enabled = false;
             FindRadio("ApproxNone").Checked = true;
-            dst0 = Cv2.ImRead(task.HomeDir + "Data/star1.png", ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY);
-            dst1 = Cv2.ImRead(task.HomeDir + "Data/star2.png", ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            dst0 = Cv2.ImRead(task.HomeDir + "Data/star1.png", ImreadModes.Color).CvtColor(CV.ColorConversionCodes.BGR2GRAY);
+            dst1 = Cv2.ImRead(task.HomeDir + "Data/star2.png", ImreadModes.Color).CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             desc = "MatchShapes compares single hull to single hull - pretty tricky";
         }
-        public int findBiggestHull(cv.Point[][] hull, int maxLen, int maxIndex, Mat dst)
+        public int findBiggestHull(CV.Point[][] hull, int maxLen, int maxIndex, Mat dst)
         {
             for (int i = 0; i < hull.Length; i++)
             {
@@ -38013,11 +38015,11 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 if (dst0.Channels() != 1)
-                    dst2 = dst0.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                    dst2 = dst0.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
                 else
                     dst2 = dst0;
                 if (dst1.Channels() != 1)
-                    dst3 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                    dst3 = dst1.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
                 else
                     dst3 = dst1;
             }
@@ -38078,7 +38080,7 @@ namespace CS_Classes
                 }
             }
             if (similarCells.Count() == 0)
-                SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), new cv.Point(5, 5), 3);
+                SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), new CV.Point(5, 5), 3);
         }
     }
 
@@ -38145,7 +38147,7 @@ namespace CS_Classes
                 SetTrueText("Best match", rc.maxDist, 3);
             }
             if (similarCells.Count() == 0)
-                SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), new cv.Point(5, 5), 3);
+                SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), new CV.Point(5, 5), 3);
         }
     }
 
@@ -38294,7 +38296,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             minMax.Run(src);
-            cv.Scalar mean = cv.Scalar.All(0), stdev = cv.Scalar.All(0);
+            CV.Scalar mean = CV.Scalar.All(0), stdev = CV.Scalar.All(0);
             var mask = minMax.dst3; // the mask for stable depth.
             dst3.SetTo(0);
             task.depthRGB.CopyTo(dst3, mask);
@@ -38370,7 +38372,7 @@ namespace CS_Classes
                     }
                     if (m1 > 0 && m2 == 0)
                     {
-                        var newROI = new cv.Rect(roi.X + roi.Width, roi.Y, roi.Width, roi.Height);
+                        var newROI = new CV.Rect(roi.X + roi.Width, roi.Y, roi.Width, roi.Height);
                         if (newROI.X + newROI.Width >= dst2.Width) newROI.Width = dst2.Width - newROI.X - 1;
                         if (newROI.Y + newROI.Height >= dst2.Height) newROI.Height = dst2.Height - newROI.Y - 1;
                         var meanScalar = Cv2.Mean(dst3[newROI]);
@@ -38388,7 +38390,7 @@ namespace CS_Classes
                     }
                     if (m1 > 0 && m2 == 0)
                     {
-                        var newROI = new cv.Rect(roi.X, roi.Y + roi.Height, roi.Width, roi.Height);
+                        var newROI = new CV.Rect(roi.X, roi.Y + roi.Height, roi.Width, roi.Height);
                         if (newROI.Y + newROI.Height >= dst3.Height) newROI.Height = dst3.Height - newROI.Y;
                         var meanScalar = Cv2.Mean(dst3[newROI]);
                         dst3[newROI].CopyTo(dst2[newROI], dst3[newROI].Threshold(meanScalar[0], 255, ThresholdTypes.Otsu));
@@ -38406,8 +38408,8 @@ namespace CS_Classes
     {
         public Math_Template_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_32F, cv.Scalar.All(0));
-            dst3 = new Mat(dst3.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_32F, CV.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, CV.Scalar.All(0));
             labels = new[] { "", "", "Input Template showing columns", "Input Template showing rows" };
             desc = "Build a template for use with computing the point cloud";
         }
@@ -38429,8 +38431,8 @@ namespace CS_Classes
             {
                 dst3.Col(0).CopyTo(dst3.Col(i));
             }
-            dst2 -= cv.Scalar.All(task.calibData.ppx);
-            dst3 -= cv.Scalar.All(task.calibData.ppy);
+            dst2 -= CV.Scalar.All(task.calibData.ppx);
+            dst3 -= CV.Scalar.All(task.calibData.ppy);
         }
     }
 
@@ -38453,7 +38455,7 @@ namespace CS_Classes
                 if (dst3.Channels() != 1) dst3.ConvertTo(dst3, MatType.CV_32FC3);
                 else dst3.ConvertTo(dst3, MatType.CV_32F);
             }
-            Cv2.Multiply(dst3, cv.Scalar.All(1.0 / (images.Count() + 1)), dst3);
+            Cv2.Multiply(dst3, CV.Scalar.All(1.0 / (images.Count() + 1)), dst3);
             images.Add(dst3.Clone());
             if (images.Count() > task.frameHistoryCount) images.RemoveAt(0);
             dst3.SetTo(0);
@@ -38482,7 +38484,7 @@ namespace CS_Classes
             if (task.optionsChanged) images.Clear();
             Mat nextImage = new Mat();
             if (src.Type() != MatType.CV_32F) src.ConvertTo(nextImage, MatType.CV_32F); else nextImage = src;
-            Cv2.Multiply(nextImage, cv.Scalar.All(1.0 / task.frameHistoryCount), nextImage);
+            Cv2.Multiply(nextImage, CV.Scalar.All(1.0 / task.frameHistoryCount), nextImage);
             images.Add(nextImage.Clone());
             if (images.Count() > task.frameHistoryCount) images.RemoveAt(0);
             nextImage.SetTo(0);
@@ -38536,7 +38538,7 @@ namespace CS_Classes
         Options_Math options = new Options_Math();
         Options_Match optionsMatch = new Options_Match();
         TrackBar stdevSlider = new TrackBar();
-        Mat lastFrame = new cv.Mat();
+        Mat lastFrame = new CV.Mat();
         public Math_Stdev_CS(VBtask task) : base(task)
         {
             stdevSlider = FindSlider("Stdev Threshold");
@@ -38552,18 +38554,18 @@ namespace CS_Classes
             lowStdevMask.SetTo(0);
             highStdevMask.SetTo(0);
             dst2 = src.Clone();
-            if (dst2.Channels() == 3) dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (dst2.Channels() == 3) dst2 = dst2.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             if (task.FirstPass) lastFrame = dst2.Clone();
             saveFrame = dst2.Clone();
             Parallel.ForEach(task.gridList,
             (roi) =>
             {
-                cv.Scalar mean, stdev;
+                CV.Scalar mean, stdev;
                 Cv2.MeanStdDev(dst2[roi], out mean, out stdev);
                 if (stdev[0] < optionsMatch.stdevThreshold)
                 {
                     Interlocked.Increment(ref updateCount);
-                    var pt = new cv.Point(roi.X + 2, roi.Y + 10);
+                    var pt = new CV.Point(roi.X + 2, roi.Y + 10);
                     if (options.showMean) SetTrueText(mean[0].ToString(fmt0), pt, 2);
                     if (options.showStdev) SetTrueText(stdev[0].ToString(fmt2), pt, 2);
                     lowStdevMask[roi].SetTo(255);
@@ -38590,7 +38592,7 @@ namespace CS_Classes
     public class MeanShift_Basics_CS : CS_Parent
     {
         public int rectangleEdgeWidth = 2;
-        public cv.Rect trackbox = new cv.Rect();
+        public CV.Rect trackbox = new CV.Rect();
         Mat histogram = new Mat();
         public MeanShift_Basics_CS(VBtask task) : base(task)
         {
@@ -38600,8 +38602,8 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            var roi = task.drawRect.Width > 0 ? task.drawRect : new cv.Rect(0, 0, dst2.Width, dst2.Height);
-            var hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV);
+            var roi = task.drawRect.Width > 0 ? task.drawRect : new CV.Rect(0, 0, dst2.Width, dst2.Height);
+            var hsv = src.CvtColor(CV.ColorConversionCodes.BGR2HSV);
             int[] ch = { 0, 1, 2 };
             int[] hsize = { 16, 16, 16 };
             Rangef[] ranges = { new Rangef(0, 180) };
@@ -38619,7 +38621,7 @@ namespace CS_Classes
                 Cv2.MeanShift(dst1, ref trackbox, new TermCriteria(CriteriaTypes.Count | CriteriaTypes.Eps, 10, 1));
                 dst2.Rectangle(trackbox, Scalar.Red, rectangleEdgeWidth, task.lineType);
                 dst3 = Show_HSV_Hist(histogram);
-                dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR);
+                dst3 = dst3.CvtColor(CV.ColorConversionCodes.HSV2BGR);
             }
         }
     }
@@ -38675,7 +38677,7 @@ namespace CS_Classes
                 for (int j = 1; j < options.nabeCount; j++)
                 {
                     var pt = knn.queries[knn.result[i, j]];
-                    DrawLine(dst2, ptLast, pt, cv.Scalar.White);
+                    DrawLine(dst2, ptLast, pt, CV.Scalar.White);
                     ptLast = pt;
                 }
             }
@@ -38719,7 +38721,7 @@ namespace CS_Classes
                 var depth = task.pcSplit[2].Get<float>((int)pt.Y, (int)pt.X);
                 if (depth == 0)
                 {
-                    var r = ValidateRect(new cv.Rect((int)(pt.X - pad), (int)(pt.Y - pad), size, size));
+                    var r = ValidateRect(new CV.Rect((int)(pt.X - pad), (int)(pt.Y - pad), size, size));
                     depth = (float)task.pcSplit[2][r].Mean(task.depthMask[r])[0];
                     depthMiss++;
                 }
@@ -38736,7 +38738,7 @@ namespace CS_Classes
     public class MiniCloud_Basics_CS : CS_Parent
     {
         readonly Resize_Smaller resize;
-        public cv.Rect rect;
+        public CV.Rect rect;
         public Options_IMU options = new Options_IMU();
         public MiniCloud_Basics_CS(VBtask task) : base(task)
         {
@@ -38749,9 +38751,9 @@ namespace CS_Classes
             resize.Run(task.pointCloud);
             var split = resize.dst2.Split();
             split[2].SetTo(0, task.noDepthMask.Resize(split[2].Size()));
-            rect = new cv.Rect(0, 0, resize.dst2.Width, resize.dst2.Height);
+            rect = new CV.Rect(0, 0, resize.dst2.Width, resize.dst2.Height);
             if (rect.Height < dst2.Height / 2) rect.Y = dst2.Height / 4; // move it below the dst2 caption
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             dst2[rect] = split[2].ConvertScaleAbs(255);
             dst2.Rectangle(rect, Scalar.White, 1);
             Cv2.Merge(split, dst3);
@@ -38770,7 +38772,7 @@ namespace CS_Classes
         public MiniCloud_Rotate_CS(VBtask task) : base(task)
         {
             ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)");
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels[3] = "Side view after resize percentage - use Y-Axis slider to rotate image.";
             desc = "Create a histogram for the mini point cloud";
         }
@@ -38801,7 +38803,7 @@ namespace CS_Classes
                  (float)(gM[2, 0] * 0 + gM[2, 1] * 1 + gM[2, 2] * 0),
                  (float)(gM[2, 0] * -sy + gM[2, 1] * 0 + gM[2, 2] * cy)}};
 
-            var gMat = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, gM);
+            var gMat = CV.Mat.FromPixelData(3, 3, MatType.CV_32F, gM);
             var gInput = input.Reshape(1, input.Rows * input.Cols);
             var gOutput = (gInput * gMat).ToMat();
             input = gOutput.Reshape(3, input.Rows);
@@ -38875,7 +38877,7 @@ namespace CS_Classes
             peak.mini.Run(src);
             float maxHist = Single.MinValue;
             int bestAngle = 0;
-            cv.Point bestLoc = new cv.Point();
+            CV.Point bestLoc = new CV.Point();
             mmData mm;
             for (int i = ySlider.Minimum; i < ySlider.Maximum - 1; i++)
             {
@@ -38944,12 +38946,12 @@ namespace CS_Classes
                 SetTrueText(strOut, 3);
                 return;
             }
-            Mat mLearn = cv.Mat.FromPixelData(mlInput.Count(), 5, MatType.CV_32F, mlInput.ToArray());
-            Mat response = cv.Mat.FromPixelData(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
+            Mat mLearn = CV.Mat.FromPixelData(mlInput.Count(), 5, MatType.CV_32F, mlInput.ToArray());
+            Mat response = CV.Mat.FromPixelData(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
             rtree.Train(mLearn, SampleTypes.RowSample, response);
             var predictList = new List<mlData>();
             var colors = new List<Vec3b>();
-            var saveRoi = new List<cv.Rect>();
+            var saveRoi = new List<CV.Rect>();
             var depthMask = new List<Mat>();
             for (int i = 0; i < task.gridList.Count(); i++)
             {
@@ -38967,8 +38969,8 @@ namespace CS_Classes
                 colors.Add(c);
                 saveRoi.Add(roi);
             }
-            Mat predMat = cv.Mat.FromPixelData(predictList.Count(), 5, MatType.CV_32F, predictList.ToArray());
-            Mat output = new Mat(predictList.Count(), 1, MatType.CV_32FC1, cv.Scalar.All(0));
+            Mat predMat = CV.Mat.FromPixelData(predictList.Count(), 5, MatType.CV_32F, predictList.ToArray());
+            Mat output = new Mat(predictList.Count(), 1, MatType.CV_32FC1, CV.Scalar.All(0));
             rtree.Predict(predMat, output);
             dst1 = task.pcSplit[2];
             dst3.SetTo(0);
@@ -38997,7 +38999,7 @@ namespace CS_Classes
             var learnData = new SortedList<Vec3f, float>(new CompareVec3f());
             var rng = new Random();
             int holeCount = Cv2.CountNonZero(holeMask);
-            if (borderMask.Channels() != 1) borderMask = borderMask.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (borderMask.Channels() != 1) borderMask = borderMask.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             int borderCount = Cv2.CountNonZero(borderMask);
             if (holeCount > 0 && borderCount > minLearnCount)
             {
@@ -39021,8 +39023,8 @@ namespace CS_Classes
                         }
                     }
                 }
-                Mat learnInput = cv.Mat.FromPixelData(learnData.Count(), 3, MatType.CV_32F, learnInputList.ToArray());
-                Mat depthResponse = cv.Mat.FromPixelData(learnData.Count(), 1, MatType.CV_32F, responseInputList.ToArray());
+                Mat learnInput = CV.Mat.FromPixelData(learnData.Count(), 3, MatType.CV_32F, learnInputList.ToArray());
+                Mat depthResponse = CV.Mat.FromPixelData(learnData.Count(), 1, MatType.CV_32F, responseInputList.ToArray());
                 // now learn what depths are associated with which colors.
                 var rtree = RTrees.Create();
                 rtree.Train(learnInput, SampleTypes.RowSample, depthResponse);
@@ -39092,7 +39094,7 @@ namespace CS_Classes
             mats.mat[1] = task.noDepthMask.Clone();
             Mat color32f = new Mat();
             resizer.Run(src);
-            cv.Rect colorROI = new cv.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height);
+            CV.Rect colorROI = new CV.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height);
             resizer.dst2.ConvertTo(color32f, MatType.CV_32FC3);
             Mat shadowSmall = mats.mat[1].Resize(color32f.Size()).Clone();
             color32f.SetTo(Scalar.Black, shadowSmall); // where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
@@ -39148,7 +39150,7 @@ namespace CS_Classes
             mats.mat[0] = shadow.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
             Mat color32f = new Mat();
             resizer.Run(src);
-            cv.Rect colorROI = new cv.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height);
+            CV.Rect colorROI = new CV.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height);
             resizer.dst2.ConvertTo(color32f, MatType.CV_32FC3);
             Mat shadowSmall = shadow.dst2.Resize(color32f.Size()).Clone();
             color32f.SetTo(Scalar.Black, shadowSmall); // where depth is unknown, set to black
@@ -39166,7 +39168,7 @@ namespace CS_Classes
             dst2 = mask.CvtColor(ColorConversionCodes.GRAY2BGR);
             Mat c = color32f.Reshape(1, (int)color32f.Total());
             Mat depthResponse = depth32f.Reshape(1, (int)depth32f.Total());
-            Mat learnInput = new Mat(c.Rows, 6, MatType.CV_32F, cv.Scalar.All(0));
+            Mat learnInput = new Mat(c.Rows, 6, MatType.CV_32F, CV.Scalar.All(0));
             for (int y = 0; y < c.Rows; y++)
             {
                 for (int x = 0; x < c.Cols; x++)
@@ -39176,11 +39178,11 @@ namespace CS_Classes
                 }
             }
             // Now learn what depths are associated with which colors.
-            var rtree = cv.ML.RTrees.Create();
+            var rtree = CV.ML.RTrees.Create();
             rtree.Train(learnInput, SampleTypes.RowSample, depthResponse);
             src.ConvertTo(color32f, MatType.CV_32FC3);
             Mat allC = color32f.Reshape(1, (int)color32f.Total()); // test the entire original image.
-            Mat input = new Mat(allC.Rows, 6, MatType.CV_32F, cv.Scalar.All(0));
+            Mat input = new Mat(allC.Rows, 6, MatType.CV_32F, CV.Scalar.All(0));
             for (int y = 0; y < allC.Rows; y++)
             {
                 for (int x = 0; x < allC.Cols; x++)
@@ -39223,14 +39225,14 @@ namespace CS_Classes
             colorClass.Run(src);
             dst2 = colorClass.dst3;
             labels[2] = "Output of Color8U_Basics running " + task.redOptions.colorInputName;
-            var rtree = cv.ML.RTrees.Create();
+            var rtree = CV.ML.RTrees.Create();
             List<mlColor> mlInput = new List<mlColor>();
             List<float> mResponse = new List<float>();
             List<mlColor> predictList = new List<mlColor>();
-            List<cv.Rect> roiPredict = new List<cv.Rect>();
+            List<CV.Rect> roiPredict = new List<CV.Rect>();
             for (int i = 0; i < task.gridList.Count(); i++)
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 mlColor mls = new mlColor
                 {
                     colorIndex = colorClass.dst2.Get<byte>(roi.Y, roi.X),
@@ -39253,17 +39255,17 @@ namespace CS_Classes
                 SetTrueText("No learning data was found or provided.  Exit...", 3);
                 return;
             }
-            Mat mLearn = cv.Mat.FromPixelData(mlInput.Count(), 3, MatType.CV_32F, mlInput.ToArray());
-            Mat response = cv.Mat.FromPixelData(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
+            Mat mLearn = CV.Mat.FromPixelData(mlInput.Count(), 3, MatType.CV_32F, mlInput.ToArray());
+            Mat response = CV.Mat.FromPixelData(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
             rtree.Train(mLearn, SampleTypes.RowSample, response);
-            Mat predMat = cv.Mat.FromPixelData(predictList.Count(), 3, MatType.CV_32F, predictList.ToArray());
-            Mat output = new cv.Mat(predictList.Count(), 1, MatType.CV_32FC1, cv.Scalar.All(0));
+            Mat predMat = CV.Mat.FromPixelData(predictList.Count(), 3, MatType.CV_32F, predictList.ToArray());
+            Mat output = new CV.Mat(predictList.Count(), 1, MatType.CV_32FC1, CV.Scalar.All(0));
             rtree.Predict(predMat, output);
             dst3 = task.pcSplit[2].Clone();
             for (int i = 0; i < predictList.Count(); i++)
             {
                 mlColor mls = predictList[i];
-                cv.Rect roi = roiPredict[i];
+                CV.Rect roi = roiPredict[i];
                 float depth = output.Get<float>(i, 0);
                 dst3[roi].SetTo(depth, task.noDepthMask[roi]);
             }
@@ -39294,14 +39296,14 @@ namespace CS_Classes
             colorClass.Run(src);
             dst2 = colorClass.dst3;
             labels[2] = "Output of Color8U_Basics running " + task.redOptions.colorInputName;
-            var rtree = cv.ML.RTrees.Create();
+            var rtree = CV.ML.RTrees.Create();
             List<mlColorInTier> mlInput = new List<mlColorInTier>();
             List<float> mResponse = new List<float>();
             List<mlColorInTier> predictList = new List<mlColorInTier>();
-            List<cv.Rect> roiPredict = new List<cv.Rect>();
+            List<CV.Rect> roiPredict = new List<CV.Rect>();
             for (int i = 0; i < task.gridList.Count(); i++)
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 mlColorInTier mls = new mlColorInTier
                 {
                     colorIndex = colorClass.dst2.Get<byte>(roi.Y, roi.X),
@@ -39324,17 +39326,17 @@ namespace CS_Classes
                 SetTrueText("No learning data was found or provided.  Exit...", 3);
                 return;
             }
-            Mat mLearn = cv.Mat.FromPixelData(mlInput.Count(), 3, MatType.CV_32F, mlInput.ToArray());
-            Mat response = cv.Mat.FromPixelData(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
+            Mat mLearn = CV.Mat.FromPixelData(mlInput.Count(), 3, MatType.CV_32F, mlInput.ToArray());
+            Mat response = CV.Mat.FromPixelData(mResponse.Count(), 1, MatType.CV_32F, mResponse.ToArray());
             rtree.Train(mLearn, SampleTypes.RowSample, response);
-            Mat predMat = cv.Mat.FromPixelData(predictList.Count(), 3, MatType.CV_32F, predictList.ToArray());
-            Mat output = new Mat(predictList.Count(), 1, MatType.CV_32FC1, cv.Scalar.All(0));
+            Mat predMat = CV.Mat.FromPixelData(predictList.Count(), 3, MatType.CV_32F, predictList.ToArray());
+            Mat output = new Mat(predictList.Count(), 1, MatType.CV_32FC1, CV.Scalar.All(0));
             rtree.Predict(predMat, output);
             dst3 = task.pcSplit[2].Clone();
             for (int i = 0; i < predictList.Count(); i++)
             {
                 mlColorInTier mls = predictList[i];
-                cv.Rect roi = roiPredict[i];
+                CV.Rect roi = roiPredict[i];
                 float depth = output.Get<float>(i, 0);
                 dst3[roi].SetTo(depth, task.noDepthMask[roi]);
             }
@@ -39356,7 +39358,7 @@ namespace CS_Classes
         {
             if (src.Type() == MatType.CV_8UC3)
             {
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, src.CvtColor(ColorConversionCodes.BGR2BGRA).Data);
+                dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, src.CvtColor(ColorConversionCodes.BGR2BGRA).Data);
             }
             else
             {
@@ -39370,13 +39372,13 @@ namespace CS_Classes
             int compressedCount = ML_RemoveDups_GetCount(cPtr);
             if (src.Type() == MatType.CV_32S)
             {
-                dst3 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, dst2.Type(), imagePtr).Clone();
-                Mat tmp = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC4, dst3.Data);
+                dst3 = CV.Mat.FromPixelData(dst2.Rows, dst2.Cols, dst2.Type(), imagePtr).Clone();
+                Mat tmp = CV.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC4, dst3.Data);
                 dst3 = tmp.CvtColor(ColorConversionCodes.BGRA2BGR);
             }
             else
             {
-                dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+                dst3 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
             }
             labels[3] = "The BGR data in dst2 after removing duplicate BGR entries.  Input count = " + dst2.Total() + " output = " + compressedCount;
         }
@@ -39445,10 +39447,10 @@ namespace CS_Classes
                           new int[] { dst2.Height, dst2.Width }, ranges);
             double thicknessCMs = 0.1, nextY = 0;
             totalPixels = 0;
-            cv.Rect rect = new cv.Rect(0, 0, 0, 0);
+            CV.Rect rect = new CV.Rect(0, 0, 0, 0);
             for (int y = dst0.Height - 2; y >= 0; y--)
             {
-                rect = new cv.Rect(0, y, dst0.Width - 1, 1);
+                rect = new CV.Rect(0, y, dst0.Width - 1, 1);
                 int count = dst0[rect].CountNonZero();
                 double pixelCount = dst0[rect].Sum()[0];
                 totalPixels += (int)pixelCount;
@@ -39465,7 +39467,7 @@ namespace CS_Classes
             labels[2] = "Y = " + task.pcFloor.ToString("F3") + " separates the floor.  Total pixels below floor level = " + totalPixels;
             for (int y = 0; y < dst2.Height; y++)
             {
-                rect = new cv.Rect(0, y, dst0.Width - 1, 1);
+                rect = new CV.Rect(0, y, dst0.Width - 1, 1);
                 int count = dst0[rect].CountNonZero();
                 double pixelCount = dst0[rect].Sum()[0];
                 totalPixels += (int)pixelCount;
@@ -39485,8 +39487,8 @@ namespace CS_Classes
                 dst2 = dst0.Threshold(0, 255, ThresholdTypes.Binary);
                 dst2.ConvertTo(dst2, MatType.CV_8U);
                 dst2 = dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
-                dst2.Line(new cv.Point(0, floorY), new cv.Point(dst2.Width, floorY), Scalar.Red, task.lineWidth + 2, task.lineType);
-                dst2.Line(new cv.Point(0, ceilingY), new cv.Point(dst2.Width, ceilingY), Scalar.Red, task.lineWidth + 2, task.lineType);
+                dst2.Line(new CV.Point(0, floorY), new CV.Point(dst2.Width, floorY), Scalar.Red, task.lineWidth + 2, task.lineType);
+                dst2.Line(new CV.Point(0, ceilingY), new CV.Point(dst2.Width, ceilingY), Scalar.Red, task.lineWidth + 2, task.lineType);
             }
         }
     }
@@ -39536,7 +39538,7 @@ namespace CS_Classes
                 Mat[] split = points.Split();
                 var mmX = GetMinMax(split[0]);
                 var mmY = GetMinMax(split[1]);
-                cv.Rect r = new cv.Rect((int)mmX.minVal, (int)mmY.minVal, (int)(mmX.maxVal - mmX.minVal), (int)(mmY.maxVal - mmY.minVal));
+                CV.Rect r = new CV.Rect((int)mmX.minVal, (int)mmY.minVal, (int)(mmX.maxVal - mmX.minVal), (int)(mmY.maxVal - mmY.minVal));
                 dst1.Rectangle(r, Scalar.White, 1, task.lineType);
             }
         }
@@ -39575,7 +39577,7 @@ namespace CS_Classes
             for (int i = 0; i < redCellInput.Count(); i++)
             {
                 var rc = redCellInput[i];
-                var tmp = new Mat(rc.rect.Size, MatType.CV_32F, cv.Scalar.All(0));
+                var tmp = new Mat(rc.rect.Size, MatType.CV_32F, CV.Scalar.All(0));
                 src[rc.rect].CopyTo(tmp, rc.mask);
                 rc.pixels = (int)tmp.Sum()[0];
                 sortedCells.Add(rc.pixels, rc);
@@ -39706,7 +39708,7 @@ namespace CS_Classes
         public Projection_Lines_CS(VBtask task) : base(task)
         {
             FindCheckBox("Top View (Unchecked Side View)").Checked = false;
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells" };
             desc = "Search for surfaces among the FeatureLess regions";
         }
@@ -39736,7 +39738,7 @@ namespace CS_Classes
         RedCloud_Basics redC = new RedCloud_Basics();
         public Projection_Cell_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             if (standaloneTest()) task.gOptions.setDisplay1();
             task.gOptions.setUnfiltered(true);
             labels = new string[] { "", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell" };
@@ -39829,7 +39831,7 @@ namespace CS_Classes
         Options_Projection options = new Options_Projection();
         public Projection_ObjectIsolate_CS(VBtask task) : base(task)
         {
-            dst1 = new Mat(dst1.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             side.objects.showRectangles = false;
             desc = "Using the top down view, create a histogram for Y-values of the largest object.";
         }
@@ -39863,8 +39865,8 @@ namespace CS_Classes
         public Projection_Object_CS(VBtask task) : base(task)
         {
             task.gOptions.setDebugSlider(0); // pick the biggest object...
-            dst0 = new Mat(dst0.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst1 = new Mat(dst1.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             top.objects.showRectangles = false;
             desc = "Using the top down view, create a histogram for Y-values of the largest object.";
         }
@@ -39928,11 +39930,11 @@ namespace CS_Classes
         public Point2f centroid;
         Foreground_KMeans foreground = new Foreground_KMeans();
         public int scaleFactor = 1;
-        public cv.Point offsetPt;
+        public CV.Point offsetPt;
         public Kalman_Basics kalman = new Kalman_Basics();
         public Moments_Basics_CS(VBtask task) : base(task)
         {
-            kalman.kInput = new float[2]; // 2 elements - cv.point
+            kalman.kInput = new float[2]; // 2 elements - CV.point
             labels[2] = "Red dot = Kalman smoothed centroid";
             desc = "Compute the centroid of the provided mask file.";
         }
@@ -39970,7 +39972,7 @@ namespace CS_Classes
         Kalman_Basics kalman = new Kalman_Basics();
         public Moments_CentroidKalman_CS(VBtask task) : base(task)
         {
-            kalman.kInput = new float[2]; // 2 elements - cv.point
+            kalman.kInput = new float[2]; // 2 elements - CV.point
             labels[2] = "Red dot = Kalman smoothed centroid";
             desc = "Compute the centroid of the foreground depth and smooth with Kalman filter.";
         }
@@ -39984,7 +39986,7 @@ namespace CS_Classes
                 kalman.kInput[0] = (float)(m.M10 / m.M00);
                 kalman.kInput[1] = (float)(m.M01 / m.M00);
                 kalman.Run(src);
-                DrawCircle(dst2, new cv.Point((int)kalman.kOutput[0], (int)kalman.kOutput[1]), task.DotSize + 5, Scalar.Red);
+                DrawCircle(dst2, new CV.Point((int)kalman.kOutput[0], (int)kalman.kOutput[1]), task.DotSize + 5, Scalar.Red);
             }
         }
     }
@@ -40021,7 +40023,7 @@ namespace CS_Classes
         public Options_Motion options = new Options_Motion();
         public Motion_Simple_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels[3] = "Accumulated changed pixels from the last heartbeat";
             desc = "Accumulate differences from the previous BGR image.";
         }
@@ -40038,7 +40040,7 @@ namespace CS_Classes
                     diff.changedPixels > options.motionThreshold ||
                     task.optionsChanged)
                 {
-                    task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
+                    task.motionRect = new CV.Rect(0, 0, dst2.Width, dst2.Height);
                 }
                 if (task.motionRect.Width == dst2.Width || task.heartBeat)
                 {
@@ -40062,10 +40064,10 @@ namespace CS_Classes
     public class Motion_ThruCorrelation_CS : CS_Parent
     {
         Options_MotionDetect options = new Options_MotionDetect();
-        Mat lastFrame = new cv.Mat();
+        Mat lastFrame = new CV.Mat();
         public Motion_ThruCorrelation_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Detect motion through the correlation coefficient";
         }
         public void RunCS(Mat src)
@@ -40078,9 +40080,9 @@ namespace CS_Classes
             dst3.SetTo(0);
             Parallel.For(0, task.gridList.Count(), i =>
             {
-                cv.Rect roi = task.gridList[i];
+                CV.Rect roi = task.gridList[i];
                 Mat correlation = new Mat();
-                cv.Scalar mean, stdev;
+                CV.Scalar mean, stdev;
                 Cv2.MeanStdDev(input[roi], out mean, out stdev);
                 if (stdev[0] > options.stdevThreshold)
                 {
@@ -40115,7 +40117,7 @@ namespace CS_Classes
 
     public class Motion_CCmerge_CS : CS_Parent
     {
-        Mat lastFrame = new cv.Mat();
+        Mat lastFrame = new CV.Mat();
         Motion_ThruCorrelation motionCC = new Motion_ThruCorrelation();
         public Motion_CCmerge_CS(VBtask task) : base(task)
         {
@@ -40143,7 +40145,7 @@ namespace CS_Classes
     {
         public int changedPixels;
         int changeCount, frames;
-        Mat lastFrame = new cv.Mat();
+        Mat lastFrame = new CV.Mat();
         public Motion_PixelDiff_CS(VBtask task) : base(task)
         {
             desc = "Count the number of changed pixels in the current frame and accumulate them.  If either exceeds thresholds, then set flag = true.  " +
@@ -40180,7 +40182,7 @@ namespace CS_Classes
         public Motion_DepthReconstructed_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
-            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             labels[2] = "The yellow rectangle indicates where the motion is and only that portion of the point cloud and depth mask is updated.";
             desc = "Rebuild the point cloud based on the BGR motion history.";
         }
@@ -40284,7 +40286,7 @@ namespace CS_Classes
             float CCthreshold = (float)(options.CCthreshold);
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (task.heartBeat) dst3 = src.Clone();
-            List<cv.Rect> roiMotion = new List<cv.Rect>();
+            List<CV.Rect> roiMotion = new List<CV.Rect>();
             foreach (var roi in task.gridList)
             {
                 Mat correlation = new Mat();
@@ -40315,44 +40317,44 @@ namespace CS_Classes
         int minCount = 4;
         int reconstructedRGB = 0;
         Mat color = new Mat();
-        cv.Rect lastMotionRect = new cv.Rect();
+        CV.Rect lastMotionRect = new CV.Rect();
         public Motion_Intersect_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             if (dst2.Width == 1280 || dst2.Width == 640) minCount = 16;
             desc = "Track the max rectangle that covers all the motion until there is no motion in it.";
         }
-        cv.Rect buildEnclosingRect(Mat tmp)
+        CV.Rect buildEnclosingRect(Mat tmp)
         {
-            List<cv.Rect> rectList = new List<cv.Rect>();
+            List<CV.Rect> rectList = new List<CV.Rect>();
             int[] dots = new int[tmp.Total() * 2];
             Marshal.Copy(tmp.Data, dots, 0, dots.Length);
-            List<cv.Point> pointList = new List<cv.Point>();
+            List<CV.Point> pointList = new List<CV.Point>();
             for (int i = 0; i < dots.Length; i += 2)
             {
                 if (dots[i] >= 1 && dots[i] < dst2.Width - 2 && dots[i + 1] >= 1 && dots[i + 1] < dst2.Height - 2)
                 {
-                    pointList.Add(new cv.Point(dots[i], dots[i + 1]));
+                    pointList.Add(new CV.Point(dots[i], dots[i + 1]));
                 }
             }
             FloodFillFlags flags = (FloodFillFlags)4 | FloodFillFlags.MaskOnly | FloodFillFlags.FixedRange;
-            cv.Rect rect = new cv.Rect();
-            Mat motionMat = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            Mat matPoints = dst1[new cv.Rect(1, 1, motionMat.Width - 2, motionMat.Height - 2)];
+            CV.Rect rect = new CV.Rect();
+            Mat motionMat = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            Mat matPoints = dst1[new CV.Rect(1, 1, motionMat.Width - 2, motionMat.Height - 2)];
             foreach (var pt in pointList)
             {
                 if (motionMat.At<byte>(pt.Y, pt.X) == 0 && matPoints.At<byte>(pt.Y, pt.X) != 0)
                 {
-                    int count = matPoints.FloodFill(motionMat, pt, cv.Scalar.All(255), out rect, cv.Scalar.All(0), 
-                                                    cv.Scalar.All(0), flags | (FloodFillFlags)(255 << 8));
+                    int count = matPoints.FloodFill(motionMat, pt, CV.Scalar.All(255), out rect, CV.Scalar.All(0), 
+                                                    CV.Scalar.All(0), flags | (FloodFillFlags)(255 << 8));
                     if (count <= minCount) continue;
-                    rectList.Add(new cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1));
+                    rectList.Add(new CV.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1));
                 }
             }
             labels[3] = "There were " + (dots.Length / 2) + " points collected";
-            if (rectList.Count() == 0) return new cv.Rect();
-            cv.Rect motionRect = rectList[0];
+            if (rectList.Count() == 0) return new CV.Rect();
+            CV.Rect motionRect = rectList[0];
             foreach (var r in rectList)
             {
                 motionRect = motionRect.Union(r);
@@ -40391,7 +40393,7 @@ namespace CS_Classes
             {
                 labels[2] = reconstructedRGB + " frames since last full image";
                 reconstructedRGB = 0;
-                task.motionRect = new cv.Rect();
+                task.motionRect = new CV.Rect();
                 dst2 = src.Clone();
             }
             if (standaloneTest())
@@ -40422,7 +40424,7 @@ namespace CS_Classes
     {
         Motion_Enclosing motion = new Motion_Enclosing();
         Diff_Basics diff = new Diff_Basics();
-        List<cv.Rect> lastRects = new List<cv.Rect>();
+        List<CV.Rect> lastRects = new List<CV.Rect>();
         public Motion_RectTest_CS(VBtask task) : base(task)
         {
             UpdateAdvice(traceName + ": gOptions frame history slider will impact results.");
@@ -40432,7 +40434,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             motion.Run(src);
-            cv.Rect r = motion.motionRect;
+            CV.Rect r = motion.motionRect;
             if (task.heartBeat || r.Width * r.Height > src.Total() / 2 || task.frameCount < 50)
             {
                 dst2 = src.Clone();
@@ -40475,7 +40477,7 @@ namespace CS_Classes
         public Motion_HistoryTest_CS(VBtask task) : base(task)
         {
             task.gOptions.pixelDiffThreshold = 10;
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Detect motion using the last X images";
         }
         public void RunCS(Mat src)
@@ -40517,7 +40519,7 @@ namespace CS_Classes
     {
         RedCloud_Basics redMasks = new RedCloud_Basics();
         double learnRate;
-        public cv.Rect motionRect = new cv.Rect();
+        public CV.Rect motionRect = new CV.Rect();
         public Motion_Enclosing_CPP_CS(VBtask task) : base(task)
         {
             if (dst2.Width >= 1280) learnRate = 0.5; else learnRate = 0.1; // learn faster with large images (slower frame rate)
@@ -40532,10 +40534,10 @@ namespace CS_Classes
             GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             IntPtr imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels(), learnRate);
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Threshold(0, 255, ThresholdTypes.Binary);
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Threshold(0, 255, ThresholdTypes.Binary);
             redMasks.inputMask = ~dst2;
             redMasks.Run(dst2);
-            motionRect = new cv.Rect();
+            motionRect = new CV.Rect();
             if (task.redCells.Count() < 2) return;
             motionRect = task.redCells[1].rect;
             for (int i = 2; i < task.redCells.Count(); i++)
@@ -40545,9 +40547,9 @@ namespace CS_Classes
             }
             if (motionRect.Width > dst2.Width / 2 && motionRect.Height > dst2.Height / 2)
             {
-                motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
+                motionRect = new CV.Rect(0, 0, dst2.Width, dst2.Height);
             }
-            dst2.Rectangle(motionRect, cv.Scalar.All(255), task.lineWidth, task.lineType);
+            dst2.Rectangle(motionRect, CV.Scalar.All(255), task.lineWidth, task.lineType);
         }
         public void Close()
         {
@@ -40575,7 +40577,7 @@ namespace CS_Classes
                 if (diff.lastDepth32f.Width == 0) diff.lastDepth32f = task.pcSplit[2].Clone();
                 diff.Run(task.pcSplit[2]);
                 dst3 = diff.dst2;
-                dst3.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
+                dst3.Rectangle(task.motionRect, CV.Scalar.All(255), task.lineWidth);
                 diff.lastDepth32f = task.pcSplit[2];
             }
         }
@@ -40594,7 +40596,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             if (task.heartBeat)
             {
                 dst2 = src.Clone();
@@ -40613,7 +40615,7 @@ namespace CS_Classes
                 if (diff.lastFrame.Width == 0) diff.lastFrame = dst2.Clone();
                 diff.Run(src);
                 dst3 = diff.dst2;
-                dst3.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
+                dst3.Rectangle(task.motionRect, CV.Scalar.All(255), task.lineWidth);
                 diff.lastFrame = src.Clone();
             }
         }
@@ -40626,7 +40628,7 @@ namespace CS_Classes
     {
         RedCloud_Basics redMasks = new RedCloud_Basics();
         public BGSubtract_MOG2 bgSub = new BGSubtract_MOG2();
-        List<cv.Rect> rectList = new List<cv.Rect>();
+        List<CV.Rect> rectList = new List<CV.Rect>();
         public Motion_Basics_QT_CS(VBtask task) : base(task)
         {
             task.redOptions.setIdentifyCells(false);
@@ -40637,10 +40639,10 @@ namespace CS_Classes
             task.motionDetected = true;
             if (task.heartBeat)
             {
-                task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
+                task.motionRect = new CV.Rect(0, 0, dst2.Width, dst2.Height);
                 return;
             }
-            task.motionRect = new cv.Rect();
+            task.motionRect = new CV.Rect();
             if (src.Channels() != 1)
             {
                 bgSub.Run(src);
@@ -40669,7 +40671,7 @@ namespace CS_Classes
                 if (rectList.Count() > task.frameHistoryCount) rectList.RemoveAt(0);
                 if (task.motionRect.Width > dst2.Width / 2 && task.motionRect.Height > dst2.Height / 2)
                 {
-                    task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
+                    task.motionRect = new CV.Rect(0, 0, dst2.Width, dst2.Height);
                 }
                 else
                 {
@@ -40678,7 +40680,7 @@ namespace CS_Classes
             }
             if (standaloneTest())
             {
-                dst2.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
+                dst2.Rectangle(task.motionRect, CV.Scalar.All(255), task.lineWidth);
                 if (task.redCells.Count() > 1)
                 {
                     labels[2] = task.redCells.Count().ToString() + " RedMask cells had motion";
@@ -40715,7 +40717,7 @@ namespace CS_Classes
                 if (diff.lastDepth32f.Width == 0) diff.lastDepth32f = task.pcSplit[2].Clone();
                 diff.Run(task.pcSplit[2]);
                 dst3 = diff.dst2;
-                dst3.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
+                dst3.Rectangle(task.motionRect, CV.Scalar.All(255), task.lineWidth);
                 diff.lastDepth32f = task.pcSplit[2];
             }
         }
@@ -40745,7 +40747,7 @@ namespace CS_Classes
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public BGSubtract_MOG2_QT bgSub = new BGSubtract_MOG2_QT();
-        List<cv.Rect> rectList = new List<cv.Rect>();
+        List<CV.Rect> rectList = new List<CV.Rect>();
         public Motion_BasicsQuarterRes_CS(VBtask task) : base(task)
         {
             desc = "The option-free version of Motion_Basics";
@@ -40753,7 +40755,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             task.motionDetected = true;
-            task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
+            task.motionRect = new CV.Rect(0, 0, dst2.Width, dst2.Height);
             if (src.Channels() != 1)
             {
                 bgSub.Run(src);
@@ -40779,7 +40781,7 @@ namespace CS_Classes
             }
             else
             {
-                cv.Rect nextRect = task.redCells[1].rect;
+                CV.Rect nextRect = task.redCells[1].rect;
                 for (int i = 2; i < task.redCells.Count(); i++)
                 {
                     var rc = task.redCells[i];
@@ -40794,7 +40796,7 @@ namespace CS_Classes
                 if (rectList.Count() > task.frameHistoryCount) rectList.RemoveAt(0);
                 if (task.motionRect.Width > dst2.Width / 2 && task.motionRect.Height > dst2.Height / 2)
                 {
-                    task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
+                    task.motionRect = new CV.Rect(0, 0, dst2.Width, dst2.Height);
                 }
                 else
                 {
@@ -40803,7 +40805,7 @@ namespace CS_Classes
             }
             if (standaloneTest())
             {
-                dst2.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
+                dst2.Rectangle(task.motionRect, CV.Scalar.All(255), task.lineWidth);
                 if (task.redCells.Count() > 1)
                 {
                     labels[2] = task.redCells.Count().ToString() + " RedMask cells had motion";
@@ -40821,17 +40823,17 @@ namespace CS_Classes
             int ratio = src.Width / dst2.Width;
             if (src.Size() != dst2.Size())
             {
-                cv.Rect r = task.motionRect;
-                task.motionRect = new cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio);
+                CV.Rect r = task.motionRect;
+                task.motionRect = new CV.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio);
             }
             if (task.motionRect.Width < dst2.Width)
             {
-                dst2.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth);
+                dst2.Rectangle(task.motionRect, CV.Scalar.All(255), task.lineWidth);
                 int pad = dst2.Width / 20;
-                cv.Rect r = task.motionRect;
-                r = new cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2);
+                CV.Rect r = task.motionRect;
+                r = new CV.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2);
                 task.motionRect = ValidateRect(r, ratio);
-                dst2.Rectangle(task.motionRect, cv.Scalar.All(255), task.lineWidth + 1);
+                dst2.Rectangle(task.motionRect, CV.Scalar.All(255), task.lineWidth + 1);
             }
         }
     }
@@ -40843,7 +40845,7 @@ namespace CS_Classes
     {
         public Motion_Diff_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "Unstable mask", "Pixel difference" };
             desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot";
         }
@@ -40869,7 +40871,7 @@ namespace CS_Classes
         Area_MinRect mRect = new Area_MinRect();
         public Motion_MinRect_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find the nonzero points of motion and fit an rotated rectangle to them.";
         }
         public void RunCS(Mat src)
@@ -40882,18 +40884,18 @@ namespace CS_Classes
             {
                 List<int> ptx = new List<int>();
                 List<int> pty = new List<int>();
-                List<cv.Point> inputPoints = new List<cv.Point>();
+                List<CV.Point> inputPoints = new List<CV.Point>();
                 for (int i = 0; i < nonzeros.Rows; i++)
                 {
-                    cv.Point pt = nonzeros.Get<cv.Point>(i, 0);
+                    CV.Point pt = nonzeros.Get<CV.Point>(i, 0);
                     inputPoints.Add(pt);
                     ptx.Add(pt.X);
                     pty.Add(pt.Y);
                 }
-                cv.Point p1 = inputPoints[ptx.IndexOf(ptx.Max())];
-                cv.Point p2 = inputPoints[ptx.IndexOf(ptx.Min())];
-                cv.Point p3 = inputPoints[pty.IndexOf(pty.Max())];
-                cv.Point p4 = inputPoints[pty.IndexOf(pty.Min())];
+                CV.Point p1 = inputPoints[ptx.IndexOf(ptx.Max())];
+                CV.Point p2 = inputPoints[ptx.IndexOf(ptx.Min())];
+                CV.Point p3 = inputPoints[pty.IndexOf(pty.Max())];
+                CV.Point p4 = inputPoints[pty.IndexOf(pty.Min())];
                 mRect.inputPoints = new List<Point2f> { p1, p2, p3, p4 };
                 mRect.Run(empty);
                 DrawRotatedRect(mRect.minRect, dst3, Scalar.White);
@@ -40930,7 +40932,7 @@ namespace CS_Classes
 
     public class Mouse_Basics_CS : CS_Parent
     {
-        cv.Point lastPoint = new cv.Point();
+        CV.Point lastPoint = new CV.Point();
         int colorIndex;
         public Mouse_Basics_CS(VBtask task) : base(task)
         {
@@ -40943,7 +40945,7 @@ namespace CS_Classes
             if (lastPoint == task.mouseMovePoint || task.mousePicTag != 2) return;
             lastPoint = task.mouseMovePoint;
             Scalar nextColor = task.scalarColors[colorIndex];
-            cv.Point nextPt = task.mouseMovePoint;
+            CV.Point nextPt = task.mouseMovePoint;
             DrawCircle(dst2, nextPt, task.DotSize + 3, nextColor);
             colorIndex++;
             if (colorIndex >= task.scalarColors.Count()) colorIndex = 0;
@@ -41003,7 +41005,7 @@ namespace CS_Classes
     {
         MSER_CPP_VB detect = new MSER_CPP_VB();
         public List<rcData> mserCells = new List<rcData>();
-        public List<cv.Point> floodPoints = new List<cv.Point>();
+        public List<CV.Point> floodPoints = new List<CV.Point>();
         public MSER_Basics_CS(VBtask task) : base(task)
         {
             desc = "Create cells for each region in MSER output";
@@ -41011,14 +41013,14 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             detect.Run(src);
-            var boxInput = new List<cv.Rect>(detect.boxes);
+            var boxInput = new List<CV.Rect>(detect.boxes);
             var boxes = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
             for (int i = 0; i < boxInput.Count(); i++)
             {
                 var r = boxInput[i];
                 boxes.Add(r.Width * r.Height, i);
             }
-            floodPoints = new List<cv.Point>(detect.floodPoints);
+            floodPoints = new List<CV.Point>(detect.floodPoints);
             var sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
             var matched = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
             dst0 = detect.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -41031,7 +41033,7 @@ namespace CS_Classes
                 rc.mask = dst0[rc.rect].InRange(val, val);
                 rc.pixels = detect.maskCounts[index];
                 rc.contour = contourBuild(rc.mask, ContourApproximationModes.ApproxNone);
-                DrawContour(rc.mask, rc.contour, cv.Scalar.All(255), -1);
+                DrawContour(rc.mask, rc.contour, CV.Scalar.All(255), -1);
                 rc.floodPoint = floodPoints[index];
                 rc.maxDist = GetMaxDist(ref rc);
                 rc.indexLast = task.cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
@@ -41046,7 +41048,7 @@ namespace CS_Classes
                 {
                     rc.maxDStable = rc.maxDist;
                 }
-                cv.Scalar mean, stdev;
+                CV.Scalar mean, stdev;
                 Cv2.MeanStdDev(task.color[rc.rect], out mean, out stdev, rc.mask);
                 rc.colorMean = mean;
                 rc.colorStdev = stdev;
@@ -41063,8 +41065,8 @@ namespace CS_Classes
 
     public class MSER_Detect_CS : CS_Parent
     {
-        public cv.Rect[] boxes;
-        public cv.Point[][] regions;
+        public CV.Rect[] boxes;
+        public CV.Point[][] regions;
         public MSER mser = MSER.Create();
         public Options_MSER options = new Options_MSER();
         public int classCount;
@@ -41097,21 +41099,21 @@ namespace CS_Classes
 
     public class MSER_SyntheticInput_CS : CS_Parent
     {
-        void addNestedRectangles(Mat img, cv.Point p0, int[] width, int[] color, int n)
+        void addNestedRectangles(Mat img, CV.Point p0, int[] width, int[] color, int n)
         {
             for (int i = 0; i < n; i++)
             {
-                img.Rectangle(new cv.Rect(p0.X, p0.Y, width[i], width[i]), cv.Scalar.All(color[i]), 1);
-                p0 += new cv.Point((width[i] - width[i + 1]) / 2, (width[i] - width[i + 1]) / 2);
-                img.FloodFill(p0, cv.Scalar.All(color[i]));
+                img.Rectangle(new CV.Rect(p0.X, p0.Y, width[i], width[i]), CV.Scalar.All(color[i]), 1);
+                p0 += new CV.Point((width[i] - width[i + 1]) / 2, (width[i] - width[i + 1]) / 2);
+                img.FloodFill(p0, CV.Scalar.All(color[i]));
             }
         }
-        void addNestedCircles(Mat img, cv.Point p0, int[] width, int[] color, int n)
+        void addNestedCircles(Mat img, CV.Point p0, int[] width, int[] color, int n)
         {
             for (int i = 0; i < n; i++)
             {
-                DrawCircle(img, p0, width[i] / 2, cv.Scalar.All(color[i]));
-                img.FloodFill(p0, cv.Scalar.All(color[i]));
+                DrawCircle(img, p0, width[i] / 2, CV.Scalar.All(color[i]));
+                img.FloodFill(p0, CV.Scalar.All(color[i]));
             }
         }
         public MSER_SyntheticInput_CS(VBtask task) : base(task)
@@ -41120,18 +41122,18 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            var img = new Mat(800, 800, MatType.CV_8U, cv.Scalar.All(0));
+            var img = new Mat(800, 800, MatType.CV_8U, CV.Scalar.All(0));
             int[] width = { 390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70 };
             int[] color1 = { 80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220 };
             int[] color2 = { 81, 181, 161, 141, 121, 101, 91, 111, 171, 151, 141, 101, 221 };
             int[] color3 = { 175, 75, 95, 115, 135, 155, 165, 145, 85, 105, 115, 155, 35 };
             int[] color4 = { 173, 73, 93, 113, 133, 153, 163, 143, 83, 103, 113, 153, 33 };
-            addNestedRectangles(img, new cv.Point(10, 10), width, color1, 13);
-            addNestedCircles(img, new cv.Point(200, 600), width, color2, 13);
-            addNestedRectangles(img, new cv.Point(410, 10), width, color3, 13);
-            addNestedCircles(img, new cv.Point(600, 600), width, color4, 13);
-            img = img.Resize(new cv.Size(src.Rows, src.Rows));
-            dst2[new cv.Rect(0, 0, src.Rows, src.Rows)] = img.CvtColor(ColorConversionCodes.GRAY2BGR);
+            addNestedRectangles(img, new CV.Point(10, 10), width, color1, 13);
+            addNestedCircles(img, new CV.Point(200, 600), width, color2, 13);
+            addNestedRectangles(img, new CV.Point(410, 10), width, color3, 13);
+            addNestedCircles(img, new CV.Point(600, 600), width, color4, 13);
+            img = img.Resize(new CV.Size(src.Rows, src.Rows));
+            dst2[new CV.Rect(0, 0, src.Rows, src.Rows)] = img.CvtColor(ColorConversionCodes.GRAY2BGR);
         }
     }
 
@@ -41298,7 +41300,7 @@ namespace CS_Classes
 
     public class MSER_ROI_CS : CS_Parent
     {
-        public List<cv.Rect> containers = new List<cv.Rect>();
+        public List<CV.Rect> containers = new List<CV.Rect>();
         Options_MSER options = new Options_MSER();
         MSER_Detect core = new MSER_Detect();
         public MSER_ROI_CS(VBtask task) : base(task)
@@ -41311,12 +41313,12 @@ namespace CS_Classes
             dst2 = src.Clone();
             dst3 = src.Clone();
             core.Run(src);
-            var sortedBoxes = new SortedList<int, cv.Rect>(new CompareAllowIdenticalIntegerInverted());
+            var sortedBoxes = new SortedList<int, CV.Rect>(new CompareAllowIdenticalIntegerInverted());
             foreach (var box in core.boxes)
             {
                 sortedBoxes.Add(box.Width * box.Height, box);
             }
-            var boxList = new List<cv.Rect>();
+            var boxList = new List<CV.Rect>();
             for (int i = 0; i < sortedBoxes.Count(); i++)
             {
                 boxList.Add(sortedBoxes.ElementAt(i).Value);
@@ -41330,7 +41332,7 @@ namespace CS_Classes
                 for (int i = 0; i < boxList.Count(); i++)
                 {
                     var b = boxList[i];
-                    var center = new cv.Point((int)(b.X + b.Width / 2), (int)(b.Y + b.Height / 2));
+                    var center = new CV.Point((int)(b.X + b.Width / 2), (int)(b.Y + b.Height / 2));
                     if (center.X >= box.X && center.X <= (box.X + box.Width) && center.Y >= box.Y && center.Y <= (box.Y + box.Height))
                     {
                         removeBoxes.Add(i);
@@ -41371,8 +41373,8 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            cv.Point[][] regions;
-            cv.Rect[] boxes;
+            CV.Point[][] regions;
+            CV.Rect[] boxes;
             dst0 = image.Clone();
             dst2 = image.Clone();
             dst3 = image.Clone();
@@ -41460,7 +41462,7 @@ namespace CS_Classes
                 handleSrc.Free();
                 classCount = MSER_Count(cPtr);
                 if (classCount == 0) return;
-                dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).InRange(255, 255);
+                dst3 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).InRange(255, 255);
             }
             labels[3] = classCount.ToString() + " regions identified";
             src.SetTo(Scalar.White, dst3);
@@ -41530,8 +41532,8 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             detect.Run(src);
-            var boxInput = new List<cv.Rect>(detect.boxes);
-            var boxes = new SortedList<int, cv.Rect>(new compareAllowIdenticalIntegerInverted());
+            var boxInput = new List<CV.Rect>(detect.boxes);
+            var boxes = new SortedList<int, CV.Rect>(new compareAllowIdenticalIntegerInverted());
             for (int i = 0; i < boxInput.Count(); i++)
             {
                 var r = boxInput[i];
@@ -41561,16 +41563,16 @@ namespace CS_Classes
         Mat cellMap;
         public MSER_Basics2_CS(VBtask task) : base(task)
         {
-            cellMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            cellMap = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Create cells for each region in MSER output";
         }
         public void RunCS(Mat src)
         {
             detect.Run(src);
             dst3 = detect.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
-            var floodPoints = new List<cv.Point>(detect.floodPoints);
-            var boxInput = new List<cv.Rect>(detect.boxes);
+            var floodPoints = new List<CV.Point>(detect.floodPoints);
+            var boxInput = new List<CV.Rect>(detect.boxes);
             var boxes = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
             for (int i = 0; i < boxInput.Count(); i++)
             {
@@ -41597,7 +41599,7 @@ namespace CS_Classes
                 rc.pixels = detect.maskCounts[i];
                 rc.maxDist = GetMaxDist(ref rc);
                 rc.indexLast = lastMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
-                cv.Scalar mean, stdev;
+                CV.Scalar mean, stdev;
                 Cv2.MeanStdDev(task.color[rc.rect], out mean, out stdev, rc.mask);
                 rc.colorMean = mean;
                 rc.colorStdev = stdev;
@@ -41617,8 +41619,8 @@ namespace CS_Classes
     public class MSER_CPP_CS : CS_Parent
     {
         Options_MSER options = new Options_MSER();
-        public List<cv.Rect> boxes = new List<cv.Rect>();
-        public List<cv.Point> floodPoints = new List<cv.Point>();
+        public List<CV.Rect> boxes = new List<CV.Rect>();
+        public List<CV.Point> floodPoints = new List<CV.Point>();
         public List<int> maskCounts = new List<int>();
         public int classcount;
         public MSER_CPP_CS(VBtask task) : base(task)
@@ -41646,17 +41648,17 @@ namespace CS_Classes
             var handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             var imagePtr = MSER_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels());
             handleSrc.Free();
-            dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+            dst0 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
             classcount = MSER_Count(cPtr);
             if (classcount == 0) return;
-            var ptData = cv.Mat.FromPixelData(classcount, 1, MatType.CV_32SC2, MSER_FloodPoints(cPtr));
-            var maskData = cv.Mat.FromPixelData(classcount, 1, MatType.CV_32S, MSER_MaskCounts(cPtr));
-            var rectData = cv.Mat.FromPixelData(classcount, 1, MatType.CV_32SC4, MSER_Rects(cPtr));
+            var ptData = CV.Mat.FromPixelData(classcount, 1, MatType.CV_32SC2, MSER_FloodPoints(cPtr));
+            var maskData = CV.Mat.FromPixelData(classcount, 1, MatType.CV_32S, MSER_MaskCounts(cPtr));
+            var rectData = CV.Mat.FromPixelData(classcount, 1, MatType.CV_32SC4, MSER_Rects(cPtr));
             var sortedBoxes = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
-            var rects = new List<cv.Rect>();
+            var rects = new List<CV.Rect>();
             for (int i = 0; i < classcount; i++)
             {
-                var r = rectData.Get<cv.Rect>(i, 0);
+                var r = rectData.Get<CV.Rect>(i, 0);
                 if (rects.Contains(r)) continue;
                 rects.Add(r);
                 sortedBoxes.Add(r.Width * r.Height, i);
@@ -41667,8 +41669,8 @@ namespace CS_Classes
             for (int i = 0; i < sortedBoxes.Count(); i++)
             {
                 var index = sortedBoxes.ElementAt(i).Value;
-                boxes.Add(rectData.Get<cv.Rect>(index, 0));
-                floodPoints.Add(ptData.Get<cv.Point>(index, 0));
+                boxes.Add(rectData.Get<CV.Rect>(index, 0));
+                floodPoints.Add(ptData.Get<CV.Point>(index, 0));
                 maskCounts.Add(maskData.Get<int>(index, 0));
             }
             dst2 = ShowPalette(dst0 * 255 / classcount);
@@ -41707,7 +41709,7 @@ namespace CS_Classes
     543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0};      // Washington D.C.
         public MultiDimensionScaling_Cities_CS(VBtask task) : base(task)
         {
-            labels[2] = "Resulting solution using cv.Eigen";
+            labels[2] = "Resulting solution using CV.Eigen";
             desc = "Use OpenCV's Eigen function to solve a system of equations";
         }
         double Torgerson(Mat src)
@@ -41730,13 +41732,13 @@ namespace CS_Classes
         }
         Mat CenteringMatrix(int n)
         {
-            return Mat.Eye(n, n, MatType.CV_64F) - cv.Scalar.All(1.0 / n);
+            return Mat.Eye(n, n, MatType.CV_64F) - CV.Scalar.All(1.0 / n);
         }
         public void RunCS(Mat src)
         {
             int size = 10; // we are working with 10 cities.
-            Mat cityMat = cv.Mat.FromPixelData(size, size, MatType.CV_64FC1, CityDistance);
-            cityMat += cv.Scalar.All(Torgerson(cityMat));
+            Mat cityMat = CV.Mat.FromPixelData(size, size, MatType.CV_64FC1, CityDistance);
+            cityMat += CV.Scalar.All(Torgerson(cityMat));
             cityMat = cityMat.Mul(cityMat);
             Mat g = CenteringMatrix(size);
             // calculates the inner product matrix b
@@ -41776,8 +41778,8 @@ namespace CS_Classes
                 double y = at[1, c];
                 x = w * 0.1 + 0.7 * w * (x - minX) / (maxX - minX);
                 y = h * 0.1 + 0.7 * h * (y - minY) / (maxY - minY);
-                DrawCircle(dst2, new cv.Point(x, y), task.DotSize + 3, Scalar.Red);
-                cv.Point textPos = new cv.Point(x + 5, y + 10);
+                DrawCircle(dst2, new CV.Point(x, y), task.DotSize + 3, Scalar.Red);
+                CV.Point textPos = new CV.Point(x + 5, y + 10);
                 if (c == 1) cityName = "Chicago";
                 if (c == 2) cityName = "Denver";
                 if (c == 3) cityName = "Houston";
@@ -41836,7 +41838,7 @@ namespace CS_Classes
                     var pt = task.redCells[index].maxDStable;
                     if (pt == task.rc.maxDStable)
                     {
-                        DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black);
+                        DrawCircle(dst2, pt, task.DotSize, CV.Scalar.Black);
                     }
                     else
                     {
@@ -41854,7 +41856,7 @@ namespace CS_Classes
 
     public class Neighbors_Intersects_CS : CS_Parent
     {
-        public List<cv.Point> nPoints = new List<cv.Point>();
+        public List<CV.Point> nPoints = new List<CV.Point>();
         RedCloud_Basics redC = new RedCloud_Basics();
         public Neighbors_Intersects_CS(VBtask task) : base(task)
         {
@@ -41890,7 +41892,7 @@ namespace CS_Classes
                     }
                     if (nabs.Count() > 2)
                     {
-                        nPoints.Add(new cv.Point(x, y));
+                        nPoints.Add(new CV.Point(x, y));
                     }
                 }
             }
@@ -42048,7 +42050,7 @@ namespace CS_Classes
             for (int i = 0; i < bins; i++)
             {
                 int h = (int)(dst2.Height * histArray[i]);
-                cv.Rect r = new cv.Rect(i * binW, dst2.Height - h, binW, h);
+                CV.Rect r = new CV.Rect(i * binW, dst2.Height - h, binW, h);
                 dst3.Rectangle(r, Scalar.Black, -1);
             }
             if (task.heartBeat) labels[3] = $"The max value below is {peakValue}";
@@ -42072,16 +42074,16 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             int count = 0;
-            if (task.ClickPoint != new cv.Point())
+            if (task.ClickPoint != new CV.Point())
             {
                 int connectivity = 8;
                 int flags = connectivity | (255 << 8) | (int)FloodFillFlags.FixedRange | (int)FloodFillFlags.MaskOnly;
-                Mat mask2 = new Mat(src.Rows + 2, src.Cols + 2, MatType.CV_8U, cv.Scalar.All(0));
+                Mat mask2 = new Mat(src.Rows + 2, src.Cols + 2, MatType.CV_8U, CV.Scalar.All(0));
                 // the delta between each regions value is 255 / classcount. no low or high bound needed.
                 int delta = (int)(255 / classCount) - 1;
                 Scalar bounds = new Scalar(delta, delta, delta);
-                count = Cv2.FloodFill(dst2, mask2, task.ClickPoint, cv.Scalar.All(255), out _, bounds, bounds, (cv.FloodFillFlags)flags);
-                if (count != src.Total()) dst1 = mask2[new Range(1, mask2.Rows - 1), new Range(1, mask2.Cols - 1)];
+                count = Cv2.FloodFill(dst2, mask2, task.ClickPoint, CV.Scalar.All(255), out _, bounds, bounds, (CV.FloodFillFlags)flags);
+                if (count != src.Total()) dst1 = mask2[new CV.Range(1, mask2.Rows - 1), new CV.Range(1, mask2.Cols - 1)];
             }
             Rangef[] ranges = new Rangef[] { new Rangef(0, 180), new Rangef(0, 256) };
             Mat hsv = task.color.CvtColor(ColorConversionCodes.BGR2HSV);
@@ -42209,12 +42211,12 @@ namespace CS_Classes
         Subdiv2D subdiv;
         public OEX_delaunay2_CS(VBtask task) : base(task)
         {
-            subdiv = new Subdiv2D(new cv.Rect(0, 0, dst2.Width, dst2.Height));
+            subdiv = new Subdiv2D(new CV.Rect(0, 0, dst2.Width, dst2.Height));
             if (standalone) task.gOptions.setDisplay1();
             labels = new string[] { "", "", "Next triangle list being built.  Latest entry is in red.", "The completed voronoi facets" };
             desc = "OpenCV Example delaunay2";
         }
-        public void locatePoint(Mat img, Subdiv2D subdiv, cv.Point pt, Scalar activeColor)
+        public void locatePoint(Mat img, Subdiv2D subdiv, CV.Point pt, Scalar activeColor)
         {
             int e0 = 0;
             int vertex = 0;
@@ -42224,12 +42226,12 @@ namespace CS_Classes
                 int e = e0;
                 do
                 {
-                    cv.Point2f org, dst;
+                    CV.Point2f org, dst;
                     if (subdiv.EdgeOrg(e, out org) > 0 && subdiv.EdgeDst(e, out dst) > 0)
                     {
                         DrawLine(img, org, dst, activeColor, task.lineWidth + 3);
                     }
-                    e = subdiv.GetEdge(e, (cv.NextEdgeType)Subdiv2D.NEXT_AROUND_LEFT);
+                    e = subdiv.GetEdge(e, (CV.NextEdgeType)Subdiv2D.NEXT_AROUND_LEFT);
                 } while (e != e0);
             }
             DrawCircle(img, pt, task.DotSize, activeColor);
@@ -42243,15 +42245,15 @@ namespace CS_Classes
                     dst2.SetTo(0);
                     Point2f pt = new Point2f(msRNG.Next(0, dst2.Width - 10) + 5, msRNG.Next(0, dst2.Height - 10) + 5);
                     points.Add(pt);
-                    locatePoint(dst2, subdiv, new cv.Point((int)pt.X, (int)pt.Y), active_facet_color);
+                    locatePoint(dst2, subdiv, new CV.Point((int)pt.X, (int)pt.Y), active_facet_color);
                     subdiv.Insert(pt);
                     var triangleList = subdiv.GetTriangleList();
-                    cv.Point[] pts = new cv.Point[3];
+                    CV.Point[] pts = new CV.Point[3];
                     foreach (var tri in triangleList)
                     {
-                        pts[0] = new cv.Point(Math.Round(tri[0]), Math.Round(tri[1]));
-                        pts[1] = new cv.Point(Math.Round(tri[2]), Math.Round(tri[3]));
-                        pts[2] = new cv.Point(Math.Round(tri[4]), Math.Round(tri[5]));
+                        pts[0] = new CV.Point(Math.Round(tri[0]), Math.Round(tri[1]));
+                        pts[1] = new CV.Point(Math.Round(tri[2]), Math.Round(tri[3]));
+                        pts[2] = new CV.Point(Math.Round(tri[4]), Math.Round(tri[5]));
                         DrawLine(dst2, pts[0], pts[1], delaunay_color);
                         DrawLine(dst2, pts[1], pts[2], delaunay_color);
                         DrawLine(dst2, pts[2], pts[0], delaunay_color);
@@ -42263,20 +42265,20 @@ namespace CS_Classes
                     Point2f[][] facets = new Point2f[1][];
                     Point2f[] centers;
                     subdiv.GetVoronoiFacetList(new List<int>(), out facets, out centers);
-                    List<cv.Point> ifacet = new List<cv.Point>();
-                    List<List<cv.Point>> ifacets = new List<List<cv.Point>> { ifacet };
+                    List<CV.Point> ifacet = new List<CV.Point>();
+                    List<List<CV.Point>> ifacets = new List<List<CV.Point>> { ifacet };
                     for (int i = 0; i < facets.Length; i++)
                     {
                         ifacet.Clear();
-                        ifacet.AddRange(facets[i].Select(p => new cv.Point(p.X, p.Y)));
+                        ifacet.AddRange(facets[i].Select(p => new CV.Point(p.X, p.Y)));
                         Scalar color = vecToScalar(task.vecColors[i % 256]);
-                        dst3.FillConvexPoly(ifacet, color, cv.LineTypes.Link8, 0);
+                        dst3.FillConvexPoly(ifacet, color, CV.LineTypes.Link8, 0);
                         ifacets[0] = ifacet;
-                        Cv2.Polylines(dst3, ifacets, true, new cv.Scalar(), task.lineWidth, task.lineType);
-                        DrawCircle(dst3, centers[i], 3, new cv.Scalar());
+                        Cv2.Polylines(dst3, ifacets, true, new CV.Scalar(), task.lineWidth, task.lineType);
+                        DrawCircle(dst3, centers[i], 3, new CV.Scalar());
                     }
                     points.Clear();
-                    subdiv = new Subdiv2D(new cv.Rect(0, 0, dst2.Width, dst2.Height));
+                    subdiv = new Subdiv2D(new CV.Rect(0, 0, dst2.Width, dst2.Height));
                 }
             }
         }
@@ -42290,7 +42292,7 @@ namespace CS_Classes
         TermCriteria term_crit = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.Count, 10, 1.0);
         Rangef[] ranges = new Rangef[] { new Rangef(0, 180) };
         public Mat histogram = new Mat();
-        cv.Rect trackWindow;
+        CV.Rect trackWindow;
         public OEX_MeanShift_CS(VBtask task) : base(task)
         {
             labels[3] = "Draw a rectangle around the region of interest";
@@ -42298,7 +42300,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            cv.Rect roi = task.drawRect.Width > 0 ? task.drawRect : new cv.Rect(0, 0, dst2.Width, dst2.Height);
+            CV.Rect roi = task.drawRect.Width > 0 ? task.drawRect : new CV.Rect(0, 0, dst2.Width, dst2.Height);
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             dst2 = src;
             if (task.optionsChanged)
@@ -42336,14 +42338,14 @@ namespace CS_Classes
                 src = rotatedRect.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
             }
             dst2 = src.Clone();
-            cv.Point[][] contours;
+            CV.Point[][] contours;
             Cv2.FindContours(src, out contours, out _, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
-            dst1 = new Mat(dst1.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_32F, CV.Scalar.All(0));
             for (int i = 0; i < dst1.Rows; i++)
             {
                 for (int j = 0; j < dst1.Cols; j++)
                 {
-                    double distance = Cv2.PointPolygonTest(contours[0], new cv.Point(j, i), true);
+                    double distance = Cv2.PointPolygonTest(contours[0], new CV.Point(j, i), true);
                     dst1.Set(i, j, distance);
                 }
             }
@@ -42384,20 +42386,20 @@ namespace CS_Classes
         OEX_PointPolygon pointPoly = new OEX_PointPolygon();
         public OEX_PointPolygon_demo_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "OpenCV Example PointPolygonTest_demo - it became PointPolygonTest_Basics.";
         }
         public void RunCS(Mat src)
         {
             int r = dst2.Height / 4;
-            List<cv.Point> vert = new List<cv.Point>
+            List<CV.Point> vert = new List<CV.Point>
     {
-        new cv.Point(3 * r / 2 + dst2.Width / 4, (int)(1.34 * r)),
-        new cv.Point(r + dst2.Width / 4, 2 * r),
-        new cv.Point(3 * r / 2 + dst2.Width / 4, (int)(2.866 * r)),
-        new cv.Point(5 * r / 2 + dst2.Width / 4, (int)(2.866 * r)),
-        new cv.Point(3 * r + dst2.Width / 4, 2 * r),
-        new cv.Point(5 * r / 2 + dst2.Width / 4, (int)(1.34 * r))
+        new CV.Point(3 * r / 2 + dst2.Width / 4, (int)(1.34 * r)),
+        new CV.Point(r + dst2.Width / 4, 2 * r),
+        new CV.Point(3 * r / 2 + dst2.Width / 4, (int)(2.866 * r)),
+        new CV.Point(5 * r / 2 + dst2.Width / 4, (int)(2.866 * r)),
+        new CV.Point(3 * r + dst2.Width / 4, 2 * r),
+        new CV.Point(5 * r / 2 + dst2.Width / 4, (int)(1.34 * r))
     };
             dst2.SetTo(0);
             for (int i = 0; i < vert.Count(); i++)
@@ -42515,10 +42517,10 @@ namespace CS_Classes
         {
             if (task.heartBeat)
             {
-                Mat m = cv.Mat.FromPixelData(3, 2, MatType.CV_32F, new float[] { 1, 2, 3, 4, 5, 6 });
+                Mat m = CV.Mat.FromPixelData(3, 2, MatType.CV_32F, new float[] { 1, 2, 3, 4, 5, 6 });
                 Mat col_sum = new Mat(), row_sum = new Mat();
                 Cv2.Reduce(m, col_sum, 0, ReduceTypes.Sum, MatType.CV_32F);
-                Cv2.Reduce(m, row_sum, (cv.ReduceDimension)1, ReduceTypes.Sum, MatType.CV_32F);
+                Cv2.Reduce(m, row_sum, (CV.ReduceDimension)1, ReduceTypes.Sum, MatType.CV_32F);
                 strOut = "Original Mat" + "\n";
                 for (int y = 0; y < m.Rows; y++)
                 {
@@ -42541,11 +42543,11 @@ namespace CS_Classes
                 Mat col_average = new Mat(), row_average = new Mat(), col_min = new Mat();
                 Mat col_max = new Mat(), row_min = new Mat(), row_max = new Mat();
                 Cv2.Reduce(m, col_average, 0, ReduceTypes.Avg, MatType.CV_32F);
-                Cv2.Reduce(m, row_average, (cv.ReduceDimension)1, ReduceTypes.Avg, MatType.CV_32F);
+                Cv2.Reduce(m, row_average, (CV.ReduceDimension)1, ReduceTypes.Avg, MatType.CV_32F);
                 Cv2.Reduce(m, col_min, 0, ReduceTypes.Min, MatType.CV_32F);
-                Cv2.Reduce(m, row_min, (cv.ReduceDimension)1, ReduceTypes.Min, MatType.CV_32F);
+                Cv2.Reduce(m, row_min, (CV.ReduceDimension)1, ReduceTypes.Min, MatType.CV_32F);
                 Cv2.Reduce(m, col_max, 0, ReduceTypes.Max, MatType.CV_32F);
-                Cv2.Reduce(m, row_max, (cv.ReduceDimension)1, ReduceTypes.Max, MatType.CV_32F);
+                Cv2.Reduce(m, row_max, (CV.ReduceDimension)1, ReduceTypes.Max, MatType.CV_32F);
             }
             SetTrueText(strOut, 2);
         }
@@ -42562,7 +42564,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            var d = cv.Mat.FromPixelData(2, 2, MatType.CV_8UC3, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            var d = CV.Mat.FromPixelData(2, 2, MatType.CV_8UC3, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
             var channels = d.Split();
             var samples = new byte[d.Total() * d.ElemSize()];
             Marshal.Copy(d.Data, samples, 0, samples.Length);
@@ -42594,7 +42596,7 @@ namespace CS_Classes
     public class OEX_Filter2D_CS : CS_Parent
     {
         MatType ddepth = MatType.CV_8UC3;
-        cv.Point anchor = new cv.Point(-1, -1);
+        CV.Point anchor = new CV.Point(-1, -1);
         int kernelSize = 3, ind = 0;
         public OEX_Filter2D_CS(VBtask task) : base(task)
         {
@@ -42604,7 +42606,7 @@ namespace CS_Classes
         {
             if (task.heartBeat) ind++;
             kernelSize = 3 + 2 * (ind % 5);
-            var kernel = new Mat(kernelSize, kernelSize, MatType.CV_32F, cv.Scalar.All(1.0 / (kernelSize * kernelSize)));
+            var kernel = new Mat(kernelSize, kernelSize, MatType.CV_32F, CV.Scalar.All(1.0 / (kernelSize * kernelSize)));
             dst2 = src.Filter2D(ddepth, kernel, anchor, 0, BorderTypes.Default);
             SetTrueText("Kernel size = " + kernelSize.ToString(), 3);
         }
@@ -42620,7 +42622,7 @@ namespace CS_Classes
         public OEX_FitEllipse_CPP_CS(VBtask task) : base(task)
         {
             var fileInputName = new FileInfo(task.HomeDir + "opencv/samples/data/ellipses.jpg");
-            img = Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            img = Cv2.ImRead(fileInputName.FullName).CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             cPtr = OEX_FitEllipse_Open();
             desc = "OEX Example fitellipse";
         }
@@ -42633,7 +42635,7 @@ namespace CS_Classes
             var imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
                                                     options.threshold, options.fitType);
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(img.Rows + 4, img.Cols + 4, MatType.CV_8UC3, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(img.Rows + 4, img.Cols + 4, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -42656,10 +42658,10 @@ namespace CS_Classes
         Mat randomMask;
         RNG myRNG = new RNG();
         Options_Pointilism options = new Options_Pointilism();
-        cv.Rect saveDrawRect = new cv.Rect();
+        CV.Rect saveDrawRect = new CV.Rect();
         public OilPaint_Pointilism_CS(VBtask task) : base(task)
         {
-            task.drawRect = new cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8);
+            task.drawRect = new CV.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8);
             desc = "Alter the image to effect the pointilism style";
         }
         public void RunCS(Mat src)
@@ -42671,7 +42673,7 @@ namespace CS_Classes
             {
                 saveDrawRect = task.drawRect;
                 randomMask = new Mat(img.Size(), MatType.CV_32SC2);
-                cv.Point nPt = new cv.Point();
+                CV.Point nPt = new CV.Point();
                 for (int y = 0; y < randomMask.Height; y++)
                 {
                     for (int x = 0; x < randomMask.Width; x++)
@@ -42680,7 +42682,7 @@ namespace CS_Classes
                         nPt.Y = (msRNG.Next(-1, 1) + y) % (randomMask.Height - 1);
                         if (nPt.X < 0) nPt.X = 0;
                         if (nPt.Y < 0) nPt.Y = 0;
-                        randomMask.Set<cv.Point>(y, x, nPt);
+                        randomMask.Set<CV.Point>(y, x, nPt);
                     }
                 }
                 Cv2.RandShuffle(randomMask, 1.0, ref myRNG);
@@ -42690,13 +42692,13 @@ namespace CS_Classes
             Mat fieldx = new Mat(), fieldy = new Mat();
             Cv2.Scharr(gray, fieldx, MatType.CV_32FC1, 1, 0, 1 / 15.36);
             Cv2.Scharr(gray, fieldy, MatType.CV_32FC1, 0, 1, 1 / 15.36);
-            Cv2.GaussianBlur(fieldx, fieldx, new cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0);
-            Cv2.GaussianBlur(fieldy, fieldy, new cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0);
+            Cv2.GaussianBlur(fieldx, fieldx, new CV.Size(options.smoothingRadius, options.smoothingRadius), 0, 0);
+            Cv2.GaussianBlur(fieldy, fieldy, new CV.Size(options.smoothingRadius, options.smoothingRadius), 0, 0);
             for (int y = 0; y < img.Height; y++)
             {
                 for (int x = 0; x < img.Width; x++)
                 {
-                    var nPt = rand.Get<cv.Point>(y, x);
+                    var nPt = rand.Get<CV.Point>(y, x);
                     var nextColor = src.Get<Vec3b>(saveDrawRect.Y + nPt.Y, saveDrawRect.X + nPt.X);
                     var fx = fieldx[saveDrawRect].Get<float>(nPt.Y, nPt.X);
                     var fy = fieldy[saveDrawRect].Get<float>(nPt.Y, nPt.X);
@@ -42728,7 +42730,7 @@ namespace CS_Classes
         public Options_OilPaint options = new Options_OilPaint();
         public OilPaint_ManualVB_CS(VBtask task) : base(task)
         {
-            task.drawRect = new cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8);
+            task.drawRect = new CV.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8);
             desc = "Alter an image so it appears more like an oil painting.  Select a region of interest.";
         }
         public void RunCS(Mat src)
@@ -42888,7 +42890,7 @@ namespace CS_Classes
         public float ceilingY;
         public OpAuto_FloorCeiling_CS(VBtask task) : base(task)
         {
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Automatically find the Y values that best describes the floor and ceiling (if present)";
         }
         void rebuildMask(string maskLabel, float min, float max)
@@ -42990,7 +42992,7 @@ namespace CS_Classes
                 foreach (var entry in valleyOrder)
                 {
                     int col = entry.Value * dst2.Width / task.histogramBins;
-                    DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White);
+                    DrawLine(dst2, new CV.Point(col, 0), new CV.Point(col, dst2.Height), Scalar.White);
                 }
                 SetTrueText(valleys.Count() + " valleys in histogram", 3);
             }
@@ -43024,17 +43026,17 @@ namespace CS_Classes
                 src = task.toggleOnOff ? heatmap.dst0.Clone() : heatmap.dst1.Clone();
             }
             clusterPoints.Clear();
-            clusterPoints.Add(new cv.Point(0, 0));
+            clusterPoints.Add(new CV.Point(0, 0));
             for (int i = 0; i < desiredBoundaries; i++)
             {
                 var mm = GetMinMax(src);
                 if (!clusterPoints.Contains(mm.maxLoc)) clusterPoints.Add(mm.maxLoc);
-                DrawCircle(src, mm.maxLoc, peakDistance, cv.Scalar.All(0));
+                DrawCircle(src, mm.maxLoc, peakDistance, CV.Scalar.All(0));
             }
             if (!standaloneTest()) dst2.SetTo(0);
             for (int i = 0; i < clusterPoints.Count(); i++)
             {
-                cv.Point pt = new cv.Point(clusterPoints[i].X, clusterPoints[i].Y);
+                CV.Point pt = new CV.Point(clusterPoints[i].X, clusterPoints[i].Y);
                 DrawCircle(dst2, pt, task.DotSize * 3, Scalar.White);
             }
         }
@@ -43066,16 +43068,16 @@ namespace CS_Classes
                 src = hist2d.histogram;
                 dst2.SetTo(0);
             }
-            var pointPop = new SortedList<float, cv.Point>(new CompareAllowIdenticalSingleInverted());
+            var pointPop = new SortedList<float, CV.Point>(new CompareAllowIdenticalSingleInverted());
             foreach (var roi in task.gridList)
             {
                 var mm = GetMinMax(src[roi]);
                 if (mm.maxVal == 0) continue;
-                cv.Point wPt = new cv.Point(roi.X + mm.maxLoc.X, roi.Y + mm.maxLoc.Y);
+                CV.Point wPt = new CV.Point(roi.X + mm.maxLoc.X, roi.Y + mm.maxLoc.Y);
                 pointPop.Add((float)mm.maxVal, wPt);
             }
             clusterPoints.Clear();
-            clusterPoints.Add(new cv.Point(0, 0));
+            clusterPoints.Add(new CV.Point(0, 0));
             foreach (var entry in pointPop)
             {
                 clusterPoints.Add(entry.Value);
@@ -43203,7 +43205,7 @@ namespace CS_Classes
         {
             task.OpenGLTitle = "OpenGL_Functions";
             UpdateAdvice(traceName + ": 'Show All' to see all the OpenGL options.");
-            pointCloudInput = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            pointCloudInput = new Mat(dst2.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             desc = "Create an OpenGL window and update it with images";
         }
         double[] memMapFill()
@@ -43262,7 +43264,7 @@ namespace CS_Classes
                 task.openGL_hwnd = FindWindow(null, task.OpenGLTitle);
                 if (task.openGL_hwnd != IntPtr.Zero) break;
             }
-            task.oglRect = new cv.Rect(task.OpenGL_Left, task.OpenGL_Top, windowWidth, windowHeight);
+            task.oglRect = new CV.Rect(task.OpenGL_Left, task.OpenGL_Top, windowWidth, windowHeight);
             MoveWindow(task.openGL_hwnd, task.OpenGL_Left, task.OpenGL_Top, task.oglRect.Width, task.oglRect.Height, true);
         }
         public void RunCS(Mat src)
@@ -43270,8 +43272,8 @@ namespace CS_Classes
             if (standaloneTest()) pointCloudInput = task.pointCloud;
             // adjust the point cloud if present and the 'move' sliders are non-zero
             options.RunVB();
-            cv.Scalar ptM = options.moveAmount;
-            cv.Point3f shift = new cv.Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
+            CV.Scalar ptM = options.moveAmount;
+            CV.Point3f shift = new CV.Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
             if (pointCloudInput.Width != 0 && (shift.X != 0 ||
                 shift.Y != 0 || shift.Z != 0)) pointCloudInput -= ptM;
             if (src.Width > 0)
@@ -43301,7 +43303,7 @@ namespace CS_Classes
                 if (task.openGLPipe != null)
                 {
                     int bytesRead = task.openGLPipe.Read(readPipe, 0, 4);
-                    if (bytesRead == 0) SetTrueText("The OpenGL process appears to have stopped.", new cv.Point(20, 100));
+                    if (bytesRead == 0) SetTrueText("The OpenGL process appears to have stopped.", new CV.Point(20, 100));
                 }
             }
             MemMapUpdate();
@@ -43320,11 +43322,11 @@ namespace CS_Classes
                 // lose a lot of performance doing this!
                 if (task.gOptions.getOpenGLCapture())
                 {
-                    Bitmap snapshot = GetWindowImage(task.openGL_hwnd, new cv.Rect(0, 0, (int)(task.oglRect.Width * 1.4),
+                    Bitmap snapshot = GetWindowImage(task.openGL_hwnd, new CV.Rect(0, 0, (int)(task.oglRect.Width * 1.4),
                                         (int)(task.oglRect.Height * 1.4)));
                     Mat snap = BitmapConverter.ToMat(snapshot);
                     snap = snap.CvtColor(ColorConversionCodes.BGRA2BGR);
-                    dst3 = snap.Resize(new cv.Size(dst2.Width, dst2.Height), 0, 0, InterpolationFlags.Nearest);
+                    dst3 = snap.Resize(new CV.Size(dst2.Width, dst2.Height), 0, 0, InterpolationFlags.Nearest);
                 }
             }
             catch (Exception)
@@ -43512,7 +43514,7 @@ namespace CS_Classes
                 new Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2),
                 new Point3f(pt1.X, pt2.Y, pt1.Z)
             };
-            task.ogl.dataInput = cv.Mat.FromPixelData(linePairs3D.Count(), 1, MatType.CV_32FC3, linePairs3D.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(linePairs3D.Count(), 1, MatType.CV_32FC3, linePairs3D.ToArray());
             task.ogl.pointCloudInput = task.pointCloud;
             task.ogl.Run(task.color);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43576,7 +43578,7 @@ namespace CS_Classes
             dst2 = tess.dst2;
             dst3 = tess.dst3;
             labels = tess.labels;
-            task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(dst3);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43601,7 +43603,7 @@ namespace CS_Classes
             dst2 = tess.dst2;
             dst3 = tess.dst3;
             labels = tess.labels;
-            task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(dst3);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43626,7 +43628,7 @@ namespace CS_Classes
             dst2 = tess.dst2;
             dst3 = tess.dst3;
             labels = tess.labels;
-            task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(dst3);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43648,7 +43650,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             tess.Run(src);
-            task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
             dst2 = tess.dst3;
             dst3 = tess.hulls.dst3;
             int index = 0;
@@ -43657,7 +43659,7 @@ namespace CS_Classes
                 if (index < tess.depths.Count())
                 {
                     SetTrueText(tess.depths[index].ToString(fmt1) + "\n" + tess.depths[index + 1].ToString(fmt1),
-                                new cv.Point(roi.X, roi.Y), 2);
+                                new CV.Point(roi.X, roi.Y), 2);
                 }
                 index += 2;
             }
@@ -43711,7 +43713,7 @@ namespace CS_Classes
             sCloud.Run(src);
             dst2 = sCloud.dst2;
             dst3 = sCloud.dst3;
-            task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             task.ogl.options.PointSizeSlider.Value = task.gridSize;
@@ -43735,7 +43737,7 @@ namespace CS_Classes
         {
             sCloud.Run(src);
             dst2 = sCloud.dst2;
-            task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(sCloud.oglData.Count(), 1, MatType.CV_32FC3, sCloud.oglData.ToArray());
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -43807,7 +43809,7 @@ namespace CS_Classes
             oglData.Add((float)floorColor[1]);
             oglData.Add((float)floorColor[2]);
             oglData.Add(plane.floorYPlane);
-            task.ogl.dataInput = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(4, 1, MatType.CV_32F, oglData.ToArray());
             task.ogl.pointCloudInput = task.pointCloud;
             task.ogl.Run(plane.dst2);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
@@ -43835,7 +43837,7 @@ namespace CS_Classes
             dst2 = plane.dst2;
             labels[2] = plane.labels[2];
             task.ogl.pointCloudInput = task.pointCloud;
-            task.ogl.dataInput = cv.Mat.FromPixelData(1, 1, MatType.CV_32F, new float[] { plane.planeY });
+            task.ogl.dataInput = CV.Mat.FromPixelData(1, 1, MatType.CV_32F, new float[] { plane.planeY });
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -43858,7 +43860,7 @@ namespace CS_Classes
             flatness.Run(src);
             SetTrueText(flatness.labels[2], 3);
             task.ogl.pointCloudInput = task.pointCloud;
-            task.ogl.dataInput = cv.Mat.FromPixelData(1, 1, MatType.CV_32F, new float[] { task.pcFloor });
+            task.ogl.dataInput = CV.Mat.FromPixelData(1, 1, MatType.CV_32F, new float[] { task.pcFloor });
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = flatness.labels[2];
@@ -43883,7 +43885,7 @@ namespace CS_Classes
             flatness.Run(src);
             SetTrueText(flatness.labels[2], 3);
             task.ogl.pointCloudInput = task.pointCloud;
-            task.ogl.dataInput = cv.Mat.FromPixelData(1, 1, MatType.CV_32F, new float[] { task.pcCeiling });
+            task.ogl.dataInput = CV.Mat.FromPixelData(1, 1, MatType.CV_32F, new float[] { task.pcCeiling });
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = flatness.labels[2];
@@ -43912,7 +43914,7 @@ namespace CS_Classes
             kalman.kInput = new float[] { peak.peakFloor, peak.peakCeiling };
             kalman.Run(empty);
             task.ogl.pointCloudInput = task.pointCloud;
-            task.ogl.dataInput = cv.Mat.FromPixelData(2, 1, MatType.CV_32F, new float[] { kalman.kOutput[0], kalman.kOutput[1] });
+            task.ogl.dataInput = CV.Mat.FromPixelData(2, 1, MatType.CV_32F, new float[] { kalman.kOutput[0], kalman.kOutput[1] });
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -43951,7 +43953,7 @@ namespace CS_Classes
                     oglData.Add(hull[(i + 2) % hull.Count()]);
                 }
             }
-            task.ogl.dataInput = cv.Mat.FromPixelData(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
             task.ogl.Run(src);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -44059,7 +44061,7 @@ namespace CS_Classes
                 polygonCount++;
             }
             oglData[0] = new Point3f(polygonCount, 0, 0);
-            task.ogl.dataInput = cv.Mat.FromPixelData(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
             task.ogl.Run(dst2);
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst2;
             SetTrueText(polygonCount.ToString() + " polygons were sent to OpenGL", 2);
@@ -44126,13 +44128,13 @@ namespace CS_Classes
                         if (Math.Abs(v.Z - lastDepth[2]) > options2.filterThreshold) v.Z = (float)lastDepth[2];
                     }
                     oglData.Add(new Point3f(v.X + shift.X, v.Y + shift.Y, v.Z + shift.Z));
-                    lastDepth = new cv.Scalar(v.X, v.Y, v.Z);
+                    lastDepth = new CV.Scalar(v.X, v.Y, v.Z);
                 }
                 oglData[dataIndex] = new Point3f(rc.contour.Count(), 0, 0);
                 polygonCount++;
             }
             oglData[0] = new Point3f(polygonCount, 0, 0);
-            task.ogl.dataInput = cv.Mat.FromPixelData(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(oglData.Count(), 1, MatType.CV_32FC3, oglData.ToArray());
             task.ogl.Run(new Mat());
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
         }
@@ -44155,7 +44157,7 @@ namespace CS_Classes
         {
             pts.Run(src);
             dst2 = pts.dst2;
-            task.ogl.dataInput = cv.Mat.FromPixelData(pts.allPointsH.Count(), 1, MatType.CV_32FC3, pts.allPointsH.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(pts.allPointsH.Count(), 1, MatType.CV_32FC3, pts.allPointsH.ToArray());
             task.ogl.Run(new Mat());
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = "Point cloud points found = " + (pts.actualCount / 2).ToString();
@@ -44249,7 +44251,7 @@ namespace CS_Classes
         {
             pts.Run(src);
             dst2 = pts.dst2;
-            task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
             task.ogl.Run(new Mat());
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = "Point cloud points found = " + (pts.pcPoints.Count() / 2).ToString();
@@ -44272,7 +44274,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             pts.Run(src);
-            task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
             task.ogl.Run(new Mat());
             if (task.gOptions.getOpenGLCapture()) dst3 = task.ogl.dst3;
             labels[2] = "Point cloud points found = " + pts.pcPoints.Count() / 2;
@@ -44315,7 +44317,7 @@ namespace CS_Classes
                 if (rcNew.eq.Item2 > rcNew.eq.Item0 && rcNew.eq.Item2 > rcNew.eq.Item1) pcPoints.Add(blue);
                 pcPoints.Add(new Point3f(rcNew.eq.Item0 * 0.5f, rcNew.eq.Item1 * 0.5f, rcNew.eq.Item2 * 0.5f));
             }
-            task.ogl.dataInput = cv.Mat.FromPixelData(pcPoints.Count(), 1, MatType.CV_32FC3, pcPoints.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(pcPoints.Count(), 1, MatType.CV_32FC3, pcPoints.ToArray());
             task.ogl.Run(new Mat());
         }
     }
@@ -44341,7 +44343,7 @@ namespace CS_Classes
             sides.Run(src);
             dst2 = sides.dst2;
             var rc = task.rc;
-            var contourMat = cv.Mat.FromPixelData(rc.contour.Count(), 1, MatType.CV_32SC2, rc.contour.ToArray());
+            var contourMat = CV.Mat.FromPixelData(rc.contour.Count(), 1, MatType.CV_32SC2, rc.contour.ToArray());
             if (rc.contour.Count() == 0) return;
             var split = contourMat.Split();
             var mm = GetMinMax(split[0]);
@@ -44349,11 +44351,11 @@ namespace CS_Classes
             var p2 = rc.contour.ElementAt(mm.maxLoc.Y);
             dst3.SetTo(0);
             DrawContour(dst3[rc.rect], rc.contour, Scalar.Yellow);
-            DrawCircle(dst3, new cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.DotSize + 2, Scalar.Blue);
-            DrawCircle(dst3, new cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, Scalar.Red);
+            DrawCircle(dst3, new CV.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.DotSize + 2, Scalar.Blue);
+            DrawCircle(dst3, new CV.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, Scalar.Red);
             if (rc.contour3D.Count() > 0)
             {
-                var vecMat = cv.Mat.FromPixelData(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
+                var vecMat = CV.Mat.FromPixelData(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
                 rotate.Run(empty);
                 Mat output = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix;
                 vecMat = output.Reshape(3, vecMat.Rows);
@@ -44658,7 +44660,7 @@ namespace CS_Classes
             tess.Run(src);
             dst2 = tess.dst2;
             dst3 = tess.dst3;
-            task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(tess.dst2);
             labels = tess.labels;
@@ -44682,7 +44684,7 @@ namespace CS_Classes
             tess.Run(src);
             dst2 = tess.dst2;
             dst3 = tess.dst3;
-            task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(tess.dst2);
             labels = tess.labels;
@@ -44706,7 +44708,7 @@ namespace CS_Classes
             tess.Run(src);
             dst2 = tess.dst2;
             dst3 = tess.dst3;
-            task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
+            task.ogl.dataInput = CV.Mat.FromPixelData(tess.triangles.Count(), 1, MatType.CV_32FC3, tess.triangles.ToArray());
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(src);
             labels = tess.labels;
@@ -44743,7 +44745,7 @@ namespace CS_Classes
         public OpenGL_Density2D_CS(VBtask task) : base(task)
         {
             task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
-            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             desc = "Create a mask showing which pixels are close to each other and display the results.";
         }
         public void RunCS(Mat src)
@@ -44866,7 +44868,7 @@ namespace CS_Classes
             dst2 = specZ.options.runRedCloud(ref labels[2]);
             specZ.Run(src);
             SetTrueText(specZ.strOut, 3);
-            if (task.ClickPoint == new cv.Point() && task.redCells.Count() > 1)
+            if (task.ClickPoint == new CV.Point() && task.redCells.Count() > 1)
             {
                 task.rc = task.redCells[1]; // pick the largest cell
                 task.ClickPoint = task.rc.maxDist;
@@ -44998,7 +45000,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             hcloud.Run(src);
-            Mat histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, hcloud.histogram.Data);
+            Mat histogram = CV.Mat.FromPixelData(task.redOptions.histBins3D, 1, MatType.CV_32F, hcloud.histogram.Data);
             task.ogl.dataInput = histogram;
             task.ogl.pointCloudInput = new Mat();
             task.ogl.Run(new Mat());
@@ -45208,7 +45210,7 @@ namespace CS_Classes
             options.RunVB();
 
             if (src.Channels() == 3)
-                src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             orb = ORB.Create(options.desiredCount);
             keypoints = orb.Detect(src);
             dst2 = src.Clone();
@@ -45359,7 +45361,7 @@ namespace CS_Classes
                     color1 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
                     color2 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
                     dst3.SetTo(color1);
-                    dst3[new cv.Rect(0, 0, dst3.Width, dst3.Height / 2)].SetTo(color2);
+                    dst3[new CV.Rect(0, 0, dst3.Width, dst3.Height / 2)].SetTo(color2);
                 }
                 var dst1 = new Mat(255, 1, MatType.CV_8UC3);
                 double f = 1.0;
@@ -45405,11 +45407,11 @@ namespace CS_Classes
                 gColor.color1 = Scalar.Blue;
                 gColor.Run(empty);
                 Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap);
-                gradientColorMap = gradientColorMap.Resize(new cv.Size(255, 1));
+                gradientColorMap = gradientColorMap.Resize(new CV.Size(255, 1));
                 if (standaloneTest())
                 {
-                    if (dst3.Width < 255) dst3 = new Mat(dst3.Height, 255, MatType.CV_8UC3, cv.Scalar.All(0));
-                    var r = new cv.Rect(0, 0, 255, 1);
+                    if (dst3.Width < 255) dst3 = new Mat(dst3.Height, 255, MatType.CV_8UC3, CV.Scalar.All(0));
+                    var r = new CV.Rect(0, 0, 255, 1);
                     for (int i = 0; i < dst3.Height; i++)
                     {
                         r.Y = i;
@@ -45418,7 +45420,7 @@ namespace CS_Classes
                 }
             }
             var depth8u = task.pcSplit[2].ConvertScaleAbs(options.convertScale);
-            var ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
+            var ColorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
             Cv2.ApplyColorMap(depth8u, dst2, ColorMap);
             dst2.SetTo(0, task.noDepthMask);
         }
@@ -45449,11 +45451,11 @@ namespace CS_Classes
                 gColor.color1 = Scalar.Blue;
                 gColor.Run(empty);
                 Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap);
-                gradientColorMap = gradientColorMap.Resize(new cv.Size(255, 1));
+                gradientColorMap = gradientColorMap.Resize(new CV.Size(255, 1));
             }
             var sliderVal = (task.cameraName == "Intel(R) RealSense(TM) Depth Camera 435i") ? 50 : 80;
             var depth8u = task.pcSplit[2].ConvertScaleAbs(sliderVal);
-            var ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
+            var ColorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
             Cv2.ApplyColorMap(depth8u, dst2, ColorMap);
         }
     }
@@ -45572,7 +45574,7 @@ namespace CS_Classes
                         color2 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
                         if (i == 0) colorGrad = gradMat; else Cv2.HConcat(colorGrad, gradMat, colorGrad);
                     }
-                    colorGrad = colorGrad.Resize(new cv.Size(256, 1));
+                    colorGrad = colorGrad.Resize(new CV.Size(256, 1));
                     Cv2.ImWrite(task.HomeDir + "data\\nextScheme.jpg", colorGrad); // use this to create new color schemes.
                 }
                 else
@@ -45582,7 +45584,7 @@ namespace CS_Classes
             }
             SetTrueText("Use the 'Color Transitions' slider and radio buttons to change the color ranges.", 3);
             var depth8u = task.pcSplit[2].ConvertScaleAbs(options.transitions);
-            var colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colorGrad.Data);
+            var colorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colorGrad.Data);
             Cv2.ApplyColorMap(depth8u, dst2, colorMap);
             dst2.SetTo(0, task.noDepthMask);
         }
@@ -45597,7 +45599,7 @@ namespace CS_Classes
         public Palette_Random_CS(VBtask task) : base(task)
         {
             UpdateAdvice(traceName + ": There are no options\nJust produces a colorMap filled with random vec3b's.");
-            colorMap = new Mat(256, 1, MatType.CV_8UC3, cv.Scalar.All(0));
+            colorMap = new Mat(256, 1, MatType.CV_8UC3, CV.Scalar.All(0));
             for (int i = 0; i <= 255; i++)
             {
                 colorMap.Set<Vec3b>(i, 0, randomCellColor());
@@ -45620,7 +45622,7 @@ namespace CS_Classes
         public List<Vec3b> colors = new List<Vec3b>();
         public Palette_Variable_CS(VBtask task) : base(task)
         {
-            colorGrad = new Mat(1, 256, MatType.CV_8UC3, cv.Scalar.All(0));
+            colorGrad = new Mat(1, 256, MatType.CV_8UC3, CV.Scalar.All(0));
             for (int i = 0; i <= 255; i++)
             {
                 colorGrad.Set<Vec3b>(0, i, randomCellColor());
@@ -45634,7 +45636,7 @@ namespace CS_Classes
             {
                 colorGrad.Set<Vec3b>(0, i, colors[i]);
             }
-            var colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colorGrad.Data);
+            var colorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colorGrad.Data);
             Cv2.ApplyColorMap(src, dst2, colorMap);
         }
     }
@@ -45670,11 +45672,11 @@ namespace CS_Classes
                     gColor.color1 = new Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255));
                     if (i == 0) gradientColorMap = gColor.gradient; else Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap);
                 }
-                gradientColorMap = gradientColorMap.Resize(new cv.Size(256, 1));
+                gradientColorMap = gradientColorMap.Resize(new CV.Size(256, 1));
                 if (standaloneTest()) dst3 = gradientColorMap;
                 gradientColorMap.Set<Vec3b>(0, 0, new Vec3b()); // black is black!
             }
-            var ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
+            var ColorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, gradientColorMap.Data);
             Cv2.ApplyColorMap(src, dst2, ColorMap);
         }
     }
@@ -45702,7 +45704,7 @@ namespace CS_Classes
                 var tmp = Cv2.ImRead(mapFile.FullName);
                 tmp.Col(0).SetTo(whitebackground ? Scalar.White : Scalar.Black);
                 tmp = tmp.Row(0);
-                colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
+                colorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
             }
             if (src.Type() == MatType.CV_32F)
             {
@@ -45729,7 +45731,7 @@ namespace CS_Classes
                 var str = cMapDir.FullName + "/colorscale_" + task.gOptions.getPalette() + ".jpg";
                 var mapFile = new FileInfo(str);
                 var tmp = Cv2.ImRead(mapFile.FullName);
-                colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
+                colorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, tmp.Data).Clone();
             }
             desc = "Apply the provided color map to the input image.";
         }
@@ -45790,7 +45792,7 @@ namespace CS_Classes
                     }
                 }
             }
-            var ColorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colors.Values.ToArray());
+            var ColorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colors.Values.ToArray());
             Cv2.ApplyColorMap(src, dst2, ColorMap);
         }
     }
@@ -45818,7 +45820,7 @@ namespace CS_Classes
             var nextFile = new FileInfo(task.HomeDir + "Data/ballSequence/color_" + imageFrame.ToString() + ".png");
             dst3 = Cv2.ImRead(nextFile.FullName).Resize(dst2.Size());
             IntPtr imagePtr = ParticleFilterTest_Run(cPtr);
-            dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -45846,7 +45848,7 @@ namespace CS_Classes
             IntPtr imagePtr = PCA_Prep_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleSrc.Free();
             int count = PCA_Prep_GetCount(cPtr);
-            inputData = cv.Mat.FromPixelData(count, 3, MatType.CV_32F, imagePtr).Clone();
+            inputData = CV.Mat.FromPixelData(count, 3, MatType.CV_32F, imagePtr).Clone();
             SetTrueText("Data has been prepared and resides in inputData public");
         }
         public void Close()
@@ -45884,9 +45886,9 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors);
-                Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length);
-                custom.colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palette);
+                custom.colorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palette);
                 custom.Run(img8u);
                 dst2 = custom.dst2;
             }
@@ -45958,7 +45960,7 @@ namespace CS_Classes
             }
             if (inputPoints.Count() > 0)
             {
-                Mat inputMat = cv.Mat.FromPixelData(inputPoints.Count(), 3, MatType.CV_32F, inputPoints.ToArray());
+                Mat inputMat = CV.Mat.FromPixelData(inputPoints.Count(), 3, MatType.CV_32F, inputPoints.ToArray());
                 pca_analysis = new PCA(inputMat, new Mat(), PCA.Flags.DataAsRow);
                 strOut = displayResults();
                 SetTrueText(strOut, 3);
@@ -46075,7 +46077,7 @@ namespace CS_Classes
             labels[2] = "Original image";
             labels[3] = "PCA Output";
         }
-        void drawAxis(Mat img, cv.Point p, cv.Point q, Scalar color, float scale)
+        void drawAxis(Mat img, CV.Point p, CV.Point q, Scalar color, float scale)
         {
             double angle = Math.Atan2(p.Y - q.Y, p.X - q.X);
             double hypotenuse = Math.Sqrt((p.Y - q.Y) * (p.Y - q.Y) + (p.X - q.X) * (p.X - q.X));
@@ -46094,7 +46096,7 @@ namespace CS_Classes
             dst2 = image.Resize(dst2.Size());
             Mat gray = dst2.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(50, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
             HierarchyIndex[] hierarchy;
-            cv.Point[][] contours;
+            CV.Point[][] contours;
             Cv2.FindContours(gray, out contours, out hierarchy, RetrievalModes.List, ContourApproximationModes.ApproxNone);
             dst3.SetTo(0);
             for (int i = 0; i < contours.Length; i++)
@@ -46110,7 +46112,7 @@ namespace CS_Classes
                     data_pts.Set<double>(j, 1, contours[i][j].Y);
                 }
                 PCA pca_analysis = new PCA(data_pts, new Mat(), PCA.Flags.DataAsRow);
-                cv.Point cntr = new cv.Point((int)pca_analysis.Mean.Get<double>(0, 0), (int)pca_analysis.Mean.Get<double>(0, 1));
+                CV.Point cntr = new CV.Point((int)pca_analysis.Mean.Get<double>(0, 0), (int)pca_analysis.Mean.Get<double>(0, 1));
                 Point2d[] eigen_vecs = new Point2d[2];
                 double[] eigen_val = new double[2];
                 for (int j = 0; j < 2; j++)
@@ -46120,8 +46122,8 @@ namespace CS_Classes
                 }
                 DrawCircle(dst3, cntr, task.DotSize + 1, Scalar.BlueViolet);
                 float factor = 0.02f;
-                cv.Point ept1 = new cv.Point(cntr.X + (int)(factor * eigen_vecs[0].X * eigen_val[0]), cntr.Y + (int)(factor * eigen_vecs[0].Y * eigen_val[0]));
-                cv.Point ept2 = new cv.Point(cntr.X - (int)(factor * eigen_vecs[1].X * eigen_val[1]), cntr.Y - (int)(factor * eigen_vecs[1].Y * eigen_val[1]));
+                CV.Point ept1 = new CV.Point(cntr.X + (int)(factor * eigen_vecs[0].X * eigen_val[0]), cntr.Y + (int)(factor * eigen_vecs[0].Y * eigen_val[0]));
+                CV.Point ept2 = new CV.Point(cntr.X - (int)(factor * eigen_vecs[1].X * eigen_val[1]), cntr.Y - (int)(factor * eigen_vecs[1].Y * eigen_val[1]));
                 drawAxis(dst3, cntr, ept1, Scalar.Red, 1);
                 drawAxis(dst3, cntr, ept2, Scalar.BlueViolet, 5);
             }
@@ -46621,12 +46623,12 @@ namespace CS_Classes
             Marshal.Copy(src.Data, buff, 0, buff.Length);
             palette = MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors);
             byte[] paletteImage = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors);
-            Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length);
             Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length);
             custom.Run(img8u);
             dst2 = custom.dst2;
-            Mat tmp = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palette);
+            Mat tmp = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palette);
             int paletteCount = tmp.CvtColor(ColorConversionCodes.BGR2GRAY).CountNonZero();
             if (standaloneTest())
             {
@@ -46666,8 +46668,8 @@ namespace CS_Classes
             IntPtr imagePtr = PCA_NColor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handlePalette.AddrOfPinnedObject(), src.Rows, src.Cols, classCount);
             handlePalette.Free();
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
-            custom.colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palettize.palette);
+            dst2 = CV.Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
+            custom.colorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palettize.palette);
             custom.Run(dst2);
             dst3 = custom.dst2;
             labels[2] = "The CV_8U image is below.  Values range from 0 to " + classCount.ToString();
@@ -46710,9 +46712,9 @@ namespace CS_Classes
             if (task.heartBeat) palettize.Run(src); // get the palette in C# which is very fast.
             Marshal.Copy(src.Data, rgb, 0, rgb.Length);
             var paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palettize.palette, palettize.options.desiredNcolors);
-            Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            Mat img8u = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length);
-            custom.colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palettize.palette);
+            custom.colorMap = CV.Mat.FromPixelData(256, 1, MatType.CV_8UC3, palettize.palette);
             custom.Run(img8u);
             dst2 = custom.dst2;
         }
@@ -46783,9 +46785,9 @@ namespace CS_Classes
     public class PhaseCorrelate_Basics_CS : CS_Parent
     {
         Mat hanning = new Mat();
-        public cv.Rect stableRect;
-        public cv.Rect srcRect;
-        public cv.Point center;
+        public CV.Rect stableRect;
+        public CV.Rect srcRect;
+        public CV.Point center;
         public float radius;
         public Point2d shift;
         public Mat lastFrame;
@@ -46802,7 +46804,7 @@ namespace CS_Classes
             options.RunVB();
 
             Mat input = src;
-            if (input.Channels() != 1) input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (input.Channels() != 1) input = input.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             Mat input64 = new Mat();
             input.ConvertTo(input64, MatType.CV_64F);
             if (lastFrame == null) lastFrame = input64.Clone();
@@ -46818,23 +46820,23 @@ namespace CS_Classes
                 if (options.shiftThreshold < radius) resetLastFrame = true;
                 int x1 = shift.X < 0 ? Math.Abs((int)shift.X) : 0;
                 int y1 = shift.Y < 0 ? Math.Abs((int)shift.Y) : 0;
-                stableRect = new cv.Rect(x1, y1, src.Width - Math.Abs((int)shift.X), src.Height - Math.Abs((int)shift.Y));
+                stableRect = new CV.Rect(x1, y1, src.Width - Math.Abs((int)shift.X), src.Height - Math.Abs((int)shift.Y));
                 stableRect = ValidateRect(stableRect);
                 if (stableRect.Width > 0 && stableRect.Height > 0)
                 {
                     int x2 = shift.X < 0 ? 0 : (int)shift.X;
                     int y2 = shift.Y < 0 ? 0 : (int)shift.Y;
-                    srcRect = ValidateRect(new cv.Rect(x2, y2, stableRect.Width, stableRect.Height));
-                    center = new cv.Point(input64.Cols / 2, input64.Rows / 2);
-                    if (src.Channels() == 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                    srcRect = ValidateRect(new CV.Rect(x2, y2, stableRect.Width, stableRect.Height));
+                    center = new CV.Point(input64.Cols / 2, input64.Rows / 2);
+                    if (src.Channels() == 1) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
                     dst2 = src.Clone();
                     DrawCircle(dst2, center, (int)radius, Scalar.Yellow, task.lineWidth + 2);
-                    DrawLine(dst2, center, new cv.Point(center.X + shift.X, center.Y + shift.Y), Scalar.Red, task.lineWidth + 1);
+                    DrawLine(dst2, center, new CV.Point(center.X + shift.X, center.Y + shift.Y), Scalar.Red, task.lineWidth + 1);
                     src[srcRect].CopyTo(dst3[stableRect]);
                     if (radius > 5)
                     {
                         DrawCircle(dst3, center, (int)radius, Scalar.Yellow, task.lineWidth + 2);
-                        DrawLine(dst3, center, new cv.Point(center.X + shift.X, center.Y + shift.Y), Scalar.Red, task.lineWidth + 1);
+                        DrawLine(dst3, center, new CV.Point(center.X + shift.X, center.Y + shift.Y), Scalar.Red, task.lineWidth + 1);
                     }
                 }
                 else
@@ -46887,7 +46889,7 @@ namespace CS_Classes
             if (task.FirstPass) lastFrame = task.pcSplit[2].Clone();
             phaseC.Run(task.pcSplit[2]);
             dst2 = task.pcSplit[2];
-            Mat tmp = new Mat(dst2.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            Mat tmp = new Mat(dst2.Size(), MatType.CV_32F, CV.Scalar.All(0));
             if (phaseC.resetLastFrame) task.pcSplit[2].CopyTo(lastFrame);
             if (double.IsNaN(phaseC.response))
             {
@@ -46901,7 +46903,7 @@ namespace CS_Classes
                 tmp = tmp.Normalize(0, 255, NormTypes.MinMax);
                 tmp.ConvertTo(dst3, MatType.CV_8UC1);
                 DrawCircle(dst3, phaseC.center, (int)phaseC.radius, Scalar.Yellow, task.lineWidth + 2);
-                DrawLine(dst3, phaseC.center, new cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), Scalar.Red, task.lineWidth + 1);
+                DrawLine(dst3, phaseC.center, new CV.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), Scalar.Red, task.lineWidth + 1);
             }
             lastFrame = task.pcSplit[2].Clone();
         }
@@ -46929,7 +46931,7 @@ namespace CS_Classes
     public class Photon_Basics_CS : CS_Parent
     {
         Hist_Basics hist = new Hist_Basics();
-        Mat lastImage = new cv.Mat();
+        Mat lastImage = new CV.Mat();
         public Photon_Basics_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences" };
@@ -46940,7 +46942,7 @@ namespace CS_Classes
             if (task.FirstPass) lastImage = src;
             Cv2.Absdiff(src, lastImage, dst1);
             dst0 = dst1.Reshape(1, dst1.Rows * 3);
-            dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            dst1 = dst1.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary);
             if (Cv2.CountNonZero(dst0) > 0)
             {
@@ -46991,14 +46993,14 @@ namespace CS_Classes
             dst2 = mats.dst2;
             int colWidth = dst2.Width / testCount;
             dst3.SetTo(0);
-            cv.Scalar[] choices = { Scalar.Red, Scalar.LightGreen, Scalar.Blue, Scalar.Yellow };
+            CV.Scalar[] choices = { Scalar.Red, Scalar.LightGreen, Scalar.Blue, Scalar.Yellow };
             for (int i = 0; i < counts[0].Count(); i++)
             {
                 int colTop = 0;
                 for (int j = 0; j < counts.Length; j++)
                 {
                     int h = (int)((dst2.Height - 1) * (counts[j][i] / dst2.Total())); // extra parens to avoid overflow at high res.
-                    cv.Rect r = new cv.Rect(colWidth * i, colTop, colWidth, h);
+                    CV.Rect r = new CV.Rect(colWidth * i, colTop, colWidth, h);
                     if (h > 0) dst3[r].SetTo(choices[j]);
                     colTop += h;
                 }
@@ -47012,7 +47014,7 @@ namespace CS_Classes
     public class Photon_Subtraction_CS : CS_Parent
     {
         Hist_Basics hist = new Hist_Basics();
-        Mat lastImage = new cv.Mat();
+        Mat lastImage = new CV.Mat();
         public Photon_Subtraction_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Points where B, G, or R differ", "Histogram showing distribution of differences" };
@@ -47029,7 +47031,7 @@ namespace CS_Classes
             hist.Run(histInput);
             dst2 = hist.dst2;
             subOutput = subOutput.Reshape(3, dst2.Height);
-            dst1 = subOutput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, ThresholdTypes.Binary);
+            dst1 = subOutput.CvtColor(CV.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, ThresholdTypes.Binary);
             if (Cv2.CountNonZero(dst1) > 0) dst3 = dst1.Clone(); // occasionally the image returned is identical to the last.  hmmm...
             lastImage = src.Clone();
         }
@@ -47171,10 +47173,10 @@ namespace CS_Classes
     public class Plane_OnlyPlanes_CS : CS_Parent
     {
         public Plane_CellColor plane = new Plane_CellColor();
-        public List<cv.Point> contours;
+        public List<CV.Point> contours;
         public Plane_OnlyPlanes_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             labels = new string[] { "", "", "RedCloud Cells", "gCloud reworked with planes instead of depth data" };
             desc = "Replace the gCloud with planes in every RedCloud cell";
         }
@@ -47216,7 +47218,7 @@ namespace CS_Classes
         Plane_Points plane = new Plane_Points();
         public List<float> correlations = new List<float>();
         public List<Vec4f> equations = new List<Vec4f>();
-        public List<List<cv.Point>> ptList2D = new List<List<cv.Point>>();
+        public List<List<CV.Point>> ptList2D = new List<List<CV.Point>>();
         Kalman_Basics kalman = new Kalman_Basics();
         public Plane_EqCorrelation_CS(VBtask task) : base(task)
         {
@@ -47233,18 +47235,18 @@ namespace CS_Classes
                 return;
             }
             equations = new List<Vec4f>(plane.equations);
-            ptList2D = new List<List<cv.Point>>(plane.ptList2D);
+            ptList2D = new List<List<CV.Point>>(plane.ptList2D);
             correlations.Clear();
             Mat correlationMat = new Mat();
             int[] count = new int[plane.equations.Count()];
             for (int i = 0; i < equations.Count(); i++)
             {
                 Vec4f p1 = equations[i];
-                Mat data1 = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, new float[] { p1.Item0, p1.Item1, p1.Item2, p1.Item3 });
+                Mat data1 = CV.Mat.FromPixelData(4, 1, MatType.CV_32F, new float[] { p1.Item0, p1.Item1, p1.Item2, p1.Item3 });
                 for (int j = i + 1; j < equations.Count(); j++)
                 {
                     Vec4f p2 = equations[j];
-                    Mat data2 = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, new float[] { p2.Item0, p2.Item1, p2.Item2, p2.Item3 });
+                    Mat data2 = CV.Mat.FromPixelData(4, 1, MatType.CV_32F, new float[] { p2.Item0, p2.Item1, p2.Item2, p2.Item3 });
                     Cv2.MatchTemplate(data1, data2, correlationMat, TemplateMatchModes.CCoeffNormed);
                     float correlation = correlationMat.At<float>(0, 0);
                     correlations.Add(correlation);
@@ -47343,7 +47345,7 @@ namespace CS_Classes
         Plane_From3Points plane = new Plane_From3Points();
         public List<Vec4f> equations = new List<Vec4f>();
         public List<Point3f> ptList = new List<Point3f>();
-        public List<List<cv.Point>> ptList2D = new List<List<cv.Point>>();
+        public List<List<CV.Point>> ptList2D = new List<List<CV.Point>>();
         RedCloud_Basics redC = new RedCloud_Basics();
         bool needOutput = false;
         public Plane_Points_CS(VBtask task) : base(task)
@@ -47360,7 +47362,7 @@ namespace CS_Classes
             // this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
             rc.contour = contourBuild(rc.mask, ContourApproximationModes.ApproxNone);
             Point3f pt;
-            List<cv.Point> list2D = new List<cv.Point>();
+            List<CV.Point> list2D = new List<CV.Point>();
             ptList.Clear();
             for (int i = 0; i < rc.contour.Count(); i++)
             {
@@ -47388,7 +47390,7 @@ namespace CS_Classes
                     int c = ptList.Count();
                     for (int i = 0; i < ptList.Count(); i++)
                     {
-                        List<cv.Point> list2Dinput = new List<cv.Point>();
+                        List<CV.Point> list2Dinput = new List<CV.Point>();
                         for (int j = 0; j < 3; j++)
                         {
                             int ptIndex = i;
@@ -47432,29 +47434,29 @@ namespace CS_Classes
             List<float> yList = new List<float>();
             for (int i = 0; i < points.Rows; i++)
             {
-                cv.Point pt = points.At<cv.Point>(i, 0);
+                CV.Point pt = points.At<CV.Point>(i, 0);
                 float yVal = task.pcSplit[1].At<float>(pt.Y, pt.X);
                 if (yVal != 0) yList.Add(yVal);
             }
             if (yList.Count() == 0) return;
             hist.mm.minVal = yList.Min();
             hist.mm.maxVal = yList.Max();
-            hist.Run(cv.Mat.FromPixelData(yList.Count(), 1, MatType.CV_32F, yList.ToArray()));
+            hist.Run(CV.Mat.FromPixelData(yList.Count(), 1, MatType.CV_32F, yList.ToArray()));
             dst2 = hist.dst2;
             double binWidth = dst2.Width / task.histogramBins;
             double rangePerBin = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins;
             int midHist = task.histogramBins / 2;
-            mmData mm = GetMinMax(hist.histogram[new cv.Rect(0, midHist, 1, midHist)]);
+            mmData mm = GetMinMax(hist.histogram[new CV.Rect(0, midHist, 1, midHist)]);
             floorPop = mm.maxVal;
             double peak = hist.mm.minVal + (midHist + mm.maxLoc.Y + 1) * rangePerBin;
             int rX = (midHist + mm.maxLoc.Y) * (int)binWidth;
-            dst2.Rectangle(new cv.Rect(rX, 0, (int)binWidth, dst2.Height), Scalar.Black, task.lineWidth);
+            dst2.Rectangle(new CV.Rect(rX, 0, (int)binWidth, dst2.Height), Scalar.Black, task.lineWidth);
             if (Math.Abs(peak - peakCeiling) > rangePerBin) peakCeiling = peak;
-            mm = GetMinMax(hist.histogram[new cv.Rect(0, 0, 1, midHist)]);
+            mm = GetMinMax(hist.histogram[new CV.Rect(0, 0, 1, midHist)]);
             ceilingPop = mm.maxVal;
             peak = hist.mm.minVal + (mm.maxLoc.Y + 1) * rangePerBin;
             rX = mm.maxLoc.Y * (int)binWidth;
-            dst2.Rectangle(new cv.Rect(rX, 0, (int)binWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+            dst2.Rectangle(new CV.Rect(rX, 0, (int)binWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
             if (Math.Abs(peak - peakFloor) > rangePerBin * 2) peakFloor = peak;
             labels[3] = "Peak Ceiling = " + string.Format(fmt3, peakCeiling) + " and Peak Floor = " + string.Format(fmt3, peakFloor);
             SetTrueText("Yellow rectangle is likely floor and black is likely ceiling.");
@@ -47494,10 +47496,10 @@ namespace CS_Classes
                 var p2 = rc.contour[j + offset * 1];
                 var p3 = rc.contour[j + offset * 2];
                 var p4 = rc.contour[j + offset * 3];
-                var v1 = task.pointCloud[rc.rect].Get<cv.Point3f>(p1.Y, p1.X);
-                var v2 = task.pointCloud[rc.rect].Get<cv.Point3f>(p2.Y, p2.X);
-                var v3 = task.pointCloud[rc.rect].Get<cv.Point3f>(p3.Y, p3.X);
-                var v4 = task.pointCloud[rc.rect].Get<cv.Point3f>(p4.Y, p4.X);
+                var v1 = task.pointCloud[rc.rect].Get<CV.Point3f>(p1.Y, p1.X);
+                var v2 = task.pointCloud[rc.rect].Get<CV.Point3f>(p2.Y, p2.X);
+                var v3 = task.pointCloud[rc.rect].Get<CV.Point3f>(p3.Y, p3.X);
+                var v4 = task.pointCloud[rc.rect].Get<CV.Point3f>(p4.Y, p4.X);
                 var cross1 = crossProduct(v1 - v2, v2 - v3);
                 var cross2 = crossProduct(v1 - v4, v4 - v3);
                 float dot = dotProduct3D(cross1, cross2);
@@ -47567,7 +47569,7 @@ namespace CS_Classes
         {
             solo.Run(src);
             dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total());
-            dst1 = new Mat(dst1.Size(), MatType.CV_32FC1, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_32FC1, CV.Scalar.All(0));
             solo.heat.dst0.CopyTo(dst1, dst3);
             dst1.ConvertTo(dst1, MatType.CV_32FC1);
             Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, dst1, dst2, task.rangesTop);
@@ -47600,7 +47602,7 @@ namespace CS_Classes
         {
             solo.Run(src);
             dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total());
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             solo.heat.dst1.CopyTo(dst1, dst3);
             dst1.ConvertTo(dst1, MatType.CV_32FC1);
             Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsSide, dst1, dst2, task.rangesSide);
@@ -47632,12 +47634,12 @@ namespace CS_Classes
             options.RunVB();
             slice.Run(src);
             dst1 = slice.dst3;
-            dst0 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            dst0 = dst1.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             float thicknessCMs = task.metersPerPixel * 1000 / 100, nextY = 0;
-            cv.Rect rect = new cv.Rect();
+            CV.Rect rect = new CV.Rect();
             for (int y = dst0.Height - 2; y >= 0; y--)
             {
-                rect = new cv.Rect(0, y, dst0.Width - 1, 1);
+                rect = new CV.Rect(0, y, dst0.Width - 1, 1);
                 int count = dst0[rect].CountNonZero();
                 if (count > options.countThreshold)
                 {
@@ -47653,7 +47655,7 @@ namespace CS_Classes
             yList.Add(nextY);
             planeY = yList.Average();
             if (yList.Count() > 20) yList.RemoveAt(0);
-            dst1.Line(new cv.Point(0, rect.Y), new cv.Point(dst2.Width, rect.Y), Scalar.Yellow, slice.options.sliceSize, task.lineType);
+            dst1.Line(new CV.Point(0, rect.Y), new CV.Point(dst2.Width, rect.Y), Scalar.Yellow, slice.options.sliceSize, task.lineType);
         }
     }
 
@@ -47744,7 +47746,7 @@ namespace CS_Classes
                         float sIncr = (i % 256) * incr;
                         Scalar color = new Scalar(sIncr, sIncr, sIncr);
                         if (histogram.Rows > 255) color = Scalar.Black;
-                        Cv2.Rectangle(dst2, new cv.Rect((int)(i * barWidth), dst2.Height - h, (int)Math.Max(1, barWidth), h),
+                        Cv2.Rectangle(dst2, new CV.Rect((int)(i * barWidth), dst2.Height - h, (int)Math.Max(1, barWidth), h),
                                         color, -1);
                     }
                 }
@@ -47786,8 +47788,8 @@ namespace CS_Classes
                 for (int i = 1; i <= lineCount; i++)
                 {
                     int x = i * meterDepth;
-                    DrawLine(dst2, new cv.Point(x, 0), new cv.Point(x, src.Height), Scalar.White);
-                    SetTrueText($"{i}m", new cv.Point(x + 4, src.Height - 10));
+                    DrawLine(dst2, new CV.Point(x, 0), new CV.Point(x, src.Height), Scalar.White);
+                    SetTrueText($"{i}m", new CV.Point(x + 4, src.Height - 10));
                 }
             }
         }
@@ -47841,14 +47843,14 @@ namespace CS_Classes
             if (standaloneTest()) plotData = (float)task.color.Mean(task.depthMask)[0];
             if (inputList.Count() >= dst2.Width) inputList.RemoveAt(0);
             inputList.Add(plotData);
-            dst2.ColRange(new Range(0, inputList.Count())).SetTo(backColor);
+            dst2.ColRange(new CV.Range(0, inputList.Count())).SetTo(backColor);
             max = inputList.Max();
             min = inputList.Min();
             for (int i = 0; i < inputList.Count(); i++)
             {
                 float y = 1 - (inputList[i] - min) / (max - min);
                 y *= dst2.Height - 1;
-                cv.Point c = new cv.Point(i, y);
+                CV.Point c = new CV.Point(i, y);
                 if (c.X < 1) c.X = 1;
                 DrawCircle(dst2, c, 1, plotColor);
             }
@@ -47861,14 +47863,14 @@ namespace CS_Classes
                     string nextText = max.ToString(fmt);
                     if (i == 1) nextText = inputList.Average().ToString(fmt);
                     if (i == 2) nextText = min.ToString(fmt);
-                    cv.Point pt = new cv.Point(0, 10);
-                    if (i == 1) pt = new cv.Point(0, dst2.Height / 2 - 5);
-                    if (i == 2) pt = new cv.Point(0, dst2.Height - 3);
+                    CV.Point pt = new CV.Point(0, 10);
+                    if (i == 1) pt = new CV.Point(0, dst2.Height / 2 - 5);
+                    if (i == 2) pt = new CV.Point(0, dst2.Height - 3);
                     Cv2.PutText(dst2, nextText, pt, HersheyFonts.HersheyPlain, 0.7, Scalar.White, 1, task.lineType);
                 }
             }
-            cv.Point p1 = new cv.Point(0, dst2.Height / 2);
-            cv.Point p2 = new cv.Point(dst2.Width, dst2.Height / 2);
+            CV.Point p1 = new CV.Point(0, dst2.Height / 2);
+            CV.Point p2 = new CV.Point(dst2.Width, dst2.Height / 2);
             dst2.Line(p1, p2, Scalar.White, task.cvFontThickness);
             if (standaloneTest()) SetTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3);
         }
@@ -47885,13 +47887,13 @@ namespace CS_Classes
         Mat_4Click mats = new Mat_4Click();
         public Plot_OverTimeScalar_CS(VBtask task) : base(task)
         {
-            cv.Scalar[] choices = { Scalar.Blue, Scalar.Green, Scalar.Red, Scalar.Yellow };
+            CV.Scalar[] choices = { Scalar.Blue, Scalar.Green, Scalar.Red, Scalar.Yellow };
             for (int i = 0; i < 4; i++)
             {
                 plotList.Add(new Plot_OverTimeSingle());
                 plotList[i].plotColor = choices[i];
             }
-            desc = "Plot the requested number of entries in the cv.scalar input";
+            desc = "Plot the requested number of entries in the CV.scalar input";
         }
         public void RunCS(Mat src)
         {
@@ -47992,13 +47994,13 @@ namespace CS_Classes
             {
                 var y = 1 - (plotData[i] - minScale) / (maxScale - minScale);
                 y *= dst2.Height - 1;
-                var c = new cv.Point(columnIndex - task.DotSize, y - task.DotSize);
+                var c = new CV.Point(columnIndex - task.DotSize, y - task.DotSize);
                 if (c.X < 1) c.X = 1;
                 DrawCircle(dst2, c, task.DotSize, plotColors[i]);
             }
             if (task.heartBeat)
             {
-                dst2.Line(new cv.Point(columnIndex, 0), new cv.Point(columnIndex, dst2.Height), Scalar.White, 1);
+                dst2.Line(new CV.Point(columnIndex, 0), new CV.Point(columnIndex, dst2.Height), Scalar.White, 1);
             }
             columnIndex += task.DotSize;
             dst2.Col(columnIndex).SetTo(0);
@@ -48030,7 +48032,7 @@ namespace CS_Classes
         Mat plotOutput;
         public Plot_OverTimeFixedScale_CS(VBtask task) : base(task)
         {
-            plotOutput = new Mat(new cv.Size(320, 180), MatType.CV_8UC3, cv.Scalar.All(0));
+            plotOutput = new Mat(new CV.Size(320, 180), MatType.CV_8UC3, CV.Scalar.All(0));
             desc = "Plot an input variable over time";
             task.gOptions.setLineWidth(1);
             task.gOptions.SetDotSize(2);
@@ -48081,7 +48083,7 @@ namespace CS_Classes
             if (lastXdelta.Count() >= plotSeriesCount) lastXdelta.RemoveAt(0);
             if (task.heartBeat)
             {
-                plotOutput.Line(new cv.Point(columnIndex, 0), new cv.Point(columnIndex, plotOutput.Height), Scalar.White, task.lineWidth);
+                plotOutput.Line(new CV.Point(columnIndex, 0), new CV.Point(columnIndex, plotOutput.Height), Scalar.White, task.lineWidth);
             }
             for (int i = 0; i < plotCount; i++)
             {
@@ -48089,7 +48091,7 @@ namespace CS_Classes
                 {
                     var y = 1 - (plotData[i] - minScale) / (maxScale - minScale);
                     y *= plotOutput.Height - 1;
-                    var c = new cv.Point(columnIndex - task.DotSize, y - task.DotSize);
+                    var c = new CV.Point(columnIndex - task.DotSize, y - task.DotSize);
                     if (c.X < 1) c.X = 1;
                     DrawCircle(plotOutput, c, task.DotSize, plotColors[i]);
                 }
@@ -48167,7 +48169,7 @@ namespace CS_Classes
             handleX.Free();
             handleY.Free();
 
-            dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr);
+            dst2 = CV.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr);
             var maxX = srcX.Max();
             var minX = srcX.Min();
             var maxY = srcY.Max();
@@ -48207,7 +48209,7 @@ namespace CS_Classes
             if (wipeSlate) dst2.SetTo(0);
             for (int i = 0; i < srcX.Count(); i++)
             {
-                var pt = new cv.Point(dst2.Width * srcX[i] / maxX, dst2.Height - dst2.Height * srcY[i] / maxY);
+                var pt = new CV.Point(dst2.Width * srcX[i] / maxX, dst2.Height - dst2.Height * srcY[i] / maxY);
                 DrawCircle(dst2, pt, task.DotSize, plotColor);
             }
             labels[2] = "x-Axis: " + minX + " to " + maxX + ", y-axis: " + minY + " to " + maxY;
@@ -48313,37 +48315,37 @@ namespace CS_Classes
     {
         Options_PointCloud options = new Options_PointCloud();
         public int actualCount;
-        public List<cv.Point3f> allPointsH = new List<cv.Point3f>();
-        public List<cv.Point3f> allPointsV = new List<cv.Point3f>();
-        public List<List<cv.Point3f>> hList = new List<List<cv.Point3f>>();
-        public List<List<cv.Point>> xyHList = new List<List<cv.Point>>();
-        public List<List<cv.Point3f>> vList = new List<List<cv.Point3f>>();
-        public List<List<cv.Point>> xyVList = new List<List<cv.Point>>();
+        public List<CV.Point3f> allPointsH = new List<CV.Point3f>();
+        public List<CV.Point3f> allPointsV = new List<CV.Point3f>();
+        public List<List<CV.Point3f>> hList = new List<List<CV.Point3f>>();
+        public List<List<CV.Point>> xyHList = new List<List<CV.Point>>();
+        public List<List<CV.Point3f>> vList = new List<List<CV.Point3f>>();
+        public List<List<CV.Point>> xyVList = new List<List<CV.Point>>();
         public PointCloud_Basics_CS(VBtask task) : base(task)
         {
             setPointCloudGrid();
             desc = "Reduce the point cloud to a manageable number points in 3D";
         }
-        public List<List<cv.Point3f>> findHorizontalPoints(ref List<List<cv.Point>> xyList)
+        public List<List<CV.Point3f>> findHorizontalPoints(ref List<List<CV.Point>> xyList)
         {
-            var ptlist = new List<List<cv.Point3f>>();
-            var lastVec = new cv.Point3f();
+            var ptlist = new List<List<CV.Point3f>>();
+            var lastVec = new CV.Point3f();
             for (int y = 0; y < task.pointCloud.Height; y += task.gridList[0].Height - 1)
             {
-                var vecList = new List<cv.Point3f>();
-                var xyVec = new List<cv.Point>();
+                var vecList = new List<CV.Point3f>();
+                var xyVec = new List<CV.Point>();
                 for (int x = 0; x < task.pointCloud.Width; x += task.gridList[0].Width - 1)
                 {
-                    var vec = task.pointCloud.Get<cv.Point3f>(y, x);
+                    var vec = task.pointCloud.Get<CV.Point3f>(y, x);
                     bool jumpZ = false;
                     if (vec.Z > 0)
                     {
                         if ((Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold && lastVec.X < vec.X) || lastVec.Z == 0)
                         {
                             actualCount++;
-                            DrawCircle(dst2, new cv.Point(x, y), task.DotSize, Scalar.White);
+                            DrawCircle(dst2, new CV.Point(x, y), task.DotSize, Scalar.White);
                             vecList.Add(vec);
-                            xyVec.Add(new cv.Point(x, y));
+                            xyVec.Add(new CV.Point(x, y));
                         }
                         else
                         {
@@ -48354,8 +48356,8 @@ namespace CS_Classes
                     {
                         if (vecList.Count() > 1)
                         {
-                            ptlist.Add(new List<cv.Point3f>(vecList));
-                            xyList.Add(new List<cv.Point>(xyVec));
+                            ptlist.Add(new List<CV.Point3f>(vecList));
+                            xyList.Add(new List<CV.Point>(xyVec));
                         }
                         vecList.Clear();
                         xyVec.Clear();
@@ -48365,14 +48367,14 @@ namespace CS_Classes
             }
             return ptlist;
         }
-        public List<List<cv.Point3f>> findVerticalPoints(ref List<List<cv.Point>> xyList)
+        public List<List<CV.Point3f>> findVerticalPoints(ref List<List<CV.Point>> xyList)
         {
             var ptlist = new List<List<Point3f>>();
             var lastVec = new Point3f();
             for (int x = 0; x < task.pointCloud.Width; x += task.gridList[0].Width - 1)
             {
                 var vecList = new List<Point3f>();
-                var xyVec = new List<cv.Point>();
+                var xyVec = new List<CV.Point>();
                 for (int y = 0; y < task.pointCloud.Height; y += task.gridList[0].Height - 1)
                 {
                     var vec = task.pointCloud.Get<Point3f>(y, x);
@@ -48382,9 +48384,9 @@ namespace CS_Classes
                         if ((Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold && lastVec.Y < vec.Y) || lastVec.Z == 0)
                         {
                             actualCount++;
-                            DrawCircle(dst2, new cv.Point(x, y), task.DotSize, Scalar.White);
+                            DrawCircle(dst2, new CV.Point(x, y), task.DotSize, Scalar.White);
                             vecList.Add(vec);
-                            xyVec.Add(new cv.Point(x, y));
+                            xyVec.Add(new CV.Point(x, y));
                         }
                         else
                         {
@@ -48395,8 +48397,8 @@ namespace CS_Classes
                     {
                         if (vecList.Count() > 1)
                         {
-                            ptlist.Add(new List<cv.Point3f>(vecList));
-                            xyList.Add(new List<cv.Point>(xyVec));
+                            ptlist.Add(new List<CV.Point3f>(vecList));
+                            xyList.Add(new List<CV.Point>(xyVec));
                         }
                         vecList.Clear();
                         xyVec.Clear();
@@ -48496,14 +48498,14 @@ namespace CS_Classes
             for (int i = 1; i <= task.MaxZmeters; i++)
             {
                 int xmeter = (int)(dst2.Width * i / task.MaxZmeters * distanceRatio);
-                dst2.Line(new cv.Point(xmeter, 0), new cv.Point(xmeter, dst2.Height), Scalar.AliceBlue, 1);
-                SetTrueText(i.ToString() + "m", new cv.Point(xmeter - src.Width / 24, dst2.Height - 10));
+                dst2.Line(new CV.Point(xmeter, 0), new CV.Point(xmeter, dst2.Height), Scalar.AliceBlue, 1);
+                SetTrueText(i.ToString() + "m", new CV.Point(xmeter - src.Width / 24, dst2.Height - 10));
             }
             var cam = task.sideCameraPoint;
             var marker = new Point2f(dst2.Width / (task.MaxZmeters * distanceRatio), 0);
             marker.Y = (float)(marker.X * Math.Tan((task.vFov / 2) * Cv2.PI / 180));
-            var markerLeft = new cv.Point(marker.X, cam.Y - marker.Y);
-            var markerRight = new cv.Point(marker.X, cam.Y + marker.Y);
+            var markerLeft = new CV.Point(marker.X, cam.Y - marker.Y);
+            var markerRight = new CV.Point(marker.X, cam.Y + marker.Y);
             int offset = (int)(Math.Sin(task.accRadians.X) * marker.Y);
             if (task.useGravityPointcloud)
             {
@@ -48517,11 +48519,11 @@ namespace CS_Classes
                     markerLeft.Y += offset;
                     markerRight.Y -= offset;
                 }
-                markerLeft = new cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y);
-                markerLeft = new cv.Point(markerLeft.X * Math.Cos(task.accRadians.Z) - markerLeft.Y * Math.Sin(task.accRadians.Z),
+                markerLeft = new CV.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y);
+                markerLeft = new CV.Point(markerLeft.X * Math.Cos(task.accRadians.Z) - markerLeft.Y * Math.Sin(task.accRadians.Z),
                                         markerLeft.Y * Math.Cos(task.accRadians.Z) + markerLeft.X * Math.Sin(task.accRadians.Z));
-                markerLeft = new cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y);
-                markerRight = new cv.Point((markerRight.X - cam.X) * Math.Cos(task.accRadians.Z) - (markerRight.Y - cam.Y) * Math.Sin(task.accRadians.Z) + cam.X,
+                markerLeft = new CV.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y);
+                markerRight = new CV.Point((markerRight.X - cam.X) * Math.Cos(task.accRadians.Z) - (markerRight.Y - cam.Y) * Math.Sin(task.accRadians.Z) + cam.X,
                                         (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y);
             }
             if (!standaloneTest())
@@ -48531,16 +48533,16 @@ namespace CS_Classes
             }
             float startAngle = (180 - task.vFov) / 2;
             float y = (float)(dst2.Width / Math.Tan(startAngle * Cv2.PI / 180));
-            var fovTop = new cv.Point(dst2.Width, cam.Y - y);
-            var fovBot = new cv.Point(dst2.Width, cam.Y + y);
+            var fovTop = new CV.Point(dst2.Width, cam.Y - y);
+            var fovBot = new CV.Point(dst2.Width, cam.Y + y);
             dst2.Line(cam, fovTop, Scalar.White, 1, task.lineType);
             dst2.Line(cam, fovBot, Scalar.White, 1, task.lineType);
             DrawCircle(dst2, markerLeft, task.DotSize + 3, Scalar.Red);
             DrawCircle(dst2, markerRight, task.DotSize + 3, Scalar.Red);
             dst2.Line(cam, markerLeft, Scalar.Red, 1, task.lineType);
             dst2.Line(cam, markerRight, Scalar.Red, 1, task.lineType);
-            var labelLocation = new cv.Point(src.Width * 0.02, src.Height * 7 / 8);
-            SetTrueText("vFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new cv.Point(4, dst2.Height * 3 / 4));
+            var labelLocation = new CV.Point(src.Width * 0.02, src.Height * 7 / 8);
+            SetTrueText("vFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new CV.Point(4, dst2.Height * 3 / 4));
         }
     }
 
@@ -48565,15 +48567,15 @@ namespace CS_Classes
             for (int i = 1; i <= task.MaxZmeters; i++)
             {
                 int ymeter = (int)(dst2.Height - dst2.Height * i / (task.MaxZmeters * distanceRatio));
-                dst2.Line(new cv.Point(0, ymeter), new cv.Point(dst2.Width, ymeter), Scalar.AliceBlue, 1);
-                SetTrueText(i.ToString() + "m", new cv.Point(10, ymeter));
+                dst2.Line(new CV.Point(0, ymeter), new CV.Point(dst2.Width, ymeter), Scalar.AliceBlue, 1);
+                SetTrueText(i.ToString() + "m", new CV.Point(10, ymeter));
             }
             var cam = task.topCameraPoint;
             var marker = new Point2f(cam.X, dst2.Height / task.MaxZmeters);
             float topLen = (float)(marker.Y * Math.Tan((task.hFov / 2) * Cv2.PI / 180));
             float sideLen = (float)(marker.Y * Math.Tan((task.vFov / 2) * Cv2.PI / 180));
-            var markerLeft = new cv.Point(cam.X - topLen, marker.Y);
-            var markerRight = new cv.Point(cam.X + topLen, marker.Y);
+            var markerLeft = new CV.Point(cam.X - topLen, marker.Y);
+            var markerRight = new CV.Point(cam.X + topLen, marker.Y);
             float offset = (float)Math.Sin(task.accRadians.Z) * topLen;
             if (task.useGravityPointcloud)
             {
@@ -48590,16 +48592,16 @@ namespace CS_Classes
             }
             float startAngle = (180 - task.hFov) / 2;
             float x = (float)(dst2.Height / Math.Tan(startAngle * Cv2.PI / 180));
-            var fovRight = new cv.Point(task.topCameraPoint.X + x, 0);
-            var fovLeft = new cv.Point(task.topCameraPoint.X - x, fovRight.Y);
+            var fovRight = new CV.Point(task.topCameraPoint.X + x, 0);
+            var fovLeft = new CV.Point(task.topCameraPoint.X - x, fovRight.Y);
             dst2.Line(task.topCameraPoint, fovLeft, Scalar.White, 1, task.lineType);
             DrawCircle(dst2, markerLeft, task.DotSize + 3, Scalar.Red);
             DrawCircle(dst2, markerRight, task.DotSize + 3, Scalar.Red);
             dst2.Line(cam, markerLeft, Scalar.Red, 1, task.lineType);
             dst2.Line(cam, markerRight, Scalar.Red, 1, task.lineType);
             float shift = (src.Width - src.Height) / 2;
-            var labelLocation = new cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16);
-            SetTrueText("hFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new cv.Point(4, dst2.Height * 7 / 8));
+            var labelLocation = new CV.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16);
+            SetTrueText("hFOV=" + string.Format("{0:0.0}", 180 - startAngle * 2) + " deg.", new CV.Point(4, dst2.Height * 7 / 8));
             DrawLine(dst2, task.topCameraPoint, fovRight, Scalar.White);
         }
     }
@@ -48623,8 +48625,8 @@ namespace CS_Classes
             Marshal.Copy(task.pcSplit[2].Data, depthBytes, 0, depthBytes.Length);
             var handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned);
             IntPtr imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject(), 0, task.MaxZmeters, task.pcSplit[2].Height, task.pcSplit[2].Width);
-            dst2 = cv.Mat.FromPixelData(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, imagePtr).CvtColor(ColorConversionCodes.GRAY2BGR);
-            dst3 = cv.Mat.FromPixelData(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(ColorConversionCodes.GRAY2BGR);
+            dst2 = CV.Mat.FromPixelData(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, imagePtr).CvtColor(ColorConversionCodes.GRAY2BGR);
+            dst3 = CV.Mat.FromPixelData(task.pcSplit[2].Rows, task.pcSplit[2].Cols, MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(ColorConversionCodes.GRAY2BGR);
             handleDepth.Free();
             labels[2] = "Top View (looking down)";
             labels[3] = "Side View";
@@ -48783,14 +48785,14 @@ namespace CS_Classes
         {
             options.RunVB();
             if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
-            var tmp32f = new Mat(dst2.Size(), MatType.CV_32F, cv.Scalar.All(0));
-            var r1 = new cv.Rect(options.pixels, 0, dst2.Width - options.pixels, dst2.Height);
-            var r2 = new cv.Rect(0, 0, dst2.Width - options.pixels, dst2.Height);
+            var tmp32f = new Mat(dst2.Size(), MatType.CV_32F, CV.Scalar.All(0));
+            var r1 = new CV.Rect(options.pixels, 0, dst2.Width - options.pixels, dst2.Height);
+            var r2 = new CV.Rect(0, 0, dst2.Width - options.pixels, dst2.Height);
             Cv2.Absdiff(src[r1], src[r2], tmp32f[r1]);
             tmp32f = tmp32f.Threshold(options.threshold, 255, ThresholdTypes.BinaryInv);
             dst2 = tmp32f.ConvertScaleAbs(255);
             dst2.SetTo(0, task.noDepthMask);
-            dst2[new cv.Rect(0, dst2.Height - options.pixels, dst2.Width, options.pixels)].SetTo(0);
+            dst2[new CV.Rect(0, dst2.Height - options.pixels, dst2.Width, options.pixels)].SetTo(0);
             labels[2] = "White: z is within " + (options.threshold * 1000).ToString(fmt0) + " mm's with Y pixel offset " + options.pixels.ToString();
         }
     }
@@ -48822,12 +48824,12 @@ namespace CS_Classes
         public PointCloud_PCpointsMask_CS(VBtask task) : base(task)
         {
             setPointCloudGrid();
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi.";
         }
         public void RunCS(Mat src)
         {
-            if (task.optionsChanged) pcPoints = new Mat(task.gridRows, task.gridCols, MatType.CV_32FC3, cv.Scalar.All(0));
+            if (task.optionsChanged) pcPoints = new Mat(task.gridRows, task.gridCols, MatType.CV_32FC3, CV.Scalar.All(0));
             dst2.SetTo(0);
             actualCount = 0;
             float lastMeanZ = 0;
@@ -48842,13 +48844,13 @@ namespace CS_Classes
                     {
                         pcPoints.Set<Point3f>(y, x, new Point3f((float)mean[0], (float)mean[1], (float)mean[2]));
                         actualCount++;
-                        DrawCircle(dst2, new cv.Point(roi.X, roi.Y), (int)(task.DotSize * Math.Max(mean[2], 1)),
+                        DrawCircle(dst2, new CV.Point(roi.X, roi.Y), (int)(task.DotSize * Math.Max(mean[2], 1)),
                                     Scalar.White);
                     }
                     lastMeanZ = (float)mean[2];
                 }
             }
-            labels[2] = "PointCloud cv.Point Points found = " + actualCount.ToString();
+            labels[2] = "PointCloud CV.Point Points found = " + actualCount.ToString();
         }
     }
 
@@ -48866,30 +48868,30 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             int rw = task.gridList[0].Width / 2, rh = task.gridList[0].Height / 2;
-            cv.Scalar red32 = new cv.Scalar(0, 0, 1);
-            cv.Scalar blue32 = new cv.Scalar(1, 0, 0);
-            cv.Scalar white32 = new cv.Scalar(1, 1, 1);
-            cv.Scalar red = Scalar.Red;
-            cv.Scalar blue = Scalar.Blue;
-            cv.Scalar white = Scalar.White;
+            CV.Scalar red32 = new CV.Scalar(0, 0, 1);
+            CV.Scalar blue32 = new CV.Scalar(1, 0, 0);
+            CV.Scalar white32 = new CV.Scalar(1, 1, 1);
+            CV.Scalar red = Scalar.Red;
+            CV.Scalar blue = Scalar.Blue;
+            CV.Scalar white = Scalar.White;
             pcPoints.Clear();
             dst2 = src;
             foreach (var roi in task.gridList)
             {
-                var pt = new cv.Point(roi.X + rw, roi.Y + rh);
+                var pt = new CV.Point(roi.X + rw, roi.Y + rh);
                 var mean = task.pointCloud[roi].Mean(task.depthMask[roi]);
                 if (mean[2] > 0)
                 {
-                    if (pt.Y % 3 == 0) pcPoints.Add(new cv.Point3f((float)red32[0], (float)red32[1], (float)red32[2]));
-                    if (pt.Y % 3 == 1) pcPoints.Add(new cv.Point3f((float)blue32[0], (float)blue32[1], (float)blue32[2]));
-                    if (pt.Y % 3 == 2) pcPoints.Add(new cv.Point3f((float)white32[0], (float)white32[1], (float)white32[2]));
-                    pcPoints.Add(new cv.Point3f((float)mean[0], (float)mean[1], (float)mean[2]));
+                    if (pt.Y % 3 == 0) pcPoints.Add(new CV.Point3f((float)red32[0], (float)red32[1], (float)red32[2]));
+                    if (pt.Y % 3 == 1) pcPoints.Add(new CV.Point3f((float)blue32[0], (float)blue32[1], (float)blue32[2]));
+                    if (pt.Y % 3 == 2) pcPoints.Add(new CV.Point3f((float)white32[0], (float)white32[1], (float)white32[2]));
+                    pcPoints.Add(new CV.Point3f((float)mean[0], (float)mean[1], (float)mean[2]));
                     if (pt.Y % 3 == 0) DrawCircle(dst2, pt, task.DotSize, red);
                     if (pt.Y % 3 == 1) DrawCircle(dst2, pt, task.DotSize, blue);
                     if (pt.Y % 3 == 2) DrawCircle(dst2, pt, task.DotSize, white);
                 }
             }
-            labels[2] = "PointCloud cv.Point Points found = " + (pcPoints.Count() / 2).ToString();
+            labels[2] = "PointCloud CV.Point Points found = " + (pcPoints.Count() / 2).ToString();
         }
     }
 
@@ -48899,9 +48901,9 @@ namespace CS_Classes
     public class PointCloud_PCPointsPlane_CS : CS_Parent
     {
         PointCloud_Basics pcBasics = new PointCloud_Basics();
-        public List<cv.Point3f> pcPoints = new List<cv.Point3f>();
-        public List<cv.Point> xyList = new List<cv.Point>();
-        cv.Point3f white32 = new cv.Point3f(1, 1, 1);
+        public List<CV.Point3f> pcPoints = new List<CV.Point3f>();
+        public List<CV.Point> xyList = new List<CV.Point>();
+        CV.Point3f white32 = new CV.Point3f(1, 1, 1);
         public PointCloud_PCPointsPlane_CS(VBtask task) : base(task)
         {
             setPointCloudGrid();
@@ -48931,7 +48933,7 @@ namespace CS_Classes
     {
         public PointCloud_Inspector_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             task.mouseMovePoint.X = dst2.Width / 2;
             desc = "Inspect x, y, and z values in a row or column";
         }
@@ -48944,7 +48946,7 @@ namespace CS_Classes
             Point2f topPt = new Point2f(cLine, 0);
             Point2f botPt = new Point2f(cLine, dst2.Height);
             dst2 = task.depthRGB;
-            DrawLine(dst2, topPt, botPt, cv.Scalar.All(255));
+            DrawLine(dst2, topPt, botPt, CV.Scalar.All(255));
             double stepY = dst2.Height / yLines;
             SetTrueText("\t   X\t  Y\t  Z", 3);
             for (int i = 1; i < yLines - 1; i++)
@@ -48955,7 +48957,7 @@ namespace CS_Classes
                 Point2f pt = new Point2f(cLine, (float)(i * stepY));
                 Vec3f xyz = task.pointCloud.Get<Vec3f>((int)pt.Y, (int)pt.X);
                 SetTrueText("Row " + i.ToString() + "\t" + xyz[0].ToString(fmt2) + "\t" + xyz[1].ToString(fmt2) +
-                            "\t" + xyz[2].ToString(fmt2), new cv.Point(5, (int)pt.Y), 3);
+                            "\t" + xyz[2].ToString(fmt2), new CV.Point(5, (int)pt.Y), 3);
             }
             labels[2] = "Values displayed are the point cloud X, Y, and Z values for column " + cLine.ToString();
             labels[3] = "Move mouse in the image at left to see the point cloud X, Y, and Z values.";
@@ -48970,7 +48972,7 @@ namespace CS_Classes
         List<Mat> pcHistory = new List<Mat>();
         public PointCloud_Average_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             desc = "Average all 3 elements of the point cloud - not just depth.";
         }
         public void RunCS(Mat src)
@@ -49259,15 +49261,15 @@ namespace CS_Classes
         Options_PolyLines options = new Options_PolyLines();
         public Polylines_IEnumerableExample_CS(VBtask task) : base(task)
         {
-            desc = "Manually create an IEnumerable<IEnumerable<cv.Point>>.";
+            desc = "Manually create an IEnumerable<IEnumerable<CV.Point>>.";
         }
         public void RunCS(Mat src)
         {
             options.RunVB();
             var points = Enumerable.Range(0, options.polyCount).Select(i =>
-                new cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))).ToList();
-            var pts = new List<List<cv.Point>> { points };
-            dst2 = new Mat(src.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                new CV.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))).ToList();
+            var pts = new List<List<CV.Point>> { points };
+            dst2 = new Mat(src.Size(), MatType.CV_8U, CV.Scalar.All(0));
             // NOTE: when there are 2 points, there will be 1 line.
             Cv2.Polylines(dst2, pts, options.polyClosed, Scalar.White, task.lineWidth, task.lineType);
         }
@@ -49293,17 +49295,17 @@ namespace CS_Classes
                 int h = src.Height, w = src.Width;
                 Random autorand = new Random();
                 Point2f[] points2f = new Point2f[10000];
-                var pts = new List<List<cv.Point>>();
-                var points = new List<cv.Point>();
+                var pts = new List<List<CV.Point>>();
+                var points = new List<CV.Point>();
                 points2f[0] = new Point2f((float)(autorand.NextDouble() - 0.5), (float)(autorand.NextDouble() - 0.5));
                 for (int i = 1; i < points2f.Length; i++)
                 {
                     points2f[i] = new Point2f((float)(autorand.NextDouble() - 0.5 + points2f[i - 1].X),
                                                 (float)(autorand.NextDouble() - 0.5 + points2f[i - 1].Y));
-                    points.Add(new cv.Point((int)(points2f[i].X * 10 + w / 2), (int)(points2f[i].Y * 10 + h / 2)));
+                    points.Add(new CV.Point((int)(points2f[i].X * 10 + w / 2), (int)(points2f[i].Y * 10 + h / 2)));
                 }
                 pts.Add(points);
-                dst2 = new Mat(src.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                dst2 = new Mat(src.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 Cv2.Polylines(dst2, pts, false, Scalar.White, task.lineWidth, task.lineType);
                 dst2 = dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
             }
@@ -49323,22 +49325,22 @@ namespace CS_Classes
         int numSquaresY;
         const int DAY_COLOR = 1, DAY_BALL_COLOR = 2, NIGHT_COLOR = 3, NIGHT_BALL_COLOR = 4;
         int[,] squares;
-        cv.Point p1;
+        CV.Point p1;
         Point2f d1;
-        cv.Point p2;
+        CV.Point p2;
         Point2f d2;
         int iteration = 0;
-        cv.Point p1Last = new cv.Point();
-        cv.Point p2Last = new cv.Point();
+        CV.Point p1Last = new CV.Point();
+        CV.Point p2Last = new CV.Point();
         public PongWars_Basics_CS(VBtask task) : base(task)
         {
             sqHeight = 25 * task.WorkingRes.Height / task.WorkingRes.Width;
             numSquaresX = task.WorkingRes.Width / sqWidth;
             numSquaresY = task.WorkingRes.Height / sqHeight;
             squares = new int[numSquaresX, numSquaresY];
-            p1 = new cv.Point(task.WorkingRes.Width / 4, task.WorkingRes.Height / 2);
+            p1 = new CV.Point(task.WorkingRes.Width / 4, task.WorkingRes.Height / 2);
             d1 = new Point2f(12.5f, -12.5f);
-            p2 = new cv.Point((task.WorkingRes.Width / 4) * 3, task.WorkingRes.Height / 2);
+            p2 = new CV.Point((task.WorkingRes.Width / 4) * 3, task.WorkingRes.Height / 2);
             d2 = new Point2f(-12.5f, 12.5f);
             for (int i = 0; i < numSquaresX; i++)
             {
@@ -49347,12 +49349,12 @@ namespace CS_Classes
                     squares[i, j] = (i < numSquaresX / 2) ? DAY_COLOR : NIGHT_COLOR;
                 }
             }
-            p1 = new cv.Point(msRNG.Next(0, dst2.Width / 4), msRNG.Next(0, dst2.Height / 2));
-            p2 = new cv.Point(msRNG.Next(dst2.Width / 2, dst2.Width), msRNG.Next(dst2.Height / 4, dst2.Height));
+            p1 = new CV.Point(msRNG.Next(0, dst2.Width / 4), msRNG.Next(0, dst2.Height / 2));
+            p2 = new CV.Point(msRNG.Next(dst2.Width / 2, dst2.Width), msRNG.Next(dst2.Height / 4, dst2.Height));
             UpdateAdvice(traceName + ": <place advice here on any options that are useful>");
             desc = "Pong as war between the forces of light and darkness.";
         }
-        Point2f UpdateSquareAndBounce(cv.Point pt, Point2f dxy, int sqClass)
+        Point2f UpdateSquareAndBounce(CV.Point pt, Point2f dxy, int sqClass)
         {
             for (double angle = 0; angle <= Math.PI * 2; angle += Math.PI / 4)
             {
@@ -49378,7 +49380,7 @@ namespace CS_Classes
             }
             return dxy;
         }
-        Point2f CheckBoundaryCollision(cv.Point pt, Point2f dxy)
+        Point2f CheckBoundaryCollision(CV.Point pt, Point2f dxy)
         {
             if (pt.X + dxy.X > dst2.Width - sqWidth / 2 || pt.X + dxy.X < sqWidth / 2) dxy.X = -dxy.X;
             if (pt.Y + dxy.Y > dst2.Height - sqHeight / 2 || pt.Y + dxy.Y < sqHeight / 2) dxy.Y = -dxy.Y;
@@ -49419,9 +49421,9 @@ namespace CS_Classes
             p1.Y += (int)d1.Y;
             p2.X += (int)d2.X;
             p2.Y += (int)d2.Y;
-            if (p1Last == p1) p1 = new cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2));
+            if (p1Last == p1) p1 = new CV.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2));
             p1Last = p1;
-            if (p2Last == p2) p2 = new cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2));
+            if (p2Last == p2) p2 = new CV.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2));
             p2Last = p2;
             UpdateScoreElement();
             dst2.SetTo(0);
@@ -49429,14 +49431,14 @@ namespace CS_Classes
             {
                 for (int j = 0; j < numSquaresY; j++)
                 {
-                    var rect = new cv.Rect(i * sqWidth, j * sqHeight, sqWidth, sqHeight);
+                    var rect = new CV.Rect(i * sqWidth, j * sqHeight, sqWidth, sqHeight);
                     int index = squares[i, j];
                     dst2.Rectangle(rect, task.scalarColors[index], -1);
                 }
             }
-            var pt = new cv.Point((int)(p1.X - sqWidth / 2), (int)(p1.Y - sqHeight / 2));
+            var pt = new CV.Point((int)(p1.X - sqWidth / 2), (int)(p1.Y - sqHeight / 2));
             DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors[DAY_BALL_COLOR]);
-            pt = new cv.Point((int)(p2.X - sqWidth / 2), (int)(p2.Y - sqHeight / 2));
+            pt = new CV.Point((int)(p2.X - sqWidth / 2), (int)(p2.Y - sqHeight / 2));
             DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors[NIGHT_BALL_COLOR]);
         }
     }
@@ -49509,7 +49511,7 @@ namespace CS_Classes
                     }
                 }
                 if (terminateConsumer) break;
-                cv.Cv2.WaitKey();
+                CV.Cv2.WaitKey();
             }
         }
         void Producer()
@@ -49528,7 +49530,7 @@ namespace CS_Classes
                     }
                 }
                 if (terminateProducer) break;
-                cv.Cv2.WaitKey();
+                CV.Cv2.WaitKey();
             }
         }
         public void RunCS(Mat src)
@@ -49615,9 +49617,9 @@ namespace CS_Classes
                                                         "   Bottom (white)", "   Front (yellow)", "   Back (blue)" };
         public List<Scalar> cornerColors = new List<Scalar> { Scalar.White, Scalar.LightBlue, Scalar.Red, Scalar.Green,
                                                             Scalar.White, Scalar.Yellow, Scalar.Blue };
-        public List<cv.Point3f> corners3D = new List<cv.Point3f>();
-        public List<cv.Point> corners = new List<cv.Point>();
-        public List<cv.Point> cornersRaw = new List<cv.Point>();
+        public List<CV.Point3f> corners3D = new List<CV.Point3f>();
+        public List<CV.Point> corners = new List<CV.Point>();
+        public List<CV.Point> cornersRaw = new List<CV.Point>();
         public RedCloud_Basics redC = new RedCloud_Basics();
         public Profile_Basics_CS(VBtask task) : base(task)
         {
@@ -49646,11 +49648,11 @@ namespace CS_Classes
             var sortFront = new SortedList<int, int>(new compareAllowIdenticalInteger());
             var sort2Dleft = new SortedList<int, int>(new compareAllowIdenticalInteger());
             var sort2Dtop = new SortedList<int, int>(new compareAllowIdenticalInteger());
-            rc.contour3D = new List<cv.Point3f>();
+            rc.contour3D = new List<CV.Point3f>();
             for (int i = 0; i < rc.contour.Count(); i++)
             {
                 var pt = rc.contour[i];
-                var vec = task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X);
+                var vec = task.pointCloud[rc.rect].Get<CV.Point3f>(pt.Y, pt.X);
                 if (float.IsNaN(vec.Z) || float.IsInfinity(vec.Z)) continue;
                 if (vec.Z > 0)
                 {
@@ -49673,9 +49675,9 @@ namespace CS_Classes
             corners3D.Clear();
             corners.Clear();
             cornersRaw.Clear();
-            corners.Add(new cv.Point(rc.rect.X + rc.contour[0].X, rc.rect.Y + rc.contour[0].Y)); // show the first contour point...
+            corners.Add(new CV.Point(rc.rect.X + rc.contour[0].X, rc.rect.Y + rc.contour[0].Y)); // show the first contour point...
             cornersRaw.Add(rc.contour[0]); // show the first contour point...
-            corners3D.Add(task.pointCloud.Get<cv.Point3f>(rc.rect.Y + rc.contour[0].Y, rc.rect.X + rc.contour[0].X));
+            corners3D.Add(task.pointCloud.Get<CV.Point3f>(rc.rect.Y + rc.contour[0].Y, rc.rect.X + rc.contour[0].X));
             for (int i = 0; i < 6; i++)
             {
                 int index = 0;
@@ -49692,8 +49694,8 @@ namespace CS_Classes
                 {
                     var pt = rc.contour[ptList.ElementAt(index).Value];
                     cornersRaw.Add(pt);
-                    corners.Add(new cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y));
-                    corners3D.Add(task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X));
+                    corners.Add(new CV.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y));
+                    corners3D.Add(task.pointCloud[rc.rect].Get<CV.Point3f>(pt.Y, pt.X));
                 }
             }
             for (int i = 0; i < corners.Count(); i++)
@@ -49786,8 +49788,8 @@ namespace CS_Classes
                 for (int i = 0; i < rc.contour.Count(); i++)
                 {
                     var pt = rc.contour[i];
-                    var vec = task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X);
-                    pt = new cv.Point(pt.X * rsizeX + offset, pt.Y * rsizeY + offset);
+                    var vec = task.pointCloud[rc.rect].Get<CV.Point3f>(pt.Y, pt.X);
+                    pt = new CV.Point(pt.X * rsizeX + offset, pt.Y * rsizeY + offset);
                     float t = (rc.maxVec.Z == 0) ? 0 : (vec.Z - rc.minVec.Z) / (rc.maxVec.Z - rc.minVec.Z);
                     if (vec.Z > 0 && t > 0)
                     {
@@ -49878,7 +49880,7 @@ namespace CS_Classes
                 SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1);
                 return;
             }
-            var vecMat = cv.Mat.FromPixelData(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
+            var vecMat = CV.Mat.FromPixelData(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
             ySlider.Value += 1;
             rotate.Run(empty);
             Mat output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix);  // <<< this is the XYZ-axis rotation...
@@ -49921,7 +49923,7 @@ namespace CS_Classes
         HeatMap_Basics heat = new HeatMap_Basics();
         public Profile_OpenGL_CS(VBtask task) : base(task)
         {
-            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             if (standaloneTest()) task.gOptions.setGravityUsage(false);
             task.ogl.options.PointSizeSlider.Value = 10;
             task.ogl.oglFunction = (int)oCase.pcPointsAlone;
@@ -49935,7 +49937,7 @@ namespace CS_Classes
             var rc = task.rc;
             if (rc.contour3D.Count() > 0)
             {
-                Mat vecMat = cv.Mat.FromPixelData(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
+                Mat vecMat = CV.Mat.FromPixelData(rc.contour3D.Count(), 1, MatType.CV_32FC3, rc.contour3D.ToArray());
                 rotate.Run(empty);
                 Mat output = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix;  // <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
                 task.ogl.dataInput = output.Reshape(3, vecMat.Rows);
@@ -49982,7 +49984,7 @@ namespace CS_Classes
                 DrawContour(dst3[rc.rect], rc.contour, Scalar.Yellow);
                 for (int i = 0; i < sides.corners.Count(); i++)
                 {
-                    var pt = new cv.Point((int)kalman.kOutput[i * 2], (int)kalman.kOutput[i * 2 + 1]);
+                    var pt = new CV.Point((int)kalman.kOutput[i * 2], (int)kalman.kOutput[i * 2 + 1]);
                     DrawCircle(dst3, pt, task.DotSize + 2, sides.cornerColors[i]);
                 }
             }
@@ -49996,8 +49998,8 @@ namespace CS_Classes
 
     public class Puzzle_Basics_CS : CS_Parent
     {
-        public List<cv.Rect> scrambled = new List<cv.Rect>(); // this is every roi regardless of size.
-        public List<cv.Rect> unscrambled = new List<cv.Rect>(); // this is every roi regardless of size.
+        public List<CV.Rect> scrambled = new List<CV.Rect>(); // this is every roi regardless of size.
+        public List<CV.Rect> unscrambled = new List<CV.Rect>(); // this is every roi regardless of size.
         public Mat image = new Mat();
         public Puzzle_Basics_CS(VBtask task) : base(task)
         {
@@ -50011,7 +50013,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             unscrambled.Clear();
-            List<cv.Rect> inputROI = new List<cv.Rect>();
+            List<CV.Rect> inputROI = new List<CV.Rect>();
             for (int j = 0; j < task.gridList.Count(); j++)
             {
                 var roi = task.gridList[j];
@@ -50038,7 +50040,7 @@ namespace CS_Classes
     public class Puzzle_Solver_CS : CS_Parent
     {
         public Puzzle_Basics puzzle = new Puzzle_Basics();
-        List<cv.Rect> solution = new List<cv.Rect>();
+        List<CV.Rect> solution = new List<CV.Rect>();
         Match_Basics match = new Match_Basics();
         public Mat grayMat;
         int puzzleIndex;
@@ -50057,7 +50059,7 @@ namespace CS_Classes
                 puzzle.Run(src);
                 dst2 = puzzle.dst2;
                 dst3.SetTo(0);
-                grayMat = puzzle.image.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                grayMat = puzzle.image.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
                 puzzleIndex = 0;
             }
             if (puzzle.scrambled.Count() > puzzle.unscrambled.Count())
@@ -50066,7 +50068,7 @@ namespace CS_Classes
                 var rect = puzzle.scrambled[puzzleIndex];
                 match.template = grayMat[rect];
                 match.Run(grayMat);
-                var bestRect = ValidateRect(new cv.Rect(match.matchCenter.X, match.matchCenter.Y, rect.Width, rect.Height));
+                var bestRect = ValidateRect(new CV.Rect(match.matchCenter.X, match.matchCenter.Y, rect.Width, rect.Height));
                 puzzle.unscrambled.Add(bestRect);
                 puzzleIndex++;
                 dst3[bestRect] = puzzle.image[bestRect];
@@ -50089,7 +50091,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             puzzle.puzzle.image = src.Clone();
-            puzzle.grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            puzzle.grayMat = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             puzzle.Run(src);
             dst2 = puzzle.dst2;
             dst3 = puzzle.dst3;
@@ -50113,14 +50115,14 @@ namespace CS_Classes
             {
                 if (options.zoom < 0)
                 {
-                    var tmp = src.PyrDown(new cv.Size(src.Cols / 2, src.Rows / 2));
-                    var roi = new cv.Rect((src.Cols - tmp.Cols) / 2, (src.Rows - tmp.Rows) / 2, tmp.Width, tmp.Height);
+                    var tmp = src.PyrDown(new CV.Size(src.Cols / 2, src.Rows / 2));
+                    var roi = new CV.Rect((src.Cols - tmp.Cols) / 2, (src.Rows - tmp.Rows) / 2, tmp.Width, tmp.Height);
                     dst2[roi] = tmp;
                 }
                 else
                 {
-                    var tmp = src.PyrUp(new cv.Size(src.Cols * 2, src.Rows * 2));
-                    var roi = new cv.Rect((tmp.Cols - src.Cols) / 2, (tmp.Rows - src.Rows) / 2, src.Width, src.Height);
+                    var tmp = src.PyrUp(new CV.Size(src.Cols * 2, src.Rows * 2));
+                    var roi = new CV.Rect((tmp.Cols - src.Cols) / 2, (tmp.Rows - src.Rows) / 2, src.Width, src.Height);
                     dst2 = tmp[roi];
                 }
             }
@@ -50468,8 +50470,8 @@ namespace CS_Classes
             if (fileInfo.Exists) qrInput2 = Cv2.ImRead(fileInfo.FullName);
             if (dst2.Width < 480) // for the smallest configurations the default size can be too big!
             {
-                qrInput1 = qrInput1.Resize(new cv.Size(120, 160));
-                qrInput2 = qrInput2.Resize(new cv.Size(120, 160));
+                qrInput1 = qrInput1.Resize(new CV.Size(120, 160));
+                qrInput2 = qrInput2.Resize(new CV.Size(120, 160));
             }
             desc = "Read a QR code";
         }
@@ -50484,12 +50486,12 @@ namespace CS_Classes
             var y = msRNG.Next(0, src.Height - Math.Max(qrInput1.Height, qrInput2.Height));
             if ((task.frameCount / 50) % 2 == 0)
             {
-                var roi = new cv.Rect(x, y, qrInput1.Width, qrInput1.Height);
+                var roi = new CV.Rect(x, y, qrInput1.Width, qrInput1.Height);
                 src[roi] = qrInput1;
             }
             else
             {
-                var roi = new cv.Rect(x, y, qrInput2.Width, qrInput2.Height);
+                var roi = new CV.Rect(x, y, qrInput2.Width, qrInput2.Height);
                 src[roi] = qrInput2;
             }
             Point2f[] box;
@@ -50509,35 +50511,35 @@ namespace CS_Classes
 
     public class Quadrant_Basics_CS : CS_Parent
     {
-        cv.Point p1 = new cv.Point();
-        cv.Point p2;
-        cv.Point p3;
-        cv.Point p4;
-        cv.Rect rect = new cv.Rect();
+        CV.Point p1 = new CV.Point();
+        CV.Point p2;
+        CV.Point p3;
+        CV.Point p4;
+        CV.Rect rect = new CV.Rect();
         Mat mask = new Mat();
         public Quadrant_Basics_CS(VBtask task) : base(task)
         {
-            p2 = new cv.Point(dst2.Width - 1, 0);
-            p3 = new cv.Point(0, dst2.Height - 1);
-            p4 = new cv.Point(dst2.Width - 1, dst2.Height - 1);
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            p2 = new CV.Point(dst2.Width - 1, 0);
+            p3 = new CV.Point(0, dst2.Height - 1);
+            p4 = new CV.Point(dst2.Width - 1, dst2.Height - 1);
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels[2] = "dst1 contains a map defining the quadrant value for each pixel";
             desc = "Divide the color and depth images into 4 quadrants based on the horizon and gravity vectors";
         }
         public void RunCS(Mat src)
         {
             dst1.SetTo(0);
-            DrawLine(dst1, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.All(255), 1);
-            DrawLine(dst1, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.All(255), 1);
+            DrawLine(dst1, task.gravityVec.p1, task.gravityVec.p2, CV.Scalar.All(255), 1);
+            DrawLine(dst1, task.horizonVec.p1, task.horizonVec.p2, CV.Scalar.All(255), 1);
             var flags = FloodFillFlags.FixedRange | (FloodFillFlags)(255 << 8);
             if (dst1.At<byte>(p1.Y, p1.X) == 0) 
-                Cv2.FloodFill(dst1, new Mat(), p1, cv.Scalar.All(1 * 255 / 4), out rect, cv.Scalar.All(0), cv.Scalar.All(0), flags);
+                Cv2.FloodFill(dst1, new Mat(), p1, CV.Scalar.All(1 * 255 / 4), out rect, CV.Scalar.All(0), CV.Scalar.All(0), flags);
             if (dst1.At<byte>(p2.Y, p2.X) == 0) 
-                Cv2.FloodFill(dst1, new Mat(), p2, cv.Scalar.All(2 * 255 / 4), out rect, cv.Scalar.All(0), cv.Scalar.All(0), flags);
+                Cv2.FloodFill(dst1, new Mat(), p2, CV.Scalar.All(2 * 255 / 4), out rect, CV.Scalar.All(0), CV.Scalar.All(0), flags);
             if (dst1.At<byte>(p3.Y, p3.X) == 0) 
-                Cv2.FloodFill(dst1, new Mat(), p3, cv.Scalar.All(3 * 255 / 4), out rect, cv.Scalar.All(0), cv.Scalar.All(0), flags);
+                Cv2.FloodFill(dst1, new Mat(), p3, CV.Scalar.All(3 * 255 / 4), out rect, CV.Scalar.All(0), CV.Scalar.All(0), flags);
             if (dst1.At<byte>(p4.Y, p4.X) == 0) 
-                Cv2.FloodFill(dst1, new Mat(), p4, cv.Scalar.All(4 * 255 / 4), out rect, cv.Scalar.All(0), cv.Scalar.All(0), flags);
+                Cv2.FloodFill(dst1, new Mat(), p4, CV.Scalar.All(4 * 255 / 4), out rect, CV.Scalar.All(0), CV.Scalar.All(0), flags);
             dst2 = ShowPalette(dst1);
         }
     }
@@ -50630,14 +50632,14 @@ namespace CS_Classes
 
     public class Random_Basics_CS : CS_Parent
     {
-        public List<cv.Point2f> PointList = new List<cv.Point2f>();
-        public List<cv.Point2d> PointList2d = new List<cv.Point2d>();
-        public cv.Rect range;
+        public List<CV.Point2f> PointList = new List<CV.Point2f>();
+        public List<CV.Point2d> PointList2d = new List<CV.Point2d>();
+        public CV.Rect range;
         public Options_Random options = new Options_Random();
 
         public Random_Basics_CS(VBtask task) : base(task)
         {
-            range = new cv.Rect(0, 0, dst2.Cols, dst2.Rows);
+            range = new CV.Rect(0, 0, dst2.Cols, dst2.Rows);
             desc = "Create a uniform random mask with a specified number of pixels.";
         }
 
@@ -50652,9 +50654,9 @@ namespace CS_Classes
                 Random msRNG = new Random();
                 while (PointList.Count < sizeRequest)
                 {
-                    PointList.Add(new cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
+                    PointList.Add(new CV.Point2f(msRNG.Next(range.X, range.X + range.Width),
                                                  msRNG.Next(range.Y, range.Y + range.Height)));
-                    PointList2d.Add(new cv.Point2d(msRNG.Next(range.X, range.X + range.Width),
+                    PointList2d.Add(new CV.Point2d(msRNG.Next(range.X, range.X + range.Width),
                                                    msRNG.Next(range.Y, range.Y + range.Height)));
                 }
                 if (standaloneTest())
@@ -50674,12 +50676,12 @@ namespace CS_Classes
 
     public class Random_Point2d_CS : CS_Parent
     {
-        public List<cv.Point2d> PointList { get; } = new List<cv.Point2d>();
-        public cv.Rect range;
+        public List<CV.Point2d> PointList { get; } = new List<CV.Point2d>();
+        public CV.Rect range;
         Options_Random options = new Options_Random();
         public Random_Point2d_CS(VBtask task) : base(task)
         {
-            range = new cv.Rect(0, 0, dst2.Cols, dst2.Rows);
+            range = new CV.Rect(0, 0, dst2.Cols, dst2.Rows);
             desc = "Create a uniform random mask with a specificied number of pixels.";
         }
         public void RunCS(Mat src)
@@ -50697,7 +50699,7 @@ namespace CS_Classes
                     dst2.SetTo(0);
                     foreach (var pt in PointList)
                     {
-                        DrawCircle(dst2, new cv.Point2f((float)pt.X, (float)pt.Y), task.DotSize, Scalar.Yellow, -1);
+                        DrawCircle(dst2, new CV.Point2f((float)pt.X, (float)pt.Y), task.DotSize, Scalar.Yellow, -1);
                     }
                 }
             }
@@ -50736,7 +50738,7 @@ namespace CS_Classes
     {
         public Point3f[] Points3f;
         Options_Random options = new Options_Random();
-        public List<cv.Point3f> PointList { get; } = new List<cv.Point3f>();
+        public List<CV.Point3f> PointList { get; } = new List<CV.Point3f>();
         public float[] ranges;
         public Random_Basics3D_CS(VBtask task) : base(task)
         {
@@ -50848,7 +50850,7 @@ namespace CS_Classes
             if (task.heartBeat || task.frameCount < 10)
             {
                 random.Run(empty);
-                lutMat = new Mat(new cv.Size(1, 256), MatType.CV_8UC3, cv.Scalar.All(0));
+                lutMat = new Mat(new CV.Size(1, 256), MatType.CV_8UC3, CV.Scalar.All(0));
                 int lutIndex = 0;
                 km.Run(src);
                 dst2 = km.dst2;
@@ -50876,7 +50878,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             Cv2.Randu(dst2, minVal, maxVal);
         }
     }
@@ -50998,7 +51000,7 @@ namespace CS_Classes
             byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
             IntPtr imagePtr = Random_PatternGenerator_Run(cPtr, src.Rows, src.Cols);
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
         }
         public void Close()
         {
@@ -51012,13 +51014,13 @@ namespace CS_Classes
     public class Random_CustomDistribution_CS : CS_Parent
     {
         public Mat inputCDF; // place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
-        public Mat outputRandom = new Mat(10000, 1, MatType.CV_32S, cv.Scalar.All(0)); // allocate the desired number of random numbers - size can be just one to get the next random value
+        public Mat outputRandom = new Mat(10000, 1, MatType.CV_32S, CV.Scalar.All(0)); // allocate the desired number of random numbers - size can be just one to get the next random value
         public Mat outputHistogram;
         public Plot_Histogram plot = new Plot_Histogram();
         public Random_CustomDistribution_CS(VBtask task) : base(task)
         {
             float[] loadedDice = { 1, 3, 0.5f, 0.5f, 0.75f, 0.25f };
-            inputCDF = cv.Mat.FromPixelData(loadedDice.Length, 1, MatType.CV_32F, loadedDice);
+            inputCDF = CV.Mat.FromPixelData(loadedDice.Length, 1, MatType.CV_32F, loadedDice);
             desc = "Create a custom random number distribution from any histogram";
         }
         public void RunCS(Mat src)
@@ -51032,7 +51034,7 @@ namespace CS_Classes
                     inputCDF.Set<float>(i, 0, inputCDF.At<float>(i - 1, 0) + inputCDF.At<float>(i, 0));
                 }
             }
-            outputHistogram = new Mat(inputCDF.Size(), MatType.CV_32F, cv.Scalar.All(0));
+            outputHistogram = new Mat(inputCDF.Size(), MatType.CV_32F, CV.Scalar.All(0));
             int size = outputHistogram.Rows;
             for (int i = 0; i < outputRandom.Rows; i++)
             {
@@ -51059,7 +51061,7 @@ namespace CS_Classes
     {
         public Plot_Histogram plot = new Plot_Histogram();
         Options_MonteCarlo options = new Options_MonteCarlo();
-        public Mat outputRandom = new Mat(new cv.Size(1, 4000), MatType.CV_32S, cv.Scalar.All(0)); // allocate the desired number of random numbers - size can be just one to get the next random value
+        public Mat outputRandom = new Mat(new CV.Size(1, 4000), MatType.CV_32S, CV.Scalar.All(0)); // allocate the desired number of random numbers - size can be just one to get the next random value
         public Random_MonteCarlo_CS(VBtask task) : base(task)
         {
             plot.maxValue = 100;
@@ -51068,7 +51070,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            Mat histogram = new Mat(options.dimension, 1, MatType.CV_32F, cv.Scalar.All(0));
+            Mat histogram = new Mat(options.dimension, 1, MatType.CV_32F, CV.Scalar.All(0));
             for (int i = 0; i < outputRandom.Rows; i++)
             {
                 while (true)
@@ -51102,7 +51104,7 @@ namespace CS_Classes
         public Mat saveHist;
         public Random_CustomHistogram_CS(VBtask task) : base(task)
         {
-            random.outputRandom = new Mat(1000, 1, MatType.CV_32S, cv.Scalar.All(0));
+            random.outputRandom = new Mat(1000, 1, MatType.CV_32S, CV.Scalar.All(0));
             labels[2] = "Histogram of the grayscale image";
             labels[3] = "Custom random distribution that reflects dst2 image";
             desc = "Create a random number distribution that reflects histogram of a grayscale image";
@@ -51133,7 +51135,7 @@ namespace CS_Classes
         Options_StaticTV options = new Options_StaticTV();
         public Random_StaticTV_CS(VBtask task) : base(task)
         {
-            task.drawRect = new cv.Rect(10, 10, 50, 50);
+            task.drawRect = new CV.Rect(10, 10, 50, 50);
             labels[2] = "Draw anywhere to select a test region";
             labels[3] = "Resized selection rectangle in dst2";
             desc = "Imitate an old TV appearance using randomness.";
@@ -51181,7 +51183,7 @@ namespace CS_Classes
             random.Run(src);
             mats.mat[0] = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, ThresholdTypes.Binary);
             Mat nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, ThresholdTypes.BinaryInv);
-            Mat valMat = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            Mat valMat = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             Cv2.Randu(valMat, 0, valSlider.Value);
             valMat.SetTo(0, nochangeMask);
             random.Run(src);
@@ -51237,13 +51239,13 @@ namespace CS_Classes
     {
         Random_Basics random = new Random_Basics();
         Kalman_Basics kalman = new Kalman_Basics();
-        List<cv.Point2f> targetSet = new List<cv.Point2f>();
-        List<cv.Point2f> currSet = new List<cv.Point2f>();
+        List<CV.Point2f> targetSet = new List<CV.Point2f>();
+        List<CV.Point2f> currSet = new List<CV.Point2f>();
         bool refreshPoints = true;
         public Random_KalmanPoints_CS(VBtask task) : base(task)
         {
             var offset = dst2.Width / 5;
-            random.range = new cv.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2));
+            random.range = new CV.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2));
             FindSlider("Random Pixel Count").Value = 10;
             desc = "Smoothly transition a random point from location to location.";
         }
@@ -51252,8 +51254,8 @@ namespace CS_Classes
             if (refreshPoints)
             {
                 random.Run(empty);
-                targetSet = new List<cv.Point2f>(random.PointList);
-                currSet = new List<cv.Point2f>(random.PointList); // just to get the updated size
+                targetSet = new List<CV.Point2f>(random.PointList);
+                currSet = new List<CV.Point2f>(random.PointList); // just to get the updated size
                 refreshPoints = false;
                 if (targetSet.Count() * 2 != kalman.kInput.Length)
                     Array.Resize(ref kalman.kInput, targetSet.Count() * 2);
@@ -51267,7 +51269,7 @@ namespace CS_Classes
             kalman.Run(src);
             for (int i = 0; i < kalman.kOutput.Count(); i += 2)
             {
-                currSet[i / 2] = new cv.Point(kalman.kOutput[i], kalman.kOutput[i + 1]);
+                currSet[i / 2] = new CV.Point(kalman.kOutput[i], kalman.kOutput[i + 1]);
             }
             dst2.SetTo(0);
             for (int i = 0; i < currSet.Count(); i++)
@@ -51292,7 +51294,7 @@ namespace CS_Classes
     public class Random_Clusters_CS : CS_Parent
     {
         public List<List<int>> clusterLabels = new List<List<int>>();
-        public List<List<cv.Point2f>> clusters = new List<List<cv.Point2f>>();
+        public List<List<CV.Point2f>> clusters = new List<List<CV.Point2f>>();
         Options_Clusters options = new Options_Clusters();
         public Random_Clusters_CS(VBtask task) : base(task)
         {
@@ -51313,12 +51315,12 @@ namespace CS_Classes
             for (int i = 0; i < options.numClusters; i++)
             {
                 var mean = new Scalar(msRNG.Next(dst2.Width / 8, dst2.Width * 7 / 8), msRNG.Next(dst2.Height / 8, dst2.Height * 7 / 8), 0);
-                var cList = new List<cv.Point2f>();
+                var cList = new List<CV.Point2f>();
                 var labelList = new List<int>();
                 for (int j = 0; j < options.numPoints; j++)
                 {
                     Cv2.Randn(ptMat, mean, Scalar.All(options.stdev));
-                    var pt = ptMat.Get<cv.Point2f>(0, 0);
+                    var pt = ptMat.Get<CV.Point2f>(0, 0);
                     if (pt.X < 0) pt.X = 0;
                     if (pt.X >= dst2.Width) pt.X = dst2.Width - 1;
                     if (pt.Y < 0) pt.Y = 0;
@@ -51338,7 +51340,7 @@ namespace CS_Classes
 
     public class Rectangle_Basics_CS : CS_Parent
     {
-        public List<cv.Rect> rectangles = new List<cv.Rect>();
+        public List<CV.Rect> rectangles = new List<CV.Rect>();
         public List<RotatedRect> rotatedRectangles = new List<RotatedRect>();
         public Options_Draw options = new Options_Draw();
         public Rectangle_Basics_CS(VBtask task) : base(task)
@@ -51362,7 +51364,7 @@ namespace CS_Classes
                     var angle = 180.0f * (float)(msRNG.Next(0, 1000) / 1000.0);
                     var nextColor = new Scalar(task.vecColors[i][0], task.vecColors[i][1], task.vecColors[i][2]);
                     var rr = new RotatedRect(nPoint, eSize, angle);
-                    var r = new cv.Rect((int)nPoint.X, (int)nPoint.Y, width, height);
+                    var r = new CV.Rect((int)nPoint.X, (int)nPoint.Y, width, height);
                     if (options.drawRotated)
                     {
                         DrawRotatedRect(rr, dst2, nextColor);
@@ -51401,9 +51403,9 @@ namespace CS_Classes
 
     public class Rectangle_Overlap_CS : CS_Parent
     {
-        public cv.Rect rect1;
-        public cv.Rect rect2;
-        public cv.Rect enclosingRect;
+        public CV.Rect rect1;
+        public CV.Rect rect2;
+        public CV.Rect enclosingRect;
         Rectangle_Basics draw = new Rectangle_Basics();
         public Rectangle_Overlap_CS(VBtask task) : base(task)
         {
@@ -51433,7 +51435,7 @@ namespace CS_Classes
                 rect1 = draw.rectangles[0];
                 rect2 = draw.rectangles[1];
             }
-            enclosingRect = new cv.Rect();
+            enclosingRect = new CV.Rect();
             if (rect1.IntersectsWith(rect2))
             {
                 enclosingRect = rect1.Union(rect2);
@@ -51457,8 +51459,8 @@ namespace CS_Classes
     public class Rectangle_Union_CS : CS_Parent
     {
         Rectangle_Basics draw = new Rectangle_Basics();
-        public List<cv.Rect> inputRects = new List<cv.Rect>();
-        public cv.Rect allRect; // a rectangle covering all the input
+        public List<CV.Rect> inputRects = new List<CV.Rect>();
+        public CV.Rect allRect; // a rectangle covering all the input
         public Rectangle_Union_CS(VBtask task) : base(task)
         {
             desc = "Create a rectangle that contains all the input rectangles";
@@ -51474,7 +51476,7 @@ namespace CS_Classes
                 labels[2] = "Input rectangles = " + draw.rectangles.Count();
                 draw.Run(src);
                 dst2 = draw.dst2;
-                inputRects = new List<cv.Rect>(draw.rectangles);
+                inputRects = new List<CV.Rect>(draw.rectangles);
             }
             else
             {
@@ -51510,8 +51512,8 @@ namespace CS_Classes
 
     public class Rectangle_MultiOverlap_CS : CS_Parent
     {
-        public List<cv.Rect> inputRects = new List<cv.Rect>();
-        public List<cv.Rect> outputRects = new List<cv.Rect>();
+        public List<CV.Rect> inputRects = new List<CV.Rect>();
+        public List<CV.Rect> outputRects = new List<CV.Rect>();
         Rectangle_Basics draw = new Rectangle_Basics();
         System.Windows.Forms.CheckBox rotatedCheck;
         TrackBar countSlider;
@@ -51574,7 +51576,7 @@ namespace CS_Classes
 
     public class Rectangle_EnclosingPoints_CS : CS_Parent
     {
-        public List<cv.Point2f> pointList = new List<cv.Point2f>();
+        public List<CV.Point2f> pointList = new List<CV.Point2f>();
         public Rectangle_EnclosingPoints_CS(VBtask task) : base(task)
         {
             desc = "Build an enclosing rectangle for the supplied pointlist";
@@ -51600,10 +51602,10 @@ namespace CS_Classes
 
     public class Rectangle_Intersection_CS : CS_Parent
     {
-        public List<cv.Rect> inputRects = new List<cv.Rect>();
+        public List<CV.Rect> inputRects = new List<CV.Rect>();
         Rectangle_Basics draw = new Rectangle_Basics();
-        public List<cv.Rect> enclosingRects = new List<cv.Rect>();
-        List<cv.Rect> otherRects = new List<cv.Rect>();
+        public List<CV.Rect> enclosingRects = new List<CV.Rect>();
+        List<CV.Rect> otherRects = new List<CV.Rect>();
         System.Windows.Forms.CheckBox rotatedCheck;
         TrackBar countSlider;
         public Rectangle_Intersection_CS(VBtask task) : base(task)
@@ -51612,13 +51614,13 @@ namespace CS_Classes
             countSlider = FindSlider("DrawCount");
             desc = "Test if any number of rectangles intersect.";
         }
-        cv.Rect findEnclosingRect(List<cv.Rect> rects, int proximity)
+        CV.Rect findEnclosingRect(List<CV.Rect> rects, int proximity)
         {
-            cv.Rect enclosing = rects[0];
-            List<cv.Rect> newOther = new List<cv.Rect>();
+            CV.Rect enclosing = rects[0];
+            List<CV.Rect> newOther = new List<CV.Rect>();
             for (int i = 1; i < rects.Count(); i++)
             {
-                cv.Rect r1 = rects[i];
+                CV.Rect r1 = rects[i];
                 if (enclosing.IntersectsWith(r1) || Math.Abs(r1.X - enclosing.X) < proximity)
                 {
                     enclosing = enclosing.Union(r1);
@@ -51628,7 +51630,7 @@ namespace CS_Classes
                     newOther.Add(r1);
                 }
             }
-            otherRects = new List<cv.Rect>(newOther);
+            otherRects = new List<CV.Rect>(newOther);
             return enclosing;
         }
         public void RunCS(Mat src)
@@ -51642,7 +51644,7 @@ namespace CS_Classes
                     labels[2] = "Input rectangles = " + countSlider.Value.ToString();
                     draw.Run(src);
                     dst2 = draw.dst2;
-                    inputRects = new List<cv.Rect>(draw.rectangles);
+                    inputRects = new List<CV.Rect>(draw.rectangles);
                 }
             }
             else
@@ -51653,16 +51655,16 @@ namespace CS_Classes
                     dst2.Rectangle(r, Scalar.Yellow, 1);
                 }
             }
-            SortedList<float, cv.Rect> sortedRect = new SortedList<float, cv.Rect>(new compareAllowIdenticalSingleInverted());
+            SortedList<float, CV.Rect> sortedRect = new SortedList<float, CV.Rect>(new compareAllowIdenticalSingleInverted());
             foreach (Rect r in inputRects)
             {
                 sortedRect.Add(r.Width * r.Height, r);
             }
-            otherRects = new List<cv.Rect>(sortedRect.Values);
+            otherRects = new List<CV.Rect>(sortedRect.Values);
             enclosingRects.Clear();
             while (otherRects.Count() > 0)
             {
-                cv.Rect enclosing = findEnclosingRect(otherRects, draw.options.proximity);
+                CV.Rect enclosing = findEnclosingRect(otherRects, draw.options.proximity);
                 enclosingRects.Add(enclosing);
             }
             labels[3] = enclosingRects.Count().ToString() + " enclosing rectangles were found";
@@ -51697,7 +51699,7 @@ namespace CS_Classes
             IntPtr imagePtr = RecursiveBilateralFilter_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                                             options.RBFCount);
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -51718,7 +51720,7 @@ namespace CS_Classes
         public RedCloud_Basics_CS(VBtask task) : base(task)
         {
             task.redOptions.setIdentifyCells(true);
-            inputMask = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            inputMask = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             UpdateAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + "\n" +
                             "It is behind the global options (which affect most algorithms.)");
             desc = "Find cells and then match them to the previous generation with minimum boundary";
@@ -51813,7 +51815,7 @@ namespace CS_Classes
                         defectCount++;
                     }
                     DrawContour(dst3[rc.rect], rc.hull, vecToScalar(rc.color), -1);
-                    DrawContour(task.cellMap[rc.rect], rc.hull, cv.Scalar.All(rc.index), -1);
+                    DrawContour(task.cellMap[rc.rect], rc.hull, CV.Scalar.All(rc.index), -1);
                 }
                 redCells.Add(rc);
             }
@@ -51994,7 +51996,7 @@ namespace CS_Classes
             int barWidth = dst3.Width / histBins;
             int histIndex = (int)Math.Floor((double)(task.mouseMovePoint.X / barWidth));
             if (histIndex >= slotList.Length) histIndex = slotList.Length - 1;
-            Cv2.Rectangle(dst3, new cv.Rect(histIndex * barWidth, 0, barWidth, dst3.Height), Scalar.Yellow, task.lineWidth);
+            Cv2.Rectangle(dst3, new CV.Rect(histIndex * barWidth, 0, barWidth, dst3.Height), Scalar.Yellow, task.lineWidth);
             foreach (int i in slotList[histIndex])
             {
                 var rc = task.redCells[i];
@@ -52085,7 +52087,7 @@ namespace CS_Classes
             dst2 = redC.dst2;
             labels[2] = redC.labels[2];
             dst3.SetTo(0);
-            List<cv.Point3f> fitPoints = new List<cv.Point3f>();
+            List<CV.Point3f> fitPoints = new List<CV.Point3f>();
             foreach (var rc in task.redCells)
             {
                 if (rc.eq == new Vec4f())
@@ -52131,12 +52133,12 @@ namespace CS_Classes
                 labels[2] = redC.labels[2];
             }
             var rc = task.rc;
-            List<cv.Point3f> fitPoints = new List<cv.Point3f>();
+            List<CV.Point3f> fitPoints = new List<CV.Point3f>();
             foreach (var pt in rc.contour)
             {
                 if (pt.X >= rc.rect.Width || pt.Y >= rc.rect.Height) continue;
                 if (rc.mask.Get<byte>(pt.Y, pt.X) == 0) continue;
-                fitPoints.Add(task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X));
+                fitPoints.Add(task.pointCloud[rc.rect].Get<CV.Point3f>(pt.Y, pt.X));
             }
             rc.eq = fitDepthPlane(fitPoints);
             if (standaloneTest())
@@ -52167,14 +52169,14 @@ namespace CS_Classes
                 labels[2] = redC.labels[2];
             }
             var rc = task.rc;
-            var fitPoints = new List<cv.Point3f>();
+            var fitPoints = new List<CV.Point3f>();
             for (int y = 0; y < rc.rect.Height; y++)
             {
                 for (int x = 0; x < rc.rect.Width; x++)
                 {
                     if (rc.mask.Get<byte>(y, x) != 0)
                     {
-                        fitPoints.Add(task.pointCloud[rc.rect].Get<cv.Point3f>(y, x));
+                        fitPoints.Add(task.pointCloud[rc.rect].Get<CV.Point3f>(y, x));
                     }
                 }
             }
@@ -52332,7 +52334,7 @@ namespace CS_Classes
         public RedCloud_ProjectCell_CS(VBtask task) : base(task)
         {
             task.gOptions.setDisplay1();
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels[3] = "Top: XZ values and mask, Bottom: ZY values and mask";
             desc = "Visualize the top and side projection of a RedCloud cell";
         }
@@ -52426,7 +52428,7 @@ namespace CS_Classes
     {
         Feature_Delaunay features = new Feature_Delaunay();
         RedCloud_Basics redC = new RedCloud_Basics();
-        List<List<cv.Point2f>> goodList = new List<List<cv.Point2f>>();
+        List<List<CV.Point2f>> goodList = new List<List<CV.Point2f>>();
         public RedCloud_DelaunayGuidedFeatures_CS(VBtask task) : base(task)
         {
             labels = new[] { "", "Format CV_8U of Delaunay data", "RedCloud output", "RedCloud Output of GoodFeature points" };
@@ -52439,7 +52441,7 @@ namespace CS_Classes
             redC.Run(dst1);
             dst2 = redC.dst2;
             if (task.heartBeat) goodList.Clear();
-            var nextGood = new List<cv.Point2f>(task.features);
+            var nextGood = new List<CV.Point2f>(task.features);
             goodList.Add(nextGood);
             if (goodList.Count() >= task.frameHistoryCount) goodList.RemoveAt(0);
             dst3.SetTo(0);
@@ -52460,7 +52462,7 @@ namespace CS_Classes
     public class RedCloud_UnstableCells_CS : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
-        List<cv.Point> prevList = new List<cv.Point>();
+        List<CV.Point> prevList = new List<CV.Point>();
         public RedCloud_UnstableCells_CS(VBtask task) : base(task)
         {
             labels = new[] { "", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing" };
@@ -52476,7 +52478,7 @@ namespace CS_Classes
                 dst1 = dst2.Clone();
                 dst3.SetTo(0);
             }
-            var currList = new List<cv.Point>();
+            var currList = new List<CV.Point>();
             foreach (var rc in task.redCells)
             {
                 if (!prevList.Contains(rc.maxDStable))
@@ -52487,7 +52489,7 @@ namespace CS_Classes
                 }
                 currList.Add(rc.maxDStable);
             }
-            prevList = new List<cv.Point>(currList);
+            prevList = new List<CV.Point>(currList);
         }
     }
 
@@ -52497,7 +52499,7 @@ namespace CS_Classes
     public class RedCloud_UnstableHulls_CS : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
-        List<cv.Point> prevList = new List<cv.Point>();
+        List<CV.Point> prevList = new List<CV.Point>();
         public RedCloud_UnstableHulls_CS(VBtask task) : base(task)
         {
             labels = new[] { "", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing" };
@@ -52513,7 +52515,7 @@ namespace CS_Classes
                 dst1 = dst2.Clone();
                 dst3.SetTo(0);
             }
-            var currList = new List<cv.Point>();
+            var currList = new List<CV.Point>();
             foreach (var rc in task.redCells)
             {
                 rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
@@ -52525,7 +52527,7 @@ namespace CS_Classes
                 }
                 currList.Add(rc.maxDStable);
             }
-            prevList = new List<cv.Point>(currList);
+            prevList = new List<CV.Point>(currList);
         }
     }
 
@@ -52654,7 +52656,7 @@ namespace CS_Classes
         {
             outline.Run(task.depthMask);
             colorClass.Run(src);
-            dst1 = colorClass.dst2 + cv.Scalar.All(1);
+            dst1 = colorClass.dst2 + CV.Scalar.All(1);
             dst1.SetTo(0, outline.dst2);
             dst3 = ShowPalette(dst1 * 255 / colorClass.classCount);
             redC.Run(dst1);
@@ -52672,7 +52674,7 @@ namespace CS_Classes
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_DepthOutline_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             task.redOptions.setUseColorOnly(true);
             desc = "Use the Depth_Outline output over time to isolate high quality cells";
         }
@@ -52832,7 +52834,7 @@ namespace CS_Classes
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_Overlaps_CS(VBtask task) : base(task)
         {
-            cellMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            cellMap = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Remove the overlapping cells.  Keep the largest.";
         }
         public void RunCS(Mat src)
@@ -52946,7 +52948,7 @@ namespace CS_Classes
         History_Basics frames = new History_Basics();
         public RedCloud_Gaps_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Find the gaps that are different in the RedCloud_Basics results.";
         }
         public void RunCS(Mat src)
@@ -53030,7 +53032,7 @@ namespace CS_Classes
             {
                 if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
             }
-            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             task.pointCloud.CopyTo(pc, dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
             histTop.Run(pc);
             dst3 = histTop.dst2;
@@ -53071,7 +53073,7 @@ namespace CS_Classes
             {
                 if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
             }
-            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            Mat pc = new Mat(task.pointCloud.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             task.pointCloud.CopyTo(pc, dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
             histSide.Run(pc);
             dst3 = histSide.dst2;
@@ -53094,7 +53096,7 @@ namespace CS_Classes
         {
             lastColors = dst3.Clone();
             lastMap = dst2.Clone();
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "Mask of active RedCloud cells", "CV_8U representation of redCells", "" };
             desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
         }
@@ -53181,10 +53183,10 @@ namespace CS_Classes
         int myFrameCount;
         List<int> changedCellCounts = new List<int>();
         List<int> framecounts = new List<int>();
-        List<cv.Point> frameLoc = new List<cv.Point>();
+        List<CV.Point> frameLoc = new List<CV.Point>();
         public RedCloud_UnmatchedCount_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Count the unmatched cells and display them.";
         }
         public void RunCS(Mat src)
@@ -53264,7 +53266,7 @@ namespace CS_Classes
             {
                 var rc = redCells[i];
                 rc.contour = contourBuild(rc.mask, ContourApproximationModes.ApproxNone);
-                DrawContour(rc.mask, rc.contour, cv.Scalar.All(255), -1);
+                DrawContour(rc.mask, rc.contour, CV.Scalar.All(255), -1);
                 redCells[i] = rc;
                 DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
             }
@@ -53387,7 +53389,7 @@ namespace CS_Classes
             else
             {
                 redMasks.inputMask = task.noDepthMask;
-                dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             }
             if (task.redOptions.getUseDepth() || task.redOptions.getUseGuidedProjection())
             {
@@ -53395,12 +53397,12 @@ namespace CS_Classes
                 {
                     case 0: // "GuidedBP_Depth"
                         guided.Run(src);
-                        if (colorClass.classCount > 0) guided.dst2 += cv.Scalar.All(colorClass.classCount);
+                        if (colorClass.classCount > 0) guided.dst2 += CV.Scalar.All(colorClass.classCount);
                         guided.dst2.CopyTo(dst2, task.depthMask);
                         break;
                     case 1: // "RedCloud_Reduce"
                         prep.Run(task.pointCloud);
-                        if (colorClass.classCount > 0) prep.dst2 += cv.Scalar.All(colorClass.classCount);
+                        if (colorClass.classCount > 0) prep.dst2 += CV.Scalar.All(colorClass.classCount);
                         prep.dst2.CopyTo(dst2, task.depthMask);
                         break;
                 }
@@ -53488,7 +53490,7 @@ namespace CS_Classes
                 {
                     rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
                     DrawContour(dst2[rc.rect], rc.hull, vecToScalar(rc.color), -1);
-                    DrawContour(rc.mask, rc.hull, cv.Scalar.All(255), -1);
+                    DrawContour(rc.mask, rc.hull, CV.Scalar.All(255), -1);
                     task.cellMap[rc.rect].SetTo(rc.index, rc.mask);
                 }
                 newCells.Add(rc);
@@ -53610,7 +53612,7 @@ namespace CS_Classes
         List<Mat> diffs = new List<Mat>();
         public RedCloud_Consistent1_CS(VBtask task) : base(task)
         {
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 1;
             desc = "Remove RedCloud results that are inconsistent with the previous frame.";
         }
@@ -53678,7 +53680,7 @@ namespace CS_Classes
         List<Mat> diffs = new List<Mat>();
         public RedCloud_Consistent2_CS(VBtask task) : base(task)
         {
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 1;
             desc = "Remove RedCloud results that are inconsistent with the previous frame.";
         }
@@ -53828,7 +53830,7 @@ namespace CS_Classes
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
             task.gOptions.pixelDiffThreshold = 25;
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Use absDiff to build a mask of cells that changed.";
         }
         public void RunCS(Mat src)
@@ -53914,8 +53916,8 @@ namespace CS_Classes
         int mousePicTag;
         public RedCloud_ColorAndDepth_CS(VBtask task) : base(task)
         {
-            colorMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            depthMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            colorMap = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            depthMap = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             mousePicTag = task.mousePicTag;
             task.redOptions.setIdentifyCells(false);
             desc = "Run Flood_Basics and use the cells to map the depth cells";
@@ -53992,12 +53994,12 @@ namespace CS_Classes
     {
         public Mat inputMask;
         public int classCount;
-        public List<cv.Rect> rectList = new List<cv.Rect>();
-        public List<cv.Point> floodPoints = new List<cv.Point>();
+        public List<CV.Rect> rectList = new List<CV.Rect>();
+        public List<CV.Point> floodPoints = new List<CV.Point>();
         Color8U_Basics color;
         public RedCloud_CPP_CS(VBtask task) : base(task)
         {
-            inputMask = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            inputMask = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             cPtr = RedCloud_Open();
             desc = "Run the C++ RedCloud interface with or without a mask";
         }
@@ -54019,11 +54021,11 @@ namespace CS_Classes
             imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleMask.Free();
             handleInput.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
             classCount = RedCloud_Count(cPtr);
             if (classCount == 0) return; // no data to process.
-            Mat rectData = cv.Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloud_Rects(cPtr));
-            Mat floodPointData = cv.Mat.FromPixelData(classCount, 1, MatType.CV_32SC2, RedCloud_FloodPoints(cPtr));
+            Mat rectData = CV.Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloud_Rects(cPtr));
+            Mat floodPointData = CV.Mat.FromPixelData(classCount, 1, MatType.CV_32SC2, RedCloud_FloodPoints(cPtr));
             int[] rects = new int[classCount * 4];
             Marshal.Copy(rectData.Data, rects, 0, rects.Length);
             int[] ptList = new int[classCount * 2];
@@ -54031,12 +54033,12 @@ namespace CS_Classes
             rectList.Clear();
             for (int i = 0; i < rects.Length - 4; i += 4)
             {
-                rectList.Add(new cv.Rect(rects[i], rects[i + 1], rects[i + 2], rects[i + 3]));
+                rectList.Add(new CV.Rect(rects[i], rects[i + 1], rects[i + 2], rects[i + 3]));
             }
             floodPoints.Clear();
             for (int i = 0; i < ptList.Length - 2; i += 2)
             {
-                floodPoints.Add(new cv.Point(ptList[i], ptList[i + 1]));
+                floodPoints.Add(new CV.Point(ptList[i], ptList[i + 1]));
             }
             if (standalone) dst3 = ShowPalette(dst2 * 255 / classCount);
             if (task.heartBeat) labels[2] = "CV_8U result with " + classCount.ToString() + " regions.";
@@ -54054,8 +54056,8 @@ namespace CS_Classes
     public class RedCloud_MaxDist_CPP_CS : CS_Parent
     {
         public int classCount;
-        public List<cv.Rect> RectList = new List<cv.Rect>();
-        public List<cv.Point> floodPoints = new List<cv.Point>();
+        public List<CV.Rect> RectList = new List<CV.Rect>();
+        public List<CV.Point> floodPoints = new List<CV.Point>();
         public List<int> maxList = new List<int>();
         Color8U_Basics color = new Color8U_Basics();
         public RedCloud_MaxDist_CPP_CS(VBtask task) : base(task)
@@ -54081,24 +54083,24 @@ namespace CS_Classes
             GCHandle handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned);
             imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), (IntPtr)0, src.Rows, src.Cols);
             handleInput.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
             dst3 = ShowPalette(dst2);
             classCount = RedCloudMaxDist_Count(cPtr);
             labels[2] = "CV_8U version with " + classCount.ToString() + " cells.";
             if (classCount == 0) return; // no data to process.
-            Mat rectData = cv.Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr));
-            Mat floodPointData = cv.Mat.FromPixelData(classCount, 1, MatType.CV_32SC2, RedCloudMaxDist_FloodPoints(cPtr));
+            Mat rectData = CV.Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr));
+            Mat floodPointData = CV.Mat.FromPixelData(classCount, 1, MatType.CV_32SC2, RedCloudMaxDist_FloodPoints(cPtr));
             int[] rects = new int[classCount * 4];
             Marshal.Copy(rectData.Data, rects, 0, rects.Length);
             int[] ptList = new int[classCount * 2];
             Marshal.Copy(floodPointData.Data, ptList, 0, ptList.Length);
             for (int i = 0; i < rects.Length - 4; i += 4)
             {
-                RectList.Add(new cv.Rect(rects[i], rects[i + 1], rects[i + 2], rects[i + 3]));
+                RectList.Add(new CV.Rect(rects[i], rects[i + 1], rects[i + 2], rects[i + 3]));
             }
             for (int i = 0; i < ptList.Length - 2; i += 2)
             {
-                floodPoints.Add(new cv.Point(ptList[i], ptList[i + 1]));
+                floodPoints.Add(new CV.Point(ptList[i], ptList[i + 1]));
             }
         }
         public void Close()
@@ -54149,7 +54151,7 @@ namespace CS_Classes
                     break;
             }
             var mm = GetMinMax(dst0);
-            dst2 = dst0 - cv.Scalar.All(mm.minVal);
+            dst2 = dst0 - CV.Scalar.All(mm.minVal);
             dst2 = dst2 * 255 / (mm.maxVal - mm.minVal);
             dst2.ConvertTo(dst2, MatType.CV_8U);
             labels[2] = "Reduced Pointcloud - reduction factor = " + options.reduceAmt.ToString() + " produced " + classCount.ToString() + " regions";
@@ -54196,7 +54198,7 @@ namespace CS_Classes
         Options_RedCloudOther options = new Options_RedCloudOther();
         public RedCloud_FeatureLessReduce_CS(VBtask task) : base(task)
         {
-            cellMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            cellMap = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Remove any cells which are in a featureless region - they are part of the neighboring (and often surrounding) region.";
         }
         public void RunCS(Mat src)
@@ -54210,7 +54212,7 @@ namespace CS_Classes
             redCells.Clear();
             foreach (var rc in task.redCells)
             {
-                var tmp = new Mat(rc.mask.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                var tmp = new Mat(rc.mask.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 devGrid.dst3[rc.rect].CopyTo(tmp, rc.mask);
                 var count = tmp.CountNonZero();
                 if (count == 0 || rc.pixels == 0) continue;
@@ -54289,7 +54291,7 @@ namespace CS_Classes
             if (options.selection == 2 || options.selection == 3)
             {
                 dst3[rc.rect].SetTo(vbNearFar((options.selection == 2 ? correlationXtoZ : correlationYtoZ) + 1), rc.mask);
-                SetTrueText("(" + correlationXtoZ.ToString("F3") + ", " + correlationYtoZ.ToString("F3") + ")", new cv.Point(rc.rect.X, rc.rect.Y), 3);
+                SetTrueText("(" + correlationXtoZ.ToString("F3") + ", " + correlationYtoZ.ToString("F3") + ")", new CV.Point(rc.rect.X, rc.rect.Y), 3);
             }
             DrawContour(dst0[rc.rect], rc.contour, Scalar.Yellow);
             SetTrueText(labels[3], 3);
@@ -54307,7 +54309,7 @@ namespace CS_Classes
         public RedTrack_Basics_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
-            if (task.WorkingRes != new cv.Size(168, 94)) task.frameHistoryCount = 1;
+            if (task.WorkingRes != new CV.Size(168, 94)) task.frameHistoryCount = 1;
             desc = "Get stats on each RedCloud cell.";
         }
         public void RunCS(Mat src)
@@ -54335,7 +54337,7 @@ namespace CS_Classes
         RedTrack_Basics track = new RedTrack_Basics();
         public RedTrack_Lines_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Identify and track the lines in an image as RedCloud Cells";
         }
         public void RunCS(Mat src)
@@ -54345,7 +54347,7 @@ namespace CS_Classes
             int index = 0;
             foreach (var lp in lines.lpList)
             {
-                DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.All(255));
+                DrawLine(dst3, lp.p1, lp.p2, CV.Scalar.All(255));
                 index++;
                 if (index > 10) break;
             }
@@ -54363,12 +54365,12 @@ namespace CS_Classes
     {
         RedTrack_Basics track = new RedTrack_Basics();
         int leftMost, rightmost;
-        cv.Point leftCenter, rightCenter;
+        CV.Point leftCenter, rightCenter;
         public RedTrack_LineSingle_CS(VBtask task) : base(task)
         {
             desc = "Create a line between the rightmost and leftmost good feature to show camera motion";
         }
-        int findNearest(cv.Point pt)
+        int findNearest(CV.Point pt)
         {
             float bestDistance = float.MaxValue;
             int bestIndex = 0;
@@ -54441,7 +54443,7 @@ namespace CS_Classes
         {
             feat.Run(src);
             dst2 = feat.dst2;
-            knn.queries = new List<cv.Point2f>(task.features);
+            knn.queries = new List<CV.Point2f>(task.features);
             knn.Run(empty);
             dst3 = src.Clone();
             for (int i = 0; i < knn.neighbors.Count(); i++)
@@ -54453,7 +54455,7 @@ namespace CS_Classes
                 DrawCircle(dst3, p2, task.DotSize, Scalar.Yellow);
                 DrawLine(dst3, p1, p2, Scalar.White);
             }
-            knn.trainInput = new List<cv.Point2f>(knn.queries);
+            knn.trainInput = new List<CV.Point2f>(knn.queries);
         }
     }
 
@@ -54527,7 +54529,7 @@ namespace CS_Classes
     {
         public KNN_Core knn = new KNN_Core();
         public Feature_Basics feat = new Feature_Basics();
-        public List<cv.Point2f> featureList = new List<cv.Point2f>();
+        public List<CV.Point2f> featureList = new List<CV.Point2f>();
         Options_RedTrack options = new Options_RedTrack();
         public RedTrack_GoodCellInput_CS(VBtask task) : base(task)
         {
@@ -54539,7 +54541,7 @@ namespace CS_Classes
 
             feat.Run(src);
             dst2 = feat.dst2;
-            knn.queries = new List<cv.Point2f>(task.features);
+            knn.queries = new List<CV.Point2f>(task.features);
             knn.Run(empty);
             featureList.Clear();
             for (int i = 0; i < knn.neighbors.Count(); i++)
@@ -54549,7 +54551,7 @@ namespace CS_Classes
                 var p2 = knn.trainInput[index];
                 if (p1.DistanceTo(p2) < options.maxDistance) featureList.Add(p1);
             }
-            knn.trainInput = new List<cv.Point2f>(knn.queries);
+            knn.trainInput = new List<CV.Point2f>(knn.queries);
         }
     }
 
@@ -54562,7 +54564,7 @@ namespace CS_Classes
         RedTrack_Basics track = new RedTrack_Basics();
         public RedTrack_Points_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "RedCloudX_Track output", "Input to RedCloudX_Track" };
             desc = "Identify and track the end points of lines in an image of RedCloud Cells";
         }
@@ -54573,8 +54575,8 @@ namespace CS_Classes
             int index = 0;
             foreach (var lp in lines.lpList)
             {
-                DrawCircle(dst3, lp.p1, task.DotSize, cv.Scalar.All(255));
-                DrawCircle(dst3, lp.p2, task.DotSize, cv.Scalar.All(255));
+                DrawCircle(dst3, lp.p1, task.DotSize, CV.Scalar.All(255));
+                DrawCircle(dst3, lp.p2, task.DotSize, CV.Scalar.All(255));
                 index++;
                 if (index >= 10) break;
             }
@@ -54595,7 +54597,7 @@ namespace CS_Classes
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedTrack_Features_CS(VBtask task) : base(task)
         {
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new string[] { "", "", "Output of Feature_Basics - input to RedCloud",
                             "Value Is correlation of x to y in contour points (0 indicates circular.)" };
             desc = "Similar to RedTrack_KNNPoints";
@@ -54606,7 +54608,7 @@ namespace CS_Classes
             if (task.heartBeat) dst2.SetTo(0);
             foreach (var pt in task.features)
             {
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.All(255));
+                DrawCircle(dst2, pt, task.DotSize, CV.Scalar.All(255));
             }
             redC.Run(dst2);
             dst3.SetTo(0);
@@ -54614,7 +54616,7 @@ namespace CS_Classes
             {
                 if (rc.rect.X == 0 && rc.rect.Y == 0) continue;
                 DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
-                if (rc.contour.Count() > 0) SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), new cv.Point(rc.rect.X, rc.rect.Y), 3);
+                if (rc.contour.Count() > 0) SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), new CV.Point(rc.rect.X, rc.rect.Y), 3);
             }
             SetTrueText("Move camera to see the value of this algorithm", 2);
             SetTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3);
@@ -54973,12 +54975,12 @@ namespace CS_Classes
 
     public class Resize_Basics_CS : CS_Parent
     {
-        public cv.Size newSize;
+        public CV.Size newSize;
         public Options_Resize options = new Options_Resize();
         public Resize_Basics_CS(VBtask task) : base(task)
         {
             if (standaloneTest())
-                task.drawRect = new cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2);
+                task.drawRect = new CV.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2);
             desc = "Resize with different options and compare them";
             labels[2] = "Rectangle highlight above resized";
         }
@@ -55000,7 +55002,7 @@ namespace CS_Classes
     public class Resize_Smaller_CS : CS_Parent
     {
         public Options_Resize options = new Options_Resize();
-        public cv.Size newSize;
+        public CV.Size newSize;
         public Resize_Smaller_CS(VBtask task) : base(task)
         {
             desc = "Resize by a percentage of the image.";
@@ -55008,7 +55010,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            newSize = new cv.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
+            newSize = new CV.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
             dst2 = src.Resize(newSize, 0, 0, options.warpFlag);
             labels[2] = "Image after resizing to: " + newSize.Width + "X" + newSize.Height;
         }
@@ -55020,7 +55022,7 @@ namespace CS_Classes
     public class Resize_Preserve_CS : CS_Parent
     {
         public Options_Resize options = new Options_Resize();
-        public cv.Size newSize;
+        public CV.Size newSize;
         public Resize_Preserve_CS(VBtask task) : base(task)
         {
             FindSlider("Resize Percentage (%)").Maximum = 200;
@@ -55031,9 +55033,9 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            newSize = new cv.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
+            newSize = new CV.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
             dst0 = src.Resize(newSize, 0, 0, InterpolationFlags.Nearest).SetTo(0);
-            var rect = new cv.Rect(options.topLeftOffset, options.topLeftOffset, dst2.Width, dst2.Height);
+            var rect = new CV.Rect(options.topLeftOffset, options.topLeftOffset, dst2.Width, dst2.Height);
             src.CopyTo(dst0[rect]);
             dst2 = dst0.Resize(dst2.Size(), 0, 0, options.warpFlag);
             labels[2] = "Image after resizing to: " + newSize.Width + "X" + newSize.Height;
@@ -55058,17 +55060,17 @@ namespace CS_Classes
                 dst2 = options.runRedCloud(ref labels[2]);
                 src = src[task.rc.rect];
             }
-            cv.Size newSize;
+            CV.Size newSize;
             if (dst0.Width / (double)dst0.Height < src.Width / (double)src.Height)
             {
-                newSize = new cv.Size(dst2.Width, dst2.Height * dst0.Height / dst0.Width);
+                newSize = new CV.Size(dst2.Width, dst2.Height * dst0.Height / dst0.Width);
             }
             else
             {
-                newSize = new cv.Size(dst2.Width * dst0.Height / dst0.Width, dst2.Height);
+                newSize = new CV.Size(dst2.Width * dst0.Height / dst0.Width, dst2.Height);
             }
             src = src.Resize(newSize, 0, 0, InterpolationFlags.Nearest);
-            var newRect = new cv.Rect(0, 0, newSize.Width, newSize.Height);
+            var newRect = new CV.Rect(0, 0, newSize.Width, newSize.Height);
             dst3.SetTo(0);
             src.CopyTo(dst3[newRect]);
         }
@@ -55131,7 +55133,7 @@ namespace CS_Classes
             else
             {
                 SetTrueText("Retina_Basics_CS runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.");
-                dst3= new cv.Mat(dst2.Rows, dst2.Cols, MatType.CV_8UC1, cv.Scalar.All(0));
+                dst3= new CV.Mat(dst2.Rows, dst2.Cols, MatType.CV_8UC1, CV.Scalar.All(0));
             }
             handleSrc.Free();
             handleMagno.Free();
@@ -55139,8 +55141,8 @@ namespace CS_Classes
             {
                 float nextFactor = samplingFactor;
                 if (!options.useLogSampling) nextFactor = 1;
-                dst2 = cv.Mat.FromPixelData(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone();
-                dst3 = cv.Mat.FromPixelData(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8U, magnoData).Resize(src.Size());
+                dst2 = CV.Mat.FromPixelData(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone();
+                dst3 = CV.Mat.FromPixelData(src.Rows / (int)nextFactor, src.Cols / (int)nextFactor, MatType.CV_8U, magnoData).Resize(src.Size());
             }
         }
         public void Close()
@@ -55178,11 +55180,11 @@ namespace CS_Classes
     public class ROI_Basics_CS : CS_Parent
     {
         public Diff_Basics diff = new Diff_Basics();
-        public cv.Rect aoiRect;
+        public CV.Rect aoiRect;
         public ROI_Basics_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Enclosing rectangle of all pixels that have changed", "" };
-            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, CV.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 30;
             desc = "Find the motion ROI in the latest image.";
         }
@@ -55194,7 +55196,7 @@ namespace CS_Classes
             if (split.Length == 0) return;
             var mm0 = GetMinMax(split[0]);
             var mm1 = GetMinMax(split[1]);
-            aoiRect = new cv.Rect((int)mm0.minVal, (int)mm1.minVal, (int)(mm0.maxVal - mm0.minVal), (int)(mm1.maxVal - mm1.minVal));
+            aoiRect = new CV.Rect((int)mm0.minVal, (int)mm1.minVal, (int)(mm0.maxVal - mm0.minVal), (int)(mm1.maxVal - mm1.minVal));
             if (aoiRect.Width > 0 && aoiRect.Height > 0)
             {
                 task.color.Rectangle(aoiRect, Scalar.Yellow, task.lineWidth);
@@ -55209,11 +55211,11 @@ namespace CS_Classes
     public class ROI_FindNonZeroNoSingle_CS : CS_Parent
     {
         public Diff_Basics diff = new Diff_Basics();
-        public cv.Rect aoiRect;
+        public CV.Rect aoiRect;
         public ROI_FindNonZeroNoSingle_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Enclosing rectangle of all changed pixels (after removing single pixels)", "" };
-            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, CV.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 30;
             desc = "Find the motion ROI in just the latest image - eliminate single pixels";
         }
@@ -55226,9 +55228,9 @@ namespace CS_Classes
             int minX = int.MaxValue, maxX = int.MinValue, minY = int.MaxValue, maxY = int.MinValue;
             for (int i = 0; i < tmp.Rows; i++)
             {
-                var pt = tmp.Get<cv.Point>(i, 0);
+                var pt = tmp.Get<CV.Point>(i, 0);
                 // eliminate single pixel differences.
-                var r = new cv.Rect(pt.X - 1, pt.Y - 1, 3, 3);
+                var r = new CV.Rect(pt.X - 1, pt.Y - 1, 3, 3);
                 if (r.X < 0) r.X = 0;
                 if (r.Y < 0) r.Y = 0;
                 if (r.X + r.Width < dst2.Width && r.Y + r.Height < dst2.Height)
@@ -55244,7 +55246,7 @@ namespace CS_Classes
             }
             if (minX != int.MaxValue)
             {
-                aoiRect = new cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1);
+                aoiRect = new CV.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1);
                 task.color.Rectangle(aoiRect, Scalar.Yellow, task.lineWidth);
                 dst2.Rectangle(aoiRect, Scalar.White, task.lineWidth);
             }
@@ -55257,14 +55259,14 @@ namespace CS_Classes
     public class ROI_AccumulateOld_CS : CS_Parent
     {
         public Diff_Basics diff = new Diff_Basics();
-        public cv.Rect aoiRect;
+        public CV.Rect aoiRect;
         public int minX = int.MaxValue, maxX = int.MinValue, minY = int.MaxValue, maxY = int.MinValue;
         Options_ROI options = new Options_ROI();
         public ROI_AccumulateOld_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
             labels = new string[] { "", "", "Area of Interest", "" };
-            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
+            dst1 = new Mat(dst2.Size(), MatType.CV_8UC1, CV.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 30;
             desc = "Accumulate pixels in a motion ROI - all pixels that are different by X";
         }
@@ -55275,7 +55277,7 @@ namespace CS_Classes
             {
                 dst0 = task.color;
                 dst1.SetTo(0);
-                aoiRect = new cv.Rect();
+                aoiRect = new CV.Rect();
                 minX = int.MaxValue;
                 maxX = int.MinValue;
                 minY = int.MaxValue;
@@ -55285,7 +55287,7 @@ namespace CS_Classes
             dst3 = diff.dst2;
             Cv2.BitwiseOr(dst3, dst1, dst1);
             var tmp = dst3.FindNonZero();
-            if (aoiRect != new cv.Rect())
+            if (aoiRect != new CV.Rect())
             {
                 task.color[aoiRect].CopyTo(dst0[aoiRect]);
                 dst0.Rectangle(aoiRect, Scalar.Yellow, task.lineWidth);
@@ -55294,13 +55296,13 @@ namespace CS_Classes
             if (tmp.Rows == 0) return;
             for (int i = 0; i < tmp.Rows; i++)
             {
-                var pt = tmp.Get<cv.Point>(i, 0);
+                var pt = tmp.Get<CV.Point>(i, 0);
                 if (minX > pt.X) minX = pt.X;
                 if (maxX < pt.X) maxX = pt.X;
                 if (minY > pt.Y) minY = pt.Y;
                 if (maxY < pt.Y) maxY = pt.Y;
             }
-            aoiRect = new cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1);
+            aoiRect = new CV.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1);
             dst1.CopyTo(dst2);
             dst2.Rectangle(aoiRect, Scalar.White, task.lineWidth);
         }
@@ -55312,12 +55314,12 @@ namespace CS_Classes
     public class ROI_Accumulate_CS : CS_Parent
     {
         public Diff_Basics diff = new Diff_Basics();
-        cv.Rect roiRect;
+        CV.Rect roiRect;
         Options_ROI options = new Options_ROI();
         public ROI_Accumulate_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Area of Interest", "" };
-            dst2 = new Mat(dst2.Size(), MatType.CV_8UC1, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8UC1, CV.Scalar.All(0));
             task.gOptions.pixelDiffThreshold = 30;
             desc = "Accumulate pixels in a motion ROI until the size is x% of the total image.";
         }
@@ -55328,7 +55330,7 @@ namespace CS_Classes
             if (roiRect.Width * roiRect.Height > src.Total() * options.roiPercent || task.optionsChanged)
             {
                 dst2.SetTo(0);
-                roiRect = new cv.Rect();
+                roiRect = new CV.Rect();
             }
             diff.Run(src);
             var split = diff.dst2.FindNonZero().Split();
@@ -55336,7 +55338,7 @@ namespace CS_Classes
             {
                 var mm0 = GetMinMax(split[0]);
                 var mm1 = GetMinMax(split[1]);
-                var motionRect = new cv.Rect((int)mm0.minVal, (int)mm1.minVal, (int)(mm0.maxVal - mm0.minVal),
+                var motionRect = new CV.Rect((int)mm0.minVal, (int)mm1.minVal, (int)(mm0.maxVal - mm0.minVal),
                                                 (int)(mm1.maxVal - mm1.minVal));
                 if (motionRect.Width != 0 && motionRect.Height != 0)
                 {
@@ -55408,7 +55410,7 @@ namespace CS_Classes
         readonly Rotate_Basics rotation = new Rotate_Basics();
         public Rotate_Box_CS(VBtask task) : base(task)
         {
-            task.drawRect = new cv.Rect(100, 100, 100, 100);
+            task.drawRect = new CV.Rect(100, 100, 100, 100);
             labels[2] = "Original Rectangle in the original perspective";
             labels[3] = "Same Rectangle in the new warped perspective";
             desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere.";
@@ -55423,7 +55425,7 @@ namespace CS_Classes
             var center = new Point2f(r.X + r.Width / 2, r.Y + r.Height / 2);
             var drawBox = new RotatedRect(center, new Size2f(r.Width, r.Height), 0);
             var boxPoints = Cv2.BoxPoints(drawBox);
-            var srcPoints = cv.Mat.FromPixelData(1, 4, MatType.CV_32FC2, boxPoints);
+            var srcPoints = CV.Mat.FromPixelData(1, 4, MatType.CV_32FC2, boxPoints);
             var dstpoints = new Mat();
             if (rotation.options.warpFlag != InterpolationFlags.WarpInverseMap)
             {
@@ -55435,8 +55437,8 @@ namespace CS_Classes
             }
             for (int i = 0; i < dstpoints.Width - 1; i++)
             {
-                var p1 = dstpoints.Get<cv.Point2f>(0, i);
-                var p2 = dstpoints.Get<cv.Point2f>(0, (i + 1) % 4);
+                var p1 = dstpoints.Get<CV.Point2f>(0, i);
+                var p2 = dstpoints.Get<CV.Point2f>(0, (i + 1) % 4);
                 DrawLine(dst3, p1, p2, Scalar.White, task.lineWidth + 1);
             }
         }
@@ -55450,7 +55452,7 @@ namespace CS_Classes
         Options_FPoly optionsFPoly = new Options_FPoly();
         public Options_RotatePoly options = new Options_RotatePoly();
         public Rotate_PolyQT rotateQT = new Rotate_PolyQT();
-        List<cv.Point2f> rPoly = new List<cv.Point2f>();
+        List<CV.Point2f> rPoly = new List<CV.Point2f>();
         public Rotate_Poly_CS(VBtask task) : base(task)
         {
             labels = new[] { "", "", "Triangle before rotation", "Triangle after rotation" };
@@ -55469,7 +55471,7 @@ namespace CS_Classes
                 rotateQT.rotateCenter = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                 options.changeCheck.Checked = false;
             }
-            rotateQT.poly = new List<cv.Point2f>(rPoly);
+            rotateQT.poly = new List<CV.Point2f>(rPoly);
             rotateQT.rotateAngle = options.angleSlider.Value;
             rotateQT.Run(src);
             dst2 = rotateQT.dst3;
@@ -55484,7 +55486,7 @@ namespace CS_Classes
 
     public class Rotate_PolyQT_CS : CS_Parent
     {
-        public List<cv.Point2f> poly = new List<cv.Point2f>();
+        public List<CV.Point2f> poly = new List<CV.Point2f>();
         public Point2f rotateCenter;
         public float rotateAngle;
         public Rotate_PolyQT_CS(VBtask task) : base(task)
@@ -55507,13 +55509,13 @@ namespace CS_Classes
             DrawFPoly(ref dst2, poly, Scalar.Red);
             labels[3] = "White is the original polygon, yellow has been rotated " + (rotateAngle * 57.2958).ToString() + " degrees";
             // translate so the center of rotation is 0,0
-            List<cv.Point2f> translated = new List<cv.Point2f>();
+            List<CV.Point2f> translated = new List<CV.Point2f>();
             for (int i = 0; i < poly.Count(); i++)
             {
                 Point2f pt = poly[i];
                 translated.Add(new Point2f(poly[i].X - rotateCenter.X, poly[i].Y - rotateCenter.Y));
             }
-            List<cv.Point2f> rotated = new List<cv.Point2f>();
+            List<CV.Point2f> rotated = new List<CV.Point2f>();
             for (int i = 0; i < poly.Count(); i++)
             {
                 Point2f pt = translated[i];
@@ -55539,16 +55541,16 @@ namespace CS_Classes
         Rotate_Basics rotate = new Rotate_Basics();
         public Rotate_Example_CS(VBtask task) : base(task)
         {
-            rotate.rotateCenter = new cv.Point(dst2.Height / 2, dst2.Height / 2);
+            rotate.rotateCenter = new CV.Point(dst2.Height / 2, dst2.Height / 2);
             rotate.rotateAngle = -90;
             desc = "Reminder on how to rotate an image and keep all the pixels.";
         }
         public void RunCS(Mat src)
         {
-            cv.Rect r = new cv.Rect(0, 0, src.Height, src.Height);
-            dst2[r] = src.Resize(new cv.Size(src.Height, src.Height));
+            CV.Rect r = new CV.Rect(0, 0, src.Height, src.Height);
+            dst2[r] = src.Resize(new CV.Size(src.Height, src.Height));
             rotate.Run(dst2);
-            dst3[r] = rotate.dst2[new cv.Rect(0, 0, src.Height, src.Height)];
+            dst3[r] = rotate.dst2[new CV.Rect(0, 0, src.Height, src.Height)];
         }
     }
 
@@ -55592,7 +55594,7 @@ namespace CS_Classes
             double y2 = horizonVec.p2.Y - task.horizonVec.p2.Y;
             edges.translateRotateY((int)y1, (int)y2);
             rotate.rotateAngle = edges.rotationY;
-            rotate.rotateCenter = new cv.Point(edges.centerY.X, edges.centerY.Y);
+            rotate.rotateCenter = new CV.Point(edges.centerY.X, edges.centerY.Y);
             rotate.Run(dst1);
             dst3 = rotate.dst2.Clone();
             strOut = edges.strOut;
@@ -55620,7 +55622,7 @@ namespace CS_Classes
             Marshal.Copy(src.Data, grayData, 0, grayData.Length);
             IntPtr imagePtr = Salience_Run(cPtr, options.numScales, grayHandle.AddrOfPinnedObject(), src.Height, src.Width);
             grayHandle.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone();
         }
         public void Close()
         {
@@ -55644,10 +55646,10 @@ namespace CS_Classes
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             int threads = 32;
             int h = src.Height / threads;
-            dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_8U, new cv.Scalar(0));
+            dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_8U, new CV.Scalar(0));
             Parallel.For(0, threads, i =>
             {
-                cv.Rect roi = new cv.Rect(0, i * h, src.Width, Math.Min(h, src.Height - i * h));
+                CV.Rect roi = new CV.Rect(0, i * h, src.Width, Math.Min(h, src.Height - i * h));
                 if (roi.Height <= 0) return;
                 IntPtr cPtr = Salience_Open();
                 Mat input = src[roi].Clone();
@@ -55656,7 +55658,7 @@ namespace CS_Classes
                 Marshal.Copy(input.Data, grayData, 0, grayData.Length);
                 IntPtr imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject(), roi.Height, roi.Width);
                 grayHandle.Free();
-                dst2[roi] = cv.Mat.FromPixelData(roi.Height, roi.Width, cv.MatType.CV_8U, imagePtr).Clone();
+                dst2[roi] = CV.Mat.FromPixelData(roi.Height, roi.Width, CV.MatType.CV_8U, imagePtr).Clone();
                 if (cPtr != IntPtr.Zero) cPtr = Salience_Close(cPtr);
             });
         }
@@ -55685,7 +55687,7 @@ namespace CS_Classes
                 var nextColor = sides.cornerColors[i];
                 var nextLabel = sides.cornerNames[i];
                 DrawLine(dst3, task.rc.maxDist, cornersList[i], Scalar.White);
-                SetTrueText(nextLabel, new cv.Point(cornersList[i].X, cornersList[i].Y), 3);
+                SetTrueText(nextLabel, new CV.Point(cornersList[i].X, cornersList[i].Y), 3);
             }
             if (cornersList.Count() > 0)
                 SetTrueText(sides.strOut, 3);
@@ -55800,7 +55802,7 @@ namespace CS_Classes
             {
                 if (referenceResults[numCeiling] != countPrimes) SetTrueText("Invalid prime count - check this...");
             }
-            dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8U, numArray);
+            dst2 = CV.Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8U, numArray);
             dst2 = ~dst2;
             zoom.Run(dst2);
             dst3 = zoom.dst2;
@@ -55868,13 +55870,13 @@ namespace CS_Classes
         List<float> valList = new List<float>();
         float barMidPoint;
         Point2f lastPoint;
-        public List<cv.Point2f> resultingPoints = new List<cv.Point2f>();
+        public List<CV.Point2f> resultingPoints = new List<CV.Point2f>();
         public List<float> resultingValues = new List<float>();
         public SLR_Trends_CS(VBtask task) : base(task)
         {
             desc = "Find trends by filling in short histogram gaps in the given image's histogram.";
         }
-        public void connectLine(int i, cv.Mat dst)
+        public void connectLine(int i, CV.Mat dst)
         {
             float x = barMidPoint + dst.Width * i / valList.Count();
             float y = dst.Height - dst.Height * valList[i] / hist.plot.maxValue;
@@ -55943,7 +55945,7 @@ namespace CS_Classes
                     labels[2] = "SLR_TrendImages_CS - pcSplit(2)";
                     break;
                 case "Grayscale input":
-                    trends.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY));
+                    trends.Run(src.CvtColor(CV.ColorConversionCodes.BGR2GRAY));
                     labels[2] = "SLR_TrendImages_CS - grayscale";
                     break;
                 case "Blue input":
@@ -55970,29 +55972,29 @@ namespace CS_Classes
     public class Smoothing_Exterior_CS : CS_Parent
     {
         Convex_Basics hull = new Convex_Basics();
-        public List<cv.Point> inputPoints { get; set; }
-        public List<cv.Point> smoothPoints { get; set; }
+        public List<CV.Point> inputPoints { get; set; }
+        public List<CV.Point> smoothPoints { get; set; }
         public Scalar plotColor = Scalar.Yellow;
         Options_Smoothing smOptions = new Options_Smoothing();
-        List<cv.Point> getSplineInterpolationCatmullRom(List<cv.Point> points, int nrOfInterpolatedPoints)
+        List<CV.Point> getSplineInterpolationCatmullRom(List<CV.Point> points, int nrOfInterpolatedPoints)
         {
-            List<cv.Point> spline = new List<cv.Point>();
-            List<cv.Point> spoints = new List<cv.Point>(points);
-            cv.Point startPt = (spoints[1] + spoints[0]) * 0.5;
+            List<CV.Point> spline = new List<CV.Point>();
+            List<CV.Point> spoints = new List<CV.Point>(points);
+            CV.Point startPt = (spoints[1] + spoints[0]) * 0.5;
             spoints.Insert(0, startPt);
-            cv.Point endPt = (spoints[spoints.Count() - 1] + spoints[spoints.Count() - 2]) * 0.5;
+            CV.Point endPt = (spoints[spoints.Count() - 1] + spoints[spoints.Count() - 2]) * 0.5;
             spoints.Add(endPt);
             double t;
-            cv.Point spoint;
+            CV.Point spoint;
             for (int i = 0; i <= spoints.Count() - 4; i++)
             {
-                spoint = new cv.Point();
+                spoint = new CV.Point();
                 for (int j = 0; j < nrOfInterpolatedPoints; j++)
                 {
-                    cv.Point x0 = spoints[i % spoints.Count()];
-                    cv.Point x1 = spoints[(i + 1) % spoints.Count()];
-                    cv.Point x2 = spoints[(i + 2) % spoints.Count()];
-                    cv.Point x3 = spoints[(i + 3) % spoints.Count()];
+                    CV.Point x0 = spoints[i % spoints.Count()];
+                    CV.Point x1 = spoints[(i + 1) % spoints.Count()];
+                    CV.Point x2 = spoints[(i + 2) % spoints.Count()];
+                    CV.Point x3 = spoints[(i + 3) % spoints.Count()];
                     t = 1.0 / nrOfInterpolatedPoints * j;
                     spoint.X = (int)(0.5 * (2 * x1.X + (-1 * x0.X + x2.X) * t + (2 * x0.X - 5 * x1.X + 4 * x2.X - x3.X) * t * t +
                                         (-1 * x0.X + 3 * x1.X - 3 * x2.X + x3.X) * t * t * t));
@@ -56017,11 +56019,11 @@ namespace CS_Classes
             {
                 if (task.heartBeat && !task.paused)
                 {
-                    List<cv.Point> hullList = hull.buildRandomHullPoints();
+                    List<CV.Point> hullList = hull.buildRandomHullPoints();
                     dst2.SetTo(0);
                     hull.Run(src);
-                    cv.Point[] nextHull = Cv2.ConvexHull(hullList.ToArray(), true);
-                    inputPoints = new List<cv.Point>(nextHull);
+                    CV.Point[] nextHull = Cv2.ConvexHull(hullList.ToArray(), true);
+                    inputPoints = new List<CV.Point>(nextHull);
                     DrawPoly(dst2, inputPoints, Scalar.White);
                 }
                 else
@@ -56047,14 +56049,14 @@ namespace CS_Classes
     public class Smoothing_Interior_CS : CS_Parent
     {
         Convex_Basics hull = new Convex_Basics();
-        public List<cv.Point> inputPoints { get; set; }
-        public List<cv.Point> smoothPoints { get; set; }
+        public List<CV.Point> inputPoints { get; set; }
+        public List<CV.Point> smoothPoints { get; set; }
         public Scalar plotColor = Scalar.Yellow;
         Options_Smoothing smOptions = new Options_Smoothing();
-        List<cv.Point2d> getCurveSmoothingChaikin(List<cv.Point> points, double tension, int nrOfIterations)
+        List<CV.Point2d> getCurveSmoothingChaikin(List<CV.Point> points, double tension, int nrOfIterations)
         {
             double cutdist = 0.05 + (tension * 0.4);
-            List<cv.Point2d> nl = new List<cv.Point2d>();
+            List<CV.Point2d> nl = new List<CV.Point2d>();
             for (int i = 0; i < points.Count(); i++)
             {
                 nl.Add(new Point2d(points[i].X, points[i].Y));
@@ -56065,9 +56067,9 @@ namespace CS_Classes
             }
             return nl;
         }
-        List<cv.Point2d> getSmootherChaikin(List<cv.Point2d> points, double cuttingDist)
+        List<CV.Point2d> getSmootherChaikin(List<CV.Point2d> points, double cuttingDist)
         {
-            List<cv.Point2d> nl = new List<cv.Point2d>();
+            List<CV.Point2d> nl = new List<CV.Point2d>();
             nl.Add(points[0]);
             for (int i = 0; i < points.Count() - 1; i++)
             {
@@ -56095,11 +56097,11 @@ namespace CS_Classes
             {
                 if (task.heartBeat && !task.paused)
                 {
-                    List<cv.Point> hullList = hull.buildRandomHullPoints();
+                    List<CV.Point> hullList = hull.buildRandomHullPoints();
                     dst2.SetTo(0);
                     hull.Run(src);
-                    cv.Point[] nextHull = Cv2.ConvexHull(hullList.ToArray(), true);
-                    inputPoints = new List<cv.Point>(nextHull);
+                    CV.Point[] nextHull = Cv2.ConvexHull(hullList.ToArray(), true);
+                    inputPoints = new List<CV.Point>(nextHull);
                     DrawPoly(dst2, nextHull.ToList(), Scalar.White);
                 }
                 else
@@ -56111,11 +56113,11 @@ namespace CS_Classes
             {
                 dst2.SetTo(0);
             }
-            List<cv.Point2d> smoothPoints2d = getCurveSmoothingChaikin(inputPoints, smOptions.interiorTension, smOptions.iterations);
-            smoothPoints = new List<cv.Point>();
+            List<CV.Point2d> smoothPoints2d = getCurveSmoothingChaikin(inputPoints, smOptions.interiorTension, smOptions.iterations);
+            smoothPoints = new List<CV.Point>();
             for (int i = 0; i < smoothPoints2d.Count(); i += smOptions.stepSize)
             {
-                smoothPoints.Add(new cv.Point((int)smoothPoints2d[i].X, (int)smoothPoints2d[i].Y));
+                smoothPoints.Add(new CV.Point((int)smoothPoints2d[i].X, (int)smoothPoints2d[i].Y));
             }
             if (smoothPoints.Count() > 0) DrawPoly(dst2, smoothPoints, plotColor);
         }
@@ -56138,11 +56140,11 @@ namespace CS_Classes
             // (x=4, y=6)
             double[,] av = { { 1, 1 }, { 2, 3 } };
             double[] yv = { 10, 26 };
-            Mat a = cv.Mat.FromPixelData(2, 2, MatType.CV_64FC1, av);
-            Mat y = cv.Mat.FromPixelData(2, 1, MatType.CV_64FC1, yv);
+            Mat a = CV.Mat.FromPixelData(2, 2, MatType.CV_64FC1, av);
+            Mat y = CV.Mat.FromPixelData(2, 1, MatType.CV_64FC1, yv);
             Mat x = new Mat();
             Cv2.Solve(a, y, x, DecompTypes.LU);
-            SetTrueText("Solution ByMat: X1 = " + x.At<double>(0, 0) + "\tX2 = " + x.At<double>(0, 1), new cv.Point(10, 125));
+            SetTrueText("Solution ByMat: X1 = " + x.At<double>(0, 0) + "\tX2 = " + x.At<double>(0, 1), new CV.Point(10, 125));
         }
     }
 
@@ -56164,7 +56166,7 @@ namespace CS_Classes
             double[] yv = { 10, 26 };
             Mat x = new Mat();
             Cv2.Solve(InputArray.Create(av), InputArray.Create(yv), x, DecompTypes.LU);
-            SetTrueText("Solution ByArray: X1 = " + x.At<double>(0, 0) + "\tX2 = " + x.At<double>(0, 1), new cv.Point(10, 125));
+            SetTrueText("Solution ByArray: X1 = " + x.At<double>(0, 0) + "\tX2 = " + x.At<double>(0, 1), new CV.Point(10, 125));
         }
     }
 
@@ -56191,7 +56193,7 @@ namespace CS_Classes
                 src = src.Reshape(1, src.Rows * src.Cols);
                 options.sortOption = SortFlags.EveryColumn | SortFlags.Ascending;
             }
-            if (src.Channels() == 3) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (src.Channels() == 3) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             dst2 = src.Sort(options.sortOption);
             if (options.radio4.Checked || options.radio5.Checked) dst2 = dst2.Reshape(1, dst0.Rows);
         }
@@ -56204,17 +56206,17 @@ namespace CS_Classes
     {
         Sort_Basics sort = new Sort_Basics();
         public Mat mask;
-        public cv.Rect rect;
+        public CV.Rect rect;
         public Sort_RectAndMask_CS(VBtask task) : base(task)
         {
             labels[3] = "Original input to sort";
-            if (standaloneTest()) task.drawRect = new cv.Rect(10, 10, 50, 5);
+            if (standaloneTest()) task.drawRect = new CV.Rect(10, 10, 50, 5);
             desc = "Sort the grayscale image portion in a rect while allowing for a mask.";
         }
         public void RunCS(Mat src)
         {
-            if (src.Channels() == 3) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
-            var tmpRect = rect == new cv.Rect() ? task.drawRect : rect;
+            if (src.Channels() == 3) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
+            var tmpRect = rect == new CV.Rect() ? task.drawRect : rect;
             dst1 = src[tmpRect].Clone();
             if (mask != null)
             {
@@ -56242,14 +56244,14 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (src.Channels() != 1) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             reduction.Run(src);
             byte[] dataSrc = new byte[reduction.dst2.Total() * reduction.dst2.ElemSize()];
             Marshal.Copy(reduction.dst2.Data, dataSrc, 0, dataSrc.Length);
             var handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
             var imagePtr = Sort_MLPrepTest_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
             handleSrc.Free();
-            MLTestData = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC2, imagePtr).Clone();
+            MLTestData = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC2, imagePtr).Clone();
             var split = MLTestData.Split();
             dst2 = split[0];
             dst3 = split[1];
@@ -56276,13 +56278,13 @@ namespace CS_Classes
             if (standaloneTest()) task.gOptions.setDisplay1();
             FindRadio("Sort all pixels descending").Checked = true;
             if (standaloneTest()) task.gOptions.setGridSize(10);
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels = new[] { "", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates" };
             desc = "Take some 1-channel input, sort it, and provide the list of unique elements";
         }
         public void RunCS(Mat src)
         {
-            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (src.Channels() != 1) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             dst1 = src.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
             dst2.SetTo(0);
             src.CopyTo(dst2, dst1);
@@ -56338,16 +56340,16 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            var inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            var inputMask = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             if (standaloneTest()) inputMask = inputMask.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
-            bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA);
-            dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, bgra.Data);
-            dst0 = new Mat(dst0.Size(), MatType.CV_32S, cv.Scalar.All(0));
+            bgra = src.CvtColor(CV.ColorConversionCodes.BGR2BGRA);
+            dst1 = CV.Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, bgra.Data);
+            dst0 = new Mat(dst0.Size(), MatType.CV_32S, CV.Scalar.All(0));
             dst1.CopyTo(dst0, inputMask);
             sort.Run(dst0);
             dst2 = sort.dst2.Reshape(1, dst2.Rows);
-            var tmp = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC4, dst2.Data);
-            dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR);
+            var tmp = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC4, dst2.Data);
+            dst3 = tmp.CvtColor(CV.ColorConversionCodes.BGRA2BGR);
             //dups.Run(dst2);
             //dst2 = dups.dst2;
         }
@@ -56403,10 +56405,10 @@ namespace CS_Classes
             if (standalone)
             {
                 Mat[] split = src.Split();
-                Mat zero = new Mat(split[0].Size(), MatType.CV_8U, cv.Scalar.All(0));
+                Mat zero = new Mat(split[0].Size(), MatType.CV_8U, CV.Scalar.All(0));
                 Cv2.Merge(new Mat[] { split[0], split[1], split[2], zero }, src);
                 Marshal.Copy(src.Data, data, 0, data.Length);
-                src = new Mat(src.Size(), MatType.CV_32S, cv.Scalar.All(0));
+                src = new Mat(src.Size(), MatType.CV_32S, CV.Scalar.All(0));
                 Marshal.Copy(data, 0, src.Data, data.Length);
             }
             sort.Run(src);
@@ -56448,7 +56450,7 @@ namespace CS_Classes
             {
                 input[i] = (uint)(pixels[0][i] * 65536 + pixels[1][i] * 256 + pixels[2][i]);
             }
-            sort.Run(cv.Mat.FromPixelData(gray.Length, 1, MatType.CV_32S, input));
+            sort.Run(CV.Mat.FromPixelData(gray.Length, 1, MatType.CV_32S, input));
             List<uint> unique = new List<uint>();
             unique.Add((uint)sort.data[0]);
             for (int i = 1; i < sort.data.Length; i++)
@@ -56486,7 +56488,7 @@ namespace CS_Classes
                 totals[index] += 1;
                 if (totals[index] == 1) lut[index] = new Vec3b(pixels[0][i], pixels[1][i], pixels[2][i]);
             }
-            Mat histogram = cv.Mat.FromPixelData(256, 1, MatType.CV_32F, totals);
+            Mat histogram = CV.Mat.FromPixelData(256, 1, MatType.CV_32F, totals);
             plot.Run(histogram);
             dst2 = plot.dst2;
         }
@@ -56726,13 +56728,13 @@ namespace CS_Classes
             if (rc.pixels == 0) return;
             if (rc.depthPixels / rc.pixels < 0.5)
             {
-                input = new Mat(rc.mask.Size(), MatType.CV_8U, cv.Scalar.All(0));
+                input = new Mat(rc.mask.Size(), MatType.CV_8U, CV.Scalar.All(0));
                 src[rc.rect].CopyTo(input, rc.mask);
-                input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                input = input.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             }
             else
             {
-                input = new Mat(rc.mask.Size(), MatType.CV_32F, cv.Scalar.All(0));
+                input = new Mat(rc.mask.Size(), MatType.CV_32F, CV.Scalar.All(0));
                 task.pcSplit[2][rc.rect].CopyTo(input, rc.mask);
             }
             ranges = options.buildColorRanges(input, "GrayScale");
@@ -56747,7 +56749,7 @@ namespace CS_Classes
                     maxRange = r;
                 }
             }
-            Mat rangeClip = new Mat(input.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            Mat rangeClip = new Mat(input.Size(), MatType.CV_8U, CV.Scalar.All(0));
             if (input.Type() == MatType.CV_8U)
             {
                 rangeClip = input.InRange(maxRange.start, maxRange.ending);
@@ -56755,7 +56757,7 @@ namespace CS_Classes
             }
             else
             {
-                rangeClip = new Mat(rc.mask.Size(), MatType.CV_32F, cv.Scalar.All(0));
+                rangeClip = new Mat(rc.mask.Size(), MatType.CV_32F, CV.Scalar.All(0));
                 input.CopyTo(rangeClip, rc.mask);
                 rangeClip = rangeClip.InRange(maxRange.start / 100, maxRange.ending / 100);
                 rangeClip = rangeClip.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
@@ -56841,7 +56843,7 @@ namespace CS_Classes
             options.RunVB();
             if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
             var input = src[task.rc.rect];
-            if (input.Type() != MatType.CV_8U) input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (input.Type() != MatType.CV_8U) input = input.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             var ranges = options.buildColorRanges(input, typeSpec);
             strOut = options.strOut;
             SetTrueText(strOut, 3);
@@ -56856,14 +56858,14 @@ namespace CS_Classes
         Match_Basics match = new Match_Basics();
         public int shiftX;
         public int shiftY;
-        public cv.Rect templateRect;
-        public cv.Rect searchRect;
-        public cv.Rect stableRect;
+        public CV.Rect templateRect;
+        public CV.Rect searchRect;
+        public CV.Rect stableRect;
         Options_Stabilizer options = new Options_Stabilizer();
         Mat lastFrame;
         public Stabilizer_Basics_CS(VBtask task) : base(task)
         {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, CV.Scalar.All(0));
             labels[2] = "Current frame - rectangle input to matchTemplate";
             desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames";
         }
@@ -56871,9 +56873,9 @@ namespace CS_Classes
         {
             options.RunVB();
             bool resetImage = false;
-            templateRect = new cv.Rect(src.Width / 2 - options.width / 2, src.Height / 2 - options.height / 2,
+            templateRect = new CV.Rect(src.Width / 2 - options.width / 2, src.Height / 2 - options.height / 2,
                                         options.width, options.height);
-            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (src.Channels() != 1) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             if (task.FirstPass) lastFrame = src.Clone();
             dst2 = src.Clone();
             Scalar mean;
@@ -56886,12 +56888,12 @@ namespace CS_Classes
                 int h = t.Height + options.pad * 2;
                 int x = Math.Abs(t.X - options.pad);
                 int y = Math.Abs(t.Y - options.pad);
-                searchRect = new cv.Rect(x, y, Math.Min(w, lastFrame.Width - x - 1), Math.Min(h, lastFrame.Height - y - 1));
+                searchRect = new CV.Rect(x, y, Math.Min(w, lastFrame.Width - x - 1), Math.Min(h, lastFrame.Height - y - 1));
                 match.template = lastFrame[searchRect];
                 match.Run(src[templateRect]);
                 if (match.correlation > options.corrThreshold)
                 {
-                    var maxLoc = new cv.Point(match.matchCenter.X, match.matchCenter.Y);
+                    var maxLoc = new CV.Point(match.matchCenter.X, match.matchCenter.Y);
                     shiftX = templateRect.X - maxLoc.X - searchRect.X;
                     shiftY = templateRect.Y - maxLoc.Y - searchRect.Y;
                     int x1 = shiftX < 0 ? Math.Abs(shiftX) : 0;
@@ -56899,9 +56901,9 @@ namespace CS_Classes
                     dst3.SetTo(0);
                     int x2 = shiftX < 0 ? 0 : shiftX;
                     int y2 = shiftY < 0 ? 0 : shiftY;
-                    stableRect = new cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY));
-                    var srcRect = new cv.Rect(x2, y2, stableRect.Width, stableRect.Height);
-                    stableRect = new cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY));
+                    stableRect = new CV.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY));
+                    var srcRect = new CV.Rect(x2, y2, stableRect.Width, stableRect.Height);
+                    stableRect = new CV.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY));
                     src[srcRect].CopyTo(dst3[stableRect]);
                     double nonZero = Cv2.CountNonZero(dst3) / (dst3.Width * dst3.Height);
                     if (nonZero < (1 - options.lostMax))
@@ -56963,7 +56965,7 @@ namespace CS_Classes
     public class Stabilizer_OpticalFlow_CS : CS_Parent
     {
         public Feature_Basics feat = new Feature_Basics();
-        public List<cv.Point2f> inputFeat = new List<cv.Point2f>();
+        public List<CV.Point2f> inputFeat = new List<CV.Point2f>();
         public int borderCrop = 30;
         Mat sumScale, sScale, features1;
         Mat errScale, qScale, rScale;
@@ -56979,35 +56981,35 @@ namespace CS_Classes
             double vert_Border = borderCrop * src.Rows / src.Cols;
             if (task.optionsChanged)
             {
-                errScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(1));
-                qScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(0.004));
-                rScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(0.5));
-                sumScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(0));
-                sScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(0));
+                errScale = new Mat(new CV.Size(1, 5), MatType.CV_64F, CV.Scalar.All(1));
+                qScale = new Mat(new CV.Size(1, 5), MatType.CV_64F, CV.Scalar.All(0.004));
+                rScale = new Mat(new CV.Size(1, 5), MatType.CV_64F, CV.Scalar.All(0.5));
+                sumScale = new Mat(new CV.Size(1, 5), MatType.CV_64F, CV.Scalar.All(0));
+                sScale = new Mat(new CV.Size(1, 5), MatType.CV_64F, CV.Scalar.All(0));
             }
             dst2 = src;
-            if (src.Channels() == 3) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (src.Channels() == 3) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             if (task.FirstPass) lastFrame = src.Clone();
             feat.Run(src);
-            inputFeat = new List<cv.Point2f>(task.features);
-            features1 = cv.Mat.FromPixelData(inputFeat.Count(), 1, MatType.CV_32FC2, inputFeat.ToArray());
+            inputFeat = new List<CV.Point2f>(task.features);
+            features1 = CV.Mat.FromPixelData(inputFeat.Count(), 1, MatType.CV_32FC2, inputFeat.ToArray());
             if (task.frameCount > 0)
             {
                 Mat features2 = new Mat();
                 Mat status = new Mat();
                 Mat err = new Mat();
-                cv.Size winSize = new cv.Size(3, 3);
+                CV.Size winSize = new CV.Size(3, 3);
                 TermCriteria term = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.Count, 10, 1.0);
                 Cv2.CalcOpticalFlowPyrLK(src, lastFrame, features1, features2, status, err, winSize, 3, term, OpticalFlowFlags.None);
                 lastFrame = src.Clone();
-                List<cv.Point2f> commonPoints = new List<cv.Point2f>();
-                List<cv.Point2f> lastFeatures = new List<cv.Point2f>();
+                List<CV.Point2f> commonPoints = new List<CV.Point2f>();
+                List<CV.Point2f> lastFeatures = new List<CV.Point2f>();
                 for (int i = 0; i < status.Rows; i++)
                 {
                     if (status.Get<byte>(i, 0) != 0)
                     {
-                        Point2f pt1 = features1.Get<cv.Point2f>(i, 0);
-                        Point2f pt2 = features2.Get<cv.Point2f>(i, 0);
+                        Point2f pt1 = features1.Get<CV.Point2f>(i, 0);
+                        Point2f pt2 = features2.Get<CV.Point2f>(i, 0);
                         double length = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y));
                         if (length < 10)
                         {
@@ -57026,7 +57028,7 @@ namespace CS_Classes
                 string text = "Original dx = " + dx.ToString(fmt2) + "\n" + " dy = " + dy.ToString(fmt2) + "\n" + " da = " + da.ToString(fmt2);
                 SetTrueText(text);
                 double sx = ds_x, sy = ds_y;
-                Mat delta = cv.Mat.FromPixelData(5, 1, MatType.CV_64F, new double[] { ds_x, ds_y, da, dx, dy });
+                Mat delta = CV.Mat.FromPixelData(5, 1, MatType.CV_64F, new double[] { ds_x, ds_y, da, dx, dy });
                 Cv2.Add(sumScale, delta, sumScale);
                 Mat diff = new Mat();
                 Cv2.Subtract(sScale, sumScale, diff);
@@ -57037,7 +57039,7 @@ namespace CS_Classes
                 if (Math.Abs(dy) > 50) dy = saveDY;
                 if (Math.Abs(da) > 50) da = saveDA;
                 text = "dx = " + dx.ToString(fmt2) + "\n" + " dy = " + dy.ToString(fmt2) + "\n" + " da = " + da.ToString(fmt2);
-                SetTrueText(text, new cv.Point(10, 100));
+                SetTrueText(text, new CV.Point(10, 100));
                 Mat smoothedMat = new Mat(2, 3, MatType.CV_64F);
                 smoothedMat.Set<double>(0, 0, sx * Math.Cos(da));
                 smoothedMat.Set<double>(0, 1, sx * -Math.Sin(da));
@@ -57046,8 +57048,8 @@ namespace CS_Classes
                 smoothedMat.Set<double>(0, 2, dx);
                 smoothedMat.Set<double>(1, 2, dy);
                 Mat smoothedFrame = task.color.WarpAffine(smoothedMat, src.Size());
-                smoothedFrame = smoothedFrame[new Range((int)vert_Border, (int)(smoothedFrame.Rows - vert_Border)),
-                                                new Range(borderCrop, smoothedFrame.Cols - borderCrop)];
+                smoothedFrame = smoothedFrame[new CV.Range((int)vert_Border, (int)(smoothedFrame.Rows - vert_Border)),
+                                                new CV.Range(borderCrop, smoothedFrame.Cols - borderCrop)];
                 dst3 = smoothedFrame.Resize(src.Size());
                 for (int i = 0; i < commonPoints.Count(); i++)
                 {
@@ -57115,14 +57117,14 @@ namespace CS_Classes
     public class Stabilizer_CornerPoints_CS : CS_Parent
     {
         public Stable_Basics basics = new Stable_Basics();
-        public List<cv.Point2f> features = new List<cv.Point2f>();
-        cv.Rect ul, ur, ll, lr;
+        public List<CV.Point2f> features = new List<CV.Point2f>();
+        CV.Rect ul, ur, ll, lr;
         Options_StabilizerOther options = new Options_StabilizerOther();
         public Stabilizer_CornerPoints_CS(VBtask task) : base(task)
         {
             desc = "Track the FAST feature points found in the corners of the BGR image.";
         }
-        void getKeyPoints(Mat src, cv.Rect r)
+        void getKeyPoints(Mat src, CV.Rect r)
         {
             KeyPoint[] kpoints = Cv2.FAST(src[r], options.fastThreshold, true);
             foreach (var kp in kpoints)
@@ -57137,12 +57139,12 @@ namespace CS_Classes
             if (task.optionsChanged)
             {
                 int size = task.gridSize;
-                ul = new cv.Rect(0, 0, size, size);
-                ur = new cv.Rect(dst2.Width - size, 0, size, size);
-                ll = new cv.Rect(0, dst2.Height - size, size, size);
-                lr = new cv.Rect(dst2.Width - size, dst2.Height - size, size, size);
+                ul = new CV.Rect(0, 0, size, size);
+                ur = new CV.Rect(dst2.Width - size, 0, size, size);
+                ll = new CV.Rect(0, dst2.Height - size, size, size);
+                lr = new CV.Rect(dst2.Width - size, dst2.Height - size, size, size);
             }
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             features.Clear();
             getKeyPoints(src, ul);
             getKeyPoints(src, ur);
@@ -57175,7 +57177,7 @@ namespace CS_Classes
         {
             options.RunVB();
             Mat input = src;
-            if (input.Channels() != 1) input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (input.Channels() != 1) input = input.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             int shiftX = msRNG.Next(-options.range, options.range);
             int shiftY = msRNG.Next(-options.range, options.range);
             if (task.FirstPass)
@@ -57197,8 +57199,8 @@ namespace CS_Classes
                 int y = shiftY < 0 ? Math.Abs(shiftY) : 0;
                 int x2 = shiftX < 0 ? 0 : shiftX;
                 int y2 = shiftY < 0 ? 0 : shiftY;
-                cv.Rect srcRect = new cv.Rect(x, y, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY));
-                cv.Rect dstRect = new cv.Rect(x2, y2, srcRect.Width, srcRect.Height);
+                CV.Rect srcRect = new CV.Rect(x, y, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY));
+                CV.Rect dstRect = new CV.Rect(x2, y2, srcRect.Width, srcRect.Height);
                 dst2[srcRect].CopyTo(input[dstRect]);
             }
             dst3 = input;
@@ -57211,7 +57213,7 @@ namespace CS_Classes
     public class Stable_Basics_CS : CS_Parent
     {
         public Delaunay_Generations facetGen = new Delaunay_Generations();
-        public List<cv.Point2f> ptList = new List<cv.Point2f>();
+        public List<CV.Point2f> ptList = new List<CV.Point2f>();
         public Point2f anchorPoint;
         Feature_KNN good = new Feature_KNN();
         public Stable_Basics_CS(VBtask task) : base(task)
@@ -57223,7 +57225,7 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 good.Run(src);
-                facetGen.inputPoints = new List<cv.Point2f>(good.featurePoints);
+                facetGen.inputPoints = new List<CV.Point2f>(good.featurePoints);
             }
             facetGen.Run(src);
             if (facetGen.inputPoints.Count() == 0) return; // nothing to work on ...
@@ -57274,7 +57276,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             feat.Run(src);
-            basics.facetGen.inputPoints = new List<cv.Point2f>(task.features);
+            basics.facetGen.inputPoints = new List<CV.Point2f>(task.features);
             basics.Run(src);
             dst2 = basics.dst2;
             dst3 = basics.dst3;
@@ -57348,7 +57350,7 @@ namespace CS_Classes
         {
             fast.Run(src);
             basics.facetGen.inputPoints.Clear();
-            basics.facetGen.inputPoints = new List<cv.Point2f>(fast.features);
+            basics.facetGen.inputPoints = new List<CV.Point2f>(fast.features);
             basics.Run(src);
             dst3 = basics.dst3;
             dst2 = basics.dst2;
@@ -57376,7 +57378,7 @@ namespace CS_Classes
         public SortedList<int, int> genSorted = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
         public Stable_GoodFeatures_CS(VBtask task) : base(task)
         {
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Track the stable good features found in the BGR image.";
         }
         public void RunCS(Mat src)
@@ -57384,7 +57386,7 @@ namespace CS_Classes
             feat.Run(src);
             dst3 = basics.dst3;
             if (task.features.Count() == 0) return; // nothing to work on...
-            basics.facetGen.inputPoints = new List<cv.Point2f>(task.features);
+            basics.facetGen.inputPoints = new List<CV.Point2f>(task.features);
             basics.Run(src);
             dst2 = basics.dst2;
             dst1.SetTo(0);
@@ -57423,7 +57425,7 @@ namespace CS_Classes
             {
                 int x1 = (int)msRNG.Next(0, src.Width - options.width);
                 int x2 = (int)msRNG.Next(0, src.Height - options.height);
-                cv.Rect rect = new cv.Rect(x1, x2, options.width, options.height);
+                CV.Rect rect = new CV.Rect(x1, x2, options.width, options.height);
                 dst2.Rectangle(rect, Scalar.Red, 2);
                 mats.Add(src[rect].Clone());
             }
@@ -57431,7 +57433,7 @@ namespace CS_Classes
             {
                 // It runs fine but after several runs during 'Test All', it will fail with an external exception.  Only happens on 'Test All' runs.
                 SetTrueText("Stitch_Basics_CS only fails when running 'Test All'.\n" +
-                            "Skipping it during a 'Test All' just so all the other tests can be exercised.", new cv.Point(10, 100), 3);
+                            "Skipping it during a 'Test All' just so all the other tests can be exercised.", new CV.Point(10, 100), 3);
                 return;
             }
             var stitcher = Stitcher.Create(Stitcher.Mode.Scans);
@@ -57445,7 +57447,7 @@ namespace CS_Classes
                 int w = pano.Width, h = pano.Height;
                 if (w > dst2.Width) w = dst2.Width;
                 if (h > dst2.Height) h = dst2.Height;
-                pano.CopyTo(dst3[new cv.Rect(0, 0, w, h)]);
+                pano.CopyTo(dst3[new CV.Rect(0, 0, w, h)]);
             }
             else
             {
@@ -57533,8 +57535,8 @@ namespace CS_Classes
                                 split[2].Row(i).SetTo(mean[0]);
                             }
                         }
-                        DrawLine(dst2, new cv.Point(0, firstRow), new cv.Point(dst2.Width, firstRow), Scalar.Yellow, task.lineWidth + 1);
-                        DrawLine(dst2, new cv.Point(0, lastRow), new cv.Point(dst2.Width, lastRow), Scalar.Yellow, task.lineWidth + 1);
+                        DrawLine(dst2, new CV.Point(0, firstRow), new CV.Point(dst2.Width, firstRow), Scalar.Yellow, task.lineWidth + 1);
+                        DrawLine(dst2, new CV.Point(0, lastRow), new CV.Point(dst2.Width, lastRow), Scalar.Yellow, task.lineWidth + 1);
                     }
                 }
                 Cv2.Merge(split, imuPC);
@@ -57562,7 +57564,7 @@ namespace CS_Classes
             int stepSize = options.stepSize;
             heat.Run(src);
             split = task.pointCloud.Split();
-            dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             for (int xCoordinate = 0; xCoordinate < src.Width; xCoordinate += stepSize)
             {
                 float planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X;
@@ -57667,7 +57669,7 @@ namespace CS_Classes
         }
         Mat rebuildX(Mat viewX)
         {
-            Mat output = new Mat(task.pcSplit[1].Size(), MatType.CV_32F, cv.Scalar.All(0));
+            Mat output = new Mat(task.pcSplit[1].Size(), MatType.CV_32F, CV.Scalar.All(0));
             int firstCol;
             for (firstCol = 0; firstCol < viewX.Width; firstCol++)
             {
@@ -57690,7 +57692,7 @@ namespace CS_Classes
         }
         Mat rebuildY(Mat viewY)
         {
-            Mat output = new Mat(task.pcSplit[1].Size(), MatType.CV_32F, cv.Scalar.All(0));
+            Mat output = new Mat(task.pcSplit[1].Size(), MatType.CV_32F, CV.Scalar.All(0));
             int firstLine;
             for (firstLine = 0; firstLine < viewY.Height; firstLine++)
             {
@@ -57753,7 +57755,7 @@ namespace CS_Classes
             if (input.Type() != MatType.CV_32F) input = task.pcSplit[2];
             float stepX = dst2.Width / options.xLines;
             float stepY = dst2.Height / options.yLines;
-            dst3 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst3 = new Mat(dst2.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             float midX = dst2.Width / 2;
             float midY = dst2.Height / 2;
             float halfStepX = stepX / 2;
@@ -57780,14 +57782,14 @@ namespace CS_Classes
                             p[1] = (p1.Y - midY) * mmPP;
                             if (p1.Y == midY) p[1] = mmPP;
                         }
-                        cv.Rect r = new cv.Rect((int)(p1.X - halfStepX), (int)(p1.Y - halfStepy), (int)stepX, (int)stepY);
+                        CV.Rect r = new CV.Rect((int)(p1.X - halfStepX), (int)(p1.Y - halfStepy), (int)stepX, (int)stepY);
                         Scalar meanVal = Cv2.Mean(task.pcSplit[2][r], task.depthMask[r]);
                         p[2] = (d1 + d2) / 2;
                         dst3.Set<Vec3f>(y, x, p);
                     }
                 }
             }
-            dst2 = dst3[new cv.Rect(0, 0, options.xLines, options.yLines)].Resize(dst2.Size(), 0, 0, InterpolationFlags.Nearest);
+            dst2 = dst3[new CV.Rect(0, 0, options.xLines, options.yLines)].Resize(dst2.Size(), 0, 0, InterpolationFlags.Nearest);
         }
     }
 
@@ -57808,14 +57810,14 @@ namespace CS_Classes
             int yLines = (int)(options.xLines * dst2.Height / dst2.Width);
             float stepX = dst3.Width / options.xLines;
             float stepY = dst3.Height / yLines;
-            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             for (int y = 0; y < yLines; y++)
             {
                 for (int x = 0; x < options.xLines; x++)
                 {
-                    cv.Rect r = new cv.Rect((int)(x * stepX), (int)(y * stepY), (int)(stepX - 1), (int)(stepY - 1));
-                    cv.Point p1 = new cv.Point(r.X, r.Y);
-                    cv.Point p2 = new cv.Point(r.X + r.Width, r.Y + r.Height);
+                    CV.Rect r = new CV.Rect((int)(x * stepX), (int)(y * stepY), (int)(stepX - 1), (int)(stepY - 1));
+                    CV.Point p1 = new CV.Point(r.X, r.Y);
+                    CV.Point p2 = new CV.Point(r.X + r.Width, r.Y + r.Height);
                     Vec3f vec1 = task.pointCloud.Get<Vec3f>(p1.Y, p1.X);
                     Vec3f vec2 = task.pointCloud.Get<Vec3f>(p2.Y, p2.X);
                     if (vec1[2] > 0 && vec2[2] > 0) dst2[r].SetTo(vec1);
@@ -57831,7 +57833,7 @@ namespace CS_Classes
     public class Structured_ROI_CS : CS_Parent
     {
         public Mat data = new Mat();
-        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public List<CV.Point3f> oglData = new List<CV.Point3f>();
         public Structured_ROI_CS(VBtask task) : base(task)
         {
             task.gOptions.setGridSize(10);
@@ -57839,12 +57841,12 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
+            dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, CV.Scalar.All(0));
             foreach (var roi in task.gridList)
             {
                 Scalar d = task.pointCloud[roi].Mean(task.depthMask[roi]);
                 Vec3f depth = new Vec3f((float)d.Val0, (float)d.Val1, (float)d.Val2);
-                cv.Point pt = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
+                CV.Point pt = new CV.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
                 Vec3f vec = task.pointCloud.Get<Vec3f>(pt.Y, pt.X);
                 if (vec[2] > 0) dst2[roi].SetTo(depth);
             }
@@ -57923,8 +57925,8 @@ namespace CS_Classes
             dst0 = makeXSlice(index);
             dst2 = task.color.Clone();
             dst2.SetTo(Scalar.White, dst0);
-            dst1.Line(new cv.Point(index, 0), new cv.Point(index, dst1.Height), Scalar.Red, slice.options.sliceSize);
-            Mat hist = cv.Mat.FromPixelData(dst0.Width, 1, MatType.CV_32F, counts.ToArray());
+            dst1.Line(new CV.Point(index, 0), new CV.Point(index, dst1.Height), Scalar.Red, slice.options.sliceSize);
+            Mat hist = CV.Mat.FromPixelData(dst0.Width, 1, MatType.CV_32F, counts.ToArray());
             plot.Run(hist);
             dst3 = plot.dst2;
         }
@@ -57950,8 +57952,8 @@ namespace CS_Classes
             dst3 = src.Clone();
             for (int i = 0; i <= lines.lines2D.Count() - 1; i += 2)
             {
-                cv.Point2f p1 = lines.lines2D[i];
-                cv.Point2f p2 = lines.lines2D[i + 1];
+                CV.Point2f p1 = lines.lines2D[i];
+                CV.Point2f p2 = lines.lines2D[i + 1];
                 DrawLine(dst3, p1, p2, Scalar.Yellow, task.lineWidth);
             }
         }
@@ -58007,16 +58009,16 @@ namespace CS_Classes
             kalman.Run(src);
             labels[2] = "Current slice is at row =" + task.mouseMovePoint.Y.ToString();
             labels[3] = "Ceiling is at row =" + ((int)kalman.kOutput[1]).ToString() + " floor at y=" + ((int)kalman.kOutput[0]).ToString();
-            DrawLine(dst2, new cv.Point(0, floorY), new cv.Point(dst2.Width, floorY), Scalar.Yellow);
-            SetTrueText("floor", new cv.Point(10, floorY + task.DotSize), 3);
-            cv.Rect rect = new cv.Rect(0, Math.Max(ceilingY - 5, 0), dst2.Width, 10);
+            DrawLine(dst2, new CV.Point(0, floorY), new CV.Point(dst2.Width, floorY), Scalar.Yellow);
+            SetTrueText("floor", new CV.Point(10, floorY + task.DotSize), 3);
+            CV.Rect rect = new CV.Rect(0, Math.Max(ceilingY - 5, 0), dst2.Width, 10);
             Mat mask = slice.heat.dst3[rect];
             Scalar mean, stdev;
             Cv2.MeanStdDev(mask, out mean, out stdev);
             if (mean[0] < mean[2])
             {
-                DrawLine(dst2, new cv.Point(0, ceilingY), new cv.Point(dst2.Width, ceilingY), Scalar.Yellow);
-                SetTrueText("ceiling", new cv.Point(10, ceilingY + task.DotSize), 3);
+                DrawLine(dst2, new CV.Point(0, ceilingY), new CV.Point(dst2.Width, ceilingY), Scalar.Yellow);
+                SetTrueText("ceiling", new CV.Point(10, ceilingY + task.DotSize), 3);
             }
             else
             {
@@ -58044,7 +58046,7 @@ namespace CS_Classes
             int stepsize = options.stepSize;
             heat.Run(src);
             dst3 = heat.dst3;
-            sliceMask = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            sliceMask = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             for (int yCoordinate = 0; yCoordinate <= src.Height - 1; yCoordinate += stepsize)
             {
                 double planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y;
@@ -58081,7 +58083,7 @@ namespace CS_Classes
             int stepsize = options.stepSize;
             heat.Run(src);
             dst3 = heat.dst2;
-            Mat sliceMask = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            Mat sliceMask = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             for (int xCoordinate = 0; xCoordinate <= src.Width - 1; xCoordinate += stepsize)
             {
                 double planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X;
@@ -58117,9 +58119,9 @@ namespace CS_Classes
             multi.Run(src);
             dst3 = multi.heat.dst2;
             int col = (task.mouseMovePoint.X == 0) ? dst2.Width / 2 : task.mouseMovePoint.X;
-            cv.Rect rect = new cv.Rect(col, 0, (col + options.sliceSize >= dst3.Width) ? dst3.Width - col : options.sliceSize, dst3.Height - 1);
+            CV.Rect rect = new CV.Rect(col, 0, (col + options.sliceSize >= dst3.Width) ? dst3.Width - col : options.sliceSize, dst3.Height - 1);
             mmData mm = GetMinMax(multi.heat.topframes.dst2[rect]);
-            DrawCircle(dst3, new cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, Scalar.Yellow);
+            DrawCircle(dst3, new CV.Point(col, mm.maxLoc.Y), task.DotSize + 3, Scalar.Yellow);
             dst2 = task.color.Clone();
             double filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters;
             if (filterZ > 0)
@@ -58129,7 +58131,7 @@ namespace CS_Classes
                 dst2.SetTo(Scalar.White, depthMask);
             }
             labels[3] = "Peak histogram count (" + mm.maxVal.ToString("F0") + ") at " + filterZ.ToString("F2") + " meters +-" + (5 / dst2.Height / task.MaxZmeters).ToString("F2") + " m";
-            SetTrueText("Use the mouse to move the yellow dot above.", new cv.Point(10, dst2.Height * 7 / 8), 3);
+            SetTrueText("Use the mouse to move the yellow dot above.", new CV.Point(10, dst2.Height * 7 / 8), 3);
         }
     }
 
@@ -58150,12 +58152,12 @@ namespace CS_Classes
             multi.Run(src);
             dst3 = multi.heat.dst3;
             int row = task.mouseMovePoint.Y == 0 ? dst2.Height / 2 : task.mouseMovePoint.Y;
-            cv.Rect rect = new cv.Rect(0, row, dst3.Width - 1, row + options.sliceSize >= dst3.Height ? dst3.Height - row : options.sliceSize);
+            CV.Rect rect = new CV.Rect(0, row, dst3.Width - 1, row + options.sliceSize >= dst3.Height ? dst3.Height - row : options.sliceSize);
             mmData mm = GetMinMax(multi.heat.sideframes.dst2[rect]);
             if (mm.maxVal > 0)
             {
-                DrawCircle(dst3, new cv.Point(mm.maxLoc.X, row), task.DotSize + 3, Scalar.Yellow);
-                // dst3.Line(new cv.Point(mm.maxLoc.X, 0), new cv.Point(mm.maxLoc.X, dst3.Height), task.HighlightColor, task.lineWidth, task.lineType);
+                DrawCircle(dst3, new CV.Point(mm.maxLoc.X, row), task.DotSize + 3, Scalar.Yellow);
+                // dst3.Line(new CV.Point(mm.maxLoc.X, 0), new CV.Point(mm.maxLoc.X, dst3.Height), task.HighlightColor, task.lineWidth, task.lineType);
                 double filterZ = mm.maxLoc.X / (double)dst3.Width * task.MaxZmeters;
                 Mat depthMask = multi.split[2].InRange(filterZ - 0.05, filterZ + 0.05); // a 10 cm buffer surrounding the z value
                 dst2 = task.color.Clone();
@@ -58163,7 +58165,7 @@ namespace CS_Classes
                 double pixelsPerMeter = (double)dst2.Width / task.MaxZmeters;
                 labels[3] = $"Peak histogram count ({mm.maxVal.ToString(fmt0)}) at {filterZ.ToString(fmt2)} meters ±{(5 / pixelsPerMeter).ToString(fmt2)} m";
             }
-            SetTrueText("Use the mouse to move the yellow dot above.", new cv.Point(10, dst2.Height * 7 / 8), 3);
+            SetTrueText("Use the mouse to move the yellow dot above.", new CV.Point(10, dst2.Height * 7 / 8), 3);
         }
     }
 
@@ -58182,13 +58184,13 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            if (task.mouseMovePoint == new cv.Point()) task.mouseMovePoint = new cv.Point(dst2.Width / 2, dst2.Height);
+            if (task.mouseMovePoint == new CV.Point()) task.mouseMovePoint = new CV.Point(dst2.Width / 2, dst2.Height);
             slice.Run(src);
             lines.Run(slice.sliceMask);
             List<int> tops = new List<int>();
             List<int> bots = new List<int>();
-            List<cv.Point> topsList = new List<cv.Point>();
-            List<cv.Point> botsList = new List<cv.Point>();
+            List<CV.Point> topsList = new List<CV.Point>();
+            List<CV.Point> botsList = new List<CV.Point>();
             if (lines.lpList.Count() > 0)
             {
                 dst3 = lines.dst2;
@@ -58197,8 +58199,8 @@ namespace CS_Classes
                     DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor, task.lineWidth + 3);
                     if (lp.p1.Y < lp.p2.Y) tops.Add((int)lp.p1.Y); else tops.Add((int)lp.p2.Y);
                     if (lp.p1.Y > lp.p2.Y) bots.Add((int)lp.p1.Y); else bots.Add((int)lp.p2.Y);
-                    topsList.Add(new cv.Point(lp.p1.X, lp.p1.Y));
-                    botsList.Add(new cv.Point(lp.p2.X, lp.p2.Y));
+                    topsList.Add(new CV.Point(lp.p1.X, lp.p1.Y));
+                    botsList.Add(new CV.Point(lp.p2.X, lp.p2.Y));
                 }
             }
             if (standaloneTest())
@@ -58250,15 +58252,15 @@ namespace CS_Classes
             labels[2] = $"At offset {sliceVal} x = {((maxVal + minVal) / 2).ToString(fmt2)} with {w.ToString(fmt2)} cm width";
             labels[3] = heat.labels[3];
             dst3 = heat.dst3;
-            DrawCircle(dst3, new cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize, Scalar.Yellow);
+            DrawCircle(dst3, new CV.Point(task.topCameraPoint.X, dst3.Height), task.DotSize, Scalar.Yellow);
             if (topView)
             {
-                dst3.Line(new cv.Point(sliceVal, 0), new cv.Point(sliceVal, dst3.Height), Scalar.Yellow, task.lineWidth);
+                dst3.Line(new CV.Point(sliceVal, 0), new CV.Point(sliceVal, dst3.Height), Scalar.Yellow, task.lineWidth);
             }
             else
             {
                 int yPlaneOffset = sliceVal < dst3.Height - options.sliceSize ? sliceVal : dst3.Height - options.sliceSize - 1;
-                dst3.Line(new cv.Point(0, yPlaneOffset), new cv.Point(dst3.Width, yPlaneOffset), Scalar.Yellow, options.sliceSize);
+                dst3.Line(new CV.Point(0, yPlaneOffset), new CV.Point(dst3.Width, yPlaneOffset), Scalar.Yellow, options.sliceSize);
             }
             if (standaloneTest())
             {
@@ -58325,7 +58327,7 @@ namespace CS_Classes
         {
             options.RunVB();
             Mat sliceMask = new Mat();
-            if (task.mouseMovePoint == new cv.Point()) task.mouseMovePoint = new cv.Point(dst2.Width / 2, dst2.Height);
+            if (task.mouseMovePoint == new CV.Point()) task.mouseMovePoint = new CV.Point(dst2.Width / 2, dst2.Height);
             int xCoordinate = task.mouseMovePoint.X == 0 ? dst2.Width / 2 : task.mouseMovePoint.X;
             double planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X;
             if (xCoordinate > task.topCameraPoint.X) planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X);
@@ -58364,7 +58366,7 @@ namespace CS_Classes
         public List<float> yValues = new List<float>();
         public Structured_CountSide_CS(VBtask task) : base(task)
         {
-            rotate.rotateCenter = new cv.Point((int)(dst2.Width / 2), (int)(dst2.Width / 2));
+            rotate.rotateCenter = new CV.Point((int)(dst2.Width / 2), (int)(dst2.Width / 2));
             rotate.rotateAngle = -90;
             if (standaloneTest()) task.gOptions.setDisplay1();
             labels = new string[] { "", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice" };
@@ -58387,12 +58389,12 @@ namespace CS_Classes
             }
             float max = counts.Max();
             maxCountIndex = counts.IndexOf(max);
-            dst2.Line(new cv.Point(0, maxCountIndex), new cv.Point(dst2.Width, maxCountIndex), Scalar.Red, slice.options.sliceSize);
-            Mat hist = cv.Mat.FromPixelData(dst0.Height, 1, MatType.CV_32F, counts.ToArray());
-            plot.dst2 = new Mat(dst2.Height, dst2.Height, MatType.CV_8UC3, cv.Scalar.All(0));
+            dst2.Line(new CV.Point(0, maxCountIndex), new CV.Point(dst2.Width, maxCountIndex), Scalar.Red, slice.options.sliceSize);
+            Mat hist = CV.Mat.FromPixelData(dst0.Height, 1, MatType.CV_32F, counts.ToArray());
+            plot.dst2 = new Mat(dst2.Height, dst2.Height, MatType.CV_8UC3, CV.Scalar.All(0));
             plot.Run(hist);
             dst3 = plot.dst2;
-            dst3 = dst3.Resize(new cv.Size(dst2.Width, dst2.Width));
+            dst3 = dst3.Resize(new CV.Size(dst2.Width, dst2.Width));
             rotate.Run(dst3);
             dst3 = rotate.dst2;
             SetTrueText("Max flat surface at: " + "\n" + string.Format(fmt3, yValues[maxCountIndex]), 2);
@@ -58434,7 +58436,7 @@ namespace CS_Classes
             {
                 if (counts[i] >= max / 2)
                 {
-                    DrawLine(dst2, new cv.Point(0, i), new cv.Point(dst2.Width, i), Scalar.White);
+                    DrawLine(dst2, new CV.Point(0, i), new CV.Point(dst2.Width, i), Scalar.White);
                     surfaces.Add(yValues[i]);
                 }
             }
@@ -58453,7 +58455,7 @@ namespace CS_Classes
             for (int i = 0; i < counts.Count(); i++)
             {
                 float w = dst2.Width * counts[i] / max;
-                Cv2.Rectangle(dst3, new cv.Rect(0, (int)(i * barHeight), (int)w, (int)barHeight), Scalar.Black, -1);
+                Cv2.Rectangle(dst3, new CV.Rect(0, (int)(i * barHeight), (int)w, (int)barHeight), Scalar.Black, -1);
             }
         }
     }
@@ -58474,7 +58476,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            if (task.mouseMovePoint == new cv.Point()) task.mouseMovePoint = new cv.Point(dst2.Width / 2, dst2.Height);
+            if (task.mouseMovePoint == new CV.Point()) task.mouseMovePoint = new CV.Point(dst2.Width / 2, dst2.Height);
             int xCoordinate = (task.mouseMovePoint.X == 0) ? dst2.Width / 2 : task.mouseMovePoint.X;
             heat.Run(src);
             float planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X;
@@ -58488,8 +58490,8 @@ namespace CS_Classes
                         " with " + string.Format(fmt2, Math.Abs(maxVal - minVal) * 100) + " cm width";
             labels[3] = heat.labels[3];
             dst3 = heat.dst2;
-            DrawCircle(dst3, new cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.HighlightColor);
-            dst3.Line(new cv.Point(xCoordinate, 0), new cv.Point(xCoordinate, dst3.Height), task.HighlightColor, options.sliceSize);
+            DrawCircle(dst3, new CV.Point(task.topCameraPoint.X, 0), task.DotSize, task.HighlightColor);
+            dst3.Line(new CV.Point(xCoordinate, 0), new CV.Point(xCoordinate, dst3.Height), task.HighlightColor, options.sliceSize);
             if (standaloneTest())
             {
                 dst2 = src;
@@ -58528,8 +58530,8 @@ namespace CS_Classes
             labels[3] = heat.labels[2];
             dst3 = heat.dst3;
             int yPlaneOffset = (ycoordinate < dst3.Height - options.sliceSize) ? ycoordinate : dst3.Height - options.sliceSize - 1;
-            DrawCircle(dst3, new cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.HighlightColor);
-            dst3.Line(new cv.Point(0, yPlaneOffset), new cv.Point(dst3.Width, yPlaneOffset), task.HighlightColor, options.sliceSize);
+            DrawCircle(dst3, new CV.Point(0, task.sideCameraPoint.Y), task.DotSize, task.HighlightColor);
+            dst3.Line(new CV.Point(0, yPlaneOffset), new CV.Point(dst3.Width, yPlaneOffset), task.HighlightColor, options.sliceSize);
             if (standaloneTest())
             {
                 dst2 = src;
@@ -58648,8 +58650,8 @@ namespace CS_Classes
             options.RunVB();
             multi.Run(src);
             dst2 = ~multi.dst3;
-            cv.Point[][] rawContours = Cv2.FindContoursAsArray(dst2, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
-            cv.Point[][] contours = new cv.Point[rawContours.Length][];
+            CV.Point[][] rawContours = Cv2.FindContoursAsArray(dst2, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+            CV.Point[][] contours = new CV.Point[rawContours.Length][];
             for (int j = 0; j < rawContours.Length; j++)
             {
                 contours[j] = Cv2.ApproxPolyDP(rawContours[j], 3, true);
@@ -58695,8 +58697,8 @@ namespace CS_Classes
                         "/" + maxY.ToString("0.00"), 3);
             dst2.SetTo(0);
             Vec3b white = new Vec3b(255, 255, 255);
-            Mat pointX = new Mat(sCloud.dst2.Size(), MatType.CV_32S, cv.Scalar.All(0));
-            Mat pointY = new Mat(sCloud.dst2.Size(), MatType.CV_32S, cv.Scalar.All(0));
+            Mat pointX = new Mat(sCloud.dst2.Size(), MatType.CV_32S, CV.Scalar.All(0));
+            Mat pointY = new Mat(sCloud.dst2.Size(), MatType.CV_32S, CV.Scalar.All(0));
             int yy, xx;
             for (int y = 1; y < sCloud.dst2.Height - 1; y++)
             {
@@ -58719,19 +58721,19 @@ namespace CS_Classes
                         pointY.Set<int>(y, x, yy);
                         if (x == sCloud.options.indexX)
                         {
-                            cv.Point p1 = new cv.Point(pointX.Get<int>(y - 1, x), pointY.Get<int>(y - 1, x));
+                            CV.Point p1 = new CV.Point(pointX.Get<int>(y - 1, x), pointY.Get<int>(y - 1, x));
                             if (p1.X > 0)
                             {
-                                cv.Point p2 = new cv.Point(xx, yy);
+                                CV.Point p2 = new CV.Point(xx, yy);
                                 dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType);
                             }
                         }
                         if (y == sCloud.options.indexY)
                         {
-                            cv.Point p1 = new cv.Point(pointX.Get<int>(y, x - 1), pointY.Get<int>(y, x - 1));
+                            CV.Point p1 = new CV.Point(pointX.Get<int>(y, x - 1), pointY.Get<int>(y, x - 1));
                             if (p1.X > 0)
                             {
-                                cv.Point p2 = new cv.Point(xx, yy);
+                                CV.Point p2 = new CV.Point(xx, yy);
                                 dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType);
                             }
                         }
@@ -58793,11 +58795,11 @@ namespace CS_Classes
             var imagePtr = SuperPixel_Run(cPtr, handleSrc.AddrOfPinnedObject());
             handleSrc.Free();
             dst2 = input;
-            dst2.SetTo(gridColor, cv.Mat.FromPixelData(input.Rows, input.Cols, MatType.CV_8UC1, imagePtr));
+            dst2.SetTo(gridColor, CV.Mat.FromPixelData(input.Rows, input.Cols, MatType.CV_8UC1, imagePtr));
             var labelData = new byte[input.Total() * 4]; // labels are 32-bit integers.
             var labelPtr = SuperPixel_GetLabels(cPtr);
             Marshal.Copy(labelPtr, labelData, 0, labelData.Length);
-            var labels = cv.Mat.FromPixelData(input.Rows, input.Cols, MatType.CV_32S, labelData);
+            var labels = CV.Mat.FromPixelData(input.Rows, input.Cols, MatType.CV_32S, labelData);
             if (options.numSuperPixels < 255) labels *= 255 / options.numSuperPixels;
             labels.ConvertTo(dst3, MatType.CV_8U);
         }
@@ -58995,7 +58997,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            task.mouseMovePoint = new cv.Point(45, 60);
+            task.mouseMovePoint = new CV.Point(45, 60);
             video.Run(empty);
             if (video.video.captureVideo.PosFrames > 30) return;
             dst1 = video.dst2;
@@ -59024,10 +59026,10 @@ namespace CS_Classes
         1, 2, 3, 4, 5,
         1, 2, 3, 4, 5
     };
-            src = cv.Mat.FromPixelData(5, 5, MatType.CV_32F, inputData);
+            src = CV.Mat.FromPixelData(5, 5, MatType.CV_32F, inputData);
             Mat W = new Mat(), U = new Mat(), VT = new Mat();
             Cv2.SVDecomp(src, W, U, VT, SVD.Flags.FullUV);
-            Mat WD = new Mat(5, 5, MatType.CV_32F, cv.Scalar.All(0));
+            Mat WD = new Mat(5, 5, MatType.CV_32F, CV.Scalar.All(0));
             W.CopyTo(WD.Diag());
             Mat rec = VT.Transpose() * WD * U.Transpose();
             strOut = "";
@@ -59063,7 +59065,7 @@ namespace CS_Classes
                 var m = Cv2.Moments(rc.mask, true);
                 var center = new Point2f((float)(m.M10 / rc.pixels), (float)(m.M01 / rc.pixels));
                 DrawCircle(task.color[rc.rect], center, task.DotSize, task.HighlightColor);
-                Mat mArea = cv.Mat.FromPixelData(4, 1, MatType.CV_32F, new float[]
+                Mat mArea = CV.Mat.FromPixelData(4, 1, MatType.CV_32F, new float[]
                             { (float)(m.M20 / rc.pixels), (float)(m.Mu11 / rc.pixels),
                             (float)(m.Mu11 / rc.pixels), (float)(m.Mu02 / rc.pixels) });
                 Mat U = new Mat();
@@ -59157,9 +59159,9 @@ namespace CS_Classes
     {
         public Options_SVM options = new Options_SVM();
         SVM_SampleData sampleData = new SVM_SampleData();
-        public List<cv.Point2f> points = new List<cv.Point2f>();
+        public List<CV.Point2f> points = new List<CV.Point2f>();
         public List<int> response = new List<int>();
-        cv.ML.SVM svm;
+        CV.ML.SVM svm;
         public SVM_Basics_CS(VBtask task) : base(task)
         {
             desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data.";
@@ -59176,17 +59178,17 @@ namespace CS_Classes
                 points = sampleData.points;
                 response = sampleData.responses;
             }
-            var dataMat = cv.Mat.FromPixelData(options.sampleCount, 2, MatType.CV_32FC1, points.ToArray());
-            var resMat = cv.Mat.FromPixelData(options.sampleCount, 1, MatType.CV_32SC1, response.ToArray());
+            var dataMat = CV.Mat.FromPixelData(options.sampleCount, 2, MatType.CV_32FC1, points.ToArray());
+            var resMat = CV.Mat.FromPixelData(options.sampleCount, 1, MatType.CV_32SC1, response.ToArray());
             dataMat *= 1 / src.Height;
             if (task.optionsChanged) svm = options.createSVM();
-            svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat);
+            svm.Train(dataMat, CV.ML.SampleTypes.RowSample, resMat);
             dst3.SetTo(0);
             foreach (var roi in task.gridList)
             {
                 if (roi.X > src.Height) continue; // working only with square - not rectangles.
                 float[] samples = { roi.X / src.Height, roi.Y / src.Height };
-                if (svm.Predict(cv.Mat.FromPixelData(1, 2, MatType.CV_32F, samples)) == 1)
+                if (svm.Predict(CV.Mat.FromPixelData(1, 2, MatType.CV_32F, samples)) == 1)
                 {
                     dst3[roi].SetTo(Scalar.Red);
                 }
@@ -59214,7 +59216,7 @@ namespace CS_Classes
     public class SVM_SampleData_CS : CS_Parent
     {
         readonly Options_SVM options = new Options_SVM();
-        public List<cv.Point2f> points = new List<cv.Point2f>();
+        public List<CV.Point2f> points = new List<CV.Point2f>();
         public List<int> responses = new List<int>();
         public SVM_SampleData_CS(VBtask task) : base(task)
         {
@@ -59238,12 +59240,12 @@ namespace CS_Classes
                 if (y > inputFunction(x))
                 {
                     responses.Add(1);
-                    DrawCircle(dst2, new cv.Point(x, y), 2, Scalar.Red);
+                    DrawCircle(dst2, new CV.Point(x, y), 2, Scalar.Red);
                 }
                 else
                 {
                     responses.Add(-1);
-                    DrawCircle(dst2, new cv.Point(x, y), 3, Scalar.GreenYellow);
+                    DrawCircle(dst2, new CV.Point(x, y), 3, Scalar.GreenYellow);
                 }
             }
         }
@@ -59255,9 +59257,9 @@ namespace CS_Classes
     public class SVM_TestCase_CS : CS_Parent
     {
         Options_SVM options = new Options_SVM();
-        List<cv.Point2f> points = new List<cv.Point2f>();
+        List<CV.Point2f> points = new List<CV.Point2f>();
         List<int> responses = new List<int>();
-        cv.ML.SVM svm;
+        CV.ML.SVM svm;
         public SVM_TestCase_CS(VBtask task) : base(task)
         {
             FindSlider("Granularity").Value = 15;
@@ -59282,11 +59284,11 @@ namespace CS_Classes
                     responses.Add(choices[i]);
                 }
             }
-            var trainMat = cv.Mat.FromPixelData(4, 2, MatType.CV_32F, points.ToArray());
-            var labelsMat = cv.Mat.FromPixelData(4, 1, MatType.CV_32SC1, responses.ToArray());
+            var trainMat = CV.Mat.FromPixelData(4, 2, MatType.CV_32F, points.ToArray());
+            var labelsMat = CV.Mat.FromPixelData(4, 1, MatType.CV_32SC1, responses.ToArray());
             var dataMat = trainMat * 1 / src.Height;
             if (task.optionsChanged) svm = options.createSVM();
-            svm.Train(dataMat, cv.ML.SampleTypes.RowSample, labelsMat);
+            svm.Train(dataMat, CV.ML.SampleTypes.RowSample, labelsMat);
             var sampleMat = new Mat(1, 2, MatType.CV_32F);
             for (int y = 0; y < dst2.Height; y += options.granularity)
             {
@@ -59296,13 +59298,13 @@ namespace CS_Classes
                     sampleMat.Set<float>(0, 1, y / src.Height);
                     var response = svm.Predict(sampleMat);
                     var color = response >= 0 ? Scalar.Blue : Scalar.Red;
-                    DrawCircle(dst3, new cv.Point((int)x, (int)y), task.DotSize + 1, color);
+                    DrawCircle(dst3, new CV.Point((int)x, (int)y), task.DotSize + 1, color);
                 }
             }
             for (int i = 0; i < trainMat.Rows; i++)
             {
                 var color = labelsMat.Get<int>(i) == 1 ? Scalar.Blue : Scalar.Red;
-                var pt = new cv.Point(trainMat.Get<float>(i, 0), trainMat.Get<float>(i, 1));
+                var pt = new CV.Point(trainMat.Get<float>(i, 0), trainMat.Get<float>(i, 1));
                 DrawCircle(dst2, pt, task.DotSize + 2, color);
                 DrawCircle(dst3, pt, task.DotSize + 2, color);
             }
@@ -59315,7 +59317,7 @@ namespace CS_Classes
     public class SVM_ReuseBasics_CS : CS_Parent
     {
         SVM_Basics svm = new SVM_Basics();
-        List<cv.Point2f> points = new List<cv.Point2f>();
+        List<CV.Point2f> points = new List<CV.Point2f>();
         List<int> responses = new List<int>();
         public SVM_ReuseBasics_CS(VBtask task) : base(task)
         {
@@ -59368,7 +59370,7 @@ namespace CS_Classes
         public SVM_ReuseRandom_CS(VBtask task) : base(task)
         {
             FindSlider("Granularity").Value = 15;
-            task.drawRect = new cv.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2);
+            task.drawRect = new CV.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2);
             labels[2] = "SVM Training data - draw a rectangle anywhere to test further.";
             desc = "Use SVM to classify random points - testing if height must equal width - needs more work";
         }
@@ -59376,14 +59378,14 @@ namespace CS_Classes
         {
             svm.options.RunVB();
             var rect = task.drawRect;
-            var contour = new List<cv.Point>();
+            var contour = new List<CV.Point>();
             contour.Clear();
-            contour.Add(new cv.Point(rect.X, rect.Y));
-            contour.Add(new cv.Point(rect.X, rect.Y + rect.Height));
-            contour.Add(new cv.Point(rect.X + rect.Width, rect.Y + rect.Height));
-            contour.Add(new cv.Point(rect.X + rect.Width, rect.Y));
+            contour.Add(new CV.Point(rect.X, rect.Y));
+            contour.Add(new CV.Point(rect.X, rect.Y + rect.Height));
+            contour.Add(new CV.Point(rect.X + rect.Width, rect.Y + rect.Height));
+            contour.Add(new CV.Point(rect.X + rect.Width, rect.Y));
             int width = src.Width;
-            if (svm.options.kernelType == cv.ML.SVM.KernelTypes.Linear)
+            if (svm.options.kernelType == CV.ML.SVM.KernelTypes.Linear)
             {
                 width = src.Height;
                 rect.X = 0;
@@ -59401,7 +59403,7 @@ namespace CS_Classes
                     var pt = new Point2f(msRNG.Next(0, width - 1), msRNG.Next(0, src.Height - 1));
                     svm.points.Add(pt);
                     int res = 0;
-                    if (svm.options.kernelType == cv.ML.SVM.KernelTypes.Linear)
+                    if (svm.options.kernelType == CV.ML.SVM.KernelTypes.Linear)
                     {
                         res = pt.X >= pt.Y ? 1 : -1;
                     }
@@ -59417,7 +59419,7 @@ namespace CS_Classes
                 dst3 = svm.dst3;
             }
             labels[3] = "There were " + blueCount + " blue points out of " + svm.options.sampleCount;
-            if (svm.options.kernelType != cv.ML.SVM.KernelTypes.Linear)
+            if (svm.options.kernelType != CV.ML.SVM.KernelTypes.Linear)
             {
                 dst2.Rectangle(rect, Scalar.Black, 2);
                 dst3.Rectangle(rect, Scalar.Black, 2);
@@ -59437,13 +59439,13 @@ namespace CS_Classes
         public float directionAvg;
         public float distanceMax;
         public Options_Swarm options = new Options_Swarm();
-        List<List<cv.Point2f>> cornerHistory = new List<List<cv.Point2f>>();
+        List<List<CV.Point2f>> cornerHistory = new List<List<CV.Point2f>>();
         public Swarm_Basics_CS(VBtask task) : base(task)
         {
             FindSlider("Feature Sample Size").Value = 1000;
             FindSlider("Blocksize").Value = 1;
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, CV.Scalar.All(0));
             desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history.";
         }
         public void DrawLines(ref Mat dst)
@@ -59474,10 +59476,10 @@ namespace CS_Classes
             dst3 = feat.dst2;
             if (task.optionsChanged) cornerHistory.Clear();
             int histCount = task.frameHistoryCount;
-            cornerHistory.Add(new List<cv.Point2f>(task.features));
+            cornerHistory.Add(new List<CV.Point2f>(task.features));
             int lastIndex = cornerHistory.Count() - 1;
-            knn.trainInput = new List<cv.Point2f>(cornerHistory.ElementAt(0));
-            knn.queries = new List<cv.Point2f>(cornerHistory.ElementAt(lastIndex));
+            knn.trainInput = new List<CV.Point2f>(cornerHistory.ElementAt(0));
+            knn.queries = new List<CV.Point2f>(cornerHistory.ElementAt(lastIndex));
             knn.Run(empty);
             dst2.SetTo(0);
             mpList.Clear();
@@ -59526,8 +59528,8 @@ namespace CS_Classes
 
     public class Swarm_LeftRightFeatures_CS : CS_Parent
     {
-        public List<cv.Point2f> leftList = new List<cv.Point2f>();
-        public List<cv.Point2f> rightList = new List<cv.Point2f>();
+        public List<CV.Point2f> leftList = new List<CV.Point2f>();
+        public List<CV.Point2f> rightList = new List<CV.Point2f>();
         Feature_Basics feat = new Feature_Basics();
         public Swarm_LeftRightFeatures_CS(VBtask task) : base(task)
         {
@@ -59537,10 +59539,10 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             feat.Run(task.leftView);
-            leftList = new List<cv.Point2f>(task.features);
+            leftList = new List<CV.Point2f>(task.features);
             dst2 = feat.dst2.Clone();
             feat.Run(task.rightView);
-            rightList = new List<cv.Point2f>(task.features);
+            rightList = new List<CV.Point2f>(task.features);
             dst3 = feat.dst2.Clone();
         }
     }
@@ -59702,7 +59704,7 @@ namespace CS_Classes
 
     public class Tessallate_Basics_CS : CS_Parent
     {
-        public List<cv.Point3f> points = new List<cv.Point3f>();
+        public List<CV.Point3f> points = new List<CV.Point3f>();
         public List<Scalar> colors = new List<Scalar>();
         public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
         public RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -59711,7 +59713,7 @@ namespace CS_Classes
             task.gOptions.setGridSize(30);
             desc = "Prepare the list of 2D triangles";
         }
-        List<cv.Point> addTriangle(cv.Point c1, cv.Point c2, cv.Point center, rcData rc, Point3f shift)
+        List<CV.Point> addTriangle(CV.Point c1, CV.Point c2, CV.Point center, rcData rc, Point3f shift)
         {
             var pt1 = getWorldCoordinates(new Point3f(c1.X, c1.Y, (float)rc.depthMean[2]));
             var ptCenter = getWorldCoordinates(new Point3f(center.X, center.Y, (float)rc.depthMean[2]));
@@ -59720,7 +59722,7 @@ namespace CS_Classes
             points.Add(new Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z));
             points.Add(new Point3f(ptCenter.X + shift.X, ptCenter.Y + shift.Y, ptCenter.Z + shift.Z));
             points.Add(new Point3f(pt2.X + shift.X, pt2.Y + shift.Y, pt2.Z + shift.Z));
-            var points2d = new List<cv.Point> { c1, center, c2 };
+            var points2d = new List<CV.Point> { c1, center, c2 };
             return points2d;
         }
         public void RunCS(Mat src)
@@ -59732,17 +59734,17 @@ namespace CS_Classes
             dst2 = hulls.dst2;
             points.Clear();
             colors.Clear();
-            var listOfPoints = new List<List<cv.Point>>();
+            var listOfPoints = new List<List<CV.Point>>();
             foreach (var rc in task.redCells)
             {
                 if (rc.contour == null || rc.contour.Count() < 5) continue;
-                cv.Point[] corners = new cv.Point[4];
+                CV.Point[] corners = new CV.Point[4];
                 for (int i = 0; i < corners.Length; i++)
                 {
                     var pt = rc.contour[i * rc.contour.Count() / 4];
-                    corners[i] = new cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y);
+                    corners[i] = new CV.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y);
                 }
-                var center = new cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2);
+                var center = new CV.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2);
                 DrawLine(dst2, corners[0], center, Scalar.White);
                 DrawLine(dst2, corners[1], center, Scalar.White);
                 DrawLine(dst2, corners[2], center, Scalar.White);
@@ -59767,7 +59769,7 @@ namespace CS_Classes
     public class Tessallate_Triangles_CS : CS_Parent
     {
         public Tessallate_Basics basics = new Tessallate_Basics();
-        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public List<CV.Point3f> oglData = new List<CV.Point3f>();
         public Tessallate_Triangles_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "", "" };
@@ -59798,7 +59800,7 @@ namespace CS_Classes
 
     public class Tessallate_QuadSimple_CS : CS_Parent
     {
-        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public List<CV.Point3f> oglData = new List<CV.Point3f>();
         public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
         RedCloud_Basics redC = new RedCloud_Basics();
         public Tessallate_QuadSimple_CS(VBtask task) : base(task)
@@ -59818,12 +59820,12 @@ namespace CS_Classes
             for (int i = 0; i < task.gridList.Count(); i++)
             {
                 var roi = task.gridList[i];
-                var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
+                var center = new CV.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
                 var index = task.cellMap.Get<byte>(center.Y, center.X);
                 if (index <= 0) continue;
                 var rc = task.redCells[index];
                 dst3[roi].SetTo(rc.color);
-                SetTrueText(rc.depthMean[2].ToString(fmt1), new cv.Point(roi.X, roi.Y));
+                SetTrueText(rc.depthMean[2].ToString(fmt1), new CV.Point(roi.X, roi.Y));
                 var topLeft = getWorldCoordinates(new Point3f(roi.X, roi.Y, (float)rc.depthMean[2]));
                 var botRight = getWorldCoordinates(new Point3f(roi.X + roi.Width, roi.Y + roi.Height, (float)rc.depthMean[2]));
                 oglData.Add(new Point3f(rc.color[2] / 255, rc.color[1] / 255, rc.color[0] / 255));
@@ -59841,7 +59843,7 @@ namespace CS_Classes
 
     public class Tessallate_QuadHulls_CS : CS_Parent
     {
-        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public List<CV.Point3f> oglData = new List<CV.Point3f>();
         public List<List<double>> depthList = new List<List<double>>();
         public List<Vec3b> colorList = new List<Vec3b>();
         public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
@@ -59872,7 +59874,7 @@ namespace CS_Classes
             for (int i = 0; i < task.gridList.Count(); i++)
             {
                 var roi = task.gridList[i];
-                var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
+                var center = new CV.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
                 var index = task.cellMap.Get<byte>(center.Y, center.X);
                 if (index <= 0)
                 {
@@ -59908,7 +59910,7 @@ namespace CS_Classes
 
     public class Tessallate_QuadMinMax_CS : CS_Parent
     {
-        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public List<CV.Point3f> oglData = new List<CV.Point3f>();
         public List<List<double>> depthList1 = new List<List<double>>();
         public List<List<double>> depthList2 = new List<List<double>>();
         public List<Vec3b> colorList = new List<Vec3b>();
@@ -59944,7 +59946,7 @@ namespace CS_Classes
             for (int i = 0; i < task.gridList.Count(); i++)
             {
                 var roi = task.gridList[i];
-                var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
+                var center = new CV.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
                 var index = task.cellMap.Get<byte>(center.Y, center.X);
                 if (index <= 0)
                 {
@@ -59961,7 +59963,7 @@ namespace CS_Classes
                     depthList2[i].Clear();
                 }
                 double depthMin, depthMax;
-                cv.Point minLoc, maxLoc;
+                CV.Point minLoc, maxLoc;
                 Cv2.MinMaxLoc(depth32s[roi], out depthMin, out depthMax, out minLoc, out maxLoc, task.depthMask[roi]);
                 depthMax /= 1000;
                 depthMin /= 1000;
@@ -59985,7 +59987,7 @@ namespace CS_Classes
                     oglData.Add(new Point3f(botRight.X + shift.X, botRight.Y + shift.Y, (float)(depth + shift.Z)));
                     oglData.Add(new Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, (float)(depth + shift.Z)));
                 }
-                SetTrueText(string.Format("{0}\n{1}", d1.ToString(fmt1), d2.ToString(fmt1)), new cv.Point(roi.X, roi.Y), 3);
+                SetTrueText(string.Format("{0}\n{1}", d1.ToString(fmt1), d2.ToString(fmt1)), new CV.Point(roi.X, roi.Y), 3);
                 if (depthList1[i].Count() >= depthListMaxCount) depthList1[i].RemoveAt(0);
                 if (depthList2[i].Count() >= depthListMaxCount) depthList2[i].RemoveAt(0);
             }
@@ -59998,7 +60000,7 @@ namespace CS_Classes
 
     public class Tessallate_Bricks_CS : CS_Parent
     {
-        public List<cv.Point3f> oglData = new List<cv.Point3f>();
+        public List<CV.Point3f> oglData = new List<CV.Point3f>();
         public List<double> depths = new List<double>();
         public Options_OpenGLFunctions options = new Options_OpenGLFunctions();
         public RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -60034,10 +60036,10 @@ namespace CS_Classes
             for (int i = 0; i < task.gridList.Count(); i++)
             {
                 var roi = task.gridList[i];
-                var center = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
+                var center = new CV.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
                 var index = task.cellMap.Get<byte>(center.Y, center.X);
                 double depthMin = 0, depthMax = 0;
-                cv.Point minLoc, maxLoc;
+                CV.Point minLoc, maxLoc;
                 if (index >= 0)
                 {
                     Cv2.MinMaxLoc(task.pcSplit[2][roi], out depthMin, out depthMax, out minLoc, out maxLoc, task.depthMask[roi]);
@@ -60083,7 +60085,7 @@ namespace CS_Classes
                         oglData.Add(min[2]);
                         oglData.Add(min[3]);
                         oglData.Add(max[3]);
-                        SetTrueText(string.Format("{0}\n{1}", depthMin.ToString(fmt1), depthMax.ToString(fmt1)), new cv.Point(roi.X, roi.Y));
+                        SetTrueText(string.Format("{0}\n{1}", depthMin.ToString(fmt1), depthMax.ToString(fmt1)), new CV.Point(roi.X, roi.Y));
                         if (depthMinList[i].Count() >= myListMax) depthMinList[i].RemoveAt(0);
                         if (depthMaxList[i].Count() >= myListMax) depthMaxList[i].RemoveAt(0);
                     }
@@ -60103,7 +60105,7 @@ namespace CS_Classes
     {
         Draw_Ellipses ellipse = new Draw_Ellipses();
         public Mat texture = new Mat();
-        public cv.Rect tRect;
+        public CV.Rect tRect;
         int texturePop;
         public bool tChange; // if the texture hasn't changed this will be false.
         public Texture_Basics_CS(VBtask task) : base(task)
@@ -60133,7 +60135,7 @@ namespace CS_Classes
             }
             if (tChange)
             {
-                var sortcounts = new SortedList<int, cv.Rect>(new compareAllowIdenticalIntegerInverted());
+                var sortcounts = new SortedList<int, CV.Rect>(new compareAllowIdenticalIntegerInverted());
                 foreach (var roi in task.gridList)
                 {
                     sortcounts.Add(dst2[roi].CountNonZero(), roi);
@@ -60171,8 +60173,8 @@ namespace CS_Classes
                 for (int x = (int)d2; x < dst2.Width - 1; x += (int)d2)
                 {
                     var delta = new Point2f(split[4].Get<float>(y, x), split[5].Get<float>(y, x)) * options.TFdelta;
-                    var p1 = new cv.Point((int)(x - delta.X), (int)(y - delta.Y));
-                    var p2 = new cv.Point((int)(x + delta.X), (int)(y + delta.Y));
+                    var p1 = new CV.Point((int)(x - delta.X), (int)(y - delta.Y));
+                    var p2 = new CV.Point((int)(x + delta.X), (int)(y + delta.Y));
                     DrawLine(dst2, p1, p2, task.HighlightColor);
                 }
             }
@@ -60227,7 +60229,7 @@ namespace CS_Classes
         Random_Shuffle shuffle = new Random_Shuffle();
         OpenGL_FlatStudy2 floor = new OpenGL_FlatStudy2();
         Texture_Basics texture;
-        public cv.Rect tRect;
+        public CV.Rect tRect;
         public Mat rgbaTexture = new Mat();
         public OpenGL_TextureShuffle_CS(VBtask task) : base(task)
         {
@@ -60253,10 +60255,10 @@ namespace CS_Classes
             dst2 = texture.dst3;
             dst3.Rectangle(texture.tRect, Scalar.White, task.lineWidth);
             shuffle.Run(texture.texture);
-            tRect = new cv.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4);
+            tRect = new CV.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4);
             dst2[tRect] = shuffle.dst2.Repeat(4, 4);
             var split = dst2[tRect].Split();
-            var alpha = new Mat(split[0].Size(), MatType.CV_8U, cv.Scalar.All(1));
+            var alpha = new Mat(split[0].Size(), MatType.CV_8U, CV.Scalar.All(1));
             var merged = new Mat[] { split[2], split[1], split[0], alpha };
             Cv2.Merge(merged, rgbaTexture);
             SetTrueText("Use mouse movement over the image to display results.", 3);
@@ -60478,11 +60480,11 @@ namespace CS_Classes
             dst2 = mats.dst2;
             dst3 = mats.dst3;
             SetTrueText("Input Gradient Image", 0);
-            SetTrueText("Binary", new cv.Point(dst2.Width / 2 + 5, 10), 1);
+            SetTrueText("Binary", new CV.Point(dst2.Width / 2 + 5, 10), 1);
             SetTrueText("BinaryInv", 2);
-            SetTrueText("Trunc", new cv.Point(dst2.Width / 2 + 5, 10), 2);
-            SetTrueText("ToZero", new cv.Point(10, dst2.Height / 2 + 10), 2);
-            SetTrueText("ToZeroInv", new cv.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2);
+            SetTrueText("Trunc", new CV.Point(dst2.Width / 2 + 5, 10), 2);
+            SetTrueText("ToZero", new CV.Point(10, dst2.Height / 2 + 10), 2);
+            SetTrueText("ToZeroInv", new CV.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2);
             SetTrueText("Current selection from grid at left", 3);
         }
     }
@@ -60549,18 +60551,18 @@ namespace CS_Classes
 
     public class Tracker_Basics_CPP_CS : CS_Parent
     {
-        public cv.Rect tRect;
-        cv.Rect saveRect = new cv.Rect();
+        public CV.Rect tRect;
+        CV.Rect saveRect = new CV.Rect();
         Options_Tracker options = new Options_Tracker();
         public Tracker_Basics_CPP_CS(VBtask task) : base(task)
         {
-            if (task.testAllRunning) task.drawRect = new cv.Rect(25, 25, 25, 25);
+            if (task.testAllRunning) task.drawRect = new CV.Rect(25, 25, 25, 25);
             desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect";
         }
         public void RunCS(Mat src)
         {
             options.RunVB();
-            if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (src.Channels() != 1) src = src.CvtColor(CV.ColorConversionCodes.BGR2GRAY);
             if (task.drawRect != saveRect || task.optionsChanged)
             {
                 if (cPtr != (IntPtr)0) Tracker_Basics_Close(cPtr);
@@ -60572,18 +60574,18 @@ namespace CS_Classes
                 byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
                 Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
                 GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
-                cv.Rect r = saveRect;
+                CV.Rect r = saveRect;
                 IntPtr imagePtr = Tracker_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, r.X, r.Y, r.Width, r.Height);
                 handleSrc.Free();
                 dst2 = src;
                 int[] rectData = new int[4];
                 Marshal.Copy(imagePtr, rectData, 0, rectData.Length);
-                tRect = new cv.Rect(rectData[0], rectData[1], rectData[2], rectData[3]);
+                tRect = new CV.Rect(rectData[0], rectData[1], rectData[2], rectData[3]);
                 dst2.Rectangle(tRect, Scalar.White, task.lineWidth);
             }
             else
             {
-                SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", new cv.Point(10, 140));
+                SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", new CV.Point(10, 140));
             }
         }
         public void Close()
@@ -60610,15 +60612,15 @@ namespace CS_Classes
             if (options.resizeFactor > 1)
             {
                 Mat tmp = new Mat();
-                tmp = src.Resize(new cv.Size(w, h), 0);
-                cv.Rect roi = new cv.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height);
+                tmp = src.Resize(new CV.Size(w, h), 0);
+                CV.Rect roi = new CV.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height);
                 tmp[roi].CopyTo(dst2);
             }
             else
             {
                 dst2.SetTo(0);
-                cv.Rect roi = new cv.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h);
-                dst2[roi] = src.Resize(new cv.Size(w, h), 0);
+                CV.Rect roi = new CV.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h);
+                dst2[roi] = src.Resize(new CV.Size(w, h), 0);
             }
         }
     }
@@ -60703,7 +60705,7 @@ namespace CS_Classes
             options.RunVB();
             imageCenter = new Point2f(options.centerX, options.centerY);
             Mat rotationMat = Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale);
-            Cv2.WarpAffine(src, dst2, rotationMat, new cv.Size());
+            Cv2.WarpAffine(src, dst2, rotationMat, new CV.Size());
             DrawCircle(dst2, imageCenter, task.DotSize * 2, Scalar.Yellow);
             DrawCircle(dst2, imageCenter, task.DotSize, Scalar.Blue);
         }
@@ -60714,7 +60716,7 @@ namespace CS_Classes
 
     public class TransformationMatrix_Basics_CS : CS_Parent
     {
-        List<cv.Point3d> topLocations = new List<cv.Point3d>();
+        List<CV.Point3d> topLocations = new List<CV.Point3d>();
         Options_TransformationMatrix options = new Options_TransformationMatrix();
         public TransformationMatrix_Basics_CS(VBtask task) : base(task)
         {
@@ -60739,18 +60741,18 @@ namespace CS_Classes
                     var pt = topLocations[i];
                     if (pt.X > 0 && pt.X < dst2.Width && pt.Z > 0 && pt.Z < src.Height)
                     {
-                        DrawCircle(dst2, new cv.Point(pt.X, pt.Z), task.DotSize + 2, Scalar.Yellow);
+                        DrawCircle(dst2, new CV.Point(pt.X, pt.Z), task.DotSize + 2, Scalar.Yellow);
                     }
                     if (pt.Z > 0 && pt.Z < dst2.Width && pt.Y > 0 && pt.Y < src.Height)
                     {
-                        DrawCircle(dst3, new cv.Point(pt.Z, pt.Y), task.DotSize + 2, Scalar.Yellow);
+                        DrawCircle(dst3, new CV.Point(pt.Z, pt.Y), task.DotSize + 2, Scalar.Yellow);
                     }
                 }
                 if (topLocations.Count() > 20) topLocations.RemoveAt(0); // just show the last x points
             }
             else
             {
-                SetTrueText("The transformation matrix for the current camera has not been set", new cv.Point(10, 125));
+                SetTrueText("The transformation matrix for the current camera has not been set", new CV.Point(10, 125));
             }
         }
     }
@@ -60761,7 +60763,7 @@ namespace CS_Classes
     public class Triangle_Basics_CS : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
-        public List<cv.Point3f> triangles = new List<cv.Point3f>();
+        public List<CV.Point3f> triangles = new List<CV.Point3f>();
         public Triangle_Basics_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth" };
@@ -60775,15 +60777,15 @@ namespace CS_Classes
             var rc = task.rc;
             if (rc.index == 0) return;
             dst3.SetTo(0);
-            var pt3D = new List<cv.Point3f>();
+            var pt3D = new List<CV.Point3f>();
             foreach (var pt in rc.contour)
             {
-                var point = new cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
-                var vec = task.pointCloud.Get<cv.Point3f>(point.Y, point.X);
+                var point = new CV.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
+                var vec = task.pointCloud.Get<CV.Point3f>(point.Y, point.X);
                 DrawCircle(dst3, point, task.DotSize, Scalar.Yellow);
                 pt3D.Add(vec);
             }
-            var c3D = task.pointCloud.Get<cv.Point3f>(rc.maxDist.Y, rc.maxDist.X);
+            var c3D = task.pointCloud.Get<CV.Point3f>(rc.maxDist.Y, rc.maxDist.X);
             triangles.Clear();
             var color3D = new Point3f(rc.color.Item2 / 255f, rc.color.Item1 / 255f, rc.color.Item0 / 255f);
             for (int i = 0; i < pt3D.Count(); i++)
@@ -60818,13 +60820,13 @@ namespace CS_Classes
             dst3.SetTo(0);
             foreach (var pt in rc.contour)
             {
-                var point = new cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
+                var point = new CV.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
                 DrawCircle(dst3, point, task.DotSize, Scalar.Yellow);
             }
             dst1.SetTo(0);
             foreach (var pt in rc.hull)
             {
-                var point = new cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
+                var point = new CV.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
                 DrawCircle(dst1, point, task.DotSize, Scalar.Yellow);
             }
         }
@@ -60836,7 +60838,7 @@ namespace CS_Classes
     public class Triangle_RedCloud_CS : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
-        public List<cv.Point3f> triangles = new List<cv.Point3f>();
+        public List<CV.Point3f> triangles = new List<CV.Point3f>();
         public Triangle_RedCloud_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "RedCloud_Basics output", "Selected contour - each pixel has depth" };
@@ -60853,14 +60855,14 @@ namespace CS_Classes
             triangles.Clear();
             foreach (rcData rc in task.redCells)
             {
-                var pt3D = new List<cv.Point3f>();
+                var pt3D = new List<CV.Point3f>();
                 foreach (var pt in rc.contour)
                 {
-                    var point = new cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
-                    var vec = task.pointCloud.Get<cv.Point3f>(point.Y, point.X);
+                    var point = new CV.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y);
+                    var vec = task.pointCloud.Get<CV.Point3f>(point.Y, point.X);
                     if (vec.Z > 0) pt3D.Add(vec);
                 }
-                var c3D = task.pointCloud.Get<cv.Point3f>(rc.maxDist.Y, rc.maxDist.X);
+                var c3D = task.pointCloud.Get<CV.Point3f>(rc.maxDist.Y, rc.maxDist.X);
                 var color3D = new Point3f(rc.color.Item2 / 255f, rc.color.Item1 / 255f, rc.color.Item0 / 255f);
                 for (int i = 0; i < pt3D.Count(); i++)
                 {
@@ -60879,7 +60881,7 @@ namespace CS_Classes
     public class Triangle_Cell_CS : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
-        public List<cv.Point3f> triangles = new List<cv.Point3f>();
+        public List<CV.Point3f> triangles = new List<CV.Point3f>();
         public Triangle_Cell_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "RedCloud_Basics output", "Selected contour - each pixel has depth" };
@@ -60893,31 +60895,31 @@ namespace CS_Classes
             var rc = task.rc;
             if (rc.index == 0) return;
             dst3.SetTo(0);
-            var pt3D = new List<cv.Point3f>();
+            var pt3D = new List<CV.Point3f>();
             float aspectRect = (float)rc.rect.Width / rc.rect.Height, aspect = (float)dst2.Width / dst2.Height;
-            cv.Rect cellRect;
+            CV.Rect cellRect;
             float xFactor, yFactor;
             if (aspectRect > aspect)
             {
-                cellRect = new cv.Rect(0, 0, dst2.Width, (int)(rc.rect.Height * dst2.Width / rc.rect.Width));
+                cellRect = new CV.Rect(0, 0, dst2.Width, (int)(rc.rect.Height * dst2.Width / rc.rect.Width));
                 xFactor = dst2.Width;
                 yFactor = (float)(rc.rect.Height * dst2.Width / rc.rect.Width);
             }
             else
             {
-                cellRect = new cv.Rect(0, 0, (int)(rc.rect.Width * dst2.Height / rc.rect.Height), dst2.Height);
+                cellRect = new CV.Rect(0, 0, (int)(rc.rect.Width * dst2.Height / rc.rect.Height), dst2.Height);
                 xFactor = (float)(rc.rect.Width * dst2.Height / rc.rect.Height);
                 yFactor = dst2.Height;
             }
             dst3.Rectangle(cellRect, Scalar.White, task.lineWidth);
             foreach (var pt in rc.contour)
             {
-                var vec = task.pointCloud[rc.rect].Get<cv.Point3f>(pt.Y, pt.X);
-                var point = new cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height);
+                var vec = task.pointCloud[rc.rect].Get<CV.Point3f>(pt.Y, pt.X);
+                var point = new CV.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height);
                 DrawCircle(dst3, point, task.DotSize, Scalar.Yellow);
                 pt3D.Add(vec);
             }
-            var c3D = task.pointCloud.Get<cv.Point3f>(rc.maxDist.Y, rc.maxDist.X);
+            var c3D = task.pointCloud.Get<CV.Point3f>(rc.maxDist.Y, rc.maxDist.X);
             triangles.Clear();
             var color3D = new Point3f(rc.color.Item2 / 255f, rc.color.Item1 / 255f, rc.color.Item0 / 255f);
             for (int i = 0; i < pt3D.Count(); i++)
@@ -60936,7 +60938,7 @@ namespace CS_Classes
     public class Triangle_Mask_CS : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
-        public List<cv.Point3f> triangles = new List<cv.Point3f>();
+        public List<CV.Point3f> triangles = new List<CV.Point3f>();
         public Triangle_Mask_CS(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "RedCloud_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist." };
@@ -60950,19 +60952,19 @@ namespace CS_Classes
             var rc = task.rc;
             if (rc.index == 0) return;
             dst3.SetTo(0);
-            var pt3D = new List<cv.Point3f>();
+            var pt3D = new List<CV.Point3f>();
             float aspectRect = (float)rc.rect.Width / rc.rect.Height, aspect = (float)dst2.Width / dst2.Height;
-            cv.Rect cellRect;
+            CV.Rect cellRect;
             float xFactor, yFactor;
             if (aspectRect > aspect)
             {
-                cellRect = new cv.Rect(0, 0, dst2.Width, (int)(rc.rect.Height * dst2.Width / rc.rect.Width));
+                cellRect = new CV.Rect(0, 0, dst2.Width, (int)(rc.rect.Height * dst2.Width / rc.rect.Width));
                 xFactor = dst2.Width;
                 yFactor = (float)(rc.rect.Height * dst2.Width / rc.rect.Width);
             }
             else
             {
-                cellRect = new cv.Rect(0, 0, (int)(rc.rect.Width * dst2.Height / rc.rect.Height), dst2.Height);
+                cellRect = new CV.Rect(0, 0, (int)(rc.rect.Width * dst2.Height / rc.rect.Height), dst2.Height);
                 xFactor = (float)(rc.rect.Width * dst2.Height / rc.rect.Height);
                 yFactor = dst2.Height;
             }
@@ -60973,7 +60975,7 @@ namespace CS_Classes
                 for (int x = 0; x < rc.rect.Width; x++)
                 {
                     if (rc.mask.Get<byte>(y, x) == 0) continue;
-                    var vec = task.pointCloud[rc.rect].Get<cv.Point3f>(y, x);
+                    var vec = task.pointCloud[rc.rect].Get<CV.Point3f>(y, x);
                     var point = new Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height);
                     DrawCircle(dst3, point, task.DotSize, Scalar.Yellow);
                     pt3D.Add(vec);
@@ -61000,7 +61002,7 @@ namespace CS_Classes
         {
             float[] cVector = { 1, 4, 4, 8 };
             strOut = $"p1 = ({cVector[0]}, {cVector[1]})\t p2 = ({cVector[2]}, {cVector[3]})\n\n";
-            Mat coordinates = cv.Mat.FromPixelData(1, 4, MatType.CV_32F, cVector);
+            Mat coordinates = CV.Mat.FromPixelData(1, 4, MatType.CV_32F, cVector);
             Mat diff_x = coordinates.Col(0) - coordinates.Col(2);
             Mat diff_y = coordinates.Col(1) - coordinates.Col(3);
             // sqrt((x2 - x1)^2 + (y2 - y1)^2)
@@ -61011,8 +61013,8 @@ namespace CS_Classes
             strOut += $"manhattan_distance = {manhattan_distance.At<float>(0, 0)}\n\n";
             // Another way to compute L1 distance, with Absdiff
             // abs(x2 - x1) + abs(y2 - y1)
-            Mat points1 = coordinates[new Range(0, 1), new Range(0, 2)];
-            Mat points2 = coordinates[new Range(0, 1), new Range(2, 4)];
+            Mat points1 = coordinates[new CV.Range(0, 1), new CV.Range(0, 2)];
+            Mat points2 = coordinates[new CV.Range(0, 1), new CV.Range(2, 4)];
             Mat other_manhattan_distance = new Mat();
             Cv2.Absdiff(points1, points2, other_manhattan_distance);
             other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1);
@@ -61081,7 +61083,7 @@ namespace CS_Classes
             int[] choices = { 230, 460, 680, 900, 1110 };
             for (int i = 0; i < choices.Length; i++)
             {
-                var lane = new cv.Rect(choices[i], finishLine, 40, activeHeight);
+                var lane = new CV.Rect(choices[i], finishLine, 40, activeHeight);
                 int cellCount = videoImage[lane].CountNonZero();
                 if (cellCount > 0)
                 {
@@ -61136,7 +61138,7 @@ namespace CS_Classes
     {
         public Video_Basics video = new Video_Basics();
         public BGSubtract_MOG bgSub = new BGSubtract_MOG();
-        public cv.Point[][] contours;
+        public CV.Point[][] contours;
         public Video_MinRect_CS(VBtask task) : base(task)
         {
             video.options.fileInfo = new FileInfo(task.HomeDir + "Data/CarsDrivingUnderBridge.mp4");
@@ -61199,25 +61201,25 @@ namespace CS_Classes
     public class Vignetting_Basics_CPP_CS : CS_Parent
     {
         public bool removeVig;
-        cv.Point center;
+        CV.Point center;
         Options_Vignetting options = new Options_Vignetting();
         public Vignetting_Basics_CPP_CS(VBtask task) : base(task)
         {
-            center = new cv.Point(dst2.Width / 2, dst2.Height / 2);
+            center = new CV.Point(dst2.Width / 2, dst2.Height / 2);
             cPtr = Vignetting_Open();
             desc = "C++ version of vignetting for comparison with the VB version.";
         }
         public void RunCS(Mat src)
         {
             options.RunVB();
-            if (task.ClickPoint != new cv.Point())
+            if (task.ClickPoint != new CV.Point())
                 center = task.ClickPoint;
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, cppData, 0, cppData.Length);
             GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
             IntPtr imagePtr = Vignetting_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.radius, center.X, center.Y, removeVig);
             handleSrc.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
         }
         public void Close()
         {
@@ -61232,11 +61234,11 @@ namespace CS_Classes
     public class Vignetting_VB_CS : CS_Parent
     {
         public bool removeVig;
-        cv.Point center;
+        CV.Point center;
         Options_Vignetting options = new Options_Vignetting();
         public Vignetting_VB_CS(VBtask task) : base(task)
         {
-            center = new cv.Point(dst2.Width / 2, dst2.Height / 2);
+            center = new CV.Point(dst2.Width / 2, dst2.Height / 2);
             labels = new string[] { "", "", "Resulting vignetting.  Click where the center should be located for vignetting", "" };
             desc = "Create a stream of images that have been vignetted.";
         }
@@ -61250,15 +61252,15 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            if (task.ClickPoint != new cv.Point())
+            if (task.ClickPoint != new CV.Point())
                 center = task.ClickPoint;
-            double maxDist = new cv.Point(0, 0).DistanceTo(center) * options.radius;
+            double maxDist = new CV.Point(0, 0).DistanceTo(center) * options.radius;
             double tmp;
             for (int y = 0; y < src.Height; y++)
             {
                 for (int x = 0; x < src.Width; x++)
                 {
-                    cv.Point pt = new cv.Point(x, y);
+                    CV.Point pt = new CV.Point(x, y);
                     double cos = fastCos(pt.DistanceTo(center) / maxDist);
                     cos *= cos;
                     Vec3b val = src.Get<Vec3b>(y, x);
@@ -61458,7 +61460,7 @@ namespace CS_Classes
             {
                 int i = rng.Next(0, image.Cols - 1);
                 int j = rng.Next(0, image.Rows - 1);
-                var center = new cv.Point(i, j);
+                var center = new CV.Point(i, j);
                 var c = new Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255));
                 DrawCircle(image, center, rng.Next(1, 3), c);
             }
@@ -61472,14 +61474,14 @@ namespace CS_Classes
                 int startY = rng.Next(0, image.Rows - 1);
                 int endY = rng.Next(0, image.Rows - 1);
                 var c = new Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255));
-                image.Line(new cv.Point(startX, startY), new cv.Point(endX, endY), c, rng.Next(1, 3), task.lineType);
+                image.Line(new CV.Point(startX, startY), new CV.Point(endX, endY), c, rng.Next(1, 3), task.lineType);
             }
         }
         void scaleImg(Mat input, ref Mat output)
         {
             int height = rng.Next(0, 19) * -1 + charHeight;
             int width = rng.Next(0, 19) * -1 + charWidth;
-            var s = new cv.Size(width, height);
+            var s = new CV.Size(width, height);
             output = input.Resize(s);
         }
         void rotateImg(Mat input, ref Mat output)
@@ -61500,7 +61502,7 @@ namespace CS_Classes
             float heightWarp = charHeight - varHeight + (float)(rng.NextDouble() * varHeight);
             Point2f[] dstPt = { new Point2f(0, 0), new Point2f(0, charHeight), new Point2f(charWidth, 0), new Point2f(widthWarp, heightWarp) };
             var perspectiveTranx = Cv2.GetPerspectiveTransform(srcPt, dstPt);
-            Cv2.WarpPerspective(charImage, charImage, perspectiveTranx, new cv.Size(charImage.Cols, charImage.Rows), InterpolationFlags.Cubic,
+            Cv2.WarpPerspective(charImage, charImage, perspectiveTranx, new CV.Size(charImage.Cols, charImage.Rows), InterpolationFlags.Cubic,
                                     BorderTypes.Constant, Scalar.White);
         }
         public void RunCS(Mat src)
@@ -61512,17 +61514,17 @@ namespace CS_Classes
             {
                 Mat charImage = new Mat(charHeight, charWidth, MatType.CV_8UC3, Scalar.White);
                 string c = characters[rng.Next(0, characters.Length - 1)];
-                Cv2.PutText(charImage, c, new cv.Point(10, charHeight - 10), (cv.HersheyFonts)msRNG.Next(1, 6), msRNG.Next(3, 4),
+                Cv2.PutText(charImage, c, new CV.Point(10, charHeight - 10), (CV.HersheyFonts)msRNG.Next(1, 6), msRNG.Next(3, 4),
                             task.scalarColors[i], msRNG.Next(1, 5), LineTypes.AntiAlias);
                 transformPerspective(ref charImage);
                 rotateImg(charImage, ref charImage);
                 scaleImg(charImage, ref charImage);
-                charImage.CopyTo(outImage[new cv.Rect(charWidth * i, 0, charImage.Cols, charImage.Rows)]);
+                charImage.CopyTo(outImage[new CV.Rect(charWidth * i, 0, charImage.Cols, charImage.Rows)]);
             }
             addLines(ref outImage);
             addNoise(outImage);
-            var roi = new cv.Rect(0, src.Height / 2 - charHeight / 2, dst2.Cols, charHeight);
-            dst2[roi] = outImage.Resize(new cv.Size(dst2.Cols, charHeight));
+            var roi = new CV.Rect(0, src.Height / 2 - charHeight / 2, dst2.Cols, charHeight);
+            dst2[roi] = outImage.Resize(new CV.Size(dst2.Cols, charHeight));
         }
     }
 
@@ -61546,41 +61548,41 @@ namespace CS_Classes
                 Mat[] triangles = new Mat[2];
                 triangle.Run(src);
                 triangles[0] = triangle.triangle.Clone();
-                var srcPoints1 = new List<cv.Point2f>(triangle.options.srcPoints);
+                var srcPoints1 = new List<CV.Point2f>(triangle.options.srcPoints);
                 triangle.Run(src);
                 triangles[1] = triangle.triangle.Clone();
-                var srcPoints2 = new List<cv.Point2f>(triangle.options.srcPoints);
-                var tOriginal = cv.Mat.FromPixelData(3, 1, MatType.CV_32FC2, new float[] { 0, 0, 0, src.Height, src.Width, src.Height });
+                var srcPoints2 = new List<CV.Point2f>(triangle.options.srcPoints);
+                var tOriginal = CV.Mat.FromPixelData(3, 1, MatType.CV_32FC2, new float[] { 0, 0, 0, src.Height, src.Width, src.Height });
                 M = Cv2.GetAffineTransform(tOriginal, triangles[1]);
-                Mat wideMat = new Mat(src.Rows, src.Cols * 2, MatType.CV_8UC3, cv.Scalar.All(0));
-                cv.Scalar[] choices = { Scalar.Red, Scalar.White, Scalar.Yellow };
+                Mat wideMat = new Mat(src.Rows, src.Cols * 2, MatType.CV_8UC3, CV.Scalar.All(0));
+                CV.Scalar[] choices = { Scalar.Red, Scalar.White, Scalar.Yellow };
                 for (int j = 0; j <= 1; j++)
                 {
                     for (int i = 0; i < triangles[j].Rows; i++)
                     {
-                        var p1 = triangles[j].Get<cv.Point2f>(i) + new Point2f(j * src.Width, 0);
-                        var p2 = triangles[j].Get<cv.Point2f>((i + 1) % 3) + new Point2f(j * src.Width, 0);
+                        var p1 = triangles[j].Get<CV.Point2f>(i) + new Point2f(j * src.Width, 0);
+                        var p2 = triangles[j].Get<CV.Point2f>((i + 1) % 3) + new Point2f(j * src.Width, 0);
                         var color = choices[i];
                         DrawLine(wideMat, p1, p2, color, task.lineWidth + 3);
                         if (j == 0)
                         {
-                            var p3 = triangles[j + 1].Get<cv.Point2f>(i) + new Point2f(src.Width, 0);
+                            var p3 = triangles[j + 1].Get<CV.Point2f>(i) + new Point2f(src.Width, 0);
                             DrawLine(wideMat, p1, p3, Scalar.White);
                         }
                     }
                 }
-                var corner = triangles[0].Get<cv.Point2f>(0);
+                var corner = triangles[0].Get<CV.Point2f>(0);
                 DrawCircle(wideMat, corner, task.DotSize + 5, Scalar.Yellow);
                 corner = new Point2f((float)M.Get<double>(0, 2) + src.Width, (float)M.Get<double>(1, 2));
                 DrawCircle(wideMat, corner, task.DotSize + 5, Scalar.Yellow);
-                dst2 = wideMat[new cv.Rect(0, 0, src.Width, src.Height)];
-                dst3 = wideMat[new cv.Rect(src.Width, 0, src.Width, src.Height)];
-                cv.Point pt;
+                dst2 = wideMat[new CV.Rect(0, 0, src.Width, src.Height)];
+                dst3 = wideMat[new CV.Rect(src.Width, 0, src.Width, src.Height)];
+                CV.Point pt;
                 for (int i = 0; i < srcPoints1.Count(); i++)
                 {
-                    pt = new cv.Point((int)srcPoints1[i].X, (int)srcPoints1[i].Y);
+                    pt = new CV.Point((int)srcPoints1[i].X, (int)srcPoints1[i].Y);
                     DrawCircle(dst2, pt, task.DotSize + 2, Scalar.White);
-                    pt = new cv.Point((int)srcPoints2[i].X, (int)srcPoints2[i].Y);
+                    pt = new CV.Point((int)srcPoints2[i].X, (int)srcPoints2[i].Y);
                     DrawCircle(dst3, pt, task.DotSize + 2, Scalar.White);
                 }
             }
@@ -61613,8 +61615,8 @@ namespace CS_Classes
             {
                 options.RunVB();
                 mRect.inputPoints = options.srcPoints;
-                var roi = new cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6);
-                var smallImage = src.Resize(new cv.Size(roi.Width, roi.Height));
+                var roi = new CV.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6);
+                var smallImage = src.Resize(new CV.Size(roi.Width, roi.Height));
                 RotatedRect[] rectangles = new RotatedRect[2];
                 mRect.Run(src);
                 rectangles[1] = mRect.minRect;
@@ -61623,7 +61625,7 @@ namespace CS_Classes
                 M = Cv2.GetPerspectiveTransform(rectangles[0].Points(), rectangles[1].Points());
                 Cv2.WarpPerspective(src, dst2, M, src.Size());
                 dst2[roi] = smallImage;
-                cv.Scalar[] choices = { Scalar.Red, Scalar.White, Scalar.Yellow, Scalar.Green, Scalar.White };
+                CV.Scalar[] choices = { Scalar.Red, Scalar.White, Scalar.Yellow, Scalar.Green, Scalar.White };
                 for (int j = 0; j <= 1; j++)
                 {
                     for (int i = 0; i < rectangles[j].Points().Length; i++)
@@ -61635,7 +61637,7 @@ namespace CS_Classes
                             var p3 = rectangles[1].Points()[i];
                             DrawLine(dst2, p1, p3, Scalar.White);
                         }
-                        cv.Scalar color = choices[i];
+                        CV.Scalar color = choices[i];
                         DrawLine(dst2, p1, p2, color, task.lineWidth + 3);
                     }
                 }
@@ -61663,11 +61665,11 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            var rect = new cv.Rect(0, 0, dst2.Height, dst2.Height);
+            var rect = new CV.Rect(0, 0, dst2.Height, dst2.Height);
             dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst2 = dst1.Clone();
             dst3 = dst1.Clone();
-            var center = new cv.Point(rect.Width / 2, rect.Height / 2);
+            var center = new CV.Point(rect.Width / 2, rect.Height / 2);
             int angle45 = 45, angle90 = 90;
             double scale = 1.0;
             int h = rect.Height, w = rect.Width;
@@ -61685,15 +61687,15 @@ namespace CS_Classes
             m2.Set<double>(0, 2, val + bound_w / 2 - center.X);
             val = m2.At<double>(1, 2);
             m2.Set<double>(1, 2, val + bound_h / 2 - center.Y);
-            Cv2.WarpAffine(dst1[rect], dst2[rect], m1, new cv.Size(bound_w, bound_h));
+            Cv2.WarpAffine(dst1[rect], dst2[rect], m1, new CV.Size(bound_w, bound_h));
             for (int i = 0; i <= 6; i++)
             {
-                Cv2.WarpAffine(dst2[rect], dst2[rect], m1, new cv.Size(bound_w, bound_h));
+                Cv2.WarpAffine(dst2[rect], dst2[rect], m1, new CV.Size(bound_w, bound_h));
             }
-            Cv2.WarpAffine(dst1[rect], dst3[rect], m2, new cv.Size(bound_w, bound_h));
+            Cv2.WarpAffine(dst1[rect], dst3[rect], m2, new CV.Size(bound_w, bound_h));
             for (int i = 0; i <= 2; i++)
             {
-                Cv2.WarpAffine(dst3[rect], dst3[rect], m2, new cv.Size(bound_w, bound_h));
+                Cv2.WarpAffine(dst3[rect], dst3[rect], m2, new CV.Size(bound_w, bound_h));
             }
             dst2.Rectangle(rect, Scalar.White, task.lineWidth, task.lineType);
             dst3.Rectangle(rect, Scalar.White, task.lineWidth, task.lineType);
@@ -61713,7 +61715,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             var input = Cv2.ImRead(task.HomeDir + "Data/8.jpg", ImreadModes.Color);
-            var center = new cv.Point(input.Width / 2, input.Height / 2);
+            var center = new CV.Point(input.Width / 2, input.Height / 2);
             int angle45 = 45, angle90 = 90;
             double scale = 1.0;
             int h = input.Height, w = input.Width;
@@ -61731,15 +61733,15 @@ namespace CS_Classes
             m2.Set<double>(0, 2, val + bound_w / 2 - center.X);
             val = m2.At<double>(1, 2);
             m2.Set<double>(1, 2, val + bound_h / 2 - center.Y);
-            Cv2.WarpAffine(input, dst2, m1, new cv.Size(bound_w, bound_h));
+            Cv2.WarpAffine(input, dst2, m1, new CV.Size(bound_w, bound_h));
             for (int i = 0; i <= 6; i++)
             {
-                Cv2.WarpAffine(dst2, dst2, m1, new cv.Size(bound_w, bound_h));
+                Cv2.WarpAffine(dst2, dst2, m1, new CV.Size(bound_w, bound_h));
             }
-            Cv2.WarpAffine(input, dst3, m2, new cv.Size(bound_w, bound_h));
+            Cv2.WarpAffine(input, dst3, m2, new CV.Size(bound_w, bound_h));
             for (int i = 0; i <= 2; i++)
             {
-                Cv2.WarpAffine(dst3, dst3, m2, new cv.Size(bound_w, bound_h));
+                Cv2.WarpAffine(dst3, dst3, m2, new CV.Size(bound_w, bound_h));
             }
         }
     }
@@ -61785,10 +61787,10 @@ namespace CS_Classes
             Mat merged = new Mat();
             Cv2.Merge(mergeInput, merged);
             dst3.SetTo(0);
-            dst3[new cv.Rect(0, 0, merged.Width, merged.Height)] = merged;
+            dst3[new CV.Rect(0, 0, merged.Width, merged.Height)] = merged;
             SetTrueText("Note small displacement of" + "\n" + "the image when gradient is used." + "\n" +
                             "Other than that, images look the same." + "\n" +
-                            "Displacement increases with Sobel" + "\n" + "kernel size", new cv.Point(merged.Width + 10, 40), 3);
+                            "Displacement increases with Sobel" + "\n" + "kernel size", new CV.Point(merged.Width + 10, 40), 3);
         }
     }
 
@@ -61801,7 +61803,7 @@ namespace CS_Classes
         public float[] warpMatrix;
         public Mat src2 = new Mat();
         public Mat aligned = new Mat();
-        public cv.Rect outputRect;
+        public CV.Rect outputRect;
         readonly Options_WarpModel options = new Options_WarpModel();
         public WarpModel_ECC_CPP_CS(VBtask task) : base(task)
         {
@@ -61847,17 +61849,17 @@ namespace CS_Classes
             Marshal.Copy(imagePtr, warpMatrix, 0, warpMatrix.Length);
             if (options.warpMode != 3)
             {
-                Mat warpMat = cv.Mat.FromPixelData(2, 3, MatType.CV_32F, warpMatrix);
+                Mat warpMat = CV.Mat.FromPixelData(2, 3, MatType.CV_32F, warpMatrix);
                 Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), InterpolationFlags.Linear | InterpolationFlags.WarpInverseMap);
             }
             else
             {
-                Mat warpMat = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, warpMatrix);
+                Mat warpMat = CV.Mat.FromPixelData(3, 3, MatType.CV_32F, warpMatrix);
                 Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), InterpolationFlags.Linear | InterpolationFlags.WarpInverseMap);
             }
-            dst2 = new Mat(task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
-            outputRect = new cv.Rect(0, 0, src.Width, src.Height);
+            dst2 = new Mat(task.WorkingRes, MatType.CV_8U, CV.Scalar.All(0));
+            dst3 = new Mat(task.WorkingRes, MatType.CV_8U, CV.Scalar.All(0));
+            outputRect = new CV.Rect(0, 0, src.Width, src.Height);
             dst2[outputRect] = src;
             dst3[outputRect] = src2;
             string outStr = "The warp matrix is:" + "\n";
@@ -61870,7 +61872,7 @@ namespace CS_Classes
             {
                 outStr += "\nNOTE: Gradients may give better results.";
             }
-            SetTrueText(outStr, new cv.Point(aligned.Width + 10, 220));
+            SetTrueText(outStr, new CV.Point(aligned.Width + 10, 220));
         }
         public void Close()
         {
@@ -61897,10 +61899,10 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
-            cv.Rect[] r = {
-        new cv.Rect(0, 0, options.pkImage.Width, options.pkImage.Height / 3),
-        new cv.Rect(0, options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3),
-        new cv.Rect(0, 2 * options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3)
+            CV.Rect[] r = {
+        new CV.Rect(0, 0, options.pkImage.Width, options.pkImage.Height / 3),
+        new CV.Rect(0, options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3),
+        new CV.Rect(0, 2 * options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3)
     };
             for (int i = 0; i < r.Length; i++)
             {
@@ -61915,8 +61917,8 @@ namespace CS_Classes
             {
                 for (int i = 0; i < rgb.Length; i++)
                 {
-                    cv.Size sz = new cv.Size(src.Width * rgb[i].Height / rgb[i].Width, src.Height);
-                    r[i] = new cv.Rect(0, 0, sz.Width, sz.Height);
+                    CV.Size sz = new CV.Size(src.Width * rgb[i].Height / rgb[i].Width, src.Height);
+                    r[i] = new CV.Rect(0, 0, sz.Width, sz.Height);
                     rgb[i] = rgb[i].Resize(sz);
                 }
             }
@@ -61966,7 +61968,7 @@ namespace CS_Classes
             Point2f[] pts = { new Point2f(0, 0), new Point2f(0, src.Height), new Point2f(src.Width, 0),
                         new Point2f(options.width, options.height) };
             Mat perpectiveTranx = Cv2.GetPerspectiveTransform(srcPt, pts);
-            Cv2.WarpPerspective(src, dst2, perpectiveTranx, new cv.Size(src.Cols, src.Rows), InterpolationFlags.Cubic, BorderTypes.Constant, Scalar.White);
+            Cv2.WarpPerspective(src, dst2, perpectiveTranx, new CV.Size(src.Cols, src.Rows), InterpolationFlags.Cubic, BorderTypes.Constant, Scalar.White);
             Point2f center = new Point2f(src.Cols / 2, src.Rows / 2);
             Mat rotationMatrix = Cv2.GetRotationMatrix2D(center, options.angle, 1.0);
             Cv2.WarpAffine(dst2, dst3, rotationMatrix, src.Size(), InterpolationFlags.Nearest);
@@ -61979,7 +61981,7 @@ namespace CS_Classes
     public class Watershed_Basics_CS : CS_Parent
     {
         AddWeighted_Basics addW = new AddWeighted_Basics();
-        List<cv.Rect> rects = new List<cv.Rect>();
+        List<CV.Rect> rects = new List<CV.Rect>();
         public bool UseCorners { get; set; }
         public Watershed_Basics_CS(VBtask task) : base(task)
         {
@@ -61995,7 +61997,7 @@ namespace CS_Classes
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    cv.Rect r = new cv.Rect(0, 0, src.Width / 10, src.Height / 10);
+                    CV.Rect r = new CV.Rect(0, 0, src.Width / 10, src.Height / 10);
                     switch (i)
                     {
                         case 1:
@@ -62014,7 +62016,7 @@ namespace CS_Classes
             }
             if (rects.Count() > 0)
             {
-                Mat markers = new Mat(src.Size(), MatType.CV_32S, cv.Scalar.All(0));
+                Mat markers = new Mat(src.Size(), MatType.CV_32S, CV.Scalar.All(0));
                 for (int i = 0; i < rects.Count(); i++)
                 {
                     markers.Rectangle(rects[i], Scalar.All(i + 1), -1);
@@ -62032,7 +62034,7 @@ namespace CS_Classes
             {
                 dst2 = src;
             }
-            task.drawRect = new cv.Rect();
+            task.drawRect = new CV.Rect();
             labels[2] = "There were " + rects.Count().ToString() + " regions defined as input";
         }
     }
@@ -62101,8 +62103,8 @@ namespace CS_Classes
                 {
                     float r = kpt.Size / 2;
                     DrawCircle(dst2, kpt.Pt, (int)Math.Truncate(r), new Scalar(0, 255, 0));
-                    dst2.Line(new cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), new cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), new Scalar(0, 255, 0), task.lineWidth, LineTypes.Link8, 0);
-                    dst2.Line(new cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), new cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), new Scalar(0, 255, 0), task.lineWidth, LineTypes.Link8, 0);
+                    dst2.Line(new CV.Point(kpt.Pt.X + r, kpt.Pt.Y + r), new CV.Point(kpt.Pt.X - r, kpt.Pt.Y - r), new Scalar(0, 255, 0), task.lineWidth, LineTypes.Link8, 0);
+                    dst2.Line(new CV.Point(kpt.Pt.X - r, kpt.Pt.Y + r), new CV.Point(kpt.Pt.X + r, kpt.Pt.Y - r), new Scalar(0, 255, 0), task.lineWidth, LineTypes.Link8, 0);
                 }
             }
         }
@@ -62174,7 +62176,7 @@ namespace CS_Classes
             IntPtr imagePtr = xPhoto_OilPaint_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                                     options.blockSize, options.dynamicRatio, options.colorCode);
             handleSrc.Free();
-            if (imagePtr != IntPtr.Zero) dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+            if (imagePtr != IntPtr.Zero) dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
         }
         public void Close()
         {
@@ -62238,7 +62240,7 @@ namespace CS_Classes
             IntPtr imagePtr = xPhoto_Inpaint_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, (int)iType);
             handleSrc.Free();
             handleMask.Free();
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+            dst2 = CV.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
             SetTrueText("The xPhoto Inpaint call hangs." + "\n" + "Uncomment the C++ line - see XPhoto.cpp - to test", 1);
         }
         public void Close()
@@ -62288,10 +62290,10 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             int resizeFactor = 1;
-            Mat input = new cv.Mat();
+            Mat input = new CV.Mat();
             if (src.Cols >= 1280)
             {
-                Cv2.Resize(src, input, new cv.Size(src.Cols / 4, src.Rows / 4));
+                Cv2.Resize(src, input, new CV.Size(src.Cols / 4, src.Rows / 4));
                 resizeFactor = 4;
             }
             else

@@ -1,4 +1,6 @@
 Imports cv = OpenCvSharp
+Imports System.Windows.Forms
+
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class IMU_Basics : Inherits VB_Parent
     Dim lastTimeStamp As Double
@@ -924,9 +926,9 @@ End Class
 Public Class IMU_GMatrixWithOptions : Inherits VB_Parent
     Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
     Public gMatrix As cv.Mat
-    Dim xSlider As Windows.Forms.TrackBar
-    Dim ySlider As Windows.Forms.TrackBar
-    Dim zSlider As Windows.Forms.TrackBar
+    Dim xSlider As TrackBar
+    Dim ySlider As TrackBar
+    Dim zSlider As TrackBar
     Dim options As New Options_IMU
     Public Sub New()
         desc = "Find the angle of tilt for the camera with respect to gravity."

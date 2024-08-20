@@ -49,5 +49,5 @@ Partial Class OptionsRadioButtons
 
     End Sub
 
-    Friend WithEvents FlowLayoutPanel1 As Windows.Forms.FlowLayoutPanel
+    Friend WithEvents FlowLayoutPanel1 As System.Windows.Forms.FlowLayoutPanel
 End Class

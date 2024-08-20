@@ -2,6 +2,7 @@
 Imports System.IO
 Imports System.Numerics
 Imports OpenCvSharp.ML
+Imports System.Windows.Forms
 
 Public Class Options_Annealing : Inherits VB_Parent
     Public cityCount As Integer = 25
@@ -797,7 +798,7 @@ Public Class Options_OpenGLFunctions : Inherits VB_Parent
     Public zTrans As Double = 0.5
     Public eye As cv.Vec3f = New cv.Vec3f(0, 0, -40)
     Public scaleXYZ As cv.Vec3f = New cv.Vec3f(10, 10, 1)
-    Public PointSizeSlider As Windows.Forms.TrackBar
+    Public PointSizeSlider As TrackBar
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("OpenGL shift left/right (X-axis) X100", -300, 300, 0)
@@ -958,7 +959,7 @@ End Class
 
 Public Class Options_Fractal : Inherits VB_Parent
     Public iterations As Integer = 34
-    Public resetCheck As Windows.Forms.CheckBox
+    Public resetCheck As CheckBox
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Mandelbrot iterations", 1, 50, iterations)
         If check.Setup(traceName) Then check.addCheckBox("Reset to original Mandelbrot")
@@ -1075,7 +1076,7 @@ End Class
 
 Public Class Options_MotionBlur : Inherits VB_Parent
     Public showDirection As Boolean = True
-    Public redoCheckBox As Windows.Forms.CheckBox
+    Public redoCheckBox As CheckBox
     Public kernelSize As Integer = 51
     Public theta As Double = 0
     Public restoreLen As Integer = 10
@@ -1734,8 +1735,8 @@ End Class
 
 
 Public Class Options_RotatePoly : Inherits VB_Parent
-    Public changeCheck As Windows.Forms.CheckBox
-    Public angleSlider As Windows.Forms.TrackBar
+    Public changeCheck As CheckBox
+    Public angleSlider As TrackBar
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Amount to rotate triangle", -180, 180, 10)
 
@@ -1946,12 +1947,12 @@ End Class
 
 Public Class Options_Sort : Inherits VB_Parent
     Public sortOption As cv.SortFlags = cv.SortFlags.EveryColumn + cv.SortFlags.Ascending
-    Public radio0 As Windows.Forms.RadioButton
-    Public radio1 As Windows.Forms.RadioButton
-    Public radio2 As Windows.Forms.RadioButton
-    Public radio3 As Windows.Forms.RadioButton
-    Public radio4 As Windows.Forms.RadioButton
-    Public radio5 As Windows.Forms.RadioButton
+    Public radio0 As RadioButton
+    Public radio1 As RadioButton
+    Public radio2 As RadioButton
+    Public radio3 As RadioButton
+    Public radio4 As RadioButton
+    Public radio5 As RadioButton
     Public sortThreshold As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -2841,14 +2842,14 @@ End Class
 
 
 Public Class Options_Gif : Inherits VB_Parent
-    Public buildCheck As Windows.Forms.CheckBox
-    Public restartCheck As Windows.Forms.CheckBox
-    Public dst0Radio As Windows.Forms.RadioButton
-    Public dst1Radio As Windows.Forms.RadioButton
-    Public dst2Radio As Windows.Forms.RadioButton
-    Public dst3Radio As Windows.Forms.RadioButton
-    Public OpenCVBwindow As Windows.Forms.RadioButton
-    Public OpenGLwindow As Windows.Forms.RadioButton
+    Public buildCheck As CheckBox
+    Public restartCheck As CheckBox
+    Public dst0Radio As RadioButton
+    Public dst1Radio As RadioButton
+    Public dst2Radio As RadioButton
+    Public dst3Radio As RadioButton
+    Public OpenCVBwindow As RadioButton
+    Public OpenGLwindow As RadioButton
     Public Sub New()
         If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)

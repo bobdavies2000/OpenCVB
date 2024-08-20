@@ -87,7 +87,7 @@ Public Class MiniCloud_RotateAngle : Inherits VB_Parent
     ReadOnly peak As New MiniCloud_Rotate
     Dim mats As New Mat_4to1
     Public plot As New Plot_OverTimeSingle
-    ReadOnly resetCheck As Windows.Forms.CheckBox
+    ReadOnly resetCheck As System.Windows.Forms.CheckBox
     Public Sub New()
         task.accRadians.Y = -cv.Cv2.PI / 2
 

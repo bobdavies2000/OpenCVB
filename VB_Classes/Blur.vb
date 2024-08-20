@@ -1,4 +1,5 @@
 Imports OpenCvSharp
+Imports System.Windows.Forms
 Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
 Public Class Blur_Basics : Inherits VB_Parent
@@ -21,7 +22,7 @@ End Class
 
 Public Class Blur_Homogeneous : Inherits VB_Parent
     Dim blur As New Blur_Basics
-    Dim blurKernelSlider As Windows.Forms.TrackBar
+    Dim blurKernelSlider As TrackBar
     Public Sub New()
         desc = "Smooth each pixel with a kernel of 1's of different sizes."
         blurKernelSlider = FindSlider("Blur Kernel Size")
@@ -40,7 +41,7 @@ End Class
 
 Public Class Blur_Median : Inherits VB_Parent
     Dim blur As New Blur_Basics
-    Dim blurKernelSlider As Windows.Forms.TrackBar
+    Dim blurKernelSlider As TrackBar
     Public Sub New()
         desc = "Replace each pixel with the median of neighborhood of varying sizes."
         blurKernelSlider = FindSlider("Blur Kernel Size")
@@ -59,7 +60,7 @@ End Class
 ' https://www.tutorialspoint.com/opencv/opencv_bilateral_filter.htm
 Public Class Blur_Bilateral : Inherits VB_Parent
     Dim blur As New Blur_Basics
-    Dim blurKernelSlider As Windows.Forms.TrackBar
+    Dim blurKernelSlider As TrackBar
     Public Sub New()
         desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
         blurKernelSlider = FindSlider("Blur Kernel Size")

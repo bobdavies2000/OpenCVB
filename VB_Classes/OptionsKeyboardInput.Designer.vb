@@ -55,6 +55,6 @@ Partial Class OptionsKeyboardInput
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents TextBox1 As Windows.Forms.TextBox
-    Friend WithEvents KeyboardLabel As Windows.Forms.Label
+    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
+    Friend WithEvents KeyboardLabel As System.Windows.Forms.Label
 End Class

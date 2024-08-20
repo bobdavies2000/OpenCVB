@@ -1636,6 +1636,8 @@ Public Class Main_UI
                 Dim updatedDrawRect = task.drawRect
                 If parms.algName.EndsWith("_CS") Then
                     Static findCSharp = New CS_Classes.CSAlgorithmList()
+
+
                     If task.csAlgorithmObject Is Nothing Then
                         task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)
                         task.desc = task.csAlgorithmObject.desc

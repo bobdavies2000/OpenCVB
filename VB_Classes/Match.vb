@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
+Imports System.Windows.Forms
 Public Class Match_Basics : Inherits VB_Parent
     Public template As cv.Mat
     Public mmData As mmData
@@ -9,7 +10,7 @@ Public Class Match_Basics : Inherits VB_Parent
     Public matchRect As New cv.Rect
     Public searchRect As New cv.Rect
     Public Sub New()
-        If standalone Then task.gOptions.DebugChecked = True
+        If standalone Then task.gOptions.debugChecked = True
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
@@ -17,8 +18,8 @@ Public Class Match_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If standalone Then
-            If task.gOptions.DebugChecked Then
-                task.gOptions.DebugChecked = False
+            If task.gOptions.debugChecked Then
+                task.gOptions.debugChecked = False
                 Dim inputRect = If(task.FirstPass, New cv.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
                 template = src(inputRect)
             End If
@@ -43,7 +44,7 @@ Public Class Match_Basics : Inherits VB_Parent
         End If
         If standalone Then
             dst2 = src
-            DrawCircle(dst2,matchCenter, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst2, matchCenter, task.DotSize, cv.Scalar.White)
             dst3 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
         End If
     End Sub
@@ -475,7 +476,7 @@ End Class
 
 Public Class Match_tCell : Inherits VB_Parent
     Public tCells As New List(Of tCell)
-    Dim cellSlider As Windows.Forms.TrackBar
+    Dim cellSlider As TrackBar
     Dim options As New Options_Features
     Dim lineDisp As New Line_DisplayInfo
     Public Sub New()

@@ -1,4 +1,5 @@
 Imports cv = OpenCvSharp
+Imports System.Windows.Forms
 Imports System.Text.RegularExpressions
 ' Benford's Law is pretty cool but I don't think it is a phenomenon of nature.  It is produced from bringing real world measurements to a human scale.
 ' Reducing an image with compression works because human understanding maps the data within reach of the understanding embedded in our number system.
@@ -17,7 +18,7 @@ Public Class Benford_Basics : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Dim addW As New AddWeighted_Basics
     Dim use99 As Boolean
-    Dim weightSlider As Windows.Forms.TrackBar
+    Dim weightSlider As TrackBar
     Public Sub New()
         For i = 1 To expectedDistribution.Count - 1
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.

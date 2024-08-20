@@ -115,11 +115,11 @@ Partial Class PixelViewerForm
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents rtb As Windows.Forms.RichTextBox
-    Friend WithEvents Timer1 As Windows.Forms.Timer
-    Friend WithEvents ToolStrip1 As Windows.Forms.ToolStrip
-    Friend WithEvents ToolStripButton1 As Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripButton2 As Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripButton3 As Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripButton4 As Windows.Forms.ToolStripButton
+    Friend WithEvents rtb As System.Windows.Forms.RichTextBox
+    Friend WithEvents Timer1 As System.Windows.Forms.Timer
+    Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
+    Friend WithEvents ToolStripButton1 As System.Windows.Forms.ToolStripButton
+    Friend WithEvents ToolStripButton2 As System.Windows.Forms.ToolStripButton
+    Friend WithEvents ToolStripButton3 As System.Windows.Forms.ToolStripButton
+    Friend WithEvents ToolStripButton4 As System.Windows.Forms.ToolStripButton
 End Class

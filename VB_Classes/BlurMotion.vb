@@ -1,9 +1,10 @@
 Imports cv = OpenCvSharp
+Imports System.Windows.Forms
 Public Class BlurMotion_Basics : Inherits VB_Parent
     Public kernel As cv.Mat
     Public options As New Options_MotionBlur
-    Dim blurSlider As Windows.Forms.TrackBar
-    Dim blurAngleSlider As Windows.Forms.TrackBar
+    Dim blurSlider As TrackBar
+    Dim blurAngleSlider As TrackBar
     Public Sub New()
         blurSlider = FindSlider("Motion Blur Length")
         blurAngleSlider = FindSlider("Motion Blur Angle")

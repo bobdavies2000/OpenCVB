@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
 Public Class PhotoShop_Clahe : Inherits VB_Parent
     ' Contrast Limited Adaptive Histogram Equalization (CLAHE) : Inherits VB_Parent
     Public Sub New()
@@ -323,7 +324,7 @@ End Class
 Public Class PhotoShop_EmbossAll : Inherits VB_Parent
     Dim emboss As New PhotoShop_Emboss
     Dim mats As New Mat_4to1
-    Dim sizeSlider As Windows.Forms.TrackBar
+    Dim sizeSlider As TrackBar
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Emboss threshold", 0, 255, 200)

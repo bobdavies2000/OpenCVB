@@ -74,7 +74,7 @@ Partial Class OptionsContainer
 
     End Sub
 
-    Friend WithEvents ToolStrip1 As Windows.Forms.ToolStrip
-    Friend WithEvents ToolStripButton1 As Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripButton2 As Windows.Forms.ToolStripButton
+    Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
+    Friend WithEvents ToolStripButton1 As System.Windows.Forms.ToolStripButton
+    Friend WithEvents ToolStripButton2 As System.Windows.Forms.ToolStripButton
 End Class

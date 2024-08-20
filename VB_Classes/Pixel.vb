@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
 Public Class Pixel_Viewer : Inherits VB_Parent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
@@ -382,7 +383,7 @@ End Class
 
 Public Class Pixel_Zoom : Inherits VB_Parent
     Public mousePoint = New cv.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
-    Public zoomSlider As Windows.Forms.TrackBar
+    Public zoomSlider As TrackBar
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom Factor", 2, 16, 4)
         labels(2) = "To zoom move the mouse over the image"

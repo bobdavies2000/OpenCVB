@@ -17,7 +17,7 @@ Module VB_Common
     Public algorithmNames As New List(Of String)
     Public algorithmTimes As New List(Of DateTime)
     Public algorithmStack As New Stack()
-    Public Function FindFrm(title As String) As Windows.Forms.Form
+    Public Function FindFrm(title As String) As System.Windows.Forms.Form
         For Each frm In Application.OpenForms
             If frm.text = title Then Return frm
         Next

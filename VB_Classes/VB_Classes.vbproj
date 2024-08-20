@@ -516,7 +516,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(ProjectDir)\..\bin\Release\UI_Generator.exe
+    <PreBuildEvent>$(SolutionDir)bin\Release\net8.0-windows\UI_Generator.exe
 </PreBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

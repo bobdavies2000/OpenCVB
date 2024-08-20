@@ -102,11 +102,11 @@ Partial Class OptionsFileName
 
     End Sub
 
-    Friend WithEvents TrackBar1 As Windows.Forms.TrackBar
-    Friend WithEvents PlayButton As Windows.Forms.Button
-    Friend WithEvents FileNameLabel As Windows.Forms.Label
-    Friend WithEvents Button1 As Windows.Forms.Button
-    Friend WithEvents filename As Windows.Forms.TextBox
-    Friend WithEvents OpenFileDialog1 As Windows.Forms.OpenFileDialog
-    Friend WithEvents OpenFileDialog2 As Windows.Forms.OpenFileDialog
+    Friend WithEvents TrackBar1 As System.Windows.Forms.TrackBar
+    Friend WithEvents PlayButton As System.Windows.Forms.Button
+    Friend WithEvents FileNameLabel As System.Windows.Forms.Label
+    Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents filename As System.Windows.Forms.TextBox
+    Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents OpenFileDialog2 As System.Windows.Forms.OpenFileDialog
 End Class

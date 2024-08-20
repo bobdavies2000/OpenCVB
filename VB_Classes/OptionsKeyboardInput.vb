@@ -1,4 +1,5 @@
 ﻿Imports System.Windows.Forms
+
 Public Class OptionsKeyboardInput
     Public inputText As New List(Of String)
     Dim keyboardLastInput As String

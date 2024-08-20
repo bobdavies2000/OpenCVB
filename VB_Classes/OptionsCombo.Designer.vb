@@ -60,6 +60,6 @@ Partial Class OptionsCombo
 
     End Sub
 
-    Friend WithEvents Box As Windows.Forms.ComboBox
-    Friend WithEvents ComboLabel As Windows.Forms.Label
+    Friend WithEvents Box As System.Windows.Forms.ComboBox
+    Friend WithEvents ComboLabel As System.Windows.Forms.Label
 End Class

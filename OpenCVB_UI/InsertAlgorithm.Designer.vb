@@ -48,7 +48,7 @@ Partial Class InsertAlgorithm
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(642, 20)
         Me.Label1.TabIndex = 4
-        Me.Label1.Text = "Algorithm Name - must have the form of 'ModuleName_ClassName', i.e. RedCloud_Basi" &
+        Me.Label1.Text = "Algorithm Name - must have the form of 'ModuleName_ClassName', i.e. RedCloud_Basics" &
     "cs"
         '
         'AddVB

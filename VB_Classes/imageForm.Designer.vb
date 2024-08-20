@@ -49,5 +49,5 @@ Partial Class ImageForm
 
     End Sub
 
-    Friend WithEvents imagePic As Windows.Forms.PictureBox
+    Friend WithEvents imagePic As System.Windows.Forms.PictureBox
 End Class
