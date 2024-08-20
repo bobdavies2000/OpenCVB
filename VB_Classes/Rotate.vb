@@ -7,7 +7,7 @@ Public Class Rotate_Basics : Inherits VB_Parent
     Public options As New Options_Resize
     Public rotateAngle As Single = 1000
     Public rotateCenter As cv.Point
-    Dim optionsRotate As New Options_Rotate
+    Public optionsRotate As New Options_Rotate
     Public Sub New()
         rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Rotate a rectangle by a specified angle"
@@ -254,5 +254,25 @@ Public Class Rotate_Horizon : Inherits VB_Parent
         dst3 = rotate.dst2.Clone
 
         strOut = edges.strOut
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Rotate_Verticalize : Inherits VB_Parent
+    Dim rotate As New Rotate_Basics
+    Dim angleSlider As New System.Windows.Forms.TrackBar
+    Public Sub New()
+        angleSlider = FindSlider("Rotation Angle in degrees")
+        FindRadio("Nearest (preserves pixel values best)").Checked = True
+        desc = "Use gravity vector to rotate the image to be vertical"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then angleSlider.Value = task.verticalizeAngle
+        rotate.Run(src)
+        dst2 = rotate.dst2
     End Sub
 End Class

@@ -92,7 +92,7 @@ Public Class OptionsRedCloud
             Dim method = colorMethods(i)
             ColorSource.Items.Add(method)
         Next
-        ColorSource.SelectedItem() = "Bin4Way_Regions"
+        ColorSource.SelectedItem() = "FeatureLess_Groups"
 
         task.redOptions.setBitReductionBar(40)
         Select Case task.cameraName

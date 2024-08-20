@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Foreground_KMeans2 : Inherits VB_Parent
+Public Class Foreground_KMeans : Inherits VB_Parent
     Dim km As New KMeans_Image
     Public Sub New()
         FindSlider("KMeans k").Value = 2

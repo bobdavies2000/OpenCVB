@@ -328,7 +328,7 @@ End Class
 
 
 Public Class Contour_Foreground : Inherits VB_Parent
-    Dim km As New Foreground_KMeans2
+    Dim km As New Foreground_KMeans
     Dim contour As New Contour_General
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

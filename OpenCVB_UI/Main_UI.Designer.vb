@@ -177,6 +177,9 @@ Partial Class Main_UI
         ' 
         AvailableAlgorithms.AutoCompleteMode = AutoCompleteMode.SuggestAppend
         AvailableAlgorithms.AutoCompleteSource = AutoCompleteSource.ListItems
+        AvailableAlgorithms.DropDownHeight = 500
+        AvailableAlgorithms.IntegralHeight = False
+        AvailableAlgorithms.MaxDropDownItems = 100
         AvailableAlgorithms.Name = "AvailableAlgorithms"
         AvailableAlgorithms.Size = New Size(300, 34)
         ' 

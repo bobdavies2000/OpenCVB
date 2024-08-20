@@ -37,6 +37,7 @@ Public Class IMU_Basics : Inherits VB_Parent
         Dim x2 = -(90 + task.theta.X * 57.2958)
         Dim y1 = task.accRadians.Y - cv.Cv2.PI
         If task.accRadians.X < 0 Then y1 *= -1
+        task.verticalizeAngle = y1 * 58.2958
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
                  Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf +
                  "Velocity-Filtered Angles to gravity in degrees" + vbCrLf +

@@ -96,16 +96,16 @@ Public Class CPP_Basics : Inherits VB_Parent
 
         Dim dstPtr As IntPtr, type As Integer
         dstPtr = cppTask_GetDst(cPtr, 0, type)
-        dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr)
+        dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
 
         dstPtr = cppTask_GetDst(cPtr, 1, type)
-        dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr)
+        dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
 
         dstPtr = cppTask_GetDst(cPtr, 2, type)
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr)
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
 
         dstPtr = cppTask_GetDst(cPtr, 3, type)
-        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr)
+        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = cppTask_Close(cPtr)

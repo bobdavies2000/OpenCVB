@@ -9002,7 +9002,7 @@ namespace CS_Classes
 
     public class Contour_Foreground_CS : CS_Parent
     {
-        Foreground_KMeans2 km = new Foreground_KMeans2();
+        Foreground_KMeans km = new Foreground_KMeans();
         Contour_General contour = new Contour_General();
 
         public Contour_Foreground_CS(VBtask task) : base(task)
@@ -14197,7 +14197,7 @@ namespace CS_Classes
     public class Distance_Foreground_CS : CS_Parent
     {
         Distance_Basics dist = new Distance_Basics();
-        Foreground_KMeans2 foreground = new Foreground_KMeans2();
+        Foreground_KMeans foreground = new Foreground_KMeans();
         public bool useBackgroundAsInput;
 
         public Distance_Foreground_CS(VBtask task) : base(task)
@@ -22730,10 +22730,10 @@ namespace CS_Classes
 
 
 
-    public class Foreground_KMeans2_CS : CS_Parent
+    public class Foreground_KMeans_CS : CS_Parent
     {
         KMeans_Image km = new KMeans_Image();
-        public Foreground_KMeans2_CS(VBtask task) : base(task)
+        public Foreground_KMeans_CS(VBtask task) : base(task)
         {
             FindSlider("KMeans k").Value = 2;
             labels = new string[] { "", "", "Foreground Mask", "Background Mask" };
@@ -26901,7 +26901,7 @@ namespace CS_Classes
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         public Mat depthMask = new Mat();
-        Foreground_KMeans2 fore = new Foreground_KMeans2();
+        Foreground_KMeans fore = new Foreground_KMeans();
         public Hist3D_DepthWithMask_CS(VBtask task) : base(task)
         {
             desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics";
@@ -39926,7 +39926,7 @@ namespace CS_Classes
     public class Moments_Basics_CS : CS_Parent
     {
         public Point2f centroid;
-        Foreground_KMeans2 foreground = new Foreground_KMeans2();
+        Foreground_KMeans foreground = new Foreground_KMeans();
         public int scaleFactor = 1;
         public cv.Point offsetPt;
         public Kalman_Basics kalman = new Kalman_Basics();
@@ -39966,7 +39966,7 @@ namespace CS_Classes
 
     public class Moments_CentroidKalman_CS : CS_Parent
     {
-        Foreground_KMeans2 foreground = new Foreground_KMeans2();
+        Foreground_KMeans foreground = new Foreground_KMeans();
         Kalman_Basics kalman = new Kalman_Basics();
         public Moments_CentroidKalman_CS(VBtask task) : base(task)
         {

@@ -578,7 +578,7 @@ namespace CS_Classes
 			if (algorithmName == "Foreground_CellsFore_CS") return new Foreground_CellsFore_CS(task);
 			if (algorithmName == "Foreground_Contours_CS") return new Foreground_Contours_CS(task);
 			if (algorithmName == "Foreground_Hist3D_CS") return new Foreground_Hist3D_CS(task);
-			if (algorithmName == "Foreground_KMeans2_CS") return new Foreground_KMeans2_CS(task);
+			if (algorithmName == "Foreground_KMeans_CS") return new Foreground_KMeans_CS(task);
 			if (algorithmName == "Foreground_RedCloud_CS") return new Foreground_RedCloud_CS(task);
 			if (algorithmName == "Fractal_Dimension_CS") return new Fractal_Dimension_CS(task);
 			if (algorithmName == "Fractal_Julia_CS") return new Fractal_Julia_CS(task);

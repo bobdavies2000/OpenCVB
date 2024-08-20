@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Moments_Basics : Inherits VB_Parent
     Public centroid As cv.Point2f
-    Dim foreground As New Foreground_KMeans2
+    Dim fore As New Foreground_KMeans
     Public scaleFactor As Integer = 1
     Public offsetPt As cv.Point
     Public kalman As New Kalman_Basics
@@ -12,10 +12,10 @@ Public Class Moments_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If standaloneTest() Then
-            foreground.Run(src)
-            dst2 = foreground.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            fore.Run(src)
+            dst2 = fore.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
-        Dim m = cv.Cv2.Moments(foreground.dst2, True)
+        Dim m = cv.Cv2.Moments(fore.dst2, True)
 
         Dim center As cv.Point2f
         If task.gOptions.UseKalman.Checked Then
@@ -36,7 +36,7 @@ End Class
 
 
 Public Class Moments_CentroidKalman : Inherits VB_Parent
-    Dim foreground As New Foreground_KMeans2
+    Dim fore As New Foreground_KMeans
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
@@ -44,9 +44,9 @@ Public Class Moments_CentroidKalman : Inherits VB_Parent
         desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        foreground.Run(src)
-        dst2 = foreground.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        Dim m = cv.Cv2.Moments(foreground.dst2, True)
+        fore.Run(src)
+        dst2 = fore.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim m = cv.Cv2.Moments(fore.dst2, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00

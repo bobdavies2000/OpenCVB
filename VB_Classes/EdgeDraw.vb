@@ -84,3 +84,26 @@ Public Class EdgeDraw_LeftRight : Inherits VB_Parent
         dst3 = edges.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class EdgeDraw_LeftRightVertical : Inherits VB_Parent
+    Dim edges As New EdgeDraw_Basics
+    Dim vert As New Rotate_Verticalize
+    Public Sub New()
+        desc = "Find edges is the left and right images using EdgeDraw after verticalizing the images."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        vert.Run(task.leftView)
+        edges.Run(vert.dst2)
+        dst2 = edges.dst2.Clone
+
+        vert.Run(task.rightView)
+        edges.Run(vert.dst2)
+        dst3 = edges.dst2
+    End Sub
+End Class

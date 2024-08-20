@@ -977,7 +977,6 @@ Public Class Main_UI
 
         PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/PauseButton.png")
         stopTest = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/StopTest.png")
-        complexityTest = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/complexity.jpg")
         testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/testall.png")
         runPlay = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/PauseButtonRun.png")
 

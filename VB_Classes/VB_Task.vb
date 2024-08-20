@@ -131,6 +131,7 @@ Public Class VBtask : Implements IDisposable
 
     Public accRadians As cv.Point3f  ' rotation angles around x/y/z-axis to align with gravity
     Public theta As cv.Point3f ' velocity-filtered angles around x/y/z-axis to align with gravity
+    Public verticalizeAngle As Double
 
     Public pitch As Single
     Public yaw As Single
