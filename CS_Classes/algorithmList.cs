@@ -333,8 +333,6 @@ namespace CS_Classes
 			if (algorithmName == "Diff_Basics_CS") return new Diff_Basics_CS(task);
 			if (algorithmName == "Diff_Color_CS") return new Diff_Color_CS(task);
 			if (algorithmName == "Diff_Depth32f_CS") return new Diff_Depth32f_CS(task);
-			if (algorithmName == "Diff_Depth32S_CS") return new Diff_Depth32S_CS(task);
-			if (algorithmName == "Diff_DepthAccum_CS") return new Diff_DepthAccum_CS(task);
 			if (algorithmName == "Diff_Heartbeat_CS") return new Diff_Heartbeat_CS(task);
 			if (algorithmName == "Diff_Identical_CS") return new Diff_Identical_CS(task);
 			if (algorithmName == "Diff_Lines_CS") return new Diff_Lines_CS(task);
@@ -1084,7 +1082,6 @@ namespace CS_Classes
 			if (algorithmName == "OpenGL_ColorReduced3D_CS") return new OpenGL_ColorReduced3D_CS(task);
 			if (algorithmName == "OpenGL_Contours_CS") return new OpenGL_Contours_CS(task);
 			if (algorithmName == "OpenGL_Density2D_CS") return new OpenGL_Density2D_CS(task);
-			if (algorithmName == "OpenGL_DiffDepth_CS") return new OpenGL_DiffDepth_CS(task);
 			if (algorithmName == "OpenGL_DrawCube_CS") return new OpenGL_DrawCube_CS(task);
 			if (algorithmName == "OpenGL_DrawHull_CS") return new OpenGL_DrawHull_CS(task);
 			if (algorithmName == "OpenGL_DrawHulls_CS") return new OpenGL_DrawHulls_CS(task);

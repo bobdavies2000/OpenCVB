@@ -77,3 +77,47 @@ Public Class Denoise_Pixels_CPP_VB : Inherits VB_Parent
         Denoise_Pixels_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+
+Public Class Denoise_Unreliable : Inherits VB_Parent
+    Dim denoise As New Denoise_SinglePixels_CPP_VB
+    Dim relyGray As New Reliable_Gray
+    Public Sub New()
+        desc = "Manually remove single pixels in the binary image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        relyGray.Run(src)
+        dst2 = relyGray.dst2
+
+        denoise.Run(dst2)
+        dst2 = denoise.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class Denoise_SinglePixels_CPP_VB : Inherits VB_Parent
+    Public Sub New()
+        cPtr = Denoise_SinglePixels_Open(3)
+        labels = {"", "", "Input image", "Output: Use PixelViewer to see changes"}
+        desc = "Remove any single pixels sitting alone..."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) - 1
+        Dim dataSrc(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+        Dim imagePtr = Denoise_SinglePixels_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+        handleSrc.Free()
+
+        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = Denoise_SinglePixels_Close(cPtr)
+    End Sub
+End Class

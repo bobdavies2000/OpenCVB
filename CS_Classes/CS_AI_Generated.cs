@@ -13785,70 +13785,6 @@ namespace CS_Classes
 
 
 
-    public class Diff_DepthAccum_CS : CS_Parent
-    {
-        Diff_Depth32S diff = new Diff_Depth32S();
-        History_Basics frames = new History_Basics();
-
-        public Diff_DepthAccum_CS(VBtask task) : base(task)
-        {
-            desc = "Accumulate the mask of depth differences.";
-        }
-
-        public void RunCS(Mat src)
-        {
-            diff.Run(src);
-            frames.Run(diff.dst2);
-            dst2 = frames.dst2;
-            labels = diff.labels;
-        }
-    }
-
-
-
-
-
-    public class Diff_Depth32S_CS : CS_Parent
-    {
-        public Mat lastDepth32s;
-        Options_Depth options = new Options_Depth();
-
-        public Diff_Depth32S_CS(VBtask task) : base(task)
-        {
-            lastDepth32s = dst0.Clone();
-            desc = "Where is the depth difference between frames greater than X millimeters.";
-        }
-
-        public void RunCS(Mat src)
-        {
-            options.RunVB();
-
-            Mat depth32f = 1000 * task.pcSplit[2];
-            depth32f.ConvertTo(dst0, MatType.CV_32S);
-
-            if (task.optionsChanged)
-                lastDepth32s = dst0.Clone();
-
-            Cv2.Absdiff(dst0, lastDepth32s, dst1);
-            dst1 = dst1.ConvertScaleAbs();
-            var mm = GetMinMax(dst1);
-
-            dst2 = dst1.Threshold(options.millimeters - 1, 255, ThresholdTypes.Binary);
-
-            lastDepth32s = dst0.Clone();
-            if (task.heartBeat)
-            {
-                labels[2] = $"Mask where depth difference between frames is more than {options.millimeters} mm's";
-                int count = Cv2.CountNonZero(dst2);
-                labels[3] = $"{count} pixels ({(double)count / Cv2.CountNonZero(task.depthMask):P0} of all depth pixels) were different by more than {options.millimeters} mm's";
-            }
-        }
-    }
-
-
-
-
-
     public class Diff_Depth32f_CS : CS_Parent
     {
         public Mat lastDepth32f;
@@ -44490,28 +44426,6 @@ namespace CS_Classes
         }
     }
 
-
-
-
-    public class OpenGL_DiffDepth_CS : CS_Parent
-    {
-        Diff_Depth32S diff = new Diff_Depth32S();
-        public OpenGL_DiffDepth_CS(VBtask task) : base(task)
-        {
-            task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
-            labels = new string[] { "", "", "Point cloud after filtering for consistent depth", "" };
-            desc = "Run OpenGL with a point cloud with consistent depth data (defined with slider in Motion_PixelDiff)";
-        }
-        public void RunCS(Mat src)
-        {
-            diff.Run(src);
-            dst2 = diff.dst2;
-            if (!task.gOptions.debugChecked) task.pointCloud.SetTo(0, dst2);
-            task.ogl.pointCloudInput = task.pointCloud;
-            task.ogl.Run(src);
-            labels = diff.labels;
-        }
-    }
 
 
 

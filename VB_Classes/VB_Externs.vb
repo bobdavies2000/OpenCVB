@@ -188,6 +188,21 @@ Module VB_Externs
 
 
 
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Denoise_SinglePixels_Open(frameCount As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Denoise_SinglePixels_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Denoise_SinglePixels_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    End Function
+
+
+
+
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Denoise_Pixels_Open() As IntPtr
     End Function

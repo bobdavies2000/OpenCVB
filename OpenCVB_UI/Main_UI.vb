@@ -76,7 +76,7 @@ Public Class Main_UI
     Dim activeMouseDown As Boolean
 
     Dim myBrush = New SolidBrush(Color.White)
-    Dim groupNames As New List(Of String)
+    Dim groupList As New List(Of String)
     Dim TreeViewDialog As TreeviewForm
     Public fpsAlgorithm As Single
     Public fpsCamera As Single
@@ -389,7 +389,7 @@ Public Class Main_UI
         Else
             AvailableAlgorithms.Enabled = False
             Dim keyIndex = GroupName.Items.IndexOf(GroupName.Text)
-            Dim groupings = groupNames(keyIndex)
+            Dim groupings = groupList(keyIndex)
             Dim split = Regex.Split(groupings, ",")
             AvailableAlgorithms.Items.Clear()
 
@@ -838,6 +838,7 @@ Public Class Main_UI
         saveAlgorithmName = "" ' this will close the current algorithm.
     End Sub
     Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
+        If AvailableAlgorithms.Items.Count = 0 Then Exit Sub
         If (paintNewImages Or algorithmRefresh) And AvailableAlgorithms.Text.StartsWith(saveAlgorithmName) Then
             camPic(0).Refresh()
             camPic(1).Refresh()
@@ -891,23 +892,23 @@ Public Class Main_UI
             If Split(0).StartsWith("<") = False Then
                 If Split(0).Contains("_") Then
                     If lastSplit0.Contains("_") = False Then
-                        groupNames.Add("")
+                        groupList.Add("")
                         GroupName.Items.Add("")
                     End If
                     Dim nameSplit = Split(0).Split("_")
                     If nameSplit(0) <> lastNameSplit And lastNameSplit <> "" Then
-                        groupNames.Add("")
+                        groupList.Add("")
                         GroupName.Items.Add("")
                     End If
                     lastNameSplit = nameSplit(0)
                     lastSplit0 = Split(0)
                 ElseIf lastSplit0.Contains("_") Then
-                    groupNames.Add("")
+                    groupList.Add("")
                     GroupName.Items.Add("")
                     lastNameSplit = Split(0)
                 End If
             End If
-            groupNames.Add(infoLine)
+            groupList.Add(infoLine)
             GroupName.Items.Add(Split(0))
         End While
         sr.Close()
@@ -1060,9 +1061,9 @@ Public Class Main_UI
 
         If settings.algorithmGroup.Contains("<All ") Then
             Dim searchStr = settings.algorithmGroup.Substring(0, InStr(settings.algorithmGroup, "("))
-            For i = 0 To Math.Min(20, groupNames.Count)
-                If groupNames(i).StartsWith(searchStr) Then
-                    GroupName.SelectedItem() = groupNames(i).Substring(0, InStr(groupNames(i), ">") - 1) + ">"
+            For i = 0 To Math.Min(20, groupList.Count)
+                If groupList(i).StartsWith(searchStr) Then
+                    GroupName.SelectedItem() = groupList(i).Substring(0, InStr(groupList(i), ">") - 1) + ">"
                     Exit For
                 End If
             Next
@@ -1070,7 +1071,7 @@ Public Class Main_UI
             GroupName.Text = settings.algorithmGroup
         End If
 
-        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupNames(1)
+        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupList(1)
 
         If AvailableAlgorithms.Items.Count = 0 Then
             MsgBox("There were no algorithms listed for the " + GroupName.Text + vbCrLf +

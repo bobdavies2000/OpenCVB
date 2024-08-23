@@ -1408,32 +1408,6 @@ End Class
 
 
 
-
-Public Class OpenGL_DiffDepth : Inherits VB_Parent
-    Dim diff As New Diff_Depth32S
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        labels = {"", "", "Point cloud after filtering for consistent depth", ""}
-        desc = "Run OpenGL with a point cloud with consistent depth data (defined with slider in Motion_PixelDiff)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        diff.Run(src)
-        dst2 = diff.dst2
-        If task.gOptions.debugChecked = False Then task.pointCloud.SetTo(0, dst2)
-        task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.Run(src)
-        labels = diff.labels
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class OpenGL_CloudMisses : Inherits VB_Parent
     Dim frames As New History_Basics
     Public Sub New()

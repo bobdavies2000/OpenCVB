@@ -17,6 +17,10 @@ Public Class Edge_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
+
+        Static frm = FindFrm("Options_Edge_Basics Radio Buttons")
+        If frm.left <> task.gOptions.Width / 2 Then frm.left = task.gOptions.Width / 2
+
         If task.FirstPass Then
             Dim frmRadio = FindFrm("Options_Edge_Basics Radio Buttons")
             frmRadio.Left = task.gOptions.Width / 2
@@ -111,9 +115,9 @@ Public Class Edge_Scharr : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
-        Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim xField = src.Scharr(cv.MatType.CV_32FC1, 1, 0)
+        Dim yField = src.Scharr(cv.MatType.CV_32FC1, 0, 1)
         cv.Cv2.Add(xField, yField, dst3)
         dst3.ConvertTo(dst2, cv.MatType.CV_8U, options.scharrMultiplier)
     End Sub

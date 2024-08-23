@@ -77,7 +77,6 @@ Public Class Hist_Grayscale : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         hist.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = hist.dst2
-        dst3 = hist.dst3
         labels = hist.labels
     End Sub
 End Class

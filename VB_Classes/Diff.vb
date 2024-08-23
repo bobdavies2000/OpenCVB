@@ -153,64 +153,6 @@ End Class
 
 
 
-Public Class Diff_DepthAccum : Inherits VB_Parent
-    Dim diff As New Diff_Depth32S
-    Dim frames As New History_Basics
-    Public Sub New()
-        desc = "Accumulate the mask of depth differences."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        diff.Run(src)
-        frames.Run(diff.dst2)
-        dst2 = frames.dst2
-        labels = diff.labels
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Diff_Depth32S : Inherits VB_Parent
-    Public lastDepth32s As cv.Mat = dst0.Clone
-    Dim options As New Options_DiffDepth
-    Public Sub New()
-        desc = "Where is the depth difference between frames greater than X centimeters."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        Dim depth32f As cv.Mat = 1000 * task.pcSplit(2)
-        depth32f.ConvertTo(dst0, cv.MatType.CV_32S)
-
-        If task.optionsChanged Then lastDepth32s = dst0.Clone
-
-        cv.Cv2.Absdiff(dst0, lastDepth32s, dst1)
-        dst1 = dst1.ConvertScaleAbs
-        Dim mm As mmData = GetMinMax(dst1)
-
-        dst2 = dst1.Threshold(options.millimeters - 1, 255, cv.ThresholdTypes.Binary)
-
-        lastDepth32s = dst0.Clone
-        If task.heartBeat Then
-            labels(2) = "Mask where depth difference between frames is more than " + CStr(options.millimeters) + " mm's"
-            Dim count = dst2.CountNonZero()
-            labels(3) = CStr(count) + " pixels (" + Format(count / task.depthMask.CountNonZero, "0%") +
-                        " of all depth pixels)" + "were different by more than " + CStr(options.millimeters) + " mm's"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Diff_Depth32f : Inherits VB_Parent
     Public lastDepth32f As New cv.Mat
     Dim options As New Options_DiffDepth

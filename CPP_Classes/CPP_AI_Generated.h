@@ -781,6 +781,54 @@ int* Denoise_Pixels_RunCPP(Denoise_Pixels* cPtr, int* dataPtr, int rows, int col
 
 
 
+
+
+class Denoise_SinglePixels
+{
+private:
+public:
+    Mat src;
+    Denoise_SinglePixels() {}
+    void RunCPP() {
+        int kSize = 3;
+        Rect r = Rect(0, 0, kSize, kSize);
+        for (int y = 0; y < src.rows - kSize; y++)
+        {
+            for (int x = 0; x < src.cols - kSize; x++)
+            {
+                if (src.at<uchar>(y + 1, x + 1) != 0)
+                {
+                    r.x = x;
+                    r.y = y;
+                    if (countNonZero(src(r)) == 1) src(r).setTo(0);
+                }
+            }
+        }
+    }
+};
+extern "C" __declspec(dllexport)
+Denoise_Pixels* Denoise_SinglePixels_Open() {
+    Denoise_Pixels* cPtr = new Denoise_Pixels();
+    return cPtr;
+}
+extern "C" __declspec(dllexport)
+void Denoise_SinglePixels_Close(Denoise_Pixels* cPtr)
+{
+    delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Denoise_SinglePixels_Run(Denoise_Pixels* cPtr, int* dataPtr, int rows, int cols)
+{
+    cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+    cPtr->RunCPP();
+    return (int*)cPtr->src.data;
+}
+
+
+
+
+
 class Density_2D
 {
 private:

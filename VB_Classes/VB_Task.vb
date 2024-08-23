@@ -736,6 +736,7 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.UseReliableDepth.Checked Then
             reliableDepth.Run(src)
+            task.reliableDepthMask = reliableDepth.dst2
             task.pointCloud.SetTo(0, Not task.reliableDepthMask)
             task.pcSplit(2).SetTo(0, Not task.reliableDepthMask)
         End If

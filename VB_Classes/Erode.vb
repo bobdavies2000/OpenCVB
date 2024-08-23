@@ -97,3 +97,4 @@ Public Class Erode_Dilate : Inherits VB_Parent
         cv.Cv2.MorphologyEx(dst2, dst2, cv.MorphTypes.Open, options.element)
     End Sub
 End Class
+

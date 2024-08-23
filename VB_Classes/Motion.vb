@@ -662,6 +662,7 @@ Public Class Motion_Diff : Inherits VB_Parent
 
         cv.Cv2.Absdiff(src, dst1, dst3)
         dst2 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        dst1 = src.Clone
     End Sub
 End Class
 
@@ -674,7 +675,7 @@ End Class
 
 Public Class Motion_MinRect : Inherits VB_Parent
     Dim mRect As New Area_MinRect
-    Dim history8U As New History_Basics8U
+    Dim history As New History_Basics8U
     Dim lastFrame As cv.Mat
     Dim options As New Options_MinArea
     Public Sub New()
@@ -690,8 +691,8 @@ Public Class Motion_MinRect : Inherits VB_Parent
         cv.Cv2.Absdiff(src, lastFrame, dst3)
         lastFrame = src.Clone
 
-        history8U.Run(dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary))
-        dst2 = history8U.dst2
+        history.Run(dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary))
+        dst2 = history.dst2
 
         Dim nonzeros = dst2.FindNonZero()
 
