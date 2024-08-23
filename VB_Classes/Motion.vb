@@ -680,7 +680,7 @@ Public Class Motion_MinRect : Inherits VB_Parent
     Public Sub New()
         task.gOptions.setDisplay1()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Find the nonzero points of motion and fit an rotated rectangle to them."
+        desc = "Find the nonzero points of motion and fit a rotated rectangle to them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()

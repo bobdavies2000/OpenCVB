@@ -1,25 +1,17 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Reliable_Depth : Inherits VB_Parent
-    Dim history8u As New History_Basics8U
-    Dim diff As New Diff_Depth32f
+    Dim rDepth As New History_ReliableDepth
     Public Sub New()
         task.reliableDepthMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Provide only depth that is reliable"
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F)
+        labels = {"", "", "Mask of unreliable depth data", "Task.DepthRGB after removing unreliable depth (compare with above.)"}
+        desc = "Provide only depth that has been present over the last framehistory frames."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone And task.gOptions.UseReliableDepth.Checked Then
-            dst2.SetTo(0)
-            task.depthRGB.CopyTo(dst2, task.reliableDepthMask)
-        Else
-            diff.Run(task.pcSplit(2))
-            diff.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
-            history8u.Run(dst3)
-            dst2.SetTo(0)
-            If task.FirstPass = False Then
-                task.pointCloud.CopyTo(dst2, history8u.dst2)
-                task.reliableDepthMask = history8u.dst2.Clone
-            End If
-        End If
+        rDepth.Run(task.noDepthMask)
+        dst3.SetTo(0)
+        task.reliableDepthMask = rDepth.dst2
+        If standaloneTest() Then task.pcSplit(2).CopyTo(dst3, task.reliableDepthMask)
     End Sub
 End Class
 
@@ -27,17 +19,32 @@ End Class
 
 
 
-Public Class Reliable_DepthNot : Inherits VB_Parent
-    Dim history8u As New History_Basics8U
-    Dim motionD As New Motion_Depth
+
+Public Class Reliable_MaxDepth : Inherits VB_Parent
+    Public options As New Options_MinMaxNone
     Public Sub New()
-        desc = "Display an accumulation the noDepthMask"
+        desc = "Create a mas"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        motionD.Run(src)
+        options.RunVB()
+        Dim split() As cv.Mat
+        If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
 
-        history8u.Run(motionD.dst3)
-        dst2 = history8u.dst2
-        dst2.SetTo(255, task.noDepthMask)
+        If task.heartBeat Then
+            dst3 = split(2)
+        End If
+        If options.useMax Then
+            labels(2) = "Point cloud maximum values at each pixel"
+            cv.Cv2.Max(split(2), dst3, split(2))
+        End If
+        If options.useMin Then
+            labels(2) = "Point cloud minimum values at each pixel"
+            Dim saveMat = split(2).Clone
+            cv.Cv2.Min(split(2), dst3, split(2))
+            Dim mask = split(2).InRange(0, 0.1)
+            saveMat.CopyTo(split(2), mask)
+        End If
+        cv.Cv2.Merge(split, dst2)
+        dst3 = split(2)
     End Sub
 End Class

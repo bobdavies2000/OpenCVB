@@ -709,12 +709,6 @@ Public Class VBtask : Implements IDisposable
             task.motionDetected = True
             task.motionRect = New cv.Rect(0, 0, src.Width, src.Height)
 
-            If task.gOptions.UseReliableDepth.Checked Then
-                reliableDepth.Run(src)
-                task.pointCloud.SetTo(0, Not task.reliableDepthMask)
-                cv.Cv2.ImShow("reliable", Not task.reliableDepthMask)
-            End If
-
             task.gOptions.unFiltered.Checked = True ' until the motion rectangle problems are resolved.
         End If
 
@@ -739,6 +733,12 @@ Public Class VBtask : Implements IDisposable
 
         colorizer.RunVB(task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc))
         task.depthRGB = colorizer.dst2.Clone
+
+        If task.gOptions.UseReliableDepth.Checked Then
+            reliableDepth.Run(src)
+            task.pointCloud.SetTo(0, Not task.reliableDepthMask)
+            task.pcSplit(2).SetTo(0, Not task.reliableDepthMask)
+        End If
 
         TaskTimer.Enabled = True
 

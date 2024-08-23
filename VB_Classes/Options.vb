@@ -7706,11 +7706,13 @@ End Class
 
 Public Class Options_DiffDepth : Inherits VB_Parent
     Public millimeters As Integer
+    Public meters As Double
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 2000, 1000)
     End Sub
     Public Sub RunVB()
         Static mmSlider = FindSlider("Depth varies more than X mm's")
         millimeters = mmSlider.value
+        meters = millimeters / 1000
     End Sub
 End Class

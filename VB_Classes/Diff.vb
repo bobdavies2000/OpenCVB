@@ -225,7 +225,7 @@ Public Class Diff_Depth32f : Inherits VB_Parent
         cv.Cv2.Absdiff(task.pcSplit(2), lastDepth32f, dst1)
         Dim mm As mmData = GetMinMax(dst1)
 
-        dst2 = dst1.Threshold(options.millimeters, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst1.Threshold(options.meters, 255, cv.ThresholdTypes.Binary)
 
         lastDepth32f = task.pcSplit(2).Clone
         If task.heartBeat Then

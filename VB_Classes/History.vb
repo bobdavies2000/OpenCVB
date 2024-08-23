@@ -145,7 +145,6 @@ End Class
 
 
 
-
 Public Class History_Basics8U : Inherits VB_Parent
     Public saveFrames As New List(Of cv.Mat)
     Dim mats As New Mat_4to1
@@ -184,5 +183,38 @@ Public Class History_Basics8U : Inherits VB_Parent
             mats.Run(empty)
             dst3 = mats.dst2
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class History_ReliableDepth : Inherits VB_Parent
+    Public saveFrames As New List(Of cv.Mat)
+    Public Sub New()
+        task.gOptions.FrameHistory.Value = 30
+        desc = "Create a frame history by Or'ing the last X frames of CV_8U data"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then src = task.noDepthMask
+
+        If task.frameHistoryCount = 1 Then
+            dst2 = task.depthMask
+            Exit Sub
+        End If
+
+        If task.optionsChanged Then saveFrames.Clear()
+
+        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        saveFrames.Add(src.Clone)
+
+        dst2 = saveFrames(0)
+        For i = 1 To saveFrames.Count - 1
+            dst2 = dst2 Or saveFrames(i)
+        Next
+        dst2 = Not dst2
+        dst3.SetTo(0)
+        task.depthRGB.CopyTo(dst3, dst2)
     End Sub
 End Class
