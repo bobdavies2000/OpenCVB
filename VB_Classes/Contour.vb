@@ -850,6 +850,7 @@ End Class
 
 Public Class Contour_DepthTiers : Inherits VB_Parent
     Public options As New Options_Contours
+    Public optionsTiers As New Options_DepthTiers
     Public classCount As Integer
     Public contourlist As New List(Of cv.Point())
     Public Sub New()
@@ -862,7 +863,7 @@ Public Class Contour_DepthTiers : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        task.pcSplit(2).ConvertTo(dst1, cv.MatType.CV_32S, 100 / options.cmPerTier, 1)
+        task.pcSplit(2).ConvertTo(dst1, cv.MatType.CV_32S, 100 / optionsTiers.cmPerTier, 1)
 
         Dim allContours As cv.Point()()
         cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
@@ -889,7 +890,7 @@ Public Class Contour_DepthTiers : Inherits VB_Parent
         Next
 
         dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
-        classCount = task.MaxZmeters * 100 / options.cmPerTier
+        classCount = task.MaxZmeters * 100 / optionsTiers.cmPerTier
 
         If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."

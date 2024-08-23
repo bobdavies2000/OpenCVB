@@ -449,8 +449,8 @@ End Class
 
 
 Public Class Bin4Way_RegionsLeftRight : Inherits VB_Parent
-    Dim binaryLeft As New Bin4Way_SplitGaps
-    Dim binaryRight As New Bin4Way_SplitGaps
+    Dim binaryLeft As New Bin4Way_SplitMean
+    Dim binaryRight As New Bin4Way_SplitMean
     Public classCount = 4 ' 4-way split
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -466,7 +466,7 @@ Public Class Bin4Way_RegionsLeftRight : Inherits VB_Parent
         dst0.SetTo(3, binaryLeft.mats.mat(2))
         dst0.SetTo(4, binaryLeft.mats.mat(3))
 
-        dst2 = ShowPalette((dst0 * 255 / classCount).ToMat)
+        dst2 = ShowPalette((dst0 * 255 / classCount).ToMat).Clone
 
         binaryRight.Run(task.rightView)
 
@@ -519,98 +519,6 @@ End Class
 
 
 
-
-Public Class Bin4Way_SplitMean1 : Inherits VB_Parent
-    Dim binary As New Binarize_Simple
-    Public mats As New Mat_4Click
-    Dim botColor As cv.Scalar, midColor As cv.Scalar, topColor As cv.Scalar
-    Public Sub New()
-        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
-        desc = "Binarize an image and split it into quartiles using peaks."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binary.Run(gray)
-        Dim mask = binary.dst2.Clone
-
-        If task.heartBeat Then
-            midColor = binary.meanScalar(0)
-            topColor = cv.Cv2.Mean(gray, mask)(0)
-            botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        End If
-        mats.mat(0) = gray.InRange(0, botColor(0) / 2)
-        mats.mat(1) = gray.InRange(botColor(0) / 2, (botColor(0) + midColor(0)) / 2)
-        mats.mat(2) = gray.InRange((botColor(0) + midColor(0)) / 2, (midColor(0) + topColor(0)) / 2)
-        mats.mat(3) = gray.InRange((midColor(0) + topColor(0)) / 2, 255)
-
-        mats.Run(empty)
-        dst2 = mats.dst2
-        dst3 = mats.dst3
-        labels(3) = mats.labels(3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Bin4Way_SplitMean2 : Inherits VB_Parent
-    Dim binary As New Binarize_Simple
-    Dim hist As New Hist_Basics
-    Public mats As New Mat_4Click
-    Dim botColor As cv.Scalar, midColor As cv.Scalar, topColor As cv.Scalar
-    Public Sub New()
-        task.gOptions.setHistogramBins(256)
-        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
-        desc = "Binarize an image and split it into quartiles finding the minimum between peaks."
-    End Sub
-    Private Function findMin(start As Integer, finish As Integer) As Integer
-        Dim minIndex As Integer
-        Dim minVal As Integer = Integer.MaxValue
-        For i = start To finish - 1
-            If hist.histArray(i) < minVal Then
-                minVal = hist.histArray(i)
-                minIndex = i
-            End If
-        Next
-        Return minIndex
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        hist.Run(gray)
-
-        binary.Run(gray)
-        Dim mask = binary.dst2.Clone
-
-        If task.heartBeat Then
-            midColor = binary.meanScalar(0)
-            topColor = cv.Cv2.Mean(gray, mask)(0)
-            botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        End If
-        Dim botmin = findMin(5, botColor(0))
-        mats.mat(0) = gray.InRange(0, botmin)
-
-        Dim midMin = findMin(botColor(0), midColor(0))
-        mats.mat(1) = gray.InRange(botmin, midMin)
-
-        Dim topMin = findMin(midColor(0), topColor(0))
-        mats.mat(2) = gray.InRange(midMin, topMin)
-        mats.mat(3) = gray.InRange(topMin, 255)
-
-        mats.Run(empty)
-        dst2 = mats.dst2
-        dst3 = mats.dst3
-        labels(3) = mats.labels(3)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Bin4Way_BasicsColors : Inherits VB_Parent
     Dim quart As New Bin4Way_Basics
     Dim color As New Color8U_Basics
@@ -620,7 +528,7 @@ Public Class Bin4Way_BasicsColors : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         color.Run(src)
-        quart.Run(color.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        quart.Run(color.dst3)
         dst1 = quart.dst1
         dst2 = quart.dst2
         dst3 = quart.dst3
@@ -786,6 +694,7 @@ Public Class Bin4Way_Regions : Inherits VB_Parent
         dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
     End Sub
 End Class
+
 
 
 

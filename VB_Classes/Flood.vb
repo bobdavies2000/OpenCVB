@@ -162,7 +162,7 @@ End Class
 
 Public Class Flood_Tiers : Inherits VB_Parent
     Dim flood As New Flood_BasicsMask
-    Dim tiers As New Depth_TiersZ
+    Dim tiers As New Depth_Tiers
     Dim cvt As New Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)

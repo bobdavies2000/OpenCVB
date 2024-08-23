@@ -38,7 +38,6 @@ End Class
 
 
 
-
 Public Class History_MotionRect : Inherits VB_Parent
     Public Sub New()
         desc = "Create an image that is the motionRect applied to the previous image."
@@ -139,5 +138,51 @@ Public Class History_BasicsDiff : Inherits VB_Parent
 
         diff.Run(frames.dst2)
         dst3 = diff.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class History_Basics8U : Inherits VB_Parent
+    Public saveFrames As New List(Of cv.Mat)
+    Dim mats As New Mat_4to1
+    Dim lastFrame As cv.Mat
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Create a frame history by Or'ing the last X frames of CV_8U data"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If task.FirstPass Then lastFrame = src.Clone
+            cv.Cv2.Absdiff(src, lastFrame, dst3)
+            lastFrame = src.Clone
+            src = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        End If
+
+        If task.frameHistoryCount = 1 Then
+            dst2 = src
+            Exit Sub
+        End If
+
+        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        saveFrames.Add(src.Clone)
+
+        dst2.SetTo(0)
+        For Each m In saveFrames
+            dst2 = dst2 Or m
+        Next
+
+        If task.algName = traceName Then
+            For i = 0 To Math.Min(saveFrames.Count, 4) - 1
+                Debug.WriteLine("count = " + CStr(saveFrames(i).CountNonZero))
+                mats.mat(i) = saveFrames(i).Clone
+            Next
+            mats.Run(empty)
+            dst3 = mats.dst2
+        End If
     End Sub
 End Class

@@ -104,7 +104,6 @@ Public Class Options_Contours : Inherits VB_Parent
     Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Double = 0.03
     Public minPixels As Integer = 30
-    Public cmPerTier As Integer = 50
     Public trueTextOffset As Integer = 80
     Dim maxContourCount As Integer = 50
     Dim options2 As New Options_Contours2
@@ -119,8 +118,6 @@ Public Class Options_Contours : Inherits VB_Parent
         End If
 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("cm's per tier", 10, 200, cmPerTier)
-            ' sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, epsilon * 100)
             sliders.setupTrackBar("Min Pixels", 1, 2000, minPixels)
             sliders.setupTrackBar("Max contours", 1, 200, maxContourCount)
             sliders.setupTrackBar("TrueText offset", 1, dst2.Width / 3, trueTextOffset)
@@ -128,8 +125,6 @@ Public Class Options_Contours : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         options2.RunVB()
-        Static cmSlider = FindSlider("cm's per tier")
-        ' Static epsilonSlider = FindSlider("Contour epsilon (arc length percent)")
         Static minSlider = FindSlider("Min Pixels")
         Static countSlider = FindSlider("Max contours")
         Static offsetSlider = FindSlider("TrueText offset")
@@ -148,10 +143,39 @@ Public Class Options_Contours : Inherits VB_Parent
         Next
         ApproximationMode = options2.ApproximationMode
         minPixels = minSlider.value
-        cmPerTier = cmSlider.value
         trueTextOffset = offsetSlider.value
     End Sub
 End Class
+
+
+
+
+Public Class Options_DepthTiers : Inherits VB_Parent
+    Public pcSplitIndex As Integer
+    Public cmPerTier As Integer = 50
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("X-Range")
+            radio.addRadio("Y-Range")
+            radio.addRadio("Z-Range")
+            radio.check(2).Checked = True
+        End If
+
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("cm's per tier", 10, 200, cmPerTier)
+    End Sub
+    Public Sub RunVB()
+        Static cmSlider = FindSlider("cm's per tier")
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
+                pcSplitIndex = i
+                Exit For
+            End If
+        Next
+        cmPerTier = cmSlider.value
+    End Sub
+End Class
+
 
 
 
@@ -7672,5 +7696,21 @@ Public Class Options_ColorMethod : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_DiffDepth : Inherits VB_Parent
+    Public millimeters As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 2000, 1000)
+    End Sub
+    Public Sub RunVB()
+        Static mmSlider = FindSlider("Depth varies more than X mm's")
+        millimeters = mmSlider.value
     End Sub
 End Class

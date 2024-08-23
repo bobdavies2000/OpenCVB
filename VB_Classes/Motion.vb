@@ -20,6 +20,74 @@ End Class
 
 
 
+
+Public Class Motion_Basics_QT : Inherits VB_Parent
+    Dim redMasks As New RedCloud_Basics
+    Public bgSub As New BGSubtract_MOG2
+    Dim rectList As New List(Of cv.Rect)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        task.redOptions.setIdentifyCells(False)
+        desc = "The option-free version of Motion_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        task.motionDetected = True
+        If task.heartBeat Then
+            task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            Exit Sub
+        End If
+        task.motionRect = New cv.Rect
+
+        If src.Channels() <> 1 Then
+            bgSub.Run(src)
+            src = bgSub.dst2
+        End If
+
+        dst2 = src
+
+        redMasks.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        If task.redCells.Count < 2 Then
+            task.motionDetected = False
+            rectList.Clear()
+        Else
+            Dim nextRect = task.redCells.ElementAt(1).rect
+            For i = 2 To task.redCells.Count - 1
+                Dim rc = task.redCells.ElementAt(i)
+                nextRect = nextRect.Union(rc.rect)
+            Next
+
+            rectList.Add(nextRect)
+            For Each r In rectList
+                If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
+            Next
+            If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
+            If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
+                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            Else
+                If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then task.motionDetected = False
+            End If
+        End If
+
+        If standaloneTest() Then
+            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
+            If task.redCells.Count > 1 Then
+                labels(2) = CStr(task.redCells.Count) + " RedMask cells had motion"
+            Else
+                labels(2) = "No motion detected"
+            End If
+            labels(3) = ""
+            If task.motionRect.Width > 0 Then
+                labels(3) = "Rect width = " + CStr(task.motionRect.Width) + ", height = " + CStr(task.motionRect.Height)
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Simple : Inherits VB_Parent
     Public diff As New Diff_Basics
@@ -126,15 +194,18 @@ End Class
 
 Public Class Motion_CCmerge : Inherits VB_Parent
     Dim motionCC As New Motion_ThruCorrelation
+    Dim lastFrame As cv.Mat
     Public Sub New()
         desc = "Use the correlation coefficient to maintain an up-to-date image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.frameCount < 10 Then dst2 = src.Clone
+        If task.heartBeat Then
+            dst2 = src.Clone
+            lastFrame = src.Clone
+        End If
 
         motionCC.Run(src)
 
-        Static lastFrame = src.Clone
         If motionCC.dst3.CountNonZero > src.Total / 2 Then
             dst2 = src.Clone
             lastFrame = src.Clone
@@ -183,65 +254,6 @@ Public Class Motion_PixelDiff : Inherits VB_Parent
 End Class
 
 
-
-
-
-
-
-
-
-Public Class Motion_DepthReconstructed : Inherits VB_Parent
-    Public motion As New Motion_Basics
-    Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
-        labels(2) = "The yellow rectangle indicates where the motion is and only that portion of the point cloud and depth mask is updated."
-        desc = "Rebuild the point cloud based on the BGR motion history."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        motion.Run(src)
-        dst2 = src
-
-        If task.motionFlag Then
-            dst0 = src.Clone
-            dst1 = task.noDepthMask.Clone
-            dst3 = task.pointCloud.Clone
-            labels(3) = motion.labels(2)
-        End If
-
-        If task.motionDetected = False Then Exit Sub
-
-        src(task.motionRect).CopyTo(dst0(task.motionRect))
-        task.noDepthMask(task.motionRect).CopyTo(dst1(task.motionRect))
-        task.pointCloud(task.motionRect).CopyTo(dst3(task.motionRect))
-    End Sub
-End Class
-
-
-
-
-
-Public Class Motion_Contours : Inherits VB_Parent
-    Public motion As New Motion_MinRect
-    Dim contours As New Contour_Largest
-    Public cumulativePixels As Integer
-    Public Sub New()
-        labels(2) = "Enclosing rectangles are yellow in dst2 and dst3"
-        desc = "Detect contours in the motion data and the resulting rectangles"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        dst2 = src
-        motion.Run(src)
-        dst3 = motion.dst3
-        Dim changedPixels = dst3.CountNonZero
-
-        If task.heartBeat Then cumulativePixels = changedPixels Else cumulativePixels += changedPixels
-        If changedPixels > 0 Then
-            contours.Run(dst3)
-            DrawContour(dst2, contours.bestContour, cv.Scalar.Yellow)
-        End If
-    End Sub
-End Class
 
 
 
@@ -553,33 +565,6 @@ End Class
 
 
 
-
-Public Class Motion_Depth : Inherits VB_Parent
-    Dim diff As New Diff_Depth32f
-    Public Sub New()
-        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
-        desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then dst2 = task.pcSplit(2).Clone
-
-        If task.motionDetected Then task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
-
-        If standaloneTest() Then
-            If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
-            diff.Run(task.pcSplit(2))
-            dst3 = diff.dst2
-            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
-            diff.lastDepth32f = task.pcSplit(2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Motion_Grayscale : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -613,69 +598,151 @@ End Class
 
 
 
-Public Class Motion_Basics_QT : Inherits VB_Parent
-    Dim redMasks As New RedCloud_Basics
-    Public bgSub As New BGSubtract_MOG2
-    Dim rectList As New List(Of cv.Rect)
+
+
+
+
+
+Public Class Motion_RedCloud : Inherits VB_Parent
+    Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(False)
-        desc = "The option-free version of Motion_Basics"
+        labels(3) = "Motion detected in the cells below"
+        desc = "Use RedCloud to define where there is motion"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        task.motionDetected = True
-        If task.heartBeat Then
-            task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-            Exit Sub
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        For Each rc In task.redCells
+            If rc.motionPixels > 0 Then dst3(rc.rect).SetTo(rc.naturalColor, rc.mask)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Motion_Color : Inherits VB_Parent
+    Public Sub New()
+        labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
+                  "Diff of input and latest accumulated color image"}
+        desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
+        If standaloneTest() And task.motionDetected Then dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
+Public Class Motion_Diff : Inherits VB_Parent
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        labels = {"", "", "Unstable mask", "Pixel difference"}
+        desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.heartBeat Or dst1.Channels <> 1 Then
+            dst1 = src.Clone
+            dst2.SetTo(0)
         End If
-        task.motionRect = New cv.Rect
 
-        If src.Channels() <> 1 Then
-            bgSub.Run(src)
-            src = bgSub.dst2
-        End If
+        cv.Cv2.Absdiff(src, dst1, dst3)
+        dst2 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
 
-        dst2 = src
 
-        redMasks.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If task.redCells.Count < 2 Then
-            task.motionDetected = False
-            rectList.Clear()
-        Else
-            Dim nextRect = task.redCells.ElementAt(1).rect
-            For i = 2 To task.redCells.Count - 1
-                Dim rc = task.redCells.ElementAt(i)
-                nextRect = nextRect.Union(rc.rect)
+
+
+
+
+
+
+Public Class Motion_MinRect : Inherits VB_Parent
+    Dim mRect As New Area_MinRect
+    Dim history8U As New History_Basics8U
+    Dim lastFrame As cv.Mat
+    Dim options As New Options_MinArea
+    Public Sub New()
+        task.gOptions.setDisplay1()
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Find the nonzero points of motion and fit an rotated rectangle to them."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.FirstPass Then lastFrame = src.Clone
+        cv.Cv2.Absdiff(src, lastFrame, dst3)
+        lastFrame = src.Clone
+
+        history8U.Run(dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary))
+        dst2 = history8U.dst2
+
+        Dim nonzeros = dst2.FindNonZero()
+
+        dst3.SetTo(0)
+        If nonzeros.Rows > options.numPoints Then
+            Dim minX As Integer = Integer.MaxValue, maxX As Integer = 0, minY As Integer = Integer.MaxValue, maxY As Integer = 0
+            Dim p1 As cv.Point, p2 As cv.Point, p3 As cv.Point, p4 As cv.Point
+            For i = 0 To nonzeros.Rows - 1
+                Dim pt = nonzeros.Get(Of cv.Point)(i, 0)
+                If pt.X < minX Then
+                    minX = pt.X
+                    p1 = pt
+                End If
+                If pt.X > maxX Then
+                    maxX = pt.X
+                    p2 = pt
+                End If
+                If pt.Y < minY Then
+                    minY = pt.Y
+                    p3 = pt
+                End If
+                If pt.Y > maxY Then
+                    maxY = pt.Y
+                    p4 = pt
+                End If
             Next
 
-            rectList.Add(nextRect)
-            For Each r In rectList
-                If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
-            Next
-            If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
-            If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
-                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-            Else
-                If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then task.motionDetected = False
-            End If
-        End If
-
-        If standaloneTest() Then
-            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            If task.redCells.Count > 1 Then
-                labels(2) = CStr(task.redCells.Count) + " RedMask cells had motion"
-            Else
-                labels(2) = "No motion detected"
-            End If
-            labels(3) = ""
-            If task.motionRect.Width > 0 Then
-                labels(3) = "Rect width = " + CStr(task.motionRect.Width) + ", height = " + CStr(task.motionRect.Height)
-            End If
+            mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
+            mRect.Run(empty)
+            DrawRotatedRect(mRect.minRect, dst3, cv.Scalar.White)
+            If dst3.CountNonZero > dst3.Total / 2 Then dst3.SetTo(255)
         End If
     End Sub
 End Class
 
 
 
+
+Public Class Motion_Contours : Inherits VB_Parent
+    Public motion As New Motion_MinRect
+    Public changedPixels As Integer
+    Public Sub New()
+        labels(2) = "Enclosing rectangles are yellow in dst2 and dst3"
+        desc = "Detect contours in the motion data and the resulting rectangles"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src
+        motion.Run(src)
+        dst3 = motion.dst3
+    End Sub
+End Class
 
 
 
@@ -705,189 +772,20 @@ End Class
 
 
 
-Public Class Motion_Color : Inherits VB_Parent
+Public Class Motion_Depth : Inherits VB_Parent
+    Dim diff As New Diff_Depth32f
     Public Sub New()
-        labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
-                  "Diff of input and latest accumulated color image"}
-        desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
+        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
+        desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
-        If standaloneTest() And task.motionDetected Then dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+        If task.heartBeat Then dst2 = task.pcSplit(2).Clone
+
+        If task.motionDetected Then task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
+
+        diff.Run(task.pcSplit(2))
+        diff.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
+        diff.lastDepth32f = task.pcSplit(2)
     End Sub
 End Class
 
-
-
-
-
-Public Class Motion_BasicsQuarterRes : Inherits VB_Parent
-    Dim redC As New RedCloud_Basics
-    Public bgSub As New BGSubtract_MOG2_QT
-    Dim rectList As New List(Of cv.Rect)
-    Public Sub New()
-        desc = "The option-free version of Motion_Basics"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.motionDetected = True
-        task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-
-        If src.Channels() <> 1 Then
-            bgSub.Run(src)
-            dst2 = bgSub.dst2
-        Else
-            dst2 = src
-        End If
-
-        If dst2.Size <> task.quarterRes Then
-            dst2 = dst2.Resize(task.quarterRes).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        Else
-            dst2 = src.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        End If
-
-        redC.inputMask = Not dst2
-        redC.Run(dst2)
-        If task.redCells.Count <= 2 Then
-            task.motionDetected = False
-        Else
-            Dim nextRect = task.redCells.ElementAt(1).rect
-            For i = 2 To task.redCells.Count - 1
-                Dim rc = task.redCells.ElementAt(i)
-                nextRect = nextRect.Union(rc.rect)
-            Next
-
-            rectList.Add(nextRect)
-            task.motionRect = rectList(0)
-            For i = 1 To rectList.Count - 1
-                task.motionRect = task.motionRect.Union(rectList(i))
-            Next
-            If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
-            If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
-                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-            Else
-                If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then task.motionDetected = False
-            End If
-        End If
-
-        If standaloneTest() Then
-            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            If task.redCells.Count > 1 Then
-                labels(2) = CStr(task.redCells.Count) + " RedMask cells had motion"
-            Else
-                labels(2) = "No motion detected"
-            End If
-            labels(3) = ""
-            If task.motionRect.Width > 0 Then
-                labels(3) = "Rect width = " + CStr(task.motionRect.Width) + ", height = " + CStr(task.motionRect.Height)
-            End If
-        End If
-
-        Dim ratio = CInt(src.Width / dst2.Width)
-        If src.Size <> dst2.Size Then
-            Dim r = task.motionRect
-            task.motionRect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
-        End If
-
-        If task.motionRect.Width < dst2.Width Then
-            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            Dim pad = dst2.Width / 20
-            Dim r = task.motionRect
-            r = New cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2)
-            task.motionRect = ValidateRect(r, ratio)
-            dst2.Rectangle(task.motionRect, 255, task.lineWidth + 1)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_Diff : Inherits VB_Parent
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        labels = {"", "", "Unstable mask", "Pixel difference"}
-        desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.heartBeat Then
-            dst1 = src.Clone
-            dst2.SetTo(0)
-        End If
-
-        cv.Cv2.Absdiff(src, dst1, dst3)
-        dst2 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class Motion_MinRect : Inherits VB_Parent
-    Public motion As New Motion_Diff
-    Dim mRect As New Area_MinRect
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Find the nonzero points of motion and fit an rotated rectangle to them."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        motion.Run(src)
-        dst2 = motion.dst2
-
-        Dim nonzeros = dst2.FindNonZero()
-        If task.heartBeat Then dst3.SetTo(0)
-        If nonzeros.Rows > 5 Then
-            Dim ptx As New List(Of Integer)
-            Dim pty As New List(Of Integer)
-            Dim inputPoints As New List(Of cv.Point)
-            For i = 0 To nonzeros.Rows - 1
-                Dim pt = nonzeros.Get(Of cv.Point)(i, 0)
-                inputPoints.Add(pt)
-                ptx.Add(pt.X)
-                pty.Add(pt.Y)
-            Next
-            Dim p1 = inputPoints(ptx.IndexOf(ptx.Max))
-            Dim p2 = inputPoints(ptx.IndexOf(ptx.Min))
-            Dim p3 = inputPoints(pty.IndexOf(pty.Max))
-            Dim p4 = inputPoints(pty.IndexOf(pty.Min))
-
-            mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
-            mRect.Run(empty)
-            DrawRotatedRect(mRect.minRect, dst3, cv.Scalar.White)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Motion_RedCloud : Inherits VB_Parent
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        labels(3) = "Motion detected in the cells below"
-        desc = "Use RedCloud to define where there is motion"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        dst3.SetTo(0)
-        For Each rc In task.redCells
-            If rc.motionPixels > 0 Then dst3(rc.rect).SetTo(rc.naturalColor, rc.mask)
-        Next
-    End Sub
-End Class

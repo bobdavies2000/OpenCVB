@@ -110,8 +110,6 @@ namespace CS_Classes
 			if (algorithmName == "Bin4Way_Sobel_CS") return new Bin4Way_Sobel_CS(task);
 			if (algorithmName == "Bin4Way_SplitGaps_CS") return new Bin4Way_SplitGaps_CS(task);
 			if (algorithmName == "Bin4Way_SplitMean_CS") return new Bin4Way_SplitMean_CS(task);
-			if (algorithmName == "Bin4Way_SplitMean1_CS") return new Bin4Way_SplitMean1_CS(task);
-			if (algorithmName == "Bin4Way_SplitMean2_CS") return new Bin4Way_SplitMean2_CS(task);
 			if (algorithmName == "Bin4Way_SplitValley_CS") return new Bin4Way_SplitValley_CS(task);
 			if (algorithmName == "Bin4Way_Unstable_CS") return new Bin4Way_Unstable_CS(task);
 			if (algorithmName == "Bin4Way_Unstable1_CS") return new Bin4Way_Unstable1_CS(task);
@@ -318,7 +316,7 @@ namespace CS_Classes
 			if (algorithmName == "Depth_StableMin_CS") return new Depth_StableMin_CS(task);
 			if (algorithmName == "Depth_StableMinMax_CS") return new Depth_StableMinMax_CS(task);
 			if (algorithmName == "Depth_TierCount_CS") return new Depth_TierCount_CS(task);
-			if (algorithmName == "Depth_TiersZ_CS") return new Depth_TiersZ_CS(task);
+			if (algorithmName == "Depth_Tiers_CS") return new Depth_Tiers_CS(task);
 			if (algorithmName == "Depth_Uncertainty_CS") return new Depth_Uncertainty_CS(task);
 			if (algorithmName == "Depth_World_CS") return new Depth_World_CS(task);
 			if (algorithmName == "Depth_WorldXYMT_CS") return new Depth_WorldXYMT_CS(task);

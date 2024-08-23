@@ -771,7 +771,7 @@ End Class
 
 
 Public Class Edge_Regions : Inherits VB_Parent
-    Dim tiers As New Depth_TiersZ
+    Dim tiers As New Depth_Tiers
     Dim edge As New Edge_Canny
     Public Sub New()
         FindSlider("Canny threshold2").Value = 30

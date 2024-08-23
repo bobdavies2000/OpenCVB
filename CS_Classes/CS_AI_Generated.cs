@@ -3189,94 +3189,6 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_SplitMean1_CS : CS_Parent
-    {
-        Binarize_Simple binary = new Binarize_Simple();
-        public Mat_4Click mats = new Mat_4Click();
-        Scalar botColor, midColor, topColor;
-        public Bin4Way_SplitMean1_CS(VBtask task) : base(task)
-        {
-            labels[2] = "A 4-way split - darkest (upper left) to lightest (lower right)";
-            desc = "Binarize an image and split it into quartiles using peaks.";
-        }
-        public void RunCS(Mat src)
-        {
-            Mat gray = src.Channels() == 1 ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            binary.Run(gray);
-            Mat mask = binary.dst2.Clone();
-            if (task.heartBeat)
-            {
-                midColor = CV.Scalar.All(binary.meanScalar[0]);
-                topColor = CV.Scalar.All(Cv2.Mean(gray, mask)[0]);
-                botColor = CV.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
-            }
-            mats.mat[0] = gray.InRange(0, botColor[0] / 2);
-            mats.mat[1] = gray.InRange(botColor[0] / 2, (botColor[0] + midColor[0]) / 2);
-            mats.mat[2] = gray.InRange((botColor[0] + midColor[0]) / 2, (midColor[0] + topColor[0]) / 2);
-            mats.mat[3] = gray.InRange((midColor[0] + topColor[0]) / 2, 255);
-            mats.Run(empty);
-            dst2 = mats.dst2;
-            dst3 = mats.dst3;
-            labels[3] = mats.labels[3];
-        }
-    }
-    
-    
-    
-    public class Bin4Way_SplitMean2_CS : CS_Parent
-    {
-        Binarize_Simple binary = new Binarize_Simple();
-        Hist_Basics hist = new Hist_Basics();
-        public Mat_4Click mats = new Mat_4Click();
-        Scalar botColor, midColor, topColor;
-        public Bin4Way_SplitMean2_CS(VBtask task) : base(task)
-        {
-            task.gOptions.setHistogramBins(256);
-            labels[2] = "A 4-way split - darkest (upper left) to lightest (lower right)";
-            desc = "Binarize an image and split it into quartiles finding the minimum between peaks.";
-        }
-        int findMin(int start, int finish)
-        {
-            int minIndex = 0;
-            int minVal = int.MaxValue;
-            for (int i = start; i < finish; i++)
-            {
-                if (hist.histArray[i] < minVal)
-                {
-                    minVal = (int)hist.histArray[i];
-                    minIndex = i;
-                }
-            }
-            return minIndex;
-        }
-        public void RunCS(Mat src)
-        {
-            Mat gray = src.Channels() == 1 ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            hist.Run(gray);
-            binary.Run(gray);
-            Mat mask = binary.dst2.Clone();
-            if (task.heartBeat)
-            {
-                midColor = CV.Scalar.All(binary.meanScalar[0]);
-                topColor = CV.Scalar.All(Cv2.Mean(gray, mask)[0]);
-                botColor = CV.Scalar.All(Cv2.Mean(gray, ~mask)[0]);
-            }
-            int botmin = findMin(5, (int)botColor[0]);
-            mats.mat[0] = gray.InRange(0, botmin);
-            int midMin = findMin((int)botColor[0], (int)midColor[0]);
-            mats.mat[1] = gray.InRange(botmin, midMin);
-            int topMin = findMin((int)midColor[0], (int)topColor[0]);
-            mats.mat[2] = gray.InRange(midMin, topMin);
-            mats.mat[3] = gray.InRange(topMin, 255);
-            mats.Run(empty);
-            dst2 = mats.dst2;
-            dst3 = mats.dst3;
-            labels[3] = mats.labels[3];
-        }
-    }
-
-
-
 
 
     public class Bin4Way_BasicsColors_CS : CS_Parent
@@ -4178,14 +4090,14 @@ namespace CS_Classes
 
     public class Binarize_DepthTiers_CS : CS_Parent
     {
-        Depth_TiersZ tiers = new Depth_TiersZ();
+        Depth_Tiers tiers = new Depth_Tiers();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
         public int classCount = 200; // 4-way split with 50 depth levels at 10 cm's each.
 
         public Binarize_DepthTiers_CS(VBtask task) : base(task)
         {
             task.redOptions.useColorOnlyChecked = true;
-            desc = "Add the Depth_TiersZ and Bin4Way_Regions output in preparation for RedCloud";
+            desc = "Add the Depth_Tiers and Bin4Way_Regions output in preparation for RedCloud";
         }
 
         public void RunCS(Mat src)
@@ -9433,6 +9345,7 @@ namespace CS_Classes
     public class Contour_DepthTiers_CS : CS_Parent
     {
         public Options_Contours options = new Options_Contours();
+        public Options_DepthTiers optionsTiers = new Options_DepthTiers();
         public int classCount;
         public List<CV.Point[]> contourlist = new List<CV.Point[]>();
 
@@ -9448,8 +9361,9 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
+            optionsTiers.RunVB();
 
-            task.pcSplit[2].ConvertTo(dst1, MatType.CV_32S, 100 / options.cmPerTier, 1);
+            task.pcSplit[2].ConvertTo(dst1, MatType.CV_32S, 100 / optionsTiers.cmPerTier, 1);
 
             CV.Point[][] allContours;
             Cv2.FindContours(dst1, out allContours, out _, RetrievalModes.FloodFill, ContourApproximationModes.ApproxSimple);
@@ -9483,7 +9397,7 @@ namespace CS_Classes
             }
 
             dst2.SetTo(1, dst2.Threshold(0, 255, ThresholdTypes.BinaryInv));
-            classCount = (int)(task.MaxZmeters * 100 / options.cmPerTier);
+            classCount = (int)(task.MaxZmeters * 100 / optionsTiers.cmPerTier);
 
             if (standaloneTest())
                 dst3 = ShowPalette(dst2 * 255 / classCount);
@@ -13086,12 +13000,12 @@ namespace CS_Classes
 
 
 
-    public class Depth_TiersZ_CS : CS_Parent
+    public class Depth_Tiers_CS : CS_Parent
     {
         public int classCount;
-        Options_Contours options = new Options_Contours();
+        Options_DepthTiers options = new Options_DepthTiers();
 
-        public Depth_TiersZ_CS(VBtask task) : base(task)
+        public Depth_Tiers_CS(VBtask task) : base(task)
         {
             UpdateAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.");
             desc = "Create a reduced image of the depth data to define tiers of similar values";
@@ -15687,7 +15601,7 @@ namespace CS_Classes
     }
     public class Edge_Regions_CS : CS_Parent
     {
-        Depth_TiersZ tiers = new Depth_TiersZ();
+        Depth_Tiers tiers = new Depth_Tiers();
         Edge_Canny edge = new Edge_Canny();
         public Edge_Regions_CS(VBtask task) : base(task)
         {
@@ -22337,7 +22251,7 @@ namespace CS_Classes
     public class Flood_Tiers_CS : CS_Parent
     {
         Flood_BasicsMask flood = new Flood_BasicsMask();
-        Depth_TiersZ tiers = new Depth_TiersZ();
+        Depth_Tiers tiers = new Depth_Tiers();
         Color8U_Basics cvt = new Color8U_Basics();
         public Flood_Tiers_CS(VBtask task) : base(task)
         {
@@ -53311,12 +53225,12 @@ namespace CS_Classes
     public class RedCloud_Tiers_CS : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
-        Depth_TiersZ tiers = new Depth_TiersZ();
+        Depth_Tiers tiers = new Depth_Tiers();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
         public RedCloud_Tiers_CS(VBtask task) : base(task)
         {
             task.redOptions.setUseColorOnly(true);
-            desc = "Use the Depth_TiersZ algorithm to create a color-based RedCloud";
+            desc = "Use the Depth_Tiers algorithm to create a color-based RedCloud";
         }
         public void RunCS(Mat src)
         {
@@ -53337,12 +53251,12 @@ namespace CS_Classes
     public class RedCloud_TiersBinarize_CS : CS_Parent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
-        Depth_TiersZ tiers = new Depth_TiersZ();
+        Depth_Tiers tiers = new Depth_Tiers();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
         public RedCloud_TiersBinarize_CS(VBtask task) : base(task)
         {
             task.redOptions.setUseColorOnly(true);
-            desc = "Use the Depth_TiersZ with Bin4Way_Regions algorithm to create a color-based RedCloud";
+            desc = "Use the Depth_Tiers with Bin4Way_Regions algorithm to create a color-based RedCloud";
         }
         public void RunCS(Mat src)
         {
@@ -53563,7 +53477,7 @@ namespace CS_Classes
 
     public class RedCloud_PlusTiers_CS : CS_Parent
     {
-        Depth_TiersZ tiers = new Depth_TiersZ();
+        Depth_Tiers tiers = new Depth_Tiers();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_PlusTiers_CS(VBtask task) : base(task)

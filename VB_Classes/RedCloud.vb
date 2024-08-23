@@ -1691,11 +1691,11 @@ End Class
 
 Public Class RedCloud_Tiers : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
-    Dim tiers As New Depth_TiersZ
+    Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
-        desc = "Use the Depth_TiersZ algorithm to create a color-based RedCloud"
+        desc = "Use the Depth_TierZ algorithm to create a color-based RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)
@@ -1716,11 +1716,11 @@ End Class
 
 Public Class RedCloud_TiersBinarize : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
-    Dim tiers As New Depth_TiersZ
+    Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
-        desc = "Use the Depth_TiersZ with Bin4Way_Regions algorithm to create a color-based RedCloud"
+        desc = "Use the Depth_TierZ with Bin4Way_Regions algorithm to create a color-based RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)
@@ -1976,7 +1976,7 @@ End Class
 
 
 Public Class RedCloud_PlusTiers : Inherits VB_Parent
-    Dim tiers As New Depth_TiersZ
+    Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
     Dim redC As New RedCloud_Basics
     Public Sub New()

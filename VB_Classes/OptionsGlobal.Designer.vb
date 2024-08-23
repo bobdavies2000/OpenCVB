@@ -78,6 +78,7 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.UseReliableDepth = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -305,6 +306,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.UseReliableDepth)
         Me.GroupBox2.Controls.Add(Me.Label1)
         Me.GroupBox2.Controls.Add(Me.HighlightColor)
         Me.GroupBox2.Controls.Add(Me.CrossHairs)
@@ -357,7 +359,7 @@ Partial Class OptionsGlobal
         Me.CrossHairs.AutoSize = True
         Me.CrossHairs.Checked = True
         Me.CrossHairs.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CrossHairs.Location = New System.Drawing.Point(24, 235)
+        Me.CrossHairs.Location = New System.Drawing.Point(24, 255)
         Me.CrossHairs.Name = "CrossHairs"
         Me.CrossHairs.Size = New System.Drawing.Size(151, 24)
         Me.CrossHairs.TabIndex = 71
@@ -367,7 +369,7 @@ Partial Class OptionsGlobal
         'ShowMotionRectangle
         '
         Me.ShowMotionRectangle.AutoSize = True
-        Me.ShowMotionRectangle.Location = New System.Drawing.Point(24, 206)
+        Me.ShowMotionRectangle.Location = New System.Drawing.Point(24, 199)
         Me.ShowMotionRectangle.Name = "ShowMotionRectangle"
         Me.ShowMotionRectangle.Size = New System.Drawing.Size(275, 24)
         Me.ShowMotionRectangle.TabIndex = 70
@@ -381,6 +383,7 @@ Partial Class OptionsGlobal
         Me.GroupBox1.Controls.Add(Me.UseHistoryCloud)
         Me.GroupBox1.Controls.Add(Me.MotionFilteredCloudOnly)
         Me.GroupBox1.Controls.Add(Me.unFiltered)
+        Me.GroupBox1.Enabled = False
         Me.GroupBox1.Location = New System.Drawing.Point(366, 255)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(306, 186)
@@ -446,7 +449,7 @@ Partial Class OptionsGlobal
         'ShowGrid
         '
         Me.ShowGrid.AutoSize = True
-        Me.ShowGrid.Location = New System.Drawing.Point(24, 118)
+        Me.ShowGrid.Location = New System.Drawing.Point(24, 115)
         Me.ShowGrid.Name = "ShowGrid"
         Me.ShowGrid.Size = New System.Drawing.Size(200, 24)
         Me.ShowGrid.TabIndex = 67
@@ -456,7 +459,7 @@ Partial Class OptionsGlobal
         'debugSyncUI
         '
         Me.debugSyncUI.AutoSize = True
-        Me.debugSyncUI.Location = New System.Drawing.Point(24, 148)
+        Me.debugSyncUI.Location = New System.Drawing.Point(24, 143)
         Me.debugSyncUI.Name = "debugSyncUI"
         Me.debugSyncUI.Size = New System.Drawing.Size(261, 24)
         Me.debugSyncUI.TabIndex = 66
@@ -477,7 +480,7 @@ Partial Class OptionsGlobal
         'ShowAllOptions
         '
         Me.ShowAllOptions.AutoSize = True
-        Me.ShowAllOptions.Location = New System.Drawing.Point(24, 89)
+        Me.ShowAllOptions.Location = New System.Drawing.Point(24, 87)
         Me.ShowAllOptions.Name = "ShowAllOptions"
         Me.ShowAllOptions.Size = New System.Drawing.Size(220, 24)
         Me.ShowAllOptions.TabIndex = 64
@@ -508,7 +511,7 @@ Partial Class OptionsGlobal
         'CreateGif
         '
         Me.CreateGif.AutoSize = True
-        Me.CreateGif.Location = New System.Drawing.Point(24, 178)
+        Me.CreateGif.Location = New System.Drawing.Point(24, 171)
         Me.CreateGif.Name = "CreateGif"
         Me.CreateGif.Size = New System.Drawing.Size(256, 24)
         Me.CreateGif.TabIndex = 24
@@ -526,7 +529,7 @@ Partial Class OptionsGlobal
         'gravityPointCloud
         '
         Me.gravityPointCloud.AutoSize = True
-        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 288)
+        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 311)
         Me.gravityPointCloud.Name = "gravityPointCloud"
         Me.gravityPointCloud.Size = New System.Drawing.Size(294, 24)
         Me.gravityPointCloud.TabIndex = 23
@@ -580,7 +583,7 @@ Partial Class OptionsGlobal
         'displayDst1
         '
         Me.displayDst1.AutoSize = True
-        Me.displayDst1.Location = New System.Drawing.Point(24, 60)
+        Me.displayDst1.Location = New System.Drawing.Point(24, 59)
         Me.displayDst1.Name = "displayDst1"
         Me.displayDst1.Size = New System.Drawing.Size(160, 24)
         Me.displayDst1.TabIndex = 4
@@ -671,7 +674,7 @@ Partial Class OptionsGlobal
         'UseKalman
         '
         Me.UseKalman.AutoSize = True
-        Me.UseKalman.Location = New System.Drawing.Point(24, 260)
+        Me.UseKalman.Location = New System.Drawing.Point(24, 283)
         Me.UseKalman.Name = "UseKalman"
         Me.UseKalman.Size = New System.Drawing.Size(176, 24)
         Me.UseKalman.TabIndex = 0
@@ -688,6 +691,16 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
+        'UseReliableDepth
+        '
+        Me.UseReliableDepth.AutoSize = True
+        Me.UseReliableDepth.Location = New System.Drawing.Point(24, 227)
+        Me.UseReliableDepth.Name = "UseReliableDepth"
+        Me.UseReliableDepth.Size = New System.Drawing.Size(254, 24)
+        Me.UseReliableDepth.TabIndex = 75
+        Me.UseReliableDepth.Text = "Use Reliable Depth/PointCloud"
+        Me.UseReliableDepth.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
@@ -777,4 +790,5 @@ Partial Class OptionsGlobal
     Friend WithEvents CrossHairs As System.Windows.Forms.CheckBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
+    Friend WithEvents UseReliableDepth As Windows.Forms.CheckBox
 End Class

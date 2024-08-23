@@ -41,7 +41,6 @@ Public Class VBtask : Implements IDisposable
     Public pcSplit() As cv.Mat
     Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public WorkingRes As cv.Size
-    Public motionRect As cv.Rect
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
     Public paletteGradient As cv.Mat
@@ -49,14 +48,22 @@ Public Class VBtask : Implements IDisposable
     Public depthRGB As New cv.Mat
     Public srcThread As cv.Mat
 
+    Public motionFlag As Boolean
+    Public motionRect As cv.Rect
+    Public motionDetected As Boolean
+    Public motionColor As Motion_Color
+
+    Public reliableDepth As Reliable_Depth
+    Public reliableDepthMask As cv.Mat
+
+    Public camMotionPixels As Single ' distance in pixels that the camera has moved.
+    Public camDirection As Single ' camera direction in radians.
+
     ' add any global algorithms here
     Public cMotion As CameraMotion_Basics
     Public gravityHorizon As Gravity_Horizon
     Public PixelViewer As Pixel_Viewer
     Public colorizer As Depth_Colorizer_CPP_VB
-    Public hCloud As History_Cloud
-    Public motionCloud As Motion_PointCloud
-    Public motionColor As Motion_Color
     Public rgbFilter As Object
     Public gMat As IMU_GMatrix
     Public IMUBasics As IMU_Basics
@@ -107,14 +114,8 @@ Public Class VBtask : Implements IDisposable
 
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
-    Public motionFlag As Boolean
-    Public motionDetected As Boolean
-
     Public gravityVec As New PointPair
     Public horizonVec As New PointPair
-
-    Public camMotionPixels As Single ' distance in pixels that the camera has moved.
-    Public camDirection As Single ' camera direction in radians.
 
     Public IMU_RawAcceleration As cv.Point3f
     Public IMU_Acceleration As cv.Point3f
@@ -392,8 +393,7 @@ Public Class VBtask : Implements IDisposable
         colorizer = New Depth_Colorizer_CPP_VB
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
-        'hCloud = New History_Cloud
-        'motionCloud = New Motion_PointCloud
+        reliableDepth = New Reliable_Depth
         'motionColor = New Motion_Color
         'cMotion = New CameraMotion_Basics
         gravityHorizon = New Gravity_Horizon
@@ -682,8 +682,6 @@ Public Class VBtask : Implements IDisposable
         task.IMU_AlphaFilter = 0.5 '  task.gOptions.imu_Alpha
         grid.RunVB(task.color)
 
-        If task.algName.StartsWith("CPP_") = False Then task.motionFlag = True
-
         imuStabilityTest.RunVB(src)
         task.cameraStable = imuStabilityTest.stableTest
         task.cameraStableString = imuStabilityTest.stableStr
@@ -708,38 +706,16 @@ Public Class VBtask : Implements IDisposable
 
             If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
 
+            task.motionDetected = True
+            task.motionRect = New cv.Rect(0, 0, src.Width, src.Height)
 
-
+            If task.gOptions.UseReliableDepth.Checked Then
+                reliableDepth.Run(src)
+                task.pointCloud.SetTo(0, Not task.reliableDepthMask)
+                cv.Cv2.ImShow("reliable", Not task.reliableDepthMask)
+            End If
 
             task.gOptions.unFiltered.Checked = True ' until the motion rectangle problems are resolved.
-
-
-
-
-            ' on each heartbeat or when options changed, update the whole image.
-            If task.heartBeat Or task.gOptions.unFiltered.Checked Then
-                task.motionDetected = True
-                task.motionRect = New cv.Rect(0, 0, src.Width, src.Height)
-                'motionColor.dst2 = src.Clone
-                'motionCloud.dst2 = task.pointCloud.Clone
-            Else
-                'motionBasics.RunVB(src) ' get the latest motionRect
-                'If task.gOptions.UseHistoryCloud.Checked Then
-                '    hCloud.RunVB(task.pointCloud)
-                '    task.pointCloud = hCloud.dst2
-                'ElseIf task.gOptions.MotionFilteredColorAndCloud.Checked Then
-                '    motionColor.RunVB(src)
-                '    task.color = motionColor.dst2.Clone
-                '    motionCloud.RunVB(task.pointCloud)
-                '    task.pointCloud = motionCloud.dst2.Clone
-                'ElseIf task.gOptions.MotionFilteredCloudOnly.Checked Then
-                '    motionCloud.RunVB(task.pointCloud)
-                '    task.pointCloud = motionCloud.dst2.Clone
-                'ElseIf task.gOptions.MotionFilteredColorOnly.Checked Then
-                '    motionColor.RunVB(src)
-                '    task.color = motionColor.dst2.Clone
-                'End If
-            End If
         End If
 
         If task.motionDetected Or heartBeat Then
@@ -747,7 +723,6 @@ Public Class VBtask : Implements IDisposable
 
             If task.optionsChanged Then task.maxDepthMask.SetTo(0)
             task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
-            'task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
 
             task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             task.noDepthMask = Not task.depthMask
@@ -762,10 +737,8 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
 
-        ' small improvement to speed up colorized depth - make it smaller before colorizing.
-        Dim depthRGBInput = task.pcSplit(2).Resize(task.quarterRes)
-        colorizer.RunVB(depthRGBInput.Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc))
-        task.depthRGB = colorizer.dst2.Resize(task.color.Size)
+        colorizer.RunVB(task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc))
+        task.depthRGB = colorizer.dst2.Clone
 
         TaskTimer.Enabled = True
 
@@ -806,11 +779,6 @@ Public Class VBtask : Implements IDisposable
             src = rgbFilter.dst2
         End If
 
-
-
-
-
-        'cMotion.Run(src)
         If task.paused = False And src.Size = task.WorkingRes Then
             If task.algName.EndsWith("_CS") Then
                 csAlgorithmObject.trueData.clear()

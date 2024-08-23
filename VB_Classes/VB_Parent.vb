@@ -82,7 +82,7 @@ Public Class VB_Parent : Implements IDisposable
         End If
 
         If traceName <> "Controls_Basics" Then
-            standalone = callTrace(0) = traceName + "\" ' only the first is standaloneTest() (the primary algorithm.)
+            standalone = callTrace(0) = traceName + "\" ' only the first is standalone (the primary algorithm.)
             If traceName = "Python_Run" Then standalone = True
             If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
             If standalone = False And callTrace.Contains(callStack) = False Then callTrace.Add(callStack)

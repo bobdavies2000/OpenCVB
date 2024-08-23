@@ -107,3 +107,29 @@ Public Class EdgeDraw_LeftRightVertical : Inherits VB_Parent
         dst3 = edges.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class EdgeDraw_SplitMean : Inherits VB_Parent
+    Dim binary As New Bin4Way_SplitMean
+    Dim edges As New EdgeDraw_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "find the edges in a 4-way color split of the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binary.Run(src)
+
+        dst2.SetTo(0)
+        For i = 0 To binary.mats.mat.Count - 1
+            edges.Run(binary.mats.mat(i))
+            dst2 = dst2 Or edges.dst2
+        Next
+        edges.Run(src)
+        dst3 = edges.dst2
+    End Sub
+End Class

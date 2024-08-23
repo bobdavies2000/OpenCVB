@@ -165,13 +165,14 @@ Partial Class Main_UI
         ' 
         ' RecentList
         ' 
+        RecentList.AutoToolTip = False
         RecentList.DisplayStyle = ToolStripItemDisplayStyle.Text
         RecentList.Image = CType(resources.GetObject("RecentList.Image"), Image)
         RecentList.ImageTransparentColor = Color.Magenta
         RecentList.Name = "RecentList"
-        RecentList.Size = New Size(82, 29)
+        RecentList.ShowDropDownArrow = False
+        RecentList.Size = New Size(68, 29)
         RecentList.Text = "Recent"
-        RecentList.ToolTipText = "The list of recently used algorithms"
         ' 
         ' AvailableAlgorithms
         ' 

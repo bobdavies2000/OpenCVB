@@ -36,11 +36,17 @@ public:
 	ContourApproximationModes ApproximationMode =  ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
 	double epsilon =  0.03;
 	int minPixels =  30;
-	int cmPerTier =  50;
 	int trueTextOffset =  80;
 	int maxContourCount =  50;
 	void RunVB() {}
 	Options_Contours() {
+	}
+};
+class Options_DepthTiers {
+public:
+	int cmPerTier =  50;
+	void RunVB() {}
+	Options_DepthTiers() {
 	}
 };
 class Options_Encode {
@@ -2097,5 +2103,11 @@ class Options_ColorMethod {
 public:
 	void RunVB() {}
 	Options_ColorMethod() {
+	}
+};
+class Options_DiffDepth {
+public:
+	void RunVB() {}
+	Options_DiffDepth() {
 	}
 };

@@ -1491,28 +1491,29 @@ End Class
 
 
 
-
-Public Class Depth_TiersZ : Inherits VB_Parent
+Public Class Depth_Tiers : Inherits VB_Parent
     Public classCount As Integer
-    Dim options As New Options_Contours
+    Dim options As New Options_DepthTiers
+
     Public Sub New()
         UpdateAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
         desc = "Create a reduced image of the depth data to define tiers of similar values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static cmSlider = FindSlider("cm's per tier")
-        Dim cmTier = cmSlider.value
+        options.RunVB()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        dst1 = (src * 100 / cmTier).toMat
+        dst1 = (src * 100 / options.cmPerTier).ToMat
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        classCount = task.MaxZmeters * 100 / cmTier + 1
+        Dim mm = GetMinMax(src)
+        classCount = (mm.maxVal - mm.minVal) * 100 / options.cmPerTier + 1
 
         dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(2) = $"{classCount} regions found."
     End Sub
 End Class
+
 
 
 
@@ -1564,6 +1565,34 @@ Public Class Depth_Flatland : Inherits VB_Parent
         dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Depth_MotionTempered : Inherits VB_Parent
+    Dim motion As New Motion_MinRect
+    Dim colorize As New Depth_Colorizer_CPP_VB
+    Public Sub New()
+        desc = "Update depth only near any motion."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then dst2 = task.pcSplit(2)
+        motion.Run(src)
+        task.pcSplit(2).CopyTo(dst2, motion.dst3)
+
+        If standalone Then
+            colorize.Run(dst2)
+            dst3 = colorize.dst2
+        End If
+    End Sub
+End Class
+
+
+
+
 
 
 

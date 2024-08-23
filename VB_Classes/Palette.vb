@@ -555,3 +555,34 @@ Public Class Palette_GrayToColor : Inherits VB_Parent
         cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Palette_Bin4Way : Inherits VB_Parent
+    Dim binary As New Bin4Way_SplitMean
+    Dim tiers As New Depth_Tiers
+    Public classCount As Integer
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "CV_8U data is below", "Palettized version of dst2 at left"}
+        desc = "Create a colorized representation of the 4-way bin split with and without depth tiers."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binary.Run(src)
+
+        dst2.SetTo(0)
+        For i = 0 To binary.mats.mat.Count - 1
+            dst2.SetTo(i, binary.mats.mat(i))
+        Next
+
+        tiers.Run(src)
+        dst2 += tiers.dst2
+        classCount = tiers.classCount + 4
+
+        dst3 = ShowPalette(dst2 * 255 / classCount)
+    End Sub
+End Class
