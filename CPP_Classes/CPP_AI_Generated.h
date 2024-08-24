@@ -807,18 +807,18 @@ public:
     }
 };
 extern "C" __declspec(dllexport)
-Denoise_Pixels* Denoise_SinglePixels_Open() {
-    Denoise_Pixels* cPtr = new Denoise_Pixels();
+Denoise_SinglePixels* Denoise_SinglePixels_Open() {
+    Denoise_SinglePixels* cPtr = new Denoise_SinglePixels();
     return cPtr;
 }
 extern "C" __declspec(dllexport)
-void Denoise_SinglePixels_Close(Denoise_Pixels* cPtr)
+void Denoise_SinglePixels_Close(Denoise_SinglePixels* cPtr)
 {
     delete cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* Denoise_SinglePixels_Run(Denoise_Pixels* cPtr, int* dataPtr, int rows, int cols)
+int* Denoise_SinglePixels_Run(Denoise_SinglePixels* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
     cPtr->RunCPP();

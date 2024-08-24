@@ -1,16 +1,42 @@
 ﻿Imports cv = OpenCvSharp
+Public Class Reliable_Basics : Inherits VB_Parent
+    Dim bgs As New BGSubtract_Basics
+    Dim relyDepth As New Reliable_Depth
+    Dim diff
+    Public Sub New()
+        task.gOptions.setDisplay1()
+        desc = "Identify each grid element with unreliable data or motion."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+
+        bgs.Run(src)
+        dst2 = bgs.dst2
+
+        relyDepth.Run(src)
+        dst3 = relyDepth.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class Reliable_Depth : Inherits VB_Parent
     Dim rDepth As New History_ReliableDepth
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F)
-        labels = {"", "", "Mask of unreliable depth data", "Task.DepthRGB after removing unreliable depth (compare with above.)"}
+        labels = {"", "", "Mask of Reliable depth data", "Task.DepthRGB after removing unreliable depth (compare with above.)"}
         desc = "Provide only depth that has been present over the last framehistory frames."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rDepth.Run(task.noDepthMask)
-        dst3.SetTo(0)
         dst2 = rDepth.dst2
-        If standaloneTest() Then task.pcSplit(2).CopyTo(dst3, dst2)
+
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            task.depthRGB.CopyTo(dst3, dst2)
+        End If
     End Sub
 End Class
 
@@ -55,22 +81,25 @@ End Class
 Public Class Reliable_Gray : Inherits VB_Parent
     Dim diff As New Motion_Diff
     Dim history As New History_Basics8U
-    Public removeSingles As Boolean = False
+    Dim options As New Options_Denoise
+    Dim singles As New Denoise_SinglePixels_CPP_VB
     Public Sub New()
-        task.gOptions.setPixelDifference(3)
-        task.gOptions.FrameHistory.Value = 30
+        task.gOptions.setPixelDifference(10)
         labels = {"", "", "Mask of unreliable color data", "Color image after removing unreliable pixels"}
         desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Pixel Difference threshold'"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         dst3 = src.Clone
         diff.Run(src)
         history.Run(diff.dst2)
         dst2 = history.dst2
-        dst3.SetTo(0, dst2)
-
-        If removeSingles Then
+        If options.removeSinglePixels Then
+            singles.Run(dst2)
+            dst2 = singles.dst2
         End If
+        dst3.SetTo(0, dst2)
     End Sub
 End Class
 
@@ -78,7 +107,7 @@ End Class
 
 
 
-Public Class Reliable_BGR : Inherits VB_Parent
+Public Class Reliable_RGB : Inherits VB_Parent
     Dim diff(2) As Motion_Diff
     Dim history(2) As History_Basics8U
     Public Sub New()
@@ -86,8 +115,7 @@ Public Class Reliable_BGR : Inherits VB_Parent
             diff(i) = New Motion_Diff
             history(i) = New History_Basics8U
         Next
-        task.gOptions.setPixelDifference(3)
-        task.gOptions.FrameHistory.Value = 30
+        task.gOptions.setPixelDifference(10)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Mask of unreliable color data", "Color image after removing unreliable pixels"}
         desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Pixel Difference threshold'"
@@ -112,11 +140,11 @@ End Class
 
 
 Public Class Reliable_CompareBGR : Inherits VB_Parent
-    Dim relyBGR As New Reliable_BGR
+    Dim relyBGR As New Reliable_RGB
     Dim relyGray As New Reliable_Gray
     Public Sub New()
         task.gOptions.setDisplay1()
-        labels = {"", "Reliable_Gray output", "Compare Reliable_Gray and Reliable_BGR - if blank, they are the same.", "Reliable_BGR output"}
+        labels = {"", "Reliable_Gray output", "Compare Reliable_Gray and Reliable_RGB - if blank, they are the same.", "Reliable_RGB output"}
         desc = "Compare the results of Reliable_Color and Reliable_Gray"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -128,7 +156,7 @@ Public Class Reliable_CompareBGR : Inherits VB_Parent
         dst2.SetTo(0)
         dst2.SetTo(cv.Scalar.Yellow, dst1)
         dst2.SetTo(0, dst3)
-        SetTrueText("if dst2 is blank, the Reliable_Gray and Reliable_BGR produce the same results.")
+        SetTrueText("if dst2 is blank, the Reliable_Gray and Reliable_RGB produce the same results.")
     End Sub
 End Class
 

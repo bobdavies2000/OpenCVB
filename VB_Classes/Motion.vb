@@ -627,23 +627,6 @@ End Class
 
 
 
-Public Class Motion_Color : Inherits VB_Parent
-    Public Sub New()
-        labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
-                  "Diff of input and latest accumulated color image"}
-        desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
-        If standaloneTest() And task.motionDetected Then dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
@@ -672,14 +655,44 @@ End Class
 
 
 
+Public Class Motion_TestSingle : Inherits VB_Parent
+    Dim singles As New Denoise_SinglePixels_CPP_VB
+    Dim random As New Random_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Input to the Denoise_SinglePixels_CPP_VB code"
+        desc = "Make sure Denoise_SinglePixels_CPP_VB is working properly."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        random.Run(empty)
+        dst2.SetTo(0)
+        For Each pt In random.PointList
+            dst2.Set(Of Byte)(pt.Y, pt.X, 255)
+            If task.toggleOnOff Then dst2.Set(Of Byte)(pt.Y + 1, pt.X, 255)
+        Next
+
+        labels(3) = If(task.toggleOnOff, "There should be points below that are next to each other", "There should be no points below")
+        singles.Run(dst2.Clone)
+        dst3 = singles.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
 
 Public Class Motion_MinRect : Inherits VB_Parent
     Dim mRect As New Area_MinRect
     Dim history As New History_Basics8U
     Dim lastFrame As cv.Mat
     Dim options As New Options_MinArea
+    Dim singles As New Denoise_SinglePixels_CPP_VB
     Public Sub New()
-        task.gOptions.setDisplay1()
+        task.gOptions.setPixelDifference(10)
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the nonzero points of motion and fit a rotated rectangle to them."
     End Sub
@@ -688,43 +701,46 @@ Public Class Motion_MinRect : Inherits VB_Parent
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.FirstPass Then lastFrame = src.Clone
-        cv.Cv2.Absdiff(src, lastFrame, dst3)
+        cv.Cv2.Absdiff(src, lastFrame, dst2)
+        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        singles.Run(dst2)
+        dst3 = singles.dst2
         lastFrame = src.Clone
 
-        history.Run(dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary))
+        history.Run(dst3)
         dst2 = history.dst2
 
-        Dim nonzeros = dst2.FindNonZero()
+        'Dim nonzeros = dst2.FindNonZero()
 
-        dst3.SetTo(0)
-        If nonzeros.Rows > options.numPoints Then
-            Dim minX As Integer = Integer.MaxValue, maxX As Integer = 0, minY As Integer = Integer.MaxValue, maxY As Integer = 0
-            Dim p1 As cv.Point, p2 As cv.Point, p3 As cv.Point, p4 As cv.Point
-            For i = 0 To nonzeros.Rows - 1
-                Dim pt = nonzeros.Get(Of cv.Point)(i, 0)
-                If pt.X < minX Then
-                    minX = pt.X
-                    p1 = pt
-                End If
-                If pt.X > maxX Then
-                    maxX = pt.X
-                    p2 = pt
-                End If
-                If pt.Y < minY Then
-                    minY = pt.Y
-                    p3 = pt
-                End If
-                If pt.Y > maxY Then
-                    maxY = pt.Y
-                    p4 = pt
-                End If
-            Next
+        'dst3.SetTo(0)
+        'If nonzeros.Rows > options.numPoints Then
+        '    Dim minX As Integer = Integer.MaxValue, maxX As Integer = 0, minY As Integer = Integer.MaxValue, maxY As Integer = 0
+        '    Dim p1 As cv.Point, p2 As cv.Point, p3 As cv.Point, p4 As cv.Point
+        '    For i = 0 To nonzeros.Rows - 1
+        '        Dim pt = nonzeros.Get(Of cv.Point)(i, 0)
+        '        If pt.X < minX Then
+        '            minX = pt.X
+        '            p1 = pt
+        '        End If
+        '        If pt.X > maxX Then
+        '            maxX = pt.X
+        '            p2 = pt
+        '        End If
+        '        If pt.Y < minY Then
+        '            minY = pt.Y
+        '            p3 = pt
+        '        End If
+        '        If pt.Y > maxY Then
+        '            maxY = pt.Y
+        '            p4 = pt
+        '        End If
+        '    Next
 
-            mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
-            mRect.Run(empty)
-            DrawRotatedRect(mRect.minRect, dst3, cv.Scalar.White)
-            If dst3.CountNonZero > dst3.Total / 2 Then dst3.SetTo(255)
-        End If
+        '    mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
+        '    mRect.Run(empty)
+        '    DrawRotatedRect(mRect.minRect, dst3, cv.Scalar.White)
+        '    If dst3.CountNonZero > dst3.Total / 2 Then dst3.SetTo(255)
+        'End If
     End Sub
 End Class
 

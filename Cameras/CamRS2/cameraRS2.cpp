@@ -51,7 +51,6 @@ public:
 	float depth_scale = 0.0f;
 	int z = 132;
 	rs2::context ctx;
-	int frameRate = 0;
 	string serialNumber;
 	Mat color, leftView, rightView, pointCloud;
 private:

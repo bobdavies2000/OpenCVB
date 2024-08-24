@@ -134,13 +134,13 @@ Public Class OpenGL_Basics : Inherits VB_Parent
                 Dim snapshot As Bitmap = GetWindowImage(task.openGL_hwnd, New cv.Rect(0, 0, task.oglRect.Width * 1.4, task.oglRect.Height * 1.4))
                 Dim snap = cvext.BitmapConverter.ToMat(snapshot)
                 snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-                dst3 = snap.Resize(New cv.Size(dst2.Width, dst2.Height), 0, 0, cv.InterpolationFlags.Nearest)
+                dst3 = snap.Resize(New cv.Size(dst3.Width, dst3.Height), 0, 0, cv.InterpolationFlags.Nearest)
             End If
         Catch ex As Exception
             ' OpenGL window was likely closed.  
         End Try
-        ' If standaloneTest() Then SetTrueText(task.gMat.strout, 3)
         If standaloneTest() Then SetTrueText(task.gMat.strOut, 3)
+        If standalone Then dst2 = task.pointCloud
     End Sub
 End Class
 

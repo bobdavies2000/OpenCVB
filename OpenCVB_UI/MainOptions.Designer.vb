@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class OptionsDialog
+Partial Class MainOptions
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -244,7 +244,7 @@ Partial Class OptionsDialog
         Me.Label5.TabIndex = 17
         Me.Label5.Text = "Working Size Resolution"
         '
-        'OptionsDialog
+        'MainOptions
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -261,7 +261,7 @@ Partial Class OptionsDialog
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.Name = "OptionsDialog"
+        Me.Name = "MainOptions"
         Me.ShowInTaskbar = False
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show
         Me.Text = "OpenCVB Global Settings"

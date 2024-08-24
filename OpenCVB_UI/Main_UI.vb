@@ -33,7 +33,7 @@ Public Class Main_UI
 
     Dim threadStartTime As DateTime
 
-    Dim optionsForm As OptionsDialog
+    Dim optionsForm As MainOptions
     Dim AlgorithmCount As Integer
     Dim AlgorithmTestAllCount As Integer
     Dim algorithmTaskHandle As Thread
@@ -251,8 +251,8 @@ Public Class Main_UI
 
             If testAllRunning = False Then
                 Dim resStr = CStr(.WorkingRes.Width) + "x" + CStr(.WorkingRes.Height)
-                For i = 0 To OptionsDialog.resolutionList.Count - 1
-                    If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
+                For i = 0 To MainOptions.resolutionList.Count - 1
+                    If MainOptions.resolutionList(i).StartsWith(resStr) Then
                         .WorkingResIndex = i
                         Exit For
                     End If
@@ -264,7 +264,7 @@ Public Class Main_UI
             Me.Top = .locationMain.Item1
             Me.Width = .locationMain.Item2
             Me.Height = .locationMain.Item3
-            optionsForm = New OptionsDialog
+            optionsForm = New MainOptions
             optionsForm.defineCameraResolutions(settings.cameraIndex)
         End With
     End Sub
@@ -1146,11 +1146,11 @@ Public Class Main_UI
         If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
         Dim saveCameraIndex = settings.cameraIndex
 
-        optionsForm.OptionsDialog_Load(sender, e)
+        optionsForm.MainOptions_Load(sender, e)
         optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
         Dim resStr = CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height)
-        For i = 0 To OptionsDialog.resolutionList.Count - 1
-            If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
+        For i = 0 To MainOptions.resolutionList.Count - 1
+            If MainOptions.resolutionList(i).StartsWith(resStr) Then
                 optionsForm.WorkingResRadio(i).Checked = True
             End If
         Next
@@ -1207,7 +1207,7 @@ Public Class Main_UI
                     If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
                     settings.cameraName = cameraNames(settings.cameraIndex)
                     If settings.cameraPresent(settings.cameraIndex) Then
-                        OptionsDialog.defineCameraResolutions(settings.cameraIndex)
+                        MainOptions.defineCameraResolutions(settings.cameraIndex)
                         setupTestAll()
                         settings.WorkingResIndex = testAllStartingRes
                         Exit While
@@ -1404,20 +1404,20 @@ Public Class Main_UI
         End If
     End Sub
     Private Function getCamera() As Object
-        Select Case settings.cameraIndex
-            Case 0
+        Select Case settings.cameraName
+            Case "Azure Kinect 4K"
                 Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case 1
+            Case "Intel(R) RealSense(TM) Depth Camera 435i"
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
-            Case 2
+            Case "Intel(R) RealSense(TM) Depth Camera 455"
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
-            Case 3
+            Case "Oak-D camera"
                 Return Nothing ' special handling required.  See CameraTask...
-            Case 4
+            Case "StereoLabs ZED 2/2i"
                 Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case 5
+            Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case 6
+            Case "Orbbec Gemini 335L"
                 Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
         End Select
         Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)

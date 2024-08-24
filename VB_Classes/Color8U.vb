@@ -376,15 +376,15 @@ End Class
 Public Class Color8U_MotionFiltered : Inherits VB_Parent
     Dim colorClass As New Color8U_Basics
     Public classCount As Integer
-    Dim motionColor As New Motion_Color
+    Dim motion As New Motion_Basics
     Public Sub New()
         desc = "Prepare a Color8U_Basics image using the task.motionRect"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        motionColor.Run(src)
+        motion.Run(src)
 
-        dst3 = motionColor.dst2
-        colorClass.Run(motionColor.dst2)
+        dst3 = motion.dst2
+        colorClass.Run(motion.dst2)
         dst2 = colorClass.dst3
         classCount = colorClass.classCount
     End Sub

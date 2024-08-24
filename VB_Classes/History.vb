@@ -192,7 +192,6 @@ End Class
 Public Class History_ReliableDepth : Inherits VB_Parent
     Public saveFrames As New List(Of cv.Mat)
     Public Sub New()
-        task.gOptions.FrameHistory.Value = 30
         desc = "Create a frame history by Or'ing the last X frames of CV_8U data"
     End Sub
     Public Sub RunVB(src As cv.Mat)

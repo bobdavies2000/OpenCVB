@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class OptionsDialog
+Public Class MainOptions
     Public cameraRadioButton(Main_UI.cameraNames.Count - 1) As RadioButton
     Public WorkingResRadio(resolutionList.Count - 1) As RadioButton
     Public cameraWorkingRes As cv.Size
@@ -88,7 +88,7 @@ Public Class OptionsDialog
             WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
     End Sub
-    Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Static radioButtonsPresent = False
         defineCameraResolutions(cameraIndex)
 
@@ -119,11 +119,11 @@ Public Class OptionsDialog
         cameraDisplayRes = Main_UI.settings.displayRes
         showConsoleLog.Checked = Main_UI.settings.showConsoleLog
     End Sub
-    Private Sub OptionsDialog_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+    Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
     End Sub
     Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
-        OptionsDialog_Load(sender, e) ' restore the settings to what they were on entry...
+        MainOptions_Load(sender, e) ' restore the settings to what they were on entry...
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Hide()
     End Sub

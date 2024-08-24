@@ -51,7 +51,6 @@ Public Class VBtask : Implements IDisposable
     Public motionFlag As Boolean
     Public motionRect As cv.Rect
     Public motionDetected As Boolean
-    Public motionColor As Motion_Color
 
     Public reliableDepth As Reliable_Depth
     Public reliableDepthMask As cv.Mat
@@ -394,7 +393,6 @@ Public Class VBtask : Implements IDisposable
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
         reliableDepth = New Reliable_Depth
-        'motionColor = New Motion_Color
         'cMotion = New CameraMotion_Basics
         gravityHorizon = New Gravity_Horizon
         imuStabilityTest = New Stabilizer_VerticalIMU

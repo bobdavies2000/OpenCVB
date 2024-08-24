@@ -8059,7 +8059,7 @@ namespace CS_Classes
     {
         Color8U_Basics colorClass = new Color8U_Basics();
         public int classCount;
-        Motion_Color motionColor = new Motion_Color();
+        Motion_Basics motion = new Motion_Basics();
 
         public Color8U_MotionFiltered_CS(VBtask task) : base(task)
         {
@@ -8068,10 +8068,10 @@ namespace CS_Classes
 
         public void RunCS(Mat src)
         {
-            motionColor.Run(src);
+            motion.Run(src);
 
-            dst3 = motionColor.dst2;
-            colorClass.Run(motionColor.dst2);
+            dst3 = motion.dst2;
+            colorClass.Run(motion.dst2);
             dst2 = colorClass.dst3;
             classCount = colorClass.classCount;
         }
