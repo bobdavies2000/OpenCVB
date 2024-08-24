@@ -3198,7 +3198,7 @@ public:
 		int kernelsize[] = { 3 * 4, 3 * 4 * 2, 3 * 4 * 2 * 2, 7 * 4, 7 * 4 * 2, 7 * 4 * 2 * 2 };
 
 		// Calculate integral image, only once.
-		integral(src, integralImage);
+		cv::integral(src, integralImage);
 
 		for (int i = 0; i < numScales; ++i) {
 			intensityScaledOn[i].setTo(0);
