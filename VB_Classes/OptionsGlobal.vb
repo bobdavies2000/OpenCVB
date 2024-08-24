@@ -65,7 +65,7 @@ Public Class OptionsGlobal
 
         ShowAllOptions.Checked = GetSetting("OpenCVB", "ShowAllOptions", "ShowAllOptions", False)
 
-        UseReliableDepth.Checked = True
+        UseReliableDepth.Checked = False
 
         task.DotSize = 1
         task.cvFontThickness = 1

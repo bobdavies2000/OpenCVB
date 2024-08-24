@@ -177,7 +177,6 @@ Public Class History_Basics8U : Inherits VB_Parent
 
         If task.algName = traceName Then
             For i = 0 To Math.Min(saveFrames.Count, 4) - 1
-                Debug.WriteLine("count = " + CStr(saveFrames(i).CountNonZero))
                 mats.mat(i) = saveFrames(i).Clone
             Next
             mats.Run(empty)

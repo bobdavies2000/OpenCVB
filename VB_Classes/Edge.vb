@@ -238,14 +238,15 @@ Public Class Edge_Deriche_CPP_VB : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
+        If src.Channels = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Dim imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega)
-        handleSrc.Free()
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+            Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+            Dim imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega)
+            handleSrc.Free()
 
-        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         dst3 = src Or dst2
     End Sub
     Public Sub Close()

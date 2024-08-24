@@ -62,7 +62,7 @@ Public Class OpenGL_Basics : Inherits VB_Parent
         Dim memMap = memMapFill()
         Dim memMapbufferSize = 8 * memMap.Length
 
-        startInfo.FileName = task.OpenGLTitle + ".exe"
+        startInfo.FileName = task.HomeDir + "bin\Release\" + task.OpenGLTitle + ".exe"
 
         Dim windowWidth = 720
         Dim windowHeight = 720 * 240 / 320
@@ -1954,6 +1954,7 @@ Public Class OpenGL_ColorReduced3D : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
+        If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
         labels(2) = "There are " + CStr(colorClass.classCount) + " classes for " + task.redOptions.colorInputName
         dst1 = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
