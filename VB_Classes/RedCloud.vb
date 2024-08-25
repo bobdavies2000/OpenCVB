@@ -790,30 +790,6 @@ End Class
 
 
 
-
-Public Class RedCloud_FeatureLess : Inherits VB_Parent
-    Dim cpp As New CPP_Basics
-    Public Sub New()
-        cpp.updateFunction(AlgorithmList.cppFunctionNames._RedColor_FeatureLess_CPP)
-        desc = "This is a duplicate of FeatureLess_RedCloud to make it easier to find."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        cpp.Run(src)
-        dst2 = cpp.dst3
-        labels(2) = cpp.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
 Public Class RedCloud_UnstableCells : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim prevList As New List(Of cv.Point)

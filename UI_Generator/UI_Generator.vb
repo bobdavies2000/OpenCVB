@@ -454,14 +454,14 @@ Module UI_GeneratorMain
         sw.WriteLine()
 
 
-        Dim cppNames As New List(Of String)
+        Dim ccNames As New List(Of String)
         For Each nm In allButPython.Keys
-            If nm.Contains("_CPP") Then cppNames.Add(nm)
+            If nm.Contains("_CC") Then ccNames.Add(nm)
         Next
 
-        sw.Write("<All C++ (" + CStr(cppNames.Count) + ")>")
-        For i = 0 To cppNames.Count - 1
-            sw.Write("," + cppNames(i))
+        sw.Write("<All C++ (" + CStr(ccNames.Count) + ")>")
+        For i = 0 To ccNames.Count - 1
+            sw.Write("," + ccNames(i))
         Next
         sw.WriteLine()
 

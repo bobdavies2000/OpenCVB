@@ -2392,14 +2392,14 @@ int Pixels_Vector_RunCPP(Pixels_Vector* cPtr, int* dataPtr, int rows, int cols)
 
 
 
-class Stabilizer_Basics_CPP
+class Stabilizer_Basics_CC
 {
 private:
 public:
     VideoStab stab;
     Mat rgb;
     Mat smoothedFrame;
-    Stabilizer_Basics_CPP()
+    Stabilizer_Basics_CC()
     {
         smoothedFrame = Mat(2, 3, CV_64F);
     }
@@ -2410,14 +2410,14 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-Stabilizer_Basics_CPP* Stabilizer_Basics_Open()
+Stabilizer_Basics_CC* Stabilizer_Basics_Open()
 {
-    Stabilizer_Basics_CPP* cPtr = new Stabilizer_Basics_CPP();
+    Stabilizer_Basics_CC* cPtr = new Stabilizer_Basics_CC();
     return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* Stabilizer_Basics_Close(Stabilizer_Basics_CPP* cPtr)
+int* Stabilizer_Basics_Close(Stabilizer_Basics_CC* cPtr)
 {
     delete cPtr;
     return (int*)0;
@@ -2425,7 +2425,7 @@ int* Stabilizer_Basics_Close(Stabilizer_Basics_CPP* cPtr)
 
 // https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 extern "C" __declspec(dllexport)
-int* Stabilizer_Basics_Run(Stabilizer_Basics_CPP* cPtr, int* bgrPtr, int rows, int cols)
+int* Stabilizer_Basics_Run(Stabilizer_Basics_CC* cPtr, int* bgrPtr, int rows, int cols)
 {
     cPtr->rgb = Mat(rows, cols, CV_8UC3, bgrPtr);
     cvtColor(cPtr->rgb, cPtr->stab.gray, COLOR_BGR2GRAY);
@@ -2623,12 +2623,12 @@ void VideoStab::Kalman_Filter()
 
 
 // https://stackoverflow.com/questions/22654770/creating-vignette-filter-in-opencv
-class Vignetting_CPP
+class Vignetting_CC
 {
 private:
 public:
     Mat src, dst;
-    Vignetting_CPP() {}
+    Vignetting_CC() {}
     double fastCos(double x) {
         x += 1.57079632;
         if (x > 3.14159265) x -= 6.28318531;
@@ -2664,20 +2664,20 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-Vignetting_CPP* Vignetting_Open() {
-    Vignetting_CPP* cPtr = new Vignetting_CPP();
+Vignetting_CC* Vignetting_Open() {
+    Vignetting_CC* cPtr = new Vignetting_CC();
     return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* Vignetting_Close(Vignetting_CPP* cPtr)
+int* Vignetting_Close(Vignetting_CC* cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
 extern "C" __declspec(dllexport)
-int* Vignetting_RunCPP(Vignetting_CPP* cPtr, int* dataPtr, int rows, int cols, double radius, double centerX, double centerY, bool removal)
+int* Vignetting_RunCPP(Vignetting_CC* cPtr, int* dataPtr, int rows, int cols, double radius, double centerX, double centerY, bool removal)
 {
     cPtr->src = Mat(rows, cols, CV_8UC3, dataPtr);
     cPtr->RunCPP(radius, centerX, centerY, removal);
@@ -3911,13 +3911,13 @@ RedCloudMaxDist_Run(RedCloudMaxDist* cPtr, int* dataPtr, unsigned char* maskPtr,
 
 
 cppTask* task;
-class AddWeighted_Basics_CPP : public CPP_Parent
+class AddWeighted_Basics_CC : public CPP_Parent
 {
 public:
     double weight;
     cv::Mat src2;
     Options_AddWeighted* options = new Options_AddWeighted();
-    AddWeighted_Basics_CPP() : CPP_Parent()
+    AddWeighted_Basics_CC() : CPP_Parent()
     {
         task->UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'");
         desc = "Add 2 images with specified weights.";
@@ -3951,13 +3951,13 @@ public:
 
 
 
-class Random_Basics_CPP : public CPP_Parent {
+class Random_Basics_CC : public CPP_Parent {
 public:
     vector<Point2f> pointList;
     Rect range;
     int sizeRequest = 10;
 
-    Random_Basics_CPP() : CPP_Parent() {
+    Random_Basics_CC() : CPP_Parent() {
         range = Rect(0, 0, dst2.cols, dst2.rows);
         desc = "Create a uniform random mask with a specified number of pixels.";
     }
@@ -3980,12 +3980,12 @@ public:
 
 
 
-class Resize_Basics_CPP : public CPP_Parent {
+class Resize_Basics_CC : public CPP_Parent {
 public:
     Size newSize;
     float resizePercent = 0.5;
 
-    Resize_Basics_CPP() : CPP_Parent() {
+    Resize_Basics_CC() : CPP_Parent() {
         if (standalone) {
             task->drawRect = Rect(dst2.cols / 4, dst2.rows / 4, dst2.cols / 2, dst2.rows / 2);
         }
@@ -4008,12 +4008,12 @@ public:
 
 
 
-class Remap_Basics_CPP : public CPP_Parent {
+class Remap_Basics_CC : public CPP_Parent {
 public:
     int direction = 3;  // Default to remap horizontally and vertically
     Mat mapx1, mapx2, mapx3, mapy1, mapy2, mapy3;
 
-    Remap_Basics_CPP() : CPP_Parent() {
+    Remap_Basics_CC() : CPP_Parent() {
         // Initialize map matrices with appropriate size and type
         mapx1 = Mat::zeros(dst2.size(), CV_32FC1);
         mapy1 = Mat::zeros(dst2.size(), CV_32FC1);
@@ -4070,12 +4070,12 @@ public:
 
 
 
-class Random_Enumerable_CPP : public CPP_Parent {
+class Random_Enumerable_CC : public CPP_Parent {
 public:
     int sizeRequest = 100;
     vector<Point2f> points;
 
-    Random_Enumerable_CPP() : CPP_Parent() {
+    Random_Enumerable_CC() : CPP_Parent() {
         desc = "Create an enumerable list of points using a lambda function";
     }
 
@@ -4102,16 +4102,16 @@ public:
 
 
 
-class Delaunay_Basics_CPP : public CPP_Parent {
+class Delaunay_Basics_CC : public CPP_Parent {
 public:
     std::vector<cv::Point2f> inputPoints;
     cv::Mat facet32s;
-    Random_Enumerable_CPP* randEnum;
+    Random_Enumerable_CC* randEnum;
     cv::Subdiv2D subdiv;
     Mat lastColor;
     std::vector<std::vector<cv::Point>> facetlist;
-    Delaunay_Basics_CPP() : CPP_Parent() {
-        randEnum = new Random_Enumerable_CPP();
+    Delaunay_Basics_CC() : CPP_Parent() {
+        randEnum = new Random_Enumerable_CC();
         lastColor = Mat(task->WorkingRes, CV_8UC3);
         lastColor.setTo(0);
         facet32s = cv::Mat::zeros(dst2.size(), CV_32SC1);
@@ -4160,14 +4160,14 @@ public:
 
 
 
-class Delaunay_GenerationsNoKNN_CPP : public CPP_Parent {
+class Delaunay_GenerationsNoKNN_CC : public CPP_Parent {
 public:
     vector<Point2f> inputPoints;
     Random_Basics* random;
-    Delaunay_Basics_CPP* facet;
+    Delaunay_Basics_CC* facet;
     Mat generationMap;
-    Delaunay_GenerationsNoKNN_CPP() : CPP_Parent() {
-        facet = new Delaunay_Basics_CPP();
+    Delaunay_GenerationsNoKNN_CC() : CPP_Parent() {
+        facet = new Delaunay_Basics_CC();
         random = new Random_Basics();
         generationMap = Mat::zeros(dst3.size(), CV_32S);
         labels = { "", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region." };
@@ -4216,9 +4216,9 @@ public:
 
 
 
-class Grid_Basics_CPP : public CPP_Parent {
+class Grid_Basics_CC : public CPP_Parent {
 public:
-    Grid_Basics_CPP() : CPP_Parent() {
+    Grid_Basics_CC() : CPP_Parent() {
         desc = "Create a grid of squares covering the entire image.";
     }
 
@@ -4278,7 +4278,7 @@ public:
             task->color.copyTo(dst2);
             dst2.setTo(Scalar(255, 255, 255), task->gridMask); 
             stringstream ss;
-            ss << "Grid_Basics_CPP " << task->gridList.size() << " (" << task->gridRows << "X" << task->gridCols << ") "
+            ss << "Grid_Basics_CC " << task->gridList.size() << " (" << task->gridRows << "X" << task->gridCols << ") "
                 << task->gridSize << "X" << task->gridSize << " regions";
             labels[2] = ss.str();
         }
@@ -4291,7 +4291,7 @@ public:
 
 
 
-class KNN_Core_CPP : public CPP_Parent
+class KNN_Core_CC : public CPP_Parent
 {
 public:
     Ptr<ml::KNearest> knn = ml::KNearest::create();
@@ -4303,7 +4303,7 @@ public:
     Random_Basics* random;
     vector<int> neighborIndexToTrain;
     
-    KNN_Core_CPP() : CPP_Parent()
+    KNN_Core_CC() : CPP_Parent()
     {
         random = new Random_Basics();
         labels[2] = "Red=TrainingData, yellow = queries";
@@ -4400,19 +4400,19 @@ public:
 
 
 
-class KNN_Basics_CPP : public CPP_Parent
+class KNN_Basics_CC : public CPP_Parent
 {
 private:
 public:
     vector<PointPair> matches;
     vector<Point> noMatch;
-    KNN_Core_CPP* basics;
+    KNN_Core_CC* basics;
     vector<Point2f> queries;
     vector<int> neighbors;
     Random_Basics* random;
 
-    KNN_Basics_CPP() : CPP_Parent() {
-        basics = new KNN_Core_CPP();
+    KNN_Basics_CC() : CPP_Parent() {
+        basics = new KNN_Core_CC();
         random = new Random_Basics();
         desc = "Map points 1:1 with losses. Toss any duplicates that are farther.";
     }
@@ -4492,22 +4492,22 @@ public:
 
 
 
-class Delaunay_Generations_CPP : public CPP_Parent
+class Delaunay_Generations_CC : public CPP_Parent
 {
 private:
 public:
     vector<Point2f> inputPoints;
-    Delaunay_Basics_CPP* facet;
-    KNN_Basics_CPP* knn;
-    Random_Basics_CPP* random;
+    Delaunay_Basics_CC* facet;
+    KNN_Basics_CC* knn;
+    Random_Basics_CC* random;
     Mat generationMap;
 
-    Delaunay_Generations_CPP() : CPP_Parent()
+    Delaunay_Generations_CC() : CPP_Parent()
     {
         generationMap = Mat::zeros(dst3.size(), CV_32S);
-        knn = new KNN_Basics_CPP();
-        facet = new Delaunay_Basics_CPP();
-        random = new Random_Basics_CPP();
+        knn = new KNN_Basics_CC();
+        facet = new Delaunay_Basics_CC();
+        random = new Random_Basics_CC();
         random->sizeRequest = 10;
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region",
                     "Generation counts in CV_32SC1 format" };
@@ -4555,14 +4555,14 @@ public:
 
 
 
-class Feature_Basics_CPP : public CPP_Parent {
+class Feature_Basics_CC : public CPP_Parent {
 private:
     cv::Ptr<cv::BRISK> Brisk;
 public:
     vector<cv::Point2f> featurePoints;
     Options_Features* options = new Options_Features;
 
-    Feature_Basics_CPP() : CPP_Parent() {
+    Feature_Basics_CC() : CPP_Parent() {
         Brisk = cv::BRISK::create();
         desc = "Find good features to track in a BGR image.";
     }
@@ -4595,16 +4595,16 @@ public:
 
 
 
-class Stable_Basics_CPP : public CPP_Parent {
+class Stable_Basics_CC : public CPP_Parent {
 public:
-    Delaunay_Generations_CPP* facetGen;
+    Delaunay_Generations_CC* facetGen;
     vector<Point2f> ptList;
     Point2f anchorPoint;
-    Feature_Basics_CPP* good;
+    Feature_Basics_CC* good;
 
-    Stable_Basics_CPP() : CPP_Parent() {
-        good = new Feature_Basics_CPP();
-        facetGen = new Delaunay_Generations_CPP();
+    Stable_Basics_CC() : CPP_Parent() {
+        good = new Feature_Basics_CC();
+        facetGen = new Delaunay_Generations_CC();
         desc = "Maintain the generation counts around the feature points.";
     }
 
@@ -4653,17 +4653,17 @@ public:
 
 
 
-class Stable_BasicsCount_CPP : public CPP_Parent
+class Stable_BasicsCount_CC : public CPP_Parent
 {
 private:
 public:
-    Stable_Basics_CPP* basics;
-    Feature_Basics_CPP* good;
+    Stable_Basics_CC* basics;
+    Feature_Basics_CC* good;
     map<int, int, greater<float>> goodCounts;
-    Stable_BasicsCount_CPP() : CPP_Parent()
+    Stable_BasicsCount_CC() : CPP_Parent()
     {
-        good = new Feature_Basics_CPP();
-        basics = new Stable_Basics_CPP();
+        good = new Feature_Basics_CC();
+        basics = new Stable_Basics_CC();
         desc = "Track the stable good features found in the BGR image.";
     }
     void Run(Mat src)
@@ -4688,13 +4688,13 @@ public:
 };
 
 
-class FPoly_TopFeatures_CPP : public CPP_Parent {
+class FPoly_TopFeatures_CC : public CPP_Parent {
 public:
-    Stable_BasicsCount_CPP* stable;
+    Stable_BasicsCount_CC* stable;
     vector<Point2f> poly;
 
-    FPoly_TopFeatures_CPP() : CPP_Parent() {
-        stable = new Stable_BasicsCount_CPP();
+    FPoly_TopFeatures_CC() : CPP_Parent() {
+        stable = new Stable_BasicsCount_CC();
         desc = "Get the top features and validate them";
     }
 
@@ -4721,9 +4721,9 @@ public:
 
 
 
-class Edge_Scharr_CPP : public CPP_Parent {
+class Edge_Scharr_CC : public CPP_Parent {
 public:
-    Edge_Scharr_CPP() : CPP_Parent() {
+    Edge_Scharr_CC() : CPP_Parent() {
         desc = "Scharr is most accurate with 3x3 kernel.";
     }
 
@@ -4743,9 +4743,9 @@ public:
 
 
 
-class Depth_Colorizer_CPP : public CPP_Parent {
+class Depth_Colorizer_CC : public CPP_Parent {
 public:
-    Depth_Colorizer_CPP() : CPP_Parent() {
+    Depth_Colorizer_CC() : CPP_Parent() {
         desc = "Colorize the depth based on the near and far colors.";
     }
 
@@ -4775,12 +4775,12 @@ public:
 
 
 
-class RedCloud_Reduce_CPP : public CPP_Parent {
+class RedCloud_Reduce_CC : public CPP_Parent {
 public:
     int classCount;
     int givenClassCount = 0;
     int reduceAmt = 250;
-    RedCloud_Reduce_CPP() : CPP_Parent() {
+    RedCloud_Reduce_CC() : CPP_Parent() {
         //if (standalone) {
         //    task.redOptions.RedCloud_Reduce.Checked = true;
         //}
@@ -4833,11 +4833,11 @@ public:
 
 
 
-class Depth_PointCloud_CPP : public CPP_Parent
+class Depth_PointCloud_CC : public CPP_Parent
 {
 private: 
 public: 
-	Depth_PointCloud_CPP() : CPP_Parent()
+	Depth_PointCloud_CC() : CPP_Parent()
     {
         desc = "Display the contents of the point cloud as a 2D image";
     }
@@ -4861,13 +4861,13 @@ public:
 
 
 
-class IMU_GMatrix_QT_CPP : public CPP_Parent
+class IMU_GMatrix_QT_CC : public CPP_Parent
 {
 private:
 public:
     float cx = 1.0f, sx = 0.0f, cy = 1.0f, sy = 0.0f, cz = 1.0f, sz = 0.0f;
     bool usingSliders = false;
-    IMU_GMatrix_QT_CPP() : CPP_Parent() {
+    IMU_GMatrix_QT_CC() : CPP_Parent() {
         desc = "Find the angle of tilt for the camera with respect to gravity without any options_";
     }
     void Run(Mat src) {
@@ -4901,14 +4901,14 @@ public:
 
 
 
-class IMU_GMatrix_CPP : public CPP_Parent
+class IMU_GMatrix_CC : public CPP_Parent
 {
 private:
 public:
     string strOut;
-    IMU_GMatrix_QT_CPP* qt;
-    IMU_GMatrix_CPP() : CPP_Parent() {
-        qt = new IMU_GMatrix_QT_CPP();
+    IMU_GMatrix_QT_CC* qt;
+    IMU_GMatrix_CC() : CPP_Parent() {
+        qt = new IMU_GMatrix_QT_CC();
         qt->usingSliders = true;
         desc = "Find the angle of tilt for the camera with respect to gravity.";
     }
@@ -4930,16 +4930,16 @@ public:
 
 
 
-class Depth_PointCloud_IMU_CPP : public CPP_Parent
+class Depth_PointCloud_IMU_CC : public CPP_Parent
 {
 private:
 public:
     float option_resizeFactor = 1;
-    IMU_GMatrix_QT_CPP* gMatrix;
-    Depth_PointCloud_CPP* cloud;
-    Depth_PointCloud_IMU_CPP() : CPP_Parent() {
-        gMatrix = new IMU_GMatrix_QT_CPP();
-        cloud = new Depth_PointCloud_CPP();
+    IMU_GMatrix_QT_CC* gMatrix;
+    Depth_PointCloud_CC* cloud;
+    Depth_PointCloud_IMU_CC() : CPP_Parent() {
+        gMatrix = new IMU_GMatrix_QT_CC();
+        cloud = new Depth_PointCloud_CC();
         desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU.";
     }
     void Run(Mat src) {
@@ -4962,13 +4962,13 @@ public:
 
 
 
-class Edge_Sobel_CPP : public CPP_Parent {
+class Edge_Sobel_CC : public CPP_Parent {
 public:
     bool horizontalDerivative = true;
     bool verticalDerivative = true;
     int kernelSize = 3;
-    AddWeighted_Basics_CPP* addw;
-    Edge_Sobel_CPP() : CPP_Parent() {
+    AddWeighted_Basics_CC* addw;
+    Edge_Sobel_CC() : CPP_Parent() {
         labels = { "", "", "Horizontal derivative", "Vertical derivative" };
         desc = "Show Sobel edge detection with varying kernel sizes and directions.";
     }
@@ -4993,12 +4993,12 @@ public:
 
 
 
-class Binarize_Simple_CPP : public CPP_Parent {
+class Binarize_Simple_CC : public CPP_Parent {
 public:
     Scalar meanScalar;
     int injectVal = 255;
 
-    Binarize_Simple_CPP() : CPP_Parent() {
+    Binarize_Simple_CC() : CPP_Parent() {
         desc = "Binarize an image using Threshold with OTSU.";
     }
 
@@ -5013,7 +5013,7 @@ public:
 
 
 
-class Plot_Histogram_CPP : public CPP_Parent {
+class Plot_Histogram_CC : public CPP_Parent {
 public:
     Mat histogram;
     float minRange = 0;
@@ -5027,7 +5027,7 @@ public:
     bool removeZeroEntry = true;
     bool createHistogram = false;
 
-    Plot_Histogram_CPP() : CPP_Parent() {
+    Plot_Histogram_CC() : CPP_Parent() {
         desc = "Plot histogram data with a stable scale at the left of the image.";
     }
 
@@ -5086,17 +5086,17 @@ public:
 
 
 
-class Hist_Basics_CPP : public CPP_Parent
+class Hist_Basics_CC : public CPP_Parent
 {
 public:
     Mat histogram;
     mmData mm;
-    Plot_Histogram_CPP* plot;
+    Plot_Histogram_CC* plot;
     vector<Range> ranges;
     int splitIndex = 0;
-    Hist_Basics_CPP() : CPP_Parent()
+    Hist_Basics_CC() : CPP_Parent()
     {
-        plot = new Plot_Histogram_CPP();
+        plot = new Plot_Histogram_CC();
         desc = "Create a histogram (no Kalman)";
     }
 
@@ -5182,14 +5182,14 @@ public:
 
 
 
-class Kalman_Basics_CPP : public CPP_Parent {
+class Kalman_Basics_CC : public CPP_Parent {
 public:
     vector<Kalman_Simple> kalman;
     vector<float> kInput = { 0, 0, 0, 0 };
     vector<float> kOutput;
     int saveDimension = -1;
 
-    Kalman_Basics_CPP() : CPP_Parent() {
+    Kalman_Basics_CC() : CPP_Parent() {
         desc = "Use Kalman to stabilize values (such as a Rect)";
     }
 
@@ -5237,14 +5237,14 @@ public:
 
 
 
-class Hist_Kalman_CPP : public CPP_Parent {
+class Hist_Kalman_CC : public CPP_Parent {
 public:
-    Hist_Basics_CPP* hist;
-    Kalman_Basics_CPP* kalman;
+    Hist_Basics_CC* hist;
+    Kalman_Basics_CC* kalman;
 
-    Hist_Kalman_CPP() : CPP_Parent() {
-        kalman = new Kalman_Basics_CPP();
-        hist = new Hist_Basics_CPP();
+    Hist_Kalman_CC() : CPP_Parent() {
+        kalman = new Kalman_Basics_CC();
+        hist = new Hist_Basics_CC();
         labels = { "", "", "With Kalman", "Without Kalman" };
         desc = "Use Kalman to smooth the histogram results.";
     }
@@ -5276,13 +5276,13 @@ public:
 
 
 
-class BackProject_Basics_CPP : public CPP_Parent {
+class BackProject_Basics_CC : public CPP_Parent {
 public:
-    Hist_Kalman_CPP* histK;
+    Hist_Kalman_CC* histK;
     Scalar minRange, maxRange;
 
-    BackProject_Basics_CPP() : CPP_Parent() {
-        histK = new Hist_Kalman_CPP();
+    BackProject_Basics_CC() : CPP_Parent() {
+        histK = new Hist_Kalman_CC();
         labels[2] = "Move mouse to backproject a histogram column";
         desc = "Mouse over any bin to see the color histogram backprojected.";
     }
@@ -5339,7 +5339,7 @@ public:
 
 
 
-class Rectangle_Basics_CPP : public CPP_Parent {
+class Rectangle_Basics_CC : public CPP_Parent {
 public:
     vector<Rect> rectangles;
     vector<RotatedRect> rotatedRectangles;
@@ -5347,7 +5347,7 @@ public:
     bool options_drawFilled = false;
     bool options_drawRotated = false;
 
-    Rectangle_Basics_CPP() : CPP_Parent() {
+    Rectangle_Basics_CC() : CPP_Parent() {
         desc = "Draw the requested number of rectangles.";
     }
 
@@ -5384,12 +5384,12 @@ public:
 
 
 
-class Rectangle_Rotated_CPP : public CPP_Parent {
+class Rectangle_Rotated_CC : public CPP_Parent {
 public:
-    Rectangle_Basics_CPP* rectangle;
+    Rectangle_Basics_CC* rectangle;
 
-    Rectangle_Rotated_CPP() : CPP_Parent() {
-        rectangle = new Rectangle_Basics_CPP();
+    Rectangle_Rotated_CC() : CPP_Parent() {
+        rectangle = new Rectangle_Basics_CC();
         rectangle->options_drawRotated = true;
         desc = "Draw the requested number of rectangles.";
     }
@@ -5403,17 +5403,17 @@ public:
 
 
 
-class Contour_Largest_CPP : public CPP_Parent {
+class Contour_Largest_CC : public CPP_Parent {
 public:
     vector<Point> bestContour;
     vector<vector<Point>> allContours;
     RetrievalModes options_retrievalMode = RetrievalModes::RETR_LIST;
     ContourApproximationModes options_approximationMode = ContourApproximationModes::CHAIN_APPROX_NONE;
     int maxIndex;
-    Rectangle_Rotated_CPP* rotatedRect;
+    Rectangle_Rotated_CC* rotatedRect;
 
-    Contour_Largest_CPP() : CPP_Parent() {
-        rotatedRect = new Rectangle_Rotated_CPP();
+    Contour_Largest_CC() : CPP_Parent() {
+        rotatedRect = new Rectangle_Rotated_CC();
         labels = { "", "", "Input to FindContours", "Largest single contour in the input image." };
         desc = "Create a mask from the largest contour of the input.";
     }
@@ -5462,12 +5462,12 @@ public:
 
 
 
-class Diff_Basics_CPP : public CPP_Parent {
+class Diff_Basics_CC : public CPP_Parent {
 public:
     int changedPixels;
     Mat lastGray;
 
-    Diff_Basics_CPP() : CPP_Parent() {
+    Diff_Basics_CC() : CPP_Parent() {
         labels = {"", "", "Stable gray", "Unstable mask"};
         desc = "Capture an image and compare it to previous frame using absDiff and threshold";
     }
@@ -5495,12 +5495,12 @@ public:
 
 
 
-class ApproxPoly_FindandDraw_CPP : public CPP_Parent {
+class ApproxPoly_FindandDraw_CC : public CPP_Parent {
 public:
-    Rectangle_Rotated_CPP* rotatedRect;
+    Rectangle_Rotated_CC* rotatedRect;
     vector<vector<Point>> allContours;
-    ApproxPoly_FindandDraw_CPP() : CPP_Parent() {
-        rotatedRect = new Rectangle_Rotated_CPP();
+    ApproxPoly_FindandDraw_CC() : CPP_Parent() {
+        rotatedRect = new Rectangle_Rotated_CC();
         labels[2] = "FindandDraw input";
         labels[3] = "FindandDraw output - note the change in line width where ApproxPoly differs from DrawContours";
         desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours.";
@@ -5526,13 +5526,13 @@ public:
 
 
 
-class ApproxPoly_Basics_CPP : public CPP_Parent {
+class ApproxPoly_Basics_CC : public CPP_Parent {
 public:
-    Contour_Largest_CPP* contour;
-    Rectangle_Rotated_CPP* rotatedRect;
-    ApproxPoly_Basics_CPP() : CPP_Parent() {
-        contour = new Contour_Largest_CPP();
-        rotatedRect = new Rectangle_Rotated_CPP();
+    Contour_Largest_CC* contour;
+    Rectangle_Rotated_CC* rotatedRect;
+    ApproxPoly_Basics_CC() : CPP_Parent() {
+        contour = new Contour_Largest_CC();
+        rotatedRect = new Rectangle_Rotated_CC();
         labels = { "", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP" };
         desc = "Using the input contours, create ApproxPoly output";
     }
@@ -5560,13 +5560,13 @@ public:
 
 
 
-class Hull_Basics_CPP : public CPP_Parent {
+class Hull_Basics_CC : public CPP_Parent {
 public:
     Random_Basics* random;
     vector<Point2f> inputPoints;
     vector<Point> hull;
     bool useRandomPoints;
-    Hull_Basics_CPP() : CPP_Parent() {
+    Hull_Basics_CC() : CPP_Parent() {
         random = new Random_Basics();
         labels = { "", "", "Input Points - draw a rectangle anywhere. Enclosing rectangle in yellow.", "" };
         if (standalone) random->range = Rect(100, 100, 50, 50);
@@ -5590,13 +5590,13 @@ public:
 
 
 
-class ApproxPoly_Hull_CPP : public CPP_Parent {
+class ApproxPoly_Hull_CC : public CPP_Parent {
 public:
-    Hull_Basics_CPP* hull;
-    ApproxPoly_Basics_CPP* aPoly;
-    ApproxPoly_Hull_CPP() : CPP_Parent() {
-        hull = new Hull_Basics_CPP();
-        aPoly = new ApproxPoly_Basics_CPP();
+    Hull_Basics_CC* hull;
+    ApproxPoly_Basics_CC* aPoly;
+    ApproxPoly_Hull_CC() : CPP_Parent() {
+        hull = new Hull_Basics_CC();
+        aPoly = new ApproxPoly_Basics_CC();
         hull->useRandomPoints = true;
         labels = { "", "", "Original Hull", "Hull after ApproxPoly" };
         desc = "Use ApproxPolyDP on a hull to show impact of options (which appears to be minimal - what is wrong?)";
@@ -5613,12 +5613,12 @@ public:
 
 
 
-class RedCloud_Flood_CPP : public CPP_Parent
+class RedCloud_Flood_CC : public CPP_Parent
 {
 private:
 public:
     Mat inputMask;
-    RedCloud_Reduce_CPP* prepData;
+    RedCloud_Reduce_CC* prepData;
     int option_loDiff = 0;
     int option_hiDiff = 0;
     int option_minSizeCell = 75;
@@ -5627,8 +5627,8 @@ public:
     int totalCount;
     vector<Rect>rects;
     vector<int> sizes;
-    RedCloud_Flood_CPP() : CPP_Parent() {
-        prepData = new RedCloud_Reduce_CPP();
+    RedCloud_Flood_CC() : CPP_Parent() {
+        prepData = new RedCloud_Reduce_CC();
         desc = "Perform the RedCloud low level FloodFill";
     }
     rcData buildZeroEntry() {
@@ -5699,17 +5699,17 @@ enum FeatureSrc : uint8_t
 
 
 
-class Motion_Simple_CPP : public CPP_Parent {
+class Motion_Simple_CC : public CPP_Parent {
 public:
-    Diff_Basics_CPP* diff;
+    Diff_Basics_CC* diff;
     double cumulativePixels;
     float options_cumulativePercentThreshold = 0.1f;
     int options_motionThreshold;
     int saveFrameCount;
-    Motion_Simple_CPP() : CPP_Parent() {
+    Motion_Simple_CC() : CPP_Parent() {
         task->pixelDiffThreshold = 25;
         options_motionThreshold = dst2.rows * dst2.cols / 16;
-        diff = new Diff_Basics_CPP();
+        diff = new Diff_Basics_CC();
         dst3 = Mat::zeros(dst3.size(), CV_8U);
         labels[3] = "Accumulated changed pixels from the last heartbeat";
         desc = "Accumulate differences from the previous BGR image.";
@@ -5743,10 +5743,10 @@ public:
 
 
 
-class History_Basics_CPP : public CPP_Parent {
+class History_Basics_CC : public CPP_Parent {
 public:
     vector<Mat> saveFrames;
-    History_Basics_CPP() : CPP_Parent() {
+    History_Basics_CC() : CPP_Parent() {
         desc = "Create a frame history to sum the last X frames";
     }
     void Run(Mat src) override {
@@ -5782,10 +5782,10 @@ public:
 
 
 // https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html
-class Edge_Canny_CPP : public CPP_Parent {
+class Edge_Canny_CC : public CPP_Parent {
 public:
     Options_Canny* options = new Options_Canny();
-    Edge_Canny_CPP() : CPP_Parent() {
+    Edge_Canny_CC() : CPP_Parent() {
         desc = "Show canny edge detection with varying thresholds";
     }
 
@@ -5810,13 +5810,13 @@ public:
 
 
 
-class Edge_MotionFrames_CPP : public CPP_Parent {
+class Edge_MotionFrames_CC : public CPP_Parent {
 public:
-    Edge_Canny_CPP* edges;
-    History_Basics_CPP* frames;
-    Edge_MotionFrames_CPP() : CPP_Parent() {
-        edges = new Edge_Canny_CPP();
-        frames = new History_Basics_CPP();
+    Edge_Canny_CC* edges;
+    History_Basics_CC* frames;
+    Edge_MotionFrames_CC() : CPP_Parent() {
+        edges = new Edge_Canny_CC();
+        frames = new History_Basics_CC();
         labels = { "", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only" };
         desc = "Collect edges over several frames controlled with global frame history";
     }
@@ -5832,11 +5832,11 @@ public:
 
 
 
-class Edge_Preserving_CPP : public CPP_Parent {
+class Edge_Preserving_CC : public CPP_Parent {
 public:
     int sigma_s = 10;
     double sigma_r = 40;
-    Edge_Preserving_CPP() : CPP_Parent() {
+    Edge_Preserving_CC() : CPP_Parent() {
         task->drawRect = Rect(50, 50, 25, 25);
         labels = { "", "", "", "Edge preserving blur for BGR depth image above" };
         desc = "OpenCV's edge preserving filter.";
@@ -5854,13 +5854,13 @@ public:
 
 
 
-class Resize_Preserve_CPP : public CPP_Parent {
+class Resize_Preserve_CC : public CPP_Parent {
 public:
     int options_resizePercent = 120;
     int options_topLeftOffset = 10;
     InterpolationFlags options_warpFlag = INTER_NEAREST; 
     Size newSize;
-    Resize_Preserve_CPP() : CPP_Parent() {
+    Resize_Preserve_CC() : CPP_Parent() {
         desc = "Decrease the size but preserve the full image size.";
     }
     void Run(Mat src) override {
@@ -5879,10 +5879,10 @@ public:
 
 
 
-class Convex_Basics_CPP : public CPP_Parent {
+class Convex_Basics_CC : public CPP_Parent {
 public: 
     vector<Point> hull;
-    Convex_Basics_CPP() : CPP_Parent() {
+    Convex_Basics_CC() : CPP_Parent() {
         desc = "Surround a set of random points with a convex hull";
         labels = { "", "", "Convex Hull - red dot is center and the black dots are the input points", "" };
     }
@@ -5926,11 +5926,11 @@ public:
 
 
 
-class Distance_Basics_CPP : public CPP_Parent {
+class Distance_Basics_CC : public CPP_Parent {
 public:
     DistanceTypes options_distanceType = DIST_L1;
     int options_kernelSize = 0;
-    Distance_Basics_CPP() : CPP_Parent() {
+    Distance_Basics_CC() : CPP_Parent() {
         labels = { "", "", "Distance transform - create a mask with threshold", "" };
         desc = "Distance algorithm basics.";
     }
@@ -5950,7 +5950,7 @@ public:
 
 
 
-class Line_BasicsOld_CPP : public CPP_Parent {
+class Line_BasicsOld_CC : public CPP_Parent {
 public: 
     Ptr<ximgproc::FastLineDetector> ld;
     map<float, int> sortLength;
@@ -5959,7 +5959,7 @@ public:
     Rect subsetRect;
     int options_lineLengthThreshold = 20;
     // vector<tCell> tCells;
-    Line_BasicsOld_CPP() : CPP_Parent() {
+    Line_BasicsOld_CC() : CPP_Parent() {
         subsetRect = Rect(0, 0, dst2.cols, dst2.rows);
         dst3 = Mat::zeros(dst3.size(), CV_8U);
         ld = ximgproc::createFastLineDetector();
@@ -6014,12 +6014,12 @@ public:
 
 
 
-class Edge_Segments_CPP : public CPP_Parent
+class Edge_Segments_CC : public CPP_Parent
 {
 private:
 public:
     Ptr<EdgeDrawing> ed;
-    Edge_Segments_CPP() : CPP_Parent()
+    Edge_Segments_CC() : CPP_Parent()
     {
         labels[2] = "Lines found with the Edge Drawing Filter";
         ed = createEdgeDrawing();
@@ -6057,10 +6057,10 @@ public:
 
 
 
-class EdgeDraw_Basics_CPP : public CPP_Parent {
+class EdgeDraw_Basics_CC : public CPP_Parent {
 public:
     EdgeDraw* cPtr;
-    EdgeDraw_Basics_CPP() : CPP_Parent() {
+    EdgeDraw_Basics_CC() : CPP_Parent() {
         cPtr = new EdgeDraw;
         labels = { "", "", "EdgeDraw_Basics output", "" };
         desc = "Access EdgeDraw directly for efficiency";
@@ -6076,7 +6076,7 @@ public:
             rectangle(dst2, Rect(0, 0, dst2.cols, dst2.rows), Scalar(255), task->lineWidth);
         }
     }
-    ~EdgeDraw_Basics_CPP() {
+    ~EdgeDraw_Basics_CC() {
         EdgeDraw_Edges_Close(cPtr);
         delete cPtr;
     }
@@ -6087,12 +6087,12 @@ public:
 
 
 
-class FeatureLess_Basics_CPP : public CPP_Parent {
+class FeatureLess_Basics_CC : public CPP_Parent {
 public:
-    EdgeDraw_Basics_CPP* edgeD;
-    FeatureLess_Basics_CPP() : CPP_Parent()
+    EdgeDraw_Basics_CC* edgeD;
+    FeatureLess_Basics_CC() : CPP_Parent()
     {
-        edgeD = new EdgeDraw_Basics_CPP();
+        edgeD = new EdgeDraw_Basics_CC();
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the Basics interface - more efficient";
     }
     void Run(Mat src) {
@@ -6107,16 +6107,16 @@ public:
 
 
 
-class FeatureLess_Edge_CPP : public CPP_Parent
+class FeatureLess_Edge_CC : public CPP_Parent
 {
 private:
 public:
-    Distance_Basics_CPP* dist;
-    EdgeDraw_Basics_CPP* eDraw;
-    FeatureLess_Edge_CPP() : CPP_Parent()
+    Distance_Basics_CC* dist;
+    EdgeDraw_Basics_CC* eDraw;
+    FeatureLess_Edge_CC() : CPP_Parent()
     {
-        eDraw = new EdgeDraw_Basics_CPP();
-        dist = new Distance_Basics_CPP();
+        eDraw = new EdgeDraw_Basics_CC();
+        dist = new Distance_Basics_CC();
         labels[2] = "Edges found using the Segments and the distance function";
         desc = "Floodfill the output of the Edge Drawing filter (C++)";
     }
@@ -6136,11 +6136,11 @@ public:
 
 
 
-class Bezier_Basics_CPP : public CPP_Parent {
+class Bezier_Basics_CC : public CPP_Parent {
 public:
     vector<Point> points;
 
-    Bezier_Basics_CPP() : CPP_Parent() {
+    Bezier_Basics_CC() : CPP_Parent() {
         advice = "Update the public points array and then Run.";
         points = { Point(100, 100),
                     Point(150, 50),
@@ -6182,15 +6182,15 @@ public:
 
 
 
-class FeatureLess_History_CPP : public CPP_Parent {
+class FeatureLess_History_CC : public CPP_Parent {
 public:
-    EdgeDraw_Basics_CPP* edgeD;
-    History_Basics_CPP* frames;
-    FeatureLess_History_CPP() : CPP_Parent()
+    EdgeDraw_Basics_CC* edgeD;
+    History_Basics_CC* frames;
+    FeatureLess_History_CC() : CPP_Parent()
     {
         dst2 = Mat::zeros(dst2.size(), CV_8U); 
-        edgeD = new EdgeDraw_Basics_CPP();
-        frames = new History_Basics_CPP();
+        edgeD = new EdgeDraw_Basics_CC();
+        frames = new History_Basics_CC();
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the Basics interface - more efficient";
         task->frameHistoryCount = 10;
     }
@@ -6209,10 +6209,10 @@ public:
 
 
 
-class Palette_Basics_CPP : public CPP_Parent {
+class Palette_Basics_CC : public CPP_Parent {
 public:
     bool whitebackground;
-    Palette_Basics_CPP() : CPP_Parent() {
+    Palette_Basics_CC() : CPP_Parent() {
         desc = "Apply the different color maps in OpenCV";
     }
     void Run(Mat src) {
@@ -6251,7 +6251,7 @@ vector<Point> contourBuild(const Mat& mask, int approxMode) {
 
 Mat vbPalette(Mat input)
 {
-    static Palette_Basics_CPP* palette = new Palette_Basics_CPP();
+    static Palette_Basics_CC* palette = new Palette_Basics_CC();
     if (input.type() == CV_8U) palette->Run(input);
     return palette->dst2;
 }
@@ -6259,22 +6259,22 @@ Mat vbPalette(Mat input)
 
 
 
-class RedColor_FeatureLessCore_CPP : public CPP_Parent {
+class RedColor_FeatureLessCore_CC : public CPP_Parent {
 public:
     map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
-    FeatureLess_Basics_CPP* fLess;
+    FeatureLess_Basics_CC* fLess;
     RedCloud* cPtr;
-    RedColor_FeatureLessCore_CPP() : CPP_Parent() {
+    RedColor_FeatureLessCore_CC() : CPP_Parent() {
         vbPalette(dst2);
-        fLess = new FeatureLess_Basics_CPP();
+        fLess = new FeatureLess_Basics_CC();
         cPtr = new RedCloud();
         advice = "In redOptions the 'Desired RedCloud Cells' slider has a big impact.";
         inputMask = Mat(dst2.size(), CV_8U);
         inputMask.setTo(0);
         desc = "Another minimalist approach to building RedCloud color-based cells.";
     }
-    ~RedColor_FeatureLessCore_CPP() {
+    ~RedColor_FeatureLessCore_CC() {
 
         if (cPtr) { 
             RedCloud_Close(cPtr);
@@ -6340,14 +6340,14 @@ public:
 
 
 
-class RedColor_FeatureLess_CPP : public CPP_Parent {
+class RedColor_FeatureLess_CC : public CPP_Parent {
 public:
-    RedColor_FeatureLessCore_CPP* minCore;
+    RedColor_FeatureLessCore_CC* minCore;
     vector<rcData> redCells;
     Mat lastColors;
     Mat lastMap = dst2.clone();
-    RedColor_FeatureLess_CPP() : CPP_Parent() {
-        minCore = new RedColor_FeatureLessCore_CPP();
+    RedColor_FeatureLess_CC() : CPP_Parent() {
+        minCore = new RedColor_FeatureLessCore_CC();
         advice = minCore->advice;
         dst2 = Mat::zeros(dst2.size(), CV_8U);  
         labels = { "", "Mask of active RedCloud cells", "CV_8U representation of redCells", "" };
@@ -6402,13 +6402,13 @@ public:
 
 
 
-class Mesh_Basics_CPP : public CPP_Parent {
+class Mesh_Basics_CC : public CPP_Parent {
 public:
     Random_Basics* random;
-    KNN_Core_CPP* knn;
-    Mesh_Basics_CPP() : CPP_Parent() {
+    KNN_Core_CC* knn;
+    Mesh_Basics_CC() : CPP_Parent() {
         random = new Random_Basics();
-        knn = new KNN_Core_CPP();
+        knn = new KNN_Core_CC();
         labels[2] = "Triangles built with each random point and its 2 nearest neighbors.";
         advice = "Adjust the number of points with the options_random";
         desc = "Build triangles from random points";
@@ -6445,13 +6445,13 @@ public:
 
 
 
-class Mesh_Features_CPP : public CPP_Parent {
+class Mesh_Features_CC : public CPP_Parent {
 public:
-    Feature_Basics_CPP* feat;
-    Mesh_Basics_CPP* mesh;
-    Mesh_Features_CPP() : CPP_Parent() {
-        feat = new Feature_Basics_CPP();
-        mesh = new Mesh_Basics_CPP();
+    Feature_Basics_CC* feat;
+    Mesh_Basics_CC* mesh;
+    Mesh_Features_CC() : CPP_Parent() {
+        feat = new Feature_Basics_CC();
+        mesh = new Mesh_Basics_CC();
         labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
         advice = "Use Options_Features to update results.";
         desc = "Build triangles from feature points";
@@ -6471,11 +6471,11 @@ public:
 
 
 
-class Area_MinRect_CPP : public CPP_Parent {
+class Area_MinRect_CC : public CPP_Parent {
 public:
     RotatedRect minRect;
     vector<Point2f> inputPoints;
-    Area_MinRect_CPP() : CPP_Parent() {
+    Area_MinRect_CC() : CPP_Parent() {
         desc = "Find minimum containing rectangle for a set of points.";
     }
     void Run(Mat src) {
@@ -6500,12 +6500,12 @@ public:
 
 
 
-class Mat_4to1_CPP : public CPP_Parent {
+class Mat_4to1_CC : public CPP_Parent {
 public:
     Mat mat[4];
     bool lineSeparators = true;
 
-    Mat_4to1_CPP() : CPP_Parent() {
+    Mat_4to1_CC() : CPP_Parent() {
         for (int i = 0; i < 4; i++) {
             mat[i] = dst2.clone();
         }
@@ -6550,12 +6550,12 @@ public:
 };
 
 
-class Mat_4Click_CPP : public CPP_Parent {
+class Mat_4Click_CC : public CPP_Parent {
 public:
-    Mat_4to1_CPP* mats;
+    Mat_4to1_CC* mats;
     int quadrant = 0;
-    Mat_4Click_CPP() : CPP_Parent() {
-        mats = new Mat_4to1_CPP();
+    Mat_4Click_CC() : CPP_Parent() {
+        mats = new Mat_4to1_CC();
         labels[3] = "Click a quadrant in dst2 to view it in dst3";
         desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3";
     }
@@ -6585,13 +6585,13 @@ public:
 
 
 
-class Bin4Way_Regions_CPP : public CPP_Parent {
+class Bin4Way_Regions_CC : public CPP_Parent {
 public:
-    Binarize_Simple_CPP* binarize;
-    Mat_4Click_CPP* mats;
-    Bin4Way_Regions_CPP() : CPP_Parent() {
-        binarize = new Binarize_Simple_CPP();
-        mats = new Mat_4Click_CPP();
+    Binarize_Simple_CC* binarize;
+    Mat_4Click_CC* mats;
+    Bin4Way_Regions_CC() : CPP_Parent() {
+        binarize = new Binarize_Simple_CC();
+        mats = new Mat_4Click_CC();
         labels[2] = "A 4-way split - lightest (upper left) to darkest (lower right)";
         desc = "Binarize an image twice using masks";
     }
@@ -6625,12 +6625,12 @@ public:
 
 
 
-class Bin4Way_RegionsCombine_CPP : public CPP_Parent {
+class Bin4Way_RegionsCombine_CC : public CPP_Parent {
 public:
-    Bin4Way_Regions_CPP* binarize;
+    Bin4Way_Regions_CC* binarize;
     int classCount = 4;
-    Bin4Way_RegionsCombine_CPP() : CPP_Parent() {
-        binarize = new Bin4Way_Regions_CPP();
+    Bin4Way_RegionsCombine_CC() : CPP_Parent() {
+        binarize = new Bin4Way_Regions_CC();
         dst1 = Mat::zeros(dst3.size(), CV_8U);
         desc = "Add the 4-way split of images to define the different regions.";
     }
@@ -6652,7 +6652,7 @@ public:
 
 
 
-class Color_Basics_CPP : public CPP_Parent {
+class Color_Basics_CC : public CPP_Parent {
 public:
     int classCount;
     string CurrentColorClassifier;
@@ -6662,9 +6662,9 @@ public:
     //Reduction_Basics* reduction;
     //Hist3Dcolor_Basics* hColor;
     String colorInput; 
-    Bin4Way_RegionsCombine_CPP* binarize;
-    Color_Basics_CPP() : CPP_Parent() {
-        binarize = new Bin4Way_RegionsCombine_CPP();
+    Bin4Way_RegionsCombine_CC* binarize;
+    Color_Basics_CC() : CPP_Parent() {
+        binarize = new Bin4Way_RegionsCombine_CC();
         desc = "Classify pixels by color using a variety of techniques";
     }
     void Run(Mat src) {
@@ -6720,10 +6720,10 @@ public:
 
 
 
-class Blur_Basics_CPP : public CPP_Parent {
+class Blur_Basics_CC : public CPP_Parent {
 public:
     Options_Blur* options = new Options_Blur;
-    Blur_Basics_CPP() : CPP_Parent() {
+    Blur_Basics_CC() : CPP_Parent() {
         desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
     }
     void Run(cv::Mat src) {
@@ -6738,10 +6738,10 @@ public:
 
 
 
-class Palette_Random_CPP : public CPP_Parent {
+class Palette_Random_CC : public CPP_Parent {
 public:
     Mat colorMap;
-    Palette_Random_CPP() : CPP_Parent() {
+    Palette_Random_CC() : CPP_Parent() {
         colorMap = Mat(256, 1, CV_8UC3, Scalar(0, 0, 0));
         for (int i = 1; i < 256; i++) {
             colorMap.at<Vec3b>(i, 0) = task->randomCellColor();
@@ -6758,11 +6758,11 @@ public:
 
 
 
-class Hist_RedOptions_CPP : public CPP_Parent {
+class Hist_RedOptions_CC : public CPP_Parent {
 public:
     std::vector<cv::Range> ranges;
     std::vector<cv::Range> rangesCloud;
-    Hist_RedOptions_CPP() : CPP_Parent() {
+    Hist_RedOptions_CC() : CPP_Parent() {
         advice = "See redOption 'Histogram Channels' to control the settings here.";
         desc = "Build the channels, channel count, and ranges based on the PointCloud Reduction setting.";
     }
@@ -6828,9 +6828,9 @@ public:
 
 
 
-class Plot_Histogram2D_CPP : public CPP_Parent {
+class Plot_Histogram2D_CC : public CPP_Parent {
 public:
-    Plot_Histogram2D_CPP() : CPP_Parent() {
+    Plot_Histogram2D_CC() : CPP_Parent() {
         labels = { "", "", "2D Histogram", "Threshold of all non-zero values in the plot at left." };
         desc = "Plot a 2D histogram from the input Mat";
     }
@@ -6853,14 +6853,14 @@ public:
 
 
 
-class Feature_StableSorted_CPP : public CPP_Parent {
+class Feature_StableSorted_CC : public CPP_Parent {
 public:
-    Feature_Basics_CPP* feat;
+    Feature_Basics_CC* feat;
     int desiredCount = 200;
     vector<Point2f> stablePoints;
     vector<int> generations;
-    Feature_StableSorted_CPP() : CPP_Parent() {
-        feat = new Feature_Basics_CPP();
+    Feature_StableSorted_CC() : CPP_Parent() {
+        feat = new Feature_Basics_CC();
         desc = "Display the top X feature points ordered by generations they were present.";
     }
     void Run(Mat src) {
@@ -6910,12 +6910,12 @@ public:
 
 
 
-class BGSubtract_Basics_CPP : public CPP_Parent {
+class BGSubtract_Basics_CC : public CPP_Parent {
 public:
     Options_BGSubtract* options = new Options_BGSubtract;
     BGSubtract_BGFG* cPtr = nullptr;
     vector<string> labels = { "", "", "BGSubtract output - aging differences", "Mask for any changes" };
-    BGSubtract_Basics_CPP() : CPP_Parent() {
+    BGSubtract_Basics_CC() : CPP_Parent() {
         desc = "Different background subtraction algorithms in OpenCV - some only available in C++";
     }
     void Run(Mat src) {
@@ -6942,12 +6942,12 @@ public:
 
 
 
-class Motion_Basics_CPP : public CPP_Parent {
+class Motion_Basics_CC : public CPP_Parent {
 public:
     Options_BGSubtract* options = new Options_BGSubtract;
     BGSubtract_BGFG* cPtr = nullptr;
     string desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
-    Motion_Basics_CPP() : CPP_Parent() {
+    Motion_Basics_CC() : CPP_Parent() {
         cPtr = BGSubtract_BGFG_Open(options->currMethod);
         labels[2] = "BGSubtract output";
     }
@@ -6973,14 +6973,14 @@ public:
 
 
 
-class RedCloud_Basics_CPP : public CPP_Parent {
+class RedCloud_Basics_CC : public CPP_Parent {
 public:
     map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
     int classCount;
-    Color_Basics_CPP* colorClass = new Color_Basics_CPP();
+    Color_Basics_CC* colorClass = new Color_Basics_CC();
     RedCloud* cPtr;
-    RedCloud_Basics_CPP() : CPP_Parent() {
+    RedCloud_Basics_CC() : CPP_Parent() {
         cPtr = new RedCloud;
         inputMask = Mat(dst2.size(), CV_8U);
         inputMask.setTo(0);
@@ -7041,7 +7041,7 @@ public:
 
 
 
-class RedCloud_BasicsNative_CPP : public CPP_Parent {
+class RedCloud_BasicsNative_CC : public CPP_Parent {
 public:
     map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     int classCount;
@@ -7049,8 +7049,8 @@ public:
     vector<Rect>cellRects;
     vector<int> cellSizes;
     vector<Point> floodPoints;
-    Color_Basics_CPP* colorClass = new Color_Basics_CPP();
-    RedCloud_BasicsNative_CPP() : CPP_Parent() {
+    Color_Basics_CC* colorClass = new Color_Basics_CC();
+    RedCloud_BasicsNative_CC() : CPP_Parent() {
         dst2 = Mat(dst2.size(), CV_8U);
         desc = "This algorithm is the same as RedCloud_Basics.  It was meant only to test if it could be faster by eliminating some moves.";
     }
@@ -7137,7 +7137,7 @@ public:
 
      
 
-class Feature_Agast_CPP : public CPP_Parent
+class Feature_Agast_CC : public CPP_Parent
 {
 private:
 public:
@@ -7145,7 +7145,7 @@ public:
     vector<Point2f> stablePoints;
     Ptr<AgastFeatureDetector> agastFD;
     std::vector<Point2f> lastPoints;
-    Feature_Agast_CPP() : CPP_Parent()
+    Feature_Agast_CC() : CPP_Parent()
     {
         agastFD = AgastFeatureDetector::create(10, true, AgastFeatureDetector::OAST_9_16);
         desc = "Use the Agast Feature Detector in the OpenCV Contrib.";
@@ -7194,11 +7194,11 @@ public:
 
 
 
-class Feature_AKaze_CPP : public CPP_Parent
+class Feature_AKaze_CC : public CPP_Parent
 {
 public:
     std::vector<cv::KeyPoint> kazeKeyPoints;
-    Feature_AKaze_CPP() : CPP_Parent()
+    Feature_AKaze_CC() : CPP_Parent()
     {
         labels[2] = "AKAZE key points";
         desc = "Find keypoints using AKAZE algorithm.";
@@ -7221,12 +7221,12 @@ public:
 
 
 
-class AddWeighted_DepthAccumulate_CPP : public CPP_Parent
+class AddWeighted_DepthAccumulate_CC : public CPP_Parent
 {
 private:
     Options_AddWeighted* options = new Options_AddWeighted();
 public:
-    AddWeighted_DepthAccumulate_CPP() : CPP_Parent()
+    AddWeighted_DepthAccumulate_CC() : CPP_Parent()
     {
         desc = "Update a running average of the image";
     }
@@ -7246,21 +7246,21 @@ public:
 
 
 
-//class Edge_Basics_CPP : public CPP_Parent
+//class Edge_Basics_CC : public CPP_Parent
 //{
 //private:
 //    Edge_Canny canny;
 //    Edge_Scharr scharr;
 //    Edge_BinarizedReduction binRed;
 //    Bin4Way_Sobel binSobel;
-//    Edge_ColorGap_CPP_VB colorGap;
-//    Edge_Deriche_CPP_VB deriche;
+//    Edge_ColorGap_CC_VB colorGap;
+//    Edge_Deriche_CC_VB deriche;
 //    Edge_Laplacian Laplacian;
 //    Edge_ResizeAdd resizeAdd;
 //    Edge_Regions regions;
 //public:
 //    Options_Edge_Basics* options;
-//    Edge_Basics_CPP() : CPP_Parent()
+//    Edge_Basics_CC() : CPP_Parent()
 //    {
 //        desc = "Use Radio Buttons to select the different edge algorithms.";
 //    }
@@ -7323,15 +7323,15 @@ public:
 
 
 
-class Edge_Basics_CPP : public CPP_Parent
+class Edge_Basics_CC : public CPP_Parent
 {
 private:
-    Edge_Canny_CPP* canny = new Edge_Canny_CPP();
+    Edge_Canny_CC* canny = new Edge_Canny_CC();
     Options_Edge_Basics* options = new Options_Edge_Basics();
 public:
-    Edge_Basics_CPP() : CPP_Parent()
+    Edge_Basics_CC() : CPP_Parent()
     {
-        labels[2] = "Edge_Basics_CPP";
+        labels[2] = "Edge_Basics_CC";
         desc = "Use Radio Buttons to select the different edge algorithms.";
     }
     void Run(cv::Mat src)
@@ -7350,17 +7350,17 @@ public:
 
 
 
-class Hist_DepthSimple_CPP : public CPP_Parent
+class Hist_DepthSimple_CC : public CPP_Parent
 {
 public:
     std::vector<float> histList;
     std::vector<float> histArray;
     cv::Mat histogram;
-    Plot_Histogram_CPP plotHist;
+    Plot_Histogram_CC plotHist;
     mmData mm;
     cv::Mat inputMask;
     float ranges[2];
-    Hist_DepthSimple_CPP() : CPP_Parent()
+    Hist_DepthSimple_CC() : CPP_Parent()
     {
         plotHist.addLabels = false;
         desc = "Use Kalman to smooth the histogram results.";

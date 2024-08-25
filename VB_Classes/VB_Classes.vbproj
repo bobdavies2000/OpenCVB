@@ -150,7 +150,6 @@
     <Compile Include="Swarm.vb" />
     <Compile Include="VB_Common.vb" />
     <Compile Include="VB_Externs.vb" />
-    <Compile Include="ExtractCPPresults.vb" />
     <Compile Include="Foreground.vb" />
     <Compile Include="FrameRate.vb" />
     <Compile Include="Hist3D.vb" />

@@ -519,13 +519,13 @@ namespace CS_Classes
 
 
         [DllImport(("CPP_Code.dll"), CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr OpticalFlow_CPP_Open();
+        public static extern IntPtr OpticalFlow_Open();
 
         [DllImport(("CPP_Code.dll"), CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr OpticalFlow_CPP_Close(IntPtr sPtr);
+        public static extern IntPtr OpticalFlow_Close(IntPtr sPtr);
 
         [DllImport(("CPP_Code.dll"), CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr OpticalFlow_CPP_Run(IntPtr sPtr, IntPtr bgrPtr, int rows, int cols);
+        public static extern IntPtr OpticalFlow_Run(IntPtr sPtr, IntPtr bgrPtr, int rows, int cols);
 
         public void calcOpticalFlowPyrLK_Native(Mat gray1, Mat gray2, Mat features1, Mat features2)
         {

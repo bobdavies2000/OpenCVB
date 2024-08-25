@@ -198,25 +198,6 @@ End Class
 
 
 
-Public Class FeatureLess_Edge_CPP_VB : Inherits VB_Parent
-    Dim cpp As New CPP_Basics
-    Public Sub New()
-        cpp.updateFunction(AlgorithmList.cppFunctionNames._EdgeDraw_Basics_CPP)
-        desc = "Floodfill the output of the Edge Drawing filter (C++)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        cpp.Run(src)
-        dst2 = cpp.dst2
-        dst3 = cpp.dst3
-        SetTrueText("The objective here is to show how to get the output of a C++ IncludeOnly algorithm.", 3)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class FeatureLess_History : Inherits VB_Parent

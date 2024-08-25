@@ -182,7 +182,7 @@ Partial Class Main_UI
         AvailableAlgorithms.IntegralHeight = False
         AvailableAlgorithms.MaxDropDownItems = 100
         AvailableAlgorithms.Name = "AvailableAlgorithms"
-        AvailableAlgorithms.Size = New Size(300, 34)
+        AvailableAlgorithms.Size = New Size(350, 34)
         ' 
         ' GroupName
         ' 

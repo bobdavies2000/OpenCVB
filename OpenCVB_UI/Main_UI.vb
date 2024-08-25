@@ -1373,7 +1373,7 @@ Public Class Main_UI
 
         Dim sw = New StreamWriter(functionNames.FullName, False)
         For Each line In lines
-            If line.Contains("_Stable_BasicsCount_CPP,") Then
+            If line.Contains("_Stable_BasicsCount_CC,") Then
                 sw.WriteLine(vbTab + "_" + algorithmName + ",")
             End If
             sw.WriteLine(line)
