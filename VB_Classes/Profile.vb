@@ -139,7 +139,7 @@ End Class
 
 Public Class Profile_Derivative : Inherits VB_Parent
     Public sides As New Profile_Basics
-    Dim saveTrueText As New List(Of trueText)
+    Dim saveTrueText As New List(Of TrueText)
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
@@ -193,8 +193,8 @@ Public Class Profile_Derivative : Inherits VB_Parent
             DrawCircle(dst1,sides.corners(i), task.DotSize, color)
         Next
         SetTrueText(strOut, 1)
-        saveTrueText = New List(Of trueText)(trueData)
-        If saveTrueText IsNot Nothing Then trueData = New List(Of trueText)(saveTrueText)
+        saveTrueText = New List(Of TrueText)(trueData)
+        If saveTrueText IsNot Nothing Then trueData = New List(Of TrueText)(saveTrueText)
     End Sub
 End Class
 

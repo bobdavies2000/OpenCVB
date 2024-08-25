@@ -29,15 +29,41 @@
 
 using namespace System;
 using namespace VB_Classes;
+using namespace std;
 
 namespace CPP_Classes {
+    class TrueText {
+    public:
+        std::string text;
+        int picTag;
+        cv::Point pt;
+
+        TrueText(const std::string& _text, const cv::Point& _pt, int camPicIndex) {
+            setup(_text, _pt, camPicIndex);
+        }
+
+        TrueText(const std::string& _text, const cv::Point& _pt) {
+            setup(_text, _pt, 2);
+        }
+
+    private:
+        void setup(const std::string& _text, const cv::Point& _pt, int camPicIndex) {
+            text = _text;
+            pt = _pt;
+            picTag = camPicIndex;
+        }
+    };
+
+
     public class CPP_Parent
     {
+    public:
         gcroot<VBtask^> task;
         bool standalone;
         char* chars = new char[1];
         gcroot<String^> desc = gcnew String(chars);
         cv::Mat dst0, dst1, dst2, dst3, empty;
+        std::vector<TrueText> trueData = std::vector<TrueText>();
     };
     
     public class AddWeighted_Basics_CPP : public CPP_Parent
@@ -52,7 +78,7 @@ namespace CPP_Classes {
             //desc = "Add 2 images with specified weights.";
         }
 
-        void RunCS(cv::Mat& src)
+        void RunCPP(cv::Mat& src)
         {
             options->RunVB();
 

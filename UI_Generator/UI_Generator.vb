@@ -230,6 +230,13 @@ Module UI_GeneratorMain
             End If
         Next
 
+        'For Each name In cppSortedNames.Keys
+        '    allButPython.Add(name, name)
+        'Next
+
+        For Each name In csSortedNames.Keys
+            allButPython.Add(name, name)
+        Next
 
         Dim cleanNames As New List(Of String)
         Dim lastName As String = ""
@@ -298,17 +305,9 @@ Module UI_GeneratorMain
         sw.WriteLine(vbTab + "If algorithmName.endsWith("".py"") then return new Python_Run()")
         For i = 0 To cleanNames.Count - 1
             Dim nextName = cleanNames(i)
+            If nextName.StartsWith("CPP_Basics") Then Continue For
             If nextName.EndsWith(".py") = False Then
                 sw.WriteLine(vbTab + "if algorithmName = """ + nextName + """ Then return new " + nextName)
-            End If
-
-            If nextName.StartsWith("CPP_Basics") Then
-                For j = 0 To ccFunctionNames.Count - 1
-                    Dim functionText = ccFunctionNames.ElementAt(j).Key
-                    functionText = functionText.Substring(1)
-                    sw.WriteLine("if algorithmName = """ + functionText + """ Then " +
-                                 "return new CPP_Basics(ccFunctionNames._" + functionText + ")")
-                Next
             End If
         Next
 
@@ -339,35 +338,15 @@ Module UI_GeneratorMain
         sw = New StreamWriter(textInfo.FullName)
         sw.WriteLine("CodeLineCount = " + CStr(CodeLineCount))
         For i = 0 To cleanNames.Count - 1
-            If cleanNames(i).StartsWith("CSV_Basics") Then
-                For j = 0 To csSortedNames.Count - 1
-                    sw.WriteLine(csSortedNames.ElementAt(j).Key)
-                    allButPython.Add(csSortedNames.ElementAt(j).Key, csSortedNames.ElementAt(j).Key)
-                Next
-                sw.WriteLine(cleanNames(i))
-            ElseIf cleanNames(i).StartsWith("CPP_Basics") Then ' skip writing CPP_Basics but write all the others...
-                For j = 0 To ccFunctionNames.Count - 1
-                    Dim functionText = ccFunctionNames.ElementAt(j).Key
-                    sw.WriteLine(functionText.Substring(1))
-                    allButPython.Add(functionText.Substring(1), functionText.Substring(1))
-                Next
-            Else
-                sw.WriteLine(cleanNames(i))
-            End If
-
+            sw.WriteLine(cleanNames(i))
             If cleanNames(i).EndsWith(".py") Then
                 PYnames.Add(cleanNames(i), cleanNames(i))
                 If cleanNames(i).EndsWith("_PS.py") Then PYStreamNames.Add(cleanNames(i), cleanNames(i))
             Else
-                If cleanNames(i) <> "" Then
-                    If cleanNames(i).Contains("Python_Stream") = False And cleanNames(i).Contains("Python") = False And
-                        cleanNames(i).Contains("CPP_Basics") = False Then
-                        VBNames.Add(cleanNames(i), cleanNames(i))
-                        apiList.Add(cleanNames(i))
-                        apiListLCase.Add(LCase(cleanNames(i)))
-                        allButPython.Add(cleanNames(i), cleanNames(i))
-                    End If
-                End If
+                VBNames.Add(cleanNames(i), cleanNames(i))
+                apiList.Add(cleanNames(i))
+                apiListLCase.Add(LCase(cleanNames(i)))
+                allButPython.Add(cleanNames(i), cleanNames(i))
             End If
         Next
         sw.Close()
@@ -469,6 +448,8 @@ Module UI_GeneratorMain
             End If
         Next
 
+
+
         'Dim count As Integer
         'Dim testkeys = New List(Of String)
         'For Each nm In CSnames.Keys
@@ -503,7 +484,8 @@ Module UI_GeneratorMain
 
         Dim ccNames As New List(Of String)
         For Each nm In allButPython.Keys
-            If nm.Contains("_CC") Then ccNames.Add(nm)
+            If nm.Contains("_CPP_") Then ccNames.Add(nm)
+            If nm.EndsWith("_CPP") Then ccNames.Add(nm)
         Next
 
         sw.Write("<All C++ (" + CStr(ccNames.Count) + ")>")
@@ -729,6 +711,7 @@ Module UI_GeneratorMain
             If line.Contains("fileName") Then Continue While
             If line.Contains("fileNames ") Then Continue While
 
+            line = line.Replace("cvb.", "cv::")
             If line.StartsWith("Public Class Options_") Or line.Contains("Public Sub New") Then
                 phase3.Add(line)
                 Continue While
@@ -778,8 +761,6 @@ Module UI_GeneratorMain
                             Dim listtype = split(5).Substring(0, Len(split(5)) - 1)
                             output.Add("vector<" + listtype + "> " + split(1) + ";")
                         Else
-                            line = line.Replace(" cv.", " ")
-                            split(3) = split(3).Replace("cv.", "")
                             If line.Contains(" = ") Then
                                 If line.Contains("reduceXYZ") Then
                                     output.Add(vbTab + "bool reduceXYZ[3] = {true, true, true};")
@@ -805,7 +786,6 @@ Module UI_GeneratorMain
         For i = 0 To output.Count - 1
             Dim nextLine = output(i)
             output(i) = ""
-            nextLine = nextLine.Replace("cv.", "cv::")
             nextLine = nextLine.Replace("ContourApproximationModes.", "ContourApproximationModes::")
             nextLine = nextLine.Replace("ApproxTC89KCOS", "CHAIN_APPROX_TC89_KCOS")
             nextLine = nextLine.Replace("ApproxNone", "CHAIN_APPROX_NONE")
@@ -863,6 +843,8 @@ Module UI_GeneratorMain
 
             If nextLine.Contains("SimpleBlobDetector.Params") Then Continue For
 
+            nextLine = nextLine.Replace("cv::int ", "int ")
+            nextLine = nextLine.Replace("cv::cv::", "cv::")
             output(i) = nextLine
         Next
 

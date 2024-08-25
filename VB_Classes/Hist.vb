@@ -634,7 +634,7 @@ Public Class Hist_CompareGray : Inherits VB_Parent
             Dim Comparison = cvb.Cv2.CompareHist(histNorm, lastHistNorm, options.compareMethod)
             If Double.IsNaN(Comparison) Then Comparison = 0
             labels(3) = "CompareHist output = " + Format(Comparison, fmt3) + " using " + options.compareName + " method"
-            trueData = New List(Of trueText)(histK.hist.plot.trueData)
+            trueData = New List(Of TrueText)(histK.hist.plot.trueData)
             SetTrueText(labels(3), 2)
         Else
             lastHistNorm = histNorm.Clone
@@ -664,7 +664,7 @@ End Class
 
 Public Class Hist_ComparePlot : Inherits VB_Parent
     Dim comp As New Hist_CompareGray
-    Dim ttLabels As New List(Of trueText)
+    Dim ttLabels As New List(Of TrueText)
     Public Sub New()
         labels(3) = "Differences have been multiplied by 1000 to build scale at the left"
         desc = "Compare grayscale histograms for successive frames and plot the difference as a histogram."
@@ -674,7 +674,7 @@ Public Class Hist_ComparePlot : Inherits VB_Parent
         dst2 = comp.dst2.Clone
 
         If task.heartBeat Then
-            ttLabels = New List(Of trueText)(comp.trueData)
+            ttLabels = New List(Of TrueText)(comp.trueData)
             Dim histX = comp.histDiffAbs
             comp.histK.hist.plot.Run(histX)
             dst3 = comp.histK.hist.plot.dst2.Clone
@@ -682,7 +682,7 @@ Public Class Hist_ComparePlot : Inherits VB_Parent
             Dim mm As mmData = GetMinMax(histX)
             AddPlotScale(dst2, 0, mm.maxVal)
         End If
-        trueData = New List(Of trueText)(ttLabels)
+        trueData = New List(Of TrueText)(ttLabels)
     End Sub
 End Class
 
@@ -828,7 +828,7 @@ Public Class Hist_PointCloudXYZ : Inherits VB_Parent
         desc = "Show individual channel of the point cloud data as a histogram."
     End Sub
     Public Sub RunVB(src As cvb.Mat)
-        Static ttlists As New List(Of List(Of trueText))({New List(Of trueText), New List(Of trueText), New List(Of trueText)})
+        Static ttlists As New List(Of List(Of TrueText))({New List(Of TrueText), New List(Of TrueText), New List(Of TrueText)})
         For i = 0 To 2
             dst0 = task.pcSplit(i)
             Dim mm As mmData = GetMinMax(dst0)

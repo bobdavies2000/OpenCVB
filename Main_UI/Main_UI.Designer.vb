@@ -193,11 +193,11 @@ Partial Class Main_UI
         ' 
         ' AlgorithmDesc
         ' 
-        AlgorithmDesc.Location = New Point(1124, 36)
+        AlgorithmDesc.Location = New Point(1200, 33)
         AlgorithmDesc.Multiline = True
         AlgorithmDesc.Name = "AlgorithmDesc"
         AlgorithmDesc.ScrollBars = ScrollBars.Vertical
-        AlgorithmDesc.Size = New Size(158, 62)
+        AlgorithmDesc.Size = New Size(109, 65)
         AlgorithmDesc.TabIndex = 2
         ' 
         ' fpsTimer

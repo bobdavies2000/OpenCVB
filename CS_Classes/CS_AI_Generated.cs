@@ -22493,7 +22493,7 @@ namespace CS_Classes
         public string nextMsg;
         public int maxLines = 23;
         public int dst = 2;
-        public List<trueText> textResult = new List<trueText>();
+        public List<TrueText> textResult = new List<TrueText>();
         public object parentData;
         public Font_FlowText_CS(VBtask task) : base(task)
         {
@@ -25739,7 +25739,7 @@ namespace CS_Classes
     public class Hist_ComparePlot_CS : CS_Parent
     {
         Hist_CompareGray comp = new Hist_CompareGray();
-        List<trueText> ttLabels;
+        List<TrueText> ttLabels;
         public Hist_ComparePlot_CS(VBtask task) : base(task)
         {
             labels[3] = "Differences have been multiplied by 1000 to build scale at the left";
@@ -25887,7 +25887,7 @@ namespace CS_Classes
     public class Hist_PointCloudXYZ_CS : CS_Parent
     {
         public Plot_Histogram plot = new Plot_Histogram();
-        List<List<trueText>> ttlists;
+        List<List<TrueText>> ttlists;
         public Hist_PointCloudXYZ_CS(VBtask task) : base(task)
         {
             plot.createHistogram = true;
@@ -25897,7 +25897,7 @@ namespace CS_Classes
         }
         public void RunCS(Mat src)
         {
-            if (task.FirstPass) ttlists = new List<List<trueText>> { new List<trueText>(), new List<trueText>(), new List<trueText>() };
+            if (task.FirstPass) ttlists = new List<List<TrueText>> { new List<TrueText>(), new List<TrueText>(), new List<TrueText>() };
             for (int i = 0; i <= 2; i++)
             {
                 dst0 = task.pcSplit[i];
@@ -49592,7 +49592,7 @@ namespace CS_Classes
     public class Profile_Derivative_CS : CS_Parent
     {
         public Profile_Basics sides = new Profile_Basics();
-        List<trueText> saveTrueText = new List<trueText>();
+        List<TrueText> saveTrueText = new List<TrueText>();
         public Profile_Derivative_CS(VBtask task) : base(task)
         {
             if (standaloneTest()) task.gOptions.setDisplay1();
@@ -49650,8 +49650,8 @@ namespace CS_Classes
                 DrawCircle(dst1, sides.corners[i], task.DotSize, color);
             }
             SetTrueText(strOut, 1);
-            saveTrueText = new List<trueText>(trueData);
-            if (saveTrueText != null) trueData = new List<trueText>(saveTrueText);
+            saveTrueText = new List<TrueText>(trueData);
+            if (saveTrueText != null) trueData = new List<TrueText>(saveTrueText);
         }
     }
 

@@ -4,7 +4,7 @@ Imports System.Drawing
 Imports OpenCvSharp
 Imports System.IO.Pipes
 
-Public Class trueText
+Public Class TrueText
     Public text As String
     Public picTag = 2
     Public pt As cvb.Point
@@ -38,7 +38,7 @@ Public Class VB_Parent : Implements IDisposable
     Public zero3f As New cvb.Point3f(0, 0, 0)
     Public newVec4f As New cvb.Vec4f
     Public cPtr As IntPtr
-    Public trueData As New List(Of trueText)
+    Public trueData As New List(Of TrueText)
     Public strOut As String
     Dim retryCount As Integer
     Public Const depthListMaxCount As Integer = 10
@@ -520,19 +520,19 @@ Public Class VB_Parent : Implements IDisposable
         Return mm
     End Function
     Public Sub SetTrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
-        Dim str As New trueText(text, pt, picTag)
+        Dim str As New TrueText(text, pt, picTag)
         trueData.Add(str)
     End Sub
     Public Sub SetTrueText(text As String)
         Dim pt = New cvb.Point(0, 0)
         Dim picTag = 2
-        Dim str As New trueText(text, pt, picTag)
+        Dim str As New TrueText(text, pt, picTag)
         trueData.Add(str)
     End Sub
     Public Sub SetTrueText(text As String, picTag As Integer)
         If text Is Nothing Then Return
         Dim pt = New cvb.Point(0, 0)
-        Dim str As New trueText(text, pt, picTag)
+        Dim str As New TrueText(text, pt, picTag)
         trueData.Add(str)
     End Sub
     Public Function standaloneTest() As Boolean
@@ -629,7 +629,7 @@ Public Class VB_Parent : Implements IDisposable
         task.dst1 = dst1
         task.dst2 = dst2
         task.dst3 = dst3
-        task.trueData = New List(Of trueText)(trueData)
+        task.trueData = New List(Of TrueText)(trueData)
         trueData.Clear()
     End Sub
     Public Sub measureStartRun(name As String)

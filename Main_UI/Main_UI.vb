@@ -1092,7 +1092,7 @@ Public Class Main_UI
         AvailableAlgorithms.Width = 600
         AvailableAlgorithms.ComboBox.Select()
         AlgorithmDesc.Top = ToolStrip1.Top
-        AlgorithmDesc.Left = ToolStrip1.Left + 800
+        AlgorithmDesc.Left = ToolStrip1.Left + 830
         AlgorithmDesc.Width = ToolStrip1.Left + ToolStrip1.Width - AlgorithmDesc.Left
         AlgorithmDesc.Height = ToolStrip1.Height
 
@@ -1648,7 +1648,7 @@ Public Class Main_UI
                     Static findCPP = New CPP_AlgorithmList()
                     If task.cppAlgorithmObject Is Nothing Then
                         task.cppAlgorithmObject = findCPP.createCPPAlgorithm(parms.algName)
-                        task.desc = task.csAlgorithmObject.desc
+                        'task.desc = task.cppAlgorithmObject.desc
                     End If
                 End If
 

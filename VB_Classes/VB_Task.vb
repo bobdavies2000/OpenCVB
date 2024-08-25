@@ -411,7 +411,7 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add(algName + "\")
         activeObjects.Clear()
 
-        If task.algName.EndsWith("_CS") = False Then
+        If task.algName.EndsWith("_CS") = False And task.algName.EndsWith("_CPP") = False Then
             vbAlgorithmObject = algoList.createVBAlgorithm(algName)
             desc = vbAlgorithmObject.desc
             FirstPass = True
@@ -461,7 +461,7 @@ Public Class VBtask : Implements IDisposable
         allOptions.Close()
         If vbAlgorithmObject IsNot Nothing Then vbAlgorithmObject.Dispose()
     End Sub
-    Public Sub trueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
+    Public Sub TrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
         Dim str As New trueText(text, pt, picTag)
         task.trueData.Add(str)
     End Sub
@@ -792,6 +792,20 @@ Public Class VBtask : Implements IDisposable
                 dst3 = csAlgorithmObject.dst3
 
                 For Each ttxt In csAlgorithmObject.trueData
+                    task.trueData.Add(ttxt)
+                Next
+            ElseIf task.algName.EndsWith("_CPP") Then
+                cppAlgorithmObject.trueData.clear()
+                cppAlgorithmObject.RunCPP(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested CPP algorithm runs...
+
+                task.labels = cppAlgorithmObject.labels
+
+                dst0 = cppAlgorithmObject.dst0
+                dst1 = cppAlgorithmObject.dst1
+                dst2 = cppAlgorithmObject.dst2
+                dst3 = cppAlgorithmObject.dst3
+
+                For Each ttxt In cppAlgorithmObject.trueData
                     task.trueData.Add(ttxt)
                 Next
             Else

@@ -20,7 +20,7 @@ namespace CS_Classes
         public CV.Mat dst0, dst1, dst2, dst3, empty;
         public string traceName;
         public string[] labels = new string[4];
-        public List<trueText> trueData = new List<trueText>();
+        public List<TrueText> trueData = new List<TrueText>();
         public const string fmt0 = "0";
         public const string fmt1 = "0.0";
         public const string fmt2 = "0.00";
@@ -673,26 +673,26 @@ namespace CS_Classes
         }
         public void SetTrueText(string text, CV.Point pt, int picTag = 2)
         {
-            trueText str = new trueText(text, pt, picTag);
+            TrueText str = new TrueText(text, pt, picTag);
             trueData.Add(str);
         }
         public void SetTrueText(string text, CV.Point2f pt, int picTag = 2)
         {
-            trueText str = new trueText(text, new CV.Point(pt.X, pt.Y), picTag);
+            TrueText str = new TrueText(text, new CV.Point(pt.X, pt.Y), picTag);
             trueData.Add(str);
         }
 
         public void SetTrueText(string text)
         {
             CV.Point pt = new CV.Point(0, 0);
-            trueText str = new trueText(text, pt, 2);
+            TrueText str = new TrueText(text, pt, 2);
             trueData.Add(str);
         }
 
         public void SetTrueText(string text, int picTag)
         {
             CV.Point pt = new CV.Point(0, 0);
-            trueText str = new trueText(text, pt, picTag);
+            TrueText str = new TrueText(text, pt, picTag);
             trueData.Add(str);
         }
         public void SetSlider(string opt, int val)
