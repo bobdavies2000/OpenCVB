@@ -13,25 +13,27 @@ Module UI_GeneratorMain
         Dim LastEdits As New SortedList(Of String, String)
 
         Dim prefix As String = "../../../../"
-        Dim CPPInput = New FileInfo(prefix + "CPP_Code/CPP_AI_Generated.h")
+        Dim CCInput = New FileInfo(prefix + "CPP_Code/CPP_AI_Generated.h")
         For i = 0 To 3
-            If CPPInput.Exists = False Then
+            If CCInput.Exists = False Then
                 prefix = prefix.Substring(3)
-                CPPInput = New FileInfo(prefix + "CPP_Code/CPP_AI_Generated.h")
+                CCInput = New FileInfo(prefix + "CPP_Code/CPP_AI_Generated.h")
             Else
                 Exit For
             End If
         Next
-        If CPPInput.Exists = False Then
+        If CCInput.Exists = False Then
             MsgBox("The UI_Generator code needs to be reviewed." + vbCrLf + "Either UI_Generator has moved or projects reference have." + vbCrLf +
-                   CPPInput.FullName + " was not found.")
+                   CCInput.FullName + " was not found.")
             Exit Sub
         End If
 
-        Dim HomeDir As New DirectoryInfo(CPPInput.DirectoryName + "/../")
-        Dim CSInputs = {New FileInfo(HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs").FullName,
-                        New FileInfo(HomeDir.FullName + "CS_Classes/Non_AI.cs").FullName}
+        Dim HomeDir As New DirectoryInfo(CCInput.DirectoryName + "/../")
+        Dim CS_CPPCLR_Inputs = {New FileInfo(HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs").FullName,
+                                New FileInfo(HomeDir.FullName + "CPP_Classes/CPP_Classes.cpp").FullName,
+                                New FileInfo(HomeDir.FullName + "CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(HomeDir.FullName + "VB_classes/")
+        Dim CPPInput As New DirectoryInfo(HomeDir.FullName + "CPP_classes/CPP_Classes.cpp")
 
         Dim OptionsFile = New FileInfo(VBcodeDir.FullName + "Options.vb")
         Dim vbOptions = New FileInfo(VBcodeDir.FullName + "/../VB_Classes/Options.vb")
@@ -53,24 +55,37 @@ Module UI_GeneratorMain
             If checkDates(New DirectoryInfo(HomeDir.FullName + "/CS_Classes/"), indexTestFile) = False Then
                 If checkDates(New DirectoryInfo(HomeDir.FullName + "/VB_Classes/"), indexTestFile) = False Then
                     If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Code/"), indexTestFile) = False Then
-                        Console.WriteLine("The user interface is already up to date.")
-                        Exit Sub ' nothing to trigger 
+                        If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Classes/"), indexTestFile) = False Then
+                            Console.WriteLine("The user interface is already up to date.")
+                            Exit Sub ' nothing to trigger 
+                        End If
                     End If
                 End If
             End If
         End If
         Console.WriteLine("Starting work to generate the user interface.")
 
-        Dim includeOnly = File.ReadAllLines(CPPInput.FullName)
-        Dim cppLines As Integer, csLines As Integer
-        For Each incline In includeOnly
+        Dim includeCC = File.ReadAllLines(CCInput.FullName)
+        Dim ccLines As Integer
+        For Each incline In includeCC
             incline = Trim(incline)
             If incline.StartsWith("//") Then Continue For
             If incline.Length = 0 Then Continue For
+            ccLines += 1
+        Next
+
+        Dim includeCPP = File.ReadAllLines(CPPInput.FullName)
+        Dim cppLines As Integer
+        For Each algline In includeCPP
+            algline = Trim(algline)
+            If algline.StartsWith("//") Then Continue For
+            If algline = "{" Or algline = "}" Then Continue For
+            If algline.Length = 0 Then Continue For
             cppLines += 1
         Next
 
-        For Each csFile In CSInputs
+        Dim csLines As Integer
+        For Each csFile In CS_CPPCLR_Inputs
             Dim CSAlgorithms = File.ReadAllLines(csFile)
             For Each algline In CSAlgorithms
                 algline = Trim(algline)
@@ -84,7 +99,7 @@ Module UI_GeneratorMain
         ' first read all the cpp functions that are present in the project
         Dim functionInput As New FileInfo(HomeDir.FullName + "/CPP_Code/CPP_Enum.h")
         Dim srFunctions = New StreamReader(functionInput.FullName)
-        Dim cppFunctionNames As New SortedList(Of String, String)
+        Dim ccFunctionNames As New SortedList(Of String, String)
         Dim unsortedFunctions As New List(Of String)
         While srFunctions.EndOfStream = False
             Dim cppline = srFunctions.ReadLine()
@@ -95,7 +110,7 @@ Module UI_GeneratorMain
                     If cppline = "};" Then Exit While
                     Dim split = cppline.Split(",")
                     If split(0).Contains("MAX_FUNCTION = ") Then Continue While
-                    cppFunctionNames.Add(split(0).Substring(0).Trim(), split(0).Trim())
+                    ccFunctionNames.Add(split(0).Substring(0).Trim(), split(0).Trim())
                     unsortedFunctions.Add(split(0).Substring(0).Trim())
                 End While
             End If
@@ -106,7 +121,6 @@ Module UI_GeneratorMain
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
 
         Dim pythonAppDir As New IO.DirectoryInfo(HomeDir.FullName + "/Python_Classes/")
-
         Dim vbProjFile As New FileInfo(HomeDir.FullName + "/VB_Classes/VB_Classes.vbproj")
         Dim readVBProj = New StreamReader(vbProjFile.FullName)
         While readVBProj.EndOfStream = False
@@ -132,7 +146,7 @@ Module UI_GeneratorMain
         Next
 
         Dim className As String = ""
-        Dim CodeLineCount As Integer = cppLines + csLines ' now adding in the C++ and C# lines...
+        Dim CodeLineCount As Integer = ccLines + cppLines + csLines ' now adding in the C++ and C# lines...
         Dim sortedNames As New SortedList(Of String, Integer)
         For Each fileName In fileNames
             If fileName.EndsWith(".py") And fileName.Contains("__init") = False Then
@@ -164,37 +178,51 @@ Module UI_GeneratorMain
         Next
 
         Dim csSortedNames As New SortedList(Of String, Integer)
+        Dim cppSortedNames As New SortedList(Of String, Integer)
         Dim csFileNames As New List(Of String)
         Dim csAdds As New List(Of String)
+        Dim cppAdds As New List(Of String)
         ' we only want python files that are included in the Python_Classes Project.  Other Python files may be support modules or just experiments.
         Dim csAppDir As New IO.DirectoryInfo(HomeDir.FullName + "/CS_Classes/")
         Dim csFiles() As String = Directory.GetFiles(csAppDir.FullName, "*.cs", SearchOption.AllDirectories)
         For Each csFile As String In csFiles
             csFileNames.Add(csFile)
         Next
-        For Each fileName In CSInputs
+        For Each fileName In CS_CPPCLR_Inputs
             If fileName.EndsWith("CS_Parent.cs") = False Then
                 Dim csName As String = ""
+                Dim cppName As String = ""
                 Dim nextFile As New System.IO.StreamReader(fileName)
                 While nextFile.Peek() <> -1
-                    Dim csline = Trim(nextFile.ReadLine())
-                    If csline Is Nothing Then Continue While
-                    If csline.Length > 1 Then
-                        If csline.Substring(0, 2) <> "//" Then
+                    Dim line = Trim(nextFile.ReadLine())
+                    If line Is Nothing Then Continue While
+                    If line.Length > 1 Then
+                        If line.Substring(0, 2) <> "//" Then
                             CodeLineCount += 1
-                            If LCase(csline).StartsWith("public class ") Then
-                                Dim split As String() = Regex.Split(csline, "\W+")
-                                If csline.EndsWith(" : CS_Parent") Then
+                            If LCase(line).StartsWith("public class ") And line <> "public class CPP_Parent" Then
+                                Dim split As String() = Regex.Split(line, "\W+")
+                                If line.EndsWith(" : CS_Parent") Then
                                     csName = split(2)
                                     If csAdds.Contains(fileName) = False Then
                                         csAdds.Add(fileName)
                                         fileNames.Add(fileName)
                                     End If
                                 End If
+                                If line.EndsWith(" public CPP_Parent") Then
+                                    cppName = split(2)
+                                    If cppAdds.Contains(fileName) = False Then
+                                        cppAdds.Add(fileName)
+                                        fileNames.Add(fileName)
+                                    End If
+                                End If
                             End If
-                            If LCase(csline).StartsWith("public ") And csSortedNames.ContainsKey(csName) = False And
+                            If LCase(line).StartsWith("public ") And csSortedNames.ContainsKey(csName) = False And
                                 csName <> "" Then
                                 csSortedNames.Add(csName, csSortedNames.Count)
+                            End If
+                            If LCase(line).StartsWith("public ") And csSortedNames.ContainsKey(cppName) = False And
+                                cppName <> "" Then
+                                cppSortedNames.Add(cppName, cppSortedNames.Count)
                             End If
                         End If
                     End If
@@ -213,7 +241,7 @@ Module UI_GeneratorMain
 
 
         ' CS output
-        Dim CSlistInfo As New FileInfo(HomeDir.FullName + "\CS_Classes\AlgorithmList.cs")
+        Dim CSlistInfo As New FileInfo(HomeDir.FullName + "CS_Classes\AlgorithmList.cs")
         Dim sw As New StreamWriter(CSlistInfo.FullName)
         sw.WriteLine("// this file is automatically generated in a pre-build step.  Any manual modifications will be lost.")
         sw.WriteLine("using VB_Classes;")
@@ -237,11 +265,30 @@ Module UI_GeneratorMain
 
 
 
-        Dim listInfo As New FileInfo(HomeDir.FullName + "/UI_Generator/AlgorithmList.vb")
+        ' C++ output
+        Dim CPPlistInfo As New FileInfo(HomeDir.FullName + "Main_UI\CPP_AlgorithmList.vb")
+        sw = New StreamWriter(CPPlistInfo.FullName)
+        sw.WriteLine("' this file is automatically generated in a pre-build step.  Any manual modifications will be lost.")
+        sw.WriteLine("imports CPP_Classes")
+        sw.WriteLine("Public Class CPP_AlgorithmList")
+        sw.WriteLine(vbTab + "public Function createCPPAlgorithm(algorithmName as string) as Object")
+        For Each cppName In cppSortedNames.Keys
+            sw.WriteLine(vbTab + vbTab + "if algorithmName = """ + cppName + """ Then Return New " + cppName + "()")
+        Next
+        sw.WriteLine(vbTab + vbTab + "Return Nothing")
+        sw.WriteLine(vbTab + "End Function")
+        sw.WriteLine("End Class")
+        sw.Close()
+
+
+
+
+
+        Dim listInfo As New FileInfo(HomeDir.FullName + "UI_Generator/AlgorithmList.vb")
         sw = New StreamWriter(listInfo.FullName)
         sw.WriteLine("' this file is automatically generated in a pre-build step.  Do not waste your time modifying manually.")
         sw.WriteLine("Public Class AlgorithmList")
-        sw.WriteLine("Public Enum cppFunctionNames")
+        sw.WriteLine("Public Enum ccFunctionNames")
         For i = 0 To unsortedFunctions.Count - 1
             sw.WriteLine(unsortedFunctions(i))
         Next
@@ -256,11 +303,11 @@ Module UI_GeneratorMain
             End If
 
             If nextName.StartsWith("CPP_Basics") Then
-                For j = 0 To cppFunctionNames.Count - 1
-                    Dim functionText = cppFunctionNames.ElementAt(j).Key
+                For j = 0 To ccFunctionNames.Count - 1
+                    Dim functionText = ccFunctionNames.ElementAt(j).Key
                     functionText = functionText.Substring(1)
                     sw.WriteLine("if algorithmName = """ + functionText + """ Then " +
-                                 "return new CPP_Basics(cppFunctionNames._" + functionText + ")")
+                                 "return new CPP_Basics(ccFunctionNames._" + functionText + ")")
                 Next
             End If
         Next
@@ -299,8 +346,8 @@ Module UI_GeneratorMain
                 Next
                 sw.WriteLine(cleanNames(i))
             ElseIf cleanNames(i).StartsWith("CPP_Basics") Then ' skip writing CPP_Basics but write all the others...
-                For j = 0 To cppFunctionNames.Count - 1
-                    Dim functionText = cppFunctionNames.ElementAt(j).Key
+                For j = 0 To ccFunctionNames.Count - 1
+                    Dim functionText = ccFunctionNames.ElementAt(j).Key
                     sw.WriteLine(functionText.Substring(1))
                     allButPython.Add(functionText.Substring(1), functionText.Substring(1))
                 Next

@@ -1638,9 +1638,16 @@ Public Class Main_UI
                 If parms.algName.EndsWith("_CS") Then
                     Static findCSharp = New CS_Classes.CSAlgorithmList()
 
-
                     If task.csAlgorithmObject Is Nothing Then
                         task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)
+                        task.desc = task.csAlgorithmObject.desc
+                    End If
+                End If
+
+                If parms.algName.EndsWith("_CPP") Then
+                    Static findCPP = New CPP_AlgorithmList()
+                    If task.cppAlgorithmObject Is Nothing Then
+                        task.cppAlgorithmObject = findCPP.createCPPAlgorithm(parms.algName)
                         task.desc = task.csAlgorithmObject.desc
                     End If
                 End If

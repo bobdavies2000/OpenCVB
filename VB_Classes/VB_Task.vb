@@ -16,6 +16,7 @@ Public Class VBtask : Implements IDisposable
 
     Public vbAlgorithmObject As Object
     Public csAlgorithmObject As Object
+    Public cppAlgorithmObject As Object
     Public myStopWatch As Stopwatch
     Public mbuf(2 - 1) As inBuffer
     Public mbIndex As Integer
