@@ -1,5 +1,5 @@
 ﻿Imports System.ComponentModel
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class TreeviewForm
     Dim botDistance As Integer
     Dim treeData As New List(Of String)

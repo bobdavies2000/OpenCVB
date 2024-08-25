@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.IO
 
 Public Class CSV_Basics : Inherits VB_Parent
@@ -10,7 +10,7 @@ Public Class CSV_Basics : Inherits VB_Parent
         inputFile = fileInput.FullName
         desc = "Read and prepare a .csv file"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Dim readText() As String = File.ReadAllLines(inputFile) ' user supplies the inputfile name.
         Dim variables = readText(0).Split(",")
         ReDim array(readText.Length - 1, variables.Length - 1)
@@ -46,7 +46,7 @@ End Class
 '        inputFile = task.HomeDir + "Data\examples.xls" ' default input file when run standaloneTest()
 '        desc = "Read an Excel file"
 '    End Sub
-'    Public Sub RunVB(src as cv.Mat)
+'    Public Sub RunVB(src as cvb.Mat)
 '        Dim reader As IExcelDataReader
 '        Dim stream = File.Open(inputFile, FileMode.Open, FileAccess.Read)
 '        reader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream)

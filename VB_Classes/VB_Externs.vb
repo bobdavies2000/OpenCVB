@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
 Imports System.Drawing
@@ -681,10 +681,10 @@ Module VB_Externs
 
 
 
-    ' https://docs.opencv.org/3.4/db/d7f/tutorial_js_lucas_kanade.html
-    Public Function opticalFlow_Dense(oldGray As cv.Mat, gray As cv.Mat, pyrScale As Single, levels As Integer, winSize As Integer, iterations As Integer,
-                                polyN As Single, polySigma As Single, OpticalFlowFlags As cv.OpticalFlowFlags) As cv.Mat
-        Dim flow As New cv.Mat
+    ' https://docs.opencvb.org/3.4/db/d7f/tutorial_js_lucas_kanade.html
+    Public Function opticalFlow_Dense(oldGray As cvb.Mat, gray As cvb.Mat, pyrScale As Single, levels As Integer, winSize As Integer, iterations As Integer,
+                                polyN As Single, polySigma As Single, OpticalFlowFlags As cvb.OpticalFlowFlags) As cvb.Mat
+        Dim flow As New cvb.Mat
         If pyrScale >= 1 Then pyrScale = 0.99
 
         ' When running "Test All", the OpenGL code requires full resolution which switches to low resolution (if active) after completion.
@@ -692,23 +692,23 @@ Module VB_Externs
         ' if another algorithm lexically follows the OpenGL algorithms, this may change (or be deleted!)
         If oldGray.Size() <> gray.Size() Then oldGray = gray.Clone()
 
-        cv.Cv2.CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, polyN, polySigma, OpticalFlowFlags)
-        Dim flowVec(1) As cv.Mat
+        cvb.Cv2.CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, polyN, polySigma, OpticalFlowFlags)
+        Dim flowVec(1) As cvb.Mat
         flowVec = flow.Split()
 
-        Dim hsv As New cv.Mat
-        Dim hsv0 As New cv.Mat
-        Dim hsv1 As New cv.Mat(gray.Rows, gray.Cols, cv.MatType.CV_8UC1, cv.Scalar.All(255))
-        Dim hsv2 As New cv.Mat
+        Dim hsv As New cvb.Mat
+        Dim hsv0 As New cvb.Mat
+        Dim hsv1 As New cvb.Mat(gray.Rows, gray.Cols, cvb.MatType.CV_8UC1, cvb.Scalar.All(255))
+        Dim hsv2 As New cvb.Mat
 
-        Dim magnitude As New cv.Mat
-        Dim angle As New cv.Mat
-        cv.Cv2.CartToPolar(flowVec(0), flowVec(1), magnitude, angle)
-        angle.ConvertTo(hsv0, cv.MatType.CV_8UC1, 180 / Math.PI / 2)
-        cv.Cv2.Normalize(magnitude, hsv2, 0, 255, cv.NormTypes.MinMax, cv.MatType.CV_8UC1)
+        Dim magnitude As New cvb.Mat
+        Dim angle As New cvb.Mat
+        cvb.Cv2.CartToPolar(flowVec(0), flowVec(1), magnitude, angle)
+        angle.ConvertTo(hsv0, cvb.MatType.CV_8UC1, 180 / Math.PI / 2)
+        cvb.Cv2.Normalize(magnitude, hsv2, 0, 255, cvb.NormTypes.MinMax, cvb.MatType.CV_8UC1)
 
-        Dim hsvVec() As cv.Mat = {hsv0, hsv1, hsv2}
-        cv.Cv2.Merge(hsvVec, hsv)
+        Dim hsvVec() As cvb.Mat = {hsv0, hsv1, hsv2}
+        cvb.Cv2.Merge(hsvVec, hsv)
         Return hsv
     End Function
     <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -720,7 +720,7 @@ Module VB_Externs
     <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OpticalFlow_CPP_Run(sPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
     End Function
-    Public Sub calcOpticalFlowPyrLK_Native(gray1 As cv.Mat, gray2 As cv.Mat, features1 As cv.Mat, features2 As cv.Mat)
+    Public Sub calcOpticalFlowPyrLK_Native(gray1 As cvb.Mat, gray2 As cvb.Mat, features1 As cvb.Mat, features2 As cvb.Mat)
         Dim hGray1 As GCHandle
         Dim hGray2 As GCHandle
         Dim hF1 As GCHandle
@@ -848,7 +848,7 @@ Module VB_Externs
             Return -1
         End Function
     End Class
-    Public Function findNearestCentroid(detailPoint As cv.Point, centroids As List(Of cv.Point)) As Integer
+    Public Function findNearestCentroid(detailPoint As cvb.Point, centroids As List(Of cvb.Point)) As Integer
         Dim minIndex As Integer
         Dim minDistance As Single = Single.MaxValue
         For i = 0 To centroids.Count - 1
@@ -976,7 +976,7 @@ Module VB_Externs
     Public Function PlotOpenCV_Close(cPtr As IntPtr) As IntPtr
     End Function
 
-    Public backColor = cv.Scalar.DarkGray
+    Public backColor = cvb.Scalar.DarkGray
 
     <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function PlotOpenCV_Run(cPtr As IntPtr, inX As IntPtr, inY As IntPtr, inLen As Integer,
@@ -1022,13 +1022,13 @@ Module VB_Externs
 
 
 
-    Public Function shapeCorrelation(points As List(Of cv.Point)) As Single
-        Dim pts As cv.Mat = cv.Mat.FromPixelData(points.Count, 1, cv.MatType.CV_32SC2, points.ToArray)
-        Dim pts32f As New cv.Mat
-        pts.ConvertTo(pts32f, cv.MatType.CV_32FC2)
+    Public Function shapeCorrelation(points As List(Of cvb.Point)) As Single
+        Dim pts As cvb.Mat = cvb.Mat.FromPixelData(points.Count, 1, cvb.MatType.CV_32SC2, points.ToArray)
+        Dim pts32f As New cvb.Mat
+        pts.ConvertTo(pts32f, cvb.MatType.CV_32FC2)
         Dim split = pts32f.Split()
-        Dim correlationMat As New cv.Mat
-        cv.Cv2.MatchTemplate(split(0), split(1), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        Dim correlationMat As New cvb.Mat
+        cvb.Cv2.MatchTemplate(split(0), split(1), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
 

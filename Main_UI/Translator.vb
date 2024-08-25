@@ -195,7 +195,7 @@ Public Class Translator
                     If inline.Contains(className) Then inline = inline.Replace(className, className + "_CS")
                     If inline.Contains("VB_Parent") Then inline = inline.Replace("VB_Parent", "CS_Parent")
                     If inline.Contains("RunVB(Mat") Then inline = inline.Replace("RunVB(Mat", "RunCS(Mat")
-                    If inline.Contains("RunVB(cv.Mat") Then inline = inline.Replace("RunVB(cv.Mat", "RunCS(Mat")
+                    If inline.Contains("RunVB(cvb.Mat") Then inline = inline.Replace("RunVB(cvb.Mat", "RunCS(Mat")
                     If inline.Contains(".GetSubRect(") Then inline = inline.Replace(".GetSubRect(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' .Get(
                     If inline.Contains(".Get(") Then inline = inline.Replace(".Get(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' 
                     If inline.Contains("public " + className + "_CS") And inline.EndsWith("()") Then
@@ -210,14 +210,14 @@ Public Class Translator
                     inline = inline.Replace("options.Run(", "options.RunVB(")
                     inline = inline.Replace("options;", "options")
                     inline = inline.Replace("Mat dst", "dst") ' Mat dst2 problem - should never need to be declared.
-                    inline = inline.Replace("MCvScalar", "cv.Scalar")
+                    inline = inline.Replace("MCvScalar", "cvb.Scalar")
                     inline = inline.Replace("Rectangle r", "Rect r")
                     inline = inline.Replace("Rectangle(", "Rect(")
-                    inline = inline.Replace("CvInvoke.", "cv.")
-                    inline = inline.Replace(" Point ", " cv.Point ")
-                    inline = inline.Replace(" Point(", " cv.Point(")
-                    inline = inline.Replace("<Point", "<cv.Point")
-                    inline = inline.Replace(" Size(", " cv.Size(")
+                    inline = inline.Replace("CvInvoke.", "cvb.")
+                    inline = inline.Replace(" Point ", " cvb.Point ")
+                    inline = inline.Replace(" Point(", " cvb.Point(")
+                    inline = inline.Replace("<Point", "<cvb.Point")
+                    inline = inline.Replace(" Size(", " cvb.Size(")
                     inline = inline.Replace(".Rect(", ".Rectangle(")
                     inline = inline.Replace("Cv2.Line(", "DrawLine(")
                     inline = inline.Replace("Cv2.Circle(", "DrawCircle(")
@@ -225,9 +225,9 @@ Public Class Translator
                     inline = Replace(inline, "bgr2gray", "BGR2GRAY", 1, -1, vbTextCompare)
                     inline = Replace(inline, "task.rightview", "task.rightView", 1, -1, vbTextCompare)
                     inline = Replace(inline, "task.leftview", "task.leftView", 1, -1, vbTextCompare)
-                    inline = Replace(inline, "ColorConversion.BgrToGray", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
-                    inline = Replace(inline, "ColorConversion.GrayToBgr", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
-                    inline = Replace(inline, "ColorConversion.BgrToHsv", "cv.ColorConversionCodes.BGR2HSV", 1, -1, vbTextCompare)
+                    inline = Replace(inline, "ColorConversion.BgrToGray", "cvb.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
+                    inline = Replace(inline, "ColorConversion.GrayToBgr", "cvb.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
+                    inline = Replace(inline, "ColorConversion.BgrToHsv", "cvb.ColorConversionCodes.BGR2HSV", 1, -1, vbTextCompare)
                     inline = Replace(inline, " Options.", " options.")
 
                     inline = Replace(inline, "task.pcSplit(2)", "task.pcSplit[2]")
@@ -246,16 +246,16 @@ Public Class Translator
                     inline = Replace(inline, "DepthType.", "MatType.")
                     inline = Replace(inline, "Cv8u", "CV_8U")
                     inline = Replace(inline, "Environment.NewLine", """\n""")
-                    inline = Replace(inline, "CvPoint", "cv.Point")
-                    inline = inline.Replace(" Rect", " cv.Rect")
-                    inline = inline.Replace("<Rect", "<cv.Rect")
-                    inline = Replace(inline, "ColorConversion.BgraToBgr", "cv.ColorConversionCodes.BGRA2BGR")
-                    inline = Replace(inline, "ColorConversion.BgrToBgra", "cv.ColorConversionCodes.BGR2BGRA")
+                    inline = Replace(inline, "CvPoint", "cvb.Point")
+                    inline = inline.Replace(" Rect", " cvb.Rect")
+                    inline = inline.Replace("<Rect", "<cvb.Rect")
+                    inline = Replace(inline, "ColorConversion.BgraToBgr", "cvb.ColorConversionCodes.BGRA2BGR")
+                    inline = Replace(inline, "ColorConversion.BgrToBgra", "cvb.ColorConversionCodes.BGR2BGRA")
                     inline = Replace(inline, "cPtr != 0", "cPtr != (IntPtr)0")
 
                     inline = Replace(inline, "()(", "(")
                     inline = Replace(inline, "()()", "()")
-                    inline = Replace(inline, "cv.Rectangle", "Rectangle")
+                    inline = Replace(inline, "cvb.Rectangle", "Rectangle")
 
                 Case "C# to VB.Net (back)"
                     If trimLine.StartsWith("Public Class ") Then
@@ -273,9 +273,9 @@ Public Class Translator
                     inline = inline.Replace(" RunCS(src As Mat)", " RunVB(src As Mat)")
                     inline = inline.Replace("Private ", "Dim ")
                     If inline.Contains(" Rect") Then
-                        inline = inline.Replace(" Rect", " cv.Rect")
+                        inline = inline.Replace(" Rect", " cvb.Rect")
                     End If
-                    inline = inline.Replace(" Size(", " cv.Size(")
+                    inline = inline.Replace(" Size(", " cvb.Size(")
 
                 Case "C# to C++"
                     inline = inline.Replace("_CS : public CS_Parent", "_CPP : public CPP_Parent")

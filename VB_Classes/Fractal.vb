@@ -1,5 +1,5 @@
 Imports System.Numerics
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_Mandelbrot : Inherits VB_Parent
     Public startX As Single = -2
@@ -10,7 +10,7 @@ Public Class Fractal_Mandelbrot : Inherits VB_Parent
     Dim incrY As Single
     Public options As New Options_Fractal
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels(2) = "Use the iteration slider to see the impact of the number of iterations."
         desc = "Run the classic Mandalbrot algorithm"
     End Sub
@@ -35,7 +35,7 @@ Public Class Fractal_Mandelbrot : Inherits VB_Parent
             dst2.Set(Of Byte)(y, x, If(iter < options.iterations, 255 * iter / (options.iterations - 1), 0))
         Next
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Options.RunVB()
         For y = 0 To src.Height - 1
             mandelbrotLoop(y)
@@ -50,11 +50,11 @@ End Class
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_MandelbrotZoom : Inherits VB_Parent
     Public mandel As New Fractal_Mandelbrot
-    Dim saveDrawRect As New cv.Rect(1, 1, 1, 1)
+    Dim saveDrawRect As New cvb.Rect(1, 1, 1, 1)
     Public Sub New()
         desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If task.drawRect.Width <> 0 Then
             Dim newStartX = mandel.startX + (mandel.endX - mandel.startX) * task.drawRect.X / src.Width
             mandel.endX = mandel.startX + (mandel.endX - mandel.startX) * (task.drawRect.X + task.drawRect.Width) / src.Width
@@ -90,7 +90,7 @@ Public Class Fractal_MandelbrotZoomColor : Inherits VB_Parent
     Public Sub New()
         desc = "Classic Mandelbrot in color"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If zoom.mandel.options.resetCheck.Checked Then zoom.mandel.reset()
         zoom.Run(src)
         dst2 = ShowPalette(zoom.dst2)
@@ -111,7 +111,7 @@ Public Class Fractal_Julia : Inherits VB_Parent
     Dim mandel As New Fractal_MandelbrotZoomColor
     Dim rt As Double = 0.282
     Dim mt As Double = -0.58
-    Dim savedMouse = New cv.Point(-1, -1)
+    Dim savedMouse = New cvb.Point(-1, -1)
     Public Sub New()
         labels(3) = "Mouse selects different Julia Sets - zoom for detail"
         desc = "Build Julia set from any point in the Mandelbrot fractal"
@@ -126,7 +126,7 @@ Public Class Fractal_Julia : Inherits VB_Parent
         If depth < max / 4 Then Return 0
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Static resetCheck = FindCheckBox("Reset to original Mandelbrot")
         If savedMouse <> task.mouseMovePoint Or resetCheck.Checked Then
             savedMouse = task.mouseMovePoint
@@ -136,7 +136,7 @@ Public Class Fractal_Julia : Inherits VB_Parent
             Dim detail = 1
             Dim depth = 100
             Dim r = 2
-            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst2 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
             Dim m = mandel.zoom.mandel
             rt = m.startX + (m.endX - m.startX) * task.mouseMovePoint.X / src.Width
             mt = m.startY + (m.endY - m.startY) * task.mouseMovePoint.Y / src.Height
@@ -163,13 +163,13 @@ End Class
 Public Class Fractal_Dimension : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub
-    Public Function dimension(Input As cv.Mat) As Double
-        Dim tmp64f As New cv.Mat
-        Input.ConvertTo(tmp64f, cv.MatType.CV_64F, 0, 0)
+    Public Function dimension(Input As cvb.Mat) As Double
+        Dim tmp64f As New cvb.Mat
+        Input.ConvertTo(tmp64f, cvb.MatType.CV_64F, 0, 0)
         Dim G = 256
         Dim d As Double
 
@@ -205,19 +205,19 @@ Public Class Fractal_Dimension : Inherits VB_Parent
         'D = np.polyfit(x, y, 1)[0]  # D = lim r -> 0 log(Nr)/log(1/r)
         Return d
     End Function
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         dst3.SetTo(0)
 
-        Static rect = New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
+        Static rect = New cvb.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
         If task.optionsChanged Or task.mouseClickFlag Then
-            rect = New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
+            rect = New cvb.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
         End If
 
         If task.rc.rect.Width = 0 Or task.rc.rect.Height = 0 Then Exit Sub
-        task.rc.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)))
+        task.rc.mask.CopyTo(dst3(New cvb.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)))
         If rect.Width < rect.Height Then rect.Width = rect.Height Else rect.Height = rect.Width
-        dst3.Rectangle(rect, cv.Scalar.White, task.lineWidth, task.lineType)
+        dst3.Rectangle(rect, cvb.Scalar.White, task.lineWidth, task.lineType)
     End Sub
 End Class

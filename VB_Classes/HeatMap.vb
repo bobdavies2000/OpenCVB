@@ -1,22 +1,22 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class HeatMap_Basics : Inherits VB_Parent
     Public topframes As New History_Basics
     Public sideframes As New History_Basics
-    Public histogramTop As New cv.Mat
-    Public histogramSide As New cv.Mat
+    Public histogramTop As New cvb.Mat
+    Public histogramSide As New cvb.Mat
     Dim options As New Options_HeatMap
     Public Sub New()
         desc = "Highlight concentrations of depth pixels in the side view"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
-        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogramTop, 2, task.bins2D, task.rangesTop)
+        cvb.Cv2.CalcHist({src}, task.channelsTop, New cvb.Mat, histogramTop, 2, task.bins2D, task.rangesTop)
         histogramTop.Row(0).SetTo(0)
 
-        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
+        cvb.Cv2.CalcHist({src}, task.channelsSide, New cvb.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
         histogramSide.Col(0).SetTo(0)
 
         topframes.Run(histogramTop)
@@ -43,13 +43,13 @@ Public Class HeatMap_Grid : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         task.gOptions.setGridSize(5)
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1"}
         desc = "Apply a grid to the HeatMap_OverTime to isolate objects."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         heat.Run(src)
 
@@ -106,12 +106,12 @@ Public Class HeatMap_HotNot : Inherits VB_Parent
         labels = {"", "", "Mask of cool areas in the heat map - top view", "Mask of cool areas in the heat map - side view"}
         desc = "Isolate points with low histogram values in side and top views"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         heat.Run(src)
         dst0 = heat.dst2.ConvertScaleAbs
         dst1 = heat.dst3.ConvertScaleAbs
-        dst2 = dst0.Threshold(task.redOptions.ProjectionThresholdBar.Value, 255, cv.ThresholdTypes.Binary)
-        dst3 = dst1.Threshold(task.redOptions.ProjectionThresholdBar.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst0.Threshold(task.redOptions.ProjectionThresholdBar.Value, 255, cvb.ThresholdTypes.Binary)
+        dst3 = dst1.Threshold(task.redOptions.ProjectionThresholdBar.Value, 255, cvb.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -127,7 +127,7 @@ Public Class HeatMap_Hot : Inherits VB_Parent
         labels = {"", "", "Mask of hotter areas for the Top View", "Mask of hotter areas for the Side View"}
         desc = "Isolate masks for just the hotspots in the heat map"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         histTop.Run(src)
         dst2 = histTop.histogram
 
@@ -156,12 +156,12 @@ Public Class HeatMap_Cell : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Display the heat map for the selected cell"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         flood.Run(src)
         dst2 = flood.dst2
         labels(2) = flood.labels(2)
 
-        dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
+        dst0 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32FC3, 0)
         task.pointCloud(task.rc.rect).CopyTo(dst0(task.rc.rect), task.rc.mask)
 
         heat.Run(dst0)
@@ -186,7 +186,7 @@ Public Class HeatMap_GuidedBP : Inherits VB_Parent
         task.redOptions.setProjection(1)
         desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         guided.Run(src)
         dst2 = guided.dst2
         dst3 = guided.dst3

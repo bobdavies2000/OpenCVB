@@ -1,12 +1,12 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
 Imports OpenCvSharp
 
 Public Class CPP_Basics : Inherits VB_Parent
     Dim cppFunction As Integer
-    Public result As cv.Mat
-    Public neighbors As New List(Of cv.Point2f)
+    Public result As cvb.Mat
+    Public neighbors As New List(Of cvb.Point2f)
     Public neighborIndexToTrain As List(Of Integer)
     Public Sub New(_cppFunction As Integer)
         updateFunction(_cppFunction)
@@ -42,7 +42,7 @@ Public Class CPP_Basics : Inherits VB_Parent
     Public Sub New()
     End Sub
 
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
 
         cppTask_OptionsVBtoCPP(cPtr, task.gridSize,
                                task.histogramBins,
@@ -96,16 +96,16 @@ Public Class CPP_Basics : Inherits VB_Parent
 
         Dim dstPtr As IntPtr, type As Integer
         dstPtr = cppTask_GetDst(cPtr, 0, type)
-        dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
+        dst0 = cvb.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
 
         dstPtr = cppTask_GetDst(cPtr, 1, type)
-        dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
+        dst1 = cvb.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
 
         dstPtr = cppTask_GetDst(cPtr, 2, type)
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
 
         dstPtr = cppTask_GetDst(cPtr, 3, type)
-        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
+        dst3 = cvb.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = cppTask_Close(cPtr)

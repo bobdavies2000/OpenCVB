@@ -1,23 +1,23 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Public Class Hist3Dcloud_Basics : Inherits VB_Parent
-    Public histogram As New cv.Mat
-    Public histogram1D As New cv.Mat
+    Public histogram As New cvb.Mat
+    Public histogram1D As New cvb.Mat
     Public histArray() As Single
     Public classCount As Integer
-    Public maskInput As New cv.Mat
+    Public maskInput As New cvb.Mat
     Public simK As New Hist3D_BuildHistogram
     Public Sub New()
         labels(2) = "dst2 = backprojection of pointcloud (8UC1 format)."
         desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim bins = task.redOptions.HistBinBar3D.Value
 
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, task.redOptions.rangesCloud)
+        cvb.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, task.redOptions.rangesCloud)
 
         ReDim histArray(task.redOptions.histBins3D - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -27,13 +27,13 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Parent
             If histArray(i) > threshold Then Exit For
             histArray(i) = 0
         Next
-        histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+        histogram = cvb.Mat.FromPixelData(histArray.Count, 1, cvb.MatType.CV_32F, histArray)
 
         simK.Run(histogram)
-        histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
+        histogram = cvb.Mat.FromPixelData(histArray.Count, 1, cvb.MatType.CV_32F, simK.histArray)
         classCount = simK.classCount
 
-        cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {task.redOptions.rangesCloud(task.redOptions.rangesCloud.Count - 1)})
+        cvb.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {task.redOptions.rangesCloud(task.redOptions.rangesCloud.Count - 1)})
         dst2 = dst2.ConvertScaleAbs
 
         dst2.SetTo(0, task.noDepthMask)
@@ -65,7 +65,7 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Parent
         labels(3) = "X to Y histogram (upper left), X to Z (upper right), and Y to Z (bottom)."
         desc = "Plot the 3 histograms of the depth data dimensions"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         For i = 0 To 2
             hist(i).Run(task.pcSplit(i))
             mats1.mat(i) = hist(i).dst2.Clone
@@ -93,22 +93,22 @@ End Class
 
 
 Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
-    Public histogram As New cv.Mat
-    Public ranges() As cv.Rangef
+    Public histogram As New cvb.Mat
+    Public ranges() As cvb.Rangef
     Dim maskval As Integer
     Public Sub New()
         desc = "Plot the 3D histogram of the depth data"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Dim bins = task.redOptions.HistBinBar3D.Value
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+        Dim rx = New cvb.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+        Dim ry = New cvb.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        Dim rz = New cvb.Vec2f(0, task.MaxZmeters)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
         Dim dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
@@ -116,9 +116,9 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
                                      rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, dstPtr)
+        histogram = cvb.Mat.FromPixelData(task.redOptions.histBins3D, 1, cvb.MatType.CV_32F, dstPtr)
 
-        ranges = New cv.Rangef() {New cv.Rangef(rx(0), rx(1)), New cv.Rangef(ry(0), ry(1)), New cv.Rangef(rz(0), rz(1))}
+        ranges = New cvb.Rangef() {New cvb.Rangef(rx(0), rx(1)), New cvb.Rangef(ry(0), ry(1)), New cvb.Rangef(rz(0), rz(1))}
 
         Dim samples(histogram.Total - 1) As Single
         Marshal.Copy(histogram.Data, samples, 0, samples.Length)
@@ -136,7 +136,7 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
         Next
 
         Marshal.Copy(samples, 0, histogram.Data, samples.Length)
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
+        cvb.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
 
         If task.heartBeat Then maskval += 1
 
@@ -153,26 +153,26 @@ End Class
 
 
 Public Class Hist3Dcloud_BP_Filter : Inherits VB_Parent
-    Public histogram As New cv.Mat
+    Public histogram As New cvb.Mat
     Dim options As New Options_HistXD
     Public Sub New()
         task.redOptions.HistBinBar3D.Value = 16
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_32FC3, 0)
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         Dim bins = task.redOptions.HistBinBar3D.Value
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * 3 - 1) As Single
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+        Dim rx = New cvb.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+        Dim ry = New cvb.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        Dim rz = New cvb.Vec2f(0, task.MaxZmeters)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
         Dim imagePtr = BackProjectCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins, options.threshold3D,
@@ -180,7 +180,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Parent
                                             rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
+        dst2 = cvb.Mat.FromPixelData(dst2.Height, dst2.Width, cvb.MatType.CV_8U, imagePtr)
         dst2.SetTo(0, task.noDepthMask)
         dst3.SetTo(0)
         task.pointCloud.CopyTo(dst3, dst2)
@@ -197,7 +197,7 @@ End Class
 Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Parent
     Dim hcloud As New Hist3Dcloud_Basics
     Dim plot As New Plot_Histogram
-    Public histogram As cv.Mat
+    Public histogram As cvb.Mat
     Public histArray() As Single
     Dim simK As New Hist3D_BuildHistogram
     Public Sub New()
@@ -205,13 +205,13 @@ Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Parent
         labels(2) = "The 3D histogram of the pointcloud data stream - note the number of gaps"
         desc = "Present the 3D histogram as a typical histogram bar chart."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
         hcloud.Run(src)
         ReDim histArray(hcloud.histogram.Total - 1)
         Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length)
 
-        histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+        histogram = cvb.Mat.FromPixelData(histArray.Count, 1, cvb.MatType.CV_32F, histArray)
         plot.Run(histogram)
         dst2 = plot.dst2
 

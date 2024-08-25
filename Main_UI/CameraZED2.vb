@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Runtime
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 
@@ -32,7 +32,7 @@ Module Zed2_Interface
     End Function
 End Module
 Public Class CameraZED2 : Inherits Camera
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
         MyBase.setupMats(WorkingRes)
         ' if OpenCVB fails here, it is likely because you have turned off the StereoLabs support.
@@ -61,32 +61,32 @@ Public Class CameraZED2 : Inherits Camera
         Dim h_fov As Single ' horizontal field of view in degrees.
         Dim d_fov As Single ' diagonal field of view in degrees.
     End Structure
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(WorkingRes As cvb.Size)
         Zed2WaitForFrame(cPtr)
 
         If cPtr = 0 Then Exit Sub
         Zed2GetData(cPtr, WorkingRes.Width, WorkingRes.Height)
 
         SyncLock cameraLock
-            mbuf(mbIndex).color = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3,
+            mbuf(mbIndex).color = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
                                              Zed2Color(cPtr)).Clone
-            mbuf(mbIndex).rightView = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3,
+            mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
                                                  Zed2RightView(cPtr)).Clone
             mbuf(mbIndex).leftView = mbuf(mbIndex).color.Clone
 
-            mbuf(mbIndex).pointCloud = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_32FC3,
+            mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC3,
                                                       Zed2PointCloud(cPtr)).Clone
             Dim acc = Zed2Acceleration(cPtr)
-            IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+            IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(acc)
             IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
 
             Dim ang = Zed2AngularVelocity(cPtr)
-            IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+            IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(ang)
             IMU_AngularVelocity *= 0.0174533 ' Zed 2 gyro is in degrees/sec
             IMU_AngularVelocity.Z *= -1 ' make it consistent with the other cameras.
 
             'Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
-            'Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
+            'Dim t = New cvb.Point3f(rt.tx, rt.ty, rt.tz)
             'Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
             '                       -rt.r10, rt.r11, rt.r12, 0.0,
             '                       -rt.r20, rt.r21, -rt.r22, 0.0,

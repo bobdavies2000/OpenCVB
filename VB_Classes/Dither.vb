@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://www.codeproject.com/Articles/5259216/Dither-Ordered-and-Floyd-Steinberg-Monochrome-Colo
 Public Class Dither_Basics : Inherits VB_Parent
@@ -8,7 +8,7 @@ Public Class Dither_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": use local options to control which method is used.")
         desc = "Explore all the varieties of dithering"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Options.RunVB()
 
         Dim w = dst2.Width
@@ -70,9 +70,9 @@ Public Class Dither_Basics : Inherits VB_Parent
                     ditherSierra(hpixels.AddrOfPinnedObject, w, h)
             End Select
             If i = 0 Then
-                dst2 = cv.Mat.FromPixelData(src.Height, src.Width, cv.MatType.CV_8UC3, pixels).Clone()
+                dst2 = cvb.Mat.FromPixelData(src.Height, src.Width, cvb.MatType.CV_8UC3, pixels).Clone()
             Else
-                dst3 = cv.Mat.FromPixelData(src.Height, src.Width, cv.MatType.CV_8UC3, pixels).Clone()
+                dst3 = cvb.Mat.FromPixelData(src.Height, src.Width, cvb.MatType.CV_8UC3, pixels).Clone()
             End If
         Next
         hpixels.Free()

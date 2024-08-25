@@ -1,5 +1,5 @@
 Imports NAudio
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class FeatureFlow_Basics : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Public mpList As New List(Of PointPair)
@@ -10,19 +10,19 @@ Public Class FeatureFlow_Basics : Inherits VB_Parent
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
-    Public Sub buildCorrelations(prevFeatures As List(Of cv.Point), currFeatures As List(Of cv.Point))
+    Public Sub buildCorrelations(prevFeatures As List(Of cvb.Point), currFeatures As List(Of cvb.Point))
         Dim correlationMin = feat.options.correlationMin
 
-        Dim correlationmat As New cv.Mat
+        Dim correlationmat As New cvb.Mat
         mpList.Clear()
         mpCorrelation.Clear()
         Dim pad = feat.options.templatePad, size = feat.options.templateSize
         For Each p1 In prevFeatures
-            Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, size, size))
+            Dim rect = ValidateRect(New cvb.Rect(p1.X - pad, p1.Y - pad, size, size))
             Dim correlations As New List(Of Single)
             For Each p2 In currFeatures
-                Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)))
-                cv.Cv2.MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
+                Dim r = ValidateRect(New cvb.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)))
+                cvb.Cv2.MatchTemplate(dst2(rect), dst3(r), correlationmat, cvb.TemplateMatchModes.CCoeffNormed)
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next
             Dim maxCorrelation = correlations.Max
@@ -33,12 +33,12 @@ Public Class FeatureFlow_Basics : Inherits VB_Parent
             End If
         Next
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         feat.Run(src)
         labels = feat.labels
 
         dst3 = If(task.FirstPass, src.Clone, dst2.Clone)
-        Static prevFeatures As New List(Of cv.Point)(task.featurePoints)
+        Static prevFeatures As New List(Of cvb.Point)(task.featurePoints)
         buildCorrelations(prevFeatures, task.featurePoints)
 
         SetTrueText("Click near any feature to find the corresponding pair of features.", 1)
@@ -46,7 +46,7 @@ Public Class FeatureFlow_Basics : Inherits VB_Parent
         For Each pt In task.featurePoints
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
         Next
-        prevFeatures = New List(Of cv.Point)(task.featurePoints)
+        prevFeatures = New List(Of cvb.Point)(task.featurePoints)
     End Sub
 End Class
 
@@ -55,23 +55,23 @@ End Class
 
 
 
-'https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
+'https://www.learnopencvb.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class FeatureFlow_Dense : Inherits VB_Parent
     Dim options As New Options_OpticalFlow
     Public Sub New()
         desc = "Use dense optical flow algorithm  "
     End Sub
 
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         options.RunVB()
-        Static lastGray As cv.Mat = src.Clone
+        Static lastGray As cvb.Mat = src.Clone
         Dim hsv = opticalFlow_Dense(lastGray, src, options.pyrScale, options.levels, options.winSize, options.iterations, options.polyN,
                                     options.polySigma, options.OpticalFlowFlags)
 
-        dst2 = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
+        dst2 = hsv.CvtColor(cvb.ColorConversionCodes.HSV2RGB)
         dst2 = dst2.ConvertScaleAbs(options.outputScaling)
-        dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         lastGray = src.Clone()
     End Sub
 End Class
@@ -82,42 +82,42 @@ End Class
 
 
 
-' https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
+' https://www.learnopencvb.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class FeatureFlow_LucasKanade : Inherits VB_Parent
-    Public features As New List(Of cv.Point2f)
-    Public lastFeatures As New List(Of cv.Point2f)
+    Public features As New List(Of cvb.Point2f)
+    Public lastFeatures As New List(Of cvb.Point2f)
     Dim feat As New Feature_Basics
     Dim options As New Options_OpticalFlowSparse
     Public Sub New()
         desc = "Show the optical flow of a sparse matrix."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         dst2 = src.Clone()
         dst3 = src.Clone()
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static lastGray As cv.Mat = src.Clone
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        Static lastGray As cvb.Mat = src.Clone
         feat.Run(src)
         features = task.features
-        Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
-        Dim features2 = New cv.Mat
-        Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)
-        cv.Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
-        features = New List(Of cv.Point2f)
+        Dim features1 = cvb.Mat.FromPixelData(features.Count, 1, cvb.MatType.CV_32FC2, features.ToArray)
+        Dim features2 = New cvb.Mat
+        Dim status As New cvb.Mat, err As New cvb.Mat, winSize As New cvb.Size(3, 3)
+        cvb.Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
+        features = New List(Of cvb.Point2f)
         lastFeatures.Clear()
         For i = 0 To status.Rows - 1
             If status.Get(Of Byte)(i, 0) Then
-                Dim pt1 = features1.Get(Of cv.Point2f)(i, 0)
-                Dim pt2 = features2.Get(Of cv.Point2f)(i, 0)
+                Dim pt1 = features1.Get(Of cvb.Point2f)(i, 0)
+                Dim pt2 = features2.Get(Of cvb.Point2f)(i, 0)
                 Dim length = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
                 If length < 30 Then
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
                     dst2.Line(pt1, pt2, task.HighlightColor, task.lineWidth + task.lineWidth, task.lineType)
-                    DrawCircle(dst3, pt1, task.DotSize + 3, cv.Scalar.White)
-                    DrawCircle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red)
+                    DrawCircle(dst3, pt1, task.DotSize + 3, cvb.Scalar.White)
+                    DrawCircle(dst3, pt2, task.DotSize + 1, cvb.Scalar.Red)
                 End If
             End If
         Next
@@ -136,14 +136,14 @@ End Class
 Public Class FeatureFlow_LeftRight1 : Inherits VB_Parent
     Dim pyrLeft As New FeatureFlow_LucasKanade
     Dim pyrRight As New FeatureFlow_LucasKanade
-    Dim ptLeft As New List(Of cv.Point)
-    Dim ptRight As New List(Of cv.Point)
-    Public ptlist As New List(Of cv.Point)
+    Dim ptLeft As New List(Of cvb.Point)
+    Dim ptRight As New List(Of cvb.Point)
+    Public ptlist As New List(Of cvb.Point)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         desc = "Find features using optical flow in both the left and right images."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         pyrLeft.Run(task.leftView)
         pyrRight.Run(task.rightView)
 
@@ -152,12 +152,12 @@ Public Class FeatureFlow_LeftRight1 : Inherits VB_Parent
         dst2 = task.leftView.Clone
         For i = 0 To pyrLeft.features.Count - 1
             Dim pt = pyrLeft.features(i)
-            ptLeft.Add(New cv.Point(pt.X, pt.Y))
+            ptLeft.Add(New cvb.Point(pt.X, pt.Y))
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
             leftY.Add(pt.Y)
 
             pt = pyrLeft.lastFeatures(i)
-            ptLeft.Add(New cv.Point(pt.X, pt.Y))
+            ptLeft.Add(New cvb.Point(pt.X, pt.Y))
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
             leftY.Add(pt.Y)
         Next
@@ -167,12 +167,12 @@ Public Class FeatureFlow_LeftRight1 : Inherits VB_Parent
         dst3 = task.rightView.Clone
         For i = 0 To pyrRight.features.Count - 1
             Dim pt = pyrRight.features(i)
-            ptRight.Add(New cv.Point(pt.X, pt.Y))
+            ptRight.Add(New cvb.Point(pt.X, pt.Y))
             DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
             rightY.Add(pt.Y)
 
             pt = pyrRight.lastFeatures(i)
-            ptRight.Add(New cv.Point(pt.X, pt.Y))
+            ptRight.Add(New cvb.Point(pt.X, pt.Y))
             DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
             rightY.Add(pt.Y)
         Next
@@ -199,42 +199,42 @@ End Class
 Public Class FeatureFlow_LeftRightHist : Inherits VB_Parent
     Dim pyrLeft As New FeatureFlow_LucasKanade
     Dim pyrRight As New FeatureFlow_LucasKanade
-    Public leftFeatures As New List(Of cv.Point)
-    Public rightFeatures As New List(Of cv.Point)
+    Public leftFeatures As New List(Of cvb.Point)
+    Public rightFeatures As New List(Of cvb.Point)
     Public Sub New()
         desc = "Keep only the features that have been around for the specified number of frames."
     End Sub
-    Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
+    Public Function displayFeatures(dst As cvb.Mat, features As List(Of cvb.Point)) As cvb.Mat
         For Each pt In features
             DrawCircle(dst, pt, task.DotSize, task.HighlightColor)
         Next
         Return dst
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         pyrLeft.Run(task.leftView)
-        Dim tmpLeft As New List(Of cv.Point)
+        Dim tmpLeft As New List(Of cvb.Point)
         For i = 0 To pyrLeft.features.Count - 1
-            Dim pt = New cv.Point(pyrLeft.features(i).X, pyrLeft.features(i).Y)
-            tmpLeft.Add(New cv.Point(pt.X, pt.Y))
-            pt = New cv.Point(pyrLeft.lastFeatures(i).X, pyrLeft.lastFeatures(i).Y)
-            tmpLeft.Add(New cv.Point(pt.X, pt.Y))
+            Dim pt = New cvb.Point(pyrLeft.features(i).X, pyrLeft.features(i).Y)
+            tmpLeft.Add(New cvb.Point(pt.X, pt.Y))
+            pt = New cvb.Point(pyrLeft.lastFeatures(i).X, pyrLeft.lastFeatures(i).Y)
+            tmpLeft.Add(New cvb.Point(pt.X, pt.Y))
         Next
 
         pyrRight.Run(task.rightView)
-        Dim tmpRight As New List(Of cv.Point)
+        Dim tmpRight As New List(Of cvb.Point)
         For i = 0 To pyrRight.features.Count - 1
-            Dim pt = New cv.Point(pyrRight.features(i).X, pyrRight.features(i).Y)
-            tmpRight.Add(New cv.Point(pt.X, pt.Y))
-            pt = New cv.Point(pyrRight.lastFeatures(i).X, pyrRight.lastFeatures(i).Y)
-            tmpRight.Add(New cv.Point(pt.X, pt.Y))
+            Dim pt = New cvb.Point(pyrRight.features(i).X, pyrRight.features(i).Y)
+            tmpRight.Add(New cvb.Point(pt.X, pt.Y))
+            pt = New cvb.Point(pyrRight.lastFeatures(i).X, pyrRight.lastFeatures(i).Y)
+            tmpRight.Add(New cvb.Point(pt.X, pt.Y))
         Next
 
-        Static leftHist As New List(Of List(Of cv.Point))({tmpLeft})
-        Static rightHist As New List(Of List(Of cv.Point))({tmpRight})
+        Static leftHist As New List(Of List(Of cvb.Point))({tmpLeft})
+        Static rightHist As New List(Of List(Of cvb.Point))({tmpRight})
 
         If task.optionsChanged Then
-            leftHist = New List(Of List(Of cv.Point))({tmpLeft})
-            rightHist = New List(Of List(Of cv.Point))({tmpRight})
+            leftHist = New List(Of List(Of cvb.Point))({tmpLeft})
+            rightHist = New List(Of List(Of cvb.Point))({tmpRight})
         End If
 
         leftFeatures.Clear()
@@ -258,11 +258,11 @@ Public Class FeatureFlow_LeftRightHist : Inherits VB_Parent
         Dim minPoints = 10 ' just a guess - trying to keep things current.
         If leftFeatures.Count < minPoints Then
             leftFeatures = tmpLeft
-            leftHist = New List(Of List(Of cv.Point))({tmpLeft})
+            leftHist = New List(Of List(Of cvb.Point))({tmpLeft})
         End If
         If rightFeatures.Count < minPoints Then
             rightFeatures = tmpRight
-            rightHist = New List(Of List(Of cv.Point))({tmpRight})
+            rightHist = New List(Of List(Of cvb.Point))({tmpRight})
         End If
 
         dst2 = displayFeatures(task.leftView.Clone, leftFeatures)
@@ -289,12 +289,12 @@ End Class
 
 Public Class FeatureFlow_LeftRight : Inherits VB_Parent
     Dim flowHist As New FeatureFlow_LeftRightHist
-    Public leftFeatures As New List(Of List(Of cv.Point))
-    Public rightFeatures As New List(Of List(Of cv.Point))
+    Public leftFeatures As New List(Of List(Of cvb.Point))
+    Public rightFeatures As New List(Of List(Of cvb.Point))
     Public Sub New()
         desc = "Match features in the left and right images"
     End Sub
-    Public Function displayFeatures(dst As cv.Mat, features As List(Of List(Of cv.Point))) As cv.Mat
+    Public Function displayFeatures(dst As cvb.Mat, features As List(Of List(Of cvb.Point))) As cvb.Mat
         For Each ptlist In features
             For Each pt In ptlist
                 DrawCircle(dst, pt, task.DotSize, task.HighlightColor)
@@ -302,11 +302,11 @@ Public Class FeatureFlow_LeftRight : Inherits VB_Parent
         Next
         Return dst
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         flowHist.Run(src)
 
-        Dim tmpLeft As New SortedList(Of Integer, List(Of cv.Point))
-        Dim ptlist As List(Of cv.Point)
+        Dim tmpLeft As New SortedList(Of Integer, List(Of cvb.Point))
+        Dim ptlist As List(Of cvb.Point)
         For Each pt In flowHist.leftFeatures
             If tmpLeft.Keys.Contains(pt.Y) Then
                 Dim index = tmpLeft.Keys.IndexOf(pt.Y)
@@ -314,12 +314,12 @@ Public Class FeatureFlow_LeftRight : Inherits VB_Parent
                 ptlist.Add(pt)
                 tmpLeft.RemoveAt(index)
             Else
-                ptlist = New List(Of cv.Point)({pt})
+                ptlist = New List(Of cvb.Point)({pt})
             End If
             tmpLeft.Add(pt.Y, ptlist)
         Next
 
-        Dim tmpRight As New SortedList(Of Integer, List(Of cv.Point))
+        Dim tmpRight As New SortedList(Of Integer, List(Of cvb.Point))
         For Each pt In flowHist.rightFeatures
             If tmpRight.Keys.Contains(pt.Y) Then
                 Dim index = tmpRight.Keys.IndexOf(pt.Y)
@@ -327,7 +327,7 @@ Public Class FeatureFlow_LeftRight : Inherits VB_Parent
                 ptlist.Add(pt)
                 tmpRight.RemoveAt(index)
             Else
-                ptlist = New List(Of cv.Point)({pt})
+                ptlist = New List(Of cvb.Point)({pt})
             End If
             tmpRight.Add(pt.Y, ptlist)
         Next

@@ -1,38 +1,38 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class Horizon_Basics : Inherits VB_Parent
-    Public points As New List(Of cv.Point)
+    Public points As New List(Of cvb.Point)
     Dim resizeRatio As Integer = 1
     Public vec As New PointPair
     Public vecPresent As Boolean
     Public autoDisplay As Boolean
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find all the points where depth Y-component transitions from positive to negative"
     End Sub
-    Public Sub displayResults(p1 As cv.Point2f, p2 As cv.Point2f)
+    Public Sub displayResults(p1 As cvb.Point2f, p2 As cvb.Point2f)
         If task.heartBeat Then
             If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
         End If
 
         dst2.SetTo(0)
         For Each pt In points
-            pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
+            pt = New cvb.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
+            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
         Next
 
         DrawLine(dst2, vec.p1, vec.p2, 255)
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(1) Else dst0 = src
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Type <> cvb.MatType.CV_32F Then dst0 = PrepareDepthInput(1) Else dst0 = src
 
         Dim resolution = task.quarterRes
         If dst0.Size <> resolution Then
-            dst0 = dst0.Resize(resolution, 0, 0, cv.InterpolationFlags.Nearest)
+            dst0 = dst0.Resize(resolution, 0, 0, cvb.InterpolationFlags.Nearest)
             resizeRatio = CInt(dst2.Height / resolution.Height)
         End If
 
         dst0 = dst0.Abs()
-        dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        dst1 = dst0.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs()
         dst0.SetTo(task.MaxZmeters, Not dst1)
 
         points.Clear()
@@ -41,16 +41,16 @@ Public Class Horizon_Basics : Inherits VB_Parent
             If mm1.minVal > 0 And mm1.minVal < 0.005 Then
                 dst0.Col(i).Set(Of Single)(mm1.minLoc.Y, mm1.minLoc.X, 10)
                 Dim mm2 = GetMinMax(dst0.Col(i))
-                If mm2.minVal > 0 And Math.Abs(mm1.minLoc.Y - mm2.minLoc.Y) <= 1 Then points.Add(New cv.Point(i, mm1.minLoc.Y))
+                If mm2.minVal > 0 And Math.Abs(mm1.minLoc.Y - mm2.minLoc.Y) <= 1 Then points.Add(New cvb.Point(i, mm1.minLoc.Y))
             End If
         Next
 
         labels(2) = CStr(points.Count) + " points found. "
-        Dim p1 As cv.Point
-        Dim p2 As cv.Point
+        Dim p1 As cvb.Point
+        Dim p2 As cvb.Point
         If points.Count >= 2 Then
-            p1 = New cv.Point(resizeRatio * points(points.Count - 1).X, resizeRatio * points(points.Count - 1).Y)
-            p2 = New cv.Point(resizeRatio * points(0).X, resizeRatio * points(0).Y)
+            p1 = New cvb.Point(resizeRatio * points(points.Count - 1).X, resizeRatio * points(points.Count - 1).Y)
+            p2 = New cvb.Point(resizeRatio * points(0).X, resizeRatio * points(0).Y)
         End If
 
         Dim distance = p1.DistanceTo(p2)
@@ -65,7 +65,7 @@ Public Class Horizon_Basics : Inherits VB_Parent
             vecPresent = True
             If standaloneTest() Or autoDisplay Then
                 displayResults(p1, p2)
-                displayResults(New cv.Point(-p1.Y, p1.X), New cv.Point(p2.Y, -p2.X))
+                displayResults(New cvb.Point(-p1.Y, p1.X), New cvb.Point(p2.Y, -p2.X))
             End If
         End If
         SetTrueText(strOut, 3)
@@ -84,19 +84,19 @@ Public Class Horizon_Perpendicular : Inherits VB_Parent
         labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
         desc = "Find the gravity vector using the perpendicular to the horizon."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         dst2 = src
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
 
         perp.p1 = task.horizonVec.p1
         perp.p2 = task.horizonVec.p2
         perp.Run(src)
-        DrawLine(dst2, perp.r1, perp.r2, cv.Scalar.Yellow)
+        DrawLine(dst2, perp.r1, perp.r2, cvb.Scalar.Yellow)
 
         Dim gVec = task.gravityVec
         gVec.p1.X += 10
         gVec.p2.X += 10
-        DrawLine(dst2, gVec.p1, gVec.p2, cv.Scalar.White)
+        DrawLine(dst2, gVec.p1, gVec.p2, cvb.Scalar.White)
     End Sub
 End Class
 
@@ -107,12 +107,12 @@ End Class
 
 
 Public Class Horizon_BasicsAlt : Inherits VB_Parent
-    Public cloudY As cv.Mat
+    Public cloudY As cvb.Mat
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Search for the transition from positive to negative to find the horizon."
     End Sub
-    Private Function findTransition(startCol As Integer, stopCol As Integer, stepCol As Integer) As cv.Point2f
+    Private Function findTransition(startCol As Integer, stopCol As Integer, stepCol As Integer) As cvb.Point2f
         Dim val As Single, lastVal As Single
         Dim ptX As New List(Of Single)
         Dim ptY As New List(Of Single)
@@ -122,16 +122,16 @@ Public Class Horizon_BasicsAlt : Inherits VB_Parent
                 val = cloudY.Get(Of Single)(y, x)
                 If val >= 0 And lastVal <= 0 Then
                     ' change sub-pixel accuracy here 
-                    Dim pt = New cv.Point2f(x, y + Math.Abs(val) / Math.Abs(val - lastVal))
+                    Dim pt = New cvb.Point2f(x, y + Math.Abs(val) / Math.Abs(val - lastVal))
                     ptX.Add(pt.X)
                     ptY.Add(pt.Y)
-                    If ptX.Count >= task.gOptions.FrameHistory.Value Then Return New cv.Point2f(ptX.Average, ptY.Average)
+                    If ptX.Count >= task.gOptions.FrameHistory.Value Then Return New cvb.Point2f(ptX.Average, ptY.Average)
                 End If
             Next
         Next
-        Return New cv.Point
+        Return New cvb.Point
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.useGravityPointcloud Then
             cloudY = task.pcSplit(1) ' already oriented to gravity
         Else
@@ -170,20 +170,20 @@ Public Class Horizon_FindNonZero : Inherits VB_Parent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.setDisplay1()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gravityVec = New PointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
-        task.horizonVec = New PointPair(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
+        task.horizonVec = New PointPair(New cvb.Point2f(0, dst2.Height / 2), New cvb.Point2f(dst2.Width, dst2.Height / 2))
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Dim xRatio = dst0.Width / task.quarterRes.Width
         Dim yRatio = dst0.Height / task.quarterRes.Height
 
         Dim pc = task.pointCloud.Resize(task.quarterRes)
         Dim split = pc.Split()
         split(2).SetTo(task.MaxZmeters)
-        cv.Cv2.Merge(split, pc)
+        cvb.Cv2.Merge(split, pc)
 
         pc = (pc.Reshape(1, pc.Rows * pc.Cols) * task.gMatrix).ToMat.Reshape(3, pc.Rows)
 
@@ -194,11 +194,11 @@ Public Class Horizon_FindNonZero : Inherits VB_Parent
         If pointsMat.Rows > 0 Then
             dst2.SetTo(0)
             Dim xVals As New List(Of Integer)
-            Dim points As New List(Of cv.Point)
+            Dim points As New List(Of cvb.Point)
             For i = 0 To pointsMat.Rows - 1
-                Dim pt = pointsMat.Get(Of cv.Point)(i, 0)
+                Dim pt = pointsMat.Get(Of cvb.Point)(i, 0)
                 xVals.Add(pt.X)
-                points.Add(New cv.Point2f(pt.X * xRatio, pt.Y * yRatio))
+                points.Add(New cvb.Point2f(pt.X * xRatio, pt.Y * yRatio))
             Next
 
             Dim p1 = points(xVals.IndexOf(xVals.Min()))
@@ -214,17 +214,17 @@ Public Class Horizon_FindNonZero : Inherits VB_Parent
         pointsMat = dst3.FindNonZero()
         If pointsMat.Rows > 0 Then
             Dim yVals As New List(Of Integer)
-            Dim points = New List(Of cv.Point)
+            Dim points = New List(Of cvb.Point)
             For i = 0 To pointsMat.Rows - 1
-                Dim pt = pointsMat.Get(Of cv.Point)(i, 0)
+                Dim pt = pointsMat.Get(Of cvb.Point)(i, 0)
                 yVals.Add(pt.Y)
-                points.Add(New cv.Point2f(pt.X * xRatio, pt.Y * yRatio))
+                points.Add(New cvb.Point2f(pt.X * xRatio, pt.Y * yRatio))
             Next
 
             Dim p1 = points(yVals.IndexOf(yVals.Min()))
             Dim p2 = points(yVals.IndexOf(yVals.Max()))
             If Math.Abs(p1.X - p2.X) < 2 Then
-                task.gravityVec = New PointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
+                task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
             Else
                 Dim lp = New PointPair(p1, p2)
                 task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
@@ -243,15 +243,15 @@ End Class
 Public Class Horizon_UnstableResults : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         dst1 = task.pcSplit(1).InRange(-0.05, 0.05)
         dst0.SetTo(0)
-        dst0.SetTo(cv.Scalar.White, dst1)
+        dst0.SetTo(cvb.Scalar.White, dst1)
         dst0.SetTo(0, task.noDepthMask)
         lines.Run(dst0)
 
@@ -263,16 +263,16 @@ Public Class Horizon_UnstableResults : Inherits VB_Parent
             Next
 
             Dim lpBest = distances.ElementAt(0).Value
-            Dim p1 = New cv.Point2f(0, lpBest.yIntercept)
-            Dim p2 = New cv.Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept)
+            Dim p1 = New cvb.Point2f(0, lpBest.yIntercept)
+            Dim p2 = New cvb.Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept)
             task.horizonVec = New PointPair(p1, p2)
-            DrawLine(dst2, p1, p2, cv.Scalar.White)
+            DrawLine(dst2, p1, p2, cvb.Scalar.White)
             labels(2) = "horizonVec slope/intercept = " + Format(lpBest.slope, fmt1) + "/" + Format(lpBest.yIntercept, fmt1)
         End If
 
         dst1 = task.pcSplit(0).InRange(-0.01, 0.01)
         dst0.SetTo(0)
-        dst0.SetTo(cv.Scalar.White, dst1)
+        dst0.SetTo(cvb.Scalar.White, dst1)
         dst0.SetTo(0, task.noDepthMask)
         lines.Run(dst0)
 
@@ -283,10 +283,10 @@ Public Class Horizon_UnstableResults : Inherits VB_Parent
             Next
 
             Dim lpBest = distances.ElementAt(0).Value
-            Dim p1 = New cv.Point2f(0, lpBest.yIntercept)
-            Dim p2 = New cv.Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept)
+            Dim p1 = New cvb.Point2f(0, lpBest.yIntercept)
+            Dim p2 = New cvb.Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept)
             task.gravityVec = New PointPair(p1, p2)
-            DrawLine(dst2, p1, p2, cv.Scalar.White)
+            DrawLine(dst2, p1, p2, cvb.Scalar.White)
             labels(3) = "gravityVec slope/intercept = " + Format(lpBest.slope, fmt1) + "/" + Format(lpBest.yIntercept, fmt1)
         End If
     End Sub
@@ -303,22 +303,22 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
         task.gOptions.setGravityUsage(False)
         task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.setDisplay1()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gravityVec = New PointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
-        task.horizonVec = New PointPair(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
+        task.horizonVec = New PointPair(New cvb.Point2f(0, dst2.Height / 2), New cvb.Point2f(dst2.Width, dst2.Height / 2))
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Dim xRatio = dst0.Width / task.quarterRes.Width
         Dim yRatio = dst0.Height / task.quarterRes.Height
         Dim splitX = task.pcSplit(0)
         Dim splitY = task.pcSplit(1)
         Dim noDepth = task.noDepthMask
         If splitX.Size <> task.quarterRes Then
-            splitX = splitX.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Nearest)
-            splitY = splitY.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Nearest)
-            noDepth = task.noDepthMask.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Nearest)
+            splitX = splitX.Resize(task.quarterRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            splitY = splitY.Resize(task.quarterRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            noDepth = task.noDepthMask.Resize(task.quarterRes, 0, 0, cvb.InterpolationFlags.Nearest)
         End If
 
         dst1 = splitY.InRange(-0.05, 0.05)
@@ -327,11 +327,11 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
         If pointsMat.Rows > 0 Then
             dst2.SetTo(0)
             Dim xVals As New List(Of Integer)
-            Dim points As New List(Of cv.Point)
+            Dim points As New List(Of cvb.Point)
             For i = 0 To pointsMat.Rows - 1
-                Dim pt = pointsMat.Get(Of cv.Point)(i, 0)
+                Dim pt = pointsMat.Get(Of cvb.Point)(i, 0)
                 xVals.Add(pt.X)
-                points.Add(New cv.Point2f(pt.X * xRatio, pt.Y * yRatio))
+                points.Add(New cvb.Point2f(pt.X * xRatio, pt.Y * yRatio))
             Next
 
             Dim p1 = points(xVals.IndexOf(xVals.Min()))
@@ -351,17 +351,17 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
         pointsMat = dst3.FindNonZero()
         If pointsMat.Rows > 0 Then
             Dim yVals As New List(Of Integer)
-            Dim points = New List(Of cv.Point)
+            Dim points = New List(Of cvb.Point)
             For i = 0 To pointsMat.Rows - 1
-                Dim pt = pointsMat.Get(Of cv.Point)(i, 0)
+                Dim pt = pointsMat.Get(Of cvb.Point)(i, 0)
                 yVals.Add(pt.Y)
-                points.Add(New cv.Point2f(pt.X * xRatio, pt.Y * yRatio))
+                points.Add(New cvb.Point2f(pt.X * xRatio, pt.Y * yRatio))
             Next
 
             Dim p1 = points(yVals.IndexOf(yVals.Min()))
             Dim p2 = points(yVals.IndexOf(yVals.Max()))
             If Math.Abs(p1.X - p2.X) < 2 Then
-                task.gravityVec = New PointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
+                task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
             Else
                 Dim lp = New PointPair(p1, p2)
                 task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
@@ -382,31 +382,31 @@ End Class
 
 Public Class Horizon_Validate : Inherits VB_Parent
     Dim match As New Match_Basics
-    Dim ptLeft As New cv.Point2f, ptRight As New cv.Point2f
-    Dim leftTemplate As cv.Mat, rightTemplate As cv.Mat
+    Dim ptLeft As New cvb.Point2f, ptRight As New cvb.Point2f
+    Dim leftTemplate As cvb.Mat, rightTemplate As cvb.Mat
     Public Sub New()
         desc = "Validate the horizon points using Match_Basics"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Dim templatePad = match.options.templatePad
         Dim templateSize = match.options.templateSize
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then
             ptLeft = task.gravityVec.p1
             ptRight = task.gravityVec.p2
-            Dim r = ValidateRect(New cv.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
+            Dim r = ValidateRect(New cvb.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
             leftTemplate = src(r)
 
-            r = ValidateRect(New cv.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
+            r = ValidateRect(New cvb.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
             rightTemplate = src(r)
         Else
-            Dim r = ValidateRect(New cv.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
+            Dim r = ValidateRect(New cvb.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
             match.template = leftTemplate
             match.Run(src)
             ptLeft = match.matchCenter
 
-            r = ValidateRect(New cv.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
+            r = ValidateRect(New cvb.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
             match.template = leftTemplate
             match.Run(src)
             ptLeft = match.matchCenter
@@ -425,7 +425,7 @@ Public Class Horizon_Regress : Inherits VB_Parent
     Public Sub New()
         desc = "Collect the horizon points and run a linear regression on all the points."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         horizon.Run(src)
 
         For i = 0 To horizon.points.Count - 1
@@ -448,7 +448,7 @@ Public Class Horizon_ExternalTest : Inherits VB_Parent
     Public Sub New()
         desc = "Supply the point cloud input to Horizon_Basics"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         dst0 = PrepareDepthInput(1)
         horizon.Run(dst0)
         dst2 = horizon.dst2

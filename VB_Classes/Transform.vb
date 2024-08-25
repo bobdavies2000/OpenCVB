@@ -1,23 +1,23 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Transform_Resize : Inherits VB_Parent
     Dim options As New Options_Transform
     Public Sub New()
         desc = "Resize an image based on the slider value."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         Dim w = CInt(options.resizeFactor * src.Width)
         Dim h = CInt(options.resizeFactor * src.Height)
         If options.resizeFactor > 1 Then
-            Dim tmp As New cv.Mat
-            tmp = src.Resize(New cv.Size(w, h), 0)
-            Dim roi = New cv.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height)
+            Dim tmp As New cvb.Mat
+            tmp = src.Resize(New cvb.Size(w, h), 0)
+            Dim roi = New cvb.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height)
             tmp(roi).CopyTo(dst2)
         Else
             dst2.SetTo(0)
-            Dim roi = New cv.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h)
-            dst2(roi) = src.Resize(New cv.Size(w, h), 0)
+            Dim roi = New cvb.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h)
+            dst2(roi) = src.Resize(New cvb.Size(w, h), 0)
         End If
     End Sub
 End Class
@@ -27,14 +27,14 @@ End Class
 
 
 Public Class Transform_Affine3D : Inherits VB_Parent
-    Dim pc1 As cv.Mat
-    Dim pc2 As cv.Mat
-    Dim affineTransform As cv.Mat
+    Dim pc1 As cvb.Mat
+    Dim pc2 As cvb.Mat
+    Dim affineTransform As cvb.Mat
     Dim options As New Options_Transform
     Public Sub New()
         desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
@@ -58,11 +58,11 @@ Public Class Transform_Affine3D : Inherits VB_Parent
 
         If pc1 IsNot Nothing Then
             If pc2 IsNot Nothing Then
-                Dim inliers = New cv.Mat
-                affineTransform = New cv.Mat(3, 4, cv.MatType.CV_64F)
+                Dim inliers = New cvb.Mat
+                affineTransform = New cvb.Mat(3, 4, cvb.MatType.CV_64F)
                 pc1 = pc1.Reshape(3, pc1.Rows * pc1.Cols)
                 pc2 = pc2.Reshape(3, pc2.Rows * pc2.Cols)
-                cv.Cv2.EstimateAffine3D(pc1, pc2, affineTransform, inliers)
+                cvb.Cv2.EstimateAffine3D(pc1, pc2, affineTransform, inliers)
                 pc1 = Nothing
                 pc2 = Nothing
             End If
@@ -91,18 +91,18 @@ End Class
 
 
 Public Class Transform_Rotate : Inherits VB_Parent
-    Public imageCenter As cv.Point2f
+    Public imageCenter As cvb.Point2f
     Dim options As New Options_Transform
     Public Sub New()
         desc = "Rotate and scale and image based on the slider values."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
-        imageCenter = New cv.Point2f(options.centerX, options.centerY)
-        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale)
-        cv.Cv2.WarpAffine(src, dst2, rotationMat, New cv.Size())
-        DrawCircle(dst2, imageCenter, task.DotSize * 2, cv.Scalar.Yellow)
-        DrawCircle(dst2, imageCenter, task.DotSize, cv.Scalar.Blue)
+        imageCenter = New cvb.Point2f(options.centerX, options.centerY)
+        Dim rotationMat = cvb.Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale)
+        cvb.Cv2.WarpAffine(src, dst2, rotationMat, New cvb.Size())
+        DrawCircle(dst2, imageCenter, task.DotSize * 2, cvb.Scalar.Yellow)
+        DrawCircle(dst2, imageCenter, task.DotSize, cvb.Scalar.Blue)
     End Sub
 End Class

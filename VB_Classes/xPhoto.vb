@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
@@ -9,14 +9,14 @@ Public Class XPhoto_Bm3dDenoise : Inherits VB_Parent
         labels(2) = "Bm3dDenoising"
         labels(3) = "Difference from Input"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        cv.Cv2.EqualizeHist(src, src)
+    Public Sub RunVB(src as cvb.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        cvb.Cv2.EqualizeHist(src, src)
         CvXPhoto.Bm3dDenoising(src, dst2)
-        cv.Cv2.Subtract(dst2, src, dst3)
+        cvb.Cv2.Subtract(dst2, src, dst3)
         Dim mm as mmData = GetMinMax(dst3)
         labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
-        dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst3 = dst3.Normalize(0, 255, cvb.NormTypes.MinMax)
     End Sub
 End Class
 
@@ -29,15 +29,15 @@ Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VB_Parent
         desc = "Denoise the depth image with block matching and filtering."
         labels(3) = "Difference from Input"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim test = New cv.Mat(src.Size(), cv.MatType.CV_8U)
-        Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        cv.Cv2.EqualizeHist(gray, gray)
+    Public Sub RunVB(src as cvb.Mat)
+        Dim test = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
+        Dim gray = task.depthRGB.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        cvb.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst2)
-        cv.Cv2.Subtract(dst2, gray, dst3)
+        cvb.Cv2.Subtract(dst2, gray, dst3)
         Dim mm as mmData = GetMinMax(dst3)
         labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
-        dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst3 = dst3.Normalize(0, 255, cvb.NormTypes.MinMax)
     End Sub
 End Class
 
@@ -54,7 +54,7 @@ Public Class XPhoto_OilPaint_CPP_VB : Inherits VB_Parent
         cPtr = xPhoto_OilPaint_Open()
         desc = "Use the xPhoto Oil Painting transform"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
@@ -64,7 +64,7 @@ Public Class XPhoto_OilPaint_CPP_VB : Inherits VB_Parent
                                            options.blockSize, options.dynamicRatio, options.colorCode)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = xPhoto_OilPaint_Close(cPtr)
@@ -85,7 +85,7 @@ Public Class XPhoto_Inpaint : Inherits VB_Parent
         labels(3) = "Repaired result..."
         desc = "Use the xPhoto inpaint to fill in the depth holes"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         dst2 = src
@@ -110,7 +110,7 @@ Public Class XPhoto_Inpaint_CPP_VB : Inherits VB_Parent
         labels = {"", "Mask for inpainted repair", "output with inpainted data repaired", "Input to the inpaint C++ algorithm - not working!!!"}
         desc = "Use the xPhoto Oil Painting transform"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         inpVB.options.RunVB()
 
         Dim iType = InpaintTypes.FSR_BEST
@@ -131,7 +131,7 @@ Public Class XPhoto_Inpaint_CPP_VB : Inherits VB_Parent
         handleSrc.Free()
         handleMask.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC3, imagePtr).Clone
         SetTrueText("The xPhoto Inpaint call hangs." + vbCrLf + "Uncomment the C++ line - see XPhoto.cpp - to test", 1)
     End Sub
     Public Sub Close()

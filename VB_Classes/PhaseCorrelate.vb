@@ -1,31 +1,31 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/phase_corr.cpp
-' https://docs.opencv.org/master/d7/df3/group__imgproc__motion.html
+' https://docs.opencvb.org/master/d7/df3/group__imgproc__motion.html
 Public Class PhaseCorrelate_Basics : Inherits VB_Parent
-    Dim hanning As New cv.Mat
-    Public stableRect As cv.Rect
-    Public srcRect As cv.Rect
-    Public center As cv.Point
+    Dim hanning As New cvb.Mat
+    Public stableRect As cvb.Rect
+    Public srcRect As cvb.Rect
+    Public center As cvb.Point
     Public radius As Single
-    Public shift As cv.Point2d
-    Public lastFrame As cv.Mat
+    Public shift As cvb.Point2d
+    Public lastFrame As cvb.Mat
     Public response As Double
     Public resetLastFrame As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold shift to cause reset of lastFrame", 0, 100, 30)
-        cv.Cv2.CreateHanningWindow(hanning, dst2.Size(), cv.MatType.CV_64F)
+        cvb.Cv2.CreateHanningWindow(hanning, dst2.Size(), cvb.MatType.CV_64F)
         desc = "Look for a shift between the current frame and the previous"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Static thresholdSlider = FindSlider("Threshold shift to cause reset of lastFrame")
 
         Dim input = src
-        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        Dim input64 As New cv.Mat
-        input.ConvertTo(input64, cv.MatType.CV_64F)
+        If input.Channels() <> 1 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        Dim input64 As New cvb.Mat
+        input.ConvertTo(input64, cvb.MatType.CV_64F)
         If lastFrame Is Nothing Then lastFrame = input64.Clone
 
-        shift = cv.Cv2.PhaseCorrelate(lastFrame, input64, hanning, response)
+        shift = cvb.Cv2.PhaseCorrelate(lastFrame, input64, hanning, response)
 
         If Double.IsNaN(response) Then
             SetTrueText("PhaseCorrelate_Basics has detected NaN's in the input image.", 3)
@@ -37,25 +37,25 @@ Public Class PhaseCorrelate_Basics : Inherits VB_Parent
             Dim x1 = If(shift.X < 0, Math.Abs(shift.X), 0)
             Dim y1 = If(shift.Y < 0, Math.Abs(shift.Y), 0)
 
-            stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shift.X), src.Height - Math.Abs(shift.Y))
+            stableRect = New cvb.Rect(x1, y1, src.Width - Math.Abs(shift.X), src.Height - Math.Abs(shift.Y))
             stableRect = ValidateRect(stableRect)
 
             If stableRect.Width > 0 And stableRect.Height > 0 Then
                 Dim x2 = If(shift.X < 0, 0, shift.X)
                 Dim y2 = If(shift.Y < 0, 0, shift.Y)
-                srcRect = ValidateRect(New cv.Rect(x2, y2, stableRect.Width, stableRect.Height))
+                srcRect = ValidateRect(New cvb.Rect(x2, y2, stableRect.Width, stableRect.Height))
 
-                center = New cv.Point(input64.Cols / 2, input64.Rows / 2)
-                If src.Channels() = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                center = New cvb.Point(input64.Cols / 2, input64.Rows / 2)
+                If src.Channels() = 1 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
                 dst2 = src.Clone
-                dst2.Circle(center, radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
-                dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                dst2.Circle(center, radius, cvb.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+                dst2.Line(center, New cvb.Point(center.X + shift.X, center.Y + shift.Y), cvb.Scalar.Red, task.lineWidth + 1, task.lineType)
 
                 src(srcRect).CopyTo(dst3(stableRect))
 
                 If radius > 5 Then
-                    dst3.Circle(center, radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
-                    dst3.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                    dst3.Circle(center, radius, cvb.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+                    dst3.Line(center, New cvb.Point(center.X + shift.X, center.Y + shift.Y), cvb.Scalar.Red, task.lineWidth + 1, task.lineType)
                 End If
             Else
                 resetLastFrame = True
@@ -84,7 +84,7 @@ Public Class PhaseCorrelate_BasicsTest : Inherits VB_Parent
         labels(3) = "Stabilized output from Phase_Correlate_Basics"
         desc = "Test the PhaseCorrelate_Basics with random movement"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         random.Run(src)
 
         stable.Run(random.dst3.Clone)
@@ -108,11 +108,11 @@ Public Class PhaseCorrelate_Depth : Inherits VB_Parent
     Public Sub New()
         desc = "Use phase correlation on the depth data"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Static lastFrame = task.pcSplit(2).Clone
         phaseC.Run(task.pcSplit(2))
         dst2 = task.pcSplit(2)
-        Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim tmp = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
         If phaseC.resetLastFrame Then task.pcSplit(2).CopyTo(lastFrame)
         If Double.IsNaN(phaseC.response) Then
             SetTrueText("PhaseCorrelate_Basics has detected NaN's in the input image.", 3)
@@ -122,11 +122,11 @@ Public Class PhaseCorrelate_Depth : Inherits VB_Parent
             labels(2) = phaseC.labels(2)
             labels(3) = phaseC.labels(3)
 
-            tmp = tmp.Normalize(0, 255, cv.NormTypes.MinMax)
-            tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
+            tmp = tmp.Normalize(0, 255, cvb.NormTypes.MinMax)
+            tmp.ConvertTo(dst3, cvb.MatType.CV_8UC1)
 
-            dst3.Circle(phaseC.center, phaseC.radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
-            dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            dst3.Circle(phaseC.center, phaseC.radius, cvb.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+            dst3.Line(phaseC.center, New cvb.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cvb.Scalar.Red, task.lineWidth + 1, task.lineType)
         End If
 
         lastFrame = task.pcSplit(2).Clone
@@ -139,13 +139,13 @@ End Class
 
 
 
-' https://docs.opencv.org/master/d7/df3/group__imgproc__motion.html
+' https://docs.opencvb.org/master/d7/df3/group__imgproc__motion.html
 Public Class PhaseCorrelate_HanningWindow : Inherits VB_Parent
     Public Sub New()
         labels(2) = "Looking down on a bell curve in 2 dimensions"
         desc = "Show what a Hanning window looks like"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        cv.Cv2.CreateHanningWindow(dst2, src.Size(), cv.MatType.CV_32F)
+    Public Sub RunVB(src as cvb.Mat)
+        cvb.Cv2.CreateHanningWindow(dst2, src.Size(), cvb.MatType.CV_32F)
     End Sub
 End Class

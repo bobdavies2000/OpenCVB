@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits VB_Parent
     Public bgSub As New BGSubtract_MOG2
     Dim motion As New Motion_Basics_QT
@@ -8,7 +8,7 @@ Public Class Motion_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": redOptions are used as well as BGSubtract options.")
         desc = "Use floodfill to find all the real motion in an image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         bgSub.Run(src)
         motion.Run(bgSub.dst2)
         dst2 = motion.dst2
@@ -24,19 +24,19 @@ End Class
 Public Class Motion_Basics_QT : Inherits VB_Parent
     Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2
-    Dim rectList As New List(Of cv.Rect)
+    Dim rectList As New List(Of cvb.Rect)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         task.redOptions.setIdentifyCells(False)
         desc = "The option-free version of Motion_Basics"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         task.motionDetected = True
         If task.heartBeat Then
-            task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            task.motionRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
             Exit Sub
         End If
-        task.motionRect = New cv.Rect
+        task.motionRect = New cvb.Rect
 
         If src.Channels() <> 1 Then
             bgSub.Run(src)
@@ -45,7 +45,7 @@ Public Class Motion_Basics_QT : Inherits VB_Parent
 
         dst2 = src
 
-        redMasks.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        redMasks.Run(src.Threshold(0, 255, cvb.ThresholdTypes.Binary))
         If task.redCells.Count < 2 Then
             task.motionDetected = False
             rectList.Clear()
@@ -62,7 +62,7 @@ Public Class Motion_Basics_QT : Inherits VB_Parent
             Next
             If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
             If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
-                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+                task.motionRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
             Else
                 If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then task.motionDetected = False
             End If
@@ -94,11 +94,11 @@ Public Class Motion_Simple : Inherits VB_Parent
     Public cumulativePixels As Integer
     Public options As New Options_Motion
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels(3) = "Accumulated changed pixels from the last heartbeat"
         desc = "Accumulate differences from the previous BGR image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         diff.Run(src)
@@ -108,7 +108,7 @@ Public Class Motion_Simple : Inherits VB_Parent
             cumulativePixels += diff.changedPixels
             If cumulativePixels / src.Total > options.cumulativePercentThreshold Or diff.changedPixels > options.motionThreshold Or
                 task.optionsChanged Then
-                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+                task.motionRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
             End If
             If task.motionRect.Width = dst2.Width Or task.heartBeat Then
                 dst2.CopyTo(dst3)
@@ -139,10 +139,10 @@ Public Class Motion_ThruCorrelation : Inherits VB_Parent
             sliders.setupTrackBar("Pad size in pixels for the search area", 0, 100, 20)
         End If
 
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Detect motion through the correlation coefficient"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Static ccSlider = FindSlider("Correlation threshold X1000")
         Static padSlider = FindSlider("Pad size in pixels for the search area")
         Static stdevSlider = FindSlider("Stdev threshold for using correlation")
@@ -151,18 +151,18 @@ Public Class Motion_ThruCorrelation : Inherits VB_Parent
         Dim stdevThreshold = stdevSlider.Value
 
         Dim input = src.Clone
-        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        Static lastFrame As cv.Mat = input.Clone
+        Static lastFrame As cvb.Mat = input.Clone
         dst3.SetTo(0)
         Parallel.For(0, task.gridList.Count,
         Sub(i)
             Dim roi = task.gridList(i)
-            Dim correlation As New cv.Mat
+            Dim correlation As New cvb.Mat
             Dim mean As Single, stdev As Single
-            cv.Cv2.MeanStdDev(input(roi), mean, stdev)
+            cvb.Cv2.MeanStdDev(input(roi), mean, stdev)
             If stdev > stdevThreshold Then
-                cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                cvb.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
                 Dim mm As mmData = GetMinMax(correlation)
                 If mm.maxVal < ccThreshold / 1000 Then
                     If (i Mod task.gridRows) <> 0 Then dst3(task.gridList(i - 1)).SetTo(255)
@@ -194,11 +194,11 @@ End Class
 
 Public Class Motion_CCmerge : Inherits VB_Parent
     Dim motionCC As New Motion_ThruCorrelation
-    Dim lastFrame As cv.Mat
+    Dim lastFrame As cvb.Mat
     Public Sub New()
         desc = "Use the correlation coefficient to maintain an up-to-date image"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.heartBeat Then
             dst2 = src.Clone
             lastFrame = src.Clone
@@ -231,12 +231,12 @@ Public Class Motion_PixelDiff : Inherits VB_Parent
         desc = "Count the number of changed pixels in the current frame and accumulate them.  If either exceeds thresholds, then set flag = true.  " +
                     "To get the Options Slider, use " + traceName + "QT"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cvb.Mat)
+        src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        Static lastFrame As cv.Mat = src
-        cv.Cv2.Absdiff(src, lastFrame, dst2)
-        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        Static lastFrame As cvb.Mat = src
+        cvb.Cv2.Absdiff(src, lastFrame, dst2)
+        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
         changedPixels = dst2.CountNonZero
         task.motionFlag = changedPixels > 0
 
@@ -266,23 +266,23 @@ Public Class Motion_Grid_MP : Inherits VB_Parent
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect Motion in the color image using multi-threading."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Static correlationSlider = FindSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then dst3 = src.Clone
 
         dst2 = src
 
         Dim updateCount As Integer
-        Parallel.ForEach(Of cv.Rect)(task.gridList,
+        Parallel.ForEach(Of cvb.Rect)(task.gridList,
             Sub(roi)
-                Dim correlation As New cv.Mat
-                cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                Dim correlation As New cvb.Mat
+                cvb.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     src(roi).CopyTo(dst3(roi))
-                    dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth)
+                    dst2.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
                 End If
             End Sub)
         labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridList.Count)
@@ -301,16 +301,16 @@ Public Class Motion_Grid : Inherits VB_Parent
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect Motion in the color image"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Static correlationSlider = FindSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then dst3 = src.Clone
 
-        Dim roiMotion As New List(Of cv.Rect)
+        Dim roiMotion As New List(Of cvb.Rect)
         For Each roi In task.gridList
-            Dim correlation As New cv.Mat
-            cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+            Dim correlation As New cvb.Mat
+            cvb.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
             If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                 src(roi).CopyTo(dst3(roi))
                 roiMotion.Add(roi)
@@ -318,7 +318,7 @@ Public Class Motion_Grid : Inherits VB_Parent
         Next
         dst2 = src
         For Each roi In roiMotion
-            dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth)
+            dst2.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
         Next
         labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridList.Count)
         labels(3) = CStr(task.gridList.Count - roiMotion.Count) + " segments out of " + CStr(task.gridList.Count) + " had > " +
@@ -337,53 +337,53 @@ Public Class Motion_Intersect : Inherits VB_Parent
     Dim reconstructedRGB As Integer
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
         desc = "Track the max rectangle that covers all the motion until there is no motion in it."
     End Sub
-    Private Function buildEnclosingRect(tmp As cv.Mat)
-        Dim rectList As New List(Of cv.Rect)
+    Private Function buildEnclosingRect(tmp As cvb.Mat)
+        Dim rectList As New List(Of cvb.Rect)
         Dim dots(tmp.Total * 2 - 1) As Integer
         Marshal.Copy(tmp.Data, dots, 0, dots.Length)
-        Dim pointList As New List(Of cv.Point)
+        Dim pointList As New List(Of cvb.Point)
         For i = 0 To dots.Length - 1 Step 2
             If dots(i) >= 1 And dots(i) < dst2.Width - 2 And dots(i + 1) >= 1 And dots(i + 1) < dst2.Height - 2 Then
-                pointList.Add(New cv.Point(dots(i), dots(i + 1)))
+                pointList.Add(New cvb.Point(dots(i), dots(i + 1)))
             End If
         Next
 
-        Dim flags = 4 Or cv.FloodFillFlags.MaskOnly Or cv.FloodFillFlags.FixedRange
-        Dim rect As cv.Rect
-        Dim motionMat = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        Dim matPoints = dst1(New cv.Rect(1, 1, motionMat.Width - 2, motionMat.Height - 2))
+        Dim flags = 4 Or cvb.FloodFillFlags.MaskOnly Or cvb.FloodFillFlags.FixedRange
+        Dim rect As cvb.Rect
+        Dim motionMat = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        Dim matPoints = dst1(New cvb.Rect(1, 1, motionMat.Width - 2, motionMat.Height - 2))
         For Each pt In pointList
             If motionMat.Get(Of Byte)(pt.Y, pt.X) = 0 And matPoints.Get(Of Byte)(pt.Y, pt.X) <> 0 Then
                 Dim count = matPoints.FloodFill(motionMat, pt, 255, rect, 0, 0, flags Or (255 << 8))
                 If count <= minCount Then Continue For
-                rectList.Add(New cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1))
+                rectList.Add(New cvb.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1))
             End If
         Next
 
         labels(3) = "There were " + CStr(CInt(dots.Length / 2)) + " points collected"
 
-        If rectList.Count = 0 Then Return New cv.Rect
-        Dim motionRect As cv.Rect = rectList(0)
+        If rectList.Count = 0 Then Return New cvb.Rect
+        Dim motionRect As cvb.Rect = rectList(0)
         For Each r In rectList
             motionRect = motionRect.Union(r)
         Next
         Return motionRect
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Static color = src.Clone
-        Static lastMotionRect As cv.Rect = task.motionRect
+        Static lastMotionRect As cvb.Rect = task.motionRect
         task.motionFlag = False
         If task.heartBeat Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
             task.motionFlag = True
         Else
             bgSub.Run(src)
             dst1 = bgSub.dst2
-            Dim tmp As New cv.Mat
-            cv.Cv2.FindNonZero(dst1, tmp)
+            Dim tmp As New cvb.Mat
+            cvb.Cv2.FindNonZero(dst1, tmp)
 
             If tmp.Total > src.Total / 2 Then
                 task.motionFlag = True
@@ -399,7 +399,7 @@ Public Class Motion_Intersect : Inherits VB_Parent
         If task.motionFlag Then
             labels(2) = CStr(reconstructedRGB) + " frames since last full image"
             reconstructedRGB = 0
-            task.motionRect = New cv.Rect
+            task.motionRect = New cvb.Rect
             dst2 = src.Clone
         End If
 
@@ -414,7 +414,7 @@ Public Class Motion_Intersect : Inherits VB_Parent
         If standaloneTest() Then
             If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
                 src(task.motionRect).CopyTo(dst0(task.motionRect))
-                color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth, task.lineType)
+                color.Rectangle(task.motionRect, cvb.Scalar.White, task.lineWidth, task.lineType)
             End If
         End If
         lastMotionRect = task.motionRect
@@ -430,13 +430,13 @@ End Class
 Public Class Motion_RectTest : Inherits VB_Parent
     Dim motion As New Motion_Enclosing
     Dim diff As New Diff_Basics
-    Dim lastRects As New List(Of cv.Rect)
+    Dim lastRects As New List(Of cvb.Rect)
     Public Sub New()
         UpdateAdvice(traceName + ": gOptions frame history slider will impact results.")
         labels(3) = "The white spots show the difference of the constructed image from the current image."
         desc = "Track the RGB image using Motion_Enclosing to isolate the motion"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         motion.Run(src)
         Dim r = motion.motionRect
         If task.heartBeat Or r.Width * r.Height > src.Total / 2 Or task.frameCount < 50 Then
@@ -456,9 +456,9 @@ Public Class Motion_RectTest : Inherits VB_Parent
         End If
 
         If standaloneTest() Then
-            diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            diff.lastFrame = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst2)
-            dst3 = diff.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = diff.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
             dst3.Rectangle(r, task.HighlightColor, task.lineWidth, task.lineType)
         End If
     End Sub
@@ -477,17 +477,17 @@ Public Class Motion_HistoryTest : Inherits VB_Parent
     Dim frames As New History_Basics
     Public Sub New()
         task.gOptions.pixelDiffThreshold = 10
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Detect motion using the last X images"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         diff.Run(src)
-        dst1 = diff.dst2.Threshold(0, 1, cv.ThresholdTypes.Binary)
+        dst1 = diff.dst2.Threshold(0, 1, cvb.ThresholdTypes.Binary)
         frames.Run(dst1)
 
-        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = frames.dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
         labels(2) = "Cumulative diff for the last " + CStr(task.frameHistoryCount) + " frames"
     End Sub
 End Class
@@ -506,7 +506,7 @@ Public Class Motion_History : Inherits VB_Parent
         task.gOptions.FrameHistory.Value = 10
         desc = "Accumulate differences from the previous BGR images."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         motionCore.Run(src)
         dst2 = motionCore.dst2
 
@@ -523,26 +523,26 @@ End Class
 Public Class Motion_Enclosing : Inherits VB_Parent
     Dim redMasks As New RedCloud_Basics
     Dim learnRate As Double
-    Public motionRect As New cv.Rect
+    Public motionRect As New cvb.Rect
     Public Sub New()
         If dst2.Width >= 1280 Then learnRate = 0.5 Else learnRate = 0.1 ' learn faster with large images (slower frame rate)
         cPtr = BGSubtract_BGFG_Open(4)
         labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
         desc = "Build an enclosing rectangle for the motion"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, learnRate)
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cvb.ThresholdTypes.Binary)
 
         redMasks.inputMask = Not dst2
         redMasks.Run(dst2)
 
-        motionRect = New cv.Rect
+        motionRect = New cvb.Rect
         If task.redCells.Count < 2 Then Exit Sub
         motionRect = task.redCells.ElementAt(1).rect
         For i = 2 To task.redCells.Count - 1
@@ -551,7 +551,7 @@ Public Class Motion_Enclosing : Inherits VB_Parent
         Next
 
         If motionRect.Width > dst2.Width / 2 And motionRect.Height > dst2.Height / 2 Then
-            motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            motionRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
         End If
         dst2.Rectangle(motionRect, 255, task.lineWidth, task.lineType)
     End Sub
@@ -572,8 +572,8 @@ Public Class Motion_Grayscale : Inherits VB_Parent
                   "Diff of input and latest accumulated grayscale image"}
         desc = "Display the grayscale image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cvb.Mat)
+        src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then
             dst2 = src.Clone
         ElseIf task.motionDetected Then
@@ -609,7 +609,7 @@ Public Class Motion_RedCloud : Inherits VB_Parent
         labels(3) = "Motion detected in the cells below"
         desc = "Use RedCloud to define where there is motion"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -632,19 +632,19 @@ End Class
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Diff : Inherits VB_Parent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "", "Unstable mask", "Pixel difference"}
         desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Or dst1.Channels <> 1 Then
             dst1 = src.Clone
             dst2.SetTo(0)
         End If
 
-        cv.Cv2.Absdiff(src, dst1, dst3)
-        dst2 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        cvb.Cv2.Absdiff(src, dst1, dst3)
+        dst2 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
         dst1 = src.Clone
     End Sub
 End Class
@@ -660,7 +660,7 @@ Public Class Motion_Contours : Inherits VB_Parent
         labels(2) = "Enclosing rectangles are yellow in dst2 and dst3"
         desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         dst2 = src
         motion.Run(src)
         dst3 = motion.dst3
@@ -678,7 +678,7 @@ Public Class Motion_PointCloud : Inherits VB_Parent
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
         If standaloneTest() Then
             If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
@@ -701,13 +701,13 @@ Public Class Motion_Depth : Inherits VB_Parent
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
         desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.heartBeat Then dst2 = task.pcSplit(2).Clone
 
         If task.motionDetected Then task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
 
         diff.Run(task.pcSplit(2))
-        diff.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
+        diff.dst2.ConvertTo(dst3, cvb.MatType.CV_8U)
         diff.lastDepth32f = task.pcSplit(2)
     End Sub
 End Class
@@ -724,11 +724,11 @@ Public Class Motion_TestSingle : Inherits VB_Parent
     Dim singles As New Denoise_SinglePixels_CPP_VB
     Dim random As New Random_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         labels(2) = "Input to the Denoise_SinglePixels_CPP_VB code"
         desc = "Make sure Denoise_SinglePixels_CPP_VB is working properly."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         random.Run(empty)
         dst2.SetTo(0)
         For Each pt In random.PointList
@@ -753,21 +753,21 @@ End Class
 Public Class Motion_MinRect : Inherits VB_Parent
     Dim mRect As New Area_MinRect
     Dim history As New History_Basics8U
-    Dim lastFrame As cv.Mat
+    Dim lastFrame As cvb.Mat
     Dim options As New Options_MinArea
     Dim singles As New Denoise_SinglePixels_CPP_VB
     Public Sub New()
         task.gOptions.setPixelDifference(10)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find the nonzero points of motion and fit a rotated rectangle to them."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.FirstPass Then lastFrame = src.Clone
-        cv.Cv2.Absdiff(src, lastFrame, dst2)
-        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        cvb.Cv2.Absdiff(src, lastFrame, dst2)
+        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
         singles.Run(dst2)
         dst3 = singles.dst2
         lastFrame = src.Clone
@@ -780,9 +780,9 @@ Public Class Motion_MinRect : Inherits VB_Parent
         dst3.SetTo(0)
         If nonzeros.Rows > options.numPoints Then
             Dim minX As Integer = Integer.MaxValue, maxX As Integer = 0, minY As Integer = Integer.MaxValue, maxY As Integer = 0
-            Dim p1 As cv.Point, p2 As cv.Point, p3 As cv.Point, p4 As cv.Point
+            Dim p1 As cvb.Point, p2 As cvb.Point, p3 As cvb.Point, p4 As cvb.Point
             For i = 0 To nonzeros.Rows - 1
-                Dim pt = nonzeros.Get(Of cv.Point)(i, 0)
+                Dim pt = nonzeros.Get(Of cvb.Point)(i, 0)
                 If pt.X < minX Then
                     minX = pt.X
                     p1 = pt
@@ -801,9 +801,9 @@ Public Class Motion_MinRect : Inherits VB_Parent
                 End If
             Next
 
-            mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
+            mRect.inputPoints = New List(Of cvb.Point2f)({p1, p2, p3, p4})
             mRect.Run(empty)
-            DrawRotatedRect(mRect.minRect, dst3, cv.Scalar.White)
+            DrawRotatedRect(mRect.minRect, dst3, cvb.Scalar.White)
             If dst3.CountNonZero > dst3.Total / 2 Then dst3.SetTo(255)
         End If
     End Sub

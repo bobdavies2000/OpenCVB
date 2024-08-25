@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Module ORB_Module
     <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBWaitForFrame(cPtr As IntPtr) As IntPtr
     End Function
@@ -29,7 +29,7 @@ Public Class CameraORB : Inherits Camera
     Public deviceNum As Integer
     Public deviceName As String
     Public cPtrOpen As IntPtr
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
         MyBase.setupMats(WorkingRes)
 
@@ -43,7 +43,7 @@ Public Class CameraORB : Inherits Camera
         cameraInfo.fx = intrinInfo(2)
         cameraInfo.fy = intrinInfo(3)
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(WorkingRes As cvb.Size)
         If cPtr = 0 Then Exit Sub
 
         Try
@@ -55,11 +55,11 @@ Public Class CameraORB : Inherits Camera
             End While
 
             Dim accelFrame = ORBAccel(cPtr)
-            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(accelFrame)
             ' IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
 
             Dim gyroFrame = ORBGyro(cPtr)
-            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame)
 
             Static imuStartTime = ORBIMUTimeStamp(cPtr)
             IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
@@ -67,42 +67,42 @@ Public Class CameraORB : Inherits Camera
             SyncLock cameraLock
                 Dim cols = WorkingRes.Width, rows = WorkingRes.Height
                 If captureRes = WorkingRes Then
-                    If colorData <> 0 Then mbuf(mbIndex).color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorData).Clone
+                    If colorData <> 0 Then mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorData).Clone
 
                     Dim pcData = ORBPointCloud(cPtr)
-                    If pcData <> 0 Then mbuf(mbIndex).pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData) * 0.001
+                    If pcData <> 0 Then mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcData) * 0.001
 
                     Dim leftData = ORBLeftImage(cPtr)
-                    If leftData <> 0 Then mbuf(mbIndex).leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, leftData).
-                            CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
+                    If leftData <> 0 Then mbuf(mbIndex).leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, leftData).
+                            CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
 
                     Dim rightData = ORBRightImage(cPtr)
-                    If rightData <> 0 Then mbuf(mbIndex).rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, rightData).
-                            CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
+                    If rightData <> 0 Then mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, rightData).
+                            CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
                 Else
                     If colorData <> 0 Then
-                        mbuf(mbIndex).color = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).
-                                                             Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                        mbuf(mbIndex).color = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC3, colorData).
+                                                             Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
                     End If
 
                     Dim pcData = ORBPointCloud(cPtr)
                     If pcData <> 0 Then
-                        mbuf(mbIndex).pointCloud = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcData).
-                                                                  Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 0.001
+                        mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_32FC3, pcData).
+                                                                  Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest) * 0.001
                     End If
 
                     Dim leftData = ORBLeftImage(cPtr)
                     If leftData <> 0 Then
-                        mbuf(mbIndex).leftView = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, leftData).
-                                                                  Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).
-                                                                  CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
+                        mbuf(mbIndex).leftView = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8U, leftData).
+                                                                  Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).
+                                                                  CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
                     End If
 
                     Dim rightData = ORBRightImage(cPtr)
                     If rightData <> 0 Then
-                        mbuf(mbIndex).rightView = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, rightData).
-                                                                 Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).
-                                                                 CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
+                        mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8U, rightData).
+                                                                 Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).
+                                                                 CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
                     End If
                 End If
             End SyncLock

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.ComponentModel
 Imports System.Windows.Forms
 Imports System.Drawing
@@ -30,9 +30,9 @@ Public Class OptionsContainer
     End Sub
     Public Sub layoutOptions(normalRequest As Boolean)
         Dim w = GetSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
-        Dim radioCheckOffset = New cv.Point(w / 2, 0)
+        Dim radioCheckOffset = New cvb.Point(w / 2, 0)
 
-        Dim sliderOffset As New cv.Point(0, 0)
+        Dim sliderOffset As New cvb.Point(0, 0)
         For Each title In hiddenOptions
             Dim hideList As New List(Of Form)
             For Each frm In Application.OpenForms

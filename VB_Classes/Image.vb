@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Imports System.Drawing
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
 Public Class Image_Basics : Inherits VB_Parent
     Public inputFileName As String
@@ -8,18 +8,18 @@ Public Class Image_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Load an image into OpenCVB"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         src = options.fullsizeImage
 
         If src.Width <> dst2.Width Or src.Height <> dst2.Height Then
-            Dim newSize = New cv.Size(dst2.Height * src.Width / src.Height, dst2.Height)
+            Dim newSize = New cvb.Size(dst2.Height * src.Width / src.Height, dst2.Height)
             If newSize.Width > dst2.Width Then
-                newSize = New cv.Size(dst2.Width, dst2.Width * src.Height / src.Width)
+                newSize = New cvb.Size(dst2.Width, dst2.Width * src.Height / src.Width)
             End If
             dst2.SetTo(0)
-            dst2(New cv.Rect(0, 0, newSize.Width, newSize.Height)) = src.Resize(newSize)
+            dst2(New cvb.Rect(0, 0, newSize.Width, newSize.Height)) = src.Resize(newSize)
         Else
             dst2 = src
         End If
@@ -41,7 +41,7 @@ Public Class Image_Series : Inherits VB_Parent
         images.options.imageSeries = True
         desc = "Display a new image from the directory every heartbeat"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         ' to work on a specific file, specify it here.
         ' options.fileInputName = new fileinfo(task.HomeDir + "Images/train/103041.jpg")
         images.Run(images.options.fullsizeImage)
@@ -65,16 +65,16 @@ Public Class Image_RedCloudColor : Inherits VB_Parent
         task.gOptions.setDisplay1()
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         images.Run(empty)
         dst0 = images.dst2.Clone
-        dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = images.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         redC.Run(dst0)
         dst2 = redC.dst2
 
         Dim mask = task.cellMap.InRange(0, 0)
-        dst2.SetTo(cv.Scalar.Black, mask)
+        dst2.SetTo(cvb.Scalar.Black, mask)
 
         labels(2) = redC.labels(2)
     End Sub
@@ -95,7 +95,7 @@ Public Class Image_CellStats : Inherits VB_Parent
         task.redOptions.setUseColorOnly(True)
         desc = "Display the statistics for the selected cell"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         task.pointCloud.SetTo(0)
         task.pcSplit = task.pointCloud.Split()
 
@@ -127,7 +127,7 @@ Public Class Image_MSER : Inherits VB_Parent
         FindSlider("MSER Max Area").Value = 200000
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         images.Run(options.fullsizeImage)
@@ -150,7 +150,7 @@ Public Class Image_Icon : Inherits VB_Parent
         inputImage = New Bitmap(task.HomeDir + "/Main_UI/Data/OpenCVB.bmp")
         desc = "Create an icon from an image"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If inputImage Is Nothing Then Exit Sub
         Dim iconHandle As IntPtr = inputImage.GetHicon()
         Dim icon As Icon = Icon.FromHandle(iconHandle)

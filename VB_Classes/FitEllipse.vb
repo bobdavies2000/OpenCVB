@@ -1,15 +1,15 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
+' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
 Public Class FitEllipse_Basics : Inherits VB_Parent
     Dim options As New Options_MinArea
-    Public inputPoints As New List(Of cv.Point2f)
-    Public box As cv.RotatedRect
-    Public vertices() As cv.Point2f
+    Public inputPoints As New List(Of cvb.Point2f)
+    Public box As cvb.RotatedRect
+    Public vertices() As cvb.Point2f
     Public Sub New()
         desc = "Use FitEllipse OpenCV API to draw around a set of points"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If not task.heartBeat Then Exit Sub
         If standaloneTest() Then
             options.RunVB()
@@ -18,17 +18,17 @@ Public Class FitEllipse_Basics : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize, cvb.Scalar.White)
         Next
 
         If inputPoints.Count > 4 Then
-            box = cv.Cv2.FitEllipse(inputPoints)
+            box = cvb.Cv2.FitEllipse(inputPoints)
             vertices = box.Points()
             If standaloneTest() Then
                 For j = 0 To vertices.Count - 1
-                    DrawLine(dst2, vertices(j), vertices((j + 1) Mod 4), cv.Scalar.Green)
+                    DrawLine(dst2, vertices(j), vertices((j + 1) Mod 4), cvb.Scalar.Green)
                 Next
-                dst2.Ellipse(box, cv.Scalar.Green, task.lineWidth, task.lineType)
+                dst2.Ellipse(box, cvb.Scalar.Green, task.lineWidth, task.lineType)
             End If
         End If
     End Sub
@@ -38,15 +38,15 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
+' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
 Public Class FitEllipse_AMS_CPP_VB : Inherits VB_Parent
     Dim options As New Options_MinArea
-    Public inputPoints As New List(Of cv.Point2f)
+    Public inputPoints As New List(Of cvb.Point2f)
     Public Sub New()
         labels(2) = "FitEllipse_AMS_CPP C++ "
         desc = "Use FitEllipse_AMS to draw around a set of points"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If not task.heartBeat Then Exit Sub
         If standaloneTest() Then
             options.RunVB()
@@ -54,10 +54,10 @@ Public Class FitEllipse_AMS_CPP_VB : Inherits VB_Parent
         End If
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
         Next
 
-        Dim input As cv.Mat = cv.Mat.FromPixelData(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
+        Dim input As cvb.Mat = cvb.Mat.FromPixelData(inputPoints.Count, 1, cvb.MatType.CV_32FC2, inputPoints.ToArray)
         Dim dataSrc(inputPoints.Count * 2 - 1) As Single
         Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
 
@@ -69,12 +69,12 @@ Public Class FitEllipse_AMS_CPP_VB : Inherits VB_Parent
         Marshal.Copy(boxPtr, ellipse, 0, ellipse.Length)
 
         Dim angle = ellipse(0)
-        Dim center As New cv.Point2f(ellipse(1), ellipse(2))
-        Dim size As New cv.Size2f(ellipse(3), ellipse(4))
+        Dim center As New cvb.Point2f(ellipse(1), ellipse(2))
+        Dim size As New cvb.Size2f(ellipse(3), ellipse(4))
         If size.Width < task.lineWidth + 1 Or size.Height < task.lineWidth + 1 Then Exit Sub
 
-        Dim box = New cv.RotatedRect(center, size, angle)
-        dst2.Ellipse(box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        Dim box = New cvb.RotatedRect(center, size, angle)
+        dst2.Ellipse(box, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -83,24 +83,24 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
+' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
 Public Class FitEllipse_Direct_CPP_VB : Inherits VB_Parent
     Dim options As New Options_MinArea
     Public Sub New()
         labels(2) = "The FitEllipse_Direct C++ "
         desc = "Use FitEllipse to draw around a set of points"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If not task.heartBeat Then Exit Sub
         options.RunVB()
         Dim dataSrc(options.srcPoints.Count * 2 - 1) As Single
 
         dst2.SetTo(0)
         For Each pt In options.srcPoints
-            DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize, cvb.Scalar.White)
         Next
 
-        Dim input As cv.Mat = cv.Mat.FromPixelData(options.srcPoints.Count, 1, cv.MatType.CV_32FC2, options.srcPoints.ToArray)
+        Dim input As cvb.Mat = cvb.Mat.FromPixelData(options.srcPoints.Count, 1, cvb.MatType.CV_32FC2, options.srcPoints.ToArray)
         Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
 
         Dim srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
@@ -111,12 +111,12 @@ Public Class FitEllipse_Direct_CPP_VB : Inherits VB_Parent
         Marshal.Copy(boxPtr, ellipse, 0, ellipse.Length)
 
         Dim angle = ellipse(0)
-        Dim center As New cv.Point2f(ellipse(1), ellipse(2))
-        Dim size As New cv.Size2f(ellipse(3), ellipse(4))
+        Dim center As New cvb.Point2f(ellipse(1), ellipse(2))
+        Dim size As New cvb.Size2f(ellipse(3), ellipse(4))
         If size.Width < task.lineWidth + 1 Or size.Height < task.lineWidth + 1 Then Exit Sub
 
-        Dim box = New cv.RotatedRect(center, size, angle)
-        dst2.Ellipse(box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        Dim box = New cvb.RotatedRect(center, size, angle)
+        dst2.Ellipse(box, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -132,7 +132,7 @@ Public Class FitEllipse_RedCloud : Inherits VB_Parent
     Public Sub New()
         desc = "Create an ellipse from a contour"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If not task.heartBeat Then Exit Sub
         redC.Run(src)
         dst2 = redC.dst2
@@ -140,12 +140,12 @@ Public Class FitEllipse_RedCloud : Inherits VB_Parent
         If task.rc.contour Is Nothing Then Exit Sub
         fitE.inputPoints.Clear()
         For Each pt In task.rc.contour
-            fitE.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
+            fitE.inputPoints.Add(New cvb.Point2f(pt.X, pt.Y))
         Next
         fitE.Run(empty)
         dst3.SetTo(0)
-        dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
-        dst3.Rectangle(task.rc.rect, cv.Scalar.White, task.lineWidth, task.lineType)
-        dst3(task.rc.rect).Ellipse(fitE.box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        dst3(task.rc.rect).SetTo(cvb.Scalar.White, task.rc.mask)
+        dst3.Rectangle(task.rc.rect, cvb.Scalar.White, task.lineWidth, task.lineType)
+        dst3(task.rc.rect).Ellipse(fitE.box, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
     End Sub
 End Class

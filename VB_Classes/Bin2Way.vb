@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class Bin2Way_Basics : Inherits VB_Parent
     Public hist As New Hist_Basics
     Public mats As New Mat_4Click
@@ -10,9 +10,9 @@ Public Class Bin2Way_Basics : Inherits VB_Parent
         labels = {"", "", "Image separated into 2 segments from darkest and lightest", "Histogram Of grayscale image"}
         desc = "Split an image into 2 parts - darkest and lightest,"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Dim bins = task.histogramBins
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
         dst3 = hist.dst2
 
@@ -27,7 +27,7 @@ Public Class Bin2Way_Basics : Inherits VB_Parent
         Next
 
         Dim offset = halfSplit / bins * dst3.Width
-        DrawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White)
+        DrawLine(dst3, New cvb.Point(offset, 0), New cvb.Point(offset, dst3.Height), cvb.Scalar.White)
 
         mats.mat(0) = src.InRange(0, halfSplit - 1)         ' darkest
         mats.mat(1) = src.InRange(halfSplit, 255)            ' lightest
@@ -53,8 +53,8 @@ Public Class Bin2Way_KMeans : Inherits VB_Parent
         labels = {"", "", "Darkest (upper left),lightest (upper right)", "Selected image from dst2"}
         desc = "Use kmeans with each of the 2-way split images"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         bin2.Run(src)
 
         kmeans.Run(src)
@@ -81,7 +81,7 @@ Public Class Bin2Way_RedCloudDarkest : Inherits VB_Parent
     Public Sub New()
         desc = "Use RedCloud with the darkest regions"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standalone Then bin2.Run(src)
 
         flood.inputMask = Not bin2.mats.mat(0)
@@ -103,7 +103,7 @@ Public Class Bin2Way_RedCloudLightest : Inherits VB_Parent
     Public Sub New()
         desc = "Use RedCloud with the lightest regions"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standalone Then bin2.Run(src)
 
         flood.inputMask = Not bin2.mats.mat(3)
@@ -122,11 +122,11 @@ Public Class Bin2Way_RecurseOnce : Inherits VB_Parent
     Public Sub New()
         desc = "Keep splitting an image between light and dark"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         bin2.fraction = src.Total / 2
-        bin2.hist.inputMask = New cv.Mat
+        bin2.hist.inputMask = New cvb.Mat
         bin2.Run(src)
         Dim darkestMask = bin2.mats.mat(0).Clone
         Dim lightestMask = bin2.mats.mat(1).Clone
@@ -158,19 +158,19 @@ End Class
 Public Class Bin2Way_RedCloud : Inherits VB_Parent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
-    Dim cellMaps(3) As cv.Mat, redCells(3) As List(Of rcData)
+    Dim cellMaps(3) As cvb.Mat, redCells(3) As List(Of rcData)
     Dim options As New Options_Bin2WayRedCloud
     Public Sub New()
         flood.showSelected = False
         desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
-                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+                cellMaps(i) = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
             Next
         End If
 

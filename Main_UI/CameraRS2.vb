@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Text
 
 Module RS2_Module_CPP
@@ -30,16 +30,16 @@ Module RS2_Module_CPP
 End Module
 
 Structure RS2IMUdata
-    Public acceleration As cv.Point3f
-    Public velocity As cv.Point3f
-    Public angularVelocity As cv.Point3f
-    Public angularAcceleration As cv.Point3f
+    Public acceleration As cvb.Point3f
+    Public velocity As cvb.Point3f
+    Public angularVelocity As cvb.Point3f
+    Public angularAcceleration As cvb.Point3f
 End Structure
 Public Class CameraRS2 : Inherits Camera
     Public deviceNum As Integer
     Public deviceName As String
     Public cPtrOpen As IntPtr
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
         MyBase.setupMats(WorkingRes)
 
@@ -54,34 +54,34 @@ Public Class CameraRS2 : Inherits Camera
         cameraInfo.fx = intrinInfo(2)
         cameraInfo.fy = intrinInfo(3)
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(WorkingRes As cvb.Size)
         If cPtr = 0 Then Exit Sub
 
         ' if OpenCVB fails here, just unplug and plug in the RealSense camera.
         RS2WaitForFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
 
         Dim accelFrame = RS2Accel(cPtr)
-        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(accelFrame)
         IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
 
         Dim gyroFrame = RS2Gyro(cPtr)
-        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame)
 
         Static imuStartTime = RS2IMUTimeStamp(cPtr)
         IMU_TimeStamp = RS2IMUTimeStamp(cPtr) - imuStartTime
 
         SyncLock cameraLock
             Dim cols = WorkingRes.Width, rows = WorkingRes.Height
-            mbuf(mbIndex).color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone
-            Dim tmp As cv.Mat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, RS2Color(cPtr)).Clone
+            Dim tmp As cvb.Mat = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
             mbuf(mbIndex).leftView = tmp * 4 - 35 ' improved brightness specific to RealSense
-            tmp = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            tmp = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
             mbuf(mbIndex).rightView = tmp * 4 - 35 ' improved brightness specific to RealSense
             If captureRes <> WorkingRes Then
-                Dim pc = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr))
-                mbuf(mbIndex).pointCloud = pc.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                Dim pc = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_32FC3, RS2PointCloud(cPtr))
+                mbuf(mbIndex).pointCloud = pc.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             Else
-                mbuf(mbIndex).pointCloud = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr)).Clone
+                mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_32FC3, RS2PointCloud(cPtr)).Clone
             End If
         End SyncLock
         MyBase.GetNextFrameCounts(IMU_FrameTime)

@@ -1,11 +1,11 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Duster_Basics : Inherits VB_Parent
     Public dust As New Duster_MaskZ
     Public Sub New()
         desc = "Removed blowback in the pointcloud"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         dust.Run(src)
 
         For i = 1 To dust.classCount
@@ -14,7 +14,7 @@ Public Class Duster_Basics : Inherits VB_Parent
             task.pcSplit(2).SetTo(depth(0), mask)
         Next
 
-        cv.Cv2.Merge(task.pcSplit, dst2)
+        cvb.Cv2.Merge(task.pcSplit, dst2)
         dst2.SetTo(0, Not dust.dst0)
         dst2.SetTo(0, task.maxDepthMask)
 
@@ -35,7 +35,7 @@ Public Class Duster_MaskZ : Inherits VB_Parent
         labels(3) = "Any flickering below is from changes in the sorted order of the clusters.  It should not be a problem."
         desc = "Build a histogram that finds the clusters of depth data"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
         hist.bins = options.bins
 
@@ -43,7 +43,7 @@ Public Class Duster_MaskZ : Inherits VB_Parent
         task.maxDepthMask = src32f.InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
         src32f.SetTo(task.MaxZmeters, task.maxDepthMask)
 
-        hist.fixedRanges = {New cv.Rangef(0.001, task.MaxZmeters)}
+        hist.fixedRanges = {New cvb.Rangef(0.001, task.MaxZmeters)}
         hist.Run(src32f)
 
         Dim histArray = hist.histArray
@@ -52,14 +52,14 @@ Public Class Duster_MaskZ : Inherits VB_Parent
         histArray(histArray.Count - 1) = 0
 
         Dim start As Integer
-        Dim clusters As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
+        Dim clusters As New SortedList(Of Integer, cvb.Vec2i)(New compareAllowIdenticalIntegerInverted)
         Dim lastEntry As Single
         Dim sampleCount As Integer
 
         For i = 0 To histArray.Count - 1
             If histArray(i) > 0 And lastEntry = 0 Then start = i
             If histArray(i) = 0 And lastEntry > 0 Then
-                clusters.Add(sampleCount, New cv.Vec2i(start, i))
+                clusters.Add(sampleCount, New cvb.Vec2i(start, i))
                 sampleCount = 0
             End If
             lastEntry = histArray(i)
@@ -77,15 +77,15 @@ Public Class Duster_MaskZ : Inherits VB_Parent
         Next
 
         Marshal.Copy(histArray, 0, hist.histogram.Data, histArray.Length)
-        cv.Cv2.CalcBackProject({src32f}, {0}, hist.histogram, dst1, hist.ranges)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+        cvb.Cv2.CalcBackProject({src32f}, {0}, hist.histogram, dst1, hist.ranges)
+        dst1.ConvertTo(dst2, cvb.MatType.CV_8U)
 
         classCount += 1
         dst2.SetTo(classCount, task.maxDepthMask)
 
         dst3 = ShowPalette(dst2 * 255 / classCount)
         If task.heartBeat Then labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
-        dst0 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst0 = dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -97,7 +97,7 @@ Public Class Duster_BasicsY : Inherits VB_Parent
     Public Sub New()
         desc = "Removed blowback in the pointcloud"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         dust.Run(src)
 
         For i = 1 To dust.classCount
@@ -106,7 +106,7 @@ Public Class Duster_BasicsY : Inherits VB_Parent
             task.pcSplit(1).SetTo(pcY(0), mask)
         Next
 
-        cv.Cv2.Merge(task.pcSplit, dst2)
+        cvb.Cv2.Merge(task.pcSplit, dst2)
         dst2.SetTo(0, Not dust.dst0)
         dst2.SetTo(0, task.maxDepthMask)
 
@@ -125,7 +125,7 @@ Public Class Duster_RedCloud : Inherits VB_Parent
     Public Sub New()
         desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         duster.Run(src)
         dst1 = duster.dust.dst2.InRange(1, 1)
 

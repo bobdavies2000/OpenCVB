@@ -1,10 +1,10 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.Windows.Forms
 Public Class VB_Controls_CSharp : Inherits VB_Parent
     Public Sub New()
         desc = "Access form controls from C#"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         SetTrueText("The Controls_Basics algorithm is to support FindSlider/FindCheckBox/FindRadio from C#" + vbCrLf +
                     "It has no output...")
     End Sub
@@ -17,7 +17,7 @@ Public Class VB_Controls_CSharp : Inherits VB_Parent
         If standalone = False And callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
         Return standalone
     End Function
-    Public Sub RunFromVB(src As cv.Mat, csCode As Object)
+    Public Sub RunFromVB(src As cvb.Mat, csCode As Object)
         If task.testAllRunning = False Then measureStartRun(csCode.traceName)
 
         trueData.Clear()

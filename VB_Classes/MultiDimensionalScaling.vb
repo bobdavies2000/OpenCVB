@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 ' https://github.com/shimat/opencvsharp_2410/blob/master/sample/CStyleSamplesCS/Samples/MDS.cs
 Public Class MultiDimensionScaling_Cities : Inherits VB_Parent
     Dim CityDistance() As Double = { ' 10x10 array of distances for 10 cities
@@ -13,10 +13,10 @@ Public Class MultiDimensionScaling_Cities : Inherits VB_Parent
         2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    ' Seattle
         543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C.
     Public Sub New()
-        labels(2) = "Resulting solution using cv.Eigen"
+        labels(2) = "Resulting solution using cvb.Eigen"
         desc = "Use OpenCV's Eigen function to solve a system of equations"
     End Sub
-    Private Function Torgerson(src As cv.Mat) As Double
+    Private Function Torgerson(src As cvb.Mat) As Double
         Dim rows = src.Rows
         Dim mm as mmData = GetMinMax(src)
         Dim c1 = 0
@@ -30,23 +30,23 @@ Public Class MultiDimensionScaling_Cities : Inherits VB_Parent
         Next
         Return Math.Max(Math.Max(c1, mm.maxVal), 0)
     End Function
-    Private Function CenteringMatrix(n As integer) As cv.Mat
-        Return cv.Mat.Eye(n, n, cv.MatType.CV_64F) - 1.0 / n
+    Private Function CenteringMatrix(n As integer) As cvb.Mat
+        Return cvb.Mat.Eye(n, n, cvb.MatType.CV_64F) - 1.0 / n
     End Function
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Dim size = 10 ' we are working with 10 cities.
-        Dim cityMat = cv.Mat.FromPixelData(size, size, cv.MatType.CV_64FC1, CityDistance)
+        Dim cityMat = cvb.Mat.FromPixelData(size, size, cvb.MatType.CV_64FC1, CityDistance)
         cityMat += Torgerson(cityMat)
         cityMat = cityMat.Mul(cityMat)
         Dim g = CenteringMatrix(size)
 
         ' calculates the inner product matrix b
         Dim b = g * cityMat * g.T * -0.5
-        Dim vectors = New cv.Mat(size, size, cv.MatType.CV_64F)
-        Dim values = New cv.Mat(size, 1, cv.MatType.CV_64F)
+        Dim vectors = New cvb.Mat(size, size, cvb.MatType.CV_64F)
+        Dim values = New cvb.Mat(size, 1, cvb.MatType.CV_64F)
 
-        cv.Cv2.Eigen(b, values, vectors)
-        values.Threshold(0, 0, cv.ThresholdTypes.Tozero)
+        cvb.Cv2.Eigen(b, values, vectors)
+        values.Threshold(0, 0, cvb.ThresholdTypes.Tozero)
 
         Dim result = vectors.RowRange(0, 2)
         Dim at = result.GetGenericIndexer(Of Double)()
@@ -56,7 +56,7 @@ Public Class MultiDimensionScaling_Cities : Inherits VB_Parent
             Next
         Next
 
-        result.Normalize(0, 800, cv.NormTypes.MinMax)
+        result.Normalize(0, 800, cvb.NormTypes.MinMax)
 
         at = result.GetGenericIndexer(Of Double)()
         Dim maxX As Double, maxY As Double, minX As Double = Double.MaxValue, minY As Double = Double.MaxValue
@@ -76,8 +76,8 @@ Public Class MultiDimensionScaling_Cities : Inherits VB_Parent
             Dim y = at(1, c)
             x = w * 0.1 + 0.7 * w * (x - minX) / (maxX - minX)
             y = h * 0.1 + 0.7 * h * (y - minY) / (maxY - minY)
-            DrawCircle(dst2, New cv.Point(x, y), task.DotSize + 3, cv.Scalar.Red)
-            Dim textPos = New cv.Point(x + 5, y + 10)
+            DrawCircle(dst2, New cvb.Point(x, y), task.DotSize + 3, cvb.Scalar.Red)
+            Dim textPos = New cvb.Point(x + 5, y + 10)
             Dim cityName = Choose(c + 1, "Atlanta", "Chicago", "Denver", "Houston", "Los Angeles", "Miami", "New York", "San Francisco",
                                          "Seattle", "Washington D.C.")
             SetTrueText(cityName, textPos, 2)

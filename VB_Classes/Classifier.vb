@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 
@@ -8,19 +8,19 @@ Public Class Classifier_Basics : Inherits VB_Parent
         cPtr = OEX_Points_Classifier_Open()
         desc = "OpenCV Example Points_Classifier"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If task.optionsChanged Then task.gOptions.debugChecked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
 If(task.gOptions.debugChecked, 1, 0))
         task.gOptions.debugChecked = False
-        dst1 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
+        dst1 = cvb.Mat.FromPixelData(dst0.Rows, dst0.Cols, cvb.MatType.CV_32S, imagePtr)
 
-        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
+        dst1.ConvertTo(dst0, cvb.MatType.CV_8U)
         dst2 = ShowPalette(dst0 * 255 / 2)
         imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
-        dst3 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
+        dst3 = cvb.Mat.FromPixelData(dst2.Rows, dst2.Cols, cvb.MatType.CV_8UC3, imagePtr)
 
         SetTrueText("Click the global DebugCheckBox to get another set of points.", 3)
     End Sub
@@ -81,9 +81,9 @@ Public Class Classifier_Bayesian : Inherits VB_Parent
         cPtr = OEX_Points_Classifier_Open()
         desc = "Run the Bayesian classifier with the input."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Dim sampleCount As Integer, methodIndex = 0
-        If src.Type <> cv.MatType.CV_32FC2 Then
+        If src.Type <> cvb.MatType.CV_32FC2 Then
             options.RunVB()
             sampleCount = options.sampleCount
             methodIndex = options.methodIndex
@@ -94,8 +94,8 @@ Public Class Classifier_Bayesian : Inherits VB_Parent
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, sampleCount, methodIndex, dst2.Rows, dst2.Cols,
 If(task.gOptions.debugChecked, 1, 0))
         task.gOptions.debugChecked = False
-        dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr)
-        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
+        dst1 = cvb.Mat.FromPixelData(dst1.Rows, dst1.Cols, cvb.MatType.CV_32S, imagePtr)
+        dst1.ConvertTo(dst0, cvb.MatType.CV_8U)
         dst2 = ShowPalette(dst0 * 255 / 2)
         imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
     End Sub
@@ -115,13 +115,13 @@ Public Class Classifier_BayesianTest : Inherits VB_Parent
     Dim nabs As New Neighbors_Precise
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output"}
         If standalone Then task.gOptions.setDisplay1()
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -129,7 +129,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Parent
         'nabs.redCells = task.redCells
         'nabs.Run(task.cellMap)
 
-        'Dim trainList As New List(Of cv.Scalar)
+        'Dim trainList As New List(Of cvb.Scalar)
         'Dim responseList As New List(Of Integer)
         'For Each rc In task.redCells
         '    trainList.Add(rc.depthMean)
@@ -146,7 +146,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Parent
 
         'responseList(task.rc.index) = 1
 
-        'Dim queryList As New List(Of cv.Scalar)
+        'Dim queryList As New List(Of cvb.Scalar)
         'Dim maskList As New List(Of Integer)
         'For i = responseList.Count - 1 To 0 Step -1
         '    If responseList(i) = -1 Then

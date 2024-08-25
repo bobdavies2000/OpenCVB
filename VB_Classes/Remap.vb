@@ -1,15 +1,15 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Remap_Basics : Inherits VB_Parent
     Public direction As Integer = 3 ' default to remap horizontally and vertically
-    Dim mapx1 As cv.Mat, mapx2 As cv.Mat, mapx3 As cv.Mat
-    Dim mapy1 As cv.Mat, mapy2 As cv.Mat, mapy3 As cv.Mat
+    Dim mapx1 As cvb.Mat, mapx2 As cvb.Mat, mapx3 As cvb.Mat
+    Dim mapy1 As cvb.Mat, mapy2 As cvb.Mat, mapy3 As cvb.Mat
     Public Sub New()
-        mapx1 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapy1 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapx2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapy2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapx3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapy3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
+        mapx1 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F)
+        mapy1 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F)
+        mapx2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F)
+        mapy2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F)
+        mapx3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F)
+        mapy3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F)
 
         For j = 0 To mapx1.Rows - 1
             For i = 0 To mapx1.Cols - 1
@@ -24,18 +24,18 @@ Public Class Remap_Basics : Inherits VB_Parent
 
         desc = "Use remap to reflect an image in 4 directions."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         labels(2) = Choose(direction + 1, "Remap_Basics - original", "Remap vertically", "Remap horizontally", "Remap horizontally and vertically")
 
         Select Case direction
             Case 0
                 dst2 = src
             Case 1
-                cv.Cv2.Remap(src, dst2, mapx1, mapy1, cv.InterpolationFlags.Nearest)
+                cvb.Cv2.Remap(src, dst2, mapx1, mapy1, cvb.InterpolationFlags.Nearest)
             Case 2
-                cv.Cv2.Remap(src, dst2, mapx2, mapy2, cv.InterpolationFlags.Nearest)
+                cvb.Cv2.Remap(src, dst2, mapx2, mapy2, cvb.InterpolationFlags.Nearest)
             Case 3
-                cv.Cv2.Remap(src, dst2, mapx3, mapy3, cv.InterpolationFlags.Nearest)
+                cvb.Cv2.Remap(src, dst2, mapx3, mapy3, cvb.InterpolationFlags.Nearest)
         End Select
 
         If task.heartBeat Then
@@ -53,18 +53,18 @@ Public Class Remap_Flip : Inherits VB_Parent
     Public Sub New()
         desc = "Use flip to remap an image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         labels(2) = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",
                                             "Remap_Flip - flip horizontal and vertical")
         Select Case direction
             Case 0 ' do nothing!
                 src.CopyTo(dst2)
             Case 1 ' flip vertically
-                cv.Cv2.Flip(src, dst2, cv.FlipMode.Y)
+                cvb.Cv2.Flip(src, dst2, cvb.FlipMode.Y)
             Case 2 ' flip horizontally
-                cv.Cv2.Flip(src, dst2, cv.FlipMode.X)
+                cvb.Cv2.Flip(src, dst2, cvb.FlipMode.X)
             Case 3 ' flip horizontally and vertically
-                cv.Cv2.Flip(src, dst2, cv.FlipMode.XY)
+                cvb.Cv2.Flip(src, dst2, cvb.FlipMode.XY)
         End Select
         If task.heartBeat Then
             direction += 1
@@ -84,7 +84,7 @@ Public Class Flip_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Placeholder to make it easy to remember 'Remap'."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         flip.Run(src)
         dst2 = flip.dst2
         labels = flip.labels

@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Module K4A_Interface
     <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4AOpen(width As Integer, height As Integer) As IntPtr
     End Function
@@ -21,7 +21,7 @@ Module K4A_Interface
     End Sub
 End Module
 Public Class CameraKinect : Inherits Camera
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
         MyBase.setupMats(WorkingRes)
         cPtr = K4AOpen(captureRes.Width, captureRes.Height)
@@ -41,9 +41,9 @@ Public Class CameraKinect : Inherits Camera
     End Sub
     Structure imuData
         Dim placeholderForTemperature As Single
-        Dim imuAccel As cv.Point3f
+        Dim imuAccel As cvb.Point3f
         Dim accelTimeStamp As Long
-        Dim imu_Gyro As cv.Point3f
+        Dim imu_Gyro As cvb.Point3f
     End Structure
     Structure intrinsicsData
         Dim cx As Single            ' Principal point In image, x */
@@ -62,7 +62,7 @@ Public Class CameraKinect : Inherits Camera
         Dim p1 As Single            ' Tangential distortion coefficient 1 */
         Dim metric_radius As Single ' Metric radius */
     End Structure
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(WorkingRes As cvb.Size)
         Try
             Dim imuFrame As IntPtr
             If cPtr = 0 Then Exit Sub
@@ -93,19 +93,19 @@ Public Class CameraKinect : Inherits Camera
             If cPtr = 0 Then Exit Sub
 
             SyncLock cameraLock
-                mbuf(mbIndex).color = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, K4AColor(cPtr)).Clone
+                mbuf(mbIndex).color = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, K4AColor(cPtr)).Clone
 
                 ' so depth data fits into 0-255 (approximately)
-                mbuf(mbIndex).leftView = (cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_16U,
-                                          K4ALeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone
+                mbuf(mbIndex).leftView = (cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_16U,
+                                          K4ALeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone
                 mbuf(mbIndex).rightView = mbuf(mbIndex).leftView
                 If captureRes <> WorkingRes Then
-                    Dim tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_16SC3,
-                                     K4APointCloud(cPtr)).Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                    tmp.ConvertTo(mbuf(mbIndex).pointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
+                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16SC3,
+                                     K4APointCloud(cPtr)).Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                    tmp.ConvertTo(mbuf(mbIndex).pointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 Else
-                    Dim tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_16SC3, K4APointCloud(cPtr))
-                    tmp.ConvertTo(mbuf(mbIndex).pointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
+                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16SC3, K4APointCloud(cPtr))
+                    tmp.ConvertTo(mbuf(mbIndex).pointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 End If
             End SyncLock
             MyBase.GetNextFrameCounts(IMU_FrameTime)

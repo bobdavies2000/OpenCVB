@@ -1,5 +1,5 @@
 ﻿Imports System.Threading
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Threading_Test : Inherits VB_Parent
     Dim thread1 As System.Threading.Thread
     Dim thread2 As System.Threading.Thread
@@ -29,7 +29,7 @@ Public Class Threading_Test : Inherits VB_Parent
             End If
         End While
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If thread1 Is Nothing Then
             thread1 = New System.Threading.Thread(AddressOf runThread)
             thread1.Name = "Threading_Test1"
@@ -74,7 +74,7 @@ Public Class Threading_Test1 : Inherits VB_Parent
             End If
         End While
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If thread Is Nothing Then
             thread = New System.Threading.Thread(AddressOf runThread)
             thread.Name = "Threading_Test"

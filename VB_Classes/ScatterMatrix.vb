@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 ' https://en.wikipedia.org/wiki/Scatter_matrix
 Public Class ScatterMatrix_Example : Inherits VB_Parent
     Dim data(,) As Double
@@ -72,7 +72,7 @@ Public Class ScatterMatrix_Example : Inherits VB_Parent
         SetTrueText(strOut, 2)
     End Sub
 
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         ' Compute the mean vector
         Dim meanVector() As Double = ComputeMeanVector(data)
 

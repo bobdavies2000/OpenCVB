@@ -1,19 +1,19 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 'https://github.com/DinoZ1729/Double-Pendulum/blob/main/pendulum_with_trace.cpp
 Public Class Pendulum_Basics : Inherits VB_Parent
     Dim l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
-    Dim o1 = 2 * cv.Cv2.PI / 2, o2 = 2 * cv.Cv2.PI / 3
+    Dim o1 = 2 * cvb.Cv2.PI / 2, o2 = 2 * cvb.Cv2.PI / 3
     Dim w1 As Single, w2 As Single
     Dim g = 9.81
     Dim dw As Single = 2, dh As Single = 4
-    Dim center = New cv.Point2f(dst2.Width / 2, 0)
+    Dim center = New cvb.Point2f(dst2.Width / 2, 0)
     Dim fps As Single = 300
     Dim options = New Options_Pendulum()
     Public Sub New()
         labels = {"", "", "A double pendulum representation", "Trace of the pendulum end points (p1 and p2)"}
         desc = "Build a double pendulum"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         Dim accumulator As Single
@@ -43,10 +43,10 @@ Public Class Pendulum_Basics : Inherits VB_Parent
 
         accumulator += dt
 
-        Dim p1 = New cv.Point2f((dst2.Width / 2 + Math.Sin(o1) * l1 + dw * 0.5) / dw, dst2.Height - (Math.Cos(o1) * l1 + dh * 0.5) / dh + dst2.Height / dh / 2)
+        Dim p1 = New cvb.Point2f((dst2.Width / 2 + Math.Sin(o1) * l1 + dw * 0.5) / dw, dst2.Height - (Math.Cos(o1) * l1 + dh * 0.5) / dh + dst2.Height / dh / 2)
         ' adjust to fit in the image better
-        p1 = New cv.Point2f(p1.X * 2, p1.Y * 0.5)
-        Dim p2 = New cv.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5) / dh)
+        p1 = New cvb.Point2f(p1.X * 2, p1.Y * 0.5)
+        Dim p2 = New cvb.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5) / dh)
 
         DrawLine(dst2, center, p1, task.scalarColors(task.frameCount Mod 255))
         DrawLine(dst2, p1, p2, task.scalarColors(task.frameCount Mod 255))

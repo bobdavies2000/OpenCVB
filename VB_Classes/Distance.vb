@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Distance_Basics : Inherits VB_Parent
     Dim options As New Options_Distance
     Public Sub New()
@@ -6,15 +6,15 @@ Public Class Distance_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": use local options to control which method is used.")
         desc = "Distance algorithm basics."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If standaloneTest() Then src = task.depthRGB
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         dst0 = src.DistanceTransform(options.distanceType, 0)
         dst1 = Convert32f_To_8UC3(dst0)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
+        dst1.ConvertTo(dst2, cvb.MatType.CV_8UC1)
     End Sub
 End Class
 
@@ -30,17 +30,17 @@ Public Class Distance_Labels : Inherits VB_Parent
         labels(3) = "Input mask to distance transformm"
         desc = "Distance algorithm basics."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If standaloneTest() Then src = task.depthRGB
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        'Dim labels As cv.Mat
-        'cv.Cv2.DistanceTransformWithLabels(src, dst0, labels, cv.DistanceTypes.L2, cv.DistanceTransformMasks.Precise)
-        'Dim dist32f = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
-        'dist32f.ConvertTo(src, cv.MatType.CV_8UC1)
-        'dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        'Dim labels As cvb.Mat
+        'cvb.Cv2.DistanceTransformWithLabels(src, dst0, labels, cvb.DistanceTypes.L2, cvb.DistanceTransformMasks.Precise)
+        'Dim dist32f = dst0.Normalize(0, 255, cvb.NormTypes.MinMax)
+        'dist32f.ConvertTo(src, cvb.MatType.CV_8UC1)
+        'dst2 = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -58,23 +58,23 @@ Public Class Distance_Foreground : Inherits VB_Parent
         labels(3) = "Input mask to distance transformm"
         desc = "Distance algorithm basics."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Static cRadio = FindRadio("C")
         Static l1Radio = FindRadio("L1")
 
         foreground.Run(src)
         dst3 = If(useBackgroundAsInput, foreground.dst2, foreground.dst3)
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim DistanceType = cv.DistanceTypes.L2
-        If cRadio.Checked Then DistanceType = cv.DistanceTypes.C
-        If l1Radio.Checked Then DistanceType = cv.DistanceTypes.L1
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        Dim DistanceType = cvb.DistanceTypes.L2
+        If cRadio.Checked Then DistanceType = cvb.DistanceTypes.C
+        If l1Radio.Checked Then DistanceType = cvb.DistanceTypes.L1
 
         src = dst3 And src
-        Dim dist = src.DistanceTransform(DistanceType, cv.DistanceTransformMasks.Precise)
-        Dim dist32f = dist.Normalize(0, 255, cv.NormTypes.MinMax)
-        dist32f.ConvertTo(src, cv.MatType.CV_8UC1)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim dist = src.DistanceTransform(DistanceType, cvb.DistanceTransformMasks.Precise)
+        Dim dist32f = dist.Normalize(0, 255, cvb.NormTypes.MinMax)
+        dist32f.ConvertTo(src, cvb.MatType.CV_8UC1)
+        dst2 = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -90,7 +90,7 @@ Public Class Distance_Background : Inherits VB_Parent
         dist.useBackgroundAsInput = True
         desc = "Use distance algorithm on the background"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         dist.Run(src)
         dst2 = dist.dst2
         dst3 = dist.dst3
@@ -105,24 +105,24 @@ End Class
 
 
 Public Class Distance_Point3D : Inherits VB_Parent
-    Public inPoint1 As cv.Point3f
-    Public inPoint2 As cv.Point3f
+    Public inPoint1 As cvb.Point3f
+    Public inPoint2 As cvb.Point3f
     Public distance As Single
     Public Sub New()
         desc = "Compute the distance in meters between 3D points in the point cloud"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If standaloneTest() And task.heartBeat Then
-            inPoint1 = New cv.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
-            inPoint2 = New cv.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
+            inPoint1 = New cvb.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
+            inPoint2 = New cvb.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
 
             dst2.SetTo(0)
-            Dim p1 = New cv.Point(inPoint1.X, inPoint1.Y)
-            Dim p2 = New cv.Point(inPoint2.X, inPoint2.Y)
+            Dim p1 = New cvb.Point(inPoint1.X, inPoint1.Y)
+            Dim p2 = New cvb.Point(inPoint2.X, inPoint2.Y)
             DrawLine(dst2, p1, p2, task.HighlightColor)
 
-            Dim vec1 = task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)
-            Dim vec2 = task.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X)
+            Dim vec1 = task.pointCloud.Get(Of cvb.Point3f)(p1.Y, p1.X)
+            Dim vec2 = task.pointCloud.Get(Of cvb.Point3f)(p2.Y, p2.X)
         End If
 
         Dim x = inPoint1.X - inPoint2.X
@@ -143,17 +143,17 @@ End Class
 
 
 Public Class Distance_Point4D : Inherits VB_Parent
-    Public inPoint1 As cv.Vec4f
-    Public inPoint2 As cv.Vec4f
+    Public inPoint1 As cvb.Vec4f
+    Public inPoint2 As cvb.Vec4f
     Public distance As Single
     Public Sub New()
         desc = "Compute the distance between 4D points"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standaloneTest() Then
-            inPoint1 = New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
+            inPoint1 = New cvb.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
                                     msRNG.Next(0, task.MaxZmeters), msRNG.Next(0, task.MaxZmeters))
-            inPoint2 = New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
+            inPoint2 = New cvb.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
                                     msRNG.Next(0, task.MaxZmeters), msRNG.Next(0, task.MaxZmeters))
         End If
 
@@ -164,7 +164,7 @@ Public Class Distance_Point4D : Inherits VB_Parent
         distance = Math.Sqrt(x * x + y * y + z * z + d * d)
 
         strOut = inPoint1.ToString + vbCrLf + inPoint2.ToString + vbCrLf + "Distance = " + Format(distance, fmt1)
-        SetTrueText(strOut, New cv.Point(10, 10), 2)
+        SetTrueText(strOut, New cvb.Point(10, 10), 2)
     End Sub
 End Class
 
@@ -196,7 +196,7 @@ Public Class Distance_RedCloud : Inherits VB_Parent
         Next
         Return Math.Sqrt(result)
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         redC.Run(src)
 
         pixelVector.Clear()
@@ -231,7 +231,7 @@ Public Class Distance_RedCloud : Inherits VB_Parent
                 If index Mod 6 = 5 Then strOut += vbCrLf
                 index += 1
                 Dim rc = lastredCells(el.Value)
-                SetTrueText(el.Value, New cv.Point(rc.maxDist.X, rc.maxDist.Y + 10))
+                SetTrueText(el.Value, New cvb.Point(rc.maxDist.X, rc.maxDist.Y + 10))
             Next
 
             For Each el In distances
@@ -242,7 +242,7 @@ Public Class Distance_RedCloud : Inherits VB_Parent
 
         For Each el In lastDistances
             Dim rp = lastredCells(el.Value)
-            SetTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
+            SetTrueText(el.Value, New cvb.Point(rp.maxDist.X, rp.maxDist.Y + 10))
         Next
 
         SetTrueText(strOut, 1)
@@ -276,7 +276,7 @@ Public Class Distance_BinaryImage : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Measure the fragmentation of a binary image by using the distance transform"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         binary.Run(src)
         dst2 = binary.dst2
         labels(2) = binary.labels(2) + " Draw a rectangle to measure specific area."
@@ -287,6 +287,6 @@ Public Class Distance_BinaryImage : Inherits VB_Parent
             distance.Run(dst2)
         End If
         dst3 = distance.dst2
-        dst1 = dst3.Threshold(task.gOptions.DebugSliderValue, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst3.Threshold(task.gOptions.DebugSliderValue, 255, cvb.ThresholdTypes.Binary)
     End Sub
 End Class

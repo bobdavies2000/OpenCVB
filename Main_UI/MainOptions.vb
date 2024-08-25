@@ -1,9 +1,9 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class MainOptions
     Public cameraRadioButton(Main_UI.cameraNames.Count - 1) As RadioButton
     Public WorkingResRadio(resolutionList.Count - 1) As RadioButton
-    Public cameraWorkingRes As cv.Size
-    Public cameraDisplayRes As cv.Size
+    Public cameraWorkingRes As cvb.Size
+    Public cameraDisplayRes As cvb.Size
     Public cameraName As String
     Public cameraIndex As Integer
     Public testDuration As Integer
@@ -25,7 +25,7 @@ Public Class MainOptions
                 Dim strRes = radio.text.split(" ")
                 Dim resText = strRes(0)
                 Dim strVals = resText.split("x")
-                cameraWorkingRes = New cv.Size(CInt(strVals(0)), CInt(strVals(1)))
+                cameraWorkingRes = New cvb.Size(CInt(strVals(0)), CInt(strVals(1)))
                 Exit For
             End If
         Next
@@ -140,14 +140,14 @@ Public Class MainOptions
     Public Sub Snap320_CheckedChanged(sender As Object, e As EventArgs) Handles Snap320.CheckedChanged
         Dim height = 180
         If cameraWorkingRes.Height = 120 Or cameraWorkingRes.Height = 240 Or cameraWorkingRes.Height = 480 Then height = 240
-        cameraDisplayRes = New cv.Size(320, height)
+        cameraDisplayRes = New cvb.Size(320, height)
     End Sub
     Public Sub Snap640_CheckedChanged(sender As Object, e As EventArgs) Handles Snap640.CheckedChanged
         Dim height = 360
         If cameraWorkingRes.Height = 120 Or cameraWorkingRes.Height = 240 Or cameraWorkingRes.Height = 480 Then height = 480
-        cameraDisplayRes = New cv.Size(640, height)
+        cameraDisplayRes = New cvb.Size(640, height)
     End Sub
     Public Sub SnapCustom_CheckedChanged(sender As Object, e As EventArgs) Handles SnapCustom.CheckedChanged
-        ' cameraDisplayRes = New cv.Size(0, 0) ' figure it out in Main_UI.vb resizing...
+        ' cameraDisplayRes = New cvb.Size(0, 0) ' figure it out in Main_UI.vb resizing...
     End Sub
 End Class

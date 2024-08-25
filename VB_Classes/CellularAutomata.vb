@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellularAutomata_Basics : Inherits VB_Parent
     Public i18 As New List(Of String)({"00011110 Rule 30 (chaotic)", "00110110 Rule 54", "00111100 Rule 60", "00111110 Rule 62",
@@ -9,13 +9,13 @@ Public Class CellularAutomata_Basics : Inherits VB_Parent
     Dim inputCombo = "111,110,101,100,011,010,001,000"
     Dim cellInput(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
     Public options As New Options_CellAutomata
-    Public input As New cv.Mat
+    Public input As New cvb.Mat
     Public index As Integer
     Public Sub New()
         Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
         desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
     End Sub
-    Public Function createCells(outStr As String) As cv.Mat
+    Public Function createCells(outStr As String) As cvb.Mat
         Dim outcomes(7) As Byte
         For i = 0 To outcomes.Length - 1
             outcomes(i) = Integer.Parse(outStr.Substring(i, 1))
@@ -35,9 +35,9 @@ Public Class CellularAutomata_Basics : Inherits VB_Parent
                 Next
             Next
         Next
-        Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Return dst.ConvertScaleAbs(255).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If task.heartBeat Then
@@ -47,7 +47,7 @@ Public Class CellularAutomata_Basics : Inherits VB_Parent
         End If
 
         If standalone Then
-            input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
+            input = New cvb.Mat(New cvb.Size(src.Width, src.Height), cvb.MatType.CV_8UC1, 0)
             input.Set(Of Byte)(0, src.Width / 2, 1)
             dst2 = createCells(labels(2))
         Else
@@ -65,13 +65,13 @@ End Class
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class CellularAutomata_Life : Inherits VB_Parent
     Dim random As New Random_Basics
-    Dim grid As cv.Mat
-    Dim nextgrid As cv.Mat
+    Dim grid As cvb.Mat
+    Dim nextgrid As cvb.Mat
     Dim factor = 8
     Dim generation As Integer
     Public population As Integer
-    Public nodeColor = cv.Scalar.White
-    Public backColor = cv.Scalar.Black
+    Public nodeColor = cvb.Scalar.White
+    Public backColor = cvb.Scalar.Black
     Dim savePointCount As Integer
     Dim lastPopulation As Integer
     Private Function CountNeighbors(cellX As Integer, cellY As Integer) As Integer
@@ -94,13 +94,13 @@ Public Class CellularAutomata_Life : Inherits VB_Parent
         Return CountNeighbors
     End Function
     Public Sub New()
-        grid = New cv.Mat(dst2.Height / factor, dst2.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
+        grid = New cvb.Mat(dst2.Height / factor, dst2.Width / factor, cvb.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
-        random.range = New cv.Rect(0, 0, grid.Width, grid.Height)
+        random.range = New cvb.Rect(0, 0, grid.Width, grid.Height)
         FindSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         desc = "Use OpenCV to implement the Game of Life"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If random.options.count <> savePointCount Or generation = 0 Then
             random.Run(empty)
             generation = 0
@@ -126,7 +126,7 @@ Public Class CellularAutomata_Life : Inherits VB_Parent
                     nextgrid.Set(Of Byte)(y, x, 0)
                 End If
                 If nextgrid.Get(Of Byte)(y, x) Then
-                    Dim pt = New cv.Point(x, y) * factor
+                    Dim pt = New cvb.Point(x, y) * factor
                     DrawCircle(dst2, pt, factor / 2, nodeColor)
                     population += 1
                 End If
@@ -161,26 +161,26 @@ End Class
 Public Class CellularAutomata_LifeColor : Inherits VB_Parent
     Dim game As New CellularAutomata_Life
     Public Sub New()
-        game.backColor = cv.Scalar.White
-        game.nodeColor = cv.Scalar.Black
+        game.backColor = cvb.Scalar.White
+        game.nodeColor = cvb.Scalar.Black
 
         labels(2) = "Births are blue, deaths are red"
         desc = "Game of Life but with color added"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim lastBoard = game.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cvb.Mat)
+        Dim lastBoard = game.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         game.Run(src)
-        dst1 = game.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = game.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        Dim deaths As New cv.Mat, births As New cv.Mat
+        Dim deaths As New cvb.Mat, births As New cvb.Mat
 
-        cv.Cv2.Subtract(dst1, lastBoard, births)
-        cv.Cv2.Subtract(lastBoard, dst1, deaths)
-        births = births.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        deaths = deaths.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cvb.Cv2.Subtract(dst1, lastBoard, births)
+        cvb.Cv2.Subtract(lastBoard, dst1, deaths)
+        births = births.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        deaths = deaths.Threshold(0, 255, cvb.ThresholdTypes.Binary)
         dst2 = game.dst2.Clone()
-        dst2.SetTo(cv.Scalar.Blue, births)
-        dst2.SetTo(cv.Scalar.Red, deaths)
+        dst2.SetTo(cvb.Scalar.Blue, births)
+        dst2.SetTo(cvb.Scalar.Red, deaths)
     End Sub
 End Class
 
@@ -195,11 +195,11 @@ Public Class CellularAutomata_LifePopulation : Inherits VB_Parent
     Public Sub New()
         desc = "Show Game of Life display with plot of population"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         game.Run(src)
         dst2 = game.dst2
 
-        plot.plotData = New cv.Scalar(game.population, 0, 0)
+        plot.plotData = New cvb.Scalar(game.population, 0, 0)
         plot.Run(empty)
         dst3 = plot.dst2
     End Sub
@@ -218,8 +218,8 @@ Public Class CellularAutomata_MultiPoint : Inherits VB_Parent
         cell.index = 4 ' this one is nice...
         desc = "All256 above starts with just one point.  Here we start with multiple points."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim tmp = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
+    Public Sub RunVB(src As cvb.Mat)
+        Dim tmp = New cvb.Mat(New cvb.Size(src.Width / 4, src.Height / 4), cvb.MatType.CV_8UC1, 0)
         tmp.Set(0, val1, 1)
         tmp.Set(0, val2, 1)
         cell.Run(tmp)
@@ -253,9 +253,9 @@ Public Class CellularAutomata_All256 : Inherits VB_Parent
         Next
         Return outstr
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.heartBeat Then
-            cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
+            cell.input = New cvb.Mat(New cvb.Size(src.Width / 4, src.Height / 4), cvb.MatType.CV_8UC1, 0)
             cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
 
             labels(2) = createOutcome(options.currentRule) + " options.currentRule = " + CStr(options.currentRule)

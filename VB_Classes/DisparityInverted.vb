@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 'The Function relating() depth To disparity Is
 
 'Z = B * f / disparity
@@ -29,7 +29,7 @@ Public Class DisparityFunction_Basics : Inherits VB_Parent
         If depth = 0 Then Return 0
         Return task.baseline * 1000 * task.focalLength / depth
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.cameraName = "Azure Kinect 4K" Then
             SetTrueText("Kinect for Azure does not have a left and right view to compute disparities", 2)
             Exit Sub
@@ -81,6 +81,6 @@ Public Class DisparityFunction_Basics : Inherits VB_Parent
                        CStr(CInt(disparityformulaoutput / task.disparityAdjustment)) + " pixels"
         End If
         SetTrueText(depthStr + vbCrLf + vbCrLf + dispStr, 3)
-        SetTrueText(strOut, New cv.Point(0, dst2.Height / 3), 3)
+        SetTrueText(strOut, New cvb.Point(0, dst2.Height / 3), 3)
     End Sub
 End Class

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports  System.IO
 Imports NAudio.Wave
 Imports NAudio.Wave.SampleProviders.SignalGeneratorType
@@ -11,7 +11,7 @@ Public Class Sound_Basics : Inherits VB_Parent
     Dim currentTime As Date
     Dim startTime As Date
     Dim fileNameForm As OptionsFileName
-    Public pcm32f As New cv.Mat
+    Public pcm32f As New cvb.Mat
     Public stereo As Boolean
     Public bpp16 As Boolean
     Public pcmDuration As Double ' in seconds.
@@ -53,7 +53,7 @@ Public Class Sound_Basics : Inherits VB_Parent
 
         desc = "Load an audio file, play it, and convert to PCM"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         Dim sender As New Object, e As New EventArgs
         Static fileinfo = New FileInfo(fileNameForm.filename.Text)
@@ -71,17 +71,17 @@ Public Class Sound_Basics : Inherits VB_Parent
 
             Dim channels = reader.WaveFormat.Channels
             Dim bpSample = reader.WaveFormat.BitsPerSample
-            Dim mattype = cv.MatType.CV_16SC2
-            If bpSample = 8 And channels = 1 Then mattype = cv.MatType.CV_8U
-            If bpSample = 8 And channels = 2 Then mattype = cv.MatType.CV_8UC2
-            If bpSample = 16 And channels = 1 Then mattype = cv.MatType.CV_16SC1
-            Dim input As New cv.Mat
+            Dim mattype = cvb.MatType.CV_16SC2
+            If bpSample = 8 And channels = 1 Then mattype = cvb.MatType.CV_8U
+            If bpSample = 8 And channels = 2 Then mattype = cvb.MatType.CV_8UC2
+            If bpSample = 16 And channels = 1 Then mattype = cvb.MatType.CV_16SC1
+            Dim input As New cvb.Mat
             If bpSample = 16 Then
-                input = cv.Mat.FromPixelData(pcmData16.Length / channels, 1, mattype, pcmData16)
+                input = cvb.Mat.FromPixelData(pcmData16.Length / channels, 1, mattype, pcmData16)
             Else
-                input = cv.Mat.FromPixelData(pcmData8.Length, 1, mattype, pcmData8)
+                input = cvb.Mat.FromPixelData(pcmData8.Length, 1, mattype, pcmData8)
             End If
-            input.ConvertTo(pcm32f, cv.MatType.CV_32F)
+            input.ConvertTo(pcm32f, cvb.MatType.CV_32F)
             startTime = Now
         End If
         If fileNameForm.PlayButton.Text = "Stop" And pcmDuration > 0 Then
@@ -90,7 +90,7 @@ Public Class Sound_Basics : Inherits VB_Parent
             fileNameForm.PlayButton_Click(sender, e)
             player?.Stop()
         End If
-        SetTrueText("Requested sound data is in the pcm32f cv.Mat")
+        SetTrueText("Requested sound data is in the pcm32f cvb.Mat")
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -107,7 +107,7 @@ End Class
 Public Class Sound_SignalGenerator : Inherits VB_Parent
     Dim player As NAudio.Wave.IWavePlayer
     Dim wGen As New NAudio.Wave.SampleProviders.SignalGenerator
-    Public pcm32f As New cv.Mat
+    Public pcm32f As New cvb.Mat
     Public stereo As Boolean = False ' only mono generated sound
     Public bpp16 As Boolean = False ' only 8 bit generated sound
     Public pcmDuration As Double ' in seconds.
@@ -146,7 +146,7 @@ Public Class Sound_SignalGenerator : Inherits VB_Parent
 
         desc = "Generate sound with a sine waveform."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         Static wgenSlider = FindSlider("Sine Wave Frequency")
         Static DecibelSlider = FindSlider("Decibels")
@@ -184,10 +184,10 @@ Public Class Sound_SignalGenerator : Inherits VB_Parent
             End If
 
             Dim count = wGen.Read(pcmData, 0, pcmData.Length)
-            pcm32f = cv.Mat.FromPixelData(pcmData.Length, 1, cv.MatType.CV_32F, pcmData)
+            pcm32f = cvb.Mat.FromPixelData(pcmData.Length, 1, cvb.MatType.CV_32F, pcmData)
             player.Play()
         End If
-        SetTrueText("Requested sound data is in the pcm32f cv.Mat")
+        SetTrueText("Requested sound data is in the pcm32f cvb.Mat")
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -218,7 +218,7 @@ Public Class Sound_Display : Inherits VB_Parent
 
         desc = "Display a sound buffer in several styles"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         If standaloneTest() Then soundSource.Run(src)
         If fileStarted = False Then
@@ -235,7 +235,7 @@ Public Class Sound_Display : Inherits VB_Parent
             SetTrueText("No sound data was loaded.")
             Exit Sub
         End If
-        dst2 = New cv.Mat(New cv.Size(src.Width * 2, src.Height), cv.MatType.CV_8UC3, cv.Scalar.Beige)
+        dst2 = New cvb.Mat(New cvb.Size(src.Width * 2, src.Height), cvb.MatType.CV_8UC3, cvb.Scalar.Beige)
         samplesperLine = If(soundSource.stereo, totalSamples / 2 / dst2.Width, totalSamples / dst2.Width)
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
@@ -252,49 +252,49 @@ Public Class Sound_Display : Inherits VB_Parent
         Select Case formatIndex
             Case 0
                 For i = 0 To dst2.Width - 1
-                    Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
+                    Dim rect = New cvb.Rect(0, i * samplesperLine, 1, samplesperLine)
                     If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
                     pcm(rect).MinMaxLoc(minVal, maxVal)
                     If minVal > 0 Then minVal = 0
                     If maxVal < 0 Then maxVal = 0
 
-                    DrawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red)
-                    DrawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray)
+                    DrawLine(dst2, New cvb.Point(i, halfHeight), New cvb.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cvb.Scalar.Red)
+                    DrawLine(dst2, New cvb.Point(i, halfHeight), New cvb.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cvb.Scalar.Gray)
                 Next
                 labels(2) = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max Absolute Value"
             Case 1
                 For i = 0 To dst2.Width - 1
-                    Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
+                    Dim rect = New cvb.Rect(0, i * samplesperLine, 1, samplesperLine)
                     If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
                     Dim tmp = pcm(rect).mul(pcm(rect)).toMat()
                     Dim sum = tmp.sum()
                     Dim nextVal = Math.Sqrt(sum(0) / samplesperLine)
 
-                    DrawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red)
-                    DrawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray)
+                    DrawLine(dst2, New cvb.Point(i, halfHeight), New cvb.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cvb.Scalar.Red)
+                    DrawLine(dst2, New cvb.Point(i, halfHeight), New cvb.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cvb.Scalar.Gray)
                 Next
                 labels(2) = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max RMS Value"
             Case 2
                 For i = 0 To dst2.Width - 1
-                    Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
+                    Dim rect = New cvb.Rect(0, i * samplesperLine, 1, samplesperLine)
                     If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
                     pcm(rect).MinMaxLoc(minVal, maxVal)
                     If minVal > 0 Then minVal = 0
                     If maxVal < 0 Then maxVal = 0
 
-                    DrawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red)
-                    DrawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray)
+                    DrawLine(dst2, New cvb.Point(i, halfHeight), New cvb.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cvb.Scalar.Red)
+                    DrawLine(dst2, New cvb.Point(i, halfHeight), New cvb.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cvb.Scalar.Gray)
                 Next
             Case 3
-                pcm = cv.Cv2.Abs(pcm).toMat
+                pcm = cvb.Cv2.Abs(pcm).toMat
                 For i = 0 To dst2.Width - 1
-                    Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
+                    Dim rect = New cvb.Rect(0, i * samplesperLine, 1, samplesperLine)
                     If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
                     Dim sum = pcm(rect).sum
                     Dim nextVal = sum(0) / samplesperLine
 
-                    DrawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red)
-                    DrawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray)
+                    DrawLine(dst2, New cvb.Point(i, halfHeight), New cvb.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cvb.Scalar.Red)
+                    DrawLine(dst2, New cvb.Point(i, halfHeight), New cvb.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cvb.Scalar.Gray)
                 Next
                 labels(2) = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Scaled Average"
         End Select
@@ -305,7 +305,7 @@ Public Class Sound_Display : Inherits VB_Parent
             starttime = Now
         End If
         Dim x = dst2.Width * sliderPercent
-        dst2.Line(New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.Black, task.lineWidth + 1)
+        dst2.Line(New cvb.Point(x, 0), New cvb.Point(x, dst2.Height), cvb.Scalar.Black, task.lineWidth + 1)
     End Sub
 End Class
 
@@ -321,12 +321,12 @@ Public Class Sound_GenWaveDisplay : Inherits VB_Parent
     Public Sub New()
         desc = "Display the generated sound waves"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         plotSound.soundSource.Run(src)
         plotSound.Run(src)
-        Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
-        Dim r2 = New cv.Rect(src.Width, 0, src.Width, src.Height)
+        Dim r1 = New cvb.Rect(0, 0, src.Width, src.Height)
+        Dim r2 = New cvb.Rect(src.Width, 0, src.Width, src.Height)
         dst2 = plotSound.dst2(r1)
         dst3 = plotSound.dst2(r2)
     End Sub
@@ -345,12 +345,12 @@ Public Class Sound_WaveDisplay : Inherits VB_Parent
         plotSound.soundSource = New Sound_Basics
         desc = "Display the generated sound waves"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         plotSound.soundSource.Run(src)
         plotSound.Run(src)
-        Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
-        Dim r2 = New cv.Rect(src.Width, 0, src.Width, src.Height)
+        Dim r1 = New cvb.Rect(0, 0, src.Width, src.Height)
+        Dim r2 = New cvb.Rect(src.Width, 0, src.Width, src.Height)
         dst2 = plotSound.dst2(r1)
         dst3 = plotSound.dst2(r2)
     End Sub

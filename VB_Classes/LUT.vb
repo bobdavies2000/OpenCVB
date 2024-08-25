@@ -1,17 +1,17 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
+' https://docs.opencvb.org/2.4/modules/core/doc/operations_on_arrays.html
 Public Class LUT_Basics : Inherits VB_Parent
     Public classCount As Integer
     Dim options As New Options_LUT
     Dim segment(255) As Byte
-    Dim myLut As cv.Mat
+    Dim myLut As cvb.Mat
     Public Sub New()
         labels(3) = "Palettized version of dst2"
         desc = "Divide the image into n-segments controlled with a slider."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If classCount <> options.lutSegments Then
@@ -26,9 +26,9 @@ Public Class LUT_Basics : Inherits VB_Parent
             For i = incr * classCount To 255
                 segment(i) = 255
             Next
-            myLut = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, segment)
+            myLut = cvb.Mat.FromPixelData(1, 256, cvb.MatType.CV_8U, segment)
         End If
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         dst2 = src.LUT(myLut) * classCount / 255
 
         dst3 = ShowPalette(dst2 * 255 / classCount)
@@ -47,11 +47,11 @@ Public Class LUT_Sliders : Inherits VB_Parent
     Public Sub New()
         desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
-        Dim gray = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
+        Dim gray = If(src.Channels() = 1, src, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
+        Dim myLut As New cvb.Mat(1, 256, cvb.MatType.CV_8U)
         Dim splitIndex As Integer
         For i = 0 To 255
             myLut.Set(Of Byte)(0, i, options.vals(splitIndex))
@@ -72,17 +72,17 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class LUT_Reduction : Inherits VB_Parent
     Public reduction As New Reduction_Basics
-    Dim vector = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+    Dim vector = New cvb.Mat(256, 1, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
     Public Sub New()
         For i = 0 To 255
-            vector.Set(Of cv.Vec3b)(i, 0, randomCellColor())
+            vector.Set(Of cvb.Vec3b)(i, 0, randomCellColor())
         Next
         labels(3) = "Custom Color Lookup Table"
         desc = "Build and use a custom color palette"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         reduction.Run(src)
-        dst2 = reduction.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR).LUT(vector)
+        dst2 = reduction.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR).LUT(vector)
     End Sub
 End Class
 
@@ -100,8 +100,8 @@ Public Class LUT_RGBDepth : Inherits VB_Parent
     Public Sub New()
         desc = "Use a LUT on the RGBDepth to segregate depth data."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        lut.Run(task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+    Public Sub RunVB(src As cvb.Mat)
+        lut.Run(task.depthRGB.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
         dst2 = lut.dst2 * 255 / lut.classCount
         labels(2) = lut.labels(2)
     End Sub
@@ -119,7 +119,7 @@ Public Class LUT_Depth32f : Inherits VB_Parent
     Public Sub New()
         desc = "Use a LUT on the 32-bit depth to segregate depth data."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         lut.Run(task.pcSplit(2).Normalize(255).ConvertScaleAbs(255))
         dst2 = lut.dst2 * 255 / lut.classCount
         dst2.SetTo(0, task.noDepthMask)
@@ -143,7 +143,7 @@ Public Class LUT_Equalized : Inherits VB_Parent
         labels(3) = "With Histogram Equalized"
         desc = "Use LUT_Basics but with an equalized histogram image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         lut.Run(src)
         dst3 = lut.dst2 * 255 / lut.classCount
 
@@ -172,12 +172,12 @@ Public Class LUT_Watershed : Inherits VB_Parent
         wShed.UseCorners = True
         desc = "Use watershed algorithm with LUT input to identify regions in the image"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         lut.Run(src)
-        dst3 = lut.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = lut.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
         edges.Run(src)
-        dst3.SetTo(cv.Scalar.White, edges.dst2)
+        dst3.SetTo(cvb.Scalar.White, edges.dst2)
 
         wShed.Run(dst3)
         dst2 = wShed.dst3
@@ -193,20 +193,20 @@ End Class
 
 Public Class LUT_Custom : Inherits VB_Parent
     Dim gradMap As New Palette_RandomColorMap
-    Public colorMap As cv.Mat
+    Public colorMap As cvb.Mat
     Dim saveColorCount = -1
     Public Sub New()
         FindSlider("Color transitions").Value = 5
         labels(3) = "Custom Color Lookup Table"
         desc = "Use a palette to provide the lookup table for LUT"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Static colorSlider = FindSlider("Color transitions")
         If task.optionsChanged Or task.heartBeat Then
             If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
             saveColorCount = colorSlider.Value
             gradMap.Run(src)
-            colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
+            colorMap = gradMap.gradientColorMap.Flip(cvb.FlipMode.X)
         End If
         dst2 = src.LUT(colorMap)
         dst3 = colorMap.Resize(src.Size())
@@ -225,7 +225,7 @@ Public Class LUT_RedCloud : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Use LUT on the grayscale image after masking with rc.mask"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -250,7 +250,7 @@ Public Class LUT_Create : Inherits VB_Parent
     Public Sub New()
         desc = "Create a LUT table that can map similar pixels to the same exact pixel."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         Dim split = src.Split()
@@ -260,13 +260,13 @@ Public Class LUT_Create : Inherits VB_Parent
         Next
 
         Dim totals(255) As Single
-        Dim lutI(255) As cv.Vec3i
+        Dim lutI(255) As cvb.Vec3i
         For i = 0 To src.Total - 1
             Dim index = CInt(0.299 * pixels(2)(i) + 0.587 * pixels(1)(i) + 0.114 * pixels(0)(i))
             totals(index) += 1
             Dim v1 = lutI(index)
-            Dim v2 = New cv.Vec3i(pixels(0)(i), pixels(1)(i), pixels(2)(i))
-            lutI(index) = New cv.Vec3i((v1(0) + v2(0)) / 2, (v1(1) + v2(1)) / 2, (v1(2) + v2(2)) / 2)
+            Dim v2 = New cvb.Vec3i(pixels(0)(i), pixels(1)(i), pixels(2)(i))
+            lutI(index) = New cvb.Vec3i((v1(0) + v2(0)) / 2, (v1(1) + v2(1)) / 2, (v1(2) + v2(2)) / 2)
         Next
 
         Dim lastVec = lutI(0)
@@ -280,13 +280,13 @@ Public Class LUT_Create : Inherits VB_Parent
             End If
         Next
 
-        Dim lut(255) As cv.Vec3b
+        Dim lut(255) As cvb.Vec3b
         For i = 0 To lutI.Count - 1
-            lut(i) = New cv.Vec3b(lutI(i)(0), lutI(i)(1), lutI(i)(2))
+            lut(i) = New cvb.Vec3b(lutI(i)(0), lutI(i)(1), lutI(i)(2))
         Next
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim myLut As cv.Mat = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, lut)
+        dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        Dim myLut As cvb.Mat = cvb.Mat.FromPixelData(1, 256, cvb.MatType.CV_8U, lut)
         dst3 = dst2.LUT(myLut)
     End Sub
 End Class

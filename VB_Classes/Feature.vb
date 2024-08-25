@@ -1,25 +1,25 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Imports System.Drawing
 Imports System.Security.Cryptography
 Public Class Feature_Basics : Inherits VB_Parent
-    Dim nextMatList As New List(Of cv.Mat)
-    Dim ptList As New List(Of cv.Point2f)
+    Dim nextMatList As New List(Of cvb.Mat)
+    Dim ptList As New List(Of cvb.Point2f)
     Dim knn As New KNN_Core
-    Dim ptLost As New List(Of cv.Point2f)
+    Dim ptLost As New List(Of cvb.Point2f)
     Dim gather As New Feature_Gather
-    Dim featureMatList As New List(Of cv.Mat)
+    Dim featureMatList As New List(Of cvb.Mat)
     Public options As New Options_Features
     Dim noMotionFrames As Single
     Public Sub New()
         task.features.Clear() ' in case it was previously in use...
         desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
         dst2 = src.Clone
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
 
@@ -30,15 +30,15 @@ Public Class Feature_Basics : Inherits VB_Parent
 
         nextMatList.Clear()
         ptList.Clear()
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New cvb.Mat
         Dim saveFeatureCount = Math.Min(featureMatList.Count, task.features.Count)
         For i = 0 To saveFeatureCount - 1
             Dim pt = task.features(i)
-            Dim rect = ValidateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMatList(i).Width, featureMatList(i).Height))
+            Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMatList(i).Width, featureMatList(i).Height))
             If gather.ptList.Contains(pt) = False Then
-                cv.Cv2.MatchTemplate(src(rect), featureMatList(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                cvb.Cv2.MatchTemplate(src(rect), featureMatList(i), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
                 If correlationMat.Get(Of Single)(0, 0) < options.correlationMin Then
-                    Dim ptNew = New cv.Point2f(CInt(pt.X), CInt(pt.Y))
+                    Dim ptNew = New cvb.Point2f(CInt(pt.X), CInt(pt.Y))
                     If ptLost.Contains(ptNew) = False Then ptLost.Add(ptNew)
                     Continue For
                 End If
@@ -49,7 +49,7 @@ Public Class Feature_Basics : Inherits VB_Parent
 
         Dim survivorPercent As Single = (ptList.Count - ptLost.Count) / saveFeatureCount
         Dim extra = 1 + (1 - options.resyncThreshold)
-        task.features = New List(Of cv.Point2f)(ptList)
+        task.features = New List(Of cvb.Point2f)(ptList)
 
         If task.features.Count < gather.features.Count * options.resyncThreshold Or task.features.Count > extra * gather.features.Count Then
             task.featureMotion = True
@@ -57,7 +57,7 @@ Public Class Feature_Basics : Inherits VB_Parent
             featureMatList.Clear()
             task.features.Clear()
             For Each pt In gather.features
-                Dim rect = ValidateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
                 featureMatList.Add(src(rect))
                 task.features.Add(pt)
             Next
@@ -69,20 +69,20 @@ Public Class Feature_Basics : Inherits VB_Parent
 
                 For i = 0 To knn.queries.Count - 1
                     Dim pt = knn.queries(i)
-                    Dim rect = ValidateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                    Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
                     featureMatList.Add(src(rect))
                     task.features.Add(knn.trainInput(knn.result(i, 0)))
                 Next
             End If
             task.featureMotion = False
             noMotionFrames += 1
-            featureMatList = New List(Of cv.Mat)(nextMatList)
+            featureMatList = New List(Of cvb.Mat)(nextMatList)
         End If
 
         task.featurePoints.Clear()
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
-            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+            task.featurePoints.Add(New cvb.Point(pt.X, pt.Y))
         Next
         If task.heartBeat Then
             If task.featureMotion = True Then survivorPercent = 0
@@ -105,7 +105,7 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_BasicsNoFrills : Inherits VB_Parent
     Public options As New Options_Features
     Dim gather As New Feature_Gather
@@ -113,7 +113,7 @@ Public Class Feature_BasicsNoFrills : Inherits VB_Parent
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
         dst2 = src.Clone
 
@@ -123,7 +123,7 @@ Public Class Feature_BasicsNoFrills : Inherits VB_Parent
         task.featurePoints.Clear()
         For Each pt In gather.features
             task.features.Add(pt)
-            task.featurePoints.Add(New cv.Point(pt.X, pt.X))
+            task.featurePoints.Add(New cvb.Point(pt.X, pt.X))
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
         Next
 
@@ -136,20 +136,20 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_KNN : Inherits VB_Parent
     Dim knn As New KNN_Core
-    Public featurePoints As New List(Of cv.Point2f)
+    Public featurePoints As New List(Of cvb.Point2f)
     Public feat As New Feature_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         feat.Run(src)
 
-        knn.queries = New List(Of cv.Point2f)(task.features)
-        If task.FirstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.queries = New List(Of cvb.Point2f)(task.features)
+        If task.FirstPass Then knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
         knn.Run(empty)
 
         For i = 0 To knn.neighbors.Count - 1
@@ -158,13 +158,13 @@ Public Class Feature_KNN : Inherits VB_Parent
             Dim qPt = task.features(i)
             If pt.DistanceTo(qPt) > feat.options.minDistance Then knn.trainInput(trainIndex) = task.features(i)
         Next
-        featurePoints = New List(Of cv.Point2f)(knn.trainInput)
+        featurePoints = New List(Of cvb.Point2f)(knn.trainInput)
 
         src.CopyTo(dst2)
         dst3.SetTo(0)
         For Each pt In featurePoints
-            DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.White)
-            DrawCircle(dst3, pt, task.DotSize + 2, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize + 2, cvb.Scalar.White)
+            DrawCircle(dst3, pt, task.DotSize + 2, cvb.Scalar.White)
         Next
 
         labels(2) = feat.labels(2)
@@ -185,15 +185,15 @@ Public Class Feature_Reduction : Inherits VB_Parent
         labels = {"", "", "Good features", "History of good features"}
         desc = "Get the features in a reduction grayscale image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         reduction.Run(src)
         dst2 = src
 
         feat.Run(reduction.dst2)
         If task.heartBeat Then dst3.SetTo(0)
         For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
-            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White)
         Next
     End Sub
 End Class
@@ -206,17 +206,17 @@ End Class
 
 Public Class Feature_MultiPass : Inherits VB_Parent
     Dim feat As New Feature_Basics
-    Public featurePoints As New List(Of cv.Point2f)
+    Public featurePoints As New List(Of cvb.Point2f)
     Dim sharpen As New PhotoShop_SharpenDetail
     Public Sub New()
         task.gOptions.RGBFilterActive.Checked = True
         task.gOptions.RGBFilterList.SelectedIndex = task.gOptions.RGBFilterList.Items.IndexOf("Filter_Laplacian")
         desc = "Run Feature_Basics twice and compare results."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         feat.Run(task.color)
         dst2 = src.Clone
-        featurePoints = New List(Of cv.Point2f)(task.features)
+        featurePoints = New List(Of cvb.Point2f)(task.features)
         Dim passCounts As String = CStr(featurePoints.Count) + "/"
 
         feat.Run(src)
@@ -259,7 +259,7 @@ Public Class Feature_PointTracker : Inherits VB_Parent
         labels(3) = "Correlation coefficients for each remaining cell"
         desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
         Dim correlationMin = options.correlationMin
         Dim templatePad = options.templatePad
@@ -271,7 +271,7 @@ Public Class Feature_PointTracker : Inherits VB_Parent
             feat.Run(src)
             For Each pt In task.features
                 mPoints.ptx.Add(pt)
-                Dim rect = ValidateRect(New cv.Rect(pt.X - templatePad, pt.Y - templatePad, templateSize, templateSize))
+                Dim rect = ValidateRect(New cvb.Rect(pt.X - templatePad, pt.Y - templatePad, templateSize, templateSize))
             Next
             strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
         End If
@@ -310,7 +310,7 @@ Public Class Feature_Delaunay : Inherits VB_Parent
         FindSlider("Min Distance to next").Value = 10
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         feat.Run(src)
         dst2 = feat.dst2
         labels(2) = feat.labels(2)
@@ -323,7 +323,7 @@ Public Class Feature_Delaunay : Inherits VB_Parent
         facet.Run(src)
         dst3 = facet.dst2
         For Each pt In task.features
-            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White)
         Next
         labels(3) = "There were " + CStr(task.features.Count) + " Delaunay contours"
     End Sub
@@ -337,13 +337,13 @@ End Class
 
 Public Class Feature_LucasKanade : Inherits VB_Parent
     Dim pyr As New FeatureFlow_LucasKanade
-    Public ptList As New List(Of cv.Point)
-    Public ptLast As New List(Of cv.Point)
-    Dim ptHist As New List(Of List(Of cv.Point))
+    Public ptList As New List(Of cvb.Point)
+    Public ptLast As New List(Of cvb.Point)
+    Dim ptHist As New List(Of List(Of cvb.Point))
     Public Sub New()
         desc = "Provide a trace of the tracked features"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         pyr.Run(src)
         dst2 = src
         labels(2) = pyr.labels(2)
@@ -353,19 +353,19 @@ Public Class Feature_LucasKanade : Inherits VB_Parent
         ptList.Clear()
         Dim stationary As Integer, motion As Integer
         For i = 0 To pyr.features.Count - 1
-            Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
+            Dim pt = New cvb.Point(pyr.features(i).X, pyr.features(i).Y)
             ptList.Add(pt)
             If ptLast.Contains(pt) Then
                 DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
                 stationary += 1
             Else
-                DrawLine(dst3, pyr.lastFeatures(i), pyr.features(i), cv.Scalar.White)
+                DrawLine(dst3, pyr.lastFeatures(i), pyr.features(i), cvb.Scalar.White)
                 motion += 1
             End If
         Next
 
         If task.heartBeat Then labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
-        ptLast = New List(Of cv.Point)(ptList)
+        ptLast = New List(Of cvb.Point)(ptList)
     End Sub
 End Class
 
@@ -382,7 +382,7 @@ Public Class Feature_NearestCell : Inherits VB_Parent
     Public Sub New()
         desc = "Find the nearest feature to every cell in task.redCells"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         feat.Run(src)
         redC.Run(src)
         dst2 = redC.dst2
@@ -396,7 +396,7 @@ Public Class Feature_NearestCell : Inherits VB_Parent
 
         knn.trainInput.Clear()
         For Each mp In feat.mpList
-            knn.trainInput.Add(New cv.Point2f(mp.p1.X, mp.p1.Y))
+            knn.trainInput.Add(New cvb.Point2f(mp.p1.X, mp.p1.Y))
         Next
 
         knn.Run(Nothing)
@@ -422,7 +422,7 @@ Public Class Feature_Points : Inherits VB_Parent
         labels(3) = "Features found in the image"
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         feat.Run(src)
         dst2 = feat.dst2
         If task.heartBeat Then dst3.SetTo(0)
@@ -445,7 +445,7 @@ Public Class Feature_Trace : Inherits VB_Parent
     Public Sub New()
         desc = "Placeholder to help find RedTrack_Features"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         track.Run(src)
         dst2 = track.dst2
         labels = track.labels
@@ -458,18 +458,18 @@ End Class
 
 Public Class Feature_TraceDelaunay : Inherits VB_Parent
     Dim features As New Feature_Delaunay
-    Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
+    Public goodList As New List(Of List(Of cvb.Point2f)) ' stable points only
     Public Sub New()
         labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
         desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         features.Run(src)
         dst3 = features.dst2
 
         If task.optionsChanged Then goodList.Clear()
 
-        Dim ptList As New List(Of cv.Point2f)(task.features)
+        Dim ptList As New List(Of cvb.Point2f)(task.features)
         goodList.Add(ptList)
 
         If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
@@ -478,7 +478,7 @@ Public Class Feature_TraceDelaunay : Inherits VB_Parent
         For Each ptList In goodList
             For Each pt In ptList
                 DrawCircle(task.color, pt, task.DotSize, task.HighlightColor)
-                Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                Dim c = dst3.Get(Of cvb.Vec3b)(pt.Y, pt.X)
                 DrawCircle(dst2, pt, task.DotSize + 1, c)
             Next
         Next
@@ -500,17 +500,17 @@ Public Class Feature_ShiTomasi : Inherits VB_Parent
         labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
         desc = "Identify feature points in the left And right views"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If options.useShiTomasi Then
             dst2 = task.leftView
             dst3 = task.rightView
             shiTomasi.Run(task.leftView)
-            dst2.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst2.SetTo(cvb.Scalar.White, shiTomasi.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
 
             shiTomasi.Run(task.rightView)
-            dst3.SetTo(task.HighlightColor, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst3.SetTo(task.HighlightColor, shiTomasi.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
         Else
             harris.Run(task.leftView)
             dst2 = harris.dst2.Clone
@@ -527,16 +527,16 @@ End Class
 
 Public Class Feature_Generations : Inherits VB_Parent
     Dim feat As New Feature_Basics
-    Dim features As New List(Of cv.Point)
+    Dim features As New List(Of cvb.Point)
     Dim gens As New List(Of Integer)
     Public Sub New()
         UpdateAdvice(traceName + ": Local options will determine how many features are present.")
         desc = "Find feature age maximum and average."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         feat.Run(src)
 
-        Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+        Dim newfeatures As New SortedList(Of Integer, cvb.Point)(New compareAllowIdenticalIntegerInverted)
         For Each pt In task.featurePoints
             Dim index = features.IndexOf(pt)
             If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
@@ -547,14 +547,14 @@ Public Class Feature_Generations : Inherits VB_Parent
             gens.Clear()
         End If
 
-        features = New List(Of cv.Point)(newfeatures.Values)
+        features = New List(Of cvb.Point)(newfeatures.Values)
         gens = New List(Of Integer)(newfeatures.Keys)
 
         dst2 = src
         For i = 0 To features.Count - 1
             If gens(i) = 1 Then Exit For
             Dim pt = features(i)
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
         Next
 
         If task.heartBeat Then
@@ -566,24 +566,24 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_History : Inherits VB_Parent
-    Public features As New List(Of cv.Point)
+    Public features As New List(Of cvb.Point)
     Public feat As New Feature_Basics
-    Dim featureHistory As New List(Of List(Of cv.Point))
+    Dim featureHistory As New List(Of List(Of cvb.Point))
     Dim gens As New List(Of Integer)
     Public Sub New()
         desc = "Find good features across multiple frames."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Dim histCount = task.gOptions.FrameHistory.Value
 
         feat.Run(src)
         dst2 = src.Clone
 
-        featureHistory.Add(New List(Of cv.Point)(task.featurePoints))
+        featureHistory.Add(New List(Of cvb.Point)(task.featurePoints))
 
-        Dim newFeatures As New List(Of cv.Point)
+        Dim newFeatures As New List(Of cvb.Point)
         gens.Clear()
         For Each cList In featureHistory
             For Each pt In cList
@@ -605,7 +605,7 @@ Public Class Feature_History : Inherits VB_Parent
                 Dim pt = newFeatures(i)
                 features.Add(pt)
                 If gens(i) < histCount Then
-                    DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
+                    DrawCircle(dst2, pt, task.DotSize + 2, cvb.Scalar.Red)
                 Else
                     whiteCount += 1
                     DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
@@ -629,11 +629,11 @@ End Class
 Public Class Feature_GridPopulation : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."
         desc = "Find the feature population for each cell."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         feat.Run(src)
         dst2 = feat.dst2
         labels(2) = feat.labels(2)
@@ -662,23 +662,23 @@ End Class
 Public Class Feature_Compare : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim noFrill As New Feature_BasicsNoFrills
-    Dim saveLFeatures As New List(Of cv.Point2f)
-    Dim saveRFeatures As New List(Of cv.Point2f)
+    Dim saveLFeatures As New List(Of cvb.Point2f)
+    Dim saveRFeatures As New List(Of cvb.Point2f)
     Public Sub New()
         desc = "Prepare features for the left and right views"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.features = New List(Of cv.Point2f)(saveLFeatures)
+    Public Sub RunVB(src As cvb.Mat)
+        task.features = New List(Of cvb.Point2f)(saveLFeatures)
         feat.Run(src.Clone)
         dst2 = feat.dst2
         labels(2) = feat.labels(2)
-        saveLFeatures = New List(Of cv.Point2f)(task.features)
+        saveLFeatures = New List(Of cvb.Point2f)(task.features)
 
-        task.features = New List(Of cv.Point2f)(saveRFeatures)
+        task.features = New List(Of cvb.Point2f)(saveRFeatures)
         noFrill.Run(src.Clone)
         dst3 = noFrill.dst2
         labels(3) = "With no correlation coefficients " + noFrill.labels(2)
-        saveRFeatures = New List(Of cv.Point2f)(task.features)
+        saveRFeatures = New List(Of cvb.Point2f)(task.features)
     End Sub
 End Class
 
@@ -691,8 +691,8 @@ Public Class Feature_Gather : Inherits VB_Parent
     Dim harris As New Corners_HarrisDetector_CPP_VB
     Dim FAST As New Corners_Basics
     Dim myOptions As New Options_FeatureGather
-    Public features As New List(Of cv.Point2f)
-    Public ptList As New List(Of cv.Point)
+    Public features As New List(Of cvb.Point2f)
+    Public ptList As New List(Of cvb.Point)
     Dim brisk As New BRISK_Basics
     Public options As New Options_Features
     Public Sub New()
@@ -700,15 +700,15 @@ Public Class Feature_Gather : Inherits VB_Parent
         cPtr = Agast_Open()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
         myOptions.RunVB()
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         Select Case myOptions.featureSource
             Case FeatureSrc.GoodFeaturesFull
-                features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
+                features = cvb.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
                                                       options.blockSize, True, options.k).ToList
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.GoodFeaturesGrid
@@ -716,10 +716,10 @@ Public Class Feature_Gather : Inherits VB_Parent
                 features.Clear()
                 For i = 0 To task.gridList.Count - 1
                     Dim roi = task.gridList(i)
-                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cv.Mat,
+                    Dim tmpFeatures = cvb.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
                                                                  options.blockSize, True, options.k).ToList
                     For j = 0 To tmpFeatures.Count - 1
-                        features.Add(New cv.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
+                        features.Add(New cvb.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
                     Next
                 Next
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
@@ -732,14 +732,14 @@ Public Class Feature_Gather : Inherits VB_Parent
                 Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
                 handleSrc.Free()
 
-                Dim ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
+                Dim ptMat = cvb.Mat.FromPixelData(Agast_Count(cPtr), 1, cvb.MatType.CV_32FC2, imagePtr).Clone
                 features.Clear()
                 If standaloneTest() Then dst2 = src
 
                 For i = 0 To ptMat.Rows - 1
-                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+                    Dim pt = ptMat.Get(Of cvb.Point2f)(i, 0)
                     features.Add(pt)
-                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
+                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
                 Next
 
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
@@ -759,7 +759,7 @@ Public Class Feature_Gather : Inherits VB_Parent
 
         ptList.Clear()
         For Each pt In features
-            ptList.Add(New cv.Point(pt.X, pt.Y))
+            ptList.Add(New cvb.Point(pt.X, pt.Y))
         Next
         If standaloneTest() Then
             dst2 = task.color.Clone
@@ -790,7 +790,7 @@ Public Class Feature_Agast : Inherits VB_Parent
         Dim resizeFactor As Integer = 1
         Dim input As New Mat()
         If src.Cols >= 1280 Then
-            Cv2.Resize(src, input, New cv.Size(src.Cols \ 4, src.Rows \ 4))
+            Cv2.Resize(src, input, New cvb.Size(src.Cols \ 4, src.Rows \ 4))
             resizeFactor = 4
         Else
             input = src

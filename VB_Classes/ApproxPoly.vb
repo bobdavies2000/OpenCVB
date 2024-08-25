@@ -1,6 +1,6 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
-' https://docs.opencv.org/4.x/js_contour_features_approxPolyDP.html
+' https://docs.opencvb.org/4.x/js_contour_features_approxPolyDP.html
 Public Class ApproxPoly_Basics : Inherits VB_Parent
     Dim contour As New Contour_Largest
     Dim rotatedRect As New Rectangle_Rotated
@@ -9,7 +9,7 @@ Public Class ApproxPoly_Basics : Inherits VB_Parent
         labels = {"", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP"}
         desc = "Using the input contours, create ApproxPoly output"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If standaloneTest() Then
@@ -21,10 +21,10 @@ Public Class ApproxPoly_Basics : Inherits VB_Parent
         dst2 = contour.dst2
 
         If contour.allContours.Count > 0 Then
-            Dim nextContour As cv.Point()
-            nextContour = cv.Cv2.ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly)
+            Dim nextContour As cvb.Point()
+            nextContour = cvb.Cv2.ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly)
             dst3.SetTo(0)
-            DrawContour(dst3, nextContour.ToList, cv.Scalar.Yellow)
+            DrawContour(dst3, nextContour.ToList, cvb.Scalar.Yellow)
         Else
             labels(2) = "No contours found"
         End If
@@ -42,30 +42,30 @@ End Class
 ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
 Public Class ApproxPoly_FindandDraw : Inherits VB_Parent
     Dim rotatedRect As New Rectangle_Rotated
-    Public allContours As cv.Point()()
+    Public allContours As cvb.Point()()
     Public Sub New()
         labels(2) = "FindandDraw input"
         labels(3) = "FindandDraw output - note the change in line width where ApproxPoly differs from DrawContours"
         desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         rotatedRect.Run(src)
         dst2 = rotatedRect.dst2
-        dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst0 = dst0.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst0 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst0 = dst0.Threshold(1, 255, cvb.ThresholdTypes.Binary)
 
-        dst0.ConvertTo(dst1, cv.MatType.CV_32SC1)
-        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
+        dst0.ConvertTo(dst1, cvb.MatType.CV_32SC1)
+        cvb.Cv2.FindContours(dst1, allContours, Nothing, cvb.RetrievalModes.FloodFill, cvb.ContourApproximationModes.ApproxSimple)
         dst3.SetTo(0)
 
-        Dim nextContour As cv.Point()
-        Dim contours As New List(Of cv.Point())
+        Dim nextContour As cvb.Point()
+        Dim contours As New List(Of cvb.Point())
         For i = 0 To allContours.Count - 1
-            nextContour = cv.Cv2.ApproxPolyDP(allContours(i), 3, True)
+            nextContour = cvb.Cv2.ApproxPolyDP(allContours(i), 3, True)
             If nextContour.Count > 2 Then contours.Add(nextContour)
         Next
 
-        cv.Cv2.DrawContours(dst3, contours, -1, New cv.Scalar(0, 255, 255), task.lineWidth, task.lineType)
+        cvb.Cv2.DrawContours(dst3, contours, -1, New cvb.Scalar(0, 255, 255), task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -83,7 +83,7 @@ Public Class ApproxPoly_Hull : Inherits VB_Parent
         labels = {"", "", "Original Hull", "Hull after ApproxPoly"}
         desc = "Use ApproxPolyDP on a hull to show impact of options (which appears to be minimal - what is wrong?)"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         hull.Run(src)
         dst2 = hull.dst2
 

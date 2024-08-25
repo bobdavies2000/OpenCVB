@@ -1,15 +1,15 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Exterior : Inherits VB_Parent
     Dim hull As New Convex_Basics
-    Public inputPoints As List(Of cv.Point)
-	Public smoothPoints As List(Of cv.Point)
-	Public plotColor = cv.Scalar.Yellow
+    Public inputPoints As List(Of cvb.Point)
+	Public smoothPoints As List(Of cvb.Point)
+	Public plotColor = cvb.Scalar.Yellow
     Dim smOptions As New Options_Smoothing
-    Private Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
-        Dim spline As New List(Of cv.Point)
+    Private Function getSplineInterpolationCatmullRom(points As List(Of cvb.Point), nrOfInterpolatedPoints As Integer) As List(Of cvb.Point)
+        Dim spline As New List(Of cvb.Point)
         ' Create a new pointlist to spline.  If you don't do this, the original pointlist is included with the extrapolated points
-        Dim spoints As New List(Of cv.Point)
+        Dim spoints As New List(Of cvb.Point)
         spoints = points
 
         Dim startPt = (spoints(1) + spoints(0)) * 0.5
@@ -20,9 +20,9 @@ Public Class Smoothing_Exterior : Inherits VB_Parent
         ' Note the nrOfInterpolatedPoints acts as a kind of tension factor between 0 and 1 because it is normalised
         ' to 1/nrOfInterpolatedPoints. It can never be 0
         Dim t As Double = 0
-        Dim spoint As cv.Point
+        Dim spoint As cvb.Point
         For i = 0 To spoints.Count - 4
-            spoint = New cv.Point()
+            spoint = New cvb.Point()
             For j = 0 To nrOfInterpolatedPoints - 1
                 Dim x0 = spoints.ElementAt((i) Mod spoints.Count)
                 Dim x1 = spoints.ElementAt((i + 1) Mod spoints.Count)
@@ -46,16 +46,16 @@ Public Class Smoothing_Exterior : Inherits VB_Parent
         labels(3) = ""
         desc = "Smoothing the line connecting a series of points."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         smOptions.RunVB()
         If standaloneTest() Then
             If task.heartBeat And Not task.paused Then
                 Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)
                 hull.Run(src)
-                Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
+                Dim nextHull = cvb.Cv2.ConvexHull(hullList.ToArray, True)
                 inputPoints = nextHull.ToList
-                DrawPoly(dst2, inputPoints, cv.Scalar.White)
+                DrawPoly(dst2, inputPoints, cvb.Scalar.White)
             Else
                 Exit Sub
             End If
@@ -76,20 +76,20 @@ End Class
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Interior : Inherits VB_Parent
     Dim hull As New Convex_Basics
-    Public inputPoints As List(Of cv.Point)
-    Public smoothPoints As List(Of cv.Point)
-    Public plotColor = cv.Scalar.Yellow
+    Public inputPoints As List(Of cvb.Point)
+    Public smoothPoints As List(Of cvb.Point)
+    Public plotColor = cvb.Scalar.Yellow
     Dim options As New Options_Smoothing
-    Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of cv.Point2d)
+    Private Function getCurveSmoothingChaikin(points As List(Of cvb.Point), tension As Double, nrOfIterations As Integer) As List(Of cvb.Point2d)
         'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
         'the opposite corner will be cut by the inverse (i.e. 1-cutting distance) to keep symmetry
         'with a tension value of 0.5 this amounts to 0.25 = 1/4 and 0.75 = 3/4 the original Chaikin values
         Dim cutdist As Double = 0.05 + (tension * 0.4)
 
         'make a copy of the pointlist and feed it to the iteration
-        Dim nl As New List(Of cv.Point2d)
+        Dim nl As New List(Of cvb.Point2d)
         For i = 0 To points.Count - 1
-            nl.Add(New cv.Point2d(CDbl(points.ElementAt(i).X), CDbl(points.ElementAt(i).Y)))
+            nl.Add(New cvb.Point2d(CDbl(points.ElementAt(i).X), CDbl(points.ElementAt(i).Y)))
         Next
 
         For i = 1 To nrOfIterations
@@ -99,17 +99,17 @@ Public Class Smoothing_Interior : Inherits VB_Parent
         Return nl
     End Function
 
-    Private Function getSmootherChaikin(points As List(Of cv.Point2d), cuttingDist As Double) As List(Of cv.Point2d)
-        Dim nl As New List(Of cv.Point2d)
+    Private Function getSmootherChaikin(points As List(Of cvb.Point2d), cuttingDist As Double) As List(Of cvb.Point2d)
+        Dim nl As New List(Of cvb.Point2d)
         'always add the first point
         nl.Add(points(0))
 
         For i = 0 To points.Count - 2
-            Dim pt1 = New cv.Point2d((1 - cuttingDist) * points.ElementAt(i).X, (1 - cuttingDist) * points.ElementAt(i).Y)
-            Dim pt2 = New cv.Point2d(cuttingDist * points.ElementAt(i + 1).X, cuttingDist * points.ElementAt(i + 1).Y)
+            Dim pt1 = New cvb.Point2d((1 - cuttingDist) * points.ElementAt(i).X, (1 - cuttingDist) * points.ElementAt(i).Y)
+            Dim pt2 = New cvb.Point2d(cuttingDist * points.ElementAt(i + 1).X, cuttingDist * points.ElementAt(i + 1).Y)
             nl.Add(pt1 + pt2)
-            pt1 = New cv.Point2d(cuttingDist * points.ElementAt(i).X, cuttingDist * points.ElementAt(i).Y)
-            pt2 = New cv.Point2d((1 - cuttingDist) * points.ElementAt(i + 1).X, (1 - cuttingDist) * points.ElementAt(i + 1).Y)
+            pt1 = New cvb.Point2d(cuttingDist * points.ElementAt(i).X, cuttingDist * points.ElementAt(i).Y)
+            pt2 = New cvb.Point2d((1 - cuttingDist) * points.ElementAt(i + 1).X, (1 - cuttingDist) * points.ElementAt(i + 1).Y)
             nl.Add(pt1 + pt2)
         Next
 
@@ -124,16 +124,16 @@ Public Class Smoothing_Interior : Inherits VB_Parent
         labels(3) = ""
         desc = "Smoothing the line connecting a series of points staying inside the outline."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
         If standaloneTest() Then
             If task.heartBeat And task.paused = False Then
                 Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)
                 hull.Run(src)
-                Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
+                Dim nextHull = cvb.Cv2.ConvexHull(hullList.ToArray, True)
                 inputPoints = nextHull.ToList
-                DrawPoly(dst2, nextHull.ToList, cv.Scalar.White)
+                DrawPoly(dst2, nextHull.ToList, cvb.Scalar.White)
             Else
                 Exit Sub
             End If
@@ -141,9 +141,9 @@ Public Class Smoothing_Interior : Inherits VB_Parent
             dst2.SetTo(0)
         End If
         Dim smoothPoints2d = getCurveSmoothingChaikin(inputPoints, options.interiorTension, options.iterations)
-        smoothPoints = New List(Of cv.Point)
+        smoothPoints = New List(Of cvb.Point)
         For i = 0 To smoothPoints2d.Count - 1 Step options.stepSize
-            smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
+            smoothPoints.Add(New cvb.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
         Next
         If smoothPoints.Count > 0 Then DrawPoly(dst2, smoothPoints, plotColor)
     End Sub

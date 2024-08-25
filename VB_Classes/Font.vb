@@ -1,13 +1,13 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Font_OpenCV : Inherits VB_Parent
     Public Sub New()
         desc = "Display different font options available in OpenCV"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If not task.heartBeat Then Exit Sub
-        Dim hersheyFont = Choose(task.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
-                                 cv.HersheyFonts.HersheyPlain, cv.HersheyFonts.HersheyScriptComplex, cv.HersheyFonts.HersheyScriptSimplex, cv.HersheyFonts.HersheySimplex,
-                                 cv.HersheyFonts.HersheyTriplex, cv.HersheyFonts.Italic)
+        Dim hersheyFont = Choose(task.frameCount Mod 7 + 1, cvb.HersheyFonts.HersheyComplex, cvb.HersheyFonts.HersheyComplexSmall, cvb.HersheyFonts.HersheyDuplex,
+                                 cvb.HersheyFonts.HersheyPlain, cvb.HersheyFonts.HersheyScriptComplex, cvb.HersheyFonts.HersheyScriptSimplex, cvb.HersheyFonts.HersheySimplex,
+                                 cvb.HersheyFonts.HersheyTriplex, cvb.HersheyFonts.Italic)
         Dim hersheyName = Choose(task.frameCount Mod 7 + 1, "HersheyComplex", "HersheyComplexSmall", "HersheyDuplex", "HersheyPlain", "HersheyScriptComplex",
                                  "HersheyScriptSimplex", "HersheySimplex", "HersheyTriplex", "Italic")
         labels(2) = hersheyName
@@ -16,9 +16,9 @@ Public Class Font_OpenCV : Inherits VB_Parent
         dst3.SetTo(0)
         For i = 1 To 10
             Dim size = 1.5 - i * 0.1
-            cv.Cv2.PutText(dst2, hersheyName + " " + Format(size, fmt1), New cv.Point(10, 30 + i * 30), hersheyFont, size, cv.Scalar.White, task.lineWidth, task.lineType)
-            Dim hersheyFontItalics = hersheyFont + cv.HersheyFonts.Italic
-            cv.Cv2.PutText(dst3, hersheyName + " " + Format(size, fmt1), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, cv.Scalar.White, task.lineWidth, task.lineType)
+            cvb.Cv2.PutText(dst2, hersheyName + " " + Format(size, fmt1), New cvb.Point(10, 30 + i * 30), hersheyFont, size, cvb.Scalar.White, task.lineWidth, task.lineType)
+            Dim hersheyFontItalics = hersheyFont + cvb.HersheyFonts.Italic
+            cvb.Cv2.PutText(dst3, hersheyName + " " + Format(size, fmt1), New cvb.Point(10, 30 + i * 30), hersheyFontItalics, size, cvb.Scalar.White, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -31,7 +31,7 @@ Public Class Font_FlowTextOld : Inherits VB_Parent
     Public Sub New()
         desc = "Show TrueType text flowing through an image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standaloneTest() Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
@@ -80,7 +80,7 @@ Public Class Font_FlowText : Inherits VB_Parent
     Public Sub New()
         desc = "Show TrueType text flowing through an image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standaloneTest() Then
             strOut = "-------------------------------------------------------------------------------------------------------------------" + vbCrLf
             strOut += "To get text to flow across an image in any algorithm, add Font_FlowText to your algorithm." + vbCrLf

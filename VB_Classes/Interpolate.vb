@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Flann
 
@@ -12,7 +12,7 @@ Public Class Interpolate_Basics : Inherits VB_Parent
                     "Local option 'Line length' affects the lines found.")
         desc = "Resize image using all available interpolation methods in OpenCV"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
         iOptions.RunVB()
         Static saveSliderValue As Integer = iOptions.interpolationThreshold
@@ -32,7 +32,7 @@ Public Class Interpolate_Basics : Inherits VB_Parent
         End If
 
         dst2 = src.Clone
-        Dim newSize = New cv.Size(CInt(dst2.Width * saveSliderValue / 100), CInt(dst2.Height * saveSliderValue / 100))
+        Dim newSize = New cvb.Size(CInt(dst2.Width * saveSliderValue / 100), CInt(dst2.Height * saveSliderValue / 100))
         dst2 = src.Resize(newSize, 0, 0, options.warpFlag)
         labels(2) = "Resize % = " + Format(saveSliderValue / 100, "0%")
     End Sub
@@ -54,18 +54,18 @@ Public Class Interpolate_Kalman : Inherits VB_Parent
     Public Sub New()
         desc = "Use Kalman to smooth the grayscale results of interpolation"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         inter.Run(src)
 
-        dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = inter.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.optionsChanged Then
             ReDim kalman.kInput(dst2.Width * dst2.Height - 1)
             myFrameCount = 1
             updatedFrames = 0
         End If
 
-        Dim tmp32f As New cv.Mat
-        dst2.ConvertTo(tmp32f, cv.MatType.CV_32F)
+        Dim tmp32f As New cvb.Mat
+        dst2.ConvertTo(tmp32f, cvb.MatType.CV_32F)
         Marshal.Copy(tmp32f.Data, kalman.kInput, 0, kalman.kInput.Length)
         kalman.Run(empty)
 
@@ -85,9 +85,9 @@ Public Class Interpolate_Kalman : Inherits VB_Parent
             labels(2) = "Raw output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
         End If
 
-        Static lastframe As cv.Mat = dst2.Clone
+        Static lastframe As cvb.Mat = dst2.Clone
         If lastframe.Size <> dst2.Size Then lastframe = dst2.Clone
-        Dim tmp As cv.Mat = dst2 - lastframe
+        Dim tmp As cvb.Mat = dst2 - lastframe
         Dim diffCount = tmp.CountNonZero
         If diffCount > inter.iOptions.pixelCountThreshold Then
             lastframe = dst2.Clone
@@ -123,15 +123,15 @@ Public Class Interpolate_Lines : Inherits VB_Parent
         FindSlider("Interpolation threshold").Value = 100
         desc = "Detect lines in interpolation results."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         inter.Run(src)
-        dst1 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size)
-        dst1 = dst1.Threshold(inter.iOptions.interpolationThreshold, 255, cv.ThresholdTypes.Binary)
+        dst1 = inter.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size)
+        dst1 = dst1.Threshold(inter.iOptions.interpolationThreshold, 255, cvb.ThresholdTypes.Binary)
         lines.Run(dst1)
         dst2 = lines.dst2
         dst3 = src
         For Each lp In lines.lpList
-            DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
+            DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.Yellow)
         Next
         labels(3) = "There were " + CStr(lines.lpList.Count) + " lines found"
         labels(2) = inter.labels(2)
@@ -149,12 +149,12 @@ Public Class Interpolate_Difference : Inherits VB_Parent
     Public Sub New()
         desc = "Highlight the difference between the interpolation results and the current image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         inter.Run(src)
-        dst2 = inter.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = inter.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         labels(2) = inter.labels(3)
 
-        diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        diff.lastFrame = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         diff.Run(dst2)
         dst3 = diff.dst2
     End Sub
@@ -177,12 +177,12 @@ Public Class Interpolate_QuarterBeat : Inherits VB_Parent
     Public Sub New()
         desc = "Highlight the image differences after every quarter second."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.quarterBeat Then
             diff.Run(src)
             dst3 = diff.dst2
             If diff.dst2.CountNonZero > 0 Then
-                diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                diff.lastFrame = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
                 dst2 = src
                 updatedFrames += 1
             End If

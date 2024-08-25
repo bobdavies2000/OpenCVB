@@ -1,7 +1,7 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports  System.IO
 Imports System.Runtime.InteropServices
-' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
+' https://www.learnopencvb.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_Basics : Inherits VB_Parent
     ReadOnly ecc As New WarpModel_ECC
     Dim options As New Options_WarpModel
@@ -11,14 +11,14 @@ Public Class WarpModel_Basics : Inherits VB_Parent
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image"}
         desc = "Align the BGR inputs raw images from the Prokudin examples."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If standaloneTest() Then ecc.warpInput.Run(src)
         dst0 = ecc.warpInput.rgb(0).Clone
         dst1 = ecc.warpInput.rgb(1).Clone
         dst2 = ecc.warpInput.rgb(2).Clone
-        Dim aligned() = {New cv.Mat, New cv.Mat}
+        Dim aligned() = {New cvb.Mat, New cvb.Mat}
         For i = 0 To 1
             If options.useGradient Then
                 src = ecc.warpInput.gradient(0)
@@ -32,13 +32,13 @@ Public Class WarpModel_Basics : Inherits VB_Parent
         Next
 
         Dim mergeInput() = {src, aligned(0), aligned(1)}
-        Dim merged As New cv.Mat
-        cv.Cv2.Merge(mergeInput, merged)
+        Dim merged As New cvb.Mat
+        cvb.Cv2.Merge(mergeInput, merged)
         dst3.SetTo(0)
-        dst3(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
+        dst3(New cvb.Rect(0, 0, merged.Width, merged.Height)) = merged
         SetTrueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                       "Other than that, images look the same." + vbCrLf +
-                      "Displacement increases with Sobel" + vbCrLf + "kernel size", New cv.Point(merged.Width + 10, 40), 3)
+                      "Displacement increases with Sobel" + vbCrLf + "kernel size", New cvb.Point(merged.Width + 10, 40), 3)
     End Sub
 End Class
 
@@ -48,13 +48,13 @@ End Class
 
 
 
-' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
+' https://www.learnopencvb.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_ECC : Inherits VB_Parent
     Public warpInput As New WarpModel_Input
     Public warpMatrix() As Single
-    Public src2 As New cv.Mat
-    Public aligned As New cv.Mat
-    Public outputRect As cv.Rect
+    Public src2 As New cvb.Mat
+    Public aligned As New cvb.Mat
+    Public outputRect As cvb.Rect
     ReadOnly options As New Options_WarpModel
     Public Sub New()
         cPtr = WarpModel_Open()
@@ -63,7 +63,7 @@ Public Class WarpModel_ECC : Inherits VB_Parent
         labels(3) = "Src2 image aligned to src image"
         desc = "Use FindTransformECC to align 2 images"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Options.RunVB()
 
         If standaloneTest() Then
@@ -97,17 +97,17 @@ Public Class WarpModel_ECC : Inherits VB_Parent
         Marshal.Copy(imagePtr, warpMatrix, 0, warpMatrix.Length)
 
         If options.warpMode <> 3 Then
-            Dim warpMat = cv.Mat.FromPixelData(2, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            Dim warpMat = cvb.Mat.FromPixelData(2, 3, cvb.MatType.CV_32F, warpMatrix)
+            cvb.Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), cvb.InterpolationFlags.Linear + cvb.InterpolationFlags.WarpInverseMap)
         Else
-            Dim warpMat = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            Dim warpMat = cvb.Mat.FromPixelData(3, 3, cvb.MatType.CV_32F, warpMatrix)
+            cvb.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cvb.InterpolationFlags.Linear + cvb.InterpolationFlags.WarpInverseMap)
         End If
 
-        dst2 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst3 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
 
-        outputRect = New cv.Rect(0, 0, src.Width, src.Height)
+        outputRect = New cvb.Rect(0, 0, src.Width, src.Height)
         dst2(outputRect) = src
         dst3(outputRect) = src2
 
@@ -120,7 +120,7 @@ Public Class WarpModel_ECC : Inherits VB_Parent
         If options.useWarpAffine Or options.useWarpHomography Then
             outStr += vbCrLf + "NOTE: Gradients may give better results."
         End If
-        SetTrueText(outStr, New cv.Point(aligned.Width + 10, 220))
+        SetTrueText(outStr, New cvb.Point(aligned.Width + 10, 220))
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = WarpModel_Close(cPtr)
@@ -136,8 +136,8 @@ End Class
 ' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
 ' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
 Public Class WarpModel_Input : Inherits VB_Parent
-    Public rgb(3 - 1) As cv.Mat
-    Public gradient(3 - 1) As cv.Mat
+    Public rgb(3 - 1) As cvb.Mat
+    Public gradient(3 - 1) As cvb.Mat
     ReadOnly sobel as new Edge_Sobel
     ReadOnly options As New Options_WarpModel
     Public Sub New()
@@ -146,12 +146,12 @@ Public Class WarpModel_Input : Inherits VB_Parent
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "Naively Aligned image"}
         desc = "Import the misaligned input."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Options.RunVB()
 
-        Dim r() = {New cv.Rect(0, 0, options.pkImage.Width, options.pkImage.Height / 3),
-                   New cv.Rect(0, options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3),
-                   New cv.Rect(0, 2 * options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3)}
+        Dim r() = {New cvb.Rect(0, 0, options.pkImage.Width, options.pkImage.Height / 3),
+                   New cvb.Rect(0, options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3),
+                   New cvb.Rect(0, 2 * options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3)}
 
         For i = 0 To r.Count - 1
             If options.useGradient Then
@@ -163,8 +163,8 @@ Public Class WarpModel_Input : Inherits VB_Parent
 
         If src.Width < rgb(0).Width Or src.Height < rgb(0).Height Then
             For i = 0 To rgb.Count - 1
-                Dim sz = New cv.Size(src.Width * rgb(i).Height / rgb(i).Width, src.Height)
-                r(i) = New cv.Rect(0, 0, sz.Width, sz.Height)
+                Dim sz = New cvb.Size(src.Width * rgb(i).Height / rgb(i).Width, src.Height)
+                r(i) = New cvb.Rect(0, 0, sz.Width, sz.Height)
                 rgb(i) = rgb(i).Resize(sz)
             Next
         End If
@@ -173,8 +173,8 @@ Public Class WarpModel_Input : Inherits VB_Parent
         dst1 = rgb(1)
         dst2 = rgb(2)
 
-        Dim merged As New cv.Mat
-        cv.Cv2.Merge(rgb, merged)
+        Dim merged As New cvb.Mat
+        cvb.Cv2.Merge(rgb, merged)
         dst3.SetTo(0)
         dst3(r(0)) = merged
     End Sub

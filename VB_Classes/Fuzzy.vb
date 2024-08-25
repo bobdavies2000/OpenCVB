@@ -1,11 +1,11 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Public Class Fuzzy_Basics : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_Contours
-    Public contours As cv.Point()()
-    Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
+    Public contours As cvb.Point()()
+    Public sortContours As New SortedList(Of Integer, cvb.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         Dim floodRadio = FindRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
@@ -16,12 +16,12 @@ Public Class Fuzzy_Basics : Inherits VB_Parent
         labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}
         desc = "That which is not solid is fuzzy"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         reduction.Run(src)
         dst0 = reduction.dst2
-        If dst0.Channels() <> 1 Then dst0 = dst0.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If dst0.Channels() <> 1 Then dst0 = dst0.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         Dim dataSrc(dst0.Total) As Byte
         Marshal.Copy(dst0.Data, dataSrc, 0, dataSrc.Length)
@@ -29,16 +29,16 @@ Public Class Fuzzy_Basics : Inherits VB_Parent
         Dim imagePtr = Fuzzy_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst0.Rows, dst0.Cols)
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
-        dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        dst2 = cvb.Mat.FromPixelData(dst0.Rows, dst0.Cols, cvb.MatType.CV_8UC1, imagePtr).Clone
+        dst3 = dst2.Threshold(0, 255, cvb.ThresholdTypes.BinaryInv)
 
-        Dim tmp As New cv.Mat
-        If options.retrievalMode = cv.RetrievalModes.CComp Or options.retrievalMode = cv.RetrievalModes.FloodFill Then
-            dst3.ConvertTo(tmp, cv.MatType.CV_32S)
+        Dim tmp As New cvb.Mat
+        If options.retrievalMode = cvb.RetrievalModes.CComp Or options.retrievalMode = cvb.RetrievalModes.FloodFill Then
+            dst3.ConvertTo(tmp, cvb.MatType.CV_32S)
         Else
-            dst3.ConvertTo(tmp, cv.MatType.CV_8U)
+            dst3.ConvertTo(tmp, cvb.MatType.CV_8U)
         End If
-        contours = cv.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
+        contours = cvb.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
 
         sortContours.Clear()
         For i = 0 To contours.Length - 1
@@ -57,7 +57,7 @@ Public Class Fuzzy_Basics : Inherits VB_Parent
                 Next
                 If maskID <> 0 Then Exit For
             Next
-            sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
+            sortContours.Add(contours(i).Length, New cvb.Point(i, maskID))
         Next
 
         dst1 = ShowPalette(dst2 * 255 / reduction.classCount)
@@ -75,37 +75,37 @@ End Class
 
 
 Public Class Fuzzy_Filter : Inherits VB_Parent
-    Dim kernel As cv.Mat
+    Dim kernel As cvb.Mat
     Dim reduction As New Reduction_Basics
-    Public contours As cv.Point()()
-    Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
+    Public contours As cvb.Point()()
+    Public sortContours As New SortedList(Of Integer, cvb.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Dim options As New Options_Contours
     Public Sub New()
         Dim array() As Single = {1, 1, 1, 1, 1, 1, 1, 1, 1}
-        kernel = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, array)
+        kernel = cvb.Mat.FromPixelData(3, 3, cvb.MatType.CV_32F, array)
         kernel *= 1 / 9
         desc = "Use a 2D filter to find smooth areas"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         reduction.Run(src)
 
-        Dim src32f As New cv.Mat
-        reduction.dst2.ConvertTo(src32f, cv.MatType.CV_32F)
+        Dim src32f As New cvb.Mat
+        reduction.dst2.ConvertTo(src32f, cvb.MatType.CV_32F)
         dst2 = src32f.Filter2D(-1, kernel)
         dst3 = dst2.Subtract(src32f)
-        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        dst3.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        dst3 = dst3.Threshold(0, 255, cvb.ThresholdTypes.BinaryInv)
+        dst3.ConvertTo(dst3, cvb.MatType.CV_8U)
+        dst3 = dst3.Threshold(0, 255, cvb.ThresholdTypes.BinaryInv)
 
-        If options.retrievalMode = cv.RetrievalModes.FloodFill Then
-            Dim tmp As New cv.Mat
-            dst3.ConvertTo(tmp, cv.MatType.CV_32S)
-            contours = cv.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
+        If options.retrievalMode = cvb.RetrievalModes.FloodFill Then
+            Dim tmp As New cvb.Mat
+            dst3.ConvertTo(tmp, cvb.MatType.CV_32S)
+            contours = cvb.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
         Else
-            contours = cv.Cv2.FindContoursAsArray(dst3, options.retrievalMode, options.ApproximationMode)
+            contours = cvb.Cv2.FindContoursAsArray(dst3, options.retrievalMode, options.ApproximationMode)
         End If
 
         sortContours.Clear()
@@ -124,7 +124,7 @@ Public Class Fuzzy_Filter : Inherits VB_Parent
                 Next
                 If maskID <> 0 Then Exit For
             Next
-            sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
+            sortContours.Add(contours(i).Length, New cvb.Point(i, maskID))
         Next
 
         dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
@@ -144,7 +144,7 @@ Public Class Fuzzy_ContoursDepth : Inherits VB_Parent
     Public Sub New()
         desc = "Use contours to outline solids in the depth data"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         fuzzyD.Run(task.depthRGB)
         dst2 = fuzzyD.dst1
     End Sub
@@ -163,7 +163,7 @@ Public Class Fuzzy_NeighborProof : Inherits VB_Parent
     Public Sub New()
         desc = "Prove that every contour point has at one and only one neighbor with the mask ID and that the rest are zero"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If proofFailed Then Exit Sub
         fuzzy.Run(src)
         dst2 = fuzzy.dst1
@@ -187,7 +187,7 @@ Public Class Fuzzy_NeighborProof : Inherits VB_Parent
                 Next
             Next
         Next
-        SetTrueText("Results are valid." + vbCrLf + "Mask ID's for all contour points in each region identified only one region.", New cv.Point(10, 50), 3)
+        SetTrueText("Results are valid." + vbCrLf + "Mask ID's for all contour points in each region identified only one region.", New cvb.Point(10, 50), 3)
     End Sub
 End Class
 
@@ -200,17 +200,17 @@ End Class
 
 Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
     Public fuzzy As New Fuzzy_Basics
-    Public centroids As New List(Of cv.Point)
-    Public rects As New List(Of cv.Rect)
+    Public centroids As New List(Of cvb.Point)
+    Public rects As New List(Of cvb.Rect)
     Public layoutColor As New List(Of Integer)
-    Public highlightPoint As cv.Point
-    Public highlightRect As cv.Rect
+    Public highlightPoint As cvb.Point
+    Public highlightRect As cvb.Rect
     Public highlightRegion = -1
     Dim options As New Options_TrackerDepth
     Public Sub New()
         desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         fuzzy.Run(task.depthRGB)
@@ -223,22 +223,22 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
         Dim minY As Double, maxY As Double
         For Each vec In fuzzy.sortContours.Values
             Dim contours = fuzzy.contours(vec(0))
-            Dim points = cv.Mat.FromPixelData(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
+            Dim points = cvb.Mat.FromPixelData(contours.Length, 1, cvb.MatType.CV_32SC2, contours.ToArray)
             Dim center = points.Sum()
-            points = cv.Mat.FromPixelData(contours.Length, 2, cv.MatType.CV_32S, contours.ToArray)
+            points = cvb.Mat.FromPixelData(contours.Length, 2, cvb.MatType.CV_32S, contours.ToArray)
             points.Col(0).MinMaxIdx(minX, maxX)
             points.Col(1).MinMaxIdx(minY, maxY)
 
-            Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
+            Dim rect = New cvb.Rect(minX, minY, maxX - minX, maxY - minY)
             If rect.Width * rect.Height > options.minRectSize Then
-                Dim centroid = New cv.Point2f(center(0) / contours.Length, center(1) / contours.Length)
+                Dim centroid = New cvb.Point2f(center(0) / contours.Length, center(1) / contours.Length)
                 centroids.Add(centroid)
                 rects.Add(rect)
                 layoutColor.Add(vec(1))
                 If options.displayRect Then
-                    DrawCircle(dst2, centroid, task.DotSize + 3, cv.Scalar.Yellow)
-                    DrawCircle(dst2, centroid, task.DotSize, cv.Scalar.Red)
-                    dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
+                    DrawCircle(dst2, centroid, task.DotSize + 3, cvb.Scalar.Yellow)
+                    DrawCircle(dst2, centroid, task.DotSize, cvb.Scalar.Red)
+                    dst2.Rectangle(rect, cvb.Scalar.Yellow, 2)
                 End If
             End If
         Next
@@ -255,18 +255,18 @@ End Class
 
 Public Class Fuzzy_TrackerDepthClick : Inherits VB_Parent
     Public tracker As New Fuzzy_TrackerDepth
-    Public highlightPoint As cv.Point
-    Public highlightRect As cv.Rect
+    Public highlightPoint As cvb.Point
+    Public highlightRect As cvb.Rect
     Public highlightRegion = -1
-    Public regionMask As cv.Mat
+    Public regionMask As cvb.Mat
     Public Sub New()
         desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         tracker.Run(src)
         dst2 = tracker.dst2
 
-        If highlightRegion < 0 Then SetTrueText("Click any color region to get more details and track it", New cv.Point(10, 50), 3)
+        If highlightRegion < 0 Then SetTrueText("Click any color region to get more details and track it", New cvb.Point(10, 50), 3)
 
         dst3 = tracker.fuzzy.dst1
         If task.mouseClickFlag Then
@@ -275,7 +275,7 @@ Public Class Fuzzy_TrackerDepthClick : Inherits VB_Parent
         End If
         If highlightRegion >= 0 Then
             regionMask = tracker.fuzzy.dst2.InRange(highlightRegion, highlightRegion + 1)
-            dst3.SetTo(cv.Scalar.Yellow, regionMask)
+            dst3.SetTo(cvb.Scalar.Yellow, regionMask)
         End If
         labels(2) = CStr(tracker.fuzzy.sortContours.Count) + " regions were found in the image."
     End Sub

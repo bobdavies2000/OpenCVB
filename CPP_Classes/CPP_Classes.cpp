@@ -27,15 +27,14 @@
 #include "opencv2/xphoto/oilpainting.hpp"
 
 using namespace System;
-using namespace cv;
 
 namespace CPP_Classes {
     class AddWeighted_Basics_CC
     {
     public:
         double weight;
-        Mat src2;
-        Mat dst2;
+        cv::Mat src2;
+        cv::Mat dst2;
         AddWeighted_Basics_CC()
         {
             auto desc = "Add 2 images with specified weights.";
@@ -43,7 +42,7 @@ namespace CPP_Classes {
 
         void RunCS(cv::Mat& src)
         {
-            Mat srcPlus = src2;
+            cv::Mat srcPlus = src2;
             double weight = 0.5;
             addWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2);
         }

@@ -2,7 +2,7 @@ Imports  System.IO
 Imports System.Runtime.InteropServices
 Imports  System.IO.MemoryMappedFiles
 Imports  System.IO.Pipes
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Python_Basics : Inherits VB_Parent
     Public Function StartPython(arguments As String) As Boolean
         Dim pythonApp = New FileInfo(task.pythonTaskName)
@@ -36,7 +36,7 @@ Public Class Python_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Access Python from OpenCVB - contains the startPython interface"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         SetTrueText("There is no output from " + traceName + ".  It contains the interface to python.")
     End Sub
 End Class
@@ -74,7 +74,7 @@ Public Class Python_Run : Inherits VB_Parent
         End If
         desc = "Run Python app: " + pythonApp.Name
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If task.cameraName = "Oak-D camera" And pythonApp.Name.EndsWith("_PS.py") And testPyStreamOakD = False Then
             OakDPipeIssue()
         Else
@@ -123,7 +123,7 @@ Public Class Python_MemMap : Inherits VB_Parent
             desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If standaloneTest() Then
             SetTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
@@ -181,14 +181,14 @@ Public Class Python_Stream : Inherits VB_Parent
         labels(2) = "Output of Python Backend"
         desc = "General purpose class to pipe BGR and Depth to Python scripts."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If standaloneTest() Then
             SetTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
         End If
 
         If task.pythonReady And task.pcSplit(2).Width > 0 Then
-            Dim depth32f As cv.Mat = task.pcSplit(2) * 1000
+            Dim depth32f As cvb.Mat = task.pcSplit(2) * 1000
             For i = 0 To memMap.memMapValues.Length - 1
                 memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize,
                                                 depth32f.Total * depth32f.ElemSize, src.Rows, src.Cols,

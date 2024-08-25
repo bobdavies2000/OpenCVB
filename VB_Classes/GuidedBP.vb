@@ -1,24 +1,24 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class GuidedBP_Basics : Inherits VB_Parent
     Public ptHot As New GuidedBP_HotPoints
-    Dim topMap As New cv.Mat
-    Dim sideMap As New cv.Mat
+    Dim topMap As New cvb.Mat
+    Dim sideMap As New cvb.Mat
     Public Sub New()
-        topMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        sideMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        topMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        sideMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Correlate the hot points with the previous generation using a Map"
     End Sub
-    Private Sub runMap(rectList As List(Of cv.Rect), dstindex As Integer, map As cv.Mat)
-        Dim sortRects As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+    Private Sub runMap(rectList As List(Of cvb.Rect), dstindex As Integer, map As cvb.Mat)
+        Dim sortRects As New SortedList(Of Integer, cvb.Rect)(New compareAllowIdenticalIntegerInverted)
         For Each r In rectList
             sortRects.Add(r.Width * r.Height, r)
         Next
 
-        Dim ptList As New List(Of cv.Point)
+        Dim ptList As New List(Of cvb.Point)
         Dim indices As New List(Of Integer)
         For Each r In sortRects.Values
-            Dim pt = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
+            Dim pt = New cvb.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
             Dim index = map.Get(Of Byte)(pt.Y, pt.X)
             If index = 0 Or indices.Contains(index) Then
                 If index = ptList.Count Then index = ptList.Count + 1 Else index = ptList.Count
@@ -29,13 +29,13 @@ Public Class GuidedBP_Basics : Inherits VB_Parent
 
         map.SetTo(0)
         For Each r In sortRects.Values
-            Dim pt = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
+            Dim pt = New cvb.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
             Dim index = indices(ptList.IndexOf(pt))
             map.Rectangle(r, index, -1)
             SetTrueText(CStr(index), pt, dstindex)
         Next
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         ptHot.Run(src)
         dst2 = ptHot.dst2
         dst3 = ptHot.dst3
@@ -60,13 +60,13 @@ Public Class GuidedBP_HotPointsKNN : Inherits VB_Parent
     Public Sub New()
         desc = "Correlate the hot points with the previous generation to ID each object"
     End Sub
-    Private Sub runKNN(knn As KNN_Core, rectList As List(Of cv.Rect), dst As cv.Mat, dstindex As Integer)
+    Private Sub runKNN(knn As KNN_Core, rectList As List(Of cvb.Rect), dst As cvb.Mat, dstindex As Integer)
         knn.queries.Clear()
         For Each r In rectList
-            knn.queries.Add(New cv.Point2f(CSng(r.X + r.Width / 2), CSng(r.Y + r.Height / 2)))
+            knn.queries.Add(New cvb.Point2f(CSng(r.X + r.Width / 2), CSng(r.Y + r.Height / 2)))
         Next
 
-        If task.FirstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        If task.FirstPass Then knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
 
         knn.Run(empty)
 
@@ -77,15 +77,15 @@ Public Class GuidedBP_HotPointsKNN : Inherits VB_Parent
             Dim dist = p1.DistanceTo(p2)
             Dim r = rectList(i)
             If dist < r.Width / 2 And dist < r.Height / 2 Then
-                dst.Rectangle(r, cv.Scalar.White, task.lineWidth)
-                Dim pt = New cv.Point(r.X + r.Width, r.Y + r.Height)
+                dst.Rectangle(r, cvb.Scalar.White, task.lineWidth)
+                Dim pt = New cvb.Point(r.X + r.Width, r.Y + r.Height)
                 SetTrueText(CStr(index), pt, dstindex)
             End If
         Next
 
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         ptHot.Run(src)
         dst2 = ptHot.dst2
         dst3 = ptHot.dst3
@@ -107,39 +107,39 @@ End Class
 Public Class GuidedBP_HotPoints : Inherits VB_Parent
     Public histTop As New Projection_HistTop
     Public histSide As New Projection_HistSide
-    Public topRects As New List(Of cv.Rect)
-    Public sideRects As New List(Of cv.Rect)
-    Dim floodRect As New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
-    Dim mask As New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U)
+    Public topRects As New List(Of cvb.Rect)
+    Public sideRects As New List(Of cvb.Rect)
+    Dim floodRect As New cvb.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
+    Dim mask As New cvb.Mat(New cvb.Size(dst2.Width + 2, dst2.Height + 2), cvb.MatType.CV_8U)
     Public Sub New()
         task.useXYRange = False
         desc = "Use floodfill to identify all the objects in both the top and side views."
     End Sub
-    Private Function hotPoints(ByRef view As cv.Mat) As List(Of cv.Rect)
-        Dim rect As cv.Rect
+    Private Function hotPoints(ByRef view As cvb.Mat) As List(Of cvb.Rect)
+        Dim rect As cvb.Rect
         Dim points = view.FindNonZero()
 
-        Dim viewList As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+        Dim viewList As New SortedList(Of Integer, cvb.Point)(New compareAllowIdenticalIntegerInverted)
         mask.SetTo(0)
         Dim lastCount As Integer = 0
         For i = 0 To points.Rows - 1
-            Dim pt = points.Get(Of cv.Point)(i, 0)
-            Dim count = view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.MaskOnly Or (255 << 8))
+            Dim pt = points.Get(Of cvb.Point)(i, 0)
+            Dim count = view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cvb.FloodFillFlags.MaskOnly Or (255 << 8))
             If count > 0 Then viewList.Add(count, pt)
         Next
 
         mask.SetTo(0)
-        Dim rectList As New List(Of cv.Rect)
+        Dim rectList As New List(Of cvb.Rect)
         For i = 0 To Math.Min(viewList.Count, 10) - 1
             Dim pt = viewList.ElementAt(i).Value
-            view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.FixedRange Or (i + 1 << 8))
-            rectList.Add(New cv.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height))
+            view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cvb.FloodFillFlags.FixedRange Or (i + 1 << 8))
+            rectList.Add(New cvb.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height))
         Next
 
         mask(floodRect).CopyTo(view)
         Return rectList
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         histTop.Run(src.Clone)
         topRects = hotPoints(histTop.dst3)
         dst2 = ShowPalette(histTop.dst3 * 255 / topRects.Count)
@@ -167,7 +167,7 @@ Public Class GuidedBP_PlanesPlot : Inherits VB_Parent
         labels = {"", "", "Side view", "Plot of nonzero rows in the side view"}
         desc = "Plot the likely floor or ceiling areas."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         histSide.Run(src)
         dst2 = histSide.dst3
 
@@ -176,7 +176,7 @@ Public Class GuidedBP_PlanesPlot : Inherits VB_Parent
         For i = 0 To dst2.Rows - 1
             Dim x = dst2.Row(i).CountNonZero
             sumList.Add(x)
-            DrawLine(dst3, New cv.Point(0, i), New cv.Point(x, i), cv.Scalar.White)
+            DrawLine(dst3, New cvb.Point(0, i), New cvb.Point(x, i), cvb.Scalar.White)
         Next
 
         Dim flatSurfacesInRow As New List(Of Integer)
@@ -210,28 +210,28 @@ End Class
 Public Class GuidedBP_Points : Inherits VB_Parent
     Public hotPoints As New GuidedBP_Basics
     Public classCount As Integer
-    Public selectedPoint As cv.Point
-    Public topRects As New List(Of cv.Rect)
-    Public sideRects As New List(Of cv.Rect)
-    Public histogramTop As New cv.Mat
-    Public histogramSide As New cv.Mat
-    Public backP As New cv.Mat
+    Public selectedPoint As cvb.Point
+    Public topRects As New List(Of cvb.Rect)
+    Public sideRects As New List(Of cvb.Rect)
+    Public histogramTop As New cvb.Mat
+    Public histogramSide As New cvb.Mat
+    Public backP As New cvb.Mat
     Public Sub New()
         desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         hotPoints.Run(src)
 
-        hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP, task.rangesTop)
+        hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cvb.MatType.CV_32F)
+        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP, task.rangesTop)
 
-        topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
-        sideRects = New List(Of cv.Rect)(hotPoints.ptHot.sideRects)
+        topRects = New List(Of cvb.Rect)(hotPoints.ptHot.topRects)
+        sideRects = New List(Of cvb.Rect)(hotPoints.ptHot.sideRects)
 
         dst2 = ShowPalette(backP * 255 / topRects.Count)
 
-        hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
+        hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cvb.MatType.CV_32F)
+        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
 
         dst3 = ShowPalette(dst3 * 255 / sideRects.Count)
 
@@ -252,10 +252,10 @@ End Class
 Public Class GuidedBP_Lookup : Inherits VB_Parent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
-        task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         guided.Run(src)
         dst2 = guided.dst2
         labels(2) = guided.labels(2)
@@ -278,8 +278,8 @@ Public Class GuidedBP_Depth : Inherits VB_Parent
         task.gOptions.setHistogramBins(16)
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         hist.Run(src)
 
@@ -308,8 +308,8 @@ Public Class GuidedBP_Depth : Inherits VB_Parent
 
         Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
 
-        cv.Cv2.CalcBackProject({src}, task.redOptions.channels, hist.histogram, dst2, task.redOptions.ranges)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        cvb.Cv2.CalcBackProject({src}, task.redOptions.channels, hist.histogram, dst2, task.redOptions.ranges)
+        dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
 
         If standaloneTest() Then
             labels(3) = "Note that colors are shifting because this is before any matching."

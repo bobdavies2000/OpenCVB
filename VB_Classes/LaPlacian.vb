@@ -1,5 +1,5 @@
-Imports cv = OpenCvSharp
-' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
+Imports cvb = OpenCvSharp
+' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Laplacian_Basics : Inherits VB_Parent
     Dim options As New Options_Laplacian
     Dim erode As New Erode_Basics
@@ -7,13 +7,13 @@ Public Class Laplacian_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Laplacian filter - the second derivative."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Options.RunVB()
         If standaloneTest() Then src = src.GaussianBlur(options.kernel, 0, 0)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        dst3 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        dst3 = src.Laplacian(cvb.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
 
-        erode.Run(dst3.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary))
+        erode.Run(dst3.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary))
         dilate.Run(erode.dst2)
         dst2 = dilate.dst2
 
@@ -26,13 +26,13 @@ End Class
 
 
 
-' https://docs.opencv.org/3.2.0/de/db2/laplace_8cpp-example.html
+' https://docs.opencvb.org/3.2.0/de/db2/laplace_8cpp-example.html
 Public Class Laplacian_Blur : Inherits VB_Parent
     Dim options As New Options_Laplacian
     Public Sub New()
         desc = "Laplacian filter - the second derivative - with different bluring techniques"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Options.RunVB()
 
         Dim blurText As String
@@ -46,8 +46,8 @@ Public Class Laplacian_Blur : Inherits VB_Parent
             src = src.MedianBlur(options.kernel.Width)
             blurText = "MedianBlur"
         End If
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        dst2 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        dst2 = src.Laplacian(cvb.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
         labels(2) = "Laplacian+" + blurText + " k = " + CStr(options.kernel.Width)
     End Sub
 End Class
@@ -62,9 +62,9 @@ Public Class Laplacian_PyramidFilter : Inherits VB_Parent
     Public Sub New()
         desc = "VB.Net version of the Laplacian Pyramid Filter - see http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        src.ConvertTo(options.img, cv.MatType.CV_32F)
+    Public Sub RunVB(src As cvb.Mat)
+        src.ConvertTo(options.img, cvb.MatType.CV_32F)
         options.RunVB()
-        options.img.ConvertTo(dst2, cv.MatType.CV_8UC3)
+        options.img.ConvertTo(dst2, cvb.MatType.CV_8UC3)
     End Sub
 End Class

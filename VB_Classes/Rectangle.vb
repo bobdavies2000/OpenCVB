@@ -1,31 +1,31 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Rectangle_Basics : Inherits VB_Parent
-    Public rectangles As New List(Of cv.Rect)
-    Public rotatedRectangles As New List(Of cv.RotatedRect)
+    Public rectangles As New List(Of cvb.Rect)
+    Public rotatedRectangles As New List(Of cvb.RotatedRect)
     Public options As New Options_Draw
     Public Sub New()
         desc = "Draw the requested number of rectangles."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
         If task.heartBeat Then
-            dst2.SetTo(cv.Scalar.Black)
+            dst2.SetTo(cvb.Scalar.Black)
             rectangles.Clear()
             rotatedRectangles.Clear()
             For i = 0 To options.drawCount - 1
-                Dim nPoint = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
+                Dim nPoint = New cvb.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
                 Dim width = msRNG.Next(0, src.Cols - nPoint.X - 1)
                 Dim height = msRNG.Next(0, src.Rows - nPoint.Y - 1)
-                Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
+                Dim eSize = New cvb.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
 
-                Dim nextColor = New cv.Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
-                Dim rr = New cv.RotatedRect(nPoint, eSize, angle)
-                Dim r = New cv.Rect(nPoint.X, nPoint.Y, width, height)
+                Dim nextColor = New cvb.Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+                Dim rr = New cvb.RotatedRect(nPoint, eSize, angle)
+                Dim r = New cvb.Rect(nPoint.X, nPoint.Y, width, height)
                 If options.drawRotated Then
                     DrawRotatedRect(rr, dst2, nextColor)
                 Else
-                    cv.Cv2.Rectangle(dst2, r, nextColor, options.drawFilled)
+                    cvb.Cv2.Rectangle(dst2, r, nextColor, options.drawFilled)
                 End If
                 rotatedRectangles.Add(rr)
                 rectangles.Add(r)
@@ -43,7 +43,7 @@ Public Class Rectangle_Rotated : Inherits VB_Parent
         FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = True
         desc = "Draw the requested number of rectangles."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         rectangle.Run(src)
         dst2 = rectangle.dst2
     End Sub
@@ -57,15 +57,15 @@ End Class
 
 
 Public Class Rectangle_Overlap : Inherits VB_Parent
-    Public rect1 As cv.Rect
-    Public rect2 As cv.Rect
-    Public enclosingRect As cv.Rect
+    Public rect1 As cvb.Rect
+    Public rect2 As cvb.Rect
+    Public enclosingRect As cvb.Rect
     Dim draw As New Rectangle_Basics
     Public Sub New()
         FindSlider("DrawCount").Value = 2
         desc = "Test if 2 rectangles overlap"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         Static typeCheckBox = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         If not task.heartBeat Then Exit Sub
         If standaloneTest() Then
@@ -75,28 +75,28 @@ Public Class Rectangle_Overlap : Inherits VB_Parent
 
         dst3.SetTo(0)
         If typeCheckBox.Checked Then
-            Dim r1 As cv.RotatedRect = draw.rotatedRectangles(0)
-            Dim r2 As cv.RotatedRect = draw.rotatedRectangles(1)
+            Dim r1 As cvb.RotatedRect = draw.rotatedRectangles(0)
+            Dim r2 As cvb.RotatedRect = draw.rotatedRectangles(1)
             rect1 = r1.BoundingRect
             rect2 = r2.BoundingRect
-            drawRotatedOutline(r1, dst3, cv.Scalar.Yellow)
-            drawRotatedOutline(r2, dst3, cv.Scalar.Yellow)
+            drawRotatedOutline(r1, dst3, cvb.Scalar.Yellow)
+            drawRotatedOutline(r2, dst3, cvb.Scalar.Yellow)
         Else
             rect1 = draw.rectangles(0)
             rect2 = draw.rectangles(1)
         End If
 
-        enclosingRect = New cv.Rect
+        enclosingRect = New cvb.Rect
         If rect1.IntersectsWith(rect2) Then
             enclosingRect = rect1.Union(rect2)
-            dst3.Rectangle(enclosingRect, cv.Scalar.White, 4)
+            dst3.Rectangle(enclosingRect, cvb.Scalar.White, 4)
             labels(3) = "Rectangles intersect - red marks overlapping rectangle"
-            dst3.Rectangle(rect1.Intersect(rect2), cv.Scalar.Red, -1)
+            dst3.Rectangle(rect1.Intersect(rect2), cvb.Scalar.Red, -1)
         Else
             labels(3) = "Rectangles don't intersect"
         End If
-        dst3.Rectangle(rect1, cv.Scalar.Yellow, 2)
-        dst3.Rectangle(rect2, cv.Scalar.Yellow, 2)
+        dst3.Rectangle(rect1, cvb.Scalar.Yellow, 2)
+        dst3.Rectangle(rect2, cvb.Scalar.Yellow, 2)
     End Sub
 End Class
 
@@ -108,10 +108,10 @@ End Class
 
 
 Public Class Rectangle_Intersection : Inherits VB_Parent
-    Public inputRects As New List(Of cv.Rect)
+    Public inputRects As New List(Of cvb.Rect)
     Dim draw As New Rectangle_Basics
-    Public enclosingRects As New List(Of cv.Rect)
-    Dim otherRects As New List(Of cv.Rect)
+    Public enclosingRects As New List(Of cvb.Rect)
+    Dim otherRects As New List(Of cvb.Rect)
     Dim rotatedCheck As System.Windows.Forms.CheckBox
     Dim countSlider As System.Windows.Forms.TrackBar
     Public Sub New()
@@ -119,9 +119,9 @@ Public Class Rectangle_Intersection : Inherits VB_Parent
         countSlider = FindSlider("DrawCount")
         desc = "Test if any number of rectangles intersect."
     End Sub
-    Private Function findEnclosingRect(rects As List(Of cv.Rect), proximity As Integer) As cv.Rect
+    Private Function findEnclosingRect(rects As List(Of cvb.Rect), proximity As Integer) As cvb.Rect
         Dim enclosing = rects(0)
-        Dim newOther As New List(Of cv.Rect)
+        Dim newOther As New List(Of cvb.Rect)
         For i = 1 To rects.Count - 1
             Dim r1 = rects(i)
             If enclosing.IntersectsWith(r1) Or Math.Abs(r1.X - enclosing.X) < proximity Then
@@ -130,10 +130,10 @@ Public Class Rectangle_Intersection : Inherits VB_Parent
                 newOther.Add(r1)
             End If
         Next
-        otherRects = New List(Of cv.Rect)(newOther)
+        otherRects = New List(Of cvb.Rect)(newOther)
         Return enclosing
     End Function
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 rotatedCheck.Enabled = task.toggleOnOff
@@ -142,21 +142,21 @@ Public Class Rectangle_Intersection : Inherits VB_Parent
 
                 draw.Run(src)
                 dst2 = draw.dst2
-                inputRects = New List(Of cv.Rect)(draw.rectangles)
+                inputRects = New List(Of cvb.Rect)(draw.rectangles)
             End If
         Else
             dst2.SetTo(0)
             For Each r In inputRects
-                dst2.Rectangle(r, cv.Scalar.Yellow, 1)
+                dst2.Rectangle(r, cvb.Scalar.Yellow, 1)
             Next
         End If
 
-        Dim sortedRect As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
+        Dim sortedRect As New SortedList(Of Single, cvb.Rect)(New compareAllowIdenticalSingleInverted)
         For Each r In inputRects
             sortedRect.Add(r.Width * r.Height, r)
         Next
 
-        otherRects = New List(Of cv.Rect)(sortedRect.Values)
+        otherRects = New List(Of cvb.Rect)(sortedRect.Values)
 
         enclosingRects.Clear()
         While otherRects.Count
@@ -167,7 +167,7 @@ Public Class Rectangle_Intersection : Inherits VB_Parent
 
         dst3.SetTo(0)
         For Each r In enclosingRects
-            dst3.Rectangle(r, cv.Scalar.Yellow, 2)
+            dst3.Rectangle(r, cvb.Scalar.Yellow, 2)
         Next
         dst3 = dst2 * 0.5 Or dst3
     End Sub
@@ -182,12 +182,12 @@ End Class
 
 Public Class Rectangle_Union : Inherits VB_Parent
     Dim draw As New Rectangle_Basics
-    Public inputRects As New List(Of cv.Rect)
-    Public allRect As cv.Rect ' a rectangle covering all the input
+    Public inputRects As New List(Of cvb.Rect)
+    Public allRect As cvb.Rect ' a rectangle covering all the input
     Public Sub New()
         desc = "Create a rectangle that contains all the input rectangles"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standaloneTest() Then
             Static countSlider = FindSlider("DrawCount")
             Static rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
@@ -197,11 +197,11 @@ Public Class Rectangle_Union : Inherits VB_Parent
 
             draw.Run(src)
             dst2 = draw.dst2
-            inputRects = New List(Of cv.Rect)(draw.rectangles)
+            inputRects = New List(Of cvb.Rect)(draw.rectangles)
         Else
             dst2.SetTo(0)
             For Each r In inputRects
-                dst2.Rectangle(r, cv.Scalar.Yellow, 1)
+                dst2.Rectangle(r, cvb.Scalar.Yellow, 1)
             Next
             labels(2) = "Input rectangles = " + CStr(inputRects.Count)
         End If
@@ -220,7 +220,7 @@ Public Class Rectangle_Union : Inherits VB_Parent
         Next
         If allRect.X + allRect.Width >= dst2.Width Then allRect.Width = dst2.Width - allRect.X
         If allRect.Y + allRect.Height >= dst2.Height Then allRect.Height = dst2.Height - allRect.Y
-        dst2.Rectangle(allRect, cv.Scalar.Red, 2)
+        dst2.Rectangle(allRect, cvb.Scalar.Red, 2)
     End Sub
 End Class
 
@@ -232,13 +232,13 @@ End Class
 
 
 Public Class Rectangle_MultiOverlap : Inherits VB_Parent
-    Public inputRects As New List(Of cv.Rect)
-    Public outputRects As New List(Of cv.Rect)
+    Public inputRects As New List(Of cvb.Rect)
+    Public outputRects As New List(Of cvb.Rect)
     Dim draw As New Rectangle_Basics
     Public Sub New()
         desc = "Given a group of rectangles, merge all the rectangles that overlap"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standaloneTest() Then
             Static rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             Static countSlider = FindSlider("DrawCount")
@@ -275,7 +275,7 @@ Public Class Rectangle_MultiOverlap : Inherits VB_Parent
         If standaloneTest() Then
             dst3.SetTo(0)
             For Each r In outputRects
-                dst3.Rectangle(r, cv.Scalar.Yellow, 2)
+                dst3.Rectangle(r, cvb.Scalar.Yellow, 2)
             Next
             dst3 = dst2 * 0.5 Or dst3
             labels(3) = CStr(outputRects.Count) + " output rectangles"
@@ -292,11 +292,11 @@ End Class
 
 
 Public Class Rectangle_EnclosingPoints : Inherits VB_Parent
-    Public pointList As New List(Of cv.Point2f)
+    Public pointList As New List(Of cvb.Point2f)
     Public Sub New()
         desc = "Build an enclosing rectangle for the supplied pointlist"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standaloneTest() Then
             pointList = quickRandomPoints(20)
             dst2.SetTo(0)
@@ -305,8 +305,8 @@ Public Class Rectangle_EnclosingPoints : Inherits VB_Parent
             Next
         End If
 
-        Dim minRect = cv.Cv2.MinAreaRect(pointList.ToArray)
-        drawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
+        Dim minRect = cvb.Cv2.MinAreaRect(pointList.ToArray)
+        drawRotatedOutline(minRect, dst2, cvb.Scalar.Yellow)
     End Sub
 End Class
 

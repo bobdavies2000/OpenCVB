@@ -2,7 +2,7 @@
 Imports System.Globalization
 Imports System.IO
 Imports System.Text.RegularExpressions
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VB_Classes
 Imports System.Management
@@ -50,7 +50,7 @@ Public Class Main_UI
     Dim cameraTaskHandle As Thread
     Dim camPic(4 - 1) As PictureBox
     Dim camLabel(camPic.Count - 1) As Label
-    Dim dst(camPic.Count - 1) As cv.Mat
+    Dim dst(camPic.Count - 1) As cvb.Mat
 
     Dim paintNewImages As Boolean
     Dim newCameraImages As Boolean
@@ -58,7 +58,7 @@ Public Class Main_UI
     Dim algorithmRefresh As Boolean
     Dim CodeLineCount As Integer
     Dim DrawingRectangle As Boolean
-    Dim drawRect As New cv.Rect
+    Dim drawRect As New cvb.Rect
     Dim drawRectPic As Integer
     Dim externalPythonInvocation As Boolean
     Dim frameCount As Integer
@@ -68,11 +68,11 @@ Public Class Main_UI
     Dim LastX As Integer
     Dim LastY As Integer
     Dim mouseClickFlag As Boolean
-    Dim ClickPoint As New cv.Point
+    Dim ClickPoint As New cvb.Point
     Dim mousePicTag As Integer
-    Dim mouseDownPoint As New cv.Point
-    Dim mouseMovePoint As New cv.Point
-    Dim mousePoint As New cv.Point
+    Dim mouseDownPoint As New cvb.Point
+    Dim mouseMovePoint As New cvb.Point
+    Dim mousePoint As New cvb.Point
     Dim activeMouseDown As Boolean
 
     Dim myBrush = New SolidBrush(Color.White)
@@ -102,7 +102,7 @@ Public Class Main_UI
     Dim arrowIndex As Integer
 
     Public intermediateReview As String
-    Dim pixelViewerRect As cv.Rect
+    Dim pixelViewerRect As cvb.Rect
     Dim pixelViewTag As Integer
 
     Dim PausePlay As Bitmap
@@ -206,20 +206,20 @@ Public Class Main_UI
 
             Select Case .WorkingRes.Height
                 Case 270, 540, 1080
-                    .captureRes = New cv.Size(1920, 1080)
+                    .captureRes = New cvb.Size(1920, 1080)
                     If .camera1920x1080Support(.cameraIndex) = False Then
-                        .captureRes = New cv.Size(1280, 720)
-                        .WorkingRes = New cv.Size(320, 180)
+                        .captureRes = New cvb.Size(1280, 720)
+                        .WorkingRes = New cvb.Size(320, 180)
                     End If
                 Case 180, 360, 720
-                    .captureRes = New cv.Size(1280, 720)
+                    .captureRes = New cvb.Size(1280, 720)
                 Case 376, 188, 94
-                    .captureRes = New cv.Size(672, 376)
+                    .captureRes = New cvb.Size(672, 376)
                 Case 120, 240, 480
-                    .captureRes = New cv.Size(640, 480)
+                    .captureRes = New cvb.Size(640, 480)
                     If .camera640x480Support(.cameraIndex) = False Then
-                        .captureRes = New cv.Size(1280, 720)
-                        .WorkingRes = New cv.Size(320, 180)
+                        .captureRes = New cvb.Size(1280, 720)
+                        .WorkingRes = New cvb.Size(320, 180)
                     End If
             End Select
 
@@ -230,12 +230,12 @@ Public Class Main_UI
                 .locationMain.Item2 = 1321
                 .locationMain.Item3 = 870
                 If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 1096
-                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(640, 480) Else .displayRes = New cv.Size(640, 360)
+                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cvb.Size(640, 480) Else .displayRes = New cvb.Size(640, 360)
             ElseIf .snap320 Then
                 .locationMain.Item2 = 683
                 .locationMain.Item3 = 510
                 If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 616
-                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(320, 240) Else .displayRes = New cv.Size(320, 180)
+                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cvb.Size(320, 240) Else .displayRes = New cvb.Size(320, 180)
             End If
 
             Dim border As Integer = 6
@@ -274,10 +274,10 @@ Public Class Main_UI
             settings.algorithmGroup = GroupName.Text
         End If
 
-        settings.locationMain = New cv.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
+        settings.locationMain = New cvb.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
         settings.treeButton = TreeButton.Checked
         settings.PixelViewerButton = False
-        settings.displayRes = New cv.Size(camPic(0).Width, camPic(0).Height) ' used only when .snapCustom is true
+        settings.displayRes = New cvb.Size(camPic(0).Width, camPic(0).Height) ' used only when .snapCustom is true
         If settings.translatorMode = "" Then settings.translatorMode = "VB.Net to C#"
 
         Dim setlist = New List(Of jsonClass.ApplicationStorage)
@@ -301,7 +301,7 @@ Public Class Main_UI
         End If
         Environment.SetEnvironmentVariable("Path", systemPath)
     End Sub
-    Public Function validateRect(r As cv.Rect, width As Integer, height As Integer) As cv.Rect
+    Public Function validateRect(r As cvb.Rect, width As Integer, height As Integer) As cvb.Rect
         If r.Width < 0 Then r.Width = 1
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
@@ -657,8 +657,8 @@ Public Class Main_UI
 
         ' when switching resolution, best to reset these as the move from higher to lower res
         ' could mean the point is no longer valid.
-        ClickPoint = New cv.Point
-        mousePoint = New cv.Point
+        ClickPoint = New cvb.Point
+        mousePoint = New cvb.Point
 
         StartTask()
 
@@ -679,41 +679,41 @@ Public Class Main_UI
     Private Sub setWorkingRes()
         Select Case settings.WorkingResIndex
             Case 0
-                settings.WorkingRes = New cv.Size(1920, 1080)
-                settings.captureRes = New cv.Size(1920, 1080)
+                settings.WorkingRes = New cvb.Size(1920, 1080)
+                settings.captureRes = New cvb.Size(1920, 1080)
             Case 1
-                settings.WorkingRes = New cv.Size(960, 540)
-                settings.captureRes = New cv.Size(1920, 1080)
+                settings.WorkingRes = New cvb.Size(960, 540)
+                settings.captureRes = New cvb.Size(1920, 1080)
             Case 2
-                settings.WorkingRes = New cv.Size(480, 270)
-                settings.captureRes = New cv.Size(1920, 1080)
+                settings.WorkingRes = New cvb.Size(480, 270)
+                settings.captureRes = New cvb.Size(1920, 1080)
             Case 3
-                settings.WorkingRes = New cv.Size(1280, 720)
-                settings.captureRes = New cv.Size(1280, 720)
+                settings.WorkingRes = New cvb.Size(1280, 720)
+                settings.captureRes = New cvb.Size(1280, 720)
             Case 4
-                settings.WorkingRes = New cv.Size(640, 360)
-                settings.captureRes = New cv.Size(1280, 720)
+                settings.WorkingRes = New cvb.Size(640, 360)
+                settings.captureRes = New cvb.Size(1280, 720)
             Case 5
-                settings.WorkingRes = New cv.Size(320, 180)
-                settings.captureRes = New cv.Size(1280, 720)
+                settings.WorkingRes = New cvb.Size(320, 180)
+                settings.captureRes = New cvb.Size(1280, 720)
             Case 6
-                settings.WorkingRes = New cv.Size(640, 480)
-                settings.captureRes = New cv.Size(640, 480)
+                settings.WorkingRes = New cvb.Size(640, 480)
+                settings.captureRes = New cvb.Size(640, 480)
             Case 7
-                settings.WorkingRes = New cv.Size(320, 240)
-                settings.captureRes = New cv.Size(640, 480)
+                settings.WorkingRes = New cvb.Size(320, 240)
+                settings.captureRes = New cvb.Size(640, 480)
             Case 8
-                settings.WorkingRes = New cv.Size(160, 120)
-                settings.captureRes = New cv.Size(640, 480)
+                settings.WorkingRes = New cvb.Size(160, 120)
+                settings.captureRes = New cvb.Size(640, 480)
             Case 9
-                settings.WorkingRes = New cv.Size(672, 376)
-                settings.captureRes = New cv.Size(672, 376)
+                settings.WorkingRes = New cvb.Size(672, 376)
+                settings.captureRes = New cvb.Size(672, 376)
             Case 10
-                settings.WorkingRes = New cv.Size(336, 188)
-                settings.captureRes = New cv.Size(672, 376)
+                settings.WorkingRes = New cvb.Size(336, 188)
+                settings.captureRes = New cvb.Size(672, 376)
             Case 11
-                settings.WorkingRes = New cv.Size(168, 94)
-                settings.captureRes = New cv.Size(672, 376)
+                settings.WorkingRes = New cvb.Size(168, 94)
+                settings.captureRes = New cvb.Size(672, 376)
         End Select
     End Sub
 
@@ -1225,8 +1225,8 @@ Public Class Main_UI
 
             ' when switching resolution, best to reset these as the move from higher to lower res
             ' could mean the point is no longer valid.
-            ClickPoint = New cv.Point
-            mousePoint = New cv.Point
+            ClickPoint = New cvb.Point
+            mousePoint = New cvb.Point
         End If
 
         Static saveLastAlgorithm = AvailableAlgorithms.Text
@@ -1264,7 +1264,7 @@ Public Class Main_UI
         If settings.cameraName <> "" Then parms.cameraInfo = camera.cameraInfo
 
         parms.main_hwnd = Me.Handle
-        parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
+        parms.mainFormLocation = New cvb.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
 
         parms.WorkingRes = settings.WorkingRes
         parms.captureRes = settings.captureRes
@@ -1297,7 +1297,7 @@ Public Class Main_UI
 
         If settings.PixelViewerButton And mousePicTag = pic.Tag Then
             Dim r = pixelViewerRect
-            Dim rect = New cv.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
+            Dim rect = New cvb.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
                                    CInt(r.Width * ratio), CInt(r.Height * ratio))
             g.DrawRectangle(myWhitePen, rect.X, rect.Y, rect.Width, rect.Height)
         End If
@@ -1316,7 +1316,7 @@ Public Class Main_UI
                 SyncLock cameraLock
                     If camera.mbuf(mbIndex).color IsNot Nothing Then
                         If camera.mbuf(mbIndex).color.width > 0 And dst(0) IsNot Nothing Then
-                            Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
+                            Dim camSize = New cvb.Size(camPic(0).Size.Width, camPic(0).Size.Height)
                             For i = 0 To dst.Count - 1
                                 Dim tmp = dst(i).Resize(camSize)
                                 cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
@@ -1424,12 +1424,12 @@ Public Class Main_UI
     End Function
     Private Sub CameraTask()
         restartCameraRequest = True
-        Static saveWorkingRes As cv.Size
+        Static saveWorkingRes As cvb.Size
         For i = 0 To mbuf.Count - 1
-            mbuf(i).color = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
-            mbuf(i).leftView = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
-            mbuf(i).rightView = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
-            mbuf(i).pointCloud = New cv.Mat(settings.WorkingRes, cv.MatType.CV_32FC3)
+            mbuf(i).color = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
+            mbuf(i).leftView = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
+            mbuf(i).rightView = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
+            mbuf(i).pointCloud = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_32FC3)
         Next
 
         While 1
@@ -1442,7 +1442,7 @@ Public Class Main_UI
                     ' Changing the working res is not a problem so just leave it open.
                     ' Oak-D camera cannot be restarted without restarting OpenCVB.
                     ' Leave it alone once it is started...
-                    settings.captureRes = New cv.Size(1280, 720)
+                    settings.captureRes = New cvb.Size(1280, 720)
                     If camera Is Nothing Then camera = New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 Else
                     If camera IsNot Nothing Then camera.stopCamera()
@@ -1485,7 +1485,7 @@ Public Class Main_UI
         SyncLock algorithmThreadLock
             algorithmQueueCount -= 1
             AlgorithmTestAllCount += 1
-            drawRect = New cv.Rect
+            drawRect = New cvb.Rect
             Dim task = New VBtask(parms)
             textDesc = task.desc
             intermediateReview = ""
@@ -1502,18 +1502,18 @@ Public Class Main_UI
                                   CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
             End If
             ' Adjust drawrect for the ratio of the actual size and WorkingRes.
-            If task.drawRect <> New cv.Rect Then
+            If task.drawRect <> New cvb.Rect Then
                 ' relative size of algorithm size image to displayed image
                 Dim ratio = camPic(0).Width / task.WorkingRes.Width
-                drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
+                drawRect = New cvb.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
                                        task.drawRect.Width * ratio, task.drawRect.Height * ratio)
             End If
 
             Dim saveWorkingRes = settings.WorkingRes
             task.labels = {"", "", "", ""}
-            mousePoint = New cv.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2) ' mouse click point default = center of the image
+            mousePoint = New cvb.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2) ' mouse click point default = center of the image
 
-            Dim saveDrawRect As cv.Rect
+            Dim saveDrawRect As cvb.Rect
             While 1
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.
@@ -1585,8 +1585,8 @@ Public Class Main_UI
                             GrabRectangleData = False
                             ' relative size of algorithm size image to displayed image
                             Dim ratio = task.WorkingRes.Width / camPic(0).Width
-                            Dim tmpDrawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                            task.drawRect = New cv.Rect
+                            Dim tmpDrawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                            task.drawRect = New cvb.Rect
                             If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
                                 If saveDrawRect <> tmpDrawRect Then
                                     task.optionsChanged = True
@@ -1617,8 +1617,8 @@ Public Class Main_UI
                         If mousePoint.Y >= task.WorkingRes.Height Then mousePoint.Y = task.WorkingRes.Height - 1
 
                         task.mouseMovePoint = mousePoint
-                        If task.mouseMovePoint = New cv.Point(0, 0) Then
-                            task.mouseMovePoint = New cv.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2)
+                        If task.mouseMovePoint = New cvb.Point(0, 0) Then
+                            task.mouseMovePoint = New cvb.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2)
                         End If
                         task.mousePicTag = mousePicTag
                         If mouseClickFlag Then
@@ -1657,10 +1657,10 @@ Public Class Main_UI
                     drawRect = task.drawRect
                     ' relative size of algorithm size image to displayed image
                     Dim ratio = camPic(0).Width / task.WorkingRes.Width
-                    drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                    drawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
                 End If
                 If task.drawRectClear Then
-                    drawRect = New cv.Rect
+                    drawRect = New cvb.Rect
                     task.drawRect = drawRect
                     task.drawRectClear = False
                 End If

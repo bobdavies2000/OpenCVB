@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.Drawing
 Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
@@ -11,7 +11,7 @@ Module VB_Common
     Public Const fmt2 = "0.00"
     Public Const fmt3 = "0.000"
     Public Const fmt4 = "0.0000"
-    Public newPoint As New cv.Point
+    Public newPoint As New cvb.Point
     Public callTrace As New List(Of String)
     Public algorithm_ms As New List(Of Single)
     Public algorithmNames As New List(Of String)
@@ -29,37 +29,37 @@ Module VB_Common
         thisObj = withThisObj
         withThisObj = tempObj
     End Sub
-    Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
-        Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
+    Public Function Convert32f_To_8UC3(Input As cvb.Mat) As cvb.Mat
+        Dim outMat = Input.Normalize(0, 255, cvb.NormTypes.MinMax)
         If Input.Channels() = 1 Then
-            outMat.ConvertTo(outMat, cv.MatType.CV_8U)
-            Return outMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            outMat.ConvertTo(outMat, cvb.MatType.CV_8U)
+            Return outMat.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
         End If
-        outMat.ConvertTo(outMat, cv.MatType.CV_8UC3)
+        outMat.ConvertTo(outMat, cvb.MatType.CV_8UC3)
         Return outMat
     End Function
-    Public Function MakeSureImage8uC3(ByVal input As cv.Mat) As cv.Mat
-        Dim outMat As New cv.Mat
-        If input.Type = cv.MatType.CV_8UC3 Then Return input
-        If input.Type = cv.MatType.CV_32F Then
+    Public Function MakeSureImage8uC3(ByVal input As cvb.Mat) As cvb.Mat
+        Dim outMat As New cvb.Mat
+        If input.Type = cvb.MatType.CV_8UC3 Then Return input
+        If input.Type = cvb.MatType.CV_32F Then
             outMat = Convert32f_To_8UC3(input)
-        ElseIf input.Type = cv.MatType.CV_32SC1 Then
-            input.ConvertTo(outMat, cv.MatType.CV_32F)
+        ElseIf input.Type = cvb.MatType.CV_32SC1 Then
+            input.ConvertTo(outMat, cvb.MatType.CV_32F)
             outMat = Convert32f_To_8UC3(outMat)
-        ElseIf input.Type = cv.MatType.CV_32SC3 Then
-            input.ConvertTo(outMat, cv.MatType.CV_32F)
-            outMat = outMat.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ElseIf input.Type = cvb.MatType.CV_32SC3 Then
+            input.ConvertTo(outMat, cvb.MatType.CV_32F)
+            outMat = outMat.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             outMat = Convert32f_To_8UC3(outMat)
-        ElseIf input.Type = cv.MatType.CV_32FC3 Then
+        ElseIf input.Type = cvb.MatType.CV_32FC3 Then
             Dim split = input.Split()
             split(0) = split(0).ConvertScaleAbs(255)
             split(1) = split(1).ConvertScaleAbs(255)
             split(2) = split(2).ConvertScaleAbs(255)
-            cv.Cv2.Merge(split, outMat)
+            cvb.Cv2.Merge(split, outMat)
         Else
             outMat = input.Clone
         End If
-        If input.Channels() = 1 And input.Type = cv.MatType.CV_8UC1 Then outMat = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If input.Channels() = 1 And input.Type = cvb.MatType.CV_8UC1 Then outMat = input.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
         Return outMat
     End Function
     Public Sub updateSettings()
@@ -149,8 +149,8 @@ End Enum
 Public Structure mmData
     Dim minVal As Double
     Dim maxVal As Double
-    Dim minLoc As cv.Point
-    Dim maxLoc As cv.Point
+    Dim minLoc As cvb.Point
+    Dim maxLoc As cvb.Point
 End Structure
 
 
@@ -158,10 +158,10 @@ End Structure
 
 
 Public Structure tCell
-    Dim template As cv.Mat
-    Dim searchRect As cv.Rect
-    Dim rect As cv.Rect
-    Dim center As cv.Point2f
+    Dim template As cvb.Mat
+    Dim searchRect As cvb.Rect
+    Dim rect As cvb.Rect
+    Dim center As cvb.Point2f
     Dim correlation As Single
     Dim depth As Single
     Dim strOut As String
@@ -172,8 +172,8 @@ End Structure
 
 
 Public Structure gravityLine
-    Dim pt1 As cv.Point3f
-    Dim pt2 As cv.Point3f
+    Dim pt1 As cvb.Point3f
+    Dim pt2 As cvb.Point3f
     Dim len3D As Single
     Dim imageAngle As Single
     Dim arcX As Single
@@ -189,7 +189,7 @@ End Structure
 
 Public Structure DNAentry
     Dim color As Byte
-    Dim pt As cv.Point
+    Dim pt As cvb.Point
     Dim size As Single
     Dim rotation As Single
     Dim brushNumber As Integer
@@ -200,13 +200,13 @@ End Structure
 
 
 Public Class PointPair
-    Public p1 As cv.Point2f
-    Public p2 As cv.Point2f
+    Public p1 As cvb.Point2f
+    Public p2 As cvb.Point2f
     Public slope As Single
     Public yIntercept As Single
     Public xIntercept As Single
     Public length As Single
-    Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
+    Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
         p1 = _p1
         p2 = _p2
         If CInt(p1.X) = CInt(p2.X) Then If p1.X < p2.X Then p2.X += 1 Else p1.X += 1 ' shift it so we can be sane.
@@ -215,13 +215,13 @@ Public Class PointPair
         length = p1.DistanceTo(p2)
     End Sub
     Sub New()
-        p1 = New cv.Point2f()
-        p2 = New cv.Point2f()
+        p1 = New cvb.Point2f()
+        p2 = New cvb.Point2f()
     End Sub
-    Public Function edgeToEdgeLine(size As cv.Size) As PointPair
+    Public Function edgeToEdgeLine(size As cvb.Size) As PointPair
         Dim lp As New PointPair(p1, p2)
-        lp.p1 = New cv.Point2f(0, yIntercept)
-        lp.p2 = New cv.Point2f(size.Width, size.Width * slope + yIntercept)
+        lp.p1 = New cvb.Point2f(0, yIntercept)
+        lp.p2 = New cvb.Point2f(size.Width, size.Width * slope + yIntercept)
         xIntercept = -yIntercept / slope
         If lp.p1.Y > size.Height Then
             lp.p1.X = (size.Height - yIntercept) / slope
@@ -255,10 +255,10 @@ End Class
 
 
 Public Structure coinPoints
-    Dim p1 As cv.Point
-    Dim p2 As cv.Point
-    Dim p3 As cv.Point
-    Dim p4 As cv.Point
+    Dim p1 As cvb.Point
+    Dim p2 As cvb.Point
+    Dim p3 As cvb.Point
+    Dim p4 As cvb.Point
 End Structure
 
 
@@ -267,8 +267,8 @@ End Structure
 
 
 Public Structure matchRect
-    Dim p1 As cv.Point
-    Dim p2 As cv.Point
+    Dim p1 As cvb.Point
+    Dim p2 As cvb.Point
     Dim correlation1 As Single
     Dim correlation2 As Single
 End Structure
@@ -291,7 +291,7 @@ End Structure
 
 Public Class roiData
     Public depth As Single
-    Public color As cv.Vec3b
+    Public color As cvb.Vec3b
 End Class
 
 
@@ -299,26 +299,26 @@ End Class
 
 
 Public Class fPolyData
-    Public prevPoly As New List(Of cv.Point2f)
+    Public prevPoly As New List(Of cvb.Point2f)
     Public lengthPrevious As New List(Of Single)
     Public polyPrevSideIndex As Integer
 
-    Public rotateCenter As cv.Point2f
+    Public rotateCenter As cvb.Point2f
     Public rotateAngle As Single
-    Public centerShift As cv.Point2f
-    Public currPoly As New List(Of cv.Point2f)
+    Public centerShift As cvb.Point2f
+    Public currPoly As New List(Of cvb.Point2f)
     Public currLength As New List(Of Single)
-    Dim jitterCheck As cv.Mat
+    Dim jitterCheck As cvb.Mat
     Dim lastJitterPixels As Integer
     Public featureLineChanged As Boolean
     Sub New()
-        prevPoly = New List(Of cv.Point2f)
-        currPoly = New List(Of cv.Point2f)
+        prevPoly = New List(Of cvb.Point2f)
+        currPoly = New List(Of cvb.Point2f)
         polyPrevSideIndex = 0
     End Sub
-    Sub New(_currPoly As List(Of cv.Point2f))
-        prevPoly = New List(Of cv.Point2f)(_currPoly)
-        currPoly = New List(Of cv.Point2f)(_currPoly)
+    Sub New(_currPoly As List(Of cvb.Point2f))
+        prevPoly = New List(Of cvb.Point2f)(_currPoly)
+        currPoly = New List(Of cvb.Point2f)(_currPoly)
         polyPrevSideIndex = 0
     End Sub
     Public Function computeCurrLengths() As Single
@@ -338,7 +338,7 @@ Public Class fPolyData
     Public Sub resync()
         lengthPrevious = New List(Of Single)(currLength)
         polyPrevSideIndex = lengthPrevious.IndexOf(lengthPrevious.Max)
-        prevPoly = New List(Of cv.Point2f)(currPoly)
+        prevPoly = New List(Of cvb.Point2f)(currPoly)
         jitterCheck.SetTo(0)
     End Sub
     Public Function prevmp() As PointPair
@@ -348,14 +348,14 @@ Public Class fPolyData
         If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
         Return New PointPair(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
-    Public Sub DrawPolys(dst As cv.Mat, currPoly As List(Of cv.Point2f), parent As Object)
-        parent.DrawFPoly(dst, prevPoly, cv.Scalar.White)
-        parent.DrawFPoly(dst, currPoly, cv.Scalar.Yellow)
-        parent.DrawFatLine(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cv.Scalar.Yellow)
-        parent.DrawFatLine(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cv.Scalar.White)
+    Public Sub DrawPolys(dst As cvb.Mat, currPoly As List(Of cvb.Point2f), parent As Object)
+        parent.DrawFPoly(dst, prevPoly, cvb.Scalar.White)
+        parent.DrawFPoly(dst, currPoly, cvb.Scalar.Yellow)
+        parent.DrawFatLine(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cvb.Scalar.Yellow)
+        parent.DrawFatLine(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cvb.Scalar.White)
     End Sub
-    Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
-        If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+    Public Sub jitterTest(dst As cvb.Mat, parent As Object) ' return true if there is nothing to change
+        If jitterCheck Is Nothing Then jitterCheck = New cvb.Mat(dst.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         Dim polymp = currmp()
         parent.DrawLine(jitterCheck, polymp.p1, polymp.p2, 255, task.lineWidth)
         Dim jitterPixels = jitterCheck.CountNonZero
@@ -414,32 +414,32 @@ End Structure
 
 
 Public Class rcData
-    Public rect As cv.Rect
-    Public mask As cv.Mat
+    Public rect As cvb.Rect
+    Public mask As cvb.Mat
     Public pixels As Integer
-    Public floodPoint As cv.Point
+    Public floodPoint As cvb.Point
 
-    Public color As New cv.Vec3b
-    Public naturalColor As New cv.Vec3b
+    Public color As New cvb.Vec3b
+    Public naturalColor As New cvb.Vec3b
     Public naturalGray As Integer
     Public exactMatch As Boolean
     Public pointMatch As Boolean
 
     Public depthPixels As Integer
-    Public depthMask As cv.Mat
-    Public depthMean As cv.Scalar
-    Public depthStdev As cv.Scalar
+    Public depthMask As cvb.Mat
+    Public depthMean As cvb.Scalar
+    Public depthStdev As cvb.Scalar
 
-    Public colorMean As cv.Scalar
-    Public colorStdev As cv.Scalar
+    Public colorMean As cvb.Scalar
+    Public colorStdev As cvb.Scalar
 
-    Public minVec As cv.Point3f
-    Public maxVec As cv.Point3f
-    Public minLoc As cv.Point
-    Public maxLoc As cv.Point
+    Public minVec As cvb.Point3f
+    Public maxVec As cvb.Point3f
+    Public minLoc As cvb.Point
+    Public maxLoc As cvb.Point
 
-    Public maxDist As cv.Point
-    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
+    Public maxDist As cvb.Point
+    Public maxDStable As cvb.Point ' keep maxDist the same if it is still on the cell.
 
     Public index As Integer
     Public indexLast As Integer
@@ -447,26 +447,26 @@ Public Class rcData
     Public nab As Integer
     Public container As Integer
 
-    Public contour As New List(Of cv.Point)
+    Public contour As New List(Of cvb.Point)
     Public motionFlag As Boolean
     Public motionPixels As Integer
 
-    Public nearestFeature As cv.Point2f
-    Public features As New List(Of cv.Point)
+    Public nearestFeature As cvb.Point2f
+    Public features As New List(Of cvb.Point)
     Public featurePair As New List(Of PointPair)
     Public matchCandidatesSorted As New SortedList(Of Integer, Integer)
     Public matchCandidates As New List(Of Integer)
 
     ' transition these...
     Public nabs As New List(Of Integer)
-    Public hull As New List(Of cv.Point)
-    Public eq As cv.Vec4f ' plane equation
-    Public contour3D As New List(Of cv.Point3f)
+    Public hull As New List(Of cvb.Point)
+    Public eq As cvb.Vec4f ' plane equation
+    Public contour3D As New List(Of cvb.Point3f)
     Public Sub New()
         index = 0
-        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
+        mask = New cvb.Mat(1, 1, cvb.MatType.CV_8U)
         depthMask = mask
-        rect = New cv.Rect(0, 0, 1, 1)
+        rect = New cvb.Rect(0, 0, 1, 1)
     End Sub
 End Class
 

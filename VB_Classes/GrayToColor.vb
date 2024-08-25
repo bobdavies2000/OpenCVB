@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class GrayToColor_Palette : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Public Sub New()
@@ -6,14 +6,14 @@ Public Class GrayToColor_Palette : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Identify the main colors in an image using RedCloud"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         flood.Run(src)
         dst2 = flood.dst2
         labels(2) = flood.labels(2)
 
         Dim indices(255) As Byte
-        Dim colors(255) As cv.Vec3b
-        Dim sorted As New SortedList(Of Integer, cv.Vec3b)(New compareAllowIdenticalInteger)
+        Dim colors(255) As cvb.Vec3b
+        Dim sorted As New SortedList(Of Integer, cvb.Vec3b)(New compareAllowIdenticalInteger)
         For Each rc In task.redCells
             Dim index = rc.naturalGray
             If index = 0 Then Continue For
@@ -29,7 +29,7 @@ Public Class GrayToColor_Palette : Inherits VB_Parent
         Next
 
         dst1 = task.rightView
-        Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors.ToArray)
-        cv.Cv2.ApplyColorMap(task.leftView, dst3, colorMap)
+        Dim colorMap = cvb.Mat.FromPixelData(256, 1, cvb.MatType.CV_8UC3, colors.ToArray)
+        cvb.Cv2.ApplyColorMap(task.leftView, dst3, colorMap)
     End Sub
 End Class

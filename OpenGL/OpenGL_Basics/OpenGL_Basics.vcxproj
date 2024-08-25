@@ -96,7 +96,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/third-party/glfw/include;$(ProjectDir)/../../OpenCV//modules\imgproc\include;$(ProjectDir)/../../OpenCV//modules\core\include;$(ProjectDir)/../../OpenCV//Build;$(ProjectDir)/../../OpenCV/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/third-party/glfw/include;$(ProjectDir)/../../OpenCV//modules\imgproc\include;$(ProjectDir)/../../OpenCV//modules\core\include;$(ProjectDir)/../../OpenCV//Build;$(ProjectDir)/../../OpenCV/;$(ProjectDir)/../../OpenCV/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4098;26495;6294;6201</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -152,7 +152,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/third-party/glfw/include;$(ProjectDir)/../../OpenCV//modules\imgproc\include;$(ProjectDir)/../../OpenCV//modules\core\include;$(ProjectDir)/../../OpenCV//Build;$(ProjectDir)/../../OpenCV/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/third-party/glfw/include;$(ProjectDir)/../../OpenCV//modules\imgproc\include;$(ProjectDir)/../../OpenCV//modules\core\include;$(ProjectDir)/../../OpenCV//Build;$(ProjectDir)/../../OpenCV/;$(ProjectDir)/../../OpenCV/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26495;6294;6201</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>

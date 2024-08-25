@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Public Class Photon_Basics : Inherits VB_Parent
     Dim hist As New Hist_Basics
@@ -6,13 +6,13 @@ Public Class Photon_Basics : Inherits VB_Parent
         labels = {"", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences"}
         desc = "With no motion the camera values will show the random photon differences.  Are they random?"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static lastImage As cv.Mat = src
-        cv.Cv2.Absdiff(src, lastImage, dst1)
+    Public Sub RunVB(src as cvb.Mat)
+        Static lastImage As cvb.Mat = src
+        cvb.Cv2.Absdiff(src, lastImage, dst1)
 
         dst0 = dst1.Reshape(1, dst1.Rows * 3)
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst1.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary)
 
         If dst0.CountNonZero > 0 Then
             dst2 = dst1.Clone
@@ -44,7 +44,7 @@ Public Class Photon_Test : Inherits VB_Parent
         labels = {"", "", "5 color levels from reduction (black not shown)", "Selected distribution"}
         desc = ""
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         task.redOptions.setBitReductionBar(64) ' for now...
         Dim reduce = 64
 
@@ -70,8 +70,8 @@ Public Class Photon_Test : Inherits VB_Parent
             Dim colTop = 0
             For j = 0 To counts.Length - 1
                 Dim h = CInt((dst2.Height - 1) * (counts(j)(i) / dst2.Total)) ' extra parens to avoid overflow at high res.
-                Dim r = New cv.Rect(colWidth * i, colTop, colWidth, h)
-                If h > 0 Then dst3(r).SetTo(Choose(j + 1, cv.Scalar.Red, cv.Scalar.LightGreen, cv.Scalar.Blue, cv.Scalar.Yellow))
+                Dim r = New cvb.Rect(colWidth * i, colTop, colWidth, h)
+                If h > 0 Then dst3(r).SetTo(Choose(j + 1, cvb.Scalar.Red, cvb.Scalar.LightGreen, cvb.Scalar.Blue, cvb.Scalar.Yellow))
                 colTop += h
             Next
         Next
@@ -94,20 +94,20 @@ Public Class Photon_Subtraction : Inherits VB_Parent
         labels = {"", "", "Points where B, G, or R differ", "Histogram showing distribution of differences"}
         desc = "Same as Photon_Basics but without ignoring sign."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         src = src.Reshape(1, src.Rows * 3)
-        src.ConvertTo(src, cv.MatType.CV_32F)
+        src.ConvertTo(src, cvb.MatType.CV_32F)
 
-        Static lastImage As cv.Mat = src
-        Dim subOutput As New cv.Mat
-        cv.Cv2.Subtract(src, lastImage, subOutput)
-        Dim histInput = subOutput.Add(cv.Scalar.All(100)).ToMat
+        Static lastImage As cvb.Mat = src
+        Dim subOutput As New cvb.Mat
+        cvb.Cv2.Subtract(src, lastImage, subOutput)
+        Dim histInput = subOutput.Add(cvb.Scalar.All(100)).ToMat
 
         hist.Run(histInput)
         dst2 = hist.dst2
 
         subOutput = subOutput.Reshape(3, dst2.Height)
-        dst1 = subOutput.CvtColor(cv.ColorConversionCodes.BGR2Gray).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = subOutput.CvtColor(cvb.ColorConversionCodes.BGR2Gray).Threshold(0, 255, cvb.ThresholdTypes.Binary)
         If dst1.CountNonZero Then dst3 = dst1.Clone ' occasionally the image returned is identical to the last.  hmmm...
         lastImage = src
     End Sub

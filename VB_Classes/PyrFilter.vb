@@ -1,13 +1,13 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
 Public Class PyrFilter_Basics : Inherits VB_Parent
     Dim options As New Options_PyrFilter
     Public Sub New()
         desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
-        cv.Cv2.PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid)
+        cvb.Cv2.PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid)
     End Sub
 End Class
 
@@ -25,9 +25,9 @@ Public Class PyrFilter_RedCloud : Inherits VB_Parent
         labels = {"", "", "RedCloud_Basics output", "PyrFilter output before reduction"}
         desc = "Use RedColor to segment the output of PyrFilter"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         pyr.Run(src)
-        dst3 = pyr.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = pyr.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         reduction.Run(dst3)
 

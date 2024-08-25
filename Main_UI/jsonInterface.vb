@@ -1,5 +1,5 @@
 ﻿Imports Newtonsoft.Json
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.IO
 
 Namespace jsonClass
@@ -17,10 +17,10 @@ Namespace jsonClass
         Public camera640x480Support As List(Of Boolean)
         Public camera1920x1080Support As List(Of Boolean)
 
-        Public locationMain As cv.Vec4f
-        Public locationPixelViewer As cv.Vec4f
-        Public locationOpenGL As cv.Vec4f
-        Public locationOptions As cv.Vec4f
+        Public locationMain As cvb.Vec4f
+        Public locationPixelViewer As cvb.Vec4f
+        Public locationOpenGL As cvb.Vec4f
+        Public locationOptions As cvb.Vec4f
 
         Public myntSDKready As Boolean
         Public zedSDKready As Boolean
@@ -30,10 +30,10 @@ Namespace jsonClass
         Public snap320 As Boolean
         Public snapCustom As Boolean
 
-        Public WorkingRes As cv.Size
+        Public WorkingRes As cvb.Size
         Public WorkingResIndex As Integer
-        Public captureRes As cv.Size
-        Public displayRes As cv.Size
+        Public captureRes As cvb.Size
+        Public displayRes As cvb.Size
 
         Public testAllDuration As Integer
         Public showConsoleLog As Boolean
@@ -67,7 +67,7 @@ Namespace jsonClass
             Dim emptyApp As New ApplicationStorage
             emptyApp.cameraName = ""
             emptyApp.cameraIndex = 0
-            emptyApp.WorkingRes = New cv.Size(320, 240)
+            emptyApp.WorkingRes = New cvb.Size(320, 240)
             emptyApp.snap640 = True
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False

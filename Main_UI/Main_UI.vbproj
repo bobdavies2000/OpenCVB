@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CPP_Classes\CPP_Classes.vcxproj" />
     <ProjectReference Include="..\CS_Classes\CS_Classes.csproj" />
     <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj" />
   </ItemGroup>

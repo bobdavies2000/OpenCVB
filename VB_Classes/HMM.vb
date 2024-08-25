@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 'https://github.com/omidsakhi/cv-hmm
 Public Class HMM_Example_CPP_VB : Inherits VB_Parent
@@ -7,7 +7,7 @@ Public Class HMM_Example_CPP_VB : Inherits VB_Parent
         labels(2) = "Text output with explanation will appear in the Visual Studio output."
         desc = "Simple test of Hidden Markov Model - text output"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.testAllRunning Then
             SetTrueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
             Exit Sub
@@ -19,7 +19,7 @@ Public Class HMM_Example_CPP_VB : Inherits VB_Parent
         handleSrc.Free()
 
         SetTrueText("Review the 'Immediate Window' output to see the results.", 3)
-        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, IIf(src.Channels() = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, IIf(src.Channels() = 3, cvb.MatType.CV_8UC3, cvb.MatType.CV_8UC1), imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = HMM_Close(cPtr)

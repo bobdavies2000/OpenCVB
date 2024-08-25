@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports  System.IO
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
 Public Class SLR_Data : Inherits VB_Parent
@@ -20,7 +20,7 @@ Public Class SLR_Data : Inherits VB_Parent
         Next
         desc = "Plot the data used in SLR_Basics"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         plot.srcX = dataX
         plot.srcY = dataY
         plot.Run(src)
@@ -39,7 +39,7 @@ Public Class SLR_TrendImages : Inherits VB_Parent
     Public Sub New()
         desc = "Find trends by filling in short histogram gaps for depth or 1-channel images"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         Dim split = src.Split()
@@ -54,7 +54,7 @@ Public Class SLR_TrendImages : Inherits VB_Parent
                 trends.Run(task.pcSplit(2))
                 labels(2) = "SLR_TrendImages - pcSplit(2)"
             Case "Grayscale input"
-                trends.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+                trends.Run(src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
                 labels(2) = "SLR_TrendImages - grayscale"
             Case "Blue input"
                 labels(2) = "SLR_TrendImages - Blue channel"
@@ -85,7 +85,7 @@ Public Class SLR_SurfaceH : Inherits VB_Parent
     Public Sub New()
         desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         surface.Run(src)
         dst2 = surface.dst3
     End Sub
@@ -103,24 +103,24 @@ Public Class SLR_Trends : Inherits VB_Parent
     Public hist As New Hist_KalmanAuto
     Dim valList As New List(Of Single)
     Dim barMidPoint As Single
-    Dim lastPoint As cv.Point2f
-    Public resultingPoints As New List(Of cv.Point2f)
+    Dim lastPoint As cvb.Point2f
+    Public resultingPoints As New List(Of cvb.Point2f)
     Public resultingValues As New List(Of Single)
     Public Sub New()
         desc = "Find trends by filling in short histogram gaps in the given image's histogram."
     End Sub
-    Public Sub connectLine(i As Integer, dst As cv.Mat)
+    Public Sub connectLine(i As Integer, dst As cvb.Mat)
         Dim x = barMidPoint + dst.Width * i / valList.Count
         Dim y = dst.Height - dst.Height * valList(i) / hist.plot.maxValue
-        Dim p1 = New cv.Point2f(x, y)
+        Dim p1 = New cvb.Point2f(x, y)
         resultingPoints.Add(p1)
         resultingValues.Add(p1.Y)
-        dst.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        dst.Line(lastPoint, p1, cvb.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         lastPoint = p1
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         labels(2) = "Grayscale histogram - yellow line shows trend"
-        hist.plot.backColor = cv.Scalar.Red
+        hist.plot.backColor = cvb.Scalar.Red
         hist.Run(src)
         dst2 = hist.dst2
 
@@ -133,7 +133,7 @@ Public Class SLR_Trends : Inherits VB_Parent
 
         If valList.Count < 2 Then Exit Sub
         hist.plot.maxValue = valList.Max
-        lastPoint = New cv.Point2f(barMidPoint, dst2.Height - dst2.Height * valList(0) / hist.plot.maxValue)
+        lastPoint = New cvb.Point2f(barMidPoint, dst2.Height - dst2.Height * valList(0) / hist.plot.maxValue)
         resultingPoints.Clear()
         resultingValues.Clear()
         resultingPoints.Add(lastPoint)

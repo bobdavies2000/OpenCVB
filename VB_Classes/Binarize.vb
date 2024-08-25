@@ -1,29 +1,29 @@
 Imports OpenCvSharp
 Imports OpenCvSharp.XImgProc
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 
-' https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
-' https://www.learnopencv.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175
+' https://docs.opencvb.org/3.4/d7/d4d/tutorial_py_thresholding.html
+' https://www.learnopencvb.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175
 ' https://github.com/spmallick/learnopencv/tree/master/otsu-method?ck_subscriber_id=785741175
 Public Class Binarize_Basics : Inherits VB_Parent
-    Public thresholdType = cv.ThresholdTypes.Otsu
+    Public thresholdType = cvb.ThresholdTypes.Otsu
     Dim minRange = 0
     Dim maxRange = 255
-    Public histogram As New cv.Mat
-    Public meanScalar As cv.Scalar
-    Public mask As New cv.Mat
+    Public histogram As New cvb.Mat
+    Public meanScalar As cvb.Scalar
+    Public mask As New cvb.Mat
     Dim blur As New Blur_Basics
     Public useBlur As Boolean
     Public Sub New()
-        mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 255)
+        mask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, 255)
         UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.")
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        meanScalar = cv.Cv2.Mean(src, mask)
+    Public Sub RunVB(src As cvb.Mat)
+        meanScalar = cvb.Cv2.Mean(src, mask)
 
         Dim input = src
-        If input.Channels() = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If input.Channels() = 3 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
 
         If useBlur Then
             blur.Run(input)
@@ -38,7 +38,7 @@ End Class
 
 
 
-'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
+'https://docs.opencvb.org/3.4/d7/d4d/tutorial_py_thresholding.html
 Public Class Binarize_OTSU : Inherits VB_Parent
     Dim binarize As Binarize_Basics
     Dim options As New Options_Binarize
@@ -49,25 +49,25 @@ Public Class Binarize_OTSU : Inherits VB_Parent
         labels(3) = "Histograms correspond to images on the left"
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         Dim input = src
-        If input.Channels() = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If input.Channels() = 3 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
 
-        binarize.meanScalar = cv.Cv2.Mean(input)
+        binarize.meanScalar = cvb.Cv2.Mean(input)
 
         binarize.useBlur = False
         Select Case labels(2)
             Case "Binary"
-                binarize.thresholdType = cv.ThresholdTypes.Binary
+                binarize.thresholdType = cvb.ThresholdTypes.Binary
             Case "Binary + OTSU"
-                binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
+                binarize.thresholdType = cvb.ThresholdTypes.Binary + cvb.ThresholdTypes.Otsu
             Case "OTSU"
-                binarize.thresholdType = cv.ThresholdTypes.Otsu
+                binarize.thresholdType = cvb.ThresholdTypes.Otsu
             Case "OTSU + Blur"
                 binarize.useBlur = True
-                binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
+                binarize.thresholdType = cvb.ThresholdTypes.Binary + cvb.ThresholdTypes.Otsu
         End Select
         binarize.Run(input)
         dst2 = binarize.dst2
@@ -85,9 +85,9 @@ Public Class Binarize_Niblack_Sauvola : Inherits VB_Parent
         labels(2) = "Binarize Niblack"
         labels(3) = "Binarize Sauvola"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
         dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR)
         CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
@@ -107,10 +107,10 @@ Public Class Binarize_Wolf_Nick : Inherits VB_Parent
         labels(2) = "Binarize Niblack"
         labels(3) = "Binarize Nick"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
 
         CvXImgProc.NiblackThreshold(src, dst2, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
         CvXImgProc.NiblackThreshold(src, dst3, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
@@ -127,10 +127,10 @@ Public Class Binarize_KMeansMasks : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Ordered from dark to light, top left darkest, bottom right lightest "
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Display the top 4 masks from the BGR kmeans output"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         km.Run(src)
         For i = 0 To km.masks.Count - 1
             mats.mat(i) = km.masks(i)
@@ -158,11 +158,11 @@ Public Class Binarize_KMeansRGB : Inherits VB_Parent
         labels(2) = "Ordered from dark to light, top left darkest, bottom right lightest "
         desc = "Display the top 4 masks from the BGR kmeans output"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         km.Run(src)
         dst1.SetTo(0)
         For i = 0 To km.masks.Count - 1
-            mats.mat(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+            mats.mat(i) = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
             src.CopyTo(mats.mat(i), km.masks(i))
             If i >= 3 Then Exit For
         Next
@@ -184,13 +184,13 @@ Public Class Binarize_FourPixelFlips : Inherits VB_Parent
     Public Sub New()
         desc = "Identify the marginal regions that flip between subdivisions based on brightness."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         binar4.Run(src)
         dst2 = ShowPalette(binar4.dst2 * 255 / 5)
 
-        Static lastSubD As cv.Mat = binar4.dst2.Clone
+        Static lastSubD As cvb.Mat = binar4.dst2.Clone
         dst3 = lastSubD - binar4.dst2
-        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst3.Threshold(0, 255, cvb.ThresholdTypes.Binary)
         lastSubD = binar4.dst2.Clone
     End Sub
 End Class
@@ -208,7 +208,7 @@ Public Class Binarize_DepthTiers : Inherits VB_Parent
         task.redOptions.setUseColorOnly(True)
         desc = "Add the Depth_TierZ and Bin4Way_Regions output in preparation for RedCloud"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         binar4.Run(src)
         tiers.Run(src)
         dst3 = tiers.dst3
@@ -232,14 +232,14 @@ End Class
 
 
 Public Class Binarize_Simple : Inherits VB_Parent
-    Public meanScalar As cv.Scalar
+    Public meanScalar As cvb.Scalar
     Public injectVal As Integer = 255
     Public Sub New()
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        meanScalar = cv.Cv2.Mean(src)
-        dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        meanScalar = cvb.Cv2.Mean(src)
+        dst2 = src.Threshold(meanScalar(0), injectVal, cvb.ThresholdTypes.Binary)
     End Sub
 End Class

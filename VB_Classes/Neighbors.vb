@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Neighbors_Basics : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Dim knn As New KNN_Core
@@ -8,7 +8,7 @@ Public Class Neighbors_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Find all the neighbors with KNN"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If standalone Or runRedCloud Then
@@ -21,7 +21,7 @@ Public Class Neighbors_Basics : Inherits VB_Parent
         For Each rc In task.redCells
             knn.queries.Add(rc.maxDStable)
         Next
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
         knn.Run(src)
 
         For i = 0 To task.redCells.Count - 1
@@ -54,13 +54,13 @@ End Class
 
 
 Public Class Neighbors_Intersects : Inherits VB_Parent
-    Public nPoints As New List(Of cv.Point)
+    Public nPoints As New List(Of cvb.Point)
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
+    Public Sub RunVB(src As cvb.Mat)
+        If standaloneTest() Or src.Type <> cvb.MatType.CV_8U Then
             redC.Run(src)
             dst2 = redC.dst2
             src = task.cellMap
@@ -84,7 +84,7 @@ Public Class Neighbors_Intersects : Inherits VB_Parent
                     Next
                 Next
                 If nabs.Count > 2 Then
-                    nPoints.Add(New cv.Point(x, y))
+                    nPoints.Add(New cvb.Point(x, y))
                 End If
             Next
         Next
@@ -93,7 +93,7 @@ Public Class Neighbors_Intersects : Inherits VB_Parent
             dst3 = task.color.Clone
             For Each pt In nPoints
                 DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
-                DrawCircle(dst3,pt, task.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3,pt, task.DotSize, cvb.Scalar.Yellow)
             Next
         End If
 
@@ -115,7 +115,7 @@ Public Class Neighbors_ColorOnly : Inherits VB_Parent
     Public Sub New()
         desc = "Find neighbors in a color only RedCloud cellMap"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -145,7 +145,7 @@ Public Class Neighbors_Precise : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Find the neighbors in a selected RedCloud cell"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
             redC.Run(src)
             dst2 = redC.dst2
@@ -163,14 +163,14 @@ Public Class Neighbors_Precise : Inherits VB_Parent
         SetTrueText("Review the neighbors_Precise algorithm")
 
         'If nabCount > 0 Then
-        '    Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbors_NabList(cPtr))
+        '    Dim nabData = New cvb.Mat(nabCount, 1, cvb.MatType.CV_32SC2, Neighbors_NabList(cPtr))
         '    nabList.Clear()
         '    For i = 0 To redCells.Count - 1
         '        nabList.Add(New List(Of Integer))
         '    Next
         '    redCells(i).nab = nabList.Min()
         '    For i = 0 To nabCount - 1
-        '        Dim pt = nabData.Get(Of cv.Point)(i, 0)
+        '        Dim pt = nabData.Get(Of cvb.Point)(i, 0)
         '        If nabList(pt.X).Contains(pt.Y) = False And pt.Y <> 0 Then
         '            nabList(pt.X).Add(pt.Y)
         '            redCells(pt.X).nabs.Add(pt.Y)

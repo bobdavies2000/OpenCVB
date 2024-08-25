@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Public Class Denoise_Basics_CPP_VB : Inherits VB_Parent
@@ -8,8 +8,8 @@ Public Class Denoise_Basics_CPP_VB : Inherits VB_Parent
         labels = {"", "", "Input image", "Output: Use PixelViewer to see changes"}
         desc = "Denoise example."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) - 1
+    Public Sub RunVB(src As cvb.Mat)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) - 1
         Dim dataSrc(src.Total - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
@@ -17,7 +17,7 @@ Public Class Denoise_Basics_CPP_VB : Inherits VB_Parent
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+            dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr).Clone
             diff.Run(dst2)
             dst3 = diff.dst2
         End If
@@ -41,7 +41,7 @@ Public Class Denoise_Pixels_CPP_VB : Inherits VB_Parent
         labels = {"", "", "Before removing single pixels", "After removing single pixels"}
         desc = "Remove single pixels between identical pixels"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If standaloneTest() Then
@@ -49,7 +49,7 @@ Public Class Denoise_Pixels_CPP_VB : Inherits VB_Parent
             src = reduction.dst2
             classCount = reduction.classCount
         End If
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         If options.removeSinglePixels Then
             Dim cppData(src.Total - 1) As Byte
@@ -57,7 +57,7 @@ Public Class Denoise_Pixels_CPP_VB : Inherits VB_Parent
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Denoise_Pixels_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+            dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr).Clone
         Else
             dst2 = src
         End If
@@ -91,7 +91,7 @@ Public Class Denoise_Reliable : Inherits VB_Parent
         labels(3) = "After denoising single pixels"
         desc = "Manually remove single pixels in the binary image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         relyGray.Run(src)
         dst2 = relyGray.dst2
 
@@ -111,18 +111,18 @@ Public Class Denoise_SinglePixels_CPP_VB : Inherits VB_Parent
         labels = {"", "", "Input image", "Output: Use PixelViewer to see changes"}
         desc = "Remove any single pixels sitting alone..."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If options.removeSinglePixels Then
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             Dim dataSrc(src.Total - 1) As Byte
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = Denoise_SinglePixels_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()
 
-            If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+            If imagePtr <> 0 Then dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr).Clone
         Else
             dst2 = src
         End If

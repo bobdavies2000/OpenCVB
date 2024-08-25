@@ -1,6 +1,6 @@
 Imports OpenCvSharp
 Imports System.Security.Cryptography
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 
 Public Class Blob_Basics : Inherits VB_Parent
     Dim options As Options_Blob
@@ -60,7 +60,7 @@ Public Class Blob_Input : Inherits VB_Parent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Generate data to test Blob Detector."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         rotatedRect.Run(src)
         Mats.mat(0) = rotatedRect.dst2
 
@@ -88,29 +88,29 @@ Public Class Blob_RenderBlobs : Inherits VB_Parent
         labels(3) = "Largest blob, centroid in yellow"
         desc = "Use connected components to find blobs."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         If task.frameCount Mod input.updateFrequency = 0 Then
             input.Run(src)
             dst2 = input.dst2
-            Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-            Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
+            Dim gray = dst2.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+            Dim binary = gray.Threshold(0, 255, cvb.ThresholdTypes.Otsu Or cvb.ThresholdTypes.Binary)
             Dim labelView = dst2.EmptyClone
-            Dim stats As New cv.Mat
-            Dim centroids As New cv.Mat
-            Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
-            Dim labelCount = cv.Cv2.ConnectedComponentsWithStats(binary, labelView, stats, centroids)
+            Dim stats As New cvb.Mat
+            Dim centroids As New cvb.Mat
+            Dim cc = cvb.Cv2.ConnectedComponentsEx(binary)
+            Dim labelCount = cvb.Cv2.ConnectedComponentsWithStats(binary, labelView, stats, centroids)
             cc.RenderBlobs(labelView)
 
             For Each b In cc.Blobs.Skip(1)
-                dst2.Rectangle(b.Rect, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                dst2.Rectangle(b.Rect, cvb.Scalar.Red, task.lineWidth + 1, task.lineType)
             Next
 
             Dim maxBlob = cc.GetLargestBlob()
             dst3.SetTo(0)
             cc.FilterByBlob(dst2, dst3, maxBlob)
 
-            dst3.Circle(New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cv.Scalar.Blue, -1, task.lineType)
-            DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, cv.Scalar.Yellow)
+            dst3.Circle(New cvb.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cvb.Scalar.Blue, -1, task.lineType)
+            DrawCircle(dst3, New cvb.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, cvb.Scalar.Yellow)
         End If
     End Sub
 End Class

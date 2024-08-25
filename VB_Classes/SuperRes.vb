@@ -1,18 +1,18 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.IO
 ' https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
 Public Class SuperRes_Basics : Inherits VB_Parent
     Dim video As New SuperRes_Input
     Dim options As New Options_SuperRes
-    Dim optFlow As cv.DenseOpticalFlowExt
-    Dim superres As cv.SuperResolution
+    Dim optFlow As cvb.DenseOpticalFlowExt
+    Dim superres As cvb.SuperResolution
     Dim warningMessage As Integer = 10
     Public Sub New()
         labels(2) = "Original Input video"
         labels(3) = "SuperRes output"
         desc = "Create superres version of the video input"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If warningMessage > 0 Then
             SetTrueText("The first frame takes a while when iterations are over 50 or so")
             warningMessage -= 1
@@ -33,20 +33,20 @@ Public Class SuperRes_Basics : Inherits VB_Parent
         If optFlow Is Nothing Then
             Select Case options.method ' only one method available with OpenCVSharp...
                 Case "farneback"
-                    optFlow = cv.FarnebackOpticalFlow.CreateFarneback
+                    optFlow = cvb.FarnebackOpticalFlow.CreateFarneback
                 Case "brox"
-                    optFlow = cv.BroxOpticalFlow.CreateFarneback
+                    optFlow = cvb.BroxOpticalFlow.CreateFarneback
                 Case "tvl1"
-                    optFlow = cv.DualTVL1OpticalFlow.CreateDualTVL1
+                    optFlow = cvb.DualTVL1OpticalFlow.CreateDualTVL1
                 Case "pyrlk"
-                    optFlow = cv.PyrLKOpticalFlow.CreateFarneback
+                    optFlow = cvb.PyrLKOpticalFlow.CreateFarneback
             End Select
             If optFlow Is Nothing Then Exit Sub
-            superres = cv.SuperResolution.CreateBTVL1()
+            superres = cvb.SuperResolution.CreateBTVL1()
             superres.Iterations = options.iterations
             superres.Scale = 4
             superres.TemporalAreaRadius = 4
-            superres.SetInput(cv.FrameSource.CreateFrameSource_Video(video.inputFileName))
+            superres.SetInput(cvb.FrameSource.CreateFrameSource_Video(video.inputFileName))
         End If
 
         superres.NextFrame(dst3)
@@ -71,7 +71,7 @@ Public Class SuperRes_Input : Inherits VB_Parent
         inputFileName = video.options.fileInfo.FullName
         desc = "Input data for the superres testing"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         video.Run(empty)
         dst2 = video.dst2
     End Sub
@@ -93,8 +93,8 @@ Public Class SuperRes_SubPixelZoom : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.mouseMovePoint = New cv.Point(45, 60)
+    Public Sub RunVB(src As cvb.Mat)
+        task.mouseMovePoint = New cvb.Point(45, 60)
         video.Run(empty)
         If video.video.captureVideo.PosFrames > 30 Then Exit Sub
         dst1 = video.dst2

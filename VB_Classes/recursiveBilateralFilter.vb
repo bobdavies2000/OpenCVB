@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/ufoym
 Public Class RecursiveBilateralFilter_CPP_VB : Inherits VB_Parent
@@ -8,7 +8,7 @@ Public Class RecursiveBilateralFilter_CPP_VB : Inherits VB_Parent
         cPtr = RecursiveBilateralFilter_Open()
         desc = "Apply the recursive bilateral filter"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If dataSrc.Length <> src.Total * src.ElemSize Then ReDim dataSrc(src.Total * src.ElemSize - 1)
@@ -18,7 +18,7 @@ Public Class RecursiveBilateralFilter_CPP_VB : Inherits VB_Parent
                                                     options.RBFCount)
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RecursiveBilateralFilter_Close(cPtr)

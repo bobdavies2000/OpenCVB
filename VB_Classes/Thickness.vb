@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class Thickness_Basics : Inherits VB_Parent
     Public rc As New rcData
     Public volZ As New Volume_Basics
@@ -6,7 +6,7 @@ Public Class Thickness_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Determine the thickness of a RedCloud cell"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         If standaloneTest() Then
             redC.Run(src)
             dst2 = redC.dst2

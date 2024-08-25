@@ -1,17 +1,17 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class Bezier_Basics : Inherits VB_Parent
-    Public points() As cv.Point
+    Public points() As cvb.Point
     Public Sub New()
-        points = {New cv.Point(100, 100),
-                  New cv.Point(150, 50),
-                  New cv.Point(250, 150),
-                  New cv.Point(300, 100),
-                  New cv.Point(350, 150),
-                  New cv.Point(450, 50)}
+        points = {New cvb.Point(100, 100),
+                  New cvb.Point(150, 50),
+                  New cvb.Point(250, 150),
+                  New cvb.Point(300, 100),
+                  New cvb.Point(350, 150),
+                  New cvb.Point(450, 50)}
         UpdateAdvice(traceName + ": Update the public points array variable.  No exposed options.")
         desc = "Use n points to draw a Bezier curve."
     End Sub
-    Public Function nextPoint(points() As cv.Point, i As Integer, t As Single) As cv.Point
+    Public Function nextPoint(points() As cvb.Point, i As Integer, t As Single) As cvb.Point
         Dim x = Math.Pow(1 - t, 3) * points(i).X +
                 3 * t * Math.Pow(1 - t, 2) * points(i + 1).X +
                 3 * Math.Pow(t, 2) * (1 - t) * points(i + 2).X +
@@ -21,10 +21,10 @@ Public Class Bezier_Basics : Inherits VB_Parent
                 3 * t * Math.Pow(1 - t, 2) * points(i + 1).Y +
                 3 * Math.Pow(t, 2) * (1 - t) * points(i + 2).Y +
                 Math.Pow(t, 3) * points(i + 3).Y
-        Return New cv.Point(x, y)
+        Return New cvb.Point(x, y)
     End Function
-    Public Sub RunVB(src As cv.Mat)
-        Dim p1 As cv.Point
+    Public Sub RunVB(src As cvb.Mat)
+        Dim p1 As cvb.Point
         For i = 0 To points.Count - 4 Step 3
             For j = 0 To 100
                 Dim p2 = nextPoint(points, i, j / 100)
@@ -44,15 +44,15 @@ End Class
 
 Public Class Bezier_Example : Inherits VB_Parent
     Dim bezier As New Bezier_Basics
-    Public points() As cv.Point = {New cv.Point(task.DotSize, task.DotSize), New cv.Point(dst2.Width / 6, dst2.Width / 6),
-                                   New cv.Point(dst2.Width * 3 / 4, dst2.Height / 2),
-                                   New cv.Point(dst2.Width - task.DotSize * 2, dst2.Height - task.DotSize * 2)}
+    Public points() As cvb.Point = {New cvb.Point(task.DotSize, task.DotSize), New cvb.Point(dst2.Width / 6, dst2.Width / 6),
+                                   New cvb.Point(dst2.Width * 3 / 4, dst2.Height / 2),
+                                   New cvb.Point(dst2.Width - task.DotSize * 2, dst2.Height - task.DotSize * 2)}
     Public Sub New()
         desc = "Draw a Bezier curve based with the 4 input points."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         dst2.SetTo(0)
-        Dim p1 As cv.Point
+        Dim p1 As cvb.Point
         For i = 0 To 100 - 1
             Dim p2 = bezier.nextPoint(points, 0, i / 100)
             If i > 0 Then DrawLine(dst2, p1, p2, task.HighlightColor)
@@ -60,11 +60,11 @@ Public Class Bezier_Example : Inherits VB_Parent
         Next
 
         For i = 0 To points.Count - 1
-            DrawCircle(dst2, points(i), task.DotSize + 2, cv.Scalar.White)
+            DrawCircle(dst2, points(i), task.DotSize + 2, cvb.Scalar.White)
         Next
 
-        DrawLine(dst2, points(0), points(1), cv.Scalar.White)
-        DrawLine(dst2, points(2), points(3), cv.Scalar.White)
+        DrawLine(dst2, points(0), points(1), cvb.Scalar.White)
+        DrawLine(dst2, points(2), points(3), cvb.Scalar.White)
     End Sub
 End Class
 

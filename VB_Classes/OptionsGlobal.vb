@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class OptionsGlobal
     Public maxDepth As Integer
     Public debugChecked As Boolean
@@ -76,8 +76,8 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 4
                 task.DotSize = 4
                 task.disparityAdjustment = 1.1
-                task.lowRes = New cv.Size(240, 135)
-                task.quarterRes = New cv.Size(480, 270)
+                task.lowRes = New cvb.Size(240, 135)
+                task.quarterRes = New cvb.Size(480, 270)
                 task.densityMetric = 40
                 task.FASTthreshold = 25
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
@@ -87,16 +87,16 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 2
                 task.DotSize = 2
                 task.disparityAdjustment = 2.2
-                task.lowRes = New cv.Size(240, 135)
-                task.quarterRes = New cv.Size(480, 270)
+                task.lowRes = New cvb.Size(240, 135)
+                task.quarterRes = New cvb.Size(480, 270)
                 task.densityMetric = 200
                 task.FASTthreshold = 40
             Case 480
                 GridSlider.Value = 48
                 task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
-                task.lowRes = New cv.Size(240, 135)
-                task.quarterRes = New cv.Size(480, 270)
+                task.lowRes = New cvb.Size(240, 135)
+                task.quarterRes = New cvb.Size(480, 270)
                 task.densityMetric = 650
                 task.FASTthreshold = 10
             Case 1280
@@ -105,8 +105,8 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 2
                 task.DotSize = 5
                 task.disparityAdjustment = 2.2
-                task.lowRes = New cv.Size(320, 180)
-                task.quarterRes = New cv.Size(320, 180)
+                task.lowRes = New cvb.Size(320, 180)
+                task.quarterRes = New cvb.Size(320, 180)
                 task.densityMetric = 150
                 task.FASTthreshold = 40
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
@@ -115,25 +115,25 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.disparityAdjustment = 4.2
-                task.lowRes = New cv.Size(320, task.WorkingRes.Height / 2)
-                task.quarterRes = New cv.Size(320, 180)
+                task.lowRes = New cvb.Size(320, task.WorkingRes.Height / 2)
+                task.quarterRes = New cvb.Size(320, 180)
                 task.densityMetric = 200
                 task.FASTthreshold = 30
             Case 320
                 GridSlider.Value = 32
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 8.4
-                task.lowRes = New cv.Size(320, 180)
-                task.quarterRes = New cv.Size(320, 180)
-                If task.WorkingRes.Height = 240 Then task.lowRes = New cv.Size(160, 120)
+                task.lowRes = New cvb.Size(320, 180)
+                task.quarterRes = New cvb.Size(320, 180)
+                If task.WorkingRes.Height = 240 Then task.lowRes = New cvb.Size(160, 120)
                 task.densityMetric = 500
                 task.FASTthreshold = 10
             Case 160
                 GridSlider.Value = 16
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4
-                task.lowRes = New cv.Size(160, 120)
-                task.quarterRes = New cv.Size(320, 180)
+                task.lowRes = New cvb.Size(160, 120)
+                task.quarterRes = New cvb.Size(320, 180)
                 task.densityMetric = 100
                 task.FASTthreshold = 10
             Case 672
@@ -141,8 +141,8 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.5
                 task.DotSize = 1
                 task.disparityAdjustment = 4.4
-                task.lowRes = New cv.Size(168, 94)
-                task.quarterRes = New cv.Size(336, 188)
+                task.lowRes = New cvb.Size(168, 94)
+                task.quarterRes = New cvb.Size(336, 188)
                 task.densityMetric = 300
                 task.FASTthreshold = 10
             Case 336
@@ -150,16 +150,16 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.0
                 task.DotSize = 1
                 task.disparityAdjustment = 8.8
-                task.lowRes = New cv.Size(168, 94)
-                task.quarterRes = New cv.Size(336, 188)
+                task.lowRes = New cvb.Size(168, 94)
+                task.quarterRes = New cvb.Size(336, 188)
                 task.densityMetric = 700
                 task.FASTthreshold = 10
             Case 168
                 GridSlider.Value = 16
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
-                task.lowRes = New cv.Size(168, 94)
-                task.quarterRes = New cv.Size(336, 188)
+                task.lowRes = New cvb.Size(168, 94)
+                task.quarterRes = New cvb.Size(336, 188)
                 task.densityMetric = 1700
                 task.FASTthreshold = 10
         End Select
@@ -176,11 +176,11 @@ Public Class OptionsGlobal
         task.optionsChanged = True
         Select Case LineType.Text
             Case "AntiAlias"
-                task.lineType = cv.LineTypes.AntiAlias
+                task.lineType = cvb.LineTypes.AntiAlias
             Case "Link4"
-                task.lineType = cv.LineTypes.Link4
+                task.lineType = cvb.LineTypes.Link4
             Case "Link8"
-                task.lineType = cv.LineTypes.Link8
+                task.lineType = cvb.LineTypes.Link8
         End Select
     End Sub
     Private Sub LineWidth_Scroll(sender As Object, e As EventArgs) Handles LineWidth.Scroll
@@ -296,13 +296,13 @@ Public Class OptionsGlobal
     Private Sub HighlightColor_SelectedIndexChanged(sender As Object, e As EventArgs) Handles HighlightColor.SelectedIndexChanged
         Select Case HighlightColor.Text
             Case "Yellow"
-                task.HighlightColor = cv.Scalar.Yellow
+                task.HighlightColor = cvb.Scalar.Yellow
             Case "Black"
-                task.HighlightColor = cv.Scalar.Black
+                task.HighlightColor = cvb.Scalar.Black
             Case "White"
-                task.HighlightColor = cv.Scalar.White
+                task.HighlightColor = cvb.Scalar.White
             Case "Red"
-                task.HighlightColor = cv.Scalar.Red
+                task.HighlightColor = cvb.Scalar.Red
         End Select
     End Sub
     Public Sub setMaxDepth(val As Integer)

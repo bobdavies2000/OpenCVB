@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Imports OpenCvSharp.Dnn
 Imports System.Net
 Imports System.IO
@@ -31,17 +31,17 @@ Public Class DNN_Test : Inherits VB_Parent
         labels(3) = "Input Image"
         desc = "Download and use a Caffe database"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
 
-        Dim image = cv.Cv2.ImRead(task.HomeDir + "Data/space_shuttle.jpg")
+        Dim image = cvb.Cv2.ImRead(task.HomeDir + "Data/space_shuttle.jpg")
         dst3 = image.Resize(dst3.Size())
-        Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
+        Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cvb.Size(224, 224), New cvb.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
         Dim prob = net.Forward("prob")
 
         Dim mm As mmData = GetMinMax(prob.Reshape(1, 1))
         SetTrueText("Best classification: index = " + CStr(mm.maxLoc.X) + " which is for '" + classnames(mm.maxLoc.X) + "' with Probability " +
-                    Format(mm.maxVal, "#0.00%"), New cv.Point(40, 200))
+                    Format(mm.maxVal, "#0.00%"), New cvb.Point(40, 200))
     End Sub
 End Class
 
@@ -54,11 +54,11 @@ End Class
 Public Class DNN_Basics : Inherits VB_Parent
     Dim net As Net
     Dim dnnPrepared As Boolean
-    Dim crop As cv.Rect
+    Dim crop As cvb.Rect
     Dim dnnWidth As Integer, dnnHeight As Integer
-    Dim testImage As cv.Mat
+    Dim testImage As cvb.Mat
     Dim kalman(10) As Kalman_Basics
-    Public rect As cv.Rect
+    Public rect As cvb.Rect
     Dim options As New Options_DNN
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
@@ -72,7 +72,7 @@ Public Class DNN_Basics : Inherits VB_Parent
 
         dnnWidth = dst2.Height ' height is always smaller than width...
         dnnHeight = dst2.Height
-        crop = New cv.Rect(dst2.Width / 2 - dnnWidth / 2, dst2.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
+        crop = New cvb.Rect(dst2.Width / 2 - dnnWidth / 2, dst2.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
         Dim infoText As New FileInfo(task.HomeDir + "Data/MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
@@ -88,32 +88,32 @@ Public Class DNN_Basics : Inherits VB_Parent
         desc = "Use OpenCV's dnn from Caffe file."
         labels(2) = "Cropped Input Image - must be square!"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
 
         If dnnPrepared Then
             Dim inScaleFactor As Single = options.ScaleFactor / options.scaleMax ' should be 0.0078 by default...
-            Dim inputBlob = CvDnn.BlobFromImage(src(crop), inScaleFactor, New cv.Size(300, 300), CSng(options.meanValue), False)
+            Dim inputBlob = CvDnn.BlobFromImage(src(crop), inScaleFactor, New cvb.Size(300, 300), CSng(options.meanValue), False)
             src.CopyTo(dst3)
             src(crop).CopyTo(dst2(crop))
             net.SetInput(inputBlob, "data")
 
             Dim detection = net.Forward("detection_out")
-            Dim detectionMat = cv.Mat.FromPixelData(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
+            Dim detectionMat = cvb.Mat.FromPixelData(detection.Size(2), detection.Size(3), cvb.MatType.CV_32F, detection.Data)
 
             Dim rows = src(crop).Rows
             Dim cols = src(crop).Cols
             labels(3) = ""
 
-            Dim kPoints As New List(Of cv.Point)
+            Dim kPoints As New List(Of cvb.Point)
             For i = 0 To detectionMat.Rows - 1
                 Dim confidence = detectionMat.Get(Of Single)(i, 2)
                 If confidence > options.confidenceThreshold Then
-                    Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
+                    Dim vec = detectionMat.Get(Of cvb.Vec4f)(i, 3)
                     If kalman(i).kInput(0) = 0 And kalman(i).kInput(1) = 0 Then
-                        kPoints.Add(New cv.Point2f(vec(0) * cols + crop.Left, vec(1) * rows + crop.Top))
+                        kPoints.Add(New cvb.Point2f(vec(0) * cols + crop.Left, vec(1) * rows + crop.Top))
                     Else
-                        kPoints.Add(New cv.Point2f(kalman(i).kInput(0), kalman(i).kInput(1)))
+                        kPoints.Add(New cvb.Point2f(kalman(i).kInput(0), kalman(i).kInput(1)))
                     End If
                 End If
             Next
@@ -124,11 +124,11 @@ Public Class DNN_Basics : Inherits VB_Parent
                 If confidence > options.confidenceThreshold Then
                     Dim nextName = classNames(CInt(detectionMat.Get(Of Single)(i, 1)))
                     labels(3) += nextName + " "  ' display the name of what we found.
-                    Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
-                    rect = New cv.Rect(vec(0) * cols + crop.Left, vec(1) * rows + crop.Top, (vec(2) - vec(0)) * cols, (vec(3) - vec(1)) * rows)
-                    rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
+                    Dim vec = detectionMat.Get(Of cvb.Vec4f)(i, 3)
+                    rect = New cvb.Rect(vec(0) * cols + crop.Left, vec(1) * rows + crop.Top, (vec(2) - vec(0)) * cols, (vec(3) - vec(1)) * rows)
+                    rect = New cvb.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
 
-                    Dim pt = New cv.Point(rect.X, rect.Y)
+                    Dim pt = New cvb.Point(rect.X, rect.Y)
                     Dim minIndex As Integer
                     Dim minDistance As Single = Single.MaxValue
                     For j = 0 To kPoints.Count - 1
@@ -142,13 +142,13 @@ Public Class DNN_Basics : Inherits VB_Parent
                     If minIndex < kalman.Count Then
                         kalman(minIndex).kInput = {rect.X, rect.Y, rect.Width, rect.Height}
                         kalman(minIndex).Run(src)
-                        rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
+                        rect = New cvb.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
                     End If
-                    dst3.Rectangle(rect, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+                    dst3.Rectangle(rect, cvb.Scalar.Yellow, task.lineWidth + 2, task.lineType)
                     rect.Width = src.Width / 12
                     rect.Height = src.Height / 16
-                    dst3.Rectangle(rect, cv.Scalar.Black, -1)
-                    SetTrueText(nextName, New cv.Point(rect.X, rect.Y), 3)
+                    dst3.Rectangle(rect, cvb.Scalar.Black, -1)
+                    SetTrueText(nextName, New cvb.Point(rect.X, rect.Y), 3)
                 End If
             Next
 
@@ -177,11 +177,11 @@ Public Class DNN_SuperRes : Inherits VB_Parent
     Dim saveModelFile = ""
     Dim multiplier As Integer
     Public Sub New()
-        task.drawRect = New cv.Rect(10, 10, 20, 20)
+        task.drawRect = New cvb.Rect(10, 10, 20, 20)
         labels(2) = "Output of a resize using OpenCV"
         desc = "Get better super-resolution through a DNN"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         options.RunVB()
         If saveModelFile <> options.superResModelFileName Then
             saveModelFile = options.superResModelFileName
@@ -191,7 +191,7 @@ Public Class DNN_SuperRes : Inherits VB_Parent
         End If
         Dim r = task.drawRect
         If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
-        Dim outRect = New cv.Rect(0, 0, r.Width * multiplier, r.Height * multiplier)
+        Dim outRect = New cvb.Rect(0, 0, r.Width * multiplier, r.Height * multiplier)
         If outRect.Width > dst3.Width Then
             r.Width = dst3.Width / multiplier
             outRect.Width = dst3.Width
@@ -202,7 +202,7 @@ Public Class DNN_SuperRes : Inherits VB_Parent
         End If
         dst2.SetTo(0)
         dst3.SetTo(0)
-        dst2(outRect) = src(r).Resize(New cv.Size(r.Width * multiplier, r.Height * multiplier))
+        dst2(outRect) = src(r).Resize(New cvb.Size(r.Width * multiplier, r.Height * multiplier))
         dnn.Upsample(src(r), dst3(outRect))
         labels(3) = CStr(multiplier) + "X resize of selected area using DNN super resolution"
     End Sub
@@ -221,10 +221,10 @@ Public Class DNN_SuperResize : Inherits VB_Parent
         labels(3) = "dst3 = dst2 - src or no difference - honors original"
         desc = "Compare superRes reduced to original size"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
+    Public Sub RunVB(src As cvb.Mat)
         super.Run(src)
-        Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        Dim tmp As New cv.Mat
+        Dim r = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
+        Dim tmp As New cvb.Mat
         super.dnn.upsample(src, tmp)
         dst2 = tmp.Resize(dst2.Size)
         dst3 = dst2 - src

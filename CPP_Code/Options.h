@@ -18,22 +18,22 @@ public:
 class Options_CamShift {
 public:
 	int camMax =  255;
-	Scalar camSBins =  Scalar(0, 40, 32);
+	cv::Scalar camSBins =  cv::Scalar(0, 40, 32);
 	void RunVB() {}
 	Options_CamShift() {
 	}
 };
 class Options_Contours2 {
 public:
-	ContourApproximationModes ApproximationMode =  ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
+	cv::ContourApproximationModes ApproximationMode =  cv::ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
 	void RunVB() {}
 	Options_Contours2() {
 	}
 };
 class Options_Contours {
 public:
-	RetrievalModes retrievalMode =  cv::RetrievalModes::RETR_EXTERNAL;
-	ContourApproximationModes ApproximationMode =  ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
+	cv::RetrievalModes retrievalMode =  cv::RetrievalModes::RETR_EXTERNAL;
+	cv::ContourApproximationModes ApproximationMode =  cv::ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
 	double epsilon =  0.03;
 	int minPixels =  30;
 	int trueTextOffset =  80;
@@ -53,7 +53,7 @@ class Options_Encode {
 public:
 	int qualityLevel =  1;
 	int scalingLevel =  85;
-	int encodeOption =  ImwriteFlags::IMWRITE_JPEG_PROGRESSIVE;
+	int encodeOption =  cv::ImwriteFlags::IMWRITE_JPEG_PROGRESSIVE;
 	void RunVB() {}
 	Options_Encode() {
 	}
@@ -78,7 +78,7 @@ public:
 };
 class Options_MatchShapes {
 public:
-	ShapeMatchModes matchOption =   ShapeMatchModes::CONTOURS_MATCH_I1;
+	cv::ShapeMatchModes matchOption =  cv:: ShapeMatchModes::CONTOURS_MATCH_I1;
 	double matchThreshold =  0.4;
 	double maxYdelta =  0.05;
 	double minSize =  120;
@@ -118,7 +118,7 @@ public:
 };
 class Options_Resize {
 public:
-	InterpolationFlags warpFlag =  InterpolationFlags::INTER_NEAREST;
+	cv::InterpolationFlags warpFlag =  cv::InterpolationFlags::INTER_NEAREST;
 	int radioIndex =  0;
 	double resizePercent =  0.03;
 	int topLeftOffset =  10;
@@ -146,14 +146,14 @@ public:
 };
 class Options_SVM2 {
 public:
-	int SVMType =  ml::SVM::C_SVC;
+	int SVMType =  cv::ml::SVM::C_SVC;
 	void RunVB() {}
 	Options_SVM2() {
 	}
 };
 class Options_SVM {
 public:
-	int kernelType =  ml::SVM::KernelTypes::POLY;
+	int kernelType =  cv::ml::SVM::KernelTypes::POLY;
 	int granularity =  5;
 	double svmDegree =  1;
 	int gamma =  1;
@@ -195,15 +195,15 @@ public:
 	double zFar =  20;
 	int pointSize =  2;
 	double zTrans =  0.5;
-	Vec3f eye =  Vec3f(0, 0, -40);
-	Vec3f scaleXYZ =  Vec3f(10, 10, 1);
+	cv::Vec3f eye =  cv::Vec3f(0, 0, -40);
+	cv::Vec3f scaleXYZ =  cv::Vec3f(10, 10, 1);
 	void RunVB() {}
 	Options_OpenGL() {
 	}
 };
 class Options_OpenGLFunctions {
 public:
-	Scalar moveAmount =  Scalar(0, 0, 0);
+	cv::Scalar moveAmount =  cv::Scalar(0, 0, 0);
 	double FOV =  75;
 	double yaw =  -3;
 	double pitch =  3;
@@ -211,8 +211,8 @@ public:
 	double zNear =  0;
 	double zFar =  20.0;
 	double zTrans =  0.5;
-	Vec3f eye =  Vec3f(0, 0, -40);
-	Vec3f scaleXYZ =  Vec3f(10, 10, 1);
+	cv::Vec3f eye =  cv::Vec3f(0, 0, -40);
+	cv::Vec3f scaleXYZ =  cv::Vec3f(10, 10, 1);
 	void RunVB() {}
 	Options_OpenGLFunctions() {
 	}
@@ -352,7 +352,7 @@ public:
 class Options_SymmetricalShapes {
 public:
 	double rotateAngle =  0;
-	Scalar fillColor =  Scalar(0, 0, 255);
+	cv::Scalar fillColor =  cv::Scalar(0, 0, 255);
 	int numPoints =  0;
 	int nGenPer =  0;
 	int radius1 =  0;
@@ -406,15 +406,15 @@ public:
 	int minDistance =  7;
 	int blockSize =  7;
 	bool nightMode =  false;
-	Size subPixWinSize =  Size(10, 10);
-	Size winSize =  Size(3, 3);
+	cv::Size subPixWinSize =  cv::Size(10, 10);
+	cv::Size winSize =  cv::Size(3, 3);
 	void RunVB() {}
 	Options_KLT() {
 	}
 };
 class Options_Laplacian {
 public:
-	Size kernel =  Size(3, 3);
+	cv::Size kernel =  cv::Size(3, 3);
 	double scale =  1;
 	double delta =  0;
 	bool gaussianBlur =  false;
@@ -447,7 +447,7 @@ public:
 };
 class Options_XPhoto {
 public:
-	int colorCode =  ColorConversionCodes::COLOR_BGR2GRAY;
+	int colorCode =  cv::ColorConversionCodes::COLOR_BGR2GRAY;
 	int dynamicRatio =  0;
 	int blockSize =  0;
 	void RunVB() {}
@@ -477,7 +477,7 @@ public:
 };
 class Options_Homography {
 public:
-	int hMethod =  LMEDS;
+	int hMethod =  cv::LMEDS;
 	void RunVB() {}
 	Options_Homography() {
 	}
@@ -526,7 +526,7 @@ public:
 };
 class Options_Distance {
 public:
-	int distanceType =  DistanceTypes::DIST_L1;
+	int distanceType =  cv::DistanceTypes::DIST_L1;
 	void RunVB() {}
 	Options_Distance() {
 	}
@@ -544,7 +544,7 @@ public:
 };
 class Options_HistCompare {
 public:
-	HistCompMethods compareMethod =  cv::HistCompMethods::HISTCMP_CORREL;
+	cv::HistCompMethods compareMethod =  cv::HistCompMethods::HISTCMP_CORREL;
 	string compareName =  "Chi Square Alt";
 	void RunVB() {}
 	Options_HistCompare() {
@@ -628,7 +628,7 @@ public:
 };
 class Options_Flood {
 public:
-	int floodFlag =  4 | FloodFillFlags::FLOODFILL_FIXED_RANGE;
+	int floodFlag =  4 | cv::FloodFillFlags::FLOODFILL_FIXED_RANGE;
 	int stepSize =  30;
 	int minPixels =  30;
 	void RunVB() {}
@@ -689,7 +689,7 @@ class Options_Dilate {
 public:
 	int kernelSize =  3;
 	int iterations =  1;
-	MorphShapes morphShape =  cv::MorphShapes::MORPH_CROSS;
+	cv::MorphShapes morphShape =  cv::MorphShapes::MORPH_CROSS;
 	bool noshape =  false;
 	void RunVB() {}
 	Options_Dilate() {
@@ -697,7 +697,7 @@ public:
 };
 class Options_KMeans {
 public:
-	int kMeansFlag =  KmeansFlags::KMEANS_RANDOM_CENTERS;
+	int kMeansFlag =  cv::KmeansFlags::KMEANS_RANDOM_CENTERS;
 	int kMeansK =  5;
 	void RunVB() {}
 	Options_KMeans() {
@@ -814,7 +814,7 @@ public:
 };
 class Options_Complexity {
 public:
-	Scalar plotColor =  Scalar(255, 255, 0);
+	cv::Scalar plotColor =  cv::Scalar(255, 255, 0);
 	void RunVB() {}
 	Options_Complexity() {
 	}
@@ -866,7 +866,7 @@ public:
 };
 class Options_Threshold {
 public:
-	ThresholdTypes thresholdMethod =  cv::ThresholdTypes::THRESH_BINARY;
+	cv::ThresholdTypes thresholdMethod =  cv::ThresholdTypes::THRESH_BINARY;
 	string thresholdName =  "";
 	int threshold =  128;
 	bool inputGray =  false;
@@ -877,7 +877,7 @@ public:
 };
 class Options_AdaptiveThreshold {
 public:
-	AdaptiveThresholdTypes method =  cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
+	cv::AdaptiveThresholdTypes method =  cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
 	int blockSize =  5;
 	int constantVal =  0;
 	void RunVB() {}
@@ -895,21 +895,21 @@ public:
 };
 class Options_Threshold_AdaptiveMin {
 public:
-	AdaptiveThresholdTypes adaptiveMethod =  cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
+	cv::AdaptiveThresholdTypes adaptiveMethod =  cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
 	void RunVB() {}
 	Options_Threshold_AdaptiveMin() {
 	}
 };
 class Options_ThresholdAll {
 public:
-	ThresholdTypes thresholdMethod =  cv::ThresholdTypes::THRESH_BINARY;
+	cv::ThresholdTypes thresholdMethod =  cv::ThresholdTypes::THRESH_BINARY;
 	int blockSize =  5;
 	int constantVal =  0;
 	int maxVal =  255;
 	int threshold =  100;
 	bool inputGray =  false;
 	bool otsuOption =  false;
-	AdaptiveThresholdTypes adaptiveMethod =  cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
+	cv::AdaptiveThresholdTypes adaptiveMethod =  cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
 	void RunVB() {}
 	Options_ThresholdAll() {
 	}
@@ -927,7 +927,7 @@ class Options_DFT {
 public:
 	int radius =  120;
 	int order =  2;
-	int dftFlag =  DftFlags::DFT_COMPLEX_OUTPUT;
+	int dftFlag =  cv::DftFlags::DFT_COMPLEX_OUTPUT;
 	void RunVB() {}
 	Options_DFT() {
 	}
@@ -1041,14 +1041,14 @@ class Options_AsciiArt {
 public:
 	double hStep =  31;
 	double wStep =  55;
-	Size size =  Size(wStep, hStep);
+	cv::Size size =  cv::Size(wStep, hStep);
 	void RunVB() {}
 	Options_AsciiArt() {
 	}
 };
 class Options_MotionDetect {
 public:
-	Vec3i threadData =  Vec3i(0, 0, 0);
+	cv::Vec3i threadData =  cv::Vec3i(0, 0, 0);
 	double CCthreshold =  0;
 	int pad =  0;
 	int stdevThreshold =  0;
@@ -1417,7 +1417,7 @@ class Options_Erode {
 public:
 	int kernelSize =  3;
 	int iterations =  1;
-	MorphShapes morphShape =  cv::MorphShapes::MORPH_CROSS;
+	cv::MorphShapes morphShape =  cv::MorphShapes::MORPH_CROSS;
 	bool noshape =  false;
 	double flatDepth =  100;
 	void RunVB() {}
@@ -1646,7 +1646,7 @@ public:
 };
 class Options_Mat {
 public:
-	int decompType =  DecompTypes::DECOMP_CHOLESKY;
+	int decompType =  cv::DecompTypes::DECOMP_CHOLESKY;
 	void RunVB() {}
 	Options_Mat() {
 	}
@@ -1683,8 +1683,8 @@ public:
 };
 class Options_OEX {
 public:
-	Scalar lows =  Scalar(90, 50, 50);
-	Scalar highs =  Scalar(180, 150, 150);
+	cv::Scalar lows =  cv::Scalar(90, 50, 50);
+	cv::Scalar highs =  cv::Scalar(180, 150, 150);
 	void RunVB() {}
 	Options_OEX() {
 	}

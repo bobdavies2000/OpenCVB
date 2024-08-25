@@ -1,24 +1,24 @@
-Imports cv = OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class MiniCloud_Basics : Inherits VB_Parent
     ReadOnly resize As Resize_Smaller
-    Public rect As cv.Rect
+    Public rect As cvb.Rect
     Public options As New Options_IMU
     Public Sub New()
         resize = New Resize_Smaller
         FindSlider("Resize Percentage (%)").Value = 25
         desc = "Create a mini point cloud for use with histograms"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         resize.Run(task.pointCloud)
 
         Dim split = resize.dst2.Split()
         split(2).SetTo(0, task.noDepthMask.Resize(split(2).Size))
-        rect = New cv.Rect(0, 0, resize.dst2.Width, resize.dst2.Height)
+        rect = New cvb.Rect(0, 0, resize.dst2.Width, resize.dst2.Height)
         If rect.Height < dst2.Height / 2 Then rect.Y = dst2.Height / 4 ' move it below the dst2 caption
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         dst2(rect) = split(2).ConvertScaleAbs(255)
-        dst2.Rectangle(rect, cv.Scalar.White, 1)
-        cv.Cv2.Merge(split, dst3)
+        dst2.Rectangle(rect, cvb.Scalar.White, 1)
+        cvb.Cv2.Merge(split, dst3)
         labels(2) = "MiniPC is " + CStr(rect.Width) + "x" + CStr(rect.Height) + " total pixels = " + CStr(rect.Width * rect.Height)
     End Sub
 End Class
@@ -32,13 +32,13 @@ End Class
 
 Public Class MiniCloud_Rotate : Inherits VB_Parent
     Public mini As New MiniCloud_Basics
-    Public histogram As New cv.Mat
+    Public histogram As New cvb.Mat
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels(3) = "Side view after resize percentage - use Y-Axis slider to rotate image."
         desc = "Create a histogram for the mini point cloud"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
 
         Dim input = src
@@ -53,25 +53,25 @@ Public Class MiniCloud_Rotate : Inherits VB_Parent
         '[cos(a) 0 -sin(a)]
         '[0      1       0]
         '[sin(a) 0   cos(a] rotate the point cloud around the y-axis.
-        cy = Math.Cos(task.accRadians.Y * cv.Cv2.PI / 180)
-        sy = Math.Sin(task.accRadians.Y * cv.Cv2.PI / 180)
+        cy = Math.Cos(task.accRadians.Y * cvb.Cv2.PI / 180)
+        sy = Math.Sin(task.accRadians.Y * cvb.Cv2.PI / 180)
         gM = {{gM(0, 0) * cy + gM(0, 1) * 0 + gM(0, 2) * sy}, {gM(0, 0) * 0 + gM(0, 1) * 1 + gM(0, 2) * 0}, {gM(0, 0) * -sy + gM(0, 1) * 0 + gM(0, 2) * cy},
               {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
               {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
 
-        Dim gMat = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, gM)
+        Dim gMat = cvb.Mat.FromPixelData(3, 3, cvb.MatType.CV_32F, gM)
         Dim gInput = input.Reshape(1, input.Rows * input.Cols)
         Dim gOutput = (gInput * gMat).ToMat
         input = gOutput.Reshape(3, input.Rows)
 
         Dim split = input.Split()
-        Dim mask = split(2).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        Dim mask = split(2).Threshold(1, 255, cvb.ThresholdTypes.BinaryInv)
         input.SetTo(0, mask.ConvertScaleAbs(255)) ' remove zero depth pixels with non-zero x and y.
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
-        cv.Cv2.CalcHist({input}, {1, 2}, New cv.Mat, histogram, 2, {input.Height, input.Width}, ranges)
+        Dim ranges() = New cvb.Rangef() {New cvb.Rangef(-task.yRange, task.yRange), New cvb.Rangef(0, task.MaxZmeters)}
+        cvb.Cv2.CalcHist({input}, {1, 2}, New cvb.Mat, histogram, 2, {input.Height, input.Width}, ranges)
 
-        dst2(mini.rect) = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        dst2(mini.rect) = histogram.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs(255)
         dst3(mini.rect) = input.ConvertScaleAbs(255)
     End Sub
 End Class
@@ -89,14 +89,14 @@ Public Class MiniCloud_RotateAngle : Inherits VB_Parent
     Public plot As New Plot_OverTimeSingle
     ReadOnly resetCheck As System.Windows.Forms.CheckBox
     Public Sub New()
-        task.accRadians.Y = -cv.Cv2.PI / 2
+        task.accRadians.Y = -cvb.Cv2.PI / 2
 
         labels(2) = "peak dst2, peak dst3, changed mask, maxvalues history"
         labels(3) = "Blue is maxVal, green is mean * 100"
         desc = "Find a peak value in the side view histograms"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then
+    Public Sub RunVB(src as cvb.Mat)
+        If src.Type <> cvb.MatType.CV_32FC3 Then
             peak.mini.Run(src)
             src = peak.mini.dst3
         End If
@@ -108,10 +108,10 @@ Public Class MiniCloud_RotateAngle : Inherits VB_Parent
         Dim mm as mmData = GetMinMax(peak.histogram)
 
         Dim mean = peak.histogram.Mean()(0) * 100
-        Dim mask = peak.histogram.Threshold(mean, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        Dim mask = peak.histogram.Threshold(mean, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs(255)
         mats.mat(2) = mask
 
-        plot.plotData = New cv.Scalar(mm.maxVal)
+        plot.plotData = New cvb.Scalar(mm.maxVal)
         plot.Run(empty)
         dst3 = plot.dst2
         labels(3) = "Histogram maxVal = " + Format(mm.maxVal, fmt1) + " histogram mean = " + Format(mean, fmt1)
@@ -135,16 +135,16 @@ End Class
 Public Class MiniCloud_RotateSinglePass : Inherits VB_Parent
     Dim peak As New MiniCloud_Rotate
     Public Sub New()
-        task.accRadians.Y = -cv.Cv2.PI
+        task.accRadians.Y = -cvb.Cv2.PI
         desc = "Same operation as New MiniCloud_RotateAngle but in a single pass."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src as cvb.Mat)
         Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
         peak.mini.Run(src)
 
         Dim maxHist = Single.MinValue
         Dim bestAngle As Integer
-        Dim bestLoc As cv.Point
+        Dim bestLoc As cvb.Point
         Dim mm As mmData
         For i = ySlider.minimum To ySlider.maximum - 1
             peak.Run(peak.mini.dst3)
