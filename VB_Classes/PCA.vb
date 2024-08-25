@@ -271,13 +271,13 @@ End Class
 
 
 Module PCA_NColor_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function PCA_NColor_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub PCA_NColor_Close(cPtr As IntPtr)
     End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function PCA_NColor_RunCPP(cPtr As IntPtr, imagePtr As IntPtr, palettePtr As IntPtr, rows As Integer, cols As Integer, desiredNcolors As Integer) As IntPtr
     End Function
 End Module

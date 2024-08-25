@@ -46,7 +46,7 @@ Public Class InsertAlgorithm
             Case algType.addCPP
                 VBoutputName = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\" + split(0) + ".vb")
 
-                CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Classes\CPP_Algorithms.h")
+                CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Code\CPP_Algorithms.h")
 
                 ret = MsgBox("Would you like to add the C++ algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + "_VB" +
                              vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name +
@@ -179,11 +179,11 @@ Public Class InsertAlgorithm
         sw.Close()
 
         If createCPPfile And createVBfile Then
-            MsgBox("Be sure to add: " + CPPoutputName.Name + vbCrLf + vbCrLf + "to the 'CPP_Classes' project" + vbCrLf + vbCrLf +
+            MsgBox("Be sure to add: " + CPPoutputName.Name + vbCrLf + vbCrLf + "to the 'CPP_Code' project" + vbCrLf + vbCrLf +
                    "And add " + VBoutputName.Name + " to the 'VB_Classes' project" + vbCrLf + vbCrLf +
                    "And edit the algorithm in:" + vbCrLf + vbCrLf + VBoutputName.Name + vbCrLf + vbCrLf + CPPoutputName.Name)
         ElseIf createCPPfile Then
-            MsgBox("Be sure to add: " + CPPoutputName.Name + vbCrLf + vbCrLf + "to the 'CPP_Classes' project" + vbCrLf + vbCrLf +
+            MsgBox("Be sure to add: " + CPPoutputName.Name + vbCrLf + vbCrLf + "to the 'CPP_Code' project" + vbCrLf + vbCrLf +
                    "And edit the algorithm in:" + vbCrLf + vbCrLf + VBoutputName.Name + vbCrLf + vbCrLf + CPPoutputName.Name)
         ElseIf createVBfile Then
             MsgBox("Be sure to add: " + VBoutputName.Name + " to the 'VB_Classes' project" + vbCrLf + vbCrLf +
@@ -337,7 +337,7 @@ Public Class InsertAlgorithm
         If AlgorithmName.Text.EndsWith("_CPP") = False Then AlgorithmName.Text = AlgorithmName.Text + "_CPP"
         If nextAlgorithm(algType.addCPP_AI) = False Then Exit Sub
 
-        CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Classes\CPP_AI_Generated.h")
+        CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Code\CPP_AI_Generated.h")
 
         Dim trigger As Boolean
         sw = New StreamWriter(CPPoutputName.FullName, True)

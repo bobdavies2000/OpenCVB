@@ -2809,8 +2809,8 @@ Public Class Options_WarpModel2 : Inherits VB_Parent
         If radio.Setup(traceName) Then
             radio.addRadio("Motion_Translation (fastest)")
             radio.addRadio("Motion_Euclidean")
-            radio.addRadio("Motion_Affine (very slow - Be sure to configure CPP_Classes in Release Mode)")
-            radio.addRadio("Motion_Homography (even slower - Use CPP_Classes in Release Mode)")
+            radio.addRadio("Motion_Affine (very slow - Be sure to configure CPP_Code in Release Mode)")
+            radio.addRadio("Motion_Homography (even slower - Use CPP_Code in Release Mode)")
             radio.check(0).Checked = True
         End If
 

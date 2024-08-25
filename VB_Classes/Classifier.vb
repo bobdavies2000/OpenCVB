@@ -37,16 +37,16 @@ End Class
 
 
 Module OEX_Points_Classifier_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OEX_Points_Classifier_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub OEX_Points_Classifier_Close(cPtr As IntPtr)
     End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OEX_ShowPoints(cPtr As IntPtr, imgRows As Integer, imgCols As Integer, DotSize As Integer) As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OEX_Points_Classifier_RunCPP(cPtr As IntPtr, count As Integer, methodIndex As Integer,
                                                  imgRows As Integer, imgCols As Integer, resetInput As Integer) As IntPtr
     End Function
@@ -54,16 +54,16 @@ Module OEX_Points_Classifier_CPP_Module
 
 
 
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Classifier_Bayesian_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Classifier_Bayesian_Close(cPtr As IntPtr)
     End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Classifier_Bayesian_Train(cPtr As IntPtr, trainInput As IntPtr, response As IntPtr, count As Integer)
     End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Code.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Classifier_Bayesian_RunCPP(cPtr As IntPtr, trainInput As IntPtr, count As Integer) As IntPtr
     End Function
 End Module
