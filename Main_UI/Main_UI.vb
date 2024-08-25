@@ -976,10 +976,10 @@ Public Class Main_UI
             externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
         End If
 
-        PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/PauseButton.png")
-        stopTest = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/StopTest.png")
-        testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/testall.png")
-        runPlay = New Bitmap(HomeDir.FullName + "OpenCVB_UI/Data/PauseButtonRun.png")
+        PausePlay = New Bitmap(HomeDir.FullName + "Main_UI/Data/PauseButton.png")
+        stopTest = New Bitmap(HomeDir.FullName + "Main_UI/Data/StopTest.png")
+        testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "Main_UI/Data/testall.png")
+        runPlay = New Bitmap(HomeDir.FullName + "Main_UI/Data/PauseButtonRun.png")
 
         setupAlgorithmHistory()
 
