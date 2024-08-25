@@ -87,6 +87,8 @@ Public Class Denoise_Reliable : Inherits VB_Parent
     Dim relyGray As New Reliable_Gray
     Public Sub New()
         task.gOptions.setPixelDifference(10)
+        labels(2) = "Before denoising"
+        labels(3) = "After denoising single pixels"
         desc = "Manually remove single pixels in the binary image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -94,7 +96,7 @@ Public Class Denoise_Reliable : Inherits VB_Parent
         dst2 = relyGray.dst2
 
         denoise.Run(dst2)
-        dst2 = denoise.dst2
+        dst3 = denoise.dst2
     End Sub
 End Class
 

@@ -85,13 +85,12 @@ Public Class Reliable_Gray : Inherits VB_Parent
     Dim singles As New Denoise_SinglePixels_CPP_VB
     Public Sub New()
         task.gOptions.setPixelDifference(10)
-        labels = {"", "", "Mask of unreliable color data", "Color image after removing unreliable pixels"}
+        labels = {"", "Mask of unreliable data after denoising", "Mask of unreliable color data (before denoising", "Color image with unreliable pixels set to zero"}
         desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Pixel Difference threshold'"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst3 = src.Clone
         diff.Run(src)
         history.Run(diff.dst2)
         dst2 = history.dst2
@@ -99,7 +98,11 @@ Public Class Reliable_Gray : Inherits VB_Parent
             singles.Run(dst2)
             dst2 = singles.dst2
         End If
-        dst3.SetTo(0, dst2)
+
+        If standalone Then
+            dst3 = src.Clone
+            dst3.SetTo(0, dst2)
+        End If
     End Sub
 End Class
 

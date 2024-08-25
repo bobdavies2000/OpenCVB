@@ -8,8 +8,8 @@ namespace CS_Classes
 		public CS_Parent createCSAlgorithm( string algorithmName, VB_Classes.VBtask task)
 		{
 			if (algorithmName == "AddWeighted_Basics_CS") return new AddWeighted_Basics_CS(task);
+			if (algorithmName == "AddWeighted_DepthAccumulate_CS") return new AddWeighted_DepthAccumulate_CS(task);
 			if (algorithmName == "AddWeighted_Edges_CS") return new AddWeighted_Edges_CS(task);
-			if (algorithmName == "AddWeighted_ImageAccumulate_CS") return new AddWeighted_ImageAccumulate_CS(task);
 			if (algorithmName == "AddWeighted_InfraRed_CS") return new AddWeighted_InfraRed_CS(task);
 			if (algorithmName == "AlphaChannel_Basics_CS") return new AlphaChannel_Basics_CS(task);
 			if (algorithmName == "Annealing_Basics_CPP_CS") return new Annealing_Basics_CPP_CS(task);

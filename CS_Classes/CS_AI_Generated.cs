@@ -92,10 +92,10 @@ namespace CS_Classes
 
 
 
-    public class AddWeighted_ImageAccumulate_CS : CS_Parent
+    public class AddWeighted_DepthAccumulate_CS : CS_Parent
     {
         Options_AddWeighted options = new Options_AddWeighted();
-        public AddWeighted_ImageAccumulate_CS(VBtask task) : base(task)
+        public AddWeighted_DepthAccumulate_CS(VBtask task) : base(task)
         {
             desc = "Update a running average of the image";
         }

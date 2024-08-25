@@ -75,7 +75,7 @@ _Distance_Basics_CPP
 _FeatureLess_Basics_CPP
 _FeatureLess_Edge_CPP
 _Feature_AKaze_CPP
-_AddWeighted_ImageAccumulate_CPP
+_AddWeighted_DepthAccumulate_CPP
 _Edge_Basics_CPP
 _Hist_DepthSimple_CPP
 _Stable_BasicsCount_CPP
@@ -83,8 +83,8 @@ End Enum
 Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	If algorithmName.endsWith(".py") then return new Python_Run()
 	if algorithmName = "AddWeighted_Basics" Then return new AddWeighted_Basics
+	if algorithmName = "AddWeighted_DepthAccumulate" Then return new AddWeighted_DepthAccumulate
 	if algorithmName = "AddWeighted_Edges" Then return new AddWeighted_Edges
-	if algorithmName = "AddWeighted_ImageAccumulate" Then return new AddWeighted_ImageAccumulate
 	if algorithmName = "AddWeighted_InfraRed" Then return new AddWeighted_InfraRed
 	if algorithmName = "AlphaChannel_Basics" Then return new AlphaChannel_Basics
 	if algorithmName = "Annealing_Basics_CPP_VB" Then return new Annealing_Basics_CPP_VB
@@ -333,7 +333,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Covariance_Test" Then return new Covariance_Test
 	if algorithmName = "CPP_Basics" Then return new CPP_Basics
 if algorithmName = "AddWeighted_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._AddWeighted_Basics_CPP)
-if algorithmName = "AddWeighted_ImageAccumulate_CPP" Then return new CPP_Basics(cppFunctionNames._AddWeighted_ImageAccumulate_CPP)
+if algorithmName = "AddWeighted_DepthAccumulate_CPP" Then return new CPP_Basics(cppFunctionNames._AddWeighted_DepthAccumulate_CPP)
 if algorithmName = "ApproxPoly_Basics_CPP" Then return new CPP_Basics(cppFunctionNames._ApproxPoly_Basics_CPP)
 if algorithmName = "ApproxPoly_FindandDraw_CPP" Then return new CPP_Basics(cppFunctionNames._ApproxPoly_FindandDraw_CPP)
 if algorithmName = "ApproxPoly_Hull_CPP" Then return new CPP_Basics(cppFunctionNames._ApproxPoly_Hull_CPP)

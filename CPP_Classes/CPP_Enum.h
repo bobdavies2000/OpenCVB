@@ -75,7 +75,7 @@ enum functions
     _FeatureLess_Basics_CPP,
     _FeatureLess_Edge_CPP,
     _Feature_AKaze_CPP,
-	_AddWeighted_ImageAccumulate_CPP,
+	_AddWeighted_DepthAccumulate_CPP,
 	_Edge_Basics_CPP,
 	_Hist_DepthSimple_CPP,
     _Stable_BasicsCount_CPP,
