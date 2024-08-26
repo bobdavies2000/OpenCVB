@@ -3911,8 +3911,7 @@ RedCloudMaxDist_Run(RedCloudMaxDist* cPtr, int* dataPtr, unsigned char* maskPtr,
 
 
 cppTask* task;
-class AddWeighted_Basics_CC : public CPP_Parent
-{
+class AddWeighted_Basics_CC : public CPP_Parent {
 public:
     double weight;
     cv::Mat src2;
@@ -4291,8 +4290,7 @@ public:
 
 
 
-class KNN_Core_CC : public CPP_Parent
-{
+class KNN_Core_CC : public CPP_Parent {
 public:
     Ptr<ml::KNearest> knn = ml::KNearest::create();
     vector<Point2f> trainInput;
@@ -4400,8 +4398,7 @@ public:
 
 
 
-class KNN_Basics_CC : public CPP_Parent
-{
+class KNN_Basics_CC : public CPP_Parent {
 private:
 public:
     vector<PointPair> matches;
@@ -4492,8 +4489,7 @@ public:
 
 
 
-class Delaunay_Generations_CC : public CPP_Parent
-{
+class Delaunay_Generations_CC : public CPP_Parent {
 private:
 public:
     vector<Point2f> inputPoints;
@@ -4833,8 +4829,7 @@ public:
 
 
 
-class Depth_PointCloud_CC : public CPP_Parent
-{
+class Depth_PointCloud_CC : public CPP_Parent {
 private: 
 public: 
 	Depth_PointCloud_CC() : CPP_Parent()
@@ -4861,8 +4856,7 @@ public:
 
 
 
-class IMU_GMatrix_QT_CC : public CPP_Parent
-{
+class IMU_GMatrix_QT_CC : public CPP_Parent {
 private:
 public:
     float cx = 1.0f, sx = 0.0f, cy = 1.0f, sy = 0.0f, cz = 1.0f, sz = 0.0f;
@@ -6014,8 +6008,7 @@ public:
 
 
 
-class Edge_Segments_CC : public CPP_Parent
-{
+class Edge_Segments_CC : public CPP_Parent {
 private:
 public:
     Ptr<EdgeDrawing> ed;
@@ -7137,8 +7130,7 @@ public:
 
      
 
-class Feature_Agast_CC : public CPP_Parent
-{
+class Feature_Agast_CC : public CPP_Parent {
 private:
 public:
     vector<KeyPoint> featurePoints;
@@ -7194,8 +7186,7 @@ public:
 
 
 
-class Feature_AKaze_CC : public CPP_Parent
-{
+class Feature_AKaze_CC : public CPP_Parent {
 public:
     std::vector<cv::KeyPoint> kazeKeyPoints;
     Feature_AKaze_CC() : CPP_Parent()
@@ -7221,8 +7212,7 @@ public:
 
 
 
-class AddWeighted_DepthAccumulate_CC : public CPP_Parent
-{
+class AddWeighted_DepthAccumulate_CC : public CPP_Parent {
 private:
     Options_AddWeighted* options = new Options_AddWeighted();
 public:
@@ -7246,8 +7236,7 @@ public:
 
 
 
-//class Edge_Basics_CC : public CPP_Parent
-//{
+//class Edge_Basics_CC : public CPP_Parent {
 //private:
 //    Edge_Canny canny;
 //    Edge_Scharr scharr;
@@ -7323,8 +7312,7 @@ public:
 
 
 
-class Edge_Basics_CC : public CPP_Parent
-{
+class Edge_Basics_CC : public CPP_Parent {
 private:
     Edge_Canny_CC* canny = new Edge_Canny_CC();
     Options_Edge_Basics* options = new Options_Edge_Basics();
@@ -7350,8 +7338,7 @@ public:
 
 
 
-class Hist_DepthSimple_CC : public CPP_Parent
-{
+class Hist_DepthSimple_CC : public CPP_Parent {
 public:
     std::vector<float> histList;
     std::vector<float> histArray;

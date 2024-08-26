@@ -2,11 +2,93 @@
 Imports CS_Classes
 Imports VB_Classes
 Public Class algorithmList
+Public Enum ccFunctionNames
+_AddWeighted_Basics_CC
+_RedCloud_BasicsNative_CC
+_RedCloud_Basics_CC
+_BGSubtract_Basics_CC
+_Stable_Basics_CC
+_Feature_StableSorted_CC
+_Plot_Histogram2D_CC
+_Hist_RedOptions_CC
+_Palette_Random_CC
+_Blur_Basics_CC
+_Color_Basics_CC
+_Bin4Way_RegionsCombine_CC
+_Bin4Way_Regions_CC
+_Mat_4Click_CC
+_Area_MinRect_CC
+_Mesh_Features_CC
+_Mesh_Basics_CC
+_RedColor_FeatureLess_CC
+_RedColor_FeatureLessCore_CC
+_Palette_Basics_CC
+_FeatureLess_History_CC
+_Line_BasicsOld_CC
+_Convex_Basics_CC
+_Resize_Preserve_CC
+_History_Basics_CC
+_Motion_Simple_CC
+_Hist_Kalman_CC
+_Kalman_Basics_CC
+_RedCloud_Reduce_CC
+_FPoly_TopFeatures_CC
+_Random_Enumerable_CC
+_Bezier_Basics_CC
+_Feature_Agast_CC
+_Resize_Basics_CC
+_Delaunay_Basics_CC
+_Delaunay_GenerationsNoKNN_CC
+_KNN_Core_CC
+_Random_Basics_CC
+_KNN_Basics_CC
+_Delaunay_Generations_CC
+_Feature_Basics_CC
+_Remap_Basics_CC
+_Edge_Canny_CC
+_Edge_Sobel_CC
+_Edge_Scharr_CC
+_Mat_4to1_CC
+_Grid_Basics_CC
+_Depth_Colorizer_CC
+_RedCloud_Flood_CC
+_Depth_PointCloud_CC
+_IMU_GMatrix_CC
+_IMU_GMatrix_QT_CC
+_Depth_PointCloud_IMU_CC
+_Binarize_Simple_CC
+_Plot_Histogram_CC
+_Hist_Basics_CC
+_BackProject_Basics_CC
+_Rectangle_Basics_CC
+_Rectangle_Rotated_CC
+_Contour_Largest_CC
+_Diff_Basics_CC
+_ApproxPoly_FindandDraw_CC
+_ApproxPoly_Basics_CC
+_Hull_Basics_CC
+_ApproxPoly_Hull_CC
+_Edge_Segments_CC
+_Motion_Basics_CC
+_Edge_MotionFrames_CC
+_Edge_Preserving_CC
+_EdgeDraw_Basics_CC
+_Distance_Basics_CC
+_FeatureLess_Basics_CC
+_FeatureLess_Edge_CC
+_Feature_AKaze_CC
+_AddWeighted_DepthAccumulate_CC
+_Edge_Basics_CC
+_Hist_DepthSimple_CC
+_Stable_BasicsCount_CC
+End Enum
 	Public Function createAlgorithm(algorithmName as string) as Object
 	If algorithmName.endsWith(".py") then return new Python_Run()
 	If algorithmName = "AddWeighted_Basics" Then return new AddWeighted_Basics
+	If algorithmName = "AddWeighted_Basics_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_Basics_CC)
 	If algorithmName = "AddWeighted_Basics_CS" Then return new AddWeighted_Basics_CS
 	If algorithmName = "AddWeighted_DepthAccumulate" Then return new AddWeighted_DepthAccumulate
+	If algorithmName = "AddWeighted_DepthAccumulate_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_DepthAccumulate_CC)
 	If algorithmName = "AddWeighted_DepthAccumulate_CS" Then return new AddWeighted_DepthAccumulate_CS
 	If algorithmName = "AddWeighted_Edges" Then return new AddWeighted_Edges
 	If algorithmName = "AddWeighted_Edges_CS" Then return new AddWeighted_Edges_CS
@@ -19,16 +101,20 @@ Public Class algorithmList
 	If algorithmName = "Annealing_MT_CPP_CS" Then return new Annealing_MT_CPP_CS
 	If algorithmName = "Annealing_MT_CPP_VB" Then return new Annealing_MT_CPP_VB
 	If algorithmName = "ApproxPoly_Basics" Then return new ApproxPoly_Basics
+	If algorithmName = "ApproxPoly_Basics_CC" Then return new CPP_Basics(ccFunctionNames._ApproxPoly_Basics_CC)
 	If algorithmName = "ApproxPoly_Basics_CS" Then return new ApproxPoly_Basics_CS
 	If algorithmName = "ApproxPoly_FindandDraw" Then return new ApproxPoly_FindandDraw
+	If algorithmName = "ApproxPoly_FindandDraw_CC" Then return new CPP_Basics(ccFunctionNames._ApproxPoly_FindandDraw_CC)
 	If algorithmName = "ApproxPoly_FindandDraw_CS" Then return new ApproxPoly_FindandDraw_CS
 	If algorithmName = "ApproxPoly_Hull" Then return new ApproxPoly_Hull
+	If algorithmName = "ApproxPoly_Hull_CC" Then return new CPP_Basics(ccFunctionNames._ApproxPoly_Hull_CC)
 	If algorithmName = "ApproxPoly_Hull_CS" Then return new ApproxPoly_Hull_CS
 	If algorithmName = "Area_FindNonZero" Then return new Area_FindNonZero
 	If algorithmName = "Area_FindNonZero_CS" Then return new Area_FindNonZero_CS
 	If algorithmName = "Area_MinMotionRect" Then return new Area_MinMotionRect
 	If algorithmName = "Area_MinMotionRect_CS" Then return new Area_MinMotionRect_CS
 	If algorithmName = "Area_MinRect" Then return new Area_MinRect
+	If algorithmName = "Area_MinRect_CC" Then return new CPP_Basics(ccFunctionNames._Area_MinRect_CC)
 	If algorithmName = "Area_MinRect_CS" Then return new Area_MinRect_CS
 	If algorithmName = "Area_MinTriangle_CPP_CS" Then return new Area_MinTriangle_CPP_CS
 	If algorithmName = "Area_MinTriangle_CPP_VB" Then return new Area_MinTriangle_CPP_VB
@@ -41,6 +127,7 @@ Public Class algorithmList
 	If algorithmName = "AsciiArt_Diff" Then return new AsciiArt_Diff
 	If algorithmName = "AsciiArt_Diff_CS" Then return new AsciiArt_Diff_CS
 	If algorithmName = "BackProject_Basics" Then return new BackProject_Basics
+	If algorithmName = "BackProject_Basics_CC" Then return new CPP_Basics(ccFunctionNames._BackProject_Basics_CC)
 	If algorithmName = "BackProject_Basics_CS" Then return new BackProject_Basics_CS
 	If algorithmName = "BackProject_BasicsKeyboard" Then return new BackProject_BasicsKeyboard
 	If algorithmName = "BackProject_BasicsKeyboard_CS" Then return new BackProject_BasicsKeyboard_CS
@@ -130,12 +217,14 @@ Public Class algorithmList
 	If algorithmName = "Benford_Primes" Then return new Benford_Primes
 	If algorithmName = "Benford_Primes_CS" Then return new Benford_Primes_CS
 	If algorithmName = "Bezier_Basics" Then return new Bezier_Basics
+	If algorithmName = "Bezier_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Bezier_Basics_CC)
 	If algorithmName = "Bezier_Basics_CS" Then return new Bezier_Basics_CS
 	If algorithmName = "Bezier_Example" Then return new Bezier_Example
 	If algorithmName = "Bezier_Example_CS" Then return new Bezier_Example_CS
 	If algorithmName = "BGRPattern_Basics" Then return new BGRPattern_Basics
 	If algorithmName = "BGRPattern_Basics_CS" Then return new BGRPattern_Basics_CS
 	If algorithmName = "BGSubtract_Basics" Then return new BGSubtract_Basics
+	If algorithmName = "BGSubtract_Basics_CC" Then return new CPP_Basics(ccFunctionNames._BGSubtract_Basics_CC)
 	If algorithmName = "BGSubtract_Basics_CS" Then return new BGSubtract_Basics_CS
 	If algorithmName = "BGSubtract_Basics_QT" Then return new BGSubtract_Basics_QT
 	If algorithmName = "BGSubtract_Basics_QT_CS" Then return new BGSubtract_Basics_QT_CS
@@ -201,9 +290,11 @@ Public Class algorithmList
 	If algorithmName = "Bin4Way_RedCloud" Then return new Bin4Way_RedCloud
 	If algorithmName = "Bin4Way_RedCloud_CS" Then return new Bin4Way_RedCloud_CS
 	If algorithmName = "Bin4Way_Regions" Then return new Bin4Way_Regions
+	If algorithmName = "Bin4Way_Regions_CC" Then return new CPP_Basics(ccFunctionNames._Bin4Way_Regions_CC)
 	If algorithmName = "Bin4Way_Regions_CS" Then return new Bin4Way_Regions_CS
 	If algorithmName = "Bin4Way_Regions1" Then return new Bin4Way_Regions1
 	If algorithmName = "Bin4Way_Regions1_CS" Then return new Bin4Way_Regions1_CS
+	If algorithmName = "Bin4Way_RegionsCombine_CC" Then return new CPP_Basics(ccFunctionNames._Bin4Way_RegionsCombine_CC)
 	If algorithmName = "Bin4Way_RegionsLeftRight" Then return new Bin4Way_RegionsLeftRight
 	If algorithmName = "Bin4Way_RegionsLeftRight_CS" Then return new Bin4Way_RegionsLeftRight_CS
 	If algorithmName = "Bin4Way_Sobel" Then return new Bin4Way_Sobel
@@ -239,6 +330,7 @@ Public Class algorithmList
 	If algorithmName = "Binarize_OTSU" Then return new Binarize_OTSU
 	If algorithmName = "Binarize_OTSU_CS" Then return new Binarize_OTSU_CS
 	If algorithmName = "Binarize_Simple" Then return new Binarize_Simple
+	If algorithmName = "Binarize_Simple_CC" Then return new CPP_Basics(ccFunctionNames._Binarize_Simple_CC)
 	If algorithmName = "Binarize_Simple_CS" Then return new Binarize_Simple_CS
 	If algorithmName = "Binarize_Wolf_Nick" Then return new Binarize_Wolf_Nick
 	If algorithmName = "Binarize_Wolf_Nick_CS" Then return new Binarize_Wolf_Nick_CS
@@ -253,6 +345,7 @@ Public Class algorithmList
 	If algorithmName = "BlockMatching_Basics" Then return new BlockMatching_Basics
 	If algorithmName = "BlockMatching_Basics_CS" Then return new BlockMatching_Basics_CS
 	If algorithmName = "Blur_Basics" Then return new Blur_Basics
+	If algorithmName = "Blur_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Blur_Basics_CC)
 	If algorithmName = "Blur_Basics_CS" Then return new Blur_Basics_CS
 	If algorithmName = "Blur_Bilateral" Then return new Blur_Bilateral
 	If algorithmName = "Blur_Bilateral_CS" Then return new Blur_Bilateral_CS
@@ -371,6 +464,7 @@ Public Class algorithmList
 	If algorithmName = "Coherence_Depth" Then return new Coherence_Depth
 	If algorithmName = "Coherence_Depth_CS" Then return new Coherence_Depth_CS
 	If algorithmName = "Color_Basics" Then return new Color_Basics
+	If algorithmName = "Color_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Color_Basics_CC)
 	If algorithmName = "Color_Basics_CS" Then return new Color_Basics_CS
 	If algorithmName = "Color8U_Basics" Then return new Color8U_Basics
 	If algorithmName = "Color8U_Basics_CS" Then return new Color8U_Basics_CS
@@ -433,6 +527,7 @@ Public Class algorithmList
 	If algorithmName = "Contour_Gray" Then return new Contour_Gray
 	If algorithmName = "Contour_Gray_CS" Then return new Contour_Gray_CS
 	If algorithmName = "Contour_Largest" Then return new Contour_Largest
+	If algorithmName = "Contour_Largest_CC" Then return new CPP_Basics(ccFunctionNames._Contour_Largest_CC)
 	If algorithmName = "Contour_Largest_CS" Then return new Contour_Largest_CS
 	If algorithmName = "Contour_Outline" Then return new Contour_Outline
 	If algorithmName = "Contour_Outline_CS" Then return new Contour_Outline_CS
@@ -463,6 +558,7 @@ Public Class algorithmList
 	If algorithmName = "Contrast_POW" Then return new Contrast_POW
 	If algorithmName = "Contrast_POW_CS" Then return new Contrast_POW_CS
 	If algorithmName = "Convex_Basics" Then return new Convex_Basics
+	If algorithmName = "Convex_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Convex_Basics_CC)
 	If algorithmName = "Convex_Basics_CS" Then return new Convex_Basics_CS
 	If algorithmName = "Convex_Defects" Then return new Convex_Defects
 	If algorithmName = "Convex_Defects_CS" Then return new Convex_Defects_CS
@@ -515,14 +611,17 @@ Public Class algorithmList
 	If algorithmName = "DCT_Surfaces_debug" Then return new DCT_Surfaces_debug
 	If algorithmName = "DCT_Surfaces_debug_CS" Then return new DCT_Surfaces_debug_CS
 	If algorithmName = "Delaunay_Basics" Then return new Delaunay_Basics
+	If algorithmName = "Delaunay_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Delaunay_Basics_CC)
 	If algorithmName = "Delaunay_Basics_CS" Then return new Delaunay_Basics_CS
 	If algorithmName = "Delaunay_ConsistentColor" Then return new Delaunay_ConsistentColor
 	If algorithmName = "Delaunay_ConsistentColor_CS" Then return new Delaunay_ConsistentColor_CS
 	If algorithmName = "Delaunay_Contours" Then return new Delaunay_Contours
 	If algorithmName = "Delaunay_Contours_CS" Then return new Delaunay_Contours_CS
 	If algorithmName = "Delaunay_Generations" Then return new Delaunay_Generations
+	If algorithmName = "Delaunay_Generations_CC" Then return new CPP_Basics(ccFunctionNames._Delaunay_Generations_CC)
 	If algorithmName = "Delaunay_Generations_CS" Then return new Delaunay_Generations_CS
 	If algorithmName = "Delaunay_GenerationsNoKNN" Then return new Delaunay_GenerationsNoKNN
+	If algorithmName = "Delaunay_GenerationsNoKNN_CC" Then return new CPP_Basics(ccFunctionNames._Delaunay_GenerationsNoKNN_CC)
 	If algorithmName = "Delaunay_GenerationsNoKNN_CS" Then return new Delaunay_GenerationsNoKNN_CS
 	If algorithmName = "Delaunay_SubDiv" Then return new Delaunay_SubDiv
 	If algorithmName = "Delaunay_SubDiv_CS" Then return new Delaunay_SubDiv_CS
@@ -548,6 +647,7 @@ Public Class algorithmList
 	If algorithmName = "Depth_Basics_CS" Then return new Depth_Basics_CS
 	If algorithmName = "Depth_BGSubtract" Then return new Depth_BGSubtract
 	If algorithmName = "Depth_BGSubtract_CS" Then return new Depth_BGSubtract_CS
+	If algorithmName = "Depth_Colorizer_CC" Then return new CPP_Basics(ccFunctionNames._Depth_Colorizer_CC)
 	If algorithmName = "Depth_Colorizer_CPP_CS" Then return new Depth_Colorizer_CPP_CS
 	If algorithmName = "Depth_Colorizer_CPP_VB" Then return new Depth_Colorizer_CPP_VB
 	If algorithmName = "Depth_Colorizer_VB" Then return new Depth_Colorizer_VB
@@ -602,6 +702,8 @@ Public Class algorithmList
 	If algorithmName = "Depth_Outline_CS" Then return new Depth_Outline_CS
 	If algorithmName = "Depth_Palette" Then return new Depth_Palette
 	If algorithmName = "Depth_Palette_CS" Then return new Depth_Palette_CS
+	If algorithmName = "Depth_PointCloud_CC" Then return new CPP_Basics(ccFunctionNames._Depth_PointCloud_CC)
+	If algorithmName = "Depth_PointCloud_IMU_CC" Then return new CPP_Basics(ccFunctionNames._Depth_PointCloud_IMU_CC)
 	If algorithmName = "Depth_PunchBlob" Then return new Depth_PunchBlob
 	If algorithmName = "Depth_PunchBlob_CS" Then return new Depth_PunchBlob_CS
 	If algorithmName = "Depth_PunchBlobNew" Then return new Depth_PunchBlobNew
@@ -657,6 +759,7 @@ Public Class algorithmList
 	If algorithmName = "DFT_Shapes" Then return new DFT_Shapes
 	If algorithmName = "DFT_Shapes_CS" Then return new DFT_Shapes_CS
 	If algorithmName = "Diff_Basics" Then return new Diff_Basics
+	If algorithmName = "Diff_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Diff_Basics_CC)
 	If algorithmName = "Diff_Basics_CS" Then return new Diff_Basics_CS
 	If algorithmName = "Diff_Color" Then return new Diff_Color
 	If algorithmName = "Diff_Color_CS" Then return new Diff_Color_CS
@@ -683,6 +786,7 @@ Public Class algorithmList
 	If algorithmName = "Distance_Background" Then return new Distance_Background
 	If algorithmName = "Distance_Background_CS" Then return new Distance_Background_CS
 	If algorithmName = "Distance_Basics" Then return new Distance_Basics
+	If algorithmName = "Distance_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Distance_Basics_CC)
 	If algorithmName = "Distance_Basics_CS" Then return new Distance_Basics_CS
 	If algorithmName = "Distance_BinaryImage" Then return new Distance_BinaryImage
 	If algorithmName = "Distance_BinaryImage_CS" Then return new Distance_BinaryImage_CS
@@ -743,12 +847,14 @@ Public Class algorithmList
 	If algorithmName = "Edge_BackProjection" Then return new Edge_BackProjection
 	If algorithmName = "Edge_BackProjection_CS" Then return new Edge_BackProjection_CS
 	If algorithmName = "Edge_Basics" Then return new Edge_Basics
+	If algorithmName = "Edge_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Edge_Basics_CC)
 	If algorithmName = "Edge_Basics_CS" Then return new Edge_Basics_CS
 	If algorithmName = "Edge_BinarizedBrightness" Then return new Edge_BinarizedBrightness
 	If algorithmName = "Edge_BinarizedBrightness_CS" Then return new Edge_BinarizedBrightness_CS
 	If algorithmName = "Edge_BinarizedReduction" Then return new Edge_BinarizedReduction
 	If algorithmName = "Edge_BinarizedReduction_CS" Then return new Edge_BinarizedReduction_CS
 	If algorithmName = "Edge_Canny" Then return new Edge_Canny
+	If algorithmName = "Edge_Canny_CC" Then return new CPP_Basics(ccFunctionNames._Edge_Canny_CC)
 	If algorithmName = "Edge_Canny_CS" Then return new Edge_Canny_CS
 	If algorithmName = "Edge_CannyCombined" Then return new Edge_CannyCombined
 	If algorithmName = "Edge_CannyCombined_CS" Then return new Edge_CannyCombined_CS
@@ -786,11 +892,13 @@ Public Class algorithmList
 	If algorithmName = "Edge_Matching_CS" Then return new Edge_Matching_CS
 	If algorithmName = "Edge_Motion_CS" Then return new Edge_Motion_CS
 	If algorithmName = "Edge_MotionFrames" Then return new Edge_MotionFrames
+	If algorithmName = "Edge_MotionFrames_CC" Then return new CPP_Basics(ccFunctionNames._Edge_MotionFrames_CC)
 	If algorithmName = "Edge_MotionFrames_CS" Then return new Edge_MotionFrames_CS
 	If algorithmName = "Edge_MotionOverlay" Then return new Edge_MotionOverlay
 	If algorithmName = "Edge_MotionOverlay_CS" Then return new Edge_MotionOverlay_CS
 	If algorithmName = "Edge_NoDepth_CS" Then return new Edge_NoDepth_CS
 	If algorithmName = "Edge_Preserving" Then return new Edge_Preserving
+	If algorithmName = "Edge_Preserving_CC" Then return new CPP_Basics(ccFunctionNames._Edge_Preserving_CC)
 	If algorithmName = "Edge_Preserving_CS" Then return new Edge_Preserving_CS
 	If algorithmName = "Edge_RandomForest_CPP_CS" Then return new Edge_RandomForest_CPP_CS
 	If algorithmName = "Edge_RandomForest_CPP_VB" Then return new Edge_RandomForest_CPP_VB
@@ -804,8 +912,11 @@ Public Class algorithmList
 	If algorithmName = "Edge_RGB" Then return new Edge_RGB
 	If algorithmName = "Edge_RGB_CS" Then return new Edge_RGB_CS
 	If algorithmName = "Edge_Scharr" Then return new Edge_Scharr
+	If algorithmName = "Edge_Scharr_CC" Then return new CPP_Basics(ccFunctionNames._Edge_Scharr_CC)
 	If algorithmName = "Edge_Scharr_CS" Then return new Edge_Scharr_CS
+	If algorithmName = "Edge_Segments_CC" Then return new CPP_Basics(ccFunctionNames._Edge_Segments_CC)
 	If algorithmName = "Edge_Sobel" Then return new Edge_Sobel
+	If algorithmName = "Edge_Sobel_CC" Then return new CPP_Basics(ccFunctionNames._Edge_Sobel_CC)
 	If algorithmName = "Edge_Sobel_CS" Then return new Edge_Sobel_CS
 	If algorithmName = "Edge_SobelCustom" Then return new Edge_SobelCustom
 	If algorithmName = "Edge_SobelCustom_CS" Then return new Edge_SobelCustom_CS
@@ -822,6 +933,7 @@ Public Class algorithmList
 	If algorithmName = "Edge_SobelLRBinarized" Then return new Edge_SobelLRBinarized
 	If algorithmName = "Edge_SobelLRBinarized_CS" Then return new Edge_SobelLRBinarized_CS
 	If algorithmName = "EdgeDraw_Basics" Then return new EdgeDraw_Basics
+	If algorithmName = "EdgeDraw_Basics_CC" Then return new CPP_Basics(ccFunctionNames._EdgeDraw_Basics_CC)
 	If algorithmName = "EdgeDraw_Basics_CPP_CS" Then return new EdgeDraw_Basics_CPP_CS
 	If algorithmName = "EdgeDraw_LeftRight" Then return new EdgeDraw_LeftRight
 	If algorithmName = "EdgeDraw_LeftRightVertical" Then return new EdgeDraw_LeftRightVertical
@@ -881,10 +993,13 @@ Public Class algorithmList
 	If algorithmName = "Face_Haar_LBP" Then return new Face_Haar_LBP
 	If algorithmName = "Face_Haar_LBP_CS" Then return new Face_Haar_LBP_CS
 	If algorithmName = "Feature_Agast" Then return new Feature_Agast
+	If algorithmName = "Feature_Agast_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Agast_CC)
 	If algorithmName = "Feature_Agast_CS" Then return new Feature_Agast_CS
 	If algorithmName = "Feature_AKaze" Then return new Feature_AKaze
+	If algorithmName = "Feature_AKaze_CC" Then return new CPP_Basics(ccFunctionNames._Feature_AKaze_CC)
 	If algorithmName = "Feature_AKaze_CS" Then return new Feature_AKaze_CS
 	If algorithmName = "Feature_Basics" Then return new Feature_Basics
+	If algorithmName = "Feature_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Basics_CC)
 	If algorithmName = "Feature_Basics_CS" Then return new Feature_Basics_CS
 	If algorithmName = "Feature_BasicsNoFrills" Then return new Feature_BasicsNoFrills
 	If algorithmName = "Feature_BasicsNoFrills_CS" Then return new Feature_BasicsNoFrills_CS
@@ -922,6 +1037,7 @@ Public Class algorithmList
 	If algorithmName = "Feature_Sift_CS" Then return new Feature_Sift_CS
 	If algorithmName = "Feature_SiftLeftRight_CS" Then return new Feature_SiftLeftRight_CS
 	If algorithmName = "Feature_SiftSlices_CS" Then return new Feature_SiftSlices_CS
+	If algorithmName = "Feature_StableSorted_CC" Then return new CPP_Basics(ccFunctionNames._Feature_StableSorted_CC)
 	If algorithmName = "Feature_SURF_CS" Then return new Feature_SURF_CS
 	If algorithmName = "Feature_SURF_Draw_CS" Then return new Feature_SURF_Draw_CS
 	If algorithmName = "Feature_SURFMatch_CS" Then return new Feature_SURFMatch_CS
@@ -950,16 +1066,19 @@ Public Class algorithmList
 	If algorithmName = "FeatureLeftRight_LeftRightPrep" Then return new FeatureLeftRight_LeftRightPrep
 	If algorithmName = "FeatureLeftRight_LeftRightPrep_CS" Then return new FeatureLeftRight_LeftRightPrep_CS
 	If algorithmName = "FeatureLess_Basics" Then return new FeatureLess_Basics
+	If algorithmName = "FeatureLess_Basics_CC" Then return new CPP_Basics(ccFunctionNames._FeatureLess_Basics_CC)
 	If algorithmName = "FeatureLess_Basics_CS" Then return new FeatureLess_Basics_CS
 	If algorithmName = "FeatureLess_Canny" Then return new FeatureLess_Canny
 	If algorithmName = "FeatureLess_Canny_CS" Then return new FeatureLess_Canny_CS
 	If algorithmName = "FeatureLess_DCT" Then return new FeatureLess_DCT
 	If algorithmName = "FeatureLess_DCT_CS" Then return new FeatureLess_DCT_CS
+	If algorithmName = "FeatureLess_Edge_CC" Then return new CPP_Basics(ccFunctionNames._FeatureLess_Edge_CC)
 	If algorithmName = "FeatureLess_Groups" Then return new FeatureLess_Groups
 	If algorithmName = "FeatureLess_Groups_CS" Then return new FeatureLess_Groups_CS
 	If algorithmName = "FeatureLess_Histogram" Then return new FeatureLess_Histogram
 	If algorithmName = "FeatureLess_Histogram_CS" Then return new FeatureLess_Histogram_CS
 	If algorithmName = "FeatureLess_History" Then return new FeatureLess_History
+	If algorithmName = "FeatureLess_History_CC" Then return new CPP_Basics(ccFunctionNames._FeatureLess_History_CC)
 	If algorithmName = "FeatureLess_History_CS" Then return new FeatureLess_History_CS
 	If algorithmName = "FeatureLess_LeftRight" Then return new FeatureLess_LeftRight
 	If algorithmName = "FeatureLess_LeftRight_CS" Then return new FeatureLess_LeftRight_CS
@@ -1143,6 +1262,7 @@ Public Class algorithmList
 	If algorithmName = "Foreground_KMeans_CS" Then return new Foreground_KMeans_CS
 	If algorithmName = "Foreground_RedCloud" Then return new Foreground_RedCloud
 	If algorithmName = "Foreground_RedCloud_CS" Then return new Foreground_RedCloud_CS
+	If algorithmName = "FPoly_TopFeatures_CC" Then return new CPP_Basics(ccFunctionNames._FPoly_TopFeatures_CC)
 	If algorithmName = "Fractal_Dimension" Then return new Fractal_Dimension
 	If algorithmName = "Fractal_Dimension_CS" Then return new Fractal_Dimension_CS
 	If algorithmName = "Fractal_Julia" Then return new Fractal_Julia
@@ -1207,6 +1327,7 @@ Public Class algorithmList
 	If algorithmName = "GrayToColor_Palette" Then return new GrayToColor_Palette
 	If algorithmName = "GrayToColor_Palette_CS" Then return new GrayToColor_Palette_CS
 	If algorithmName = "Grid_Basics" Then return new Grid_Basics
+	If algorithmName = "Grid_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Grid_Basics_CC)
 	If algorithmName = "Grid_Basics_CS" Then return new Grid_Basics_CS
 	If algorithmName = "Grid_BasicsTest" Then return new Grid_BasicsTest
 	If algorithmName = "Grid_BasicsTest_CS" Then return new Grid_BasicsTest_CS
@@ -1259,6 +1380,7 @@ Public Class algorithmList
 	If algorithmName = "HeatMap_HotNot" Then return new HeatMap_HotNot
 	If algorithmName = "HeatMap_HotNot_CS" Then return new HeatMap_HotNot_CS
 	If algorithmName = "Hist_Basics" Then return new Hist_Basics
+	If algorithmName = "Hist_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Hist_Basics_CC)
 	If algorithmName = "Hist_Basics_CS" Then return new Hist_Basics_CS
 	If algorithmName = "Hist_Byte_CPP_CS" Then return new Hist_Byte_CPP_CS
 	If algorithmName = "Hist_Byte_CPP_VB" Then return new Hist_Byte_CPP_VB
@@ -1279,6 +1401,7 @@ Public Class algorithmList
 	If algorithmName = "Hist_Depth" Then return new Hist_Depth
 	If algorithmName = "Hist_Depth_CS" Then return new Hist_Depth_CS
 	If algorithmName = "Hist_DepthSimple" Then return new Hist_DepthSimple
+	If algorithmName = "Hist_DepthSimple_CC" Then return new CPP_Basics(ccFunctionNames._Hist_DepthSimple_CC)
 	If algorithmName = "Hist_DepthSimple_CS" Then return new Hist_DepthSimple_CS
 	If algorithmName = "Hist_EqualizeColor" Then return new Hist_EqualizeColor
 	If algorithmName = "Hist_EqualizeColor_CS" Then return new Hist_EqualizeColor_CS
@@ -1299,6 +1422,7 @@ Public Class algorithmList
 	If algorithmName = "Hist_Grayscale" Then return new Hist_Grayscale
 	If algorithmName = "Hist_Grayscale_CS" Then return new Hist_Grayscale_CS
 	If algorithmName = "Hist_Kalman" Then return new Hist_Kalman
+	If algorithmName = "Hist_Kalman_CC" Then return new CPP_Basics(ccFunctionNames._Hist_Kalman_CC)
 	If algorithmName = "Hist_Kalman_CS" Then return new Hist_Kalman_CS
 	If algorithmName = "Hist_KalmanAuto" Then return new Hist_KalmanAuto
 	If algorithmName = "Hist_KalmanAuto_CS" Then return new Hist_KalmanAuto_CS
@@ -1320,6 +1444,7 @@ Public Class algorithmList
 	If algorithmName = "Hist_PointCloud_CS" Then return new Hist_PointCloud_CS
 	If algorithmName = "Hist_PointCloudXYZ" Then return new Hist_PointCloudXYZ
 	If algorithmName = "Hist_PointCloudXYZ_CS" Then return new Hist_PointCloudXYZ_CS
+	If algorithmName = "Hist_RedOptions_CC" Then return new CPP_Basics(ccFunctionNames._Hist_RedOptions_CC)
 	If algorithmName = "Hist_ShapeSide" Then return new Hist_ShapeSide
 	If algorithmName = "Hist_ShapeSide_CS" Then return new Hist_ShapeSide_CS
 	If algorithmName = "Hist_ShapeTop" Then return new Hist_ShapeTop
@@ -1397,6 +1522,7 @@ Public Class algorithmList
 	If algorithmName = "Hist3Dcolor_ZeroGroups" Then return new Hist3Dcolor_ZeroGroups
 	If algorithmName = "Hist3Dcolor_ZeroGroups_CS" Then return new Hist3Dcolor_ZeroGroups_CS
 	If algorithmName = "History_Basics" Then return new History_Basics
+	If algorithmName = "History_Basics_CC" Then return new CPP_Basics(ccFunctionNames._History_Basics_CC)
 	If algorithmName = "History_Basics_CS" Then return new History_Basics_CS
 	If algorithmName = "History_Basics8U" Then return new History_Basics8U
 	If algorithmName = "History_BasicsDiff" Then return new History_BasicsDiff
@@ -1495,6 +1621,7 @@ Public Class algorithmList
 	If algorithmName = "Hough_Sudoku" Then return new Hough_Sudoku
 	If algorithmName = "Hough_Sudoku_CS" Then return new Hough_Sudoku_CS
 	If algorithmName = "Hull_Basics" Then return new Hull_Basics
+	If algorithmName = "Hull_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Hull_Basics_CC)
 	If algorithmName = "Hull_Basics_CS" Then return new Hull_Basics_CS
 	If algorithmName = "Hull_Contour" Then return new Hull_Contour
 	If algorithmName = "Hull_Contour_CS" Then return new Hull_Contour_CS
@@ -1526,7 +1653,9 @@ Public Class algorithmList
 	If algorithmName = "IMU_BasicsWithOptions" Then return new IMU_BasicsWithOptions
 	If algorithmName = "IMU_BasicsWithOptions_CS" Then return new IMU_BasicsWithOptions_CS
 	If algorithmName = "IMU_GMatrix" Then return new IMU_GMatrix
+	If algorithmName = "IMU_GMatrix_CC" Then return new CPP_Basics(ccFunctionNames._IMU_GMatrix_CC)
 	If algorithmName = "IMU_GMatrix_CS" Then return new IMU_GMatrix_CS
+	If algorithmName = "IMU_GMatrix_QT_CC" Then return new CPP_Basics(ccFunctionNames._IMU_GMatrix_QT_CC)
 	If algorithmName = "IMU_GMatrixWithOptions" Then return new IMU_GMatrixWithOptions
 	If algorithmName = "IMU_GMatrixWithOptions_CS" Then return new IMU_GMatrixWithOptions_CS
 	If algorithmName = "IMU_IscameraStable" Then return new IMU_IscameraStable
@@ -1578,6 +1707,7 @@ Public Class algorithmList
 	If algorithmName = "Interpolate_QuarterBeat" Then return new Interpolate_QuarterBeat
 	If algorithmName = "Interpolate_QuarterBeat_CS" Then return new Interpolate_QuarterBeat_CS
 	If algorithmName = "Kalman_Basics" Then return new Kalman_Basics
+	If algorithmName = "Kalman_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Kalman_Basics_CC)
 	If algorithmName = "Kalman_Basics_CS" Then return new Kalman_Basics_CS
 	If algorithmName = "Kalman_Compare" Then return new Kalman_Compare
 	If algorithmName = "Kalman_Compare_CS" Then return new Kalman_Compare_CS
@@ -1638,6 +1768,7 @@ Public Class algorithmList
 	If algorithmName = "KMeans_Valleys" Then return new KMeans_Valleys
 	If algorithmName = "KMeans_Valleys_CS" Then return new KMeans_Valleys_CS
 	If algorithmName = "KNN_Basics" Then return new KNN_Basics
+	If algorithmName = "KNN_Basics_CC" Then return new CPP_Basics(ccFunctionNames._KNN_Basics_CC)
 	If algorithmName = "KNN_Basics_CS" Then return new KNN_Basics_CS
 	If algorithmName = "KNN_BasicsOld" Then return new KNN_BasicsOld
 	If algorithmName = "KNN_BasicsOld_CS" Then return new KNN_BasicsOld_CS
@@ -1648,6 +1779,7 @@ Public Class algorithmList
 	If algorithmName = "KNN_ClosestVertical" Then return new KNN_ClosestVertical
 	If algorithmName = "KNN_ClosestVertical_CS" Then return new KNN_ClosestVertical_CS
 	If algorithmName = "KNN_Core" Then return new KNN_Core
+	If algorithmName = "KNN_Core_CC" Then return new CPP_Basics(ccFunctionNames._KNN_Core_CC)
 	If algorithmName = "KNN_Core_CS" Then return new KNN_Core_CS
 	If algorithmName = "KNN_Core2DTest" Then return new KNN_Core2DTest
 	If algorithmName = "KNN_Core2DTest_CS" Then return new KNN_Core2DTest_CS
@@ -1717,6 +1849,7 @@ Public Class algorithmList
 	If algorithmName = "LeftRight_Reduction_CS" Then return new LeftRight_Reduction_CS
 	If algorithmName = "Line_Basics" Then return new Line_Basics
 	If algorithmName = "Line_Basics_CS" Then return new Line_Basics_CS
+	If algorithmName = "Line_BasicsOld_CC" Then return new CPP_Basics(ccFunctionNames._Line_BasicsOld_CC)
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Canny_CS" Then return new Line_Canny_CS
 	If algorithmName = "Line_Cells" Then return new Line_Cells
@@ -1839,8 +1972,10 @@ Public Class algorithmList
 	If algorithmName = "Mat_2to1" Then return new Mat_2to1
 	If algorithmName = "Mat_2to1_CS" Then return new Mat_2to1_CS
 	If algorithmName = "Mat_4Click" Then return new Mat_4Click
+	If algorithmName = "Mat_4Click_CC" Then return new CPP_Basics(ccFunctionNames._Mat_4Click_CC)
 	If algorithmName = "Mat_4Click_CS" Then return new Mat_4Click_CS
 	If algorithmName = "Mat_4to1" Then return new Mat_4to1
+	If algorithmName = "Mat_4to1_CC" Then return new CPP_Basics(ccFunctionNames._Mat_4to1_CC)
 	If algorithmName = "Mat_4to1_CS" Then return new Mat_4to1_CS
 	If algorithmName = "Mat_Inverse" Then return new Mat_Inverse
 	If algorithmName = "Mat_Inverse_4D" Then return new Mat_Inverse_4D
@@ -1941,8 +2076,10 @@ Public Class algorithmList
 	If algorithmName = "MeanSubtraction_Basics" Then return new MeanSubtraction_Basics
 	If algorithmName = "MeanSubtraction_Basics_CS" Then return new MeanSubtraction_Basics_CS
 	If algorithmName = "Mesh_Basics" Then return new Mesh_Basics
+	If algorithmName = "Mesh_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Mesh_Basics_CC)
 	If algorithmName = "Mesh_Basics_CS" Then return new Mesh_Basics_CS
 	If algorithmName = "Mesh_Features" Then return new Mesh_Features
+	If algorithmName = "Mesh_Features_CC" Then return new CPP_Basics(ccFunctionNames._Mesh_Features_CC)
 	If algorithmName = "Mesh_Features_CS" Then return new Mesh_Features_CS
 	If algorithmName = "MiniCloud_Basics" Then return new MiniCloud_Basics
 	If algorithmName = "MiniCloud_Basics_CS" Then return new MiniCloud_Basics_CS
@@ -1981,6 +2118,7 @@ Public Class algorithmList
 	If algorithmName = "Moments_CentroidKalman" Then return new Moments_CentroidKalman
 	If algorithmName = "Moments_CentroidKalman_CS" Then return new Moments_CentroidKalman_CS
 	If algorithmName = "Motion_Basics" Then return new Motion_Basics
+	If algorithmName = "Motion_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Motion_Basics_CC)
 	If algorithmName = "Motion_Basics_CS" Then return new Motion_Basics_CS
 	If algorithmName = "Motion_Basics_QT" Then return new Motion_Basics_QT
 	If algorithmName = "Motion_Basics_QT_CS" Then return new Motion_Basics_QT_CS
@@ -2020,6 +2158,7 @@ Public Class algorithmList
 	If algorithmName = "Motion_RedCloud" Then return new Motion_RedCloud
 	If algorithmName = "Motion_RedCloud_CS" Then return new Motion_RedCloud_CS
 	If algorithmName = "Motion_Simple" Then return new Motion_Simple
+	If algorithmName = "Motion_Simple_CC" Then return new CPP_Basics(ccFunctionNames._Motion_Simple_CC)
 	If algorithmName = "Motion_Simple_CS" Then return new Motion_Simple_CS
 	If algorithmName = "Motion_TestSingle" Then return new Motion_TestSingle
 	If algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
@@ -2524,6 +2663,7 @@ Public Class algorithmList
 	If algorithmName = "ORB_Basics" Then return new ORB_Basics
 	If algorithmName = "ORB_Basics_CS" Then return new ORB_Basics_CS
 	If algorithmName = "Palette_Basics" Then return new Palette_Basics
+	If algorithmName = "Palette_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Palette_Basics_CC)
 	If algorithmName = "Palette_Basics_CS" Then return new Palette_Basics_CS
 	If algorithmName = "Palette_Bin4Way" Then return new Palette_Bin4Way
 	If algorithmName = "Palette_Color" Then return new Palette_Color
@@ -2549,6 +2689,7 @@ Public Class algorithmList
 	If algorithmName = "Palette_LoadColorMap" Then return new Palette_LoadColorMap
 	If algorithmName = "Palette_LoadColorMap_CS" Then return new Palette_LoadColorMap_CS
 	If algorithmName = "Palette_Random" Then return new Palette_Random
+	If algorithmName = "Palette_Random_CC" Then return new CPP_Basics(ccFunctionNames._Palette_Random_CC)
 	If algorithmName = "Palette_Random_CS" Then return new Palette_Random_CS
 	If algorithmName = "Palette_RandomColorMap" Then return new Palette_RandomColorMap
 	If algorithmName = "Palette_RandomColorMap_CS" Then return new Palette_RandomColorMap_CS
@@ -2674,8 +2815,10 @@ Public Class algorithmList
 	If algorithmName = "Plot_Dots" Then return new Plot_Dots
 	If algorithmName = "Plot_Dots_CS" Then return new Plot_Dots_CS
 	If algorithmName = "Plot_Histogram" Then return new Plot_Histogram
+	If algorithmName = "Plot_Histogram_CC" Then return new CPP_Basics(ccFunctionNames._Plot_Histogram_CC)
 	If algorithmName = "Plot_Histogram_CS" Then return new Plot_Histogram_CS
 	If algorithmName = "Plot_Histogram2D" Then return new Plot_Histogram2D
+	If algorithmName = "Plot_Histogram2D_CC" Then return new CPP_Basics(ccFunctionNames._Plot_Histogram2D_CC)
 	If algorithmName = "Plot_Histogram2D_CS" Then return new Plot_Histogram2D_CS
 	If algorithmName = "Plot_OverTime" Then return new Plot_OverTime
 	If algorithmName = "Plot_OverTime_CS" Then return new Plot_OverTime_CS
@@ -2821,6 +2964,7 @@ Public Class algorithmList
 	If algorithmName = "Quaterion_IMUPrediction" Then return new Quaterion_IMUPrediction
 	If algorithmName = "Quaterion_IMUPrediction_CS" Then return new Quaterion_IMUPrediction_CS
 	If algorithmName = "Random_Basics" Then return new Random_Basics
+	If algorithmName = "Random_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Random_Basics_CC)
 	If algorithmName = "Random_Basics_CS" Then return new Random_Basics_CS
 	If algorithmName = "Random_Basics3D" Then return new Random_Basics3D
 	If algorithmName = "Random_Basics3D_CS" Then return new Random_Basics3D_CS
@@ -2841,6 +2985,7 @@ Public Class algorithmList
 	If algorithmName = "Random_CustomHistogram" Then return new Random_CustomHistogram
 	If algorithmName = "Random_CustomHistogram_CS" Then return new Random_CustomHistogram_CS
 	If algorithmName = "Random_Enumerable" Then return new Random_Enumerable
+	If algorithmName = "Random_Enumerable_CC" Then return new CPP_Basics(ccFunctionNames._Random_Enumerable_CC)
 	If algorithmName = "Random_Enumerable_CS" Then return new Random_Enumerable_CS
 	If algorithmName = "Random_KalmanPoints" Then return new Random_KalmanPoints
 	If algorithmName = "Random_KalmanPoints_CS" Then return new Random_KalmanPoints_CS
@@ -2865,6 +3010,7 @@ Public Class algorithmList
 	If algorithmName = "Random_UniformDist" Then return new Random_UniformDist
 	If algorithmName = "Random_UniformDist_CS" Then return new Random_UniformDist_CS
 	If algorithmName = "Rectangle_Basics" Then return new Rectangle_Basics
+	If algorithmName = "Rectangle_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Rectangle_Basics_CC)
 	If algorithmName = "Rectangle_Basics_CS" Then return new Rectangle_Basics_CS
 	If algorithmName = "Rectangle_EnclosingPoints" Then return new Rectangle_EnclosingPoints
 	If algorithmName = "Rectangle_EnclosingPoints_CS" Then return new Rectangle_EnclosingPoints_CS
@@ -2875,13 +3021,16 @@ Public Class algorithmList
 	If algorithmName = "Rectangle_Overlap" Then return new Rectangle_Overlap
 	If algorithmName = "Rectangle_Overlap_CS" Then return new Rectangle_Overlap_CS
 	If algorithmName = "Rectangle_Rotated" Then return new Rectangle_Rotated
+	If algorithmName = "Rectangle_Rotated_CC" Then return new CPP_Basics(ccFunctionNames._Rectangle_Rotated_CC)
 	If algorithmName = "Rectangle_Rotated_CS" Then return new Rectangle_Rotated_CS
 	If algorithmName = "Rectangle_Union" Then return new Rectangle_Union
 	If algorithmName = "Rectangle_Union_CS" Then return new Rectangle_Union_CS
 	If algorithmName = "RecursiveBilateralFilter_CPP_CS" Then return new RecursiveBilateralFilter_CPP_CS
 	If algorithmName = "RecursiveBilateralFilter_CPP_VB" Then return new RecursiveBilateralFilter_CPP_VB
 	If algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
+	If algorithmName = "RedCloud_Basics_CC" Then return new CPP_Basics(ccFunctionNames._RedCloud_Basics_CC)
 	If algorithmName = "RedCloud_Basics_CS" Then return new RedCloud_Basics_CS
+	If algorithmName = "RedCloud_BasicsNative_CC" Then return new CPP_Basics(ccFunctionNames._RedCloud_BasicsNative_CC)
 	If algorithmName = "RedCloud_BProject3D" Then return new RedCloud_BProject3D
 	If algorithmName = "RedCloud_BProject3D_CS" Then return new RedCloud_BProject3D_CS
 	If algorithmName = "RedCloud_CCompColor" Then return new RedCloud_CCompColor
@@ -2930,6 +3079,7 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_FindCells_CPP_CS" Then return new RedCloud_FindCells_CPP_CS
 	If algorithmName = "RedCloud_Flippers" Then return new RedCloud_Flippers
 	If algorithmName = "RedCloud_Flippers_CS" Then return new RedCloud_Flippers_CS
+	If algorithmName = "RedCloud_Flood_CC" Then return new CPP_Basics(ccFunctionNames._RedCloud_Flood_CC)
 	If algorithmName = "RedCloud_FloodPoint" Then return new RedCloud_FloodPoint
 	If algorithmName = "RedCloud_FloodPoint_CS" Then return new RedCloud_FloodPoint_CS
 	If algorithmName = "RedCloud_FourColor" Then return new RedCloud_FourColor
@@ -2991,6 +3141,7 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_ProjectCell" Then return new RedCloud_ProjectCell
 	If algorithmName = "RedCloud_ProjectCell_CS" Then return new RedCloud_ProjectCell_CS
 	If algorithmName = "RedCloud_Reduce" Then return new RedCloud_Reduce
+	If algorithmName = "RedCloud_Reduce_CC" Then return new CPP_Basics(ccFunctionNames._RedCloud_Reduce_CC)
 	If algorithmName = "RedCloud_Reduce_CS" Then return new RedCloud_Reduce_CS
 	If algorithmName = "RedCloud_Reduction" Then return new RedCloud_Reduction
 	If algorithmName = "RedCloud_Reduction_CS" Then return new RedCloud_Reduction_CS
@@ -3024,6 +3175,8 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_XZ_CS" Then return new RedCloud_XZ_CS
 	If algorithmName = "RedCloud_YZ" Then return new RedCloud_YZ
 	If algorithmName = "RedCloud_YZ_CS" Then return new RedCloud_YZ_CS
+	If algorithmName = "RedColor_FeatureLess_CC" Then return new CPP_Basics(ccFunctionNames._RedColor_FeatureLess_CC)
+	If algorithmName = "RedColor_FeatureLessCore_CC" Then return new CPP_Basics(ccFunctionNames._RedColor_FeatureLessCore_CC)
 	If algorithmName = "RedTrack_Basics" Then return new RedTrack_Basics
 	If algorithmName = "RedTrack_Basics_CS" Then return new RedTrack_Basics_CS
 	If algorithmName = "RedTrack_Features" Then return new RedTrack_Features
@@ -3067,6 +3220,7 @@ Public Class algorithmList
 	If algorithmName = "Reliable_MaxDepth" Then return new Reliable_MaxDepth
 	If algorithmName = "Reliable_RGB" Then return new Reliable_RGB
 	If algorithmName = "Remap_Basics" Then return new Remap_Basics
+	If algorithmName = "Remap_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Remap_Basics_CC)
 	If algorithmName = "Remap_Basics_CS" Then return new Remap_Basics_CS
 	If algorithmName = "Remap_Flip" Then return new Remap_Flip
 	If algorithmName = "Remap_Flip_CS" Then return new Remap_Flip_CS
@@ -3074,8 +3228,10 @@ Public Class algorithmList
 	If algorithmName = "Replay_Play" Then return new Replay_Play
 	If algorithmName = "Replay_Record" Then return new Replay_Record
 	If algorithmName = "Resize_Basics" Then return new Resize_Basics
+	If algorithmName = "Resize_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Resize_Basics_CC)
 	If algorithmName = "Resize_Basics_CS" Then return new Resize_Basics_CS
 	If algorithmName = "Resize_Preserve" Then return new Resize_Preserve
+	If algorithmName = "Resize_Preserve_CC" Then return new CPP_Basics(ccFunctionNames._Resize_Preserve_CC)
 	If algorithmName = "Resize_Preserve_CS" Then return new Resize_Preserve_CS
 	If algorithmName = "Resize_Proportional" Then return new Resize_Proportional
 	If algorithmName = "Resize_Proportional_CS" Then return new Resize_Proportional_CS
@@ -3206,8 +3362,10 @@ Public Class algorithmList
 	If algorithmName = "Stabilizer_VerticalIMU" Then return new Stabilizer_VerticalIMU
 	If algorithmName = "Stabilizer_VerticalIMU_CS" Then return new Stabilizer_VerticalIMU_CS
 	If algorithmName = "Stable_Basics" Then return new Stable_Basics
+	If algorithmName = "Stable_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Stable_Basics_CC)
 	If algorithmName = "Stable_Basics_CS" Then return new Stable_Basics_CS
 	If algorithmName = "Stable_BasicsCount" Then return new Stable_BasicsCount
+	If algorithmName = "Stable_BasicsCount_CC" Then return new CPP_Basics(ccFunctionNames._Stable_BasicsCount_CC)
 	If algorithmName = "Stable_BasicsCount_CS" Then return new Stable_BasicsCount_CS
 	If algorithmName = "Stable_FAST" Then return new Stable_FAST
 	If algorithmName = "Stable_FAST_CS" Then return new Stable_FAST_CS
@@ -3378,7 +3536,6 @@ Public Class algorithmList
 	If algorithmName = "Triangle_Mask_CS" Then return new Triangle_Mask_CS
 	If algorithmName = "Triangle_RedCloud" Then return new Triangle_RedCloud
 	If algorithmName = "Triangle_RedCloud_CS" Then return new Triangle_RedCloud_CS
-	If algorithmName = "VB_Controls_CSharp" Then return new VB_Controls_CSharp
 	If algorithmName = "Vector_Magnitude" Then return new Vector_Magnitude
 	If algorithmName = "VectorMagnitude_CS" Then return new VectorMagnitude_CS
 	If algorithmName = "Video_Basics" Then return new Video_Basics

@@ -31,6 +31,7 @@ Module UI_GeneratorMain
         Dim HomeDir As New DirectoryInfo(CCInput.DirectoryName + "/../")
         Dim CS_CPPCLR_Inputs = {New FileInfo(HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs").FullName,
                                 New FileInfo(HomeDir.FullName + "CPP_Classes/CPP_Classes.cpp").FullName,
+                                New FileInfo(HomeDir.FullName + "CPP_Code/CPP_AI_Generated.h").FullName,
                                 New FileInfo(HomeDir.FullName + "CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(HomeDir.FullName + "VB_classes/")
         Dim CPPInput As New DirectoryInfo(HomeDir.FullName + "CPP_classes/CPP_Classes.cpp")
@@ -96,7 +97,7 @@ Module UI_GeneratorMain
             Next
         Next
 
-        ' first read all the cpp functions that are present in the project
+        ' first read all the CPP_Code functions that are present in the project
         Dim functionInput As New FileInfo(HomeDir.FullName + "/CPP_Code/CPP_Enum.h")
         Dim srFunctions = New StreamReader(functionInput.FullName)
         Dim ccFunctionNames As New SortedList(Of String, String)
@@ -199,7 +200,7 @@ Module UI_GeneratorMain
                     If line.Length > 1 Then
                         If line.Substring(0, 2) <> "//" Then
                             CodeLineCount += 1
-                            If LCase(line).StartsWith("public class ") And line <> "public class CPP_Parent" Then
+                            If LCase(line).StartsWith("public class ") Or line.Contains("public CPP_Parent") Then
                                 Dim split As String() = Regex.Split(line, "\W+")
                                 If line.EndsWith(" : VB_Parent") Then
                                     csName = split(2)
@@ -208,8 +209,15 @@ Module UI_GeneratorMain
                                         fileNames.Add(fileName)
                                     End If
                                 End If
-                                If line.EndsWith(" public CPP_Parent") Then
-                                    cppName = split(2)
+                                If line.EndsWith("public CPP_Parent") Then
+                                    If line.Contains(" ref ") Then cppName = split(3) Else cppName = split(2)
+                                    If cppAdds.Contains(fileName) = False Then
+                                        cppAdds.Add(fileName)
+                                        fileNames.Add(fileName)
+                                    End If
+                                End If
+                                If line.Contains("_CC ") Then
+                                    cppName = split(1)
                                     If cppAdds.Contains(fileName) = False Then
                                         cppAdds.Add(fileName)
                                         fileNames.Add(fileName)
@@ -220,7 +228,11 @@ Module UI_GeneratorMain
                                 csName <> "" Then
                                 csSortedNames.Add(csName, csSortedNames.Count)
                             End If
-                            If LCase(line).StartsWith("public ") And csSortedNames.ContainsKey(cppName) = False And
+                            If LCase(line).StartsWith("public ") And cppSortedNames.ContainsKey(cppName) = False And
+                                cppName <> "" Then
+                                cppSortedNames.Add(cppName, cppSortedNames.Count)
+                            End If
+                            If cppName.EndsWith("_CC") And cppSortedNames.ContainsKey(cppName) = False And
                                 cppName <> "" Then
                                 cppSortedNames.Add(cppName, cppSortedNames.Count)
                             End If
@@ -230,9 +242,9 @@ Module UI_GeneratorMain
             End If
         Next
 
-        'For Each name In cppSortedNames.Keys
-        '    sortedNames.Add(name, name)
-        'Next
+        For Each name In cppSortedNames.Keys
+            sortedNames.Add(name, sortedNames.Count)
+        Next
 
         For Each name In csSortedNames.Keys
             sortedNames.Add(name, sortedNames.Count)
@@ -277,7 +289,14 @@ Module UI_GeneratorMain
         ' sw.WriteLine("Imports CPP_Classes")
         sw.WriteLine("Imports CS_Classes")
         sw.WriteLine("Imports VB_Classes")
+
         sw.WriteLine("Public Class algorithmList")
+        sw.WriteLine("Public Enum ccFunctionNames")
+        For i = 0 To unsortedFunctions.Count - 1
+            sw.WriteLine(unsortedFunctions(i))
+        Next
+        sw.WriteLine("End Enum")
+
         sw.WriteLine(vbTab + "Public Function createAlgorithm(algorithmName as string) as Object")
         sw.WriteLine(vbTab + "If algorithmName.endsWith("".py"") then return new Python_Run()")
         'For Each cppName In cppSortedNames.Key
@@ -285,44 +304,19 @@ Module UI_GeneratorMain
         'Next
         For Each nextName In cleanNames
             If nextName.StartsWith("CPP_Basics") Then Continue For
-            If nextName.EndsWith(".py") = False Then
-                sw.WriteLine(vbTab + "If algorithmName = """ + nextName + """ Then return new " + nextName)
+            If nextName = "AddWeighted_Basics_CPP" Then Continue For
+            If nextName.EndsWith("_CC") Then
+                sw.WriteLine(vbTab + "If algorithmName = """ + nextName + """ Then return new CPP_Basics(ccFunctionNames._" + nextName + ")")
+            Else
+                If nextName.EndsWith(".py") = False Then
+                    sw.WriteLine(vbTab + "If algorithmName = """ + nextName + """ Then return new " + nextName)
+                End If
             End If
         Next
         sw.WriteLine(vbTab + vbTab + "Return Nothing")
         sw.WriteLine(vbTab + "End Function")
         sw.WriteLine("End Class")
         sw.Close()
-
-
-
-
-
-        Dim listInfo As New FileInfo(HomeDir.FullName + "UI_Generator/AlgorithmList.vb")
-        sw = New StreamWriter(listInfo.FullName)
-        sw.WriteLine("' this file is automatically generated in a pre-build step.  Do not waste your time modifying manually.")
-        sw.WriteLine("Public Class AlgorithmList")
-        sw.WriteLine("Public Enum ccFunctionNames")
-        For i = 0 To unsortedFunctions.Count - 1
-            sw.WriteLine(unsortedFunctions(i))
-        Next
-        sw.WriteLine("End Enum")
-
-        'sw.WriteLine("Public Function createVBAlgorithm( algorithmName as string) As VB_Parent")
-        'sw.WriteLine(vbTab + "If algorithmName.endsWith("".py"") then return new Python_Run()")
-        'For i = 0 To cleanNames.Count - 1
-        '    Dim nextName = cleanNames(i)
-        '    If nextName.StartsWith("CPP_Basics") Then Continue For
-        '    If nextName.EndsWith(".py") = False Then
-        '        sw.WriteLine(vbTab + "if algorithmName = """ + nextName + """ Then return new " + nextName)
-        '    End If
-        'Next
-
-        'sw.WriteLine("return nothing")
-        'sw.WriteLine("End Function")
-        sw.WriteLine("End Class")
-        sw.Close()
-
 
 
         Dim apiList As New List(Of String)
@@ -496,6 +490,7 @@ Module UI_GeneratorMain
         For Each nm In allButPython.Keys
             If nm.Contains("_CPP_") Then ccNames.Add(nm)
             If nm.EndsWith("_CPP") Then ccNames.Add(nm)
+            If nm.EndsWith("_CC") Then ccNames.Add(nm)
         Next
 
         sw.Write("<All C++ (" + CStr(ccNames.Count) + ")>")
@@ -647,7 +642,6 @@ Module UI_GeneratorMain
             If fileInfo.Name = "VB_Task.vb" Then Continue For
             If fileInfo.Name = "VB_Externs.vb" Then Continue For
             If fileInfo.Name.StartsWith("Options") Then Continue For
-            If fileInfo.Name = "AlgorithmList.vb" Then Continue For
             Dim result As Integer = DateTime.Compare(fileInfo.LastWriteTime, algorithmGroupNames.LastWriteTime)
             If result > 0 Then Return True
         Next

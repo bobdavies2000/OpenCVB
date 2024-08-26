@@ -130,7 +130,6 @@
     <Compile Include="Complexity.vb" />
     <Compile Include="Reliable.vb" />
     <Compile Include="ScatterMatrix.vb" />
-    <Compile Include="VB_Controls.vb" />
     <Compile Include="Derivative.vb" />
     <Compile Include="Duster.vb" />
     <Compile Include="FeatureLine.vb" />
@@ -279,7 +278,6 @@
     <Compile Include="SVD.vb" />
     <Compile Include="Texture.vb" />
     <Compile Include="Threshold.vb" />
-    <Compile Include="..\UI_Generator\AlgorithmList.vb" />
     <Compile Include="AlphaChannel.vb" />
     <Compile Include="Benford.vb" />
     <Compile Include="Bitmap.vb" />
