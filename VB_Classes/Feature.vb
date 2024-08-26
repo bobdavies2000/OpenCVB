@@ -16,8 +16,8 @@ Public Class Feature_Basics : Inherits VB_Parent
         task.features.Clear() ' in case it was previously in use...
         desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         dst2 = src.Clone
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
@@ -113,8 +113,8 @@ Public Class Feature_BasicsNoFrills : Inherits VB_Parent
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         dst2 = src.Clone
 
         gather.Run(src)
@@ -145,7 +145,7 @@ Public Class Feature_KNN : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
 
         knn.queries = New List(Of cvb.Point2f)(task.features)
@@ -185,7 +185,7 @@ Public Class Feature_Reduction : Inherits VB_Parent
         labels = {"", "", "Good features", "History of good features"}
         desc = "Get the features in a reduction grayscale image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = src
 
@@ -213,7 +213,7 @@ Public Class Feature_MultiPass : Inherits VB_Parent
         task.gOptions.RGBFilterList.SelectedIndex = task.gOptions.RGBFilterList.Items.IndexOf("Filter_Laplacian")
         desc = "Run Feature_Basics twice and compare results."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(task.color)
         dst2 = src.Clone
         featurePoints = New List(Of cvb.Point2f)(task.features)
@@ -259,8 +259,8 @@ Public Class Feature_PointTracker : Inherits VB_Parent
         labels(3) = "Correlation coefficients for each remaining cell"
         desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim correlationMin = options.correlationMin
         Dim templatePad = options.templatePad
         Dim templateSize = options.templateSize
@@ -310,7 +310,7 @@ Public Class Feature_Delaunay : Inherits VB_Parent
         FindSlider("Min Distance to next").Value = 10
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         dst2 = feat.dst2
         labels(2) = feat.labels(2)
@@ -343,7 +343,7 @@ Public Class Feature_LucasKanade : Inherits VB_Parent
     Public Sub New()
         desc = "Provide a trace of the tracked features"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pyr.Run(src)
         dst2 = src
         labels(2) = pyr.labels(2)
@@ -382,7 +382,7 @@ Public Class Feature_NearestCell : Inherits VB_Parent
     Public Sub New()
         desc = "Find the nearest feature to every cell in task.redCells"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         redC.Run(src)
         dst2 = redC.dst2
@@ -422,7 +422,7 @@ Public Class Feature_Points : Inherits VB_Parent
         labels(3) = "Features found in the image"
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         dst2 = feat.dst2
         If task.heartBeat Then dst3.SetTo(0)
@@ -445,7 +445,7 @@ Public Class Feature_Trace : Inherits VB_Parent
     Public Sub New()
         desc = "Placeholder to help find RedTrack_Features"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         track.Run(src)
         dst2 = track.dst2
         labels = track.labels
@@ -463,7 +463,7 @@ Public Class Feature_TraceDelaunay : Inherits VB_Parent
         labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
         desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         features.Run(src)
         dst3 = features.dst2
 
@@ -500,8 +500,8 @@ Public Class Feature_ShiTomasi : Inherits VB_Parent
         labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
         desc = "Identify feature points in the left And right views"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If options.useShiTomasi Then
             dst2 = task.leftView
@@ -533,7 +533,7 @@ Public Class Feature_Generations : Inherits VB_Parent
         UpdateAdvice(traceName + ": Local options will determine how many features are present.")
         desc = "Find feature age maximum and average."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
 
         Dim newfeatures As New SortedList(Of Integer, cvb.Point)(New compareAllowIdenticalIntegerInverted)
@@ -575,7 +575,7 @@ Public Class Feature_History : Inherits VB_Parent
     Public Sub New()
         desc = "Find good features across multiple frames."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim histCount = task.gOptions.FrameHistory.Value
 
         feat.Run(src)
@@ -633,7 +633,7 @@ Public Class Feature_GridPopulation : Inherits VB_Parent
         labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."
         desc = "Find the feature population for each cell."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         dst2 = feat.dst2
         labels(2) = feat.labels(2)
@@ -667,7 +667,7 @@ Public Class Feature_Compare : Inherits VB_Parent
     Public Sub New()
         desc = "Prepare features for the left and right views"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.features = New List(Of cvb.Point2f)(saveLFeatures)
         feat.Run(src.Clone)
         dst2 = feat.dst2
@@ -700,9 +700,9 @@ Public Class Feature_Gather : Inherits VB_Parent
         cPtr = Agast_Open()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
-        myOptions.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        myOptions.RunOpt()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
@@ -786,7 +786,7 @@ Public Class Feature_Agast : Inherits VB_Parent
         stablePoints = New List(Of Point2f)()
         lastPoints = New List(Of Point2f)()
     End Sub
-    Public Sub RunVB(src As Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim resizeFactor As Integer = 1
         Dim input As New Mat()
         If src.Cols >= 1280 Then
@@ -833,7 +833,7 @@ Public Class Feature_AKaze : Inherits VB_Parent
         labels(2) = "AKAZE key points"
         desc = "Find keypoints using AKAZE algorithm."
     End Sub
-    Public Sub RunVB(src As Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone()
         If src.Channels() <> 1 Then
             src = src.CvtColor(ColorConversionCodes.BGR2GRAY)

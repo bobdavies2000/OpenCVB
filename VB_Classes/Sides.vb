@@ -7,7 +7,7 @@ Public Class Sides_Basics : Inherits VB_Parent
         labels = {"", "", "RedCloud output", "Selected Cell showing the various extrema."}
         desc = "Find the 6 extrema and the 4 farthest points in each quadrant for the selected RedCloud cell"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         sides.Run(src)
         dst2 = sides.dst2
         dst3 = sides.dst3
@@ -37,7 +37,7 @@ Public Class Sides_Profile : Inherits VB_Parent
         labels = {"", "", "RedCloud_Basics Output", "Selected Cell"}
         desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -61,7 +61,7 @@ Public Class Sides_Corner : Inherits VB_Parent
         labels = {"", "", "RedCloud_Basics output", ""}
         desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -85,7 +85,7 @@ Public Class Sides_ColorC : Inherits VB_Parent
         labels = {"", "", "RedColor Output", "Cell Extrema"}
         desc = "Find the extrema - top/bottom, left/right, near/far - points for a RedColor Cell"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 

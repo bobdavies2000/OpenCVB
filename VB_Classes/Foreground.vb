@@ -9,7 +9,7 @@ Public Class Foreground_Basics : Inherits VB_Parent
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find the first KMeans class with depth over 1 meter and use it to define foreground"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         simK.Run(src)
         classCount = simK.classCount
 
@@ -60,7 +60,7 @@ Public Class Foreground_KMeans : Inherits VB_Parent
         dst3 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Separate foreground and background using Kmeans with k=2."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         km.Run(task.pcSplit(2))
 
         Dim minDistance = Single.MaxValue
@@ -93,7 +93,7 @@ Public Class Foreground_Contours : Inherits VB_Parent
     Public Sub New()
         desc = "Create contours for the foreground mask"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fore.Run(src)
 
         contours.Run(fore.dst2)
@@ -113,7 +113,7 @@ Public Class Foreground_Hist3D : Inherits VB_Parent
         labels = {"", "", "Foreground", "Background"}
         desc = "Use the first class of hist3Dcloud_Basics as the definition of foreground"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hcloud.Run(src)
 
         dst2.SetTo(0)
@@ -133,7 +133,7 @@ Public Class Foreground_RedCloud : Inherits VB_Parent
     Public Sub New()
         desc = "Isolate foreground from background, then segment each with RedCloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fore.Run(src)
         dst2 = fore.dst2
         labels(2) = fore.labels(2)
@@ -160,7 +160,7 @@ Public Class Foreground_CellsFore : Inherits VB_Parent
         task.redOptions.setUseColorOnly(True)
         desc = "Get the foreground cells"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
 
         fore.Run(src)
@@ -185,7 +185,7 @@ Public Class Foreground_CellsBack : Inherits VB_Parent
         task.redOptions.setUseColorOnly(True)
         desc = "Get the background cells"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
 
         fore.Run(src)

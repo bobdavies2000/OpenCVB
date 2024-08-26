@@ -8,7 +8,7 @@ Public Class Bin3Way_Basics : Inherits VB_Parent
         labels = {"", "", "Image separated into three segments from darkest to lightest and 'Other' (between)", "Histogram Of grayscale image"}
         desc = "Split an image into 3 parts - darkest, lightest, and in-between the 2"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim bins = task.histogramBins
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
@@ -65,7 +65,7 @@ Public Class Bin3Way_KMeans : Inherits VB_Parent
         labels = {"", "", "Darkest (upper left), mixed (upper right), lightest (bottom left)", "Selected image from dst2"}
         desc = "Use kmeans with each of the 3-way split images"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         bin3.Run(src)
 
@@ -93,7 +93,7 @@ Public Class Bin3Way_Color : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Build the palette input that best separates the light and dark regions of an image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         bin3.Run(src)
         dst2.SetTo(4)
         dst2.SetTo(1, bin3.bin3.mats.mat(0))
@@ -115,7 +115,7 @@ Public Class Bin3Way_RedCloudDarkest : Inherits VB_Parent
     Public Sub New()
         desc = "Use RedCloud with the darkest regions"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then bin3.Run(src)
 
         flood.inputMask = Not bin3.bin3.mats.mat(0)
@@ -136,7 +136,7 @@ Public Class Bin3Way_RedCloudLightest : Inherits VB_Parent
     Public Sub New()
         desc = "Use RedCloud with the lightest regions"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then bin3.Run(src)
 
         flood.inputMask = Not bin3.bin3.mats.mat(2)
@@ -157,7 +157,7 @@ Public Class Bin3Way_RedCloudOther : Inherits VB_Parent
         flood.inputMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Use RedCloud with the regions that are neither lightest or darkest"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then bin3.Run(src)
 
         flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
@@ -183,8 +183,8 @@ Public Class Bin3Way_RedCloud1 : Inherits VB_Parent
     Public Sub New()
         desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the rcData."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
@@ -240,8 +240,8 @@ Public Class Bin3Way_RedCloud : Inherits VB_Parent
         flood.showSelected = False
         desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1

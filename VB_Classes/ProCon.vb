@@ -58,12 +58,12 @@ Public Class ProCon_Basics : Inherits VB_Parent
             Windows.Forms.Application.DoEvents()
         End While
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.testAllRunning Then
             SetTrueText("ProCon_Basics is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
             Exit Sub
         End If
-        options.RunVB()
+        options.RunOpt()
         If options.buffer.Length <> options.bufferSize Then
             SyncLock mutex
                 ReDim options.buffer(options.bufferSize - 1)
@@ -97,7 +97,7 @@ Public Class ProCon_Variation : Inherits VB_Parent
         procon.terminateProducer = True ' we don't need a 2 producer task.  RunVB below provides the second thread.
         desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.testAllRunning Then
             SetTrueText("ProCon_Variation is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
             Exit Sub

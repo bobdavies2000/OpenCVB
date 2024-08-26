@@ -4,7 +4,7 @@ Public Class XFeatures2D_StarDetector : Inherits VB_Parent
     Public Sub New()
         desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone()
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         Dim detector = OpenCvSharp.XFeatures2D.StarDetector.Create()

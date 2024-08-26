@@ -22,7 +22,7 @@ Public Class Horizon_Basics : Inherits VB_Parent
 
         DrawLine(dst2, vec.p1, vec.p2, 255)
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32F Then dst0 = PrepareDepthInput(1) Else dst0 = src
 
         Dim resolution = task.quarterRes
@@ -84,7 +84,7 @@ Public Class Horizon_Perpendicular : Inherits VB_Parent
         labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
         desc = "Find the gravity vector using the perpendicular to the horizon."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src
         DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
 
@@ -131,7 +131,7 @@ Public Class Horizon_BasicsAlt : Inherits VB_Parent
         Next
         Return New cvb.Point
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.useGravityPointcloud Then
             cloudY = task.pcSplit(1) ' already oriented to gravity
         Else
@@ -176,7 +176,7 @@ Public Class Horizon_FindNonZero : Inherits VB_Parent
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim xRatio = dst0.Width / task.quarterRes.Width
         Dim yRatio = dst0.Height / task.quarterRes.Height
 
@@ -246,7 +246,7 @@ Public Class Horizon_UnstableResults : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         dst1 = task.pcSplit(1).InRange(-0.05, 0.05)
@@ -309,7 +309,7 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim xRatio = dst0.Width / task.quarterRes.Width
         Dim yRatio = dst0.Height / task.quarterRes.Height
         Dim splitX = task.pcSplit(0)
@@ -387,7 +387,7 @@ Public Class Horizon_Validate : Inherits VB_Parent
     Public Sub New()
         desc = "Validate the horizon points using Match_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim templatePad = match.options.templatePad
         Dim templateSize = match.options.templateSize
 
@@ -425,7 +425,7 @@ Public Class Horizon_Regress : Inherits VB_Parent
     Public Sub New()
         desc = "Collect the horizon points and run a linear regression on all the points."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         horizon.Run(src)
 
         For i = 0 To horizon.points.Count - 1
@@ -448,7 +448,7 @@ Public Class Horizon_ExternalTest : Inherits VB_Parent
     Public Sub New()
         desc = "Supply the point cloud input to Horizon_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst0 = PrepareDepthInput(1)
         horizon.Run(dst0)
         dst2 = horizon.dst2

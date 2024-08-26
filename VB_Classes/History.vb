@@ -4,7 +4,7 @@ Public Class History_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Create a frame history to sum the last X frames"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.frameHistoryCount = 1 Then
             dst2 = src
             Exit Sub
@@ -42,7 +42,7 @@ Public Class History_MotionRect : Inherits VB_Parent
     Public Sub New()
         desc = "Create an image that is the motionRect applied to the previous image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then dst2 = src.Clone
 
         If task.motionDetected Then
@@ -64,7 +64,7 @@ Public Class History_Cloud : Inherits VB_Parent
     Public Sub New()
         desc = "Create a frame history and sum the last X task.pointcloud's"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Or src.Channels() <> 3 Then src = task.pointCloud
 
         If task.optionsChanged Or dst3.Type <> cvb.MatType.CV_32FC3 Then
@@ -95,7 +95,7 @@ Public Class History_BasicsNoSaturation : Inherits VB_Parent
     Public Sub New()
         desc = "Create a frame history and sum the last X frames (without saturation!)"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim input = src.Clone
         If input.Channels() <> 1 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If input.Type <> cvb.MatType.CV_32F Then input.ConvertTo(input, cvb.MatType.CV_32F)
@@ -132,7 +132,7 @@ Public Class History_BasicsDiff : Inherits VB_Parent
         task.gOptions.pixelDiffThreshold = 0
         desc = "Find the floodfill trouble spots."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         frames.Run(src)
         dst2 = ShowPalette(frames.dst2)
 
@@ -153,7 +153,7 @@ Public Class History_Basics8U : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         desc = "Create a frame history by Or'ing the last X frames of CV_8U data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             If task.FirstPass Then lastFrame = src.Clone
@@ -194,7 +194,7 @@ Public Class History_ReliableDepth : Inherits VB_Parent
     Public Sub New()
         desc = "Create a frame history by Or'ing the last X frames of CV_8U data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then src = task.noDepthMask
 
         If task.frameHistoryCount = 1 Then

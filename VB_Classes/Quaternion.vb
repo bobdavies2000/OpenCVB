@@ -5,8 +5,8 @@ Public Class Quaterion_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim quatmul = Quaternion.Multiply(options.q1, options.q2)
         SetTrueText("q1 = " + options.q1.ToString() + vbCrLf + "q2 = " + options.q2.ToString() + vbCrLf +
                     "Multiply q1 * q2" + quatmul.ToString())
@@ -34,7 +34,7 @@ Public Class Options_Quaternion : Inherits VB_Parent
             sliders.setupTrackBar("quaternion B Theta X100", -100, 100, 100)
         End If
     End Sub
-    Public Sub RunVB()
+    Public Sub RunOpt()
         Static axSlider = FindSlider("quaternion A.x X100")
         Static aySlider = FindSlider("quaternion A.y X100")
         Static azSlider = FindSlider("quaternion A.z X100")
@@ -73,7 +73,7 @@ Public Class Quaterion_IMUPrediction : Inherits VB_Parent
         Dim s = If(theta2 < Math.Sqrt(120 * Single.Epsilon), 1 - theta2 / 6, Math.Sin(theta) / theta2)
         Return New Quaternion(s * v.X, s * v.Y, s * v.Z, c)
     End Function
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         host.Run(src)
 
         Dim dt = host.HostInterruptDelayEstimate

@@ -22,8 +22,8 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Parent
         task.drawRect = New cvb.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize)
         task.drawRectUpdated = True
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = task.leftView.Clone
         dst3 = task.rightView.Clone
@@ -138,7 +138,7 @@ Public Class FeatureLeftRight_LeftRightPrep : Inherits VB_Parent
     Public Sub New()
         desc = "Prepare features for the left and right views"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.features = New List(Of cvb.Point2f)(saveLFeatures)
         lFeat.Run(task.leftView)
         dst2 = lFeat.dst2
@@ -167,7 +167,7 @@ Public Class FeatureLeftRight_Grid : Inherits VB_Parent
         FindRadio("GoodFeatures (ShiTomasi) grid").Checked = True
         desc = "Run FeatureLeftRight_Basics but with 'GoodFeatures grid' instead of 'GoodFeatures full image'"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         match.Run(src)
         If match.mpList.Count = 0 Then Exit Sub
         dst1 = match.dst1.Clone
@@ -207,13 +207,13 @@ Public Class FeatureLeftRight_Input : Inherits VB_Parent
         task.drawRect = New cvb.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize)
         task.drawRectUpdated = True
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If ptLeft.Count = 0 Or ptRight.Count = 0 Then
             SetTrueText("Caller provides the ptLeft/ptRight points to use.", 1)
             Exit Sub
         End If
 
-        options.RunVB()
+        options.RunOpt()
 
         Dim prepList As New List(Of PointPair)
         For Each p1 In ptLeft

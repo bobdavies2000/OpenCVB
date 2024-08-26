@@ -7,8 +7,8 @@ Public Class Homography_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Build the homography matrix from 2 lists of corners and use it in a WarpPerspective call."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         If standaloneTest() And task.heartBeat And options.hMethod = cvb.HomographyMethods.None Then
             random.Run(empty)
@@ -39,7 +39,7 @@ Public Class Homography_FPoly : Inherits VB_Parent
     Public Sub New()
         desc = "Use the feature polygon to warp the current image to a previous image.  This is not useful but demonstrates how to use homography."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fPoly.Run(src)
         dst2 = fPoly.dst1
         If fPoly.fPD.currPoly Is Nothing Or fPoly.fPD.prevPoly Is Nothing Then Exit Sub

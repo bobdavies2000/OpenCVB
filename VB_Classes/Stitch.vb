@@ -5,8 +5,8 @@ Public Class Stitch_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Stitch together random parts of a color image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim mats As New List(Of cvb.Mat)
         dst2 = src.Clone()

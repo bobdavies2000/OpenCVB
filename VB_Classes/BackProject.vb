@@ -8,7 +8,7 @@ Public Class BackProject_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
         desc = "Mouse over any bin to see the histogram backprojected."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim input = src.Clone
         If input.Channels() <> 1 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         histK.Run(input)
@@ -60,7 +60,7 @@ Public Class BackProject_Full : Inherits VB_Parent
         labels = {"", "", "CV_8U format of the backprojection", "dst2 presented with a palette"}
         desc = "Create a color histogram, normalize it, and backproject it with a palette."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         classCount = task.histogramBins
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         src.ConvertTo(dst1, cvb.MatType.CV_32F)
@@ -92,7 +92,7 @@ Public Class BackProject_Reduction : Inherits VB_Parent
         labels(3) = "Backprojection of highlighted histogram bin"
         desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
 
         backP.Run(reduction.dst2)
@@ -118,7 +118,7 @@ Public Class BackProject_FeatureLess : Inherits VB_Parent
                   "Move mouse over the histogram to backproject a column"}
         desc = "Create a histogram of the featureless regions"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         edges.Run(src)
         reduction.Run(edges.dst3)
         backP.Run(reduction.dst2)
@@ -143,7 +143,7 @@ Public Class BackProject_BasicsKeyboard : Inherits VB_Parent
         labels(2) = "Move the mouse away from OpenCVB and use the left and right arrows to move between histogram bins."
         desc = "Move the mouse off of OpenCVB and then use the left and right arrow keys move around in the backprojection histogram"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         keys.Run(src)
         Dim keyIn = New List(Of String)(keys.keyInput)
         Dim incrX = dst1.Width / task.histogramBins
@@ -186,7 +186,7 @@ Public Class BackProject_FullLines : Inherits VB_Parent
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
         desc = "Find lines in the back projection"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         backP.Run(src)
         dst3 = backP.dst3
 
@@ -211,7 +211,7 @@ Public Class BackProject_PointCloud : Inherits VB_Parent
         labels = {"", "", "Backprojection after histogram binning X and Z values", "Backprojection after histogram binning Y and Z values"}
         desc = "Explore Backprojection of the cloud histogram."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim threshold = hist.options.threshold
         hist.Run(src)
 
@@ -246,7 +246,7 @@ Public Class BackProject_Display : Inherits VB_Parent
         labels = {"", "", "Back projection", ""}
         desc = "Display the back projected color image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         backP.Run(src)
         dst2 = backP.dst2
         dst3 = backP.dst3
@@ -267,7 +267,7 @@ Public Class BackProject_Unstable : Inherits VB_Parent
         labels = {"", "", "Backprojection output", "Unstable pixels in the backprojection.  If flashing, set 'Pixel Difference Threshold' higher."}
         desc = "Highlight the unstable pixels in the backprojection."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         backP.Run(src)
         dst2 = ShowPalette(backP.dst2 * 255 / backP.classCount)
 
@@ -293,7 +293,7 @@ Public Class BackProject_FullEqualized : Inherits VB_Parent
         labels = {"", "", "BackProject_Full output without equalization", "BackProject_Full with equalization"}
         desc = "Create a histogram from the equalized color and then backproject it."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         backP.Run(src)
         backP.dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
         Dim mm = GetMinMax(dst2)
@@ -323,7 +323,7 @@ Public Class BackProject_Side : Inherits VB_Parent
         labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
         desc = "Display the back projection of the hotspots in the Side View"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histSide.Run(src)
         autoY.Run(histSide.histogram)
 
@@ -345,7 +345,7 @@ Public Class BackProject_Top : Inherits VB_Parent
         labels = {"", "", "Hotspots in the Top View", "Back projection of the hotspots in the Top View"}
         desc = "Display the back projection of the hotspots in the Top View"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histTop.Run(src)
         dst2 = histTop.dst2
 
@@ -367,7 +367,7 @@ Public Class BackProject_Horizontal : Inherits VB_Parent
     Public Sub New()
         desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         bpTop.Run(src)
         task.pointCloud.SetTo(0, bpTop.dst3)
 
@@ -391,7 +391,7 @@ Public Class BackProject_Vertical : Inherits VB_Parent
     Public Sub New()
         desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         bpSide.Run(src)
         task.pointCloud.SetTo(0, bpSide.dst3)
 
@@ -414,7 +414,7 @@ Public Class BackProject_SoloSide : Inherits VB_Parent
         labels = {"", "", "Solo samples in the Side View", "Back projection of the solo samples in the Side View"}
         desc = "Display the back projection of the solo samples in the Side View"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histSide.Run(src)
 
         dst3 = histSide.histogram.Threshold(1, 255, cvb.ThresholdTypes.TozeroInv)
@@ -437,7 +437,7 @@ Public Class BackProject_SoloTop : Inherits VB_Parent
         labels = {"", "", "Solo samples in the Top View", "Back projection of the solo samples in the Top View"}
         desc = "Display the back projection of the solo samples in the Top View"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histTop.Run(src)
 
         dst3 = histTop.histogram.Threshold(1, 255, cvb.ThresholdTypes.TozeroInv)
@@ -460,7 +460,7 @@ Public Class BackProject_LineTop : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Backproject the lines found in the top view."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         line.Run(src)
 
         dst2.SetTo(0)
@@ -491,7 +491,7 @@ Public Class BackProject_LineSide : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Backproject the lines found in the side view."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         line.Run(src)
 
         dst2.SetTo(0)
@@ -528,7 +528,7 @@ Public Class BackProject_Image : Inherits VB_Parent
         labels(2) = "Move mouse to backproject each histogram column"
         desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim input = src
         If input.Channels() <> 1 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         hist.Run(input)
@@ -589,7 +589,7 @@ Public Class BackProject_Mouse : Inherits VB_Parent
         labels(2) = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
         desc = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         backP.Run(src)
         dst2 = backP.dst2
         dst3 = backP.dst3
@@ -604,7 +604,7 @@ Public Class BackProject_Depth : Inherits VB_Parent
     Public Sub New()
         desc = "Allow review of the depth backprojection"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim depth = task.pcSplit(2).Threshold(task.MaxZmeters, 255, cvb.ThresholdTypes.TozeroInv)
         backp.Run(depth * 1000)
         dst2 = backp.dst2
@@ -621,7 +621,7 @@ Public Class BackProject_MeterByMeter : Inherits VB_Parent
     Public Sub New()
         desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.histogramBins < task.MaxZmeters Then task.gOptions.setHistogramBins(task.MaxZmeters + 1)
         If task.optionsChanged Then
             Dim incr = task.MaxZmeters / task.histogramBins
@@ -654,7 +654,7 @@ Public Class BackProject_Hue : Inherits VB_Parent
     Public Sub New()
         desc = "Create an 8UC1 image with a backprojection of the hue."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hue.Run(src)
         classCount = hue.classCount
         dst2 = hue.dst2
@@ -679,7 +679,7 @@ Public Class BackProject_MaskLines : Inherits VB_Parent
                   "Yellow is backProjection, lines detected are highlighted"}
         desc = "Inspect the lines from individual backprojection masks from a histogram"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         masks.Run(src)
         dst2 = masks.dst2
         dst3 = src.Clone
@@ -727,7 +727,7 @@ Public Class BackProject_Masks : Inherits VB_Parent
         cvb.Cv2.CalcBackProject({gray}, {0}, hist.histogram, mask, ranges)
         Return mask
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hist.Run(src)
         dst2 = hist.dst2
 
@@ -760,7 +760,7 @@ Public Class BackProject_MaskList : Inherits VB_Parent
         labels(3) = "Depth mask used to build the depth histogram at left"
         desc = "Create masks for each histogram bin backprojection"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim gray = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Dim bins = If(task.histogramBins <= 255, task.histogramBins - 1, 255)
         Dim incr = 255 / bins

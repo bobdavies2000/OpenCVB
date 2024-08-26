@@ -11,7 +11,7 @@ Public Class CameraMotion_Basics : Inherits VB_Parent
         task.gOptions.setDebugSlider(3)
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         gravity.Run(src)
 
         Dim gravityVec = New PointPair(task.gravityVec.p1, task.gravityVec.p2)
@@ -130,7 +130,7 @@ Public Class CameraMotion_WithRotation : Inherits VB_Parent
             rotationY *= -1
         End If
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.FirstPass Then
             gravityVec = task.gravityVec
             horizonVec = task.horizonVec
@@ -185,7 +185,7 @@ Public Class CameraMotion_SceneMotion : Inherits VB_Parent
         labels(2) = "Image after adjusting for camera motion."
         desc = "Display both camera motion (on heartbeats) and scene motion."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         cMotion.Run(src)
         dst2 = cMotion.dst3
 

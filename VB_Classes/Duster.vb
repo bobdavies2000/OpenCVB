@@ -5,7 +5,7 @@ Public Class Duster_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Removed blowback in the pointcloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dust.Run(src)
 
         For i = 1 To dust.classCount
@@ -35,8 +35,8 @@ Public Class Duster_MaskZ : Inherits VB_Parent
         labels(3) = "Any flickering below is from changes in the sorted order of the clusters.  It should not be a problem."
         desc = "Build a histogram that finds the clusters of depth data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         hist.bins = options.bins
 
         Dim src32f = task.pcSplit(2)
@@ -97,7 +97,7 @@ Public Class Duster_BasicsY : Inherits VB_Parent
     Public Sub New()
         desc = "Removed blowback in the pointcloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dust.Run(src)
 
         For i = 1 To dust.classCount
@@ -125,7 +125,7 @@ Public Class Duster_RedCloud : Inherits VB_Parent
     Public Sub New()
         desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         duster.Run(src)
         dst1 = duster.dust.dst2.InRange(1, 1)
 

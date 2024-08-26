@@ -4,8 +4,8 @@ Public Class Color_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Choose a color source"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If options.colorFormat Is Nothing Then options.colorFormat = "BGR" ' multiple invocations cause this to be necessary but how to fix?
         Select Case options.colorFormat

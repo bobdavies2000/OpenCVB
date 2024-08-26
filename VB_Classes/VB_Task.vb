@@ -3,20 +3,16 @@ Imports System.Windows.Forms
 Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.IO
-Imports OpenCvSharp
 
 Public Class VBtask : Implements IDisposable
     Public TaskTimer As New System.Timers.Timer(1000)
-    Public algoList As New AlgorithmList
 
     Public dst0 As cvb.Mat
     Public dst1 As cvb.Mat
     Public dst2 As cvb.Mat
     Public dst3 As cvb.Mat
 
-    Public vbAlgorithmObject As Object
-    Public csAlgorithmObject As Object
-    Public cppAlgorithmObject As Object
+    Public algorithmObject As Object
     Public myStopWatch As Stopwatch
     Public mbuf(2 - 1) As inBuffer
     Public mbIndex As Integer
@@ -415,12 +411,6 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add(algName + "\")
         activeObjects.Clear()
 
-        If task.algName.EndsWith("_CS") = False And task.algName.EndsWith("_CPP") = False Then
-            vbAlgorithmObject = algoList.createVBAlgorithm(algName)
-            desc = vbAlgorithmObject.desc
-            FirstPass = True
-        End If
-
         If task.advice = "" Then
             task.advice = "No advice for " + algName + " yet." + vbCrLf +
                            "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
@@ -463,7 +453,6 @@ Public Class VBtask : Implements IDisposable
         End If
         TaskTimer.Enabled = False
         allOptions.Close()
-        If vbAlgorithmObject IsNot Nothing Then vbAlgorithmObject.Dispose()
     End Sub
     Public Sub TrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
         Dim str As New trueText(text, pt, picTag)
@@ -606,7 +595,7 @@ Public Class VBtask : Implements IDisposable
                 task.color.Rectangle(task.motionRect, cvb.Scalar.White, task.lineWidth)
             End If
 
-            gravityHorizon.RunVB(src)
+            gravityHorizon.RunAlg(src)
             If task.gOptions.CrossHairs.Checked Then
                 If task.paused = False Then
                     DrawLine(task.color, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
@@ -683,13 +672,13 @@ Public Class VBtask : Implements IDisposable
         task.IMU_RawAcceleration = task.IMU_Acceleration
         task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
         task.IMU_AlphaFilter = 0.5 '  task.gOptions.imu_Alpha
-        grid.RunVB(task.color)
+        grid.RunAlg(task.color)
 
-        imuStabilityTest.RunVB(src)
+        imuStabilityTest.RunAlg(src)
         task.cameraStable = imuStabilityTest.stableTest
         task.cameraStableString = imuStabilityTest.stableStr
-        IMUBasics.RunVB(src)
-        gMat.RunVB(src)
+        IMUBasics.RunAlg(src)
+        gMat.RunAlg(src)
 
         If task.gOptions.CreateGif.Checked Then
             heartBeat = False
@@ -734,7 +723,7 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
 
-        colorizer.RunVB(task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc))
+        colorizer.RunAlg(task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc))
         task.depthRGB = colorizer.dst2.Clone
 
         If task.gOptions.UseReliableDepth.Checked Then
@@ -748,7 +737,7 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.CreateGif.Checked Then
             If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB
-            gifCreator.RunVB(src)
+            gifCreator.RunAlg(src)
             If task.gifBuild Then
                 task.gifBuild = False
                 If task.gifImages.Count = 0 Then
@@ -775,46 +764,16 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
 
-        If task.gOptions.RGBFilterActive.Checked Then
-            Dim filterName = task.gOptions.RGBFilterList.Text
-            If rgbFilter Is Nothing Then rgbFilter = algoList.createVBAlgorithm(filterName)
-            If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createVBAlgorithm(filterName)
-            rgbFilter.RunVB(src)
-            src = rgbFilter.dst2
-        End If
+        'If task.gOptions.RGBFilterActive.Checked Then
+        '    Dim filterName = task.gOptions.RGBFilterList.Text
+        '    If rgbFilter Is Nothing Then rgbFilter = algoList.createVBAlgorithm(filterName)
+        '    If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createVBAlgorithm(filterName)
+        '    rgbFilter.RunAlg(src)
+        '    src = rgbFilter.dst2
+        'End If
 
         If task.paused = False And src.Size = task.WorkingRes Then
-            If task.algName.EndsWith("_CS") Then
-                csAlgorithmObject.trueData.clear()
-                csAlgorithmObject.RunCS(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested CS algorithm runs...
-
-                task.labels = csAlgorithmObject.labels
-
-                dst0 = csAlgorithmObject.dst0
-                dst1 = csAlgorithmObject.dst1
-                dst2 = csAlgorithmObject.dst2
-                dst3 = csAlgorithmObject.dst3
-
-                For Each ttxt In csAlgorithmObject.trueData
-                    task.trueData.Add(ttxt)
-                Next
-            ElseIf task.algName.EndsWith("_CPP") Then
-                cppAlgorithmObject.trueData.clear()
-                cppAlgorithmObject.RunCPP(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested CPP algorithm runs...
-
-                task.labels = cppAlgorithmObject.labels
-
-                dst0 = cppAlgorithmObject.dst0
-                dst1 = cppAlgorithmObject.dst1
-                dst2 = cppAlgorithmObject.dst2
-                dst3 = cppAlgorithmObject.dst3
-
-                For Each ttxt In cppAlgorithmObject.trueData
-                    task.trueData.Add(ttxt)
-                Next
-            Else
-                vbAlgorithmObject.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
-            End If
+            algorithmObject.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
             task.FirstPass = False
             postProcess(src)
         End If

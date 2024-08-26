@@ -6,7 +6,7 @@ Public Class Photon_Basics : Inherits VB_Parent
         labels = {"", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences"}
         desc = "With no motion the camera values will show the random photon differences.  Are they random?"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static lastImage As cvb.Mat = src
         cvb.Cv2.Absdiff(src, lastImage, dst1)
 
@@ -44,7 +44,7 @@ Public Class Photon_Test : Inherits VB_Parent
         labels = {"", "", "5 color levels from reduction (black not shown)", "Selected distribution"}
         desc = ""
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.redOptions.setBitReductionBar(64) ' for now...
         Dim reduce = 64
 
@@ -94,7 +94,7 @@ Public Class Photon_Subtraction : Inherits VB_Parent
         labels = {"", "", "Points where B, G, or R differ", "Histogram showing distribution of differences"}
         desc = "Same as Photon_Basics but without ignoring sign."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         src = src.Reshape(1, src.Rows * 3)
         src.ConvertTo(src, cvb.MatType.CV_32F)
 

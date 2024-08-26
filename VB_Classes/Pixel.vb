@@ -17,7 +17,7 @@ Public Class Pixel_Viewer : Inherits VB_Parent
     Public Sub New()
         desc = "Display pixels under the cursor"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             task.dst0 = task.color.Clone
             task.dst1 = task.depthRGB.Clone
@@ -191,7 +191,7 @@ Public Class Pixel_GetSet : Inherits VB_Parent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""
@@ -256,7 +256,7 @@ Public Class Pixel_Measure : Inherits VB_Parent
         Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
         Return halfLineInMeters * 2 / dst2.Width
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static distanceSlider = FindSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.Value)
         SetTrueText("At a distance of " + CStr(distanceSlider.Value) + " mm's the camera's FOV is " +
@@ -280,7 +280,7 @@ Public Class Pixel_SampleColor : Inherits VB_Parent
     Public Sub New()
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 Dim w = 25, h = 25
@@ -343,7 +343,7 @@ Public Class Pixel_Unstable : Inherits VB_Parent
         labels(2) = "KMeans_Basics output"
         desc = "Detect where pixels are unstable"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         k = kSlider.Value
 
         km.Run(src)
@@ -390,7 +390,7 @@ Public Class Pixel_Zoom : Inherits VB_Parent
         zoomSlider = FindSlider("Zoom Factor")
         desc = "Zoom into the pixels under the mouse in dst2"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoomSlider.Value)
 
@@ -416,7 +416,7 @@ Public Class Pixel_SubPixel : Inherits VB_Parent
     Public Sub New()
         desc = "Show how to use the GetRectSubPix OpenCV API"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoom.zoomSlider.Value)
 
@@ -445,8 +445,8 @@ Public Class Pixel_NeighborsHorizontal : Inherits VB_Parent
     Public Sub New()
         desc = "Manual step through depth data to find horizontal neighbors within x mm's"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -487,8 +487,8 @@ Public Class Pixel_NeighborsVertical : Inherits VB_Parent
     Public Sub New()
         desc = "Manual step through depth data to find vertical neighbors within x mm's"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -526,8 +526,8 @@ Public Class Pixel_NeighborsMaskH : Inherits VB_Parent
     Public Sub New()
         desc = "Show where horizontal neighbor depth values are within X mm's"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim tmp32f = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
@@ -553,8 +553,8 @@ Public Class Pixel_NeighborsMaskV : Inherits VB_Parent
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim tmp32f = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
@@ -583,7 +583,7 @@ Public Class Pixel_NeighborsMask : Inherits VB_Parent
     Public Sub New()
         desc = "Show the mask for both the horizontal and vertical neighbors"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         maskH.Run(src)
         dst2 = maskH.dst2
 
@@ -603,8 +603,8 @@ Public Class Pixel_NeighborsPatchNeighbors : Inherits VB_Parent
         FindSlider("Minimum offset to neighbor pixel").Value = 1
         desc = "Update depth values for neighbors where they are within X mm's"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -661,7 +661,7 @@ Public Class Pixel_Vector3D : Inherits VB_Parent
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         Dim maxRegion = 20
 
@@ -703,7 +703,7 @@ Public Class Pixel_Unique_CPP_VB : Inherits VB_Parent
         cPtr = Pixels_Vector_Open()
         desc = "Create the list of pixels in a RedCloud Cell"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         src = src.Resize(task.lowRes)
         If task.drawRect <> New cvb.Rect Then src = src(task.drawRect)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -736,7 +736,7 @@ Public Class Pixel_Vectors : Inherits VB_Parent
         labels = {"", "", "RedCloud_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(3)
@@ -762,7 +762,7 @@ Public Class Pixel_Mapper : Inherits VB_Parent
     Public Sub New()
         desc = "Resize the input to a small image, convert to gray, and map gray to color"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             Dim nSize = New cvb.Size(src.Width / 8, src.Height / 8)
             dst1 = src.Resize(nSize)
@@ -814,7 +814,7 @@ Public Class Pixel_MapLeftRight : Inherits VB_Parent
         labels = {"", "", "Left view with averaged color", "Right view with averaged color"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         mapper.Run(src)
         dst2 = mapper.dst2
 
@@ -834,7 +834,7 @@ Public Class Pixel_MapDistance : Inherits VB_Parent
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         mapper.Run(src)
         dst2 = mapper.dst2
 
@@ -890,7 +890,7 @@ Public Class Pixel_Sampler : Inherits VB_Parent
     Public Sub New()
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 If task.drawRect <> New cvb.Rect Then
@@ -965,7 +965,7 @@ Public Class Pixel_Display : Inherits VB_Parent
         labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."
         desc = "Find the pixels within the drawrect and display their stats."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src
         If task.heartBeat Then
             Dim mean As cvb.Scalar, stdev As cvb.Scalar
@@ -990,7 +990,7 @@ Public Class Pixel_ColorGuess : Inherits VB_Parent
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         mapper.Run(src)
         dst2 = mapper.dst2
 

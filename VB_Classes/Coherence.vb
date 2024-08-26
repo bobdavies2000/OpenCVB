@@ -6,8 +6,8 @@ Public Class Coherence_Basics : Inherits VB_Parent
         labels(2) = "Coherence - draw rectangle to apply"
         desc = "Find lines that are artistically coherent in the image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim side As Integer
         Select Case src.Height
@@ -80,7 +80,7 @@ Public Class Coherence_Depth : Inherits VB_Parent
     Public Sub New()
         desc = "Find coherent lines in the depth image"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         coherent.Run(task.depthRGB)
         dst2 = coherent.dst2
     End Sub

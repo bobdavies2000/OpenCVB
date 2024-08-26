@@ -23,8 +23,8 @@ Public Class HOG_Basics : Inherits VB_Parent
             dst2.Rectangle(r.TopLeft, r.BottomRight, cvb.Scalar.Red, 3, cvb.LineTypes.Link8, 0)
         Next rect
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim hog As New cvb.HOGDescriptor()
         hog.SetSVMDetector(cvb.HOGDescriptor.GetDefaultPeopleDetector())

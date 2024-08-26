@@ -6,7 +6,7 @@ Public Class ML_Basics : Inherits VB_Parent
         labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
         desc = "Predict depth from color to fill in the depth shadow areas"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim noDepthCount(task.gridList.Count - 1) As Integer
         Dim roiColor(task.gridList.Count - 1) As cvb.Vec3b
 
@@ -161,7 +161,7 @@ Public Class ML_FillRGBDepth_MT : Inherits VB_Parent
         labels = {"", "", "ML filled shadow", ""}
         desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim minLearnCount = 5
         Parallel.ForEach(task.gridList,
             Sub(roi)
@@ -188,7 +188,7 @@ Public Class ML_DepthFromColor : Inherits VB_Parent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
 
         mats.mat(1) = task.noDepthMask.Clone
 
@@ -250,7 +250,7 @@ Public Class ML_DepthFromXYColor : Inherits VB_Parent
         labels(2) = "Predicted Depth"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         shadow.Run(src)
         mats.mat(0) = shadow.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
@@ -336,7 +336,7 @@ Public Class ML_Color2Depth : Inherits VB_Parent
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
         labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
@@ -403,7 +403,7 @@ Public Class ML_ColorInTier2Depth : Inherits VB_Parent
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
         labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
@@ -465,7 +465,7 @@ Public Class ML_RemoveDups_CPP_VB : Inherits VB_Parent
         labels = {"", "", "BGR input below is converted to BGRA and sorted as integers", ""}
         desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
 
         If src.Type = cvb.MatType.CV_8UC3 Then
             dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_32S, src.CvtColor(cvb.ColorConversionCodes.BGR2BGRA).Data)

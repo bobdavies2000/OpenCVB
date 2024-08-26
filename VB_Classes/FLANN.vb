@@ -6,7 +6,7 @@ Public Class FLANN_Test : Inherits VB_Parent
         desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
         labels(2) = "FLANN Basics"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         ' creates data set
         Using features As New cvb.Mat(10000, 2, cvb.MatType.CV_32FC1)
             cvb.Cv2.Randu(features, 0, msRNG.Next(9900, 10000))
@@ -57,8 +57,8 @@ Public Class FLANN_Basics : Inherits VB_Parent
         desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         labels(2) = "Red is query, Nearest points blue"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If options.reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(empty) ' fill result1 with random points in x and y range of the image.
         Dim features As cvb.Mat = cvb.Mat.FromPixelData(random.PointList.Count, 2, cvb.MatType.CV_32F, random.PointList.ToArray)

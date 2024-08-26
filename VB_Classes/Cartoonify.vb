@@ -8,8 +8,8 @@ Public Class Cartoonify_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": click 'Show All' to control cartoonify options.")
         desc = "Create a cartoon from a color image"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         Dim gray8u = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         gray8u = gray8u.MedianBlur(options.medianBlur)

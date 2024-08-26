@@ -3924,7 +3924,7 @@ public:
     }
     void Run(cv::Mat src)
     {
-        options->RunVB();
+        options->RunOpt();
         cv::Mat srcPlus = src2;
         // algorithm user normally provides src2! 
         if (standalone || src2.empty()) srcPlus = task->depthRGB;
@@ -5790,7 +5790,7 @@ public:
     }
 
     void Run(Mat src) {
-        options->RunVB();
+        options->RunOpt();
 
         if (src.channels() == 3) {
             cvtColor(src, src, COLOR_BGR2GRAY);
@@ -6727,7 +6727,7 @@ public:
         desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
     }
     void Run(cv::Mat src) {
-        options->RunVB();
+        options->RunOpt();
         cv::GaussianBlur(src, dst2, cv::Size(options->kernelSize, options->kernelSize), 
                             options->sigma, options->sigma);
     }
@@ -7232,7 +7232,7 @@ public:
     }
     void Run(Mat src)
     {
-        options->RunVB();
+        options->RunOpt();
         if (task->optionsChanged)
         {
             dst2 = task->pcSplit[2] * 1000;
@@ -7266,7 +7266,7 @@ public:
 //    }
 //    void Run(cv::Mat src)
 //    {
-//        options->RunVB();
+//        options->RunOpt();
 //        std::string edgeSelection = options->edgeSelection;
 //        if (edgeSelection == "Canny")
 //        {
@@ -7336,7 +7336,7 @@ public:
     }
     void Run(cv::Mat src)
     {
-        options->RunVB();
+        options->RunOpt();
         canny->Run(src);
         dst2 = canny->dst2;
         if (dst2.channels() != 1)

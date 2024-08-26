@@ -6,8 +6,8 @@ Public Class Threshold_Basics : Inherits VB_Parent
         labels(2) = "Original image"
         desc = "Demonstrate the use of OpenCV's threshold and all its options"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         labels(3) = "Image after thresholding with threshold = " + CStr(options.threshold)
         dst2 = src
@@ -37,9 +37,9 @@ Public Class Threshold_Adaptive : Inherits VB_Parent
         labels = {"", "", "Original input", "Output of AdaptiveThreshold"}
         desc = "Explore what adaptive threshold can do."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
-        optionsAdaptive.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        optionsAdaptive.RunOpt()
 
         If src.Channels() <> 1 Then dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) Else dst2 = src
         dst3 = dst2.AdaptiveThreshold(255, optionsAdaptive.method, options.thresholdMethod,
@@ -64,8 +64,8 @@ Public Class Threshold_Definitions : Inherits VB_Parent
         labels = {"Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection"}
         desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         gradient.Run(empty)
         dst0 = gradient.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -103,9 +103,9 @@ Public Class Threshold_ByChannels : Inherits VB_Parent
         UpdateAdvice(traceName + ": see local options.")
         desc = "Threshold by channel - use red threshold slider to impact grayscale results."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
-        optionsColor.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        optionsColor.RunOpt()
 
         If options.inputGray Then
             src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
@@ -138,7 +138,7 @@ Public Class Threshold_ColorSource : Inherits VB_Parent
         UpdateAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.")
         desc = "Use all the alternative color sources as input to Threshold_ByChannels."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         colorClass.Run(src)
         byChan.Run(colorClass.dst3)
         dst2 = byChan.dst2

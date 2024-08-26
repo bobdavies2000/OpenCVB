@@ -35,7 +35,7 @@ Public Class GuidedBP_Basics : Inherits VB_Parent
             SetTrueText(CStr(index), pt, dstindex)
         Next
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         ptHot.Run(src)
         dst2 = ptHot.dst2
         dst3 = ptHot.dst3
@@ -85,7 +85,7 @@ Public Class GuidedBP_HotPointsKNN : Inherits VB_Parent
 
         knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         ptHot.Run(src)
         dst2 = ptHot.dst2
         dst3 = ptHot.dst3
@@ -139,7 +139,7 @@ Public Class GuidedBP_HotPoints : Inherits VB_Parent
         mask(floodRect).CopyTo(view)
         Return rectList
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histTop.Run(src.Clone)
         topRects = hotPoints(histTop.dst3)
         dst2 = ShowPalette(histTop.dst3 * 255 / topRects.Count)
@@ -167,7 +167,7 @@ Public Class GuidedBP_PlanesPlot : Inherits VB_Parent
         labels = {"", "", "Side view", "Plot of nonzero rows in the side view"}
         desc = "Plot the likely floor or ceiling areas."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histSide.Run(src)
         dst2 = histSide.dst3
 
@@ -219,7 +219,7 @@ Public Class GuidedBP_Points : Inherits VB_Parent
     Public Sub New()
         desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hotPoints.Run(src)
 
         hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cvb.MatType.CV_32F)
@@ -255,7 +255,7 @@ Public Class GuidedBP_Lookup : Inherits VB_Parent
         task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         guided.Run(src)
         dst2 = guided.dst2
         labels(2) = guided.labels(2)
@@ -278,7 +278,7 @@ Public Class GuidedBP_Depth : Inherits VB_Parent
         task.gOptions.setHistogramBins(16)
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         hist.Run(src)

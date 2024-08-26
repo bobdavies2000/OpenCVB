@@ -9,7 +9,7 @@ Public Class MeanShift_Basics : Inherits VB_Parent
         labels(2) = "Draw anywhere to start mean shift tracking."
         desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim roi = If(task.drawRect.Width > 0, task.drawRect, New cvb.Rect(0, 0, dst2.Width, dst2.Height))
         Dim hsv = src.CvtColor(cvb.ColorConversionCodes.BGR2HSV)
         Dim ch() As Integer = {0, 1, 2}
@@ -41,7 +41,7 @@ Public Class MeanShift_Depth : Inherits VB_Parent
         labels(2) = "Draw anywhere to start mean shift tracking."
         desc = "Use depth to start mean shift algorithm."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         meanShift.Run(task.depthRGB)
         dst2 = meanShift.dst2
         dst3 = meanShift.dst1

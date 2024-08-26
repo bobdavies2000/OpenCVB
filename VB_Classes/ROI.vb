@@ -8,7 +8,7 @@ Public Class ROI_Basics : Inherits VB_Parent
         task.gOptions.pixelDiffThreshold = 30
         desc = "Find the motion ROI in the latest image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         diff.Run(src)
         dst2 = diff.dst2
 
@@ -40,7 +40,7 @@ Public Class ROI_FindNonZeroNoSingle : Inherits VB_Parent
         task.gOptions.pixelDiffThreshold = 30
         desc = "Find the motion ROI in just the latest image - eliminate single pixels"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         diff.Run(src)
         dst2 = diff.dst2
         Dim tmp = diff.dst2.FindNonZero()
@@ -87,8 +87,8 @@ Public Class ROI_AccumulateOld : Inherits VB_Parent
         task.gOptions.pixelDiffThreshold = 30
         desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
             dst0 = task.color
             dst1.SetTo(0)
@@ -138,8 +138,8 @@ Public Class ROI_Accumulate : Inherits VB_Parent
         task.gOptions.pixelDiffThreshold = 30
         desc = "Accumulate pixels in a motion ROI until the size is x% of the total image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         SetTrueText(traceName + " is the same as ROI_AccumulateOld but simpler.", 3)
         If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then

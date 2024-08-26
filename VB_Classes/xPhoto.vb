@@ -9,7 +9,7 @@ Public Class XPhoto_Bm3dDenoise : Inherits VB_Parent
         labels(2) = "Bm3dDenoising"
         labels(3) = "Difference from Input"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         cvb.Cv2.EqualizeHist(src, src)
         CvXPhoto.Bm3dDenoising(src, dst2)
@@ -29,7 +29,7 @@ Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VB_Parent
         desc = "Denoise the depth image with block matching and filtering."
         labels(3) = "Difference from Input"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim test = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
         Dim gray = task.depthRGB.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         cvb.Cv2.EqualizeHist(gray, gray)
@@ -54,8 +54,8 @@ Public Class XPhoto_OilPaint_CPP_VB : Inherits VB_Parent
         cPtr = xPhoto_OilPaint_Open()
         desc = "Use the xPhoto Oil Painting transform"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
@@ -85,8 +85,8 @@ Public Class XPhoto_Inpaint : Inherits VB_Parent
         labels(3) = "Repaired result..."
         desc = "Use the xPhoto inpaint to fill in the depth holes"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src
         Dim mask = basics.drawRandomLine(dst2)
@@ -110,8 +110,8 @@ Public Class XPhoto_Inpaint_CPP_VB : Inherits VB_Parent
         labels = {"", "Mask for inpainted repair", "output with inpainted data repaired", "Input to the inpaint C++ algorithm - not working!!!"}
         desc = "Use the xPhoto Oil Painting transform"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        inpVB.options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        inpVB.options.RunOpt()
 
         Dim iType = InpaintTypes.FSR_BEST
         If inpVB.options.FSRFast Then iType = InpaintTypes.FSR_FAST

@@ -8,8 +8,8 @@ Public Class Structured_LinearizeFloor : Inherits VB_Parent
     Public Sub New()
         desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         floor.Run(src)
         dst2 = floor.dst2
@@ -93,8 +93,8 @@ Public Class Structured_MultiSlice : Inherits VB_Parent
     Public Sub New()
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim stepSize = options.stepSize
 
         heat.Run(src)
@@ -148,7 +148,7 @@ Public Class Structured_MultiSliceLines : Inherits VB_Parent
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         multi.Run(src)
         dst3 = multi.dst3
         lines.Run(dst3)
@@ -168,7 +168,7 @@ Public Class Structured_Depth : Inherits VB_Parent
         labels = {"", "", "Use mouse to explore slices", "Top down view of the highlighted slice (at left)"}
         desc = "Use the structured depth to enhance the depth away from the centerline."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         sliceH.Run(src)
         dst0 = sliceH.dst3
         dst2 = sliceH.dst2
@@ -249,8 +249,8 @@ Public Class Structured_Rebuild : Inherits VB_Parent
         Next
         Return output
     End Function
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim metersPerPixel = task.MaxZmeters / dst3.Height
         thickness = options.sliceSize * metersPerPixel
@@ -285,8 +285,8 @@ Public Class Structured_Cloud2 : Inherits VB_Parent
     Public Sub New()
         desc = "Attempt to impose a structure on the point cloud data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim input = src
         If input.Type <> cvb.MatType.CV_32F Then input = task.pcSplit(2)
@@ -340,8 +340,8 @@ Public Class Structured_Cloud : Inherits VB_Parent
         task.gOptions.setGridSize(10)
         desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim yLines = CInt(options.xLines * dst2.Height / dst2.Width)
 
@@ -375,7 +375,7 @@ Public Class Structured_ROI : Inherits VB_Parent
         task.gOptions.setGridSize(10)
         desc = "Simplify the point cloud so it can be represented as quads in OpenGL"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_32FC3, 0)
         For Each roi In task.gridList
             Dim d = task.pointCloud(roi).Mean(task.depthMask(roi))
@@ -402,7 +402,7 @@ Public Class Structured_Tiles : Inherits VB_Parent
         task.gOptions.setGridSize(10)
         desc = "Use the OpenGL point size to represent the point cloud as data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hulls.Run(src)
         dst2 = hulls.dst3
 
@@ -439,8 +439,8 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
         labels = {"", "RedCloud cells", "Simplified depth map - CV_32FC3", "Simplified depth map with RedCloud cell colors"}
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
         hulls.Run(src)
         dst2 = hulls.dst2
 
@@ -502,7 +502,7 @@ Public Class Structured_CountTop : Inherits VB_Parent
         counts.Add(sliceMask.CountNonZero)
         Return sliceMask
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         slice.Run(src)
         dst1 = slice.dst3.Clone
 
@@ -536,7 +536,7 @@ Public Class Structured_FeatureLines : Inherits VB_Parent
     Public Sub New()
         desc = "Find the lines in the Structured_MultiSlice algorithm output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         struct.Run(src)
         dst2 = struct.dst2
 
@@ -562,7 +562,7 @@ Public Class Structured_FloorCeiling : Inherits VB_Parent
         FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Find the floor or ceiling plane"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         slice.Run(src)
         dst2 = slice.heat.dst3
 
@@ -629,8 +629,8 @@ Public Class Structured_MultiSliceH : Inherits VB_Parent
         FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim stepsize = options.stepSize
 
         heat.Run(src)
@@ -667,8 +667,8 @@ Public Class Structured_MultiSliceV : Inherits VB_Parent
         FindCheckBox("Top View (Unchecked Side View)").Checked = True
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim stepsize = options.stepSize
 
         heat.Run(src)
@@ -705,8 +705,8 @@ Public Class Structured_SliceXPlot : Inherits VB_Parent
     Public Sub New()
         desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         multi.Run(src)
         dst3 = multi.heat.dst2
@@ -744,8 +744,8 @@ Public Class Structured_SliceYPlot : Inherits VB_Parent
     Public Sub New()
         desc = "Find any plane around a peak value in the side view histogram"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         multi.Run(src)
         dst3 = multi.heat.dst3
@@ -786,7 +786,7 @@ Public Class Structured_MouseSlice : Inherits VB_Parent
         labels(3) = "White = SliceV output, Red Dot is avgPt"
         desc = "Find the vertical center line with accurate depth data.."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.mouseMovePoint = New cvb.Point Then task.mouseMovePoint = New cvb.Point(dst2.Width / 2, dst2.Height)
         slice.Run(src)
 
@@ -832,8 +832,8 @@ Public Class Structured_SliceEither : Inherits VB_Parent
         FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Create slices in top and side views"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Static topRadio = FindCheckBox("Top View (Unchecked Side View)")
         Dim topView = topRadio.checked
 
@@ -898,7 +898,7 @@ Public Class Structured_TransformH : Inherits VB_Parent
         desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
     End Sub
     Public Function createSliceMaskH() As cvb.Mat
-        options.RunVB()
+        options.RunOpt()
 
         Dim sliceMask As New cvb.Mat
         Dim ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
@@ -917,7 +917,7 @@ Public Class Structured_TransformH : Inherits VB_Parent
 
         Return sliceMask
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim sliceMask = createSliceMaskH()
 
         histTop.Run(task.pointCloud.SetTo(0, Not sliceMask))
@@ -943,7 +943,7 @@ Public Class Structured_TransformV : Inherits VB_Parent
         desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Function createSliceMaskV() As cvb.Mat
-        options.RunVB()
+        options.RunOpt()
 
         Dim sliceMask As New cvb.Mat
         If task.mouseMovePoint = New cvb.Point Then task.mouseMovePoint = New cvb.Point(dst2.Width / 2, dst2.Height)
@@ -964,7 +964,7 @@ Public Class Structured_TransformV : Inherits VB_Parent
 
         Return sliceMask
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim sliceMask = createSliceMaskV()
 
         histSide.Run(task.pointCloud.SetTo(0, Not sliceMask))
@@ -996,7 +996,7 @@ Public Class Structured_CountSide : Inherits VB_Parent
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         slice.Run(src)
         dst2 = slice.dst3
 
@@ -1041,7 +1041,7 @@ Public Class Structured_CountSideSum : Inherits VB_Parent
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of points found in each slice of the point cloud data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         cvb.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cvb.Mat, dst2, 2, task.bins2D, task.rangesSide)
         dst2.Col(0).SetTo(0)
 
@@ -1100,8 +1100,8 @@ Public Class Structured_SliceV : Inherits VB_Parent
         FindCheckBox("Top View (Unchecked Side View)").Checked = True
         desc = "Find and isolate planes using the top view histogram data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.mouseMovePoint = New cvb.Point Then task.mouseMovePoint = New cvb.Point(dst2.Width / 2, dst2.Height)
         Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
@@ -1146,8 +1146,8 @@ Public Class Structured_SliceH : Inherits VB_Parent
     Public Sub New()
         desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         heat.Run(src)
 
@@ -1191,7 +1191,7 @@ Public Class Structured_SurveyH : Inherits VB_Parent
         labels(3) = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice."
         desc = "Mark each horizontal slice with a separate color.  Y-Range determines how thick the slice is."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         cvb.Cv2.CalcHist({src}, task.channelsSide, New cvb.Mat, dst3, 2, task.bins2D, task.rangesSide)
@@ -1238,7 +1238,7 @@ Public Class Structured_SurveyV : Inherits VB_Parent
         labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."
         desc = "Mark each vertical slice with a separate color.  X-Range determines how thick the slice is."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         cvb.Cv2.CalcHist({src}, task.channelsTop, New cvb.Mat, dst3, 2, task.bins2D, task.rangesTop)
@@ -1286,8 +1286,8 @@ Public Class Structured_MultiSlicePolygon : Inherits VB_Parent
         labels(3) = "ApproxPolyDP 4-corner object from FindContours input"
         desc = "Detect polygons in the multiSlice output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         multi.Run(src)
         dst2 = Not multi.dst3
@@ -1321,7 +1321,7 @@ Public Class Structured_Crosshairs : Inherits VB_Parent
     Public Sub New()
         desc = "Connect vertical and horizontal dots that are in the same column and row."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim xLines = sCloud.options.indexX
         Dim yLines = CInt(xLines * dst2.Width / dst2.Height)
         If sCloud.options.indexX > xLines Then sCloud.options.indexX = xLines - 1

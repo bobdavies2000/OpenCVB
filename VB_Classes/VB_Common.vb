@@ -17,12 +17,6 @@ Public Module vbc
     Public algorithmNames As New List(Of String)
     Public algorithmTimes As New List(Of DateTime)
     Public algorithmStack As New Stack()
-    Public Function FindFrm(title As String) As System.Windows.Forms.Form
-        For Each frm In Application.OpenForms
-            If frm.text = title Then Return frm
-        Next
-        Return Nothing
-    End Function
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj
@@ -105,6 +99,12 @@ Public Module vbc
         task.metersPerPixel = task.MaxZmeters / task.WorkingRes.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
     End Sub
+    Public Function FindFrm(title As String) As System.Windows.Forms.Form
+        For Each frm In Application.OpenForms
+            If frm.text = title Then Return frm
+        Next
+        Return Nothing
+    End Function
 End Module
 
 

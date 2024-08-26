@@ -31,9 +31,9 @@ Public Class MatchShapes_Basics : Inherits VB_Parent
         Next
         Return maxIndex
     End Function
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
-        match.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        match.RunOpt()
 
         If standaloneTest() Then
             dst2 = dst0.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
@@ -75,8 +75,8 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Parent
         labels = {"", "", "Output of RedCloud_Hulls", "Cells similar to selected cell"}
         desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standaloneTest() Then
             hulls.Run(task.color)
@@ -129,8 +129,8 @@ Public Class MatchShapes_Nearby : Inherits VB_Parent
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
         desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim myStandalone = standaloneTest() Or runStandalone
 
@@ -190,8 +190,8 @@ Public Class MatchShapes_Hulls : Inherits VB_Parent
         labels = {"", "", "Output of RedCloud_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         hulls.Run(src)
         dst2 = hulls.dst2
@@ -225,8 +225,8 @@ Public Class MatchShapes_Contours : Inherits VB_Parent
         labels = {"", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         redC.Run(src)
         dst2 = redC.dst2

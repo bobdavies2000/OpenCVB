@@ -7,7 +7,7 @@ Public Class OpAuto_XRange : Inherits VB_Parent
         labels(2) = "Optimized top view to show as many samples as possible."
         desc = "Automatically adjust the X-Range option of the pointcloud to maximize visible pixels"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim expectedCount = task.depthMask.CountNonZero
 
         Dim diff = Math.Abs(expectedCount - adjustedCount)
@@ -56,7 +56,7 @@ Public Class OpAuto_YRange : Inherits VB_Parent
         labels(2) = "Optimized side view to show as much as possible."
         desc = "Automatically adjust the Y-Range option of the pointcloud to maximize visible pixels"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim expectedCount = task.depthMask.CountNonZero
 
         Dim diff = Math.Abs(expectedCount - adjustedCount)
@@ -119,7 +119,7 @@ Public Class OpAuto_FloorCeiling : Inherits VB_Parent
 
         If Math.Abs(mean(1)) > task.yRange / 4 Then dst1 = mask Or dst1
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim pad As Single = 0.05 ' pad the estimate by X cm's
 
         dst2 = src.Clone
@@ -160,8 +160,8 @@ Public Class OpAuto_Valley : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim desiredBoundaries = options.desiredBoundaries
 
         ' input should be a histogram.  If not, get one...
@@ -224,8 +224,8 @@ Public Class OpAuto_Peaks2D : Inherits VB_Parent
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim desiredBoundaries = options.desiredBoundaries
         Dim peakDistance = options.peakDistance
 
@@ -265,7 +265,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static boundarySlider = FindSlider("Desired boundary count")
         Dim desiredBoundaries = boundarySlider.value
 
@@ -318,7 +318,7 @@ Public Class OpAuto_PixelDifference : Inherits VB_Parent
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If not task.heartBeat And task.frameCount > 10 Then Exit Sub
         If standaloneTest() Then
             diff.Run(src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
@@ -352,7 +352,7 @@ Public Class OpAuto_MSER : Inherits VB_Parent
     Public Sub New()
         desc = "Option Automation: find the best MSER max and min area values"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static minSlider = FindSlider("MSER Min Area")
         Static maxSlider = FindSlider("MSER Max Area")
         If standaloneTest() Then

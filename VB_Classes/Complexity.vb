@@ -6,8 +6,8 @@ Public Class Complexity_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Plot all the available complexity runs."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        complex.options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        complex.options.RunOpt()
 
         Dim saveLatestFile = complex.options.filename.FullName
 
@@ -96,8 +96,8 @@ Public Class Complexity_PlotOpenCV : Inherits VB_Parent
         dst2 = plot.dst2.Clone
         Return maxTime
     End Function
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         maxFrameCount = 0
         plot.srcX.Clear()
@@ -127,8 +127,8 @@ Public Class Complexity_Dots : Inherits VB_Parent
     Public Sub New()
         desc = "Plot the results of multiple runs at various resolutions."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If fileName <> "" Then options.filename = New FileInfo(fileName)
         Dim contents = My.Computer.FileSystem.ReadAllText(options.filename.FullName)

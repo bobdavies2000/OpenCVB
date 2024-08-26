@@ -5,6 +5,7 @@ Imports System.Text.RegularExpressions
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VB_Classes
+Imports CS_Classes
 Imports System.Management
 Imports cvext = OpenCvSharp.Extensions
 Imports System.ComponentModel
@@ -1487,7 +1488,11 @@ Public Class Main_UI
             AlgorithmTestAllCount += 1
             drawRect = New cvb.Rect
             Dim task = New VBtask(parms)
-            textDesc = task.desc
+            Static algolist As algorithmList = New algorithmList
+
+            task.algorithmObject = algolist.createAlgorithm(parms.algName)
+            textDesc = task.algorithmObject.desc
+
             intermediateReview = ""
 
             If ComplexityTimer.Enabled = False Then
@@ -1635,22 +1640,22 @@ Public Class Main_UI
                 Dim spanWait = New TimeSpan(elapsedWaitTicks)
                 task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
                 Dim updatedDrawRect = task.drawRect
-                If parms.algName.EndsWith("_CS") Then
-                    Static findCSharp = New CS_Classes.CSAlgorithmList()
+                'If parms.algName.EndsWith("_CS") Then
+                '    Static findCSharp = New CS_Classes.CSAlgorithmList()
 
-                    If task.csAlgorithmObject Is Nothing Then
-                        task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)
-                        task.desc = task.csAlgorithmObject.desc
-                    End If
-                End If
+                '    If task.csAlgorithmObject Is Nothing Then
+                '        task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)
+                '        task.desc = task.csAlgorithmObject.desc
+                '    End If
+                'End If
 
-                If parms.algName.EndsWith("_CPP") Then
-                    Static findCPP = New CPP_AlgorithmList()
-                    If task.cppAlgorithmObject Is Nothing Then
-                        task.cppAlgorithmObject = findCPP.createCPPAlgorithm(parms.algName)
-                        'task.desc = task.cppAlgorithmObject.desc
-                    End If
-                End If
+                'If parms.algName.EndsWith("_CPP") Then
+                '    Static findCPP = New CPP_AlgorithmList()
+                '    If task.cppAlgorithmObject Is Nothing Then
+                '        task.cppAlgorithmObject = findCPP.createCPPAlgorithm(parms.algName)
+                '        'task.desc = task.cppAlgorithmObject.desc
+                '    End If
+                'End If
 
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 textDesc = task.desc

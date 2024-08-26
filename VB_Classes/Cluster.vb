@@ -11,7 +11,7 @@ Public Class Cluster_Basics : Inherits VB_Parent
         FindSlider("Min Distance to next").Value = 10
         desc = "Group the points based on their proximity to each other."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
         If standalone Then
             feat.Run(src)
@@ -83,7 +83,7 @@ Public Class Cluster_Hulls : Inherits VB_Parent
     Public Sub New()
         desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
 
         feat.Run(src)
@@ -124,7 +124,7 @@ Public Class Cluster_RedCloud : Inherits VB_Parent
     Public Sub New()
         desc = "Cluster the center points of the RedCloud cells"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)

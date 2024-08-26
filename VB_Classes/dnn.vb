@@ -31,7 +31,7 @@ Public Class DNN_Test : Inherits VB_Parent
         labels(3) = "Input Image"
         desc = "Download and use a Caffe database"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
 
         Dim image = cvb.Cv2.ImRead(task.HomeDir + "Data/space_shuttle.jpg")
         dst3 = image.Resize(dst3.Size())
@@ -88,8 +88,8 @@ Public Class DNN_Basics : Inherits VB_Parent
         desc = "Use OpenCV's dnn from Caffe file."
         labels(2) = "Cropped Input Image - must be square!"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If dnnPrepared Then
             Dim inScaleFactor As Single = options.ScaleFactor / options.scaleMax ' should be 0.0078 by default...
@@ -181,8 +181,8 @@ Public Class DNN_SuperRes : Inherits VB_Parent
         labels(2) = "Output of a resize using OpenCV"
         desc = "Get better super-resolution through a DNN"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If saveModelFile <> options.superResModelFileName Then
             saveModelFile = options.superResModelFileName
             multiplier = options.superResMultiplier
@@ -221,7 +221,7 @@ Public Class DNN_SuperResize : Inherits VB_Parent
         labels(3) = "dst3 = dst2 - src or no difference - honors original"
         desc = "Compare superRes reduced to original size"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         super.Run(src)
         Dim r = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
         Dim tmp As New cvb.Mat

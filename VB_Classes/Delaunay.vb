@@ -10,7 +10,7 @@ Public Class Delaunay_Basics : Inherits VB_Parent
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat And standalone Then
             randEnum.Run(empty)
             inputPoints = New List(Of cvb.Point2f)(randEnum.points)
@@ -51,7 +51,7 @@ Public Class Delaunay_SubDiv : Inherits VB_Parent
         FindSlider("Random Pixel Count").Value = 100
         desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then If not task.heartBeat Then Exit Sub
         Dim subdiv As New cvb.Subdiv2D(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
         random.Run(empty)
@@ -102,7 +102,7 @@ Public Class Delaunay_Subdiv2D : Inherits VB_Parent
         labels(3) = "Voronoi facets for the same subdiv2D"
         desc = "Generate random points and divide the image around those points."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If not task.heartBeat Then Exit Sub ' too fast otherwise...
         dst2.SetTo(0)
         Dim points = Enumerable.Range(0, 100).Select(Of cvb.Point2f)(
@@ -159,7 +159,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits VB_Parent
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region."}
         desc = "Create a region in an image for each point provided without using KNN."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() And task.heartBeat Then
             random.Run(empty)
             inputPoints = New List(Of cvb.Point2f)(random.PointList)
@@ -213,7 +213,7 @@ Public Class Delaunay_Generations : Inherits VB_Parent
         FindSlider("Random Pixel Count").Value = 10
         desc = "Create a region in an image for each point provided"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.heartBeat Then Random.Run(empty)
             inputPoints = New List(Of cvb.Point2f)(random.PointList)
@@ -267,7 +267,7 @@ Public Class Delaunay_ConsistentColor : Inherits VB_Parent
         labels(3) = "Inconsistent colors in dst2 are duplicate randomCellColor output."
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat And standalone Then
             randEnum.Run(empty)
             inputPoints = New List(Of cvb.Point2f)(randEnum.points)
@@ -319,7 +319,7 @@ Public Class Delaunay_Contours : Inherits VB_Parent
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat And standalone Then
             randEnum.Run(empty)
             inputPoints = New List(Of cvb.Point2f)(randEnum.points)

@@ -9,8 +9,8 @@ Public Class TransformationMatrix_Basics : Inherits VB_Parent
         labels = {"", "", "View from above the camera", "View from side of the camera"}
         desc = "Show the contents of the transformation matrix"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.transformationMatrix IsNot Nothing Then
             Dim t = task.transformationMatrix

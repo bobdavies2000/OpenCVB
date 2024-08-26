@@ -15,7 +15,7 @@ Public Class Entropy_Basics : Inherits VB_Parent
         If r.Y + r.Height >= task.WorkingRes.Height Then r.Y = task.WorkingRes.Height - r.Height - 1
         Return r
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim stdSize = 30
         If task.drawRect = New cvb.Rect Then
             task.drawRect = New cvb.Rect(30, 30, stdSize, stdSize) ' arbitrary rectangle
@@ -52,7 +52,7 @@ Public Class Entropy_Highest : Inherits VB_Parent
         labels(2) = "Highest entropy marked with red rectangle"
         desc = "Find the highest entropy section of the color image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim entropyMap = New cvb.Mat(src.Size(), cvb.MatType.CV_32F)
         Dim entropyList(task.gridList.Count - 1) As Single
         Dim maxEntropy As Single = Single.MinValue
@@ -101,7 +101,7 @@ Public Class Entropy_FAST : Inherits VB_Parent
         labels = {"", "", "Output of Corners_FAST, input to entropy calculation", "Lighter color is higher entropy, highlight shows highest"}
         desc = "Use FAST markings to add to entropy"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fast.Run(src)
 
         entropy.Run(fast.dst2)
@@ -128,7 +128,7 @@ Public Class Entropy_Rectangle : Inherits VB_Parent
         Next
         Return channelEntropy
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim dimensions() = New Integer() {task.histogramBins}
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
 
@@ -173,7 +173,7 @@ Public Class Entropy_SubDivisions : Inherits VB_Parent
         Next
         desc = "Find the highest entropy in each quadrant"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = task.color.Clone
         For i = 0 To task.subDivisionCount - 1
             entropies(i).Clear()
@@ -231,7 +231,7 @@ Public Class Entropy_BinaryImage : Inherits VB_Parent
     Public Sub New()
         desc = "Measure entropy in a binary image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         binary.Run(src)
         dst2 = binary.dst2
         labels(2) = binary.labels(2)

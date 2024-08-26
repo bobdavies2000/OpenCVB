@@ -6,7 +6,7 @@ Public Class Triangle_Basics : Inherits VB_Parent
         labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -48,7 +48,7 @@ Public Class Triangle_HullContour : Inherits VB_Parent
         labels = {"", "Selected cell", "RedCloud_Basics output", "Selected contour"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
         If task.redCells.Count <= 1 Then Exit Sub
@@ -83,7 +83,7 @@ Public Class Triangle_RedCloud : Inherits VB_Parent
         labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst0 = redC.dst0
         dst1 = redC.dst1
@@ -126,7 +126,7 @@ Public Class Triangle_Cell : Inherits VB_Parent
         labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         If task.redCells.Count <= 1 Then Exit Sub
@@ -182,7 +182,7 @@ Public Class Triangle_Mask : Inherits VB_Parent
         desc = "Given a RedCloud cell, resize it and show the points with depth."
     End Sub
 
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         If task.redCells.Count <= 1 Then Exit Sub

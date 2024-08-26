@@ -8,8 +8,8 @@ Public Class Dither_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": use local options to control which method is used.")
         desc = "Explore all the varieties of dithering"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         Dim w = dst2.Width
         Dim h = dst2.Height

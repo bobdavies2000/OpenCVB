@@ -4,7 +4,7 @@ Public Class VB_Controls_CSharp : Inherits VB_Parent
     Public Sub New()
         desc = "Access form controls from C#"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         SetTrueText("The Controls_Basics algorithm is to support FindSlider/FindCheckBox/FindRadio from C#" + vbCrLf +
                     "It has no output...")
     End Sub
@@ -21,7 +21,7 @@ Public Class VB_Controls_CSharp : Inherits VB_Parent
         If task.testAllRunning = False Then measureStartRun(csCode.traceName)
 
         trueData.Clear()
-        If task.paused = False Then csCode.RunCS(src)
+        If task.paused = False Then csCode.RunAlg(src)
         If task.testAllRunning = False Then measureEndRun(csCode.traceName)
     End Sub
     Public Sub CS_SetSlider(opt As String, val As Integer)

@@ -11,8 +11,8 @@ Public Class Contour_Basics : Inherits VB_Parent
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         colorClass.Run(src)
         dst2 = colorClass.dst2
@@ -60,7 +60,7 @@ Public Class Contour_General : Inherits VB_Parent
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             If Not task.heartBeat Then Exit Sub
             rotatedRect.Run(src)
@@ -105,8 +105,8 @@ Public Class Contour_GeneralWithOptions : Inherits VB_Parent
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standaloneTest() Then
             If Not task.heartBeat Then Exit Sub
@@ -149,7 +149,7 @@ Public Class Contour_RotatedRects : Inherits VB_Parent
         labels(3) = "Find contours of several rotated rects"
         desc = "Demo options on FindContours."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim imageInput As New cvb.Mat
         rotatedRect.Run(src)
         imageInput = rotatedRect.dst2
@@ -196,8 +196,8 @@ Public Class Contour_RemoveLines : Inherits VB_Parent
         Next
         Return tour
     End Function
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = image.Resize(dst2.Size)
         dst3 = dst2.Clone
@@ -242,7 +242,7 @@ Public Class Contour_Edges : Inherits VB_Parent
     Public Sub New()
         desc = "Create contours for Edge_MotionAccum"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         edges.Run(src)
         dst2 = edges.dst2
 
@@ -285,7 +285,7 @@ Public Class Contour_SidePoints : Inherits VB_Parent
     Private Function vec3fToString(v As cvb.Vec3f) As String
         Return Format(v(0), fmt3) + vbTab + Format(v(1), fmt3) + vbTab + Format(v(2), fmt3)
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rc
@@ -335,7 +335,7 @@ Public Class Contour_Foreground : Inherits VB_Parent
         labels = {"", "", "Kmeans foreground output", "Contour of foreground"}
         desc = "Build a contour for the foreground"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         km.Run(task.pcSplit(2))
         dst2 = km.dst2
 
@@ -374,7 +374,7 @@ Public Class Contour_Sorted : Inherits VB_Parent
         task.gOptions.pixelDiffThreshold = 25
         desc = "Display the contours from largest to smallest in the motion output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         diff.Run(src)
         erode.Run(diff.dst2) ' remove solo points.
 
@@ -418,7 +418,7 @@ Public Class Contour_Outline : Inherits VB_Parent
     Public Sub New()
         desc = "Create a simplified contour of the selected cell"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         Dim ptList As List(Of cvb.Point) = rc.contour
@@ -455,7 +455,7 @@ Public Class Contour_SelfIntersect : Inherits VB_Parent
     Public Sub New()
         desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             redC.Run(src)
             dst2 = redC.dst2
@@ -500,8 +500,8 @@ Public Class Contour_Largest : Inherits VB_Parent
         labels = {"", "", "Input to FindContours", "Largest single contour in the input image."}
         desc = "Create a mask from the largest contour of the input."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If standaloneTest() Then
             If task.heartBeat Then
                 rotatedRect.Run(src)
@@ -551,8 +551,8 @@ Public Class Contour_Compare : Inherits VB_Parent
     Public Sub New()
         desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         redC.Run(src)
         dst2 = redC.dst2
@@ -585,7 +585,7 @@ Public Class Contour_RedCloudCorners : Inherits VB_Parent
         labels(2) = "The RedCloud Output with the highlighted contour to smooth"
         desc = "Find the point farthest from the center in each cell."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             redC.Run(src)
             dst2 = redC.dst2
@@ -636,7 +636,7 @@ Public Class Contour_RedCloudEdges : Inherits VB_Parent
         labels = {"", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         labels(2) = redC.redC.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
@@ -663,7 +663,7 @@ Public Class Contour_RedCloud : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Show all the contours found in the RedCloud output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -687,7 +687,7 @@ Public Class Contour_CompareToFeatureless : Inherits VB_Parent
         labels = {"", "", "Contour_WholeImage output", "FeatureLess_Basics output"}
         desc = "Compare Contour_WholeImage and FeatureLess_Basics."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         contour.Run(src)
         dst2 = contour.dst2
 
@@ -709,7 +709,7 @@ Public Class Contour_Smoothing : Inherits VB_Parent
         labels(3) = "The white outline is the truest contour while the red is the selected approximation."
         desc = "Compare contours of the selected cell. Cells are offset to help comparison."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -743,9 +743,9 @@ Public Class Contour_RC_AddContour : Inherits VB_Parent
     Public Sub New()
         desc = "Find the contour for the src."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If myFrameCount <> task.frameCount Then
-            options.RunVB() ' avoid running options more than once per frame.
+            options.RunOpt() ' avoid running options more than once per frame.
             myFrameCount = task.frameCount
         End If
 
@@ -787,9 +787,9 @@ Public Class Contour_Gray : Inherits VB_Parent
     Public Sub New()
         desc = "Find the contour for the src."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If myFrameCount <> task.frameCount Then
-            options.RunVB() ' avoid running options more than once per frame.
+            options.RunOpt() ' avoid running options more than once per frame.
             myFrameCount = task.frameCount
         End If
 
@@ -827,7 +827,7 @@ Public Class Contour_WholeImage : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find the top X contours by size and display them."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         contour.Run(src)
         Dim sortedContours As New SortedList(Of Integer, List(Of cvb.Point))(New compareAllowIdenticalIntegerInverted)
         For Each tour In contour.contourlist
@@ -860,8 +860,8 @@ Public Class Contour_DepthTiers : Inherits VB_Parent
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         task.pcSplit(2).ConvertTo(dst1, cvb.MatType.CV_32S, 100 / optionsTiers.cmPerTier, 1)
 
@@ -909,7 +909,7 @@ Public Class Contour_FromPoints : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Create a contour from some random points"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             random.Run(src)
             dst2.SetTo(0)

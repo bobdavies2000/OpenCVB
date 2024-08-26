@@ -10,8 +10,8 @@ Public Class BlurMotion_Basics : Inherits VB_Parent
         blurAngleSlider = FindSlider("Motion Blur Angle")
         desc = "Use Filter2D to create a motion blur"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If standaloneTest() Then
             blurAngleSlider.Value = If(blurAngleSlider.Value < blurAngleSlider.Maximum, blurAngleSlider.Value + 1, blurAngleSlider.Minimum)
         End If
@@ -113,8 +113,8 @@ Public Class BlurMotion_Deblur : Inherits VB_Parent
         labels(2) = "Blurred Image Input"
         labels(3) = "Deblurred Image Output"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        mblur.Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        mblur.Options.RunOpt()
 
         If task.heartBeat Then mblur.options.redoCheckBox.Checked = True
         If mblur.options.redoCheckBox.Checked Then

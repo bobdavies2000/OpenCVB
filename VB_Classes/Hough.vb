@@ -8,8 +8,8 @@ Public Class Hough_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Use Houghlines to find lines in the image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         edges.Run(src)
 
         segments = cvb.Cv2.HoughLines(edges.dst2, options.rho, options.theta, options.threshold)
@@ -47,7 +47,7 @@ Public Class Hough_Circles : Inherits VB_Parent
         labels(3) = "Hough Circles found"
         desc = "Find circles using HoughCircles."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         circles.Run(src)
         dst2 = circles.dst2
         cvb.Cv2.CvtColor(dst2, dst3, cvb.ColorConversionCodes.BGR2GRAY)
@@ -79,8 +79,8 @@ Public Class Hough_Lines_MT : Inherits VB_Parent
         desc = "Multithread Houghlines to find lines in image fragments."
     End Sub
 
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         edges.Run(src)
         dst2 = edges.dst2
 
@@ -121,8 +121,8 @@ Public Class Hough_Featureless : Inherits VB_Parent
         labels(2) = "Featureless mask"
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         edges.Run(src)
 
@@ -168,8 +168,8 @@ Public Class Hough_FeatureLessTopX : Inherits VB_Parent
         labels = {"", "", "Areas without features", "Areas with features"}
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Static segSlider = FindSlider("Minimum feature pixels")
         Dim minSegments = segSlider.Value
@@ -217,7 +217,7 @@ Public Class Hough_LaneFinder : Inherits VB_Parent
         labels = {"Original video image", "Mask to isolate lane regions", "Combined yellow and white masks", "HoughLines output"}
         desc = "Use Hough to isolate features in the mask of the road."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hls.Run(empty)
         If task.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
@@ -264,7 +264,7 @@ Public Class Hough_Sudoku : Inherits VB_Parent
     Public Sub New()
         desc = "Successful use of Hough to find lines in Sudoku grid."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = cvb.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
         dst3 = dst2.Clone
         hough.Run(dst2)

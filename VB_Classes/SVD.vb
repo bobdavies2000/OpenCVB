@@ -4,7 +4,7 @@ Public Class SVD_Example : Inherits VB_Parent
     Public Sub New()
         desc = "SVD example"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim inputData() As Single = {
             1, 2, 3, 4, 5,
             1, 2, 3, 4, 5,
@@ -47,7 +47,7 @@ Public Class SVD_Example2 : Inherits VB_Parent
     Public Sub New()
         desc = "Compute the mean and tangent of a RedCloud Cell"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -101,7 +101,7 @@ Public Class SVD_Gaussian : Inherits VB_Parent
     Public Sub New()
         desc = "Compute the SVD for the covariance of 2 images - only close to working..."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         covar.Run(src)
         dst2 = src
 

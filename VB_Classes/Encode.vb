@@ -7,8 +7,8 @@ Public Class Encode_Basics : Inherits VB_Parent
         labels(2) = "absDiff with original"
         labels(3) = "Original decompressed"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If task.FirstPass Then FindSlider("Encode Output Scaling").Value = 10
 
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
@@ -35,8 +35,8 @@ Public Class Encode_Scaling : Inherits VB_Parent
     Public Sub New()
         desc = "JPEG Encoder"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
 

@@ -46,8 +46,8 @@ Public Class Smoothing_Exterior : Inherits VB_Parent
         labels(3) = ""
         desc = "Smoothing the line connecting a series of points."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        smOptions.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        smOptions.RunOpt()
         If standaloneTest() Then
             If task.heartBeat And Not task.paused Then
                 Dim hullList = hull.buildRandomHullPoints()
@@ -124,8 +124,8 @@ Public Class Smoothing_Interior : Inherits VB_Parent
         labels(3) = ""
         desc = "Smoothing the line connecting a series of points staying inside the outline."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If standaloneTest() Then
             If task.heartBeat And task.paused = False Then
                 Dim hullList = hull.buildRandomHullPoints()

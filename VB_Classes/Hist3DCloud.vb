@@ -12,7 +12,7 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Parent
         labels(2) = "dst2 = backprojection of pointcloud (8UC1 format)."
         desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim bins = task.redOptions.HistBinBar3D.Value
@@ -65,7 +65,7 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Parent
         labels(3) = "X to Y histogram (upper left), X to Z (upper right), and Y to Z (bottom)."
         desc = "Plot the 3 histograms of the depth data dimensions"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         For i = 0 To 2
             hist(i).Run(task.pcSplit(i))
             mats1.mat(i) = hist(i).dst2.Clone
@@ -99,7 +99,7 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
     Public Sub New()
         desc = "Plot the 3D histogram of the depth data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim bins = task.redOptions.HistBinBar3D.Value
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
@@ -161,8 +161,8 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Parent
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim bins = task.redOptions.HistBinBar3D.Value
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
@@ -205,7 +205,7 @@ Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Parent
         labels(2) = "The 3D histogram of the pointcloud data stream - note the number of gaps"
         desc = "Present the 3D histogram as a typical histogram bar chart."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
         hcloud.Run(src)
         ReDim histArray(hcloud.histogram.Total - 1)

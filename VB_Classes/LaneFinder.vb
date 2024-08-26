@@ -7,7 +7,7 @@ Public Class LaneFinder_Basics : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lane.Run(src)
         dst0 = lane.dst0
         dst1 = lane.dst1
@@ -32,8 +32,8 @@ Public Class LaneFinder_Videos : Inherits VB_Parent
         video.options.fileInfo = New FileInfo(inputfile.FullName)
         desc = "Read in the videos showing road conditions."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.optionsChanged Then
             Dim inputfile = New FileInfo(task.HomeDir + options.inputName)
@@ -57,7 +57,7 @@ Public Class LaneFinder_Edges : Inherits VB_Parent
     Public Sub New()
         desc = "Using the videos provided, find the lane markers."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         input.Run(empty)
         dst0 = input.dst2
         edges.Run(dst0)
@@ -79,7 +79,7 @@ Public Class LaneFinder_HLSColor : Inherits VB_Parent
         labels = {"HLS color conversion", "InRange White", "InRange Yellow", "Combined InRange White and InRange Yellow results"}
         desc = "Isolate the colors for the white and yellow"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         input.Run(empty)
         dst0 = input.dst2.CvtColor(cvb.ColorConversionCodes.BGR2HLS)
         dst1 = dst0.InRange(New cvb.Scalar(0, 200, 0), New cvb.Scalar(255, 255, 255))
@@ -103,7 +103,7 @@ Public Class LaneFinder_ROI : Inherits VB_Parent
         labels = {"Original input", "Mask showing ROI", "HLS version with ROI outline", "HLS Mask with ROI outline"}
         desc = "Define the ROI for the location of the lanes"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hls.Run(empty)
 
         If task.optionsChanged Then
@@ -146,7 +146,7 @@ Public Class LaneFinder_SlopeIntercept : Inherits VB_Parent
     Public Sub New()
         desc = "Use the Hough lines found to build a slope intercept format line."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hough.Run(empty)
         dst0 = hough.dst0
         dst1 = hough.dst2

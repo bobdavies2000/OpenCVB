@@ -7,8 +7,8 @@ Public Class Correlation_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": there are several local options panels.")
         desc = "Compute a correlation for src rows (See also: Match.vb"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         kFlood.Run(src)
         dst1 = kFlood.dst2

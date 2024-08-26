@@ -6,7 +6,7 @@ Public Class LinearRegression_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "A simple example of using OpenCV's linear regression."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             x = New List(Of Single)({1, 2, 3, 4, 5})
             y = New List(Of Single)({2, 4, 5, 4, 5})
@@ -47,7 +47,7 @@ Public Class LinearRegression_Test : Inherits VB_Parent
     Public Sub New()
         desc = "A simple example of using OpenCV's linear regression."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim x As New List(Of Single)({1, 2, 3, 4, 5})
         Dim y As New List(Of Single)({2, 4, 5, 4, 5})
 
@@ -75,7 +75,7 @@ Public Class LinearRegression_Random : Inherits VB_Parent
     Public Sub New()
         desc = "A simple example of using OpenCV's linear regression."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         random.Run(Nothing)
 
         regress.x.Clear()

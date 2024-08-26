@@ -7,7 +7,7 @@ Public Class Flood_Basics : Inherits VB_Parent
         task.redOptions.setIdentifyCells(True)
         desc = "Build the RedCloud cells with the grayscale input."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then
             If color Is Nothing Then color = New Color8U_Basics
             color.Run(src)
@@ -51,7 +51,7 @@ Public Class Flood_CellStatsPlot : Inherits VB_Parent
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         flood.Run(src)
 
         stats.Run(src)
@@ -81,7 +81,7 @@ Public Class Flood_ContainedCells : Inherits VB_Parent
         task.redOptions.setIdentifyCells(True)
         desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             flood.Run(src)
             dst2 = flood.dst2
@@ -131,7 +131,7 @@ Public Class Flood_BasicsMask : Inherits VB_Parent
         labels(3) = "The inputMask used to limit how much of the image is processed."
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Or buildInputMask Then
             cvt.Run(src)
             inputMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
@@ -168,7 +168,7 @@ Public Class Flood_Tiers : Inherits VB_Parent
         task.redOptions.setIdentifyCells(True)
         desc = "Subdivide the Flood_Basics cells using depth tiers."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim tier = task.gOptions.DebugSliderValue
 
         tiers.Run(src)
@@ -210,7 +210,7 @@ Public Class Flood_Motion : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             flood.Run(src)
             redCells = New List(Of rcData)(task.redCells)
@@ -255,7 +255,7 @@ Public Class Flood_Motion1 : Inherits VB_Parent
     Public Sub New()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             flood.Run(src)
             redCells = New List(Of rcData)(task.redCells)
@@ -304,7 +304,7 @@ Public Class Flood_LeftRight : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Floodfill left and right images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.redCells = New List(Of rcData)(cellsLeft)
         task.cellMap = mapLeft.Clone
 
@@ -358,7 +358,7 @@ Public Class Flood_MaxDistPoints : Inherits VB_Parent
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         cvt.Run(src)
         redCPP.Run(cvt.dst2)
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.

@@ -30,9 +30,9 @@ Public Class DFT_Basics : Inherits VB_Parent
         labels(2) = "Image after inverse DFT"
         labels(3) = "DFT_Basics Spectrum Magnitude"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         grayMat = src
-        If src.Channels() = 3 Then grayMat = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then grayMat = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         rows = cvb.Cv2.GetOptimalDFTSize(grayMat.Rows)
         cols = cvb.Cv2.GetOptimalDFTSize(grayMat.Cols)
@@ -83,8 +83,8 @@ Public Class DFT_Inverse : Inherits VB_Parent
         labels(2) = "Image after Inverse DFT"
         desc = "Take the inverse of the Discrete Fourier Transform."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+    Public Sub RunAlg(src As cvb.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cvb.Mat
         src.ConvertTo(gray32f, cvb.MatType.CV_32F)
         Dim planes() = {gray32f, New cvb.Mat(gray32f.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))}
@@ -123,8 +123,8 @@ Public Class DFT_ButterworthFilter_MT : Inherits VB_Parent
         labels(2) = "Image with Butterworth Low Pass Filter Applied"
         labels(3) = "Same filter with radius / 2"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         dft.Run(src)
 
         If task.optionsChanged Then
@@ -169,8 +169,8 @@ Public Class DFT_ButterworthDepth : Inherits VB_Parent
         labels(2) = "Image with Butterworth Low Pass Filter Applied"
         labels(3) = "Same filter with radius / 2"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        bfilter.Run(task.depthRGB.CvtColor(cvb.ColorConversionCodes.BGR2Gray))
+    Public Sub RunAlg(src As cvb.Mat)
+        bfilter.Run(task.depthRGB.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
         dst2 = bfilter.dst2
         dst3 = bfilter.dst3
     End Sub
@@ -202,8 +202,8 @@ Public Class DFT_Shapes : Inherits VB_Parent
         labels = {"Inverse of the DFT - the same grayscale input.", "", "Input to the DFT", "Discrete Fourier Transform Output"}
         desc = "Show the spectrum magnitude for some standard shapes"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Static frm = FindFrm("Options_DFTShape Radio Buttons")
         Select Case findRadioText(frm.check)

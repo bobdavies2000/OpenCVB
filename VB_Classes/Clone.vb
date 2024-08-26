@@ -12,7 +12,7 @@ Public Class Clone_Basics : Inherits VB_Parent
         desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
         task.drawRect = New cvb.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim mask As New cvb.Mat(src.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         If task.drawRect = New cvb.Rect Then
             mask.SetTo(255)
@@ -44,8 +44,8 @@ Public Class Clone_ColorChange : Inherits VB_Parent
         labels(3) = "Mask used for clone"
         desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         clone.cloneSpec = 0
         clone.colorChangeValues = New cvb.Point3f(options.blueChange, options.greenChange, options.redChange)
@@ -66,8 +66,8 @@ Public Class Clone_IlluminationChange : Inherits VB_Parent
         labels(3) = "Mask used for clone"
         desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cvb.Vec2f(options.alpha, options.beta)
@@ -89,8 +89,8 @@ Public Class Clone_TextureFlattening : Inherits VB_Parent
         labels(3) = "mask used for clone"
         desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cvb.Vec2f(options.lowThreshold, options.highThreshold)
@@ -133,8 +133,8 @@ Public Class Clone_Eagle : Inherits VB_Parent
         labels(3) = "Source image and source mask."
         desc = "Clone an eagle into the video stream."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src.Clone()
         If task.mouseClickFlag Then
@@ -160,8 +160,8 @@ Public Class Clone_Seamless : Inherits VB_Parent
         labels(3) = "Mask for Clone"
         desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim center As New cvb.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100

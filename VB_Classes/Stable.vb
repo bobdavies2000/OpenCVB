@@ -7,7 +7,7 @@ Public Class Stable_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Maintain the generation counts around the feature points."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             good.Run(src)
             facetGen.inputPoints = New List(Of cvb.Point2f)(good.featurePoints)
@@ -64,7 +64,7 @@ Public Class Stable_BasicsCount : Inherits VB_Parent
     Public Sub New()
         desc = "Track the stable good features found in the BGR image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         basics.facetGen.inputPoints = New List(Of cvb.Point2f)(task.features)
         basics.Run(src)
@@ -99,7 +99,7 @@ Public Class Stable_Lines : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Track the line end points found in the BGR image and keep those that are stable."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
 
         basics.facetGen.inputPoints.Clear()
@@ -138,7 +138,7 @@ Public Class Stable_FAST : Inherits VB_Parent
         FindSlider("FAST Threshold").Value = 100
         desc = "Track the FAST feature points found in the BGR image and track those that appear stable."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fast.Run(src)
 
         basics.facetGen.inputPoints.Clear()
@@ -176,7 +176,7 @@ Public Class Stable_GoodFeatures : Inherits VB_Parent
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Track the stable good features found in the BGR image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         dst3 = basics.dst3
         If task.features.Count = 0 Then Exit Sub ' nothing to work on...

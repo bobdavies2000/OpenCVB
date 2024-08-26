@@ -10,7 +10,7 @@ Public Class Keyboard_Basics : Inherits VB_Parent
         labels(2) = "Use the Options form to send in keystrokes"
         desc = "Test the keyboard interface available to all algorithms"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() And checkKeys.inputText.Count > 0 Then
             For Each txt In checkKeys.inputText
                 flow.nextMsg += txt.ToString()

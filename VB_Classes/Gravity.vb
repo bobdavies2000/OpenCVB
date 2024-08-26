@@ -23,7 +23,7 @@ Public Class Gravity_Basics : Inherits VB_Parent
         DrawLine(dst2, vec.p1, vec.p2, cvb.Scalar.White)
         DrawLine(dst3, vec.p1, vec.p2, cvb.Scalar.White)
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
 
         Dim resolution = task.quarterRes
@@ -98,7 +98,7 @@ Public Class Gravity_BasicsOriginal : Inherits VB_Parent
         Next
         Return New cvb.Point
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
@@ -134,7 +134,7 @@ Public Class Gravity_HorizonCompare : Inherits VB_Parent
         horizon.autoDisplay = True
         desc = "Collect results from Horizon_Basics with Gravity_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         gravity.Run(src)
         Dim g1 = gravity.vec
         Dim h1 = gravity.vec
@@ -173,11 +173,11 @@ Public Class Gravity_Horizon : Inherits VB_Parent
         labels(2) = "Gravity vector in yellow and Horizon vector in red."
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        gravity.RunVB(src)
+    Public Sub RunAlg(src As cvb.Mat)
+        gravity.RunAlg(src)
         If gravity.vec.p2.Y > 0 Or gravity.vec.p1.Y > 0 Then task.gravityVec = gravity.vec ' don't update if not found
 
-        horizon.RunVB(src)
+        horizon.RunAlg(src)
         If task.FirstPass Then lastVec = horizon.vec
         If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
         If lastVec IsNot Nothing And horizon.vec.p1.Y = 0 Then horizon.vec = lastVec

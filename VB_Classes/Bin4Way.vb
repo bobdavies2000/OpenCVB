@@ -15,7 +15,7 @@ Public Class Bin4Way_Basics : Inherits VB_Parent
                       "Quartiles for the selected grid element, darkest to lightest"}
         desc = "Highlight the contours for each grid element with stats for each."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static index = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         If task.mousePicTag = 1 Then index = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         Dim roiSave = If(index < task.gridList.Count, task.gridList(index), New cvb.Rect)
@@ -112,7 +112,7 @@ Public Class Bin4Way_Canny : Inherits VB_Parent
         labels(2) = "Edges between halves, lightest, darkest, and the combo"
         desc = "Find edges from each of the binarized images"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
 
         binary.Run(src)
 
@@ -153,7 +153,7 @@ Public Class Bin4Way_Sobel : Inherits VB_Parent
         labels(3) = "Click any quadrant in dst2 to view it in dst3"
         desc = "Collect Sobel edges from binarized images"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         binary.Run(src)
 
         edges.Run(binary.mats.mat(0)) ' the light and dark halves
@@ -187,7 +187,7 @@ Public Class Bin4Way_Unstable1 : Inherits VB_Parent
     Public Sub New()
         desc = "Find the unstable pixels in the binary image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         binary.Run(src)
         dst2 = binary.dst2
         diff.Run(binary.dst3)
@@ -210,7 +210,7 @@ Public Class Bin4Way_UnstableEdges : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Find unstable pixels but remove those that are also edges."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         canny.Run(src)
         blur.Run(canny.dst2)
         dst1 = blur.dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
@@ -235,7 +235,7 @@ Public Class Bin4Way_UnstablePixels : Inherits VB_Parent
     Public Sub New()
         desc = "Identify the unstable grayscale pixel values "
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         unstable.Run(src)
@@ -300,7 +300,7 @@ Public Class Bin4Way_SplitValley : Inherits VB_Parent
         labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
         desc = "Binarize an image using the valleys provided by HistValley_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
 
         binary.Run(gray)
@@ -335,7 +335,7 @@ Public Class Bin4Way_UnstablePixels1 : Inherits VB_Parent
         task.gOptions.setHistogramBins(256)
         desc = "Identify the unstable grayscale pixel values "
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         hist.Run(src)
@@ -418,7 +418,7 @@ Public Class Bin4Way_SplitGaps : Inherits VB_Parent
         labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
         desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
 
         unstable.Run(gray)
@@ -458,7 +458,7 @@ Public Class Bin4Way_RegionsLeftRight : Inherits VB_Parent
         labels = {"", "", "Left in in 4 colors", "Right image in 4 colors"}
         desc = "Add the 4-way split of left and right views."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         binaryLeft.Run(src)
 
         dst0.SetTo(1, binaryLeft.mats.mat(0))
@@ -493,7 +493,7 @@ Public Class Bin4Way_Regions1 : Inherits VB_Parent
         labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
         desc = "Binarize an image and split it into quartiles using peaks."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
 
         binary.Run(gray)
@@ -526,7 +526,7 @@ Public Class Bin4Way_BasicsColors : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Test Bin4Way_Basics with different src inputs."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         color.Run(src)
         quart.Run(color.dst3)
         dst1 = quart.dst1
@@ -552,7 +552,7 @@ Public Class Bin4Way_Unstable : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find the unstable pixels in the binary image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         binary.Run(src)
         dst2 = binary.dst2
         dst3.SetTo(0)
@@ -576,7 +576,7 @@ Public Class Bin4Way_BasicsRed : Inherits VB_Parent
         labels(3) = "Grayscale histogram of the image with markers showing where each quarter of the samples are."
         desc = "Implement a 4-way split similar to the Bin3Way_Basics algorithm."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim bins = task.histogramBins
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
@@ -629,8 +629,8 @@ Public Class Bin4Way_RedCloud : Inherits VB_Parent
         flood.showSelected = False
         desc = "Identify the lightest and darkest regions separately and then combine the rcData."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
@@ -681,7 +681,7 @@ Public Class Bin4Way_Regions : Inherits VB_Parent
             binary.mats.mat(i) = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC1, 0)
         Next
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         binary.Run(src)
         If dst2.Width <> binary.mats.mat(0).Width Then rebuildMats()
 
@@ -710,7 +710,7 @@ Public Class Bin4Way_SplitMean : Inherits VB_Parent
         labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
         desc = "Binarize an image and split it into quartiles using peaks."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
 
         binary.Run(gray)

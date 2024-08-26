@@ -13,7 +13,7 @@ Public Class FeatureROI_Basics : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst1 = If(src.Channels() <> 1, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), src.Clone)
         stdevList.Clear()
         meanList.Clear()
@@ -62,7 +62,7 @@ Public Class FeatureROI_Color : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim stdevList0 As New List(Of Single)
         Dim stdevList1 As New List(Of Single)
         Dim stdevList2 As New List(Of Single)
@@ -105,7 +105,7 @@ Public Class FeatureROI_Canny : Inherits VB_Parent
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Create the stdev grid with the input image, then create the stdev grid for the canny output, then combine them."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         canny.Run(src)
         dst3 = canny.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
@@ -136,8 +136,8 @@ Public Class FeatureROI_Sorted : Inherits VB_Parent
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
         desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim meanS As cvb.Scalar, stdev As cvb.Scalar
         sortedStd.Clear()
@@ -211,7 +211,7 @@ Public Class FeatureROI_ColorSplit : Inherits VB_Parent
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Split each roi into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red - based on the stdev for the roi"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         devGrid.Run(src)
 
         For i = 0 To devGrid.bgrList.Count - 1
@@ -244,8 +244,8 @@ Public Class FeatureROI_Correlation : Inherits VB_Parent
         FindSlider("Feature Correlation Threshold").Value = 90
         desc = "Use the grid-based correlations with the previous image to determine if there was camera motion"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst1 = If(src.Channels() <> 1, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
@@ -286,7 +286,7 @@ Public Class FeatureROI_LowStdev : Inherits VB_Parent
     Public Sub New()
         desc = "Isolate the roi's with low stdev"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst1 = If(src.Channels() <> 1, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
@@ -317,8 +317,8 @@ Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Parent
         FindSlider("Feature Correlation Threshold").Value = 50
         desc = "Display the correlation coefficients for roi's with low standard deviation."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst1 = If(src.Channels() <> 1, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
@@ -367,7 +367,7 @@ Public Class FeatureROI_LR : Inherits VB_Parent
     Public Sub New()
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         gLeft.Run(task.leftView)
         dst2 = gLeft.dst2
         labels(2) = CStr(gLeft.rects.Count) + " roi's had above average standard deviation in the left image"
@@ -399,8 +399,8 @@ Public Class FeatureROI_LRClick : Inherits VB_Parent
         ClickPoint = pt
         picTag = _pictag
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst0 = src.Clone
         dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
@@ -473,8 +473,8 @@ Public Class FeatureROI_LRAll : Inherits VB_Parent
         labels(3) = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images."
         desc = "Find all the roi's with high stdev and high correlation between left and right images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
         src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)

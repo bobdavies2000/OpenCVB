@@ -6,8 +6,8 @@ Public Class Mesh_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Build triangles from the ptList input of points."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src
         If task.heartBeat And standaloneTest() Then
@@ -53,7 +53,7 @@ Public Class Mesh_Features : Inherits VB_Parent
         UpdateAdvice(traceName + ": Use 'Options_Features' to update results.")
         desc = "Build triangles from feature points"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         If task.features.Count < 3 Then Exit Sub
         mesh.ptList = task.features

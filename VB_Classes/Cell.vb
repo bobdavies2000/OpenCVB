@@ -61,7 +61,7 @@ Public Class Cell_Basics : Inherits VB_Parent
             'End If
         End If
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
             redC.Run(src)
             dst2 = redC.dst2
@@ -87,7 +87,7 @@ Public Class Cell_PixelCountCompare : Inherits VB_Parent
         task.gOptions.DebugChecked = True
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -126,7 +126,7 @@ Public Class Cell_ValidateColorCells : Inherits VB_Parent
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -177,7 +177,7 @@ Public Class Cell_Distance : Inherits VB_Parent
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
         desc = "Measure the color distance of each cell to the selected cell."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Or task.quarterBeat Then
             redC.Run(src)
             dst0 = task.color
@@ -221,7 +221,7 @@ Public Class Cell_Binarize : Inherits VB_Parent
         labels = {"", "Binarized image", "", "Relative gray image"}
         desc = "Separate the image into light and dark using RedCloud cells"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst0 = src
         If task.heartBeat Or task.quarterBeat Then
             redC.Run(src)
@@ -260,7 +260,7 @@ Public Class Cell_Floodfill : Inherits VB_Parent
     Public Sub New()
         desc = "Provide cell stats on the flood_basics cells."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         flood.Run(src)
 
         stats.Run(src)
@@ -299,7 +299,7 @@ Public Class Cell_BasicsPlot : Inherits VB_Parent
         stats.statsString()
         strOut = stats.strOut
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
             redC.Run(src)
             dst2 = redC.dst2
@@ -335,7 +335,7 @@ Public Class Cell_Stable : Inherits VB_Parent
         labels(3) = "Below are cells that were not exact matches."
         desc = "Identify cells which were NOT present in the previous generation."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -374,7 +374,7 @@ Public Class Cell_Generate : Inherits VB_Parent
         task.redCells = New List(Of rcData)
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             If bounds Is Nothing Then bounds = New Boundary_RemovedRects
             bounds.Run(src)

@@ -4,8 +4,8 @@ Public Class Brightness_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Implement a brightness effect"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         dst2 = src.ConvertScaleAbs(Options.brightness, Options.contrast)
         labels(3) = "Brightness level = " + CStr(Options.contrast)
@@ -24,8 +24,8 @@ Public Class Brightness_HSV : Inherits VB_Parent
         labels(3) = "HSV image"
         desc = "Implement the brightness effect for HSV images"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst3 = src.CvtColor(cvb.ColorConversionCodes.BGR2HSV)
         Dim hsv64 As New cvb.Mat

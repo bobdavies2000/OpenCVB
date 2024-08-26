@@ -7,7 +7,7 @@ Public Class RedTrack_Basics : Inherits VB_Parent
         If task.WorkingRes <> New cvb.Size(168, 94) Then task.frameHistoryCount = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         stats.Run(src)
         labels = stats.labels
@@ -34,7 +34,7 @@ Public Class RedTrack_Lines : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
 
         If task.heartBeat Or task.motionFlag Then dst3.SetTo(0)
@@ -80,7 +80,7 @@ Public Class RedTrack_LineSingle : Inherits VB_Parent
         Next
         Return bestIndex
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         track.Run(src)
         dst0 = track.redC.dst0
         dst1 = track.redC.dst1
@@ -135,7 +135,7 @@ Public Class RedTrack_FeaturesKNN : Inherits VB_Parent
         labels = {"", "", "Output of Feature_Basics", "Grid of points to measure motion."}
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         dst2 = feat.dst2
 
@@ -169,7 +169,7 @@ Public Class RedTrack_GoodCell : Inherits VB_Parent
         FindSlider("Feature Sample Size").Value = 100
         desc = "Track the cells that have good features"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
 
@@ -194,7 +194,7 @@ Public Class RedTrack_GoodCells : Inherits VB_Parent
     Public Sub New()
         desc = "Track the cells that have good features"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2.Clone
 
@@ -234,7 +234,7 @@ Public Class RedTrack_GoodCellInput : Inherits VB_Parent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
         desc = "Use KNN to find good features to track"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static distSlider = FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
@@ -269,7 +269,7 @@ Public Class RedTrack_Points : Inherits VB_Parent
         labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
 
         dst3.SetTo(0)
@@ -304,7 +304,7 @@ Public Class RedTrack_Features : Inherits VB_Parent
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
         desc = "Similar to RedTrack_KNNPoints"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
 
         If task.heartBeat Then dst2.SetTo(0)

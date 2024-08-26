@@ -33,8 +33,9 @@ Public Class VB_Parent : Implements IDisposable
     Public traceName As String
     Public desc As String
     Public black As New cvb.Vec3b, white As New cvb.Vec3b(255, 255, 255), grayColor As New cvb.Vec3b(127, 127, 127)
-    Public yellow = New cvb.Vec3b(0, 255, 255), purple = New cvb.Vec3b(255, 0, 255), teal = New cvb.Vec3b(255, 255, 0)
-    Public red = New cvb.Vec3b(0, 0, 255), green = New cvb.Vec3b(0, 255, 0), blue = New cvb.Vec3b(255, 0, 0)
+    Public yellow As New cvb.Vec3b(0, 255, 255), purple As New cvb.Vec3b(255, 0, 255)
+    Public teal As New cvb.Vec3b(255, 255, 0)
+    Public red As New cvb.Vec3b(0, 0, 255), green As New cvb.Vec3b(0, 255, 0), blue As New cvb.Vec3b(255, 0, 0)
     Public zero3f As New cvb.Point3f(0, 0, 0)
     Public newVec4f As New cvb.Vec4f
     Public cPtr As IntPtr
@@ -559,8 +560,8 @@ Public Class VB_Parent : Implements IDisposable
             DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
         Next
     End Sub
-    Public Sub DrawCircle(dst As cvb.Mat, pt As cvb.Point2f, radius As Integer, color As cvb.Scalar)
-        dst.Circle(pt, radius, color, -1, task.lineType)
+    Public Sub DrawCircle(dst As cvb.Mat, pt As cvb.Point2f, radius As Integer, color As cvb.Scalar, Optional fillFlag As Integer = -1)
+        dst.Circle(pt, radius, color, fillFlag, task.lineType)
     End Sub
     Public Sub DrawPolkaDot(pt As cvb.Point2f, dst As cvb.Mat)
         dst.Circle(pt, task.DotSize + 2, cvb.Scalar.White, -1, task.lineType)
@@ -591,7 +592,7 @@ Public Class VB_Parent : Implements IDisposable
         Return New cvb.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))
     End Function
-    Public Function QuickRandomPoints(howMany As Integer) As List(Of cvb.Point2f)
+    Public Function quickRandomPoints(howMany As Integer) As List(Of cvb.Point2f)
         Dim srcPoints As New List(Of cvb.Point2f)
         Dim w = task.WorkingRes.Width
         Dim h = task.WorkingRes.Height
@@ -622,7 +623,7 @@ Public Class VB_Parent : Implements IDisposable
         combo.Dispose()
     End Sub
     Public Sub processFrame(src As cvb.Mat)
-        algorithm.Run(src)
+        task.algorithmObject.Run(src)
         task.labels = labels
 
         task.dst0 = dst0
@@ -667,7 +668,7 @@ Public Class VB_Parent : Implements IDisposable
         If task.testAllRunning = False Then measureStartRun(traceName)
 
         task.trueData.Clear()
-        If task.paused = False Then algorithm.RunVB(src)
+        If task.paused = False Then Algorithm.RunAlg(src)
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
     Public Sub DrawContour(dst As cvb.Mat, contour As List(Of cvb.Point), color As cvb.Scalar, Optional lineWidth As Integer = -10)
@@ -682,7 +683,7 @@ Public Class VB_Parent : Implements IDisposable
         Dim listOfPoints = New List(Of List(Of cvb.Point))({polyPoints})
         cvb.Cv2.DrawContours(result, listOfPoints, 0, color, 2)
     End Sub
-    Public Sub detectFace(ByRef src As cvb.Mat, cascade As cvb.CascadeClassifier)
+    Public Sub DetectFace(ByRef src As cvb.Mat, cascade As cvb.CascadeClassifier)
         Dim gray = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Dim faces() = cascade.DetectMultiScale(gray, 1.08, 3, cvb.HaarDetectionTypes.ScaleImage, New cvb.Size(30, 30))
         For Each fface In faces

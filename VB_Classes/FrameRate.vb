@@ -5,7 +5,7 @@ Public Class FrameRate_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Compare each frame to its last to figure out which frames really changed for each invocation."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static lastImages() As cvb.Mat = {task.color.Clone, task.leftview.Clone,
                                          task.rightview.Clone, task.depthRGB.Clone}
         For i = 0 To frameCounts.Count - 1
@@ -41,7 +41,7 @@ Public Class FrameRate_BasicsGray : Inherits VB_Parent
     Public Sub New()
         desc = "Compare each frame to its last to figure out which frames really changed for each invocation."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static lastImages() As cvb.Mat = {task.color.Clone, task.leftview.Clone,
                                          task.rightview.Clone, task.depthRGB.Clone}
         For i = 0 To frameCounts.Count - 1

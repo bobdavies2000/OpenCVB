@@ -5,7 +5,7 @@ Public Class Palette_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
 
         If src.Type = cvb.MatType.CV_32F Then
@@ -35,8 +35,8 @@ Public Class Palette_Color : Inherits VB_Parent
     Public Sub New()
         desc = "Define a color Using sliders."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         dst2.SetTo(New cvb.Scalar(options.blueS, options.greenS, options.redS))
         dst3.SetTo(New cvb.Scalar(255 - options.blueS, 255 - options.greenS, 255 - options.redS))
         labels(2) = "Color (RGB) = " + CStr(options.blueS) + " " + CStr(options.greenS) + " " + CStr(options.redS)
@@ -60,7 +60,7 @@ Public Class Palette_LinearPolar : Inherits VB_Parent
             sliders.setupTrackBar("LinearPolar radius", 0, dst2.Cols, dst2.Cols / 2)
         End If
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static radiusSlider = FindSlider("LinearPolar radius")
         Dim radius = radiusSlider.Value ' msRNG.next(0, dst2.Cols)
 
@@ -70,7 +70,7 @@ Public Class Palette_LinearPolar : Inherits VB_Parent
             dst2.Row(i).SetTo(New cvb.Scalar(c, c, c))
         Next
 
-        rotateOptions.RunVB()
+        rotateOptions.RunOpt()
 
         dst3.SetTo(0)
         If rotateOptions.warpFlag = cvb.InterpolationFlags.WarpInverseMap Then radiusSlider.Value = radiusSlider.Maximum
@@ -92,7 +92,7 @@ Public Class Palette_Reduction : Inherits VB_Parent
         desc = "Map colors To different palette"
         labels(2) = "Reduced Colors"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst3 = reduction.dst2
 
@@ -108,7 +108,7 @@ Public Class Palette_DrawTest : Inherits VB_Parent
     Public Sub New()
         desc = "Experiment With palette Using a drawn image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         draw.Run(src)
         dst2 = ShowPalette(draw.dst2)
     End Sub
@@ -125,7 +125,7 @@ Public Class Palette_Gradient : Inherits VB_Parent
         labels(3) = "From And To colors"
         desc = "Create gradient image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             If standaloneTest() Then
                 ' every 30 frames try a different pair of random colors.
@@ -159,7 +159,7 @@ Public Class Palette_DepthColorMap : Inherits VB_Parent
         labels(3) = "Palette used To color left image"
         desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static cvtScaleSlider = FindSlider("Convert And Scale")
         If task.optionsChanged Then
             gColor.color1 = cvb.Scalar.Yellow
@@ -206,7 +206,7 @@ Public Class Palette_RGBDepth : Inherits VB_Parent
     Public Sub New()
         desc = "Build a colormap that best shows the depth.  NOTE: duplicate of Palette_DepthColorMap but no slider."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.optionsChanged Then
             gColor.color1 = cvb.Scalar.Yellow
             gColor.color2 = cvb.Scalar.Red
@@ -241,7 +241,7 @@ Public Class Palette_Layout2D : Inherits VB_Parent
     Public Sub New()
         desc = "Layout the available colors in a 2D grid"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim index As Integer
         For Each r In task.gridList
             dst2(r).SetTo(task.scalarColors(index Mod 256))
@@ -262,7 +262,7 @@ Public Class Palette_LeftRightImages : Inherits VB_Parent
     Public Sub New()
         desc = "Use a palette with the left and right images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = ShowPalette(task.leftView.ConvertScaleAbs)
         dst3 = ShowPalette(task.rightView.ConvertScaleAbs)
     End Sub
@@ -273,7 +273,7 @@ Public Class Palette_TaskColors : Inherits VB_Parent
         labels = {"", "", "ScalarColors", "VecColors"}
         desc = "Display that task.scalarColors and task.vecColors"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.gridSize <= 10 Then direction *= -1
         If task.gridSize >= 100 Then direction *= -1
 
@@ -328,7 +328,7 @@ Public Class Palette_Create : Inherits VB_Parent
         Next
         Return result
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static transitionSlider = FindSlider("Color Transitions")
         Dim colorTransitionCount = transitionSlider.Value
 
@@ -379,7 +379,7 @@ Public Class Palette_Random : Inherits VB_Parent
 
         desc = "Build a random colorGrad - no smooth transitions."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         cvb.Cv2.ApplyColorMap(src, dst2, colorMap)
     End Sub
 End Class
@@ -400,7 +400,7 @@ Public Class Palette_Variable : Inherits VB_Parent
         originalColorMap = colorGrad.Clone
         desc = "Build a new palette for every frame."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         For i = 0 To colors.Count - 1
             colorGrad.Set(Of cvb.Vec3b)(0, i, colors(i))
         Next
@@ -422,7 +422,7 @@ Public Class Palette_RandomColorMap : Inherits VB_Parent
         labels(3) = "Generated colormap"
         desc = "Build a random colormap that smoothly transitions colors"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static paletteSlider = FindSlider("Color transitions")
         If transitionCount <> paletteSlider.Value Then
             transitionCount = paletteSlider.Value
@@ -460,7 +460,7 @@ Public Class Palette_LoadColorMap : Inherits VB_Parent
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.optionsChanged Or colorMap.Rows <> 256 Then
             labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
             Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
@@ -501,7 +501,7 @@ Public Class Palette_CustomColorMap : Inherits VB_Parent
         End If
         desc = "Apply the provided color map to the input image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If colorMap Is Nothing Then
             SetTrueText("With " + traceName + " the colorMap must be provided.  Update the ColorMap Mat and then call Run(src)...")
             Exit Sub
@@ -526,7 +526,7 @@ Public Class Palette_GrayToColor : Inherits VB_Parent
     Public Sub New()
         desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         Dim pixels As New List(Of Byte)
@@ -571,7 +571,7 @@ Public Class Palette_Bin4Way : Inherits VB_Parent
         labels = {"", "", "CV_8U data is below", "Palettized version of dst2 at left"}
         desc = "Create a colorized representation of the 4-way bin split with and without depth tiers."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         binary.Run(src)
 
         dst2.SetTo(0)

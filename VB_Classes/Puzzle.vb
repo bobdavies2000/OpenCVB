@@ -12,7 +12,7 @@ Public Class Puzzle_Basics : Inherits VB_Parent
         Dim r As Random = New Random()
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         unscrambled.Clear()
         Dim inputROI As New List(Of cvb.Rect)
         For j = 0 To task.gridList.Count - 1
@@ -52,8 +52,8 @@ Public Class Puzzle_Solver : Inherits VB_Parent
         labels = {"", "", "Puzzle Input", "Puzzle Solver Output - missing pieces can result from identical cells (usually bright white)"}
         desc = "Solve the puzzle using matchTemplate"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.optionsChanged Or options.startPuzzle Then
             puzzle.Run(src)
@@ -90,7 +90,7 @@ Public Class Puzzle_SolverDynamic : Inherits VB_Parent
         labels = {"", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical."}
         desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         puzzle.puzzle.image = src.Clone
         puzzle.grayMat = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         puzzle.Run(src)

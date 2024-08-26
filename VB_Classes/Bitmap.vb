@@ -7,7 +7,7 @@ Public Class Bitmap_ToMat : Inherits VB_Parent
         labels(3) = "Convert Mat to bitmap and then back to Mat"
         desc = "Convert a color and grayscale bitmap to a cvb.Mat"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim bitmap = New Bitmap(task.HomeDir + "opencv/Samples/Data/lena.jpg")
         dst2 = cvb.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)
 

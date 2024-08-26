@@ -7,8 +7,8 @@ Public Class Resize_Basics : Inherits VB_Parent
         desc = "Resize with different options and compare them"
         labels(2) = "Rectangle highlight above resized"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         If task.drawRect.Width <> 0 Then
             src = src(task.drawRect)
@@ -31,8 +31,8 @@ Public Class Resize_Smaller : Inherits VB_Parent
     Public Sub New()
         desc = "Resize by a percentage of the image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         newSize = New cvb.Size(Math.Ceiling(src.Width * options.resizePercent), Math.Ceiling(src.Height * options.resizePercent))
 
@@ -56,8 +56,8 @@ Public Class Resize_Preserve : Inherits VB_Parent
         FindSlider("Resize Percentage (%)").Minimum = 100
         desc = "Decrease the size but preserve the full image size."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
         newSize = New cvb.Size(Math.Ceiling(src.Width * options.resizePercent), Math.Ceiling(src.Height * options.resizePercent))
 
         dst0 = src.Resize(newSize, cvb.InterpolationFlags.Nearest).SetTo(0)
@@ -83,9 +83,9 @@ Public Class Resize_Proportional : Inherits VB_Parent
     Public Sub New()
         desc = "Resize the input but keep the results proportional to the original."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            options.RunVB()
+            options.RunOpt()
             dst2 = options.runRedCloud(labels(2))
             src = src(task.rc.rect)
         End If

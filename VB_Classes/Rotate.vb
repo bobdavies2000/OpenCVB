@@ -12,9 +12,9 @@ Public Class Rotate_Basics : Inherits VB_Parent
         rotateCenter = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Rotate a rectangle by a specified angle"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
-        optionsRotate.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        optionsRotate.RunOpt()
 
         rotateAngle = optionsRotate.rotateAngle
         M = cvb.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
@@ -39,7 +39,7 @@ Public Class Rotate_BasicsQT : Inherits VB_Parent
         rotateCenter = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Rotate a rectangle by a specified angle"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim M = cvb.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
         dst2 = src.WarpAffine(M, src.Size(), cvb.InterpolationFlags.Nearest)
     End Sub
@@ -58,7 +58,7 @@ Public Class Rotate_Box : Inherits VB_Parent
         labels(3) = "Same Rectangle in the new warped perspective"
         desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         rotation.Run(src)
         dst3 = dst2.Clone()
 
@@ -101,8 +101,8 @@ Public Class Rotate_Poly : Inherits VB_Parent
         labels = {"", "", "Triangle before rotation", "Triangle after rotation"}
         desc = "Rotate a triangle around a center of rotation"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        optionsFPoly.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        optionsFPoly.RunOpt()
 
         If options.changeCheck.Checked Or task.FirstPass Then
             rPoly.Clear()
@@ -140,7 +140,7 @@ Public Class Rotate_PolyQT : Inherits VB_Parent
         labels = {"", "", "Polygon before rotation", ""}
         desc = "Rotate a triangle around a center of rotation"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             dst2.SetTo(0)
             dst3.SetTo(0)
@@ -193,7 +193,7 @@ Public Class Rotate_Example : Inherits VB_Parent
         rotate.rotateAngle = -90
         desc = "Reminder on how to rotate an image and keep all the pixels."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim r = New cvb.Rect(0, 0, src.Height, src.Height)
         dst2(r) = src.Resize(New cvb.Size(src.Height, src.Height))
         rotate.Run(dst2)
@@ -231,7 +231,7 @@ Public Class Rotate_Horizon : Inherits VB_Parent
 
         Return New cvb.Point2f(xNew, yNew)
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         rotate.Run(src)
         dst2 = rotate.dst2.Clone
         dst1 = dst2.Clone
@@ -270,7 +270,7 @@ Public Class Rotate_Verticalize : Inherits VB_Parent
         FindRadio("Nearest (preserves pixel values best)").Checked = True
         desc = "Use gravity vector to rotate the image to be vertical"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then angleSlider.Value = task.verticalizeAngle
         rotate.Run(src)
         dst2 = rotate.dst2

@@ -9,8 +9,8 @@ Public Class Tracker_Basics : Inherits VB_Parent
         If task.testAllRunning Then task.drawRect = New cvb.Rect(25, 25, 25, 25)
         desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 

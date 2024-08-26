@@ -7,8 +7,8 @@ Public Class Area_MinTriangle_CPP_VB : Inherits VB_Parent
     Public Sub New()
         desc = "Find minimum containing triangle for a set of points."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If task.heartBeat Then
             srcPoints = New List(Of cvb.Point2f)(options.srcPoints)
         Else
@@ -67,10 +67,10 @@ Public Class Area_MinMotionRect : Inherits VB_Parent
         Next
         Return gray
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         bgSub.Run(src)
         Dim gray As cvb.Mat
-        If bgSub.dst2.Channels() = 1 Then gray = bgSub.dst2 Else gray = bgSub.dst2.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If bgSub.dst2.Channels() = 1 Then gray = bgSub.dst2 Else gray = bgSub.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         dst2 = motionRectangles(gray, task.vecColors)
         dst2.SetTo(cvb.Scalar.All(255), gray)
     End Sub
@@ -89,7 +89,7 @@ Public Class Area_FindNonZero : Inherits VB_Parent
         labels(3) = "Non-zero original points"
         desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             src = New cvb.Mat(src.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
             Dim srcPoints(100 - 1) As cvb.Point ' doesn't really matter how many there are.
@@ -132,7 +132,7 @@ Public Class Area_SoloPoints : Inherits VB_Parent
     Public Sub New()
         desc = "Find the solo points in the pointcloud histograms for top and side views."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hotTop.Run(src)
         dst2 = hotTop.dst3
 
@@ -161,11 +161,11 @@ Public Class Area_MinRect : Inherits VB_Parent
     Public Sub New()
         desc = "Find minimum containing rectangle for a set of points."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If Not task.heartBeat Then Exit Sub
-            options.RunVB()
-            inputPoints = QuickRandomPoints(options.numPoints)
+            options.RunOpt()
+            inputPoints = quickRandomPoints(options.numPoints)
         End If
 
         minRect = cvb.Cv2.MinAreaRect(inputPoints.ToArray)

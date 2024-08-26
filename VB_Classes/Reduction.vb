@@ -6,7 +6,7 @@ Public Class Reduction_Basics : Inherits VB_Parent
         task.redOptions.enableReductionSliders(True)
         desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
 
         If task.redOptions.reductionType = "Use Bitwise Reduction" Then
@@ -45,7 +45,7 @@ Public Class Reduction_Floodfill : Inherits VB_Parent
         task.redOptions.setBitReductionBar(32)
         desc = "Use the reduction output as input to floodfill to get masks of cells."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
         redC.Run(reduction.dst2)
@@ -73,7 +73,7 @@ Public Class Reduction_HeatMapLines : Inherits VB_Parent
         labels(3) = "Gravity rotated Top View width detected lines"
         desc = "Present both the top and side view to minimize pixel counts."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         heat.Run(src)
 
@@ -102,7 +102,7 @@ Public Class Reduction_PointCloud : Inherits VB_Parent
         labels = {"", "", "8-bit reduced depth", "Palettized output of the different depth levels found"}
         desc = "Use reduction to smooth depth data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pcSplit(2)
 
         src *= 255 / task.MaxZmeters
@@ -128,8 +128,8 @@ Public Class Reduction_XYZ : Inherits VB_Parent
         task.redOptions.setBitReductionBar(400)
         desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
         Dim split = src.Split()
@@ -164,7 +164,7 @@ Public Class Reduction_Edges : Inherits VB_Parent
         task.redOptions.checkSimpleReduction(True)
         desc = "Get the edges after reducing the image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2 * 255 / reduction.classCount
 
@@ -195,7 +195,7 @@ Public Class Reduction_Histogram : Inherits VB_Parent
         labels = {"", "", "Reduction image", "Histogram of the reduction"}
         desc = "Visualize a reduction with a histogram"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2 * 255 / reduction.classCount
 
@@ -216,7 +216,7 @@ Public Class Reduction_BGR : Inherits VB_Parent
     Public Sub New()
         desc = "Reduce BGR image in parallel"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim split = src.Split
 
         For i = 0 To 2

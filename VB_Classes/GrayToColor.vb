@@ -6,7 +6,7 @@ Public Class GrayToColor_Palette : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Identify the main colors in an image using RedCloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         flood.Run(src)
         dst2 = flood.dst2
         labels(2) = flood.labels(2)

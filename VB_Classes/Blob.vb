@@ -13,8 +13,8 @@ Public Class Blob_Basics : Inherits VB_Parent
         desc = "Isolate and list blobs with specified options"
     End Sub
 
-    Public Sub RunVB(src As Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standaloneTest() Then
             input.Run(src)
@@ -60,7 +60,7 @@ Public Class Blob_Input : Inherits VB_Parent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Generate data to test Blob Detector."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         rotatedRect.Run(src)
         Mats.mat(0) = rotatedRect.dst2
 
@@ -88,7 +88,7 @@ Public Class Blob_RenderBlobs : Inherits VB_Parent
         labels(3) = "Largest blob, centroid in yellow"
         desc = "Use connected components to find blobs."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.frameCount Mod input.updateFrequency = 0 Then
             input.Run(src)
             dst2 = input.dst2

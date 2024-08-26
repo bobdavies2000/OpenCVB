@@ -8,8 +8,8 @@ Public Class Image_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Load an image into OpenCVB"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         src = options.fullsizeImage
 
@@ -41,7 +41,7 @@ Public Class Image_Series : Inherits VB_Parent
         images.options.imageSeries = True
         desc = "Display a new image from the directory every heartbeat"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         ' to work on a specific file, specify it here.
         ' options.fileInputName = new fileinfo(task.HomeDir + "Images/train/103041.jpg")
         images.Run(images.options.fullsizeImage)
@@ -65,7 +65,7 @@ Public Class Image_RedCloudColor : Inherits VB_Parent
         task.gOptions.setDisplay1()
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         images.Run(empty)
         dst0 = images.dst2.Clone
         dst1 = images.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -95,7 +95,7 @@ Public Class Image_CellStats : Inherits VB_Parent
         task.redOptions.setUseColorOnly(True)
         desc = "Display the statistics for the selected cell"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.pointCloud.SetTo(0)
         task.pcSplit = task.pointCloud.Split()
 
@@ -127,8 +127,8 @@ Public Class Image_MSER : Inherits VB_Parent
         FindSlider("MSER Max Area").Value = 200000
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         images.Run(options.fullsizeImage)
         dst1 = images.dst2
@@ -150,7 +150,7 @@ Public Class Image_Icon : Inherits VB_Parent
         inputImage = New Bitmap(task.HomeDir + "/Main_UI/Data/OpenCVB.bmp")
         desc = "Create an icon from an image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If inputImage Is Nothing Then Exit Sub
         Dim iconHandle As IntPtr = inputImage.GetHicon()
         Dim icon As Icon = Icon.FromHandle(iconHandle)

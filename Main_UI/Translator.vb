@@ -194,20 +194,16 @@ Public Class Translator
                     If inline.Contains("IntPtr cPtr;") Then Continue For
                     If inline.Contains(className) Then inline = inline.Replace(className, className + "_CS")
                     If inline.Contains("VB_Parent") Then inline = inline.Replace("VB_Parent", "CS_Parent")
-                    If inline.Contains("RunVB(Mat") Then inline = inline.Replace("RunVB(Mat", "RunCS(Mat")
-                    If inline.Contains("RunVB(cvb.Mat") Then inline = inline.Replace("RunVB(cvb.Mat", "RunCS(Mat")
                     If inline.Contains(".GetSubRect(") Then inline = inline.Replace(".GetSubRect(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' .Get(
                     If inline.Contains(".Get(") Then inline = inline.Replace(".Get(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' 
                     If inline.Contains("public " + className + "_CS") And inline.EndsWith("()") Then
                         inline = inline.Replace("()", "(VBtask task) : base(task)")
                     End If
                     inline = inline.Replace("private ", "")
-                    inline = inline.Replace(" Run(Mat ", " RunCS(Mat ")
-                    inline = inline.Replace("RunCSharp(Mat ", "RunCS(Mat ")
+                    inline = inline.Replace(" Run(Mat ", " RunAlg(Mat ")
+                    inline = inline.Replace("RunAlgharp(Mat ", "RunAlg(Mat ")
                     inline = inline.Replace("Options_CS_", "Options_")
                     inline = inline.Replace("task.gOptions.FrameHistory.Value", "task.frameHistoryCount")
-                    inline = inline.Replace("options.RunCSharp", "options.RunVB")
-                    inline = inline.Replace("options.Run(", "options.RunVB(")
                     inline = inline.Replace("options;", "options")
                     inline = inline.Replace("Mat dst", "dst") ' Mat dst2 problem - should never need to be declared.
                     inline = inline.Replace("MCvScalar", "cvb.Scalar")
@@ -270,7 +266,7 @@ Public Class Translator
                     inline = inline.Replace("Round(", "Math.Round(")
                     inline = inline.Replace("Math.Math.", "Math.")
 
-                    inline = inline.Replace(" RunCS(src As Mat)", " RunVB(src As Mat)")
+                    inline = inline.Replace(" RunAlg(src As Mat)", " RunVB(src As Mat)")
                     inline = inline.Replace("Private ", "Dim ")
                     If inline.Contains(" Rect") Then
                         inline = inline.Replace(" Rect", " cvb.Rect")
@@ -293,7 +289,7 @@ Public Class Translator
                     inline = inline.Replace("options.", "options->")
                     inline = inline.Replace("standaloneTest()", "standalone")
                     inline = inline.Replace("_CS()", "_CPP() : CPP_Parent()")
-                    inline = inline.Replace("RunCS(", "Run(")
+                    inline = inline.Replace("RunAlg(", "Run(")
 
             End Select
 

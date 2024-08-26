@@ -5,7 +5,7 @@ Public Class Extrinsics_Basics : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.DotSizeSlider.Value = 5
         desc = "MatchShapes: Show the alignment of the BGR image to the left and right camera images."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = task.leftView
         dst3 = task.rightView
 
@@ -43,9 +43,9 @@ Public Class Extrinsics_Display : Inherits VB_Parent
         labels = {"", "", "Left Image", "Right Image"}
         desc = "MatchShapes: Build overlays for the left and right images on the BGR image"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
-        optTrans.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        optTrans.RunOpt()
 
         Dim rectLeft = New cvb.Rect(options.leftCorner - optTrans.leftTrans, options.topCorner, dst2.Width - 2 * options.leftCorner, dst2.Height - 2 * options.topCorner)
         Dim rectRight = New cvb.Rect(options.rightCorner - optTrans.rightTrans, options.topCorner, dst2.Width - 2 * options.rightCorner, dst2.Height - 2 * options.topCorner)

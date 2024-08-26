@@ -7,8 +7,8 @@ Public Class Salience_Basics_CPP_VB : Inherits VB_Parent
         cPtr = Salience_Open()
         desc = "Show results of Salience algorithm when using C++"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
@@ -32,7 +32,7 @@ Public Class Salience_Basics_MT : Inherits VB_Parent
         FindSlider("Salience numScales").Value = 2
         desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Dim threads = 32
         Dim h = CInt(src.Height / threads)

@@ -9,8 +9,8 @@ Public Class ApproxPoly_Basics : Inherits VB_Parent
         labels = {"", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP"}
         desc = "Using the input contours, create ApproxPoly output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standaloneTest() Then
             If task.heartBeat Then rotatedRect.Run(src)
@@ -48,7 +48,7 @@ Public Class ApproxPoly_FindandDraw : Inherits VB_Parent
         labels(3) = "FindandDraw output - note the change in line width where ApproxPoly differs from DrawContours"
         desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         rotatedRect.Run(src)
         dst2 = rotatedRect.dst2
         dst0 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -83,7 +83,7 @@ Public Class ApproxPoly_Hull : Inherits VB_Parent
         labels = {"", "", "Original Hull", "Hull after ApproxPoly"}
         desc = "Use ApproxPolyDP on a hull to show impact of options (which appears to be minimal - what is wrong?)"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hull.Run(src)
         dst2 = hull.dst2
 

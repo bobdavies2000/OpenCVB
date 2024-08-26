@@ -6,7 +6,7 @@ Public Class SuperPixel_Basics : Inherits VB_Parent
         labels(2) = "Super Pixel cells"
         desc = "A Better superpixel algorithm"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -29,8 +29,8 @@ Public Class SuperPixel_Basics_CPP_VB : Inherits VB_Parent
         labels(3) = "Superpixel label data (0-255)"
         desc = "Sub-divide the image into super pixels."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.optionsChanged Then
             If cPtr <> 0 Then SuperPixel_Close(cPtr)
@@ -74,7 +74,7 @@ Public Class SuperPixel_BinarizedImage : Inherits VB_Parent
         FindSlider("Number of SuperPixels").Value = 20 ' find the top 20 super pixels.
         desc = "Create SuperPixels from a binary image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         binarize.Run(src)
 
         pixels.Run(binarize.dst2)
@@ -94,7 +94,7 @@ Public Class SuperPixel_Depth : Inherits VB_Parent
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pixels.Run(task.depthRGB)
         dst2 = pixels.dst2
         dst3 = pixels.dst3
@@ -112,7 +112,7 @@ Public Class SuperPixel_WithCanny : Inherits VB_Parent
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         edges.Run(src)
         src = task.color.Clone()
         src.SetTo(cvb.Scalar.White, edges.dst2)
@@ -136,7 +136,7 @@ Public Class SuperPixel_WithLineDetector : Inherits VB_Parent
         labels(3) = "Input to superpixel basics."
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst3 = lines.dst2
         pixels.Run(dst3)

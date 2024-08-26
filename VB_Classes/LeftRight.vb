@@ -5,7 +5,7 @@ Public Class LeftRight_Basics : Inherits VB_Parent
         labels = {"", "", "Left camera image", If(task.cameraName = "Azure Kinect 4K", "No right image", "Right camera image")}
         desc = "Display the left and right views as they came from the camera."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = task.leftView
         dst3 = task.rightView
     End Sub
@@ -22,8 +22,8 @@ Public Class LeftRight_CompareRaw : Inherits VB_Parent
     Public Sub New()
         desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim r1 = New cvb.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight)
         Dim r2 = New cvb.Rect(0, 25, task.leftView.Width, options.sliceHeight)
@@ -46,7 +46,7 @@ Public Class LeftRight_Palettized : Inherits VB_Parent
         labels(2) = "Left Image"
         labels(3) = "Right Image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = ShowPalette(task.leftview)
         dst3 = ShowPalette(task.rightview)
     End Sub
@@ -67,7 +67,7 @@ Public Class LeftRight_BRISK : Inherits VB_Parent
         labels = {"", "", "Left Image", "Right Image"}
         desc = "Add color to the 8-bit infrared images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         brisk.Run(task.leftview)
         dst2 = brisk.dst2.Clone
 
@@ -89,7 +89,7 @@ Public Class LeftRight_Edges : Inherits VB_Parent
         labels(2) = "Left Image"
         labels(3) = "Right Image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         edges.Run(task.leftview)
         dst2 = edges.dst2
 
@@ -109,7 +109,7 @@ Public Class LeftRight_Reduction : Inherits VB_Parent
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Reduce both the left and right color images"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(task.leftview)
         dst2 = reduction.dst2.Clone
 
@@ -133,7 +133,7 @@ Public Class LeftRight_Markers : Inherits VB_Parent
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Use the left/right reductions to find hard markers - neighboring pixels of identical values"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redView.Run(src)
         dst2 = redView.reduction.dst3.Clone
         dst3 = redView.reduction.dst3.Clone
@@ -192,7 +192,7 @@ Public Class LeftRight_Markers1 : Inherits VB_Parent
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Use the left/right reductions to find markers - neighboring pixels of identical values"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redView.Run(src)
         dst0 = redView.dst2
         dst1 = redView.dst3
@@ -245,7 +245,7 @@ Public Class LeftRight_Lines : Inherits VB_Parent
         labels = {"", "", "Left camera lines", "Right camera lines"}
         desc = "Find the lines in the Left and Right images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(task.leftview)
         dst2 = lines.dst2.Clone
 
@@ -267,7 +267,7 @@ Public Class LeftRight_RedCloudRight : Inherits VB_Parent
         task.redOptions.setUseColorOnly(True)
         desc = "Segment the right view image with RedCloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(task.rightView)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -286,7 +286,7 @@ Public Class LeftRight_RedCloudLeft : Inherits VB_Parent
         task.redOptions.setUseColorOnly(True)
         desc = "Segment the left view image with RedCloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(task.leftView)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -306,7 +306,7 @@ Public Class LeftRight_RedCloudBoth : Inherits VB_Parent
     Public Sub New()
         desc = "Match cells in the left view to the right view - something is flipped here..."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         stRight.Run(empty)
         dst2 = stRight.dst2
         labels(2) = "Left view - " + stRight.labels(2)
@@ -327,7 +327,7 @@ Public Class LeftRight_Features : Inherits VB_Parent
     Public Sub New()
         desc = "Placeholder to make it easier to find FeatureLeftRight_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         dst2 = feat.dst2
         dst3 = feat.dst3

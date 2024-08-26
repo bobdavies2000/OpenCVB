@@ -42,7 +42,7 @@ Public Class CPP_Basics : Inherits VB_Parent
     Public Sub New()
     End Sub
 
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
 
         cppTask_OptionsVBtoCPP(cPtr, task.gridSize,
                                task.histogramBins,

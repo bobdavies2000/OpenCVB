@@ -83,11 +83,11 @@ Public Class OpenGL_Basics : Inherits VB_Parent
         task.oglRect = New cvb.Rect(task.OpenGL_Left, task.OpenGL_Top, windowWidth, windowHeight)
         MoveWindow(task.openGL_hwnd, task.OpenGL_Left, task.OpenGL_Top, task.oglRect.Width, task.oglRect.Height, True)
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then pointCloudInput = task.pointCloud
 
         ' adjust the point cloud if present and the 'move' sliders are non-zero
-        options.RunVB()
+        options.RunOpt()
         If pointCloudInput.Width <> 0 And options.moveAmount <> New cvb.Scalar Then pointCloudInput -= options.moveAmount
 
         If src.Width > 0 Then
@@ -159,8 +159,8 @@ Public Class OpenGL_BasicsSliders : Inherits VB_Parent
         FindSlider("OpenGL FOV").Value = 150
         desc = "Show the OpenGL point cloud with sliders support."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standaloneTest() Then task.ogl.pointCloudInput = task.pointCloud Else task.ogl.pointCloudInput = pointCloudInput
 
@@ -192,7 +192,7 @@ Public Class OpenGL_BasicsMouse : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Show the OpenGL point cloud with mouse support."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.testAllRunning Then Exit Sub ' seems to not like it when running overnight but it runs fine.
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
@@ -214,7 +214,7 @@ Public Class OpenGL_ReducedXYZ : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = reduction.dst3
 
@@ -236,7 +236,7 @@ Public Class OpenGL_Reduction : Inherits VB_Parent
         reduction = New Reduction_PointCloud
         desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2
         task.ogl.pointCloudInput = reduction.dst3
@@ -257,7 +257,7 @@ Public Class OpenGL_ReducedSideView : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         sideView.Run(src)
         dst2 = sideView.dst2
         task.ogl.pointCloudInput = sideView.dst3
@@ -279,7 +279,7 @@ Public Class OpenGL_Rebuilt : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Review the rebuilt point cloud from Structured_Rebuild"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         rebuild.Run(src)
         dst2 = rebuild.dst2
         task.ogl.pointCloudInput = rebuild.pointcloud
@@ -300,7 +300,7 @@ Public Class OpenGL_VerticalSingle : Inherits VB_Parent
         task.ogl.oglFunction = oCase.verticalLines
         desc = "Visualize the vertical line found with FeatureLine_LongestV_Tutorial"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         vLine.Run(src)
         dst2 = vLine.dst2
         dst3 = vLine.dst3
@@ -327,7 +327,7 @@ Public Class OpenGL_Pyramid : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Draw the traditional OpenGL pyramid"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.ogl.pointCloudInput = New cvb.Mat
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -345,7 +345,7 @@ Public Class OpenGL_DrawCube : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Draw the traditional OpenGL cube"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.ogl.pointCloudInput = New cvb.Mat()
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -365,7 +365,7 @@ Public Class OpenGL_QuadSimple : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -391,7 +391,7 @@ Public Class OpenGL_QuadHulls : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -417,7 +417,7 @@ Public Class OpenGL_QuadMinMax : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Reflect the min and max for each roi of the RedCloud data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -441,7 +441,7 @@ Public Class OpenGL_Bricks : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create blocks in each roi using the min and max depth values"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         tess.Run(src)
         task.ogl.dataInput = cvb.Mat.FromPixelData(tess.oglData.Count, 1, cvb.MatType.CV_32FC3, tess.oglData.ToArray)
         dst2 = tess.dst3
@@ -476,7 +476,7 @@ Public Class OpenGL_StructuredCloud : Inherits VB_Parent
         labels(2) = "Structured cloud 32fC3 data"
         desc = "Visualize the Structured_Cloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         sCloud.Run(src)
 
         redC.Run(src)
@@ -501,7 +501,7 @@ Public Class OpenGL_Tiles : Inherits VB_Parent
         labels = {"", "", "Input from Structured_Tiles", ""}
         desc = "Display the quads built by Structured_Tiles in OpenGL - uses OpenGL's point size"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         sCloud.Run(src)
         dst2 = sCloud.dst2
         dst3 = sCloud.dst3
@@ -525,7 +525,7 @@ Public Class OpenGL_TilesQuad : Inherits VB_Parent
         labels = {"", "", "Input from Structured_Tiles", ""}
         desc = "Display the quads built by Structured_TilesQuad in OpenGL - does NOT use OpenGL's point size"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         sCloud.Run(src)
         dst2 = sCloud.dst2
 
@@ -552,7 +552,7 @@ Public Class OpenGL_OnlyPlanes : Inherits VB_Parent
         labels = {"", "", "RedCloud Cells", "Planes built in the point cloud"}
         desc = "Display the pointCloud as a set of RedCloud cell planes"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         planes.Run(src)
         dst2 = planes.dst2
         dst3 = planes.dst3
@@ -577,7 +577,7 @@ Public Class OpenGL_FlatStudy1 : Inherits VB_Parent
         labels = {"", "", "Side view of point cloud - use mouse to highlight the floor", "Highlight the floor in BGR image"}
         desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         plane.Run(src)
         dst2 = plane.dst3
         task.ogl.pointCloudInput = task.pointCloud
@@ -599,7 +599,7 @@ Public Class OpenGL_FlatStudy2 : Inherits VB_Parent
         task.ogl.oglFunction = oCase.drawFloor
         desc = "Show the floor in the pointcloud as a plane"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         plane.Run(src)
         dst2 = plane.dst3
 
@@ -629,7 +629,7 @@ Public Class OpenGL_FlatStudy3 : Inherits VB_Parent
         labels = {"", "", "", ""}
         desc = "Create an OpenGL display where the floor is built as a quad"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static cushionSlider = FindSlider("Structured Depth slice thickness in pixels")
 
         plane.Run(src)
@@ -655,7 +655,7 @@ Public Class OpenGL_FlatFloor : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Using minimal cost, create an OpenGL display where the floor is built as a quad"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         flatness.Run(src)
         SetTrueText(flatness.labels(2), 3)
 
@@ -680,7 +680,7 @@ Public Class OpenGL_FlatCeiling : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Using minimal cost, create an OpenGL display where the ceiling is built as a quad"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         flatness.Run(src)
         SetTrueText(flatness.labels(2), 3)
 
@@ -709,7 +709,7 @@ Public Class OpenGL_PeakFlat : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display the peak flat level in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         peak.Run(src)
         dst2 = peak.dst2
         labels(2) = peak.labels(3)
@@ -737,7 +737,7 @@ Public Class OpenGL_DrawHull : Inherits VB_Parent
         labels = {"", "", "RedCloud output", ""}
         desc = "Select a cell and display its hull in OpenGL as a polygon."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
         Dim oglData As New List(Of cvb.Point3f)
@@ -779,7 +779,7 @@ Public Class OpenGL_FPolyCloud : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display the pointcloud after FeaturePoly_PointCloud identifies the changes depth pixels"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fpolyPC.Run(src)
         dst1 = fpolyPC.dst1
         dst2 = fpolyPC.dst2
@@ -808,7 +808,7 @@ Public Class OpenGL_Sierpinski : Inherits VB_Parent
         FindSlider("OpenGL Point Size").Value = 3
         desc = "Draw the Sierpinski triangle pattern in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -831,8 +831,8 @@ Public Class OpenGL_DrawHulls : Inherits VB_Parent
         labels = {"", "", "", ""}
         desc = "Draw all the hulls in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim ptM = options.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
 
@@ -891,12 +891,12 @@ Public Class OpenGL_Contours : Inherits VB_Parent
         labels = {"", "", "Output of RedCloud", "OpenGL snapshot"}
         desc = "Draw all the RedCloud contours in OpenGL with various settings."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim ptM = options.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
 
-        options2.RunVB()
+        options2.RunOpt()
 
         redC.Run(src)
         dst2 = redC.dst2
@@ -957,7 +957,7 @@ Public Class OpenGL_PCLineCandidates : Inherits VB_Parent
         FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the output of the PointCloud_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pts.Run(src)
         dst2 = pts.dst2
 
@@ -982,7 +982,7 @@ Public Class OpenGL_PClinesFirstLast : Inherits VB_Parent
         FindSlider("OpenGL Point Size").Value = 10
         desc = "Draw the 3D lines found from the PCpoints"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst2 = lines.dst2
 
@@ -1007,7 +1007,7 @@ Public Class OpenGL_PClinesAll : Inherits VB_Parent
         FindSlider("OpenGL Point Size").Value = 10
         desc = "Draw the 3D lines found from the PCpoints"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst2 = lines.dst2
 
@@ -1032,7 +1032,7 @@ Public Class OpenGL_PatchHorizontal : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Draw the point cloud after patching z-values that are similar"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         patch.Run(src)
         dst2 = patch.dst3
         task.ogl.pointCloudInput = dst2
@@ -1057,7 +1057,7 @@ Public Class OpenGL_PCpoints : Inherits VB_Parent
         FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the output of the PointCloud_Points"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pts.Run(src)
         dst2 = pts.dst2
 
@@ -1084,7 +1084,7 @@ Public Class OpenGL_PCpointsPlane : Inherits VB_Parent
         FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the points that are likely to be in a plane - found by both the vertical and horizontal searches"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pts.Run(src)
 
         task.ogl.dataInput = cvb.Mat.FromPixelData(pts.pcPoints.Count, 1, cvb.MatType.CV_32FC3, pts.pcPoints.ToArray)
@@ -1108,7 +1108,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits VB_Parent
         labels(3) = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis"
         desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         dst3 = redC.dst3
@@ -1152,7 +1152,7 @@ Public Class OpenGL_Profile : Inherits VB_Parent
         labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
         desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         sides.Run(src)
         dst2 = sides.dst2
 
@@ -1199,12 +1199,12 @@ Public Class OpenGL_ProfileSweep : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Test the X-, Y-, and Z-axis rotation in sequence"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.gOptions.setGravityUsage(False)
         If task.frameCount Mod 100 = 0 Then
             testCase += 1
             If testCase >= 3 Then testCase = 0
-            options.RunVB()
+            options.RunOpt()
             options.rotateX = -45
             options.rotateY = -45
             options.rotateZ = -45
@@ -1251,7 +1251,7 @@ Public Class OpenGL_FlatSurfaces : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Review the vertical and horizontal regions from Plane_Basics."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         flat.Run(src)
         task.pointCloud.CopyTo(dst2, flat.dst2)
 
@@ -1271,7 +1271,7 @@ Public Class OpenGL_GradientPhase : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Show the depth gradient Phase in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         gradient.Run(src)
         dst2 = gradient.dst2
         dst3 = gradient.dst3
@@ -1296,7 +1296,7 @@ Public Class OpenGL_GravityTransform : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -1318,7 +1318,7 @@ Public Class OpenGL_GravityAverage : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         strOut = "To remove the point cloud averaging, set the global option 'Frame History' to 1." + vbCrLf +
                  "Or, even alternatively, run the 'OpenGL_GravityTransform' algorithm." + vbCrLf + vbCrLf +
                  "Before Averaging: Average IMU acceleration: X = " + Format(task.IMU_RawAcceleration.X, fmt3) + ", Y = " + Format(task.IMU_RawAcceleration.Y, fmt3) +
@@ -1352,7 +1352,7 @@ Public Class OpenGL_GravityKalman : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         strOut = "To remove the point cloud averaging, set the global option 'Frame History' to 1." + vbCrLf +
                  "Or, even alternatively, run the 'OpenGL_GravityTransform' algorithm." + vbCrLf + vbCrLf +
                  "Before Kalman: IMU acceleration: X = " + Format(task.IMU_RawAcceleration.X, fmt3) + ", Y = " + Format(task.IMU_RawAcceleration.Y, fmt3) +
@@ -1390,7 +1390,7 @@ Public Class OpenGL_StableMinMax : Inherits VB_Parent
         labels = {"", "", "Pointcloud Max", "Pointcloud Min"}
         desc = "display the Pointcloud Min or Max in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         minmax.Run(task.pointCloud)
         dst2 = minmax.dst2
 
@@ -1415,7 +1415,7 @@ Public Class OpenGL_CloudMisses : Inherits VB_Parent
         labels = {"", "", "Point cloud after over the last X frames", ""}
         desc = "Run OpenGL removing all pixels not present for all X frames"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         frames.Run(task.depthMask / 255)
         dst2 = frames.dst2
         dst2 = dst2.Threshold(frames.saveFrames.Count - 1, 255, cvb.ThresholdTypes.Binary)
@@ -1440,7 +1440,7 @@ Public Class OpenGL_CloudHistory : Inherits VB_Parent
         labels = {"", "", "Point cloud after over the last X frames", "Mask to remove partially missing pixels"}
         desc = "Run OpenGL with a masked point cloud averaged over the last X frames."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hCloud.Run(task.pointCloud)
         dst2 = hCloud.dst2
 
@@ -1462,7 +1462,7 @@ Public Class OpenGL_TessellateCell : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display a tessellated representation of the point cloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -1486,7 +1486,7 @@ Public Class OpenGL_Tessellate : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display a tessellated representation of the point cloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -1510,7 +1510,7 @@ Public Class OpenGL_TessellateRGB : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display a tessellated representation of the point cloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -1533,7 +1533,7 @@ Public Class OpenGL_RedTrack : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display all the RedCC cells in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redCC.Run(src)
         dst2 = redCC.dst2
 
@@ -1557,7 +1557,7 @@ Public Class OpenGL_Density2D : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32FC3, 0)
         desc = "Create a mask showing which pixels are close to each other and display the results."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dense.Run(src)
         dst2.SetTo(0)
         task.pointCloud.CopyTo(dst2, dense.dst2)
@@ -1580,7 +1580,7 @@ Public Class OpenGL_ViewObjects : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Identify the objects in the scene and display them in OpenGL with their respective colors."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst1 = task.pointCloud.Clone
 
         bpDoctor.Run(src)
@@ -1609,7 +1609,7 @@ Public Class OpenGL_NoSolo : Inherits VB_Parent
         labels(2) = "The points below were identified as solo points in the point cloud"
         desc = "Display point cloud without solo points"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hotTop.Run(src)
         dst2 = hotTop.dst3
 
@@ -1636,7 +1636,7 @@ Public Class OpenGL_RedCloud : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display all the RedCloud cells in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -1657,7 +1657,7 @@ Public Class OpenGL_RedCloudSpectrum : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display all the RedCloud cells after Spectrum filtering."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redS.Run(src)
         dst2 = redS.dst3
         task.pointCloud.SetTo(0, dst2.InRange(0, 0))
@@ -1681,7 +1681,7 @@ Public Class OpenGL_RedCloudCell : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = " Isolate a RedCloud cell - after filtering by Spectrum_Depth - in an OpenGL display"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = specZ.options.runRedCloud(labels(2))
 
         specZ.Run(src)
@@ -1714,7 +1714,7 @@ Public Class OpenGL_FilteredSideView : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         filter.Run(src)
         dst2 = filter.dst2
 
@@ -1735,7 +1735,7 @@ Public Class OpenGL_FilteredTopView : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         filter.Run(src)
         dst2 = filter.dst2
 
@@ -1756,7 +1756,7 @@ Public Class OpenGL_FilteredBoth : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         filter.Run(src)
         dst2 = filter.dst2
 
@@ -1778,7 +1778,7 @@ Public Class OpenGL_Filtered3D : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         filter.Run(src)
         dst2 = filter.dst3
 
@@ -1800,7 +1800,7 @@ Public Class OpenGL_HistNorm3D : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Create an OpenGL plot using the BGR data normalized to between 0 and 1."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         src.ConvertTo(src, cvb.MatType.CV_32FC3)
         task.ogl.pointCloudInput = src.Normalize(0, 1, cvb.NormTypes.MinMax)
         task.ogl.Run(New cvb.Mat)
@@ -1823,7 +1823,7 @@ Public Class OpenGL_HistDepth3D : Inherits VB_Parent
         task.ogl.options.PointSizeSlider.Value = 10
         desc = "Display the 3D histogram of the depth in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hcloud.Run(src)
         Dim histogram = cvb.Mat.FromPixelData(task.redOptions.histBins3D, 1, cvb.MatType.CV_32F, hcloud.histogram.Data)
         task.ogl.dataInput = histogram
@@ -1847,7 +1847,7 @@ Public Class OpenGL_SoloPointsRemoved : Inherits VB_Parent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Remove the solo points and display the pointcloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.toggleOnOff Then
             solos.Run(src)
             dst2 = solos.dst2
@@ -1874,8 +1874,8 @@ Public Class OpenGL_Duster : Inherits VB_Parent
     Public Sub New()
         desc = "Show a dusted version point cloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         duster.Run(src)
         dst2 = duster.dst3
@@ -1896,8 +1896,8 @@ Public Class OpenGL_DusterY : Inherits VB_Parent
     Public Sub New()
         desc = "Show a dusted version point cloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         duster.Run(src)
         dst2 = duster.dst3
@@ -1922,7 +1922,7 @@ Public Class OpenGL_Color3D : Inherits VB_Parent
         task.ogl.options.PointSizeSlider.Value = 10
         desc = "Plot the results of a 3D histogram of the BGR data "
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hColor.Run(src)
         dst2 = hColor.dst3
         labels(2) = hColor.labels(2)
@@ -1951,7 +1951,7 @@ Public Class OpenGL_ColorReduced3D : Inherits VB_Parent
         FindSlider("OpenGL Point Size").Value = 20
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
         If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
@@ -1980,7 +1980,7 @@ Public Class OpenGL_ColorRaw : Inherits VB_Parent
         task.ogl.options.PointSizeSlider.Value = 10
         desc = "Plot the results of a 3D histogram of the BGR data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src
         src.ConvertTo(dst1, cvb.MatType.CV_32FC3)
         dst1 = dst1.Normalize(0, 1, cvb.NormTypes.MinMax)
@@ -2010,7 +2010,7 @@ Public Class OpenGL_ColorBin4Way : Inherits VB_Parent
         dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_8UC3, cvb.Scalar.White)
         desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -2049,7 +2049,7 @@ Public Class OpenGL_World : Inherits VB_Parent
         labels = {"", "", "Generated Pointcloud", ""}
         desc = "Display the generated point cloud in OpenGL"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static generatedRadio = FindRadio("Use Generated Pointcloud")
 
         If generatedRadio.checked Then
@@ -2085,7 +2085,7 @@ Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Parent
         task.ogl.oglFunction = oCase.verticalLines
         desc = "Visualize all the vertical lines found in FeatureLine_Finder"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static verticalRadio = FindRadio("Show Vertical Lines")
         Dim showVerticals = verticalRadio.checked
 

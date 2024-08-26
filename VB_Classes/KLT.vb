@@ -10,8 +10,8 @@ Public Class KLT_Basics : Inherits VB_Parent
         term = New cvb.TermCriteria(cvb.CriteriaTypes.Eps Or cvb.CriteriaTypes.Count, 10, 1.0)
         desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         If options.nightMode Then dst2.SetTo(0) Else src.CopyTo(dst2)
         Static lastGray As cvb.Mat = src.Clone
@@ -67,7 +67,7 @@ Public Class KLT_OpticalFlow : Inherits VB_Parent
     Public Sub New()
         desc = "KLT optical flow - needs more work"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         klt.Run(src)
         If task.frameCount > 0 And lastpoints IsNot Nothing And klt.ptInput IsNot Nothing Then
             dst2 = klt.dst2

@@ -5,8 +5,8 @@ Public Class WarpPerspective_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Essentials of the rotation matrix of WarpPerspective"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
         dst2 = src.EmptyClone
         cvb.Cv2.WarpPerspective(src, dst2, options.transformMatrix, dst2.Size(), cvb.InterpolationFlags.Cubic Or cvb.InterpolationFlags.WarpInverseMap)
         SetTrueText("Use sliders to understand impact of WarpPerspective", 3)
@@ -25,8 +25,8 @@ Public Class WarpPerspective_WidthHeight : Inherits VB_Parent
     Public Sub New()
         desc = "Use WarpPerspective to transform input images."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim srcPt() = {New cvb.Point2f(0, 0), New cvb.Point2f(0, src.Height), New cvb.Point2f(src.Width, 0), New cvb.Point2f(src.Width, src.Height)}
         Dim pts() = {New cvb.Point2f(0, 0), New cvb.Point2f(0, src.Height), New cvb.Point2f(src.Width, 0),

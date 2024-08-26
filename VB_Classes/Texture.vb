@@ -11,7 +11,7 @@ Public Class Texture_Basics : Inherits VB_Parent
 
         desc = "find the best sample 256x256 texture of a mask"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or src.Channels() <> 1 Then
             ellipse.Run(src)
             dst2 = ellipse.dst2.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
@@ -51,8 +51,8 @@ Public Class Texture_Flow : Inherits VB_Parent
     Public Sub New()
         desc = "Find and mark the texture flow in an image - see texture_flow.py"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src.Clone
         If src.Channels() <> 1 Then src = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2Gray)
@@ -80,7 +80,7 @@ Public Class Texture_Flow_Depth : Inherits VB_Parent
         texture = New Texture_Flow()
         desc = "Display texture flow in the depth data"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         texture.Run(task.depthRGB)
         dst2 = texture.dst2
     End Sub
@@ -98,7 +98,7 @@ Public Class Texture_Flow_Reduction : Inherits VB_Parent
         texture = New Texture_Flow
         desc = "Display texture flow in the reduced color image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2
 
@@ -123,7 +123,7 @@ Public Class OpenGL_TextureShuffle : Inherits VB_Parent
         texture = New Texture_Basics()
         desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If dst2.Width = 320 Then
                 SetTrueText("Texture_Shuffle is not supported at the 320x240 resolution.  It needs at least 256 rows in the output.")

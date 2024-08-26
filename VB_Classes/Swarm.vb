@@ -32,8 +32,8 @@ Public Class Swarm_Basics : Inherits VB_Parent
             Next
         Next
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         feat.Run(src)
         dst3 = feat.dst2
@@ -99,7 +99,7 @@ Public Class Swarm_LeftRightFeatures : Inherits VB_Parent
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         feat.Run(task.leftView)
         leftList = New List(Of cvb.Point2f)(task.features)
         dst2 = feat.dst2.Clone
@@ -128,7 +128,7 @@ Public Class Swarm_LeftRight : Inherits VB_Parent
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Get direction and distance from the left and right images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         swarm.Run(task.leftView)
         leftDistance = swarm.distanceAvg
         leftDirection = swarm.directionAvg
@@ -161,8 +161,8 @@ Public Class Swarm_Percentage : Inherits VB_Parent
     Public Sub New()
         desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         swarm.Run(src)
         dst2 = swarm.dst2
@@ -194,7 +194,7 @@ Public Class Swarm_Flood : Inherits VB_Parent
         task.redOptions.setIdentifyCells(True)
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         swarm.Run(src)
 
         cvt.Run(src)
@@ -232,7 +232,7 @@ Public Class Swarm_Flood2 : Inherits VB_Parent
         flood.Run(cvt.dst2)
         Return flood.dst2
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat = False Then Exit Sub
 
         dst2 = runRedCloud(src).Clone()
@@ -255,7 +255,7 @@ Public Class Swarm_Flood3 : Inherits VB_Parent
     Public Sub New()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         swarm.Run(src)
         dst2 = swarm.dst2
         labels(2) = swarm.labels(2)

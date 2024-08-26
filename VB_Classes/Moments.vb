@@ -10,7 +10,7 @@ Public Class Moments_Basics : Inherits VB_Parent
         labels(2) = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the provided mask file."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             fore.Run(src)
             dst2 = fore.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
@@ -43,7 +43,7 @@ Public Class Moments_CentroidKalman : Inherits VB_Parent
         labels(2) = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fore.Run(src)
         dst2 = fore.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
         Dim m = cvb.Cv2.Moments(fore.dst2, True)

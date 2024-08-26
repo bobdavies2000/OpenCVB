@@ -7,8 +7,8 @@ Public Class ORB_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Find keypoints using ORB - Oriented Fast and Rotated BRIEF"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         orb = cvb.ORB.Create(options.desiredCount)

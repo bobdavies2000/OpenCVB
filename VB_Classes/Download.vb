@@ -13,8 +13,8 @@ Public Class Download_Databases : Inherits VB_Parent
     Public Sub New()
         desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         'Dim fileToDecompress = New FileInfo(task.HomeDir + "Data/" + filename)
         'Dim downloadDir = New DirectoryInfo(task.HomeDir + "Data/" + Mid(fileToDecompress.Name, 1, Len(fileToDecompress.Name) - Len(".tar.gz")))

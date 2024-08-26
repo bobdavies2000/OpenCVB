@@ -6,7 +6,7 @@ Public Class Thickness_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Determine the thickness of a RedCloud cell"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             redC.Run(src)
             dst2 = redC.dst2

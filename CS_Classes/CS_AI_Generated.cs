@@ -38,9 +38,9 @@ namespace CS_Classes
             desc = "Add 2 images with specified weights.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Mat srcPlus = src2;
             // algorithm user normally provides src2! 
@@ -77,7 +77,7 @@ namespace CS_Classes
             desc = "Add in the edges separating light and dark to the color image";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(src);
             dst2 = edges.dst2;
@@ -99,9 +99,9 @@ namespace CS_Classes
         {
             desc = "Update a running average of the image";
         }
-        public void RunCS(cv.Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
             {
@@ -126,7 +126,7 @@ namespace CS_Classes
             desc = "Align the depth data with the left or right view. Oak-D is aligned with the right image. Some cameras are not close to aligned.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.toggleOnOff)
             {
@@ -238,7 +238,7 @@ namespace CS_Classes
             desc = "Use the Windows alpha channel to separate foreground and background";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src = src.CvtColor(ColorConversionCodes.BGR2BGRA);
             Mat[] split = Cv2.Split(src);
@@ -266,9 +266,9 @@ namespace CS_Classes
             desc = "Using the input contours, create ApproxPoly output";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (standaloneTest())
             {
@@ -285,7 +285,7 @@ namespace CS_Classes
                 cv.Point[] nextContour;
                 nextContour = Cv2.ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly);
                 dst3.SetTo(Scalar.Black);
-                DrawContour(ref dst3, new List<cv.Point>(nextContour), Scalar.Yellow);
+                DrawContour(dst3, new List<cv.Point>(nextContour), Scalar.Yellow);
             }
             else
             {
@@ -308,7 +308,7 @@ namespace CS_Classes
             desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             rotatedRect.Run(src);
             dst2 = rotatedRect.dst2;
@@ -345,7 +345,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Original Hull", "Hull after ApproxPoly" };
             desc = "Use ApproxPolyDP on a hull to show impact of options (which appears to be minimal - what is wrong?)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hull.Run(src);
             dst2 = hull.dst2;
@@ -372,9 +372,9 @@ namespace CS_Classes
             desc = "Find minimum containing triangle for a set of points.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.heartBeat)
             {
                 srcPoints = new List<cv.Point2f>(options.srcPoints);
@@ -485,7 +485,7 @@ namespace CS_Classes
             desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var saveCityOrder = (int[])cityOrder.Clone();
             GCHandle hCityOrder = GCHandle.Alloc(cityOrder, GCHandleType.Pinned);
@@ -557,9 +557,9 @@ namespace CS_Classes
             desc = "Setup and control finding the optimal route for a traveling salesman";
         }
 
-        public void RunCS(cv.Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged) setup();
 
@@ -651,7 +651,7 @@ namespace CS_Classes
             return gray;
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bgSub.Run(src);
             Mat gray;
@@ -678,7 +678,7 @@ namespace CS_Classes
             desc = "Use FindNonZero API to get coordinates of non-zero points.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone)
             {
@@ -729,7 +729,7 @@ namespace CS_Classes
             desc = "Find the solo points in the pointcloud histograms for top and side views.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hotTop.Run(src);
             dst2 = hotTop.dst3;
@@ -765,13 +765,13 @@ namespace CS_Classes
             desc = "Find minimum containing rectangle for a set of points.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
                 if (!vbc.task.heartBeat) return;
-                options.RunVB();
-                inputPoints = QuickRandomPoints(options.numPoints);
+                options.RunOpt();
+                inputPoints = quickRandomPoints(options.numPoints);
             }
 
             minRect = Cv2.MinAreaRect(inputPoints.ToArray());
@@ -803,9 +803,9 @@ namespace CS_Classes
             desc = "Build an ascii art representation of the input stream.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst3 = src.CvtColor(ColorConversionCodes.BGR2GRAY).Resize(options.size, 0, 0, InterpolationFlags.Nearest);
             for (int y = 0; y < dst3.Height; y++)
@@ -832,7 +832,7 @@ namespace CS_Classes
             desc = "A palette'd version of the ascii art data";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int hStep = src.Height / 31 - 1;
             int wStep = src.Width / 55 - 1;
@@ -870,7 +870,7 @@ namespace CS_Classes
             desc = "Display the instability in image pixels.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             colorAA.Run(src);
             dst2 = colorAA.dst2;
@@ -895,7 +895,7 @@ namespace CS_Classes
             desc = "Mouse over any bin to see the histogram backprojected.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat input = src.Clone();
             if (input.Channels() != 1)
@@ -950,7 +950,7 @@ namespace CS_Classes
             desc = "Create a color histogram, normalize it, and backproject it with a palette.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             classCount = vbc.task.histogramBins;
             if (src.Channels() == 3)
@@ -985,7 +985,7 @@ namespace CS_Classes
             desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
 
@@ -1014,7 +1014,7 @@ namespace CS_Classes
             desc = "Create a histogram of the featureless regions";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(src);
             reduction.Run(edges.dst3);
@@ -1038,7 +1038,7 @@ namespace CS_Classes
             labels[2] = "Move the mouse away from OpenCVB and use the left and right arrows to move between histogram bins.";
             desc = "Move the mouse off of OpenCVB and then use the left and right arrow keys move around in the backprojection histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             keys.Run(src);
             List<string> keyIn = new List<string>(keys.keyInput);
@@ -1094,7 +1094,7 @@ namespace CS_Classes
             desc = "Find lines in the back projection";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             backP.Run(src);
             dst3 = backP.dst3;
@@ -1118,7 +1118,7 @@ namespace CS_Classes
             desc = "Explore Backprojection of the cloud histogram.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hist.Run(src);
 
@@ -1151,7 +1151,7 @@ namespace CS_Classes
             desc = "Display the back projected color image";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             backP.Run(src);
             dst2 = backP.dst2;
@@ -1174,7 +1174,7 @@ namespace CS_Classes
             desc = "Highlight the unstable pixels in the backprojection.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             backP.Run(src);
             dst2 = ShowPalette(backP.dst2 * 255 / backP.classCount);
@@ -1198,7 +1198,7 @@ namespace CS_Classes
             desc = "Create a histogram from the equalized color and then backproject it.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             backP.Run(src);
             backP.dst2.ConvertTo(dst2, MatType.CV_8U);
@@ -1232,7 +1232,7 @@ namespace CS_Classes
             desc = "Inspect the lines from individual backprojection masks from a histogram";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             masks.Run(src);
             dst2 = masks.dst2;
@@ -1288,7 +1288,7 @@ namespace CS_Classes
             return mask;
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hist.Run(src);
             dst2 = hist.dst2;
@@ -1319,7 +1319,7 @@ namespace CS_Classes
             desc = "Display the back projection of the hotspots in the Side View";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histSide.Run(src);
             autoY.Run(histSide.histogram);
@@ -1343,7 +1343,7 @@ namespace CS_Classes
             desc = "Display the back projection of the hotspots in the Top View";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src);
             dst2 = histTop.dst2;
@@ -1367,7 +1367,7 @@ namespace CS_Classes
             desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bpTop.Run(src);
             vbc.task.pointCloud.SetTo(0, bpTop.dst3);
@@ -1390,7 +1390,7 @@ namespace CS_Classes
             desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces.";
         }
 
-        public void RunCS(cv.Mat src)
+        public void RunAlg(Mat src)
         {
             bpSide.Run(src);
             vbc.task.pointCloud.SetTo(0, bpSide.dst3);
@@ -1413,7 +1413,7 @@ namespace CS_Classes
             desc = "Display the back projection of the solo samples in the Side View";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histSide.Run(src);
 
@@ -1439,7 +1439,7 @@ namespace CS_Classes
             desc = "Display the back projection of the solo samples in the Top View";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src);
 
@@ -1464,7 +1464,7 @@ namespace CS_Classes
             desc = "Backproject the lines found in the top view.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             line.Run(src);
 
@@ -1499,7 +1499,7 @@ namespace CS_Classes
             desc = "Backproject the lines found in the side view.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             line.Run(src);
 
@@ -1543,7 +1543,7 @@ namespace CS_Classes
             desc = "Explore Backprojection of each element of a grayscale histogram.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat input = src;
             if (input.Channels() != 1)
@@ -1618,7 +1618,7 @@ namespace CS_Classes
             labels[2] = "Use the mouse to select what should be shown in the backprojection of the depth histogram";
             desc = "Use the mouse to select what should be shown in the backprojection of the depth histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             backP.Run(src);
             dst2 = backP.dst2;
@@ -1637,7 +1637,7 @@ namespace CS_Classes
             backp = new BackProject_Image_CS();
             desc = "Allow review of the depth backprojection";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var depth = vbc.task.pcSplit[2].Threshold(vbc.task.MaxZmeters, 255, ThresholdTypes.TozeroInv);
             backp.Run(depth * 1000);
@@ -1657,7 +1657,7 @@ namespace CS_Classes
         {
             desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.histogramBins < vbc.task.MaxZmeters) vbc.task.gOptions.setHistogramBins((int)vbc.task.MaxZmeters + 1);
             if (vbc.task.optionsChanged)
@@ -1691,7 +1691,7 @@ namespace CS_Classes
         {
             desc = "Create an 8UC1 image with a backprojection of the hue.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hue.Run(src);
             classCount = hue.classCount;
@@ -1734,7 +1734,7 @@ namespace CS_Classes
             use99 = true;
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -1810,7 +1810,7 @@ namespace CS_Classes
         {
             desc = "Perform a Benford analysis of an image normalized to between 0 and 1";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst3 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat gray32f = new Mat();
@@ -1836,7 +1836,7 @@ namespace CS_Classes
             benford.setup99();
             desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst3 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat gray32f = new Mat();
@@ -1860,7 +1860,7 @@ namespace CS_Classes
         {
             desc = "Apply Benford to the depth data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             benford.Run(vbc.task.pcSplit[2]);
             dst2 = benford.dst2;
@@ -1883,7 +1883,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Actual Distribution of input", "" };
             desc = "Apply Benford to a list of primes";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged)
                 sieve.Run(src); // only need to compute this once...
@@ -1934,7 +1934,7 @@ namespace CS_Classes
             return new cv.Point((int)x, (int)y);
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cv.Point p1 = new cv.Point();
             for (int i = 0; i <= points.Length - 4; i += 3)
@@ -1967,7 +1967,7 @@ namespace CS_Classes
             desc = "Draw a Bezier curve based with the 4 input points.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2.SetTo(Scalar.Black);
             cv.Point p1 = new cv.Point();
@@ -2005,7 +2005,7 @@ namespace CS_Classes
             desc = "Classify each 3-channel input pixel according to their relative values";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             colorFmt.Run(src);
             src = colorFmt.dst2;
@@ -2050,9 +2050,9 @@ namespace CS_Classes
             desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
             {
@@ -2095,7 +2095,7 @@ namespace CS_Classes
             desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
@@ -2129,9 +2129,9 @@ namespace CS_Classes
             desc = "Subtract background using a mixture of Gaussians";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() == 3)
             {
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -2154,7 +2154,7 @@ namespace CS_Classes
             desc = "Subtract background using a mixture of Gaussians - the QT version";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3)
             {
@@ -2178,9 +2178,9 @@ namespace CS_Classes
             desc = "Subtract background using a mixture of Gaussians";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             MOG.Apply(src, dst2, options.learnRate);
         }
@@ -2201,9 +2201,9 @@ namespace CS_Classes
             desc = "GMG and KNN API's to subtract background";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.frameCount < 120)
             {
                 SetTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + vbc.task.frameCount);
@@ -2236,9 +2236,9 @@ namespace CS_Classes
             desc = "Isolate motion in both depth and color data using a mixture of Gaussians";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             grayMat = vbc.task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
             MOGDepth.Apply(grayMat, grayMat, options.learnRate);
             dst2 = grayMat.CvtColor(ColorConversionCodes.GRAY2BGR);
@@ -2261,9 +2261,9 @@ namespace CS_Classes
             desc = "Detect Motion for use with background subtraction";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged || vbc.task.frameCount < 10)
             {
@@ -2321,9 +2321,9 @@ namespace CS_Classes
             desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image.";
         }
 
-        public void RunCS(OpenCvSharp.Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             byte[] jpeg = src.ImEncode(".jpg", new int[] { (int)OpenCvSharp.ImwriteFlags.JpegQuality, options.quality });
             Mat tmp = cv.Mat.FromPixelData(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
@@ -2350,9 +2350,9 @@ namespace CS_Classes
             desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image.";
         }
 
-        public void RunCS(OpenCvSharp.Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             byte[] jpeg = src.ImEncode(".jpg", new int[] { (int)OpenCvSharp.ImwriteFlags.JpegQuality, options.quality });
             var tmp = cv.Mat.FromPixelData(jpeg.Length, 1, OpenCvSharp.MatType.CV_8U, jpeg);
@@ -2378,9 +2378,9 @@ namespace CS_Classes
             desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image.";
         }
 
-        public void RunCS(OpenCvSharp.Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             byte[] png = src.ImEncode(".png", new int[] { (int)OpenCvSharp.ImwriteFlags.PngCompression, options.compression });
             var tmp = cv.Mat.FromPixelData(png.Length, 1, OpenCvSharp.MatType.CV_8U, png);
@@ -2407,7 +2407,7 @@ namespace CS_Classes
             desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             retina.Run(vbc.task.depthRGB);
             bgSub.Run(retina.dst3.Clone());
@@ -2427,7 +2427,7 @@ namespace CS_Classes
         {
             desc = "Detect motion with both depth and color changes";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             motion.Run(src);
             dst2 = motion.dst2;
@@ -2453,7 +2453,7 @@ namespace CS_Classes
             desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             video.Run(src);
             dst3 = video.dst2;
@@ -2477,7 +2477,7 @@ namespace CS_Classes
             desc = "Demonstrate background subtraction algorithms with synthetic images";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             synth.Run(src);
             dst3 = synth.dst2;
@@ -2499,7 +2499,7 @@ namespace CS_Classes
             desc = "Use BGSubtract with the output of a reduction";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             var mm = GetMinMax(reduction.dst2);
@@ -2530,7 +2530,7 @@ namespace CS_Classes
             desc = "Split an image into 2 parts - darkest and lightest,";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int halfSplit = 0;
             int bins = vbc.task.histogramBins;
@@ -2580,7 +2580,7 @@ namespace CS_Classes
             desc = "Use kmeans with each of the 2-way split images";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             bin2.Run(src);
@@ -2611,7 +2611,7 @@ namespace CS_Classes
             desc = "Use RedCloud with the darkest regions";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone) bin2.Run(src);
 
@@ -2635,7 +2635,7 @@ namespace CS_Classes
             desc = "Use RedCloud with the lightest regions";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone) bin2.Run(src);
 
@@ -2659,7 +2659,7 @@ namespace CS_Classes
             desc = "Keep splitting an image between light and dark";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
             {
@@ -2709,9 +2709,9 @@ namespace CS_Classes
             desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
             {
@@ -2765,7 +2765,7 @@ namespace CS_Classes
             desc = "Split an image into 3 parts - darkest, lightest, and in-between the 2";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int bins = vbc.task.histogramBins;
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -2832,7 +2832,7 @@ namespace CS_Classes
             desc = "Use kmeans with each of the 3-way split images";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             bin3.Run(src);
@@ -2864,7 +2864,7 @@ namespace CS_Classes
             desc = "Build the palette input that best separates the light and dark regions of an image";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bin3.Run(src);
             dst2.SetTo(4);
@@ -2888,7 +2888,7 @@ namespace CS_Classes
             desc = "Use RedCloud with the darkest regions";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone) bin3.Run(src);
 
@@ -2911,7 +2911,7 @@ namespace CS_Classes
             desc = "Use RedCloud with the lightest regions";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone) bin3.Run(src);
 
@@ -2936,7 +2936,7 @@ namespace CS_Classes
             desc = "Use RedCloud with the regions that are neither lightest or darkest";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone) bin3.Run(src);
 
@@ -2965,9 +2965,9 @@ namespace CS_Classes
             desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the rcData.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
             {
@@ -3033,9 +3033,9 @@ namespace CS_Classes
             desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
             {
@@ -3096,7 +3096,7 @@ namespace CS_Classes
             desc = "Highlight the contours for each grid element with stats for each.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.mousePicTag == 1) index = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
             cv.Rect roiSave = index < vbc.task.gridList.Count ? vbc.task.gridList[index] : new cv.Rect();
@@ -3200,7 +3200,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Test Bin4Way_Basics with different src inputs.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             color.Run(src);
             if (color.dst3.Channels() == 1) 
@@ -3233,7 +3233,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Find the unstable pixels in the binary image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binary.Run(src);
             dst2 = binary.dst2;
@@ -3260,7 +3260,7 @@ namespace CS_Classes
             labels[3] = "Grayscale histogram of the image with markers showing where each quarter of the samples are.";
             desc = "Implement a 4-way split similar to the Bin3Way_Basics algorithm.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int bins = vbc.task.histogramBins;
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -3316,7 +3316,7 @@ namespace CS_Classes
             desc = "Find edges from each of the binarized images";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binary.Run(src);
 
@@ -3364,7 +3364,7 @@ namespace CS_Classes
             desc = "Collect Sobel edges from binarized images";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binary.Run(src);
 
@@ -3400,7 +3400,7 @@ namespace CS_Classes
             desc = "Find the unstable pixels in the binary image";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binary.Run(src);
             dst2 = binary.dst2;
@@ -3433,7 +3433,7 @@ namespace CS_Classes
             desc = "Find unstable pixels but remove those that are also edges.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             canny.Run(src);
             blur.Run(canny.dst2);
@@ -3463,7 +3463,7 @@ namespace CS_Classes
             desc = "Identify the unstable grayscale pixel values ";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -3540,7 +3540,7 @@ namespace CS_Classes
             desc = "Binarize an image using the valleys provided by HistValley_Basics";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat gray = src.Channels() == 1 ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -3577,7 +3577,7 @@ namespace CS_Classes
             desc = "Identify the unstable grayscale pixel values ";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -3670,7 +3670,7 @@ namespace CS_Classes
             desc = "Binarize an image and split it into quartiles using peaks.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat gray = (src.Channels() == 1) ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -3714,7 +3714,7 @@ namespace CS_Classes
             desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat gray = (src.Channels() == 1) ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -3757,7 +3757,7 @@ namespace CS_Classes
             desc = "Add the 4-way split of left and right views.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binaryLeft.Run(src);
 
@@ -3796,9 +3796,9 @@ namespace CS_Classes
             desc = "Identify the lightest and darkest regions separately and then combine the rcData.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
             {
@@ -3857,7 +3857,7 @@ namespace CS_Classes
             }
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binary.Run(src);
             if (dst2.Width != binary.mats.mat[0].Width) rebuildMats();
@@ -3889,7 +3889,7 @@ namespace CS_Classes
             desc = "Binarize an image and split it into quartiles using peaks.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat gray = (src.Channels() == 1) ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -3934,7 +3934,7 @@ namespace CS_Classes
             desc = "Binarize an image using Threshold with OTSU.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             meanScalar = Cv2.Mean(src, mask);
 
@@ -3971,9 +3971,9 @@ namespace CS_Classes
             desc = "Binarize an image using Threshold with OTSU.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Mat input = src;
             if (input.Channels() == 3)
@@ -4016,7 +4016,7 @@ namespace CS_Classes
             dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Display the top 4 masks from the BGR kmeans output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             km.Run(src);
             for (int i = 0; i < km.masks.Count; i++)
@@ -4046,7 +4046,7 @@ namespace CS_Classes
             desc = "Display the top 4 masks from the BGR kmeans output";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             km.Run(src);
             dst1.SetTo(0);
@@ -4075,7 +4075,7 @@ namespace CS_Classes
             desc = "Identify the marginal regions that flip between subdivisions based on brightness.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binar4.Run(src);
             dst2 = ShowPalette(binar4.dst2 * 255 / 5);
@@ -4103,7 +4103,7 @@ namespace CS_Classes
             desc = "Add the Depth_Tiers and Bin4Way_Regions output in preparation for RedCloud";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binar4.Run(src);
             tiers.Run(src);
@@ -4137,7 +4137,7 @@ namespace CS_Classes
             desc = "Binarize an image using Threshold with OTSU.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             meanScalar = Cv2.Mean(src);
@@ -4164,9 +4164,9 @@ namespace CS_Classes
             labels[3] = "Binarize Sauvola";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() == 3)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack);
@@ -4188,9 +4188,9 @@ namespace CS_Classes
             labels[2] = "Binarize Wolf";
             labels[3] = "Binarize Nick";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -4225,7 +4225,7 @@ namespace CS_Classes
             desc = "Generate data to test Blob Detector.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             rotatedRect.Run(src);
             Mats.mat[0] = rotatedRect.dst2;
@@ -4259,7 +4259,7 @@ namespace CS_Classes
             desc = "Use connected components to find blobs.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -4309,9 +4309,9 @@ namespace CS_Classes
             desc = "Use OpenCV's block matching on left and right views";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.cameraName == "Azure Kinect 4K")
             {
@@ -4361,9 +4361,9 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.");
             desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Cv2.GaussianBlur(src, dst2, new cv.Size(options.kernelSize, options.kernelSize), options.sigma, options.sigma);
         }
     }
@@ -4379,7 +4379,7 @@ namespace CS_Classes
         {
             desc = "Smooth each pixel with a kernel of 1's of different sizes.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.Blur(src, dst2, new cv.Size(blur.Options.kernelSize, blur.Options.kernelSize), new cv.Point(-1, -1));
         }
@@ -4395,7 +4395,7 @@ namespace CS_Classes
         {
             desc = "Replace each pixel with the median of neighborhood of varying sizes.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.MedianBlur(src, dst2, blur.Options.kernelSize);
         }
@@ -4414,7 +4414,7 @@ namespace CS_Classes
         {
             desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.BilateralFilter(src, dst2, blur.Options.kernelSize, blur.Options.kernelSize * 2, blur.Options.kernelSize / 2);
         }
@@ -4437,7 +4437,7 @@ namespace CS_Classes
             desc = "Compound algorithms Blur and Histogram";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             myhist.Run(src);
             mat2to1.mat[0] = myhist.dst2.Clone();
@@ -4469,7 +4469,7 @@ namespace CS_Classes
             desc = "Detect blur in an image";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cv.Rect r = new cv.Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50);
             if (standaloneTest())
@@ -4507,7 +4507,7 @@ namespace CS_Classes
             desc = "Blur the depth results to help find the boundaries to large depth regions";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst3 = vbc.task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(0, 255, ThresholdTypes.Binary);
 
@@ -4531,9 +4531,9 @@ namespace CS_Classes
             desc = "Create a topo map from the blurred image";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             gradient.Run(src);
             dst2 = gradient.magnitude;
@@ -4577,9 +4577,9 @@ namespace CS_Classes
             desc = "Use Filter2D to create a motion blur";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (standaloneTest())
             {
@@ -4709,9 +4709,9 @@ namespace CS_Classes
             labels[3] = "Deblurred Image Output";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            mblur.options.RunVB();
+            mblur.options.RunOpt();
 
             if (vbc.task.heartBeat)
             {
@@ -4774,7 +4774,7 @@ namespace CS_Classes
             desc = "Create a mask of the RedCloud cell boundaries";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
             {
@@ -4834,7 +4834,7 @@ namespace CS_Classes
             desc = "Add the depth tiers to the cell boundaries";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cells.Run(src);
             dst3 = cells.dst2;
@@ -4843,7 +4843,7 @@ namespace CS_Classes
             dst2.SetTo(0);
             foreach (var tour in contours.contourlist)
             {
-                DrawContour(ref dst2, tour.ToList(), cv.Scalar.All(255), 2);
+                DrawContour(dst2, tour.ToList(), cv.Scalar.All(255), 2);
             }
             labels[2] = $"{contours.contourlist.Count} depth tiers were found.";
             labels[3] = cells.labels[2];
@@ -4866,9 +4866,9 @@ namespace CS_Classes
             desc = "Build the boundaries for redCells and remove interior rectangles";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             bounds.Run(src);
 
@@ -4934,7 +4934,7 @@ namespace CS_Classes
             desc = "Build the boundaries for redCells and remove interior rectangles";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bRects.Run(src);
             dst2 = bRects.bounds.dst2.Clone();
@@ -4965,7 +4965,7 @@ namespace CS_Classes
             desc = "Determine if 2 contours overlap";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bounds.Run(src);
             dst3 = bounds.dst2;
@@ -5009,9 +5009,9 @@ namespace CS_Classes
             desc = "Implement a brightness effect";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            Options.RunVB();
+            Options.RunOpt();
 
             dst2 = src.ConvertScaleAbs(Options.brightness, Options.contrast);
             labels[3] = "Brightness level = " + Options.contrast.ToString();
@@ -5033,9 +5033,9 @@ namespace CS_Classes
             desc = "Implement the brightness effect for HSV images";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            Options.RunVB();
+            Options.RunOpt();
 
             dst3 = src.CvtColor(ColorConversionCodes.BGR2HSV);
             Mat hsv64 = new Mat();
@@ -5071,9 +5071,9 @@ namespace CS_Classes
             desc = "Detect features with BRISK";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             src.CopyTo(dst2);
 
@@ -5111,7 +5111,7 @@ namespace CS_Classes
             desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int index = vbc.task.gridMap.At<int>(vbc.task.mouseMovePoint.Y, vbc.task.mouseMovePoint.X);
             var roi = vbc.task.gridList[index];
@@ -5182,7 +5182,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.");
             desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bpCol = (int)Math.Floor((double)(vbc.task.mouseMovePoint.X / vbc.task.gridCols));
             bpRow = (int)Math.Floor((double)(vbc.task.mouseMovePoint.Y / vbc.task.gridRows));
@@ -5225,9 +5225,9 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize(10);
             desc = "Backproject the whole row or column of the 2D histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst0 = src.Clone();
             var selection = options.backProjectRow ? "Row" : "Col";
             labels[2] = "Histogram 2D with Backprojection by " + selection;
@@ -5283,7 +5283,7 @@ namespace CS_Classes
             desc = "Compare the hue and brightness images and the results of the Hist_backprojection2d";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hueSat.Run(src.Clone());
             mats.mat[0] = hueSat.dst2;
@@ -5319,7 +5319,7 @@ namespace CS_Classes
             desc = "Backproject the output of the Top View.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             heat.Run(src);
             dst2 = heat.dst2;
@@ -5344,7 +5344,7 @@ namespace CS_Classes
             desc = "Backproject the output of the Side View.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             heat.Run(src);
             dst2 = heat.dst3;
@@ -5370,7 +5370,7 @@ namespace CS_Classes
             desc = "Filter a 2D histogram for the backprojection.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -5395,9 +5395,9 @@ namespace CS_Classes
             desc = "Backproject the output of the Side View after removing low sample bins.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Mat histogram = new Mat();
             Cv2.CalcHist(new Mat[] { vbc.task.pointCloud }, vbc.task.channelsSide, new Mat(), histogram, 2, vbc.task.bins2D, vbc.task.rangesSide);
@@ -5428,9 +5428,9 @@ namespace CS_Classes
             desc = "Backproject the output of the Side View after removing low sample bins.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Mat histogram = new Mat();
             Cv2.CalcHist(new Mat[] { vbc.task.pointCloud }, vbc.task.channelsSide, new Mat(), histogram, 2, vbc.task.bins2D, vbc.task.rangesSide);
@@ -5461,7 +5461,7 @@ namespace CS_Classes
             desc = "Backproject the output of the both the top and side views after removing low sample bins.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             filterSide.Run(src);
             filterTop.Run(src);
@@ -5487,7 +5487,7 @@ namespace CS_Classes
             desc = "Backproject the 2D histogram marking each grid element's backprojection";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             backP.Run(src);
             dst2 = backP.dst0;
@@ -5517,7 +5517,7 @@ namespace CS_Classes
             desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gravity.Run(src);
 
@@ -5671,7 +5671,7 @@ namespace CS_Classes
                 rotationY *= -1;
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass)
             {
@@ -5724,7 +5724,7 @@ namespace CS_Classes
             labels[2] = "Image after adjusting for camera motion.";
             desc = "Display both camera motion (on heartbeats) and scene motion.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cMotion.Run(src);
             dst2 = cMotion.dst3;
@@ -5750,9 +5750,9 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": click 'Show All' to control camShift options.");
             desc = "CamShift Demo - draw on the images to define the object to track.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            redHue.RunVB(src);
+            redHue.RunAlg(src);
             dst2 = redHue.dst2;
             Mat hue = redHue.dst1;
             Mat mask = redHue.dst3;
@@ -5788,9 +5788,9 @@ namespace CS_Classes
             labels = new string[] { "", "Hue", "Image regions with red hue", "Mask for hue regions" };
             desc = "Find that portion of the image where red dominates";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             dst3 = hsv.InRange(options.camSBins, new Scalar(180, 255, options.camMax));
             dst2.SetTo(0);
@@ -5811,9 +5811,9 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": click 'Show All' to control cartoonify options.");
             desc = "Create a cartoon from a color image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat gray8u = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             gray8u = gray8u.MedianBlur(options.medianBlur);
             Mat edges = gray8u.Laplacian(MatType.CV_8U, options.kernelSize);
@@ -5843,7 +5843,7 @@ namespace CS_Classes
             labels[2] = "KMeans_Basics output";
             desc = "Detect where pixels are unstable";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             k = kSlider.Value;
             km.Run(src);
@@ -5889,9 +5889,9 @@ namespace CS_Classes
             labels[2] = "Input to ConnectedComponenetsEx";
             desc = "Draw bounding boxes around BGR binarized connected Components";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             rects.Clear();
             centroids.Clear();
             Mat input = src;
@@ -5929,7 +5929,7 @@ namespace CS_Classes
             labels[3] = "RectView, LabelView, Binary, grayscale";
             desc = "Use connected components to isolate objects in image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var gray = shapes.CvtColor(ColorConversionCodes.BGR2GRAY);
             var binary = gray.Threshold(0, 255, ThresholdTypes.Otsu | ThresholdTypes.Binary);
@@ -5967,9 +5967,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Connected components in both the lighter and darker halves", "Connected components in the darker half of the image" };
             desc = "Prepare the connected components for both above and below the threshold";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            above.options.RunVB();
+            above.options.RunOpt();
             var light = src.Threshold(above.options.light, 255, ThresholdTypes.Binary);
             below.Run(light);
             dst2 = below.dst3;
@@ -5989,7 +5989,7 @@ namespace CS_Classes
         {
             desc = "Create connected components using RedCloud Hulls";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             ccomp.Run(src.CvtColor(ColorConversionCodes.BGR2GRAY));
             dst2 = ccomp.dst3;
@@ -6017,10 +6017,10 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Use a threshold slider on the CComp input";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src;
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (standaloneTest())
@@ -6135,7 +6135,7 @@ namespace CS_Classes
                 // }
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() || runRedCloud)
             {
@@ -6161,7 +6161,7 @@ namespace CS_Classes
             vbc.task.gOptions.setDebugCheckBox(true);
             desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -6205,7 +6205,7 @@ namespace CS_Classes
             dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Validate that all the depthCells are correctly identified.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -6258,7 +6258,7 @@ namespace CS_Classes
             labels = new string[] { "", "Depth distance to selected cell", "", "Color distance to selected cell" };
             desc = "Measure the color distance of each cell to the selected cell.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat || vbc.task.quarterBeat)
             {
@@ -6304,7 +6304,7 @@ namespace CS_Classes
             labels = new string[] { "", "Binarized image", "", "Relative gray image" };
             desc = "Separate the image into light and dark using RedCloud cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst0 = src;
             if (vbc.task.heartBeat || vbc.task.quarterBeat)
@@ -6345,7 +6345,7 @@ namespace CS_Classes
         {
             desc = "Provide cell stats on the flood_basics cells.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flood.Run(src);
             stats.Run(src);
@@ -6385,7 +6385,7 @@ namespace CS_Classes
             stats.statsString();
             strOut = stats.strOut;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() || runRedCloud)
             {
@@ -6419,7 +6419,7 @@ namespace CS_Classes
             labels[3] = "Below are cells that were not exact matches.";
             desc = "Identify cells which were NOT present in the previous generation.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -6460,7 +6460,7 @@ namespace CS_Classes
             vbc.task.redCells = new List<rcData>();
             desc = "Generate the RedCloud cells from the rects, mask, and pixel counts.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone)
             {
@@ -6649,7 +6649,7 @@ namespace CS_Classes
             desc = "Use OpenCV to implement the Game of Life";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (random.options.count != savePointCount || generation == 0)
             {
@@ -6733,7 +6733,7 @@ namespace CS_Classes
             desc = "Game of Life but with color added";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat lastBoard = game.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
             game.Run(src);
@@ -6765,7 +6765,7 @@ namespace CS_Classes
             desc = "Show Game of Life display with plot of population";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             game.Run(src);
             dst2 = game.dst2;
@@ -6803,7 +6803,7 @@ namespace CS_Classes
             return outstr;
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -6813,7 +6813,7 @@ namespace CS_Classes
                 labels[2] = createOutcome(options.currentRule) + " options.currentRule = " + options.currentRule.ToString();
                 dst2 = cell.createCells(labels[2]);
 
-                options.RunVB();
+                options.RunOpt();
 
                 if (vbc.task.heartBeat)
                 {
@@ -6842,7 +6842,7 @@ namespace CS_Classes
             desc = "All256 above starts with just one point. Here we start with multiple points.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat tmp = new Mat(new cv.Size(src.Width / 4, src.Height / 4), MatType.CV_8UC1, cv.Scalar.All(0));
             tmp.Set(0, val1, 1);
@@ -6905,7 +6905,7 @@ namespace CS_Classes
             return dst.ConvertScaleAbs(255).CvtColor(ColorConversionCodes.GRAY2BGR);
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -6945,9 +6945,9 @@ namespace CS_Classes
             desc = "OpenCV Example Points_Classifier";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged) vbc.task.gOptions.setDebugCheckBox(true);
             IntPtr imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
@@ -6986,12 +6986,12 @@ namespace CS_Classes
             desc = "Run the Bayesian classifier with the input.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int sampleCount, methodIndex = 0;
             if (src.Type() != MatType.CV_32FC2)
             {
-                options.RunVB();
+                options.RunOpt();
                 sampleCount = options.sampleCount;
                 methodIndex = options.methodIndex;
             }
@@ -7034,7 +7034,7 @@ namespace CS_Classes
             desc = "Classify the neighbor cells to be similar to the selected cell or not.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -7131,7 +7131,7 @@ namespace CS_Classes
             vbc.task.drawRect = new cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2);
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat mask = new Mat(src.Size(), MatType.CV_8U, Scalar.All(0));
             if (vbc.task.drawRect == new cv.Rect())
@@ -7174,9 +7174,9 @@ namespace CS_Classes
             desc = "Clone a portion of one image into another controlling rgb. Draw on any image to change selected area.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             clone.cloneSpec = 0;
             clone.colorChangeValues = new Vec3f((float)options.blueChange, (float)options.greenChange, (float)options.redChange);
@@ -7201,9 +7201,9 @@ namespace CS_Classes
             desc = "Clone a portion of one image into another controlling illumination. Draw on any image to change selected area.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             clone.cloneSpec = 1;
             clone.illuminationChangeValues = new Vec2f((float)options.alpha, (float)options.beta);
@@ -7227,9 +7227,9 @@ namespace CS_Classes
             desc = "Clone a portion of one image into another controlling texture. Draw on any image to change selected area.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             clone.cloneSpec = 2;
             clone.textureFlatteningValues = new Vec2f(options.lowThreshold, options.highThreshold);
@@ -7271,9 +7271,9 @@ namespace CS_Classes
             desc = "Clone an eagle into the video stream.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst2 = src.Clone();
             if (vbc.task.mouseClickFlag)
@@ -7304,9 +7304,9 @@ namespace CS_Classes
             desc = "Use the seamlessclone API to merge color and depth...";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             cv.Point center = new cv.Point(src.Width / 2, src.Height / 2);
             int radius = 100;
@@ -7344,7 +7344,7 @@ namespace CS_Classes
             desc = "Group the points based on their proximity to each other.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             if (standalone)
@@ -7420,7 +7420,7 @@ namespace CS_Classes
         {
             desc = "Cluster the center points of the RedCloud cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -7453,7 +7453,7 @@ namespace CS_Classes
             desc = "Create hulls for each cluster of feature points found in Cluster_Basics";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
 
@@ -7494,9 +7494,9 @@ namespace CS_Classes
             labels[2] = "Coherence - draw rectangle to apply";
             desc = "Find lines that are artistically coherent in the image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             int side;
             switch (src.Height)
@@ -7578,7 +7578,7 @@ namespace CS_Classes
         {
             desc = "Find coherent lines in the depth image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             coherent.Run(vbc.task.depthRGB);
             dst2 = coherent.dst2;
@@ -7595,9 +7595,9 @@ namespace CS_Classes
         {
             desc = "Choose a color source";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (options.colorFormat == null) options.colorFormat = "BGR"; // multiple invocations cause this to be necessary but how to fix?
 
@@ -7643,7 +7643,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": redOptions 'Color Source' control which color source is used.");
             desc = "Classify pixels by color using a variety of techniques";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int index = vbc.task.redOptions.colorInputIndex;
             if (vbc.task.optionsChanged || classifier == null)
@@ -7730,9 +7730,9 @@ namespace CS_Classes
             desc = "Manually create a grayscale image. The only reason for this example is to show how slow it can be to do the work manually in C#";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (options.useOpenCV)
             {
@@ -7771,7 +7771,7 @@ namespace CS_Classes
             desc = "Add depth regions edges to the color Reduction image.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst2 = reduction.dst2;
@@ -7803,7 +7803,7 @@ namespace CS_Classes
             desc = "Run KMeans on each of the 3 color channels";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             colorFmt.Run(src);
             dst0 = colorFmt.dst2;
@@ -7840,9 +7840,9 @@ namespace CS_Classes
             desc = "Find all the reddish pixels in the image - indicate some life form.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             Mat mask = hsv.InRange(options.camSBins, new Scalar(180, 255, options.camMax));
@@ -7863,7 +7863,7 @@ namespace CS_Classes
             desc = "Display the current image in complementary colors";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             Mat[] split = hsv.Split();
@@ -7888,7 +7888,7 @@ namespace CS_Classes
             desc = "Create the complementary images for Gilles Tran's 'Glasses' image for comparison";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             images.options.fileNameForm.setFileName(vbc.task.HomeDir + "Data/Glasses by Gilles Tran.png");
             images.Run(new Mat());
@@ -7911,7 +7911,7 @@ namespace CS_Classes
             desc = "Use inRange to isolate colors from the background";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = Cv2.ImRead(vbc.task.HomeDir + "Data/1.jpg", ImreadModes.Grayscale);
             dst1 = dst2.InRange(105, 165); // should make this a slider and experiment further...
@@ -7934,9 +7934,9 @@ namespace CS_Classes
             desc = "Classify every BGR pixel into some common colors";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Mat input = src;
             input = input.Resize(vbc.task.lowRes, 0, 0, InterpolationFlags.Nearest);
@@ -7988,7 +7988,7 @@ namespace CS_Classes
             desc = "Classify every BGR pixel into some common colors";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             for (int y = 0; y < src.Rows; y++)
             {
@@ -8023,7 +8023,7 @@ namespace CS_Classes
             desc = "Merge that last X BGR frames to smooth out differences.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             frames.Run(src);
             dst2 = frames.dst2;
@@ -8045,7 +8045,7 @@ namespace CS_Classes
             desc = "Remove single pixels between identical pixels for all color classifiers.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             denoise.Run(src);
             dst2 = denoise.dst2;
@@ -8069,7 +8069,7 @@ namespace CS_Classes
             desc = "Prepare a Color8U_Basics image using the vbc.task.motionRect";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             motion.Run(src);
 
@@ -8091,7 +8091,7 @@ namespace CS_Classes
             desc = "Isolate those regions in the image that have a reddish hue.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             Scalar loBins = new Scalar(0, 40, 32);
@@ -8114,9 +8114,9 @@ namespace CS_Classes
             desc = "Create masks for black and white";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst2 = dst1.Threshold(options.minThreshold, 255, ThresholdTypes.BinaryInv);
@@ -8137,9 +8137,9 @@ namespace CS_Classes
         {
             desc = "Plot all the available complexity runs.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            complex.options.RunVB();
+            complex.options.RunOpt();
 
             string saveLatestFile = complex.options.filename.FullName;
 
@@ -8239,9 +8239,9 @@ namespace CS_Classes
             dst2 = plot.dst2.Clone();
             return maxTime;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             maxFrameCount = 0;
             plot.srcX.Clear();
@@ -8273,9 +8273,9 @@ namespace CS_Classes
             dst = new Mat(new cv.Size(vbc.task.lowRes.Width * 2, vbc.task.lowRes.Height * 2), MatType.CV_8UC3, Scalar.Black);
             desc = "Plot the results of multiple runs at various resolutions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (!string.IsNullOrEmpty(fileName)) options.filename = new FileInfo(fileName);
             string contents = File.ReadAllText(options.filename.FullName);
@@ -8363,7 +8363,7 @@ namespace CS_Classes
             labels[3] = "Vertical concatenation";
             desc = "Concatenate 2 images - horizontally and vertically";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat tmp = new Mat();
             Cv2.HConcat(src, vbc.task.depthRGB, tmp);
@@ -8389,7 +8389,7 @@ namespace CS_Classes
             labels[2] = "Color/RGBDepth/Left/Right views";
             desc = "Concatenate 4 images - horizontally and vertically";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -8429,9 +8429,9 @@ namespace CS_Classes
             desc = "General purpose contour finder";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             colorClass.Run(src);
             dst2 = colorClass.dst2;
@@ -8486,7 +8486,7 @@ namespace CS_Classes
             desc = "General purpose contour finder";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone)
             {
@@ -8542,9 +8542,9 @@ namespace CS_Classes
             desc = "General purpose contour finder";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (standaloneTest())
             {
@@ -8597,7 +8597,7 @@ namespace CS_Classes
             labels = new string[] { "", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges." };
             desc = "Intersect the cell contours and the edges in the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             labels[2] = redC.redC.labels[2] + " - Contours only.  Click anywhere to select a cell";
@@ -8619,7 +8619,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Show all the contours found in the RedCloud output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -8639,7 +8639,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Contour_WholeImage output", "FeatureLess_Basics output" };
             desc = "Compare Contour_WholeImage and FeatureLess_Basics.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             contour.Run(src);
             dst2 = contour.dst2;
@@ -8656,7 +8656,7 @@ namespace CS_Classes
             labels[3] = "The white outline is the truest contour while the red is the selected approximation.";
             desc = "Compare contours of the selected cell. Cells are offset to help comparison.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -8681,11 +8681,11 @@ namespace CS_Classes
         {
             desc = "Find the contour for the src.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (myFrameCount != vbc.task.frameCount)
             {
-                options.RunVB(); // avoid running options more than once per frame.
+                options.RunOpt(); // avoid running options more than once per frame.
                 myFrameCount = vbc.task.frameCount;
             }
             if (standalone)
@@ -8727,7 +8727,7 @@ namespace CS_Classes
             desc = "Demo options on FindContours.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat imageInput = new Mat();
             rotatedRect.Run(src);
@@ -8776,9 +8776,9 @@ namespace CS_Classes
             }
             return tour;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = image.Resize(dst2.Size());
             dst3 = dst2.Clone();
             var gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
@@ -8823,7 +8823,7 @@ namespace CS_Classes
             desc = "Create contours for motion";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(src);
             dst2 = edges.dst2;
@@ -8874,7 +8874,7 @@ namespace CS_Classes
             return string.Format("{0:F3}\t{1:F3}\t{2:F3}", v[0], v[1], v[2]);
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sides.Run(src);
             dst2 = sides.dst2;
@@ -8929,7 +8929,7 @@ namespace CS_Classes
             desc = "Build a contour for the foreground";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             km.Run(vbc.task.pcSplit[2]);
             dst2 = km.dst2;
@@ -8966,7 +8966,7 @@ namespace CS_Classes
             desc = "Display the contours from largest to smallest in the motion output";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             diff.Run(src);
             erode.Run(diff.dst2); // remove solo points.
@@ -9015,7 +9015,7 @@ namespace CS_Classes
             desc = "Create a simplified contour of the selected cell";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -9056,7 +9056,7 @@ namespace CS_Classes
             desc = "Search the contour points for duplicates indicating the contour is self-intersecting.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -9106,9 +9106,9 @@ namespace CS_Classes
             desc = "Create a mask from the largest contour of the input.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (standaloneTest())
             {
@@ -9177,9 +9177,9 @@ namespace CS_Classes
             desc = "Compare findContours options - ApproxSimple, ApproxNone, etc.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             redC.Run(src);
             dst2 = redC.dst2;
@@ -9214,7 +9214,7 @@ namespace CS_Classes
             desc = "Find the point farthest from the center in each cell.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -9276,11 +9276,11 @@ namespace CS_Classes
             desc = "Find the contour for the src.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (myFrameCount != vbc.task.frameCount)
             {
-                options.RunVB(); // avoid running options more than once per frame.
+                options.RunOpt(); // avoid running options more than once per frame.
                 myFrameCount = vbc.task.frameCount;
             }
 
@@ -9323,7 +9323,7 @@ namespace CS_Classes
             desc = "Find the top X contours by size and display them.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             contour.Run(src);
             var sortedContours = new SortedList<int, List<cv.Point>>(new compareAllowIdenticalIntegerInverted());
@@ -9361,10 +9361,10 @@ namespace CS_Classes
             desc = "General purpose contour finder";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            optionsTiers.RunVB();
+            options.RunOpt();
+            optionsTiers.RunOpt();
 
             vbc.task.pcSplit[2].ConvertTo(dst1, MatType.CV_32S, 100 / optionsTiers.cmPerTier, 1);
 
@@ -9424,7 +9424,7 @@ namespace CS_Classes
             desc = "Create a contour from some random points";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -9467,9 +9467,9 @@ namespace CS_Classes
             desc = "Reduce contrast with POW function";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst2.ConvertTo(dst3, MatType.CV_32FC3);
@@ -9493,9 +9493,9 @@ namespace CS_Classes
             desc = "Show image with varying contrast and brightness.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst2 = src.ConvertScaleAbs(options.brightness, options.contrast);
         }
@@ -9532,9 +9532,9 @@ namespace CS_Classes
             return hullList;
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             List<cv.Point> hullList = vbc.task.rc.contour;
             if (standaloneTest())
@@ -9581,7 +9581,7 @@ namespace CS_Classes
             desc = "Get lots of odd shapes from the RedCloud_Basics output and use ConvexHull to simplify them.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -9615,7 +9615,7 @@ namespace CS_Classes
             desc = "Find the convexityDefects in the image";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             contours.Run(dst2.Clone());
             cv.Point[] c = contours.bestContour.ToArray();
@@ -9685,7 +9685,7 @@ namespace CS_Classes
             return newC;
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             convex.Run(src);
             dst1 = convex.redC.dst2;
@@ -9733,10 +9733,10 @@ namespace CS_Classes
             desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            optionCorner.RunVB();
-            options.RunVB();
+            optionCorner.RunOpt();
+            options.RunOpt();
 
             dst2 = src.Clone();
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -9777,9 +9777,9 @@ namespace CS_Classes
             labels[3] = "Corner Eigen values";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             mc = new Mat(gray.Size(), MatType.CV_32FC1, new Scalar(0));
@@ -9833,9 +9833,9 @@ namespace CS_Classes
             desc = "Use PreCornerDetect to find features in the image.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Mat gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat prob = new Mat();
@@ -9864,9 +9864,9 @@ namespace CS_Classes
             labels[3] = "Corner Eigen values using ShiTomasi which is also what is used in GoodFeatures.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -9901,7 +9901,7 @@ namespace CS_Classes
             desc = "Find interesting points with the FAST and smooth the centroid with kalman";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fast.Run(src);
             dst2 = fast.dst2;
@@ -9937,7 +9937,7 @@ namespace CS_Classes
             desc = "Find and save only the stable points in the FAST output.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fast.Run(src);
 
@@ -9982,7 +9982,7 @@ namespace CS_Classes
             desc = "Use a thread grid to find the centroids in each grid element";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
 
@@ -10023,9 +10023,9 @@ namespace CS_Classes
             desc = "Use Harris feature detectors to identify interesting points.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             byte[] dataSrc = new byte[src.Total() * src.Channels()];
@@ -10074,9 +10074,9 @@ namespace CS_Classes
             desc = "Use Harris detector to identify interesting points.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst2 = src.Clone();
 
@@ -10132,7 +10132,7 @@ namespace CS_Classes
             desc = "Find the corners for each RedCloud cell.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -10165,9 +10165,9 @@ namespace CS_Classes
             desc = "Use PreCornerDetect to refine the feature points to sub-pixel accuracy.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst2 = src.Clone();
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -10201,9 +10201,9 @@ namespace CS_Classes
             desc = "Compute a correlation for src rows (See also: Match.cs";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             kFlood.Run(src);
             dst1 = kFlood.dst2;
@@ -10279,7 +10279,7 @@ namespace CS_Classes
             desc = "Calculate the covariance of random depth data points.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst3.SetTo(0);
             if (standaloneTest())
@@ -10336,7 +10336,7 @@ namespace CS_Classes
             desc = "Test the covariance basics algorithm.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             double[] testInput = { 1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9 };
             Mat samples = cv.Mat.FromPixelData(10, 2, MatType.CV_64F, testInput);
@@ -10362,7 +10362,7 @@ namespace CS_Classes
             desc = "Calculate the covariance of 2 images";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (vbc.task.optionsChanged) gray.ConvertTo(last32f, MatType.CV_32F);
@@ -10400,7 +10400,7 @@ namespace CS_Classes
             desc = "Experiment with hashing algorithm and guid";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int iSize = (int)(src.Total() * src.ElemSize());
             int maxImages = 10;
@@ -10459,7 +10459,7 @@ namespace CS_Classes
             ArrayList = new List<List<string>>();
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             string[] readText = File.ReadAllLines(InputFile);
             string[] variables = readText[0].Split(',');
@@ -10504,9 +10504,9 @@ namespace CS_Classes
             desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Channels() == 3)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -10543,9 +10543,9 @@ namespace CS_Classes
             desc = "Apply OpenCV's Discrete Cosine Transform to a BGR image and use slider to remove the highest frequencies.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            dct.options.RunVB();
+            dct.options.RunOpt();
 
             Mat[] srcPlanes = Cv2.Split(src);
 
@@ -10586,7 +10586,7 @@ namespace CS_Classes
             desc = "Find featureless surfaces in the depth data - expected to be useful only on the K4A for Azure camera.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat gray = vbc.task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat frequencies = new Mat();
@@ -10620,7 +10620,7 @@ namespace CS_Classes
             labels[3] = "FeatureLess BGR regions";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dct.Run(src);
 
@@ -10681,7 +10681,7 @@ namespace CS_Classes
             desc = "Find plane equation for a featureless surface - debugging one region for now.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             mats.mat[0] = src.Clone();
             mats.mat[0].SetTo(Scalar.White, vbc.task.gridMask);
@@ -10762,7 +10762,7 @@ namespace CS_Classes
             desc = "Subdivide an image based on the points provided.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat && standalone)
             {
@@ -10810,7 +10810,7 @@ namespace CS_Classes
             desc = "Use Delaunay to subdivide an image into triangles.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -10871,7 +10871,7 @@ namespace CS_Classes
             desc = "Generate random points and divide the image around those points.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
             dst2.SetTo(new Scalar(0));
@@ -10930,7 +10930,7 @@ namespace CS_Classes
             desc = "Create a region in an image for each cv.Point provided without using KNN.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() && vbc.task.heartBeat)
             {
@@ -10991,7 +10991,7 @@ namespace CS_Classes
             desc = "Create a region in an image for each cv.Point provided";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -11060,7 +11060,7 @@ namespace CS_Classes
             desc = "Subdivide an image based on the points provided.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat && standalone)
             {
@@ -11126,7 +11126,7 @@ namespace CS_Classes
             desc = "Subdivide an image based on the points provided.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat && standalone)
             {
@@ -11171,7 +11171,7 @@ namespace CS_Classes
             desc = "Denoise example.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY) - cv.Scalar.All(1);
@@ -11214,9 +11214,9 @@ namespace CS_Classes
             desc = "Remove single pixels between identical pixels";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (standaloneTest())
             {
@@ -11280,7 +11280,7 @@ namespace CS_Classes
             desc = "Colorize the depth data into vbc.task.depthRGB";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = vbc.task.pcSplit[2];
 
@@ -11319,7 +11319,7 @@ namespace CS_Classes
             if (p.Y >= dst2.Height) p.Y = dst2.Height - 1;
             return p;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged) kalman.kInput = new float[vbc.task.gridList.Count() * 4];
             dst2 = src.Clone();
@@ -11373,9 +11373,9 @@ namespace CS_Classes
         {
             desc = "Display the depth as a color map";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Cv2.ConvertScaleAbs(vbc.task.pcSplit[2] * 1000, dst1, options.alpha, options.beta);
             dst1 += cv.Scalar.All(1);
             dst2 = ShowPalette(dst1);
@@ -11391,7 +11391,7 @@ namespace CS_Classes
             labels[3] = "Stable (non-zero) Depth";
             desc = "Collect X frames, compute stable depth using the BGR and Depth image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest()) src = vbc.task.depthRGB;
             bgSub.Run(src);
@@ -11417,7 +11417,7 @@ namespace CS_Classes
             desc = "Display the vbc.task.pcSplit[2], vbc.task.pointcloud, vbc.task.depthMask, and vbc.task.noDepthMask";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst0 = vbc.task.pcSplit[2];
             dst1 = vbc.task.pointCloud;
@@ -11438,9 +11438,9 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": use local options to control separation of points in 3D.");
             desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Type() != MatType.CV_32F) src = vbc.task.pcSplit[2];
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
@@ -11463,7 +11463,7 @@ namespace CS_Classes
         {
             desc = "Display gradient phase and 2D density side by side.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gradient.Run(empty);
             dst3 = Convert32f_To_8UC3(gradient.dst3);
@@ -11479,9 +11479,9 @@ namespace CS_Classes
             cPtr = Density_Count_Open();
             desc = "Isolate points in 3D by counting 8 neighboring Z points in the pointcloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Type() != MatType.CV_32F) src = vbc.task.pcSplit[2];
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
@@ -11503,7 +11503,7 @@ namespace CS_Classes
         {
             desc = "Measure a mask's size in any image and track the biggest regions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             src.SetTo(0, vbc.task.noDepthMask);
@@ -11553,7 +11553,7 @@ namespace CS_Classes
             SetTrueText(text, pt, 3);
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var mm = GetMinMax(vbc.task.pcSplit[2], vbc.task.depthMask);
             vbc.task.depthRGB.CopyTo(dst2);
@@ -11581,7 +11581,7 @@ namespace CS_Classes
             desc = "Identify the minimum rectangles of contours of the depth shadow";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             shadow.Run(src);
 
@@ -11624,7 +11624,7 @@ namespace CS_Classes
             desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged)
                 meanSeries = new cv.Mat(vbc.task.gridList.Count, vbc.task.frameHistoryCount, MatType.CV_32F, cv.Scalar.All(0));
@@ -11706,7 +11706,7 @@ namespace CS_Classes
             desc = "Plot the mean and stdev of the depth image";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Scalar mean, stdev;
             Mat depthMask = vbc.task.depthMask;
@@ -11740,9 +11740,9 @@ namespace CS_Classes
             desc = "Use the bio-inspired retina algorithm to determine depth uncertainty.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             retina.Run(vbc.task.depthRGB);
             dst2 = retina.dst2;
@@ -11764,7 +11764,7 @@ namespace CS_Classes
             desc = "Use a palette to display depth from the raw depth data.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gColor.gradientWidth = 255;
             gColor.Run(empty);
@@ -11790,7 +11790,7 @@ namespace CS_Classes
             desc = "Display depth data with InRange. Higher contrast than others - yellow to blue always present.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32F)
                 src = vbc.task.pcSplit[2];
@@ -11828,7 +11828,7 @@ namespace CS_Classes
             desc = "Find min and max depth in each segment.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -11881,7 +11881,7 @@ namespace CS_Classes
             median.rangeMin = 0;
             desc = "Divide the depth image ahead and behind the median.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             median.Run(vbc.task.pcSplit[2]);
 
@@ -11912,9 +11912,9 @@ namespace CS_Classes
             labels[3] = "Depth pixels after smoothing";
             desc = "Use depth rate of change to smooth the depth values in close range";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             cv.Rect rect = vbc.task.drawRect.Width != 0 ? vbc.task.drawRect : new cv.Rect(0, 0, src.Width, src.Height);
 
@@ -11946,7 +11946,7 @@ namespace CS_Classes
             labels[3] = "Mask of depth that is smooth";
             desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             smooth.Run(vbc.task.pcSplit[2]);
             Mat input = smooth.dst2.Normalize(0, 255, NormTypes.MinMax);
@@ -11979,7 +11979,7 @@ namespace CS_Classes
             labels[3] = "Latest hole mask";
             desc = "Integrate memory holes over time to identify unstable depth";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged)
             {
@@ -12017,9 +12017,9 @@ namespace CS_Classes
             element = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(5, 5));
             desc = "Identify holes in the depth image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst2 = vbc.task.pcSplit[2].Threshold(0.01, 255, ThresholdTypes.BinaryInv).ConvertScaleAbs(255);
             dst2 = dst2.Dilate(element, null, options.holeDilation);
@@ -12040,7 +12040,7 @@ namespace CS_Classes
         {
             desc = "Dilate the depth data to fill holes.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dilate.Run(vbc.task.pcSplit[2]);
             dst2 = dilate.dst2;
@@ -12062,7 +12062,7 @@ namespace CS_Classes
             labels[2] = "Blue is current, red is kalman, green is trusted";
             desc = "Use Depth_ForeGround to find the foreground blob.  Then find the probable head of the person in front of the camera.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fgnd.Run(src);
 
@@ -12107,7 +12107,7 @@ namespace CS_Classes
         {
             desc = "Merge the BGR and Depth Shadow";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src;
             dst2.SetTo(0, vbc.task.noDepthMask);
@@ -12126,7 +12126,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Latest vbc.task.noDepthMask", "BGSubtract output for the vbc.task.noDepthMask" };
             desc = "Create a mask for the missing depth across multiple frame";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = vbc.task.noDepthMask;
 
@@ -12148,7 +12148,7 @@ namespace CS_Classes
             labels[3] = "32-bit format depth data";
             desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32F) src = vbc.task.pcSplit[2];
             avg.Run(src);
@@ -12171,7 +12171,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Depth that is too far", "Contour of depth that is too far..." };
             desc = "Display the vbc.task.maxDepthMask and its contour containing depth that is greater than maxdepth (global setting)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src;
 
@@ -12209,9 +12209,9 @@ namespace CS_Classes
             vbc.task.frameHistoryCount = 5;
             desc = "Create a fused foreground mask over x number of frames (vbc.task.frameHistoryCount)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged) lastFrames.Clear();
 
@@ -12257,9 +12257,9 @@ namespace CS_Classes
             desc = "Use InRange to define foreground and find the largest blob in the foreground";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Cv2.InRange(vbc.task.pcSplit[2], 0.01, options.maxForegroundDepthInMeters, dst2);
             dst3 = dst2.Clone();
@@ -12313,9 +12313,9 @@ namespace CS_Classes
             desc = "Create a mask for the objects in the foreground";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Cv2.Threshold(vbc.task.pcSplit[2], dst1, options.maxForegroundDepthInMeters, 255, cv.ThresholdTypes.BinaryInv);
             dst1 = dst1.ConvertScaleAbs();
@@ -12350,7 +12350,7 @@ namespace CS_Classes
             desc = "Find boundaries in depth to separate featureless regions.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst3 = vbc.task.pcSplit[2];
             dst2 = vbc.task.gridMask.Clone();
@@ -12385,9 +12385,9 @@ namespace CS_Classes
             desc = "Create the selected number of depth ranges ";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             List<Mat> regMats = new List<Mat>();
             for (int i = 0; i < options.numberOfRegions; i++)
@@ -12447,7 +12447,7 @@ namespace CS_Classes
             desc = "Separate the scene into a specified number of regions by depth";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.Threshold(vbc.task.pcSplit[2], dst1, vbc.task.gOptions.maxDepth, 255, ThresholdTypes.Binary);
             dst0 = (vbc.task.pcSplit[2] / vbc.task.gOptions.maxDepth) * 255 / classCount;
@@ -12474,7 +12474,7 @@ namespace CS_Classes
             desc = "Identify where depth is increasing - retreating from the camera.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             depth.Run(src);
             dst2 = depth.dst2;
@@ -12497,9 +12497,9 @@ namespace CS_Classes
             desc = "Identify where depth is decreasing - coming toward the camera.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             fore.Run(src);
             dst1.SetTo(0);
@@ -12541,7 +12541,7 @@ namespace CS_Classes
             desc = "Identify the punch with a rectangle around the largest blob";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             depthInc.Run(src);
             dst1 = depthInc.dst2;
@@ -12590,9 +12590,9 @@ namespace CS_Classes
             desc = "Identify a punch using both depth and color";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.FirstPass) lastColor = vbc.task.color.Clone();
             dst2 = vbc.task.color.Clone();
@@ -12622,7 +12622,7 @@ namespace CS_Classes
             desc = "Create and display the vbc.task.depthMask output as a contour.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             contour.Run(vbc.task.depthMask);
 
@@ -12650,7 +12650,7 @@ namespace CS_Classes
             desc = "Provide a line that separates depth from no depth throughout the image.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest()) { src = vbc.task.depthMask; }
             contour.Run(src);
@@ -12684,7 +12684,7 @@ namespace CS_Classes
             desc = "Use Depth_StableMax to remove the artifacts from the Depth_Averaging";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32F) { src = vbc.task.pcSplit[2]; }
             extrema.Run(src);
@@ -12717,9 +12717,9 @@ namespace CS_Classes
             desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat[] split = src.Type() == MatType.CV_32FC3 ? src.Split() : vbc.task.pcSplit;
 
             if (vbc.task.heartBeat)
@@ -12765,7 +12765,7 @@ namespace CS_Classes
             desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC1) { src = vbc.task.pcSplit[2]; }
 
@@ -12803,7 +12803,7 @@ namespace CS_Classes
             desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC1) { src = vbc.task.pcSplit[2]; }
 
@@ -12844,9 +12844,9 @@ namespace CS_Classes
             desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Type() != MatType.CV_32FC1) { src = vbc.task.pcSplit[2]; }
             if (vbc.task.optionsChanged) { dst3 = vbc.task.pcSplit[2]; }
@@ -12885,7 +12885,7 @@ namespace CS_Classes
             desc = "Create OpenGL point cloud from depth data (slow)";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC1) { src = vbc.task.pcSplit[2]; }
 
@@ -12932,7 +12932,7 @@ namespace CS_Classes
             desc = "Create 32-bit XYZ format from depth data (too slow to be useful.)";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC1)
                 src = vbc.task.pcSplit[2];
@@ -12974,7 +12974,7 @@ namespace CS_Classes
             desc = "Build the (approximate) point cloud using camera intrinsics - see CameraOakD.cs for comparable calculations";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass)
                 template.Run(empty);
@@ -13014,9 +13014,9 @@ namespace CS_Classes
             desc = "Create a reduced image of the depth data to define tiers of similar values";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Type() != MatType.CV_32F) src = vbc.task.pcSplit[2];
 
@@ -13046,7 +13046,7 @@ namespace CS_Classes
             desc = "Determine the 'K' value for the best number of clusters for the depth";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             valley.Run(src);
             dst2 = valley.dst2;
@@ -13076,9 +13076,9 @@ namespace CS_Classes
             desc = "Attempt to stabilize the depth image.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst2 = vbc.task.depthRGB / options.reductionFactor;
             dst2 *= options.reductionFactor;
@@ -13105,9 +13105,9 @@ namespace CS_Classes
             desc = "Display a first or second derivative of the selected depth dimension and direction.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Type() != MatType.CV_32F)
             {
@@ -13168,7 +13168,7 @@ namespace CS_Classes
             desc = "Display the derivative of the selected depth dimension.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int channel = deriv.options.channel;
             string chanName = "X";
@@ -13208,9 +13208,9 @@ namespace CS_Classes
             desc = "Create a histogram and backprojection for the second derivative of depth in the selected dimension.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             int channel = deriv.options.channel;
             cv.Size gausskern = new cv.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize);
@@ -13253,7 +13253,7 @@ namespace CS_Classes
             return count;
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             deriv.Run(vbc.task.pcSplit[deriv.options.channel].Sobel(MatType.CV_32F, 1, 0, deriv.options.kernelSize));
             classCountX = derivClassCount(ref dst2);
@@ -13297,7 +13297,7 @@ namespace CS_Classes
             invDFT.ConvertTo(invDFT, MatType.CV_8U);
             return invDFT;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             grayMat = src;
             if (src.Channels() == 3)
@@ -13351,10 +13351,10 @@ namespace CS_Classes
             labels[2] = "Image with Butterworth Low Pass Filter Applied";
             labels[3] = "Same filter with radius / 2";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            dft.RunCS(src);
+            options.RunOpt();
+            dft.RunAlg(src);
             if (vbc.task.optionsChanged)
             {
                 Parallel.For(0, 2, k =>
@@ -13403,7 +13403,7 @@ namespace CS_Classes
             desc = "Take the inverse of the Discrete Fourier Transform.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -13453,7 +13453,7 @@ namespace CS_Classes
             labels[3] = "Same filter with radius / 2";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bfilter.Run(vbc.task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY));
             dst2 = bfilter.dst2;
@@ -13485,10 +13485,10 @@ namespace CS_Classes
             desc = "Show the spectrum magnitude for some standard shapes";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            optionsDFT.RunVB();
+            options.RunOpt();
+            optionsDFT.RunOpt();
 
             switch (optionsDFT.dftShape)
             {
@@ -13561,7 +13561,7 @@ namespace CS_Classes
             desc = "Capture an image and compare it to previous frame using absDiff and threshold";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -13604,7 +13604,7 @@ namespace CS_Classes
         {
             desc = "Count frames that are identical to the previous - a driver issue. The interrupt is triggered by something other than an RGB image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             diffColor.Run(src);
             dst2 = diffColor.dst2;
@@ -13640,7 +13640,7 @@ namespace CS_Classes
             desc = "Use Diff_Basics with a color image.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass)
                 diff.lastFrame = src.Reshape(1, src.Rows * 3);
@@ -13667,7 +13667,7 @@ namespace CS_Classes
             desc = "Build a mask for any pixels that have either unstable depth or color";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             diff.Run(src);
             Mat unstableGray = diff.dst2.Clone();
@@ -13703,7 +13703,7 @@ namespace CS_Classes
             desc = "Run Diff_Basics and accumulate BGR diff data.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             diff.Run(src);
             if (vbc.task.optionsChanged)
@@ -13736,7 +13736,7 @@ namespace CS_Classes
             desc = "identify lines in the diff output";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             diff.Run(src);
             dst2 = diff.dst2;
@@ -13767,7 +13767,7 @@ namespace CS_Classes
             desc = "Diff an image with one from the last heartbeat.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -13799,9 +13799,9 @@ namespace CS_Classes
             desc = "Where is the depth difference between frames greater than X centimeters.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
                 lastDepth32f = vbc.task.pcSplit[2].Clone();
@@ -13835,9 +13835,9 @@ namespace CS_Classes
             desc = "Dilate the image provided.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (options.noshape || options.iterations == 0)
                 dst2 = src;
@@ -13866,9 +13866,9 @@ namespace CS_Classes
             desc = "Erode and dilate with MorphologyEx on the BGR and Depth image.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             MorphTypes openClose = options.iterations > 0 ? MorphTypes.Open : MorphTypes.Close;
             Cv2.MorphologyEx(vbc.task.depthRGB, dst3, openClose, options.element);
             Cv2.MorphologyEx(src, dst2, openClose, options.element);
@@ -13888,9 +13888,9 @@ namespace CS_Classes
             desc = "Erode and dilate with MorphologyEx on the input image.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Cv2.MorphologyEx(src, dst2, MorphTypes.Open, options.element);
             Cv2.MorphologyEx(dst2, dst2, MorphTypes.Close, options.element);
         }
@@ -13920,7 +13920,7 @@ namespace CS_Classes
             return (int)(vbc.task.baseline * 1000 * vbc.task.focalLength / depth);
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.cameraName == "Azure Kinect 4K")
             {
@@ -14001,9 +14001,9 @@ namespace CS_Classes
             desc = "Distance algorithm basics.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (standaloneTest()) src = vbc.task.depthRGB;
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -14029,9 +14029,9 @@ namespace CS_Classes
             desc = "Distance algorithm basics.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (standaloneTest()) src = vbc.task.depthRGB;
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -14062,7 +14062,7 @@ namespace CS_Classes
             desc = "Distance algorithm basics.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var cRadio = FindRadio("C");
             var l1Radio = FindRadio("L1");
@@ -14097,7 +14097,7 @@ namespace CS_Classes
             desc = "Use distance algorithm on the background";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dist.Run(src);
             dst2 = dist.dst2;
@@ -14122,7 +14122,7 @@ namespace CS_Classes
             desc = "Compute the distance in meters between 3D points in the point cloud";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() && vbc.task.heartBeat)
             {
@@ -14165,7 +14165,7 @@ namespace CS_Classes
             desc = "Compute the distance between 4D points";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -14218,7 +14218,7 @@ namespace CS_Classes
             return Math.Sqrt(result);
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
 
@@ -14314,7 +14314,7 @@ namespace CS_Classes
             desc = "Measure the fragmentation of a binary image by using the distance transform";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binary.Run(src);
             dst2 = binary.dst2;
@@ -14348,9 +14348,9 @@ namespace CS_Classes
         {
             desc = "Add Noise to the color image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             src.CopyTo(dst2);
             noiseMask = new Mat(src.Size(), MatType.CV_8UC1, Scalar.Black);
@@ -14380,9 +14380,9 @@ namespace CS_Classes
         {
             desc = "Draw the requested number of ellipses.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.heartBeat)
             {
                 dst2.SetTo(Scalar.Black);
@@ -14408,9 +14408,9 @@ namespace CS_Classes
         {
             desc = "Draw the requested number of circles.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.heartBeat)
             {
                 dst2.SetTo(Scalar.Black);
@@ -14435,9 +14435,9 @@ namespace CS_Classes
         {
             desc = "Draw the requested number of Lines.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.heartBeat)
             {
                 dst2.SetTo(Scalar.Black);
@@ -14463,9 +14463,9 @@ namespace CS_Classes
             desc = "Draw Polygon figures";
             labels = new string[] { "", "", "Convex Hull for the same points", "Polylines output" };
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (!vbc.task.heartBeat) return;
             int height = src.Height / 8;
             int width = src.Width / 8;
@@ -14511,7 +14511,7 @@ namespace CS_Classes
         {
             desc = "Use RNG to draw the same set of shapes every time";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int offsetX = 25, offsetY = 25, lineLength = 25, thickness = 2;
             dst2.SetTo(0);
@@ -14560,9 +14560,9 @@ namespace CS_Classes
         {
             desc = "Generate shapes programmatically";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.heartBeat)
             {
                 dst2.SetTo(Scalar.Black);
@@ -14607,9 +14607,9 @@ namespace CS_Classes
         {
             desc = "Use OpenCV's ellipse function to draw an arc";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.heartBeat)
             {
                 rect = InitRandomRect(options.saveMargin);
@@ -14673,7 +14673,7 @@ namespace CS_Classes
             setup();
             desc = "Demonstrate the use of the ClipLine function in Opencv. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst3 = src;
             kalman.kInput = new float[] { pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height };
@@ -14710,7 +14710,7 @@ namespace CS_Classes
     //        alpha.Text = "Perception is the key";
     //        desc = "What it means to recognize a cube.  Zygmunt Pizlo - UC Irvine";
     //    }
-    //    public void RunCS(Mat src)
+    //    public void RunAlg(Mat src)
     //    {
     //    }
     //}
@@ -14726,7 +14726,7 @@ namespace CS_Classes
         {
             desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) vbc.task.ClickPoint = new cv.Point();
             if (p1 != new cv.Point() && p2 != new cv.Point() && vbc.task.ClickPoint != new cv.Point())
@@ -14760,7 +14760,7 @@ namespace CS_Classes
         {
             desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line...";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -14784,7 +14784,7 @@ namespace CS_Classes
             labels[3] = "Frustrum 3D pointcloud";
             desc = "Draw a frustrum for a camera viewport";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src = new Mat(vbc.task.WorkingRes, MatType.CV_32F, cv.Scalar.All(0));
             int mid = src.Height / 2;
@@ -14811,7 +14811,7 @@ namespace CS_Classes
         {
             desc = "Removed blowback in the pointcloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dust.Run(src);
             for (int i = 1; i <= dust.classCount; i++)
@@ -14840,9 +14840,9 @@ namespace CS_Classes
             labels[3] = "Any flickering below is from changes in the sorted order of the clusters.  It should not be a problem.";
             desc = "Build a histogram that finds the clusters of depth data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             hist.bins = options.bins;
             Mat src32f = vbc.task.pcSplit[2];
             vbc.task.maxDepthMask = src32f.InRange(vbc.task.MaxZmeters, vbc.task.MaxZmeters).ConvertScaleAbs();
@@ -14899,7 +14899,7 @@ namespace CS_Classes
         {
             desc = "Removed blowback in the pointcloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dust.Run(src);
             for (int i = 1; i <= dust.classCount; i++)
@@ -14926,7 +14926,7 @@ namespace CS_Classes
         {
             desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             duster.Run(src);
             dst1 = duster.dust.dst2.InRange(1, 1);
@@ -14957,7 +14957,7 @@ namespace CS_Classes
             labels[2] = "Edges in color and depth after dilate";
             labels[3] = "Edges in color and depth no dilate";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             canny.Run(src);
             shadow.Run(src);
@@ -14976,9 +14976,9 @@ namespace CS_Classes
             labels[3] = "x field + y field in CV_32F format";
             desc = "Scharr is most accurate with 3x3 kernel.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             var xField = gray.Scharr(MatType.CV_32FC1, 1, 0);
             var yField = gray.Scharr(MatType.CV_32FC1, 0, 1);
@@ -14994,9 +14994,9 @@ namespace CS_Classes
             labels[3] = "Edge preserving blur for BGR depth image above";
             desc = "OpenCV's edge preserving filter.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.recurseCheck)
             {
                 Cv2.EdgePreservingFilter(src, dst2, EdgePreservingMethods.RecursFilter, (float)options.EP_Sigma_s,
@@ -15029,9 +15029,9 @@ namespace CS_Classes
             rgbData = new byte[dst2.Total() * dst2.ElemSize()];
             labels[3] = "Thresholded Edge Mask (use slider to adjust)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.frameCount < 100)
                 SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", new cv.Point(10, 100));
             if (vbc.task.frameCount == 5)
@@ -15062,9 +15062,9 @@ namespace CS_Classes
             labels[3] = "Mask for the isolated frequencies";
             desc = "Find edges by removing all the highest frequencies.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var gray = vbc.task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
             var frequencies = new Mat();
             var src32f = new Mat();
@@ -15087,9 +15087,9 @@ namespace CS_Classes
             labels[3] = "Image enhanced with Deriche results";
             desc = "Edge detection using the Deriche X and Y gradients";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
             var handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
@@ -15116,7 +15116,7 @@ namespace CS_Classes
             labels[3] = "Edges produced with featureless regions cleared";
             desc = "Use the featureless regions to enhance the edge detection";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(src);
             dst2 = edges.dst2.Clone();
@@ -15135,7 +15135,7 @@ namespace CS_Classes
             FindSlider("Sobel kernel Size").Value = 5;
             desc = "Edges that are consistent for x number of frames";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged) saveFrames = new List<Mat>();
             edges.Run(src);
@@ -15159,7 +15159,7 @@ namespace CS_Classes
         {
             desc = "Visualize the impact of reduction on Edge_BinarizeSobel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst3 = reduction.dst2;
@@ -15176,7 +15176,7 @@ namespace CS_Classes
             FindRadio("Binarized Sobel").Checked = true;
             desc = "Visualize the impact of brightness on Bin4Way_Sobel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bright.Run(src);
             dst2 = bright.dst3;
@@ -15194,7 +15194,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View" };
             desc = "Isolate edges in the left and right views.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.mouseClickFlag) vbc.task.mouseClickFlag = false; // preempt use of quadrants.
             edges.Run(vbc.task.rightView);
@@ -15230,9 +15230,9 @@ namespace CS_Classes
         {
             desc = "Match edges in the left and right views to determine distance";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = vbc.task.leftView;
             dst3 = vbc.task.rightView;
             int[] maxLocs = new int[vbc.task.gridList.Count()];
@@ -15302,7 +15302,7 @@ namespace CS_Classes
         {
             desc = "Combine the edges from all 3 channels";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat img32f = new Mat();
             src.ConvertTo(img32f, MatType.CV_32FC3);
@@ -15328,7 +15328,7 @@ namespace CS_Classes
         {
             desc = "Combine the edges from all 3 HSV channels";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             edges.Run(hsv);
@@ -15344,7 +15344,7 @@ namespace CS_Classes
             desc = "Find the edges in the LeftViewimages.";
             labels = new string[] { "", "", "Edges in Left Image", "Edges in Right Image (except on Kinect 4 Azure)" };
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sobel.Run(vbc.task.rightView);
             dst3 = sobel.dst2.Clone();
@@ -15364,7 +15364,7 @@ namespace CS_Classes
             cPtr = Edge_ColorGap_Open();
             desc = "Using grayscale image to identify color gaps which imply an edge - C++ version";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int diff = diffSlider.Value;
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -15393,9 +15393,9 @@ namespace CS_Classes
             dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Using grayscale image to identify color gaps which imply an edge - C# edition";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             dst2.SetTo(0);
             int half = options.gapDistance / 2;
@@ -15433,9 +15433,9 @@ namespace CS_Classes
             dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Using depth image to identify gaps which imply an edge";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() != 1) src = vbc.task.pcSplit[2];
             dst2.SetTo(0);
             int half = options.depthDist / 2;
@@ -15470,9 +15470,9 @@ namespace CS_Classes
             cPtr = Edge_DepthGap_Open();
             desc = "Create edges wherever depth differences are greater than x";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Type() != MatType.CV_32FC1) src = vbc.task.pcSplit[2];
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, cppData, 0, cppData.Length);
@@ -15496,7 +15496,7 @@ namespace CS_Classes
             desc = "Set the max thresholds for Canny to get the minimum number of edge pixels";
             labels[2] = "Essential lines in the image - minimum number of pixels in Canny output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             canny.Run(src);
             dst2 = canny.dst2;
@@ -15512,7 +15512,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Essential lines in the left image", "Essential lines in the right image" };
             desc = "Set the max thresholds for Canny to get the minimum number of edge pixels for the left and right images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             canny.Run(vbc.task.leftView);
             dst2 = canny.dst2.Clone();
@@ -15530,7 +15530,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Edges in the Reduction output", "Reduction_Basics output" };
             desc = "Find edges in the reduction image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst3 = reduction.dst2;
@@ -15548,7 +15548,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Edge_Canny output for the depth regions", "Identified regions " };
             desc = "Find the edges for the depth tiers.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tiers.Run(src);
             dst3 = tiers.dst3;
@@ -15564,9 +15564,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Canny using L1 Norm", "Canny using L2 Norm" };
             desc = "Show canny edge detection with varying thresholds";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (src.Type() != MatType.CV_8U) src.ConvertTo(src, MatType.CV_8U);
             dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, true);
@@ -15584,9 +15584,9 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Show canny edge over the last X frame (see global option 'FrameHistory')";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, true);
             if (vbc.task.optionsChanged) frameList.Clear();
@@ -15608,9 +15608,9 @@ namespace CS_Classes
             labels[2] = "Edges found with just resizing";
             labels[3] = "Found edges added to grayscale image source.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat gray = src;
             if (src.Channels() == 3) gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat newFrame = gray[new cv.Range(options.vertPixels, gray.Rows - options.vertPixels),
@@ -15629,7 +15629,7 @@ namespace CS_Classes
         {
             desc = "Combine the results of Edge_ResizeAdd and Canny";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             canny.Run(src);
             edges.Run(canny.dst2);
@@ -15643,7 +15643,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Sobel Custom 1", "Sobel Custom 2" };
             desc = "Show Sobel edge detection a custom vertical kernel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 0, -1, 2, 0, -2, 1, 0, -1 }));
             dst1.ConvertTo(dst2, src.Type());
@@ -15658,7 +15658,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Sobel Custom 1", "Sobel Custom 2" };
             desc = "Show Sobel edge detection a custom horizontal kernel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst1 = src.Filter2D(MatType.CV_32F, cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 2, 1, 0, 0, 0, -1, -2, -1 }));
             dst1.ConvertTo(dst2, src.Type());
@@ -15677,9 +15677,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Sobel Custom 1", "Sobel Custom 2" };
             desc = "Show Sobel edge detection with custom horizont and vertical kernels";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.horizonCheck)
             {
                 edgesH.Run(src);
@@ -15713,7 +15713,7 @@ namespace CS_Classes
             labels = new string[] { "Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2" };
             desc = "Show Sobel edge detection for both left and right images";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             custom.Run(vbc.task.leftView);
             dst0 = custom.dst2.Clone();
@@ -15732,7 +15732,7 @@ namespace CS_Classes
             labels[3] = "Canny edges in grayscale (red) and edges in back projection (blue)";
             desc = "Find the edges in the HistValley_FromPeaks backprojection";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             canny.Run(src);
             dst1 = canny.dst2.Clone();
@@ -15756,9 +15756,9 @@ namespace CS_Classes
         {
             desc = "Show Sobel edge detection with varying kernel sizes";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst0 = src.Sobel(MatType.CV_32F, 1, 0, options.kernelSize);
             if (options.horizontalDerivative && options.verticalDerivative)
@@ -15790,9 +15790,9 @@ namespace CS_Classes
             labels[3] = "Laplacian of DepthRGB";
             desc = "Show Laplacian edge detection with varying kernel sizes";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.GaussianBlur(new cv.Size((int)options.gaussiankernelSize, (int)options.gaussiankernelSize), 0, 0);
             dst2 = dst2.Laplacian(MatType.CV_8U, options.LaplaciankernelSize, 1, 0);
             dst2 = dst2.ConvertScaleAbs();
@@ -15812,7 +15812,7 @@ namespace CS_Classes
             FindCheckBox("Horizontal Derivative").Checked = true;
             desc = "Find edges with Sobel only in the horizontal direction";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(src);
             dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
@@ -15829,7 +15829,7 @@ namespace CS_Classes
             FindSlider("Canny threshold2").Value = 50;
             desc = "Collect edges over several frames controlled with global frame history";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(src);
             dst3 = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
@@ -15846,9 +15846,9 @@ namespace CS_Classes
             labels[3] = "AbsDiff output of offset with original";
             desc = "Find edges by displacing the current BGR image in any direction and diff it with the original.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (vbc.task.FirstPass) offsetImage = src.Clone();
@@ -15878,15 +15878,15 @@ namespace CS_Classes
         System.Windows.Forms.Form frmCheck;
         public Edge_Color8U_CS()
         {
-            frmCheck = FindFrm("Options_ColorMethod CheckBoxes");
+            frmCheck = vbc.FindFrm("Options_ColorMethod CheckBoxes");
             dst2 = new Mat(dst2.Size(), MatType.CV_8U);
             dst3 = new Mat(dst3.Size(), MatType.CV_8U);
             labels = new string[] { "", "", "The 'OR' of each selected method", "The 'AND' of each selected method" };
             desc = "Find edges in a variety of Color8U algorithms then find the edges common to all.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.FirstPass)
                 frmCheck.Left = vbc.task.gOptions.Width / 2;
@@ -15933,7 +15933,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "EdgeDraw_Basics_CS output", "" };
             desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -15966,7 +15966,7 @@ namespace CS_Classes
             dst3 = new Mat(dst2.Size(), MatType.CV_8U, new Scalar(0));
             desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -16010,7 +16010,7 @@ namespace CS_Classes
             labels[2] = "EigenVec (solution)";
             labels[3] = "Relationship between Eigen Vec and Vals";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             double[] a = { 1.96, -6.49, -0.47, -7.2, -0.65,
                        -6.49, 3.8, -6.39, 1.5, -6.34,
@@ -16069,9 +16069,9 @@ namespace CS_Classes
             labels[2] = "Use sliders to adjust the width and intensity of the line";
             desc = "Generate a noisy line in a field of random data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.heartBeat)
             {
@@ -16141,7 +16141,7 @@ namespace CS_Classes
             labels[3] = "Raw input (use sliders below to explore)";
             desc = "Remove outliers when trying to fit a line. Fitline and the Eigen computation below produce the same result.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             noisyLine.options.recompute = true;
             noisyLine.Run(src);
@@ -16227,9 +16227,9 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": use local options to control EMax.");
             desc = "Use EMax - Expectation Maximization - to classify the regions around a series of labeled points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (eLabels.Count == 0 || useInputClusters)
             {
                 useInputClusters = true;
@@ -16289,7 +16289,7 @@ namespace CS_Classes
             labels[2] = "Centers are highlighted, Previous centers are black";
             desc = "Display the Emax centers as they move";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             emax.Run(src);
             dst2 = emax.dst2;
@@ -16321,9 +16321,9 @@ namespace CS_Classes
             labels[2] = "EMax algorithms input samples";
             desc = "Options for EMax algorithms.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.FirstPass)
             {
@@ -16374,7 +16374,7 @@ namespace CS_Classes
         {
             desc = "OpenCV expectation maximization example.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             emaxInput.Run(empty);
             eLabels = new List<int>(emaxInput.eLabels);
@@ -16419,7 +16419,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Output of EMax_RedCloud", "Emax centers tracked and smoothed." };
             desc = "Use KNN to track the EMax Centers";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             emax.Run(src);
             dst2 = emax.dst2;
@@ -16457,7 +16457,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Random_Clusters output", "EMax layout for the random clusters supplied" };
             desc = "Build an EMax layout for random set of clusters (not a grid)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var regionSlider = FindSlider("Number of Clusters");
             emax.regionCount = regionSlider.Value;
@@ -16495,9 +16495,9 @@ namespace CS_Classes
             labels[2] = "absDiff with original";
             labels[3] = "Original decompressed";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.FirstPass) FindSlider("Encode Output Scaling").Value = 10;
 
             int[] encodeParams = { (int)options.encodeOption, options.qualityLevel };
@@ -16522,9 +16522,9 @@ namespace CS_Classes
         {
             desc = "JPEG Encoder";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.FirstPass) FindSlider("Encode Output Scaling").Value = 10;
 
             int[] encodeParams = { (int)options.encodeOption, options.qualityLevel };
@@ -16561,7 +16561,7 @@ namespace CS_Classes
             if (r.Y + r.Height >= vbc.task.WorkingRes.Height) r.Y = vbc.task.WorkingRes.Height - r.Height - 1;
             return r;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int stdSize = 30;
             if (vbc.task.drawRect == new cv.Rect())
@@ -16606,7 +16606,7 @@ namespace CS_Classes
             labels[2] = "Highest entropy marked with red rectangle";
             desc = "Find the highest entropy section of the color image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat entropyMap = new Mat(src.Size(), MatType.CV_32F);
             float[] entropyList = new float[vbc.task.gridList.Count];
@@ -16657,7 +16657,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Output of Corners_FAST, input to entropy calculation", "Lighter color is higher entropy, highlight shows highest" };
             desc = "Use FAST markings to add to entropy";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fast.Run(src);
             entropy.Run(fast.dst2);
@@ -16687,7 +16687,7 @@ namespace CS_Classes
             }
             return channelEntropy;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int[] dimensions = new int[] { vbc.task.histogramBins };
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -16733,7 +16733,7 @@ namespace CS_Classes
             }
             desc = "Find the highest entropy in each quadrant";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = vbc.task.color.Clone();
             for (int i = 0; i < vbc.task.subDivisionCount; i++)
@@ -16790,7 +16790,7 @@ namespace CS_Classes
         {
             desc = "Measure entropy in a binary image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binary.Run(src);
             dst2 = binary.dst2;
@@ -16814,9 +16814,9 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": use local options to control erosion.");
             desc = "Erode the image provided.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.noshape || options.iterations == 0)
                 dst2 = src;
             else
@@ -16845,7 +16845,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Eroded point cloud X", "Erode point cloud Y" };
             desc = "Erode depth and then find edges";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var dilateSlider = FindSlider("Dilate Iterations");
             var erodeSlider = FindSlider("Erode Iterations");
@@ -16873,9 +16873,9 @@ namespace CS_Classes
         {
             desc = "Erode depth to build a depth mask for inrange data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Cv2.Erode(vbc.task.pcSplit[2], dst0, erode.options.element);
             dst0 = vbc.task.pcSplit[2] - dst0;
             dst3 = dst0.LessThan(options.flatDepth).ToMat();
@@ -16898,9 +16898,9 @@ namespace CS_Classes
         {
             desc = "Erode and then dilate with MorphologyEx on the input image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Cv2.MorphologyEx(src, dst2, MorphTypes.Close, options.element);
             Cv2.MorphologyEx(dst2, dst2, MorphTypes.Open, options.element);
         }
@@ -16934,9 +16934,9 @@ namespace CS_Classes
             dst2.SetTo(slateColor);
             desc = "Use OpenCV to simulate the Etch-a-Sketch Toy";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             keys.Run(src);
             List<string> keyIn = new List<string>(keys.keyInput);
             if (options.demoMode)
@@ -16997,7 +16997,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.SetDotSize(5);
             desc = "MatchShapes: Show the alignment of the BGR image to the left and right camera images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = vbc.task.leftView;
             dst3 = vbc.task.rightView;
@@ -17034,10 +17034,10 @@ namespace CS_Classes
             labels = new string[] { "", "", "Left Image", "Right Image" };
             desc = "MatchShapes: Build overlays for the left and right images on the BGR image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            optTrans.RunVB();
+            options.RunOpt();
+            optTrans.RunOpt();
             cv.Rect rectLeft = new cv.Rect(options.leftCorner - optTrans.leftTrans, options.topCorner, dst2.Width - 2 * options.leftCorner, dst2.Height - 2 * options.topCorner);
             cv.Rect rectRight = new cv.Rect(options.rightCorner - optTrans.rightTrans, options.topCorner, dst2.Width - 2 * options.rightCorner, dst2.Height - 2 * options.topCorner);
             addw.src2 = vbc.task.leftView[rectLeft].Resize(dst2.Size());
@@ -17066,7 +17066,7 @@ namespace CS_Classes
             labels[2] = "Faces detected with Haar";
             labels[3] = "Faces detected with LBP";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             DetectFace(ref dst2, haarCascade);
@@ -17087,7 +17087,7 @@ namespace CS_Classes
             desc = "Detect faces Haar_alt database.";
             labels[2] = "Faces detected with Haar_Alt";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             DetectFace(ref dst2, haarCascade);
@@ -17113,9 +17113,9 @@ namespace CS_Classes
             vbc.task.features.Clear(); // in case it was previously in use...
             desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Clone();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             gather.Run(src);
@@ -17206,9 +17206,9 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": Use 'Options_Features' to control output.");
             desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Clone();
             gather.Run(src);
             vbc.task.features.Clear();
@@ -17236,7 +17236,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Find good features to track in a BGR image but use the same point if closer than a threshold";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             knn.queries = new List<cv.Point2f>(vbc.task.features);
@@ -17274,7 +17274,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Good features", "History of good features" };
             desc = "Get the features in a reduction grayscale image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst2 = src;
@@ -17302,7 +17302,7 @@ namespace CS_Classes
             vbc.task.gOptions.setRGBFilterSelection("Filter_Laplacian");
             desc = "Run Feature_Basics twice and compare results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(vbc.task.color);
             dst2 = src.Clone();
@@ -17348,9 +17348,9 @@ namespace CS_Classes
             labels[3] = "Correlation coefficients for each remaining cell";
             desc = "Use the top X goodFeatures and then use matchTemplate to find track them.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             double correlationMin = options.correlationMin;
             int templatePad = options.templatePad;
             int templateSize = options.templateSize;
@@ -17401,7 +17401,7 @@ namespace CS_Classes
             FindSlider("Min Distance to next").Value = 10;
             desc = "Divide the image into contours with Delaunay using features";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             dst2 = feat.dst2;
@@ -17434,7 +17434,7 @@ namespace CS_Classes
         {
             desc = "Provide a trace of the tracked features";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pyr.Run(src);
             dst2 = src;
@@ -17474,7 +17474,7 @@ namespace CS_Classes
         {
             desc = "Find the nearest feature to every cell in vbc.task.redCells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             redC.Run(src);
@@ -17512,7 +17512,7 @@ namespace CS_Classes
             labels[3] = "Features found in the image";
             desc = "Use the sorted list of Delaunay regions to find the top X points to track.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             dst2 = feat.dst2;
@@ -17536,7 +17536,7 @@ namespace CS_Classes
         {
             desc = "Placeholder to help find RedTrack_Features";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             track.Run(src);
             dst2 = track.dst2;
@@ -17556,7 +17556,7 @@ namespace CS_Classes
             labels = new string[] { "Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points" };
             desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             features.Run(src);
             dst3 = features.dst2;
@@ -17594,9 +17594,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Features in the left camera image", "Features in the right camera image" };
             desc = "Identify feature points in the left and right views";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.useShiTomasi)
             {
                 dst2 = vbc.task.leftView;
@@ -17629,7 +17629,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": Local options will determine how many features are present.");
             desc = "Find feature age maximum and average.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             SortedList<int, cv.Point> newfeatures = new SortedList<int, cv.Point>(new compareAllowIdenticalIntegerInverted());
@@ -17676,7 +17676,7 @@ namespace CS_Classes
         {
             desc = "Find good features across multiple frames.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int histCount = vbc.task.frameHistoryCount;
             feat.Run(src);
@@ -17742,7 +17742,7 @@ namespace CS_Classes
             labels[3] = "Click 'Show grid mask overlay' to see grid boundaries.";
             desc = "Find the feature population for each cell.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             dst2 = feat.dst2;
@@ -17773,7 +17773,7 @@ namespace CS_Classes
         {
             desc = "Prepare features for the left and right views";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.features = new List<cv.Point2f>(saveLFeatures);
             feat.Run(src.Clone());
@@ -17806,10 +17806,10 @@ namespace CS_Classes
             cPtr = Agast_Open();
             desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            myOptions.RunVB();
+            options.RunOpt();
+            myOptions.RunOpt();
 
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -17935,7 +17935,7 @@ namespace CS_Classes
                 }
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             labels = feat.labels;
@@ -17988,10 +17988,10 @@ namespace CS_Classes
             Cv2.Merge(hsvVec, hsv);
             return hsv;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            options.RunVB();
+            options.RunOpt();
             Mat lastGray = src.Clone();
             Mat hsv = opticalFlow_Dense(lastGray, src, (float)options.pyrScale, options.levels, options.winSize, 
                                         options.iterations, (float)options.polyN, (float)options.polySigma, options.OpticalFlowFlags);
@@ -18015,9 +18015,9 @@ namespace CS_Classes
         {
             desc = "Show the optical flow of a sparse matrix.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Clone();
             dst3 = src.Clone();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -18071,7 +18071,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Find features using optical flow in both the left and right images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pyrLeft.Run(vbc.task.leftView);
             pyrRight.Run(vbc.task.rightView);
@@ -18139,7 +18139,7 @@ namespace CS_Classes
             }
             return dst;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pyrLeft.Run(vbc.task.leftView);
             List<cv.Point> tmpLeft = new List<cv.Point>();
@@ -18238,7 +18238,7 @@ namespace CS_Classes
             }
             return dst;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flowHist.Run(src);
             var tmpLeft = new SortedList<int, List<cv.Point>>();
@@ -18316,9 +18316,9 @@ namespace CS_Classes
             vbc.task.drawRect = new cv.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
             vbc.task.drawRectUpdated = true;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst2 = vbc.task.leftView.Clone();
             dst3 = vbc.task.rightView.Clone();
@@ -18426,7 +18426,7 @@ namespace CS_Classes
         {
             desc = "Prepare features for the left and right views";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.features = new List<cv.Point2f>(saveLFeatures);
             lFeat.Run(vbc.task.leftView);
@@ -18455,7 +18455,7 @@ namespace CS_Classes
             FindRadio("GoodFeatures (ShiTomasi) grid").Checked = true;
             desc = "Run FeatureLeftRight_Basics but with 'GoodFeatures grid' instead of 'GoodFeatures full image'";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             match.Run(src);
             if (match.mpList.Count() == 0) return;
@@ -18499,14 +18499,14 @@ namespace CS_Classes
             vbc.task.drawRect = new cv.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
             vbc.task.drawRectUpdated = true;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (ptLeft.Count == 0 || ptRight.Count == 0)
             {
                 SetTrueText("Caller provides the ptLeft/ptRight points to use.", 1);
                 return;
             }
-            options.RunVB();
+            options.RunOpt();
             List<PointPair> prepList = new List<PointPair>();
             foreach (cv.Point p1 in ptLeft)
             {
@@ -18609,7 +18609,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "EdgeDraw_Basics output", "" };
             desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edgeD.Run(src);
             dst2 = edgeD.dst2;
@@ -18632,9 +18632,9 @@ namespace CS_Classes
         {
             desc = "Use Canny edges to define featureless regions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             edges.Run(src);
             dst2 = ~edges.dst2.Threshold(options.distanceThreshold, 255, ThresholdTypes.Binary);
@@ -18652,9 +18652,9 @@ namespace CS_Classes
         {
             desc = "Use Sobel edges to define featureless regions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             edges.Run(src);
             dst2 = ~edges.dst2.Threshold(options.distanceThreshold, 255, ThresholdTypes.Binary);
@@ -18675,7 +18675,7 @@ namespace CS_Classes
             labels = new string[] { "", "Gray scale input to sort/remove dups", "Unique pixels", "" };
             desc = "Find the unique gray pixels for the featureless regions";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fless.Run(src);
             dst2 = fless.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -18695,7 +18695,7 @@ namespace CS_Classes
         {
             desc = "Find the unique 3-channel pixels for the featureless regions";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fless.Run(src);
             dst2 = fless.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -18714,7 +18714,7 @@ namespace CS_Classes
         {
             desc = "Create a histogram of the featureless regions";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             backP.Run(src);
             dst2 = backP.dst2;
@@ -18734,7 +18734,7 @@ namespace CS_Classes
             labels[3] = "Largest FeatureLess Region";
             desc = "Use DCT to find featureless regions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dct.Run(src);
             dst2 = dct.dst2;
@@ -18782,7 +18782,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "FeatureLess Left mask", "FeatureLess Right mask" };
             desc = "Find the featureless regions of the left and right images";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fLess.Run(vbc.task.leftView);
             dst2 = fLess.dst2.Clone();
@@ -18803,7 +18803,7 @@ namespace CS_Classes
         {
             desc = "Accumulate the edges over a span of X images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fLess.Run(src);
             dst2 = fLess.dst2;
@@ -18823,7 +18823,7 @@ namespace CS_Classes
         {
             desc = "Floodfill the FeatureLess output so each cell can be tracked.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fless.Run(src);
             redC.Run(fless.dst2);
@@ -18844,7 +18844,7 @@ namespace CS_Classes
         {
             desc = "Group RedCloud cells by the value of their featureless maxDist";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fless.Run(src);
             dst2 = fless.dst2;
@@ -18876,9 +18876,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Longest line present.", "" };
             desc = "Find and track a line using the end points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int distanceThreshold = 50; // pixels - arbitrary but realistically needs some value
             double linePercentThreshold = 0.7; // if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
             double correlationMin = options.correlationMin;
@@ -18925,7 +18925,7 @@ namespace CS_Classes
         {
             desc = "Select a line or group of lines and track the result";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             linesVH.Run(src);
             verify.gCells = new List<gravityLine>(linesVH.gCells);
@@ -18948,9 +18948,9 @@ namespace CS_Classes
             labels[3] = "More readable than dst1 - index, correlation, length (meters), and ArcY";
             desc = "Find and track all the horizontal or vertical lines";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             int templatePad = options.templatePad;
             // gLines.lines.subsetRect = new cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
@@ -18993,9 +18993,10 @@ namespace CS_Classes
             for (int i = 0; i < gCells.Count; i++)
             {
                 var gc = gCells[i];
-                Point2f p1 = gc.tc1.center, p2 = gc.tc2.center;
-                SetTrueText($"{i}\n{gc.tc1.strOut}\n{gc.arcY.ToString(vbc.fmt1)}", gc.tc1.center, 2);
-                SetTrueText($"{i}\n{gc.tc1.strOut}\n{gc.arcY.ToString(vbc.fmt1)}", gc.tc1.center, 3);
+                cv.Point p1 = new cv.Point(gc.tc1.center.X, gc.tc1.center.Y);
+                cv.Point p2 = new cv.Point(gc.tc2.center.X, gc.tc1.center.Y);
+                SetTrueText($"{i}\n{gc.tc1.strOut}\n{gc.arcY.ToString(vbc.fmt1)}", p1, 2);
+                SetTrueText($"{i}\n{gc.tc2.strOut}\n{gc.arcY.ToString(vbc.fmt1)}", p2, 3);
                 DrawLine(dst2, p1, p2, vbc.task.HighlightColor, vbc.task.lineWidth);
                 DrawLine(dst3, p1, p2, vbc.task.HighlightColor, vbc.task.lineWidth);
             }
@@ -19013,7 +19014,7 @@ namespace CS_Classes
             labels[3] = "The highlighted lines are also lines in 3D.";
             desc = "Find all the lines in the image and determine which are in the depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst2 = lines.dst2;
@@ -19052,9 +19053,9 @@ namespace CS_Classes
         {
             desc = "Find all the lines in the image and determine which are vertical and horizontal";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             lines.Run(src);
             dst2 = lines.dst2;
@@ -19122,7 +19123,7 @@ namespace CS_Classes
             if (distance1 < 0.75 * p1.DistanceTo(p2)) return true; // it the longest vertical * 0.75 > current lastPair, then use the longest vertical...
             return false;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gLines.Run(src);
             if (gLines.sortedVerticals.Count == 0)
@@ -19161,7 +19162,7 @@ namespace CS_Classes
         {
             desc = "Use FeatureLine_Finder to find all the vertical lines and show the longest.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             lines.Run(src);
@@ -19193,7 +19194,7 @@ namespace CS_Classes
         {
             desc = "Use FeatureLine_Finder to find all the vertical lines.  Use KNN_Core4D to track each line.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             lines.Run(src);
@@ -19263,9 +19264,9 @@ namespace CS_Classes
         {
             desc = "Find all the lines in the image and determine which are vertical and horizontal";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst3 = src.Clone();
             lines2D.Clear();
@@ -19367,7 +19368,7 @@ namespace CS_Classes
         {
             desc = "Use FeatureLine_Finder data to identify the longest lines and show its angle.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -19412,7 +19413,7 @@ namespace CS_Classes
             flow.dst = 3;
             desc = "Use FeatureLine_Finder data to collect vertical lines and measure accuracy of each.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -19487,9 +19488,9 @@ namespace CS_Classes
         {
             desc = "Find and track the longest line in the BGR image with a lightweight KNN.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src;
             knn.Run(src.Clone());
             p1 = knn.lastPair.p1;
@@ -19532,9 +19533,9 @@ namespace CS_Classes
             labels[2] = "Longest line end points are highlighted ";
             desc = "Find and track the longest line in the BGR image with a lightweight KNN.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Clone();
             double correlationMin = match1.options.correlationMin;
             int templatePad = match1.options.templatePad;
@@ -19586,10 +19587,10 @@ namespace CS_Classes
                   "Ordered Feature polygons of best features - white is original, yellow latest" };
             desc = "Build a Feature polygon with the top generation counts of the good features";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) sides.prevImage = src.Clone();
-            sides.options.RunVB();
+            sides.options.RunOpt();
 
             topFeatures.Run(src);
             dst2 = topFeatures.dst2;
@@ -19599,9 +19600,9 @@ namespace CS_Classes
             dst3 = sides.dst2;
             for (int i = 0; i < sides.currPoly.Count; i++)
             {
-                SetTrueText(i.ToString(), sides.currPoly[i], 3);
+                SetTrueText(i.ToString(), new cv.Point(sides.currPoly[i].X, sides.currPoly[i].Y), 3);
             }
-            SetTrueText("Rotate center", new Point2f(sides.rotateCenter.X + 10, sides.rotateCenter.Y), 3);
+            SetTrueText("Rotate center", new cv.Point(sides.rotateCenter.X + 10, sides.rotateCenter.Y), 3);
             string causes = "";
             if (Math.Abs(sides.rotateAngle * 57.2958) > 10)
             {
@@ -19692,11 +19693,11 @@ namespace CS_Classes
             labels[2] = "White is the original FPoly and yellow is the current FPoly.";
             desc = "Compute the lengths of each side in a polygon";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.FirstPass) prevImage = src.Clone();
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest() && vbc.task.heartBeat)
             {
                 random.Run(empty);
@@ -19808,10 +19809,10 @@ namespace CS_Classes
                   "Ordered Feature polygons of best features - white is original, yellow latest" };
             desc = "Build a Feature polygon with the top generation counts of the good features";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) resyncImage = src.Clone();
-            options.RunVB();
+            options.RunOpt();
             topFeatures.Run(src);
             dst2 = topFeatures.dst2;
             dst1 = topFeatures.dst3;
@@ -19821,7 +19822,7 @@ namespace CS_Classes
             fPD.computeCurrLengths();
             for (int i = 0; i < fPD.currPoly.Count; i++)
             {
-                SetTrueText(i.ToString(), fPD.currPoly[i], 1);
+                SetTrueText(i.ToString(), new cv.Point(fPD.currPoly[i].X, fPD.currPoly[i].Y), 1);
             }
             if (vbc.task.FirstPass) fPD.lengthPrevious = new List<float>(fPD.currLength);
             ((dynamic)center).fPD = fPD;
@@ -19882,8 +19883,8 @@ namespace CS_Classes
             fPD.DrawPolys(dst1, fPD.currPoly, this);
             for (int i = 0; i < fPD.prevPoly.Count; i++)
             {
-                SetTrueText(i.ToString(), fPD.currPoly[i], 1);
-                SetTrueText(i.ToString(), fPD.currPoly[i], 1);
+                SetTrueText(i.ToString(), new cv.Point(fPD.currPoly[i].X, fPD.currPoly[i].Y), 1);
+                SetTrueText(i.ToString(), new cv.Point(fPD.currPoly[i].X, fPD.currPoly[i].Y), 1);
             }
             strOut = $"Rotation: {fPD.rotateAngle * 57.2958:F1} degrees{"\n"}";
             strOut += $"Translation: {(int)fPD.centerShift.X}, {(int)fPD.centerShift.Y}{"\n"}";
@@ -19894,7 +19895,7 @@ namespace CS_Classes
             {
                 var pt = topFeatures.stable.basics.ptList[keyval.Value];
                 int g = topFeatures.stable.basics.facetGen.dst0.At<int>((int)pt.Y, (int)pt.X);
-                SetTrueText(g.ToString(), pt);
+                SetTrueText(g.ToString(), new cv.Point(pt.X, pt.Y));
             }
             SetTrueText(strOut, 1);
             dst3 = ((dynamic)center).dst3;
@@ -19919,7 +19920,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "", "anchor and companions - input to distance difference" };
             desc = "Feature Grid: compute distances between good features from frame to frame and plot the distribution";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat lastDistance = fGrid.dst0.Clone();
             fGrid.Run(src);
@@ -19973,7 +19974,7 @@ namespace CS_Classes
             labels = new string[] { "", "Distance change from previous frame", "", "anchor and companions - input to distance difference" };
             desc = "Feature Grid: compute distances between good features from frame to frame and plot with weighting and Kalman to smooth results";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fPlot.Run(src);
             dst3 = fPlot.dst3;
@@ -20013,7 +20014,7 @@ namespace CS_Classes
             desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)";
             fGrid = new FeaturePoly_Core();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fGrid.Run(src.Clone());
             dst3 = fGrid.dst3;
@@ -20058,7 +20059,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Track the feature grid points back to the last sync point";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int threshold = resyncSlider.Value;
             double maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold;
@@ -20120,7 +20121,7 @@ namespace CS_Classes
         {
             desc = "Find the minimum triangle that contains the feature grid";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fGrid.Run(src);
             dst2 = fGrid.dst2;
@@ -20146,9 +20147,9 @@ namespace CS_Classes
         {
             desc = "Get the top features and validate them";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             stable.Run(src);
             dst2 = stable.dst2;
             poly.Clear();
@@ -20181,7 +20182,7 @@ namespace CS_Classes
                   "Feature polygon with rotation and shift - should be aligned" };
             desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fPoly.Run(src);
             List<cv.Point2f> polyPrev = fPoly.fPD.prevPoly;
@@ -20248,7 +20249,7 @@ namespace CS_Classes
             int totalY = (int)(rotatePoly.poly[polyPrevSideIndex].Y - polyPrev[polyPrevSideIndex].Y);
             return new cv.Point(totalX, totalY);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -20266,8 +20267,8 @@ namespace CS_Classes
                 cv.Point2f p1 = new cv.Point(rotatePoly.poly[i].X - centerShift.X, rotatePoly.poly[i].Y - centerShift.Y);
                 cv.Point p2 = new cv.Point(rotatePoly.poly[(i + 1) % vbc.task.polyCount].X - centerShift.X, rotatePoly.poly[(i + 1) % vbc.task.polyCount].Y - centerShift.Y);
                 rotateAndShift.Add(p1);
-                SetTrueText(i.ToString(), rotatePoly.poly[i], 2);
-                SetTrueText(i.ToString(), polyPrev[i], 2);
+                SetTrueText(i.ToString(), new cv.Point(rotatePoly.poly[i].X, rotatePoly.poly[i].Y), 2);
+                SetTrueText(i.ToString(), new cv.Point(polyPrev[i].X, polyPrev[i].Y), 2);
             }
             DrawFPoly(ref dst3, polyPrev, new cv.Scalar(255));
             DrawFPoly(ref dst3, rotateAndShift, new cv.Scalar(255, 255, 0));
@@ -20293,7 +20294,7 @@ namespace CS_Classes
                 vbc.task.gOptions.setDisplay1();
             desc = "Use OpenCV's WarpAffine to rotate and translate the starting image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fPoly.Run(src);
             warp.rotateCenter = fPoly.fPD.rotateCenter;
@@ -20345,7 +20346,7 @@ namespace CS_Classes
             if (double.IsNaN(angle)) return 0;
             return (float)angle;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -20403,7 +20404,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Test the perpendicular method of finding the rotate center of the Feature Polygon";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fPoly.Run(src);
             dst1 = fPoly.dst1;
@@ -20425,7 +20426,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Rotate the image using the perpendicular method of finding the rotate center";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fImage.Run(src);
             dst1 = fImage.dst1;
@@ -20449,7 +20450,7 @@ namespace CS_Classes
                                 "Resync Image after rotation and translation", "Difference between current image and dst2" };
             desc = "Rotate and shift the image as indicated by FeaturePoly_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat input = src.Clone();
             fpoly.Run(src);
@@ -20516,7 +20517,7 @@ namespace CS_Classes
             vbc.task.gOptions.pixelDiffThreshold = 10;
             desc = "Build the image mask of the differences between the current frame and resync image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fImage.Run(src);
             dst2 = fImage.dst3;
@@ -20540,7 +20541,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Update changed point cloud pixels as indicated by the FeaturePoly_ImageMask";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fMask.Run(src);
             if (fMask.fImage.fpoly.resync || vbc.task.FirstPass) fPolyCloud = vbc.task.pointCloud.Clone();
@@ -20564,7 +20565,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fPoly.Run(src);
             dst2 = fPoly.dst1;
@@ -20600,7 +20601,7 @@ namespace CS_Classes
                       "Layout of feature polygons after rotation and translation" };
             desc = "Manually rotate and translate the current feature polygon to a previous feature polygon.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -20639,7 +20640,7 @@ namespace CS_Classes
             fPD.rotateCenter = new Point2f(fPD.rotateCenter.X - fPD.centerShift.X, fPD.rotateCenter.Y - fPD.centerShift.Y);
             dst1.SetTo(0);
             fPD.DrawPolys(dst1, transPoly, this);
-            SetTrueText("Rotate center", fPD.rotateCenter, 1);
+            SetTrueText("Rotate center", new cv.Point(fPD.rotateCenter.X, fPD.rotateCenter.Y), 1);
             strOut = "No rotation" + "\n";
             fPD.rotateAngle = 0;
             if (d1 != d2)
@@ -20688,7 +20689,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Remove edges from the FeaturePoly_ImageMask";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fMask.Run(src);
             dst2 = fMask.dst3;
@@ -20713,7 +20714,7 @@ namespace CS_Classes
                   "Resync Image after rotation and translation", "Difference between current image and dst2" };
             desc = "Rotate and shift the image as indicated by FeaturePoly_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat input = src.Clone();
             fpoly.Run(src);
@@ -20774,7 +20775,7 @@ namespace CS_Classes
             labels = new string[] { "Left image", "Right image", "FPoly output for left image", "FPoly output for right image" };
             desc = "Measure camera motion through the left and right images using FPoly";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst0 = vbc.task.leftView;
             dst1 = vbc.task.rightView;
@@ -20808,10 +20809,10 @@ namespace CS_Classes
             labels = new string[] { "", "Distance change from previous frame", "", "Feature Grid with anchor" };
             desc = "Feature Grid: compute distances between good features from frame to frame";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            optionsCore.RunVB();
+            options.RunOpt();
+            optionsCore.RunOpt();
 
             stable.Run(src);
             dst3 = stable.basics.dst3;
@@ -20837,7 +20838,7 @@ namespace CS_Classes
                 {
                     goodPoints.Add(pt);
                     goodFacets.Add(facet);
-                    SetTrueText(pt.ToString(), pt, 2);
+                    SetTrueText(pt.ToString(), new cv.Point(pt.X, pt.Y), 2);
                     Cv2.Line(dst3, anchor.ToPoint(), pt.ToPoint(), vbc.task.HighlightColor);
                     dst2.Set<Vec3b>((int)pt.Y, (int)pt.X, white);
                 }
@@ -20869,7 +20870,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white).";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst1 = src.Channels() != 1 ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src.Clone();
             stdevList.Clear();
@@ -20920,7 +20921,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white).";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var stdevList0 = new List<float>();
             var stdevList1 = new List<float>();
@@ -20964,7 +20965,7 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
             desc = "Create the stdev grid with the input image, then create the stdev grid for the canny output, then combine them.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             canny.Run(src);
             dst3 = canny.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
@@ -20993,9 +20994,9 @@ namespace CS_Classes
             labels[2] = "Use the AddWeighted slider to observe where stdev is above average.";
             desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Scalar meanS, stdev;
             sortedStd.Clear();
             bgrList.Clear();
@@ -21076,7 +21077,7 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
             desc = "Split each roi into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red - based on the stdev for the roi";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             devGrid.Run(src);
             for (int i = 0; i < devGrid.bgrList.Count; i++)
@@ -21118,9 +21119,9 @@ namespace CS_Classes
             FindSlider("Feature Correlation Threshold").Value = 90;
             desc = "Use the grid-based correlations with the previous image to determine if there was camera motion";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst1 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src.Clone();
             gather.Run(dst1);
             dst2 = gather.dst2;
@@ -21158,7 +21159,7 @@ namespace CS_Classes
         {
             desc = "Isolate the roi's with low stdev";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst1 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src.Clone();
             gather.Run(dst1);
@@ -21194,9 +21195,9 @@ namespace CS_Classes
             FindSlider("Feature Correlation Threshold").Value = 50;
             desc = "Display the correlation coefficients for roi's with low standard deviation.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst1 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src.Clone();
             gather.Run(dst1);
             dst2 = gather.dst2;
@@ -21241,7 +21242,7 @@ namespace CS_Classes
         {
             desc = "Capture the above average standard deviation roi's for the left and right images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gLeft.Run(vbc.task.leftView);
             dst2 = gLeft.dst2;
@@ -21275,9 +21276,9 @@ namespace CS_Classes
             ClickPoint = pt;
             picTag = _pictag;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst0 = src.Clone();
             dst3 = (vbc.task.rightView.Channels() != 3) ? vbc.task.rightView.CvtColor(ColorConversionCodes.GRAY2BGR) : vbc.task.rightView.Clone();
@@ -21358,9 +21359,9 @@ namespace CS_Classes
             labels[3] = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images.";
             desc = "Find all the roi's with high stdev and high correlation between left and right images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst3 = (vbc.task.rightView.Channels() != 3) ? vbc.task.rightView.CvtColor(ColorConversionCodes.GRAY2BGR) : vbc.task.rightView.Clone();
             src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (vbc.task.rightView.Channels() != 1) vbc.task.rightView = vbc.task.rightView.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -21400,7 +21401,7 @@ namespace CS_Classes
             flow.parentData = this;
             desc = "Generate the fibonacci sequence using conventional code";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (a == 1134903170)
             {
@@ -21445,7 +21446,7 @@ namespace CS_Classes
                 b = t;
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             IEnumerable<double> fibs = NextFib();
             flow.nextMsg = $"{vbc.task.frameCount % 74:00} fibonacci number {fibs.ElementAt(vbc.task.frameCount):###,##0}";
@@ -21466,7 +21467,7 @@ namespace CS_Classes
             labels[3] = "Output of Filter2D (approximated Laplacian)";
             desc = "Use a filter to approximate the Laplacian derivative.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat imgLaplacian = src.Filter2D(MatType.CV_32F,
                 cv.Mat.FromPixelData(3, 3, MatType.CV_32FC1, new float[] { 1, 1, 1, 1, -8, 1, 1, 1, 1 }));
@@ -21487,9 +21488,9 @@ namespace CS_Classes
         {
             desc = "Create a normalized kernel and use it.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             double sum = 0;
             for (int i = 0; i < options.kernel.Width; i++)
             {
@@ -21511,9 +21512,9 @@ namespace CS_Classes
         {
             desc = "Create and apply a normalized kernel.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int kernelSize = standaloneTest() ? (vbc.task.frameCount % 20) + 1 : options.kernelSize;
             Mat kernel = new Mat(kernelSize, kernelSize, MatType.CV_32F).SetTo(1.0 / (kernelSize * kernelSize));
             dst2 = src.Filter2D(-1, kernel);
@@ -21532,9 +21533,9 @@ namespace CS_Classes
             labels[2] = "Gaussian Blur result";
             desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat kernel = Cv2.GetGaussianKernel(options.xDim, options.sigma);
             dst2 = src.GaussianBlur(new cv.Size(options.xDim, options.yDim), options.sigma);
             dst3 = src.SepFilter2D(MatType.CV_8UC3, kernel, kernel);
@@ -21562,9 +21563,9 @@ namespace CS_Classes
         {
             desc = "Implement the Minimum Filter - use minimum value in kernel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int kernelSize = standaloneTest() ? (vbc.task.frameCount % 20) + 1 : options.kernelSize;
             Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(kernelSize, kernelSize));
             dst2 = src.Erode(element);
@@ -21581,9 +21582,9 @@ namespace CS_Classes
         {
             desc = "Implement the Maximum Filter - use maximum value in kernel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int kernelSize = standaloneTest() ? (vbc.task.frameCount % 20) + 1 : options.kernelSize;
             Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(kernelSize, kernelSize));
             dst2 = src.Dilate(element);
@@ -21600,9 +21601,9 @@ namespace CS_Classes
         {
             desc = "Implement the Mean Filter - use mean value in kernel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int kernelSize = standaloneTest() ? (vbc.task.frameCount % 20) + 1 : options.kernelSize;
             Mat kernel = (Mat.Ones(MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat();
             dst2 = src.Filter2D(-1, kernel);
@@ -21619,9 +21620,9 @@ namespace CS_Classes
         {
             desc = "Implement the Median Filter - use median value in kernel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int kernelSize = standaloneTest() ? (vbc.task.frameCount % 20) + 1 : options.kernelSize;
             if (kernelSize % 2 == 0) kernelSize += 1;
             dst2 = src.MedianBlur(kernelSize);
@@ -21643,12 +21644,12 @@ namespace CS_Classes
         {
             desc = "Use FitEllipse OpenCV API to draw around a set of points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
             if (standaloneTest())
             {
-                options.RunVB();
+                options.RunOpt();
                 inputPoints = options.srcPoints;
             }
             dst2.SetTo(0);
@@ -21684,12 +21685,12 @@ namespace CS_Classes
             labels[2] = "FitEllipse_AMS_CS C++ ";
             desc = "Use FitEllipse_AMS to draw around a set of points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
             if (standaloneTest())
             {
-                options.RunVB();
+                options.RunOpt();
                 inputPoints = options.srcPoints;
             }
             dst2.SetTo(0);
@@ -21725,10 +21726,10 @@ namespace CS_Classes
             labels[2] = "The FitEllipse_Direct C++ ";
             desc = "Use FitEllipse to draw around a set of points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
-            options.RunVB();
+            options.RunOpt();
             float[] dataSrc = new float[options.srcPoints.Count * 2];
             dst2.SetTo(0);
             foreach (var pt in options.srcPoints)
@@ -21762,7 +21763,7 @@ namespace CS_Classes
         {
             desc = "Create an ellipse from a contour";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
             redC.Run(src);
@@ -21797,10 +21798,10 @@ namespace CS_Classes
             labels[3] = "FitLine_Basics_CS input";
             desc = "Show how Fitline API works. When the lines overlap the image has a single contour and the lines are occasionally not found.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest())
             {
                 draw.Run(src);
@@ -21852,7 +21853,7 @@ namespace CS_Classes
             cv.Point pt2 = m == 0 ? new cv.Point(x, dst.Rows) : new cv.Point((dst.Rows - b) / m, dst.Rows);
             DrawLine(dst, pt1, pt2, Scalar.Red, vbc.task.lineWidth + 2);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
             hlines.Run(src);
@@ -21920,7 +21921,7 @@ namespace CS_Classes
             desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. ";
             labels[2] = "FLANN Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             // creates data set
             using (var features = new Mat(10000, 2, MatType.CV_32FC1))
@@ -21969,9 +21970,9 @@ namespace CS_Classes
             desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor";
             labels[2] = "Red is query, Nearest points blue";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.reuseData == false || vbc.task.frameCount < 2 || vbc.task.mouseClickFlag)
                 random.Run(empty); // fill result1 with random points in x and y range of the image.
             var features = cv.Mat.FromPixelData(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
@@ -22042,7 +22043,7 @@ namespace CS_Classes
             vbc.task.redOptions.setIdentifyCells(true);
             desc = "Build the RedCloud cells with the grayscale input.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
             {
@@ -22082,7 +22083,7 @@ namespace CS_Classes
             labels[1] = "Histogram of the depth for the selected cell.  Click any cell in the lower left.";
             desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flood.Run(src);
             stats.Run(src);
@@ -22111,7 +22112,7 @@ namespace CS_Classes
             vbc.task.redOptions.setIdentifyCells(true);
             desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone)
             {
@@ -22162,7 +22163,7 @@ namespace CS_Classes
             labels[3] = "The inputMask used to limit how much of the image is processed.";
             desc = "Floodfill by color as usual but this is run repeatedly with the different tiers.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone || buildInputMask)
             {
@@ -22197,7 +22198,7 @@ namespace CS_Classes
             vbc.task.redOptions.setIdentifyCells(true);
             desc = "Subdivide the Flood_Basics cells using depth tiers.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int tier = vbc.task.gOptions.DebugSliderValue;
             tiers.Run(src);
@@ -22235,7 +22236,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -22286,7 +22287,7 @@ namespace CS_Classes
         {
             desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -22341,7 +22342,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Floodfill left and right images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.redCells = new List<rcData>(cellsLeft);
             vbc.task.cellMap = mapLeft.Clone();
@@ -22391,7 +22392,7 @@ namespace CS_Classes
             labels[3] = "Contour boundaries - input to RedCloud_Basics";
             desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cvt.Run(src);
             redCPP.Run(cvt.dst2);
@@ -22425,7 +22426,7 @@ namespace CS_Classes
         {
             desc = "Display different font options available in OpenCV";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
             HersheyFonts hersheyFont = (HersheyFonts)((vbc.task.frameCount % 7) + 1);
@@ -22457,7 +22458,7 @@ namespace CS_Classes
         {
             desc = "Show TrueType text flowing through an image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -22502,7 +22503,7 @@ namespace CS_Classes
         {
             desc = "Show TrueType text flowing through an image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             string strOut;
             if (standaloneTest())
@@ -22542,7 +22543,7 @@ namespace CS_Classes
             dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Find the first KMeans class with depth over 1 meter and use it to define foreground";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             simK.Run(src);
             classCount = simK.classCount;
@@ -22596,7 +22597,7 @@ namespace CS_Classes
             dst3 = new Mat(vbc.task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
             desc = "Separate foreground and background using Kmeans with k=2.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             km.Run(vbc.task.pcSplit[2]);
             float minDistance = float.MaxValue;
@@ -22629,7 +22630,7 @@ namespace CS_Classes
         {
             desc = "Create contours for the foreground mask";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fore.Run(src);
             contours.Run(fore.dst2);
@@ -22649,7 +22650,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Foreground", "Background" };
             desc = "Use the first class of hist3Dcloud_Basics as the definition of foreground";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hcloud.Run(src);
             dst2.SetTo(0);
@@ -22669,7 +22670,7 @@ namespace CS_Classes
         {
             desc = "Isolate foreground from background, then segment each with RedCloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fore.Run(src);
             dst2 = fore.dst2;
@@ -22698,7 +22699,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Get the foreground cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             fore.Run(src);
@@ -22727,7 +22728,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Get the background cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             fore.Run(src);
@@ -22787,9 +22788,9 @@ namespace CS_Classes
                 dst2.Set<byte>(y, x, (byte)(iter < options.iterations ? 255 * iter / (options.iterations - 1) : 0));
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             for (int y = 0; y < src.Height; y++)
             {
@@ -22809,7 +22810,7 @@ namespace CS_Classes
         {
             desc = "Run the classic Mandalbrot algorithm and allow zooming in";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.drawRect.Width != 0)
             {
@@ -22845,7 +22846,7 @@ namespace CS_Classes
         {
             desc = "Classic Mandelbrot in color";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (zoom.mandel.options.resetCheck.Checked) zoom.mandel.reset();
             zoom.Run(src);
@@ -22883,7 +22884,7 @@ namespace CS_Classes
             if (depth < max / 4) return 0;
             return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (savedMouse != vbc.task.mouseMovePoint || resetCheck.Checked)
             {
@@ -22962,7 +22963,7 @@ namespace CS_Classes
             //D = np.polyfit(x, y, 1)[0]  # D = lim r -> 0 log(Nr)/log(1/r)
             return d;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -22992,7 +22993,7 @@ namespace CS_Classes
         {
             desc = "Compare each frame to its last to figure out which frames really changed for each invocation.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) lastImages = new Mat[] { vbc.task.color.Clone(), vbc.task.leftView.Clone(), vbc.task.rightView.Clone(), vbc.task.depthRGB.Clone() };
             for (int i = 0; i < frameCounts.Length; i++)
@@ -23038,7 +23039,7 @@ namespace CS_Classes
         {
             desc = "Compare each frame to its last to figure out which frames really changed for each invocation.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) lastImages = new Mat[] { vbc.task.color.Clone(), vbc.task.leftView.Clone(), vbc.task.rightView.Clone(), vbc.task.depthRGB.Clone() };
             for (int i = 0; i < frameCounts.Length; i++)
@@ -23086,7 +23087,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Find keypoints using FREAK algorithm";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             orb.Run(src);
             dst1 = orb.dst2;
@@ -23129,9 +23130,9 @@ namespace CS_Classes
             labels = new[] { "", "Solid regions", "8-Bit output of Fuzzy_Basics_CS", "Fuzzy edges" };
             desc = "That which is not solid is fuzzy";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             reduction.Run(src);
             dst0 = reduction.dst2;
             if (dst0.Channels() != 1) dst0 = dst0.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -23203,9 +23204,9 @@ namespace CS_Classes
             kernel *= 1 / 9.0;
             desc = "Use a 2D filter to find smooth areas";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             reduction.Run(src);
             Mat src32f = new Mat();
@@ -23263,7 +23264,7 @@ namespace CS_Classes
         {
             desc = "Use contours to outline solids in the depth data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fuzzyD.Run(vbc.task.depthRGB);
             dst2 = fuzzyD.dst1;
@@ -23281,7 +23282,7 @@ namespace CS_Classes
         {
             desc = "Prove that every contour point has at one and only one neighbor with the mask ID and that the rest are zero";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (proofFailed) return;
             fuzzy.Run(src);
@@ -23333,9 +23334,9 @@ namespace CS_Classes
         {
             desc = "Create centroids and rect's for solid regions and track them - tracker";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             fuzzy.Run(vbc.task.depthRGB);
             dst2 = fuzzy.dst1;
             centroids.Clear();
@@ -23383,7 +23384,7 @@ namespace CS_Classes
         {
             desc = "Create centroids and rect's for solid regions and track them - tracker";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tracker.Run(src);
             dst2 = tracker.dst2;
@@ -23413,9 +23414,9 @@ namespace CS_Classes
         {
             desc = "Explore Gabor kernel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Filter2D(MatType.CV_8UC3, options.gKernel);
         }
     }
@@ -23434,7 +23435,7 @@ namespace CS_Classes
         {
             desc = "Use Foreground_Basics to define the foreground for use in GrabCut.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fore.Run(src);
             dst2 = fore.dst2;
@@ -23475,7 +23476,7 @@ namespace CS_Classes
             image = Cv2.ImRead(fileInputName.FullName);
             desc = "Grabcut example using a single image.  Fix this.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = image;
             dst0 = new Mat(image.Size(), MatType.CV_8U, cv.Scalar.All((double)GrabCutClasses.PR_BGD));
@@ -23510,7 +23511,7 @@ namespace CS_Classes
             image = Cv2.ImRead(fileInputName.FullName);
             desc = "Grabcut example using a single image. ";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -23545,9 +23546,9 @@ namespace CS_Classes
             labels[3] = "Grabcut results after adding fine tuning selections";
             desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.clearAll || basics.fgFineTune == null)
             {
                 basics.fgFineTune = new Mat(src.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -23593,7 +23594,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Gradient_Basics_CS - Sobel output", "Phase Output" };
             desc = "Use phase to compute gradient";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sobel.Run(src);
             Cv2.Phase(sobel.dst0, sobel.dst1, dst3);
@@ -23612,7 +23613,7 @@ namespace CS_Classes
             labels[3] = "Phase Output";
             desc = "Use phase to compute gradient on depth image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sobel.Run(vbc.task.pcSplit[2]);
             Cv2.Phase(sobel.dst0, sobel.dst1, dst3);
@@ -23634,7 +23635,7 @@ namespace CS_Classes
         {
             desc = "Provide a spectrum that is a gradient from one color to another.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gradientWidth = dst2.Width;
             double f = 1.0;
@@ -23670,9 +23671,9 @@ namespace CS_Classes
             labels[3] = "CartToPolar Angle Output";
             desc = "Compute the gradient and use CartToPolar to image the magnitude and angle";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat tmp = new Mat();
             src.ConvertTo(tmp, MatType.CV_32FC3, 1.0 / 255);
             basics.Run(tmp);
@@ -23718,7 +23719,7 @@ namespace CS_Classes
             DrawLine(dst2, vec.p1, vec.p2, Scalar.White, vbc.task.lineWidth);
             DrawLine(dst3, vec.p1, vec.p2, Scalar.White, vbc.task.lineWidth);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32F)
                 dst0 = PrepareDepthInput(0);
@@ -23806,7 +23807,7 @@ namespace CS_Classes
             }
             return new cv.Point();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32F)
                 dst0 = PrepareDepthInput(0);
@@ -23843,7 +23844,7 @@ namespace CS_Classes
             horizon.autoDisplay = true;
             desc = "Collect results from Horizon_Basics with Gravity_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gravity.Run(src);
             var g1 = gravity.vec;
@@ -23878,7 +23879,7 @@ namespace CS_Classes
             labels[2] = "Gravity vector in yellow and Horizon vector in red.";
             desc = "Compute the gravity vector and the horizon vector separately";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gravity.Run(src);
             if (gravity.vec.p2.Y > 0 || gravity.vec.p1.Y > 0)
@@ -23912,7 +23913,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Identify the main colors in an image using RedCloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flood.Run(src);
             dst2 = flood.dst2;
@@ -23952,7 +23953,7 @@ namespace CS_Classes
         {
             desc = "Create a grid of squares covering the entire image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.mouseClickFlag && !vbc.task.FirstPass)
             {
@@ -24085,7 +24086,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi." };
             if (standaloneTest()) desc = "Validation test for Grid_Basics algorithm";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var mean = Cv2.Mean(src);
             dst2.SetTo(0);
@@ -24116,7 +24117,7 @@ namespace CS_Classes
             labels[2] = "Adjust grid width/height to increase thread count.";
             if (standaloneTest()) desc = "List the active threads";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Parallel.ForEach(vbc.task.gridList, roi =>
             {
@@ -24159,9 +24160,9 @@ namespace CS_Classes
             vbc.task.gridMap = new Mat(dst2.Size(), MatType.CV_32S);
             if (standaloneTest()) desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.mouseClickFlag) vbc.task.gridROIclicked = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
             if (vbc.task.optionsChanged)
@@ -24226,9 +24227,9 @@ namespace CS_Classes
             fpsSlider = FindSlider("Desired FPS rate");
             desc = "Provide a service that lets any algorithm control its frame rate";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             int fps = (int)(vbc.task.fpsRate / options.desiredFPS);
             if (fps == 0) fps = 1;
@@ -24258,7 +24259,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Grid_Basics output", "" };
             desc = "Click any grid element to see its neighbors";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.gridRows != (int)(dst2.Height / 10))
             {
@@ -24310,7 +24311,7 @@ namespace CS_Classes
             gridMap = new Mat(dst2.Size(), MatType.CV_32S);
             desc = "Grids are normally square.  Grid_Special_CS allows grid elements to be rectangles.  Specify the Y size.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged)
             {
@@ -24409,7 +24410,7 @@ namespace CS_Classes
             grid.updateTaskGridList = false;
             desc = "Provide the grid list for the lowest resolution of the current stream.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             grid.Run(inputSrc);
             gridList = grid.gridList;
@@ -24431,7 +24432,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": goptions 'Grid Square Size' has direct impact.");
             desc = "Find the min and max depth within each grid roi.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (minMaxLocs.Length != vbc.task.gridList.Count) Array.Resize(ref minMaxLocs, vbc.task.gridList.Count);
             if (minMaxVals.Length != vbc.task.gridList.Count) Array.Resize(ref minMaxVals, vbc.task.gridList.Count);
@@ -24469,7 +24470,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setShowGrid(true);
             desc = "Track a cell near the center of the grid";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (match.correlation < match.options.correlationMin || vbc.task.gOptions.getDebugCheckBox())
             {
@@ -24506,7 +24507,7 @@ namespace CS_Classes
         {
             desc = "Verify that vbc.task.gridMap is laid out correctly";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.gridMap.ConvertTo(dst2, MatType.CV_8U);
             dst3 = ShowPalette(dst2);
@@ -24556,7 +24557,7 @@ namespace CS_Classes
                 SetTrueText(index.ToString(), pt, dstindex);
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             ptHot.Run(src);
             dst2 = ptHot.dst2;
@@ -24605,7 +24606,7 @@ namespace CS_Classes
             }
             knn.trainInput = new List<cv.Point2f>(knn.queries);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             ptHot.Run(src);
             dst2 = ptHot.dst2;
@@ -24660,7 +24661,7 @@ namespace CS_Classes
             mask[floodRect].CopyTo(view);
             return rectList;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src.Clone());
             topRects = hotPoints(ref histTop.dst3);
@@ -24684,7 +24685,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Side view", "Plot of nonzero rows in the side view" };
             desc = "Plot the likely floor or ceiling areas.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histSide.Run(src);
             dst2 = histSide.dst3;
@@ -24740,7 +24741,7 @@ namespace CS_Classes
         {
             desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hotPoints.Run(src);
             hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, MatType.CV_32F);
@@ -24769,7 +24770,7 @@ namespace CS_Classes
             vbc.task.ClickPoint = new cv.Point(dst2.Width / 2, dst2.Height / 2);
             desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             guided.Run(src);
             dst2 = guided.dst2;
@@ -24790,7 +24791,7 @@ namespace CS_Classes
             vbc.task.gOptions.setHistogramBins(16);
             desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             hist.Run(src);
@@ -24844,9 +24845,9 @@ namespace CS_Classes
         {
             desc = "Highlight concentrations of depth pixels in the side view";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             Cv2.CalcHist(new Mat[] { src }, vbc.task.channelsTop, new Mat(), histogramTop, 2, vbc.task.bins2D, vbc.task.rangesTop);
             histogramTop.Row(0).SetTo(0);
@@ -24877,7 +24878,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1" };
             desc = "Apply a grid to the HeatMap_OverTime to isolate objects.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             heat.Run(src);
@@ -24937,7 +24938,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Mask of cool areas in the heat map - top view", "Mask of cool areas in the heat map - side view" };
             desc = "Isolate points with low histogram values in side and top views";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             heat.Run(src);
             dst0 = heat.dst2.ConvertScaleAbs();
@@ -24959,7 +24960,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Mask of hotter areas for the Top View", "Mask of hotter areas for the Side View" };
             desc = "Isolate masks for just the hotspots in the heat map";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src);
             dst2 = histTop.histogram;
@@ -24985,7 +24986,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Display the heat map for the selected cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flood.Run(src);
             dst2 = flood.dst2;
@@ -25011,7 +25012,7 @@ namespace CS_Classes
             vbc.task.redOptions.setProjection(1);
             desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             guided.Run(src);
             dst2 = guided.dst2;
@@ -25041,7 +25042,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setHistogramBins(255);
             desc = "Create a histogram (no Kalman)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone)
             {
@@ -25128,7 +25129,7 @@ namespace CS_Classes
             plotHist.addLabels = false;
             desc = "Use Kalman to smooth the histogram results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -25159,7 +25160,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setHistogramBins(255);
             desc = "Create a histogram of the grayscale image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hist.Run(src.CvtColor(ColorConversionCodes.BGR2GRAY));
             dst2 = hist.dst2;
@@ -25185,7 +25186,7 @@ namespace CS_Classes
         {
             desc = "Plot histograms for up to 3 channels.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int[] dimensions = { vbc.task.histogramBins };
             Rangef[] ranges = new Rangef[] { new Rangef(minRange, maxRange) };
@@ -25234,9 +25235,9 @@ namespace CS_Classes
             desc = "Create a histogram of a normalized image";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst3 = src.Normalize(options.minGray, options.maxGray, NormTypes.MinMax); // only minMax is working...
             histogram.Run(dst3);
@@ -25260,7 +25261,7 @@ namespace CS_Classes
             labels[3] = "Orig. Hist, Eq. Hist, Orig. Image, Eq. Image";
             desc = "Create an equalized histogram of the grayscale image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             histogram.Run(src);
@@ -25286,7 +25287,7 @@ namespace CS_Classes
             labels[2] = "Histogram of the grayscale video stream";
             desc = "Build a simple and reusable histogram for grayscale images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Rangef[] ranges = new Rangef[] { new Rangef(plot.minRange, plot.maxRange) };
@@ -25309,7 +25310,7 @@ namespace CS_Classes
             labels[2] = "Click any quadrant at right to view it below";
             desc = "Create a histogram of a normalized image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat[] split = src.Split();
             Array.Resize(ref split, 4);
@@ -25344,7 +25345,7 @@ namespace CS_Classes
             vbc.task.gOptions.setGravityUsage(false);
             desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             heat.Run(src);
             dst2 = heat.dst2;
@@ -25370,7 +25371,7 @@ namespace CS_Classes
             labels[3] = "Grayscale Histogram";
             hist = new Hist_Basics();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.gOptions.SetUseKalman(false);
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -25414,7 +25415,7 @@ namespace CS_Classes
             peakCounts = new float[vbc.task.histogramBins];
             saveHistBins = vbc.task.histogramBins;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = vbc.task.pcSplit[2];
             hist.Run(src);
@@ -25504,7 +25505,7 @@ namespace CS_Classes
             desc = "Find the peaks - columns taller that both neighbors - in the histogram";
             peaks = new Hist_PeakFinder();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             peaks.Run(vbc.task.pcSplit[2]);
             dst2 = peaks.dst2;
@@ -25530,7 +25531,7 @@ namespace CS_Classes
             desc = "Find the peaks and valleys for each of the BGR channels.";
             mats = new Mat_4Click();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat[] split = src.Split();
             for (int i = 0; i < 3; i++)
@@ -25563,7 +25564,7 @@ namespace CS_Classes
         {
             desc = "Create a histogram of green and red.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             ranges = new Rangef[2] { new Rangef(0, 255), new Rangef(0, 255) };
             Cv2.CalcHist(new Mat[] { src }, new int[] { 1, 2 }, new Mat(), histogram, 1, new int[] { vbc.task.histogramBins, vbc.task.histogramBins }, ranges);
@@ -25595,7 +25596,7 @@ namespace CS_Classes
         {
             desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -25658,7 +25659,7 @@ namespace CS_Classes
             desc = "Create an equalized histogram of the color image.";
             labels[2] = "Image Enhanced with Equalized Histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat[] rgb = src.Split();
             Mat[] rgbEq = src.Split();
@@ -25700,9 +25701,9 @@ namespace CS_Classes
             labels[2] = "Kalman-smoothed current histogram";
             desc = "Compare grayscale histograms for successive frames";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             histK.Run(src);
             dst2 = histK.dst2.Clone();
             if (vbc.task.FirstPass) lastHist = histK.hist.histogram.Clone();
@@ -25748,7 +25749,7 @@ namespace CS_Classes
             labels[3] = "Differences have been multiplied by 1000 to build scale at the left";
             desc = "Compare grayscale histograms for successive frames and plot the difference as a histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             comp.Run(src);
             dst2 = comp.dst2.Clone();
@@ -25779,7 +25780,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms" };
             desc = "The idea is to reduce a comparison of 2 histograms to a single number";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             comp.Run(src);
             dst1 = comp.dst2.Clone();
@@ -25805,7 +25806,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms" };
             desc = "Use OpenCV's Earth Mover Distance to compare 2 images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             if (vbc.task.FirstPass) lastHSV = hsv.Clone();
@@ -25849,7 +25850,7 @@ namespace CS_Classes
             desc = "Interactive Histogram";
             masks = new BackProject_Masks();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             masks.Run(src);
             dst2 = masks.dst2;
@@ -25871,7 +25872,7 @@ namespace CS_Classes
             desc = "Create a histogram from a BGR image converted to LAB.";
             hist = new Hist_Basics();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst0 = src.CvtColor(ColorConversionCodes.BGR2Lab);
             Mat[] split = dst0.Split();
@@ -25898,7 +25899,7 @@ namespace CS_Classes
             labels = new string[] { "", "Histogram of the X channel", "Histogram of the Y channel", "Histogram of the Z channel" };
             desc = "Show individual channel of the point cloud data as a histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) ttlists = new List<List<TrueText>> { new List<TrueText>(), new List<TrueText>(), new List<TrueText>() };
             for (int i = 0; i <= 2; i++)
@@ -25958,7 +25959,7 @@ namespace CS_Classes
         {
             desc = "Find flat surfaces with the histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int maxRange = 4;
             Mat cloudY = vbc.task.pcSplit[1].Clone();
@@ -26002,7 +26003,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "ZY Side View", "ZY Side View Mask" };
             desc = "Create a 2D side view for ZY histogram of depth";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (rc.pixels == 0) src = vbc.task.pointCloud;
             Cv2.CalcHist(new Mat[] { src }, vbc.task.channelsSide, new Mat(), dst0, 2,
@@ -26028,7 +26029,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "ZY Side View", "ZY Side View Mask" };
             desc = "Create a 2D top view for XZ histogram of depth";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (rc.pixels == 0) src = vbc.task.pointCloud;
             Cv2.CalcHist(new Mat[] { src }, vbc.task.channelsTop, new Mat(), dst0, 2,
@@ -26053,7 +26054,7 @@ namespace CS_Classes
             labels[2] = "ZY (Side View)";
             desc = "Create a 2D side view for ZY histogram of depth using integer values.  Testing calcHist gotcha.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int expected = vbc.task.pcSplit[2].CountNonZero();
             Rangef[] ranges = vbc.task.rangesSide;
@@ -26090,7 +26091,7 @@ namespace CS_Classes
             labels[2] = "Grayscale histogram";
             desc = "Simple test: input samples should equal histogram samples.  What is wrong?  Exclusive ranges!";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             long expected = src.Total();
@@ -26119,7 +26120,7 @@ namespace CS_Classes
             cPtr = Hist_1D_Open();
             desc = "Testing the C++ CalcHist to investigate gotcha with sample counts";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
@@ -26156,7 +26157,7 @@ namespace CS_Classes
             cPtr = Hist_1D_Open();
             desc = "For Byte histograms, the C++ code works but the .Net interface doesn't honor exclusive ranges.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
@@ -26185,7 +26186,7 @@ namespace CS_Classes
         {
             desc = "Plot the histogram of the X layer of the point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plot.Run(vbc.task.pcSplit[0]);
             dst2 = plot.dst2;
@@ -26204,7 +26205,7 @@ namespace CS_Classes
         {
             desc = "Plot the histogram of the Y layer of the point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plot.Run(vbc.task.pcSplit[1]);
             dst2 = plot.dst2;
@@ -26223,7 +26224,7 @@ namespace CS_Classes
         {
             desc = "Plot the histogram of the Z layer of the point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plot.Run(vbc.task.pcSplit[2]);
             dst2 = plot.dst2;
@@ -26245,7 +26246,7 @@ namespace CS_Classes
         {
             desc = "Show depth data as a histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Rows <= 0) return;
             plot.minRange = 0;
@@ -26297,7 +26298,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud cells", "Histogram of the depth for the selected cell." };
             desc = "Review depth data for a RedCloud Cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -26323,9 +26324,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis" };
             desc = "Create a 2D histogram for the pointcloud in XZ and YZ.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             rangesX = new Rangef[] { new Rangef(-vbc.task.xRange, vbc.task.xRange), new Rangef(0, vbc.task.MaxZmeters) };
             rangesY = new Rangef[] { new Rangef(-vbc.task.yRange, vbc.task.yRange), new Rangef(0, vbc.task.MaxZmeters) };
@@ -26350,7 +26351,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "With Kalman", "Without Kalman" };
             desc = "Use Kalman to smooth the histogram results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hist.Run(src);
             dst3 = hist.dst2.Clone();
@@ -26378,7 +26379,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Updated point cloud (holes filled)", "Original point cloud" };
             desc = "Fill single pixel holes in the point cloud.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
@@ -26407,9 +26408,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Updated point cloud - nearest depth to each edge is replicated to the image boundary", "Original point cloud" };
             desc = "Replicate the nearest depth measurement at all the image edges";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.cameraName == "Oak-D camera" || vbc.task.cameraName == "Azure Kinect 4K")
             {
@@ -26446,7 +26447,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "All non-zero entries in the 2D histogram", "" };
             desc = "Create a 2D histogram from the input.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             ranges = GetHist2Dminmax(src, channels[0], channels[1]);
             Cv2.CalcHist(new Mat[] { src }, channels, new Mat(), histogram, 2, histRowsCols, ranges);
@@ -26469,7 +26470,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram" };
             desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Vec2f r1 = new Vec2f(), r2 = new Vec2f();
             if (vbc.task.redOptions.channels[0] == 0 || vbc.task.redOptions.channels[0] == 1)
@@ -26500,7 +26501,7 @@ namespace CS_Classes
         {
             desc = "Create 2D histogram from the 3D pointcloud - use options to select dimensions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hist2d.Run(vbc.task.pointCloud);
             histogram = hist2d.histogram;
@@ -26524,7 +26525,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Mask of histogram", "DrawRect area from the histogram" };
             desc = "Draw a rectangle on an area to zoom in on...";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hist2d.Run(src);
             dst2 = hist2d.dst2;
@@ -26545,7 +26546,7 @@ namespace CS_Classes
             labels = new string[] { "", "HSV image", "", "" };
             desc = "Create a 2D histogram for Hue to Saturation and Hue to Value.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int[] histRowsCols = new int[] { dst2.Height, dst2.Width };
             src = src.CvtColor(ColorConversionCodes.BGR2HSV);
@@ -26570,7 +26571,7 @@ namespace CS_Classes
             vbc.task.gOptions.setHistogramBins(256);
             desc = "Create a 2D histogram for blue to red and blue to green.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int[] histRowsCols = new int[] { dst2.Height, dst2.Width };
             Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 2 }, vbc.task.depthMask, histogram02, 2, histRowsCols, vbc.task.redOptions.rangesBGR);
@@ -26596,7 +26597,7 @@ namespace CS_Classes
             labels[2] = "Hist2D_PlotHistogram1D_CS output shown with plot_histogram";
             desc = "Create a 2D histogram for blue to red and blue to green.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.CalcHist(new Mat[] { src }, vbc.task.redOptions.channels, vbc.task.depthMask, histogram, 2, new int[] { vbc.task.histogramBins, vbc.task.histogramBins },
                           vbc.task.redOptions.rangesBGR);
@@ -26622,9 +26623,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Sum of 8UC1 outputs of Hist3Dcolor_Basics and Hist3Dcloud_basics", "" };
             desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             hColor.Run(src);
             dst2 = hColor.dst2;
             hCloud.Run(src);
@@ -26655,7 +26656,7 @@ namespace CS_Classes
         {
             desc = "Build a guided 3D histogram from the 3D histogram supplied in src.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -26710,7 +26711,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hist3D.Run(src);
             dst2 = hist3D.dst3;
@@ -26734,7 +26735,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hColor.Run(src);
             dst3 = hColor.dst3;
@@ -26761,7 +26762,7 @@ namespace CS_Classes
         {
             desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -26792,7 +26793,7 @@ namespace CS_Classes
         {
             desc = "Classify each pixel using a 3D histogram backprojection.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 3) src = vbc.task.color;
             var bins = vbc.task.redOptions.getHistBinBar3D();
@@ -26823,7 +26824,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2" };
             desc = "After classifying each pixel, backproject each redCell using the same 3D histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             pixel.Run(src);
@@ -26846,7 +26847,7 @@ namespace CS_Classes
         {
             desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_Basics on the output.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pixel.Run(src);
             redC.Run(pixel.dst2);
@@ -26872,7 +26873,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pixel.Run(src);
             if (vbc.task.FirstPass) lastImage = pixel.dst2.Clone();
@@ -26912,7 +26913,7 @@ namespace CS_Classes
             }
             return Math.Sqrt(accum);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pixels.Run(src);
             dst2 = vbc.task.cellMap;
@@ -26973,7 +26974,7 @@ namespace CS_Classes
             labels[2] = "dst2 = backprojection of pointcloud (8UC1 format).";
             desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             int bins = vbc.task.redOptions.getHistBinBar3D();
@@ -27018,7 +27019,7 @@ namespace CS_Classes
             labels[3] = "X to Y histogram (upper left), X to Z (upper right), and Y to Z (bottom).";
             desc = "Plot the 3 histograms of the depth data dimensions";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             for (int i = 0; i < 3; i++)
             {
@@ -27050,7 +27051,7 @@ namespace CS_Classes
         {
             desc = "Plot the 3D histogram of the depth data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int bins = vbc.task.redOptions.getHistBinBar3D();
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
@@ -27102,9 +27103,9 @@ namespace CS_Classes
             labels[2] = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels";
             desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int bins = vbc.task.redOptions.getHistBinBar3D();
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             float[] histInput = new float[src.Total() * 3];
@@ -27139,7 +27140,7 @@ namespace CS_Classes
             labels[2] = "The 3D histogram of the pointcloud data stream - note the number of gaps";
             desc = "Present the 3D histogram as a typical histogram bar chart.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             hcloud.Run(src);
@@ -27169,7 +27170,7 @@ namespace CS_Classes
         {
             desc = "Capture a 3D color histogram, find the gaps, and backproject the clusters found.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_8UC3) src = vbc.task.color;
             if (vbc.task.heartBeat || alwaysRun)
@@ -27202,7 +27203,7 @@ namespace CS_Classes
         {
             desc = "Get the number of non-zero BGR elements in the 3D color histogram of the current image and their BGR values";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hColor.Run(src);
             pixels.Clear();
@@ -27239,7 +27240,7 @@ namespace CS_Classes
         {
             desc = "Get the top 256 of non-zero BGR elements in the 3D color histogram of the current image and their BGR values";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             unique.Run(src);
             var sortedPixels = new SortedList<int, Point3f>(new CompareAllowIdenticalIntegerInverted());
@@ -27271,7 +27272,7 @@ namespace CS_Classes
             vbc.task.redOptions.setSimpleReductionBar(45);
             desc = "Backproject the 3D histogram for RGB after reduction";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 3) src = vbc.task.color;
             reduction.Run(src);
@@ -27295,7 +27296,7 @@ namespace CS_Classes
         {
             desc = "Breakdown the 3D histogram using the '0' entries as boundaries between clusters.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 3) src = vbc.task.color;
             if (vbc.task.optionsChanged)
@@ -27357,7 +27358,7 @@ namespace CS_Classes
             labels[2] = "The 3D histogram of the RGB image stream - note the number of gaps";
             desc = "Present the 3D histogram as a typical histogram bar chart.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hColor.Run(src);
             histogram1D = hColor.histogram1D;
@@ -27378,7 +27379,7 @@ namespace CS_Classes
             labels[3] = "The highlighted pixels are in the selected bin";
             desc = "Build a 3D histogram from the BGR image and backproject the 'Selected bin' (in options_HistXD sliders).";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hColor.Run(src);
             int selection = vbc.task.gOptions.DebugSliderValue;
@@ -27404,7 +27405,7 @@ namespace CS_Classes
         {
             desc = "Build a 3D histogram from the BGR image and sort it by histogram entry size.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             byte[] histInput = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, histInput, 0, histInput.Length);
@@ -27443,7 +27444,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hColor.Run(src);
             dst2 = hColor.dst3;
@@ -27471,7 +27472,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": redOptions '3D Histogram Bins'");
             desc = "Capture a 3D color histogram for input src - likely to be src(rect).";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 3) src = vbc.task.color;
             if (vbc.task.optionsChanged)
@@ -27496,7 +27497,7 @@ namespace CS_Classes
         {
             desc = "Create a frame history to sum the last X frames";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.frameHistoryCount == 1)
             {
@@ -27538,7 +27539,7 @@ namespace CS_Classes
         {
             desc = "Create an image that is the motionRect applied to the previous image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
                 dst2 = src.Clone();
@@ -27560,7 +27561,7 @@ namespace CS_Classes
         {
             desc = "Create a frame history and sum the last X vbc.task.pointcloud's";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3 || src.Channels() != 3)
                 src = vbc.task.pointCloud;
@@ -27592,7 +27593,7 @@ namespace CS_Classes
         {
             desc = "Create a frame history and sum the last X frames (without saturation!)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var input = src.Clone();
             if (input.Channels() != 1)
@@ -27631,7 +27632,7 @@ namespace CS_Classes
             vbc.task.gOptions.pixelDiffThreshold = 0;
             desc = "Find the floodfill trouble spots.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             frames.Run(src);
             dst2 = ShowPalette(frames.dst2);
@@ -27655,7 +27656,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             // if standaloneTest(), go get a histogram for input.  Src is the 3-channel input to the histogram.
             if (standaloneTest())
@@ -27696,7 +27697,7 @@ namespace CS_Classes
         {
             desc = "Find the top X peaks in the 2D histogram of the top and side views and backproject them.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.toggleOnOff)
             {
@@ -27729,7 +27730,7 @@ namespace CS_Classes
         {
             desc = "Find the regions with the non-zero (low) samples in the top view";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src);
             dst1 = histTop.histogram.InRange(0, 0).ConvertScaleAbs();
@@ -27755,7 +27756,7 @@ namespace CS_Classes
         {
             desc = "Display the HistPeak2D_Basics edges in the RGB image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src);
             dst3 = histTop.histogram.Threshold(vbc.task.projectionThreshold, 255, ThresholdTypes.Binary);
@@ -27779,7 +27780,7 @@ namespace CS_Classes
         {
             desc = "Find the peaks in the 2D plot of the HSV image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hsv.Run(src);
             peak.histogram = hsv.histogram01;
@@ -27801,7 +27802,7 @@ namespace CS_Classes
         {
             desc = "Find the peaks in the 2D plot of the BGR image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bgr.Run(src);
             peak.histogram = bgr.histogram02;
@@ -27822,7 +27823,7 @@ namespace CS_Classes
         {
             desc = "Find the peaks in the 2D plot of the BGR image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             peak.Run(src);
             dst2 = peak.dst2;
@@ -27843,7 +27844,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Backprojection of Side View hotspots", "Side view with highlighted hot spots" };
             desc = "Find the top X peaks in the 2D histogram of the side view and backproject it.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histSide.Run(src);
             dst3 = histSide.histogram;
@@ -27873,7 +27874,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Backprojection of Top View hotspots", "Top view with highlighted hot spots" };
             desc = "Find the top X peaks in the 2D histogram of the top view and backproject it.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src);
             dst3 = histTop.histogram;
@@ -27907,9 +27908,9 @@ namespace CS_Classes
             labels[2] = "Histogram of the grayscale image.  White lines mark local minimum above threshold.  Yellow horizontal = histogram mean.";
             desc = "Find the histogram valleys for a grayscale image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int vCount = options.desiredBoundaries;
             int minDistance = options.peakDistance;
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -27971,7 +27972,7 @@ namespace CS_Classes
                 dst.Line(new cv.Point(col, dst.Height), new cv.Point(col, dst.Height * 9 / 10), Scalar.White, vbc.task.lineWidth);
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             peak.Run(src);
             dst2 = peak.hist.dst2;
@@ -28020,9 +28021,9 @@ namespace CS_Classes
             labels[2] = "Histogram - white lines are peaks";
             desc = "Find the requested number of peaks in the histogram ";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int desiredBoundaries = options.desiredBoundaries;
             if (src.Type() != MatType.CV_32FC1 || standaloneTest())
             {
@@ -28100,7 +28101,7 @@ namespace CS_Classes
             labels[2] = "Top markers = peaks, bottom markers = valleys";
             desc = "Find the valleys in the depth histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -28136,7 +28137,7 @@ namespace CS_Classes
         {
             desc = "Find the valleys in the depth histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32F) src = vbc.task.pcSplit[2];
             valley.Run(src);
@@ -28160,9 +28161,9 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setHistogramBins(256);
             desc = "Get the top X highest quality valley points in the histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int desiredBoundaries = options.desiredBoundaries;
             // input should be a histogram.  If not, get one...
             if (standaloneTest())
@@ -28230,7 +28231,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Grayscale histogram - white lines are valleys", "" };
             desc = "Isolate the different levels of gray using the histogram valleys.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -28275,7 +28276,7 @@ namespace CS_Classes
         {
             desc = "Compare frame to frame what has changed";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             valley.Run(src);
             dst2 = valley.dst2;
@@ -28295,7 +28296,7 @@ namespace CS_Classes
         {
             desc = "Remove edge color in RGB before HistValley_FromPeaks";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(src);
             dst3 = src;
@@ -28317,7 +28318,7 @@ namespace CS_Classes
         {
             desc = "Identify ranges by marking the depth histogram entries from valley to valley";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             trends.Run(src);
             if (kalman.kInput.Length != vbc.task.histogramBins) Array.Resize(ref kalman.kInput, vbc.task.histogramBins);
@@ -28368,7 +28369,7 @@ namespace CS_Classes
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
             valleys.Run(src);
@@ -28398,7 +28399,7 @@ namespace CS_Classes
             if (standaloneTest()) FindSlider("Desired boundary count").Value = 10;
             desc = "Find the histogram valleys for each of the colors.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat) splitIndex = (splitIndex + 1) % 3;
             src = src.ExtractChannel(splitIndex);
@@ -28440,7 +28441,7 @@ namespace CS_Classes
             if (standaloneTest()) FindSlider("Desired boundary count").Value = 4;
             desc = "Find the histogram valleys for a grayscale image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             hist.Run(src);
@@ -28478,7 +28479,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setHistogramBins(256);
             desc = "Find the histogram valleys for a grayscale image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             hist.Run(src);
@@ -28536,7 +28537,7 @@ namespace CS_Classes
             labels[2] = "Text output with explanation will appear in the Visual Studio output.";
             desc = "Simple test of Hidden Markov Model - text output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.testAllRunning)
             {
@@ -28597,9 +28598,9 @@ namespace CS_Classes
                 dst2.Rectangle(r.TopLeft, r.BottomRight, Scalar.Red, 3, LineTypes.Link8, 0);
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             HOGDescriptor hog = new HOGDescriptor();
             hog.SetSVMDetector(HOGDescriptor.GetDefaultPeopleDetector());
             bool b = hog.CheckDetectorSize();
@@ -28643,9 +28644,9 @@ namespace CS_Classes
         {
             desc = "Build the homography matrix from 2 lists of corners and use it in a WarpPerspective call.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest() && vbc.task.heartBeat && (cv.HomographyMethods)options.hMethod == HomographyMethods.None)
             {
                 random.Run(empty);
@@ -28674,7 +28675,7 @@ namespace CS_Classes
         {
             desc = "Use the feature polygon to warp the current image to a previous image.  This is not useful but demonstrates how to use homography.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fPoly.Run(src);
             dst2 = fPoly.dst1;
@@ -28724,7 +28725,7 @@ namespace CS_Classes
             }
             DrawLine(dst2, vec.p1, vec.p2, new cv.Scalar(255), 255);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32F) dst0 = PrepareDepthInput(1); else dst0 = src;
             cv.Size resolution = vbc.task.quarterRes;
@@ -28808,7 +28809,7 @@ namespace CS_Classes
             }
             return new Point2f();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.useGravityPointcloud)
             {
@@ -28856,7 +28857,7 @@ namespace CS_Classes
             labels = new string[] { "", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask" };
             desc = "Create lines for the gravity vector and horizon vector in the camera image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             double xRatio = dst0.Width / vbc.task.quarterRes.Width;
             double yRatio = dst0.Height / vbc.task.quarterRes.Height;
@@ -28930,7 +28931,7 @@ namespace CS_Classes
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Create lines for the gravity vector and horizon vector in the camera image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != cv.MatType.CV_32FC3) src = vbc.task.pointCloud;
             dst1 = vbc.task.pcSplit[1].InRange(-0.05, 0.05);
@@ -28991,7 +28992,7 @@ namespace CS_Classes
             labels = new string[] { "", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask" };
             desc = "Create lines for the gravity vector and horizon vector in the camera image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             double xRatio = dst0.Width / (double)vbc.task.quarterRes.Width;
             double yRatio = dst0.Height / (double)vbc.task.quarterRes.Height;
@@ -29073,7 +29074,7 @@ namespace CS_Classes
         {
             desc = "Validate the horizon points using Match_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int templatePad = match.options.templatePad;
             int templateSize = match.options.templateSize;
@@ -29112,7 +29113,7 @@ namespace CS_Classes
         {
             desc = "Collect the horizon points and run a linear regression on all the points.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             horizon.Run(src);
             foreach (cv.Point point in horizon.points)
@@ -29136,7 +29137,7 @@ namespace CS_Classes
         {
             desc = "Supply the point cloud input to Horizon_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst0 = PrepareDepthInput(1);
             horizon.Run(dst0);
@@ -29156,9 +29157,9 @@ namespace CS_Classes
         {
             desc = "Use Houghlines to find lines in the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             edges.Run(src);
             segments = Cv2.HoughLines(edges.dst2, options.rho, options.theta, options.threshold);
             labels[2] = "Found " + segments.Length + " Lines";
@@ -29167,7 +29168,7 @@ namespace CS_Classes
                 src.CopyTo(dst2);
                 dst2.SetTo(Scalar.White, edges.dst2);
                 src.CopyTo(dst3);
-                base.HoughShowLines(ref dst2, segments, options.lineCount);
+                houghShowLines(dst2, segments, options.lineCount);
                 var probSegments = Cv2.HoughLinesP(edges.dst2, options.rho, options.theta, options.threshold);
                 for (int i = 0; i < Math.Min(probSegments.Length, options.lineCount); i++)
                 {
@@ -29193,7 +29194,7 @@ namespace CS_Classes
             labels[3] = "Hough Circles found";
             desc = "Find circles using HoughCircles.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             circles.Run(src);
             dst2 = circles.dst2;
@@ -29223,9 +29224,9 @@ namespace CS_Classes
             labels[3] = "Hough Lines for each threaded cell or if no lines, the featureless cell depth data.";
             desc = "Multithread Houghlines to find lines in image fragments.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             edges.Run(src);
             dst2 = edges.dst2;
             var depth8uC3 = vbc.task.depthRGB;
@@ -29239,7 +29240,7 @@ namespace CS_Classes
                 }
                 dst3[roi].SetTo(0);
                 Mat tmp = dst3[roi];
-                HoughShowLines(ref tmp, segments, 1);
+                houghShowLines(tmp, segments, 1);
             });
             dst2.SetTo(Scalar.White, vbc.task.gridMask);
         }
@@ -29260,9 +29261,9 @@ namespace CS_Classes
             labels[2] = "Featureless mask";
             desc = "Multithread Houghlines to find featureless regions in an image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             edges.Run(src);
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             int regionCount = 0;
@@ -29304,9 +29305,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Areas without features", "Areas with features" };
             desc = "Multithread Houghlines to find featureless regions in an image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var segSlider = FindSlider("Minimum feature pixels");
             int minSegments = segSlider.Value;
             edges.Run(src);
@@ -29347,7 +29348,7 @@ namespace CS_Classes
             labels = new string[] { "Original video image", "Mask to isolate lane regions", "Combined yellow and white masks", "HoughLines output" };
             desc = "Use Hough to isolate features in the mask of the road.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hls.Run(empty);
             if (vbc.task.optionsChanged)
@@ -29393,12 +29394,12 @@ namespace CS_Classes
         {
             desc = "Successful use of Hough to find lines in Sudoku grid.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = Cv2.ImRead(vbc.task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size());
             dst3 = dst2.Clone();
             hough.Run(dst2);
-            HoughShowLines(ref dst3, hough.segments, hough.options.lineCount);
+            houghShowLines(dst3, hough.segments, hough.options.lineCount);
         }
     }
 
@@ -29426,7 +29427,7 @@ namespace CS_Classes
             }
             return ptList;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if ((standaloneTest() && vbc.task.heartBeat) || (useRandomPoints && vbc.task.heartBeat))
             {
@@ -29454,7 +29455,7 @@ namespace CS_Classes
         {
             desc = "Compare the hull to the contour of a RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -29489,9 +29490,9 @@ namespace CS_Classes
         {
             desc = "Load an image into OpenCVB";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             src = options.fullsizeImage;
             if (src.Width != dst2.Width || src.Height != dst2.Height)
             {
@@ -29521,7 +29522,7 @@ namespace CS_Classes
             images.options.imageSeries = true;
             desc = "Display a new image from the directory every heartbeat";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             // to work on a specific file, specify it here.
             // options.fileInputName = new FileInfo(vbc.task.HomeDir + "Images/train/103041.jpg");
@@ -29542,7 +29543,7 @@ namespace CS_Classes
             vbc.task.gOptions.setDisplay1();
             desc = "Use RedCloud on a photo instead of the video stream.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             images.Run(empty);
             dst0 = images.dst2.Clone();
@@ -29570,7 +29571,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Display the statistics for the selected cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.pointCloud.SetTo(0);
             vbc.task.pcSplit = vbc.task.pointCloud.Split();
@@ -29598,9 +29599,9 @@ namespace CS_Classes
             FindSlider("MSER Max Area").Value = 200000;
             desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             images.Run(options.fullsizeImage);
             dst1 = images.dst2;
             core.Run(dst1);
@@ -29617,7 +29618,7 @@ namespace CS_Classes
         {
             desc = "This is just a reminder that all HighGUI methods are available in OpenCVB";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.ImShow("color", src);
         }
@@ -29633,7 +29634,7 @@ namespace CS_Classes
         {
             desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             Cv2.ImShow("Hit space bar to advance to the next frame", feat.dst2);
@@ -29651,7 +29652,7 @@ namespace CS_Classes
         {
             desc = "Experimenting with how to show an 32fc3 Mat file.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.ImShow("Point cloud", vbc.task.pointCloud);
             dst2 = vbc.task.pointCloud.Clone();
@@ -29668,7 +29669,7 @@ namespace CS_Classes
         {
             desc = "Read and display the IMU coordinates";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Point3f gyroAngle;
             if (vbc.task.optionsChanged)
@@ -29731,7 +29732,7 @@ namespace CS_Classes
         {
             desc = "Read and display the IMU coordinates";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Point3f gyroAngle;
             if (vbc.task.optionsChanged)
@@ -29778,9 +29779,9 @@ namespace CS_Classes
         {
             desc = "Read and display the IMU coordinates";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Point3f gyroAngle;
             if (vbc.task.optionsChanged)
             {
@@ -29859,7 +29860,7 @@ namespace CS_Classes
             float[] tmp = new float[] { g1, g2, g3, g4, g5, g6, g7, g8, g9 };
             gMatrix = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, tmp);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             //[cos(a) -sin(a)    0]
             //[sin(a)  cos(a)    0]
@@ -29900,7 +29901,7 @@ namespace CS_Classes
             desc = "Stabilize IMU acceleration data.";
             labels = new string[] { "", "", "IMU Stabilize (move camera around)", "Difference from Color Image" };
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int borderCrop = 5;
             int vert_Border = borderCrop * src.Rows / src.Cols;
@@ -29946,9 +29947,9 @@ namespace CS_Classes
             labels[3] = "IMU (blue) Host (green) Latency est. (red) - all in ms";
             desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int IMUanchor = (int)vbc.task.IMU_FrameTime;
             int[] histogramIMU = new int[plot.maxScale];
             // there can be some errant times at startup.
@@ -30044,7 +30045,7 @@ namespace CS_Classes
             labels[3] = "IMU (blue) Host (green) Latency est. (red) - all in ms";
             desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int plotLastX = countSlider.Value;
             host.Run(src);
@@ -30107,7 +30108,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Highlighted vertical lines", "Line details" };
             desc = "Compare the IMU changes to the angle changes in the vertical lines.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             vert.Run(src);
@@ -30119,8 +30120,9 @@ namespace CS_Classes
                 strOut += i + "\t" + string.Format("{0}", gc.len3D) + "m" + "\t" + string.Format("{0}", gc.tc1.depth) + "m" + "\t" +
                           string.Format("{0}", gc.arcX) + "\t" + string.Format("{0}", gc.arcY) + "\t" + string.Format("{0}", gc.arcZ) + "\t";
                 strOut += string.Format("{0}", vbc.task.accRadians.X * 57.2958) + "\t" + string.Format("{0}", vbc.task.accRadians.Y * 57.2958) + "\t" + string.Format("{0}", vbc.task.accRadians.Z * 57.2958) + "\t" + "\n";
-                SetTrueText(i.ToString(), gc.tc1.center, 2);
-                SetTrueText(i.ToString(), gc.tc1.center, 3);
+                cv.Point pt = new cv.Point(gc.tc1.center.X, gc.tc1.center.Y);
+                SetTrueText(i.ToString(), pt, 2);
+                SetTrueText(i.ToString(), pt, 3);
                 DrawLine(dst2, gc.tc1.center, gc.tc2.center, vbc.task.HighlightColor, vbc.task.lineWidth);
                 DrawLine(dst3, gc.tc1.center, gc.tc2.center, Scalar.White, vbc.task.lineWidth);
             }
@@ -30139,7 +30141,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Plot the motion of the camera based on the IMU data in degrees";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             SetTrueText("ts = " + string.Format("{0}", vbc.task.IMU_TimeStamp) + "\n" + "X degrees = " + string.Format("{0}", vbc.task.accRadians.X * 57.2958) + "\n" +
                         "Y degrees = " + string.Format("{0}", Math.Abs(vbc.task.accRadians.Y * 57.2958)) + "\n" + "Z degrees = " + string.Format("{0}", vbc.task.accRadians.Z * 57.2958) + "\n" + "\n" +
@@ -30163,7 +30165,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Plot the IMU Velocity over time.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             SetTrueText("ts = " + string.Format("{0}", vbc.task.IMU_TimeStamp) + "\n" + "X m/sec^2 = " + string.Format("{0}", vbc.task.IMU_Acceleration.X) + "\n" +
                         "Y m/sec^2 = " + string.Format("{0}", vbc.task.IMU_Acceleration.Y) + "\n" + "Z m/sec^2 = " + string.Format("{0}", vbc.task.IMU_Acceleration.Z) + "\n" + "\n" +
@@ -30191,7 +30193,7 @@ namespace CS_Classes
             labels[2] = "Vertical lines in Blue and horizontal lines in Yellow";
             desc = "Find the vertical and horizontal lines";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vert.Run(src);
             dst2 = vert.dst2;
@@ -30237,7 +30239,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Plot the IMU Acceleration in m/Sec^2 over time.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             SetTrueText("ts = " + string.Format("{0}", vbc.task.IMU_TimeStamp) + "\n" + "X m/sec^2 = " + string.Format("{0}", vbc.task.IMU_Acceleration.X) + "\n" +
                         "Y m/sec^2 = " + string.Format("{0}", vbc.task.IMU_Acceleration.Y) + "\n" + "Z m/sec^2 = " + string.Format("{0}", vbc.task.IMU_Acceleration.Z) + "\n" + "\n" +
@@ -30260,7 +30262,7 @@ namespace CS_Classes
         {
             desc = "Average the IMU Acceleration values over the previous X images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged) accList.Clear();
             accList.Add(new cv.Scalar(vbc.task.IMU_RawAcceleration.X, vbc.task.IMU_RawAcceleration.Y, vbc.task.IMU_RawAcceleration.Z));
@@ -30293,7 +30295,7 @@ namespace CS_Classes
             labels = new string[] { "IMU Acceleration in X", "IMU Acceleration in Y", "IMU Acceleration in Z", "" };
             desc = "imre the results of the raw IMU data with the same values after Kalman";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             imuAll.Run(empty);
             plot[0].plotData = new Scalar(vbc.task.IMU_RawAcceleration.X, vbc.task.IMU_Acceleration.X, vbc.task.kalmanIMUacc.X, vbc.task.IMU_AverageAcceleration.X);
@@ -30324,7 +30326,7 @@ namespace CS_Classes
         {
             desc = "Use Kalman Filter to stabilize the IMU acceleration and velocity";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             kalman.kInput = new float[] { vbc.task.IMU_RawAcceleration.X, vbc.task.IMU_RawAcceleration.Y, vbc.task.IMU_RawAcceleration.Z,
                                        vbc.task.IMU_RawAngularVelocity.X, vbc.task.IMU_RawAngularVelocity.Y, vbc.task.IMU_RawAngularVelocity.Z };
@@ -30351,7 +30353,7 @@ namespace CS_Classes
         {
             desc = "Compute the IMU acceleration using all available methods - raw, Kalman, averaging, and velocity-filtered.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             basics.Run(empty);
             kalman.Run(empty);
@@ -30371,14 +30373,14 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Plot the angular velocity";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.pitch = vbc.task.IMU_AngularVelocity.X;
             vbc.task.yaw = vbc.task.IMU_AngularVelocity.Y;
             vbc.task.roll = vbc.task.IMU_AngularVelocity.Z;
-            plot.blue = vbc.task.pitch * 1000;
-            plot.green = vbc.task.yaw * 1000;
-            plot.red = vbc.task.roll * 1000;
+            plot.blueA = vbc.task.pitch * 1000;
+            plot.greenA = vbc.task.yaw * 1000;
+            plot.redA = vbc.task.roll * 1000;
             plot.labels[2] = "pitch X 1000 (blue), Yaw X 1000 (green), and roll X 1000 (red)";
             plot.Run(empty);
             dst2 = plot.dst2;
@@ -30404,9 +30406,9 @@ namespace CS_Classes
         {
             desc = "Track the standard deviation of the angular velocities.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             vbc.task.pitch = vbc.task.IMU_AngularVelocity.X;
             vbc.task.yaw = vbc.task.IMU_AngularVelocity.Y;
             vbc.task.roll = vbc.task.IMU_AngularVelocity.Z;
@@ -30441,9 +30443,9 @@ namespace CS_Classes
             labels[3] = "IMU (blue) Host (green) Latency est. (red) - all in ms";
             desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.FirstPass) CPUanchor = (int)vbc.task.CPU_FrameTime;
             if (vbc.task.FirstPass) hist = new int[plot.maxScale + 1];
             // there can be some errant times at startup.
@@ -30520,9 +30522,9 @@ namespace CS_Classes
             labels[3] = "IMU (blue) Host (green) Latency est. (red) - all in ms";
             desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.FirstPass) CPUanchor = vbc.task.CPU_FrameTime;
             int cpuFrameTime = (int)vbc.task.CPU_FrameTime;
             if (CPUanchor != 0) cpuFrameTime = (int)(cpuFrameTime % CPUanchor);
@@ -30601,7 +30603,7 @@ namespace CS_Classes
             });
             return tmpGMatrix;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (xSlider == null) xSlider = FindSlider("Rotate pointcloud around X-axis (degrees)");
             if (ySlider == null) ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)");
@@ -30656,9 +30658,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Highlighted vertical lines", "Line details" };
             desc = "Use the Y-Arc to confirm which vertical lines are valid";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Clone();
             if (standaloneTest())
             {
@@ -30685,8 +30687,9 @@ namespace CS_Classes
                               string.Format("{0:F1}", gc.arcY) + "\t" +
                               string.Format("{0:F1}", gc.imageAngle) + "\t";
                     strOut += string.Format("{0:F1}", vbc.task.accRadians.Y * 57.2958) + "\n";
-                    SetTrueText(index.ToString(), gc.tc1.center, 2);
-                    SetTrueText(index.ToString(), gc.tc1.center, 3);
+                    cv.Point pt = new cv.Point(gc.tc1.center.X, gc.tc1.center.Y);
+                    SetTrueText(index.ToString(), pt, 2);
+                    SetTrueText(index.ToString(), pt, 3);
                     DrawLine(dst2, gc.tc1.center, gc.tc2.center, vbc.task.HighlightColor, vbc.task.lineWidth);
                     DrawLine(dst3, gc.tc1.center, gc.tc2.center, Scalar.White, vbc.task.lineWidth);
                     gCells[i] = gc;
@@ -30713,9 +30716,9 @@ namespace CS_Classes
             plot.plotCount = 3;
             desc = "Plot the angular velocity of the camera based on the IMU data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest())
             {
                 blueA = vbc.task.IMU_AngularVelocity.X * 1000;
@@ -30755,9 +30758,9 @@ namespace CS_Classes
             DrawLine(mask, p1, p2, Scalar.All(255), vbc.task.lineWidth);
             return mask;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             src.CopyTo(dst2);
             Mat mask = drawRandomLine(dst2);
             Cv2.Inpaint(dst2, mask, dst3, vbc.task.lineWidth, options.telea ? InpaintMethod.Telea : InpaintMethod.NS);
@@ -30776,9 +30779,9 @@ namespace CS_Classes
             desc = "Create noise in an image and then use inPaint to remove it.";
             labels[3] = "Repaired Image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             noise.Run(src); // create some noise in the result1 image.
             dst2 = noise.dst2;
             Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, options.telea ? InpaintMethod.Telea : InpaintMethod.NS);
@@ -30797,9 +30800,9 @@ namespace CS_Classes
             labels[3] = "32-bit depth repaired with inpainting";
             desc = "Use Navier-Stokes to fill in the holes in the depth";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Type() != MatType.CV_32F) src = vbc.task.pcSplit[2];
             dst2 = src.Clone();
             Cv2.Inpaint(src, vbc.task.noDepthMask, dst3, 20, options.telea ? InpaintMethod.Telea : InpaintMethod.NS);
@@ -30822,10 +30825,10 @@ namespace CS_Classes
                          "Local option 'Line length' affects the lines found.");
             desc = "Resize image using all available interpolation methods in OpenCV";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            iOptions.RunVB();
+            options.RunOpt();
+            iOptions.RunOpt();
             if (vbc.task.FirstPass) saveSliderValue = iOptions.interpolationThreshold;
             if (standaloneTest())
             {
@@ -30868,7 +30871,7 @@ namespace CS_Classes
         {
             desc = "Use Kalman to smooth the grayscale results of interpolation";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             inter.Run(src);
             dst2 = inter.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -30939,7 +30942,7 @@ namespace CS_Classes
             FindSlider("Interpolation threshold").Value = 100;
             desc = "Detect lines in interpolation results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             inter.Run(src);
             dst1 = inter.dst2.CvtColor(ColorConversionCodes.BGR2GRAY).Resize(dst3.Size());
@@ -30967,7 +30970,7 @@ namespace CS_Classes
         {
             desc = "Highlight the difference between the interpolation results and the current image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             inter.Run(src);
             dst2 = inter.dst3.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -30994,7 +30997,7 @@ namespace CS_Classes
         {
             desc = "Highlight the image differences after every quarter second.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.quarterBeat)
             {
@@ -31044,7 +31047,7 @@ namespace CS_Classes
         {
             desc = "Use Kalman to stabilize values (such as a cv.rect.)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (saveDimension != kInput.Length)
             {
@@ -31068,7 +31071,7 @@ namespace CS_Classes
                 for (int i = 0; i < kalman.Length; i++)
                 {
                     kalman[i].inputReal = kInput[i];
-                    kalman[i].RunVB(null);
+                    kalman[i].RunAlg(null);
                     if (double.IsNaN(kalman[i].stateResult)) kalman[i].stateResult = kalman[i].inputReal; // kalman failure...
                     kOutput[i] = kalman[i].stateResult;
                 }
@@ -31111,7 +31114,7 @@ namespace CS_Classes
             labels[3] = "Kalman output: smoothed mean values for RGB";
             desc = "Use this kalman filter to predict the next value.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged)
             {
@@ -31177,7 +31180,7 @@ namespace CS_Classes
             center = new Point2f(dst2.Cols / 2, dst2.Rows / 2);
             desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real).";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             float stateAngle = kState.Get<float>(0);
             Mat prediction = kf.Predict();
@@ -31214,7 +31217,7 @@ namespace CS_Classes
             labels[2] = "Red is real mouse, white is prediction";
             desc = "Use kalman filter to predict the next mouse location.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.frameCount % 300 == 0) dst2.SetTo(0);
             cv.Point lastStateResult = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
@@ -31245,7 +31248,7 @@ namespace CS_Classes
             if (standaloneTest()) labels[2] = "Rectangle moves smoothly to random locations";
             desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (saveDimension != input.Rows)
             {
@@ -31269,7 +31272,7 @@ namespace CS_Classes
                 for (int i = 0; i < kalman.Length; i++)
                 {
                     kalman[i].inputReal = input.Get<float>(i, 0);
-                    kalman[i].RunVB(src);
+                    kalman[i].RunAlg(src);
                     output.Set<float>(i, 0, kalman[i].stateResult);
                 }
             }
@@ -31314,7 +31317,7 @@ namespace CS_Classes
             labels[3] = "Mask of the smoothed image minus original";
             desc = "Resize the image to allow the Kalman filter to process the whole image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             resize.Run(src);
@@ -31345,7 +31348,7 @@ namespace CS_Classes
             labels[3] = "Mask of the smoothed image minus original";
             desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             kalman.Run(vbc.task.depthRGB);
             dst2 = kalman.dst2;
@@ -31368,7 +31371,7 @@ namespace CS_Classes
             labels[3] = "Difference from original depth";
             desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             resize.Run(vbc.task.pcSplit[2]);
             kalman.input = resize.dst2.Reshape(1, resize.dst2.Width * resize.dst2.Height);
@@ -31407,7 +31410,7 @@ namespace CS_Classes
             plot.plotCount = 2;
             desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -31456,7 +31459,7 @@ namespace CS_Classes
         {
             float[] tMatrix = { 1, 1, 0, 1 };
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (newTMatrix)
             {
@@ -31528,9 +31531,9 @@ namespace CS_Classes
             kOutput += K_0 * kError; // Update our state estimate
             q_bias += K_1 * kError;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (standaloneTest()) kInput = (float)src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Mean()[0];
             if (options.averageInputCount != saveAvgCount)
@@ -31580,9 +31583,9 @@ namespace CS_Classes
         {
             desc = "Track movement with Kanada-Lucas-Tomasi algorithm";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.nightMode)
                 dst2.SetTo(0);
             else
@@ -31651,7 +31654,7 @@ namespace CS_Classes
         {
             desc = "KLT optical flow - needs more work";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             klt.Run(src);
             if (vbc.task.frameCount > 0 && lastpoints != null && klt.ptInput != null)
@@ -31689,11 +31692,11 @@ namespace CS_Classes
             labels = new string[] { "", "", "", "Palette output for the kMeans labels" };
             desc = "Cluster the input using kMeans.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() && src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            options.RunVB();
+            options.RunOpt();
             classCount = options.kMeansK;
             if (vbc.task.FirstPass) lastK = classCount;
             if (vbc.task.optionsChanged || lastK != classCount)
@@ -31738,7 +31741,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "KMeans_Basics output with BGR input", "dst3 contains the labels spread across the palette (dst0 contains the exact labels)" };
             desc = "Cluster the input using kMeans.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
                 vbc.task.color.ConvertTo(src, MatType.CV_32FC3);
@@ -31767,7 +31770,7 @@ namespace CS_Classes
             labels[2] = "kmeans - k=2,4,6,8";
             desc = "Show clustering with various settings for cluster count.  Draw to select region of interest.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.frameCount % 100 == 0)
             {
@@ -31798,7 +31801,7 @@ namespace CS_Classes
             labels[3] = "The white marks areas that are busy while the black marks areas that are consistent in color - not fuzzy.";
             desc = "Use the KMeans output as input to the Fuzzy detector - those areas which have little info";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             km.Run(src);
             dst2 = km.km.dst2;
@@ -31817,7 +31820,7 @@ namespace CS_Classes
             cPtr = KMeans_MultiGaussian_Open();
             desc = "Use KMeans on a random multi-gaussian distribution.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             IntPtr imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols);
             if (imagePtr != IntPtr.Zero && vbc.task.heartBeat)
@@ -31844,9 +31847,9 @@ namespace CS_Classes
             randslider = FindSlider("Random Pixel Count");
             desc = "Cluster the selected input using kMeans";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            km.options.RunVB();
+            km.options.RunOpt();
             int k = km.options.kMeansK;
             if (src.Rows < k) k = src.Rows;
             if (standaloneTest())
@@ -31877,7 +31880,7 @@ namespace CS_Classes
             cPtr = Kmeans_Simple_Open();
             desc = "Split the input into 3 levels - zero (no depth), closer to min, closer to max.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest()) src = vbc.task.pcSplit[2];
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -31912,7 +31915,7 @@ namespace CS_Classes
             labels[3] = "KMeans with edges output";
             desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(src);
             src.SetTo(Scalar.White, edges.dst2);
@@ -31937,7 +31940,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "KMeans_Basics output", "KMeans on all 3 channels - recombined" };
             desc = "Compare the results of using grayscale KMeans with multi-channel KMeans";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             km.Run(src);
             dst2 = km.dst2;
@@ -31962,7 +31965,7 @@ namespace CS_Classes
             kSlider = FindSlider("KMeans k");
             desc = "Use the Histogram valleys to find the best 'K' value for the current depth data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             kCount.Run(src);
             if (kSlider.Value != kCount.classCount) kSlider.Value = Math.Max(kCount.classCount, kSlider.Minimum);
@@ -31990,7 +31993,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "KMeans output after Palette run", "Each of the KMeans masks is displayed below in rotation." };
             desc = "Cluster the input image pixels using kMeans and allow any region to be selected for highlight in dst3.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             km.Run(src);
             dst2 = ShowPalette(km.dst2 * 255 / km.classCount);
@@ -32024,7 +32027,7 @@ namespace CS_Classes
             grayPlus[0] = new Mat(vbc.task.WorkingRes, MatType.CV_32F, cv.Scalar.All(0));
             desc = "Cluster the rgb+depth image pixels using kMeans";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(grayPlus[0], MatType.CV_32F);
             grayPlus[0].SetTo(0, vbc.task.noDepthMask);
@@ -32051,7 +32054,7 @@ namespace CS_Classes
             dimSlider = FindSlider("Dimension");
             desc = "Demonstrate how to use KMeans for a variety of dimensions";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat merge = new Mat();
             switch (dimSlider.Value)
@@ -32113,7 +32116,7 @@ namespace CS_Classes
             labels[2] = "8-Bit input to vbPalette output in dst3";
             desc = "Cluster depth using kMeans - use KMeans_TierCount to determine 'K'";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tiers.Run(src);
             kSlider.Value = tiers.classCount;
@@ -32138,7 +32141,7 @@ namespace CS_Classes
             labels[2] = "";
             desc = "Cluster depth using kMeans - useful to split foreground and background";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             km.Run(vbc.task.pcSplit[2]);
             dst2 = km.dst2 + cv.Scalar.All(1);
@@ -32162,7 +32165,7 @@ namespace CS_Classes
         {
             desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -32191,7 +32194,7 @@ namespace CS_Classes
         {
             desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             if (vbc.task.heartBeat)
@@ -32227,7 +32230,7 @@ namespace CS_Classes
             labels[3] = "CS_KNN_Basics_CS output with just the closest match.  Red = training data, yellow = queries.";
             desc = "Map points 1:1 with losses. Toss any farther duplicates. Easier to follow than previous version.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -32331,7 +32334,7 @@ namespace CS_Classes
                 DrawCircle(dst2, pt, vbc.task.DotSize + 4, Scalar.Red);
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int KNNdimension = 2;
             if (standalone)
@@ -32420,7 +32423,7 @@ namespace CS_Classes
                 DrawCircle(dst3, pt, vbc.task.DotSize + 4, Scalar.Red);
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -32452,7 +32455,7 @@ namespace CS_Classes
             knn = KNearest.Create();
             desc = "Use knn with the input 3D points in the image.  Find the nearest neighbors.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -32502,7 +32505,7 @@ namespace CS_Classes
             labels[2] = "Red=TrainingData, yellow = queries, text shows Z distance to that point from query point";
             desc = "Use knn with the input 4D points in the image.  Find the nearest neighbors.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -32553,9 +32556,9 @@ namespace CS_Classes
             knn = KNearest.Create();
             desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             IEnumerable<int> responseList = Enumerable.Range(0, 10);
             if (standaloneTest())
             {
@@ -32610,7 +32613,7 @@ namespace CS_Classes
             FindSlider("Random Pixel Count").Value = 100;
             desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -32639,7 +32642,7 @@ namespace CS_Classes
             dist.inPoint1 = knn.queries[0];
             for (int i = 0; i < knn.trainInput.Count(); i++)
             {
-                var pt = new Point2f(knn.trainInput[i].X, knn.trainInput[i].Y);
+                var pt = new cv.Point(knn.trainInput[i].X, knn.trainInput[i].Y);
                 DrawCircle(dst2, pt, vbc.task.DotSize, Scalar.Red);
                 dist.inPoint2 = knn.trainInput[i];
                 dist.Run(src);
@@ -32647,7 +32650,7 @@ namespace CS_Classes
             }
             for (int i = 0; i < knn.queries.Count(); i++)
             {
-                var pt = new Point2f(knn.queries[i].X, knn.queries[i].Y);
+                cv.Point pt = new cv.Point(knn.queries[i].X, knn.queries[i].Y);
                 for (int j = 0; j <= Math.Min(2, knn.trainInput.Count()); j++)
                 {
                     int index = knn.result[i, j];
@@ -32655,7 +32658,7 @@ namespace CS_Classes
                     var nn = new Point2f(knn.trainInput[index].X, knn.trainInput[index].Y);
                     DrawCircle(dst2, pt, vbc.task.DotSize, Scalar.Yellow);
                     DrawLine(dst2, pt, nn, Scalar.Yellow);
-                    var midPt = new Point2f((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2);
+                    cv.Point midPt = new cv.Point((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2);
                     SetTrueText(j.ToString(), midPt);
                     SetTrueText("depth=" + knn.queries[i].Z.ToString(), pt);
                 }
@@ -32677,7 +32680,7 @@ namespace CS_Classes
             FindSlider("Random Pixel Count").Value = 5;
             desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -32691,7 +32694,7 @@ namespace CS_Classes
             dist.inPoint1 = knn.queries[0];
             for (int i = 0; i < knn.trainInput.Count(); i++)
             {
-                var pt = new Point2f(knn.trainInput[i][0], knn.trainInput[i][1]);
+                cv.Point pt = new cv.Point(knn.trainInput[i][0], knn.trainInput[i][1]);
                 DrawCircle(dst2, pt, vbc.task.DotSize, Scalar.Red);
                 dist.inPoint2 = knn.trainInput[i];
                 dist.Run(src);
@@ -32699,7 +32702,7 @@ namespace CS_Classes
             }
             for (int i = 0; i < knn.queries.Count(); i++)
             {
-                var pt = new Point2f(knn.queries[i][0], knn.queries[i][1]);
+                cv.Point pt = new cv.Point(knn.queries[i][0], knn.queries[i][1]);
                 for (int j = knn.result.GetLowerBound(1); j <= knn.result.GetUpperBound(1); j++)
                 {
                     int index = knn.result[i, j];
@@ -32707,7 +32710,7 @@ namespace CS_Classes
                     var nn = new Point2f(knn.trainInput[index][0], knn.trainInput[index][1]);
                     DrawCircle(dst2, pt, vbc.task.DotSize, Scalar.Yellow);
                     DrawLine(dst2, pt, nn, vbc.task.HighlightColor);
-                    var midPt = new Point2f((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2);
+                    cv.Point midPt = new cv.Point((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2);
                     SetTrueText(j.ToString(), midPt);
                 }
             }
@@ -32725,7 +32728,7 @@ namespace CS_Classes
             labels[2] = "Highlight color (Yellow) is query.  The red dots are the training set.";
             desc = "Test the use of the general form KNN_CoreN algorithm";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -32782,7 +32785,7 @@ namespace CS_Classes
             labels[3] = "Red=TrainingData, yellow = queries - use EMax sigma to introduce more chaos.";
             desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             em.Run(src);
             random.Run(empty);
@@ -32848,7 +32851,7 @@ namespace CS_Classes
             }
             return histSum / histList.Count();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) lastImage = src.Clone();
             int multiplier = dotSlider.Value;
@@ -32906,7 +32909,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Highlight the tracked line (move camera to see track results)", "Candidate lines - standaloneTest() only" };
             desc = "Find the longest line and keep finding it among the list of lines using a minimized KNN test.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             cv.Point2f p1 = new cv.Point2f(), p2 = new cv.Point2f();
@@ -32985,7 +32988,7 @@ namespace CS_Classes
         {
             desc = "Try to find the closest pair of points in the traininput.  Dynamically compute distance ceiling to determine when to report fail.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             if (lastP1 == new Point2f())
@@ -33034,7 +33037,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Highlight the tracked line", "Candidate vertical lines are in Blue" };
             desc = "Test the code find the longest line and track it using a minimized KNN test.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             lines.Run(src);
@@ -33082,7 +33085,7 @@ namespace CS_Classes
             labels[3] = "KNN_BasicsOld_CS output with just the closest match.  Red = training data, yellow = queries.";
             desc = "Map points 1:1 with losses.  When duplicates are found, toss the farthest.  Too hard to follow.  Trying a better approach.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -33181,7 +33184,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Lines connecting pairs that are farthest.", "Training Input which is also query input and longest line" };
             desc = "Use KNN to find the farthest point from each query point.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -33229,7 +33232,7 @@ namespace CS_Classes
         {
             desc = "Track each good feature with KNN and match the goodFeatures from frame to frame";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var minDistance = feat.options.minDistance;
             if (!vbc.task.motionFlag || vbc.task.optionsChanged) minDistance = 2;
@@ -33271,7 +33274,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lane.Run(src);
             dst0 = lane.dst0;
@@ -33295,9 +33298,9 @@ namespace CS_Classes
 
             desc = "Read in the videos showing road conditions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
             {
@@ -33320,7 +33323,7 @@ namespace CS_Classes
         {
             desc = "Using the videos provided, find the lane markers.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             input.Run(empty);
             dst0 = input.dst2;
@@ -33340,7 +33343,7 @@ namespace CS_Classes
             labels = new string[] { "HLS color conversion", "InRange White", "InRange Yellow", "Combined InRange White and InRange Yellow results" };
             desc = "Isolate the colors for the white and yellow";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             input.Run(empty);
             dst0 = input.dst2.CvtColor(cv.ColorConversionCodes.BGR2HLS);
@@ -33362,7 +33365,7 @@ namespace CS_Classes
             labels = new string[] { "Original input", "Mask showing ROI", "HLS version with ROI outline", "HLS Mask with ROI outline" };
             desc = "Define the ROI for the location of the lanes";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hls.Run(empty);
             if (vbc.task.optionsChanged)
@@ -33401,7 +33404,7 @@ namespace CS_Classes
         {
             desc = "Use the Hough lines found to build a slope intercept format line.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hough.Run(empty);
             dst0 = hough.dst0;
@@ -33470,10 +33473,10 @@ namespace CS_Classes
         {
             desc = "C# version of the Laplacian Pyramid Filter - see http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src.ConvertTo(options.img, MatType.CV_32F);
-            options.RunVB();
+            options.RunOpt();
             options.img.ConvertTo(dst2, MatType.CV_8UC3);
         }
     }
@@ -33490,9 +33493,9 @@ namespace CS_Classes
         {
             desc = "Laplacian filter - the second derivative.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest()) src = src.GaussianBlur(options.kernel, 0, 0);
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst3 = src.Laplacian(MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs();
@@ -33514,9 +33517,9 @@ namespace CS_Classes
         {
             desc = "Laplacian filter - the second derivative - with different bluring techniques";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             string blurText;
             if (options.gaussianBlur)
             {
@@ -33550,7 +33553,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Left camera image", vbc.task.cameraName == "Azure Kinect 4K" ? "No right image" : "Right camera image" };
             desc = "Display the left and right views as they came from the camera.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = vbc.task.leftView;
             dst3 = vbc.task.rightView;
@@ -33567,9 +33570,9 @@ namespace CS_Classes
         {
             desc = "Show slices of the left and right view next to each other for visual comparison";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             cv.Rect r1 = new cv.Rect(0, options.sliceY, vbc.task.leftView.Width, options.sliceHeight);
             cv.Rect r2 = new cv.Rect(0, 25, vbc.task.leftView.Width, options.sliceHeight);
             dst2.SetTo(0);
@@ -33591,7 +33594,7 @@ namespace CS_Classes
             labels[2] = "Left Image";
             labels[3] = "Right Image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = ShowPalette(vbc.task.leftView);
             dst3 = ShowPalette(vbc.task.rightView);
@@ -33611,7 +33614,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Left Image", "Right Image" };
             desc = "Add color to the 8-bit infrared images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             brisk.Run(vbc.task.leftView);
             dst2 = brisk.dst2.Clone();
@@ -33632,7 +33635,7 @@ namespace CS_Classes
             labels[2] = "Left Image";
             labels[3] = "Right Image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(vbc.task.leftView);
             dst2 = edges.dst2;
@@ -33652,7 +33655,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Reduced Left Image", "Reduced Right Image" };
             desc = "Reduce both the left and right color images";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(vbc.task.leftView);
             dst2 = reduction.dst2.Clone();
@@ -33676,7 +33679,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Reduced Left Image", "Reduced Right Image" };
             desc = "Use the left/right reductions to find hard markers - neighboring pixels of identical values";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redView.Run(src);
             dst2 = redView.reduction.dst3.Clone();
@@ -33734,7 +33737,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Reduced Left Image", "Reduced Right Image" };
             desc = "Use the left/right reductions to find markers - neighboring pixels of identical values";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redView.Run(src);
             dst0 = redView.dst2;
@@ -33788,7 +33791,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Left camera lines", "Right camera lines" };
             desc = "Find the lines in the Left and Right images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(vbc.task.leftView);
             dst2 = lines.dst2.Clone();
@@ -33808,7 +33811,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Segment the right view image with RedCloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(vbc.task.rightView);
             dst2 = redC.dst2;
@@ -33827,7 +33830,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Segment the left view image with RedCloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(vbc.task.leftView);
             dst2 = redC.dst2;
@@ -33846,7 +33849,7 @@ namespace CS_Classes
         {
             desc = "Match cells in the left view to the right view - something is flipped here...";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             stRight.Run(empty);
             dst2 = stRight.dst2;
@@ -33867,7 +33870,7 @@ namespace CS_Classes
         {
             desc = "Placeholder to make it easier to find FeatureLeftRight_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             dst2 = feat.dst2;
@@ -33890,7 +33893,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3)
                 dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -33942,7 +33945,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3)
                 dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -33999,7 +34002,7 @@ namespace CS_Classes
             labels[2] = "Use mouse in right image to highlight lines";
             desc = "An alternative way to highlight line segments with common slope";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst3.SetTo(0);
@@ -34103,9 +34106,9 @@ namespace CS_Classes
                 }
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             lines.Run(src);
             if (lines.lpList.Count() == 0) return;
             dst2 = src;
@@ -34160,7 +34163,7 @@ namespace CS_Classes
             labels[2] = "Left image lines(red) with Right(blue)";
             desc = "Find lines in the infrared images and overlay them in a single image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.cameraStable) dst2.SetTo(Scalar.White);
             leftLines.Run(vbc.task.leftView);
@@ -34189,7 +34192,7 @@ namespace CS_Classes
             labels[3] = "Lines in BGR confirmed in the point cloud";
             desc = "Find the BGR lines and confirm they are present in the cloud data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst2 = lines.dst2;
@@ -34258,7 +34261,7 @@ namespace CS_Classes
             labels = new[] { "", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN" };
             desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst2 = src;
@@ -34351,7 +34354,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Line Movement", "" };
             desc = "Show the movement of the line provided";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -34419,9 +34422,9 @@ namespace CS_Classes
             }
             return gc;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var maxAngle = angleSlider.Value;
             dst2 = src.Clone();
             lines.Run(src.Clone());
@@ -34464,7 +34467,7 @@ namespace CS_Classes
             labels[2] = "When running standaloneTest(), a pair of random points is used to test the algorithm.";
             desc = "Display the line provided in mp";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src;
             if (standaloneTest() && vbc.task.heartBeat)
@@ -34521,7 +34524,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", "" };
             desc = "Find the line perpendicular to the line created by the points provided.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass && p1 != new Point2f()) externalUse = true;
             if (vbc.task.heartBeat || externalUse)
@@ -34558,7 +34561,7 @@ namespace CS_Classes
             labels[2] = "RedCloud_Hulls output with lines highlighted";
             desc = "Identify the lines created by the RedCloud Cells and separate vertical from horizontal";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hulls.Run(src);
             dst2 = hulls.dst2;
@@ -34593,7 +34596,7 @@ namespace CS_Classes
         {
             desc = "Identify all lines in the RedCloud_Basics cell boundaries";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -34616,7 +34619,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View." };
             desc = "Find lines in the hotspots for the side view.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histSide.Run(src);
             autoY.Run(histSide.histogram);
@@ -34639,7 +34642,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View." };
             desc = "Find lines in the hotspots for the Top View.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src);
             autoX.Run(histTop.histogram);
@@ -34664,7 +34667,7 @@ namespace CS_Classes
             UpdateAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.");
             desc = "Find the lines in the contours.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             contours.Run(reduction.dst2);
@@ -34691,7 +34694,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Lines for the current color class", "Color Class input" };
             desc = "Review lines in all the different color classes";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             colorClass.Run(src);
             dst1 = colorClass.dst2;
@@ -34716,7 +34719,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Straight lines in Canny output", "Input to Line_Basics" };
             desc = "Find lines in the Canny output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             canny.Run(src);
             dst3 = canny.dst2.Clone();
@@ -34738,7 +34741,7 @@ namespace CS_Classes
             labels[3] = "Vertical (blue) Horizontal (Red) Other (Green)";
             desc = "Find slope and y-intercept of lines over time.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             if (lines.pixelcount == 0) return;
@@ -34772,7 +34775,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Collect lines over time";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             if (vbc.task.optionsChanged || vbc.task.motionFlag) frameList.Clear();
@@ -34819,9 +34822,9 @@ namespace CS_Classes
             angleZSlider = FindSlider("Z angle tolerance in degrees");
             desc = "Capture all vertical and horizontal lines.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             maxAngleX = angleXSlider.Value;
             maxAngleZ = angleZSlider.Value;
             int radius = (int)(cellSlider.Value / 2);
@@ -34853,8 +34856,9 @@ namespace CS_Classes
                 double arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958;
                 if (Math.Abs(arcX) <= maxAngleX && Math.Abs(arcZ) <= maxAngleZ)
                 {
-                    SetTrueText(arcX.ToString(vbc.fmt1) + " X" + "\n" + arcZ.ToString(vbc.fmt1) + " Z", lines2[i], 2);
-                    SetTrueText(arcX.ToString(vbc.fmt1) + " X" + "\n" + arcZ.ToString(vbc.fmt1) + " Z", lines2[i], 3);
+                    cv.Point pt = new cv.Point(lines2[i].X, lines2[i].Y);
+                    SetTrueText(arcX.ToString(vbc.fmt1) + " X" + "\n" + arcZ.ToString(vbc.fmt1) + " Z", pt, 2);
+                    SetTrueText(arcX.ToString(vbc.fmt1) + " X" + "\n" + arcZ.ToString(vbc.fmt1) + " Z", pt, 3);
                     DrawLine(dst2, lines2[i], lines2[i + 1], vbc.task.HighlightColor);
                     verticals.Add(vert);
                 }
@@ -34877,7 +34881,7 @@ namespace CS_Classes
             labels[3] = "Numbers below are: correlation coefficient, distance in meters, angle from vertical in the X-direction, angle from vertical in the Z-direction";
             desc = "Find the list of vertical lines and track them until most are lost, then recapture the vertical lines again.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (verticals.Count() < 2 || verticals.Count() < verts.verticals.Count() / 3 || vbc.task.optionsChanged)
             {
@@ -34956,7 +34960,7 @@ namespace CS_Classes
             labels[2] = "Yellow line is input line, white dot is the input point, and the white line is the nearest path to the input line.";
             desc = "Find the nearest point on a line";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() && vbc.task.heartBeat)
             {
@@ -35018,7 +35022,7 @@ namespace CS_Classes
         {
             desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -35059,7 +35063,7 @@ namespace CS_Classes
             vbc.task.gOptions.setLineWidth(2);
             desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             float pixelDiff = vbc.task.gOptions.pixelDiffThreshold;
             dst2 = src.Clone();
@@ -35116,9 +35120,9 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Use KNN to find the other line end points nearest to each endpoint and connect them with a line.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            swarm.options.RunVB();
+            swarm.options.RunOpt();
             lines.Run(src);
             dst2 = lines.dst2;
             dst3.SetTo(0);
@@ -35161,7 +35165,7 @@ namespace CS_Classes
             Cv2.MatchTemplate(pts1, pts2, correlationMat, TemplateMatchModes.CCoeffNormed);
             return correlationMat.At<float>(0, 0);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -35216,7 +35220,7 @@ namespace CS_Classes
         {
             desc = "Use the first and last points in the sequence to build a single line and then check it against the rest of the sequence.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pts.Run(src);
             dst3 = pts.dst2;
@@ -35276,7 +35280,7 @@ namespace CS_Classes
                 DrawLine(dst2, p1, p2, Scalar.White);
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pts.Run(src);
             dst2 = pts.dst2;
@@ -35324,7 +35328,7 @@ namespace CS_Classes
                 }
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pts.Run(src);
             dst2 = pts.dst2;
@@ -35348,7 +35352,7 @@ namespace CS_Classes
         {
             desc = "A simple example of using OpenCV's linear regression.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone)
             {
@@ -35388,7 +35392,7 @@ namespace CS_Classes
         {
             desc = "A simple example of using OpenCV's linear regression.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var x = new List<float> { 1, 2, 3, 4, 5 };
             var y = new List<float> { 2, 4, 5, 4, 5 };
@@ -35415,7 +35419,7 @@ namespace CS_Classes
         {
             desc = "A simple example of using OpenCV's linear regression.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             random.Run(null);
             regress.x.Clear();
@@ -35488,7 +35492,7 @@ namespace CS_Classes
             if (lpLists.Count() >= vbc.task.frameHistoryCount) lpLists.RemoveAt(0);
             return lpList;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged) lpLists.Clear();
             longLines.Run(src);
@@ -35519,7 +35523,7 @@ namespace CS_Classes
             dst2 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "find lines with coincident slopes and intercepts.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged) mpLists.Clear();
             coin.Run(src);
@@ -35540,7 +35544,7 @@ namespace CS_Classes
         {
             desc = "Find the lines that are coincident in the parallel lines";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             parallel.Run(src);
             coinList.Clear();
@@ -35602,9 +35606,9 @@ namespace CS_Classes
             }
             return new PointPair(new cv.Point(lp.p1.X, 0), new cv.Point(lp.p1.X, dst2.Height));
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Clone();
             lines.Run(src);
             lpList.Clear();
@@ -35632,7 +35636,7 @@ namespace CS_Classes
         {
             desc = "Isolate the longest X lines.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst2 = lines.dst2;
@@ -35663,7 +35667,7 @@ namespace CS_Classes
             plot.dst2 = dst3;
             desc = "Find the longest line in BGR and use it to measure the average depth for the line";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             longLine.Run(src.Clone());
             dst1 = src;
@@ -35703,7 +35707,7 @@ namespace CS_Classes
             longest.lineCount = 4;
             desc = "Isolate the line that is consistently among the longest lines present in the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             longest.Run(src);
@@ -35738,7 +35742,7 @@ namespace CS_Classes
         {
             desc = "Isolate the line that is consistently among the longest lines present in the image and then kalmanize the mid-point";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             longLine.Run(src);
             dst2 = longLine.dst2;
@@ -35765,9 +35769,9 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_32F, cv.Scalar.All(0));
             desc = "Find the longest line from last image and use matchTemplate to find the line in the latest image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             longest.Run(src);
             dst2 = longest.dst2;
@@ -35802,7 +35806,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Random Line drawn", "" };
             desc = "Test PointPair constructor with random values to make sure lines are extended properly";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -35830,7 +35834,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Image output from Line_Basics", "The extended line for each line found in Line_Basics" };
             desc = "Create a list of all the extended lines in an image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst2 = lines.dst2;
@@ -35858,7 +35862,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Image output from Line_Basics", "Parallel extended lines" };
             desc = "Use KNN to find which lines are near each other and parallel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             extendAll.Run(src);
             dst3 = extendAll.dst2;
@@ -35937,7 +35941,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Original Line", "Original line Extended" };
             desc = "Given 2 points, extend the line to the edges of the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() && vbc.task.heartBeat)
             {
@@ -35970,7 +35974,7 @@ namespace CS_Classes
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Find any lines in regions without depth.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lineHist.Run(src);
             dst2 = lineHist.dst2;
@@ -35990,7 +35994,7 @@ namespace CS_Classes
         {
             desc = "Find the longest lines and toss any that are intermittant.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst2 = lines.dst2;
@@ -36042,9 +36046,9 @@ namespace CS_Classes
             labels[3] = "Palettized version of dst2";
             desc = "Divide the image into n-segments controlled with a slider.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (classCount != options.lutSegments)
             {
                 classCount = options.lutSegments;
@@ -36080,9 +36084,9 @@ namespace CS_Classes
         {
             desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat gray = (src.Channels() == 1) ? src : src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat myLut = new Mat(1, 256, MatType.CV_8U);
             int splitIndex = 0;
@@ -36111,7 +36115,7 @@ namespace CS_Classes
             labels[3] = "Custom Color Lookup Table";
             desc = "Build and use a custom color palette";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst2 = reduction.dst2.CvtColor(ColorConversionCodes.GRAY2BGR).LUT(vector);
@@ -36128,7 +36132,7 @@ namespace CS_Classes
         {
             desc = "Use a LUT on the RGBDepth to segregate depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lut.Run(vbc.task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY));
             dst2 = lut.dst2 * 255 / lut.classCount;
@@ -36146,7 +36150,7 @@ namespace CS_Classes
         {
             desc = "Use a LUT on the 32-bit depth to segregate depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lut.Run(vbc.task.pcSplit[2].Normalize(255).ConvertScaleAbs(255));
             dst2 = lut.dst2 * 255 / lut.classCount;
@@ -36168,7 +36172,7 @@ namespace CS_Classes
             labels[3] = "With Histogram Equalized";
             desc = "Use LUT_Basics but with an equalized histogram image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lut.Run(src);
             dst3 = lut.dst2 * 255 / lut.classCount;
@@ -36194,7 +36198,7 @@ namespace CS_Classes
             wShed.UseCorners = true;
             desc = "Use watershed algorithm with LUT input to identify regions in the image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lut.Run(src);
             dst3 = lut.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
@@ -36221,7 +36225,7 @@ namespace CS_Classes
             labels[3] = "Custom Color Lookup Table";
             desc = "Use a palette to provide the lookup table for LUT";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged || vbc.task.heartBeat)
             {
@@ -36247,7 +36251,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Use LUT on the grayscale image after masking with rc.mask";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -36271,9 +36275,9 @@ namespace CS_Classes
         {
             desc = "Create a LUT table that can map similar pixels to the same exact pixel.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var split = src.Split();
             for (int i = 0; i <= 2; i++)
             {
@@ -36325,7 +36329,7 @@ namespace CS_Classes
             vbc.task.drawRect = new cv.Rect(10, 10, 50, 50);
             desc = "Magnify the drawn rectangle on dst2 and put it in dst3.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src;
             if (vbc.task.drawRect.Width > 0 && vbc.task.drawRect.Height > 0)
@@ -36346,7 +36350,7 @@ namespace CS_Classes
         {
             desc = "Magnify the output of the algorithm above.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             prep.Run(src);
             dst2 = prep.dst2;
@@ -36364,7 +36368,7 @@ namespace CS_Classes
         {
             desc = "Use the repeat method to replicate data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var small = src.Resize(new cv.Size(src.Cols / 10, src.Rows / 10));
             dst2 = small.Repeat(10, 10);
@@ -36385,7 +36389,7 @@ namespace CS_Classes
             labels[3] = "Random_Basics points after format change with indexer";
             desc = "Convert point2f into a mat of points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             random.Run(empty);
             dst2.SetTo(0);
@@ -36415,7 +36419,7 @@ namespace CS_Classes
             desc = "Convert a mat into a vector of points.";
             labels[2] = "Reconstructed BGR Image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var points = new Vec3b[src.Total()];
             Vec3b vec = new Vec3b();
@@ -36445,7 +36449,7 @@ namespace CS_Classes
             labels[3] = "Mat transposed around the diagonal";
             desc = "Show some Mat tricks.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var mat = src.Resize(new cv.Size(src.Height, src.Height));
             var roi = new cv.Rect(0, 0, mat.Width, mat.Height);
@@ -36464,7 +36468,7 @@ namespace CS_Classes
             labels[2] = "BitwiseNot of RowRange and ColRange";
             desc = "Perform operation on a range of cols and/or Rows.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var midX = src.Width / 2;
             var midY = src.Height / 2;
@@ -36484,7 +36488,7 @@ namespace CS_Classes
         {
             desc = "Review matrix multiplication";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int[,] a = { { 1, 4, 2 }, { 2, 5, 1 } };
             int[,] b = { { 3, 4, 2 }, { 3, 5, 7 }, { 1, 2, 1 } };
@@ -36551,7 +36555,7 @@ namespace CS_Classes
             labels[2] = "";
             desc = "Fill a Mat with 2 images";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var nSize = new cv.Size(vbc.task.WorkingRes.Width, vbc.task.WorkingRes.Height / 2);
             var roiTop = new cv.Rect(0, 0, nSize.Width, nSize.Height);
@@ -36592,7 +36596,7 @@ namespace CS_Classes
         {
             desc = "Convert a Mat to List of points in 2 ways to measure which is better";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src);
             autoX.Run(histTop.histogram);
@@ -36633,9 +36637,9 @@ namespace CS_Classes
         {
             desc = "Given a 3x3 matrix, invert it and present results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest() || validateInverse)
             {
                 strOut = "Matrix Input " + "\n";
@@ -36691,7 +36695,7 @@ namespace CS_Classes
             labels[2] = "Color Image Transposed";
             labels[3] = "Color Image Transposed back (artifacts)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var trColor = src.T();
             dst2 = trColor.ToMat().Resize(new cv.Size(src.Cols, src.Rows));
@@ -36714,7 +36718,7 @@ namespace CS_Classes
             labels[2] = "Color change is in the managed cv.vec3b array";
             desc = "There is a limited ability to use Mat data in Managed code directly.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, img);
             if (vbc.task.heartBeat)
@@ -36764,7 +36768,7 @@ namespace CS_Classes
             }
             return outstr;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (input.Width != input.Height)
             {
@@ -36795,7 +36799,7 @@ namespace CS_Classes
             desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             mat = mats.mat;
             mats.Run(Mat.Zeros(src.Size(), MatType.CV_8UC3));
@@ -36853,7 +36857,7 @@ namespace CS_Classes
             mat = new Mat[] { vbc.task.color.Clone(), vbc.task.depthRGB.Clone(), tmpLeft, tmpRight };
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cv.Size nSize = new cv.Size(dst2.Width / 2, dst2.Height / 2);
             cv.Rect roiTopLeft = new cv.Rect(0, 0, nSize.Width, nSize.Height);
@@ -36901,9 +36905,9 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_32F, cv.Scalar.All(0));
             desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standalone)
             {
                 if (vbc.task.gOptions.getDebugCheckBox())
@@ -36956,7 +36960,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest point below" };
             desc = "Test the Match_Basics algorithm";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if ((vbc.task.FirstPass || (vbc.task.mouseClickFlag && vbc.task.drawRect.Width != 0)) && standaloneTest())
             {
@@ -36994,9 +36998,9 @@ namespace CS_Classes
             flow.parentData = this;
             desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest())
             {
                 if (saveSampleCount != options.featurePoints)
@@ -37047,7 +37051,7 @@ namespace CS_Classes
             labels[3] = "Red is the best template to match (highest entropy)";
             desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -37075,7 +37079,7 @@ namespace CS_Classes
             labels[2] = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected.";
             desc = "Use the 2 points from a line as input to a 4-dimension KNN";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst2 = lines.dst2;
@@ -37122,7 +37126,7 @@ namespace CS_Classes
             labels = new[] { "", "Output of Lines_PointSlope", "Matched lines", "correlationMats" };
             desc = "Initialize with the best lines in the image and track them using matchTemplate.  Reinitialize when correlations drop.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             var w = vbc.task.gridSize;
@@ -37217,7 +37221,7 @@ namespace CS_Classes
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat || !vbc.task.cameraStable) dst2.SetTo(0);
             redC.Run(src);
@@ -37259,7 +37263,7 @@ namespace CS_Classes
             labels[2] = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again.";
             desc = "Find the requested template in vbc.task.drawrect in an image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) lastImage = src.Clone();
             if (vbc.task.mouseClickFlag && vbc.task.drawRect.Width != 0)
@@ -37319,12 +37323,12 @@ namespace CS_Classes
             if (tc.template == null) tc.template = src[tc.rect].Clone();
             return tc;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var rSize = cellSlider.Value;
             if (standaloneTest() && vbc.task.heartBeat)
             {
-                options.RunVB();
+                options.RunOpt();
                 tCells.Clear();
                 tCells.Add(createCell(src, 0, new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))));
                 tCells.Add(createCell(src, 0, new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))));
@@ -37371,9 +37375,9 @@ namespace CS_Classes
             corrSlider = FindSlider("Feature Correlation Threshold");
             desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             float minCorrelation = corrSlider.Value / 100f;
             int rSize = cellSlider.Value;
@@ -37436,9 +37440,9 @@ namespace CS_Classes
             labels[3] = "Shake camera to see tracking of the highlighted features";
             desc = "Track the GoodFeatures with KNN";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             feat.Run(src);
             knn.queries = new List<cv.Point2f>(vbc.task.features);
@@ -37485,7 +37489,7 @@ namespace CS_Classes
             labels[2] = "Rectangle shown is the search rectangle.";
             desc = "Track the selected point";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -37521,7 +37525,7 @@ namespace CS_Classes
             labels[2] = "Rectangle shown is the search rectangle.";
             desc = "Track the selected points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) mPoint.target = src.Clone();
             if (standaloneTest())
@@ -37561,10 +37565,10 @@ namespace CS_Classes
             dst3 = mask.Clone();
             desc = "Assign each segment a correlation coefficient and stdev to the previous frame";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            optionsMatch.RunVB();
+            options.RunOpt();
+            optionsMatch.RunOpt();
             float CCthreshold = (float)correlationSlider.Value / correlationSlider.Maximum;
             dst2 = src.Clone();
             if (dst2.Channels() == 3) dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
@@ -37639,7 +37643,7 @@ namespace CS_Classes
             }
             return new Point2f(r.TopLeft.X, r.BottomRight.Y);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             var correlationMin = match.options.correlationMin;
@@ -37705,7 +37709,7 @@ namespace CS_Classes
         {
             desc = "Find and track the longest line in the BGR image with a lightweight KNN.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             knn.Run(src.Clone());
             matchLine.lpInput = new PointPair(knn.lastPair.p1, knn.lastPair.p2);
@@ -37727,7 +37731,7 @@ namespace CS_Classes
         {
             desc = "Verify the horizon using MatchTemplate.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             //if (matchLine.match.correlation < matchLine.match.options.correlationThreshold) matchLine.lpInput = vbc.task.horizonVec;
             if (vbc.task.quarterBeat) matchLine.lpInput = vbc.task.horizonVec;
@@ -37748,7 +37752,7 @@ namespace CS_Classes
         {
             desc = "Verify the gravity vector using MatchTemplate.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.quarterBeat) matchLine.lpInput = vbc.task.gravityVec;
             matchLine.Run(src);
@@ -37773,7 +37777,7 @@ namespace CS_Classes
         {
             desc = "Track a RedCloud rectangle using MatchTemplate.  Click on a cell.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged) match.correlation = 0;
             if (match.correlation < match.options.correlationMin || rectSave != rectInput || vbc.task.mouseClickFlag)
@@ -37809,7 +37813,7 @@ namespace CS_Classes
         {
             desc = "Track a RedCloud cell using MatchTemplate.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -37861,10 +37865,10 @@ namespace CS_Classes
             }
             return maxIndex;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            match.RunVB();
+            options.RunOpt();
+            match.RunOpt();
             if (standaloneTest())
             {
                 if (dst0.Channels() != 1)
@@ -37903,9 +37907,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Output of RedCloud_Hulls", "Cells similar to selected cell" };
             desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest())
             {
                 hulls.Run(vbc.task.color);
@@ -37955,9 +37959,9 @@ namespace CS_Classes
             labels = new string[] { "Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells" };
             desc = "MatchShapes: Find matches at similar latitude (controlled with slider)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             bool myStandalone = standaloneTest() || runStandalone;
             if (myStandalone)
             {
@@ -38018,9 +38022,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Output of RedCloud_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below." };
             desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             hulls.Run(src);
             dst2 = hulls.dst2;
             if (vbc.task.heartBeat) dst3.SetTo(0);
@@ -38047,9 +38051,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below." };
             desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             redC.Run(src);
             dst2 = redC.dst2;
             if (vbc.task.heartBeat) dst3.SetTo(0);
@@ -38073,9 +38077,9 @@ namespace CS_Classes
         {
             desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var bgr = new Scalar(options.blueS, options.greenS, options.redS);
             Cv2.Subtract(bgr, src, dst2); // or dst2 = bgr - src
             dst3 = src - bgr;
@@ -38118,7 +38122,7 @@ namespace CS_Classes
         {
             desc = "Compute the src image median";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             medianVal = Math_Functions.computeMedian(src, new Mat(), (int)src.Total(), vbc.task.histogramBins, rangeMin, rangeMax);
@@ -38146,7 +38150,7 @@ namespace CS_Classes
         {
             desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             minMax.Run(src);
             cv.Scalar mean = cv.Scalar.All(0), stdev = cv.Scalar.All(0);
@@ -38174,7 +38178,7 @@ namespace CS_Classes
             flow.parentData = this;
             desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var split = src.Split();
             match.template = split[0];
@@ -38206,7 +38210,7 @@ namespace CS_Classes
             labels[3] = "High stdev segments after the first pass";
             desc = "Explore how to get a better boundary on the low stdev mask";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             stdev.Run(src);
             dst2 = stdev.dst2;
@@ -38266,7 +38270,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Input Template showing columns", "Input Template showing rows" };
             desc = "Build a template for use with computing the point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             for (int i = 0; i < dst2.Width; i++)
             {
@@ -38299,7 +38303,7 @@ namespace CS_Classes
         {
             desc = "Create an image that is the mean of x number of previous images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged) images.Clear();
             dst3 = src.Clone();
@@ -38332,7 +38336,7 @@ namespace CS_Classes
         {
             desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged) images.Clear();
             Mat nextImage = new Mat();
@@ -38364,7 +38368,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Parallel Test Output", "" };
             desc = "Test if 2 vectors are parallel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             v1 *= 1 / Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z); // normalize the input
             v2 *= 1 / Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z);
@@ -38400,9 +38404,9 @@ namespace CS_Classes
             lowStdevMask = new Mat(dst2.Size(), MatType.CV_8U);
             desc = "Compute the standard deviation in each segment";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int updateCount = 0;
             lowStdevMask.SetTo(0);
             highStdevMask.SetTo(0);
@@ -38453,7 +38457,7 @@ namespace CS_Classes
             labels[2] = "Draw anywhere to start mean shift tracking.";
             desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var roi = vbc.task.drawRect.Width > 0 ? vbc.task.drawRect : new cv.Rect(0, 0, dst2.Width, dst2.Height);
             var hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV);
@@ -38490,7 +38494,7 @@ namespace CS_Classes
             labels[2] = "Draw anywhere to start mean shift tracking.";
             desc = "Use depth to start mean shift algorithm.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             meanShift.Run(vbc.task.depthRGB);
             dst2 = meanShift.dst2;
@@ -38510,9 +38514,9 @@ namespace CS_Classes
         {
             desc = "Build triangles from the ptList input of points.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src;
             if (vbc.task.heartBeat && standaloneTest())
             {
@@ -38558,7 +38562,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": Use 'Options_Features' to update results.");
             desc = "Build triangles from feature points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             if (vbc.task.features.Count() < 3) return;
@@ -38599,7 +38603,7 @@ namespace CS_Classes
             FindSlider("Resize Percentage (%)").Value = 25;
             desc = "Create a mini point cloud for use with histograms";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             resize.Run(vbc.task.pointCloud);
             var split = resize.dst2.Split();
@@ -38629,7 +38633,7 @@ namespace CS_Classes
             labels[3] = "Side view after resize percentage - use Y-Axis slider to rotate image.";
             desc = "Create a histogram for the mini point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var input = src;
             mini.Run(input);
@@ -38687,7 +38691,7 @@ namespace CS_Classes
             labels[3] = "Blue is maxVal, green is mean * 100";
             desc = "Find a peak value in the side view histograms";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3)
             {
@@ -38725,7 +38729,7 @@ namespace CS_Classes
             vbc.task.accRadians.Y = (float)-Cv2.PI;
             desc = "Same operation as New MiniCloud_RotateAngle but in a single pass.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             peak.mini.Run(src);
             float maxHist = Single.MinValue;
@@ -38763,7 +38767,7 @@ namespace CS_Classes
             labels = new string[] { "", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction" };
             desc = "Predict depth from color to fill in the depth shadow areas";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int[] noDepthCount = new int[vbc.task.gridList.Count()];
             Vec3b[] roiColor = new Vec3b[vbc.task.gridList.Count()];
@@ -38915,7 +38919,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "ML filled shadow", "" };
             desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int minLearnCount = 5;
             Parallel.ForEach(vbc.task.gridList, roi =>
@@ -38942,7 +38946,7 @@ namespace CS_Classes
             labels[3] = "Click any quadrant at left to view it below";
             desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             mats.mat[1] = vbc.task.noDepthMask.Clone();
             Mat color32f = new Mat();
@@ -38996,7 +39000,7 @@ namespace CS_Classes
             labels[2] = "Predicted Depth";
             desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int maxDepth = vbc.task.gOptions.maxDepth;
             shadow.Run(src);
@@ -39073,7 +39077,7 @@ namespace CS_Classes
             vbc.task.redOptions.setColorSource("Bin4Way_Regions");
             desc = "Prepare a grid of color and depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             colorClass.Run(src);
             dst2 = colorClass.dst3;
@@ -39144,7 +39148,7 @@ namespace CS_Classes
             vbc.task.redOptions.setColorSource("Bin4Way_Regions");
             desc = "Prepare a grid of color and depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             colorClass.Run(src);
             dst2 = colorClass.dst3;
@@ -39207,7 +39211,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "BGR input below is converted to BGRA and sorted as integers", "" };
             desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() == MatType.CV_8UC3)
             {
@@ -39252,7 +39256,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Captured OpenGL output", "" };
             desc = "Capture the output of the OpenGL window";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest()) oglM.Run(src);
             dst2 = oglM.dst2;
@@ -39272,7 +39276,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Captured OpenGL output", "" };
             desc = "Capture the output of the OpenGL window";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.ogl.pointCloudInput = vbc.task.pointCloud;
             if (standaloneTest()) vbc.task.ogl.Run(src);
@@ -39293,7 +39297,7 @@ namespace CS_Classes
         {
             desc = "Minimalist approach to find a flat surface that is oriented to gravity (floor or ceiling)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Rangef[] ranges = new Rangef[] { new Rangef(-vbc.task.yRange, vbc.task.yRange), new Rangef(0, vbc.task.MaxZmeters) };
             Cv2.CalcHist(new Mat[] { vbc.task.pointCloud }, new int[] { 1, 2 }, new Mat(), dst0, 2,
@@ -39357,7 +39361,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "OpenGL output", "RedCloud Output" };
             desc = "Capture the OpenGL output of the drawn cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             oglD.Run(src);
             dst2 = oglD.dst2;
@@ -39376,7 +39380,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud_Hull output", "Selected cell in 3D" };
             desc = "Zoom in on the selected RedCloud cell in the OpenGL output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             oglData.Run(src);
             dst2 = oglData.dst2;
@@ -39413,7 +39417,7 @@ namespace CS_Classes
         {
             desc = "Find all the masks, rects, and counts in the input";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone)
             {
@@ -39518,7 +39522,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.");
             desc = "Create a 2D side view for ZY histogram of depth";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             Cv2.CalcHist(new Mat[] { src }, vbc.task.channelsSide, new Mat(), histogram, 2, vbc.task.bins2D, vbc.task.rangesSide);
@@ -39540,7 +39544,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.");
             desc = "Create a 2D top view for XZ histogram of depth";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             Cv2.CalcHist(new Mat[] { src }, vbc.task.channelsTop, new Mat(), histogram, 2, vbc.task.bins2D, vbc.task.rangesTop);
@@ -39565,9 +39569,9 @@ namespace CS_Classes
             labels = new string[] { "", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells" };
             desc = "Search for surfaces among the FeatureLess regions";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.heartBeat)
             {
                 dst1.SetTo(0);
@@ -39597,7 +39601,7 @@ namespace CS_Classes
             labels = new string[] { "", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell" };
             desc = "Create a top and side projection of the selected cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -39630,7 +39634,7 @@ namespace CS_Classes
             vbc.task.redOptions.setIdentifyCells(true);
             desc = "Find all the masks, rects, and counts in the top down view.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histTop.Run(src);
             redC.inputMask = ~histTop.dst3;
@@ -39659,7 +39663,7 @@ namespace CS_Classes
             objects.viewType = "Side";
             desc = "Find all the masks, rects, and counts in the side view.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             histSide.Run(src);
             redC.inputMask = ~histSide.dst3;
@@ -39688,9 +39692,9 @@ namespace CS_Classes
             side.objects.showRectangles = false;
             desc = "Using the top down view, create a histogram for Y-values of the largest object.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             top.Run(src);
             dst3 = top.dst2;
             labels[3] = top.labels[2];
@@ -39723,7 +39727,7 @@ namespace CS_Classes
             top.objects.showRectangles = false;
             desc = "Using the top down view, create a histogram for Y-values of the largest object.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             top.Run(src);
             dst3 = top.dst2;
@@ -39759,7 +39763,7 @@ namespace CS_Classes
             objSlider = FindSlider("Index of object");
             desc = "Isolate just the floor.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             isolate.Run(src);
             dst2 = isolate.dst2;
@@ -39791,7 +39795,7 @@ namespace CS_Classes
             labels[2] = "Red dot = Kalman smoothed centroid";
             desc = "Compute the centroid of the provided mask file.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -39829,7 +39833,7 @@ namespace CS_Classes
             labels[2] = "Red dot = Kalman smoothed centroid";
             desc = "Compute the centroid of the foreground depth and smooth with Kalman filter.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             foreground.Run(src);
             dst2 = foreground.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
@@ -39857,10 +39861,10 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": redOptions are used as well as BGSubtract options.");
             desc = "Use floodfill to find all the real motion in an image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bgSub.Run(src);
-            motion.RunCS(bgSub.dst2);
+            motion.RunAlg(bgSub.dst2);
             dst2 = motion.dst2;
             labels[2] = motion.labels[2];
         }
@@ -39880,9 +39884,9 @@ namespace CS_Classes
             labels[3] = "Accumulated changed pixels from the last heartbeat";
             desc = "Accumulate differences from the previous BGR image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             diff.Run(src);
             dst2 = diff.dst2;
             if (vbc.task.heartBeat) cumulativePixels = 0;
@@ -39923,9 +39927,9 @@ namespace CS_Classes
             dst3 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Detect motion through the correlation coefficient";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             var input = src.Clone();
             if (input.Channels() != 1) input = input.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -39976,7 +39980,7 @@ namespace CS_Classes
         {
             desc = "Use the correlation coefficient to maintain an up-to-date image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.frameCount < 10) dst2 = src.Clone();
             motionCC.Run(src);
@@ -40004,7 +40008,7 @@ namespace CS_Classes
             desc = "Count the number of changed pixels in the current frame and accumulate them.  If either exceeds thresholds, then set flag = true.  " +
                     "To get the Options Slider, use " + traceName + "QT";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (vbc.task.FirstPass) lastFrame = src.Clone();
@@ -40039,7 +40043,7 @@ namespace CS_Classes
             labels[2] = "The yellow rectangle indicates where the motion is and only that portion of the point cloud and depth mask is updated.";
             desc = "Rebuild the point cloud based on the BGR motion history.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             motion.Run(src);
             dst2 = src;
@@ -40070,7 +40074,7 @@ namespace CS_Classes
             labels[2] = "Enclosing rectangles are yellow in dst2 and dst3";
             desc = "Detect contours in the motion data and the resulting rectangles";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src;
             motion.Run(src);
@@ -40097,9 +40101,9 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.");
             desc = "Detect Motion in the color image using multi-threading.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (vbc.task.heartBeat) dst3 = src.Clone();
             dst2 = src;
@@ -40132,9 +40136,9 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.");
             desc = "Detect Motion in the color image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             float CCthreshold = (float)(options.CCthreshold);
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -40214,7 +40218,7 @@ namespace CS_Classes
             }
             return motionRect;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) color = src.Clone();
             if (vbc.task.FirstPass) lastMotionRect = vbc.task.motionRect;
@@ -40284,7 +40288,7 @@ namespace CS_Classes
             labels[3] = "The white spots show the difference of the constructed image from the current image.";
             desc = "Track the RGB image using Motion_Enclosing to isolate the motion";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             motion.Run(src);
             cv.Rect r = motion.motionRect;
@@ -40333,7 +40337,7 @@ namespace CS_Classes
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Detect motion using the last X images";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             diff.Run(src);
@@ -40356,7 +40360,7 @@ namespace CS_Classes
             vbc.task.frameHistoryCount = 10;
             desc = "Accumulate differences from the previous BGR images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             motionCore.Run(src);
             dst2 = motionCore.dst2;
@@ -40380,7 +40384,7 @@ namespace CS_Classes
             labels[2] = "MOG2 is the best option.  See BGSubtract_Basics to see more options.";
             desc = "Build an enclosing rectangle for the motion";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
@@ -40421,7 +40425,7 @@ namespace CS_Classes
             labels = new string[] { "", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud" };
             desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat) dst2 = vbc.task.pcSplit[2].Clone();
             if (vbc.task.motionDetected) vbc.task.pcSplit[2][vbc.task.motionRect].CopyTo(dst2[vbc.task.motionRect]);
@@ -40447,7 +40451,7 @@ namespace CS_Classes
             labels = new string[] { "", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated grayscale image", "Diff of input and latest accumulated grayscale image" };
             desc = "Display the grayscale image after updating only the motion rectangle.  Resync every heartbeat.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             if (vbc.task.heartBeat)
@@ -40487,7 +40491,7 @@ namespace CS_Classes
             vbc.task.redOptions.setIdentifyCells(false);
             desc = "The option-free version of Motion_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.motionDetected = true;
             if (vbc.task.heartBeat)
@@ -40562,7 +40566,7 @@ namespace CS_Classes
             labels = new string[] { "", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud" };
             desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.motionDetected) vbc.task.pointCloud[vbc.task.motionRect].CopyTo(dst2[vbc.task.motionRect]);
             if (standaloneTest())
@@ -40586,7 +40590,7 @@ namespace CS_Classes
             labels = new string[] { "", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image", "Diff of input and latest accumulated color image" };
             desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.motionDetected) src[vbc.task.motionRect].CopyTo(dst2[vbc.task.motionRect]);
             if (standaloneTest() && vbc.task.motionDetected) dst2.Rectangle(vbc.task.motionRect, Scalar.White, vbc.task.lineWidth);
@@ -40605,7 +40609,7 @@ namespace CS_Classes
         {
             desc = "The option-free version of Motion_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.motionDetected = true;
             vbc.task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
@@ -40702,7 +40706,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Unstable mask", "Pixel difference" };
             desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (vbc.task.heartBeat)
@@ -40727,7 +40731,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Find the nonzero points of motion and fit an rotated rectangle to them.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             motion.Run(src);
             dst2 = motion.dst2;
@@ -40767,7 +40771,7 @@ namespace CS_Classes
             labels[3] = "Motion detected in the cells below";
             desc = "Use RedCloud to define where there is motion";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -40792,7 +40796,7 @@ namespace CS_Classes
             labels[2] = "Move the mouse below to show mouse tracking.";
             desc = "Test the mousePoint interface";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             // only display mouse movement in the lower left image (pic.tag = 2)
             if (lastPoint == vbc.task.mouseMovePoint || vbc.task.mousePicTag != 2) return;
@@ -40815,7 +40819,7 @@ namespace CS_Classes
             labels[2] = "Left click and drag to draw a rectangle";
             desc = "Demonstrate what the left-click enables";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             SetTrueText("Left-click and drag to select a region in any of the images." + "\n" +
                         "The selected area is a rectangle that is saved in vbc.task.drawRect." + "\n" +
@@ -40836,7 +40840,7 @@ namespace CS_Classes
         {
             desc = "This algorithm shows how to use vbc.task.ClickPoint to dynamically identify what to break on.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             SetTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.");
             feat.Run(src);
@@ -40863,7 +40867,7 @@ namespace CS_Classes
         {
             desc = "Create cells for each region in MSER output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             detect.Run(src);
             var boxInput = new List<cv.Rect>(detect.boxes);
@@ -40927,9 +40931,9 @@ namespace CS_Classes
         {
             desc = "Run the core MSER (Maximally Stable Extremal Region) algorithm";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Clone();
             if (vbc.task.optionsChanged)
             {
@@ -40973,7 +40977,7 @@ namespace CS_Classes
         {
             desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var img = new Mat(800, 800, MatType.CV_8U, cv.Scalar.All(0));
             int[] width = { 390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70 };
@@ -41002,7 +41006,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "MSER_Basics output for left camera", "MSER_Basics output for right camera" };
             desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             left.Run(vbc.task.leftView);
             dst2 = left.dst2;
@@ -41024,7 +41028,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "MSER_Basics output for left camera", "MSER_Basics rectangles found" };
             desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             mBase.Run(vbc.task.leftView);
             dst2 = mBase.dst2;
@@ -41044,7 +41048,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "MSER_Basics output for right camera", "MSER_Basics rectangles found" };
             desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             mBase.Run(vbc.task.rightView);
             dst2 = mBase.dst2;
@@ -41064,9 +41068,9 @@ namespace CS_Classes
         {
             desc = "Use MSER (Maximally Stable Extremal Region) but show the contours of each region.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             mBase.Run(src);
             dst2 = mBase.dst2;
             int pixels = 0;
@@ -41096,9 +41100,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Synthetic input", "Output from MSER (Maximally Stable Extremal Region)" };
             desc = "Test MSER (Maximally Stable Extremal Region) with the synthetic image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             synth.Run(src);
             dst2 = synth.dst2.Clone();
             mBase.Run(dst2);
@@ -41118,7 +41122,7 @@ namespace CS_Classes
             FindCheckBox("Use grayscale input").Checked = true;
             desc = "Run MSER (Maximally Stable Extremal Region) with grayscale input";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             mBase.Run(reduction.dst2);
@@ -41139,7 +41143,7 @@ namespace CS_Classes
             FindCheckBox("Use grayscale input").Checked = false;
             desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             mBase.Run(reduction.dst2);
@@ -41160,9 +41164,9 @@ namespace CS_Classes
         {
             desc = "Identify the main regions of interest with MSER (Maximally Stable Extremal Region)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Clone();
             dst3 = src.Clone();
             core.Run(src);
@@ -41223,9 +41227,9 @@ namespace CS_Classes
             image = Cv2.ImRead(vbc.task.HomeDir + "Data/MSERtestfile.jpg", ImreadModes.Color);
             mser = MSER.Create();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             cv.Point[][] regions;
             cv.Rect[] boxes;
             dst0 = image.Clone();
@@ -41267,7 +41271,7 @@ namespace CS_Classes
         {
             desc = "Use the MSER_Basics output as input to RedCloud_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             mBase.Run(src);
             redC.Run(mBase.dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
@@ -41288,15 +41292,15 @@ namespace CS_Classes
         {
             vbc.task.redOptions.setUseColorOnly(true);
             FindCheckBox("Use grayscale input").Checked = false;
-            options.RunVB();
+            options.RunOpt();
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, (float)options.maxVariation,
                              (float)options.minDiversity, options.maxEvolution, (float)options.areaThreshold,
                               (float)options.minMargin, options.edgeBlurSize, options.pass2Setting);
             desc = "MSER in a nutshell: intensity threshold, stability, maximize region, adaptive threshold.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.optionsChanged)
             {
                 MSER_Close(cPtr);
@@ -41340,7 +41344,7 @@ namespace CS_Classes
         {
             desc = "Instead of a BGR src, try using the color output of Bin4Way_Regions";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bin4.Run(src);
             dst2 = ShowPalette(bin4.dst2 * 255 / 4);
@@ -41361,7 +41365,7 @@ namespace CS_Classes
         {
             desc = "Create cells for each region in MSER output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             detect.Run(src);
             dst3 = detect.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -41382,7 +41386,7 @@ namespace CS_Classes
         {
             desc = "Create cells for each region in MSER output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             detect.Run(src);
             var boxInput = new List<cv.Rect>(detect.boxes);
@@ -41420,7 +41424,7 @@ namespace CS_Classes
             dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Create cells for each region in MSER output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             detect.Run(src);
             dst3 = detect.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -41479,15 +41483,15 @@ namespace CS_Classes
         public MSER_CPP_CS()
         {
             FindCheckBox("Use grayscale input").Checked = false;
-            options.RunVB();
+            options.RunOpt();
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, (float)options.maxVariation,
                              (float)options.minDiversity, options.maxEvolution, (float)options.areaThreshold,
                               (float)options.minMargin, options.edgeBlurSize, (int)options.pass2Setting);
             desc = "C++ version of MSER basics.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.optionsChanged)
             {
                 MSER_Close(cPtr);
@@ -41587,7 +41591,7 @@ namespace CS_Classes
         {
             return Mat.Eye(n, n, MatType.CV_64F) - cv.Scalar.All(1.0 / n);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int size = 10; // we are working with 10 cities.
             Mat cityMat = cv.Mat.FromPixelData(size, size, MatType.CV_64FC1, CityDistance);
@@ -41660,9 +41664,9 @@ namespace CS_Classes
         {
             desc = "Find all the neighbors with KNN";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standalone || runRedCloud)
             {
                 redC.Run(src);
@@ -41715,7 +41719,7 @@ namespace CS_Classes
         {
             desc = "Find the corner points where multiple cells intersect.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() || src.Type() != MatType.CV_8U)
             {
@@ -41773,7 +41777,7 @@ namespace CS_Classes
         {
             desc = "Find neighbors in a color only RedCloud cellMap";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -41802,7 +41806,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Find the neighbors in a selected RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() || runRedCloud)
             {
@@ -41884,7 +41888,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": <place advice here on any options that are useful>");
             desc = "OpenCV Sample CalcBackProject_Demo1";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Rangef[] ranges = new Rangef[] { new Rangef(0, 180) };
             Mat hsv = vbc.task.color.CvtColor(ColorConversionCodes.BGR2HSV);
@@ -41924,7 +41928,7 @@ namespace CS_Classes
             labels = new string[] { "", "Mask for isolated region", "Backprojection of the hsv 2D histogram", "Mask in image context" };
             desc = "OpenCV Sample CalcBackProject_Demo2";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int count = 0;
             if (vbc.task.ClickPoint != new cv.Point())
@@ -41960,7 +41964,7 @@ namespace CS_Classes
         {
             desc = "OpenCV example bgfg_segm - existing BGSubtract_Basics is the same.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bgSub.Run(src);
             dst2 = bgSub.dst2;
@@ -41979,9 +41983,9 @@ namespace CS_Classes
         {
             desc = "OpenCV example bgSub";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.optionsChanged)
             {
                 switch (options.methodDesc)
@@ -42014,9 +42018,9 @@ namespace CS_Classes
         {
             desc = "OpenCV Example BasicLinearTransforms - NOTE: much faster than BasicLinearTransformTrackBar";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             src.ConvertTo(dst2, -1, options.brightness, options.contrast);
         }
     }
@@ -42031,9 +42035,9 @@ namespace CS_Classes
         {
             desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than OEX_BasicLinearTransforms";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Cols >= 640)
             {
                 src = src.Resize(vbc.task.lowRes);
@@ -42089,7 +42093,7 @@ namespace CS_Classes
             }
             DrawCircle(img, pt, vbc.task.DotSize, activeColor);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.quarterBeat)
             {
@@ -42151,7 +42155,7 @@ namespace CS_Classes
             labels[3] = "Draw a rectangle around the region of interest";
             desc = "OpenCV Example MeanShift";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cv.Rect roi = vbc.task.drawRect.Width > 0 ? vbc.task.drawRect : new cv.Rect(0, 0, dst2.Width, dst2.Height);
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
@@ -42183,7 +42187,7 @@ namespace CS_Classes
         {
             desc = "PointPolygonTest will decide what is inside and what is outside.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -42242,7 +42246,7 @@ namespace CS_Classes
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "OpenCV Example PointPolygonTest_demo - it became PointPolygonTest_Basics.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int r = dst2.Height / 4;
             List<cv.Point> vert = new List<cv.Point>
@@ -42274,7 +42278,7 @@ namespace CS_Classes
         {
             desc = "The OpenCV Remap example became the Remap_Basics algorithm.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             remap.Run(src);
             dst2 = remap.dst2;
@@ -42292,7 +42296,7 @@ namespace CS_Classes
         {
             desc = "OpenCV Example Threshold became Threshold_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             threshold.Run(src);
             dst2 = threshold.dst2;
@@ -42311,9 +42315,9 @@ namespace CS_Classes
         {
             desc = "OpenCV Example Threshold_Inrange";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             dst2 = hsv.InRange(options.lows, options.highs);
         }
@@ -42329,7 +42333,7 @@ namespace CS_Classes
         {
             desc = "OpenCV Example Points_Classifier became Classifier_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             basics.Run(src);
             dst2 = basics.dst2;
@@ -42349,7 +42353,7 @@ namespace CS_Classes
         {
             desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             dst2 = feat.dst2;
@@ -42366,7 +42370,7 @@ namespace CS_Classes
         {
             desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -42415,7 +42419,7 @@ namespace CS_Classes
         {
             desc = "OpenCV Example Core_Split";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var d = cv.Mat.FromPixelData(2, 2, MatType.CV_8UC3, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
             var channels = d.Split();
@@ -42455,7 +42459,7 @@ namespace CS_Classes
         {
             desc = "OpenCV Example Filter2D demo - Use a varying kernel to show the impact.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat) ind++;
             kernelSize = 3 + 2 * (ind % 5);
@@ -42479,9 +42483,9 @@ namespace CS_Classes
             cPtr = OEX_FitEllipse_Open();
             desc = "OEX Example fitellipse";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var cppData = new byte[img.Total() * img.ElemSize()];
             Marshal.Copy(img.Data, cppData, 0, cppData.Length);
             var handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
@@ -42517,9 +42521,9 @@ namespace CS_Classes
             vbc.task.drawRect = new cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8);
             desc = "Alter the image to effect the pointilism style";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src;
             var img = src[vbc.task.drawRect];
             if (saveDrawRect != vbc.task.drawRect)
@@ -42586,9 +42590,9 @@ namespace CS_Classes
             vbc.task.drawRect = new cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8);
             desc = "Alter an image so it appears more like an oil painting.  Select a region of interest.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int filterKern = options.filterSize | 1;
             var roi = vbc.task.drawRect;
             src.CopyTo(dst2);
@@ -42644,7 +42648,7 @@ namespace CS_Classes
             labels[2] = "Optimized top view to show as many samples as possible.";
             desc = "Automatically adjust the X-Range option of the pointcloud to maximize visible pixels";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int expectedCount = vbc.task.depthMask.CountNonZero();
             int diff = Math.Abs(expectedCount - adjustedCount);
@@ -42694,7 +42698,7 @@ namespace CS_Classes
             labels[2] = "Optimized side view to show as much as possible.";
             desc = "Automatically adjust the Y-Range option of the pointcloud to maximize visible pixels";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int expectedCount = vbc.task.depthMask.CountNonZero();
             int diff = Math.Abs(expectedCount - adjustedCount);
@@ -42756,7 +42760,7 @@ namespace CS_Classes
             strOut += maskLabel + " Y Stdev = " + string.Format("{0:F3}", stdev[1]) + "\n" + "\n";
             if (Math.Abs(mean[1]) > vbc.task.yRange / 4) dst1 = mask | dst1;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             float pad = 0.05f; // pad the estimate by X cm's
             dst2 = src.Clone();
@@ -42796,9 +42800,9 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setHistogramBins(256);
             desc = "Get the top X highest quality valley points in the histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int desiredBoundaries = options.desiredBoundaries;
             // input should be a histogram.  If not, get one...
             if (standaloneTest())
@@ -42866,9 +42870,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "2D Histogram view with highlighted peaks", "" };
             desc = "Find the peaks in a 2D histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int desiredBoundaries = options.desiredBoundaries;
             int peakDistance = options.peakDistance;
             // input should be a 2D histogram.  If standaloneTest(), get one...
@@ -42911,7 +42915,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "2D Histogram view with highlighted peaks", "" };
             desc = "Find the peaks in a 2D histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var desiredBoundaries = boundarySlider.Value;
             // input should be a 2D histogram.  If standaloneTest() or src is not a histogram, get one...
@@ -42959,7 +42963,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "2D Histogram view with highlighted peaks", "" };
             desc = "Find the peaks in a 2D histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat && vbc.task.frameCount > 10) return;
             if (standaloneTest())
@@ -42998,7 +43002,7 @@ namespace CS_Classes
             maxSlider = FindSlider("MSER Max Area");
             desc = "Option Automation: find the best MSER max and min area values";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -43120,11 +43124,11 @@ namespace CS_Classes
             vbc.task.oglRect = new cv.Rect(vbc.task.OpenGL_Left, vbc.task.OpenGL_Top, windowWidth, windowHeight);
             MoveWindow(vbc.task.openGL_hwnd, vbc.task.OpenGL_Left, vbc.task.OpenGL_Top, vbc.task.oglRect.Width, vbc.task.oglRect.Height, true);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest()) pointCloudInput = vbc.task.pointCloud;
             // adjust the point cloud if present and the 'move' sliders are non-zero
-            options.RunVB();
+            options.RunOpt();
             cv.Scalar ptM = options.moveAmount;
             cv.Point3f shift = new cv.Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
             if (pointCloudInput.Width != 0 && (shift.X != 0 ||
@@ -43218,9 +43222,9 @@ namespace CS_Classes
             FindSlider("OpenGL FOV").Value = 150;
             desc = "Show the OpenGL point cloud with sliders support.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             vbc.task.ogl.pointCloudInput = standaloneTest() ? vbc.task.pointCloud : pointCloudInput;
             // update all the options from the slider values.
             vbc.task.ogl.options.FOV = options.FOV;
@@ -43248,7 +43252,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Show the OpenGL point cloud with mouse support.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.testAllRunning) return; // seems to not like it when running overnight but it runs fine.
             vbc.task.ogl.pointCloudInput = vbc.task.pointCloud;
@@ -43268,7 +43272,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Display the pointCloud after reduction in X, Y, or Z dimensions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst2 = reduction.dst3;
@@ -43290,7 +43294,7 @@ namespace CS_Classes
             reduction = new Reduction_PointCloud();
             desc = "Use the reduced depth pointcloud in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst2 = reduction.dst2;
@@ -43311,7 +43315,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sideView.Run(src);
             dst2 = sideView.dst2;
@@ -43334,7 +43338,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Review the rebuilt point cloud from Structured_Rebuild";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             rebuild.Run(src);
             dst2 = rebuild.dst2;
@@ -43355,7 +43359,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.verticalLines;
             desc = "Visualize the vertical line found with FeatureLine_LongestV_Tutorial";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vLine.Run(src);
             dst2 = vLine.dst2;
@@ -43386,7 +43390,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Draw the traditional OpenGL pyramid";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.ogl.pointCloudInput = new Mat();
             vbc.task.ogl.Run(src);
@@ -43405,7 +43409,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Draw the traditional OpenGL cube";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.ogl.pointCloudInput = new Mat();
             vbc.task.ogl.Run(src);
@@ -43425,7 +43429,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Create a simple plane in each roi of the RedCloud data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tess.Run(src);
             dst2 = tess.dst2;
@@ -43450,7 +43454,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Create a simple plane in each roi of the RedCloud data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tess.Run(src);
             dst2 = tess.dst2;
@@ -43475,7 +43479,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Reflect the min and max for each roi of the RedCloud data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tess.Run(src);
             dst2 = tess.dst2;
@@ -43500,7 +43504,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Create blocks in each roi using the min and max depth values";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tess.Run(src);
             vbc.task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count(), 1, MatType.CV_32FC3, tess.oglData.ToArray());
@@ -43535,7 +43539,7 @@ namespace CS_Classes
             labels[2] = "Structured cloud 32fC3 data";
             desc = "Visualize the Structured_Cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sCloud.Run(src);
             redC.Run(src);
@@ -43561,7 +43565,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Input from Structured_Tiles", "" };
             desc = "Display the quads built by Structured_Tiles in OpenGL - uses OpenGL's point size";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sCloud.Run(src);
             dst2 = sCloud.dst2;
@@ -43586,7 +43590,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Input from Structured_Tiles", "" };
             desc = "Display the quads built by Structured_TilesQuad in OpenGL - does NOT use OpenGL's point size";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sCloud.Run(src);
             dst2 = sCloud.dst2;
@@ -43608,7 +43612,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud Cells", "Planes built in the point cloud" };
             desc = "Display the pointCloud as a set of RedCloud cell planes";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             planes.Run(src);
             dst2 = planes.dst2;
@@ -43631,7 +43635,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Side view of point cloud - use mouse to highlight the floor", "Highlight the floor in BGR image" };
             desc = "Convert depth cloud floor to a plane and visualize it with OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plane.Run(src);
             dst2 = plane.dst3;
@@ -43652,7 +43656,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.drawFloor;
             desc = "Show the floor in the pointcloud as a plane";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plane.Run(src);
             dst2 = plane.dst3;
@@ -43684,7 +43688,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "", "" };
             desc = "Create an OpenGL display where the floor is built as a quad";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plane.Run(src);
             dst2 = plane.dst2;
@@ -43708,7 +43712,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Using minimal cost, create an OpenGL display where the floor is built as a quad";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flatness.Run(src);
             SetTrueText(flatness.labels[2], 3);
@@ -43733,7 +43737,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Using minimal cost, create an OpenGL display where the ceiling is built as a quad";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flatness.Run(src);
             SetTrueText(flatness.labels[2], 3);
@@ -43759,7 +43763,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Display the peak flat level in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             peak.Run(src);
             dst2 = peak.dst2;
@@ -43786,7 +43790,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud output", "" };
             desc = "Select a cell and display its hull in OpenGL as a polygon.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hulls.Run(src);
             dst2 = hulls.dst2;
@@ -43825,7 +43829,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Display the pointcloud after FeaturePoly_PointCloud identifies the changes depth pixels";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fpolyPC.Run(src);
             dst1 = fpolyPC.dst1;
@@ -43851,7 +43855,7 @@ namespace CS_Classes
             FindSlider("OpenGL Point Size").Value = 3;
             desc = "Draw the Sierpinski triangle pattern in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.ogl.pointCloudInput = vbc.task.pointCloud;
             vbc.task.ogl.Run(src);
@@ -43873,9 +43877,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "", "" };
             desc = "Draw all the hulls in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var ptM = options.moveAmount;
             var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
             hulls.Run(src);
@@ -43937,12 +43941,12 @@ namespace CS_Classes
             labels = new string[] { "", "", "Output of RedCloud", "OpenGL snapshot" };
             desc = "Draw all the RedCloud contours in OpenGL with various settings.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var ptM = options.moveAmount;
             var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
-            options2.RunVB();
+            options2.RunOpt();
             redC.Run(src);
             dst2 = redC.dst2;
             var rcx = vbc.task.rc;
@@ -44006,7 +44010,7 @@ namespace CS_Classes
             FindSlider("OpenGL Point Size").Value = 10;
             desc = "Display the output of the PointCloud_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pts.Run(src);
             dst2 = pts.dst2;
@@ -44030,7 +44034,7 @@ namespace CS_Classes
             FindSlider("OpenGL Point Size").Value = 10;
             desc = "Draw the 3D lines found from the PCpoints";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst2 = lines.dst2;
@@ -44054,7 +44058,7 @@ namespace CS_Classes
             FindSlider("OpenGL Point Size").Value = 10;
             desc = "Draw the 3D lines found from the PCpoints";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst2 = lines.dst2;
@@ -44077,7 +44081,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Draw the point cloud after patching z-values that are similar";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             patch.Run(src);
             dst2 = patch.dst3;
@@ -44100,7 +44104,7 @@ namespace CS_Classes
             FindSlider("OpenGL Point Size").Value = 10;
             desc = "Display the output of the PointCloud_Points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pts.Run(src);
             dst2 = pts.dst2;
@@ -44124,7 +44128,7 @@ namespace CS_Classes
             FindSlider("OpenGL Point Size").Value = 10;
             desc = "Display the points that are likely to be in a plane - found by both the vertical and horizontal searches";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pts.Run(src);
             vbc.task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count(), 1, MatType.CV_32FC3, pts.pcPoints.ToArray());
@@ -44148,7 +44152,7 @@ namespace CS_Classes
             labels[3] = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis";
             desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -44191,7 +44195,7 @@ namespace CS_Classes
             labels[3] = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)";
             desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sides.Run(src);
             dst2 = sides.dst2;
@@ -44240,14 +44244,14 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Test the X-, Y-, and Z-axis rotation in sequence";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.gOptions.setGravityUsage(false);
             if (vbc.task.frameCount % 100 == 0)
             {
                 testCase++;
                 if (testCase >= 3) testCase = 0;
-                options.RunVB();
+                options.RunOpt();
                 options.rotateX = -45;
                 options.rotateY = -45;
                 options.rotateZ = -45;
@@ -44291,7 +44295,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Review the vertical and horizontal regions from Plane_Basics.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flat.Run(src);
             vbc.task.pointCloud.CopyTo(dst2, flat.dst2);
@@ -44311,7 +44315,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Show the depth gradient Phase in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gradient.Run(src);
             dst2 = gradient.dst2;
@@ -44333,7 +44337,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.ogl.pointCloudInput = vbc.task.pointCloud;
             vbc.task.ogl.Run(src);
@@ -44353,7 +44357,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             strOut = "To remove the point cloud averaging, set the global option 'Frame History' to 1.\n" +
                         "Or, even alternatively, run the 'OpenGL_GravityTransform' algorithm.\n\n" +
@@ -44384,7 +44388,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             strOut = "To remove the point cloud averaging, set the global option 'Frame History' to 1.\n" +
                         "Or, even alternatively, run the 'OpenGL_GravityTransform' algorithm.\n\n" +
@@ -44417,7 +44421,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Pointcloud Max", "Pointcloud Min" };
             desc = "display the Pointcloud Min or Max in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             minmax.Run(vbc.task.pointCloud);
             dst2 = minmax.dst2;
@@ -44442,7 +44446,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Point cloud after over the last X frames", "" };
             desc = "Run OpenGL removing all pixels not present for all X frames";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             frames.Run(vbc.task.depthMask / 255);
             dst2 = frames.dst2;
@@ -44465,7 +44469,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Point cloud after over the last X frames", "Mask to remove partially missing pixels" };
             desc = "Run OpenGL with a masked point cloud averaged over the last X frames.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hCloud.Run(vbc.task.pointCloud);
             dst2 = hCloud.dst2;
@@ -44486,7 +44490,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Display a tessellated representation of the point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tess.Run(src);
             dst2 = tess.dst2;
@@ -44510,7 +44514,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Display a tessellated representation of the point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tess.Run(src);
             dst2 = tess.dst2;
@@ -44534,7 +44538,7 @@ namespace CS_Classes
             vbc.task.OpenGLTitle = "OpenGL_Functions";
             desc = "Display a tessellated representation of the point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tess.Run(src);
             dst2 = tess.dst2;
@@ -44557,7 +44561,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Display all the RedCC cells in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redCC.Run(src);
             dst2 = redCC.dst2;
@@ -44579,7 +44583,7 @@ namespace CS_Classes
             dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             desc = "Create a mask showing which pixels are close to each other and display the results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dense.Run(src);
             dst2.SetTo(0);
@@ -44600,7 +44604,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Identify the objects in the scene and display them in OpenGL with their respective colors.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst1 = vbc.task.pointCloud.Clone();
             bpDoctor.Run(src);
@@ -44626,7 +44630,7 @@ namespace CS_Classes
             labels[2] = "The points below were identified as solo points in the point cloud";
             desc = "Display point cloud without solo points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hotTop.Run(src);
             dst2 = hotTop.dst3;
@@ -44651,7 +44655,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Display all the RedCloud cells in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -44672,7 +44676,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Display all the RedCloud cells after Spectrum filtering.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redS.Run(src);
             dst2 = redS.dst3;
@@ -44694,7 +44698,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Isolate a RedCloud cell - after filtering by Spectrum_Depth - in an OpenGL display";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = specZ.options.runRedCloud(ref labels[2]);
             specZ.Run(src);
@@ -44724,7 +44728,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             filter.Run(src);
             dst2 = filter.dst2;
@@ -44744,7 +44748,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             filter.Run(src);
             dst2 = filter.dst2;
@@ -44764,7 +44768,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             filter.Run(src);
             dst2 = filter.dst2;
@@ -44785,7 +44789,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             filter.Run(src);
             dst2 = filter.dst3;
@@ -44806,7 +44810,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Create an OpenGL plot using the BGR data normalized to between 0 and 1.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src.ConvertTo(src, MatType.CV_32FC3);
             vbc.task.ogl.pointCloudInput = src.Normalize(0, 1, NormTypes.MinMax);
@@ -44828,7 +44832,7 @@ namespace CS_Classes
             vbc.task.ogl.options.PointSizeSlider.Value = 10;
             desc = "Display the 3D histogram of the depth in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hcloud.Run(src);
             Mat histogram = cv.Mat.FromPixelData(vbc.task.redOptions.histBins3D, 1, MatType.CV_32F, hcloud.histogram.Data);
@@ -44853,7 +44857,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             desc = "Remove the solo points and display the pointcloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.toggleOnOff)
             {
@@ -44883,9 +44887,9 @@ namespace CS_Classes
         {
             desc = "Show a dusted version point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             duster.Run(src);
             dst2 = duster.dst3;
             vbc.task.ogl.pointCloudInput = options.useTaskPointCloud ? vbc.task.pointCloud : duster.dst2;
@@ -44904,9 +44908,9 @@ namespace CS_Classes
         {
             desc = "Show a dusted version point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             duster.Run(src);
             dst2 = duster.dst3;
             vbc.task.ogl.pointCloudInput = options.useTaskPointCloud ? vbc.task.pointCloud : duster.dst2;
@@ -44927,7 +44931,7 @@ namespace CS_Classes
             vbc.task.ogl.options.PointSizeSlider.Value = 10;
             desc = "Plot the results of a 3D histogram of the BGR data ";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hColor.Run(src);
             dst2 = hColor.dst3;
@@ -44955,7 +44959,7 @@ namespace CS_Classes
             FindSlider("OpenGL Point Size").Value = 20;
             desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             colorClass.Run(src);
             dst2 = colorClass.dst3;
@@ -44982,7 +44986,7 @@ namespace CS_Classes
             vbc.task.ogl.options.PointSizeSlider.Value = 10;
             desc = "Plot the results of a 3D histogram of the BGR data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src;
             src.ConvertTo(dst1, MatType.CV_32FC3);
@@ -45009,7 +45013,7 @@ namespace CS_Classes
             dst0 = new Mat(dst0.Size(), MatType.CV_8UC3, Scalar.White);
             desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -45036,9 +45040,9 @@ namespace CS_Classes
         {
             desc = "Find keypoints using ORB - Oriented Fast and Rotated BRIEF";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Channels() == 3)
                 src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
@@ -45069,7 +45073,7 @@ namespace CS_Classes
     {
             desc = "Apply the different color maps in OpenCV";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             labels[2] = "ColorMap = " + vbc.task.gOptions.getPalette();
             if (src.Type() == MatType.CV_32F)
@@ -45091,9 +45095,9 @@ namespace CS_Classes
         {
             desc = "Define a color Using sliders.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2.SetTo(new Scalar(options.blueS, options.greenS, options.redS));
             dst3.SetTo(new Scalar(255 - options.blueS, 255 - options.greenS, 255 - options.redS));
             labels[2] = "Color (RGB) = " + options.blueS + " " + options.greenS + " " + options.redS;
@@ -45117,7 +45121,7 @@ namespace CS_Classes
             pt = new Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1));
             desc = "Use LinearPolar To create gradient image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2.SetTo(0);
             for (int i = 0; i < dst2.Rows; i++)
@@ -45125,7 +45129,7 @@ namespace CS_Classes
                 var c = i * 255 / dst2.Rows;
                 dst2.Row(i).SetTo(new Scalar(c, c, c));
             }
-            rotateOptions.RunVB();
+            rotateOptions.RunOpt();
             dst3.SetTo(0);
             if (rotateOptions.warpFlag == InterpolationFlags.WarpInverseMap)
                 radiusSlider.Value = radiusSlider.Maximum;
@@ -45146,7 +45150,7 @@ namespace CS_Classes
             desc = "Map colors To different palette";
             labels[2] = "Reduced Colors";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst3 = reduction.dst2;
@@ -45164,7 +45168,7 @@ namespace CS_Classes
         {
             desc = "Experiment With palette Using a drawn image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             draw.Run(src);
             dst2 = ShowPalette(draw.dst2);
@@ -45183,7 +45187,7 @@ namespace CS_Classes
             labels[3] = "From And To colors";
             desc = "Create gradient image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -45222,9 +45226,9 @@ namespace CS_Classes
             labels[3] = "Palette used To color left image";
             desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
             {
@@ -45268,7 +45272,7 @@ namespace CS_Classes
         {
             desc = "Build a colormap that best shows the depth.  NOTE: duplicate of Palette_DepthColorMap but no slider.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged)
             {
@@ -45300,7 +45304,7 @@ namespace CS_Classes
         {
             desc = "Layout the available colors in a 2D grid";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int index = 0;
             foreach (var r in vbc.task.gridList)
@@ -45321,7 +45325,7 @@ namespace CS_Classes
         {
             desc = "Use a palette with the left and right images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = ShowPalette(vbc.task.leftView.ConvertScaleAbs());
             dst3 = ShowPalette(vbc.task.rightView.ConvertScaleAbs());
@@ -45339,7 +45343,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "ScalarColors", "VecColors" };
             desc = "Display that vbc.task.scalarColors and vbc.task.vecColors";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.gridSize <= 10) direction *= -1;
             if (vbc.task.gridSize >= 100) direction *= -1;
@@ -45384,9 +45388,9 @@ namespace CS_Classes
             }
             return result;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (activeSchemeName != options.schemeName || options.transitions != saveColorTransitionCount)
             {
@@ -45437,7 +45441,7 @@ namespace CS_Classes
             }
             desc = "Build a random colorGrad - no smooth transitions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.ApplyColorMap(src, dst2, colorMap);
         }
@@ -45461,7 +45465,7 @@ namespace CS_Classes
             originalColorMap = colorGrad.Clone();
             desc = "Build a new palette for every frame.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             for (int i = 0; i < colors.Count(); i++)
             {
@@ -45486,9 +45490,9 @@ namespace CS_Classes
             labels[3] = "Generated colormap";
             desc = "Build a random colormap that smoothly transitions colors";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (transitionCount != options.transitions)
             {
@@ -45525,7 +45529,7 @@ namespace CS_Classes
             cMapDir = new DirectoryInfo(vbc.task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps");
             desc = "Apply the different color maps in OpenCV";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged || colorMap.Rows != 256)
             {
@@ -45566,7 +45570,7 @@ namespace CS_Classes
             }
             desc = "Apply the provided color map to the input image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (colorMap == null)
             {
@@ -45593,7 +45597,7 @@ namespace CS_Classes
         {
             desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             var pixels = new List<byte>();
@@ -45639,7 +45643,7 @@ namespace CS_Classes
             cPtr = ParticleFilterTest_Open(vbc.task.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols);
             desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             imageFrame += 1;
             if (imageFrame % 45 == 0)
@@ -45670,7 +45674,7 @@ namespace CS_Classes
             cPtr = PCA_Prep_Open();
             desc = "Take some pointcloud data and return the non-zero points in a point3f vector";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
@@ -45706,9 +45710,9 @@ namespace CS_Classes
             FindSlider("Desired number of colors").Value = 256;
             desc = "Create a palette for the input image but don't use it.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             rgb = new byte[src.Total() * src.ElemSize()];
             buff = new byte[rgb.Length];
             Marshal.Copy(src.Data, rgb, 0, rgb.Length);
@@ -45773,7 +45777,7 @@ namespace CS_Classes
             pcaStr += "\n";
             return pcaStr;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() || runRedCloud)
             {
@@ -45815,7 +45819,7 @@ namespace CS_Classes
             pca.runRedCloud = true;
             desc = "Find the Principal Component Analysis vector for all the 3D points in a RedCloud cell.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pca.Run(src);
             dst2 = pca.dst2;
@@ -45851,9 +45855,9 @@ namespace CS_Classes
         {
             desc = "Reconstruct a video stream as a composite of X images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             int index = vbc.task.frameCount % images.Length;
             images[index] = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -45887,7 +45891,7 @@ namespace CS_Classes
         {
             desc = "Reconstruct a depth stream as a composite of X images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pca.Run(vbc.task.depthRGB);
             dst2 = pca.dst2;
@@ -45922,7 +45926,7 @@ namespace CS_Classes
             p.Y = (int)(q.Y + 9 * Math.Sin(angle - Math.PI / 4));
             img.Line(p, q, color, vbc.task.lineWidth, vbc.task.lineType);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = image.Resize(dst2.Size());
             Mat gray = dst2.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(50, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
@@ -46447,9 +46451,9 @@ namespace CS_Classes
             custom.colorMap = new Mat(256, 1, MatType.CV_8UC3);
             desc = "Use PCA to build a palettized CV_8U image from the input using a palette.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Marshal.Copy(src.Data, rgb, 0, rgb.Length);
             Marshal.Copy(src.Data, buff, 0, buff.Length);
             palette = MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors);
@@ -46489,7 +46493,7 @@ namespace CS_Classes
             desc = "Create a faster version of the PCA_NColor algorithm.";
             rgb = new byte[dst1.Total() * dst1.ElemSize()];
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat) palettize.Run(src); // get the palette in C#
             Marshal.Copy(src.Data, rgb, 0, rgb.Length);
@@ -46538,7 +46542,7 @@ namespace CS_Classes
             answer = new byte[dst2.Width * dst2.Height];
             rgb = new byte[dst1.Total() * dst1.ElemSize()];
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat) palettize.Run(src); // get the palette in C# which is very fast.
             Marshal.Copy(src.Data, rgb, 0, rgb.Length);
@@ -46571,9 +46575,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "A double pendulum representation", "Trace of the pendulum end points (p1 and p2)" };
             desc = "Build a double pendulum";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             float accumulator = 0;
             if (vbc.task.frameCount % 1000 == 0 || vbc.task.optionsChanged)
             {
@@ -46630,9 +46634,9 @@ namespace CS_Classes
             Cv2.CreateHanningWindow(hanning, dst2.Size(), MatType.CV_64F);
             desc = "Look for a shift between the current frame and the previous";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             Mat input = src;
             if (input.Channels() != 1) input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
@@ -46694,7 +46698,7 @@ namespace CS_Classes
             labels[3] = "Stabilized output from Phase_Correlate_Basics";
             desc = "Test the PhaseCorrelate_Basics with random movement";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             random.Run(src);
             stable.Run(random.dst3.Clone());
@@ -46715,7 +46719,7 @@ namespace CS_Classes
         {
             desc = "Use phase correlation on the depth data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) lastFrame = vbc.task.pcSplit[2].Clone();
             phaseC.Run(vbc.task.pcSplit[2]);
@@ -46750,7 +46754,7 @@ namespace CS_Classes
             labels[2] = "Looking down on a bell curve in 2 dimensions";
             desc = "Show what a Hanning window looks like";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.CreateHanningWindow(dst2, src.Size(), MatType.CV_32F);
         }
@@ -46768,7 +46772,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences" };
             desc = "With no motion the camera values will show the random photon differences.  Are they random?";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) lastImage = src;
             Cv2.Absdiff(src, lastImage, dst1);
@@ -46803,7 +46807,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "5 color levels from reduction (black not shown)", "Selected distribution" };
             desc = "";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.redOptions.setSimpleReductionBar(64); // for now...
             int reduce = 64;
@@ -46851,7 +46855,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Points where B, G, or R differ", "Histogram showing distribution of differences" };
             desc = "Same as Photon_Basics but without ignoring sign.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src = src.Reshape(1, src.Rows * 3);
             src.ConvertTo(src, MatType.CV_32F);
@@ -46879,7 +46883,7 @@ namespace CS_Classes
             labels = new string[] { "", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions" };
             desc = "Find the regions that are mostly vertical and mostly horizontal.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat topHist = new Mat(), sideHist = new Mat(), topBackP = new Mat(), sideBackP = new Mat();
             Cv2.CalcHist(new Mat[] { vbc.task.pointCloud }, vbc.task.channelsTop, new Mat(), topHist, 2,
@@ -46919,7 +46923,7 @@ namespace CS_Classes
                     Math.Abs(eq.Item2).ToString(vbc.fmt3) + "*z = " +
                     eq.Item3.ToString(vbc.fmt3) + "\n";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Point3f v1 = input[1] - input[0];
             Point3f v2 = input[1] - input[2];
@@ -46956,7 +46960,7 @@ namespace CS_Classes
             addW.src2 = dst2.Clone();
             desc = "Find all the cells from a RedCloud_Basics output that are likely to be flat";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plane.Run(src);
             dst2 = plane.dst2;
@@ -47027,7 +47031,7 @@ namespace CS_Classes
                 }
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plane.Run(src);
             dst2 = plane.dst2;
@@ -47055,7 +47059,7 @@ namespace CS_Classes
         {
             desc = "Classify equations based on the correlation of their coefficients";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plane.Run(src);
             dst2 = plane.dst2;
@@ -47136,9 +47140,9 @@ namespace CS_Classes
             }
             return fitPoints;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             redC.Run(src);
             dst2 = redC.dst2;
             dst3.SetTo(0);
@@ -47184,7 +47188,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud Basics output - click to highlight a cell", "" };
             desc = "Detect if a some or all points in a RedCloud cell are in a plane.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -47257,7 +47261,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Histogram of Y-Values of the point cloud after masking", "Mask used to isolate histogram input" };
             desc = "Create a histogram plot of the Y-values in the backprojection of solo points.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             solo.Run(src);
             dst3 = solo.dst3;
@@ -47306,7 +47310,7 @@ namespace CS_Classes
         {
             desc = "Compute the coefficients for an estimated plane equation given the rc contour";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -47396,7 +47400,7 @@ namespace CS_Classes
     };
             desc = "Use a heatmap to isolate vertical walls - incomplete!";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             solo.Run(src);
             dst3 = solo.heat.topframes.dst2.InRange(vbc.task.projectionThreshold * vbc.task.frameHistoryCount, dst2.Total());
@@ -47429,7 +47433,7 @@ namespace CS_Classes
     };
             desc = "Use the solo points to isolate horizontal surfaces - floor or ceiling or table tops.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             solo.Run(src);
             dst3 = solo.heat.sideframes.dst2.InRange(vbc.task.projectionThreshold * vbc.task.frameHistoryCount, dst2.Total());
@@ -47460,9 +47464,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "", "" };
             desc = "Find the floor plane (if present)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             slice.Run(src);
             dst1 = slice.dst3;
             dst0 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
@@ -47507,7 +47511,7 @@ namespace CS_Classes
             labels[3] = "Same Data but using OpenCV C++ plot";
             desc = "Plot data provided in src Mat";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hist.plotColors[0] = Scalar.White;
             hist.Run(src);
@@ -47517,7 +47521,7 @@ namespace CS_Classes
                 plot.srcX.Add(i);
                 plot.srcY.Add(hist.histRaw[0].At<float>(i, 0));
             }
-            plot.RunCS(empty);
+            plot.RunAlg(empty);
             dst3 = plot.dst2;
             labels[2] = hist.labels[2];
         }
@@ -47545,7 +47549,7 @@ namespace CS_Classes
         {
             desc = "Plot histogram data with a stable scale at the left of the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() || createHistogram)
             {
@@ -47597,7 +47601,7 @@ namespace CS_Classes
         {
             desc = "Show depth using OpenCV's plot format with variable bins.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32F) src = vbc.task.pcSplit[2];
             hist.Run(src);
@@ -47637,7 +47641,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "2D Histogram", "" };
             desc = "Plot a 2D histogram from the input Mat";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat histogram = src.Clone();
             if (standaloneTest())
@@ -47668,7 +47672,7 @@ namespace CS_Classes
             labels[2] = "Plot_OverTime ";
             desc = "Plot an input variable over time";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = dst2.Resize(vbc.task.quarterRes);
             if (standaloneTest()) plotData = (float)vbc.task.color.Mean(vbc.task.depthMask)[0];
@@ -47726,7 +47730,7 @@ namespace CS_Classes
             }
             desc = "Plot the requested number of entries in the cv.scalar input";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest()) plotData = vbc.task.color.Mean();
             for (int i = 0; i < Math.Min(plotCount, 4); i++)
@@ -47780,7 +47784,7 @@ namespace CS_Classes
             }
             vbc.task.gOptions.SetDotSize(vbc.task.lineWidth);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             const int plotSeriesCount = 100;
             lastXdelta.Add(plotData);
@@ -47868,7 +47872,7 @@ namespace CS_Classes
             vbc.task.gOptions.setLineWidth(1);
             vbc.task.gOptions.SetDotSize(2);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             const int plotSeriesCount = 100;
             lastXdelta.Add(plotData);
@@ -47958,7 +47962,7 @@ namespace CS_Classes
             plot.maxScale = 5;
             desc = "Plot the beats.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plot.plotData[0] = vbc.task.heartBeat ? 1 : -1;
             plot.plotData[1] = vbc.task.midHeartBeat ? 2 : -1;
@@ -47991,7 +47995,7 @@ namespace CS_Classes
             cPtr = PlotOpenCV_Open();
             desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             GCHandle handleX = GCHandle.Alloc(srcX.ToArray(), GCHandleType.Pinned);
             GCHandle handleY = GCHandle.Alloc(srcY.ToArray(), GCHandleType.Pinned);
@@ -48031,7 +48035,7 @@ namespace CS_Classes
             }
             desc = "Plot the requested points...";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var maxX = srcX.Max();
             var minX = srcX.Min();
@@ -48058,9 +48062,9 @@ namespace CS_Classes
         {
             desc = "Create a .ply format file with the pointcloud.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.fileName.Length != 0)
             {
                 var fileInfo = new FileInfo(options.fileName);
@@ -48102,9 +48106,9 @@ namespace CS_Classes
         {
             desc = "Save the pointcloud in .ply format and include the RGB data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.fileName.Length != 0)
             {
                 var fileInfo = new FileInfo(options.fileName);
@@ -48239,9 +48243,9 @@ namespace CS_Classes
             }
             return ptlist;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             dst2 = src;
             actualCount = 0;
@@ -48278,7 +48282,7 @@ namespace CS_Classes
         {
             desc = "Display the point cloud CV_32FC3 format";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = vbc.task.pointCloud;
         }
@@ -48297,7 +48301,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes." };
             desc = "Spin the RedCloud output exercise";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -48320,7 +48324,7 @@ namespace CS_Classes
             labels[2] = "Layout markers for side view";
             desc = "Create the colorized mat used for side projections";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             float distanceRatio = 1;
             if (src.Channels() != 3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
@@ -48389,7 +48393,7 @@ namespace CS_Classes
             labels[2] = "Layout markers for top view";
             desc = "Create the colorize the mat for a topdown projections";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             float distanceRatio = 1;
             if (src.Channels() != 3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
@@ -48450,7 +48454,7 @@ namespace CS_Classes
             desc = "Project the depth data onto a top view And side view.";
             cPtr = SimpleProjectionOpen();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.FirstPass) Array.Resize(ref depthBytes, (int)(vbc.task.pcSplit[2].Total() * vbc.task.pcSplit[2].ElemSize()));
             Marshal.Copy(vbc.task.pcSplit[2].Data, depthBytes, 0, depthBytes.Length);
@@ -48480,7 +48484,7 @@ namespace CS_Classes
             desc = "Project the depth data onto a top view And side view - Using only VB code (too slow.)";
             cPtr = SimpleProjectionOpen();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             float range = vbc.task.MaxZmeters;
             dst2 = src.EmptyClone().SetTo(Scalar.White);
@@ -48526,7 +48530,7 @@ namespace CS_Classes
             labels[3] = "Histogram after filtering For Single-only histogram bins";
             desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             heat.Run(src);
             dst2 = heat.dst0.InRange(vbc.task.frameHistoryCount, vbc.task.frameHistoryCount).ConvertScaleAbs();
@@ -48547,7 +48551,7 @@ namespace CS_Classes
             labels[3] = "Histogram after filtering For Single-only histogram bins";
             desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             solo.Run(src);
             dst2 = solo.dst2;
@@ -48571,7 +48575,7 @@ namespace CS_Classes
         {
             desc = "Find the horizontal surfaces With a projects Of the SideView histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             heat.Run(src);
             dst2 = heat.dst3;
@@ -48612,9 +48616,9 @@ namespace CS_Classes
         {
             desc = "Show where vertical neighbor depth values are within Y mm's";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Type() != MatType.CV_32F) src = vbc.task.pcSplit[2];
             var tmp32f = new Mat(dst2.Size(), MatType.CV_32F, cv.Scalar.All(0));
             var r1 = new cv.Rect(options.pixels, 0, dst2.Width - options.pixels, dst2.Height);
@@ -48638,7 +48642,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Pointcloud visualized", "" };
             desc = "Display the pointcloud as a BGR image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var pcSplit = new Mat[] { vbc.task.pcSplit[0].ConvertScaleAbs(255), vbc.task.pcSplit[1].ConvertScaleAbs(255), vbc.task.pcSplit[2].ConvertScaleAbs(255) };
             Cv2.Merge(pcSplit, dst2);
@@ -48658,7 +48662,7 @@ namespace CS_Classes
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged) pcPoints = new Mat(vbc.task.gridRows, vbc.task.gridCols, MatType.CV_32FC3, cv.Scalar.All(0));
             dst2.SetTo(0);
@@ -48696,7 +48700,7 @@ namespace CS_Classes
             setPointCloudGrid();
             desc = "Reduce the point cloud to a manageable number points in 3D using the mean value";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int rw = vbc.task.gridList[0].Width / 2, rh = vbc.task.gridList[0].Height / 2;
             cv.Scalar red32 = new cv.Scalar(0, 0, 1);
@@ -48740,7 +48744,7 @@ namespace CS_Classes
             setPointCloudGrid();
             desc = "Find planes using a reduced set of 3D points and the intersection of vertical and horizontal lines through those points.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pcBasics.Run(src);
             pcPoints.Clear();
@@ -48768,7 +48772,7 @@ namespace CS_Classes
             vbc.task.mouseMovePoint.X = dst2.Width / 2;
             desc = "Inspect x, y, and z values in a row or column";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int yLines = 20;
             int cLine = vbc.task.mouseMovePoint.X;
@@ -48806,7 +48810,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             desc = "Average all 3 elements of the point cloud - not just depth.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pcHistory.Add(vbc.task.pointCloud);
             if (pcHistory.Count() >= vbc.task.frameHistoryCount) pcHistory.RemoveAt(0);
@@ -48834,7 +48838,7 @@ namespace CS_Classes
             labels[3] = "Draw the frustrum from the top view";
             desc = "Draw the top view of the frustrum";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             frustrum.Run(src);
             heat.Run(frustrum.dst3.Resize(dst2.Size()));
@@ -48858,7 +48862,7 @@ namespace CS_Classes
             labels[2] = "Draw the frustrum from the side view";
             desc = "Draw the side view of the frustrum";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             frustrum.Run(src);
             heat.Run(frustrum.dst3.Resize(dst2.Size()));
@@ -48884,7 +48888,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram" };
             desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.redOptions.Sync(); // make sure settings are consistent
             Cv2.CalcHist(new Mat[] { vbc.task.pointCloud }, vbc.task.redOptions.channels, new Mat(), histogram, vbc.task.redOptions.channelCount,
@@ -48958,7 +48962,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": redOptions 'X/Y-Range X100' sliders to test further.");
             desc = "Reduce the vbc.task.pcSplit[2] for use in several algorithms.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = vbc.task.pcSplit[2] * 1000;
             dst2.ConvertTo(dst2, MatType.CV_32S);
@@ -48989,7 +48993,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.");
             desc = "Create a stable side view of the point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             split2.Run(vbc.task.pointCloud);
             Cv2.CalcHist(new Mat[] { split2.dst3 }, vbc.task.channelsTop, new Mat(), dst1, 2, vbc.task.bins2D, vbc.task.rangesTop);
@@ -49009,7 +49013,7 @@ namespace CS_Classes
         {
             desc = "Show where vertical neighbor depth values are within X mm's";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             split2.Run(null);
             Cv2.CalcHist(new Mat[] { split2.dst3 }, vbc.task.channelsSide, new Mat(), dst1, 2, vbc.task.bins2D, vbc.task.rangesSide);
@@ -49030,7 +49034,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Reduced side view", "Reduced top view" };
             desc = "Show where vertical neighbor depth values are within X mm's";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             split2.Run(null);
             Cv2.CalcHist(new Mat[] { split2.dst3 }, vbc.task.channelsSide, new Mat(), dst1, 2, vbc.task.bins2D, vbc.task.rangesSide);
@@ -49054,7 +49058,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": redOptions 'X-Range X100' slider has high impact.");
             desc = "Test adjusting the X-Range value to squeeze a histogram into dst2.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             split2.Run(src);
             Cv2.CalcHist(new Mat[] { split2.dst3 }, vbc.task.channelsTop, new Mat(), dst1, 2, vbc.task.bins2D, vbc.task.rangesTop);
@@ -49075,7 +49079,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": redOptions 'Y-Range X100' slider has high impact.");
             desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             split2.Run(src);
             Cv2.CalcHist(new Mat[] { split2.dst3 }, vbc.task.channelsSide, new Mat(), dst1, 2, vbc.task.bins2D, vbc.task.rangesSide);
@@ -49094,9 +49098,9 @@ namespace CS_Classes
         {
             desc = "Manually create an IEnumerable<IEnumerable<cv.Point>>.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var points = Enumerable.Range(0, options.polyCount).Select(i =>
                 new cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))).ToList();
             var pts = new List<List<cv.Point>> { points };
@@ -49119,7 +49123,7 @@ namespace CS_Classes
             labels[2] = "To zoom move the mouse over the image";
             desc = "Create a random procedural image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.frameCount % (vbc.task.fpsRate * 3) == 0) // every x frames.
             {
@@ -49237,7 +49241,7 @@ namespace CS_Classes
             }
             if (vbc.task.heartBeat) labels[2] = $"Pong War: day {dayScore} | night {nightScore}";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             iteration += 1;
             if (iteration % 1000 == 0)
@@ -49285,7 +49289,7 @@ namespace CS_Classes
         {
             desc = "Running 2 pong wars at once.  Randomness inserted with starting location.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pong1.Run(src);
             dst2 = pong1.dst2.Clone();
@@ -49364,7 +49368,7 @@ namespace CS_Classes
                 cv.Cv2.WaitKey();
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.testAllRunning)
             {
@@ -49372,7 +49376,7 @@ namespace CS_Classes
                 return;
             }
             
-            options.RunVB();
+            options.RunOpt();
             if (options.buffer.Length != options.bufferSize)
             {
                 lock (_lockObject)
@@ -49410,7 +49414,7 @@ namespace CS_Classes
             procon.terminateProducer = true; // we don't need a 2 producer vbc.task.  RunVB below provides the second thread.
             desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.testAllRunning)
             {
@@ -49460,7 +49464,7 @@ namespace CS_Classes
         {
             return string.Format("{0}\t{1}\t{2}", v.X.ToString(vbc.fmt3), v.Y.ToString(vbc.fmt3), v.Z.ToString(vbc.fmt3));
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -49565,7 +49569,7 @@ namespace CS_Classes
             labels[2] = "Top matrix is the current gMatrix while the bottom one includes the Y-axis rotation.";
             desc = "Build the rotation matrix around the Y-axis";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -49576,7 +49580,7 @@ namespace CS_Classes
             gMat.Run(src);
             if (standaloneTest())
             {
-                options.RunVB();
+                options.RunOpt();
                 strOut = "Gravity-oriented gMatrix\n";
                 strOut += vbc.task.gMat.strOut + "\n";
                 strOut += "\nNew gMatrix from sliders\n";
@@ -49602,7 +49606,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth" };
             desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sides.Run(src);
             dst2 = sides.dst2;
@@ -49670,7 +49674,7 @@ namespace CS_Classes
             labels = new string[] { "", "The outline of the selected RedCloud cell", traceName + " - click any RedCloud cell to visualize it's side view in the upper right image.", "" };
             desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             profile.Run(src);
             dst1 = profile.dst1;
@@ -49700,9 +49704,9 @@ namespace CS_Classes
             vbc.task.gOptions.setDisplay1();
             desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             sides.Run(src);
             dst2 = sides.dst2;
             var rc = vbc.task.rc;
@@ -49760,7 +49764,7 @@ namespace CS_Classes
             vbc.task.ogl.oglFunction = (int)oCase.pcPointsAlone;
             desc = "Visualize just the RedCloud cell contour in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sides.Run(src);
             dst2 = sides.dst2;
@@ -49795,7 +49799,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman" };
             desc = "Use Kalman to smooth the results of the contour key points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sides.Run(src);
             dst0 = sides.redC.dst0;
@@ -49841,7 +49845,7 @@ namespace CS_Classes
             Random r = new Random();
             return collection.OrderBy(a => r.Next()).ToList();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             unscrambled.Clear();
             List<cv.Rect> inputROI = new List<cv.Rect>();
@@ -49882,9 +49886,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Puzzle Input", "Puzzle Solver Output - missing pieces can result from identical cells (usually bright white)" };
             desc = "Solve the puzzle using matchTemplate";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.optionsChanged || options.startPuzzle)
             {
                 puzzle.Run(src);
@@ -49919,7 +49923,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical." };
             desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             puzzle.puzzle.image = src.Clone();
             puzzle.grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
@@ -49939,9 +49943,9 @@ namespace CS_Classes
         {
             desc = "Use pyrup and pyrdown to zoom in and out of an image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.zoom != 0)
             {
                 if (options.zoom < 0)
@@ -49974,7 +49978,7 @@ namespace CS_Classes
         {
             desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             laplace.Run(src);
             dst2 = laplace.dst2;
@@ -49991,9 +49995,9 @@ namespace CS_Classes
         {
             desc = "Use PyrMeanShiftFiltering to segment an image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Cv2.PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid);
         }
     }
@@ -50011,7 +50015,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud_Basics output", "PyrFilter output before reduction" };
             desc = "Use RedColor to segment the output of PyrFilter";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pyr.Run(src);
             dst3 = pyr.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -50073,7 +50077,7 @@ namespace CS_Classes
         {
             desc = "Access Python from OpenCVB - contains the startPython interface";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             SetTrueText("There is no output from " + traceName + ".  It contains the interface to python.");
         }
@@ -50119,7 +50123,7 @@ namespace CS_Classes
             }
             desc = "Run Python app: " + pythonApp.Name;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.cameraName == "Oak-D camera" && pythonApp.Name.EndsWith("_PS.py") && !testPyStreamOakD)
             {
@@ -50177,7 +50181,7 @@ namespace CS_Classes
                 desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python.";
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -50238,7 +50242,7 @@ namespace CS_Classes
             labels[2] = "Output of Python Backend";
             desc = "General purpose class to pipe BGR and Depth to Python scripts.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -50306,7 +50310,7 @@ namespace CS_Classes
             }
             desc = "Read a QR code";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Height < 240)
             {
@@ -50357,7 +50361,7 @@ namespace CS_Classes
             labels[2] = "dst1 contains a map defining the quadrant value for each pixel";
             desc = "Divide the color and depth images into 4 quadrants based on the horizon and gravity vectors";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst1.SetTo(0);
             DrawLine(dst1, vbc.task.gravityVec.p1, vbc.task.gravityVec.p2, cv.Scalar.All(255), 1);
@@ -50385,9 +50389,9 @@ namespace CS_Classes
         {
             desc = "Use the quaternion values to multiply and compute conjugate";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             var quatmul = Quaternion.Multiply(options.q1, options.q2);
             SetTrueText("q1 = " + options.q1.ToString() + "\n" + "q2 = " + options.q2.ToString() + "\n" +
                         "Multiply q1 * q2" + quatmul.ToString());
@@ -50415,7 +50419,7 @@ namespace CS_Classes
             var s = (theta2 < Math.Sqrt(120 * Single.Epsilon)) ? 1 - theta2 / 6 : Math.Sin(theta) / theta2;
             return new Quaternion((float)(s * v.X), (float)(s * v.Y), (float)(s * v.Z), (float)c);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             host.Run(src);
             var dt = host.HostInterruptDelayEstimate;
@@ -50474,9 +50478,9 @@ namespace CS_Classes
             desc = "Create a uniform random mask with a specified number of pixels.";
         }
 
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             int sizeRequest = options.count;
             if (!vbc.task.paused)
@@ -50515,9 +50519,9 @@ namespace CS_Classes
             range = new cv.Rect(0, 0, dst2.Cols, dst2.Rows);
             desc = "Create a uniform random mask with a specificied number of pixels.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             PointList.Clear();
             if (!vbc.task.paused)
             {
@@ -50549,9 +50553,9 @@ namespace CS_Classes
             FindSlider("Random Pixel Count").Value = 100;
             desc = "Create an enumerable list of points using a lambda function";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             points = Enumerable.Range(0, options.count).Select(i =>
                 new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))).ToArray();
             dst2.SetTo(0);
@@ -50578,9 +50582,9 @@ namespace CS_Classes
             FindSlider("Random Pixel Count").Maximum = dst2.Cols * dst2.Rows;
             desc = "Create a uniform random mask with a specificied number of pixels.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             PointList.Clear();
             if (!vbc.task.paused)
             {
@@ -50619,7 +50623,7 @@ namespace CS_Classes
             desc = "Create a uniform random mask with a specificied number of pixels.";
             countSlider = FindSlider("Random Pixel Count");
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             PointList.Clear();
             var count = countSlider.Value;
@@ -50655,7 +50659,7 @@ namespace CS_Classes
         {
             desc = "Use randomShuffle to reorder an image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             src.CopyTo(dst2);
             Cv2.RandShuffle(dst2, 1.0, ref myRNG); // don't remove that myRNG!  It will fail in RandShuffle.
@@ -50676,7 +50680,7 @@ namespace CS_Classes
             desc = "Use a random Look-Up-Table to modify few colors in a kmeans image.";
             labels[3] = "kmeans run to get colors";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat || vbc.task.frameCount < 10)
             {
@@ -50707,7 +50711,7 @@ namespace CS_Classes
         {
             desc = "Create a uniform distribution.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             Cv2.Randu(dst2, minVal, maxVal);
@@ -50724,9 +50728,9 @@ namespace CS_Classes
         {
             desc = "Create a normal distribution in all 3 colors with a variable standard deviation.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.grayChecked && dst2.Channels() != 1) dst2 = new Mat(dst2.Size(), MatType.CV_8U);
             Cv2.Randn(dst2, new Scalar(options.blueVal, options.greenVal, options.redVal), Scalar.All(options.stdev));
         }
@@ -50743,7 +50747,7 @@ namespace CS_Classes
         {
             desc = "Display the smoothed histogram for a uniform distribution.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             rUniform.Run(src);
             dst2 = rUniform.dst2;
@@ -50764,7 +50768,7 @@ namespace CS_Classes
         {
             desc = "Display the histogram for a uniform distribution.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             rUniform.Run(src);
             dst2 = rUniform.dst2;
@@ -50785,7 +50789,7 @@ namespace CS_Classes
         {
             desc = "Display the histogram for a Normal distribution.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             normalDist.Run(src);
             dst3 = normalDist.dst2;
@@ -50807,7 +50811,7 @@ namespace CS_Classes
             histogram.plot.minRange = 1;
             desc = "Display the histogram for a Normal distribution.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             normalDist.Run(src);
             dst3 = normalDist.dst2;
@@ -50826,7 +50830,7 @@ namespace CS_Classes
             cPtr = Random_PatternGenerator_Open();
             desc = "Generate random patterns for use with 'Random Pattern Calibration'";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
@@ -50854,7 +50858,7 @@ namespace CS_Classes
             inputCDF = cv.Mat.FromPixelData(loadedDice.Length, 1, MatType.CV_32F, loadedDice);
             desc = "Create a custom random number distribution from any histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             float lastValue = inputCDF.At<float>(inputCDF.Rows - 1, 0);
             if (!(lastValue > 0.99 && lastValue <= 1.0)) // convert the input histogram to a cdf.
@@ -50898,9 +50902,9 @@ namespace CS_Classes
             plot.maxValue = 100;
             desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat histogram = new Mat(options.dimension, 1, MatType.CV_32F, cv.Scalar.All(0));
             for (int i = 0; i < outputRandom.Rows; i++)
             {
@@ -50940,7 +50944,7 @@ namespace CS_Classes
             labels[3] = "Custom random distribution that reflects dst2 image";
             desc = "Create a random number distribution that reflects histogram of a grayscale image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             hist.plot.maxValue = 0; // we are sharing the plot with the code below...
@@ -50971,9 +50975,9 @@ namespace CS_Classes
             labels[3] = "Resized selection rectangle in dst2";
             desc = "Imitate an old TV appearance using randomness.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst3 = dst2[vbc.task.drawRect];
             for (int y = 0; y < dst3.Height; y++)
@@ -51008,7 +51012,7 @@ namespace CS_Classes
             labels[3] = "Changed pixels, add/sub mask, plusMask, minusMask";
             desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             random.Run(src);
@@ -51045,7 +51049,7 @@ namespace CS_Classes
             percentSlider = FindSlider("Percentage of pixels to include noise");
             desc = "Remove diagnostics from the faster algorithm to simplify code.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             random.Run(src);
@@ -51080,7 +51084,7 @@ namespace CS_Classes
             FindSlider("Random Pixel Count").Value = 10;
             desc = "Smoothly transition a random point from location to location.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (refreshPoints)
             {
@@ -51135,10 +51139,10 @@ namespace CS_Classes
             labels = new string[] { "", "", "Colorized sets", "" };
             desc = "Use OpenCV's randN API to create a cluster around a random mean with a requested stdev";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
-            options.RunVB();
+            options.RunOpt();
             var ptMat = new Mat(1, 1, MatType.CV_32FC2);
             dst2.SetTo(0);
             clusters.Clear();
@@ -51178,9 +51182,9 @@ namespace CS_Classes
         {
             desc = "Draw the requested number of rectangles.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.heartBeat)
             {
                 dst2.SetTo(Scalar.Black);
@@ -51222,7 +51226,7 @@ namespace CS_Classes
             FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = true;
             desc = "Draw the requested number of rectangles.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             rectangle.Run(src);
             dst2 = rectangle.dst2;
@@ -51243,7 +51247,7 @@ namespace CS_Classes
             FindSlider("DrawCount").Value = 2;
             desc = "Test if 2 rectangles overlap";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
             if (standaloneTest())
@@ -51296,7 +51300,7 @@ namespace CS_Classes
         {
             desc = "Create a rectangle that contains all the input rectangles";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -51354,7 +51358,7 @@ namespace CS_Classes
             countSlider = FindSlider("DrawCount");
             desc = "Given a group of rectangles, merge all the rectangles that overlap";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -51412,11 +51416,11 @@ namespace CS_Classes
         {
             desc = "Build an enclosing rectangle for the supplied pointlist";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
-                pointList = vbc.QuickRandomPoints(20);
+                pointList = quickRandomPoints(20);
                 dst2.SetTo(0);
                 foreach (var pt in pointList)
                 {
@@ -51464,7 +51468,7 @@ namespace CS_Classes
             otherRects = new List<cv.Rect>(newOther);
             return enclosing;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -51520,9 +51524,9 @@ namespace CS_Classes
             cPtr = RecursiveBilateralFilter_Open();
             desc = "Apply the recursive bilateral filter - edge-preserving but faster.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (dataSrc.Length != src.Total() * src.ElemSize())
                 Array.Resize(ref dataSrc, (int)(src.Total() * src.ElemSize()));
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
@@ -51556,7 +51560,7 @@ namespace CS_Classes
                             "It is behind the global options (which affect most algorithms.)");
             desc = "Find cells and then match them to the previous generation with minimum boundary";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
             {
@@ -51601,7 +51605,7 @@ namespace CS_Classes
             vbc.task.gOptions.setHistogramBins(20);
             desc = "Segment the image based on both the reduced color";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst3 = vbc.task.cellMap;
@@ -51622,7 +51626,7 @@ namespace CS_Classes
             labels = new string[] { "", "Cells where convexity defects failed", "", "Improved contour results using OpenCV's ConvexityDefects" };
             desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -51669,7 +51673,7 @@ namespace CS_Classes
             cPtr = RedCloud_FindCells_Open();
             desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cellList = new List<int>();
             redC.Run(src);
@@ -51722,7 +51726,7 @@ namespace CS_Classes
         {
             desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             planes.Run(src);
             dst2 = planes.dst2;
@@ -51744,7 +51748,7 @@ namespace CS_Classes
             labels[3] = "The estimated plane equations for the largest 20 RedCloud cells.";
             desc = "Show the estimated plane equations for all the cells.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -51798,7 +51802,7 @@ namespace CS_Classes
             labels[3] = "Histogram of depth weighted by the size of the cell.";
             desc = "Create a histogram of depth using RedCloud cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -51847,7 +51851,7 @@ namespace CS_Classes
         {
             desc = "A shape correlation is between each x and y in list of contours points.  It allows classification based on angle and shape.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -51881,7 +51885,7 @@ namespace CS_Classes
             vbc.task.gOptions.setDisplay1();
             desc = "Display RedCloud output at a fixed frame rate";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fps.Run(empty);
             if (fps.heartBeat)
@@ -51910,10 +51914,10 @@ namespace CS_Classes
             labels[3] = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis";
             desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.motionDetected) return;
-            options.RunVB();
+            options.RunOpt();
             redC.Run(src);
             dst2 = redC.dst2;
             labels[2] = redC.labels[2];
@@ -51955,7 +51959,7 @@ namespace CS_Classes
             labels[3] = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis";
             desc = "Create a plane equation each cell's contour";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -51991,7 +51995,7 @@ namespace CS_Classes
             labels[3] = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis";
             desc = "Create a plane equation from the pointcloud samples in a RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -52031,7 +52035,7 @@ namespace CS_Classes
         {
             desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hcloud.Run(src);
             dst3 = hcloud.dst2;
@@ -52052,7 +52056,7 @@ namespace CS_Classes
             stats.runRedCloud = true;
             desc = "Build horizontal RedCloud cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.redOptions.setYZReduction(true);
             stats.Run(src);
@@ -52074,7 +52078,7 @@ namespace CS_Classes
             stats.runRedCloud = true;
             desc = "Build vertical RedCloud cells.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.redOptions.setXZReduction(true);
             stats.Run(src);
@@ -52097,7 +52101,7 @@ namespace CS_Classes
             labels[3] = "Generated pointcloud";
             desc = "Display the output of a generated pointcloud as RedCloud cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             world.Run(src);
             vbc.task.pointCloud = world.dst2;
@@ -52120,7 +52124,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "KMeans_MultiChannel output", "RedCloud_Basics output" };
             desc = "Use RedCloud to identify the regions created by kMeans";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             km.Run(src);
             dst3 = km.dst2;
@@ -52141,7 +52145,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Diff output, RedCloud input", "RedCloud output" };
             desc = "Isolate blobs in the diff output with RedCloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             SetTrueText("Wave at the camera to see the segmentation of the motion.", 3);
             diff.Run(src);
@@ -52169,7 +52173,7 @@ namespace CS_Classes
             labels[3] = "Top: XZ values and mask, Bottom: ZY values and mask";
             desc = "Visualize the top and side projection of a RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52191,7 +52195,7 @@ namespace CS_Classes
             labels[1] = "RedCloud output";
             desc = "Use the mask for vertical surfaces to identify RedCloud cells that appear to be flat.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             verts.Run(src);
             redC.Run(src);
@@ -52234,7 +52238,7 @@ namespace CS_Classes
         {
             desc = "If a RedColor cell contains depth then build a plane equation";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52265,7 +52269,7 @@ namespace CS_Classes
             labels = new[] { "", "Format CV_8U of Delaunay data", "RedCloud output", "RedCloud Output of GoodFeature points" };
             desc = "Track the GoodFeatures points using RedCloud.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             features.Run(src);
             dst1 = features.dst3;
@@ -52299,7 +52303,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing" };
             desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52336,7 +52340,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing" };
             desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52375,7 +52379,7 @@ namespace CS_Classes
             if (standaloneTest()) redC = new RedCloud_Basics();
             desc = "Count the cells that have changed in a RedCloud generation";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52407,7 +52411,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Verify that floodpoints correctly determine if depth is present.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52436,7 +52440,7 @@ namespace CS_Classes
             cells.runRedCloud = true;
             desc = "Display the stats for the requested cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cells.Run(src);
             dst1 = cells.dst1;
@@ -52457,7 +52461,7 @@ namespace CS_Classes
             labels[3] = "Cells that have no depth data.";
             desc = "Identify cells that have no depth";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52483,7 +52487,7 @@ namespace CS_Classes
             labels[3] = "Color input to RedCloud_Basics with depth boundary blocking color connections.";
             desc = "Use the depth outline as input to RedCloud_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             outline.Run(vbc.task.depthMask);
             colorClass.Run(src);
@@ -52509,7 +52513,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Use the Depth_Outline output over time to isolate high quality cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             outline.Run(vbc.task.depthMask);
             if (vbc.task.heartBeat) dst3.SetTo(0);
@@ -52532,7 +52536,7 @@ namespace CS_Classes
         {
             desc = "Run RedCloud meter by meter";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             meter.Run(src);
             dst2 = meter.dst3;
@@ -52557,7 +52561,7 @@ namespace CS_Classes
             labels[3] = "A 4-way split of the input grayscale image based on brightness";
             desc = "Use RedCloud on a 4-way split based on light to dark in the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binar4.Run(src);
             dst3 = ShowPalette(binar4.dst2 * 255 / 5);
@@ -52579,7 +52583,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Identify each Connected component as a RedCloud Cell.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             ccomp.Run(src);
@@ -52604,7 +52608,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Create RedCloud output using only color";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52629,7 +52633,7 @@ namespace CS_Classes
             labels[3] = "Highlighted below are the cells which flipped in color from the previous frame.";
             desc = "Identify the 4-way split cells that are flipping between brightness boundaries.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst3 = redC.dst3;
@@ -52668,7 +52672,7 @@ namespace CS_Classes
             cellMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Remove the overlapping cells.  Keep the largest.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52704,7 +52708,7 @@ namespace CS_Classes
         {
             desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_Basics.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hColor.Run(src);
             dst2 = hColor.dst3;
@@ -52726,7 +52730,7 @@ namespace CS_Classes
         {
             desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redMasks.Run(src);
             List<rcData> lastCells = new List<rcData>(vbc.task.redCells);
@@ -52782,7 +52786,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Find the gaps that are different in the RedCloud_Basics results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -52816,7 +52820,7 @@ namespace CS_Classes
             vbc.task.gOptions.setDebugSlider(0);
             desc = "Select blobs by size using the DebugSlider in the global options";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             SetTrueText("Use the goptions 'DebugSlider' to select cells by size." + "\n" + "Size order changes frequently.", 3);
             redC.Run(src);
@@ -52850,7 +52854,7 @@ namespace CS_Classes
             }
             desc = "Display the RedCloud cells found with a horizontal slice through the cellMap.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat sliceMask = transform.createSliceMaskH();
             dst0 = src;
@@ -52890,7 +52894,7 @@ namespace CS_Classes
             }
             desc = "Display the RedCloud cells found with a vertical slice through the cellMap.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat sliceMask = transform.createSliceMaskV();
             dst0 = src;
@@ -52931,7 +52935,7 @@ namespace CS_Classes
             labels = new string[] { "", "Mask of active RedCloud cells", "CV_8U representation of redCells", "" };
             desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redMasks.Run(src);
             rMotion.Run(vbc.task.color.Clone());
@@ -52993,7 +52997,7 @@ namespace CS_Classes
             labels = new string[] { "", "Contour_WholeImage Input", "RedCloud_Basics - toggling between Contour and Featureless inputs", "FeatureLess_Basics Input" };
             desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             contour.Run(src);
             dst1 = contour.dst2;
@@ -53020,7 +53024,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Count the unmatched cells and display them.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             myFrameCount++;
             if (standaloneTest())
@@ -53083,7 +53087,7 @@ namespace CS_Classes
         {
             desc = "For each cell, add a contour if its count is zero.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -53115,7 +53119,7 @@ namespace CS_Classes
         {
             desc = "Show the maxdist before and after updating the mask with the contour.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -53149,7 +53153,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Use the Depth_Tiers algorithm to create a color-based RedCloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binar4.Run(src);
             dst1 = ShowPalette((binar4.dst2 * 255 / binar4.classCount).ToMat());
@@ -53175,7 +53179,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Use the Depth_Tiers with Bin4Way_Regions algorithm to create a color-based RedCloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binar4.Run(src);
             tiers.Run(src);
@@ -53201,7 +53205,7 @@ namespace CS_Classes
         {
             desc = "Combined the color and cloud as indicated in the RedOptions panel.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             maxDepth.Run(src);
             if (vbc.task.redOptions.getUseColorOnly() || vbc.task.redOptions.getUseGuidedProjection())
@@ -53263,9 +53267,9 @@ namespace CS_Classes
         {
             desc = "Show only the top X cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             redC.Run(src);
             dst2.SetTo(0);
             foreach (var rc in vbc.task.redCells)
@@ -53289,9 +53293,9 @@ namespace CS_Classes
             nab.runRedCloud = true;
             desc = "Add unused neighbors to each of the top X cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             nab.Run(src);
             SetTrueText("Review the neighbors_Precise algorithm");
             // The commented code has been omitted for brevity
@@ -53308,7 +53312,7 @@ namespace CS_Classes
         {
             desc = "Build the hulls for the top X RedCloud cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             topX.Run(src);
             labels = topX.redC.labels;
@@ -53344,7 +53348,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseColorOnly(true);
             desc = "Run RedCloud on just the red hue regions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hue.Run(src);
             dst3 = hue.dst2;
@@ -53366,7 +53370,7 @@ namespace CS_Classes
             vbc.task.redOptions.setIdentifyCells(true);
             desc = "Merge cells contained in the top X cells and remove all other cells.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flood.Run(src);
             dst3 = flood.dst2;
@@ -53401,7 +53405,7 @@ namespace CS_Classes
         {
             desc = "Add the depth tiers to the input for RedCloud_Basics.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             tiers.Run(src);
             binar4.Run(src);
@@ -53423,7 +53427,7 @@ namespace CS_Classes
             vbc.task.redOptions.setUseDepth(true);
             desc = "Create RedCloud output using only depth.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             flood.Run(src);
             dst2 = flood.dst2;
@@ -53447,7 +53451,7 @@ namespace CS_Classes
             vbc.task.gOptions.pixelDiffThreshold = 1;
             desc = "Remove RedCloud results that are inconsistent with the previous frame.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -53515,7 +53519,7 @@ namespace CS_Classes
             vbc.task.gOptions.pixelDiffThreshold = 1;
             desc = "Remove RedCloud results that are inconsistent with the previous frame.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -53581,7 +53585,7 @@ namespace CS_Classes
             lastImage = redC.dst2.Clone();
             desc = "Remove RedCloud results that are inconsistent with the previous frame(s).";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             cellLists.Add(new List<rcData>(vbc.task.redCells));
@@ -53640,7 +53644,7 @@ namespace CS_Classes
         {
             desc = "Display the RedCloud results with the mean color of the cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             labels[2] = redC.labels[2];
@@ -53664,7 +53668,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Use absDiff to build a mask of cells that changed.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             bgSub.Run(src);
             dst3 = bgSub.dst2;
@@ -53698,7 +53702,7 @@ namespace CS_Classes
             labels = new string[] { "", "FeatureLess_RedCloud output.", "RedCloud_Basics output", "RedCloud_Basics cells joined by using the color from the FeatureLess_RedCloud cellMap" };
             desc = "Run RedCloud_Basics and use FeatureLess_RedCloud to join cells that are in the same featureless regions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fLess.Run(src);
             dst2 = fLess.dst2;
@@ -53723,7 +53727,7 @@ namespace CS_Classes
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Placeholder to make it easier to find where left and right images are floodfilled.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst1 = redC.dst1;
@@ -53753,7 +53757,7 @@ namespace CS_Classes
             vbc.task.redOptions.setIdentifyCells(false);
             desc = "Run Flood_Basics and use the cells to map the depth cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.redOptions.setUseColorOnly(true);
             vbc.task.redCells = new List<rcData>(colorCells);
@@ -53801,7 +53805,7 @@ namespace CS_Classes
         {
             desc = "Test Feature_Delaunay points after Delaunay contours have been added.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             delaunay.Run(src);
             dst1 = delaunay.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -53834,7 +53838,7 @@ namespace CS_Classes
             cPtr = RedCloud_Open();
             desc = "Run the C++ RedCloud interface with or without a mask";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
             {
@@ -53896,7 +53900,7 @@ namespace CS_Classes
             cPtr = RedCloudMaxDist_Open();
             desc = "Run the C++ RedCloudMaxDist interface without a mask";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
             {
@@ -53952,9 +53956,9 @@ namespace CS_Classes
         {
             desc = "Reduction transform for the point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             vbc.task.pointCloud.ConvertTo(dst0, MatType.CV_32S, 1000 / options.reduceAmt);
             var split = dst0.Split();
             switch (vbc.task.redOptions.PointCloudReduction)
@@ -54000,9 +54004,9 @@ namespace CS_Classes
         {
             desc = "Display the RedCloud results with the mean grayscale value of the cell +- delta";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             redC.Run(src);
             dst2 = redC.dst2;
             labels[2] = redC.labels[2];
@@ -54032,9 +54036,9 @@ namespace CS_Classes
             cellMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Remove any cells which are in a featureless region - they are part of the neighboring (and often surrounding) region.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             devGrid.Run(src);
             redC.Run(src);
             dst2 = redC.dst2;
@@ -54086,9 +54090,9 @@ namespace CS_Classes
                                 (byte)((1 - factor) * farBlue.Item1 + factor * nearYellow.Item1),
                                 (byte)((1 - factor) * farBlue.Item2 + factor * nearYellow.Item2));
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             redC.Run(src);
             dst2 = redC.dst2;
             var rc = vbc.task.rc;
@@ -54143,7 +54147,7 @@ namespace CS_Classes
             if (vbc.task.WorkingRes != new cv.Size(168, 94)) vbc.task.frameHistoryCount = 1;
             desc = "Get stats on each RedCloud cell.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             stats.Run(src);
@@ -54171,7 +54175,7 @@ namespace CS_Classes
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Identify and track the lines in an image as RedCloud Cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             if (vbc.task.heartBeat || vbc.task.motionFlag) dst3.SetTo(0);
@@ -54216,7 +54220,7 @@ namespace CS_Classes
             }
             return bestIndex;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             track.Run(src);
             dst0 = track.redC.dst0;
@@ -54270,7 +54274,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Output of Feature_Basics", "Grid of points to measure motion." };
             desc = "Use KNN with the good features in the image to create a grid of points";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             dst2 = feat.dst2;
@@ -54302,7 +54306,7 @@ namespace CS_Classes
             FindSlider("Feature Sample Size").Value = 100;
             desc = "Track the cells that have good features";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hulls.Run(src);
             dst2 = hulls.dst2;
@@ -54326,7 +54330,7 @@ namespace CS_Classes
         {
             desc = "Track the cells that have good features";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hulls.Run(src);
             dst2 = hulls.dst2.Clone();
@@ -54366,9 +54370,9 @@ namespace CS_Classes
         {
             desc = "Use KNN to find good features to track";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             feat.Run(src);
             dst2 = feat.dst2;
@@ -54399,7 +54403,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloudX_Track output", "Input to RedCloudX_Track" };
             desc = "Identify and track the end points of lines in an image of RedCloud Cells";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst3.SetTo(0);
@@ -54433,7 +54437,7 @@ namespace CS_Classes
                             "Value Is correlation of x to y in contour points (0 indicates circular.)" };
             desc = "Similar to RedTrack_KNNPoints";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             if (vbc.task.heartBeat) dst2.SetTo(0);
@@ -54466,7 +54470,7 @@ namespace CS_Classes
             vbc.task.redOptions.enableReductionSliders(true);
             desc = "Reduction: a simpler way to KMeans by reducing color resolution";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -54510,7 +54514,7 @@ namespace CS_Classes
             vbc.task.redOptions.setBitReductionBar(32);
             desc = "Use the reduction output as input to floodfill to get masks of cells.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount);
@@ -54536,7 +54540,7 @@ namespace CS_Classes
             labels[3] = "Gravity rotated Top View width detected lines";
             desc = "Present both the top and side view to minimize pixel counts.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             heat.Run(src);
@@ -54564,7 +54568,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "8-bit reduced depth", "Palettized output of the different depth levels found" };
             desc = "Use reduction to smooth depth data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pcSplit[2];
             src *= 255 / vbc.task.MaxZmeters;
@@ -54589,9 +54593,9 @@ namespace CS_Classes
             vbc.task.redOptions.setBitReductionBar(400);
             desc = "Use reduction to slice the point cloud in 3 dimensions";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             Mat[] split = src.Split();
@@ -54624,7 +54628,7 @@ namespace CS_Classes
             vbc.task.redOptions.checkSimpleReduction(true); ;
             desc = "Get the edges after reducing the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst2 = reduction.dst2 * 255 / reduction.classCount;
@@ -54651,7 +54655,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Reduction image", "Histogram of the reduction" };
             desc = "Visualize a reduction with a histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst2 = reduction.dst2 * 255 / reduction.classCount;
@@ -54672,7 +54676,7 @@ namespace CS_Classes
         {
             desc = "Reduce BGR image in parallel";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat[] split = src.Split();
             for (int i = 0; i <= 2; i++)
@@ -54721,7 +54725,7 @@ namespace CS_Classes
             }
             desc = "Use remap to reflect an image in 4 directions.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             labels[2] = new[] { "Remap_Basics_CS - original", "Remap vertically", "Remap horizontally", "Remap horizontally and vertically" }[direction];
             switch (direction)
@@ -54757,7 +54761,7 @@ namespace CS_Classes
         {
             desc = "Use flip to remap an image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             labels[2] = new[] { "Remap_Flip_CS - original", "Remap_Flip_CS - flip horizontal", "Remap_Flip_CS - flip vertical", "Remap_Flip_CS - flip horizontal and vertical" }[direction];
             switch (direction)
@@ -54793,9 +54797,9 @@ namespace CS_Classes
         {
             desc = "Placeholder to make it easy to remember 'Remap'.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            flip.RunVB(src);
+            flip.RunAlg(src);
             dst2 = flip.dst2;
             labels = flip.labels;
         }
@@ -54815,9 +54819,9 @@ namespace CS_Classes
             desc = "Resize with different options and compare them";
             labels[2] = "Rectangle highlight above resized";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.drawRect.Width != 0)
             {
                 src = src[vbc.task.drawRect];
@@ -54838,9 +54842,9 @@ namespace CS_Classes
         {
             desc = "Resize by a percentage of the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             newSize = new cv.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
             dst2 = src.Resize(newSize, 0, 0, options.warpFlag);
             labels[2] = "Image after resizing to: " + newSize.Width + "X" + newSize.Height;
@@ -54861,9 +54865,9 @@ namespace CS_Classes
             FindSlider("Resize Percentage (%)").Minimum = 100;
             desc = "Decrease the size but preserve the full image size.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             newSize = new cv.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
             dst0 = src.Resize(newSize, 0, 0, InterpolationFlags.Nearest).SetTo(0);
             var rect = new cv.Rect(options.topLeftOffset, options.topLeftOffset, dst2.Width, dst2.Height);
@@ -54883,11 +54887,11 @@ namespace CS_Classes
         {
             desc = "Resize the input but keep the results proportional to the original.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
-                options.RunVB();
+                options.RunOpt();
                 dst2 = options.runRedCloud(ref labels[2]);
                 src = src[vbc.task.rc.rect];
             }
@@ -54924,9 +54928,9 @@ namespace CS_Classes
             labels[3] = "Retina Magno";
             desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.xmlCheck)
             {
                 var fileinfo = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), "RetinaDefaultParameters.xml"));
@@ -54995,7 +54999,7 @@ namespace CS_Classes
             labels[2] = "Last result || current result";
             labels[3] = "Current depth motion result";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             retina.Run(vbc.task.depthRGB);
             dst3 = retina.dst3;
@@ -55019,7 +55023,7 @@ namespace CS_Classes
             vbc.task.gOptions.pixelDiffThreshold = 30;
             desc = "Find the motion ROI in the latest image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             diff.Run(src);
             dst2 = diff.dst2;
@@ -55050,7 +55054,7 @@ namespace CS_Classes
             vbc.task.gOptions.pixelDiffThreshold = 30;
             desc = "Find the motion ROI in just the latest image - eliminate single pixels";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             diff.Run(src);
             dst2 = diff.dst2;
@@ -55101,9 +55105,9 @@ namespace CS_Classes
             vbc.task.gOptions.pixelDiffThreshold = 30;
             desc = "Accumulate pixels in a motion ROI - all pixels that are different by X";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (aoiRect.Width * aoiRect.Height > src.Total() * options.roiPercent || vbc.task.optionsChanged)
             {
                 dst0 = vbc.task.color;
@@ -55154,9 +55158,9 @@ namespace CS_Classes
             vbc.task.gOptions.pixelDiffThreshold = 30;
             desc = "Accumulate pixels in a motion ROI until the size is x% of the total image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             SetTrueText(traceName + " is the same as ROI_AccumulateOld_CS but simpler.", 3);
             if (roiRect.Width * roiRect.Height > src.Total() * options.roiPercent || vbc.task.optionsChanged)
             {
@@ -55199,10 +55203,10 @@ namespace CS_Classes
             rotateCenter = new Point2f(dst2.Width / 2, dst2.Height / 2);
             desc = "Rotate a rectangle by a specified angle";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            optionsRotate.RunVB();
+            options.RunOpt();
+            optionsRotate.RunOpt();
             rotateAngle = optionsRotate.rotateAngle;
             M = Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1);
             dst2 = src.WarpAffine(M, src.Size(), options.warpFlag);
@@ -55226,7 +55230,7 @@ namespace CS_Classes
             rotateCenter = new Point2f(dst2.Width / 2, dst2.Height / 2);
             desc = "Rotate a rectangle by a specified angle";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var M = Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1);
             dst2 = src.WarpAffine(M, src.Size(), InterpolationFlags.Nearest);
@@ -55246,7 +55250,7 @@ namespace CS_Classes
             labels[3] = "Same Rectangle in the new warped perspective";
             desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             rotation.Run(src);
             dst3 = dst2.Clone();
@@ -55289,9 +55293,9 @@ namespace CS_Classes
             labels = new[] { "", "", "Triangle before rotation", "Triangle after rotation" };
             desc = "Rotate a triangle around a center of rotation";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            optionsFPoly.RunVB();
+            optionsFPoly.RunOpt();
             if (options.changeCheck.Checked || vbc.task.FirstPass)
             {
                 rPoly.Clear();
@@ -55307,7 +55311,7 @@ namespace CS_Classes
             rotateQT.Run(src);
             dst2 = rotateQT.dst3;
             DrawCircle(dst2, rotateQT.rotateCenter, vbc.task.DotSize + 2, Scalar.Yellow);
-            SetTrueText("center of rotation", rotateQT.rotateCenter);
+            SetTrueText("center of rotation", new cv.Point(rotateQT.rotateCenter.X, rotateQT.rotateCenter.Y));
             labels[3] = rotateQT.labels[3];
         }
     }
@@ -55325,7 +55329,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Polygon before rotation", "" };
             desc = "Rotate a triangle around a center of rotation";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -55376,7 +55380,7 @@ namespace CS_Classes
             rotate.rotateAngle = -90;
             desc = "Reminder on how to rotate an image and keep all the pixels.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             cv.Rect r = new cv.Rect(0, 0, src.Height, src.Height);
             dst2[r] = src.Resize(new cv.Size(src.Height, src.Height));
@@ -55411,7 +55415,7 @@ namespace CS_Classes
             yNew += center.Y;
             return new Point2f((float)xNew, (float)yNew);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             rotate.Run(src);
             dst2 = rotate.dst2.Clone();
@@ -55444,9 +55448,9 @@ namespace CS_Classes
             cPtr = Salience_Open();
             desc = "Show results of Salience algorithm when using C++";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (src.Total() != grayData.Length) Array.Resize(ref grayData, (int)src.Total());
             GCHandle grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned);
@@ -55472,7 +55476,7 @@ namespace CS_Classes
             FindSlider("Salience numScales").Value = 2;
             desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             int threads = 32;
@@ -55507,7 +55511,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud output", "Selected Cell showing the various extrema." };
             desc = "Find the 6 extrema and the 4 farthest points in each quadrant for the selected RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sides.Run(src);
             dst2 = sides.dst2;
@@ -55539,7 +55543,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud_Basics Output", "Selected Cell" };
             desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -55561,7 +55565,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud_Basics output", "" };
             desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -55583,7 +55587,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedColor Output", "Cell Extrema" };
             desc = "Find the extrema - top/bottom, left/right, near/far - points for a RedColor Cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -55611,7 +55615,7 @@ namespace CS_Classes
             labels[3] = "Zoom output";
             desc = "Create an image marking primes";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int numCeiling = numArray.Length - 1;
             Array.Resize(ref numArray, numCeiling + 1);
@@ -55666,7 +55670,7 @@ namespace CS_Classes
             }
             desc = "Plot the data used in SLR_Basics";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             plot.srcX = dataX;
             plot.srcY = dataY;
@@ -55685,7 +55689,7 @@ namespace CS_Classes
         {
             desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             surface.Run(src);
             dst2 = surface.dst3;
@@ -55717,7 +55721,7 @@ namespace CS_Classes
             DrawLine(dst, lastPoint, p1, Scalar.Yellow, vbc.task.lineWidth + 1);
             lastPoint = p1;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             labels[2] = "Grayscale histogram - yellow line shows trend";
             hist.plot.backColor = Scalar.Red;
@@ -55760,9 +55764,9 @@ namespace CS_Classes
         {
             desc = "Find trends by filling in short histogram gaps for depth or 1-channel images";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat[] split = src.Split();
             trends.hist.plot.maxRange = 255;
             trends.hist.plot.removeZeroEntry = false; // default is to look at element 0....
@@ -55843,9 +55847,9 @@ namespace CS_Classes
             labels[3] = "";
             desc = "Smoothing the line connecting a series of points.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            smOptions.RunVB();
+            smOptions.RunOpt();
             if (standaloneTest())
             {
                 if (vbc.task.heartBeat && !vbc.task.paused)
@@ -55921,9 +55925,9 @@ namespace CS_Classes
             labels[3] = "";
             desc = "Smoothing the line connecting a series of points staying inside the outline.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            smOptions.RunVB();
+            smOptions.RunOpt();
             if (standaloneTest())
             {
                 if (vbc.task.heartBeat && !vbc.task.paused)
@@ -55964,7 +55968,7 @@ namespace CS_Classes
         {
             desc = "Solve a set of equations with OpenCV's Solve API.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             // x + y = 10
             // 2x + 3y = 26
@@ -55988,7 +55992,7 @@ namespace CS_Classes
         {
             desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  ";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             // x + y = 10
             // 2x + 3y = 26
@@ -56011,9 +56015,9 @@ namespace CS_Classes
         {
             desc = "Sort the pixels of a grayscale image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (options.radio5.Checked)
             {
                 src = src.Reshape(1, src.Rows * src.Cols);
@@ -56044,7 +56048,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.drawRect = new cv.Rect(10, 10, 50, 5);
             desc = "Sort the grayscale image portion in a rect while allowing for a mask.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             var tmpRect = rect == new cv.Rect() ? vbc.task.drawRect : rect;
@@ -56073,7 +56077,7 @@ namespace CS_Classes
             cPtr = Sort_MLPrepTest_Open();
             desc = "Prepare the grayscale image and row to predict depth";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             reduction.Run(src);
@@ -56113,7 +56117,7 @@ namespace CS_Classes
             labels = new[] { "", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates" };
             desc = "Take some 1-channel input, sort it, and provide the list of unique elements";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             dst1 = src.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
@@ -56169,7 +56173,7 @@ namespace CS_Classes
             labels = new[] { "", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data" };
             desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             if (standaloneTest()) inputMask = inputMask.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
@@ -56201,7 +56205,7 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize(8);
             desc = "Sort all the featureless grayscale pixels.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             devGrid.Run(src);
             dst2 = devGrid.dst2;
@@ -56231,7 +56235,7 @@ namespace CS_Classes
             labels = new string[] { "", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates" };
             desc = "Take some 1-channel input, sort it, and provide the list of unique elements";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standalone)
             {
@@ -56265,7 +56269,7 @@ namespace CS_Classes
         {
             desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             byte[] gray = new byte[dst1.Total()];
@@ -56303,7 +56307,7 @@ namespace CS_Classes
         {
             desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat[] split = src.Split();
             for (int i = 0; i < 3; i++)
@@ -56337,7 +56341,7 @@ namespace CS_Classes
         {
             desc = "Given a RedCloud cell, create a spectrum that contains the ranges of the depth and color.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = options.runRedCloud(ref labels[2]);
             dSpec.Run(src);
@@ -56360,9 +56364,9 @@ namespace CS_Classes
         {
             desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
             if (vbc.task.heartBeat && vbc.task.rc.index > 0)
             {
@@ -56383,9 +56387,9 @@ namespace CS_Classes
         {
             desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
             if (vbc.task.heartBeat && vbc.task.rc.index > 0)
             {
@@ -56406,9 +56410,9 @@ namespace CS_Classes
         {
             desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
             if (vbc.task.heartBeat && vbc.task.rc.index > 0)
             {
@@ -56432,9 +56436,9 @@ namespace CS_Classes
         {
             desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
             if (vbc.task.heartBeat)
             {
@@ -56461,9 +56465,9 @@ namespace CS_Classes
         {
             desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
             if (vbc.task.heartBeat)
             {
@@ -56487,9 +56491,9 @@ namespace CS_Classes
         {
             desc = "Create a spectrum of the RGB values for a given RedCloud cell.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
             var split = src.Split();
             gSpec.typeSpec = " blue ";
@@ -56518,9 +56522,9 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            breakdown.options.RunVB();
+            breakdown.options.RunOpt();
             dst2 = breakdown.options.runRedCloud(ref labels[2]);
             if (vbc.task.heartBeat)
             {
@@ -56546,11 +56550,11 @@ namespace CS_Classes
         {
             desc = "Breakdown a cell if possible.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
-                options.RunVB();
+                options.RunOpt();
                 dst2 = options.runRedCloud(ref labels[2]);
             }
             var rc = vbc.task.rc;
@@ -56619,9 +56623,9 @@ namespace CS_Classes
         {
             desc = "Breakdown each cell in redCells.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            breakdown.options.RunVB();
+            breakdown.options.RunOpt();
             dst2 = breakdown.options.runRedCloud(ref labels[2]);
             redCells.Clear();
             dst3.SetTo(0);
@@ -56649,7 +56653,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Create a mask from the Spectrum ranges";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             gSpec.Run(src);
             dst1 = gSpec.dst2;
@@ -56669,9 +56673,9 @@ namespace CS_Classes
         {
             desc = "Given a RedCloud cell, create a spectrum that contains the color ranges.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest()) dst2 = options.runRedCloud(ref labels[2]);
             var input = src[vbc.task.rc.rect];
             if (input.Type() != MatType.CV_8U) input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
@@ -56700,9 +56704,9 @@ namespace CS_Classes
             labels[2] = "Current frame - rectangle input to matchTemplate";
             desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             bool resetImage = false;
             templateRect = new cv.Rect(src.Width / 2 - options.width / 2, src.Height / 2 - options.height / 2,
                                         options.width, options.height);
@@ -56779,7 +56783,7 @@ namespace CS_Classes
             labels[2] = "Unstable input to Stabilizer_Basics";
             desc = "Test the Stabilizer_Basics with random movement";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             random.Run(src);
             stable.Run(random.dst3.Clone());
@@ -56807,7 +56811,7 @@ namespace CS_Classes
             desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!";
             labels[2] = "Stabilized Image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             double vert_Border = borderCrop * src.Rows / src.Cols;
             if (vbc.task.optionsChanged)
@@ -56907,7 +56911,7 @@ namespace CS_Classes
         {
             desc = "Use the IMU angular velocity to determine if the camera is moving or stable.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             angleXValue.Add(vbc.task.accRadians.X);
             angleYValue.Add(vbc.task.accRadians.Y);
@@ -56963,9 +56967,9 @@ namespace CS_Classes
                 features.Add(new Point2f(kp.Pt.X + r.X, kp.Pt.Y + r.Y));
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             if (vbc.task.optionsChanged)
             {
@@ -57004,9 +57008,9 @@ namespace CS_Classes
             labels[3] = "Image after shift";
             desc = "Generate images that have been arbitrarily shifted";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat input = src;
             if (input.Channels() != 1) input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             int shiftX = msRNG.Next(-options.range, options.range);
@@ -57051,7 +57055,7 @@ namespace CS_Classes
         {
             desc = "Maintain the generation counts around the feature points.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -57062,8 +57066,9 @@ namespace CS_Classes
             if (facetGen.inputPoints.Count() == 0) return; // nothing to work on ...
             ptList.Clear();
             List<int> generations = new List<int>();
-            foreach (var pt in facetGen.inputPoints)
+            foreach (var ptf in facetGen.inputPoints)
             {
+                cv.Point pt = new cv.Point(ptf.X, ptf.Y);
                 int fIndex = facetGen.facet.facet32s.Get<int>((int)pt.Y, (int)pt.X);
                 if (fIndex >= facetGen.facet.facetList.Count()) continue; // new point
                 int g = facetGen.dst0.Get<int>((int)pt.Y, (int)pt.X);
@@ -57104,7 +57109,7 @@ namespace CS_Classes
         {
             desc = "Track the stable good features found in the BGR image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             basics.facetGen.inputPoints = new List<cv.Point2f>(vbc.task.features);
@@ -57115,7 +57120,7 @@ namespace CS_Classes
             int g;
             for (int i = 0; i < basics.ptList.Count(); i++)
             {
-                var pt = basics.ptList[i];
+                cv.Point pt = new cv.Point(basics.ptList[i].X, basics.ptList[i].Y);
                 DrawCircle(dst2, pt, vbc.task.DotSize, vbc.task.HighlightColor);
                 g = basics.facetGen.dst0.Get<int>((int)pt.Y, (int)pt.X);
                 goodCounts.Add(g, i);
@@ -57137,7 +57142,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Track the line end points found in the BGR image and keep those that are stable.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             basics.facetGen.inputPoints.Clear();
@@ -57151,8 +57156,9 @@ namespace CS_Classes
             basics.Run(src);
             dst2 = basics.dst2;
             dst3 = basics.dst3;
-            foreach (var pt in basics.ptList)
+            foreach (var ptf in basics.ptList)
             {
+                cv.Point pt = new cv.Point(ptf.X, ptf.Y);
                 DrawCircle(dst2, pt, vbc.task.DotSize + 1, vbc.task.HighlightColor);
                 if (standaloneTest())
                 {
@@ -57177,7 +57183,7 @@ namespace CS_Classes
             FindSlider("FAST Threshold").Value = 100;
             desc = "Track the FAST feature points found in the BGR image and track those that appear stable.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             fast.Run(src);
             basics.facetGen.inputPoints.Clear();
@@ -57185,8 +57191,9 @@ namespace CS_Classes
             basics.Run(src);
             dst3 = basics.dst3;
             dst2 = basics.dst2;
-            foreach (var pt in basics.ptList)
+            foreach (var ptf in basics.ptList)
             {
+                cv.Point pt = new cv.Point(ptf.X, ptf.Y);
                 DrawCircle(dst2, pt, vbc.task.DotSize + 1, vbc.task.HighlightColor);
                 if (standaloneTest())
                 {
@@ -57212,7 +57219,7 @@ namespace CS_Classes
             dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Track the stable good features found in the BGR image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(src);
             dst3 = basics.dst3;
@@ -57224,7 +57231,7 @@ namespace CS_Classes
             genSorted.Clear();
             for (int i = 0; i < basics.ptList.Count(); i++)
             {
-                var pt = basics.ptList[i];
+                cv.Point pt = new cv.Point(basics.ptList[i].X, basics.ptList[i].Y);
                 if (standaloneTest()) DrawCircle(dst2, pt, vbc.task.DotSize + 1, Scalar.Yellow);
                 dst1.Set<byte>((int)pt.Y, (int)pt.X, 255);
                 int g = basics.facetGen.dst0.Get<int>((int)pt.Y, (int)pt.X);
@@ -57247,9 +57254,9 @@ namespace CS_Classes
         {
             desc = "Stitch together random parts of a color image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             List<Mat> mats = new List<Mat>();
             dst2 = src.Clone();
             for (int i = 0; i < options.imageCount; i++)
@@ -57301,9 +57308,9 @@ namespace CS_Classes
         {
             desc = "Using the mask for the floor create a better representation of the floor plane";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             floor.Run(src);
             dst2 = floor.dst2;
             dst3 = floor.dst3;
@@ -57389,9 +57396,9 @@ namespace CS_Classes
         {
             desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int stepSize = options.stepSize;
             heat.Run(src);
             split = vbc.task.pointCloud.Split();
@@ -57438,7 +57445,7 @@ namespace CS_Classes
         {
             desc = "Detect lines in the multiSlice output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             multi.Run(src);
             dst3 = multi.dst3;
@@ -57459,7 +57466,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Use mouse to explore slices", "Top down view of the highlighted slice (at left)" };
             desc = "Use the structured depth to enhance the depth away from the centerline.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             sliceH.Run(src);
             dst0 = sliceH.dst3;
@@ -57544,9 +57551,9 @@ namespace CS_Classes
             }
             return output;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             float metersPerPixel = vbc.task.MaxZmeters / dst3.Height;
             thickness = options.sliceSize * metersPerPixel;
             heat.Run(src);
@@ -57579,9 +57586,9 @@ namespace CS_Classes
         {
             desc = "Attempt to impose a structure on the point cloud data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Mat input = src;
             if (input.Type() != MatType.CV_32F) input = vbc.task.pcSplit[2];
             float stepX = dst2.Width / options.xLines;
@@ -57635,9 +57642,9 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize(10);
             desc = "Attempt to impose a linear structure on the pointcloud.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int yLines = (int)(options.xLines * dst2.Height / dst2.Width);
             float stepX = dst3.Width / options.xLines;
             float stepY = dst3.Height / yLines;
@@ -57670,7 +57677,7 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize(10);
             desc = "Simplify the point cloud so it can be represented as quads in OpenGL";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             foreach (var roi in vbc.task.gridList)
@@ -57697,7 +57704,7 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize(10);
             desc = "Use the OpenGL point size to represent the point cloud as data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hulls.Run(src);
             dst2 = hulls.dst3;
@@ -57742,7 +57749,7 @@ namespace CS_Classes
             counts.Add(sliceMask.CountNonZero());
             return sliceMask;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             slice.Run(src);
             dst1 = slice.dst3.Clone();
@@ -57775,7 +57782,7 @@ namespace CS_Classes
         {
             desc = "Find the lines in the Structured_MultiSlice algorithm output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             mStruct.Run(src);
             dst2 = mStruct.dst2;
@@ -57803,7 +57810,7 @@ namespace CS_Classes
             FindCheckBox("Top View (Unchecked Side View)").Checked = false;
             desc = "Find the floor or ceiling plane";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             slice.Run(src);
             dst2 = slice.heat.dst3;
@@ -57871,9 +57878,9 @@ namespace CS_Classes
             FindCheckBox("Top View (Unchecked Side View)").Checked = false;
             desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int stepsize = options.stepSize;
             heat.Run(src);
             dst3 = heat.dst3;
@@ -57908,9 +57915,9 @@ namespace CS_Classes
             FindCheckBox("Top View (Unchecked Side View)").Checked = true;
             desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int stepsize = options.stepSize;
             heat.Run(src);
             dst3 = heat.dst2;
@@ -57944,9 +57951,9 @@ namespace CS_Classes
         {
             desc = "Find any plane around a peak value in the top-down histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             multi.Run(src);
             dst3 = multi.heat.dst2;
             int col = (vbc.task.mouseMovePoint.X == 0) ? dst2.Width / 2 : vbc.task.mouseMovePoint.X;
@@ -57977,9 +57984,9 @@ namespace CS_Classes
         {
             desc = "Find any plane around a peak value in the side view histogram";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             multi.Run(src);
             dst3 = multi.heat.dst3;
             int row = vbc.task.mouseMovePoint.Y == 0 ? dst2.Height / 2 : vbc.task.mouseMovePoint.Y;
@@ -58013,7 +58020,7 @@ namespace CS_Classes
             labels[3] = "White = SliceV output, Red Dot is avgPt";
             desc = "Find the vertical center line with accurate depth data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.mouseMovePoint == new cv.Point()) vbc.task.mouseMovePoint = new cv.Point(dst2.Width / 2, dst2.Height);
             slice.Run(src);
@@ -58055,9 +58062,9 @@ namespace CS_Classes
             FindCheckBox("Top View (Unchecked Side View)").Checked = false;
             desc = "Create slices in top and side views";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             bool topView = FindCheckBox("Top View (Unchecked Side View)").Checked;
             int sliceVal = topView ? vbc.task.mouseMovePoint.X : vbc.task.mouseMovePoint.Y;
             heat.Run(src);
@@ -58115,7 +58122,7 @@ namespace CS_Classes
         }
         public Mat createSliceMaskH()
         {
-            options.RunVB();
+            options.RunOpt();
             Mat sliceMask = new Mat();
             int ycoordinate = vbc.task.mouseMovePoint.Y == 0 ? dst2.Height / 2 : vbc.task.mouseMovePoint.Y;
             double planeY = -vbc.task.yRange * (vbc.task.sideCameraPoint.Y - ycoordinate) / vbc.task.sideCameraPoint.Y;
@@ -58129,7 +58136,7 @@ namespace CS_Classes
             if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, vbc.task.noDepthMask);
             return sliceMask;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat sliceMask = createSliceMaskH();
             histTop.Run(vbc.task.pointCloud.SetTo(0, ~sliceMask));
@@ -58156,7 +58163,7 @@ namespace CS_Classes
         }
         public Mat createSliceMaskV()
         {
-            options.RunVB();
+            options.RunOpt();
             Mat sliceMask = new Mat();
             if (vbc.task.mouseMovePoint == new cv.Point()) vbc.task.mouseMovePoint = new cv.Point(dst2.Width / 2, dst2.Height);
             int xCoordinate = vbc.task.mouseMovePoint.X == 0 ? dst2.Width / 2 : vbc.task.mouseMovePoint.X;
@@ -58171,7 +58178,7 @@ namespace CS_Classes
             if (minVal < 0 && maxVal > 0) sliceMask.SetTo(0, vbc.task.noDepthMask);
             return sliceMask;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat sliceMask = createSliceMaskV();
             histSide.Run(vbc.task.pointCloud.SetTo(0, ~sliceMask));
@@ -58203,7 +58210,7 @@ namespace CS_Classes
             labels = new string[] { "", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice" };
             desc = "Count the number of pixels found in each slice of the point cloud data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             slice.Run(src);
             dst2 = slice.dst3;
@@ -58246,7 +58253,7 @@ namespace CS_Classes
             labels = new string[] { "", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice" };
             desc = "Count the number of points found in each slice of the point cloud data.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Cv2.CalcHist(new Mat[] { vbc.task.pointCloud }, vbc.task.channelsSide, new Mat(), dst2, 2, vbc.task.bins2D, vbc.task.rangesSide);
             dst2.Col(0).SetTo(0);
@@ -58304,9 +58311,9 @@ namespace CS_Classes
             FindCheckBox("Top View (Unchecked Side View)").Checked = true;
             desc = "Find and isolate planes using the top view histogram data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.mouseMovePoint == new cv.Point()) vbc.task.mouseMovePoint = new cv.Point(dst2.Width / 2, dst2.Height);
             int xCoordinate = (vbc.task.mouseMovePoint.X == 0) ? dst2.Width / 2 : vbc.task.mouseMovePoint.X;
             heat.Run(src);
@@ -58344,9 +58351,9 @@ namespace CS_Classes
         {
             desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             heat.Run(src);
             if (standaloneTest()) ycoordinate = (vbc.task.mouseMovePoint.Y == 0) ? dst2.Height / 2 : vbc.task.mouseMovePoint.Y;
             float sliceY = -vbc.task.yRange * (vbc.task.sideCameraPoint.Y - ycoordinate) / vbc.task.sideCameraPoint.Y;
@@ -58384,7 +58391,7 @@ namespace CS_Classes
             labels[3] = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice.";
             desc = "Mark each horizontal slice with a separate color.  Y-Range determines how thick the slice is.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             Cv2.CalcHist(new Mat[] { src }, vbc.task.channelsSide, new Mat(), dst3, 2, vbc.task.bins2D, vbc.task.rangesSide);
@@ -58430,7 +58437,7 @@ namespace CS_Classes
             labels[3] = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice.";
             desc = "Mark each vertical slice with a separate color.  X-Range determines how thick the slice is.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Type() != MatType.CV_32FC3) src = vbc.task.pointCloud;
             Cv2.CalcHist(new Mat[] { src }, vbc.task.channelsTop, new Mat(), dst3, 2, vbc.task.bins2D, vbc.task.rangesTop);
@@ -58476,9 +58483,9 @@ namespace CS_Classes
             labels[3] = "ApproxPolyDP 4-corner object from FindContours input";
             desc = "Detect polygons in the multiSlice output";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             multi.Run(src);
             dst2 = ~multi.dst3;
             cv.Point[][] rawContours = Cv2.FindContoursAsArray(dst2, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
@@ -58510,7 +58517,7 @@ namespace CS_Classes
         {
             desc = "Connect vertical and horizontal dots that are in the same column and row.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int xLines = sCloud.options.indexX;
             int yLines = (int)(xLines * dst2.Width / dst2.Height);
@@ -58585,7 +58592,7 @@ namespace CS_Classes
             labels[2] = "Super Pixel cells";
             desc = "A Better superpixel algorithm";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -58610,9 +58617,9 @@ namespace CS_Classes
             labels[3] = "Superpixel label data (0-255)";
             desc = "Sub-divide the image into super pixels.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.optionsChanged)
             {
                 if (cPtr != (IntPtr)0) SuperPixel_Close(cPtr);
@@ -58654,7 +58661,7 @@ namespace CS_Classes
             FindSlider("Number of SuperPixels").Value = 20; // find the top 20 super pixels.
             desc = "Create SuperPixels from a binary image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             binarize.Run(src);
             pixels.Run(binarize.dst2);
@@ -58674,7 +58681,7 @@ namespace CS_Classes
         {
             desc = "Create SuperPixels using RGBDepth image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             pixels.Run(vbc.task.depthRGB);
             dst2 = pixels.dst2;
@@ -58693,7 +58700,7 @@ namespace CS_Classes
         {
             desc = "Create SuperPixels using RGBDepth image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             edges.Run(src);
             src = vbc.task.color.Clone();
@@ -58718,7 +58725,7 @@ namespace CS_Classes
             labels[3] = "Input to superpixel basics.";
             desc = "Create SuperPixels using RGBDepth image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             lines.Run(src);
             dst3 = lines.dst2;
@@ -58743,7 +58750,7 @@ namespace CS_Classes
             labels[3] = "SuperRes output";
             desc = "Create superres version of the video input";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (warningMessage > 0)
             {
@@ -58751,7 +58758,7 @@ namespace CS_Classes
                 warningMessage -= 1;
                 return;
             }
-            options.RunVB();
+            options.RunOpt();
             if (options.restartWithNewOptions)
             {
                 warningMessage = 10;
@@ -58807,7 +58814,7 @@ namespace CS_Classes
             inputFileName = video.options.fileInfo.FullName;
             desc = "Input data for the superres testing";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             video.Run(empty);
             dst2 = video.dst2;
@@ -58826,7 +58833,7 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             desc = "Is SuperRes better than just zoom with sub-pixel accuracy?";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             vbc.task.mouseMovePoint = new cv.Point(45, 60);
             video.Run(empty);
@@ -58848,7 +58855,7 @@ namespace CS_Classes
         {
             desc = "SVD example";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             float[] inputData = {
         1, 2, 3, 4, 5,
@@ -58886,7 +58893,7 @@ namespace CS_Classes
         {
             desc = "Compute the mean and tangent of a RedCloud Cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -58936,7 +58943,7 @@ namespace CS_Classes
         {
             desc = "Compute the SVD for the covariance of 2 images - only close to working...";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             covar.Run(src);
             dst2 = src;
@@ -58999,9 +59006,9 @@ namespace CS_Classes
             if (standaloneTest()) vbc.task.gOptions.setGridSize(8);
             labels = new string[] { "", "", "SVM_Basics_CS input data", "Results - white line is ground truth" };
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB(); // update any options specified in the interface.
+            options.RunOpt(); // update any options specified in the interface.
             if (standaloneTest())
             {
                 sampleData.Run(src);
@@ -59057,9 +59064,9 @@ namespace CS_Classes
         {
             return x + 50 * Math.Sin(x / 15.0);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2.SetTo(0);
             points.Clear();
             responses.Clear();
@@ -59097,9 +59104,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "Input points - color is the category label", "Predictions" };
             desc = "Text book example on SVM";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2.SetTo(Scalar.White);
             dst3.SetTo(0);
             int labeled = 1;
@@ -59157,7 +59164,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Input points", "Predictions" };
             desc = "Text book example on SVM";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int labeled = 1;
             int nonlabel = -1;
@@ -59205,9 +59212,9 @@ namespace CS_Classes
             labels[2] = "SVM Training data - draw a rectangle anywhere to test further.";
             desc = "Use SVM to classify random points - testing if height must equal width - needs more work";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            svm.options.RunVB();
+            svm.options.RunOpt();
             var rect = vbc.task.drawRect;
             var contour = new List<cv.Point>();
             contour.Clear();
@@ -59299,9 +59306,9 @@ namespace CS_Classes
                 }
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             feat.Run(src);
             dst3 = feat.dst2;
@@ -59367,7 +59374,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Left view feature points", "Right view feature points" };
             desc = "Double the votes on motion by collecting features for both left and right images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             feat.Run(vbc.task.leftView);
             leftList = new List<cv.Point2f>(vbc.task.features);
@@ -59396,7 +59403,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Left view feature points", "Right view feature points" };
             desc = "Get direction and distance from the left and right images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             swarm.Run(vbc.task.leftView);
             leftDistance = swarm.distanceAvg;
@@ -59429,7 +59436,7 @@ namespace CS_Classes
             vbc.task.redOptions.setIdentifyCells(true);
             desc = "Floodfill the color image using the swarm outline as a mask";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             swarm.Run(src);
             cvt.Run(src);
@@ -59453,9 +59460,9 @@ namespace CS_Classes
         {
             desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             swarm.Run(src);
             dst2 = swarm.dst2;
             dst3.SetTo(0);
@@ -59499,7 +59506,7 @@ namespace CS_Classes
             flood.Run(cvt.dst2);
             return flood.dst2;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (!vbc.task.heartBeat) return;
             dst2 = runRedCloud(src).Clone();
@@ -59520,7 +59527,7 @@ namespace CS_Classes
         {
             desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             swarm.Run(src);
             dst2 = swarm.dst2;
@@ -59556,9 +59563,9 @@ namespace CS_Classes
             var points2d = new List<cv.Point> { c1, center, c2 };
             return points2d;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            oglOptions.RunVB();
+            oglOptions.RunOpt();
             var ptM = oglOptions.moveAmount;
             var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
             hulls.Run(src);
@@ -59606,7 +59613,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "", "" };
             desc = "Prepare colors and triangles for use in OpenGL Triangle presentation.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             basics.Run(src);
             dst2 = basics.dst2;
@@ -59639,9 +59646,9 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize(20);
             desc = "Prepare to tessellate the point cloud with RedCloud data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            oglOptions.RunVB();
+            oglOptions.RunOpt();
             var ptM = oglOptions.moveAmount;
             var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
             redC.Run(src);
@@ -59684,9 +59691,9 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize(20);
             desc = "Prepare to tessellate the point cloud with RedCloud data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            oglOptions.RunVB();
+            oglOptions.RunOpt();
             var ptM = oglOptions.moveAmount;
             var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
             hulls.Run(src);
@@ -59752,11 +59759,11 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize(20);
             desc = "Prepare to tessellate the point cloud with RedCloud data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
-            oglOptions.RunVB();
+            oglOptions.RunOpt();
             var ptM = oglOptions.moveAmount;
             var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
             if (vbc.task.optionsChanged)
@@ -59843,7 +59850,7 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize(20);
             desc = "Tessellate each quad in point cloud";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged)
             {
@@ -59855,7 +59862,7 @@ namespace CS_Classes
                     depthMaxList.Add(new List<double>());
                 }
             }
-            options.RunVB();
+            options.RunOpt();
             var ptM = options.moveAmount;
             var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
             oglData.Clear();
@@ -59944,7 +59951,7 @@ namespace CS_Classes
             vbc.task.gOptions.setGridSize((int)(dst2.Width / 8));
             desc = "find the best sample 256x256 texture of a mask";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() || src.Channels() != 1)
             {
@@ -59990,9 +59997,9 @@ namespace CS_Classes
         {
             desc = "Find and mark the texture flow in an image - see texture_flow.py";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.Clone();
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -60024,7 +60031,7 @@ namespace CS_Classes
             texture = new Texture_Flow();
             desc = "Display texture flow in the depth data";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             texture.Run(vbc.task.depthRGB);
             dst2 = texture.dst2;
@@ -60043,7 +60050,7 @@ namespace CS_Classes
             texture = new Texture_Flow();
             desc = "Display texture flow in the reduced color image";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(src);
             dst2 = reduction.dst2;
@@ -60067,7 +60074,7 @@ namespace CS_Classes
             texture = new Texture_Basics();
             desc = "Use random shuffling to homogenize a texture sample of what the floor looks like.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -60108,7 +60115,7 @@ namespace CS_Classes
         {
             desc = "Determine the thickness of a RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -60165,7 +60172,7 @@ namespace CS_Classes
                 }
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (thread1 == null)
             {
@@ -60217,7 +60224,7 @@ namespace CS_Classes
                 }
             }
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (thread == null)
             {
@@ -60244,9 +60251,9 @@ namespace CS_Classes
             labels[2] = "Original image";
             desc = "Demonstrate the use of OpenCV's threshold and all its options";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             labels[3] = "Image after thresholding with threshold = " + options.threshold.ToString();
             dst2 = src;
             if (options.inputGray) dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -60271,10 +60278,10 @@ namespace CS_Classes
             labels = new string[] { "", "", "Original input", "Output of AdaptiveThreshold" };
             desc = "Explore what adaptive threshold can do.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            options1.RunVB();
+            options.RunOpt();
+            options1.RunOpt();
             dst2 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src;
             dst3 = dst2.AdaptiveThreshold(255, options1.method, options.thresholdMethod,
                                                options1.blockSize, options1.constantVal);
@@ -60296,9 +60303,9 @@ namespace CS_Classes
             labels = new string[] { "Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection" };
             desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
 
             gradient.Run(empty);
             dst0 = gradient.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -60333,10 +60340,10 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": see local options.");
             desc = "Threshold by channel - use red threshold slider to impact grayscale results.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            optionsColor.RunVB();
+            options.RunOpt();
+            optionsColor.RunOpt();
             if (options.inputGray)
             {
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -60367,7 +60374,7 @@ namespace CS_Classes
             UpdateAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.");
             desc = "Use all the alternative color sources as input to Threshold_ByChannels.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             colorClass.Run(src);
             byChan.Run(colorClass.dst3);
@@ -60390,9 +60397,9 @@ namespace CS_Classes
             if (vbc.task.testAllRunning) vbc.task.drawRect = new cv.Rect(25, 25, 25, 25);
             desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             if (vbc.task.drawRect != saveRect || vbc.task.optionsChanged)
             {
@@ -60435,9 +60442,9 @@ namespace CS_Classes
         {
             desc = "Resize an image based on the slider value.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             int w = (int)(options.resizeFactor * src.Width);
             int h = (int)(options.resizeFactor * src.Height);
             if (options.resizeFactor > 1)
@@ -60469,9 +60476,9 @@ namespace CS_Classes
         {
             desc = "Using 2 point clouds compute the 3D affine transform between them";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             string output = "Use the check boxes to snapshot the different point clouds" + "\n";
             if (vbc.task.testAllRunning)
             {
@@ -60531,9 +60538,9 @@ namespace CS_Classes
         {
             desc = "Rotate and scale and image based on the slider values.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             imageCenter = new Point2f(options.centerX, options.centerY);
             Mat rotationMat = Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale);
             Cv2.WarpAffine(src, dst2, rotationMat, new cv.Size());
@@ -60558,9 +60565,9 @@ namespace CS_Classes
             labels = new string[] { "", "", "View from above the camera", "View from side of the camera" };
             desc = "Show the contents of the transformation matrix";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.transformationMatrix != null)
             {
                 var t = vbc.task.transformationMatrix;
@@ -60600,7 +60607,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth" };
             desc = "Given a contour, convert that contour to a series of triangles";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -60641,7 +60648,7 @@ namespace CS_Classes
             labels = new string[] { "", "Selected cell", "RedCloud_Basics output", "Selected contour" };
             desc = "Given a contour, convert that contour to a series of triangles";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             hulls.Run(src);
             dst2 = hulls.dst2;
@@ -60675,7 +60682,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud_Basics output", "Selected contour - each pixel has depth" };
             desc = "Given a contour, convert that contour to a series of triangles";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst0 = redC.dst0;
@@ -60718,7 +60725,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud_Basics output", "Selected contour - each pixel has depth" };
             desc = "Given a contour, convert that contour to a series of triangles";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -60775,7 +60782,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "RedCloud_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist." };
             desc = "Given a RedCloud cell, resize it and show the points with depth.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             redC.Run(src);
             dst2 = redC.dst2;
@@ -60829,7 +60836,7 @@ namespace CS_Classes
             desc = "Compute Euclidian and Manhattan Distance on a single vector.";
             labels[2] = "Vector Magnitude";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             float[] cVector = { 1, 4, 4, 8 };
             strOut = $"p1 = ({cVector[0]}, {cVector[1]})\t p2 = ({cVector[2]}, {cVector[3]})\n\n";
@@ -60867,9 +60874,9 @@ namespace CS_Classes
             labels[2] = options.fileInfo.Name;
             desc = "Show a video file";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.optionsChanged)
             {
                 captureVideo = new VideoCapture(options.fileInfo.FullName);
@@ -60902,7 +60909,7 @@ namespace CS_Classes
             flow.parentData = this;
             desc = "Count cars in a video file";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             video.Run(src);
             dst2.SetTo(0);
@@ -60949,7 +60956,7 @@ namespace CS_Classes
         {
             desc = "Outline cars with a rectangle";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             video.Run(src);
             if (!video.dst2.Empty())
@@ -60976,7 +60983,7 @@ namespace CS_Classes
             video.Run(dst2);
             desc = "Find area of car outline - example of using minAreaRect";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             video.Run(src);
             if (!video.dst2.Empty())
@@ -61007,7 +61014,7 @@ namespace CS_Classes
         {
             desc = "Find area of car outline - example of using MinEnclosingCircle";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             video.Run(src);
             dst2 = video.dst2;
@@ -61040,9 +61047,9 @@ namespace CS_Classes
             cPtr = Vignetting_Open();
             desc = "C++ version of vignetting for comparison with the VB version.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.ClickPoint != new cv.Point())
                 center = vbc.task.ClickPoint;
             byte[] cppData = new byte[src.Total() * src.ElemSize()];
@@ -61080,9 +61087,9 @@ namespace CS_Classes
             if (x < 0) return 1.27323954 * x + 0.405284735 * x * x;
             return 1.27323954 * x - 0.405284735 * x * x;
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (vbc.task.ClickPoint != new cv.Point())
                 center = vbc.task.ClickPoint;
             double maxDist = new cv.Point(0, 0).DistanceTo(center) * options.radius;
@@ -61122,7 +61129,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Vignetted input - click anywhere to adjust the center of the vignetting.", "The devignetted output - brighter, more vivid colors." };
             desc = "Demonstrate devignetting";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() && defaultImage == null)
             {
@@ -61152,7 +61159,7 @@ namespace CS_Classes
             labels = new string[] { "", "", "Vignetted image", "Devignetted image" };
             desc = "Inject vignetting into the image and then remove it to test devignetting.  Click to relocate the center";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             basics.Run(src);
             dst2 = basics.dst2;
@@ -61173,7 +61180,7 @@ namespace CS_Classes
         {
             desc = "Build a box containing all the 3D points of a RedCloud cell";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest())
             {
@@ -61228,10 +61235,10 @@ namespace CS_Classes
             warpQT = new WarpAffine_BasicsQT_CS();
             desc = "Use WarpAffine to transform input images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
-            optionsWarp.RunVB();
+            options.RunOpt();
+            optionsWarp.RunOpt();
 
             if (standaloneTest() && vbc.task.heartBeat)
             {
@@ -61241,7 +61248,7 @@ namespace CS_Classes
             }
             warpQT.rotateCenter = rotateCenter;
             warpQT.rotateAngle = rotateAngle;
-            warpQT.RunCS(src);
+            warpQT.RunAlg(src);
             labels = warpQT.labels;
             dst2 = warpQT.dst2;
         }
@@ -61258,7 +61265,7 @@ namespace CS_Classes
         {
             desc = "Use WarpAffine to transform input images with no options.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (standaloneTest() && vbc.task.heartBeat)
             {
@@ -61336,7 +61343,7 @@ namespace CS_Classes
             Cv2.WarpPerspective(charImage, charImage, perspectiveTranx, new cv.Size(charImage.Cols, charImage.Rows), InterpolationFlags.Cubic,
                                     BorderTypes.Constant, Scalar.White);
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             string[] characters = { "a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             int charactersSize = characters.Length / characters[0].Length;
@@ -61372,7 +61379,7 @@ namespace CS_Classes
             labels[2] = "Triangles define the affine transform";
             labels[3] = "Image with affine transform applied";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
@@ -61440,11 +61447,11 @@ namespace CS_Classes
             desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image.";
             labels[2] = "Color image with perspective transform applied";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.heartBeat)
             {
-                options.RunVB();
+                options.RunOpt();
                 mRect.inputPoints = options.srcPoints;
                 var roi = new cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6);
                 var smallImage = src.Resize(new cv.Size(roi.Width, roi.Height));
@@ -61494,7 +61501,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Rotated repeatedly 45 degrees - note the blur", "Rotated repeatedly 90 degrees" };
             desc = "Compare an image before and after repeated and equivalent in degrees rotations.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var rect = new cv.Rect(0, 0, dst2.Height, dst2.Height);
             dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -61543,7 +61550,7 @@ namespace CS_Classes
             labels = new[] { "", "", "Rotated repeatedly 45 degrees", "Rotated repeatedly 90 degrees" };
             desc = "Compare an image before and after repeated rotations.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             var input = Cv2.ImRead(vbc.task.HomeDir + "Data/8.jpg", ImreadModes.Color);
             var center = new cv.Point(input.Width / 2, input.Height / 2);
@@ -61591,9 +61598,9 @@ namespace CS_Classes
             labels = new[] { "Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image" };
             desc = "Align the BGR inputs raw images from the Prokudin examples.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest()) ecc.warpInput.Run(src);
             dst0 = ecc.warpInput.rgb[0].Clone();
             dst1 = ecc.warpInput.rgb[1].Clone();
@@ -61643,9 +61650,9 @@ namespace CS_Classes
             labels[3] = "Src2 image aligned to src image";
             desc = "Use FindTransformECC to align 2 images";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             if (standaloneTest())
             {
                 warpInput.Run(src);
@@ -61727,9 +61734,9 @@ namespace CS_Classes
             labels = new[] { "Original Blue plane", "Original Green plane", "Original Red plane", "Naively Aligned image" };
             desc = "Import the misaligned input.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             cv.Rect[] r = {
         new cv.Rect(0, 0, options.pkImage.Width, options.pkImage.Height / 3),
         new cv.Rect(0, options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3),
@@ -61773,9 +61780,9 @@ namespace CS_Classes
         {
             desc = "Essentials of the rotation matrix of WarpPerspective";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src.EmptyClone();
             Cv2.WarpPerspective(src, dst2, options.transformMatrix, dst2.Size(), InterpolationFlags.Cubic | InterpolationFlags.WarpInverseMap);
             SetTrueText("Use sliders to understand impact of WarpPerspective", 3);
@@ -61792,9 +61799,9 @@ namespace CS_Classes
         {
             desc = "Use WarpPerspective to transform input images.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             Point2f[] srcPt = { new Point2f(0, 0), new Point2f(0, src.Height), new Point2f(src.Width, 0), new Point2f(src.Width, src.Height) };
             Point2f[] pts = { new Point2f(0, 0), new Point2f(0, src.Height), new Point2f(src.Width, 0),
                         new Point2f(options.width, options.height) };
@@ -61820,7 +61827,7 @@ namespace CS_Classes
             labels[3] = "Mask for watershed (selected regions).";
             desc = "Watershed API experiment.  Draw on the image to test.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (vbc.task.drawRect.Width > 0 && vbc.task.drawRect.Height > 0)
                 rects.Add(vbc.task.drawRect);
@@ -61883,7 +61890,7 @@ namespace CS_Classes
             labels[3] = "Reduction input to WaterShed";
             desc = "Watershed the depth image using shadow, close, and far points.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             reduction.Run(vbc.task.depthRGB);
             dst3 = reduction.dst3;
@@ -61905,7 +61912,7 @@ namespace CS_Classes
             watershed.UseCorners = true;
             desc = "Watershed the four corners of the depth image.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             watershed.Run(vbc.task.depthRGB);
             dst2 = watershed.dst2;
@@ -61922,7 +61929,7 @@ namespace CS_Classes
         {
             desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src.Clone();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -61952,7 +61959,7 @@ namespace CS_Classes
             labels[2] = "Bm3dDenoising";
             labels[3] = "Difference from Input";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Cv2.EqualizeHist(src, src);
@@ -61974,7 +61981,7 @@ namespace CS_Classes
             desc = "Denoise the depth image with block matching and filtering.";
             labels[3] = "Difference from Input";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             Mat test = new Mat(src.Size(), MatType.CV_8U);
             Mat gray = vbc.task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -61998,9 +62005,9 @@ namespace CS_Classes
             cPtr = xPhoto_OilPaint_Open();
             desc = "Use the xPhoto Oil Painting transform";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
             GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
@@ -62028,9 +62035,9 @@ namespace CS_Classes
             labels[3] = "Repaired result...";
             desc = "Use the xPhoto inpaint to fill in the depth holes";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             dst2 = src;
             Mat mask = basics.drawRandomLine(dst2);
             //InpaintTypes iType = InpaintTypes.FSR_BEST;
@@ -62053,9 +62060,9 @@ namespace CS_Classes
             labels = new string[] { "", "Mask for inpainted repair", "output with inpainted data repaired", "Input to the inpaint C++ algorithm - not working!!!" };
             desc = "Use the xPhoto Oil Painting transform";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            inpVB.options.RunVB();
+            inpVB.options.RunOpt();
             InpaintTypes iType = InpaintTypes.FSR_BEST;
             if (inpVB.options.FSRFast) iType = InpaintTypes.FSR_FAST;
             if (inpVB.options.shiftMap) iType = InpaintTypes.SHIFTMAP;
@@ -62090,7 +62097,7 @@ namespace CS_Classes
             labels[2] = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU.";
             desc = "Find the gravity vector using the perpendicular to the horizon.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             dst2 = src;
             DrawLine(dst2, vbc.task.horizonVec.p1, vbc.task.horizonVec.p2, Scalar.White);
@@ -62118,7 +62125,7 @@ namespace CS_Classes
             stablePoints = new List<Point2f>();
             lastPoints = new List<Point2f>();
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
             int resizeFactor = 1;
             Mat input = new cv.Mat();
@@ -62183,9 +62190,9 @@ namespace CS_Classes
         {
             desc = "Use Radio Buttons to select the different edge algorithms.";
         }
-        public void RunCS(Mat src)
+        public void RunAlg(Mat src)
         {
-            options.RunVB();
+            options.RunOpt();
             switch (options.edgeSelection)
             {
                 case "Canny":

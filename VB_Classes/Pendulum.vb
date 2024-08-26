@@ -13,8 +13,8 @@ Public Class Pendulum_Basics : Inherits VB_Parent
         labels = {"", "", "A double pendulum representation", "Trace of the pendulum end points (p1 and p2)"}
         desc = "Build a double pendulum"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim accumulator As Single
 

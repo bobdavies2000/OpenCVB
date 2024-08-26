@@ -27,8 +27,8 @@ Public Class Gif_Basics : Inherits VB_Parent
             If gifFile.Exists Then My.Computer.FileSystem.DeleteFile(gifFile.FullName)
         End If
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src
 
@@ -60,7 +60,7 @@ Public Class Gif_OpenGL : Inherits VB_Parent
     Public Sub New()
         desc = "Create a GIF for the Model_RedCloud output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         input.Run(src)
 
         dst2 = input.dst3
@@ -88,7 +88,7 @@ Public Class Gif_OpenGLwithColor : Inherits VB_Parent
     Public Sub New()
         desc = "Create a GIF for the Model_RedCloud output and color image at the same time."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         input.Run(src)
 
         Dim r = New cvb.Rect(0, 0, dst2.Height, dst2.Height)
@@ -159,7 +159,7 @@ Public Class Gif_OpenCVB : Inherits VB_Parent
             snapCheck.checked = False
         End If
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         SetTrueText("Results are best when the main form is set to an 'auto-sized' setting.", 3)
         Static snapCheck = FindCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
 

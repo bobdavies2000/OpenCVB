@@ -6,7 +6,7 @@ Public Class Grid_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Create a grid of squares covering the entire image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.mouseClickFlag And Not task.FirstPass Then
             task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
@@ -111,7 +111,7 @@ Public Class Grid_BasicsTest : Inherits VB_Parent
         labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi."}
         If standaloneTest() Then desc = "Validation test for Grid_Basics algorithm"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim mean = cvb.Cv2.Mean(src)
 
         dst2.SetTo(0)
@@ -150,7 +150,7 @@ Public Class Grid_List : Inherits VB_Parent
         labels(2) = "Adjust grid width/height to increase thread count."
         If standaloneTest() Then desc = "List the active threads"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Parallel.ForEach(Of cvb.Rect)(task.gridList,
          Sub(roi)
              dst3(roi).SetTo(0)
@@ -190,8 +190,8 @@ Public Class Grid_Rectangles : Inherits VB_Parent
         task.gridMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32S)
         If standaloneTest() Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.mouseClickFlag Then task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         If task.optionsChanged Then
@@ -246,8 +246,8 @@ Public Class Grid_FPS : Inherits VB_Parent
     Public Sub New()
         desc = "Provide a service that lets any algorithm control its frame rate"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim fps = CInt(task.fpsRate / options.desiredFPS)
         If fps = 0 Then fps = 1
@@ -275,7 +275,7 @@ Public Class Grid_Neighbors : Inherits VB_Parent
         labels = {"", "", "Grid_Basics output", ""}
         desc = "Click any grid element to see its neighbors"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.gridRows <> CInt(dst2.Height / 10) Then
             task.gOptions.setGridSize(CInt(dst2.Height / 10))
             task.gridRows = task.gridSize
@@ -326,7 +326,7 @@ Public Class Grid_Special : Inherits VB_Parent
         gridMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32S)
         desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles.  Specify the Y size."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.optionsChanged Then
             gridWidth = task.gridSize
             gridList.Clear()
@@ -398,7 +398,7 @@ Public Class Grid_QuarterRes : Inherits VB_Parent
         grid.updateTaskGridList = False
         desc = "Provide the grid list for the lowest resolution of the current stream."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static inputSrc As New cvb.Mat(task.quarterRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
         grid.Run(inputSrc)
         gridList = grid.gridList
@@ -420,7 +420,7 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
         UpdateAdvice(traceName + ": goptions 'Grid Square Size' has direct impact.")
         desc = "Find the min and max depth within each grid roi."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If minMaxLocs.Count <> task.gridList.Count Then ReDim minMaxLocs(task.gridList.Count - 1)
         If minMaxVals.Count <> task.gridList.Count Then ReDim minMaxVals(task.gridList.Count - 1)
         Dim mm As mmData
@@ -457,7 +457,7 @@ Public Class Grid_TrackCenter : Inherits VB_Parent
 
         desc = "Track a cell near the center of the grid"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If match.correlation < match.options.correlationMin Or task.gOptions.DebugChecked Then
             task.gOptions.DebugChecked = False
             Dim index = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
@@ -494,7 +494,7 @@ Public Class Grid_ShowMap : Inherits VB_Parent
     Public Sub New()
         desc = "Verify that task.gridMap is laid out correctly"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         task.gridMap.ConvertTo(dst2, cvb.MatType.CV_8U)
         dst3 = ShowPalette(dst2)
     End Sub

@@ -94,8 +94,8 @@ Public Class GeneticDrawing_Basics : Inherits VB_Parent
         mats.mat(3) = runDNAseq(DNAseq)
         totalError = calculateError(mats.mat(3))
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.intermediateObject IsNot Nothing Then
             SetTrueText("There are too many operations inside GeneticDrawing_Basics to break down the intermediate results")
@@ -202,7 +202,7 @@ Public Class GeneticDrawing_Color : Inherits VB_Parent
         labels(2) = "Intermediate results - original+2 partial+Mag"
         desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static restartCheck = FindCheckBox("Restart the algorithm with the current settings")
         Dim split() As cvb.Mat
         split = src.Split()
@@ -250,7 +250,7 @@ Public Class GeneticDrawing_Photo : Inherits VB_Parent
 
         desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
 
         Static fileInputName = New FileInfo(fileNameForm.filename.Text)
         If inputFileName <> fileInputName.FullName Or task.optionsChanged Then

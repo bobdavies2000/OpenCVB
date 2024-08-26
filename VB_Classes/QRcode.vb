@@ -15,7 +15,7 @@ Public Class QRcode_Basics : Inherits VB_Parent
         End If
         desc = "Read a QR code"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Height < 240 Then
             SetTrueText("This QR Code test does not run at low resolutions")
             Exit Sub

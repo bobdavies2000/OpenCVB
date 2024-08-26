@@ -12,9 +12,9 @@ Public Class Interpolate_Basics : Inherits VB_Parent
                     "Local option 'Line length' affects the lines found.")
         desc = "Resize image using all available interpolation methods in OpenCV"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
-        iOptions.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        iOptions.RunOpt()
         Static saveSliderValue As Integer = iOptions.interpolationThreshold
 
         If standaloneTest() Then
@@ -54,7 +54,7 @@ Public Class Interpolate_Kalman : Inherits VB_Parent
     Public Sub New()
         desc = "Use Kalman to smooth the grayscale results of interpolation"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         inter.Run(src)
 
         dst2 = inter.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -123,7 +123,7 @@ Public Class Interpolate_Lines : Inherits VB_Parent
         FindSlider("Interpolation threshold").Value = 100
         desc = "Detect lines in interpolation results."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         inter.Run(src)
         dst1 = inter.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size)
         dst1 = dst1.Threshold(inter.iOptions.interpolationThreshold, 255, cvb.ThresholdTypes.Binary)
@@ -149,7 +149,7 @@ Public Class Interpolate_Difference : Inherits VB_Parent
     Public Sub New()
         desc = "Highlight the difference between the interpolation results and the current image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         inter.Run(src)
         dst2 = inter.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         labels(2) = inter.labels(3)
@@ -177,7 +177,7 @@ Public Class Interpolate_QuarterBeat : Inherits VB_Parent
     Public Sub New()
         desc = "Highlight the image differences after every quarter second."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.quarterBeat Then
             diff.Run(src)
             dst3 = diff.dst2

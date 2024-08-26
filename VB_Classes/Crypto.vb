@@ -10,7 +10,7 @@ Public Class Crypto_Hash : Inherits VB_Parent
         flow.parentData = Me
         desc = "Experiment with hashing algorithm and guid"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim iSize = src.Total * src.ElemSize
         Dim maxImages = 10
         images.Add(src)

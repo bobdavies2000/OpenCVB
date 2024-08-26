@@ -8,8 +8,8 @@ Public Class HeatMap_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Highlight concentrations of depth pixels in the side view"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
@@ -48,7 +48,7 @@ Public Class HeatMap_Grid : Inherits VB_Parent
         labels = {"", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1"}
         desc = "Apply a grid to the HeatMap_OverTime to isolate objects."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         heat.Run(src)
@@ -106,7 +106,7 @@ Public Class HeatMap_HotNot : Inherits VB_Parent
         labels = {"", "", "Mask of cool areas in the heat map - top view", "Mask of cool areas in the heat map - side view"}
         desc = "Isolate points with low histogram values in side and top views"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         heat.Run(src)
         dst0 = heat.dst2.ConvertScaleAbs
         dst1 = heat.dst3.ConvertScaleAbs
@@ -127,7 +127,7 @@ Public Class HeatMap_Hot : Inherits VB_Parent
         labels = {"", "", "Mask of hotter areas for the Top View", "Mask of hotter areas for the Side View"}
         desc = "Isolate masks for just the hotspots in the heat map"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histTop.Run(src)
         dst2 = histTop.histogram
 
@@ -156,7 +156,7 @@ Public Class HeatMap_Cell : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Display the heat map for the selected cell"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         flood.Run(src)
         dst2 = flood.dst2
         labels(2) = flood.labels(2)
@@ -186,7 +186,7 @@ Public Class HeatMap_GuidedBP : Inherits VB_Parent
         task.redOptions.setProjection(1)
         desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         guided.Run(src)
         dst2 = guided.dst2
         dst3 = guided.dst3

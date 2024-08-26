@@ -7,7 +7,7 @@ Public Class Reliable_Basics : Inherits VB_Parent
         task.gOptions.setDisplay1()
         desc = "Identify each grid element with unreliable data or motion."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
 
         bgs.Run(src)
         dst2 = bgs.dst2
@@ -29,7 +29,7 @@ Public Class Reliable_Depth : Inherits VB_Parent
         labels = {"", "", "Mask of Reliable depth data", "Task.DepthRGB after removing unreliable depth (compare with above.)"}
         desc = "Provide only depth that has been present over the last framehistory frames."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         rDepth.Run(task.noDepthMask)
         dst2 = rDepth.dst2
 
@@ -50,8 +50,8 @@ Public Class Reliable_MaxDepth : Inherits VB_Parent
     Public Sub New()
         desc = "Create a mas"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         Dim split() As cvb.Mat
         If src.Type = cvb.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
 
@@ -88,8 +88,8 @@ Public Class Reliable_Gray : Inherits VB_Parent
         labels = {"", "Mask of unreliable data after denoising", "Mask of unreliable color data (before denoising", "Color image with unreliable pixels set to zero"}
         desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Pixel Difference threshold'"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         diff.Run(src)
         history.Run(diff.dst2)
@@ -123,7 +123,7 @@ Public Class Reliable_RGB : Inherits VB_Parent
         labels = {"", "", "Mask of unreliable color data", "Color image after removing unreliable pixels"}
         desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Pixel Difference threshold'"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst3 = src.Clone
         dst2.SetTo(0)
         For i = 0 To diff.Count - 1
@@ -150,7 +150,7 @@ Public Class Reliable_CompareBGR : Inherits VB_Parent
         labels = {"", "Reliable_Gray output", "Compare Reliable_Gray and Reliable_RGB - if blank, they are the same.", "Reliable_RGB output"}
         desc = "Compare the results of Reliable_Color and Reliable_Gray"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         relyBGR.Run(src)
         dst1 = relyBGR.dst2
         relyGray.Run(src)
@@ -177,7 +177,7 @@ Public Class Reliable_Histogram : Inherits VB_Parent
         task.gOptions.setHistogramBins(255)
         desc = "Create a histogram of reliable pixels"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
         dst2 = hist.dst2.Clone
@@ -205,7 +205,7 @@ Public Class Reliable_Edges : Inherits VB_Parent
         task.gOptions.setDisplay1()
         desc = "Does removing unreliable pixels improve the edge detection.  Unreliable pixels are concentrated in edges."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         relyGray.Run(src)
 

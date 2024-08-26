@@ -8,7 +8,7 @@ Public Class Denoise_Basics_CPP_VB : Inherits VB_Parent
         labels = {"", "", "Input image", "Output: Use PixelViewer to see changes"}
         desc = "Denoise example."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) - 1
         Dim dataSrc(src.Total - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
@@ -41,8 +41,8 @@ Public Class Denoise_Pixels_CPP_VB : Inherits VB_Parent
         labels = {"", "", "Before removing single pixels", "After removing single pixels"}
         desc = "Remove single pixels between identical pixels"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standaloneTest() Then
             reduction.Run(src)
@@ -91,7 +91,7 @@ Public Class Denoise_Reliable : Inherits VB_Parent
         labels(3) = "After denoising single pixels"
         desc = "Manually remove single pixels in the binary image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         relyGray.Run(src)
         dst2 = relyGray.dst2
 
@@ -111,8 +111,8 @@ Public Class Denoise_SinglePixels_CPP_VB : Inherits VB_Parent
         labels = {"", "", "Input image", "Output: Use PixelViewer to see changes"}
         desc = "Remove any single pixels sitting alone..."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If options.removeSinglePixels Then
             If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)

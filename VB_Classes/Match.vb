@@ -15,8 +15,8 @@ Public Class Match_Basics : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If standalone Then
             If task.gOptions.debugChecked Then
                 task.gOptions.debugChecked = False
@@ -64,7 +64,7 @@ Public Class Match_BasicsTest : Inherits VB_Parent
         labels = {"", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest point below"}
         desc = "Test the Match_Basics algorithm"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If (task.FirstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
             Dim r = If(task.FirstPass, New cvb.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
             match.template = src(r)
@@ -102,8 +102,8 @@ Public Class Match_RandomTest : Inherits VB_Parent
         flow.parentData = Me
         desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If standaloneTest() Then
             Static saveSampleCount = options.featurePoints
             If saveSampleCount <> options.featurePoints Then
@@ -157,7 +157,7 @@ Public Class Match_BestEntropy : Inherits VB_Parent
         labels(3) = "Red is the best template to match (highest entropy)"
         desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             entropy.Run(src)
             task.drawRect = entropy.eMaxRect
@@ -191,9 +191,9 @@ Public Class Match_Motion : Inherits VB_Parent
         dst3 = mask.Clone
         desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
-        optionsMatch.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        optionsMatch.RunOpt()
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
         dst2 = src.Clone
@@ -251,7 +251,7 @@ Public Class Match_Lines : Inherits VB_Parent
         labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst2 = lines.dst2
         Static lastPt As New List(Of PointPair)(lines.lpList)
@@ -299,7 +299,7 @@ Public Class Match_PointSlope : Inherits VB_Parent
         labels = {"", "Output of Lines_PointSlope", "Matched lines", "correlationMats"}
         desc = "Initialize with the best lines in the image and track them using matchTemplate.  Reinitialize when correlations drop."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
         Dim w = task.gridSize
         Dim h = w
@@ -395,7 +395,7 @@ Public Class Match_TraceRedC : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Or task.cameraStable = False Then dst2.SetTo(0)
         redC.Run(src)
 
@@ -439,7 +439,7 @@ Public Class Match_DrawRect : Inherits VB_Parent
         labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
         desc = "Find the requested template in task.drawrect in an image"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static lastImage As cvb.Mat = src.Clone
         If task.mouseClickFlag And task.drawRect.Width <> 0 Then
             inputRect = ValidateRect(task.drawRect)
@@ -497,10 +497,10 @@ Public Class Match_tCell : Inherits VB_Parent
         If tc.template Is Nothing Then tc.template = src(tc.rect).Clone
         Return tc
     End Function
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim rSize = cellSlider.Value
         If standaloneTest() And task.heartBeat Then
-            options.RunVB()
+            options.RunOpt()
             tCells.Clear()
             tCells.Add(createCell(src, 0, New cvb.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
             tCells.Add(createCell(src, 0, New cvb.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
@@ -543,7 +543,7 @@ Public Class Match_LinePairTest : Inherits VB_Parent
     Public Sub New()
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static cellSlider = FindSlider("MatchTemplate Cell Size")
         Static corrSlider = FindSlider("Feature Correlation Threshold")
         Dim minCorrelation = corrSlider.Value / 100
@@ -552,7 +552,7 @@ Public Class Match_LinePairTest : Inherits VB_Parent
 
         Dim rect As cvb.Rect
 
-        Options.RunVB()
+        Options.RunOpt()
 
         If (target(0) IsNot Nothing And correlation(0) < minCorrelation) Then target(0) = Nothing
         If task.mouseClickFlag Then
@@ -615,7 +615,7 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Parent
         labels(3) = "Shake camera to see tracking of the highlighted features"
         desc = "Track the GoodFeatures with KNN"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static distSlider = FindSlider("Maximum travel distance per frame")
         Dim maxDistance = distSlider.Value
 
@@ -663,7 +663,7 @@ Public Class Match_Point : Inherits VB_Parent
         labels(2) = "Rectangle shown is the search rectangle."
         desc = "Track the selected point"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             SetTrueText("Set the target mat and the pt then run to track an individual point." + vbCrLf +
                         "After running, the pt is updated with the new location and correlation with the updated correlation." + vbCrLf +
@@ -702,7 +702,7 @@ Public Class Match_Points : Inherits VB_Parent
         labels(2) = "Rectangle shown is the search rectangle."
         desc = "Track the selected points"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.FirstPass Then mPoint.target = src.Clone
 
         If standaloneTest() Then

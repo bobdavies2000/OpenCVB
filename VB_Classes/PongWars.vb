@@ -72,7 +72,7 @@ Public Class PongWars_Basics : Inherits VB_Parent
 
         If task.heartBeat Then labels(2) = $"Pong War: day {dayScore} | night {nightScore}"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         iteration += 1
         If iteration Mod 1000 = 0 Then
             Console.WriteLine("iteration " & iteration)
@@ -126,7 +126,7 @@ Public Class PongWars_Two : Inherits VB_Parent
     Public Sub New()
         desc = "Running 2 pong wars at once.  Randomness inserted with starting location."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pong1.Run(src)
         dst2 = pong1.dst2.Clone
         labels(2) = pong1.labels(2)

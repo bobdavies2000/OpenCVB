@@ -8,8 +8,8 @@ Public Class Derivative_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": gOptions histogram Bins and several local options are important.")
         desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Type <> cvb.MatType.CV_32F Then
             src = task.pcSplit(options.channel).Sobel(cvb.MatType.CV_32F, 1, 0, options.kernelSize)
@@ -63,7 +63,7 @@ Public Class Derivative_Sobel : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Display the derivative of the selected depth dimension."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim channel = deriv.options.channel
         Dim chanName As String = "X"
         If channel <> 0 Then
@@ -99,8 +99,8 @@ Public Class Derivative_Laplacian : Inherits VB_Parent
     Public Sub New()
         desc = "Create a histogram and backprojection for the second derivative of depth in the selected dimension."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim channel = deriv.options.channel
         Dim gausskern = New cvb.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize))
@@ -135,7 +135,7 @@ Public Class Derivative_Classes : Inherits VB_Parent
         dst.SetTo(0, task.noDepthMask)
         Return derivClassCount
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         deriv.Run(task.pcSplit(deriv.options.channel).Sobel(cvb.MatType.CV_32F, 1, 0, deriv.options.kernelSize))
         classCountX = derivClassCount(dst2)
         labels(2) = $"Backprojection of X dimension of task.pcSplit({deriv.options.channel})"

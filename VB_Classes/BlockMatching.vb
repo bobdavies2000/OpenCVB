@@ -10,8 +10,8 @@ Public Class BlockMatching_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": click 'Show All' to see all the available options.")
         desc = "Use OpenCV's block matching on left and right views"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         If task.cameraName = "Azure Kinect 4K" Then
             SetTrueText("For the K4A 4 Azure camera, the left and right views are the same.")

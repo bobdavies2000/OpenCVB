@@ -14,8 +14,8 @@ Public Class Stabilizer_Basics : Inherits VB_Parent
         labels(2) = "Current frame - rectangle input to matchTemplate"
         desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim resetImage As Boolean
         templateRect = New cvb.Rect(src.Width / 2 - options.width / 2, src.Height / 2 - options.height / 2,
@@ -97,8 +97,8 @@ Public Class Stabilizer_BasicsRandomInput : Inherits VB_Parent
         labels(3) = "Image after shift"
         desc = "Generate images that have been arbitrarily shifted"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim input = src
         If input.Channels() <> 1 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -148,7 +148,7 @@ Public Class Stabilizer_BasicsTest : Inherits VB_Parent
         labels(2) = "Unstable input to Stabilizer_Basics"
         desc = "Test the Stabilizer_Basics with random movement"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
 
         random.Run(src)
         stable.Run(random.dst3.Clone)
@@ -176,7 +176,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
         desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         labels(2) = "Stabilized Image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If task.optionsChanged Then
             errScale = New cvb.Mat(New cvb.Size(1, 5), cvb.MatType.CV_64F, 1)
@@ -284,7 +284,7 @@ Public Class Stabilizer_VerticalIMU : Inherits VB_Parent
     Public Sub New()
         desc = "Use the IMU angular velocity to determine if the camera is moving or stable."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         angleXValue.Add(task.accRadians.X)
         angleYValue.Add(task.accRadians.Y)
 
@@ -344,7 +344,7 @@ Public Class Stabilizer_CornerPoints : Inherits VB_Parent
             features.Add(New cvb.Point2f(kp.Pt.X + r.X, kp.Pt.Y + r.Y))
         Next
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.optionsChanged Then
             Dim size = task.gridSize
             ul = New cvb.Rect(0, 0, size, size)

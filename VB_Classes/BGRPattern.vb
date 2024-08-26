@@ -10,7 +10,7 @@ Public Class BGRPattern_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": local options 'Options_ColorFormat' selects color.")
         desc = "Classify each 3-channel input pixel according to their relative values"
     End Sub
-    Public Sub RunVB(ByVal src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         colorFmt.Run(src)
         src = colorFmt.dst2
 

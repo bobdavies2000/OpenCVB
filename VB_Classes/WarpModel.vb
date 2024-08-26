@@ -11,8 +11,8 @@ Public Class WarpModel_Basics : Inherits VB_Parent
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image"}
         desc = "Align the BGR inputs raw images from the Prokudin examples."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standaloneTest() Then ecc.warpInput.Run(src)
         dst0 = ecc.warpInput.rgb(0).Clone
@@ -63,8 +63,8 @@ Public Class WarpModel_ECC : Inherits VB_Parent
         labels(3) = "Src2 image aligned to src image"
         desc = "Use FindTransformECC to align 2 images"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         If standaloneTest() Then
             warpInput.Run(src)
@@ -146,8 +146,8 @@ Public Class WarpModel_Input : Inherits VB_Parent
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "Naively Aligned image"}
         desc = "Import the misaligned input."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         Dim r() = {New cvb.Rect(0, 0, options.pkImage.Width, options.pkImage.Height / 3),
                    New cvb.Rect(0, options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3),

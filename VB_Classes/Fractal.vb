@@ -35,8 +35,8 @@ Public Class Fractal_Mandelbrot : Inherits VB_Parent
             dst2.Set(Of Byte)(y, x, If(iter < options.iterations, 255 * iter / (options.iterations - 1), 0))
         Next
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
         For y = 0 To src.Height - 1
             mandelbrotLoop(y)
         Next
@@ -54,7 +54,7 @@ Public Class Fractal_MandelbrotZoom : Inherits VB_Parent
     Public Sub New()
         desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.drawRect.Width <> 0 Then
             Dim newStartX = mandel.startX + (mandel.endX - mandel.startX) * task.drawRect.X / src.Width
             mandel.endX = mandel.startX + (mandel.endX - mandel.startX) * (task.drawRect.X + task.drawRect.Width) / src.Width
@@ -90,7 +90,7 @@ Public Class Fractal_MandelbrotZoomColor : Inherits VB_Parent
     Public Sub New()
         desc = "Classic Mandelbrot in color"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If zoom.mandel.options.resetCheck.Checked Then zoom.mandel.reset()
         zoom.Run(src)
         dst2 = ShowPalette(zoom.dst2)
@@ -126,7 +126,7 @@ Public Class Fractal_Julia : Inherits VB_Parent
         If depth < max / 4 Then Return 0
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static resetCheck = FindCheckBox("Reset to original Mandelbrot")
         If savedMouse <> task.mouseMovePoint Or resetCheck.Checked Then
             savedMouse = task.mouseMovePoint
@@ -205,7 +205,7 @@ Public Class Fractal_Dimension : Inherits VB_Parent
         'D = np.polyfit(x, y, 1)[0]  # D = lim r -> 0 log(Nr)/log(1/r)
         Return d
     End Function
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         dst3.SetTo(0)

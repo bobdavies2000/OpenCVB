@@ -8,8 +8,8 @@ Public Class Classifier_Basics : Inherits VB_Parent
         cPtr = OEX_Points_Classifier_Open()
         desc = "OpenCV Example Points_Classifier"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.optionsChanged Then task.gOptions.debugChecked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
@@ -81,10 +81,10 @@ Public Class Classifier_Bayesian : Inherits VB_Parent
         cPtr = OEX_Points_Classifier_Open()
         desc = "Run the Bayesian classifier with the input."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim sampleCount As Integer, methodIndex = 0
         If src.Type <> cvb.MatType.CV_32FC2 Then
-            options.RunVB()
+            options.RunOpt()
             sampleCount = options.sampleCount
             methodIndex = options.methodIndex
         Else
@@ -121,7 +121,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Parent
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 

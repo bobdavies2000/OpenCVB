@@ -4,8 +4,8 @@ Public Class Transform_Resize : Inherits VB_Parent
     Public Sub New()
         desc = "Resize an image based on the slider value."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim w = CInt(options.resizeFactor * src.Width)
         Dim h = CInt(options.resizeFactor * src.Height)
@@ -34,8 +34,8 @@ Public Class Transform_Affine3D : Inherits VB_Parent
     Public Sub New()
         desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
 
@@ -96,8 +96,8 @@ Public Class Transform_Rotate : Inherits VB_Parent
     Public Sub New()
         desc = "Rotate and scale and image based on the slider values."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         imageCenter = New cvb.Point2f(options.centerX, options.centerY)
         Dim rotationMat = cvb.Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale)

@@ -7,7 +7,7 @@ Public Class HMM_Example_CPP_VB : Inherits VB_Parent
         labels(2) = "Text output with explanation will appear in the Visual Studio output."
         desc = "Simple test of Hidden Markov Model - text output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.testAllRunning Then
             SetTrueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
             Exit Sub

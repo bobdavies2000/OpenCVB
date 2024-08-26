@@ -20,7 +20,7 @@ Public Class SLR_Data : Inherits VB_Parent
         Next
         desc = "Plot the data used in SLR_Basics"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         plot.srcX = dataX
         plot.srcY = dataY
         plot.Run(src)
@@ -39,8 +39,8 @@ Public Class SLR_TrendImages : Inherits VB_Parent
     Public Sub New()
         desc = "Find trends by filling in short histogram gaps for depth or 1-channel images"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim split = src.Split()
         trends.hist.plot.maxRange = 255
@@ -85,7 +85,7 @@ Public Class SLR_SurfaceH : Inherits VB_Parent
     Public Sub New()
         desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         surface.Run(src)
         dst2 = surface.dst3
     End Sub
@@ -118,7 +118,7 @@ Public Class SLR_Trends : Inherits VB_Parent
         dst.Line(lastPoint, p1, cvb.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         lastPoint = p1
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         labels(2) = "Grayscale histogram - yellow line shows trend"
         hist.plot.backColor = cvb.Scalar.Red
         hist.Run(src)

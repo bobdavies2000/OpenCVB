@@ -10,7 +10,7 @@ Public Class MSER_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         detect.Run(src)
         Dim boxInput = New List(Of cvb.Rect)(detect.boxes)
         Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -75,8 +75,8 @@ Public Class MSER_Detect : Inherits VB_Parent
     Public Sub New()
         desc = "Run the core MSER (Maximally Stable Extremal Region) algorithm"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src.Clone
 
@@ -121,7 +121,7 @@ Public Class MSER_SyntheticInput : Inherits VB_Parent
     Public Sub New()
         desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim img = New cvb.Mat(800, 800, cvb.MatType.CV_8U, cvb.Scalar.All(0))
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
@@ -154,7 +154,7 @@ Public Class MSER_LeftRight : Inherits VB_Parent
         labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics output for right camera"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         left.Run(task.leftView)
         dst2 = left.dst2
         labels(2) = left.labels(2)
@@ -177,7 +177,7 @@ Public Class MSER_Left : Inherits VB_Parent
         labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         mBase.Run(task.leftView)
         dst2 = mBase.dst2
         dst3 = mBase.dst3
@@ -198,7 +198,7 @@ Public Class MSER_Right : Inherits VB_Parent
         labels = {"", "", "MSER_Basics output for right camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         mBase.Run(task.rightView)
         dst2 = mBase.dst2
         dst3 = mBase.dst3
@@ -219,8 +219,8 @@ Public Class MSER_Hulls : Inherits VB_Parent
     Public Sub New()
         desc = "Use MSER (Maximally Stable Extremal Region) but show the contours of each region."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         mBase.Run(src)
         dst2 = mBase.dst2
@@ -254,8 +254,8 @@ Public Class MSER_TestSynthetic : Inherits VB_Parent
         labels = {"", "", "Synthetic input", "Output from MSER (Maximally Stable Extremal Region)"}
         desc = "Test MSER (Maximally Stable Extremal Region) with the synthetic image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         synth.Run(src)
         dst2 = synth.dst2.Clone()
@@ -279,7 +279,7 @@ Public Class MSER_Grayscale : Inherits VB_Parent
         FindCheckBox("Use grayscale input").Checked = True
         desc = "Run MSER (Maximally Stable Extremal Region) with grayscale input"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
 
         mBase.Run(reduction.dst2)
@@ -301,7 +301,7 @@ Public Class MSER_ReducedRGB : Inherits VB_Parent
         FindCheckBox("Use grayscale input").Checked = False
         desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
 
         mBase.Run(reduction.dst2)
@@ -324,8 +324,8 @@ Public Class MSER_ROI : Inherits VB_Parent
     Public Sub New()
         desc = "Identify the main regions of interest with MSER (Maximally Stable Extremal Region)"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src.Clone
         dst3 = src.Clone
@@ -391,8 +391,8 @@ Public Class MSER_TestExample : Inherits VB_Parent
         image = cvb.Cv2.ImRead(task.HomeDir + "Data/MSERtestfile.jpg", cvb.ImreadModes.Color)
         mser = cvb.MSER.Create()
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim regions()() As cvb.Point
         Dim boxes() As cvb.Rect
@@ -435,7 +435,7 @@ Public Class MSER_RedCloud : Inherits VB_Parent
     Public Sub New()
         desc = "Use the MSER_Basics output as input to RedCloud_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         mBase.Run(src)
 
         redC.Run(mBase.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
@@ -457,13 +457,13 @@ Public Class MSER_Mask_CPP_VB : Inherits VB_Parent
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         FindCheckBox("Use grayscale input").Checked = False
-        options.RunVB()
+        options.RunOpt()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         desc = "MSER in a nutshell: intensity threshold, stability, maximize region, adaptive threshold."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If task.optionsChanged Then
             MSER_Close(cPtr)
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
@@ -506,7 +506,7 @@ Public Class MSER_Binarize : Inherits VB_Parent
     Public Sub New()
         desc = "Instead of a BGR src, try using the color output of Bin4Way_Regions"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         bin4.Run(src)
         dst2 = ShowPalette(bin4.dst2 * 255 / 4)
 
@@ -526,7 +526,7 @@ Public Class MSER_Basics1 : Inherits VB_Parent
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         flood.Run(dst3)
@@ -545,7 +545,7 @@ Public Class MSER_BasicsNew : Inherits VB_Parent
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         detect.Run(src)
 
         Dim boxInput = New List(Of cvb.Rect)(detect.boxes)
@@ -581,7 +581,7 @@ Public Class MSER_Basics2 : Inherits VB_Parent
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
@@ -640,13 +640,13 @@ Public Class MSER_CPP_VB : Inherits VB_Parent
     Public classcount As Integer
     Public Sub New()
         FindCheckBox("Use grayscale input").Checked = False
-        options.RunVB()
+        options.RunOpt()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         desc = "C++ version of MSER basics."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         If task.optionsChanged Then
             MSER_Close(cPtr)
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,

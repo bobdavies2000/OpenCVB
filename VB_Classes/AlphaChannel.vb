@@ -9,7 +9,7 @@ Public Class AlphaChannel_Basics : Inherits VB_Parent
         alpha.Size = New System.Drawing.Size(dst2.Width + 10, dst2.Height + 10)
         desc = "Use the the Windows 10 alpha channel to separate foreground and background"
     End Sub
-    Public Sub RunVB(ByVal src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         src = src.CvtColor(cvb.ColorConversionCodes.BGR2BGRA)
         Dim split = src.Split()
         split(3) = task.depthMask

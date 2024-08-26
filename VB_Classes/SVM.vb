@@ -10,8 +10,8 @@ Public Class SVM_Basics : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setGridSize(8)
         labels = {"", "", "SVM_Basics input data", "Results - white line is ground truth"}
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB() ' update any options specified in the interface.
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt() ' update any options specified in the interface.
 
         If standaloneTest() Then
             sampleData.Run(src)
@@ -65,8 +65,8 @@ Public Class SVM_SampleData : Inherits VB_Parent
     Public Function inputFunction(x As Double) As Double
         Return x + 50 * Math.Sin(x / 15.0)
     End Function
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2.SetTo(0)
         points.Clear()
@@ -103,8 +103,8 @@ Public Class SVM_TestCase : Inherits VB_Parent
         labels = {"", "", "Input points - color is the category label", "Predictions"}
         desc = "Text book example on SVM"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2.SetTo(cvb.Scalar.White)
         dst3.SetTo(0)
@@ -167,7 +167,7 @@ Public Class SVM_ReuseBasics : Inherits VB_Parent
         labels = {"", "", "Input points", "Predictions"}
         desc = "Text book example on SVM"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim labeled = 1
         Dim nonlabel = -1
 
@@ -214,8 +214,8 @@ Public Class SVM_ReuseRandom : Inherits VB_Parent
         labels(2) = "SVM Training data - draw a rectangle anywhere to test further."
         desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        svm.options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        svm.options.RunOpt()
 
         Dim rect = task.drawRect
         Dim contour As New List(Of cvb.Point)

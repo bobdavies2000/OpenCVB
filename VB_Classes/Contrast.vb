@@ -5,8 +5,8 @@ Public Class Contrast_POW : Inherits VB_Parent
         labels = {"", "", "Original Image", "Contrast reduced with POW function"}
         desc = "Reduce contrast with POW function"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         dst2.ConvertTo(dst3, cvb.MatType.CV_32FC3)
@@ -27,8 +27,8 @@ Public Class Contrast_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": use the local options to control brightness and contrast.")
         desc = "Show image with varying contrast and brightness."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src.ConvertScaleAbs(options.brightness, options.contrast)
     End Sub

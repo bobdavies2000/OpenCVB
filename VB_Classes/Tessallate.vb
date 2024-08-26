@@ -24,8 +24,8 @@ Public Class Tessallate_Basics : Inherits VB_Parent
         points2d.Add(c2)
         Return points2d
     End Function
-    Public Sub RunVB(src As cvb.Mat)
-        oglOptions.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
 
@@ -74,7 +74,7 @@ Public Class Tessallate_Triangles : Inherits VB_Parent
         labels = {"", "", "", ""}
         desc = "Prepare colors and triangles for use in OpenGL Triangle presentation."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
@@ -106,8 +106,8 @@ Public Class Tessallate_QuadSimple : Inherits VB_Parent
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        oglOptions.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
 
@@ -156,8 +156,8 @@ Public Class Tessallate_QuadHulls : Inherits VB_Parent
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        oglOptions.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
 
@@ -232,11 +232,11 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Parent
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
-        oglOptions.RunVB()
+        oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
 
@@ -328,7 +328,7 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
         task.gOptions.setGridSize(20)
         desc = "Tessellate each quad in point cloud"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.optionsChanged Then
             depthMinList.Clear()
             depthMaxList.Clear()
@@ -338,7 +338,7 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
             Next
         End If
 
-        options.RunVB()
+        options.RunOpt()
         Dim ptM = options.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
 

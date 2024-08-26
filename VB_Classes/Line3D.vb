@@ -20,7 +20,7 @@ Public Class Line3D_Draw : Inherits VB_Parent
         cvb.Cv2.MatchTemplate(pts1, pts2, correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.mouseClickFlag Then
                 If toggleFirstSecond = False Then
@@ -78,7 +78,7 @@ Public Class Line3D_Checks : Inherits VB_Parent
     Public Sub New()
         desc = "Use the first and last points in the sequence to build a single line and then check it against the rest of the sequence."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pts.Run(src)
         dst3 = pts.dst2
 
@@ -132,7 +132,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits VB_Parent
             DrawLine(dst2, p1, p2, cvb.Scalar.White)
         Next
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pts.Run(src)
         dst2 = pts.dst2
 
@@ -179,7 +179,7 @@ Public Class Line3D_CandidatesAll : Inherits VB_Parent
             Next
         Next
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pts.Run(src)
         dst2 = pts.dst2
 

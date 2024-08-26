@@ -9,7 +9,7 @@ Public Class HistPeak2D_Basics : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         ' if standaloneTest(), go get a histogram for input.  Src is the 3-channel input to the histogram.
         If standaloneTest() Then
             bgr.Run(src)
@@ -52,7 +52,7 @@ Public Class HistPeak2D_TopAndSide : Inherits VB_Parent
     Public Sub New()
         desc = "Find the top X peaks in the 2D histogram of the top and side views and backproject them."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.toggleOnOff Then
             histSide.Run(src)
             peak.ranges = task.rangesSide
@@ -84,7 +84,7 @@ Public Class HistPeak2D_NotHotTop : Inherits VB_Parent
     Public Sub New()
         desc = "Find the regions with the non-zero (low) samples in the top view"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histTop.Run(src)
         dst1 = histTop.histogram.InRange(0, 0).ConvertScaleAbs
 
@@ -112,7 +112,7 @@ Public Class HistPeak2D_Edges : Inherits VB_Parent
     Public Sub New()
         desc = "Display the HistPeak2D_Basics edges in the RGB image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histTop.Run(src)
 
         dst3 = histTop.histogram.Threshold(task.projectionThreshold, 255, cvb.ThresholdTypes.Binary)
@@ -138,7 +138,7 @@ Public Class HistPeak2D_HSV : Inherits VB_Parent
     Public Sub New()
         desc = "Find the peaks in the 2D plot of the HSV image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hsv.Run(src)
         peak.histogram = hsv.histogram01
         peak.Run(hsv.dst1)
@@ -160,7 +160,7 @@ Public Class HistPeak2D_BGR : Inherits VB_Parent
     Public Sub New()
         desc = "Find the peaks in the 2D plot of the BGR image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         bgr.Run(src)
 
         peak.histogram = bgr.histogram02
@@ -183,7 +183,7 @@ Public Class HistPeak2D_RGB : Inherits VB_Parent
     Public Sub New()
         desc = "Find the peaks in the 2D plot of the BGR image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         peak.Run(src)
         dst2 = peak.dst2
         dst3 = peak.dst3
@@ -205,7 +205,7 @@ Public Class HistPeak2D_HotSide : Inherits VB_Parent
         labels = {"", "", "Backprojection of Side View hotspots", "Side view with highlighted hot spots"}
         desc = "Find the top X peaks in the 2D histogram of the side view and backproject it."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histSide.Run(src)
         dst3 = histSide.histogram
 
@@ -235,7 +235,7 @@ Public Class HistPeak2D_HotTop : Inherits VB_Parent
         labels = {"", "", "Backprojection of Top View hotspots", "Top view with highlighted hot spots"}
         desc = "Find the top X peaks in the 2D histogram of the top view and backproject it."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histTop.Run(src)
         dst3 = histTop.histogram
 

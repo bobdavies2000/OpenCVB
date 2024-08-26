@@ -6,8 +6,8 @@ Public Class Distance_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": use local options to control which method is used.")
         desc = "Distance algorithm basics."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standaloneTest() Then src = task.depthRGB
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -30,8 +30,8 @@ Public Class Distance_Labels : Inherits VB_Parent
         labels(3) = "Input mask to distance transformm"
         desc = "Distance algorithm basics."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standaloneTest() Then src = task.depthRGB
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -58,7 +58,7 @@ Public Class Distance_Foreground : Inherits VB_Parent
         labels(3) = "Input mask to distance transformm"
         desc = "Distance algorithm basics."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static cRadio = FindRadio("C")
         Static l1Radio = FindRadio("L1")
 
@@ -90,7 +90,7 @@ Public Class Distance_Background : Inherits VB_Parent
         dist.useBackgroundAsInput = True
         desc = "Use distance algorithm on the background"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dist.Run(src)
         dst2 = dist.dst2
         dst3 = dist.dst3
@@ -111,7 +111,7 @@ Public Class Distance_Point3D : Inherits VB_Parent
     Public Sub New()
         desc = "Compute the distance in meters between 3D points in the point cloud"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() And task.heartBeat Then
             inPoint1 = New cvb.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
             inPoint2 = New cvb.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
@@ -149,7 +149,7 @@ Public Class Distance_Point4D : Inherits VB_Parent
     Public Sub New()
         desc = "Compute the distance between 4D points"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             inPoint1 = New cvb.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
                                     msRNG.Next(0, task.MaxZmeters), msRNG.Next(0, task.MaxZmeters))
@@ -196,7 +196,7 @@ Public Class Distance_RedCloud : Inherits VB_Parent
         Next
         Return Math.Sqrt(result)
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
 
         pixelVector.Clear()
@@ -276,7 +276,7 @@ Public Class Distance_BinaryImage : Inherits VB_Parent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Measure the fragmentation of a binary image by using the distance transform"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         binary.Run(src)
         dst2 = binary.dst2
         labels(2) = binary.labels(2) + " Draw a rectangle to measure specific area."

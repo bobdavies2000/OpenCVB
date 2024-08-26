@@ -7,8 +7,8 @@ Public Class Gabor_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Explore Gabor kernel"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         dst2 = src.Filter2D(cvb.MatType.CV_8UC3, options.gKernel)
     End Sub

@@ -13,7 +13,7 @@ Public Class KNN_Basics : Inherits VB_Parent
         labels(3) = "KNN_Basics output with just the closest match.  Red = training data, yellow = queries."
         desc = "Map points 1:1 with losses. Toss any farther duplicates. Easier to follow than previous version."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 Random.Run(empty)
@@ -108,7 +108,7 @@ Public Class KNN_Core : Inherits VB_Parent
             DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Red)
         Next
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim KNNdimension = 2
 
         If standalone Then
@@ -194,7 +194,7 @@ Public Class KNN_Core2DTest : Inherits VB_Parent
         Next
     End Sub
 
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             dst3.SetTo(0)
             random.Run(empty)
@@ -227,7 +227,7 @@ Public Class KNN_Core3D : Inherits VB_Parent
         knn = cvb.ML.KNearest.Create()
         desc = "Use knn with the input 3D points in the image.  Find the nearest neighbors."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm")
             Exit Sub
@@ -276,7 +276,7 @@ Public Class KNN_Core4D : Inherits VB_Parent
         labels(2) = "Red=TrainingData, yellow = queries, text shows Z distance to that point from query point"
         desc = "Use knn with the input 4D points in the image.  Find the nearest neighbors."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm")
             Exit Sub
@@ -326,8 +326,8 @@ Public Class KNN_CoreN : Inherits VB_Parent
         knn = cvb.ML.KNearest.Create()
         desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
         If standaloneTest() Then
@@ -380,7 +380,7 @@ Public Class KNN_Core3DTest : Inherits VB_Parent
         FindSlider("Random Pixel Count").Value = 100
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             knn.queries.Clear()
             knn.trainInput.Clear()
@@ -441,7 +441,7 @@ Public Class KNN_Core4DTest : Inherits VB_Parent
         FindSlider("Random Pixel Count").Value = 5
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             random.Run(empty)
             knn.trainInput = New List(Of cvb.Vec4f)(random.PointList)
@@ -488,7 +488,7 @@ Public Class KNN_CoreNTest : Inherits VB_Parent
         labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
         desc = "Test the use of the general form KNN_CoreN algorithm"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             knn.trainInput.Clear()
             For i = 0 To knn.options.numPoints - 1
@@ -540,7 +540,7 @@ Public Class KNN_Emax : Inherits VB_Parent
         labels(3) = "Red=TrainingData, yellow = queries - use EMax sigma to introduce more chaos."
         desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         em.Run(src)
         random.Run(empty)
 
@@ -607,7 +607,7 @@ Public Class KNN_TrackMean : Inherits VB_Parent
         Next
         Return histSum / histList.Count
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.FirstPass Then lastImage = src.Clone
         Dim multiplier = dotSlider.Value
 
@@ -671,7 +671,7 @@ Public Class KNN_ClosestTracker : Inherits VB_Parent
         labels = {"", "", "Highlight the tracked line (move camera to see track results)", "Candidate lines - standaloneTest() only"}
         desc = "Find the longest line and keep finding it among the list of lines using a minimized KNN test."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
 
         Dim p1 As cvb.Point2f, p2 As cvb.Point2f
@@ -743,7 +743,7 @@ Public Class KNN_ClosestLine : Inherits VB_Parent
     Public Sub New()
         desc = "Try to find the closest pair of points in the traininput.  Dynamically compute distance ceiling to determine when to report fail."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
 
         If lastP1 = New cvb.Point2f Then
@@ -798,7 +798,7 @@ Public Class KNN_ClosestVertical : Inherits VB_Parent
         labels = {"", "", "Highlight the tracked line", "Candidate vertical lines are in Blue"}
         desc = "Test the code find the longest line and track it using a minimized KNN test."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
 
         lines.Run(src)
@@ -850,7 +850,7 @@ Public Class KNN_BasicsOld : Inherits VB_Parent
         labels(3) = "KNN_BasicsOld output with just the closest match.  Red = training data, yellow = queries."
         desc = "Map points 1:1 with losses.  When duplicates are found, toss the farthest.  Too hard to follow.  Trying a better approach."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 Random.Run(empty)
@@ -942,7 +942,7 @@ Public Class KNN_Farthest : Inherits VB_Parent
         labels = {"", "", "Lines connecting pairs that are farthest.", "Training Input which is also query input and longest line"}
         desc = "Use KNN to find the farthest point from each query point."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 Random.Run(empty)
@@ -992,7 +992,7 @@ Public Class KNN_TrackEach : Inherits VB_Parent
     Public Sub New()
         desc = "Track each good feature with KNN and match the goodFeatures from frame to frame"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim minDistance = feat.options.minDistance
         ' if there was no motion, use minDistance to eliminate the unstable points.
         If task.motionFlag = False Or task.optionsChanged = False Then minDistance = 2

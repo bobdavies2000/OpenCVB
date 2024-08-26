@@ -23,7 +23,7 @@ Public Class Bezier_Basics : Inherits VB_Parent
                 Math.Pow(t, 3) * points(i + 3).Y
         Return New cvb.Point(x, y)
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim p1 As cvb.Point
         For i = 0 To points.Count - 4 Step 3
             For j = 0 To 100
@@ -50,7 +50,7 @@ Public Class Bezier_Example : Inherits VB_Parent
     Public Sub New()
         desc = "Draw a Bezier curve based with the 4 input points."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2.SetTo(0)
         Dim p1 As cvb.Point
         For i = 0 To 100 - 1

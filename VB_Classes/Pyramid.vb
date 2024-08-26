@@ -5,8 +5,8 @@ Public Class Pyramid_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If options.zoom <> 0 Then
             If options.zoom < 0 Then
@@ -34,7 +34,7 @@ Public Class Pyramid_Filter : Inherits VB_Parent
     Public Sub New()
         desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         laplace.Run(src)
         dst2 = laplace.dst2
     End Sub

@@ -5,8 +5,8 @@ Public Class PyrFilter_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
         cvb.Cv2.PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid)
     End Sub
 End Class
@@ -25,7 +25,7 @@ Public Class PyrFilter_RedCloud : Inherits VB_Parent
         labels = {"", "", "RedCloud_Basics output", "PyrFilter output before reduction"}
         desc = "Use RedColor to segment the output of PyrFilter"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pyr.Run(src)
         dst3 = pyr.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 

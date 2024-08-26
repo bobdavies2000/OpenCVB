@@ -5,8 +5,8 @@ Public Class Erode_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": use local options to control erosion.")
         desc = "Erode the image provided."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
 
         If options.noshape Or options.iterations = 0 Then dst2 = src Else dst2 = src.Erode(options.element, Nothing, options.iterations)
 
@@ -35,7 +35,7 @@ Public Class Erode_CloudXY : Inherits VB_Parent
         labels = {"", "", "Eroded point cloud X", "Erode point cloud Y"}
         desc = "Erode depth and then find edges"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static dilateSlider = FindSlider("Dilate Iterations")
         Static erodeSlider = FindSlider("Erode Iterations")
         erodeMask.Run(task.depthMask)
@@ -64,8 +64,8 @@ Public Class Erode_DepthSeed : Inherits VB_Parent
     Public Sub New()
         desc = "Erode depth to build a depth mask for inrange data."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         cvb.Cv2.Erode(task.pcSplit(2), dst0, erode.options.element)
         dst0 = task.pcSplit(2) - dst0
@@ -91,8 +91,8 @@ Public Class Erode_Dilate : Inherits VB_Parent
     Public Sub New()
         desc = "Erode and then dilate with MorphologyEx on the input image."
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
-        Options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        Options.RunOpt()
         cvb.Cv2.MorphologyEx(src, dst2, cvb.MorphTypes.Close, options.element)
         cvb.Cv2.MorphologyEx(dst2, dst2, cvb.MorphTypes.Open, options.element)
     End Sub

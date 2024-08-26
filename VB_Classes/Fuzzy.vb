@@ -16,8 +16,8 @@ Public Class Fuzzy_Basics : Inherits VB_Parent
         labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}
         desc = "That which is not solid is fuzzy"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         reduction.Run(src)
         dst0 = reduction.dst2
@@ -86,8 +86,8 @@ Public Class Fuzzy_Filter : Inherits VB_Parent
         kernel *= 1 / 9
         desc = "Use a 2D filter to find smooth areas"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         reduction.Run(src)
@@ -144,7 +144,7 @@ Public Class Fuzzy_ContoursDepth : Inherits VB_Parent
     Public Sub New()
         desc = "Use contours to outline solids in the depth data"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fuzzyD.Run(task.depthRGB)
         dst2 = fuzzyD.dst1
     End Sub
@@ -163,7 +163,7 @@ Public Class Fuzzy_NeighborProof : Inherits VB_Parent
     Public Sub New()
         desc = "Prove that every contour point has at one and only one neighbor with the mask ID and that the rest are zero"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If proofFailed Then Exit Sub
         fuzzy.Run(src)
         dst2 = fuzzy.dst1
@@ -210,8 +210,8 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
     Public Sub New()
         desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         fuzzy.Run(task.depthRGB)
         dst2 = fuzzy.dst1
@@ -262,7 +262,7 @@ Public Class Fuzzy_TrackerDepthClick : Inherits VB_Parent
     Public Sub New()
         desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
-    Public Sub RunVB(src as cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         tracker.Run(src)
         dst2 = tracker.dst2
 

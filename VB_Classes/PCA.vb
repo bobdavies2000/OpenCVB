@@ -57,7 +57,7 @@ Public Class PCA_Basics : Inherits VB_Parent
         pcaStr += vbCrLf
         Return pcaStr
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
             If task.FirstPass Then task.redOptions.setUseColorOnly(True)
             redC.Run(src)
@@ -99,7 +99,7 @@ Public Class PCA_CellMask : Inherits VB_Parent
         pca.runRedCloud = True
         desc = "Find the Principal Component Analysis vector for all the 3D points in a RedCloud cell."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pca.Run(src)
         dst2 = pca.dst2
         labels(2) = pca.labels(2)
@@ -136,7 +136,7 @@ Public Class PCA_Reconstruct : Inherits VB_Parent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Retained Variance", 1, 100, 95)
         desc = "Reconstruct a video stream as a composite of X images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static retainSlider = FindSlider("Retained Variance")
         Dim index = task.frameCount Mod images.Length
         images(index) = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -168,7 +168,7 @@ Public Class PCA_Depth : Inherits VB_Parent
     Public Sub New()
         desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         pca.Run(task.depthRGB)
         dst2 = pca.dst2
     End Sub
@@ -200,7 +200,7 @@ Public Class PCA_DrawImage : Inherits VB_Parent
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
         img.Line(p, q, color, task.lineWidth, task.lineType)
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = image.Resize(dst2.Size())
         Dim gray = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cvb.ThresholdTypes.Binary Or cvb.ThresholdTypes.Otsu)
         Dim hierarchy() As cvb.HierarchyIndex
@@ -251,7 +251,7 @@ Public Class PCA_Prep_CPP_VB : Inherits VB_Parent
         cPtr = PCA_Prep_Open()
         desc = "Take some pointcloud data and return the non-zero points in a point3f vector"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -301,8 +301,8 @@ Public Class PCA_Palettize : Inherits VB_Parent
         FindSlider("Desired number of colors").Value = 256
         desc = "Create a palette for the input image but don't use it."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
         Marshal.Copy(src.Data, buff, 0, buff.Length)
@@ -835,8 +835,8 @@ Public Class PCA_NColor : Inherits VB_Parent
         custom.colorMap = New cvb.Mat(256, 1, cvb.MatType.CV_8UC3)
         desc = "Use PCA to build a palettized CV_8U image from the input using a palette."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
         Marshal.Copy(src.Data, buff, 0, buff.Length)
@@ -881,7 +881,7 @@ Public Class PCA_NColor_CPP_VB : Inherits VB_Parent
         labels = {"", "", "Palettized (CV_8U) version of color image.", ""}
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
         classCount = palettize.options.desiredNcolors
@@ -921,7 +921,7 @@ Public Class PCA_NColorPalettize : Inherits VB_Parent
         FindSlider("Desired number of colors").Value = 8
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net which is very fast.
 
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)

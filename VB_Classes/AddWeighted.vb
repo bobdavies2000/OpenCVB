@@ -6,8 +6,8 @@ Public Class AddWeighted_Basics : Inherits VB_Parent
         UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'")
         desc = "Add 2 images with specified weights."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If standalone Then src2 = task.depthRGB
         If src2.Type <> src.Type Then
@@ -39,8 +39,8 @@ Public Class AddWeighted_DepthAccumulate : Inherits VB_Parent
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32F, 0)
         desc = "Update a running average of the image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         cvb.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New cvb.Mat)
     End Sub
@@ -58,7 +58,7 @@ Public Class AddWeighted_InfraRed : Inherits VB_Parent
     Public Sub New()
         desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.toggleOnOff Then
             dst1 = task.leftView
             labels(2) = "Left view combined with depthRGB"
@@ -86,7 +86,7 @@ Public Class AddWeighted_Edges : Inherits VB_Parent
         labels = {"", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image"}
         desc = "Add in the edges separating light and dark to the color image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         edges.Run(src)
         dst2 = edges.dst2
         labels(2) = edges.labels(2)

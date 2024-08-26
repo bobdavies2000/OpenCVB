@@ -8,7 +8,7 @@ Public Class Line_Basics : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() = 3 Then dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
         If dst2.Type <> cvb.MatType.CV_8U Then dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
 
@@ -55,7 +55,7 @@ Public Class Line_SubsetRect : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() = 3 Then dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
         If dst2.Type <> cvb.MatType.CV_8U Then dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
 
@@ -107,7 +107,7 @@ Public Class Line_InterceptsUI : Inherits VB_Parent
         labels(2) = "Use mouse in right image to highlight lines"
         desc = "An alternative way to highlight line segments with common slope"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst3.SetTo(0)
 
@@ -204,8 +204,8 @@ Public Class Line_Intercepts : Inherits VB_Parent
             End Select
         Next
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         lines.Run(src)
         If lines.lpList.Count = 0 Then Exit Sub
@@ -264,7 +264,7 @@ Public Class Line_LeftRightImages : Inherits VB_Parent
         labels(2) = "Left image lines(red) with Right(blue)"
         desc = "Find lines in the infrared images and overlay them in a single image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.cameraStable = False Then dst2.SetTo(cvb.Scalar.White)
 
         leftLines.Run(task.leftView)
@@ -299,7 +299,7 @@ Public Class Line_InDepthAndBGR : Inherits VB_Parent
         labels(3) = "Lines in BGR confirmed in the point cloud"
         desc = "Find the BGR lines and confirm they are present in the cloud data."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst2 = lines.dst2
         If lines.lpList.Count = 0 Then Exit Sub
@@ -364,7 +364,7 @@ Public Class Line_PointSlope : Inherits VB_Parent
         labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
         desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst2 = src
 
@@ -449,7 +449,7 @@ Public Class Line_Movement : Inherits VB_Parent
         labels = {"", "", "Line Movement", ""}
         desc = "Show the movement of the line provided"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             Static k1 = p1
             Static k2 = p2
@@ -514,8 +514,8 @@ Public Class Line_GCloud : Inherits VB_Parent
 
         Return gc
     End Function
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         Dim maxAngle = angleSlider.Value
 
@@ -561,7 +561,7 @@ Public Class Line_DisplayInfo : Inherits VB_Parent
         labels(2) = "When running standaloneTest(), a pair of random points is used to test the algorithm."
         desc = "Display the line provided in mp"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst2 = src
         If standaloneTest() And task.heartBeat Then
             Dim tc As tCell
@@ -619,7 +619,7 @@ Public Class Line_Perpendicular : Inherits VB_Parent
         labels = {"", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", ""}
         desc = "Find the line perpendicular to the line created by the points provided."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static externalUse = If(p1 = New cvb.Point2f, False, True)
         If task.heartBeat Or externalUse Then
             If standaloneTest() Then
@@ -659,7 +659,7 @@ Public Class Line_CellsVertHoriz : Inherits VB_Parent
         labels(2) = "RedCloud_Hulls output with lines highlighted"
         desc = "Identify the lines created by the RedCloud Cells and separate vertical from horizontal"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
 
@@ -690,7 +690,7 @@ Public Class Line_Cells : Inherits VB_Parent
     Public Sub New()
         desc = "Identify all lines in the RedCloud_Basics cell boundaries"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -712,7 +712,7 @@ Public Class Line_ViewSide : Inherits VB_Parent
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
         desc = "Find lines in the hotspots for the side view."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histSide.Run(src)
 
         autoY.Run(histSide.histogram)
@@ -736,7 +736,7 @@ Public Class Line_ViewTop : Inherits VB_Parent
         labels = {"", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View."}
         desc = "Find lines in the hotspots for the Top View."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         histTop.Run(src)
 
         autoX.Run(histTop.histogram)
@@ -762,7 +762,7 @@ Public Class Line_FromContours : Inherits VB_Parent
         UpdateAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
         desc = "Find the lines in the contours."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         contours.Run(reduction.dst2)
         dst2 = contours.dst2.Clone
@@ -790,7 +790,7 @@ Public Class Line_ColorClass : Inherits VB_Parent
         labels = {"", "", "Lines for the current color class", "Color Class input"}
         desc = "Review lines in all the different color classes"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         colorClass.Run(src)
         dst1 = colorClass.dst2
 
@@ -817,7 +817,7 @@ Public Class Line_Canny : Inherits VB_Parent
         labels = {"", "", "Straight lines in Canny output", "Input to Line_Basics"}
         desc = "Find lines in the Canny output"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         canny.Run(src)
         dst3 = canny.dst2.Clone
 
@@ -845,7 +845,7 @@ Public Class Line_TimeViewLines : Inherits VB_Parent
         labels(3) = "Vertical (blue) Horizontal (Red) Other (Green)"
         desc = "Find slope and y-intercept of lines over time."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         If lines.pixelcount = 0 Then Exit Sub
 
@@ -879,7 +879,7 @@ Public Class Line_TimeView : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Collect lines over time"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
 
         If task.optionsChanged Or task.motionFlag Then frameList.Clear()
@@ -928,7 +928,7 @@ Public Class Line_RegionsVB : Inherits VB_Parent
 
         desc = "Use the reduction values between lines to identify regions."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static noVertCheck = FindCheckBox("Run horizontal without vertical step")
         Static verticalCheck = FindCheckBox("Show intermediate vertical step results.")
         reduction.Run(src)
@@ -1026,8 +1026,8 @@ Public Class Line_Verticals : Inherits VB_Parent
         angleZSlider = FindSlider("Z angle tolerance in degrees")
         desc = "Capture all vertical and horizontal lines."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         maxAngleX = angleXSlider.Value
         maxAngleZ = angleZSlider.Value
@@ -1089,7 +1089,7 @@ Public Class Line_Verts : Inherits VB_Parent
         labels(3) = "Numbers below are: correlation coefficient, distance in meters, angle from vertical in the X-direction, angle from vertical in the Z-direction"
         desc = "Find the list of vertical lines and track them until most are lost, then recapture the vertical lines again."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
 
         If verticals.Count < 2 Or verticals.Count < verts.verticals.Count / 3 Or task.optionsChanged Then
             verts.Run(src)
@@ -1168,7 +1168,7 @@ Public Class Line_Nearest : Inherits VB_Parent
         labels(2) = "Yellow line is input line, white dot is the input point, and the white line is the nearest path to the input line."
         desc = "Find the nearest point on a line"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() And task.heartBeat Then
             lp.p1 = New cvb.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             lp.p2 = New cvb.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -1226,7 +1226,7 @@ Public Class Line_Intersection : Inherits VB_Parent
     Public Sub New()
         desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             p1 = New cvb.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cvb.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -1263,7 +1263,7 @@ Public Class Line_Gravity : Inherits VB_Parent
         task.gOptions.LineWidth.Value = 2
         desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim pixelDiff = task.gOptions.pixelDiffThreshold
 
         dst2 = src.Clone
@@ -1327,8 +1327,8 @@ Public Class Line_KNN : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Use KNN to find the other line end points nearest to each endpoint and connect them with a line."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        swarm.options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        swarm.options.RunOpt()
         lines.Run(src)
         dst2 = lines.dst2
 

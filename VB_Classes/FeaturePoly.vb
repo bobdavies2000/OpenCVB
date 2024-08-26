@@ -15,9 +15,9 @@ Public Class FeaturePoly_Basics : Inherits VB_Parent
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.FirstPass Then sides.prevImage = src.Clone
-        sides.options.RunVB()
+        sides.options.RunOpt()
 
         topFeatures.Run(src)
         dst2 = topFeatures.dst2
@@ -130,11 +130,11 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
         labels(2) = "White is the original FPoly and yellow is the current FPoly."
         desc = "Compute the lengths of each side in a polygon"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         If task.FirstPass Then prevImage = src.Clone
-        options.RunVB()
+        options.RunOpt()
 
         If standaloneTest() And task.heartBeat Then
             Random.Run(empty)
@@ -252,9 +252,9 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If task.FirstPass Then resyncImage = src.Clone
-        options.RunVB()
+        options.RunOpt()
 
         topFeatures.Run(src)
         dst2 = topFeatures.dst2
@@ -368,7 +368,7 @@ Public Class FeaturePoly_Plot : Inherits VB_Parent
         labels = {"", "", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot the distribution"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim lastDistance = fGrid.dst0.Clone
 
         fGrid.Run(src)
@@ -424,7 +424,7 @@ Public Class FeaturePoly_PlotWeighted : Inherits VB_Parent
         labels = {"", "Distance change from previous frame", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot with weighting and Kalman to smooth results"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fPlot.Run(src)
         dst3 = fPlot.dst3
 
@@ -465,7 +465,7 @@ Public Class FeaturePoly_Stablizer : Inherits VB_Parent
                   "current image with distance map"}
         desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fGrid.Run(src.Clone)
         dst3 = fGrid.dst3
         labels(3) = fGrid.labels(2)
@@ -510,7 +510,7 @@ Public Class FeaturePoly_StartPoints : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Track the feature grid points back to the last sync point"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
         Dim maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold
@@ -565,7 +565,7 @@ Public Class FeaturePoly_Triangle : Inherits VB_Parent
     Public Sub New()
         desc = "Find the minimum triangle that contains the feature grid"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fGrid.Run(src)
         dst2 = fGrid.dst2
 
@@ -588,8 +588,8 @@ Public Class FeaturePoly_TopFeatures : Inherits VB_Parent
     Public Sub New()
         desc = "Get the top features and validate them"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
 
         stable.Run(src)
         dst2 = stable.dst2
@@ -625,7 +625,7 @@ Public Class FeaturePoly_WarpAffinePoly : Inherits VB_Parent
                   "Feature polygon with rotation and shift - should be aligned"}
         desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fPoly.Run(src)
         Dim polyPrev = fPoly.fPD.prevPoly
         Dim poly = New List(Of cvb.Point2f)(fPoly.fPD.currPoly)
@@ -701,7 +701,7 @@ Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
 
         Return New cvb.Point2f(totalX, totalY)
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             SetTrueText(traceName + " is meant only to run with FeaturePoly_Basics to validate the translation")
             Exit Sub
@@ -747,7 +747,7 @@ Public Class FeaturePoly_WarpAffineImage : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fPoly.Run(src)
 
         warp.rotateCenter = fPoly.fPD.rotateCenter
@@ -808,7 +808,7 @@ Public Class FeaturePoly_Perpendiculars : Inherits VB_Parent
         If Single.IsNaN(angle) Then Return 0
         Return angle
     End Function
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().")
             Exit Sub
@@ -871,7 +871,7 @@ Public Class FeaturePoly_PerpendicularsTest : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Test the perpendicular method of finding the rotate center of the Feature Polygon"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fPoly.Run(src)
         dst1 = fPoly.dst1
         dst2 = fPoly.dst2
@@ -894,7 +894,7 @@ Public Class FeaturePoly_PerpendicularsImage : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Rotate the image using the perpendicular method of finding the rotate center"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fImage.Run(src)
         dst1 = fImage.dst1
         dst2 = fImage.dst2
@@ -920,7 +920,7 @@ Public Class FeaturePoly_Image : Inherits VB_Parent
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FeaturePoly_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim input = src.Clone
         fpoly.Run(src)
         dst1 = fpoly.dst1
@@ -994,7 +994,7 @@ Public Class FeaturePoly_ImageMask : Inherits VB_Parent
         task.gOptions.pixelDiffThreshold = 10
         desc = "Build the image mask of the differences between the current frame and resync image"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fImage.Run(src)
         dst2 = fImage.dst3
         dst0 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -1018,7 +1018,7 @@ Public Class FeaturePoly_PointCloud : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Update changed point cloud pixels as indicated by the FeaturePoly_ImageMask"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fMask.Run(src)
         If fMask.fImage.fpoly.resync Or task.FirstPass Then fPolyCloud = task.pointCloud.Clone
         dst1 = fMask.dst1
@@ -1042,7 +1042,7 @@ Public Class FeaturePoly_ResyncCheck : Inherits VB_Parent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fPoly.Run(src)
         dst2 = fPoly.dst1
         SetTrueText(fPoly.strOut, 2)
@@ -1083,7 +1083,7 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
                       "Layout of feature polygons after rotation and translation"}
         desc = "Manually rotate and translate the current feature polygon to a previous feature polygon."
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             SetTrueText(traceName + " is called by FeaturePoly_Basics to get the rotate center and angle." + vbCrLf +
                         "It does not produce any output when run standaloneTest().")
@@ -1175,7 +1175,7 @@ Public Class FeaturePoly_EdgeRemoval : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Remove edges from the FeaturePoly_ImageMask"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         fMask.Run(src)
         dst2 = fMask.dst3
 
@@ -1209,7 +1209,7 @@ Public Class FeaturePoly_ImageNew : Inherits VB_Parent
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FeaturePoly_Basics"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         Dim input = src.Clone
         fpoly.Run(src)
         dst1 = fpoly.dst3
@@ -1277,7 +1277,7 @@ Public Class FeaturePoly_LeftRight : Inherits VB_Parent
         labels = {"Left image", "Right image", "FPoly output for left image", "FPoly output for right image"}
         desc = "Measure camera motion through the left and right images using FPoly"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
+    Public Sub RunAlg(src As cvb.Mat)
         dst0 = task.leftView
         dst1 = task.rightView
         leftPoly.Run(task.leftView)
@@ -1312,9 +1312,9 @@ Public Class FeaturePoly_Core : Inherits VB_Parent
         labels = {"", "Distance change from previous frame", "", "Feature Grid with anchor"}
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub
-    Public Sub RunVB(src As cvb.Mat)
-        options.RunVB()
-        optionsCore.RunVB()
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        optionsCore.RunOpt()
 
         stable.Run(src)
         dst3 = stable.basics.dst3
