@@ -126,6 +126,8 @@ Public Class Main_UI
     Dim testAllStartingRes As Integer
     Dim testAllEndingRes As Integer
     Dim windowsVersion As Integer
+    Dim algolist As algorithmList = New algorithmList
+
 #End Region
 #Region "Non-volatile"
     Public Sub jsonRead()
@@ -804,7 +806,7 @@ Public Class Main_UI
             Return -1
         End Function
     End Class
-    Private Function killPythonCameraOrTask() As Boolean
+    Private Function killPython() As Boolean
         Dim proc = Process.GetProcesses()
         Dim foundCamera As Boolean
         'Dim procList As New SortedList(Of String, String)(New compareAllowIdenticalString)
@@ -834,7 +836,7 @@ Public Class Main_UI
         cameraTaskHandle = Nothing
         If TreeButton.Checked Then TreeViewDialog.Close()
 
-        killPythonCameraOrTask()
+        killPython()
 
         saveAlgorithmName = "" ' this will close the current algorithm.
     End Sub
@@ -1488,7 +1490,6 @@ Public Class Main_UI
             AlgorithmTestAllCount += 1
             drawRect = New cvb.Rect
             Dim task = New VBtask(parms)
-            Static algolist As algorithmList = New algorithmList
 
             task.algorithmObject = algolist.createAlgorithm(parms.algName)
             textDesc = task.algorithmObject.desc
@@ -1732,6 +1733,7 @@ Public Class Main_UI
             task.Dispose()
         End SyncLock
 
+        If parms.algName.EndsWith(".py") Then killPython()
         frameCount = 0
     End Sub
 End Class

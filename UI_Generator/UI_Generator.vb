@@ -29,8 +29,8 @@ Module UI_GeneratorMain
         End If
 
         Dim HomeDir As New DirectoryInfo(CCInput.DirectoryName + "/../")
+        ' New FileInfo(HomeDir.FullName + "CPP_Classes/CPP_Classes.cpp").FullName,
         Dim CS_CPPCLR_Inputs = {New FileInfo(HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs").FullName,
-                                New FileInfo(HomeDir.FullName + "CPP_Classes/CPP_Classes.cpp").FullName,
                                 New FileInfo(HomeDir.FullName + "CPP_Code/CPP_AI_Generated.h").FullName,
                                 New FileInfo(HomeDir.FullName + "CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(HomeDir.FullName + "VB_classes/")
@@ -304,7 +304,6 @@ Module UI_GeneratorMain
         'Next
         For Each nextName In cleanNames
             If nextName.StartsWith("CPP_Basics") Then Continue For
-            If nextName = "AddWeighted_Basics_CPP" Then Continue For
             If nextName.EndsWith("_CC") Then
                 sw.WriteLine(vbTab + "If algorithmName = """ + nextName + """ Then return new CPP_Basics(ccFunctionNames._" + nextName + ")")
             Else
