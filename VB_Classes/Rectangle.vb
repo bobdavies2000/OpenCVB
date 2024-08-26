@@ -79,8 +79,8 @@ Public Class Rectangle_Overlap : Inherits VB_Parent
             Dim r2 As cvb.RotatedRect = draw.rotatedRectangles(1)
             rect1 = r1.BoundingRect
             rect2 = r2.BoundingRect
-            drawRotatedOutline(r1, dst3, cvb.Scalar.Yellow)
-            drawRotatedOutline(r2, dst3, cvb.Scalar.Yellow)
+            DrawRotatedOutline(r1, dst3, cvb.Scalar.Yellow)
+            DrawRotatedOutline(r2, dst3, cvb.Scalar.Yellow)
         Else
             rect1 = draw.rectangles(0)
             rect2 = draw.rectangles(1)
@@ -298,7 +298,7 @@ Public Class Rectangle_EnclosingPoints : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cvb.Mat)
         If standaloneTest() Then
-            pointList = quickRandomPoints(20)
+            pointList = QuickRandomPoints(20)
             dst2.SetTo(0)
             For Each pt In pointList
                 DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
@@ -306,7 +306,7 @@ Public Class Rectangle_EnclosingPoints : Inherits VB_Parent
         End If
 
         Dim minRect = cvb.Cv2.MinAreaRect(pointList.ToArray)
-        drawRotatedOutline(minRect, dst2, cvb.Scalar.Yellow)
+        DrawRotatedOutline(minRect, dst2, cvb.Scalar.Yellow)
     End Sub
 End Class
 

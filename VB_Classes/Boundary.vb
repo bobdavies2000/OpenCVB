@@ -37,7 +37,7 @@ Public Class Boundary_Basics : Inherits VB_Parent
             For i = 1 To redCPP.classCount - 1
                 Dim rect = redCPP.rectList(i - 1)
                 Dim mask = redCPP.dst2(rect).InRange(i, i)
-                Dim contour = contourBuild(mask, cvb.ContourApproximationModes.ApproxNone)
+                Dim contour = ContourBuild(mask, cvb.ContourApproximationModes.ApproxNone)
                 DrawContour(dst2(rect), contour, 255, task.lineWidth)
                 rects.Add(rect)
                 masks.Add(mask)

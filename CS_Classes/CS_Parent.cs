@@ -297,7 +297,7 @@ namespace CS_Classes
         }
     }
 
-    public List<CV.Point> contourBuild(CV.Mat mask, CV.ContourApproximationModes approxMode)
+    public List<CV.Point> ContourBuild(CV.Mat mask, CV.ContourApproximationModes approxMode)
     {
         CV.Point[][] allContours;
         CV.HierarchyIndex[] test;
@@ -694,10 +694,6 @@ namespace CS_Classes
             CV.Point pt = new CV.Point(0, 0);
             TrueText str = new TrueText(text, pt, picTag);
             trueData.Add(str);
-        }
-        public void SetSlider(string opt, int val)
-        {
-            controls.CS_SetSlider(opt, val);
         }
         public TrackBar FindSlider(string opt)
         {

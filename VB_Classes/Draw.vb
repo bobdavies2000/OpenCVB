@@ -270,7 +270,7 @@ Public Class Draw_Arc : Inherits VB_Parent
         dst2.SetTo(cvb.Scalar.White)
         If options.drawFull Then
             dst2.Ellipse(rr, color, thickness, task.lineType)
-            drawRotatedOutline(rr, dst2, task.scalarColors(colorIndex))
+            DrawRotatedOutline(rr, dst2, task.scalarColors(colorIndex))
         Else
             Dim angle = kalman.kOutput(4)
             Dim startAngle = kalman.kOutput(5)

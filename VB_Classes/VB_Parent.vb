@@ -216,7 +216,7 @@ Public Class VB_Parent : Implements IDisposable
                          (p1(1) - p2(1)) * (p1(1) - p2(1)) +
                          (p1(2) - p2(2)) * (p1(2) - p2(2)))
     End Function
-    Public Function contourBuild(mask As cvb.Mat, approxMode As cvb.ContourApproximationModes) As List(Of cvb.Point)
+    Public Function ContourBuild(mask As cvb.Mat, approxMode As cvb.ContourApproximationModes) As List(Of cvb.Point)
         Dim allContours As cvb.Point()()
         cvb.Cv2.FindContours(mask, allContours, Nothing, cvb.RetrievalModes.External, approxMode)
 
@@ -567,7 +567,7 @@ Public Class VB_Parent : Implements IDisposable
         DrawCircle(dst, pt, task.DotSize, cvb.Scalar.Black)
     End Sub
 
-    Public Sub drawRotatedOutline(rotatedRect As cvb.RotatedRect, dst2 As cvb.Mat, color As cvb.Scalar)
+    Public Sub DrawRotatedOutline(rotatedRect As cvb.RotatedRect, dst2 As cvb.Mat, color As cvb.Scalar)
         Dim pts = rotatedRect.Points()
         Dim lastPt = pts(0)
         For i = 1 To pts.Length
@@ -591,7 +591,7 @@ Public Class VB_Parent : Implements IDisposable
         Return New cvb.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))
     End Function
-    Public Function quickRandomPoints(howMany As Integer) As List(Of cvb.Point2f)
+    Public Function QuickRandomPoints(howMany As Integer) As List(Of cvb.Point2f)
         Dim srcPoints As New List(Of cvb.Point2f)
         Dim w = task.WorkingRes.Width
         Dim h = task.WorkingRes.Height
@@ -670,7 +670,7 @@ Public Class VB_Parent : Implements IDisposable
         If task.paused = False Then algorithm.RunVB(src)
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
-    Public Sub DrawContour(ByRef dst As cvb.Mat, contour As List(Of cvb.Point), color As cvb.Scalar, Optional lineWidth As Integer = -10)
+    Public Sub DrawContour(dst As cvb.Mat, contour As List(Of cvb.Point), color As cvb.Scalar, Optional lineWidth As Integer = -10)
         If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
         Dim listOfPoints = New List(Of List(Of cvb.Point))

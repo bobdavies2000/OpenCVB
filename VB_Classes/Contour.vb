@@ -718,10 +718,10 @@ Public Class Contour_Smoothing : Inherits VB_Parent
         dst1.SetTo(0)
         dst3.SetTo(0)
 
-        Dim bestContour = contourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone)
+        Dim bestContour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone)
         DrawContour(dst3(rc.rect), bestContour, cvb.Scalar.White, task.lineWidth + 3)
 
-        Dim approxContour = contourBuild(rc.mask, options.ApproximationMode)
+        Dim approxContour = ContourBuild(rc.mask, options.ApproximationMode)
         DrawContour(dst3(rc.rect), approxContour, cvb.Scalar.Red)
 
         If task.heartBeat Then labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +

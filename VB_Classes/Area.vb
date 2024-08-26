@@ -165,7 +165,7 @@ Public Class Area_MinRect : Inherits VB_Parent
         If standaloneTest() Then
             If Not task.heartBeat Then Exit Sub
             options.RunVB()
-            inputPoints = quickRandomPoints(options.numPoints)
+            inputPoints = QuickRandomPoints(options.numPoints)
         End If
 
         minRect = cvb.Cv2.MinAreaRect(inputPoints.ToArray)
@@ -175,7 +175,7 @@ Public Class Area_MinRect : Inherits VB_Parent
             For Each pt In inputPoints
                 DrawCircle(dst2, pt, task.DotSize + 2, cvb.Scalar.Red)
             Next
-            drawRotatedOutline(minRect, dst2, cvb.Scalar.Yellow)
+            DrawRotatedOutline(minRect, dst2, cvb.Scalar.Yellow)
         End If
     End Sub
 End Class

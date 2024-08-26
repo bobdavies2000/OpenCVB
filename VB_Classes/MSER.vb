@@ -33,7 +33,7 @@ Public Class MSER_Basics : Inherits VB_Parent
             rc.mask = dst0(rc.rect).InRange(val, val)
             rc.pixels = detect.maskCounts(index)
 
-            rc.contour = contourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(rc.mask, rc.contour, 255, -1)
 
             rc.floodPoint = floodPoints(index)

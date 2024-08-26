@@ -54,7 +54,7 @@ Public Class Triangle_HullContour : Inherits VB_Parent
         If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
 
-        rc.contour = contourBuild(rc.mask, cvb.ContourApproximationModes.ApproxTC89L1)
+        rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxTC89L1)
 
         dst3.SetTo(0)
         For Each pt In rc.contour

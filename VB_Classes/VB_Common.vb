@@ -2,7 +2,7 @@
 Imports System.Drawing
 Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
-Module VB_Common
+Public Module vbc
     Public task As VBtask
     Public allOptions As OptionsContainer
     Public recordedData As Replay_Play

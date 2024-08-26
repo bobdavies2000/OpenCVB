@@ -53,6 +53,7 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="AlgorithmList.cs" />
     <Compile Remove="CSharp_Externs.cs" />
     <Compile Remove="CS_Task.cs" />
   </ItemGroup>

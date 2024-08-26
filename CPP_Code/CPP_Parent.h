@@ -309,7 +309,7 @@ public:
         }
         return mm;
     }
-    void drawRotatedOutline(const RotatedRect& rotatedRect, Mat& dst2, const Scalar& color) {
+    void DrawRotatedOutline(const RotatedRect& rotatedRect, Mat& dst2, const Scalar& color) {
         vector<Point2f> pts;
         rotatedRect.points(pts);
 

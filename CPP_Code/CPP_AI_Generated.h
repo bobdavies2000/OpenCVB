@@ -6233,7 +6233,7 @@ public:
 };
 
 
-vector<Point> contourBuild(const Mat& mask, int approxMode) {
+vector<Point> ContourBuild(const Mat& mask, int approxMode) {
     std::vector<std::vector<Point>> allContours;
     findContours(mask, allContours, RETR_EXTERNAL, approxMode);  // Adjusted retrieval mode
 
@@ -6316,7 +6316,7 @@ public:
             cell.index = int(sortedCells.size()) + 1;
             cell.rect = task->validateRect(rectData.at<cv::Rect>(i, 0), dst2.cols, dst2.rows);
             inRange(dst2(cell.rect), cell.index, cell.index, cell.mask);
-            //vector<Point> contour = contourBuild(cell.mask, cv::CHAIN_APPROX_NONE); 
+            //vector<Point> contour = ContourBuild(cell.mask, cv::CHAIN_APPROX_NONE); 
             //DrawContours(cell.mask, vector<vector<Point>> {contour}, 255, -1);
 
             cell.floodPoint = floodPointData.at<cv::Point>(i, 0);
@@ -6489,7 +6489,7 @@ public:
             for (const Point2f& pt : inputPoints) {
                 circle(dst2, pt, task->DotSize + 2, Scalar(0, 0, 255), -1, task->lineType);
             }
-            task->drawRotatedOutline(minRect, dst2, Scalar(0, 255, 255));
+            task->DrawRotatedOutline(minRect, dst2, Scalar(0, 255, 255));
         }
     }
 };

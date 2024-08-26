@@ -1617,7 +1617,7 @@ Public Class RedCloud_ContourUpdate : Inherits VB_Parent
         dst3.SetTo(0)
         For i = 1 To redCells.Count - 1
             Dim rc = redCells(i)
-            rc.contour = contourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(rc.mask, rc.contour, 255, -1)
             redCells(i) = rc
             DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
