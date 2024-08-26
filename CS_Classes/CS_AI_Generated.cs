@@ -3203,7 +3203,10 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             color.Run(src);
-            quart.Run(color.dst3.CvtColor(ColorConversionCodes.BGR2GRAY));
+            if (color.dst3.Channels() == 1) 
+                quart.Run(color.dst3);
+            else
+                quart.Run(color.dst3.CvtColor(ColorConversionCodes.BGR2GRAY));
             dst1 = quart.dst1;
             dst2 = quart.dst2;
             dst3 = quart.dst3;

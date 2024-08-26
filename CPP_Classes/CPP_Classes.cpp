@@ -55,23 +55,21 @@ namespace CPP_Classes {
     };
 
 
-    public class CPP_Parent
+    public ref class CPP_Parent
     {
     public:
-        gcroot<VBtask^> task;
-        bool standalone;
-        char* chars = new char[1];
-        gcroot<String^> desc = gcnew String(chars);
-        cv::Mat dst0, dst1, dst2, dst3, empty;
-        std::vector<TrueText> trueData = std::vector<TrueText>();
+        //VBtask task;
+        //bool standalone;
+        //String desc = "";
+        //cv::Mat dst0, dst1, dst2, dst3, empty;
+        //std::vector<TrueText> trueData = std::vector<TrueText>();
     };
     
-    public class AddWeighted_Basics_CPP : public CPP_Parent
+    public ref class AddWeighted_Basics_CPP : public CPP_Parent
     {
     public:
         double weight;
-        cv::Mat src2, dst2;
-        gcroot<Options_AddWeighted^> options = gcnew Options_AddWeighted();
+        //gcroot<Options_AddWeighted^> options = gcnew Options_AddWeighted();
 
         AddWeighted_Basics_CPP() 
         {
@@ -80,7 +78,7 @@ namespace CPP_Classes {
 
         void RunCPP(cv::Mat& src)
         {
-            options->RunVB();
+            //options->RunVB();
 
             //cv::Mat srcPlus = src2;
             //// algorithm user normally provides src2! 
@@ -97,7 +95,7 @@ namespace CPP_Classes {
             //}
 
             weight = 0.5;
-            cv::addWeighted(src, weight, src2, 1.0 - weight, 0, dst2);
+            //cv::addWeighted(src, weight, src2, 1.0 - weight, 0, dst2);
            //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
         }
     };

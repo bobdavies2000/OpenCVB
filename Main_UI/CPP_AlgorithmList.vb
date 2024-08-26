@@ -2,7 +2,6 @@
 imports CPP_Classes
 Public Class CPP_AlgorithmList
 	public Function createCPPAlgorithm(algorithmName as string) as Object
-		if algorithmName = "AddWeighted_Basics_CPP" Then Return New AddWeighted_Basics_CPP()
 		Return Nothing
 	End Function
 End Class

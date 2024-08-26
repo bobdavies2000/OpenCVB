@@ -154,26 +154,26 @@ Module UI_GeneratorMain
                 If sortedNames.Keys.Contains(fileinfo.Name) = False Then sortedNames.Add(fileinfo.Name, sortedNames.Count)
                 fileName = fileinfo.FullName
             Else
-                If fileName.EndsWith("VB_Parent.vb") = False And fileName.EndsWith("AlgorithmList.cs") = False Then
-                    Dim nextFile As New System.IO.StreamReader(fileName)
-                    While nextFile.Peek() <> -1
-                        Dim fileline = Trim(nextFile.ReadLine())
-                        fileline = Replace(fileline, vbTab, "")
-                        If fileline IsNot Nothing Then
-                            If fileline.Substring(0, 1) <> "'" Then
-                                If Len(fileline) > 0 Then CodeLineCount += 1
-                                If LCase(fileline).StartsWith("public class") Then
-                                    Dim split As String() = Regex.Split(fileline, "\W+")
-                                    If fileline.EndsWith(" : Inherits VB_Parent") Then className = split(2)
-                                End If
-                                If LCase(fileline).StartsWith("public sub new(") And
-                                    sortedNames.ContainsKey(className) = False Then
-                                    If sortedNames.Keys.Contains(className) = False Then sortedNames.Add(className, sortedNames.Count)
-                                End If
+                If fileName.EndsWith("VB_Parent.vb") Then Continue For
+                If fileName.EndsWith("AlgorithmList.cs") Then Continue For
+                Dim nextFile As New System.IO.StreamReader(fileName)
+                While nextFile.Peek() <> -1
+                    Dim fileline = Trim(nextFile.ReadLine())
+                    fileline = Replace(fileline, vbTab, "")
+                    If fileline IsNot Nothing Then
+                        If fileline.Substring(0, 1) <> "'" Then
+                            If Len(fileline) > 0 Then CodeLineCount += 1
+                            If LCase(fileline).StartsWith("public class") Then
+                                Dim split As String() = Regex.Split(fileline, "\W+")
+                                If fileline.EndsWith(" : Inherits VB_Parent") Then className = split(2)
+                            End If
+                            If LCase(fileline).StartsWith("public sub new(") And
+                                        sortedNames.ContainsKey(className) = False Then
+                                If sortedNames.Keys.Contains(className) = False Then sortedNames.Add(className, sortedNames.Count)
                             End If
                         End If
-                    End While
-                End If
+                    End If
+                End While
             End If
         Next
 
@@ -231,11 +231,11 @@ Module UI_GeneratorMain
         Next
 
         'For Each name In cppSortedNames.Keys
-        '    allButPython.Add(name, name)
+        '    sortedNames.Add(name, name)
         'Next
 
         For Each name In csSortedNames.Keys
-            allButPython.Add(name, name)
+            sortedNames.Add(name, sortedNames.Count)
         Next
 
         Dim cleanNames As New List(Of String)
@@ -306,7 +306,7 @@ Module UI_GeneratorMain
         For i = 0 To cleanNames.Count - 1
             Dim nextName = cleanNames(i)
             If nextName.StartsWith("CPP_Basics") Then Continue For
-            If nextName.EndsWith(".py") = False Then
+            If nextName.EndsWith(".py") = False And nextName.EndsWith("_CS") = False Then
                 sw.WriteLine(vbTab + "if algorithmName = """ + nextName + """ Then return new " + nextName)
             End If
         Next
@@ -343,7 +343,9 @@ Module UI_GeneratorMain
                 PYnames.Add(cleanNames(i), cleanNames(i))
                 If cleanNames(i).EndsWith("_PS.py") Then PYStreamNames.Add(cleanNames(i), cleanNames(i))
             Else
-                VBNames.Add(cleanNames(i), cleanNames(i))
+                If cleanNames(i).EndsWith("_CS") = False And cleanNames(i).EndsWith("_CPP") = False Then
+                    VBNames.Add(cleanNames(i), cleanNames(i))
+                End If
                 apiList.Add(cleanNames(i))
                 apiListLCase.Add(LCase(cleanNames(i)))
                 allButPython.Add(cleanNames(i), cleanNames(i))
@@ -471,7 +473,9 @@ Module UI_GeneratorMain
 
         sw.Write("<All but Python (" + CStr(allButPython.Count) + ")>")
         For i = 0 To allButPython.Count - 1
-            sw.Write("," + allButPython.ElementAt(i).Key)
+            Dim nextName = allButPython.ElementAt(i).Key
+            If nextName = "CPP_Basics" Then Continue For
+            sw.Write("," + nextName)
         Next
         sw.WriteLine()
 

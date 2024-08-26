@@ -348,6 +348,10 @@ Public Class VBtask : Implements IDisposable
             openGL_hwnd = 0
         End If
     End Sub
+    Public Sub New()
+
+    End Sub
+
     Public Sub New(parms As algParms)
         AddHandler TaskTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf VBTaskTimerPop)
         TaskTimer.AutoReset = True

@@ -8,6 +8,7 @@ Imports VB_Classes
 Imports System.Management
 Imports cvext = OpenCvSharp.Extensions
 Imports System.ComponentModel
+Imports System.Windows.Documents
 #Region "Globals"
 Module opencv_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
@@ -85,7 +86,7 @@ Public Class Main_UI
     Dim textDesc As String = ""
     Dim textAdvice As String = ""
     Dim totalBytesOfMemoryUsed As Integer
-    Dim trueData As New List(Of VB_Classes.trueText)
+    Dim trueData As New List(Of VB_Classes.TrueText)
     Dim mbuf(2 - 1) As VB_Classes.VBtask.inBuffer
     Dim mbIndex As Integer
 
@@ -381,9 +382,9 @@ Public Class Main_UI
             While sr.EndOfStream = False
                 infoLine = sr.ReadLine
                 infoLine = UCase(Mid(infoLine, 1, 1)) + Mid(infoLine, 2)
-                If infoLine.StartsWith("Options_") = False Then
-                    addNextAlgorithm(infoLine, lastNameSplit)
-                End If
+                If infoLine.StartsWith("Options_") Then Continue While
+                If infoLine.StartsWith("CPP_Basics") Then Continue While
+                addNextAlgorithm(infoLine, lastNameSplit)
             End While
             sr.Close()
         Else
@@ -392,11 +393,10 @@ Public Class Main_UI
             Dim groupings = groupList(keyIndex)
             Dim split = Regex.Split(groupings, ",")
             AvailableAlgorithms.Items.Clear()
-
             For i = 1 To split.Length - 1
-                If split(i).StartsWith("Options_") = False Then
-                    addNextAlgorithm(split(i), lastNameSplit)
-                End If
+                If split(i).StartsWith("Options_") Then Continue For
+                If split(i).StartsWith("CPP_Basics") Then Continue For
+                addNextAlgorithm(split(i), lastNameSplit)
             Next
             AvailableAlgorithms.Enabled = True
         End If
@@ -582,7 +582,7 @@ Public Class Main_UI
         If goodPoint.X > Me.Left Then Me.Left = goodPoint.X
         If goodPoint.Y > Me.Top Then Me.Top = goodPoint.Y
 
-        trueData = New List(Of VB_Classes.trueText)
+        trueData = New List(Of VB_Classes.TrueText)
 
         If camLabel(0) Is Nothing Then
             For i = 0 To camLabel.Length - 1
@@ -1680,7 +1680,7 @@ Public Class Main_UI
                 If task.paused = False Then
                     SyncLock trueData
                         If task.trueData.Count Then
-                            trueData = New List(Of VB_Classes.trueText)(task.trueData)
+                            trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         Else
                             trueData = New List(Of VB_Classes.trueText)
                         End If
