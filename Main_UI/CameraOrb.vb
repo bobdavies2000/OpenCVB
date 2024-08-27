@@ -109,7 +109,7 @@ Public Class CameraORB : Inherits Camera
 
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         Catch ex As Exception
-            Console.WriteLine("Orbec camera failure..." + ex.Message)
+            debug.writeline("Orbec camera failure..." + ex.Message)
         End Try
     End Sub
     Public Sub stopCamera()
@@ -117,7 +117,7 @@ Public Class CameraORB : Inherits Camera
         Try
             ORBClose(cPtr)
         Catch ex As Exception
-            Console.WriteLine("Orbec camera shutdown failure..." + ex.Message)
+            debug.writeline("Orbec camera shutdown failure..." + ex.Message)
         End Try
         cPtr = 0
     End Sub

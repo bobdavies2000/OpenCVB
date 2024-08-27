@@ -54,7 +54,7 @@ Public Class Mouse_ClickPointUsage : Inherits VB_Parent
 
         For Each pt In task.features
             If pt = task.ClickPoint Then
-                Console.WriteLine("Hit the point you selected.")
+                debug.writeline("Hit the point you selected.")
             End If
         Next
     End Sub

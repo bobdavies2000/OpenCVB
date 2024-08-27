@@ -97,7 +97,7 @@ Public Class Annealing_MT_CPP_VB : Inherits VB_Parent
             anneal(i).Open() ' this will initialize the C++ copy of the city positions.
         Next
         Dim timeSpent = Now.Subtract(startTime)
-        If timeSpent.TotalSeconds < 10000 Then Console.WriteLine("time spent on last problem = " + Format(timeSpent.TotalSeconds, fmt1) + " seconds.")
+        If timeSpent.TotalSeconds < 10000 Then debug.writeline("time spent on last problem = " + Format(timeSpent.TotalSeconds, fmt1) + " seconds.")
         startTime = Now
     End Sub
     Public Sub New()

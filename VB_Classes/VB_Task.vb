@@ -324,7 +324,7 @@ Public Class VBtask : Implements IDisposable
         Static WarningCount As Integer
         Static saveFrameCount = -1
         If saveFrameCount = frameCount And frameCount > 0 And WarningCount = 0 Then
-            Console.WriteLine("Warning: " + task.algName + " has not completed work on a frame in a second. Warning " + CStr(WarningCount))
+            debug.writeline("Warning: " + task.algName + " has not completed work on a frame in a second. Warning " + CStr(WarningCount))
             WarningCount += 1
         Else
             WarningCount = 0
@@ -452,7 +452,7 @@ Public Class VBtask : Implements IDisposable
             openGL_hwnd = 0
         End If
         TaskTimer.Enabled = False
-        allOptions.Close()
+        'allOptions.Close()
     End Sub
     Public Sub TrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
         Dim str As New trueText(text, pt, picTag)
@@ -611,7 +611,7 @@ Public Class VBtask : Implements IDisposable
             task.algorithm_msMain = New List(Of Single)(algorithm_ms)
             task.algorithmNamesMain = New List(Of String)(algorithmNames)
         Catch ex As Exception
-            Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
+            debug.writeline("Active Algorithm exception occurred: " + ex.Message)
         End Try
     End Sub
     Public Sub RunAlgorithm()

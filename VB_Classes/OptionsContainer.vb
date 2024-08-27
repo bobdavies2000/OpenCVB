@@ -77,7 +77,7 @@ Public Class OptionsContainer
                 End If
             Next
         Catch ex As Exception
-            Console.WriteLine("Error in layoutOptions: " + ex.Message)
+            debug.writeline("Error in layoutOptions: " + ex.Message)
         End Try
         hiddenOptions.Clear()
     End Sub

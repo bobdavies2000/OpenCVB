@@ -75,7 +75,7 @@ Public Class PongWars_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         iteration += 1
         If iteration Mod 1000 = 0 Then
-            Console.WriteLine("iteration " & iteration)
+            debug.writeline("iteration " & iteration)
         End If
 
         d1 = UpdateSquareAndBounce(p1, d1, DAY_COLOR)

@@ -135,7 +135,7 @@ Public Class KNN_Core : Inherits VB_Parent
         Dim dm = If(desiredMatches < 0, trainInput.Count, desiredMatches)
         knn.FindNearest(queryMat, dm, New cvb.Mat, neighborMat)
         If neighborMat.Rows <> queryMat.Rows Or neighborMat.Cols <> dm Then
-            Console.WriteLine("KNN's FindNearest did not return the correct number of neighbors.  Marshal.copy will fail so exit.")
+            debug.writeline("KNN's FindNearest did not return the correct number of neighbors.  Marshal.copy will fail so exit.")
             Exit Sub
         End If
 
@@ -713,7 +713,7 @@ Public Class KNN_ClosestTracker : Inherits VB_Parent
 
         If minDistances.Count > 0 Then
             If minDist > minDistances.Max * 2 Then
-                Console.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
+                debug.writeline("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
                 lastPair = New PointPair(trainInput(0), trainInput(1))
             Else
                 lastPair = New PointPair(p1, p2)
@@ -767,7 +767,7 @@ Public Class KNN_ClosestLine : Inherits VB_Parent
 
         Static minDistances As New List(Of Single)({distances(0)})
         If minDist > minDistances.Max * 4 Then
-            Console.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
+            debug.writeline("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
             lastP1 = trainInput(0)
             lastP2 = trainInput(1)
         End If

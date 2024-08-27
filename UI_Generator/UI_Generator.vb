@@ -57,14 +57,14 @@ Module UI_GeneratorMain
                 If checkDates(New DirectoryInfo(HomeDir.FullName + "/VB_Classes/"), indexTestFile) = False Then
                     If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Code/"), indexTestFile) = False Then
                         If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Classes/"), indexTestFile) = False Then
-                            Console.WriteLine("The user interface is already up to date.")
+                            Debug.WriteLine("The user interface is already up to date.")
                             Exit Sub ' nothing to trigger 
                         End If
                     End If
                 End If
             End If
         End If
-        Console.WriteLine("Starting work to generate the user interface.")
+        Debug.WriteLine("Starting work to generate the user interface.")
 
         Dim includeCC = File.ReadAllLines(CCInput.FullName)
         Dim ccLines As Integer
@@ -460,7 +460,7 @@ Module UI_GeneratorMain
         'For Each nm In VBNames.Keys
         '    If testkeys.Contains(nm) = False And nm.StartsWith("options_") = False Then
         '        If nm.EndsWith("_CPP_VB") = False And nm.StartsWith("Options_") = False Then
-        '            Console.WriteLine("missing from c# code: " + nm)
+        '            debug.writeline("missing from c# code: " + nm)
         '            count += 1
         '        End If
         '    End If

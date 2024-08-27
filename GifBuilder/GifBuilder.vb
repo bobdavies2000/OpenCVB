@@ -18,10 +18,10 @@ Public Class GifBuilder
         For Each imgFile In imgList
             Dim bmp = System.Drawing.Bitmap.FromFile(imgFile.FullName)
             images.Add(bmp)
-            Console.WriteLine("File Name: {0}", imgFile.Name)
-            Console.WriteLine("File Full Name: {0}", imgFile.FullName)
-            Console.WriteLine("File Extension: {0}", imgFile.Extension)
-            Console.WriteLine("Last Accessed: {0}", imgFile.LastAccessTime)
+            debug.writeline("File Name: {0}", imgFile.Name)
+            debug.writeline("File Full Name: {0}", imgFile.FullName)
+            debug.writeline("File Extension: {0}", imgFile.Extension)
+            debug.writeline("Last Accessed: {0}", imgFile.LastAccessTime)
         Next
         Dim encoder = New GifBitmapEncoder()
         For Each bmp In images

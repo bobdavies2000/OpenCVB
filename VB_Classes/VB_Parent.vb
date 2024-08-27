@@ -376,9 +376,9 @@ Public Class VB_Parent : Implements IDisposable
                 End If
             Next
         Catch ex As Exception
-            Console.WriteLine("FindSlider failed.  The application list of forms changed while iterating.  Not critical." + ex.Message)
+            debug.writeline("FindSlider failed.  The application list of forms changed while iterating.  Not critical." + ex.Message)
         End Try
-        Console.WriteLine("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+        debug.writeline("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
 
         Return Nothing
     End Function
@@ -393,12 +393,12 @@ Public Class VB_Parent : Implements IDisposable
                     End If
                 Next
             Catch ex As Exception
-                Console.WriteLine("FindCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
+                debug.writeline("FindCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
             End Try
             Application.DoEvents()
             retryCount += 1
             If retryCount >= 5 Then
-                Console.WriteLine("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                debug.writeline("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
                 Exit While
             End If
         End While
@@ -419,12 +419,12 @@ Public Class VB_Parent : Implements IDisposable
                     End If
                 Next
             Catch ex As Exception
-                Console.WriteLine("findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
+                debug.writeline("findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
             End Try
             Application.DoEvents()
             retryCount += 1
             If retryCount >= 5 Then
-                Console.WriteLine("A Radio button was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                debug.writeline("A Radio button was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
                 Exit While
             End If
         End While

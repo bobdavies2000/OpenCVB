@@ -347,7 +347,7 @@ Public Class Main_UI
                         Name.StartsWith("PCI-to-PCI") Or Name.StartsWith("Network Controller") Or Name.StartsWith("ATAPI ") Or
                         Name.Contains("Gen Intel(R) ") Then
                     Else
-                        Console.WriteLine(Name) ' looking for new cameras 
+                        Debug.WriteLine(Name) ' looking for new cameras 
                     End If
                 End If
             Next
@@ -516,7 +516,7 @@ Public Class Main_UI
             End If
             activeMouseDown = False
         Catch ex As Exception
-            Console.WriteLine("Error in camPic_MouseUp: " + ex.Message)
+            Debug.WriteLine("Error in camPic_MouseUp: " + ex.Message)
         End Try
     End Sub
 
@@ -535,7 +535,7 @@ Public Class Main_UI
                 mouseDownPoint.Y = e.Y
             End If
         Catch ex As Exception
-            Console.WriteLine("Error in camPic_MouseDown: " + ex.Message)
+            Debug.WriteLine("Error in camPic_MouseDown: " + ex.Message)
         End Try
     End Sub
     Private Sub CamPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -569,7 +569,7 @@ Public Class Main_UI
             mousePoint *= settings.WorkingRes.Width / camPic(0).Width
             XYLoc.Text = mousePoint.ToString + " - last click point at: " + ClickPoint.ToString
         Catch ex As Exception
-            Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
+            Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
     End Sub
     Private Sub Campic_Click(sender As Object, e As EventArgs)
@@ -851,7 +851,7 @@ Public Class Main_UI
     End Sub
     Private Sub RecordWindowsVersion()
         Dim Version = Environment.OSVersion.Version
-        Console.WriteLine("Windows version = " + CStr(Version.Major) + "." + CStr(Version.Minor) + " with build = " + CStr(Version.Build))
+        Debug.WriteLine("Windows version = " + CStr(Version.Major) + "." + CStr(Version.Minor) + " with build = " + CStr(Version.Build))
         If Version.Build >= 22000 Then windowsVersion = 11 Else windowsVersion = 10
     End Sub
     Private Sub PixelViewerButton_Click(sender As Object, e As EventArgs) Handles PixelViewerButton.Click
@@ -974,7 +974,7 @@ Public Class Main_UI
             Else
                 algorithm = args(1)
             End If
-            Console.WriteLine("'" + algorithm + "' was provided in the command line arguments to OpenCVB")
+            Debug.WriteLine("'" + algorithm + "' was provided in the command line arguments to OpenCVB")
             If algorithm = "Pyglet_Image_PS.py" Then End
             externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
         End If
@@ -1107,7 +1107,10 @@ Public Class Main_UI
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
-
+        If textDesc <> "" Then
+            AlgorithmDesc.Text = textDesc
+            textDesc = ""
+        End If
         If camera Is Nothing Then Exit Sub
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
         If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
@@ -1183,7 +1186,7 @@ Public Class Main_UI
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         ' don't start another algorithm until the current one has finished 
         If algorithmQueueCount <> 0 Then
-            Console.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
+            Debug.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
             While 1
                 If algorithmQueueCount = 0 Then Exit While
                 'Console.Write(".")
@@ -1240,7 +1243,7 @@ Public Class Main_UI
         StartTask()
     End Sub
     Private Sub StartTask()
-        Console.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
+        Debug.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
         SyncLock callTraceLock
             If TreeViewDialog IsNot Nothing Then
                 callTrace.Clear()
@@ -1282,11 +1285,11 @@ Public Class Main_UI
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
-
+        AlgorithmDesc.Text = ""
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
         algorithmTaskHandle.Start(parms)
-        Console.WriteLine("Start Algorithm completed.")
+        Debug.WriteLine("Start Algorithm completed.")
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
@@ -1328,7 +1331,7 @@ Public Class Main_UI
                     End If
                 End SyncLock
             Catch ex As Exception
-                Console.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
+                Debug.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
             End Try
         End If
 
@@ -1346,7 +1349,7 @@ Public Class Main_UI
                     End If
                 Next
             Catch ex As Exception
-                Console.WriteLine("Error in trueData update: " + ex.Message)
+                Debug.WriteLine("Error in trueData update: " + ex.Message)
             End Try
         End SyncLock
 
@@ -1363,7 +1366,6 @@ Public Class Main_UI
         camLabel(2).Text = picLabels(2)
         camLabel(3).Text = picLabels(3)
         If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
-        AlgorithmDesc.Text = textDesc
     End Sub
     Public Sub setupNewCPPalgorithm(algorithmName As String)
         Dim functionNames = New FileInfo(HomeDir.FullName + "CPP_Code\CPP_Enum.h")
@@ -1468,7 +1470,7 @@ Public Class Main_UI
                         newCameraImages = True
                     End If
                 Catch ex As Exception
-                    Console.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
+                    Debug.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
                 End Try
             End SyncLock
             If cameraTaskHandle Is Nothing Then
@@ -1497,13 +1499,13 @@ Public Class Main_UI
             intermediateReview = ""
 
             If ComplexityTimer.Enabled = False Then
-                Console.WriteLine(CStr(Now))
-                Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + vbCrLf + vbTab +
+                Debug.WriteLine(CStr(Now))
+                Debug.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + vbCrLf + vbTab +
                                   CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
-                Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
+                Debug.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
                                   parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
 
-                Console.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
+                Debug.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
                                   CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
                                   CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
             End If
@@ -1659,7 +1661,6 @@ Public Class Main_UI
                 'End If
 
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
-                textDesc = task.desc
                 picLabels = task.labels
 
                 Dim returnTime = Now
@@ -1688,7 +1689,7 @@ Public Class Main_UI
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         Else
-                            trueData = New List(Of VB_Classes.trueText)
+                            trueData = New List(Of VB_Classes.TrueText)
                         End If
                         task.trueData.Clear()
                     End SyncLock
@@ -1727,7 +1728,7 @@ Public Class Main_UI
                 If task.debugSyncUI Then Thread.Sleep(100)
             End While
 
-            Console.WriteLine(parms.algName + " ending.  Thread closing...")
+            Debug.WriteLine(parms.algName + " ending.  Thread closing...")
             task.frameCount = -1
             Application.DoEvents()
             task.Dispose()

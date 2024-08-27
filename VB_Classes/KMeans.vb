@@ -43,7 +43,7 @@ Public Class KMeans_Basics : Inherits VB_Parent
             columnVector.SetTo(0)
             dst2.SetTo(0)
             cvb.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
-            ' Console.WriteLine("Huge or NaN values in the input... Can happen on an initial useInitialValues run... It is corrected here...")
+            ' debug.writeline("Huge or NaN values in the input... Can happen on an initial useInitialValues run... It is corrected here...")
         End Try
 
         saveLabels = dst2.Clone

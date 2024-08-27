@@ -16,7 +16,7 @@ Public Class Python_Basics : Inherits VB_Parent
             Else
                 task.pythonProcess.StartInfo.Arguments = """" + pythonApp.Name + """" + " " + arguments
             End If
-            Console.WriteLine("Starting Python with the following command:" + vbCrLf + task.pythonProcess.StartInfo.Arguments + vbCrLf)
+            Debug.WriteLine("Starting Python with the following command:" + vbCrLf + task.pythonProcess.StartInfo.Arguments + vbCrLf)
             If task.showConsoleLog = False Then task.pythonProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
             Try
                 task.pythonProcess.Start()

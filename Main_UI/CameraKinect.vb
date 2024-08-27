@@ -68,7 +68,7 @@ Public Class CameraKinect : Inherits Camera
             If cPtr = 0 Then Exit Sub
             imuFrame = K4AWaitFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
             If imuFrame = 0 Then
-                Console.WriteLine("KinectWaitFrame has returned without any image.")
+                debug.writeline("KinectWaitFrame has returned without any image.")
                 failedImageCount += 1
                 Exit Sub ' just process the existing images again?  
             Else

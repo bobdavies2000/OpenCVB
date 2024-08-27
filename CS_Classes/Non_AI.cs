@@ -1818,11 +1818,11 @@ namespace CS_Classes
             {
                 //  empty and reversed ranges are NOT allowed in this type 
                 if (_b <= _a)
-                    Console.WriteLine("invalid range");
+                    Debug.WriteLine("invalid range");
 
                 //  a negative index will crash application 
                 if (_a < 0)
-                    Console.WriteLine("invalide index");
+                    Debug.WriteLine("invalide index");
 
                 idx_a = _a;
                 idx_b = _b;
@@ -1850,7 +1850,7 @@ namespace CS_Classes
         {
             if (data_y_orig.Count != data_y_approx.Count)
             {
-                Console.WriteLine("SLR: data size error");
+                Debug.WriteLine("SLR: data size error");
                 return double.MaxValue;
             }
 
@@ -1941,7 +1941,7 @@ namespace CS_Classes
         {
             if (idx_range.Length() < RangeLengthMin())
             {
-                Console.WriteLine("SLR error: input range is too small");
+                Debug.WriteLine("SLR error: input range is too small");
                 return;
             }
 
@@ -1968,7 +1968,7 @@ namespace CS_Classes
             if (!LinearRegressionParameters(n_vals, sum_x, sum_y, sum_xx, sum_xy, lin_regr_out))
             {
                 //  this is a very unusual case for real data  
-                //Console.WriteLine("SLR: special case error");
+                //Debug.WriteLine("SLR: special case error");
                 return;
             }
 
@@ -2252,7 +2252,7 @@ namespace CS_Classes
 
             if (vec_devns_in.Count != data_x.Count)
             {
-                Console.WriteLine("SLR: size error");
+                Debug.WriteLine("SLR: size error");
                 return false;
             }
 
@@ -2260,7 +2260,7 @@ namespace CS_Classes
             int range_len = idx_range_in.Length();
             if (range_len < end_offset)
             {
-                Console.WriteLine("SLR: input range is too small");
+                Debug.WriteLine("SLR: input range is too small");
                 return false;
             }
 
@@ -2607,7 +2607,7 @@ namespace CS_Classes
                 }
 
                 watch.Stop();
-                Console.WriteLine("execution time of AlgoBruteForce algorithm = {0} ms ;", watch.ElapsedMilliseconds);
+                Debug.WriteLine("execution time of AlgoBruteForce algorithm = {0} ms ;", watch.ElapsedMilliseconds);
 
                 return dist;
             }
@@ -2766,7 +2766,7 @@ namespace CS_Classes
                 }
 
                 watch.Stop();
-                Console.WriteLine("execution time of ordered dataset algorithm = {0} ms ;", watch.ElapsedMilliseconds);
+                Debug.WriteLine("execution time of ordered dataset algorithm = {0} ms ;", watch.ElapsedMilliseconds);
 
                 return dist;
             }
@@ -2860,9 +2860,8 @@ namespace CS_Classes
 
             PrepareModel(caffeModel);
             net = CvDnn.ReadNetFromCaffe(protoTxt, caffeModel);
-            Console.WriteLine("Layer names: {0}", string.Join(", ", net.GetLayerNames()));
-            Console.WriteLine();
-            Console.WriteLine("Preparation complete");
+            Debug.WriteLine("Layer names: {0}", string.Join(", ", net.GetLayerNames()));
+            Debug.WriteLine("Preparation complete");
         }
         public string RunAlg(Mat image)
         {
@@ -2942,7 +2941,7 @@ namespace CS_Classes
             for (int i = 0; i < trainingSetValues.Count; i++)
                 distances[i] = new float[2];
 
-            Console.WriteLine("[i] classifying...");
+            Debug.WriteLine("[i] classifying...");
 
             // start computing
             for (var test = 0; test < this.testSetValues.Count; test++)
@@ -2987,16 +2986,16 @@ namespace CS_Classes
             bool ShowIntermediate = false; // turn this on if further detail is needed.
             double d = MatDeterminant(m);
             if (Math.Abs(d) < 1.0e-5)
-                if (ShowIntermediate) Console.WriteLine("\nMatrix has no inverse");
+                if (ShowIntermediate) Debug.WriteLine("\nMatrix has no inverse");
                 else
-                if (ShowIntermediate) Console.WriteLine("\nDet(m) = " + d.ToString("F4"));
+                if (ShowIntermediate) Debug.WriteLine("\nDet(m) = " + d.ToString("F4"));
 
             inverse = MatInverse(m);
 
             cv.Mat prod = MatProduct(m, inverse);
             if (ShowIntermediate)
             {
-                Console.WriteLine("\nThe product of m * inv is ");
+                Debug.WriteLine("\nThe product of m * inv is ");
                 MatShow(prod, 1, 6);
             }
 
@@ -3005,7 +3004,7 @@ namespace CS_Classes
             int toggle = MatDecompose(m, out lum, out perm);
             if (ShowIntermediate)
             {
-                Console.WriteLine("\nThe combined lower-upper decomposition of m is");
+                Debug.WriteLine("\nThe combined lower-upper decomposition of m is");
                 MatShow(lum, 4, 8);
             }
 
@@ -3015,25 +3014,25 @@ namespace CS_Classes
             if (ShowIntermediate)
             {
                 solution = MatVecProd(inverse, bVector);  // (1, 0, 2, 1)
-                Console.WriteLine("\nThe lower part of LUM is");
+                Debug.WriteLine("\nThe lower part of LUM is");
                 MatShow(lower, 4, 8);
 
-                Console.WriteLine("\nThe upper part of LUM is");
+                Debug.WriteLine("\nThe upper part of LUM is");
                 MatShow(upper, 4, 8);
 
-                Console.WriteLine("\nThe perm[] array is");
+                Debug.WriteLine("\nThe perm[] array is");
                 VecShow(perm, 4);
 
                 cv.Mat lowUp = MatProduct(lower, upper);
-                Console.WriteLine("\nThe product of lower * upper is ");
+                Debug.WriteLine("\nThe product of lower * upper is ");
                 MatShow(lowUp, 4, 8);
 
-                Console.WriteLine("\nVector b = ");
+                Debug.WriteLine("\nVector b = ");
                 VecShow(bVector, 1, 8);
 
-                Console.WriteLine("\nSolving m*x = b");
+                Debug.WriteLine("\nSolving m*x = b");
 
-                Console.WriteLine("\nSolution x = ");
+                Debug.WriteLine("\nSolution x = ");
                 VecShow(solution, 1, 8);
             }
             return inverse;
@@ -3250,7 +3249,7 @@ namespace CS_Classes
                     if (Math.Abs(v) < 1.0e-5) v = 0.0;  // avoid "-0.00"
                     Console.Write(v.ToString("F" + dec).PadLeft(wid));
                 }
-                Console.WriteLine("");
+                Debug.WriteLine("");
             }
         }
 
@@ -3258,7 +3257,7 @@ namespace CS_Classes
         {
             for (int i = 0; i < vec.Length; ++i)
                 Console.Write(vec[i].ToString().PadLeft(wid));
-            Console.WriteLine("");
+            Debug.WriteLine("");
         }
 
         static void VecShow(double[] vec, int dec, int wid)
@@ -3269,7 +3268,7 @@ namespace CS_Classes
                 if (Math.Abs(x) < 1.0e-5) x = 0.0;  // avoid "-0.00"
                 Console.Write(x.ToString("F" + dec).PadLeft(wid));
             }
-            Console.WriteLine("");
+            Debug.WriteLine("");
         }
     }
 

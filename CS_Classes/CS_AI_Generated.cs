@@ -543,7 +543,7 @@ namespace CS_Classes
             TimeSpan timeSpent = DateTime.Now.Subtract(startTime);
             if (timeSpent.TotalSeconds < 10000)
             {
-                Console.WriteLine("time spent on last problem = " + timeSpent.TotalSeconds.ToString("0.00") + " seconds.");
+                Debug.WriteLine("time spent on last problem = " + timeSpent.TotalSeconds.ToString("0.00") + " seconds.");
             }
             startTime = DateTime.Now;
         }
@@ -32362,7 +32362,7 @@ namespace CS_Classes
             knn.FindNearest(queryMat, dm, new Mat(), neighborMat);
             if (neighborMat.Rows != queryMat.Rows || neighborMat.Cols != dm)
             {
-                Console.WriteLine("KNN's FindNearest did not return the correct number of neighbors.  Marshal.copy will fail so exit.");
+                Debug.WriteLine("KNN's FindNearest did not return the correct number of neighbors.  Marshal.copy will fail so exit.");
                 return;
             }
             float[] nData = new float[queryMat.Rows * dm];
@@ -32955,7 +32955,7 @@ namespace CS_Classes
             {
                 if (minDist > minDistances.Max() * 2)
                 {
-                    Console.WriteLine("Overriding KNN min Distance Rule = " + string.Format("{0:0}", minDist) + " max = " + string.Format("{0:0}", minDistances.Max()));
+                    Debug.WriteLine("Overriding KNN min Distance Rule = " + string.Format("{0:0}", minDist) + " max = " + string.Format("{0:0}", minDistances.Max()));
                     lastPair = new PointPair(trainInput[0], trainInput[1]);
                 }
                 else
@@ -33012,7 +33012,7 @@ namespace CS_Classes
             if (vbc.task.FirstPass) minDistances = new List<float> { distances[0] };
             if (minDist > minDistances.Max() * 4)
             {
-                Console.WriteLine("Overriding KNN min Distance Rule = " + string.Format("{0:0}", minDist) + " max = " + string.Format("{0:0}", minDistances.Max()));
+                Debug.WriteLine("Overriding KNN min Distance Rule = " + string.Format("{0:0}", minDist) + " max = " + string.Format("{0:0}", minDistances.Max()));
                 lastP1 = trainInput[0];
                 lastP2 = trainInput[1];
             }
@@ -40849,7 +40849,7 @@ namespace CS_Classes
             {
                 if (pt == vbc.task.ClickPoint)
                 {
-                    Console.WriteLine("Hit the point you selected.");
+                    Debug.WriteLine("Hit the point you selected.");
                 }
             }
         }
@@ -44949,31 +44949,36 @@ namespace CS_Classes
 
 
 
+
     public class OpenGL_ColorReduced3D_CS : VB_Parent
     {
-        Color8U_Basics colorClass = new Color8U_Basics();
+        private Color8U_Basics colorClass = new Color8U_Basics();
+
         public OpenGL_ColorReduced3D_CS()
         {
             vbc.task.OpenGLTitle = "OpenGL_Functions";
-            vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
+            vbc.task.ogl.oglFunction = (int) oCase.pointCloudAndRGB;
             FindSlider("OpenGL Point Size").Value = 20;
             desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)";
         }
+
         public void RunAlg(Mat src)
         {
             colorClass.Run(src);
             dst2 = colorClass.dst3;
+            if (dst2.Channels() == 1)
+                dst2 = dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
             dst2.ConvertTo(dst1, MatType.CV_32FC3);
-            labels[2] = "There are " + colorClass.classCount.ToString() + " classes for " + vbc.task.redOptions.colorInputName;
+            labels[2] = $"There are {colorClass.classCount} classes for {vbc.task.redOptions.colorInputName}";
             dst1 = dst1.Normalize(0, 1, NormTypes.MinMax);
-            var split = dst1.Split();
+            Mat[] split = dst1.Split();
             split[1] *= -1;
             Cv2.Merge(split, vbc.task.ogl.pointCloudInput);
             vbc.task.ogl.Run(dst2);
-            if (vbc.task.gOptions.getOpenGLCapture()) dst3 = vbc.task.ogl.dst3;
+            if (vbc.task.gOptions.getOpenGLCapture())
+                dst3 = vbc.task.ogl.dst3;
         }
     }
-
 
 
 
@@ -49246,7 +49251,7 @@ namespace CS_Classes
             iteration += 1;
             if (iteration % 1000 == 0)
             {
-                Console.WriteLine("iteration " + iteration);
+                Debug.WriteLine("iteration " + iteration);
             }
             d1 = UpdateSquareAndBounce(p1, d1, DAY_COLOR);
             d2 = UpdateSquareAndBounce(p2, d2, NIGHT_COLOR);
@@ -50047,7 +50052,7 @@ namespace CS_Classes
                 {
                     vbc.task.pythonProcess.StartInfo.Arguments = "\"" + pythonApp.Name + "\" " + arguments;
                 }
-                Console.WriteLine("Starting Python with the following command:\n" + vbc.task.pythonProcess.StartInfo.Arguments + "\n");
+                Debug.WriteLine("Starting Python with the following command:\n" + vbc.task.pythonProcess.StartInfo.Arguments + "\n");
                 if (!vbc.task.showConsoleLog) vbc.task.pythonProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 try
                 {
