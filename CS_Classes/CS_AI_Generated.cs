@@ -361,7 +361,7 @@ namespace CS_Classes
         public Options_MinArea options = new Options_MinArea();
         public List<cv.Point2f> srcPoints;
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void MinTriangle_Run(IntPtr inputPtr, int numberOfPoints, IntPtr outputTriangle);
 
         public Area_MinTriangle_CPP_CS()
@@ -424,13 +424,13 @@ namespace CS_Classes
         public double energyLast;
         public bool circularPattern = true;
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Annealing_Basics_Open(IntPtr cityPositions, int numberOfCities);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Annealing_Basics_Close(IntPtr saPtr);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Annealing_Basics_Run(IntPtr saPtr, IntPtr cityOrder, int numberOfCities);
         public void drawMap()
         {
@@ -6930,10 +6930,10 @@ namespace CS_Classes
 
     public class Classifier_Basics_CS : VB_Parent
     {
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_Open();
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void OEX_Points_Classifier_Close(IntPtr cPtr);
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_ShowPoints(IntPtr cPtr, int imgRows, int imgCols, int DotSize);
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_RunCPP(IntPtr cPtr, int count, int methodIndex, int imgRows, int imgCols, int resetInput);
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_Open();
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void OEX_Points_Classifier_Close(IntPtr cPtr);
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_ShowPoints(IntPtr cPtr, int imgRows, int imgCols, int DotSize);
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_RunCPP(IntPtr cPtr, int count, int methodIndex, int imgRows, int imgCols, int resetInput);
         Options_Classifier options = new Options_Classifier();
 
         public Classifier_Basics_CS()
@@ -6971,10 +6971,10 @@ namespace CS_Classes
 
     public class Classifier_Bayesian_CS : VB_Parent
     {
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_Open();
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void OEX_Points_Classifier_Close(IntPtr cPtr);
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_ShowPoints(IntPtr cPtr, int imgRows, int imgCols, int DotSize);
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_RunCPP(IntPtr cPtr, int count, int methodIndex, int imgRows, int imgCols, int resetInput);
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_Open();
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void OEX_Points_Classifier_Close(IntPtr cPtr);
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_ShowPoints(IntPtr cPtr, int imgRows, int imgCols, int DotSize);
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_RunCPP(IntPtr cPtr, int count, int methodIndex, int imgRows, int imgCols, int resetInput);
         Options_Classifier options = new Options_Classifier();
 
         public Classifier_Bayesian_CS()
@@ -7013,10 +7013,10 @@ namespace CS_Classes
 
     public class Classifier_BayesianTest_CS : VB_Parent
     {
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr Classifier_Bayesian_Open();
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void Classifier_Bayesian_Close(IntPtr cPtr);
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void Classifier_Bayesian_Train(IntPtr cPtr, IntPtr trainInput, IntPtr response, int count);
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr Classifier_Bayesian_RunCPP(IntPtr cPtr, IntPtr trainInput, int count);
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr Classifier_Bayesian_Open();
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void Classifier_Bayesian_Close(IntPtr cPtr);
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void Classifier_Bayesian_Train(IntPtr cPtr, IntPtr trainInput, IntPtr response, int count);
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr Classifier_Bayesian_RunCPP(IntPtr cPtr, IntPtr trainInput, int count);
 
         RedCloud_Basics redC = new RedCloud_Basics();
         Neighbors_Precise nabs = new Neighbors_Precise();
@@ -9879,7 +9879,7 @@ namespace CS_Classes
             dst3 = dst3.Threshold(options.threshold, 255, ThresholdTypes.Binary);
         }
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Corners_ShiTomasi(IntPtr grayPtr, int rows, int cols, int blocksize, int aperture);
     }
 
@@ -10046,13 +10046,13 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = Harris_Features_Close(cPtr);
         }
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Harris_Features_Open();
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Harris_Features_Close(IntPtr Harris_FeaturesPtr);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Harris_Features_Run(IntPtr Harris_FeaturesPtr, IntPtr inputPtr, int rows, int cols, float threshold, short neighborhood, short aperture, float HarrisParm);
     }
 
@@ -10101,16 +10101,16 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = Harris_Detector_Close(cPtr);
         }
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int Harris_Detector_Count(IntPtr cPtr);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Harris_Detector_Open();
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Harris_Detector_Close(IntPtr Harris_FeaturesPtr);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Harris_Detector_Run(IntPtr Harris_FeaturesPtr, IntPtr inputPtr, int rows, int cols, double qualityLevel);
     }
 
@@ -28555,13 +28555,13 @@ namespace CS_Classes
         {
             if (cPtr != IntPtr.Zero) cPtr = HMM_Close(cPtr);
         }
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr HMM_Open();
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr HMM_Close(IntPtr cPtr);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr HMM_Run(IntPtr HMMPtr, IntPtr bgrPtr, int rows, int cols, int channels);
     }
 
@@ -42495,11 +42495,11 @@ namespace CS_Classes
         {
             OEX_FitEllipse_Close(cPtr);
         }
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr OEX_FitEllipse_Open();
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void OEX_FitEllipse_Close(IntPtr cPtr);
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr OEX_FitEllipse_RunCPP(IntPtr cPtr, IntPtr dataPtr, int rows, int cols,
                                                             int threshold, int fitType);
     }
@@ -46516,13 +46516,13 @@ namespace CS_Classes
         {
             PCA_NColor_Close(cPtr);
         }
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr PCA_NColor_Open();
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void PCA_NColor_Close(IntPtr cPtr);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr PCA_NColor_RunCPP(IntPtr cPtr, IntPtr imagePtr, IntPtr palettePtr, int rows, int cols, int desiredNcolors);
     }
 

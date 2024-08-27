@@ -721,13 +721,13 @@ namespace CS_Classes
     // https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
     public class Voronoi_CS : VB_Parent
     {
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr VoronoiDemo_Open(string matlabFileName, int rows, int cols);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr VoronoiDemo_Close(IntPtr cPtr);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr VoronoiDemo_Run(IntPtr pfPtr, IntPtr Input, int pointCount, int width, int height);
 
         Voronoi_Basics_CS vDemo;
@@ -1113,76 +1113,76 @@ namespace CS_Classes
 
             hpixels.Free();
         }
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayer16(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayer8(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayer4(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayer3(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayer2(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayerRgbNbpp(IntPtr pixels, int width, int height, int nColors);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayerRgb3bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayerRgb6bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayerRgb9bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayerRgb12bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayerRgb15bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherBayerRgb18bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherFSRgbNbpp(IntPtr pixels, int width, int height, int nColors);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherFS(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherFSRgb3bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherFSRgb6bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherFSRgb9bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherFSRgb12bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherFSRgb15bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherFSRgb18bpp(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherSierraLiteRgbNbpp(IntPtr pixels, int width, int height, int nColors);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherSierraLite(IntPtr pixels, int width, int height);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherSierraRgbNbpp(IntPtr pixels, int width, int height, int nColors);
 
-        [DllImport("CPP_Code.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ditherSierra(IntPtr pixels, int width, int height);
     }
 

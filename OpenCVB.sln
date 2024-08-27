@@ -54,11 +54,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL_Basics", "OpenGL\Ope
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL_Functions", "OpenGL\OpenGL_Functions\OpenGL_Functions.vcxproj", "{2F1A4D85-BD75-4528-A1BC-D605EF6E52CF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPP_Code", "CPP_Code\CPP_Code.vcxproj", "{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}"
-	ProjectSection(ProjectDependencies) = postProject
-		{735A2264-8A36-4D0A-ADE0-2BFAD6734401} = {735A2264-8A36-4D0A-ADE0-2BFAD6734401}
-		{CAC826CF-7103-4245-9C09-C0C2E8BBCAF1} = {CAC826CF-7103-4245-9C09-C0C2E8BBCAF1}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPP_Native", "CPP_Native\CPP_Native.vcxproj", "{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -13,11 +13,11 @@ Module UI_GeneratorMain
         Dim LastEdits As New SortedList(Of String, String)
 
         Dim prefix As String = "../../../../"
-        Dim CCInput = New FileInfo(prefix + "CPP_Code/CPP_AI_Generated.h")
+        Dim CCInput = New FileInfo(prefix + "CPP_Native/CPP_AI_Generated.h")
         For i = 0 To 3
             If CCInput.Exists = False Then
                 prefix = prefix.Substring(3)
-                CCInput = New FileInfo(prefix + "CPP_Code/CPP_AI_Generated.h")
+                CCInput = New FileInfo(prefix + "CPP_Native/CPP_AI_Generated.h")
             Else
                 Exit For
             End If
@@ -31,14 +31,14 @@ Module UI_GeneratorMain
         Dim HomeDir As New DirectoryInfo(CCInput.DirectoryName + "/../")
         ' New FileInfo(HomeDir.FullName + "CPP_Classes/CPP_Classes.cpp").FullName,
         Dim CS_CPPCLR_Inputs = {New FileInfo(HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs").FullName,
-                                New FileInfo(HomeDir.FullName + "CPP_Code/CPP_AI_Generated.h").FullName,
+                                New FileInfo(HomeDir.FullName + "CPP_Native/CPP_AI_Generated.h").FullName,
                                 New FileInfo(HomeDir.FullName + "CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(HomeDir.FullName + "VB_classes/")
         Dim CPPInput As New DirectoryInfo(HomeDir.FullName + "CPP_classes/CPP_Classes.cpp")
 
         Dim OptionsFile = New FileInfo(VBcodeDir.FullName + "Options.vb")
         Dim vbOptions = New FileInfo(VBcodeDir.FullName + "/../VB_Classes/Options.vb")
-        Dim includeOptions = New FileInfo(VBcodeDir.FullName + "/../CPP_Code/Options.h")
+        Dim includeOptions = New FileInfo(VBcodeDir.FullName + "/../CPP_Native/Options.h")
         Dim result As Integer
         If includeOptions.Exists Then
             result = DateTime.Compare(vbOptions.LastWriteTime, includeOptions.LastWriteTime)
@@ -55,7 +55,7 @@ Module UI_GeneratorMain
         If indexTestFile.Exists And Not Debugger.IsAttached Then
             If checkDates(New DirectoryInfo(HomeDir.FullName + "/CS_Classes/"), indexTestFile) = False Then
                 If checkDates(New DirectoryInfo(HomeDir.FullName + "/VB_Classes/"), indexTestFile) = False Then
-                    If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Code/"), indexTestFile) = False Then
+                    If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Native/"), indexTestFile) = False Then
                         If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Classes/"), indexTestFile) = False Then
                             Debug.WriteLine("The user interface is already up to date.")
                             Exit Sub ' nothing to trigger 
@@ -97,8 +97,8 @@ Module UI_GeneratorMain
             Next
         Next
 
-        ' first read all the CPP_Code functions that are present in the project
-        Dim functionInput As New FileInfo(HomeDir.FullName + "/CPP_Code/CPP_Enum.h")
+        ' first read all the CPP_Native functions that are present in the project
+        Dim functionInput As New FileInfo(HomeDir.FullName + "/CPP_Native/CPP_Enum.h")
         Dim srFunctions = New StreamReader(functionInput.FullName)
         Dim ccFunctionNames As New SortedList(Of String, String)
         Dim unsortedFunctions As New List(Of String)
@@ -851,7 +851,7 @@ Module UI_GeneratorMain
             output(i) = nextLine
         Next
 
-        Dim outFile = New FileInfo(inputfile.Directory.FullName + "/../CPP_Code/Options.h")
+        Dim outFile = New FileInfo(inputfile.Directory.FullName + "/../CPP_Native/Options.h")
         File.WriteAllLines(outFile.FullName, output)
     End Sub
 End Module

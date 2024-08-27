@@ -986,7 +986,7 @@ Public Class Main_UI
 
         setupAlgorithmHistory()
 
-        Dim libraries = {"Cam_K4A.dll", "Cam_RS2.dll", "CPP_Code.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
+        Dim libraries = {"Cam_K4A.dll", "Cam_RS2.dll", "CPP_Native.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
         For i = 0 To libraries.Count - 1
             Dim dllName = libraries(i)
             Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
@@ -1368,7 +1368,7 @@ Public Class Main_UI
         If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
     End Sub
     Public Sub setupNewCPPalgorithm(algorithmName As String)
-        Dim functionNames = New FileInfo(HomeDir.FullName + "CPP_Code\CPP_Enum.h")
+        Dim functionNames = New FileInfo(HomeDir.FullName + "CPP_Native\CPP_Enum.h")
         Dim lines = File.ReadAllLines(functionNames.FullName)
 
         ' is it already up to date in the CPP_Enum.h file?
@@ -1385,7 +1385,7 @@ Public Class Main_UI
         Next
         sw.Close()
 
-        Dim externNames = New FileInfo(HomeDir.FullName + "CPP_Code\CPP_Externs.h")
+        Dim externNames = New FileInfo(HomeDir.FullName + "CPP_Native\CPP_Externs.h")
         lines = File.ReadAllLines(externNames.FullName)
 
         sw = New StreamWriter(externNames.FullName, False)
