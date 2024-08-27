@@ -1,7 +1,5 @@
 ﻿Imports System.IO
-Imports System.Runtime.InteropServices.ComTypes
 Imports System.Text.RegularExpressions
-Imports System.Windows
 Module UI_GeneratorMain
     Sub Main()
         Dim CSnames As New SortedList(Of String, String)
@@ -37,16 +35,15 @@ Module UI_GeneratorMain
         Dim CPPInput As New DirectoryInfo(HomeDir.FullName + "CPP_classes/CPP_Classes.cpp")
 
         Dim OptionsFile = New FileInfo(VBcodeDir.FullName + "Options.vb")
-        Dim vbOptions = New FileInfo(VBcodeDir.FullName + "/../VB_Classes/Options.vb")
         Dim includeOptions = New FileInfo(VBcodeDir.FullName + "/../CPP_Native/Options.h")
-        Dim result As Integer
-        If includeOptions.Exists Then
-            result = DateTime.Compare(vbOptions.LastWriteTime, includeOptions.LastWriteTime)
-        End If
-        If result > 0 Then
-            includeOptions.Delete()
-            ConvertOptionsToCPP(OptionsFile)
-        End If
+        'Dim result As Integer
+        'If includeOptions.Exists Then
+        '    result = DateTime.Compare(OptionsFile.LastWriteTime, includeOptions.LastWriteTime)
+        'End If
+        'If result > 0 Or includeOptions.Exists = False Then
+        '    includeOptions.Delete()
+        ConvertOptionsToCPP(OptionsFile)
+        'End If
 
         Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/AlgorithmGroupNames.txt")
 #If DEBUG Then

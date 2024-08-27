@@ -1,4 +1,3 @@
-#include "CPP_Classes.h"
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -37,25 +36,25 @@ using namespace cv;
 namespace CPP_Classes {
     public ref class AddWeighted_Basics_CPP : public VB_Parent
     {
+        Options_AddWeighted options;
     public:
         double weight;
-        //gcroot<Options_AddWeighted^> options = gcnew Options_AddWeighted();
-
-        AddWeighted_Basics_CPP() 
+        AddWeighted_Basics_CPP()
         {
             desc = "Add 2 images with specified weights.";
         }
 
-        void RunAlg(IntPtr dataPtr, int rows, int cols, int step)
+        void RunAlg(IntPtr dataPtr, int rows, int cols, int type)
         {
             uchar* data = static_cast<uchar*>(dataPtr.ToPointer());
-            cv::Mat src(rows, cols, CV_8UC3, data, step);
-            imshow("src", src);
+            Mat src(rows, cols, type, data);
 
-            //options->RunVB();
+            options.RunOpt();
 
-            //Mat srcPlus = src2;
-            //// algorithm user normally provides src2! 
+            Mat srcPlus(rows, cols, type);
+            srcPlus.setTo(0);
+
+            // algorithm user normally provides src2! 
             //if (standaloneTest() || src2.empty()) srcPlus = task.depthRGB;
             //if (srcPlus.type() != src.type())
             //{
@@ -68,9 +67,11 @@ namespace CPP_Classes {
             //    }
             //}
 
-            weight = 0.5;
-            //addWeighted(src, weight, src2, 1.0 - weight, 0, dst2);
+            weight = options.addWeighted;
+            Mat dst2;
+            addWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2);
            //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
+            imshow("dst2", dst2);
         }
     };
 }

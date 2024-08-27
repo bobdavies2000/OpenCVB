@@ -705,15 +705,12 @@ Public Class VB_Parent : Implements IDisposable
         task.trueData.Clear()
         If task.paused = False Then
             If algorithm.tracename.endswith("_CPP") Then
-                algorithm.RunAlg(src.Data, src.Rows, src.Cols, src.Step)
+                algorithm.RunAlg(src.Data, src.Rows, src.Cols, src.Type)
             Else
                 algorithm.RunAlg(src)
             End If
         End If
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
-
-    ' Managed C++ interface
-    Public srcData() As Byte
 End Class
 

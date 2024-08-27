@@ -86,6 +86,10 @@
       <AdditionalDependencies />
       <AdditionalLibraryDirectories>$(ProjectDir)..\</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -121,6 +125,9 @@
       <AdditionalDependencies />
       <AdditionalLibraryDirectories>$(ProjectDir)..\</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)bin\Release\net8.0-windows\UI_Generate.exe</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CPP_Classes.h" />

@@ -88,8 +88,8 @@ Public Class Options_Contours2 : Inherits VB_Parent
     End Sub
     Public Sub RunOpt()
         Static radioChoices() As cvb.ContourApproximationModes = {cvb.ContourApproximationModes.ApproxNone,
-                                 cvb.ContourApproximationModes.ApproxSimple, cvb.ContourApproximationModes.ApproxTC89KCOS,
-                                 cvb.ContourApproximationModes.ApproxTC89L1}
+                                cvb.ContourApproximationModes.ApproxSimple, cvb.ContourApproximationModes.ApproxTC89KCOS,
+                                cvb.ContourApproximationModes.ApproxTC89L1}
         Static frm = FindFrm(traceName + " Radio Buttons")
         ApproximationMode = radioChoices(findRadioIndex(frm.check))
     End Sub
@@ -136,8 +136,8 @@ Public Class Options_Contours : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 retrievalMode = Choose(i + 1, cvb.RetrievalModes.CComp, cvb.RetrievalModes.External,
-                                       cvb.RetrievalModes.FloodFill, cvb.RetrievalModes.List,
-                                       cvb.RetrievalModes.Tree)
+                                    cvb.RetrievalModes.FloodFill, cvb.RetrievalModes.List,
+                                    cvb.RetrievalModes.Tree)
                 Exit For
             End If
         Next
@@ -208,7 +208,7 @@ Public Class Options_Encode : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 encodeOption = Choose(i + 1, cvb.ImwriteFlags.JpegChromaQuality, cvb.ImwriteFlags.JpegLumaQuality, cvb.ImwriteFlags.JpegOptimize, cvb.ImwriteFlags.JpegProgressive,
-                                              cvb.ImwriteFlags.JpegQuality, cvb.ImwriteFlags.WebPQuality)
+                                            cvb.ImwriteFlags.JpegQuality, cvb.ImwriteFlags.WebPQuality)
                 Exit For
             End If
         Next
@@ -457,8 +457,8 @@ Public Class Options_Resize : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 warpFlag = Choose(i + 1, cvb.InterpolationFlags.Area, cvb.InterpolationFlags.Cubic, cvb.InterpolationFlags.Lanczos4,
-                                         cvb.InterpolationFlags.Linear, cvb.InterpolationFlags.Nearest,
-                                         cvb.InterpolationFlags.WarpFillOutliers, cvb.InterpolationFlags.WarpInverseMap)
+                                        cvb.InterpolationFlags.Linear, cvb.InterpolationFlags.Nearest,
+                                        cvb.InterpolationFlags.WarpFillOutliers, cvb.InterpolationFlags.WarpInverseMap)
                 radioIndex = i
                 Exit For
             End If
@@ -1274,9 +1274,9 @@ Public Class Options_Dither : Inherits VB_Parent
         End If
         If radio.Setup(traceName) Then
             Dim radioChoices = {"Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
-                                           "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
-                                           "FSRgb3bpp", "FSRgb6bpp", "FSRgb9bpp", "FSRgb12bpp", "FSRgb15bpp", "FSRgb18bpp",
-                                           "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra"}
+                                        "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
+                                        "FSRgb3bpp", "FSRgb6bpp", "FSRgb9bpp", "FSRgb12bpp", "FSRgb15bpp", "FSRgb18bpp",
+                                        "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra"}
             For i = 0 To radioChoices.Count - 1
                 radio.addRadio(radioChoices(i))
             Next
@@ -1649,7 +1649,7 @@ Public Class Options_OpticalFlow : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 OpticalFlowFlags = Choose(i + 1, cvb.OpticalFlowFlags.FarnebackGaussian, cvb.OpticalFlowFlags.LkGetMinEigenvals, cvb.OpticalFlowFlags.None,
-                                                 cvb.OpticalFlowFlags.PyrAReady, cvb.OpticalFlowFlags.PyrBReady, cvb.OpticalFlowFlags.UseInitialFlow)
+                                                cvb.OpticalFlowFlags.PyrAReady, cvb.OpticalFlowFlags.PyrBReady, cvb.OpticalFlowFlags.UseInitialFlow)
                 Exit For
             End If
         Next
@@ -1681,7 +1681,7 @@ Public Class Options_OpticalFlowSparse : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 OpticalFlowFlag = Choose(i + 1, cvb.OpticalFlowFlags.FarnebackGaussian, cvb.OpticalFlowFlags.LkGetMinEigenvals, cvb.OpticalFlowFlags.None,
-                                                cvb.OpticalFlowFlags.PyrAReady, cvb.OpticalFlowFlags.PyrBReady, cvb.OpticalFlowFlags.UseInitialFlow)
+                                            cvb.OpticalFlowFlags.PyrAReady, cvb.OpticalFlowFlags.PyrBReady, cvb.OpticalFlowFlags.UseInitialFlow)
                 Exit For
             End If
         Next
@@ -1721,7 +1721,7 @@ Public Class Options_XPhoto : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 colorCode = Choose(i + 1, cvb.ColorConversionCodes.BGR2GRAY, cvb.ColorConversionCodes.BGR2HSV, cvb.ColorConversionCodes.BGR2YUV,
-                                          cvb.ColorConversionCodes.BGR2XYZ, cvb.ColorConversionCodes.BGR2Lab)
+                                        cvb.ColorConversionCodes.BGR2XYZ, cvb.ColorConversionCodes.BGR2Lab)
                 Exit For
             End If
         Next
@@ -1843,10 +1843,10 @@ Public Class Options_Homography : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 hMethod = Choose(i + 1, cvb.HomographyMethods.None, cvb.HomographyMethods.LMedS, cvb.HomographyMethods.Ransac,
-                                 cvb.HomographyMethods.Rho, cvb.HomographyMethods.USAC_DEFAULT,
-                                 cvb.HomographyMethods.USAC_PARALLEL, cvb.HomographyMethods.USAC_FM_8PTS,
-                                 cvb.HomographyMethods.USAC_FAST, cvb.HomographyMethods.USAC_ACCURATE,
-                                 cvb.HomographyMethods.USAC_PROSAC, cvb.HomographyMethods.USAC_MAGSAC)
+                                cvb.HomographyMethods.Rho, cvb.HomographyMethods.USAC_DEFAULT,
+                                cvb.HomographyMethods.USAC_PARALLEL, cvb.HomographyMethods.USAC_FM_8PTS,
+                                cvb.HomographyMethods.USAC_FAST, cvb.HomographyMethods.USAC_ACCURATE,
+                                cvb.HomographyMethods.USAC_PROSAC, cvb.HomographyMethods.USAC_MAGSAC)
                 Exit For
             End If
         Next
@@ -2073,33 +2073,33 @@ Public Class Options_Warp : Inherits VB_Parent
         distance = distanceSlider.value
 
         Dim a(,) As Double = {{1, 0, -dst2.Width / 2},
-                              {0, 1, -dst2.Height / 2},
-                              {0, 0, 0},
-                              {0, 0, 1}}
+                            {0, 1, -dst2.Height / 2},
+                            {0, 0, 0},
+                            {0, 0, 1}}
 
         Dim x(,) As Double = {{1, 0, 0, 0},
-                              {0, Math.Cos(alpha), -Math.Sin(alpha), 0},
-                              {0, Math.Sin(alpha), Math.Cos(alpha), 0},
-                              {0, 0, 0, 1}}
+                            {0, Math.Cos(alpha), -Math.Sin(alpha), 0},
+                            {0, Math.Sin(alpha), Math.Cos(alpha), 0},
+                            {0, 0, 0, 1}}
 
         Dim y(,) As Double = {{Math.Cos(beta), 0, -Math.Sin(beta), 0},
-                              {0, 1, 0, 0},
-                              {Math.Sin(beta), 0, Math.Cos(beta), 0},
-                              {0, 0, 0, 1}}
+                            {0, 1, 0, 0},
+                            {Math.Sin(beta), 0, Math.Cos(beta), 0},
+                            {0, 0, 0, 1}}
 
         Dim z(,) As Double = {{Math.Cos(gamma), -Math.Sin(gamma), 0, 0},
-                              {Math.Sin(gamma), Math.Cos(gamma), 0, 0},
-                              {0, 0, 1, 0},
-                              {0, 0, 0, 1}}
+                            {Math.Sin(gamma), Math.Cos(gamma), 0, 0},
+                            {0, 0, 1, 0},
+                            {0, 0, 0, 1}}
 
         Dim t(,) As Double = {{1, 0, 0, 0},
-                              {0, 1, 0, 0},
-                              {0, 0, 1, distance},
-                              {0, 0, 0, 1}}
+                            {0, 1, 0, 0},
+                            {0, 0, 1, distance},
+                            {0, 0, 0, 1}}
 
         Dim b(,) As Double = {{f, 0, dst2.Width / 2, 0},
-                              {0, f, dst2.Height / 2, 0},
-                              {0, 0, 1, 0}}
+                            {0, f, dst2.Height / 2, 0},
+                            {0, 0, 1, 0}}
 
         Dim a1 = cvb.Mat.FromPixelData(4, 3, cvb.MatType.CV_64F, a)
         Dim rx = cvb.Mat.FromPixelData(4, 4, cvb.MatType.CV_64F, x)
@@ -2987,7 +2987,7 @@ Public Class Options_FeatureMatch : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 matchOption = Choose(i + 1, cvb.TemplateMatchModes.CCoeff, cvb.TemplateMatchModes.CCoeffNormed, cvb.TemplateMatchModes.CCorr,
-                                            cvb.TemplateMatchModes.CCorrNormed, cvb.TemplateMatchModes.SqDiff, cvb.TemplateMatchModes.SqDiffNormed)
+                                        cvb.TemplateMatchModes.CCorrNormed, cvb.TemplateMatchModes.SqDiff, cvb.TemplateMatchModes.SqDiffNormed)
                 matchText = Choose(i + 1, "CCoeff", "CCoeffNormed", "CCorr", "CCorrNormed", "SqDiff", "SqDiffNormed")
                 Exit For
             End If
@@ -3393,7 +3393,7 @@ Public Class Options_Complexity : Inherits VB_Parent
         Dim fnames = Directory.GetFiles(task.HomeDir + "Complexity")
         filenames = fnames.ToList
         Dim latestFile = Directory.GetFiles(task.HomeDir + "Complexity").OrderByDescending(
-                     Function(f) New FileInfo(f).LastWriteTime).First()
+                    Function(f) New FileInfo(f).LastWriteTime).First()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
 
@@ -3641,7 +3641,7 @@ Public Class Options_Threshold : Inherits VB_Parent
     End Sub
     Public Sub RunOpt()
         Static radioChoices = {cvb.ThresholdTypes.Binary, cvb.ThresholdTypes.BinaryInv, cvb.ThresholdTypes.Tozero,
-                               cvb.ThresholdTypes.TozeroInv, cvb.ThresholdTypes.Triangle, cvb.ThresholdTypes.Trunc}
+                            cvb.ThresholdTypes.TozeroInv, cvb.ThresholdTypes.Triangle, cvb.ThresholdTypes.Trunc}
         Static frm = FindFrm(traceName + " Radio Buttons")
         Dim index = findRadioIndex(frm.check)
         thresholdMethod = radioChoices(index)
@@ -3792,7 +3792,7 @@ Public Class Options_ThresholdAll : Inherits VB_Parent
     End Sub
     Public Sub RunOpt()
         Dim radioChoices = {cvb.ThresholdTypes.Binary, cvb.ThresholdTypes.BinaryInv, cvb.ThresholdTypes.Tozero,
-                        cvb.ThresholdTypes.TozeroInv, cvb.ThresholdTypes.Triangle, cvb.ThresholdTypes.Trunc}
+                    cvb.ThresholdTypes.TozeroInv, cvb.ThresholdTypes.Triangle, cvb.ThresholdTypes.Trunc}
         options.RunOpt()
         adaptiveMethod = options.adaptiveMethod
 
@@ -3878,7 +3878,7 @@ Public Class Options_DFT : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 dftFlag = Choose(i + 1, cvb.DftFlags.ComplexOutput, cvb.DftFlags.Inverse, cvb.DftFlags.None,
-                                        cvb.DftFlags.RealOutput, cvb.DftFlags.Rows, cvb.DftFlags.Scale)
+                                    cvb.DftFlags.RealOutput, cvb.DftFlags.Rows, cvb.DftFlags.Scale)
                 Exit For
             End If
         Next
@@ -4249,7 +4249,7 @@ Public Class Options_FeatureGather : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 featureSource = Choose(i + 1, FeatureSrc.GoodFeaturesFull, FeatureSrc.GoodFeaturesGrid, FeatureSrc.Agast,
-                                       FeatureSrc.BRISK, FeatureSrc.Harris, FeatureSrc.FAST)
+                                    FeatureSrc.BRISK, FeatureSrc.Harris, FeatureSrc.FAST)
                 Exit For
             End If
         Next
@@ -4308,10 +4308,10 @@ Public Class Options_MotionDetect : Inherits VB_Parent
         Dim w = dst2.Width
         Dim h = dst2.Height
         Static radioChoices() As cvb.Vec3i = {New cvb.Vec3i(1, w, h), New cvb.Vec3i(2, w / 2, h), New cvb.Vec3i(4, w / 2, h / 2),
-                        New cvb.Vec3i(8, w / 4, h / 2), New cvb.Vec3i(16, w / 4, h / 4), New cvb.Vec3i(32, w / 8, h / 4),
-                        New cvb.Vec3i(32, w / 8, h / 8), New cvb.Vec3i(1, w, h), New cvb.Vec3i(2, w / 2, h), New cvb.Vec3i(4, w / 2, h / 2),
-                        New cvb.Vec3i(8, w / 4, h / 2), New cvb.Vec3i(16, w / 4, h / 4), New cvb.Vec3i(32, w / 8, h / 4),
-                        New cvb.Vec3i(32, w / 8, h / 8)}
+                    New cvb.Vec3i(8, w / 4, h / 2), New cvb.Vec3i(16, w / 4, h / 4), New cvb.Vec3i(32, w / 8, h / 4),
+                    New cvb.Vec3i(32, w / 8, h / 8), New cvb.Vec3i(1, w, h), New cvb.Vec3i(2, w / 2, h), New cvb.Vec3i(4, w / 2, h / 2),
+                    New cvb.Vec3i(8, w / 4, h / 2), New cvb.Vec3i(16, w / 4, h / 4), New cvb.Vec3i(32, w / 8, h / 4),
+                    New cvb.Vec3i(32, w / 8, h / 8)}
 
         Static correlationSlider = FindSlider("Correlation Threshold")
         Static frm = FindFrm(traceName + " Radio Buttons")
@@ -5307,7 +5307,7 @@ Public Class Options_DNN : Inherits VB_Parent
             End If
         End If
         SetTrueText("Current Options: " + shortModelName + " at resolution " + CStr(superResMultiplier) + vbCrLf +
-                    superResModelFileName + " is present and will be used.")
+                superResModelFileName + " is present and will be used.")
     End Sub
 End Class
 
@@ -6319,7 +6319,7 @@ Public Class Options_Mat : Inherits VB_Parent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 decompType = Choose(i + 1, cvb.DecompTypes.Cholesky, cvb.DecompTypes.Eig, cvb.DecompTypes.LU, cvb.DecompTypes.Normal,
-                                         cvb.DecompTypes.QR, cvb.DecompTypes.SVD)
+                                        cvb.DecompTypes.QR, cvb.DecompTypes.SVD)
                 Exit For
             End If
         Next

@@ -6443,7 +6443,7 @@ public:
         feat = new Feature_Basics_CC();
         mesh = new Mesh_Basics_CC();
         labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
-        advice = "Use Options_Features to update results.";
+        advice = "Use options_Features to update results.";
         desc = "Build triangles from feature points";
     }
     void Run(Mat src) {
