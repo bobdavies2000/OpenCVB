@@ -13,11 +13,11 @@ Module UI_GeneratorMain
         Dim LastEdits As New SortedList(Of String, String)
 
         Dim prefix As String = "../../../../"
-        Dim CCInput = New FileInfo(prefix + "CPP_Native/CPP_AI_Generated.h")
+        Dim CCInput = New FileInfo(prefix + "CPP_Native/CPP_NativeClasses.h")
         For i = 0 To 3
             If CCInput.Exists = False Then
                 prefix = prefix.Substring(3)
-                CCInput = New FileInfo(prefix + "CPP_Native/CPP_AI_Generated.h")
+                CCInput = New FileInfo(prefix + "CPP_Native/CPP_NativeClasses.h")
             Else
                 Exit For
             End If
@@ -31,7 +31,7 @@ Module UI_GeneratorMain
         Dim HomeDir As New DirectoryInfo(CCInput.DirectoryName + "/../")
         ' New FileInfo(HomeDir.FullName + "CPP_Classes/CPP_Classes.cpp").FullName,
         Dim CS_CPPCLR_Inputs = {New FileInfo(HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs").FullName,
-                                New FileInfo(HomeDir.FullName + "CPP_Native/CPP_AI_Generated.h").FullName,
+                                New FileInfo(HomeDir.FullName + "CPP_Native/CPP_NativeClasses.h").FullName,
                                 New FileInfo(HomeDir.FullName + "CS_Classes/Non_AI.cs").FullName}
         Dim VBcodeDir As New DirectoryInfo(HomeDir.FullName + "VB_classes/")
         Dim CPPInput As New DirectoryInfo(HomeDir.FullName + "CPP_classes/CPP_Classes.cpp")

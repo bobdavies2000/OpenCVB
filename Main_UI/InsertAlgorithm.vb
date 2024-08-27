@@ -39,7 +39,7 @@ Public Class InsertAlgorithm
 
             Case algType.addCPP_AI
                 ret = MsgBox("Would you like to add the C++ algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text +
-                             vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "File: CPP_AI_Generated.h?",
+                             vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "File: CPP_NativeClasses.h?",
                              MsgBoxStyle.OkCancel)
 
 
@@ -337,7 +337,7 @@ Public Class InsertAlgorithm
         If AlgorithmName.Text.EndsWith("_CPP") = False Then AlgorithmName.Text = AlgorithmName.Text + "_CPP"
         If nextAlgorithm(algType.addCPP_AI) = False Then Exit Sub
 
-        CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Native\CPP_AI_Generated.h")
+        CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Native\CPP_NativeClasses.h")
 
         Dim trigger As Boolean
         sw = New StreamWriter(CPPoutputName.FullName, True)
@@ -355,7 +355,7 @@ Public Class InsertAlgorithm
 
         Main_UI.setupNewCPPalgorithm(AlgorithmName.Text)
 
-        MsgBox("Edit the new algorithm in CPP_AI_Generated.h")
+        MsgBox("Edit the new algorithm in CPP_NativeClasses.h")
         Me.Close()
     End Sub
 End Class

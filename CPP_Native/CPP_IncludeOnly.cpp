@@ -1,3 +1,3 @@
 #pragma once
-#include "CPP_AI_Generated.h"
+#include "CPP_NativeClasses.h"
 #include "CPP_Externs.h"

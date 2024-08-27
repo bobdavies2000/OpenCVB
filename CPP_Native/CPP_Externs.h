@@ -1,5 +1,5 @@
 #pragma once
-#include "CPP_AI_Generated.h"
+#include "CPP_NativeClasses.h"
 
 namespace CPP_Native
 {

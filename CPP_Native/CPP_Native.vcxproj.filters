@@ -10,6 +10,6 @@
     <ClInclude Include="Options.h" />
     <ClInclude Include="CPP_Enum.h" />
     <ClInclude Include="CPP_Parent.h" />
-    <ClInclude Include="CPP_AI_Generated.h" />
+    <ClInclude Include="CPP_NativeClasses.h" />
   </ItemGroup>
 </Project>
