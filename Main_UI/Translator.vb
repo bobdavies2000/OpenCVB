@@ -4,7 +4,7 @@ Imports System.Runtime.InteropServices
 
 Public Class Translator
 #Region "NonVolatile"
-
+    Dim algName As String = ""
     <DllImport("user32.dll")>
     Private Shared Function SetCursorPos(x As Integer, y As Integer) As Boolean
     End Function
@@ -81,7 +81,6 @@ Public Class Translator
         Main_UI.settings.translatorMode = "C# to VB.Net (back)"
     End Sub
     Private Sub Timer4_Tick(sender As Object, e As EventArgs) Handles Timer4.Tick
-        Timer4.Enabled = False
         Select Case Main_UI.settings.translatorMode
             Case "VB.Net to C#"
                 VBtoCSharp.Checked = True
@@ -93,11 +92,15 @@ Public Class Translator
                 CsharpToVB.Checked = True
                 CsharpToVB_CheckedChanged(sender, e)
         End Select
+        If algName = "" Then
+            ReadFileData()
+            Timer4.Enabled = False
+        End If
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Algorithms.SelectedIndex = Main_UI.AvailableAlgorithms.SelectedIndex
-    End Sub
+    'Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    '    Algorithms.SelectedIndex = Main_UI.AvailableAlgorithms.SelectedIndex
+    'End Sub
 #End Region
     Private Sub Translator_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim saveTask = InitializeAsync()
@@ -106,11 +109,16 @@ Public Class Translator
         XYLoc.Left = 10
         XYLoc.Top = WebView.Top + WebView.Height + 3
         Me.WindowState = FormWindowState.Maximized
+
+        For Each alg In Main_UI.AvailableAlgorithms.Items
+            Algorithms.Items.Add(alg)
+        Next
+        Algorithms.SelectedIndex = Main_UI.AvailableAlgorithms.SelectedIndex
         Timer4.Enabled = True
     End Sub
 
     Private Sub ReadFileData()
-        Dim algName = Algorithms.Text
+        algName = Algorithms.Text
         Dim split = algName.Split("_")
         Dim algType As Integer = 0
 
@@ -193,28 +201,24 @@ Public Class Translator
                     If inline.Contains("string desc;") Then Continue For
                     If inline.Contains("IntPtr cPtr;") Then Continue For
                     If inline.Contains(className) Then inline = inline.Replace(className, className + "_CS")
-                    If inline.Contains("VB_Parent") Then inline = inline.Replace("VB_Parent", "CS_Parent")
                     If inline.Contains(".GetSubRect(") Then inline = inline.Replace(".GetSubRect(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' .Get(
                     If inline.Contains(".Get(") Then inline = inline.Replace(".Get(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' 
-                    If inline.Contains("public " + className + "_CS") And inline.EndsWith("()") Then
-                        inline = inline.Replace("()", "(VBtask task) : base(task)")
-                    End If
-                    inline = inline.Replace("private ", "")
                     inline = inline.Replace(" Run(Mat ", " RunAlg(Mat ")
-                    inline = inline.Replace("RunAlgharp(Mat ", "RunAlg(Mat ")
                     inline = inline.Replace("Options_CS_", "Options_")
+                    inline = inline.Replace("task.", "vbc.task.")
                     inline = inline.Replace("task.gOptions.FrameHistory.Value", "task.frameHistoryCount")
-                    inline = inline.Replace("options;", "options")
+                    inline = inline.Replace("options;", "options") ' make sure we see an error when this happens.
                     inline = inline.Replace("Mat dst", "dst") ' Mat dst2 problem - should never need to be declared.
                     inline = inline.Replace("MCvScalar", "cvb.Scalar")
-                    inline = inline.Replace("Rectangle r", "Rect r")
-                    inline = inline.Replace("Rectangle(", "Rect(")
+                    inline = inline.Replace("Rectangle r", "cvb.Rect r")
+                    inline = inline.Replace("Rectangle(", "cvb.Rect(")
+                    inline = inline.Replace(" Rect", " cvb.Rect")
+                    inline = inline.Replace("<Rect", "<cvb.Rect")
                     inline = inline.Replace("CvInvoke.", "cvb.")
                     inline = inline.Replace(" Point ", " cvb.Point ")
                     inline = inline.Replace(" Point(", " cvb.Point(")
                     inline = inline.Replace("<Point", "<cvb.Point")
                     inline = inline.Replace(" Size(", " cvb.Size(")
-                    inline = inline.Replace(".Rect(", ".Rectangle(")
                     inline = inline.Replace("Cv2.Line(", "DrawLine(")
                     inline = inline.Replace("Cv2.Circle(", "DrawCircle(")
                     inline = inline.Replace("override ", "")
@@ -243,8 +247,6 @@ Public Class Translator
                     inline = Replace(inline, "Cv8u", "CV_8U")
                     inline = Replace(inline, "Environment.NewLine", """\n""")
                     inline = Replace(inline, "CvPoint", "cvb.Point")
-                    inline = inline.Replace(" Rect", " cvb.Rect")
-                    inline = inline.Replace("<Rect", "<cvb.Rect")
                     inline = Replace(inline, "ColorConversion.BgraToBgr", "cvb.ColorConversionCodes.BGRA2BGR")
                     inline = Replace(inline, "ColorConversion.BgrToBgra", "cvb.ColorConversionCodes.BGR2BGRA")
                     inline = Replace(inline, "cPtr != 0", "cPtr != (IntPtr)0")
@@ -259,14 +261,9 @@ Public Class Translator
                         inline = "Public Class " + className + " : Inherits VB_Parent"
                     End If
 
-                    If inline.Contains(" CS_Parent") Then Continue For
-                    If inline.Contains("MyBase.New(task)") Then Continue For
-
-                    inline = inline.Replace("task As VBtask", "")
                     inline = inline.Replace("Round(", "Math.Round(")
                     inline = inline.Replace("Math.Math.", "Math.")
 
-                    inline = inline.Replace(" RunAlg(src As Mat)", " RunVB(src As Mat)")
                     inline = inline.Replace("Private ", "Dim ")
                     If inline.Contains(" Rect") Then
                         inline = inline.Replace(" Rect", " cvb.Rect")
@@ -274,7 +271,6 @@ Public Class Translator
                     inline = inline.Replace(" Size(", " cvb.Size(")
 
                 Case "C# to C++"
-                    inline = inline.Replace("_CS : public CS_Parent", "_CPP : public CPP_Parent")
                     If inline.StartsWith("class") Or inline.StartsWith("public class") Then
                         If inline.StartsWith("class") Then inline = "public " + inline
                         Dim split = inline.Split(" ")
@@ -282,14 +278,10 @@ Public Class Translator
                     End If
                     inline = inline.Replace("GetMinMax(", "task->vbMinMax(")
                     inline = inline.Replace("UpdateAdvice(", "task->UpdateAdvice(")
-                    inline = inline.Replace("_CS(VBtask task) : CS_Parent(task)", "_CPP() : CPP_Parent()")
-                    inline = inline.Replace("_CS(VBtask& task) : CS_Parent(task)", "_CPP() : CPP_Parent()")
                     inline = inline.Replace("task.", "task->")
                     inline = inline.Replace(" options;", " *options;")
                     inline = inline.Replace("options.", "options->")
                     inline = inline.Replace("standaloneTest()", "standalone")
-                    inline = inline.Replace("_CS()", "_CPP() : CPP_Parent()")
-                    inline = inline.Replace("RunAlg(", "Run(")
 
             End Select
 

@@ -2,6 +2,7 @@ Imports cvb = OpenCvSharp
 Public Class AddWeighted_Basics : Inherits VB_Parent
     Public src2 As cvb.Mat  ' user normally provides src2! 
     Public options As New Options_AddWeighted
+    Public weight As Double
     Public Sub New()
         UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'")
         desc = "Add 2 images with specified weights."
@@ -19,7 +20,7 @@ Public Class AddWeighted_Basics : Inherits VB_Parent
             End If
         End If
 
-        Dim weight = options.addWeighted
+        weight = options.addWeighted
         cvb.Cv2.AddWeighted(src, weight, src2, 1.0 - weight, 0, dst2)
         labels(2) = $"Depth %: {100 - weight * 100} BGR %: {CInt(weight * 100)}"
     End Sub

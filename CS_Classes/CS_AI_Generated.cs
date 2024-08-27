@@ -28,40 +28,38 @@ namespace CS_Classes
 {
     public class AddWeighted_Basics_CS : VB_Parent
     {
-        public double weight;
-        public Mat src2;
+        public Mat src2;  // user normally provides src2! 
         public Options_AddWeighted options = new Options_AddWeighted();
-         
+        public double weight = 0.5;
         public AddWeighted_Basics_CS()
         {
             UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'");
             desc = "Add 2 images with specified weights.";
         }
-
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-
-            Mat srcPlus = src2;
-            // algorithm user normally provides src2! 
-            if (standaloneTest() || src2 == null) srcPlus = vbc.task.depthRGB;
-            if (srcPlus.Type() != src.Type())
+            if (standalone)
+                src2 = vbc.task.depthRGB;
+            if (src2.Type() != src.Type())
             {
-                if (src.Type() != MatType.CV_8UC3 || srcPlus.Type() != MatType.CV_8UC3)
+                if (src.Type() != MatType.CV_8UC3 || src2.Type() != MatType.CV_8UC3)
                 {
-                    if (src.Type() == MatType.CV_32FC1) src = Convert32f_To_8UC3(src);
-                    if (srcPlus.Type() == MatType.CV_32FC1) srcPlus = Convert32f_To_8UC3(srcPlus);
-                    if (src.Type() != MatType.CV_8UC3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
-                    if (srcPlus.Type() != MatType.CV_8UC3) srcPlus = srcPlus.CvtColor(ColorConversionCodes.GRAY2BGR);
+                    if (src.Type() == MatType.CV_32FC1)
+                        src = Convert32f_To_8UC3(src);
+                    if (src2.Type() == MatType.CV_32FC1)
+                        src2 = Convert32f_To_8UC3(src2);
+                    if (src.Type() != MatType.CV_8UC3)
+                        src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
+                    if (src2.Type() != MatType.CV_8UC3)
+                        src2 = src2.CvtColor(ColorConversionCodes.GRAY2BGR);
                 }
             }
-
-            weight = options.addWeighted;
-            Cv2.AddWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2);
+            double weight = options.addWeighted;
+            Cv2.AddWeighted(src, weight, src2, 1.0 - weight, 0, dst2);
             labels[2] = $"Depth %: {100 - weight * 100} BGR %: {(int)(weight * 100)}";
         }
     }
-
 
 
 
@@ -117,13 +115,12 @@ namespace CS_Classes
 
     public class AddWeighted_InfraRed_CS : VB_Parent
     {
-        AddWeighted_Basics_CS addw;
+        AddWeighted_Basics_CS addw = new AddWeighted_Basics_CS();
         Mat src2 = new Mat();
 
         public AddWeighted_InfraRed_CS()
         {
-            addw = new AddWeighted_Basics_CS();
-            desc = "Align the depth data with the left or right view. Oak-D is aligned with the right image. Some cameras are not close to aligned.";
+            desc = "Align the depth data with the left or right view. Oak-D is aligned with the right image. All cameras are aligned horizontally.";
         }
 
         public void RunAlg(Mat src)

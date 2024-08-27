@@ -171,6 +171,7 @@ Partial Class Translator
         Button1.TabIndex = 10
         Button1.Text = "Use Current Algorithm"
         Button1.UseVisualStyleBackColor = True
+        Button1.Visible = False
         ' 
         ' Translator
         ' 
