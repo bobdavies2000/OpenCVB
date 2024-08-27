@@ -28,17 +28,14 @@
 #include <opencv2/plot.hpp>
 #include "opencv2/ccalib/randpattern.hpp"
 #include "opencv2/xphoto/oilpainting.hpp"
-
-using namespace std;
-using namespace  cv;
-using namespace bgsegm;
+#include "../CPP_Classes/PragmaLibs.h"
 
 using namespace std;
 using namespace cv;
+using namespace bgsegm;
 using namespace ximgproc;
 using namespace ml;
 
-#include "../CPP_Classes/PragmaLibs.h"
 #include "CPP_Parent.h"
 #include "Options.h"
 

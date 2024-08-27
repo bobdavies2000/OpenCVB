@@ -3,6 +3,7 @@ Imports System.Windows.Forms
 Imports System.Drawing
 Imports OpenCvSharp
 Imports System.IO.Pipes
+Imports System.Runtime.InteropServices
 
 Public Class TrueText
     Public text As String
@@ -376,9 +377,9 @@ Public Class VB_Parent : Implements IDisposable
                 End If
             Next
         Catch ex As Exception
-            debug.writeline("FindSlider failed.  The application list of forms changed while iterating.  Not critical." + ex.Message)
+            Debug.WriteLine("FindSlider failed.  The application list of forms changed while iterating.  Not critical." + ex.Message)
         End Try
-        debug.writeline("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+        Debug.writeline("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
 
         Return Nothing
     End Function
@@ -664,13 +665,6 @@ Public Class VB_Parent : Implements IDisposable
         Catch ex As Exception
         End Try
     End Sub
-    Public Sub Run(src As cvb.Mat)
-        If task.testAllRunning = False Then measureStartRun(traceName)
-
-        task.trueData.Clear()
-        If task.paused = False Then Algorithm.RunAlg(src)
-        If task.testAllRunning = False Then measureEndRun(traceName)
-    End Sub
     Public Sub DrawContour(dst As cvb.Mat, contour As List(Of cvb.Point), color As cvb.Scalar, Optional lineWidth As Integer = -10)
         If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
@@ -705,5 +699,21 @@ Public Class VB_Parent : Implements IDisposable
             dst.Line(pt1, pt2, cvb.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
         Next
     End Sub
+    Public Sub Run(src As cvb.Mat)
+        If task.testAllRunning = False Then measureStartRun(traceName)
+
+        task.trueData.Clear()
+        If task.paused = False Then
+            If algorithm.tracename.endswith("_CPP") Then
+                algorithm.RunAlg(src.Data, src.Rows, src.Cols, src.Step)
+            Else
+                algorithm.RunAlg(src)
+            End If
+        End If
+        If task.testAllRunning = False Then measureEndRun(traceName)
+    End Sub
+
+    ' Managed C++ interface
+    Public srcData() As Byte
 End Class
 

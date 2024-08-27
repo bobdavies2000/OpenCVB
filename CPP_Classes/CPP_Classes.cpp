@@ -26,46 +26,16 @@
 #include "opencv2/ccalib/randpattern.hpp"
 #include "opencv2/xphoto/oilpainting.hpp"
 #include <vcclr.h>
+#include "PragmaLibs.h"
 
 using namespace System;
+using namespace System::Runtime::InteropServices;
 using namespace VB_Classes;
 using namespace std;
+using namespace cv;
 
 namespace CPP_Classes {
-    class TrueText {
-    public:
-        std::string text;
-        int picTag;
-        cv::Point pt;
-
-        TrueText(const std::string& _text, const cv::Point& _pt, int camPicIndex) {
-            setup(_text, _pt, camPicIndex);
-        }
-
-        TrueText(const std::string& _text, const cv::Point& _pt) {
-            setup(_text, _pt, 2);
-        }
-
-    private:
-        void setup(const std::string& _text, const cv::Point& _pt, int camPicIndex) {
-            text = _text;
-            pt = _pt;
-            picTag = camPicIndex;
-        }
-    };
-
-
-    public ref class CPP_Parent
-    {
-    public:
-        //VBtask task;
-        //bool standalone;
-        //String desc = "";
-        //cv::Mat dst0, dst1, dst2, dst3, empty;
-        //std::vector<TrueText> trueData = std::vector<TrueText>();
-    };
-    
-    public ref class AddWeighted_Basics_CPP : public CPP_Parent
+    public ref class AddWeighted_Basics_CPP : public VB_Parent
     {
     public:
         double weight;
@@ -73,14 +43,18 @@ namespace CPP_Classes {
 
         AddWeighted_Basics_CPP() 
         {
-            //desc = "Add 2 images with specified weights.";
+            desc = "Add 2 images with specified weights.";
         }
 
-        void RunCPP(cv::Mat& src)
+        void RunAlg(IntPtr dataPtr, int rows, int cols, int step)
         {
+            uchar* data = static_cast<uchar*>(dataPtr.ToPointer());
+            cv::Mat src(rows, cols, CV_8UC3, data, step);
+            imshow("src", src);
+
             //options->RunVB();
 
-            //cv::Mat srcPlus = src2;
+            //Mat srcPlus = src2;
             //// algorithm user normally provides src2! 
             //if (standaloneTest() || src2.empty()) srcPlus = task.depthRGB;
             //if (srcPlus.type() != src.type())
@@ -89,13 +63,13 @@ namespace CPP_Classes {
             //    {
             //        if (src.type() == CV_32FC1) src = Convert32f_To_8UC3(src);
             //        if (srcPlus.type() == CV_32FC1) srcPlus = Convert32f_To_8UC3(srcPlus);
-            //        if (src.type() != CV_8UC3) cv::cvtColor(src, src, cv::COLOR_GRAY2BGR);
-            //        if (srcPlus.type() != CV_8UC3) cv::cvtColor(srcPlus, srcPlus, cv::COLOR_GRAY2BGR);
+            //        if (src.type() != CV_8UC3) cvtColor(src, src, COLOR_GRAY2BGR);
+            //        if (srcPlus.type() != CV_8UC3) cvtColor(srcPlus, srcPlus, COLOR_GRAY2BGR);
             //    }
             //}
 
             weight = 0.5;
-            //cv::addWeighted(src, weight, src2, 1.0 - weight, 0, dst2);
+            //addWeighted(src, weight, src2, 1.0 - weight, 0, dst2);
            //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
         }
     };

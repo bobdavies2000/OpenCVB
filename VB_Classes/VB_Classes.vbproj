@@ -495,6 +495,9 @@
     <PackageReference Include="OpenCvSharp4.runtime.win">
       <Version>4.10.0.20240616</Version>
     </PackageReference>
+    <PackageReference Include="OpenCvSharp4.Windows">
+      <Version>4.10.0.20240616</Version>
+    </PackageReference>
     <PackageReference Include="System.Buffers">
       <Version>4.5.1</Version>
     </PackageReference>
