@@ -288,7 +288,7 @@ Public Class Translator
             outputLines.Add(inline)
         Next
 
-        If Main_UI.settings.translatorMode = "C# to C++" Then Main_UI.setupNewCPPalgorithm(className)
+        'If Main_UI.settings.translatorMode = "C# to C++" Then Main_UI.setupNewCPPalgorithm(className)
         TranslatorResults.rtb.Clear()
         For Each line In outputLines
             TranslatorResults.rtb.Text += line + vbCrLf

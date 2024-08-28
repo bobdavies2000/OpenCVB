@@ -1367,38 +1367,6 @@ Public Class Main_UI
         camLabel(3).Text = picLabels(3)
         If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
     End Sub
-    Public Sub setupNewCPPalgorithm(algorithmName As String)
-        Dim functionNames = New FileInfo(HomeDir.FullName + "CPP_Native\CPP_Enum.h")
-        Dim lines = File.ReadAllLines(functionNames.FullName)
-
-        ' is it already up to date in the CPP_Enum.h file?
-        For Each line In lines
-            If line.Contains("_" + algorithmName) Then Exit Sub
-        Next
-
-        Dim sw = New StreamWriter(functionNames.FullName, False)
-        For Each line In lines
-            If line.Contains("_Stable_BasicsCount_CC,") Then
-                sw.WriteLine(vbTab + "_" + algorithmName + ",")
-            End If
-            sw.WriteLine(line)
-        Next
-        sw.Close()
-
-        Dim externNames = New FileInfo(HomeDir.FullName + "CPP_Native\CPP_Externs.h")
-        lines = File.ReadAllLines(externNames.FullName)
-
-        sw = New StreamWriter(externNames.FullName, False)
-        For Each line In lines
-            If line.Contains("// end of switch - don't remove...") Then
-                sw.WriteLine(vbTab + vbTab + "case _" + algorithmName + ":")
-                sw.WriteLine(vbTab + vbTab + "{ task->alg = new " + algorithmName + "(); task->alg->traceName = " +
-                               """" + algorithmName + """; break; }")
-            End If
-            sw.WriteLine(line)
-        Next
-        sw.Close()
-    End Sub
     Private Sub startCamera()
         paintNewImages = False
         newCameraImages = False

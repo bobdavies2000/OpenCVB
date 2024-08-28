@@ -2,6 +2,7 @@
 Imports System.Text.RegularExpressions
 Module UI_GeneratorMain
     Sub Main()
+        Exit Sub
         Dim CSnames As New SortedList(Of String, String)
         Dim OpenGLnames As New SortedList(Of String, String)
         Dim PYnames As New SortedList(Of String, String)
@@ -47,7 +48,7 @@ Module UI_GeneratorMain
 
         Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/AlgorithmGroupNames.txt")
 #If DEBUG Then
-        If indexTestFile.Exists Then My.Computer.FileSystem.DeleteFile(indexTestFile.FullName)
+        ' If indexTestFile.Exists Then My.Computer.FileSystem.DeleteFile(indexTestFile.FullName)
 #End If
         If indexTestFile.Exists And Not Debugger.IsAttached Then
             If checkDates(New DirectoryInfo(HomeDir.FullName + "/CS_Classes/"), indexTestFile) = False Then

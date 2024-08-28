@@ -353,7 +353,7 @@ Public Class InsertAlgorithm
         Next
         sw.Close()
 
-        Main_UI.setupNewCPPalgorithm(AlgorithmName.Text)
+        'Main_UI.setupNewCPPalgorithm(AlgorithmName.Text)
 
         MsgBox("Edit the new algorithm in CPP_NativeClasses.h")
         Me.Close()

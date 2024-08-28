@@ -1,5 +1,6 @@
 #pragma once
 #include "CPP_NativeClasses.h"
+#include "CPP_Enum.h"
 
 namespace CPP_Native
 {
