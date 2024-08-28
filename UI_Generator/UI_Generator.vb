@@ -101,13 +101,12 @@ Module UI_GeneratorMain
         Dim unsortedFunctions As New List(Of String)
         While srFunctions.EndOfStream = False
             Dim cppline = srFunctions.ReadLine()
-            If cppline.Contains("enum functions") Then
+            If cppline.Contains("enum ccListFunctions") Then
                 While 1
                     cppline = Trim(srFunctions.ReadLine())
                     If cppline = "{" Then Continue While
                     If cppline = "};" Then Exit While
                     Dim split = cppline.Split(",")
-                    If split(0).Contains("MAX_FUNCTION = ") Then Continue While
                     ccFunctionNames.Add(split(0).Substring(0).Trim(), split(0).Trim())
                     unsortedFunctions.Add(split(0).Substring(0).Trim())
                 End While
@@ -118,7 +117,7 @@ Module UI_GeneratorMain
         Dim fileNames As New List(Of String)
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
 
-        Dim pythonAppDir As New IO.DirectoryInfo(HomeDir.FullName + "/Python_Classes/")
+        Dim pythonAppDir As New IO.DirectoryInfo(HomeDir.FullName + "/Python/")
         Dim vbProjFile As New FileInfo(HomeDir.FullName + "/VB_Classes/VB_Classes.vbproj")
         Dim readVBProj = New StreamReader(vbProjFile.FullName)
         While readVBProj.EndOfStream = False
@@ -137,7 +136,7 @@ Module UI_GeneratorMain
         End While
         readVBProj.Close()
 
-        ' we only want python files that are included in the Python_Classes Project.  Other Python files may be support modules or just experiments.
+        ' we only want python files that are included in the Python Project.  Other Python files may be support modules or just experiments.
         Dim pythonFiles() As String = Directory.GetFiles(pythonAppDir.FullName, "*.py", SearchOption.AllDirectories)
         For Each pythonFile As String In pythonFiles
             fileNames.Add(pythonFile)
@@ -180,7 +179,7 @@ Module UI_GeneratorMain
         Dim csFileNames As New List(Of String)
         Dim csAdds As New List(Of String)
         Dim cppAdds As New List(Of String)
-        ' we only want python files that are included in the Python_Classes Project.  Other Python files may be support modules or just experiments.
+        ' we only want python files that are included in the Python Project.  Other Python files may be support modules or just experiments.
         Dim csAppDir As New IO.DirectoryInfo(HomeDir.FullName + "/CS_Classes/")
         Dim csFiles() As String = Directory.GetFiles(csAppDir.FullName, "*.cs", SearchOption.AllDirectories)
         For Each csFile As String In csFiles

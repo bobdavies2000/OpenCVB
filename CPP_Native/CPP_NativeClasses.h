@@ -2914,26 +2914,57 @@ int* xPhoto_Inpaint_Run(xPhoto_Inpaint* cPtr, int* imagePtr, int* maskPtr, int r
 
 
 
+cppTask* task;
 
-class Random_Basics : public CPP_Parent {
+class Random_Basics_CC : public CPP_Parent {
 public:
     vector<Point2f> pointList;
     Rect range;
     int sizeRequest = 10;
 
-    Random_Basics() : CPP_Parent() {
-        traceName = "Random_Basics";
+    Random_Basics_CC() : CPP_Parent() {
+        range = Rect(0, 0, dst2.cols, dst2.rows);
         desc = "Create a uniform random mask with a specified number of pixels.";
     }
 
     void Run(Mat src) {
-        if (range.width == 0 || range.height == 0) range = Rect(0, 0, dst2.cols, dst2.rows);
         pointList.clear();
-        while (pointList.size() < sizeRequest) {
-            pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
+        if (!task->paused) {
+            while (pointList.size() < sizeRequest) {
+                pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
+            }
+
+            dst2.setTo(0);
+            for (Point2f pt : pointList) {
+                circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
+            }
         }
     }
 };
+
+
+
+
+
+//class Random_Basics_CC : public CPP_Parent {
+//public:
+//    vector<Point2f> pointList;
+//    Rect range;
+//    int sizeRequest = 10;
+//
+//    Random_Basics_CC() : CPP_Parent() {
+//        traceName = "Random_Basics";
+//        desc = "Create a uniform random mask with a specified number of pixels.";
+//    }
+//
+//    void Run(Mat src) {
+//        if (range.width == 0 || range.height == 0) range = Rect(0, 0, dst2.cols, dst2.rows);
+//        pointList.clear();
+//        while (pointList.size() < sizeRequest) {
+//            pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
+//        }
+//    }
+//};
 
 
 
@@ -2970,7 +3001,7 @@ public:
                 inputPoints.at<float>(index++) = pt.y;
             }
         }
-        Random_Basics* random = new Random_Basics();
+        Random_Basics_CC* random = new Random_Basics_CC();
         random->sizeRequest = count;
 
         random->range = Rect(0, 0, cols * 3 / 4, rows * 3 / 4);
@@ -3907,7 +3938,6 @@ RedCloudMaxDist_Run(RedCloudMaxDist* cPtr, int* dataPtr, unsigned char* maskPtr,
 
 
 
-cppTask* task;
 class AddWeighted_Basics_CC : public CPP_Parent {
 public:
     double weight;
@@ -3943,35 +3973,6 @@ public:
 
 
 
-
-
-
-
-class Random_Basics_CC : public CPP_Parent {
-public:
-    vector<Point2f> pointList;
-    Rect range;
-    int sizeRequest = 10;
-
-    Random_Basics_CC() : CPP_Parent() {
-        range = Rect(0, 0, dst2.cols, dst2.rows);
-        desc = "Create a uniform random mask with a specified number of pixels.";
-    }
-
-    void Run(Mat src) {
-        pointList.clear();
-        if (!task->paused) {
-            while (pointList.size() < sizeRequest) {
-                pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
-            }
-
-            dst2.setTo(0);
-            for (Point2f pt : pointList) {
-                circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
-            }
-        }
-    }
-};
 
 
 
@@ -4159,12 +4160,12 @@ public:
 class Delaunay_GenerationsNoKNN_CC : public CPP_Parent {
 public:
     vector<Point2f> inputPoints;
-    Random_Basics* random;
+    Random_Basics_CC* random;
     Delaunay_Basics_CC* facet;
     Mat generationMap;
     Delaunay_GenerationsNoKNN_CC() : CPP_Parent() {
         facet = new Delaunay_Basics_CC();
-        random = new Random_Basics();
+        random = new Random_Basics_CC();
         generationMap = Mat::zeros(dst3.size(), CV_32S);
         labels = { "", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region." };
         desc = "Create a region in an image for each point provided with KNN.";
@@ -4295,12 +4296,12 @@ public:
     vector<vector<int>> neighbors;
     Mat result;
     int desiredMatches = -1;
-    Random_Basics* random;
+    Random_Basics_CC* random;
     vector<int> neighborIndexToTrain;
     
     KNN_Core_CC() : CPP_Parent()
     {
-        random = new Random_Basics();
+        random = new Random_Basics_CC();
         labels[2] = "Red=TrainingData, yellow = queries";
         desc = "Train a KNN model and map each query to the nearest training neighbor.";
     }
@@ -4403,11 +4404,11 @@ public:
     KNN_Core_CC* basics;
     vector<Point2f> queries;
     vector<int> neighbors;
-    Random_Basics* random;
+    Random_Basics_CC* random;
 
     KNN_Basics_CC() : CPP_Parent() {
         basics = new KNN_Core_CC();
-        random = new Random_Basics();
+        random = new Random_Basics_CC();
         desc = "Map points 1:1 with losses. Toss any duplicates that are farther.";
     }
     void Run(Mat src)
@@ -5553,12 +5554,12 @@ public:
 
 class Hull_Basics_CC : public CPP_Parent {
 public:
-    Random_Basics* random;
+    Random_Basics_CC* random;
     vector<Point2f> inputPoints;
     vector<Point> hull;
     bool useRandomPoints;
     Hull_Basics_CC() : CPP_Parent() {
-        random = new Random_Basics();
+        random = new Random_Basics_CC();
         labels = { "", "", "Input Points - draw a rectangle anywhere. Enclosing rectangle in yellow.", "" };
         if (standalone) random->range = Rect(100, 100, 50, 50);
         desc = "Given a list of points, create a hull that encloses them.";
@@ -6394,10 +6395,10 @@ public:
 
 class Mesh_Basics_CC : public CPP_Parent {
 public:
-    Random_Basics* random;
+    Random_Basics_CC* random;
     KNN_Core_CC* knn;
     Mesh_Basics_CC() : CPP_Parent() {
-        random = new Random_Basics();
+        random = new Random_Basics_CC();
         knn = new KNN_Core_CC();
         labels[2] = "Triangles built with each random point and its 2 nearest neighbors.";
         advice = "Adjust the number of points with the options_random";
