@@ -52,6 +52,7 @@ Module UI_Gen
         Dim allButPython As New SortedList(Of String, String)
         Dim pyStream As New SortedList(Of String, String)
         Dim allList As New SortedList(Of String, String)
+        Dim opengl As New SortedList(Of String, String)
         For Each line In pyFiles
             If line.Contains("<Compile Include=") = False Then Continue For
             Dim split = line.Split("""")
@@ -84,40 +85,41 @@ Module UI_Gen
                 totalLines += 1
 
                 If fn.EndsWith(".py") Then Continue For
-                If line.StartsWith("Public Class") Then
-                    Dim split As String() = Regex.Split(line, "\W+")
+                If line.StartsWith("Public Class") Then ' VB algorithms
                     If line.EndsWith(" : Inherits VB_Parent") Then
+                        Dim split As String() = Regex.Split(line, "\W+")
                         classname = split(2)
-                        vbList.Add(classname, classname)
-                        allButPython.Add(classname, classname)
-                        allList.Add(classname, classname)
+                        If classname.StartsWith("OpenGL_") Then opengl.Add(classname, line)
+                        vbList.Add(classname, line)
+                        allButPython.Add(classname, line)
+                        allList.Add(classname, line)
                     End If
-                ElseIf line.StartsWith("public class ") Then
+                ElseIf line.StartsWith("public class ") Then ' C# algorithms
                     If line.EndsWith(" : VB_Parent") Then
                         Dim split As String() = Regex.Split(line, "\W+")
                         classname = split(2)
-                        csList.Add(classname, classname)
-                        allButPython.Add(classname, classname)
-                        allList.Add(classname, classname)
+                        csList.Add(classname, line)
+                        allButPython.Add(classname, line)
+                        allList.Add(classname, line)
                     End If
-                ElseIf line.StartsWith("class") Then
+                ElseIf line.StartsWith("class") Then ' C++ Native algorithms
                     If line.EndsWith("_CC") Or line.Contains(" : public CPP_Parent") Then
                         Dim split = line.Split(" ")
                         classname = split(1)
-                        cppList.Add(classname, classname)
-                        cppNative.Add(classname, classname)
-                        allButPython.Add(classname, classname)
-                        allList.Add(classname, classname)
-                        ccList.Add(classname, classname)
+                        cppList.Add(classname, line)
+                        cppNative.Add(classname, line)
+                        allButPython.Add(classname, line)
+                        allList.Add(classname, line)
+                        ccList.Add(classname, line)
                     End If
-                ElseIf line.StartsWith("public ref class ") Then
+                ElseIf line.StartsWith("public ref class ") Then ' Managed C++ algorithms.
                     If line.EndsWith(" : public VB_Parent") Then
                         Dim split = line.Split(" ")
                         classname = split(3)
-                        cppList.Add(classname, classname)
-                        cppManaged.Add(classname, classname)
-                        allButPython.Add(classname, classname)
-                        allList.Add(classname, classname)
+                        cppList.Add(classname, line)
+                        cppManaged.Add(classname, line)
+                        allButPython.Add(classname, line)
+                        allList.Add(classname, line)
                     End If
                 End If
             Next
@@ -189,6 +191,129 @@ Module UI_Gen
         sw.WriteLine("End Class")
         sw.Close()
 
+
+
+        Dim tokens(allButPython.Count - 1) As String
+        For i = 0 To allButPython.Keys.Count - 1
+            tokens(i) = allButPython.Keys(i)
+        Next
+        Dim references As New SortedList(Of String, String)
+        For Each fn In srcList
+            If fn.EndsWith(".py") Then Continue For
+            Dim srclines = File.ReadAllLines(fn)
+            Dim classname As String = ""
+            For Each line In srclines
+                line = Trim(line)
+                If line.Length = 0 Then Continue For
+                If line.StartsWith("//") Then Continue For
+                If line.StartsWith("'") Then Continue For
+                If line = "{" Or line = "}" Then Continue For
+
+                If line.StartsWith("Public Class") Then ' VB algorithms
+                    If line.EndsWith(" : Inherits VB_Parent") Then
+                        Dim split As String() = Regex.Split(line, "\W+")
+                        classname = split(2)
+                    End If
+                ElseIf line.StartsWith("public class ") Then ' C# algorithms
+                    If line.EndsWith(" : VB_Parent") Then
+                        Dim split As String() = Regex.Split(line, "\W+")
+                        classname = split(2)
+                    End If
+                ElseIf line.StartsWith("class") Then ' C++ Native algorithms
+                    If line.EndsWith("_CC") Or line.Contains(" : public CPP_Parent") Then
+                        Dim split = line.Split(" ")
+                        classname = split(1)
+                    End If
+                ElseIf line.StartsWith("public ref class ") Then ' Managed C++ algorithms.
+                    If line.EndsWith(" : public VB_Parent") Then
+                        Dim split = line.Split(" ")
+                        classname = split(3)
+                    End If
+                End If
+                If classname <> "" Then
+                    For Each alg In allList.Keys
+                        If line.Contains(alg) Then
+                            Dim index = allButPython.IndexOfKey(alg)
+                            If tokens(index).Contains(classname) = False Then tokens(index) += "," + classname
+                        End If
+                    Next
+                End If
+            Next
+        Next
+
+
+
+        Dim sortedRefs As New List(Of String)
+        Dim refCounts As New List(Of String)
+        For i = 0 To tokens.Count - 1
+            ' sort the tokens before creating the final entry
+            Dim split As String() = Regex.Split(tokens(i), ",")
+            Dim tokenSort As New SortedList(Of String, String)
+            For j = 0 To split.Length - 1
+                tokenSort.Add(split(j), split(j))
+            Next
+            Dim finalEntry = allButPython.ElementAt(i).Key
+            For j = 0 To tokenSort.Keys.Count - 1
+                finalEntry += "," + tokenSort.ElementAt(j).Key
+            Next
+            sortedRefs.Add(finalEntry)
+            refCounts.Add("(" + CStr(tokenSort.Keys.Count) + ") ")
+        Next
+
+
+
+
+        sw = New StreamWriter(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
+        sw.WriteLine("<All (" + CStr(allList.Count) + ")>")
+        sw.Write("<All but Python (" + CStr(allButPython.Count) + ")>")
+        For Each alg In allButPython.Keys
+            If alg = "CPP_Basics" Then Continue For
+            sw.Write("," + alg)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<All C# (" + CStr(csList.Count) + ")>")
+        For Each alg In ccList.Keys
+            sw.Write("," + alg)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<All C++ (" + CStr(cppList.Count) + ")>")
+        For Each alg In cppList.Keys
+            sw.Write("," + alg)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<All OpenGL (" + CStr(opengl.Count) + ")>")
+        For Each alg In opengl.Keys
+            sw.Write("," + alg)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<All PyStream(" + CStr(pyStream.Count) + ">")
+        For Each alg In pyStream.Keys
+            sw.Write("," + alg)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<All Python (" + CStr(pythonList.Count) + ")>")
+        For Each alg In pythonList.Keys
+            sw.Write("," + alg)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<All VB.Net (" + CStr(vbList.Count) + ")>")
+        For Each alg In vbList.Keys
+            sw.Write("," + alg)
+        Next
+        sw.WriteLine()
+
+        'sw.WriteLine("<All using recorded data>")
+
+        For i = 0 To sortedRefs.Count - 1
+            sw.WriteLine(refCounts(i) + sortedRefs(i))
+        Next
+        sw.Close()
     End Sub
 
     Private Function checkDates(dirInfo As DirectoryInfo, algorithmGroupNames As FileInfo) As Boolean

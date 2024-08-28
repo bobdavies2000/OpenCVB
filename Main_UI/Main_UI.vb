@@ -882,22 +882,19 @@ Public Class Main_UI
 
         Dim AlgorithmMapFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
         If AlgorithmMapFileInfo.Exists = False Then
-            MsgBox("The AlgorithmGroupNames.txt file is missing.  Run 'UI_Generator' or rebuild all to rebuild the user interface.")
-            End
+            MsgBox("The AlgorithmGroupNames.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
         End If
         sr = New StreamReader(AlgorithmMapFileInfo.FullName)
         GroupName.Items.Clear()
         Dim lastNameSplit As String = "", lastSplit0 As String = ""
         While sr.EndOfStream = False
             infoLine = sr.ReadLine
+            GroupName.Items.Add(infoline)
             Split = Regex.Split(infoLine, ",")
 
             If Split(0).StartsWith("<") = False Then
+
                 If Split(0).Contains("_") Then
-                    If lastSplit0.Contains("_") = False Then
-                        groupList.Add("")
-                        GroupName.Items.Add("")
-                    End If
                     Dim nameSplit = Split(0).Split("_")
                     If nameSplit(0) <> lastNameSplit And lastNameSplit <> "" Then
                         groupList.Add("")

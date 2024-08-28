@@ -55,14 +55,14 @@ Module UI_GeneratorMain
                 If checkDates(New DirectoryInfo(HomeDir.FullName + "/VB_Classes/"), indexTestFile) = False Then
                     If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Native/"), indexTestFile) = False Then
                         If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Classes/"), indexTestFile) = False Then
-                            Debug.WriteLine("The user interface is already up to date.")
+                            Console.WriteLine("The user interface is already up to date.")
                             Exit Sub ' nothing to trigger 
                         End If
                     End If
                 End If
             End If
         End If
-        Debug.WriteLine("Starting work to generate the user interface.")
+        Console.WriteLine("Starting work to generate the user interface.")
 
         Dim includeCC = File.ReadAllLines(CCInput.FullName)
         Dim ccLines As Integer
