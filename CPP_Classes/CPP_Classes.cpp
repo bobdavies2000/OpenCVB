@@ -37,7 +37,9 @@ namespace CPP_Classes {
     public ref class AddWeighted_Basics_CPP : public VB_Parent
     {
         Options_AddWeighted options;
+        AddWeighted_BasicsTest test;
     public:
+        VBtask task;
         double weight;
         AddWeighted_Basics_CPP()
         {
@@ -46,14 +48,22 @@ namespace CPP_Classes {
 
         void RunAlg(IntPtr dataPtr, int rows, int cols, int type)
         {
+            //VBtask^ task = Marshal::PtrToStructure<VBtask^>(taskPtr);
+            //imshow("DepthRGB", task->depthRGB);
             uchar* data = static_cast<uchar*>(dataPtr.ToPointer());
             Mat src(rows, cols, type, data);
 
             options.RunOpt();
+            test.RunAlg();
+            //Size workingRes = test.workingRes;
+
+
 
             Mat srcPlus(rows, cols, type);
             srcPlus.setTo(0);
-
+            
+            //Mat test = task->depthRGB;
+            //imshow("cppTask->depthRGB", cppTask->depthRGB);
             // algorithm user normally provides src2! 
             //if (standaloneTest() || src2.empty()) srcPlus = task.depthRGB;
             //if (srcPlus.type() != src.type())

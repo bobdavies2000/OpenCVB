@@ -97,3 +97,19 @@ Public Class AddWeighted_Edges : Inherits VB_Parent
         dst3 = addw.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class AddWeighted_BasicsTest : Inherits VB_Parent
+    Public workingRes As New cvb.Size
+    Public Sub New()
+        desc = "Testing access from C++"
+    End Sub
+    Public Sub RunAlg()
+        workingRes = task.WorkingRes
+    End Sub
+End Class

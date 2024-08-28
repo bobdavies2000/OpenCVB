@@ -56,8 +56,8 @@ Public Class Anyname_CPP : Inherits VB_Algorithm
         UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
         desc = "description"
 	  End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunAlg(src as cvb.Mat)
+        If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
@@ -65,7 +65,7 @@ Public Class Anyname_CPP : Inherits VB_Algorithm
         Dim imagePtr = Anyname_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, If(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).clone
+        dst2 = New cvb.Mat(src.Rows, src.Cols, If(src.Channels = 3, cvb.MatType.CV_8UC3, cvb.MatType.CV_8UC1), imagePtr).clone
     End Sub
     Public Sub Close() 
         Anyname_Close(cPtr)

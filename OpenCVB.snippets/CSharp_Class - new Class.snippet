@@ -10,15 +10,13 @@
 	public class CS_AnyName_Basics : CS_Parent
     {
         public Options_Blur options;
-        public CS_AnyName_Basics(VBtask task) : base(task)
+        public AnyName_Basics_CS()
         {
-		    options = new Options_Blur();
             desc = "description";
         }
 
         public void RunCS(Mat src)
         {
-            options.RunVB();
         }
     }  // End Class
 ]]>

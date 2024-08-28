@@ -6,6 +6,7 @@ Imports System.IO.Pipes
 Imports System.Runtime.InteropServices
 
 Public Class TrueText
+    Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
     Public text As String
     Public picTag = 2
     Public pt As cvb.Point
@@ -705,6 +706,8 @@ Public Class VB_Parent : Implements IDisposable
         task.trueData.Clear()
         If task.paused = False Then
             If algorithm.tracename.endswith("_CPP") Then
+                'Dim ptr As IntPtr = Marshal.AllocHGlobal(Marshal.SizeOf(task))
+                'Marshal.StructureToPtr(task, ptr, False)
                 algorithm.RunAlg(src.Data, src.Rows, src.Cols, src.Type)
             Else
                 algorithm.RunAlg(src)

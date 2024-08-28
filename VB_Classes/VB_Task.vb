@@ -3,7 +3,9 @@ Imports System.Windows.Forms
 Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.IO
+Imports System.Runtime.InteropServices
 
+<StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     Public TaskTimer As New System.Timers.Timer(1000)
 
@@ -220,7 +222,7 @@ Public Class VBtask : Implements IDisposable
     Public mainFormLocation As cvb.Rect
     Public main_hwnd As IntPtr
 
-    Public trueData As New List(Of trueText)
+    Public trueData As New List(Of TrueText)
 
     Public callTraceMain As New List(Of String)
     Public algorithm_msMain As New List(Of Single)
@@ -324,7 +326,7 @@ Public Class VBtask : Implements IDisposable
         Static WarningCount As Integer
         Static saveFrameCount = -1
         If saveFrameCount = frameCount And frameCount > 0 And WarningCount = 0 Then
-            debug.writeline("Warning: " + task.algName + " has not completed work on a frame in a second. Warning " + CStr(WarningCount))
+            Debug.WriteLine("Warning: " + task.algName + " has not completed work on a frame in a second. Warning " + CStr(WarningCount))
             WarningCount += 1
         Else
             WarningCount = 0
@@ -455,7 +457,7 @@ Public Class VBtask : Implements IDisposable
         'allOptions.Close()
     End Sub
     Public Sub TrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
-        Dim str As New trueText(text, pt, picTag)
+        Dim str As New TrueText(text, pt, picTag)
         task.trueData.Add(str)
     End Sub
     Public Sub setSelectedContour(ByRef redCells As List(Of rcData), ByRef cellMap As cvb.Mat)
@@ -518,14 +520,14 @@ Public Class VBtask : Implements IDisposable
 
             Dim obj = checkIntermediateResults()
             task.intermediateObject = obj
-            If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of trueText)(trueData)
+            If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(trueData)
             If obj IsNot Nothing Then
                 If task.gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(obj.dst0) Else task.dst0 = task.color
                 If task.gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(obj.dst1) Else task.dst1 = task.depthRGB
                 task.dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, MakeSureImage8uC3(obj.dst2))
                 task.dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, MakeSureImage8uC3(obj.dst3))
                 task.labels = obj.labels
-                If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of trueText)(obj.trueData)
+                If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
             Else
                 If task.gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(dst0) Else task.dst0 = task.color
                 If task.gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(dst1) Else task.dst1 = task.depthRGB
@@ -555,7 +557,7 @@ Public Class VBtask : Implements IDisposable
                     Dim rcx = redCells(i)
                     If ptCells.Contains(rcx.maxDStable) = False Then
                         If rcx.maxDStable <> ptNew And rcx.index <= task.redOptions.identifyCount Then
-                            Dim str As New trueText(CStr(rcx.index), rcx.maxDStable, 2)
+                            Dim str As New TrueText(CStr(rcx.index), rcx.maxDStable, 2)
                             trueData.Add(str)
                         End If
                         ptCells.Add(rcx.maxDStable)
@@ -578,7 +580,7 @@ Public Class VBtask : Implements IDisposable
                         If cellStats Is Nothing Then cellStats = New Cell_Basics
                         cellStats.statsString()
                         dst1 = cellStats.dst1
-                        Dim str As New trueText(cellStats.strOut, New cvb.Point, 3)
+                        Dim str As New TrueText(cellStats.strOut, New cvb.Point, 3)
                         trueData.Add(str)
                     End If
                 End If
@@ -611,7 +613,7 @@ Public Class VBtask : Implements IDisposable
             task.algorithm_msMain = New List(Of Single)(algorithm_ms)
             task.algorithmNamesMain = New List(Of String)(algorithmNames)
         Catch ex As Exception
-            debug.writeline("Active Algorithm exception occurred: " + ex.Message)
+            Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
     End Sub
     Public Sub RunAlgorithm()

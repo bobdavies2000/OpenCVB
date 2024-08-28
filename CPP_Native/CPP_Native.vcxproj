@@ -187,7 +187,8 @@
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)bin\Release\net8.0-windows\UI_Generate.exe</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>

@@ -14,7 +14,7 @@ Public Class RedCloud_AnyName : Inherits VB_Parent
         UpdateAdvice(tracename + ": <place advice here on any options that are useful>")
         desc = "description"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunAlg(src as cvb.Mat)
 	    redC.run(src)
 		dst2 = redC.dst2
 		labels = redC.labels
