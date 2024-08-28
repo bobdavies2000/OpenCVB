@@ -3355,6 +3355,7 @@ End Enum
 	If algorithmName = "Spectrum_Z" Then return new Spectrum_Z
 	If algorithmName = "Spectrum_Z_CS" Then return new Spectrum_Z_CS
 	If algorithmName = "Stabilizer_Basics" Then return new Stabilizer_Basics
+	If algorithmName = "Stabilizer_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Stabilizer_Basics_CC)
 	If algorithmName = "Stabilizer_Basics_CS" Then return new Stabilizer_Basics_CS
 	If algorithmName = "Stabilizer_BasicsRandomInput" Then return new Stabilizer_BasicsRandomInput
 	If algorithmName = "Stabilizer_BasicsRandomInput_CS" Then return new Stabilizer_BasicsRandomInput_CS
@@ -3555,6 +3556,7 @@ End Enum
 	If algorithmName = "Video_MinRect_CS" Then return new Video_MinRect_CS
 	If algorithmName = "Vignetting_Basics" Then return new Vignetting_Basics
 	If algorithmName = "Vignetting_Basics_CPP_CS" Then return new Vignetting_Basics_CPP_CS
+	If algorithmName = "Vignetting_CC" Then return new CPP_Basics(ccFunctionNames._Vignetting_CC)
 	If algorithmName = "Vignetting_Devignetting" Then return new Vignetting_Devignetting
 	If algorithmName = "Vignetting_Devignetting_CS" Then return new Vignetting_Devignetting_CS
 	If algorithmName = "Vignetting_Removal" Then return new Vignetting_Removal
