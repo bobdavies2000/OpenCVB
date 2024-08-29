@@ -38,10 +38,6 @@ namespace CPP_Native
         {
         case _AddWeighted_Basics_CC:
         { task->alg = new AddWeighted_Basics_CC(); task->alg->traceName = "AddWeighted_Basics_CC"; break; }
-        case _RedCloud_BasicsNative_CC:
-        { task->alg = new RedCloud_BasicsNative_CC(); task->alg->traceName = "RedCloud_BasicsNative_CC"; break; }
-        case _RedCloud_Basics_CC:
-        { task->alg = new RedCloud_Basics_CC(); task->alg->traceName = "RedCloud_Basics_CC"; break; }
         case _BGSubtract_Basics_CC:
         { task->alg = new BGSubtract_Basics_CC(); task->alg->traceName = "BGSubtract_Basics_CC"; break; }
         case _Plot_Histogram2D_CC:

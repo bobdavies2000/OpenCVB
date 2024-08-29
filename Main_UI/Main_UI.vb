@@ -251,7 +251,7 @@ Public Class Main_UI
             End If
 
             If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
-            If settings.algorithmGroup = "" Then settings.algorithmGroup = "<All but Python"
+            If settings.groupComboText = "" Then settings.groupComboText = "< All but Python >"
 
             If testAllRunning = False Then
                 Dim resStr = CStr(.WorkingRes.Width) + "x" + CStr(.WorkingRes.Height)
@@ -275,7 +275,7 @@ Public Class Main_UI
     Public Sub jsonWrite()
         If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if testing all
             settings.algorithm = AvailableAlgorithms.Text
-            settings.algorithmGroup = GroupName.Text
+            settings.groupComboText = GroupCombo.Text
         End If
 
         settings.locationMain = New cvb.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
@@ -357,18 +357,18 @@ Public Class Main_UI
         Next
         Return False
     End Function
-    Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupName.SelectedIndexChanged
-        If GroupName.Text = "" Then
+    Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupCombo.SelectedIndexChanged
+        If GroupCombo.Text = "" Then
             Dim incr = 1
             If upArrow Then incr = -1
             upArrow = False
             downArrow = False
-            GroupName.Text = GroupName.Items(GroupName.SelectedIndex + incr)
+            GroupCombo.Text = GroupCombo.Items(GroupCombo.SelectedIndex + incr)
             Exit Sub
         End If
 
         AvailableAlgorithms.Enabled = False
-        Dim keyIndex = GroupName.Items.IndexOf(GroupName.Text)
+        Dim keyIndex = GroupCombo.Items.IndexOf(GroupCombo.Text)
         Dim groupings = groupList(keyIndex)
         Dim split = Regex.Split(groupings, ",")
         AvailableAlgorithms.Items.Clear()
@@ -385,7 +385,7 @@ Public Class Main_UI
         Next
         AvailableAlgorithms.Enabled = True
 
-        If GroupName.Text.Contains("All") = False Then algHistory.Clear()
+        If GroupCombo.Text.Contains("All") = False Then algHistory.Clear()
 
         ' if the fpstimer is enabled, then OpenCVB is running - not initializing.
         If fpsTimer.Enabled Then
@@ -863,12 +863,12 @@ Public Class Main_UI
             MsgBox("The groupFileInfo.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
         End If
         sr = New StreamReader(groupFileInfo.FullName)
-        GroupName.Items.Clear()
+        GroupCombo.Items.Clear()
         While sr.EndOfStream = False
             infoLine = sr.ReadLine
             Split = infoLine.Split(",")
             groupList.Add(infoLine)
-            GroupName.Items.Add(split(0))
+            GroupCombo.Items.Add(Split(0))
         End While
         sr.Close()
     End Sub
@@ -925,7 +925,7 @@ Public Class Main_UI
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
             Dim algorithm As String = "AddWeighted_PS.py"
-            settings.algorithmGroup = "< All >"
+            settings.groupComboText = "< All >"
             If args.Length > 2 Then ' arguments from python os.spawnv are passed as wide characters.  
                 For i = 0 To args.Length - 1
                     algorithm += args(i)
@@ -1021,12 +1021,25 @@ Public Class Main_UI
 
         loadAlgorithmComboBoxes()
 
-        GroupName.Text = settings.algorithmGroup
+        GroupCombo.Text = settings.groupComboText
 
-        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupList(1) ' all but python
+        If GroupCombo.SelectedItem() Is Nothing Then
+            Dim group = GroupCombo.Text
+            If InStr(group, ") ") Then
+                Dim offset = InStr(group, ") ")
+                group = group.Substring(offset + 2)
+            End If
+            For i = 0 To GroupCombo.Items.Count - 1
+                If GroupCombo.Items(i).contains(group) Then
+                    GroupCombo.SelectedItem() = GroupCombo.Items(i)
+                    settings.groupComboText = GroupCombo.Text
+                    Exit For
+                End If
+            Next
+        End If
 
         If AvailableAlgorithms.Items.Count = 0 Then
-            MsgBox("There were no algorithms listed for the " + GroupName.Text + vbCrLf +
+            MsgBox("There were no algorithms listed for the " + GroupCombo.Text + vbCrLf +
                    "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
         Else
             If settings.algorithm Is Nothing Then
@@ -1207,7 +1220,7 @@ Public Class Main_UI
         Dim parms As New VB_Classes.VBtask.algParms
         parms.fpsRate = settings.desiredFPS
 
-        parms.useRecordedData = GroupName.Text = "<All using recorded data>"
+        parms.useRecordedData = GroupCombo.Text = "<All using recorded data>"
         parms.testAllRunning = testAllRunning
 
         parms.externalPythonInvocation = externalPythonInvocation

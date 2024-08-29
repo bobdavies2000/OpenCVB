@@ -38,7 +38,7 @@ Partial Class Main_UI
         Advice = New ToolStripButton()
         RecentList = New ToolStripDropDownButton()
         AvailableAlgorithms = New ToolStripComboBox()
-        GroupName = New ToolStripComboBox()
+        GroupCombo = New ToolStripComboBox()
         AlgorithmDesc = New TextBox()
         fpsTimer = New Timer(components)
         TestAllTimer = New Timer(components)
@@ -57,7 +57,7 @@ Partial Class Main_UI
         ' ToolStrip1
         ' 
         ToolStrip1.ImageScalingSize = New Size(24, 24)
-        ToolStrip1.Items.AddRange(New ToolStripItem() {BackButton, ForwardButton, PausePlayButton, OptionsButton, TestAllButton, TreeButton, PixelViewerButton, BluePlusButton, ComplexityButton, TranslateButton, Advice, RecentList, AvailableAlgorithms, GroupName})
+        ToolStrip1.Items.AddRange(New ToolStripItem() {BackButton, ForwardButton, PausePlayButton, OptionsButton, TestAllButton, TreeButton, PixelViewerButton, BluePlusButton, ComplexityButton, TranslateButton, Advice, RecentList, AvailableAlgorithms, GroupCombo})
         ToolStrip1.Location = New Point(0, 33)
         ToolStrip1.Name = "ToolStrip1"
         ToolStrip1.Size = New Size(1556, 34)
@@ -184,12 +184,12 @@ Partial Class Main_UI
         AvailableAlgorithms.Name = "AvailableAlgorithms"
         AvailableAlgorithms.Size = New Size(350, 34)
         ' 
-        ' GroupName
+        ' GroupCombo
         ' 
-        GroupName.AutoCompleteMode = AutoCompleteMode.Suggest
-        GroupName.AutoCompleteSource = AutoCompleteSource.ListItems
-        GroupName.Name = "GroupName"
-        GroupName.Size = New Size(300, 34)
+        GroupCombo.AutoCompleteMode = AutoCompleteMode.Suggest
+        GroupCombo.AutoCompleteSource = AutoCompleteSource.ListItems
+        GroupCombo.Name = "GroupCombo"
+        GroupCombo.Size = New Size(300, 34)
         ' 
         ' AlgorithmDesc
         ' 
@@ -287,7 +287,7 @@ Partial Class Main_UI
     Friend WithEvents TranslateButton As ToolStripButton
     Friend WithEvents Advice As ToolStripButton
     Friend WithEvents AvailableAlgorithms As ToolStripComboBox
-    Friend WithEvents GroupName As ToolStripComboBox
+    Friend WithEvents GroupCombo As ToolStripComboBox
     Friend WithEvents AlgorithmDesc As TextBox
     Friend WithEvents fpsTimer As Timer
     Friend WithEvents TestAllTimer As Timer

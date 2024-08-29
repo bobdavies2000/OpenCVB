@@ -71,8 +71,6 @@ _Random_Basics_CC
 _Random_Enumerable_CC
 _Rectangle_Basics_CC
 _Rectangle_Rotated_CC
-_RedCloud_Basics_CC
-_RedCloud_BasicsNative_CC
 _RedCloud_Flood_CC
 _RedCloud_Reduce_CC
 _RedColor_FeatureLess_CC
@@ -87,11 +85,11 @@ _Vignetting_CC
 End Enum
 	Public Function createAlgorithm(algorithmName as string) as Object
 	If algorithmName.endsWith(".py") then return new Python_Run()
+	If algorithmName = "AddWeight_BasicsTest" Then return new AddWeight_BasicsTest
 	If algorithmName = "AddWeighted_Basics" Then return new AddWeighted_Basics
 	If algorithmName = "AddWeighted_Basics_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_Basics_CC)
 	If algorithmName = "AddWeighted_Basics_CPP" Then return new AddWeighted_Basics_CPP
 	If algorithmName = "AddWeighted_Basics_CS" Then return new AddWeighted_Basics_CS
-	If algorithmName = "AddWeighted_BasicsTest" Then return new AddWeighted_BasicsTest
 	If algorithmName = "AddWeighted_DepthAccumulate" Then return new AddWeighted_DepthAccumulate
 	If algorithmName = "AddWeighted_DepthAccumulate_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_DepthAccumulate_CC)
 	If algorithmName = "AddWeighted_DepthAccumulate_CS" Then return new AddWeighted_DepthAccumulate_CS
@@ -3033,9 +3031,7 @@ End Enum
 	If algorithmName = "RecursiveBilateralFilter_CPP_CS" Then return new RecursiveBilateralFilter_CPP_CS
 	If algorithmName = "RecursiveBilateralFilter_CPP_VB" Then return new RecursiveBilateralFilter_CPP_VB
 	If algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
-	If algorithmName = "RedCloud_Basics_CC" Then return new CPP_Basics(ccFunctionNames._RedCloud_Basics_CC)
 	If algorithmName = "RedCloud_Basics_CS" Then return new RedCloud_Basics_CS
-	If algorithmName = "RedCloud_BasicsNative_CC" Then return new CPP_Basics(ccFunctionNames._RedCloud_BasicsNative_CC)
 	If algorithmName = "RedCloud_BProject3D" Then return new RedCloud_BProject3D
 	If algorithmName = "RedCloud_BProject3D_CS" Then return new RedCloud_BProject3D_CS
 	If algorithmName = "RedCloud_CCompColor" Then return new RedCloud_CCompColor

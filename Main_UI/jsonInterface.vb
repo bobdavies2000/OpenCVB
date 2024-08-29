@@ -6,7 +6,7 @@ Namespace jsonClass
 
     Public Class ApplicationStorage
         Public algorithm As String
-        Public algorithmGroup As String
+        Public groupComboText As String
 
         Public cameraIndex As Integer
         Public cameraName As String
@@ -72,7 +72,7 @@ Namespace jsonClass
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
-            emptyApp.algorithmGroup = "<All but Python ("
+            emptyApp.groupComboText = "< All but Python >"
             emptyApp.translatorMode = "VB.Net to C#"
             SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 30)
             SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", 30)
