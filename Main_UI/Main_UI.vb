@@ -715,11 +715,11 @@ Public Class Main_UI
     Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
         arrowIndex = 0
         Dim item = TryCast(sender, ToolStripMenuItem)
-        If AvailableAlgorithms.Items.Contains(item.Name) = False Then
+        If AvailableAlgorithms.Items.Contains(item.Text) = False Then
             MsgBox("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed or " + vbCrLf +
-                   "The currently selected group does not contain " + item.Name + vbCrLf + "Change the group to <All> to guarantee access.")
+                   "The currently selected group does not contain " + item.Text + vbCrLf + "Change the group to <All> to guarantee access.")
         Else
-            recentAlgorithm(item.Text)
+            AvailableAlgorithms.SelectedItem = item.Text
         End If
     End Sub
     Private Sub BackButton_Click(sender As Object, e As EventArgs) Handles BackButton.Click
@@ -739,9 +739,6 @@ Public Class Main_UI
             arrowIndex = Math.Max(0, arrowIndex - 1)
             jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
         End If
-    End Sub
-    Private Sub recentAlgorithm(algName As String)
-        AvailableAlgorithms.SelectedItem = algName
     End Sub
     Private Sub setupAlgorithmHistory()
         For i = 0 To MAX_RECENT - 1
