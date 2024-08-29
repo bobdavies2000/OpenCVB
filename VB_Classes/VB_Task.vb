@@ -449,12 +449,12 @@ Public Class VBtask : Implements IDisposable
         Application.DoEvents()
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        allOptions.Close()
         If openGL_hwnd <> 0 Then
             task.OpenGLClose()
             openGL_hwnd = 0
         End If
         TaskTimer.Enabled = False
-        'allOptions.Close()
     End Sub
     Public Sub TrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
         Dim str As New TrueText(text, pt, picTag)

@@ -13,12 +13,6 @@ Public Class OptionsContainer
         Me.Width = GetSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
         Me.Height = GetSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", task.mainFormLocation.Height)
     End Sub
-    Private Sub Options_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", Math.Abs(Me.Left))
-        SaveSetting("OpenCVB", "gOptionsTop", "gOptionsTop", Me.Top)
-        SaveSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", Me.Width)
-        SaveSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", Me.Height)
-    End Sub
     Public Sub addTitle(frm As Object)
         If optionsTitle.Contains(frm.Text) = False Then
             optionsTitle.Add(frm.Text)
@@ -86,5 +80,11 @@ Public Class OptionsContainer
     End Sub
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
         layoutOptions(normalRequest:=False)
+    End Sub
+    Private Sub OptionsContainer_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", Math.Abs(Me.Left))
+        SaveSetting("OpenCVB", "gOptionsTop", "gOptionsTop", Me.Top)
+        SaveSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", Me.Width)
+        SaveSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", Me.Height)
     End Sub
 End Class
