@@ -1,5 +1,6 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
+
 Module UI_Gen
     Sub Main(args As String())
         Dim CCInput = New FileInfo("../../../../CPP_Native/CPP_NativeClasses.h")
@@ -11,6 +12,7 @@ Module UI_Gen
                    CCInput.FullName + " was not found.")
             Exit Sub
         End If
+        MsgBox("test")
 
         Dim HomeDir As New DirectoryInfo(CCInput.DirectoryName + "/../")
         Dim srcList As New List(Of String)({HomeDir.FullName + "CPP_Classes/CPP_Classes.cpp",    ' all the managed C++ code

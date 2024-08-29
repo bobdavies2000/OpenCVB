@@ -87,8 +87,7 @@
       <AdditionalLibraryDirectories>$(ProjectDir)..\</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -126,8 +125,7 @@
       <AdditionalLibraryDirectories>$(ProjectDir)..\</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -925,7 +925,7 @@ Public Class Main_UI
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
             Dim algorithm As String = "AddWeighted_PS.py"
-            settings.algorithmGroup = "<All >"
+            settings.algorithmGroup = "< All >"
             If args.Length > 2 Then ' arguments from python os.spawnv are passed as wide characters.  
                 For i = 0 To args.Length - 1
                     algorithm += args(i)
