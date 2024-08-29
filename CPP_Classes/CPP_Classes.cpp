@@ -37,7 +37,7 @@ namespace CPP_Classes {
     public ref class AddWeighted_Basics_CPP : public VB_Parent
     {
         Options_AddWeighted options;
-        AddWeighted_BasicsTest test;
+        CPP_Managed^ tin = gcnew CPP_Managed();
     public:
         VBtask task;
         double weight;
@@ -46,22 +46,17 @@ namespace CPP_Classes {
             desc = "Add 2 images with specified weights.";
         }
 
-        void RunAlg(IntPtr dataPtr, int rows, int cols, int type)
+        void RunAlg()
         {
-            //VBtask^ task = Marshal::PtrToStructure<VBtask^>(taskPtr);
-            //imshow("DepthRGB", task->depthRGB);
-            uchar* data = static_cast<uchar*>(dataPtr.ToPointer());
-            Mat src(rows, cols, type, data);
-
             options.RunOpt();
-            test.RunAlg();
+            tin->getInput();
+            Mat src(tin->rows, tin->cols, tin->srcType, static_cast<uchar*>(tin->color.ToPointer()));
+            Mat srcPlus(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->depthRGB.ToPointer()));
+
             //Size workingRes = test.workingRes;
 
 
 
-            Mat srcPlus(rows, cols, type);
-            srcPlus.setTo(0);
-            
             //Mat test = task->depthRGB;
             //imshow("cppTask->depthRGB", cppTask->depthRGB);
             // algorithm user normally provides src2! 

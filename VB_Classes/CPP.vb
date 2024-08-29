@@ -111,3 +111,37 @@ Public Class CPP_Basics : Inherits VB_Parent
         If cPtr <> 0 Then cPtr = cppTask_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class CPP_Managed
+    Public workingRes As New cvb.Size
+    Public color As IntPtr
+    Public depthRGB As IntPtr
+    Public pointCloud As IntPtr
+    Public leftView As IntPtr
+    Public rightView As IntPtr
+    Public input As IntPtr
+    Public cols As Integer
+    Public rows As Integer
+    Public srcType As Integer
+    Public Sub New()
+        ' This interface is called from the C++/CLR algorithms to build the task structure in C++/CLR."
+    End Sub
+    Public Sub getInput()
+        cols = task.color.Width
+        rows = task.color.Height
+        srcType = task.color.Type
+        color = task.color.Data
+        depthRGB = task.depthRGB.Data
+        pointCloud = task.pointCloud.Data
+        leftView = task.leftView.Data
+        rightView = task.rightView.Data
+    End Sub
+    Public Sub putOutput()
+
+    End Sub
+End Class

@@ -85,7 +85,6 @@ _Vignetting_CC
 End Enum
 	Public Function createAlgorithm(algorithmName as string) as Object
 	If algorithmName.endsWith(".py") then return new Python_Run()
-	If algorithmName = "AddWeight_BasicsTest" Then return new AddWeight_BasicsTest
 	If algorithmName = "AddWeighted_Basics" Then return new AddWeighted_Basics
 	If algorithmName = "AddWeighted_Basics_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_Basics_CC)
 	If algorithmName = "AddWeighted_Basics_CPP" Then return new AddWeighted_Basics_CPP

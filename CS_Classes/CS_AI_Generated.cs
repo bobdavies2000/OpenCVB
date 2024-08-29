@@ -3840,24 +3840,24 @@ namespace CS_Classes
 
         public Bin4Way_Regions_CS()
         {
-            rebuildMats();
+            rebuildMats(dst2.Size());
             labels = new string[] { "", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2" };
             desc = "Add the 4-way split of images to define the different regions.";
         }
 
-        void rebuildMats()
+        void rebuildMats(cv.Size Size)
         {
-            dst2 = new Mat(vbc.task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(Size, MatType.CV_8U, cv.Scalar.All(0));
             for (int i = 0; i < binary.mats.mat.Count(); i++)
             {
-                binary.mats.mat[i] = new Mat(vbc.task.WorkingRes, MatType.CV_8UC1, cv.Scalar.All(0));
+                binary.mats.mat[i] = new Mat(Size, MatType.CV_8UC1, cv.Scalar.All(0));
             }
         }
 
         public void RunAlg(Mat src)
         {
             binary.Run(src);
-            if (dst2.Width != binary.mats.mat[0].Width) rebuildMats();
+            if (dst2.Width != binary.mats.mat[0].Width) rebuildMats(src.Size());
 
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             dst2.SetTo(1, binary.mats.mat[0]);
