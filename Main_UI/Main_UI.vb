@@ -36,8 +36,8 @@ Public Class Main_UI
     Dim threadStartTime As DateTime
 
     Dim optionsForm As MainOptions
-    Dim AlgorithmCount As Integer
     Dim AlgorithmTestAllCount As Integer
+    Dim algorithmCount As Integer
     Dim algorithmTaskHandle As Thread
     Dim algorithmQueueCount As Integer
 
@@ -357,12 +357,6 @@ Public Class Main_UI
         Next
         Return False
     End Function
-    Private Sub addNextAlgorithm(nextName As String, ByRef lastNameSplit As String)
-        Dim nameSplit = nextName.Split("_")
-        If nameSplit(0) <> lastNameSplit And lastNameSplit <> "" Then AvailableAlgorithms.Items.Add("")
-        lastNameSplit = nameSplit(0)
-        AvailableAlgorithms.Items.Add(nextName)
-    End Sub
     Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupName.SelectedIndexChanged
         If GroupName.Text = "" Then
             Dim incr = 1
@@ -373,36 +367,24 @@ Public Class Main_UI
             Exit Sub
         End If
 
-        Dim lastNameSplit As String = ""
-        If GroupName.Text.StartsWith("<All (") Or GroupName.Text = "<All using recorded data>" Then
-            Dim AlgorithmListFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmList.txt")
-            Dim sr = New StreamReader(AlgorithmListFileInfo.FullName)
+        AvailableAlgorithms.Enabled = False
+        Dim keyIndex = GroupName.Items.IndexOf(GroupName.Text)
+        Dim groupings = groupList(keyIndex)
+        Dim split = Regex.Split(groupings, ",")
+        AvailableAlgorithms.Items.Clear()
+        Dim lastSplit As String = ""
+        For i = 1 To split.Length - 1
+            If split(i).StartsWith("Options_") Then Continue For
+            If split(i).StartsWith("CPP_Basics") Then Continue For
+            Dim namesplit = split(i).Split("_")
+            If lastSplit <> namesplit(0) And lastSplit <> "" Then
+                AvailableAlgorithms.Items.Add(" ")
+            End If
+            AvailableAlgorithms.Items.Add(split(i))
+            lastSplit = namesplit(0)
+        Next
+        AvailableAlgorithms.Enabled = True
 
-            Dim infoLine = sr.ReadLine
-            Dim Split = Regex.Split(infoLine, "\W+")
-            CodeLineCount = Split(1)
-            AvailableAlgorithms.Items.Clear()
-            While sr.EndOfStream = False
-                infoLine = sr.ReadLine
-                infoLine = UCase(Mid(infoLine, 1, 1)) + Mid(infoLine, 2)
-                If infoLine.StartsWith("Options_") Then Continue While
-                If infoLine.StartsWith("CPP_Basics") Then Continue While
-                addNextAlgorithm(infoLine, lastNameSplit)
-            End While
-            sr.Close()
-        Else
-            AvailableAlgorithms.Enabled = False
-            Dim keyIndex = GroupName.Items.IndexOf(GroupName.Text)
-            Dim groupings = groupList(keyIndex)
-            Dim split = Regex.Split(groupings, ",")
-            AvailableAlgorithms.Items.Clear()
-            For i = 1 To split.Length - 1
-                If split(i).StartsWith("Options_") Then Continue For
-                If split(i).StartsWith("CPP_Basics") Then Continue For
-                addNextAlgorithm(split(i), lastNameSplit)
-            Next
-            AvailableAlgorithms.Enabled = True
-        End If
         If GroupName.Text.Contains("All") = False Then algHistory.Clear()
 
         ' if the fpstimer is enabled, then OpenCVB is running - not initializing.
@@ -864,52 +846,32 @@ Public Class Main_UI
         settings.PixelViewerButton = PixelViewerButton.Checked
     End Sub
     Private Sub loadAlgorithmComboBoxes()
-        ' we always need the number of lines from the AlgorithmList.txt file (and it is not always read when working with a subset of algorithms.)
-        Dim AlgorithmListFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmList.txt")
-        If AlgorithmListFileInfo.Exists = False Then
-            MsgBox("The AlgorithmList.txt file is missing.  Run 'UI_Generator' or rebuild all to rebuild the user interface.")
-            End
+        Dim countFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmCounts.txt")
+        If countFileInfo.Exists = False Then
+            MsgBox("The AlgorithmCounts.txt file is missing.  Run 'UI_Generator' or rebuild all to rebuild the user interface.")
         End If
-        Dim sr = New StreamReader(AlgorithmListFileInfo.FullName)
+        Dim sr = New StreamReader(countFileInfo.FullName)
+
         Dim infoLine = sr.ReadLine
         Dim Split = Regex.Split(infoLine, "\W+")
         CodeLineCount = Split(1)
-        While sr.EndOfStream = False
-            infoLine = sr.ReadLine
-            AlgorithmCount += 1
-        End While
+
+        infoLine = sr.ReadLine
+        Split = Regex.Split(infoLine, "\W+")
+        algorithmCount = Split(1)
         sr.Close()
 
-        Dim AlgorithmMapFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
-        If AlgorithmMapFileInfo.Exists = False Then
-            MsgBox("The AlgorithmGroupNames.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
+        Dim groupFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
+        If groupFileInfo.Exists = False Then
+            MsgBox("The groupFileInfo.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
         End If
-        sr = New StreamReader(AlgorithmMapFileInfo.FullName)
+        sr = New StreamReader(groupFileInfo.FullName)
         GroupName.Items.Clear()
-        Dim lastNameSplit As String = "", lastSplit0 As String = ""
         While sr.EndOfStream = False
             infoLine = sr.ReadLine
-            GroupName.Items.Add(infoline)
-            Split = Regex.Split(infoLine, ",")
-
-            If Split(0).StartsWith("<") = False Then
-
-                If Split(0).Contains("_") Then
-                    Dim nameSplit = Split(0).Split("_")
-                    If nameSplit(0) <> lastNameSplit And lastNameSplit <> "" Then
-                        groupList.Add("")
-                        GroupName.Items.Add("")
-                    End If
-                    lastNameSplit = nameSplit(0)
-                    lastSplit0 = Split(0)
-                ElseIf lastSplit0.Contains("_") Then
-                    groupList.Add("")
-                    GroupName.Items.Add("")
-                    lastNameSplit = Split(0)
-                End If
-            End If
+            Split = infoLine.Split(",")
             groupList.Add(infoLine)
-            GroupName.Items.Add(Split(0))
+            GroupName.Items.Add(split(0))
         End While
         sr.Close()
     End Sub
@@ -1059,19 +1021,9 @@ Public Class Main_UI
 
         loadAlgorithmComboBoxes()
 
-        If settings.algorithmGroup.Contains("<All ") Then
-            Dim searchStr = settings.algorithmGroup.Substring(0, InStr(settings.algorithmGroup, "("))
-            For i = 0 To Math.Min(20, groupList.Count)
-                If groupList(i).StartsWith(searchStr) Then
-                    GroupName.SelectedItem() = groupList(i).Substring(0, InStr(groupList(i), ">") - 1) + ">"
-                    Exit For
-                End If
-            Next
-        Else
-            GroupName.Text = settings.algorithmGroup
-        End If
+        GroupName.Text = settings.algorithmGroup
 
-        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupList(1)
+        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupList(1) ' all but python
 
         If AvailableAlgorithms.Items.Count = 0 Then
             MsgBox("There were no algorithms listed for the " + GroupName.Text + vbCrLf +
@@ -1136,9 +1088,9 @@ Public Class Main_UI
             fpsCamera = fpsListC.Average
             If fpsAlgorithm >= 100 Then fpsAlgorithm = 99
             If fpsCamera >= 100 Then fpsCamera = 99
-            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " +
-                      CStr(CInt(CodeLineCount / AlgorithmCount)) + " lines each (avg) - " + cameraName +
-                      " - Camera FPS/task FPS: " + Format(fpsAlgorithm, "0") + "/" + Format(fpsCamera, "0")
+            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(algorithmCount) + " algorithms = " +
+                      CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + cameraName +
+                          " - Camera FPS/task FPS: " + Format(fpsAlgorithm, "0") + "/" + Format(fpsCamera, "0")
             If fpsListA.Count > 5 Then
                 fpsListA.RemoveAt(0)
                 fpsListC.RemoveAt(0)

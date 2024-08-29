@@ -60,6 +60,7 @@ Module UI_Gen
             srcList.Add(PythonProjFile.DirectoryName + "\" + split(1))
 
             If split(1).EndsWith("_PS.py") Then pyStream.Add(split(1), split(1))
+            allList.Add(split(1), split(1))
         Next
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
         For Each fn In fileEntries
@@ -69,9 +70,9 @@ Module UI_Gen
             If fn.Contains(".vbproj") Then Continue For
             srcList.Add(fn)
         Next
-        ' read all the code, count the lines, and get the algorithm list.
 
-        Dim totalLines As Integer
+        ' read all the code, count the lines, and get the algorithm list.
+        Dim CodeLineCount As Integer
         For Each fn In srcList
             Dim srclines = File.ReadAllLines(fn)
             Dim classname As String = ""
@@ -82,7 +83,7 @@ Module UI_Gen
                 If line.StartsWith("'") Then Continue For
                 If line = "{" Or line = "}" Then Continue For
 
-                totalLines += 1
+                CodeLineCount += 1
 
                 If fn.EndsWith(".py") Then Continue For
                 If line.StartsWith("Public Class") Then ' VB algorithms
@@ -126,6 +127,7 @@ Module UI_Gen
         Next
 
 
+
         ' CS output
         Dim CSlistInfo As New FileInfo(HomeDir.FullName + "CS_Classes\AlgorithmList.cs")
         Dim sw As New StreamWriter(CSlistInfo.FullName)
@@ -146,6 +148,11 @@ Module UI_Gen
         sw.Close()
 
 
+
+        sw = New StreamWriter(HomeDir.FullName + "Data\AlgorithmCounts.txt")
+        sw.WriteLine("CodeLineCount = " + CStr(CodeLineCount))
+        sw.WriteLine("AlgorithmCount = " + CStr(allList.Count))
+        sw.Close()
 
         ' CPP_Enum.h
         sw = New StreamWriter(HomeDir.FullName + "CPP_Native/CPP_Enum.h")
@@ -231,7 +238,7 @@ Module UI_Gen
                     End If
                 End If
                 If classname <> "" Then
-                    For Each alg In allList.Keys
+                    For Each alg In allButPython.Keys
                         If line.Contains(alg) Then
                             Dim index = allButPython.IndexOfKey(alg)
                             If tokens(index).Contains(classname) = False Then tokens(index) += "," + classname
@@ -264,51 +271,55 @@ Module UI_Gen
 
 
         sw = New StreamWriter(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
-        sw.WriteLine("<All (" + CStr(allList.Count) + ")>")
-        sw.Write("<All but Python (" + CStr(allButPython.Count) + ")>")
+        sw.Write("(" + CStr(allList.Count) + ") < All >")
         For Each alg In allButPython.Keys
             If alg = "CPP_Basics" Then Continue For
             sw.Write("," + alg)
         Next
         sw.WriteLine()
 
-        sw.Write("<All C# (" + CStr(csList.Count) + ")>")
+        sw.Write("(" + CStr(allButPython.Count) + ") < All but Python >")
+        For Each alg In allButPython.Keys
+            If alg = "CPP_Basics" Then Continue For
+            sw.Write("," + alg)
+        Next
+        sw.WriteLine()
+
+        sw.Write("(" + CStr(ccList.Count) + ") < All C# >")
         For Each alg In ccList.Keys
             sw.Write("," + alg)
         Next
         sw.WriteLine()
 
-        sw.Write("<All C++ (" + CStr(cppList.Count) + ")>")
+        sw.Write("(" + CStr(cppList.Count) + ") < All C++ >")
         For Each alg In cppList.Keys
             sw.Write("," + alg)
         Next
         sw.WriteLine()
 
-        sw.Write("<All OpenGL (" + CStr(opengl.Count) + ")>")
+        sw.Write("(" + CStr(opengl.Count) + ") < All OpenGL >")
         For Each alg In opengl.Keys
             sw.Write("," + alg)
         Next
         sw.WriteLine()
 
-        sw.Write("<All PyStream(" + CStr(pyStream.Count) + ">")
+        sw.Write("(" + CStr(pyStream.Count) + ") < All PyStream >")
         For Each alg In pyStream.Keys
             sw.Write("," + alg)
         Next
         sw.WriteLine()
 
-        sw.Write("<All Python (" + CStr(pythonList.Count) + ")>")
+        sw.Write("(" + CStr(pythonList.Count) + ") < All Python >")
         For Each alg In pythonList.Keys
             sw.Write("," + alg)
         Next
         sw.WriteLine()
 
-        sw.Write("<All VB.Net (" + CStr(vbList.Count) + ")>")
+        sw.Write("(" + CStr(vbList.Count) + ") < All VB.Net >")
         For Each alg In vbList.Keys
             sw.Write("," + alg)
         Next
         sw.WriteLine()
-
-        'sw.WriteLine("<All using recorded data>")
 
         For i = 0 To sortedRefs.Count - 1
             sw.WriteLine(refCounts(i) + sortedRefs(i))
