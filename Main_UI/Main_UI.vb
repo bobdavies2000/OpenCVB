@@ -914,12 +914,15 @@ Public Class Main_UI
     End Sub
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
+        Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
+        HomeDir = New DirectoryInfo(exeDir.FullName + "/../../../../../")
+
         threadStartTime = DateTime.Now
 
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
         Dim args() = Environment.GetCommandLineArgs()
 
-        HomeDir = If(args.Length > 1, New DirectoryInfo(CurDir() + "\..\..\..\..\"), New DirectoryInfo(CurDir() + "\..\..\..\..\..\"))
         jsonRead()
 
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
