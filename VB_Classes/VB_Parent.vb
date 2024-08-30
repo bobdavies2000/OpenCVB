@@ -711,7 +711,7 @@ Public Class VB_Parent : Implements IDisposable
                 Static nativeCPP As New CPP_ManagedTest()
                 nativeCPP.RunAlg(src)
                 algorithm.RunAlg()
-                nativeCPP.Release()
+                nativeCPP.Pause()
             Else
                 algorithm.RunAlg(src)
             End If

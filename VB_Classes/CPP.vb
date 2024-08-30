@@ -2,6 +2,7 @@ Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
 Imports OpenCvSharp
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 
 Public Class CPP_Basics : Inherits VB_Parent
     Dim cppFunction As Integer
@@ -172,24 +173,55 @@ End Class
 
 Module managedCPP_Interface
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ManagedCPP_Setup(data As IntPtr, rows As Integer, cols As Integer)
+    Public Sub ManagedCPP_Resume(rows As Integer, cols As Integer, colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
+                                depthRGBPtr As IntPtr, cloud As IntPtr)
+    End Sub
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ManagedCPP_Pause()
     End Sub
 End Module
 
 
 
 Public Class CPP_ManagedTest : Inherits VB_Parent
-    Dim hSrc As GCHandle
+    Dim hColor As GCHandle
+    Dim hLeft As GCHandle
+    Dim hRight As GCHandle
+    Dim hDepthRGB As GCHandle
+    Dim hCloud As GCHandle
     Public Sub New()
-        desc = "Move data to the Managed C++/CLR code"
+        desc = "Move data to the Managed C++/CLR code (CPP_Classes)"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
-        hSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        ManagedCPP_Setup(hSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+        Dim colorData(task.color.Total * task.color.ElemSize - 1) As Byte
+        Dim leftData(task.leftView.Total * task.leftView.ElemSize - 1) As Byte
+        Dim rightData(task.rightView.Total * task.rightView.ElemSize - 1) As Byte
+        Dim depthRGBData(task.depthRGB.Total * task.depthRGB.ElemSize - 1) As Byte
+        Dim cloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
+
+        Marshal.Copy(task.color.Data, colorData, 0, colorData.Length)
+        Marshal.Copy(task.leftView.Data, leftData, 0, leftData.Length)
+        Marshal.Copy(task.rightView.Data, rightData, 0, rightData.Length)
+        Marshal.Copy(task.depthRGB.Data, depthRGBData, 0, depthRGBData.Length)
+        Marshal.Copy(task.pointCloud.Data, cloudData, 0, cloudData.Length)
+
+        hColor = GCHandle.Alloc(colorData, GCHandleType.Pinned)
+        hLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)
+        hRight = GCHandle.Alloc(rightData, GCHandleType.Pinned)
+        hDepthRGB = GCHandle.Alloc(depthRGBData, GCHandleType.Pinned)
+        hCloud = GCHandle.Alloc(cloudData, GCHandleType.Pinned)
+
+        ManagedCPP_Resume(src.Rows, src.Cols, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
+                          hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject())
+
+        hColor.Free()
+        hLeft.Free()
+        hRight.Free()
+        hDepthRGB.Free()
+        hCloud.Free()
     End Sub
-    Public Sub Release()
-        hSrc.Free()
+    Public Sub Pause()
+        ManagedCPP_Pause()
     End Sub
 End Class

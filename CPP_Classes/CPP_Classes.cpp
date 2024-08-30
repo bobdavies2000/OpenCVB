@@ -33,101 +33,90 @@ using namespace VB_Classes;
 using namespace std;
 using namespace cv;
 
-
-
-
 namespace CPP_Classes {
-    Mat src, color, leftView, rightView, depthRGB, pointCloud;
-    Mat tdst0, tdst1, tdst2, tdst3;
+    Mat color, leftView, rightView, depthRGB, pointCloud;
+    Mat dst0, dst1, dst2, dst3;
+    int rows, cols;
 
     extern "C" __declspec(dllexport)
-        void ManagedCPP_Setup(int* srcPtr, int rows, int cols) {
-        src = Mat(rows, cols, CV_8UC3, srcPtr);
+    void ManagedCPP_Resume(int _rows, int _cols, int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBPtr, int *cloudPtr) 
+    {
+        rows = _rows;
+        cols = _cols;
+        color = Mat(rows, cols, CV_8UC3, colorPtr).clone();
+        leftView = Mat(rows, cols, CV_8UC3, leftPtr).clone();
+        rightView = Mat(rows, cols, CV_8UC3, rightPtr).clone();
+        depthRGB = Mat(rows, cols, CV_8UC3, depthRGBPtr).clone();
+        pointCloud = Mat(rows, cols, CV_8UC3, cloudPtr).clone();
+
+    }
+
+    extern "C" __declspec(dllexport)
+    void ManagedCPP_Pause() 
+    {
     }
 
     public ref class cpp_Task : public VB_Parent
     {
-        uchar* pColor, * pLeft, * pRight, pDepthRGB, pCloud;
     public:
         CPP_Managed^ tin = gcnew CPP_Managed();
-        VB_to_ManagedCPP^ vbd;
         cpp_Task()
         {
 
         }
 
-        void resumeTask()
+        Mat resumeTask()
         {
-            vbd = tin->resumeTask();
-
-            imshow("src", src);
-            //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
-            //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
-            //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
-            //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
-            //src = Mat(vbd->rows, vbd->cols, vbd->type, vbd->src);
-
-            //color = tin->color;
-            //depthRGB = tin->depthRGB;
-            //leftView = tin->leftView;
-            //rightView = tin->rightView;
-            //pointCloud = tin->pointCloud;
-
-            //tdst0 = tin->dst0;
-            //tdst1 = tin->dst1;
-            //tdst2 = tin->dst2;
-            //tdst3 = tin->dst3;
+            return color.clone();
         }
-        void pauseTask() 
+        void pauseTask()
         {
             //tin->pauseTask((IntPtr)tdst0.data, (IntPtr)tdst1.data, (IntPtr)tdst2.dsta, (IntPtr)tdst3.data);
-        } 
-    }; 
-
-
-
+        }
+    };
 
 
     public ref class AddWeighted_Basics_CPP : public VB_Parent
     {
         Options_AddWeighted options;
     public:
-        cpp_Task^ task = gcnew cpp_Task();
-
         double weight;
+        cpp_Task^ task = gcnew cpp_Task();
         AddWeighted_Basics_CPP()
         {
             desc = "Add 2 images with specified weights.";
         }
 
-        //void RunAlg(IntPtr srcData, int rows, int cols, int type)
         void RunAlg()
         {
-            task->resumeTask();
-
+            Mat src = task->resumeTask();
+            Mat dst0 = Mat(rows, cols, CV_8UC3);
+            Mat dst1 = Mat(rows, cols, CV_8UC3);
+            Mat dst2 = Mat(rows, cols, CV_8UC3);
+            Mat dst3 = Mat(rows, cols, CV_8UC3);
+            
             options.RunOpt();
 
             //Size workingRes = test.workingRes;
              
-            //Mat test = task->depthRGB;
-            //imshow("cppTask->depthRGB", cppTask->depthRGB);
             // algorithm user normally provides src2! 
-            //if (standaloneTest() || src2.empty()) srcPlus = task.depthRGB;
-            //if (srcPlus.type() != src.type())
-            //{
-            //    if (src.type() != CV_8UC3 || srcPlus.type() != CV_8UC3)
-            //    {
-            //        if (src.type() == CV_32FC1) src = Convert32f_To_8UC3(src);
-            //        if (srcPlus.type() == CV_32FC1) srcPlus = Convert32f_To_8UC3(srcPlus);
-            //        if (src.type() != CV_8UC3) cvtColor(src, src, COLOR_GRAY2BGR);
-            //        if (srcPlus.type() != CV_8UC3) cvtColor(srcPlus, srcPlus, COLOR_GRAY2BGR);
-            //    }
-            //}
+            Mat src2, srcPlus;
+            if (standaloneTest() || src2.empty()) srcPlus = depthRGB;
+            if (srcPlus.type() != src.type())
+            {
+                if (src.type() != CV_8UC3 || srcPlus.type() != CV_8UC3)
+                {
+                    //if (src.type() == CV_32FC1) src = Convert32f_To_8UC3(src);
+                    //if (srcPlus.type() == CV_32FC1) srcPlus = Convert32f_To_8UC3(srcPlus);
+                    //if (src.type() != CV_8UC3) cvtColor(src, src, COLOR_GRAY2BGR);
+                    //if (srcPlus.type() != CV_8UC3) cvtColor(srcPlus, srcPlus, COLOR_GRAY2BGR);
+                }
+            }
 
             weight = options.addWeighted;
-            //tdst2 = depthRGB;
-            //tdst3 = src;
-            //Cv2:AddWeighted(src, weight, task->depthRGB, 1.0 - weight, 0, task->tdst2);
+            addWeighted(src, weight, depthRGB, 1.0 - weight, 0, dst2);
+
+            imshow("dst2", dst2);
             //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
 
             task->pauseTask();
