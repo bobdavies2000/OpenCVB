@@ -32,14 +32,44 @@ using namespace System::Runtime::InteropServices;
 using namespace VB_Classes;
 using namespace std;
 using namespace cv;
+//using namespace OpenCvSharp;
 
 namespace CPP_Classes {
+    Mat color, leftView, rightView, pointCloud, depthRGB;
+    Mat tdst0, tdst1, tdst2, tdst3; 
+    Mat src;
+    public ref class cpp_Task : public VB_Parent
+    {
+    public:
+        CPP_Managed^ tin = gcnew CPP_Managed();
+        cpp_Task() {}
+
+        void resumeTask()
+        {
+            tin->resumeTask();
+            color = Mat(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->color.ToPointer()));
+            src = color;
+            depthRGB = Mat(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->depthRGB.ToPointer()));
+            leftView = Mat(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->leftView.ToPointer()));
+            rightView = Mat(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->rightView.ToPointer()));
+            pointCloud = Mat(tin->rows, tin->cols, CV_32FC3, static_cast<uchar*>(tin->pointCloud.ToPointer()));
+            tdst0 = Mat(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->dptr0.ToPointer()));
+            tdst1 = Mat(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->dptr1.ToPointer()));
+            tdst2 = Mat(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->dptr2.ToPointer()));
+            tdst3 = Mat(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->dptr3.ToPointer()));
+        }
+        void pauseTask() 
+        {
+            tin->pauseTask();
+        } 
+    }; 
+
+
     public ref class AddWeighted_Basics_CPP : public VB_Parent
     {
         Options_AddWeighted options;
-        CPP_Managed^ tin = gcnew CPP_Managed();
     public:
-        VBtask task;
+        cpp_Task^ task = gcnew cpp_Task();
         double weight;
         AddWeighted_Basics_CPP()
         {
@@ -48,10 +78,9 @@ namespace CPP_Classes {
 
         void RunAlg()
         {
+            task->resumeTask();
+
             options.RunOpt();
-            tin->getInput();
-            Mat src(tin->rows, tin->cols, tin->srcType, static_cast<uchar*>(tin->color.ToPointer()));
-            Mat srcPlus(tin->rows, tin->cols, CV_8UC3, static_cast<uchar*>(tin->depthRGB.ToPointer()));
 
             //Size workingRes = test.workingRes;
 
@@ -73,10 +102,10 @@ namespace CPP_Classes {
             //}
 
             weight = options.addWeighted;
-            Mat dst2;
-            addWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2);
-           //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
-            imshow("dst2", dst2);
+            addWeighted(src, weight, depthRGB, 1.0 - weight, 0, tdst2);
+            //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
+
+            task->pauseTask();
         }
     };
 }

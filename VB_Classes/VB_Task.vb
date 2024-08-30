@@ -502,15 +502,13 @@ Public Class VBtask : Implements IDisposable
 
             If task.pixelViewerOn Then
                 If task.intermediateObject IsNot Nothing Then
-                    task.dst0 = task.intermediateObject.dst0
-                    task.dst1 = task.intermediateObject.dst1
-                    task.dst2 = task.intermediateObject.dst2
-                    task.dst3 = task.intermediateObject.dst3
+                    dst0 = task.intermediateObject.dst0
+                    dst1 = task.intermediateObject.dst1
+                    dst2 = task.intermediateObject.dst2
+                    dst3 = task.intermediateObject.dst3
                 Else
-                    task.dst0 = If(task.gOptions.displayDst0.Checked, dst0, task.color)
-                    task.dst1 = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
-                    task.dst2 = dst2
-                    task.dst3 = dst3
+                    dst0 = If(task.gOptions.displayDst0.Checked, dst0, task.color)
+                    dst1 = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
                 End If
                 task.PixelViewer.viewerForm.Show()
                 task.PixelViewer.Run(src)
@@ -522,28 +520,28 @@ Public Class VBtask : Implements IDisposable
             task.intermediateObject = obj
             If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(trueData)
             If obj IsNot Nothing Then
-                If task.gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(obj.dst0) Else task.dst0 = task.color
-                If task.gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(obj.dst1) Else task.dst1 = task.depthRGB
-                task.dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, MakeSureImage8uC3(obj.dst2))
-                task.dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, MakeSureImage8uC3(obj.dst3))
+                If task.gOptions.displayDst0.Checked Then dst0 = MakeSureImage8uC3(obj.dst0) Else dst0 = task.color
+                If task.gOptions.displayDst1.Checked Then dst1 = MakeSureImage8uC3(obj.dst1) Else dst1 = task.depthRGB
+                dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, MakeSureImage8uC3(obj.dst2))
+                dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, MakeSureImage8uC3(obj.dst3))
                 task.labels = obj.labels
                 If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
             Else
-                If task.gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(dst0) Else task.dst0 = task.color
-                If task.gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(dst1) Else task.dst1 = task.depthRGB
-                task.dst2 = MakeSureImage8uC3(dst2)
-                task.dst3 = MakeSureImage8uC3(dst3)
+                If task.gOptions.displayDst0.Checked Then dst0 = MakeSureImage8uC3(dst0) Else dst0 = task.color
+                If task.gOptions.displayDst1.Checked Then dst1 = MakeSureImage8uC3(dst1) Else dst1 = task.depthRGB
+                If dst2.Type <> cvb.MatType.CV_8UC3 Then dst2 = MakeSureImage8uC3(dst2)
+                If dst3.Type <> cvb.MatType.CV_8UC3 Then dst3 = MakeSureImage8uC3(dst3)
             End If
 
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
-            If task.dst2.Width = task.WorkingRes.Width And task.dst2.Height = task.WorkingRes.Height Then
-                If task.gOptions.ShowGrid.Checked Then task.dst2.SetTo(cvb.Scalar.White, task.gridMask)
-                If task.dst2.Width <> task.WorkingRes.Width Or task.dst2.Height <> task.WorkingRes.Height Then
-                    task.dst2 = task.dst2.Resize(task.WorkingRes, cvb.InterpolationFlags.Nearest)
+            If dst2.Width = task.WorkingRes.Width And dst2.Height = task.WorkingRes.Height Then
+                If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.gridMask)
+                If dst2.Width <> task.WorkingRes.Width Or dst2.Height <> task.WorkingRes.Height Then
+                    dst2 = dst2.Resize(task.WorkingRes, cvb.InterpolationFlags.Nearest)
                 End If
-                If task.dst3.Width <> task.WorkingRes.Width Or task.dst3.Height <> task.WorkingRes.Height Then
-                    task.dst3 = task.dst3.Resize(task.WorkingRes, cvb.InterpolationFlags.Nearest)
+                If dst3.Width <> task.WorkingRes.Width Or dst3.Height <> task.WorkingRes.Height Then
+                    dst3 = dst3.Resize(task.WorkingRes, cvb.InterpolationFlags.Nearest)
                 End If
             End If
 

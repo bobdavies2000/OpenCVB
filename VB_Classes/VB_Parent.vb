@@ -628,10 +628,13 @@ Public Class VB_Parent : Implements IDisposable
         task.algorithmObject.Run(src)
         task.labels = labels
 
-        task.dst0 = dst0
-        task.dst1 = dst1
-        task.dst2 = dst2
-        task.dst3 = dst3
+        ' C++/CLR apps have already put their results in task.dst...
+        If task.algName.EndsWith("_CPP") = False Then
+            task.dst0 = dst0
+            task.dst1 = dst1
+            task.dst2 = dst2
+            task.dst3 = dst3
+        End If
         task.trueData = New List(Of TrueText)(trueData)
         trueData.Clear()
     End Sub

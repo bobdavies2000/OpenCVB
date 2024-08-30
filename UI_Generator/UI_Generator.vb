@@ -142,13 +142,12 @@ Module UI_Generator
         Catch ex As Exception
             MsgBox("The UI_Generator failed collecting algorithm references.  Error is " + vbCrLf + ex.Message)
         End Try
-
+        Console.WriteLine("Algorithm names collected.")
 
 
 
 
         Try
-
             ' CS output
             Dim CSlistInfo As New FileInfo(HomeDir.FullName + "CS_Classes\AlgorithmList.cs")
             Dim sw As New StreamWriter(CSlistInfo.FullName)
@@ -219,8 +218,9 @@ Module UI_Generator
             sw.WriteLine("End Class")
             sw.Close()
         Catch ex As Exception
-            MsgBox("The UI_Generator failed writing the C# and VB.Net algorithm lists.  Error is " + vbCrLf + ex.Message)
+            MsgBox("UI_Generator failed writing the C# and VB.Net algorithm lists.  Error is " + vbCrLf + ex.Message)
         End Try
+        Console.WriteLine("AlgorithmList.cs and AlgorithmList.vb prepared.")
 
 
 
@@ -231,71 +231,72 @@ Module UI_Generator
         Dim refCounts As New List(Of String)
         Try
 
-            Dim tokens(allButPython.Count - 1) As String
-            For i = 0 To allButPython.Keys.Count - 1
-                tokens(i) = allButPython.Keys(i)
-            Next
-            Dim references As New SortedList(Of String, String)
-            For Each fn In srcList
-                If fn.EndsWith(".py") Then Continue For
-                Dim srclines = File.ReadAllLines(fn)
-                Dim classname As String = ""
-                For Each line In srclines
-                    line = Trim(line)
-                    If line.Length = 0 Then Continue For
-                    If line.StartsWith("//") Then Continue For
-                    If line.StartsWith("'") Then Continue For
-                    If line = "{" Or line = "}" Then Continue For
+            'Dim tokens(allButPython.Count - 1) As String
+            'For i = 0 To allButPython.Keys.Count - 1
+            '    tokens(i) = allButPython.Keys(i)
+            'Next
+            'Dim references As New SortedList(Of String, String)
+            'For Each fn In srcList
+            '    If fn.EndsWith(".py") Then Continue For
+            '    Dim srclines = File.ReadAllLines(fn)
+            '    Dim classname As String = ""
+            '    For Each line In srclines
+            '        line = Trim(line)
+            '        If line.Length = 0 Then Continue For
+            '        If line.StartsWith("//") Then Continue For
+            '        If line.StartsWith("'") Then Continue For
+            '        If line = "{" Or line = "}" Then Continue For
 
-                    If line.StartsWith("Public Class") Then ' VB algorithms
-                        If line.EndsWith(" : Inherits VB_Parent") Then
-                            Dim split As String() = Regex.Split(line, "\W+")
-                            classname = split(2)
-                        End If
-                    ElseIf line.StartsWith("public class ") Then ' C# algorithms
-                        If line.EndsWith(" : VB_Parent") Then
-                            Dim split As String() = Regex.Split(line, "\W+")
-                            classname = split(2)
-                        End If
-                    ElseIf line.StartsWith("class") Then ' C++ Native algorithms
-                        If line.EndsWith("_CC") Or line.Contains(" : public CPP_Parent") Then
-                            Dim split = line.Split(" ")
-                            classname = split(1)
-                        End If
-                    ElseIf line.StartsWith("public ref class ") Then ' Managed C++ algorithms.
-                        If line.EndsWith(" : public VB_Parent") Then
-                            Dim split = line.Split(" ")
-                            classname = split(3)
-                        End If
-                    End If
-                    If classname <> "" Then
-                        For Each alg In allButPython.Keys
-                            If line.Contains(alg) Then
-                                Dim index = allButPython.IndexOfKey(alg)
-                                If tokens(index).Contains(classname) = False Then tokens(index) += "," + classname
-                            End If
-                        Next
-                    End If
-                Next
-            Next
+            '        If line.StartsWith("Public Class") Then ' VB algorithms
+            '            If line.EndsWith(" : Inherits VB_Parent") Then
+            '                Dim split As String() = Regex.Split(line, "\W+")
+            '                classname = split(2)
+            '            End If
+            '        ElseIf line.StartsWith("public class ") Then ' C# algorithms
+            '            If line.EndsWith(" : VB_Parent") Then
+            '                Dim split As String() = Regex.Split(line, "\W+")
+            '                classname = split(2)
+            '            End If
+            '        ElseIf line.StartsWith("class") Then ' C++ Native algorithms
+            '            If line.EndsWith("_CC") Or line.Contains(" : public CPP_Parent") Then
+            '                Dim split = line.Split(" ")
+            '                classname = split(1)
+            '            End If
+            '        ElseIf line.StartsWith("public ref class ") Then ' Managed C++ algorithms.
+            '            If line.EndsWith(" : public VB_Parent") Then
+            '                Dim split = line.Split(" ")
+            '                classname = split(3)
+            '            End If
+            '        End If
+            '        If classname <> "" Then
+            '            For Each alg In allButPython.Keys
+            '                If line.Contains(alg) Then
+            '                    Dim index = allButPython.IndexOfKey(alg)
+            '                    If tokens(index).Contains(classname) = False Then tokens(index) += "," + classname
+            '                End If
+            '            Next
+            '        End If
+            '    Next
+            'Next
 
-            For i = 0 To tokens.Count - 1
-                ' sort the tokens before creating the final entry
-                Dim split As String() = Regex.Split(tokens(i), ",")
-                Dim tokenSort As New SortedList(Of String, String)
-                For j = 0 To split.Length - 1
-                    tokenSort.Add(split(j), split(j))
-                Next
-                Dim finalEntry = allButPython.ElementAt(i).Key
-                For j = 0 To tokenSort.Keys.Count - 1
-                    finalEntry += "," + tokenSort.ElementAt(j).Key
-                Next
-                sortedRefs.Add(finalEntry)
-                refCounts.Add("(" + CStr(tokenSort.Keys.Count) + ") ")
-            Next
+            'For i = 0 To tokens.Count - 1
+            '    ' sort the tokens before creating the final entry
+            '    Dim split As String() = Regex.Split(tokens(i), ",")
+            '    Dim tokenSort As New SortedList(Of String, String)
+            '    For j = 0 To split.Length - 1
+            '        tokenSort.Add(split(j), split(j))
+            '    Next
+            '    Dim finalEntry = allButPython.ElementAt(i).Key
+            '    For j = 0 To tokenSort.Keys.Count - 1
+            '        finalEntry += "," + tokenSort.ElementAt(j).Key
+            '    Next
+            '    sortedRefs.Add(finalEntry)
+            '    refCounts.Add("(" + CStr(tokenSort.Keys.Count) + ") ")
+            'Next
         Catch ex As Exception
-            MsgBox("The UI_Generator failed creating the usage index.  Error is " + vbCrLf + ex.Message)
+            MsgBox("UI_Generator failed creating the usage index.  Error is " + vbCrLf + ex.Message)
         End Try
+        Console.WriteLine("Algorithm references prepared.")
 
 
 
@@ -359,8 +360,9 @@ Module UI_Generator
             Next
             sw.Close()
         Catch ex As Exception
-            MsgBox("The UI_Generator failed writing the algorithm groups.  Error is " + vbCrLf + ex.Message)
+            MsgBox("UI_Generator failed writing the algorithm groups.  Error is " + vbCrLf + ex.Message)
         End Try
+        Console.WriteLine("Algorithm Group Names prepared.")
     End Sub
 
     Private Function checkDates(dirInfo As DirectoryInfo, algorithmGroupNames As FileInfo) As Boolean

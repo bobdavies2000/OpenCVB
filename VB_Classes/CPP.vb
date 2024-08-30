@@ -128,10 +128,15 @@ Public Class CPP_Managed
     Public cols As Integer
     Public rows As Integer
     Public srcType As Integer
+
+    Public dptr0 As IntPtr
+    Public dptr1 As IntPtr
+    Public dptr2 As IntPtr
+    Public dptr3 As IntPtr
     Public Sub New()
         ' This interface is called from the C++/CLR algorithms to build the task structure in C++/CLR."
     End Sub
-    Public Sub getInput()
+    Public Sub resumeTask()
         cols = task.color.Width
         rows = task.color.Height
         srcType = task.color.Type
@@ -140,8 +145,22 @@ Public Class CPP_Managed
         pointCloud = task.pointCloud.Data
         leftView = task.leftView.Data
         rightView = task.rightView.Data
-    End Sub
-    Public Sub putOutput()
 
+        If task.dst0 Is Nothing Then
+            task.dst0 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+            task.dst1 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+            task.dst2 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+            task.dst3 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        End If
+        dptr0 = task.dst0.Data
+        dptr1 = task.dst1.Data
+        dptr2 = task.dst2.Data
+        dptr3 = task.dst3.Data
+    End Sub
+    Public Sub pauseTask()
+        'task.dst0 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, buf0)
+        'task.dst1 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, buf1)
+        'task.dst2 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, buf2)
+        'task.dst3 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, buf3)
     End Sub
 End Class
