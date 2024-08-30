@@ -77,19 +77,18 @@ Public Class VB_Parent : Implements IDisposable
             End If
         Next
 
-        If task.algName.StartsWith("CPP_") Then
+        If task.algName.StartsWith("_CPP") Then
             callTrace.Clear()
             algorithm_ms.Clear()
             algorithmNames.Clear()
             callTrace.Add("CPP_Basics\")
         End If
 
-        If traceName <> "Controls_Basics" Then
-            standalone = callTrace(0) = traceName + "\" ' only the first is standalone (the primary algorithm.)
-            If traceName = "Python_Run" Then standalone = True
-            If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
-            If standalone = False And callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
-        End If
+        standalone = callTrace(0) = traceName + "\" ' only the first is standalone (the primary algorithm.)
+        If traceName = "Python_Run" Then standalone = True
+        If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
+        If standalone = False And callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
+
         dst0 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         dst1 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         dst2 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
@@ -707,13 +706,7 @@ Public Class VB_Parent : Implements IDisposable
         If task.testAllRunning = False Then measureStartRun(traceName)
 
         task.trueData.Clear()
-        If task.paused = False Then
-            If algorithm.tracename.endswith("_CPP") Then
-                algorithm.RunAlg()
-            Else
-                algorithm.RunAlg(src)
-            End If
-        End If
+        If task.paused = False Then algorithm.RunAlg(src)
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
 End Class

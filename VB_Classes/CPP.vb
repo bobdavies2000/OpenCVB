@@ -119,20 +119,20 @@ End Class
 
 Public Class CPP_Managed
     Public workingRes As New cvb.Size
-    Public color As IntPtr
-    Public depthRGB As IntPtr
-    Public pointCloud As IntPtr
-    Public leftView As IntPtr
-    Public rightView As IntPtr
-    Public input As IntPtr
+    Public color As cvb.Mat
+    Public depthRGB As cvb.Mat
+    Public pointCloud As cvb.Mat
+    Public leftView As cvb.Mat
+    Public rightView As cvb.Mat
+    Public input As cvb.Mat
     Public cols As Integer
     Public rows As Integer
     Public srcType As Integer
 
-    Public dptr0 As IntPtr
-    Public dptr1 As IntPtr
-    Public dptr2 As IntPtr
-    Public dptr3 As IntPtr
+    Public dst0 As cvb.Mat
+    Public dst1 As cvb.Mat
+    Public dst2 As cvb.Mat
+    Public dst3 As cvb.Mat
     Public Sub New()
         ' This interface is called from the C++/CLR algorithms to build the task structure in C++/CLR."
     End Sub
@@ -140,27 +140,21 @@ Public Class CPP_Managed
         cols = task.color.Width
         rows = task.color.Height
         srcType = task.color.Type
-        color = task.color.Data
-        depthRGB = task.depthRGB.Data
-        pointCloud = task.pointCloud.Data
-        leftView = task.leftView.Data
-        rightView = task.rightView.Data
+        color = task.color
+        depthRGB = task.depthRGB
+        pointCloud = task.pointCloud
+        leftView = task.leftView
+        rightView = task.rightView
 
-        If task.dst0 Is Nothing Then
-            task.dst0 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-            task.dst1 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-            task.dst2 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-            task.dst3 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        End If
-        dptr0 = task.dst0.Data
-        dptr1 = task.dst1.Data
-        dptr2 = task.dst2.Data
-        dptr3 = task.dst3.Data
+        dst0 = task.dst0
+        dst1 = task.dst1
+        dst2 = task.dst2
+        dst3 = task.dst3
     End Sub
-    Public Sub pauseTask()
-        'task.dst0 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, buf0)
-        'task.dst1 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, buf1)
-        'task.dst2 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, buf2)
-        'task.dst3 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, buf3)
+    Public Sub pauseTask(dst0 As cvb.Mat, dst1 As cvb.Mat, dst2 As cvb.Mat, dst3 As cvb.Mat)
+        task.dst0 = dst0
+        task.dst1 = dst1
+        task.dst2 = dst2
+        task.dst3 = dst3
     End Sub
 End Class

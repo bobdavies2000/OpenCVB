@@ -372,8 +372,13 @@ Public Class VBtask : Implements IDisposable
         externalPythonInvocation = parms.externalPythonInvocation
 
         mainFormLocation = parms.mainFormLocation
-        WorkingRes = parms.WorkingRes ' gets referenced a lot
         displayRes = parms.displayRes
+        WorkingRes = parms.WorkingRes ' gets referenced a lot
+
+        task.dst0 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst1 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst2 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst3 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
 
         OpenGL_Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
         OpenGL_Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
