@@ -33,36 +33,17 @@ using namespace VB_Classes;
 using namespace std;
 using namespace cv;
 
+
+
+
 namespace CPP_Classes {
-    Mat color, leftView, rightView, depthRGB, pointCloud;
+    Mat src, color, leftView, rightView, depthRGB, pointCloud;
     Mat tdst0, tdst1, tdst2, tdst3;
 
-
-    public ref class ManagedWrapper
-    {
-    private:
-        CPP_Managed^ tin = gcnew CPP_Managed();
-
-    public:
-        ManagedWrapper()
-        {
-        }
-
-        void CallManagedMethod()
-        {
-            tin->resumeTask();
-        }
-    };
-
-
-
-    void test()
-    {
-        ManagedWrapper^ wrapper = gcnew ManagedWrapper();
-        wrapper->CallManagedMethod();
-        imshow("color", color);
+    extern "C" __declspec(dllexport)
+        void ManagedCPP_Setup(int* srcPtr, int rows, int cols) {
+        src = Mat(rows, cols, CV_8UC3, srcPtr);
     }
-
 
     public ref class cpp_Task : public VB_Parent
     {
@@ -79,12 +60,7 @@ namespace CPP_Classes {
         {
             vbd = tin->resumeTask();
 
-            color = Mat(vbd->rows, vbd->cols, CV_8UC3);
-            int rc = vbd->rows * vbd->cols;
-            color = Mat(vbd->rows, vbd->cols, CV_8UC3);
-
-            test();
-
+            imshow("src", src);
             //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
             //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
             //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
@@ -107,6 +83,8 @@ namespace CPP_Classes {
             //tin->pauseTask((IntPtr)tdst0.data, (IntPtr)tdst1.data, (IntPtr)tdst2.dsta, (IntPtr)tdst3.data);
         } 
     }; 
+
+
 
 
 

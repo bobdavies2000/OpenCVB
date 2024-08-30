@@ -708,7 +708,10 @@ Public Class VB_Parent : Implements IDisposable
         task.trueData.Clear()
         If task.paused = False Then
             If algorithm.traceName.EndsWith("_CPP") Then
+                Static nativeCPP As New CPP_ManagedTest()
+                nativeCPP.RunAlg(src)
                 algorithm.RunAlg()
+                nativeCPP.Release()
             Else
                 algorithm.RunAlg(src)
             End If

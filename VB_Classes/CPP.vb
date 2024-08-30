@@ -131,6 +131,7 @@ End Class
 
 
 
+
 Public Class CPP_Managed
     Public color As cvb.Mat
     Public depthRGB As cvb.Mat
@@ -165,5 +166,30 @@ Public Class CPP_Managed
         'task.dst1 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr1).clone
         'task.dst2 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr2).clone
         'task.dst3 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr3).clone
+    End Sub
+End Class
+
+
+Module managedCPP_Interface
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ManagedCPP_Setup(data As IntPtr, rows As Integer, cols As Integer)
+    End Sub
+End Module
+
+
+
+Public Class CPP_ManagedTest : Inherits VB_Parent
+    Dim hSrc As GCHandle
+    Public Sub New()
+        desc = "Move data to the Managed C++/CLR code"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Dim cppData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+        hSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        ManagedCPP_Setup(hSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+    End Sub
+    Public Sub Release()
+        hSrc.Free()
     End Sub
 End Class
