@@ -52,8 +52,7 @@ Module UI_Generator
 
             Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/AlgorithmGroupNames.txt")
 #If DEBUG Then
-            If indexTestFile.Exists Then indexTestFile.Delete() ' force app to run when in debug mode.
-#End If
+#Else
             If indexTestFile.Exists Then
                 If checkDates(New DirectoryInfo(HomeDir.FullName + "/CS_Classes/"), indexTestFile) = False Then
                     If checkDates(New DirectoryInfo(HomeDir.FullName + "/VB_Classes/"), indexTestFile) = False Then
@@ -66,6 +65,7 @@ Module UI_Generator
                     End If
                 End If
             End If
+#End If
             Console.WriteLine("Starting work to generate the user interface.")
 
             For Each line In pyFiles

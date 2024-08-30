@@ -31,37 +31,83 @@ using namespace System;
 using namespace System::Runtime::InteropServices;
 using namespace VB_Classes;
 using namespace std;
-using namespace OpenCvSharp;
+using namespace cv;
 
 namespace CPP_Classes {
+    Mat color, leftView, rightView, depthRGB, pointCloud;
+    Mat tdst0, tdst1, tdst2, tdst3;
+
+
+    public ref class ManagedWrapper
+    {
+    private:
+        CPP_Managed^ tin = gcnew CPP_Managed();
+
+    public:
+        ManagedWrapper()
+        {
+        }
+
+        void CallManagedMethod()
+        {
+            tin->resumeTask();
+        }
+    };
+
+
+
+    void test()
+    {
+        ManagedWrapper^ wrapper = gcnew ManagedWrapper();
+        wrapper->CallManagedMethod();
+        imshow("color", color);
+    }
+
+
     public ref class cpp_Task : public VB_Parent
     {
+        uchar* pColor, * pLeft, * pRight, pDepthRGB, pCloud;
     public:
-        Mat^ color; Mat^ leftView; Mat^ rightView; Mat^ pointCloud; Mat^ depthRGB;
-        Mat^ tdst0; Mat^ tdst1; Mat^ tdst2; Mat^ tdst3;
         CPP_Managed^ tin = gcnew CPP_Managed();
-        cpp_Task() {}
+        VB_to_ManagedCPP^ vbd;
+        cpp_Task()
+        {
+
+        }
 
         void resumeTask()
         {
-            tin->resumeTask();
+            vbd = tin->resumeTask();
 
-            color = tin->color;
-            depthRGB = tin->depthRGB;
-            leftView = tin->leftView;
-            rightView = tin->rightView;
-            pointCloud = tin->pointCloud;
+            color = Mat(vbd->rows, vbd->cols, CV_8UC3);
+            int rc = vbd->rows * vbd->cols;
+            color = Mat(vbd->rows, vbd->cols, CV_8UC3);
 
-            tdst0 = tin->dst0;
-            tdst1 = tin->dst1;
-            tdst2 = tin->dst2;
-            tdst3 = tin->dst3;
+            test();
+
+            //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
+            //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
+            //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
+            //src = Mat(vbd->rows, vbd->cols, CV_8UC3, vbd->src);
+            //src = Mat(vbd->rows, vbd->cols, vbd->type, vbd->src);
+
+            //color = tin->color;
+            //depthRGB = tin->depthRGB;
+            //leftView = tin->leftView;
+            //rightView = tin->rightView;
+            //pointCloud = tin->pointCloud;
+
+            //tdst0 = tin->dst0;
+            //tdst1 = tin->dst1;
+            //tdst2 = tin->dst2;
+            //tdst3 = tin->dst3;
         }
         void pauseTask() 
         {
-            tin->pauseTask(tdst0, tdst1, tdst2, tdst3);
+            //tin->pauseTask((IntPtr)tdst0.data, (IntPtr)tdst1.data, (IntPtr)tdst2.dsta, (IntPtr)tdst3.data);
         } 
     }; 
+
 
 
     public ref class AddWeighted_Basics_CPP : public VB_Parent
@@ -76,7 +122,8 @@ namespace CPP_Classes {
             desc = "Add 2 images with specified weights.";
         }
 
-        void RunAlg(Mat^ src)
+        //void RunAlg(IntPtr srcData, int rows, int cols, int type)
+        void RunAlg()
         {
             task->resumeTask();
 
@@ -100,8 +147,8 @@ namespace CPP_Classes {
             //}
 
             weight = options.addWeighted;
-            task->tdst2 = task->depthRGB;
-            task->tdst3 = src;
+            //tdst2 = depthRGB;
+            //tdst3 = src;
             //Cv2:AddWeighted(src, weight, task->depthRGB, 1.0 - weight, 0, task->tdst2);
             //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
 

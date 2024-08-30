@@ -117,44 +117,53 @@ End Class
 
 
 
+<StructLayout(LayoutKind.Sequential)>
+Public Class VB_to_ManagedCPP
+    Public color As IntPtr
+    Public leftview As IntPtr
+    Public rightview As IntPtr
+    Public depthRGB As IntPtr
+    Public pointCloud As IntPtr
+    Public rows As Integer
+    Public cols As Integer
+End Class
+
+
+
+
 Public Class CPP_Managed
-    Public workingRes As New cvb.Size
     Public color As cvb.Mat
     Public depthRGB As cvb.Mat
-    Public pointCloud As cvb.Mat
     Public leftView As cvb.Mat
     Public rightView As cvb.Mat
-    Public input As cvb.Mat
+    Public pointCloud As cvb.Mat
+
     Public cols As Integer
     Public rows As Integer
-    Public srcType As Integer
 
     Public dst0 As cvb.Mat
     Public dst1 As cvb.Mat
     Public dst2 As cvb.Mat
     Public dst3 As cvb.Mat
     Public Sub New()
-        ' This interface is called from the C++/CLR algorithms to build the task structure in C++/CLR."
+        ' This interface is called from the C++/CLR algorithms to build the task structure in C++/CLR.
+        ' This is not an algorithm but an interface to the Managed C++ code.
     End Sub
-    Public Sub resumeTask()
-        cols = task.color.Width
-        rows = task.color.Height
-        srcType = task.color.Type
-        color = task.color
-        depthRGB = task.depthRGB
-        pointCloud = task.pointCloud
-        leftView = task.leftView
-        rightView = task.rightView
-
-        dst0 = task.dst0
-        dst1 = task.dst1
-        dst2 = task.dst2
-        dst3 = task.dst3
-    End Sub
-    Public Sub pauseTask(dst0 As cvb.Mat, dst1 As cvb.Mat, dst2 As cvb.Mat, dst3 As cvb.Mat)
-        task.dst0 = dst0
-        task.dst1 = dst1
-        task.dst2 = dst2
-        task.dst3 = dst3
+    Public Function resumeTask() As VB_to_ManagedCPP
+        Dim vbData As New VB_to_ManagedCPP
+        vbData.color = task.color.Data
+        vbData.leftview = task.leftView.Data
+        vbData.rightview = task.rightView.Data
+        vbData.depthRGB = task.depthRGB.Data
+        vbData.pointCloud = task.pointCloud.Data
+        vbData.rows = task.dst0.Rows
+        vbData.cols = task.dst0.Cols
+        Return vbData
+    End Function
+    Public Sub pauseTask(ptr0 As IntPtr, ptr1 As IntPtr, ptr2 As IntPtr, ptr3 As cvb.Mat)
+        'task.dst0 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr0).clone
+        'task.dst1 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr1).clone
+        'task.dst2 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr2).clone
+        'task.dst3 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr3).clone
     End Sub
 End Class

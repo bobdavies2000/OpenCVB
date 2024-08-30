@@ -706,7 +706,13 @@ Public Class VB_Parent : Implements IDisposable
         If task.testAllRunning = False Then measureStartRun(traceName)
 
         task.trueData.Clear()
-        If task.paused = False Then algorithm.RunAlg(src)
+        If task.paused = False Then
+            If algorithm.traceName.EndsWith("_CPP") Then
+                algorithm.RunAlg()
+            Else
+                algorithm.RunAlg(src)
+            End If
+        End If
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
 End Class
