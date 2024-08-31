@@ -273,7 +273,7 @@ Public Class Main_UI
         End With
     End Sub
     Public Sub jsonWrite()
-        If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if testing all
+        If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
             settings.algorithm = AvailableAlgorithms.Text
             settings.groupComboText = GroupCombo.Text
         End If
@@ -711,6 +711,8 @@ Public Class Main_UI
         Else
             AvailableAlgorithms.SelectedItem = algName
         End If
+        settings.algorithm = AvailableAlgorithms.Text
+        jsonWrite()
     End Sub
     Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
         arrowIndex = 0
@@ -719,7 +721,7 @@ Public Class Main_UI
             MsgBox("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed or " + vbCrLf +
                    "The currently selected group does not contain " + item.Text + vbCrLf + "Change the group to <All> to guarantee access.")
         Else
-            AvailableAlgorithms.SelectedItem = item.Text
+            jumpToAlgorithm(item.Text)
         End If
     End Sub
     Private Sub BackButton_Click(sender As Object, e As EventArgs) Handles BackButton.Click
@@ -813,7 +815,7 @@ Public Class Main_UI
         jsonWrite()
 
         cameraTaskHandle = Nothing
-        If TreeButton.Checked Then TreeViewDialog.Close()
+        ' If TreeButton.Checked Then TreeViewDialog.Close()
 
         killPython()
 

@@ -34,33 +34,44 @@ using namespace std;
 using namespace cv;
 
 namespace CPP_Classes {
-    Mat color, leftView, rightView, depthRGB, pointCloud;
-    Mat cdst0, cdst1, cdst2, cdst3;
-    int rows, cols;
+    public struct unmanagedTaskStructure
+    {
+        Mat src, color, leftView, rightView, depthRGB, pointCloud;
+        Mat dst0, dst1, dst2, dst3;
+        int rows, cols;
+    };
+
+    unmanagedTaskStructure task;
 
     extern "C" __declspec(dllexport)
-    void ManagedCPP_Resume(int _rows, int _cols, int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBPtr, int *cloudPtr) 
+    void ManagedCPP_Resume(int rows, int cols, int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBPtr, int *cloudPtr) 
     {
-        rows = _rows;
-        cols = _cols;
-        color = Mat(rows, cols, CV_8UC3, colorPtr).clone();
-        leftView = Mat(rows, cols, CV_8UC3, leftPtr).clone();
-        rightView = Mat(rows, cols, CV_8UC3, rightPtr).clone();
-        depthRGB = Mat(rows, cols, CV_8UC3, depthRGBPtr).clone();
-        pointCloud = Mat(rows, cols, CV_8UC3, cloudPtr).clone();
+        task.rows = rows;
+        task.cols = cols;
+        task.color = Mat(rows, cols, CV_8UC3, colorPtr).clone();
+        task.leftView = Mat(rows, cols, CV_8UC3, leftPtr).clone();
+        task.rightView = Mat(rows, cols, CV_8UC3, rightPtr).clone();
+        task.depthRGB = Mat(rows, cols, CV_8UC3, depthRGBPtr).clone();
+        task.pointCloud = Mat(rows, cols, CV_8UC3, cloudPtr).clone();
 
-        cdst0 = Mat(rows, cols, CV_8UC3);
-        cdst1 = Mat(rows, cols, CV_8UC3);
-        cdst2 = Mat(rows, cols, CV_8UC3);
-        cdst3 = Mat(rows, cols, CV_8UC3);
+        task.dst0 = Mat(rows, cols, CV_8UC3);
+        task.dst1 = Mat(rows, cols, CV_8UC3);
+        task.dst2 = Mat(rows, cols, CV_8UC3);
+        task.dst3 = Mat(rows, cols, CV_8UC3);
+
+        task.src = task.color.clone();
     }
 
     extern "C" __declspec(dllexport)
     int* ManagedCPP_Pause() 
     {
-        return (int*) cdst2.data;
+        return (int*) task.dst2.data;
     }
 
+
+
+
+    // everything is managed C++ from here.  Anything above is unmanaged.
     public ref class cpp_Task : public VB_Parent
     {
     public:
@@ -72,7 +83,7 @@ namespace CPP_Classes {
 
         Mat resumeTask()
         {
-            return color.clone();
+            return task.color.clone();
         }
     };
 
@@ -82,34 +93,32 @@ namespace CPP_Classes {
         Options_AddWeighted options;
     public:
         double weight;
-        cpp_Task^ task = gcnew cpp_Task();
         AddWeighted_Basics_CPP()
         {
+            findSliderCPP("Add Weighted %", 49); // showing how to set a slider in managed C++ which doesn't have System.Windows.Forms.
             desc = "Add 2 images with specified weights.";
         }
 
         void RunAlg()
         {
-            Mat src = task->resumeTask();
-            
             options.RunOpt();
 
             // algorithm user normally provides src2! 
             Mat src2, srcPlus;
-            if (standaloneTest() || src2.empty()) srcPlus = depthRGB;
-            if (srcPlus.type() != src.type())
+            if (standaloneTest() || src2.empty()) srcPlus = task.depthRGB;
+            if (srcPlus.type() != task.src.type())
             {
-                if (src.type() != CV_8UC3 || srcPlus.type() != CV_8UC3)
+                if (task.src.type() != CV_8UC3 || srcPlus.type() != CV_8UC3)
                 {
-                    //if (src.type() == CV_32FC1) src = Convert32f_To_8UC3(src);
+                    //if (task.src.type() == CV_32FC1) task.src = Convert32f_To_8UC3(task.src);
                     //if (srcPlus.type() == CV_32FC1) srcPlus = Convert32f_To_8UC3(srcPlus);
-                    //if (src.type() != CV_8UC3) cvtColor(src, src, COLOR_GRAY2BGR);
-                    //if (srcPlus.type() != CV_8UC3) cvtColor(srcPlus, srcPlus, COLOR_GRAY2BGR);
+                    if (task.src.type() != CV_8UC3) cvtColor(task.src, task.src, COLOR_GRAY2BGR);
+                    if (srcPlus.type() != CV_8UC3) cvtColor(srcPlus, srcPlus, COLOR_GRAY2BGR);
                 }
             }
 
             weight = options.addWeighted;
-            addWeighted(src, weight, depthRGB, 1.0 - weight, 0, cdst2);
+            addWeighted(task.src, weight, srcPlus, 1.0 - weight, 0, task.dst2);
 
             //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
         }
