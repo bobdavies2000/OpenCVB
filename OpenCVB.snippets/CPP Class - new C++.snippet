@@ -73,13 +73,13 @@ Public Class Anyname_CPP : Inherits VB_Algorithm
 End Class
 
 Module Anyname_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Anyname_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Anyname_Close(cPtr As IntPtr)
     End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Anyname_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
     End Function
 End Module

@@ -14,7 +14,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
-#include "../../CPP_Classes/DepthColorizer.hpp"
+#include "../../CPP_Managed/DepthColorizer.hpp"
 
 using namespace std;
 using namespace cv;

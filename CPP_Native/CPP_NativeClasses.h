@@ -28,7 +28,7 @@
 #include <opencv2/plot.hpp>
 #include "opencv2/ccalib/randpattern.hpp"
 #include "opencv2/xphoto/oilpainting.hpp"
-#include "../CPP_Classes/PragmaLibs.h"
+#include "../CPP_Managed/PragmaLibs.h"
 
 using namespace std;
 using namespace cv;

@@ -33,7 +33,7 @@ using namespace VB_Classes;
 using namespace std;
 using namespace cv;
 
-namespace CPP_Classes {
+namespace CPP_Managed {
     public struct unmanagedTaskStructure
     {
         Mat src, color, leftView, rightView, depthRGB, pointCloud;
@@ -72,22 +72,6 @@ namespace CPP_Classes {
 
 
     // everything is managed C++ from here.  Anything above is unmanaged.
-    public ref class cpp_Task : public VB_Parent
-    {
-    public:
-        CPP_Managed^ tin = gcnew CPP_Managed();
-        cpp_Task()
-        {
-
-        }
-
-        Mat resumeTask()
-        {
-            return task.color.clone();
-        }
-    };
-
-
     public ref class AddWeighted_Basics_CPP : public VB_Parent
     {
         Options_AddWeighted options;

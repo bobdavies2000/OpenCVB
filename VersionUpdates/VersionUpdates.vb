@@ -8,7 +8,7 @@ Module VersionUpdates
             Dim coreList = openCVLibDir.GetFiles("opencv_*.lib")
             If coreList.Count > 1 Then
                 Dim coreLibName = New FileInfo(coreList(0).FullName)
-                Dim outPragmaLibs As New FileInfo(homeDir.FullName + "/CPP_Classes/PragmaLibs.h")
+                Dim outPragmaLibs As New FileInfo(homeDir.FullName + "/CPP_Managed/PragmaLibs.h")
                 Dim libList = openCVLibDir.GetFiles("*.lib")
                 Dim sw = New StreamWriter(outPragmaLibs.FullName)
 

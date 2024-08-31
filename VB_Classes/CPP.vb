@@ -117,81 +117,27 @@ End Class
 
 
 
-
-<StructLayout(LayoutKind.Sequential)>
-Public Class VB_to_ManagedCPP
-    Public color As IntPtr
-    Public leftview As IntPtr
-    Public rightview As IntPtr
-    Public depthRGB As IntPtr
-    Public pointCloud As IntPtr
-    Public rows As Integer
-    Public cols As Integer
-End Class
-
-
-
-
-
-Public Class CPP_Managed
-    Public color As cvb.Mat
-    Public depthRGB As cvb.Mat
-    Public leftView As cvb.Mat
-    Public rightView As cvb.Mat
-    Public pointCloud As cvb.Mat
-
-    Public cols As Integer
-    Public rows As Integer
-
-    Public dst0 As cvb.Mat
-    Public dst1 As cvb.Mat
-    Public dst2 As cvb.Mat
-    Public dst3 As cvb.Mat
-    Public Sub New()
-        ' This interface is called from the C++/CLR algorithms to build the task structure in C++/CLR.
-        ' This is not an algorithm but an interface to the Managed C++ code.
-    End Sub
-    Public Function resumeTask() As VB_to_ManagedCPP
-        Dim vbData As New VB_to_ManagedCPP
-        vbData.color = task.color.Data
-        vbData.leftview = task.leftView.Data
-        vbData.rightview = task.rightView.Data
-        vbData.depthRGB = task.depthRGB.Data
-        vbData.pointCloud = task.pointCloud.Data
-        vbData.rows = task.dst0.Rows
-        vbData.cols = task.dst0.Cols
-        Return vbData
-    End Function
-    Public Sub pauseTask(ptr0 As IntPtr, ptr1 As IntPtr, ptr2 As IntPtr, ptr3 As cvb.Mat)
-        'task.dst0 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr0)
-        'task.dst1 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr1)
-        task.dst2 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr2)
-        'task.dst3 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr3)
-    End Sub
-End Class
-
-
 Module managedCPP_Interface
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub ManagedCPP_Resume(rows As Integer, cols As Integer, colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
                                 depthRGBPtr As IntPtr, cloud As IntPtr)
     End Sub
 
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function ManagedCPP_Pause() As IntPtr
     End Function
 End Module
 
 
 
-Public Class CPP_ManagedTest : Inherits VB_Parent
+Public Class CPP_ManagedResume : Inherits VB_Parent
     Dim hColor As GCHandle
     Dim hLeft As GCHandle
     Dim hRight As GCHandle
     Dim hDepthRGB As GCHandle
     Dim hCloud As GCHandle
     Public Sub New()
-        desc = "Move data to the Managed C++/CLR code (CPP_Classes)"
+        desc = "Move data to the Managed C++/CLR code (CPP_Managed)"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim colorData(task.color.Total * task.color.ElemSize - 1) As Byte

@@ -95,7 +95,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../../CPP_Classes/;$(ProjectDir)/../../Mynt/samples/src/;$(ProjectDir)/../../Mynt/3rdparty/opencv/build/include;$(ProjectDir)/../../Mynt/include/;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\include;$(ProjectDir)/../../Mynt/3rdparty/opencv/sources/include/opencv2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../../CPP_Managed/;$(ProjectDir)/../../Mynt/samples/src/;$(ProjectDir)/../../Mynt/3rdparty/opencv/build/include;$(ProjectDir)/../../Mynt/include/;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\include;$(ProjectDir)/../../Mynt/3rdparty/opencv/sources/include/opencv2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DisableSpecificWarnings>4267;4251;4244</DisableSpecificWarnings>
@@ -151,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../../CPP_Classes/;$(ProjectDir)/../../Mynt/samples/src/;$(ProjectDir)/../../Mynt/3rdparty/opencv/build/include;$(ProjectDir)/../../Mynt/include/;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../../CPP_Managed/;$(ProjectDir)/../../Mynt/samples/src/;$(ProjectDir)/../../Mynt/3rdparty/opencv/build/include;$(ProjectDir)/../../Mynt/include/;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DisableSpecificWarnings>4267;4251;4244</DisableSpecificWarnings>
     </ClCompile>

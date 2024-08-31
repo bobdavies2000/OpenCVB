@@ -72,7 +72,7 @@ Public Class VB_to_CPP
     End Sub
     Private Sub PrepareCPP_Click(sender As Object, e As EventArgs) Handles PrepareCPP.Click
         ' read all the existing CPP_ algorithms so names can be recognized when parsing the new algorithm.
-        Dim Input = New FileInfo("../../CPP_Classes/CPP_Functions.h")
+        Dim Input = New FileInfo("../../CPP_Managed/CPP_Managed.h")
         Dim includeOnly = File.ReadAllLines(Input.FullName)
         Dim functions As New List(Of String)
         For Each line In includeOnly
@@ -192,7 +192,7 @@ Public Class VB_to_CPP
         Next
     End Sub
     Private Sub UpdateInfrastructure_Click(sender As Object, e As EventArgs) Handles UpdateInfrastructure.Click
-        Dim input = New FileInfo("../../CPP_Classes/CPP_Externs.h")
+        Dim input = New FileInfo("../../CPP_Managed/CPP_Externs.h")
         Dim externs = File.ReadAllLines(input.FullName)
         Dim buttonText = UpdateInfrastructure.Text
         Dim split = buttonText.Split(" ")
@@ -214,7 +214,7 @@ Public Class VB_to_CPP
         Next
         sw.Close()
 
-        input = New FileInfo("../../CPP_Classes/CPP_Functions.h")
+        input = New FileInfo("../../CPP_Managed/CPP_Managed.h")
         Dim includeOnly = File.ReadAllLines(input.FullName)
         sw = New StreamWriter(input.FullName)
         For Each line In includeOnly
