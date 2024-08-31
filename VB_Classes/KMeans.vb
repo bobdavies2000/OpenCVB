@@ -357,7 +357,7 @@ Public Class KMeans_DepthPlusGray : Inherits VB_Parent
     Public Sub New()
         km.buildPaletteOutput = False
         labels(3) = "KMeans 8-bit results"
-        grayPlus(0) = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_32F, cvb.Scalar.All(0))
+        grayPlus(0) = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_32F, cvb.Scalar.All(0))
         desc = "Cluster the rgb+depth image pixels using kMeans"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)

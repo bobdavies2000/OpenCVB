@@ -40,7 +40,7 @@ Public Class OptionsRedCloud
                 task.xRange = 4.4
                 task.yRange = 1.5
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                If task.workingRes.Height = 480 Or task.workingRes.Height = 240 Or task.workingRes.Height = 120 Then
+                If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
                     task.xRange = 1.38
                     task.yRange = 1.0
                 Else
@@ -48,7 +48,7 @@ Public Class OptionsRedCloud
                     task.yRange = 0.8
                 End If
             Case "Intel(R) RealSense(TM) Depth Camera 455", ""
-                If task.workingRes.Height = 480 Or task.workingRes.Height = 240 Or task.workingRes.Height = 120 Then
+                If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
                     task.xRange = 2.04
                     task.yRange = 2.14
                 Else
@@ -76,8 +76,8 @@ Public Class OptionsRedCloud
         task.xRangeDefault = task.xRange
         task.yRangeDefault = task.yRange
 
-        task.sideCameraPoint = New cvb.Point(0, CInt(task.workingRes.Height / 2))
-        task.topCameraPoint = New cvb.Point(CInt(task.workingRes.Width / 2), 0)
+        task.sideCameraPoint = New cvb.Point(0, CInt(task.dst2.Height / 2))
+        task.topCameraPoint = New cvb.Point(CInt(task.dst2.Width / 2), 0)
 
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
@@ -111,16 +111,16 @@ Public Class OptionsRedCloud
         Me.Top = 0
     End Sub
     Public Sub Sync()
-        task.maxZmeters = task.gOptions.maxDepth + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
+        task.MaxZmeters = task.gOptions.maxDepth + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
 
         task.xRange = XRangeBar.Value / 100
         task.yRange = YRangeSlider.Value / 100
 
-        task.rangesTop = New cvb.Rangef() {New cvb.Rangef(0.1, task.maxZmeters), New cvb.Rangef(-task.xRange, task.xRange)}
-        task.rangesSide = New cvb.Rangef() {New cvb.Rangef(-task.yRange, task.yRange), New cvb.Rangef(0.1, task.maxZmeters)}
+        task.rangesTop = New cvb.Rangef() {New cvb.Rangef(0.1, task.MaxZmeters), New cvb.Rangef(-task.xRange, task.xRange)}
+        task.rangesSide = New cvb.Rangef() {New cvb.Rangef(-task.yRange, task.yRange), New cvb.Rangef(0.1, task.MaxZmeters)}
 
-        task.sideCameraPoint = New cvb.Point(0, CInt(task.WorkingRes.Height / 2))
-        task.topCameraPoint = New cvb.Point(CInt(task.WorkingRes.Width / 2), 0)
+        task.sideCameraPoint = New cvb.Point(0, CInt(task.dst2.Height / 2))
+        task.topCameraPoint = New cvb.Point(CInt(task.dst2.Width / 2), 0)
 
         task.projectionThreshold = ProjectionThresholdBar.Value
         identifyCount = IdentifyCountBar.Value

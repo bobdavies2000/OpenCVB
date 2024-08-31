@@ -56,8 +56,8 @@ Public Class Foreground_KMeans : Inherits VB_Parent
     Public Sub New()
         FindSlider("KMeans k").Value = 2
         labels = {"", "", "Foreground Mask", "Background Mask"}
-        dst2 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Separate foreground and background using Kmeans with k=2."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)

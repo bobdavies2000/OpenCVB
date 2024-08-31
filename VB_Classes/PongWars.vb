@@ -3,17 +3,17 @@
 ' https://twitter.com/nicolasdnl/status/1749715070928433161
 Public Class PongWars_Basics : Inherits VB_Parent
     Dim sqWidth As Integer = 25
-    Dim sqHeight As Integer = 25 * task.WorkingRes.Height / task.WorkingRes.Width
-    Dim numSquaresX As Integer = task.WorkingRes.Width / sqWidth
-    Dim numSquaresY As Integer = task.WorkingRes.Height / sqHeight
+    Dim sqHeight As Integer = 25 * task.dst2.Height / task.dst2.Width
+    Dim numSquaresX As Integer = task.dst2.Width / sqWidth
+    Dim numSquaresY As Integer = task.dst2.Height / sqHeight
 
     Dim DAY_COLOR = 1, DAY_BALL_COLOR = 2, NIGHT_COLOR = 3, NIGHT_BALL_COLOR = 4
     Dim squares(numSquaresX - 1, numSquaresY - 1) As Integer
 
-    Dim p1 = New cvb.Point(task.WorkingRes.Width / 4, task.WorkingRes.Height / 2)
+    Dim p1 = New cvb.Point(task.dst2.Width / 4, task.dst2.Height / 2)
     Dim d1 As cvb.Point2f = New cvb.Point(12.5, -12.5)
 
-    Dim p2 = New cvb.Point((task.WorkingRes.Width / 4) * 3, task.WorkingRes.Height / 2)
+    Dim p2 = New cvb.Point((task.dst2.Width / 4) * 3, task.dst2.Height / 2)
     Dim d2 As cvb.Point2f = New cvb.Point(-12.5, 12.5)
 
     Dim iteration As Integer = 0

@@ -424,16 +424,16 @@ Public Class Draw_Frustrum : Inherits VB_Parent
         desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        src = New cvb.Mat(task.workingRes, cvb.MatType.CV_32F, cvb.Scalar.All(0))
+        src = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_32F, cvb.Scalar.All(0))
 
         Dim mid = src.Height / 2
-        Dim zIncr = task.maxZmeters / mid
+        Dim zIncr = task.MaxZmeters / mid
         dst2 = src.Clone
         Dim fRect = New cvb.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height)
         For i = 0 To src.Height / 2
             dst2(fRect).Rectangle(New cvb.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), i * zIncr, 1)
         Next
         xyzDepth.Run(dst2)
-        dst3 = xyzDepth.dst2.Resize(task.workingRes)
+        dst3 = xyzDepth.dst2.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height))
     End Sub
 End Class

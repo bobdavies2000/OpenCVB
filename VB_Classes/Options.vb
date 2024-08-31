@@ -3095,7 +3095,7 @@ Public Class Options_MSER : Inherits VB_Parent
     Public pass2Setting As Integer = 0
     Public graySetting As Boolean = False
     Public Sub New()
-        Select Case task.WorkingRes.Width
+        Select Case task.dst2.Width
             Case 1920
                 maxArea = 350000
                 minArea = 6000
@@ -4275,8 +4275,8 @@ Public Class Options_AsciiArt : Inherits VB_Parent
         Static hSlider = FindSlider("Character height in pixels")
         Static wSlider = FindSlider("Character width in pixels")
 
-        hStep = CInt(task.WorkingRes.Height / hSlider.value)
-        wStep = CInt(task.WorkingRes.Width / wSlider.value)
+        hStep = CInt(task.dst2.Height / hSlider.value)
+        wStep = CInt(task.dst2.Width / wSlider.value)
         size = New cvb.Size(CInt(wSlider.value), CInt(hSlider.value))
     End Sub
 End Class
@@ -5407,7 +5407,7 @@ Public Class Options_Edges3 : Inherits VB_Parent
             sliders.setupTrackBar("Deriche Alpha X100", 1, 400, alpha)
             sliders.setupTrackBar("Deriche Omega X1000", 1, 1000, omega)
             sliders.setupTrackBar("Input pixel distance", 0, 20, gapDistance)
-            sliders.setupTrackBar("Input pixel difference", 0, 50, If(task.WorkingRes.Width = 640, gapdiff, 20))
+            sliders.setupTrackBar("Input pixel difference", 0, 50, If(task.dst2.Width = 640, gapdiff, 20))
         End If
     End Sub
     Public Sub RunOpt()
@@ -7153,12 +7153,12 @@ Public Class Options_Stitch : Inherits VB_Parent
     Public width As Integer = 0
     Public height As Integer = 0
     Public Sub New()
-        width = task.WorkingRes.Width / 2
-        height = task.WorkingRes.Height / 2
+        width = task.dst2.Width / 2
+        height = task.dst2.Height / 2
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Number of random images", 10, 50, 10)
-            sliders.setupTrackBar("Rectangle width", task.WorkingRes.Width / 4, task.WorkingRes.Width - 1, width)
-            sliders.setupTrackBar("Rectangle height", task.WorkingRes.Height / 4, task.WorkingRes.Height - 1, height)
+            sliders.setupTrackBar("Rectangle width", task.dst2.Width / 4, task.dst2.Width - 1, width)
+            sliders.setupTrackBar("Rectangle height", task.dst2.Height / 4, task.dst2.Height - 1, height)
         End If
     End Sub
     Public Sub RunOpt()

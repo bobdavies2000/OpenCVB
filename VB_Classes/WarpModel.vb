@@ -104,8 +104,8 @@ Public Class WarpModel_ECC : Inherits VB_Parent
             cvb.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cvb.InterpolationFlags.Linear + cvb.InterpolationFlags.WarpInverseMap)
         End If
 
-        dst2 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
 
         outputRect = New cvb.Rect(0, 0, src.Width, src.Height)
         dst2(outputRect) = src

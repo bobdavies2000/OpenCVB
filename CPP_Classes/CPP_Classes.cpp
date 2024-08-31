@@ -35,7 +35,7 @@ using namespace cv;
 
 namespace CPP_Classes {
     Mat color, leftView, rightView, depthRGB, pointCloud;
-    Mat dst0, dst1, dst2, dst3;
+    Mat cdst0, cdst1, cdst2, cdst3;
     int rows, cols;
 
     extern "C" __declspec(dllexport)
@@ -49,11 +49,16 @@ namespace CPP_Classes {
         depthRGB = Mat(rows, cols, CV_8UC3, depthRGBPtr).clone();
         pointCloud = Mat(rows, cols, CV_8UC3, cloudPtr).clone();
 
+        cdst0 = Mat(rows, cols, CV_8UC3);
+        cdst1 = Mat(rows, cols, CV_8UC3);
+        cdst2 = Mat(rows, cols, CV_8UC3);
+        cdst3 = Mat(rows, cols, CV_8UC3);
     }
 
     extern "C" __declspec(dllexport)
-    void ManagedCPP_Pause() 
+    int* ManagedCPP_Pause() 
     {
+        return (int*) cdst2.data;
     }
 
     public ref class cpp_Task : public VB_Parent
@@ -68,10 +73,6 @@ namespace CPP_Classes {
         Mat resumeTask()
         {
             return color.clone();
-        }
-        void pauseTask()
-        {
-            //tin->pauseTask((IntPtr)tdst0.data, (IntPtr)tdst1.data, (IntPtr)tdst2.dsta, (IntPtr)tdst3.data);
         }
     };
 
@@ -90,15 +91,9 @@ namespace CPP_Classes {
         void RunAlg()
         {
             Mat src = task->resumeTask();
-            Mat dst0 = Mat(rows, cols, CV_8UC3);
-            Mat dst1 = Mat(rows, cols, CV_8UC3);
-            Mat dst2 = Mat(rows, cols, CV_8UC3);
-            Mat dst3 = Mat(rows, cols, CV_8UC3);
             
             options.RunOpt();
 
-            //Size workingRes = test.workingRes;
-             
             // algorithm user normally provides src2! 
             Mat src2, srcPlus;
             if (standaloneTest() || src2.empty()) srcPlus = depthRGB;
@@ -114,12 +109,9 @@ namespace CPP_Classes {
             }
 
             weight = options.addWeighted;
-            addWeighted(src, weight, depthRGB, 1.0 - weight, 0, dst2);
+            addWeighted(src, weight, depthRGB, 1.0 - weight, 0, cdst2);
 
-            imshow("dst2", dst2);
             //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
-
-            task->pauseTask();
         }
     };
 }

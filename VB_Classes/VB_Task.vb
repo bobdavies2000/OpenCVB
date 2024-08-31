@@ -375,10 +375,10 @@ Public Class VBtask : Implements IDisposable
         displayRes = parms.displayRes
         WorkingRes = parms.WorkingRes ' gets referenced a lot
 
-        task.dst0 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        task.dst1 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        task.dst2 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        task.dst3 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst0 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst1 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst2 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst3 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
 
         OpenGL_Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
         OpenGL_Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
@@ -392,7 +392,7 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add("Options_XYRanges") ' so calltrace is not nothing on initial call...
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
-        task.cellMap = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.cellMap = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
 
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
@@ -500,10 +500,10 @@ Public Class VBtask : Implements IDisposable
     Private Sub postProcess(src As cvb.Mat)
         Try
             ' make sure that any outputs from the algorithm are the right size.nearest
-            If dst0.Size <> task.WorkingRes And dst0.Width > 0 Then dst0 = dst0.Resize(task.WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-            If dst1.Size <> task.WorkingRes And dst1.Width > 0 Then dst1 = dst1.Resize(task.WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-            If dst2.Size <> task.WorkingRes And dst2.Width > 0 Then dst2 = dst2.Resize(task.WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-            If dst3.Size <> task.WorkingRes And dst3.Width > 0 Then dst3 = dst3.Resize(task.WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            If dst0.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) And dst0.Width > 0 Then dst0 = dst0.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), 0, 0, cvb.InterpolationFlags.Nearest)
+            If dst1.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) And dst1.Width > 0 Then dst1 = dst1.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), 0, 0, cvb.InterpolationFlags.Nearest)
+            If dst2.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) And dst2.Width > 0 Then dst2 = dst2.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), 0, 0, cvb.InterpolationFlags.Nearest)
+            If dst3.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) And dst3.Width > 0 Then dst3 = dst3.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), 0, 0, cvb.InterpolationFlags.Nearest)
 
             If task.pixelViewerOn Then
                 If task.intermediateObject IsNot Nothing Then
@@ -540,13 +540,13 @@ Public Class VBtask : Implements IDisposable
 
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
-            If dst2.Width = task.WorkingRes.Width And dst2.Height = task.WorkingRes.Height Then
+            If dst2.Width = task.dst2.Width And dst2.Height = task.dst2.Height Then
                 If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.gridMask)
-                If dst2.Width <> task.WorkingRes.Width Or dst2.Height <> task.WorkingRes.Height Then
-                    dst2 = dst2.Resize(task.WorkingRes, cvb.InterpolationFlags.Nearest)
+                If dst2.Width <> task.dst2.Width Or dst2.Height <> task.dst2.Height Then
+                    dst2 = dst2.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.InterpolationFlags.Nearest)
                 End If
-                If dst3.Width <> task.WorkingRes.Width Or dst3.Height <> task.WorkingRes.Height Then
-                    dst3 = dst3.Resize(task.WorkingRes, cvb.InterpolationFlags.Nearest)
+                If dst3.Width <> task.dst2.Width Or dst3.Height <> task.dst2.Height Then
+                    dst3 = dst3.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.InterpolationFlags.Nearest)
                 End If
             End If
 
@@ -661,14 +661,14 @@ Public Class VBtask : Implements IDisposable
 
         task.redOptions.Sync()
 
-        task.bins2D = {task.WorkingRes.Height, task.WorkingRes.Width}
+        task.bins2D = {task.dst2.Height, task.dst2.Width}
         Dim src = task.color
 
         ' If the WorkingRes changes, the previous generation of images needs to be reset.
-        If task.pointCloud.Size <> task.WorkingRes Or task.color.Size <> task.WorkingRes Then
-            task.pointCloud = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_32FC3, 0)
-            task.noDepthMask = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
-            task.depthMask = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        If task.pointCloud.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) Or task.color.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) Then
+            task.pointCloud = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_32FC3, 0)
+            task.noDepthMask = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+            task.depthMask = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         End If
 
         Application.DoEvents()
@@ -777,7 +777,8 @@ Public Class VBtask : Implements IDisposable
         '    src = rgbFilter.dst2
         'End If
 
-        If task.paused = False And src.Size = task.WorkingRes Then
+        Dim currSize As cvb.Size = New cvb.Size(task.dst2.Cols, task.dst2.Rows)
+        If task.paused = False And src.Size = currSize Then
             algorithmObject.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
             task.FirstPass = False
             postProcess(src)

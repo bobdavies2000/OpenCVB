@@ -8816,7 +8816,7 @@ namespace CS_Classes
         int minLengthContour = 4; // use any contour With enough points To make a contour!
         public Contour_Edges_CS()
         {
-            lastImage = new Mat(vbc.task.WorkingRes, MatType.CV_8UC3, cv.Scalar.All(0));
+            lastImage = new Mat(vbc.task.dst2.Width, vbc.task.dst2.Height, MatType.CV_8UC3, cv.Scalar.All(0));
             desc = "Create contours for motion";
         }
 
@@ -9605,7 +9605,8 @@ namespace CS_Classes
         public Convex_Defects_CS()
         {
             contours = new Contour_Largest_CS();
-            dst2 = Cv2.ImRead(vbc.task.HomeDir + "Data/star2.png").Threshold(200, 255, ThresholdTypes.Binary).Resize(vbc.task.WorkingRes);
+            dst2 = Cv2.ImRead(vbc.task.HomeDir + "Data/star2.png").Threshold(200, 255, ThresholdTypes.Binary)
+                              .Resize(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height));
             dst2 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
 
             labels = new string[] { "", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, Red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points" };
@@ -13961,7 +13962,7 @@ namespace CS_Classes
                 strOut += "baseline * focal length / actual depth\n";
                 strOut += "A disparity adjustment that is dependent on working resolution is used here \n";
                 strOut += "to adjust the observed disparity to match the formula.\n";
-                strOut += $"At working resolution = {vbc.task.WorkingRes.Width}x{vbc.task.WorkingRes.Height}";
+                strOut += $"At working resolution = {vbc.task.dst2.Width}x{vbc.task.dst2.Height}";
                 strOut += $" the adjustment factor is {vbc.task.disparityAdjustment:F3}\n\n";
 
                 int disparityformulaoutput = DisparityFormula(actualDepth);
@@ -14783,7 +14784,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            src = new Mat(vbc.task.WorkingRes, MatType.CV_32F, cv.Scalar.All(0));
+            src = new Mat(vbc.task.dst2.Width, vbc.task.dst2.Height, MatType.CV_32F, cv.Scalar.All(0));
             int mid = src.Height / 2;
             float zIncr = vbc.task.MaxZmeters / mid;
             dst2 = src.Clone();
@@ -14793,7 +14794,7 @@ namespace CS_Classes
                 Cv2.Rectangle(dst2[fRect], new cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1);
             }
             xyzDepth.Run(dst2);
-            dst3 = xyzDepth.dst2.Resize(vbc.task.WorkingRes);
+            dst3 = xyzDepth.dst2.Resize(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height));
         }
     }
 
@@ -16554,8 +16555,8 @@ namespace CS_Classes
             if (r.Height <= 0) r.Height = 1;
             if (r.X < 0) r.X = 0;
             if (r.Y < 0) r.Y = 0;
-            if (r.X + r.Width >= vbc.task.WorkingRes.Width) r.X = vbc.task.WorkingRes.Width - r.Width - 1;
-            if (r.Y + r.Height >= vbc.task.WorkingRes.Height) r.Y = vbc.task.WorkingRes.Height - r.Height - 1;
+            if (r.X + r.Width >= vbc.task.dst2.Width) r.X = vbc.task.dst2.Width - r.Width - 1;
+            if (r.Y + r.Height >= vbc.task.dst2.Height) r.Y = vbc.task.dst2.Height - r.Height - 1;
             return r;
         }
         public void RunAlg(Mat src)
@@ -22466,7 +22467,7 @@ namespace CS_Classes
                 msgs.Add("Then at the end of your Run method, invoke flow.Run(empty)");
             }
             int maxLines = 31;
-            if (vbc.task.WorkingRes.Height == 720 || vbc.task.WorkingRes.Height == 360 || vbc.task.WorkingRes.Height == 180) maxLines = 23;
+            if (vbc.task.dst2.Height == 720 || vbc.task.dst2.Height == 360 || vbc.task.dst2.Height == 180) maxLines = 23;
             bool clearRequested = false;
             if (msgs.Count > maxLines)
             {
@@ -22590,8 +22591,8 @@ namespace CS_Classes
         {
             FindSlider("KMeans k").Value = 2;
             labels = new string[] { "", "", "Foreground Mask", "Background Mask" };
-            dst2 = new Mat(vbc.task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(vbc.task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Separate foreground and background using Kmeans with k=2.";
         }
         public void RunAlg(Mat src)
@@ -32021,7 +32022,7 @@ namespace CS_Classes
         {
             km.buildPaletteOutput = false;
             labels[3] = "KMeans 8-bit results";
-            grayPlus[0] = new Mat(vbc.task.WorkingRes, MatType.CV_32F, cv.Scalar.All(0));
+            grayPlus[0] = new Mat(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height), MatType.CV_32F, cv.Scalar.All(0));
             desc = "Cluster the rgb+depth image pixels using kMeans";
         }
         public void RunAlg(Mat src)
@@ -36554,7 +36555,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            var nSize = new cv.Size(vbc.task.WorkingRes.Width, vbc.task.WorkingRes.Height / 2);
+            var nSize = new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height / 2);
             var roiTop = new cv.Rect(0, 0, nSize.Width, nSize.Height);
             var roibot = new cv.Rect(0, nSize.Height, nSize.Width, nSize.Height);
             if (standaloneTest())
@@ -36812,11 +36813,11 @@ namespace CS_Classes
             {
                 if (vbc.task.ClickPoint.Y < dst2.Rows / 2)
                 {
-                    quadrant = (vbc.task.ClickPoint.X < vbc.task.WorkingRes.Width / 2) ? 0 : 1;
+                    quadrant = (vbc.task.ClickPoint.X < vbc.task.dst2.Width / 2) ? 0 : 1;
                 }
                 else
                 {
-                    quadrant = (vbc.task.ClickPoint.X < vbc.task.WorkingRes.Width / 2) ? 2 : 3;
+                    quadrant = (vbc.task.ClickPoint.X < vbc.task.dst2.Width / 2) ? 2 : 3;
                 }
             }
             mats.Run(Mat.Zeros(src.Size(), MatType.CV_8UC3));
@@ -47766,7 +47767,7 @@ namespace CS_Classes
         public Plot_OverTime_CS()
         {
             desc = "Plot an input variable over time";
-            switch (vbc.task.WorkingRes.Width)
+            switch (vbc.task.dst2.Width)
             {
                 case 1920:
                     vbc.task.gOptions.setLineWidth(10);
@@ -47945,7 +47946,7 @@ namespace CS_Classes
             var lineCount = (int)(maxScale - minScale - 1);
             if (lineCount > 3 || lineCount < 0) lineCount = 3;
             if (showScale) AddPlotScale(plotOutput, minScale, maxScale, lineCount);
-            dst2 = plotOutput.Resize(vbc.task.WorkingRes);
+            dst2 = plotOutput.Resize(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height));
         }
     }
 
@@ -49171,13 +49172,13 @@ namespace CS_Classes
         cv.Point p2Last = new cv.Point();
         public PongWars_Basics_CS()
         {
-            sqHeight = 25 * vbc.task.WorkingRes.Height / vbc.task.WorkingRes.Width;
-            numSquaresX = vbc.task.WorkingRes.Width / sqWidth;
-            numSquaresY = vbc.task.WorkingRes.Height / sqHeight;
+            sqHeight = 25 * vbc.task.dst2.Height / vbc.task.dst2.Width;
+            numSquaresX = vbc.task.dst2.Width / sqWidth;
+            numSquaresY = vbc.task.dst2.Height / sqHeight;
             squares = new int[numSquaresX, numSquaresY];
-            p1 = new cv.Point(vbc.task.WorkingRes.Width / 4, vbc.task.WorkingRes.Height / 2);
+            p1 = new cv.Point(vbc.task.dst2.Width / 4, vbc.task.dst2.Height / 2);
             d1 = new Point2f(12.5f, -12.5f);
-            p2 = new cv.Point((vbc.task.WorkingRes.Width / 4) * 3, vbc.task.WorkingRes.Height / 2);
+            p2 = new cv.Point((vbc.task.dst2.Width / 4) * 3, vbc.task.dst2.Height / 2);
             d2 = new Point2f(-12.5f, 12.5f);
             for (int i = 0; i < numSquaresX; i++)
             {
@@ -54146,7 +54147,7 @@ namespace CS_Classes
         public RedTrack_Basics_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            if (vbc.task.WorkingRes != new cv.Size(168, 94)) vbc.task.frameHistoryCount = 1;
+            if (new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height) != new cv.Size(168, 94)) vbc.task.frameHistoryCount = 1;
             desc = "Get stats on each RedCloud cell.";
         }
         public void RunAlg(Mat src)
@@ -61697,8 +61698,8 @@ namespace CS_Classes
                 Mat warpMat = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, warpMatrix);
                 Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), InterpolationFlags.Linear | InterpolationFlags.WarpInverseMap);
             }
-            dst2 = new Mat(vbc.task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
-            dst3 = new Mat(vbc.task.WorkingRes, MatType.CV_8U, cv.Scalar.All(0));
+            dst2 = new Mat(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height), MatType.CV_8U, cv.Scalar.All(0));
+            dst3 = new Mat(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height), MatType.CV_8U, cv.Scalar.All(0));
             outputRect = new cv.Rect(0, 0, src.Width, src.Height);
             dst2[outputRect] = src;
             dst3[outputRect] = src2;

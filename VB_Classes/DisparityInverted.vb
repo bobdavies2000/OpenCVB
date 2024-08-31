@@ -64,7 +64,7 @@ Public Class DisparityFunction_Basics : Inherits VB_Parent
             strOut += "baseline * focal length / actual depth" + vbCrLf
             strOut += "A disparity adjustment that is dependent on working resolution is used here " + vbCrLf
             strOut += "to adjust the observed disparity to match the formula." + vbCrLf
-            strOut += "At working resolution = " + CStr(task.WorkingRes.Width) + "x" + CStr(task.WorkingRes.Height)
+            strOut += "At working resolution = " + CStr(task.dst2.Width) + "x" + CStr(task.dst2.Height)
             strOut += " the adjustment factor is " + Format(task.disparityAdjustment, fmt1) + vbCrLf + vbCrLf
 
             Dim disparityformulaoutput = disparityFormula(actualDepth)

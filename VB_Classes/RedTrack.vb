@@ -4,7 +4,7 @@ Public Class RedTrack_Basics : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        If task.WorkingRes <> New cvb.Size(168, 94) Then task.frameHistoryCount = 1
+        If New cvb.Size(task.dst2.Width, task.dst2.Height) <> New cvb.Size(168, 94) Then task.frameHistoryCount = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)

@@ -205,7 +205,7 @@ Module UI_Generator
             sw.WriteLine(vbTab + "Public Function createAlgorithm(algorithmName as string) as Object")
             sw.WriteLine(vbTab + "If algorithmName.endsWith("".py"") then return new Python_Run()")
             For Each nextName In allList.Keys
-                If nextName.StartsWith("CPP_Basics") Then Continue For
+                If nextName.StartsWith("CPP_Basics") Or nextName.StartsWith("cpp_Task") Then Continue For
                 If nextName.EndsWith(".py") Then Continue For
                 If nextName.EndsWith("_CC") Then
                     sw.WriteLine(vbTab + "If algorithmName = """ + nextName + """ Then return new CPP_Basics(ccFunctionNames._" + nextName + ")")
@@ -307,14 +307,14 @@ Module UI_Generator
             Dim sw = New StreamWriter(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
             sw.Write("(" + CStr(allList.Count) + ") < All >")
             For Each alg In allButPython.Keys
-                If alg = "CPP_Basics" Then Continue For
+                If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
                 sw.Write("," + alg)
             Next
             sw.WriteLine()
 
             sw.Write("(" + CStr(allButPython.Count) + ") < All but Python >")
             For Each alg In allButPython.Keys
-                If alg = "CPP_Basics" Then Continue For
+                If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
                 sw.Write("," + alg)
             Next
             sw.WriteLine()

@@ -16,7 +16,7 @@ Public Class CPP_Basics : Inherits VB_Parent
         cppFunction = _cppFunction
         labels(2) = "Running CPP_Basics, Output from " + task.algName
 
-        cPtr = cppTask_Open(cppFunction, task.WorkingRes.Height, task.WorkingRes.Width,
+        cPtr = cppTask_Open(cppFunction, task.dst2.Rows, task.dst2.Cols,
                             task.heartBeat, 0.5, task.lineWidth, task.lineType, task.DotSize,
                             task.gridSize, task.histogramBins,
                             task.useGravityPointcloud, task.gOptions.pixelDiffThreshold,
@@ -163,10 +163,10 @@ Public Class CPP_Managed
         Return vbData
     End Function
     Public Sub pauseTask(ptr0 As IntPtr, ptr1 As IntPtr, ptr2 As IntPtr, ptr3 As cvb.Mat)
-        'task.dst0 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr0).clone
-        'task.dst1 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr1).clone
-        'task.dst2 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr2).clone
-        'task.dst3 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr3).clone
+        'task.dst0 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr0)
+        'task.dst1 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr1)
+        task.dst2 = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr2)
+        'task.dst3 = New cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, ptr3)
     End Sub
 End Class
 
@@ -178,8 +178,8 @@ Module managedCPP_Interface
     End Sub
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ManagedCPP_Pause()
-    End Sub
+    Public Function ManagedCPP_Pause() As IntPtr
+    End Function
 End Module
 
 
@@ -222,6 +222,6 @@ Public Class CPP_ManagedTest : Inherits VB_Parent
         hCloud.Free()
     End Sub
     Public Sub Pause()
-        ManagedCPP_Pause()
+        task.dst2 = cvb.Mat.FromPixelData(task.dst2.Rows, task.dst2.Cols, cvb.MatType.CV_8UC3, ManagedCPP_Pause()).Clone
     End Sub
 End Class

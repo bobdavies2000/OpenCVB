@@ -238,7 +238,7 @@ End Class
 Public Class Contour_Edges : Inherits VB_Parent
     Dim edges As New Edge_ResizeAdd
     Dim contour As New Contour_General
-    Dim lastImage = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+    Dim lastImage = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
     Public Sub New()
         desc = "Create contours for Edge_MotionAccum"
     End Sub

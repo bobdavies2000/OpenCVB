@@ -89,10 +89,10 @@ Public Class VB_Parent : Implements IDisposable
         If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
         If standalone = False And callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
 
-        dst0 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
-        dst1 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
-        dst2 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+        dst0 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+        dst1 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+        dst2 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+        dst3 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         task.activeObjects.Add(Me)
 
         If task.recordTimings Then
@@ -171,7 +171,7 @@ Public Class VB_Parent : Implements IDisposable
     End Sub
     Public Sub DrawFatLine(p1 As cvb.Point2f, p2 As cvb.Point2f, dst As cvb.Mat, fatColor As cvb.Scalar)
         Dim pad = 2
-        If task.WorkingRes.Width >= 640 Then pad = 6
+        If task.dst2.Width >= 640 Then pad = 6
         dst.Line(p1, p2, fatColor, task.lineWidth + pad, task.lineType)
         DrawLine(dst, p1, p2, cvb.Scalar.Black)
     End Sub
@@ -235,9 +235,9 @@ Public Class VB_Parent : Implements IDisposable
     End Function
     Public Sub setPointCloudGrid()
         task.gOptions.setGridSize(8)
-        If task.WorkingRes.Width = 640 Then
+        If task.dst2.Width = 640 Then
             task.gOptions.setGridSize(16)
-        ElseIf task.WorkingRes.Width = 1280 Then
+        ElseIf task.dst2.Width = 1280 Then
             task.gOptions.setGridSize(32)
         End If
     End Sub
@@ -357,14 +357,14 @@ Public Class VB_Parent : Implements IDisposable
         If r.Height <= 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > task.WorkingRes.Width * ratio Then r.X = task.WorkingRes.Width * ratio - 1
-        If r.Y > task.WorkingRes.Height * ratio Then r.Y = task.WorkingRes.Height * ratio - 1
-        If r.X + r.Width > task.WorkingRes.Width * ratio Then r.Width = task.WorkingRes.Width * ratio - r.X
-        If r.Y + r.Height > task.WorkingRes.Height * ratio Then r.Height = task.WorkingRes.Height * ratio - r.Y
+        If r.X > task.dst2.Width * ratio Then r.X = task.dst2.Width * ratio - 1
+        If r.Y > task.dst2.Height * ratio Then r.Y = task.dst2.Height * ratio - 1
+        If r.X + r.Width > task.dst2.Width * ratio Then r.Width = task.dst2.Width * ratio - r.X
+        If r.Y + r.Height > task.dst2.Height * ratio Then r.Height = task.dst2.Height * ratio - r.Y
         If r.Width <= 0 Then r.Width = 1 ' check again (it might have changed.)
         If r.Height <= 0 Then r.Height = 1
-        If r.X = task.WorkingRes.Width * ratio Then r.X = r.X - 1
-        If r.Y = task.WorkingRes.Height * ratio Then r.Y = r.Y - 1
+        If r.X = task.dst2.Width * ratio Then r.X = r.X - 1
+        If r.Y = task.dst2.Height * ratio Then r.Y = r.Y - 1
         Return r
     End Function
     Public Function FindSlider(opt As String) As TrackBar
@@ -379,7 +379,7 @@ Public Class VB_Parent : Implements IDisposable
         Catch ex As Exception
             Debug.WriteLine("FindSlider failed.  The application list of forms changed while iterating.  Not critical." + ex.Message)
         End Try
-        Debug.writeline("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+        Debug.WriteLine("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
 
         Return Nothing
     End Function
@@ -394,12 +394,12 @@ Public Class VB_Parent : Implements IDisposable
                     End If
                 Next
             Catch ex As Exception
-                debug.writeline("FindCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
+                Debug.WriteLine("FindCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
             End Try
             Application.DoEvents()
             retryCount += 1
             If retryCount >= 5 Then
-                debug.writeline("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Debug.WriteLine("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
                 Exit While
             End If
         End While
@@ -420,12 +420,12 @@ Public Class VB_Parent : Implements IDisposable
                     End If
                 Next
             Catch ex As Exception
-                debug.writeline("findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
+                Debug.WriteLine("findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
             End Try
             Application.DoEvents()
             retryCount += 1
             If retryCount >= 5 Then
-                debug.writeline("A Radio button was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Debug.WriteLine("A Radio button was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
                 Exit While
             End If
         End While
@@ -461,7 +461,7 @@ Public Class VB_Parent : Implements IDisposable
         Return DisplayCells()
     End Function
     Public Function DisplayCells() As cvb.Mat
-        Dim dst As New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+        Dim dst As New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         task.cellMap.SetTo(0)
         For Each rc In task.redCells
             dst(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
@@ -470,7 +470,7 @@ Public Class VB_Parent : Implements IDisposable
         Return dst
     End Function
     Public Function Show_HSV_Hist(hist As cvb.Mat) As cvb.Mat
-        Dim img As New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+        Dim img As New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         Dim binCount = hist.Height
         Dim binWidth = img.Width / hist.Height
         Dim mm As mmData = GetMinMax(hist)
@@ -595,8 +595,8 @@ Public Class VB_Parent : Implements IDisposable
     End Function
     Public Function quickRandomPoints(howMany As Integer) As List(Of cvb.Point2f)
         Dim srcPoints As New List(Of cvb.Point2f)
-        Dim w = task.WorkingRes.Width
-        Dim h = task.WorkingRes.Height
+        Dim w = task.dst2.Width
+        Dim h = task.dst2.Height
         For i = 0 To howMany - 1
             Dim pt = New cvb.Point2f(msRNG.Next(0, w), msRNG.Next(0, h))
             srcPoints.Add(pt)

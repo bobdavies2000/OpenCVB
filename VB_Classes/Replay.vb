@@ -26,8 +26,8 @@ Module recordPlaybackCommon
         Public cloudElemsize As integer
     End Structure
     Public Sub writeHeader(binWrite As BinaryWriter)
-        binWrite.Write(task.WorkingRes.Width)
-        binWrite.Write(task.WorkingRes.Height)
+        binWrite.Write(task.dst2.Width)
+        binWrite.Write(task.dst2.Height)
         binWrite.Write(task.color.ElemSize)
 
         binWrite.Write(task.pcSplit(2).Width)
@@ -187,7 +187,7 @@ Public Class Replay_Play : Inherits VB_Parent
             If playbackActive Then
                 colorBytes = binRead.ReadBytes(bytesPerColor)
                 Dim tmpMat = cvb.Mat.FromPixelData(fh.colorHeight, fh.colorWidth, cvb.MatType.CV_8UC3, colorBytes)
-                task.color = tmpMat.Resize(task.WorkingRes)
+                task.color = tmpMat.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height))
                 bytesTotal += colorBytes.Length
 
                 depth32fBytes = binRead.ReadBytes(bytesPerdepth32f)

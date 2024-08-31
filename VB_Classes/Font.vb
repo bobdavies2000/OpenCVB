@@ -41,7 +41,7 @@ Public Class Font_FlowTextOld : Inherits VB_Parent
         End If
 
         Dim maxLines = 31
-        If task.WorkingRes.Height = 720 Or task.WorkingRes.Height = 360 Or task.WorkingRes.Height = 180 Then maxLines = 23
+        If task.dst2.Height = 720 Or task.dst2.Height = 360 Or task.dst2.Height = 180 Then maxLines = 23
         Dim clearRequested As Boolean
         If msgs.Count > maxLines Then
             If msgs.Count < maxLines * 2 Then

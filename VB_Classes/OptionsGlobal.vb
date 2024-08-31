@@ -14,10 +14,10 @@ Public Class OptionsGlobal
 
         DotSizeSlider.Value = 1
         LineWidth.Value = 1
-        If task.WorkingRes.Width <= 320 Then
+        If task.dst2.Width <= 320 Then
             DotSizeSlider.Value = 1
             LineWidth.Value = 1
-        ElseIf task.WorkingRes.Width = 640 Then
+        ElseIf task.dst2.Width = 640 Then
             DotSizeSlider.Value = 2
             LineWidth.Value = 2
         End If
@@ -69,7 +69,7 @@ Public Class OptionsGlobal
 
         task.DotSize = 1
         task.cvFontThickness = 1
-        Select Case task.WorkingRes.Width
+        Select Case task.dst2.Width
             Case 1920
                 GridSlider.Value = 192
                 task.cvFontSize = 3.5
@@ -115,7 +115,7 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.disparityAdjustment = 4.2
-                task.lowRes = New cvb.Size(320, task.WorkingRes.Height / 2)
+                task.lowRes = New cvb.Size(320, task.dst2.Height / 2)
                 task.quarterRes = New cvb.Size(320, 180)
                 task.densityMetric = 200
                 task.FASTthreshold = 30
@@ -125,7 +125,7 @@ Public Class OptionsGlobal
                 task.disparityAdjustment = 8.4
                 task.lowRes = New cvb.Size(320, 180)
                 task.quarterRes = New cvb.Size(320, 180)
-                If task.WorkingRes.Height = 240 Then task.lowRes = New cvb.Size(160, 120)
+                If task.dst2.Height = 240 Then task.lowRes = New cvb.Size(160, 120)
                 task.densityMetric = 500
                 task.FASTthreshold = 10
             Case 160

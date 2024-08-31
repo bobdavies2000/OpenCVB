@@ -459,7 +459,7 @@ Public Class Main_UI
         Translator.Show()
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-        If AvailableAlgorithms.Text = "" Then
+        If Trim(AvailableAlgorithms.Text) = "" Then
             Dim incr = 1
             If upArrow Then incr = -1
             upArrow = False
@@ -1442,14 +1442,14 @@ Public Class Main_UI
             ' Adjust drawrect for the ratio of the actual size and WorkingRes.
             If task.drawRect <> New cvb.Rect Then
                 ' relative size of algorithm size image to displayed image
-                Dim ratio = camPic(0).Width / task.WorkingRes.Width
+                Dim ratio = camPic(0).Width / task.dst2.Width
                 drawRect = New cvb.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
                                        task.drawRect.Width * ratio, task.drawRect.Height * ratio)
             End If
 
             Dim saveWorkingRes = settings.WorkingRes
             task.labels = {"", "", "", ""}
-            mousePoint = New cvb.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2) ' mouse click point default = center of the image
+            mousePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
 
             Dim saveDrawRect As cvb.Rect
             While 1
@@ -1480,8 +1480,8 @@ Public Class Main_UI
 
                         If frameCount < 10 Then
                             Dim sizeRatio = settings.captureRes.Width / saveWorkingRes.Width
-                            task.calibData.ppx = task.WorkingRes.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
-                            task.calibData.ppy = task.WorkingRes.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
+                            task.calibData.ppx = task.dst2.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
+                            task.calibData.ppy = task.dst2.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
                             task.calibData.fx = camera.cameraInfo.fx
                             task.calibData.fy = camera.cameraInfo.fy
                             task.calibData.v_fov = camera.cameraInfo.v_fov
@@ -1522,7 +1522,7 @@ Public Class Main_UI
                         If GrabRectangleData Then
                             GrabRectangleData = False
                             ' relative size of algorithm size image to displayed image
-                            Dim ratio = task.WorkingRes.Width / camPic(0).Width
+                            Dim ratio = task.dst2.Width / camPic(0).Width
                             Dim tmpDrawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
                             task.drawRect = New cvb.Rect
                             If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
@@ -1551,12 +1551,12 @@ Public Class Main_UI
                     SyncLock mouseLock
                         If mousePoint.X < 0 Then mousePoint.X = 0
                         If mousePoint.Y < 0 Then mousePoint.Y = 0
-                        If mousePoint.X >= task.WorkingRes.Width Then mousePoint.X = task.WorkingRes.Width - 1
-                        If mousePoint.Y >= task.WorkingRes.Height Then mousePoint.Y = task.WorkingRes.Height - 1
+                        If mousePoint.X >= task.dst2.Width Then mousePoint.X = task.dst2.Width - 1
+                        If mousePoint.Y >= task.dst2.Height Then mousePoint.Y = task.dst2.Height - 1
 
                         task.mouseMovePoint = mousePoint
                         If task.mouseMovePoint = New cvb.Point(0, 0) Then
-                            task.mouseMovePoint = New cvb.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2)
+                            task.mouseMovePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2)
                         End If
                         task.mousePicTag = mousePicTag
                         If mouseClickFlag Then
@@ -1600,7 +1600,7 @@ Public Class Main_UI
                 If updatedDrawRect <> task.drawRect Then
                     drawRect = task.drawRect
                     ' relative size of algorithm size image to displayed image
-                    Dim ratio = camPic(0).Width / task.WorkingRes.Width
+                    Dim ratio = camPic(0).Width / task.dst2.Width
                     drawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
                 End If
                 If task.drawRectClear Then

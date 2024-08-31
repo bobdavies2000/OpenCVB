@@ -676,9 +676,9 @@ Public Class Bin4Way_Regions : Inherits VB_Parent
         desc = "Add the 4-way split of images to define the different regions."
     End Sub
     Private Sub rebuildMats()
-        dst2 = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         For i = 0 To binary.mats.mat.Count - 1
-            binary.mats.mat(i) = New cvb.Mat(task.WorkingRes, cvb.MatType.CV_8UC1, 0)
+            binary.mats.mat(i) = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC1, 0)
         Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)

@@ -96,7 +96,7 @@ Public Module vbc
         task.DotSize = task.gOptions.DotSizeSlider.Value
 
         task.MaxZmeters = task.gOptions.maxDepth
-        task.metersPerPixel = task.MaxZmeters / task.WorkingRes.Height ' meters per pixel in projections - side and top.
+        task.metersPerPixel = task.MaxZmeters / task.dst2.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
     End Sub
     Public Function FindFrm(title As String) As System.Windows.Forms.Form
