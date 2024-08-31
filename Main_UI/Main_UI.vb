@@ -35,7 +35,7 @@ Public Class Main_UI
 
     Dim threadStartTime As DateTime
 
-    Dim optionsForm As MainOptions
+    Dim optionsForm As Options
     Dim AlgorithmTestAllCount As Integer
     Dim algorithmCount As Integer
     Dim algorithmTaskHandle As Thread
@@ -255,8 +255,8 @@ Public Class Main_UI
 
             If testAllRunning = False Then
                 Dim resStr = CStr(.WorkingRes.Width) + "x" + CStr(.WorkingRes.Height)
-                For i = 0 To MainOptions.resolutionList.Count - 1
-                    If MainOptions.resolutionList(i).StartsWith(resStr) Then
+                For i = 0 To Options.resolutionList.Count - 1
+                    If Options.resolutionList(i).StartsWith(resStr) Then
                         .WorkingResIndex = i
                         Exit For
                     End If
@@ -268,7 +268,7 @@ Public Class Main_UI
             Me.Top = .locationMain.Item1
             Me.Width = .locationMain.Item2
             Me.Height = .locationMain.Item3
-            optionsForm = New MainOptions
+            optionsForm = New Options
             optionsForm.defineCameraResolutions(settings.cameraIndex)
         End With
     End Sub
@@ -1119,8 +1119,8 @@ Public Class Main_UI
         optionsForm.MainOptions_Load(sender, e)
         optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
         Dim resStr = CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height)
-        For i = 0 To MainOptions.resolutionList.Count - 1
-            If MainOptions.resolutionList(i).StartsWith(resStr) Then
+        For i = 0 To Options.resolutionList.Count - 1
+            If Options.resolutionList(i).StartsWith(resStr) Then
                 optionsForm.WorkingResRadio(i).Checked = True
             End If
         Next
@@ -1177,7 +1177,7 @@ Public Class Main_UI
                     If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
                     settings.cameraName = cameraNames(settings.cameraIndex)
                     If settings.cameraPresent(settings.cameraIndex) Then
-                        MainOptions.defineCameraResolutions(settings.cameraIndex)
+                        Options.defineCameraResolutions(settings.cameraIndex)
                         setupTestAll()
                         settings.WorkingResIndex = testAllStartingRes
                         Exit While
@@ -1575,22 +1575,6 @@ Public Class Main_UI
                 Dim spanWait = New TimeSpan(elapsedWaitTicks)
                 task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
                 Dim updatedDrawRect = task.drawRect
-                'If parms.algName.EndsWith("_CS") Then
-                '    Static findCSharp = New CS_Classes.CSAlgorithmList()
-
-                '    If task.csAlgorithmObject Is Nothing Then
-                '        task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)
-                '        task.desc = task.csAlgorithmObject.desc
-                '    End If
-                'End If
-
-                'If parms.algName.EndsWith("_CPP") Then
-                '    Static findCPP = New CPP_AlgorithmList()
-                '    If task.cppAlgorithmObject Is Nothing Then
-                '        task.cppAlgorithmObject = findCPP.createCPPAlgorithm(parms.algName)
-                '        'task.desc = task.cppAlgorithmObject.desc
-                '    End If
-                'End If
 
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 picLabels = task.labels

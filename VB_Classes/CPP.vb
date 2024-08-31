@@ -168,6 +168,14 @@ Public Class CPP_ManagedResume : Inherits VB_Parent
         hCloud.Free()
     End Sub
     Public Sub Pause()
-        task.dst2 = cvb.Mat.FromPixelData(task.dst2.Rows, task.dst2.Cols, cvb.MatType.CV_8UC3, ManagedCPP_Pause()).Clone
+        Dim ptr As IntPtr = ManagedCPP_Pause()
+        Dim pointers(3) As IntPtr
+        Marshal.Copy(ptr, pointers, 0, 4)
+
+        task.dst0 = cvb.Mat.FromPixelData(task.dst0.Rows, task.dst0.Cols, cvb.MatType.CV_8UC3, pointers(0)).Clone
+        task.dst1 = cvb.Mat.FromPixelData(task.dst1.Rows, task.dst1.Cols, cvb.MatType.CV_8UC3, pointers(1)).Clone
+        task.dst2 = cvb.Mat.FromPixelData(task.dst2.Rows, task.dst2.Cols, cvb.MatType.CV_8UC3, pointers(2)).Clone
+        task.dst3 = cvb.Mat.FromPixelData(task.dst3.Rows, task.dst3.Cols, cvb.MatType.CV_8UC3, pointers(3)).Clone
+
     End Sub
 End Class

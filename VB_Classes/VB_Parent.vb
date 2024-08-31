@@ -383,10 +383,10 @@ Public Class VB_Parent : Implements IDisposable
 
         Return Nothing
     End Function
-    Public Function findSliderCPP(opt As String, value As Integer)
+    Public Sub findSliderCPP(opt As String, value As Integer)
         ' managed C++ does not have System.Windows.Forms...
         FindSlider(opt).Value = value
-    End Function
+    End Sub
     Public Function FindCheckBox(opt As String) As CheckBox
         While 1
             Try

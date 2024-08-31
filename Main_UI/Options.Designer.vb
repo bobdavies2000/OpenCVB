@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class MainOptions
+Partial Class Options
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -23,6 +23,8 @@ Partial Class MainOptions
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         GroupBox2 = New GroupBox()
+        Label7 = New Label()
+        TextBox1 = New TextBox()
         Label6 = New Label()
         UpdateXRef = New Button()
         TestAllDuration = New NumericUpDown()
@@ -45,8 +47,6 @@ Partial Class MainOptions
         Resolutions = New FlowLayoutPanel()
         Label4 = New Label()
         Label5 = New Label()
-        TextBox1 = New TextBox()
-        Label7 = New Label()
         GroupBox2.SuspendLayout()
         CType(TestAllDuration, ComponentModel.ISupportInitialize).BeginInit()
         GroupBox5.SuspendLayout()
@@ -71,6 +71,22 @@ Partial Class MainOptions
         GroupBox2.TabIndex = 5
         GroupBox2.TabStop = False
         GroupBox2.Text = "Other Global Settings"
+        ' 
+        ' Label7
+        ' 
+        Label7.AutoSize = True
+        Label7.Location = New Point(742, 65)
+        Label7.Name = "Label7"
+        Label7.Size = New Size(215, 25)
+        Label7.TabIndex = 15
+        Label7.Text = "is only updated manually."
+        ' 
+        ' TextBox1
+        ' 
+        TextBox1.Location = New Point(958, 116)
+        TextBox1.Name = "TextBox1"
+        TextBox1.Size = New Size(150, 31)
+        TextBox1.TabIndex = 14
         ' 
         ' Label6
         ' 
@@ -282,23 +298,7 @@ Partial Class MainOptions
         Label5.TabIndex = 17
         Label5.Text = "Working Size Resolution"
         ' 
-        ' TextBox1
-        ' 
-        TextBox1.Location = New Point(958, 116)
-        TextBox1.Name = "TextBox1"
-        TextBox1.Size = New Size(150, 31)
-        TextBox1.TabIndex = 14
-        ' 
-        ' Label7
-        ' 
-        Label7.AutoSize = True
-        Label7.Location = New Point(742, 65)
-        Label7.Name = "Label7"
-        Label7.Size = New Size(215, 25)
-        Label7.TabIndex = 15
-        Label7.Text = "is only updated manually."
-        ' 
-        ' MainOptions
+        ' Options
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
@@ -315,7 +315,7 @@ Partial Class MainOptions
         FormBorderStyle = FormBorderStyle.FixedDialog
         KeyPreview = True
         Margin = New Padding(4, 6, 4, 6)
-        Name = "MainOptions"
+        Name = "Options"
         ShowInTaskbar = False
         SizeGripStyle = SizeGripStyle.Show
         Text = "OpenCVB Global Settings"

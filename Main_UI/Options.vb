@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class MainOptions
+Public Class Options
     Public cameraRadioButton(Main_UI.cameraNames.Count - 1) As RadioButton
     Public WorkingResRadio(resolutionList.Count - 1) As RadioButton
     Public cameraWorkingRes As cvb.Size
@@ -149,5 +149,13 @@ Public Class MainOptions
     End Sub
     Public Sub SnapCustom_CheckedChanged(sender As Object, e As EventArgs) Handles SnapCustom.CheckedChanged
         ' cameraDisplayRes = New cvb.Size(0, 0) ' figure it out in Main_UI.vb resizing...
+    End Sub
+
+    Private Sub UpdateXRef_Click(sender As Object, e As EventArgs) Handles UpdateXRef.Click
+        Dim UIProcess As New Process
+        UIProcess.StartInfo.FileName = Main_UI.HomeDir.FullName + "UI_Generator\bin\X64\UI_Generator.exe"
+        UIProcess.StartInfo.WorkingDirectory = Main_UI.HomeDir.FullName + "UI_Generator\bin\X64\"
+        UIProcess.StartInfo.Arguments = "All"
+        UIProcess.Start()
     End Sub
 End Class

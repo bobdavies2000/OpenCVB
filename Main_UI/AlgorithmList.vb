@@ -94,6 +94,7 @@ End Enum
 	If algorithmName = "AddWeighted_DepthAccumulate_CS" Then return new AddWeighted_DepthAccumulate_CS
 	If algorithmName = "AddWeighted_Edges" Then return new AddWeighted_Edges
 	If algorithmName = "AddWeighted_Edges_CS" Then return new AddWeighted_Edges_CS
+	If algorithmName = "AddWeighted_Edges1" Then return new AddWeighted_Edges1
 	If algorithmName = "AddWeighted_InfraRed" Then return new AddWeighted_InfraRed
 	If algorithmName = "AddWeighted_InfraRed_CS" Then return new AddWeighted_InfraRed_CS
 	If algorithmName = "AlphaChannel_Basics" Then return new AlphaChannel_Basics

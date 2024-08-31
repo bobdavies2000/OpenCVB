@@ -93,7 +93,7 @@
       <AdditionalLibraryDirectories>$(ProjectDir)..\</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)UI_Generator\bin\x64\UI_Generator.exe</Command>
+      <Command>$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -131,11 +131,10 @@
       <AdditionalLibraryDirectories>$(ProjectDir)..\</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)UI_Generator\bin\x64\UI_Generator.exe</Command>
+      <Command>$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CPP_Classes.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>

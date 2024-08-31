@@ -39,6 +39,8 @@ namespace CPP_Managed {
         Mat src, color, leftView, rightView, depthRGB, pointCloud;
         Mat dst0, dst1, dst2, dst3;
         int rows, cols;
+
+
     };
 
     unmanagedTaskStructure task;
@@ -62,10 +64,15 @@ namespace CPP_Managed {
         task.src = task.color.clone();
     }
 
+    unsigned char** dst = new unsigned char* [4];
     extern "C" __declspec(dllexport)
-    int* ManagedCPP_Pause() 
+    unsigned char** ManagedCPP_Pause()
     {
-        return (int*) task.dst2.data;
+        dst[0] = task.dst0.data;
+        dst[1] = task.dst1.data;
+        dst[2] = task.dst2.data;
+        dst[3] = task.dst3.data;
+        return dst;
     }
 
 
@@ -103,6 +110,7 @@ namespace CPP_Managed {
 
             weight = options.addWeighted;
             addWeighted(task.src, weight, srcPlus, 1.0 - weight, 0, task.dst2);
+            task.dst3 = task.depthRGB;
 
             //labels[2] = "Depth %: " + std::to_string(100 - weight * 100) + " BGR %: " + std::to_string(static_cast<int>(weight * 100));
         }
