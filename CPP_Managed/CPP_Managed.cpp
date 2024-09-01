@@ -111,7 +111,7 @@ namespace CPP_Managed {
     };
 
 
-
+     
 
     public ref class AddWeighted_Basics_CPP : public VB_Parent
     {

@@ -1,10 +1,18 @@
 ﻿Imports System.IO
 Imports System.Text.RegularExpressions
+Imports System.Threading
 Module UI_Generator
-    Function Main(args As String()) As Integer
+    Private ReadOnly MutexName As String = "SingleInstanceAppMutex"
+    Sub Main(args As String())
 #If DEBUG Then
         Console.WriteLine("Currently compiled with DEBUG (so it is slower.)")
 #End If
+        Using mutex As New Mutex(False, MutexName, createdNew:=False)
+            mutex.WaitOne()
+            mutex.ReleaseMutex()
+        End Using
+
+
         Dim fullXRef As Boolean
         If args.Length > 0 Then
             If args(0) = "All" Then fullXRef = True
@@ -18,13 +26,6 @@ Module UI_Generator
 
         Dim xRefFile = New FileInfo(HomeDir.FullName + "Data/XRef.txt")
         If xRefFile.Exists = False Then fullXRef = True
-
-        Dim CCInput = New FileInfo(HomeDir.FullName + "CPP_Native/CPP_NativeClasses.h")
-        If CCInput.Exists = False Then
-            Console.WriteLine("The UI_Generator code needs to be reviewed." + vbCrLf + "Either UI_Generator has moved Or projects reference have." + vbCrLf +
-                   CCInput.FullName + " was Not found.")
-            Return 1
-        End If
 
         Dim PythonProjFile As New FileInfo(HomeDir.FullName + "/Python/Python.pyproj")
         Dim pyFiles = File.ReadAllLines(PythonProjFile.FullName)
@@ -63,21 +64,7 @@ Module UI_Generator
             End If
 
             Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/AlgorithmGroupNames.txt")
-#If DEBUG Then
-#Else
-            If indexTestFile.Exists Then
-                If checkDates(New DirectoryInfo(HomeDir.FullName + "/CS_Classes/"), indexTestFile) = False Then
-                    If checkDates(New DirectoryInfo(HomeDir.FullName + "/VB_Classes/"), indexTestFile) = False Then
-                        If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Native/"), indexTestFile) = False Then
-                            If checkDates(New DirectoryInfo(HomeDir.FullName + "/CPP_Managed/"), indexTestFile) = False Then
-                                Console.WriteLine("The user interface Is already up to date.")
-                                Return 2
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-#End If
+
             If fullXRef Then
                 Console.WriteLine("Starting work to generate the user interface with updated XRef algorithms.")
             Else
@@ -371,8 +358,7 @@ Module UI_Generator
             MsgBox("UI_Generator failed writing the algorithm groups.  Error is " + vbCrLf + ex.Message)
         End Try
         Console.WriteLine("Algorithm Group Names prepared.")
-        Return 0
-    End Function
+    End Sub
 
     Private Function checkDates(dirInfo As DirectoryInfo, algorithmGroupNames As FileInfo) As Boolean
         For Each fileInfo As FileInfo In dirInfo.GetFiles()
