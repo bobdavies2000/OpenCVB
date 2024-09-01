@@ -36,7 +36,9 @@ using namespace cv;
 public struct unmanagedData
 {
     Mat src, color, leftView, rightView, depthRGB, pointCloud;
+    Mat pcSplit[3];
     int rows, cols; // working resolution for all Mat's
+    bool optionsChanged;
 };
 
 unmanagedData task;
@@ -70,6 +72,7 @@ int ManagedCPP_Resume(int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBP
     task.rightView = Mat(task.rows, task.cols, CV_8UC3, rightPtr).clone();
     task.depthRGB = Mat(task.rows, task.cols, CV_8UC3, depthRGBPtr).clone();
     task.pointCloud = Mat(task.rows, task.cols, CV_8UC3, cloudPtr).clone();
+    split(task.pointCloud, task.pcSplit);
 
     //ioList[ioIndex]->src = task.color.clone();
     return (int)ioList.size() - 1;
@@ -108,6 +111,8 @@ namespace CPP_Managed {
             task.rows = _rows;
             task.cols = _cols;
         }
+
+
     };
 
      
@@ -184,6 +189,36 @@ namespace CPP_Managed {
             io->dst3 = addw->io->dst3;
         }
     };
+
+
+
+
+    //public ref class AddWeighted_DepthAccumulate_CPP : public VB_Parent
+    //{
+    //private:
+    //    Options_AddWeighted^ options = gcnew Options_AddWeighted();
+    //public:
+    //    size_t ioIndex;
+    //    unManagedIO* io;
+    //    AddWeighted_DepthAccumulate_CPP()
+    //    {
+    //        unManagedIO* ioNew = new unManagedIO();
+    //        ioIndex = ioList.size();
+    //        ioList.push_back(ioNew);
+    //        io = ioNew;
+    //    }
+    //    void RunAlg()
+    //    {
+    //        io = ioList[ioIndex];
+    //        options->RunOpt();
+    //        if (task.optionsChanged)
+    //        {
+    //            dst2 = task.pcSplit[2] * 1000;
+    //        }
+    //        accumulateWeighted(task.pcSplit[2] * 1000, io->dst2, options->accumWeighted, Mat());
+    //    }
+    //};
+
 
 
 }

@@ -1,6 +1,7 @@
 ﻿Imports OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
+Imports Microsoft.Web.WebView2.Core
 
 Public Class Translator
 #Region "NonVolatile"
@@ -65,33 +66,7 @@ Public Class Translator
         Dim script = "document.getElementById('convert-btn').click();"
         Await WebView.CoreWebView2.ExecuteScriptAsync(script)
     End Sub
-    Private Sub VBtoCSharp_CheckedChanged(sender As Object, e As EventArgs) Handles VBtoCSharp.CheckedChanged
-        'setInputLanguage("VB")
-        'setOutputLanguage("Csharp")
-        Main_UI.settings.translatorMode = "VB.Net to C#"
-    End Sub
-    Private Sub CsharpToCPP_CheckedChanged(sender As Object, e As EventArgs) Handles CsharpToCPP.CheckedChanged
-        'setInputLanguage("VB")
-        'setOutputLanguage("C++")
-        Main_UI.settings.translatorMode = "C# to C++"
-    End Sub
-    Private Sub CsharpToVB_CheckedChanged(sender As Object, e As EventArgs) Handles CsharpToVB.CheckedChanged
-        'setInputLanguage("Csharp")
-        'setOutputLanguage("VB")
-        Main_UI.settings.translatorMode = "C# to VB.Net (back)"
-    End Sub
     Private Sub Timer4_Tick(sender As Object, e As EventArgs) Handles Timer4.Tick
-        Select Case Main_UI.settings.translatorMode
-            Case "VB.Net to C#"
-                VBtoCSharp.Checked = True
-                VBtoCSharp_CheckedChanged(sender, e)
-            Case "C# to C++"
-                CsharpToCPP.Checked = True
-                CsharpToCPP_CheckedChanged(sender, e)
-            Case "VB.Net to C++ (back)"
-                CsharpToVB.Checked = True
-                CsharpToVB_CheckedChanged(sender, e)
-        End Select
         If algName = "" Then
             ReadFileData()
             Timer4.Enabled = False
@@ -113,19 +88,35 @@ Public Class Translator
         For Each alg In Main_UI.AvailableAlgorithms.Items
             Algorithms.Items.Add(alg)
         Next
-        Algorithms.SelectedIndex = Main_UI.AvailableAlgorithms.SelectedIndex
+        ' Algorithms.SelectedIndex = Main_UI.AvailableAlgorithms.SelectedIndex
+
         Timer4.Enabled = True
     End Sub
 
+    Dim result As String
+    Private Async Sub translateSetting()
+        Dim script As String = "document.documentElement.outerHTML;"
+        result = Await WebView.CoreWebView2.ExecuteScriptAsync(script)
+    End Sub
     Private Sub ReadFileData()
-        algName = Algorithms.Text
-        Dim split = algName.Split("_")
-        Dim algType As Integer = 0
 
-        Dim filename = New FileInfo(Main_UI.HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs")
-        If algName.Contains("_CS") = False And algName.Contains("_CPP") = False Then
-            filename = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes/" + split(0) + ".vb")
+        algName = Algorithms.Text
+        If algName = "" Then Exit Sub
+        If algName.EndsWith("_CPP_VB") Or algName.EndsWith("_CPP_CS") Then
+            MsgBox("The selected algorithm is a Native C++ algorithm" + vbCrLf + "Choose a VB.Net or C# algorithm.")
+            Exit Sub
         End If
+
+        Dim split = algName.Split("_")
+        Dim filename = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes/" + split(0) + ".vb")
+
+        Main_UI.settings.translatorMode = "VB.Net to C#"
+        If algName.EndsWith("_CS") Then
+            Main_UI.settings.translatorMode = "C# to C++"
+            filename = New FileInfo(Main_UI.HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs")
+        End If
+
+        translateSetting()
 
         Dim lines = File.ReadAllLines(filename.FullName)
         clipLines = ""
@@ -140,16 +131,17 @@ Public Class Translator
                         Next
                         Clipboard.SetText(clipLines)
                     End If
-                Case "C# to VB.Net (back)"
                 Case "C# to C++"
-                    If nextLine.StartsWith("public class " + algName + " ") Then
-                        clipLines += lines(i) + vbCrLf
-                        For j = i + 1 To lines.Count - 1
-                            nextLine = lines(j).Trim()
-                            If nextLine.StartsWith("public class ") Then Exit For
-                            clipLines += lines(j) + vbCrLf
-                        Next
-                        Clipboard.SetText(clipLines)
+                    If nextLine.StartsWith("public class") Then
+                        If nextLine.StartsWith("public class " + algName + " ") Then
+                            clipLines += lines(i) + vbCrLf
+                            For j = i + 1 To lines.Count - 1
+                                nextLine = lines(j).Trim()
+                                If nextLine.StartsWith("public class ") Then Exit For
+                                clipLines += lines(j) + vbCrLf
+                            Next
+                            Clipboard.SetText(clipLines)
+                        End If
                     End If
             End Select
         Next
@@ -186,18 +178,20 @@ Public Class Translator
         Timer3.Enabled = False
         Dim inputLines = My.Computer.Clipboard.GetText(TextDataFormat.Text).Split(vbLf)
         Dim className As String = ""
+        Dim originalName As String = ""
         Dim outputLines As New List(Of String)
-            For Each inline In inputLines
-                Dim trimLine = Trim(inline)
-                If trimLine.StartsWith("using ") Then Continue For
-                If trimLine.Length = 0 Then Continue For
-                If trimLine.StartsWith("public class") Then
-                    Dim split = trimLine.Split(" ")
-                    className = split(2)
-                End If
+        Dim lastLine As String = ""
+        For Each inline In inputLines
+            Dim trimLine = Trim(inline)
+            If trimLine.StartsWith("using ") Then Continue For
+            If trimLine.Length = 0 Then Continue For
+            If trimLine.StartsWith("public class") Then
+                Dim split = trimLine.Split(" ")
+                className = split(2)
+            End If
 
-                Select Case Main_UI.settings.translatorMode
-                    Case "VB.Net to C#"
+            Select Case Main_UI.settings.translatorMode
+                Case "VB.Net to C#"
                     If inline.Contains("string desc;") Then Continue For
                     If inline.Contains("IntPtr cPtr;") Then Continue For
                     If inline.Contains(className) Then inline = inline.Replace(className, className + "_CS")
@@ -255,37 +249,87 @@ Public Class Translator
                     inline = Replace(inline, "()()", "()")
                     inline = Replace(inline, "cvb.Rectangle", "Rectangle")
 
-                Case "C# to VB.Net (back)"
-                    If trimLine.StartsWith("Public Class ") Then
-                        className = className.Replace("_CS", "")
-                        inline = "Public Class " + className + " : Inherits VB_Parent"
-                    End If
+                'Case "C# to VB.Net (back)"
+                '    If trimLine.StartsWith("Public Class ") Then
+                '        className = className.Replace("_CS", "")
+                '        inline = "Public Class " + className + " : Inherits VB_Parent"
+                '    End If
 
-                    inline = inline.Replace("Round(", "Math.Round(")
-                    inline = inline.Replace("Math.Math.", "Math.")
+                '    inline = inline.Replace("Round(", "Math.Round(")
+                '    inline = inline.Replace("Math.Math.", "Math.")
 
-                    inline = inline.Replace("Private ", "Dim ")
-                    If inline.Contains(" Rect") Then
-                        inline = inline.Replace(" Rect", " cvb.Rect")
-                    End If
-                    inline = inline.Replace(" Size(", " cvb.Size(")
+                '    inline = inline.Replace("Private ", "Dim ")
+                '    If inline.Contains(" Rect") Then
+                '        inline = inline.Replace(" Rect", " cvb.Rect")
+                '    End If
+                '    inline = inline.Replace(" Size(", " cvb.Size(")
 
                 Case "C# to C++"
-                    If inline.StartsWith("class") Or inline.StartsWith("public class") Then
-                        If inline.StartsWith("class") Then inline = "public " + inline
-                        Dim split = inline.Split(" ")
-                        className = split(2)
+                    If trimLine.StartsWith("#") Then Continue For
+                    If trimLine.StartsWith("class") Then
+                        Dim split = trimLine.Split(" ")
+                        originalName = split(1)
+                        className = originalName.Replace("_CS", "_CPP")
+                        trimLine = "public ref class " + className + " : public VB_Parent"
                     End If
-                    inline = inline.Replace("GetMinMax(", "task->vbMinMax(")
-                    inline = inline.Replace("UpdateAdvice(", "task->UpdateAdvice(")
-                    inline = inline.Replace("task.", "task->")
-                    inline = inline.Replace(" options;", " *options;")
-                    inline = inline.Replace("options.", "options->")
-                    inline = inline.Replace("standaloneTest()", "standalone")
 
+                    If originalName <> "" Then trimLine = trimLine.Replace(originalName, className)
+                    trimLine = trimLine.Replace("cv::", "")
+                    trimLine = trimLine.Replace("RunAlg(cv::Mat& src)", "RunAlg()")
+                    trimLine = trimLine.Replace("RunAlg(Mat src)", "RunAlg()")
+
+                    If trimLine.StartsWith("public:") Then
+                        outputLines.Add(trimLine)
+                        outputLines.Add(vbTab + "size_t ioIndex;")
+                        trimLine = vbTab + "unManagedIO* io;"
+                    End If
+
+                    If trimLine.StartsWith("desc = ") Then
+                        outputLines.Add("unManagedIO* ioNew = new unManagedIO();")
+                        outputLines.Add("ioIndex = ioList.size();")
+                        outputLines.Add("ioList.push_back(ioNew);")
+                        trimLine = "io = ioNew;"
+                    End If
+
+                    If trimLine = "{" And lastLine.Contains("RunAlg(") Then
+                        outputLines.Add("{")
+                        trimLine = "io = ioList[ioIndex];"
+                    End If
+
+                    If trimLine.StartsWith("src") Then trimLine = trimLine.Replace("src", "io->src")
+                    trimLine = trimLine.Replace(".src", "io->src")
+                    trimLine = trimLine.Replace(" src", " io->src")
+                    trimLine = trimLine.Replace("(src", "(io->src")
+                    trimLine = trimLine.Replace(".dst0.", ".io->dst0.")
+                    trimLine = trimLine.Replace(".dst1.", ".io->dst1.")
+                    trimLine = trimLine.Replace(".dst2.", ".io->dst2.")
+                    trimLine = trimLine.Replace(".dst3.", ".io->dst3.")
+                    trimLine = trimLine.Replace(" dst0", " io->dst0")
+                    trimLine = trimLine.Replace(" dst1", " io->dst1")
+                    trimLine = trimLine.Replace(" dst2", " io->dst2")
+                    trimLine = trimLine.Replace(" dst3", " io->dst3")
+                    trimLine = trimLine.Replace("(dst0.", "(io->dst0.")
+                    trimLine = trimLine.Replace("(dst1.", "(io->dst1.")
+                    trimLine = trimLine.Replace("(dst2.", "(io->dst2.")
+                    trimLine = trimLine.Replace("(dst3.", "(io->dst3.")
+
+                    trimLine = trimLine.Replace("vbc.task.", "task.")
+                    If trimLine.EndsWith("options;") Then
+                        Dim split = trimLine.Split(" ")
+                        trimLine = split(0) + "^ options = gcnew " + split(0) + "();"
+                    End If
+
+                    trimLine = trimLine.Replace("GetMinMax(", "task->vbMinMax(")
+                    trimLine = trimLine.Replace("UpdateAdvice(", "task->UpdateAdvice(")
+                    trimLine = trimLine.Replace(" options;", " *options;")
+                    trimLine = trimLine.Replace("options.", "options->")
+                    trimLine = trimLine.Replace("standaloneTest()", "standalone")
+
+                    inline = trimLine
             End Select
 
             outputLines.Add(inline)
+            lastLine = inline
         Next
 
         'If Main_UI.settings.translatorMode = "C# to C++" Then Main_UI.setupNewCPPalgorithm(className)

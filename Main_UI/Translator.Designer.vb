@@ -31,15 +31,10 @@ Partial Class Translator
         Timer1 = New Timer(components)
         Timer2 = New Timer(components)
         Timer3 = New Timer(components)
-        GroupBox1 = New GroupBox()
-        CsharpToVB = New RadioButton()
-        CsharpToCPP = New RadioButton()
-        VBtoCSharp = New RadioButton()
         Timer4 = New Timer(components)
         Label1 = New Label()
         Button1 = New Button()
         CType(WebView, ComponentModel.ISupportInitialize).BeginInit()
-        GroupBox1.SuspendLayout()
         SuspendLayout()
         ' 
         ' translate
@@ -104,51 +99,6 @@ Partial Class Translator
         ' Timer3
         ' 
         ' 
-        ' GroupBox1
-        ' 
-        GroupBox1.Controls.Add(CsharpToVB)
-        GroupBox1.Controls.Add(CsharpToCPP)
-        GroupBox1.Controls.Add(VBtoCSharp)
-        GroupBox1.Location = New Point(13, 1)
-        GroupBox1.Name = "GroupBox1"
-        GroupBox1.Size = New Size(221, 148)
-        GroupBox1.TabIndex = 8
-        GroupBox1.TabStop = False
-        GroupBox1.Text = "Translate"
-        ' 
-        ' CsharpToVB
-        ' 
-        CsharpToVB.AutoSize = True
-        CsharpToVB.Location = New Point(17, 65)
-        CsharpToVB.Name = "CsharpToVB"
-        CsharpToVB.Size = New Size(191, 29)
-        CsharpToVB.TabIndex = 2
-        CsharpToVB.TabStop = True
-        CsharpToVB.Text = "C# to VB.Net (back)"
-        CsharpToVB.UseVisualStyleBackColor = True
-        ' 
-        ' CsharpToCPP
-        ' 
-        CsharpToCPP.AutoSize = True
-        CsharpToCPP.Location = New Point(17, 100)
-        CsharpToCPP.Name = "CsharpToCPP"
-        CsharpToCPP.Size = New Size(121, 29)
-        CsharpToCPP.TabIndex = 1
-        CsharpToCPP.TabStop = True
-        CsharpToCPP.Text = "C# to C++"
-        CsharpToCPP.UseVisualStyleBackColor = True
-        ' 
-        ' VBtoCSharp
-        ' 
-        VBtoCSharp.AutoSize = True
-        VBtoCSharp.Location = New Point(17, 30)
-        VBtoCSharp.Name = "VBtoCSharp"
-        VBtoCSharp.Size = New Size(139, 29)
-        VBtoCSharp.TabIndex = 0
-        VBtoCSharp.TabStop = True
-        VBtoCSharp.Text = "VB.Net to C#"
-        VBtoCSharp.UseVisualStyleBackColor = True
-        ' 
         ' Timer4
         ' 
         Timer4.Interval = 1000
@@ -181,7 +131,6 @@ Partial Class Translator
         ClientSize = New Size(1555, 1604)
         Controls.Add(Button1)
         Controls.Add(Label1)
-        Controls.Add(GroupBox1)
         Controls.Add(WebView)
         Controls.Add(XYLoc)
         Controls.Add(Algorithms)
@@ -193,8 +142,6 @@ Partial Class Translator
         Name = "Translator"
         Text = "Translate OpenCVB Algorithms using CodeConvert.AI"
         CType(WebView, ComponentModel.ISupportInitialize).EndInit()
-        GroupBox1.ResumeLayout(False)
-        GroupBox1.PerformLayout()
         ResumeLayout(False)
         PerformLayout()
 
@@ -207,10 +154,6 @@ Partial Class Translator
     Friend WithEvents Timer1 As Timer
     Friend WithEvents Timer2 As Timer
     Friend WithEvents Timer3 As Timer
-    Friend WithEvents GroupBox1 As GroupBox
-    Friend WithEvents CsharpToVB As RadioButton
-    Friend WithEvents CsharpToCPP As RadioButton
-    Friend WithEvents VBtoCSharp As RadioButton
     Friend WithEvents Timer4 As Timer
     Friend WithEvents Label1 As Label
     Friend WithEvents Button1 As Button
