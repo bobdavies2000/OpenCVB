@@ -77,11 +77,11 @@ Public Class VBtask : Implements IDisposable
     Public pythonTaskName As String
     Public pythonProcess As Process
     Public pythonReady As Boolean
+    Public pythonPipeIndex As Integer
 
     Public openGL_hwnd As IntPtr
     Public openGLPipe As NamedPipeServerStream
     Public pipeCount As Integer
-    Public pythonPipeIndex As Integer ' increment this for each algorithm to avoid any conflicts with other Python apps.
 
     Public gifCreator As Gif_OpenCVB
     Public gifImages As New List(Of Bitmap)
@@ -384,7 +384,7 @@ Public Class VBtask : Implements IDisposable
         OpenGL_Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
 
         buildColors()
-        pythonTaskName = HomeDir + "Python_Classes\" + algName
+        pythonTaskName = HomeDir + "Python\" + algName
 
         allOptions = New OptionsContainer
         allOptions.Show()

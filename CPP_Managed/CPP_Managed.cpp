@@ -33,24 +33,24 @@ using namespace VB_Classes;
 using namespace std;
 using namespace cv;
 
-int rows, cols; // working resolution for all Mat's
-public struct unmanagedTaskStructure
+public struct unmanagedData
 {
     Mat src, color, leftView, rightView, depthRGB, pointCloud;
+    int rows, cols; // working resolution for all Mat's
 };
 
-unmanagedTaskStructure task;
+unmanagedData task;
 
 public struct unManagedIO
 {
     Mat src, src2, dst0, dst1, dst2, dst3;
     unManagedIO()
     {
-        src = Mat(rows, cols, CV_8UC3);
-        dst0 = Mat(rows, cols, CV_8UC3);
-        dst1 = Mat(rows, cols, CV_8UC3);
-        dst2 = Mat(rows, cols, CV_8UC3);
-        dst3 = Mat(rows, cols, CV_8UC3);
+        src = Mat(task.rows, task.cols, CV_8UC3);
+        dst0 = Mat(task.rows, task.cols, CV_8UC3);
+        dst1 = Mat(task.rows, task.cols, CV_8UC3);
+        dst2 = Mat(task.rows, task.cols, CV_8UC3);
+        dst3 = Mat(task.rows, task.cols, CV_8UC3);
 
         dst0.setTo(0);
         dst1.setTo(0);
@@ -65,11 +65,11 @@ vector<unManagedIO*> ioList({});
 extern "C" __declspec(dllexport)
 int ManagedCPP_Resume(int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBPtr, int* cloudPtr)
 {
-    task.color = Mat(rows, cols, CV_8UC3, colorPtr).clone();
-    task.leftView = Mat(rows, cols, CV_8UC3, leftPtr).clone();
-    task.rightView = Mat(rows, cols, CV_8UC3, rightPtr).clone();
-    task.depthRGB = Mat(rows, cols, CV_8UC3, depthRGBPtr).clone();
-    task.pointCloud = Mat(rows, cols, CV_8UC3, cloudPtr).clone();
+    task.color = Mat(task.rows, task.cols, CV_8UC3, colorPtr).clone();
+    task.leftView = Mat(task.rows, task.cols, CV_8UC3, leftPtr).clone();
+    task.rightView = Mat(task.rows, task.cols, CV_8UC3, rightPtr).clone();
+    task.depthRGB = Mat(task.rows, task.cols, CV_8UC3, depthRGBPtr).clone();
+    task.pointCloud = Mat(task.rows, task.cols, CV_8UC3, cloudPtr).clone();
 
     //ioList[ioIndex]->src = task.color.clone();
     return (int)ioList.size() - 1;
@@ -105,12 +105,12 @@ namespace CPP_Managed {
 
         CPP_IntializeManaged(int _rows, int _cols)
         {
-            rows = _rows;
-            cols = _cols;
+            task.rows = _rows;
+            task.cols = _cols;
         }
     };
 
-
+     
      
 
     public ref class AddWeighted_Basics_CPP : public VB_Parent
@@ -160,7 +160,6 @@ namespace CPP_Managed {
 
     public ref class AddWeighted_LeftRight_CPP : public VB_Parent
     {
-        Options_AddWeighted options;
         AddWeighted_Basics_CPP^ addw = gcnew AddWeighted_Basics_CPP();
     public:
         size_t ioIndex;

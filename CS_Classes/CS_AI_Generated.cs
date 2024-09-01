@@ -50210,8 +50210,7 @@ namespace CS_Classes
         Python_MemMap memMap;
         public Python_Stream_CS()
         {
-            vbc.task.pipeName = "PyStream2Way" + vbc.task.pythonPipeIndex.ToString();
-            vbc.task.pythonPipeIndex++;
+            vbc.task.pipeName = "PyStream2Way";
             try
             {
                 vbc.task.pythonPipeOut = new NamedPipeServerStream(vbc.task.pipeName, PipeDirection.Out);
@@ -50225,7 +50224,7 @@ namespace CS_Classes
             // Was this class invoked standaloneTest()?  Then just run something that works with BGR and depth...
             if (vbc.task.pythonTaskName.EndsWith("Python_Stream_CS"))
             {
-                vbc.task.pythonTaskName = vbc.task.HomeDir + "Python_Classes/Python_Stream_CS_PS.py";
+                vbc.task.pythonTaskName = vbc.task.HomeDir + "Python/Python_Stream_CS_PS.py";
             }
             memMap = new Python_MemMap();
             if (vbc.task.externalPythonInvocation)

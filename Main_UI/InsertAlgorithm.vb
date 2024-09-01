@@ -118,7 +118,7 @@ Public Class InsertAlgorithm
         cppSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\CPP Class - new C++.snippet")
         cppAISnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\CPP Class - AI_Generated.snippet")
         CSSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\CSharp_Class - new Class.snippet")
-        pyStream = File.ReadAllLines(Main_UI.HomeDir.FullName + "Python_Classes\AddWeighted_PS.py")
+        pyStream = File.ReadAllLines(Main_UI.HomeDir.FullName + "Python\AddWeighted_PS.py")
     End Sub
     Private Sub AddCPP_Click(sender As Object, e As EventArgs) Handles AddCPP.Click
         If AlgorithmName.Text.EndsWith("_cpp") Then AlgorithmName.Text = AlgorithmName.Text.Substring(1, Len(AlgorithmName.Text) - 4) + "_CPP"

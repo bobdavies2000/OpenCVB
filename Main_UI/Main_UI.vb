@@ -815,7 +815,6 @@ Public Class Main_UI
         jsonWrite()
 
         cameraTaskHandle = Nothing
-        ' If TreeButton.Checked Then TreeViewDialog.Close()
 
         killPython()
 

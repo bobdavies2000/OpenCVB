@@ -48,26 +48,12 @@ End Class
 
 Public Class Python_Run : Inherits VB_Parent
     Dim python As New Python_Basics
-    Public pyStream As Python_Stream
+    Public pyStream As New Python_Stream
     Dim pythonApp As FileInfo
-    Dim testPyStreamOakD As Boolean = False ' set this to true to test the PyStream problem with the OakD Python camera
-    Public Sub OakDPipeIssue()
-        SetTrueText("Python Stream ('_PS.py') algorithms don't work reliably when using the Oak-D Python camera interface." + vbCrLf +
-                    "They both use named pipes to communicate between OpenCVB and the external processes (a camera and a Python algorithm.)" + vbCrLf +
-                    "To experiment with Python Stream algorithms, any of the other supported cameras work fine." + vbCrLf +
-                    "To see the problem: comment out the camera test in RunVB below to test any '_PS.py' algorithm.  It may work but" + vbCrLf +
-                    "if you move the algorithm window (separate from OpenCVB), the algorithm will hang.  More importantly," + vbCrLf +
-                    "several of the algorithms just hang without moving the window.  Any suggestions would be gratefully received." + vbCrLf +
-                    "Using another camera is the best option to observe all the Python Stream algorithms.")
-    End Sub
     Public Sub New()
         pythonApp = New FileInfo(task.pythonTaskName)
         If pythonApp.Name.EndsWith("_PS.py") Then
-            If testPyStreamOakD Then
-                pyStream = New Python_Stream()
-            Else
-                If task.cameraName <> "Oak-D camera" Then pyStream = New Python_Stream()
-            End If
+            pyStream = New Python_Stream()
         Else
             python.StartPython("")
             If python.strOut <> "" Then SetTrueText(python.strOut)
@@ -75,19 +61,15 @@ Public Class Python_Run : Inherits VB_Parent
         desc = "Run Python app: " + pythonApp.Name
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.cameraName = "Oak-D camera" And pythonApp.Name.EndsWith("_PS.py") And testPyStreamOakD = False Then
-            OakDPipeIssue()
+        If pyStream IsNot Nothing Then
+            pyStream.Run(src)
+            dst2 = pyStream.dst2
+            dst3 = pyStream.dst3
+            labels(2) = "Output of Python Backend"
+            labels(3) = "Second Output of Python Backend"
         Else
-            If pyStream IsNot Nothing Then
-                pyStream.Run(src)
-                dst2 = pyStream.dst2
-                dst3 = pyStream.dst3
-                labels(2) = "Output of Python Backend"
-                labels(3) = "Second Output of Python Backend"
-            Else
-                If pythonApp.Name = "PyStream.py" Then
-                    SetTrueText("The PyStream.py algorithm is used by a wide variety of apps but has no output when run by itself.")
-                End If
+            If pythonApp.Name = "PyStream.py" Then
+                SetTrueText("The PyStream.py algorithm is used by a wide variety of apps but has no output when run by itself.")
             End If
         End If
     End Sub
@@ -163,7 +145,7 @@ Public Class Python_Stream : Inherits VB_Parent
 
         ' Was this class invoked standaloneTest()?  Then just run something that works with BGR and depth...
         If task.pythonTaskName.EndsWith("Python_Stream") Then
-            task.pythonTaskName = task.HomeDir + "Python_Classes/Python_Stream_PS.py"
+            task.pythonTaskName = task.HomeDir + "Python/Python_Stream_PS.py"
         End If
 
         memMap = New Python_MemMap()

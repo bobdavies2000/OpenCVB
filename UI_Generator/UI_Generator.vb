@@ -200,7 +200,7 @@ Module UI_Generator
             sw.WriteLine("End Class")
             sw.Close()
         Catch ex As Exception
-            MsgBox("UI_Generator failed writing the C# and VB.Net algorithm lists.  Error is " + vbCrLf + ex.Message)
+            Console.WriteLine("UI_Generator failed writing the C# and VB.Net algorithm lists.  Error is " + vbCrLf + ex.Message)
         End Try
         Console.WriteLine("AlgorithmList.vb prepared." + vbCrLf + "Now preparing the sorted algorithm cross reference.")
 
@@ -355,7 +355,7 @@ Module UI_Generator
             Next
             sw.Close()
         Catch ex As Exception
-            MsgBox("UI_Generator failed writing the algorithm groups.  Error is " + vbCrLf + ex.Message)
+            Console.WriteLine("UI_Generator failed writing the algorithm groups.  Error is " + vbCrLf + ex.Message)
         End Try
         Console.WriteLine("Algorithm Group Names prepared.")
     End Sub
