@@ -119,9 +119,9 @@ End Class
 
 Module managedCPP_Interface
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function ManagedCPP_Resume(ioIndex As Integer, colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
-                                depthRGBPtr As IntPtr, cloud As IntPtr) As Integer
-    End Function
+    Public Sub ManagedCPP_Resume(ioIndex As Integer, colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
+                                depthRGBPtr As IntPtr, cloud As IntPtr)
+    End Sub
 
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function ManagedCPP_Pause(ioIndex As Integer) As IntPtr
@@ -134,7 +134,7 @@ End Module
 
 
 
-Public Class CPP_ManagedResume : Inherits VB_Parent
+Public Class CPP_ManagedTask : Inherits VB_Parent
     Dim hColor As GCHandle
     Dim hLeft As GCHandle
     Dim hRight As GCHandle
@@ -164,8 +164,8 @@ Public Class CPP_ManagedResume : Inherits VB_Parent
         hDepthRGB = GCHandle.Alloc(depthRGBData, GCHandleType.Pinned)
         hCloud = GCHandle.Alloc(cloudData, GCHandleType.Pinned)
 
-        ioIndex = ManagedCPP_Resume(ioIndex, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
-                                    hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject())
+        ManagedCPP_Resume(ioIndex, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
+                          hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject())
 
         hColor.Free()
         hLeft.Free()
@@ -182,6 +182,5 @@ Public Class CPP_ManagedResume : Inherits VB_Parent
         task.dst1 = cvb.Mat.FromPixelData(task.dst1.Rows, task.dst1.Cols, cvb.MatType.CV_8UC3, pointers(1)).Clone
         task.dst2 = cvb.Mat.FromPixelData(task.dst2.Rows, task.dst2.Cols, cvb.MatType.CV_8UC3, pointers(2)).Clone
         task.dst3 = cvb.Mat.FromPixelData(task.dst3.Rows, task.dst3.Cols, cvb.MatType.CV_8UC3, pointers(3)).Clone
-
     End Sub
 End Class

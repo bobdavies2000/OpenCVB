@@ -92,6 +92,7 @@ Public Class TreeviewForm
         Next
 
         For Each sn In Main_UI.callTrace
+            If sn = "" Then Exit For
             Dim split() = sn.Split("\")
             treeData.Add(split(split.Length - 2))
         Next

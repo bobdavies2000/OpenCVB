@@ -58,13 +58,13 @@ namespace CPP_Managed {
         }
     };
 
-    vector<unManagedIO*> ioList;
+    vector<unManagedIO*> ioList({});
 
     extern "C" __declspec(dllexport)
-    int ManagedCPP_Initialize(int rows, int cols)
+    size_t ManagedCPP_Initialize(int rows, int cols)
     {
         unManagedIO *io = new unManagedIO(rows, cols);
-        int ioIndex = ioList.size();
+        size_t ioIndex = ioList.size();
         ioList.push_back(io);
         return ioIndex;
     }
@@ -102,9 +102,10 @@ namespace CPP_Managed {
     // everything is managed C++ from here.  Anything above is unmanaged.
     public ref class AddWeighted_Basics_CPP : public VB_Parent
     {
-        Options_AddWeighted options;
+        Options_AddWeighted^ options = gcnew Options_AddWeighted();
     public:
-        int ioIndex;
+        size_t ioIndex;
+        unManagedIO* io;
         double weight;
         AddWeighted_Basics_CPP()
         {
@@ -113,10 +114,10 @@ namespace CPP_Managed {
             desc = "Add 2 images with specified weights.";
         }
 
-        void RunAlg(int ioIndex)
+        void RunAlg()
         {
-            unManagedIO* io = ioList[ioIndex];
-            options.RunOpt();
+            io = ioList[ioIndex];
+            options->RunOpt();
 
             // algorithm user normally provides src2! 
             Mat src2, srcPlus;
@@ -132,7 +133,7 @@ namespace CPP_Managed {
                 }
             }
 
-            weight = options.addWeighted;
+            weight = options->addWeighted;
             addWeighted(io->src, weight, srcPlus, 1.0 - weight, 0, io->dst2);
             io->dst3 = task.depthRGB;
 
@@ -143,23 +144,26 @@ namespace CPP_Managed {
 
 
 
-    // everything is managed C++ from here.  Anything above is unmanaged.
-    //public ref class AddWeighted_Basics1_CPP : public VB_Parent
-    //{
-    //    Options_AddWeighted options;
-    //    AddWeighted_Basics_CPP addw = new AddWeighted_Edges();
-    //public:
-    //    AddWeighted_Basics1_CPP()
-    //    {
-    //        desc = "Test calling another C++/CLR algorithm from a C++/CLR algorithm.";
-    //    }
+    public ref class AddWeighted_Basics1_CPP : public VB_Parent
+    {
+        size_t ioIndex;
+        Options_AddWeighted options;
+        AddWeighted_Basics_CPP^ addw = gcnew AddWeighted_Basics_CPP();
+    public:
+        AddWeighted_Basics1_CPP()
+        {
+            ioIndex = ioList.size();
+            desc = "Test calling another C++/CLR algorithm from a C++/CLR algorithm.";
+        }
 
-    //    void RunAlg(int ioIndex)
-    //    {
-    //        unManagedIO* io = ioList[ioIndex];
-    //        addw.RunAlg(addw)
-    //    }
-    //};
+        void RunAlg()
+        {
+            unManagedIO* io = ioList[ioIndex];
+            addw->RunAlg();
+            io->dst2 = addw->io->dst2;
+            io->dst3 = addw->io->dst3;
+        }
+    };
 
 
 }

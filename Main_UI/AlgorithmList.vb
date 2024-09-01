@@ -89,6 +89,7 @@ End Enum
 	If algorithmName = "AddWeighted_Basics_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_Basics_CC)
 	If algorithmName = "AddWeighted_Basics_CPP" Then return new AddWeighted_Basics_CPP
 	If algorithmName = "AddWeighted_Basics_CS" Then return new AddWeighted_Basics_CS
+	If algorithmName = "AddWeighted_Basics1_CPP" Then return new AddWeighted_Basics1_CPP
 	If algorithmName = "AddWeighted_DepthAccumulate" Then return new AddWeighted_DepthAccumulate
 	If algorithmName = "AddWeighted_DepthAccumulate_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_DepthAccumulate_CC)
 	If algorithmName = "AddWeighted_DepthAccumulate_CS" Then return new AddWeighted_DepthAccumulate_CS
@@ -599,7 +600,7 @@ End Enum
 	If algorithmName = "Covariance_Images_CS" Then return new Covariance_Images_CS
 	If algorithmName = "Covariance_Test" Then return new Covariance_Test
 	If algorithmName = "Covariance_Test_CS" Then return new Covariance_Test_CS
-	If algorithmName = "CPP_ManagedResume" Then return new CPP_ManagedResume
+	If algorithmName = "CPP_ManagedTask" Then return new CPP_ManagedTask
 	If algorithmName = "Crypto_Hash" Then return new Crypto_Hash
 	If algorithmName = "Crypto_Hash_CS" Then return new Crypto_Hash_CS
 	If algorithmName = "CSV_Basics" Then return new CSV_Basics
