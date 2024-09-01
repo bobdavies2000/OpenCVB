@@ -16,6 +16,9 @@ Module UI_Generator
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
         Dim HomeDir = New DirectoryInfo(exeDir.FullName + "/../../../../")
 
+        Dim xRefFile = New FileInfo(HomeDir.FullName + "Data/XRef.txt")
+        If xRefFile.Exists = False Then fullXRef = True
+
         Dim CCInput = New FileInfo(HomeDir.FullName + "CPP_Native/CPP_NativeClasses.h")
         If CCInput.Exists = False Then
             Console.WriteLine("The UI_Generator code needs to be reviewed." + vbCrLf + "Either UI_Generator has moved Or projects reference have." + vbCrLf +
@@ -212,7 +215,7 @@ Module UI_Generator
         Catch ex As Exception
             MsgBox("UI_Generator failed writing the C# and VB.Net algorithm lists.  Error is " + vbCrLf + ex.Message)
         End Try
-        Console.WriteLine("AlgorithmList.vb prepared." + vbCrLf + "Now preparing the sorted cross reference.")
+        Console.WriteLine("AlgorithmList.vb prepared." + vbCrLf + "Now preparing the sorted algorithm cross reference.")
 
 
 
@@ -286,7 +289,7 @@ Module UI_Generator
                     refCounts.Add("(" + CStr(tokenSort.Keys.Count) + ") ")
                 Next
 
-                Dim xRefsw As New StreamWriter(HomeDir.FullName + "Data/XRef.txt")
+                Dim xRefsw As New StreamWriter(xRefFile.FullName)
                 For i = 0 To sortedXRefs.Count - 1
                     xRefsw.WriteLine(refCounts(i) + sortedXRefs(i))
                 Next
@@ -294,7 +297,7 @@ Module UI_Generator
 
                 Console.WriteLine("Algorithm references prepared.")
             Else
-                Dim xreflines = File.ReadAllLines(HomeDir.FullName + "Data/XRef.txt")
+                Dim xreflines = File.ReadAllLines(xRefFile.FullName)
                 For i = 0 To xreflines.Count - 1
                     sortedXRefs.Add(xreflines(i))
                 Next

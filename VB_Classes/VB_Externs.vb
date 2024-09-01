@@ -109,8 +109,6 @@ Module VB_Externs
 
 
 
-
-
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function cppTask_Open(cppFunction As Integer, rows As Integer, cols As Integer,
                              heartBeat As Boolean, addWeighted As Single, lineWidth As Integer,

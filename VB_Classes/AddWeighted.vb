@@ -121,3 +121,19 @@ Public Class AddWeighted_Edges1 : Inherits VB_Parent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class AddWeighted_LeftRight : Inherits VB_Parent
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        desc = "Use AddWeighted to add the left and right images."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        addw.src2 = task.rightView
+        addw.Run(task.leftView)
+        dst2 = addw.dst2
+    End Sub
+End Class

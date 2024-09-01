@@ -1425,7 +1425,11 @@ Public Class Main_UI
             drawRect = New cvb.Rect
             Dim task = New VBtask(parms)
 
+            ' make sure unmanaged portion of the CPP_Managed library is initialized with critical data before the first C++/CLR algorithm.
+            Dim setup = New CPP_Managed.CPP_IntializeManaged(settings.WorkingRes.Height, settings.WorkingRes.Width)
+
             task.algorithmObject = algolist.createAlgorithm(parms.algName)
+
             textDesc = task.algorithmObject.desc
 
             intermediateReview = ""

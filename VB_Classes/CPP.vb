@@ -119,18 +119,16 @@ End Class
 
 Module managedCPP_Interface
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ManagedCPP_Resume(ioIndex As Integer, colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
-                                depthRGBPtr As IntPtr, cloud As IntPtr)
-    End Sub
+    Public Function ManagedCPP_Resume(colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
+                                depthRGBPtr As IntPtr, cloud As IntPtr) As Integer
+    End Function
 
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function ManagedCPP_Pause(ioIndex As Integer) As IntPtr
     End Function
-
-    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function ManagedCPP_Initialize(rows As Integer, cols As Integer) As Integer
-    End Function
 End Module
+
+
 
 
 
@@ -140,10 +138,9 @@ Public Class CPP_ManagedTask : Inherits VB_Parent
     Dim hRight As GCHandle
     Dim hDepthRGB As GCHandle
     Dim hCloud As GCHandle
-    Public ioIndex As Integer
+    Dim ioIndex As Integer
     Public Sub New()
-        ioIndex = ManagedCPP_Initialize(dst2.Rows, dst2.Cols)
-        desc = "Move data to the Managed C++/CLR code (CPP_Managed)"
+        desc = "Move data to the Managed C++/CLR code (CPP_Managed), run it, and retrieve the results."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim colorData(task.color.Total * task.color.ElemSize - 1) As Byte
@@ -164,8 +161,8 @@ Public Class CPP_ManagedTask : Inherits VB_Parent
         hDepthRGB = GCHandle.Alloc(depthRGBData, GCHandleType.Pinned)
         hCloud = GCHandle.Alloc(cloudData, GCHandleType.Pinned)
 
-        ManagedCPP_Resume(ioIndex, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
-                          hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject())
+        ioIndex = ManagedCPP_Resume(hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
+                                    hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject())
 
         hColor.Free()
         hLeft.Free()

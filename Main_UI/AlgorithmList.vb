@@ -89,7 +89,6 @@ End Enum
 	If algorithmName = "AddWeighted_Basics_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_Basics_CC)
 	If algorithmName = "AddWeighted_Basics_CPP" Then return new AddWeighted_Basics_CPP
 	If algorithmName = "AddWeighted_Basics_CS" Then return new AddWeighted_Basics_CS
-	If algorithmName = "AddWeighted_Basics1_CPP" Then return new AddWeighted_Basics1_CPP
 	If algorithmName = "AddWeighted_DepthAccumulate" Then return new AddWeighted_DepthAccumulate
 	If algorithmName = "AddWeighted_DepthAccumulate_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_DepthAccumulate_CC)
 	If algorithmName = "AddWeighted_DepthAccumulate_CS" Then return new AddWeighted_DepthAccumulate_CS
@@ -98,6 +97,8 @@ End Enum
 	If algorithmName = "AddWeighted_Edges1" Then return new AddWeighted_Edges1
 	If algorithmName = "AddWeighted_InfraRed" Then return new AddWeighted_InfraRed
 	If algorithmName = "AddWeighted_InfraRed_CS" Then return new AddWeighted_InfraRed_CS
+	If algorithmName = "AddWeighted_LeftRight" Then return new AddWeighted_LeftRight
+	If algorithmName = "AddWeighted_LeftRight_CPP" Then return new AddWeighted_LeftRight_CPP
 	If algorithmName = "AlphaChannel_Basics" Then return new AlphaChannel_Basics
 	If algorithmName = "AlphaChannel_Basics_CS" Then return new AlphaChannel_Basics_CS
 	If algorithmName = "Annealing_Basics_CPP_CS" Then return new Annealing_Basics_CPP_CS
