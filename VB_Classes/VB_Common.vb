@@ -3,14 +3,6 @@ Imports System.Drawing
 Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
 Public Module vbc
-    <StructLayout(LayoutKind.Sequential)>
-    Public Class taskInfo
-        Public optionsChanged As Boolean ' global or local options changed.
-        Public rows As Integer
-        Public cols As Integer
-    End Class
-
-
     Public task As VBtask
     Public tInfo As New taskInfo
     Public allOptions As OptionsContainer

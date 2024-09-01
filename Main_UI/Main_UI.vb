@@ -1425,7 +1425,7 @@ Public Class Main_UI
             Dim task = New VBtask(parms)
 
             ' make sure unmanaged portion of the CPP_Managed library is initialized with critical data before the first C++/CLR algorithm.
-            Dim setup = New CPP_Managed.CPP_IntializeManaged(settings.WorkingRes.Height, settings.WorkingRes.Width)
+            Dim setup = New CPP_Managed.CPP_IntializeManaged()
 
             task.algorithmObject = algolist.createAlgorithm(parms.algName)
 

@@ -91,6 +91,7 @@ End Enum
 	If algorithmName = "AddWeighted_Basics_CS" Then return new AddWeighted_Basics_CS
 	If algorithmName = "AddWeighted_DepthAccumulate" Then return new AddWeighted_DepthAccumulate
 	If algorithmName = "AddWeighted_DepthAccumulate_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_DepthAccumulate_CC)
+	If algorithmName = "AddWeighted_DepthAccumulate_CPP" Then return new AddWeighted_DepthAccumulate_CPP
 	If algorithmName = "AddWeighted_DepthAccumulate_CS" Then return new AddWeighted_DepthAccumulate_CS
 	If algorithmName = "AddWeighted_Edges" Then return new AddWeighted_Edges
 	If algorithmName = "AddWeighted_Edges_CS" Then return new AddWeighted_Edges_CS

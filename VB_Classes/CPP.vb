@@ -126,6 +126,11 @@ Module managedCPP_Interface
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function ManagedCPP_Pause(ioIndex As Integer) As IntPtr
     End Function
+
+
+    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function ManagedCPP_Formats(ioIndex As Integer) As IntPtr
+    End Function
 End Module
 
 
@@ -175,9 +180,14 @@ Public Class CPP_ManagedTask : Inherits VB_Parent
         Dim pointers(3) As IntPtr
         Marshal.Copy(ptr, pointers, 0, 4)
 
-        task.dst0 = cvb.Mat.FromPixelData(task.dst0.Rows, task.dst0.Cols, cvb.MatType.CV_8UC3, pointers(0)).Clone
-        task.dst1 = cvb.Mat.FromPixelData(task.dst1.Rows, task.dst1.Cols, cvb.MatType.CV_8UC3, pointers(1)).Clone
-        task.dst2 = cvb.Mat.FromPixelData(task.dst2.Rows, task.dst2.Cols, cvb.MatType.CV_8UC3, pointers(2)).Clone
-        task.dst3 = cvb.Mat.FromPixelData(task.dst3.Rows, task.dst3.Cols, cvb.MatType.CV_8UC3, pointers(3)).Clone
+        ptr = ManagedCPP_Formats(ioIndex)
+        Dim formats(3) As Integer
+        Marshal.Copy(ptr, formats, 0, formats.Length)
+        dst2.Type()
+
+        task.dst0 = cvb.Mat.FromPixelData(task.dst0.Rows, task.dst0.Cols, New cvb.MatType(formats(0)), pointers(0)).Clone
+        task.dst1 = cvb.Mat.FromPixelData(task.dst1.Rows, task.dst1.Cols, New cvb.MatType(formats(1)), pointers(1)).Clone
+        task.dst2 = cvb.Mat.FromPixelData(task.dst2.Rows, task.dst2.Cols, New cvb.MatType(formats(2)), pointers(2)).Clone
+        task.dst3 = cvb.Mat.FromPixelData(task.dst3.Rows, task.dst3.Cols, New cvb.MatType(formats(3)), pointers(3)).Clone
     End Sub
 End Class

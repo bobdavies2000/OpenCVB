@@ -6,6 +6,16 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 
 <StructLayout(LayoutKind.Sequential)>
+Public Class taskInfo
+    Public optionsChanged As Boolean ' global or local options changed.
+    Public rows As Integer
+    Public cols As Integer
+    Public Sub New()
+        optionsChanged = True
+    End Sub
+End Class
+
+<StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     Public TaskTimer As New System.Timers.Timer(1000)
 
@@ -346,9 +356,7 @@ Public Class VBtask : Implements IDisposable
         End If
     End Sub
     Public Sub New()
-
     End Sub
-
     Public Sub New(parms As algParms)
         AddHandler TaskTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf VBTaskTimerPop)
         TaskTimer.AutoReset = True
@@ -378,6 +386,8 @@ Public Class VBtask : Implements IDisposable
         task.dst1 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
         task.dst2 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
         task.dst3 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        tInfo.rows = task.dst2.Rows
+        tInfo.cols = task.dst2.Cols
 
         OpenGL_Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
         OpenGL_Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
