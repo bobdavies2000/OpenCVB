@@ -119,12 +119,16 @@ End Class
 
 Module managedCPP_Interface
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ManagedCPP_Resume(rows As Integer, cols As Integer, colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
-                                depthRGBPtr As IntPtr, cloud As IntPtr)
-    End Sub
+    Public Function ManagedCPP_Resume(ioIndex As Integer, colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
+                                depthRGBPtr As IntPtr, cloud As IntPtr) As Integer
+    End Function
 
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function ManagedCPP_Pause() As IntPtr
+    Public Function ManagedCPP_Pause(ioIndex As Integer) As IntPtr
+    End Function
+
+    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function ManagedCPP_Initialize(rows As Integer, cols As Integer) As Integer
     End Function
 End Module
 
@@ -136,7 +140,9 @@ Public Class CPP_ManagedResume : Inherits VB_Parent
     Dim hRight As GCHandle
     Dim hDepthRGB As GCHandle
     Dim hCloud As GCHandle
+    Public ioIndex As Integer
     Public Sub New()
+        ioIndex = ManagedCPP_Initialize(dst2.Rows, dst2.Cols)
         desc = "Move data to the Managed C++/CLR code (CPP_Managed)"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -158,8 +164,8 @@ Public Class CPP_ManagedResume : Inherits VB_Parent
         hDepthRGB = GCHandle.Alloc(depthRGBData, GCHandleType.Pinned)
         hCloud = GCHandle.Alloc(cloudData, GCHandleType.Pinned)
 
-        ManagedCPP_Resume(src.Rows, src.Cols, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
-                          hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject())
+        ioIndex = ManagedCPP_Resume(ioIndex, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
+                                    hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject())
 
         hColor.Free()
         hLeft.Free()
@@ -168,7 +174,7 @@ Public Class CPP_ManagedResume : Inherits VB_Parent
         hCloud.Free()
     End Sub
     Public Sub Pause()
-        Dim ptr As IntPtr = ManagedCPP_Pause()
+        Dim ptr As IntPtr = ManagedCPP_Pause(ioIndex)
         Dim pointers(3) As IntPtr
         Marshal.Copy(ptr, pointers, 0, 4)
 

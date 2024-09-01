@@ -714,7 +714,7 @@ Public Class VB_Parent : Implements IDisposable
             If algorithm.traceName.EndsWith("_CPP") Then
                 Static nativeCPP As New CPP_ManagedResume()
                 nativeCPP.RunAlg(src)
-                algorithm.RunAlg()
+                algorithm.RunAlg(nativeCPP.ioIndex)
                 nativeCPP.Pause()
             Else
                 algorithm.RunAlg(src)
