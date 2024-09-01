@@ -27,7 +27,7 @@ Public Class HistPeak2D_Basics : Inherits VB_Parent
         delaunay.dst1.ConvertTo(histogram, cvb.MatType.CV_32F)
         histogram.SetTo(0, Not mask)
 
-        If ranges Is Nothing Or task.optionsChanged Then
+        If ranges Is Nothing Or tInfo.optionsChanged Then
             ranges = GetHist2Dminmax(src, task.redOptions.channels(0), task.redOptions.channels(1))
         End If
 

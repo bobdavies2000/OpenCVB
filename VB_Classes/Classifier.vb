@@ -11,7 +11,7 @@ Public Class Classifier_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.optionsChanged Then task.gOptions.debugChecked = True
+        If tInfo.optionsChanged Then task.gOptions.debugChecked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
 If(task.gOptions.debugChecked, 1, 0))
         task.gOptions.debugChecked = False
@@ -90,7 +90,7 @@ Public Class Classifier_Bayesian : Inherits VB_Parent
         Else
             sampleCount = src.Rows
         End If
-        If task.optionsChanged Then task.gOptions.debugChecked = True
+        If tInfo.optionsChanged Then task.gOptions.debugChecked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, sampleCount, methodIndex, dst2.Rows, dst2.Cols,
 If(task.gOptions.debugChecked, 1, 0))
         task.gOptions.debugChecked = False

@@ -30,7 +30,7 @@ Public Class OpAuto_XRange : Inherits VB_Parent
                  "xRange = " + vbTab + Format(task.xRange, fmt3)
 
         If task.useXYRange Then
-            Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
+            Dim saveOptionState = tInfo.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
             Dim leftGap = histogram.Col(0).CountNonZero
             Dim rightGap = histogram.Col(histogram.Width - 1).CountNonZero
             If leftGap = 0 And rightGap = 0 And task.redOptions.XRangeBar.Value > 3 Then
@@ -38,7 +38,7 @@ Public Class OpAuto_XRange : Inherits VB_Parent
             Else
                 If adjustedCount < expectedCount Then task.redOptions.XRangeBar.Value += 1 Else task.redOptions.XRangeBar.Value -= 1
             End If
-            task.optionsChanged = saveOptionState
+            tInfo.optionsChanged = saveOptionState
         End If
 
         SetTrueText(strOut, 3)
@@ -79,7 +79,7 @@ Public Class OpAuto_YRange : Inherits VB_Parent
                  "yRange = " + vbTab + Format(task.yRange, fmt3)
 
         If task.useXYRange Then
-            Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
+            Dim saveOptionState = tInfo.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
             Dim topGap = histogram.Row(0).CountNonZero
             Dim botGap = histogram.Row(histogram.Height - 1).CountNonZero
             If topGap = 0 And botGap = 0 And task.redOptions.YRangeSlider.Value > 3 Then
@@ -87,7 +87,7 @@ Public Class OpAuto_YRange : Inherits VB_Parent
             Else
                 If adjustedCount < expectedCount Then task.redOptions.YRangeSlider.Value += 1 Else task.redOptions.YRangeSlider.Value -= 1
             End If
-            task.optionsChanged = saveOptionState
+            tInfo.optionsChanged = saveOptionState
         End If
         SetTrueText(strOut, 3)
     End Sub

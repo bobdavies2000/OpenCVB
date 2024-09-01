@@ -24,7 +24,7 @@ Public Class SVM_Basics : Inherits VB_Parent
         Dim resMat = cvb.Mat.FromPixelData(options.sampleCount, 1, cvb.MatType.CV_32SC1, response.ToArray)
         dataMat *= 1 / src.Height
 
-        If task.optionsChanged Then svm = options.createSVM()
+        If tInfo.optionsChanged Then svm = options.createSVM()
         svm.Train(dataMat, cvb.ML.SampleTypes.RowSample, resMat)
 
         dst3.SetTo(0)
@@ -124,7 +124,7 @@ Public Class SVM_TestCase : Inherits VB_Parent
         Dim labelsMat = cvb.Mat.FromPixelData(4, 1, cvb.MatType.CV_32SC1, responses.ToArray)
         Dim dataMat = trainMat * 1 / src.Height
 
-        If task.optionsChanged Then svm = options.createSVM()
+        If tInfo.optionsChanged Then svm = options.createSVM()
         svm.Train(dataMat, cvb.ML.SampleTypes.RowSample, labelsMat)
 
         Dim sampleMat As New cvb.Mat(1, 2, cvb.MatType.CV_32F)

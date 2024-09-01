@@ -53,7 +53,7 @@ Public Class OptionsSliders
         Dim outStr = myLabels(sender.tag).Text
         Dim split = outStr.Split("=")
         myLabels(sender.tag).Text = split(0) + "= " + CStr(mytrackbars(sender.tag).Value)
-        task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = defaultWidth

@@ -178,7 +178,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim vert_Border = borderCrop * src.Rows / src.Cols
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             errScale = New cvb.Mat(New cvb.Size(1, 5), cvb.MatType.CV_64F, 1)
             qScale = New cvb.Mat(New cvb.Size(1, 5), cvb.MatType.CV_64F, 0.004)
             rScale = New cvb.Mat(New cvb.Size(1, 5), cvb.MatType.CV_64F, 0.5)
@@ -345,7 +345,7 @@ Public Class Stabilizer_CornerPoints : Inherits VB_Parent
         Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             Dim size = task.gridSize
             ul = New cvb.Rect(0, 0, size, size)
             ur = New cvb.Rect(dst2.Width - size, 0, size, size)

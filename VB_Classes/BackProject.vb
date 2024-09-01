@@ -623,7 +623,7 @@ Public Class BackProject_MeterByMeter : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.histogramBins < task.MaxZmeters Then task.gOptions.setHistogramBins(task.MaxZmeters + 1)
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             Dim incr = task.MaxZmeters / task.histogramBins
             Dim histData As New List(Of Single)
             For i = 0 To task.histogramBins - 1

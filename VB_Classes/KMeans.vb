@@ -15,7 +15,7 @@ Public Class KMeans_Basics : Inherits VB_Parent
         options.RunOpt()
         classCount = options.kMeansK
         Static lastK = classCount
-        If task.optionsChanged Or lastK <> classCount Then
+        If tInfo.optionsChanged Or lastK <> classCount Then
             options.kMeansFlag = cvb.KMeansFlags.PpCenters
             saveLabels = New cvb.Mat
         End If

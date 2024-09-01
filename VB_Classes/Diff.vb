@@ -10,7 +10,7 @@ Public Class Diff_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         If task.FirstPass Or lastFrame Is Nothing Then lastFrame = src.Clone
-        If task.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
+        If tInfo.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
 
         cvb.Cv2.Absdiff(src, lastFrame, dst0)
         dst2 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
@@ -86,7 +86,7 @@ Public Class Diff_RGBAccum : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         diff.Run(src)
-        If task.optionsChanged Then history.Clear()
+        If tInfo.optionsChanged Then history.Clear()
         history.Add(diff.dst2)
         If history.Count > task.frameHistoryCount Then history.RemoveAt(0)
 
@@ -162,7 +162,7 @@ Public Class Diff_Depth32f : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.optionsChanged Or lastDepth32f.Width = 0 Then lastDepth32f = task.pcSplit(2).Clone
+        If tInfo.optionsChanged Or lastDepth32f.Width = 0 Then lastDepth32f = task.pcSplit(2).Clone
 
         cvb.Cv2.Absdiff(task.pcSplit(2), lastDepth32f, dst1)
         Dim mm As mmData = GetMinMax(dst1)

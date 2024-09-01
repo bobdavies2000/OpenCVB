@@ -211,7 +211,7 @@ namespace CPP_Managed {
     //    {
     //        io = ioList[ioIndex];
     //        options->RunOpt();
-    //        if (task.optionsChanged)
+    //        if (tInfo.optionsChanged)
     //        {
     //            dst2 = task.pcSplit[2] * 1000;
     //        }

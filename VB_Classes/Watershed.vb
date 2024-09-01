@@ -11,7 +11,7 @@ Public Class Watershed_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
 
-        If (standaloneTest() Or UseCorners) And task.optionsChanged Then
+        If (standaloneTest() Or UseCorners) And tInfo.optionsChanged Then
             For i = 0 To 4 - 1
                 Dim r As New cvb.Rect(0, 0, src.Width / 10, src.Height / 10)
                 Select Case i

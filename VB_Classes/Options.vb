@@ -683,7 +683,7 @@ Public Class Options_WarpModel : Inherits VB_Parent
         Static gradientCheck = FindCheckBox("Use Gradient in WarpInput")
         Static frm = FindFrm(traceName + " Radio Buttons")
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             options2.RunOpt()
             warpMode = options2.warpMode
             useWarpAffine = options2.useWarpAffine
@@ -1018,7 +1018,7 @@ Public Class Options_ProCon : Inherits VB_Parent
         Static sizeSlider = FindSlider("Buffer Size")
         Static proSlider = FindSlider("Producer Workload Duration (ms)")
         Static conSlider = FindSlider("Consumer Workload Duration (ms)")
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             bufferSize = sizeSlider.Value
             pduration = proSlider.Value
             cduration = conSlider.Value
@@ -2753,7 +2753,7 @@ Public Class Options_KMeans : Inherits VB_Parent
             Case "Use RandomCenters"
                 kMeansFlag = cvb.KMeansFlags.RandomCenters
             Case "Use Initialized Labels"
-                If task.optionsChanged Then kMeansFlag = cvb.KMeansFlags.PpCenters Else kMeansFlag = cvb.KMeansFlags.UseInitialLabels
+                If tInfo.optionsChanged Then kMeansFlag = cvb.KMeansFlags.PpCenters Else kMeansFlag = cvb.KMeansFlags.UseInitialLabels
         End Select
         kMeansK = kSlider.Value
     End Sub
@@ -2926,7 +2926,7 @@ Public Class Options_Gif : Inherits VB_Parent
         buildCheck.Checked = False
         restartCheck.Checked = False
 
-        task.optionsChanged = False
+        tInfo.optionsChanged = False
     End Sub
 End Class
 
@@ -4399,7 +4399,7 @@ Public Class Options_BlurTopo : Inherits VB_Parent
         Static frameSlider = FindSlider("Frame Count Cycle")
         Static percentSlider = FindSlider("Percent of Blurring")
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             savePercent = percentSlider.Value
             nextPercent = savePercent
         End If
@@ -5640,7 +5640,7 @@ Public Class Options_Features : Inherits VB_Parent
         resyncThreshold = resyncSlider.value / 100
         agastThreshold = agastslider.value
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             quality = qualitySlider.Value / 100
             minDistance = distSlider.Value
         End If
@@ -7540,7 +7540,7 @@ Public Class Options_Video : Inherits VB_Parent
         fileNameForm.filename.Text = fileInfo.FullName
     End Sub
     Public Sub RunOpt()
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             maxFrames = 1000
             currFrame = 0
             If fileNameForm.newFileName Then fileInfo = New FileInfo(fileNameForm.filename.Text)

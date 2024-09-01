@@ -15,7 +15,7 @@ Public Class MeanShift_Basics : Inherits VB_Parent
         Dim ch() As Integer = {0, 1, 2}
         Dim hsize() As Integer = {16, 16, 16}
         Dim ranges() = New cvb.Rangef() {New cvb.Rangef(0, 180)}
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             trackbox = task.drawRect
             Dim maskROI = hsv(roi).InRange(New cvb.Scalar(0, 60, 32), New cvb.Scalar(180, 255, 255))
             cvb.Cv2.CalcHist({hsv(roi)}, ch, maskROI, histogram, 1, hsize, ranges)

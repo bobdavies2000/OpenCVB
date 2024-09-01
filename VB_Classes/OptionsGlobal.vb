@@ -173,7 +173,7 @@ Public Class OptionsGlobal
         Me.Top = 30
     End Sub
     Private Sub LineType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LineType.SelectedIndexChanged
-        task.optionsChanged = True
+        tInfo.optionsChanged = True
         Select Case LineType.Text
             Case "AntiAlias"
                 task.lineType = cvb.LineTypes.AntiAlias
@@ -185,76 +185,72 @@ Public Class OptionsGlobal
     End Sub
     Private Sub LineWidth_Scroll(sender As Object, e As EventArgs) Handles LineWidth.Scroll
         LineThicknessAmount.Text = CStr(LineWidth.Value)
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub LineWidth_ValueChanged(sender As Object, e As EventArgs) Handles LineWidth.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
         LineThicknessAmount.Text = CStr(LineWidth.Value)
     End Sub
     Private Sub DotSizeSlider_Scroll(sender As Object, e As EventArgs) Handles DotSizeSlider.Scroll
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs) Handles UseKalman.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub UseMultiThreading_CheckedChanged(sender As Object, e As EventArgs) Handles UseMultiThreading.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub displayDst0_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst0.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub displayDst1_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst1.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepthBar.ValueChanged
         maxCount.Text = CStr(MaxDepthBar.Value)
         maxDepth = MaxDepthBar.Value
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub GridSlider_Scroll(sender As Object, e As EventArgs) Handles GridSlider.Scroll
-        If task IsNot Nothing Then
-            task.optionsChanged = True
-            task.gridSize = GridSlider.Value
-        End If
+        tInfo.optionsChanged = True
+        task.gridSize = GridSlider.Value
         ThreadGridSize.Text = CStr(GridSlider.Value)
     End Sub
     Private Sub GridSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSlider.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
         ThreadGridSize.Text = CStr(GridSlider.Value)
     End Sub
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
         labelBinsCount.Text = CStr(HistBinBar.Value)
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
-        If task IsNot Nothing Then
-            task.optionsChanged = True
-            task.useGravityPointcloud = gravityPointCloud.Checked
-        End If
+        tInfo.optionsChanged = True
+        task.useGravityPointcloud = gravityPointCloud.Checked
     End Sub
     Private Sub PixelDiffThreshold_ValueChanged(sender As Object, e As EventArgs) Handles PixelDiffBar.ValueChanged
         PixelDiff.Text = CStr(PixelDiffBar.Value)
         pixelDiffThreshold = PixelDiffBar.Value
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub FrameHistory_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistory.ValueChanged
         fHist.Text = CStr(FrameHistory.Value)
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
         task.paletteIndex = mapNames.IndexOf(Palettes.Text)
     End Sub
     Private Sub DebugCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles DebugCheckBox.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
         debugChecked = DebugCheckBox.Checked
     End Sub
     Private Sub OpenGLCapture_Click(sender As Object, e As EventArgs) Handles OpenGLCapture.Click
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub useMotion_CheckedChanged(sender As Object, e As EventArgs)
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
         SaveSetting("OpenCVB", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
@@ -264,34 +260,34 @@ Public Class OptionsGlobal
         DebugSliderValue = DebugSlider.Value
     End Sub
     Private Sub debugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles debugSyncUI.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs)
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
 
 
 
     Private Sub unFiltered_CheckedChanged(sender As Object, e As EventArgs) Handles unFiltered.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub MotionFilteredCloudOnly_CheckedChanged(sender As Object, e As EventArgs) Handles MotionFilteredCloudOnly.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub MotionFilteredColorOnly_CheckedChanged(sender As Object, e As EventArgs) Handles MotionFilteredColorOnly.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub MotionFilteredColorAndCloud_CheckedChanged(sender As Object, e As EventArgs) Handles MotionFilteredColorAndCloud.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub UseHistoryCloud_CheckedChanged(sender As Object, e As EventArgs) Handles UseHistoryCloud.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub DustFree_CheckedChanged(sender As Object, e As EventArgs)
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles RGBFilterActive.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
     Private Sub HighlightColor_SelectedIndexChanged(sender As Object, e As EventArgs) Handles HighlightColor.SelectedIndexChanged
         Select Case HighlightColor.Text

@@ -127,7 +127,7 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Parent
         desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then meanSeries = New cvb.Mat(task.gridList.Count, task.frameHistoryCount, cvb.MatType.CV_32F, cvb.Scalar.All(0))
+        If tInfo.optionsChanged Then meanSeries = New cvb.Mat(task.gridList.Count, task.frameHistoryCount, cvb.MatType.CV_32F, cvb.Scalar.All(0))
 
         Dim index = task.frameCount Mod task.frameHistoryCount
         Dim meanValues(task.gridList.Count - 1) As Single
@@ -351,7 +351,7 @@ Public Class Depth_MinMaxToVoronoi : Inherits VB_Parent
         Return p
     End Function
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then ReDim kalman.kInput(task.gridList.Count * 4 - 1)
+        If tInfo.optionsChanged Then ReDim kalman.kInput(task.gridList.Count * 4 - 1)
 
         dst2 = src.Clone()
         dst2.SetTo(cvb.Scalar.White, task.gridMask)
@@ -551,7 +551,7 @@ Public Class Depth_HolesOverTime : Inherits VB_Parent
         desc = "Integrate memory holes over time to identify unstable depth"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             images.Clear()
             dst0.SetTo(0)
         End If
@@ -777,7 +777,7 @@ Public Class Depth_ForegroundOverTime : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.optionsChanged Then lastFrames.Clear()
+        If tInfo.optionsChanged Then lastFrames.Clear()
 
         fore.Run(src)
         lastFrames.Add(fore.dst3)
@@ -1361,7 +1361,7 @@ Public Class Depth_StableMinMax : Inherits VB_Parent
         options.RunOpt()
 
         If src.Type <> cvb.MatType.CV_32FC1 Then src = task.pcSplit(2)
-        If task.optionsChanged Then dst3 = task.pcSplit(2)
+        If tInfo.optionsChanged Then dst3 = task.pcSplit(2)
 
         If options.useMax Then
             dMax.Run(src)

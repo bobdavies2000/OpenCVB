@@ -55,7 +55,7 @@ Public Class Puzzle_Solver : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.optionsChanged Or options.startPuzzle Then
+        If tInfo.optionsChanged Or options.startPuzzle Then
             puzzle.Run(src)
             dst2 = puzzle.dst2
             dst3.SetTo(0)

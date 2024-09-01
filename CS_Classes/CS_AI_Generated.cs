@@ -101,7 +101,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 dst2 = vbc.task.pcSplit[2] * 1000;
             }
@@ -494,7 +494,7 @@ namespace CS_Classes
             energy = float.Parse(split[split.Length - 2] + "." + split[split.Length - 1]);
             if (standaloneTest())
             {
-                if (energyLast == energy || vbc.task.optionsChanged)
+                if (energyLast == energy || vbc.tInfo.optionsChanged)
                 {
                     Annealing_Basics_Close(cPtr);
                     setup();
@@ -558,7 +558,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged) setup();
+            if (vbc.tInfo.optionsChanged) setup();
 
             Parallel.For(0, anneal.Length, i =>
             {
@@ -1657,7 +1657,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             if (vbc.task.histogramBins < vbc.task.MaxZmeters) vbc.task.gOptions.setHistogramBins((int)vbc.task.MaxZmeters + 1);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 var incr = vbc.task.MaxZmeters / vbc.task.histogramBins;
                 var histData = new List<float>();
@@ -1882,7 +1882,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
                 sieve.Run(src); // only need to compute this once...
             SetTrueText($"Primes found: {sieve.primes.Count}", 3);
 
@@ -2051,7 +2051,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 BGSubtract_BGFG_Close(cPtr);
                 cPtr = BGSubtract_BGFG_Open(options.currMethod);
@@ -2262,7 +2262,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged || vbc.task.frameCount < 10)
+            if (vbc.tInfo.optionsChanged || vbc.task.frameCount < 10)
             {
                 src.CopyTo(dst3);
             }
@@ -2710,7 +2710,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 for (int i = 0; i < redCells.Length; i++)
                 {
@@ -2966,7 +2966,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 for (int i = 0; i < redCells.Length; i++)
                 {
@@ -3034,7 +3034,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 for (int i = 0; i < redCells.Length; i++)
                 {
@@ -3098,7 +3098,7 @@ namespace CS_Classes
             if (vbc.task.mousePicTag == 1) index = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
             cv.Rect roiSave = index < vbc.task.gridList.Count ? vbc.task.gridList[index] : new cv.Rect();
 
-            if (vbc.task.optionsChanged) index = 0;
+            if (vbc.tInfo.optionsChanged) index = 0;
 
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat[] matList = new Mat[4];
@@ -3797,7 +3797,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 for (int i = 0; i < redCells.Length; i++)
                 {
@@ -6946,7 +6946,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged) vbc.task.gOptions.setDebugCheckBox(true);
+            if (vbc.tInfo.optionsChanged) vbc.task.gOptions.setDebugCheckBox(true);
             IntPtr imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
                                                            vbc.task.gOptions.getDebugCheckBox() ? 1 : 0);
             vbc.task.gOptions.setDebugCheckBox(false);
@@ -7643,7 +7643,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             int index = vbc.task.redOptions.colorInputIndex;
-            if (vbc.task.optionsChanged || classifier == null)
+            if (vbc.tInfo.optionsChanged || classifier == null)
             {
                 switch (index)
                 {
@@ -9939,7 +9939,7 @@ namespace CS_Classes
         {
             fast.Run(src);
 
-            if (vbc.task.motionFlag || vbc.task.optionsChanged)
+            if (vbc.task.motionFlag || vbc.tInfo.optionsChanged)
             {
                 foreach (Point2f pt in fast.features)
                 {
@@ -10363,7 +10363,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             Mat gray = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            if (vbc.task.optionsChanged) gray.ConvertTo(last32f, MatType.CV_32F);
+            if (vbc.tInfo.optionsChanged) gray.ConvertTo(last32f, MatType.CV_32F);
             dst2 = gray;
 
             Mat gray32f = new Mat();
@@ -11319,7 +11319,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) kalman.kInput = new float[vbc.task.gridList.Count() * 4];
+            if (vbc.tInfo.optionsChanged) kalman.kInput = new float[vbc.task.gridList.Count() * 4];
             dst2 = src.Clone();
             dst2.SetTo(Scalar.White, vbc.task.gridMask);
             Mat depthmask = vbc.task.depthMask;
@@ -11624,7 +11624,7 @@ namespace CS_Classes
 
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
                 meanSeries = new cv.Mat(vbc.task.gridList.Count, vbc.task.frameHistoryCount, MatType.CV_32F, cv.Scalar.All(0));
 
             int index = vbc.task.frameCount % vbc.task.frameHistoryCount;
@@ -11979,7 +11979,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 images.Clear();
                 dst0.SetTo(0);
@@ -12211,7 +12211,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged) lastFrames.Clear();
+            if (vbc.tInfo.optionsChanged) lastFrames.Clear();
 
             fore.Run(src);
             lastFrames.Add(fore.dst3);
@@ -12847,7 +12847,7 @@ namespace CS_Classes
             options.RunOpt();
 
             if (src.Type() != MatType.CV_32FC1) { src = vbc.task.pcSplit[2]; }
-            if (vbc.task.optionsChanged) { dst3 = vbc.task.pcSplit[2]; }
+            if (vbc.tInfo.optionsChanged) { dst3 = vbc.task.pcSplit[2]; }
 
             if (options.useMax)
             {
@@ -13353,7 +13353,7 @@ namespace CS_Classes
         {
             options.RunOpt();
             dft.RunAlg(src);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 Parallel.For(0, 2, k =>
                 {
@@ -13565,7 +13565,7 @@ namespace CS_Classes
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
             if (vbc.task.FirstPass) lastFrame = src.Clone();
-            if (vbc.task.optionsChanged || lastFrame.Size() != src.Size())
+            if (vbc.tInfo.optionsChanged || lastFrame.Size() != src.Size())
                 lastFrame = src.Clone();
 
             Cv2.Absdiff(src, lastFrame, dst0);
@@ -13704,7 +13704,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             diff.Run(src);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
                 history.Clear();
 
             history.Add(diff.dst2);
@@ -13801,7 +13801,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
                 lastDepth32f = vbc.task.pcSplit[2].Clone();
 
             Cv2.Absdiff(vbc.task.pcSplit[2], lastDepth32f, dst1);
@@ -15135,7 +15135,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) saveFrames = new List<Mat>();
+            if (vbc.tInfo.optionsChanged) saveFrames = new List<Mat>();
             edges.Run(src);
             Mat tmp = edges.dst2.Channels() == 1 ? edges.dst2.Clone() : edges.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
             saveFrames.Add(tmp);
@@ -15587,7 +15587,7 @@ namespace CS_Classes
             options.RunOpt();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, true);
-            if (vbc.task.optionsChanged) frameList.Clear();
+            if (vbc.tInfo.optionsChanged) frameList.Clear();
             frameList.Add(dst2);
             dst3.SetTo(0);
             foreach (var m in frameList)
@@ -16329,7 +16329,7 @@ namespace CS_Classes
                 vbc.task.gOptions.setGridSize((int)(dst2.Width / 3));
                 vbc.task.grid.Run(dst2);
             }
-            if (regionCount != vbc.task.gridList.Count) vbc.task.optionsChanged = true;
+            if (regionCount != vbc.task.gridList.Count) vbc.tInfo.optionsChanged = true;
             regionCount = vbc.task.gridList.Count;
             Mat samples = new Mat(regionCount * options.samplesPerRegion, 2, MatType.CV_32F).Reshape(2, 0);
             Mat eLabelMat = new Mat(regionCount * options.samplesPerRegion, 1, MatType.CV_32S);
@@ -16616,7 +16616,7 @@ namespace CS_Classes
                 cv.Rect roi = vbc.task.gridList[i];
                 entropy.Run(src[roi]);
                 entropyMap[roi].SetTo(entropy.entropyVal);
-                if (entropy.entropyVal > maxEntropy || vbc.task.optionsChanged)
+                if (entropy.entropyVal > maxEntropy || vbc.tInfo.optionsChanged)
                 {
                     maxEntropy = entropy.entropyVal;
                     eMaxRect = roi;
@@ -17117,7 +17117,7 @@ namespace CS_Classes
             dst2 = src.Clone();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             gather.Run(src);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 vbc.task.features.Clear();
                 featureMat.Clear();
@@ -17558,7 +17558,7 @@ namespace CS_Classes
         {
             features.Run(src);
             dst3 = features.dst2;
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
                 goodList.Clear();
             List<cv.Point2f> ptList = new List<cv.Point2f>(vbc.task.features);
             goodList.Add(ptList);
@@ -18159,7 +18159,7 @@ namespace CS_Classes
             }
             List<List<cv.Point>> leftHist = new List<List<cv.Point>> { tmpLeft };
             List<List<cv.Point>> rightHist = new List<List<cv.Point>> { tmpRight };
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 leftHist = new List<List<cv.Point>> { tmpLeft };
                 rightHist = new List<List<cv.Point>> { tmpRight };
@@ -18882,7 +18882,7 @@ namespace CS_Classes
             double correlationMin = options.correlationMin;
             bool correlationTest = tcells[0].correlation <= correlationMin || tcells[1].correlation <= correlationMin;
             lineDisp.distance = (int)tcells[0].center.DistanceTo(tcells[1].center);
-            if (vbc.task.optionsChanged || correlationTest || lineDisp.maskCount / lineDisp.distance < linePercentThreshold || lineDisp.distance < distanceThreshold)
+            if (vbc.tInfo.optionsChanged || correlationTest || lineDisp.maskCount / lineDisp.distance < linePercentThreshold || lineDisp.distance < distanceThreshold)
             {
                 int templatePad = options.templatePad;
                 lines.subsetRect = new cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
@@ -19609,7 +19609,7 @@ namespace CS_Classes
                 sides.rotateAngle = 0;
             }
             causes += "\n";
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 resync = true;
                 causes += " - Options changed";
@@ -19635,7 +19635,7 @@ namespace CS_Classes
                 }
             }
             causes += "\n";
-            if (resync || sides.prevPoly.Count != vbc.task.polyCount || vbc.task.optionsChanged)
+            if (resync || sides.prevPoly.Count != vbc.task.polyCount || vbc.tInfo.optionsChanged)
             {
                 sides.prevPoly = new List<cv.Point2f>(sides.currPoly);
                 sides.prevLengths = new List<float>(sides.currLengths);
@@ -19815,7 +19815,7 @@ namespace CS_Classes
             dst2 = topFeatures.dst2;
             dst1 = topFeatures.dst3;
             fPD.currPoly = new List<cv.Point2f>(topFeatures.poly);
-            if (vbc.task.optionsChanged) fPD = new fPolyData(fPD.currPoly);
+            if (vbc.tInfo.optionsChanged) fPD = new fPolyData(fPD.currPoly);
             if (fPD.currPoly.Count < vbc.task.polyCount) return;
             fPD.computeCurrLengths();
             for (int i = 0; i < fPD.currPoly.Count; i++)
@@ -19843,7 +19843,7 @@ namespace CS_Classes
                 causes += " - Difference of startFrame and current frame exceeded 20% of image size";
             }
             causes += "\n";
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 resync = true;
                 causes += " - Options changed";
@@ -19869,7 +19869,7 @@ namespace CS_Classes
                 }
             }
             causes += "\n";
-            if (resync || fPD.prevPoly.Count != vbc.task.polyCount || vbc.task.optionsChanged)
+            if (resync || fPD.prevPoly.Count != vbc.task.polyCount || vbc.tInfo.optionsChanged)
             {
                 fPD.resync();
                 resyncImage = src.Clone();
@@ -19977,7 +19977,7 @@ namespace CS_Classes
             fPlot.Run(src);
             dst3 = fPlot.dst3;
             Mat lastPlot = plot.dst2.Clone();
-            if (vbc.task.optionsChanged) kalman.kInput = new float[fPlot.hist.Length];
+            if (vbc.tInfo.optionsChanged) kalman.kInput = new float[fPlot.hist.Length];
             kalman.kInput = fPlot.hist;
             kalman.Run(new Mat());
             fPlot.hist = kalman.kOutput;
@@ -21981,7 +21981,7 @@ namespace CS_Classes
                 var pt = random.PointList[i];
                 DrawCircle(dst2, pt, vbc.task.DotSize, Scalar.Blue);
             }
-            if (options.reuseData == false || vbc.task.optionsChanged || vbc.task.mouseClickFlag)
+            if (options.reuseData == false || vbc.tInfo.optionsChanged || vbc.task.mouseClickFlag)
             {
                 qArray = new Point2f[options.queryCount];
                 for (int i = 0; i < options.queryCount; i++)
@@ -22822,7 +22822,7 @@ namespace CS_Classes
                 vbc.task.drawRectClear = true;
             }
             if (mandel.options.resetCheck.Checked) mandel.reset();
-            if (vbc.task.optionsChanged || saveDrawRect != vbc.task.drawRect)
+            if (vbc.tInfo.optionsChanged || saveDrawRect != vbc.task.drawRect)
             {
                 saveDrawRect = vbc.task.drawRect;
                 mandel.Run(src);
@@ -22967,7 +22967,7 @@ namespace CS_Classes
             dst2 = redC.dst2;
             dst3.SetTo(0);
             cv.Rect rect = new cv.Rect(0, 0, vbc.task.rc.rect.Width, vbc.task.rc.rect.Height);
-            if (vbc.task.optionsChanged || vbc.task.mouseClickFlag)
+            if (vbc.tInfo.optionsChanged || vbc.task.mouseClickFlag)
             {
                 rect = new cv.Rect(0, 0, vbc.task.rc.rect.Width, vbc.task.rc.rect.Height);
             }
@@ -23957,7 +23957,7 @@ namespace CS_Classes
             {
                 vbc.task.gridROIclicked = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
             }
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 vbc.task.gridSize = vbc.task.gOptions.getGridSize();
                 vbc.task.gridMask = new Mat(src.Size(), MatType.CV_8U);
@@ -24163,7 +24163,7 @@ namespace CS_Classes
             options.RunOpt();
 
             if (vbc.task.mouseClickFlag) vbc.task.gridROIclicked = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 vbc.task.gridList.Clear();
                 for (int y = 0; y < dst2.Height; y += options.height)
@@ -24275,7 +24275,7 @@ namespace CS_Classes
                 }
             }
             SetTrueText("Click any grid entry to see its neighbors", 3);
-            if (vbc.task.optionsChanged) mask = vbc.task.gridMask.Clone();
+            if (vbc.tInfo.optionsChanged) mask = vbc.task.gridMask.Clone();
             if (vbc.task.mouseClickFlag)
             {
                 mask = vbc.task.gridMask.Clone();
@@ -24311,7 +24311,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 gridWidth = vbc.task.gridSize;
                 gridList.Clear();
@@ -25539,7 +25539,7 @@ namespace CS_Classes
                 peaks[i].Run(split[i]);
                 mats.mat[i] = peaks[i].dst2.Clone();
             }
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 vbc.task.mouseClickFlag = true;
                 vbc.task.mousePicTag = 2;
@@ -27297,7 +27297,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             if (src.Channels() != 3) src = vbc.task.color;
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 int bins = vbc.task.redOptions.getHistBinBar3D();
                 int[] hBins = { bins, bins, bins };
@@ -27473,7 +27473,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             if (src.Channels() != 3) src = vbc.task.color;
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 int bins = vbc.task.redOptions.getHistBinBar3D();
                 binArray = new int[] { bins, bins, bins };
@@ -27504,7 +27504,7 @@ namespace CS_Classes
             }
             if (src.Type() != MatType.CV_32F)
                 src.ConvertTo(src, MatType.CV_32F);
-            if (dst1.Type() != src.Type() || dst1.Channels() != src.Channels() || vbc.task.optionsChanged)
+            if (dst1.Type() != src.Type() || dst1.Channels() != src.Channels() || vbc.tInfo.optionsChanged)
             {
                 dst1 = src;
                 saveFrames.Clear();
@@ -27563,7 +27563,7 @@ namespace CS_Classes
         {
             if (src.Type() != MatType.CV_32FC3 || src.Channels() != 3)
                 src = vbc.task.pointCloud;
-            if (vbc.task.optionsChanged || dst3.Type() != MatType.CV_32FC3)
+            if (vbc.tInfo.optionsChanged || dst3.Type() != MatType.CV_32FC3)
             {
                 saveFrames.Clear();
                 dst3 = new Mat(dst2.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
@@ -27601,7 +27601,7 @@ namespace CS_Classes
             if (dst3.Type() != input.Type() || dst3.Channels() != input.Channels())
                 dst3 = new Mat(input.Size(), input.Type(), cv.Scalar.All(0));
             input /= 255; // input is all zeros or ones.
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 saveFrames.Clear();
                 dst3.SetTo(0);
@@ -27673,7 +27673,7 @@ namespace CS_Classes
             var mask = histogram.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
             delaunay.dst1.ConvertTo(histogram, MatType.CV_32F);
             histogram.SetTo(0, ~mask);
-            if (ranges == null || vbc.task.optionsChanged)
+            if (ranges == null || vbc.tInfo.optionsChanged)
             {
                 ranges = GetHist2Dminmax(src, vbc.task.redOptions.channels[0], vbc.task.redOptions.channels[1]);
             }
@@ -27988,7 +27988,7 @@ namespace CS_Classes
                 }
                 valleyIndex.Add(start + testList.IndexOf(testList.Min()));
             }
-            if (vbc.task.optionsChanged) avgValley = new float[valleyIndex.Count];
+            if (vbc.tInfo.optionsChanged) avgValley = new float[valleyIndex.Count];
             float depthPerBin = vbc.task.MaxZmeters / histList.Count;
             for (int i = 0; i < avgValley.Length; i++)
             {
@@ -29349,7 +29349,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             hls.Run(empty);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 int w = hls.input.video.dst2.Width;
                 int h = hls.input.video.dst2.Height;
@@ -29670,7 +29670,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             Point3f gyroAngle;
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 lastTimeStamp = vbc.task.IMU_TimeStamp;
             }
@@ -29687,7 +29687,7 @@ namespace CS_Classes
             cv.Point3f g = vbc.task.IMU_RawAcceleration;
             vbc.task.accRadians = new Point3f((float)Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          (float)Math.Abs(Math.Atan2(g.X, g.Y)), (float)Math.Atan2(g.Y, g.Z));
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 vbc.task.theta = vbc.task.accRadians;
             }
@@ -29733,7 +29733,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             Point3f gyroAngle;
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 lastTimeStamp = vbc.task.IMU_TimeStamp;
             }
@@ -29781,7 +29781,7 @@ namespace CS_Classes
         {
             options.RunOpt();
             Point3f gyroAngle;
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 lastTimeStamp = vbc.task.IMU_TimeStamp;
             }
@@ -29798,7 +29798,7 @@ namespace CS_Classes
             cv.Point3f g = vbc.task.IMU_RawAcceleration;
             vbc.task.accRadians = new Point3f((float)Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                           (float)Math.Abs(Math.Atan2(g.X, g.Y)), (float)Math.Atan2(g.Y, g.Z));
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 vbc.task.theta = vbc.task.accRadians;
             }
@@ -30262,7 +30262,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) accList.Clear();
+            if (vbc.tInfo.optionsChanged) accList.Clear();
             accList.Add(new cv.Scalar(vbc.task.IMU_RawAcceleration.X, vbc.task.IMU_RawAcceleration.Y, vbc.task.IMU_RawAcceleration.Z));
             var accMat = cv.Mat.FromPixelData(accList.Count(), 1, MatType.CV_64FC4, accList.ToArray());
             var imuMean = accMat.Mean();
@@ -30873,7 +30873,7 @@ namespace CS_Classes
         {
             inter.Run(src);
             dst2 = inter.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 kalman.kInput = new float[dst2.Width * dst2.Height];
                 myFrameCount = 1;
@@ -31114,7 +31114,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 if (kalman != null && kalman.Length > 0)
                 {
@@ -31697,7 +31697,7 @@ namespace CS_Classes
             options.RunOpt();
             classCount = options.kMeansK;
             if (vbc.task.FirstPass) lastK = classCount;
-            if (vbc.task.optionsChanged || lastK != classCount)
+            if (vbc.tInfo.optionsChanged || lastK != classCount)
             {
                 options.kMeansFlag = KMeansFlags.PpCenters;
                 saveLabels = new Mat();
@@ -33233,7 +33233,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             var minDistance = feat.options.minDistance;
-            if (!vbc.task.motionFlag || vbc.task.optionsChanged) minDistance = 2;
+            if (!vbc.task.motionFlag || vbc.tInfo.optionsChanged) minDistance = 2;
             feat.Run(src);
             knn.queries = new List<cv.Point2f>(vbc.task.features);
             knn.Run(src);
@@ -33300,7 +33300,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 FileInfo inputFile = new FileInfo(vbc.task.HomeDir + options.inputName);
                 if (inputFile.Exists) video.options.fileInfo = new FileInfo(inputFile.FullName);
@@ -33366,7 +33366,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             hls.Run(empty);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 var w = hls.input.video.dst2.Width;
                 var h = hls.input.video.dst2.Height;
@@ -34196,7 +34196,7 @@ namespace CS_Classes
             dst2 = lines.dst2;
             if (lines.lpList.Count() == 0) return;
             var lineList = new List<cv.Rect>();
-            if (vbc.task.motionFlag || vbc.task.optionsChanged) dst3.SetTo(0);
+            if (vbc.task.motionFlag || vbc.tInfo.optionsChanged) dst3.SetTo(0);
             p1List.Clear();
             p2List.Clear();
             z1List.Clear();
@@ -34776,7 +34776,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             lines.Run(src);
-            if (vbc.task.optionsChanged || vbc.task.motionFlag) frameList.Clear();
+            if (vbc.tInfo.optionsChanged || vbc.task.motionFlag) frameList.Clear();
             var nextMpList = new List<PointPair>(lines.lpList);
             frameList.Add(nextMpList);
             dst2 = src;
@@ -34881,7 +34881,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (verticals.Count() < 2 || verticals.Count() < verts.verticals.Count() / 3 || vbc.task.optionsChanged)
+            if (verticals.Count() < 2 || verticals.Count() < verts.verticals.Count() / 3 || vbc.tInfo.optionsChanged)
             {
                 verts.Run(src);
                 foreach (var vert in verts.verticals)
@@ -35492,7 +35492,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) lpLists.Clear();
+            if (vbc.tInfo.optionsChanged) lpLists.Clear();
             longLines.Run(src);
             lpLists.Add(longLines.lpList);
             lpList = findLines(lpLists);
@@ -35523,7 +35523,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) mpLists.Clear();
+            if (vbc.tInfo.optionsChanged) mpLists.Clear();
             coin.Run(src);
             dst2 = coin.dst2;
             labels[2] = $"The {lpList.Count()} lines below were present in each of the last " + vbc.task.frameHistoryCount.ToString() + " frames";
@@ -36225,7 +36225,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged || vbc.task.heartBeat)
+            if (vbc.tInfo.optionsChanged || vbc.task.heartBeat)
             {
                 if (saveColorCount == 20) colorSlider.Value = 5; else colorSlider.Value++;
                 saveColorCount = colorSlider.Value;
@@ -37087,7 +37087,7 @@ namespace CS_Classes
             {
                 knn.queries.Add(new Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y));
             }
-            if (vbc.task.optionsChanged) knn.trainInput = new List<Vec4f>(knn.queries);
+            if (vbc.tInfo.optionsChanged) knn.trainInput = new List<Vec4f>(knn.queries);
             knn.Run(empty);
             if (knn.queries.Count() == 0) return;
             foreach (var i in knn.result)
@@ -37223,7 +37223,7 @@ namespace CS_Classes
         {
             if (vbc.task.heartBeat || !vbc.task.cameraStable) dst2.SetTo(0);
             redC.Run(src);
-            if (vbc.task.optionsChanged) frameList.Clear();
+            if (vbc.tInfo.optionsChanged) frameList.Clear();
             dst0.SetTo(0);
             var points = new List<cv.Point>();
             foreach (var rc in vbc.task.redCells)
@@ -37445,7 +37445,7 @@ namespace CS_Classes
             feat.Run(src);
             knn.queries = new List<cv.Point2f>(vbc.task.features);
             knn.Run(empty);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 frameList.Clear();
                 dst1.SetTo(0);
@@ -37777,7 +37777,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) match.correlation = 0;
+            if (vbc.tInfo.optionsChanged) match.correlation = 0;
             if (match.correlation < match.options.correlationMin || rectSave != rectInput || vbc.task.mouseClickFlag)
             {
                 if (standalone)
@@ -38303,7 +38303,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) images.Clear();
+            if (vbc.tInfo.optionsChanged) images.Clear();
             dst3 = src.Clone();
             if (dst3.Type() != MatType.CV_32F)
             {
@@ -38336,7 +38336,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) images.Clear();
+            if (vbc.tInfo.optionsChanged) images.Clear();
             Mat nextImage = new Mat();
             if (src.Type() != MatType.CV_32F) src.ConvertTo(nextImage, MatType.CV_32F); else nextImage = src;
             Cv2.Multiply(nextImage, cv.Scalar.All(1.0 / vbc.task.frameHistoryCount), nextImage);
@@ -38462,7 +38462,7 @@ namespace CS_Classes
             int[] ch = { 0, 1, 2 };
             int[] hsize = { 16, 16, 16 };
             Rangef[] ranges = { new Rangef(0, 180) };
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 trackbox = vbc.task.drawRect;
                 var maskROI = hsv[roi].InRange(new Scalar(0, 60, 32), new Scalar(180, 255, 255));
@@ -39893,7 +39893,7 @@ namespace CS_Classes
                 cumulativePixels += diff.changedPixels;
                 if (cumulativePixels / src.Total() > options.cumulativePercentThreshold ||
                     diff.changedPixels > options.motionThreshold ||
-                    vbc.task.optionsChanged)
+                    vbc.tInfo.optionsChanged)
                 {
                     vbc.task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
                 }
@@ -40221,7 +40221,7 @@ namespace CS_Classes
             if (vbc.task.FirstPass) color = src.Clone();
             if (vbc.task.FirstPass) lastMotionRect = vbc.task.motionRect;
             vbc.task.motionFlag = false;
-            if (vbc.task.heartBeat || vbc.task.motionRect.Width * vbc.task.motionRect.Height > src.Total() / 2 || vbc.task.optionsChanged)
+            if (vbc.task.heartBeat || vbc.task.motionRect.Width * vbc.task.motionRect.Height > src.Total() / 2 || vbc.tInfo.optionsChanged)
             {
                 vbc.task.motionFlag = true;
             }
@@ -40933,7 +40933,7 @@ namespace CS_Classes
         {
             options.RunOpt();
             dst2 = src.Clone();
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 mser = MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                     options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize);
@@ -41233,7 +41233,7 @@ namespace CS_Classes
             dst0 = image.Clone();
             dst2 = image.Clone();
             dst3 = image.Clone();
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 mser = MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                     options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize);
@@ -41299,7 +41299,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 MSER_Close(cPtr);
                 cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, (float)options.maxVariation,
@@ -41490,7 +41490,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 MSER_Close(cPtr);
                 cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, (float)options.maxVariation,
@@ -41984,7 +41984,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 switch (options.methodDesc)
                 {
@@ -42158,7 +42158,7 @@ namespace CS_Classes
             cv.Rect roi = vbc.task.drawRect.Width > 0 ? vbc.task.drawRect : new cv.Rect(0, 0, dst2.Width, dst2.Height);
             Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
             dst2 = src;
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 trackWindow = roi;
                 Mat mask = new Mat();
@@ -42667,7 +42667,7 @@ namespace CS_Classes
                         "xRange = " + "\t" + string.Format("{0:F3}", vbc.task.xRange);
             if (vbc.task.useXYRange)
             {
-                bool saveOptionState = vbc.task.optionsChanged; // the xRange and yRange change frequently.  It is safe to ignore it.
+                bool saveOptionState = vbc.tInfo.optionsChanged; // the xRange and yRange change frequently.  It is safe to ignore it.
                 int leftGap = histogram.Col(0).CountNonZero();
                 int rightGap = histogram.Col(histogram.Width - 1).CountNonZero();
                 if (leftGap == 0 && rightGap == 0 && vbc.task.redOptions.getXRangeSlider() > 3)
@@ -42678,7 +42678,7 @@ namespace CS_Classes
                 {
                     vbc.task.redOptions.setXRangeSlider(vbc.task.redOptions.getXRangeSlider() + (adjustedCount < expectedCount ? 1 : -1));
                 }
-                vbc.task.optionsChanged = saveOptionState;
+                vbc.tInfo.optionsChanged = saveOptionState;
             }
             SetTrueText(strOut, 3);
         }
@@ -42717,7 +42717,7 @@ namespace CS_Classes
                         "yRange = " + "\t" + string.Format("{0:F3}", vbc.task.yRange);
             if (vbc.task.useXYRange)
             {
-                bool saveOptionState = vbc.task.optionsChanged; // the xRange and yRange change frequently.  It is safe to ignore it.
+                bool saveOptionState = vbc.tInfo.optionsChanged; // the xRange and yRange change frequently.  It is safe to ignore it.
                 int topGap = histogram.Row(0).CountNonZero();
                 int botGap = histogram.Row(histogram.Height - 1).CountNonZero();
                 if (topGap == 0 && botGap == 0 && vbc.task.redOptions.getYRangeSlider() > 3)
@@ -42728,7 +42728,7 @@ namespace CS_Classes
                 {
                     vbc.task.redOptions.setYRangeSlider(vbc.task.redOptions.getYRangeSlider() + ((adjustedCount < expectedCount) ? 1 : -1));
                 }
-                vbc.task.optionsChanged = saveOptionState;
+                vbc.tInfo.optionsChanged = saveOptionState;
             }
             SetTrueText(strOut, 3);
         }
@@ -45233,7 +45233,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 gColor.color1 = Scalar.Yellow;
                 gColor.color2 = Scalar.Red;
@@ -45277,7 +45277,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 gColor.color1 = Scalar.Yellow;
                 gColor.color2 = Scalar.Red;
@@ -45534,7 +45534,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged || colorMap.Rows != 256)
+            if (vbc.tInfo.optionsChanged || colorMap.Rows != 256)
             {
                 labels[2] = "ColorMap = " + vbc.task.gOptions.getPalette();
                 var str = cMapDir.FullName + "/colorscale_" + vbc.task.gOptions.getPalette() + ".jpg";
@@ -46582,7 +46582,7 @@ namespace CS_Classes
         {
             options.RunOpt();
             float accumulator = 0;
-            if (vbc.task.frameCount % 1000 == 0 || vbc.task.optionsChanged)
+            if (vbc.task.frameCount % 1000 == 0 || vbc.tInfo.optionsChanged)
             {
                 dst2.SetTo(0);
                 dst3.SetTo(0);
@@ -48667,7 +48667,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) pcPoints = new Mat(vbc.task.gridRows, vbc.task.gridCols, MatType.CV_32FC3, cv.Scalar.All(0));
+            if (vbc.tInfo.optionsChanged) pcPoints = new Mat(vbc.task.gridRows, vbc.task.gridCols, MatType.CV_32FC3, cv.Scalar.All(0));
             dst2.SetTo(0);
             actualCount = 0;
             float lastMeanZ = 0;
@@ -49892,7 +49892,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            if (vbc.task.optionsChanged || options.startPuzzle)
+            if (vbc.tInfo.optionsChanged || options.startPuzzle)
             {
                 puzzle.Run(src);
                 dst2 = puzzle.dst2;
@@ -55110,7 +55110,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            if (aoiRect.Width * aoiRect.Height > src.Total() * options.roiPercent || vbc.task.optionsChanged)
+            if (aoiRect.Width * aoiRect.Height > src.Total() * options.roiPercent || vbc.tInfo.optionsChanged)
             {
                 dst0 = vbc.task.color;
                 dst1.SetTo(0);
@@ -55164,7 +55164,7 @@ namespace CS_Classes
         {
             options.RunOpt();
             SetTrueText(traceName + " is the same as ROI_AccumulateOld_CS but simpler.", 3);
-            if (roiRect.Width * roiRect.Height > src.Total() * options.roiPercent || vbc.task.optionsChanged)
+            if (roiRect.Width * roiRect.Height > src.Total() * options.roiPercent || vbc.tInfo.optionsChanged)
             {
                 dst2.SetTo(0);
                 roiRect = new cv.Rect();
@@ -56816,7 +56816,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             double vert_Border = borderCrop * src.Rows / src.Cols;
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 errScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(1));
                 qScale = new Mat(new cv.Size(1, 5), MatType.CV_64F, cv.Scalar.All(0.004));
@@ -56973,7 +56973,7 @@ namespace CS_Classes
         {
             options.RunOpt();
 
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 int size = vbc.task.gridSize;
                 ul = new cv.Rect(0, 0, size, size);
@@ -58622,7 +58622,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 if (cPtr != (IntPtr)0) SuperPixel_Close(cPtr);
                 cPtr = SuperPixel_Open(src.Width, src.Height, options.numSuperPixels, options.numIterations, options.prior);
@@ -59021,7 +59021,7 @@ namespace CS_Classes
             var dataMat = cv.Mat.FromPixelData(options.sampleCount, 2, MatType.CV_32FC1, points.ToArray());
             var resMat = cv.Mat.FromPixelData(options.sampleCount, 1, MatType.CV_32SC1, response.ToArray());
             dataMat *= 1 / src.Height;
-            if (vbc.task.optionsChanged) svm = options.createSVM();
+            if (vbc.tInfo.optionsChanged) svm = options.createSVM();
             svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat);
             dst3.SetTo(0);
             foreach (var roi in vbc.task.gridList)
@@ -59127,7 +59127,7 @@ namespace CS_Classes
             var trainMat = cv.Mat.FromPixelData(4, 2, MatType.CV_32F, points.ToArray());
             var labelsMat = cv.Mat.FromPixelData(4, 1, MatType.CV_32SC1, responses.ToArray());
             var dataMat = trainMat * 1 / src.Height;
-            if (vbc.task.optionsChanged) svm = options.createSVM();
+            if (vbc.tInfo.optionsChanged) svm = options.createSVM();
             svm.Train(dataMat, cv.ML.SampleTypes.RowSample, labelsMat);
             var sampleMat = new Mat(1, 2, MatType.CV_32F);
             for (int y = 0; y < dst2.Height; y += options.granularity)
@@ -59314,7 +59314,7 @@ namespace CS_Classes
 
             feat.Run(src);
             dst3 = feat.dst2;
-            if (vbc.task.optionsChanged) cornerHistory.Clear();
+            if (vbc.tInfo.optionsChanged) cornerHistory.Clear();
             int histCount = vbc.task.frameHistoryCount;
             cornerHistory.Add(new List<cv.Point2f>(vbc.task.features));
             int lastIndex = cornerHistory.Count() - 1;
@@ -59700,7 +59700,7 @@ namespace CS_Classes
             var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
             hulls.Run(src);
             dst2 = hulls.dst2;
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 depthList = new List<List<double>>();
                 for (int i = 0; i < vbc.task.gridList.Count(); i++)
@@ -59768,7 +59768,7 @@ namespace CS_Classes
             oglOptions.RunOpt();
             var ptM = oglOptions.moveAmount;
             var shift = new Point3f((float)ptM[0], (float)ptM[1], (float)ptM[2]);
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 depthList1 = new List<List<double>>();
                 depthList2 = new List<List<double>>();
@@ -59854,7 +59854,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 depthMinList.Clear();
                 depthMaxList.Clear();
@@ -60403,7 +60403,7 @@ namespace CS_Classes
         {
             options.RunOpt();
             if (src.Channels() != 1) src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
-            if (vbc.task.drawRect != saveRect || vbc.task.optionsChanged)
+            if (vbc.task.drawRect != saveRect || vbc.tInfo.optionsChanged)
             {
                 if (cPtr != (IntPtr)0) Tracker_Basics_Close(cPtr);
                 cPtr = Tracker_Basics_Open(options.trackType);
@@ -60879,7 +60879,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            if (vbc.task.optionsChanged)
+            if (vbc.tInfo.optionsChanged)
             {
                 captureVideo = new VideoCapture(options.fileInfo.FullName);
             }
@@ -61833,7 +61833,7 @@ namespace CS_Classes
         {
             if (vbc.task.drawRect.Width > 0 && vbc.task.drawRect.Height > 0)
                 rects.Add(vbc.task.drawRect);
-            if ((standaloneTest() || UseCorners) && vbc.task.optionsChanged)
+            if ((standaloneTest() || UseCorners) && vbc.tInfo.optionsChanged)
             {
                 for (int i = 0; i < 4; i++)
                 {

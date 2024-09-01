@@ -89,7 +89,7 @@ Public Class ROI_AccumulateOld : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
+        If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or tInfo.optionsChanged Then
             dst0 = task.color
             dst1.SetTo(0)
             aoiRect = New cvb.Rect
@@ -142,7 +142,7 @@ Public Class ROI_Accumulate : Inherits VB_Parent
         options.RunOpt()
 
         SetTrueText(traceName + " is the same as ROI_AccumulateOld but simpler.", 3)
-        If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
+        If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or tInfo.optionsChanged Then
             dst2.SetTo(0)
             roiRect = New cvb.Rect
         End If

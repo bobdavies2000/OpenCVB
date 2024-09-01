@@ -995,7 +995,7 @@ Public Class KNN_TrackEach : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         Dim minDistance = feat.options.minDistance
         ' if there was no motion, use minDistance to eliminate the unstable points.
-        If task.motionFlag = False Or task.optionsChanged = False Then minDistance = 2
+        If task.motionFlag = False Or tInfo.optionsChanged = False Then minDistance = 2
 
         feat.Run(src)
 

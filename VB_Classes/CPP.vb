@@ -20,7 +20,7 @@ Public Class CPP_Basics : Inherits VB_Parent
                             task.heartBeat, 0.5, task.lineWidth, task.lineType, task.DotSize,
                             task.gridSize, task.histogramBins,
                             task.useGravityPointcloud, task.gOptions.pixelDiffThreshold,
-                            task.gOptions.UseKalman.Checked, task.gOptions.Palettes.SelectedIndex, task.optionsChanged,
+                            task.gOptions.UseKalman.Checked, task.gOptions.Palettes.SelectedIndex, tInfo.optionsChanged,
                             task.frameHistoryCount, task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked)
 
         getOptions()
@@ -90,7 +90,7 @@ Public Class CPP_Basics : Inherits VB_Parent
         Marshal.Copy(src.Data, inputImage, 0, inputImage.Length)
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
         cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
-                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z, task.optionsChanged, task.heartBeat,
+                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z, tInfo.optionsChanged, task.heartBeat,
                        task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked, task.gOptions.debugChecked)
         handleInput.Free()
         getOptions()

@@ -11,7 +11,7 @@ Public Class History_Basics : Inherits VB_Parent
         End If
         If src.Type <> cvb.MatType.CV_32F Then src.ConvertTo(src, cvb.MatType.CV_32F)
 
-        If dst1.Type <> src.Type Or dst1.Channels() <> src.Channels() Or task.optionsChanged Then
+        If dst1.Type <> src.Type Or dst1.Channels() <> src.Channels() Or tInfo.optionsChanged Then
             dst1 = src
             saveFrames.Clear()
         End If
@@ -67,7 +67,7 @@ Public Class History_Cloud : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Or src.Channels() <> 3 Then src = task.pointCloud
 
-        If task.optionsChanged Or dst3.Type <> cvb.MatType.CV_32FC3 Then
+        If tInfo.optionsChanged Or dst3.Type <> cvb.MatType.CV_32FC3 Then
             saveFrames.Clear()
             dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32FC3, 0)
         End If
@@ -102,7 +102,7 @@ Public Class History_BasicsNoSaturation : Inherits VB_Parent
         If dst3.Type <> input.Type Or dst3.Channels() <> input.Channels() Then dst3 = New cvb.Mat(input.Size(), input.Type, 0)
         input /= 255 ' input is all zeros or ones.
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             saveFrames.Clear()
             dst3.SetTo(0)
         End If
@@ -202,7 +202,7 @@ Public Class History_ReliableDepth : Inherits VB_Parent
             Exit Sub
         End If
 
-        If task.optionsChanged Then saveFrames.Clear()
+        If tInfo.optionsChanged Then saveFrames.Clear()
 
         If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
         saveFrames.Add(src.Clone)

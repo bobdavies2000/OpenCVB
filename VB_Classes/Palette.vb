@@ -161,7 +161,7 @@ Public Class Palette_DepthColorMap : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Static cvtScaleSlider = FindSlider("Convert And Scale")
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             gColor.color1 = cvb.Scalar.Yellow
             gColor.color2 = cvb.Scalar.Red
             Dim gradMat As New cvb.Mat
@@ -207,7 +207,7 @@ Public Class Palette_RGBDepth : Inherits VB_Parent
         desc = "Build a colormap that best shows the depth.  NOTE: duplicate of Palette_DepthColorMap but no slider."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             gColor.color1 = cvb.Scalar.Yellow
             gColor.color2 = cvb.Scalar.Red
             Dim gradMat As New cvb.Mat
@@ -461,7 +461,7 @@ Public Class Palette_LoadColorMap : Inherits VB_Parent
         desc = "Apply the different color maps in OpenCV"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Or colorMap.Rows <> 256 Then
+        If tInfo.optionsChanged Or colorMap.Rows <> 256 Then
             labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
             Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
             Dim mapFile As New FileInfo(str)

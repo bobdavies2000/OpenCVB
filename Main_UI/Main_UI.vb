@@ -1532,7 +1532,7 @@ Public Class Main_UI
                             task.drawRect = New cvb.Rect
                             If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
                                 If saveDrawRect <> tmpDrawRect Then
-                                    task.optionsChanged = True
+                                    tInfo.optionsChanged = True
                                     saveDrawRect = tmpDrawRect
                                 End If
                                 task.drawRect = tmpDrawRect

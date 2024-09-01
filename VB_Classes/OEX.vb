@@ -118,7 +118,7 @@ Public Class OEX_bgSub : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             Select Case options.methodDesc
                 Case "GMG"
                     pBackSub = cvb.BackgroundSubtractorGMG.Create()
@@ -285,7 +285,7 @@ Public Class OEX_MeanShift : Inherits VB_Parent
         Dim roi = If(task.drawRect.Width > 0, task.drawRect, New cvb.Rect(0, 0, dst2.Width, dst2.Height))
         Dim hsv As cvb.Mat = src.CvtColor(cvb.ColorConversionCodes.BGR2HSV)
         dst2 = src
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             trackWindow = roi
             Dim mask As New cvb.Mat
             cvb.Cv2.InRange(hsv, New cvb.Scalar(0, 60, 32), New cvb.Scalar(180, 255, 255), mask)

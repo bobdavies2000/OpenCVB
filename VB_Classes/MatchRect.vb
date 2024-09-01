@@ -10,7 +10,7 @@ Public Class MatchRect_Basics : Inherits VB_Parent
         desc = "Track a RedCloud rectangle using MatchTemplate.  Click on a cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then match.correlation = 0
+        If tInfo.optionsChanged Then match.correlation = 0
         If match.correlation < match.options.correlationMin Or rectSave <> rectInput Or task.mouseClickFlag Then
             If standalone Then
                 redC.Run(src)

@@ -296,7 +296,7 @@ Public Class Edge_Consistent : Inherits VB_Parent
         desc = "Edges that are consistent for x number of frames"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then saveFrames = New List(Of cvb.Mat)
+        If tInfo.optionsChanged Then saveFrames = New List(Of cvb.Mat)
 
         edges.Run(src)
 
@@ -837,7 +837,7 @@ Public Class Edge_CannyHistory : Inherits VB_Parent
 
         dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
         Static frameList As New List(Of cvb.Mat)
-        If task.optionsChanged Then frameList.Clear()
+        If tInfo.optionsChanged Then frameList.Clear()
         frameList.Add(dst2)
         dst3.SetTo(0)
         For Each m In frameList

@@ -232,7 +232,7 @@ Public Class FeatureFlow_LeftRightHist : Inherits VB_Parent
         Static leftHist As New List(Of List(Of cvb.Point))({tmpLeft})
         Static rightHist As New List(Of List(Of cvb.Point))({tmpRight})
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             leftHist = New List(Of List(Of cvb.Point))({tmpLeft})
             rightHist = New List(Of List(Of cvb.Point))({tmpRight})
         End If

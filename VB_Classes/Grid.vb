@@ -10,7 +10,7 @@ Public Class Grid_Basics : Inherits VB_Parent
         If task.mouseClickFlag And Not task.FirstPass Then
             task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             task.gridSize = task.gOptions.GridSlider.Value
             task.gridMask = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
             task.gridMap = New cvb.Mat(src.Size(), cvb.MatType.CV_32S, 255)
@@ -194,7 +194,7 @@ Public Class Grid_Rectangles : Inherits VB_Parent
         options.RunOpt()
 
         If task.mouseClickFlag Then task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             task.gridList.Clear()
             For y = 0 To dst2.Height - 1 Step options.height
                 For x = 0 To dst2.Width - 1 Step options.width
@@ -291,7 +291,7 @@ Public Class Grid_Neighbors : Inherits VB_Parent
         End If
 
         SetTrueText("Click any grid entry to see its neighbors", 3)
-        If task.optionsChanged Then mask = task.gridMask.Clone
+        If tInfo.optionsChanged Then mask = task.gridMask.Clone
 
         If task.mouseClickFlag Then
             mask = task.gridMask.Clone
@@ -327,7 +327,7 @@ Public Class Grid_Special : Inherits VB_Parent
         desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles.  Specify the Y size."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             gridWidth = task.gridSize
             gridList.Clear()
             gridRows = 0

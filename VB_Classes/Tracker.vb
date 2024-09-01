@@ -14,7 +14,7 @@ Public Class Tracker_Basics : Inherits VB_Parent
 
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        If task.drawRect <> saveRect Or task.optionsChanged Then
+        If task.drawRect <> saveRect Or tInfo.optionsChanged Then
             If cPtr <> 0 Then Tracker_Basics_Close(cPtr)
             cPtr = Tracker_Basics_Open(options.trackType)
             saveRect = task.drawRect

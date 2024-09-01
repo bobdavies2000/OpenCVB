@@ -58,7 +58,7 @@ Public Class Interpolate_Kalman : Inherits VB_Parent
         inter.Run(src)
 
         dst2 = inter.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             ReDim kalman.kInput(dst2.Width * dst2.Height - 1)
             myFrameCount = 1
             updatedFrames = 0

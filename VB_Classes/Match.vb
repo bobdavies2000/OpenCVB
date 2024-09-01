@@ -260,7 +260,7 @@ Public Class Match_Lines : Inherits VB_Parent
         For Each lp In lines.lpList
             knn.queries.Add(New cvb.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
         Next
-        If task.optionsChanged Then knn.trainInput = New List(Of cvb.Vec4f)(knn.queries)
+        If tInfo.optionsChanged Then knn.trainInput = New List(Of cvb.Vec4f)(knn.queries)
         knn.Run(empty)
 
         If knn.queries.Count = 0 Then Exit Sub
@@ -399,7 +399,7 @@ Public Class Match_TraceRedC : Inherits VB_Parent
         If task.heartBeat Or task.cameraStable = False Then dst2.SetTo(0)
         redC.Run(src)
 
-        If task.optionsChanged Then frameList.Clear()
+        If tInfo.optionsChanged Then frameList.Clear()
 
         dst0.SetTo(0)
         Dim points As New List(Of cvb.Point)
@@ -624,7 +624,7 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Parent
         knn.queries = New List(Of cvb.Point2f)(task.features)
         knn.Run(empty)
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             frameList.Clear()
             dst1.SetTo(0)
         End If

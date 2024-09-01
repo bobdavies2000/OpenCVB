@@ -70,7 +70,7 @@ Public Class FLANN_Basics : Inherits VB_Parent
             DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Blue)
         Next
 
-        If options.reuseData = False Or task.optionsChanged Or task.mouseClickFlag Then
+        If options.reuseData = False Or tInfo.optionsChanged Or task.mouseClickFlag Then
             ReDim qArray(options.queryCount - 1)
             For i = 0 To options.queryCount - 1
                 qArray(i) = New cvb.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))

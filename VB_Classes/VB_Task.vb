@@ -101,7 +101,6 @@ Public Class VBtask : Implements IDisposable
     Public FirstPass As Boolean
 
     Public toggleOnOff As Boolean ' toggles on the heartbeat.
-    Public optionsChanged As Boolean ' global or local options changed.
     Public paused As Boolean
     Public showAllOptions As Boolean ' show all options when initializing the options for all algorithms.
 
@@ -283,12 +282,12 @@ Public Class VBtask : Implements IDisposable
     Public Structure algParms
         ' The order of cameras in cameraNames is important. Add new cameras at the end.
         Public Shared cameraNames As New List(Of String)({"Azure Kinect 4K",
-                                                         "Intel(R) RealSense(TM) Depth Camera 435i",
-                                                         "Intel(R) RealSense(TM) Depth Camera 455",
-                                                         "Oak-D camera",
-                                                         "StereoLabs ZED 2/2i",
-                                                         "MYNT-EYE-D1000",
-                                                         "Orbbec Gemini 335L"})
+                                                                 "Intel(R) RealSense(TM) Depth Camera 435i",
+                                                                 "Intel(R) RealSense(TM) Depth Camera 455",
+                                                                 "Oak-D camera",
+                                                                 "StereoLabs ZED 2/2i",
+                                                                 "MYNT-EYE-D1000",
+                                                                 "Orbbec Gemini 335L"})
         Public cameraName As String
         Public cameraIndex As Integer
 
@@ -420,7 +419,7 @@ Public Class VBtask : Implements IDisposable
 
         If task.advice = "" Then
             task.advice = "No advice for " + algName + " yet." + vbCrLf +
-                           "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
+                               "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
         End If
 
         If parms.useRecordedData Then recordedData = New Replay_Play()
@@ -450,7 +449,7 @@ Public Class VBtask : Implements IDisposable
         baseline = baseLines(parms.cameraIndex)
 
         task.myStopWatch = Stopwatch.StartNew()
-        optionsChanged = True
+        tInfo.optionsChanged = True
         Application.DoEvents()
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -608,7 +607,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            task.optionsChanged = False
+            tInfo.optionsChanged = False
             TaskTimer.Enabled = False
             task.frameCount += 1
 
@@ -687,9 +686,9 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.CreateGif.Checked Then
             heartBeat = False
-            task.optionsChanged = False
+            tInfo.optionsChanged = False
         Else
-            task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
+            task.heartBeat = task.heartBeat Or task.debugSyncUI Or tInfo.optionsChanged Or task.mouseClickFlag
         End If
 
         If task.paused = False Then
@@ -712,7 +711,7 @@ Public Class VBtask : Implements IDisposable
         If task.motionDetected Or heartBeat Then
             task.pcSplit = task.pointCloud.Split
 
-            If task.optionsChanged Then task.maxDepthMask.SetTo(0)
+            If tInfo.optionsChanged Then task.maxDepthMask.SetTo(0)
             task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc)
 
             task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs()

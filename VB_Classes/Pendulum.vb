@@ -18,7 +18,7 @@ Public Class Pendulum_Basics : Inherits VB_Parent
 
         Dim accumulator As Single
 
-        If task.frameCount Mod 1000 = 0 Or task.optionsChanged Then
+        If task.frameCount Mod 1000 = 0 Or tInfo.optionsChanged Then
             dst2.SetTo(0)
             dst3.SetTo(0)
         End If

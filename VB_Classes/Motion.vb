@@ -107,7 +107,7 @@ Public Class Motion_Simple : Inherits VB_Parent
         If diff.changedPixels > 0 Or task.heartBeat Then
             cumulativePixels += diff.changedPixels
             If cumulativePixels / src.Total > options.cumulativePercentThreshold Or diff.changedPixels > options.motionThreshold Or
-                task.optionsChanged Then
+                tInfo.optionsChanged Then
                 task.motionRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
             End If
             If task.motionRect.Width = dst2.Width Or task.heartBeat Then
@@ -377,7 +377,7 @@ Public Class Motion_Intersect : Inherits VB_Parent
         Static color = src.Clone
         Static lastMotionRect As cvb.Rect = task.motionRect
         task.motionFlag = False
-        If task.heartBeat Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
+        If task.heartBeat Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or tInfo.optionsChanged Then
             task.motionFlag = True
         Else
             bgSub.Run(src)

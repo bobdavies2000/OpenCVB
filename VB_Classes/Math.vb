@@ -233,7 +233,7 @@ Public Class Math_ImageAverage : Inherits VB_Parent
         desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then images.Clear()
+        If tInfo.optionsChanged Then images.Clear()
         dst3 = src.Clone
         If dst3.Type <> cvb.MatType.CV_32F Then
             If dst3.Channels() <> 1 Then dst3.ConvertTo(dst3, cvb.MatType.CV_32FC3) Else dst3.ConvertTo(dst3, cvb.MatType.CV_32F)
@@ -264,7 +264,7 @@ Public Class Math_ImageMaskedAverage : Inherits VB_Parent
         desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then images.Clear()
+        If tInfo.optionsChanged Then images.Clear()
         Dim nextImage As New cvb.Mat
         If src.Type <> cvb.MatType.CV_32F Then src.ConvertTo(nextImage, cvb.MatType.CV_32F) Else nextImage = src
         cvb.Cv2.Multiply(nextImage, cvb.Scalar.All(1 / task.frameHistoryCount), nextImage)

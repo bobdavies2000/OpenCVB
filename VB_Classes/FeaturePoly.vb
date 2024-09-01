@@ -45,7 +45,7 @@ Public Class FeaturePoly_Basics : Inherits VB_Parent
         'End If
         causes += vbCrLf
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             resync = True
             causes += " - Options changed"
         End If
@@ -69,7 +69,7 @@ Public Class FeaturePoly_Basics : Inherits VB_Parent
         End If
         causes += vbCrLf
 
-        If resync Or sides.prevPoly.Count <> task.polyCount Or task.optionsChanged Then
+        If resync Or sides.prevPoly.Count <> task.polyCount Or tInfo.optionsChanged Then
             sides.prevPoly = New List(Of cvb.Point2f)(sides.currPoly)
             sides.prevLengths = New List(Of Single)(sides.currLengths)
             sides.prevSideIndex = sides.prevLengths.IndexOf(sides.prevLengths.Max)
@@ -261,7 +261,7 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         dst1 = topFeatures.dst3
         fPD.currPoly = New List(Of cvb.Point2f)(topFeatures.poly)
 
-        If task.optionsChanged Then fPD = New fPolyData(fPD.currPoly)
+        If tInfo.optionsChanged Then fPD = New fPolyData(fPD.currPoly)
         If fPD.currPoly.Count < task.polyCount Then Exit Sub
 
         fPD.computeCurrLengths()
@@ -292,7 +292,7 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         End If
         causes += vbCrLf
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             resync = True
             causes += " - Options changed"
         End If
@@ -316,7 +316,7 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         End If
         causes += vbCrLf
 
-        If resync Or fPD.prevPoly.Count <> task.polyCount Or task.optionsChanged Then
+        If resync Or fPD.prevPoly.Count <> task.polyCount Or tInfo.optionsChanged Then
             fPD.resync()
             resyncImage = src.Clone
             resyncFrames = 0
@@ -429,7 +429,7 @@ Public Class FeaturePoly_PlotWeighted : Inherits VB_Parent
         dst3 = fPlot.dst3
 
         Dim lastPlot As cvb.Mat = plot.dst2.Clone
-        If task.optionsChanged Then ReDim kalman.kInput(fPlot.hist.Length - 1)
+        If tInfo.optionsChanged Then ReDim kalman.kInput(fPlot.hist.Length - 1)
 
         kalman.kInput = fPlot.hist
         kalman.Run(empty)

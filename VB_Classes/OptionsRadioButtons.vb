@@ -17,6 +17,6 @@ Public Class OptionsRadioButtons
         FlowLayoutPanel1.Controls.Add(check(index))
     End Sub
     Private Sub radio_CheckChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        tInfo.optionsChanged = True
     End Sub
 End Class

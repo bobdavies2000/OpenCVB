@@ -37,7 +37,7 @@ Public Class Gif_Basics : Inherits VB_Parent
             clearTempDir()
         End If
 
-        task.optionsChanged = False ' trying to reduce the impact of options changing on the active algorithm
+        tInfo.optionsChanged = False ' trying to reduce the impact of options changing on the active algorithm
 
         labels(2) = "Images captured: " + CStr(task.gifImages.Count)
         SetTrueText("Gif_Basics is typically called from VB_Task to create the .gif file." + vbCrLf +

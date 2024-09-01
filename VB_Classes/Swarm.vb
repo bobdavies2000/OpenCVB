@@ -38,7 +38,7 @@ Public Class Swarm_Basics : Inherits VB_Parent
         feat.Run(src)
         dst3 = feat.dst2
 
-        If task.optionsChanged Then cornerHistory.Clear()
+        If tInfo.optionsChanged Then cornerHistory.Clear()
 
         Dim histCount = task.frameHistoryCount
         cornerHistory.Add(New List(Of cvb.Point2f)(task.features))

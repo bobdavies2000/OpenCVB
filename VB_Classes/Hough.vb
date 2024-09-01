@@ -219,7 +219,7 @@ Public Class Hough_LaneFinder : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         hls.Run(empty)
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
             Dim h = hls.input.video.dst2.Height
 

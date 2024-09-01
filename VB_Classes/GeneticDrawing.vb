@@ -253,7 +253,7 @@ Public Class GeneticDrawing_Photo : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
 
         Static fileInputName = New FileInfo(fileNameForm.filename.Text)
-        If inputFileName <> fileInputName.FullName Or task.optionsChanged Then
+        If inputFileName <> fileInputName.FullName Or tInfo.optionsChanged Then
             inputFileName = fileInputName.FullName
             If fileInputName.Exists = False Then
                 labels(2) = "No input file specified or file not found."

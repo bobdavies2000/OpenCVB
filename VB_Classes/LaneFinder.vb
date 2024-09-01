@@ -35,7 +35,7 @@ Public Class LaneFinder_Videos : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             Dim inputfile = New FileInfo(task.HomeDir + options.inputName)
             If inputfile.Exists Then video.options.fileInfo = New FileInfo(inputfile.FullName)
         End If
@@ -106,7 +106,7 @@ Public Class LaneFinder_ROI : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         hls.Run(empty)
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
             Dim h = hls.input.video.dst2.Height
 

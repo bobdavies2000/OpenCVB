@@ -19,7 +19,7 @@ Public Class FeatureLine_Basics : Inherits VB_Parent
         Dim correlationMin = options.correlationMin
         Dim correlationTest = tcells(0).correlation <= correlationMin Or tcells(1).correlation <= correlationMin
         lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
-        If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
+        If tInfo.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
             Dim templatePad = options.templatePad
             lines.subsetRect = New cvb.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
             lines.Run(src.Clone)

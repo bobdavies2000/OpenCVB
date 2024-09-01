@@ -23,7 +23,7 @@ Public Class Feature_Basics : Inherits VB_Parent
 
         gather.Run(src)
 
-        If task.optionsChanged Then
+        If tInfo.optionsChanged Then
             task.features.Clear()
             featureMatList.Clear()
         End If
@@ -467,7 +467,7 @@ Public Class Feature_TraceDelaunay : Inherits VB_Parent
         features.Run(src)
         dst3 = features.dst2
 
-        If task.optionsChanged Then goodList.Clear()
+        If tInfo.optionsChanged Then goodList.Clear()
 
         Dim ptList As New List(Of cvb.Point2f)(task.features)
         goodList.Add(ptList)
