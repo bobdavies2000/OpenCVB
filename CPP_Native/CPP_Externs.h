@@ -186,8 +186,8 @@ namespace CPP_Native
 		{ task->alg = new AddWeighted_DepthAccumulate_CC(); task->alg->traceName = "AddWeighted_DepthAccumulate_CC"; break; }
 		case _Edge_Basics_CC:
 		{ task->alg = new Edge_Basics_CC(); task->alg->traceName = "Edge_Basics_CC"; break; }
-		case _Hist_DepthSimple_CC:
-		{ task->alg = new Hist_DepthSimple_CC(); task->alg->traceName = "Hist_DepthSimple_CC"; break; }
+        case _Hist_DepthSimple_CC:
+        { task->alg = new Hist_DepthSimple_CC(); task->alg->traceName = "Hist_DepthSimple_CC"; break; }
         // end of switch - don't remove...
         }
 

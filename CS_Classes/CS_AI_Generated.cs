@@ -14784,19 +14784,20 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            src = new Mat(vbc.task.dst2.Width, vbc.task.dst2.Height, MatType.CV_32F, cv.Scalar.All(0));
+            src = new Mat(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height), MatType.CV_32F, Scalar.All(0));
             int mid = src.Height / 2;
             float zIncr = vbc.task.MaxZmeters / mid;
             dst2 = src.Clone();
             cv.Rect fRect = new cv.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height);
             for (int i = 0; i <= src.Height / 2; i++)
             {
-                Cv2.Rectangle(dst2[fRect], new cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1);
+                cv.Cv2.Rectangle(dst2[fRect], new cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), new Scalar(i * zIncr), 1);
             }
             xyzDepth.Run(dst2);
             dst3 = xyzDepth.dst2.Resize(new cv.Size(vbc.task.dst2.Width, vbc.task.dst2.Height));
         }
     }
+
 
 
 

@@ -198,30 +198,31 @@ Public Class Translator
                     If inline.Contains(".GetSubRect(") Then inline = inline.Replace(".GetSubRect(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' .Get(
                     If inline.Contains(".Get(") Then inline = inline.Replace(".Get(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' 
                     inline = inline.Replace(" Run(Mat ", " RunAlg(Mat ")
+                    inline = inline.Replace("cvb.", "cv.")
                     inline = inline.Replace("Options_CS_", "Options_")
                     inline = inline.Replace("task.", "vbc.task.")
                     inline = inline.Replace("task.gOptions.FrameHistory.Value", "task.frameHistoryCount")
                     inline = inline.Replace("options;", "options") ' make sure we see an error when this happens.
                     inline = inline.Replace("Mat dst", "dst") ' Mat dst2 problem - should never need to be declared.
-                    inline = inline.Replace("MCvScalar", "cvb.Scalar")
-                    inline = inline.Replace("Rectangle r", "cvb.Rect r")
-                    inline = inline.Replace("Rectangle(", "cvb.Rect(")
-                    inline = inline.Replace(" Rect", " cvb.Rect")
-                    inline = inline.Replace("<Rect", "<cvb.Rect")
-                    inline = inline.Replace("CvInvoke.", "cvb.")
-                    inline = inline.Replace(" Point ", " cvb.Point ")
-                    inline = inline.Replace(" Point(", " cvb.Point(")
-                    inline = inline.Replace("<Point", "<cvb.Point")
-                    inline = inline.Replace(" Size(", " cvb.Size(")
+                    inline = inline.Replace("MCvScalar", "cv.Scalar")
+                    inline = inline.Replace("Rectangle r", "cv.Rect r")
+                    inline = inline.Replace("Rectangle(", "cv.Rect(")
+                    inline = inline.Replace(" Rect", " cv.Rect")
+                    inline = inline.Replace("<Rect", "<cv.Rect")
+                    inline = inline.Replace("CvInvoke.", "cv.")
+                    inline = inline.Replace(" Point ", " cv.Point ")
+                    inline = inline.Replace(" Point(", " cv.Point(")
+                    inline = inline.Replace("<Point", "<cv.Point")
+                    inline = inline.Replace(" Size(", " cv.Size(")
                     inline = inline.Replace("Cv2.Line(", "DrawLine(")
                     inline = inline.Replace("Cv2.Circle(", "DrawCircle(")
                     inline = inline.Replace("override ", "")
                     inline = Replace(inline, "bgr2gray", "BGR2GRAY", 1, -1, vbTextCompare)
                     inline = Replace(inline, "task.rightview", "task.rightView", 1, -1, vbTextCompare)
                     inline = Replace(inline, "task.leftview", "task.leftView", 1, -1, vbTextCompare)
-                    inline = Replace(inline, "ColorConversion.BgrToGray", "cvb.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
-                    inline = Replace(inline, "ColorConversion.GrayToBgr", "cvb.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
-                    inline = Replace(inline, "ColorConversion.BgrToHsv", "cvb.ColorConversionCodes.BGR2HSV", 1, -1, vbTextCompare)
+                    inline = Replace(inline, "ColorConversion.BgrToGray", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
+                    inline = Replace(inline, "ColorConversion.GrayToBgr", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
+                    inline = Replace(inline, "ColorConversion.BgrToHsv", "cv.ColorConversionCodes.BGR2HSV", 1, -1, vbTextCompare)
                     inline = Replace(inline, " Options.", " options.")
 
                     inline = Replace(inline, "task.pcSplit(2)", "task.pcSplit[2]")
@@ -240,14 +241,14 @@ Public Class Translator
                     inline = Replace(inline, "DepthType.", "MatType.")
                     inline = Replace(inline, "Cv8u", "CV_8U")
                     inline = Replace(inline, "Environment.NewLine", """\n""")
-                    inline = Replace(inline, "CvPoint", "cvb.Point")
-                    inline = Replace(inline, "ColorConversion.BgraToBgr", "cvb.ColorConversionCodes.BGRA2BGR")
-                    inline = Replace(inline, "ColorConversion.BgrToBgra", "cvb.ColorConversionCodes.BGR2BGRA")
+                    inline = Replace(inline, "CvPoint", "cv.Point")
+                    inline = Replace(inline, "ColorConversion.BgraToBgr", "cv.ColorConversionCodes.BGRA2BGR")
+                    inline = Replace(inline, "ColorConversion.BgrToBgra", "cv.ColorConversionCodes.BGR2BGRA")
                     inline = Replace(inline, "cPtr != 0", "cPtr != (IntPtr)0")
 
                     inline = Replace(inline, "()(", "(")
                     inline = Replace(inline, "()()", "()")
-                    inline = Replace(inline, "cvb.Rectangle", "Rectangle")
+                    inline = Replace(inline, "cv.Rectangle", "Rectangle")
 
                 'Case "C# to VB.Net (back)"
                 '    If trimLine.StartsWith("Public Class ") Then
@@ -260,9 +261,9 @@ Public Class Translator
 
                 '    inline = inline.Replace("Private ", "Dim ")
                 '    If inline.Contains(" Rect") Then
-                '        inline = inline.Replace(" Rect", " cvb.Rect")
+                '        inline = inline.Replace(" Rect", " cv.Rect")
                 '    End If
-                '    inline = inline.Replace(" Size(", " cvb.Size(")
+                '    inline = inline.Replace(" Size(", " cv.Size(")
 
                 Case "C# to C++"
                     If trimLine.StartsWith("#") Then Continue For

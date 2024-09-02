@@ -78,7 +78,6 @@ _RedColor_FeatureLessCore_CC
 _Remap_Basics_CC
 _Resize_Basics_CC
 _Resize_Preserve_CC
-_Stabilizer_Basics_CC
 _Stable_Basics_CC
 _Stable_BasicsCount_CC
 _Vignetting_CC
@@ -3355,7 +3354,6 @@ End Enum
 	If algorithmName = "Spectrum_Z" Then return new Spectrum_Z
 	If algorithmName = "Spectrum_Z_CS" Then return new Spectrum_Z_CS
 	If algorithmName = "Stabilizer_Basics" Then return new Stabilizer_Basics
-	If algorithmName = "Stabilizer_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Stabilizer_Basics_CC)
 	If algorithmName = "Stabilizer_Basics_CS" Then return new Stabilizer_Basics_CS
 	If algorithmName = "Stabilizer_BasicsRandomInput" Then return new Stabilizer_BasicsRandomInput
 	If algorithmName = "Stabilizer_BasicsRandomInput_CS" Then return new Stabilizer_BasicsRandomInput_CS
