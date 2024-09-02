@@ -44,11 +44,11 @@ A full installation can take about 30-50 minutes using the 1-step “Update_All.
 
 However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized. The output is often self-documenting or a natural representation of the algorithm’s intent.
 
-The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<Al but Python\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
+The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<All but Python\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
 
 # OpenCVB Layout
 
-![A screenshot of a computer Description automatically generated](media/5bfa7d36d0713e88db4510ae57d5bac9.png)
+![A screenshot of a computer Description automatically generated](media/1709e670143edb3c5e7240a592abdf14.png)
 
 **OpenCVB Layout:** *The layout of the OpenCVB application shows the RGB camera output in the upper left, the colorized depth data in the upper right, and the algorithm outputs in the bottom left and right. This algorithm (Segmented Linear Regression or SLR_Trends) has only one output in the lower left.*
 
