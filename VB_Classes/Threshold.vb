@@ -100,6 +100,7 @@ Public Class Threshold_ByChannels : Inherits VB_Parent
     Dim options As New Options_Threshold
     Public Sub New()
         labels(3) = "Threshold Inverse"
+        FindRadio("Trunc").Checked = True
         UpdateAdvice(traceName + ": see local options.")
         desc = "Threshold by channel - use red threshold slider to impact grayscale results."
     End Sub
@@ -107,8 +108,10 @@ Public Class Threshold_ByChannels : Inherits VB_Parent
         options.RunOpt()
         optionsColor.RunOpt()
 
-        If options.inputGray Then
-            src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If src.Channels = 1 Then
+            dst2 = src.Threshold(optionsColor.redS, 255, options.thresholdMethod)
+        ElseIf options.inputGray Then
+            src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             dst2 = src.Threshold(optionsColor.redS, 255, options.thresholdMethod)
         Else
             Dim split = src.Split()
