@@ -77,5 +77,4 @@ _Resize_Basics_CC,
 _Resize_Preserve_CC,
 _Stable_Basics_CC,
 _Stable_BasicsCount_CC,
-_Vignetting_CC,
 };

@@ -121,7 +121,7 @@ Module UI_Generator
                             allList.Add(classname, line)
                         End If
                     ElseIf line.StartsWith("class") Then ' C++ Native algorithms
-                        If line.EndsWith("_CC") Or line.Contains(" : public CPP_Parent") Then
+                        If line.Contains(" : public CPP_Parent") Then
                             Dim split = line.Split(" ")
                             classname = split(1)
                             cppList.Add(classname, line)

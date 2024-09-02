@@ -80,7 +80,6 @@ _Resize_Basics_CC
 _Resize_Preserve_CC
 _Stable_Basics_CC
 _Stable_BasicsCount_CC
-_Vignetting_CC
 End Enum
 	Public Function createAlgorithm(algorithmName as string) as Object
 	If algorithmName.endsWith(".py") then return new Python_Run()
@@ -3554,7 +3553,6 @@ End Enum
 	If algorithmName = "Video_MinRect_CS" Then return new Video_MinRect_CS
 	If algorithmName = "Vignetting_Basics" Then return new Vignetting_Basics
 	If algorithmName = "Vignetting_Basics_CPP_CS" Then return new Vignetting_Basics_CPP_CS
-	If algorithmName = "Vignetting_CC" Then return new CPP_Basics(ccFunctionNames._Vignetting_CC)
 	If algorithmName = "Vignetting_Devignetting" Then return new Vignetting_Devignetting
 	If algorithmName = "Vignetting_Devignetting_CS" Then return new Vignetting_Devignetting_CS
 	If algorithmName = "Vignetting_Removal" Then return new Vignetting_Removal
