@@ -119,8 +119,8 @@ End Class
 
 Module managedCPP_Interface
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function ManagedCPP_Resume(colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
-                                depthRGBPtr As IntPtr, cloud As IntPtr) As Integer
+    Public Function ManagedCPP_Resume(ioIndex As Integer, colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
+                                      depthRGBPtr As IntPtr, cloud As IntPtr) As Integer
     End Function
 
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -166,7 +166,7 @@ Public Class CPP_ManagedTask : Inherits VB_Parent
         hDepthRGB = GCHandle.Alloc(depthRGBData, GCHandleType.Pinned)
         hCloud = GCHandle.Alloc(cloudData, GCHandleType.Pinned)
 
-        ioIndex = ManagedCPP_Resume(hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
+        ioIndex = ManagedCPP_Resume(ioIndex, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
                                     hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject())
 
         hColor.Free()

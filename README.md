@@ -1,49 +1,38 @@
-# Recent Changes – August 2024
+# Recent Changes – September 2024
 
--   Over 3700 algorithms are included, averaging 37 lines of code per algorithm.
--   OpenCVB has been upgraded to the latest version of OpenCVSharp.
-    -   Mat’s initialized with a data pointer now use “FromPixelData”.
-    -   Mat’s initialized with a Scalar now use “cv.Scalar.All(\<value\>)”.
-    -   It was a lot of typing and testing to make this change.
+-   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
+-   OpenCVB’s user interface is updated to run with .Net Framework 8.0.
+    -   Better debugger, improved GC, async programming, C\# 11.0.
+    -   Visual Studio 2022 Version 17.8 or later is now required.
+        -   In Visual Studio, click Help/Check for Updates to get updated.
+    -   Translation (see below) needed to use the latest web control.
+    -   ComboBox control has improved navigation through the list of algorithms.
+    -   Download .Net Framework 8.0 [here](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.401-windows-x64-installer) if not already installed.
+-   Translating algorithms to C\#, C++, or VB.Net is streamlined and improved.
+    -   Translation is now integrated into the main app – not a separate .exe.
+    -   CodeConvert.ai is used but the process is now more automated.
+    -   CodeConvert.ai is free for 10 conversions per month. Otherwise, \$10/month.
+-   “First make it work, then make it better.” C\# support shares more VB.Net code.
+    -   The interoperability of C\# and VB.Net is nearly invisible.
+    -   The CPP_Managed project is now a C++/CLR (managed code.)
+        -   The translation from C\# to C++ is working but largely untested.
+    -   The previous C++ algorithms are in a project called CPP_Native.
+-   CPP_Managed is a C++/CLR Visual Studio project.
+    -   C++/CLR or Managed C++ is rarely encountered but suitable for OpenCVB.
 -   The breakdown of the suffix for any algorithm is as follows:
     -   AddWeighted_Basics – no suffix means it is VB.Net code only.
     -   AddWeighted_Basics_CS – “_CS” suffix means it is C\# code only.
-    -   AddWeighted_Basics_CPP_VB – C++ code with a VB.Net interface.
-    -   AddWeighted_Basics_CPP_CS – C++ code with a C\# interface.
-    -   AddWeighted_Basics_MT_CPP – a multi-threaded C++ algorithm.
-    -   AddWeighted_Basics_CPP – “_CPP” suffix means it is C++ code.
-        -   For “_CPP” the call to C++ is from the VB.Net infrastructure.
-        -   A deprecated AI-generated mechanism was used to build these.
-        -   This interface will be reworked soon to make it more general.
+    -   AddWeighted_Basics_CPP_VB – native C++ code with a VB.Net wrapper.
+    -   AddWeighted_Basics_CPP_CS – native C++ code with a C\# wrapper.
+    -   AddWeighted_Basics_CPP – “_CPP” suffix means C++/CLR (managed) code.
+    -   AddWeighted_Basics_CC – “_CC” suffix means it is Native C++ code.
+        -   “_CC” algorithms are called using PInvoke to native dll’s.
     -   Python examples end in .py. PyStream algorithms end in …_PS.py.
--   The jump in algorithm count is due to the addition of AI-generated C\# algorithms.
-    -   Almost all the VB.Net algorithms have been converted to C\#.
-        -   Fewer C\# algorithms than VB.Net because Options are VB-only.
-    -   The average lines per algorithm jumped as well from 31 lines to 37.
--   Microsoft’s CodeConverter.ai translated the VB.Net algorithms to C\#.
-    -   With such small algorithms, AI translation is feasible.
-    -   The VB.Net code was improved because of translation to C\#.
--   C\# is now a peer to VB.Net when developing algorithms in OpenCVB.
-    -   A new snippet version for C\# is equivalent to the VB.Net snippet.
-    -   Performance measurement for C\# works the same as that for VB.Net
-    -   Existing manually created C\# algorithms are in CS_Non_AI.cs.
--   Existing VB.Net infrastructure is reused for C\# algorithms.
--   OpenCVB’s Touchup.exe simplifies necessary small changes after AI translation.
-    -   The Touchup application is invoked from OpenCVB’s main toolbar.
-    -   Most algorithms were converted to C\# in a few minutes.
-    -   Longer conversions required the improved VB.Net infrastructure.
--   Previous Releases had a discontinued C++ AI translation process. It will return.
 -   A log of previous changes is included at the bottom of this document.
 
-![A collage of images of a room Description automatically generated](media/5eb5c074fbaeaf5aa017addc04b8710d.png)
+![](media/f6ba222f6e73f72f51d0b393a6b64bae.png)
 
-**AddWeighted_Basics_CS:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms end with “_CS” to distinguish them from the VB.Net version. If the algorithm uses both C++ and C\#, the name ends with “_CPP_CS”.*
-
-![A screenshot of a computer program Description automatically generated](media/cb0b14073ca049ecd641450e21bb739e.png)
-
-![A screenshot of a computer program Description automatically generated](media/b2dafcc91cee598b2abfca8ce921a5b4.png)
-
-**Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP_VB. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
+**Code Translator:** *The user interface for the code translator is shown above with the results shown at the bottom. It is invoked in OpenCVB using the ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button in the main panel. The web page for CodeConvert.ai is contained in a WebView2 control. The ComboBox and buttons at the top provide a 3-step process to translate the code. Here AddWeighted_CS, a C\# algorithm, is translated to C++. The formatting of the results is corrected when the code is pasted into CPP_Managed.cpp.*
 
 # 
 
@@ -201,7 +190,7 @@ Code snippets are installed using the Tools/Code Snippets Manager menu entry. Fo
 
 \<OpenCVB HomeDir\>/OpenCVB.snippets \>
 
-For C++ and VB.Net writing a new experiment requires a new class to be added in the “VB_Classes” project. OpenCVB will automatically detect the new class and present it in the user interface. The UI_Generator project is invoked in a pre-compile step for the VB_Classes project and the CS_Classes project. Just add code for a new algorithm and it will automatically appear in the user interface. Similarly, for C\# algorithms, add a code snippet to the “Non_AI.cs” file and the recompile will add the algorithm to the user interface. If you are using CodeConvert.ai to translate a VB.Net algorithm to C\#, place the translated C\# version in “AI_Gen.cs”.
+For C++ and VB.Net writing a new experiment requires a new class to be added in the “VB_Classes” project. OpenCVB will automatically detect the new class and present it in the user interface. The UI_Generator project is invoked in a pre-compile step for the VB_Classes project and the CS_Classes project. Just add code for a new algorithm and it will automatically appear in the user interface. Similarly, for C\# algorithms, add a code snippet to the “Non_AI.cs” file and the recompile will add the algorithm to the user interface. If you are using CodeConvert.ai to translate a VB.Net algorithm to C\#, place the translated C\# version in “CS_AI_Generated.cs”.
 
 Python examples don’t even require a VB.Net wrapper. But they do need to be added to the Python_Classes Project. Python algorithms, once added to the Python_Classes project, will appear in the user interface.
 
@@ -213,7 +202,7 @@ To install OpenCVB’s snippets in Visual Studio:
 -   Select “Basic” or “CSharp” as the Language.
 -   Add the “\<OpenCVB Dir\>/OpenCVB.snippets” directory.
 -   Access the code snippets with a right-click in the VB.Net or C\# code, select “Snippet/Insert Snippet” and select “OpenCVB.snippets”.
--   Even C++ algorithms can use snippets, but each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net code in the snippet. The C++ portion can be cut and pasted anywhere in OpenCVB’s “CPP_Classes” Visual Studio project.
+-   Even C++ algorithms can use snippets, but each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net code in the snippet. The C++ portion can be cut and pasted anywhere in OpenCVB’s “CPP_Managed” Visual Studio project.
 
 An alternate way to add projects is also available in OpenCVB. To see the complete list of algorithm types that can be added to OpenCVB, click on the “Blue Plus” button*![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png)* in OpenCVB’s main toolbar. A dialog box will guide the selection of the type of algorithm to be added.
 
@@ -223,7 +212,7 @@ The complete list of algorithms may be grouped into smaller subsets to study som
 
 ![](media/3248f766185f423ebb41215b2db7a2dd.png)
 
-*In the image above, the Group ComboBox selects all algorithms that use the “Edges_Sobel” algorithm. The Algorithm Combo Box shows the “Gradient_Depth” algorithm, one of the algorithms that uses “Edges_Sobel”. When the Group ComboBox is set to “\<All\>”, the Algorithm Combo Box will contain all the algorithms in OpenCVB.*
+*In the image above, the Group ComboBox selects all algorithms in the “\<All but Python\> group. The Algorithm Combo Box shows the “SLR_Trends” algorithm, one of the algorithms in that group. When the Group ComboBox is set to “\<All\>”, the Algorithm Combo Box will contain all the algorithms in OpenCVB.*
 
 The ability to create subsets from the hundreds of algorithms makes it easier to study examples of an OpenCV API or OpenCVB algorithm usage. In addition, the Group ComboBox has several higher-level groupings. For example, “\<Python\>” selects all Python algorithms. Or “\<OpenGL\>” selects only the OpenGL algorithms. The “\<All\>” entry in the Group ComboBox will restore the complete list of algorithms.
 
@@ -239,7 +228,7 @@ One side benefit of the “Test All” feature is that it provides a way to visu
 
 VB.Net is not a language typically associated with computer vision algorithms. But the abundance of examples in OpenCVB suggests this may be an oversight. Even the seasoned developer should recognize what is obvious to the beginner: VB.Net can keep the code simple to read and write. Papers and articles on software often use pseudo-code to present an algorithm. In many respects, VB.Net code resembles pseudo-code except it is an actual working implementation of the algorithm.
 
-VB.Net provides a full-featured language just like C\# with lambda functions and multi-threading except VB.Net uses only a subset of the special keys available on the keyboard. Contrasted with Python or C++, VB.Net need make no apologies for using real words instead of the keyboard hieroglyphics defined in Python or C++. VB.Net syntax easier to recall and much easier to type in. VB.Net includes user interface tools that are flexible and complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) - options missing from OpenCV's popular HighGUI library. (All existing HighGUI interfaces are still supported in OpenCVB.)
+VB.Net provides a full-featured language just like C\# with lambda functions and multi-threading except VB.Net uses only a subset of the special keys available on the keyboard. Contrasted with Python or C++, VB.Net need make no apologies for using real words instead of the keyboard hieroglyphics defined in Python or C++. VB.Net syntax is easier to recall and much easier to type in – the Intellisense is better than any other language. VB.Net includes user interface tools that are flexible and complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) - options missing from OpenCV's popular HighGUI library. (All existing HighGUI interfaces are still supported in OpenCVB.)
 
 The main caution in using VB.Net is to treat it as a scripting language like Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be detailed but it will be slower than optimized C++. Usually, the VB.Net algorithm is doing most of the real work in optimized C++ through the OpenCVSharp interface. Most algorithms run reasonably fast even in Debug mode because the release version of OpenCVSharp is active when OpenCVB is in Debug mode. Review the OpenCVB setup using Visual Studio’s “Build/Configuration Manager”.
 
@@ -1451,3 +1440,50 @@ The heat map is a well-known method to display populations – blue is cool or l
 **CS_AddWeighted_Basics:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms start with “CS_” to distinguish them from the VB.Net version.*
 
 ![A screenshot of a computer program Description automatically generated](media/498a747eed8b64cf8e4aab79d498d0c7.png)
+
+# Recent Changes – August 2024
+
+-   Over 3700 algorithms are included, averaging 37 lines of code per algorithm.
+-   OpenCVB has been upgraded to the latest version of OpenCVSharp.
+    -   Mat’s initialized with a data pointer now use “FromPixelData”.
+    -   Mat’s initialized with a Scalar now use “cv.Scalar.All(\<value\>)”.
+    -   It was a lot of typing and testing to make this change.
+-   The breakdown of the suffix for any algorithm is as follows:
+    -   AddWeighted_Basics – no suffix means it is VB.Net code only.
+    -   AddWeighted_Basics_CS – “_CS” suffix means it is C\# code only.
+    -   AddWeighted_Basics_CPP_VB – C++ code with a VB.Net interface.
+    -   AddWeighted_Basics_CPP_CS – C++ code with a C\# interface.
+    -   AddWeighted_Basics_MT_CPP – a multi-threaded C++ algorithm.
+    -   AddWeighted_Basics_CPP – “_CPP” suffix means it is C++ code.
+        -   For “_CPP” the call to C++ is from the VB.Net infrastructure.
+        -   A deprecated AI-generated mechanism was used to build these.
+        -   This interface will be reworked soon to make it more general.
+    -   Python examples end in .py. PyStream algorithms end in …_PS.py.
+-   The jump in algorithm count is due to the addition of AI-generated C\# algorithms.
+    -   Almost all the VB.Net algorithms have been converted to C\#.
+        -   Fewer C\# algorithms than VB.Net because Options are VB-only.
+    -   The average lines per algorithm jumped as well from 31 lines to 37.
+-   Microsoft’s CodeConverter.ai translated the VB.Net algorithms to C\#.
+    -   With such small algorithms, AI translation is feasible.
+    -   The VB.Net code was improved because of translation to C\#.
+-   C\# is now a peer to VB.Net when developing algorithms in OpenCVB.
+    -   A new snippet version for C\# is equivalent to the VB.Net snippet.
+    -   Performance measurement for C\# works the same as that for VB.Net
+    -   Existing manually created C\# algorithms are in CS_Non_AI.cs.
+-   Existing VB.Net infrastructure is reused for C\# algorithms.
+-   OpenCVB’s Touchup.exe simplifies necessary small changes after AI translation.
+    -   The Touchup application is invoked from OpenCVB’s main toolbar.
+    -   Most algorithms were converted to C\# in a few minutes.
+    -   Longer conversions required the improved VB.Net infrastructure.
+-   Previous Releases had a discontinued C++ AI translation process. It will return.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of a room Description automatically generated](media/5eb5c074fbaeaf5aa017addc04b8710d.png)
+
+**AddWeighted_Basics_CS:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms end with “_CS” to distinguish them from the VB.Net version. If the algorithm uses both C++ and C\#, the name ends with “_CPP_CS”.*
+
+![A screenshot of a computer program Description automatically generated](media/cb0b14073ca049ecd641450e21bb739e.png)
+
+![A screenshot of a computer program Description automatically generated](media/b2dafcc91cee598b2abfca8ce921a5b4.png)
+
+**Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP_VB. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*

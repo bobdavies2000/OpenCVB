@@ -76,7 +76,7 @@ vector<unManagedIO*> ioList({});
 
 
 extern "C" __declspec(dllexport)
-int ManagedCPP_Resume(int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBPtr, int* cloudPtr)
+int ManagedCPP_Resume(int ioIndex, int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBPtr, int* cloudPtr)
 {
     task.update();
     task.color = Mat(task.rows, task.cols, CV_8UC3, colorPtr).clone();
@@ -86,7 +86,7 @@ int ManagedCPP_Resume(int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBP
     task.pointCloud = Mat(task.rows, task.cols, CV_32FC3, cloudPtr).clone();
     split(task.pointCloud, task.pcSplit);
 
-    //ioList[ioIndex]->src = task.color.clone();
+    ioList[ioIndex]->src = task.color.clone();
     return (int)ioList.size() - 1;
 }
 
