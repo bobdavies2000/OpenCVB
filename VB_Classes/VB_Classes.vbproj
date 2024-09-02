@@ -486,6 +486,9 @@
     <PackageReference Include="NAudio">
       <Version>2.2.1</Version>
     </PackageReference>
+    <PackageReference Include="NETStandard.Library">
+      <Version>2.0.3</Version>
+    </PackageReference>
     <PackageReference Include="OpenCvSharp4">
       <Version>4.10.0.20240616</Version>
     </PackageReference>
