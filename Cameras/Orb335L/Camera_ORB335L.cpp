@@ -1,5 +1,4 @@
 #include "../CameraDefines.hpp"
-#ifdef ORB335L
 #include "libobsensor/hpp/Pipeline.hpp"
 #include "libobsensor/hpp/Error.hpp"
 #include <mutex>
@@ -16,6 +15,7 @@
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 #include "PragmaLibs.h" 
+#pragma comment(lib, "OrbbecSDK.lib")
 
 using namespace  cv;
 using namespace std;
@@ -190,4 +190,3 @@ extern "C" __declspec(dllexport) int* ORBPointCloud(CameraOrb335L * cPtr) { retu
 extern "C" __declspec(dllexport) int* ORBAccel(CameraOrb335L * cPtr){return (int*)&cPtr->acceleration;}
 extern "C" __declspec(dllexport) int* ORBGyro(CameraOrb335L * cPtr){return (int*)&cPtr->gyro;}
 extern "C" __declspec(dllexport) double ORBIMUTimeStamp(CameraOrb335L * cPtr){return cPtr->imuTimeStamp;}
-#endif

@@ -192,6 +192,8 @@ PublishScripts/
 ## NuGet v3's project.json files produces more ignorable files
 #*.nuget.props
 #*.nuget.targets
+packages/
+
 
 # Microsoft Azure Build Output
 csx/
@@ -383,11 +385,11 @@ VB_to_CPP/.vs/
 .vs/
 .vs/OpenCVB/v17/.suo
 cmake.db
-OakD/Build
-Mynt
-OrbbecSDK
+OakD/Build/
+Mynt/
+OrbbecSDK/
 zed-sdk/
 *.json
 CS_Classes\createAlgorithms.cs
 Temp/*.ply
-testORB/*.*
+testORB/
