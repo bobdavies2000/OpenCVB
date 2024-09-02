@@ -28,7 +28,7 @@
     <OutputPath>..\bin\Debug\</OutputPath>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <NoWarn>1701;1702;1416;</NoWarn>
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
