@@ -297,6 +297,7 @@ Public Class Translator
                         trimLine = "io = ioList[ioIndex];"
                     End If
 
+                    inline = inline.Replace("(Mat& io->src)", "()")
                     If trimLine.StartsWith("src") Then trimLine = trimLine.Replace("src", "io->src")
                     trimLine = trimLine.Replace(".src", "io->src")
                     trimLine = trimLine.Replace(" src", " io->src")

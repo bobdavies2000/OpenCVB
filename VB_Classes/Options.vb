@@ -3187,7 +3187,6 @@ Public Class Options_Spectrum : Inherits VB_Parent
         End If
     End Sub
     Public Function runRedCloud(ByRef label As String) As cvb.Mat
-        redC.Run(task.color)
         label = redC.labels(2)
         Return redC.dst2
     End Function
@@ -3339,6 +3338,7 @@ Public Class Options_Spectrum : Inherits VB_Parent
         Return ranges
     End Function
     Public Sub RunOpt()
+        If task.FirstPass Then redC.Run(task.color) ' special case!  Can't run it in constructor or measurements fail...
         Static frmSliders = FindFrm("Options_Spectrum Sliders")
         Static gapDSlider = FindSlider("Gap in depth spectrum (cm's)")
         Static gapGSlider = FindSlider("Gap in gray spectrum")
@@ -3635,11 +3635,13 @@ Public Class Options_Threshold : Inherits VB_Parent
             radio.addRadio("Trunc")
             radio.check(0).Checked = True
         End If
-
-        gradient.Run(empty)
-        dst2 = gradient.dst2
     End Sub
     Public Sub RunOpt()
+        If task.FirstPass Then  ' special case!  Can't run it in constructor or measurements fail...
+            gradient.Run(empty)
+            dst2 = gradient.dst2
+        End If
+
         Static radioChoices = {cvb.ThresholdTypes.Binary, cvb.ThresholdTypes.BinaryInv, cvb.ThresholdTypes.Tozero,
                             cvb.ThresholdTypes.TozeroInv, cvb.ThresholdTypes.Triangle, cvb.ThresholdTypes.Trunc}
         Static frm = FindFrm(traceName + " Radio Buttons")
@@ -3786,11 +3788,13 @@ Public Class Options_ThresholdAll : Inherits VB_Parent
             radio.addRadio("Trunc")
             radio.check(4).Checked = True
         End If
-
-        gradient.Run(empty)
-        dst2 = gradient.dst2
     End Sub
     Public Sub RunOpt()
+        If task.FirstPass Then  ' special case!  Can't run it in constructor or measurements fail...
+            gradient.Run(empty)
+            dst2 = gradient.dst2
+        End If
+
         Dim radioChoices = {cvb.ThresholdTypes.Binary, cvb.ThresholdTypes.BinaryInv, cvb.ThresholdTypes.Tozero,
                     cvb.ThresholdTypes.TozeroInv, cvb.ThresholdTypes.Triangle, cvb.ThresholdTypes.Trunc}
         options.RunOpt()

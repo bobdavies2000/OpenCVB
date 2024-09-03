@@ -95,6 +95,7 @@ Public Class VB_Parent : Implements IDisposable
         dst3 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         task.activeObjects.Add(Me)
 
+        If traceName = "Gradient_Color" Then Dim k = 0
         If task.recordTimings Then
             If standalone And task.testAllRunning = False Then
                 algorithm_ms.Clear()
