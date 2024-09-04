@@ -15,6 +15,7 @@ Public Class taskInfo
     End Sub
 End Class
 
+
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     Public TaskTimer As New System.Timers.Timer(1000)
@@ -32,14 +33,6 @@ Public Class VBtask : Implements IDisposable
     Public quarterRes As cvb.Size
     Public displayRes As cvb.Size
 
-    Public Enum gifTypes
-        gifdst0 = 0
-        gifdst1 = 1
-        gifdst2 = 2
-        gifdst3 = 3
-        openCVBwindow = 4
-        openGLwindow = 5
-    End Enum
     Public cvFontSize As Single = 0.8
     Public cvFontThickness As Integer = 1
 

@@ -486,3 +486,18 @@ Public Class rangeData
         ending = _ending
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Enum gifTypes
+    gifdst0 = 0
+    gifdst1 = 1
+    gifdst2 = 2
+    gifdst3 = 3
+    openCVBwindow = 4
+    openGLwindow = 5
+End Enum
