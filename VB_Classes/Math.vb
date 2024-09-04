@@ -1,6 +1,5 @@
 Imports cvb = OpenCvSharp
 Imports System.Threading
-Imports VB_Classes.VBtask
 ' https://answers.opencvb.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
 Public Class Math_Subtract : Inherits VB_Parent
     Dim options As New Options_Colors

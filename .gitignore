@@ -392,3 +392,4 @@ zed-sdk/
 CS_Classes\createAlgorithms.cs
 Temp/*.ply
 testORB/
+algorithmCount.txt

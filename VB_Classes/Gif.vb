@@ -2,7 +2,6 @@
 Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
 Imports System.IO
-Imports VB_Classes.VBtask
 
 ' https://stackoverflow.com/questions/1196322/how-to-create-an-animated-gif-in-net
 ' https://stackoverflow.com/questions/18719302/net-creating-a-looping-gif-using-gifbitmapencoder
