@@ -73,19 +73,9 @@ Public Class Options
             WorkingResRadio(i).Enabled = Main_UI.settings.resolutionsSupported(i)
         Next
 
-        If cameraName.StartsWith("Intel") Then
-            WorkingResRadio(resolutionList.IndexOf("320x240 - Quarter resolution")).Checked = True
-        Else
-            WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
-        End If
+        WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         If cameraName.StartsWith("StereoLabs") Then
             WorkingResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
-        End If
-        If cameraName.StartsWith("Azure Kinect 4K") Then
-            WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
-        End If
-        If cameraName.StartsWith("Orbbec Gemini 335L") Then
-            WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load

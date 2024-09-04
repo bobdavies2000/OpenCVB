@@ -1135,7 +1135,6 @@ Public Class Main_UI
 
         If OKcancel = DialogResult.OK Then
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
-            restartCameraRequest = True
             saveAlgorithmName = ""
             settings.WorkingRes = optionsForm.cameraWorkingRes
             settings.displayRes = optionsForm.cameraDisplayRes
@@ -1147,6 +1146,8 @@ Public Class Main_UI
 
             jsonWrite()
             jsonRead() ' this will apply all the changes...
+            restartCameraRequest = True
+            Application.DoEvents()
 
             StartTask()
         Else
@@ -1367,7 +1368,8 @@ Public Class Main_UI
     End Function
     Private Sub CameraTask()
         restartCameraRequest = True
-        Static saveWorkingRes As cvb.Size
+        Static saveWorkingRes As cvb.Size, saveCameraName As String = settings.cameraName
+
         For i = 0 To mbuf.Count - 1
             mbuf(i).color = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
             mbuf(i).leftView = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
@@ -1376,8 +1378,9 @@ Public Class Main_UI
         Next
 
         While 1
-            If restartCameraRequest Or settings.WorkingRes <> saveWorkingRes Then
+            If restartCameraRequest Or settings.cameraName <> saveCameraName Or settings.WorkingRes <> saveWorkingRes Then
                 saveWorkingRes = settings.WorkingRes
+                saveCameraName = settings.cameraName
                 If settings.cameraIndex = 3 Then
                     ' special handling for the Oak-D camera as it cannot be restarted.
                     ' It is my problem but I don't see how to fix it.
