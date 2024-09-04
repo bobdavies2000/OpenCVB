@@ -144,6 +144,7 @@ Public Class CPP_ManagedTask : Inherits VB_Parent
     Dim hDepthRGB As GCHandle
     Dim hCloud As GCHandle
     Dim ioIndex As Integer
+    Public ManagedObject As Object
     Public Sub New()
         desc = "Move data to the Managed C++/CLR code (CPP_Managed), run it, and retrieve the results."
     End Sub

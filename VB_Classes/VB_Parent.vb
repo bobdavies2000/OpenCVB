@@ -31,7 +31,7 @@ Public Class VB_Parent : Implements IDisposable
     Public dst0 As cvb.Mat, dst1 As cvb.Mat, dst2 As cvb.Mat, dst3 As cvb.Mat, empty As cvb.Mat
     Public labels(4 - 1) As String
     Public msRNG As New System.Random
-    Public algorithm As Object
+    Public VB_Algorithm As Object
     Public traceName As String
     Public desc As String
     Public black As New cvb.Vec3b, white As New cvb.Vec3b(255, 255, 255), grayColor As New cvb.Vec3b(127, 127, 127)
@@ -58,7 +58,7 @@ Public Class VB_Parent : Implements IDisposable
         FAST = 5
     End Enum
     Public Sub New()
-        algorithm = Me
+        VB_Algorithm = Me
         traceName = Me.GetType.Name
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
@@ -628,7 +628,7 @@ Public Class VB_Parent : Implements IDisposable
         combo.Dispose()
     End Sub
     Public Sub processFrame(src As cvb.Mat)
-        task.algorithmObject.Run(src)
+        task.MainUI_Algorithm.Run(src)
         task.labels = labels
 
         ' C++/CLR apps have already put their results in task.dst...
@@ -711,13 +711,14 @@ Public Class VB_Parent : Implements IDisposable
 
         task.trueData.Clear()
         If task.paused = False Then
-            If algorithm.traceName.EndsWith("_CPP") Then
+            If VB_Algorithm.traceName.EndsWith("_CPP") Then
                 Static nativeTask As New CPP_ManagedTask()
+                If nativeTask.ManagedObject Is Nothing Then nativeTask.ManagedObject = VB_Algorithm
                 nativeTask.RunAlg(src)
-                algorithm.RunAlg()
+                VB_Algorithm.RunAlg()
                 nativeTask.Pause()
             Else
-                algorithm.RunAlg(src)
+                VB_Algorithm.RunAlg(src)
             End If
         End If
         If task.testAllRunning = False Then measureEndRun(traceName)

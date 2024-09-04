@@ -25,7 +25,7 @@ Public Class VBtask : Implements IDisposable
     Public dst2 As cvb.Mat
     Public dst3 As cvb.Mat
 
-    Public algorithmObject As Object
+    Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
     Public mbuf(2 - 1) As inBuffer
     Public mbIndex As Integer
@@ -781,7 +781,7 @@ Public Class VBtask : Implements IDisposable
 
         Dim currSize As cvb.Size = New cvb.Size(task.dst2.Cols, task.dst2.Rows)
         If task.paused = False And src.Size = currSize Then
-            algorithmObject.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
+            MainUI_Algorithm.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
             task.FirstPass = False
             postProcess(src)
         End If

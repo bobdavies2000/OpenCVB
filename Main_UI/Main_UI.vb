@@ -281,7 +281,7 @@ Public Class Main_UI
         End If
 
         If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
-            settings.algorithm = AvailableAlgorithms.Text
+            settings.MainUI_AlgName = AvailableAlgorithms.Text
             settings.groupComboText = GroupCombo.Text
         End If
 
@@ -396,8 +396,8 @@ Public Class Main_UI
 
         ' if the fpstimer is enabled, then OpenCVB is running - not initializing.
         If fpsTimer.Enabled Then
-            If AvailableAlgorithms.Items.Contains(settings.algorithm) Then
-                AvailableAlgorithms.Text = settings.algorithm
+            If AvailableAlgorithms.Items.Contains(settings.MainUI_AlgName) Then
+                AvailableAlgorithms.Text = settings.MainUI_AlgName
             Else
                 AvailableAlgorithms.SelectedIndex = 0
             End If
@@ -718,7 +718,7 @@ Public Class Main_UI
         Else
             AvailableAlgorithms.SelectedItem = algName
         End If
-        settings.algorithm = AvailableAlgorithms.Text
+        settings.MainUI_AlgName = AvailableAlgorithms.Text
         jsonWrite()
     End Sub
     Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
@@ -1050,12 +1050,12 @@ Public Class Main_UI
             MsgBox("There were no algorithms listed for the " + GroupCombo.Text + vbCrLf +
                    "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
         Else
-            If settings.algorithm Is Nothing Then
+            If settings.MainUI_AlgName Is Nothing Then
                 AvailableAlgorithms.SelectedIndex = 0
-                settings.algorithm = AvailableAlgorithms.Text
+                settings.MainUI_AlgName = AvailableAlgorithms.Text
             End If
-            If AvailableAlgorithms.Items.Contains(settings.algorithm) Then
-                AvailableAlgorithms.Text = settings.algorithm
+            If AvailableAlgorithms.Items.Contains(settings.MainUI_AlgName) Then
+                AvailableAlgorithms.Text = settings.MainUI_AlgName
             Else
                 AvailableAlgorithms.SelectedIndex = 0
             End If
@@ -1437,9 +1437,9 @@ Public Class Main_UI
             ' make sure unmanaged portion of the CPP_Managed library is initialized with critical data before the first C++/CLR algorithm.
             Dim setup = New CPP_Managed.CPP_IntializeManaged()
 
-            task.algorithmObject = algolist.createAlgorithm(parms.algName)
+            task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 
-            textDesc = task.algorithmObject.desc
+            textDesc = task.MainUI_Algorithm.desc
 
             intermediateReview = ""
 

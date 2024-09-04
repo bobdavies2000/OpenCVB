@@ -86,6 +86,7 @@ int ManagedCPP_Resume(int ioIndex, int* colorPtr, int* leftPtr, int* rightPtr, i
     task.pointCloud = Mat(task.rows, task.cols, CV_32FC3, cloudPtr).clone();
     split(task.pointCloud, task.pcSplit);
 
+
     ioList[ioIndex]->src = task.color.clone();
     return (int)ioList.size() - 1;
 }
@@ -142,6 +143,7 @@ namespace CPP_Managed {
         size_t ioIndex;
         unManagedIO* io;
         double weight;
+       // cv::Mat src2; // provided by the callee...
         AddWeighted_Basics_CPP()
         {
             unManagedIO* ioNew = new unManagedIO();
@@ -157,7 +159,6 @@ namespace CPP_Managed {
             io = ioList[ioIndex];
             options->RunOpt();
 
-            // algorithm user normally provides src2! 
             if (standaloneTest() || io->src2.empty()) io->src2 = task.depthRGB;
             if (io->src.type() != io->src2.type())
             {

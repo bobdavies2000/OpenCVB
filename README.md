@@ -1,13 +1,12 @@
 # Recent Changes – September 2024
 
 -   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
--   OpenCVB’s user interface is updated to run with .Net Framework 8.0.
+-   Visual Studio Community Edition upgraded to 17.11.
     -   Better debugger, improved GC, async programming, C\# 11.0.
     -   Visual Studio 2022 Version 17.8 or later is now required.
         -   In Visual Studio, click Help/Check for Updates to get updated.
     -   Translation (see below) needed to use the latest web control.
     -   ComboBox control has improved navigation through the list of algorithms.
-    -   Download .Net Framework 8.0 [here](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.401-windows-x64-installer) if not already installed.
 -   Translating algorithms to C\#, C++, or VB.Net is streamlined and improved.
     -   Translation is now integrated into the main app – not a separate .exe.
     -   CodeConvert.ai is used but the process is now more automated.

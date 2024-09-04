@@ -5,7 +5,7 @@ Imports System.IO
 Namespace jsonClass
 
     Public Class ApplicationStorage
-        Public algorithm As String
+        Public MainUI_AlgName As String
         Public groupComboText As String
 
         Public cameraIndex As Integer
