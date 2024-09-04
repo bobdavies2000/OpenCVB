@@ -10,10 +10,6 @@ Public Class TreeviewForm
         Dim split = e.Node.Text.Split(" ")
         Main_UI.intermediateReview = split(0)
     End Sub
-    Private Sub TreeviewForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        Dim split() = Me.Text.Split()
-        If split(0) <> "CPP_Basics" Then Main_UI.AvailableAlgorithms.Text = split(0)
-    End Sub
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
         PercentTime.Height = TreeView1.Height
@@ -33,12 +29,6 @@ Public Class TreeviewForm
         Next
         Return Nothing
     End Function
-    Private Sub Options_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        SaveSetting("OpenCVB", "treeViewLeft", "treeViewLeft", Me.Left)
-        SaveSetting("OpenCVB", "treeViewTop", "treeViewTop", Me.Top)
-        SaveSetting("OpenCVB", "treeViewWidth", "treeViewWidth", Me.Width)
-        SaveSetting("OpenCVB", "treeViewHeight", "treeViewHeight", Me.Height)
-    End Sub
     Private Function getNode(tv As TreeView, name As String) As TreeNode
         For Each n In tv.Nodes
             If n.tag = name Then Return n

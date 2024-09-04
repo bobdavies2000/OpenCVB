@@ -81,9 +81,6 @@ Namespace jsonClass
             SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", 10)
             SaveSetting("OpenCVB", "gOptionsTop", "gOptionsTop", 10)
 
-            SaveSetting("OpenCVB", "treeViewLeft", "treeViewLeft", 20)
-            SaveSetting("OpenCVB", "treeViewTop", "treeViewTop", 20)
-
             empty.Add(emptyApp)
             Return empty
         End Function

@@ -79,7 +79,7 @@ Public Class Main_UI
 
     Dim myBrush = New SolidBrush(Color.White)
     Dim groupList As New List(Of String)
-    Dim TreeViewDialog As TreeviewForm
+    Public TreeViewDialog As TreeviewForm
     Public fpsAlgorithm As Single
     Public fpsCamera As Single
     Dim picLabels() = {"", "", "", ""}
@@ -273,6 +273,13 @@ Public Class Main_UI
         End With
     End Sub
     Public Sub jsonWrite()
+        If TreeButton.Checked Then
+            SaveSetting("OpenCVB", "treeViewLeft", "treeViewLeft", TreeViewDialog.Left)
+            SaveSetting("OpenCVB", "treeViewTop", "treeViewTop", TreeViewDialog.Top)
+            SaveSetting("OpenCVB", "treeViewWidth", "treeViewWidth", TreeViewDialog.Width)
+            SaveSetting("OpenCVB", "treeViewHeight", "treeViewHeight", TreeViewDialog.Height)
+        End If
+
         If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
             settings.algorithm = AvailableAlgorithms.Text
             settings.groupComboText = GroupCombo.Text
@@ -1018,7 +1025,7 @@ Public Class Main_UI
 
         setupCamPics()
 
-        If settings.treeButton Then TreeButton_Click(sender, e)
+        TreeButton_Click(sender, e)
 
         loadAlgorithmComboBoxes()
 
