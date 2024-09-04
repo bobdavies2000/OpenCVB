@@ -67,14 +67,6 @@ if not exist OakD\Build (
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
 )
 
-echo "repeated so you don't miss it!'"
-echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
-echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
-echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
-echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
-echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
-echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
-echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
 
 echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
 echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
@@ -83,6 +75,17 @@ echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stere
 echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
 echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
 echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
+echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
+echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
+echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
+echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
+echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
+echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
+echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
+echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
+echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
+echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
+
 
 echo "StereoLabs SDK install may also download and install CUDA if not already present."
 echo "Set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3" <<< or whatever version was downloaded.
