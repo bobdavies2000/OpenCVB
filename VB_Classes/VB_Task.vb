@@ -756,7 +756,7 @@ Public Class VBtask : Implements IDisposable
                     Next
 
                     task.gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(task.HomeDir + "\GifBuilder\bin\x64\Release\net7.0-windows\")
+                    Dim dirInfo As New DirectoryInfo(task.HomeDir + "GifBuilder\bin\x64\Release\net48\")
                     Dim dirData = dirInfo.GetDirectories()
                     Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                     If gifExe.Exists = False Then
