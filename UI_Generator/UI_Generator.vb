@@ -4,9 +4,6 @@ Imports System.Threading
 Module UI_Generator
     Private ReadOnly MutexName As String = "SingleInstanceAppMutex"
     Sub Main(args As String())
-#If DEBUG Then
-        Console.WriteLine("Currently compiled with DEBUG (so it is slower.)")
-#End If
         Using mutex As New Mutex(False, MutexName, createdNew:=False)
             mutex.WaitOne()
             mutex.ReleaseMutex()
@@ -14,11 +11,7 @@ Module UI_Generator
 
 
         Dim fullXRef As Boolean
-        If args.Length > 0 Then
-            If args(0) = "All" Then fullXRef = True
-        Else
-            Console.WriteLine("No arguments provided.")
-        End If
+        If args.Length > 0 Then If args(0) = "All" Then fullXRef = True
 
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
