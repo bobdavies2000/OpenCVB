@@ -2905,14 +2905,10 @@ Public Class Options_Gif : Inherits VB_Parent
     Public Sub RunOpt()
         Static frmCheck = FindFrm(traceName + " CheckBoxes")
         Static frmRadio = FindFrm(traceName + " Radio Buttons")
-        If task.FirstPass Then
-            Static myFrameCount As Integer = 0
-            myFrameCount += 1
-            frmCheck.Left = task.gOptions.Width / 2
-            frmCheck.top = task.gOptions.Height / 2
-            frmRadio.left = task.gOptions.Width * 2 / 3
-            frmRadio.top = task.gOptions.Height * 2 / 3
-        End If
+        frmCheck.Left = task.gOptions.Width / 2
+        frmCheck.top = task.gOptions.Height / 2
+        frmRadio.left = task.gOptions.Width * 2 / 3
+        frmRadio.top = task.gOptions.Height * 2 / 3
 
         If dst0Radio.Checked Then task.gifCaptureIndex = 0
         If dst1Radio.Checked Then task.gifCaptureIndex = 1
