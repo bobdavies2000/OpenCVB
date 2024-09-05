@@ -62,7 +62,7 @@
     <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj" />
   </ItemGroup>
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe</PreBuildEvent>
+    <PreBuildEvent>"$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe"</PreBuildEvent>
     <BaseOutputPath></BaseOutputPath>
   </PropertyGroup>
 </Project>
