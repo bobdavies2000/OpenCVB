@@ -922,6 +922,8 @@ Public Class Main_UI
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
         HomeDir = New DirectoryInfo(exeDir.FullName + "/../../../../../")
+        Directory.SetCurrentDirectory(HomeDir.FullName)
+        HomeDir = New DirectoryInfo("./")
 
         threadStartTime = DateTime.Now
 

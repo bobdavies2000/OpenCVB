@@ -23,6 +23,8 @@ Module UI_Generator
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
         Dim HomeDir = New DirectoryInfo(exeDir.FullName + "/../../../../")
+        Directory.SetCurrentDirectory(HomeDir.FullName)
+        HomeDir = New DirectoryInfo("./")
 
         Dim xRefFile = New FileInfo(HomeDir.FullName + "Data/XRef.txt")
         If xRefFile.Exists = False Then fullXRef = True
