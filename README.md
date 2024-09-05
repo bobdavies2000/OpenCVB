@@ -29,6 +29,7 @@
     -   Python examples end in .py. PyStream algorithms end in …_PS.py.
 -   CAUTION: install OpenCVB in a directory with no spaces – a lot of things break.
     -   It will be fixed real soon. Install problems are the highest priority.
+    -   Install problem resolved – September 5th.
 -   A log of previous changes is included at the bottom of this document.
 
 ![](media/f6ba222f6e73f72f51d0b393a6b64bae.png)
