@@ -154,7 +154,7 @@ Why are there no official releases of OpenCVB? The repository is the release. Th
 Support for some optional cameras can be added.
 
 -   For the StereoLabs ZED 2 and 2i cameras, install the StereoLabs SDK from
-    -   [ZED SDK 3.8 - Download \| Stereolabs](https://www.stereolabs.com/developers/release/3.8/)
+    -   [ZED SDK 4.1 with CUDA 12.0 - Download \| Stereolabs](https://download.stereolabs.com/zedsdk/4.1/cu121/win)
     -   NOTE: StereoLabs requires an NVIDIA card with CUDA.
 -   For the Mynt Eye D 1000 camera, download the SDK from:
     -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
