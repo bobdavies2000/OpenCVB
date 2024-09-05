@@ -67,24 +67,22 @@ if not exist OakD\Build (
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
 )
 
-
-echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
-echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
-echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
-echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
-echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
-echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
-echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
-echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
-echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
-echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
-echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
-echo "If you compiler OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
+echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
+echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
+echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
+echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
+echo "If you compile OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
+echo "If you compile OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
+echo "If you compile OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
+echo "If you compile OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
-echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
+echo "Download from here for StereoLabs SDK 4.1 with CUDA 12: https://download.stereolabs.com/zedsdk/4.1/cu121/win"
+echo "Download from here for StereoLabs SDK 4.1 with CUDA 12: https://download.stereolabs.com/zedsdk/4.1/cu121/win"
+echo "Download from here for StereoLabs SDK 4.1 with CUDA 12: https://download.stereolabs.com/zedsdk/4.1/cu121/win"
+echo "Download from here for StereoLabs SDK 4.1 with CUDA 12: https://download.stereolabs.com/zedsdk/4.1/cu121/win"
 
 
 echo "StereoLabs SDK install may also download and install CUDA if not already present."
