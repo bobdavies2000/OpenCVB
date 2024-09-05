@@ -1,25 +1,41 @@
-﻿Imports OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
 Imports Microsoft.Web.WebView2.Core
 
 Public Class Translator
 #Region "NonVolatile"
+    Dim cursorInPoint As New cvb.Point(250, 750)
+    Dim cursorOutPoint As New cvb.Point(650, 750)
     Dim algName As String = ""
     <DllImport("user32.dll")>
     Private Shared Function SetCursorPos(x As Integer, y As Integer) As Boolean
     End Function
 
-    <DllImport("user32.dll")>
-    Private Shared Sub mouse_event(dwFlags As Integer, dx As Integer, dy As Integer, cButtons As Integer, dwExtraInfo As Integer)
-    End Sub
-
     Private Const MOUSEEVENTF_LEFTDOWN As Integer = &H2
     Private Const MOUSEEVENTF_LEFTUP As Integer = &H4
     Dim saveTask As Object
     Dim clipLines As String = ""
-    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        XYLoc.Text = "X = " + CStr(Cursor.Position.X) + ", Y = " + CStr(Cursor.Position.Y)
+    <DllImport("user32.dll")>
+    Private Shared Sub mouse_event(dwFlags As Integer, dx As Integer, dy As Integer, cButtons As Integer, dwExtraInfo As Integer)
+    End Sub
+
+    Private Sub LoadData(sender As Object, e As EventArgs)
+        Dim testLines = My.Computer.Clipboard.GetText(System.Windows.Forms.TextDataFormat.Text)
+        If testLines.Length = 0 Then Clipboard.SetText(clipLines)
+
+        SetCursorPos(cursorInPoint.X, cursorInPoint.Y)
+        PerformMouseClick("LeftClick")
+        SendKeys.Send("^a")
+        SendKeys.Send("^v")
+    End Sub
+    Private Sub CopyResultsBack_Click(sender As Object, e As EventArgs) Handles CopyResultsBack.Click
+        SetCursorPos(cursorOutPoint.X, cursorOutPoint.Y)
+        PerformMouseClick("LeftClick")
+        SendKeys.Send("^a")
+        SendKeys.Send("^c")
+
+        Timer3.Enabled = True
     End Sub
     Private Sub WebView_CoreWebView2InitializationCompleted(sender As Object, e As Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs) Handles WebView.CoreWebView2InitializationCompleted
         'subscribe to CoreWebView2 event(s) (add event handlers) 
@@ -46,22 +62,6 @@ Public Class Translator
                 ' Implement right click logic (similar to left click)
         End Select
     End Sub
-    Private Sub setInputLanguage(langStr As String)
-        SetCursorPos(385, 385)
-        PerformMouseClick("LeftClick")
-
-        SendKeys.Send(langStr)
-        Application.DoEvents()
-        SendKeys.Send(vbCrLf)
-    End Sub
-    Private Sub setOutputLanguage(langStr As String)
-        SetCursorPos(815, 385)
-        PerformMouseClick("LeftClick")
-
-        SendKeys.Send(langStr)
-        Application.DoEvents()
-        SendKeys.Send(vbCrLf)
-    End Sub
     Private Async Sub Translate_Click(sender As Object, e As EventArgs) Handles translate.Click
         Dim script = "document.getElementById('convert-btn').click();"
         Await WebView.CoreWebView2.ExecuteScriptAsync(script)
@@ -81,18 +81,11 @@ Public Class Translator
         Dim saveTask = InitializeAsync()
         Me.Top = 0
         Me.Left = 0
-        XYLoc.Left = 10
-        XYLoc.Top = WebView.Top + WebView.Height + 3
-        Me.WindowState = FormWindowState.Maximized
-
         For Each alg In Main_UI.AvailableAlgorithms.Items
             Algorithms.Items.Add(alg)
         Next
-        ' Algorithms.SelectedIndex = Main_UI.AvailableAlgorithms.SelectedIndex
-
         Timer4.Enabled = True
     End Sub
-
     Dim result As String
     Private Async Sub translateSetting()
         Dim script As String = "document.documentElement.outerHTML;"
@@ -156,23 +149,7 @@ Public Class Translator
         Timer2.Enabled = False
         LoadData(sender, e)
     End Sub
-    Private Sub LoadData(sender As Object, e As EventArgs)
-        Dim testLines = My.Computer.Clipboard.GetText(System.Windows.Forms.TextDataFormat.Text)
-        If testLines.Length = 0 Then Clipboard.SetText(clipLines)
 
-        SetCursorPos(250, 900)
-        PerformMouseClick("LeftClick")
-        SendKeys.Send("^a")
-        SendKeys.Send("^v")
-    End Sub
-    Private Sub CopyResultsBack_Click(sender As Object, e As EventArgs) Handles CopyResultsBack.Click
-        SetCursorPos(900, 900)
-        PerformMouseClick("LeftClick")
-        SendKeys.Send("^a")
-        SendKeys.Send("^c")
-
-        Timer3.Enabled = True
-    End Sub
 
     Private Sub Timer3_Tick(sender As Object, e As EventArgs) Handles Timer3.Tick
         Timer3.Enabled = False
@@ -340,5 +317,14 @@ Public Class Translator
             TranslatorResults.rtb.Text += line + vbCrLf
         Next
         TranslatorResults.Show()
+    End Sub
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        XYLoc.Text = "X = " + CStr(Cursor.Position.X) + ", Y = " + CStr(Cursor.Position.Y)
+    End Sub
+    Private Sub Timer5_Tick(sender As Object, e As EventArgs) Handles Timer5.Tick
+        Me.Top = 0
+        Me.Left = 0
+        Me.Width = 880
+        Me.Height = 880
     End Sub
 End Class
