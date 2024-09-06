@@ -27,9 +27,7 @@
     -   AddWeighted_Basics_CC – “_CC” suffix means it is Native C++ code.
         -   “_CC” algorithms are called using PInvoke to native dll’s.
     -   Python examples end in .py. PyStream algorithms end in …_PS.py.
--   \~\~CAUTION: install OpenCVB in a directory with no spaces – a lot of things break.
-    -   It will be fixed real soon. Install problems are the highest priority.\~\~
-    -   Install problem resolved – September 5th.
+-   Install directory with spaces now supported. Resolved – September 5th.
 -   A log of previous changes is included at the bottom of this document.
 
 ![](media/f6ba222f6e73f72f51d0b393a6b64bae.png)
