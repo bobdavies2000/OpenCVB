@@ -428,3 +428,4 @@ Public Class Color8U_BlackAndWhite : Inherits VB_Parent
         dst3 = dst1.Threshold(options.maxThreshold, 255, cvb.ThresholdTypes.Binary)
     End Sub
 End Class
+

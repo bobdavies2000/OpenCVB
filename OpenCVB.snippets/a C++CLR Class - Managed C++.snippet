@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>C++/CLR Algorithm</Title>
+			<Shortcut>cppclrmain</Shortcut>
+			<Description>Snippet for C++/CLR Algorithm</Description>
+			<Author>OpenCVB</Author>
+		</Header>
+		<Snippet>
+			<Code Language="C#">
+				<![CDATA[
+    public ref class AnyName_Basics_CPP : public VB_Parent
+    {
+        Options_AddWeighted^ options = gcnew Options_AddWeighted();
+    public:
+        size_t ioIndex;
+        unManagedIO* io;
+        AnyName_Basics_CPP`()
+        {
+            unManagedIO* ioNew = new unManagedIO(); // statements to show how to initialize the io structure.
+            ioIndex = ioList.size();
+            ioList.push_back(ioNew);
+            io = ioNew;
+            desc = "description";
+        }
+
+        void RunAlg()
+        {
+            io = ioList[ioIndex];
+            options->RunOpt();
+            addWeighted(io->src, weight, io->src2, 1.0 - weight, 0, io->dst2);  // statement shows how to use io structure.
+        }
+    };
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

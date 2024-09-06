@@ -83,6 +83,7 @@ _Stable_BasicsCount_CC
 End Enum
 	Public Function createAlgorithm(algorithmName as string) as Object
 	If algorithmName.endsWith(".py") then return new Python_Run()
+	If algorithmName = "AddWeighted_Accumulate" Then return new AddWeighted_Accumulate
 	If algorithmName = "AddWeighted_Basics" Then return new AddWeighted_Basics
 	If algorithmName = "AddWeighted_Basics_CC" Then return new CPP_Basics(ccFunctionNames._AddWeighted_Basics_CC)
 	If algorithmName = "AddWeighted_Basics_CPP" Then return new AddWeighted_Basics_CPP
@@ -859,7 +860,10 @@ End Enum
 	If algorithmName = "Edge_BinarizedReduction_CS" Then return new Edge_BinarizedReduction_CS
 	If algorithmName = "Edge_Canny" Then return new Edge_Canny
 	If algorithmName = "Edge_Canny_CC" Then return new CPP_Basics(ccFunctionNames._Edge_Canny_CC)
+	If algorithmName = "Edge_Canny_CPP" Then return new Edge_Canny_CPP
 	If algorithmName = "Edge_Canny_CS" Then return new Edge_Canny_CS
+	If algorithmName = "Edge_CannyAccum" Then return new Edge_CannyAccum
+	If algorithmName = "Edge_CannyAccumColorize" Then return new Edge_CannyAccumColorize
 	If algorithmName = "Edge_CannyCombined" Then return new Edge_CannyCombined
 	If algorithmName = "Edge_CannyCombined_CS" Then return new Edge_CannyCombined_CS
 	If algorithmName = "Edge_CannyHistory" Then return new Edge_CannyHistory
@@ -1987,6 +1991,7 @@ End Enum
 	If algorithmName = "Mat_Inverse_CS" Then return new Mat_Inverse_CS
 	If algorithmName = "Mat_Managed" Then return new Mat_Managed
 	If algorithmName = "Mat_Managed_CS" Then return new Mat_Managed_CS
+	If algorithmName = "Mat_ManualCopyTest_CPP" Then return new Mat_ManualCopyTest_CPP
 	If algorithmName = "Mat_MatToPoint" Then return new Mat_MatToPoint
 	If algorithmName = "Mat_MatToPoint_CS" Then return new Mat_MatToPoint_CS
 	If algorithmName = "Mat_MultiplyReview" Then return new Mat_MultiplyReview
@@ -2139,6 +2144,7 @@ End Enum
 	If algorithmName = "Motion_Diff_CS" Then return new Motion_Diff_CS
 	If algorithmName = "Motion_Enclosing" Then return new Motion_Enclosing
 	If algorithmName = "Motion_Enclosing_CPP_CS" Then return new Motion_Enclosing_CPP_CS
+	If algorithmName = "Motion_FromEdgeAccum" Then return new Motion_FromEdgeAccum
 	If algorithmName = "Motion_Grayscale" Then return new Motion_Grayscale
 	If algorithmName = "Motion_Grayscale_CS" Then return new Motion_Grayscale_CS
 	If algorithmName = "Motion_Grid" Then return new Motion_Grid

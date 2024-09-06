@@ -29,7 +29,7 @@ Public Class VB_Parent : Implements IDisposable
     Public sliders As New OptionsSliders
     Public standalone As Boolean
     Public dst0 As cvb.Mat, dst1 As cvb.Mat, dst2 As cvb.Mat, dst3 As cvb.Mat, empty As cvb.Mat
-    Public labels(4 - 1) As String
+    Public labels() As String = {"", "", "", ""}
     Public msRNG As New System.Random
     Public VB_Algorithm As Object
     Public traceName As String
@@ -383,10 +383,6 @@ Public Class VB_Parent : Implements IDisposable
 
         Return Nothing
     End Function
-    Public Sub findSliderCPP(opt As String, value As Integer)
-        ' managed C++ does not have System.Windows.Forms...
-        FindSlider(opt).Value = value
-    End Sub
     Public Function FindCheckBox(opt As String) As CheckBox
         While 1
             Try

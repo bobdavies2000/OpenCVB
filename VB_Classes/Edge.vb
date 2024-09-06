@@ -1268,3 +1268,41 @@ Public Class Edge_Color8U : Inherits VB_Parent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Edge_CannyAccum : Inherits VB_Parent
+    Dim canny As New Edge_Canny
+    Dim accum As New AddWeighted_Accumulate
+    Public Sub New()
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        desc = "Accumulate Canny edges to highlight all real edges better."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        canny.Run(src)
+        accum.Run(canny.dst2)
+        dst2 = accum.dst2
+        labels(2) = "Accumulated canny edges."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Edge_CannyAccumColorize : Inherits VB_Parent
+    Dim cAccum As New Edge_CannyAccum
+    Public Sub New()
+        labels = {"", "", "Canny edges accumulated", "Colorized version of dst2 - blue indicates motion."}
+        desc = "Colorize the output of Edge_CannyAccum to show values off the peak value which indicate motion."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        cAccum.Run(src)
+        dst2 = cAccum.dst2
+        dst3 = ShowPalette(dst2)
+    End Sub
+End Class

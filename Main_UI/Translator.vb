@@ -303,6 +303,7 @@ Public Class Translator
                     trimLine = trimLine.Replace(" options;", " *options;")
                     trimLine = trimLine.Replace("options.", "options->")
                     trimLine = trimLine.Replace("standaloneTest()", "standalone")
+                    trimLine = trimLine.Replace("RunAlg(Mat& io->src)", "RunAlg()")
 
                     inline = trimLine
             End Select

@@ -808,3 +808,24 @@ Public Class Motion_MinRect : Inherits VB_Parent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Motion_FromEdgeAccum : Inherits VB_Parent
+    Dim cAccum As New Edge_CannyAccum
+    Public Sub New()
+        desc = "Detect motion from pixels less that max value in an accumulation."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        cAccum.Run(src)
+
+        Dim mm = GetMinMax(cAccum.dst2)
+        labels(3) = "Max value = " + CStr(mm.maxVal)
+
+        dst2 = cAccum.dst2.Threshold(mm.maxVal, 255, cvb.ThresholdTypes.TozeroInv)
+        dst3 = cAccum.dst2.InRange(0, mm.maxVal - 10)
+    End Sub
+End Class

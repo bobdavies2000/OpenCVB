@@ -53,6 +53,31 @@ End Class
 
 
 
+
+Public Class AddWeighted_Accumulate : Inherits VB_Parent
+    Dim options As New Options_AddWeighted
+    Public Sub New()
+        dst1 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32F, 0)
+        labels(3) = "Instantaneous gray scale image"
+        desc = "Update a running average of the image"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        src.ConvertTo(dst3, cvb.MatType.CV_32F)
+        cvb.Cv2.AccumulateWeighted(dst3, dst1, options.accumWeighted, New cvb.Mat)
+        dst1.ConvertTo(dst2, cvb.MatType.CV_8U)
+        labels(2) = "Accumulated gray scale image"
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class AddWeighted_InfraRed : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Dim src2 As New cvb.Mat
@@ -115,3 +140,7 @@ Public Class AddWeighted_LeftRight : Inherits VB_Parent
         dst2 = addw.dst2
     End Sub
 End Class
+
+
+
+

@@ -32,15 +32,18 @@ using namespace System::Runtime::InteropServices;
 using namespace VB_Classes;
 using namespace std;
 using namespace cv;
+using namespace System;
+using namespace System::Drawing;
+using namespace System::Windows::Forms;
 
-public class unmanagedData
+public class unManagedData
 {
 public:
     Mat src, color, leftView, rightView, depthRGB, pointCloud;
     Mat pcSplit[3];
     int rows, cols; // working resolution for all Mat's
     bool optionsChanged;
-    unmanagedData()
+    unManagedData()
     {
     }
     void update()
@@ -52,23 +55,16 @@ public:
 
 };
 
-unmanagedData task;
+unManagedData task;
 
 public struct unManagedIO
 {
     Mat src, src2, dst0, dst1, dst2, dst3;
     unManagedIO()
     {
-        src = Mat(task.rows, task.cols, CV_8UC3);
-        dst0 = Mat(task.rows, task.cols, CV_8UC3);
-        dst1 = Mat(task.rows, task.cols, CV_8UC3);
-        dst2 = Mat(task.rows, task.cols, CV_8UC3);
-        dst3 = Mat(task.rows, task.cols, CV_8UC3);
-
-        dst0.setTo(0);
-        dst1.setTo(0);
-        dst2.setTo(0);
-        dst3.setTo(0);
+        src = Mat(task.rows, task.cols, CV_8UC3); dst0 = Mat(task.rows, task.cols, CV_8UC3); dst1 = Mat(task.rows, task.cols, CV_8UC3);
+        dst2 = Mat(task.rows, task.cols, CV_8UC3); dst3 = Mat(task.rows, task.cols, CV_8UC3);
+        dst0.setTo(0); dst1.setTo(0); dst2.setTo(0); dst3.setTo(0); 
     }
 };
 
@@ -85,7 +81,6 @@ int ManagedCPP_Resume(int ioIndex, int* colorPtr, int* leftPtr, int* rightPtr, i
     task.depthRGB = Mat(task.rows, task.cols, CV_8UC3, depthRGBPtr).clone();
     task.pointCloud = Mat(task.rows, task.cols, CV_32FC3, cloudPtr).clone();
     split(task.pointCloud, task.pcSplit);
-
 
     ioList[ioIndex]->src = task.color.clone();
     return (int)ioList.size() - 1;
@@ -150,7 +145,7 @@ namespace CPP_Managed {
             ioIndex = ioList.size();
             ioList.push_back(ioNew);
             io = ioNew;
-            findSliderCPP("Add Weighted %", 49); // showing how to set a slider in managed C++ which doesn't have System.Windows.Forms.
+            FindSlider("Add Weighted %")->Value = 49; // showing how to set a slider in managed C++ which doesn't have System.Windows.Forms.
             desc = "Add 2 images with specified weights.";
         }
 
@@ -237,6 +232,198 @@ namespace CPP_Managed {
         }
     };
 
+
+
+
+
+    public ref class Mat_ManualCopyTest_CPP : public VB_Parent
+    {
+    private:
+        Options_BrightnessContrast^ options = gcnew Options_BrightnessContrast();
+    public:
+        size_t ioIndex;
+        unManagedIO* io;
+        Mat_ManualCopyTest_CPP()
+        {
+            unManagedIO* ioNew = new unManagedIO();
+            ioIndex = ioList.size();
+            ioList.push_back(ioNew);
+            io = ioNew;
+            desc = "Testing access to the Native C++ buffer for src - it is not managed and should be accessible.";
+        }
+        void RunAlg()
+        {
+            io = ioList[ioIndex];
+            options->RunOpt();
+
+            int alpha = (int)options->brightness;
+            size_t beta = options->contrast;
+            size_t stepSize = io->src.cols * io->src.elemSize();
+            uchar* srcData = io->src.data;
+            uchar* dst2Data = io->dst2.data;
+            for (int y = 0; y < io->src.rows; y++)
+            {
+                for (int x = 0; x < stepSize; x++)
+                {
+                    uchar b = (uchar)abs(srcData[y * stepSize + x] * alpha - beta);
+                    dst2Data[y * stepSize + x] = b;
+                }
+            }
+            memcpy(io->dst3.data, srcData, io->src.rows * stepSize);  // Native buffers are fixed but may not be contiguous.
+        }
+    };
+
+
+
+
+    public ref class Edge_Canny_CPP : public VB_Parent
+    {
+    private:
+        Options_Canny^ options = gcnew Options_Canny();
+    public:
+        size_t ioIndex;
+        unManagedIO* io;
+        Edge_Canny_CPP()
+        {
+            unManagedIO* ioNew = new unManagedIO();
+            ioIndex = ioList.size();
+            ioList.push_back(ioNew);
+            io = ioNew;
+            labels[2] = "Canny using L1 Norm";
+            labels[3] = "Canny using L2 Norm";
+            desc = "Show canny edge detection with varying thresholds";
+        }
+        void RunAlg()
+        {
+            options->RunOpt();
+
+            if (io->src.channels() == 3) {
+                cvtColor(io->src, io->src, COLOR_BGR2GRAY);
+            }
+            if (io->src.type() != CV_8U) {
+                io->src.convertTo(io->src, CV_8U);
+            }
+            Canny(io->src, io->dst2, options->threshold1, options->threshold2, options->aperture, true);
+        }
+    };
+
+
+
+
+
+    //public ref class AddWeighted_Edges_CPP : public VB_Parent
+    //{
+    //private:
+    //    Edge_Basics_CPP edges = new Edge_Basics_CPP();
+    //    AddWeighted_Basics_CPP addw = AddWeighted_Basics_CPP();
+    //public:
+    //    size_t ioIndex;
+    //    unManagedIO* io;
+    //    AddWeighted_Edges_CPP()
+    //    {
+    //        labels = { "", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image" };
+    //        unManagedIO* ioNew = new unManagedIO();
+    //        ioIndex = ioList.size();
+    //        ioList.push_back(ioNew);
+    //        io = ioNew;
+    //    }
+    //    void RunAlg(Mat& io->src)
+    //    {
+    //        io = ioList[ioIndex];
+    //        edges.Run(io->src);
+    //        dst2 = edges.dst2;
+    //        labels[2] = edges.labels[2];
+    //        addw->io->src2 = cvtColor(edges->io->dst2, COLOR_GRAY2BGR);
+    //        addw.Run(io->src);
+    //        dst3 = addw.dst2;
+    //    }
+    //};
+
+
+
+
+    //public ref class Edge_Basics_CPP : public VB_Parent
+    //{
+    //private:
+    //    Edge_Canny_CPP canny = new Edge_Canny_CPP();
+    //    //Edge_Scharr_CPP scharr = new Edge_Scharr_CPP();
+    //    //Edge_BinarizedReduction_CPP binRed = new Edge_BinarizedReduction_CPP();
+    //    //Bin4Way_Sobel_CPP binSobel = new Bin4Way_Sobel_CPP();
+    //    //Edge_Laplacian_CPP Laplacian = new Edge_Laplacian_CPP();
+    //    //Edge_ResizeAdd_CPP resizeAdd = new Edge_ResizeAdd_CPP();
+    //    //Edge_Regions_CPP regions = new Edge_Regions_CPP();
+    //public:
+    //    size_t ioIndex;
+    //    unManagedIO* io;
+    //    Options_Edge_Basics^ options = gcnew Options_Edge_Basics();
+    //    Edge_Basics_CPP()
+    //    {
+    //        unManagedIO* ioNew = new unManagedIO();
+    //        ioIndex = ioList.size();
+    //        ioList.push_back(ioNew);
+    //        io = ioNew;
+    //    }
+    //    void RunAlg()
+    //    {
+    //        io = ioList[ioIndex];
+    //        options->RunOpt();
+    //        if (options->edgeSelection == "Canny")
+    //        {
+    //            if (!canny) canny = std::make_unique<Edge_Canny>();
+    //            canny->Run(io->src);
+    //            dst2 = canny->dst2;
+    //        }
+    //        //else if (options->edgeSelection == "Scharr")
+    //        //{
+    //        //    if (!scharr) scharr = std::make_unique<Edge_Scharr>();
+    //        //    scharr->Run(io->src);
+    //        //    dst2 = scharr->dst3;
+    //        //}
+    //        //else if (options->edgeSelection == "Binarized Reduction")
+    //        //{
+    //        //    if (!binRed) binRed = std::make_unique<Edge_BinarizedReduction>();
+    //        //    binRed->Run(io->src);
+    //        //    dst2 = binRed->dst2;
+    //        //}
+    //        //else if (options->edgeSelection == "Binarized Sobel")
+    //        //{
+    //        //    if (!binSobel) binSobel = std::make_unique<Bin4Way_Sobel>();
+    //        //    binSobel->Run(io->src);
+    //        //    dst2 = binSobel->dst2;
+    //        //}
+    //        //else if (options->edgeSelection == "Color Gap")
+    //        //{
+    //        //    if (!colorGap) colorGap = std::make_unique<Edge_ColorGap_CPP_VB>();
+    //        //    colorGap->Run(io->src);
+    //        //    dst2 = colorGap->dst2;
+    //        //}
+    //        //else if (options->edgeSelection == "Deriche")
+    //        //{
+    //        //    if (!deriche) deriche = std::make_unique<Edge_Deriche_CPP_VB>();
+    //        //    deriche->Run(io->src);
+    //        //    dst2 = deriche->dst2;
+    //        //}
+    //        //else if (options->edgeSelection == "Laplacian")
+    //        //{
+    //        //    if (!Laplacian) Laplacian = std::make_unique<Edge_Laplacian>();
+    //        //    Laplacian->Run(io->src);
+    //        //    dst2 = Laplacian->dst2;
+    //        //}
+    //        //else if (options->edgeSelection == "Resize And Add")
+    //        //{
+    //        //    if (!resizeAdd) resizeAdd = std::make_unique<Edge_ResizeAdd>();
+    //        //    resizeAdd->Run(io->src);
+    //        //    dst2 = resizeAdd->dst2;
+    //        //}
+    //        //else if (options->edgeSelection == "Depth Region Boundaries")
+    //        //{
+    //        //    if (!regions) regions = std::make_unique<Edge_Regions>();
+    //        //    regions->Run(io->src);
+    //        //    dst2 = regions->dst2;
+    //        //}
+    //        labels[2] = traceName + " - selection = " + options->edgeSelection;
+    //    }
+    //};
 
 
 
