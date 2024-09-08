@@ -49,6 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Intel.RealSense">
+      <HintPath>..\librealsense\Build\wrappers\csharp\Intel.RealSense\obj\x64\Release\Intel.RealSense.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore">
       <HintPath>..\..\..\Windows\Microsoft.NET\Framework64\v4.0.30319\WPF\PresentationCore.dll</HintPath>
     </Reference>

@@ -143,6 +143,7 @@ public:
                 pointCloud.setCreatePointFormat(OB_FORMAT_POINT);
                 pcData = (int*)pointCloud.process(newFrameSet)->data();
             }
+            if (gyroFrames.size() != 0)
             {
                 std::unique_lock<std::mutex> lock(gyroMutex);
                 auto val = gyroFrames.back()->as<ob::GyroFrame>()->value();
@@ -151,6 +152,7 @@ public:
                 gyro[2] = val.z;
                 gyroFrames.clear();
             }
+            if (imuFrames.size() != 0) 
             {
                 std::unique_lock<std::mutex> lock(imuMutex);
                 auto val = imuFrames.back()->as<ob::AccelFrame>()->value();

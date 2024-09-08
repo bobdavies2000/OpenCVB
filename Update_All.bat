@@ -45,20 +45,20 @@ msbuild.exe VersionUpdates/VersionUpdates.sln /p:Configuration=Debug
 bin\Debug\VersionUpdates.exe
 
 if not exist librealsense\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -S librealsense -B librealsense/Build
-	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
+	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_CSHARP_BINDINGS=ON -DBUILD_SHARED_LIBS=ON -S librealsense -B librealsense/Build
+	rem msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Release
 )
 
 if not exist OrbbecSDK\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK -B OrbbecSDK/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DOpenCVDir=opencv/Build -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
-	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
+	rem msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
 	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Release
 )
 
 if not exist Azure-Kinect-Sensor-SDK\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build
-	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
+	rem msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
 	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Release
 )
 

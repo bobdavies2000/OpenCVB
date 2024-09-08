@@ -50,6 +50,9 @@ Public Class Main_UI
     Dim restartCameraRequest As Boolean
 
     Dim cameraTaskHandle As Thread
+    Dim cameraDetectorThread As Thread
+    'Public DevicesChanged As Boolean
+    'Public DevicesStart As Boolean
     Dim camPic(4 - 1) As PictureBox
     Dim camLabel(camPic.Count - 1) As Label
     Dim dst(camPic.Count - 1) As cvb.Mat
@@ -927,6 +930,11 @@ Public Class Main_UI
 
         threadStartTime = DateTime.Now
 
+        'Dim detector As New CameraDetector()
+        'cameraDetectorThread = New Thread(AddressOf detector.Start)
+        'cameraDetectorThread.SetApartmentState(ApartmentState.STA)
+        'cameraDetectorThread.Start()
+
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
         Dim args() = Environment.GetCommandLineArgs()
 
@@ -1022,6 +1030,8 @@ Public Class Main_UI
         If settings.cameraFound Then
             startCamera()
             While camera Is Nothing ' wait for camera to start...
+                Application.DoEvents()
+                Thread.Sleep(100)
             End While
         End If
 
@@ -1370,6 +1380,7 @@ Public Class Main_UI
     End Function
     Private Sub CameraTask()
         restartCameraRequest = True
+
         Static saveWorkingRes As cvb.Size, saveCameraName As String = settings.cameraName
 
         For i = 0 To mbuf.Count - 1
@@ -1416,6 +1427,13 @@ Public Class Main_UI
                     Debug.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
                 End Try
             End SyncLock
+            'If DevicesChanged Then
+            '    DevicesChanged = False
+            '    Dim ret = MsgBox("The device configurations for this system have changed." + vbCrLf + "Would you like to restart to look for new cameras?", MsgBoxStyle.YesNo)
+            '    If ret = MsgBoxResult.Yes Then
+            '        ' reinitialize cameras.
+            '    End If
+            'End If
             If cameraTaskHandle Is Nothing Then
                 camera.stopCamera()
                 Exit Sub
