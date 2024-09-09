@@ -73,7 +73,7 @@ Public Class Camera
         Dim cam As VBtask.cameraInfo
         cameraInfo = cam
     End Sub
-    Public Function vbMinMax(mat As cvb.Mat, Optional mask As cvb.Mat = Nothing) As mmData
+    Public Function getMinMax(mat As cvb.Mat, Optional mask As cvb.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
             mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)

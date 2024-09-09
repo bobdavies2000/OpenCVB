@@ -51,7 +51,7 @@ Public Class Main_UI
     Dim restartCameraRequest As Boolean
 
     Dim cameraTaskHandle As Thread
-    Dim detector As New CameraDetector
+    Dim detectorObj As CameraDetector
     Public DevicesChanged As Boolean
     Dim camPic(4 - 1) As PictureBox
     Dim camLabel(camPic.Count - 1) As Label
@@ -134,8 +134,6 @@ Public Class Main_UI
 #End Region
 #Region "Non-volatile"
     Public Sub jsonRead()
-        RS2_Module_CPP.searchForRealSense()
-
         jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
         settings = jsonfs.Load()(0)
 
@@ -1068,11 +1066,12 @@ Public Class Main_UI
         fpsTimer.Enabled = True
         XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
 
-        detector.StartDetector()
+        'detectorObj = New CameraDetector
+        'detectorObj.StartDetector()
 
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        detector.StopDetector()
+        If detectorObj IsNot Nothing Then detectorObj.StopDetector()
         jsonWrite()
 
         cameraTaskHandle = Nothing
@@ -1374,7 +1373,6 @@ Public Class Main_UI
         End Select
         Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
     End Function
-    <STAThread>
     Private Sub CameraTask()
         restartCameraRequest = True
 
