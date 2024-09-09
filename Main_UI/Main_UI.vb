@@ -9,7 +9,8 @@ Imports CS_Classes
 Imports System.Management
 Imports cvext = OpenCvSharp.Extensions
 Imports System.ComponentModel
-Imports System.Windows.Documents
+Imports Microsoft.VisualBasic
+
 #Region "Globals"
 Module opencv_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
@@ -50,9 +51,8 @@ Public Class Main_UI
     Dim restartCameraRequest As Boolean
 
     Dim cameraTaskHandle As Thread
-    Dim cameraDetectorThread As Thread
-    'Public DevicesChanged As Boolean
-    'Public DevicesStart As Boolean
+    Dim detector As New CameraDetector
+    Public DevicesChanged As Boolean
     Dim camPic(4 - 1) As PictureBox
     Dim camLabel(camPic.Count - 1) As Label
     Dim dst(camPic.Count - 1) As cvb.Mat
@@ -134,6 +134,8 @@ Public Class Main_UI
 #End Region
 #Region "Non-volatile"
     Public Sub jsonRead()
+        RS2_Module_CPP.searchForRealSense()
+
         jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
         settings = jsonfs.Load()(0)
 
@@ -194,7 +196,6 @@ Public Class Main_UI
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
                        "and rebuild OpenCVB with the StereoLabs SDK.")
             End If
-
 
             settings.cameraFound = False
             For i = 0 To settings.cameraPresent.Count - 1
@@ -821,15 +822,6 @@ Public Class Main_UI
         Next
         Return foundCamera
     End Function
-    Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        jsonWrite()
-
-        cameraTaskHandle = Nothing
-
-        killPython()
-
-        saveAlgorithmName = "" ' this will close the current algorithm.
-    End Sub
     Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
         If AvailableAlgorithms.Items.Count = 0 Then Exit Sub
         If (paintNewImages Or algorithmRefresh) And AvailableAlgorithms.Text.StartsWith(saveAlgorithmName) Then
@@ -921,6 +913,50 @@ Public Class Main_UI
         End If
     End Sub
 #End Region
+    Private Sub setupPath()
+        ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
+        ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
+        ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
+        updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
+        updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
+
+        Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
+        If cudaPath IsNot Nothing Then
+            updatePath(cudaPath, "Cuda - needed for StereoLabs")
+            updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
+        End If
+
+        updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
+
+        ' OpenCV needs to be in the path and the librealsense and K4A open source code needs to be in the path.
+        updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
+
+        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+
+        updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
+        updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
+
+        updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
+
+        ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
+        ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
+        ' Post an issue if this Is Not a valid assumption
+        Dim K4ADLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
+        If K4ADLL.Exists = False Then
+            MsgBox("The Microsoft installer for the Kinect 4 Azure camera proprietary portion" + vbCrLf +
+                   "was not installed in:" + vbCrLf + vbCrLf + K4ADLL.FullName + vbCrLf + vbCrLf +
+                   "Did a new Version get installed?" + vbCrLf +
+                   "Support for the K4A camera may not work until you update the code near this message.")
+            Dim k4aIndex = cameraNames.IndexOf("Azure Kinect 4K")
+            settings.cameraPresent(k4aIndex) = False ' we can't use this device
+            settings.cameraSupported(k4aIndex) = False
+        Else
+            updatePath(K4ADLL.Directory.FullName, "Kinect depth engine dll.")
+        End If
+    End Sub
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
@@ -930,14 +966,10 @@ Public Class Main_UI
 
         threadStartTime = DateTime.Now
 
-        'Dim detector As New CameraDetector()
-        'cameraDetectorThread = New Thread(AddressOf detector.Start)
-        'cameraDetectorThread.SetApartmentState(ApartmentState.STA)
-        'cameraDetectorThread.Start()
-
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
         Dim args() = Environment.GetCommandLineArgs()
 
+        setupPath()
         jsonRead()
 
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
@@ -982,49 +1014,6 @@ Public Class Main_UI
             MsgBox("Python needs to be in the path in order to run all the algorithms written in python." + vbCrLf +
                    "That is how you control which version of python is active for OpenCVB." + vbCrLf +
                    "All Python algorithms will be disabled for now...")
-        End If
-
-        ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
-        ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
-        ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
-        updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
-        updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
-
-        Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
-        If cudaPath IsNot Nothing Then
-            updatePath(cudaPath, "Cuda - needed for StereoLabs")
-            updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
-        End If
-
-        updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
-        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
-
-        ' OpenCV needs to be in the path and the librealsense and K4A open source code needs to be in the path.
-        updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
-        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
-
-        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
-        updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
-        updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
-
-        updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
-
-        ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
-        ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
-        ' Post an issue if this Is Not a valid assumption
-        Dim K4ADLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
-        If K4ADLL.Exists = False Then
-            MsgBox("The Microsoft installer for the Kinect 4 Azure camera proprietary portion" + vbCrLf +
-                   "was not installed in:" + vbCrLf + vbCrLf + K4ADLL.FullName + vbCrLf + vbCrLf +
-                   "Did a new Version get installed?" + vbCrLf +
-                   "Support for the K4A camera may not work until you update the code near this message.")
-            Dim k4aIndex = cameraNames.IndexOf("Azure Kinect 4K")
-            settings.cameraPresent(k4aIndex) = False ' we can't use this device
-            settings.cameraSupported(k4aIndex) = False
-        Else
-            updatePath(K4ADLL.Directory.FullName, "Kinect depth engine dll.")
         End If
 
         If settings.cameraFound Then
@@ -1084,8 +1073,20 @@ Public Class Main_UI
         RecordWindowsVersion()
         fpsTimer.Enabled = True
         XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
-    End Sub
 
+        detector.StartDetector()
+
+    End Sub
+    Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        detector.StopDetector()
+        jsonWrite()
+
+        cameraTaskHandle = Nothing
+
+        killPython()
+
+        saveAlgorithmName = "" ' this will close the current algorithm.
+    End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
@@ -1122,8 +1123,9 @@ Public Class Main_UI
             If fpsAlgorithm >= 100 Then fpsAlgorithm = 99
             If fpsCamera >= 100 Then fpsCamera = 99
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(algorithmCount) + " algorithms = " +
-                      CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + cameraName +
-                          " - Camera FPS/task FPS: " + Format(fpsAlgorithm, "0") + "/" + Format(fpsCamera, "0")
+                  CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + cameraName +
+                      " - Camera FPS/task FPS: " + Format(fpsAlgorithm, "0") + "/" +
+                      Format(fpsCamera, "0")
             If fpsListA.Count > 5 Then
                 fpsListA.RemoveAt(0)
                 fpsListC.RemoveAt(0)
@@ -1378,6 +1380,7 @@ Public Class Main_UI
         End Select
         Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
     End Function
+    <STAThread>
     Private Sub CameraTask()
         restartCameraRequest = True
 
@@ -1427,13 +1430,16 @@ Public Class Main_UI
                     Debug.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
                 End Try
             End SyncLock
-            'If DevicesChanged Then
-            '    DevicesChanged = False
-            '    Dim ret = MsgBox("The device configurations for this system have changed." + vbCrLf + "Would you like to restart to look for new cameras?", MsgBoxStyle.YesNo)
-            '    If ret = MsgBoxResult.Yes Then
-            '        ' reinitialize cameras.
-            '    End If
-            'End If
+            If DevicesChanged Then
+                DevicesChanged = False
+                Dim ret = MsgBox("The device configurations for this system have changed." + vbCrLf + "Would you like to search for a new cameras?", MsgBoxStyle.YesNo)
+                If ret = MsgBoxResult.Yes Then
+                    Dim searcher As New ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE PNPClass = 'Image'")
+                    For Each device As ManagementObject In searcher.Get()
+                        Debug.WriteLine("Camera detected: " & device("Name"))
+                    Next
+                End If
+            End If
             If cameraTaskHandle Is Nothing Then
                 camera.stopCamera()
                 Exit Sub

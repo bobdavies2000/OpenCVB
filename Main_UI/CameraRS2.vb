@@ -1,6 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 Imports System.Text
+Imports Intel.RealSense
 
 Module RS2_Module_CPP
     <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub RS2WaitForFrame(cPtr As IntPtr, w As Integer, h As Integer)
@@ -27,8 +28,33 @@ Module RS2_Module_CPP
                                                    <MarshalAs(UnmanagedType.LPStr)> ByVal deviceName As StringBuilder,
                                                    width As Integer, height As Integer) As IntPtr
     End Function
-End Module
+    Public Sub searchForRealSense()
+        Dim ctx As New Context()
+        ' Get a list of all connected devices
+        Dim devices = ctx.QueryDevices()
 
+        ' Iterate through the devices
+        For Each device In devices
+            ' Get the device info
+            Dim info = device.Info
+
+            ' Display the device name and serial number
+            Debug.WriteLine("Device: " & info.Item(0) & ", Serial Number: " & info.Item(1))
+
+            ' Check for specific sensors (depth, IR, etc.)
+            For Each sensor In device.QuerySensors()
+                Select Case sensor.Info.Item(0)
+                    Case "Stereo Module"
+                        Debug.WriteLine(" - Depth/IR Camera detected")
+                    Case "RGB Camera"
+                        Debug.WriteLine(" - RGB Camera detected")
+                    Case Else
+                        Debug.WriteLine(" - Other sensor: " & sensor.Info.Item(0))
+                End Select
+            Next
+        Next
+    End Sub
+End Module
 Structure RS2IMUdata
     Public acceleration As cvb.Point3f
     Public velocity As cvb.Point3f
