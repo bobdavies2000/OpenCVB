@@ -59,7 +59,7 @@ Namespace jsonClass
             If fileInfo.Exists Then
                 Using streamReader = New StreamReader(jsonFileName)
                     Dim json = streamReader.ReadToEnd()
-                    Return JsonConvert.DeserializeObject(Of List(Of ApplicationStorage))(json)
+                    If json <> "" Then Return JsonConvert.DeserializeObject(Of List(Of ApplicationStorage))(json)
                 End Using
             End If
             Dim empty As New List(Of ApplicationStorage)

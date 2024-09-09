@@ -831,11 +831,6 @@ Public Class Main_UI
             camPic(3).Refresh()
         End If
     End Sub
-    Private Sub RecordWindowsVersion()
-        Dim Version = Environment.OSVersion.Version
-        Debug.WriteLine("Windows version = " + CStr(Version.Major) + "." + CStr(Version.Minor) + " with build = " + CStr(Version.Build))
-        If Version.Build >= 22000 Then windowsVersion = 11 Else windowsVersion = 10
-    End Sub
     Private Sub PixelViewerButton_Click(sender As Object, e As EventArgs) Handles PixelViewerButton.Click
         If fpsTimer.Enabled Then
             SaveSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
@@ -1070,7 +1065,6 @@ Public Class Main_UI
         AlgorithmDesc.Width = ToolStrip1.Left + ToolStrip1.Width - AlgorithmDesc.Left
         AlgorithmDesc.Height = ToolStrip1.Height
 
-        RecordWindowsVersion()
         fpsTimer.Enabled = True
         XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
 
@@ -1413,23 +1407,25 @@ Public Class Main_UI
                 End If
             End If
             If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
-            If restartCameraRequest = False Then camera.GetNextFrame(settings.WorkingRes)
+            If restartCameraRequest = False Then
+                camera.GetNextFrame(settings.WorkingRes)
 
-            ' The first few frames from the camera are junk.  Skip them.
-            SyncLock cameraLock
-                mbuf(mbIndex) = camera.mbuf(camera.mbIndex)
-                camera.mbindex += 1
-                If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
+                ' The first few frames from the camera are junk.  Skip them.
+                SyncLock cameraLock
+                    mbuf(mbIndex) = camera.mbuf(camera.mbIndex)
+                    camera.mbindex += 1
+                    If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
 
-                Try
-                    If camera.mbuf(mbIndex).color.width > 0 Then
-                        paintNewImages = True ' trigger the paint 
-                        newCameraImages = True
-                    End If
-                Catch ex As Exception
-                    Debug.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
-                End Try
-            End SyncLock
+                    Try
+                        If camera.mbuf(mbIndex).color.width > 0 Then
+                            paintNewImages = True ' trigger the paint 
+                            newCameraImages = True
+                        End If
+                    Catch ex As Exception
+                        Debug.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
+                    End Try
+                End SyncLock
+            End If
             If DevicesChanged Then
                 DevicesChanged = False
                 Dim ret = MsgBox("The device configurations for this system have changed." + vbCrLf + "Would you like to search for a new cameras?", MsgBoxStyle.YesNo)
