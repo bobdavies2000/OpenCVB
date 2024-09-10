@@ -69,9 +69,9 @@ public:
 		throw std::runtime_error("Device does not have a depth sensor");
 	}
 	RealSense2Camera() {}
-	RealSense2Camera(int w, int h, string devName)
+	RealSense2Camera(int cw, int ch, string devName)
 	{
-		captureRes = Size(w, h);
+		captureRes = Size(cw, ch);
 
 		string serialNumber;
 		rs2::context ctx;
@@ -88,10 +88,10 @@ public:
 		rs2::config cfg;
 		cfg.enable_device(serialNumber);
 
-		cfg.enable_stream(RS2_STREAM_COLOR, w, h, RS2_FORMAT_BGR8);
-		cfg.enable_stream(RS2_STREAM_DEPTH, w, h, RS2_FORMAT_Z16);
-		cfg.enable_stream(RS2_STREAM_INFRARED, 1, w, h, RS2_FORMAT_Y8);
-		cfg.enable_stream(RS2_STREAM_INFRARED, 2, w, h, RS2_FORMAT_Y8);
+		cfg.enable_stream(RS2_STREAM_COLOR, cw, ch, RS2_FORMAT_BGR8);
+		cfg.enable_stream(RS2_STREAM_DEPTH, cw, ch, RS2_FORMAT_Z16);
+		cfg.enable_stream(RS2_STREAM_INFRARED, 1, cw, ch, RS2_FORMAT_Y8);
+		cfg.enable_stream(RS2_STREAM_INFRARED, 2, cw, ch, RS2_FORMAT_Y8);
 
 		cfg.enable_stream(RS2_STREAM_GYRO);
 		cfg.enable_stream(RS2_STREAM_ACCEL);
@@ -110,16 +110,17 @@ public:
 		static rs2::align align_to_color(RS2_STREAM_COLOR);
 		processedFrames = align_to_color.process(frames);
 		color = Mat(captureRes.height, captureRes.width, CV_8UC3, (int*)processedFrames.get_color_frame().get_data());
+		leftView = Mat(captureRes.height, captureRes.width, CV_8UC1, (int*)frames.get_infrared_frame(1).get_data());
+		rightView = Mat(captureRes.height, captureRes.width, CV_8UC1, (int*)frames.get_infrared_frame(2).get_data());
+		rs2::frame pcFrame = pc.process(processedFrames.get_depth_frame());
+		pointCloud = Mat(captureRes.height, captureRes.width, CV_32FC3, (int*)pcFrame.get_data());
 		if (w != captureRes.width || h != captureRes.height)
+		{
 			resize(color, color, Size(w, h), 0, 0, INTER_NEAREST);
-
-		leftView = Mat(captureRes.height, captureRes.width, CV_8UC1, (int*)processedFrames.get_infrared_frame(1).get_data());
-		if (w != captureRes.width || h != captureRes.height)
 			resize(leftView, leftView, Size(w, h), 0, 0, INTER_NEAREST);
-
-		rightView = Mat(captureRes.height, captureRes.width, CV_8UC1, (int*)processedFrames.get_infrared_frame(2).get_data());
-		if (w != captureRes.width || h != captureRes.height)
 			resize(rightView, rightView, Size(w, h), 0, 0, INTER_NEAREST);
+			resize(pointCloud, pointCloud, Size(w, h), 0, 0, INTER_NEAREST);
+		}
 
 		gyro = frames.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 		accel = frames.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
@@ -135,7 +136,7 @@ extern "C" __declspec(dllexport) int* RS2intrinsics(RealSense2Camera * cPtr) { r
 extern "C" __declspec(dllexport) int* RS2Color(RealSense2Camera * cPtr) { return (int*)cPtr->color.data; }
 extern "C" __declspec(dllexport) int* RS2PointCloud(RealSense2Camera * cPtr)
 {
-	return (int*)cPtr->pc.process(cPtr->processedFrames.get_depth_frame()).as<rs2::points>().get_data();
+	return (int*)cPtr->pointCloud.data;
 }
 extern "C" __declspec(dllexport) void RS2WaitForFrame(RealSense2Camera * cPtr, int w, int h)
 { 

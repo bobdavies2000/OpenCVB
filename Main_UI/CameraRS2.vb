@@ -2,7 +2,7 @@
 Imports cvb = OpenCvSharp
 Imports Intel.RealSense
 Imports System.Text
-#If 0 Then
+#If 1 Then
 ' VB.Net version of the Realsense interface.  It works but is not stable.
 Public Class CameraRS2 : Inherits Camera
     Dim pipe As New Pipeline()
@@ -25,12 +25,12 @@ Public Class CameraRS2 : Inherits Camera
         cfg.EnableDevice(serialNumber)
 
         captureRes = _captureRes
-        cfg.EnableStream(Stream.Color, _captureRes.Width, _captureRes.Height, Format.Rgb8, fps)
-        cfg.EnableStream(Stream.Infrared, 1, _captureRes.Width, _captureRes.Height, Format.Y8, fps)
-        cfg.EnableStream(Stream.Infrared, 2, _captureRes.Width, _captureRes.Height, Format.Y8, fps)
-        cfg.EnableStream(Stream.Depth, _captureRes.Width, _captureRes.Height, Format.Z16, fps)
-        'cfg.EnableStream(Stream.Accel, Format.MotionXyz32f, 63)
-        'cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
+        cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Rgb8, fps)
+        cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, fps)
+        cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, fps)
+        cfg.EnableStream(Stream.Depth, captureRes.Width, captureRes.Height, Format.Z16, fps)
+        cfg.EnableStream(Stream.Accel, Format.MotionXyz32f, 63)
+        cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
 
         profiles = pipe.Start(cfg)
         Dim StreamColor = profiles.GetStream(Stream.Color)
@@ -42,44 +42,44 @@ Public Class CameraRS2 : Inherits Camera
         Dim cols = captureRes.Width, rows = captureRes.Height
 
         Using frames As FrameSet = pipe.WaitForFrames(5000)
-            Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
-
-            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, alignedFrames.ColorFrame.Data).
-                                  CvtColor(cvb.ColorConversionCodes.RGB2BGR).Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-
             For Each frame As Intel.RealSense.Frame In frames
                 If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
-                    mbuf(mbIndex).leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data).
-                                                                   Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                    mbuf(mbIndex).leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data)
                     Exit For
                 End If
             Next
 
             For Each frame As Intel.RealSense.Frame In frames
                 If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
-                    mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data).
-                                                                    Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                    mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data)
                     Exit For
                 End If
             Next
 
-            Using depthFrame As Frame = alignToColor.Process(alignedFrames.DepthFrame)
-                Dim pcFrame = pointcloud.Process(depthFrame)
-                mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data).
-                                                                 Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-            End Using
+            Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
+
+            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, alignedFrames.ColorFrame.Data).
+                                  CvtColor(cvb.ColorConversionCodes.RGB2BGR)
+
+            Dim pcFrame = pointcloud.Process(alignedFrames.DepthFrame)
+            mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data)
+
+            If captureRes.Width <> WorkingRes.Width Or captureRes.Height <> WorkingRes.Height Then
+                mbuf(mbIndex).color = mbuf(mbIndex).color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                mbuf(mbIndex).leftView = mbuf(mbIndex).leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                mbuf(mbIndex).rightView = mbuf(mbIndex).rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                mbuf(mbIndex).pointCloud = mbuf(mbIndex).pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            End If
 
             'Using accelFrame As MotionFrame = frames.FirstOrDefault(Function(f) f.Profile.Stream = Stream.Accel)
             '    If accelFrame IsNot Nothing Then
-            '        Dim accelData As MotionData = accelFrame.MotionData
-            '        Console.WriteLine($"Accel: X={accelData.X}, Y={accelData.Y}, Z={accelData.Z}")
+            '        IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(accelFrame.Data)
             '    End If
             'End Using
 
             'Using gyroFrame As MotionFrame = frames.FirstOrDefault(Function(f) f.Profile.Stream = Stream.Gyro)
             '    If gyroFrame IsNot Nothing Then
-            '        Dim gyroData As MotionData = gyroFrame.MotionData
-            '        Console.WriteLine($"Gyro: X={gyroData.X}, Y={gyroData.Y}, Z={gyroData.Z}")
+            '        IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame.Data)
             '    End If
             'End Using
         End Using
@@ -187,17 +187,10 @@ Public Class CameraRS2 : Inherits Camera
 
         SyncLock cameraLock
             Dim cols = WorkingRes.Width, rows = WorkingRes.Height
-            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, RS2Color(cPtr)).Clone
-            Dim tmp As cvb.Mat = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
-            mbuf(mbIndex).leftView = tmp * 4 - 35 ' improved brightness specific to RealSense
-            tmp = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
-            mbuf(mbIndex).rightView = tmp * 4 - 35 ' improved brightness specific to RealSense
-            If captureRes <> WorkingRes Then
-                Dim pc = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_32FC3, RS2PointCloud(cPtr))
-                mbuf(mbIndex).pointCloud = pc.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-            Else
-                mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_32FC3, RS2PointCloud(cPtr)).Clone
-            End If
+            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, RS2Color(cPtr))
+            mbuf(mbIndex).leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+            mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+            mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, RS2PointCloud(cPtr))
         End SyncLock
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
