@@ -1,14 +1,29 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
-Imports System.Text
 Imports Intel.RealSense
-Imports OpenCvSharp
+Imports System.Text
 #If 1 Then
+' VB.Net version of the Realsense interface.  It works but is not stable.
 Public Class CameraRS2 : Inherits Camera
     Dim pipe As New Pipeline()
     Dim cfg As New Config()
+    Dim profiles As PipelineProfile
+    Public depthScale As Double
+    Public myIntrinsics As Intrinsics
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, devName As String, Optional fps As Integer = 30)
+        Dim serialNumber As String = ""
+        Dim ctx As New Context()
+        Dim searchName As String = devName
 
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String, Optional fps As Integer = 30)
+        For Each dev In ctx.QueryDevices()
+            Dim deviceName As String = dev.Info.Item(0)
+            If String.Compare(deviceName, searchName) = 0 Then
+                serialNumber = dev.Info.Item(1)
+            End If
+        Next
+
+        cfg.EnableDevice(serialNumber)
+
         captureRes = _captureRes
         cfg.EnableStream(Stream.Color, _captureRes.Width, _captureRes.Height, Format.Rgb8, fps)
         cfg.EnableStream(Stream.Infrared, 1, _captureRes.Width, _captureRes.Height, Format.Y8, fps)
@@ -17,21 +32,20 @@ Public Class CameraRS2 : Inherits Camera
         'cfg.EnableStream(Stream.Accel, Format.MotionXyz32f, 63)
         'cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
 
-        pipe.Start(cfg)
+        profiles = pipe.Start(cfg)
+        Dim StreamColor = profiles.GetStream(Stream.Color)
+        myIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
     End Sub
     Public Sub GetNextFrame(WorkingRes As cvb.Size)
-        Static alignToColor = New Align(Stream.Color)
-        Static colorizer = New Colorizer
+        Dim alignToColor = New Align(Stream.Color)
         Dim pointcloud = New PointCloud()
         Dim cols = captureRes.Width, rows = captureRes.Height
 
-        Using frames As FrameSet = pipe.WaitForFrames()
+        Using frames As FrameSet = pipe.WaitForFrames(5000)
+            Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
 
-            Dim alignedDepthFrame As Frame = alignToColor.Process(frames.DepthFrame)
-            ' Dim processedFrames = colorizer.process(frames)
-
-            Using depthFrame As DepthFrame = alignedDepthFrame.As(Of DepthFrame)()
-                Dim pcFrame = pointcloud.Process(alignedDepthFrame)
+            Using depthFrame As Frame = alignToColor.Process(alignedFrames.DepthFrame)
+                Dim pcFrame = pointcloud.Process(depthFrame)
                 mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data).
                                                                  Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             End Using
@@ -90,7 +104,8 @@ End Class
 
 
 Module RS2_Module_CPP
-    <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub RS2WaitForFrame(cPtr As IntPtr, w As Integer, h As Integer)
+    <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub RS2WaitForFrame(cPtr As IntPtr, w As Integer, h As Integer)
     End Sub
     <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RS2RightRaw(cPtr As IntPtr) As IntPtr
     End Function
@@ -126,12 +141,26 @@ Public Class CameraRS2 : Inherits Camera
     Public deviceNum As Integer
     Public deviceName As String
     Public cPtrOpen As IntPtr
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, devName As String)
         captureRes = _captureRes
         MyBase.setupMats(WorkingRes)
 
-        Dim devName As StringBuilder = New StringBuilder(deviceName)
-        cPtr = RS2Open(devName, captureRes.Width, captureRes.Height)
+        'Dim serialNumber As String = ""
+        'Dim ctx As New Context()
+        'Dim searchName As String = devName
+
+        'For Each dev In ctx.QueryDevices()
+        '    Dim deviceName As String = dev.Info.Item(0)
+        '    If String.Compare(deviceName, searchName) = 0 Then
+        '        serialNumber = dev.Info.Item(1)
+        '    End If
+        'Next
+
+        'Dim sNumber As StringBuilder = New StringBuilder(serialNumber)
+
+        'cPtr = RS2Open(sNumber, captureRes.Width, captureRes.Height)
+        Dim deviceName As StringBuilder = New StringBuilder(serialNumber)
+        cPtr = RS2Open(deviceName, captureRes.Width, captureRes.Height)
 
         Dim intrin = RS2intrinsics(cPtr)
         Dim intrinInfo(4 - 1) As Single

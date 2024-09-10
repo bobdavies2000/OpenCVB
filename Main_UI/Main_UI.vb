@@ -1415,9 +1415,11 @@ Public Class Main_UI
                     If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
 
                     Try
-                        If camera.mbuf(mbIndex).color.width > 0 Then
-                            paintNewImages = True ' trigger the paint 
-                            newCameraImages = True
+                        If camera.mbuf(mbIndex).color IsNot Nothing Then
+                            If camera.mbuf(mbIndex).color.width > 0 Then
+                                paintNewImages = True ' trigger the paint 
+                                newCameraImages = True
+                            End If
                         End If
                     Catch ex As Exception
                         Debug.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
