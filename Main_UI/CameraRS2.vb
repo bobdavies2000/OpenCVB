@@ -2,7 +2,7 @@
 Imports cvb = OpenCvSharp
 Imports Intel.RealSense
 Imports System.Text
-#If 1 Then
+#If 0 Then
 ' VB.Net version of the Realsense interface.  It works but is not stable.
 Public Class CameraRS2 : Inherits Camera
     Dim pipe As New Pipeline()
@@ -44,15 +44,8 @@ Public Class CameraRS2 : Inherits Camera
         Using frames As FrameSet = pipe.WaitForFrames(5000)
             Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
 
-            Using depthFrame As Frame = alignToColor.Process(alignedFrames.DepthFrame)
-                Dim pcFrame = pointcloud.Process(depthFrame)
-                mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data).
-                                                                 Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-            End Using
-
-            Dim colorFrame As Frame = alignToColor.Process(frames.ColorFrame)
-            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorFrame.Data).
-                 CvtColor(cvb.ColorConversionCodes.RGB2BGR).Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, alignedFrames.ColorFrame.Data).
+                                  CvtColor(cvb.ColorConversionCodes.RGB2BGR).Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
 
             For Each frame As Intel.RealSense.Frame In frames
                 If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
@@ -69,6 +62,12 @@ Public Class CameraRS2 : Inherits Camera
                     Exit For
                 End If
             Next
+
+            Using depthFrame As Frame = alignToColor.Process(alignedFrames.DepthFrame)
+                Dim pcFrame = pointcloud.Process(depthFrame)
+                mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data).
+                                                                 Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            End Using
 
             'Using accelFrame As MotionFrame = frames.FirstOrDefault(Function(f) f.Profile.Stream = Stream.Accel)
             '    If accelFrame IsNot Nothing Then
