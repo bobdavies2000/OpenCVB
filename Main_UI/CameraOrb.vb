@@ -35,26 +35,45 @@ Public Class CameraORB : Inherits Camera
     End Sub
     Public Sub GetNextFrame(WorkingRes As cvb.Size)
         Dim rows = captureRes.Height, cols = captureRes.Width
+        Static PointCloud As New PointCloudFilter
+        Static cameraParams As CameraParam = pipe.getCameraParam()
         With mbuf(mbIndex)
+            If cameraFrameCount = 0 Then
+                .color = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
+                .leftView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC1, New cvb.Scalar(0))
+                .rightView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC1, New cvb.Scalar(0))
+                .pointCloud = New cvb.Mat(rows, cols, cvb.MatType.CV_32FC3)
+                PointCloud.SetCameraParam(cameraParams)
+            End If
             Using frames = pipe.WaitForFrames(100)
                 If frames Is Nothing Then Exit Sub
                 Dim colorFrame = frames?.GetColorFrame()
-                .color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorFrame.GetDataPtr())
-                Dim irFrame = frames?.GetIRFrame()
-
+                Dim depthFrame = frames?.GetDepthFrame()
                 Dim leftFrame = frames?.GetFrame(FrameType.OB_FRAME_IR_LEFT)
+                Dim rightFrame = frames?.GetFrame(FrameType.OB_FRAME_IR_RIGHT)
+
+                If colorFrame IsNot Nothing Then
+                    .color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorFrame.GetDataPtr())
+                End If
+
                 If leftFrame IsNot Nothing Then
                     .leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, leftFrame.GetDataPtr())
-                Else
-                    If .leftView Is Nothing Then .leftView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC1, New cvb.Scalar(0))
                 End If
-                Dim rightFrame = frames?.GetFrame(FrameType.OB_FRAME_IR_RIGHT)
+
                 If rightFrame IsNot Nothing Then
                     .rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, rightFrame.GetDataPtr())
-                Else
-                    If .rightView Is Nothing Then .rightView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC1, New cvb.Scalar(0))
                 End If
-                .pointCloud = New cvb.Mat(rows, cols, cvb.MatType.CV_32FC3)
+                If depthFrame IsNot Nothing Then
+                    'Dim newFrame = Align.Process(frames)
+                    'Dim newFrameSet = TryCast(newFrame, o)
+                    'Dim cFrame = newFrameSet.ColorFrame()
+                    'Dim dFrame = newFrameSet.DepthFrame()
+
+                    'Dim depthValueScale As Single = dFrame.GetValueScale()
+                    'PointCloud.SetPositionDataScaled(depthValueScale)
+                    'PointCloud.SetCreatePointFormat(OB_FORMAT_POINT)
+                    'pcData = CType(PointCloud.Process(newFrameSet).Data(), Integer())
+                End If
             End Using
 
             If captureRes.Width <> WorkingRes.Width Or captureRes.Height <> WorkingRes.Height Then
