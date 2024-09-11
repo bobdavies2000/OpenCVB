@@ -32,6 +32,10 @@ Public Class CameraRS2 : Inherits Camera
         profiles = pipe.Start(cfg)
         Dim StreamColor = profiles.GetStream(Stream.Color)
         myIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
+        cameraInfo.ppx = myIntrinsics.ppx
+        cameraInfo.ppy = myIntrinsics.ppy
+        cameraInfo.fx = myIntrinsics.fx
+        cameraInfo.fy = myIntrinsics.fy
     End Sub
     Public Sub GetNextFrame(WorkingRes As cvb.Size)
         Dim alignToColor = New Align(Stream.Color)
