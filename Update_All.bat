@@ -21,6 +21,10 @@ if not exist OrbbecSDK (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK.git"
 ) 
 
+if not exist OrbbecSDK_CSharp (
+	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK_CSharp.git"
+) 
+
 if not exist Azure-Kinect-Sensor-SDK (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/microsoft/Azure-Kinect-Sensor-SDK"
 )
@@ -46,19 +50,25 @@ bin\Debug\VersionUpdates.exe
 
 if not exist librealsense\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_CSHARP_BINDINGS=ON -DBUILD_SHARED_LIBS=ON -S librealsense -B librealsense/Build
-	rem msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
+	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Release
 )
 
 if not exist OrbbecSDK\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK -B OrbbecSDK/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DOpenCVDir=opencv/Build -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
-	rem msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
+	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
+	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Release
+)
+
+if not exist OrbbecSDK_CSharp\Build (
+	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK_CSharp -B OrbbecSDK_CSharp/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DCMAKE_INSTALL_PREFIX=OrbbecSDK_CSharp/Build
+	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
 	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Release
 )
 
 if not exist Azure-Kinect-Sensor-SDK\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build
-	rem msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
+	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
 	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Release
 )
 

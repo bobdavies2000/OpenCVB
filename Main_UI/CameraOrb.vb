@@ -1,5 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
+Imports Intel.RealSense
 Imports cvb = OpenCvSharp
+#If 0 Then
 Module ORB_Module
     <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBWaitForFrame(cPtr As IntPtr) As IntPtr
     End Function
@@ -122,3 +124,23 @@ Public Class CameraORB : Inherits Camera
         cPtr = 0
     End Sub
 End Class
+#Else
+'Imports Orbbec
+Public Class CameraORB : Inherits Camera
+    Public deviceNum As Integer
+    Public deviceName As String
+    Public cPtrOpen As IntPtr
+
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+        captureRes = _captureRes
+
+    End Sub
+    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+
+    End Sub
+    Public Sub stopCamera()
+
+    End Sub
+End Class
+
+#End If

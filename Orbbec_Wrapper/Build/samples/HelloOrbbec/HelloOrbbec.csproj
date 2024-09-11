@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B29C8937-E6B6-35C9-BDE5-7DE8A4AC4675}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>HelloOrbbec</ProjectName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+    <ManagedAssembly>true</ManagedAssembly>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <OutputPath>C:\_src\OpenCVB\OrbbecSDK_CSharp\Build\samples\HelloOrbbec\Debug\</OutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <PlatformToolset>v143</PlatformToolset>
+    <AssemblyName>HelloOrbbec</AssemblyName>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\_src\OpenCVB\OrbbecSDK_CSharp\Build\samples\HelloOrbbec\Debug\HelloOrbbec.exe</StartProgram>
+    <DebugType>full</DebugType>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <Optimize>false</Optimize>
+    <WarningLevel>3</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <OutputPath>C:\_src\OpenCVB\OrbbecSDK_CSharp\Build\samples\HelloOrbbec\Release\</OutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <PlatformToolset>v143</PlatformToolset>
+    <AssemblyName>HelloOrbbec</AssemblyName>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\_src\OpenCVB\OrbbecSDK_CSharp\Build\samples\HelloOrbbec\Release\HelloOrbbec.exe</StartProgram>
+    <DebugType>none</DebugType>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>queue</ErrorReport>
+    <Optimize>true</Optimize>
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.CSharp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.CSharp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemGroup>
+    <None Include="C:\_src\OpenCVB\OrbbecSDK_CSharp\samples\HelloOrbbec\CMakeLists.txt">
+      <Link>CMakeLists.txt</Link>
+    </None>
+  </ItemGroup>
+  <Target Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Name="CustomCommand_Debug_c54517893c179e4a8e82d9225280901c" Inputs="C:/_src/OpenCVB/OrbbecSDK_CSharp/samples/HelloOrbbec/CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.28\Modules\CSharpUtilities.cmake" Outputs="C:\_src\OpenCVB\OrbbecSDK_CSharp\Build\samples\HelloOrbbec\CMakeFiles\generate.stamp">
+    <Exec Command="echo Building Custom Rule C:/_src/OpenCVB/OrbbecSDK_CSharp/samples/HelloOrbbec/CMakeLists.txt" />
+    <Exec Command="setlocal&#xA;&quot;C:\Program Files\CMake\bin\cmake.exe&quot; -SC:/_src/OpenCVB/OrbbecSDK_CSharp -BC:/_src/OpenCVB/OrbbecSDK_CSharp/Build --check-stamp-file C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/samples/HelloOrbbec/CMakeFiles/generate.stamp&#xA;if %errorlevel% neq 0 goto :cmEnd&#xA;:cmEnd&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xA;:cmErrorLevel&#xA;exit /b %1&#xA;:cmDone&#xA;if %errorlevel% neq 0 goto :VCEnd&#xA;:VCEnd" />
+  </Target>
+  <Target Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Name="CustomCommand_Release_c54517893c179e4a8e82d9225280901c" Inputs="C:/_src/OpenCVB/OrbbecSDK_CSharp/samples/HelloOrbbec/CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.28\Modules\CSharpUtilities.cmake" Outputs="C:\_src\OpenCVB\OrbbecSDK_CSharp\Build\samples\HelloOrbbec\CMakeFiles\generate.stamp">
+    <Exec Command="echo Building Custom Rule C:/_src/OpenCVB/OrbbecSDK_CSharp/samples/HelloOrbbec/CMakeLists.txt" />
+    <Exec Command="setlocal&#xA;&quot;C:\Program Files\CMake\bin\cmake.exe&quot; -SC:/_src/OpenCVB/OrbbecSDK_CSharp -BC:/_src/OpenCVB/OrbbecSDK_CSharp/Build --check-stamp-file C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/samples/HelloOrbbec/CMakeFiles/generate.stamp&#xA;if %errorlevel% neq 0 goto :cmEnd&#xA;:cmEnd&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xA;:cmErrorLevel&#xA;exit /b %1&#xA;:cmDone&#xA;if %errorlevel% neq 0 goto :VCEnd&#xA;:VCEnd" />
+  </Target>
+  <ItemGroup>
+    <Compile Include="C:\_src\OpenCVB\OrbbecSDK_CSharp\samples\HelloOrbbec\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\_src\OpenCVB\OrbbecSDK_CSharp\Build\ZERO_CHECK.vcxproj">
+      <Project>{0A428EF4-99C1-33CA-91F9-7758C4CAD5DB}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+  </PropertyGroup>
+  <PropertyGroup>
+    <BuildDependsOn>
+      CustomCommand_Debug_c54517893c179e4a8e82d9225280901c;
+      CustomCommand_Release_c54517893c179e4a8e82d9225280901c;
+      $(BuildDependsOn)
+</BuildDependsOn>
+  </PropertyGroup>
+</Project>

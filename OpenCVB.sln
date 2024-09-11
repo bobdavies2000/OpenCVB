@@ -60,6 +60,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CS_Classes", "CS_Classes\CS
 		{944C045A-DECE-450E-B21D-87063852CFA0} = {944C045A-DECE-450E-B21D-87063852CFA0}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orbbec_Wrapper", "Orbbec_Wrapper\Build\Orbbec_Wrapper.csproj", "{AD91A905-69AE-3939-A374-DB9435177D1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -180,6 +182,14 @@ Global
 		{36FDCD23-B8F3-459A-8F19-0C6D4599C00F}.Release|x64.Build.0 = Release|x64
 		{36FDCD23-B8F3-459A-8F19-0C6D4599C00F}.RelWithDebInfo|x64.ActiveCfg = Release|x64
 		{36FDCD23-B8F3-459A-8F19-0C6D4599C00F}.RelWithDebInfo|x64.Build.0 = Release|x64
+		{AD91A905-69AE-3939-A374-DB9435177D1B}.Debug|x64.ActiveCfg = Release|x64
+		{AD91A905-69AE-3939-A374-DB9435177D1B}.Debug|x64.Build.0 = Release|x64
+		{AD91A905-69AE-3939-A374-DB9435177D1B}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{AD91A905-69AE-3939-A374-DB9435177D1B}.MinSizeRel|x64.Build.0 = Debug|x64
+		{AD91A905-69AE-3939-A374-DB9435177D1B}.Release|x64.ActiveCfg = Release|x64
+		{AD91A905-69AE-3939-A374-DB9435177D1B}.Release|x64.Build.0 = Release|x64
+		{AD91A905-69AE-3939-A374-DB9435177D1B}.RelWithDebInfo|x64.ActiveCfg = Release|x64
+		{AD91A905-69AE-3939-A374-DB9435177D1B}.RelWithDebInfo|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
