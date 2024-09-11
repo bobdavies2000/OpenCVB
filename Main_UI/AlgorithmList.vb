@@ -863,7 +863,6 @@ End Enum
 	If algorithmName = "Edge_Canny_CPP" Then return new Edge_Canny_CPP
 	If algorithmName = "Edge_Canny_CS" Then return new Edge_Canny_CS
 	If algorithmName = "Edge_CannyAccum" Then return new Edge_CannyAccum
-	If algorithmName = "Edge_CannyAccumColorize" Then return new Edge_CannyAccumColorize
 	If algorithmName = "Edge_CannyCombined" Then return new Edge_CannyCombined
 	If algorithmName = "Edge_CannyCombined_CS" Then return new Edge_CannyCombined_CS
 	If algorithmName = "Edge_CannyHistory" Then return new Edge_CannyHistory
@@ -2144,7 +2143,8 @@ End Enum
 	If algorithmName = "Motion_Diff_CS" Then return new Motion_Diff_CS
 	If algorithmName = "Motion_Enclosing" Then return new Motion_Enclosing
 	If algorithmName = "Motion_Enclosing_CPP_CS" Then return new Motion_Enclosing_CPP_CS
-	If algorithmName = "Motion_FromEdgeAccum" Then return new Motion_FromEdgeAccum
+	If algorithmName = "Motion_FromEdge" Then return new Motion_FromEdge
+	If algorithmName = "Motion_FromEdgeColorize" Then return new Motion_FromEdgeColorize
 	If algorithmName = "Motion_Grayscale" Then return new Motion_Grayscale
 	If algorithmName = "Motion_Grayscale_CS" Then return new Motion_Grayscale_CS
 	If algorithmName = "Motion_Grid" Then return new Motion_Grid

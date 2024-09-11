@@ -988,7 +988,7 @@ Public Class Main_UI
 
         setupAlgorithmHistory()
 
-        Dim libraries = {"Cam_K4A.dll", "Cam_RS2.dll", "CPP_Native.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
+        Dim libraries = {"Cam_K4A.dll", "CPP_Native.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
         For i = 0 To libraries.Count - 1
             Dim dllName = libraries(i)
             Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)

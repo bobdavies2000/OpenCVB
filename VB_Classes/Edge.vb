@@ -1288,21 +1288,3 @@ Public Class Edge_CannyAccum : Inherits VB_Parent
         labels(2) = "Accumulated canny edges."
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Edge_CannyAccumColorize : Inherits VB_Parent
-    Dim cAccum As New Edge_CannyAccum
-    Public Sub New()
-        labels = {"", "", "Canny edges accumulated", "Colorized version of dst2 - blue indicates motion."}
-        desc = "Colorize the output of Edge_CannyAccum to show values off the peak value which indicate motion."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        cAccum.Run(src)
-        dst2 = cAccum.dst2
-        dst3 = ShowPalette(dst2)
-    End Sub
-End Class

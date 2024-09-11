@@ -325,16 +325,11 @@ Public Class VBtask : Implements IDisposable
         Next
     End Sub
     Private Sub VBTaskTimerPop(sender As Object, e As EventArgs)
-        Static WarningCount As Integer
-        Static saveFrameCount = -1
-        If saveFrameCount = frameCount And frameCount > 0 And WarningCount = 0 Then
-            Debug.WriteLine("Warning: " + task.algName + " has not completed work on a frame in a second. Warning " + CStr(WarningCount))
-            WarningCount += 1
-        Else
-            WarningCount = 0
-            saveFrameCount = frameCount
+        Static WarningIssued As Boolean = False
+        If frameCount > 0 And WarningIssued = False Then
+            WarningIssued = True
+            Debug.WriteLine("Warning: " + task.algName + " has not completed work on a frame in a second.")
         End If
-        saveFrameCount = frameCount
     End Sub
     Public Sub OpenGLClose()
         If openGL_hwnd <> 0 Then

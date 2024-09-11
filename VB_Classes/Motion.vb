@@ -814,7 +814,7 @@ End Class
 
 
 
-Public Class Motion_FromEdgeAccum : Inherits VB_Parent
+Public Class Motion_FromEdge : Inherits VB_Parent
     Dim cAccum As New Edge_CannyAccum
     Public Sub New()
         desc = "Detect motion from pixels less that max value in an accumulation."
@@ -827,5 +827,23 @@ Public Class Motion_FromEdgeAccum : Inherits VB_Parent
 
         dst2 = cAccum.dst2.Threshold(mm.maxVal, 255, cvb.ThresholdTypes.TozeroInv)
         dst3 = cAccum.dst2.InRange(0, mm.maxVal - 10)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_FromEdgeColorize : Inherits VB_Parent
+    Dim cAccum As New Edge_CannyAccum
+    Public Sub New()
+        labels = {"", "", "Canny edges accumulated", "Colorized version of dst2 - blue indicates motion."}
+        desc = "Colorize the output of Edge_CannyAccum to show values off the peak value which indicate motion."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        cAccum.Run(src)
+        dst2 = cAccum.dst2
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class
