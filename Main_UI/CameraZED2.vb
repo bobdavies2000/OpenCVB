@@ -34,7 +34,6 @@ End Module
 Public Class CameraZED2 : Inherits Camera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        MyBase.setupMats(WorkingRes)
         ' if OpenCVB fails here, it is likely because you have turned off the StereoLabs support.
         ' Open the CameraDefines.hpp file and uncomment the StereoLab
         cPtr = Zed2Open(captureRes.Width, captureRes.Height)

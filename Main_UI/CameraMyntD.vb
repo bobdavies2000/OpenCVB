@@ -23,7 +23,6 @@ End Module
 Public Class CameraMyntD : Inherits Camera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        MyBase.setupMats(WorkingRes)
         cPtr = MyntDOpen(captureRes.Width, captureRes.Height)
         cameraName = deviceName
         If cPtr <> 0 Then

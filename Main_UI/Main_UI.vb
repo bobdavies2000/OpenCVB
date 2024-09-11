@@ -1408,6 +1408,7 @@ Public Class Main_UI
             End If
             If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
             If restartCameraRequest = False Then
+                Application.DoEvents()
                 camera.GetNextFrame(settings.WorkingRes)
 
                 ' The first few frames from the camera are junk.  Skip them.

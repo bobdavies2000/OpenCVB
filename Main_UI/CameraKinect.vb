@@ -23,7 +23,6 @@ End Module
 Public Class CameraKinect : Inherits Camera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        MyBase.setupMats(WorkingRes)
         cPtr = K4AOpen(captureRes.Width, captureRes.Height)
         cameraName = deviceName
         If cPtr <> 0 Then

@@ -1,146 +1,72 @@
 ﻿Imports System.Runtime.InteropServices
-Imports Intel.RealSense
+Imports System
+Imports System.Threading
+Imports System.Threading.Tasks
+Imports System.Windows
+Imports System.Windows.Controls
+Imports System.Windows.Media
+Imports System.Windows.Media.Imaging
+Imports System.Windows.Threading
 Imports cvb = OpenCvSharp
-#If 0 Then
-Module ORB_Module
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBWaitForFrame(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBRightImage(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBColor(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBLeftImage(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBIntrinsics(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBPointCloud(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBGyro(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBIMUTimeStamp(cPtr As IntPtr) As Double
-    End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBAccel(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub ORBClose(cPtr As IntPtr)
-    End Sub
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBOpen(
-                                                   width As Integer, height As Integer) As IntPtr
-    End Function
-End Module
+Imports Orbbec
+Imports System.IO
 Public Class CameraORB : Inherits Camera
-    Public deviceNum As Integer
-    Public deviceName As String
-    Public cPtrOpen As IntPtr
+    Dim pipe As New Pipeline()
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        MyBase.setupMats(WorkingRes)
+        Dim w = captureRes.Width, h = captureRes.Height
+        Dim colorProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_COLOR).
+                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_BGR, 0)
+        Dim depthProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_DEPTH).
+                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y16, 0)
+        Dim leftProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_LEFT).
+                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, 0)
+        Dim rightProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT).
+                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, 0)
+        Dim config As New Config()
+        config.EnableStream(colorProfile)
+        config.EnableStream(depthProfile)
+        config.EnableStream(leftProfile)
+        config.EnableStream(rightProfile)
+        config.SetAlignMode(AlignMode.ALIGN_D2C_SW_MODE)
 
-        cPtr = ORBOpen(captureRes.Width, captureRes.Height)
-
-        Dim intrin = ORBintrinsics(cPtr)
-        Dim intrinInfo(4 - 1) As Single
-        Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
-        cameraInfo.ppx = intrinInfo(0)
-        cameraInfo.ppy = intrinInfo(1)
-        cameraInfo.fx = intrinInfo(2)
-        cameraInfo.fy = intrinInfo(3)
+        pipe.EnableFrameSync()
+        pipe.Start(config)
     End Sub
     Public Sub GetNextFrame(WorkingRes As cvb.Size)
-        If cPtr = 0 Then Exit Sub
+        Dim rows = captureRes.Height, cols = captureRes.Width
+        With mbuf(mbIndex)
+            Using frames = pipe.WaitForFrames(100)
+                If frames Is Nothing Then Exit Sub
+                Dim colorFrame = frames?.GetColorFrame()
+                .color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorFrame.GetDataPtr())
+                Dim irFrame = frames?.GetIRFrame()
 
-        Try
-            Dim colorData As IntPtr
-            While (1)
-                colorData = ORBWaitForFrame(cPtr)
-                If colorData <> 0 Then Exit While
-                Application.DoEvents()
-            End While
-
-            Dim accelFrame = ORBAccel(cPtr)
-            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(accelFrame)
-            ' IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
-
-            Dim gyroFrame = ORBGyro(cPtr)
-            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame)
-
-            Static imuStartTime = ORBIMUTimeStamp(cPtr)
-            IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
-
-            SyncLock cameraLock
-                Dim cols = WorkingRes.Width, rows = WorkingRes.Height
-                If captureRes = WorkingRes Then
-                    If colorData <> 0 Then mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorData).Clone
-
-                    Dim pcData = ORBPointCloud(cPtr)
-                    If pcData <> 0 Then mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcData) * 0.001
-
-                    Dim leftData = ORBLeftImage(cPtr)
-                    If leftData <> 0 Then mbuf(mbIndex).leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, leftData).
-                            CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
-
-                    Dim rightData = ORBRightImage(cPtr)
-                    If rightData <> 0 Then mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, rightData).
-                            CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
+                Dim leftFrame = frames?.GetFrame(FrameType.OB_FRAME_IR_LEFT)
+                If leftFrame IsNot Nothing Then
+                    .leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, leftFrame.GetDataPtr())
                 Else
-                    If colorData <> 0 Then
-                        mbuf(mbIndex).color = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC3, colorData).
-                                                             Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                    End If
-
-                    Dim pcData = ORBPointCloud(cPtr)
-                    If pcData <> 0 Then
-                        mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_32FC3, pcData).
-                                                                  Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest) * 0.001
-                    End If
-
-                    Dim leftData = ORBLeftImage(cPtr)
-                    If leftData <> 0 Then
-                        mbuf(mbIndex).leftView = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8U, leftData).
-                                                                  Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).
-                                                                  CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
-                    End If
-
-                    Dim rightData = ORBRightImage(cPtr)
-                    If rightData <> 0 Then
-                        mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8U, rightData).
-                                                                 Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).
-                                                                 CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
-                    End If
+                    If .leftView Is Nothing Then .leftView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC1, New cvb.Scalar(0))
                 End If
-            End SyncLock
+                Dim rightFrame = frames?.GetFrame(FrameType.OB_FRAME_IR_RIGHT)
+                If rightFrame IsNot Nothing Then
+                    .rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, rightFrame.GetDataPtr())
+                Else
+                    If .rightView Is Nothing Then .rightView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC1, New cvb.Scalar(0))
+                End If
+                .pointCloud = New cvb.Mat(rows, cols, cvb.MatType.CV_32FC3)
+            End Using
 
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
-        Catch ex As Exception
-            debug.writeline("Orbec camera failure..." + ex.Message)
-        End Try
+            If captureRes.Width <> WorkingRes.Width Or captureRes.Height <> WorkingRes.Height Then
+                .color = .color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                .leftView = .leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                .rightView = .rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                .pointCloud = .pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            End If
+        End With
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        Application.DoEvents()
-        Try
-            ORBClose(cPtr)
-        Catch ex As Exception
-            debug.writeline("Orbec camera shutdown failure..." + ex.Message)
-        End Try
-        cPtr = 0
+        pipe.Stop()
     End Sub
 End Class
-#Else
-'Imports Orbbec
-Public Class CameraORB : Inherits Camera
-    Public deviceNum As Integer
-    Public deviceName As String
-    Public cPtrOpen As IntPtr
-
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
-        captureRes = _captureRes
-
-    End Sub
-    Public Sub GetNextFrame(WorkingRes As cvb.Size)
-
-    End Sub
-    Public Sub stopCamera()
-
-    End Sub
-End Class
-
-#End If

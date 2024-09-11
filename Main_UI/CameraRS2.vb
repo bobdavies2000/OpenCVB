@@ -4,9 +4,6 @@ Imports Intel.RealSense
 Imports System.Text
 Public Class CameraRS2 : Inherits Camera
     Dim pipe As New Pipeline()
-    Dim cfg As New Config()
-    Dim profiles As PipelineProfile
-    Public myIntrinsics As Intrinsics
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, devName As String, Optional fps As Integer = 30)
         Dim serialNumber As String = ""
         Dim ctx As New Context()
@@ -19,19 +16,20 @@ Public Class CameraRS2 : Inherits Camera
             End If
         Next
 
+        Dim cfg As New Config()
         cfg.EnableDevice(serialNumber)
 
         captureRes = _captureRes
-        cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Rgb8, fps)
+        cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Bgr8, fps)
         cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, fps)
         cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, fps)
         cfg.EnableStream(Stream.Depth, captureRes.Width, captureRes.Height, Format.Z16, fps)
         cfg.EnableStream(Stream.Accel, Format.MotionXyz32f, 63)
         cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
 
-        profiles = pipe.Start(cfg)
+        Dim profiles = pipe.Start(cfg)
         Dim StreamColor = profiles.GetStream(Stream.Color)
-        myIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
+        Dim myIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
         cameraInfo.ppx = myIntrinsics.ppx
         cameraInfo.ppy = myIntrinsics.ppy
         cameraInfo.fx = myIntrinsics.fx
@@ -62,8 +60,7 @@ Public Class CameraRS2 : Inherits Camera
 
             Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
 
-            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, alignedFrames.ColorFrame.Data).
-                                  CvtColor(cvb.ColorConversionCodes.RGB2BGR)
+            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, alignedFrames.ColorFrame.Data)
 
             Dim pcFrame = pointcloud.Process(alignedFrames.DepthFrame)
             mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data)
@@ -80,10 +77,6 @@ Public Class CameraRS2 : Inherits Camera
         End Using
     End Sub
     Public Sub stopCamera()
-        Application.DoEvents()
-        Try
-            pipe.Stop()
-        Catch ex As Exception
-        End Try
+        pipe.Stop()
     End Sub
 End Class

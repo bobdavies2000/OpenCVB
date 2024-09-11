@@ -61,14 +61,6 @@ Public Class Camera
         Public trackerConfidence As Integer
         Public mapperConfidence As Integer
     End Structure
-    Public Sub setupMats(WorkingRes As cvb.Size)
-        For i = 0 To mbuf.Count - 1
-            mbuf(i).color = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-            mbuf(i).leftView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-            mbuf(i).rightView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-            mbuf(i).pointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3)
-        Next
-    End Sub
     Public Sub New()
         Dim cam As VBtask.cameraInfo
         cameraInfo = cam

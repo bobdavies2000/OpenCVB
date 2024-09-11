@@ -41,7 +41,6 @@ Public Class CameraOakD : Inherits Camera
     Dim templateY As cvb.Mat
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        MyBase.setupMats(WorkingRes)
         If templateX IsNot Nothing Then Return ' we have already been initialized.
         cameraName = deviceName
         cPtr = OakDOpen(captureRes.Width, captureRes.Height)
