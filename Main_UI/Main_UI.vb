@@ -1073,6 +1073,7 @@ Public Class Main_UI
 
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        saveAlgorithmName = "" ' this will close the current algorithm.
         If detectorObj IsNot Nothing Then detectorObj.StopDetector()
         jsonWrite()
 
@@ -1080,7 +1081,6 @@ Public Class Main_UI
 
         killPython()
 
-        saveAlgorithmName = "" ' this will close the current algorithm.
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastAlgorithmFrame As Integer

@@ -33,7 +33,7 @@ Structure OakDIMUdata
     Public angularVelocity As cvb.Point3f
     Public angularAcceleration As cvb.Point3f
 End Structure
-Public Class CameraOakD : Inherits Camera
+Public Class CameraOakD : Inherits GenericCamera
     Public deviceNum As Integer
     Public accel As cvb.Point3f
     Public gyro As cvb.Point3f

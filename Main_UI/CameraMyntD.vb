@@ -20,7 +20,7 @@ Module MyntD_Interface
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function MyntDIMU_TimeStamp(cPtr As IntPtr) As Double
     End Function
 End Module
-Public Class CameraMyntD : Inherits Camera
+Public Class CameraMyntD : Inherits GenericCamera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
         cPtr = MyntDOpen(captureRes.Width, captureRes.Height)

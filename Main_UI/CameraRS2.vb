@@ -2,7 +2,7 @@
 Imports cvb = OpenCvSharp
 Imports Intel.RealSense
 Imports System.Text
-Public Class CameraRS2 : Inherits Camera
+Public Class CameraRS2 : Inherits GenericCamera
     Dim pipe As New Pipeline()
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, devName As String, Optional fps As Integer = 30)
         Dim serialNumber As String = ""

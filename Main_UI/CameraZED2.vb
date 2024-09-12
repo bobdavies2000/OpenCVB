@@ -2,9 +2,89 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
+Imports sl
 
+'Public Class CameraZED2 : Inherits GenericCamera
+'    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+'        captureRes = _captureRes
+'        Dim init_params As New InitParameters()
+'        init_params.camera_resolution = sl.Resolution.HD720
+'        init_params.resolution = sl.Resolution.HD720
+
+
+'        Dim zedCamera As New Camera(0)
+
+'        Dim mWidth As UInteger = CUInt(zedCamera.ImageWidth)
+'        Dim mHeight As UInteger = CUInt(zedCamera.ImageHeight)
+
+'        Dim RuntimeParameters = New RuntimeParameters()
+'        'Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsZed)(Zed2Intrinsics(cPtr))
+'        'cameraInfo.ppx = intrinsics.cx
+'        'cameraInfo.ppy = intrinsics.cy
+'        'cameraInfo.fx = intrinsics.fx
+'        'cameraInfo.fy = intrinsics.fy
+'        'cameraInfo.v_fov = intrinsics.v_fov
+'        'cameraInfo.h_fov = intrinsics.h_fov
+'        'cameraInfo.d_fov = intrinsics.d_fov
+'    End Sub
+'    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+'        Dim rows = captureRes.Height, cols = captureRes.Width
+'        With mbuf(mbIndex)
+'            .color = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
+'            .leftView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
+'            .rightView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
+'            .pointCloud = New cvb.Mat(rows, cols, cvb.MatType.CV_32FC3, New cvb.Scalar(0))
+'        End With
+'        MyBase.GetNextFrameCounts(IMU_FrameTime)
+'    End Sub
+'    Public Sub stopCamera()
+'    End Sub
+'End Class
+
+
+
+
+#If 0 Then
+Dim init_params As New InitParameters()
+init_params.resolution = RESOLUTION.HD1080
+
+Dim zedCamera As New Camera(0)
+' Open the camera
+Dim err As ERROR_CODE = zedCamera.Open(init_params)
+If err <> ERROR_CODE.SUCCESS Then
+    Environment.Exit(-1)
+End If
+
+' Get resolution of camera
+Dim mWidth As UInteger = CUInt(zedCamera.ImageWidth)
+Dim mHeight As UInteger = CUInt(zedCamera.ImageHeight)
+
+' Initialize the Mat that will contain the left image
+Dim image As New Mat()
+image.Create(mWidth, mHeight, MAT_TYPE.MAT_8U_C4, MEM.CPU) ' Mat need to be created before use.
+
+' Define default Runtime parameters
+Dim runtimeParameters As New RuntimeParameters()
+
+' Initialize runtime parameters and frame counter
+Dim i As Integer = 0
+While i < 1000
+    If zedCamera.Grab(runtimeParameters) = ERROR_CODE.SUCCESS Then
+        zedCamera.RetrieveImage(image, VIEW.LEFT) ' Get the left image
+        Dim timestamp As ULong = zedCamera.GetCameraTimeStamp() ' Get image timestamp
+        Console.WriteLine("Image resolution: " & image.GetWidth() & "x" & image.GetHeight() & "|| Image timestamp: " & timestamp)
+        ' increment frame count
+        i += 1
+    End If
+End While
+
+' Disable positional tracking and close the camera
+zedCamera.DisablePositionalTracking("")
+zedCamera.Close()
+#End If
 Module Zed2_Interface
-    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Zed2Open(width As Integer, height As Integer) As IntPtr
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2Open(width As Integer, height As Integer, fps As Integer) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub Zed2Close(cPtr As IntPtr)
     End Sub
@@ -31,12 +111,18 @@ Module Zed2_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Zed2Intrinsics(cPtr As IntPtr) As IntPtr
     End Function
 End Module
-Public Class CameraZED2 : Inherits Camera
+Public Class CameraZED2 : Inherits GenericCamera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
+        Dim fps = 100
+        If captureRes.Width = 960 Then fps = 120
+        If captureRes.Width = 1920 And captureRes.Height = 1080 Then fps = 30
+        If captureRes.Width = 1920 And captureRes.Height = 1200 Then fps = 60
+        If captureRes.Width = 1280 And captureRes.Height = 720 Then fps = 60
+
         ' if OpenCVB fails here, it is likely because you have turned off the StereoLabs support.
         ' Open the CameraDefines.hpp file and uncomment the StereoLab
-        cPtr = Zed2Open(captureRes.Width, captureRes.Height)
+        cPtr = Zed2Open(captureRes.Width, captureRes.Height, fps)
         cameraName = deviceName
         If cPtr <> 0 Then
             deviceCount = 1

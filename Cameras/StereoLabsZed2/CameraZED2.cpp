@@ -52,7 +52,7 @@ private:
 	float imuData = 0;
 public:
 	~StereoLabsZed2() {}
-	StereoLabsZed2(int w, int h)
+	StereoLabsZed2(int w, int h, int fps)
 	{
 		captureWidth = w;
 		captureHeight = h;
@@ -61,10 +61,12 @@ public:
 		init_params.depth_mode = DEPTH_MODE::ULTRA;
 		init_params.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP; // OpenGL's coordinate system is right_handed
 		init_params.coordinate_units = UNIT::METER;
-		init_params.camera_fps = 0; // use the highest frame rate available.
+		init_params.camera_fps = 100; // use the highest frame rate available.
 
 		init_params.camera_resolution = sl::RESOLUTION::HD720;
-		if (w == 1920) init_params.camera_resolution = sl::RESOLUTION::HD1080;
+		if (w == 1920 && h == 1080) init_params.camera_resolution = sl::RESOLUTION::HD1080;
+		if (w == 1920 && h == 1200) init_params.camera_resolution = sl::RESOLUTION::HD1200;
+		if (w == 1280) init_params.camera_resolution = sl::RESOLUTION::HD720;
 		if (w == 672) init_params.camera_resolution = sl::RESOLUTION::VGA;
 
 		zed.open(init_params);
@@ -197,7 +199,7 @@ public:
 	};
 
 
-extern "C" __declspec(dllexport) int* Zed2Open(int w, int h) { StereoLabsZed2* cPtr = new StereoLabsZed2(w, h); return (int*)cPtr; }
+extern "C" __declspec(dllexport) int* Zed2Open(int w, int h, int fps) { StereoLabsZed2* cPtr = new StereoLabsZed2(w, h, fps); return (int*)cPtr; }
 extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * cPtr) { cPtr->zed.close(); }
 extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.linear_acceleration; }
 extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.angular_velocity; }

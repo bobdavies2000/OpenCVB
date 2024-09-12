@@ -2,7 +2,7 @@
 Imports System.Numerics
 Imports VB_Classes
 
-Public Class Camera
+Public Class GenericCamera
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
     Public IMU_Acceleration As cvb.Point3f

@@ -3,7 +3,7 @@ Imports System.Threading
 Imports System.Windows.Controls
 Imports cvb = OpenCvSharp
 Imports Orbbec
-Public Class CameraORB : Inherits Camera
+Public Class CameraORB : Inherits GenericCamera
     Dim pipe As New Pipeline()
     Dim accelSensor As Sensor
     Dim gyroSensor As Sensor
@@ -32,6 +32,13 @@ Public Class CameraORB : Inherits Camera
 
         gyroSensor = dev.GetSensorList.GetSensor(SensorType.OB_SENSOR_GYRO)
         accelSensor = dev.GetSensorList.GetSensor(SensorType.OB_SENSOR_ACCEL)
+
+        Dim myIntrinsics = dev.GetCalibrationCameraParamList()
+        Dim param As CameraParam = myIntrinsics.GetCameraParam(0)
+        cameraInfo.fx = param.rgbIntrinsic.fx
+        cameraInfo.fy = param.rgbIntrinsic.fy
+        cameraInfo.ppx = param.rgbIntrinsic.cx
+        cameraInfo.ppy = param.rgbIntrinsic.cy
 
         pipe.EnableFrameSync()
         pipe.Start(config)

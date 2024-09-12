@@ -20,7 +20,7 @@ Module K4A_Interface
     <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub K4AClose(cPtr As IntPtr)
     End Sub
 End Module
-Public Class CameraKinect : Inherits Camera
+Public Class CameraKinect : Inherits GenericCamera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
         cPtr = K4AOpen(captureRes.Width, captureRes.Height)
