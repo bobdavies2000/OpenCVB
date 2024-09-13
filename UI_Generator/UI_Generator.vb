@@ -352,6 +352,12 @@ Module UI_Generator
         Catch ex As Exception
             Console.WriteLine("UI_Generator failed writing the algorithm groups.  Error is " + vbCrLf + ex.Message)
         End Try
+
+        Dim logs As String() = Directory.GetFiles(HomeDir.FullName + "Log")
+        For Each fn In logs
+            My.Computer.FileSystem.DeleteFile(fn)
+        Next
+
         Console.WriteLine("Algorithm Group Names prepared.")
     End Sub
 
