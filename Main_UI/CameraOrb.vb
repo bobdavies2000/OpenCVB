@@ -3,6 +3,7 @@ Imports System.Threading
 Imports System.Windows.Controls
 Imports cvb = OpenCvSharp
 Imports Orbbec
+Imports System.Runtime
 Public Class CameraORB : Inherits GenericCamera
     Dim pipe As New Pipeline()
     Dim accelSensor As Sensor
@@ -49,59 +50,52 @@ Public Class CameraORB : Inherits GenericCamera
         Static cameraParams As CameraParam = pipe.GetCameraParam()
         Static orbMutex As New Mutex(True, "orbMutex")
         Static acceleration As cvb.Point3f, angularVelocity As cvb.Point3f, timeStamp As Int64
-        With mbuf(mbIndex)
-            Application.DoEvents()
-            Dim frames = pipe.WaitForFrames(2000)
-            If cameraFrameCount <= 1 Then
-                Dim w = WorkingRes.Width, h = WorkingRes.Height
-                .color = New cvb.Mat(h, w, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
-                .leftView = New cvb.Mat(h, w, cvb.MatType.CV_8UC1, New cvb.Scalar(0))
-                .rightView = New cvb.Mat(h, w, cvb.MatType.CV_8UC1, New cvb.Scalar(0))
-                .pointCloud = New cvb.Mat(h, w, cvb.MatType.CV_32FC3)
-            End If
-            If cameraFrameCount = 0 Then
-                PointCloud.SetCameraParam(cameraParams)
 
-                Dim gProfiles = gyroSensor.GetStreamProfileList()
-                Dim gProfile = gProfiles.GetProfile(0)
-                gyroSensor.Start(gProfile, Sub(frame As Orbbec.Frame)
-                                               SyncLock orbMutex
-                                                   angularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
-                                                   timeStamp = frame.GetTimeStamp
-                                               End SyncLock
-                                           End Sub)
+        Dim frames = pipe.WaitForFrames(2000)
+        If cameraFrameCount = 0 Then
+            PointCloud.SetCameraParam(cameraParams)
 
-                Dim accProfiles = accelSensor.GetStreamProfileList()
-                Dim accProfile = accProfiles.GetProfile(0)
-                accelSensor.Start(accProfile, Sub(frame As Orbbec.Frame)
-                                                  SyncLock orbMutex
-                                                      acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
-                                                      timeStamp = frame.GetTimeStamp
-                                                  End SyncLock
-                                              End Sub)
-            End If
+            Dim gProfiles = gyroSensor.GetStreamProfileList()
+            Dim gProfile = gProfiles.GetProfile(0)
+            gyroSensor.Start(gProfile, Sub(frame As Orbbec.Frame)
+                                           SyncLock orbMutex
+                                               angularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
+                                               timeStamp = frame.GetTimeStamp
+                                           End SyncLock
+                                       End Sub)
 
-            If frames Is Nothing Then Exit Sub
+            Dim accProfiles = accelSensor.GetStreamProfileList()
+            Dim accProfile = accProfiles.GetProfile(0)
+            accelSensor.Start(accProfile, Sub(frame As Orbbec.Frame)
+                                              SyncLock orbMutex
+                                                  acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
+                                                  timeStamp = frame.GetTimeStamp
+                                              End SyncLock
+                                          End Sub)
+        End If
 
-            Dim cFrame = frames.GetColorFrame
-            Dim dFrame = frames.GetDepthFrame
-            Dim lFrame = frames.GetFrame(FrameType.OB_FRAME_IR_LEFT)
-            Dim rFrame = frames.GetFrame(FrameType.OB_FRAME_IR_RIGHT)
-            Dim needResize = captureRes.Width <> WorkingRes.Width Or captureRes.Height <> WorkingRes.Height
+        If frames Is Nothing Then Exit Sub
 
+        Dim cFrame = frames.GetColorFrame
+        Dim dFrame = frames.GetDepthFrame
+        Dim lFrame = frames.GetFrame(FrameType.OB_FRAME_IR_LEFT)
+        Dim rFrame = frames.GetFrame(FrameType.OB_FRAME_IR_RIGHT)
+        Dim needResize = captureRes.Width <> WorkingRes.Width Or captureRes.Height <> WorkingRes.Height
+
+        SyncLock cameraLock
             If cFrame IsNot Nothing Then
-                .color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, cFrame.GetDataPtr)
-                If needResize Then .color = .color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiColor = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, cFrame.GetDataPtr)
+                If needResize Then uiColor = uiColor.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             End If
 
             If lFrame IsNot Nothing Then
-                .leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, lFrame.GetDataPtr)
-                If needResize Then .leftView = .leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiLeft = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, lFrame.GetDataPtr)
+                If needResize Then uiLeft = uiLeft.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             End If
 
             If rFrame IsNot Nothing Then
-                .rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, rFrame.GetDataPtr)
-                If needResize Then .rightView = .rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiRight = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, rFrame.GetDataPtr)
+                If needResize Then uiRight = uiRight.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             End If
 
             If dFrame IsNot Nothing Then
@@ -109,8 +103,8 @@ Public Class CameraORB : Inherits GenericCamera
                 PointCloud.SetPositionDataScaled(depthValueScale)
                 PointCloud.SetPointFormat(Format.OB_FORMAT_POINT)
                 Dim pcData = PointCloud.Process(dFrame)
-                .pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
-                If needResize Then .pointCloud = .pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiPointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
+                If needResize Then uiPointCloud = uiPointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             End If
 
             SyncLock orbMutex
@@ -118,7 +112,13 @@ Public Class CameraORB : Inherits GenericCamera
                 IMU_AngularVelocity = angularVelocity
                 IMU_TimeStamp = timeStamp
             End SyncLock
-        End With
+
+            If uiColor Is Nothing Then uiColor = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+            If uiLeft Is Nothing Then uiLeft = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+            If uiRight Is Nothing Then uiRight = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+            If uiPointCloud Is Nothing Then uiPointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3)
+        End SyncLock
+
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

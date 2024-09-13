@@ -91,8 +91,14 @@ Public Class Main_UI
     Dim textAdvice As String = ""
     Dim totalBytesOfMemoryUsed As Integer
     Dim trueData As New List(Of VB_Classes.TrueText)
+
     Dim mbuf(2 - 1) As VB_Classes.VBtask.inBuffer
     Dim mbIndex As Integer
+
+    Dim uiColor As cvb.Mat
+    Dim uiLeft As cvb.Mat
+    Dim uiRight As cvb.Mat
+    Dim uiPointCloud As cvb.Mat
 
     Dim pauseAlgorithmThread As Boolean
     Dim logAlgorithms As StreamWriter
@@ -1300,8 +1306,8 @@ Public Class Main_UI
             paintNewImages = False
             Try
                 SyncLock cameraLock
-                    If camera.mbuf(mbIndex).color IsNot Nothing Then
-                        If camera.mbuf(mbIndex).color.width > 0 And dst(0) IsNot Nothing Then
+                    If uiColor IsNot Nothing Then
+                        If uiColor.Width > 0 And dst(0) IsNot Nothing Then
                             Dim camSize = New cvb.Size(camPic(0).Size.Width, camPic(0).Size.Height)
                             For i = 0 To dst.Count - 1
                                 Dim tmp = dst(i).Resize(camSize)
@@ -1380,12 +1386,10 @@ Public Class Main_UI
 
         Static saveWorkingRes As cvb.Size, saveCameraName As String = settings.cameraName
 
-        For i = 0 To mbuf.Count - 1
-            mbuf(i).color = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
-            mbuf(i).leftView = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
-            mbuf(i).rightView = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
-            mbuf(i).pointCloud = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_32FC3)
-        Next
+        uiColor = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
+        uiLeft = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
+        uiRight = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
+        uiPointCloud = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_32FC3)
 
         While 1
             If restartCameraRequest Or settings.cameraName <> saveCameraName Or settings.WorkingRes <> saveWorkingRes Then
@@ -1413,20 +1417,12 @@ Public Class Main_UI
 
                 ' The first few frames from the camera are junk.  Skip them.
                 SyncLock cameraLock
-                    mbuf(mbIndex) = camera.mbuf(camera.mbIndex)
-                    camera.mbindex += 1
-                    If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
-
-                    Try
-                        If camera.mbuf(mbIndex).color IsNot Nothing Then
-                            If camera.mbuf(mbIndex).color.width > 0 Then
-                                paintNewImages = True ' trigger the paint 
-                                newCameraImages = True
-                            End If
-                        End If
-                    Catch ex As Exception
-                        Debug.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
-                    End Try
+                    uiColor = camera.uiColor.clone
+                    uiLeft = camera.uiLeft.clone
+                    uiRight = camera.uiRight.clone
+                    uiPointCloud = camera.uiPointCloud.clone
+                    paintNewImages = True ' trigger the paint 
+                    newCameraImages = True ' trigger the algorithm task
                 End SyncLock
             End If
             If DevicesChanged Then
@@ -1513,27 +1509,22 @@ Public Class Main_UI
                     If newCameraImages Then
                         Dim copyTime = Now
 
-                        task.color = mbuf(mbIndex).color
-                        task.leftView = mbuf(mbIndex).leftView
-                        task.rightView = mbuf(mbIndex).rightView
-                        task.pointCloud = mbuf(mbIndex).pointCloud
-
-                        If frameCount < 10 Then
-                            Dim sizeRatio = settings.captureRes.Width / saveWorkingRes.Width
-                            task.calibData.ppx = task.dst2.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
-                            task.calibData.ppy = task.dst2.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
-                            task.calibData.fx = camera.cameraInfo.fx
-                            task.calibData.fy = camera.cameraInfo.fy
-                            task.calibData.v_fov = camera.cameraInfo.v_fov
-                            task.calibData.h_fov = camera.cameraInfo.h_fov
-                            task.calibData.d_fov = camera.cameraInfo.d_fov
-                        End If
                         SyncLock cameraLock
-                            task.mbuf(mbIndex) = mbuf(mbIndex)
-                            task.mbIndex = mbIndex
-                            mbIndex += 1
-                            If mbIndex >= mbuf.Count Then mbIndex = 0
+                            task.color = camera.uiColor
+                            task.leftView = camera.uiLeft
+                            task.rightView = camera.uiRight
+                            task.pointCloud = camera.uiPointCloud
 
+                            If frameCount < 10 Then
+                                Dim sizeRatio = settings.captureRes.Width / saveWorkingRes.Width
+                                task.calibData.ppx = task.dst2.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
+                                task.calibData.ppy = task.dst2.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
+                                task.calibData.fx = camera.cameraInfo.fx
+                                task.calibData.fy = camera.cameraInfo.fy
+                                task.calibData.v_fov = camera.cameraInfo.v_fov
+                                task.calibData.h_fov = camera.cameraInfo.h_fov
+                                task.calibData.d_fov = camera.cameraInfo.d_fov
+                            End If
                             task.transformationMatrix = camera.transformationMatrix
                             task.IMU_TimeStamp = camera.IMU_TimeStamp
                             task.IMU_Acceleration = camera.IMU_Acceleration

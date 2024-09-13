@@ -662,7 +662,9 @@ Public Class VBtask : Implements IDisposable
         Dim src = task.color
 
         ' If the WorkingRes changes, the previous generation of images needs to be reset.
-        If task.pointCloud.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) Or task.color.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) Then
+        If task.pointCloud.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) Or
+            task.color.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) Then
+
             task.pointCloud = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_32FC3, 0)
             task.noDepthMask = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
             task.depthMask = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))

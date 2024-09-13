@@ -16,6 +16,11 @@ Public Class GenericCamera
     Public mbuf(2 - 1) As VB_Classes.VBtask.inBuffer
     Public mbIndex As Integer
 
+    Public uiColor As cvb.Mat
+    Public uiLeft As cvb.Mat
+    Public uiRight As cvb.Mat
+    Public uiPointCloud As cvb.Mat
+
     Public captureRes As cvb.Size
 
     Public deviceCount As Integer
