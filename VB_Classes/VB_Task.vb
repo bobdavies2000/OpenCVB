@@ -27,8 +27,6 @@ Public Class VBtask : Implements IDisposable
 
     Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
-    Public mbuf(2 - 1) As inBuffer
-    Public mbIndex As Integer
     Public lowRes As cvb.Size
     Public quarterRes As cvb.Size
     Public displayRes As cvb.Size

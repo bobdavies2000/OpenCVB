@@ -106,17 +106,17 @@ Public Class CameraOakD : Inherits GenericCamera
             If captureRes <> WorkingRes Then
                 Dim tmp As cvb.Mat
                 tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC3, OakDColor(cPtr))
-                mbuf(mbIndex).color = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiColor = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
 
                 tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8U, OakDLeftImage(cPtr))
-                mbuf(mbIndex).leftView = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                uiLeft = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
                 tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8U, OakDRightImage(cPtr))
-                mbuf(mbIndex).rightView = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                uiRight = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
             Else
-                mbuf(mbIndex).color = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, OakDColor(cPtr)).Clone
-                mbuf(mbIndex).leftView = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8U, OakDLeftImage(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
-                mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8U, OakDRightImage(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, OakDColor(cPtr)).Clone
+                uiLeft = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8U, OakDLeftImage(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                uiRight = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8U, OakDRightImage(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
             End If
 
             ' the Oak-D cameras do not produce a point cloud - update if that changes.
@@ -132,9 +132,9 @@ Public Class CameraOakD : Inherits GenericCamera
             Dim pc As New cvb.Mat
             cvb.Cv2.Merge({worldX, worldY, d32f}, pc)
             If WorkingRes = captureRes Then
-                mbuf(mbIndex).pointCloud = pc
+                uiPointCloud = pc
             Else
-                mbuf(mbIndex).pointCloud = pc.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiPointCloud = pc.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             End If
         End SyncLock
         MyBase.GetNextFrameCounts(IMU_FrameTime)

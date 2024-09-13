@@ -67,7 +67,7 @@ Public Class CameraKinect : Inherits GenericCamera
             If cPtr = 0 Then Exit Sub
             imuFrame = K4AWaitFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
             If imuFrame = 0 Then
-                debug.writeline("KinectWaitFrame has returned without any image.")
+                Debug.WriteLine("KinectWaitFrame has returned without any image.")
                 failedImageCount += 1
                 Exit Sub ' just process the existing images again?  
             Else
@@ -92,19 +92,19 @@ Public Class CameraKinect : Inherits GenericCamera
             If cPtr = 0 Then Exit Sub
 
             SyncLock cameraLock
-                mbuf(mbIndex).color = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, K4AColor(cPtr)).Clone
+                uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, K4AColor(cPtr)).Clone
 
                 ' so depth data fits into 0-255 (approximately)
-                mbuf(mbIndex).leftView = (cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_16U,
+                uiLeft = (cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_16U,
                                           K4ALeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone
-                mbuf(mbIndex).rightView = mbuf(mbIndex).leftView
+                uiRight = uiLeft.Clone
                 If captureRes <> WorkingRes Then
                     Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16SC3,
                                      K4APointCloud(cPtr)).Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                    tmp.ConvertTo(mbuf(mbIndex).pointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
+                    tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 Else
                     Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16SC3, K4APointCloud(cPtr))
-                    tmp.ConvertTo(mbuf(mbIndex).pointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
+                    tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 End If
             End SyncLock
             MyBase.GetNextFrameCounts(IMU_FrameTime)

@@ -13,9 +13,6 @@ Public Class GenericCamera
     Public CPU_FrameTime As Double
     Public cameraFrameCount As Integer
 
-    Public mbuf(2 - 1) As VB_Classes.VBtask.inBuffer
-    Public mbIndex As Integer
-
     Public uiColor As cvb.Mat
     Public uiLeft As cvb.Mat
     Public uiRight As cvb.Mat

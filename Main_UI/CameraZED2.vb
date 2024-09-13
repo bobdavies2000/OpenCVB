@@ -153,13 +153,11 @@ Public Class CameraZED2 : Inherits GenericCamera
         Zed2GetData(cPtr, WorkingRes.Width, WorkingRes.Height)
 
         SyncLock cameraLock
-            mbuf(mbIndex).color = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
-                                             Zed2Color(cPtr)).Clone
-            mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
-                                                 Zed2RightView(cPtr)).Clone
-            mbuf(mbIndex).leftView = mbuf(mbIndex).color.Clone
+            uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, Zed2Color(cPtr)).Clone
+            uiRight = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, Zed2RightView(cPtr)).Clone
+            uiLeft = uiColor.Clone
 
-            mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC3,
+            uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC3,
                                                       Zed2PointCloud(cPtr)).Clone
             Dim acc = Zed2Acceleration(cPtr)
             IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(acc)
@@ -183,6 +181,7 @@ Public Class CameraZED2 : Inherits GenericCamera
             IMU_TimeStamp -= imuStartTime
         End SyncLock
 
+        GC.Collect()
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

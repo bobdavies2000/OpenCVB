@@ -92,9 +92,6 @@ Public Class Main_UI
     Dim totalBytesOfMemoryUsed As Integer
     Dim trueData As New List(Of VB_Classes.TrueText)
 
-    Dim mbuf(2 - 1) As VB_Classes.VBtask.inBuffer
-    Dim mbIndex As Integer
-
     Dim uiColor As cvb.Mat
     Dim uiLeft As cvb.Mat
     Dim uiRight As cvb.Mat
@@ -1417,12 +1414,14 @@ Public Class Main_UI
 
                 ' The first few frames from the camera are junk.  Skip them.
                 SyncLock cameraLock
-                    uiColor = camera.uiColor.clone
-                    uiLeft = camera.uiLeft.clone
-                    uiRight = camera.uiRight.clone
-                    uiPointCloud = camera.uiPointCloud.clone
-                    paintNewImages = True ' trigger the paint 
-                    newCameraImages = True ' trigger the algorithm task
+                    If camera.uicolor IsNot Nothing Then
+                        uiColor = camera.uiColor.clone
+                        uiLeft = camera.uiLeft.clone
+                        uiRight = camera.uiRight.clone
+                        uiPointCloud = camera.uiPointCloud.clone
+                        paintNewImages = True ' trigger the paint 
+                        newCameraImages = True ' trigger the algorithm task
+                    End If
                 End SyncLock
             End If
             If DevicesChanged Then

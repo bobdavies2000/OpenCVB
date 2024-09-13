@@ -37,16 +37,17 @@ Public Class CameraRS2 : Inherits GenericCamera
     End Sub
     Public Sub GetNextFrame(WorkingRes As cvb.Size)
         Dim alignToColor = New Align(Stream.Color)
-        Dim pointcloud = New PointCloud()
+        Dim ptcloud = New PointCloud()
         Dim cols = captureRes.Width, rows = captureRes.Height
+        Static color As cvb.Mat, leftView As cvb.Mat, rightView As cvb.Mat, pointCloud As cvb.Mat
 
         Using frames As FrameSet = pipe.WaitForFrames(5000)
             For Each frame As Intel.RealSense.Frame In frames
                 If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
-                    mbuf(mbIndex).leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data)
+                    leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data)
                 End If
                 If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
-                    mbuf(mbIndex).rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data)
+                    rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data)
                 End If
                 If frame.Profile.Stream = Stream.Accel Then
                     IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(frame.Data)
@@ -60,17 +61,17 @@ Public Class CameraRS2 : Inherits GenericCamera
 
             Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
 
-            mbuf(mbIndex).color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, alignedFrames.ColorFrame.Data)
+            color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, alignedFrames.ColorFrame.Data)
 
-            Dim pcFrame = pointcloud.Process(alignedFrames.DepthFrame)
-            mbuf(mbIndex).pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data)
+            Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
+            pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data)
 
-            If captureRes.Width <> WorkingRes.Width Or captureRes.Height <> WorkingRes.Height Then
-                mbuf(mbIndex).color = mbuf(mbIndex).color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                mbuf(mbIndex).leftView = mbuf(mbIndex).leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                mbuf(mbIndex).rightView = mbuf(mbIndex).rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                mbuf(mbIndex).pointCloud = mbuf(mbIndex).pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-            End If
+            SyncLock cameraLock
+                uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiLeft = leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiRight = rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiPointCloud = pointcloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            End SyncLock
 
             GC.Collect() ' do you think this is unnecessary?  Remove it and check...
             MyBase.GetNextFrameCounts(IMU_FrameTime)
