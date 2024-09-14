@@ -68,11 +68,16 @@ Public Class CameraRS2 : Inherits GenericCamera
             Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
             pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data)
 
+            If color Is Nothing Then color = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+            If leftView Is Nothing Then leftView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+            If rightView Is Nothing Then rightView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+            If pointCloud Is Nothing Then pointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3)
+
             SyncLock cameraLock
                 uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
                 uiLeft = leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
                 uiRight = rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                uiPointCloud = pointcloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             End SyncLock
 
             GC.Collect() ' do you think this is unnecessary?  Remove it and check...

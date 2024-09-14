@@ -10,19 +10,14 @@ Public Class CameraORB : Inherits GenericCamera
     Dim gyroSensor As Sensor
     Dim orbMutex As New Mutex(True, "orbMutex")
     Dim acceleration As cvb.Point3f, angularVelocity As cvb.Point3f, timeStamp As Int64
-    Dim config As New Config()
-    Dim initialized As Boolean
-    Dim accelerationList As New List(Of IntPtr)
-    Dim angularVelocityList As New List(Of IntPtr)
     Dim timeStampList As New List(Of Int64)
-    Private Sub initialize(fps As Integer)
-        If initialized Then pipe.Stop()
-        Application.DoEvents()
-
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+        captureRes = _captureRes
         Dim ctx As New Context
         Dim devList = ctx.QueryDeviceList()
         Dim dev = devList.GetDevice(0)
 
+        Dim fps = 30
         Dim w = captureRes.Width, h = captureRes.Height
         Dim colorProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_COLOR).
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_BGR, fps)
@@ -30,12 +25,14 @@ Public Class CameraORB : Inherits GenericCamera
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y16, fps)
         Dim leftProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_LEFT).
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
-        Dim rightProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT).
-                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
+        'Dim rightProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT).
+        '                                    GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
+
+        Dim config As New Config()
         config.EnableStream(colorProfile)
         config.EnableStream(depthProfile)
         config.EnableStream(leftProfile)
-        config.EnableStream(rightProfile)
+        'config.EnableStream(rightProfile)
         config.SetAlignMode(AlignMode.ALIGN_D2C_SW_MODE)
 
         gyroSensor = dev.GetSensorList.GetSensor(SensorType.OB_SENSOR_GYRO)
@@ -52,10 +49,8 @@ Public Class CameraORB : Inherits GenericCamera
         Dim gProfile = gProfiles.GetProfile(0)
         gyroSensor.Start(gProfile, Sub(frame As Orbbec.Frame)
                                        SyncLock orbMutex
-                                           angularVelocityList.Add(frame.GetDataPtr)
-                                           timeStampList.Add(frame.GetTimeStamp)
-                                           'angularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
-                                           'timeStamp = frame.GetTimeStamp
+                                           angularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
+                                           timeStamp = frame.GetTimeStamp
                                        End SyncLock
                                    End Sub)
 
@@ -63,24 +58,18 @@ Public Class CameraORB : Inherits GenericCamera
         Dim accProfile = accProfiles.GetProfile(0)
         accelSensor.Start(accProfile, Sub(frame As Orbbec.Frame)
                                           SyncLock orbMutex
-                                              accelerationList.Add(frame.GetDataPtr)
-                                              timeStampList.Add(frame.GetTimeStamp)
-                                              'acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
-                                              'timeStamp = frame.GetTimeStamp
+                                              acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
+                                              timeStamp = frame.GetTimeStamp
                                           End SyncLock
                                       End Sub)
         pipe.EnableFrameSync()
         pipe.Start(config)
-        initialized = True
-    End Sub
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
-        captureRes = _captureRes
-        initialize(15) ' try 15 on the first attempt...
     End Sub
     Public Sub GetNextFrame(WorkingRes As cvb.Size)
         Dim rows = captureRes.Height, cols = captureRes.Width
         Static PtCloud As New PointCloudFilter
-        Static color As cvb.Mat, leftView As cvb.Mat, rightView As cvb.Mat, pointCloud As cvb.Mat
+        ' turning on the right view overworks the camera processor.  Reduce the work and get 30 fps reliably.  Otherwise 5 fps.
+        Static color As cvb.Mat, leftView As cvb.Mat, pointCloud As cvb.Mat ' , rightView As cvb.Mat
 
         Dim frames As Frameset = Nothing
         While frames Is Nothing
@@ -99,17 +88,15 @@ Public Class CameraORB : Inherits GenericCamera
 
         If cFrame IsNot Nothing Then
             color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, cFrame.GetDataPtr)
-        Else
-            If cameraFrameCount > 10 Then initialize(15) ' try 5 fps if we can't get color...
         End If
 
         If lFrame IsNot Nothing Then
             leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, lFrame.GetDataPtr)
         End If
 
-        If rFrame IsNot Nothing Then
-            rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, rFrame.GetDataPtr)
-        End If
+        'If rFrame IsNot Nothing Then
+        '    rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, rFrame.GetDataPtr)
+        'End If
 
         If dFrame IsNot Nothing Then
             Dim depthValueScale As Single = dFrame.GetValueScale()
@@ -120,22 +107,21 @@ Public Class CameraORB : Inherits GenericCamera
         End If
 
         SyncLock orbMutex
-            Dim ptr = angularVelocityList(angularVelocityList.Count - 1)
-            IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(ptr)
-            ptr = accelerationList(accelerationList.Count - 1)
-            IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(ptr)
-            IMU_TimeStamp = timeStampList(timeStampList.Count - 1)
+            IMU_AngularVelocity = angularVelocity
+            IMU_Acceleration = acceleration
+            IMU_TimeStamp = timeStamp
         End SyncLock
 
         If color Is Nothing Then color = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
         If leftView Is Nothing Then leftView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-        If rightView Is Nothing Then rightView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+        ' If rightView Is Nothing Then rightView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
         If pointCloud Is Nothing Then pointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3)
 
         SyncLock cameraLock
             uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             uiLeft = leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-            uiRight = rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            ' uiRight = rightview.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest) 
+            uiRight = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest) '  note duplicate of color for right view - less stress on camera.
             uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
         End SyncLock
 
@@ -146,7 +132,6 @@ Public Class CameraORB : Inherits GenericCamera
         accelSensor.Stop()
         gyroSensor.Stop()
         pipe.Stop()
-        config.DisableAllStream()
     End Sub
 End Class
 #Else
@@ -195,43 +180,52 @@ Public Class CameraORB : Inherits GenericCamera
         Static color As cvb.Mat, leftView As cvb.Mat, rightView As cvb.Mat, pointCloud As cvb.Mat
 
         If cPtr = 0 Then Exit Sub
+        Dim cols = captureRes.Width, rows = captureRes.Height
 
         Dim colorData = ORBWaitForFrame(cPtr)
 
-        Dim accelFrame = ORBAccel(cPtr)
-        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(accelFrame)
-        ' IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
-
-        Dim gyroFrame = ORBGyro(cPtr)
-        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame)
-
-        Static imuStartTime = ORBIMUTimeStamp(cPtr)
-        IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
-
-        Dim cols = captureRes.Width, rows = captureRes.Height
-        If colorData <> 0 Then color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorData).Clone
+        If colorData <> 0 Then
+            color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorData).Clone
+        Else
+            color = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
+        End If
 
         Dim pcData = ORBPointCloud(cPtr)
-        If pcData <> 0 Then pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcData) * 0.001
+        If pcData <> 0 Then
+            pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcData) * 0.001
+        Else
+            pointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3, New cvb.Scalar(0))
+        End If
 
         Dim leftData = ORBLeftImage(cPtr)
-        If leftData <> 0 Then leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, leftData).
-                                                                   CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
+        If leftData <> 0 Then
+            leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, leftData).
+                                             CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
+        Else
+            leftView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
+
+        End If
 
         Dim rightData = ORBRightImage(cPtr)
-        If rightData <> 0 Then rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, rightData).
-                                                                 CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
+        If rightData <> 0 Then
+            rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, rightData).
+                                              CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
+        Else
+            rightView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
+        End If
 
+        Dim accelFrame = ORBAccel(cPtr)
+        Dim gyroFrame = ORBGyro(cPtr)
         SyncLock cameraLock
+            Static imuStartTime = ORBIMUTimeStamp(cPtr)
+            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(accelFrame)
+            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame)
+            IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
+
             uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             uiLeft = leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             uiRight = rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-
-            If uiColor Is Nothing Then uiColor = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-            If uiLeft Is Nothing Then uiLeft = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-            If uiRight Is Nothing Then uiRight = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-            If uiPointCloud Is Nothing Then uiPointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3)
         End SyncLock
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)
