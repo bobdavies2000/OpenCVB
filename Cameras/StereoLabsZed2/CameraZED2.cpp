@@ -91,7 +91,7 @@ public:
 
 	void waitForFrame()
 	{
-		while(1)
+		while (1)
 			if (zed.grab() == ERROR_CODE::SUCCESS) return;
 	}
 
@@ -141,7 +141,7 @@ public:
 		float* pc = (float*)pcMatSL.getPtr<sl::uchar1>();
 		if (pc == 0) return;
 
-		if (pointCloud.rows != captureHeight) 
+		if (pointCloud.rows != captureHeight)
 			pointCloud = cv::Mat(h, w, CV_32FC3);
 
 		pointCloud.setTo(0);
@@ -160,7 +160,7 @@ public:
 				if (isnan(pc[offset + 2]) || isinf(pc[offset + 2])) // checking the Z value...
 					continue;
 				int index = (y * w + x) * 3;
-				pc32fC3[index    ] =  pc[offset    ];
+				pc32fC3[index] = pc[offset];
 				pc32fC3[index + 1] = -pc[offset + 1];
 				pc32fC3[index + 2] = -pc[offset + 2];
 			}
@@ -195,31 +195,31 @@ public:
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
-		}
-	};
+	}
+};
 
 
 extern "C" __declspec(dllexport) int* Zed2Open(int w, int h, int fps) { StereoLabsZed2* cPtr = new StereoLabsZed2(w, h, fps); return (int*)cPtr; }
-extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * cPtr) { cPtr->zed.close(); }
-extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.linear_acceleration; }
-extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.angular_velocity; }
-extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * cPtr) { return cPtr->serialNumber; }
-extern "C" __declspec(dllexport) void Zed2WaitForFrame(StereoLabsZed2 * cPtr) { cPtr->waitForFrame(); }
-extern "C" __declspec(dllexport) double Zed2IMU_TimeStamp(StereoLabsZed2 * cPtr) { return cPtr->imuTimeStamp; }
-extern "C" __declspec(dllexport) void Zed2GetData(StereoLabsZed2 * cPtr, int w, int h) { cPtr->GetData(w, h); }
-extern "C" __declspec(dllexport) int* Zed2Color(StereoLabsZed2 * cPtr)
+extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2* cPtr) { cPtr->zed.close(); }
+extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2* cPtr) { return (int*)&cPtr->sensordata.imu.linear_acceleration; }
+extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2* cPtr) { return (int*)&cPtr->sensordata.imu.angular_velocity; }
+extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2* cPtr) { return cPtr->serialNumber; }
+extern "C" __declspec(dllexport) void Zed2WaitForFrame(StereoLabsZed2* cPtr) { cPtr->waitForFrame(); }
+extern "C" __declspec(dllexport) double Zed2IMU_TimeStamp(StereoLabsZed2* cPtr) { return cPtr->imuTimeStamp; }
+extern "C" __declspec(dllexport) void Zed2GetData(StereoLabsZed2* cPtr, int w, int h) { cPtr->GetData(w, h); }
+extern "C" __declspec(dllexport) int* Zed2Color(StereoLabsZed2* cPtr)
 {
 	return (int*)cPtr->color.data;
 }
-extern "C" __declspec(dllexport) int* Zed2PointCloud(StereoLabsZed2 * cPtr)
+extern "C" __declspec(dllexport) int* Zed2PointCloud(StereoLabsZed2* cPtr)
 {
 	return (int*)cPtr->pointCloud.data;
 }
-extern "C" __declspec(dllexport) int* Zed2RightView(StereoLabsZed2 * cPtr)
+extern "C" __declspec(dllexport) int* Zed2RightView(StereoLabsZed2* cPtr)
 {
 	return (int*)cPtr->rightView.data;
 }
-extern "C" __declspec(dllexport) int* Zed2Intrinsics(StereoLabsZed2 * cPtr) { return (int*)&cPtr->cameraData; }
+extern "C" __declspec(dllexport) int* Zed2Intrinsics(StereoLabsZed2* cPtr) { return (int*)&cPtr->cameraData; }
 #else
 extern "C" __declspec(dllexport) int placeholder() { return 0; }
 #endif

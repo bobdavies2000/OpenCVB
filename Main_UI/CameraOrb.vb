@@ -1,8 +1,9 @@
 ﻿Imports System.Runtime.InteropServices
-Imports System.Threading
-Imports System.Windows.Controls
 Imports cvb = OpenCvSharp
+Imports System.Threading
 Imports Orbbec
+' switch between the VB.Net version of the Orbbec camera interface and the C++ one.
+#If 1 Then
 Public Class CameraORB : Inherits GenericCamera
     Dim pipe As New Pipeline()
     Dim accelSensor As Sensor
@@ -11,6 +12,9 @@ Public Class CameraORB : Inherits GenericCamera
     Dim acceleration As cvb.Point3f, angularVelocity As cvb.Point3f, timeStamp As Int64
     Dim config As New Config()
     Dim initialized As Boolean
+    Dim accelerationList As New List(Of IntPtr)
+    Dim angularVelocityList As New List(Of IntPtr)
+    Dim timeStampList As New List(Of Int64)
     Private Sub initialize(fps As Integer)
         If initialized Then pipe.Stop()
         Application.DoEvents()
@@ -48,8 +52,10 @@ Public Class CameraORB : Inherits GenericCamera
         Dim gProfile = gProfiles.GetProfile(0)
         gyroSensor.Start(gProfile, Sub(frame As Orbbec.Frame)
                                        SyncLock orbMutex
-                                           angularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
-                                           timeStamp = frame.GetTimeStamp
+                                           angularVelocityList.Add(frame.GetDataPtr)
+                                           timeStampList.Add(frame.GetTimeStamp)
+                                           'angularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
+                                           'timeStamp = frame.GetTimeStamp
                                        End SyncLock
                                    End Sub)
 
@@ -57,11 +63,12 @@ Public Class CameraORB : Inherits GenericCamera
         Dim accProfile = accProfiles.GetProfile(0)
         accelSensor.Start(accProfile, Sub(frame As Orbbec.Frame)
                                           SyncLock orbMutex
-                                              acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
-                                              timeStamp = frame.GetTimeStamp
+                                              accelerationList.Add(frame.GetDataPtr)
+                                              timeStampList.Add(frame.GetTimeStamp)
+                                              'acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(frame.GetDataPtr)
+                                              'timeStamp = frame.GetTimeStamp
                                           End SyncLock
                                       End Sub)
-
         pipe.EnableFrameSync()
         pipe.Start(config)
         initialized = True
@@ -93,7 +100,7 @@ Public Class CameraORB : Inherits GenericCamera
         If cFrame IsNot Nothing Then
             color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, cFrame.GetDataPtr)
         Else
-            If cameraFrameCount > 10 Then initialize(5) ' try 5 fps if we can't get color...
+            If cameraFrameCount > 10 Then initialize(15) ' try 5 fps if we can't get color...
         End If
 
         If lFrame IsNot Nothing Then
@@ -113,10 +120,107 @@ Public Class CameraORB : Inherits GenericCamera
         End If
 
         SyncLock orbMutex
-            IMU_Acceleration = acceleration
-            IMU_AngularVelocity = angularVelocity
-            IMU_TimeStamp = timeStamp
+            Dim ptr = angularVelocityList(angularVelocityList.Count - 1)
+            IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(ptr)
+            ptr = accelerationList(accelerationList.Count - 1)
+            IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(ptr)
+            IMU_TimeStamp = timeStampList(timeStampList.Count - 1)
         End SyncLock
+
+        If color Is Nothing Then color = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+        If leftView Is Nothing Then leftView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+        If rightView Is Nothing Then rightView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+        If pointCloud Is Nothing Then pointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3)
+
+        SyncLock cameraLock
+            uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            uiLeft = leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            uiRight = rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+        End SyncLock
+
+        GC.Collect()
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
+    End Sub
+    Public Sub stopCamera()
+        accelSensor.Stop()
+        gyroSensor.Stop()
+        pipe.Stop()
+        config.DisableAllStream()
+    End Sub
+End Class
+#Else
+Module ORB_Module
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBWaitForFrame(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBRightImage(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBColor(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBLeftImage(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBIntrinsics(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBPointCloud(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBGyro(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBIMUTimeStamp(cPtr As IntPtr) As Double
+    End Function
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBAccel(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub ORBClose(cPtr As IntPtr)
+    End Sub
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBOpen(
+                                                   width As Integer, height As Integer) As IntPtr
+    End Function
+End Module
+Public Class CameraORB : Inherits GenericCamera
+    Public deviceNum As Integer
+    Public deviceName As String
+    Public cPtrOpen As IntPtr
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+        captureRes = _captureRes
+
+        cPtr = ORBOpen(captureRes.Width, captureRes.Height)
+        Dim intrin = ORBIntrinsics(cPtr)
+        Dim intrinInfo(4 - 1) As Single
+        Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
+        cameraInfo.ppx = intrinInfo(0)
+        cameraInfo.ppy = intrinInfo(1)
+        cameraInfo.fx = intrinInfo(2)
+        cameraInfo.fy = intrinInfo(3)
+    End Sub
+    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+        Static color As cvb.Mat, leftView As cvb.Mat, rightView As cvb.Mat, pointCloud As cvb.Mat
+
+        If cPtr = 0 Then Exit Sub
+
+        Dim colorData = ORBWaitForFrame(cPtr)
+
+        Dim accelFrame = ORBAccel(cPtr)
+        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(accelFrame)
+        ' IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
+
+        Dim gyroFrame = ORBGyro(cPtr)
+        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame)
+
+        Static imuStartTime = ORBIMUTimeStamp(cPtr)
+        IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
+
+        Dim cols = captureRes.Width, rows = captureRes.Height
+        If colorData <> 0 Then color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorData).Clone
+
+        Dim pcData = ORBPointCloud(cPtr)
+        If pcData <> 0 Then pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcData) * 0.001
+
+        Dim leftData = ORBLeftImage(cPtr)
+        If leftData <> 0 Then leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, leftData).
+                                                                   CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
+
+        Dim rightData = ORBRightImage(cPtr)
+        If rightData <> 0 Then rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8U, rightData).
+                                                                 CvtColor(cvb.ColorConversionCodes.GRAY2BGR) * 3
 
         SyncLock cameraLock
             uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
@@ -130,11 +234,15 @@ Public Class CameraORB : Inherits GenericCamera
             If uiPointCloud Is Nothing Then uiPointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3)
         End SyncLock
 
-        GC.Collect()
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        pipe.Stop()
-        config.DisableAllStream()
+        Application.DoEvents()
+        Try
+            ORBClose(cPtr)
+        Catch ex As Exception
+        End Try
+        cPtr = 0
     End Sub
 End Class
+#End If

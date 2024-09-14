@@ -447,7 +447,7 @@ Module UI_Generator
                 Continue While
             End If
 
-            If line.Contains(" As cv.Mat") Then Continue While
+            If line.Contains(" As cvb.Mat") Then Continue While
 
             phase3.Add(line)
         End While

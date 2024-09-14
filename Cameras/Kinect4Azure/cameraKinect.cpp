@@ -21,7 +21,6 @@
 #include <k4apixel.h>
 #include "PragmaLibs.h"
 
-
 using namespace std;
 using namespace  cv;
 using namespace k4aviewer;
