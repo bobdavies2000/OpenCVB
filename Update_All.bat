@@ -85,6 +85,7 @@ if not exist Azure-Kinect-Sensor-SDK\Build (
 if not exist OakD\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -S OakD -B OakD\Build -DOpenCV_DIR='%CD%/opencv/Build/'
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
+	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Debug
 )
 
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"

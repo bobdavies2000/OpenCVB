@@ -936,7 +936,8 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
         updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
-        updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
+        updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
+        'updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
 
         updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
 
