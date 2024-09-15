@@ -25,14 +25,13 @@ Public Class CameraORB : Inherits GenericCamera
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y16, fps)
         Dim leftProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_LEFT).
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
-        'Dim rightProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT).
-        '                                    GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
-
+        Dim rightProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT). ' USE_RIGHT_IMAGE
+                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
         Dim config As New Config()
         config.EnableStream(colorProfile)
         config.EnableStream(depthProfile)
         config.EnableStream(leftProfile)
-        'config.EnableStream(rightProfile)
+        config.EnableStream(rightProfile) ' USE_RIGHT_IMAGE
         config.SetAlignMode(AlignMode.ALIGN_D2C_SW_MODE)
 
         gyroSensor = dev.GetSensorList.GetSensor(SensorType.OB_SENSOR_GYRO)
@@ -69,7 +68,7 @@ Public Class CameraORB : Inherits GenericCamera
         Dim rows = captureRes.Height, cols = captureRes.Width
         Static PtCloud As New PointCloudFilter
         ' turning on the right view overworks the camera processor.  Reduce the work and get 30 fps reliably.  Otherwise 5 fps.
-        Static color As cvb.Mat, leftView As cvb.Mat, pointCloud As cvb.Mat ' , rightView As cvb.Mat
+        Static color As cvb.Mat, leftView As cvb.Mat, pointCloud As cvb.Mat, rightView As cvb.Mat ' USE_RIGHT_IMAGE
 
         Dim frames As Frameset = Nothing
         While frames Is Nothing
@@ -94,9 +93,9 @@ Public Class CameraORB : Inherits GenericCamera
             leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, lFrame.GetDataPtr)
         End If
 
-        'If rFrame IsNot Nothing Then
-        '    rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, rFrame.GetDataPtr)
-        'End If
+        If rFrame IsNot Nothing Then ' USE_RIGHT_IMAGE
+            rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, rFrame.GetDataPtr)
+        End If
 
         If dFrame IsNot Nothing Then
             Dim depthValueScale As Single = dFrame.GetValueScale()
@@ -114,14 +113,14 @@ Public Class CameraORB : Inherits GenericCamera
 
         If color Is Nothing Then color = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
         If leftView Is Nothing Then leftView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-        ' If rightView Is Nothing Then rightView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
+        If rightView Is Nothing Then rightView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3) ' USE_RIGHT_IMAGE
         If pointCloud Is Nothing Then pointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3)
 
         SyncLock cameraLock
             uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             uiLeft = leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-            ' uiRight = rightview.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest) 
-            uiRight = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest) '  note duplicate of color for right view - less stress on camera.
+            uiRight = rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest) ' USE_RIGHT_IMAGE
+            'uiRight = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest) '  note duplicate of color for right view - less stress on camera.
             uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
         End SyncLock
 
