@@ -37,12 +37,11 @@ public:
 	int* depthBuffer = 0;
 	uint8_t* colorBuffer = 0;;
 	k4a_image_t point_cloud_image = NULL;
-	int pointCloudBuffSize = 0;
 	k4a_image_t colorImage = NULL;
 	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 	char outMsg[10000];
-	Mat colorMat, leftView, pointcloud;
-	int width, height, colorBuffSize;
+	Mat colorMat, leftView;
+	int width, height;
 
 private:
 	k4a_capture_t capture = NULL;
@@ -62,7 +61,6 @@ public:
 		{
 			width = _width;
 			height = _height;
-			colorBuffSize = width * height;
 			device = NULL;
 			if (K4A_RESULT_SUCCEEDED != k4a_device_open(K4A_DEVICE_DEFAULT, &device)) { deviceCount = 0; return; }
 
@@ -75,8 +73,6 @@ public:
 			config.camera_fps = K4A_FRAMES_PER_SECOND_30;
 
 			k4a_device_get_calibration(device, config.depth_mode, config.color_resolution, &calibration);
-
-			pointCloudBuffSize = colorBuffSize * 3 * int(sizeof(int16_t));
 
 			k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, width, height, width * int(sizeof(int16_t)), &depthInColor);
 			k4a_image_create(K4A_IMAGE_FORMAT_CUSTOM, width, height, width * 3 * int(sizeof(int16_t)), 
@@ -139,8 +135,6 @@ public:
 
 		k4a_transformation_depth_image_to_point_cloud(transformation, depthInColor, K4A_CALIBRATION_TYPE_COLOR, point_cloud_image);
 		
-		pointcloud = Mat(height, width, CV_16UC3, (int*)point_cloud_image);
-
 		for (int i = 0; i < 1000; i++)
 		{
 			auto test = k4a_device_get_imu_sample(device, &imu_sample, 0); // get the latest sample

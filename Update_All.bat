@@ -21,6 +21,10 @@ if not exist OrbbecSDK (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK.git"
 ) 
 
+if not exist zed-c-api (
+	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/stereolabs/zed-c-api"
+) 
+
 if not exist OrbbecSDK_CSharp (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK_CSharp.git"
 ) 
@@ -52,6 +56,12 @@ if not exist librealsense\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_CSHARP_BINDINGS=ON -DBUILD_SHARED_LIBS=ON -S librealsense -B librealsense/Build
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Release
+)
+
+if not exist zed-c-api\Build (
+	"C:\Program Files\CMake\bin\Cmake.exe" -S zed-c-api -B zed-c-api/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
+	msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Debug
+	msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Release
 )
 
 if not exist OrbbecSDK\Build (

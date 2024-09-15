@@ -924,6 +924,7 @@ Public Class Main_UI
 
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
+        updatePath(HomeDir.FullName + "zed-c-api\Build\Release\", "StereoLabs C dll supports StereoLabs C# library.")
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
 

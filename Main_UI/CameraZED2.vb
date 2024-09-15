@@ -4,84 +4,99 @@ Imports System.Runtime
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports sl
 
-'Public Class CameraZED2 : Inherits GenericCamera
-'    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
-'        captureRes = _captureRes
-'        Dim init_params As New InitParameters()
-'        init_params.camera_resolution = sl.Resolution.HD720
-'        init_params.resolution = sl.Resolution.HD720
+#If 1 Then
+Public Class CameraZED2 : Inherits GenericCamera
+    Dim zed As sl.Camera
+    Dim init_params As New InitParameters()
+    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+        captureRes = _captureRes
+        Dim fps = 100
+        If captureRes.Width = 960 Then fps = 120
+        If captureRes.Width = 1920 And captureRes.Height = 1080 Then fps = 30
+        If captureRes.Width = 1920 And captureRes.Height = 1200 Then fps = 60
+        If captureRes.Width = 1280 And captureRes.Height = 720 Then fps = 60
+
+        init_params.cameraFPS = fps
+        init_params.sensorsRequired = True
+        init_params.depthMode = sl.DEPTH_MODE.PERFORMANCE
+        init_params.coordinateSystem = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
+        init_params.coordinateUnits = sl.UNIT.METER
+
+        If captureRes.Height = 720 Then init_params.resolution = 4 ' sl.Resolution.HD720
+        If captureRes.Height = 1080 Then init_params.resolution = 3 ' sl.Resolution.HD720
+        If captureRes.Height = 1200 Then init_params.resolution = 2 ' sl.Resolution.HD720
+        If captureRes.Height = 376 Then init_params.resolution = 6 ' sl.Resolution.HD720
+
+        zed = New sl.Camera(0)
+        zed.Open(init_params)
+
+        Dim camInfo As sl.CameraInformation = zed.GetCameraInformation
+
+        cameraInfo.ppx = camInfo.cameraConfiguration.calibrationParameters.leftCam.cx
+        cameraInfo.ppy = camInfo.cameraConfiguration.calibrationParameters.leftCam.cy
+        cameraInfo.fx = camInfo.cameraConfiguration.calibrationParameters.leftCam.fx
+        cameraInfo.fy = camInfo.cameraConfiguration.calibrationParameters.leftCam.fy
+
+        Dim posTrack As New sl.PositionalTrackingParameters
+        posTrack.enableAreaMemory = True
+        zed.EnablePositionalTracking(posTrack)
+    End Sub
+    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+        Static RuntimeParameters = New RuntimeParameters()
+        Dim rows = captureRes.Height, cols = captureRes.Width
+        Dim w = WorkingRes.Width, h = WorkingRes.Height
+        While 1
+            Dim rc = zed.Grab(RuntimeParameters)
+            If rc = 0 Then Exit While
+        End While
+
+        Dim color As New cvb.Mat, leftView As New cvb.Mat, rightView As New cvb.Mat, pointCloud As New cvb.Mat
+        Static colorSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
+        Static rightSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
+        Static pointCloudSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
+
+        zed.RetrieveImage(colorSL, sl.VIEW.LEFT)
+        color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, colorSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+
+        zed.RetrieveImage(rightSL, sl.VIEW.RIGHT)
+        rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, rightSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+
+        zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZ)
+        pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC4, pointCloudSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+
+        Dim sensordata As New sl.SensorsData
+        zed.GetSensorsData(sensordata, sl.TIME_REFERENCE.CURRENT)
+
+        SyncLock cameraLock
+            Dim acc = sensordata.imu.linearAcceleration
+            IMU_Acceleration = New cvb.Point3f(acc.X, acc.Y, acc.Z)
+            Dim gyro = sensordata.imu.angularVelocity
+            IMU_AngularVelocity = New cvb.Point3f(gyro.X, gyro.Y, gyro.Z)
+            IMU_TimeStamp = sensordata.imu.timestamp
+
+            If WorkingRes <> captureRes Then
+                uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiLeft = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiRight = rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).Clone
+            Else
+                uiColor = color.Clone
+                uiLeft = color.Clone
+                uiRight = rightView.Clone
+                uiPointCloud = pointCloud.Clone
+            End If
+        End SyncLock
+
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
+    End Sub
+    Public Sub stopCamera()
+        zed.Close()
+    End Sub
+End Class
 
 
-'        Dim zedCamera As New Camera(0)
+#Else
 
-'        Dim mWidth As UInteger = CUInt(zedCamera.ImageWidth)
-'        Dim mHeight As UInteger = CUInt(zedCamera.ImageHeight)
-
-'        Dim RuntimeParameters = New RuntimeParameters()
-'        'Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsZed)(Zed2Intrinsics(cPtr))
-'        'cameraInfo.ppx = intrinsics.cx
-'        'cameraInfo.ppy = intrinsics.cy
-'        'cameraInfo.fx = intrinsics.fx
-'        'cameraInfo.fy = intrinsics.fy
-'        'cameraInfo.v_fov = intrinsics.v_fov
-'        'cameraInfo.h_fov = intrinsics.h_fov
-'        'cameraInfo.d_fov = intrinsics.d_fov
-'    End Sub
-'    Public Sub GetNextFrame(WorkingRes As cvb.Size)
-'        Dim rows = captureRes.Height, cols = captureRes.Width
-'        With mbuf(mbIndex)
-'            .color = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
-'            .leftView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
-'            .rightView = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar(0))
-'            .pointCloud = New cvb.Mat(rows, cols, cvb.MatType.CV_32FC3, New cvb.Scalar(0))
-'        End With
-'        MyBase.GetNextFrameCounts(IMU_FrameTime)
-'    End Sub
-'    Public Sub stopCamera()
-'    End Sub
-'End Class
-
-
-
-
-#If 0 Then
-Dim init_params As New InitParameters()
-init_params.resolution = RESOLUTION.HD1080
-
-Dim zedCamera As New Camera(0)
-' Open the camera
-Dim err As ERROR_CODE = zedCamera.Open(init_params)
-If err <> ERROR_CODE.SUCCESS Then
-    Environment.Exit(-1)
-End If
-
-' Get resolution of camera
-Dim mWidth As UInteger = CUInt(zedCamera.ImageWidth)
-Dim mHeight As UInteger = CUInt(zedCamera.ImageHeight)
-
-' Initialize the Mat that will contain the left image
-Dim image As New Mat()
-image.Create(mWidth, mHeight, MAT_TYPE.MAT_8U_C4, MEM.CPU) ' Mat need to be created before use.
-
-' Define default Runtime parameters
-Dim runtimeParameters As New RuntimeParameters()
-
-' Initialize runtime parameters and frame counter
-Dim i As Integer = 0
-While i < 1000
-    If zedCamera.Grab(runtimeParameters) = ERROR_CODE.SUCCESS Then
-        zedCamera.RetrieveImage(image, VIEW.LEFT) ' Get the left image
-        Dim timestamp As ULong = zedCamera.GetCameraTimeStamp() ' Get image timestamp
-        Console.WriteLine("Image resolution: " & image.GetWidth() & "x" & image.GetHeight() & "|| Image timestamp: " & timestamp)
-        ' increment frame count
-        i += 1
-    End If
-End While
-
-' Disable positional tracking and close the camera
-zedCamera.DisablePositionalTracking("")
-zedCamera.Close()
-#End If
 Module Zed2_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Open(width As Integer, height As Integer, fps As Integer) As IntPtr
@@ -189,3 +204,4 @@ Public Class CameraZED2 : Inherits GenericCamera
         cPtr = 0
     End Sub
 End Class
+#End If

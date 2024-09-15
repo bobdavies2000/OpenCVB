@@ -61,7 +61,7 @@ public:
 		init_params.depth_mode = DEPTH_MODE::ULTRA;
 		init_params.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP; // OpenGL's coordinate system is right_handed
 		init_params.coordinate_units = UNIT::METER;
-		init_params.camera_fps = 100; // use the highest frame rate available.
+		init_params.camera_fps = fps; // use the highest frame rate available.
 
 		init_params.camera_resolution = sl::RESOLUTION::HD720;
 		if (w == 1920 && h == 1080) init_params.camera_resolution = sl::RESOLUTION::HD1080;
@@ -188,10 +188,10 @@ public:
 		//	printf(" - Barometer \n \t Atmospheric pressure: %f [hPa] \n", sensor_data.barometer.pressure);
 		//}
 
-		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
-		RotationMatrix = zed_pose.getRotationMatrix();
-		RotationVector = zed_pose.getRotationVector();
-		IMU_Translation = zed_pose.getTranslation();
+		//zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
+		//RotationMatrix = zed_pose.getRotationMatrix();
+		//RotationVector = zed_pose.getRotationVector();
+		//IMU_Translation = zed_pose.getTranslation();
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
