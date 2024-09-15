@@ -32,12 +32,7 @@ class StereoLabsZed2
 {
 public:
 	int serialNumber = 0;
-	Translation extrinsicsTranslation;
-	Rotation extrinsicsRotationMatrix;
 	float acceleration[3] = { 0, 0, 0 };
-	sl::float3 RotationVector;
-	Rotation RotationMatrix;
-	Translation IMU_Translation;
 	SensorsData sensordata;
 	Orientation orientation;
 	float cameraData[7];
@@ -76,13 +71,6 @@ public:
 		cameraData[1] = camera_info.camera_configuration.calibration_parameters.left_cam.fy;
 		cameraData[2] = camera_info.camera_configuration.calibration_parameters.left_cam.cx;
 		cameraData[3] = camera_info.camera_configuration.calibration_parameters.left_cam.cy;
-		cameraData[4] = camera_info.camera_configuration.calibration_parameters.left_cam.v_fov;
-		cameraData[5] = camera_info.camera_configuration.calibration_parameters.left_cam.h_fov;
-		cameraData[6] = camera_info.camera_configuration.calibration_parameters.left_cam.d_fov;
-		serialNumber = camera_info.serial_number;
-		printf("serial number = %d", serialNumber);
-		extrinsicsTranslation = camera_info.camera_configuration.calibration_parameters.stereo_transform.getTranslation();
-		extrinsicsRotationMatrix = camera_info.camera_configuration.calibration_parameters.stereo_transform.getRotationMatrix();
 
 		PositionalTrackingParameters positional_tracking_param;
 		positional_tracking_param.enable_area_memory = true;
@@ -138,66 +126,17 @@ public:
 		rightView = getMat((void*)rightViewSL.getPtr<sl::uchar1>(), w, h);
 
 		zed.retrieveMeasure(pcMatSL, MEASURE::XYZBGRA); // XYZ has an extra float!
-		float* pc = (float*)pcMatSL.getPtr<sl::uchar1>();
-		if (pc == 0) return;
 
-		if (pointCloud.rows != captureHeight)
-			pointCloud = cv::Mat(h, w, CV_32FC3);
+		pointCloud = cv::Mat(captureHeight, captureWidth, CV_32FC4, pcMatSL.getPtr<sl::uchar1>());
+		cvtColor(pointCloud, pointCloud, COLOR_BGRA2BGR);
+		cv::patchNaNs(pointCloud);
+		if (captureWidth != w) resize(pointCloud, pointCloud, Size(w, h));
 
-		pointCloud.setTo(0);
-
-		float* pc32fC3 = (float*)pointCloud.data;
-		int incr = 4;
-		if (captureWidth / w >= 4)
-			incr = 16;
-		else
-			if (captureWidth / w >= 2) incr = 8;
-
-		for (int y = 0; y < h; y++)
-			for (int x = 0; x < w; x++)
-			{
-				int offset = (y * captureWidth + x) * incr;
-				if (isnan(pc[offset + 2]) || isinf(pc[offset + 2])) // checking the Z value...
-					continue;
-				int index = (y * w + x) * 3;
-				pc32fC3[index] = pc[offset];
-				pc32fC3[index + 1] = -pc[offset + 1];
-				pc32fC3[index + 2] = -pc[offset + 2];
-			}
-
-		//Mat splitMats[3]{};
-		//split(pointCloud, splitMats);
-		//auto test = countNonZero(splitMats[2]);
-		//double maxVal;
-		//Mat testMat;
-		//splitMats[2].convertTo(testMat, CV_8UC1);
-		//minMaxLoc(testMat, NULL, &maxVal);
-		//imshow("testMat", testMat * 255 / 8);
-		//waitKey(1);
-
-		//if (sl_get_sensors_data(camera_id, &sensor_data, SL_TIME_REFERENCE_CURRENT) == SL_ERROR_CODE_SUCCESS) {
-
-		//	printf("Sample %i \n", n++);
-		//	printf(" - IMU:\n");
-		//	printf(" \t Orientation: {%f,%f,%f,%f} \n", sensor_data.imu.orientation.x, sensor_data.imu.orientation.y, sensor_data.imu.orientation.z, sensor_data.imu.orientation.w);
-		//	printf(" \t Acceleration: {%f,%f,%f} [m/sec^2] \n", sensor_data.imu.linear_acceleration.x, sensor_data.imu.linear_acceleration.y, sensor_data.imu.linear_acceleration.z);
-		//	printf(" \t Angular Velocity: {%f,%f,%f} [deg/sec] \n", sensor_data.imu.angular_velocity.x, sensor_data.imu.angular_velocity.y, sensor_data.imu.angular_velocity.z);
-
-		//	printf(" - Magnetometer \n \t Magnetic Field: {%f,%f,%f} [uT] \n", sensor_data.magnetometer.magnetic_field_c.x, sensor_data.magnetometer.magnetic_field_c.y, sensor_data.magnetometer.magnetic_field_c.z);
-
-		//	printf(" - Barometer \n \t Atmospheric pressure: %f [hPa] \n", sensor_data.barometer.pressure);
-		//}
-
-		//zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
-		//RotationMatrix = zed_pose.getRotationMatrix();
-		//RotationVector = zed_pose.getRotationVector();
-		//IMU_Translation = zed_pose.getTranslation();
-
+		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
 	}
 };
-
 
 extern "C" __declspec(dllexport) int* Zed2Open(int w, int h, int fps) { StereoLabsZed2* cPtr = new StereoLabsZed2(w, h, fps); return (int*)cPtr; }
 extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2* cPtr) { cPtr->zed.close(); }

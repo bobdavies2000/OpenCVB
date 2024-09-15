@@ -3,6 +3,9 @@ Imports cvb = OpenCvSharp
 Imports System.Runtime
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports sl
+Imports System.Numerics
+Imports Intel.RealSense
+
 
 #If 1 Then
 Public Class CameraZED2 : Inherits GenericCamera
@@ -18,7 +21,7 @@ Public Class CameraZED2 : Inherits GenericCamera
 
         init_params.cameraFPS = fps
         init_params.sensorsRequired = True
-        init_params.depthMode = sl.DEPTH_MODE.PERFORMANCE
+        init_params.depthMode = sl.DEPTH_MODE.ULTRA
         init_params.coordinateSystem = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
         init_params.coordinateUnits = sl.UNIT.METER
 
@@ -63,16 +66,20 @@ Public Class CameraZED2 : Inherits GenericCamera
 
         zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZ)
         pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC4, pointCloudSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+        cvb.Cv2.PatchNaNs(pointCloud, 0)
 
+        Dim zed_pose As New sl.Pose
+        zed.GetPosition(zed_pose, REFERENCE_FRAME.WORLD)
         Dim sensordata As New sl.SensorsData
-        zed.GetSensorsData(sensordata, sl.TIME_REFERENCE.CURRENT)
+        zed.GetSensorsData(sensordata, TIME_REFERENCE.CURRENT)
 
         SyncLock cameraLock
             Dim acc = sensordata.imu.linearAcceleration
-            IMU_Acceleration = New cvb.Point3f(acc.X, acc.Y, acc.Z)
+            IMU_Acceleration = New cvb.Point3f(-acc.X, acc.Y, -acc.Z)
             Dim gyro = sensordata.imu.angularVelocity
-            IMU_AngularVelocity = New cvb.Point3f(gyro.X, gyro.Y, gyro.Z)
-            IMU_TimeStamp = sensordata.imu.timestamp
+            IMU_AngularVelocity = New cvb.Point3f(gyro.X, gyro.Y, gyro.Z) * 0.0174533 ' Zed 2 gyro is in degrees/sec 
+            Static IMU_StartTime = sensordata.imu.timestamp
+            IMU_TimeStamp = (sensordata.imu.timestamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
 
             If WorkingRes <> captureRes Then
                 uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
@@ -173,7 +180,13 @@ Public Class CameraZED2 : Inherits GenericCamera
             uiLeft = uiColor.Clone
 
             uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC3,
-                                                      Zed2PointCloud(cPtr)).Clone
+                                                 Zed2PointCloud(cPtr)).Clone
+
+
+            Dim samples(uiPointCloud.Total * 3 - 1) As Single
+            Marshal.Copy(uiPointCloud.Data, samples, 0, samples.Length)
+
+
             Dim acc = Zed2Acceleration(cPtr)
             IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(acc)
             IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
