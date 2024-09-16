@@ -16,7 +16,8 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
-#include "PragmaLibs.h" 
+#include "PragmaLibs.h"
+#pragma comment(lib, "C:/Program Files/OrbbecSDK 1.10.5/SDK/lib/OrbbecSDK.lib") 
 
 using namespace  cv;
 using namespace std;
