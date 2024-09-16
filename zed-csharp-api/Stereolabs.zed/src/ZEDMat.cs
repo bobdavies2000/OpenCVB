@@ -415,7 +415,7 @@ namespace sl
         private static extern bool dllz_mat_is_memory_owner(System.IntPtr ptr);
 
         [DllImport(nameDll, EntryPoint = "sl_mat_get_resolution")]
-        private static extern sl.Resolution dllz_mat_get_resolution(System.IntPtr ptr);
+        private static extern sl.ResolutionStruct dllz_mat_get_resolution(System.IntPtr ptr);
 
         [DllImport(nameDll, EntryPoint = "sl_mat_alloc")]
         private static extern void dllz_mat_alloc(System.IntPtr ptr, int width, int height, int type, int mem);
@@ -474,7 +474,7 @@ namespace sl
         /// <param name="type">Type of the matrix. Depends on texture type (see sl.VIEW and sl.MEASURE).</param>
         /// <param name="mem">Where the buffer will be stored (CPU or GPU memory).
         /// \n Choose depending on where you'll need to access it from.</param>
-        public Mat(sl.Resolution resolution, MAT_TYPE type, MEM mem = MEM.CPU)
+        public Mat(sl.ResolutionStruct resolution, MAT_TYPE type, MEM mem = MEM.CPU)
         {
             _matInternalPtr = dllz_mat_create_new((int)resolution.width, (int)resolution.height, (int)(type), (int)(mem));
         }
@@ -486,7 +486,7 @@ namespace sl
         /// <param name="type">Type of the matrix. Depends on texture type (see sl.VIEW and sl.MEASURE).</param>
         /// <param name="mem">Where the buffer will be stored (CPU or GPU memory).
         /// \n Choose depending on where you'll need to access it from.</param>
-        public void Create(sl.Resolution resolution, MAT_TYPE type, MEM mem = MEM.CPU)
+        public void Create(sl.ResolutionStruct resolution, MAT_TYPE type, MEM mem = MEM.CPU)
         {
             _matInternalPtr = dllz_mat_create_new((int)resolution.width, (int)resolution.height, (int)(type), (int)(mem));
         }
@@ -667,7 +667,7 @@ namespace sl
         /// Returns the resolution (width and height) of the matrix.
         /// </summary>
         /// <returns></returns>
-        public sl.Resolution GetResolution()
+        public sl.ResolutionStruct GetResolution()
         {
             return dllz_mat_get_resolution(_matInternalPtr);
         }
@@ -690,7 +690,7 @@ namespace sl
         /// <param name="resolution">Size of the image/matrix in pixels.</param>
         /// <param name="matType">Type of matrix (data type and channels - see sl.MAT_TYPE)</param>
         /// <param name="mem">Where the buffer will be stored - CPU memory or GPU memory.</param>
-        public void Alloc(sl.Resolution resolution, MAT_TYPE matType, MEM mem = MEM.CPU)
+        public void Alloc(sl.ResolutionStruct resolution, MAT_TYPE matType, MEM mem = MEM.CPU)
         {
             dllz_mat_alloc(_matInternalPtr, (int)resolution.width, (int)resolution.height, (int)matType, (int)mem);
         }

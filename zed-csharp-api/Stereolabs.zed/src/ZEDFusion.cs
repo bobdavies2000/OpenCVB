@@ -289,7 +289,7 @@ namespace sl
         /// <param name="uuid">the requested camera identifier.</param>
         /// <param name="resolution">the requested resolution of the output image, can be lower or equal (default) to the original image resolution.</param>
         /// <returns>FUSION_ERROR_CODE "SUCCESS" if it goes as it should, otherwise it returns an FUSION_ERROR_CODE.</returns>
-        public FUSION_ERROR_CODE RetrieveImage(Mat mat, ref CameraIdentifier uuid, Resolution resolution = new sl.Resolution())
+        public FUSION_ERROR_CODE RetrieveImage(Mat mat, ref CameraIdentifier uuid, ResolutionStruct resolution = new sl.ResolutionStruct())
         {
             return dllz_fusion_retrieve_image(mat.MatPtr, ref uuid, (int)resolution.width, (int)resolution.height);
         }
@@ -303,7 +303,7 @@ namespace sl
         /// Only MEASURE: DEPTH, XYZ, XYZRGBA, XYZBGRA, XYZARGB, XYZABGR, DEPTH_U16_MM are available.
         /// <param name="resolution">the requested resolution of the output image, can be lower or equal (default) to the original image resolution.</param>
         /// <returns>FUSION_ERROR_CODE "SUCCESS" if it goes as it should, otherwise it returns an FUSION_ERROR_CODE.</returns>
-        public FUSION_ERROR_CODE RetrieveMeasure(Mat mat, ref CameraIdentifier uuid, MEASURE measure = MEASURE.DEPTH, Resolution resolution = new sl.Resolution())
+        public FUSION_ERROR_CODE RetrieveMeasure(Mat mat, ref CameraIdentifier uuid, MEASURE measure = MEASURE.DEPTH, ResolutionStruct resolution = new sl.ResolutionStruct())
         {
             return dllz_fusion_retrieve_measure(mat.MatPtr, ref uuid, measure, (int)resolution.width, (int)resolution.height);
         }

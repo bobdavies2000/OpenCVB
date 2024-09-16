@@ -104,14 +104,14 @@ namespace sl
     /// \ingroup Core_group
     /// Structure containing the width and height of an image.
     /// </summary>
-    public struct Resolution
+    public struct ResolutionStruct
     {
         /// <summary>
         /// Default constructor.
         /// </summary>
         /// <param name="width">Width of the image in pixels.</param>
         /// <param name="height">Height of the image in pixels.</param>
-        public Resolution(uint width = 0, uint height = 0)
+        public ResolutionStruct(uint width = 0, uint height = 0)
         {
             this.width = (System.UIntPtr)width;
             this.height = (System.UIntPtr)height;
@@ -413,7 +413,7 @@ namespace sl
         /// <summary>
         /// Resolution of the camera.
         /// </summary>
-        public Resolution resolution;
+        public ResolutionStruct resolution;
     };
 
     /// \ingroup Core_group
@@ -1330,7 +1330,7 @@ namespace sl
         /// <summary>
         /// Size in pixels of the images given by the camera.
         /// </summary>
-        public Resolution resolution;
+        public ResolutionStruct resolution;
         /// <summary>
         /// Real focal length in millimeters.
         /// </summary>

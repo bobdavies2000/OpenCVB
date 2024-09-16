@@ -1101,7 +1101,7 @@ namespace sl
         /// <param name="mem">Whether the image should be on CPU or GPU memory.</param>
         /// <param name="resolution">Resolution of the texture.</param>
         /// <returns>sl.ERROR_CODE indicating if the retrieval was successful, and why it wasn't otherwise.</returns>
-        public sl.ERROR_CODE RetrieveImage(sl.Mat mat, sl.VIEW view, sl.MEM mem = sl.MEM.CPU, sl.Resolution resolution = new sl.Resolution())
+        public sl.ERROR_CODE RetrieveImage(sl.Mat mat, sl.VIEW view, sl.MEM mem = sl.MEM.CPU, sl.ResolutionStruct resolution = new sl.ResolutionStruct())
         {
             return (sl.ERROR_CODE)(dllz_retrieve_image(CameraID, mat.MatPtr, (int)view, (int)mem, (int)resolution.width, (int)resolution.height));
         }
@@ -1210,17 +1210,17 @@ namespace sl
         /// </summary>
         /// <param name="resolution">The wanted sl.RESOLUTION.</param>
         /// <returns>The sl.Resolution corresponding to sl.RESOLUTION given as argument.</returns>
-        public static sl.Resolution GetResolution(RESOLUTION resolution)
+        public static sl.ResolutionStruct GetResolution(RESOLUTION resolution)
         {
-            sl.Resolution res = new sl.Resolution();
+            sl.ResolutionStruct res = new sl.ResolutionStruct();
             switch (resolution)
             {
-                case RESOLUTION.HD2K: res = new sl.Resolution(2208, 1242); break;
-                case RESOLUTION.HD1080: res = new sl.Resolution(1920, 1080); break;
-                case RESOLUTION.HD1200: res = new sl.Resolution(1920, 1200); break;
-                case RESOLUTION.HD720: res = new sl.Resolution(1280, 720); break;
-                case RESOLUTION.VGA: res = new sl.Resolution(672, 376); break;
-                case RESOLUTION.HDSVGA: res = new sl.Resolution(960, 600); break;
+                case RESOLUTION.HD2K: res = new sl.ResolutionStruct(2208, 1242); break;
+                case RESOLUTION.HD1080: res = new sl.ResolutionStruct(1920, 1080); break;
+                case RESOLUTION.HD1200: res = new sl.ResolutionStruct(1920, 1200); break;
+                case RESOLUTION.HD720: res = new sl.ResolutionStruct(1280, 720); break;
+                case RESOLUTION.VGA: res = new sl.ResolutionStruct(672, 376); break;
+                case RESOLUTION.HDSVGA: res = new sl.ResolutionStruct(960, 600); break;
             }
             return res;
         }
@@ -1257,7 +1257,7 @@ namespace sl
         public sl.ERROR_CODE GetCameraSettings(VIDEO_SETTINGS settings, ref int minvalue, ref int maxvalue)
         {
             AssertCameraIsReady();
-            int ret = -1;
+            //int ret = -1;
             return dllz_get_camera_settings_min_max(CameraID, settings, ref minvalue, ref maxvalue);
         }
 
@@ -1628,7 +1628,7 @@ namespace sl
         /// <param name="mem">Whether the image should be on CPU or GPU memory.</param>
         /// <param name="resolution">Resolution of the texture.</param>
         /// <returns>sl.ERROR_CODE indicating if the retrieval was successful, and why it wasn't otherwise.</returns>
-        public sl.ERROR_CODE RetrieveMeasure(sl.Mat mat, sl.MEASURE measure, sl.MEM mem = sl.MEM.CPU, sl.Resolution resolution = new sl.Resolution())
+        public sl.ERROR_CODE RetrieveMeasure(sl.Mat mat, sl.MEASURE measure, sl.MEM mem = sl.MEM.CPU, sl.ResolutionStruct resolution = new sl.ResolutionStruct())
         {
             return (sl.ERROR_CODE)(dllz_retrieve_measure(CameraID, mat.MatPtr, (int)measure, (int)mem, (int)resolution.width, (int)resolution.height));
         }
@@ -1776,7 +1776,7 @@ namespace sl
         /// \n When reading an SVO file, the parameters will correspond to the camera used for recording.
         /// </summary>
         /// <returns> CameraInformation containing the calibration parameters of the camera, as well as serial number and firmware version.</returns>
-        public CameraInformation GetCameraInformation(Resolution resolution = new Resolution())
+        public CameraInformation GetCameraInformation(ResolutionStruct resolution = new ResolutionStruct())
         {
             IntPtr p = dllz_get_camera_information(CameraID, (int)resolution.width, (int)resolution.height);
 
@@ -1936,7 +1936,7 @@ namespace sl
         /// <param name="resolution">The optional size of the returned mask</param>
         /// <param name="module"> Specifies the module from which the ROI is to be obtained. </param>
         /// <returns>An sl.ERROR_CODE if something went wrong.</returns>
-        public ERROR_CODE GetRegionOfInterest(sl.Mat roiMask, sl.Resolution resolution = new sl.Resolution(), MODULE module = MODULE.ALL)
+        public ERROR_CODE GetRegionOfInterest(sl.Mat roiMask, sl.ResolutionStruct resolution = new sl.ResolutionStruct(), MODULE module = MODULE.ALL)
         {
             return (sl.ERROR_CODE)dllz_get_region_of_interest(CameraID, roiMask.MatPtr, (int)resolution.width, (int)resolution.height, module);
         }
