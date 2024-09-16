@@ -52,10 +52,6 @@ if not exist opencv\Build (
 	msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Release
 )
 
-:: update the pragma comments for the OpenCV libraries to point to the latest version of OpenCV
-msbuild.exe VersionUpdates/VersionUpdates.sln /p:Configuration=Debug
-bin\Debug\VersionUpdates.exe
-
 if not exist librealsense\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_CSHARP_BINDINGS=ON -DBUILD_SHARED_LIBS=ON -S librealsense -B librealsense/Build
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
@@ -90,6 +86,12 @@ if not exist OakD\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -S OakD -B OakD\Build -DOpenCV_DIR='%CD%/opencv/Build/'
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Debug
+)
+
+if not exist zed-csharp-api\Stereolabs.zed\Build (
+	"C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api\Stereolabs.zed -B zed-csharp-api\Stereolabs.zed\Build  -DCMAKE_CONFIGURATION_TYPES=Debug;Release;
+	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Cam_Oak-D.sln /p:Configuration=Release
+	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Cam_Oak-D.sln /p:Configuration=Debug
 )
 
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
