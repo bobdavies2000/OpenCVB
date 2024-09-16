@@ -387,7 +387,6 @@ cmake.db
 OakD/Build/
 Mynt/
 OrbbecSDK/
-zed-sdk/
 *.json
 CS_Classes\createAlgorithms.cs
 Temp/*.ply
