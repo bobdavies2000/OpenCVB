@@ -419,7 +419,7 @@
             </summary>
             <returns>The current sl.INPUT_TYPE.</returns>
         </member>
-        <member name="M:sl.Camera.RetrieveImage(sl.Mat,sl.VIEW,sl.MEM,sl.Resolution)">
+        <member name="M:sl.Camera.RetrieveImage(sl.Mat,sl.VIEW,sl.MEM,sl.ResolutionStruct)">
             @name Video
              <summary>
              Retrieves an image texture from the ZED SDK and loads it into a sl.Mat.
@@ -697,7 +697,7 @@
             Checks if the camera has been initialized and the plugin has been loaded. Throws exceptions otherwise.
             </summary>
         </member>
-        <member name="M:sl.Camera.RetrieveMeasure(sl.Mat,sl.MEASURE,sl.MEM,sl.Resolution)">
+        <member name="M:sl.Camera.RetrieveMeasure(sl.Mat,sl.MEASURE,sl.MEM,sl.ResolutionStruct)">
             @{
              @name Depth Sensing
             <summary>
@@ -794,7 +794,7 @@
             </summary>
             <returns> SensorsConfiguration containing the sensor calibration information of the camera.</returns>
         </member>
-        <member name="M:sl.Camera.GetCameraInformation(sl.Resolution)">
+        <member name="M:sl.Camera.GetCameraInformation(sl.ResolutionStruct)">
              <summary>
              Returns the CameraInformation associated the camera being used.
             
@@ -892,7 +892,7 @@
             </param>
             <returns>An sl.ERROR_CODE if something went wrong.</returns>
         </member>
-        <member name="M:sl.Camera.GetRegionOfInterest(sl.Mat,sl.Resolution,sl.MODULE)">
+        <member name="M:sl.Camera.GetRegionOfInterest(sl.Mat,sl.ResolutionStruct,sl.MODULE)">
             <summary>
             Get the previously set or computed region of interest.
             </summary>
@@ -1592,25 +1592,25 @@
         <member name="F:sl.POSITION_TYPE.SL_POSITION_TYPE_LAST">
             @cond SHOWHIDDEN 
         </member>
-        <member name="T:sl.Resolution">
+        <member name="T:sl.ResolutionStruct">
             <summary>
             \ingroup Core_group
             Structure containing the width and height of an image.
             </summary>
         </member>
-        <member name="M:sl.Resolution.#ctor(System.UInt32,System.UInt32)">
+        <member name="M:sl.ResolutionStruct.#ctor(System.UInt32,System.UInt32)">
             <summary>
             Default constructor.
             </summary>
             <param name="width">Width of the image in pixels.</param>
             <param name="height">Height of the image in pixels.</param>
         </member>
-        <member name="F:sl.Resolution.width">
+        <member name="F:sl.ResolutionStruct.width">
             <summary>
             Width of the image in pixels.
             </summary>
         </member>
-        <member name="F:sl.Resolution.height">
+        <member name="F:sl.ResolutionStruct.height">
             <summary>
             Height of the image in pixels.
             </summary>
@@ -7117,7 +7117,7 @@
             Creates a sl.Mat from an existing internal pointer.
             <param name="ptr">Internal pointer to create the sl.Mat with.</param>
         </member>
-        <member name="M:sl.Mat.#ctor(sl.Resolution,sl.MAT_TYPE,sl.MEM)">
+        <member name="M:sl.Mat.#ctor(sl.ResolutionStruct,sl.MAT_TYPE,sl.MEM)">
             <summary>
             Constructor.
             </summary>
@@ -7127,7 +7127,7 @@
             <param name="mem">Where the buffer will be stored (CPU or GPU memory).
             \n Choose depending on where you'll need to access it from.</param>
         </member>
-        <member name="M:sl.Mat.Create(sl.Resolution,sl.MAT_TYPE,sl.MEM)">
+        <member name="M:sl.Mat.Create(sl.ResolutionStruct,sl.MAT_TYPE,sl.MEM)">
             <summary>
             Creates a sl.Mat with a given sl.Resolution.
             </summary>
@@ -7266,7 +7266,7 @@
             <param name="matType">Type of matrix (data type and channels - see sl.MAT_TYPE)</param>
             <param name="mem">Where the buffer will be stored - CPU memory or GPU memory.</param>
         </member>
-        <member name="M:sl.Mat.Alloc(sl.Resolution,sl.MAT_TYPE,sl.MEM)">
+        <member name="M:sl.Mat.Alloc(sl.ResolutionStruct,sl.MAT_TYPE,sl.MEM)">
             <summary>
             Allocates the sl.Mat memory.
             </summary>
@@ -7652,7 +7652,7 @@
             <param name="poseRotation"></param>
             <returns></returns>
         </member>
-        <member name="M:sl.Fusion.RetrieveImage(sl.Mat,sl.CameraIdentifier@,sl.Resolution)">
+        <member name="M:sl.Fusion.RetrieveImage(sl.Mat,sl.CameraIdentifier@,sl.ResolutionStruct)">
             <summary>
             Returns the current sl.VIEW.LEFT of the specified camera, the data is synchronized.
             </summary>
@@ -7661,7 +7661,7 @@
             <param name="resolution">the requested resolution of the output image, can be lower or equal (default) to the original image resolution.</param>
             <returns>FUSION_ERROR_CODE "SUCCESS" if it goes as it should, otherwise it returns an FUSION_ERROR_CODE.</returns>
         </member>
-        <member name="M:sl.Fusion.RetrieveMeasure(sl.Mat,sl.CameraIdentifier@,sl.MEASURE,sl.Resolution)">
+        <member name="M:sl.Fusion.RetrieveMeasure(sl.Mat,sl.CameraIdentifier@,sl.MEASURE,sl.ResolutionStruct)">
             <summary>
             Returns the current measure of the specified camera, the data is synchronized.
             </summary>
