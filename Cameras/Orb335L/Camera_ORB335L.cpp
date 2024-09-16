@@ -1,5 +1,6 @@
 #include "../CameraDefines.hpp"
 
+#ifdef ORBBEC_GEMINI335
 #include "libobsensor/hpp/Pipeline.hpp"
 #include "libobsensor/hpp/Error.hpp"
 #include <mutex>
@@ -189,3 +190,4 @@ extern "C" __declspec(dllexport) int* ORBPointCloud(CameraOrb335L * cPtr) { retu
 extern "C" __declspec(dllexport) int* ORBAccel(CameraOrb335L * cPtr){return (int*)&cPtr->acceleration;}
 extern "C" __declspec(dllexport) int* ORBGyro(CameraOrb335L * cPtr){return (int*)&cPtr->gyro;}
 extern "C" __declspec(dllexport) double ORBIMUTimeStamp(CameraOrb335L * cPtr){return cPtr->imuTimeStamp;}
+#endif
