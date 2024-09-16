@@ -89,7 +89,7 @@ if not exist OakD\Build (
 )
 
 if not exist zed-csharp-api\Stereolabs.zed\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -S Stereolabs.zed -B Stereolabs.zed\Build  -DCMAKE_CONFIGURATION_TYPES=Debug;Release;
+	"C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api\Stereolabs.zed -B zed-csharp-api\Stereolabs.zed\Build  -DCMAKE_CONFIGURATION_TYPES=Debug;Release;
 	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Cam_Oak-D.sln /p:Configuration=Release
 	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Cam_Oak-D.sln /p:Configuration=Debug
 )
