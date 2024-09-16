@@ -1,38 +1,35 @@
-# Recent Changes – September 2024
+# Recent Changes – September 2024 (Part 2)
 
 -   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
--   Visual Studio Community Edition upgraded to 17.11.
-    -   Better debugger, improved GC, async programming, C\# 11.0.
-    -   Visual Studio 2022 Version 17.8 or later is now required.
-        -   In Visual Studio, click Help/Check for Updates to get updated.
-    -   Translation (see below) needed to use the latest web control.
-    -   ComboBox control has improved navigation through the list of algorithms.
--   Translating algorithms to C\#, C++, or VB.Net is streamlined and improved.
-    -   Translation is now integrated into the main app – not a separate .exe.
-    -   CodeConvert.ai is used but the process is now more automated.
-    -   CodeConvert.ai is free for 10 conversions per month. Otherwise, \$10/month.
--   “First make it work, then make it better.” C\# support shares more VB.Net code.
-    -   The interoperability of C\# and VB.Net is nearly invisible.
-    -   The CPP_Managed project is now a C++/CLR (managed code.)
-        -   The translation from C\# to C++ is working but largely untested.
-    -   The previous C++ algorithms are in a project called CPP_Native.
--   CPP_Managed is a C++/CLR Visual Studio project.
-    -   C++/CLR or Managed C++ is rarely encountered but suitable for OpenCVB.
--   The breakdown of the suffix for any algorithm is as follows:
-    -   AddWeighted_Basics – no suffix means it is VB.Net code only.
-    -   AddWeighted_Basics_CS – “_CS” suffix means it is C\# code only.
-    -   AddWeighted_Basics_CPP_VB – native C++ code with a VB.Net wrapper.
-    -   AddWeighted_Basics_CPP_CS – native C++ code with a C\# wrapper.
-    -   AddWeighted_Basics_CPP – “_CPP” suffix means C++/CLR (managed) code.
-    -   AddWeighted_Basics_CC – “_CC” suffix means it is Native C++ code.
-        -   “_CC” algorithms are called using PInvoke to native dll’s.
-    -   Python examples end in .py. PyStream algorithms end in …_PS.py.
--   Install directory with spaces now supported. Resolved – September 5th.
+-   The key camera interfaces were reviewed and rewritten in VB.Net.
+    -   StereoLabs Zed 2i, Intel RealSense D455/D435, Orbbec Gemini 335L
+    -   VB.Net camera interfaces are much easier to debug.
+    -   The Oak-D interface was rewritten but in C++
+        -   Oak-D has no C\# interface (resource constraint at Luxonis)
+        -   The OpenCVB interface is no longer troublesome.
+    -   The previous C++ interfaces are still there and toggled with \#ifdef
+-   All the camera interfaces collect all image and IMU data.
+    -   Color, Left, Right, PointCloud, and IMU acceleration/angularvelocity.
+-   The StereoLabs camera “tearing” problem was not a software issue.
+    -   The cable provided by StereoLabs needed to be replaced.
+-   Orbbec Gemini 335L camera interface rewritten in VB.Net.
+    -   OrbbecSDK_CSharp project on GitHub integrated into OpenCVB project.
+    -   OrbbecSDK_CSharp was upgraded to Framework 8.0.
+        -   The original required old Frameworks to be installed.
+        -   Switching Frameworks means fewer dependencies.
+-   The Mynt camera interface is unchanged. Company went out-of-business.
+-   The Kinect for Azure camera is also unchanged – support is coming soon.
+    -   The K4A camera doesn’t use the same technique as all the other cameras.
+        -   No left and right images are available.
+    -   K4A is useful and it is the most accurate at close range.
+    -   The K4A equivalent camera is available with Orbbec Femto Bolt.
+-   Another way to capture motion is in Motion_FromEdgeColorize
+    -   Blue is motion, Red is not (see below.)
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/f6ba222f6e73f72f51d0b393a6b64bae.png)
+![](media/3b7fcfc4ec5dcb8a1619770024131824.png)
 
-**Code Translator:** *The user interface for the code translator is shown above with the results shown at the bottom. It is invoked in OpenCVB using the ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button in the main panel. The web page for CodeConvert.ai is contained in a WebView2 control. The ComboBox and buttons at the top provide a 3-step process to translate the code. Here AddWeighted_CS, a C\# algorithm, is translated to C++. The formatting of the results is corrected when the code is pasted into CPP_Managed.cpp.*
+**Motion_FromEdgeColorize:** *This algorithm uses the palette to identify motion. Motion is blue while red is not.*
 
 # 
 
@@ -1487,3 +1484,39 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A screenshot of a computer program Description automatically generated](media/b2dafcc91cee598b2abfca8ce921a5b4.png)
 
 **Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP_VB. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
+
+# Recent Changes – September 2024
+
+-   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
+-   Visual Studio Community Edition upgraded to 17.11.
+    -   Better debugger, improved GC, async programming, C\# 11.0.
+    -   Visual Studio 2022 Version 17.8 or later is now required.
+        -   In Visual Studio, click Help/Check for Updates to get updated.
+    -   Translation (see below) needed to use the latest web control.
+    -   ComboBox control has improved navigation through the list of algorithms.
+-   Translating algorithms to C\#, C++, or VB.Net is streamlined and improved.
+    -   Translation is now integrated into the main app – not a separate .exe.
+    -   CodeConvert.ai is used but the process is now more automated.
+    -   CodeConvert.ai is free for 10 conversions per month. Otherwise, \$10/month.
+-   “First make it work, then make it better.” C\# support shares more VB.Net code.
+    -   The interoperability of C\# and VB.Net is nearly invisible.
+    -   The CPP_Managed project is now a C++/CLR (managed code.)
+        -   The translation from C\# to C++ is working but largely untested.
+    -   The previous C++ algorithms are in a project called CPP_Native.
+-   CPP_Managed is a C++/CLR Visual Studio project.
+    -   C++/CLR or Managed C++ is rarely encountered but suitable for OpenCVB.
+-   The breakdown of the suffix for any algorithm is as follows:
+    -   AddWeighted_Basics – no suffix means it is VB.Net code only.
+    -   AddWeighted_Basics_CS – “_CS” suffix means it is C\# code only.
+    -   AddWeighted_Basics_CPP_VB – native C++ code with a VB.Net wrapper.
+    -   AddWeighted_Basics_CPP_CS – native C++ code with a C\# wrapper.
+    -   AddWeighted_Basics_CPP – “_CPP” suffix means C++/CLR (managed) code.
+    -   AddWeighted_Basics_CC – “_CC” suffix means it is Native C++ code.
+        -   “_CC” algorithms are called using PInvoke to native dll’s.
+    -   Python examples end in .py. PyStream algorithms end in …_PS.py.
+-   Install directory with spaces now supported. Resolved – September 5th.
+-   A log of previous changes is included at the bottom of this document.
+
+![](media/f6ba222f6e73f72f51d0b393a6b64bae.png)
+
+**Code Translator:** *The user interface for the code translator is shown above with the results shown at the bottom. It is invoked in OpenCVB using the ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button in the main panel. The web page for CodeConvert.ai is contained in a WebView2 control. The ComboBox and buttons at the top provide a 3-step process to translate the code. Here AddWeighted_CS, a C\# algorithm, is translated to C++. The formatting of the results is corrected when the code is pasted into CPP_Managed.cpp.*

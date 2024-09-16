@@ -937,7 +937,7 @@ Public Class Main_UI
 
         updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
         updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
-        'updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
+        updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
 
         updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
 
@@ -1370,7 +1370,7 @@ Public Class Main_UI
             Case "Intel(R) RealSense(TM) Depth Camera 455"
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
             Case "Oak-D camera"
-                Return Nothing ' special handling required.  See CameraTask...
+                Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
                 Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
@@ -1394,20 +1394,9 @@ Public Class Main_UI
             If restartCameraRequest Or settings.cameraName <> saveCameraName Or settings.WorkingRes <> saveWorkingRes Then
                 saveWorkingRes = settings.WorkingRes
                 saveCameraName = settings.cameraName
-                If settings.cameraIndex = 3 Then
-                    ' special handling for the Oak-D camera as it cannot be restarted.
-                    ' It is my problem but I don't see how to fix it.
-                    ' The Oak-D interface cannot run any resolution other than 1280x720 in OpenCVB.
-                    ' Changing the working res is not a problem so just leave it open.
-                    ' Oak-D camera cannot be restarted without restarting OpenCVB.
-                    ' Leave it alone once it is started...
-                    settings.captureRes = New cvb.Size(1280, 720)
-                    If camera Is Nothing Then camera = New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
-                Else
-                    If camera IsNot Nothing Then camera.stopCamera()
-                    camera = getCamera()
-                    newCameraImages = False
-                End If
+                If camera IsNot Nothing Then camera.stopCamera()
+                camera = getCamera()
+                newCameraImages = False
             End If
             If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
             If restartCameraRequest = False Then

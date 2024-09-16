@@ -254,6 +254,7 @@ public:
 	bool firstTs = false;
 	int rows, cols;
 	bool firstPass;
+	std::shared_ptr<dai::Device> device;
 	std::shared_ptr<dai::node::ColorCamera> camRgb;
 	std::shared_ptr<dai::node::XLinkOut> xoutRgb;
 	std::shared_ptr<dai::node::MonoCamera> monoLeft;
@@ -267,14 +268,14 @@ public:
 	std::shared_ptr<dai::node::IMU> imu;
 	std::shared_ptr<dai::node::XLinkOut> xlinkOut;
 
-	//std::shared_ptr <dai::DataOutputQueue> qRgb;
-	//std::shared_ptr <dai::DataOutputQueue> leftQueue;
-	//std::shared_ptr <dai::DataOutputQueue> rightQueue;
-	//std::shared_ptr <dai::DataOutputQueue> depthQueue;
-	//std::shared_ptr <dai::DataOutputQueue> rectifLeftQueue;
-	//std::shared_ptr <dai::DataOutputQueue> rectifRightQueue;
-	//std::shared_ptr <dai::DataOutputQueue> imuQueue;
-	//std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs;
+	std::shared_ptr <dai::DataOutputQueue> qRgb;
+	std::shared_ptr <dai::DataOutputQueue> leftQueue;
+	std::shared_ptr <dai::DataOutputQueue> rightQueue;
+	std::shared_ptr <dai::DataOutputQueue> depthQueue;
+	std::shared_ptr <dai::DataOutputQueue> rectifLeftQueue;
+	std::shared_ptr <dai::DataOutputQueue> rectifRightQueue;
+	std::shared_ptr <dai::DataOutputQueue> imuQueue;
+	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs;
 
 	dai::IMUReportAccelerometer acceleroValues;
 	dai::IMUReportGyroscope gyroValues;
@@ -370,21 +371,11 @@ public:
 		stereo->syncedLeft.link(xoutLeft->input);
 		stereo->syncedRight.link(xoutRight->input);
 
-		//static dai::Device device(pipeline);
-		//deviceCalib = device.readCalibration();
+		device = std::make_shared<dai::Device>(pipeline);
+		deviceCalib = device->readCalibration();
 
-		//qRgb = device.getOutputQueue("rgb", 4, false);
-		//auto inRGB = qRgb->get<dai::ImgFrame>();
-		//leftQueue = device.getOutputQueue("left", 8, false);
-		//rightQueue = device.getOutputQueue("right", 8, false);
-		//depthQueue = device.getOutputQueue("depth", 8, false);
-		//rectifLeftQueue = device.getOutputQueue("rectified_left", 8, false);
-		//rectifRightQueue = device.getOutputQueue("rectified_right", 8, false);
-		//auto inLeft = rectifLeftQueue->get<dai::ImgFrame>();
-		//auto inRight = rectifRightQueue->get<dai::ImgFrame>();
-
-		//imuQueue = device.getOutputQueue("imu", 50, false);
-		//baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
+		imuQueue = device->getOutputQueue("imu", 50, false);
+		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
 
 		rgb = Mat(rows, cols, CV_8UC3);
 		depth16u = Mat(rows, cols, CV_16UC1);
@@ -392,34 +383,26 @@ public:
 		rightView = Mat(rows, cols, CV_8UC1);
 	}
 
-	void waitForFrame(bool close)
+	void waitForFrame()
 	{
 		std::unordered_map<std::string, std::shared_ptr<dai::ImgFrame>> latestPacket;
-		//auto inRGB = qRgb->get<dai::ImgFrame>();
-		//auto inLeft = rectifLeftQueue->get<dai::ImgFrame>();
-		//auto inRight = rectifRightQueue->get<dai::ImgFrame>();
+
 		using namespace std::chrono;
 
-		static dai::Device device(pipeline);
-		deviceCalib = device.readCalibration();
-		static auto qRgb = device.getOutputQueue("rgb", 4, false);
+		qRgb = device->getOutputQueue("rgb", 4, false);
+		leftQueue = device->getOutputQueue("left", 8, false);
+		rightQueue = device->getOutputQueue("right", 8, false);
+		depthQueue = device->getOutputQueue("depth", 8, false);
+		rectifLeftQueue = device->getOutputQueue("rectified_left", 8, false);
+		rectifRightQueue = device->getOutputQueue("rectified_right", 8, false);
+
 		auto inRGB = qRgb->get<dai::ImgFrame>();
-		static auto leftQueue = device.getOutputQueue("left", 8, false);
-		static auto rightQueue = device.getOutputQueue("right", 8, false);
-		static auto depthQueue = device.getOutputQueue("depth", 8, false);
-		static auto rectifLeftQueue = device.getOutputQueue("rectified_left", 8, false);
-		static auto rectifRightQueue = device.getOutputQueue("rectified_right", 8, false);
 		auto inLeft = rectifLeftQueue->get<dai::ImgFrame>();
 		auto inRight = rectifRightQueue->get<dai::ImgFrame>();
-		static auto imuQueue = device.getOutputQueue("imu", 50, false);
-		static auto baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
 
-		// this is for the shutdown process only...
-		if (close) { device.close();  return; }
-
-		auto queueEvents = device.getQueueEvents(queueNames);
+		auto queueEvents = device->getQueueEvents(queueNames);
 		for (const auto& name : queueEvents) {
-			auto packets = device.getOutputQueue(name)->tryGetAll<dai::ImgFrame>();
+			auto packets = device->getOutputQueue(name)->tryGetAll<dai::ImgFrame>();
 			auto count = packets.size();
 			if (count > 0) latestPacket[name] = packets[count - 1];
 		}
@@ -449,9 +432,6 @@ public:
 			auto acceleroTs = acceleroTs1 - baseTs;
 			auto gyroTs = gyroTs1 - baseTs;
 		}
-
-		// this is for the shutdown process only...
-		if (close) { device.close();  return; }
 	}
 };
 
@@ -487,10 +467,10 @@ extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera* cPtr) { ret
 extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)&cPtr->gyroValues.x; }
 extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera* cPtr) { return (int*)&cPtr->acceleroValues.x; }
 extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*)cPtr->rgb.data; }
-extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(false); }
+extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
 extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr)
 {
-	cPtr->waitForFrame(true);
+	cPtr->device->close();
 	if (cPtr != 0) delete cPtr;
 }
 extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }

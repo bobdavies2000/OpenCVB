@@ -288,6 +288,7 @@ Public Class CameraOakD : Inherits GenericCamera
                 uiPointCloud = pc.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
             End If
         End SyncLock
+
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
