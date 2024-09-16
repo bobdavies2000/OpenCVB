@@ -89,9 +89,9 @@ if not exist OakD\Build (
 )
 
 if not exist zed-csharp-api\Stereolabs.zed\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api\Stereolabs.zed -B zed-csharp-api\Stereolabs.zed\Build  -DCMAKE_CONFIGURATION_TYPES=Debug;Release;
-	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Cam_Oak-D.sln /p:Configuration=Release
-	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Cam_Oak-D.sln /p:Configuration=Debug
+	"C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api/Stereolabs.zed -B zed-csharp-api/Stereolabs.zed/Build  -DCMAKE_CONFIGURATION_TYPES=Debug;Release;
+rem 	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Release
+rem 	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Debug
 )
 
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
