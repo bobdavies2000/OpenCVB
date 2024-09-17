@@ -1,6 +1,8 @@
 #include "../CameraDefines.hpp"
-
-#ifdef ORBBEC_GEMINI335
+// Turn on this #ifdef if you need to fall back to the C++ interface.
+// The corresponding driver interface in CameraOrb.vb needs to be turned off.
+// The CameraOrb.vb supports both the C++ and the VB.Net interfaces.
+#if 0
 #include "libobsensor/hpp/Pipeline.hpp"
 #include "libobsensor/hpp/Error.hpp"
 #include <mutex>
@@ -17,7 +19,7 @@
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 #include "PragmaLibs.h"
-#pragma comment(lib, "C:/Program Files/OrbbecSDK 1.10.5/SDK/lib/OrbbecSDK.lib") 
+#pragma comment(lib, "../../OrbbecSDK/lib/win_x64/OrbbecSDK.lib") 
 
 using namespace  cv;
 using namespace std;
