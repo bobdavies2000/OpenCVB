@@ -922,12 +922,14 @@ Public Class Main_UI
             updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
         End If
 
-        updatePath(HomeDir.FullName + "zed-c-api/Build/Release", "StereoLabs Zed 2i camera support of C# interface.")
+        Dim CUDApresent As String = Environment.GetEnvironmentVariable("CUDA_PATH")
+        If CUDApresent IsNot Nothing Then
+            updatePath(HomeDir.FullName + "zed-c-api/Build/Release", "StereoLabs Zed 2i camera support of C# interface.")
+        End If
         updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
-        updatePath(HomeDir.FullName + "zed-c-api\Build\Release\", "StereoLabs C dll supports StereoLabs C# library.")
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
 
