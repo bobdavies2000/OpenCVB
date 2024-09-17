@@ -49,7 +49,7 @@ public:
     {
         width = _width;
         height = _height;
-        int fps = 30;
+        int fps = 15;
         auto devList = ctx.queryDeviceList();
         auto dev = devList->getDevice(0);
 
