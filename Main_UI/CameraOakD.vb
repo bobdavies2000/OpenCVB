@@ -3,7 +3,7 @@ Imports cvb = OpenCvSharp
 Imports System.Threading
 Imports VB_Classes
 
-#If 0 Then
+#If 1 Then
 Module OakD_Module_CPP
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDOpen(width As Integer, height As Integer) As IntPtr
     End Function
