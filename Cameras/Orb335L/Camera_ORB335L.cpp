@@ -2,7 +2,7 @@
 // Turn on this #ifdef if you need to fall back to the C++ interface.
 // The corresponding driver interface in CameraOrb.vb needs to be turned off.
 // The CameraOrb.vb supports both the C++ and the VB.Net interfaces.
-#if 0
+#if 1
 #include "libobsensor/hpp/Pipeline.hpp"
 #include "libobsensor/hpp/Error.hpp"
 #include <mutex>
