@@ -68,11 +68,11 @@ if not exist OrbbecSDK\Build (
 	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Release
 )
 
-if not exist OrbbecSDK_CSharp\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK_CSharp -B OrbbecSDK_CSharp/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DCMAKE_INSTALL_PREFIX=OrbbecSDK_CSharp/Build
-	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
-	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Release
-)
+rem if not exist OrbbecSDK_CSharp\Build (
+rem 	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK_CSharp -B OrbbecSDK_CSharp/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DCMAKE_INSTALL_PREFIX=OrbbecSDK_CSharp/Build
+rem 	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
+rem 	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Release
+rem )
 
 if not exist Azure-Kinect-Sensor-SDK\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build

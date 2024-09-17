@@ -1,0 +1,9 @@
+C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/CMakeFiles/ob_csharp.dir
+C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/CMakeFiles/ALL_BUILD.dir
+C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/CMakeFiles/ZERO_CHECK.dir
+C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/samples/HelloOrbbec/CMakeFiles/HelloOrbbec.dir
+C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/samples/HelloOrbbec/CMakeFiles/ALL_BUILD.dir
+C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/samples/MultiStream/CMakeFiles/MultiStream.dir
+C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/samples/MultiStream/CMakeFiles/ALL_BUILD.dir
+C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/samples/SyncAlign/CMakeFiles/SyncAlign.dir
+C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/samples/SyncAlign/CMakeFiles/ALL_BUILD.dir

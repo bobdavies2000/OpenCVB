@@ -1,0 +1,110 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeDetermineSystem.cmake:233 (message)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      The system is: Windows - 10.0.22631 - AMD64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeDetermineCSharpCompiler.cmake:23 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Compiling the CSharp compiler identification source file "CMakeCSharpCompilerId.cs" succeeded.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      MSBuild version 17.11.2+c078802d4 for .NET Framework
+      Build started 9/11/2024 12:42:22 PM.
+      
+      Project "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\3.28.0\\CompilerIdCSharp\\CompilerIdCSharp.csproj" on node 1 (default targets).
+      PrepareForBuild:
+        Creating directory "obj\\x64\\Debug\\".
+      CoreCompile:
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\Roslyn\\csc.exe /noconfig /nowarn:1701,1702 /fullpaths /nostdlib+ /platform:anycpu32bitpreferred /define:Platformx64;PlatformToolsetv143 /highentropyva+ /reference:"C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.7.2\\mscorlib.dll" /reference:"C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.7.2\\System.Core.dll" /debug+ /out:obj\\x64\\Debug\\CompilerIdCSharp.exe /subsystemversion:6.00 /target:exe /utf8output /langversion:7.3 CMakeCSharpCompilerId.cs "obj\\x64\\Debug\\.NETFramework,Version=v4.7.2.AssemblyAttributes.cs"
+        CompilerServer: server - server processed compilation - CompilerIdCSharp
+      CopyFilesToOutputDirectory:
+        Copying file from "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\3.28.0\\CompilerIdCSharp\\obj\\x64\\Debug\\CompilerIdCSharp.exe" to "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\3.28.0\\CompilerIdCSharp\\CompilerIdCSharp.exe".
+        CompilerIdCSharp -> C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\3.28.0\\CompilerIdCSharp\\CompilerIdCSharp.exe
+        Copying file from "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\3.28.0\\CompilerIdCSharp\\obj\\x64\\Debug\\CompilerIdCSharp.pdb" to "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\3.28.0\\CompilerIdCSharp\\CompilerIdCSharp.pdb".
+      PostBuildEvent:
+        if not "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\Roslyn"=="" if exist "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\Roslyn\\csc.exe" set _CSC=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\Roslyn
+        if exist "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\csc.exe" set _CSC=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64
+        if "%_CSC%"=="" exit -1
+        @echo CMAKE_CSharp_COMPILER=%_CSC%\\csc.exe
+        CMAKE_CSharp_COMPILER=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\Roslyn\\csc.exe
+      Done Building Project "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\3.28.0\\CompilerIdCSharp\\CompilerIdCSharp.csproj" (default targets).
+      
+      Build succeeded.
+          0 Warning(s)
+          0 Error(s)
+      
+      Time Elapsed 00:00:00.18
+      
+      
+      Compilation of the CSharp compiler identification source "CMakeCSharpCompilerId.cs" produced "CompilerIdCSharp.csproj"
+      
+      Compilation of the CSharp compiler identification source "CMakeCSharpCompilerId.cs" produced "CompilerIdCSharp.exe"
+      
+      Compilation of the CSharp compiler identification source "CMakeCSharpCompilerId.cs" produced "CompilerIdCSharp.pdb"
+      
+      The CSharp compiler identification could not be found in:
+        C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/CMakeFiles/3.28.0/CompilerIdCSharp/CompilerIdCSharp.csproj
+      
+      The CSharp compiler identification is Microsoft Visual Studio, found in:
+        C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/CMakeFiles/3.28.0/CompilerIdCSharp/CompilerIdCSharp.exe
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeTestCSharpCompiler.cmake:34 (try_compile)"
+      - "CMakeLists.txt:3 (project)"
+    checks:
+      - "Check for working C# compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/Roslyn/csc.exe"
+    directories:
+      source: "C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/CMakeFiles/CMakeScratch/TryCompile-dcgr7p"
+      binary: "C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/CMakeFiles/CMakeScratch/TryCompile-dcgr7p"
+    cmakeVariables:
+      CMAKE_CSharp_FLAGS: "/platform:x64 /define:TRACE"
+      CMAKE_CSharp_FLAGS_DEBUG: "/debug:full /optimize- /warn:3 /errorreport:prompt /define:DEBUG"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_CSharp_COMPILER_WORKS"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/_src/OpenCVB/OrbbecSDK_CSharp/Build/CMakeFiles/CMakeScratch/TryCompile-dcgr7p'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_78ba7.csproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.11.2+c078802d4 for .NET Framework
+        Build started 9/11/2024 12:42:22 PM.
+        
+        Project "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-dcgr7p\\cmTC_78ba7.csproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-dcgr7p\\Debug\\".
+          Creating directory "obj\\x64\\Debug\\".
+        CoreCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\Roslyn\\csc.exe /noconfig /nowarn:1701,1702 /fullpaths /nostdlib+ /platform:x64 /errorreport:prompt /warn:3 /define:TRACE;DEBUG /highentropyva+ /reference:"C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.7.2\\mscorlib.dll" /reference:"C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.7.2\\System.Core.dll" /debug+ /debug:full /optimize- /out:obj\\x64\\Debug\\cmTC_78ba7.exe /subsystemversion:6.00 /target:exe /utf8output /langversion:7.3 C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-dcgr7p\\testCSharpCompiler.cs "obj\\x64\\Debug\\.NETFramework,Version=v4.7.2.AssemblyAttributes.cs"
+          CompilerServer: server - server processed compilation - cmTC_78ba7
+        CopyFilesToOutputDirectory:
+          Copying file from "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-dcgr7p\\obj\\x64\\Debug\\cmTC_78ba7.exe" to "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-dcgr7p\\Debug\\cmTC_78ba7.exe".
+          cmTC_78ba7 -> C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-dcgr7p\\Debug\\cmTC_78ba7.exe
+          Copying file from "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-dcgr7p\\obj\\x64\\Debug\\cmTC_78ba7.pdb" to "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-dcgr7p\\Debug\\cmTC_78ba7.pdb".
+        Done Building Project "C:\\_src\\OpenCVB\\OrbbecSDK_CSharp\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-dcgr7p\\cmTC_78ba7.csproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.15
+        
+      exitCode: 0
+...
