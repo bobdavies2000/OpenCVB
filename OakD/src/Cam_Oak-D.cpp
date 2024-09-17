@@ -85,7 +85,6 @@ public:
 		camRgb->setInterleaved(false);
 		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
 		camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
-		camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
 		camRgb->isp.link(xoutRgb->input);
 		// If the Oak-D camera is stopped and then restarted, it will fail here.  Need to find out why.  
 		camRgb->setPreviewSize(cols, rows);
@@ -102,7 +101,6 @@ public:
 		xoutDepth->setStreamName("depth");
 		xoutRectifL->setStreamName("rectified_left");
 		xoutRectifR->setStreamName("rectified_right");
-		//xlinkImu->setStreamName("imu");
 
 		queueNames.push_back("rgb");
 		queueNames.push_back("depth");
@@ -110,13 +108,19 @@ public:
 		queueNames.push_back("right");
 		queueNames.push_back("rectified_left");
 		queueNames.push_back("rectified_right");
-		//queueNames.push_back("imu");
 
-		// Properties
+		//auto connectedCameras = device.getConnectedCameraFeatures();
+		//for (const auto& cam : connectedCameras) {
+		//	if (cam.sensorName == "COLOR") {
+		//		camRgb->setBoardSocket(cam.socket);
+		//		break;
+		//	}
+		//}
+		camRgb->setBoardSocket(dai::CameraBoardSocket::CAM_A); 
 		monoLeft->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
-		monoLeft->setBoardSocket(dai::CameraBoardSocket::LEFT);
+		monoLeft->setBoardSocket(dai::CameraBoardSocket::CAM_B);
 		monoRight->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
-		monoRight->setBoardSocket(dai::CameraBoardSocket::RIGHT);
+		monoRight->setBoardSocket(dai::CameraBoardSocket::CAM_C);
 
 		stereo->setRectifyEdgeFillColor(0);  // black, to better see the cutout
 		stereo->initialConfig.setMedianFilter(dai::MedianFilter::KERNEL_7x7);
@@ -126,7 +130,7 @@ public:
 
 		// added these
 		stereo->initialConfig.setConfidenceThreshold(230);
-		stereo->setDepthAlign(dai::CameraBoardSocket::RGB);
+		stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
 
 		// Linking
 		monoLeft->out.link(stereo->left);
@@ -213,7 +217,7 @@ int* OakDOpen(int w, int h)
 extern "C" __declspec(dllexport)
 int* OakDintrinsics(OakDCamera* cPtr)
 {
-	std::vector<std::vector<float>> intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::RGB, 1280, 720);
+	std::vector<std::vector<float>> intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_A, 1280, 720);
 	int i = 0;
 	for (auto row : intrin)  for (auto val : row) cPtr->intrinsics[i++] = val;
 	return (int*)&cPtr->intrinsics;
