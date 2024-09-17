@@ -927,16 +927,15 @@ Public Class Main_UI
             updatePath(HomeDir.FullName + "zed-c-api/Build/Release", "StereoLabs Zed 2i camera support of C# interface.")
         End If
         updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
-        updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
-        updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
-        updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
+        updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\obj\x64\Debug\", "Orbbec camera support.")
+        updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\obj\x64\Release\", "Orbbec camera support.")
+        updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
-        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
-
-        ' OpenCV needs to be in the path and the librealsense and K4A open source code needs to be in the path.
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
 
+        ' OpenCV needs to be in the path and the librealsense and K4A open source code needs to be in the path.
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
@@ -944,7 +943,6 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
         updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
 
-        updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
 
         ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
