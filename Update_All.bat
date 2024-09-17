@@ -56,6 +56,8 @@ if not exist librealsense\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_CSHARP_BINDINGS=ON -DBUILD_SHARED_LIBS=ON -S librealsense -B librealsense/Build
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Release
+	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.sln /p:Configuration=Release
+	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.sln /p:Configuration=Debug
 )
 
 if not exist zed-c-api\Build (
