@@ -47,7 +47,7 @@ public:
     {
         width = _width;
         height = _height;
-        int fps = 5;
+        int fps = 30;
         auto devList = ctx.queryDeviceList();
         auto dev = devList->getDevice(0);
 
@@ -178,7 +178,9 @@ extern "C" __declspec(dllexport) int* ORBWaitForFrame(CameraOrb335L * cPtr)
 extern "C" __declspec(dllexport) int* ORBOpen(int width, int height) { return (int*) new CameraOrb335L(width, height);}
 extern "C" __declspec(dllexport) void ORBClose(CameraOrb335L * cPtr) 
 { 
-    cPtr->pipe.stop(); 
+    cPtr->accelSensor.reset();
+    cPtr->gyroSensor.reset();
+    cPtr->pipe.stop();
     delete cPtr; 
 }
 extern "C" __declspec(dllexport) int* ORBIntrinsics(CameraOrb335L * cPtr) 

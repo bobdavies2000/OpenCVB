@@ -3,7 +3,7 @@ Imports cvb = OpenCvSharp
 Imports System.Threading
 Imports Orbbec
 ' switch between the VB.Net version of the Orbbec camera interface and the C++ one.
-#If 1 Then
+#If 0 Then
 Public Class CameraORB : Inherits GenericCamera
     Dim pipe As New Pipeline()
     Dim accelSensor As Sensor
