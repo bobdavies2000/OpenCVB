@@ -70,6 +70,8 @@ if not exist OrbbecSDK\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK -B OrbbecSDK/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DOpenCVDir=opencv/Build -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
 	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
 	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Release
+	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Debug
+	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Release
 )
 
 if not exist OrbbecSDK_CSharp\Build (
