@@ -60,12 +60,6 @@ if not exist librealsense\Build (
 	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.sln /p:Configuration=Debug
 )
 
-if not exist zed-c-api\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -S zed-c-api -B zed-c-api/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
-	msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Debug
-	msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Release
-)
-
 if not exist OrbbecSDK\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK -B OrbbecSDK/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DOpenCVDir=opencv/Build -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
 	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
@@ -90,6 +84,14 @@ if not exist OakD\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -S OakD -B OakD\Build -DOpenCV_DIR='%CD%/opencv/Build/'
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Debug
+)
+
+if not exist zed-c-api\Build (
+	if exist "c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" (
+		"C:\Program Files\CMake\bin\Cmake.exe" -S zed-c-api -B zed-c-api/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
+		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Debug
+		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Release
+	)
 )
 
 if not exist zed-csharp-api\Stereolabs.zed\Build (
