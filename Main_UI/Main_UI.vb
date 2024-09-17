@@ -922,6 +922,7 @@ Public Class Main_UI
             updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
         End If
 
+        updatePath(HomeDir.FullName + "zed-c-api/Build/Release", "StereoLabs Zed 2i camera support of C# interface.")
         updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
