@@ -6,6 +6,11 @@ if errorlevel 1 goto errorNoPython
 :: Reaching here means Python is installed.
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
 
+echo "OpenCVB requires that .Net Framework 3.5 be installed."
+echo "You need to check before installing OpenCVB."
+optionalfeatures.exe
+set /p ok="And hit enter after verifying that .Net Framework 3.5 is installed."
+
 if not exist librealsense (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/IntelRealSense/librealsense"
 )
@@ -27,10 +32,6 @@ if not exist zed-c-api (
 
 if not exist OrbbecSDK_CSharp (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK_CSharp.git"
-) 
-
-if not exist zed-csharp-api (
-	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/stereolabs/zed-csharp-api"
 ) 
 
 if not exist Azure-Kinect-Sensor-SDK (
@@ -68,12 +69,6 @@ if not exist OrbbecSDK\Build (
 	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Release
 )
 
-rem if not exist OrbbecSDK_CSharp\Build (
-rem 	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK_CSharp -B OrbbecSDK_CSharp/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DCMAKE_INSTALL_PREFIX=OrbbecSDK_CSharp/Build
-rem 	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
-rem 	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Release
-rem )
-
 if not exist Azure-Kinect-Sensor-SDK\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build
 	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
@@ -92,12 +87,6 @@ if not exist zed-c-api\Build (
 		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Debug
 		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Release
 	)
-)
-
-if not exist zed-csharp-api\Stereolabs.zed\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api/Stereolabs.zed -B zed-csharp-api/Stereolabs.zed/Build  -DCMAKE_CONFIGURATION_TYPES=Debug;Release;
-rem 	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Release
-rem 	msbuild.exe zed-csharp-api/Stereolabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Debug
 )
 
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
