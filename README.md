@@ -1,29 +1,34 @@
 # Recent Changes – September 2024 (Part 2)
 
 -   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
--   The key camera interfaces were reviewed and rewritten in VB.Net.
-    -   StereoLabs Zed 2i, Intel RealSense D455/D435, Orbbec Gemini 335L
+-   This OpenCVB update is focused almost exclusively on the camera interfaces.
+-   More camera interfaces are using only VB.Net to capture image and IMU data.
+    -   The C\# wrappers require the .Net Framework 3.5 – install had to change.
+    -   The install script now prompts to install .Net Framework 3.5.
+        -   Update_All.bat script will fail if 3.5 is not present on the system
+    -   In addition, the StereoLabs C\# interface needed to be reworked.
+        -   The same name is used for a struct, an enum, and a variable.
+        -   VB.Net does not allow this kind of overlapping names.
+        -   The replacement C\# code is now included in OpenCVB.
+-   StereoLabs Zed 2i, Intel RealSense D455/D435, Orbbec Gemini 335L updated.
     -   VB.Net camera interfaces are much easier to debug.
     -   The Oak-D interface was rewritten but in C++
         -   Oak-D has no C\# interface (resource constraint at Luxonis)
         -   The OpenCVB interface is no longer troublesome.
-    -   The previous C++ interfaces are still there and toggled with \#ifdef
+    -   All previous C++ interfaces are still there and toggled with \#ifdef
 -   All the camera interfaces collect all image and IMU data.
-    -   Color, Left, Right, PointCloud, and IMU acceleration/angularvelocity.
--   The StereoLabs camera “tearing” problem was not a software issue.
+    -   Color, Left, Right, Point Cloud, and IMU acceleration/angularvelocity.
+    -   OpenCVB is focused on using only the image and IMU data.
+-   The StereoLabs camera “tearing” problem is not a software issue.
     -   The cable provided by StereoLabs needed to be replaced.
--   Orbbec Gemini 335L camera interface rewritten in VB.Net.
-    -   OrbbecSDK_CSharp project on GitHub integrated into OpenCVB project.
-    -   OrbbecSDK_CSharp was upgraded to Framework 8.0.
-        -   The original required old Frameworks to be installed.
-        -   Switching Frameworks means fewer dependencies.
 -   The Mynt camera interface is unchanged. Company went out-of-business.
--   The Kinect for Azure camera is also unchanged – support is coming soon.
+-   The Kinect for Azure camera is also unchanged – VB.Net version is coming soon.
     -   The K4A camera doesn’t use the same technique as all the other cameras.
         -   No left and right images are available.
     -   K4A is useful and it is the most accurate at close range.
-    -   The K4A equivalent camera is available with Orbbec Femto Bolt.
--   Another way to capture motion is in Motion_FromEdgeColorize
+-   Microsoft has discontinued their K4A camera.
+    -   The K4A equivalent camera is available as Orbbec Femto Bolt.
+-   Other news: another way to capture motion is in Motion_FromEdgeColorize
     -   Blue is motion, Red is not (see below.)
 -   A log of previous changes is included at the bottom of this document.
 
