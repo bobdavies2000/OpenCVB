@@ -8,8 +8,8 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 
 echo "OpenCVB requires that .Net Framework 3.5 be installed."
 echo "You need to check before installing OpenCVB."
-echo "When you close the install window, OpenCVB will install."
-optionalfeatures.exe
+echo "When you close the optionalfeatures window, OpenCVB will install."
+start /wait optionalfeatures.exe
 
 if not exist librealsense (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/IntelRealSense/librealsense"
@@ -61,10 +61,8 @@ if not exist librealsense\Build (
 	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.sln /p:Configuration=Debug
 )
 
-if not exist OrbbecSDK\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK -B OrbbecSDK/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DOpenCVDir=opencv/Build -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
-	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
-	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Release
+if not exist OrbbecSDK_CSharp\Build (
+	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK_CSharp -B OrbbecSDK_CSharp/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
 	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Debug
 	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Release
 )

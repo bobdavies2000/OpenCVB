@@ -1,0 +1,3 @@
+add_subdirectory(HelloOrbbec)
+add_subdirectory(MultiStream)
+add_subdirectory(SyncAlign)

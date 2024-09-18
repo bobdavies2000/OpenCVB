@@ -53,7 +53,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CPP_Managed\CPP_Managed.vcxproj" />
     <ProjectReference Include="..\CS_Classes\CS_Classes.csproj" />
-    <ProjectReference Include="..\OrbbecSDK_CSharp\OrbbecSDK_CSharp.csproj" />
     <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj" />
     <ProjectReference Include="..\zed-csharp\zed_csharp.csproj" />
   </ItemGroup>
@@ -61,6 +60,9 @@
   <ItemGroup>
     <Reference Include="Intel.RealSense">
       <HintPath>..\librealsense\Build\wrappers\csharp\Intel.RealSense\obj\x64\Release\Intel.RealSense.dll</HintPath>
+    </Reference>
+    <Reference Include="ob_csharp">
+      <HintPath>..\OrbbecSDK_CSharp\Build\Release\ob_csharp.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore">
       <HintPath>..\..\..\Windows\Microsoft.NET\Framework64\v4.0.30319\WPF\PresentationCore.dll</HintPath>
