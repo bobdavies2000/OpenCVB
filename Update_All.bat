@@ -8,8 +8,8 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 
 echo "OpenCVB requires that .Net Framework 3.5 be installed."
 echo "You need to check before installing OpenCVB."
+echo "When you close the install window, OpenCVB will install."
 optionalfeatures.exe
-set /p ok="And hit enter after verifying that .Net Framework 3.5 is installed."
 
 if not exist librealsense (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/IntelRealSense/librealsense"
