@@ -2634,6 +2634,7 @@ End Enum
 	If algorithmName = "Options_StaticTV" Then return new Options_StaticTV
 	If algorithmName = "Options_StdevGrid" Then return new Options_StdevGrid
 	If algorithmName = "Options_Stitch" Then return new Options_Stitch
+	If algorithmName = "Options_Stripes" Then return new Options_Stripes
 	If algorithmName = "Options_Structured" Then return new Options_Structured
 	If algorithmName = "Options_StructuredCloud" Then return new Options_StructuredCloud
 	If algorithmName = "Options_StructuredFloor" Then return new Options_StructuredFloor
@@ -3383,6 +3384,7 @@ End Enum
 	If algorithmName = "Stable_Lines_CS" Then return new Stable_Lines_CS
 	If algorithmName = "Stitch_Basics" Then return new Stitch_Basics
 	If algorithmName = "Stitch_Basics_CS" Then return new Stitch_Basics_CS
+	If algorithmName = "Stripes_Basics" Then return new Stripes_Basics
 	If algorithmName = "Structured_Cloud" Then return new Structured_Cloud
 	If algorithmName = "Structured_Cloud_CS" Then return new Structured_Cloud_CS
 	If algorithmName = "Structured_Cloud2" Then return new Structured_Cloud2

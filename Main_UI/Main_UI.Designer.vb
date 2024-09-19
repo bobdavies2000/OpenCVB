@@ -22,256 +22,261 @@ Partial Class Main_UI
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        components = New ComponentModel.Container()
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main_UI))
-        ToolStrip1 = New ToolStrip()
-        BackButton = New ToolStripButton()
-        ForwardButton = New ToolStripButton()
-        PausePlayButton = New ToolStripButton()
-        OptionsButton = New ToolStripButton()
-        TestAllButton = New ToolStripButton()
-        TreeButton = New ToolStripButton()
-        PixelViewerButton = New ToolStripButton()
-        BluePlusButton = New ToolStripButton()
-        ComplexityButton = New ToolStripButton()
-        TranslateButton = New ToolStripButton()
-        Advice = New ToolStripButton()
-        RecentList = New ToolStripDropDownButton()
-        AvailableAlgorithms = New ToolStripComboBox()
-        GroupCombo = New ToolStripComboBox()
-        AlgorithmDesc = New TextBox()
-        fpsTimer = New Timer(components)
-        TestAllTimer = New Timer(components)
-        ComplexityTimer = New Timer(components)
-        XYLoc = New Label()
-        MenuStrip1 = New MenuStrip()
-        FileToolStripMenuItem = New ToolStripMenuItem()
-        ExitToolStripMenuItem = New ToolStripMenuItem()
-        AboutToolStripMenuItem = New ToolStripMenuItem()
-        RefreshTimer = New Timer(components)
-        ToolTip1 = New ToolTip(components)
-        ToolStrip1.SuspendLayout()
-        MenuStrip1.SuspendLayout()
-        SuspendLayout()
-        ' 
-        ' ToolStrip1
-        ' 
-        ToolStrip1.ImageScalingSize = New Size(24, 24)
-        ToolStrip1.Items.AddRange(New ToolStripItem() {BackButton, ForwardButton, PausePlayButton, OptionsButton, TestAllButton, TreeButton, PixelViewerButton, BluePlusButton, ComplexityButton, TranslateButton, Advice, RecentList, AvailableAlgorithms, GroupCombo})
-        ToolStrip1.Location = New Point(0, 33)
-        ToolStrip1.Name = "ToolStrip1"
-        ToolStrip1.Size = New Size(1556, 34)
-        ToolStrip1.TabIndex = 0
-        ToolStrip1.Text = "ToolStrip1"
-        ' 
-        ' BackButton
-        ' 
-        BackButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        BackButton.Image = CType(resources.GetObject("BackButton.Image"), Image)
-        BackButton.ImageTransparentColor = Color.Magenta
-        BackButton.Name = "BackButton"
-        BackButton.Size = New Size(34, 29)
-        BackButton.Text = "Back to Previous Algorithm"
-        ' 
-        ' ForwardButton
-        ' 
-        ForwardButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ForwardButton.Image = CType(resources.GetObject("ForwardButton.Image"), Image)
-        ForwardButton.ImageTransparentColor = Color.Magenta
-        ForwardButton.Name = "ForwardButton"
-        ForwardButton.Size = New Size(34, 29)
-        ForwardButton.Text = "Forward to the next algorithm"
-        ' 
-        ' PausePlayButton
-        ' 
-        PausePlayButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        PausePlayButton.Image = CType(resources.GetObject("PausePlayButton.Image"), Image)
-        PausePlayButton.ImageTransparentColor = Color.Magenta
-        PausePlayButton.Name = "PausePlayButton"
-        PausePlayButton.Size = New Size(34, 29)
-        PausePlayButton.Text = "Run Pause Button"
-        ' 
-        ' OptionsButton
-        ' 
-        OptionsButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), Image)
-        OptionsButton.ImageTransparentColor = Color.Magenta
-        OptionsButton.Name = "OptionsButton"
-        OptionsButton.Size = New Size(34, 29)
-        OptionsButton.Text = "OpenCVB Settings"
-        ' 
-        ' TestAllButton
-        ' 
-        TestAllButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        TestAllButton.Image = CType(resources.GetObject("TestAllButton.Image"), Image)
-        TestAllButton.ImageTransparentColor = Color.Magenta
-        TestAllButton.Name = "TestAllButton"
-        TestAllButton.Size = New Size(34, 29)
-        TestAllButton.Text = "Test All Algorithms"
-        ' 
-        ' TreeButton
-        ' 
-        TreeButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        TreeButton.Image = CType(resources.GetObject("TreeButton.Image"), Image)
-        TreeButton.ImageTransparentColor = Color.Magenta
-        TreeButton.Name = "TreeButton"
-        TreeButton.Size = New Size(34, 29)
-        TreeButton.Text = "Treeview to see performance and explore algorithm stack"
-        ' 
-        ' PixelViewerButton
-        ' 
-        PixelViewerButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), Image)
-        PixelViewerButton.ImageTransparentColor = Color.Magenta
-        PixelViewerButton.Name = "PixelViewerButton"
-        PixelViewerButton.Size = New Size(34, 29)
-        PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
-        ' 
-        ' BluePlusButton
-        ' 
-        BluePlusButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        BluePlusButton.Image = CType(resources.GetObject("BluePlusButton.Image"), Image)
-        BluePlusButton.ImageTransparentColor = Color.Magenta
-        BluePlusButton.Name = "BluePlusButton"
-        BluePlusButton.Size = New Size(34, 29)
-        BluePlusButton.Text = "Add new OpenGL, Python, C#, C++, or VB.Net algorithms"
-        ' 
-        ' ComplexityButton
-        ' 
-        ComplexityButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ComplexityButton.Image = CType(resources.GetObject("ComplexityButton.Image"), Image)
-        ComplexityButton.ImageTransparentColor = Color.Magenta
-        ComplexityButton.Name = "ComplexityButton"
-        ComplexityButton.Size = New Size(34, 29)
-        ComplexityButton.Text = "Measure an algorithm's complexity"
-        ' 
-        ' TranslateButton
-        ' 
-        TranslateButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        TranslateButton.Image = CType(resources.GetObject("TranslateButton.Image"), Image)
-        TranslateButton.ImageTransparentColor = Color.Magenta
-        TranslateButton.Name = "TranslateButton"
-        TranslateButton.Size = New Size(34, 29)
-        TranslateButton.Text = "Translate algorithms to C#, C++, or VB.Net"
-        ' 
-        ' Advice
-        ' 
-        Advice.DisplayStyle = ToolStripItemDisplayStyle.Image
-        Advice.Image = CType(resources.GetObject("Advice.Image"), Image)
-        Advice.ImageTransparentColor = Color.Magenta
-        Advice.Name = "Advice"
-        Advice.Size = New Size(34, 29)
-        Advice.Text = "Show any advice on options for the current algorithm"
-        ' 
-        ' RecentList
-        ' 
-        RecentList.AutoToolTip = False
-        RecentList.DisplayStyle = ToolStripItemDisplayStyle.Text
-        RecentList.Image = CType(resources.GetObject("RecentList.Image"), Image)
-        RecentList.ImageTransparentColor = Color.Magenta
-        RecentList.Name = "RecentList"
-        RecentList.ShowDropDownArrow = False
-        RecentList.Size = New Size(68, 29)
-        RecentList.Text = "Recent"
-        ' 
-        ' AvailableAlgorithms
-        ' 
-        AvailableAlgorithms.AutoCompleteMode = AutoCompleteMode.SuggestAppend
-        AvailableAlgorithms.AutoCompleteSource = AutoCompleteSource.ListItems
-        AvailableAlgorithms.DropDownHeight = 500
-        AvailableAlgorithms.IntegralHeight = False
-        AvailableAlgorithms.MaxDropDownItems = 100
-        AvailableAlgorithms.Name = "AvailableAlgorithms"
-        AvailableAlgorithms.Size = New Size(350, 34)
-        ' 
-        ' GroupCombo
-        ' 
-        GroupCombo.AutoCompleteMode = AutoCompleteMode.Suggest
-        GroupCombo.AutoCompleteSource = AutoCompleteSource.ListItems
-        GroupCombo.Name = "GroupCombo"
-        GroupCombo.Size = New Size(300, 34)
-        ' 
-        ' AlgorithmDesc
-        ' 
-        AlgorithmDesc.Location = New Point(1200, 33)
-        AlgorithmDesc.Multiline = True
-        AlgorithmDesc.Name = "AlgorithmDesc"
-        AlgorithmDesc.ScrollBars = ScrollBars.Vertical
-        AlgorithmDesc.Size = New Size(109, 65)
-        AlgorithmDesc.TabIndex = 2
-        ' 
-        ' fpsTimer
-        ' 
-        ' 
-        ' TestAllTimer
-        ' 
-        ' 
-        ' ComplexityTimer
-        ' 
-        ' 
-        ' XYLoc
-        ' 
-        XYLoc.AutoSize = True
-        XYLoc.Location = New Point(12, 906)
-        XYLoc.Name = "XYLoc"
-        XYLoc.Size = New Size(60, 25)
-        XYLoc.TabIndex = 3
-        XYLoc.Text = "XYLoc"
-        ' 
-        ' MenuStrip1
-        ' 
-        MenuStrip1.ImageScalingSize = New Size(24, 24)
-        MenuStrip1.Items.AddRange(New ToolStripItem() {FileToolStripMenuItem, AboutToolStripMenuItem})
-        MenuStrip1.Location = New Point(0, 0)
-        MenuStrip1.Name = "MenuStrip1"
-        MenuStrip1.Size = New Size(1556, 33)
-        MenuStrip1.TabIndex = 4
-        MenuStrip1.Text = "MenuStrip1"
-        ' 
-        ' FileToolStripMenuItem
-        ' 
-        FileToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {ExitToolStripMenuItem})
-        FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        FileToolStripMenuItem.Size = New Size(54, 29)
-        FileToolStripMenuItem.Text = "&File"
-        ' 
-        ' ExitToolStripMenuItem
-        ' 
-        ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        ExitToolStripMenuItem.Size = New Size(141, 34)
-        ExitToolStripMenuItem.Text = "E&xit"
-        ' 
-        ' AboutToolStripMenuItem
-        ' 
-        AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        AboutToolStripMenuItem.Size = New Size(78, 29)
-        AboutToolStripMenuItem.Text = "About"
-        ' 
-        ' RefreshTimer
-        ' 
-        RefreshTimer.Enabled = True
-        RefreshTimer.Interval = 10
-        ' 
-        ' Main_UI
-        ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
-        AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1556, 935)
-        Controls.Add(XYLoc)
-        Controls.Add(AlgorithmDesc)
-        Controls.Add(ToolStrip1)
-        Controls.Add(MenuStrip1)
-        Icon = CType(resources.GetObject("$this.Icon"), Icon)
-        KeyPreview = True
-        MainMenuStrip = MenuStrip1
-        Name = "Main_UI"
-        Text = "OpenCVB Main Form"
-        ToolStrip1.ResumeLayout(False)
-        ToolStrip1.PerformLayout()
-        MenuStrip1.ResumeLayout(False)
-        MenuStrip1.PerformLayout()
-        ResumeLayout(False)
-        PerformLayout()
+        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
+        Me.BackButton = New System.Windows.Forms.ToolStripButton()
+        Me.ForwardButton = New System.Windows.Forms.ToolStripButton()
+        Me.PausePlayButton = New System.Windows.Forms.ToolStripButton()
+        Me.OptionsButton = New System.Windows.Forms.ToolStripButton()
+        Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
+        Me.TreeButton = New System.Windows.Forms.ToolStripButton()
+        Me.PixelViewerButton = New System.Windows.Forms.ToolStripButton()
+        Me.BluePlusButton = New System.Windows.Forms.ToolStripButton()
+        Me.ComplexityButton = New System.Windows.Forms.ToolStripButton()
+        Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
+        Me.Advice = New System.Windows.Forms.ToolStripButton()
+        Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
+        Me.AvailableAlgorithms = New System.Windows.Forms.ToolStripComboBox()
+        Me.GroupCombo = New System.Windows.Forms.ToolStripComboBox()
+        Me.AlgorithmDesc = New System.Windows.Forms.TextBox()
+        Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.TestAllTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.ComplexityTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.XYLoc = New System.Windows.Forms.Label()
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.ToolStrip1.SuspendLayout()
+        Me.MenuStrip1.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'ToolStrip1
+        '
+        Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackButton, Me.ForwardButton, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupCombo})
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
+        Me.ToolStrip1.Name = "ToolStrip1"
+        Me.ToolStrip1.Size = New System.Drawing.Size(1400, 34)
+        Me.ToolStrip1.TabIndex = 0
+        Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'BackButton
+        '
+        Me.BackButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.BackButton.Image = CType(resources.GetObject("BackButton.Image"), System.Drawing.Image)
+        Me.BackButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.BackButton.Name = "BackButton"
+        Me.BackButton.Size = New System.Drawing.Size(34, 29)
+        Me.BackButton.Text = "Back to Previous Algorithm"
+        '
+        'ForwardButton
+        '
+        Me.ForwardButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ForwardButton.Image = CType(resources.GetObject("ForwardButton.Image"), System.Drawing.Image)
+        Me.ForwardButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ForwardButton.Name = "ForwardButton"
+        Me.ForwardButton.Size = New System.Drawing.Size(34, 29)
+        Me.ForwardButton.Text = "Forward to the next algorithm"
+        '
+        'PausePlayButton
+        '
+        Me.PausePlayButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.PausePlayButton.Image = CType(resources.GetObject("PausePlayButton.Image"), System.Drawing.Image)
+        Me.PausePlayButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.PausePlayButton.Name = "PausePlayButton"
+        Me.PausePlayButton.Size = New System.Drawing.Size(34, 29)
+        Me.PausePlayButton.Text = "Run Pause Button"
+        '
+        'OptionsButton
+        '
+        Me.OptionsButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), System.Drawing.Image)
+        Me.OptionsButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.OptionsButton.Name = "OptionsButton"
+        Me.OptionsButton.Size = New System.Drawing.Size(34, 29)
+        Me.OptionsButton.Text = "OpenCVB Settings"
+        '
+        'TestAllButton
+        '
+        Me.TestAllButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TestAllButton.Image = CType(resources.GetObject("TestAllButton.Image"), System.Drawing.Image)
+        Me.TestAllButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TestAllButton.Name = "TestAllButton"
+        Me.TestAllButton.Size = New System.Drawing.Size(34, 29)
+        Me.TestAllButton.Text = "Test All Algorithms"
+        '
+        'TreeButton
+        '
+        Me.TreeButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TreeButton.Image = CType(resources.GetObject("TreeButton.Image"), System.Drawing.Image)
+        Me.TreeButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TreeButton.Name = "TreeButton"
+        Me.TreeButton.Size = New System.Drawing.Size(34, 29)
+        Me.TreeButton.Text = "Treeview to see performance and explore algorithm stack"
+        '
+        'PixelViewerButton
+        '
+        Me.PixelViewerButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), System.Drawing.Image)
+        Me.PixelViewerButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.PixelViewerButton.Name = "PixelViewerButton"
+        Me.PixelViewerButton.Size = New System.Drawing.Size(34, 29)
+        Me.PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
+        '
+        'BluePlusButton
+        '
+        Me.BluePlusButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.BluePlusButton.Image = CType(resources.GetObject("BluePlusButton.Image"), System.Drawing.Image)
+        Me.BluePlusButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.BluePlusButton.Name = "BluePlusButton"
+        Me.BluePlusButton.Size = New System.Drawing.Size(34, 29)
+        Me.BluePlusButton.Text = "Add new OpenGL, Python, C#, C++, or VB.Net algorithms"
+        '
+        'ComplexityButton
+        '
+        Me.ComplexityButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ComplexityButton.Image = CType(resources.GetObject("ComplexityButton.Image"), System.Drawing.Image)
+        Me.ComplexityButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ComplexityButton.Name = "ComplexityButton"
+        Me.ComplexityButton.Size = New System.Drawing.Size(34, 29)
+        Me.ComplexityButton.Text = "Measure an algorithm's complexity"
+        '
+        'TranslateButton
+        '
+        Me.TranslateButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TranslateButton.Image = CType(resources.GetObject("TranslateButton.Image"), System.Drawing.Image)
+        Me.TranslateButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TranslateButton.Name = "TranslateButton"
+        Me.TranslateButton.Size = New System.Drawing.Size(34, 29)
+        Me.TranslateButton.Text = "Translate algorithms to C#, C++, or VB.Net"
+        '
+        'Advice
+        '
+        Me.Advice.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.Advice.Image = CType(resources.GetObject("Advice.Image"), System.Drawing.Image)
+        Me.Advice.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.Advice.Name = "Advice"
+        Me.Advice.Size = New System.Drawing.Size(34, 29)
+        Me.Advice.Text = "Show any advice on options for the current algorithm"
+        '
+        'RecentList
+        '
+        Me.RecentList.AutoToolTip = False
+        Me.RecentList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.RecentList.Image = CType(resources.GetObject("RecentList.Image"), System.Drawing.Image)
+        Me.RecentList.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.RecentList.Name = "RecentList"
+        Me.RecentList.ShowDropDownArrow = False
+        Me.RecentList.Size = New System.Drawing.Size(68, 29)
+        Me.RecentList.Text = "Recent"
+        '
+        'AvailableAlgorithms
+        '
+        Me.AvailableAlgorithms.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+        Me.AvailableAlgorithms.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
+        Me.AvailableAlgorithms.DropDownHeight = 500
+        Me.AvailableAlgorithms.IntegralHeight = False
+        Me.AvailableAlgorithms.MaxDropDownItems = 100
+        Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
+        Me.AvailableAlgorithms.Size = New System.Drawing.Size(315, 34)
+        '
+        'GroupCombo
+        '
+        Me.GroupCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
+        Me.GroupCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
+        Me.GroupCombo.Name = "GroupCombo"
+        Me.GroupCombo.Size = New System.Drawing.Size(270, 34)
+        '
+        'AlgorithmDesc
+        '
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(1120, 33)
+        Me.AlgorithmDesc.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.AlgorithmDesc.Multiline = True
+        Me.AlgorithmDesc.Name = "AlgorithmDesc"
+        Me.AlgorithmDesc.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.AlgorithmDesc.Size = New System.Drawing.Size(98, 53)
+        Me.AlgorithmDesc.TabIndex = 2
+        '
+        'fpsTimer
+        '
+        '
+        'TestAllTimer
+        '
+        '
+        'ComplexityTimer
+        '
+        '
+        'XYLoc
+        '
+        Me.XYLoc.AutoSize = True
+        Me.XYLoc.Location = New System.Drawing.Point(11, 725)
+        Me.XYLoc.Name = "XYLoc"
+        Me.XYLoc.Size = New System.Drawing.Size(57, 20)
+        Me.XYLoc.TabIndex = 3
+        Me.XYLoc.Text = "XYLoc"
+        '
+        'MenuStrip1
+        '
+        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
+        Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.AboutToolStripMenuItem})
+        Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
+        Me.MenuStrip1.Name = "MenuStrip1"
+        Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(5, 2, 0, 2)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1400, 33)
+        Me.MenuStrip1.TabIndex = 4
+        Me.MenuStrip1.Text = "MenuStrip1"
+        '
+        'FileToolStripMenuItem
+        '
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExitToolStripMenuItem})
+        Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(54, 29)
+        Me.FileToolStripMenuItem.Text = "&File"
+        '
+        'ExitToolStripMenuItem
+        '
+        Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(141, 34)
+        Me.ExitToolStripMenuItem.Text = "E&xit"
+        '
+        'AboutToolStripMenuItem
+        '
+        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 29)
+        Me.AboutToolStripMenuItem.Text = "About"
+        '
+        'RefreshTimer
+        '
+        Me.RefreshTimer.Enabled = True
+        Me.RefreshTimer.Interval = 10
+        '
+        'Main_UI
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(1400, 748)
+        Me.Controls.Add(Me.XYLoc)
+        Me.Controls.Add(Me.AlgorithmDesc)
+        Me.Controls.Add(Me.ToolStrip1)
+        Me.Controls.Add(Me.MenuStrip1)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
+        Me.MainMenuStrip = Me.MenuStrip1
+        Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.Name = "Main_UI"
+        Me.Text = "OpenCVB Main Form"
+        Me.ToolStrip1.ResumeLayout(False)
+        Me.ToolStrip1.PerformLayout()
+        Me.MenuStrip1.ResumeLayout(False)
+        Me.MenuStrip1.PerformLayout()
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
+
     End Sub
 
     Friend WithEvents ToolStrip1 As ToolStrip

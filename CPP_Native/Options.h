@@ -2111,3 +2111,9 @@ public:
 	Options_DiffDepth() {
 	}
 };
+class Options_Stripes {
+public:
+	void RunOpt() {}
+	Options_Stripes() {
+	}
+};

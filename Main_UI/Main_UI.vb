@@ -1070,7 +1070,7 @@ Public Class Main_UI
         AvailableAlgorithms.Width = 600
         AvailableAlgorithms.ComboBox.Select()
         AlgorithmDesc.Top = ToolStrip1.Top
-        AlgorithmDesc.Left = ToolStrip1.Left + 830
+        AlgorithmDesc.Left = ToolStrip1.Left + GroupCombo.Bounds.Right
         AlgorithmDesc.Width = ToolStrip1.Left + ToolStrip1.Width - AlgorithmDesc.Left
         AlgorithmDesc.Height = ToolStrip1.Height
 
