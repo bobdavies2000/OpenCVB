@@ -2111,9 +2111,9 @@ public:
 	Options_DiffDepth() {
 	}
 };
-class Options_Stripes {
+class Options_Outliers {
 public:
 	void RunOpt() {}
-	Options_Stripes() {
+	Options_Outliers() {
 	}
 };

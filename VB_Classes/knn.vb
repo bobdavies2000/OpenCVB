@@ -597,7 +597,7 @@ Public Class KNN_TrackMean : Inherits VB_Parent
         Dim histList = hist.ToList
         Dim maxVal = histList.Max
         Dim maxIndex = histList.IndexOf(maxVal)
-        plot.maxValue = Math.Ceiling((maxVal + 50) - (maxVal + 50) Mod 50)
+        plot.maxRange = Math.Ceiling((maxVal + 50) - (maxVal + 50) Mod 50)
         label = xyStr + "Max count = " + CStr(maxVal) + " at " + CStr(maxIndex - zeroLoc) + " with " + CStr(nonZero) + " non-zero values or " +
                              Format(nonZero / (nonZero + zeroCount), "0%")
 

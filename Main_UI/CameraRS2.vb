@@ -57,7 +57,8 @@ Public Class CameraRS2 : Inherits GenericCamera
                 If frame.Profile.Stream = Stream.Gyro Then
                     IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(frame.Data)
                     Dim mFrame = frame.As(Of MotionFrame)
-                    IMU_FrameTime = mFrame.Timestamp
+                    Static initialTime As Int64 = mFrame.Timestamp
+                    IMU_FrameTime = mFrame.Timestamp - initialTime
                 End If
             Next
 

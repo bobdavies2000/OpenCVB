@@ -389,7 +389,7 @@ Public Class Random_MonteCarlo : Inherits VB_Parent
     Dim options As New Options_MonteCarlo
     Public outputRandom = New cvb.Mat(New cvb.Size(1, 4000), cvb.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New()
-        plot.maxValue = 100
+        plot.maxRange = 100
         desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -435,7 +435,7 @@ Public Class Random_CustomHistogram : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        hist.plot.maxValue = 0 ' we are sharing the plot with the code below...
+        hist.plot.maxRange = 0 ' we are sharing the plot with the code below...
         hist.Run(src)
         dst2 = hist.dst2.Clone()
         saveHist = hist.plot.histogram.Clone()
@@ -444,7 +444,7 @@ Public Class Random_CustomHistogram : Inherits VB_Parent
         random.Run(src)
 
         If standaloneTest() Then
-            hist.plot.maxValue = 100
+            hist.plot.maxRange = 100
             hist.plot.Run(random.outputHistogram)
             dst3 = hist.plot.dst2
         End If

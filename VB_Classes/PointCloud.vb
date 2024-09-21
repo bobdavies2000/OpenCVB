@@ -592,7 +592,7 @@ Public Class PointCloud_SurfaceH : Inherits VB_Parent
             If topRow = 0 And indexer(i) > 10 Then topRow = i
         Next
 
-        plot.maxValue = (Math.Floor(peakVal / 100) + 1) * 100
+        plot.maxRange = (Math.Floor(peakVal / 100) + 1) * 100
         For i = hist.Rows - 1 To 0 Step -1
             If botRow = 0 And indexer(i) > 10 Then botRow = i
         Next

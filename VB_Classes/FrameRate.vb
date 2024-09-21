@@ -45,9 +45,14 @@ Public Class FrameRate_BasicsGray : Inherits VB_Parent
         Static lastImages() As cvb.Mat = {task.color.Clone, task.leftview.Clone,
                                          task.rightview.Clone, task.depthRGB.Clone}
         For i = 0 To frameCounts.Count - 1
-            mats.mat(i) = Choose(i + 1, task.color, task.leftview, task.rightview, task.depthRGB).clone()
-            mats.mat(i) = mats.mat(i).CvtColor(cvb.ColorConversionCodes.BGR2Gray)
-            lastImages(i) = lastImages(i).CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+            mats.mat(i) = Choose(i + 1, task.color, task.leftView, task.rightView, task.depthRGB).clone()
+            If mats.mat(i).Channels > 1 Then
+                mats.mat(i) = mats.mat(i).CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+                lastImages(i) = lastImages(i).CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            Else
+                mats.mat(i) = mats.mat(i)
+                lastImages(i) = lastImages(i)
+            End If
             mats.mat(i) -= lastImages(i)
             Dim count = mats.mat(i).CountNonZero()
             If count > 0 Then frameCounts(i) += 1

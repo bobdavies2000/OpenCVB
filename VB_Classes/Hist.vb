@@ -1098,18 +1098,29 @@ End Class
 
 
 
-
-
-Public Class Hist_Xdimension : Inherits VB_Parent
+Public Class Hist_Cloud : Inherits VB_Parent
     Dim plot As New Hist_Depth
+    Public histArray() As Single
+    Public dimensionLabel As String = "X"
+    Dim maxMaxVal As Integer
     Public Sub New()
+        plot.plot.removeZeroEntry = True
         desc = "Plot the histogram of the X layer of the point cloud"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        plot.Run(task.pcSplit(0))
+        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(0)
+        Dim mm = GetMinMax(src)
+        Dim norm32f = src + Math.Abs(mm.minVal)
+        If mm.maxVal > maxMaxVal Then maxMaxVal = mm.maxVal
+        plot.plot.maxRange = maxMaxVal
+        plot.Run(norm32f)
         dst2 = plot.dst2
-        SetTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
-                    "Chart right = " + Format(plot.mm.maxVal, fmt0), 2)
+        histArray = plot.plot.histArray
+        If task.heartBeat Then
+            strOut = "Chart left = 0 " + vbCrLf + "Chart right = " + Format(mm.maxVal, fmt0) + vbCrLf
+            labels(2) = "Shifted " + dimensionLabel + " Histogram Range = 0 to " + CStr(CInt(mm.maxVal))
+        End If
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -1117,41 +1128,54 @@ End Class
 
 
 
-
-
-
-Public Class Hist_Ydimension : Inherits VB_Parent
-    Dim plot As New Hist_Depth
+Public Class Hist_CloudX : Inherits VB_Parent
+    Dim histDim As New Hist_Cloud
     Public Sub New()
+        histDim.dimensionLabel = "X"
         desc = "Plot the histogram of the X layer of the point cloud"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        plot.Run(task.pcSplit(1))
-        dst2 = plot.dst2
-        SetTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
-                    "Chart right = " + Format(plot.mm.maxVal, fmt0), 2)
+        histDim.Run(task.pcSplit(0))
+        dst2 = histDim.dst2
+        labels = histDim.labels
+        SetTrueText(histDim.strOut, 3)
     End Sub
 End Class
 
 
 
 
-
-
-
-
-Public Class Hist_Zdimension : Inherits VB_Parent
-    Dim plot As New Hist_Depth
+Public Class Hist_CloudY : Inherits VB_Parent
+    Dim histDim As New Hist_Cloud
     Public Sub New()
+        histDim.dimensionLabel = "Y"
         desc = "Plot the histogram of the X layer of the point cloud"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        plot.Run(task.pcSplit(2))
-        dst2 = plot.dst2
-        SetTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
-                    "Chart right = " + Format(plot.mm.maxVal, fmt0), 2)
+        histDim.Run(task.pcSplit(1))
+        dst2 = histDim.dst2
+        labels = histDim.labels
+        SetTrueText(histDim.strOut, 3)
     End Sub
 End Class
+
+
+
+
+Public Class Hist_CloudZ : Inherits VB_Parent
+    Dim histDim As New Hist_Cloud
+    Public Sub New()
+        histDim.dimensionLabel = "Z"
+        desc = "Plot the histogram of the X layer of the point cloud"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        histDim.Run(task.pcSplit(2))
+        dst2 = histDim.dst2
+        labels = histDim.labels
+        SetTrueText(histDim.strOut, 3)
+    End Sub
+End Class
+
 
 
 
@@ -1182,6 +1206,7 @@ Public Class Hist_Depth : Inherits VB_Parent
             plot.maxRange = mm.maxVal
         End If
 
+        If plot.minRange = plot.maxRange Then Exit Sub ' at startup some cameras have no depth...
         cvb.Cv2.CalcHist({src}, {0}, New cvb.Mat, histogram, 1, {task.histogramBins}, {New cvb.Rangef(plot.minRange, plot.maxRange)})
 
         plot.histogram = histogram
@@ -1328,5 +1353,68 @@ Public Class Hist_DepthSimple : Inherits VB_Parent
             dst2 = plotHist.dst2
         End If
         histList = histArray.ToList
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Hist_CloudSegments : Inherits VB_Parent
+    Dim plot As New Plot_Histogram
+    Public trimHist As New cvb.Mat
+    Dim options As New Options_Outliers
+    Public Sub New()
+        task.redOptions.UseDepth.Checked = True
+        task.redOptions.XReduction.Checked = True
+        dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U, 0)
+        task.gOptions.FrameHistory.Value = 10
+        plot.createHistogram = True
+        desc = "Find the segments of X, Y, and Z values from the point cloud."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        Dim index As Integer
+        Dim mm As mmData
+        If task.redOptions.XReduction.Checked Then
+            index = 0
+            mm.minVal = -task.xRange
+            mm.maxVal = task.xRange
+        End If
+        If task.redOptions.YReduction.Checked Then
+            index = 1
+            mm.minVal = -task.yRange
+            mm.maxVal = task.yRange
+        End If
+        If task.redOptions.ZReduction.Checked Then
+            index = 2
+            mm.minVal = 0
+            mm.maxVal = task.MaxZmeters
+        End If
+
+        If src.Type <> cvb.MatType.CV_32FC1 Then src = task.pcSplit(index)
+        src = (src - mm.minVal).ToMat
+
+        Static incr As Single
+        If task.heartBeat Or tInfo.optionsChanged Then
+            incr = (mm.maxVal - mm.minVal) / task.histogramBins
+            plot.minRange = mm.minVal
+            plot.maxRange = mm.maxVal
+            plot.Run(src)
+            dst2 = plot.dst2.Clone
+            labels(3) = "Min = " + Format(mm.minVal, fmt1) + " max = " + Format(mm.maxVal, fmt1)
+        End If
+
+        dst1.SetTo(0)
+        For i = 0 To plot.histogram.Rows - 1
+            Dim mask = src.InRange(i * incr, (i + 1) * incr).ConvertScaleAbs
+            dst1.SetTo(i + 1, mask)
+        Next
+        dst3 = ShowPalette(dst1 * 255 / task.histogramBins)
+        dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class

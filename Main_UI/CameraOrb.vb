@@ -108,7 +108,8 @@ Public Class CameraORB : Inherits GenericCamera
         SyncLock orbMutex
             IMU_AngularVelocity = angularVelocity
             IMU_Acceleration = acceleration
-            IMU_TimeStamp = timeStamp
+            Static initialTime As Int64 = timeStamp
+            IMU_FrameTime = timeStamp - initialTime
         End SyncLock
 
         If color Is Nothing Then color = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)

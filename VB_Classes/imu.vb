@@ -301,7 +301,7 @@ Public Class IMU_PlotIMUFrameTime : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        Static IMUanchor As Integer = task.IMU_FrameTime
+        Static IMUanchor As Integer = task.IMU_FrameTime Mod 4000000000
         Static histogramIMU(plot.maxScale) As Integer
 
         ' there can be some errant times at startup.

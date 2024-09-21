@@ -871,6 +871,7 @@ End Enum
 	If algorithmName = "Edge_CannyLeftRight_CS" Then return new Edge_CannyLeftRight_CS
 	If algorithmName = "Edge_CannyMin" Then return new Edge_CannyMin
 	If algorithmName = "Edge_CannyMin_CS" Then return new Edge_CannyMin_CS
+	If algorithmName = "Edge_CloudSegments" Then return new Edge_CloudSegments
 	If algorithmName = "Edge_Color8U" Then return new Edge_Color8U
 	If algorithmName = "Edge_Color8U_CS" Then return new Edge_Color8U_CS
 	If algorithmName = "Edge_ColorGap_CPP_CS" Then return new Edge_ColorGap_CPP_CS
@@ -1393,6 +1394,11 @@ End Enum
 	If algorithmName = "Hist_Byte_CPP_VB" Then return new Hist_Byte_CPP_VB
 	If algorithmName = "Hist_Cell" Then return new Hist_Cell
 	If algorithmName = "Hist_Cell_CS" Then return new Hist_Cell_CS
+	If algorithmName = "Hist_Cloud" Then return new Hist_Cloud
+	If algorithmName = "Hist_CloudSegments" Then return new Hist_CloudSegments
+	If algorithmName = "Hist_CloudX" Then return new Hist_CloudX
+	If algorithmName = "Hist_CloudY" Then return new Hist_CloudY
+	If algorithmName = "Hist_CloudZ" Then return new Hist_CloudZ
 	If algorithmName = "Hist_Color" Then return new Hist_Color
 	If algorithmName = "Hist_Color_CS" Then return new Hist_Color_CS
 	If algorithmName = "Hist_ColorsAndGray" Then return new Hist_ColorsAndGray
@@ -1458,11 +1464,8 @@ End Enum
 	If algorithmName = "Hist_ShapeTop_CS" Then return new Hist_ShapeTop_CS
 	If algorithmName = "Hist_Simple" Then return new Hist_Simple
 	If algorithmName = "Hist_Simple_CS" Then return new Hist_Simple_CS
-	If algorithmName = "Hist_Xdimension" Then return new Hist_Xdimension
 	If algorithmName = "Hist_Xdimension_CS" Then return new Hist_Xdimension_CS
-	If algorithmName = "Hist_Ydimension" Then return new Hist_Ydimension
 	If algorithmName = "Hist_Ydimension_CS" Then return new Hist_Ydimension_CS
-	If algorithmName = "Hist_Zdimension" Then return new Hist_Zdimension
 	If algorithmName = "Hist_Zdimension_CS" Then return new Hist_Zdimension_CS
 	If algorithmName = "Hist2D_Basics" Then return new Hist2D_Basics
 	If algorithmName = "Hist2D_Basics_CS" Then return new Hist2D_Basics_CS
@@ -2585,6 +2588,7 @@ End Enum
 	If algorithmName = "Options_OpticalFlow" Then return new Options_OpticalFlow
 	If algorithmName = "Options_OpticalFlowSparse" Then return new Options_OpticalFlowSparse
 	If algorithmName = "Options_ORB" Then return new Options_ORB
+	If algorithmName = "Options_Outliers" Then return new Options_Outliers
 	If algorithmName = "Options_Palette" Then return new Options_Palette
 	If algorithmName = "Options_PCA" Then return new Options_PCA
 	If algorithmName = "Options_PCA_NColor" Then return new Options_PCA_NColor
@@ -2634,7 +2638,6 @@ End Enum
 	If algorithmName = "Options_StaticTV" Then return new Options_StaticTV
 	If algorithmName = "Options_StdevGrid" Then return new Options_StdevGrid
 	If algorithmName = "Options_Stitch" Then return new Options_Stitch
-	If algorithmName = "Options_Stripes" Then return new Options_Stripes
 	If algorithmName = "Options_Structured" Then return new Options_Structured
 	If algorithmName = "Options_StructuredCloud" Then return new Options_StructuredCloud
 	If algorithmName = "Options_StructuredFloor" Then return new Options_StructuredFloor
@@ -3152,6 +3155,7 @@ End Enum
 	If algorithmName = "RedCloud_Reduce" Then return new RedCloud_Reduce
 	If algorithmName = "RedCloud_Reduce_CC" Then return new CPP_Basics(ccFunctionNames._RedCloud_Reduce_CC)
 	If algorithmName = "RedCloud_Reduce_CS" Then return new RedCloud_Reduce_CS
+	If algorithmName = "RedCloud_ReduceHist" Then return new RedCloud_ReduceHist
 	If algorithmName = "RedCloud_Reduction" Then return new RedCloud_Reduction
 	If algorithmName = "RedCloud_Reduction_CS" Then return new RedCloud_Reduction_CS
 	If algorithmName = "RedCloud_ShapeCorrelation" Then return new RedCloud_ShapeCorrelation
@@ -3385,6 +3389,11 @@ End Enum
 	If algorithmName = "Stitch_Basics" Then return new Stitch_Basics
 	If algorithmName = "Stitch_Basics_CS" Then return new Stitch_Basics_CS
 	If algorithmName = "Stripes_Basics" Then return new Stripes_Basics
+	If algorithmName = "Stripes_CloudX" Then return new Stripes_CloudX
+	If algorithmName = "Stripes_CloudY" Then return new Stripes_CloudY
+	If algorithmName = "Stripes_CloudZ" Then return new Stripes_CloudZ
+	If algorithmName = "Stripes_Histogram" Then return new Stripes_Histogram
+	If algorithmName = "Stripes_XYZ" Then return new Stripes_XYZ
 	If algorithmName = "Structured_Cloud" Then return new Structured_Cloud
 	If algorithmName = "Structured_Cloud_CS" Then return new Structured_Cloud_CS
 	If algorithmName = "Structured_Cloud2" Then return new Structured_Cloud2

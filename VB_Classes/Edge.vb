@@ -1288,3 +1288,21 @@ Public Class Edge_CannyAccum : Inherits VB_Parent
         labels(2) = "Accumulated canny edges."
     End Sub
 End Class
+
+
+
+
+
+Public Class Edge_CloudSegments : Inherits VB_Parent
+    Dim segments As New Hist_CloudSegments
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        desc = "Build edges from the point cloud segments from Hist_Cloud - simplistic approach"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        segments.Run(src)
+        dst3 = segments.dst3
+        edges.Run(dst3)
+        dst2 = edges.dst2
+    End Sub
+End Class

@@ -32,66 +32,6 @@ End Class
 
 
 
-Public Class Plot_Histogram : Inherits VB_Parent
-    Public histogram As New cvb.Mat
-    Public histArray() As Single
-    Public minRange As Single = 0
-    Public maxRange As Single = 255
-    Public backColor As cvb.Scalar = cvb.Scalar.Red
-    Public maxValue As Single
-    Public minValue As Single
-    Public plotCenter As Single
-    Public barWidth As Single
-    Public addLabels As Boolean = True
-    Public removeZeroEntry As Boolean = True
-    Public createHistogram As Boolean = False
-    Public mm As mmData
-    Public Sub New()
-        desc = "Plot histogram data with a stable scale at the left of the image."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Or createHistogram Then
-            If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-            cvb.Cv2.CalcHist({src}, {0}, New cvb.Mat(), histogram, 1, {task.histogramBins}, {New cvb.Rangef(minRange, maxRange)})
-        Else
-            histogram = src
-        End If
-
-        If removeZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
-
-        dst2.SetTo(backColor)
-        barWidth = dst2.Width / histogram.Rows
-        plotCenter = barWidth * histogram.Rows / 2 + barWidth / 2
-
-        ReDim histArray(histogram.Rows - 1)
-        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-
-        mm = GetMinMax(histogram)
-
-        If mm.maxVal > 0 And histogram.Rows > 0 Then
-            Dim incr = 255 / histogram.Rows
-            For i = 0 To histArray.Count - 1
-                If Single.IsNaN(histArray(i)) Then histArray(i) = 0
-                If histArray(i) > 0 Then
-                    Dim h = CInt(histArray(i) * dst2.Height / mm.maxVal)
-                    Dim sIncr = (i Mod 256) * incr
-                    Dim color = New cvb.Scalar(sIncr, sIncr, sIncr)
-                    If histogram.Rows > 255 Then color = cvb.Scalar.Black
-                    cvb.Cv2.Rectangle(dst2, New cvb.Rect(i * barWidth, dst2.Height - h, Math.Max(1, barWidth), h), color, -1)
-                End If
-            Next
-            If addLabels Then AddPlotScale(dst2, mm.minVal, mm.maxVal)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Plot_Depth : Inherits VB_Parent
     Dim plotDepth As New Plot_Basics_CPP_VB
     Dim hist As New Hist_Basics
@@ -514,8 +454,63 @@ Public Class Plot_Dots : Inherits VB_Parent
         If wipeSlate Then dst2.SetTo(0)
         For i = 0 To srcX.Count - 1
             Dim pt = New cvb.Point(dst2.Width * srcX(i) / maxX, dst2.Height - dst2.Height * srcY(i) / maxY)
-            DrawCircle(dst2,pt, task.DotSize, plotColor)
+            DrawCircle(dst2, pt, task.DotSize, plotColor)
         Next
         labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Plot_Histogram : Inherits VB_Parent
+    Public histogram As New cvb.Mat
+    Public histArray() As Single
+    Public minRange As Single = 0
+    Public maxRange As Single = 255
+    Public backColor As cvb.Scalar = cvb.Scalar.Red
+    Public plotCenter As Single
+    Public barWidth As Single
+    Public addLabels As Boolean = True
+    Public removeZeroEntry As Boolean = True
+    Public createHistogram As Boolean = False
+    Public mm As mmData
+    Public Sub New()
+        desc = "Plot histogram data with a stable scale at the left of the image."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standaloneTest() Or createHistogram Then
+            If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            cvb.Cv2.CalcHist({src}, {0}, New cvb.Mat(), histogram, 1, {task.histogramBins}, {New cvb.Rangef(minRange, maxRange)})
+        Else
+            histogram = src
+        End If
+
+        If removeZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
+        ReDim histArray(histogram.Rows - 1)
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+        dst2.SetTo(backColor)
+        barWidth = dst2.Width / histogram.Rows
+        plotCenter = barWidth * histogram.Rows / 2 + barWidth / 2
+
+        mm = GetMinMax(histogram)
+
+        If mm.maxVal > 0 And histogram.Rows > 0 Then
+            Dim incr = 255 / histogram.Rows
+            For i = 0 To histArray.Count - 1
+                If Single.IsNaN(histArray(i)) Then histArray(i) = 0
+                If histArray(i) > 0 Then
+                    Dim h = CInt(histArray(i) * dst2.Height / mm.maxVal)
+                    Dim sIncr = (i Mod 256) * incr
+                    Dim color = New cvb.Scalar(sIncr, sIncr, sIncr)
+                    If histogram.Rows > 255 Then color = cvb.Scalar.Black
+                    cvb.Cv2.Rectangle(dst2, New cvb.Rect(i * barWidth, dst2.Height - h, Math.Max(1, barWidth), h), color, -1)
+                End If
+            Next
+            If addLabels Then AddPlotScale(dst2, mm.minVal, mm.maxVal)
+        End If
     End Sub
 End Class

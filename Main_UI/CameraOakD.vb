@@ -96,8 +96,8 @@ Public Class CameraOakD : Inherits GenericCamera
         Dim gyroFrame = OakDGyro(cPtr)
         If accelFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame)
 
-        Static imuStartTime = OakDIMUTimeStamp(cPtr)
-        IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
+        Static initialTime = OakDIMUTimeStamp(cPtr)
+        IMU_FrameTime = OakDIMUTimeStamp(cPtr) - initialTime
 
         Dim depth32f As New cvb.Mat
         Dim depth16 = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16U, OakDRawDepth(cPtr))

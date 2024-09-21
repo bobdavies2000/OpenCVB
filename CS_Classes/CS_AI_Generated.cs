@@ -23,6 +23,7 @@ using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.IO.Pipes;
 using System.Runtime.Versioning;
+using System.Diagnostics.Eventing.Reader;
 
 namespace CS_Classes
 {
@@ -19949,7 +19950,7 @@ namespace CS_Classes
             float peak = hlist.Max();
             int peakIndex = hlist.IndexOf(peak);
             Mat histMat = cv.Mat.FromPixelData(hist.Length, 1, MatType.CV_32F, hist);
-            plot.maxValue = fGrid.stable.basics.ptList.Count;
+            plot.maxRange = fGrid.stable.basics.ptList.Count;
             plot.Run(histMat);
             dst2 = plot.dst2;
             float avg = distDiff.Count > 0 ? distDiff.Average() : 0;
@@ -19986,7 +19987,7 @@ namespace CS_Classes
             float peak = hlist.Max();
             int peakIndex = hlist.IndexOf(peak);
             Mat histMat = cv.Mat.FromPixelData(fPlot.hist.Length, 1, MatType.CV_32F, fPlot.hist);
-            plot.maxValue = fPlot.fGrid.stable.basics.ptList.Count;
+            plot.maxRange = fPlot.fGrid.stable.basics.ptList.Count;
             plot.Run(histMat);
             addw.src2 = plot.dst2;
             addw.Run(lastPlot);
@@ -23047,8 +23048,16 @@ namespace CS_Classes
                 if (i == 1) mats.mat[i] = vbc.task.leftView.Clone();
                 if (i == 2) mats.mat[i] = vbc.task.rightView.Clone();
                 if (i == 3) mats.mat[i] = vbc.task.depthRGB.Clone();
-                mats.mat[i] = mats.mat[i].CvtColor(cv.ColorConversionCodes.BGR2GRAY);
-                lastImages[i] = lastImages[i].CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                if (mats.mat[i].Channels() > 1)
+                {
+                    mats.mat[i] = mats.mat[i].CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                    lastImages[i] = lastImages[i].CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                } else
+                {
+                    mats.mat[i] = mats.mat[i];
+                    lastImages[i] = lastImages[i];
+                }
+
                 mats.mat[i] -= lastImages[i];
                 var count = mats.mat[i].CountNonZero();
                 if (count > 0) frameCounts[i]++;
@@ -32840,7 +32849,7 @@ namespace CS_Classes
             var histList = hist.ToList();
             float maxVal = histList.Max();
             int maxIndex = histList.IndexOf(maxVal);
-            plot.maxValue = (float)Math.Ceiling((maxVal + 50) - (maxVal + 50) % 50);
+            plot.maxRange = (float)Math.Ceiling((maxVal + 50) - (maxVal + 50) % 50);
             label = xyStr + "Max count = " + maxVal + " at " + (maxIndex - zeroLoc) + " with " + nonZero + " non-zero values or " +
                     string.Format("{0:0%}", (float)nonZero / (nonZero + zeroCount));
             float histSum = 0;
@@ -50902,7 +50911,7 @@ namespace CS_Classes
         public Mat outputRandom = new Mat(new cv.Size(1, 4000), MatType.CV_32S, cv.Scalar.All(0)); // allocate the desired number of random numbers - size can be just one to get the next random value
         public Random_MonteCarlo_CS()
         {
-            plot.maxValue = 100;
+            plot.maxRange = 100;
             desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution";
         }
         public void RunAlg(Mat src)
@@ -50950,7 +50959,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            hist.plot.maxValue = 0; // we are sharing the plot with the code below...
+            hist.plot.maxRange = 0; // we are sharing the plot with the code below...
             hist.Run(src);
             dst2 = hist.dst2.Clone();
             saveHist = hist.plot.histogram.Clone();
@@ -50958,7 +50967,7 @@ namespace CS_Classes
             random.Run(src);
             if (standaloneTest())
             {
-                hist.plot.maxValue = 100;
+                hist.plot.maxRange = 100;
                 hist.plot.Run(random.outputHistogram);
                 dst3 = hist.plot.dst2;
             }
@@ -55717,7 +55726,7 @@ namespace CS_Classes
         public void connectLine(int i, cv.Mat dst)
         {
             float x = barMidPoint + dst.Width * i / valList.Count();
-            float y = dst.Height - dst.Height * valList[i] / hist.plot.maxValue;
+            float y = dst.Height - dst.Height * valList[i] / hist.plot.maxRange;
             Point2f p1 = new Point2f(x, y);
             resultingPoints.Add(p1);
             resultingValues.Add(p1.Y);
@@ -55738,8 +55747,8 @@ namespace CS_Classes
             }
             barMidPoint = dst2.Width / valList.Count() / 2;
             if (valList.Count() < 2) return;
-            hist.plot.maxValue = valList.Max();
-            lastPoint = new Point2f(barMidPoint, dst2.Height - dst2.Height * valList[0] / hist.plot.maxValue);
+            hist.plot.maxRange = valList.Max();
+            lastPoint = new Point2f(barMidPoint, dst2.Height - dst2.Height * valList[0] / hist.plot.maxRange);
             resultingPoints.Clear();
             resultingValues.Clear();
             resultingPoints.Add(lastPoint);

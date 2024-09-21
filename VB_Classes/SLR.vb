@@ -111,7 +111,7 @@ Public Class SLR_Trends : Inherits VB_Parent
     End Sub
     Public Sub connectLine(i As Integer, dst As cvb.Mat)
         Dim x = barMidPoint + dst.Width * i / valList.Count
-        Dim y = dst.Height - dst.Height * valList(i) / hist.plot.maxValue
+        Dim y = dst.Height - dst.Height * valList(i) / hist.plot.maxRange
         Dim p1 = New cvb.Point2f(x, y)
         resultingPoints.Add(p1)
         resultingValues.Add(p1.Y)
@@ -132,8 +132,8 @@ Public Class SLR_Trends : Inherits VB_Parent
         barMidPoint = dst2.Width / valList.Count / 2
 
         If valList.Count < 2 Then Exit Sub
-        hist.plot.maxValue = valList.Max
-        lastPoint = New cvb.Point2f(barMidPoint, dst2.Height - dst2.Height * valList(0) / hist.plot.maxValue)
+        hist.plot.maxRange = valList.Max
+        lastPoint = New cvb.Point2f(barMidPoint, dst2.Height - dst2.Height * valList(0) / hist.plot.maxRange)
         resultingPoints.Clear()
         resultingValues.Clear()
         resultingPoints.Add(lastPoint)

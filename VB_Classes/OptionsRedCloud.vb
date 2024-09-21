@@ -12,6 +12,7 @@ Public Class OptionsRedCloud
     Public bitReductionChecked As Boolean
 
     Public PointCloudReduction As Integer
+    Public PointCloudReductionLabel As String
     Public channels() As Integer = {0, 1}
     Public channelIndex As Integer
     Public rangesBGR() As cvb.Rangef = New cvb.Rangef() {New cvb.Rangef(0, 256), New cvb.Rangef(0, 256), New cvb.Rangef(0, 256)}
@@ -233,36 +234,43 @@ Public Class OptionsRedCloud
         tInfo.optionsChanged = True
         PointCloudReduction = XReduction.Tag
         task.gOptions.setHistogramBins(16)
+        PointCloudReductionLabel = "X Reduction"
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         tInfo.optionsChanged = True
         PointCloudReduction = YReduction.Tag
         task.gOptions.setHistogramBins(16)
+        PointCloudReductionLabel = "Y Reduction"
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         tInfo.optionsChanged = True
         PointCloudReduction = ZReduction.Tag
         task.gOptions.setHistogramBins(16)
+        PointCloudReductionLabel = "Z Reduction"
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         tInfo.optionsChanged = True
         PointCloudReduction = XYReduction.Tag
         task.gOptions.setHistogramBins(16)
+        PointCloudReductionLabel = "XY Reduction"
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         tInfo.optionsChanged = True
         PointCloudReduction = XZReduction.Tag
         task.gOptions.setHistogramBins(16)
+        PointCloudReductionLabel = "XZ Reduction"
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         tInfo.optionsChanged = True
         PointCloudReduction = YZReduction.Tag
         task.gOptions.setHistogramBins(16)
+        PointCloudReductionLabel = "YZ Reduction"
     End Sub
     Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         tInfo.optionsChanged = True
         PointCloudReduction = XYZReduction.Tag
         task.gOptions.setHistogramBins(6)
+        PointCloudReductionLabel = "XYX Reduction"
     End Sub
 
 

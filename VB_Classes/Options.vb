@@ -7720,36 +7720,18 @@ End Class
 
 
 
-Public Class Options_Stripes : Inherits VB_Parent
-    Public xVal As Integer
-    Public yVal As Integer
-    Public zVal As Integer
-    Public xyzDim As Integer
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("X")
-            radio.addRadio("Y")
-            radio.addRadio("Z")
-            radio.check(2).Checked = True
-        End If
 
+
+
+Public Class Options_Outliers : Inherits VB_Parent
+    Public cutoffPercent As Single
+    Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Stripes with X", 0, 100, 50)
-            sliders.setupTrackBar("Stripes with Y", 0, 100, 50)
-            sliders.setupTrackBar("Stripes with Z", 0, 100, 50)
+            sliders.setupTrackBar("Cutoff bins with less than %", 0, 100, 1)
         End If
     End Sub
     Public Sub RunOpt()
-        Static xSlider = FindSlider("Stripes with X")
-        Static ySlider = FindSlider("Stripes with Y")
-        Static zSlider = FindSlider("Stripes with Z")
-        xVal = xSlider.value
-        yVal = ySlider.value
-        zVal = zSlider.value
-
-        If radio.check(0).Checked Then xyzDim = 0
-        If radio.check(1).Checked Then xyzDim = 1
-        If radio.check(2).Checked Then xyzDim = 2
+        Static percentSlider = FindSlider("Cutoff bins with less than %")
+        cutoffPercent = percentSlider.value / 100
     End Sub
 End Class

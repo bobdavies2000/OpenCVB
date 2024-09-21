@@ -397,7 +397,7 @@ Public Class FeaturePoly_Plot : Inherits VB_Parent
         Dim peakIndex = hlist.IndexOf(peak)
 
         Dim histMat = cvb.Mat.FromPixelData(hist.Length, 1, cvb.MatType.CV_32F, hist.ToArray)
-        plot.maxValue = fGrid.stable.basics.ptList.Count
+        plot.maxRange = fGrid.stable.basics.ptList.Count
         plot.Run(histMat)
         dst2 = plot.dst2
         Dim avg = If(distDiff.Count > 0, distDiff.Average, 0)
@@ -439,7 +439,7 @@ Public Class FeaturePoly_PlotWeighted : Inherits VB_Parent
         Dim peak = hlist.Max
         Dim peakIndex = hlist.IndexOf(peak)
         Dim histMat = cvb.Mat.FromPixelData(fPlot.hist.Length, 1, cvb.MatType.CV_32F, fPlot.hist)
-        plot.maxValue = fPlot.fGrid.stable.basics.ptList.Count
+        plot.maxRange = fPlot.fGrid.stable.basics.ptList.Count
         plot.Run(histMat)
         addw.src2 = plot.dst2
         addw.Run(lastPlot)

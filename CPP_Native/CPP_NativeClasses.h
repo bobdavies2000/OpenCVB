@@ -5125,8 +5125,8 @@ public:
 
         dst2 = plot->dst2;
         labels[2] = " histogram, bins = " +
-                    to_string(task->histogramBins) + ", X ranges from " + to_string(mm.minVal) +
-                    " to " + to_string(mm.maxVal) + ", y is sample count";
+                    to_string(task->histogramBins) + ", X ranges from " + to_string(int(mm.minVal)) +
+                    " to " + to_string(int(mm.maxVal)) + ", y is sample count";
         labels[2] = (splitIndex == 0 ? "Blue" : splitIndex == 1 ? "Green" : "Red") + labels[2];
     }
 };

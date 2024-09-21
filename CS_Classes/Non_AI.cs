@@ -884,7 +884,8 @@ namespace CS_Classes
 
         void connectLine(int i)
         {
-            var p1 = new Point2f(barMidPoint + dst2.Width * i / valList.Count, dst2.Height - dst2.Height * valList[i] / slr.hist.plot.maxValue);
+            var p1 = new Point2f(barMidPoint + dst2.Width * i / valList.Count, 
+                                 dst2.Height - dst2.Height * valList[i] / slr.hist.plot.maxRange);
             resultingPoints.Add(p1);
             Cv2.Line(dst2, (int)lastPoint.X, (int)lastPoint.Y, (int)p1.X, (int)p1.Y, Scalar.Yellow, vbc.task.lineWidth + 1, vbc.task.lineType);
             lastPoint = p1;
@@ -907,8 +908,8 @@ namespace CS_Classes
             barMidPoint = dst2.Width / valList.Count / 2;
 
             if (valList.Count < 2) return;
-            slr.hist.plot.maxValue = valList.Max();
-            lastPoint = new Point2f(barMidPoint, dst2.Height - dst2.Height * valList[0] / slr.hist.plot.maxValue);
+            slr.hist.plot.maxRange = valList.Max();
+            lastPoint = new Point2f(barMidPoint, dst2.Height - dst2.Height * valList[0] / slr.hist.plot.maxRange);
             resultingPoints.Clear();
             resultingPoints.Add(lastPoint);
             for (int i = 1; i < valList.Count - 1; i++)
