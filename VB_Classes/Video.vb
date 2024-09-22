@@ -12,7 +12,7 @@ Public Class Video_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             captureVideo = New cvb.VideoCapture(options.fileInfo.FullName)
         End If
 

@@ -9,7 +9,7 @@ Public Class IMU_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim gyroAngle As cvb.Point3f
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             lastTimeStamp = task.IMU_TimeStamp
         Else
             gyroAngle = task.IMU_AngularVelocity
@@ -24,7 +24,7 @@ Public Class IMU_Basics : Inherits VB_Parent
         Dim g = task.IMU_RawAcceleration
         task.accRadians = New cvb.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             task.theta = task.accRadians
         Else
             ' Apply the Complementary Filter:
@@ -72,7 +72,7 @@ Public Class IMU_BasicsKalman : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim gyroAngle As cvb.Point3f
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             lastTimeStamp = task.IMU_TimeStamp
         Else
             gyroAngle = task.IMU_AngularVelocity
@@ -125,7 +125,7 @@ Public Class IMU_BasicsWithOptions : Inherits VB_Parent
         options.RunOpt()
 
         Dim gyroAngle As cvb.Point3f
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             lastTimeStamp = task.IMU_TimeStamp
         Else
             gyroAngle = task.IMU_AngularVelocity
@@ -141,7 +141,7 @@ Public Class IMU_BasicsWithOptions : Inherits VB_Parent
         task.accRadians = New cvb.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             task.theta = task.accRadians
         Else
             ' Apply the Complementary Filter:
@@ -613,7 +613,7 @@ Public Class IMU_Average : Inherits VB_Parent
         desc = "Average the IMU Acceleration values over the previous X images."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If tInfo.optionsChanged Then accList.Clear()
+        If task.optionsChanged Then accList.Clear()
         accList.Add(task.IMU_RawAcceleration)
         Dim accMat = cvb.Mat.FromPixelData(accList.Count, 1, cvb.MatType.CV_64FC4, accList.ToArray)
         Dim imuMean = accMat.Mean()

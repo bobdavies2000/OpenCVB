@@ -14,7 +14,7 @@ Public Class BGSubtract_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             BGSubtract_BGFG_Close(cPtr)
             cPtr = BGSubtract_BGFG_Open(options.currMethod)
         End If
@@ -111,7 +111,7 @@ Public Class BGSubtract_MotionDetect : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If tInfo.optionsChanged Or task.frameCount < 10 Then src.CopyTo(dst3)
+        If task.optionsChanged Or task.frameCount < 10 Then src.CopyTo(dst3)
         Dim threadCount = options.threadData(0)
         Dim width = options.threadData(1), height = options.threadData(2)
         Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
@@ -283,7 +283,7 @@ Public Class BGSubtract_Synthetic_CPP_VB : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             If Not task.FirstPass Then BGSubtract_Synthetic_Close(cPtr)
 
             Dim dataSrc(src.Total * src.ElemSize - 1) As Byte

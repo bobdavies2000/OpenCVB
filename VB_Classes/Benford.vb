@@ -249,7 +249,7 @@ Public Class Benford_Primes : Inherits VB_Parent
         desc = "Apply Benford to a list of primes"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If tInfo.optionsChanged Then sieve.Run(src) ' only need to compute this once...
+        If task.optionsChanged Then sieve.Run(src) ' only need to compute this once...
         SetTrueText($"Primes found: {sieve.primes.Count}", 3)
 
         Dim tmp = cvb.Mat.FromPixelData(sieve.primes.Count, 1, cvb.MatType.CV_32S, sieve.primes.ToArray())

@@ -127,7 +127,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits VB_Parent
         options.RunOpt()
         dft.Run(src)
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             Parallel.For(0, 2,
             Sub(k)
                 Dim r = options.radius / (k + 1), rNext As Double

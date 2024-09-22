@@ -16,11 +16,11 @@ Public Class CPP_Basics : Inherits VB_Parent
         cppFunction = _cppFunction
         labels(2) = "Running CPP_Basics, Output from " + task.algName
 
-        cPtr = cppTask_Open(cppFunction, task.dst2.Rows, task.dst2.Cols,
+        cPtr = cppTask_Open(cppFunction, task.rows, task.cols,
                             task.heartBeat, 0.5, task.lineWidth, task.lineType, task.DotSize,
                             task.gridSize, task.histogramBins,
                             task.useGravityPointcloud, task.gOptions.pixelDiffThreshold,
-                            task.gOptions.UseKalman.Checked, task.gOptions.Palettes.SelectedIndex, tInfo.optionsChanged,
+                            task.gOptions.UseKalman.Checked, task.gOptions.Palettes.SelectedIndex, task.optionsChanged,
                             task.frameHistoryCount, task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked)
 
         getOptions()
@@ -90,7 +90,7 @@ Public Class CPP_Basics : Inherits VB_Parent
         Marshal.Copy(src.Data, inputImage, 0, inputImage.Length)
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
         cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
-                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z, tInfo.optionsChanged, task.heartBeat,
+                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z, task.optionsChanged, task.heartBeat,
                        task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked, task.gOptions.debugChecked)
         handleInput.Free()
         getOptions()
@@ -120,7 +120,8 @@ End Class
 Module managedCPP_Interface
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function ManagedCPP_Resume(ioIndex As Integer, colorPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr,
-                                      depthRGBPtr As IntPtr, cloud As IntPtr) As Integer
+                                      depthRGBPtr As IntPtr, cloud As IntPtr, rows As Integer, cols As Integer,
+                                      optionsChanged As Boolean) As Integer
     End Function
 
     <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -168,7 +169,8 @@ Public Class CPP_ManagedTask : Inherits VB_Parent
         hCloud = GCHandle.Alloc(cloudData, GCHandleType.Pinned)
 
         ioIndex = ManagedCPP_Resume(ioIndex, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
-                                    hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject())
+                                    hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject(), task.color.Rows,
+                                    task.color.Cols, task.optionsChanged)
 
         hColor.Free()
         hLeft.Free()

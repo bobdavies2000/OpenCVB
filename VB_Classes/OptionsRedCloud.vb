@@ -180,19 +180,19 @@ Public Class OptionsRedCloud
 
 
     Private Sub XRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles XRangeBar.ValueChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         XLabel.Text = CStr(XRangeBar.Value)
     End Sub
     Private Sub YRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles YRangeSlider.ValueChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         YLabel.Text = CStr(YRangeSlider.Value)
     End Sub
     Private Sub ProjectionThreshold_ValueChanged(sender As Object, e As EventArgs) Handles ProjectionThresholdBar.ValueChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         SideLabel.Text = CStr(ProjectionThresholdBar.Value)
     End Sub
     Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles IdentifyCountBar.ValueChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         identifyCount = IdentifyCountBar.Value
         LabelIdentify.Text = CStr(IdentifyCountBar.Value)
     End Sub
@@ -200,17 +200,17 @@ Public Class OptionsRedCloud
 
 
     Private Sub SimpleReduction_CheckedChanged(sender As Object, e As EventArgs) Handles UseSimpleReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         SimpleReductionChecked = UseSimpleReduction.Checked
         reductionType = UseSimpleReduction.Text
     End Sub
     Private Sub BitwiseReduction_CheckedChanged(sender As Object, e As EventArgs) Handles BitwiseReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         bitReductionChecked = BitwiseReduction.Checked
         reductionType = BitwiseReduction.Text
     End Sub
     Private Sub NoReduction_CheckedChanged(sender As Object, e As EventArgs) Handles NoReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         reductionType = NoReduction.Text
     End Sub
 
@@ -218,12 +218,12 @@ Public Class OptionsRedCloud
 
 
     Private Sub ColorReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles SimpleReductionBar.ValueChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         SimpleReduction = SimpleReductionBar.Value
         ColorLabel.Text = CStr(SimpleReductionBar.Value)
     End Sub
     Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionBar.ValueChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         bitReduction = BitwiseReductionBar.Value
         bitwiseLabel.Text = CStr(BitwiseReductionBar.Value)
     End Sub
@@ -231,43 +231,43 @@ Public Class OptionsRedCloud
 
 
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         PointCloudReduction = XReduction.Tag
         task.gOptions.setHistogramBins(16)
         PointCloudReductionLabel = "X Reduction"
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         PointCloudReduction = YReduction.Tag
         task.gOptions.setHistogramBins(16)
         PointCloudReductionLabel = "Y Reduction"
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         PointCloudReduction = ZReduction.Tag
         task.gOptions.setHistogramBins(16)
         PointCloudReductionLabel = "Z Reduction"
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         PointCloudReduction = XYReduction.Tag
         task.gOptions.setHistogramBins(16)
         PointCloudReductionLabel = "XY Reduction"
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         PointCloudReduction = XZReduction.Tag
         task.gOptions.setHistogramBins(16)
         PointCloudReductionLabel = "XZ Reduction"
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         PointCloudReduction = YZReduction.Tag
         task.gOptions.setHistogramBins(16)
         PointCloudReductionLabel = "YZ Reduction"
     End Sub
     Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         PointCloudReduction = XYZReduction.Tag
         task.gOptions.setHistogramBins(6)
         PointCloudReductionLabel = "XYX Reduction"
@@ -276,35 +276,35 @@ Public Class OptionsRedCloud
 
 
     Private Sub GuidedBP_Depth_CheckedChanged(sender As Object, e As EventArgs)
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         depthInputIndex = 0
     End Sub
     Private Sub RedCloud_Reduce_CheckedChanged(sender As Object, e As EventArgs)
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         depthInputIndex = 1
     End Sub
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar3D.ValueChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         LabelHistogramBins.Text = CStr(HistBinBar3D.Value)
         histBins3D = HistBinBar3D.Value * HistBinBar3D.Value * HistBinBar3D.Value
     End Sub
 
     Private Sub UseGuidedProjection_CheckedChanged(sender As Object, e As EventArgs) Handles UseGuidedProjection.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub UseDepth_CheckedChanged(sender As Object, e As EventArgs) Handles UseDepth.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         useDepthChecked = UseDepth.Checked
     End Sub
     Private Sub UseColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseColorOnly.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         useColorOnlyChecked = UseColorOnly.Checked
     End Sub
 
 
 
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         colorInputName = ColorSource.Text
         colorInputIndex = ColorSource.SelectedIndex
         ReductionSliders.Enabled = colorInputName = "Reduction_Basics"
@@ -319,13 +319,13 @@ Public Class OptionsRedCloud
     Private Sub DisplayCellStats_CheckedChanged(sender As Object, e As EventArgs) Handles DisplayCellStats.CheckedChanged
         task.gOptions.displayDst1.Checked = DisplayCellStats.Checked
         task.redOptions.setIdentifyCells(True)
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub naturalColor_CheckedChanged(sender As Object, e As EventArgs) Handles NaturalColor.CheckedChanged
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         useNaturalColor = NaturalColor.Checked
     End Sub
     Public Sub setUseColorOnly(newVal As Boolean)

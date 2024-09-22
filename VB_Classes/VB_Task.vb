@@ -6,18 +6,10 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 
 <StructLayout(LayoutKind.Sequential)>
-Public Class taskInfo
+Public Class VBtask : Implements IDisposable
     Public optionsChanged As Boolean ' global or local options changed.
     Public rows As Integer
     Public cols As Integer
-    Public Sub New()
-        optionsChanged = True
-    End Sub
-End Class
-
-
-<StructLayout(LayoutKind.Sequential)>
-Public Class VBtask : Implements IDisposable
     Public TaskTimer As New System.Timers.Timer(1000)
 
     Public dst0 As cvb.Mat
@@ -40,7 +32,6 @@ Public Class VBtask : Implements IDisposable
     Public pointCloud As cvb.Mat
     Public pcSplit() As cvb.Mat
     Public gMatrix As cvb.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
-    Public WorkingRes As cvb.Size
     Public noDepthMask As New cvb.Mat
     Public depthMask As New cvb.Mat
     Public paletteGradient As cvb.Mat
@@ -159,8 +150,8 @@ Public Class VBtask : Implements IDisposable
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridROIclicked As Integer
 
-    Public gOptions As New OptionsGlobal
-    Public redOptions As New OptionsRedCloud
+    Public gOptions As OptionsGlobal
+    Public redOptions As OptionsRedCloud
 
     Public paletteIndex As Integer
 
@@ -305,7 +296,7 @@ Public Class VBtask : Implements IDisposable
         Public main_hwnd As IntPtr
 
         Public fpsRate As Integer
-        Public WorkingRes As cvb.Size
+        Public workingRes As cvb.Size
         Public captureRes As cvb.Size ' DisparityIn-verted_Basics needs the full resolution to compute disparity.
         Public displayRes As cvb.Size
 
@@ -366,14 +357,14 @@ Public Class VBtask : Implements IDisposable
 
         mainFormLocation = parms.mainFormLocation
         displayRes = parms.displayRes
-        WorkingRes = parms.WorkingRes ' gets referenced a lot
+        rows = parms.workingRes.Height
+        cols = parms.workingRes.Width
+        task.optionsChanged = True
 
-        task.dst0 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        task.dst1 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        task.dst2 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        task.dst3 = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        tInfo.rows = task.dst2.Rows
-        tInfo.cols = task.dst2.Cols
+        task.dst0 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst1 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst2 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        task.dst3 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
 
         OpenGL_Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
         OpenGL_Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
@@ -445,7 +436,7 @@ Public Class VBtask : Implements IDisposable
         baseline = baseLines(parms.cameraIndex)
 
         task.myStopWatch = Stopwatch.StartNew()
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
         Application.DoEvents()
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -603,7 +594,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            tInfo.optionsChanged = False
+            task.optionsChanged = False
             TaskTimer.Enabled = False
             task.frameCount += 1
 
@@ -660,12 +651,10 @@ Public Class VBtask : Implements IDisposable
         Dim src = task.color
 
         ' If the WorkingRes changes, the previous generation of images needs to be reset.
-        If task.pointCloud.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) Or
-            task.color.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) Then
-
-            task.pointCloud = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_32FC3, 0)
-            task.noDepthMask = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-            task.depthMask = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        If task.pointCloud.Size <> New cvb.Size(cols, rows) Or task.color.Size <> task.dst2.Size Then
+            task.pointCloud = New cvb.Mat(rows, cols, cvb.MatType.CV_32FC3, cvb.Scalar.All(0))
+            task.noDepthMask = New cvb.Mat(rows, cols, cvb.MatType.CV_8U, cvb.Scalar.All(0))
+            task.depthMask = New cvb.Mat(rows, cols, cvb.MatType.CV_8U, cvb.Scalar.All(0))
         End If
 
         Application.DoEvents()
@@ -684,9 +673,9 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.CreateGif.Checked Then
             heartBeat = False
-            tInfo.optionsChanged = False
+            task.optionsChanged = False
         Else
-            task.heartBeat = task.heartBeat Or task.debugSyncUI Or tInfo.optionsChanged Or task.mouseClickFlag
+            task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
         End If
 
         If task.paused = False Then
@@ -709,7 +698,7 @@ Public Class VBtask : Implements IDisposable
         If task.motionDetected Or heartBeat Then
             task.pcSplit = task.pointCloud.Split
 
-            If tInfo.optionsChanged Then task.maxDepthMask.SetTo(0)
+            If task.optionsChanged Then task.maxDepthMask.SetTo(0)
             task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc)
 
             task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs()

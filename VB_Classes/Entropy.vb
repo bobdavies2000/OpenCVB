@@ -63,7 +63,7 @@ Public Class Entropy_Highest : Inherits VB_Parent
             entropy.Run(src(roi))
             entropyMap(roi).SetTo(entropy.entropyVal)
 
-            If entropy.entropyVal > maxEntropy Or tInfo.optionsChanged Then
+            If entropy.entropyVal > maxEntropy Or task.optionsChanged Then
                 maxEntropy = entropy.entropyVal
                 eMaxRect = roi
             End If

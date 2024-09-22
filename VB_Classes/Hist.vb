@@ -454,7 +454,7 @@ Public Class Hist_PeaksRGB : Inherits VB_Parent
             mats.mat(i) = peaks(i).dst2.Clone
         Next
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             task.mouseClickFlag = True
             task.mousePicTag = 2
         End If
@@ -1400,20 +1400,21 @@ Public Class Hist_CloudSegments : Inherits VB_Parent
         src = (src - mm.minVal).ToMat
 
         Static incr As Single
-        If task.heartBeat Or tInfo.optionsChanged Then
+        If task.heartBeat Or task.optionsChanged Then
             incr = (mm.maxVal - mm.minVal) / task.histogramBins
             plot.minRange = mm.minVal
             plot.maxRange = mm.maxVal
             plot.Run(src)
             dst2 = plot.dst2.Clone
             labels(3) = "Min = " + Format(mm.minVal, fmt1) + " max = " + Format(mm.maxVal, fmt1)
-        End If
 
-        dst1.SetTo(0)
-        For i = 0 To plot.histogram.Rows - 1
-            Dim mask = src.InRange(i * incr, (i + 1) * incr).ConvertScaleAbs
-            dst1.SetTo(i + 1, mask)
-        Next
+            dst1.SetTo(0)
+            For i = 0 To plot.histogram.Rows - 1
+                Dim mask = src.InRange(i * incr, (i + 1) * incr).ConvertScaleAbs
+                dst1.SetTo(i + 1, mask)
+            Next
+            dst1.SetTo(0, task.noDepthMask)
+        End If
         dst3 = ShowPalette(dst1 * 255 / task.histogramBins)
         dst3.SetTo(0, task.noDepthMask)
     End Sub

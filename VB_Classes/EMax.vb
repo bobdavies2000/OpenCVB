@@ -120,7 +120,7 @@ Public Class EMax_InputClusters : Inherits VB_Parent
             task.grid.Run(dst2)
         End If
 
-        If regionCount <> task.gridList.Count Then tInfo.optionsChanged = True
+        If regionCount <> task.gridList.Count Then task.optionsChanged = True
 
         regionCount = task.gridList.Count
 

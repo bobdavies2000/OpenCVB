@@ -145,7 +145,7 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 3 Then src = task.color
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             Dim bins = task.redOptions.HistBinBar3D.Value
             Dim hBins() As Integer = {bins, bins, bins}
             cvb.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, task.redOptions.rangesBGR)
@@ -333,7 +333,7 @@ Public Class Hist3Dcolor_Vector : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 3 Then src = task.color
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             Dim bins = task.redOptions.HistBinBar3D.Value
             binArray = {bins, bins, bins}
         End If

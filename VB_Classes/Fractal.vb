@@ -69,7 +69,7 @@ Public Class Fractal_MandelbrotZoom : Inherits VB_Parent
         End If
         If mandel.options.resetCheck.Checked Then mandel.reset()
 
-        If tInfo.optionsChanged Or saveDrawRect <> task.drawRect Then
+        If task.optionsChanged Or saveDrawRect <> task.drawRect Then
             saveDrawRect = task.drawRect
             mandel.Run(src)
             mandel.options.resetCheck.Checked = False
@@ -211,7 +211,7 @@ Public Class Fractal_Dimension : Inherits VB_Parent
         dst3.SetTo(0)
 
         Static rect = New cvb.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
-        If tInfo.optionsChanged Or task.mouseClickFlag Then
+        If task.optionsChanged Or task.mouseClickFlag Then
             rect = New cvb.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
         End If
 

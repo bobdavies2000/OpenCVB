@@ -296,7 +296,7 @@ namespace CS_Classes
             }
 
             dst3 = src.Clone();
-            if (vbc.tInfo.optionsChanged) history.Clear();
+            if (vbc.task.optionsChanged) history.Clear();
             history.Add(newPoints);
             stablePoints.Clear();
             foreach (var pt in newPoints)

@@ -202,7 +202,7 @@ Public Class LUT_Custom : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Static colorSlider = FindSlider("Color transitions")
-        If tInfo.optionsChanged Or task.heartBeat Then
+        If task.optionsChanged Or task.heartBeat Then
             If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
             saveColorCount = colorSlider.Value
             gradMap.Run(src)

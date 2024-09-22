@@ -42,7 +42,7 @@ Public Class LineCoin_Basics : Inherits VB_Parent
         Return lpList
     End Function
     Public Sub RunAlg(src As cvb.Mat)
-        If tInfo.optionsChanged Then lpLists.Clear()
+        If task.optionsChanged Then lpLists.Clear()
 
         longLines.Run(src)
         lpLists.Add(longLines.lpList)
@@ -72,7 +72,7 @@ Public Class LineCoin_HistoryIntercept : Inherits VB_Parent
         desc = "find lines with coincident slopes and intercepts."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If tInfo.optionsChanged Then mpLists.Clear()
+        If task.optionsChanged Then mpLists.Clear()
 
         coin.Run(src)
         dst2 = coin.dst2

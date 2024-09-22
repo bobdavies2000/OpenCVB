@@ -186,7 +186,7 @@ Public Class Bin3Way_RedCloud1 : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
                 cellMaps(i) = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -243,7 +243,7 @@ Public Class Bin3Way_RedCloud : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
                 cellMaps(i) = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))

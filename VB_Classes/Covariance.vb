@@ -77,7 +77,7 @@ Public Class Covariance_Images : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim gray = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If tInfo.optionsChanged Then gray.ConvertTo(last32f, cvb.MatType.CV_32F)
+        If task.optionsChanged Then gray.ConvertTo(last32f, cvb.MatType.CV_32F)
         dst2 = gray
 
         Dim gray32f As New cvb.Mat

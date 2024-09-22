@@ -18,6 +18,6 @@ Public Class OptionsCheckbox
         FlowLayoutPanel1.Controls.Add(Box(index))
     End Sub
     Private Sub Box_CheckChanged(sender As Object, e As EventArgs)
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
     End Sub
 End Class

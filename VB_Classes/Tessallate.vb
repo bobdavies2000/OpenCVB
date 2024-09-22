@@ -164,7 +164,7 @@ Public Class Tessallate_QuadHulls : Inherits VB_Parent
         hulls.Run(src)
         dst2 = hulls.dst2
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             depthList = New List(Of List(Of Single))
             For i = 0 To task.gridList.Count
                 depthList.Add(New List(Of Single))
@@ -240,7 +240,7 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Parent
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             depthList1 = New List(Of List(Of Single))
             depthList2 = New List(Of List(Of Single))
             For i = 0 To task.gridList.Count
@@ -329,7 +329,7 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
         desc = "Tessellate each quad in point cloud"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             depthMinList.Clear()
             depthMaxList.Clear()
             For i = 0 To task.gridList.Count - 1

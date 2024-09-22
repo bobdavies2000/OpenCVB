@@ -4,7 +4,6 @@ Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
 Public Module vbc
     Public task As VBtask
-    Public tInfo As New taskInfo
     Public allOptions As OptionsContainer
     Public recordedData As Replay_Play
     Public Const fmt0 = "0"

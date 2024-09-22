@@ -296,7 +296,7 @@ Public Class Edge_Consistent : Inherits VB_Parent
         desc = "Edges that are consistent for x number of frames"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If tInfo.optionsChanged Then saveFrames = New List(Of cvb.Mat)
+        If task.optionsChanged Then saveFrames = New List(Of cvb.Mat)
 
         edges.Run(src)
 
@@ -837,7 +837,7 @@ Public Class Edge_CannyHistory : Inherits VB_Parent
 
         dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
         Static frameList As New List(Of cvb.Mat)
-        If tInfo.optionsChanged Then frameList.Clear()
+        If task.optionsChanged Then frameList.Clear()
         frameList.Add(dst2)
         dst3.SetTo(0)
         For Each m In frameList
@@ -1303,7 +1303,7 @@ Public Class Edge_CloudSegments : Inherits VB_Parent
         segments.Run(src)
         dst3 = segments.dst3
         edges.Run(dst3)
-        dst2 = edges.dst2
+        dst2 = segments.dst3
     End Sub
 End Class
 
@@ -1311,14 +1311,17 @@ End Class
 
 
 Public Class Edge_Diff_CPP_VB : Inherits VB_Parent
+    Dim segments As New Hist_CloudSegments
+    Dim edges As New Edge_Sobel
     Public Sub New()
         cPtr = Edge_Diff_Open()
-        labels = {"", "", "Grayscale image of src", "dst3Label"}
-        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If standalone Then
+            segments.Run(src)
+            src = segments.dst1 ' the byte version of the segmented image.
+        End If
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
@@ -1326,7 +1329,8 @@ Public Class Edge_Diff_CPP_VB : Inherits VB_Parent
         Dim imagePtr = Edge_Diff_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, If(src.Channels = 3, cvb.MatType.CV_8UC3, cvb.MatType.CV_8UC1), imagePtr)
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr)
+        dst3 = segments.dst3
     End Sub
     Public Sub Close()
         Edge_Diff_Close(cPtr)

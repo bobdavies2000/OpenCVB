@@ -80,7 +80,7 @@ Public Class MSER_Detect : Inherits VB_Parent
 
         dst2 = src.Clone
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             mser = cvb.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                   options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize)
             mser.Pass2Only = options.pass2Setting
@@ -401,7 +401,7 @@ Public Class MSER_TestExample : Inherits VB_Parent
         dst2 = image.Clone
         dst3 = image.Clone()
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             mser = cvb.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                   options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize)
             mser.Pass2Only = options.pass2Setting
@@ -464,7 +464,7 @@ Public Class MSER_Mask_CPP_VB : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             MSER_Close(cPtr)
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                              options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
@@ -647,7 +647,7 @@ Public Class MSER_CPP_VB : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             MSER_Close(cPtr)
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                              options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)

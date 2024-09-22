@@ -72,7 +72,7 @@ Public Class Kalman_Compare : Inherits VB_Parent
         desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
                     For i = 0 To kalman.Count - 1

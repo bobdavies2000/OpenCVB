@@ -11,7 +11,7 @@ Public Class Color8U_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim index = task.redOptions.colorInputIndex
-        If tInfo.optionsChanged Or classifier Is Nothing Then
+        If task.optionsChanged Or classifier Is Nothing Then
             Select Case index
                 Case 0
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full

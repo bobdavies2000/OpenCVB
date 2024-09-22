@@ -7370,7 +7370,22 @@ public:
     Mat src, dst;
     Edge_Diff(){}
     void RunCPP() {
-        dst = src.clone();
+        if (dst.rows == 0) dst = Mat(src.rows, src.cols, CV_8U);
+        dst.setTo(0);
+        uchar* in = src.data;
+        uchar* out = dst.data;
+        for (int y = 0; y < src.rows; y++)
+        {
+            for (int x = 0; x < src.cols - 1; x++)
+            {
+                int index = y * src.cols + x;
+                int v1 = in[index];
+                int v2 = in[index + 1];
+                if (v1 == 0 || v2 == 0) continue;
+                if (v1 == v2) continue;
+                out[index] = 255;
+            }
+        }
     } 
 };
 extern "C" __declspec(dllexport)

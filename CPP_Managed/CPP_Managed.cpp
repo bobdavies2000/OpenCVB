@@ -46,11 +46,11 @@ public:
     unManagedData()
     {
     }
-    void update()
+    void update(int _rows, int _cols, bool _optionsChanged)
     {
-        rows = vbc::tInfo->rows;
-        cols = vbc::tInfo->cols;
-        optionsChanged = vbc::tInfo->optionsChanged;
+        rows = _rows;
+        cols = _cols;
+        optionsChanged = _optionsChanged;
     }
 
 };
@@ -72,9 +72,10 @@ vector<unManagedIO*> ioList({});
 
 
 extern "C" __declspec(dllexport)
-int ManagedCPP_Resume(int ioIndex, int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBPtr, int* cloudPtr)
+int ManagedCPP_Resume(int ioIndex, int* colorPtr, int* leftPtr, int* rightPtr, int* depthRGBPtr, int* cloudPtr,
+                      int rows, int cols, bool optionsChanged)
 {
-    task.update();
+    task.update(rows, cols, optionsChanged );
     task.color = Mat(task.rows, task.cols, CV_8UC3, colorPtr).clone();
     task.leftView = Mat(task.rows, task.cols, CV_8UC3, leftPtr).clone();
     task.rightView = Mat(task.rows, task.cols, CV_8UC3, rightPtr).clone();
@@ -121,10 +122,10 @@ namespace CPP_Managed {
     public ref class CPP_IntializeManaged 
     {
     public:
-        CPP_IntializeManaged()
+        CPP_IntializeManaged(int rows, int cols)
         {
-            task.rows = vbc::tInfo->rows;
-            task.cols = vbc::tInfo->cols;
+            task.rows = rows;
+            task.cols = cols;
         }
     };
 

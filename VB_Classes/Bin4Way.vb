@@ -20,7 +20,7 @@ Public Class Bin4Way_Basics : Inherits VB_Parent
         If task.mousePicTag = 1 Then index = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         Dim roiSave = If(index < task.gridList.Count, task.gridList(index), New cvb.Rect)
 
-        If tInfo.optionsChanged Then index = 0
+        If task.optionsChanged Then index = 0
 
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Dim matList(3) As cvb.Mat
@@ -632,7 +632,7 @@ Public Class Bin4Way_RedCloud : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
                 cellMaps(i) = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))

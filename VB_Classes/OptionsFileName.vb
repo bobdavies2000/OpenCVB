@@ -10,12 +10,12 @@ Public Class OptionsFileName
             PlayButton.Text = "Start"
             fileStarted = False
         End If
-        tInfo.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
             filename.Text = OpenFileDialog1.FileName
-            tInfo.optionsChanged = True
+            task.optionsChanged = True
         End If
         newFileName = True
     End Sub

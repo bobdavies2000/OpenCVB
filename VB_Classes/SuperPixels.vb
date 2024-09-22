@@ -32,7 +32,7 @@ Public Class SuperPixel_Basics_CPP_VB : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If tInfo.optionsChanged Then
+        If task.optionsChanged Then
             If cPtr <> 0 Then SuperPixel_Close(cPtr)
             cPtr = SuperPixel_Open(src.Width, src.Height, options.numSuperPixels, options.numIterations, options.prior)
         End If

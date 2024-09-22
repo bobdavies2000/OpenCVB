@@ -305,7 +305,7 @@ Public Class Line_InDepthAndBGR : Inherits VB_Parent
         If lines.lpList.Count = 0 Then Exit Sub
 
         Dim lineList = New List(Of cvb.Rect)
-        If task.motionFlag Or tInfo.optionsChanged Then dst3.SetTo(0)
+        If task.motionFlag Or task.optionsChanged Then dst3.SetTo(0)
         p1List.Clear()
         p2List.Clear()
         z1List.Clear()
@@ -882,7 +882,7 @@ Public Class Line_TimeView : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
 
-        If tInfo.optionsChanged Or task.motionFlag Then frameList.Clear()
+        If task.optionsChanged Or task.motionFlag Then frameList.Clear()
         Dim nextMpList = New List(Of PointPair)(lines.lpList)
         frameList.Add(nextMpList)
 
@@ -1091,7 +1091,7 @@ Public Class Line_Verts : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
 
-        If verticals.Count < 2 Or verticals.Count < verts.verticals.Count / 3 Or tInfo.optionsChanged Then
+        If verticals.Count < 2 Or verticals.Count < verts.verticals.Count / 3 Or task.optionsChanged Then
             verts.Run(src)
             For Each vert In verts.verticals
                 vert.tc1 = match.createCell(src, 0, vert.tc1.center)

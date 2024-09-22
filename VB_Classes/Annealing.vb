@@ -56,7 +56,7 @@ Public Class Annealing_Basics_CPP_VB : Inherits VB_Parent
         Dim split As String() = Regex.Split(msg, "\W+")
         energy = CSng(split(split.Count - 2) + "." + split(split.Count - 1))
         If standaloneTest() Then
-            If energyLast = energy Or tInfo.optionsChanged Then
+            If energyLast = energy Or task.optionsChanged Then
                 Annealing_Basics_Close(cPtr)
                 setup()
                 Open()
@@ -97,7 +97,7 @@ Public Class Annealing_MT_CPP_VB : Inherits VB_Parent
             anneal(i).Open() ' this will initialize the C++ copy of the city positions.
         Next
         Dim timeSpent = Now.Subtract(startTime)
-        If timeSpent.TotalSeconds < 10000 Then debug.writeline("time spent on last problem = " + Format(timeSpent.TotalSeconds, fmt1) + " seconds.")
+        If timeSpent.TotalSeconds < 10000 Then Debug.WriteLine("time spent on last problem = " + Format(timeSpent.TotalSeconds, fmt1) + " seconds.")
         startTime = Now
     End Sub
     Public Sub New()
@@ -107,7 +107,7 @@ Public Class Annealing_MT_CPP_VB : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        If tInfo.optionsChanged Then setup()
+        If task.optionsChanged Then setup()
         Parallel.For(0, anneal.Length,
             Sub(i)
                 anneal(i).Run(src)
