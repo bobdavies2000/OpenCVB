@@ -892,6 +892,7 @@ End Enum
 	If algorithmName = "Edge_DepthGap_Native_CS" Then return new Edge_DepthGap_Native_CS
 	If algorithmName = "Edge_Deriche_CPP_CS" Then return new Edge_Deriche_CPP_CS
 	If algorithmName = "Edge_Deriche_CPP_VB" Then return new Edge_Deriche_CPP_VB
+	If algorithmName = "Edge_Diff_CPP_VB" Then return new Edge_Diff_CPP_VB
 	If algorithmName = "Edge_HSV" Then return new Edge_HSV
 	If algorithmName = "Edge_HSV_CS" Then return new Edge_HSV_CS
 	If algorithmName = "Edge_Laplacian" Then return new Edge_Laplacian

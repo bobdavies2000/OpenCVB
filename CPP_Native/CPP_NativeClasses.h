@@ -2946,30 +2946,6 @@ public:
 
 
 
-//class Random_Basics_CC : public CPP_Parent {
-//public:
-//    vector<Point2f> pointList;
-//    Rect range;
-//    int sizeRequest = 10;
-//
-//    Random_Basics_CC() : CPP_Parent() {
-//        traceName = "Random_Basics";
-//        desc = "Create a uniform random mask with a specified number of pixels.";
-//    }
-//
-//    void Run(Mat src) {
-//        if (range.width == 0 || range.height == 0) range = Rect(0, 0, dst2.cols, dst2.rows);
-//        pointList.clear();
-//        while (pointList.size() < sizeRequest) {
-//            pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
-//        }
-//    }
-//};
-
-
-
-
-
 class OEX_PointsClassifier
 {
 private:
@@ -7381,4 +7357,36 @@ int* Denoise_SinglePixels_Run(Denoise_SinglePixels* cPtr, int* dataPtr, int rows
     cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
     cPtr->RunCPP();
     return (int*)cPtr->src.data;
+}
+
+
+
+
+
+class Edge_Diff
+{
+private:
+public:
+    Mat src, dst;
+    Edge_Diff(){}
+    void RunCPP() {
+        dst = src.clone();
+    } 
+};
+extern "C" __declspec(dllexport)
+Edge_Diff *Edge_Diff_Open() {
+    Edge_Diff *cPtr = new Edge_Diff();
+    return cPtr;
+}
+extern "C" __declspec(dllexport)
+void Edge_Diff_Close(Edge_Diff *cPtr)
+{
+    delete cPtr;
+}
+extern "C" __declspec(dllexport)
+int *Edge_Diff_RunCPP(Edge_Diff *cPtr, int *dataPtr, int rows, int cols, int channels)
+{
+		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
+		cPtr->RunCPP();
+		return (int *) cPtr->dst.data; 
 }

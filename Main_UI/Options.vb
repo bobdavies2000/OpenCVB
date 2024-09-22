@@ -141,10 +141,10 @@ Public Class Options
         ' cameraDisplayRes = New cvb.Size(0, 0) ' figure it out in Main_UI.vb resizing...
     End Sub
 
-    Private Sub UpdateXRef_Click(sender As Object, e As EventArgs) Handles UpdateXRef.Click
+    Public Sub UpdateXRef_Click(sender As Object, e As EventArgs) Handles UpdateXRef.Click
         Dim UIProcess As New Process
-        UIProcess.StartInfo.FileName = Main_UI.HomeDir.FullName + "UI_Generator\bin\X64\UI_Generator.exe"
-        UIProcess.StartInfo.WorkingDirectory = Main_UI.HomeDir.FullName + "UI_Generator\bin\X64\"
+        UIProcess.StartInfo.FileName = Main_UI.HomeDir.FullName + "UI_Generator\bin\X64\Release\UI_Generator.exe"
+        UIProcess.StartInfo.WorkingDirectory = Main_UI.HomeDir.FullName + "UI_Generator\bin\X64\Release\"
         UIProcess.StartInfo.Arguments = "All"
         UIProcess.Start()
     End Sub

@@ -49,7 +49,7 @@
 '//		return (int *) cPtr->dst.data; 
 '//}
 
-Public Class Anyname_CPP : Inherits VB_Parent
+Public Class Anyname_CPP_VB : Inherits VB_Parent
     Public Sub New()
         cPtr = Anyname_Open()
 	    labels = {"", "", "Grayscale image of src", "dst3Label"}
@@ -65,7 +65,7 @@ Public Class Anyname_CPP : Inherits VB_Parent
         Dim imagePtr = Anyname_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        dst2 = New cvb.Mat(src.Rows, src.Cols, If(src.Channels = 3, cvb.MatType.CV_8UC3, cvb.MatType.CV_8UC1), imagePtr).clone
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, If(src.Channels = 3, cvb.MatType.CV_8UC3, cvb.MatType.CV_8UC1), imagePtr).clone
     End Sub
     Public Sub Close() 
         Anyname_Close(cPtr)
@@ -73,13 +73,13 @@ Public Class Anyname_CPP : Inherits VB_Parent
 End Class
 
 Module Anyname_CPP_Module
-    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Anyname_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Anyname_Close(cPtr As IntPtr)
     End Sub
-    <DllImport(("CPP_Managed.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Anyname_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
     End Function
 End Module

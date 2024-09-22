@@ -153,6 +153,7 @@ Module UI_Generator
 
             ' CPP_Enum.h
             sw = New StreamWriter(HomeDir.FullName + "CPP_Native/CPP_Enum.h")
+            sw.WriteLine("// this file is automatically created by UI_Generator.vb")
             sw.WriteLine("#pragma once")
             sw.WriteLine("enum ccListFunctions")
             sw.WriteLine("{")

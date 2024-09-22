@@ -1,3 +1,4 @@
+// this file is automatically created by UI_Generator.vb
 #pragma once
 enum ccListFunctions
 {

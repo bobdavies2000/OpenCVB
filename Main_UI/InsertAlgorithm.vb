@@ -46,7 +46,7 @@ Public Class InsertAlgorithm
             Case algType.addCPP
                 VBoutputName = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\" + split(0) + ".vb")
 
-                CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Native\CPP_Algorithms.h")
+                CPPoutputName = New FileInfo(Main_UI.HomeDir.FullName + "CPP_Native\CPP_NativeClasses.h")
 
                 ret = MsgBox("Would you like to add the C++ algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + "_VB" +
                              vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name +
@@ -114,10 +114,10 @@ Public Class InsertAlgorithm
     End Sub
     Private Sub AddAlgorithm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AlgorithmName.Text = Main_UI.AvailableAlgorithms.Text
-        vbSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "\OpenCVB.snippets\VB_Class - new Class.snippet")
-        cppSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\CPP Class - new C++.snippet")
-        cppAISnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\CPP Class - AI_Generated.snippet")
-        CSSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\CSharp_Class - new Class.snippet")
+        vbSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "\OpenCVB.snippets\a VB_Class.snippet")
+        cppSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\UnManaged (Native) C++ Class - both VB and C++.snippet")
+        cppAISnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\Managed C++ Class - AI_Generated.snippet")
+        CSSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\a CSharp Class.snippet")
         pyStream = File.ReadAllLines(Main_UI.HomeDir.FullName + "Python\AddWeighted_PS.py")
     End Sub
     Private Sub AddCPP_Click(sender As Object, e As EventArgs) Handles AddCPP.Click
@@ -128,8 +128,7 @@ Public Class InsertAlgorithm
         Dim split = AlgorithmName.Text.Split("_")
         Dim nameNoCPP As String = split(0) + "_" + split(1)
 
-        Dim createCPPfile As Boolean, createVBfile As Boolean
-        If CPPoutputName.Exists = False Then createCPPfile = True
+        Dim createVBfile As Boolean
         If VBoutputName.Exists = False Then createVBfile = True
 
         Dim trigger As Boolean
@@ -158,39 +157,24 @@ Public Class InsertAlgorithm
         sw.Close()
 
         sw = New StreamWriter(CPPoutputName.FullName, True)
-        If createCPPfile Then
-            sw.WriteLine("#include <cstdlib>")
-            sw.WriteLine("#include <cstdio>")
-            sw.WriteLine("#include <iostream>")
-            sw.WriteLine("#include <algorithm>")
-            sw.WriteLine("#include <opencv2/core.hpp>")
-            sw.WriteLine("#include <opencv2/ximgproc.hpp>")
-            sw.WriteLine("#include <opencv2/highgui.hpp>")
-            sw.WriteLine("#include <opencv2/core/utility.hpp>")
-            sw.WriteLine("using namespace std;")
-            sw.WriteLine("using namespace  cv;")
-        Else
-            sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf + vbCrLf)
-        End If
+        sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf + vbCrLf)
         For Each line In cppCode
             line = line.Replace("'//", "")
             sw.WriteLine(line)
         Next
         sw.Close()
 
-        If createCPPfile And createVBfile Then
-            MsgBox("Be sure to add: " + CPPoutputName.Name + vbCrLf + vbCrLf + "to the 'CPP_Native' project" + vbCrLf + vbCrLf +
-                   "And add " + VBoutputName.Name + " to the 'VB_Classes' project" + vbCrLf + vbCrLf +
-                   "And edit the algorithm in:" + vbCrLf + vbCrLf + VBoutputName.Name + vbCrLf + vbCrLf + CPPoutputName.Name)
-        ElseIf createCPPfile Then
-            MsgBox("Be sure to add: " + CPPoutputName.Name + vbCrLf + vbCrLf + "to the 'CPP_Native' project" + vbCrLf + vbCrLf +
-                   "And edit the algorithm in:" + vbCrLf + vbCrLf + VBoutputName.Name + vbCrLf + vbCrLf + CPPoutputName.Name)
-        ElseIf createVBfile Then
+        If createVBfile Then
             MsgBox("Be sure to add: " + VBoutputName.Name + " to the 'VB_Classes' project" + vbCrLf + vbCrLf +
                    "And edit the algorithm in:" + vbCrLf + vbCrLf + VBoutputName.Name + vbCrLf + vbCrLf + CPPoutputName.Name)
         Else
             MsgBox("Edit the new algorithm in " + vbCrLf + vbCrLf + VBoutputName.Name + vbCrLf + vbCrLf + CPPoutputName.Name)
         End If
+        Dim UIProcess As New Process
+        UIProcess.StartInfo.FileName = Main_UI.HomeDir.FullName + "UI_Generator\bin\X64\Release\UI_Generator.exe"
+        UIProcess.StartInfo.WorkingDirectory = Main_UI.HomeDir.FullName + "UI_Generator\bin\X64\Release\"
+        UIProcess.StartInfo.Arguments = "All"
+        UIProcess.Start()
         Me.Close()
     End Sub
     Private Sub AddOpenGL_Click(sender As Object, e As EventArgs) Handles AddOpenGL.Click

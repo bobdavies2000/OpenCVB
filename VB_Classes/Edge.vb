@@ -1306,3 +1306,41 @@ Public Class Edge_CloudSegments : Inherits VB_Parent
         dst2 = edges.dst2
     End Sub
 End Class
+
+
+
+
+Public Class Edge_Diff_CPP_VB : Inherits VB_Parent
+    Public Sub New()
+        cPtr = Edge_Diff_Open()
+        labels = {"", "", "Grayscale image of src", "dst3Label"}
+        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
+        desc = "Ignore edges with zero - in C++ because it needs to be optimized."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+
+        Dim cppData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim imagePtr = Edge_Diff_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        handleSrc.Free()
+
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, If(src.Channels = 3, cvb.MatType.CV_8UC3, cvb.MatType.CV_8UC1), imagePtr)
+    End Sub
+    Public Sub Close()
+        Edge_Diff_Close(cPtr)
+    End Sub
+End Class
+
+Module EdgeDiff_CPP_Module
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edge_Diff_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Edge_Diff_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edge_Diff_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    End Function
+End Module
