@@ -43,6 +43,7 @@ Partial Class OptionsGlobal
         Me.MaxDepthBar = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.UseReliableDepth = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.HighlightColor = New System.Windows.Forms.ComboBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
@@ -78,7 +79,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.UseReliableDepth = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -336,6 +336,16 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
+        '
+        'UseReliableDepth
+        '
+        Me.UseReliableDepth.AutoSize = True
+        Me.UseReliableDepth.Location = New System.Drawing.Point(24, 227)
+        Me.UseReliableDepth.Name = "UseReliableDepth"
+        Me.UseReliableDepth.Size = New System.Drawing.Size(254, 24)
+        Me.UseReliableDepth.TabIndex = 75
+        Me.UseReliableDepth.Text = "Use Reliable Depth/PointCloud"
+        Me.UseReliableDepth.UseVisualStyleBackColor = True
         '
         'Label1
         '
@@ -691,16 +701,6 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'UseReliableDepth
-        '
-        Me.UseReliableDepth.AutoSize = True
-        Me.UseReliableDepth.Location = New System.Drawing.Point(24, 227)
-        Me.UseReliableDepth.Name = "UseReliableDepth"
-        Me.UseReliableDepth.Size = New System.Drawing.Size(254, 24)
-        Me.UseReliableDepth.TabIndex = 75
-        Me.UseReliableDepth.Text = "Use Reliable Depth/PointCloud"
-        Me.UseReliableDepth.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '

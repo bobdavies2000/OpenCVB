@@ -484,7 +484,6 @@ End Enum
 	If algorithmName = "Color8U_Denoise_CS" Then return new Color8U_Denoise_CS
 	If algorithmName = "Color8U_Depth" Then return new Color8U_Depth
 	If algorithmName = "Color8U_Depth_CS" Then return new Color8U_Depth_CS
-	If algorithmName = "Color8U_DepthSegments" Then return new Color8U_DepthSegments
 	If algorithmName = "Color8U_Grayscale" Then return new Color8U_Grayscale
 	If algorithmName = "Color8U_Grayscale_CS" Then return new Color8U_Grayscale_CS
 	If algorithmName = "Color8U_Hue" Then return new Color8U_Hue

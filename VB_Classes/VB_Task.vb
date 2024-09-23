@@ -611,6 +611,7 @@ Public Class VBtask : Implements IDisposable
             allOptions.layoutOptions(normalRequest:=True)
         End If
 
+        Application.DoEvents()
         updateSettings()
 
         If task.testAllRunning = False Then
@@ -656,8 +657,6 @@ Public Class VBtask : Implements IDisposable
             task.noDepthMask = New cvb.Mat(rows, cols, cvb.MatType.CV_8U, cvb.Scalar.All(0))
             task.depthMask = New cvb.Mat(rows, cols, cvb.MatType.CV_8U, cvb.Scalar.All(0))
         End If
-
-        Application.DoEvents()
 
         ' run any universal algorithms here
         task.IMU_RawAcceleration = task.IMU_Acceleration
@@ -765,7 +764,7 @@ Public Class VBtask : Implements IDisposable
 
         Dim currSize As cvb.Size = New cvb.Size(task.dst2.Cols, task.dst2.Rows)
         If task.paused = False And src.Size = currSize Then
-            MainUI_Algorithm.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
+            MainUI_Algorithm.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
             task.FirstPass = False
             postProcess(src)
         End If

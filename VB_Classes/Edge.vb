@@ -1311,7 +1311,7 @@ End Class
 
 
 Public Class Edge_DiffX_CPP_VB : Inherits VB_Parent
-    Dim segments As New Hist_CloudSegments
+    Public segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
         task.redOptions.XReduction.Checked = True
@@ -1319,6 +1319,7 @@ Public Class Edge_DiffX_CPP_VB : Inherits VB_Parent
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        segments.reductionVal = "X"
         segments.Run(src)
         src = segments.dst1 ' the byte version of the segmented image.
 
@@ -1343,7 +1344,7 @@ End Class
 
 
 Public Class Edge_DiffY_CPP_VB : Inherits VB_Parent
-    Dim segments As New Hist_CloudSegments
+    Public segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
         task.redOptions.YReduction.Checked = True
@@ -1351,6 +1352,7 @@ Public Class Edge_DiffY_CPP_VB : Inherits VB_Parent
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        segments.reductionVal = "Y"
         segments.Run(src)
         src = segments.dst1 ' the byte version of the segmented image.
 
@@ -1375,7 +1377,7 @@ End Class
 
 
 Public Class Edge_DiffZ_CPP_VB : Inherits VB_Parent
-    Dim segments As New Hist_CloudSegments
+    Public segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
         task.redOptions.ZReduction.Checked = True
@@ -1383,6 +1385,7 @@ Public Class Edge_DiffZ_CPP_VB : Inherits VB_Parent
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        segments.reductionVal = "Z"
         segments.Run(src)
         src = segments.dst1 ' the byte version of the segmented image.
 
@@ -1414,22 +1417,19 @@ Public Class Edge_DiffXYZ : Inherits VB_Parent
     Dim diffZ As New Edge_DiffZ_CPP_VB
     Dim mats As New Mat_4Click
     Public Sub New()
-        desc = "Combine the edges found in Edge_DiffX and Edge_DiffY of the cloud XY values"
+        desc = "Combine the edges found in Edge_DiffX/Y/Z and Edge_DiffY of the cloud XY values"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        task.redOptions.XReduction.Checked = True
         diffX.Run(src)
         mats.mat(0) = diffX.dst3
 
-        task.redOptions.YReduction.Checked = True
         diffY.Run(src)
         mats.mat(1) = diffY.dst3
 
-        task.redOptions.ZReduction.Checked = True
         diffZ.Run(src)
         mats.mat(2) = diffZ.dst3
 
-        mats.mat(3) = diffX.dst2 Or diffY.dst2 Or diffZ.dst2
+        mats.mat(3) = diffX.dst2 Or diffY.dst2 ' diffz is too much...
 
         mats.Run(empty)
         dst2 = mats.dst2

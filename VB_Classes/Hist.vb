@@ -1367,6 +1367,7 @@ Public Class Hist_CloudSegments : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Public trimHist As New cvb.Mat
     Dim options As New Options_Outliers
+    Public reductionVal As String = "X"
     Public Sub New()
         task.redOptions.UseDepth.Checked = True
         If standalone Then task.redOptions.XReduction.Checked = True
@@ -1380,17 +1381,17 @@ Public Class Hist_CloudSegments : Inherits VB_Parent
 
         Dim index As Integer
         Dim mm As mmData
-        If task.redOptions.XReduction.Checked Then
+        If reductionVal = "X" Then
             index = 0
             mm.minVal = -task.xRange
             mm.maxVal = task.xRange
         End If
-        If task.redOptions.YReduction.Checked Then
+        If reductionVal = "Y" Then
             index = 1
             mm.minVal = -task.yRange
             mm.maxVal = task.yRange
         End If
-        If task.redOptions.ZReduction.Checked Then
+        If reductionVal = "Z" Then
             index = 2
             mm.minVal = 0
             mm.maxVal = task.MaxZmeters
@@ -1399,22 +1400,19 @@ Public Class Hist_CloudSegments : Inherits VB_Parent
         If src.Type <> cvb.MatType.CV_32FC1 Then src = task.pcSplit(index)
         src = (src - mm.minVal).ToMat
 
-        Static incr As Single
-        If task.heartBeat Or task.optionsChanged Then
-            incr = (mm.maxVal - mm.minVal) / task.histogramBins
-            plot.minRange = mm.minVal
-            plot.maxRange = mm.maxVal
-            plot.Run(src)
-            dst2 = plot.dst2.Clone
-            labels(3) = "Min = " + Format(mm.minVal, fmt1) + " max = " + Format(mm.maxVal, fmt1)
+        Dim incr = (mm.maxVal - mm.minVal) / task.histogramBins
+        plot.minRange = mm.minVal
+        plot.maxRange = mm.maxVal
+        plot.Run(src)
+        dst2 = plot.dst2.Clone
+        labels(3) = "Min = " + Format(mm.minVal, fmt1) + " max = " + Format(mm.maxVal, fmt1)
 
-            dst1.SetTo(0)
-            For i = 0 To plot.histogram.Rows - 1
-                Dim mask = src.InRange(i * incr, (i + 1) * incr).ConvertScaleAbs
-                dst1.SetTo(i + 1, mask)
-            Next
-            dst1.SetTo(0, task.noDepthMask)
-        End If
+        dst1.SetTo(0)
+        For i = 0 To plot.histogram.Rows - 1
+            Dim mask = src.InRange(i * incr, (i + 1) * incr).ConvertScaleAbs
+            dst1.SetTo(i + 1, mask)
+        Next
+        dst1.SetTo(0, task.noDepthMask)
         dst3 = ShowPalette(dst1 * 255 / task.histogramBins)
         dst3.SetTo(0, task.noDepthMask)
     End Sub
