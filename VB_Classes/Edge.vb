@@ -1319,10 +1319,8 @@ Public Class Edge_DiffX_CPP_VB : Inherits VB_Parent
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            segments.Run(src)
-            src = segments.dst1 ' the byte version of the segmented image.
-        End If
+        segments.Run(src)
+        src = segments.dst1 ' the byte version of the segmented image.
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
@@ -1353,10 +1351,8 @@ Public Class Edge_DiffY_CPP_VB : Inherits VB_Parent
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            segments.Run(src)
-            src = segments.dst1 ' the byte version of the segmented image.
-        End If
+        segments.Run(src)
+        src = segments.dst1 ' the byte version of the segmented image.
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
@@ -1371,5 +1367,72 @@ Public Class Edge_DiffY_CPP_VB : Inherits VB_Parent
     End Sub
     Public Sub Close()
         Edge_DiffY_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Edge_DiffZ_CPP_VB : Inherits VB_Parent
+    Dim segments As New Hist_CloudSegments
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        task.redOptions.ZReduction.Checked = True
+        cPtr = Edge_DiffY_Open()
+        desc = "Ignore edges with zero - in C++ because it needs to be optimized."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        segments.Run(src)
+        src = segments.dst1 ' the byte version of the segmented image.
+
+        Dim cppData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim imagePtr = Edge_DiffY_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        handleSrc.Free()
+
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr)
+        dst3 = segments.dst3
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+    End Sub
+    Public Sub Close()
+        Edge_DiffY_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Edge_DiffXYZ : Inherits VB_Parent
+    Dim diffX As New Edge_DiffX_CPP_VB
+    Dim diffY As New Edge_DiffY_CPP_VB
+    Dim diffZ As New Edge_DiffZ_CPP_VB
+    Dim mats As New Mat_4Click
+    Public Sub New()
+        desc = "Combine the edges found in Edge_DiffX and Edge_DiffY of the cloud XY values"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        task.redOptions.XReduction.Checked = True
+        diffX.Run(src)
+        mats.mat(0) = diffX.dst3
+
+        task.redOptions.YReduction.Checked = True
+        diffY.Run(src)
+        mats.mat(1) = diffY.dst3
+
+        task.redOptions.ZReduction.Checked = True
+        diffZ.Run(src)
+        mats.mat(2) = diffZ.dst3
+
+        mats.mat(3) = diffX.dst2 Or diffY.dst2 Or diffZ.dst2
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
     End Sub
 End Class

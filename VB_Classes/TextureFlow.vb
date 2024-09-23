@@ -28,14 +28,13 @@ End Class
 
 
 Public Class TextureFlow_Depth : Inherits VB_Parent
-    Dim texture As TextureFlow_Basics
+    Dim flow As New TextureFlow_Basics
     Public Sub New()
-        texture = New TextureFlow_Basics()
         desc = "Display texture flow in the depth data"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        texture.Run(task.depthRGB)
-        dst2 = texture.dst2
+        flow.Run(task.depthRGB)
+        dst2 = flow.dst2
     End Sub
 End Class
 
@@ -45,18 +44,17 @@ End Class
 
 
 Public Class TextureFlow_Reduction : Inherits VB_Parent
-    Dim texture As TextureFlow_Basics
+    Dim flow As New TextureFlow_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        texture = New TextureFlow_Basics
         desc = "Display texture flow in the reduced color image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2
 
-        texture.Run(reduction.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR))
-        dst3 = texture.dst2
+        flow.Run(reduction.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR))
+        dst3 = flow.dst2
     End Sub
 End Class
 
@@ -67,11 +65,18 @@ End Class
 
 
 Public Class TextureFlow_DepthSegments : Inherits VB_Parent
-
+    Dim segments As New Hist_CloudSegments
+    Dim diffx As New Edge_DiffX_CPP_VB
+    Dim flow As New TextureFlow_Basics
     Public Sub New()
+        labels = {"", "", "TextureFlow output", "TextureFlow Input"}
         desc = "Find the texture flow for the depth segments output"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-
+        segments.Run(src)
+        diffx.Run(segments.dst1)
+        dst3 = segments.dst3
+        flow.Run(dst3)
+        dst2 = flow.dst2
     End Sub
 End Class

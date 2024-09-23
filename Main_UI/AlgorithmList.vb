@@ -484,6 +484,7 @@ End Enum
 	If algorithmName = "Color8U_Denoise_CS" Then return new Color8U_Denoise_CS
 	If algorithmName = "Color8U_Depth" Then return new Color8U_Depth
 	If algorithmName = "Color8U_Depth_CS" Then return new Color8U_Depth_CS
+	If algorithmName = "Color8U_DepthSegments" Then return new Color8U_DepthSegments
 	If algorithmName = "Color8U_Grayscale" Then return new Color8U_Grayscale
 	If algorithmName = "Color8U_Grayscale_CS" Then return new Color8U_Grayscale_CS
 	If algorithmName = "Color8U_Hue" Then return new Color8U_Hue
@@ -893,7 +894,9 @@ End Enum
 	If algorithmName = "Edge_Deriche_CPP_CS" Then return new Edge_Deriche_CPP_CS
 	If algorithmName = "Edge_Deriche_CPP_VB" Then return new Edge_Deriche_CPP_VB
 	If algorithmName = "Edge_DiffX_CPP_VB" Then return new Edge_DiffX_CPP_VB
+	If algorithmName = "Edge_DiffXYZ" Then return new Edge_DiffXYZ
 	If algorithmName = "Edge_DiffY_CPP_VB" Then return new Edge_DiffY_CPP_VB
+	If algorithmName = "Edge_DiffZ_CPP_VB" Then return new Edge_DiffZ_CPP_VB
 	If algorithmName = "Edge_HSV" Then return new Edge_HSV
 	If algorithmName = "Edge_HSV_CS" Then return new Edge_HSV_CS
 	If algorithmName = "Edge_Laplacian" Then return new Edge_Laplacian

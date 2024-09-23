@@ -429,3 +429,41 @@ Public Class Color8U_BlackAndWhite : Inherits VB_Parent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+
+
+Public Class Color8U_DepthSegments : Inherits VB_Parent
+    Dim diffX As New Edge_DiffX_CPP_VB
+    Dim diffY As New Edge_DiffY_CPP_VB
+    Dim diffZ As New Edge_DiffZ_CPP_VB
+    Dim mats As New Mat_4Click
+    Public Sub New()
+        desc = "Combine the edges found in Edge_DiffX and Edge_DiffY of the cloud XY values"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        task.redOptions.XReduction.Checked = True
+        diffX.Run(src)
+        mats.mat(0) = diffX.dst3
+
+        task.redOptions.YReduction.Checked = True
+        diffY.Run(src)
+        mats.mat(1) = diffY.dst3
+
+        task.redOptions.ZReduction.Checked = True
+        diffZ.Run(src)
+        mats.mat(2) = diffZ.dst3
+
+        mats.mat(3) = diffX.dst2 Or diffY.dst2 Or diffZ.dst2
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+    End Sub
+End Class
