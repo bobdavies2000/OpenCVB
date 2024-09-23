@@ -1310,11 +1310,12 @@ End Class
 
 
 
-Public Class Edge_Diff_CPP_VB : Inherits VB_Parent
+Public Class Edge_DiffX_CPP_VB : Inherits VB_Parent
     Dim segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
-        cPtr = Edge_Diff_Open()
+        task.redOptions.XReduction.Checked = True
+        cPtr = Edge_DiffX_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -1326,25 +1327,49 @@ Public Class Edge_Diff_CPP_VB : Inherits VB_Parent
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Edge_Diff_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        Dim imagePtr = Edge_DiffX_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
         dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr)
         dst3 = segments.dst3
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
     End Sub
     Public Sub Close()
-        Edge_Diff_Close(cPtr)
+        Edge_DiffX_Close(cPtr)
     End Sub
 End Class
 
-Module EdgeDiff_CPP_Module
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_Diff_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Edge_Diff_Close(cPtr As IntPtr)
+
+
+
+
+Public Class Edge_DiffY_CPP_VB : Inherits VB_Parent
+    Dim segments As New Hist_CloudSegments
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        task.redOptions.YReduction.Checked = True
+        cPtr = Edge_DiffY_Open()
+        desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_Diff_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
-    End Function
-End Module
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            segments.Run(src)
+            src = segments.dst1 ' the byte version of the segmented image.
+        End If
+
+        Dim cppData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim imagePtr = Edge_DiffY_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        handleSrc.Free()
+
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr)
+        dst3 = segments.dst3
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+    End Sub
+    Public Sub Close()
+        Edge_DiffY_Close(cPtr)
+    End Sub
+End Class

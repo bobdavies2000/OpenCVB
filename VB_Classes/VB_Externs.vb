@@ -1209,4 +1209,30 @@ Module VB_Externs
                                   ByVal cx As Integer, ByVal cy As Integer, ByVal uFlags As UInteger) As Boolean
     End Function
 
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edge_DiffX_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Edge_DiffX_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edge_DiffX_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    End Function
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edge_DiffY_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Edge_DiffY_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edge_DiffY_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    End Function
 End Module

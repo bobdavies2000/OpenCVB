@@ -26,8 +26,6 @@ Module opencv_module
         Dim Bottom As Integer
     End Structure
 End Module
-
-
 Public Class Main_UI
     Public Shared settings As jsonClass.ApplicationStorage
     Public Shared cameraNames As List(Of String)
@@ -133,6 +131,7 @@ Public Class Main_UI
     Dim testAllEndingRes As Integer
     Dim windowsVersion As Integer
     Dim algolist As algorithmList = New algorithmList
+    Dim magIndex As Integer
 
 #End Region
 #Region "Non-volatile"
@@ -1079,7 +1078,6 @@ Public Class Main_UI
 
         'detectorObj = New CameraDetector
         'detectorObj.StartDetector()
-
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         saveAlgorithmName = "" ' this will close the current algorithm.
@@ -1089,7 +1087,6 @@ Public Class Main_UI
         cameraTaskHandle = Nothing
 
         killPython()
-
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastAlgorithmFrame As Integer
@@ -1261,7 +1258,7 @@ Public Class Main_UI
         parms.main_hwnd = Me.Handle
         parms.mainFormLocation = New cvb.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
 
-        parms.WorkingRes = settings.WorkingRes
+        parms.workingRes = settings.WorkingRes
         parms.captureRes = settings.captureRes
         parms.displayRes = settings.displayRes
         parms.algName = AvailableAlgorithms.Text
@@ -1676,4 +1673,16 @@ Public Class Main_UI
         If parms.algName.EndsWith(".py") Then killPython()
         frameCount = 0
     End Sub
+    Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
+        Dim ratio = task.dst2.Width / camPic(0).Width
+        Dim r = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+        If r.Width = 0 Or r.Height = 0 Then Exit Sub
+        Dim img = dst(drawRectPic)(r).Resize(New cvb.Size(drawRect.Width * 5, drawRect.Height * 5))
+        cvb.Cv2.ImShow("DrawRect Region " + CStr(magIndex), img)
+    End Sub
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles Magnify.Click
+        MagnifyTimer.Enabled = True
+        magIndex += 1
+    End Sub
 End Class
+

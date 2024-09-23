@@ -60037,10 +60037,10 @@ namespace CS_Classes
 
     public class Texture_Flow_Depth_CS : VB_Parent
     {
-        Texture_Flow texture;
+        TextureFlow_Basics texture;
         public Texture_Flow_Depth_CS()
         {
-            texture = new Texture_Flow();
+            texture = new TextureFlow_Basics();
             desc = "Display texture flow in the depth data";
         }
         public void RunAlg(Mat src)
@@ -60055,11 +60055,11 @@ namespace CS_Classes
 
     public class Texture_Flow_Reduction_CS : VB_Parent
     {
-        Texture_Flow texture;
+        TextureFlow_Basics texture;
         Reduction_Basics reduction = new Reduction_Basics();
         public Texture_Flow_Reduction_CS()
         {
-            texture = new Texture_Flow();
+            texture = new TextureFlow_Basics();
             desc = "Display texture flow in the reduced color image";
         }
         public void RunAlg(Mat src)

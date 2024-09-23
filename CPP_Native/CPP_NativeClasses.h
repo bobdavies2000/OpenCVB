@@ -7363,12 +7363,12 @@ int* Denoise_SinglePixels_Run(Denoise_SinglePixels* cPtr, int* dataPtr, int rows
 
 
 
-class Edge_Diff
+class Edge_DiffX
 {
 private:
 public:
     Mat src, dst;
-    Edge_Diff(){}
+    Edge_DiffX() {}
     void RunCPP() {
         if (dst.rows == 0) dst = Mat(src.rows, src.cols, CV_8U);
         dst.setTo(0);
@@ -7376,32 +7376,95 @@ public:
         uchar* out = dst.data;
         for (int y = 0; y < src.rows; y++)
         {
+            int segID = 0;
             for (int x = 0; x < src.cols - 1; x++)
             {
                 int index = y * src.cols + x;
                 int v1 = in[index];
                 int v2 = in[index + 1];
                 if (v1 == 0 || v2 == 0) continue;
+                if (v1 == 0 && v2 != segID)
+                {
+                    out[index + 1] = 255;
+                    segID = v2;
+                    continue;
+                }
                 if (v1 == v2) continue;
                 out[index] = 255;
+                segID = v2;
             }
         }
-    } 
+    }
 };
 extern "C" __declspec(dllexport)
-Edge_Diff *Edge_Diff_Open() {
-    Edge_Diff *cPtr = new Edge_Diff();
+Edge_DiffX* Edge_DiffX_Open() {
+    Edge_DiffX* cPtr = new Edge_DiffX();
     return cPtr;
 }
 extern "C" __declspec(dllexport)
-void Edge_Diff_Close(Edge_Diff *cPtr)
+void Edge_DiffX_Close(Edge_DiffX* cPtr)
 {
     delete cPtr;
 }
 extern "C" __declspec(dllexport)
-int *Edge_Diff_RunCPP(Edge_Diff *cPtr, int *dataPtr, int rows, int cols, int channels)
+int* Edge_DiffX_RunCPP(Edge_DiffX* cPtr, int* dataPtr, int rows, int cols, int channels)
 {
-		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
-		cPtr->RunCPP();
-		return (int *) cPtr->dst.data; 
+    cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
+    cPtr->RunCPP();
+    return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+class Edge_DiffY
+{
+private:
+public:
+    Mat src, dst;
+    Edge_DiffY() {}
+    void RunCPP() {
+        if (dst.rows == 0) dst = Mat(src.rows, src.cols, CV_8U);
+        dst.setTo(0);
+        uchar* in = src.data;
+        uchar* out = dst.data;
+        for (int x = 0; x < src.cols; x++)
+        {
+            int segID = 0;
+            for (int y = 0; y < src.rows - 1; y++)
+            {
+                int index = y * src.cols + x;
+                int v1 = in[index];
+                int v2 = in[index + src.cols];
+                if (v1 == 0 || v2 == 0) continue;
+                if (v1 == 0 && v2 != segID)
+                {
+                    out[index + src.cols] = 255;
+                    segID = v2;
+                    continue;
+                }
+                if (v1 == v2) continue;
+                out[index] = 255;
+                segID = v2;
+            }
+        }
+    }
+};
+extern "C" __declspec(dllexport)
+Edge_DiffY* Edge_DiffY_Open() {
+    Edge_DiffY* cPtr = new Edge_DiffY();
+    return cPtr;
+}
+extern "C" __declspec(dllexport)
+void Edge_DiffY_Close(Edge_DiffY* cPtr)
+{
+    delete cPtr;
+}
+extern "C" __declspec(dllexport)
+int* Edge_DiffY_RunCPP(Edge_DiffY* cPtr, int* dataPtr, int rows, int cols, int channels)
+{
+    cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
+    cPtr->RunCPP();
+    return (int*)cPtr->dst.data;
 }

@@ -1369,7 +1369,7 @@ Public Class Hist_CloudSegments : Inherits VB_Parent
     Dim options As New Options_Outliers
     Public Sub New()
         task.redOptions.UseDepth.Checked = True
-        task.redOptions.XReduction.Checked = True
+        If standalone Then task.redOptions.XReduction.Checked = True
         dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U, 0)
         task.gOptions.FrameHistory.Value = 10
         plot.createHistogram = True

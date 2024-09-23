@@ -148,6 +148,7 @@
     <Compile Include="FeatureROI.vb" />
     <Compile Include="Stripes.vb" />
     <Compile Include="Swarm.vb" />
+    <Compile Include="TextureFlow.vb" />
     <Compile Include="VB_Common.vb" />
     <Compile Include="VB_Externs.vb" />
     <Compile Include="Foreground.vb" />

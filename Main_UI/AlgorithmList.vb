@@ -892,7 +892,8 @@ End Enum
 	If algorithmName = "Edge_DepthGap_Native_CS" Then return new Edge_DepthGap_Native_CS
 	If algorithmName = "Edge_Deriche_CPP_CS" Then return new Edge_Deriche_CPP_CS
 	If algorithmName = "Edge_Deriche_CPP_VB" Then return new Edge_Deriche_CPP_VB
-	If algorithmName = "Edge_Diff_CPP_VB" Then return new Edge_Diff_CPP_VB
+	If algorithmName = "Edge_DiffX_CPP_VB" Then return new Edge_DiffX_CPP_VB
+	If algorithmName = "Edge_DiffY_CPP_VB" Then return new Edge_DiffY_CPP_VB
 	If algorithmName = "Edge_HSV" Then return new Edge_HSV
 	If algorithmName = "Edge_HSV_CS" Then return new Edge_HSV_CS
 	If algorithmName = "Edge_Laplacian" Then return new Edge_Laplacian
@@ -3514,12 +3515,13 @@ End Enum
 	If algorithmName = "Tessallate_Triangles_CS" Then return new Tessallate_Triangles_CS
 	If algorithmName = "Texture_Basics" Then return new Texture_Basics
 	If algorithmName = "Texture_Basics_CS" Then return new Texture_Basics_CS
-	If algorithmName = "Texture_Flow" Then return new Texture_Flow
 	If algorithmName = "Texture_Flow_CS" Then return new Texture_Flow_CS
-	If algorithmName = "Texture_Flow_Depth" Then return new Texture_Flow_Depth
 	If algorithmName = "Texture_Flow_Depth_CS" Then return new Texture_Flow_Depth_CS
-	If algorithmName = "Texture_Flow_Reduction" Then return new Texture_Flow_Reduction
 	If algorithmName = "Texture_Flow_Reduction_CS" Then return new Texture_Flow_Reduction_CS
+	If algorithmName = "TextureFlow_Basics" Then return new TextureFlow_Basics
+	If algorithmName = "TextureFlow_Depth" Then return new TextureFlow_Depth
+	If algorithmName = "TextureFlow_DepthSegments" Then return new TextureFlow_DepthSegments
+	If algorithmName = "TextureFlow_Reduction" Then return new TextureFlow_Reduction
 	If algorithmName = "Thickness_Basics" Then return new Thickness_Basics
 	If algorithmName = "Thickness_Basics_CS" Then return new Thickness_Basics_CS
 	If algorithmName = "Threading_Test" Then return new Threading_Test

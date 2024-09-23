@@ -32,11 +32,13 @@ Partial Class Main_UI
         Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
         Me.TreeButton = New System.Windows.Forms.ToolStripButton()
         Me.PixelViewerButton = New System.Windows.Forms.ToolStripButton()
+        Me.Magnify = New System.Windows.Forms.ToolStripButton()
         Me.BluePlusButton = New System.Windows.Forms.ToolStripButton()
         Me.ComplexityButton = New System.Windows.Forms.ToolStripButton()
         Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
         Me.Advice = New System.Windows.Forms.ToolStripButton()
         Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
+        Me.RecentSep = New System.Windows.Forms.ToolStripSeparator()
         Me.AvailableAlgorithms = New System.Windows.Forms.ToolStripComboBox()
         Me.GroupCombo = New System.Windows.Forms.ToolStripComboBox()
         Me.AlgorithmDesc = New System.Windows.Forms.TextBox()
@@ -50,6 +52,7 @@ Partial Class Main_UI
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.MagnifyTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -57,7 +60,7 @@ Partial Class Main_UI
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackButton, Me.ForwardButton, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupCombo})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackButton, Me.ForwardButton, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.RecentSep, Me.AvailableAlgorithms, Me.GroupCombo})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(1400, 34)
@@ -127,6 +130,16 @@ Partial Class Main_UI
         Me.PixelViewerButton.Size = New System.Drawing.Size(34, 29)
         Me.PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
         '
+        'Magnify
+        '
+        Me.Magnify.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.Magnify.Image = CType(resources.GetObject("Magnify.Image"), System.Drawing.Image)
+        Me.Magnify.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.Magnify.Name = "Magnify"
+        Me.Magnify.Size = New System.Drawing.Size(34, 29)
+        Me.Magnify.Text = "Magnify - click then draw a rectangle"
+        Me.Magnify.ToolTipText = "Magnify - draw a rectangle then click"
+        '
         'BluePlusButton
         '
         Me.BluePlusButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
@@ -173,6 +186,14 @@ Partial Class Main_UI
         Me.RecentList.ShowDropDownArrow = False
         Me.RecentList.Size = New System.Drawing.Size(68, 29)
         Me.RecentList.Text = "Recent"
+        '
+        'RecentSep
+        '
+        Me.RecentSep.AutoSize = False
+        Me.RecentSep.BackColor = System.Drawing.SystemColors.ActiveCaptionText
+        Me.RecentSep.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
+        Me.RecentSep.Name = "RecentSep"
+        Me.RecentSep.Size = New System.Drawing.Size(20, 34)
         '
         'AvailableAlgorithms
         '
@@ -255,6 +276,10 @@ Partial Class Main_UI
         Me.RefreshTimer.Enabled = True
         Me.RefreshTimer.Interval = 10
         '
+        'MagnifyTimer
+        '
+        Me.MagnifyTimer.Interval = 500
+        '
         'Main_UI
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -305,5 +330,7 @@ Partial Class Main_UI
     Friend WithEvents RefreshTimer As Timer
     Friend WithEvents RecentList As ToolStripDropDownButton
     Friend WithEvents ToolTip1 As ToolTip
-
+    Friend WithEvents Magnify As ToolStripButton
+    Friend WithEvents MagnifyTimer As Timer
+    Friend WithEvents RecentSep As ToolStripSeparator
 End Class
