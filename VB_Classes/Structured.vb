@@ -335,7 +335,7 @@ End Class
 
 
 Public Class Structured_Cloud : Inherits VB_Parent
-    public options As New Options_StructuredCloud
+    Public options As New Options_StructuredCloud
     Public Sub New()
         task.gOptions.setGridSize(10)
         desc = "Attempt to impose a linear structure on the pointcloud."
@@ -440,7 +440,7 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Options.RunOpt()
+        options.RunOpt()
         hulls.Run(src)
         dst2 = hulls.dst2
 
@@ -715,9 +715,9 @@ Public Class Structured_SliceXPlot : Inherits VB_Parent
 
         Dim rect = New cvb.Rect(col, 0, If(col + options.sliceSize >= dst3.Width, dst3.Width - col,
                                options.sliceSize), dst3.Height - 1)
-        Dim mm as mmData = GetMinMax(multi.heat.topframes.dst2(rect))
+        Dim mm As mmData = GetMinMax(multi.heat.topframes.dst2(rect))
 
-        DrawCircle(dst3,New cvb.Point(col, mm.maxLoc.Y), task.DotSize + 3, cvb.Scalar.Yellow)
+        DrawCircle(dst3, New cvb.Point(col, mm.maxLoc.Y), task.DotSize + 3, cvb.Scalar.Yellow)
 
         dst2 = task.color.Clone
         Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters
@@ -754,10 +754,10 @@ Public Class Structured_SliceYPlot : Inherits VB_Parent
 
         Dim rect = New cvb.Rect(0, row, dst3.Width - 1, If(row + options.sliceSize >= dst3.Height,
                                dst3.Height - row, options.sliceSize))
-        Dim mm as mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
+        Dim mm As mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
 
         If mm.maxVal > 0 Then
-            DrawCircle(dst3,New cvb.Point(mm.maxLoc.X, row), task.DotSize + 3, cvb.Scalar.Yellow)
+            DrawCircle(dst3, New cvb.Point(mm.maxLoc.X, row), task.DotSize + 3, cvb.Scalar.Yellow)
             ' dst3.Line(New cvb.Point(mm.maxLoc.X, 0), New cvb.Point(mm.maxLoc.X, dst3.Height), task.HighlightColor, task.lineWidth, task.lineType)
             Dim filterZ = mm.maxLoc.X / dst3.Width * task.MaxZmeters
 
@@ -863,7 +863,7 @@ Public Class Structured_SliceEither : Inherits VB_Parent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst3
-        DrawCircle(dst3,New cvb.Point(task.topCameraPoint.X, dst3.Height), task.DotSize,
+        DrawCircle(dst3, New cvb.Point(task.topCameraPoint.X, dst3.Height), task.DotSize,
                     cvb.Scalar.Yellow)
         If topView Then
             dst3.Line(New cvb.Point(sliceVal, 0), New cvb.Point(sliceVal, dst3.Height),
@@ -1123,7 +1123,7 @@ Public Class Structured_SliceV : Inherits VB_Parent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst2
-        DrawCircle(dst3,New cvb.Point(task.topCameraPoint.X, 0), task.DotSize, task.HighlightColor)
+        DrawCircle(dst3, New cvb.Point(task.topCameraPoint.X, 0), task.DotSize, task.HighlightColor)
         dst3.Line(New cvb.Point(xCoordinate, 0), New cvb.Point(xCoordinate, dst3.Height), task.HighlightColor, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
@@ -1168,7 +1168,7 @@ Public Class Structured_SliceH : Inherits VB_Parent
 
         dst3 = heat.dst3
         Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
-        DrawCircle(dst3,New cvb.Point(0, task.sideCameraPoint.Y), task.DotSize, task.HighlightColor)
+        DrawCircle(dst3, New cvb.Point(0, task.sideCameraPoint.Y), task.DotSize, task.HighlightColor)
         dst3.Line(New cvb.Point(0, yPlaneOffset), New cvb.Point(dst3.Width, yPlaneOffset), task.HighlightColor, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
