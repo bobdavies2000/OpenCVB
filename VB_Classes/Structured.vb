@@ -85,63 +85,6 @@ End Class
 
 
 
-Public Class Structured_MultiSlice : Inherits VB_Parent
-    Public heat As New HeatMap_Basics
-    Public sliceMask As cvb.Mat
-    Public split() As cvb.Mat
-    Public options As New Options_Structured
-    Public Sub New()
-        desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        Dim stepSize = options.stepSize
-
-        heat.Run(src)
-
-        split = task.pointCloud.Split()
-
-        dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        For xCoordinate = 0 To src.Width - 1 Step stepSize
-            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-            If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-            Dim depthMask As New cvb.Mat
-            Dim minVal As Double, maxVal As Double
-            minVal = planeX - task.metersPerPixel
-            maxVal = planeX + task.metersPerPixel
-            cvb.Cv2.InRange(split(0).Clone, minVal, maxVal, depthMask)
-            sliceMask = depthMask
-            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
-            dst3.SetTo(255, sliceMask)
-        Next
-
-        For yCoordinate = 0 To src.Height - 1 Step stepSize
-            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
-            Dim depthMask As New cvb.Mat
-            Dim minVal As Double, maxVal As Double
-            minVal = planeY - task.metersPerPixel
-            maxVal = planeY + task.metersPerPixel
-            cvb.Cv2.InRange(split(1).Clone, minVal, maxVal, depthMask)
-            Dim tmp = depthMask
-            sliceMask = tmp Or sliceMask
-            dst3.SetTo(255, sliceMask)
-        Next
-
-        dst2 = task.color.Clone
-        dst2.SetTo(cvb.Scalar.White, dst3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
 Public Class Structured_MultiSliceLines : Inherits VB_Parent
     Dim multi As New Structured_MultiSlice
     Public lines As New Line_Basics
@@ -1380,5 +1323,58 @@ Public Class Structured_Crosshairs : Inherits VB_Parent
                 End If
             Next
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Structured_MultiSlice : Inherits VB_Parent
+    Public heat As New HeatMap_Basics
+    Public sliceMask As cvb.Mat
+    Public split() As cvb.Mat
+    Public options As New Options_Structured
+    Public Sub New()
+        desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        Dim stepSize = options.stepSize
+
+        heat.Run(src)
+
+        split = task.pointCloud.Split()
+
+        dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        For xCoordinate = 0 To src.Width - 1 Step stepSize
+            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+            Dim depthMask As New cvb.Mat
+            Dim minVal As Double, maxVal As Double
+            minVal = planeX - task.metersPerPixel
+            maxVal = planeX + task.metersPerPixel
+            cvb.Cv2.InRange(split(0).Clone, minVal, maxVal, depthMask)
+            sliceMask = depthMask
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
+            dst3.SetTo(255, sliceMask)
+        Next
+
+        For yCoordinate = 0 To src.Height - 1 Step stepSize
+            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+            Dim depthMask As New cvb.Mat
+            Dim minVal As Double, maxVal As Double
+            minVal = planeY - task.metersPerPixel
+            maxVal = planeY + task.metersPerPixel
+            cvb.Cv2.InRange(split(1).Clone, minVal, maxVal, depthMask)
+            Dim tmp = depthMask
+            sliceMask = tmp Or sliceMask
+            dst3.SetTo(255, sliceMask)
+        Next
+
+        dst2 = task.color.Clone
+        dst2.SetTo(cvb.Scalar.White, dst3)
     End Sub
 End Class
