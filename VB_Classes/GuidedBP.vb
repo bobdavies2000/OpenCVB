@@ -354,8 +354,8 @@ Public Class GuidedBP_MultiSlice : Inherits VB_Parent
                 classCount += 1
             End If
         Next
-        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst1, task.rangesTop)
-        dst2 = ShowPalette(dst1 * 255 / classCount)
+        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst0, task.rangesTop)
+        dst2 = ShowPalette(dst0 * 255 / classCount)
         labels(2) = "The nonzero horizontal slices produced " + CStr(classCount) + " classes"
 
         histSide.Run(src.Clone)
@@ -372,5 +372,99 @@ Public Class GuidedBP_MultiSlice : Inherits VB_Parent
         cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst1, task.rangesSide)
         dst3 = ShowPalette(dst1 * 255 / classCount)
         labels(3) = "The nonzero vertical slices produced " + CStr(classCount) + " classes"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GuidedBP_RedCloud : Inherits VB_Parent
+    Dim guide As New GuidedBP_MultiSlice
+    Public redCx As New RedCloud_Basics
+    Public redCy As New RedCloud_Basics
+    Public xCells As New List(Of rcData)
+    Public yCells As New List(Of rcData)
+    Public cellMapX As New cvb.Mat
+    Public cellMapY As New cvb.Mat
+    Public Sub New()
+        desc = "Identify each segment in the X and Y point cloud data"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        guide.Run(src)
+
+        redCx.Run(guide.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
+        cellMapX = task.cellMap.Clone
+        dst2 = redCx.dst2
+        xCells = New List(Of rcData)(task.redCells)
+
+        redCx.Run(guide.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
+        cellMapY = task.cellMap.Clone
+        dst3 = redCx.dst2
+        yCells = New List(Of rcData)(task.redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class GuidedBP_Regions : Inherits VB_Parent
+    Public redC As New GuidedBP_RedCloud
+    Public mats As New Mat_4Click
+    Dim options As New Options_BP_Regions
+    Public xCells As New List(Of rcData)
+    Public yCells As New List(Of rcData)
+    Public cellMapX As New cvb.Mat
+    Public cellMapY As New cvb.Mat
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
+        task.redOptions.IdentifyCells.Checked = False
+        labels(3) = "Click a quadrant in the left image and see it below."
+        desc = "Identify the top X regions in the GuidedBP_RedCloud output"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        redC.Run(src)
+
+        cellMapX = redC.cellMapX.Threshold(options.cellCount - 1, 255, cvb.ThresholdTypes.TozeroInv)
+        cellMapY = redC.cellMapY.Threshold(options.cellCount - 1, 255, cvb.ThresholdTypes.TozeroInv)
+        If standaloneTest() Then
+            dst0 = ShowPalette(cellMapX * 255 / options.cellCount)
+            dst1 = ShowPalette(cellMapY * 255 / options.cellCount)
+        End If
+
+        mats.mat(0) = redC.dst2
+        mats.mat(1) = redC.dst3
+
+        mats.mat(2).SetTo(0)
+        mats.mat(3).SetTo(0)
+
+        xCells.Clear()
+        yCells.Clear()
+
+        For i = 1 To options.cellCount
+            Dim rc = redC.xCells(i)
+            mats.mat(2)(rc.rect).SetTo(rc.naturalColor, rc.mask)
+            xCells.Add(rc)
+
+            rc = redC.yCells(i)
+            mats.mat(3)(rc.rect).SetTo(rc.naturalColor, rc.mask)
+            yCells.Add(rc)
+        Next
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+
+        labels(2) = "(left to right) Regions from cloud X, Regions from Cloud Y, Top " + CStr(options.cellCount) +
+                    " X regions, Top " + CStr(options.cellCount) + " Y regions"
     End Sub
 End Class

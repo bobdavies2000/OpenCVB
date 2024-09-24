@@ -374,7 +374,7 @@ End Class
 
 
 Public Class Color8U_MotionFiltered : Inherits VB_Parent
-    Dim colorClass As New Color8U_Basics
+    Dim color As New Color8U_Basics
     Public classCount As Integer
     Dim motion As New Motion_Basics
     Public Sub New()
@@ -384,9 +384,9 @@ Public Class Color8U_MotionFiltered : Inherits VB_Parent
         motion.Run(src)
 
         dst3 = motion.dst2
-        colorClass.Run(motion.dst2)
-        dst2 = colorClass.dst3
-        classCount = colorClass.classCount
+        color.Run(motion.dst2)
+        dst2 = color.dst3
+        classCount = color.classCount
     End Sub
 End Class
 

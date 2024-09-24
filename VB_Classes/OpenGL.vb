@@ -1944,7 +1944,7 @@ End Class
 
 
 Public Class OpenGL_ColorReduced3D : Inherits VB_Parent
-    Dim colorClass As New Color8U_Basics
+    Dim color As New Color8U_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1952,11 +1952,11 @@ Public Class OpenGL_ColorReduced3D : Inherits VB_Parent
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        colorClass.Run(src)
-        dst2 = colorClass.dst3
+        color.Run(src)
+        dst2 = color.dst3
         If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
         dst2.ConvertTo(dst1, cvb.MatType.CV_32FC3)
-        labels(2) = "There are " + CStr(colorClass.classCount) + " classes for " + task.redOptions.colorInputName
+        labels(2) = "There are " + CStr(color.classCount) + " classes for " + task.redOptions.colorInputName
         dst1 = dst1.Normalize(0, 1, cvb.NormTypes.MinMax)
         Dim split = dst1.Split()
         split(1) *= -1

@@ -5,7 +5,7 @@ Public Class Boundary_Basics : Inherits VB_Parent
     Public masks As New List(Of cvb.Mat)
     Public contours As New List(Of List(Of cvb.Point))
     Public runRedCPP As Boolean = True
-    Dim cvt As New Color8U_Basics
+    Dim color As New Color8U_Basics
     Dim prep As New RedCloud_Reduce
     Dim guided As New GuidedBP_Depth
     Public Sub New()
@@ -16,8 +16,8 @@ Public Class Boundary_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then
             If task.redOptions.UseColorOnly.Checked Then
-                cvt.Run(src)
-                dst1 = cvt.dst2
+                color.Run(src)
+                dst1 = color.dst2
             ElseIf task.redOptions.UseDepth.Checked Then
                 prep.Run(src)
                 dst1 = prep.dst2

@@ -331,14 +331,14 @@ End Structure
 
 Public Class ML_Color2Depth : Inherits VB_Parent
     Dim minMax As New Grid_MinMaxDepth
-    Dim colorClass As New Color8U_Basics
+    Dim color As New Color8U_Basics
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        colorClass.Run(src)
-        dst2 = colorClass.dst3
+        color.Run(src)
+        dst2 = color.dst3
         labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
 
         Dim rtree = cvb.ML.RTrees.Create()
@@ -349,7 +349,7 @@ Public Class ML_Color2Depth : Inherits VB_Parent
         For i = 0 To task.gridList.Count - 1
             Dim roi = task.gridList(i)
             Dim mls As mlColor
-            mls.colorIndex = colorClass.dst2.Get(Of Byte)(roi.Y, roi.X)
+            mls.colorIndex = color.dst2.Get(Of Byte)(roi.Y, roi.X)
             mls.x = roi.X
             mls.y = roi.Y
 
@@ -397,15 +397,15 @@ Public Structure mlColorInTier
 End Structure
 Public Class ML_ColorInTier2Depth : Inherits VB_Parent
     Dim minMax As New Grid_MinMaxDepth
-    Dim colorClass As New Color8U_Basics
+    Dim color As New Color8U_Basics
     Dim tiers As New Contour_DepthTiers
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        colorClass.Run(src)
-        dst2 = colorClass.dst3
+        color.Run(src)
+        dst2 = color.dst3
         labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
 
         Dim rtree = cvb.ML.RTrees.Create()
@@ -416,7 +416,7 @@ Public Class ML_ColorInTier2Depth : Inherits VB_Parent
         For i = 0 To task.gridList.Count - 1
             Dim roi = task.gridList(i)
             Dim mls As mlColorInTier
-            mls.colorIndex = colorClass.dst2.Get(Of Byte)(roi.Y, roi.X)
+            mls.colorIndex = color.dst2.Get(Of Byte)(roi.Y, roi.X)
             mls.x = roi.X
             mls.y = roi.Y
 
@@ -466,7 +466,6 @@ Public Class ML_RemoveDups_CPP_VB : Inherits VB_Parent
         desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-
         If src.Type = cvb.MatType.CV_8UC3 Then
             dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_32S, src.CvtColor(cvb.ColorConversionCodes.BGR2BGRA).Data)
         Else
@@ -495,3 +494,108 @@ Public Class ML_RemoveDups_CPP_VB : Inherits VB_Parent
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class ML_LearnZfromXGray : Inherits VB_Parent
+    Dim regions As New GuidedBP_Regions
+    Public Sub New()
+        task.redOptions.IdentifyCells.Checked = False
+        desc = "This runs and is helpful to understanding how to use rtree.  Learn Z from X, Y, and grayscale of the RedCloud cells."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Dim gray = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) ' input to ML
+
+        regions.Run(src)
+
+        Dim ptList As New List(Of cvb.Point3f)
+        Dim mlInput As New List(Of cvb.Vec3f)
+        Dim mResponse As New List(Of Single)
+        For y = 0 To regions.cellMapX.Height - 1
+            For x = 0 To regions.cellMapX.Width - 1
+                Dim zVal = task.pcSplit(2).Get(Of Single)(y, x)
+                Dim val = CSng(gray.Get(Of Byte)(y, x))
+                If zVal = 0 Then
+                    ptList.Add(New cvb.Point3f(CSng(x), CSng(y), val))
+                Else
+                    mlInput.Add(New cvb.Vec3f(val, x, y))
+                    mResponse.Add(zVal)
+                End If
+            Next
+        Next
+
+        Dim rtree = cvb.ML.RTrees.Create()
+        Dim mLearn As cvb.Mat = cvb.Mat.FromPixelData(mlInput.Count, 3, cvb.MatType.CV_32F, mlInput.ToArray)
+        Dim response As cvb.Mat = cvb.Mat.FromPixelData(mResponse.Count, 1, cvb.MatType.CV_32F, mResponse.ToArray)
+        rtree.Train(mLearn, cvb.ML.SampleTypes.RowSample, response)
+
+        Dim predMat = cvb.Mat.FromPixelData(ptList.Count, 3, cvb.MatType.CV_32F, ptList.ToArray)
+        Dim output = New cvb.Mat(ptList.Count, 1, cvb.MatType.CV_32FC1, cvb.Scalar.All(0))
+        rtree.Predict(predMat, output)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class ML_LearnRegion : Inherits VB_Parent
+    Dim regions As New GuidedBP_Regions
+    Dim color As New Color8U_Basics
+    Public Sub New()
+        task.gOptions.setDisplay1()
+        task.redOptions.IdentifyCells.Checked = False
+        labels = {"", "", "Entire image after ML", "ML Predictions where no region was defined."}
+        desc = "Learn region from X, Y, and grayscale for the RedCloud cells."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        regions.Run(src)
+
+        color.Run(src)
+        dst1 = color.dst3
+
+        Dim graySrc = If(dst1.Channels = 1, dst1, dst1.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)) ' input to ML
+        Dim regionX = regions.cellMapX ' Target variable
+
+        Dim ptList As New List(Of cvb.Point3f)
+        Dim mlInput As New List(Of cvb.Vec3f)
+        Dim mResponse As New List(Of Single)
+
+        For y = 0 To regions.cellMapX.Height - 1
+            For x = 0 To regions.cellMapX.Width - 1
+                Dim gray = CSng(graySrc.Get(Of Byte)(y, x))
+                Dim region = CSng(regionX.Get(Of Byte)(y, x))
+                If region = 0 Then
+                    ptList.Add(New cvb.Point3f(CSng(x), CSng(y), gray))
+                Else
+                    mlInput.Add(New cvb.Vec3f(gray, x, y))
+                    mResponse.Add(region)
+                End If
+            Next
+        Next
+
+        Dim rtree = cvb.ML.RTrees.Create()
+        Dim mLearn As cvb.Mat = cvb.Mat.FromPixelData(mlInput.Count, 3, cvb.MatType.CV_32F, mlInput.ToArray)
+        Dim response As cvb.Mat = cvb.Mat.FromPixelData(mResponse.Count, 1, cvb.MatType.CV_32F, mResponse.ToArray)
+        rtree.Train(mLearn, cvb.ML.SampleTypes.RowSample, response)
+
+        Dim predMat = cvb.Mat.FromPixelData(ptList.Count, 3, cvb.MatType.CV_32F, ptList.ToArray)
+        Dim output = New cvb.Mat(ptList.Count, 1, cvb.MatType.CV_32FC1, cvb.Scalar.All(0))
+        rtree.Predict(predMat, output)
+
+        regions.mats.mat(0).CopyTo(dst2)
+        dst3.SetTo(0)
+        For i = 0 To ptList.Count - 1
+            Dim pt = ptList(i)
+            Dim regionID = CInt(output.Get(Of Single)(i, 0))
+            Dim rc = regions.xCells(regionID)
+            dst2.Set(Of cvb.Vec3b)(pt.Y, pt.X, rc.naturalColor)
+            dst3.Set(Of cvb.Vec3b)(pt.Y, pt.X, rc.naturalColor)
+        Next
+    End Sub
+End Class

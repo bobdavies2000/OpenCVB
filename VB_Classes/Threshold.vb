@@ -59,8 +59,8 @@ Public Class Threshold_Definitions : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Dim options As New Options_ThresholdDef
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection"}
         desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
     End Sub
@@ -135,15 +135,15 @@ End Class
 
 
 Public Class Threshold_ColorSource : Inherits VB_Parent
-    Dim colorClass As New Color8U_Basics
+    Dim color As New Color8U_Basics
     Dim byChan As New Threshold_ByChannels
     Public Sub New()
         UpdateAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.")
         desc = "Use all the alternative color sources as input to Threshold_ByChannels."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        colorClass.Run(src)
-        byChan.Run(colorClass.dst3)
+        color.Run(src)
+        byChan.Run(color.dst3)
         dst2 = byChan.dst2
         dst3 = byChan.dst3
         labels = byChan.labels

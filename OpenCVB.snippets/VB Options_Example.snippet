@@ -8,6 +8,7 @@
             <Code Language="VB">
                 <![CDATA[
 Public Class Options_Example : Inherits VB_Parent
+    Public count
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("firstSlider", 0, 100, 50)
@@ -15,7 +16,7 @@ Public Class Options_Example : Inherits VB_Parent
     End Sub
     Public Sub RunOpt()
         static firstSlider = findSlider("firstSlider")
-        dim test = firstSlider.value
+        count = firstSlider.value
     End Sub
 End Class
 ]]>

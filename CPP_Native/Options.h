@@ -2117,3 +2117,9 @@ public:
 	Options_Outliers() {
 	}
 };
+class Options_BP_Regions {
+public:
+	void RunOpt() {}
+	Options_BP_Regions() {
+	}
+};

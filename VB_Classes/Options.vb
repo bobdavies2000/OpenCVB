@@ -7735,3 +7735,19 @@ Public Class Options_Outliers : Inherits VB_Parent
         cutoffPercent = percentSlider.value / 100
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_BP_Regions : Inherits VB_Parent
+    Public cellCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of cells to identify", 1, 100, 50)
+    End Sub
+    Public Sub RunOpt()
+        Static countSlider = FindSlider("Number of cells to identify")
+        cellCount = countSlider.value
+    End Sub
+End Class

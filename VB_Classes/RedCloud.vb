@@ -982,7 +982,7 @@ End Class
 Public Class RedCloud_OutlineColor : Inherits VB_Parent
     Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
-    Dim colorClass As New Color8U_Basics
+    Dim color As New Color8U_Basics
     Public Sub New()
         labels(3) = "Color input to RedCloud_Basics with depth boundary blocking color connections."
         desc = "Use the depth outline as input to RedCloud_Basics"
@@ -990,10 +990,10 @@ Public Class RedCloud_OutlineColor : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         outline.Run(task.depthMask)
 
-        colorClass.Run(src)
-        dst1 = colorClass.dst2 + 1
+        color.Run(src)
+        dst1 = color.dst2 + 1
         dst1.SetTo(0, outline.dst2)
-        dst3 = ShowPalette(dst1 * 255 / colorClass.classCount)
+        dst3 = ShowPalette(dst1 * 255 / color.classCount)
 
         redC.Run(dst1)
         dst2 = redC.dst2
@@ -1718,7 +1718,7 @@ End Class
 
 
 Public Class RedCloud_Combine : Inherits VB_Parent
-    Public colorClass As New Color8U_Basics
+    Dim color As New Color8U_Basics
     Public guided As New GuidedBP_Depth
     Public redMasks As New RedCloud_Basics
     Public combinedCells As New List(Of rcData)
@@ -1732,8 +1732,8 @@ Public Class RedCloud_Combine : Inherits VB_Parent
         If task.redOptions.UseColorOnly.Checked Or task.redOptions.UseGuidedProjection.Checked Then
             redMasks.inputMask.SetTo(0)
             If src.Channels() = 3 Then
-                colorClass.Run(src)
-                dst2 = colorClass.dst2.Clone
+                color.Run(src)
+                dst2 = color.dst2.Clone
             Else
                 dst2 = src
             End If
@@ -1746,11 +1746,11 @@ Public Class RedCloud_Combine : Inherits VB_Parent
             Select Case task.redOptions.depthInputIndex
                 Case 0 ' "GuidedBP_Depth"
                     guided.Run(src)
-                    If colorClass.classCount > 0 Then guided.dst2 += colorClass.classCount
+                    If color.classCount > 0 Then guided.dst2 += color.classCount
                     guided.dst2.CopyTo(dst2, task.depthMask)
                 Case 1 ' "RedCloud_Reduce"
                     prep.Run(task.pointCloud)
-                    If colorClass.classCount > 0 Then prep.dst2 += colorClass.classCount
+                    If color.classCount > 0 Then prep.dst2 += color.classCount
                     prep.dst2.CopyTo(dst2, task.depthMask)
             End Select
         End If

@@ -1380,6 +1380,8 @@ End Enum
 	If algorithmName = "GuidedBP_PlanesPlot_CS" Then return new GuidedBP_PlanesPlot_CS
 	If algorithmName = "GuidedBP_Points" Then return new GuidedBP_Points
 	If algorithmName = "GuidedBP_Points_CS" Then return new GuidedBP_Points_CS
+	If algorithmName = "GuidedBP_RedCloud" Then return new GuidedBP_RedCloud
+	If algorithmName = "GuidedBP_Regions" Then return new GuidedBP_Regions
 	If algorithmName = "HeatMap_Basics" Then return new HeatMap_Basics
 	If algorithmName = "HeatMap_Basics_CS" Then return new HeatMap_Basics_CS
 	If algorithmName = "HeatMap_Cell" Then return new HeatMap_Cell
@@ -2117,6 +2119,8 @@ End Enum
 	If algorithmName = "ML_DepthFromXYColor_CS" Then return new ML_DepthFromXYColor_CS
 	If algorithmName = "ML_FillRGBDepth_MT" Then return new ML_FillRGBDepth_MT
 	If algorithmName = "ML_FillRGBDepth_MT_CS" Then return new ML_FillRGBDepth_MT_CS
+	If algorithmName = "ML_LearnRegion" Then return new ML_LearnRegion
+	If algorithmName = "ML_LearnZfromXGray" Then return new ML_LearnZfromXGray
 	If algorithmName = "ML_RemoveDups_CPP_CS" Then return new ML_RemoveDups_CPP_CS
 	If algorithmName = "ML_RemoveDups_CPP_VB" Then return new ML_RemoveDups_CPP_VB
 	If algorithmName = "Model_Basics" Then return new Model_Basics
@@ -2457,6 +2461,7 @@ End Enum
 	If algorithmName = "Options_BlurTopo" Then return new Options_BlurTopo
 	If algorithmName = "Options_Boundary" Then return new Options_Boundary
 	If algorithmName = "Options_BoundaryRect" Then return new Options_BoundaryRect
+	If algorithmName = "Options_BP_Regions" Then return new Options_BP_Regions
 	If algorithmName = "Options_BrightnessContrast" Then return new Options_BrightnessContrast
 	If algorithmName = "Options_CamShift" Then return new Options_CamShift
 	If algorithmName = "Options_Canny" Then return new Options_Canny
