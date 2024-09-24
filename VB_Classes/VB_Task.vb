@@ -648,8 +648,10 @@ Public Class VBtask : Implements IDisposable
 
         task.redOptions.Sync()
 
-        task.bins2D = {task.dst2.Height, task.dst2.Width}
         Dim src = task.color
+        If src.Size <> New cvb.Size(task.dst2.Cols, task.dst2.Rows) Then dst2 = dst2.Resize(src.Size)
+        If src.Size <> New cvb.Size(task.dst3.Cols, task.dst3.Rows) Then dst3 = dst3.Resize(src.Size)
+        task.bins2D = {task.dst2.Height, task.dst2.Width}
 
         ' If the WorkingRes changes, the previous generation of images needs to be reset.
         If task.pointCloud.Size <> New cvb.Size(cols, rows) Or task.color.Size <> task.dst2.Size Then
@@ -762,8 +764,7 @@ Public Class VBtask : Implements IDisposable
         '    src = rgbFilter.dst2
         'End If
 
-        Dim currSize As cvb.Size = New cvb.Size(task.dst2.Cols, task.dst2.Rows)
-        If task.paused = False And src.Size = currSize Then
+        If task.paused = False Then
             MainUI_Algorithm.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
             task.FirstPass = False
             postProcess(src)

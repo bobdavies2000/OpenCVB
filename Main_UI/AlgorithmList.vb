@@ -1375,6 +1375,7 @@ End Enum
 	If algorithmName = "GuidedBP_HotPointsKNN_CS" Then return new GuidedBP_HotPointsKNN_CS
 	If algorithmName = "GuidedBP_Lookup" Then return new GuidedBP_Lookup
 	If algorithmName = "GuidedBP_Lookup_CS" Then return new GuidedBP_Lookup_CS
+	If algorithmName = "GuidedBP_MultiSlice" Then return new GuidedBP_MultiSlice
 	If algorithmName = "GuidedBP_PlanesPlot" Then return new GuidedBP_PlanesPlot
 	If algorithmName = "GuidedBP_PlanesPlot_CS" Then return new GuidedBP_PlanesPlot_CS
 	If algorithmName = "GuidedBP_Points" Then return new GuidedBP_Points

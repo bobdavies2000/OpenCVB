@@ -1973,7 +1973,7 @@ class Options_Structured {
 public:
 	bool rebuilt =  true;
 	int sliceSize =  1;
-	int stepSize =  20;
+	int stepSize =  6;
 	void RunOpt() {}
 	Options_Structured() {
 	}

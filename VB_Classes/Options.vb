@@ -7275,7 +7275,7 @@ End Class
 Public Class Options_Structured : Inherits VB_Parent
     Public rebuilt As Boolean = True
     Public sliceSize As Integer = 1
-    Public stepSize As Integer = 20
+    Public stepSize As Integer = 6
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Structured Depth slice thickness in pixels", 1, 10, sliceSize)

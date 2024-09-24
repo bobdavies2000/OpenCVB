@@ -104,61 +104,6 @@ End Class
 
 
 
-Public Class GuidedBP_HotPoints : Inherits VB_Parent
-    Public histTop As New Projection_HistTop
-    Public histSide As New Projection_HistSide
-    Public topRects As New List(Of cvb.Rect)
-    Public sideRects As New List(Of cvb.Rect)
-    Dim floodRect As New cvb.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
-    Dim mask As New cvb.Mat(New cvb.Size(dst2.Width + 2, dst2.Height + 2), cvb.MatType.CV_8U)
-    Public Sub New()
-        task.useXYRange = False
-        desc = "Use floodfill to identify all the objects in both the top and side views."
-    End Sub
-    Private Function hotPoints(ByRef view As cvb.Mat) As List(Of cvb.Rect)
-        Dim rect As cvb.Rect
-        Dim points = view.FindNonZero()
-
-        Dim viewList As New SortedList(Of Integer, cvb.Point)(New compareAllowIdenticalIntegerInverted)
-        mask.SetTo(0)
-        Dim lastCount As Integer = 0
-        For i = 0 To points.Rows - 1
-            Dim pt = points.Get(Of cvb.Point)(i, 0)
-            Dim count = view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cvb.FloodFillFlags.MaskOnly Or (255 << 8))
-            If count > 0 Then viewList.Add(count, pt)
-        Next
-
-        mask.SetTo(0)
-        Dim rectList As New List(Of cvb.Rect)
-        For i = 0 To Math.Min(viewList.Count, 10) - 1
-            Dim pt = viewList.ElementAt(i).Value
-            view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cvb.FloodFillFlags.FixedRange Or (i + 1 << 8))
-            rectList.Add(New cvb.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height))
-        Next
-
-        mask(floodRect).CopyTo(view)
-        Return rectList
-    End Function
-    Public Sub RunAlg(src As cvb.Mat)
-        histTop.Run(src.Clone)
-        topRects = hotPoints(histTop.dst3)
-        dst2 = ShowPalette(histTop.dst3 * 255 / topRects.Count)
-
-        histSide.Run(src)
-        sideRects = hotPoints(histSide.dst3)
-        dst3 = ShowPalette(histSide.dst3 * 255 / sideRects.Count)
-
-        If task.heartBeat Then labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
-        If task.heartBeat Then labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class GuidedBP_PlanesPlot : Inherits VB_Parent
@@ -321,5 +266,111 @@ Public Class GuidedBP_Depth : Inherits VB_Parent
 
         Dim depthCount = task.depthMask.CountNonZero
         labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / depthCount, "0%") + " of depth data"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GuidedBP_HotPoints : Inherits VB_Parent
+    Public histTop As New Projection_HistTop
+    Public histSide As New Projection_HistSide
+    Public topRects As New List(Of cvb.Rect)
+    Public sideRects As New List(Of cvb.Rect)
+    Dim floodRect As New cvb.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
+    Dim mask As New cvb.Mat(New cvb.Size(dst2.Width + 2, dst2.Height + 2), cvb.MatType.CV_8U)
+    Public Sub New()
+        task.useXYRange = False
+        desc = "Use floodfill to identify all the objects in both the top and side views."
+    End Sub
+    Private Function hotPoints(ByRef view As cvb.Mat) As List(Of cvb.Rect)
+        Dim rect As cvb.Rect
+        Dim points = view.FindNonZero()
+
+        Dim viewList As New SortedList(Of Integer, cvb.Point)(New compareAllowIdenticalIntegerInverted)
+        mask.SetTo(0)
+        Dim lastCount As Integer = 0
+        For i = 0 To points.Rows - 1
+            Dim pt = points.Get(Of cvb.Point)(i, 0)
+            Dim count = view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cvb.FloodFillFlags.MaskOnly Or (255 << 8))
+            If count > 0 Then viewList.Add(count, pt)
+        Next
+
+        mask.SetTo(0)
+        Dim rectList As New List(Of cvb.Rect)
+        For i = 0 To Math.Min(viewList.Count, 10) - 1
+            Dim pt = viewList.ElementAt(i).Value
+            view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cvb.FloodFillFlags.FixedRange Or (i + 1 << 8))
+            rectList.Add(New cvb.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height))
+        Next
+
+        mask(floodRect).CopyTo(view)
+        Return rectList
+    End Function
+    Public Sub RunAlg(src As cvb.Mat)
+        histTop.Run(src.Clone)
+        topRects = hotPoints(histTop.dst3)
+        dst2 = ShowPalette(histTop.dst3 * 255 / topRects.Count)
+
+        histSide.Run(src)
+        sideRects = hotPoints(histSide.dst3)
+        dst3 = ShowPalette(histSide.dst3 * 255 / sideRects.Count)
+
+        If task.heartBeat Then labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
+        If task.heartBeat Then labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GuidedBP_MultiSlice : Inherits VB_Parent
+    Dim histTop As New Projection_HistTop
+    Dim histSide As New Projection_HistSide
+    Public sliceMask As cvb.Mat
+    Public split() As cvb.Mat
+    Public options As New Options_Structured
+    Public classCount As Integer
+    Public Sub New()
+        desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        Dim stepSize = options.stepSize
+
+        histTop.Run(src.Clone)
+
+        classCount = 1
+        For x = 0 To histTop.dst3.Height - stepSize Step stepSize
+            Dim r = New cvb.Rect(x, 0, stepSize, dst2.Height)
+            Dim slice = histTop.dst3(r)
+            If slice.CountNonZero Then
+                histTop.histogram(r).SetTo(classCount, slice)
+                classCount += 1
+            End If
+        Next
+        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst1, task.rangesTop)
+        dst2 = ShowPalette(dst1 * 255 / classCount)
+        labels(2) = "The nonzero horizontal slices produced " + CStr(classCount) + " classes"
+
+        histSide.Run(src.Clone)
+
+        classCount = 1
+        For y = 0 To histSide.dst3.Height - stepSize Step stepSize
+            Dim r = New cvb.Rect(0, y, dst2.Width, stepSize)
+            Dim slice = histSide.dst3(r)
+            If slice.CountNonZero Then
+                histSide.histogram(r).SetTo(classCount, slice)
+                classCount += 1
+            End If
+        Next
+        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst1, task.rangesSide)
+        dst3 = ShowPalette(dst1 * 255 / classCount)
+        labels(3) = "The nonzero vertical slices produced " + CStr(classCount) + " classes"
     End Sub
 End Class
