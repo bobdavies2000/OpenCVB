@@ -1,11 +1,40 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
-Imports System.Drawing
-Imports System.Security.Cryptography
+' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_Basics : Inherits VB_Parent
+    Public options As New Options_Features
+    Dim gather As New Feature_Gather
+    Public Sub New()
+        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
+        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+
+        gather.Run(src)
+
+        task.features.Clear()
+        task.featurePoints.Clear()
+        For Each pt In gather.features
+            task.features.Add(pt)
+            task.featurePoints.Add(New cvb.Point(pt.X, pt.X))
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
+
+        labels(2) = gather.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_Stable : Inherits VB_Parent
     Dim nextMatList As New List(Of cvb.Mat)
-    Public ptList As New List(Of cvb.Point2f)
+    Dim ptList As New List(Of cvb.Point2f)
     Dim knn As New KNN_Core
     Dim ptLost As New List(Of cvb.Point2f)
     Dim gather As New Feature_Gather
@@ -106,41 +135,10 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_BasicsNoFrills : Inherits VB_Parent
-    Public options As New Options_Features
-    Dim gather As New Feature_Gather
-    Public Sub New()
-        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
-        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        dst2 = src.Clone
-
-        gather.Run(src)
-
-        task.features.Clear()
-        task.featurePoints.Clear()
-        For Each pt In gather.features
-            task.features.Add(pt)
-            task.featurePoints.Add(New cvb.Point(pt.X, pt.X))
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
-        Next
-
-        labels(2) = gather.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_KNN : Inherits VB_Parent
     Dim knn As New KNN_Core
     Public featurePoints As New List(Of cvb.Point2f)
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
@@ -180,7 +178,7 @@ End Class
 
 Public Class Feature_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
         labels = {"", "", "Good features", "History of good features"}
         desc = "Get the features in a reduction grayscale image."
@@ -205,13 +203,13 @@ End Class
 
 
 Public Class Feature_MultiPass : Inherits VB_Parent
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public featurePoints As New List(Of cvb.Point2f)
     Dim sharpen As New PhotoShop_SharpenDetail
     Public Sub New()
         task.gOptions.RGBFilterActive.Checked = True
         task.gOptions.RGBFilterList.SelectedIndex = task.gOptions.RGBFilterList.Items.IndexOf("Filter_Laplacian")
-        desc = "Run Feature_Basics twice and compare results."
+        desc = "Run Feature_Stable twice and compare results."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(task.color)
@@ -250,7 +248,7 @@ End Class
 
 Public Class Feature_PointTracker : Inherits VB_Parent
     Dim flow As New Font_FlowText
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Dim mPoints As New Match_Points
     Dim options As New Options_Features
     Public Sub New()
@@ -305,7 +303,7 @@ End Class
 
 Public Class Feature_Delaunay : Inherits VB_Parent
     Dim facet As New Delaunay_Contours
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
         FindSlider("Min Distance to next").Value = 10
         desc = "Divide the image into contours with Delaunay using features"
@@ -417,7 +415,7 @@ End Class
 
 
 Public Class Feature_Points : Inherits VB_Parent
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Public Sub New()
         labels(3) = "Features found in the image"
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
@@ -526,7 +524,7 @@ End Class
 
 
 Public Class Feature_Generations : Inherits VB_Parent
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Dim features As New List(Of cvb.Point)
     Dim gens As New List(Of Integer)
     Public Sub New()
@@ -569,7 +567,7 @@ End Class
 ' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_History : Inherits VB_Parent
     Public features As New List(Of cvb.Point)
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Dim featureHistory As New List(Of List(Of cvb.Point))
     Dim gens As New List(Of Integer)
     Public Sub New()
@@ -627,7 +625,7 @@ End Class
 
 
 Public Class Feature_GridPopulation : Inherits VB_Parent
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."
@@ -660,8 +658,8 @@ End Class
 
 
 Public Class Feature_Compare : Inherits VB_Parent
-    Dim feat As New Feature_Basics
-    Dim noFrill As New Feature_BasicsNoFrills
+    Dim feat As New Feature_Stable
+    Dim noFrill As New Feature_Basics
     Dim saveLFeatures As New List(Of cvb.Point2f)
     Dim saveRFeatures As New List(Of cvb.Point2f)
     Public Sub New()

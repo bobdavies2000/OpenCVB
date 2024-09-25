@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Swarm_Basics : Inherits VB_Parent
     Public knn As New KNN_Core
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public mpList As New List(Of PointPair)
     Public distanceAvg As Single
     Public directionAvg As Single
@@ -94,7 +94,7 @@ End Class
 Public Class Swarm_LeftRightFeatures : Inherits VB_Parent
     Public leftList As New List(Of cvb.Point2f)
     Public rightList As New List(Of cvb.Point2f)
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."

@@ -43,7 +43,7 @@ End Class
 
 
 Public Class Mouse_ClickPointUsage : Inherits VB_Parent
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
         desc = "This algorithm shows how to use task.ClickPoint to dynamically identify what to break on."
     End Sub

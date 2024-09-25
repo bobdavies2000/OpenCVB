@@ -167,7 +167,7 @@ End Class
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Public inputFeat As New List(Of cvb.Point2f)
     Public borderCrop = 30
     Dim sumScale As cvb.Mat, sScale As cvb.Mat, features1 As cvb.Mat

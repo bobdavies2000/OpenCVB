@@ -4525,14 +4525,14 @@ public:
 
 
 
-class Feature_Basics_CC : public CPP_Parent {
+class Feature_Stable_CC : public CPP_Parent {
 private:
     cv::Ptr<cv::BRISK> Brisk;
 public:
     vector<cv::Point2f> featurePoints;
     Options_Features* options = new Options_Features;
 
-    Feature_Basics_CC() : CPP_Parent() {
+    Feature_Stable_CC() : CPP_Parent() {
         Brisk = cv::BRISK::create();
         desc = "Find good features to track in a BGR image.";
     }
@@ -4570,10 +4570,10 @@ public:
     Delaunay_Generations_CC* facetGen;
     vector<Point2f> ptList;
     Point2f anchorPoint;
-    Feature_Basics_CC* good;
+    Feature_Stable_CC* good;
 
     Stable_Basics_CC() : CPP_Parent() {
-        good = new Feature_Basics_CC();
+        good = new Feature_Stable_CC();
         facetGen = new Delaunay_Generations_CC();
         desc = "Maintain the generation counts around the feature points.";
     }
@@ -4628,11 +4628,11 @@ class Stable_BasicsCount_CC : public CPP_Parent
 private:
 public:
     Stable_Basics_CC* basics;
-    Feature_Basics_CC* good;
+    Feature_Stable_CC* good;
     map<int, int, greater<float>> goodCounts;
     Stable_BasicsCount_CC() : CPP_Parent()
     {
-        good = new Feature_Basics_CC();
+        good = new Feature_Stable_CC();
         basics = new Stable_Basics_CC();
         desc = "Track the stable good features found in the BGR image.";
     }
@@ -6414,10 +6414,10 @@ public:
 
 class Mesh_Features_CC : public CPP_Parent {
 public:
-    Feature_Basics_CC* feat;
+    Feature_Stable_CC* feat;
     Mesh_Basics_CC* mesh;
     Mesh_Features_CC() : CPP_Parent() {
-        feat = new Feature_Basics_CC();
+        feat = new Feature_Stable_CC();
         mesh = new Mesh_Basics_CC();
         labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
         advice = "Use options_Features to update results.";
@@ -6822,12 +6822,12 @@ public:
 
 class Feature_StableSorted_CC : public CPP_Parent {
 public:
-    Feature_Basics_CC* feat;
+    Feature_Stable_CC* feat;
     int desiredCount = 200;
     vector<Point2f> stablePoints;
     vector<int> generations;
     Feature_StableSorted_CC() : CPP_Parent() {
-        feat = new Feature_Basics_CC();
+        feat = new Feature_Stable_CC();
         desc = "Display the top X feature points ordered by generations they were present.";
     }
     void Run(Mat src) {
@@ -6868,7 +6868,7 @@ public:
             generations.push_back(it->first);
         }
         labels[2] = "The most stable " + to_string(displayCount) + " are highlighted below";
-        labels[3] = "Output of Feature_Basics" + to_string(feat->featurePoints.size()) + " points found";
+        labels[3] = "Output of Feature_Stable" + to_string(feat->featurePoints.size()) + " points found";
     }
 };
 

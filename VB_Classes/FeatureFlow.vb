@@ -1,7 +1,7 @@
 Imports NAudio
 Imports cvb = OpenCvSharp
 Public Class FeatureFlow_Basics : Inherits VB_Parent
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public mpList As New List(Of PointPair)
     Public mpCorrelation As New List(Of Single)
     Public Sub New()
@@ -86,7 +86,7 @@ End Class
 Public Class FeatureFlow_LucasKanade : Inherits VB_Parent
     Public features As New List(Of cvb.Point2f)
     Public lastFeatures As New List(Of cvb.Point2f)
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Dim options As New Options_OpticalFlowSparse
     Public Sub New()
         desc = "Show the optical flow of a sparse matrix."

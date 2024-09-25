@@ -7334,7 +7334,7 @@ namespace CS_Classes
         public List<cv.Point> ptList = new List<cv.Point>();
         public List<int> clusterID = new List<int>();
         public SortedList<int, List<cv.Point>> clusters = new SortedList<int, List<cv.Point>>();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
 
         public Cluster_Basics_CS()
         {
@@ -7444,7 +7444,7 @@ namespace CS_Classes
     {
         Cluster_Basics cluster = new Cluster_Basics();
         public List<List<cv.Point>> hulls = new List<List<cv.Point>>();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
 
         public Cluster_Hulls_CS()
         {
@@ -10155,7 +10155,7 @@ namespace CS_Classes
 
     public class Corners_SubPix_CS : VB_Parent
     {
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public Options_PreCorners options = new Options_PreCorners();
 
         public Corners_SubPix_CS()
@@ -17099,7 +17099,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Basics_CS : VB_Parent
+    public class Feature_Stable_CS : VB_Parent
     {
         List<Mat> matList = new List<Mat>();
         List<cv.Point2f> ptList = new List<cv.Point2f>();
@@ -17108,7 +17108,7 @@ namespace CS_Classes
         Feature_Gather gather = new Feature_Gather();
         List<Mat> featureMat = new List<Mat>();
         public Options_Features options = new Options_Features();
-        public Feature_Basics_CS()
+        public Feature_Stable_CS()
         {
             vbc.task.features.Clear(); // in case it was previously in use...
             desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate";
@@ -17197,11 +17197,11 @@ namespace CS_Classes
 
 
 
-    public class Feature_BasicsNoFrills_CS : VB_Parent
+    public class Feature_Basics_CS : VB_Parent
     {
         public Options_Features options = new Options_Features();
         Feature_Gather gather = new Feature_Gather();
-        public Feature_BasicsNoFrills_CS()
+        public Feature_Basics_CS()
         {
             UpdateAdvice(traceName + ": Use 'Options_Features' to control output.");
             desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results.";
@@ -17230,7 +17230,7 @@ namespace CS_Classes
     {
         KNN_Core knn = new KNN_Core();
         public List<cv.Point2f> featurePoints = new List<cv.Point2f>();
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public Feature_KNN_CS()
         {
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -17268,7 +17268,7 @@ namespace CS_Classes
     public class Feature_Reduction_CS : VB_Parent
     {
         Reduction_Basics reduction = new Reduction_Basics();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public Feature_Reduction_CS()
         {
             labels = new string[] { "", "", "Good features", "History of good features" };
@@ -17293,14 +17293,14 @@ namespace CS_Classes
 
     public class Feature_MultiPass_CS : VB_Parent
     {
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public List<cv.Point2f> featurePoints = new List<cv.Point2f>();
         PhotoShop_SharpenDetail sharpen = new PhotoShop_SharpenDetail();
         public Feature_MultiPass_CS()
         {
             vbc.task.gOptions.setRGBFilterActive(true);
             vbc.task.gOptions.setRGBFilterSelection("Filter_Laplacian");
-            desc = "Run Feature_Basics twice and compare results.";
+            desc = "Run Feature_Stable twice and compare results.";
         }
         public void RunAlg(Mat src)
         {
@@ -17338,7 +17338,7 @@ namespace CS_Classes
     public class Feature_PointTracker_CS : VB_Parent
     {
         Font_FlowText flow = new Font_FlowText();
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         Match_Points mPoints = new Match_Points();
         Options_Features options = new Options_Features();
         public Feature_PointTracker_CS()
@@ -17395,7 +17395,7 @@ namespace CS_Classes
     public class Feature_Delaunay_CS : VB_Parent
     {
         Delaunay_Contours facet = new Delaunay_Contours();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public Feature_Delaunay_CS()
         {
             FindSlider("Min Distance to next").Value = 10;
@@ -17506,7 +17506,7 @@ namespace CS_Classes
 
     public class Feature_Points_CS : VB_Parent
     {
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public Feature_Points_CS()
         {
             labels[3] = "Features found in the image";
@@ -17621,7 +17621,7 @@ namespace CS_Classes
 
     public class Feature_Generations_CS : VB_Parent
     {
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         List<cv.Point> features = new List<cv.Point>();
         List<int> gens = new List<int>();
         public Feature_Generations_CS()
@@ -17669,7 +17669,7 @@ namespace CS_Classes
     public class Feature_History_CS : VB_Parent
     {
         public List<cv.Point> features = new List<cv.Point>();
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         List<List<cv.Point>> featureHistory = new List<List<cv.Point>>();
         List<int> gens = new List<int>();
         public Feature_History_CS()
@@ -17735,7 +17735,7 @@ namespace CS_Classes
 
     public class Feature_GridPopulation_CS : VB_Parent
     {
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public Feature_GridPopulation_CS()
         {
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -17765,8 +17765,8 @@ namespace CS_Classes
 
     public class Feature_Compare_CS : VB_Parent
     {
-        Feature_Basics feat = new Feature_Basics();
-        Feature_BasicsNoFrills noFrill = new Feature_BasicsNoFrills();
+        Feature_Stable feat = new Feature_Stable();
+        Feature_Basics noFrill = new Feature_Basics();
         List<cv.Point2f> saveLFeatures = new List<cv.Point2f>();
         List<cv.Point2f> saveRFeatures = new List<cv.Point2f>();
         public Feature_Compare_CS()
@@ -17899,7 +17899,7 @@ namespace CS_Classes
 
     public class FeatureFlow_Basics_CS : VB_Parent
     {
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public List<PointPair> mpList = new List<PointPair>();
         public List<float> mpCorrelation = new List<float>();
         public FeatureFlow_Basics_CS()
@@ -18009,7 +18009,7 @@ namespace CS_Classes
     {
         public List<cv.Point2f> features = new List<cv.Point2f>();
         public List<cv.Point2f> lastFeatures = new List<cv.Point2f>();
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public Options_OpticalFlowSparse options = new Options_OpticalFlowSparse();
         public FeatureFlow_LucasKanade_CS()
         {
@@ -18416,8 +18416,8 @@ namespace CS_Classes
 
     public class FeatureLeftRight_LeftRightPrep_CS : VB_Parent
     {
-        public Feature_Basics lFeat = new Feature_Basics();
-        public Feature_Basics rFeat = new Feature_Basics();
+        public Feature_Stable lFeat = new Feature_Stable();
+        public Feature_Stable rFeat = new Feature_Stable();
         public List<cv.Point> leftFeatures = new List<cv.Point>();
         public List<cv.Point> rightFeatures = new List<cv.Point>();
         public List<cv.Point2f> saveLFeatures = new List<cv.Point2f>();
@@ -29637,7 +29637,7 @@ namespace CS_Classes
 
     public class ImShow_WaitKey_CS : VB_Parent
     {
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public ImShow_WaitKey_CS()
         {
             desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time.";
@@ -32813,7 +32813,7 @@ namespace CS_Classes
     {
         Plot_Histogram plot = new Plot_Histogram();
         KNN_Basics knn = new KNN_Basics();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         const int maxDistance = 50;
         public float shiftX;
         public float shiftY;
@@ -33234,7 +33234,7 @@ namespace CS_Classes
     public class KNN_TrackEach_CS : VB_Parent
     {
         KNN_Basics knn = new KNN_Basics();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         List<List<PointPair>> trackAll = new List<List<PointPair>>();
         public KNN_TrackEach_CS()
         {
@@ -37438,7 +37438,7 @@ namespace CS_Classes
     public class Match_GoodFeatureKNN_CS : VB_Parent
     {
         public KNN_Basics knn = new KNN_Basics();
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         List<Mat> frameList = new List<Mat>();
         Options_Match options = new Options_Match();
         public Match_GoodFeatureKNN_CS()
@@ -37527,7 +37527,7 @@ namespace CS_Classes
         public List<cv.Point2f> ptx = new List<cv.Point2f>();
         public List<float> correlation = new List<float>();
         public Match_Point mPoint = new Match_Point();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public Match_Points_CS()
         {
             labels[2] = "Rectangle shown is the search rectangle.";
@@ -38528,7 +38528,7 @@ namespace CS_Classes
             dst2 = src;
             if (vbc.task.heartBeat && standaloneTest())
             {
-                var feat = new Feature_Basics();
+                var feat = new Feature_Stable();
                 feat.Run(src);
                 ptList = vbc.task.features;
             }
@@ -38561,7 +38561,7 @@ namespace CS_Classes
 
     public class Mesh_Features_CS : VB_Parent
     {
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         Mesh_Basics mesh = new Mesh_Basics();
         public Mesh_Features_CS()
         {
@@ -40843,7 +40843,7 @@ namespace CS_Classes
 
     public class Mouse_ClickPointUsage_CS : VB_Parent
     {
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public Mouse_ClickPointUsage_CS()
         {
             desc = "This algorithm shows how to use vbc.task.ClickPoint to dynamically identify what to break on.";
@@ -42356,10 +42356,10 @@ namespace CS_Classes
 
     public class OEX_GoodFeaturesToTrackDemo_CS : VB_Parent
     {
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public OEX_GoodFeaturesToTrackDemo_CS()
         {
-            desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Basics";
+            desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Stable";
         }
         public void RunAlg(Mat src)
         {
@@ -54280,10 +54280,10 @@ namespace CS_Classes
     public class RedTrack_FeaturesKNN_CS : VB_Parent
     {
         public KNN_Core knn = new KNN_Core();
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public RedTrack_FeaturesKNN_CS()
         {
-            labels = new string[] { "", "", "Output of Feature_Basics", "Grid of points to measure motion." };
+            labels = new string[] { "", "", "Output of Feature_Stable", "Grid of points to measure motion." };
             desc = "Use KNN with the good features in the image to create a grid of points";
         }
         public void RunAlg(Mat src)
@@ -54375,7 +54375,7 @@ namespace CS_Classes
     public class RedTrack_GoodCellInput_CS : VB_Parent
     {
         public KNN_Core knn = new KNN_Core();
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public List<cv.Point2f> featureList = new List<cv.Point2f>();
         Options_RedTrack options = new Options_RedTrack();
         public RedTrack_GoodCellInput_CS()
@@ -54440,12 +54440,12 @@ namespace CS_Classes
     public class RedTrack_Features_CS : VB_Parent
     {
         Options_Flood options = new Options_Flood();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedTrack_Features_CS()
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            labels = new string[] { "", "", "Output of Feature_Basics - input to RedCloud",
+            labels = new string[] { "", "", "Output of Feature_Stable - input to RedCloud",
                             "Value Is correlation of x to y in contour points (0 indicates circular.)" };
             desc = "Similar to RedTrack_KNNPoints";
         }
@@ -56811,7 +56811,7 @@ namespace CS_Classes
 
     public class Stabilizer_OpticalFlow_CS : VB_Parent
     {
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public List<cv.Point2f> inputFeat = new List<cv.Point2f>();
         public int borderCrop = 30;
         Mat sumScale, sScale, features1;
@@ -57115,7 +57115,7 @@ namespace CS_Classes
     public class Stable_BasicsCount_CS : VB_Parent
     {
         public Stable_Basics basics = new Stable_Basics();
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public SortedList<int, int> goodCounts = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
         public Stable_BasicsCount_CS()
         {
@@ -57224,7 +57224,7 @@ namespace CS_Classes
     public class Stable_GoodFeatures_CS : VB_Parent
     {
         public Stable_Basics basics = new Stable_Basics();
-        public Feature_Basics feat = new Feature_Basics();
+        public Feature_Stable feat = new Feature_Stable();
         public SortedList<int, int> genSorted = new SortedList<int, int>(new compareAllowIdenticalIntegerInverted());
         public Stable_GoodFeatures_CS()
         {
@@ -59283,7 +59283,7 @@ namespace CS_Classes
     public class Swarm_Basics_CS : VB_Parent
     {
         public KNN_Core knn = new KNN_Core();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public List<PointPair> mpList = new List<PointPair>();
         public float distanceAvg;
         public float directionAvg;
@@ -59380,7 +59380,7 @@ namespace CS_Classes
     {
         public List<cv.Point2f> leftList = new List<cv.Point2f>();
         public List<cv.Point2f> rightList = new List<cv.Point2f>();
-        Feature_Basics feat = new Feature_Basics();
+        Feature_Stable feat = new Feature_Stable();
         public Swarm_LeftRightFeatures_CS()
         {
             labels = new[] { "", "", "Left view feature points", "Right view feature points" };

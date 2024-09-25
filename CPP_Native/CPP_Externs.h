@@ -170,8 +170,8 @@ namespace CPP_Native
         { task->alg = new FeatureLess_Edge_CC(); task->alg->traceName = "FeatureLess_Edge_CC"; break; }
         case _Stable_Basics_CC:
         { task->alg = new Stable_Basics_CC(); task->alg->traceName = "Stable_Basics_CC"; break; }
-        case _Feature_Basics_CC:
-        { task->alg = new Feature_Basics_CC(); task->alg->traceName = "Feature_Basics_CC"; break; }
+        case _Feature_Stable_CC:
+        { task->alg = new Feature_Stable_CC(); task->alg->traceName = "Feature_Stable_CC"; break; }
         case _Stable_BasicsCount_CC:
         { task->alg = new Stable_BasicsCount_CC(); task->alg->traceName = "Stable_BasicsCount_CC"; break; }
         case _FPoly_TopFeatures_CC:

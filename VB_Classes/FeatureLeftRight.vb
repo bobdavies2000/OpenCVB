@@ -129,8 +129,8 @@ End Class
 
 
 Public Class FeatureLeftRight_LeftRightPrep : Inherits VB_Parent
-    Dim lFeat As New Feature_Basics
-    Dim rFeat As New Feature_Basics
+    Dim lFeat As New Feature_Stable
+    Dim rFeat As New Feature_Stable
     Public leftFeatures As New List(Of cvb.Point)
     Public rightFeatures As New List(Of cvb.Point)
     Dim saveLFeatures As New List(Of cvb.Point2f)

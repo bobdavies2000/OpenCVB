@@ -355,7 +355,7 @@ End Class
 
 
 Public Class Corners_SubPix : Inherits VB_Parent
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Dim options As New Options_PreCorners
     Public Sub New()
         labels(2) = "Output of PreCornerDetect"

@@ -6,7 +6,7 @@ Public Class Cluster_Basics : Inherits VB_Parent
     Public ptList As New List(Of cvb.Point)
     Public clusterID As New List(Of Integer)
     Public clusters As New SortedList(Of Integer, List(Of cvb.Point))
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
         FindSlider("Min Distance to next").Value = 10
         desc = "Group the points based on their proximity to each other."
@@ -79,7 +79,7 @@ End Class
 Public Class Cluster_Hulls : Inherits VB_Parent
     Dim cluster As New Cluster_Basics
     Public hulls As New List(Of List(Of cvb.Point))
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
         desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
     End Sub

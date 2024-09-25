@@ -130,9 +130,9 @@ End Class
 
 Public Class RedTrack_FeaturesKNN : Inherits VB_Parent
     Public knn As New KNN_Core
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Public Sub New()
-        labels = {"", "", "Output of Feature_Basics", "Grid of points to measure motion."}
+        labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -228,7 +228,7 @@ End Class
 
 Public Class RedTrack_GoodCellInput : Inherits VB_Parent
     Public knn As New KNN_Core
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Public featureList As New List(Of cvb.Point2f)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
@@ -296,11 +296,11 @@ End Class
 
 Public Class RedTrack_Features : Inherits VB_Parent
     Dim options As New Options_Flood
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        labels = {"", "", "Output of Feature_Basics - input to RedCloud",
+        labels = {"", "", "Output of Feature_Stable - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
         desc = "Similar to RedTrack_KNNPoints"
     End Sub

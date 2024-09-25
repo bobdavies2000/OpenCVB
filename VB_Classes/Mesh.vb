@@ -11,7 +11,7 @@ Public Class Mesh_Basics : Inherits VB_Parent
 
         dst2 = src
         If task.heartBeat And standaloneTest() Then
-            Dim feat As New Feature_Basics
+            Dim feat As New Feature_Stable
             feat.Run(src)
             ptList = task.features
         End If
@@ -46,7 +46,7 @@ End Class
 
 
 Public Class Mesh_Features : Inherits VB_Parent
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Dim mesh As New Mesh_Basics
     Public Sub New()
         labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."

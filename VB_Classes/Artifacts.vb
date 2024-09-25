@@ -11,8 +11,8 @@ Public Class Artifacts_LowRes : Inherits VB_Parent
         options.RunOpt()
 
         Dim pct = options.resizePercent
-        dst2 = src.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
-        dst2 = dst2.Resize(New cvb.Size(src.Width / pct, src.Height / pct))
+        dst3 = src.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
+        dst2 = dst3.Resize(New cvb.Size(src.Width / pct, src.Height / pct))
     End Sub
 End Class
 
@@ -44,16 +44,17 @@ End Class
 
 Public Class Artifacts_Features : Inherits VB_Parent
     Dim lowRes As New Artifacts_LowRes
-    Dim feat As New Feature_BasicsNoFrills
+    Dim feat As New Feature_Basics
     Public Sub New()
         FindSlider("Resize Percentage (%)").Value = 20
+        task.gOptions.SetDotSize(1)
         desc = "Find features in a low res image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         lowRes.Run(src)
         dst2 = lowRes.dst2
 
-        feat.Run(dst2)
+        feat.Run(lowRes.dst3)
         dst3 = feat.dst2
     End Sub
 End Class

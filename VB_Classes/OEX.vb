@@ -466,9 +466,9 @@ End Class
 
 
 Public Class OEX_GoodFeaturesToTrackDemo : Inherits VB_Parent
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
-        desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Basics"
+        desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Stable"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)

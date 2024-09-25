@@ -606,7 +606,7 @@ End Class
 
 Public Class Match_GoodFeatureKNN : Inherits VB_Parent
     Public knn As New KNN_Basics
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Dim frameList As New List(Of cvb.Mat)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Maximum travel distance per frame", 1, 20, 5)
@@ -697,7 +697,7 @@ Public Class Match_Points : Inherits VB_Parent
     Public ptx As New List(Of cvb.Point2f)
     Public correlation As New List(Of Single)
     Public mPoint As New Match_Point
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
         labels(2) = "Rectangle shown is the search rectangle."
         desc = "Track the selected points"

@@ -15,7 +15,7 @@ End Class
 
 
 Public Class ImShow_WaitKey : Inherits VB_Parent
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Public Sub New()
         desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
     End Sub

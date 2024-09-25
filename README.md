@@ -1399,7 +1399,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   Default group name is \<All VB.Net\> to get only VB.Net classes
     -   Other group names added were: “\<All Python\>” and “\<All C\#\>” classes.
 -   The code to find and track features was reorganized. New features added for ROI’s.
-    -   Feature_Basics now uses correlation coefficients to track RGB features.
+    -   Feature_Stable now uses correlation coefficients to track RGB features.
 -   Color8U is the new name for algorithms converting RGB to CV_8U format.
 -   New modules for C\# interface were added but are not yet in use.
 -   A log of previous changes is included at the bottom of this document.

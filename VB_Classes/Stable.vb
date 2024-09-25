@@ -59,7 +59,7 @@ End Class
 
 Public Class Stable_BasicsCount : Inherits VB_Parent
     Public basics As New Stable_Basics
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         desc = "Track the stable good features found in the BGR image."
@@ -170,7 +170,7 @@ End Class
 
 Public Class Stable_GoodFeatures : Inherits VB_Parent
     Public basics As New Stable_Basics
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Stable
     Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))

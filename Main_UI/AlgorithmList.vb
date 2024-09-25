@@ -38,7 +38,7 @@ _Edge_Sobel_CC
 _EdgeDraw_Basics_CC
 _Feature_Agast_CC
 _Feature_AKaze_CC
-_Feature_Basics_CC
+_Feature_Stable_CC
 _Feature_StableSorted_CC
 _FeatureLess_Basics_CC
 _FeatureLess_Edge_CC
@@ -1014,10 +1014,7 @@ End Enum
 	If algorithmName = "Feature_AKaze_CC" Then return new CPP_Basics(ccFunctionNames._Feature_AKaze_CC)
 	If algorithmName = "Feature_AKaze_CS" Then return new Feature_AKaze_CS
 	If algorithmName = "Feature_Basics" Then return new Feature_Basics
-	If algorithmName = "Feature_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Basics_CC)
 	If algorithmName = "Feature_Basics_CS" Then return new Feature_Basics_CS
-	If algorithmName = "Feature_BasicsNoFrills" Then return new Feature_BasicsNoFrills
-	If algorithmName = "Feature_BasicsNoFrills_CS" Then return new Feature_BasicsNoFrills_CS
 	If algorithmName = "Feature_Compare" Then return new Feature_Compare
 	If algorithmName = "Feature_Compare_CS" Then return new Feature_Compare_CS
 	If algorithmName = "Feature_Delaunay" Then return new Feature_Delaunay
@@ -1052,6 +1049,9 @@ End Enum
 	If algorithmName = "Feature_Sift_CS" Then return new Feature_Sift_CS
 	If algorithmName = "Feature_SiftLeftRight_CS" Then return new Feature_SiftLeftRight_CS
 	If algorithmName = "Feature_SiftSlices_CS" Then return new Feature_SiftSlices_CS
+	If algorithmName = "Feature_Stable" Then return new Feature_Stable
+	If algorithmName = "Feature_Stable_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Stable_CC)
+	If algorithmName = "Feature_Stable_CS" Then return new Feature_Stable_CS
 	If algorithmName = "Feature_StableSorted_CC" Then return new CPP_Basics(ccFunctionNames._Feature_StableSorted_CC)
 	If algorithmName = "Feature_SURF_CS" Then return new Feature_SURF_CS
 	If algorithmName = "Feature_SURF_Draw_CS" Then return new Feature_SURF_Draw_CS

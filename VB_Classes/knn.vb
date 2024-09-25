@@ -565,7 +565,7 @@ End Class
 Public Class KNN_TrackMean : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Dim knn As New KNN_Basics
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Const maxDistance As Integer = 50
     Public shiftX As Single
     Public shiftY As Single
@@ -987,7 +987,7 @@ End Class
 
 Public Class KNN_TrackEach : Inherits VB_Parent
     Dim knn As New KNN_Basics
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_Stable
     Dim trackAll As New List(Of List(Of PointPair))
     Public Sub New()
         desc = "Track each good feature with KNN and match the goodFeatures from frame to frame"
