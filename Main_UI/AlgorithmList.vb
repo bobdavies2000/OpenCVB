@@ -124,6 +124,8 @@ End Enum
 	If algorithmName = "Area_MinTriangle_CPP_VB" Then return new Area_MinTriangle_CPP_VB
 	If algorithmName = "Area_SoloPoints" Then return new Area_SoloPoints
 	If algorithmName = "Area_SoloPoints_CS" Then return new Area_SoloPoints_CS
+	If algorithmName = "Artifacts_LowRes" Then return new Artifacts_LowRes
+	If algorithmName = "Artifacts_Reduction" Then return new Artifacts_Reduction
 	If algorithmName = "AsciiArt_Basics" Then return new AsciiArt_Basics
 	If algorithmName = "AsciiArt_Basics_CS" Then return new AsciiArt_Basics_CS
 	If algorithmName = "AsciiArt_Color" Then return new AsciiArt_Color
@@ -2119,7 +2121,7 @@ End Enum
 	If algorithmName = "ML_DepthFromXYColor_CS" Then return new ML_DepthFromXYColor_CS
 	If algorithmName = "ML_FillRGBDepth_MT" Then return new ML_FillRGBDepth_MT
 	If algorithmName = "ML_FillRGBDepth_MT_CS" Then return new ML_FillRGBDepth_MT_CS
-	If algorithmName = "ML_LearnRegion" Then return new ML_LearnRegion
+	If algorithmName = "ML_LearnRegions" Then return new ML_LearnRegions
 	If algorithmName = "ML_LearnZfromXGray" Then return new ML_LearnZfromXGray
 	If algorithmName = "ML_RemoveDups_CPP_CS" Then return new ML_RemoveDups_CPP_CS
 	If algorithmName = "ML_RemoveDups_CPP_VB" Then return new ML_RemoveDups_CPP_VB

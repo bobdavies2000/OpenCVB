@@ -430,7 +430,7 @@ End Class
 Public Class Options_Resize : Inherits VB_Parent
     Public warpFlag As cvb.InterpolationFlags = cvb.InterpolationFlags.Nearest
     Public radioIndex As Integer = 0
-    Public resizePercent As Double = 0.03
+    Public resizePercent As Double = 0.05
     Public topLeftOffset As Integer = 10
     Public Sub New()
         If radio.Setup(traceName) Then

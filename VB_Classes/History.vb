@@ -195,6 +195,10 @@ Public Class History_ReliableDepth : Inherits VB_Parent
         desc = "Create a frame history by Or'ing the last X frames of CV_8U data"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        If saveFrames.Count > 0 Then
+            If task.optionsChanged Or saveFrames(0).Size <> src.Size Then saveFrames.Clear()
+        End If
+
         If standalone Then src = task.noDepthMask
 
         If task.frameHistoryCount = 1 Then

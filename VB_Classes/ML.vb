@@ -544,7 +544,7 @@ End Class
 
 
 
-Public Class ML_LearnRegion : Inherits VB_Parent
+Public Class ML_LearnRegions : Inherits VB_Parent
     Dim regions As New GuidedBP_Regions
     Dim color As New Color8U_Basics
     Public Sub New()
@@ -599,3 +599,4 @@ Public Class ML_LearnRegion : Inherits VB_Parent
         Next
     End Sub
 End Class
+

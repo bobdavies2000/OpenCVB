@@ -526,14 +526,16 @@ Public Class VBtask : Implements IDisposable
 
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
+            If dst2.Size <> task.color.Size Then
+                dst2 = dst2.Resize(New cvb.Size(task.color.Width, task.color.Height), cvb.InterpolationFlags.Nearest)
+            End If
+
+            If dst3.Size <> task.color.Size Then
+                dst3 = dst3.Resize(New cvb.Size(task.color.Width, task.color.Height), cvb.InterpolationFlags.Nearest)
+            End If
+
             If dst2.Width = task.dst2.Width And dst2.Height = task.dst2.Height Then
                 If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.gridMask)
-                If dst2.Width <> task.dst2.Width Or dst2.Height <> task.dst2.Height Then
-                    dst2 = dst2.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.InterpolationFlags.Nearest)
-                End If
-                If dst3.Width <> task.dst2.Width Or dst3.Height <> task.dst2.Height Then
-                    dst3 = dst3.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.InterpolationFlags.Nearest)
-                End If
             End If
 
             Dim rc = task.rc
