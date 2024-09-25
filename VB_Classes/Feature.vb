@@ -5,7 +5,7 @@ Imports System.Drawing
 Imports System.Security.Cryptography
 Public Class Feature_Basics : Inherits VB_Parent
     Dim nextMatList As New List(Of cvb.Mat)
-    Dim ptList As New List(Of cvb.Point2f)
+    Public ptList As New List(Of cvb.Point2f)
     Dim knn As New KNN_Core
     Dim ptLost As New List(Of cvb.Point2f)
     Dim gather As New Feature_Gather
