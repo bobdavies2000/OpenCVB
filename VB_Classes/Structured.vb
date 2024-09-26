@@ -320,7 +320,7 @@ Public Class Structured_ROI : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_32FC3, 0)
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim d = task.pointCloud(roi).Mean(task.depthMask(roi))
             Dim depth = New cvb.Vec3f(d.Val0, d.Val1, d.Val2)
             Dim pt = New cvb.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
@@ -328,7 +328,7 @@ Public Class Structured_ROI : Inherits VB_Parent
             If vec(2) > 0 Then dst2(roi).SetTo(depth)
         Next
 
-        labels(2) = traceName + " with " + CStr(task.gridList.Count) + " regions was created"
+        labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
     End Sub
 End Class
 
@@ -351,7 +351,7 @@ Public Class Structured_Tiles : Inherits VB_Parent
 
         dst3.SetTo(0)
         oglData.Clear()
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim c = dst2.Get(Of cvb.Vec3b)(roi.Y, roi.X)
             If c = black Then Continue For
             oglData.Add(New cvb.Vec3f(c(2) / 255, c(1) / 255, c(0) / 255))
@@ -360,7 +360,7 @@ Public Class Structured_Tiles : Inherits VB_Parent
             oglData.Add(New cvb.Vec3f(v.Val0, v.Val1, v.Val2))
             dst3(roi).SetTo(c)
         Next
-        labels(2) = traceName + " with " + CStr(task.gridList.Count) + " regions was created"
+        labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
     End Sub
 End Class
 
@@ -393,7 +393,7 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
         Dim vec As cvb.Scalar
         Dim ptM = options.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim c = dst2.Get(Of cvb.Vec3b)(roi.Y, roi.X)
             If standaloneTest() Then dst3(roi).SetTo(c)
             If c = black Then Continue For
@@ -414,7 +414,7 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
             oglData.Add(New cvb.Point3f(vec.Val0, vec.Val1, vec.Val2))
             If standaloneTest() Then dst1(roi).SetTo(v)
         Next
-        labels(2) = traceName + " with " + CStr(task.gridList.Count) + " regions was created"
+        labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
     End Sub
 End Class
 

@@ -155,9 +155,9 @@ Public Class Motion_ThruCorrelation : Inherits VB_Parent
 
         Static lastFrame As cvb.Mat = input.Clone
         dst3.SetTo(0)
-        Parallel.For(0, task.gridList.Count,
+        Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             Dim correlation As New cvb.Mat
             Dim mean As Single, stdev As Single
             cvb.Cv2.MeanStdDev(input(roi), mean, stdev)
@@ -165,15 +165,15 @@ Public Class Motion_ThruCorrelation : Inherits VB_Parent
                 cvb.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
                 Dim mm As mmData = GetMinMax(correlation)
                 If mm.maxVal < ccThreshold / 1000 Then
-                    If (i Mod task.gridRows) <> 0 Then dst3(task.gridList(i - 1)).SetTo(255)
-                    If (i Mod task.gridRows) < task.gridRows And i < task.gridList.Count - 1 Then dst3(task.gridList(i + 1)).SetTo(255)
+                    If (i Mod task.gridRows) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
+                    If (i Mod task.gridRows) < task.gridRows And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
                     If i > task.gridRows Then
-                        dst3(task.gridList(i - task.gridRows)).SetTo(255)
-                        dst3(task.gridList(i - task.gridRows + 1)).SetTo(255)
+                        dst3(task.gridRects(i - task.gridRows)).SetTo(255)
+                        dst3(task.gridRects(i - task.gridRows + 1)).SetTo(255)
                     End If
-                    If i < (task.gridList.Count - task.gridRows - 1) Then
-                        dst3(task.gridList(i + task.gridRows)).SetTo(255)
-                        dst3(task.gridList(i + task.gridRows + 1)).SetTo(255)
+                    If i < (task.gridRects.Count - task.gridRows - 1) Then
+                        dst3(task.gridRects(i + task.gridRows)).SetTo(255)
+                        dst3(task.gridRects(i + task.gridRows + 1)).SetTo(255)
                     End If
                     dst3(roi).SetTo(255)
                 End If
@@ -275,7 +275,7 @@ Public Class Motion_Grid_MP : Inherits VB_Parent
         dst2 = src
 
         Dim updateCount As Integer
-        Parallel.ForEach(Of cvb.Rect)(task.gridList,
+        Parallel.ForEach(Of cvb.Rect)(task.gridRects,
             Sub(roi)
                 Dim correlation As New cvb.Mat
                 cvb.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
@@ -285,8 +285,8 @@ Public Class Motion_Grid_MP : Inherits VB_Parent
                     dst2.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
                 End If
             End Sub)
-        labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridList.Count)
-        labels(3) = CStr(task.gridList.Count - updateCount) + " segments out of " + CStr(task.gridList.Count) + " had > " +
+        labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridRects.Count)
+        labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
                          Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
     End Sub
 End Class
@@ -308,7 +308,7 @@ Public Class Motion_Grid : Inherits VB_Parent
         If task.heartBeat Then dst3 = src.Clone
 
         Dim roiMotion As New List(Of cvb.Rect)
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim correlation As New cvb.Mat
             cvb.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
             If correlation.Get(Of Single)(0, 0) < CCthreshold Then
@@ -320,8 +320,8 @@ Public Class Motion_Grid : Inherits VB_Parent
         For Each roi In roiMotion
             dst2.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
         Next
-        labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridList.Count)
-        labels(3) = CStr(task.gridList.Count - roiMotion.Count) + " segments out of " + CStr(task.gridList.Count) + " had > " +
+        labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count)
+        labels(3) = CStr(task.gridRects.Count - roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
                          Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
     End Sub
 End Class

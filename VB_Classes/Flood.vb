@@ -382,3 +382,41 @@ Public Class Flood_MaxDistPoints : Inherits VB_Parent
         labels(2) = genCells.labels(2)
     End Sub
 End Class
+
+
+
+
+Public Class Flood_Simple : Inherits VB_Parent
+    Public count As Integer
+    Public Sub New()
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S)
+        desc = "Simple FloodFill - useful only to the Artifacts_CellMap"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If src.Channels <> 3 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+
+        count = 0
+        dst2.SetTo(0)
+        For y = 0 To dst2.Height - 1
+            Dim val = src.Get(Of cvb.Vec3b)(y, 0)
+            For x = 0 To dst2.Width - 1
+                Dim vec = src.Get(Of cvb.Vec3b)(y, x)
+                If vec <> val Then
+                    val = vec
+                    count += 1
+                    dst2.Set(Of Integer)(y, x, count)
+                Else
+                    dst2.Set(Of Integer)(y, x, count)
+                End If
+            Next
+            Dim i = y + 1
+            For i = y + 1 To dst2.Height - 1
+                Dim tmp As cvb.Mat = (src.Row(i - 1) - src.Row(i)).ToMat.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+                If tmp.CountNonZero Then Exit For
+                dst2.Row(i - 1).CopyTo(dst2.Row(i))
+            Next
+            count += 1
+            y = i - 1
+        Next
+    End Sub
+End Class

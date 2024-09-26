@@ -225,9 +225,9 @@ Public Class Corners_BasicsCentroids : Inherits VB_Parent
         dst2 = src.Clone
 
         fast.Run(src)
-        ReDim fastCenters(task.gridList.Count - 1)
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        ReDim fastCenters(task.gridRects.Count - 1)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
             Dim tmp = fast.dst3(roi).FindNonZero()
             If tmp.Rows > 0 Then
                 Dim mean = tmp.Mean()

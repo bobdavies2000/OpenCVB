@@ -15,9 +15,9 @@ Public Class Puzzle_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         unscrambled.Clear()
         Dim inputROI As New List(Of cvb.Rect)
-        For j = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(j)
-            If roi.Width = task.gridSize And roi.Height = task.gridSize Then inputROI.Add(task.gridList(j))
+        For j = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(j)
+            If roi.Width = task.gridSize And roi.Height = task.gridSize Then inputROI.Add(task.gridRects(j))
         Next
 
         scrambled = Shuffle(inputROI)
@@ -25,7 +25,7 @@ Public Class Puzzle_Basics : Inherits VB_Parent
 
         ' display image with shuffled roi's
         For i = 0 To scrambled.Count - 1
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             Dim roi2 = scrambled(i)
             If roi.Width = task.gridSize And roi.Height = task.gridSize And
                roi2.Width = task.gridSize And roi2.Height = task.gridSize Then dst2(roi2) = src(roi)

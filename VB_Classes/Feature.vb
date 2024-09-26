@@ -641,7 +641,7 @@ Public Class Feature_GridPopulation : Inherits VB_Parent
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim test = dst3(roi).FindNonZero()
             SetTrueText(CStr(test.Rows), roi.TopLeft, 3)
         Next
@@ -712,8 +712,8 @@ Public Class Feature_Gather : Inherits VB_Parent
             Case FeatureSrc.GoodFeaturesGrid
                 options.featurePoints = 4
                 features.Clear()
-                For i = 0 To task.gridList.Count - 1
-                    Dim roi = task.gridList(i)
+                For i = 0 To task.gridRects.Count - 1
+                    Dim roi = task.gridRects(i)
                     Dim tmpFeatures = cvb.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
                                                                  options.blockSize, True, options.k).ToList
                     For j = 0 To tmpFeatures.Count - 1

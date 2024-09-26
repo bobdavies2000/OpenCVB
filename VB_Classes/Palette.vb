@@ -243,11 +243,11 @@ Public Class Palette_Layout2D : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim index As Integer
-        For Each r In task.gridList
+        For Each r In task.gridRects
             dst2(r).SetTo(task.scalarColors(index Mod 256))
             index += 1
         Next
-        labels(2) = "Palette_Layout2D - " + CStr(task.gridList.Count) + " regions"
+        labels(2) = "Palette_Layout2D - " + CStr(task.gridRects.Count) + " regions"
     End Sub
 End Class
 
@@ -280,8 +280,8 @@ Public Class Palette_TaskColors : Inherits VB_Parent
         task.gridSize -= direction * 1
         task.grid.Run(src)
 
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
             dst2(roi).SetTo(task.scalarColors(i Mod 256))
             dst3(roi).SetTo(task.vecColors(i Mod 256))
         Next

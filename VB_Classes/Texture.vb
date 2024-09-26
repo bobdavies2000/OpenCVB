@@ -29,7 +29,7 @@ Public Class Texture_Basics : Inherits VB_Parent
         End If
         If tChange Then
             Dim sortcounts As New SortedList(Of Integer, cvb.Rect)(New compareAllowIdenticalIntegerInverted)
-            For Each roi In task.gridList
+            For Each roi In task.gridRects
                 sortcounts.Add(dst2(roi).CountNonZero, roi)
             Next
             If standaloneTest() Then dst3.Rectangle(sortcounts.ElementAt(0).Value, cvb.Scalar.White, 2)

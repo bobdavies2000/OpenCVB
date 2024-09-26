@@ -142,13 +142,16 @@ Public Class VBtask : Implements IDisposable
     Public gridRows As Integer
     Public gridCols As Integer
     Public gridIndex As New List(Of Integer)
-    Public gridList As List(Of cvb.Rect)
+    Public gridRects As List(Of cvb.Rect)
     Public subDivisions As New List(Of Integer)
     Public subDivisionCount As Integer = 9
     Public gridMask As cvb.Mat
     Public gridMap As New cvb.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridROIclicked As Integer
+
+    Public artifactMap As cvb.Mat
+    Public artifactRects As New List(Of cvb.Rect)
 
     Public gOptions As OptionsGlobal
     Public redOptions As OptionsRedCloud
@@ -342,7 +345,7 @@ Public Class VBtask : Implements IDisposable
 
         task = Me
         useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve results.
-        gridList = New List(Of cvb.Rect)
+        gridRects = New List(Of cvb.Rect)
         FirstPass = True
         algName = parms.algName
         cameraName = parms.cameraName

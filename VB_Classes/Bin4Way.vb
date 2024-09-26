@@ -18,7 +18,7 @@ Public Class Bin4Way_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         Static index = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         If task.mousePicTag = 1 Then index = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        Dim roiSave = If(index < task.gridList.Count, task.gridList(index), New cvb.Rect)
+        Dim roiSave = If(index < task.gridRects.Count, task.gridRects(index), New cvb.Rect)
 
         If task.optionsChanged Then index = 0
 
@@ -43,14 +43,14 @@ Public Class Bin4Way_Basics : Inherits VB_Parent
             dst0 = dst0 Or diff(i).dst2
         Next
 
-        Dim counts(3, task.gridList.Count) As Integer
+        Dim counts(3, task.gridRects.Count) As Integer
         Dim contourCounts As New List(Of List(Of Integer))
         Dim means As New List(Of List(Of Single))
 
         Dim allContours As cvb.Point()()
         For i = 0 To counts.GetUpperBound(0)
-            For j = 0 To task.gridList.Count - 1
-                Dim roi = task.gridList(j)
+            For j = 0 To task.gridRects.Count - 1
+                Dim roi = task.gridRects(j)
                 Dim tmp = matList(i)(roi)
                 cvb.Cv2.FindContours(tmp, allContours, Nothing, cvb.RetrievalModes.External, cvb.ContourApproximationModes.ApproxSimple)
                 If i = 0 Then
@@ -65,7 +65,7 @@ Public Class Bin4Way_Basics : Inherits VB_Parent
         Next
 
         Dim bump = 3
-        Dim ratio = dst2.Height / task.gridList(0).Height
+        Dim ratio = dst2.Height / task.gridRects(0).Height
         For i = 0 To matList.Count - 1
             Dim tmp As cvb.Mat = matList(i)(roiSave) * 0.5
             Dim nextCount = tmp.CountNonZero

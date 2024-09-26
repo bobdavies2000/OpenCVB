@@ -415,10 +415,10 @@ Public Class Edge_Matching : Inherits VB_Parent
         dst2 = task.leftView
         dst3 = task.rightView
 
-        Dim maxLocs(task.gridList.Count - 1) As Integer
+        Dim maxLocs(task.gridRects.Count - 1) As Integer
         Dim highlights As New List(Of Integer)
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
             Dim width = If(roi.X + roi.Width + options.searchDepth < dst2.Width, roi.Width + options.searchDepth, dst2.Width - roi.X - 1)
             Dim searchROI = New cvb.Rect(roi.X, roi.Y, width, roi.Height)
             match.template = dst3(roi)
@@ -441,7 +441,7 @@ Public Class Edge_Matching : Inherits VB_Parent
         If options.highlightChecked Then
             labels(2) = "Matched grid segments in dst3 with disparity"
             For Each i In highlights
-                Dim roi = task.gridList(i)
+                Dim roi = task.gridRects(i)
                 dst3.Rectangle(roi, cvb.Scalar.Red, 2)
                 roi.X += maxLocs(i)
                 dst2.Rectangle(roi, cvb.Scalar.Red, 2)
@@ -457,7 +457,7 @@ Public Class Edge_Matching : Inherits VB_Parent
             If task.gridROIclicked Then
                 If redRects.Contains(task.gridROIclicked) = False Then redRects.Add(task.gridROIclicked)
                 For Each i In redRects
-                    Dim roi = task.gridList(i)
+                    Dim roi = task.gridRects(i)
                     dst3.Rectangle(roi, cvb.Scalar.Red, 2)
                     roi.X += maxLocs(i)
                     dst2.Rectangle(roi, cvb.Scalar.Red, 2)

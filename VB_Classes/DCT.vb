@@ -163,19 +163,19 @@ Public Class DCT_Surfaces_debug : Inherits VB_Parent
 
         ' find the most featureless roi
         Dim maxIndex As Integer
-        Dim roiCounts(task.gridList.Count - 1)
-        For i = 0 To task.gridList.Count - 1
-            roiCounts(i) = mask(task.gridList(i)).CountNonZero
+        Dim roiCounts(task.gridRects.Count - 1)
+        For i = 0 To task.gridRects.Count - 1
+            roiCounts(i) = mask(task.gridRects(i)).CountNonZero
             If roiCounts(i) > roiCounts(maxIndex) Then maxIndex = i
         Next
 
         mats.mat(3) = New cvb.Mat(src.Size(), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
-        src(task.gridList(maxIndex)).CopyTo(mats.mat(3)(task.gridList(maxIndex)), mask(task.gridList(maxIndex)))
+        src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
         mats.Run(empty)
         dst3 = mats.dst2
 
-        Dim roi = task.gridList(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
-        If roi.X = task.gridList(maxIndex).X And roi.Y = task.gridList(maxIndex).Y Then
+        Dim roi = task.gridRects(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
+        If roi.X = task.gridRects(maxIndex).X And roi.Y = task.gridRects(maxIndex).Y Then
             If roiCounts(maxIndex) > roi.Width * roi.Height / 4 Then
                 Dim fitPoints As New List(Of cvb.Point3f)
                 Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue

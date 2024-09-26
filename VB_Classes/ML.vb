@@ -7,13 +7,13 @@ Public Class ML_Basics : Inherits VB_Parent
         desc = "Predict depth from color to fill in the depth shadow areas"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Dim noDepthCount(task.gridList.Count - 1) As Integer
-        Dim roiColor(task.gridList.Count - 1) As cvb.Vec3b
+        Dim noDepthCount(task.gridRects.Count - 1) As Integer
+        Dim roiColor(task.gridRects.Count - 1) As cvb.Vec3b
 
         dst2.SetTo(0)
-        Parallel.For(0, task.gridList.Count,
+        Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             roiColor(i) = src(roi).Get(Of cvb.Vec3b)(roi.Height / 2, roi.Width / 2)
             dst2(roi).SetTo(roiColor(i), task.depthMask(roi))
             noDepthCount(i) = task.noDepthMask(roi).CountNonZero
@@ -22,10 +22,10 @@ Public Class ML_Basics : Inherits VB_Parent
         Dim rtree = cvb.ML.RTrees.Create()
         Dim mlInput As New List(Of mlData)
         Dim mResponse As New List(Of Single)
-        For i = 0 To task.gridList.Count - 1
+        For i = 0 To task.gridRects.Count - 1
             If noDepthCount(i) = 0 Then Continue For
             Dim ml As mlData
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             ml.row = roi.Y + roi.Height / 2
             ml.col = roi.X + roi.Width / 2
             Dim c = roiColor(i)
@@ -51,9 +51,9 @@ Public Class ML_Basics : Inherits VB_Parent
         Dim colors As New List(Of cvb.Vec3b)
         Dim saveRoi As New List(Of cvb.Rect)
         Dim depthMask As New List(Of cvb.Mat)
-        For i = 0 To task.gridList.Count - 1
+        For i = 0 To task.gridRects.Count - 1
             If noDepthCount(i) = 0 Then Continue For
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             depthMask.Add(task.noDepthMask(roi))
             Dim ml As mlData
             ml.row = roi.Y + roi.Height / 2
@@ -80,7 +80,7 @@ Public Class ML_Basics : Inherits VB_Parent
             dst3(roi).SetTo(colors(i), depthMask(i))
         Next
 
-        labels(2) = CStr(task.gridList.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
+        labels(2) = CStr(task.gridRects.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
     End Sub
 End Class
 
@@ -163,7 +163,7 @@ Public Class ML_FillRGBDepth_MT : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim minLearnCount = 5
-        Parallel.ForEach(task.gridList,
+        Parallel.ForEach(task.gridRects,
             Sub(roi)
                 task.pcSplit(2)(roi) = detectAndFillShadow(task.noDepthMask(roi), shadow.dst3(roi), task.pcSplit(2)(roi), src(roi), minLearnCount)
             End Sub)
@@ -346,8 +346,8 @@ Public Class ML_Color2Depth : Inherits VB_Parent
         Dim mResponse As New List(Of Single)
         Dim predictList As New List(Of mlColor)
         Dim roiPredict As New List(Of cvb.Rect)
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
             Dim mls As mlColor
             mls.colorIndex = color8U.dst2.Get(Of Byte)(roi.Y, roi.X)
             mls.x = roi.X
@@ -413,8 +413,8 @@ Public Class ML_ColorInTier2Depth : Inherits VB_Parent
         Dim mResponse As New List(Of Single)
         Dim predictList As New List(Of mlColorInTier)
         Dim roiPredict As New List(Of cvb.Rect)
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
             Dim mls As mlColorInTier
             mls.colorIndex = color8U.dst2.Get(Of Byte)(roi.Y, roi.X)
             mls.x = roi.X

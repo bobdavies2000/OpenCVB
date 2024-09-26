@@ -150,7 +150,7 @@ Public Class Math_StdevBoundary : Inherits VB_Parent
         Static stdevSlider = FindSlider("Stdev Threshold")
         Dim stdevThreshold = CSng(stdevSlider.Value)
 
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             If roi.X + roi.Width < dst3.Width Then
                 Dim m1 = dst2.Get(Of Byte)(roi.Y, roi.X)
                 Dim m2 = dst2.Get(Of Byte)(roi.Y, roi.X + roi.Width)
@@ -348,7 +348,7 @@ Public Class Math_Stdev : Inherits VB_Parent
 
         Static lastFrame As cvb.Mat = dst2.Clone()
         saveFrame = dst2.Clone
-        Parallel.ForEach(task.gridList,
+        Parallel.ForEach(task.gridRects,
         Sub(roi)
             Dim mean As Single, stdev As Single
             cvb.Cv2.MeanStdDev(dst2(roi), mean, stdev)
@@ -368,7 +368,7 @@ Public Class Math_Stdev : Inherits VB_Parent
         saveFrame.CopyTo(dst3, highStdevMask)
         lastFrame = saveFrame
         Dim stdevPercent = " stdev " + Format(stdevSlider.Value, "0.0")
-        labels(2) = CStr(updateCount) + " of " + CStr(task.gridList.Count) + " segments with < " + stdevPercent
-        labels(3) = CStr(task.gridList.Count - updateCount) + " out of " + CStr(task.gridList.Count) + " had stdev > " + Format(stdevSlider.Value, "0.0")
+        labels(2) = CStr(updateCount) + " of " + CStr(task.gridRects.Count) + " segments with < " + stdevPercent
+        labels(3) = CStr(task.gridRects.Count - updateCount) + " out of " + CStr(task.gridRects.Count) + " had stdev > " + Format(stdevSlider.Value, "0.0")
     End Sub
 End Class

@@ -28,7 +28,7 @@ Public Class SVM_Basics : Inherits VB_Parent
         svm.Train(dataMat, cvb.ML.SampleTypes.RowSample, resMat)
 
         dst3.SetTo(0)
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             If roi.X > src.Height Then Continue For ' working only with square - not rectangles.
             Dim samples() As Single = {roi.X / src.Height, roi.Y / src.Height}
             If svm.Predict(cvb.Mat.FromPixelData(1, 2, cvb.MatType.CV_32F, samples)) = 1 Then

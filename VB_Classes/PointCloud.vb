@@ -20,10 +20,10 @@ Public Class PointCloud_Basics : Inherits VB_Parent
     Public Function findHorizontalPoints(ByRef xyList As List(Of List(Of cvb.Point))) As List(Of List(Of cvb.Point3f))
         Dim ptlist As New List(Of List(Of cvb.Point3f))
         Dim lastVec = New cvb.Point3f
-        For y = 0 To task.pointCloud.Height - 1 Step task.gridList(0).Height - 1
+        For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
             Dim vecList As New List(Of cvb.Point3f)
             Dim xyVec As New List(Of cvb.Point)
-            For x = 0 To task.pointCloud.Width - 1 Step task.gridList(0).Width - 1
+            For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
                 Dim vec = task.pointCloud.Get(Of cvb.Point3f)(y, x)
                 Dim jumpZ As Boolean = False
                 If vec.Z > 0 Then
@@ -52,10 +52,10 @@ Public Class PointCloud_Basics : Inherits VB_Parent
     Public Function findVerticalPoints(ByRef xyList As List(Of List(Of cvb.Point))) As List(Of List(Of cvb.Point3f))
         Dim ptlist As New List(Of List(Of cvb.Point3f))
         Dim lastVec = New cvb.Point3f
-        For x = 0 To task.pointCloud.Width - 1 Step task.gridList(0).Width - 1
+        For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
             Dim vecList As New List(Of cvb.Point3f)
             Dim xyVec As New List(Of cvb.Point)
-            For y = 0 To task.pointCloud.Height - 1 Step task.gridList(0).Height - 1
+            For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
                 Dim vec = task.pointCloud.Get(Of cvb.Point3f)(y, x)
                 Dim jumpZ As Boolean = False
                 If vec.Z > 0 Then
@@ -445,7 +445,7 @@ Public Class PointCloud_Raw : Inherits VB_Parent
         dst2 = src.EmptyClone.SetTo(cvb.Scalar.White)
         dst3 = dst2.Clone()
         Dim black = New cvb.Vec3b(0, 0, 0)
-        Parallel.ForEach(task.gridList,
+        Parallel.ForEach(task.gridRects,
              Sub(roi)
                  For y = roi.Y To roi.Y + roi.Height - 1
                      For x = roi.X To roi.X + roi.Width - 1
@@ -675,7 +675,7 @@ Public Class PointCloud_PCpointsMask : Inherits VB_Parent
         Dim lastMeanZ As Single
         For y = 0 To task.gridRows - 1
             For x = 0 To task.gridCols - 1
-                Dim roi = task.gridList(y * task.gridCols + x)
+                Dim roi = task.gridRects(y * task.gridCols + x)
                 Dim mean = task.pointCloud(roi).Mean(task.depthMask(roi))
                 Dim depthPresent = task.depthMask(roi).CountNonZero > roi.Width * roi.Height / 2
                 If (depthPresent And mean(2) > 0 And Math.Abs(lastMeanZ - mean(2)) < 0.2 And
@@ -705,13 +705,13 @@ Public Class PointCloud_PCPoints : Inherits VB_Parent
         desc = "Reduce the point cloud to a manageable number points in 3D using the mean value"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Dim rw = task.gridList(0).Width / 2, rh = task.gridList(0).Height / 2
+        Dim rw = task.gridRects(0).Width / 2, rh = task.gridRects(0).Height / 2
         Dim red32 = New cvb.Point3f(0, 0, 1), blue32 = New cvb.Point3f(1, 0, 0), white32 = New cvb.Point3f(1, 1, 1)
         Dim red = cvb.Scalar.Red, blue = cvb.Scalar.Blue, white = cvb.Scalar.White
 
         pcPoints.Clear()
         dst2 = src
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim pt = New cvb.Point(roi.X + rw, roi.Y + rh)
             Dim mean = task.pointCloud(roi).Mean(task.depthMask(roi))
 
@@ -924,7 +924,7 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
                 If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
                     task.histogramBins += 1
                 End If
-                If task.gridList.Count < histData.Length And task.gridSize > 2 Then
+                If task.gridRects.Count < histData.Length And task.gridSize > 2 Then
                     task.gridSize -= 1
                     grid.Run(src)
                     dst2.SetTo(0)
@@ -932,8 +932,8 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
                 histData(0) = 0 ' count of zero pixels - distorts results..
 
                 Dim maxVal = histData.ToList.Max
-                For i = 0 To task.gridList.Count - 1
-                    Dim roi = task.gridList(i)
+                For i = 0 To task.gridRects.Count - 1
+                    Dim roi = task.gridRects(i)
                     If i >= histData.Length Then
                         dst2(roi).SetTo(0)
                     Else

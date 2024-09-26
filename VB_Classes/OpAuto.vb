@@ -277,7 +277,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
         End If
 
         Dim pointPop As New SortedList(Of Single, cvb.Point)(New compareAllowIdenticalSingleInverted)
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim mm as mmData = GetMinMax(src(roi))
             If mm.maxVal = 0 Then Continue For
             pointPop.Add(mm.maxVal, New cvb.Point(roi.X + mm.maxLoc.X, roi.Y + mm.maxLoc.Y))
@@ -326,12 +326,12 @@ Public Class OpAuto_PixelDifference : Inherits VB_Parent
         End If
 
         Dim gridCount As Integer
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             If src(roi).CountNonZero Then gridCount += 1
         Next
 
         If task.gOptions.pixelDiffThreshold < task.gOptions.PixelDiffBar.Maximum Then
-            If gridCount > task.gridList.Count / 10 Then task.gOptions.pixelDiffThreshold += 1
+            If gridCount > task.gridRects.Count / 10 Then task.gOptions.pixelDiffThreshold += 1
         End If
         If gridCount = 0 And task.gOptions.pixelDiffThreshold > 1 Then task.gOptions.pixelDiffThreshold -= 1
         SetTrueText("Pixel difference threshold is at " + CStr(task.gOptions.pixelDiffThreshold))

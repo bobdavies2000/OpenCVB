@@ -91,11 +91,11 @@ Public Class Density_Mask : Inherits VB_Parent
         src.SetTo(0, task.noDepthMask)
 
         Dim threshold = task.gridSize * task.gridSize / 2
-        Dim activeList(task.gridList.Count - 1) As Boolean
+        Dim activeList(task.gridRects.Count - 1) As Boolean
         dst3.SetTo(0)
-        Parallel.For(0, task.gridList.Count,
+        Parallel.For(0, task.gridRects.Count,
              Sub(i)
-                 Dim roi = task.gridList(i)
+                 Dim roi = task.gridRects(i)
                  Dim count = src(roi).CountNonZero
                  If count > threshold Then
                      dst3(roi).SetTo(cvb.Scalar.White)
@@ -107,7 +107,7 @@ Public Class Density_Mask : Inherits VB_Parent
 
         For i = 0 To activeList.Count - 1
             If activeList(i) Then
-                Dim roi = task.gridList(i)
+                Dim roi = task.gridRects(i)
                 pointList.Add(New cvb.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2))
             End If
         Next

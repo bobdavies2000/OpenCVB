@@ -414,8 +414,4 @@ Public Class OptionsGlobal
     Public Sub SetDotSize(val As Integer)
         DotSizeSlider.Value = val
     End Sub
-
-    Private Sub HistBinBar_Scroll(sender As Object, e As EventArgs) Handles HistBinBar.Scroll
-
-    End Sub
 End Class

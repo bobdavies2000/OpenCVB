@@ -223,7 +223,7 @@ public:
     int colorInputIndex;
     int depthInputIndex;
     float xRangeDefault; float yRangeDefault;
-    vector<Rect> gridList;
+    vector<Rect> gridRects;
     vector<vector<int>> gridNeighbors;
 
     Mat gMatrix; vector<Mat> pcSplit;

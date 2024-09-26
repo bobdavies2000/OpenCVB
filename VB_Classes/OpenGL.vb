@@ -448,7 +448,7 @@ Public Class OpenGL_Bricks : Inherits VB_Parent
         dst3 = tess.hulls.dst3
 
         Dim index As Integer
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             If index < tess.depths.Count Then
                 SetTrueText(Format(tess.depths(index), fmt1) + vbCrLf + Format(tess.depths(index + 1), fmt1), New cvb.Point(roi.X, roi.Y), 2)
             End If

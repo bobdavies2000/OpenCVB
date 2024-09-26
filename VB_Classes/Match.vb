@@ -204,9 +204,9 @@ Public Class Match_Motion : Inherits VB_Parent
         Dim updateCount As Integer
         mask.SetTo(0)
 
-        'Parallel.ForEach(task.gridList,
+        'Parallel.ForEach(task.gridRects,
         'Sub(roi)
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim correlation As New cvb.Mat, mean As Single, stdev As Single
             cvb.Cv2.MeanStdDev(dst2(roi), mean, stdev)
             If stdev > optionsMatch.stdevThreshold Then
@@ -229,9 +229,9 @@ Public Class Match_Motion : Inherits VB_Parent
         saveFrame.CopyTo(dst3, mask)
         lastFrame = saveFrame
         Dim corrPercent = Format(correlationSlider.Value / 100, "0.0%") + " correlation"
-        labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " + CStr(task.gridList.Count) + " with < " + corrPercent +
+        labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " + CStr(task.gridRects.Count) + " with < " + corrPercent +
                     " or stdev < " + Format(optionsMatch.stdevThreshold, fmt0)
-        labels(3) = CStr(task.gridList.Count - updateCount) + " segments out of " + CStr(task.gridList.Count) + " had > " + corrPercent
+        labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " + corrPercent
     End Sub
 End Class
 

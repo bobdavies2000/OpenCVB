@@ -3097,7 +3097,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             if (vbc.task.mousePicTag == 1) index = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
-            cv.Rect roiSave = index < vbc.task.gridList.Count ? vbc.task.gridList[index] : new cv.Rect();
+            cv.Rect roiSave = index < vbc.task.gridRects.Count ? vbc.task.gridRects[index] : new cv.Rect();
 
             if (vbc.task.optionsChanged) index = 0;
 
@@ -3124,16 +3124,16 @@ namespace CS_Classes
                 dst0 = dst0 | diff[i].dst2;
             }
 
-            int[,] counts = new int[4, vbc.task.gridList.Count];
+            int[,] counts = new int[4, vbc.task.gridRects.Count];
             List<List<int>> contourCounts = new List<List<int>>();
             List<List<float>> means = new List<List<float>>();
 
             cv.Point[][] allContours;
             for (int i = 0; i < counts.GetLength(0); i++)
             {
-                for (int j = 0; j < vbc.task.gridList.Count; j++)
+                for (int j = 0; j < vbc.task.gridRects.Count; j++)
                 {
-                    cv.Rect roi = vbc.task.gridList[j];
+                    cv.Rect roi = vbc.task.gridRects[j];
                     Mat tmp = new Mat(matList[i], roi);
                     Cv2.FindContours(tmp, out allContours, out _, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
                     if (i == 0)
@@ -3149,7 +3149,7 @@ namespace CS_Classes
             }
 
             int bump = 3;
-            double ratio = (double)dst2.Height / vbc.task.gridList[0].Height;
+            double ratio = (double)dst2.Height / vbc.task.gridRects[0].Height;
             for (int i = 0; i < matList.Length; i++)
             {
                 Mat tmp = new Mat(matList[i], roiSave) * 0.5;
@@ -5112,7 +5112,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             int index = vbc.task.gridMap.At<int>(vbc.task.mouseMovePoint.Y, vbc.task.mouseMovePoint.X);
-            var roi = vbc.task.gridList[index];
+            var roi = vbc.task.gridRects[index];
 
             colorFmt.Run(src);
             hist2d.Run(colorFmt.dst2);
@@ -5231,7 +5231,7 @@ namespace CS_Classes
             labels[2] = "Histogram 2D with Backprojection by " + selection;
             backp.Run(src);
             dst2 = Convert32f_To_8UC3(backp.dst2) * 255;
-            var roi = vbc.task.gridList[vbc.task.gridMap.Get<int>(vbc.task.mouseMovePoint.Y, vbc.task.mouseMovePoint.X)];
+            var roi = vbc.task.gridRects[vbc.task.gridMap.Get<int>(vbc.task.mouseMovePoint.Y, vbc.task.mouseMovePoint.X)];
             cv.Rect rect;
             if (options.backProjectRow)
             {
@@ -9986,10 +9986,10 @@ namespace CS_Classes
             dst2 = src.Clone();
 
             fast.Run(src);
-            fastCenters = new Point2f[vbc.task.gridList.Count];
-            for (int i = 0; i < vbc.task.gridList.Count; i++)
+            fastCenters = new Point2f[vbc.task.gridRects.Count];
+            for (int i = 0; i < vbc.task.gridRects.Count; i++)
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 Mat tmp = fast.dst3[roi];
                 var nonZero = tmp.FindNonZero();
                 if (nonZero.Rows > 0)
@@ -10693,21 +10693,21 @@ namespace CS_Classes
             vbc.task.pcSplit[2].SetTo(0, ~mask);
 
             int maxIndex = 0;
-            int[] roiCounts = new int[vbc.task.gridList.Count];
-            for (int i = 0; i < vbc.task.gridList.Count; i++)
+            int[] roiCounts = new int[vbc.task.gridRects.Count];
+            for (int i = 0; i < vbc.task.gridRects.Count; i++)
             {
-                roiCounts[i] = mask[vbc.task.gridList[i]].CountNonZero();
+                roiCounts[i] = mask[vbc.task.gridRects[i]].CountNonZero();
                 if (roiCounts[i] > roiCounts[maxIndex])
                     maxIndex = i;
             }
 
             mats.mat[3] = new Mat(src.Size(), MatType.CV_8UC3, cv.Scalar.All(0));
-            src[vbc.task.gridList[maxIndex]].CopyTo(mats.mat[3][vbc.task.gridList[maxIndex]], mask[vbc.task.gridList[maxIndex]]);
+            src[vbc.task.gridRects[maxIndex]].CopyTo(mats.mat[3][vbc.task.gridRects[maxIndex]], mask[vbc.task.gridRects[maxIndex]]);
             mats.Run(new Mat());
             dst3 = mats.dst2;
 
-            cv.Rect roi = vbc.task.gridList[maxIndex];
-            if (roi.X == vbc.task.gridList[maxIndex].X && roi.Y == vbc.task.gridList[maxIndex].Y)
+            cv.Rect roi = vbc.task.gridRects[maxIndex];
+            if (roi.X == vbc.task.gridRects[maxIndex].X && roi.Y == vbc.task.gridRects[maxIndex].Y)
             {
                 if (roiCounts[maxIndex] > roi.Width * roi.Height / 4)
                 {
@@ -11306,7 +11306,7 @@ namespace CS_Classes
         Kalman_Basics kalman = new Kalman_Basics();
         public Depth_MinMaxToVoronoi_CS()
         {
-            kalman.kInput = new float[vbc.task.gridList.Count() * 4];
+            kalman.kInput = new float[vbc.task.gridRects.Count() * 4];
             labels = new string[] { "", "", "Red is min distance, blue is max distance", "Voronoi representation of min and max points for each cell." };
             desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points.";
         }
@@ -11320,13 +11320,13 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (vbc.task.optionsChanged) kalman.kInput = new float[vbc.task.gridList.Count() * 4];
+            if (vbc.task.optionsChanged) kalman.kInput = new float[vbc.task.gridRects.Count() * 4];
             dst2 = src.Clone();
             dst2.SetTo(Scalar.White, vbc.task.gridMask);
             Mat depthmask = vbc.task.depthMask;
-            Parallel.For(0, vbc.task.gridList.Count(), i =>
+            Parallel.For(0, vbc.task.gridRects.Count(), i =>
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 mmData mm = GetMinMax(vbc.task.pcSplit[2][roi], depthmask[roi]);
                 if (mm.minLoc.X < 0 || mm.minLoc.Y < 0) mm.minLoc = new cv.Point(0, 0);
                 kalman.kInput[i * 4] = mm.minLoc.X;
@@ -11336,9 +11336,9 @@ namespace CS_Classes
             });
             kalman.Run(src);
             Subdiv2D subdiv = new Subdiv2D(new cv.Rect(0, 0, src.Width, src.Height));
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 Point2f ptmin = new Point2f(kalman.kOutput[i * 4] + roi.X, kalman.kOutput[i * 4 + 1] + roi.Y);
                 Point2f ptmax = new Point2f(kalman.kOutput[i * 4 + 2] + roi.X, kalman.kOutput[i * 4 + 3] + roi.Y);
                 ptmin = ValidatePoint2f(ptmin);
@@ -11507,11 +11507,11 @@ namespace CS_Classes
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             src.SetTo(0, vbc.task.noDepthMask);
             var threshold = vbc.task.gridSize * vbc.task.gridSize / 2;
-            bool[] activeList = new bool[vbc.task.gridList.Count()];
+            bool[] activeList = new bool[vbc.task.gridRects.Count()];
             dst3.SetTo(0);
-            Parallel.For(0, vbc.task.gridList.Count(), i =>
+            Parallel.For(0, vbc.task.gridRects.Count(), i =>
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 var count = src[roi].CountNonZero();
                 if (count > threshold)
                 {
@@ -11524,7 +11524,7 @@ namespace CS_Classes
             {
                 if (activeList[i])
                 {
-                    var roi = vbc.task.gridList[i];
+                    var roi = vbc.task.gridRects[i];
                     pointList.Add(new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2));
                 }
             }
@@ -11626,15 +11626,15 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             if (vbc.task.optionsChanged)
-                meanSeries = new cv.Mat(vbc.task.gridList.Count, vbc.task.frameHistoryCount, MatType.CV_32F, cv.Scalar.All(0));
+                meanSeries = new cv.Mat(vbc.task.gridRects.Count, vbc.task.frameHistoryCount, MatType.CV_32F, cv.Scalar.All(0));
 
             int index = vbc.task.frameCount % vbc.task.frameHistoryCount;
-            float[] meanValues = new float[vbc.task.gridList.Count];
-            float[] stdValues = new float[vbc.task.gridList.Count];
+            float[] meanValues = new float[vbc.task.gridRects.Count];
+            float[] stdValues = new float[vbc.task.gridRects.Count];
 
-            Parallel.For(0, vbc.task.gridList.Count, i =>
+            Parallel.For(0, vbc.task.gridRects.Count, i =>
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 Cv2.MeanStdDev(vbc.task.pcSplit[2][roi], out Scalar mean, out Scalar stdev, vbc.task.depthMask[roi]);
                 meanSeries.Set(i, index, (float)mean.Val0);
                 if (vbc.task.frameCount >= vbc.task.frameHistoryCount - 1)
@@ -11647,8 +11647,8 @@ namespace CS_Classes
 
             if (vbc.task.frameCount >= vbc.task.frameHistoryCount)
             {
-                var means = cv.Mat.FromPixelData(vbc.task.gridList.Count, 1, MatType.CV_32F, meanValues);
-                var stdevs = cv.Mat.FromPixelData(vbc.task.gridList.Count, 1, MatType.CV_32F, stdValues);
+                var means = cv.Mat.FromPixelData(vbc.task.gridRects.Count, 1, MatType.CV_32F, meanValues);
+                var stdevs = cv.Mat.FromPixelData(vbc.task.gridRects.Count, 1, MatType.CV_32F, stdValues);
                 var meanmask = means.Threshold(1, vbc.task.MaxZmeters, ThresholdTypes.Binary).ConvertScaleAbs();
                 var mm = GetMinMax(means, meanmask);
                 var stdMask = stdevs.Threshold(0.001, vbc.task.MaxZmeters, ThresholdTypes.Binary).ConvertScaleAbs();
@@ -11657,9 +11657,9 @@ namespace CS_Classes
                 maxMeanVal = Math.Max(maxMeanVal, (float)mm.maxVal);
                 maxStdevVal = Math.Max(maxStdevVal, (float)mmStd.maxVal);
 
-                Parallel.For(0, vbc.task.gridList.Count, i =>
+                Parallel.For(0, vbc.task.gridRects.Count, i =>
                 {
-                    var roi = vbc.task.gridList[i];
+                    var roi = vbc.task.gridRects[i];
                     dst3[roi].SetTo(255 * stdevs.Get<float>(i, 0) / maxStdevVal);
                     dst3[roi].SetTo(0, vbc.task.noDepthMask[roi]);
 
@@ -11675,9 +11675,9 @@ namespace CS_Classes
 
                 if (standaloneTest())
                 {
-                    for (int i = 0; i < vbc.task.gridList.Count; i++)
+                    for (int i = 0; i < vbc.task.gridRects.Count; i++)
                     {
-                        var roi = vbc.task.gridList[i];
+                        var roi = vbc.task.gridRects[i];
                         SetTrueText($"{meanValues[i]:F3}\n{stdValues[i]:F3}", new cv.Point(roi.X, roi.Y), 3);
                     }
                 }
@@ -11835,18 +11835,18 @@ namespace CS_Classes
                 dst2.SetTo(Scalar.White, vbc.task.gridMask);
             }
 
-            if (minPoint.Length != vbc.task.gridList.Count)
+            if (minPoint.Length != vbc.task.gridRects.Count)
             {
-                Array.Resize(ref minPoint, vbc.task.gridList.Count);
-                Array.Resize(ref maxPoint, vbc.task.gridList.Count);
+                Array.Resize(ref minPoint, vbc.task.gridRects.Count);
+                Array.Resize(ref maxPoint, vbc.task.gridRects.Count);
             }
 
             if (vbc.task.heartBeat)
                 dst3.SetTo(0);
 
-            Parallel.For(0, vbc.task.gridList.Count, i =>
+            Parallel.For(0, vbc.task.gridRects.Count, i =>
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 mmData mm = GetMinMax(vbc.task.pcSplit[2][roi], vbc.task.depthMask[roi]);
                 if (mm.minLoc.X < 0 || mm.minLoc.Y < 0)
                     mm.minLoc = new cv.Point(0, 0);
@@ -12351,7 +12351,7 @@ namespace CS_Classes
             dst3 = vbc.task.pcSplit[2];
             dst2 = vbc.task.gridMask.Clone();
 
-            foreach (cv.Rect roi in vbc.task.gridList)
+            foreach (cv.Rect roi in vbc.task.gridRects)
             {
                 double minVal, maxVal;
                 Cv2.MinMaxLoc(dst3[roi], out minVal, out maxVal);
@@ -12890,7 +12890,7 @@ namespace CS_Classes
             double multX = vbc.task.pointCloud.Width / src.Width;
             double multY = vbc.task.pointCloud.Height / src.Height;
 
-            Parallel.ForEach(vbc.task.gridList, roi =>
+            Parallel.ForEach(vbc.task.gridRects, roi =>
             {
                 Point3f xy = new Point3f();
                 for (int y = roi.Y; y < roi.Y + roi.Height; y++)
@@ -15232,11 +15232,11 @@ namespace CS_Classes
             options.RunOpt();
             dst2 = vbc.task.leftView;
             dst3 = vbc.task.rightView;
-            int[] maxLocs = new int[vbc.task.gridList.Count()];
+            int[] maxLocs = new int[vbc.task.gridRects.Count()];
             List<int> highlights = new List<int>();
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 int width = roi.X + roi.Width + options.searchDepth < dst2.Width ? roi.Width + options.searchDepth : dst2.Width - roi.X - 1;
                 var searchROI = new cv.Rect(roi.X, roi.Y, width, roi.Height);
                 match.template = dst3[roi];
@@ -15260,7 +15260,7 @@ namespace CS_Classes
                 labels[2] = "Matched grid segments in dst3 with disparity";
                 foreach (var i in highlights)
                 {
-                    var roi = vbc.task.gridList[i];
+                    var roi = vbc.task.gridRects[i];
                     dst3.Rectangle(roi, Scalar.Red, 2);
                     roi.X += maxLocs[i];
                     dst2.Rectangle(roi, Scalar.Red, 2);
@@ -15281,7 +15281,7 @@ namespace CS_Classes
                     if (!redRects.Contains(vbc.task.gridROIclicked)) redRects.Add(vbc.task.gridROIclicked);
                     foreach (var i in redRects)
                     {
-                        var roi = vbc.task.gridList[i];
+                        var roi = vbc.task.gridRects[i];
                         dst3.Rectangle(roi, Scalar.Red, 2);
                         roi.X += maxLocs[i];
                         dst2.Rectangle(roi, Scalar.Red, 2);
@@ -16328,13 +16328,13 @@ namespace CS_Classes
                 vbc.task.gOptions.setGridSize((int)(dst2.Width / 3));
                 vbc.task.grid.Run(dst2);
             }
-            if (regionCount != vbc.task.gridList.Count) vbc.task.optionsChanged = true;
-            regionCount = vbc.task.gridList.Count;
+            if (regionCount != vbc.task.gridRects.Count) vbc.task.optionsChanged = true;
+            regionCount = vbc.task.gridRects.Count;
             Mat samples = new Mat(regionCount * options.samplesPerRegion, 2, MatType.CV_32F).Reshape(2, 0);
             Mat eLabelMat = new Mat(regionCount * options.samplesPerRegion, 1, MatType.CV_32S);
             for (int i = 0; i < regionCount; i++)
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 eLabelMat.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion).SetTo(i);
                 Mat tmp = samples.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion);
                 Cv2.Randn(tmp, new Scalar(roi.X + vbc.task.gridSize / 2, roi.Y + vbc.task.gridSize / 2),
@@ -16606,13 +16606,13 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             Mat entropyMap = new Mat(src.Size(), MatType.CV_32F);
-            float[] entropyList = new float[vbc.task.gridList.Count];
+            float[] entropyList = new float[vbc.task.gridRects.Count];
             float maxEntropy = float.MinValue;
             float minEntropy = float.MaxValue;
             src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            for (int i = 0; i < vbc.task.gridList.Count; i++)
+            for (int i = 0; i < vbc.task.gridRects.Count; i++)
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 entropy.Run(src[roi]);
                 entropyMap[roi].SetTo(entropy.entropyVal);
                 if (entropy.entropyVal > maxEntropy || vbc.task.optionsChanged)
@@ -16742,9 +16742,9 @@ namespace CS_Classes
             int[] dimensions = new int[] { vbc.task.histogramBins };
             Rangef[] ranges = new Rangef[] { new Rangef(0, 255) };
             Mat hist = new Mat();
-            for (int i = 0; i < vbc.task.gridList.Count; i++)
+            for (int i = 0; i < vbc.task.gridRects.Count; i++)
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 Cv2.CalcHist(new Mat[] { dst1[roi] }, new int[] { 0 }, null, hist, 1, dimensions, ranges);
                 hist = hist.Normalize(0, hist.Rows, NormTypes.MinMax);
                 float nextEntropy = entropy.channelEntropy((int)dst1[roi].Total(), hist) * 1000;
@@ -17749,7 +17749,7 @@ namespace CS_Classes
             {
                 dst3.Set<byte>((int)pt.Y, (int)pt.X, 255);
             }
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 Mat test = dst3.SubMat(roi).FindNonZero();
                 SetTrueText(test.Rows.ToString(), roi.TopLeft, 3);
@@ -17820,9 +17820,9 @@ namespace CS_Classes
                 case (int) FeatureSrc.GoodFeaturesGrid:
                     options.featurePoints = 4;
                     features.Clear();
-                    for (int i = 0; i < vbc.task.gridList.Count; i++)
+                    for (int i = 0; i < vbc.task.gridRects.Count; i++)
                     {
-                        var roi = vbc.task.gridList[i];
+                        var roi = vbc.task.gridRects[i];
                         var tmpFeatures = new List<cv.Point2f>(Cv2.GoodFeaturesToTrack(src.SubMat(roi), options.featurePoints, options.quality, options.minDistance, null,
                                                                      options.blockSize, true, options.k));
                         for (int j = 0; j < tmpFeatures.Count; j++)
@@ -20873,7 +20873,7 @@ namespace CS_Classes
             stdevList.Clear();
             meanList.Clear();
             Scalar mean, stdev;
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 Cv2.MeanStdDev(dst1[roi], out mean, out stdev);
                 stdevList.Add((float)stdev.Val0);
@@ -20884,7 +20884,7 @@ namespace CS_Classes
             rects.Clear();
             for (int i = 0; i < stdevList.Count; i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 var depthCheck = vbc.task.noDepthMask[roi];
                 if (stdevList[i] < stdevAverage || depthCheck.CountNonZero() / depthCheck.Total() > 0.5)
                 {
@@ -20897,7 +20897,7 @@ namespace CS_Classes
             }
             if (vbc.task.heartBeat)
             {
-                labels[2] = $"{rects.Count} of {vbc.task.gridList.Count} roi's had above average standard deviation (average = {stdevList.Average().ToString(vbc.fmt1)})";
+                labels[2] = $"{rects.Count} of {vbc.task.gridRects.Count} roi's had above average standard deviation (average = {stdevList.Average().ToString(vbc.fmt1)})";
             }
             addw.src2 = dst3;
             addw.Run(dst1);
@@ -20924,7 +20924,7 @@ namespace CS_Classes
             var stdevList1 = new List<float>();
             var stdevList2 = new List<float>();
             Scalar mean, stdev;
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 Cv2.MeanStdDev(src[roi], out mean, out stdev);
                 stdevList0.Add((float)stdev.Val0);
@@ -20937,7 +20937,7 @@ namespace CS_Classes
             dst3.SetTo(0);
             for (int i = 0; i < stdevList0.Count; i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 if (stdevList0[i] < avg0 && stdevList1[i] < avg1 && stdevList2[i] < avg2)
                 {
                     dst3.Rectangle(roi, Scalar.White, -1);
@@ -20999,7 +20999,7 @@ namespace CS_Classes
             bgrList.Clear();
             roiList.Clear();
             categories = new int[10];
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 Cv2.MeanStdDev(src[roi], out meanS, out stdev);
                 sortedStd.Add((float)(stdev.Val0 + stdev.Val1 + stdev.Val2), roi);
@@ -21127,7 +21127,7 @@ namespace CS_Classes
             int motionCount = 0;
             for (int i = 0; i < gather.stdevList.Count; i++)
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 if (gather.stdevList[i] >= gather.stdevAverage)
                 {
                     Cv2.MatchTemplate(dst1[roi], lastImage[roi], correlationMat, TemplateMatchModes.CCoeffNormed);
@@ -21140,7 +21140,7 @@ namespace CS_Classes
             plot.min = -1;
             plot.Run(empty);
             dst3 = plot.dst2;
-            labels[2] = gather.rects.Count + " of " + vbc.task.gridList.Count + " roi's had above average standard deviation.";
+            labels[2] = gather.rects.Count + " of " + vbc.task.gridRects.Count + " roi's had above average standard deviation.";
             lastImage = dst1.Clone();
         }
     }
@@ -21164,14 +21164,14 @@ namespace CS_Classes
             rects.Clear();
             for (int i = 0; i < gather.stdevList.Count; i++)
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 if (gather.stdevList[i] < gather.stdevAverage)
                 {
                     rects.Add(roi);
                     SetTrueText(gather.stdevList[i].ToString(vbc.fmt3), roi.TopLeft, 3);
                 }
             }
-            if (vbc.task.heartBeat) labels = new string[] { "", "", (vbc.task.gridList.Count - gather.rects.Count).ToString() + " roi's had low standard deviation ", "Stdev average = " + gather.stdevList.Average().ToString(vbc.fmt3) };
+            if (vbc.task.heartBeat) labels = new string[] { "", "", (vbc.task.gridRects.Count - gather.rects.Count).ToString() + " roi's had low standard deviation ", "Stdev average = " + gather.stdevList.Average().ToString(vbc.fmt3) };
         }
     }
 
@@ -21291,7 +21291,7 @@ namespace CS_Classes
             if (ClickPoint == new cv.Point()) setClickPoint(gather.rects[gather.rects.Count / 2].TopLeft, 2);
 
             int gridIndex = vbc.task.gridMap.Get<int>(ClickPoint.Y, ClickPoint.X);
-            cv.Rect roi = vbc.task.gridList[gridIndex];
+            cv.Rect roi = vbc.task.gridRects[gridIndex];
             dst2.Rectangle(roi, Scalar.White, vbc.task.lineWidth);
 
             Mat correlationMat = new Mat();
@@ -21860,7 +21860,7 @@ namespace CS_Classes
             src.CopyTo(dst2);
             List<Line3D> lines = new List<Line3D>();
             Line3D nullLine = new Line3D(0, 0, 0, 0, 0, 0);
-            Parallel.ForEach(vbc.task.gridList, roi =>
+            Parallel.ForEach(vbc.task.gridRects, roi =>
             {
                 Mat depth = vbc.task.pcSplit[2][roi];
                 Mat fMask = mask[roi];
@@ -21898,9 +21898,9 @@ namespace CS_Classes
                 }
             });
             // putting this in the parallel for above causes a memory leak - could not find it...
-            for (int i = 0; i < vbc.task.gridList.Count; i++)
+            for (int i = 0; i < vbc.task.gridRects.Count; i++)
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 houghShowLines3D(dst2[roi], lines[i]);
             }
         }
@@ -23952,8 +23952,8 @@ namespace CS_Classes
 
     public class Grid_Basics_CS : VB_Parent
     {
-        public List<cv.Rect> gridList = new List<cv.Rect>();
-        public bool updateTaskGridList = true;
+        public List<cv.Rect> gridRects = new List<cv.Rect>();
+        public bool updateTaskgridRects = true;
         public Grid_Basics_CS()
         {
             desc = "Create a grid of squares covering the entire image.";
@@ -23969,7 +23969,7 @@ namespace CS_Classes
                 vbc.task.gridSize = vbc.task.gOptions.getGridSize();
                 vbc.task.gridMask = new Mat(src.Size(), MatType.CV_8U);
                 vbc.task.gridMap = new Mat(src.Size(), MatType.CV_32S, cv.Scalar.All(255));
-                gridList.Clear();
+                gridRects.Clear();
                 vbc.task.gridIndex.Clear();
                 vbc.task.gridRows = 0;
                 vbc.task.gridCols = 0;
@@ -23983,7 +23983,7 @@ namespace CS_Classes
                         {
                             if (x == 0) vbc.task.gridRows += 1;
                             if (y == 0) vbc.task.gridCols += 1;
-                            gridList.Add(roi);
+                            gridRects.Add(roi);
                             vbc.task.gridIndex.Add(index);
                             index++;
                         }
@@ -24006,14 +24006,14 @@ namespace CS_Classes
                         var p2 = new cv.Point(src.Width, y);
                         vbc.task.gridMask.Line(p1, p2, cv.Scalar.All(255), vbc.task.lineWidth);
                     }
-                    for (int i = 0; i < gridList.Count; i++)
+                    for (int i = 0; i < gridRects.Count; i++)
                     {
-                        cv.Rect roi = gridList[i];
+                        cv.Rect roi = gridRects[i];
                         vbc.task.gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
                     }
                     vbc.task.gridNeighbors.Clear();
                     int xx = 0, yy = 0;
-                    foreach (var roi in gridList)
+                    foreach (var roi in gridRects)
                     {
                         vbc.task.gridNeighbors.Add(new List<int>());
                         for (int i = 0; i < 9; i++)
@@ -24045,7 +24045,7 @@ namespace CS_Classes
                         }
                     }
                 }
-                foreach (var roi in gridList)
+                foreach (var roi in gridRects)
                 {
                     int xSub = roi.X + roi.Width;
                     int ySub = roi.Y + roi.Height;
@@ -24074,10 +24074,10 @@ namespace CS_Classes
                 dst2 = new Mat(src.Size(), MatType.CV_8U);
                 vbc.task.color.CopyTo(dst2);
                 dst2.SetTo(Scalar.White, vbc.task.gridMask);
-                labels[2] = "Grid_Basics_CS " + gridList.Count + " (" + vbc.task.gridRows + "X" + vbc.task.gridCols + ") " +
+                labels[2] = "Grid_Basics_CS " + gridRects.Count + " (" + vbc.task.gridRows + "X" + vbc.task.gridCols + ") " +
                             vbc.task.gridSize + "X" + vbc.task.gridSize + " regions";
             }
-            if (updateTaskGridList) vbc.task.gridList = gridList;
+            if (updateTaskgridRects) vbc.task.gridRects = gridRects;
         }
     }
 
@@ -24095,17 +24095,17 @@ namespace CS_Classes
         {
             var mean = Cv2.Mean(src);
             dst2.SetTo(0);
-            for (int i = 0; i < vbc.task.gridList.Count; i++)
+            for (int i = 0; i < vbc.task.gridRects.Count; i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 Cv2.Subtract(mean, src[roi], dst2[roi]);
                 SetTrueText(i.ToString(), new cv.Point(roi.X, roi.Y));
             }
             dst2.SetTo(Scalar.White, vbc.task.gridMask);
             dst3.SetTo(0);
-            Parallel.For(0, vbc.task.gridList.Count, i =>
+            Parallel.For(0, vbc.task.gridRects.Count, i =>
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 Cv2.Subtract(mean, src[roi], dst3[roi]);
                 DrawLine(dst3[roi], new cv.Point(0, 0), new cv.Point(roi.Width, roi.Height), Scalar.White, vbc.task.lineWidth);
             });
@@ -24124,7 +24124,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            Parallel.ForEach(vbc.task.gridList, roi =>
+            Parallel.ForEach(vbc.task.gridRects, roi =>
             {
                 dst3[roi].SetTo(0);
             });
@@ -24142,7 +24142,7 @@ namespace CS_Classes
                     if (threadCount % 5 == 0) str += "\n";
                     if (thread.ThreadState != System.Diagnostics.ThreadState.Wait) notIdle++;
                 }
-                SetTrueText("There were " + threadCount + " threads in OpenCVB with " + notIdle + " of them not idle when traversing the gridList" + "\n" + str);
+                SetTrueText("There were " + threadCount + " threads in OpenCVB with " + notIdle + " of them not idle when traversing the gridRects" + "\n" + str);
             }
             catch (Exception e)
             {
@@ -24172,7 +24172,7 @@ namespace CS_Classes
             if (vbc.task.mouseClickFlag) vbc.task.gridROIclicked = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
             if (vbc.task.optionsChanged)
             {
-                vbc.task.gridList.Clear();
+                vbc.task.gridRects.Clear();
                 for (int y = 0; y < dst2.Height; y += options.height)
                 {
                     for (int x = 0; x < dst2.Width; x += options.width)
@@ -24184,7 +24184,7 @@ namespace CS_Classes
                         {
                             if (y == 0) tilesPerRow += 1;
                             if (x == 0) tilesPerCol += 1;
-                            vbc.task.gridList.Add(roi);
+                            vbc.task.gridRects.Add(roi);
                         }
                     }
                 }
@@ -24201,9 +24201,9 @@ namespace CS_Classes
                     var p2 = new cv.Point(dst2.Width, y);
                     vbc.task.gridMask.Line(p1, p2, cv.Scalar.All(255), vbc.task.lineWidth);
                 }
-                for (int i = 0; i < vbc.task.gridList.Count; i++)
+                for (int i = 0; i < vbc.task.gridRects.Count; i++)
                 {
-                    var roi = vbc.task.gridList[i];
+                    var roi = vbc.task.gridRects[i];
                     vbc.task.gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
                 }
             }
@@ -24211,7 +24211,7 @@ namespace CS_Classes
             {
                 vbc.task.color.CopyTo(dst2);
                 dst2.SetTo(Scalar.White, vbc.task.gridMask);
-                labels[2] = "Grid_Basics " + vbc.task.gridList.Count + " (" + tilesPerRow + "X" + tilesPerCol + ") " +
+                labels[2] = "Grid_Basics " + vbc.task.gridRects.Count + " (" + tilesPerRow + "X" + tilesPerCol + ") " +
                             options.width + "X" + options.height + " regions";
             }
         }
@@ -24289,7 +24289,7 @@ namespace CS_Classes
                 int roiIndex = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
                 foreach (int index in vbc.task.gridNeighbors[roiIndex])
                 {
-                    var roi = vbc.task.gridList[index];
+                    var roi = vbc.task.gridRects[index];
                     mask.Rectangle(roi, Scalar.White);
                 }
             }
@@ -24304,7 +24304,7 @@ namespace CS_Classes
     {
         public int gridWidth = 10;
         public int gridHeight = 10;
-        public List<cv.Rect> gridList = new List<cv.Rect>();
+        public List<cv.Rect> gridRects = new List<cv.Rect>();
         public int gridRows;
         public int gridCols;
         public Mat gridMask;
@@ -24321,7 +24321,7 @@ namespace CS_Classes
             if (vbc.task.optionsChanged)
             {
                 gridWidth = vbc.task.gridSize;
-                gridList.Clear();
+                gridRects.Clear();
                 gridRows = 0;
                 gridCols = 0;
                 for (int y = 0; y < dst2.Height; y += gridHeight)
@@ -24335,7 +24335,7 @@ namespace CS_Classes
                         {
                             if (x == 0) gridRows += 1;
                             if (y == 0) gridCols += 1;
-                            gridList.Add(roi);
+                            gridRects.Add(roi);
                         }
                     }
                 }
@@ -24352,13 +24352,13 @@ namespace CS_Classes
                     var p2 = new cv.Point(dst2.Width, y);
                     gridMask.Line(p1, p2, cv.Scalar.All(255), vbc.task.lineWidth);
                 }
-                for (int i = 0; i < vbc.task.gridList.Count; i++)
+                for (int i = 0; i < vbc.task.gridRects.Count; i++)
                 {
-                    var roi = gridList[i];
+                    var roi = gridRects[i];
                     gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
                 }
                 gridNeighbors.Clear();
-                foreach (var roi in gridList)
+                foreach (var roi in gridRects)
                 {
                     gridNeighbors.Add(new List<int>());
                     int x = 0, y = 0;
@@ -24395,7 +24395,7 @@ namespace CS_Classes
             {
                 vbc.task.color.CopyTo(dst2);
                 dst2.SetTo(Scalar.White, gridMask);
-                labels[2] = "Grid_Basics " + gridList.Count + " (" + gridRows + "X" + gridCols + ") " +
+                labels[2] = "Grid_Basics " + gridRects.Count + " (" + gridRows + "X" + gridCols + ") " +
                             gridWidth + "X" + gridHeight + " regions";
             }
         }
@@ -24406,19 +24406,19 @@ namespace CS_Classes
 
     public class Grid_QuarterRes_CS : VB_Parent
     {
-        public List<cv.Rect> gridList = new List<cv.Rect>();
+        public List<cv.Rect> gridRects = new List<cv.Rect>();
         Grid_Basics grid = new Grid_Basics();
         Mat inputSrc;
         public Grid_QuarterRes_CS()
         {
             inputSrc = new Mat(vbc.task.quarterRes, MatType.CV_8U, cv.Scalar.All(0));
-            grid.updateTaskGridList = false;
+            grid.updateTaskgridRects = false;
             desc = "Provide the grid list for the lowest resolution of the current stream.";
         }
         public void RunAlg(Mat src)
         {
             grid.Run(inputSrc);
-            gridList = grid.gridList;
+            gridRects = grid.gridRects;
             if (standaloneTest()) dst2 = vbc.task.gridMask;
         }
     }
@@ -24439,12 +24439,12 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            if (minMaxLocs.Length != vbc.task.gridList.Count) Array.Resize(ref minMaxLocs, vbc.task.gridList.Count);
-            if (minMaxVals.Length != vbc.task.gridList.Count) Array.Resize(ref minMaxVals, vbc.task.gridList.Count);
+            if (minMaxLocs.Length != vbc.task.gridRects.Count) Array.Resize(ref minMaxLocs, vbc.task.gridRects.Count);
+            if (minMaxVals.Length != vbc.task.gridRects.Count) Array.Resize(ref minMaxVals, vbc.task.gridRects.Count);
             mmData mm = new mmData();
             for (int i = 0; i < minMaxLocs.Length; i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 vbc.task.pcSplit[2][roi].MinMaxLoc(out mm.minVal, out mm.maxVal, out mm.minLoc, out mm.maxLoc, vbc.task.depthMask[roi]);
                 minMaxLocs[i] = new PointPair(mm.minLoc, mm.maxLoc);
                 minMaxVals[i] = new Vec2f((float)mm.minVal, (float)mm.maxVal);
@@ -24455,8 +24455,8 @@ namespace CS_Classes
                 for (int i = 0; i < minMaxLocs.Length; i++)
                 {
                     var lp = minMaxLocs[i];
-                    DrawCircle(dst2[vbc.task.gridList[i]], lp.p2, vbc.task.DotSize, Scalar.Red);
-                    DrawCircle(dst2[vbc.task.gridList[i]], lp.p1, vbc.task.DotSize, Scalar.White);
+                    DrawCircle(dst2[vbc.task.gridRects[i]], lp.p2, vbc.task.DotSize, Scalar.Red);
+                    DrawCircle(dst2[vbc.task.gridRects[i]], lp.p1, vbc.task.DotSize, Scalar.White);
                 }
                 dst2.SetTo(Scalar.White, vbc.task.gridMask);
             }
@@ -24481,7 +24481,7 @@ namespace CS_Classes
             {
                 vbc.task.gOptions.setDebugCheckBox(false);
                 int index = vbc.task.gridMap.Get<int>(dst2.Height / 2, dst2.Width / 2);
-                var roi = vbc.task.gridList[index];
+                var roi = vbc.task.gridRects[index];
                 match.template = src[roi].Clone();
                 center = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
             }
@@ -24893,7 +24893,7 @@ namespace CS_Classes
             object sync1 = new object(), sync2 = new object();
             if (vbc.task.gOptions.getMultiThreading())
             {
-                Parallel.ForEach(vbc.task.gridList, roi =>
+                Parallel.ForEach(vbc.task.gridRects, roi =>
                 {
                     int count1 = heat.histogramTop[roi].CountNonZero();
                     dst2[roi].SetTo(count1);
@@ -24917,7 +24917,7 @@ namespace CS_Classes
             }
             else
             {
-                foreach (var roi in vbc.task.gridList)
+                foreach (var roi in vbc.task.gridRects)
                 {
                     int count1 = heat.histogramTop[roi].CountNonZero();
                     dst2[roi].SetTo(count1);
@@ -26926,7 +26926,7 @@ namespace CS_Classes
             if (pixels.pixelVector.Count == 0) return;
             dst1.SetTo(0);
             dst0 = vbc.task.cellMap;
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 if (dst3[roi].CountNonZero() > 0)
                 {
@@ -29235,7 +29235,7 @@ namespace CS_Classes
             edges.Run(src);
             dst2 = edges.dst2;
             var depth8uC3 = vbc.task.depthRGB;
-            Parallel.ForEach(vbc.task.gridList, roi =>
+            Parallel.ForEach(vbc.task.gridRects, roi =>
             {
                 var segments = Cv2.HoughLines(dst2[roi], options.rho, options.theta, options.threshold);
                 if (segments.Length == 0)
@@ -29272,9 +29272,9 @@ namespace CS_Classes
             edges.Run(src);
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
             int regionCount = 0;
-            noDepthCount = new int[vbc.task.gridList.Count()];
-            roiColor = new Vec3b[vbc.task.gridList.Count()];
-            foreach (var roi in vbc.task.gridList)
+            noDepthCount = new int[vbc.task.gridRects.Count()];
+            roiColor = new Vec3b[vbc.task.gridRects.Count()];
+            foreach (var roi in vbc.task.gridRects)
             {
                 var segments = Cv2.HoughLines(edges.dst2[roi], options.rho, options.theta, options.threshold);
                 if (edges.dst2[roi].CountNonZero() == 0)
@@ -29286,7 +29286,7 @@ namespace CS_Classes
             dst3.SetTo(0);
             src.CopyTo(dst3, dst2);
             labels[2] = "FeatureLess Regions = " + regionCount;
-            labels[3] = "Of the " + vbc.task.gridList.Count() + " grid elements, " + regionCount + " had no edge or hough features present";
+            labels[3] = "Of the " + vbc.task.gridRects.Count() + " grid elements, " + regionCount + " had no edge or hough features present";
         }
     }
 
@@ -29319,7 +29319,7 @@ namespace CS_Classes
             src.CopyTo(dst2);
             maskFless.SetTo(0);
             maskFeat.SetTo(0);
-            Parallel.ForEach(vbc.task.gridList, roi =>
+            Parallel.ForEach(vbc.task.gridRects, roi =>
             {
                 var segments = Cv2.HoughLines(edges.dst2[roi], options.rho, options.theta, options.threshold);
                 if (segments.Length == 0) maskFless[roi].SetTo(255);
@@ -37581,9 +37581,9 @@ namespace CS_Classes
             Mat saveFrame = dst2.Clone();
             int updateCount = 0;
             mask.SetTo(0);
-            // Parallel.ForEach(vbc.task.gridList,
+            // Parallel.ForEach(vbc.task.gridRects,
             // roi =>
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 Mat correlation = new Mat();
                 cv.Scalar mean, stdev;
@@ -37614,9 +37614,9 @@ namespace CS_Classes
             saveFrame.CopyTo(dst3, mask);
             lastFrame = saveFrame;
             string corrPercent = string.Format("{0:0.0%} correlation", (float)correlationSlider.Value / 100);
-            labels[2] = "Correlation value for each cell is shown. " + updateCount + " of " + vbc.task.gridList.Count() + " with < " + corrPercent +
+            labels[2] = "Correlation value for each cell is shown. " + updateCount + " of " + vbc.task.gridRects.Count() + " with < " + corrPercent +
                         " or stdev < " + optionsMatch.stdevThreshold.ToString(vbc.fmt0);
-            labels[3] = (vbc.task.gridList.Count() - updateCount) + " segments out of " + vbc.task.gridList.Count() + " had > " + corrPercent;
+            labels[3] = (vbc.task.gridRects.Count() - updateCount) + " segments out of " + vbc.task.gridRects.Count() + " had > " + corrPercent;
         }
     }
 
@@ -38221,7 +38221,7 @@ namespace CS_Classes
             dst2 = stdev.dst2;
             stdev.saveFrame.CopyTo(dst3);
             float stdevThreshold = (float)stdevSlider.Value;
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 if (roi.X + roi.Width < dst3.Width)
                 {
@@ -38419,7 +38419,7 @@ namespace CS_Classes
             if (dst2.Channels() == 3) dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             if (vbc.task.FirstPass) lastFrame = dst2.Clone();
             saveFrame = dst2.Clone();
-            Parallel.ForEach(vbc.task.gridList,
+            Parallel.ForEach(vbc.task.gridRects,
             (roi) =>
             {
                 cv.Scalar mean, stdev;
@@ -38443,8 +38443,8 @@ namespace CS_Classes
             saveFrame.CopyTo(dst3, highStdevMask);
             lastFrame = saveFrame;
             string stdevPercent = " stdev " + stdevSlider.Value.ToString("0.0");
-            labels[2] = updateCount.ToString() + " of " + vbc.task.gridList.Count().ToString() + " segments with < " + stdevPercent;
-            labels[3] = (vbc.task.gridList.Count() - updateCount).ToString() + " out of " + vbc.task.gridList.Count().ToString() + " had stdev > " + stdevSlider.Value.ToString("0.0");
+            labels[2] = updateCount.ToString() + " of " + vbc.task.gridRects.Count().ToString() + " segments with < " + stdevPercent;
+            labels[3] = (vbc.task.gridRects.Count() - updateCount).ToString() + " out of " + vbc.task.gridRects.Count().ToString() + " had stdev > " + stdevSlider.Value.ToString("0.0");
         }
     }
 
@@ -38774,12 +38774,12 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            int[] noDepthCount = new int[vbc.task.gridList.Count()];
-            Vec3b[] roiColor = new Vec3b[vbc.task.gridList.Count()];
+            int[] noDepthCount = new int[vbc.task.gridRects.Count()];
+            Vec3b[] roiColor = new Vec3b[vbc.task.gridRects.Count()];
             dst2.SetTo(0);
-            Parallel.For(0, vbc.task.gridList.Count(), i =>
+            Parallel.For(0, vbc.task.gridRects.Count(), i =>
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 roiColor[i] = src[roi].Get<Vec3b>(roi.Height / 2, roi.Width / 2);
                 dst2[roi].SetTo(roiColor[i], vbc.task.depthMask[roi]);
                 noDepthCount[i] = vbc.task.noDepthMask[roi].CountNonZero();
@@ -38787,11 +38787,11 @@ namespace CS_Classes
             var rtree = RTrees.Create();
             var mlInput = new List<mlData>();
             var mResponse = new List<float>();
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
                 if (noDepthCount[i] == 0) continue;
                 mlData ml = new mlData();
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 ml.row = roi.Y + roi.Height / 2;
                 ml.col = roi.X + roi.Width / 2;
                 var c = roiColor[i];
@@ -38815,10 +38815,10 @@ namespace CS_Classes
             var colors = new List<Vec3b>();
             var saveRoi = new List<cv.Rect>();
             var depthMask = new List<Mat>();
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
                 if (noDepthCount[i] == 0) continue;
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 depthMask.Add(vbc.task.noDepthMask[roi]);
                 mlData ml = new mlData();
                 ml.row = roi.Y + roi.Height / 2;
@@ -38843,7 +38843,7 @@ namespace CS_Classes
                 dst1[roi].SetTo(depth, depthMask[i]);
                 dst3[roi].SetTo(colors[i], depthMask[i]);
             }
-            labels[2] = vbc.task.gridList.Count().ToString() + " regions with " + mlInput.Count().ToString() + " used for learning and " + predictList.Count().ToString() + " were predicted";
+            labels[2] = vbc.task.gridRects.Count().ToString() + " regions with " + mlInput.Count().ToString() + " used for learning and " + predictList.Count().ToString() + " were predicted";
         }
     }
     public static class ML__Exports
@@ -38927,7 +38927,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             int minLearnCount = 5;
-            Parallel.ForEach(vbc.task.gridList, roi =>
+            Parallel.ForEach(vbc.task.gridRects, roi =>
             {
                 vbc.task.pcSplit[2][roi] = ML__Exports.detectAndFillShadow(vbc.task.noDepthMask[roi], shadow.dst3[roi], vbc.task.pcSplit[2][roi], src[roi], minLearnCount);
             });
@@ -39092,9 +39092,9 @@ namespace CS_Classes
             List<float> mResponse = new List<float>();
             List<mlColor> predictList = new List<mlColor>();
             List<cv.Rect> roiPredict = new List<cv.Rect>();
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 mlColor mls = new mlColor
                 {
                     colorIndex = colorClass.dst2.Get<byte>(roi.Y, roi.X),
@@ -39163,9 +39163,9 @@ namespace CS_Classes
             List<float> mResponse = new List<float>();
             List<mlColorInTier> predictList = new List<mlColorInTier>();
             List<cv.Rect> roiPredict = new List<cv.Rect>();
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 mlColorInTier mls = new mlColorInTier
                 {
                     colorIndex = colorClass.dst2.Get<byte>(roi.Y, roi.X),
@@ -39940,9 +39940,9 @@ namespace CS_Classes
             if (input.Channels() != 1) input = input.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (vbc.task.FirstPass) lastFrame = input.Clone();
             dst3.SetTo(0);
-            Parallel.For(0, vbc.task.gridList.Count(), i =>
+            Parallel.For(0, vbc.task.gridRects.Count(), i =>
             {
-                cv.Rect roi = vbc.task.gridList[i];
+                cv.Rect roi = vbc.task.gridRects[i];
                 Mat correlation = new Mat();
                 cv.Scalar mean, stdev;
                 Cv2.MeanStdDev(input[roi], out mean, out stdev);
@@ -39952,17 +39952,17 @@ namespace CS_Classes
                     var mm = GetMinMax(correlation);
                     if (mm.maxVal < options.CCthreshold)
                     {
-                        if ((i % vbc.task.gridRows) != 0) dst3[vbc.task.gridList[i - 1]].SetTo(255);
-                        if ((i % vbc.task.gridRows) < vbc.task.gridRows && i < vbc.task.gridList.Count() - 1) dst3[vbc.task.gridList[i + 1]].SetTo(255);
+                        if ((i % vbc.task.gridRows) != 0) dst3[vbc.task.gridRects[i - 1]].SetTo(255);
+                        if ((i % vbc.task.gridRows) < vbc.task.gridRows && i < vbc.task.gridRects.Count() - 1) dst3[vbc.task.gridRects[i + 1]].SetTo(255);
                         if (i > vbc.task.gridRows)
                         {
-                            dst3[vbc.task.gridList[i - vbc.task.gridRows]].SetTo(255);
-                            dst3[vbc.task.gridList[i - vbc.task.gridRows + 1]].SetTo(255);
+                            dst3[vbc.task.gridRects[i - vbc.task.gridRows]].SetTo(255);
+                            dst3[vbc.task.gridRects[i - vbc.task.gridRows + 1]].SetTo(255);
                         }
-                        if (i < (vbc.task.gridList.Count() - vbc.task.gridRows - 1))
+                        if (i < (vbc.task.gridRects.Count() - vbc.task.gridRows - 1))
                         {
-                            dst3[vbc.task.gridList[i + vbc.task.gridRows]].SetTo(255);
-                            dst3[vbc.task.gridList[i + vbc.task.gridRows + 1]].SetTo(255);
+                            dst3[vbc.task.gridRects[i + vbc.task.gridRows]].SetTo(255);
+                            dst3[vbc.task.gridRects[i + vbc.task.gridRows + 1]].SetTo(255);
                         }
                         dst3[roi].SetTo(255);
                     }
@@ -40113,7 +40113,7 @@ namespace CS_Classes
             if (vbc.task.heartBeat) dst3 = src.Clone();
             dst2 = src;
             int updateCount = 0;
-            Parallel.ForEach(vbc.task.gridList, roi =>
+            Parallel.ForEach(vbc.task.gridRects, roi =>
             {
                 Mat correlation = new Mat();
                 Cv2.MatchTemplate(src[roi], dst3[roi], correlation, TemplateMatchModes.CCoeffNormed);
@@ -40124,8 +40124,8 @@ namespace CS_Classes
                     dst2.Rectangle(roi, Scalar.White, vbc.task.lineWidth);
                 }
             });
-            labels[2] = "Motion added to dst3 for " + updateCount + " segments out of " + vbc.task.gridList.Count();
-            labels[3] = (vbc.task.gridList.Count() - updateCount) + " segments out of " + vbc.task.gridList.Count() + " had > " +
+            labels[2] = "Motion added to dst3 for " + updateCount + " segments out of " + vbc.task.gridRects.Count();
+            labels[3] = (vbc.task.gridRects.Count() - updateCount) + " segments out of " + vbc.task.gridRects.Count() + " had > " +
                             (options.CCthreshold).ToString("0.0%") + " correlation.";
         }
     }
@@ -40149,7 +40149,7 @@ namespace CS_Classes
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             if (vbc.task.heartBeat) dst3 = src.Clone();
             List<cv.Rect> roiMotion = new List<cv.Rect>();
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 Mat correlation = new Mat();
                 Cv2.MatchTemplate(src[roi], dst3[roi], correlation, TemplateMatchModes.CCoeffNormed);
@@ -40164,8 +40164,8 @@ namespace CS_Classes
             {
                 dst2.Rectangle(roi, Scalar.White, vbc.task.lineWidth);
             }
-            labels[2] = "Motion added to dst3 for " + roiMotion.Count() + " segments out of " + vbc.task.gridList.Count();
-            labels[3] = (vbc.task.gridList.Count() - roiMotion.Count()) + " segments out of " + vbc.task.gridList.Count() + " had > " +
+            labels[2] = "Motion added to dst3 for " + roiMotion.Count() + " segments out of " + vbc.task.gridRects.Count();
+            labels[3] = (vbc.task.gridRects.Count() - roiMotion.Count()) + " segments out of " + vbc.task.gridRects.Count() + " had > " +
                             (options.CCthreshold).ToString("0.0%") + " correlation.";
         }
     }
@@ -42931,7 +42931,7 @@ namespace CS_Classes
                 dst2.SetTo(0);
             }
             var pointPop = new SortedList<float, cv.Point>(new CompareAllowIdenticalSingleInverted());
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 var mm = GetMinMax(src[roi]);
                 if (mm.maxVal == 0) continue;
@@ -42977,13 +42977,13 @@ namespace CS_Classes
                 src = diff.dst2;
             }
             int gridCount = 0;
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 if (src[roi].CountNonZero() > 0) gridCount++;
             }
             if (vbc.task.gOptions.pixelDiffThreshold < vbc.task.gOptions.getPixelDifferenceMax())
             {
-                if (gridCount > vbc.task.gridList.Count() / 10) vbc.task.gOptions.pixelDiffThreshold++;
+                if (gridCount > vbc.task.gridRects.Count() / 10) vbc.task.gOptions.pixelDiffThreshold++;
             }
             if (gridCount == 0 && vbc.task.gOptions.pixelDiffThreshold > 1) vbc.task.gOptions.pixelDiffThreshold--;
             SetTrueText("Pixel difference threshold is at " + vbc.task.gOptions.getPixelDifference().ToString());
@@ -43516,7 +43516,7 @@ namespace CS_Classes
             dst2 = tess.dst3;
             dst3 = tess.hulls.dst3;
             int index = 0;
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 if (index < tess.depths.Count())
                 {
@@ -45317,12 +45317,12 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             int index = 0;
-            foreach (var r in vbc.task.gridList)
+            foreach (var r in vbc.task.gridRects)
             {
                 dst2[r].SetTo(vbc.task.scalarColors[index % 256]);
                 index++;
             }
-            labels[2] = "Palette_Layout2D_CS - " + vbc.task.gridList.Count().ToString() + " regions";
+            labels[2] = "Palette_Layout2D_CS - " + vbc.task.gridRects.Count().ToString() + " regions";
         }
     }
 
@@ -45359,9 +45359,9 @@ namespace CS_Classes
             if (vbc.task.gridSize >= 100) direction *= -1;
             vbc.task.gridSize -= direction * 1;
             vbc.task.grid.Run(src);
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 dst2[roi].SetTo(vbc.task.scalarColors[i % 256]);
                 dst3[roi].SetTo(vbc.task.vecColors[i % 256]);
             }
@@ -48175,11 +48175,11 @@ namespace CS_Classes
         {
             var ptlist = new List<List<cv.Point3f>>();
             var lastVec = new cv.Point3f();
-            for (int y = 0; y < vbc.task.pointCloud.Height; y += vbc.task.gridList[0].Height - 1)
+            for (int y = 0; y < vbc.task.pointCloud.Height; y += vbc.task.gridRects[0].Height - 1)
             {
                 var vecList = new List<cv.Point3f>();
                 var xyVec = new List<cv.Point>();
-                for (int x = 0; x < vbc.task.pointCloud.Width; x += vbc.task.gridList[0].Width - 1)
+                for (int x = 0; x < vbc.task.pointCloud.Width; x += vbc.task.gridRects[0].Width - 1)
                 {
                     var vec = vbc.task.pointCloud.Get<cv.Point3f>(y, x);
                     bool jumpZ = false;
@@ -48216,11 +48216,11 @@ namespace CS_Classes
         {
             var ptlist = new List<List<Point3f>>();
             var lastVec = new Point3f();
-            for (int x = 0; x < vbc.task.pointCloud.Width; x += vbc.task.gridList[0].Width - 1)
+            for (int x = 0; x < vbc.task.pointCloud.Width; x += vbc.task.gridRects[0].Width - 1)
             {
                 var vecList = new List<Point3f>();
                 var xyVec = new List<cv.Point>();
-                for (int y = 0; y < vbc.task.pointCloud.Height; y += vbc.task.gridList[0].Height - 1)
+                for (int y = 0; y < vbc.task.pointCloud.Height; y += vbc.task.gridRects[0].Height - 1)
                 {
                     var vec = vbc.task.pointCloud.Get<Point3f>(y, x);
                     bool jumpZ = false;
@@ -48500,7 +48500,7 @@ namespace CS_Classes
             dst2 = src.EmptyClone().SetTo(Scalar.White);
             dst3 = dst2.Clone();
             var black = new Vec3b(0, 0, 0);
-            Parallel.ForEach(vbc.task.gridList, roi =>
+            Parallel.ForEach(vbc.task.gridRects, roi =>
             {
                 for (int y = roi.Y; y < roi.Y + roi.Height; y++)
                 {
@@ -48682,7 +48682,7 @@ namespace CS_Classes
             {
                 for (int x = 0; x < vbc.task.gridCols; x++)
                 {
-                    var roi = vbc.task.gridList[y * vbc.task.gridCols + x];
+                    var roi = vbc.task.gridRects[y * vbc.task.gridCols + x];
                     var mean = vbc.task.pointCloud[roi].Mean(vbc.task.depthMask[roi]);
                     bool depthPresent = vbc.task.depthMask[roi].CountNonZero() > roi.Width * roi.Height / 2;
                     if ((depthPresent && mean[2] > 0 && Math.Abs(lastMeanZ - mean[2]) < 0.2 && mean[2] < vbc.task.MaxZmeters) || (lastMeanZ == 0 && mean[2] > 0))
@@ -48712,7 +48712,7 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            int rw = vbc.task.gridList[0].Width / 2, rh = vbc.task.gridList[0].Height / 2;
+            int rw = vbc.task.gridRects[0].Width / 2, rh = vbc.task.gridRects[0].Height / 2;
             cv.Scalar red32 = new cv.Scalar(0, 0, 1);
             cv.Scalar blue32 = new cv.Scalar(1, 0, 0);
             cv.Scalar white32 = new cv.Scalar(1, 1, 1);
@@ -48721,7 +48721,7 @@ namespace CS_Classes
             cv.Scalar white = Scalar.White;
             pcPoints.Clear();
             dst2 = src;
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 var pt = new cv.Point(roi.X + rw, roi.Y + rh);
                 var mean = vbc.task.pointCloud[roi].Mean(vbc.task.depthMask[roi]);
@@ -48933,7 +48933,7 @@ namespace CS_Classes
                     {
                         vbc.task.histogramBins += 1;
                     }
-                    if (vbc.task.gridList.Count() < histData.Length && vbc.task.gridSize > 2)
+                    if (vbc.task.gridRects.Count() < histData.Length && vbc.task.gridSize > 2)
                     {
                         vbc.task.gridSize -= 1;
                         grid.Run(src);
@@ -48941,9 +48941,9 @@ namespace CS_Classes
                     }
                     histData[0] = 0; // count of zero pixels - distorts results..
                     float maxVal = histData.Max();
-                    for (int i = 0; i < vbc.task.gridList.Count(); i++)
+                    for (int i = 0; i < vbc.task.gridRects.Count(); i++)
                     {
-                        var roi = vbc.task.gridList[i];
+                        var roi = vbc.task.gridRects[i];
                         if (i >= histData.Length)
                         {
                             dst2[roi].SetTo(0);
@@ -49859,18 +49859,18 @@ namespace CS_Classes
         {
             unscrambled.Clear();
             List<cv.Rect> inputROI = new List<cv.Rect>();
-            for (int j = 0; j < vbc.task.gridList.Count(); j++)
+            for (int j = 0; j < vbc.task.gridRects.Count(); j++)
             {
-                var roi = vbc.task.gridList[j];
+                var roi = vbc.task.gridRects[j];
                 if (roi.Width == vbc.task.gridSize && roi.Height == vbc.task.gridSize)
-                    inputROI.Add(vbc.task.gridList[j]);
+                    inputROI.Add(vbc.task.gridRects[j]);
             }
             scrambled = Shuffle(inputROI);
             image = src.Clone();
             // display image with shuffled roi's
             for (int i = 0; i < scrambled.Count(); i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 var roi2 = scrambled[i];
                 if (roi.Width == vbc.task.gridSize && roi.Height == vbc.task.gridSize &&
                     roi2.Width == vbc.task.gridSize && roi2.Height == vbc.task.gridSize)
@@ -56141,9 +56141,9 @@ namespace CS_Classes
             dst3.SetTo(255);
             var inputCount = dups.dst3.CountNonZero();
             var testVals = new List<int>();
-            for (int i = 0; i < Math.Min(inputCount, vbc.task.gridList.Count()); i++)
+            for (int i = 0; i < Math.Min(inputCount, vbc.task.gridRects.Count()); i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 var val = (int)dups.dst3.Get<byte>(0, i);
                 testVals.Add(val);
                 dst3[roi].SetTo(val);
@@ -57689,7 +57689,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             dst2 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 Scalar d = vbc.task.pointCloud[roi].Mean(vbc.task.depthMask[roi]);
                 Vec3f depth = new Vec3f((float)d.Val0, (float)d.Val1, (float)d.Val2);
@@ -57697,7 +57697,7 @@ namespace CS_Classes
                 Vec3f vec = vbc.task.pointCloud.Get<Vec3f>(pt.Y, pt.X);
                 if (vec[2] > 0) dst2[roi].SetTo(depth);
             }
-            labels[2] = traceName + " with " + vbc.task.gridList.Count().ToString() + " regions was created";
+            labels[2] = traceName + " with " + vbc.task.gridRects.Count().ToString() + " regions was created";
         }
     }
 
@@ -57719,7 +57719,7 @@ namespace CS_Classes
             dst2 = hulls.dst3;
             dst3.SetTo(0);
             oglData.Clear();
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 Vec3b c = dst2.Get<Vec3b>(roi.Y, roi.X);
                 if (c == black) continue;
@@ -57728,7 +57728,7 @@ namespace CS_Classes
                 oglData.Add(new Vec3f((float)v.Val0, (float)v.Val1, (float)v.Val2));
                 dst3[roi].SetTo(c);
             }
-            labels[2] = traceName + " with " + vbc.task.gridList.Count().ToString() + " regions was created";
+            labels[2] = traceName + " with " + vbc.task.gridRects.Count().ToString() + " regions was created";
         }
     }
 
@@ -59031,7 +59031,7 @@ namespace CS_Classes
             if (vbc.task.optionsChanged) svm = options.createSVM();
             svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat);
             dst3.SetTo(0);
-            foreach (var roi in vbc.task.gridList)
+            foreach (var roi in vbc.task.gridRects)
             {
                 if (roi.X > src.Height) continue; // working only with square - not rectangles.
                 float[] samples = { roi.X / src.Height, roi.Y / src.Height };
@@ -59664,9 +59664,9 @@ namespace CS_Classes
             dst2 = redC.dst2;
             oglData.Clear();
             dst3.SetTo(0);
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
                 var index = vbc.task.cellMap.Get<byte>(center.Y, center.X);
                 if (index <= 0) continue;
@@ -59710,7 +59710,7 @@ namespace CS_Classes
             if (vbc.task.optionsChanged)
             {
                 depthList = new List<List<double>>();
-                for (int i = 0; i < vbc.task.gridList.Count(); i++)
+                for (int i = 0; i < vbc.task.gridRects.Count(); i++)
                 {
                     depthList.Add(new List<double>());
                     colorList.Add(black);
@@ -59718,9 +59718,9 @@ namespace CS_Classes
             }
             oglData.Clear();
             dst3.SetTo(0);
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
                 var index = vbc.task.cellMap.Get<byte>(center.Y, center.X);
                 if (index <= 0)
@@ -59779,7 +59779,7 @@ namespace CS_Classes
             {
                 depthList1 = new List<List<double>>();
                 depthList2 = new List<List<double>>();
-                for (int i = 0; i <= vbc.task.gridList.Count(); i++)
+                for (int i = 0; i <= vbc.task.gridRects.Count(); i++)
                 {
                     depthList1.Add(new List<double>());
                     depthList2.Add(new List<double>());
@@ -59790,9 +59790,9 @@ namespace CS_Classes
             dst3.SetTo(0);
             Mat depth32f = vbc.task.pcSplit[2] * 1000, depth32s = new Mat();
             depth32f.ConvertTo(depth32s, MatType.CV_32S);
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
                 var index = vbc.task.cellMap.Get<byte>(center.Y, center.X);
                 if (index <= 0)
@@ -59865,7 +59865,7 @@ namespace CS_Classes
             {
                 depthMinList.Clear();
                 depthMaxList.Clear();
-                for (int i = 0; i < vbc.task.gridList.Count(); i++)
+                for (int i = 0; i < vbc.task.gridRects.Count(); i++)
                 {
                     depthMinList.Add(new List<double>());
                     depthMaxList.Add(new List<double>());
@@ -59880,9 +59880,9 @@ namespace CS_Classes
             Point3f[] min = new Point3f[4];
             Point3f[] max = new Point3f[4];
             depths.Clear();
-            for (int i = 0; i < vbc.task.gridList.Count(); i++)
+            for (int i = 0; i < vbc.task.gridRects.Count(); i++)
             {
-                var roi = vbc.task.gridList[i];
+                var roi = vbc.task.gridRects[i];
                 var center = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
                 var index = vbc.task.cellMap.Get<byte>(center.Y, center.X);
                 double depthMin = 0, depthMax = 0;
@@ -59940,7 +59940,7 @@ namespace CS_Classes
                 depths.Add(depthMin);
                 depths.Add(depthMax);
             }
-            labels[2] = traceName + " completed: " + vbc.task.gridList.Count().ToString(vbc.fmt0) + " ROI's produced " + (oglData.Count() / 25).ToString(vbc.fmt0) + " six sided bricks with color";
+            labels[2] = traceName + " completed: " + vbc.task.gridRects.Count().ToString(vbc.fmt0) + " ROI's produced " + (oglData.Count() / 25).ToString(vbc.fmt0) + " six sided bricks with color";
             SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3);
         }
     }
@@ -59983,7 +59983,7 @@ namespace CS_Classes
             if (tChange)
             {
                 var sortcounts = new SortedList<int, cv.Rect>(new compareAllowIdenticalIntegerInverted());
-                foreach (var roi in vbc.task.gridList)
+                foreach (var roi in vbc.task.gridRects)
                 {
                     sortcounts.Add(dst2[roi].CountNonZero(), roi);
                 }

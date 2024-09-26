@@ -126,14 +126,14 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Parent
         desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then meanSeries = New cvb.Mat(task.gridList.Count, task.frameHistoryCount, cvb.MatType.CV_32F, cvb.Scalar.All(0))
+        If task.optionsChanged Then meanSeries = New cvb.Mat(task.gridRects.Count, task.frameHistoryCount, cvb.MatType.CV_32F, cvb.Scalar.All(0))
 
         Dim index = task.frameCount Mod task.frameHistoryCount
-        Dim meanValues(task.gridList.Count - 1) As Single
-        Dim stdValues(task.gridList.Count - 1) As Single
-        Parallel.For(0, task.gridList.Count,
+        Dim meanValues(task.gridRects.Count - 1) As Single
+        Dim stdValues(task.gridRects.Count - 1) As Single
+        Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             Dim mean As cvb.Scalar, stdev As cvb.Scalar
             cvb.Cv2.MeanStdDev(task.pcSplit(2)(roi), mean, stdev, task.depthMask(roi))
             meanSeries.Set(Of Single)(i, index, mean)
@@ -145,8 +145,8 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Parent
         End Sub)
 
         If task.frameCount >= task.frameHistoryCount Then
-            Dim means As cvb.Mat = cvb.Mat.FromPixelData(task.gridList.Count, 1, cvb.MatType.CV_32F, meanValues.ToArray)
-            Dim stdevs As cvb.Mat = cvb.Mat.FromPixelData(task.gridList.Count, 1, cvb.MatType.CV_32F, stdValues.ToArray)
+            Dim means As cvb.Mat = cvb.Mat.FromPixelData(task.gridRects.Count, 1, cvb.MatType.CV_32F, meanValues.ToArray)
+            Dim stdevs As cvb.Mat = cvb.Mat.FromPixelData(task.gridRects.Count, 1, cvb.MatType.CV_32F, stdValues.ToArray)
             Dim meanmask = means.Threshold(1, task.MaxZmeters, cvb.ThresholdTypes.Binary).ConvertScaleAbs()
             Dim mm As mmData = GetMinMax(means, meanmask)
             Dim stdMask = stdevs.Threshold(0.001, task.MaxZmeters, cvb.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
@@ -155,9 +155,9 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Parent
             maxMeanVal = Math.Max(maxMeanVal, mm.maxVal)
             maxStdevVal = Math.Max(maxStdevVal, mmStd.maxVal)
 
-            Parallel.For(0, task.gridList.Count,
+            Parallel.For(0, task.gridRects.Count,
             Sub(i)
-                Dim roi = task.gridList(i)
+                Dim roi = task.gridRects(i)
                 dst3(roi).SetTo(255 * stdevs.Get(Of Single)(i, 0) / maxStdevVal)
                 dst3(roi).SetTo(0, task.noDepthMask(roi))
 
@@ -171,8 +171,8 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Parent
             End If
 
             If standaloneTest() Then
-                For i = 0 To task.gridList.Count - 1
-                    Dim roi = task.gridList(i)
+                For i = 0 To task.gridRects.Count - 1
+                    Dim roi = task.gridRects(i)
                     SetTrueText(Format(meanValues(i), fmt3) + vbCrLf + Format(stdValues(i), fmt3), New cvb.Point(roi.X, roi.Y), 3)
                 Next
             End If
@@ -305,15 +305,15 @@ Public Class Depth_LocalMinMax_MT : Inherits VB_Parent
             dst2.SetTo(cvb.Scalar.White, task.gridMask)
         End If
 
-        If minPoint.Length <> task.gridList.Count Then
-            ReDim minPoint(task.gridList.Count - 1)
-            ReDim maxPoint(task.gridList.Count - 1)
+        If minPoint.Length <> task.gridRects.Count Then
+            ReDim minPoint(task.gridRects.Count - 1)
+            ReDim maxPoint(task.gridRects.Count - 1)
         End If
 
         If task.heartBeat Then dst3.SetTo(0)
-        Parallel.For(0, task.gridList.Count,
+        Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             Dim mm As mmData = GetMinMax(task.pcSplit(2)(roi), task.depthMask(roi))
             If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cvb.Point2f(0, 0)
             minPoint(i) = New cvb.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
@@ -337,7 +337,7 @@ End Class
 Public Class Depth_MinMaxToVoronoi : Inherits VB_Parent
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        ReDim kalman.kInput(task.gridList.Count * 4 - 1)
+        ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
 
         labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min and max points for each cell."}
         desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
@@ -350,16 +350,16 @@ Public Class Depth_MinMaxToVoronoi : Inherits VB_Parent
         Return p
     End Function
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then ReDim kalman.kInput(task.gridList.Count * 4 - 1)
+        If task.optionsChanged Then ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
 
         dst2 = src.Clone()
         dst2.SetTo(cvb.Scalar.White, task.gridMask)
 
         Dim depthmask As cvb.Mat = task.depthMask
 
-        Parallel.For(0, task.gridList.Count,
+        Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             Dim mm As mmData = GetMinMax(task.pcSplit(2)(roi), depthmask(roi))
             If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cvb.Point2f(0, 0)
             kalman.kInput(i * 4) = mm.minLoc.X
@@ -371,8 +371,8 @@ Public Class Depth_MinMaxToVoronoi : Inherits VB_Parent
         kalman.Run(src)
 
         Dim subdiv As New cvb.Subdiv2D(New cvb.Rect(0, 0, src.Width, src.Height))
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
             Dim ptmin = New cvb.Point2f(kalman.kOutput(i * 4) + roi.X, kalman.kOutput(i * 4 + 1) + roi.Y)
             Dim ptmax = New cvb.Point2f(kalman.kOutput(i * 4 + 2) + roi.X, kalman.kOutput(i * 4 + 3) + roi.Y)
             ptmin = validatePoint2f(ptmin)
@@ -899,7 +899,7 @@ Public Class Depth_Grid : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         dst3 = task.pcSplit(2)
         dst2 = task.gridMask.Clone
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim mm As mmData = GetMinMax(dst3(roi))
             If Math.Abs(mm.minVal - mm.maxVal) > 0.1 Then dst2(roi).SetTo(cvb.Scalar.White)
         Next
@@ -1396,7 +1396,7 @@ Public Class Depth_WorldXYMT : Inherits VB_Parent
         If depthUnitsMeters = False Then src = (src * 0.001).ToMat
         Dim multX = task.pointCloud.Width / src.Width
         Dim multY = task.pointCloud.Height / src.Height
-        Parallel.ForEach(task.gridList,
+        Parallel.ForEach(task.gridRects,
               Sub(roi)
                   Dim xy As New cvb.Point3f
                   For y = roi.Y To roi.Y + roi.Height - 1

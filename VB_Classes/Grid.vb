@@ -1,8 +1,8 @@
 Imports cvb = OpenCvSharp
 Imports System.Threading
 Public Class Grid_Basics : Inherits VB_Parent
-    Public gridList As New List(Of cvb.Rect)
-    Public updateTaskGridList As Boolean = True
+    Public gridRects As New List(Of cvb.Rect)
+    Public updateTaskgridRects As Boolean = True
     Public Sub New()
         desc = "Create a grid of squares covering the entire image."
     End Sub
@@ -15,7 +15,7 @@ Public Class Grid_Basics : Inherits VB_Parent
             task.gridMask = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
             task.gridMap = New cvb.Mat(src.Size(), cvb.MatType.CV_32S, 255)
 
-            gridList.Clear()
+            gridRects.Clear()
             task.gridIndex.Clear()
             task.gridRows = 0
             task.gridCols = 0
@@ -26,7 +26,7 @@ Public Class Grid_Basics : Inherits VB_Parent
                     If roi.Width > 0 And roi.Height > 0 Then
                         If x = 0 Then task.gridRows += 1
                         If y = 0 Then task.gridCols += 1
-                        gridList.Add(roi)
+                        gridRects.Add(roi)
                         task.gridIndex.Add(index)
                         index += 1
                     End If
@@ -47,13 +47,13 @@ Public Class Grid_Basics : Inherits VB_Parent
                     task.gridMask.Line(p1, p2, 255, task.lineWidth)
                 Next
 
-                For i = 0 To gridList.Count - 1
-                    Dim roi = gridList(i)
+                For i = 0 To gridRects.Count - 1
+                    Dim roi = gridRects(i)
                     task.gridMap.Rectangle(roi, i, -1)
                 Next
 
                 task.gridNeighbors.Clear()
-                For Each roi In gridList
+                For Each roi In gridRects
                     task.gridNeighbors.Add(New List(Of Integer))
                     For i = 0 To 8
                         Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
@@ -68,7 +68,7 @@ Public Class Grid_Basics : Inherits VB_Parent
                 Next
             End If
 
-            For Each roi In gridList
+            For Each roi In gridRects
                 Dim xSub = roi.X + roi.Width
                 Dim ySub = roi.Y + roi.Height
                 If ySub <= dst2.Height / 3 Then
@@ -93,11 +93,11 @@ Public Class Grid_Basics : Inherits VB_Parent
             dst2 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(cvb.Scalar.White, task.gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridList.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
+            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
                               CStr(task.gridSize) + "X" + CStr(task.gridSize) + " regions"
         End If
 
-        If updateTaskGridList Then task.gridList = gridList
+        If updateTaskgridRects Then task.gridRects = gridRects
     End Sub
 End Class
 
@@ -116,10 +116,10 @@ Public Class Grid_BasicsTest : Inherits VB_Parent
 
         dst2.SetTo(0)
         ' SetTrueText is not thread-safe...
-        'Parallel.For(0, task.gridList.Count,
+        'Parallel.For(0, task.gridRects.Count,
         ' Sub(i)
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
             cvb.Cv2.Subtract(mean, src(roi), dst2(roi))
             SetTrueText(CStr(i), New cvb.Point(roi.X, roi.Y))
         Next
@@ -127,9 +127,9 @@ Public Class Grid_BasicsTest : Inherits VB_Parent
         dst2.SetTo(cvb.Scalar.White, task.gridMask)
 
         dst3.SetTo(0)
-        Parallel.For(0, task.gridList.Count,
+        Parallel.For(0, task.gridRects.Count,
          Sub(i)
-             Dim roi = task.gridList(i)
+             Dim roi = task.gridRects(i)
              cvb.Cv2.Subtract(mean, src(roi), dst3(roi))
              DrawLine(dst3(roi), New cvb.Point(0, 0), New cvb.Point(roi.Width, roi.Height), cvb.Scalar.White)
          End Sub)
@@ -151,7 +151,7 @@ Public Class Grid_List : Inherits VB_Parent
         If standaloneTest() Then desc = "List the active threads"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Parallel.ForEach(Of cvb.Rect)(task.gridList,
+        Parallel.ForEach(Of cvb.Rect)(task.gridRects,
          Sub(roi)
              dst3(roi).SetTo(0)
          End Sub)
@@ -167,7 +167,7 @@ Public Class Grid_List : Inherits VB_Parent
                 If threadCount Mod 5 = 0 Then str += vbCrLf
                 If thread.threadstate <> 5 Then notIdle += 1
             Next thread
-            SetTrueText("There were " + CStr(threadCount) + " threads in OpenCVB with " + CStr(notIdle) + " of them not idle when traversing the gridList" + vbCrLf + str)
+            SetTrueText("There were " + CStr(threadCount) + " threads in OpenCVB with " + CStr(notIdle) + " of them not idle when traversing the gridRects" + vbCrLf + str)
         Catch e As Exception
             MsgBox(e.Message)
         End Try
@@ -195,7 +195,7 @@ Public Class Grid_Rectangles : Inherits VB_Parent
 
         If task.mouseClickFlag Then task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         If task.optionsChanged Then
-            task.gridList.Clear()
+            task.gridRects.Clear()
             For y = 0 To dst2.Height - 1 Step options.height
                 For x = 0 To dst2.Width - 1 Step options.width
                     Dim roi = New cvb.Rect(x, y, options.width, options.height)
@@ -204,7 +204,7 @@ Public Class Grid_Rectangles : Inherits VB_Parent
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
                         If x = 0 Then tilesPerCol += 1
-                        task.gridList.Add(roi)
+                        task.gridRects.Add(roi)
                     End If
                 Next
             Next
@@ -219,15 +219,15 @@ Public Class Grid_Rectangles : Inherits VB_Parent
                 task.gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
 
-            For i = 0 To task.gridList.Count - 1
-                Dim roi = task.gridList(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim roi = task.gridRects(i)
                 task.gridMap.Rectangle(roi, i, -1)
             Next
         End If
         If standaloneTest() Then
             task.color.CopyTo(dst2)
             dst2.SetTo(cvb.Scalar.White, task.gridMask)
-            labels(2) = "Grid_Basics " + CStr(task.gridList.Count) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
+            labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
                           CStr(options.width) + "X" + CStr(options.height) + " regions"
         End If
     End Sub
@@ -298,7 +298,7 @@ Public Class Grid_Neighbors : Inherits VB_Parent
             Dim roiIndex = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
 
             For Each index In task.gridNeighbors(roiIndex)
-                Dim roi = task.gridList(index)
+                Dim roi = task.gridRects(index)
                 mask.Rectangle(roi, cvb.Scalar.White)
             Next
         End If
@@ -315,7 +315,7 @@ End Class
 Public Class Grid_Special : Inherits VB_Parent
     Public gridWidth As Integer = 10
     Public gridHeight As Integer = 10
-    Public gridList As New List(Of cvb.Rect)
+    Public gridRects As New List(Of cvb.Rect)
     Public gridRows As Integer
     Public gridCols As Integer
     Public gridMask As cvb.Mat
@@ -329,7 +329,7 @@ Public Class Grid_Special : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If task.optionsChanged Then
             gridWidth = task.gridSize
-            gridList.Clear()
+            gridRects.Clear()
             gridRows = 0
             gridCols = 0
             For y = 0 To dst2.Height - 1 Step gridHeight
@@ -340,7 +340,7 @@ Public Class Grid_Special : Inherits VB_Parent
                     If roi.Width > 0 And roi.Height > 0 Then
                         If x = 0 Then gridRows += 1
                         If y = 0 Then gridCols += 1
-                        gridList.Add(roi)
+                        gridRects.Add(roi)
                     End If
                 Next
             Next
@@ -355,13 +355,13 @@ Public Class Grid_Special : Inherits VB_Parent
                 gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
 
-            For i = 0 To task.gridList.Count - 1
-                Dim roi = gridList(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim roi = gridRects(i)
                 gridMap.Rectangle(roi, i, -1)
             Next
 
             gridNeighbors.Clear()
-            For Each roi In gridList
+            For Each roi In gridRects
                 gridNeighbors.Add(New List(Of Integer))
                 For i = 0 To 8
                     Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
@@ -379,7 +379,7 @@ Public Class Grid_Special : Inherits VB_Parent
         If standaloneTest() Then
             task.color.CopyTo(dst2)
             dst2.SetTo(cvb.Scalar.White, gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridList.Count) + " (" + CStr(gridRows) + "X" + CStr(gridCols) + ") " +
+            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(gridRows) + "X" + CStr(gridCols) + ") " +
                           CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
         End If
     End Sub
@@ -392,16 +392,16 @@ End Class
 
 
 Public Class Grid_QuarterRes : Inherits VB_Parent
-    Public gridList As New List(Of cvb.Rect)
+    Public gridRects As New List(Of cvb.Rect)
     Dim grid As New Grid_Basics
     Public Sub New()
-        grid.updateTaskGridList = False
+        grid.updateTaskgridRects = False
         desc = "Provide the grid list for the lowest resolution of the current stream."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Static inputSrc As New cvb.Mat(task.quarterRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
         grid.Run(inputSrc)
-        gridList = grid.gridList
+        gridRects = grid.gridRects
         If standaloneTest() Then dst2 = task.gridMask
     End Sub
 End Class
@@ -421,11 +421,11 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
         desc = "Find the min and max depth within each grid roi."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If minMaxLocs.Count <> task.gridList.Count Then ReDim minMaxLocs(task.gridList.Count - 1)
-        If minMaxVals.Count <> task.gridList.Count Then ReDim minMaxVals(task.gridList.Count - 1)
+        If minMaxLocs.Count <> task.gridRects.Count Then ReDim minMaxLocs(task.gridRects.Count - 1)
+        If minMaxVals.Count <> task.gridRects.Count Then ReDim minMaxVals(task.gridRects.Count - 1)
         Dim mm As mmData
         For i = 0 To minMaxLocs.Count - 1
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             task.pcSplit(2)(roi).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(roi))
             minMaxLocs(i) = New PointPair(mm.minLoc, mm.maxLoc)
             minMaxVals(i) = New cvb.Vec2f(mm.minVal, mm.maxVal)
@@ -435,8 +435,8 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
             dst2.SetTo(0)
             For i = 0 To minMaxLocs.Count - 1
                 Dim lp = minMaxLocs(i)
-                DrawCircle(dst2(task.gridList(i)), lp.p2, task.DotSize, cvb.Scalar.Red)
-                DrawCircle(dst2(task.gridList(i)), lp.p1, task.DotSize, cvb.Scalar.White)
+                DrawCircle(dst2(task.gridRects(i)), lp.p2, task.DotSize, cvb.Scalar.Red)
+                DrawCircle(dst2(task.gridRects(i)), lp.p1, task.DotSize, cvb.Scalar.White)
             Next
             dst2.SetTo(cvb.Scalar.White, task.gridMask)
         End If
@@ -458,10 +458,10 @@ Public Class Grid_TrackCenter : Inherits VB_Parent
         desc = "Track a cell near the center of the grid"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If match.correlation < match.options.correlationMin Or task.gOptions.DebugChecked Then
-            task.gOptions.DebugChecked = False
+        If match.correlation < match.options.correlationMin Or task.gOptions.debugChecked Then
+            task.gOptions.debugChecked = False
             Dim index = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
-            Dim roi = task.gridList(index)
+            Dim roi = task.gridRects(index)
             match.template = src(roi).Clone
             center = New cvb.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
         End If

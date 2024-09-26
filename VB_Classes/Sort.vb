@@ -125,8 +125,8 @@ Public Class Sort_1Channel : Inherits VB_Parent
         dst3.SetTo(255)
         Dim inputCount = dups.dst3.CountNonZero
         Dim testVals As New List(Of Integer)
-        For i = 0 To Math.Min(inputCount, task.gridList.Count) - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To Math.Min(inputCount, task.gridRects.Count) - 1
+            Dim roi = task.gridRects(i)
             Dim val = CInt(dups.dst3.Get(Of Byte)(0, i))
             testVals.Add(val)
             dst3(roi).SetTo(val)

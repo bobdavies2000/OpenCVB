@@ -116,8 +116,8 @@ Public Class Tessallate_QuadSimple : Inherits VB_Parent
         oglData.Clear()
         dst3.SetTo(0)
 
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
 
             Dim center = New cvb.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
             Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
@@ -166,7 +166,7 @@ Public Class Tessallate_QuadHulls : Inherits VB_Parent
 
         If task.optionsChanged Then
             depthList = New List(Of List(Of Single))
-            For i = 0 To task.gridList.Count
+            For i = 0 To task.gridRects.Count
                 depthList.Add(New List(Of Single))
                 colorList.Add(black)
             Next
@@ -175,8 +175,8 @@ Public Class Tessallate_QuadHulls : Inherits VB_Parent
         oglData.Clear()
         dst3.SetTo(0)
 
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
 
             Dim center = New cvb.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
             Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
@@ -243,7 +243,7 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Parent
         If task.optionsChanged Then
             depthList1 = New List(Of List(Of Single))
             depthList2 = New List(Of List(Of Single))
-            For i = 0 To task.gridList.Count
+            For i = 0 To task.gridRects.Count
                 depthList1.Add(New List(Of Single))
                 depthList2.Add(New List(Of Single))
                 colorList.Add(black)
@@ -255,8 +255,8 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Parent
 
         Dim depth32f As cvb.Mat = task.pcSplit(2) * 1000, depth32s As New cvb.Mat
         depth32f.ConvertTo(depth32s, cvb.MatType.CV_32S)
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
 
             Dim center = New cvb.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
             Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
@@ -332,7 +332,7 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
         If task.optionsChanged Then
             depthMinList.Clear()
             depthMaxList.Clear()
-            For i = 0 To task.gridList.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 depthMinList.Add(New List(Of Single))
                 depthMaxList.Add(New List(Of Single))
             Next
@@ -348,8 +348,8 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
 
         Dim min(4 - 1) As cvb.Point3f, max(4 - 1) As cvb.Point3f
         depths.Clear()
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
             Dim center = New cvb.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
             Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
             Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cvb.Point, maxLoc As cvb.Point
@@ -411,7 +411,7 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
             depths.Add(depthMin)
             depths.Add(depthMax)
         Next
-        labels(2) = traceName + " completed: " + Format(task.gridList.Count, fmt0) + " ROI's produced " + Format(oglData.Count / 25, fmt0) + " six sided bricks with color"
+        labels(2) = traceName + " completed: " + Format(task.gridRects.Count, fmt0) + " ROI's produced " + Format(oglData.Count / 25, fmt0) + " six sided bricks with color"
         SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3)
     End Sub
 End Class

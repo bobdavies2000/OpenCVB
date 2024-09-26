@@ -54,12 +54,12 @@ Public Class Entropy_Highest : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim entropyMap = New cvb.Mat(src.Size(), cvb.MatType.CV_32F)
-        Dim entropyList(task.gridList.Count - 1) As Single
+        Dim entropyList(task.gridRects.Count - 1) As Single
         Dim maxEntropy As Single = Single.MinValue
         Dim minEntropy As Single = Single.MaxValue
 
         src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             entropy.Run(src(roi))
             entropyMap(roi).SetTo(entropy.entropyVal)
 
@@ -184,8 +184,8 @@ Public Class Entropy_SubDivisions : Inherits VB_Parent
         Dim dimensions() = New Integer() {task.histogramBins}
         Dim ranges() = New cvb.Rangef() {New cvb.Rangef(0, 255)}
         Dim hist As New cvb.Mat
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
             cvb.Cv2.CalcHist({dst1(roi)}, {0}, New cvb.Mat(), hist, 1, dimensions, ranges)
             hist = hist.Normalize(0, hist.Rows, cvb.NormTypes.MinMax)
 

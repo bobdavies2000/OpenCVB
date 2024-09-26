@@ -120,15 +120,15 @@ Public Class EMax_InputClusters : Inherits VB_Parent
             task.grid.Run(dst2)
         End If
 
-        If regionCount <> task.gridList.Count Then task.optionsChanged = True
+        If regionCount <> task.gridRects.Count Then task.optionsChanged = True
 
-        regionCount = task.gridList.Count
+        regionCount = task.gridRects.Count
 
         Dim samples = New cvb.Mat(regionCount * options.samplesPerRegion, 2, cvb.MatType.CV_32F).Reshape(2, 0)
         Dim eLabelMat = New cvb.Mat(regionCount * options.samplesPerRegion, 1, cvb.MatType.CV_32S)
 
         For i = 0 To regionCount - 1
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             eLabelMat.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion).SetTo(i)
             Dim tmp = samples.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion)
             cvb.Cv2.Randn(tmp, New cvb.Scalar(roi.X + task.gridSize / 2, roi.Y + task.gridSize / 2),

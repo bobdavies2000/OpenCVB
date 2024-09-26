@@ -13,7 +13,7 @@ Public Class BackProject2D_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Dim roi = task.gridList(index)
+        Dim roi = task.gridRects(index)
 
         colorFmt.Run(src)
         hist2d.Run(colorFmt.dst2)
@@ -332,7 +332,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Parent
         backp.Run(src)
         dst2 = Convert32f_To_8UC3(backp.dst2) * 255
 
-        Dim roi = task.gridList(task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X))
+        Dim roi = task.gridRects(task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X))
         Dim rect As cvb.Rect
         If options.backProjectRow Then
             rect = New cvb.Rect(0, roi.Y, dst2.Width, roi.height)

@@ -18,7 +18,7 @@ Public Class FeatureROI_Basics : Inherits VB_Parent
         stdevList.Clear()
         meanList.Clear()
         Dim mean As cvb.Scalar, stdev As cvb.Scalar
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             cvb.Cv2.MeanStdDev(dst1(roi), mean, stdev)
             stdevList.Add(stdev(0))
             meanList.Add(mean(0))
@@ -28,7 +28,7 @@ Public Class FeatureROI_Basics : Inherits VB_Parent
         dst3.SetTo(0)
         rects.Clear()
         For i = 0 To stdevList.Count - 1
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             Dim depthCheck = task.noDepthMask(roi)
             If stdevList(i) < stdevAverage Or depthCheck.CountNonZero / depthCheck.Total > 0.5 Then
                 dst3.Rectangle(roi, cvb.Scalar.White, -1)
@@ -37,7 +37,7 @@ Public Class FeatureROI_Basics : Inherits VB_Parent
             End If
         Next
         If task.heartBeat Then
-            labels(2) = CStr(rects.Count) + " of " + CStr(task.gridList.Count) + " roi's had above average standard deviation (average = " +
+            labels(2) = CStr(rects.Count) + " of " + CStr(task.gridRects.Count) + " roi's had above average standard deviation (average = " +
                         Format(stdevList.Average, fmt1) + ")"
         End If
 
@@ -67,7 +67,7 @@ Public Class FeatureROI_Color : Inherits VB_Parent
         Dim stdevList1 As New List(Of Single)
         Dim stdevList2 As New List(Of Single)
         Dim mean As cvb.Scalar, stdev As cvb.Scalar
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             cvb.Cv2.MeanStdDev(src(roi), mean, stdev)
             stdevList0.Add(stdev(0))
             stdevList1.Add(stdev(1))
@@ -79,7 +79,7 @@ Public Class FeatureROI_Color : Inherits VB_Parent
         Dim avg2 = stdevList2.Average
         dst3.SetTo(0)
         For i = 0 To stdevList0.Count - 1
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             If stdevList0(i) < avg0 And stdevList1(i) < avg1 And stdevList2(i) < avg2 Then
                 dst3.Rectangle(roi, cvb.Scalar.White, -1)
             End If
@@ -144,7 +144,7 @@ Public Class FeatureROI_Sorted : Inherits VB_Parent
         bgrList.Clear()
         roiList.Clear()
         ReDim categories(9)
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             cvb.Cv2.MeanStdDev(src(roi), meanS, stdev)
             sortedStd.Add(stdev(0) + stdev(1) + stdev(2), roi)
             Dim colorIndex As Integer = 1
@@ -256,7 +256,7 @@ Public Class FeatureROI_Correlation : Inherits VB_Parent
         Dim correlationMat As New cvb.Mat
         Dim motionCount As Integer
         For i = 0 To gather.stdevList.Count - 1
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             If gather.stdevList(i) >= gather.stdevAverage Then
                 cvb.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
@@ -270,7 +270,7 @@ Public Class FeatureROI_Correlation : Inherits VB_Parent
         plot.Run(empty)
         dst3 = plot.dst2
 
-        labels(2) = CStr(gather.rects.Count) + " of " + CStr(task.gridList.Count) + " roi's had above average standard deviation."
+        labels(2) = CStr(gather.rects.Count) + " of " + CStr(task.gridRects.Count) + " roi's had above average standard deviation."
         lastImage = dst1.Clone
     End Sub
 End Class
@@ -293,13 +293,13 @@ Public Class FeatureROI_LowStdev : Inherits VB_Parent
 
         rects.Clear()
         For i = 0 To gather.stdevList.Count - 1
-            Dim roi = task.gridList(i)
+            Dim roi = task.gridRects(i)
             If gather.stdevList(i) < gather.stdevAverage Then
                 rects.Add(roi)
                 SetTrueText(Format(gather.stdevList(i), fmt1), roi.TopLeft, 3)
             End If
         Next
-        If task.heartBeat Then labels = {"", "", CStr(task.gridList.Count - gather.rects.Count) + " roi's had low standard deviation",
+        If task.heartBeat Then labels = {"", "", CStr(task.gridRects.Count - gather.rects.Count) + " roi's had low standard deviation",
                                          "Stdev average = " + Format(gather.stdevList.Average, fmt1)}
     End Sub
 End Class
@@ -415,7 +415,7 @@ Public Class FeatureROI_LRClick : Inherits VB_Parent
         If task.mouseClickFlag Then setClickPoint(task.ClickPoint, task.mousePicTag)
         If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
         Dim gridIndex = task.gridMap.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
-        Dim roi = task.gridList(gridIndex)
+        Dim roi = task.gridRects(gridIndex)
         dst2.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
 
         Dim correlationMat As New cvb.Mat

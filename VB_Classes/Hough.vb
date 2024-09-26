@@ -85,7 +85,7 @@ Public Class Hough_Lines_MT : Inherits VB_Parent
         dst2 = edges.dst2
 
         Dim depth8uC3 = task.depthRGB
-        Parallel.ForEach(task.gridList,
+        Parallel.ForEach(task.gridRects,
         Sub(roi)
             Dim segments() = cvb.Cv2.HoughLines(dst2(roi), options.rho, options.theta, options.threshold)
             If segments.Count = 0 Then
@@ -128,10 +128,10 @@ Public Class Hough_Featureless : Inherits VB_Parent
 
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         Dim regionCount As Integer
-        ReDim noDepthCount(task.gridList.Count - 1)
-        ReDim roiColor(task.gridList.Count - 1)
+        ReDim noDepthCount(task.gridRects.Count - 1)
+        ReDim roiColor(task.gridRects.Count - 1)
 
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             Dim segments() = cvb.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
             If edges.dst2(roi).CountNonZero = 0 Then
                 regionCount += 1
@@ -142,7 +142,7 @@ Public Class Hough_Featureless : Inherits VB_Parent
         dst3.SetTo(0)
         src.CopyTo(dst3, dst2)
         labels(2) = "FeatureLess Regions = " + CStr(regionCount)
-        labels(3) = "Of the " + CStr(task.gridList.Count) + " grid elements, " + CStr(regionCount) + " had no edge or hough features present"
+        labels(3) = "Of the " + CStr(task.gridRects.Count) + " grid elements, " + CStr(regionCount) + " had no edge or hough features present"
     End Sub
 End Class
 
@@ -178,7 +178,7 @@ Public Class Hough_FeatureLessTopX : Inherits VB_Parent
         src.CopyTo(dst2)
         maskFless.SetTo(0)
         maskFeat.SetTo(0)
-        Parallel.ForEach(task.gridList,
+        Parallel.ForEach(task.gridRects,
         Sub(roi)
             Dim segments() = cvb.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
             If segments.Count = 0 Then maskFless(roi).SetTo(255)

@@ -4203,7 +4203,7 @@ public:
             task->gridMask = Mat::zeros(src.size(), CV_8U);
             task->gridToRoiIndex = Mat::zeros(src.size(), CV_32S);
 
-            task->gridList.clear();
+            task->gridRects.clear();
             task->gridRows = 0;
             task->gridCols = 0;
             for (int y = 0; y < src.rows; y += task->gridSize) {
@@ -4214,7 +4214,7 @@ public:
                     if (roi.width > 0 && roi.height > 0) {
                         if (x == 0) task->gridRows++;
                         if (y == 0) task->gridCols++;
-                        task->gridList.push_back(roi);
+                        task->gridRects.push_back(roi);
                     }
                 }
             }
@@ -4228,13 +4228,13 @@ public:
                 line(task->gridMask, p1, p2, Scalar(255), task->lineWidth);
             }
 
-            for (int i = 0; i < task->gridList.size(); i++) {
-                Rect roi = task->gridList[i];
+            for (int i = 0; i < task->gridRects.size(); i++) {
+                Rect roi = task->gridRects[i];
                 rectangle(task->gridToRoiIndex, roi, Scalar(255, 255, 255), 1);
             }
 
             task->gridNeighbors.clear();
-            for (const Rect& roi : task->gridList) {
+            for (const Rect& roi : task->gridRects) {
                 vector<int> neighbors;
                 task->gridNeighbors.push_back(neighbors);
                 for (int i = 0; i < 8; i++) {
@@ -4251,7 +4251,7 @@ public:
             task->color.copyTo(dst2);
             dst2.setTo(Scalar(255, 255, 255), task->gridMask); 
             stringstream ss;
-            ss << "Grid_Basics_CC " << task->gridList.size() << " (" << task->gridRows << "X" << task->gridCols << ") "
+            ss << "Grid_Basics_CC " << task->gridRects.size() << " (" << task->gridRows << "X" << task->gridCols << ") "
                 << task->gridSize << "X" << task->gridSize << " regions";
             labels[2] = ss.str();
         }

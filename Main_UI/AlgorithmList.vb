@@ -124,8 +124,10 @@ End Enum
 	If algorithmName = "Area_MinTriangle_CPP_VB" Then return new Area_MinTriangle_CPP_VB
 	If algorithmName = "Area_SoloPoints" Then return new Area_SoloPoints
 	If algorithmName = "Area_SoloPoints_CS" Then return new Area_SoloPoints_CS
+	If algorithmName = "Artifacts_CellMap" Then return new Artifacts_CellMap
 	If algorithmName = "Artifacts_CellSize" Then return new Artifacts_CellSize
-	If algorithmName = "Artifacts_CellSize1" Then return new Artifacts_CellSize1
+	If algorithmName = "Artifacts_FeatureCells" Then return new Artifacts_FeatureCells
+	If algorithmName = "Artifacts_FeatureCells1" Then return new Artifacts_FeatureCells1
 	If algorithmName = "Artifacts_Features" Then return new Artifacts_Features
 	If algorithmName = "Artifacts_LowRes" Then return new Artifacts_LowRes
 	If algorithmName = "Artifacts_Reduction" Then return new Artifacts_Reduction
@@ -1257,6 +1259,7 @@ End Enum
 	If algorithmName = "Flood_Motion_CS" Then return new Flood_Motion_CS
 	If algorithmName = "Flood_Motion1" Then return new Flood_Motion1
 	If algorithmName = "Flood_Motion1_CS" Then return new Flood_Motion1_CS
+	If algorithmName = "Flood_Simple" Then return new Flood_Simple
 	If algorithmName = "Flood_Tiers" Then return new Flood_Tiers
 	If algorithmName = "Flood_Tiers_CS" Then return new Flood_Tiers_CS
 	If algorithmName = "Font_FlowText" Then return new Font_FlowText

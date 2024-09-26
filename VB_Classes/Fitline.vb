@@ -70,7 +70,7 @@ Public Class FitLine_Basics3D : Inherits VB_Parent
 
         Dim lines As New List(Of cvb.Line3D)
         Dim nullLine = New cvb.Line3D(0, 0, 0, 0, 0, 0)
-        Parallel.ForEach(task.gridList,
+        Parallel.ForEach(task.gridRects,
         Sub(roi)
             Dim depth = task.pcSplit(2)(roi)
             Dim fMask = mask(roi)
@@ -100,8 +100,8 @@ Public Class FitLine_Basics3D : Inherits VB_Parent
             End SyncLock
         End Sub)
         ' putting this in the parallel for above causes a memory leak - could not find it...
-        For i = 0 To task.gridList.Count - 1
-            houghShowLines3D(dst2(task.gridList(i)), lines.ElementAt(i))
+        For i = 0 To task.gridRects.Count - 1
+            houghShowLines3D(dst2(task.gridRects(i)), lines.ElementAt(i))
         Next
     End Sub
 End Class

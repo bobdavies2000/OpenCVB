@@ -315,7 +315,7 @@ Public Class Hist3D_RedCloudGrid : Inherits VB_Parent
         If pixels.pixelVector.Count = 0 Then Exit Sub
         dst1.SetTo(0)
         dst0 = task.cellMap
-        For Each roi In task.gridList
+        For Each roi In task.gridRects
             If dst3(roi).CountNonZero Then
                 Dim candidates As New List(Of Integer)
                 For y = 0 To roi.Height - 1
