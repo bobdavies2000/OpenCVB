@@ -327,7 +327,7 @@ The TreeView shows the different layers of the algorithm and how it was built fr
 
 ![A screenshot of a computer program Description automatically generated](media/c844902ab4d892dcf51d5a2d24c676f0.png)
 
-**KNN_TrackEach:** *The tree above describes how the algorithm calls KNN_Basics and how KNN_Basics calls KNN_Core. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
+**KNN_TrackEach:** *The tree above describes how the algorithm calls KNN_NoDups and how KNN_NoDups calls KNN_Basics. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
 
 *Play with this when running OpenCVB. It is a fun feature and helps increase understanding of the composition of increasingly complex algorithms.*
 

@@ -129,7 +129,7 @@ End Class
 
 
 Public Class RedTrack_FeaturesKNN : Inherits VB_Parent
-    Public knn As New KNN_Core
+    Public knn As New KNN_Basics
     Public feat As New Feature_Stable
     Public Sub New()
         labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}
@@ -227,7 +227,7 @@ End Class
 
 
 Public Class RedTrack_GoodCellInput : Inherits VB_Parent
-    Public knn As New KNN_Core
+    Public knn As New KNN_Basics
     Public feat As New Feature_Stable
     Public featureList As New List(Of cvb.Point2f)
     Public Sub New()

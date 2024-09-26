@@ -323,12 +323,12 @@ End Class
 
 Public Class FeatureLine_LongestV_Tutorial2 : Inherits VB_Parent
     Dim lines As New FeatureLine_Finder
-    Dim knn As New KNN_Core4D
+    Dim knn As New KNN_Basics4D
     Public pt1 As New cvb.Point3f
     Public pt2 As New cvb.Point3f
     Dim lengthReject As Integer
     Public Sub New()
-        desc = "Use FeatureLine_Finder to find all the vertical lines.  Use KNN_Core4D to track each line."
+        desc = "Use FeatureLine_Finder to find all the vertical lines.  Use KNN_Basics4D to track each line."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone

@@ -75,10 +75,10 @@ End Class
 
 
 
-Public Class Artifacts_CellSize : Inherits VB_Parent
+Public Class Artifacts_CellSize1 : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim lowRes As New Artifacts_LowRes
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Public Sub New()
         FindSlider("Min Distance to next").Value = 10
         desc = "Identify the cell size from the Low Res image features"
@@ -102,6 +102,48 @@ Public Class Artifacts_CellSize : Inherits VB_Parent
         If task.heartBeat Then
             strOut = "Found " + CStr(knn.queries.Count) + " features" + vbCrLf
             strOut += Format(avg, fmt1) + " is the cell size (square) - so grid is " + CStr(CInt(avg)) + " pixels"
+        End If
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Artifacts_CellSize : Inherits VB_Parent
+    Dim feat As New Feature_Basics
+    Dim lowRes As New Artifacts_LowRes
+    Public Sub New()
+        desc = "Identify the cell size from the Low Res image features"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lowRes.Run(src)
+        dst2 = lowRes.dst2
+
+        Dim offsets As New List(Of Integer)
+        For i = 0 To dst2.Width - 2
+            Dim v1 = dst2.Get(Of cvb.Vec3b)(0, i)
+            Dim v2 = dst2.Get(Of cvb.Vec3b)(0, i + 1)
+            If v1 <> v2 Then offsets.Add(i)
+        Next
+
+        Dim distances As New List(Of Integer)
+        For i = 0 To offsets.Count - 2
+            distances.Add(offsets(i + 1) - offsets(i))
+        Next
+
+        feat.Run(lowRes.dst2)
+
+        For Each pt In task.features
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
+        If task.heartBeat Then
+            strOut = "Found " + CStr(task.features.Count) + " features" + vbCrLf
+            strOut += CStr(CInt(distances.Average)) + " is the cell size (square) "
         End If
         SetTrueText(strOut, 3)
     End Sub

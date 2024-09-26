@@ -295,7 +295,7 @@ End Class
 
 Public Class LongLine_ExtendParallel : Inherits VB_Parent
     Dim extendAll As New LongLine_ExtendAll
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Dim near As New Line_Nearest
     Public parList As New List(Of coinPoints)
     Public Sub New()

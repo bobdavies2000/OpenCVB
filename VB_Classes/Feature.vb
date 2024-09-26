@@ -35,7 +35,7 @@ End Class
 Public Class Feature_Stable : Inherits VB_Parent
     Dim nextMatList As New List(Of cvb.Mat)
     Dim ptList As New List(Of cvb.Point2f)
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Dim ptLost As New List(Of cvb.Point2f)
     Dim gather As New Feature_Gather
     Dim featureMatList As New List(Of cvb.Mat)
@@ -136,7 +136,7 @@ End Class
 
 ' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_KNN : Inherits VB_Parent
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Public featurePoints As New List(Of cvb.Point2f)
     Public feat As New Feature_Stable
     Public Sub New()
@@ -376,7 +376,7 @@ End Class
 Public Class Feature_NearestCell : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim feat As New FeatureLeftRight_Basics
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Public Sub New()
         desc = "Find the nearest feature to every cell in task.redCells"
     End Sub

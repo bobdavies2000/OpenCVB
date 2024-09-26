@@ -2,7 +2,7 @@
 Imports cvb = OpenCvSharp
 Public Class Neighbors_Basics : Inherits VB_Parent
     Public redC As New RedCloud_Basics
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Public runRedCloud As Boolean = False
     Public options As New Options_XNeighbors
     Public Sub New()

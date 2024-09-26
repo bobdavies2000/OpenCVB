@@ -742,9 +742,7 @@ Public Class Depth_MaxMask : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src
 
-        If task.maxDepthMask.Width = 0 Then
-            task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
-        End If
+        task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
         dst2.SetTo(cvb.Scalar.White, task.maxDepthMask)
         contour.Run(task.maxDepthMask)
         dst3.SetTo(0)

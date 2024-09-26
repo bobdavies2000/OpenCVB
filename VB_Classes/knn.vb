@@ -2,84 +2,6 @@ Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 Public Class KNN_Basics : Inherits VB_Parent
-    Public matches As New List(Of PointPair)
-    Public noMatch As New List(Of cvb.Point)
-    Public knn As New KNN_Core
-    Public queries As New List(Of cvb.Point2f)
-    Public neighbors As New List(Of Integer)
-    Dim random As New Random_Basics
-    Public Sub New()
-        labels(2) = "KNN_Core output with many-to-one results"
-        labels(3) = "KNN_Basics output with just the closest match.  Red = training data, yellow = queries."
-        desc = "Map points 1:1 with losses. Toss any farther duplicates. Easier to follow than previous version."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Then
-            If task.heartBeat Then
-                Random.Run(empty)
-                knn.trainInput = New List(Of cvb.Point2f)(random.PointList)
-            End If
-            Random.Run(empty)
-            queries = New List(Of cvb.Point2f)(random.PointList)
-        End If
-
-        If queries.Count = 0 Then
-            SetTrueText("Place some input points in queries before starting the knn run.")
-            Exit Sub
-        End If
-
-        knn.queries = queries
-        knn.Run(empty)
-        knn.displayResults()
-        dst2 = knn.dst2
-
-        neighbors.Clear()
-        For i = 0 To knn.neighbors.Count - 1
-            neighbors.Add(knn.neighbors(i)(0))
-        Next
-
-        For i = 0 To neighbors.Count - 1
-            Dim p1 = knn.queries(i)
-            If neighbors(i) = -1 Then Continue For
-            Dim ptn = knn.trainInput(neighbors(i))
-            For j = i + 1 To neighbors.Count - 1
-                If neighbors(j) = neighbors(i) Then
-                    Dim p2 = knn.queries(j)
-                    Dim d1 = p1.DistanceTo(ptn)
-                    Dim d2 = p2.DistanceTo(ptn)
-                    neighbors(If(d1 > d2, i, j)) = -1
-                End If
-            Next
-        Next
-
-        dst3.SetTo(0)
-        For Each pt In knn.trainInput
-            DrawCircle(dst3,pt, task.DotSize + 4, cvb.Scalar.Red)
-        Next
-
-        noMatch.Clear()
-        matches.Clear()
-        For i = 0 To neighbors.Count - 1
-            Dim pt = queries(i)
-            DrawCircle(dst3,pt, task.DotSize + 4, cvb.Scalar.Yellow)
-            If neighbors(i) = -1 Then
-                noMatch.Add(pt)
-            Else
-                Dim nn = knn.trainInput(neighbors(i))
-                matches.Add(New PointPair(pt, nn))
-                DrawLine(dst3, nn, pt, cvb.Scalar.White)
-            End If
-        Next
-        If standaloneTest() = False Then knn.trainInput = New List(Of cvb.Point2f)(queries)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class KNN_Core : Inherits VB_Parent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Point2f) ' put training data here
     Public queries As New List(Of cvb.Point2f) ' put Query data here
@@ -113,10 +35,10 @@ Public Class KNN_Core : Inherits VB_Parent
 
         If standalone Then
             If task.heartBeat Then
-                Random.Run(empty)
+                random.Run(empty)
                 trainInput = New List(Of cvb.Point2f)(random.PointList)
             End If
-            Random.Run(empty)
+            random.Run(empty)
             queries = New List(Of cvb.Point2f)(random.PointList)
         End If
 
@@ -135,7 +57,7 @@ Public Class KNN_Core : Inherits VB_Parent
         Dim dm = If(desiredMatches < 0, trainInput.Count, desiredMatches)
         knn.FindNearest(queryMat, dm, New cvb.Mat, neighborMat)
         If neighborMat.Rows <> queryMat.Rows Or neighborMat.Cols <> dm Then
-            debug.writeline("KNN's FindNearest did not return the correct number of neighbors.  Marshal.copy will fail so exit.")
+            Debug.WriteLine("KNN's FindNearest did not return the correct number of neighbors.  Marshal.copy will fail so exit.")
             Exit Sub
         End If
 
@@ -171,8 +93,86 @@ End Class
 
 
 
-Public Class KNN_Core2DTest : Inherits VB_Parent
-    Public knn As New KNN_Core
+
+Public Class KNN_NoDups : Inherits VB_Parent
+    Public matches As New List(Of PointPair)
+    Public noMatch As New List(Of cvb.Point)
+    Public knn As New KNN_Basics
+    Public queries As New List(Of cvb.Point2f)
+    Public neighbors As New List(Of Integer)
+    Dim random As New Random_Basics
+    Public Sub New()
+        labels(2) = "KNN_Basics output with many-to-one results"
+        labels(3) = "KNN_NoDups output with just the closest match.  Red = training data, yellow = queries."
+        desc = "Map points 1:1 with losses. Toss any farther duplicates. Easier to follow than previous version."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standaloneTest() Then
+            If task.heartBeat Then
+                random.Run(empty)
+                knn.trainInput = New List(Of cvb.Point2f)(random.PointList)
+            End If
+            random.Run(empty)
+            queries = New List(Of cvb.Point2f)(random.PointList)
+        End If
+
+        If queries.Count = 0 Then
+            SetTrueText("Place some input points in queries before starting the knn run.")
+            Exit Sub
+        End If
+
+        knn.queries = queries
+        knn.Run(empty)
+        knn.displayResults()
+        dst2 = knn.dst2
+
+        neighbors.Clear()
+        For i = 0 To knn.neighbors.Count - 1
+            neighbors.Add(knn.neighbors(i)(0))
+        Next
+
+        For i = 0 To neighbors.Count - 1
+            Dim p1 = knn.queries(i)
+            If neighbors(i) = -1 Then Continue For
+            Dim ptn = knn.trainInput(neighbors(i))
+            For j = i + 1 To neighbors.Count - 1
+                If neighbors(j) = neighbors(i) Then
+                    Dim p2 = knn.queries(j)
+                    Dim d1 = p1.DistanceTo(ptn)
+                    Dim d2 = p2.DistanceTo(ptn)
+                    neighbors(If(d1 > d2, i, j)) = -1
+                End If
+            Next
+        Next
+
+        dst3.SetTo(0)
+        For Each pt In knn.trainInput
+            DrawCircle(dst3, pt, task.DotSize + 4, cvb.Scalar.Red)
+        Next
+
+        noMatch.Clear()
+        matches.Clear()
+        For i = 0 To neighbors.Count - 1
+            Dim pt = queries(i)
+            DrawCircle(dst3, pt, task.DotSize + 4, cvb.Scalar.Yellow)
+            If neighbors(i) = -1 Then
+                noMatch.Add(pt)
+            Else
+                Dim nn = knn.trainInput(neighbors(i))
+                matches.Add(New PointPair(pt, nn))
+                DrawLine(dst3, nn, pt, cvb.Scalar.White)
+            End If
+        Next
+        If standaloneTest() = False Then knn.trainInput = New List(Of cvb.Point2f)(queries)
+    End Sub
+End Class
+
+
+
+
+
+Public Class KNN_Basics2DTest : Inherits VB_Parent
+    Public knn As New KNN_Basics
     Dim random As New Random_Basics
     Public Sub New()
         FindSlider("Random Pixel Count").Value = 10
@@ -218,7 +218,7 @@ End Class
 
 
 
-Public Class KNN_Core3D : Inherits VB_Parent
+Public Class KNN_Basics3D : Inherits VB_Parent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Point3f) ' put training data here
     Public queries As New List(Of cvb.Point3f) ' put Query data here
@@ -266,7 +266,7 @@ End Class
 
 
 
-Public Class KNN_Core4D : Inherits VB_Parent
+Public Class KNN_Basics4D : Inherits VB_Parent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Vec4f) ' put training data here
     Public queries As New List(Of cvb.Vec4f) ' put Query data here
@@ -315,7 +315,7 @@ End Class
 
 
 
-Public Class KNN_CoreN : Inherits VB_Parent
+Public Class KNN_BasicsN : Inherits VB_Parent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of Single) ' put training data here
     Public queries As New List(Of Single) ' put Query data here
@@ -336,7 +336,7 @@ Public Class KNN_CoreN : Inherits VB_Parent
         End If
 
         If options.knnDimension = 0 Then
-            If messageSent = False Then MsgBox("The KNN dimension needs to be set for the general purpose KNN_Core to start")
+            If messageSent = False Then MsgBox("The KNN dimension needs to be set for the general purpose KNN_Basics to start")
             Exit Sub
         End If
 
@@ -371,8 +371,8 @@ End Class
 
 
 
-Public Class KNN_Core3DTest : Inherits VB_Parent
-    Dim knn As New KNN_Core3D
+Public Class KNN_Basics3DTest : Inherits VB_Parent
+    Dim knn As New KNN_Basics3D
     Dim dist As New Distance_Point3D
     Dim random As New Random_Basics3D
     Public Sub New()
@@ -432,8 +432,8 @@ End Class
 
 
 
-Public Class KNN_Core4DTest : Inherits VB_Parent
-    Dim knn As New KNN_Core4D
+Public Class KNN_Basics4DTest : Inherits VB_Parent
+    Dim knn As New KNN_Basics4D
     Dim dist As New Distance_Point4D
     Dim random As New Random_Basics4D
     Public Sub New()
@@ -482,11 +482,11 @@ End Class
 
 
 
-Public Class KNN_CoreNTest : Inherits VB_Parent
-    Dim knn As New KNN_CoreN
+Public Class KNN_BasicsNTest : Inherits VB_Parent
+    Dim knn As New KNN_BasicsN
     Public Sub New()
         labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
-        desc = "Test the use of the general form KNN_CoreN algorithm"
+        desc = "Test the use of the general form KNN_BasicsN algorithm"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
@@ -533,7 +533,7 @@ End Class
 
 Public Class KNN_Emax : Inherits VB_Parent
     Dim random As New Random_Basics
-    Public knn As New KNN_Core
+    Public knn As New KNN_Basics
     Dim em As New EMax_Basics
     Public Sub New()
         labels(2) = "Output from Emax"
@@ -564,7 +564,7 @@ End Class
 
 Public Class KNN_TrackMean : Inherits VB_Parent
     Dim plot As New Plot_Histogram
-    Dim knn As New KNN_Basics
+    Dim knn As New KNN_NoDups
     Dim feat As New Feature_Stable
     Const maxDistance As Integer = 50
     Public shiftX As Single
@@ -713,7 +713,7 @@ Public Class KNN_ClosestTracker : Inherits VB_Parent
 
         If minDistances.Count > 0 Then
             If minDist > minDistances.Max * 2 Then
-                debug.writeline("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
+                Debug.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
                 lastPair = New PointPair(trainInput(0), trainInput(1))
             Else
                 lastPair = New PointPair(p1, p2)
@@ -767,7 +767,7 @@ Public Class KNN_ClosestLine : Inherits VB_Parent
 
         Static minDistances As New List(Of Single)({distances(0)})
         If minDist > minDistances.Max * 4 Then
-            debug.writeline("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
+            Debug.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
             lastP1 = trainInput(0)
             lastP2 = trainInput(1)
         End If
@@ -839,24 +839,24 @@ End Class
 
 
 
-Public Class KNN_BasicsOld : Inherits VB_Parent
+Public Class KNN_NoDupsOld : Inherits VB_Parent
     Public matches As New List(Of PointPair)
     Public noMatch As New List(Of cvb.Point)
-    Public knn As New KNN_Core
+    Public knn As New KNN_Basics
     Public queries As New List(Of cvb.Point2f)
     Dim random As New Random_Basics
     Public Sub New()
-        labels(2) = "KNN_Core output with many-to-one results"
-        labels(3) = "KNN_BasicsOld output with just the closest match.  Red = training data, yellow = queries."
+        labels(2) = "KNN_Basics output with many-to-one results"
+        labels(3) = "KNN_NoDupsOld output with just the closest match.  Red = training data, yellow = queries."
         desc = "Map points 1:1 with losses.  When duplicates are found, toss the farthest.  Too hard to follow.  Trying a better approach."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
-                Random.Run(empty)
+                random.Run(empty)
                 knn.trainInput = New List(Of cvb.Point2f)(random.PointList)
             End If
-            Random.Run(empty)
+            random.Run(empty)
             queries = New List(Of cvb.Point2f)(random.PointList)
         End If
 
@@ -935,7 +935,7 @@ End Class
 
 
 Public Class KNN_Farthest : Inherits VB_Parent
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Public mpFar As PointPair
     Dim random As New Random_Basics
     Public Sub New()
@@ -945,7 +945,7 @@ Public Class KNN_Farthest : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
-                Random.Run(empty)
+                random.Run(empty)
                 knn.trainInput = New List(Of cvb.Point2f)(random.PointList)
                 knn.queries = New List(Of cvb.Point2f)(knn.trainInput)
             End If
@@ -960,15 +960,15 @@ Public Class KNN_Farthest : Inherits VB_Parent
         For i = 0 To knn.result.GetUpperBound(0) - 1
             Dim farIndex = knn.result(i, knn.result.GetUpperBound(1))
             Dim mp = New PointPair(knn.queries(i), knn.trainInput(farIndex))
-            DrawCircle(dst2,mp.p1, task.DotSize + 4, cvb.Scalar.Yellow)
-            DrawCircle(dst2,mp.p2, task.DotSize + 4, cvb.Scalar.Yellow)
+            DrawCircle(dst2, mp.p1, task.DotSize + 4, cvb.Scalar.Yellow)
+            DrawCircle(dst2, mp.p2, task.DotSize + 4, cvb.Scalar.Yellow)
             DrawLine(dst2, mp.p1, mp.p2, cvb.Scalar.Yellow)
             farthest.Add(mp)
             distances.Add(mp.p1.DistanceTo(mp.p2))
         Next
 
         For Each pt In knn.queries
-            DrawCircle(dst3,pt, task.DotSize + 4, cvb.Scalar.Red)
+            DrawCircle(dst3, pt, task.DotSize + 4, cvb.Scalar.Red)
         Next
 
         Dim maxIndex = distances.IndexOf(distances.Max())
@@ -986,7 +986,7 @@ End Class
 
 
 Public Class KNN_TrackEach : Inherits VB_Parent
-    Dim knn As New KNN_Basics
+    Dim knn As New KNN_NoDups
     Dim feat As New Feature_Stable
     Dim trackAll As New List(Of List(Of PointPair))
     Public Sub New()

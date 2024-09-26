@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Swarm_Basics : Inherits VB_Parent
-    Public knn As New KNN_Core
+    Public knn As New KNN_Basics
     Dim feat As New Feature_Stable
     Public mpList As New List(Of PointPair)
     Public distanceAvg As Single

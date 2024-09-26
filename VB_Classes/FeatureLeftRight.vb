@@ -6,7 +6,7 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Parent
     Public selectedPoint As cvb.Point, mpIndex
     Dim ClickPoint As cvb.Point, picTag As Integer
     Dim options As New Options_Features
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Public Sub New()
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         If standalone Then task.gOptions.setDisplay1()
@@ -191,7 +191,7 @@ Public Class FeatureLeftRight_Input : Inherits VB_Parent
     Public selectedPoint As cvb.Point, mpIndex
     Dim ClickPoint As cvb.Point, picTag As Integer
     Dim options As New Options_Features
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Public Sub New()
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         If standalone Then task.gOptions.setDisplay1()

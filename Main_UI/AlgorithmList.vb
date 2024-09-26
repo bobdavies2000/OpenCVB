@@ -55,7 +55,7 @@ _IMU_GMatrix_CC
 _IMU_GMatrix_QT_CC
 _Kalman_Basics_CC
 _KNN_Basics_CC
-_KNN_Core_CC
+_KNN_NoDups_CC
 _Line_BasicsOld_CC
 _Mat_4Click_CC
 _Mat_4to1_CC
@@ -125,6 +125,7 @@ End Enum
 	If algorithmName = "Area_SoloPoints" Then return new Area_SoloPoints
 	If algorithmName = "Area_SoloPoints_CS" Then return new Area_SoloPoints_CS
 	If algorithmName = "Artifacts_CellSize" Then return new Artifacts_CellSize
+	If algorithmName = "Artifacts_CellSize1" Then return new Artifacts_CellSize1
 	If algorithmName = "Artifacts_Features" Then return new Artifacts_Features
 	If algorithmName = "Artifacts_LowRes" Then return new Artifacts_LowRes
 	If algorithmName = "Artifacts_Reduction" Then return new Artifacts_Reduction
@@ -1791,35 +1792,35 @@ End Enum
 	If algorithmName = "KNN_Basics" Then return new KNN_Basics
 	If algorithmName = "KNN_Basics_CC" Then return new CPP_Basics(ccFunctionNames._KNN_Basics_CC)
 	If algorithmName = "KNN_Basics_CS" Then return new KNN_Basics_CS
-	If algorithmName = "KNN_BasicsOld" Then return new KNN_BasicsOld
-	If algorithmName = "KNN_BasicsOld_CS" Then return new KNN_BasicsOld_CS
+	If algorithmName = "KNN_Basics2DTest" Then return new KNN_Basics2DTest
+	If algorithmName = "KNN_Basics2DTest_CS" Then return new KNN_Basics2DTest_CS
+	If algorithmName = "KNN_Basics3D" Then return new KNN_Basics3D
+	If algorithmName = "KNN_Basics3D_CS" Then return new KNN_Basics3D_CS
+	If algorithmName = "KNN_Basics3DTest" Then return new KNN_Basics3DTest
+	If algorithmName = "KNN_Basics3DTest_CS" Then return new KNN_Basics3DTest_CS
+	If algorithmName = "KNN_Basics4D" Then return new KNN_Basics4D
+	If algorithmName = "KNN_Basics4D_CS" Then return new KNN_Basics4D_CS
+	If algorithmName = "KNN_Basics4DTest" Then return new KNN_Basics4DTest
+	If algorithmName = "KNN_Basics4DTest_CS" Then return new KNN_Basics4DTest_CS
+	If algorithmName = "KNN_BasicsN" Then return new KNN_BasicsN
+	If algorithmName = "KNN_BasicsN_CS" Then return new KNN_BasicsN_CS
+	If algorithmName = "KNN_BasicsNTest" Then return new KNN_BasicsNTest
+	If algorithmName = "KNN_BasicsNTest_CS" Then return new KNN_BasicsNTest_CS
 	If algorithmName = "KNN_ClosestLine" Then return new KNN_ClosestLine
 	If algorithmName = "KNN_ClosestLine_CS" Then return new KNN_ClosestLine_CS
 	If algorithmName = "KNN_ClosestTracker" Then return new KNN_ClosestTracker
 	If algorithmName = "KNN_ClosestTracker_CS" Then return new KNN_ClosestTracker_CS
 	If algorithmName = "KNN_ClosestVertical" Then return new KNN_ClosestVertical
 	If algorithmName = "KNN_ClosestVertical_CS" Then return new KNN_ClosestVertical_CS
-	If algorithmName = "KNN_Core" Then return new KNN_Core
-	If algorithmName = "KNN_Core_CC" Then return new CPP_Basics(ccFunctionNames._KNN_Core_CC)
-	If algorithmName = "KNN_Core_CS" Then return new KNN_Core_CS
-	If algorithmName = "KNN_Core2DTest" Then return new KNN_Core2DTest
-	If algorithmName = "KNN_Core2DTest_CS" Then return new KNN_Core2DTest_CS
-	If algorithmName = "KNN_Core3D" Then return new KNN_Core3D
-	If algorithmName = "KNN_Core3D_CS" Then return new KNN_Core3D_CS
-	If algorithmName = "KNN_Core3DTest" Then return new KNN_Core3DTest
-	If algorithmName = "KNN_Core3DTest_CS" Then return new KNN_Core3DTest_CS
-	If algorithmName = "KNN_Core4D" Then return new KNN_Core4D
-	If algorithmName = "KNN_Core4D_CS" Then return new KNN_Core4D_CS
-	If algorithmName = "KNN_Core4DTest" Then return new KNN_Core4DTest
-	If algorithmName = "KNN_Core4DTest_CS" Then return new KNN_Core4DTest_CS
-	If algorithmName = "KNN_CoreN" Then return new KNN_CoreN
-	If algorithmName = "KNN_CoreN_CS" Then return new KNN_CoreN_CS
-	If algorithmName = "KNN_CoreNTest" Then return new KNN_CoreNTest
-	If algorithmName = "KNN_CoreNTest_CS" Then return new KNN_CoreNTest_CS
 	If algorithmName = "KNN_Emax" Then return new KNN_Emax
 	If algorithmName = "KNN_Emax_CS" Then return new KNN_Emax_CS
 	If algorithmName = "KNN_Farthest" Then return new KNN_Farthest
 	If algorithmName = "KNN_Farthest_CS" Then return new KNN_Farthest_CS
+	If algorithmName = "KNN_NoDups" Then return new KNN_NoDups
+	If algorithmName = "KNN_NoDups_CC" Then return new CPP_Basics(ccFunctionNames._KNN_NoDups_CC)
+	If algorithmName = "KNN_NoDups_CS" Then return new KNN_NoDups_CS
+	If algorithmName = "KNN_NoDupsOld" Then return new KNN_NoDupsOld
+	If algorithmName = "KNN_NoDupsOld_CS" Then return new KNN_NoDupsOld_CS
 	If algorithmName = "KNN_TrackEach" Then return new KNN_TrackEach
 	If algorithmName = "KNN_TrackEach_CS" Then return new KNN_TrackEach_CS
 	If algorithmName = "KNN_TrackMean" Then return new KNN_TrackMean

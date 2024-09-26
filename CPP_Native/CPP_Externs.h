@@ -96,12 +96,12 @@ namespace CPP_Native
         { task->alg = new Delaunay_Basics_CC(); task->alg->traceName = "Delaunay_Basics_CC"; break; }
         case _Delaunay_GenerationsNoKNN_CC:
         { task->alg = new Delaunay_GenerationsNoKNN_CC(); task->alg->traceName = "Delaunay_GenerationsNoKNN_CC"; break; }
-        case _KNN_Core_CC:
-        { task->alg = new KNN_Core_CC(); task->alg->traceName = "KNN_Core_CC"; break; }
-        case _Random_Basics_CC:
-        { task->alg = new Random_Basics_CC(); task->alg->traceName = "Random_Basics_CC"; break; }
         case _KNN_Basics_CC:
         { task->alg = new KNN_Basics_CC(); task->alg->traceName = "KNN_Basics_CC"; break; }
+        case _Random_Basics_CC:
+        { task->alg = new Random_Basics_CC(); task->alg->traceName = "Random_Basics_CC"; break; }
+        case _KNN_NoDups_CC:
+        { task->alg = new KNN_NoDups_CC(); task->alg->traceName = "KNN_NoDups_CC"; break; }
         case _Delaunay_Generations_CC:
         { task->alg = new Delaunay_Generations_CC(); task->alg->traceName = "Delaunay_Generations_CC"; break; }
         case _Remap_Basics_CC:

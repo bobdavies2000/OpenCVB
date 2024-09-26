@@ -7329,7 +7329,7 @@ namespace CS_Classes
 
     public class Cluster_Basics_CS : VB_Parent
     {
-        KNN_Core knn = new KNN_Core();
+        KNN_Basics knn = new KNN_Basics();
         public List<cv.Point> ptInput = new List<cv.Point>();
         public List<cv.Point> ptList = new List<cv.Point>();
         public List<int> clusterID = new List<int>();
@@ -10979,7 +10979,7 @@ namespace CS_Classes
     {
         public List<cv.Point2f> inputPoints;
         public Delaunay_Basics facet = new Delaunay_Basics();
-        KNN_Basics knn = new KNN_Basics();
+        KNN_NoDups knn = new KNN_NoDups();
         Random_Basics random = new Random_Basics();
 
         public Delaunay_Generations_CS()
@@ -12174,14 +12174,11 @@ namespace CS_Classes
         {
             dst2 = src;
 
-            //    If vbc.task.maxDepthMask.Width = 0 Then
-            //    vbc.task.maxDepthMask = vbc.task.pcSplit(2).InRange(vbc.task.MaxZmeters, vbc.task.MaxZmeters).ConvertScaleAbs()
-            //End If
+            vbc.task.maxDepthMask = vbc.task.pcSplit[2].InRange(vbc.task.MaxZmeters, vbc.task.MaxZmeters).ConvertScaleAbs();
             if (vbc.task.maxDepthMask.Width == 0) vbc.task.maxDepthMask = vbc.task.pcSplit[2].InRange(vbc.task.MaxZmeters, vbc.task.MaxZmeters).ConvertScaleAbs();
             dst2.SetTo(Scalar.White, vbc.task.maxDepthMask);
             contour.Run(vbc.task.maxDepthMask);
-            dst3 = new Mat();
-            dst3.SetTo(Scalar.All(0));
+            dst3.SetTo(0);
             foreach (var c in contour.allContours)
             {
                 List<cv.Point> hull = Cv2.ConvexHull(c.ToArray(), true).ToList();
@@ -16412,7 +16409,7 @@ namespace CS_Classes
 
     public class EMax_PointTracker_CS : VB_Parent
     {
-        KNN_Core knn = new KNN_Core();
+        KNN_Basics knn = new KNN_Basics();
         EMax_Basics emax = new EMax_Basics();
         public EMax_PointTracker_CS()
         {
@@ -17103,7 +17100,7 @@ namespace CS_Classes
     {
         List<Mat> matList = new List<Mat>();
         List<cv.Point2f> ptList = new List<cv.Point2f>();
-        KNN_Core knn = new KNN_Core();
+        KNN_Basics knn = new KNN_Basics();
         List<cv.Point2f> ptLost = new List<cv.Point2f>();
         Feature_Gather gather = new Feature_Gather();
         List<Mat> featureMat = new List<Mat>();
@@ -17228,7 +17225,7 @@ namespace CS_Classes
 
     public class Feature_KNN_CS : VB_Parent
     {
-        KNN_Core knn = new KNN_Core();
+        KNN_Basics knn = new KNN_Basics();
         public List<cv.Point2f> featurePoints = new List<cv.Point2f>();
         public Feature_Stable feat = new Feature_Stable();
         public Feature_KNN_CS()
@@ -17469,7 +17466,7 @@ namespace CS_Classes
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         FeatureLeftRight_Basics feat = new FeatureLeftRight_Basics();
-        KNN_Core knn = new KNN_Core();
+        KNN_Basics knn = new KNN_Basics();
         public Feature_NearestCell_CS()
         {
             desc = "Find the nearest feature to every cell in vbc.task.redCells";
@@ -18298,7 +18295,7 @@ namespace CS_Classes
         public cv.Point ClickPoint;
         public int picTag;
         public Options_Features options = new Options_Features();
-        public KNN_Core knn = new KNN_Core();
+        public KNN_Basics knn = new KNN_Basics();
         public FeatureLeftRight_Basics_CS()
         {
             labels[1] = "NOTE: matching right point is always to the left of the left point";
@@ -18481,7 +18478,7 @@ namespace CS_Classes
         public cv.Point ClickPoint;
         public int picTag;
         public Options_Features options = new Options_Features();
-        public KNN_Core knn = new KNN_Core();
+        public KNN_Basics knn = new KNN_Basics();
         public FeatureLeftRight_Input_CS()
         {
             labels[1] = "NOTE: matching right point is always to the left of the left point";
@@ -19186,13 +19183,13 @@ namespace CS_Classes
     public class FeatureLine_LongestV_Tutorial2_CS : VB_Parent
     {
         FeatureLine_Finder lines = new FeatureLine_Finder();
-        KNN_Core4D knn = new KNN_Core4D();
+        KNN_Basics4D knn = new KNN_Basics4D();
         public cv.Point3f pt1 = new cv.Point3f();
         public cv.Point3f pt2 = new cv.Point3f();
         int lengthReject;
         public FeatureLine_LongestV_Tutorial2_CS()
         {
-            desc = "Use FeatureLine_Finder to find all the vertical lines.  Use KNN_Core4D to track each line.";
+            desc = "Use FeatureLine_Finder to find all the vertical lines.  Use KNN_Basics4D to track each line.";
         }
         public void RunAlg(Mat src)
         {
@@ -24583,13 +24580,13 @@ namespace CS_Classes
     public class GuidedBP_HotPointsKNN_CS : VB_Parent
     {
         GuidedBP_HotPoints ptHot = new GuidedBP_HotPoints();
-        KNN_Core knnSide = new KNN_Core();
-        KNN_Core knnTop = new KNN_Core();
+        KNN_Basics knnSide = new KNN_Basics();
+        KNN_Basics knnTop = new KNN_Basics();
         public GuidedBP_HotPointsKNN_CS()
         {
             desc = "Correlate the hot points with the previous generation to ID each object";
         }
-        void runKNN(KNN_Core knn, List<cv.Rect> rectList, Mat dst, int dstindex)
+        void runKNN(KNN_Basics knn, List<cv.Rect> rectList, Mat dst, int dstindex)
         {
             knn.queries.Clear();
             foreach (var r in rectList)
@@ -32224,18 +32221,18 @@ namespace CS_Classes
 
 
 
-    public class KNN_Basics_CS : VB_Parent
+    public class KNN_NoDups_CS : VB_Parent
     {
         public List<PointPair> matches = new List<PointPair>();
         public List<cv.Point2f> noMatch = new List<cv.Point2f>();
-        public KNN_Core knn = new KNN_Core();
+        public KNN_Basics knn = new KNN_Basics();
         public List<cv.Point2f> queries = new List<cv.Point2f>();
         public List<int> neighbors = new List<int>();
         Random_Basics random = new Random_Basics();
-        public KNN_Basics_CS()
+        public KNN_NoDups_CS()
         {
-            labels[2] = "KNN_Core output with many-to-one results";
-            labels[3] = "CS_KNN_Basics_CS output with just the closest match.  Red = training data, yellow = queries.";
+            labels[2] = "KNN_Basics output with many-to-one results";
+            labels[3] = "CS_KNN_NoDups_CS output with just the closest match.  Red = training data, yellow = queries.";
             desc = "Map points 1:1 with losses. Toss any farther duplicates. Easier to follow than previous version.";
         }
         public void RunAlg(Mat src)
@@ -32309,7 +32306,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core_CS : VB_Parent
+    public class KNN_Basics_CS : VB_Parent
     {
         public KNearest knn;
         public List<cv.Point2f> trainInput = new List<cv.Point2f>(); // put training data here
@@ -32318,7 +32315,7 @@ namespace CS_Classes
         public int[,] result; // Get results here...
         public int desiredMatches = -1; // -1 indicates it is to use the number of queries.
         Random_Basics random = new Random_Basics();
-        public KNN_Core_CS()
+        public KNN_Basics_CS()
         {
             knn = KNearest.Create();
             labels[2] = "Red=TrainingData, yellow = queries";
@@ -32405,11 +32402,11 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core2DTest_CS : VB_Parent
+    public class KNN_Basics2DTest_CS : VB_Parent
     {
-        public KNN_Core knn = new KNN_Core();
+        public KNN_Basics knn = new KNN_Basics();
         Random_Basics random = new Random_Basics();
-        public KNN_Core2DTest_CS()
+        public KNN_Basics2DTest_CS()
         {
             FindSlider("Random Pixel Count").Value = 10;
             desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors.";
@@ -32452,13 +32449,13 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core3D_CS : VB_Parent
+    public class KNN_Basics3D_CS : VB_Parent
     {
         public KNearest knn;
         public List<cv.Point3f> trainInput = new List<cv.Point3f>(); // put training data here
         public List<cv.Point3f> queries = new List<cv.Point3f>(); // put Query data here
         public int[,] result; // Get results here...
-        public KNN_Core3D_CS()
+        public KNN_Basics3D_CS()
         {
             knn = KNearest.Create();
             desc = "Use knn with the input 3D points in the image.  Find the nearest neighbors.";
@@ -32501,13 +32498,13 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core4D_CS : VB_Parent
+    public class KNN_Basics4D_CS : VB_Parent
     {
         public KNearest knn;
         public List<Vec4f> trainInput = new List<Vec4f>(); // put training data here
         public List<Vec4f> queries = new List<Vec4f>(); // put Query data here
         public int[,] result; // Get results here...
-        public KNN_Core4D_CS()
+        public KNN_Basics4D_CS()
         {
             knn = KNearest.Create();
             labels[2] = "Red=TrainingData, yellow = queries, text shows Z distance to that point from query point";
@@ -32551,7 +32548,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_CoreN_CS : VB_Parent
+    public class KNN_BasicsN_CS : VB_Parent
     {
         public KNearest knn;
         public List<float> trainInput = new List<float>(); // put training data here
@@ -32559,7 +32556,7 @@ namespace CS_Classes
         public int[,] result; // Get results here...
         bool messageSent;
         public Options_KNN options = new Options_KNN();
-        public KNN_CoreN_CS()
+        public KNN_BasicsN_CS()
         {
             knn = KNearest.Create();
             desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors.";
@@ -32577,7 +32574,7 @@ namespace CS_Classes
             {
                 if (!messageSent)
                 {
-                    System.Windows.Forms.MessageBox.Show("The KNN dimension needs to be set for the general purpose KNN_Core to start");
+                    System.Windows.Forms.MessageBox.Show("The KNN dimension needs to be set for the general purpose KNN_Basics to start");
                     messageSent = true;
                 }
                 return;
@@ -32610,12 +32607,12 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core3DTest_CS : VB_Parent
+    public class KNN_Basics3DTest_CS : VB_Parent
     {
-        KNN_Core3D knn = new KNN_Core3D();
+        KNN_Basics3D knn = new KNN_Basics3D();
         Distance_Point3D dist = new Distance_Point3D();
         Random_Basics3D random = new Random_Basics3D();
-        public KNN_Core3DTest_CS()
+        public KNN_Basics3DTest_CS()
         {
             labels[2] = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point";
             FindSlider("Random Pixel Count").Value = 100;
@@ -32677,12 +32674,12 @@ namespace CS_Classes
 
 
 
-    public class KNN_Core4DTest_CS : VB_Parent
+    public class KNN_Basics4DTest_CS : VB_Parent
     {
-        KNN_Core4D knn = new KNN_Core4D();
+        KNN_Basics4D knn = new KNN_Basics4D();
         Distance_Point4D dist = new Distance_Point4D();
         Random_Basics4D random = new Random_Basics4D();
-        public KNN_Core4DTest_CS()
+        public KNN_Basics4DTest_CS()
         {
             labels[2] = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point";
             FindSlider("Random Pixel Count").Value = 5;
@@ -32728,13 +32725,13 @@ namespace CS_Classes
 
 
 
-    public class KNN_CoreNTest_CS : VB_Parent
+    public class KNN_BasicsNTest_CS : VB_Parent
     {
-        KNN_CoreN knn = new KNN_CoreN();
-        public KNN_CoreNTest_CS()
+        KNN_BasicsN knn = new KNN_BasicsN();
+        public KNN_BasicsNTest_CS()
         {
             labels[2] = "Highlight color (Yellow) is query.  The red dots are the training set.";
-            desc = "Test the use of the general form KNN_CoreN algorithm";
+            desc = "Test the use of the general form KNN_BasicsN algorithm";
         }
         public void RunAlg(Mat src)
         {
@@ -32785,7 +32782,7 @@ namespace CS_Classes
     public class KNN_Emax_CS : VB_Parent
     {
         Random_Basics random = new Random_Basics();
-        public KNN_Core knn = new KNN_Core();
+        public KNN_Basics knn = new KNN_Basics();
         EMax_Basics em = new EMax_Basics();
         public KNN_Emax_CS()
         {
@@ -32812,7 +32809,7 @@ namespace CS_Classes
     public class KNN_TrackMean_CS : VB_Parent
     {
         Plot_Histogram plot = new Plot_Histogram();
-        KNN_Basics knn = new KNN_Basics();
+        KNN_NoDups knn = new KNN_NoDups();
         Feature_Stable feat = new Feature_Stable();
         const int maxDistance = 50;
         public float shiftX;
@@ -33080,17 +33077,17 @@ namespace CS_Classes
 
 
 
-    public class KNN_BasicsOld_CS : VB_Parent
+    public class KNN_NoDupsOld_CS : VB_Parent
     {
         public List<PointPair> matches = new List<PointPair>();
         public List<cv.Point> noMatch = new List<cv.Point>();
-        public KNN_Core knn = new KNN_Core();
+        public KNN_Basics knn = new KNN_Basics();
         public List<cv.Point2f> queries = new List<cv.Point2f>();
         Random_Basics random = new Random_Basics();
-        public KNN_BasicsOld_CS()
+        public KNN_NoDupsOld_CS()
         {
-            labels[2] = "KNN_Core output with many-to-one results";
-            labels[3] = "KNN_BasicsOld_CS output with just the closest match.  Red = training data, yellow = queries.";
+            labels[2] = "KNN_Basics output with many-to-one results";
+            labels[3] = "KNN_NoDupsOld_CS output with just the closest match.  Red = training data, yellow = queries.";
             desc = "Map points 1:1 with losses.  When duplicates are found, toss the farthest.  Too hard to follow.  Trying a better approach.";
         }
         public void RunAlg(Mat src)
@@ -33184,7 +33181,7 @@ namespace CS_Classes
 
     public class KNN_Farthest_CS : VB_Parent
     {
-        KNN_Core knn = new KNN_Core();
+        KNN_Basics knn = new KNN_Basics();
         public PointPair mpFar;
         Random_Basics random = new Random_Basics();
         public KNN_Farthest_CS()
@@ -33233,7 +33230,7 @@ namespace CS_Classes
 
     public class KNN_TrackEach_CS : VB_Parent
     {
-        KNN_Basics knn = new KNN_Basics();
+        KNN_NoDups knn = new KNN_NoDups();
         Feature_Stable feat = new Feature_Stable();
         List<List<PointPair>> trackAll = new List<List<PointPair>>();
         public KNN_TrackEach_CS()
@@ -34258,7 +34255,7 @@ namespace CS_Classes
     {
         LongLine_Extend extend = new LongLine_Extend();
         Line_Basics lines = new Line_Basics();
-        KNN_CoreN knn = new KNN_CoreN();
+        KNN_BasicsN knn = new KNN_BasicsN();
         public List<PointPair> bestLines = new List<PointPair>();
         const int lineCount = 3;
         const int searchCount = 100;
@@ -35862,7 +35859,7 @@ namespace CS_Classes
     public class LongLine_ExtendParallel_CS : VB_Parent
     {
         LongLine_ExtendAll extendAll = new LongLine_ExtendAll();
-        KNN_Core knn = new KNN_Core();
+        KNN_Basics knn = new KNN_Basics();
         Line_Nearest near = new Line_Nearest();
         public List<coinPoints> parList = new List<coinPoints>();
         public LongLine_ExtendParallel_CS()
@@ -37079,7 +37076,7 @@ namespace CS_Classes
 
     public class Match_Lines_CS : VB_Parent
     {
-        KNN_Core4D knn = new KNN_Core4D();
+        KNN_Basics4D knn = new KNN_Basics4D();
         Line_Basics lines = new Line_Basics();
         List<PointPair> lastPt = new List<PointPair>();
         public Match_Lines_CS()
@@ -37437,7 +37434,7 @@ namespace CS_Classes
 
     public class Match_GoodFeatureKNN_CS : VB_Parent
     {
-        public KNN_Basics knn = new KNN_Basics();
+        public KNN_NoDups knn = new KNN_NoDups();
         public Feature_Stable feat = new Feature_Stable();
         List<Mat> frameList = new List<Mat>();
         Options_Match options = new Options_Match();
@@ -38515,7 +38512,7 @@ namespace CS_Classes
 
     public class Mesh_Basics_CS : VB_Parent
     {
-        KNN_Core knn = new KNN_Core();
+        KNN_Basics knn = new KNN_Basics();
         public List<Point2f> ptList = new List<Point2f>();
         Options_Mesh options = new Options_Mesh();
         public Mesh_Basics_CS()
@@ -41665,7 +41662,7 @@ namespace CS_Classes
     public class Neighbors_Basics_CS : VB_Parent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
-        KNN_Core knn = new KNN_Core();
+        KNN_Basics knn = new KNN_Basics();
         public bool runRedCloud = false;
         public Options_XNeighbors options = new Options_XNeighbors();
         public Neighbors_Basics_CS()
@@ -54279,7 +54276,7 @@ namespace CS_Classes
 
     public class RedTrack_FeaturesKNN_CS : VB_Parent
     {
-        public KNN_Core knn = new KNN_Core();
+        public KNN_Basics knn = new KNN_Basics();
         public Feature_Stable feat = new Feature_Stable();
         public RedTrack_FeaturesKNN_CS()
         {
@@ -54374,7 +54371,7 @@ namespace CS_Classes
 
     public class RedTrack_GoodCellInput_CS : VB_Parent
     {
-        public KNN_Core knn = new KNN_Core();
+        public KNN_Basics knn = new KNN_Basics();
         public Feature_Stable feat = new Feature_Stable();
         public List<cv.Point2f> featureList = new List<cv.Point2f>();
         Options_RedTrack options = new Options_RedTrack();
@@ -59282,7 +59279,7 @@ namespace CS_Classes
 
     public class Swarm_Basics_CS : VB_Parent
     {
-        public KNN_Core knn = new KNN_Core();
+        public KNN_Basics knn = new KNN_Basics();
         Feature_Stable feat = new Feature_Stable();
         public List<PointPair> mpList = new List<PointPair>();
         public float distanceAvg;

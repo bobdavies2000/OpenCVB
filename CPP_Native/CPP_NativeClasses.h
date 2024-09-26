@@ -4264,7 +4264,7 @@ public:
 
 
 
-class KNN_Core_CC : public CPP_Parent {
+class KNN_Basics_CC : public CPP_Parent {
 public:
     Ptr<ml::KNearest> knn = ml::KNearest::create();
     vector<Point2f> trainInput;
@@ -4275,7 +4275,7 @@ public:
     Random_Basics_CC* random;
     vector<int> neighborIndexToTrain;
     
-    KNN_Core_CC() : CPP_Parent()
+    KNN_Basics_CC() : CPP_Parent()
     {
         random = new Random_Basics_CC();
         labels[2] = "Red=TrainingData, yellow = queries";
@@ -4372,18 +4372,18 @@ public:
 
 
 
-class KNN_Basics_CC : public CPP_Parent {
+class KNN_NoDups_CC : public CPP_Parent {
 private:
 public:
     vector<PointPair> matches;
     vector<Point> noMatch;
-    KNN_Core_CC* basics;
+    KNN_Basics_CC* basics;
     vector<Point2f> queries;
     vector<int> neighbors;
     Random_Basics_CC* random;
 
-    KNN_Basics_CC() : CPP_Parent() {
-        basics = new KNN_Core_CC();
+    KNN_NoDups_CC() : CPP_Parent() {
+        basics = new KNN_Basics_CC();
         random = new Random_Basics_CC();
         desc = "Map points 1:1 with losses. Toss any duplicates that are farther.";
     }
@@ -4468,14 +4468,14 @@ private:
 public:
     vector<Point2f> inputPoints;
     Delaunay_Basics_CC* facet;
-    KNN_Basics_CC* knn;
+    KNN_NoDups_CC* knn;
     Random_Basics_CC* random;
     Mat generationMap;
 
     Delaunay_Generations_CC() : CPP_Parent()
     {
         generationMap = Mat::zeros(dst3.size(), CV_32S);
-        knn = new KNN_Basics_CC();
+        knn = new KNN_NoDups_CC();
         facet = new Delaunay_Basics_CC();
         random = new Random_Basics_CC();
         random->sizeRequest = 10;
@@ -6372,10 +6372,10 @@ public:
 class Mesh_Basics_CC : public CPP_Parent {
 public:
     Random_Basics_CC* random;
-    KNN_Core_CC* knn;
+    KNN_Basics_CC* knn;
     Mesh_Basics_CC() : CPP_Parent() {
         random = new Random_Basics_CC();
-        knn = new KNN_Core_CC();
+        knn = new KNN_Basics_CC();
         labels[2] = "Triangles built with each random point and its 2 nearest neighbors.";
         advice = "Adjust the number of points with the options_random";
         desc = "Build triangles from random points";

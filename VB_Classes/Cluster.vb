@@ -1,7 +1,7 @@
 ﻿Imports System.Windows
 Imports cvb = OpenCvSharp
 Public Class Cluster_Basics : Inherits VB_Parent
-    Dim knn As New KNN_Core
+    Dim knn As New KNN_Basics
     Public ptInput As New List(Of cvb.Point)
     Public ptList As New List(Of cvb.Point)
     Public clusterID As New List(Of Integer)

@@ -245,7 +245,7 @@ End Class
 
 
 Public Class Match_Lines : Inherits VB_Parent
-    Dim knn As New KNN_Core4D
+    Dim knn As New KNN_Basics4D
     Dim lines As New Line_Basics
     Public Sub New()
         labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
@@ -605,7 +605,7 @@ End Class
 
 
 Public Class Match_GoodFeatureKNN : Inherits VB_Parent
-    Public knn As New KNN_Basics
+    Public knn As New KNN_NoDups
     Public feat As New Feature_Stable
     Dim frameList As New List(Of cvb.Mat)
     Public Sub New()
