@@ -1089,6 +1089,7 @@ Public Class Main_UI
         killPython()
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
+        Static lastTime As DateTime = Now
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
         If textDesc <> "" Then
@@ -1105,13 +1106,19 @@ Public Class Main_UI
         Static fpsListA As New List(Of Single)
         Static fpsListC As New List(Of Single)
         If pauseAlgorithmThread = False Then
+            Dim timeNow As DateTime = Now
+            Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
+            Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
+            Dim taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+            lastTime = timeNow
+
             Dim countFrames = frameCount - lastAlgorithmFrame
             lastAlgorithmFrame = frameCount
-            fpsListA.Add(CSng(countFrames / (fpsTimer.Interval / 1000)))
+            fpsListA.Add(CSng(countFrames / (taskTimerInterval / 1000)))
 
             Dim camFrames = camera.cameraFrameCount - lastCameraFrame
             lastCameraFrame = camera.cameraFrameCount
-            fpsListC.Add(CSng(camFrames / (fpsTimer.Interval / 1000)))
+            fpsListC.Add(CSng(camFrames / (taskTimerInterval / 1000)))
             If cameraTaskHandle Is Nothing Then Exit Sub
             Dim cameraName = settings.cameraName
             cameraName = cameraName.Replace(" 2/2i", "")
@@ -1125,8 +1132,8 @@ Public Class Main_UI
             If fpsCamera >= 100 Then fpsCamera = 99
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(algorithmCount) + " algorithms = " +
                   CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + cameraName +
-                      " - Camera FPS/task FPS: " + Format(fpsAlgorithm, "0") + "/" +
-                      Format(fpsCamera, "0")
+                      " - Camera FPS/task FPS: " + Format(fpsCamera, "0") + "/" +
+                      Format(fpsAlgorithm, "0")
             If fpsListA.Count > 5 Then
                 fpsListA.RemoveAt(0)
                 fpsListC.RemoveAt(0)
@@ -1401,7 +1408,7 @@ Public Class Main_UI
             End If
             If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
             If restartCameraRequest = False Then
-                Application.DoEvents()
+                'Application.DoEvents()
                 camera.GetNextFrame(settings.WorkingRes)
 
                 ' The first few frames from the camera are junk.  Skip them.
@@ -1411,7 +1418,7 @@ Public Class Main_UI
                         uiLeft = camera.uiLeft.clone
                         uiRight = camera.uiRight.clone
                         uiPointCloud = camera.uiPointCloud.clone
-                        paintNewImages = True ' trigger the paint 
+                        ' paintNewImages = True ' trigger the paint 
                         newCameraImages = True ' trigger the algorithm task
                     End If
                 End SyncLock
@@ -1524,6 +1531,7 @@ Public Class Main_UI
                             task.IMU_FrameTime = camera.IMU_FrameTime
                             task.CPU_TimeStamp = camera.CPU_TimeStamp
                             task.CPU_FrameTime = camera.CPU_FrameTime
+                            newCameraImages = False
                         End SyncLock
 
                         Dim endCopyTime = Now
@@ -1536,8 +1544,6 @@ Public Class Main_UI
                             intermediateReview = ""
                         End If
                         If intermediateReview <> "" Then task.intermediateName = intermediateReview
-
-                        newCameraImages = False
 
                         task.pixelViewerOn = If(testAllRunning, False, settings.PixelViewerButton)
 
@@ -1641,10 +1647,12 @@ Public Class Main_UI
                         dst(1) = task.dst1.Clone
                         dst(2) = task.dst2.Clone
                         dst(3) = task.dst3.Clone
+                        paintNewImages = True ' trigger the paint 
                     End SyncLock
                     algorithmRefresh = True
                 End If
 
+                If task.fpsRate = 0 Then task.fpsRate = 0.01
                 If frameCount Mod task.fpsRate = 0 Then
                     SyncLock callTraceLock
                         callTrace = New List(Of String)(task.callTraceMain)

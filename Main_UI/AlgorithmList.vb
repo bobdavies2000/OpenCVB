@@ -124,6 +124,7 @@ End Enum
 	If algorithmName = "Area_MinTriangle_CPP_VB" Then return new Area_MinTriangle_CPP_VB
 	If algorithmName = "Area_SoloPoints" Then return new Area_SoloPoints
 	If algorithmName = "Area_SoloPoints_CS" Then return new Area_SoloPoints_CS
+	If algorithmName = "Artifacts_CellSize" Then return new Artifacts_CellSize
 	If algorithmName = "Artifacts_Features" Then return new Artifacts_Features
 	If algorithmName = "Artifacts_LowRes" Then return new Artifacts_LowRes
 	If algorithmName = "Artifacts_Reduction" Then return new Artifacts_Reduction

@@ -189,7 +189,7 @@ End Class
 Public Class Swarm_Flood : Inherits VB_Parent
     Dim swarm As New Swarm_Basics
     Public flood As New Flood_BasicsMask
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         desc = "Floodfill the color image using the swarm outline as a mask"
@@ -197,11 +197,11 @@ Public Class Swarm_Flood : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         swarm.Run(src)
 
-        color.Run(src)
+        color8U.Run(src)
 
         flood.genCells.removeContour = False
         flood.inputMask = swarm.dst2
-        flood.Run(color.dst2)
+        flood.Run(color8U.dst2)
         dst2 = flood.dst2
 
         task.setSelectedContour()
@@ -218,7 +218,7 @@ End Class
 Public Class Swarm_Flood2 : Inherits VB_Parent
     Public lines As New Line_KNN
     Public flood As New Flood_BasicsMask
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         flood.genCells.removeContour = False
@@ -226,10 +226,10 @@ Public Class Swarm_Flood2 : Inherits VB_Parent
     End Sub
     Public Function runRedCloud(src As cvb.Mat) As cvb.Mat
         lines.Run(src)
-        color.Run(src)
+        color8U.Run(src)
 
         flood.inputMask = lines.dst3
-        flood.Run(color.dst2)
+        flood.Run(color8U.dst2)
         Return flood.dst2
     End Function
     Public Sub RunAlg(src As cvb.Mat)

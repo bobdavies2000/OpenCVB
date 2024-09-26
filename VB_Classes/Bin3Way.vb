@@ -152,7 +152,7 @@ End Class
 Public Class Bin3Way_RedCloudOther : Inherits VB_Parent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         flood.inputMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Use RedCloud with the regions that are neither lightest or darkest"
@@ -162,8 +162,8 @@ Public Class Bin3Way_RedCloudOther : Inherits VB_Parent
 
         flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
 
-        color.Run(src)
-        flood.Run(color.dst2)
+        color8U.Run(src)
+        flood.Run(color8U.dst2)
         dst2 = flood.dst2
     End Sub
 End Class
@@ -177,7 +177,7 @@ End Class
 Public Class Bin3Way_RedCloud1 : Inherits VB_Parent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Dim cellMaps(2) As cvb.Mat, redCells(2) As List(Of rcData)
     Dim options As New Options_Bin3WayRedCloud
     Public Sub New()
@@ -200,8 +200,8 @@ Public Class Bin3Way_RedCloud1 : Inherits VB_Parent
             task.redCells = redCells(i)
             If i = 2 Then
                 flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
-                color.Run(src)
-                flood.Run(color.dst2)
+                color8U.Run(src)
+                flood.Run(color8U.dst2)
             Else
                 flood.inputMask = Not bin3.bin3.mats.mat(i)
                 flood.Run(bin3.bin3.mats.mat(i))
@@ -233,7 +233,6 @@ End Class
 Public Class Bin3Way_RedCloud : Inherits VB_Parent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
-    Dim color As New Color8U_Basics
     Dim cellMaps(2) As cvb.Mat, redCells(2) As List(Of rcData)
     Dim options As New Options_Bin3WayRedCloud
     Public Sub New()

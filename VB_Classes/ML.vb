@@ -331,14 +331,14 @@ End Structure
 
 Public Class ML_Color2Depth : Inherits VB_Parent
     Dim minMax As New Grid_MinMaxDepth
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        color.Run(src)
-        dst2 = color.dst3
+        color8U.Run(src)
+        dst2 = color8U.dst3
         labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
 
         Dim rtree = cvb.ML.RTrees.Create()
@@ -349,7 +349,7 @@ Public Class ML_Color2Depth : Inherits VB_Parent
         For i = 0 To task.gridList.Count - 1
             Dim roi = task.gridList(i)
             Dim mls As mlColor
-            mls.colorIndex = color.dst2.Get(Of Byte)(roi.Y, roi.X)
+            mls.colorIndex = color8U.dst2.Get(Of Byte)(roi.Y, roi.X)
             mls.x = roi.X
             mls.y = roi.Y
 
@@ -397,15 +397,15 @@ Public Structure mlColorInTier
 End Structure
 Public Class ML_ColorInTier2Depth : Inherits VB_Parent
     Dim minMax As New Grid_MinMaxDepth
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Dim tiers As New Contour_DepthTiers
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        color.Run(src)
-        dst2 = color.dst3
+        color8U.Run(src)
+        dst2 = color8U.dst3
         labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
 
         Dim rtree = cvb.ML.RTrees.Create()
@@ -416,7 +416,7 @@ Public Class ML_ColorInTier2Depth : Inherits VB_Parent
         For i = 0 To task.gridList.Count - 1
             Dim roi = task.gridList(i)
             Dim mls As mlColorInTier
-            mls.colorIndex = color.dst2.Get(Of Byte)(roi.Y, roi.X)
+            mls.colorIndex = color8U.dst2.Get(Of Byte)(roi.Y, roi.X)
             mls.x = roi.X
             mls.y = roi.Y
 
@@ -546,7 +546,7 @@ End Class
 
 Public Class ML_LearnRegions : Inherits VB_Parent
     Dim regions As New GuidedBP_Regions
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         task.gOptions.setDisplay1()
         task.redOptions.IdentifyCells.Checked = False
@@ -556,8 +556,8 @@ Public Class ML_LearnRegions : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         regions.Run(src)
 
-        color.Run(src)
-        dst1 = color.dst3
+        color8U.Run(src)
+        dst1 = color8U.dst3
 
         Dim graySrc = If(dst1.Channels = 1, dst1, dst1.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)) ' input to ML
         Dim regionX = regions.cellMapX ' Target variable

@@ -33,6 +33,8 @@ Public Class Color8U_Basics : Inherits VB_Parent
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Reduction_Basics
                 Case 9
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New PCA_NColor_CPP_VB
+                Case 10
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New Color8U_Grayscale
             End Select
             classifier = colorMethods(index)
         End If
@@ -73,12 +75,19 @@ End Class
 
 Public Class Color8U_Grayscale : Inherits VB_Parent
     Dim options As New Options_Grayscale8U
+    Public classCount = 255
     Public Sub New()
         labels = {"", "", "Color_Grayscale", ""}
         desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
+
+        If src.Channels = 1 Then
+            dst2 = src ' nothing to do...
+            dst3 = src ' nothing to do...
+            Exit Sub
+        End If
 
         If options.useOpenCV Then
             dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -374,7 +383,7 @@ End Class
 
 
 Public Class Color8U_MotionFiltered : Inherits VB_Parent
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public classCount As Integer
     Dim motion As New Motion_Basics
     Public Sub New()
@@ -384,9 +393,9 @@ Public Class Color8U_MotionFiltered : Inherits VB_Parent
         motion.Run(src)
 
         dst3 = motion.dst2
-        color.Run(motion.dst2)
-        dst2 = color.dst3
-        classCount = color.classCount
+        color8U.Run(motion.dst2)
+        dst2 = color8U.dst3
+        classCount = color8U.classCount
     End Sub
 End Class
 

@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 Public Class Contour_Basics : Inherits VB_Parent
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public contourlist As New List(Of cvb.Point())
     Public allContours As cvb.Point()()
     Public options As New Options_Contours
@@ -14,8 +14,8 @@ Public Class Contour_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        color.Run(src)
-        dst2 = color.dst2
+        color8U.Run(src)
+        dst2 = color8U.dst2
 
         If options.retrievalMode = cvb.RetrievalModes.FloodFill Then
             dst2.ConvertTo(dst1, cvb.MatType.CV_32SC1)
@@ -34,7 +34,7 @@ Public Class Contour_Basics : Inherits VB_Parent
 
         dst3.SetTo(0)
         contourlist.Clear()
-        dst2 = color.dst3
+        dst2 = color8U.dst3
         For i = 0 To sortedList.Count - 1
             Dim tour = allContours(sortedList.ElementAt(i).Value)
             contourlist.Add(tour)

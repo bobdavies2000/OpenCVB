@@ -135,15 +135,15 @@ End Class
 
 
 Public Class Threshold_ColorSource : Inherits VB_Parent
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Dim byChan As New Threshold_ByChannels
     Public Sub New()
         UpdateAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.")
         desc = "Use all the alternative color sources as input to Threshold_ByChannels."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        color.Run(src)
-        byChan.Run(color.dst3)
+        color8U.Run(src)
+        byChan.Run(color8U.dst3)
         dst2 = byChan.dst2
         dst3 = byChan.dst3
         labels = byChan.labels

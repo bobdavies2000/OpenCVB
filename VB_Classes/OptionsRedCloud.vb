@@ -27,7 +27,7 @@ Public Class OptionsRedCloud
     Public identifyCount As Integer
     Public histBins3D As Integer
     Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions", "Binarize_DepthTiers", "FeatureLess_Groups", "Hist3DColor_Basics",
-                                       "KMeans_Basics", "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP"}
+                                       "KMeans_Basics", "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP", "Color8U_Grayscale"}
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
@@ -93,7 +93,7 @@ Public Class OptionsRedCloud
             Dim method = colorMethods(i)
             ColorSource.Items.Add(method)
         Next
-        ColorSource.SelectedItem() = "FeatureLess_Groups"
+        ColorSource.SelectedItem() = "Reduction_Basics"
 
         task.redOptions.setBitReductionBar(40)
         Select Case task.cameraName

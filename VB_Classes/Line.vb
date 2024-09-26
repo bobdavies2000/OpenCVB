@@ -783,7 +783,7 @@ End Class
 
 
 Public Class Line_ColorClass : Inherits VB_Parent
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Dim lines As New Line_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -791,15 +791,15 @@ Public Class Line_ColorClass : Inherits VB_Parent
         desc = "Review lines in all the different color classes"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        color.Run(src)
-        dst1 = color.dst2
+        color8U.Run(src)
+        dst1 = color8U.dst2
 
-        lines.Run(dst1 * 255 / color.classCount)
+        lines.Run(dst1 * 255 / color8U.classCount)
         dst2 = lines.dst2
         dst3 = lines.dst3
 
         labels(1) = "Input to Line_Basics"
-        labels(2) = "Lines found in the " + color.classifier.traceName + " output"
+        labels(2) = "Lines found in the " + color8U.classifier.traceName + " output"
     End Sub
 End Class
 

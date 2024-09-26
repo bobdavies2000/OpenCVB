@@ -982,7 +982,7 @@ End Class
 Public Class RedCloud_OutlineColor : Inherits VB_Parent
     Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         labels(3) = "Color input to RedCloud_Basics with depth boundary blocking color connections."
         desc = "Use the depth outline as input to RedCloud_Basics"
@@ -990,10 +990,10 @@ Public Class RedCloud_OutlineColor : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         outline.Run(task.depthMask)
 
-        color.Run(src)
-        dst1 = color.dst2 + 1
+        color8U.Run(src)
+        dst1 = color8U.dst2 + 1
         dst1.SetTo(0, outline.dst2)
-        dst3 = ShowPalette(dst1 * 255 / color.classCount)
+        dst3 = ShowPalette(dst1 * 255 / color8U.classCount)
 
         redC.Run(dst1)
         dst2 = redC.dst2
@@ -1718,7 +1718,7 @@ End Class
 
 
 Public Class RedCloud_Combine : Inherits VB_Parent
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public guided As New GuidedBP_Depth
     Public redMasks As New RedCloud_Basics
     Public combinedCells As New List(Of rcData)
@@ -1732,8 +1732,8 @@ Public Class RedCloud_Combine : Inherits VB_Parent
         If task.redOptions.UseColorOnly.Checked Or task.redOptions.UseGuidedProjection.Checked Then
             redMasks.inputMask.SetTo(0)
             If src.Channels() = 3 Then
-                color.Run(src)
-                dst2 = color.dst2.Clone
+                color8U.Run(src)
+                dst2 = color8U.dst2.Clone
             Else
                 dst2 = src
             End If
@@ -1746,11 +1746,11 @@ Public Class RedCloud_Combine : Inherits VB_Parent
             Select Case task.redOptions.depthInputIndex
                 Case 0 ' "GuidedBP_Depth"
                     guided.Run(src)
-                    If color.classCount > 0 Then guided.dst2 += color.classCount
+                    If color8U.classCount > 0 Then guided.dst2 += color8U.classCount
                     guided.dst2.CopyTo(dst2, task.depthMask)
                 Case 1 ' "RedCloud_Reduce"
                     prep.Run(task.pointCloud)
-                    If color.classCount > 0 Then prep.dst2 += color.classCount
+                    If color8U.classCount > 0 Then prep.dst2 += color8U.classCount
                     prep.dst2.CopyTo(dst2, task.depthMask)
             End Select
         End If
@@ -2446,15 +2446,15 @@ Public Class RedCloud_MaxDist_CPP_VB : Inherits VB_Parent
     Public RectList As New List(Of cvb.Rect)
     Public floodPoints As New List(Of cvb.Point)
     Public maxList As New List(Of Integer)
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         cPtr = RedCloudMaxDist_Open()
         desc = "Run the C++ RedCloudMaxDist interface without a mask"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels <> 1 Then
-            color.Run(src)
-            src = color.dst2
+            color8U.Run(src)
+            src = color8U.dst2
         End If
 
         If task.heartBeat Then maxList.Clear() ' reevaluate all cells.

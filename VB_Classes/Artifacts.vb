@@ -1,7 +1,10 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports MS.Internal
+Imports cvb = OpenCvSharp
 
 Public Class Artifacts_LowRes : Inherits VB_Parent
     Dim options As New Options_Resize
+    Public dst As New cvb.Mat
+    Public dstDepth As New cvb.Mat
     Public Sub New()
         FindRadio("WarpFillOutliers").Enabled = False
         FindRadio("WarpInverseMap").Enabled = False
@@ -11,8 +14,11 @@ Public Class Artifacts_LowRes : Inherits VB_Parent
         options.RunOpt()
 
         Dim pct = options.resizePercent
-        dst3 = src.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
-        dst2 = dst3.Resize(New cvb.Size(src.Width / pct, src.Height / pct))
+        dst = src.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
+        dst2 = dst.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
+
+        dstDepth = task.depthRGB.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
+        dst3 = dstDepth.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
     End Sub
 End Class
 
@@ -24,16 +30,15 @@ End Class
 
 Public Class Artifacts_Reduction : Inherits VB_Parent
     Dim lowRes As New Artifacts_LowRes
-    Dim reduction As New Reduction_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         desc = "Build a lowRes image after reduction"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        reduction.Run(src)
-        dst3 = reduction.dst3
+        color8U.Run(src)
 
-        lowRes.Run(dst3)
-        dst2 = lowRes.dst2
+        lowRes.Run(color8U.dst3)
+        dst2 = lowRes.dst3
     End Sub
 End Class
 
@@ -46,15 +51,58 @@ Public Class Artifacts_Features : Inherits VB_Parent
     Dim lowRes As New Artifacts_LowRes
     Dim feat As New Feature_Basics
     Public Sub New()
+        task.redOptions.ColorSource.SelectedItem() = "Color8U_Grayscale"
         FindSlider("Resize Percentage (%)").Value = 20
-        task.gOptions.SetDotSize(1)
+        labels = {"", "", "LowRes image with highlighted features", "Same features highlighted in the original image."}
         desc = "Find features in a low res image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         lowRes.Run(src)
-        dst2 = lowRes.dst2
+        feat.Run(lowRes.dst2)
+        dst2 = feat.dst2
 
-        feat.Run(lowRes.dst3)
-        dst3 = feat.dst2
+        dst3 = src
+        For Each pt In task.features
+            DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Artifacts_CellSize : Inherits VB_Parent
+    Dim feat As New Feature_Basics
+    Dim lowRes As New Artifacts_LowRes
+    Dim knn As New KNN_Core
+    Public Sub New()
+        FindSlider("Min Distance to next").Value = 10
+        desc = "Identify the cell size from the Low Res image features"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lowRes.Run(src)
+        feat.Run(lowRes.dst2)
+        dst2 = lowRes.dst2
+        knn.queries = New List(Of cvb.Point2f)(task.features)
+        If task.FirstPass Then knn.trainInput = New List(Of cvb.Point2f)(task.features)
+        knn.Run(Nothing)
+
+        Dim distances As New List(Of Single)
+        For i = 0 To knn.queries.Count - 1
+            Dim p1 = knn.queries(i)
+            Dim p2 = knn.trainInput(knn.result(i, 1))
+            distances.Add(p1.DistanceTo(p2))
+            DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
+        Next
+        Dim avg = distances.Average
+        If task.heartBeat Then
+            strOut = "Found " + CStr(knn.queries.Count) + " features" + vbCrLf
+            strOut += Format(avg, fmt1) + " is the cell size (square) - so grid is " + CStr(CInt(avg)) + " pixels"
+        End If
+        SetTrueText(strOut, 3)
     End Sub
 End Class

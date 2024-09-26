@@ -521,14 +521,14 @@ End Class
 
 Public Class Bin4Way_BasicsColors : Inherits VB_Parent
     Dim quart As New Bin4Way_Basics
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         desc = "Test Bin4Way_Basics with different src inputs."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        color.Run(src)
-        quart.Run(color.dst3)
+        color8U.Run(src)
+        quart.Run(color8U.dst3)
         dst1 = quart.dst1
         dst2 = quart.dst2
         dst3 = quart.dst3

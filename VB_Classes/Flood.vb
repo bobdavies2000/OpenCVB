@@ -125,7 +125,7 @@ Public Class Flood_BasicsMask : Inherits VB_Parent
     Dim redCPP As New RedCloud_CPP_VB
     Public buildInputMask As Boolean
     Public showSelected As Boolean = True
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         labels(3) = "The inputMask used to limit how much of the image is processed."
@@ -133,9 +133,9 @@ Public Class Flood_BasicsMask : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Or buildInputMask Then
-            color.Run(src)
+            color8U.Run(src)
             inputMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
-            src = color.dst2
+            src = color8U.dst2
         End If
 
         dst3 = inputMask
@@ -163,7 +163,7 @@ End Class
 Public Class Flood_Tiers : Inherits VB_Parent
     Dim flood As New Flood_BasicsMask
     Dim tiers As New Depth_Tiers
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         desc = "Subdivide the Flood_Basics cells using depth tiers."
@@ -182,10 +182,10 @@ Public Class Flood_Tiers : Inherits VB_Parent
 
         labels(2) = tiers.labels(2) + " in tier " + CStr(tier) + ".  Use the global options 'DebugSlider' to select different tiers."
 
-        color.Run(src)
+        color8U.Run(src)
 
         flood.inputMask = dst1
-        flood.Run(color.dst2)
+        flood.Run(color8U.dst2)
 
         dst2 = flood.dst2
         dst3 = flood.dst3
@@ -352,15 +352,15 @@ Public Class Flood_MaxDistPoints : Inherits VB_Parent
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaxDist_CPP_VB
     Public genCells As New Cell_Generate
-    Dim color As New Color8U_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        color.Run(src)
-        redCPP.Run(color.dst2)
+        color8U.Run(src)
+        redCPP.Run(color8U.dst2)
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
 
         genCells.classCount = redCPP.classCount
