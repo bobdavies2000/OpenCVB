@@ -152,6 +152,7 @@ Public Class VBtask : Implements IDisposable
 
     Public artifactMap As cvb.Mat
     Public artifactRects As New List(Of cvb.Rect)
+    Public artifactMask As New cvb.Mat
 
     Public gOptions As OptionsGlobal
     Public redOptions As OptionsRedCloud

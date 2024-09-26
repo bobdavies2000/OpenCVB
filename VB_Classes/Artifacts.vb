@@ -32,13 +32,14 @@ Public Class Artifacts_Reduction : Inherits VB_Parent
     Dim lowRes As New Artifacts_LowRes
     Dim color8U As New Color8U_Basics
     Public Sub New()
+        FindSlider("Resize Percentage (%)").Value = 40
         desc = "Build a lowRes image after reduction"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         color8U.Run(src)
 
         lowRes.Run(color8U.dst3)
-        dst2 = lowRes.dst3
+        dst2 = lowRes.dst2
     End Sub
 End Class
 
@@ -174,7 +175,7 @@ End Class
 
 
 
-Public Class Artifacts_FeatureCells : Inherits VB_Parent
+Public Class Artifacts_FeatureCells2 : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim cellSize As New Artifacts_CellSize
     Public Sub New()
@@ -225,21 +226,72 @@ End Class
 
 
 Public Class Artifacts_CellMap : Inherits VB_Parent
-    Dim flood As New Flood_Simple
-    Dim lowRes As New Artifacts_LowRes
+    Dim flood As New Flood_Artifacts
+    Public lowRes As New Artifacts_LowRes
     Public Sub New()
         labels(3) = "Cell Map - CV_32S"
         desc = "Create the map of the artifacts."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged = False Then Exit Sub
-
         lowRes.Run(src)
         dst2 = lowRes.dst2
 
-        flood.Run(dst2)
-        dst3 = flood.dst2
-        task.artifactMap = dst3
+        If task.optionsChanged Then
+            flood.Run(dst2)
+            dst3 = flood.dst2
+            task.artifactMap = dst3
+            task.artifactRects = New List(Of cvb.Rect)(flood.rectList)
+            task.artifactMask = flood.dst3
+        End If
         labels(2) = "There were " + CStr(flood.count) + " cells found"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Artifacts_FeatureCells : Inherits VB_Parent
+    Dim feat As New Feature_Basics
+    Dim cellmap As New Artifacts_CellMap
+    Public Sub New()
+        FindSlider("Min Distance to next").Value = 3
+        desc = "Identify the cells with features"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.optionsChanged Then cellmap.Run(src)
+
+        feat.Run(src)
+        dst2 = cellmap.lowRes.dst2.Clone
+
+        Dim gridIndex As New List(Of Integer)
+        Dim gridCounts As New List(Of Integer)
+
+        task.featurePoints.Clear()
+        For Each pt In task.features
+            Dim tile = task.artifactMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim test = gridIndex.IndexOf(tile)
+            If test < 0 Then
+                Dim r = task.artifactRects(tile)
+                gridIndex.Add(tile)
+                gridCounts.Add(1)
+                Dim p1 = New cvb.Point(r.X, r.Y)
+                DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
+                task.featurePoints.Add(p1)
+            Else
+                gridCounts(test) += 1
+            End If
+        Next
+
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            For Each pt In task.features
+                DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Black)
+                DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+            Next
+            If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.artifactMask)
+        End If
     End Sub
 End Class

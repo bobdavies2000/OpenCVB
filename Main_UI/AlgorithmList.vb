@@ -128,6 +128,7 @@ End Enum
 	If algorithmName = "Artifacts_CellSize" Then return new Artifacts_CellSize
 	If algorithmName = "Artifacts_FeatureCells" Then return new Artifacts_FeatureCells
 	If algorithmName = "Artifacts_FeatureCells1" Then return new Artifacts_FeatureCells1
+	If algorithmName = "Artifacts_FeatureCells2" Then return new Artifacts_FeatureCells2
 	If algorithmName = "Artifacts_Features" Then return new Artifacts_Features
 	If algorithmName = "Artifacts_LowRes" Then return new Artifacts_LowRes
 	If algorithmName = "Artifacts_Reduction" Then return new Artifacts_Reduction
@@ -1243,6 +1244,7 @@ End Enum
 	If algorithmName = "FLANN_Test_CS" Then return new FLANN_Test_CS
 	If algorithmName = "Flip_Basics" Then return new Flip_Basics
 	If algorithmName = "Flip_Basics_CS" Then return new Flip_Basics_CS
+	If algorithmName = "Flood_Artifacts" Then return new Flood_Artifacts
 	If algorithmName = "Flood_Basics" Then return new Flood_Basics
 	If algorithmName = "Flood_Basics_CS" Then return new Flood_Basics_CS
 	If algorithmName = "Flood_BasicsMask" Then return new Flood_BasicsMask
@@ -1259,7 +1261,7 @@ End Enum
 	If algorithmName = "Flood_Motion_CS" Then return new Flood_Motion_CS
 	If algorithmName = "Flood_Motion1" Then return new Flood_Motion1
 	If algorithmName = "Flood_Motion1_CS" Then return new Flood_Motion1_CS
-	If algorithmName = "Flood_Simple" Then return new Flood_Simple
+	If algorithmName = "Flood_Simple1" Then return new Flood_Simple1
 	If algorithmName = "Flood_Tiers" Then return new Flood_Tiers
 	If algorithmName = "Flood_Tiers_CS" Then return new Flood_Tiers_CS
 	If algorithmName = "Font_FlowText" Then return new Font_FlowText
