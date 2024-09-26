@@ -117,34 +117,63 @@ End Class
 Public Class Artifacts_CellSize : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim lowRes As New Artifacts_LowRes
+    Dim recompute As Boolean = True
     Public Sub New()
+        FindSlider("Min Distance to next").Value = 3
         desc = "Identify the cell size from the Low Res image features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        If task.optionsChanged Then recompute = True
+
         lowRes.Run(src)
         dst2 = lowRes.dst2
 
-        Dim offsets As New List(Of Integer)
-        For i = 0 To dst2.Width - 2
-            Dim v1 = dst2.Get(Of cvb.Vec3b)(0, i)
-            Dim v2 = dst2.Get(Of cvb.Vec3b)(0, i + 1)
-            If v1 <> v2 Then offsets.Add(i)
-        Next
+        Static distance As Integer
+        If recompute Then
+            Dim sortedOffsets As New SortedList(Of Integer, Boolean)
+            Dim x = dst2.Width / 2
+            Dim y = dst2.Height / 2
+            For i = 0 To dst2.Width - 2
+                Dim v1 = dst2.Get(Of cvb.Vec3b)(y, i)
+                Dim v2 = dst2.Get(Of cvb.Vec3b)(y, i + 1)
+                sortedOffsets.Add(i, v1 <> v2)
+            Next
 
-        Dim distances As New List(Of Integer)
-        For i = 0 To offsets.Count - 2
-            distances.Add(offsets(i + 1) - offsets(i))
-        Next
+            Dim index = sortedOffsets.Count
+            For i = 0 To dst2.Height - 2
+                Dim v1 = dst2.Get(Of cvb.Vec3b)(i, x)
+                Dim v2 = dst2.Get(Of cvb.Vec3b)(i + 1, x)
+                sortedOffsets.Add(index + i, v1 <> v2)
+            Next
+
+            Dim lastOffset As Integer = -1
+            Dim offsets As New List(Of Integer)
+            For Each ele In sortedoffsets
+                If ele.Value Then
+                    offsets.Add(ele.Key - lastOffset)
+                    lastOffset = ele.Key
+                End If
+            Next
+            distance = offsets.Min
+        End If
 
         feat.Run(lowRes.dst2)
 
+        task.featurePoints.Clear()
         For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            Dim p1 = New cvb.Point2f(pt.X - (pt.X Mod distance), pt.Y - (pt.Y Mod distance))
+            DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
+            task.featurePoints.Add(p1)
         Next
-        If task.heartBeat Then
-            strOut = "Found " + CStr(task.features.Count) + " features" + vbCrLf
-            strOut += CStr(CInt(distances.Average)) + " is the cell size (square) "
-        End If
+        strOut = "Found " + CStr(task.features.Count) + " features" + vbCrLf
+        strOut += "Average = " + Format(distance, fmt1) + ", " + CStr(Math.Floor(distance)) + " is the cell size (square) "
         SetTrueText(strOut, 3)
+
+        If standaloneTest() Then
+            feat.Run(src)
+            For Each pt In task.features
+                DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Black)
+            Next
+        End If
     End Sub
 End Class
