@@ -329,7 +329,7 @@ Public Class Edge_BinarizedReduction : Inherits VB_Parent
         reduction.Run(src)
         dst3 = reduction.dst2
         edges.Run(dst3)
-        dst2 = edges.dst2
+        dst2 = edges.mats.mat(0)
     End Sub
 End Class
 

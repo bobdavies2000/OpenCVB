@@ -198,7 +198,7 @@ Module UI_Generator
         Catch ex As Exception
             Console.WriteLine("UI_Generator failed writing the C# and VB.Net algorithm lists.  Error is " + vbCrLf + ex.Message)
         End Try
-        Console.WriteLine("AlgorithmList.vb prepared." + vbCrLf + "Now preparing the sorted algorithm cross reference.")
+        Console.WriteLine("AlgorithmList.vb prepared." + vbCrLf + "Next check to see if cross reference needs update.")
 
 
 
@@ -209,6 +209,7 @@ Module UI_Generator
         Dim refCounts As New List(Of String)
         Try
             If fullXRef Then
+                Console.WriteLine("Now preparing the sorted algorithm cross reference.")
                 Dim tokens(allButPython.Count - 1) As String
                 For i = 0 To allButPython.Keys.Count - 1
                     tokens(i) = allButPython.Keys(i)

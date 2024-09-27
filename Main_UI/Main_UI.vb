@@ -1652,7 +1652,7 @@ Public Class Main_UI
                     algorithmRefresh = True
                 End If
 
-                If task.fpsRate = 0 Then task.fpsRate = 0.01
+                If task.fpsRate = 0 Then task.fpsRate = 1
                 If frameCount Mod task.fpsRate = 0 Then
                     SyncLock callTraceLock
                         callTrace = New List(Of String)(task.callTraceMain)

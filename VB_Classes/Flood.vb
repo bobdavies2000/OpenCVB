@@ -386,13 +386,13 @@ End Class
 
 
 
-Public Class Flood_Simple1 : Inherits VB_Parent
+Public Class Flood_Artifacts1 : Inherits VB_Parent
     Public count As Integer
     Public rectList As New List(Of cvb.Rect)
     Public rectGrid As New cvb.Mat
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S)
-        desc = "Simple FloodFill - useful only to the Artifacts_CellMap"
+        desc = "Simple FloodFill - useful only to the Artifact_CellMap"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels <> 3 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
@@ -458,7 +458,7 @@ Public Class Flood_Artifacts : Inherits VB_Parent
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S)
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
-        desc = "Simple FloodFill - useful only to the Artifacts_CellMap"
+        desc = "Simple FloodFill - useful only to the Artifact_CellMap"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels <> 3 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)

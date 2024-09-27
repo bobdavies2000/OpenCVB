@@ -1,13 +1,15 @@
 ﻿Imports MS.Internal
 Imports cvb = OpenCvSharp
 
-Public Class Artifacts_LowRes : Inherits VB_Parent
+Public Class Artifact_LowRes : Inherits VB_Parent
     Dim options As New Options_Resize
     Public dst As New cvb.Mat
     Public dstDepth As New cvb.Mat
+    Dim mapCells As New Artifact_MapCells
     Public Sub New()
         FindRadio("WarpFillOutliers").Enabled = False
         FindRadio("WarpInverseMap").Enabled = False
+        labels(3) = "Low resolution version of the depthRGB image."
         desc = "Build a low-res image to start the process of finding artifacts."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -19,6 +21,8 @@ Public Class Artifacts_LowRes : Inherits VB_Parent
 
         dstDepth = task.depthRGB.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
         dst3 = dstDepth.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
+
+        mapCells.Run(dst2)
     End Sub
 End Class
 
@@ -28,8 +32,39 @@ End Class
 
 
 
-Public Class Artifacts_Reduction : Inherits VB_Parent
-    Dim lowRes As New Artifacts_LowRes
+Public Class Artifact_MapCells : Inherits VB_Parent
+    Dim flood As New Flood_Artifacts
+    Public Sub New()
+        labels(3) = "Cell Map - CV_32S"
+        desc = "Create the map of the artifacts."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standaloneTest() Then
+            Static options As New Options_Resize
+            options.RunOpt()
+            Dim pct = options.resizePercent
+            dst3 = src.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
+            dst2 = dst3.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
+        End If
+
+        If task.optionsChanged Then
+            flood.Run(src)
+            dst3 = flood.dst2
+            task.artifactMap = dst3
+            task.artifactRects = New List(Of cvb.Rect)(flood.rectList)
+            task.artifactMask = flood.dst3
+        End If
+        labels(2) = "There were " + CStr(flood.count) + " cells found"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Artifact_Reduction : Inherits VB_Parent
+    Dim lowRes As New Artifact_LowRes
     Dim color8U As New Color8U_Basics
     Public Sub New()
         FindSlider("Resize Percentage (%)").Value = 40
@@ -48,34 +83,9 @@ End Class
 
 
 
-Public Class Artifacts_Features : Inherits VB_Parent
-    Dim lowRes As New Artifacts_LowRes
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        task.redOptions.ColorSource.SelectedItem() = "Color8U_Grayscale"
-        FindSlider("Resize Percentage (%)").Value = 20
-        labels = {"", "", "LowRes image with highlighted features", "Same features highlighted in the original image."}
-        desc = "Find features in a low res image"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        lowRes.Run(src)
-        feat.Run(lowRes.dst2)
-        dst2 = feat.dst2
 
-        dst3 = src
-        For Each pt In task.features
-            DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Artifacts_CellSize : Inherits VB_Parent
-    Public lowRes As New Artifacts_LowRes
+Public Class Artifact_CellSize : Inherits VB_Parent
+    Public lowRes As New Artifact_LowRes
     Dim recompute As Boolean = True
     Public distance As Integer
     Public Sub New()
@@ -139,8 +149,8 @@ End Class
 
 
 
-Public Class Artifacts_FeatureCells1 : Inherits VB_Parent
-    Dim cellSize As New Artifacts_CellSize
+Public Class Artifact_FeatureCells1 : Inherits VB_Parent
+    Dim cellSize As New Artifact_CellSize
     Dim feat As New Feature_Basics
     Public Sub New()
         FindSlider("Min Distance to next").Value = 3
@@ -175,9 +185,9 @@ End Class
 
 
 
-Public Class Artifacts_FeatureCells2 : Inherits VB_Parent
+Public Class Artifact_FeatureCells2 : Inherits VB_Parent
     Dim feat As New Feature_Basics
-    Dim cellSize As New Artifacts_CellSize
+    Dim cellSize As New Artifact_CellSize
     Public Sub New()
         FindSlider("Min Distance to next").Value = 3
         desc = "Identify the cells with features"
@@ -225,56 +235,33 @@ End Class
 
 
 
-Public Class Artifacts_CellMap : Inherits VB_Parent
-    Dim flood As New Flood_Artifacts
-    Public lowRes As New Artifacts_LowRes
-    Public Sub New()
-        labels(3) = "Cell Map - CV_32S"
-        desc = "Create the map of the artifacts."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        lowRes.Run(src)
-        dst2 = lowRes.dst2
 
-        If task.optionsChanged Then
-            flood.Run(dst2)
-            dst3 = flood.dst2
-            task.artifactMap = dst3
-            task.artifactRects = New List(Of cvb.Rect)(flood.rectList)
-            task.artifactMask = flood.dst3
-        End If
-        labels(2) = "There were " + CStr(flood.count) + " cells found"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Artifacts_FeatureCells : Inherits VB_Parent
+Public Class Artifact_Features : Inherits VB_Parent
     Dim feat As New Feature_Basics
-    Dim cellmap As New Artifacts_CellMap
+    Dim lowRes As New Artifact_LowRes
     Public Sub New()
         FindSlider("Min Distance to next").Value = 3
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
+        labels(3) = "Featureless areas"
         desc = "Identify the cells with features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then cellmap.Run(src)
+        lowRes.Run(src)
+        dst2 = lowRes.dst2.Clone
 
         feat.Run(src)
-        dst2 = cellmap.lowRes.dst2.Clone
 
         Dim gridIndex As New List(Of Integer)
         Dim gridCounts As New List(Of Integer)
 
         task.featurePoints.Clear()
+        Dim featureRects As New List(Of cvb.Rect)
         For Each pt In task.features
             Dim tile = task.artifactMap.Get(Of Integer)(pt.Y, pt.X)
             Dim test = gridIndex.IndexOf(tile)
             If test < 0 Then
                 Dim r = task.artifactRects(tile)
+                featureRects.Add(r)
                 gridIndex.Add(tile)
                 gridCounts.Add(1)
                 Dim p1 = New cvb.Point(r.X, r.Y)
@@ -285,13 +272,42 @@ Public Class Artifacts_FeatureCells : Inherits VB_Parent
             End If
         Next
 
+        task.FeatureRects.Clear()
+        task.FeaturelessRects.Clear()
+        For Each r In task.artifactRects
+            If featureRects.Contains(r) Then task.FeatureRects.Add(r) Else task.FeaturelessRects.Add(r)
+        Next
+
         If standaloneTest() Then
-            dst3.SetTo(0)
             For Each pt In task.features
                 DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Black)
-                DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
             Next
             If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.artifactMask)
+
+            dst3.SetTo(0)
+            For Each r In featureRects
+                dst3.Rectangle(r, cvb.Scalar.White, -1)
+            Next
+            dst3 = Not dst3
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Artifact_Edges : Inherits VB_Parent
+    Public feat As New Artifact_Features
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        desc = "Add edges to features"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        feat.Run(src)
+        dst2 = feat.dst2
+
+
     End Sub
 End Class
