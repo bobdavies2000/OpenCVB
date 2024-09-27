@@ -108,7 +108,7 @@ End Class
 
 Public Class SuperPixel_WithCanny : Inherits VB_Parent
     Dim pixels As New SuperPixel_Basics_CPP_VB
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub

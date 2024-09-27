@@ -99,7 +99,7 @@ End Class
 
 
 Public Class FeatureROI_Canny : Inherits VB_Parent
-    Dim canny As New Edge_Canny
+    Dim canny As New Edge_Basics
     Dim devGrid As New FeatureROI_Basics
     Public Sub New()
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.

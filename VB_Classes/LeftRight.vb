@@ -83,7 +83,7 @@ End Class
 
 
 Public Class LeftRight_Edges : Inherits VB_Parent
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Public Sub New()
         desc = "Display the edges in the left and right views"
         labels(2) = "Left Image"

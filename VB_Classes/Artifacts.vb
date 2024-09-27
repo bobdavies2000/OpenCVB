@@ -290,6 +290,7 @@ Public Class Artifact_Features : Inherits VB_Parent
             Next
             dst3 = Not dst3
         End If
+        labels(2) = CStr(task.FeatureRects.Count) + " cells had features while " + CStr(task.FeaturelessRects.Count) + " had none"
     End Sub
 End Class
 
@@ -302,12 +303,32 @@ Public Class Artifact_Edges : Inherits VB_Parent
     Public feat As New Artifact_Features
     Dim edges As New Edge_Basics
     Public Sub New()
+        dst1 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        labels = {"", "", "Low Res overlaid with edges", "Featureless spaces - no edges or features"}
         desc = "Add edges to features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
         dst2 = feat.dst2
+        If task.heartBeat Then labels(2) = feat.labels(2)
 
+        edges.Run(src)
+        dst2.SetTo(cvb.Scalar.Black, edges.dst2)
 
+        Dim newFless As New List(Of cvb.Rect)
+        dst1.SetTo(0)
+        For Each r In task.FeaturelessRects
+            Dim test = edges.dst2(r).CountNonZero
+            If test > 0 Then
+                task.FeatureRects.Add(r)
+                ' DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
+            Else
+                newFless.Add(r)
+                dst1(r).SetTo(255)
+            End If
+        Next
+
+        dst3.SetTo(0)
+        src.CopyTo(dst3, dst1)
     End Sub
 End Class

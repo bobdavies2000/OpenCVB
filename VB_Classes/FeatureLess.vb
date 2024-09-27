@@ -25,7 +25,7 @@ End Class
 
 
 Public Class FeatureLess_Canny : Inherits VB_Parent
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Dim options As New Options_Sobel()
     Public Sub New()
         desc = "Use Canny edges to define featureless regions."

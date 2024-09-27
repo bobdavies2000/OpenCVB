@@ -550,7 +550,7 @@ End Class
 
 Public Class Line_DisplayInfo : Inherits VB_Parent
     Public tcells As New List(Of tCell)
-    Dim canny As New Edge_Canny
+    Dim canny As New Edge_Basics
     Dim blur As New Blur_Basics
     Public distance As Integer
     Public maskCount As Integer
@@ -810,7 +810,7 @@ End Class
 
 
 Public Class Line_Canny : Inherits VB_Parent
-    Dim canny As New Edge_Canny
+    Dim canny As New Edge_Basics
     Dim lines As New Line_Basics
     Public Sub New()
         FindSlider("Canny Aperture").Value = 7

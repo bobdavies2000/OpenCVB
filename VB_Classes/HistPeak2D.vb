@@ -108,7 +108,7 @@ End Class
 Public Class HistPeak2D_Edges : Inherits VB_Parent
     Dim peak As New HistPeak2D_Basics
     Dim histTop As New Projection_HistTop
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Public Sub New()
         desc = "Display the HistPeak2D_Basics edges in the RGB image"
     End Sub

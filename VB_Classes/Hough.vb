@@ -2,7 +2,7 @@ Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
 Public Class Hough_Basics : Inherits VB_Parent
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Public segments() As cvb.LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
@@ -71,7 +71,7 @@ End Class
 
 
 Public Class Hough_Lines_MT : Inherits VB_Parent
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Dim options As New Options_Hough
     Public Sub New()
         labels(2) = "Output of the Canny Edge algorithm (no Hough lines)"
@@ -112,7 +112,7 @@ End Class
 
 
 Public Class Hough_Featureless : Inherits VB_Parent
-    Public edges As New Edge_Canny
+    Public edges As New Edge_Basics
     Public noDepthCount() As Integer
     Public options As New Options_Hough
     Public roiColor() As cvb.Vec3b
@@ -154,7 +154,7 @@ End Class
 
 
 Public Class Hough_FeatureLessTopX : Inherits VB_Parent
-    Public edges As New Edge_Canny
+    Public edges As New Edge_Basics
     Public options As New Options_Hough
     Public maskFless As cvb.Mat
     Public maskFeat As cvb.Mat

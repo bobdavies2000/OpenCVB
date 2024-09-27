@@ -165,7 +165,7 @@ End Class
 Public Class LUT_Watershed : Inherits VB_Parent
     Public wShed As New Watershed_Basics
     Public lut As New LUT_Equalized
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Public Sub New()
         labels(3) = "LUT output with edges highlighted."
         labels(2) = "Watershed Results - draw a rectangle to create a region"

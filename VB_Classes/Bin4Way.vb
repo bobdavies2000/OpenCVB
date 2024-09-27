@@ -105,7 +105,7 @@ End Class
 
 
 Public Class Bin4Way_Canny : Inherits VB_Parent
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Dim binary As New Bin4Way_SplitMean
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -203,7 +203,7 @@ End Class
 
 
 Public Class Bin4Way_UnstableEdges : Inherits VB_Parent
-    Dim canny As New Edge_Canny
+    Dim canny As New Edge_Basics
     Dim blur As New Blur_Basics
     Dim unstable As New Bin4Way_Unstable
     Public Sub New()

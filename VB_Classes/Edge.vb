@@ -77,7 +77,7 @@ End Class
 
 Public Class Edge_DepthAndColor : Inherits VB_Parent
     Dim shadow As New Depth_Holes
-    Dim canny As New Edge_Canny
+    Dim canny As New Edge_Basics
     Dim dilate As New Dilate_Basics
     Public Sub New()
         FindRadio("Dilate shape: Rect").Checked = True
@@ -241,10 +241,10 @@ Public Class Edge_Deriche_CPP_VB : Inherits VB_Parent
         If src.Channels = 1 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-            Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-            Dim imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega)
-            handleSrc.Free()
+        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+        Dim imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega)
+        handleSrc.Free()
 
         dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC3, imagePtr).Clone
         dst3 = src Or dst2
@@ -263,7 +263,7 @@ End Class
 
 
 Public Class Edge_DCTinput : Inherits VB_Parent
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Dim dct As New DCT_FeatureLess
     Public Sub New()
         labels(2) = "Canny edges produced from original grayscale image"
@@ -754,7 +754,7 @@ End Class
 
 Public Class Edge_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
-    Dim edge As New Edge_Canny
+    Dim edge As New Edge_Basics
     Public Sub New()
         task.redOptions.setSimpleReductionBar(1)
         labels = {"", "", "Edges in the Reduction output", "Reduction_Basics output"}
@@ -777,7 +777,7 @@ End Class
 
 Public Class Edge_Regions : Inherits VB_Parent
     Dim tiers As New Depth_Tiers
-    Dim edge As New Edge_Canny
+    Dim edge As New Edge_Basics
     Public Sub New()
         FindSlider("Canny threshold2").Value = 30
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
@@ -964,7 +964,7 @@ Public Class Edge_SobelCustom : Inherits VB_Parent
             addw.src2 = edgesV.dst3
             addw.Run(dst3)
             dst3 = addw.dst2
-        ElseIf options.verticalcheck Then
+        ElseIf options.verticalCheck Then
             dst2 = edgesV.dst2.Clone
             dst3 = edgesV.dst3.Clone
         End If
@@ -1006,7 +1006,7 @@ End Class
 
 Public Class Edge_BackProjection : Inherits VB_Parent
     Dim valley As New HistValley_OptionsAuto
-    Dim canny As New Edge_Canny
+    Dim canny As New Edge_Basics
     Public Sub New()
         labels(3) = "Canny edges in grayscale (red) and edges in back projection (blue)"
         desc = "Find the edges in the HistValley_FromPeaks backprojection"
@@ -1115,7 +1115,7 @@ End Class
 
 
 Public Class Edge_MotionFrames : Inherits VB_Parent
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only"}
@@ -1167,7 +1167,7 @@ End Class
 
 
 Public Class Edge_RedCloud : Inherits VB_Parent
-    Dim canny As New Edge_Canny
+    Dim canny As New Edge_Basics
     Dim redC As New RedCloud_Basics
     Public mats As New Mat_4Click
     Public Sub New()
@@ -1201,7 +1201,7 @@ End Class
 
 Public Class Edge_Color8U : Inherits VB_Parent
     Public colorMethods(10 - 1)
-    Dim canny As New Edge_Canny
+    Dim canny As New Edge_Basics
     Dim options As New Options_ColorMethod
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
@@ -1275,7 +1275,7 @@ End Class
 
 
 Public Class Edge_CannyAccum : Inherits VB_Parent
-    Dim canny As New Edge_Canny
+    Dim canny As New Edge_Basics
     Dim accum As New AddWeighted_Accumulate
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)

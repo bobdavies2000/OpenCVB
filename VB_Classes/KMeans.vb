@@ -228,7 +228,7 @@ End Class
 
 
 Public Class KMeans_Edges : Inherits VB_Parent
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_Basics
     Public km As New KMeans_Image
     Public classCount As Integer
     Dim redC As New RedCloud_Basics
