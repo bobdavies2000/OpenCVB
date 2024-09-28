@@ -124,7 +124,6 @@ End Enum
 	If algorithmName = "Area_MinTriangle_CPP_VB" Then return new Area_MinTriangle_CPP_VB
 	If algorithmName = "Area_SoloPoints" Then return new Area_SoloPoints
 	If algorithmName = "Area_SoloPoints_CS" Then return new Area_SoloPoints_CS
-	If algorithmName = "Artifact_Edges" Then return new Artifact_Edges
 	If algorithmName = "AsciiArt_Basics" Then return new AsciiArt_Basics
 	If algorithmName = "AsciiArt_Basics_CS" Then return new AsciiArt_Basics_CS
 	If algorithmName = "AsciiArt_Color" Then return new AsciiArt_Color
@@ -1966,8 +1965,8 @@ End Enum
 	If algorithmName = "LongLine_Point" Then return new LongLine_Point
 	If algorithmName = "LongLine_Point_CS" Then return new LongLine_Point_CS
 	If algorithmName = "LowRes_Basics" Then return new LowRes_Basics
+	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
-	If algorithmName = "LowRes_FromReduction" Then return new LowRes_FromReduction
 	If algorithmName = "LowRes_Map" Then return new LowRes_Map
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics
 	If algorithmName = "LUT_Basics_CS" Then return new LUT_Basics_CS

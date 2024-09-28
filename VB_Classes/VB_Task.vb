@@ -7,12 +7,14 @@ Imports System.Runtime.InteropServices
 
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public artifactMap As cvb.Mat
-    Public artifactRects As New List(Of cvb.Rect)
-    Public FeatureRects As New List(Of cvb.Rect)
-    Public FeaturelessRects As New List(Of cvb.Rect)
-    Public artifactMask As New cvb.Mat
+    Public lowGridMap As cvb.Mat
+    Public lowRects As New List(Of cvb.Rect)
+    Public lowFeatureRects As New List(Of cvb.Rect)
+    Public lowFeatureLess As New List(Of cvb.Rect)
+    Public lowGridMask As New cvb.Mat
     Public lowResPercent As Single
+    Public lowResColor As cvb.Mat
+    Public lowResDepth As cvb.Mat
 
     Public optionsChanged As Boolean ' global or local options changed.
     Public rows As Integer

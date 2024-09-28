@@ -3,8 +3,6 @@ Imports cvb = OpenCvSharp
 
 Public Class LowRes_Basics : Inherits VB_Parent
     Dim options As New Options_Resize
-    Public dst As New cvb.Mat
-    Public dstDepth As New cvb.Mat
     Dim mapCells As New LowRes_Map
     Public Sub New()
         FindRadio("WarpFillOutliers").Enabled = False
@@ -15,12 +13,12 @@ Public Class LowRes_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        dst = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
-        dst2 = dst.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
+        task.lowResColor = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
+        dst2 = task.lowResColor.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
 
-        dstDepth = task.depthRGB.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height),
-                                        0, 0, options.warpFlag)
-        dst3 = dstDepth.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
+        task.lowResDepth = task.depthRGB.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height),
+                                                0, 0, options.warpFlag)
+        dst3 = task.lowResDepth.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
 
         mapCells.Run(dst2)
     End Sub
@@ -49,33 +47,14 @@ Public Class LowRes_Map : Inherits VB_Parent
         If task.optionsChanged Then
             flood.Run(src)
             dst3 = flood.dst2
-            task.artifactMap = dst3
-            task.artifactRects = New List(Of cvb.Rect)(flood.rectList)
-            task.artifactMask = flood.dst3
+            task.lowGridMap = dst3
+            task.lowRects = New List(Of cvb.Rect)(flood.rectList)
+            task.lowGridMask = flood.dst3
         End If
         labels(2) = "There were " + CStr(flood.count) + " cells found"
     End Sub
 End Class
 
-
-
-
-
-
-Public Class LowRes_FromReduction : Inherits VB_Parent
-    Dim lowRes As New LowRes_Basics
-    Dim color8U As New Color8U_Basics
-    Public Sub New()
-        FindSlider("Resize Percentage (%)").Value = 40
-        desc = "Build a lowRes image after reduction"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        color8U.Run(src)
-
-        lowRes.Run(color8U.dst3)
-        dst2 = lowRes.dst2
-    End Sub
-End Class
 
 
 
@@ -102,10 +81,10 @@ Public Class LowRes_Features : Inherits VB_Parent
         task.featurePoints.Clear()
         Dim featureRects As New List(Of cvb.Rect)
         For Each pt In task.features
-            Dim tile = task.artifactMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim tile = task.lowGridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim test = gridIndex.IndexOf(tile)
             If test < 0 Then
-                Dim r = task.artifactRects(tile)
+                Dim r = task.lowRects(tile)
                 featureRects.Add(r)
                 gridIndex.Add(tile)
                 gridCounts.Add(1)
@@ -117,17 +96,19 @@ Public Class LowRes_Features : Inherits VB_Parent
             End If
         Next
 
-        task.FeatureRects.Clear()
-        task.FeaturelessRects.Clear()
-        For Each r In task.artifactRects
-            If featureRects.Contains(r) Then task.FeatureRects.Add(r) Else task.FeaturelessRects.Add(r)
+        task.lowFeatureRects.Clear()
+        task.lowFeatureLess.Clear()
+        For Each r In task.lowRects
+            If featureRects.Contains(r) Then task.lowFeatureRects.Add(r) Else task.lowFeatureLess.Add(r)
         Next
 
-        If standaloneTest() Then
+        If task.gOptions.debugChecked Then
             For Each pt In task.features
                 DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Black)
             Next
-            If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.artifactMask)
+        End If
+        If standaloneTest() Then
+            If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.lowGridMask)
 
             dst3.SetTo(0)
             For Each r In featureRects
@@ -135,7 +116,7 @@ Public Class LowRes_Features : Inherits VB_Parent
             Next
             dst3 = Not dst3
         End If
-        labels(2) = CStr(task.FeatureRects.Count) + " cells had features while " + CStr(task.FeaturelessRects.Count) + " had none"
+        labels(2) = CStr(task.lowFeatureRects.Count) + " cells had features while " + CStr(task.lowFeatureLess.Count) + " had none"
     End Sub
 End Class
 
@@ -145,17 +126,18 @@ End Class
 
 
 
-Public Class Artifact_Edges : Inherits VB_Parent
+Public Class LowRes_Edges : Inherits VB_Parent
     Public feat As New LowRes_Features
     Dim edges As New Edge_Basics
     Public Sub New()
+        FindRadio("Depth Region Boundaries").Enabled = False
         dst1 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         labels = {"", "", "Low Res overlaid with edges", "Featureless spaces - no edges or features"}
         desc = "Add edges to features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
-        dst2 = feat.dst2
+        dst2 = feat.dst2.Clone
         If task.heartBeat Then labels(2) = feat.labels(2)
 
         edges.Run(src)
@@ -163,10 +145,10 @@ Public Class Artifact_Edges : Inherits VB_Parent
 
         Dim newFless As New List(Of cvb.Rect)
         dst1.SetTo(0)
-        For Each r In task.FeaturelessRects
+        For Each r In task.lowFeatureLess
             Dim test = edges.dst2(r).CountNonZero
             If test > 0 Then
-                task.FeatureRects.Add(r)
+                task.lowFeatureRects.Add(r)
                 ' DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
             Else
                 newFless.Add(r)

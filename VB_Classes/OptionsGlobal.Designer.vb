@@ -140,7 +140,7 @@ Partial Class OptionsGlobal
         'LowResSlider
         '
         Me.LowResSlider.Location = New System.Drawing.Point(185, 167)
-        Me.LowResSlider.Maximum = 300
+        Me.LowResSlider.Maximum = 100
         Me.LowResSlider.Minimum = 2
         Me.LowResSlider.Name = "LowResSlider"
         Me.LowResSlider.Size = New System.Drawing.Size(506, 69)

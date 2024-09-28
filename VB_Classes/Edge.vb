@@ -66,6 +66,7 @@ Public Class Edge_Basics : Inherits VB_Parent
         End Select
 
         If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If dst2.Type <> cvb.MatType.CV_8UC1 Then dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
         labels(2) = traceName + " - selection = " + options.edgeSelection
     End Sub
 End Class

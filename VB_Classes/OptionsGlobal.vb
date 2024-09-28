@@ -249,6 +249,11 @@ Public Class OptionsGlobal
         task.optionsChanged = True
         debugChecked = DebugCheckBox.Checked
     End Sub
+    Private Sub LowResSlider_ValueChanged(sender As Object, e As EventArgs) Handles LowResSlider.ValueChanged
+        task.optionsChanged = True
+        task.lowResPercent = LowResSlider.Value / 100
+        LowResLabel.Text = CStr(LowResSlider.Value) + "%"
+    End Sub
     Private Sub OpenGLCapture_Click(sender As Object, e As EventArgs) Handles OpenGLCapture.Click
         task.optionsChanged = True
     End Sub
