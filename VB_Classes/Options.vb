@@ -430,7 +430,6 @@ End Class
 Public Class Options_Resize : Inherits VB_Parent
     Public warpFlag As cvb.InterpolationFlags = cvb.InterpolationFlags.Nearest
     Public radioIndex As Integer = 0
-    Public topLeftOffset As Integer = 10
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Area")
@@ -442,13 +441,9 @@ Public Class Options_Resize : Inherits VB_Parent
             radio.addRadio("WarpInverseMap")
             radio.check(4).Checked = True
         End If
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Offset from top left corner", 1, 50, topLeftOffset)
-        End If
     End Sub
     Public Sub RunOpt()
         Static offsetSlider = FindSlider("Offset from top left corner")
-        topLeftOffset = offsetSlider.Value
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then

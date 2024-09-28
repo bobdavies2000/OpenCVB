@@ -3263,9 +3263,7 @@ End Enum
 	If algorithmName = "Resize_Basics" Then return new Resize_Basics
 	If algorithmName = "Resize_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Resize_Basics_CC)
 	If algorithmName = "Resize_Basics_CS" Then return new Resize_Basics_CS
-	If algorithmName = "Resize_Preserve" Then return new Resize_Preserve
 	If algorithmName = "Resize_Preserve_CC" Then return new CPP_Basics(ccFunctionNames._Resize_Preserve_CC)
-	If algorithmName = "Resize_Preserve_CS" Then return new Resize_Preserve_CS
 	If algorithmName = "Resize_Proportional" Then return new Resize_Proportional
 	If algorithmName = "Resize_Proportional_CS" Then return new Resize_Proportional_CS
 	If algorithmName = "Resize_Smaller" Then return new Resize_Smaller

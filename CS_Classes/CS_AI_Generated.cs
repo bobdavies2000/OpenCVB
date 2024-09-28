@@ -54865,33 +54865,6 @@ namespace CS_Classes
 
 
 
-    public class Resize_Preserve_CS : VB_Parent
-    {
-        public Options_Resize options = new Options_Resize();
-        public cv.Size newSize;
-        public Resize_Preserve_CS()
-        {
-            FindSlider("Resize Percentage (%)").Maximum = 200;
-            FindSlider("Resize Percentage (%)").Value = 120;
-            FindSlider("Resize Percentage (%)").Minimum = 100;
-            desc = "Decrease the size but preserve the full image size.";
-        }
-        public void RunAlg(Mat src)
-        {
-            options.RunOpt();
-            newSize = new cv.Size((int)Math.Ceiling(src.Width * vbc.task.lowResPercent), 
-                                  (int)Math.Ceiling(src.Height * vbc.task.lowResPercent));
-            dst0 = src.Resize(newSize, 0, 0, InterpolationFlags.Nearest).SetTo(0);
-            var rect = new cv.Rect(options.topLeftOffset, options.topLeftOffset, dst2.Width, dst2.Height);
-            src.CopyTo(dst0[rect]);
-            dst2 = dst0.Resize(dst2.Size(), 0, 0, options.warpFlag);
-            labels[2] = "Image after resizing to: " + newSize.Width + "X" + newSize.Height;
-        }
-    }
-
-
-
-
     public class Resize_Proportional_CS : VB_Parent
     {
         Options_Spectrum options = new Options_Spectrum();
