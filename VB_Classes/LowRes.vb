@@ -1,16 +1,16 @@
 ﻿Imports MS.Internal
 Imports cvb = OpenCvSharp
 
-Public Class Artifact_LowRes : Inherits VB_Parent
+Public Class LowRes_Basics : Inherits VB_Parent
     Dim options As New Options_Resize
     Public dst As New cvb.Mat
     Public dstDepth As New cvb.Mat
-    Dim mapCells As New Artifact_MapCells
+    Dim mapCells As New LowRes_Map
     Public Sub New()
         FindRadio("WarpFillOutliers").Enabled = False
         FindRadio("WarpInverseMap").Enabled = False
         labels(3) = "Low resolution version of the depthRGB image."
-        desc = "Build a low-res image to start the process of finding artifacts."
+        desc = "Build the low-res image and accompanying map, rect list, and mask."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
@@ -32,11 +32,11 @@ End Class
 
 
 
-Public Class Artifact_MapCells : Inherits VB_Parent
-    Dim flood As New Flood_Artifacts
+Public Class LowRes_Map : Inherits VB_Parent
+    Dim flood As New Grid_Basics
     Public Sub New()
         labels(3) = "Cell Map - CV_32S"
-        desc = "Create the map of the artifacts."
+        desc = "Map the individual pixels in the lowRes image to the full size image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
@@ -63,8 +63,8 @@ End Class
 
 
 
-Public Class Artifact_Reduction : Inherits VB_Parent
-    Dim lowRes As New Artifact_LowRes
+Public Class LowRes_FromReduction : Inherits VB_Parent
+    Dim lowRes As New LowRes_Basics
     Dim color8U As New Color8U_Basics
     Public Sub New()
         FindSlider("Resize Percentage (%)").Value = 40
@@ -84,8 +84,8 @@ End Class
 
 
 
-Public Class Artifact_CellSize : Inherits VB_Parent
-    Public lowRes As New Artifact_LowRes
+Public Class LowRes_CellSize : Inherits VB_Parent
+    Public lowRes As New LowRes_Basics
     Dim recompute As Boolean = True
     Public distance As Integer
     Public Sub New()
@@ -149,8 +149,8 @@ End Class
 
 
 
-Public Class Artifact_FeatureCells1 : Inherits VB_Parent
-    Dim cellSize As New Artifact_CellSize
+Public Class LowRes_FeatureCells1 : Inherits VB_Parent
+    Dim cellSize As New LowRes_CellSize
     Dim feat As New Feature_Basics
     Public Sub New()
         FindSlider("Min Distance to next").Value = 3
@@ -185,9 +185,9 @@ End Class
 
 
 
-Public Class Artifact_FeatureCells2 : Inherits VB_Parent
+Public Class LowRes_FeatureCells2 : Inherits VB_Parent
     Dim feat As New Feature_Basics
-    Dim cellSize As New Artifact_CellSize
+    Dim cellSize As New LowRes_CellSize
     Public Sub New()
         FindSlider("Min Distance to next").Value = 3
         desc = "Identify the cells with features"
@@ -236,9 +236,9 @@ End Class
 
 
 
-Public Class Artifact_Features : Inherits VB_Parent
+Public Class LowRes_Features : Inherits VB_Parent
     Dim feat As New Feature_Basics
-    Dim lowRes As New Artifact_LowRes
+    Dim lowRes As New LowRes_Basics
     Public Sub New()
         FindSlider("Min Distance to next").Value = 3
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
@@ -301,7 +301,7 @@ End Class
 
 
 Public Class Artifact_Edges : Inherits VB_Parent
-    Public feat As New Artifact_Features
+    Public feat As New LowRes_Features
     Dim edges As New Edge_Basics
     Public Sub New()
         dst1 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)

@@ -44,7 +44,7 @@ _FeatureLess_Basics_CC
 _FeatureLess_Edge_CC
 _FeatureLess_History_CC
 _FPoly_TopFeatures_CC
-_Grid_Basics_CC
+_Gridgid_Basics_CC
 _Hist_Basics_CC
 _Hist_DepthSimple_CC
 _Hist_Kalman_CC
@@ -124,14 +124,7 @@ End Enum
 	If algorithmName = "Area_MinTriangle_CPP_VB" Then return new Area_MinTriangle_CPP_VB
 	If algorithmName = "Area_SoloPoints" Then return new Area_SoloPoints
 	If algorithmName = "Area_SoloPoints_CS" Then return new Area_SoloPoints_CS
-	If algorithmName = "Artifact_CellSize" Then return new Artifact_CellSize
 	If algorithmName = "Artifact_Edges" Then return new Artifact_Edges
-	If algorithmName = "Artifact_FeatureCells1" Then return new Artifact_FeatureCells1
-	If algorithmName = "Artifact_FeatureCells2" Then return new Artifact_FeatureCells2
-	If algorithmName = "Artifact_Features" Then return new Artifact_Features
-	If algorithmName = "Artifact_LowRes" Then return new Artifact_LowRes
-	If algorithmName = "Artifact_MapCells" Then return new Artifact_MapCells
-	If algorithmName = "Artifact_Reduction" Then return new Artifact_Reduction
 	If algorithmName = "AsciiArt_Basics" Then return new AsciiArt_Basics
 	If algorithmName = "AsciiArt_Basics_CS" Then return new AsciiArt_Basics_CS
 	If algorithmName = "AsciiArt_Color" Then return new AsciiArt_Color
@@ -685,7 +678,7 @@ End Enum
 	If algorithmName = "Depth_ForegroundOverTime" Then return new Depth_ForegroundOverTime
 	If algorithmName = "Depth_ForegroundOverTime_CS" Then return new Depth_ForegroundOverTime_CS
 	If algorithmName = "Depth_Grid" Then return new Depth_Grid
-	If algorithmName = "Depth_Grid_CS" Then return new Depth_Grid_CS
+	If algorithmName = "Depth_Gridgid_CS" Then return new Depth_Gridgid_CS
 	If algorithmName = "Depth_Holes" Then return new Depth_Holes
 	If algorithmName = "Depth_Holes_CS" Then return new Depth_Holes_CS
 	If algorithmName = "Depth_HolesOverTime" Then return new Depth_HolesOverTime
@@ -1080,7 +1073,7 @@ End Enum
 	If algorithmName = "FeatureLeftRight_Basics" Then return new FeatureLeftRight_Basics
 	If algorithmName = "FeatureLeftRight_Basics_CS" Then return new FeatureLeftRight_Basics_CS
 	If algorithmName = "FeatureLeftRight_Grid" Then return new FeatureLeftRight_Grid
-	If algorithmName = "FeatureLeftRight_Grid_CS" Then return new FeatureLeftRight_Grid_CS
+	If algorithmName = "FeatureLeftRight_Gridgid_CS" Then return new FeatureLeftRight_Gridgid_CS
 	If algorithmName = "FeatureLeftRight_Input" Then return new FeatureLeftRight_Input
 	If algorithmName = "FeatureLeftRight_Input_CS" Then return new FeatureLeftRight_Input_CS
 	If algorithmName = "FeatureLeftRight_LeftRightPrep" Then return new FeatureLeftRight_LeftRightPrep
@@ -1244,7 +1237,6 @@ End Enum
 	If algorithmName = "FLANN_Test_CS" Then return new FLANN_Test_CS
 	If algorithmName = "Flip_Basics" Then return new Flip_Basics
 	If algorithmName = "Flip_Basics_CS" Then return new Flip_Basics_CS
-	If algorithmName = "Flood_Artifacts" Then return new Flood_Artifacts
 	If algorithmName = "Flood_Artifacts1" Then return new Flood_Artifacts1
 	If algorithmName = "Flood_Basics" Then return new Flood_Basics
 	If algorithmName = "Flood_Basics_CS" Then return new Flood_Basics_CS
@@ -1349,28 +1341,29 @@ End Enum
 	If algorithmName = "GrayToColor_Palette" Then return new GrayToColor_Palette
 	If algorithmName = "GrayToColor_Palette_CS" Then return new GrayToColor_Palette_CS
 	If algorithmName = "Grid_Basics" Then return new Grid_Basics
-	If algorithmName = "Grid_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Grid_Basics_CC)
-	If algorithmName = "Grid_Basics_CS" Then return new Grid_Basics_CS
-	If algorithmName = "Grid_BasicsTest" Then return new Grid_BasicsTest
-	If algorithmName = "Grid_BasicsTest_CS" Then return new Grid_BasicsTest_CS
-	If algorithmName = "Grid_FPS" Then return new Grid_FPS
-	If algorithmName = "Grid_FPS_CS" Then return new Grid_FPS_CS
-	If algorithmName = "Grid_List" Then return new Grid_List
-	If algorithmName = "Grid_List_CS" Then return new Grid_List_CS
-	If algorithmName = "Grid_MinMaxDepth" Then return new Grid_MinMaxDepth
-	If algorithmName = "Grid_MinMaxDepth_CS" Then return new Grid_MinMaxDepth_CS
-	If algorithmName = "Grid_Neighbors" Then return new Grid_Neighbors
-	If algorithmName = "Grid_Neighbors_CS" Then return new Grid_Neighbors_CS
-	If algorithmName = "Grid_QuarterRes" Then return new Grid_QuarterRes
-	If algorithmName = "Grid_QuarterRes_CS" Then return new Grid_QuarterRes_CS
-	If algorithmName = "Grid_Rectangles" Then return new Grid_Rectangles
-	If algorithmName = "Grid_Rectangles_CS" Then return new Grid_Rectangles_CS
-	If algorithmName = "Grid_ShowMap" Then return new Grid_ShowMap
-	If algorithmName = "Grid_ShowMap_CS" Then return new Grid_ShowMap_CS
-	If algorithmName = "Grid_Special" Then return new Grid_Special
-	If algorithmName = "Grid_Special_CS" Then return new Grid_Special_CS
-	If algorithmName = "Grid_TrackCenter" Then return new Grid_TrackCenter
-	If algorithmName = "Grid_TrackCenter_CS" Then return new Grid_TrackCenter_CS
+	If algorithmName = "Gridgid_Basics" Then return new Gridgid_Basics
+	If algorithmName = "Gridgid_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Gridgid_Basics_CC)
+	If algorithmName = "Gridgid_Basics_CS" Then return new Gridgid_Basics_CS
+	If algorithmName = "Gridgid_BasicsTest" Then return new Gridgid_BasicsTest
+	If algorithmName = "Gridgid_BasicsTest_CS" Then return new Gridgid_BasicsTest_CS
+	If algorithmName = "Gridgid_FPS" Then return new Gridgid_FPS
+	If algorithmName = "Gridgid_FPS_CS" Then return new Gridgid_FPS_CS
+	If algorithmName = "Gridgid_List" Then return new Gridgid_List
+	If algorithmName = "Gridgid_List_CS" Then return new Gridgid_List_CS
+	If algorithmName = "Gridgid_MinMaxDepth" Then return new Gridgid_MinMaxDepth
+	If algorithmName = "Gridgid_MinMaxDepth_CS" Then return new Gridgid_MinMaxDepth_CS
+	If algorithmName = "Gridgid_Neighbors" Then return new Gridgid_Neighbors
+	If algorithmName = "Gridgid_Neighbors_CS" Then return new Gridgid_Neighbors_CS
+	If algorithmName = "Gridgid_QuarterRes" Then return new Gridgid_QuarterRes
+	If algorithmName = "Gridgid_QuarterRes_CS" Then return new Gridgid_QuarterRes_CS
+	If algorithmName = "Gridgid_Rectangles" Then return new Gridgid_Rectangles
+	If algorithmName = "Gridgid_Rectangles_CS" Then return new Gridgid_Rectangles_CS
+	If algorithmName = "Gridgid_ShowMap" Then return new Gridgid_ShowMap
+	If algorithmName = "Gridgid_ShowMap_CS" Then return new Gridgid_ShowMap_CS
+	If algorithmName = "Gridgid_Special" Then return new Gridgid_Special
+	If algorithmName = "Gridgid_Special_CS" Then return new Gridgid_Special_CS
+	If algorithmName = "Gridgid_TrackCenter" Then return new Gridgid_TrackCenter
+	If algorithmName = "Gridgid_TrackCenter_CS" Then return new Gridgid_TrackCenter_CS
 	If algorithmName = "Guess_Depth_CPP_CS" Then return new Guess_Depth_CPP_CS
 	If algorithmName = "Guess_Depth_CPP_VB" Then return new Guess_Depth_CPP_VB
 	If algorithmName = "Guess_ImageEdges_CPP_CS" Then return new Guess_ImageEdges_CPP_CS
@@ -1397,7 +1390,7 @@ End Enum
 	If algorithmName = "HeatMap_Cell" Then return new HeatMap_Cell
 	If algorithmName = "HeatMap_Cell_CS" Then return new HeatMap_Cell_CS
 	If algorithmName = "HeatMap_Grid" Then return new HeatMap_Grid
-	If algorithmName = "HeatMap_Grid_CS" Then return new HeatMap_Grid_CS
+	If algorithmName = "HeatMap_Gridgid_CS" Then return new HeatMap_Gridgid_CS
 	If algorithmName = "HeatMap_GuidedBP" Then return new HeatMap_GuidedBP
 	If algorithmName = "HeatMap_GuidedBP_CS" Then return new HeatMap_GuidedBP_CS
 	If algorithmName = "HeatMap_Hot" Then return new HeatMap_Hot
@@ -1515,7 +1508,7 @@ End Enum
 	If algorithmName = "Hist3D_RedCloud" Then return new Hist3D_RedCloud
 	If algorithmName = "Hist3D_RedCloud_CS" Then return new Hist3D_RedCloud_CS
 	If algorithmName = "Hist3D_RedCloudGrid" Then return new Hist3D_RedCloudGrid
-	If algorithmName = "Hist3D_RedCloudGrid_CS" Then return new Hist3D_RedCloudGrid_CS
+	If algorithmName = "Hist3D_RedCloudGridgid_CS" Then return new Hist3D_RedCloudGridgid_CS
 	If algorithmName = "Hist3D_RedColor" Then return new Hist3D_RedColor
 	If algorithmName = "Hist3D_RedColor_CS" Then return new Hist3D_RedColor_CS
 	If algorithmName = "Hist3Dcloud_Basics" Then return new Hist3Dcloud_Basics
@@ -1972,6 +1965,13 @@ End Enum
 	If algorithmName = "LongLine_NoDepth_CS" Then return new LongLine_NoDepth_CS
 	If algorithmName = "LongLine_Point" Then return new LongLine_Point
 	If algorithmName = "LongLine_Point_CS" Then return new LongLine_Point_CS
+	If algorithmName = "LowRes_Basics" Then return new LowRes_Basics
+	If algorithmName = "LowRes_CellSize" Then return new LowRes_CellSize
+	If algorithmName = "LowRes_FeatureCells1" Then return new LowRes_FeatureCells1
+	If algorithmName = "LowRes_FeatureCells2" Then return new LowRes_FeatureCells2
+	If algorithmName = "LowRes_Features" Then return new LowRes_Features
+	If algorithmName = "LowRes_FromReduction" Then return new LowRes_FromReduction
+	If algorithmName = "LowRes_Map" Then return new LowRes_Map
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics
 	If algorithmName = "LUT_Basics_CS" Then return new LUT_Basics_CS
 	If algorithmName = "LUT_Create" Then return new LUT_Create
@@ -2170,9 +2170,9 @@ End Enum
 	If algorithmName = "Motion_Grayscale" Then return new Motion_Grayscale
 	If algorithmName = "Motion_Grayscale_CS" Then return new Motion_Grayscale_CS
 	If algorithmName = "Motion_Grid" Then return new Motion_Grid
-	If algorithmName = "Motion_Grid_CS" Then return new Motion_Grid_CS
-	If algorithmName = "Motion_Grid_MP" Then return new Motion_Grid_MP
-	If algorithmName = "Motion_Grid_MP_CS" Then return new Motion_Grid_MP_CS
+	If algorithmName = "Motion_Gridgid_CS" Then return new Motion_Gridgid_CS
+	If algorithmName = "Motion_Gridgid_MP" Then return new Motion_Gridgid_MP
+	If algorithmName = "Motion_Gridgid_MP_CS" Then return new Motion_Gridgid_MP_CS
 	If algorithmName = "Motion_History" Then return new Motion_History
 	If algorithmName = "Motion_History_CS" Then return new Motion_History_CS
 	If algorithmName = "Motion_HistoryTest" Then return new Motion_HistoryTest
@@ -2301,7 +2301,7 @@ End Enum
 	If algorithmName = "OpAuto_Peaks2D" Then return new OpAuto_Peaks2D
 	If algorithmName = "OpAuto_Peaks2D_CS" Then return new OpAuto_Peaks2D_CS
 	If algorithmName = "OpAuto_Peaks2DGrid" Then return new OpAuto_Peaks2DGrid
-	If algorithmName = "OpAuto_Peaks2DGrid_CS" Then return new OpAuto_Peaks2DGrid_CS
+	If algorithmName = "OpAuto_Peaks2DGridgid_CS" Then return new OpAuto_Peaks2DGridgid_CS
 	If algorithmName = "OpAuto_PixelDifference" Then return new OpAuto_PixelDifference
 	If algorithmName = "OpAuto_PixelDifference_CS" Then return new OpAuto_PixelDifference_CS
 	If algorithmName = "OpAuto_Valley" Then return new OpAuto_Valley

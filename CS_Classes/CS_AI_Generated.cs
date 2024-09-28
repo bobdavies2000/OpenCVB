@@ -5157,7 +5157,7 @@ namespace CS_Classes
                 labels[3] = "That combination of channel " + c1 + "/" + c2 + " has " + bpCount +
                             " pixels while image total is " + dst0.Total().ToString("0");
             }
-            SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control the 2D backprojection",
+            SetTrueText("Use Global Algorithm Option 'Gridgid Square Size' to control the 2D backprojection",
                         new cv.Point(10, dst3.Height - 20), 3);
         }
     }
@@ -5204,7 +5204,7 @@ namespace CS_Classes
                 labels[3] = "That combination of channel " + c1.ToString() + "/" + c2.ToString() + " has " + bpCount.ToString() +
                             " pixels while image total is " + dst0.Total().ToString("0");
             }
-            SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control the 2D histogram at left",
+            SetTrueText("Use Global Algorithm Option 'Gridgid Square Size' to control the 2D histogram at left",
                         new cv.Point(10, dst3.Height - 20), 3);
         }
     }
@@ -5256,7 +5256,7 @@ namespace CS_Classes
             }
             if (vbc.task.heartBeat)
             {
-                strOut = "Use Global Algorithm Option 'Grid Square Size' to control the 2D histogram." + "\n" +
+                strOut = "Use Global Algorithm Option 'Gridgid Square Size' to control the 2D histogram." + "\n" +
                          "Move mouse in 2D histogram to select a row or column to backproject.";
             }
             SetTrueText(strOut, 1);
@@ -5297,7 +5297,7 @@ namespace CS_Classes
 
             labels[3] = backP.labels[3];
 
-            SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control this 2D histogram.\n" +
+            SetTrueText("Use Global Algorithm Option 'Gridgid Square Size' to control this 2D histogram.\n" +
                         "Move mouse in 2D histogram to select a cell to backproject.\n" +
                         "Click any quadrant at left to display that quadrant here.\n",
                         new cv.Point(10, dst3.Height - dst3.Height / 4), 3);
@@ -12337,9 +12337,9 @@ namespace CS_Classes
 
 
 
-    public class Depth_Grid_CS : VB_Parent
+    public class Depth_Gridgid_CS : VB_Parent
     {
-        public Depth_Grid_CS()
+        public Depth_Gridgid_CS()
         {
             vbc.task.gOptions.setGridSize(4);
             labels = new string[] { "", "", "White regions below are likely depth edges where depth changes rapidly", "Depth 32f display" };
@@ -18443,10 +18443,10 @@ namespace CS_Classes
 
 
 
-    public class FeatureLeftRight_Grid_CS : VB_Parent
+    public class FeatureLeftRight_Gridgid_CS : VB_Parent
     {
         public FeatureLeftRight_Basics match = new FeatureLeftRight_Basics();
-        public FeatureLeftRight_Grid_CS()
+        public FeatureLeftRight_Gridgid_CS()
         {
             if (standalone) vbc.task.gOptions.setDisplay1();
             FindRadio("GoodFeatures (ShiTomasi) grid").Checked = true;
@@ -23950,11 +23950,11 @@ namespace CS_Classes
 
 
 
-    public class Grid_Basics_CS : VB_Parent
+    public class Gridgid_Basics_CS : VB_Parent
     {
         public List<cv.Rect> gridRects = new List<cv.Rect>();
         public bool updateTaskgridRects = true;
-        public Grid_Basics_CS()
+        public Gridgid_Basics_CS()
         {
             desc = "Create a grid of squares covering the entire image.";
         }
@@ -24074,7 +24074,7 @@ namespace CS_Classes
                 dst2 = new Mat(src.Size(), MatType.CV_8U);
                 vbc.task.color.CopyTo(dst2);
                 dst2.SetTo(Scalar.White, vbc.task.gridMask);
-                labels[2] = "Grid_Basics_CS " + gridRects.Count + " (" + vbc.task.gridRows + "X" + vbc.task.gridCols + ") " +
+                labels[2] = "Gridgid_Basics_CS " + gridRects.Count + " (" + vbc.task.gridRows + "X" + vbc.task.gridCols + ") " +
                             vbc.task.gridSize + "X" + vbc.task.gridSize + " regions";
             }
             if (updateTaskgridRects) vbc.task.gridRects = gridRects;
@@ -24084,12 +24084,12 @@ namespace CS_Classes
 
 
 
-    public class Grid_BasicsTest_CS : VB_Parent
+    public class Gridgid_BasicsTest_CS : VB_Parent
     {
-        public Grid_BasicsTest_CS()
+        public Gridgid_BasicsTest_CS()
         {
             labels = new[] { "", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi." };
-            if (standaloneTest()) desc = "Validation test for Grid_Basics algorithm";
+            if (standaloneTest()) desc = "Validation test for Gridgid_Basics algorithm";
         }
         public void RunAlg(Mat src)
         {
@@ -24115,9 +24115,9 @@ namespace CS_Classes
 
 
 
-    public class Grid_List_CS : VB_Parent
+    public class Gridgid_List_CS : VB_Parent
     {
-        public Grid_List_CS()
+        public Gridgid_List_CS()
         {
             labels[2] = "Adjust grid width/height to increase thread count.";
             if (standaloneTest()) desc = "List the active threads";
@@ -24154,12 +24154,12 @@ namespace CS_Classes
 
 
 
-    public class Grid_Rectangles_CS : VB_Parent
+    public class Gridgid_Rectangles_CS : VB_Parent
     {
         public int tilesPerRow;
         public int tilesPerCol;
         Options_Grid options = new Options_Grid();
-        public Grid_Rectangles_CS()
+        public Gridgid_Rectangles_CS()
         {
             vbc.task.gridMask = new Mat(dst2.Size(), MatType.CV_8U);
             vbc.task.gridMap = new Mat(dst2.Size(), MatType.CV_32S);
@@ -24211,7 +24211,7 @@ namespace CS_Classes
             {
                 vbc.task.color.CopyTo(dst2);
                 dst2.SetTo(Scalar.White, vbc.task.gridMask);
-                labels[2] = "Grid_Basics " + vbc.task.gridRects.Count + " (" + tilesPerRow + "X" + tilesPerCol + ") " +
+                labels[2] = "Gridgid_Basics " + vbc.task.gridRects.Count + " (" + tilesPerRow + "X" + tilesPerCol + ") " +
                             options.width + "X" + options.height + " regions";
             }
         }
@@ -24220,14 +24220,14 @@ namespace CS_Classes
 
 
 
-    public class Grid_FPS_CS : VB_Parent
+    public class Gridgid_FPS_CS : VB_Parent
     {
         public bool heartBeat;
         public TrackBar fpsSlider;
         int skipCount;
         int saveSkip;
         Options_Grid options = new Options_Grid();
-        public Grid_FPS_CS()
+        public Gridgid_FPS_CS()
         {
             fpsSlider = FindSlider("Desired FPS rate");
             desc = "Provide a service that lets any algorithm control its frame rate";
@@ -24256,12 +24256,12 @@ namespace CS_Classes
 
 
 
-    public class Grid_Neighbors_CS : VB_Parent
+    public class Gridgid_Neighbors_CS : VB_Parent
     {
         Mat mask = new Mat();
-        public Grid_Neighbors_CS()
+        public Gridgid_Neighbors_CS()
         {
-            labels = new[] { "", "", "Grid_Basics output", "" };
+            labels = new[] { "", "", "Gridgid_Basics output", "" };
             desc = "Click any grid element to see its neighbors";
         }
         public void RunAlg(Mat src)
@@ -24300,7 +24300,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_Special_CS : VB_Parent
+    public class Gridgid_Special_CS : VB_Parent
     {
         public int gridWidth = 10;
         public int gridHeight = 10;
@@ -24310,11 +24310,11 @@ namespace CS_Classes
         public Mat gridMask;
         public List<List<int>> gridNeighbors = new List<List<int>>();
         public Mat gridMap;
-        public Grid_Special_CS()
+        public Gridgid_Special_CS()
         {
             gridMask = new Mat(dst2.Size(), MatType.CV_8U);
             gridMap = new Mat(dst2.Size(), MatType.CV_32S);
-            desc = "Grids are normally square.  Grid_Special_CS allows grid elements to be rectangles.  Specify the Y size.";
+            desc = "Grids are normally square.  Gridgid_Special_CS allows grid elements to be rectangles.  Specify the Y size.";
         }
         public void RunAlg(Mat src)
         {
@@ -24395,7 +24395,7 @@ namespace CS_Classes
             {
                 vbc.task.color.CopyTo(dst2);
                 dst2.SetTo(Scalar.White, gridMask);
-                labels[2] = "Grid_Basics " + gridRects.Count + " (" + gridRows + "X" + gridCols + ") " +
+                labels[2] = "Gridgid_Basics " + gridRects.Count + " (" + gridRows + "X" + gridCols + ") " +
                             gridWidth + "X" + gridHeight + " regions";
             }
         }
@@ -24404,12 +24404,12 @@ namespace CS_Classes
 
 
 
-    public class Grid_QuarterRes_CS : VB_Parent
+    public class Gridgid_QuarterRes_CS : VB_Parent
     {
         public List<cv.Rect> gridRects = new List<cv.Rect>();
-        Grid_Basics grid = new Grid_Basics();
+        Gridgid_Basics grid = new Gridgid_Basics();
         Mat inputSrc;
-        public Grid_QuarterRes_CS()
+        public Gridgid_QuarterRes_CS()
         {
             inputSrc = new Mat(vbc.task.quarterRes, MatType.CV_8U, cv.Scalar.All(0));
             grid.updateTaskgridRects = false;
@@ -24427,14 +24427,14 @@ namespace CS_Classes
 
 
 
-    public class Grid_MinMaxDepth_CS : VB_Parent
+    public class Gridgid_MinMaxDepth_CS : VB_Parent
     {
         public PointPair[] minMaxLocs = new PointPair[1];
         public Vec2f[] minMaxVals = new Vec2f[1];
-        public Grid_MinMaxDepth_CS()
+        public Gridgid_MinMaxDepth_CS()
         {
             vbc.task.gOptions.setGridSize(8);
-            UpdateAdvice(traceName + ": goptions 'Grid Square Size' has direct impact.");
+            UpdateAdvice(traceName + ": goptions 'Gridgid Square Size' has direct impact.");
             desc = "Find the min and max depth within each grid roi.";
         }
         public void RunAlg(Mat src)
@@ -24466,11 +24466,11 @@ namespace CS_Classes
 
 
 
-    public class Grid_TrackCenter_CS : VB_Parent
+    public class Gridgid_TrackCenter_CS : VB_Parent
     {
         public cv.Point center;
         Match_Basics match = new Match_Basics();
-        public Grid_TrackCenter_CS()
+        public Gridgid_TrackCenter_CS()
         {
             if (standalone) vbc.task.gOptions.setShowGrid(true);
             desc = "Track a cell near the center of the grid";
@@ -24506,9 +24506,9 @@ namespace CS_Classes
 
 
 
-    public class Grid_ShowMap_CS : VB_Parent
+    public class Gridgid_ShowMap_CS : VB_Parent
     {
-        public Grid_ShowMap_CS()
+        public Gridgid_ShowMap_CS()
         {
             desc = "Verify that vbc.task.gridMap is laid out correctly";
         }
@@ -24872,10 +24872,10 @@ namespace CS_Classes
 
 
 
-    public class HeatMap_Grid_CS : VB_Parent
+    public class HeatMap_Gridgid_CS : VB_Parent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
-        public HeatMap_Grid_CS()
+        public HeatMap_Gridgid_CS()
         {
             vbc.task.gOptions.setGridSize(5);
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -26891,11 +26891,11 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_RedCloudGrid_CS : VB_Parent
+    public class Hist3D_RedCloudGridgid_CS : VB_Parent
     {
         Pixel_Vectors pixels = new Pixel_Vectors();
         Hist3Dcolor_Vector hVector = new Hist3Dcolor_Vector();
-        public Hist3D_RedCloudGrid_CS()
+        public Hist3D_RedCloudGridgid_CS()
         {
             vbc.task.gOptions.setGridSize(8);
             desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors.";
@@ -39075,7 +39075,7 @@ namespace CS_Classes
 
     public class ML_Color2Depth_CS : VB_Parent
     {
-        Grid_MinMaxDepth minMax = new Grid_MinMaxDepth();
+        Gridgid_MinMaxDepth minMax = new Gridgid_MinMaxDepth();
         Color8U_Basics colorClass = new Color8U_Basics();
         public ML_Color2Depth_CS()
         {
@@ -39145,7 +39145,7 @@ namespace CS_Classes
 
     public class ML_ColorInTier2Depth_CS : VB_Parent
     {
-        Grid_MinMaxDepth minMax = new Grid_MinMaxDepth();
+        Gridgid_MinMaxDepth minMax = new Gridgid_MinMaxDepth();
         Color8U_Basics colorClass = new Color8U_Basics();
         Contour_DepthTiers tiers = new Contour_DepthTiers();
         public ML_ColorInTier2Depth_CS()
@@ -40098,10 +40098,10 @@ namespace CS_Classes
 
 
 
-    public class Motion_Grid_MP_CS : VB_Parent
+    public class Motion_Gridgid_MP_CS : VB_Parent
     {
         Options_MotionDetect options = new Options_MotionDetect();
-        public Motion_Grid_MP_CS()
+        public Motion_Gridgid_MP_CS()
         {
             UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.");
             desc = "Detect Motion in the color image using multi-threading.";
@@ -40133,10 +40133,10 @@ namespace CS_Classes
 
 
 
-    public class Motion_Grid_CS : VB_Parent
+    public class Motion_Gridgid_CS : VB_Parent
     {
         Options_MotionDetect options = new Options_MotionDetect();
-        public Motion_Grid_CS()
+        public Motion_Gridgid_CS()
         {
             UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.");
             desc = "Detect Motion in the color image";
@@ -42908,13 +42908,13 @@ namespace CS_Classes
 
 
 
-    public class OpAuto_Peaks2DGrid_CS : VB_Parent
+    public class OpAuto_Peaks2DGridgid_CS : VB_Parent
     {
         public List<Point2f> clusterPoints = new List<Point2f>();
         Options_Boundary options = new Options_Boundary();
         Hist2D_Basics hist2d = new Hist2D_Basics();
         TrackBar boundarySlider;
-        public OpAuto_Peaks2DGrid_CS()
+        public OpAuto_Peaks2DGridgid_CS()
         {
             boundarySlider = FindSlider("Desired boundary count");
             if (standaloneTest()) vbc.task.gOptions.setHistogramBins(256);
@@ -48890,7 +48890,7 @@ namespace CS_Classes
         Plot_Histogram2D plot2D = new Plot_Histogram2D();
         Plot_Histogram plot = new Plot_Histogram();
         Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
-        Grid_Basics grid = new Grid_Basics();
+        Gridgid_Basics grid = new Gridgid_Basics();
         public Mat histogram = new Mat();
         public PointCloud_Histograms_CS()
         {
@@ -51887,7 +51887,7 @@ namespace CS_Classes
 
     public class RedCloud_FPS_CS : VB_Parent
     {
-        Grid_FPS fps = new Grid_FPS();
+        Gridgid_FPS fps = new Gridgid_FPS();
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_FPS_CS()
         {

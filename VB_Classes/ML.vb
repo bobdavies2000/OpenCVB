@@ -330,7 +330,7 @@ End Structure
 
 
 Public Class ML_Color2Depth : Inherits VB_Parent
-    Dim minMax As New Grid_MinMaxDepth
+    Dim minMax As New Gridgid_MinMaxDepth
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
@@ -396,7 +396,7 @@ Public Structure mlColorInTier
     Dim y As Single
 End Structure
 Public Class ML_ColorInTier2Depth : Inherits VB_Parent
-    Dim minMax As New Grid_MinMaxDepth
+    Dim minMax As New Gridgid_MinMaxDepth
     Dim color8U As New Color8U_Basics
     Dim tiers As New Contour_DepthTiers
     Public Sub New()

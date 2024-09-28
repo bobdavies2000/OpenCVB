@@ -115,7 +115,8 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
-    <Compile Include="Artifacts.vb" />
+    <Compile Include="Grid.vb" />
+    <Compile Include="LowRes.vb" />
     <Compile Include="AsciiArt.vb" />
     <Compile Include="Bezier.vb" />
     <Compile Include="BGRPattern.vb" />
@@ -427,7 +428,7 @@
     <Compile Include="WarpPerspective.vb" />
     <Compile Include="XFeatures.vb" />
     <Compile Include="SVM.vb" />
-    <Compile Include="Grid.vb" />
+    <Compile Include="Gridgid.vb" />
     <Compile Include="Transform.vb" />
     <Compile Include="Vector.vb" />
     <Compile Include="WarpAffine.vb" />

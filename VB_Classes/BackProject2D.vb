@@ -46,7 +46,7 @@ Public Class BackProject2D_Basics : Inherits VB_Parent
             labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
                         " pixels while image total is " + Format(dst0.Total, "0")
         End If
-        SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control the 2D backprojection",
+        SetTrueText("Use Global Algorithm Option 'Gridgid Square Size' to control the 2D backprojection",
                     New cvb.Point(10, dst3.Height - 20), 3)
     End Sub
 End Class
@@ -95,7 +95,7 @@ Public Class BackProject2D_BasicsOld : Inherits VB_Parent
             labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
                         " pixels while image total is " + Format(dst0.Total, "0")
         End If
-        SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control the 2D histogram at left",
+        SetTrueText("Use Global Algorithm Option 'Gridgid Square Size' to control the 2D histogram at left",
                     New cvb.Point(10, dst3.Height - 20), 3)
     End Sub
 End Class
@@ -128,7 +128,7 @@ Public Class BackProject2D_Compare : Inherits VB_Parent
 
         labels(3) = backP.labels(3)
 
-        SetTrueText("Use Global Algorithm Option 'Grid Square Size' to control this 2D histogram." + vbCrLf +
+        SetTrueText("Use Global Algorithm Option 'Gridgid Square Size' to control this 2D histogram." + vbCrLf +
                     "Move mouse in 2D histogram to select a cell to backproject." + vbCrLf +
                     "Click any quadrant at left to display that quadrant here." + vbCrLf,
                     New cvb.Point(10, dst3.Height - dst3.Height / 4), 3)
@@ -356,7 +356,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Parent
         End If
 
         If task.heartBeat Then
-            strOut = "Use Global Algorithm Option 'Grid Square Size' to control the 2D histogram." + vbCrLf +
+            strOut = "Use Global Algorithm Option 'Gridgid Square Size' to control the 2D histogram." + vbCrLf +
                      "Move mouse in 2D histogram to select a row or column to backproject."
         End If
 

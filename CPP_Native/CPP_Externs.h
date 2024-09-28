@@ -4,7 +4,7 @@
 
 namespace CPP_Native
 {
-    Grid_Basics_CC* gridBasics;
+    Gridgid_Basics_CC* gridBasics;
     Hist_RedOptions_CC* redOptions;
 
     extern "C" __declspec(dllexport)
@@ -114,8 +114,8 @@ namespace CPP_Native
         { task->alg = new Edge_Scharr_CC(); task->alg->traceName = "Edge_Scharr_CC"; break; }
         case _Mat_4to1_CC:
         { task->alg = new Mat_4to1_CC(); task->alg->traceName = "Mat_4to1_CC"; break; }
-        case _Grid_Basics_CC:
-        { task->alg = new Grid_Basics_CC(); task->alg->traceName = "Grid_Basics_CC"; break; }
+        case _Gridgid_Basics_CC:
+        { task->alg = new Gridgid_Basics_CC(); task->alg->traceName = "Gridgid_Basics_CC"; break; }
         case _Depth_Colorizer_CC:
         { task->alg = new Depth_Colorizer_CC(); task->alg->traceName = "Depth_Colorizer_CC"; break; }
         case _RedCloud_Flood_CC:
@@ -195,7 +195,7 @@ namespace CPP_Native
         task->font = FONT_HERSHEY_SIMPLEX; // fontSize is set below...
         task->fontColor = Scalar(255, 255, 255);
         task->cppFunction = function;
-        gridBasics = new Grid_Basics_CC();
+        gridBasics = new Gridgid_Basics_CC();
         redOptions = new Hist_RedOptions_CC();
 
         return (int*)task;

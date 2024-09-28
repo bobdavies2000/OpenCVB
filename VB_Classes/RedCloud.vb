@@ -332,7 +332,7 @@ End Class
 
 
 Public Class RedCloud_FPS : Inherits VB_Parent
-    Dim fps As New Grid_FPS
+    Dim fps As New Gridgid_FPS
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.setDisplay1()

@@ -4196,9 +4196,9 @@ public:
 
 
 
-class Grid_Basics_CC : public CPP_Parent {
+class Gridgid_Basics_CC : public CPP_Parent {
 public:
-    Grid_Basics_CC() : CPP_Parent() {
+    Gridgid_Basics_CC() : CPP_Parent() {
         desc = "Create a grid of squares covering the entire image.";
     }
 
@@ -4258,7 +4258,7 @@ public:
             task->color.copyTo(dst2);
             dst2.setTo(Scalar(255, 255, 255), task->gridMask); 
             stringstream ss;
-            ss << "Grid_Basics_CC " << task->gridRects.size() << " (" << task->gridRows << "X" << task->gridCols << ") "
+            ss << "Gridgid_Basics_CC " << task->gridRects.size() << " (" << task->gridRows << "X" << task->gridCols << ") "
                 << task->gridSize << "X" << task->gridSize << " regions";
             labels[2] = ss.str();
         }

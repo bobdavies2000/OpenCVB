@@ -23,6 +23,9 @@ Partial Class OptionsGlobal
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.MinMaxDepth = New System.Windows.Forms.GroupBox()
+        Me.GridResAmt = New System.Windows.Forms.Label()
+        Me.GridResSlider = New System.Windows.Forms.TrackBar()
+        Me.GridResLabel = New System.Windows.Forms.Label()
         Me.TempSliderLabel = New System.Windows.Forms.Label()
         Me.DebugSlider = New System.Windows.Forms.TrackBar()
         Me.Label11 = New System.Windows.Forms.Label()
@@ -80,6 +83,7 @@ Partial Class OptionsGlobal
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
+        CType(Me.GridResSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -95,6 +99,9 @@ Partial Class OptionsGlobal
         '
         'MinMaxDepth
         '
+        Me.MinMaxDepth.Controls.Add(Me.GridResAmt)
+        Me.MinMaxDepth.Controls.Add(Me.GridResSlider)
+        Me.MinMaxDepth.Controls.Add(Me.GridResLabel)
         Me.MinMaxDepth.Controls.Add(Me.TempSliderLabel)
         Me.MinMaxDepth.Controls.Add(Me.DebugSlider)
         Me.MinMaxDepth.Controls.Add(Me.Label11)
@@ -116,15 +123,45 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.InrangeMaxLabel)
         Me.MinMaxDepth.Location = New System.Drawing.Point(12, 49)
         Me.MinMaxDepth.Name = "MinMaxDepth"
-        Me.MinMaxDepth.Size = New System.Drawing.Size(840, 609)
+        Me.MinMaxDepth.Size = New System.Drawing.Size(811, 609)
         Me.MinMaxDepth.TabIndex = 0
         Me.MinMaxDepth.TabStop = False
         Me.MinMaxDepth.Text = "Global Sliders"
         '
+        'GridResAmt
+        '
+        Me.GridResAmt.AutoSize = True
+        Me.GridResAmt.Location = New System.Drawing.Point(695, 167)
+        Me.GridResAmt.Name = "GridResAmt"
+        Me.GridResAmt.Size = New System.Drawing.Size(40, 20)
+        Me.GridResAmt.TabIndex = 59
+        Me.GridResAmt.Text = "Size"
+        '
+        'GridResSlider
+        '
+        Me.GridResSlider.Location = New System.Drawing.Point(185, 167)
+        Me.GridResSlider.Maximum = 300
+        Me.GridResSlider.Minimum = 2
+        Me.GridResSlider.Name = "GridResSlider"
+        Me.GridResSlider.Size = New System.Drawing.Size(506, 69)
+        Me.GridResSlider.TabIndex = 58
+        Me.GridResSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.GridResSlider.Value = 3
+        '
+        'GridResLabel
+        '
+        Me.GridResLabel.AutoSize = True
+        Me.GridResLabel.Location = New System.Drawing.Point(25, 167)
+        Me.GridResLabel.Name = "GridResLabel"
+        Me.GridResLabel.Size = New System.Drawing.Size(137, 20)
+        Me.GridResLabel.TabIndex = 57
+        Me.GridResLabel.Text = "Grid Resolution %"
+        Me.GridResLabel.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
         'TempSliderLabel
         '
         Me.TempSliderLabel.AutoSize = True
-        Me.TempSliderLabel.Location = New System.Drawing.Point(723, 511)
+        Me.TempSliderLabel.Location = New System.Drawing.Point(695, 515)
         Me.TempSliderLabel.Name = "TempSliderLabel"
         Me.TempSliderLabel.Size = New System.Drawing.Size(99, 20)
         Me.TempSliderLabel.TabIndex = 56
@@ -132,7 +169,7 @@ Partial Class OptionsGlobal
         '
         'DebugSlider
         '
-        Me.DebugSlider.Location = New System.Drawing.Point(212, 511)
+        Me.DebugSlider.Location = New System.Drawing.Point(185, 515)
         Me.DebugSlider.Maximum = 100
         Me.DebugSlider.Minimum = -100
         Me.DebugSlider.Name = "DebugSlider"
@@ -142,7 +179,7 @@ Partial Class OptionsGlobal
         '
         'Label11
         '
-        Me.Label11.Location = New System.Drawing.Point(56, 511)
+        Me.Label11.Location = New System.Drawing.Point(26, 515)
         Me.Label11.Name = "Label11"
         Me.Label11.Size = New System.Drawing.Size(136, 55)
         Me.Label11.TabIndex = 54
@@ -152,7 +189,7 @@ Partial Class OptionsGlobal
         'fHist
         '
         Me.fHist.AutoSize = True
-        Me.fHist.Location = New System.Drawing.Point(723, 265)
+        Me.fHist.Location = New System.Drawing.Point(696, 374)
         Me.fHist.Name = "fHist"
         Me.fHist.Size = New System.Drawing.Size(47, 20)
         Me.fHist.TabIndex = 53
@@ -160,7 +197,7 @@ Partial Class OptionsGlobal
         '
         'FrameHistory
         '
-        Me.FrameHistory.Location = New System.Drawing.Point(212, 265)
+        Me.FrameHistory.Location = New System.Drawing.Point(185, 374)
         Me.FrameHistory.Maximum = 30
         Me.FrameHistory.Minimum = 1
         Me.FrameHistory.Name = "FrameHistory"
@@ -171,7 +208,7 @@ Partial Class OptionsGlobal
         '
         'Label12
         '
-        Me.Label12.Location = New System.Drawing.Point(56, 265)
+        Me.Label12.Location = New System.Drawing.Point(26, 374)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(136, 55)
         Me.Label12.TabIndex = 51
@@ -181,7 +218,7 @@ Partial Class OptionsGlobal
         'PixelDiff
         '
         Me.PixelDiff.AutoSize = True
-        Me.PixelDiff.Location = New System.Drawing.Point(723, 203)
+        Me.PixelDiff.Location = New System.Drawing.Point(695, 305)
         Me.PixelDiff.Name = "PixelDiff"
         Me.PixelDiff.Size = New System.Drawing.Size(59, 20)
         Me.PixelDiff.TabIndex = 50
@@ -189,7 +226,7 @@ Partial Class OptionsGlobal
         '
         'PixelDiffBar
         '
-        Me.PixelDiffBar.Location = New System.Drawing.Point(212, 203)
+        Me.PixelDiffBar.Location = New System.Drawing.Point(185, 305)
         Me.PixelDiffBar.Maximum = 50
         Me.PixelDiffBar.Name = "PixelDiffBar"
         Me.PixelDiffBar.Size = New System.Drawing.Size(506, 69)
@@ -199,7 +236,7 @@ Partial Class OptionsGlobal
         '
         'Label7
         '
-        Me.Label7.Location = New System.Drawing.Point(56, 203)
+        Me.Label7.Location = New System.Drawing.Point(26, 284)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(136, 55)
         Me.Label7.TabIndex = 48
@@ -208,7 +245,7 @@ Partial Class OptionsGlobal
         '
         'DebugCheckBox
         '
-        Me.DebugCheckBox.Location = New System.Drawing.Point(104, 574)
+        Me.DebugCheckBox.Location = New System.Drawing.Point(49, 449)
         Me.DebugCheckBox.Name = "DebugCheckBox"
         Me.DebugCheckBox.Size = New System.Drawing.Size(658, 35)
         Me.DebugCheckBox.TabIndex = 56
@@ -218,7 +255,7 @@ Partial Class OptionsGlobal
         'labelBinsCount
         '
         Me.labelBinsCount.AutoSize = True
-        Me.labelBinsCount.Location = New System.Drawing.Point(723, 142)
+        Me.labelBinsCount.Location = New System.Drawing.Point(695, 236)
         Me.labelBinsCount.Name = "labelBinsCount"
         Me.labelBinsCount.Size = New System.Drawing.Size(68, 20)
         Me.labelBinsCount.TabIndex = 44
@@ -226,7 +263,7 @@ Partial Class OptionsGlobal
         '
         'HistBinBar
         '
-        Me.HistBinBar.Location = New System.Drawing.Point(212, 142)
+        Me.HistBinBar.Location = New System.Drawing.Point(185, 236)
         Me.HistBinBar.Maximum = 1000
         Me.HistBinBar.Minimum = 3
         Me.HistBinBar.Name = "HistBinBar"
@@ -238,7 +275,7 @@ Partial Class OptionsGlobal
         'labelbins
         '
         Me.labelbins.AutoSize = True
-        Me.labelbins.Location = New System.Drawing.Point(76, 142)
+        Me.labelbins.Location = New System.Drawing.Point(45, 231)
         Me.labelbins.Name = "labelbins"
         Me.labelbins.Size = New System.Drawing.Size(117, 20)
         Me.labelbins.TabIndex = 42
@@ -248,7 +285,7 @@ Partial Class OptionsGlobal
         'ThreadGridSize
         '
         Me.ThreadGridSize.AutoSize = True
-        Me.ThreadGridSize.Location = New System.Drawing.Point(723, 82)
+        Me.ThreadGridSize.Location = New System.Drawing.Point(696, 99)
         Me.ThreadGridSize.Name = "ThreadGridSize"
         Me.ThreadGridSize.Size = New System.Drawing.Size(40, 20)
         Me.ThreadGridSize.TabIndex = 32
@@ -256,7 +293,7 @@ Partial Class OptionsGlobal
         '
         'GridSlider
         '
-        Me.GridSlider.Location = New System.Drawing.Point(212, 82)
+        Me.GridSlider.Location = New System.Drawing.Point(185, 98)
         Me.GridSlider.Maximum = 300
         Me.GridSlider.Minimum = 2
         Me.GridSlider.Name = "GridSlider"
@@ -268,17 +305,17 @@ Partial Class OptionsGlobal
         'Label9
         '
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(76, 82)
+        Me.Label9.Location = New System.Drawing.Point(11, 99)
         Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(130, 20)
+        Me.Label9.Size = New System.Drawing.Size(151, 20)
         Me.Label9.TabIndex = 30
-        Me.Label9.Text = "Grid Square Size"
+        Me.Label9.Text = "Gridgid Square Size"
         Me.Label9.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'maxCount
         '
         Me.maxCount.AutoSize = True
-        Me.maxCount.Location = New System.Drawing.Point(723, 35)
+        Me.maxCount.Location = New System.Drawing.Point(695, 35)
         Me.maxCount.Name = "maxCount"
         Me.maxCount.Size = New System.Drawing.Size(81, 20)
         Me.maxCount.TabIndex = 5
@@ -286,7 +323,7 @@ Partial Class OptionsGlobal
         '
         'MaxDepthBar
         '
-        Me.MaxDepthBar.Location = New System.Drawing.Point(212, 29)
+        Me.MaxDepthBar.Location = New System.Drawing.Point(185, 29)
         Me.MaxDepthBar.Maximum = 25
         Me.MaxDepthBar.Minimum = 1
         Me.MaxDepthBar.Name = "MaxDepthBar"
@@ -298,7 +335,7 @@ Partial Class OptionsGlobal
         'InrangeMaxLabel
         '
         Me.InrangeMaxLabel.AutoSize = True
-        Me.InrangeMaxLabel.Location = New System.Drawing.Point(64, 35)
+        Me.InrangeMaxLabel.Location = New System.Drawing.Point(13, 35)
         Me.InrangeMaxLabel.Name = "InrangeMaxLabel"
         Me.InrangeMaxLabel.Size = New System.Drawing.Size(149, 20)
         Me.InrangeMaxLabel.TabIndex = 3
@@ -330,7 +367,7 @@ Partial Class OptionsGlobal
         Me.GroupBox2.Controls.Add(Me.displayDst0)
         Me.GroupBox2.Controls.Add(Me.GeometrySettings)
         Me.GroupBox2.Controls.Add(Me.UseKalman)
-        Me.GroupBox2.Location = New System.Drawing.Point(854, 49)
+        Me.GroupBox2.Location = New System.Drawing.Point(829, 49)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(838, 609)
         Me.GroupBox2.TabIndex = 3
@@ -715,6 +752,7 @@ Partial Class OptionsGlobal
         Me.Text = "All Algorithm Options - Use gOptions variable to access"
         Me.MinMaxDepth.ResumeLayout(False)
         Me.MinMaxDepth.PerformLayout()
+        CType(Me.GridResSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).EndInit()
@@ -791,4 +829,7 @@ Partial Class OptionsGlobal
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
     Friend WithEvents UseReliableDepth As Windows.Forms.CheckBox
+    Friend WithEvents GridResAmt As Windows.Forms.Label
+    Friend WithEvents GridResSlider As Windows.Forms.TrackBar
+    Friend WithEvents GridResLabel As Windows.Forms.Label
 End Class
