@@ -299,6 +299,7 @@ End Class
 
 
 
+
 Public Class Artifact_Edges : Inherits VB_Parent
     Public feat As New Artifact_Features
     Dim edges As New Edge_Basics

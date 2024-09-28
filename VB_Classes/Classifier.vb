@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 
-Public Class Classifier_Basics : Inherits VB_Parent
+Public Class Classifier_Basics_CPP_VB : Inherits VB_Parent
     Dim options As New Options_Classifier
     Public Sub New()
         cPtr = OEX_Points_Classifier_Open()

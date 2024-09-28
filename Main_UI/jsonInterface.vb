@@ -67,7 +67,7 @@ Namespace jsonClass
             Dim emptyApp As New ApplicationStorage
             emptyApp.cameraName = ""
             emptyApp.cameraIndex = 0
-            emptyApp.WorkingRes = New cvb.Size(320, 240)
+            emptyApp.WorkingRes = New cvb.Size(320, 180)
             emptyApp.snap640 = True
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False

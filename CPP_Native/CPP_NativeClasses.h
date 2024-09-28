@@ -2946,6 +2946,38 @@ public:
 
 
 
+
+class Random_Enumerable_CC : public CPP_Parent {
+public:
+    int sizeRequest = 100;
+    Rect range;
+    vector<Point2f> pointList;
+
+    Random_Enumerable_CC() : CPP_Parent() {
+        desc = "Create an enumerable list of points using a lambda function";
+    }
+
+    void Run(Mat src) {
+        random_device rd;
+        mt19937 gen(rd());  // Mersenne Twister engine for randomness
+        uniform_int_distribution<> dist_width(0, dst2.cols - 1);  // Ensure width is within bounds
+        uniform_int_distribution<> dist_height(0, dst2.rows - 1); // Ensure height is within bounds
+
+        pointList.clear();
+        for (int i = 0; i < sizeRequest; i++) {
+            pointList.push_back(Point2f(dist_width(gen), dist_height(gen)));
+        }
+
+        dst2 = Mat::zeros(dst2.size(), dst2.type());  // Set dst2 to black
+        for (const Point2f& pt : pointList) {
+            circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
+        }
+    }
+};
+
+
+
+
 class OEX_PointsClassifier
 {
 private:
@@ -2977,10 +3009,13 @@ public:
                 inputPoints.at<float>(index++) = pt.y;
             }
         }
-        Random_Basics_CC* random = new Random_Basics_CC();
+        Random_Enumerable_CC* random = new Random_Enumerable_CC();
         random->sizeRequest = count;
 
         random->range = Rect(0, 0, cols * 3 / 4, rows * 3 / 4);
+        random->dst2 = Mat(rows, cols, CV_8UC3);
+        task = new cppTask(rows, cols);
+        task->DotSize = 1;
         random->Run(Mat());
 
         trainedPoints = random->pointList;
@@ -3165,6 +3200,7 @@ public:
 
     }
 };
+
 extern "C" __declspec(dllexport)
 OEX_PointsClassifier* OEX_Points_Classifier_Open() {
     OEX_PointsClassifier* cPtr = new OEX_PointsClassifier();
@@ -4043,35 +4079,6 @@ public:
 
 
 
-class Random_Enumerable_CC : public CPP_Parent {
-public:
-    int sizeRequest = 100;
-    vector<Point2f> points;
-
-    Random_Enumerable_CC() : CPP_Parent() {
-        desc = "Create an enumerable list of points using a lambda function";
-    }
-
-    void Run(Mat src) {
-        random_device rd;
-        mt19937 gen(rd());  // Mersenne Twister engine for randomness
-        uniform_int_distribution<> dist_width(0, dst2.cols - 1);  // Ensure width is within bounds
-        uniform_int_distribution<> dist_height(0, dst2.rows - 1); // Ensure height is within bounds
-
-        points.clear();
-        for (int i = 0; i < sizeRequest; i++) {
-            points.push_back(Point2f(dist_width(gen), dist_height(gen)));
-        }
-
-        dst2 = Mat::zeros(dst2.size(), dst2.type());  // Set dst2 to black
-        for (const Point2f& pt : points) {
-            circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
-        }
-    }
-};
-
-
-
 
 
 
@@ -4092,12 +4099,12 @@ public:
     }
     void randomInput(cv::Mat src) {
         randEnum->Run(src);
-        inputPoints = randEnum->points;
+        inputPoints = randEnum->pointList;
     }
     void Run(cv::Mat src) {
         if (task->heartBeat && standalone) {
             randEnum->Run(src);
-            inputPoints = randEnum->points;
+            inputPoints = randEnum->pointList;
             dst3 = randEnum->dst2;
         }
         subdiv.initDelaunay(cv::Rect(0, 0, dst2.cols, dst2.rows));

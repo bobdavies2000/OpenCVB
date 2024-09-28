@@ -447,7 +447,7 @@ End Enum
 	If algorithmName = "CellularAutomata_LifePopulation_CS" Then return new CellularAutomata_LifePopulation_CS
 	If algorithmName = "CellularAutomata_MultiPoint" Then return new CellularAutomata_MultiPoint
 	If algorithmName = "CellularAutomata_MultiPoint_CS" Then return new CellularAutomata_MultiPoint_CS
-	If algorithmName = "Classifier_Basics" Then return new Classifier_Basics
+	If algorithmName = "Classifier_Basics_CPP_VB" Then return new Classifier_Basics_CPP_VB
 	If algorithmName = "Classifier_Basics_CS" Then return new Classifier_Basics_CS
 	If algorithmName = "Classifier_Bayesian" Then return new Classifier_Bayesian
 	If algorithmName = "Classifier_Bayesian_CS" Then return new Classifier_Bayesian_CS

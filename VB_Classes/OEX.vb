@@ -447,7 +447,7 @@ End Class
 
 
 Public Class OEX_Points_Classifier : Inherits VB_Parent
-    Dim basics As New Classifier_Basics
+    Dim basics As New Classifier_Basics_CPP_VB
     Public Sub New()
         desc = "OpenCV Example Points_Classifier became Classifier_Basics"
     End Sub

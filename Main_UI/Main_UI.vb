@@ -141,12 +141,11 @@ Public Class Main_UI
 
         cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
         With settings
-            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True}) ' Zed and Mynt updated below if supported
+            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True}) ' Mynt support updated below
             .camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True})
             .camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
             Dim sr = New StreamReader(defines.FullName)
-            If Trim(sr.ReadLine).StartsWith("//#define STEREOLAB_INSTALLED") = False Then .cameraSupported(4) = True
             If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then .cameraSupported(5) = True
             sr.Close()
 

@@ -42333,9 +42333,10 @@ namespace CS_Classes
 
     public class OEX_Points_Classifier_CS : VB_Parent
     {
-        Classifier_Basics basics = new Classifier_Basics();
+        Classifier_Basics_CS basics;
         public OEX_Points_Classifier_CS()
         {
+            basics = new Classifier_Basics_CS();
             desc = "OpenCV Example Points_Classifier became Classifier_Basics";
         }
         public void RunAlg(Mat src)
