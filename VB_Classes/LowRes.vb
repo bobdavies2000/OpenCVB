@@ -15,11 +15,11 @@ Public Class LowRes_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        Dim pct = options.resizePercent
-        dst = src.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
+        dst = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
         dst2 = dst.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
 
-        dstDepth = task.depthRGB.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
+        dstDepth = task.depthRGB.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height),
+                                        0, 0, options.warpFlag)
         dst3 = dstDepth.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
 
         mapCells.Run(dst2)
@@ -42,8 +42,7 @@ Public Class LowRes_Map : Inherits VB_Parent
         If standaloneTest() Then
             Static options As New Options_Resize
             options.RunOpt()
-            Dim pct = options.resizePercent
-            dst3 = src.Resize(New cvb.Size(pct * src.Width, pct * src.Height), 0, 0, options.warpFlag)
+            dst3 = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
             dst2 = dst3.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
         End If
 

@@ -54855,7 +54855,8 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            newSize = new cv.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
+            newSize = new cv.Size((int)Math.Ceiling(src.Width * vbc.task.lowResPercent), 
+                                  (int)Math.Ceiling(src.Height * vbc.task.lowResPercent));
             dst2 = src.Resize(newSize, 0, 0, options.warpFlag);
             labels[2] = "Image after resizing to: " + newSize.Width + "X" + newSize.Height;
         }
@@ -54878,7 +54879,8 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            newSize = new cv.Size((int)Math.Ceiling(src.Width * options.resizePercent), (int)Math.Ceiling(src.Height * options.resizePercent));
+            newSize = new cv.Size((int)Math.Ceiling(src.Width * vbc.task.lowResPercent), 
+                                  (int)Math.Ceiling(src.Height * vbc.task.lowResPercent));
             dst0 = src.Resize(newSize, 0, 0, InterpolationFlags.Nearest).SetTo(0);
             var rect = new cv.Rect(options.topLeftOffset, options.topLeftOffset, dst2.Width, dst2.Height);
             src.CopyTo(dst0[rect]);

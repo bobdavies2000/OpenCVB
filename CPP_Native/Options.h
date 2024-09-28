@@ -120,7 +120,6 @@ class Options_Resize {
 public:
 	cv::InterpolationFlags warpFlag =  cv::InterpolationFlags::INTER_NEAREST;
 	int radioIndex =  0;
-	double resizePercent =  0.05;
 	int topLeftOffset =  10;
 	void RunOpt() {}
 	Options_Resize() {

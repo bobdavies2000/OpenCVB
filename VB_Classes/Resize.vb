@@ -34,7 +34,7 @@ Public Class Resize_Smaller : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         Options.RunOpt()
 
-        newSize = New cvb.Size(Math.Ceiling(src.Width * options.resizePercent), Math.Ceiling(src.Height * options.resizePercent))
+        newSize = New cvb.Size(Math.Ceiling(src.Width * task.lowResPercent), Math.Ceiling(src.Height * task.lowResPercent))
 
         dst2 = src.Resize(newSize, 0, 0, options.warpFlag)
         labels(2) = "Image after resizing to: " + CStr(newSize.Width) + "X" + CStr(newSize.Height)
@@ -58,7 +58,7 @@ Public Class Resize_Preserve : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Options.RunOpt()
-        newSize = New cvb.Size(Math.Ceiling(src.Width * options.resizePercent), Math.Ceiling(src.Height * options.resizePercent))
+        newSize = New cvb.Size(Math.Ceiling(src.Width * task.lowResPercent), Math.Ceiling(src.Height * task.lowResPercent))
 
         dst0 = src.Resize(newSize, cvb.InterpolationFlags.Nearest).SetTo(0)
 

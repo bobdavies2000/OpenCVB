@@ -430,7 +430,6 @@ End Class
 Public Class Options_Resize : Inherits VB_Parent
     Public warpFlag As cvb.InterpolationFlags = cvb.InterpolationFlags.Nearest
     Public radioIndex As Integer = 0
-    Public resizePercent As Double = 0.05
     Public topLeftOffset As Integer = 10
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -444,14 +443,11 @@ Public Class Options_Resize : Inherits VB_Parent
             radio.check(4).Checked = True
         End If
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Resize Percentage (%)", 1, 100, resizePercent * 100)
             sliders.setupTrackBar("Offset from top left corner", 1, 50, topLeftOffset)
         End If
     End Sub
     Public Sub RunOpt()
-        Static percentSlider = FindSlider("Resize Percentage (%)")
         Static offsetSlider = FindSlider("Offset from top left corner")
-        resizePercent = percentSlider.Value / 100
         topLeftOffset = offsetSlider.Value
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1

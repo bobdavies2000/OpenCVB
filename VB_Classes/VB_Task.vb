@@ -7,6 +7,13 @@ Imports System.Runtime.InteropServices
 
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
+    Public artifactMap As cvb.Mat
+    Public artifactRects As New List(Of cvb.Rect)
+    Public FeatureRects As New List(Of cvb.Rect)
+    Public FeaturelessRects As New List(Of cvb.Rect)
+    Public artifactMask As New cvb.Mat
+    Public lowResPercent As Single
+
     Public optionsChanged As Boolean ' global or local options changed.
     Public rows As Integer
     Public cols As Integer
@@ -150,12 +157,6 @@ Public Class VBtask : Implements IDisposable
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridROIclicked As Integer
 
-    Public artifactMap As cvb.Mat
-    Public artifactRects As New List(Of cvb.Rect)
-    Public FeatureRects As New List(Of cvb.Rect)
-    Public FeaturelessRects As New List(Of cvb.Rect)
-    Public artifactMask As New cvb.Mat
-
     Public gOptions As OptionsGlobal
     Public redOptions As OptionsRedCloud
 
@@ -190,7 +191,6 @@ Public Class VBtask : Implements IDisposable
     Public intermediateObject As VB_Parent
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
-
 
     Public scalarColors(255) As cvb.Scalar
     Public vecColors(255) As cvb.Vec3b
@@ -232,7 +232,6 @@ Public Class VBtask : Implements IDisposable
     Public OpenGLTitle As String
     Public oglRect As cvb.Rect
     Public polyCount As Integer
-
 
     Public rangesTop() As cvb.Rangef
     Public rangesSide() As cvb.Rangef

@@ -23,9 +23,9 @@ Partial Class OptionsGlobal
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.MinMaxDepth = New System.Windows.Forms.GroupBox()
-        Me.GridResAmt = New System.Windows.Forms.Label()
-        Me.GridResSlider = New System.Windows.Forms.TrackBar()
-        Me.GridResLabel = New System.Windows.Forms.Label()
+        Me.LowResLabel = New System.Windows.Forms.Label()
+        Me.LowResSlider = New System.Windows.Forms.TrackBar()
+        Me.LowRes = New System.Windows.Forms.Label()
         Me.TempSliderLabel = New System.Windows.Forms.Label()
         Me.DebugSlider = New System.Windows.Forms.TrackBar()
         Me.Label11 = New System.Windows.Forms.Label()
@@ -83,7 +83,7 @@ Partial Class OptionsGlobal
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
-        CType(Me.GridResSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.LowResSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -99,9 +99,9 @@ Partial Class OptionsGlobal
         '
         'MinMaxDepth
         '
-        Me.MinMaxDepth.Controls.Add(Me.GridResAmt)
-        Me.MinMaxDepth.Controls.Add(Me.GridResSlider)
-        Me.MinMaxDepth.Controls.Add(Me.GridResLabel)
+        Me.MinMaxDepth.Controls.Add(Me.LowResLabel)
+        Me.MinMaxDepth.Controls.Add(Me.LowResSlider)
+        Me.MinMaxDepth.Controls.Add(Me.LowRes)
         Me.MinMaxDepth.Controls.Add(Me.TempSliderLabel)
         Me.MinMaxDepth.Controls.Add(Me.DebugSlider)
         Me.MinMaxDepth.Controls.Add(Me.Label11)
@@ -128,35 +128,35 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.TabStop = False
         Me.MinMaxDepth.Text = "Global Sliders"
         '
-        'GridResAmt
+        'LowResLabel
         '
-        Me.GridResAmt.AutoSize = True
-        Me.GridResAmt.Location = New System.Drawing.Point(695, 167)
-        Me.GridResAmt.Name = "GridResAmt"
-        Me.GridResAmt.Size = New System.Drawing.Size(40, 20)
-        Me.GridResAmt.TabIndex = 59
-        Me.GridResAmt.Text = "Size"
+        Me.LowResLabel.AutoSize = True
+        Me.LowResLabel.Location = New System.Drawing.Point(695, 167)
+        Me.LowResLabel.Name = "LowResLabel"
+        Me.LowResLabel.Size = New System.Drawing.Size(40, 20)
+        Me.LowResLabel.TabIndex = 59
+        Me.LowResLabel.Text = "Size"
         '
-        'GridResSlider
+        'LowResSlider
         '
-        Me.GridResSlider.Location = New System.Drawing.Point(185, 167)
-        Me.GridResSlider.Maximum = 300
-        Me.GridResSlider.Minimum = 2
-        Me.GridResSlider.Name = "GridResSlider"
-        Me.GridResSlider.Size = New System.Drawing.Size(506, 69)
-        Me.GridResSlider.TabIndex = 58
-        Me.GridResSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.GridResSlider.Value = 3
+        Me.LowResSlider.Location = New System.Drawing.Point(185, 167)
+        Me.LowResSlider.Maximum = 300
+        Me.LowResSlider.Minimum = 2
+        Me.LowResSlider.Name = "LowResSlider"
+        Me.LowResSlider.Size = New System.Drawing.Size(506, 69)
+        Me.LowResSlider.TabIndex = 58
+        Me.LowResSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.LowResSlider.Value = 5
         '
-        'GridResLabel
+        'LowRes
         '
-        Me.GridResLabel.AutoSize = True
-        Me.GridResLabel.Location = New System.Drawing.Point(25, 167)
-        Me.GridResLabel.Name = "GridResLabel"
-        Me.GridResLabel.Size = New System.Drawing.Size(137, 20)
-        Me.GridResLabel.TabIndex = 57
-        Me.GridResLabel.Text = "Grid Resolution %"
-        Me.GridResLabel.TextAlign = System.Drawing.ContentAlignment.TopRight
+        Me.LowRes.AutoSize = True
+        Me.LowRes.Location = New System.Drawing.Point(77, 167)
+        Me.LowRes.Name = "LowRes"
+        Me.LowRes.Size = New System.Drawing.Size(85, 20)
+        Me.LowRes.TabIndex = 57
+        Me.LowRes.Text = "LowRes %"
+        Me.LowRes.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'TempSliderLabel
         '
@@ -752,7 +752,7 @@ Partial Class OptionsGlobal
         Me.Text = "All Algorithm Options - Use gOptions variable to access"
         Me.MinMaxDepth.ResumeLayout(False)
         Me.MinMaxDepth.PerformLayout()
-        CType(Me.GridResSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.LowResSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).EndInit()
@@ -829,7 +829,7 @@ Partial Class OptionsGlobal
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
     Friend WithEvents UseReliableDepth As Windows.Forms.CheckBox
-    Friend WithEvents GridResAmt As Windows.Forms.Label
-    Friend WithEvents GridResSlider As Windows.Forms.TrackBar
-    Friend WithEvents GridResLabel As Windows.Forms.Label
+    Friend WithEvents LowResLabel As Windows.Forms.Label
+    Friend WithEvents LowResSlider As Windows.Forms.TrackBar
+    Friend WithEvents LowRes As Windows.Forms.Label
 End Class
