@@ -31,7 +31,7 @@ End Class
 
 
 Public Class LowRes_Map : Inherits VB_Parent
-    Dim flood As New Grid_Basics
+    Dim lowGrid As New Grid_Basics
     Public Sub New()
         labels(3) = "Cell Map - CV_32S"
         desc = "Map the individual pixels in the lowRes image to the full size image."
@@ -42,16 +42,16 @@ Public Class LowRes_Map : Inherits VB_Parent
             options.RunOpt()
             dst3 = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
             dst2 = dst3.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
+            src = dst2
         End If
 
         If task.optionsChanged Then
-            flood.Run(src)
-            dst3 = flood.dst2
+            lowGrid.Run(src)
+            dst3 = lowGrid.dst2
             task.lowGridMap = dst3
-            task.lowRects = New List(Of cvb.Rect)(flood.rectList)
-            task.lowGridMask = flood.dst3
+            task.lowGridMask = lowGrid.dst3
         End If
-        labels(2) = "There were " + CStr(flood.count) + " cells found"
+        labels(2) = "There were " + CStr(task.lowRects.Count) + " cells found"
     End Sub
 End Class
 
@@ -108,7 +108,7 @@ Public Class LowRes_Features : Inherits VB_Parent
             Next
         End If
         If standaloneTest() Then
-            If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.lowGridMask)
+            dst2.SetTo(cvb.Scalar.White, task.lowGridMask)
 
             dst3.SetTo(0)
             For Each r In featureRects

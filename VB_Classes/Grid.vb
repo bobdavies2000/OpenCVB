@@ -1,7 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Grid_Basics : Inherits VB_Parent
     Public count As Integer
-    Public rectList As New List(Of cvb.Rect)
     Public rectGrid As New cvb.Mat
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S)
@@ -12,29 +11,29 @@ Public Class Grid_Basics : Inherits VB_Parent
         If src.Channels <> 3 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
         count = 0
-        rectList.Clear()
+        task.lowRects.Clear()
         For y = 0 To dst2.Height - 1
             Dim val = src.Get(Of cvb.Vec3b)(y, 0)
-            Dim rectStart As Integer = rectList.Count
-            Dim rectindex As Integer = rectList.Count
+            Dim rectStart As Integer = task.lowRects.Count
+            Dim rectindex As Integer = task.lowRects.Count
             Dim lastX As Integer = 0
-            rectList.Add(New cvb.Rect(0, y, 0, 0))
+            task.lowRects.Add(New cvb.Rect(0, y, 0, 0))
             For x = 0 To dst2.Width - 1
                 Dim vec = src.Get(Of cvb.Vec3b)(y, x)
                 If vec <> val Then
-                    Dim r = rectList(rectindex)
+                    Dim r = task.lowRects(rectindex)
                     r.Width += x - lastX
-                    rectList(rectindex) = r
+                    task.lowRects(rectindex) = r
                     rectindex += 1
                     lastX = x
 
                     val = vec
                     count += 1
-                    rectList.Add(New cvb.Rect(x, y, 0, 0))
+                    task.lowRects.Add(New cvb.Rect(x, y, 0, 0))
                 End If
             Next
-            Dim rlast = rectList(rectList.Count - 1)
-            rectList(rectList.Count - 1) = New cvb.Rect(rlast.X, rlast.Y, dst2.Width - lastX, rlast.Height)
+            Dim rlast = task.lowRects(task.lowRects.Count - 1)
+            task.lowRects(task.lowRects.Count - 1) = New cvb.Rect(rlast.X, rlast.Y, dst2.Width - lastX, rlast.Height)
 
             Dim i = y + 1
             For i = y + 1 To dst2.Height - 1
@@ -42,17 +41,17 @@ Public Class Grid_Basics : Inherits VB_Parent
                 If tmp.CountNonZero Then Exit For
             Next
             count += 1
-            For j = rectStart To rectList.Count - 1
-                Dim r = rectList(j)
-                rectList(j) = New cvb.Rect(r.X, r.Y, r.Width, i - y)
+            For j = rectStart To task.lowRects.Count - 1
+                Dim r = task.lowRects(j)
+                task.lowRects(j) = New cvb.Rect(r.X, r.Y, r.Width, i - y)
             Next
             y = i - 1
         Next
 
         dst2.SetTo(0)
         dst3.SetTo(0)
-        For i = 0 To rectList.Count - 1
-            Dim r = rectList(i)
+        For i = 0 To task.lowRects.Count - 1
+            Dim r = task.lowRects(i)
             dst2.Rectangle(r, i, -1)
             dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
         Next
