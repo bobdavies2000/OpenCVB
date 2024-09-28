@@ -9,8 +9,9 @@ Imports System.Runtime.InteropServices
 Public Class VBtask : Implements IDisposable
     Public lowGridMap As cvb.Mat
     Public lowRects As New List(Of cvb.Rect)
-    Public lowFeatureRects As New List(Of cvb.Rect)
-    Public lowFeatureLess As New List(Of cvb.Rect)
+    Public featureRects As New List(Of cvb.Rect)
+    Public fLessRects As New List(Of cvb.Rect)
+    Public ptPixel As New List(Of cvb.Point)
     Public lowGridMask As New cvb.Mat
     Public lowResPercent As Single
     Public lowResColor As cvb.Mat

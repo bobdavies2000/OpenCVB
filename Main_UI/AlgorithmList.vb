@@ -1965,7 +1965,9 @@ End Enum
 	If algorithmName = "LongLine_Point" Then return new LongLine_Point
 	If algorithmName = "LongLine_Point_CS" Then return new LongLine_Point_CS
 	If algorithmName = "LowRes_Basics" Then return new LowRes_Basics
+	If algorithmName = "LowRes_Core" Then return new LowRes_Core
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
+	If algorithmName = "LowRes_FeatureLess" Then return new LowRes_FeatureLess
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
 	If algorithmName = "LowRes_Map" Then return new LowRes_Map
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics

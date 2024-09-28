@@ -146,7 +146,7 @@ Partial Class OptionsGlobal
         Me.LowResSlider.Size = New System.Drawing.Size(506, 69)
         Me.LowResSlider.TabIndex = 58
         Me.LowResSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.LowResSlider.Value = 5
+        Me.LowResSlider.Value = 10
         '
         'LowRes
         '

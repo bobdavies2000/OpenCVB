@@ -21,8 +21,26 @@ Public Class LowRes_Basics : Inherits VB_Parent
         dst3 = task.lowResDepth.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
 
         mapCells.Run(dst2)
+        labels(2) = "There were " + CStr(task.lowRects.Count) + " cells found"
     End Sub
 End Class
+
+
+
+
+
+Public Class LowRes_Core : Inherits VB_Parent
+    Dim options As New Options_Resize
+    Public Sub New()
+        desc = "The bare minimum needed to make the LowRes image."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst3 = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
+        dst2 = dst3.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
+    End Sub
+End Class
+
 
 
 
@@ -33,25 +51,21 @@ End Class
 Public Class LowRes_Map : Inherits VB_Parent
     Dim lowGrid As New Grid_Basics
     Public Sub New()
-        labels(3) = "Cell Map - CV_32S"
+        labels(2) = "Palettized version of task.lowGridMap - a map to translate points to grid rectangles."
         desc = "Map the individual pixels in the lowRes image to the full size image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            Static options As New Options_Resize
-            options.RunOpt()
-            dst3 = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
-            dst2 = dst3.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
-            src = dst2
+            Static lowCore As New LowRes_Core
+            lowCore.Run(src)
+            src = lowCore.dst2
         End If
 
         If task.optionsChanged Then
             lowGrid.Run(src)
-            dst3 = lowGrid.dst2
-            task.lowGridMap = dst3
-            task.lowGridMask = lowGrid.dst3
+            dst2 = lowGrid.dst2
         End If
-        labels(2) = "There were " + CStr(task.lowRects.Count) + " cells found"
+        SetTrueText("There were " + CStr(task.lowRects.Count) + " cells found", 3)
     End Sub
 End Class
 
@@ -79,13 +93,13 @@ Public Class LowRes_Features : Inherits VB_Parent
         Dim gridCounts As New List(Of Integer)
 
         task.featurePoints.Clear()
-        Dim featureRects As New List(Of cvb.Rect)
+        Dim rects As New List(Of cvb.Rect)
         For Each pt In task.features
             Dim tile = task.lowGridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim test = gridIndex.IndexOf(tile)
             If test < 0 Then
                 Dim r = task.lowRects(tile)
-                featureRects.Add(r)
+                rects.Add(r)
                 gridIndex.Add(tile)
                 gridCounts.Add(1)
                 Dim p1 = New cvb.Point(r.X, r.Y)
@@ -96,10 +110,10 @@ Public Class LowRes_Features : Inherits VB_Parent
             End If
         Next
 
-        task.lowFeatureRects.Clear()
-        task.lowFeatureLess.Clear()
+        task.featureRects.Clear()
+        task.fLessRects.Clear()
         For Each r In task.lowRects
-            If featureRects.Contains(r) Then task.lowFeatureRects.Add(r) Else task.lowFeatureLess.Add(r)
+            If rects.Contains(r) Then task.featureRects.Add(r) Else task.fLessRects.Add(r)
         Next
 
         If task.gOptions.debugChecked Then
@@ -108,15 +122,15 @@ Public Class LowRes_Features : Inherits VB_Parent
             Next
         End If
         If standaloneTest() Then
-            dst2.SetTo(cvb.Scalar.White, task.lowGridMask)
-
             dst3.SetTo(0)
-            For Each r In featureRects
+            For Each r In rects
                 dst3.Rectangle(r, cvb.Scalar.White, -1)
             Next
             dst3 = Not dst3
         End If
-        labels(2) = CStr(task.lowFeatureRects.Count) + " cells had features while " + CStr(task.lowFeatureLess.Count) + " had none"
+        If task.heartBeat Then
+            labels(2) = CStr(task.featureRects.Count) + " cells had features while " + CStr(task.fLessRects.Count) + " had none"
+        End If
     End Sub
 End Class
 
@@ -127,7 +141,7 @@ End Class
 
 
 Public Class LowRes_Edges : Inherits VB_Parent
-    Public feat As New LowRes_Features
+    Public lowRes As New LowRes_Basics
     Dim edges As New Edge_Basics
     Public Sub New()
         FindRadio("Depth Region Boundaries").Enabled = False
@@ -136,27 +150,56 @@ Public Class LowRes_Edges : Inherits VB_Parent
         desc = "Add edges to features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2.Clone
-        If task.heartBeat Then labels(2) = feat.labels(2)
+        lowRes.Run(src)
+        dst2 = lowRes.dst2.Clone
+        If task.heartBeat Then labels(2) = lowRes.labels(2)
 
         edges.Run(src)
         dst2.SetTo(cvb.Scalar.Black, edges.dst2)
 
-        Dim newFless As New List(Of cvb.Rect)
+        task.featureRects.Clear()
+        task.fLessRects.Clear()
         dst1.SetTo(0)
-        For Each r In task.lowFeatureLess
-            Dim test = edges.dst2(r).CountNonZero
-            If test > 0 Then
-                task.lowFeatureRects.Add(r)
-                ' DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
-            Else
-                newFless.Add(r)
+        For Each r In task.lowRects
+            If edges.dst2(r).CountNonZero = 0 Then
+                task.fLessRects.Add(r)
                 dst1(r).SetTo(255)
+            Else
+                task.featureRects.Add(r)
+                DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
             End If
         Next
 
         dst3.SetTo(0)
         src.CopyTo(dst3, dst1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class LowRes_FeatureLess : Inherits VB_Parent
+    Dim feat As New LowRes_Edges
+    Public Sub New()
+        task.gOptions.setDisplay1()
+        desc = "Use ML to isolate featureless pixels."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.optionsChanged Then
+
+        End If
+        feat.Run(src)
+        dst2 = feat.dst2
+        dst1 = feat.dst3
+
+        dst3 = task.lowResColor.Clone
+        dst3.SetTo(0)
+        For Each r In task.fLessRects
+            Dim index = task.lowGridMap.Get(Of Integer)(r.Y, r.X)
+            Dim pt = task.ptPixel(index)
+            Dim vec = task.lowResColor.Get(Of cvb.Vec3b)(pt.Y, pt.X)
+            dst3.Set(Of cvb.Vec3b)(pt.Y, pt.X, vec)
+        Next
     End Sub
 End Class
