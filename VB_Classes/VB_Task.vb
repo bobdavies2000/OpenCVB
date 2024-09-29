@@ -494,10 +494,10 @@ Public Class VBtask : Implements IDisposable
     Private Sub postProcess(src As cvb.Mat)
         Try
             ' make sure that any outputs from the algorithm are the right size.nearest
-            If dst0.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) And dst0.Width > 0 Then dst0 = dst0.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), 0, 0, cvb.InterpolationFlags.Nearest)
-            If dst1.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) And dst1.Width > 0 Then dst1 = dst1.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), 0, 0, cvb.InterpolationFlags.Nearest)
-            If dst2.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) And dst2.Width > 0 Then dst2 = dst2.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), 0, 0, cvb.InterpolationFlags.Nearest)
-            If dst3.Size <> New cvb.Size(task.dst2.Width, task.dst2.Height) And dst3.Width > 0 Then dst3 = dst3.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height), 0, 0, cvb.InterpolationFlags.Nearest)
+            If dst0.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst0.Width > 0 Then dst0 = dst0.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
+            If dst1.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst1.Width > 0 Then dst1 = dst1.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
+            If dst2.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst2.Width > 0 Then dst2 = dst2.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
+            If dst3.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst3.Width > 0 Then dst3 = dst3.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
 
             If task.pixelViewerOn Then
                 If task.intermediateObject IsNot Nothing Then

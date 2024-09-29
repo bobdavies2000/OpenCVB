@@ -1,4 +1,5 @@
-﻿Imports MS.Internal
+﻿Imports System.Drawing
+Imports MS.Internal
 Imports cvb = OpenCvSharp
 
 Public Class LowRes_Basics : Inherits VB_Parent
@@ -179,19 +180,29 @@ End Class
 
 
 
-Public Class LowRes_FeatureLess : Inherits VB_Parent
+Public Class LowRes_PixelPrep : Inherits VB_Parent
     Dim feat As New LowRes_Edges
+    Public featurePixels As New List(Of cvb.Vec3b)
+    Public pixelDepth As New List(Of Single)
+
+    Public fLessPixels As New List(Of cvb.Vec3b)
     Public Sub New()
+        task.gOptions.setDisplay0()
         task.gOptions.setDisplay1()
-        desc = "Use ML to isolate featureless pixels."
+        desc = "Isolate featureless pixels from those with features for use with ML (in another algorithm)."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.optionsChanged Then
 
         End If
         feat.Run(src)
-        dst2 = feat.dst2
+        dst0 = feat.dst2
         dst1 = feat.dst3
+
+        pixelDepth = New List(Of Single)
+        For Each r In task.lowRects
+            pixelDepth.Add(task.pcSplit(2).Get(Of Single)(r.Y, r.X))
+        Next
 
         dst3 = task.lowResColor.Clone
         dst3.SetTo(0)
@@ -199,11 +210,78 @@ Public Class LowRes_FeatureLess : Inherits VB_Parent
             Dim index = task.lowGridMap.Get(Of Integer)(r.Y, r.X)
             Dim pt = task.ptPixel(index)
             Dim vec = task.lowResColor.Get(Of cvb.Vec3b)(pt.Y, pt.X)
+            fLessPixels.Add(vec)
             dst3.Set(Of cvb.Vec3b)(pt.Y, pt.X, vec)
         Next
+
+        dst2 = task.lowResColor.Clone
+        dst2.SetTo(0)
+        For Each r In task.featureRects
+            Dim index = task.lowGridMap.Get(Of Integer)(r.Y, r.X)
+            Dim pt = task.ptPixel(index)
+            Dim vec = task.lowResColor.Get(Of cvb.Vec3b)(pt.Y, pt.X)
+            featurePixels.Add(vec)
+            dst2.Set(Of cvb.Vec3b)(pt.Y, pt.X, vec)
+        Next
+
         If task.heartBeat Then
             labels(2) = CStr(task.featureRects.Count) + " cells with features were found"
             labels(3) = CStr(task.fLessRects.Count) + " cells without features were found"
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LowRes_MLpixels : Inherits VB_Parent
+    Dim mlPrep As New LowRes_PixelPrep
+    Public Sub New()
+        desc = "Train an ML tree to predict each pixel of the full size image"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        mlPrep.Run(src)
+        dst2 = mlPrep.dst2
+        dst3 = mlPrep.dst3
+
+        'Dim mlInput As New List(Of cvb.Vec6f)
+        'Dim mResponse As New List(Of Single)
+
+        'Dim index As Integer
+        'For y = 0 To mlPrep.dst2.Height - 1
+        '    For x = 0 To mlPrep.dst2.Width - 1
+        '        Dim response As Integer = 1
+        '        Dim vec = mlPrep.featurePixels(index)
+        '        If vec(0) = 0 And vec(1) = 0 And vec(2) = 0 Then
+        '            vec = mlPrep.fLessPixels(index)
+        '            response = 2
+        '        End If
+        '        Dim vec6 = New cvb.Vec6f(CSng(vec(0)), CSng(vec(1)), CSng(vec(2)), CSng(x), CSng(y), mlPrep.pixelDepth(index))
+        '        mlInput.Add(vec6)
+        '        mResponse.Add(response)
+        '    Next
+        'Next
+
+        'Dim rtree = cvb.ML.RTrees.Create()
+        'Dim mLearn As cvb.Mat = cvb.Mat.FromPixelData(mlInput.Count, 3, cvb.MatType.CV_32F, mlInput.ToArray)
+        'Dim responseMat As cvb.Mat = cvb.Mat.FromPixelData(mResponse.Count, 1, cvb.MatType.CV_32F, mResponse.ToArray)
+        'rtree.Train(mLearn, cvb.ML.SampleTypes.RowSample, responseMat)
+
+        'Dim predMat = cvb.Mat.FromPixelData(ptList.Count, 3, cvb.MatType.CV_32F, ptList.ToArray)
+        'Dim output = New cvb.Mat(ptList.Count, 1, cvb.MatType.CV_32FC1, cvb.Scalar.All(0))
+        'rtree.Predict(predMat, output)
+
+        'regions.mats.mat(0).CopyTo(dst2)
+        'dst3.SetTo(0)
+        'For i = 0 To ptList.Count - 1
+        '    Dim pt = ptList(i)
+        '    Dim regionID = CInt(output.Get(Of Single)(i, 0))
+        '    Dim rc = regions.xCells(regionID)
+        '    dst2.Set(Of cvb.Vec3b)(pt.Y, pt.X, rc.naturalColor)
+        '    dst3.Set(Of cvb.Vec3b)(pt.Y, pt.X, rc.naturalColor)
+        'Next
     End Sub
 End Class
