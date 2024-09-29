@@ -201,5 +201,9 @@ Public Class LowRes_FeatureLess : Inherits VB_Parent
             Dim vec = task.lowResColor.Get(Of cvb.Vec3b)(pt.Y, pt.X)
             dst3.Set(Of cvb.Vec3b)(pt.Y, pt.X, vec)
         Next
+        If task.heartBeat Then
+            labels(2) = CStr(task.featureRects.Count) + " cells with features were found"
+            labels(3) = CStr(task.fLessRects.Count) + " cells without features were found"
+        End If
     End Sub
 End Class
