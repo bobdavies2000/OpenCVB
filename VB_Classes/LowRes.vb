@@ -1,5 +1,4 @@
-﻿Imports System.Drawing
-Imports MS.Internal
+﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 
 Public Class LowRes_Basics : Inherits VB_Parent
@@ -8,7 +7,8 @@ Public Class LowRes_Basics : Inherits VB_Parent
     Public Sub New()
         FindRadio("WarpFillOutliers").Enabled = False
         FindRadio("WarpInverseMap").Enabled = False
-        labels(3) = "Low resolution version of the depthRGB image."
+        FindRadio("Area").Checked = True
+        labels(3) = "Low resolution version of the depth data."
         desc = "Build the low-res image and accompanying map, rect list, and mask."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -17,8 +17,8 @@ Public Class LowRes_Basics : Inherits VB_Parent
         task.lowResColor = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
         dst2 = task.lowResColor.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
 
-        task.lowResDepth = task.depthRGB.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height),
-                                                0, 0, options.warpFlag)
+        task.lowResDepth = task.pcSplit(2).Resize(New cvb.Size(task.lowResPercent * src.Width,
+                                                               task.lowResPercent * src.Height), 0, 0, options.warpFlag)
         dst3 = task.lowResDepth.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
 
         mapCells.Run(dst2)
@@ -33,6 +33,7 @@ End Class
 Public Class LowRes_Core : Inherits VB_Parent
     Dim options As New Options_Resize
     Public Sub New()
+        FindRadio("Area").Checked = True
         desc = "The bare minimum needed to make the LowRes image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -144,6 +145,8 @@ End Class
 Public Class LowRes_Edges : Inherits VB_Parent
     Public lowRes As New LowRes_Basics
     Dim edges As New Edge_Basics
+    Public lowResMap As New cvb.Mat
+    Public featureCellCount As Integer
     Public Sub New()
         FindRadio("Depth Region Boundaries").Enabled = False
         dst1 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
@@ -153,7 +156,6 @@ Public Class LowRes_Edges : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         lowRes.Run(src)
         dst2 = lowRes.dst2.Clone
-        If task.heartBeat Then labels(2) = lowRes.labels(2)
 
         edges.Run(src)
         dst2.SetTo(cvb.Scalar.Black, edges.dst2)
@@ -161,18 +163,29 @@ Public Class LowRes_Edges : Inherits VB_Parent
         task.featureRects.Clear()
         task.fLessRects.Clear()
         dst1.SetTo(0)
+        Dim flist As New List(Of Single)
         For Each r In task.lowRects
             If edges.dst2(r).CountNonZero = 0 Then
                 task.fLessRects.Add(r)
                 dst1(r).SetTo(255)
+                flist.Add(0)
             Else
                 task.featureRects.Add(r)
                 DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
+                flist.Add(1)
             End If
         Next
 
+        lowResMap = cvb.Mat.FromPixelData(task.lowResColor.Width, task.lowResColor.Height,
+                                          cvb.MatType.CV_32F, flist.ToArray)
+
         dst3.SetTo(0)
         src.CopyTo(dst3, dst1)
+        If task.heartBeat Then
+            featureCellCount = lowResMap.CountNonZero
+            labels(2) = CStr(featureCellCount) + " cells with features were found"
+            labels(3) = CStr(task.lowRects.Count - featureCellCount) + " cells without features were found"
+        End If
     End Sub
 End Class
 
@@ -180,54 +193,68 @@ End Class
 
 
 
-Public Class LowRes_PixelPrep : Inherits VB_Parent
+Public Class LowRes_MLDepth : Inherits VB_Parent
     Dim feat As New LowRes_Edges
-    Public featurePixels As New List(Of cvb.Vec3b)
-    Public pixelDepth As New List(Of Single)
-
-    Public fLessPixels As New List(Of cvb.Vec3b)
+    Dim indexLowRes As New cvb.Mat
+    Dim indexHighRes As New cvb.Mat
     Public Sub New()
-        task.gOptions.setDisplay0()
-        task.gOptions.setDisplay1()
-        desc = "Isolate featureless pixels from those with features for use with ML (in another algorithm)."
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
+        desc = "Train an ML tree to predict each pixel of the full size image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.optionsChanged Then
-
-        End If
         feat.Run(src)
         dst0 = feat.dst2
         dst1 = feat.dst3
 
-        pixelDepth = New List(Of Single)
-        For Each r In task.lowRects
-            pixelDepth.Add(task.pcSplit(2).Get(Of Single)(r.Y, r.X))
-        Next
-
-        dst3 = task.lowResColor.Clone
-        dst3.SetTo(0)
-        For Each r In task.fLessRects
-            Dim index = task.lowGridMap.Get(Of Integer)(r.Y, r.X)
-            Dim pt = task.ptPixel(index)
-            Dim vec = task.lowResColor.Get(Of cvb.Vec3b)(pt.Y, pt.X)
-            fLessPixels.Add(vec)
-            dst3.Set(Of cvb.Vec3b)(pt.Y, pt.X, vec)
-        Next
-
-        dst2 = task.lowResColor.Clone
-        dst2.SetTo(0)
-        For Each r In task.featureRects
-            Dim index = task.lowGridMap.Get(Of Integer)(r.Y, r.X)
-            Dim pt = task.ptPixel(index)
-            Dim vec = task.lowResColor.Get(Of cvb.Vec3b)(pt.Y, pt.X)
-            featurePixels.Add(vec)
-            dst2.Set(Of cvb.Vec3b)(pt.Y, pt.X, vec)
-        Next
-
-        If task.heartBeat Then
-            labels(2) = CStr(task.featureRects.Count) + " cells with features were found"
-            labels(3) = CStr(task.fLessRects.Count) + " cells without features were found"
+        If task.optionsChanged Then
+            indexLowRes = New cvb.Mat(task.lowResColor.Size, cvb.MatType.CV_32FC2)
+            For y = 0 To task.lowResColor.Height - 1
+                For x = 0 To task.lowResColor.Width - 1
+                    indexLowRes.Set(Of cvb.Vec2f)(y, x, New cvb.Vec2f(CSng(x), CSng(y)))
+                Next
+            Next
+            indexHighRes = indexLowRes.Resize(dst2.Size, 0, 0, cvb.InterpolationFlags.Nearest)
         End If
+
+        Dim lowResRGB32f As New cvb.Mat
+        task.lowResColor.ConvertTo(lowResRGB32f, cvb.MatType.CV_32F)
+        Dim trainMat As New cvb.Mat
+        cvb.Cv2.Merge({lowResRGB32f, indexLowRes, task.lowResDepth}, trainMat)
+        trainMat = cvb.Mat.FromPixelData(trainMat.Width * trainMat.Height, 6, cvb.MatType.CV_32F, trainMat.Data)
+
+        Dim rtree = cvb.ML.RTrees.Create()
+        Dim responseMat As cvb.Mat = cvb.Mat.FromPixelData(feat.lowResMap.Total, 1, cvb.MatType.CV_32F,
+                                                           feat.lowResMap.Data)
+        rtree.Train(trainMat, cvb.ML.SampleTypes.RowSample, responseMat)
+
+        Dim rgb32f As New cvb.Mat
+        src.ConvertTo(rgb32f, cvb.MatType.CV_32F)
+
+        Dim testMat As New cvb.Mat
+        cvb.Cv2.Merge({rgb32f, indexHighRes, task.pcSplit(2)}, testMat)
+
+        Dim predictions As New cvb.Mat
+        testMat = cvb.Mat.FromPixelData(testMat.Total, 6, cvb.MatType.CV_32F, testMat.Data)
+        rtree.Predict(testMat, predictions)
+
+
+        Dim samples(predictions.Total - 1) As Single
+        Marshal.Copy(predictions.Data, samples, 0, samples.Length)
+
+
+        Dim fLessMask = predictions.Threshold(0.5, 255, cvb.ThresholdTypes.Binary).
+                                    ConvertScaleAbs.Reshape(1, dst2.Rows)
+        Dim featureMask = predictions.Threshold(0.5, 255, cvb.ThresholdTypes.BinaryInv).
+                                      ConvertScaleAbs.Reshape(1, dst2.Rows)
+
+        fLessMask.SetTo(0, task.noDepthMask)
+        featureMask.SetTo(0, task.noDepthMask)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        src.CopyTo(dst2, featureMask)
+        src.CopyTo(dst3, fLessMask)
     End Sub
 End Class
 
@@ -235,53 +262,67 @@ End Class
 
 
 
-
-
-Public Class LowRes_MLpixels : Inherits VB_Parent
-    Dim mlPrep As New LowRes_PixelPrep
+Public Class LowRes_MLNoDepth : Inherits VB_Parent
+    Dim feat As New LowRes_Edges
+    Dim indexLowRes As New cvb.Mat
+    Dim indexHighRes As New cvb.Mat
     Public Sub New()
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Train an ML tree to predict each pixel of the full size image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        mlPrep.Run(src)
-        dst2 = mlPrep.dst2
-        dst3 = mlPrep.dst3
+        feat.Run(src)
+        dst0 = feat.dst2
+        dst1 = feat.dst3
 
-        'Dim mlInput As New List(Of cvb.Vec6f)
-        'Dim mResponse As New List(Of Single)
+        If task.optionsChanged Then
+            indexLowRes = New cvb.Mat(task.lowResColor.Size, cvb.MatType.CV_32FC2)
+            For y = 0 To task.lowResColor.Height - 1
+                For x = 0 To task.lowResColor.Width - 1
+                    indexLowRes.Set(Of cvb.Vec2f)(y, x, New cvb.Vec2f(CSng(x), CSng(y)))
+                Next
+            Next
+            indexHighRes = indexLowRes.Resize(dst2.Size, 0, 0, cvb.InterpolationFlags.Nearest)
+        End If
 
-        'Dim index As Integer
-        'For y = 0 To mlPrep.dst2.Height - 1
-        '    For x = 0 To mlPrep.dst2.Width - 1
-        '        Dim response As Integer = 1
-        '        Dim vec = mlPrep.featurePixels(index)
-        '        If vec(0) = 0 And vec(1) = 0 And vec(2) = 0 Then
-        '            vec = mlPrep.fLessPixels(index)
-        '            response = 2
-        '        End If
-        '        Dim vec6 = New cvb.Vec6f(CSng(vec(0)), CSng(vec(1)), CSng(vec(2)), CSng(x), CSng(y), mlPrep.pixelDepth(index))
-        '        mlInput.Add(vec6)
-        '        mResponse.Add(response)
-        '    Next
-        'Next
+        Dim lowResRGB32f As New cvb.Mat
+        task.lowResColor.ConvertTo(lowResRGB32f, cvb.MatType.CV_32F)
+        Dim trainMat As New cvb.Mat
+        cvb.Cv2.Merge({lowResRGB32f, indexLowRes, task.lowResDepth}, trainMat)
+        trainMat = cvb.Mat.FromPixelData(trainMat.Width * trainMat.Height, 6, cvb.MatType.CV_32F, trainMat.Data)
 
-        'Dim rtree = cvb.ML.RTrees.Create()
-        'Dim mLearn As cvb.Mat = cvb.Mat.FromPixelData(mlInput.Count, 3, cvb.MatType.CV_32F, mlInput.ToArray)
-        'Dim responseMat As cvb.Mat = cvb.Mat.FromPixelData(mResponse.Count, 1, cvb.MatType.CV_32F, mResponse.ToArray)
-        'rtree.Train(mLearn, cvb.ML.SampleTypes.RowSample, responseMat)
+        Dim rtree = cvb.ML.RTrees.Create()
+        Dim responseMat As cvb.Mat = cvb.Mat.FromPixelData(feat.lowResMap.Total, 1, cvb.MatType.CV_32F,
+                                                           feat.lowResMap.Data)
+        rtree.Train(trainMat, cvb.ML.SampleTypes.RowSample, responseMat)
 
-        'Dim predMat = cvb.Mat.FromPixelData(ptList.Count, 3, cvb.MatType.CV_32F, ptList.ToArray)
-        'Dim output = New cvb.Mat(ptList.Count, 1, cvb.MatType.CV_32FC1, cvb.Scalar.All(0))
-        'rtree.Predict(predMat, output)
+        Dim rgb32f As New cvb.Mat
+        src.ConvertTo(rgb32f, cvb.MatType.CV_32F)
 
-        'regions.mats.mat(0).CopyTo(dst2)
-        'dst3.SetTo(0)
-        'For i = 0 To ptList.Count - 1
-        '    Dim pt = ptList(i)
-        '    Dim regionID = CInt(output.Get(Of Single)(i, 0))
-        '    Dim rc = regions.xCells(regionID)
-        '    dst2.Set(Of cvb.Vec3b)(pt.Y, pt.X, rc.naturalColor)
-        '    dst3.Set(Of cvb.Vec3b)(pt.Y, pt.X, rc.naturalColor)
-        'Next
+        Dim testMat As New cvb.Mat
+        cvb.Cv2.Merge({rgb32f, indexHighRes, task.pcSplit(2)}, testMat)
+
+        Dim predictions As New cvb.Mat
+        testMat = cvb.Mat.FromPixelData(testMat.Total, 6, cvb.MatType.CV_32F, testMat.Data)
+        rtree.Predict(testMat, predictions)
+
+
+        Dim samples(predictions.Total - 1) As Single
+        Marshal.Copy(predictions.Data, samples, 0, samples.Length)
+
+
+        Dim fLessMask = predictions.Threshold(0.5, 255, cvb.ThresholdTypes.Binary).
+                                    ConvertScaleAbs.Reshape(1, dst2.Rows)
+        Dim featureMask = predictions.Threshold(0.5, 255, cvb.ThresholdTypes.BinaryInv).
+                                      ConvertScaleAbs.Reshape(1, dst2.Rows)
+
+        fLessMask.SetTo(0, task.noDepthMask)
+        featureMask.SetTo(0, task.noDepthMask)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        src.CopyTo(dst2, featureMask)
+        src.CopyTo(dst3, fLessMask)
     End Sub
 End Class

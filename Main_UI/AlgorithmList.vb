@@ -1969,8 +1969,8 @@ End Enum
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
 	If algorithmName = "LowRes_Map" Then return new LowRes_Map
-	If algorithmName = "LowRes_MLpixels" Then return new LowRes_MLpixels
-	If algorithmName = "LowRes_PixelPrep" Then return new LowRes_PixelPrep
+	If algorithmName = "LowRes_MLDepth" Then return new LowRes_MLDepth
+	If algorithmName = "LowRes_MLNoDepth" Then return new LowRes_MLNoDepth
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics
 	If algorithmName = "LUT_Basics_CS" Then return new LUT_Basics_CS
 	If algorithmName = "LUT_Create" Then return new LUT_Create
