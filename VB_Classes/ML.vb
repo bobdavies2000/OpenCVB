@@ -1,6 +1,45 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class ML_Basics : Inherits VB_Parent
+Public Class ML_BasicsRTree : Inherits VB_Parent
+    Public trainMats() As cvb.Mat ' all entries are 32FCx
+    Public trainResponse As cvb.Mat ' 32FC1 format
+    Public testMats() As cvb.Mat ' all entries are 32FCx
+    Public predictions As New cvb.Mat
+    Public Sub New()
+        desc = "Simplify the prep for ML data train and test data and run with ML algorithms."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            SetTrueText("ML_BasicsRTree has no output when run standalone.")
+            Exit Sub
+        End If
+        Dim trainMat As New cvb.Mat
+        cvb.Cv2.Merge(trainMats, trainMat)
+
+        Dim varCount As Integer
+        For Each m In trainMats
+            varCount += m.ElemSize / 4 ' how many 32f variables in this Mat?
+        Next
+
+        trainMat = cvb.Mat.FromPixelData(trainMat.Total, varCount, cvb.MatType.CV_32F, trainMat.Data)
+        Dim responseMat = cvb.Mat.FromPixelData(trainMats(0).Total, 1, cvb.MatType.CV_32F, trainResponse.Data)
+
+        Dim rtree = cvb.ML.RTrees.Create()
+        rtree.Train(trainMat, cvb.ML.SampleTypes.RowSample, responseMat)
+
+        Dim testMat As New cvb.Mat
+        cvb.Cv2.Merge(testMats, testMat)
+
+        testMat = cvb.Mat.FromPixelData(testMat.Total, varCount, cvb.MatType.CV_32F, testMat.Data)
+        rtree.Predict(testMat, predictions)
+    End Sub
+End Class
+
+
+
+
+
+Public Class ML_BasicsOld : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
@@ -599,4 +638,3 @@ Public Class ML_LearnRegions : Inherits VB_Parent
         Next
     End Sub
 End Class
-

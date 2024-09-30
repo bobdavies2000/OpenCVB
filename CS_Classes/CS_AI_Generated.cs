@@ -38764,9 +38764,9 @@ namespace CS_Classes
 
 
 
-    public class ML_Basics_CS : VB_Parent
+    public class ML_BasicsOld_CS : VB_Parent
     {
-        public ML_Basics_CS()
+        public ML_BasicsOld_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             labels = new string[] { "", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction" };

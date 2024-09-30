@@ -1970,6 +1970,7 @@ End Enum
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
 	If algorithmName = "LowRes_Map" Then return new LowRes_Map
 	If algorithmName = "LowRes_MLDepth" Then return new LowRes_MLDepth
+	If algorithmName = "LowRes_MLDepth1" Then return new LowRes_MLDepth1
 	If algorithmName = "LowRes_MLNoDepth" Then return new LowRes_MLNoDepth
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics
 	If algorithmName = "LUT_Basics_CS" Then return new LUT_Basics_CS
@@ -2116,8 +2117,9 @@ End Enum
 	If algorithmName = "MiniCloud_RotateAngle_CS" Then return new MiniCloud_RotateAngle_CS
 	If algorithmName = "MiniCloud_RotateSinglePass" Then return new MiniCloud_RotateSinglePass
 	If algorithmName = "MiniCloud_RotateSinglePass_CS" Then return new MiniCloud_RotateSinglePass_CS
-	If algorithmName = "ML_Basics" Then return new ML_Basics
-	If algorithmName = "ML_Basics_CS" Then return new ML_Basics_CS
+	If algorithmName = "ML_BasicsOld" Then return new ML_BasicsOld
+	If algorithmName = "ML_BasicsOld_CS" Then return new ML_BasicsOld_CS
+	If algorithmName = "ML_BasicsRTree" Then return new ML_BasicsRTree
 	If algorithmName = "ML_Color2Depth" Then return new ML_Color2Depth
 	If algorithmName = "ML_Color2Depth_CS" Then return new ML_Color2Depth_CS
 	If algorithmName = "ML_ColorInTier2Depth" Then return new ML_ColorInTier2Depth
