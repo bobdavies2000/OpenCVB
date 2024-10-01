@@ -749,7 +749,8 @@ Public Class KNN_ClosestLine : Inherits VB_Parent
         If lastP1 = New cvb.Point2f Then
             SetTrueText("KNN_ClosestLine is only run with other KNN algorithms" + vbCrLf +
                         "lastP1 and lastP2 need to be initialized by the other algorithm." + vbCrLf +
-                        "Initialize with a pair of points to track a line. ", 3)
+                        "Initialize with a pair of points to track a line. " + vbCrLf +
+                        "Use KNN_ClosestVertical to test this algorithm.", 3)
             Exit Sub
         End If
 

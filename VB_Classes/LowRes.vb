@@ -53,7 +53,7 @@ End Class
 Public Class LowRes_Map : Inherits VB_Parent
     Dim lowGrid As New Grid_Basics
     Public Sub New()
-        labels(2) = "Palettized version of task.lowGridMap - a map to translate points to grid rectangles."
+        labels(2) = "Palettized version of task.lrGridMap - a map to translate points to grid rectangles."
         desc = "Map the individual pixels in the lowRes image to the full size image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -97,7 +97,7 @@ Public Class LowRes_Features : Inherits VB_Parent
         task.featurePoints.Clear()
         Dim rects As New List(Of cvb.Rect)
         For Each pt In task.features
-            Dim tile = task.lowGridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim tile = task.lrGridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim test = gridIndex.IndexOf(tile)
             If test < 0 Then
                 Dim r = task.lowRects(tile)
@@ -294,5 +294,26 @@ Public Class LowRes_MLDepth : Inherits VB_Parent
         src.CopyTo(dst3, fLessMask)
         labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
                   " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
+    End Sub
+End Class
+
+
+
+
+Public Class LowRes_Mesh : Inherits VB_Parent
+    Dim feat As New LowRes_Edges
+    Public Sub New()
+        desc = "Find every non-featureless cell next to a featureless cell."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        feat.Run(src)
+        dst2 = feat.dst2
+
+        Dim boundary As New List(Of cvb.Rect)
+        For i = 0 To task.lowRects.Count - 2
+            Dim r1 = task.lowRects(i)
+            Dim r2 = task.lowRects(i + 1)
+            Dim v1 = task.lowResColor.Get(Of cvb.Vec3b)
+        Next
     End Sub
 End Class

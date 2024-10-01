@@ -1969,6 +1969,7 @@ End Enum
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
 	If algorithmName = "LowRes_Map" Then return new LowRes_Map
+	If algorithmName = "LowRes_Mesh" Then return new LowRes_Mesh
 	If algorithmName = "LowRes_MLDepth" Then return new LowRes_MLDepth
 	If algorithmName = "LowRes_MLNoDepth" Then return new LowRes_MLNoDepth
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics
@@ -2119,7 +2120,6 @@ End Enum
 	If algorithmName = "ML_Basics" Then return new ML_Basics
 	If algorithmName = "ML_BasicsOld" Then return new ML_BasicsOld
 	If algorithmName = "ML_BasicsOld_CS" Then return new ML_BasicsOld_CS
-	If algorithmName = "ML_BasicsRTree" Then return new ML_BasicsRTree
 	If algorithmName = "ML_Color2Depth" Then return new ML_Color2Depth
 	If algorithmName = "ML_Color2Depth_CS" Then return new ML_Color2Depth_CS
 	If algorithmName = "ML_ColorInTier2Depth" Then return new ML_ColorInTier2Depth
