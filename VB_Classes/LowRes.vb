@@ -229,6 +229,7 @@ Public Class LowRes_MLNoDepth : Inherits VB_Parent
         ml.testMats = {rgb32f, indexHighRes}
         ml.Run(empty)
 
+
         Dim fLessMask = ml.predictions.Threshold(1.5, 255, cvb.ThresholdTypes.Binary).
                                        ConvertScaleAbs.Reshape(1, dst2.Rows)
         Dim featureMask = ml.predictions.Threshold(1.5, 255, cvb.ThresholdTypes.BinaryInv).

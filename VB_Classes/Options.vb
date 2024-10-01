@@ -7662,6 +7662,8 @@ Public Class Options_Edge_Basics : Inherits VB_Parent
     Public Sub RunOpt()
         Static frm = FindFrm(traceName + " Radio Buttons")
         edgeSelection = frm.check(findRadioIndex(frm.check)).text
+
+        If task.frameCount < 100 Or task.optionsChanged Then frm.left = task.gOptions.Width / 2
     End Sub
 End Class
 
@@ -7768,5 +7770,6 @@ Public Class Options_ML : Inherits VB_Parent
         Static frm = FindFrm(traceName + " Radio Buttons")
         ML_Selection = findRadioIndex(frm.check)
         ML_Name = frm.check(ML_Selection).Text
+        If task.frameCount < 100 Or task.optionsChanged Then frm.left = task.gOptions.Width / 2 + 10
     End Sub
 End Class

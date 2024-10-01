@@ -1,5 +1,8 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
+Imports OpenCvSharp.ML.ANN_MLP
+Imports OpenCvSharp.ML
 Public Class ML_Basics : Inherits VB_Parent
     Public trainMats() As cvb.Mat ' all entries are 32FCx
     Public trainResponse As cvb.Mat ' 32FC1 format
@@ -30,35 +33,94 @@ Public Class ML_Basics : Inherits VB_Parent
         Dim responseMat = cvb.Mat.FromPixelData(trainMats(0).Total, 1, cvb.MatType.CV_32F, trainResponse.Data)
 
         Static classifier As Object
-        Static saveMLName As String
-        If saveMLName <> options.ML_Name Then
-            saveMLName = options.ML_Name
+        Dim respFormat = cvb.MatType.CV_32F
+        If task.heartBeat Then
             Select Case options.ML_Name
                 Case "NormalBayesClassifier"
                     classifier = cvb.ML.NormalBayesClassifier.Create()
+                    respFormat = cvb.MatType.CV_32S
                 Case "KNearest"
                     classifier = cvb.ML.KNearest.Create()
+                    classifier.DefaultK = 15
+                    classifier.IsClassifier = True
                 Case "SVM"
                     classifier = cvb.ML.SVM.Create()
+                    classifier.C = 1
+                    classifier.TermCriteria = cvb.TermCriteria.Both(1000, 0.01)
+                    classifier.P = 0
+                    classifier.Nu = 0.5
+                    classifier.Coef0 = 1
+                    classifier.Gamma = 1
+                    classifier.Degree = 0.5
+                    classifier.KernelType = SVM.KernelTypes.Poly
+                    classifier.Type = SVM.Types.CSvc
+                    respFormat = cvb.MatType.CV_32S
                 Case "DTrees"
                     classifier = cvb.ML.DTrees.Create()
+                    classifier.CVFolds = 0
+                    classifier.TruncatePrunedTree = False
+                    classifier.UseSurrogates = False
+                    classifier.MinSampleCount = 2
+                    classifier.MaxDepth = 8
+                    classifier.Use1SERule = False
                 Case "Boost"
                     classifier = cvb.ML.Boost.Create()
-                Case "ANN_MLP"
+                    respFormat = cvb.MatType.CV_32S
+                    classifier.BoostType = Boost.Types.Discrete
+                    classifier.WeakCount = 100
+                    classifier.WeightTrimRate = 0.95
+                    classifier.MaxDepth = 2
+                    classifier.UseSurrogates = False
+                    classifier.Priors = New cvb.Mat()
+
+                Case "ANN_MLP" ' artificial neural net with multi-layer perceptron
                     classifier = cvb.ML.ANN_MLP.Create()
+
+                    ' input layer, hidden layer, output layer
+                    classifier.SetLayerSizes(cvb.Mat.FromPixelData(1, 3, cvb.MatType.CV_32SC1, {varCount, 5, 1}))
+
+                    classifier.SetActivationFunction(cvb.ML.ANN_MLP.ActivationFunctions.SigmoidSym, 1, 1)
+                    classifier.TermCriteria = cvb.TermCriteria.Both(1000, 0.000001)
+                    classifier.SetTrainMethod(cvb.ML.ANN_MLP.TrainingMethods.BackProp, 0.1, 0.1)
                 Case "LogisticRegression"
                     classifier = cvb.ML.LogisticRegression.Create()
                 Case Else
-                    classifier = cvb.ML.RTrees.Create()
-            End Select
-        End If
-        classifier.Train(trainMat, cvb.ML.SampleTypes.RowSample, responseMat)
+                    '    RF-> setMaxDepth(4);
+                    'RF-> setMinSampleCount(2);
+                    'RF-> setRegressionAccuracy(0.f);
+                    'RF-> setUseSurrogates(False);
+                    'RF-> setMaxCategories(16);
+                    'RF-> setPriors(Mat());
+                    'RF-> setCalculateVarImportance(False);
+                    'RF-> setActiveVarCount(1);
+                    'RF-> setTermCriteria(TermCriteria(TermCriteria: MAX_ITER, 5, 0));
+                    'RF-> Train(trainInput);
 
+                    classifier = cvb.ML.RTrees.Create()
+                    classifier.MinSampleCount = 2
+                    classifier.MaxDepth = 4
+                    classifier.RegressionAccuracy = 0.0
+                    classifier.UseSurrogates = False
+                    classifier.MaxCategories = 16
+                    classifier.Priors = New cvb.Mat
+                    classifier.CalculateVarImportance = False
+                    classifier.ActiveVarCount = varCount
+                    classifier.TermCriteria = cvb.TermCriteria.Both(5, 0)
+            End Select
+
+            If responseMat.Type <> respFormat Then responseMat.ConvertTo(responseMat, respFormat)
+
+            classifier.Train(trainMat, cvb.ML.SampleTypes.RowSample, responseMat)
+        End If
         Dim testMat As New cvb.Mat
         cvb.Cv2.Merge(testMats, testMat)
 
         testMat = cvb.Mat.FromPixelData(testMat.Total, varCount, cvb.MatType.CV_32F, testMat.Data)
         classifier.Predict(testMat, predictions)
+
+        If predictions.Type <> cvb.MatType.CV_32F Then
+            predictions.ConvertTo(predictions, cvb.MatType.CV_32F)
+        End If
     End Sub
 End Class
 
@@ -249,13 +311,6 @@ Module ML__Exports
         Return depth32f
     End Function
 End Module
-
-
-
-
-
-
-
 Public Class ML_FillRGBDepth_MT : Inherits VB_Parent
     Dim shadow As New Depth_Holes
     Dim colorizer As New Depth_Colorizer_CPP_VB
