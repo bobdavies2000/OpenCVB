@@ -18,13 +18,15 @@ Public Class Edge_Basics : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        Static frm = FindFrm("Options_Edge_Basics Radio Buttons")
-        If frm.left <> task.gOptions.Width / 2 Then frm.left = task.gOptions.Width / 2
-
-        If task.FirstPass Then
-            Dim frmRadio = FindFrm("Options_Edge_Basics Radio Buttons")
-            frmRadio.Left = task.gOptions.Width / 2
+        If task.optionsChanged Then
+            Static frm = FindFrm("Options_Edge_Basics Radio Buttons")
+            If frm.left <> task.gOptions.Width / 2 Then frm.left = task.gOptions.Width / 2
         End If
+
+        'If task.FirstPass Then
+        '    Dim frmRadio = FindFrm("Options_Edge_Basics Radio Buttons")
+        '    frmRadio.Left = task.gOptions.Width / 2
+        'End If
 
         Select Case options.edgeSelection
             Case "Canny"

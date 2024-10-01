@@ -193,76 +193,12 @@ End Class
 
 
 
-Public Class LowRes_MLDepth1 : Inherits VB_Parent
-    Dim feat As New LowRes_Edges
-    Dim indexLowRes As New cvb.Mat
-    Dim indexHighRes As New cvb.Mat
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
-        If standalone Then task.gOptions.setDisplay1()
-        desc = "Train an ML tree to predict each pixel of the full size image using color, position, and depth"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        dst0 = feat.dst2
-        dst1 = feat.dst3
-
-        If task.optionsChanged Then
-            indexLowRes = New cvb.Mat(task.lowResColor.Size, cvb.MatType.CV_32FC2)
-            For y = 0 To task.lowResColor.Height - 1
-                For x = 0 To task.lowResColor.Width - 1
-                    indexLowRes.Set(Of cvb.Vec2f)(y, x, New cvb.Vec2f(CSng(x), CSng(y)))
-                Next
-            Next
-            indexHighRes = indexLowRes.Resize(dst2.Size, 0, 0, cvb.InterpolationFlags.Nearest)
-        End If
-
-        Dim lowResRGB32f As New cvb.Mat
-        task.lowResColor.ConvertTo(lowResRGB32f, cvb.MatType.CV_32F)
-        Dim trainMat As New cvb.Mat
-        cvb.Cv2.Merge({lowResRGB32f, indexLowRes, task.lowResDepth}, trainMat)
-        trainMat = cvb.Mat.FromPixelData(trainMat.Total, 6, cvb.MatType.CV_32F, trainMat.Data)
-
-        Dim rtree = cvb.ML.RTrees.Create()
-        Dim responseMat As cvb.Mat = cvb.Mat.FromPixelData(feat.lowResMap.Total, 1, cvb.MatType.CV_32F,
-                                                           feat.lowResMap.Data)
-        rtree.Train(trainMat, cvb.ML.SampleTypes.RowSample, responseMat)
-
-        Dim rgb32f As New cvb.Mat
-        src.ConvertTo(rgb32f, cvb.MatType.CV_32F)
-
-        Dim testMat As New cvb.Mat
-        cvb.Cv2.Merge({rgb32f, indexHighRes, task.pcSplit(2)}, testMat)
-
-        Dim predictions As New cvb.Mat
-        testMat = cvb.Mat.FromPixelData(testMat.Total, 6, cvb.MatType.CV_32F, testMat.Data)
-        rtree.Predict(testMat, predictions)
-
-        Dim fLessMask = predictions.Threshold(1.5, 255, cvb.ThresholdTypes.Binary).
-                                    ConvertScaleAbs.Reshape(1, dst2.Rows)
-        Dim featureMask = predictions.Threshold(1.5, 255, cvb.ThresholdTypes.BinaryInv).
-                                      ConvertScaleAbs.Reshape(1, dst2.Rows)
-
-        fLessMask.SetTo(0, task.noDepthMask)
-        featureMask.SetTo(0, task.noDepthMask)
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-
-        src.CopyTo(dst2, featureMask)
-        src.CopyTo(dst3, fLessMask)
-    End Sub
-End Class
-
-
-
-
 
 Public Class LowRes_MLNoDepth : Inherits VB_Parent
     Dim feat As New LowRes_Edges
     Dim indexLowRes As New cvb.Mat
     Dim indexHighRes As New cvb.Mat
-    Dim ml As New ML_BasicsRTree
+    Dim ml As New ML_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
@@ -302,7 +238,8 @@ Public Class LowRes_MLNoDepth : Inherits VB_Parent
 
         src.CopyTo(dst2, featureMask)
         src.CopyTo(dst3, fLessMask)
-        labels = {"Src image with edges.", "Src featureless regions", "Regions with features", "Featureless regions"}
+        labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
+                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
     End Sub
 End Class
 
@@ -314,7 +251,7 @@ Public Class LowRes_MLDepth : Inherits VB_Parent
     Dim feat As New LowRes_Edges
     Dim indexLowRes As New cvb.Mat
     Dim indexHighRes As New cvb.Mat
-    Dim ml As New ML_BasicsRTree
+    Dim ml As New ML_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
@@ -354,6 +291,7 @@ Public Class LowRes_MLDepth : Inherits VB_Parent
 
         src.CopyTo(dst2, featureMask)
         src.CopyTo(dst3, fLessMask)
-        labels = {"Src image with edges.", "Src featureless regions", "Regions with features", "Featureless regions"}
+        labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
+                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
     End Sub
 End Class

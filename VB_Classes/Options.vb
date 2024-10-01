@@ -7742,3 +7742,31 @@ Public Class Options_BP_Regions : Inherits VB_Parent
         cellCount = countSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_ML : Inherits VB_Parent
+    Public ML_Selection As Integer
+    Public ML_Name As String
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("ANN_MLP")
+            radio.addRadio("Boost")
+            radio.addRadio("DTrees")
+            radio.addRadio("KNearest")
+            radio.addRadio("LogisticRegression")
+            radio.addRadio("NormalBayesClassifier")
+            radio.addRadio("RTrees")
+            radio.addRadio("SVM")
+            radio.check(6).Checked = True
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        ML_Selection = findRadioIndex(frm.check)
+        ML_Name = frm.check(ML_Selection).Text
+    End Sub
+End Class

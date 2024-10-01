@@ -1,5 +1,71 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
+Public Class ML_Basics : Inherits VB_Parent
+    Public trainMats() As cvb.Mat ' all entries are 32FCx
+    Public trainResponse As cvb.Mat ' 32FC1 format
+    Public testMats() As cvb.Mat ' all entries are 32FCx
+    Public predictions As New cvb.Mat
+    Public options As New Options_ML
+    Public Sub New()
+        desc = "Simplify the prep for ML data train and test data and run with ML algorithms."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            SetTrueText("ML_BasicsRTree has no output when run standalone.")
+            Exit Sub
+        End If
+
+        options.RunOpt()
+        labels(2) = "ML algorithm selected is " + options.ML_Name
+
+        Dim trainMat As New cvb.Mat
+        cvb.Cv2.Merge(trainMats, trainMat)
+
+        Dim varCount As Integer
+        For Each m In trainMats
+            varCount += m.ElemSize / 4 ' how many 32f variables in this Mat?
+        Next
+
+        trainMat = cvb.Mat.FromPixelData(trainMat.Total, varCount, cvb.MatType.CV_32F, trainMat.Data)
+        Dim responseMat = cvb.Mat.FromPixelData(trainMats(0).Total, 1, cvb.MatType.CV_32F, trainResponse.Data)
+
+        Static classifier As Object
+        Static saveMLName As String
+        If saveMLName <> options.ML_Name Then
+            saveMLName = options.ML_Name
+            Select Case options.ML_Name
+                Case "NormalBayesClassifier"
+                    classifier = cvb.ML.NormalBayesClassifier.Create()
+                Case "KNearest"
+                    classifier = cvb.ML.KNearest.Create()
+                Case "SVM"
+                    classifier = cvb.ML.SVM.Create()
+                Case "DTrees"
+                    classifier = cvb.ML.DTrees.Create()
+                Case "Boost"
+                    classifier = cvb.ML.Boost.Create()
+                Case "ANN_MLP"
+                    classifier = cvb.ML.ANN_MLP.Create()
+                Case "LogisticRegression"
+                    classifier = cvb.ML.LogisticRegression.Create()
+                Case Else
+                    classifier = cvb.ML.RTrees.Create()
+            End Select
+        End If
+        classifier.Train(trainMat, cvb.ML.SampleTypes.RowSample, responseMat)
+
+        Dim testMat As New cvb.Mat
+        cvb.Cv2.Merge(testMats, testMat)
+
+        testMat = cvb.Mat.FromPixelData(testMat.Total, varCount, cvb.MatType.CV_32F, testMat.Data)
+        classifier.Predict(testMat, predictions)
+    End Sub
+End Class
+
+
+
+
+
 Public Class ML_BasicsRTree : Inherits VB_Parent
     Public trainMats() As cvb.Mat ' all entries are 32FCx
     Public trainResponse As cvb.Mat ' 32FC1 format
