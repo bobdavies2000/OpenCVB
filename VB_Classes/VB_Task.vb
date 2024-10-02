@@ -7,13 +7,14 @@ Imports System.Runtime.InteropServices
 
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public lrGridMap As cvb.Mat
-    Public lowRects As New List(Of cvb.Rect)
+    Public lrFullSizeMap As cvb.Mat
+    Public lrSmallMap As cvb.Mat
+    Public lrRectsByRow As New List(Of List(Of cvb.Rect))
+    Public lrAllRects As New List(Of cvb.Rect)
     Public featureRects As New List(Of cvb.Rect)
     Public fLessRects As New List(Of cvb.Rect)
     Public flessBoundary As New cvb.Mat
-    Public ptPixel As New List(Of cvb.Point)
-    Public lrGridMask As New cvb.Mat
+    Public lrSquares As New cvb.Mat
     Public lowResPercent As Single
     Public lowResColor As cvb.Mat
     Public lowResDepth As cvb.Mat

@@ -141,7 +141,7 @@ Partial Class OptionsGlobal
         '
         Me.LowResSlider.Location = New System.Drawing.Point(185, 167)
         Me.LowResSlider.Maximum = 100
-        Me.LowResSlider.Minimum = 2
+        Me.LowResSlider.Minimum = 1
         Me.LowResSlider.Name = "LowResSlider"
         Me.LowResSlider.Size = New System.Drawing.Size(506, 69)
         Me.LowResSlider.TabIndex = 58

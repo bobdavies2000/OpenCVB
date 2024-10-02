@@ -4,8 +4,8 @@ Public Class Grid_Basics : Inherits VB_Parent
     Public rectGrid As New cvb.Mat
     Public Sub New()
         labels = {"", "", "CV_32S map of lowRes grid", "Palettized version of left image"}
-        task.lrGridMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S)
-        task.lrGridMask = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        task.lrFullSizeMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S)
+        task.lrSquares = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
         desc = "Build the grid using the lowRes image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -17,85 +17,99 @@ Public Class Grid_Basics : Inherits VB_Parent
 
         If src.Channels <> 3 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
-        count = 0
-        task.lowRects.Clear()
-        task.ptPixel.Clear()
-        Dim lrx As Integer, lry As Integer
+        Dim rectsByRow As New List(Of List(Of cvb.Rect))
         For y = 0 To dst2.Height - 1
             Dim val = src.Get(Of cvb.Vec3b)(y, 0)
-            Dim rectStart As Integer = task.lowRects.Count
-            Dim rectindex As Integer = task.lowRects.Count
-            Dim lastX As Integer = 0
-            task.lowRects.Add(New cvb.Rect(0, y, 0, 0))
-            task.ptPixel.Add(New cvb.Point(lrx, lry))
+            Dim rectList = New List(Of cvb.Rect)
+            Dim currRect As cvb.Rect
+            Dim lastX = 0
             For x = 1 To dst2.Width - 1
                 Dim vec = src.Get(Of cvb.Vec3b)(y, x)
                 If vec <> val Then
-                    Dim r = task.lowRects(rectindex)
-                    r.Width += x - lastX
-                    task.lowRects(rectindex) = r
-                    rectindex += 1
+                    currRect = New cvb.Rect(lastX, y, x - lastX, 0)
                     lastX = x
 
                     val = vec
-                    count += 1
-                    task.lowRects.Add(New cvb.Rect(x, y, 0, 0))
-                    lrx += 1
-                    task.ptPixel.Add(New cvb.Point(lrx, lry))
+                    rectList.Add(currRect)
                 End If
             Next
 
-            lrx = 0
-            lry += 1
-
-            Dim rlast = task.lowRects(task.lowRects.Count - 1)
-            task.lowRects(task.lowRects.Count - 1) = New cvb.Rect(rlast.X, rlast.Y, dst2.Width - lastX, rlast.Height)
+            rectList.Add(New cvb.Rect(lastX, y, dst2.Width - lastX, 0))
 
             Dim i = y + 1
-            For i = y + 1 To dst2.Height - 1
-                Dim tmp As cvb.Mat = (src.Row(i - 1) - src.Row(i)).ToMat.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            For i = i To dst2.Height - 1
+                Dim tmp As cvb.Mat = (src.Row(y) - src.Row(i)).ToMat.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
                 If tmp.CountNonZero Then Exit For
             Next
-            count += 1
-            For j = rectStart To task.lowRects.Count - 1
-                Dim r = task.lowRects(j)
-                task.lowRects(j) = New cvb.Rect(r.X, r.Y, r.Width, i - y)
+            For j = 0 To rectList.Count - 1
+                Dim r = rectList(j)
+                r = New cvb.Rect(r.X, r.Y, r.Width, i - y)
+                rectList(j) = r
             Next
+
+            For Each r In rectList
+            Next
+
+            rectsByRow.Add(rectList)
             y = i - 1
         Next
 
-        task.lrGridMap.SetTo(0)
-        task.lrGridMask.SetTo(0)
-        For i = 0 To task.lowRects.Count - 1
-            Dim r = task.lowRects(i)
-            task.lrGridMap.Rectangle(r, i, -1)
-            task.lrGridMask.Rectangle(r, cvb.Scalar.White, task.lineWidth)
+        Dim correctedY As New List(Of List(Of cvb.Rect))
+        For i = 0 To rectsByRow.Count - 1
+            Dim mergeRow As Boolean = False
+            Dim rectlist = rectsByRow(i)
+            For Each r In rectlist
+                If r.Height = 1 Then
+                    mergeRow = True
+                    Exit For ' add this row to the following row
+                End If
+            Next
+
+            If mergeRow Then
+                Dim newRectlist = rectsByRow(i + 1)
+                For j = 0 To newRectlist.Count - 1
+                    Dim r = newRectlist(j)
+                    r = New cvb.Rect(r.X, r.Y - 1, r.Width, r.Height + 1)
+                    newRectlist(j) = r
+                Next
+                correctedY.Add(newRectlist)
+            Else
+                correctedY.Add(rectlist)
+            End If
         Next
-        dst2 = ShowPalette(task.lrGridMap * 255 / task.lowRects.Count)
+
+        task.lrRectsByRow.Clear()
+        For i = 0 To correctedY.Count - 1
+            Dim rectlist = correctedY(i)
+            Dim mergeCol As Boolean = False
+            For j = 0 To rectlist.Count - 1
+                Dim r = rectlist(j)
+                If r.Width = 1 Then
+                    Dim rNew = rectlist(j + 1)
+                    rNew = New cvb.Rect(rNew.X - 1, rNew.Y, rNew.Width + 1, rNew.Height)
+                    rectlist(j) = rNew
+                    mergeCol = True
+                Else
+                    rectlist(j) = r
+                End If
+            Next
+            If mergeCol Then i += 1
+            task.lrRectsByRow.Add(rectlist)
+        Next
+
+        task.lrFullSizeMap.SetTo(0)
+        task.lrSquares.SetTo(0)
+        task.lrAllRects.Clear()
+        For Each rectlist In task.lrRectsByRow
+            For i = 0 To rectlist.Count - 1
+                Dim r = rectlist(i)
+                task.lrFullSizeMap.Rectangle(r, task.lrAllRects.Count, -1)
+                task.lrAllRects.Add(r)
+                task.lrSquares.Rectangle(r, cvb.Scalar.White, task.lineWidth)
+            Next
+        Next
+        dst3 = ShowPalette(task.lrFullSizeMap * 255 / task.lrAllRects.Count)
+        dst2 = task.lrFullSizeMap
+        dst1 = task.lrSquares
     End Sub
 End Class
-
-
-
-'task.flessBoundary = New cvb.Mat(task.color.Size, cvb.MatType.CV_8U, 0)
-'For i = 0 To task.lowRects.Count - 2
-'Dim r1 = task.lowRects(i)
-'Dim r2 = task.lowRects(i + 1)
-'If r2.X < r1.X Then Continue For
-'            Dim v1 = dst1.Get(Of Byte)(r1.Y, r1.X)
-'Dim v2 = dst1.Get(Of Byte)(r2.Y, r2.X)
-'If v1 = 0 And v2 > 0 Then task.flessBoundary(r1).SetTo(255)
-'            If v1 > 0 And v2 = 0 Then task.flessBoundary(r2).SetTo(255)
-'        Next
-
-'For i = 0 To task.lowRects.Count - 2
-'    Dim r1 = task.lowRects(i)
-'    Dim pt =
-'    Dim p1 = New cvb.Point(r.X, r.Y)
-'    Dim p2 = New cvb.Point(r.X, r.Y + r.Height + 1)
-'    If p2.Y >= task.color.Height Then Exit For
-'    Dim v1 = dst1.Get(Of Byte)(p1.Y, p1.X)
-'    Dim v2 = dst1.Get(Of Byte)(p2.Y, p2.X)
-'    If v1 = 0 And v2 > 0 Then task.flessBoundary(r).SetTo(255)
-'    If v1 > 0 And v2 = 0 Then task.flessBoundary(r2).SetTo(255)
-'Next
