@@ -1346,7 +1346,6 @@ End Enum
 	If algorithmName = "Grid_BasicsTest_CS" Then return new Grid_BasicsTest_CS
 	If algorithmName = "Grid_FPS" Then return new Grid_FPS
 	If algorithmName = "Grid_FPS_CS" Then return new Grid_FPS_CS
-	If algorithmName = "Grid_FromResize" Then return new Grid_FromResize
 	If algorithmName = "Grid_List" Then return new Grid_List
 	If algorithmName = "Grid_List_CS" Then return new Grid_List_CS
 	If algorithmName = "Grid_MinMaxDepth" Then return new Grid_MinMaxDepth
@@ -1966,10 +1965,10 @@ End Enum
 	If algorithmName = "LongLine_Point_CS" Then return new LongLine_Point_CS
 	If algorithmName = "LowRes_Basics" Then return new LowRes_Basics
 	If algorithmName = "LowRes_Boundaries" Then return new LowRes_Boundaries
-	If algorithmName = "LowRes_Core" Then return new LowRes_Core
+	If algorithmName = "LowRes_Color" Then return new LowRes_Color
+	If algorithmName = "LowRes_Depth" Then return new LowRes_Depth
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
-	If algorithmName = "LowRes_Map" Then return new LowRes_Map
 	If algorithmName = "LowRes_MLDepth" Then return new LowRes_MLDepth
 	If algorithmName = "LowRes_MLNoDepth" Then return new LowRes_MLNoDepth
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics

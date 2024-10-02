@@ -5157,7 +5157,7 @@ namespace CS_Classes
                 labels[3] = "That combination of channel " + c1 + "/" + c2 + " has " + bpCount +
                             " pixels while image total is " + dst0.Total().ToString("0");
             }
-            SetTrueText("Use Global Algorithm Option 'Gridgid Square Size' to control the 2D backprojection",
+            SetTrueText("Use Global Algorithm Option 'grid Square Size' to control the 2D backprojection",
                         new cv.Point(10, dst3.Height - 20), 3);
         }
     }
@@ -5204,7 +5204,7 @@ namespace CS_Classes
                 labels[3] = "That combination of channel " + c1.ToString() + "/" + c2.ToString() + " has " + bpCount.ToString() +
                             " pixels while image total is " + dst0.Total().ToString("0");
             }
-            SetTrueText("Use Global Algorithm Option 'Gridgid Square Size' to control the 2D histogram at left",
+            SetTrueText("Use Global Algorithm Option 'grid Square Size' to control the 2D histogram at left",
                         new cv.Point(10, dst3.Height - 20), 3);
         }
     }
@@ -5256,7 +5256,7 @@ namespace CS_Classes
             }
             if (vbc.task.heartBeat)
             {
-                strOut = "Use Global Algorithm Option 'Gridgid Square Size' to control the 2D histogram." + "\n" +
+                strOut = "Use Global Algorithm Option 'grid Square Size' to control the 2D histogram." + "\n" +
                          "Move mouse in 2D histogram to select a row or column to backproject.";
             }
             SetTrueText(strOut, 1);
@@ -5297,7 +5297,7 @@ namespace CS_Classes
 
             labels[3] = backP.labels[3];
 
-            SetTrueText("Use Global Algorithm Option 'Gridgid Square Size' to control this 2D histogram.\n" +
+            SetTrueText("Use Global Algorithm Option 'grid Square Size' to control this 2D histogram.\n" +
                         "Move mouse in 2D histogram to select a cell to backproject.\n" +
                         "Click any quadrant at left to display that quadrant here.\n",
                         new cv.Point(10, dst3.Height - dst3.Height / 4), 3);
@@ -24434,7 +24434,7 @@ namespace CS_Classes
         public Grid_MinMaxDepth_CS()
         {
             vbc.task.gOptions.setGridSize(8);
-            UpdateAdvice(traceName + ": goptions 'Gridgid Square Size' has direct impact.");
+            UpdateAdvice(traceName + ": goptions 'grid Square Size' has direct impact.");
             desc = "Find the min and max depth within each grid roi.";
         }
         public void RunAlg(Mat src)

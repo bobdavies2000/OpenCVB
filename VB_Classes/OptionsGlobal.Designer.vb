@@ -258,7 +258,7 @@ Partial Class OptionsGlobal
         '
         Me.GridSlider.Location = New System.Drawing.Point(185, 98)
         Me.GridSlider.Maximum = 300
-        Me.GridSlider.Minimum = 2
+        Me.GridSlider.Minimum = 1
         Me.GridSlider.Name = "GridSlider"
         Me.GridSlider.Size = New System.Drawing.Size(506, 69)
         Me.GridSlider.TabIndex = 31
@@ -270,9 +270,9 @@ Partial Class OptionsGlobal
         Me.Label9.AutoSize = True
         Me.Label9.Location = New System.Drawing.Point(11, 99)
         Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(151, 20)
+        Me.Label9.Size = New System.Drawing.Size(130, 20)
         Me.Label9.TabIndex = 30
-        Me.Label9.Text = "Gridgid Square Size"
+        Me.Label9.Text = "Grid Square Size"
         Me.Label9.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'maxCount
