@@ -7773,3 +7773,19 @@ Public Class Options_ML : Inherits VB_Parent
         If task.frameCount < 100 Or task.optionsChanged Then frm.left = task.gOptions.Width / 2 + 10
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_GridFromResize : Inherits VB_Parent
+    Public lowResPercent As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("LowRes %", 1, 100, 10)
+    End Sub
+    Public Sub RunOpt()
+        Static percentSlider = FindSlider("LowRes %")
+        lowResPercent = percentSlider.value / 100
+    End Sub
+End Class

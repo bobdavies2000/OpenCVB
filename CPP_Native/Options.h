@@ -2127,3 +2127,9 @@ public:
 	Options_ML() {
 	}
 };
+class Options_GridFromResize {
+public:
+	void RunOpt() {}
+	Options_GridFromResize() {
+	}
+};

@@ -886,7 +886,7 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
     Dim plot2D As New Plot_Histogram2D
     Dim plot As New Plot_Histogram
     Dim hcloud As New Hist3Dcloud_Basics
-    Dim grid As New Gridgid_Basics
+    Dim grid As New Grid_Basics
     Public histogram As New cvb.Mat
     Public Sub New()
         task.gOptions.setHistogramBins(9)

@@ -15,7 +15,6 @@ Public Class VBtask : Implements IDisposable
     Public fLessRects As New List(Of cvb.Rect)
     Public flessBoundary As New cvb.Mat
     Public lrSquares As New cvb.Mat
-    Public lowResPercent As Single
     Public lowResColor As cvb.Mat
     Public lowResDepth As cvb.Mat
 
@@ -72,7 +71,7 @@ Public Class VBtask : Implements IDisposable
     Public IMU_Rotation As System.Numerics.Quaternion
     Public cellStats As Cell_Basics
     Public imuStabilityTest As Stabilizer_VerticalIMU
-    Public grid As Gridgid_Basics
+    Public grid As Grid_Basics
     Public ogl As OpenGL_Basics
     Public palette As Palette_LoadColorMap
 
@@ -390,7 +389,7 @@ Public Class VBtask : Implements IDisposable
         redOptions = New OptionsRedCloud
         task.cellMap = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
 
-        grid = New Gridgid_Basics
+        grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
 
         colorizer = New Depth_Colorizer_CPP_VB

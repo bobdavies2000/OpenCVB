@@ -28,13 +28,16 @@ End Class
 Public Class Resize_Smaller : Inherits VB_Parent
     Public options As New Options_Resize
     Public newSize As cvb.Size
+    Dim optGrid As New Options_GridFromResize
     Public Sub New()
         desc = "Resize by a percentage of the image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Options.RunOpt()
+        options.RunOpt()
+        optGrid.RunOpt()
 
-        newSize = New cvb.Size(Math.Ceiling(src.Width * task.lowResPercent), Math.Ceiling(src.Height * task.lowResPercent))
+        newSize = New cvb.Size(Math.Ceiling(src.Width * optGrid.lowResPercent),
+                               Math.Ceiling(src.Height * optGrid.lowResPercent))
 
         dst2 = src.Resize(newSize, 0, 0, options.warpFlag)
         labels(2) = "Image after resizing to: " + CStr(newSize.Width) + "X" + CStr(newSize.Height)

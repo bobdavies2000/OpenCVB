@@ -260,7 +260,7 @@ End Class
 
 
 
-Public Class Motion_Gridgid_MP : Inherits VB_Parent
+Public Class Motion_Grid_MP : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")

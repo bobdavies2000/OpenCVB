@@ -23,9 +23,6 @@ Partial Class OptionsGlobal
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.MinMaxDepth = New System.Windows.Forms.GroupBox()
-        Me.LowResLabel = New System.Windows.Forms.Label()
-        Me.LowResSlider = New System.Windows.Forms.TrackBar()
-        Me.LowRes = New System.Windows.Forms.Label()
         Me.TempSliderLabel = New System.Windows.Forms.Label()
         Me.DebugSlider = New System.Windows.Forms.TrackBar()
         Me.Label11 = New System.Windows.Forms.Label()
@@ -83,7 +80,6 @@ Partial Class OptionsGlobal
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
-        CType(Me.LowResSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -99,9 +95,6 @@ Partial Class OptionsGlobal
         '
         'MinMaxDepth
         '
-        Me.MinMaxDepth.Controls.Add(Me.LowResLabel)
-        Me.MinMaxDepth.Controls.Add(Me.LowResSlider)
-        Me.MinMaxDepth.Controls.Add(Me.LowRes)
         Me.MinMaxDepth.Controls.Add(Me.TempSliderLabel)
         Me.MinMaxDepth.Controls.Add(Me.DebugSlider)
         Me.MinMaxDepth.Controls.Add(Me.Label11)
@@ -127,36 +120,6 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.TabIndex = 0
         Me.MinMaxDepth.TabStop = False
         Me.MinMaxDepth.Text = "Global Sliders"
-        '
-        'LowResLabel
-        '
-        Me.LowResLabel.AutoSize = True
-        Me.LowResLabel.Location = New System.Drawing.Point(695, 167)
-        Me.LowResLabel.Name = "LowResLabel"
-        Me.LowResLabel.Size = New System.Drawing.Size(40, 20)
-        Me.LowResLabel.TabIndex = 59
-        Me.LowResLabel.Text = "Size"
-        '
-        'LowResSlider
-        '
-        Me.LowResSlider.Location = New System.Drawing.Point(185, 167)
-        Me.LowResSlider.Maximum = 100
-        Me.LowResSlider.Minimum = 1
-        Me.LowResSlider.Name = "LowResSlider"
-        Me.LowResSlider.Size = New System.Drawing.Size(506, 69)
-        Me.LowResSlider.TabIndex = 58
-        Me.LowResSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.LowResSlider.Value = 10
-        '
-        'LowRes
-        '
-        Me.LowRes.AutoSize = True
-        Me.LowRes.Location = New System.Drawing.Point(77, 167)
-        Me.LowRes.Name = "LowRes"
-        Me.LowRes.Size = New System.Drawing.Size(85, 20)
-        Me.LowRes.TabIndex = 57
-        Me.LowRes.Text = "LowRes %"
-        Me.LowRes.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'TempSliderLabel
         '
@@ -189,7 +152,7 @@ Partial Class OptionsGlobal
         'fHist
         '
         Me.fHist.AutoSize = True
-        Me.fHist.Location = New System.Drawing.Point(696, 374)
+        Me.fHist.Location = New System.Drawing.Point(696, 309)
         Me.fHist.Name = "fHist"
         Me.fHist.Size = New System.Drawing.Size(47, 20)
         Me.fHist.TabIndex = 53
@@ -197,7 +160,7 @@ Partial Class OptionsGlobal
         '
         'FrameHistory
         '
-        Me.FrameHistory.Location = New System.Drawing.Point(185, 374)
+        Me.FrameHistory.Location = New System.Drawing.Point(185, 309)
         Me.FrameHistory.Maximum = 30
         Me.FrameHistory.Minimum = 1
         Me.FrameHistory.Name = "FrameHistory"
@@ -208,7 +171,7 @@ Partial Class OptionsGlobal
         '
         'Label12
         '
-        Me.Label12.Location = New System.Drawing.Point(26, 374)
+        Me.Label12.Location = New System.Drawing.Point(26, 309)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(136, 55)
         Me.Label12.TabIndex = 51
@@ -218,7 +181,7 @@ Partial Class OptionsGlobal
         'PixelDiff
         '
         Me.PixelDiff.AutoSize = True
-        Me.PixelDiff.Location = New System.Drawing.Point(695, 305)
+        Me.PixelDiff.Location = New System.Drawing.Point(695, 240)
         Me.PixelDiff.Name = "PixelDiff"
         Me.PixelDiff.Size = New System.Drawing.Size(59, 20)
         Me.PixelDiff.TabIndex = 50
@@ -226,7 +189,7 @@ Partial Class OptionsGlobal
         '
         'PixelDiffBar
         '
-        Me.PixelDiffBar.Location = New System.Drawing.Point(185, 305)
+        Me.PixelDiffBar.Location = New System.Drawing.Point(185, 240)
         Me.PixelDiffBar.Maximum = 50
         Me.PixelDiffBar.Name = "PixelDiffBar"
         Me.PixelDiffBar.Size = New System.Drawing.Size(506, 69)
@@ -236,7 +199,7 @@ Partial Class OptionsGlobal
         '
         'Label7
         '
-        Me.Label7.Location = New System.Drawing.Point(26, 284)
+        Me.Label7.Location = New System.Drawing.Point(26, 219)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(136, 55)
         Me.Label7.TabIndex = 48
@@ -255,7 +218,7 @@ Partial Class OptionsGlobal
         'labelBinsCount
         '
         Me.labelBinsCount.AutoSize = True
-        Me.labelBinsCount.Location = New System.Drawing.Point(695, 236)
+        Me.labelBinsCount.Location = New System.Drawing.Point(695, 171)
         Me.labelBinsCount.Name = "labelBinsCount"
         Me.labelBinsCount.Size = New System.Drawing.Size(68, 20)
         Me.labelBinsCount.TabIndex = 44
@@ -263,7 +226,7 @@ Partial Class OptionsGlobal
         '
         'HistBinBar
         '
-        Me.HistBinBar.Location = New System.Drawing.Point(185, 236)
+        Me.HistBinBar.Location = New System.Drawing.Point(185, 171)
         Me.HistBinBar.Maximum = 1000
         Me.HistBinBar.Minimum = 3
         Me.HistBinBar.Name = "HistBinBar"
@@ -275,7 +238,7 @@ Partial Class OptionsGlobal
         'labelbins
         '
         Me.labelbins.AutoSize = True
-        Me.labelbins.Location = New System.Drawing.Point(45, 231)
+        Me.labelbins.Location = New System.Drawing.Point(45, 166)
         Me.labelbins.Name = "labelbins"
         Me.labelbins.Size = New System.Drawing.Size(117, 20)
         Me.labelbins.TabIndex = 42
@@ -752,7 +715,6 @@ Partial Class OptionsGlobal
         Me.Text = "All Algorithm Options - Use gOptions variable to access"
         Me.MinMaxDepth.ResumeLayout(False)
         Me.MinMaxDepth.PerformLayout()
-        CType(Me.LowResSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).EndInit()
@@ -829,7 +791,4 @@ Partial Class OptionsGlobal
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
     Friend WithEvents UseReliableDepth As Windows.Forms.CheckBox
-    Friend WithEvents LowResLabel As Windows.Forms.Label
-    Friend WithEvents LowResSlider As Windows.Forms.TrackBar
-    Friend WithEvents LowRes As Windows.Forms.Label
 End Class

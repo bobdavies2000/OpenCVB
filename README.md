@@ -779,7 +779,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   OpenCVB has been tested on Windows 11 without incident.
 -   The current version of OpenCVB introduces heartbeats in 3 flavors:
     -   Once a second, twice per second, and “almost” heartbeat (just before a heartbeat)
-    -   In addition, a new Gridgid_FPS allows any algorithm to specify a requested heartbeat frequency.
+    -   In addition, a new Grid_FPS allows any algorithm to specify a requested heartbeat frequency.
 -   Backprojection algorithms were reviewed and 2D histogram backprojections now have a separate module.
 -   Plane equations for RedCloud cells are now computed for use in OpenGL.
 -   Post with any problems, especially install problems. They will receive the highest priority.

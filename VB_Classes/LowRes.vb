@@ -4,6 +4,7 @@ Imports cvb = OpenCvSharp
 Public Class LowRes_Basics : Inherits VB_Parent
     Dim options As New Options_Resize
     Dim mapCells As New LowRes_Map
+    Dim optGrid As New Options_GridFromResize
     Public Sub New()
         FindRadio("WarpFillOutliers").Enabled = False
         FindRadio("WarpInverseMap").Enabled = False
@@ -13,12 +14,13 @@ Public Class LowRes_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
+        optGrid.RunOpt()
 
-        task.lowResColor = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
+        task.lowResColor = src.Resize(New cvb.Size(optGrid.lowResPercent * src.Width, optGrid.lowResPercent * src.Height), 0, 0, options.warpFlag)
         dst2 = task.lowResColor.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
 
-        task.lowResDepth = task.pcSplit(2).Resize(New cvb.Size(task.lowResPercent * src.Width,
-                                                               task.lowResPercent * src.Height), 0, 0, options.warpFlag)
+        task.lowResDepth = task.pcSplit(2).Resize(New cvb.Size(optGrid.lowResPercent * src.Width,
+                                                               optGrid.lowResPercent * src.Height), 0, 0, options.warpFlag)
         dst3 = task.lowResDepth.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
 
         mapCells.Run(dst2)
@@ -32,13 +34,16 @@ End Class
 
 Public Class LowRes_Core : Inherits VB_Parent
     Dim options As New Options_Resize
+    Dim optGrid As New Options_GridFromResize
     Public Sub New()
         FindRadio("Area").Checked = True
         desc = "The bare minimum needed to make the LowRes image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        dst3 = src.Resize(New cvb.Size(task.lowResPercent * src.Width, task.lowResPercent * src.Height), 0, 0, options.warpFlag)
+        optGrid.RunOpt()
+
+        dst3 = src.Resize(New cvb.Size(optGrid.lowResPercent * src.Width, optGrid.lowResPercent * src.Height), 0, 0, options.warpFlag)
         dst2 = dst3.Resize(New cvb.Size(src.Width, src.Height), 0, 0, options.warpFlag)
     End Sub
 End Class

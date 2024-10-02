@@ -3,7 +3,6 @@ Public Class OptionsGlobal
     Public maxDepth As Integer
     Public debugChecked As Boolean
     Public DebugSliderValue As Integer
-    Public lowResPercent As Single
     Public pixelDiffThreshold As Integer
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
@@ -166,8 +165,6 @@ Public Class OptionsGlobal
         End Select
 
         task.depthThresholdPercent = 0.01
-        task.lowResPercent = LowResSlider.Value / 100
-        LowResLabel.Text = Format(task.lowResPercent, "%")
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
@@ -248,11 +245,6 @@ Public Class OptionsGlobal
     Private Sub DebugCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles DebugCheckBox.CheckedChanged
         task.optionsChanged = True
         debugChecked = DebugCheckBox.Checked
-    End Sub
-    Private Sub LowResSlider_ValueChanged(sender As Object, e As EventArgs) Handles LowResSlider.ValueChanged
-        task.optionsChanged = True
-        task.lowResPercent = LowResSlider.Value / 100
-        LowResLabel.Text = CStr(LowResSlider.Value) + "%"
     End Sub
     Private Sub OpenGLCapture_Click(sender As Object, e As EventArgs) Handles OpenGLCapture.Click
         task.optionsChanged = True
