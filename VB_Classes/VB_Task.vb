@@ -7,12 +7,27 @@ Imports System.Runtime.InteropServices
 
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public lrFeatureMap As cvb.Mat
+    Public featuresLowRes As cvb.Mat
+    Public featuresFullRes As cvb.Mat
     Public featureRects As New List(Of cvb.Rect)
     Public fLessRects As New List(Of cvb.Rect)
     Public flessBoundary As New cvb.Mat
     Public lowResColor As cvb.Mat
     Public lowResDepth As cvb.Mat
+
+    Public gridSize As Integer
+    Public gridRows As Integer
+    Public gridCols As Integer
+    Public gridIndex As New List(Of Integer)
+    Public gridRects As List(Of cvb.Rect)
+    Public subDivisions As New List(Of Integer)
+    Public subDivisionCount As Integer = 9
+    Public gridMask As cvb.Mat
+    Public gridMap As New cvb.Mat
+    Public gridLowResIndices As cvb.Mat
+    Public gridHighResIndices As cvb.Mat
+    Public gridNeighbors As New List(Of List(Of Integer))
+    Public gridROIclicked As Integer
 
     Public optionsChanged As Boolean ' global or local options changed.
     Public rows As Integer
@@ -144,20 +159,6 @@ Public Class VBtask : Implements IDisposable
     Public HighlightColor As cvb.Scalar ' color to use to highlight objects in an image.
 
     Public histogramBins As Integer
-
-    Public gridSize As Integer
-    Public gridRows As Integer
-    Public gridCols As Integer
-    Public gridIndex As New List(Of Integer)
-    Public gridRects As List(Of cvb.Rect)
-    Public subDivisions As New List(Of Integer)
-    Public subDivisionCount As Integer = 9
-    Public gridMask As cvb.Mat
-    Public gridMap As New cvb.Mat
-    Public gridLowResIndices As cvb.Mat
-    Public gridHighResIndices As cvb.Mat
-    Public gridNeighbors As New List(Of List(Of Integer))
-    Public gridROIclicked As Integer
 
     Public gOptions As OptionsGlobal
     Public redOptions As OptionsRedCloud

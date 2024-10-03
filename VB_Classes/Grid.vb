@@ -88,23 +88,23 @@ Public Class Grid_Basics : Inherits VB_Parent
                 End If
             Next
 
-            task.gridLowResIndices = New cvb.Mat(task.gridRows, task.gridCols, cvb.MatType.CV_32FC2)
-            For y = 0 To task.gridRows - 1
-                For x = 0 To task.gridCols - 1
-                    task.gridLowResIndices.Set(Of cvb.Vec2f)(y, x, New cvb.Vec2f(CSng(x), CSng(y)))
-                Next
-            Next
+            'task.gridLowResIndices = New cvb.Mat(task.gridRows, task.gridCols, cvb.MatType.CV_32FC2)
+            'For y = 0 To task.gridRows - 1
+            '    For x = 0 To task.gridCols - 1
+            '        task.gridLowResIndices.Set(Of cvb.Point2f)(y, x, New cvb.Point2f(CSng(x), CSng(y)))
+            '    Next
+            'Next
 
-            task.gridHighResIndices = New cvb.Mat(task.color.Size, cvb.MatType.CV_32FC2)
-            Dim roiIndex As Integer
-            For y = 0 To task.gridCols - 1
-                For x = 0 To task.gridRows - 1
-                    Dim roi = gridRects(roiIndex)
-                    Dim val = task.gridLowResIndices.Get(Of cvb.Vec2f)(y, x)
-                    task.gridHighResIndices(roi).Set(Of cvb.Vec2f)(y, x, val)
-                    roiIndex += 1
-                Next
-            Next
+            'task.gridHighResIndices = New cvb.Mat(task.color.Size, cvb.MatType.CV_32FC2)
+            'Dim roiIndex As Integer
+            'For y = 0 To task.gridCols - 1
+            '    For x = 0 To task.gridRows - 1
+            '        Dim val = task.gridLowResIndices.Get(Of cvb.Vec2f)(y, x)
+            '        Dim roi = gridRects(roiIndex)
+            '        task.gridHighResIndices(roi).SetTo(Val)
+            '        roiIndex += 1
+            '    Next
+            'Next
         End If
         If standaloneTest() Then
             dst2 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
