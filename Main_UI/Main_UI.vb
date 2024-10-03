@@ -75,6 +75,7 @@ Public Class Main_UI
     Dim mousePicTag As Integer
     Dim mouseDownPoint As New cvb.Point
     Dim mouseMovePoint As New cvb.Point
+    Dim mouseGridCell As Integer
     Dim mousePoint As New cvb.Point
     Dim activeMouseDown As Boolean
 
@@ -559,7 +560,10 @@ Public Class Main_UI
             mousePoint.X = e.X
             mousePoint.Y = e.Y
             mousePoint *= settings.WorkingRes.Width / camPic(0).Width
-            XYLoc.Text = mousePoint.ToString + " - last click point at: " + ClickPoint.ToString
+
+            XYLoc.Text = mousePoint.ToString + ", grid cell = " + CStr(mouseGridCell) +
+                         ", last click point at: " + ClickPoint.ToString
+
         Catch ex As Exception
             Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
@@ -1603,6 +1607,7 @@ Public Class Main_UI
 
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 picLabels = task.labels
+                mouseGridCell = task.gridMap.Get(Of Integer)(mousePoint.Y, mousePoint.X)
 
                 Dim returnTime = Now
 

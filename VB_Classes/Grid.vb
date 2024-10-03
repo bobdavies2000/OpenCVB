@@ -53,8 +53,10 @@ Public Class Grid_Basics : Inherits VB_Parent
                 Next
 
                 task.gridNeighbors.Clear()
-                For Each roi In gridRects
-                    task.gridNeighbors.Add(New List(Of Integer))
+                For j = 0 To gridRects.Count - 1
+                    Dim roi = gridRects(j)
+                    Dim nextList As New List(Of Integer)
+                    nextList.Add(j)
                     For i = 0 To 8
                         Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
                                           roi.X - 1, roi.X, roi.X + roi.Width + 1,
@@ -62,9 +64,11 @@ Public Class Grid_Basics : Inherits VB_Parent
                         Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                           roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                         If x >= 0 And x < src.Width And y >= 0 And y < src.Height Then
-                            task.gridNeighbors(task.gridNeighbors.Count - 1).Add(task.gridMap.Get(Of Integer)(y, x))
+                            Dim val = task.gridMap.Get(Of Integer)(y, x)
+                            If nextList.Contains(val) = False Then nextList.Add(val)
                         End If
                     Next
+                    task.gridNeighbors.Add(nextList)
                 Next
             End If
 

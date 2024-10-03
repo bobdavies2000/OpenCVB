@@ -32,7 +32,7 @@ Public Class LowRes_Color : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
-        If task.optionsChanged Then dst3 = New cvb.Mat(task.gridRows, task.gridCols, cvb.MatType.CV_8UC3)
+        If task.optionsChanged Then dst3 = New cvb.Mat(task.gridRows, task.gridCols, cvb.MatType.CV_32FC3)
         dst3.SetTo(0)
         Dim index As Integer
         For y = 0 To task.gridRows - 1
@@ -41,7 +41,7 @@ Public Class LowRes_Color : Inherits VB_Parent
                 index += 1
                 Dim mean = src(roi).Mean()
                 dst2(roi).SetTo(mean)
-                dst3.Set(Of cvb.Vec3b)(y, x, New cvb.Vec3b(mean(0), mean(1), mean(2)))
+                dst3.Set(Of cvb.Vec3f)(y, x, New cvb.Vec3f(mean(0), mean(1), mean(2)))
             Next
         Next
     End Sub
@@ -153,7 +153,8 @@ Public Class LowRes_Edges : Inherits VB_Parent
     Dim edges As New Edge_Basics
     Public Sub New()
         FindRadio("Depth Region Boundaries").Enabled = False
-        task.featuresFullRes = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        task.featureMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        task.fLessMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         labels = {"", "", "Low Res overlaid with edges", "Featureless spaces - no edges or features"}
         desc = "Add edges to features"
     End Sub
@@ -166,17 +167,20 @@ Public Class LowRes_Edges : Inherits VB_Parent
 
         task.featureRects.Clear()
         task.fLessRects.Clear()
-        task.featuresFullRes.SetTo(0)
+        task.featureMask.SetTo(0)
+        task.fLessMask.SetTo(0)
         Dim flist As New List(Of Single)
         For Each r In task.gridRects
             If edges.dst2(r).CountNonZero = 0 Then
                 task.fLessRects.Add(r)
-                task.featuresFullRes(r).SetTo(255)
+                task.fLessMask(r).SetTo(255)
                 flist.Add(1)
             Else
                 task.featureRects.Add(r)
-                DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
+                task.featureMask(r).SetTo(255)
                 flist.Add(2)
+
+                DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
             End If
         Next
 
@@ -184,7 +188,7 @@ Public Class LowRes_Edges : Inherits VB_Parent
                                                 cvb.MatType.CV_32F, flist.ToArray)
 
         dst3.SetTo(0)
-        src.CopyTo(dst3, task.featuresFullRes)
+        src.CopyTo(dst3, task.featureMask)
         If task.heartBeat Then
             labels(2) = CStr(task.featureRects.Count) + " cells with features were found"
             labels(3) = CStr(task.fLessRects.Count) + " cells without features were found"
@@ -196,33 +200,103 @@ End Class
 
 
 
+Public Class LowRes_Boundaries : Inherits VB_Parent
+    Public feat As New LowRes_Edges
+    Public boundaryCells As New List(Of List(Of Integer))
+    Public Sub New()
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        desc = "Find every non-featureless cell next to a featureless cell."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standaloneTest() Then
+            feat.Run(src)
+            dst1 = task.featureMask.Clone
+            dst3 = feat.dst2
+        End If
+
+        boundaryCells.Clear()
+        For Each nList In task.gridNeighbors
+            Dim roiA = task.gridRects(nList(0))
+            Dim centerType = task.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
+            If centerType <> 0 Then
+                Dim boundList = New List(Of Integer)
+                Dim addFirst As Boolean = True
+                For i = 1 To nList.Count - 1
+                    Dim roiB = task.gridRects(nList(i))
+                    Dim val = task.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
+                    If centerType <> val Then
+                        If addFirst Then boundList.Add(nList(0)) ' first element is the center point (has features)
+                        addFirst = False
+                        boundList.Add(nList(i))
+                    End If
+                Next
+                If boundList.Count > 0 Then boundaryCells.Add(boundList)
+            End If
+        Next
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            For Each nlist In boundaryCells
+                For Each n In nlist
+                    Dim mytoggle As Integer
+                    Dim roi = task.gridRects(n)
+                    Dim val = task.featureMask.Get(Of Byte)(roi.Y, roi.X)
+                    If val > 0 Then mytoggle = 255 Else mytoggle = 128
+                    dst2(task.gridRects(n)).SetTo(myToggle)
+                Next
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
 
 Public Class LowRes_MLDepth : Inherits VB_Parent
     Dim feat As New LowRes_Edges
     Dim ml As New ML_Basics
     Dim bounds As New LowRes_Boundaries
     Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
         dst1 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
-        desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth."
+        desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
-
         bounds.Run(src)
 
-        Dim lowResRGB32f As New cvb.Mat
-        task.lowResColor.ConvertTo(lowResRGB32f, cvb.MatType.CV_32FC3)
-        ml.trainMats = {lowResRGB32f, task.lowResDepth}
-        ml.trainResponse = task.featuresLowRes
-
         Dim rgb32f As New cvb.Mat, tmp As New cvb.Mat
-        dst1 = task.featuresFullRes
-        For Each roi In bounds.boundaryCells
-            src(roi).ConvertTo(rgb32f, cvb.MatType.CV_32FC3)
-            ml.testMats = {rgb32f, task.pcSplit(2)(roi)}
+        src.ConvertTo(rgb32f, cvb.MatType.CV_32FC3)
+
+        dst1 = task.fLessMask
+        Dim trainRGB As cvb.Mat, trainDepth As cvb.Mat
+        For i = 0 To bounds.boundaryCells.Count - 1
+            Dim nList = bounds.boundaryCells(i)
+            ml.trainResponse = New cvb.Mat(nList.Count, 1, cvb.MatType.CV_32F, New cvb.Scalar(1))
+            trainRGB = New cvb.Mat(nList.Count, 1, cvb.MatType.CV_32FC3)
+            trainDepth = New cvb.Mat(nList.Count, 1, cvb.MatType.CV_32F)
+
+            For j = 0 To nList.Count - 1
+                If j = 0 Then ml.trainResponse.Set(Of Single)(0, 0, 2)
+                Dim roiA = task.gridRects(nList(j))
+                Dim x As Integer = Math.Floor(roiA.X * task.gridCols / task.cols)
+                Dim y As Integer = Math.Floor(roiA.Y * task.gridRows / task.rows)
+                trainRGB.Set(Of cvb.Vec3f)(j, 0, task.lowResColor.Get(Of cvb.Vec3f)(y, x))
+                trainDepth.Set(Of Single)(j, 0, task.lowResDepth.Get(Of Single)(y, x))
+            Next
+            ml.trainMats = {trainRGB, trainDepth}
+
+            Dim roiB = task.gridRects(nList(0))
+            ml.testMats = {rgb32f(roiB), task.pcSplit(2)(roiB)}
             ml.Run(empty)
-            tmp = ml.predictions.Threshold(1.5, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs.Reshape(1, roi.Height)
-            dst1(roi) = Not tmp
+
+            Dim mm = GetMinMax(ml.predictions)
+            If mm.minVal <> mm.maxVal Then Dim k = 0
+            dst1(roiB) = ml.predictions.Threshold((mm.maxVal + mm.minVal) / 2, 255, cvb.ThresholdTypes.BinaryInv).
+                                        ConvertScaleAbs.Reshape(1, roiB.Height)
         Next
 
         dst2.SetTo(0)
@@ -239,39 +313,64 @@ End Class
 
 
 
-Public Class LowRes_Boundaries : Inherits VB_Parent
-    Public feat As New LowRes_Edges
-    Public boundaryCells As New List(Of cvb.Rect)
+
+
+
+Public Class LowRes_MLNoDepth : Inherits VB_Parent
+    Dim feat As New LowRes_Edges
+    Dim ml As New ML_Basics
+    Dim bounds As New LowRes_Boundaries
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
-        desc = "Find every non-featureless cell next to a featureless cell."
+        If standalone Then task.gOptions.setDisplay1()
+        dst1 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Then
-            feat.Run(src)
-            dst1 = task.featuresFullRes.Clone
-            dst3 = feat.dst2
-        End If
+        feat.Run(src)
+        bounds.Run(src)
 
-        boundaryCells.Clear()
-        For i = 0 To task.gridRects.Count - 1
-            Dim cell = task.gridRects(i)
-            Dim cellType = task.featuresFullRes.Get(Of Byte)(cell.Y, cell.X)
-            If cellType = 0 Then Continue For
-            Dim neighbors = task.gridNeighbors(i)
-            For Each index In neighbors
-                Dim roi = task.gridRects(index)
-                Dim nType = task.featuresFullRes.Get(Of Byte)(roi.Y, roi.X)
-                If nType <> cellType Then
-                    boundaryCells.Add(roi)
-                    Exit For
-                End If
+        Dim rgb32f As New cvb.Mat, tmp As New cvb.Mat
+        src.ConvertTo(rgb32f, cvb.MatType.CV_32FC3)
+
+        dst1 = task.fLessMask
+        Dim trainRGB As cvb.Mat
+        For i = 0 To bounds.boundaryCells.Count - 1
+            Dim nList = bounds.boundaryCells(i)
+            ml.trainResponse = New cvb.Mat(nList.Count, 1, cvb.MatType.CV_32F, New cvb.Scalar(1))
+            trainRGB = New cvb.Mat(nList.Count, 1, cvb.MatType.CV_32FC3)
+
+            For j = 0 To nList.Count - 1
+                If j = 0 Then ml.trainResponse.Set(Of Single)(0, 0, 2)
+                Dim roiA = task.gridRects(nList(j))
+                Dim x As Integer = Math.Floor(roiA.X * task.gridCols / task.cols)
+                Dim y As Integer = Math.Floor(roiA.Y * task.gridRows / task.rows)
+                trainRGB.Set(Of cvb.Vec3f)(j, 0, task.lowResColor.Get(Of cvb.Vec3f)(y, x))
             Next
+            ml.trainMats = {trainRGB}
+
+            Dim roiB = task.gridRects(nList(0))
+            ml.testMats = {rgb32f(roiB)}
+            ml.Run(empty)
+
+            Dim mm = GetMinMax(ml.predictions)
+            If mm.minVal <> mm.maxVal Then Dim k = 0
+            dst1(roiB) = ml.predictions.Threshold((mm.maxVal + mm.minVal) / 2, 255, cvb.ThresholdTypes.BinaryInv).
+                                        ConvertScaleAbs.Reshape(1, roiB.Height)
+
+
+            Dim samples(ml.predictions.Total - 1) As Single
+            Marshal.Copy(ml.predictions.Data, samples, 0, samples.Length)
+            If samples(0) - 1.4 > 0.01 Then Dim k = 0
+
         Next
 
         dst2.SetTo(0)
-        For Each roi In boundaryCells
-            dst2(roi).SetTo(255)
-        Next
+        src.CopyTo(dst2, dst1)
+
+        dst3.SetTo(0)
+        src.CopyTo(dst3, Not dst1)
+
+        labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
+                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
     End Sub
 End Class
