@@ -202,14 +202,13 @@ Public Class LowRes_MLDepth : Inherits VB_Parent
     Dim ml As New ML_Basics
     Dim bounds As New LowRes_Boundaries
     Public Sub New()
+        dst1 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
-        dst0 = feat.dst2
-        dst1 = feat.dst3
 
-        bounds.Run(empty)
+        bounds.Run(src)
 
         Dim lowResRGB32f As New cvb.Mat
         task.lowResColor.ConvertTo(lowResRGB32f, cvb.MatType.CV_32FC3)
@@ -217,18 +216,20 @@ Public Class LowRes_MLDepth : Inherits VB_Parent
         ml.trainResponse = task.featuresLowRes
 
         Dim rgb32f As New cvb.Mat, tmp As New cvb.Mat
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        src.CopyTo(dst2, task.featuresFullRes)
-        src.CopyTo(dst3, Not task.featuresFullRes)
+        dst1 = task.featuresFullRes
         For Each roi In bounds.boundaryCells
             src(roi).ConvertTo(rgb32f, cvb.MatType.CV_32FC3)
             ml.testMats = {rgb32f, task.pcSplit(2)(roi)}
             ml.Run(empty)
             tmp = ml.predictions.Threshold(1.5, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs.Reshape(1, roi.Height)
-            src(roi).CopyTo(dst2(roi), tmp)
-            src(roi).CopyTo(dst3(roi), Not tmp)
+            dst1(roi) = Not tmp
         Next
+
+        dst2.SetTo(0)
+        src.CopyTo(dst2, dst1)
+
+        dst3.SetTo(0)
+        src.CopyTo(dst3, Not dst1)
 
         labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
                   " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
@@ -248,7 +249,7 @@ Public Class LowRes_Boundaries : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             feat.Run(src)
-            dst1 = task.featuresFullRes
+            dst1 = task.featuresFullRes.Clone
             dst3 = feat.dst2
         End If
 
