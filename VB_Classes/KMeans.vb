@@ -51,7 +51,7 @@ Public Class KMeans_Basics : Inherits VB_Parent
         dst2.Reshape(1, src.Height).ConvertTo(dst2, cvb.MatType.CV_8U)
         dst3 = ShowPalette(dst2 * 255 / classCount)
         lastK = classCount
-        labels(2) = "KMeans labels 0-" + CStr(lastK) + " spread out across 255 values."
+        labels(2) = "KMeans labels 0-" + CStr(lastK - 1) + " spread out across 255 values."
     End Sub
 End Class
 

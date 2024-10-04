@@ -208,11 +208,9 @@ Public Class LowRes_Boundaries : Inherits VB_Parent
         desc = "Find every non-featureless cell next to a featureless cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Then
-            feat.Run(src)
-            dst1 = task.featureMask.Clone
-            dst3 = feat.dst2
-        End If
+        feat.Run(src)
+        dst1 = task.featureMask.Clone
+        dst3 = feat.dst2
 
         boundaryCells.Clear()
         For Each nList In task.gridNeighbors
@@ -256,16 +254,15 @@ End Class
 
 
 Public Class LowRes_MLDepth : Inherits VB_Parent
-    Dim feat As New LowRes_Edges
     Dim ml As New ML_Basics
     Dim bounds As New LowRes_Boundaries
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
+        ml.buildEveryPass = True
         dst1 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
         bounds.Run(src)
 
         Dim rgb32f As New cvb.Mat, tmp As New cvb.Mat
@@ -317,16 +314,15 @@ End Class
 
 
 Public Class LowRes_MLNoDepth : Inherits VB_Parent
-    Dim feat As New LowRes_Edges
     Dim ml As New ML_Basics
     Dim bounds As New LowRes_Boundaries
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
+        ml.buildEveryPass = True
         dst1 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
         bounds.Run(src)
 
         Dim rgb32f As New cvb.Mat, tmp As New cvb.Mat
@@ -360,8 +356,6 @@ Public Class LowRes_MLNoDepth : Inherits VB_Parent
 
             Dim samples(ml.predictions.Total - 1) As Single
             Marshal.Copy(ml.predictions.Data, samples, 0, samples.Length)
-            If samples(0) - 1.4 > 0.01 Then Dim k = 0
-
         Next
 
         dst2.SetTo(0)
@@ -372,5 +366,20 @@ Public Class LowRes_MLNoDepth : Inherits VB_Parent
 
         labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
                   " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LowRes_BoundaryKMeans : Inherits VB_Parent
+
+    Public Sub New()
+        desc = "Split each boundary cell in 2 - Feature vs. FeatureLess"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+
     End Sub
 End Class

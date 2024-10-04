@@ -9,6 +9,7 @@ Public Class ML_Basics : Inherits VB_Parent
     Public testMats() As cvb.Mat ' all entries are 32FCx
     Public predictions As New cvb.Mat
     Public options As New Options_ML
+    Public buildEveryPass As Boolean
     Public Sub New()
         desc = "Simplify the prep for ML data train and test data and run with ML algorithms."
     End Sub
@@ -34,7 +35,7 @@ Public Class ML_Basics : Inherits VB_Parent
 
         Static classifier As Object
         Dim respFormat = cvb.MatType.CV_32F
-        If task.heartBeat Then
+        If task.heartBeat Or buildEveryPass Then
             Select Case options.ML_Name
                 Case "NormalBayesClassifier"
                     classifier = cvb.ML.NormalBayesClassifier.Create()

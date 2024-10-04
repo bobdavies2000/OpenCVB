@@ -1965,6 +1965,7 @@ End Enum
 	If algorithmName = "LongLine_Point_CS" Then return new LongLine_Point_CS
 	If algorithmName = "LowRes_Basics" Then return new LowRes_Basics
 	If algorithmName = "LowRes_Boundaries" Then return new LowRes_Boundaries
+	If algorithmName = "LowRes_BoundaryKMeans" Then return new LowRes_BoundaryKMeans
 	If algorithmName = "LowRes_Color" Then return new LowRes_Color
 	If algorithmName = "LowRes_Depth" Then return new LowRes_Depth
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
