@@ -6,6 +6,7 @@ Public Class Edge_Basics : Inherits VB_Parent
     Dim scharr As Edge_Scharr
     Dim binRed As Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel
+    Dim sobel As Edge_Sobel
     Dim colorGap As Edge_ColorGap_CPP_VB
     Dim deriche As Edge_Deriche_CPP_VB
     Dim Laplacian As Edge_Laplacian
@@ -35,6 +36,10 @@ Public Class Edge_Basics : Inherits VB_Parent
                 If binSobel Is Nothing Then binSobel = New Bin4Way_Sobel
                 binSobel.Run(src)
                 dst2 = binSobel.dst2
+            Case "Sobel"
+                If sobel Is Nothing Then sobel = New Edge_Sobel
+                sobel.Run(src)
+                dst2 = sobel.dst2
             Case "Color Gap"
                 If colorGap Is Nothing Then colorGap = New Edge_ColorGap_CPP_VB
                 colorGap.Run(src)
@@ -804,7 +809,9 @@ Public Class Edge_Canny : Inherits VB_Parent
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If src.Channels() <> cvb.MatType.CV_8U Then src.ConvertTo(src, cvb.MatType.CV_8U)
         dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
-        'dst3 = src.Canny(options.threshold1, options.threshold2, options.aperture, False)
+
+        dst3.SetTo(0)
+        src.CopyTo(dst3, dst2)
     End Sub
 End Class
 
@@ -1057,30 +1064,6 @@ Public Class Edge_Sobel : Inherits VB_Parent
     End Sub
 End Class
 
-
-
-
-
-
-'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Edge_Laplacian : Inherits VB_Parent
-    Dim options As New Options_LaplacianKernels
-    Public Sub New()
-        labels(3) = "Laplacian of DepthRGB"
-        desc = "Show Laplacian edge detection with varying kernel sizes"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        dst2 = src.GaussianBlur(New cvb.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
-        dst2 = dst2.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
-        dst2 = dst2.ConvertScaleAbs()
-
-        dst3 = task.depthRGB.GaussianBlur(New cvb.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
-        dst3 = dst3.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
-        dst3 = dst3.ConvertScaleAbs()
-    End Sub
-End Class
 
 
 
@@ -1427,5 +1410,34 @@ Public Class Edge_DiffXYZ : Inherits VB_Parent
         mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
+Public Class Edge_Laplacian : Inherits VB_Parent
+    Dim options As New Options_LaplacianKernels
+    Public Sub New()
+        labels(3) = "Laplacian of DepthRGB"
+        desc = "Show Laplacian edge detection with varying kernel sizes"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = src.GaussianBlur(New cvb.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
+        dst2 = dst2.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
+        dst2 = dst2.ConvertScaleAbs()
+
+        Dim tmp = dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        cvb.Cv2.ImShow("tmp", tmp)
+
+        dst3 = task.depthRGB.GaussianBlur(New cvb.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
+        dst3 = dst3.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
+        dst3 = dst3.ConvertScaleAbs()
     End Sub
 End Class

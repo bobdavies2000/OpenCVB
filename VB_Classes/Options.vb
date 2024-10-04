@@ -3573,30 +3573,6 @@ End Class
 
 
 
-Public Class Options_LaplacianKernels : Inherits VB_Parent
-    Public gaussiankernelSize As Integer = 1
-    Public LaplaciankernelSize As Integer = 3
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Gaussian Kernel", 1, 32, gaussiankernelSize)
-            sliders.setupTrackBar("Laplacian Kernel", 1, 32, LaplaciankernelSize)
-        End If
-    End Sub
-    Public Sub RunOpt()
-        Static gaussSlider = FindSlider("Gaussian Kernel")
-        Static LaplacianSlider = FindSlider("Laplacian Kernel")
-        gaussiankernelSize = gaussSlider.Value Or 1
-        LaplaciankernelSize = LaplacianSlider.Value Or 1
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Options_Threshold : Inherits VB_Parent
     Public thresholdMethod As cvb.ThresholdTypes = cvb.ThresholdTypes.Binary
     Public thresholdName As String = ""
@@ -7651,6 +7627,7 @@ Public Class Options_Edge_Basics : Inherits VB_Parent
             radio.addRadio("Scharr")
             radio.addRadio("Binarized Reduction")
             radio.addRadio("Binarized Sobel")
+            radio.addRadio("Sobel")
             radio.addRadio("Color Gap")
             radio.addRadio("Deriche")
             radio.addRadio("Laplacian")
@@ -7787,5 +7764,27 @@ Public Class Options_GridFromResize : Inherits VB_Parent
     Public Sub RunOpt()
         Static percentSlider = FindSlider("LowRes %")
         lowResPercent = percentSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_LaplacianKernels : Inherits VB_Parent
+    Public gaussiankernelSize As Integer = 1
+    Public LaplaciankernelSize As Integer = 3
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Gaussian Kernel", 1, 32, gaussiankernelSize)
+            sliders.setupTrackBar("Laplacian Kernel", 1, 32, LaplaciankernelSize)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static gaussSlider = FindSlider("Gaussian Kernel")
+        Static LaplacianSlider = FindSlider("Laplacian Kernel")
+        gaussiankernelSize = gaussSlider.Value Or 1
+        LaplaciankernelSize = LaplacianSlider.Value Or 1
     End Sub
 End Class
