@@ -1607,8 +1607,9 @@ Public Class Main_UI
 
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 picLabels = task.labels
-                mouseGridCell = task.gridMap.Get(Of Integer)(mousePoint.Y, mousePoint.X)
-
+                SyncLock mouseLock
+                    mouseGridCell = task.gridMap.Get(Of Integer)(mousePoint.Y, mousePoint.X)
+                End SyncLock
                 Dim returnTime = Now
 
                 ' in case the algorithm has changed the mouse location...

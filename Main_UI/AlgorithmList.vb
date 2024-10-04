@@ -1970,6 +1970,7 @@ End Enum
 	If algorithmName = "LowRes_Depth" Then return new LowRes_Depth
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
+	If algorithmName = "LowRes_FLessRedCloud" Then return new LowRes_FLessRedCloud
 	If algorithmName = "LowRes_MLDepth" Then return new LowRes_MLDepth
 	If algorithmName = "LowRes_MLNoDepth" Then return new LowRes_MLNoDepth
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics

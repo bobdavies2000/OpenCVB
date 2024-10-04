@@ -28,6 +28,7 @@ Public Class VBtask : Implements IDisposable
     Public gridLowResIndices As cvb.Mat
     Public gridHighResIndices As cvb.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
+    Public gridAllNabes As New List(Of cvb.Rect)
     Public gridROIclicked As Integer
 
     Public optionsChanged As Boolean ' global or local options changed.

@@ -232,18 +232,16 @@ Public Class LowRes_Boundaries : Inherits VB_Parent
             End If
         Next
 
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            For Each nlist In boundaryCells
-                For Each n In nlist
-                    Dim mytoggle As Integer
-                    Dim roi = task.gridRects(n)
-                    Dim val = task.featureMask.Get(Of Byte)(roi.Y, roi.X)
-                    If val > 0 Then mytoggle = 255 Else mytoggle = 128
-                    dst2(task.gridRects(n)).SetTo(myToggle)
-                Next
+        dst2.SetTo(0)
+        For Each nlist In boundaryCells
+            For Each n In nlist
+                Dim mytoggle As Integer
+                Dim roi = task.gridRects(n)
+                Dim val = task.featureMask.Get(Of Byte)(roi.Y, roi.X)
+                If val > 0 Then mytoggle = 255 Else mytoggle = 128
+                dst2(task.gridRects(n)).SetTo(mytoggle)
             Next
-        End If
+        Next
     End Sub
 End Class
 
@@ -375,11 +373,47 @@ End Class
 
 
 Public Class LowRes_BoundaryKMeans : Inherits VB_Parent
-
+    Dim bounds As New LowRes_Boundaries
+    Dim kmeans As New KMeans_Basics
     Public Sub New()
+        FindSlider("KMeans k").Value = 2
+        dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U)
         desc = "Split each boundary cell in 2 - Feature vs. FeatureLess"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        bounds.Run(src)
+        dst2 = bounds.dst2.Threshold(129, 255, cvb.ThresholdTypes.Binary)
+        dst3 = bounds.dst3
 
+        If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(1, task.fLessMask)
+        dst1.SetTo(2, task.featureMask)
+        For Each nlist In bounds.boundaryCells
+            Dim roi = task.gridRects(nlist(0))
+            Dim index = task.gridMap.Get(Of Integer)(roi.Y, roi.X)
+            Dim nabes = task.gridAllNabes(index)
+            kmeans.Run(src(nabes).Clone)
+            dst1(nabes) = kmeans.dst2 + 1
+            roi = task.gridRects(nlist(1)) ' the second element is always featureLess.
+            index = dst1.Get(Of Byte)(roi.Y, roi.X)
+            If index <> 1 Then dst1(nabes) = Not dst1(nabes)
+        Next
+        dst1 = dst1 * 255 / 2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LowRes_FLessRedCloud : Inherits VB_Parent
+    Dim bounds As New LowRes_Boundaries
+    Dim redc As New RedCloud_Basics
+    Public Sub New()
+        desc = "Use the featureLess cells as flood points."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class

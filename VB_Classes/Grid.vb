@@ -70,6 +70,21 @@ Public Class Grid_Basics : Inherits VB_Parent
                     Next
                     task.gridNeighbors.Add(nextList)
                 Next
+
+                task.gridAllNabes.Clear()
+                For Each nlist In task.gridNeighbors
+                    Dim cellx As New List(Of Integer)
+                    Dim celly As New List(Of Integer)
+                    For Each n In nlist
+                        Dim roi = gridRects(n)
+                        cellx.Add(roi.X)
+                        celly.Add(roi.Y)
+                    Next
+
+                    Dim nabes = New cvb.Rect(cellx.Min, celly.Min, cellx.Max - cellx.Min,
+                                                                   celly.Max - celly.Min)
+                    task.gridAllNabes.Add(nabes)
+                Next
             End If
 
             For Each roi In gridRects
