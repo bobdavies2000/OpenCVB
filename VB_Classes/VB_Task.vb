@@ -7,7 +7,6 @@ Imports System.Runtime.InteropServices
 
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public featuresLowRes As cvb.Mat
     Public featureMask As cvb.Mat
     Public fLessMask As cvb.Mat
     Public featureRects As New List(Of cvb.Rect)

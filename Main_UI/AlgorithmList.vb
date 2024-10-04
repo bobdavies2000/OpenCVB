@@ -900,6 +900,7 @@ End Enum
 	If algorithmName = "Edge_HSV_CS" Then return new Edge_HSV_CS
 	If algorithmName = "Edge_Laplacian" Then return new Edge_Laplacian
 	If algorithmName = "Edge_Laplacian_CS" Then return new Edge_Laplacian_CS
+	If algorithmName = "Edge_LaplacianColor" Then return new Edge_LaplacianColor
 	If algorithmName = "Edge_Matching" Then return new Edge_Matching
 	If algorithmName = "Edge_Matching_CS" Then return new Edge_Matching_CS
 	If algorithmName = "Edge_Motion_CS" Then return new Edge_Motion_CS

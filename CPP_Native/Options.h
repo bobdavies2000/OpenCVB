@@ -854,14 +854,6 @@ public:
 	Options_Derivative() {
 	}
 };
-class Options_LaplacianKernels {
-public:
-	int gaussiankernelSize =  1;
-	int LaplaciankernelSize =  3;
-	void RunOpt() {}
-	Options_LaplacianKernels() {
-	}
-};
 class Options_Threshold {
 public:
 	cv::ThresholdTypes thresholdMethod =  cv::ThresholdTypes::THRESH_BINARY;
@@ -2131,5 +2123,13 @@ class Options_GridFromResize {
 public:
 	void RunOpt() {}
 	Options_GridFromResize() {
+	}
+};
+class Options_LaplacianKernels {
+public:
+	int gaussiankernelSize =  1;
+	int LaplaciankernelSize =  3;
+	void RunOpt() {}
+	Options_LaplacianKernels() {
 	}
 };

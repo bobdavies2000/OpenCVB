@@ -1420,24 +1420,40 @@ End Class
 
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Edge_Laplacian : Inherits VB_Parent
+Public Class Edge_LaplacianColor : Inherits VB_Parent
     Dim options As New Options_LaplacianKernels
     Public Sub New()
-        labels(3) = "Laplacian of DepthRGB"
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then labels(3) = "Laplacian of DepthRGB"
         desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        dst2 = src.GaussianBlur(New cvb.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
-        dst2 = dst2.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
-        dst2 = dst2.ConvertScaleAbs()
+        dst2 = src.GaussianBlur(New cvb.Size(options.gaussiankernelSize,
+                                             options.gaussiankernelSize), 0, 0)
+        dst2 = dst2.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0).ConvertScaleAbs()
+        dst2 = dst2.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary)
+    End Sub
+End Class
 
-        Dim tmp = dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
-        cvb.Cv2.ImShow("tmp", tmp)
 
-        dst3 = task.depthRGB.GaussianBlur(New cvb.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
-        dst3 = dst3.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
-        dst3 = dst3.ConvertScaleAbs()
+
+
+
+
+
+Public Class Edge_Laplacian : Inherits VB_Parent
+    Dim options As New Options_LaplacianKernels
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        desc = "Show Laplacian edge detection with varying kernel sizes"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst2.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0).ConvertScaleAbs()
+        dst2 = dst2.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary)
     End Sub
 End Class

@@ -155,10 +155,13 @@ Public Class LowRes_Edges : Inherits VB_Parent
         FindRadio("Depth Region Boundaries").Enabled = False
         task.featureMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         task.fLessMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        FindRadio("Laplacian").Checked = True
         labels = {"", "", "Low Res overlaid with edges", "Featureless spaces - no edges or features"}
         desc = "Add edges to features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        Static stateList As New List(Of Single)
+
         lowRes.Run(src)
         dst2 = lowRes.dst2.Clone
 
@@ -171,21 +174,27 @@ Public Class LowRes_Edges : Inherits VB_Parent
         task.fLessMask.SetTo(0)
         Dim flist As New List(Of Single)
         For Each r In task.gridRects
-            If edges.dst2(r).CountNonZero = 0 Then
-                task.fLessRects.Add(r)
-                task.fLessMask(r).SetTo(255)
-                flist.Add(1)
-            Else
-                task.featureRects.Add(r)
-                task.featureMask(r).SetTo(255)
-                flist.Add(2)
-
-                DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
-            End If
+            flist.Add(If(edges.dst2(r).CountNonZero <= 1, 1, 2))
         Next
 
-        task.featuresLowRes = cvb.Mat.FromPixelData(task.lowResColor.Height, task.lowResColor.Width,
-                                                cvb.MatType.CV_32F, flist.ToArray)
+        If task.FirstPass Then
+            For Each n In flist
+                stateList.Add(n)
+            Next
+        End If
+
+        For i = 0 To task.gridRects.Count - 1
+            stateList(i) = (stateList(i) + flist(i)) / 2
+            Dim r = task.gridRects(i)
+            If stateList(i) >= 1.9 Then
+                DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
+                task.featureRects.Add(r)
+                task.featureMask(r).SetTo(255)
+            Else
+                task.fLessRects.Add(r)
+                task.fLessMask(r).SetTo(255)
+            End If
+        Next
 
         dst3.SetTo(0)
         src.CopyTo(dst3, task.featureMask)
@@ -328,6 +337,12 @@ Public Class LowRes_MLNoDepth : Inherits VB_Parent
         For i = 0 To bounds.boundaryCells.Count - 1
             Dim nList = bounds.boundaryCells(i)
 
+
+            If nList(0) = 10 Then Dim kk = 0
+
+
+
+
             ' the first roi is the center one and the only roi with edges.  The rest are featureless.
             Dim roi = task.gridRects(nList(0))
             Dim edgePixels = edgeMask(roi).FindNonZero()
@@ -370,8 +385,13 @@ Public Class LowRes_MLNoDepth : Inherits VB_Parent
             Dim respdata(ml.trainResponse.Total - 1) As Single
             Marshal.Copy(ml.trainResponse.Data, respdata, 0, respdata.Length)
 
-            Dim rgbdata(trainRGB.Total - 1) As Single
+            Dim rgbdata(trainRGB.Total * 3 - 1) As Single
             Marshal.Copy(trainRGB.Data, rgbdata, 0, rgbdata.Length)
+
+            Dim test = rgb32f(roiB).Clone
+            Dim testdata(test.Total * 3 - 1) As Single
+            Marshal.Copy(test.Data, testdata, 0, testdata.Length)
+
 
             Dim k = 0
         Next

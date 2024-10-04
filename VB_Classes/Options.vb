@@ -7775,16 +7775,20 @@ End Class
 Public Class Options_LaplacianKernels : Inherits VB_Parent
     Public gaussiankernelSize As Integer = 1
     Public LaplaciankernelSize As Integer = 3
+    Public threshold As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Gaussian Kernel", 1, 32, gaussiankernelSize)
             sliders.setupTrackBar("Laplacian Kernel", 1, 32, LaplaciankernelSize)
+            sliders.setupTrackBar("Laplacian Threshold", 0, 255, 100)
         End If
     End Sub
     Public Sub RunOpt()
         Static gaussSlider = FindSlider("Gaussian Kernel")
         Static LaplacianSlider = FindSlider("Laplacian Kernel")
+        Static thresholdSlider = FindSlider("Laplacian Threshold")
         gaussiankernelSize = gaussSlider.Value Or 1
         LaplaciankernelSize = LaplacianSlider.Value Or 1
+        threshold = thresholdSlider.Value
     End Sub
 End Class
