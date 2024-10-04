@@ -150,7 +150,7 @@ End Class
 
 Public Class LowRes_Edges : Inherits VB_Parent
     Public lowRes As New LowRes_Basics
-    Dim edges As New Edge_Basics
+    Public edges As New Edge_Basics
     Public Sub New()
         FindRadio("Depth Region Boundaries").Enabled = False
         task.featureMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
@@ -195,57 +195,6 @@ Public Class LowRes_Edges : Inherits VB_Parent
         End If
     End Sub
 End Class
-
-
-
-
-
-Public Class LowRes_Boundaries : Inherits VB_Parent
-    Public feat As New LowRes_Edges
-    Public boundaryCells As New List(Of List(Of Integer))
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
-        desc = "Find every non-featureless cell next to a featureless cell."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        dst1 = task.featureMask.Clone
-        dst3 = feat.dst2
-
-        boundaryCells.Clear()
-        For Each nList In task.gridNeighbors
-            Dim roiA = task.gridRects(nList(0))
-            Dim centerType = task.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
-            If centerType <> 0 Then
-                Dim boundList = New List(Of Integer)
-                Dim addFirst As Boolean = True
-                For i = 1 To nList.Count - 1
-                    Dim roiB = task.gridRects(nList(i))
-                    Dim val = task.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
-                    If centerType <> val Then
-                        If addFirst Then boundList.Add(nList(0)) ' first element is the center point (has features)
-                        addFirst = False
-                        boundList.Add(nList(i))
-                    End If
-                Next
-                If boundList.Count > 0 Then boundaryCells.Add(boundList)
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each nlist In boundaryCells
-            For Each n In nlist
-                Dim mytoggle As Integer
-                Dim roi = task.gridRects(n)
-                Dim val = task.featureMask.Get(Of Byte)(roi.Y, roi.X)
-                If val > 0 Then mytoggle = 255 Else mytoggle = 128
-                dst2(task.gridRects(n)).SetTo(mytoggle)
-            Next
-        Next
-    End Sub
-End Class
-
-
 
 
 
@@ -309,6 +258,54 @@ End Class
 
 
 
+Public Class LowRes_Boundaries : Inherits VB_Parent
+    Public feat As New LowRes_Edges
+    Public boundaryCells As New List(Of List(Of Integer))
+    Public Sub New()
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        desc = "Find every non-featureless cell next to a featureless cell."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        feat.Run(src)
+        dst1 = task.featureMask.Clone
+        dst3 = feat.dst2
+
+        boundaryCells.Clear()
+        For Each nList In task.gridNeighbors
+            Dim roiA = task.gridRects(nList(0))
+            Dim centerType = task.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
+            If centerType <> 0 Then
+                Dim boundList = New List(Of Integer)
+                Dim addFirst As Boolean = True
+                For i = 1 To nList.Count - 1
+                    Dim roiB = task.gridRects(nList(i))
+                    Dim val = task.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
+                    If centerType <> val Then
+                        If addFirst Then boundList.Add(nList(0)) ' first element is the center point (has features)
+                        addFirst = False
+                        boundList.Add(nList(i))
+                    End If
+                Next
+                If boundList.Count > 0 Then boundaryCells.Add(boundList)
+            End If
+        Next
+
+        dst2.SetTo(0)
+        For Each nlist In boundaryCells
+            For Each n In nlist
+                Dim mytoggle As Integer
+                Dim roi = task.gridRects(n)
+                Dim val = task.featureMask.Get(Of Byte)(roi.Y, roi.X)
+                If val > 0 Then mytoggle = 255 Else mytoggle = 128
+                dst2(task.gridRects(n)).SetTo(mytoggle)
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
 
 
 Public Class LowRes_MLNoDepth : Inherits VB_Parent
@@ -364,105 +361,5 @@ Public Class LowRes_MLNoDepth : Inherits VB_Parent
 
         labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
                   " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class LowRes_BoundaryKMeans : Inherits VB_Parent
-    Dim bounds As New LowRes_Boundaries
-    Dim kmeans As New KMeans_Basics
-    Public Sub New()
-        FindSlider("KMeans k").Value = 2
-        dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U)
-        desc = "Split each boundary cell in 2 - Feature vs. FeatureLess"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        bounds.Run(src)
-        dst2 = bounds.dst2.Threshold(129, 255, cvb.ThresholdTypes.Binary)
-        dst3 = bounds.dst3
-
-        If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        dst1.SetTo(1, task.fLessMask)
-        dst1.SetTo(2, task.featureMask)
-        For Each nlist In bounds.boundaryCells
-            Dim roi = task.gridRects(nlist(0))
-            Dim index = task.gridMap.Get(Of Integer)(roi.Y, roi.X)
-            Dim nabes = task.gridAllNabes(index)
-            kmeans.Run(src(nabes).Clone)
-            dst1(nabes) = kmeans.dst2 + 1
-            roi = task.gridRects(nlist(1)) ' the second element is always featureLess.
-            index = dst1.Get(Of Byte)(roi.Y, roi.X)
-            If index <> 1 Then dst1(nabes) = Not dst1(nabes)
-        Next
-        dst1 = dst1 * 255 / 2
-    End Sub
-End Class
-
-
-
-
-Public Class LowRes_FLessFlood : Inherits VB_Parent
-    Public count As Integer
-    Public rectList As New List(Of cvb.Rect)
-    Public rectGrid As New cvb.Mat
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S)
-        desc = "Simple FloodFill at specific points"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        'If src.Channels <> 3 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
-
-        'count = 0
-        'dst2.SetTo(0)
-        'rectList.Clear()
-
-        'For y = 0 To dst2.Height - 1
-        '    Dim val = src.Get(Of cvb.Vec3b)(y, 0)
-        '    Dim rectStart As Integer = rectList.Count
-        '    Dim rectindex As Integer = rectList.Count
-        '    Dim lastX As Integer = 0
-        '    rectList.Add(New cvb.Rect(0, y, 0, 0))
-        '    For x = 0 To dst2.Width - 1
-        '        Dim vec = src.Get(Of cvb.Vec3b)(y, x)
-        '        If vec <> val Then
-        '            Dim r = rectList(rectindex)
-        '            r.Width += x - lastX
-        '            rectList(rectindex) = r
-        '            rectindex += 1
-        '            lastX = x
-
-        '            val = vec
-        '            count += 1
-        '            dst2.Set(Of Integer)(y, x, count)
-        '            rectList.Add(New cvb.Rect(x, y, 0, 0))
-        '        Else
-        '            dst2.Set(Of Integer)(y, x, count)
-        '        End If
-        '    Next
-        '    Dim rlast = rectList(rectList.Count - 1)
-        '    rectList(rectList.Count - 1) = New cvb.Rect(rlast.X, rlast.Y, dst2.Width - lastX, rlast.Height)
-
-        '    Dim i = y + 1
-        '    For i = y + 1 To dst2.Height - 1
-        '        Dim tmp As cvb.Mat = (src.Row(i - 1) - src.Row(i)).ToMat.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        '        If tmp.CountNonZero Then Exit For
-        '        dst2.Row(i - 1).CopyTo(dst2.Row(i))
-        '    Next
-        '    count += 1
-        '    For j = rectStart To rectList.Count - 1
-        '        Dim r = rectList(j)
-        '        rectList(j) = New cvb.Rect(r.X, r.Y, r.Width, i - y)
-        '    Next
-        '    y = i - 1
-        'Next
-
-        'dst3.SetTo(0)
-        'For Each r In rectList
-        '    dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
-        'Next
     End Sub
 End Class
