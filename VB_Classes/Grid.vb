@@ -427,27 +427,6 @@ End Class
 
 
 
-Public Class Grid_QuarterRes : Inherits VB_Parent
-    Public gridRects As New List(Of cvb.Rect)
-    Dim grid As New Grid_Basics
-    Public Sub New()
-        grid.updateTaskgridRects = False
-        desc = "Provide the grid list for the lowest resolution of the current stream."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Static inputSrc As New cvb.Mat(task.quarterRes, cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        grid.Run(inputSrc)
-        gridRects = grid.gridRects
-        If standaloneTest() Then dst2 = task.gridMask
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Grid_MinMaxDepth : Inherits VB_Parent
     Public minMaxLocs(0) As PointPair
     Public minMaxVals(0) As cvb.Vec2f

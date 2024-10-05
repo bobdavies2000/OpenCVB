@@ -2,7 +2,7 @@ Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 Public Class Edge_Basics : Inherits VB_Parent
-    Dim canny As Edge_Canny
+    Dim canny As New Edge_Canny
     Dim scharr As Edge_Scharr
     Dim binRed As Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel

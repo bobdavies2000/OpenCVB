@@ -187,13 +187,18 @@ Public Class LowRes_Edges : Inherits VB_Parent
         For i = 0 To task.gridRects.Count - 1
             stateList(i) = (stateList(i) + flist(i)) / 2
             Dim r = task.gridRects(i)
-            If stateList(i) >= 1.9 Then
+            If stateList(i) >= 1.95 Then
                 DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
                 task.featureRects.Add(r)
                 task.featureMask(r).SetTo(255)
+            ElseIf stateList(i) <= 1.05 Then
+                task.fLessRects.Add(r)
+                task.fLessMask(r).SetTo(255)
             Else
                 task.fLessRects.Add(r)
                 task.fLessMask(r).SetTo(255)
+                task.featureRects.Add(r)
+                task.featureMask(r).SetTo(255)
             End If
         Next
 
@@ -316,6 +321,10 @@ Public Class LowRes_MLColor : Inherits VB_Parent
 
             dst1(roiB) = ml.predictions.Threshold(1.5, 255, cvb.ThresholdTypes.BinaryInv).
                                         ConvertScaleAbs.Reshape(1, roiB.Height)
+
+            Dim samples(ml.predictions.Total - 1) As Single
+            Marshal.Copy(ml.predictions.Data, samples, 0, samples.Length)
+            Dim k = 0
         Next
 
         dst2.SetTo(0)
@@ -393,23 +402,6 @@ Public Class LowRes_MLColorDepth : Inherits VB_Parent
 
             dst1(roiB) = ml.predictions.Threshold(1.5, 255, cvb.ThresholdTypes.BinaryInv).
                                         ConvertScaleAbs.Reshape(1, roiB.Height)
-
-
-            Dim samples(ml.predictions.Total - 1) As Single
-            Marshal.Copy(ml.predictions.Data, samples, 0, samples.Length)
-
-            Dim respdata(ml.trainResponse.Total - 1) As Single
-            Marshal.Copy(ml.trainResponse.Data, respdata, 0, respdata.Length)
-
-            Dim rgbdata(trainRGB.Total * 3 - 1) As Single
-            Marshal.Copy(trainRGB.Data, rgbdata, 0, rgbdata.Length)
-
-            Dim test = rgb32f(roiB).Clone
-            Dim testdata(test.Total * 3 - 1) As Single
-            Marshal.Copy(test.Data, testdata, 0, testdata.Length)
-
-
-            Dim k = 0
         Next
 
         dst2.SetTo(0)

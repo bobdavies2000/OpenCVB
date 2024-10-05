@@ -1352,8 +1352,6 @@ End Enum
 	If algorithmName = "Grid_MinMaxDepth_CS" Then return new Grid_MinMaxDepth_CS
 	If algorithmName = "Grid_Neighbors" Then return new Grid_Neighbors
 	If algorithmName = "Grid_Neighbors_CS" Then return new Grid_Neighbors_CS
-	If algorithmName = "Grid_QuarterRes" Then return new Grid_QuarterRes
-	If algorithmName = "Grid_QuarterRes_CS" Then return new Grid_QuarterRes_CS
 	If algorithmName = "Grid_Rectangles" Then return new Grid_Rectangles
 	If algorithmName = "Grid_Rectangles_CS" Then return new Grid_Rectangles_CS
 	If algorithmName = "Grid_ShowMap" Then return new Grid_ShowMap
@@ -1969,9 +1967,8 @@ End Enum
 	If algorithmName = "LowRes_Depth" Then return new LowRes_Depth
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
-	If algorithmName = "LowRes_MLDepth" Then return new LowRes_MLDepth
-	If algorithmName = "LowRes_MLDepth1" Then return new LowRes_MLDepth1
-	If algorithmName = "LowRes_MLNoDepth" Then return new LowRes_MLNoDepth
+	If algorithmName = "LowRes_MLColor" Then return new LowRes_MLColor
+	If algorithmName = "LowRes_MLColorDepth" Then return new LowRes_MLColorDepth
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics
 	If algorithmName = "LUT_Basics_CS" Then return new LUT_Basics_CS
 	If algorithmName = "LUT_Create" Then return new LUT_Create

@@ -24404,27 +24404,6 @@ namespace CS_Classes
 
 
 
-    public class Grid_QuarterRes_CS : VB_Parent
-    {
-        public List<cv.Rect> gridRects = new List<cv.Rect>();
-        Grid_Basics grid = new Grid_Basics();
-        Mat inputSrc;
-        public Grid_QuarterRes_CS()
-        {
-            inputSrc = new Mat(vbc.task.quarterRes, MatType.CV_8U, cv.Scalar.All(0));
-            grid.updateTaskgridRects = false;
-            desc = "Provide the grid list for the lowest resolution of the current stream.";
-        }
-        public void RunAlg(Mat src)
-        {
-            grid.Run(inputSrc);
-            gridRects = grid.gridRects;
-            if (standaloneTest()) dst2 = vbc.task.gridMask;
-        }
-    }
-
-
-
 
 
     public class Grid_MinMaxDepth_CS : VB_Parent
