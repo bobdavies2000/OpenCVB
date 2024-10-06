@@ -1508,6 +1508,7 @@ Public Class Main_UI
                     End If
 
                     If newCameraImages Then
+                        Debug.WriteLine("New camera images arrived.")
                         Dim copyTime = Now
 
                         SyncLock cameraLock
@@ -1604,6 +1605,7 @@ Public Class Main_UI
                 Dim spanWait = New TimeSpan(elapsedWaitTicks)
                 task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
                 Dim updatedDrawRect = task.drawRect
+
 
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 picLabels = task.labels

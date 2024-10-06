@@ -86,17 +86,6 @@ Public Class ML_Basics : Inherits VB_Parent
                 Case "LogisticRegression"
                     classifier = cvb.ML.LogisticRegression.Create()
                 Case Else
-                    '    RF-> setMaxDepth(4);
-                    'RF-> setMinSampleCount(2);
-                    'RF-> setRegressionAccuracy(0.f);
-                    'RF-> setUseSurrogates(False);
-                    'RF-> setMaxCategories(16);
-                    'RF-> setPriors(Mat());
-                    'RF-> setCalculateVarImportance(False);
-                    'RF-> setActiveVarCount(1);
-                    'RF-> setTermCriteria(TermCriteria(TermCriteria: MAX_ITER, 5, 0));
-                    'RF-> Train(trainInput);
-
                     classifier = cvb.ML.RTrees.Create()
                     classifier.MinSampleCount = 2
                     classifier.MaxDepth = 4
@@ -122,6 +111,8 @@ Public Class ML_Basics : Inherits VB_Parent
         If predictions.Type <> cvb.MatType.CV_32F Then
             predictions.ConvertTo(predictions, cvb.MatType.CV_32F)
         End If
+        Dim test = cvb.ML.ANN_MLP.Create
+        classifier.Dispose
     End Sub
 End Class
 

@@ -175,7 +175,7 @@ Public Class LowRes_Edges : Inherits VB_Parent
             flist.Add(If(edges.dst2(r).CountNonZero <= 1, 1, 2))
         Next
 
-        If task.optionsChanged Then
+        If task.optionsChanged Or stateList.Count = 0 Then
             stateList.Clear()
             For Each n In flist
                 stateList.Add(n)
@@ -219,7 +219,7 @@ Public Class LowRes_Boundaries : Inherits VB_Parent
     Public boundaryCells As New List(Of List(Of Integer))
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
-        desc = "Find every non-featureless cell next to a featureless cell."
+        desc = "Find the boundary cells between feature and featureless cells."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)

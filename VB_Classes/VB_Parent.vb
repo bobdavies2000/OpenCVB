@@ -624,6 +624,7 @@ Public Class VB_Parent : Implements IDisposable
         combo.Dispose()
     End Sub
     Public Sub processFrame(src As cvb.Mat)
+        If dst2.Size <> src.Size Then Exit Sub
         task.MainUI_Algorithm.Run(src)
         task.labels = labels
 
