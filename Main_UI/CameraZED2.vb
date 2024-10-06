@@ -1,37 +1,30 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
-Imports System.Runtime
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports sl
-Imports System.Numerics
-Imports Intel.RealSense
-
-
 #If 1 Then
 Public Class CameraZED2 : Inherits GenericCamera
     Dim zed As sl.Camera
     Dim init_params As New InitParameters()
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        Dim fps = 100
-        If captureRes.Width = 960 Then fps = 120
-        If captureRes.Width = 1920 And captureRes.Height = 1080 Then fps = 30
-        If captureRes.Width = 1920 And captureRes.Height = 1200 Then fps = 60
-        If captureRes.Width = 1280 And captureRes.Height = 720 Then fps = 60
+        init_params.cameraFPS = 100
+        If captureRes.Width = 960 Then init_params.cameraFPS = 120
+        If captureRes.Width = 1920 And captureRes.Height = 1080 Then init_params.cameraFPS = 30
+        If captureRes.Width = 1920 And captureRes.Height = 1200 Then init_params.cameraFPS = 60
+        If captureRes.Width = 1280 And captureRes.Height = 720 Then init_params.cameraFPS = 60
 
-        init_params.cameraFPS = fps
         init_params.sensorsRequired = True
         init_params.depthMode = sl.DEPTH_MODE.ULTRA
         init_params.coordinateSystem = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
         init_params.coordinateUnits = sl.UNIT.METER
 
-        If captureRes.Height = 720 Then init_params.resolution = 4 ' sl.Resolution.HD720
-        If captureRes.Height = 1080 Then init_params.resolution = 3 ' sl.Resolution.HD720
-        If captureRes.Height = 1200 Then init_params.resolution = 2 ' sl.Resolution.HD720
-        If captureRes.Height = 376 Then init_params.resolution = 6 ' sl.Resolution.HD720
+        If captureRes.Height = 720 Then init_params.resolution = sl.RESOLUTION.HD720
+        If captureRes.Height = 1080 Then init_params.resolution = sl.RESOLUTION.HD1080
+        If captureRes.Height = 1200 Then init_params.resolution = sl.RESOLUTION.HD720
+        If captureRes.Height = 376 Then init_params.resolution = sl.RESOLUTION.VGA
 
         zed = New sl.Camera(0)
-        zed.Open(init_params)
+        Dim errCode = zed.Open(init_params)
 
         Dim camInfo As sl.CameraInformation = zed.GetCameraInformation
 
@@ -59,7 +52,8 @@ Public Class CameraZED2 : Inherits GenericCamera
         Static pointCloudSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
 
         zed.RetrieveImage(colorSL, sl.VIEW.LEFT)
-        color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, colorSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+        color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, colorSL.GetPtr).
+                                      CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
 
         zed.RetrieveImage(rightSL, sl.VIEW.RIGHT)
         rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, rightSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)

@@ -1608,7 +1608,11 @@ Public Class Main_UI
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 picLabels = task.labels
                 SyncLock mouseLock
-                    mouseGridCell = task.gridMap.Get(Of Integer)(mousePoint.Y, mousePoint.X)
+                    If mousePoint.X < task.gridMap.Width And mousePoint.Y < task.gridMap.Height Then
+                        mouseGridCell = task.gridMap.Get(Of Integer)(mousePoint.Y, mousePoint.X)
+                    Else
+                        mousePoint = New cvb.Point(0, 0)
+                    End If
                 End SyncLock
                 Dim returnTime = Now
 

@@ -71,7 +71,7 @@ Public Class OptionsGlobal
         task.cvFontThickness = 1
         Select Case task.dst2.Width
             Case 1920
-                GridSlider.Value = 192
+                GridSlider.Value = 64
                 task.cvFontSize = 3.5
                 task.cvFontThickness = 4
                 task.DotSize = 4
@@ -82,7 +82,7 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 25
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 960
-                GridSlider.Value = 96
+                GridSlider.Value = 40
                 task.cvFontSize = 2.0
                 task.cvFontThickness = 2
                 task.DotSize = 2
@@ -92,7 +92,7 @@ Public Class OptionsGlobal
                 task.densityMetric = 200
                 task.FASTthreshold = 40
             Case 480
-                GridSlider.Value = 48
+                GridSlider.Value = 20
                 task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cvb.Size(240, 135)
@@ -100,7 +100,7 @@ Public Class OptionsGlobal
                 task.densityMetric = 650
                 task.FASTthreshold = 10
             Case 1280
-                GridSlider.Value = 128
+                GridSlider.Value = 48
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
                 task.DotSize = 5
@@ -111,7 +111,7 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 40
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 640
-                GridSlider.Value = 64
+                GridSlider.Value = 24
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.disparityAdjustment = 4.2
@@ -120,7 +120,7 @@ Public Class OptionsGlobal
                 task.densityMetric = 200
                 task.FASTthreshold = 30
             Case 320
-                GridSlider.Value = 32
+                GridSlider.Value = 14
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 8.4
                 task.lowRes = New cvb.Size(320, 180)
@@ -129,7 +129,7 @@ Public Class OptionsGlobal
                 task.densityMetric = 500
                 task.FASTthreshold = 10
             Case 160
-                GridSlider.Value = 16
+                GridSlider.Value = 8
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cvb.Size(160, 120)
@@ -137,7 +137,7 @@ Public Class OptionsGlobal
                 task.densityMetric = 100
                 task.FASTthreshold = 10
             Case 672
-                GridSlider.Value = 64
+                GridSlider.Value = 24
                 task.cvFontSize = 1.5
                 task.DotSize = 1
                 task.disparityAdjustment = 4.4
@@ -146,7 +146,7 @@ Public Class OptionsGlobal
                 task.densityMetric = 300
                 task.FASTthreshold = 10
             Case 336
-                GridSlider.Value = 32
+                GridSlider.Value = 12
                 task.cvFontSize = 1.0
                 task.DotSize = 1
                 task.disparityAdjustment = 8.8
@@ -155,7 +155,7 @@ Public Class OptionsGlobal
                 task.densityMetric = 700
                 task.FASTthreshold = 10
             Case 168
-                GridSlider.Value = 16
+                GridSlider.Value = 8
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
                 task.lowRes = New cvb.Size(168, 94)

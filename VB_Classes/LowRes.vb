@@ -26,7 +26,6 @@ End Class
 
 Public Class LowRes_Color : Inherits VB_Parent
     Public Sub New()
-        task.gOptions.setGridSize(10)
         labels = {"", "", "Grid of mean color values", "Resized task.lowResColor"}
         desc = "The bare minimum needed to make the LowRes image."
     End Sub
@@ -54,7 +53,6 @@ End Class
 
 Public Class LowRes_Depth : Inherits VB_Parent
     Public Sub New()
-        task.gOptions.setGridSize(10)
         labels = {"", "", "Grid of mean depth values", "Resized task.lowResDepth"}
         desc = "The bare minimum needed to make the LowRes image."
     End Sub

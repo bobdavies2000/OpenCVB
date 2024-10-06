@@ -10,7 +10,10 @@ Public Class Grid_Basics : Inherits VB_Parent
         If task.mouseClickFlag And Not task.FirstPass Then
             task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
-        If task.optionsChanged Then
+
+        Dim testGridCols As Integer
+        If task.gridSize <> 0 Then testGridCols = CInt(src.Width / task.gridSize)
+        If task.optionsChanged Or testGridCols <> task.gridCols Then
             task.gridSize = task.gOptions.GridSlider.Value
             task.gridMask = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
             task.gridMap = New cvb.Mat(src.Size(), cvb.MatType.CV_32S, 255)
@@ -106,24 +109,6 @@ Public Class Grid_Basics : Inherits VB_Parent
                     If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(8)
                 End If
             Next
-
-            'task.gridLowResIndices = New cvb.Mat(task.gridRows, task.gridCols, cvb.MatType.CV_32FC2)
-            'For y = 0 To task.gridRows - 1
-            '    For x = 0 To task.gridCols - 1
-            '        task.gridLowResIndices.Set(Of cvb.Point2f)(y, x, New cvb.Point2f(CSng(x), CSng(y)))
-            '    Next
-            'Next
-
-            'task.gridHighResIndices = New cvb.Mat(task.color.Size, cvb.MatType.CV_32FC2)
-            'Dim roiIndex As Integer
-            'For y = 0 To task.gridCols - 1
-            '    For x = 0 To task.gridRows - 1
-            '        Dim val = task.gridLowResIndices.Get(Of cvb.Vec2f)(y, x)
-            '        Dim roi = gridRects(roiIndex)
-            '        task.gridHighResIndices(roi).SetTo(Val)
-            '        roiIndex += 1
-            '    Next
-            'Next
         End If
         If standaloneTest() Then
             dst2 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
