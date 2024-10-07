@@ -56,7 +56,7 @@ End Class
 ' https://docs.opencvb.org/4.x/d7/d4d/tutorial_py_thresholding.html
 Public Class Threshold_Definitions : Inherits VB_Parent
     Dim gradient As New Gradient_Color
-    Dim mats As New Mat_4Click
+    Dim mats As New Mat_4to1
     Dim options As New Options_ThresholdDef
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
@@ -83,7 +83,14 @@ Public Class Threshold_Definitions : Inherits VB_Parent
         SetTrueText("Trunc", New cvb.Point(dst2.Width / 2 + 5, 10), 2)
         SetTrueText("ToZero", New cvb.Point(10, dst2.Height / 2 + 10), 2)
         SetTrueText("ToZeroInv", New cvb.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2)
-        SetTrueText("Current selection from grid at left", 3)
+        SetTrueText(
+            vbCrLf + "Upper left:  the input for all the tests below..." + vbCrLf +
+            vbCrLf + "Upper right: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.Binary)" + vbCrLf +
+            vbCrLf + "0: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.BinaryInv)" + vbCrLf +
+            vbCrLf + "1: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.Trunc)" + vbCrLf +
+            vbCrLf + "2: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.Tozero)" + vbCrLf +
+            vbCrLf + "1: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.TozeroInv)" + vbCrLf,
+        3)
     End Sub
 End Class
 
