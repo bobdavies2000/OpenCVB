@@ -165,7 +165,7 @@ End Class
 Public Class Gradient_CloudX : Inherits VB_Parent
     Dim plotHist As New Plot_Histogram
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta X (mm)", 0, 1000, 10)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta X (mm)", 1, 1000, 10)
 
         task.gOptions.setDisplay0()
         task.gOptions.setDisplay1()
@@ -173,7 +173,7 @@ Public Class Gradient_CloudX : Inherits VB_Parent
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = True
 
-        labels = {"Mask of pixels < deltaX", "Mask of pixels > deltaX * 2", "Point Cloud deltaX data",
+        labels = {"Mask of pixels < 0", "Mask of pixels > deltaX", "Point Cloud deltaX data",
                   ""}
         desc = "Find the gradient in the x and y direction "
     End Sub
@@ -185,12 +185,13 @@ Public Class Gradient_CloudX : Inherits VB_Parent
         Dim r2 = New cvb.Rect(1, 1, r1.Width, r1.Height)
 
         dst2 = task.pcSplit(0)(r1) - task.pcSplit(0)(r2)
-        dst2 += deltaX ' by definition, the deltaX cannot be zero for neighbors.
 
+        ' by definition, difference between 2 neighbors cannot be zero. At least, highly unlikely.
+        ' It can go negative because the neighbor pixel may be far behind it.
         dst2 = dst2.Resize(src.Size, 0, 0, cvb.InterpolationFlags.Nearest)
-        dst2.SetTo(-1, task.noDepthMask)
-        dst0 = dst2.Threshold(0, 255, cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
-        dst1 = dst2.Threshold(deltaX * 2, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+        dst2.SetTo(0, task.noDepthMask)
+        dst0 = dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+        dst1 = dst2.Threshold(deltaX, 255, cvb.ThresholdTypes.Tozero).ConvertScaleAbs
 
         dst2 = dst2.Clone
 
@@ -199,7 +200,7 @@ Public Class Gradient_CloudX : Inherits VB_Parent
 
         If task.optionsChanged Then
             plotHist.minRange = 0
-            plotHist.maxRange = deltaX * 2
+            plotHist.maxRange = deltaX
             labels(3) = "First bin is for -" + CStr(xSlider.value) + " mm's difference " +
                         "last bin is for " + CStr(xSlider.value) + " mm's difference "
         End If

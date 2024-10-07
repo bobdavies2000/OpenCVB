@@ -1353,12 +1353,16 @@ Public Class Main_UI
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
         Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(WorkingRes.Width) + "x" + CStr(WorkingRes.Height)
-        If camLabel(0).Text <> "RGB - " + resolutionDetails Then
-            camLabel(0).Text = "RGB"
-            If picLabels(0) <> "" Then camLabel(0).Text = picLabels(0)
-            If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
-            camLabel(0).Text += " - " + resolutionDetails
+        If picLabels(0) <> "" Then
+            If camLabel(0).Text <> picLabels(0) + " - RGB " + resolutionDetails Then
+                camLabel(0).Text = picLabels(0)
+                camLabel(0).Text += " - RGB " + resolutionDetails
+            End If
+        Else
+            camLabel(0).Text = "RGB - " + resolutionDetails
         End If
+
+        If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
         camLabel(2).Text = picLabels(2)
         camLabel(3).Text = picLabels(3)
         If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
