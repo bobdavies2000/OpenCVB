@@ -96,3 +96,114 @@ Public Class Gradient_Color : Inherits VB_Parent
         dst2 = gradient.Resize(dst2.Size)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Gradient_Cloud1 : Inherits VB_Parent
+    Dim plotHistOriginal As New Plot_Histogram
+    Dim plotHistZoom As New Plot_Histogram
+    Dim depthMask As New LowRes_DepthMask
+    Public Sub New()
+        plotHistZoom.createHistogram = True
+        plotHistZoom.removeZeroEntry = True
+        plotHistOriginal.createHistogram = True
+        plotHistOriginal.removeZeroEntry = True
+        desc = "Find the gradient in the x and y direction "
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Dim r1 = New cvb.Rect(0, 0, dst2.Width - 1, dst2.Height - 1)
+        Dim r2 = New cvb.Rect(1, 1, r1.Width, r1.Height)
+
+        depthMask.Run(empty)
+        Dim pcX = task.pcSplit(0).SetTo(0, Not depthMask.dst2)
+        dst1 = pcX(r1) - pcX(r2)
+        Dim mm = GetMinMax(dst1)
+
+        plotHistOriginal.Run(dst1)
+
+        Dim firstVal As Single, lastVal As Single
+        Dim total = plotHistOriginal.histArray.Sum()
+        For i = 0 To task.histogramBins - 1
+            If plotHistOriginal.histArray(i) > total / 100 Then
+                firstVal = i
+                Exit For
+            End If
+        Next
+
+        For i = task.histogramBins - 1 To 0 Step -1
+            If plotHistOriginal.histArray(i) > total / 100 Then
+                lastVal = i
+                Exit For
+            End If
+        Next
+
+        Dim incr = (mm.maxVal - mm.minVal) / task.histogramBins
+        dst2 = dst1.InRange(firstVal * incr, lastVal * incr)
+
+        mm = GetMinMax(dst2)
+        dst2 -= mm.minVal
+        dst2 *= 255 / (mm.maxVal - mm.minVal)
+        dst2 = dst2.Resize(src.Size)
+
+        plotHistZoom.Run(dst2)
+        dst3 = plotHistZoom.dst2
+        If task.heartBeat Then labels(3) = plotHistZoom.labels(2)
+
+        If task.heartBeat Then labels(2) = CStr(CInt(mm.maxVal)) + " max value " +
+                                           CStr(CInt(mm.minVal)) + " min value"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Gradient_CloudX : Inherits VB_Parent
+    Dim plotHist As New Plot_Histogram
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta X (mm)", 0, 1000, 10)
+
+        task.gOptions.setDisplay0()
+        task.gOptions.setDisplay1()
+
+        plotHist.createHistogram = True
+        plotHist.removeZeroEntry = True
+
+        labels = {"Mask of pixels < deltaX", "Mask of pixels > deltaX * 2", "Point Cloud deltaX data",
+                  ""}
+        desc = "Find the gradient in the x and y direction "
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static xSlider = FindSlider("Delta X (mm)")
+        Dim deltaX As Single = xSlider.value / 1000
+
+        Dim r1 = New cvb.Rect(0, 0, dst2.Width - 1, dst2.Height - 1)
+        Dim r2 = New cvb.Rect(1, 1, r1.Width, r1.Height)
+
+        dst2 = task.pcSplit(0)(r1) - task.pcSplit(0)(r2)
+        dst2 += deltaX ' by definition, the deltaX cannot be zero for neighbors.
+
+        dst2 = dst2.Resize(src.Size, 0, 0, cvb.InterpolationFlags.Nearest)
+        dst2.SetTo(-1, task.noDepthMask)
+        dst0 = dst2.Threshold(0, 255, cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
+        dst1 = dst2.Threshold(deltaX * 2, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+
+        dst2 = dst2.Clone
+
+        dst2.SetTo(0, dst0)
+        dst2.SetTo(0, dst1)
+
+        If task.optionsChanged Then
+            plotHist.minRange = 0
+            plotHist.maxRange = deltaX * 2
+            labels(3) = "First bin is for -" + CStr(xSlider.value) + " mm's difference " +
+                        "last bin is for " + CStr(xSlider.value) + " mm's difference "
+        End If
+        plotHist.Run(dst2)
+        dst3 = plotHist.dst2
+    End Sub
+End Class

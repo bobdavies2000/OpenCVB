@@ -1325,6 +1325,8 @@ End Enum
 	If algorithmName = "Gradient_Basics_CS" Then return new Gradient_Basics_CS
 	If algorithmName = "Gradient_CartToPolar" Then return new Gradient_CartToPolar
 	If algorithmName = "Gradient_CartToPolar_CS" Then return new Gradient_CartToPolar_CS
+	If algorithmName = "Gradient_Cloud1" Then return new Gradient_Cloud1
+	If algorithmName = "Gradient_CloudX" Then return new Gradient_CloudX
 	If algorithmName = "Gradient_Color" Then return new Gradient_Color
 	If algorithmName = "Gradient_Color_CS" Then return new Gradient_Color_CS
 	If algorithmName = "Gradient_Depth" Then return new Gradient_Depth
@@ -1965,6 +1967,7 @@ End Enum
 	If algorithmName = "LowRes_Boundaries" Then return new LowRes_Boundaries
 	If algorithmName = "LowRes_Color" Then return new LowRes_Color
 	If algorithmName = "LowRes_Depth" Then return new LowRes_Depth
+	If algorithmName = "LowRes_DepthMask" Then return new LowRes_DepthMask
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
 	If algorithmName = "LowRes_MLColor" Then return new LowRes_MLColor
@@ -2372,6 +2375,7 @@ End Enum
 	If algorithmName = "OpenGL_GravityKalman_CS" Then return new OpenGL_GravityKalman_CS
 	If algorithmName = "OpenGL_GravityTransform" Then return new OpenGL_GravityTransform
 	If algorithmName = "OpenGL_GravityTransform_CS" Then return new OpenGL_GravityTransform_CS
+	If algorithmName = "OpenGL_Grid" Then return new OpenGL_Grid
 	If algorithmName = "OpenGL_HistDepth3D" Then return new OpenGL_HistDepth3D
 	If algorithmName = "OpenGL_HistDepth3D_CS" Then return new OpenGL_HistDepth3D_CS
 	If algorithmName = "OpenGL_HistNorm3D" Then return new OpenGL_HistNorm3D

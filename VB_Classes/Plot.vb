@@ -512,5 +512,7 @@ Public Class Plot_Histogram : Inherits VB_Parent
             Next
             If addLabels Then AddPlotScale(dst2, mm.minVal, mm.maxVal)
         End If
+        If task.heartBeat Then labels(2) = CStr(CInt(mm.maxVal)) + " max value " +
+                                           CStr(CInt(mm.minVal)) + " min value"
     End Sub
 End Class

@@ -163,6 +163,8 @@ Public Class LowRes_Edges : Inherits VB_Parent
         lowRes.Run(src)
         dst2 = lowRes.dst2.Clone
 
+        Static lastDepth As cvb.Mat = task.lowResDepth.Clone
+
         edges.Run(src)
         dst2.SetTo(0, edges.dst2)
 
@@ -182,6 +184,7 @@ Public Class LowRes_Edges : Inherits VB_Parent
             Next
         End If
 
+        Dim flipflops As Integer
         For i = 0 To task.gridRects.Count - 1
             stateList(i) = (stateList(i) + flist(i)) / 2
             Dim r = task.gridRects(i)
@@ -193,6 +196,7 @@ Public Class LowRes_Edges : Inherits VB_Parent
                 task.fLessRects.Add(r)
                 task.fLessMask(r).SetTo(255)
             Else
+                flipflops += 1
                 task.fLessRects.Add(r)
                 task.fLessMask(r).SetTo(255)
                 task.featureRects.Add(r)
@@ -202,8 +206,16 @@ Public Class LowRes_Edges : Inherits VB_Parent
 
         dst3.SetTo(0)
         src.CopyTo(dst3, task.featureMask)
+
+        For Each r In task.fLessRects
+            Dim x = CInt(r.X / task.gridSize)
+            Dim y = CInt(r.Y / task.gridSize)
+            task.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
+        Next
+        lastDepth = task.lowResDepth.Clone
         If task.heartBeat Then
-            labels(2) = CStr(task.featureRects.Count) + " cells with features were found"
+            labels(2) = CStr(task.featureRects.Count) + "/" + CStr(task.fLessRects.Count) + "/" +
+                        CStr(flipflops) + " Features/FeatureLess/Flipper cells."
             labels(3) = CStr(task.fLessRects.Count) + " cells without features were found"
         End If
     End Sub
@@ -410,5 +422,23 @@ Public Class LowRes_MLColorDepth : Inherits VB_Parent
 
         labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
                   " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
+    End Sub
+End Class
+
+
+
+
+
+Public Class LowRes_DepthMask : Inherits VB_Parent
+    Public Sub New()
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        desc = "Create a mask of the cells that are mostly depth - remove speckles in no depth regions"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2.SetTo(0)
+        For Each roi In task.gridRects
+            Dim count = task.pcSplit(2)(roi).CountNonZero()
+            If count >= task.gridSize * task.gridSize / 2 Then dst2(roi).SetTo(255)
+        Next
     End Sub
 End Class

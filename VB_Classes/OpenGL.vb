@@ -2106,3 +2106,30 @@ Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Parent
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
+
+
+
+
+
+
+Public Class OpenGL_Grid : Inherits VB_Parent
+    Dim lowRes As New LowRes_Edges
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Display the grid depth and color for each cell"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lowRes.Run(src)
+        dst2 = lowRes.dst2
+        If task.lowResDepth.Type <> cvb.MatType.CV_32F Then Exit Sub
+
+        Dim depth = task.lowResDepth.Resize(src.Size, 0, 0, cvb.InterpolationFlags.Nearest)
+        Dim pc As New cvb.Mat
+        cvb.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), depth}, pc)
+        If task.toggleOnOff Then pc.SetTo(0, task.fLessMask)
+        task.ogl.pointCloudInput = pc
+        task.ogl.Run(dst2)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+    End Sub
+End Class
