@@ -102,96 +102,37 @@ End Class
 
 
 
-Public Class Gradient_Cloud1 : Inherits VB_Parent
-    Dim plotHistOriginal As New Plot_Histogram
-    Dim plotHistZoom As New Plot_Histogram
-    Dim depthMask As New LowRes_DepthMask
-    Public Sub New()
-        plotHistZoom.createHistogram = True
-        plotHistZoom.removeZeroEntry = True
-        plotHistOriginal.createHistogram = True
-        plotHistOriginal.removeZeroEntry = True
-        desc = "Find the gradient in the x and y direction "
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Dim r1 = New cvb.Rect(0, 0, dst2.Width - 1, dst2.Height - 1)
-        Dim r2 = New cvb.Rect(1, 1, r1.Width, r1.Height)
-
-        depthMask.Run(empty)
-        Dim pcX = task.pcSplit(0).SetTo(0, Not depthMask.dst2)
-        dst1 = pcX(r1) - pcX(r2)
-        Dim mm = GetMinMax(dst1)
-
-        plotHistOriginal.Run(dst1)
-
-        Dim firstVal As Single, lastVal As Single
-        Dim total = plotHistOriginal.histArray.Sum()
-        For i = 0 To task.histogramBins - 1
-            If plotHistOriginal.histArray(i) > total / 100 Then
-                firstVal = i
-                Exit For
-            End If
-        Next
-
-        For i = task.histogramBins - 1 To 0 Step -1
-            If plotHistOriginal.histArray(i) > total / 100 Then
-                lastVal = i
-                Exit For
-            End If
-        Next
-
-        Dim incr = (mm.maxVal - mm.minVal) / task.histogramBins
-        dst2 = dst1.InRange(firstVal * incr, lastVal * incr)
-
-        mm = GetMinMax(dst2)
-        dst2 -= mm.minVal
-        dst2 *= 255 / (mm.maxVal - mm.minVal)
-        dst2 = dst2.Resize(src.Size)
-
-        plotHistZoom.Run(dst2)
-        dst3 = plotHistZoom.dst2
-        If task.heartBeat Then labels(3) = plotHistZoom.labels(2)
-
-        If task.heartBeat Then labels(2) = CStr(CInt(mm.maxVal)) + " max value " +
-                                           CStr(CInt(mm.minVal)) + " min value"
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Gradient_CloudX : Inherits VB_Parent
-    Dim plotHist As New Plot_Histogram
+    Public plotHist As New Plot_Histogram
+    Public roi As New cvb.Rect(0, 0, dst2.Width, dst2.Height)
+    Public pc As cvb.Mat
+    Public options As New Options_Gradient_Cloud
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta X (mm)", 1, 1000, 10)
-
-        task.gOptions.setDisplay0()
-        task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
 
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = True
 
-        labels = {"Mask of pixels < 0", "Mask of pixels > deltaX", "Point Cloud deltaX data",
-                  ""}
+        labels = {"Mask of differences <= 0", "Mask of differences > deltaX", "Point Cloud deltaX data", ""}
         desc = "Find the gradient in the x and y direction "
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Static xSlider = FindSlider("Delta X (mm)")
-        Dim deltaX As Single = xSlider.value / 1000
+        options.RunOpt()
 
-        Dim r1 = New cvb.Rect(0, 0, dst2.Width - 1, dst2.Height - 1)
-        Dim r2 = New cvb.Rect(1, 1, r1.Width, r1.Height)
+        pc = task.pcSplit(0)(roi)
+        Dim mm = GetMinMax(pc)
+        Dim pcShifted As cvb.Mat = pc - mm.minVal
 
-        dst2 = task.pcSplit(0)(r1) - task.pcSplit(0)(r2)
+        Dim r1 = New cvb.Rect(0, 0, dst2.Width - 1, dst2.Height)
+        Dim r2 = New cvb.Rect(1, 0, r1.Width, r1.Height)
 
-        ' by definition, difference between 2 neighbors cannot be zero. At least, highly unlikely.
-        ' It can go negative because the neighbor pixel may be far behind it.
-        dst2 = dst2.Resize(src.Size, 0, 0, cvb.InterpolationFlags.Nearest)
-        dst2.SetTo(0, task.noDepthMask)
-        dst0 = dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
-        dst1 = dst2.Threshold(deltaX, 255, cvb.ThresholdTypes.Tozero).ConvertScaleAbs
+        dst2 = pcShifted(r2) - pcShifted(r1)
+
+        dst2 = dst2.Resize(roi.Size, 0, 0, cvb.InterpolationFlags.Nearest)
+        dst0 = Not dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+        dst1 = dst2.Threshold(options.deltaX, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
 
         dst2 = dst2.Clone
 
@@ -200,9 +141,8 @@ Public Class Gradient_CloudX : Inherits VB_Parent
 
         If task.optionsChanged Then
             plotHist.minRange = 0
-            plotHist.maxRange = deltaX
-            labels(3) = "First bin is for -" + CStr(xSlider.value) + " mm's difference " +
-                        "last bin is for " + CStr(xSlider.value) + " mm's difference "
+            plotHist.maxRange = options.deltaX
+            labels(3) = "0 to " + CStr(options.deltaX) + " mm's difference from neighbor "
         End If
         plotHist.Run(dst2)
         dst3 = plotHist.dst2

@@ -7792,3 +7792,27 @@ Public Class Options_LaplacianKernels : Inherits VB_Parent
         threshold = thresholdSlider.Value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_Gradient_Cloud : Inherits VB_Parent
+    Public deltaX As Single
+    Public deltaY As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Delta X (mm)", 1, 1000, 10)
+            sliders.setupTrackBar("Delta Y (mm)", 1, 1000, 10)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static xSlider = FindSlider("Delta X (mm)")
+        deltaX = xSlider.value / 1000
+
+        Static ySlider = FindSlider("Delta Y (mm)")
+        deltaY = ySlider.value / 1000
+
+    End Sub
+End Class

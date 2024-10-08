@@ -2133,3 +2133,9 @@ public:
 	Options_LaplacianKernels() {
 	}
 };
+class Options_Gradient_Cloud {
+public:
+	void RunOpt() {}
+	Options_Gradient_Cloud() {
+	}
+};

@@ -135,6 +135,7 @@ End Enum
 	If algorithmName = "BackProject_Basics_CS" Then return new BackProject_Basics_CS
 	If algorithmName = "BackProject_BasicsKeyboard" Then return new BackProject_BasicsKeyboard
 	If algorithmName = "BackProject_BasicsKeyboard_CS" Then return new BackProject_BasicsKeyboard_CS
+	If algorithmName = "BackProject_CloudX" Then return new BackProject_CloudX
 	If algorithmName = "BackProject_Depth" Then return new BackProject_Depth
 	If algorithmName = "BackProject_Depth_CS" Then return new BackProject_Depth_CS
 	If algorithmName = "BackProject_Display" Then return new BackProject_Display
@@ -1325,7 +1326,6 @@ End Enum
 	If algorithmName = "Gradient_Basics_CS" Then return new Gradient_Basics_CS
 	If algorithmName = "Gradient_CartToPolar" Then return new Gradient_CartToPolar
 	If algorithmName = "Gradient_CartToPolar_CS" Then return new Gradient_CartToPolar_CS
-	If algorithmName = "Gradient_Cloud1" Then return new Gradient_Cloud1
 	If algorithmName = "Gradient_CloudX" Then return new Gradient_CloudX
 	If algorithmName = "Gradient_Color" Then return new Gradient_Color
 	If algorithmName = "Gradient_Color_CS" Then return new Gradient_Color_CS
@@ -2546,6 +2546,7 @@ End Enum
 	If algorithmName = "Options_Gif" Then return new Options_Gif
 	If algorithmName = "Options_GrabCut" Then return new Options_GrabCut
 	If algorithmName = "Options_Gradient" Then return new Options_Gradient
+	If algorithmName = "Options_Gradient_Cloud" Then return new Options_Gradient_Cloud
 	If algorithmName = "Options_Grayscale8U" Then return new Options_Grayscale8U
 	If algorithmName = "Options_Grid" Then return new Options_Grid
 	If algorithmName = "Options_GridFromResize" Then return new Options_GridFromResize

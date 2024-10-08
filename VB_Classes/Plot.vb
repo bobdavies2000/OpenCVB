@@ -470,6 +470,7 @@ Public Class Plot_Histogram : Inherits VB_Parent
     Public histArray() As Single
     Public minRange As Single = 0
     Public maxRange As Single = 255
+    Public ranges() As cvb.Rangef
     Public backColor As cvb.Scalar = cvb.Scalar.Red
     Public plotCenter As Single
     Public barWidth As Single
@@ -483,7 +484,8 @@ Public Class Plot_Histogram : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or createHistogram Then
             If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-            cvb.Cv2.CalcHist({src}, {0}, New cvb.Mat(), histogram, 1, {task.histogramBins}, {New cvb.Rangef(minRange, maxRange)})
+            ranges = {New cvb.Rangef(minRange, maxRange)}
+            cvb.Cv2.CalcHist({src}, {0}, New cvb.Mat(), histogram, 1, {task.histogramBins}, ranges)
         Else
             histogram = src
         End If
