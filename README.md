@@ -1,40 +1,31 @@
-# Recent Changes – September 2024 (Part 2)
+# Recent Changes – October 2024
 
 -   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
--   This OpenCVB update is focused almost exclusively on the camera interfaces.
--   More camera interfaces are using only VB.Net to capture image and IMU data.
-    -   The C\# wrappers require the .Net Framework 3.5 – install had to change.
-    -   The install script now prompts to install .Net Framework 3.5.
-        -   Update_All.bat script will fail if 3.5 is not present on the system
-    -   In addition, the StereoLabs C\# interface needed to be reworked.
-        -   The same name is used for a struct, an enum, and a variable.
-        -   VB.Net does not allow this kind of overlapping names.
-        -   The replacement C\# code is now included in OpenCVB.
--   StereoLabs Zed 2i, Intel RealSense D455/D435, Orbbec Gemini 335L updated.
-    -   VB.Net camera interfaces are much easier to debug.
-    -   The Oak-D interface was rewritten but in C++
-        -   Oak-D has no C\# interface (resource constraint at Luxonis)
-        -   The OpenCVB interface is no longer troublesome.
-    -   All previous C++ interfaces are still there and toggled with \#ifdef
--   All the camera interfaces collect all image and IMU data.
-    -   Color, Left, Right, Point Cloud, and IMU acceleration/angularvelocity.
-    -   OpenCVB is focused on using only the image and IMU data.
--   The StereoLabs camera “tearing” problem is not a software issue.
-    -   The cable provided by StereoLabs needed to be replaced.
--   The Mynt camera interface is unchanged. Company went out-of-business.
--   The Kinect for Azure camera is also unchanged – VB.Net version is coming soon.
-    -   The K4A camera doesn’t use the same technique as all the other cameras.
-        -   No left and right images are available.
-    -   K4A is useful and it is the most accurate at close range.
--   Microsoft has discontinued their K4A camera.
-    -   The K4A equivalent camera is available as Orbbec Femto Bolt.
--   Other news: another way to capture motion is in Motion_FromEdgeColorize
-    -   Blue is motion, Red is not (see below.)
+-   A magnifying glass button was added to the OpenCVB toolbar.
+    -   It can provide more detailed images of specific areas.
+    -   The detailed image is dynamic – it will update with each frame.
+    -   Mouse movement can provide additional flexibility while drawing.
+    -   Magnifying glass works with static images while OpenCVB is paused.
+    -   All 4 images show the rectangle being drawn.
+    -   Contrast: the “Microscope” button provides even more detail.
+        -   The “Microscope” button produces that hex values.
+    -   See the image below to help find the new button and see sample output.
+-   OpenCV’s machine learning algorithms are all available in a single algorithm.
+    -   See the second sample image below; image segmented by features.
+    -   ML_Basics mimics the functionality of OpenCV’s Points Classifier example.
+    -   Feature detected is the output of the Laplacian 2nd derivative.
+        -   Laplacian was more accurate in finding the edge pixels for use with ML.
+-   C\# algorithms are now always configured in Release mode.
+    -   Makes it easier to determine the value of optimizing any VB.Net algorithm.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/3b7fcfc4ec5dcb8a1619770024131824.png)
+![](media/a4ade72e34b35bccb590db3772e53c01.png)
 
-**Motion_FromEdgeColorize:** *This algorithm uses the palette to identify motion. Motion is blue while red is not.*
+**Magnifying Button on Toolbar:** *First draw a rectangle in any of the 4 images then click the magnifying button to see a 5X copy of the region. The magnified image will reflect the image contents where the rectangle is drawn but all 4 images while outline the rectangle.*
+
+![A collage of images of a person Description automatically generated](media/5ae98b4c9bad297ea31fd84e9da6369a.png)
+
+**LowRes_MLColorDepth:** *ML is used to segment the image between cells with features (Laplacian edges) and featureless regions. The lower left image shows all the cells with featureless areas while the lower right image shows the more work is required for complete segmentation. The ML input is color and depth.*
 
 # 
 
@@ -327,7 +318,7 @@ The TreeView shows the different layers of the algorithm and how it was built fr
 
 ![A screenshot of a computer program Description automatically generated](media/c844902ab4d892dcf51d5a2d24c676f0.png)
 
-**KNN_TrackEach:** *The tree above describes how the algorithm calls KNN_NoDups and how KNN_NoDups calls KNN_Basics. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
+**KNN_TrackEach:** *The tree above describes how the algorithm calls KNN_Basics and how KNN_Basics calls KNN_Core. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
 
 *Play with this when running OpenCVB. It is a fun feature and helps increase understanding of the composition of increasingly complex algorithms.*
 
@@ -1163,7 +1154,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
@@ -1399,7 +1390,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   Default group name is \<All VB.Net\> to get only VB.Net classes
     -   Other group names added were: “\<All Python\>” and “\<All C\#\>” classes.
 -   The code to find and track features was reorganized. New features added for ROI’s.
-    -   Feature_Stable now uses correlation coefficients to track RGB features.
+    -   Feature_Basics now uses correlation coefficients to track RGB features.
 -   Color8U is the new name for algorithms converting RGB to CV_8U format.
 -   New modules for C\# interface were added but are not yet in use.
 -   A log of previous changes is included at the bottom of this document.
@@ -1525,3 +1516,41 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![](media/f6ba222f6e73f72f51d0b393a6b64bae.png)
 
 **Code Translator:** *The user interface for the code translator is shown above with the results shown at the bottom. It is invoked in OpenCVB using the ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button in the main panel. The web page for CodeConvert.ai is contained in a WebView2 control. The ComboBox and buttons at the top provide a 3-step process to translate the code. Here AddWeighted_CS, a C\# algorithm, is translated to C++. The formatting of the results is corrected when the code is pasted into CPP_Managed.cpp.*
+
+# Recent Changes – September 2024 (Part 2)
+
+-   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
+-   This OpenCVB update is focused almost exclusively on the camera interfaces.
+-   More camera interfaces are using only VB.Net to capture image and IMU data.
+    -   The C\# wrappers require the .Net Framework 3.5 – install had to change.
+    -   The install script now prompts to install .Net Framework 3.5.
+        -   Update_All.bat script will fail if 3.5 is not present on the system
+    -   In addition, the StereoLabs C\# interface needed to be reworked.
+        -   The same name is used for a struct, an enum, and a variable.
+        -   VB.Net does not allow this kind of overlapping names.
+        -   The replacement C\# code is now included in OpenCVB.
+-   StereoLabs Zed 2i, Intel RealSense D455/D435, Orbbec Gemini 335L updated.
+    -   VB.Net camera interfaces are much easier to debug.
+    -   The Oak-D interface was rewritten but in C++
+        -   Oak-D has no C\# interface (resource constraint at Luxonis)
+        -   The OpenCVB interface is no longer troublesome.
+    -   All previous C++ interfaces are still there and toggled with \#ifdef
+-   All the camera interfaces collect all image and IMU data.
+    -   Color, Left, Right, Point Cloud, and IMU acceleration/angularvelocity.
+    -   OpenCVB is focused on using only the image and IMU data.
+-   The StereoLabs camera “tearing” problem is not a software issue.
+    -   The cable provided by StereoLabs needed to be replaced.
+-   The Mynt camera interface is unchanged. Company went out-of-business.
+-   The Kinect for Azure camera is also unchanged – VB.Net version is coming soon.
+    -   The K4A camera doesn’t use the same technique as all the other cameras.
+        -   No left and right images are available.
+    -   K4A is useful and it is the most accurate at close range.
+-   Microsoft has discontinued their K4A camera.
+    -   The K4A equivalent camera is available as Orbbec Femto Bolt.
+-   Other news: another way to capture motion is in Motion_FromEdgeColorize
+    -   Blue is motion, Red is not (see below.)
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of people sitting in a chair Description automatically generated](media/3b7fcfc4ec5dcb8a1619770024131824.png)
+
+**Motion_FromEdgeColorize:** *This algorithm uses the palette to identify motion. Motion is blue while red is not.*
