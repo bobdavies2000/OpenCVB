@@ -7801,10 +7801,12 @@ End Class
 Public Class Options_Gradient_Cloud : Inherits VB_Parent
     Public deltaX As Single
     Public deltaY As Single
+    Public deltaZ As Single
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Delta X (mm)", 1, 1000, 10)
-            sliders.setupTrackBar("Delta Y (mm)", 1, 1000, 10)
+            sliders.setupTrackBar("Delta X (mm)", 1, 1000, 25)
+            sliders.setupTrackBar("Delta Y (mm)", 1, 1000, 25)
+            sliders.setupTrackBar("Delta Z (mm)", 1, 1000, 25)
         End If
     End Sub
     Public Sub RunOpt()
@@ -7814,5 +7816,7 @@ Public Class Options_Gradient_Cloud : Inherits VB_Parent
         Static ySlider = FindSlider("Delta Y (mm)")
         deltaY = ySlider.value / 1000
 
+        Static zSlider = FindSlider("Delta Z (mm)")
+        deltaZ = zSlider.value / 1000
     End Sub
 End Class

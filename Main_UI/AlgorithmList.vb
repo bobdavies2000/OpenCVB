@@ -135,7 +135,6 @@ End Enum
 	If algorithmName = "BackProject_Basics_CS" Then return new BackProject_Basics_CS
 	If algorithmName = "BackProject_BasicsKeyboard" Then return new BackProject_BasicsKeyboard
 	If algorithmName = "BackProject_BasicsKeyboard_CS" Then return new BackProject_BasicsKeyboard_CS
-	If algorithmName = "BackProject_CloudX" Then return new BackProject_CloudX
 	If algorithmName = "BackProject_Depth" Then return new BackProject_Depth
 	If algorithmName = "BackProject_Depth_CS" Then return new BackProject_Depth_CS
 	If algorithmName = "BackProject_Display" Then return new BackProject_Display
@@ -1326,7 +1325,6 @@ End Enum
 	If algorithmName = "Gradient_Basics_CS" Then return new Gradient_Basics_CS
 	If algorithmName = "Gradient_CartToPolar" Then return new Gradient_CartToPolar
 	If algorithmName = "Gradient_CartToPolar_CS" Then return new Gradient_CartToPolar_CS
-	If algorithmName = "Gradient_CloudX" Then return new Gradient_CloudX
 	If algorithmName = "Gradient_Color" Then return new Gradient_Color
 	If algorithmName = "Gradient_Color_CS" Then return new Gradient_Color_CS
 	If algorithmName = "Gradient_Depth" Then return new Gradient_Depth
@@ -1927,6 +1925,9 @@ End Enum
 	If algorithmName = "Line3D_Checks_CS" Then return new Line3D_Checks_CS
 	If algorithmName = "Line3D_Draw" Then return new Line3D_Draw
 	If algorithmName = "Line3D_Draw_CS" Then return new Line3D_Draw_CS
+	If algorithmName = "Linear_BackProject" Then return new Linear_BackProject
+	If algorithmName = "Linear_Input" Then return new Linear_Input
+	If algorithmName = "Linear_InputX" Then return new Linear_InputX
 	If algorithmName = "LinearRegression_Basics" Then return new LinearRegression_Basics
 	If algorithmName = "LinearRegression_Basics_CS" Then return new LinearRegression_Basics_CS
 	If algorithmName = "LinearRegression_Random" Then return new LinearRegression_Random
