@@ -1639,7 +1639,7 @@ Public Class Main_UI
                 pixelViewerRect = task.pixelViewerRect
                 pixelViewTag = task.pixelViewTag
 
-                task.fpsRate = If(fpsAlgorithm = 0, 1, fpsAlgorithm)
+                task.fpsRate = If(fpsAlgorithm > 0.01, 1, fpsAlgorithm)
 
                 If task.paused = False Then
                     SyncLock trueData

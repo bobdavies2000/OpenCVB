@@ -17,7 +17,7 @@ Public Class CameraORB : Inherits GenericCamera
         Dim devList = ctx.QueryDeviceList()
         Dim dev = devList.GetDevice(0)
 
-        Dim fps = 5
+        Dim fps = 30
         Dim w = captureRes.Width, h = captureRes.Height
         Dim colorProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_COLOR).
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_BGR, fps)

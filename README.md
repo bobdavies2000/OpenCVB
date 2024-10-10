@@ -7,9 +7,9 @@
     -   Mouse movement can provide additional flexibility while drawing.
     -   Magnifying glass works with static images while OpenCVB is paused.
     -   All 4 images show the rectangle being drawn.
-    -   Contrast: the “Microscope” button provides even more detail.
-        -   The “Microscope” button produces that hex values.
-    -   See the image below to help find the new button and see sample output.
+    -   See the image below to help find the new button and see sample output
+-   Contrast: the “Microscope” button (next button to the left) provides more detail.
+    -   The “Microscope” button produces hex values.
 -   OpenCV’s machine learning algorithms are all available in a single algorithm.
     -   See the second sample image below; image segmented by features.
     -   ML_Basics mimics the functionality of OpenCV’s Points Classifier example.
@@ -17,6 +17,8 @@
         -   Laplacian was more accurate in finding the edge pixels for use with ML.
 -   C\# algorithms are now always configured in Release mode.
     -   Makes it easier to determine the value of optimizing any VB.Net algorithm.
+-   Orbbec Gemini 335L is now working at 30 FPS.
+    -   Care must be taken to make sure it is on a USB-C port.
 -   A log of previous changes is included at the bottom of this document.
 
 ![](media/a4ade72e34b35bccb590db3772e53c01.png)
