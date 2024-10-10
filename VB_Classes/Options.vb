@@ -7798,25 +7798,29 @@ End Class
 
 
 
-Public Class Options_Gradient_Cloud : Inherits VB_Parent
-    Public deltaX As Single
-    Public deltaY As Single
-    Public deltaZ As Single
+Public Class Options_LinearInput : Inherits VB_Parent
+    Public delta As Single
+    Public dimension As Integer
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Delta X (mm)", 1, 1000, 25)
-            sliders.setupTrackBar("Delta Y (mm)", 1, 1000, 25)
-            sliders.setupTrackBar("Delta Z (mm)", 1, 1000, 25)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta (mm)", 1, 1000, 25)
+
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("X Direction")
+            radio.addRadio("Y Direction")
+            radio.addRadio("Z Direction")
+            radio.check(2).Checked = True
         End If
     End Sub
     Public Sub RunOpt()
-        Static xSlider = FindSlider("Delta X (mm)")
-        deltaX = xSlider.value / 1000
+        Static deltaSlider = FindSlider("Delta (mm)")
+        delta = deltaSlider.value / 1000
 
-        Static ySlider = FindSlider("Delta Y (mm)")
-        deltaY = ySlider.value / 1000
+        Static xRadio = FindRadio("X Direction")
+        Static yRadio = FindRadio("Y Direction")
 
-        Static zSlider = FindSlider("Delta Z (mm)")
-        deltaZ = zSlider.value / 1000
+        dimension = 2
+        If xRadio.checked Then dimension = 0
+        If yRadio.checked Then dimension = 1
     End Sub
 End Class

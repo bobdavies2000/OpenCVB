@@ -1925,9 +1925,12 @@ End Enum
 	If algorithmName = "Line3D_Checks_CS" Then return new Line3D_Checks_CS
 	If algorithmName = "Line3D_Draw" Then return new Line3D_Draw
 	If algorithmName = "Line3D_Draw_CS" Then return new Line3D_Draw_CS
-	If algorithmName = "Linear_BackProject" Then return new Linear_BackProject
+	If algorithmName = "Linear_Basics" Then return new Linear_Basics
 	If algorithmName = "Linear_Input" Then return new Linear_Input
 	If algorithmName = "Linear_InputX" Then return new Linear_InputX
+	If algorithmName = "Linear_InputY" Then return new Linear_InputY
+	If algorithmName = "Linear_InputZ" Then return new Linear_InputZ
+	If algorithmName = "Linear_Visualize" Then return new Linear_Visualize
 	If algorithmName = "LinearRegression_Basics" Then return new LinearRegression_Basics
 	If algorithmName = "LinearRegression_Basics_CS" Then return new LinearRegression_Basics_CS
 	If algorithmName = "LinearRegression_Random" Then return new LinearRegression_Random
@@ -2381,6 +2384,7 @@ End Enum
 	If algorithmName = "OpenGL_HistDepth3D_CS" Then return new OpenGL_HistDepth3D_CS
 	If algorithmName = "OpenGL_HistNorm3D" Then return new OpenGL_HistNorm3D
 	If algorithmName = "OpenGL_HistNorm3D_CS" Then return new OpenGL_HistNorm3D_CS
+	If algorithmName = "OpenGL_Neighbors" Then return new OpenGL_Neighbors
 	If algorithmName = "OpenGL_NoSolo" Then return new OpenGL_NoSolo
 	If algorithmName = "OpenGL_NoSolo_CS" Then return new OpenGL_NoSolo_CS
 	If algorithmName = "OpenGL_OnlyPlanes" Then return new OpenGL_OnlyPlanes
@@ -2547,7 +2551,6 @@ End Enum
 	If algorithmName = "Options_Gif" Then return new Options_Gif
 	If algorithmName = "Options_GrabCut" Then return new Options_GrabCut
 	If algorithmName = "Options_Gradient" Then return new Options_Gradient
-	If algorithmName = "Options_Gradient_Cloud" Then return new Options_Gradient_Cloud
 	If algorithmName = "Options_Grayscale8U" Then return new Options_Grayscale8U
 	If algorithmName = "Options_Grid" Then return new Options_Grid
 	If algorithmName = "Options_GridFromResize" Then return new Options_GridFromResize
@@ -2583,6 +2586,7 @@ End Enum
 	If algorithmName = "Options_LaplacianKernels" Then return new Options_LaplacianKernels
 	If algorithmName = "Options_LaPlacianPyramid" Then return new Options_LaPlacianPyramid
 	If algorithmName = "Options_LeftRight" Then return new Options_LeftRight
+	If algorithmName = "Options_LinearInput" Then return new Options_LinearInput
 	If algorithmName = "Options_LineFinder" Then return new Options_LineFinder
 	If algorithmName = "Options_LongLine" Then return new Options_LongLine
 	If algorithmName = "Options_LUT" Then return new Options_LUT

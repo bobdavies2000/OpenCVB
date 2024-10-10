@@ -2133,3 +2133,25 @@ Public Class OpenGL_Grid : Inherits VB_Parent
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
+
+
+
+
+
+Public Class OpenGL_Neighbors : Inherits VB_Parent
+    Dim inputZ As New Linear_InputZ
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Display only pixels which are near each other in the Z dimension"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        inputZ.Run(src)
+        dst2 = inputZ.dst3.ConvertScaleAbs
+
+        task.ogl.pointCloudInput = task.pointCloud
+        If task.toggleOnOff Then task.ogl.pointCloudInput.SetTo(0, Not dst2)
+        task.ogl.Run(task.color)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+    End Sub
+End Class

@@ -2133,9 +2133,9 @@ public:
 	Options_LaplacianKernels() {
 	}
 };
-class Options_Gradient_Cloud {
+class Options_LinearInput {
 public:
 	void RunOpt() {}
-	Options_Gradient_Cloud() {
+	Options_LinearInput() {
 	}
 };
