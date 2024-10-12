@@ -55612,12 +55612,12 @@ namespace CS_Classes
 
 
 
-    public class SLR_Data_CS : VB_Parent
+    public class SLR_PlotData_CS : VB_Parent
     {
         Plot_Basics_CPP_VB plot = new Plot_Basics_CPP_VB();
         public List<double> dataX = new List<double>();
         public List<double> dataY = new List<double>();
-        public SLR_Data_CS()
+        public SLR_PlotData_CS()
         {
             using (var sr = new StreamReader(vbc.task.HomeDir + "/Data/real_data.txt"))
             {

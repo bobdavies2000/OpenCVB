@@ -1930,6 +1930,7 @@ End Enum
 	If algorithmName = "Linear_InputX" Then return new Linear_InputX
 	If algorithmName = "Linear_InputY" Then return new Linear_InputY
 	If algorithmName = "Linear_InputZ" Then return new Linear_InputZ
+	If algorithmName = "Linear_Segments" Then return new Linear_Segments
 	If algorithmName = "Linear_Visualize" Then return new Linear_Visualize
 	If algorithmName = "LinearRegression_Basics" Then return new LinearRegression_Basics
 	If algorithmName = "LinearRegression_Basics_CS" Then return new LinearRegression_Basics_CS
@@ -3323,11 +3324,12 @@ End Enum
 	If algorithmName = "Sieve_BasicsVB" Then return new Sieve_BasicsVB
 	If algorithmName = "Sieve_Image" Then return new Sieve_Image
 	If algorithmName = "Sieve_Image_CS" Then return new Sieve_Image_CS
+	If algorithmName = "SLR_Basics" Then return new SLR_Basics
 	If algorithmName = "SLR_Basics_CS" Then return new SLR_Basics_CS
-	If algorithmName = "SLR_Data" Then return new SLR_Data
-	If algorithmName = "SLR_Data_CS" Then return new SLR_Data_CS
 	If algorithmName = "SLR_DepthHist_CS" Then return new SLR_DepthHist_CS
 	If algorithmName = "SLR_Image_CS" Then return new SLR_Image_CS
+	If algorithmName = "SLR_PlotData" Then return new SLR_PlotData
+	If algorithmName = "SLR_PlotData_CS" Then return new SLR_PlotData_CS
 	If algorithmName = "SLR_SurfaceH" Then return new SLR_SurfaceH
 	If algorithmName = "SLR_SurfaceH_CS" Then return new SLR_SurfaceH_CS
 	If algorithmName = "SLR_TrendCompare_CS" Then return new SLR_TrendCompare_CS

@@ -27,7 +27,7 @@ Public Class Linear_Basics : Inherits VB_Parent
                     Dim vNext As Single
                     For i = i To mask.Width - 1
                         vNext = dst0.Get(Of Single)(y, i)
-                        If vNext > val And vNext > 0 Then Exit For Else fixCount += 1
+                        If vNext > val And vNext <> 0 Then Exit For Else fixCount += 1
                     Next
 
                     Dim incr = (vNext - val) / (i - x)
@@ -238,5 +238,22 @@ Public Class Linear_InputZ : Inherits VB_Parent
         dst2 = input.dst2
         dst3 = dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
         labels = input.labels
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Linear_Segments : Inherits VB_Parent
+    Dim options As New Options_LinearInput
+    Public Sub New()
+        desc = "Isolate and display a line segment through the point cloud data"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+
     End Sub
 End Class

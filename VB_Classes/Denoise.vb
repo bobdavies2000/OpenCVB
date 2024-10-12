@@ -122,7 +122,7 @@ Public Class Denoise_SinglePixels_CPP_VB : Inherits VB_Parent
             Dim imagePtr = Denoise_SinglePixels_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()
 
-            If imagePtr <> 0 Then dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr).Clone
+            If imagePtr <> 0 Then dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, src.Type, imagePtr).Clone
         Else
             dst2 = src
         End If

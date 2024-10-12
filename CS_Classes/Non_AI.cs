@@ -556,7 +556,7 @@ namespace CS_Classes
 
     public class SLR_Basics_CS : VB_Parent
     {
-        public SLR_Data slrInput = new SLR_Data();
+        public SLR_PlotData slrInput = new SLR_PlotData();
         SLR slr = new SLR();
         Plot_Basics_CPP_VB plot = new Plot_Basics_CPP_VB();
         Options_SLR options = new Options_SLR();
