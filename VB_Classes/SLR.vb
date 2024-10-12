@@ -1,12 +1,11 @@
 Imports cvb = OpenCvSharp
 Imports System.IO
 Public Class SLR_Basics : Inherits VB_Parent
-
-    Public slrInput As New SLR_PlotData()
-    Private slr As New SLR()
-    Private plot As New Plot_Basics_CPP_VB()
-    Private options As New Options_SLR()
-
+    Dim slr As New SLR()
+    Dim plot As New Plot_Basics_CPP_VB()
+    Dim options As New Options_SLR()
+    Public dataX As New List(Of Double)
+    Public dataY As New List(Of Double)
     Public Sub New()
         MyBase.New()
         desc = "Segmented Linear Regression example"
@@ -14,20 +13,20 @@ Public Class SLR_Basics : Inherits VB_Parent
 
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        If vbc.task.FirstPass AndAlso standalone Then
-            slrInput.RunAlg(dst2)
-            labels(2) = "Sample data slrInput"
+        If task.FirstPass And standalone Then
+            Static slrInput As New SLR_PlotData()
+            slrInput.getData(dataX, dataY)
         End If
 
         Dim resultX As New List(Of Double)()
         Dim resultY As New List(Of Double)()
 
-        slr.SegmentedRegressionFast(slrInput.dataX, slrInput.dataY, options.tolerance, options.halfLength, resultX, resultY)
+        slr.SegmentedRegressionFast(dataX, dataY, options.tolerance, options.halfLength, resultX, resultY)
 
         labels(2) = "Tolerance = " & options.tolerance.ToString() & " and moving average window = " & options.halfLength.ToString()
         If resultX.Count > 0 Then
-            plot.srcX = slrInput.dataX
-            plot.srcY = slrInput.dataY
+            plot.srcX = dataX
+            plot.srcY = dataY
             plot.Run(src)
             dst2 = plot.dst2.Clone()
 
@@ -41,8 +40,8 @@ Public Class SLR_Basics : Inherits VB_Parent
             SetTrueText(labels(2) & " yielded no results...")
         End If
         If Not standaloneTest() Then
-            slrInput.dataX.Clear()
-            slrInput.dataY.Clear()
+            dataX.Clear()
+            dataY.Clear()
         End If
     End Sub
 End Class
