@@ -7809,7 +7809,7 @@ Public Class Options_LinearInput : Inherits VB_Parent
             radio.addRadio("X Direction")
             radio.addRadio("Y Direction")
             radio.addRadio("Z Direction")
-            radio.check(2).Checked = True
+            radio.check(0).Checked = True
         End If
     End Sub
     Public Sub RunOpt()

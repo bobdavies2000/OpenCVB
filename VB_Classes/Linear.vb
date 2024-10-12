@@ -1,4 +1,5 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class Linear_Basics : Inherits VB_Parent
     Dim inputX As New Linear_InputX
     Dim inputY As New Linear_InputY
@@ -248,12 +249,37 @@ End Class
 
 Public Class Linear_Segments : Inherits VB_Parent
     Dim options As New Options_LinearInput
+    Dim plotSLR As New SLR_Basics
     Public Sub New()
+        labels(3) = "Move mouse in the depth image above to display line of data."
         desc = "Isolate and display a line segment through the point cloud data"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
+        Dim pt = task.mouseMovePoint
+        If standalone And task.mouseMovePoint = New cvb.Point Then
+            pt = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
+        End If
 
+        Dim rowCol As cvb.Mat, p1 As cvb.Point, p2 As cvb.Point
+        If options.dimension = 1 Then
+            rowcol = task.pcSplit(options.dimension).Col(pt.X).Clone
+            rowcol = cvb.Mat.FromPixelData(1, rowcol.Rows, cvb.MatType.CV_32FC1, rowcol.Data)
+            p1 = New cvb.Point(pt.X, 0)
+            p2 = New cvb.Point(pt.X, dst2.Height)
+        Else
+            rowCol = task.pcSplit(options.dimension).Row(pt.Y)
+            p1 = New cvb.Point(0, pt.Y)
+            p2 = New cvb.Point(dst2.Width, pt.Y)
+        End If
+        task.depthRGB.Line(p1, p2, task.HighlightColor, task.lineWidth)
+
+        For i = 0 To rowcol.Cols - 1
+            plotSLR.dataX.Add(i)
+            plotSLR.dataY.Add(rowcol.Get(Of Single)(0, i))
+        Next
+        plotSLR.Run(src)
+        dst2 = plotSLR.dst2
     End Sub
 End Class
