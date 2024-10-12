@@ -1,4 +1,5 @@
-﻿Imports OpenCvSharp
+﻿Imports System.Windows
+Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 Public Class Linear_Basics : Inherits VB_Parent
     Dim inputX As New Linear_InputX
@@ -264,8 +265,8 @@ Public Class Linear_Segments : Inherits VB_Parent
 
         Dim rowCol As cvb.Mat, p1 As cvb.Point, p2 As cvb.Point
         If options.dimension = 1 Then
-            rowcol = task.pcSplit(options.dimension).Col(pt.X).Clone
-            rowcol = cvb.Mat.FromPixelData(1, rowcol.Rows, cvb.MatType.CV_32FC1, rowcol.Data)
+            rowCol = task.pcSplit(options.dimension).Col(pt.X).Clone
+            rowCol = cvb.Mat.FromPixelData(1, rowcol.Rows, cvb.MatType.CV_32FC1, rowcol.Data)
             p1 = New cvb.Point(pt.X, 0)
             p2 = New cvb.Point(pt.X, dst2.Height)
         Else
@@ -275,11 +276,33 @@ Public Class Linear_Segments : Inherits VB_Parent
         End If
         task.depthRGB.Line(p1, p2, task.HighlightColor, task.lineWidth)
 
-        For i = 0 To rowcol.Cols - 1
-            plotSLR.dataX.Add(i)
-            plotSLR.dataY.Add(rowcol.Get(Of Single)(0, i))
+        plotSLR.slrCore.inputX.Clear()
+        plotSLR.slrCore.inputY.Clear()
+        For i = 0 To rowCol.Cols - 1
+            plotSLR.slrCore.inputX.Add(i)
+            plotSLR.slrCore.inputY.Add(rowCol.Get(Of Single)(0, i))
         Next
-        plotSLR.Run(src)
-        dst2 = plotSLR.dst2
+        If plotSLR.slrCore.inputX.Count = 0 Then
+            SetTrueText("There were no depth points in that line...", 3)
+        Else
+            plotSLR.Run(src)
+            dst2 = plotSLR.dst2
+            If task.heartBeat Then
+                labels(2) = "Below is a plot of the " + CStr(plotSLR.slrCore.outputX.Count) +
+                            " points after filtering 0's"
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Linear_Derivative : Inherits VB_Parent
+    Public Sub New()
+        desc = "Outline how to use the derivative to remove zeros"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
     End Sub
 End Class

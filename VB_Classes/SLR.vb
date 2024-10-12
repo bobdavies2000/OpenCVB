@@ -1,20 +1,84 @@
 Imports cvb = OpenCvSharp
 Imports System.IO
 Public Class SLR_Basics : Inherits VB_Parent
-    Dim slr As New SLR()
+    Public slrCore As New SLR_Core
     Dim plot As New Plot_Basics_CPP_VB()
+    Public Sub New()
+        desc = "Segmented Linear Regression example"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        slrCore.Run(src)
+
+        If task.FirstPass And standalone Then
+            Static slrInput As New SLR_PlotTest()
+            slrInput.getData(slrCore.inputX, slrCore.inputY)
+        End If
+
+        labels(2) = "Tolerance = " & slrCore.options.tolerance.ToString() &
+                    " and moving average window = " & slrCore.options.halfLength.ToString()
+        If slrCore.inputX.Count > 0 Then
+            plot.srcX = slrCore.inputX
+            plot.srcY = slrCore.inputY
+            plot.Run(src)
+            dst2 = plot.dst2.Clone()
+
+            plot.srcX = slrCore.outputX
+            plot.srcY = slrCore.outputY
+            plot.Run(src)
+            dst3 = plot.dst2
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class SLR_Core : Inherits VB_Parent
+    Dim slr As New SLR()
+    Public inputX As New List(Of Double)
+    Public inputY As New List(Of Double)
+    Public outputX As New List(Of Double)
+    Public outputY As New List(Of Double)
+    Public options As New Options_SLR()
+    Public Sub New()
+        desc = "The core algorithm for Segmented Linear Regression"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        If inputX.Count = 0 Then
+            SetTrueText("No input provided.  Update inputX and inputY and test again." + vbCrLf +
+                        traceName + " when run standalone has no output.")
+            Exit Sub
+        End If
+
+        outputX.Clear()
+        outputY.Clear()
+        slr.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
+                                    outputX, outputY)
+
+        labels(2) = "Tolerance = " & options.tolerance.ToString() & " and moving average window = " & options.halfLength.ToString()
+    End Sub
+End Class
+
+
+
+
+
+Public Class SLR_Plot : Inherits VB_Parent
+    Dim plot As New Plot_Basics_CPP_VB()
+    Dim slr As New SLR()
     Dim options As New Options_SLR()
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
     Public Sub New()
-        MyBase.New()
         desc = "Segmented Linear Regression example"
     End Sub
 
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
         If task.FirstPass And standalone Then
-            Static slrInput As New SLR_PlotData()
+            Static slrInput As New SLR_PlotTest()
             slrInput.getData(dataX, dataY)
         End If
 
@@ -52,7 +116,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
-Public Class SLR_PlotData : Inherits VB_Parent
+Public Class SLR_PlotTest : Inherits VB_Parent
     Dim plot As New Plot_Basics_CPP_VB
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
@@ -74,7 +138,6 @@ Public Class SLR_PlotData : Inherits VB_Parent
             End If
         Next
     End Sub
-
     Public Sub RunAlg(src As cvb.Mat)
         plot.srcX = dataX
         plot.srcY = dataY

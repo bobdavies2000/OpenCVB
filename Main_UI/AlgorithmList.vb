@@ -1926,6 +1926,7 @@ End Enum
 	If algorithmName = "Line3D_Draw" Then return new Line3D_Draw
 	If algorithmName = "Line3D_Draw_CS" Then return new Line3D_Draw_CS
 	If algorithmName = "Linear_Basics" Then return new Linear_Basics
+	If algorithmName = "Linear_Derivative" Then return new Linear_Derivative
 	If algorithmName = "Linear_Input" Then return new Linear_Input
 	If algorithmName = "Linear_InputX" Then return new Linear_InputX
 	If algorithmName = "Linear_InputY" Then return new Linear_InputY
@@ -3326,10 +3327,12 @@ End Enum
 	If algorithmName = "Sieve_Image_CS" Then return new Sieve_Image_CS
 	If algorithmName = "SLR_Basics" Then return new SLR_Basics
 	If algorithmName = "SLR_Basics_CS" Then return new SLR_Basics_CS
+	If algorithmName = "SLR_Core" Then return new SLR_Core
 	If algorithmName = "SLR_DepthHist_CS" Then return new SLR_DepthHist_CS
 	If algorithmName = "SLR_Image_CS" Then return new SLR_Image_CS
-	If algorithmName = "SLR_PlotData" Then return new SLR_PlotData
+	If algorithmName = "SLR_Plot" Then return new SLR_Plot
 	If algorithmName = "SLR_PlotData_CS" Then return new SLR_PlotData_CS
+	If algorithmName = "SLR_PlotTest" Then return new SLR_PlotTest
 	If algorithmName = "SLR_SurfaceH" Then return new SLR_SurfaceH
 	If algorithmName = "SLR_SurfaceH_CS" Then return new SLR_SurfaceH_CS
 	If algorithmName = "SLR_TrendCompare_CS" Then return new SLR_TrendCompare_CS
