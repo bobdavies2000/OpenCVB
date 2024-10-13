@@ -1926,12 +1926,13 @@ End Enum
 	If algorithmName = "Line3D_Draw" Then return new Line3D_Draw
 	If algorithmName = "Line3D_Draw_CS" Then return new Line3D_Draw_CS
 	If algorithmName = "Linear_Basics" Then return new Linear_Basics
-	If algorithmName = "Linear_Derivative" Then return new Linear_Derivative
+	If algorithmName = "Linear_ImageX" Then return new Linear_ImageX
+	If algorithmName = "Linear_ImageY" Then return new Linear_ImageY
 	If algorithmName = "Linear_Input" Then return new Linear_Input
 	If algorithmName = "Linear_InputX" Then return new Linear_InputX
 	If algorithmName = "Linear_InputY" Then return new Linear_InputY
 	If algorithmName = "Linear_InputZ" Then return new Linear_InputZ
-	If algorithmName = "Linear_Segments" Then return new Linear_Segments
+	If algorithmName = "Linear_Slices" Then return new Linear_Slices
 	If algorithmName = "Linear_Visualize" Then return new Linear_Visualize
 	If algorithmName = "LinearRegression_Basics" Then return new LinearRegression_Basics
 	If algorithmName = "LinearRegression_Basics_CS" Then return new LinearRegression_Basics_CS
@@ -2386,6 +2387,9 @@ End Enum
 	If algorithmName = "OpenGL_HistDepth3D_CS" Then return new OpenGL_HistDepth3D_CS
 	If algorithmName = "OpenGL_HistNorm3D" Then return new OpenGL_HistNorm3D
 	If algorithmName = "OpenGL_HistNorm3D_CS" Then return new OpenGL_HistNorm3D_CS
+	If algorithmName = "OpenGL_LinearX" Then return new OpenGL_LinearX
+	If algorithmName = "OpenGL_LinearXY" Then return new OpenGL_LinearXY
+	If algorithmName = "OpenGL_LinearY" Then return new OpenGL_LinearY
 	If algorithmName = "OpenGL_Neighbors" Then return new OpenGL_Neighbors
 	If algorithmName = "OpenGL_NoSolo" Then return new OpenGL_NoSolo
 	If algorithmName = "OpenGL_NoSolo_CS" Then return new OpenGL_NoSolo_CS
@@ -2874,6 +2878,7 @@ End Enum
 	If algorithmName = "Plot_OverTimeScalar_CS" Then return new Plot_OverTimeScalar_CS
 	If algorithmName = "Plot_OverTimeSingle" Then return new Plot_OverTimeSingle
 	If algorithmName = "Plot_OverTimeSingle_CS" Then return new Plot_OverTimeSingle_CS
+	If algorithmName = "Plot_Points" Then return new Plot_Points
 	If algorithmName = "PlyFormat_Basics" Then return new PlyFormat_Basics
 	If algorithmName = "PlyFormat_Basics_CS" Then return new PlyFormat_Basics_CS
 	If algorithmName = "PlyFormat_PlusRGB" Then return new PlyFormat_PlusRGB

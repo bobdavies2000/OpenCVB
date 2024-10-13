@@ -518,3 +518,43 @@ Public Class Plot_Histogram : Inherits VB_Parent
                                            CStr(CInt(mm.minVal)) + " min value"
     End Sub
 End Class
+
+
+
+
+Public Class Plot_Points : Inherits VB_Parent
+    Public input As New List(Of cvb.Point2d)
+    Public output As New List(Of cvb.Point)
+    Public plotZero As cvb.Point
+    Public minX As Double, maxX As Double, minY As Double, maxY As Double
+    Public Sub New()
+        For i = 0 To 50 ' something to plot if standaloneTest().
+            input.Add(New cvb.Point2d(i, i * i * i))
+        Next
+        desc = "Plot the requested points..."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If minX = 0 And maxX = 0 And minY = 0 And maxY = 0 Then
+            minX = 0
+            maxX = dst2.Width
+            minY = -task.xRange
+            maxY = task.xRange
+        End If
+
+        dst2.SetTo(0)
+        output.Clear()
+        For i = 0 To input.Count - 1
+            Dim pt = New cvb.Point(CInt(dst2.Width * (input(i).X - minX) / (maxX - minX)),
+                                   CInt(dst2.Height - dst2.Height * (input(i).Y - minY) / (maxY - minY)))
+            If pt.Y <> dst2.Height / 2 Then
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                output.Add(pt)
+            Else
+                output.Add(newPoint)
+            End If
+        Next
+
+        plotZero = New cvb.Point()
+        labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
+    End Sub
+End Class

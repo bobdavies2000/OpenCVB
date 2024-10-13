@@ -1,6 +1,5 @@
-﻿Imports System.Windows
-Imports OpenCvSharp
-Imports cvb = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
+Imports System.Runtime.InteropServices
 Public Class Linear_Basics : Inherits VB_Parent
     Dim inputX As New Linear_InputX
     Dim inputY As New Linear_InputY
@@ -248,10 +247,12 @@ End Class
 
 
 
-Public Class Linear_Segments : Inherits VB_Parent
+Public Class Linear_Slices : Inherits VB_Parent
     Dim options As New Options_LinearInput
     Dim plotSLR As New SLR_Basics
     Public Sub New()
+        plotSLR.plot.minX = 0
+        plotSLR.plot.maxX = dst2.Width
         labels(3) = "Move mouse in the depth image above to display line of data."
         desc = "Isolate and display a line segment through the point cloud data"
     End Sub
@@ -266,13 +267,17 @@ Public Class Linear_Segments : Inherits VB_Parent
         Dim rowCol As cvb.Mat, p1 As cvb.Point, p2 As cvb.Point
         If options.dimension = 1 Then
             rowCol = task.pcSplit(options.dimension).Col(pt.X).Clone
-            rowCol = cvb.Mat.FromPixelData(1, rowcol.Rows, cvb.MatType.CV_32FC1, rowcol.Data)
+            rowCol = cvb.Mat.FromPixelData(1, rowCol.Rows, cvb.MatType.CV_32FC1, rowCol.Data)
             p1 = New cvb.Point(pt.X, 0)
             p2 = New cvb.Point(pt.X, dst2.Height)
+            plotSLR.plot.minY = -task.yRange
+            plotSLR.plot.maxY = task.yRange
         Else
             rowCol = task.pcSplit(options.dimension).Row(pt.Y)
             p1 = New cvb.Point(0, pt.Y)
             p2 = New cvb.Point(dst2.Width, pt.Y)
+            plotSLR.plot.minY = -task.xRange
+            plotSLR.plot.maxY = task.xRange
         End If
         task.depthRGB.Line(p1, p2, task.HighlightColor, task.lineWidth)
 
@@ -282,15 +287,14 @@ Public Class Linear_Segments : Inherits VB_Parent
             plotSLR.slrCore.inputX.Add(i)
             plotSLR.slrCore.inputY.Add(rowCol.Get(Of Single)(0, i))
         Next
+
         If plotSLR.slrCore.inputX.Count = 0 Then
             SetTrueText("There were no depth points in that line...", 3)
         Else
             plotSLR.Run(src)
             dst2 = plotSLR.dst2
-            If task.heartBeat Then
-                labels(2) = "Below is a plot of the " + CStr(plotSLR.slrCore.outputX.Count) +
-                            " points after filtering 0's"
-            End If
+            dst3 = plotSLR.dst3
+            If task.heartBeat Then labels(2) = plotSLR.plot.labels(2)
         End If
     End Sub
 End Class
@@ -299,10 +303,93 @@ End Class
 
 
 
-Public Class Linear_Derivative : Inherits VB_Parent
+
+Public Class Linear_ImageX : Inherits VB_Parent
+    Dim options As New Options_SLR
+    Dim inputX As New List(Of Double)
+    Dim slr As New SLR()
     Public Sub New()
-        desc = "Outline how to use the derivative to remove zeros"
+        For i = 0 To dst2.Width - 1
+            inputX.Add(i)
+        Next
+        desc = "Create SLR slices for the X dimension of an entire image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = task.pcSplit(0).Clone
+
+        Dim outputX As New List(Of Double)
+        Dim outputY As New List(Of Double)
+        Dim output As New List(Of cvb.Point2d)
+
+        For y = 0 To dst2.Height - 1
+            Dim rowCol As cvb.Mat = task.pcSplit(0).Row(y)
+
+            Dim dataY(rowCol.Total - 1) As Single
+            Marshal.Copy(rowCol.Data, dataY, 0, dataY.Length)
+            Dim inputY As New List(Of Double)
+            For Each ele In dataY
+                inputY.Add(CDbl(ele))
+            Next
+
+            outputX.Clear()
+            outputY.Clear()
+            slr.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
+                                        outputX, outputY)
+            For x = 0 To outputY.Count - 1
+                dst2.Set(Of Single)(y, x, CSng(outputY(x)))
+            Next
+        Next
+        cvb.Cv2.Merge({dst2, task.pcSplit(1), task.pcSplit(2)}, dst3)
+        dst3.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Linear_ImageY : Inherits VB_Parent
+    Dim options As New Options_SLR
+    Dim inputX As New List(Of Double)
+    Dim slr As New SLR()
+    Public Sub New()
+        For i = 0 To dst2.Height - 1
+            inputX.Add(i)
+        Next
+        desc = "Create SLR slices for the Y dimension of an entire image"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = task.pcSplit(1).Clone
+
+        Dim outputX As New List(Of Double)
+        Dim outputY As New List(Of Double)
+        Dim output As New List(Of cvb.Point2d)
+
+        For x = 0 To dst2.Width - 1
+            Dim rowCol = task.pcSplit(1).Col(x).Clone
+            rowCol = cvb.Mat.FromPixelData(1, rowCol.Rows, cvb.MatType.CV_32FC1, rowCol.Data)
+
+            Dim dataY(rowCol.Total - 1) As Single
+            Marshal.Copy(rowCol.Data, dataY, 0, dataY.Length)
+            Dim inputY As New List(Of Double)
+            For Each ele In dataY
+                inputY.Add(CDbl(ele))
+            Next
+
+            outputX.Clear()
+            outputY.Clear()
+            slr.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
+                                        outputX, outputY)
+            For y = 0 To outputY.Count - 1
+                dst2.Set(Of Single)(y, x, CSng(outputY(y)))
+            Next
+        Next
+        cvb.Cv2.Merge({task.pcSplit(0), dst2, task.pcSplit(2)}, dst3)
+        dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class

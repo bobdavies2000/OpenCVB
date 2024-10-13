@@ -2155,3 +2155,62 @@ Public Class OpenGL_Neighbors : Inherits VB_Parent
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
+
+
+
+
+
+Public Class OpenGL_LinearX : Inherits VB_Parent
+    Dim linear As New Linear_ImageX
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Display the linear transform of the pointcloud"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        linear.Run(src)
+        task.ogl.pointCloudInput = linear.dst3
+        task.ogl.Run(task.color)
+    End Sub
+End Class
+
+
+
+
+Public Class OpenGL_LinearY : Inherits VB_Parent
+    Dim linear As New Linear_ImageY
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Display the linear transform of the pointcloud"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        linear.Run(src)
+        task.ogl.pointCloudInput = linear.dst3
+        task.ogl.Run(task.color)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_LinearXY : Inherits VB_Parent
+    Dim linearX As New Linear_ImageX
+    Dim linearY As New Linear_ImageY
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Display the linear transform of the pointcloud"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        linearX.Run(src)
+        linearY.Run(src)
+
+        cvb.Cv2.Merge({linearX.dst2, linearY.dst2, task.pcSplit(2)}, dst2)
+
+        task.ogl.pointCloudInput = dst2
+        task.ogl.Run(task.color)
+    End Sub
+End Class

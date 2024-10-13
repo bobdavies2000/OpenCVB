@@ -433,10 +433,13 @@ static void drawPointCloud()
 	{
 		for (int x = 0; x < imageWidth; ++x)
 		{
-			glVertex3fv(&pc[pcIndex]);
-			pt[0] = GLfloat((x + 0.5f) / imageWidth);
-			pt[1] = GLfloat((y + 0.5f) / imageHeight);
-			glTexCoord2fv(pt);
+			if (pc[pcIndex + 2] > 0.1)
+			{
+				glVertex3fv(&pc[pcIndex]);
+				pt[0] = GLfloat((x + 0.5f) / imageWidth);
+				pt[1] = GLfloat((y + 0.5f) / imageHeight);
+				glTexCoord2fv(pt);
+			}
 			pcIndex += 3;
 		}
 	}

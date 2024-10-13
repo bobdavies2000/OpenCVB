@@ -2,7 +2,7 @@ Imports cvb = OpenCvSharp
 Imports System.IO
 Public Class SLR_Basics : Inherits VB_Parent
     Public slrCore As New SLR_Core
-    Dim plot As New Plot_Basics_CPP_VB()
+    Public plot As New Plot_Points
     Public Sub New()
         desc = "Segmented Linear Regression example"
     End Sub
@@ -17,13 +17,11 @@ Public Class SLR_Basics : Inherits VB_Parent
         labels(2) = "Tolerance = " & slrCore.options.tolerance.ToString() &
                     " and moving average window = " & slrCore.options.halfLength.ToString()
         If slrCore.inputX.Count > 0 Then
-            plot.srcX = slrCore.inputX
-            plot.srcY = slrCore.inputY
+            plot.input = slrCore.input
             plot.Run(src)
             dst2 = plot.dst2.Clone()
 
-            plot.srcX = slrCore.outputX
-            plot.srcY = slrCore.outputY
+            plot.input = slrCore.output
             plot.Run(src)
             dst3 = plot.dst2
         End If
@@ -37,8 +35,8 @@ Public Class SLR_Core : Inherits VB_Parent
     Dim slr As New SLR()
     Public inputX As New List(Of Double)
     Public inputY As New List(Of Double)
-    Public outputX As New List(Of Double)
-    Public outputY As New List(Of Double)
+    Public output As New List(Of cvb.Point2d)
+    Public input As New List(Of cvb.Point2d)
     Public options As New Options_SLR()
     Public Sub New()
         desc = "The core algorithm for Segmented Linear Regression"
@@ -52,10 +50,17 @@ Public Class SLR_Core : Inherits VB_Parent
             Exit Sub
         End If
 
-        outputX.Clear()
-        outputY.Clear()
+        Dim outputX As New List(Of Double)
+        Dim outputY As New List(Of Double)
         slr.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
                                     outputX, outputY)
+
+        output.Clear()
+        input.Clear()
+        For i = 0 To outputX.Count - 1
+            output.Add(New cvb.Point2d(outputX(i), outputY(i)))
+            input.Add(New cvb.Point2d(inputX(i), inputY(i)))
+        Next
 
         labels(2) = "Tolerance = " & options.tolerance.ToString() & " and moving average window = " & options.halfLength.ToString()
     End Sub
