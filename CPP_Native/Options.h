@@ -2139,3 +2139,9 @@ public:
 	Options_LinearInput() {
 	}
 };
+class Options_ImageOffset {
+public:
+	void RunOpt() {}
+	Options_ImageOffset() {
+	}
+};

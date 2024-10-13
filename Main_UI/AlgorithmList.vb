@@ -1652,6 +1652,10 @@ End Enum
 	If algorithmName = "Image_RedCloudColor_CS" Then return new Image_RedCloudColor_CS
 	If algorithmName = "Image_Series" Then return new Image_Series
 	If algorithmName = "Image_Series_CS" Then return new Image_Series_CS
+	If algorithmName = "ImageOffset_Basics" Then return new ImageOffset_Basics
+	If algorithmName = "ImageOffset_Cloud" Then return new ImageOffset_Cloud
+	If algorithmName = "ImageOffset_SliceH" Then return new ImageOffset_SliceH
+	If algorithmName = "ImageOffset_SliceV" Then return new ImageOffset_SliceV
 	If algorithmName = "ImShow_Basics" Then return new ImShow_Basics
 	If algorithmName = "ImShow_Basics_CS" Then return new ImShow_Basics_CS
 	If algorithmName = "ImShow_CV32FC3" Then return new ImShow_CV32FC3
@@ -2573,6 +2577,7 @@ End Enum
 	If algorithmName = "Options_HOG" Then return new Options_HOG
 	If algorithmName = "Options_Homography" Then return new Options_Homography
 	If algorithmName = "Options_Hough" Then return new Options_Hough
+	If algorithmName = "Options_ImageOffset" Then return new Options_ImageOffset
 	If algorithmName = "Options_Images" Then return new Options_Images
 	If algorithmName = "Options_IMU" Then return new Options_IMU
 	If algorithmName = "Options_IMUFrameTime" Then return new Options_IMUFrameTime

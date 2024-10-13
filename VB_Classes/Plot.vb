@@ -544,6 +544,7 @@ Public Class Plot_Points : Inherits VB_Parent
         dst2.SetTo(0)
         output.Clear()
         For i = 0 To input.Count - 1
+            If Single.IsNaN(input(i).Y) Then Continue For
             Dim pt = New cvb.Point(CInt(dst2.Width * (input(i).X - minX) / (maxX - minX)),
                                    CInt(dst2.Height - dst2.Height * (input(i).Y - minY) / (maxY - minY)))
             If pt.Y <> dst2.Height / 2 Then

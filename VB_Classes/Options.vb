@@ -7727,7 +7727,6 @@ End Class
 
 
 Public Class Options_ML : Inherits VB_Parent
-    Public ML_Selection As Integer
     Public ML_Name As String
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -7745,8 +7744,7 @@ Public Class Options_ML : Inherits VB_Parent
     End Sub
     Public Sub RunOpt()
         Static frm = FindFrm(traceName + " Radio Buttons")
-        ML_Selection = findRadioIndex(frm.check)
-        ML_Name = frm.check(ML_Selection).Text
+        ML_Name = frm.check(findRadioIndex(frm.check)).Text
         If task.frameCount < 100 Or task.optionsChanged Then frm.left = task.gOptions.Width / 2 + 10
     End Sub
 End Class
@@ -7802,6 +7800,7 @@ Public Class Options_LinearInput : Inherits VB_Parent
     Public delta As Single
     Public dimension As Integer
     Public zy As Boolean ' true means use col while false means use row
+    Public offsetDirection As String
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta (mm)", 1, 1000, 25)
 
@@ -7811,12 +7810,16 @@ Public Class Options_LinearInput : Inherits VB_Parent
             radio.addRadio("Y Direction")
             radio.addRadio("Z in X-Direction")
             radio.addRadio("Z in Y-Direction")
+            radio.addRadio("X and Y-Direction")
             radio.check(0).Checked = True
         End If
     End Sub
     Public Sub RunOpt()
         Static deltaSlider = FindSlider("Delta (mm)")
         delta = deltaSlider.value / 1000
+
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        offsetDirection = frm.check(findRadioIndex(frm.check)).Text
 
         Static xRadio = FindRadio("X Direction")
         Static yRadio = FindRadio("Y Direction")
@@ -7828,5 +7831,49 @@ Public Class Options_LinearInput : Inherits VB_Parent
         If yRadio.checked Then dimension = 1
 
         If zyRadio.checked Then zy = True Else zy = False
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_ImageOffset : Inherits VB_Parent
+    Public delta As Single
+    Public offsetDirection As String
+    Public horizontalSlice As Boolean
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta (mm)", 1, 1000, 25)
+
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Upper Left")
+            radio.addRadio("Above")
+            radio.addRadio("Upper Right")
+            radio.addRadio("Left")
+            radio.addRadio("Right")
+            radio.addRadio("Lower Left")
+            radio.addRadio("Below")
+            radio.addRadio("Below Right")
+            radio.check(7).Checked = True
+        End If
+
+
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Slice Horizontally (off Vertically)")
+            check.Box(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static deltaSlider = FindSlider("Delta (mm)")
+        delta = deltaSlider.value / 1000
+
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        offsetDirection = frm.check(findRadioIndex(frm.check)).Text
+
+        Static sliceDirection = FindCheckBox("Slice Horizontally (off Vertically)")
+        horizontalSlice = sliceDirection.checked
     End Sub
 End Class
