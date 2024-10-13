@@ -2,6 +2,8 @@
 Imports System.Runtime.InteropServices
 Public Class ImageOffset_Basics : Inherits VB_Parent
     Public options As New Options_ImageOffset
+    Public masks(2) As cvb.Mat
+    Public dsts(2) As cvb.Mat
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_32FC1, New cvb.Scalar(0))
@@ -34,17 +36,16 @@ Public Class ImageOffset_Basics : Inherits VB_Parent
         End Select
 
         Dim r3 = New cvb.Rect(1, 1, r1.Width, r1.Height)
+
         cvb.Cv2.Absdiff(task.pcSplit(0)(r1), task.pcSplit(0)(r2), dst1(r3))
         cvb.Cv2.Absdiff(task.pcSplit(1)(r1), task.pcSplit(1)(r2), dst2(r3))
         cvb.Cv2.Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
 
-        Dim maskX = dst1.Threshold(options.delta, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
-        Dim maskY = dst2.Threshold(options.delta, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
-        Dim maskZ = dst3.Threshold(options.delta, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
-
-        dst1.SetTo(0, maskX)
-        dst2.SetTo(0, maskY)
-        dst3.SetTo(0, maskZ)
+        dsts = {dst1, dst2, dst3}
+        For i = 0 To dsts.Count - 1
+            masks(i) = dsts(i).Threshold(options.delta, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+            dsts(i).SetTo(0, masks(i))
+        Next
     End Sub
 End Class
 
@@ -64,13 +65,19 @@ Public Class ImageOffset_SliceH : Inherits VB_Parent
         iOff.Run(src)
 
         Dim pt = task.mouseMovePoint
-        If standalone And task.mouseMovePoint = New cvb.Point Then
+        If standalone And task.mouseMovePoint.X = 0 And task.mouseMovePoint.Y = 0 Then
             pt = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         End If
 
+        Dim pcSplit(2) As cvb.Mat
+        For i = 0 To 2
+            pcSplit(i) = task.pcSplit(i).Clone
+            pcSplit(i).SetTo(0, iOff.masks(i))
+        Next
+
         Dim slice As cvb.Mat
         For i = 0 To 2
-            slice = task.pcSplit(i).Row(pt.Y)
+            slice = pcSplit(i).Row(pt.Y)
             plotSLR.slrCore.inputX.Clear()
             plotSLR.slrCore.inputY.Clear()
             For j = 0 To dst2.Width - 1
@@ -102,7 +109,9 @@ End Class
 
 Public Class ImageOffset_SliceV : Inherits VB_Parent
     Dim iOff As New ImageOffset_Basics
-    Dim plotSLR As New SLR_Basics
+    Dim plot As New Plot_PointsV
+    Dim options As New Options_SLR
+    Dim slr As New SLR
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         desc = "Visualize a slice through the ImageOffsets_Basics images"
@@ -111,28 +120,44 @@ Public Class ImageOffset_SliceV : Inherits VB_Parent
         iOff.Run(src)
 
         Dim pt = task.mouseMovePoint
-        If standalone And task.mouseMovePoint = New cvb.Point Then
+        If standalone And task.mouseMovePoint.X = 0 And task.mouseMovePoint.Y = 0 Then
             pt = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         End If
 
+        Dim pcSplit(2) As cvb.Mat
+        For i = 0 To 2
+            pcSplit(i) = task.pcSplit(i).Clone
+            pcSplit(i).SetTo(0, iOff.masks(i))
+        Next
+
         Dim slice As cvb.Mat
         For i = 0 To 2
-            slice = task.pcSplit(i).Col(pt.X)
-            plotSLR.slrCore.inputX.Clear()
-            plotSLR.slrCore.inputY.Clear()
+            slice = pcSplit(i).Col(pt.X)
+            Dim inputX As New List(Of Double)
+            Dim inputY As New List(Of Double)
             For j = 0 To dst2.Height - 1
-                plotSLR.slrCore.inputX.Add(j)
-                plotSLR.slrCore.inputY.Add(slice.Get(Of Single)(j, 0))
+                inputX.Add(CDbl(j))
+                inputY.Add(CDbl(slice.Get(Of Single)(j, 0)))
             Next
-            plotSLR.Run(src)
+
+            Dim outputX As New List(Of Double)
+            Dim outputY As New List(Of Double)
+            SLR.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
+                                        outputX, outputY)
+            plot.input.Clear()
+            For j = 0 To outputX.Count - 1
+                plot.input.Add(New cvb.Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
+            Next
+
+            plot.Run(src)
 
             Select Case i
                 Case 0
-                    dst1 = plotSLR.dst2.Clone
+                    dst1 = plot.dst2.Clone
                 Case 1
-                    dst2 = plotSLR.dst2.Clone
+                    dst2 = plot.dst2.Clone
                 Case 2
-                    dst3 = plotSLR.dst2.Clone
+                    dst3 = plot.dst2.Clone
             End Select
         Next
 
