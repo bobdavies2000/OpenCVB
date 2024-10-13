@@ -1,5 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports NAudio.Gui
+Imports System.Windows
 Public Class ImageOffset_Basics : Inherits VB_Parent
     Public options As New Options_ImageOffset
     Public masks(2) As cvb.Mat
@@ -56,12 +58,17 @@ End Class
 
 Public Class ImageOffset_SliceH : Inherits VB_Parent
     Dim iOff As New ImageOffset_Basics
-    Dim plotSLR As New SLR_Basics
+    Dim plot As New Plot_PointsH
+    Dim options As New Options_SLR
+    Dim slr As New SLR
+    Dim mats As New Mat_4to1
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        labels(2) = "Upper left is pointcloud X, upper right pointcloud Y, bottom left pointcloud Z"
         desc = "Visualize a slice through the ImageOffsets_Basics images"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
         iOff.Run(src)
 
         Dim pt = task.mouseMovePoint
@@ -78,26 +85,32 @@ Public Class ImageOffset_SliceH : Inherits VB_Parent
         Dim slice As cvb.Mat
         For i = 0 To 2
             slice = pcSplit(i).Row(pt.Y)
-            plotSLR.slrCore.inputX.Clear()
-            plotSLR.slrCore.inputY.Clear()
+            Dim inputX As New List(Of Double)
+            Dim inputY As New List(Of Double)
             For j = 0 To dst2.Width - 1
-                plotSLR.slrCore.inputX.Add(j)
-                plotSLR.slrCore.inputY.Add(slice.Get(Of Single)(0, j))
+                inputX.Add(j)
+                inputY.Add(slice.Get(Of Single)(0, j))
             Next
-            plotSLR.Run(src)
 
-            Select Case i
-                Case 0
-                    dst1 = plotSLR.dst2.Clone
-                Case 1
-                    dst2 = plotSLR.dst2.Clone
-                Case 2
-                    dst3 = plotSLR.dst2.Clone
-            End Select
+            Dim outputX As New List(Of Double)
+            Dim outputY As New List(Of Double)
+            slr.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
+                                        outputX, outputY)
+            plot.input.Clear()
+            For j = 0 To outputX.Count - 1
+                plot.input.Add(New cvb.Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
+            Next
+
+            plot.Run(src)
+            mats.mat(i) = plot.dst2.Clone
         Next
 
-        task.color.Line(New cvb.Point(0, pt.Y), New cvb.Point(dst2.Width, pt.Y),
-                        task.HighlightColor, task.lineWidth)
+        mats.Run(empty)
+        dst2 = mats.dst2
+
+        Dim p1 = New cvb.Point(0, pt.Y), p2 = New cvb.Point(dst2.Width, pt.Y)
+        task.color.Line(p1, p2, task.HighlightColor, task.lineWidth)
+        task.depthRGB.Line(p1, p2, task.HighlightColor, task.lineWidth)
     End Sub
 End Class
 
@@ -112,11 +125,14 @@ Public Class ImageOffset_SliceV : Inherits VB_Parent
     Dim plot As New Plot_PointsV
     Dim options As New Options_SLR
     Dim slr As New SLR
+    Dim mats As New Mat_4to1
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        labels(2) = "Upper left is pointcloud X, upper right pointcloud Y, bottom left pointcloud Z"
         desc = "Visualize a slice through the ImageOffsets_Basics images"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
         iOff.Run(src)
 
         Dim pt = task.mouseMovePoint
@@ -142,7 +158,7 @@ Public Class ImageOffset_SliceV : Inherits VB_Parent
 
             Dim outputX As New List(Of Double)
             Dim outputY As New List(Of Double)
-            SLR.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
+            slr.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
                                         outputX, outputY)
             plot.input.Clear()
             For j = 0 To outputX.Count - 1
@@ -150,19 +166,15 @@ Public Class ImageOffset_SliceV : Inherits VB_Parent
             Next
 
             plot.Run(src)
-
-            Select Case i
-                Case 0
-                    dst1 = plot.dst2.Clone
-                Case 1
-                    dst2 = plot.dst2.Clone
-                Case 2
-                    dst3 = plot.dst2.Clone
-            End Select
+            mats.mat(i) = plot.dst2.Clone
         Next
 
-        task.color.Line(New cvb.Point(pt.X, 0), New cvb.Point(pt.X, dst2.Height),
-                        task.HighlightColor, task.lineWidth)
+        mats.Run(empty)
+        dst2 = mats.dst2
+
+        Dim p1 = New cvb.Point(pt.X, 0), p2 = New cvb.Point(pt.X, dst2.Height)
+        task.color.Line(p1, p2, task.HighlightColor, task.lineWidth)
+        task.depthRGB.Line(p1, p2, task.HighlightColor, task.lineWidth)
     End Sub
 End Class
 
