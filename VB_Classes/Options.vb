@@ -7801,6 +7801,7 @@ End Class
 Public Class Options_LinearInput : Inherits VB_Parent
     Public delta As Single
     Public dimension As Integer
+    Public zy As Boolean ' true means use col while false means use row
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta (mm)", 1, 1000, 25)
 
@@ -7808,7 +7809,8 @@ Public Class Options_LinearInput : Inherits VB_Parent
             radio.Setup(traceName)
             radio.addRadio("X Direction")
             radio.addRadio("Y Direction")
-            radio.addRadio("Z Direction")
+            radio.addRadio("Z in X-Direction")
+            radio.addRadio("Z in Y-Direction")
             radio.check(0).Checked = True
         End If
     End Sub
@@ -7818,9 +7820,13 @@ Public Class Options_LinearInput : Inherits VB_Parent
 
         Static xRadio = FindRadio("X Direction")
         Static yRadio = FindRadio("Y Direction")
+        Static zxRadio = FindRadio("Z in X-Direction")
+        Static zyRadio = FindRadio("Z in Y-Direction")
 
         dimension = 2
         If xRadio.checked Then dimension = 0
         If yRadio.checked Then dimension = 1
+
+        If zyRadio.checked Then zy = True Else zy = False
     End Sub
 End Class

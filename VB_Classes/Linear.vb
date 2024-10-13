@@ -162,7 +162,7 @@ Public Class Linear_Input : Inherits VB_Parent
 
         ' use the pixel below for Y dimension
         Dim r1 As cvb.Rect, r2 As cvb.Rect
-        If options.dimension <> 1 Then
+        If options.dimension <> 1 Or (options.dimension = 2 And options.zy) Then
             r1 = New cvb.Rect(0, 0, task.cols - 1, task.rows)
             r2 = New cvb.Rect(1, 0, r1.Width, r1.Height)
         Else
@@ -176,7 +176,7 @@ Public Class Linear_Input : Inherits VB_Parent
         dst1 = dst2.Threshold(options.delta, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
 
         dst2.SetTo(0, dst1)
-        Dim msg = Choose(options.dimension + 1, "X direction", "Y direction", "Z direction")
+        Dim msg = Choose(options.dimension + 1, "X direction", "Y direction", "Z in X-direction")
         labels(2) = "Pointcloud data in " + msg + " where neighbors are less than " +
                     CStr(CInt(options.delta * 1000)) + " mm's apart"
         If standaloneTest() Then
@@ -231,7 +231,7 @@ End Class
 Public Class Linear_InputZ : Inherits VB_Parent
     Dim input As New Linear_Input
     Public Sub New()
-        FindRadio("Z Direction").Checked = True
+        FindRadio("Z in X-Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the Z direction"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -265,7 +265,7 @@ Public Class Linear_Slices : Inherits VB_Parent
         End If
 
         Dim rowCol As cvb.Mat, p1 As cvb.Point, p2 As cvb.Point
-        If options.dimension = 1 Then
+        If options.dimension = 1 Or (options.dimension = 2 And options.zy) Then
             rowCol = task.pcSplit(options.dimension).Col(pt.X).Clone
             rowCol = cvb.Mat.FromPixelData(1, rowCol.Rows, cvb.MatType.CV_32FC1, rowCol.Data)
             p1 = New cvb.Point(pt.X, 0)
