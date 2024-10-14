@@ -2,7 +2,7 @@ Imports cvb = OpenCvSharp
 Imports System.IO
 Public Class SLR_Basics : Inherits VB_Parent
     Public slrCore As New SLR_Core
-    Public plot As New Plot_PointsH
+    Public plot As New Plot_Points
     Public Sub New()
         desc = "Segmented Linear Regression example"
     End Sub

@@ -1,11 +1,10 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports NAudio.Gui
-Imports System.Windows
 Public Class ImageOffset_Basics : Inherits VB_Parent
     Public options As New Options_ImageOffset
     Public masks(2) As cvb.Mat
-    Public dsts(2) As cvb.Mat
+    Public dst(2) As cvb.Mat
+    Public pcFiltered(2) As cvb.Mat
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_32FC1, New cvb.Scalar(0))
@@ -43,10 +42,11 @@ Public Class ImageOffset_Basics : Inherits VB_Parent
         cvb.Cv2.Absdiff(task.pcSplit(1)(r1), task.pcSplit(1)(r2), dst2(r3))
         cvb.Cv2.Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
 
-        dsts = {dst1, dst2, dst3}
-        For i = 0 To dsts.Count - 1
-            masks(i) = dsts(i).Threshold(options.delta, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
-            dsts(i).SetTo(0, masks(i))
+        dst = {dst1, dst2, dst3}
+        For i = 0 To dst.Count - 1
+            masks(i) = dst(i).Threshold(options.delta, 255, cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
+            pcFiltered(i) = New cvb.Mat(src.Size, cvb.MatType.CV_32FC1, New cvb.Scalar(0))
+            task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
         Next
     End Sub
 End Class
@@ -58,7 +58,7 @@ End Class
 
 Public Class ImageOffset_SliceH : Inherits VB_Parent
     Dim iOff As New ImageOffset_Basics
-    Dim plot As New Plot_PointsH
+    Dim plot As New Plot_Points
     Dim options As New Options_SLR
     Dim slr As New SLR
     Dim mats As New Mat_4to1
@@ -76,15 +76,9 @@ Public Class ImageOffset_SliceH : Inherits VB_Parent
             pt = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         End If
 
-        Dim pcSplit(2) As cvb.Mat
-        For i = 0 To 2
-            pcSplit(i) = task.pcSplit(i).Clone
-            pcSplit(i).SetTo(0, iOff.masks(i))
-        Next
-
         Dim slice As cvb.Mat
         For i = 0 To 2
-            slice = pcSplit(i).Row(pt.Y)
+            slice = iOff.pcFiltered(i).Row(pt.Y)
             Dim inputX As New List(Of Double)
             Dim inputY As New List(Of Double)
             For j = 0 To dst2.Width - 1
@@ -96,12 +90,16 @@ Public Class ImageOffset_SliceH : Inherits VB_Parent
             Dim outputY As New List(Of Double)
             slr.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
                                         outputX, outputY)
+
             plot.input.Clear()
             For j = 0 To outputX.Count - 1
                 plot.input.Add(New cvb.Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
             Next
 
+            plot.minY = Choose(i + 1, -task.xRange, -task.yRange, 0)
+            plot.maxY = Choose(i + 1, task.xRange, task.yRange, task.MaxZmeters)
             plot.Run(src)
+
             mats.mat(i) = plot.dst2.Clone
         Next
 
@@ -122,7 +120,7 @@ End Class
 
 Public Class ImageOffset_SliceV : Inherits VB_Parent
     Dim iOff As New ImageOffset_Basics
-    Dim plot As New Plot_PointsV
+    Dim plot As New Plot_Points
     Dim options As New Options_SLR
     Dim slr As New SLR
     Dim mats As New Mat_4to1
@@ -140,15 +138,9 @@ Public Class ImageOffset_SliceV : Inherits VB_Parent
             pt = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         End If
 
-        Dim pcSplit(2) As cvb.Mat
-        For i = 0 To 2
-            pcSplit(i) = task.pcSplit(i).Clone
-            pcSplit(i).SetTo(0, iOff.masks(i))
-        Next
-
         Dim slice As cvb.Mat
         For i = 0 To 2
-            slice = pcSplit(i).Col(pt.X)
+            slice = iOff.pcFiltered(i).Col(pt.X)
             Dim inputX As New List(Of Double)
             Dim inputY As New List(Of Double)
             For j = 0 To dst2.Height - 1
@@ -160,11 +152,14 @@ Public Class ImageOffset_SliceV : Inherits VB_Parent
             Dim outputY As New List(Of Double)
             slr.SegmentedRegressionFast(inputX, inputY, options.tolerance, options.halfLength,
                                         outputX, outputY)
+
             plot.input.Clear()
             For j = 0 To outputX.Count - 1
                 plot.input.Add(New cvb.Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
             Next
 
+            plot.minY = Choose(i + 1, -task.xRange, -task.yRange, 0)
+            plot.maxy = Choose(i + 1, task.xRange, task.yRange, task.MaxZmeters)
             plot.Run(src)
             mats.mat(i) = plot.dst2.Clone
         Next

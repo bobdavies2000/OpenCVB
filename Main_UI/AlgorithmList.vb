@@ -2883,8 +2883,7 @@ End Enum
 	If algorithmName = "Plot_OverTimeScalar_CS" Then return new Plot_OverTimeScalar_CS
 	If algorithmName = "Plot_OverTimeSingle" Then return new Plot_OverTimeSingle
 	If algorithmName = "Plot_OverTimeSingle_CS" Then return new Plot_OverTimeSingle_CS
-	If algorithmName = "Plot_PointsH" Then return new Plot_PointsH
-	If algorithmName = "Plot_PointsV" Then return new Plot_PointsV
+	If algorithmName = "Plot_Points" Then return new Plot_Points
 	If algorithmName = "PlyFormat_Basics" Then return new PlyFormat_Basics
 	If algorithmName = "PlyFormat_Basics_CS" Then return new PlyFormat_Basics_CS
 	If algorithmName = "PlyFormat_PlusRGB" Then return new PlyFormat_PlusRGB
