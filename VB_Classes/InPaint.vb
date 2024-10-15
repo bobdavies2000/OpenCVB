@@ -59,9 +59,36 @@ Public Class InPaint_Depth : Inherits VB_Parent
         desc = "Use Navier-Stokes to fill in the holes in the depth"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Options.RunOpt()
+        options.RunOpt()
         If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
         dst2 = src.Clone
         cvb.Cv2.Inpaint(src, task.noDepthMask, dst3, 20, If(options.telea, cvb.InpaintMethod.Telea, cvb.InpaintMethod.NS))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class InPaint_PointCloud : Inherits VB_Parent
+    Dim options As New Options_InPaint
+    Public Sub New()
+        labels(2) = "Pointcloud before inpaint"
+        labels(3) = "Pointcloud after inpaint"
+        desc = "Use Navier-Stokes to fill in the holes in the depth"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = task.pointCloud.Clone
+
+        Dim split(2) As cvb.Mat
+        For i = 0 To task.pcSplit.Count - 1
+            split(i) = New cvb.Mat
+            cvb.Cv2.Inpaint(task.pcSplit(i), task.noDepthMask, split(i), 20,
+                            If(options.telea, cvb.InpaintMethod.Telea, cvb.InpaintMethod.NS))
+        Next
+        cvb.Cv2.Merge(split, dst3)
     End Sub
 End Class

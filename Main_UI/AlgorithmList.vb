@@ -1381,6 +1381,8 @@ End Enum
 	If algorithmName = "GuidedBP_Points_CS" Then return new GuidedBP_Points_CS
 	If algorithmName = "GuidedBP_RedCloud" Then return new GuidedBP_RedCloud
 	If algorithmName = "GuidedBP_Regions" Then return new GuidedBP_Regions
+	If algorithmName = "GuidedBP_Top" Then return new GuidedBP_Top
+	If algorithmName = "GuidedBP_TopView" Then return new GuidedBP_TopView
 	If algorithmName = "HeatMap_Basics" Then return new HeatMap_Basics
 	If algorithmName = "HeatMap_Basics_CS" Then return new HeatMap_Basics_CS
 	If algorithmName = "HeatMap_Cell" Then return new HeatMap_Cell
@@ -1716,6 +1718,7 @@ End Enum
 	If algorithmName = "InPaint_Depth_CS" Then return new InPaint_Depth_CS
 	If algorithmName = "InPaint_Noise" Then return new InPaint_Noise
 	If algorithmName = "InPaint_Noise_CS" Then return new InPaint_Noise_CS
+	If algorithmName = "InPaint_PointCloud" Then return new InPaint_PointCloud
 	If algorithmName = "Interpolate_Basics" Then return new Interpolate_Basics
 	If algorithmName = "Interpolate_Basics_CS" Then return new Interpolate_Basics_CS
 	If algorithmName = "Interpolate_Difference" Then return new Interpolate_Difference
@@ -2401,6 +2404,7 @@ End Enum
 	If algorithmName = "OpenGL_OnlyPlanes_CS" Then return new OpenGL_OnlyPlanes_CS
 	If algorithmName = "OpenGL_PatchHorizontal" Then return new OpenGL_PatchHorizontal
 	If algorithmName = "OpenGL_PatchHorizontal_CS" Then return new OpenGL_PatchHorizontal_CS
+	If algorithmName = "OpenGL_PCdiff" Then return new OpenGL_PCdiff
 	If algorithmName = "OpenGL_PCLineCandidates" Then return new OpenGL_PCLineCandidates
 	If algorithmName = "OpenGL_PCLineCandidates_CS" Then return new OpenGL_PCLineCandidates_CS
 	If algorithmName = "OpenGL_PClinesAll" Then return new OpenGL_PClinesAll
@@ -2778,6 +2782,10 @@ End Enum
 	If algorithmName = "PCA_Prep_CPP_VB" Then return new PCA_Prep_CPP_VB
 	If algorithmName = "PCA_Reconstruct" Then return new PCA_Reconstruct
 	If algorithmName = "PCA_Reconstruct_CS" Then return new PCA_Reconstruct_CS
+	If algorithmName = "PCdiff_Basics" Then return new PCdiff_Basics
+	If algorithmName = "PCdiff_Filter" Then return new PCdiff_Filter
+	If algorithmName = "PCdiff_GuidedBP" Then return new PCdiff_GuidedBP
+	If algorithmName = "PCdiff_Points" Then return new PCdiff_Points
 	If algorithmName = "Pendulum_Basics" Then return new Pendulum_Basics
 	If algorithmName = "Pendulum_Basics_CS" Then return new Pendulum_Basics_CS
 	If algorithmName = "PhaseCorrelate_Basics" Then return new PhaseCorrelate_Basics

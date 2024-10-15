@@ -1,6 +1,8 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 Imports sl
+Imports OpenCvSharp
+
 #If 1 Then
 Public Class CameraZED2 : Inherits GenericCamera
     Dim zed As sl.Camera
@@ -169,17 +171,14 @@ Public Class CameraZED2 : Inherits GenericCamera
         Zed2GetData(cPtr, WorkingRes.Width, WorkingRes.Height)
 
         SyncLock cameraLock
-            uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, Zed2Color(cPtr)).Clone
-            uiRight = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, Zed2RightView(cPtr)).Clone
-            uiLeft = uiColor.Clone
+            uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
+                                            Zed2Color(cPtr)).Clone
+            uiRight = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
+                                            Zed2RightView(cPtr)).Clone
+            uiLeft = uiColor
 
             uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC3,
                                                  Zed2PointCloud(cPtr)).Clone
-
-
-            Dim samples(uiPointCloud.Total * 3 - 1) As Single
-            Marshal.Copy(uiPointCloud.Data, samples, 0, samples.Length)
-
 
             Dim acc = Zed2Acceleration(cPtr)
             IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(acc)

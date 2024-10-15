@@ -9,7 +9,7 @@ Public Class GuidedBP_Basics : Inherits VB_Parent
         sideMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Correlate the hot points with the previous generation using a Map"
     End Sub
-    Private Sub runMap(rectList As List(Of cvb.Rect), dstindex As Integer, map As cvb.Mat)
+    Public Sub runMap(rectList As List(Of cvb.Rect), dstindex As Integer, map As cvb.Mat)
         Dim sortRects As New SortedList(Of Integer, cvb.Rect)(New compareAllowIdenticalIntegerInverted)
         For Each r In rectList
             sortRects.Add(r.Width * r.Height, r)
@@ -144,47 +144,6 @@ Public Class GuidedBP_PlanesPlot : Inherits VB_Parent
         Next
 
         labels(2) = "There were " + CStr(flatSurfacesInRow.Count) + " flat surface candidates found."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class GuidedBP_Points : Inherits VB_Parent
-    Public hotPoints As New GuidedBP_Basics
-    Public classCount As Integer
-    Public selectedPoint As cvb.Point
-    Public topRects As New List(Of cvb.Rect)
-    Public sideRects As New List(Of cvb.Rect)
-    Public histogramTop As New cvb.Mat
-    Public histogramSide As New cvb.Mat
-    Public backP As New cvb.Mat
-    Public Sub New()
-        desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        hotPoints.Run(src)
-
-        hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cvb.MatType.CV_32F)
-        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP, task.rangesTop)
-
-        topRects = New List(Of cvb.Rect)(hotPoints.ptHot.topRects)
-        sideRects = New List(Of cvb.Rect)(hotPoints.ptHot.sideRects)
-
-        dst2 = ShowPalette(backP * 255 / topRects.Count)
-
-        hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cvb.MatType.CV_32F)
-        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
-
-        dst3 = ShowPalette(dst3 * 255 / sideRects.Count)
-
-        classCount = topRects.Count + sideRects.Count
-
-        If task.mouseClickFlag Then selectedPoint = task.ClickPoint
-        If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
-        If task.heartBeat Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
     End Sub
 End Class
 
@@ -466,5 +425,103 @@ Public Class GuidedBP_Regions : Inherits VB_Parent
 
         labels(2) = "(left to right) Regions from cloud X, Regions from Cloud Y, Top " + CStr(options.cellCount) +
                     " X regions, Top " + CStr(options.cellCount) + " Y regions"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GuidedBP_Points : Inherits VB_Parent
+    Public hotPoints As New GuidedBP_Basics
+    Public classCount As Integer
+    Public selectedPoint As cvb.Point
+    Public topRects As New List(Of cvb.Rect)
+    Public sideRects As New List(Of cvb.Rect)
+    Public histogramTop As New cvb.Mat
+    Public histogramSide As New cvb.Mat
+    Public backP As New cvb.Mat
+    Public Sub New()
+        desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        hotPoints.Run(src)
+
+        hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cvb.MatType.CV_32F)
+        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP,
+                                task.rangesTop)
+
+        topRects = New List(Of cvb.Rect)(hotPoints.ptHot.topRects)
+        sideRects = New List(Of cvb.Rect)(hotPoints.ptHot.sideRects)
+
+        dst2 = ShowPalette(backP * 255 / topRects.Count)
+
+        hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cvb.MatType.CV_32F)
+        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
+
+        dst3 = ShowPalette(dst3 * 255 / sideRects.Count)
+
+        classCount = topRects.Count + sideRects.Count
+
+        If task.mouseClickFlag Then selectedPoint = task.ClickPoint
+        If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
+        If task.heartBeat Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
+    End Sub
+End Class
+
+
+
+
+
+Public Class GuidedBP_Top : Inherits VB_Parent
+    Public ptHot As New GuidedBP_HotPoints
+    Dim hotPoints As New GuidedBP_Basics
+    Dim topMap As New cvb.Mat
+    Public Sub New()
+        topMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        desc = "Correlate the hot points with the previous generation using a Map"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        ptHot.Run(src)
+        dst2 = ptHot.dst2
+
+        hotPoints.trueData.Clear()
+        hotPoints.runMap(ptHot.topRects, 2, topMap)
+        trueData = hotPoints.trueData
+
+        labels(2) = CStr(ptHot.topRects.Count) + " objects found in the top view"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GuidedBP_TopView : Inherits VB_Parent
+    Public hotPoints As New GuidedBP_Top
+    Public classCount As Integer
+    Public topRects As New List(Of cvb.Rect)
+    Public histogramTop As New cvb.Mat
+    Public backP As New cvb.Mat
+    Public Sub New()
+        desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
+        hotPoints.Run(src)
+
+        hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cvb.MatType.CV_32F)
+        cvb.Cv2.CalcBackProject({src}, task.channelsTop, histogramTop, backP,
+                                task.rangesTop)
+
+        topRects = New List(Of cvb.Rect)(hotPoints.ptHot.topRects)
+
+        dst2 = ShowPalette(backP * 255 / topRects.Count)
+        classCount = topRects.Count
+
+        If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
     End Sub
 End Class

@@ -9,8 +9,8 @@
 #include <algorithm>
 
 // we are using only the C# interface to the StereoLabs camera now.  Change #ifdef here and in CameraZed2.vb.
-#if 0 
 #include "../CameraDefines.hpp"
+#define STEREOLAB_INSTALLED
 #ifdef STEREOLAB_INSTALLED
 
 #include <opencv2/core.hpp>
@@ -162,5 +162,4 @@ extern "C" __declspec(dllexport) int* Zed2RightView(StereoLabsZed2* cPtr)
 extern "C" __declspec(dllexport) int* Zed2Intrinsics(StereoLabsZed2* cPtr) { return (int*)&cPtr->cameraData; }
 #else
 extern "C" __declspec(dllexport) int placeholder() { return 0; }
-#endif
 #endif

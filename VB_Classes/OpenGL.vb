@@ -2214,3 +2214,27 @@ Public Class OpenGL_LinearXY : Inherits VB_Parent
         task.ogl.Run(task.color)
     End Sub
 End Class
+
+
+
+
+
+Public Class OpenGL_PCdiff : Inherits VB_Parent
+    Dim filter As New PCdiff_Points
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Display only pixels that are within X mm's of each other."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        filter.Run(src)
+        dst2 = filter.dst3
+
+        If task.toggleOnOff Then
+            Dim r = New cvb.Rect(0, 0, dst2.Width, 2)
+            task.color(r).SetTo(cvb.Scalar.White)
+        End If
+        task.ogl.pointCloudInput = dst2
+        task.ogl.Run(task.color)
+    End Sub
+End Class

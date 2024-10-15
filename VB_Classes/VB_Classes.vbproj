@@ -132,6 +132,7 @@
     <Compile Include="Cluster.vb" />
     <Compile Include="Color.vb" />
     <Compile Include="Complexity.vb" />
+    <Compile Include="PCdiff.vb" />
     <Compile Include="Reliable.vb" />
     <Compile Include="ScatterMatrix.vb" />
     <Compile Include="Derivative.vb" />

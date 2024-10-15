@@ -100,8 +100,10 @@ Public Class CameraKinect : Inherits GenericCamera
                                           K4ALeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone
                 uiRight = uiLeft.Clone
                 If captureRes <> WorkingRes Then
-                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16UC3,
-                                     K4APointCloud(cPtr)).Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                    Dim ptr = K4APointCloud(cPtr)
+                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                                    cvb.MatType.CV_16UC3, ptr).
+                                                    Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
                     tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 Else
                     Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16SC3, K4APointCloud(cPtr))

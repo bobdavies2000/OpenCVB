@@ -56,6 +56,7 @@ End Class
 ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
 Public Class BackProject_Full : Inherits VB_Parent
     Public classCount As Integer
+    Public ranges() As cvb.Rangef = New cvb.Rangef() {New cvb.Rangef(0, 255)}
     Public Sub New()
         labels = {"", "", "CV_8U format of the backprojection", "dst2 presented with a palette"}
         desc = "Create a color histogram, normalize it, and backproject it with a palette."
@@ -63,13 +64,12 @@ Public Class BackProject_Full : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         classCount = task.histogramBins
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        src.ConvertTo(dst1, cvb.MatType.CV_32F)
+        If src.Type <> cvb.MatType.CV_32F Then src.ConvertTo(src, cvb.MatType.CV_32F)
         Dim histogram As New cvb.Mat
-        Dim ranges() As cvb.Rangef = New cvb.Rangef() {New cvb.Rangef(0, 255)}
-        cvb.Cv2.CalcHist({dst1}, {0}, New cvb.Mat, histogram, 1, {classCount}, ranges)
+        cvb.Cv2.CalcHist({src}, {0}, New cvb.Mat, histogram, 1, {classCount}, ranges)
         histogram = histogram.Normalize(0, classCount, cvb.NormTypes.MinMax)
 
-        cvb.Cv2.CalcBackProject({dst1}, {0}, histogram, dst2, ranges)
+        cvb.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)
 
         dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
         dst3 = ShowPalette(dst2 * 255 / classCount)

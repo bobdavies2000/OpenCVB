@@ -5,11 +5,9 @@ Imports System.Text.RegularExpressions
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VB_Classes
-Imports CS_Classes
 Imports System.Management
 Imports cvext = OpenCvSharp.Extensions
 Imports System.ComponentModel
-Imports Microsoft.VisualBasic
 
 #Region "Globals"
 Module opencv_module
@@ -1424,6 +1422,10 @@ Public Class Main_UI
                         uiColor = camera.uiColor.clone
                         uiLeft = camera.uiLeft.clone
                         uiRight = camera.uiRight.clone
+                        ' a problem with the K4A interface was corrected here...
+                        If camera.uipointcloud Is Nothing Then
+                            camera.uipointcloud = New cvb.Mat(uiColor.Size, cvb.MatType.CV_32FC3, New cvb.Scalar(0))
+                        End If
                         uiPointCloud = camera.uiPointCloud.clone
                         ' paintNewImages = True ' trigger the paint 
                         newCameraImages = True ' trigger the algorithm task
@@ -1639,7 +1641,11 @@ Public Class Main_UI
                 pixelViewerRect = task.pixelViewerRect
                 pixelViewTag = task.pixelViewTag
 
-                task.fpsRate = If(fpsAlgorithm > 0.01, 1, fpsAlgorithm)
+                If Single.IsNaN(fpsAlgorithm) Then
+                    task.fpsRate = 1
+                Else
+                    task.fpsRate = If(fpsAlgorithm < 0.01, 1, fpsAlgorithm)
+                End If
 
                 If task.paused = False Then
                     SyncLock trueData
