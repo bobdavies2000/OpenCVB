@@ -4,21 +4,28 @@ Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits VB_Parent
     Dim measure As New LowRes_MeasureMotion
     Public Sub New()
+        labels(3) = "The difference between the motion-constructed image and the current image."
         desc = "Isolate all motion in the scene"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         measure.Run(src)
         dst2 = measure.dst3 ' only cells with motion detected are updated in this image.
         labels(2) = measure.labels(2)
-        labels(3) = measure.labels(3)
+
+        If standaloneTest() Then ' show any differences
+            Static diff As New Diff_Basics
+            diff.lastFrame = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            diff.Run(src)
+            dst3 = diff.dst2
+        End If
     End Sub
 End Class
 
 
 
-Public Class Motion_BasicsOld : Inherits VB_Parent
+Public Class Motion_BGSub : Inherits VB_Parent
     Public bgSub As New BGSubtract_MOG2
-    Dim motion As New Motion_Basics_QT
+    Dim motion As New Motion_BGSub_QT
     Public Sub New()
         UpdateAdvice(traceName + ": redOptions are used as well as BGSubtract options.")
         desc = "Use floodfill to find all the real motion in an image."
@@ -36,14 +43,14 @@ End Class
 
 
 
-Public Class Motion_Basics_QT : Inherits VB_Parent
+Public Class Motion_BGSub_QT : Inherits VB_Parent
     Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cvb.Rect)
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         task.redOptions.setIdentifyCells(False)
-        desc = "The option-free version of Motion_BasicsOld"
+        desc = "The option-free version of Motion_BGSub"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         task.motionDetected = True

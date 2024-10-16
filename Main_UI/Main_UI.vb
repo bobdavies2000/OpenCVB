@@ -1471,6 +1471,9 @@ Public Class Main_UI
 
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 
+            ' if you land here and you were trying subset group of algorithms,
+            ' then remove the json file, click the OpenCVB options button and click 'Update Algorithm XRef'
+            ' (it is toward the bottom of the options form.)
             textDesc = task.MainUI_Algorithm.desc
 
             intermediateReview = ""

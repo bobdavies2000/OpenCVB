@@ -180,7 +180,7 @@ End Class
 
 Public Class CameraMotion_SceneMotion : Inherits VB_Parent
     Dim cMotion As New CameraMotion_Basics
-    Dim motion As New Motion_BasicsOld
+    Dim motion As New Motion_BGSub
     Public Sub New()
         labels(2) = "Image after adjusting for camera motion."
         desc = "Display both camera motion (on heartbeats) and scene motion."

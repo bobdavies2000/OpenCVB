@@ -6916,12 +6916,12 @@ public:
 
 
 
-class Motion_Basics_CC : public CPP_Parent {
+class Motion_BGSub_CC : public CPP_Parent {
 public:
     Options_BGSubtract* options = new Options_BGSubtract;
     BGSubtract_BGFG* cPtr = nullptr;
     string desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
-    Motion_Basics_CC() : CPP_Parent() {
+    Motion_BGSub_CC() : CPP_Parent() {
         cPtr = BGSubtract_BGFG_Open(options->currMethod);
         labels[2] = "BGSubtract output";
     }

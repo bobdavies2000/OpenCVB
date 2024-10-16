@@ -61,7 +61,7 @@ _Mat_4Click_CC
 _Mat_4to1_CC
 _Mesh_Basics_CC
 _Mesh_Features_CC
-_Motion_Basics_CC
+_Motion_BGSub_CC
 _Motion_Simple_CC
 _Palette_Basics_CC
 _Palette_Random_CC
@@ -2166,11 +2166,11 @@ End Enum
 	If algorithmName = "Moments_CentroidKalman" Then return new Moments_CentroidKalman
 	If algorithmName = "Moments_CentroidKalman_CS" Then return new Moments_CentroidKalman_CS
 	If algorithmName = "Motion_Basics" Then return new Motion_Basics
-	If algorithmName = "Motion_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Motion_Basics_CC)
 	If algorithmName = "Motion_Basics_CS" Then return new Motion_Basics_CS
-	If algorithmName = "Motion_Basics_QT" Then return new Motion_Basics_QT
 	If algorithmName = "Motion_Basics_QT_CS" Then return new Motion_Basics_QT_CS
-	If algorithmName = "Motion_BasicsOld" Then return new Motion_BasicsOld
+	If algorithmName = "Motion_BGSub" Then return new Motion_BGSub
+	If algorithmName = "Motion_BGSub_CC" Then return new CPP_Basics(ccFunctionNames._Motion_BGSub_CC)
+	If algorithmName = "Motion_BGSub_QT" Then return new Motion_BGSub_QT
 	If algorithmName = "Motion_CCmerge" Then return new Motion_CCmerge
 	If algorithmName = "Motion_CCmerge_CS" Then return new Motion_CCmerge_CS
 	If algorithmName = "Motion_Color_CS" Then return new Motion_Color_CS

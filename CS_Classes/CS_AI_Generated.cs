@@ -40473,7 +40473,7 @@ namespace CS_Classes
         public Motion_Basics_QT_CS()
         {
             vbc.task.redOptions.setIdentifyCells(false);
-            desc = "The option-free version of Motion_BasicsOld";
+            desc = "The option-free version of Motion_BGSub";
         }
         public void RunAlg(Mat src)
         {

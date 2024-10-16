@@ -154,8 +154,8 @@ namespace CPP_Native
         { task->alg = new ApproxPoly_Hull_CC(); task->alg->traceName = "ApproxPoly_Hull_CC"; break; }
         case _Edge_Segments_CC:
         { task->alg = new Edge_Segments_CC(); task->alg->traceName = "Edge_Segments_CC"; break; }
-        case _Motion_Basics_CC:
-        { task->alg = new Motion_Basics_CC(); task->alg->traceName = "Motion_Basics_CC"; break; }
+        case _Motion_BGSub_CC:
+        { task->alg = new Motion_BGSub_CC(); task->alg->traceName = "Motion_BGSub_CC"; break; }
         case _Edge_MotionFrames_CC:
         { task->alg = new Edge_MotionFrames_CC(); task->alg->traceName = "Edge_MotionFrames_CC"; break; }
         case _Edge_Preserving_CC:
