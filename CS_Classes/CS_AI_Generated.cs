@@ -40473,7 +40473,7 @@ namespace CS_Classes
         public Motion_Basics_QT_CS()
         {
             vbc.task.redOptions.setIdentifyCells(false);
-            desc = "The option-free version of Motion_Basics";
+            desc = "The option-free version of Motion_BasicsOld";
         }
         public void RunAlg(Mat src)
         {
@@ -40578,104 +40578,6 @@ namespace CS_Classes
         {
             if (vbc.task.motionDetected) src[vbc.task.motionRect].CopyTo(dst2[vbc.task.motionRect]);
             if (standaloneTest() && vbc.task.motionDetected) dst2.Rectangle(vbc.task.motionRect, Scalar.White, vbc.task.lineWidth);
-        }
-    }
-
-
-
-
-    public class Motion_BasicsQuarterRes_CS : VB_Parent
-    {
-        RedCloud_Basics redC = new RedCloud_Basics();
-        public BGSubtract_MOG2_QT bgSub = new BGSubtract_MOG2_QT();
-        List<cv.Rect> rectList = new List<cv.Rect>();
-        public Motion_BasicsQuarterRes_CS()
-        {
-            desc = "The option-free version of Motion_Basics";
-        }
-        public void RunAlg(Mat src)
-        {
-            vbc.task.motionDetected = true;
-            vbc.task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
-            if (src.Channels() != 1)
-            {
-                bgSub.Run(src);
-                dst2 = bgSub.dst2;
-            }
-            else
-            {
-                dst2 = src;
-            }
-            if (dst2.Size() != vbc.task.quarterRes)
-            {
-                dst2 = dst2.Resize(vbc.task.quarterRes).Threshold(0, 255, ThresholdTypes.Binary);
-            }
-            else
-            {
-                dst2 = src.Threshold(0, 255, ThresholdTypes.Binary);
-            }
-            redC.inputMask = ~dst2;
-            redC.Run(dst2);
-            if (vbc.task.redCells.Count() <= 2)
-            {
-                vbc.task.motionDetected = false;
-            }
-            else
-            {
-                cv.Rect nextRect = vbc.task.redCells[1].rect;
-                for (int i = 2; i < vbc.task.redCells.Count(); i++)
-                {
-                    var rc = vbc.task.redCells[i];
-                    nextRect = nextRect.Union(rc.rect);
-                }
-                rectList.Add(nextRect);
-                vbc.task.motionRect = rectList[0];
-                for (int i = 1; i < rectList.Count(); i++)
-                {
-                    vbc.task.motionRect = vbc.task.motionRect.Union(rectList[i]);
-                }
-                if (rectList.Count() > vbc.task.frameHistoryCount) rectList.RemoveAt(0);
-                if (vbc.task.motionRect.Width > dst2.Width / 2 && vbc.task.motionRect.Height > dst2.Height / 2)
-                {
-                    vbc.task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
-                }
-                else
-                {
-                    if (vbc.task.motionRect.Width == 0 || vbc.task.motionRect.Height == 0) vbc.task.motionDetected = false;
-                }
-            }
-            if (standaloneTest())
-            {
-                dst2.Rectangle(vbc.task.motionRect, cv.Scalar.All(255), vbc.task.lineWidth);
-                if (vbc.task.redCells.Count() > 1)
-                {
-                    labels[2] = vbc.task.redCells.Count().ToString() + " RedMask cells had motion";
-                }
-                else
-                {
-                    labels[2] = "No motion detected";
-                }
-                labels[3] = "";
-                if (vbc.task.motionRect.Width > 0)
-                {
-                    labels[3] = "Rect width = " + vbc.task.motionRect.Width + ", height = " + vbc.task.motionRect.Height;
-                }
-            }
-            int ratio = src.Width / dst2.Width;
-            if (src.Size() != dst2.Size())
-            {
-                cv.Rect r = vbc.task.motionRect;
-                vbc.task.motionRect = new cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio);
-            }
-            if (vbc.task.motionRect.Width < dst2.Width)
-            {
-                dst2.Rectangle(vbc.task.motionRect, cv.Scalar.All(255), vbc.task.lineWidth);
-                int pad = dst2.Width / 20;
-                cv.Rect r = vbc.task.motionRect;
-                r = new cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2);
-                vbc.task.motionRect = ValidateRect(r, ratio);
-                dst2.Rectangle(vbc.task.motionRect, cv.Scalar.All(255), vbc.task.lineWidth + 1);
-            }
         }
     }
 

@@ -2170,7 +2170,7 @@ End Enum
 	If algorithmName = "Motion_Basics_CS" Then return new Motion_Basics_CS
 	If algorithmName = "Motion_Basics_QT" Then return new Motion_Basics_QT
 	If algorithmName = "Motion_Basics_QT_CS" Then return new Motion_Basics_QT_CS
-	If algorithmName = "Motion_BasicsQuarterRes_CS" Then return new Motion_BasicsQuarterRes_CS
+	If algorithmName = "Motion_BasicsOld" Then return new Motion_BasicsOld
 	If algorithmName = "Motion_CCmerge" Then return new Motion_CCmerge
 	If algorithmName = "Motion_CCmerge_CS" Then return new Motion_CCmerge_CS
 	If algorithmName = "Motion_Color_CS" Then return new Motion_Color_CS

@@ -456,6 +456,7 @@ Public Class LowRes_MeasureColor : Inherits VB_Parent
     Public colors() As cvb.Vec3b
     Public distances() As Single
     Public options As New Options_LowRes
+    Public motionList As New List(Of Integer)
     Public Sub New()
         desc = "Measure how much color changes with and without motion."
     End Sub
@@ -470,7 +471,8 @@ Public Class LowRes_MeasureColor : Inherits VB_Parent
             ReDim distances(task.gridRects.Count - 1)
         End If
 
-        Dim motionCount As Integer = 0
+        If standaloneTest() Then trueData.Clear()
+        motionList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
             Dim vec = dst2.Get(Of cvb.Vec3b)(roi.Y, roi.X)
@@ -480,13 +482,17 @@ Public Class LowRes_MeasureColor : Inherits VB_Parent
                     SetTrueText(Format(distances(i), fmt1), New cvb.Point(roi.X, roi.Y), 3)
                 End If
                 colors(i) = vec
-                motionCount += task.gridNeighbors(i).Count
+                For Each index In task.gridNeighbors(i)
+                    If motionList.Contains(index) = False Then
+                        motionList.Add(index)
+                    End If
+                Next
             End If
         Next
 
         If task.heartBeat Or task.optionsChanged Then
-            labels(3) = "Of the " + CStr(task.gridRects.Count) + " grid cells " +
-                        CStr(motionCount) + " had motion"
+            Dim percent = (task.gridRects.Count - motionList.Count) / task.gridRects.Count
+            labels(3) = "Of the " + Format(percent, "0%") + " of cells were unchanged"
         End If
     End Sub
 End Class
@@ -498,13 +504,15 @@ End Class
 Public Class LowRes_MeasureMotion : Inherits VB_Parent
     Dim measure As New LowRes_MeasureColor
     Public motionRects As New List(Of cvb.Rect)
-    Public fullUpdate As Integer
+    Dim fullUpdate As Integer
+    Public fullImageUpdate As Boolean
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         desc = "Show all the grid cells above the motionless value (an option)."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then dst0 = src.Clone
+        fullImageUpdate = False
 
         measure.Run(src)
         dst2 = measure.dst2
@@ -531,13 +539,14 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
         Dim percentChanged = motionRects.Count / task.gridRects.Count
         If task.heartBeat Or percentChanged > 0.5 Then
             Static lastFrameCount As Integer = task.frameCount
-            Dim testCount = task.frameCount - lastFrameCount
+            labels(2) = measure.labels(3)
             fullUpdate += 1
+            fullImageUpdate = True
             dst3 = src.Clone
-            labels(3) = Format(percentChanged, "0%") + " of cells changed.  " +
-                        Format(fullUpdate / (testCount), "0%") + " of the time the full frame was used." +
+            Dim frameCount = task.frameCount - lastFrameCount
+            labels(3) = Format(fullUpdate / frameCount, "0%") + " of the time the full frame was used." +
                         "  Minimum is to update on each heartbeat."
-            If testCount > 200 Then
+            If frameCount > 200 Then
                 lastFrameCount = task.frameCount
                 fullUpdate = 0
             End If
@@ -579,8 +588,10 @@ Public Class LowRes_MeasureValidate : Inherits VB_Parent
         cvb.Cv2.Absdiff(curr, motion, dst0)
 
         If task.heartBeat = False Then
-            dst1 = dst0.Threshold(1, 255, cvb.ThresholdTypes.Binary)
-            dst1 = dst1.Reshape(3, src.Rows)
+            If measure.fullImageUpdate = False Then
+                dst1 = dst0.Threshold(1, 255, cvb.ThresholdTypes.Binary)
+                dst1 = dst1.Reshape(3, src.Rows)
+            End If
             dst3 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
             dst3 = dst3.Reshape(3, src.Rows)
         End If

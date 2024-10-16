@@ -2,6 +2,21 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits VB_Parent
+    Dim measure As New LowRes_MeasureMotion
+    Public Sub New()
+        desc = "Isolate all motion in the scene"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        measure.Run(src)
+        dst2 = measure.dst3 ' only cells with motion detected are updated in this image.
+        labels(2) = measure.labels(2)
+        labels(3) = measure.labels(3)
+    End Sub
+End Class
+
+
+
+Public Class Motion_BasicsOld : Inherits VB_Parent
     Public bgSub As New BGSubtract_MOG2
     Dim motion As New Motion_Basics_QT
     Public Sub New()
@@ -28,7 +43,7 @@ Public Class Motion_Basics_QT : Inherits VB_Parent
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         task.redOptions.setIdentifyCells(False)
-        desc = "The option-free version of Motion_Basics"
+        desc = "The option-free version of Motion_BasicsOld"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         task.motionDetected = True
