@@ -455,35 +455,38 @@ Public Class LowRes_MeasureColor : Inherits VB_Parent
     Dim lowRes As New LowRes_Color
     Public colors() As cvb.Vec3b
     Public distances() As Single
-    Public distAvg As Single
+    Public options As New Options_LowRes
     Public Sub New()
         desc = "Measure how much color changes with and without motion."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
         lowRes.Run(src)
         dst2 = lowRes.dst2
 
         If task.optionsChanged Or colors Is Nothing Then
             ReDim colors(task.gridRects.Count - 1)
             ReDim distances(task.gridRects.Count - 1)
-            distAvg = 0
         End If
 
+        Dim motionCount As Integer = 0
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
             Dim vec = dst2.Get(Of cvb.Vec3b)(roi.Y, roi.X)
             distances(i) = distance3D(colors(i), vec)
-            If distances(i) > distAvg Then
-                SetTrueText(Format(distances(i), fmt1), New cvb.Point(roi.X, roi.Y), 3)
+            If distances(i) > options.colorDifferenceThreshold Then
+                If standaloneTest() Then
+                    SetTrueText(Format(distances(i), fmt1), New cvb.Point(roi.X, roi.Y), 3)
+                End If
                 colors(i) = vec
+                motionCount += task.gridNeighbors(i).Count
             End If
         Next
 
-        Dim distList = distances.ToList
-        distAvg = distList.Average
         If task.heartBeat Or task.optionsChanged Then
-            labels(3) = "Max 3D color distance = " + Format(distList.Max, fmt1) + ", mean = " +
-                         Format(distAvg, fmt1) + ".  Values shown are above average."
+            labels(3) = "Of the " + CStr(task.gridRects.Count) + " grid cells " +
+                        CStr(motionCount) + " had motion"
         End If
     End Sub
 End Class
@@ -496,25 +499,24 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
     Dim measure As New LowRes_MeasureColor
     Public motionRects As New List(Of cvb.Rect)
     Public fullUpdate As Integer
-    Public options As New Options_LowRes
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         desc = "Show all the grid cells above the motionless value (an option)."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
         If standaloneTest() Then dst0 = src.Clone
 
         measure.Run(src)
         dst2 = measure.dst2
         labels(2) = measure.labels(3)
 
+        Dim threshold = measure.options.colorDifferenceThreshold
+
         motionRects.Clear()
         Dim indexList As New List(Of Integer)
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
-            If measure.distances(i) > options.colorDifferenceThreshold Then
+            If measure.distances(i) > threshold Then
                 If indexList.Contains(i) = False Then motionRects.Add(roi)
                 For Each index In task.gridNeighbors(i)
                     If indexList.Contains(index) = False Then
