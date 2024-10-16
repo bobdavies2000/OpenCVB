@@ -7877,3 +7877,20 @@ Public Class Options_ImageOffset : Inherits VB_Parent
         horizontalSlice = sliceDirection.checked
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_LowRes : Inherits VB_Parent
+    Public colorDifferenceThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Color difference threshold", 0, 100, 3)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static diffSlider = FindSlider("Color difference threshold")
+        colorDifferenceThreshold = diffSlider.value
+    End Sub
+End Class

@@ -2145,3 +2145,9 @@ public:
 	Options_ImageOffset() {
 	}
 };
+class Options_LowRes {
+public:
+	void RunOpt() {}
+	Options_LowRes() {
+	}
+};

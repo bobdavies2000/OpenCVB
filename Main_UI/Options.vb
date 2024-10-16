@@ -11,6 +11,7 @@ Public Class Options
         {"1920x1080 - Full resolution", "960x540 - Quarter resolution", "480x270 - Small resolution",
          "1280x720 - Full resolution", "640x360 - Quarter resolution", "320x180 - Small resolution",
          "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
+         "1344x752 - Full resolution", "672x376 - Quarter resolution", "336x188 - Small resolution  ",
          "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
 
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
@@ -40,25 +41,36 @@ Public Class Options
         Select Case Main_UI.cameraNames(index)
             Case "Azure Kinect 4K"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True, True,
-                                                        True, True, False, False, False, False, False, False})
+                                                        True, True, False, False, False,
+                                                        False, False, False, False, False, False})
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, True, True, True, False, False, False})
+                                                        True, True, True, True, True, True,
+                                                        False, False, False, False, False, False})
             Case "Intel(R) RealSense(TM) Depth Camera 455"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, True, True, True, False, False, False})
+                                                        True, True, True, True, True, True,
+                                                        False, False, False, False, False, False})
             Case "Oak-D camera"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, False, False, False, False, False, False})
+                                                        True, True, True, False, False, False,
+                                                        False, False, False, False, False, False})
             Case "StereoLabs ZED 2/2i"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
-                                                        True, True, True, False, False, False, True, True, True})
+                                                        True, True, True, False, False, False,
+                                                        True, True, True, True, True, True})
+            Case "StereoLabs ZED 2/2i C++"
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
+                                                        True, True, True, False, False, False,
+                                                        True, True, True, True, True, True})
             Case "MYNT-EYE-D1000"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, False, False, False, False, False, False})
+                                                        True, True, True, False, False, False,
+                                                        False, False, False, False, False, False})
             Case "Orbbec Gemini 335L"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, True, True, True, False, False, False})
+                                                        True, True, True, True, True, True,
+                                                        False, False, False, False, False, False})
         End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)

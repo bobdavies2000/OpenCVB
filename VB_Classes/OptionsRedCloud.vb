@@ -62,6 +62,9 @@ Public Class OptionsRedCloud
             Case "StereoLabs ZED 2/2i"
                 task.xRange = 4
                 task.yRange = 1.5
+            Case "StereoLabs ZED 2/2i C++"
+                task.xRange = 4
+                task.yRange = 1.5
             Case "MYNT-EYE-D1000"
                 task.xRange = 3.5
                 task.yRange = 1.5
@@ -95,15 +98,11 @@ Public Class OptionsRedCloud
         Next
         ColorSource.SelectedItem() = "Reduction_Basics"
 
-        task.redOptions.setBitReductionBar(40)
         Select Case task.cameraName
-            Case "Azure Kinect 4K"
-            Case "Intel(R) RealSense(TM) Depth Camera 435i"
-            Case "Intel(R) RealSense(TM) Depth Camera 455"
             Case "Oak-D camera"
                 task.redOptions.setBitReductionBar(80)
-            Case "StereoLabs ZED 2/2i"
-            Case "MYNT-EYE-D1000"
+            Case Else
+                task.redOptions.setBitReductionBar(40)
         End Select
 
         task.redOptions.setBitReductionBar(5)

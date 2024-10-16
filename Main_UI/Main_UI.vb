@@ -154,7 +154,10 @@ Public Class Main_UI
                 If cameraNames(i).Contains("Orbbec") Then present = USBenumeration("Orbbec Gemini 335L Depth Camera")
                 If cameraNames(i).Contains("Oak-D") Then present = USBenumeration("Movidius MyriadX")
                 If cameraNames(i).Contains("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2i")
-                If present = False And cameraNames(i).Contains("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2") ' older edition.
+                If cameraNames(i).Contains("StereoLabs ZED 2/2i C++") Then present = USBenumeration("ZED 2i")
+                If present = False And cameraNames(i).Contains("StereoLabs ZED 2/2i") Then
+                    present = USBenumeration("ZED 2") ' older edition.
+                End If
                 .cameraPresent.Add(present <> 0)
             Next
 
@@ -1157,6 +1160,7 @@ Public Class Main_UI
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
+            task.optionsChanged = True
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
             saveAlgorithmName = ""
             settings.WorkingRes = optionsForm.cameraWorkingRes
@@ -1386,6 +1390,8 @@ Public Class Main_UI
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
                 Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+            Case "StereoLabs ZED 2/2i C++"
+                Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L"

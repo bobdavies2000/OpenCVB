@@ -3,8 +3,9 @@ Public Class TransformationMatrix_Basics : Inherits VB_Parent
     Dim topLocations As New List(Of cvb.Point3d)
     Dim options As New Options_TransformationMatrix
     Public Sub New()
-        If task.cameraName = "StereoLabs ZED 2/2i" Then
-            FindSlider("TMatrix Top View multiplier").Value = 1 ' need a smaller multiplier for this camera...
+        If task.cameraName = "StereoLabs ZED 2/2i" Or task.cameraName = "StereoLabs ZED 2/2i C++" Then
+            ' need a smaller multiplier for this camera...
+            FindSlider("TMatrix Top View multiplier").Value = 1
         End If
         labels = {"", "", "View from above the camera", "View from side of the camera"}
         desc = "Show the contents of the transformation matrix"

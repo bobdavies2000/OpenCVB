@@ -1984,6 +1984,9 @@ End Enum
 	If algorithmName = "LowRes_DepthMask" Then return new LowRes_DepthMask
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
+	If algorithmName = "LowRes_MeasureColor" Then return new LowRes_MeasureColor
+	If algorithmName = "LowRes_MeasureMotion" Then return new LowRes_MeasureMotion
+	If algorithmName = "LowRes_MeasureValidate" Then return new LowRes_MeasureValidate
 	If algorithmName = "LowRes_MLColor" Then return new LowRes_MLColor
 	If algorithmName = "LowRes_MLColorDepth" Then return new LowRes_MLColorDepth
 	If algorithmName = "LUT_Basics" Then return new LUT_Basics
@@ -2604,6 +2607,7 @@ End Enum
 	If algorithmName = "Options_LinearInput" Then return new Options_LinearInput
 	If algorithmName = "Options_LineFinder" Then return new Options_LineFinder
 	If algorithmName = "Options_LongLine" Then return new Options_LongLine
+	If algorithmName = "Options_LowRes" Then return new Options_LowRes
 	If algorithmName = "Options_LUT" Then return new Options_LUT
 	If algorithmName = "Options_LUT_Create" Then return new Options_LUT_Create
 	If algorithmName = "Options_Mat" Then return new Options_Mat

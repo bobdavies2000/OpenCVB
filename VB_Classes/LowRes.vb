@@ -154,7 +154,6 @@ Public Class LowRes_Edges : Inherits VB_Parent
         task.featureMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         task.fLessMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         FindRadio("Laplacian").Checked = True
-        labels = {"", "", "Low Res overlaid with edges", "Featureless spaces - no edges or features"}
         desc = "Add edges to features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -184,7 +183,7 @@ Public Class LowRes_Edges : Inherits VB_Parent
             Next
         End If
 
-        Dim flipflops As Integer
+        Dim flipRects As New List(Of cvb.Rect)
         For i = 0 To task.gridRects.Count - 1
             stateList(i) = (stateList(i) + flist(i)) / 2
             Dim r = task.gridRects(i)
@@ -196,7 +195,7 @@ Public Class LowRes_Edges : Inherits VB_Parent
                 task.fLessRects.Add(r)
                 task.fLessMask(r).SetTo(255)
             Else
-                flipflops += 1
+                flipRects.Add(r)
                 task.fLessRects.Add(r)
                 task.fLessMask(r).SetTo(255)
                 task.featureRects.Add(r)
@@ -207,6 +206,10 @@ Public Class LowRes_Edges : Inherits VB_Parent
         dst3.SetTo(0)
         src.CopyTo(dst3, task.featureMask)
 
+        For Each r In flipRects
+            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
+        Next
+
         For Each r In task.fLessRects
             Dim x = CInt(r.X / task.gridSize)
             Dim y = CInt(r.Y / task.gridSize)
@@ -215,8 +218,9 @@ Public Class LowRes_Edges : Inherits VB_Parent
         lastDepth = task.lowResDepth.Clone
         If task.heartBeat Then
             labels(2) = CStr(task.featureRects.Count) + "/" + CStr(task.fLessRects.Count) + "/" +
-                        CStr(flipflops) + " Features/FeatureLess/Flipper cells."
-            labels(3) = CStr(task.fLessRects.Count) + " cells without features were found"
+                        CStr(flipRects.Count) + " Features/FeatureLess/Flipper cells."
+            labels(3) = CStr(task.fLessRects.Count) + " cells without features were found.  " +
+                        "Cells that are flipping are highlighted"
         End If
     End Sub
 End Class
@@ -440,5 +444,143 @@ Public Class LowRes_DepthMask : Inherits VB_Parent
             Dim count = task.pcSplit(2)(roi).CountNonZero()
             If count >= task.gridSize * task.gridSize / 2 Then dst2(roi).SetTo(255)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class LowRes_MeasureColor : Inherits VB_Parent
+    Dim lowRes As New LowRes_Color
+    Public colors() As cvb.Vec3b
+    Public distances() As Single
+    Public distAvg As Single
+    Public Sub New()
+        desc = "Measure how much color changes with and without motion."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lowRes.Run(src)
+        dst2 = lowRes.dst2
+
+        If task.optionsChanged Or colors Is Nothing Then
+            ReDim colors(task.gridRects.Count - 1)
+            ReDim distances(task.gridRects.Count - 1)
+            distAvg = 0
+        End If
+
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
+            Dim vec = dst2.Get(Of cvb.Vec3b)(roi.Y, roi.X)
+            distances(i) = distance3D(colors(i), vec)
+            If distances(i) > distAvg Then
+                SetTrueText(Format(distances(i), fmt1), New cvb.Point(roi.X, roi.Y), 3)
+            End If
+            colors(i) = vec
+        Next
+
+        Dim distList = distances.ToList
+        distAvg = distList.Average
+        If task.heartBeat Or task.optionsChanged Then
+            labels(3) = "Max 3D color distance = " + Format(distList.Max, fmt1) + ", mean = " +
+                         Format(distAvg, fmt1) + ".  Values shown are above average."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class LowRes_MeasureMotion : Inherits VB_Parent
+    Dim measure As New LowRes_MeasureColor
+    Public motionRects As New List(Of cvb.Rect)
+    Public fullUpdate As Integer
+    Public options As New Options_LowRes
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay0()
+        desc = "Show all the grid cells above the motionless value (an option)."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        If standaloneTest() Then dst0 = src.Clone
+
+        measure.Run(src)
+        dst2 = measure.dst2
+        labels(2) = measure.labels(3)
+
+        motionRects.Clear()
+        Dim indexList As New List(Of Integer)
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
+            If measure.distances(i) > options.colorDifferenceThreshold Then
+                If indexList.Contains(i) = False Then motionRects.Add(roi)
+                For Each index In task.gridNeighbors(i)
+                    If indexList.Contains(index) = False Then
+                        roi = task.gridRects(index)
+                        indexList.Add(index)
+                        motionRects.Add(roi)
+                    End If
+                Next
+            End If
+        Next
+
+        Dim percentChanged = motionRects.Count / task.gridRects.Count
+        If task.heartBeat Or percentChanged > 0.5 Then
+            Static lastFrameCount As Integer = task.frameCount
+            Dim testCount = task.frameCount - lastFrameCount
+            fullUpdate += 1
+            dst3 = src.Clone
+            labels(3) = Format(percentChanged, "0%") + " of cells changed.  " +
+                        Format(fullUpdate / (testCount), "0%") + " of the time the full frame was used." +
+                        "  Minimum is to update on each heartbeat."
+            If testCount > 200 Then
+                lastFrameCount = task.frameCount
+                fullUpdate = 0
+            End If
+        Else
+            For Each roi In motionRects
+                src(roi).CopyTo(dst3(roi))
+                If standaloneTest() Then dst0.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LowRes_MeasureValidate : Inherits VB_Parent
+    Dim measure As New LowRes_MeasureMotion
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        task.gOptions.setPixelDifference(50)
+        task.gOptions.setDisplay1()
+        labels(1) = "Every pixel is slightly different except where motion is detected."
+        labels(3) = "Differences are individual pixels - not significant. " +
+                    "Contrast this with BGSubtract."
+        desc = "Validate the image provided by LowRes_MeasureMotion"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst0 = src.Clone
+        measure.Run(src)
+        dst2 = measure.dst3.Clone
+        labels(2) = measure.labels(2)
+        labels(2) = labels(2).Replace("Values shown are above average", "")
+
+        Dim curr = dst0.Reshape(1, dst0.Rows * 3)
+        Dim motion = dst2.Reshape(1, dst2.Rows * 3)
+
+        cvb.Cv2.Absdiff(curr, motion, dst0)
+
+        If task.heartBeat = False Then
+            dst1 = dst0.Threshold(1, 255, cvb.ThresholdTypes.Binary)
+            dst1 = dst1.Reshape(3, src.Rows)
+            dst3 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
+            dst3 = dst3.Reshape(3, src.Rows)
+        End If
     End Sub
 End Class

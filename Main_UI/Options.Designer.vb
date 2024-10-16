@@ -22,310 +22,299 @@ Partial Class Options
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        GroupBox2 = New GroupBox()
-        Label7 = New Label()
-        TextBox1 = New TextBox()
-        Label6 = New Label()
-        UpdateXRef = New Button()
-        TestAllDuration = New NumericUpDown()
-        DurationLabel = New Label()
-        fontInfo = New Label()
-        Button1 = New Button()
-        showConsoleLog = New CheckBox()
-        OpenFileDialog1 = New OpenFileDialog()
-        OKButton = New Button()
-        Cancel_Button = New Button()
-        FontDialog1 = New FontDialog()
-        CameraGroup = New FlowLayoutPanel()
-        GroupBox5 = New GroupBox()
-        Label3 = New Label()
-        Label2 = New Label()
-        Label1 = New Label()
-        SnapCustom = New RadioButton()
-        Snap320 = New RadioButton()
-        Snap640 = New RadioButton()
-        Resolutions = New FlowLayoutPanel()
-        Label4 = New Label()
-        Label5 = New Label()
-        GroupBox2.SuspendLayout()
-        CType(TestAllDuration, ComponentModel.ISupportInitialize).BeginInit()
-        GroupBox5.SuspendLayout()
-        SuspendLayout()
-        ' 
-        ' GroupBox2
-        ' 
-        GroupBox2.Controls.Add(Label7)
-        GroupBox2.Controls.Add(TextBox1)
-        GroupBox2.Controls.Add(Label6)
-        GroupBox2.Controls.Add(UpdateXRef)
-        GroupBox2.Controls.Add(TestAllDuration)
-        GroupBox2.Controls.Add(DurationLabel)
-        GroupBox2.Controls.Add(fontInfo)
-        GroupBox2.Controls.Add(Button1)
-        GroupBox2.Controls.Add(showConsoleLog)
-        GroupBox2.Location = New Point(27, 556)
-        GroupBox2.Margin = New Padding(3, 4, 3, 4)
-        GroupBox2.Name = "GroupBox2"
-        GroupBox2.Padding = New Padding(3, 4, 3, 4)
-        GroupBox2.Size = New Size(1069, 206)
-        GroupBox2.TabIndex = 5
-        GroupBox2.TabStop = False
-        GroupBox2.Text = "Other Global Settings"
-        ' 
-        ' Label7
-        ' 
-        Label7.AutoSize = True
-        Label7.Location = New Point(742, 65)
-        Label7.Name = "Label7"
-        Label7.Size = New Size(215, 25)
-        Label7.TabIndex = 15
-        Label7.Text = "is only updated manually."
-        ' 
-        ' TextBox1
-        ' 
-        TextBox1.Location = New Point(958, 116)
-        TextBox1.Name = "TextBox1"
-        TextBox1.Size = New Size(150, 31)
-        TextBox1.TabIndex = 14
-        ' 
-        ' Label6
-        ' 
-        Label6.AutoSize = True
-        Label6.Location = New Point(742, 40)
-        Label6.Name = "Label6"
-        Label6.Size = New Size(269, 25)
-        Label6.TabIndex = 13
-        Label6.Text = "The algorithm cross-reference is "
-        ' 
-        ' UpdateXRef
-        ' 
-        UpdateXRef.Location = New Point(469, 40)
-        UpdateXRef.Margin = New Padding(3, 4, 3, 4)
-        UpdateXRef.Name = "UpdateXRef"
-        UpdateXRef.Size = New Size(267, 48)
-        UpdateXRef.TabIndex = 12
-        UpdateXRef.Text = "Update the Algorithm XRef"
-        UpdateXRef.UseVisualStyleBackColor = True
-        ' 
-        ' TestAllDuration
-        ' 
-        TestAllDuration.Location = New Point(21, 149)
-        TestAllDuration.Margin = New Padding(3, 4, 3, 4)
-        TestAllDuration.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
-        TestAllDuration.Name = "TestAllDuration"
-        TestAllDuration.ReadOnly = True
-        TestAllDuration.Size = New Size(98, 31)
-        TestAllDuration.TabIndex = 8
-        TestAllDuration.Value = New Decimal(New Integer() {5, 0, 0, 0})
-        ' 
-        ' DurationLabel
-        ' 
-        DurationLabel.AutoSize = True
-        DurationLabel.Location = New Point(127, 152)
-        DurationLabel.Name = "DurationLabel"
-        DurationLabel.Size = New Size(698, 25)
-        DurationLabel.TabIndex = 7
-        DurationLabel.Text = "Duration in seconds of each test when running ""Test All"" (there is a 5 second minimum)"
-        ' 
-        ' fontInfo
-        ' 
-        fontInfo.AutoSize = True
-        fontInfo.Location = New Point(71, 94)
-        fontInfo.Name = "fontInfo"
-        fontInfo.Size = New Size(284, 25)
-        fontInfo.TabIndex = 6
-        fontInfo.Text = "Select the font for all TrueType text"
-        ' 
-        ' Button1
-        ' 
-        Button1.Location = New Point(16, 89)
-        Button1.Margin = New Padding(3, 4, 3, 4)
-        Button1.Name = "Button1"
-        Button1.Size = New Size(49, 36)
-        Button1.TabIndex = 5
-        Button1.Text = "..."
-        Button1.UseVisualStyleBackColor = True
-        ' 
-        ' showConsoleLog
-        ' 
-        showConsoleLog.AutoSize = True
-        showConsoleLog.Location = New Point(18, 40)
-        showConsoleLog.Margin = New Padding(3, 4, 3, 4)
-        showConsoleLog.Name = "showConsoleLog"
-        showConsoleLog.Size = New Size(363, 29)
-        showConsoleLog.TabIndex = 2
-        showConsoleLog.Text = "Show Console Log for external processes"
-        showConsoleLog.UseVisualStyleBackColor = True
-        ' 
-        ' OpenFileDialog1
-        ' 
-        OpenFileDialog1.FileName = "OpenFileDialog1"
-        ' 
-        ' OKButton
-        ' 
-        OKButton.Location = New Point(944, 40)
-        OKButton.Margin = New Padding(3, 4, 3, 4)
-        OKButton.Name = "OKButton"
-        OKButton.Size = New Size(158, 52)
-        OKButton.TabIndex = 10
-        OKButton.Text = "OK"
-        OKButton.UseVisualStyleBackColor = True
-        ' 
-        ' Cancel_Button
-        ' 
-        Cancel_Button.Location = New Point(944, 104)
-        Cancel_Button.Margin = New Padding(3, 4, 3, 4)
-        Cancel_Button.Name = "Cancel_Button"
-        Cancel_Button.Size = New Size(158, 52)
-        Cancel_Button.TabIndex = 11
-        Cancel_Button.Text = "Cancel"
-        Cancel_Button.UseVisualStyleBackColor = True
-        ' 
-        ' CameraGroup
-        ' 
-        CameraGroup.BorderStyle = BorderStyle.FixedSingle
-        CameraGroup.FlowDirection = FlowDirection.TopDown
-        CameraGroup.Location = New Point(27, 40)
-        CameraGroup.Margin = New Padding(3, 4, 3, 4)
-        CameraGroup.Name = "CameraGroup"
-        CameraGroup.Size = New Size(912, 154)
-        CameraGroup.TabIndex = 13
-        ' 
-        ' GroupBox5
-        ' 
-        GroupBox5.Controls.Add(Label3)
-        GroupBox5.Controls.Add(Label2)
-        GroupBox5.Controls.Add(Label1)
-        GroupBox5.Controls.Add(SnapCustom)
-        GroupBox5.Controls.Add(Snap320)
-        GroupBox5.Controls.Add(Snap640)
-        GroupBox5.Location = New Point(27, 425)
-        GroupBox5.Margin = New Padding(4, 6, 4, 6)
-        GroupBox5.Name = "GroupBox5"
-        GroupBox5.Padding = New Padding(4, 6, 4, 6)
-        GroupBox5.Size = New Size(1069, 121)
-        GroupBox5.TabIndex = 14
-        GroupBox5.TabStop = False
-        GroupBox5.Text = "Display Resolution"
-        ' 
-        ' Label3
-        ' 
-        Label3.AutoSize = True
-        Label3.Location = New Point(684, 71)
-        Label3.Name = "Label3"
-        Label3.Size = New Size(210, 25)
-        Label3.TabIndex = 7
-        Label3.Text = "User-defined image sizes"
-        ' 
-        ' Label2
-        ' 
-        Label2.AutoSize = True
-        Label2.Location = New Point(358, 71)
-        Label2.Name = "Label2"
-        Label2.Size = New Size(260, 25)
-        Label2.TabIndex = 6
-        Label2.Text = "320x240 or 320x180 per image"
-        ' 
-        ' Label1
-        ' 
-        Label1.AutoSize = True
-        Label1.Location = New Point(47, 71)
-        Label1.Name = "Label1"
-        Label1.Size = New Size(260, 25)
-        Label1.TabIndex = 5
-        Label1.Text = "640x480 or 640x360 per image"
-        ' 
-        ' SnapCustom
-        ' 
-        SnapCustom.AutoSize = True
-        SnapCustom.Location = New Point(657, 35)
-        SnapCustom.Margin = New Padding(3, 4, 3, 4)
-        SnapCustom.Name = "SnapCustom"
-        SnapCustom.Size = New Size(308, 29)
-        SnapCustom.TabIndex = 4
-        SnapCustom.TabStop = True
-        SnapCustom.Text = "Custom - retain resized main form"
-        SnapCustom.UseVisualStyleBackColor = True
-        ' 
-        ' Snap320
-        ' 
-        Snap320.AutoSize = True
-        Snap320.Location = New Point(331, 35)
-        Snap320.Margin = New Padding(3, 4, 3, 4)
-        Snap320.Name = "Snap320"
-        Snap320.Size = New Size(276, 29)
-        Snap320.TabIndex = 3
-        Snap320.TabStop = True
-        Snap320.Text = "Autosized for Laptop Displays"
-        Snap320.UseVisualStyleBackColor = True
-        ' 
-        ' Snap640
-        ' 
-        Snap640.AutoSize = True
-        Snap640.Location = New Point(16, 35)
-        Snap640.Margin = New Padding(3, 4, 3, 4)
-        Snap640.Name = "Snap640"
-        Snap640.Size = New Size(287, 29)
-        Snap640.TabIndex = 2
-        Snap640.TabStop = True
-        Snap640.Text = "Autosized for Desktop Displays"
-        Snap640.UseVisualStyleBackColor = True
-        ' 
-        ' Resolutions
-        ' 
-        Resolutions.BorderStyle = BorderStyle.FixedSingle
-        Resolutions.Location = New Point(27, 230)
-        Resolutions.Margin = New Padding(3, 4, 3, 4)
-        Resolutions.Name = "Resolutions"
-        Resolutions.Size = New Size(912, 184)
-        Resolutions.TabIndex = 15
-        ' 
-        ' Label4
-        ' 
-        Label4.AutoSize = True
-        Label4.Location = New Point(26, 11)
-        Label4.Name = "Label4"
-        Label4.Size = New Size(148, 25)
-        Label4.TabIndex = 16
-        Label4.Text = "Camera Selection"
-        ' 
-        ' Label5
-        ' 
-        Label5.AutoSize = True
-        Label5.Location = New Point(26, 199)
-        Label5.Name = "Label5"
-        Label5.Size = New Size(203, 25)
-        Label5.TabIndex = 17
-        Label5.Text = "Working Size Resolution"
-        ' 
-        ' Options
-        ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
-        AutoScaleMode = AutoScaleMode.Font
-        AutoSize = True
-        ClientSize = New Size(1120, 770)
-        Controls.Add(Label5)
-        Controls.Add(Label4)
-        Controls.Add(Resolutions)
-        Controls.Add(GroupBox5)
-        Controls.Add(CameraGroup)
-        Controls.Add(Cancel_Button)
-        Controls.Add(OKButton)
-        Controls.Add(GroupBox2)
-        FormBorderStyle = FormBorderStyle.FixedDialog
-        KeyPreview = True
-        Margin = New Padding(4, 6, 4, 6)
-        Name = "Options"
-        ShowInTaskbar = False
-        SizeGripStyle = SizeGripStyle.Show
-        Text = "OpenCVB Global Settings"
-        GroupBox2.ResumeLayout(False)
-        GroupBox2.PerformLayout()
-        CType(TestAllDuration, ComponentModel.ISupportInitialize).EndInit()
-        GroupBox5.ResumeLayout(False)
-        GroupBox5.PerformLayout()
-        ResumeLayout(False)
-        PerformLayout()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.TextBox1 = New System.Windows.Forms.TextBox()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.UpdateXRef = New System.Windows.Forms.Button()
+        Me.TestAllDuration = New System.Windows.Forms.NumericUpDown()
+        Me.DurationLabel = New System.Windows.Forms.Label()
+        Me.fontInfo = New System.Windows.Forms.Label()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.showConsoleLog = New System.Windows.Forms.CheckBox()
+        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
+        Me.OKButton = New System.Windows.Forms.Button()
+        Me.Cancel_Button = New System.Windows.Forms.Button()
+        Me.FontDialog1 = New System.Windows.Forms.FontDialog()
+        Me.CameraGroup = New System.Windows.Forms.FlowLayoutPanel()
+        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.SnapCustom = New System.Windows.Forms.RadioButton()
+        Me.Snap320 = New System.Windows.Forms.RadioButton()
+        Me.Snap640 = New System.Windows.Forms.RadioButton()
+        Me.Resolutions = New System.Windows.Forms.FlowLayoutPanel()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.GroupBox2.SuspendLayout()
+        CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox5.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.Label7)
+        Me.GroupBox2.Controls.Add(Me.TextBox1)
+        Me.GroupBox2.Controls.Add(Me.Label6)
+        Me.GroupBox2.Controls.Add(Me.UpdateXRef)
+        Me.GroupBox2.Controls.Add(Me.TestAllDuration)
+        Me.GroupBox2.Controls.Add(Me.DurationLabel)
+        Me.GroupBox2.Controls.Add(Me.fontInfo)
+        Me.GroupBox2.Controls.Add(Me.Button1)
+        Me.GroupBox2.Controls.Add(Me.showConsoleLog)
+        Me.GroupBox2.Location = New System.Drawing.Point(24, 498)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(962, 165)
+        Me.GroupBox2.TabIndex = 5
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Other Global Settings"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(668, 52)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(185, 20)
+        Me.Label7.TabIndex = 15
+        Me.Label7.Text = "is only updated manually."
+        '
+        'TextBox1
+        '
+        Me.TextBox1.Location = New System.Drawing.Point(862, 93)
+        Me.TextBox1.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.TextBox1.Name = "TextBox1"
+        Me.TextBox1.Size = New System.Drawing.Size(135, 26)
+        Me.TextBox1.TabIndex = 14
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(668, 32)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(239, 20)
+        Me.Label6.TabIndex = 13
+        Me.Label6.Text = "The algorithm cross-reference is "
+        '
+        'UpdateXRef
+        '
+        Me.UpdateXRef.Location = New System.Drawing.Point(422, 32)
+        Me.UpdateXRef.Name = "UpdateXRef"
+        Me.UpdateXRef.Size = New System.Drawing.Size(240, 38)
+        Me.UpdateXRef.TabIndex = 12
+        Me.UpdateXRef.Text = "Update the Algorithm XRef"
+        Me.UpdateXRef.UseVisualStyleBackColor = True
+        '
+        'TestAllDuration
+        '
+        Me.TestAllDuration.Location = New System.Drawing.Point(19, 119)
+        Me.TestAllDuration.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
+        Me.TestAllDuration.Name = "TestAllDuration"
+        Me.TestAllDuration.ReadOnly = True
+        Me.TestAllDuration.Size = New System.Drawing.Size(88, 26)
+        Me.TestAllDuration.TabIndex = 8
+        Me.TestAllDuration.Value = New Decimal(New Integer() {5, 0, 0, 0})
+        '
+        'DurationLabel
+        '
+        Me.DurationLabel.AutoSize = True
+        Me.DurationLabel.Location = New System.Drawing.Point(114, 122)
+        Me.DurationLabel.Name = "DurationLabel"
+        Me.DurationLabel.Size = New System.Drawing.Size(620, 20)
+        Me.DurationLabel.TabIndex = 7
+        Me.DurationLabel.Text = "Duration in seconds of each test when running ""Test All"" (there is a 5 second min" &
+    "imum)"
+        '
+        'fontInfo
+        '
+        Me.fontInfo.AutoSize = True
+        Me.fontInfo.Location = New System.Drawing.Point(64, 75)
+        Me.fontInfo.Name = "fontInfo"
+        Me.fontInfo.Size = New System.Drawing.Size(255, 20)
+        Me.fontInfo.TabIndex = 6
+        Me.fontInfo.Text = "Select the font for all TrueType text"
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(14, 71)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(44, 29)
+        Me.Button1.TabIndex = 5
+        Me.Button1.Text = "..."
+        Me.Button1.UseVisualStyleBackColor = True
+        '
+        'showConsoleLog
+        '
+        Me.showConsoleLog.AutoSize = True
+        Me.showConsoleLog.Location = New System.Drawing.Point(16, 32)
+        Me.showConsoleLog.Name = "showConsoleLog"
+        Me.showConsoleLog.Size = New System.Drawing.Size(328, 24)
+        Me.showConsoleLog.TabIndex = 2
+        Me.showConsoleLog.Text = "Show Console Log for external processes"
+        Me.showConsoleLog.UseVisualStyleBackColor = True
+        '
+        'OpenFileDialog1
+        '
+        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
+        '
+        'OKButton
+        '
+        Me.OKButton.Location = New System.Drawing.Point(850, 32)
+        Me.OKButton.Name = "OKButton"
+        Me.OKButton.Size = New System.Drawing.Size(142, 42)
+        Me.OKButton.TabIndex = 10
+        Me.OKButton.Text = "OK"
+        Me.OKButton.UseVisualStyleBackColor = True
+        '
+        'Cancel_Button
+        '
+        Me.Cancel_Button.Location = New System.Drawing.Point(850, 83)
+        Me.Cancel_Button.Name = "Cancel_Button"
+        Me.Cancel_Button.Size = New System.Drawing.Size(142, 42)
+        Me.Cancel_Button.TabIndex = 11
+        Me.Cancel_Button.Text = "Cancel"
+        Me.Cancel_Button.UseVisualStyleBackColor = True
+        '
+        'CameraGroup
+        '
+        Me.CameraGroup.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.CameraGroup.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
+        Me.CameraGroup.Location = New System.Drawing.Point(24, 32)
+        Me.CameraGroup.Name = "CameraGroup"
+        Me.CameraGroup.Size = New System.Drawing.Size(821, 124)
+        Me.CameraGroup.TabIndex = 13
+        '
+        'GroupBox5
+        '
+        Me.GroupBox5.Controls.Add(Me.Label3)
+        Me.GroupBox5.Controls.Add(Me.Label2)
+        Me.GroupBox5.Controls.Add(Me.Label1)
+        Me.GroupBox5.Controls.Add(Me.SnapCustom)
+        Me.GroupBox5.Controls.Add(Me.Snap320)
+        Me.GroupBox5.Controls.Add(Me.Snap640)
+        Me.GroupBox5.Location = New System.Drawing.Point(24, 393)
+        Me.GroupBox5.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBox5.Name = "GroupBox5"
+        Me.GroupBox5.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBox5.Size = New System.Drawing.Size(962, 97)
+        Me.GroupBox5.TabIndex = 14
+        Me.GroupBox5.TabStop = False
+        Me.GroupBox5.Text = "Display Resolution"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(616, 57)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(188, 20)
+        Me.Label3.TabIndex = 7
+        Me.Label3.Text = "User-defined image sizes"
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(322, 57)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(227, 20)
+        Me.Label2.TabIndex = 6
+        Me.Label2.Text = "320x240 or 320x180 per image"
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(42, 57)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(227, 20)
+        Me.Label1.TabIndex = 5
+        Me.Label1.Text = "640x480 or 640x360 per image"
+        '
+        'SnapCustom
+        '
+        Me.SnapCustom.AutoSize = True
+        Me.SnapCustom.Location = New System.Drawing.Point(591, 28)
+        Me.SnapCustom.Name = "SnapCustom"
+        Me.SnapCustom.Size = New System.Drawing.Size(271, 24)
+        Me.SnapCustom.TabIndex = 4
+        Me.SnapCustom.TabStop = True
+        Me.SnapCustom.Text = "Custom - retain resized main form"
+        Me.SnapCustom.UseVisualStyleBackColor = True
+        '
+        'Snap320
+        '
+        Me.Snap320.AutoSize = True
+        Me.Snap320.Location = New System.Drawing.Point(298, 28)
+        Me.Snap320.Name = "Snap320"
+        Me.Snap320.Size = New System.Drawing.Size(245, 24)
+        Me.Snap320.TabIndex = 3
+        Me.Snap320.TabStop = True
+        Me.Snap320.Text = "Autosized for Laptop Displays"
+        Me.Snap320.UseVisualStyleBackColor = True
+        '
+        'Snap640
+        '
+        Me.Snap640.AutoSize = True
+        Me.Snap640.Location = New System.Drawing.Point(14, 28)
+        Me.Snap640.Name = "Snap640"
+        Me.Snap640.Size = New System.Drawing.Size(255, 24)
+        Me.Snap640.TabIndex = 2
+        Me.Snap640.TabStop = True
+        Me.Snap640.Text = "Autosized for Desktop Displays"
+        Me.Snap640.UseVisualStyleBackColor = True
+        '
+        'Resolutions
+        '
+        Me.Resolutions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.Resolutions.Location = New System.Drawing.Point(24, 184)
+        Me.Resolutions.Name = "Resolutions"
+        Me.Resolutions.Size = New System.Drawing.Size(821, 201)
+        Me.Resolutions.TabIndex = 15
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(23, 9)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(135, 20)
+        Me.Label4.TabIndex = 16
+        Me.Label4.Text = "Camera Selection"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(23, 159)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(182, 20)
+        Me.Label5.TabIndex = 17
+        Me.Label5.Text = "Working Size Resolution"
+        '
+        'Options
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoSize = True
+        Me.ClientSize = New System.Drawing.Size(1008, 675)
+        Me.Controls.Add(Me.Label5)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.Resolutions)
+        Me.Controls.Add(Me.GroupBox5)
+        Me.Controls.Add(Me.CameraGroup)
+        Me.Controls.Add(Me.Cancel_Button)
+        Me.Controls.Add(Me.OKButton)
+        Me.Controls.Add(Me.GroupBox2)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.KeyPreview = True
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.Name = "Options"
+        Me.ShowInTaskbar = False
+        Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show
+        Me.Text = "OpenCVB Global Settings"
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox5.ResumeLayout(False)
+        Me.GroupBox5.PerformLayout()
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
     Friend WithEvents GroupBox2 As GroupBox

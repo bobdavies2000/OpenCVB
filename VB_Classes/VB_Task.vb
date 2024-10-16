@@ -287,6 +287,7 @@ Public Class VBtask : Implements IDisposable
                                                                  "Intel(R) RealSense(TM) Depth Camera 455",
                                                                  "Oak-D camera",
                                                                  "StereoLabs ZED 2/2i",
+                                                                 "StereoLabs ZED 2/2i C++",
                                                                  "MYNT-EYE-D1000",
                                                                  "Orbbec Gemini 335L"})
         Public cameraName As String

@@ -63,6 +63,7 @@ public:
 		if (w == 1920 && h == 1080) init_params.camera_resolution = sl::RESOLUTION::HD1080;
 		if (w == 1920 && h == 1200) init_params.camera_resolution = sl::RESOLUTION::HD1200;
 		if (w == 1280) init_params.camera_resolution = sl::RESOLUTION::HD720;
+		if (w == 1344) init_params.camera_resolution = sl::RESOLUTION::AUTO;
 		if (w == 672) init_params.camera_resolution = sl::RESOLUTION::VGA;
 
 		zed.open(init_params);
