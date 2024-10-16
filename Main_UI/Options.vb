@@ -7,11 +7,12 @@ Public Class Options
     Public cameraName As String
     Public cameraIndex As Integer
     Public testDuration As Integer
+    '     "1344x752 - Full resolution", "672x376 - Quarter resolution", "336x188 - Small resolution  ",
     Public Shared resolutionList As New List(Of String)(
         {"1920x1080 - Full resolution", "960x540 - Quarter resolution", "480x270 - Small resolution",
          "1280x720 - Full resolution", "640x360 - Quarter resolution", "320x180 - Small resolution",
          "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
-         "1344x752 - Full resolution", "672x376 - Quarter resolution", "336x188 - Small resolution  ",
+         "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
          "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
 
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click

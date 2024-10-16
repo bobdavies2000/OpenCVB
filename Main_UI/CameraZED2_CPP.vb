@@ -103,7 +103,7 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
             IMU_TimeStamp -= imuStartTime
         End SyncLock
 
-        GC.Collect()
+        ' GC.Collect()
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

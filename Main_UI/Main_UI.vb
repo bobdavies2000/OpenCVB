@@ -1433,28 +1433,16 @@ Public Class Main_UI
                             camera.uipointcloud = New cvb.Mat(uiColor.Size, cvb.MatType.CV_32FC3, New cvb.Scalar(0))
                         End If
                         uiPointCloud = camera.uiPointCloud.clone
-                        ' paintNewImages = True ' trigger the paint 
+
                         newCameraImages = True ' trigger the algorithm task
                     End If
                 End SyncLock
-            End If
-            If DevicesChanged Then
-                DevicesChanged = False
-                Dim ret = MsgBox("The device configurations for this system have changed." + vbCrLf + "Would you like to search for a new cameras?", MsgBoxStyle.YesNo)
-                If ret = MsgBoxResult.Yes Then
-                    Dim searcher As New ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE PNPClass = 'Image'")
-                    For Each device As ManagementObject In searcher.Get()
-                        Debug.WriteLine("Camera detected: " & device("Name"))
-                    Next
-                End If
             End If
             If cameraTaskHandle Is Nothing Then
                 camera.stopCamera()
                 Exit Sub
             End If
 
-            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-            totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
             restartCameraRequest = False
         End While
     End Sub
@@ -1481,6 +1469,8 @@ Public Class Main_UI
                 Debug.WriteLine(CStr(Now))
                 Debug.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + vbCrLf + vbTab +
                                   CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
+                Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+                totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
                 Debug.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
                                   parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
 
