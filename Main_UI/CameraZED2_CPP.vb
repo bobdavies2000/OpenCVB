@@ -3,7 +3,7 @@ Imports cvb = OpenCvSharp
 Imports sl
 Module Zed2_CPP_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Open(width As Integer, height As Integer, fps As Integer) As IntPtr
+    Public Function Zed2Open(width As Integer, height As Integer) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub Zed2Close(cPtr As IntPtr)
     End Sub
@@ -33,15 +33,10 @@ End Module
 Public Class CameraZED2_CPP : Inherits GenericCamera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        Dim fps = 100
-        If captureRes.Width = 960 Then fps = 120
-        If captureRes.Width = 1920 And captureRes.Height = 1080 Then fps = 30
-        If captureRes.Width = 1920 And captureRes.Height = 1200 Then fps = 60
-        If captureRes.Width = 1280 And captureRes.Height = 720 Then fps = 60
 
         ' if OpenCVB fails here, it is likely because you have turned off the StereoLabs support.
         ' Open the CameraDefines.hpp file and uncomment the StereoLab
-        cPtr = Zed2Open(captureRes.Width, captureRes.Height, fps)
+        cPtr = Zed2Open(captureRes.Width, captureRes.Height)
         cameraName = deviceName
         If cPtr <> 0 Then
             deviceCount = 1

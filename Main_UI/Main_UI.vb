@@ -8,6 +8,7 @@ Imports VB_Classes
 Imports System.Management
 Imports cvext = OpenCvSharp.Extensions
 Imports System.ComponentModel
+Imports OpenCvSharp.Flann
 
 #Region "Globals"
 Module opencv_module
@@ -1437,6 +1438,15 @@ Public Class Main_UI
                         newCameraImages = True ' trigger the algorithm task
                     End If
                 End SyncLock
+
+                'Static lastTime = Now
+                'Dim nextTime = Now
+                'Dim elapsedTicks = nextTime.Ticks - lastTime.Ticks
+                'lastTime = nextTime
+                'Dim span = New TimeSpan(elapsedTicks)
+                'If frameCount Mod 100 = 0 Then
+                '    Debug.WriteLine(Format(1000 / span.Milliseconds, fmt0) + " camera frames per second")
+                'End If
             End If
             If cameraTaskHandle Is Nothing Then
                 camera.stopCamera()
@@ -1510,7 +1520,7 @@ Public Class Main_UI
                     End If
 
                     If newCameraImages Then
-                        Debug.WriteLine("New camera images arrived.")
+                        ' Debug.WriteLine("New camera images arrived.")
                         Dim copyTime = Now
 
                         SyncLock cameraLock

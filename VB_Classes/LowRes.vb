@@ -475,8 +475,8 @@ Public Class LowRes_MeasureColor : Inherits VB_Parent
             distances(i) = distance3D(colors(i), vec)
             If distances(i) > distAvg Then
                 SetTrueText(Format(distances(i), fmt1), New cvb.Point(roi.X, roi.Y), 3)
+                colors(i) = vec
             End If
-            colors(i) = vec
         Next
 
         Dim distList = distances.ToList

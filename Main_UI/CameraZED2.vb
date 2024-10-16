@@ -5,20 +5,17 @@ Public Class CameraZED2 : Inherits GenericCamera
     Dim init_params As New InitParameters()
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        init_params.cameraFPS = 100
-        If captureRes.Width = 960 Then init_params.cameraFPS = 120
-        If captureRes.Width = 1920 And captureRes.Height = 1080 Then init_params.cameraFPS = 30
-        If captureRes.Width = 1920 And captureRes.Height = 1200 Then init_params.cameraFPS = 60
-        If captureRes.Width = 1280 And captureRes.Height = 720 Then init_params.cameraFPS = 60
+        init_params.cameraFPS = 0
 
         init_params.sensorsRequired = True
         init_params.depthMode = sl.DEPTH_MODE.ULTRA
-        init_params.coordinateSystem = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
+        init_params.coordinateSystem = sl.COORDINATE_SYSTEM.IMAGE
         init_params.coordinateUnits = sl.UNIT.METER
 
         If captureRes.Height = 720 Then init_params.resolution = sl.RESOLUTION.HD720
         If captureRes.Height = 1080 Then init_params.resolution = sl.RESOLUTION.HD1080
         If captureRes.Height = 1200 Then init_params.resolution = sl.RESOLUTION.HD720
+        If captureRes.Height = 600 Then init_params.resolution = sl.RESOLUTION.HDSVGA
         If captureRes.Height = 376 Then init_params.resolution = sl.RESOLUTION.VGA
 
         zed = New sl.Camera(0)
@@ -54,10 +51,12 @@ Public Class CameraZED2 : Inherits GenericCamera
                                       CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
 
         zed.RetrieveImage(rightSL, sl.VIEW.RIGHT)
-        rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, rightSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+        rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, rightSL.GetPtr).
+                                          CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
 
         zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZ)
-        pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC4, pointCloudSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+        pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC4,
+                                           pointCloudSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
         cvb.Cv2.PatchNaNs(pointCloud, 0)
 
         Dim zed_pose As New sl.Pose

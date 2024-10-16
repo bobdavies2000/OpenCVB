@@ -58,11 +58,11 @@ public:
 
 		init_params.sensors_required = true;
 		init_params.depth_mode = DEPTH_MODE::ULTRA;
-		init_params.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP; // OpenGL's coordinate system is right_handed
+		init_params.coordinate_system = COORDINATE_SYSTEM::LEFT_HANDED_Y_UP; 
 		init_params.coordinate_units = UNIT::METER;
 		init_params.camera_fps = 0; // use the highest frame rate available.
 
-		init_params.camera_resolution = sl::RESOLUTION::HD720;
+		init_params.camera_resolution = sl::RESOLUTION::AUTO;
 		if (w == 1920 && h == 1080) init_params.camera_resolution = sl::RESOLUTION::HD1080;
 		if (w == 1920 && h == 1200) init_params.camera_resolution = sl::RESOLUTION::HD1200;
 		if (w == 1280) init_params.camera_resolution = sl::RESOLUTION::HD720;
@@ -139,59 +139,10 @@ public:
 
 		zed.retrieveMeasure(pcMatSL, MEASURE::XYZBGRA); // XYZ has an extra float!
 
-		//pointCloud = cv::Mat(captureHeight, captureWidth, CV_32FC4, pcMatSL.getPtr<sl::uchar1>());
-		//cvtColor(pointCloud, pointCloud, COLOR_BGRA2BGR);
-		//cv::patchNaNs(pointCloud);
-		//if (captureWidth != w) resize(pointCloud, pointCloud, Size(w, h), 0, 0, INTER_NEAREST);
-
-		float* pc = (float*)pcMatSL.getPtr<sl::uchar1>();
-
-		if (pointCloud.rows != captureHeight) 
-			pointCloud = cv::Mat(h, w, CV_32FC3);
-
-		pointCloud.setTo(0);
-
-		float* pc32fC3 = (float*)pointCloud.data;
-		int incr = 4;
-		if (captureWidth / w >= 4)
-			incr = 16;
-		else
-			if (captureWidth / w >= 2) incr = 8;
-
-		for (int y = 0; y < h; y++)
-			for (int x = 0; x < w; x++)
-			{
-				int offset = (y * captureWidth + x) * incr;
-				if (isnan(pc[offset + 2]) || isinf(pc[offset + 2])) // checking the Z value...
-					continue;
-				int index = (y * w + x) * 3;
-				pc32fC3[index    ] =  pc[offset    ];
-				pc32fC3[index + 1] = -pc[offset + 1];
-				pc32fC3[index + 2] = -pc[offset + 2];
-			}
-
-		//Mat splitMats[3]{};
-		//split(pointCloud, splitMats);
-		//auto test = countNonZero(splitMats[2]);
-		//double maxVal;
-		//Mat testMat;
-		//splitMats[2].convertTo(testMat, CV_8UC1);
-		//minMaxLoc(testMat, NULL, &maxVal);
-		//imshow("testMat", testMat * 255 / 8);
-		//waitKey(1);
-
-		//if (sl_get_sensors_data(camera_id, &sensor_data, SL_TIME_REFERENCE_CURRENT) == SL_ERROR_CODE_SUCCESS) {
-
-		//	printf("Sample %i \n", n++);
-		//	printf(" - IMU:\n");
-		//	printf(" \t Orientation: {%f,%f,%f,%f} \n", sensor_data.imu.orientation.x, sensor_data.imu.orientation.y, sensor_data.imu.orientation.z, sensor_data.imu.orientation.w);
-		//	printf(" \t Acceleration: {%f,%f,%f} [m/sec^2] \n", sensor_data.imu.linear_acceleration.x, sensor_data.imu.linear_acceleration.y, sensor_data.imu.linear_acceleration.z);
-		//	printf(" \t Angular Velocity: {%f,%f,%f} [deg/sec] \n", sensor_data.imu.angular_velocity.x, sensor_data.imu.angular_velocity.y, sensor_data.imu.angular_velocity.z);
-
-		//	printf(" - Magnetometer \n \t Magnetic Field: {%f,%f,%f} [uT] \n", sensor_data.magnetometer.magnetic_field_c.x, sensor_data.magnetometer.magnetic_field_c.y, sensor_data.magnetometer.magnetic_field_c.z);
-
-		//	printf(" - Barometer \n \t Atmospheric pressure: %f [hPa] \n", sensor_data.barometer.pressure);
-		//}
+		pointCloud = cv::Mat(captureHeight, captureWidth, CV_32FC4, pcMatSL.getPtr<sl::uchar1>());
+		cvtColor(pointCloud, pointCloud, COLOR_BGRA2BGR);
+		cv::patchNaNs(pointCloud);
+		if (captureWidth != w) resize(pointCloud, pointCloud, Size(w, h), 0, 0, INTER_NEAREST);
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 		RotationMatrix = zed_pose.getRotationMatrix();
@@ -200,8 +151,8 @@ public:
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
-		}
-	};
+	}
+};
 
 
 extern "C" __declspec(dllexport) int* Zed2Open(int w, int h) { StereoLabsZed2* cPtr = new StereoLabsZed2(w, h); return (int*)cPtr; }
