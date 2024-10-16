@@ -125,7 +125,7 @@ Public Class CameraORB : Inherits GenericCamera
             uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
         End SyncLock
 
-        GC.Collect()
+        GC.Collect() ' this GC seems to be necessary to get the color image in the VB.Net interface.
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

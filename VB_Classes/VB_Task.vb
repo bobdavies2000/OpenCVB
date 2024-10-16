@@ -430,10 +430,10 @@ Public Class VBtask : Implements IDisposable
         ' https://www.mynteye.com/pages/mynt-eye-d
         ' https://www.orbbec.com/products/stereo-vision-camera/gemini-335l/
         ' order of cameras is the same as the order above... see cameraNames above
-        Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57, 62, 68} ' all values from the specification - this is usually overridden by calibration data.
-        Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86, 69, 94} ' all values from the specification - this is usually overridden by calibration data.
-        Dim focalLengths() As Single = {5.5, 3.4, 1.88, 4.81, 2.31, 2.45, 2.45}
-        Dim baseLines() As Single = {0.074, 0.073, 0.055, 0.052, 0.06, 0.048, 0.048} ' in meters
+        Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57, 57, 62, 68} ' all values from the specification - this is usually overridden by calibration data.
+        Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86, 86, 69, 94} ' all values from the specification - this is usually overridden by calibration data.
+        Dim focalLengths() As Single = {5.5, 3.4, 1.88, 4.81, 2.31, 2.31, 2.45, 2.45}
+        Dim baseLines() As Single = {0.074, 0.073, 0.055, 0.052, 0.06, 0.06, 0.048, 0.048} ' in meters
 
         ' NOTE: I can't find the VFOV for the Oak-D or Oak-D Lite cameras.
         ' The 62 is based on Pythagorean theorem and knowing the 71.8 HFOV and the 81.3 DFOV.
