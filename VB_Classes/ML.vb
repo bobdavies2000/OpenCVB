@@ -298,7 +298,7 @@ Public Class ML_DepthFromColor : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Dim resizer As New Resize_Smaller
     Public Sub New()
-        FindSlider("Resize Percentage (%)").Value = 2 ' 2% of the image.
+        FindSlider("LowRes %").Value = 2 ' 2% of the image.
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
@@ -360,7 +360,7 @@ Public Class ML_DepthFromXYColor : Inherits VB_Parent
     Dim resizer As New Resize_Smaller
     Dim colorizer As New Depth_Colorizer_CPP_VB
     Public Sub New()
-        FindSlider("Resize Percentage (%)").Value = 2 ' 2% of the image.
+        FindSlider("LowRes %").Value = 2 ' 2% of the image.
         labels(2) = "Predicted Depth"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub

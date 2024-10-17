@@ -592,8 +592,12 @@ Public Class LowRes_MeasureValidate : Inherits VB_Parent
                 dst1 = dst0.Threshold(1, 255, cvb.ThresholdTypes.Binary)
                 dst1 = dst1.Reshape(3, src.Rows)
             End If
-            dst3 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
-            dst3 = dst3.Reshape(3, src.Rows)
+            If standaloneTest() Then ' show any differences
+                Static diff As New Diff_Basics
+                diff.lastFrame = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+                diff.Run(src)
+                dst3 = diff.dst2
+            End If
         End If
     End Sub
 End Class

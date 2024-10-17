@@ -31350,7 +31350,7 @@ namespace CS_Classes
         public Kalman_Depth32f_CS()
         {
             resize = new Resize_Smaller();
-            FindSlider("Resize Percentage (%)").Value = 4;
+            FindSlider("LowRes %").Value = 4;
             labels[2] = "Mask of non-zero depth after Kalman smoothing";
             labels[3] = "Difference from original depth";
             desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)";
@@ -38584,7 +38584,7 @@ namespace CS_Classes
         public MiniCloud_Basics_CS()
         {
             resize = new Resize_Smaller();
-            FindSlider("Resize Percentage (%)").Value = 25;
+            FindSlider("LowRes %").Value = 25;
             desc = "Create a mini point cloud for use with histograms";
         }
         public void RunAlg(Mat src)
@@ -38926,7 +38926,7 @@ namespace CS_Classes
         Resize_Smaller resizer = new Resize_Smaller();
         public ML_DepthFromColor_CS()
         {
-            FindSlider("Resize Percentage (%)").Value = 2; // 2% of the image.
+            FindSlider("LowRes %").Value = 2; // 2% of the image.
             labels[3] = "Click any quadrant at left to view it below";
             desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well.";
         }
@@ -38980,7 +38980,7 @@ namespace CS_Classes
         Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
         public ML_DepthFromXYColor_CS()
         {
-            FindSlider("Resize Percentage (%)").Value = 2; // 2% of the image.
+            FindSlider("LowRes %").Value = 2; // 2% of the image.
             labels[2] = "Predicted Depth";
             desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well.";
         }

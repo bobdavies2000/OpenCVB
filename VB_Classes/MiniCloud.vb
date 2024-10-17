@@ -5,7 +5,7 @@ Public Class MiniCloud_Basics : Inherits VB_Parent
     Public options As New Options_IMU
     Public Sub New()
         resize = New Resize_Smaller
-        FindSlider("Resize Percentage (%)").Value = 25
+        FindSlider("LowRes %").Value = 25
         desc = "Create a mini point cloud for use with histograms"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
