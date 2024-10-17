@@ -141,9 +141,12 @@ Public Class Main_UI
 
         cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
         With settings
-            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True}) ' Mynt support updated below
-            .camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True})
-            .camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False})
+            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, True,
+                                                     True, False, True}) ' Mynt support updated below
+            .camera640x480Support = New List(Of Boolean)({False, False, True, True, False,
+                                                          False, False, False, True})
+            .camera1920x1080Support = New List(Of Boolean)({True, True, False, False, False,
+                                                            True, True, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
             Dim sr = New StreamReader(defines.FullName)
             If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then .cameraSupported(5) = True
@@ -1382,7 +1385,9 @@ Public Class Main_UI
     Private Function getCamera() As Object
         Select Case settings.cameraName
             Case "Azure Kinect 4K"
-                Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)
+            Case "Azure Kinect 4K C++"
+                Return New CameraK4A_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
             Case "Intel(R) RealSense(TM) Depth Camera 455"
@@ -1398,7 +1403,7 @@ Public Class Main_UI
             Case "Orbbec Gemini 335L"
                 Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
         End Select
-        Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
+        Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)
     End Function
     Private Sub CameraTask()
         restartCameraRequest = True

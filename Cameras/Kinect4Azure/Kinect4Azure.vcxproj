@@ -164,7 +164,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cameraKinect.cpp" />
+    <ClCompile Include="cameraK4A.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CameraDefines.hpp" />

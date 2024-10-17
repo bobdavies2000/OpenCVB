@@ -1,6 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
-#If 1 Then
 Module K4A_Interface
     <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4AOpen(width As Integer, height As Integer) As IntPtr
     End Function
@@ -21,7 +20,7 @@ Module K4A_Interface
     <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub K4AClose(cPtr As IntPtr)
     End Sub
 End Module
-Public Class CameraKinect : Inherits GenericCamera
+Public Class CameraK4A_CPP : Inherits GenericCamera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
         cPtr = K4AOpen(captureRes.Width, captureRes.Height)
@@ -120,6 +119,3 @@ Public Class CameraKinect : Inherits GenericCamera
         cPtr = 0
     End Sub
 End Class
-#else
-
-#end if

@@ -36,42 +36,41 @@ Public Class OptionsRedCloud
 
         ' The specification for each camera spells out the FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
-        Select Case task.cameraName
-            Case "Azure Kinect 4K"
-                task.xRange = 4.4
-                task.yRange = 1.5
-            Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
-                    task.xRange = 1.38
-                    task.yRange = 1.0
-                Else
-                    task.xRange = 2.5
-                    task.yRange = 0.8
-                End If
-            Case "Intel(R) RealSense(TM) Depth Camera 455", ""
-                If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
-                    task.xRange = 2.04
-                    task.yRange = 2.14
-                Else
-                    task.xRange = 3.22
-                    task.yRange = 1.39
-                End If
-            Case "Oak-D camera"
-                task.xRange = 4.07
-                task.yRange = 1.32
-            Case "StereoLabs ZED 2/2i"
-                task.xRange = 4
-                task.yRange = 1.5
-            Case "StereoLabs ZED 2/2i C++"
-                task.xRange = 4
-                task.yRange = 1.5
-            Case "MYNT-EYE-D1000"
-                task.xRange = 3.5
-                task.yRange = 1.5
-            Case "Orbbec Gemini 335L"
-                task.xRange = 3.5
-                task.yRange = 1.5
-        End Select
+        If task.cameraName.StartsWith("Azure Kinect 4K") Then
+            task.xRange = 4.4
+            task.yRange = 1.5
+        ElseIf task.cameraName.StartsWith("StereoLabs ZED 2/2i") Then
+            task.xRange = 4
+            task.yRange = 1.5
+        Else
+            Select Case task.cameraName
+                Case "Intel(R) RealSense(TM) Depth Camera 435i"
+                    If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
+                        task.xRange = 1.38
+                        task.yRange = 1.0
+                    Else
+                        task.xRange = 2.5
+                        task.yRange = 0.8
+                    End If
+                Case "Intel(R) RealSense(TM) Depth Camera 455", ""
+                    If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
+                        task.xRange = 2.04
+                        task.yRange = 2.14
+                    Else
+                        task.xRange = 3.22
+                        task.yRange = 1.39
+                    End If
+                Case "Oak-D camera"
+                    task.xRange = 4.07
+                    task.yRange = 1.32
+                Case "MYNT-EYE-D1000"
+                    task.xRange = 3.5
+                    task.yRange = 1.5
+                Case "Orbbec Gemini 335L"
+                    task.xRange = 3.5
+                    task.yRange = 1.5
+            End Select
+        End If
 
         XRangeBar.Value = task.xRange * 100
         YRangeSlider.Value = task.yRange * 100

@@ -44,6 +44,10 @@ Public Class Options
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True, True,
                                                         True, True, False, False, False,
                                                         False, False, False, False, False, False})
+            Case "Azure Kinect 4K C++"
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True, True,
+                                                        True, True, False, False, False,
+                                                        False, False, False, False, False, False})
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, True, True, True,
