@@ -78,6 +78,17 @@ Public Module vbc
         If task.heartBeat Then ReDim task.quarter(4)
 
         If task.frameCount = 0 Then task.heartBeat = True
+
+        Static heartBeatCount As Integer = 0
+        If task.heartBeat Then
+            heartBeatCount += 1
+            task.heartBeatLT = False
+            If heartBeatCount >= 5 Then
+                task.heartBeatLT = True
+                heartBeatCount = 0
+            End If
+        End If
+
         Dim frameDuration = 1000 / task.fpsRate
         task.almostHeartBeat = If(task.msWatch - task.msLast + frameDuration * 1.5 > 1000, True, False)
 

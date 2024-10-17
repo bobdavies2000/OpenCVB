@@ -31,8 +31,6 @@ Public Class LowRes_Color : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
-        If task.optionsChanged Then dst3 = New cvb.Mat(task.gridRows, task.gridCols, cvb.MatType.CV_32FC3)
-        dst3.SetTo(0)
         Dim index As Integer
         For y = 0 To task.gridRows - 1
             For x = 0 To task.gridCols - 1
@@ -40,7 +38,6 @@ Public Class LowRes_Color : Inherits VB_Parent
                 index += 1
                 Dim mean = src(roi).Mean()
                 dst2(roi).SetTo(mean)
-                dst3.Set(Of cvb.Vec3f)(y, x, New cvb.Vec3f(mean(0), mean(1), mean(2)))
             Next
         Next
     End Sub
@@ -59,8 +56,6 @@ Public Class LowRes_Depth : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2).Clone
         dst2 = src.Clone
-        If task.optionsChanged Then dst3 = New cvb.Mat(task.gridRows, task.gridCols, cvb.MatType.CV_32F)
-        dst3.SetTo(0)
         Dim index As Integer
         For y = 0 To task.gridRows - 1
             For x = 0 To task.gridCols - 1
@@ -68,7 +63,6 @@ Public Class LowRes_Depth : Inherits VB_Parent
                 index += 1
                 Dim mean = src(roi).Mean()
                 dst2(roi).SetTo(mean)
-                dst3.Set(Of Single)(y, x, mean(0))
             Next
         Next
     End Sub
@@ -505,6 +499,7 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
     Dim measure As New LowRes_MeasureColor
     Dim fullUpdate As Integer
     Public fullImageUpdate As Boolean
+    Public percentChanged As Single
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         desc = "Show all the grid cells above the motionless value (an option)."
@@ -535,7 +530,7 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
             End If
         Next
 
-        Dim percentChanged = task.motionRects.Count / task.gridRects.Count
+        percentChanged = task.motionRects.Count / task.gridRects.Count
         If task.heartBeat Or percentChanged > 0.5 Then
             Static lastFrameCount As Integer = task.frameCount
             labels(2) = measure.labels(3)

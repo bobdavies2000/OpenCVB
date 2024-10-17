@@ -109,6 +109,7 @@ Public Class VBtask : Implements IDisposable
 
     Public frameCount As Integer = 0
     Public heartBeat As Boolean
+    Public heartBeatLT As Boolean ' long term heartbeat - every X seconds.
     Public quarterBeat As Boolean
     Public quarter(4) As Boolean
     Public midHeartBeat As Boolean

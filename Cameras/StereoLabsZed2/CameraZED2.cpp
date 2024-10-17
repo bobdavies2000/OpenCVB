@@ -58,7 +58,7 @@ public:
 
 		init_params.sensors_required = true;
 		init_params.depth_mode = DEPTH_MODE::ULTRA;
-		init_params.coordinate_system = COORDINATE_SYSTEM::LEFT_HANDED_Y_UP; 
+		init_params.coordinate_system = COORDINATE_SYSTEM::IMAGE;
 		init_params.coordinate_units = UNIT::METER;
 		init_params.camera_fps = 0; // use the highest frame rate available.
 
@@ -140,9 +140,9 @@ public:
 		zed.retrieveMeasure(pcMatSL, MEASURE::XYZBGRA); // XYZ has an extra float!
 
 		pointCloud = cv::Mat(captureHeight, captureWidth, CV_32FC4, pcMatSL.getPtr<sl::uchar1>());
-		cvtColor(pointCloud, pointCloud, COLOR_BGRA2BGR);
 		cv::patchNaNs(pointCloud);
 		if (captureWidth != w) resize(pointCloud, pointCloud, Size(w, h), 0, 0, INTER_NEAREST);
+		cvtColor(pointCloud, pointCloud, ColorConversionCodes::COLOR_BGRA2BGR);
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 		RotationMatrix = zed_pose.getRotationMatrix();
