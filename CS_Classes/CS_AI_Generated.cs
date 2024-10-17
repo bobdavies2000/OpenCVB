@@ -39835,11 +39835,11 @@ namespace CS_Classes
 
 
 
-    public class Motion_Basics_CS : VB_Parent
+    public class Motion_BGSub_CS : VB_Parent
     {
         public BGSubtract_MOG2 bgSub = new BGSubtract_MOG2();
         Motion_Basics_QT_CS motion;
-        public Motion_Basics_CS()
+        public Motion_BGSub_CS()
         {
             motion = new Motion_Basics_QT_CS();
             UpdateAdvice(traceName + ": redOptions are used as well as BGSubtract options.");

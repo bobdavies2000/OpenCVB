@@ -4,7 +4,9 @@ Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits VB_Parent
     Dim measure As New LowRes_MeasureMotion
     Public Sub New()
-        labels(3) = "The difference between the motion-constructed image and the current image."
+        task.motionMask = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        labels(3) = "The difference between the motion-constructed image and the current image.  " +
+                    "It is often just individual pixels."
         desc = "Isolate all motion in the scene"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -12,11 +14,26 @@ Public Class Motion_Basics : Inherits VB_Parent
         dst2 = measure.dst3 ' only cells with motion detected are updated in this image.
         labels(2) = measure.labels(2)
 
+        task.motionMask.SetTo(0)
+        If task.motionDetected Then
+            For Each roi In task.motionRects
+                task.motionMask(roi).SetTo(255)
+            Next
+        End If
+
         If standaloneTest() Then ' show any differences
             Static diff As New Diff_Basics
             diff.lastFrame = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             diff.Run(src)
             dst3 = diff.dst2
+        Else
+            If measure.fullImageUpdate Then
+                dst3 = task.depthRGB.Clone
+            Else
+                task.depthRGB.CopyTo(dst3, task.motionMask)
+                task.depthRGB = dst3.Clone
+                task.color = dst2.Clone
+            End If
         End If
     End Sub
 End Class

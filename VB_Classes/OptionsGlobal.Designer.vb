@@ -381,9 +381,9 @@ Partial Class OptionsGlobal
         Me.ShowMotionRectangle.AutoSize = True
         Me.ShowMotionRectangle.Location = New System.Drawing.Point(24, 199)
         Me.ShowMotionRectangle.Name = "ShowMotionRectangle"
-        Me.ShowMotionRectangle.Size = New System.Drawing.Size(275, 24)
+        Me.ShowMotionRectangle.Size = New System.Drawing.Size(162, 24)
         Me.ShowMotionRectangle.TabIndex = 70
-        Me.ShowMotionRectangle.Text = "Show the motion rectangle in dst0"
+        Me.ShowMotionRectangle.Text = "Show motion cells"
         Me.ShowMotionRectangle.UseVisualStyleBackColor = True
         '
         'GroupBox1

@@ -2166,10 +2166,10 @@ End Enum
 	If algorithmName = "Moments_CentroidKalman" Then return new Moments_CentroidKalman
 	If algorithmName = "Moments_CentroidKalman_CS" Then return new Moments_CentroidKalman_CS
 	If algorithmName = "Motion_Basics" Then return new Motion_Basics
-	If algorithmName = "Motion_Basics_CS" Then return new Motion_Basics_CS
 	If algorithmName = "Motion_Basics_QT_CS" Then return new Motion_Basics_QT_CS
 	If algorithmName = "Motion_BGSub" Then return new Motion_BGSub
 	If algorithmName = "Motion_BGSub_CC" Then return new CPP_Basics(ccFunctionNames._Motion_BGSub_CC)
+	If algorithmName = "Motion_BGSub_CS" Then return new Motion_BGSub_CS
 	If algorithmName = "Motion_BGSub_QT" Then return new Motion_BGSub_QT
 	If algorithmName = "Motion_CCmerge" Then return new Motion_CCmerge
 	If algorithmName = "Motion_CCmerge_CS" Then return new Motion_CCmerge_CS

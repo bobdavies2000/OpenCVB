@@ -453,7 +453,7 @@ End Class
 
 Public Class LowRes_MeasureColor : Inherits VB_Parent
     Dim lowRes As New LowRes_Color
-    Public colors() As cvb.Vec3b
+    Public colors(0) As cvb.Vec3b
     Public distances() As Single
     Public options As New Options_LowRes
     Public motionList As New List(Of Integer)
@@ -466,7 +466,7 @@ Public Class LowRes_MeasureColor : Inherits VB_Parent
         lowRes.Run(src)
         dst2 = lowRes.dst2
 
-        If task.optionsChanged Or colors Is Nothing Then
+        If task.optionsChanged Or colors.Length <> task.gridRects.Count Then
             ReDim colors(task.gridRects.Count - 1)
             ReDim distances(task.gridRects.Count - 1)
         End If
@@ -503,7 +503,6 @@ End Class
 
 Public Class LowRes_MeasureMotion : Inherits VB_Parent
     Dim measure As New LowRes_MeasureColor
-    Public motionRects As New List(Of cvb.Rect)
     Dim fullUpdate As Integer
     Public fullImageUpdate As Boolean
     Public Sub New()
@@ -520,23 +519,23 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
 
         Dim threshold = measure.options.colorDifferenceThreshold
 
-        motionRects.Clear()
+        task.motionRects.Clear()
         Dim indexList As New List(Of Integer)
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
             If measure.distances(i) > threshold Then
-                If indexList.Contains(i) = False Then motionRects.Add(roi)
+                If indexList.Contains(i) = False Then task.motionRects.Add(roi)
                 For Each index In task.gridNeighbors(i)
                     If indexList.Contains(index) = False Then
                         roi = task.gridRects(index)
                         indexList.Add(index)
-                        motionRects.Add(roi)
+                        task.motionRects.Add(roi)
                     End If
                 Next
             End If
         Next
 
-        Dim percentChanged = motionRects.Count / task.gridRects.Count
+        Dim percentChanged = task.motionRects.Count / task.gridRects.Count
         If task.heartBeat Or percentChanged > 0.5 Then
             Static lastFrameCount As Integer = task.frameCount
             labels(2) = measure.labels(3)
@@ -550,11 +549,13 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
                 lastFrameCount = task.frameCount
                 fullUpdate = 0
             End If
+            task.motionDetected = False
         Else
-            For Each roi In motionRects
+            For Each roi In task.motionRects
                 src(roi).CopyTo(dst3(roi))
                 If standaloneTest() Then dst0.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
             Next
+            task.motionDetected = True
         End If
     End Sub
 End Class

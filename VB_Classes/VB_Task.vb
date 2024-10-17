@@ -63,8 +63,11 @@ Public Class VBtask : Implements IDisposable
     Public srcThread As cvb.Mat
 
     Public motionFlag As Boolean
-    Public motionRect As cvb.Rect
+    Public motionRect As New cvb.Rect ' get rid of this...
+    Public motionRects As New List(Of cvb.Rect)
     Public motionDetected As Boolean
+    Public motionMask As cvb.Mat
+    Public motion As Motion_Basics
 
     Public reliableDepth As Reliable_Depth
     Public reliableDepthMask As cvb.Mat
@@ -73,7 +76,6 @@ Public Class VBtask : Implements IDisposable
     Public camDirection As Single ' camera direction in radians.
 
     ' add any global algorithms here
-    Public cMotion As CameraMotion_Basics
     Public gravityHorizon As Gravity_Horizon
     Public PixelViewer As Pixel_Viewer
     Public colorizer As Depth_Colorizer_CPP_VB
@@ -397,9 +399,9 @@ Public Class VBtask : Implements IDisposable
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
         reliableDepth = New Reliable_Depth
-        'cMotion = New CameraMotion_Basics
         gravityHorizon = New Gravity_Horizon
         imuStabilityTest = New Stabilizer_VerticalIMU
+        motion = New Motion_Basics
 
         updateSettings()
         task.redOptions.Show()
@@ -595,7 +597,9 @@ Public Class VBtask : Implements IDisposable
             End If
 
             If task.motionDetected And task.gOptions.ShowMotionRectangle.Checked Then
-                task.color.Rectangle(task.motionRect, cvb.Scalar.White, task.lineWidth)
+                For Each roi In task.motionRects
+                    task.color.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
+                Next
             End If
 
             gravityHorizon.RunAlg(src)
@@ -737,6 +741,7 @@ Public Class VBtask : Implements IDisposable
             task.pcSplit(2).SetTo(0, Not task.reliableDepthMask)
         End If
 
+        motion.Run(src)
         TaskTimer.Enabled = True
 
         If task.gOptions.CreateGif.Checked Then
@@ -777,7 +782,7 @@ Public Class VBtask : Implements IDisposable
         'End If
 
         If task.paused = False Then
-            MainUI_Algorithm.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
+            MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             task.FirstPass = False
             postProcess(src)
         End If
