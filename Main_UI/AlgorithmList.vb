@@ -2946,6 +2946,7 @@ End Enum
 	If algorithmName = "PointCloud_Spin" Then return new PointCloud_Spin
 	If algorithmName = "PointCloud_Spin2" Then return new PointCloud_Spin2
 	If algorithmName = "PointCloud_Spin2_CS" Then return new PointCloud_Spin2_CS
+	If algorithmName = "PointCloud_Split" Then return new PointCloud_Split
 	If algorithmName = "PointCloud_SurfaceH" Then return new PointCloud_SurfaceH
 	If algorithmName = "PointCloud_SurfaceH_CPP_VB" Then return new PointCloud_SurfaceH_CPP_VB
 	If algorithmName = "PointCloud_SurfaceH_CS" Then return new PointCloud_SurfaceH_CS
@@ -3051,7 +3052,6 @@ End Enum
 	If algorithmName = "Random_CustomDistribution" Then return new Random_CustomDistribution
 	If algorithmName = "Random_CustomDistribution_CS" Then return new Random_CustomDistribution_CS
 	If algorithmName = "Random_CustomHistogram" Then return new Random_CustomHistogram
-	If algorithmName = "Random_CustomHistogram_CS" Then return new Random_CustomHistogram_CS
 	If algorithmName = "Random_Enumerable" Then return new Random_Enumerable
 	If algorithmName = "Random_Enumerable_CC" Then return new CPP_Basics(ccFunctionNames._Random_Enumerable_CC)
 	If algorithmName = "Random_Enumerable_CS" Then return new Random_Enumerable_CS

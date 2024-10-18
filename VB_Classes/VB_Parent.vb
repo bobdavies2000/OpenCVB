@@ -707,17 +707,21 @@ Public Class VB_Parent : Implements IDisposable
         If task.testAllRunning = False Then measureStartRun(traceName)
 
         task.trueData.Clear()
-        If task.paused = False Then
-            If VB_Algorithm.traceName.EndsWith("_CPP") Then
-                Static nativeTask As New CPP_ManagedTask()
-                If nativeTask.ManagedObject Is Nothing Then nativeTask.ManagedObject = VB_Algorithm
-                nativeTask.RunAlg(src)
-                VB_Algorithm.RunAlg()
-                nativeTask.Pause()
-            Else
-                VB_Algorithm.RunAlg(src)
+        Try
+            If task.paused = False Then
+                If VB_Algorithm.traceName.EndsWith("_CPP") Then
+                    Static nativeTask As New CPP_ManagedTask()
+                    If nativeTask.ManagedObject Is Nothing Then nativeTask.ManagedObject = VB_Algorithm
+                    nativeTask.RunAlg(src)
+                    VB_Algorithm.RunAlg()
+                    nativeTask.Pause()
+                Else
+                    VB_Algorithm.RunAlg(src)
+                End If
             End If
-        End If
+        Catch ex As Exception
+            Console.WriteLine("The algorithm has failed with error: " + ex.Message)
+        End Try
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
 End Class

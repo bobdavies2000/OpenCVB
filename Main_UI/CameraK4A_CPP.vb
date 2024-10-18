@@ -72,6 +72,7 @@ Public Class CameraK4A_CPP : Inherits GenericCamera
                 Exit Sub ' just process the existing images again?  
             Else
                 Dim imuOutput = Marshal.PtrToStructure(Of imuData)(imuFrame)
+
                 IMU_AngularVelocity = imuOutput.imu_Gyro
                 IMU_Acceleration = imuOutput.imuAccel
 
@@ -92,23 +93,29 @@ Public Class CameraK4A_CPP : Inherits GenericCamera
             If cPtr = 0 Then Exit Sub
 
             SyncLock cameraLock
-                uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, K4AColor(cPtr)).Clone
+                uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
+                                                K4AColor(cPtr)).Clone
 
-                ' so depth data fits into 0-255 (approximately)
+                ' so grayscale data fits into 0-255 (approximately)
                 uiLeft = (cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_16U,
-                                          K4ALeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone
+                                          K4ALeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().
+                                          CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone
+
                 uiRight = uiLeft.Clone
+
                 If captureRes <> WorkingRes Then
                     Dim ptr = K4APointCloud(cPtr)
                     Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
-                                                    cvb.MatType.CV_16UC3, ptr).
+                                                    cvb.MatType.CV_16SC3, ptr).
                                                     Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
                     tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 Else
-                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16SC3, K4APointCloud(cPtr))
+                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                                    cvb.MatType.CV_16SC3, K4APointCloud(cPtr))
                     tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 End If
             End SyncLock
+
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         Catch ex As Exception
 

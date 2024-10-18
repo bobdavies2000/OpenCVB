@@ -701,9 +701,22 @@ Public Class VBtask : Implements IDisposable
             task.frameHistoryCount = task.gOptions.FrameHistory.Value
 
             If task.useGravityPointcloud Then
-                If task.pointCloud.Size <> src.Size Then task.pointCloud = New cvb.Mat(src.Size, cvb.MatType.CV_32FC3, 0)
+                If task.pointCloud.Size <> src.Size Then
+                    task.pointCloud = New cvb.Mat(src.Size, cvb.MatType.CV_32FC3, 0)
+                End If
+
+
+
+                Dim samples(task.gMatrix.Total - 1) As Single
+                Marshal.Copy(task.gMatrix.Data, samples, 0, samples.Length)
+
+
+
+
+
                 '******* this is the rotation *******
-                task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
+                task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).
+                                   ToMat.Reshape(3, src.Rows)
             End If
 
             If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split

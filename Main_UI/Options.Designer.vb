@@ -63,7 +63,7 @@ Partial Class Options
         Me.GroupBox2.Controls.Add(Me.fontInfo)
         Me.GroupBox2.Controls.Add(Me.Button1)
         Me.GroupBox2.Controls.Add(Me.showConsoleLog)
-        Me.GroupBox2.Location = New System.Drawing.Point(24, 498)
+        Me.GroupBox2.Location = New System.Drawing.Point(24, 543)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(962, 165)
         Me.GroupBox2.TabIndex = 5
@@ -181,7 +181,7 @@ Partial Class Options
         Me.CameraGroup.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         Me.CameraGroup.Location = New System.Drawing.Point(24, 32)
         Me.CameraGroup.Name = "CameraGroup"
-        Me.CameraGroup.Size = New System.Drawing.Size(821, 124)
+        Me.CameraGroup.Size = New System.Drawing.Size(821, 171)
         Me.CameraGroup.TabIndex = 13
         '
         'GroupBox5
@@ -192,7 +192,7 @@ Partial Class Options
         Me.GroupBox5.Controls.Add(Me.SnapCustom)
         Me.GroupBox5.Controls.Add(Me.Snap320)
         Me.GroupBox5.Controls.Add(Me.Snap640)
-        Me.GroupBox5.Location = New System.Drawing.Point(24, 393)
+        Me.GroupBox5.Location = New System.Drawing.Point(24, 438)
         Me.GroupBox5.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox5.Name = "GroupBox5"
         Me.GroupBox5.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -264,7 +264,7 @@ Partial Class Options
         'Resolutions
         '
         Me.Resolutions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.Resolutions.Location = New System.Drawing.Point(24, 184)
+        Me.Resolutions.Location = New System.Drawing.Point(24, 229)
         Me.Resolutions.Name = "Resolutions"
         Me.Resolutions.Size = New System.Drawing.Size(821, 201)
         Me.Resolutions.TabIndex = 15
@@ -281,7 +281,7 @@ Partial Class Options
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(23, 159)
+        Me.Label5.Location = New System.Drawing.Point(20, 206)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(182, 20)
         Me.Label5.TabIndex = 17
@@ -292,7 +292,7 @@ Partial Class Options
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
-        Me.ClientSize = New System.Drawing.Size(1008, 675)
+        Me.ClientSize = New System.Drawing.Size(1008, 720)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Resolutions)
@@ -333,7 +333,6 @@ Partial Class Options
     Friend WithEvents Label1 As Label
     Friend WithEvents Resolutions As FlowLayoutPanel
     Friend WithEvents Label4 As Label
-    Friend WithEvents Label5 As Label
     Friend WithEvents TestAllDuration As NumericUpDown
     Friend WithEvents DurationLabel As Label
     Friend WithEvents fontInfo As Label
@@ -342,4 +341,5 @@ Partial Class Options
     Friend WithEvents UpdateXRef As Button
     Friend WithEvents Label7 As Label
     Friend WithEvents TextBox1 As TextBox
+    Friend WithEvents Label5 As Label
 End Class

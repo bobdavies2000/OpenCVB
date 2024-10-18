@@ -1,8 +1,10 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
+Imports Microsoft.Kinect.KinectSensor
 Public Class CameraK4A : Inherits GenericCamera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
+
         cPtr = K4AOpen(captureRes.Width, captureRes.Height)
         cameraName = deviceName
         If cPtr <> 0 Then

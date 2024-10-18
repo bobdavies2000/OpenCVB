@@ -490,6 +490,12 @@ Public Class Plot_Histogram : Inherits VB_Parent
             histogram = src
         End If
 
+        If histogram Is Nothing Then
+            createHistogram = True
+            SetTrueText("The histogram is empty.", 3)
+            Exit Sub
+        End If
+
         If removeZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
         ReDim histArray(histogram.Rows - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)

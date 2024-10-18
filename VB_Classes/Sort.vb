@@ -206,10 +206,6 @@ Public Class Sort_FeatureLess : Inherits VB_Parent
         dst1.SetTo(0, Not devGrid.dst3)
 
         sort.Run(dst1)
-        ' dst3 = sort.dst2
-
-        Dim samples(sort.dst2.Total - 1) As Byte
-        Marshal.Copy(sort.dst2.Data, samples, 0, samples.Length)
 
         plot.Run(sort.dst2)
         dst3 = plot.dst2

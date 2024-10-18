@@ -329,10 +329,6 @@ Public Class LowRes_MLColor : Inherits VB_Parent
 
             dst1(roiB) = ml.predictions.Threshold(1.5, 255, cvb.ThresholdTypes.BinaryInv).
                                         ConvertScaleAbs.Reshape(1, roiB.Height)
-
-            Dim samples(ml.predictions.Total - 1) As Single
-            Marshal.Copy(ml.predictions.Data, samples, 0, samples.Length)
-            Dim k = 0
         Next
 
         dst2.SetTo(0)

@@ -149,16 +149,19 @@ Public Class Main_UI
                                                             True, True, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
             Dim sr = New StreamReader(defines.FullName)
-            If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then .cameraSupported(5) = True
+            If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then
+                .cameraSupported(7) = True
+            End If
             sr.Close()
 
             .cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1
-                Dim present = USBenumeration(cameraNames(i))
+                Dim camName = cameraNames(i)
+                If camName.EndsWith(" C++") Then camName = camName.Replace(" C++", "")
+                Dim present = USBenumeration(camName)
                 If cameraNames(i).Contains("Orbbec") Then present = USBenumeration("Orbbec Gemini 335L Depth Camera")
                 If cameraNames(i).Contains("Oak-D") Then present = USBenumeration("Movidius MyriadX")
-                If cameraNames(i).Contains("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2i")
-                If cameraNames(i).Contains("StereoLabs ZED 2/2i C++") Then present = USBenumeration("ZED 2i")
+                If cameraNames(i).StartsWith("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2i")
                 If present = False And cameraNames(i).Contains("StereoLabs ZED 2/2i") Then
                     present = USBenumeration("ZED 2") ' older edition.
                 End If
@@ -1444,6 +1447,7 @@ Public Class Main_UI
                     End If
                 End SyncLock
 
+                ' Test the camera frame rate...
                 'Static lastTime = Now
                 'Dim nextTime = Now
                 'Dim elapsedTicks = nextTime.Ticks - lastTime.Ticks

@@ -665,8 +665,7 @@ Public Class Structured_SliceXPlot : Inherits VB_Parent
         dst2 = task.color.Clone
         Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters
         If filterZ > 0 Then
-            Dim depthMask = multi.split(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
-            depthMask = multi.sliceMask And depthMask
+            Dim depthMask = task.pcSplit(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
             dst2.SetTo(cvb.Scalar.White, depthMask)
         End If
 
@@ -704,7 +703,7 @@ Public Class Structured_SliceYPlot : Inherits VB_Parent
             ' dst3.Line(New cvb.Point(mm.maxLoc.X, 0), New cvb.Point(mm.maxLoc.X, dst3.Height), task.HighlightColor, task.lineWidth, task.lineType)
             Dim filterZ = mm.maxLoc.X / dst3.Width * task.MaxZmeters
 
-            Dim depthMask = multi.split(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
+            Dim depthMask = task.pcSplit(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
             dst2 = task.color.Clone
             dst2.SetTo(cvb.Scalar.White, depthMask)
             Dim pixelsPerMeter = dst2.Width / task.MaxZmeters
@@ -1234,8 +1233,9 @@ Public Class Structured_MultiSlicePolygon : Inherits VB_Parent
 
         multi.Run(src)
         dst2 = Not multi.dst3
-
-        Dim rawContours = cvb.Cv2.FindContoursAsArray(dst2, cvb.RetrievalModes.Tree, cvb.ContourApproximationModes.ApproxSimple)
+        If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        Dim rawContours = cvb.Cv2.FindContoursAsArray(dst2, cvb.RetrievalModes.Tree,
+                                                      cvb.ContourApproximationModes.ApproxSimple)
         Dim contours(rawContours.Length - 1)() As cvb.Point
         For j = 0 To rawContours.Length - 1
             contours(j) = cvb.Cv2.ApproxPolyDP(rawContours(j), 3, True)
@@ -1334,7 +1334,6 @@ End Class
 Public Class Structured_MultiSlice : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public sliceMask As cvb.Mat
-    Public split() As cvb.Mat
     Public options As New Options_Structured
     Public classCount As Integer
     Public Sub New()

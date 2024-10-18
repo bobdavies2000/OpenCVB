@@ -202,6 +202,12 @@ Public Class Hist_Simple : Inherits VB_Parent
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         Dim ranges() = New cvb.Rangef() {New cvb.Rangef(plot.minRange, plot.maxRange)}
+        If plot.minRange = plot.maxRange Then
+            SetTrueText("The data is just one value - " + Format(plot.minRange, fmt1) + vbCrLf +
+                        "A histogram is not necessary.", 3)
+            Exit Sub
+        End If
+
         Dim hist As New cvb.Mat
         cvb.Cv2.CalcHist({src}, {0}, New cvb.Mat, hist, 1, {task.histogramBins}, ranges)
 

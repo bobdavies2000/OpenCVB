@@ -106,9 +106,6 @@ Public Class PCdiff_Points : Inherits VB_Parent
         Dim delta = filter.pcDiff.options.delta
         For y = 0 To task.pcSplit(2).Rows - 1
             Dim slice = task.pcSplit(2).Row(y)
-            Dim samples(slice.Total - 1) As Single
-            Marshal.Copy(slice.Data, samples, 0, samples.Length)
-
             Dim lastVal As Single = 0
             For x = 0 To slice.Cols - 2
                 Dim val = slice.Get(Of Single)(0, x)

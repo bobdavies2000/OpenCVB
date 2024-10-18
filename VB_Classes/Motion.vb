@@ -3,11 +3,11 @@ Imports System.Threading
 Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits VB_Parent
     Dim measure As New LowRes_MeasureMotion
+    Dim depthRGB As cvb.Mat
     Dim leftImage As cvb.Mat
     Dim rightImage As cvb.Mat
     Dim pointcloud As cvb.Mat
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
         task.motionMask = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
         labels(3) = "The difference between the motion-constructed image and the current image.  " +
                     "It is often just individual pixels."
@@ -29,26 +29,26 @@ Public Class Motion_Basics : Inherits VB_Parent
             Static diff As New Diff_Basics
             diff.lastFrame = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             diff.Run(src)
-            dst1 = diff.dst2
+            dst3 = diff.dst2
         End If
 
         Dim updateImages As Boolean = If(task.FirstPass, True, task.gOptions.UpdateOnHeartbeat.Checked)
         If measure.percentChanged > 0.5 Or task.heartBeatLT Then updateImages = True
-        If measure.fullImageUpdate And updateImages Then
-            dst3 = task.depthRGB.Clone
+        If measure.fullImageUpdate And updateImages Or depthRGB Is Nothing Then
+            depthRGB = task.depthRGB.Clone
             leftImage = task.leftView.Clone
             rightImage = task.rightView.Clone
             pointcloud = task.pointCloud.Clone
         Else
             If task.gOptions.UseMotionConstructed.Checked Then
-                task.depthRGB.CopyTo(dst3, task.motionMask)
-                task.depthRGB = dst3.Clone
-                task.color = dst2.Clone
+                task.color = dst2.Clone ' updated by LowRes_MeasureMotion
 
+                task.depthRGB.CopyTo(depthRGB, task.motionMask)
                 task.leftView.CopyTo(leftImage, task.motionMask)
                 task.rightView.CopyTo(rightImage, task.motionMask)
                 task.pointCloud.CopyTo(pointcloud, task.motionMask)
 
+                task.depthRGB = depthRGB.Clone
                 task.leftView = leftImage.Clone
                 task.rightView = rightImage.Clone
                 task.pointCloud = pointcloud.Clone

@@ -1451,9 +1451,8 @@ Public Class Edge_Laplacian : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-
-        dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        dst2 = dst2.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0).ConvertScaleAbs()
+        If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0).ConvertScaleAbs()
         dst2 = dst2.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary)
     End Sub
 End Class

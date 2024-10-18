@@ -25,25 +25,12 @@ Public Class KMeans_Basics : Inherits VB_Parent
 
         If columnVector.ElemSize Mod 4 <> 0 Or columnVector.Type = cvb.MatType.CV_32S Then columnVector.ConvertTo(columnVector, cvb.MatType.CV_32F)
         Try
-            ' some samples are NAN and breaks the kmeans call.  The following lines were helpful to debug this problem.
-            'Dim samples(columnVector.Total - 1) As Single
-            'Marshal.Copy(columnVector.Data, samples, 0, samples.Length)
-            'Dim val = columnVector.Get(Of Single)(columnVector.Rows, 0)
-            'Dim updated As Boolean
-            'For i = 0 To samples.Count - 1
-            '    If Single.IsNaN(samples(i)) Or Single.IsInfinity(samples(i)) Then
-            '        samples(i) = 0
-            '        updated = True
-            '    End If
-            'Next
-            'If updated Then Marshal.Copy(samples, columnVector.Data, 0, samples.Length)
             If colors.Width = 0 Or colors.Height = 0 Then options.kMeansFlag = cvb.KMeansFlags.PpCenters
             cvb.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
         Catch ex As Exception
             columnVector.SetTo(0)
             dst2.SetTo(0)
             cvb.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
-            ' debug.writeline("Huge or NaN values in the input... Can happen on an initial useInitialValues run... It is corrected here...")
         End Try
 
         saveLabels = dst2.Clone

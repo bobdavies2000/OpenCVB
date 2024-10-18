@@ -66,12 +66,13 @@ Public Class CameraZED2 : Inherits GenericCamera
 
         SyncLock cameraLock
             Dim acc = sensordata.imu.linearAcceleration
-            IMU_Acceleration = New cvb.Point3f(-acc.X, acc.Y, -acc.Z)
-            Dim gyro = sensordata.imu.angularVelocity
-            IMU_AngularVelocity = New cvb.Point3f(gyro.X, gyro.Y, gyro.Z) * 0.0174533 ' Zed 2 gyro is in degrees/sec 
-            Static IMU_StartTime = sensordata.imu.timestamp
-            IMU_TimeStamp = (sensordata.imu.timestamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
-
+            If acc.X <> 0 And acc.Y <> 0 And acc.Z <> 0 Then
+                IMU_Acceleration = New cvb.Point3f(-acc.X, acc.Y, -acc.Z)
+                Dim gyro = sensordata.imu.angularVelocity
+                IMU_AngularVelocity = New cvb.Point3f(gyro.X, gyro.Y, gyro.Z) * 0.0174533 ' Zed 2 gyro is in degrees/sec 
+                Static IMU_StartTime = sensordata.imu.timestamp
+                IMU_TimeStamp = (sensordata.imu.timestamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
+            End If
             If WorkingRes <> captureRes Then
                 uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
                 uiLeft = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)

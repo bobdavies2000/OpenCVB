@@ -1091,3 +1091,26 @@ Public Class PointCloud_YRangeTest : Inherits VB_Parent
         dst1.ConvertTo(dst2, cvb.MatType.CV_8UC1)
     End Sub
 End Class
+
+
+
+
+
+Public Class PointCloud_Split : Inherits VB_Parent
+    Public Sub New()
+        desc = "Attempting to debug pointcloud problem - display the 3 components"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst1 = task.pcSplit(0)
+        dst2 = task.pcSplit(1)
+        dst3 = task.pcSplit(2)
+
+        Dim mmx = GetMinMax(dst1)
+        Dim mmy = GetMinMax(dst2)
+        Dim mmz = GetMinMax(dst3)
+
+        labels(1) = "Min/Max for X " + Format(mmx.minVal, fmt1) + " / " + Format(mmx.maxVal, fmt1)
+        labels(2) = "Min/Max for Y " + Format(mmy.minVal, fmt1) + " / " + Format(mmy.maxVal, fmt1)
+        labels(3) = "Min/Max for Z " + Format(mmz.minVal, fmt1) + " / " + Format(mmz.maxVal, fmt1)
+    End Sub
+End Class

@@ -343,7 +343,7 @@ End Class
 
 
 Public Class Random_CustomDistribution : Inherits VB_Parent
-    Public inputCDF As cvb.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
+    Public inputCDF As New cvb.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
     Public outputRandom = New cvb.Mat(10000, 1, cvb.MatType.CV_32S, cvb.Scalar.All(0)) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public outputHistogram As cvb.Mat
     Public plot As New Plot_Histogram
@@ -353,6 +353,10 @@ Public Class Random_CustomDistribution : Inherits VB_Parent
         desc = "Create a custom random number distribution from any histogram"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        If inputCDF.Rows = 0 Then
+            SetTrueText("The inputCDF was not provided.", 3)
+            Exit Sub
+        End If
         Dim lastValue = inputCDF.Get(Of Single)(inputCDF.Rows - 1, 0)
         If Not (lastValue > 0.99 And lastValue <= 1.0) Then ' convert the input histogram to a cdf.
             inputCDF *= 1 / (inputCDF.Sum()(0))
@@ -443,7 +447,11 @@ Public Class Random_CustomHistogram : Inherits VB_Parent
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
         random.Run(src)
 
-        If standaloneTest() Then
+        If saveHist.Rows = 0 Then
+            SetTrueText("The histogram is missing - probably identical values.", 3)
+            Exit Sub
+        End If
+        If standaloneTest() And random.outputHistogram IsNot Nothing Then
             hist.plot.maxRange = 100
             hist.plot.Run(random.outputHistogram)
             dst3 = hist.plot.dst2

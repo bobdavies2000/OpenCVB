@@ -50823,38 +50823,6 @@ namespace CS_Classes
 
 
 
-    public class Random_CustomHistogram_CS : VB_Parent
-    {
-        public Random_CustomDistribution random = new Random_CustomDistribution();
-        public Hist_Simple hist = new Hist_Simple();
-        public Mat saveHist;
-        public Random_CustomHistogram_CS()
-        {
-            random.outputRandom = new Mat(1000, 1, MatType.CV_32S, cv.Scalar.All(0));
-            labels[2] = "Histogram of the grayscale image";
-            labels[3] = "Custom random distribution that reflects dst2 image";
-            desc = "Create a random number distribution that reflects histogram of a grayscale image";
-        }
-        public void RunAlg(Mat src)
-        {
-            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            hist.plot.maxRange = 0; // we are sharing the plot with the code below...
-            hist.Run(src);
-            dst2 = hist.dst2.Clone();
-            saveHist = hist.plot.histogram.Clone();
-            random.inputCDF = saveHist; // it will convert the histogram into a cdf where the last value must be near one.
-            random.Run(src);
-            if (standaloneTest())
-            {
-                hist.plot.maxRange = 100;
-                hist.plot.Run(random.outputHistogram);
-                dst3 = hist.plot.dst2;
-            }
-        }
-    }
-
-
-
 
     public class Random_StaticTV_CS : VB_Parent
     {
@@ -57831,7 +57799,7 @@ namespace CS_Classes
             double filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * vbc.task.MaxZmeters;
             if (filterZ > 0)
             {
-                Mat depthMask = multi.split[2].InRange(filterZ - 0.05, filterZ + 0.05); // a 10 cm buffer surrounding the z value
+                Mat depthMask = vbc.task.pcSplit[2].InRange(filterZ - 0.05, filterZ + 0.05); // a 10 cm buffer surrounding the z value
                 depthMask = multi.sliceMask & depthMask;
                 dst2.SetTo(Scalar.White, depthMask);
             }
@@ -57864,7 +57832,7 @@ namespace CS_Classes
                 DrawCircle(dst3, new cv.Point(mm.maxLoc.X, row), vbc.task.DotSize + 3, Scalar.Yellow);
                 // dst3.Line(new cv.Point(mm.maxLoc.X, 0), new cv.Point(mm.maxLoc.X, dst3.Height), vbc.task.HighlightColor, vbc.task.lineWidth, vbc.task.lineType);
                 double filterZ = mm.maxLoc.X / (double)dst3.Width * vbc.task.MaxZmeters;
-                Mat depthMask = multi.split[2].InRange(filterZ - 0.05, filterZ + 0.05); // a 10 cm buffer surrounding the z value
+                Mat depthMask = vbc.task.pcSplit[2].InRange(filterZ - 0.05, filterZ + 0.05); // a 10 cm buffer surrounding the z value
                 dst2 = vbc.task.color.Clone();
                 dst2.SetTo(Scalar.White, depthMask);
                 double pixelsPerMeter = (double)dst2.Width / vbc.task.MaxZmeters;
@@ -58355,7 +58323,8 @@ namespace CS_Classes
             options.RunOpt();
             multi.Run(src);
             dst2 = ~multi.dst3;
-            cv.Point[][] rawContours = Cv2.FindContoursAsArray(dst2, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+            cv.Point[][] rawContours = Cv2.FindContoursAsArray(dst2, RetrievalModes.Tree, 
+                                                               ContourApproximationModes.ApproxSimple);
             cv.Point[][] contours = new cv.Point[rawContours.Length][];
             for (int j = 0; j < rawContours.Length; j++)
             {
