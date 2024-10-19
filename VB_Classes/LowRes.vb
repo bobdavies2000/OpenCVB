@@ -31,14 +31,18 @@ Public Class LowRes_Color : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
-        Dim index As Integer
-        For y = 0 To task.gridRows - 1
-            For x = 0 To task.gridCols - 1
-                Dim roi = task.gridRects(index)
-                index += 1
-                Dim mean = src(roi).Mean()
-                dst2(roi).SetTo(mean)
-            Next
+        'Dim index As Integer
+        'For y = 0 To task.gridRows - 1
+        '    For x = 0 To task.gridCols - 1
+        '        Dim roi = task.gridRects(index)
+        '        index += 1
+        '        Dim mean = src(roi).Mean()
+        '        dst2(roi).SetTo(mean)
+        '    Next
+        'Next
+        For Each roi In task.gridRects
+            Dim mean = src(roi).Mean()
+            dst2(roi).SetTo(mean)
         Next
     End Sub
 End Class
@@ -481,8 +485,16 @@ Public Class LowRes_MeasureColor : Inherits VB_Parent
         Next
 
         If task.heartBeat Or task.optionsChanged Then
-            Dim percent = (task.gridRects.Count - motionList.Count) / task.gridRects.Count
-            labels(3) = "Of the " + Format(percent, "0%") + " of cells were unchanged"
+            Static percentList As New List(Of Single)
+            percentList.Add(motionList.Count / task.gridRects.Count)
+            If percentList.Count > 3 Then percentList.RemoveAt(0)
+            task.motionPercent = percentList.Average
+            If task.gOptions.UseMotionConstructed.Checked = False Then
+                labels(3) = "100% of each image has motion."
+            Else
+                labels(3) = Format(task.motionPercent, "0%") + " each image contained motion (on average)."
+            End If
+            task.MotionLabel = labels(3)
         End If
     End Sub
 End Class
@@ -493,8 +505,6 @@ End Class
 
 Public Class LowRes_MeasureMotion : Inherits VB_Parent
     Dim measure As New LowRes_MeasureColor
-    Dim fullUpdate As Integer
-    Public percentChanged As Single
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         desc = "Show all the grid cells above the motionless value (an option)."
@@ -515,24 +525,26 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
             If measure.distances(i) > threshold Then
-                If indexList.Contains(i) = False Then task.motionRects.Add(roi)
                 For Each index In task.gridNeighbors(i)
                     If indexList.Contains(index) = False Then
-                        roi = task.gridRects(index)
                         indexList.Add(index)
-                        task.motionRects.Add(roi)
+                        task.motionRects.Add(task.gridRects(index))
                     End If
                 Next
             End If
         Next
 
         task.motionDetected = False
-        If task.motionRects.Count > 0 Then
-            For Each roi In task.motionRects
-                src(roi).CopyTo(dst3(roi))
-                If standaloneTest() Then dst0.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
-            Next
-            task.motionDetected = True
+        If task.frameCount < 10 Then ' some of the grid configurations are not compatible between cameras.
+            src.CopyTo(dst3)
+        Else
+            If task.motionRects.Count > 0 Then
+                For Each roi In task.motionRects
+                    src(roi).CopyTo(dst3(roi))
+                    If standaloneTest() Then dst0.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
+                Next
+                task.motionDetected = True
+            End If
         End If
     End Sub
 End Class

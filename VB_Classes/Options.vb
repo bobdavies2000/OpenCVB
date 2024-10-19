@@ -7885,8 +7885,11 @@ End Class
 Public Class Options_LowRes : Inherits VB_Parent
     Public colorDifferenceThreshold As Integer
     Public Sub New()
+        Dim thresholdVal = 3
+        If task.cameraName.StartsWith("StereoLabs ZED 2") Then thresholdVal = 4
+
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Color difference threshold", 0, 100, 3)
+            sliders.setupTrackBar("Color difference threshold", 0, 100, thresholdVal)
         End If
     End Sub
     Public Sub RunOpt()

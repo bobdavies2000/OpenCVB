@@ -23953,7 +23953,6 @@ namespace CS_Classes
     public class Grid_Basics_CS : VB_Parent
     {
         public List<cv.Rect> gridRects = new List<cv.Rect>();
-        public bool updateTaskgridRects = true;
         public Grid_Basics_CS()
         {
             desc = "Create a grid of squares covering the entire image.";
@@ -24068,6 +24067,7 @@ namespace CS_Classes
                         if (xSub > dst2.Width * 2 / 3) vbc.task.subDivisions.Add(8);
                     }
                 }
+                if (vbc.task.gridRects.Count() != gridRects.Count()) vbc.task.gridRects = gridRects;
             }
             if (standaloneTest())
             {
@@ -24077,7 +24077,6 @@ namespace CS_Classes
                 labels[2] = "Grid_Basics_CS " + gridRects.Count + " (" + vbc.task.gridRows + "X" + vbc.task.gridCols + ") " +
                             vbc.task.gridSize + "X" + vbc.task.gridSize + " regions";
             }
-            if (updateTaskgridRects) vbc.task.gridRects = gridRects;
         }
     }
 
@@ -24159,20 +24158,23 @@ namespace CS_Classes
         public int tilesPerRow;
         public int tilesPerCol;
         Options_Grid options = new Options_Grid();
+        Mat gridMask, gridMap;
+        public List<cv.Rect> gridRects = new List<cv.Rect>();
         public Grid_Rectangles_CS()
         {
-            vbc.task.gridMask = new Mat(dst2.Size(), MatType.CV_8U);
-            vbc.task.gridMap = new Mat(dst2.Size(), MatType.CV_32S);
+            gridMask = new Mat(dst2.Size(), MatType.CV_8U);
+            gridMap = new Mat(dst2.Size(), MatType.CV_32S);
             if (standaloneTest()) desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For";
         }
         public void RunAlg(Mat src)
         {
             options.RunOpt();
 
-            if (vbc.task.mouseClickFlag) vbc.task.gridROIclicked = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
+            if (vbc.task.mouseClickFlag) 
+                vbc.task.gridROIclicked = gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
             if (vbc.task.optionsChanged)
             {
-                vbc.task.gridRects.Clear();
+                gridRects.Clear();
                 for (int y = 0; y < dst2.Height; y += options.height)
                 {
                     for (int x = 0; x < dst2.Width; x += options.width)
@@ -24184,34 +24186,34 @@ namespace CS_Classes
                         {
                             if (y == 0) tilesPerRow += 1;
                             if (x == 0) tilesPerCol += 1;
-                            vbc.task.gridRects.Add(roi);
+                            gridRects.Add(roi);
                         }
                     }
                 }
-                vbc.task.gridMask.SetTo(0);
+                gridMask.SetTo(0);
                 for (int x = options.width; x < dst2.Width; x += options.width)
                 {
                     var p1 = new cv.Point(x, 0);
                     var p2 = new cv.Point(x, dst2.Height);
-                    vbc.task.gridMask.Line(p1, p2, cv.Scalar.All(255), vbc.task.lineWidth);
+                    gridMask.Line(p1, p2, cv.Scalar.All(255), vbc.task.lineWidth);
                 }
                 for (int y = options.height; y < dst2.Height; y += options.height)
                 {
                     var p1 = new cv.Point(0, y);
                     var p2 = new cv.Point(dst2.Width, y);
-                    vbc.task.gridMask.Line(p1, p2, cv.Scalar.All(255), vbc.task.lineWidth);
+                    gridMask.Line(p1, p2, cv.Scalar.All(255), vbc.task.lineWidth);
                 }
-                for (int i = 0; i < vbc.task.gridRects.Count; i++)
+                for (int i = 0; i < gridRects.Count; i++)
                 {
-                    var roi = vbc.task.gridRects[i];
-                    vbc.task.gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
+                    var roi = gridRects[i];
+                    gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
                 }
             }
             if (standaloneTest())
             {
                 vbc.task.color.CopyTo(dst2);
-                dst2.SetTo(Scalar.White, vbc.task.gridMask);
-                labels[2] = "Grid_Basics " + vbc.task.gridRects.Count + " (" + tilesPerRow + "X" + tilesPerCol + ") " +
+                dst2.SetTo(Scalar.White, gridMask);
+                labels[2] = "Grid_Basics " + gridRects.Count + " (" + tilesPerRow + "X" + tilesPerCol + ") " +
                             options.width + "X" + options.height + " regions";
             }
         }

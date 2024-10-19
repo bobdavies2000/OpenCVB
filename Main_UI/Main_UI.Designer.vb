@@ -53,6 +53,7 @@ Partial Class Main_UI
         Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.MagnifyTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.CameraSwitching = New System.Windows.Forms.Label()
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -61,9 +62,9 @@ Partial Class Main_UI
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackButton, Me.ForwardButton, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.RecentSep, Me.AvailableAlgorithms, Me.GroupCombo})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 36)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1400, 34)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1400, 38)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -73,7 +74,7 @@ Partial Class Main_UI
         Me.BackButton.Image = CType(resources.GetObject("BackButton.Image"), System.Drawing.Image)
         Me.BackButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.BackButton.Name = "BackButton"
-        Me.BackButton.Size = New System.Drawing.Size(34, 29)
+        Me.BackButton.Size = New System.Drawing.Size(34, 33)
         Me.BackButton.Text = "Back to Previous Algorithm"
         '
         'ForwardButton
@@ -248,7 +249,7 @@ Partial Class Main_UI
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(5, 2, 0, 2)
-        Me.MenuStrip1.Size = New System.Drawing.Size(1400, 33)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1400, 36)
         Me.MenuStrip1.TabIndex = 4
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -280,11 +281,22 @@ Partial Class Main_UI
         '
         Me.MagnifyTimer.Interval = 500
         '
+        'CameraSwitching
+        '
+        Me.CameraSwitching.AutoSize = True
+        Me.CameraSwitching.Font = New System.Drawing.Font("Microsoft Sans Serif", 28.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CameraSwitching.Location = New System.Drawing.Point(93, 236)
+        Me.CameraSwitching.Name = "CameraSwitching"
+        Me.CameraSwitching.Size = New System.Drawing.Size(519, 64)
+        Me.CameraSwitching.TabIndex = 5
+        Me.CameraSwitching.Text = "Setting Up Camera"
+        '
         'Main_UI
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1400, 748)
+        Me.Controls.Add(Me.CameraSwitching)
         Me.Controls.Add(Me.XYLoc)
         Me.Controls.Add(Me.AlgorithmDesc)
         Me.Controls.Add(Me.ToolStrip1)
@@ -333,4 +345,5 @@ Partial Class Main_UI
     Friend WithEvents Magnify As ToolStripButton
     Friend WithEvents MagnifyTimer As Timer
     Friend WithEvents RecentSep As ToolStripSeparator
+    Friend WithEvents CameraSwitching As Label
 End Class

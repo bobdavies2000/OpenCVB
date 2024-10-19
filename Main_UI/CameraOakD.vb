@@ -48,9 +48,6 @@ Public Class CameraOakD : Inherits GenericCamera
     End Sub
     Public Sub GetNextFrame(WorkingRes As cvb.Size)
         If cPtr = 0 Then Exit Sub
-        ' if it breaks here, it is because you are restarting the Oak-D camera.
-        ' I can't get that to work.  Restart OpenCVB and it will work fine.
-        ' Switching to another camera and then switching back to Oak-D will crash here.
         OakDWaitForFrame(cPtr)
 
         Static FirstPass = True

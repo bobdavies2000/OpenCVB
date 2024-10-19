@@ -2,7 +2,6 @@
 Imports System.Threading
 Public Class Grid_Basics : Inherits VB_Parent
     Public gridRects As New List(Of cvb.Rect)
-    Public updateTaskgridRects As Boolean = True
     Public Sub New()
         desc = "Create a grid of squares covering the entire image."
     End Sub
@@ -109,6 +108,7 @@ Public Class Grid_Basics : Inherits VB_Parent
                     If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(8)
                 End If
             Next
+            If task.gridRects.Count <> gridRects.Count Then task.gridRects = gridRects
         End If
         If standaloneTest() Then
             dst2 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
@@ -117,8 +117,70 @@ Public Class Grid_Basics : Inherits VB_Parent
             labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
                               CStr(task.gridSize) + "X" + CStr(task.gridSize) + " regions"
         End If
+    End Sub
+End Class
 
-        If updateTaskgridRects Then task.gridRects = gridRects
+
+
+
+
+
+
+
+Public Class Grid_Rectangles : Inherits VB_Parent
+    Public tilesPerRow As Integer
+    Public tilesPerCol As Integer
+    Dim options As New Options_Grid
+    Dim gridMask As cvb.Mat
+    Dim gridMap As cvb.Mat
+    Public gridRects As New List(Of cvb.Rect)
+    Public Sub New()
+        gridMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U)
+        gridMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32S)
+        If standaloneTest() Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        If task.optionsChanged Then
+            gridRects.Clear()
+            For y = 0 To dst2.Height - 1 Step options.height
+                For x = 0 To dst2.Width - 1 Step options.width
+                    Dim roi = New cvb.Rect(x, y, options.width, options.height)
+                    If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
+                    If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
+                    If roi.Width > 0 And roi.Height > 0 Then
+                        If y = 0 Then tilesPerRow += 1
+                        If x = 0 Then tilesPerCol += 1
+                        gridRects.Add(roi)
+                    End If
+                Next
+            Next
+
+            gridMask.SetTo(0)
+            For x = options.width To dst2.Width - 1 Step options.width
+                Dim p1 = New cvb.Point(CInt(x), 0), p2 = New cvb.Point(CInt(x), dst2.Height)
+                gridMask.Line(p1, p2, 255, task.lineWidth)
+            Next
+            For y = options.height To dst2.Height - 1 Step options.height
+                Dim p1 = New cvb.Point(0, CInt(y)), p2 = New cvb.Point(dst2.Width, CInt(y))
+                gridMask.Line(p1, p2, 255, task.lineWidth)
+            Next
+
+            For i = 0 To gridRects.Count - 1
+                Dim roi = gridRects(i)
+                gridMap.Rectangle(roi, i, -1)
+            Next
+        End If
+        If standaloneTest() Then
+            task.color.CopyTo(dst2)
+            dst2.SetTo(cvb.Scalar.White, gridMask)
+            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
+                          CStr(options.width) + "X" + CStr(options.height) + " regions"
+        End If
+        If task.mouseClickFlag Then
+            task.gridROIclicked = gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        End If
     End Sub
 End Class
 
@@ -192,65 +254,6 @@ Public Class Grid_List : Inherits VB_Parent
         Catch e As Exception
             MsgBox(e.Message)
         End Try
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Grid_Rectangles : Inherits VB_Parent
-    Public tilesPerRow As Integer
-    Public tilesPerCol As Integer
-    Dim options As New Options_Grid
-    Public Sub New()
-        task.gridMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U)
-        task.gridMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32S)
-        If standaloneTest() Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        If task.mouseClickFlag Then task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        If task.optionsChanged Then
-            task.gridRects.Clear()
-            For y = 0 To dst2.Height - 1 Step options.height
-                For x = 0 To dst2.Width - 1 Step options.width
-                    Dim roi = New cvb.Rect(x, y, options.width, options.height)
-                    If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
-                    If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
-                    If roi.Width > 0 And roi.Height > 0 Then
-                        If y = 0 Then tilesPerRow += 1
-                        If x = 0 Then tilesPerCol += 1
-                        task.gridRects.Add(roi)
-                    End If
-                Next
-            Next
-
-            task.gridMask.SetTo(0)
-            For x = options.width To dst2.Width - 1 Step options.width
-                Dim p1 = New cvb.Point(CInt(x), 0), p2 = New cvb.Point(CInt(x), dst2.Height)
-                task.gridMask.Line(p1, p2, 255, task.lineWidth)
-            Next
-            For y = options.height To dst2.Height - 1 Step options.height
-                Dim p1 = New cvb.Point(0, CInt(y)), p2 = New cvb.Point(dst2.Width, CInt(y))
-                task.gridMask.Line(p1, p2, 255, task.lineWidth)
-            Next
-
-            For i = 0 To task.gridRects.Count - 1
-                Dim roi = task.gridRects(i)
-                task.gridMap.Rectangle(roi, i, -1)
-            Next
-        End If
-        If standaloneTest() Then
-            task.color.CopyTo(dst2)
-            dst2.SetTo(cvb.Scalar.White, task.gridMask)
-            labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
-                          CStr(options.width) + "X" + CStr(options.height) + " regions"
-        End If
     End Sub
 End Class
 

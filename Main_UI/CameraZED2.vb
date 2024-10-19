@@ -1,5 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports sl
+Imports OpenCvSharp
 Public Class CameraZED2 : Inherits GenericCamera
     Dim zed As sl.Camera
     Dim init_params As New InitParameters()
@@ -58,6 +59,10 @@ Public Class CameraZED2 : Inherits GenericCamera
         pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC4,
                                            pointCloudSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
         cvb.Cv2.PatchNaNs(pointCloud, 0)
+        Dim infNans As cvb.Mat = pointCloud.Reshape(1, pointCloud.Rows * pointCloud.Cols)
+        Dim mask As cvb.Mat = infNans.Equals(Single.PositiveInfinity)
+        mask = mask.Reshape(3, pointCloud.Rows)
+        pointCloud.SetTo(0, mask)
 
         Dim zed_pose As New sl.Pose
         zed.GetPosition(zed_pose, REFERENCE_FRAME.WORLD)

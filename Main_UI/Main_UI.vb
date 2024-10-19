@@ -8,7 +8,6 @@ Imports VB_Classes
 Imports System.Management
 Imports cvext = OpenCvSharp.Extensions
 Imports System.ComponentModel
-Imports OpenCvSharp.Flann
 
 #Region "Globals"
 Module opencv_module
@@ -1038,6 +1037,7 @@ Public Class Main_UI
             End While
         End If
 
+        frameCount = 0
         setupCamPics()
 
         TreeButton_Click(sender, e)
@@ -1142,13 +1142,14 @@ Public Class Main_UI
             If fpsAlgorithm >= 100 Then fpsAlgorithm = 99
             If fpsCamera >= 100 Then fpsCamera = 99
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(algorithmCount) + " algorithms = " +
-                  CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + cameraName +
-                      " - Camera FPS/task FPS: " + Format(fpsCamera, "0") + "/" +
-                      Format(fpsAlgorithm, "0")
+                      CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + cameraName +
+                          " - Camera FPS/task FPS: " + Format(fpsCamera, "0") + "/" +
+                          Format(fpsAlgorithm, "0")
             If fpsListA.Count > 5 Then
                 fpsListA.RemoveAt(0)
                 fpsListC.RemoveAt(0)
             End If
+            If frameCount > 1 And CameraSwitching.Visible Then CameraSwitching.Visible = False
         End If
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
@@ -1167,6 +1168,8 @@ Public Class Main_UI
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
+            CameraSwitching.Visible = True
+            CameraSwitching.BringToFront()
             task.optionsChanged = True
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
             saveAlgorithmName = ""
@@ -1176,6 +1179,7 @@ Public Class Main_UI
             settings.cameraIndex = optionsForm.cameraIndex
             settings.testAllDuration = optionsForm.testDuration
 
+            frameCount = 0
             setupCamPics()
 
             jsonWrite()
@@ -1362,6 +1366,7 @@ Public Class Main_UI
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
         Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(WorkingRes.Width) + "x" + CStr(WorkingRes.Height)
+        resolutionDetails += " - Motion: " + task.MotionLabel
         If picLabels(0) <> "" Then
             If camLabel(0).Text <> picLabels(0) + " - RGB " + resolutionDetails Then
                 camLabel(0).Text = picLabels(0)
@@ -1426,9 +1431,10 @@ Public Class Main_UI
                 camera = getCamera()
                 newCameraImages = False
             End If
-            If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
+            If camera Is Nothing Then
+                Continue While ' transition from one camera to another.  Problem showed up once.
+            End If
             If restartCameraRequest = False Then
-                'Application.DoEvents()
                 camera.GetNextFrame(settings.WorkingRes)
 
                 ' The first few frames from the camera are junk.  Skip them.
