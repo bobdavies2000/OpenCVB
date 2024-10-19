@@ -43,6 +43,7 @@ End Class
 
 
 
+
 Public Class LowRes_Depth : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Grid of mean depth values", "Resized task.lowResDepth"}
@@ -496,14 +497,17 @@ End Class
 
 Public Class LowRes_MeasureMotion : Inherits VB_Parent
     Dim measure As New LowRes_MeasureColor
+    Public motionDetected As Boolean
+    Public motionRects As New List(Of cvb.Rect)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
+        labels(3) = "A composite of an earlier image and the motion from the latest input"
         desc = "Show all the grid cells above the motionless value (an option)."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then dst0 = src.Clone
 
-        If task.optionsChanged Then task.motionRects = New List(Of cvb.Rect)
+        If task.optionsChanged Then motionRects = New List(Of cvb.Rect)
 
         measure.Run(src)
         dst2 = measure.dst2
@@ -511,7 +515,7 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
 
         Dim threshold = measure.options.colorDifferenceThreshold
 
-        task.motionRects.Clear()
+        motionRects.Clear()
         Dim indexList As New List(Of Integer)
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
@@ -519,22 +523,22 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
                 For Each index In task.gridNeighbors(i)
                     If indexList.Contains(index) = False Then
                         indexList.Add(index)
-                        task.motionRects.Add(task.gridRects(index))
+                        motionRects.Add(task.gridRects(index))
                     End If
                 Next
             End If
         Next
 
-        task.motionDetected = False
+        motionDetected = False
         If task.frameCount < 10 Then ' some of the grid configurations are not compatible between cameras.
             src.CopyTo(dst3)
         Else
-            If task.motionRects.Count > 0 Then
-                For Each roi In task.motionRects
+            If motionRects.Count > 0 Then
+                For Each roi In motionRects
                     src(roi).CopyTo(dst3(roi))
                     If standaloneTest() Then dst0.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
                 Next
-                task.motionDetected = True
+                motionDetected = True
             End If
         End If
     End Sub

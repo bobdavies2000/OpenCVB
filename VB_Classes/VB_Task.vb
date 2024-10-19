@@ -714,29 +714,36 @@ Public Class VBtask : Implements IDisposable
 
             If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
 
-            task.motionDetected = True
-            task.motionRect = New cvb.Rect(0, 0, src.Width, src.Height)
-
             task.gOptions.unFiltered.Checked = True ' until the motion rectangle problems are resolved.
         End If
 
-        If task.motionDetected Or heartBeat Then
-            task.pcSplit = task.pointCloud.Split
+        motion.Run(src)
 
-            If task.optionsChanged Then task.maxDepthMask.SetTo(0)
-            task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc)
+        If task.gOptions.UseMotionConstructed.Checked Then
+            task.color = motion.color.Clone
+            task.pointCloud = motion.pointcloud.Clone
+            task.motionMask = motion.motionMask
+            task.motionDetected = motion.measure.motionDetected
+            task.motionRects = New List(Of cvb.Rect)(motion.measure.motionRects)
+        End If
 
-            task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs()
-            task.noDepthMask = Not task.depthMask
+        task.pcSplit = task.pointCloud.Split
 
-            If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
-                Dim xRatio = task.xRangeDefault / task.xRange
-                Dim yRatio = task.yRangeDefault / task.yRange
-                task.pcSplit(0) *= xRatio
-                task.pcSplit(1) *= yRatio
+        If task.optionsChanged Then task.maxDepthMask.SetTo(0)
+        task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters,
+                                                            cvb.ThresholdTypes.Trunc)
 
-                cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
-            End If
+        task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary).
+                                         ConvertScaleAbs()
+        task.noDepthMask = Not task.depthMask
+
+        If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+            Dim xRatio = task.xRangeDefault / task.xRange
+            Dim yRatio = task.yRangeDefault / task.yRange
+            task.pcSplit(0) *= xRatio
+            task.pcSplit(1) *= yRatio
+
+            cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
 
         colorizer.RunAlg(task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc))
@@ -749,7 +756,6 @@ Public Class VBtask : Implements IDisposable
             task.pcSplit(2).SetTo(0, Not task.reliableDepthMask)
         End If
 
-        motion.Run(src)
         TaskTimer.Enabled = True
 
         If task.gOptions.CreateGif.Checked Then

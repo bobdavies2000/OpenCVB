@@ -2,27 +2,28 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits VB_Parent
-    Dim measure As New LowRes_MeasureMotion
+    Public measure As New LowRes_MeasureMotion
     Dim diff As New Diff_Basics
     Dim depthRGB As cvb.Mat
-    Dim leftImage As cvb.Mat
-    Dim rightImage As cvb.Mat
-    Dim pointcloud As cvb.Mat
+    Public pointcloud As cvb.Mat
+    Public color As cvb.Mat
+    Public motionMask As cvb.Mat
     Public Sub New()
-        task.motionMask = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        motionMask = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
         labels(3) = "The difference between the motion-constructed image and the current image.  " +
-                    "It is often just individual pixels."
+                    "Highlighted pixels may often be nearly identical."
         desc = "Isolate all motion in the scene"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         measure.Run(src)
-        dst2 = measure.dst3 ' only cells with motion detected are updated in this image.
+        color = measure.dst3.Clone
+        dst2 = color
         labels(2) = measure.labels(2)
 
-        task.motionMask.SetTo(0)
-        If task.motionDetected Then
-            For Each roi In task.motionRects
-                task.motionMask(roi).SetTo(255)
+        motionMask.SetTo(0)
+        If measure.motionDetected Then
+            For Each roi In measure.motionRects
+                motionMask(roi).SetTo(255)
             Next
         End If
 
@@ -32,27 +33,14 @@ Public Class Motion_Basics : Inherits VB_Parent
             dst3 = diff.dst2
         End If
 
-        Dim percentChanged = task.motionRects.Count / task.gridRects.Count
+        Dim percentChanged = measure.motionRects.Count / task.gridRects.Count
 
         If task.heartBeatLT And task.gOptions.UpdateOnHeartbeat.Checked Or depthRGB Is Nothing Then
             depthRGB = task.depthRGB.Clone
-            leftImage = task.leftView.Clone
-            rightImage = task.rightView.Clone
             pointcloud = task.pointCloud.Clone
         Else
-            If task.gOptions.UseMotionConstructed.Checked Then
-                task.color = dst2.Clone ' updated by LowRes_MeasureMotion
-
-                task.depthRGB.CopyTo(depthRGB, task.motionMask)
-                task.leftView.CopyTo(leftImage, task.motionMask)
-                task.rightView.CopyTo(rightImage, task.motionMask)
-                task.pointCloud.CopyTo(pointcloud, task.motionMask)
-
-                task.depthRGB = depthRGB.Clone
-                task.leftView = leftImage.Clone
-                task.rightView = rightImage.Clone
-                task.pointCloud = pointcloud.Clone
-            End If
+            task.depthRGB.CopyTo(depthRGB, motionMask)
+            task.pointCloud.CopyTo(pointcloud, motionMask)
         End If
     End Sub
 End Class

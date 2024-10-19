@@ -334,3 +334,43 @@ Public Class LeftRight_Features : Inherits VB_Parent
         labels = feat.labels
     End Sub
 End Class
+
+
+
+
+
+
+Public Class LeftRight_LowRes : Inherits VB_Parent
+    Dim lowResL As New LowRes_Color
+    Dim lowResR As New LowRes_Color
+    Public Sub New()
+        desc = "Get the lowRes image for the left and right views"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lowResL.Run(task.leftView)
+        dst2 = lowResL.dst2
+
+        lowResR.Run(task.rightView)
+        dst3 = lowResR.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LeftRight_Motion : Inherits VB_Parent
+    Dim lowResL As New LowRes_Color
+    Dim lowResR As New LowRes_Color
+    Public Sub New()
+        desc = "Get the lowRes image for the left and right views"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lowResL.Run(task.leftView)
+        dst2 = lowResL.dst2
+
+        lowResR.Run(task.rightView)
+        dst3 = lowResR.dst2
+    End Sub
+End Class

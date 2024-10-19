@@ -1856,10 +1856,12 @@ End Enum
 	If algorithmName = "LeftRight_Features_CS" Then return new LeftRight_Features_CS
 	If algorithmName = "LeftRight_Lines" Then return new LeftRight_Lines
 	If algorithmName = "LeftRight_Lines_CS" Then return new LeftRight_Lines_CS
+	If algorithmName = "LeftRight_LowRes" Then return new LeftRight_LowRes
 	If algorithmName = "LeftRight_Markers" Then return new LeftRight_Markers
 	If algorithmName = "LeftRight_Markers_CS" Then return new LeftRight_Markers_CS
 	If algorithmName = "LeftRight_Markers1" Then return new LeftRight_Markers1
 	If algorithmName = "LeftRight_Markers1_CS" Then return new LeftRight_Markers1_CS
+	If algorithmName = "LeftRight_Motion" Then return new LeftRight_Motion
 	If algorithmName = "LeftRight_Palettized" Then return new LeftRight_Palettized
 	If algorithmName = "LeftRight_Palettized_CS" Then return new LeftRight_Palettized_CS
 	If algorithmName = "LeftRight_RedCloudBoth" Then return new LeftRight_RedCloudBoth
