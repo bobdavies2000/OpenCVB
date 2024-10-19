@@ -2799,6 +2799,7 @@ End Enum
 	If algorithmName = "PhaseCorrelate_HanningWindow_CS" Then return new PhaseCorrelate_HanningWindow_CS
 	If algorithmName = "Photon_Basics" Then return new Photon_Basics
 	If algorithmName = "Photon_Basics_CS" Then return new Photon_Basics_CS
+	If algorithmName = "Photon_Distance3D" Then return new Photon_Distance3D
 	If algorithmName = "Photon_Subtraction" Then return new Photon_Subtraction
 	If algorithmName = "Photon_Subtraction_CS" Then return new Photon_Subtraction_CS
 	If algorithmName = "Photon_Test" Then return new Photon_Test

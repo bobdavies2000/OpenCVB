@@ -31,15 +31,6 @@ Public Class LowRes_Color : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
-        'Dim index As Integer
-        'For y = 0 To task.gridRows - 1
-        '    For x = 0 To task.gridCols - 1
-        '        Dim roi = task.gridRects(index)
-        '        index += 1
-        '        Dim mean = src(roi).Mean()
-        '        dst2(roi).SetTo(mean)
-        '    Next
-        'Next
         For Each roi In task.gridRects
             Dim mean = src(roi).Mean()
             dst2(roi).SetTo(mean)

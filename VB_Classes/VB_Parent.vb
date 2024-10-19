@@ -154,7 +154,6 @@ Public Class VB_Parent : Implements IDisposable
         dst.FillConvexPoly(vertices, color, task.lineType)
     End Sub
     Public Sub AddPlotScale(dst As cvb.Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
-        ' draw a scale along the side
         Dim spacer = CInt(dst.Height / (lineCount + 1))
         Dim spaceVal = CInt((maxVal - minVal) / (lineCount + 1))
         If lineCount > 1 Then If spaceVal < 1 Then spaceVal = 1
@@ -165,8 +164,9 @@ Public Class VB_Parent : Implements IDisposable
             dst.Line(p1, p2, cvb.Scalar.White, task.cvFontThickness)
             Dim nextVal = (maxVal - spaceVal * i)
             Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt2))
-            cvb.Cv2.PutText(dst, nextText, p1, cvb.HersheyFonts.HersheyPlain, task.cvFontSize, cvb.Scalar.White,
-                           task.cvFontThickness, task.lineType)
+            Dim p3 = New cvb.Point(0, p1.Y + 12)
+            cvb.Cv2.PutText(dst, nextText, p3, cvb.HersheyFonts.HersheyPlain, task.cvFontSize,
+                            cvb.Scalar.White, task.cvFontThickness, task.lineType)
         Next
     End Sub
     Public Sub DrawFatLine(p1 As cvb.Point2f, p2 As cvb.Point2f, dst As cvb.Mat, fatColor As cvb.Scalar)
@@ -207,8 +207,9 @@ Public Class VB_Parent : Implements IDisposable
         Return Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y) + (p1.Z - p2.Z) * (p1.Z - p2.Z))
     End Function
     Public Function distance3D(p1 As cvb.Vec3b, p2 As cvb.Vec3b) As Single
-        Return Math.Sqrt((CInt(p1.Item0) - CInt(p2.Item0)) * (CInt(p1.Item0) - CInt(p2.Item0)) + (CInt(p1.Item1) - CInt(p2.Item1)) * (CInt(p1.Item1) - CInt(p2.Item1)) +
-                         (CInt(p1.Item2) - CInt(p2.Item2)) * (CInt(p1.Item2) - CInt(p2.Item2)))
+        Return Math.Sqrt((CInt(p1(0)) - CInt(p2(0))) * (CInt(p1(0)) - CInt(p2(0))) +
+                         (CInt(p1(1)) - CInt(p2(1))) * (CInt(p1(1)) - CInt(p2(1))) +
+                         (CInt(p1(2)) - CInt(p2(2))) * (CInt(p1(2)) - CInt(p2(2))))
     End Function
     Public Function distance3D(p1 As cvb.Point3i, p2 As cvb.Point3i) As Single
         Return Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y) + (p1.Z - p2.Z) * (p1.Z - p2.Z))

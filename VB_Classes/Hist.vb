@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
 Imports NAudio.Gui
 Imports OpenCvSharp
 Imports cvb = OpenCvSharp
@@ -48,6 +49,18 @@ Public Class Hist_Basics : Inherits VB_Parent
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+        If task.heartBeat Then
+            strOut = "Distance" + vbTab + "Value" + vbTab + "Count" + vbTab + "min val: " +
+                     vbTab + Format(mm.minVal, fmt1) + vbTab + "max val:" + vbTab +
+                     Format(mm.maxVal, fmt1) + vbCrLf
+            Dim incr As Single = (mm.maxVal - mm.minVal) / task.histogramBins
+            For i = 0 To histArray.Count - 1
+                strOut += CStr(i) + ":" + vbTab + Format(i * incr, fmt1) + vbTab +
+                          Format(histArray(i) / 1000, fmt3) + "k" + vbCrLf
+            Next
+            SetTrueText(strOut, 3)
+        End If
 
         plot.Run(histogram)
         histogram = plot.histogram ' reflect any updates to the 0 entry...  

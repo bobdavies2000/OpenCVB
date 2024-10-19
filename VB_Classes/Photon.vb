@@ -112,3 +112,54 @@ Public Class Photon_Subtraction : Inherits VB_Parent
         lastImage = src
     End Sub
 End Class
+
+
+
+
+
+Public Class Photon_Distance3D : Inherits VB_Parent
+    Dim lowRes As New LowRes_Color
+    Dim hist As New Hist_Basics
+    Dim distances As New List(Of Single)
+    Public Sub New()
+        hist.plot.removeZeroEntry = False
+        task.gOptions.HistBinBar.Value = 10
+        task.gOptions.UseMotionConstructed.Checked = False
+        desc = "Plot a histogram of the 3D distance of each picture from the previous image."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lowRes.Run(src)
+
+        Dim currColors As New List(Of cvb.Vec3b)
+        For Each roi In task.gridRects
+            currColors.Add(lowRes.dst2.Get(Of cvb.Vec3b)(roi.Y, roi.X))
+        Next
+
+        Static lastColors As New List(Of cvb.Vec3b)(currColors)
+        If task.optionsChanged Then
+            lastColors = New List(Of cvb.Vec3b)(currColors)
+        End If
+
+        For i = 0 To currColors.Count - 1
+            distances.Add(distance3D(lastColors(i), currColors(i)))
+        Next
+
+        lastColors = New List(Of cvb.Vec3b)(currColors)
+        labels(2) = "Min distance 3D = " + Format(distances.Min, fmt1) + " " +
+                    "Average = " + Format(distances.Average, fmt1) + " " +
+                    "max = " + Format(distances.Max, fmt1) + " " +
+                    "Distances count = " + Format(distances.Count, "0,000")
+
+        hist.Run(cvb.Mat.FromPixelData(distances.Count, 1, cvb.MatType.CV_32F, distances.ToArray))
+        dst2 = hist.dst2
+
+        If distances.Count > 100000 Then
+            Dim tmpDist As New List(Of Single)
+            For i = distances.Count / 2 To distances.Count - 1
+                tmpDist.Add(distances(i))
+            Next
+            distances = New List(Of Single)(tmpDist)
+        End If
+        SetTrueText(hist.strOut, 3)
+    End Sub
+End Class
