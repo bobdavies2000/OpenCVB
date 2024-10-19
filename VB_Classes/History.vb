@@ -46,7 +46,7 @@ Public Class History_MotionRect : Inherits VB_Parent
         If task.heartBeat Then dst2 = src.Clone
 
         If task.motionDetected Then
-            src(task.motionRect).CopyTo(dst2(task.motionRect))
+            src.CopyTo(dst2, task.motionMask)
         End If
     End Sub
 End Class

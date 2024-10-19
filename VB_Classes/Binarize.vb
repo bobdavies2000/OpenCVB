@@ -218,7 +218,7 @@ Public Class Binarize_DepthTiers : Inherits VB_Parent
         If task.heartBeat Then
             dst2 = dst0.Clone
         ElseIf task.motionDetected Then
-            dst0(task.motionRect).CopyTo(dst2(task.motionRect))
+            dst0.CopyTo(dst2, task.motionMask)
         End If
         classCount = binar4.classCount + tiers.classCount
     End Sub

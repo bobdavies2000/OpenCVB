@@ -2167,6 +2167,7 @@ End Enum
 	If algorithmName = "Moments_CentroidKalman_CS" Then return new Moments_CentroidKalman_CS
 	If algorithmName = "Motion_Basics" Then return new Motion_Basics
 	If algorithmName = "Motion_Basics_QT_CS" Then return new Motion_Basics_QT_CS
+	If algorithmName = "Motion_BasicsTest" Then return new Motion_BasicsTest
 	If algorithmName = "Motion_BGSub" Then return new Motion_BGSub
 	If algorithmName = "Motion_BGSub_CC" Then return new CPP_Basics(ccFunctionNames._Motion_BGSub_CC)
 	If algorithmName = "Motion_BGSub_CS" Then return new Motion_BGSub_CS
@@ -2191,8 +2192,6 @@ End Enum
 	If algorithmName = "Motion_Grid_CS" Then return new Motion_Grid_CS
 	If algorithmName = "Motion_Grid_MP" Then return new Motion_Grid_MP
 	If algorithmName = "Motion_Grid_MP_CS" Then return new Motion_Grid_MP_CS
-	If algorithmName = "Motion_History" Then return new Motion_History
-	If algorithmName = "Motion_History_CS" Then return new Motion_History_CS
 	If algorithmName = "Motion_HistoryTest" Then return new Motion_HistoryTest
 	If algorithmName = "Motion_HistoryTest_CS" Then return new Motion_HistoryTest_CS
 	If algorithmName = "Motion_Intersect" Then return new Motion_Intersect
@@ -2207,9 +2206,7 @@ End Enum
 	If algorithmName = "Motion_RectTest_CS" Then return new Motion_RectTest_CS
 	If algorithmName = "Motion_RedCloud" Then return new Motion_RedCloud
 	If algorithmName = "Motion_RedCloud_CS" Then return new Motion_RedCloud_CS
-	If algorithmName = "Motion_Simple" Then return new Motion_Simple
 	If algorithmName = "Motion_Simple_CC" Then return new CPP_Basics(ccFunctionNames._Motion_Simple_CC)
-	If algorithmName = "Motion_Simple_CS" Then return new Motion_Simple_CS
 	If algorithmName = "Motion_TestSingle" Then return new Motion_TestSingle
 	If algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
 	If algorithmName = "Motion_ThruCorrelation_CS" Then return new Motion_ThruCorrelation_CS

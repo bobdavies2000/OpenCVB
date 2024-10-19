@@ -5,14 +5,14 @@ Public Class CameraK4A : Inherits GenericCamera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
 
-        cPtr = K4AOpen(captureRes.Width, captureRes.Height)
+        cPtr = A4KOpen(captureRes.Width, captureRes.Height)
         cameraName = deviceName
         If cPtr <> 0 Then
-            deviceCount = K4ADeviceCount(cPtr)
-            Dim strPtr = K4ADeviceName(cPtr) ' The width and height of the image are set in the constructor.
+            deviceCount = A4KDeviceCount(cPtr)
+            Dim strPtr = A4KDeviceName(cPtr) ' The width and height of the image are set in the constructor.
             serialNumber = Marshal.PtrToStringAnsi(strPtr)
 
-            Dim ptr = K4AIntrinsics(cPtr)
+            Dim ptr = A4KIntrinsics(cPtr)
             Dim intrinsicsLeftOutput = Marshal.PtrToStructure(Of intrinsicsData)(ptr)
             cameraInfo.ppx = intrinsicsLeftOutput.cx
             cameraInfo.ppy = intrinsicsLeftOutput.cy
@@ -47,7 +47,7 @@ Public Class CameraK4A : Inherits GenericCamera
         Try
             Dim imuFrame As IntPtr
             If cPtr = 0 Then Exit Sub
-            imuFrame = K4AWaitFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
+            imuFrame = A4KWaitFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
             If imuFrame = 0 Then
                 Debug.WriteLine("KinectWaitFrame has returned without any image.")
                 failedImageCount += 1
@@ -74,20 +74,24 @@ Public Class CameraK4A : Inherits GenericCamera
             If cPtr = 0 Then Exit Sub
 
             SyncLock cameraLock
-                uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, K4AColor(cPtr)).Clone
+                uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
+                                                cvb.MatType.CV_8UC3, A4KColor(cPtr)).Clone
 
                 ' so depth data fits into 0-255 (approximately)
-                uiLeft = (cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_16U,
-                                          K4ALeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone
+                uiLeft = (cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
+                                                cvb.MatType.CV_16U, A4KLeftView(cPtr)) * 0.06).ToMat.
+                                                ConvertScaleAbs().
+                                                CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone
                 uiRight = uiLeft.Clone
                 If captureRes <> WorkingRes Then
-                    Dim ptr = K4APointCloud(cPtr)
+                    Dim ptr = A4KPointCloud(cPtr)
                     Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
-                                                    cvb.MatType.CV_16UC3, ptr).
+                                                    cvb.MatType.CV_16SC3, ptr).
                                                     Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
                     tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 Else
-                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16SC3, K4APointCloud(cPtr))
+                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                                    cvb.MatType.CV_16SC3, A4KPointCloud(cPtr))
                     tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 End If
             End SyncLock
@@ -97,7 +101,7 @@ Public Class CameraK4A : Inherits GenericCamera
         End Try
     End Sub
     Public Sub stopCamera()
-        If cPtr <> 0 Then K4AClose(cPtr)
+        If cPtr <> 0 Then A4KClose(cPtr)
         cPtr = 0
     End Sub
 End Class

@@ -39857,50 +39857,6 @@ namespace CS_Classes
 
 
 
-    public class Motion_Simple_CS : VB_Parent
-    {
-        public Diff_Basics diff = new Diff_Basics();
-        public int cumulativePixels;
-        public Options_Motion options = new Options_Motion();
-        public Motion_Simple_CS()
-        {
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            labels[3] = "Accumulated changed pixels from the last heartbeat";
-            desc = "Accumulate differences from the previous BGR image.";
-        }
-        public void RunAlg(Mat src)
-        {
-            options.RunOpt();
-            diff.Run(src);
-            dst2 = diff.dst2;
-            if (vbc.task.heartBeat) cumulativePixels = 0;
-            if (diff.changedPixels > 0 || vbc.task.heartBeat)
-            {
-                cumulativePixels += diff.changedPixels;
-                if (cumulativePixels / src.Total() > options.cumulativePercentThreshold ||
-                    diff.changedPixels > options.motionThreshold ||
-                    vbc.task.optionsChanged)
-                {
-                    vbc.task.motionRect = new cv.Rect(0, 0, dst2.Width, dst2.Height);
-                }
-                if (vbc.task.motionRect.Width == dst2.Width || vbc.task.heartBeat)
-                {
-                    dst2.CopyTo(dst3);
-                    cumulativePixels = 0;
-                }
-                else
-                {
-                    dst3.SetTo(255, dst2);
-                }
-            }
-            var threshold = src.Total() * options.cumulativePercentThreshold;
-            strOut = "Cumulative threshold = " + (threshold / 1000).ToString() + "k ";
-            labels[2] = strOut + "Current cumulative pixels changed = " + (cumulativePixels / 1000).ToString() + "k";
-        }
-    }
-
-
-
 
     public class Motion_ThruCorrelation_CS : VB_Parent
     {
@@ -40332,26 +40288,6 @@ namespace CS_Classes
         }
     }
 
-
-
-
-    public class Motion_History_CS : VB_Parent
-    {
-        public Motion_Simple motionCore = new Motion_Simple();
-        History_Basics frames = new History_Basics();
-        public Motion_History_CS()
-        {
-            vbc.task.frameHistoryCount = 10;
-            desc = "Accumulate differences from the previous BGR images.";
-        }
-        public void RunAlg(Mat src)
-        {
-            motionCore.Run(src);
-            dst2 = motionCore.dst2;
-            frames.Run(dst2);
-            dst3 = frames.dst2;
-        }
-    }
 
 
 

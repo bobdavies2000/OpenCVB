@@ -1295,7 +1295,7 @@ Public Class Depth_StableMin : Inherits VB_Parent
             stableMin = src.Clone
             dst3.SetTo(0)
         ElseIf task.motionDetected Then
-            src(task.motionRect).CopyTo(stableMin(task.motionRect))
+            src.CopyTo(stableMin, task.motionMask)
             If src.Type <> stableMin.Type Then src.ConvertTo(src, stableMin.Type)
             stableMin.CopyTo(src, task.noDepthMask)
             cvb.Cv2.Min(src, stableMin, stableMin)
@@ -1326,7 +1326,7 @@ Public Class Depth_StableMax : Inherits VB_Parent
             stableMax = src.Clone
             dst3.SetTo(0)
         ElseIf task.motionDetected Then
-            src(task.motionRect).CopyTo(stableMax(task.motionRect))
+            src.CopyTo(stableMax, task.motionMask)
             If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
             stableMax.CopyTo(src, task.noDepthMask)
             cvb.Cv2.Min(src, stableMax, stableMax)

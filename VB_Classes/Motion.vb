@@ -3,6 +3,7 @@ Imports System.Threading
 Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits VB_Parent
     Dim measure As New LowRes_MeasureMotion
+    Dim diff As New Diff_Basics
     Dim depthRGB As cvb.Mat
     Dim leftImage As cvb.Mat
     Dim rightImage As cvb.Mat
@@ -26,15 +27,14 @@ Public Class Motion_Basics : Inherits VB_Parent
         End If
 
         If standaloneTest() Then ' show any differences
-            Static diff As New Diff_Basics
             diff.lastFrame = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             diff.Run(src)
             dst3 = diff.dst2
         End If
 
-        Dim updateImages As Boolean = If(task.FirstPass, True, task.gOptions.UpdateOnHeartbeat.Checked)
-        If measure.percentChanged > 0.5 Or task.heartBeatLT Then updateImages = True
-        If measure.fullImageUpdate And updateImages Or depthRGB Is Nothing Then
+        Dim percentChanged = task.motionRects.Count / task.gridRects.Count
+
+        If task.heartBeatLT And task.gOptions.UpdateOnHeartbeat.Checked Or depthRGB Is Nothing Then
             depthRGB = task.depthRGB.Clone
             leftImage = task.leftView.Clone
             rightImage = task.rightView.Clone
@@ -56,6 +56,36 @@ Public Class Motion_Basics : Inherits VB_Parent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Motion_BasicsTest : Inherits VB_Parent
+    Dim diff As New Diff_Basics
+    Dim measure As New LowRes_MeasureMotion
+    Public Sub New()
+        task.gOptions.UseMotionConstructed.Checked = False
+        task.gOptions.ShowMotionRectangle.Checked = True
+        desc = "Display the difference between task.color and src to verify Motion_Basics is working"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.gOptions.UseMotionConstructed.Checked Then
+            SetTrueText("Uncheck 'Use Motion-Constructed images' to validate Motion_Basics", 3)
+            Exit Sub
+        End If
+
+        measure.Run(src)
+
+        diff.lastFrame = measure.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        diff.Run(src)
+        dst2 = diff.dst2
+
+        labels(2) = "Pixels that were different: " + CStr(dst2.CountNonZero)
+    End Sub
+End Class
+
 
 
 
@@ -92,11 +122,6 @@ Public Class Motion_BGSub_QT : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         task.motionDetected = True
-        If task.heartBeat Then
-            task.motionRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
-            Exit Sub
-        End If
-        task.motionRect = New cvb.Rect
 
         If src.Channels() <> 1 Then
             bgSub.Run(src)
@@ -115,76 +140,18 @@ Public Class Motion_BGSub_QT : Inherits VB_Parent
                 Dim rc = task.redCells.ElementAt(i)
                 nextRect = nextRect.Union(rc.rect)
             Next
-
-            rectList.Add(nextRect)
-            For Each r In rectList
-                If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
-            Next
-            If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
-            If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
-                task.motionRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
-            Else
-                If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then task.motionDetected = False
-            End If
         End If
 
         If standaloneTest() Then
-            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
             If task.redCells.Count > 1 Then
                 labels(2) = CStr(task.redCells.Count) + " RedMask cells had motion"
             Else
                 labels(2) = "No motion detected"
             End If
             labels(3) = ""
-            If task.motionRect.Width > 0 Then
-                labels(3) = "Rect width = " + CStr(task.motionRect.Width) + ", height = " + CStr(task.motionRect.Height)
-            End If
         End If
     End Sub
 End Class
-
-
-
-
-
-
-'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_Simple : Inherits VB_Parent
-    Public diff As New Diff_Basics
-    Public cumulativePixels As Integer
-    Public options As New Options_Motion
-    Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        labels(3) = "Accumulated changed pixels from the last heartbeat"
-        desc = "Accumulate differences from the previous BGR image."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        diff.Run(src)
-        dst2 = diff.dst2
-        If task.heartBeat Then cumulativePixels = 0
-        If diff.changedPixels > 0 Or task.heartBeat Then
-            cumulativePixels += diff.changedPixels
-            If cumulativePixels / src.Total > options.cumulativePercentThreshold Or diff.changedPixels > options.motionThreshold Or
-                task.optionsChanged Then
-                task.motionRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
-            End If
-            If task.motionRect.Width = dst2.Width Or task.heartBeat Then
-                dst2.CopyTo(dst3)
-                cumulativePixels = 0
-            Else
-                dst3.SetTo(255, dst2)
-            End If
-        End If
-
-        Dim threshold = src.Total * options.cumulativePercentThreshold
-        strOut = "Cumulative threshold = " + CStr(CInt(threshold / 1000)) + "k "
-        labels(2) = strOut + "Current cumulative pixels changed = " + CStr(CInt(cumulativePixels / 1000)) + "k"
-    End Sub
-End Class
-
-
 
 
 
@@ -549,29 +516,6 @@ Public Class Motion_HistoryTest : Inherits VB_Parent
 
         dst2 = frames.dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
         labels(2) = "Cumulative diff for the last " + CStr(task.frameHistoryCount) + " frames"
-    End Sub
-End Class
-
-
-
-
-
-
-
-'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_History : Inherits VB_Parent
-    Public motionCore As New Motion_Simple
-    Dim frames As New History_Basics
-    Public Sub New()
-        task.gOptions.FrameHistory.Value = 10
-        desc = "Accumulate differences from the previous BGR images."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        motionCore.Run(src)
-        dst2 = motionCore.dst2
-
-        frames.Run(dst2)
-        dst3 = frames.dst2
     End Sub
 End Class
 

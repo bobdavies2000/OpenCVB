@@ -76,12 +76,12 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
             uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
                                                  cvb.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone
 
-            Dim acc = Zed2Acceleration(cPtr)
-            Dim accel = Marshal.PtrToStructure(Of cvb.Point3f)(acc)
-            IMU_Acceleration = New cvb.Point3f(-accel.X, accel.Y, -accel.Z)
+            Dim accPtr = Zed2Acceleration(cPtr)
+            Dim accel = Marshal.PtrToStructure(Of cvb.Point3d)(accPtr)
+            IMU_Acceleration = New cvb.Point3f(accel.X, accel.Y, accel.Z)
 
-            Dim ang = Zed2AngularVelocity(cPtr)
-            IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(ang)
+            Dim angPtr = Zed2AngularVelocity(cPtr)
+            IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(angPtr)
             IMU_AngularVelocity *= 0.0174533 ' Zed 2 gyro is in degrees/sec
             IMU_AngularVelocity.Z *= -1 ' make it consistent with the other cameras.
 
@@ -90,7 +90,6 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
             IMU_TimeStamp -= imuStartTime
         End SyncLock
 
-        ' GC.Collect()
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

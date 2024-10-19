@@ -494,7 +494,6 @@ End Class
 Public Class LowRes_MeasureMotion : Inherits VB_Parent
     Dim measure As New LowRes_MeasureColor
     Dim fullUpdate As Integer
-    Public fullImageUpdate As Boolean
     Public percentChanged As Single
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
@@ -502,7 +501,8 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then dst0 = src.Clone
-        fullImageUpdate = False
+
+        If task.optionsChanged Then task.motionRects = New List(Of cvb.Rect)
 
         measure.Run(src)
         dst2 = measure.dst2
@@ -526,22 +526,8 @@ Public Class LowRes_MeasureMotion : Inherits VB_Parent
             End If
         Next
 
-        percentChanged = task.motionRects.Count / task.gridRects.Count
-        If task.heartBeat Or percentChanged > 0.5 Then
-            Static lastFrameCount As Integer = task.frameCount
-            labels(2) = measure.labels(3)
-            fullUpdate += 1
-            fullImageUpdate = True
-            dst3 = src.Clone
-            Dim frameCount = task.frameCount - lastFrameCount
-            labels(3) = Format(fullUpdate / frameCount, "0%") + " of the time the full frame was used." +
-                        "  Minimum is to update on each heartbeat."
-            If frameCount > 200 Then
-                lastFrameCount = task.frameCount
-                fullUpdate = 0
-            End If
-            task.motionDetected = False
-        Else
+        task.motionDetected = False
+        If task.motionRects.Count > 0 Then
             For Each roi In task.motionRects
                 src(roi).CopyTo(dst3(roi))
                 If standaloneTest() Then dst0.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
@@ -580,16 +566,10 @@ Public Class LowRes_MeasureValidate : Inherits VB_Parent
         cvb.Cv2.Absdiff(curr, motion, dst0)
 
         If task.heartBeat = False Then
-            If measure.fullImageUpdate = False Then
-                dst1 = dst0.Threshold(1, 255, cvb.ThresholdTypes.Binary)
-                dst1 = dst1.Reshape(3, src.Rows)
-            End If
-            If standaloneTest() Then ' show any differences
-                Static diff As New Diff_Basics
-                diff.lastFrame = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-                diff.Run(src)
-                dst3 = diff.dst2
-            End If
+            Static diff As New Diff_Basics
+            diff.lastFrame = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            diff.Run(src)
+            dst3 = diff.dst2
         End If
     End Sub
 End Class

@@ -53,7 +53,7 @@ Public Class Color8U_Basics : Inherits VB_Parent
         If task.heartBeat Then
             dst2 = classifier.dst2.clone
         ElseIf task.motionDetected Then
-            classifier.dst2(task.motionRect).copyto(dst2(task.motionRect))
+            classifier.dst2.copyto(dst2, task.motionMask)
         End If
 
         classCount = classifier.classCount

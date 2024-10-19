@@ -1,36 +1,36 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
-Module K4A_Interface
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4AOpen(width As Integer, height As Integer) As IntPtr
+Module A4K_Interface
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KOpen(width As Integer, height As Integer) As IntPtr
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4ADeviceCount(cPtr As IntPtr) As Integer
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KDeviceCount(cPtr As IntPtr) As Integer
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4ADeviceName(cPtr As IntPtr) As IntPtr
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KDeviceName(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4AWaitFrame(cPtr As IntPtr, w As Integer, h As Integer) As IntPtr
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KWaitFrame(cPtr As IntPtr, w As Integer, h As Integer) As IntPtr
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4AIntrinsics(cPtr As IntPtr) As IntPtr
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KIntrinsics(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4APointCloud(cPtr As IntPtr) As IntPtr
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KPointCloud(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4AColor(cPtr As IntPtr) As IntPtr
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KColor(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function K4ALeftView(cPtr As IntPtr) As IntPtr
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftView(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub K4AClose(cPtr As IntPtr)
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub A4KClose(cPtr As IntPtr)
     End Sub
 End Module
 Public Class CameraK4A_CPP : Inherits GenericCamera
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        cPtr = K4AOpen(captureRes.Width, captureRes.Height)
+        cPtr = A4KOpen(captureRes.Width, captureRes.Height)
         cameraName = deviceName
         If cPtr <> 0 Then
-            deviceCount = K4ADeviceCount(cPtr)
-            Dim strPtr = K4ADeviceName(cPtr) ' The width and height of the image are set in the constructor.
+            deviceCount = A4KDeviceCount(cPtr)
+            Dim strPtr = A4KDeviceName(cPtr) ' The width and height of the image are set in the constructor.
             serialNumber = Marshal.PtrToStringAnsi(strPtr)
 
-            Dim ptr = K4AIntrinsics(cPtr)
+            Dim ptr = A4KIntrinsics(cPtr)
             Dim intrinsicsLeftOutput = Marshal.PtrToStructure(Of intrinsicsData)(ptr)
             cameraInfo.ppx = intrinsicsLeftOutput.cx
             cameraInfo.ppy = intrinsicsLeftOutput.cy
@@ -65,7 +65,7 @@ Public Class CameraK4A_CPP : Inherits GenericCamera
         Try
             Dim imuFrame As IntPtr
             If cPtr = 0 Then Exit Sub
-            imuFrame = K4AWaitFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
+            imuFrame = A4KWaitFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
             If imuFrame = 0 Then
                 Debug.WriteLine("KinectWaitFrame has returned without any image.")
                 failedImageCount += 1
@@ -94,24 +94,24 @@ Public Class CameraK4A_CPP : Inherits GenericCamera
 
             SyncLock cameraLock
                 uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
-                                                K4AColor(cPtr)).Clone
+                                                A4KColor(cPtr)).Clone
 
                 ' so grayscale data fits into 0-255 (approximately)
                 uiLeft = (cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_16U,
-                                          K4ALeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().
+                                          A4KLeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs().
                                           CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone
 
                 uiRight = uiLeft.Clone
 
                 If captureRes <> WorkingRes Then
-                    Dim ptr = K4APointCloud(cPtr)
+                    Dim ptr = A4KPointCloud(cPtr)
                     Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
                                                     cvb.MatType.CV_16SC3, ptr).
                                                     Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
                     tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 Else
                     Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
-                                                    cvb.MatType.CV_16SC3, K4APointCloud(cPtr))
+                                                    cvb.MatType.CV_16SC3, A4KPointCloud(cPtr))
                     tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
                 End If
             End SyncLock
@@ -122,7 +122,7 @@ Public Class CameraK4A_CPP : Inherits GenericCamera
         End Try
     End Sub
     Public Sub stopCamera()
-        If cPtr <> 0 Then K4AClose(cPtr)
+        If cPtr <> 0 Then A4KClose(cPtr)
         cPtr = 0
     End Sub
 End Class
