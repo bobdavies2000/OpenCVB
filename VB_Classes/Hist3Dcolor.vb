@@ -13,7 +13,7 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_8UC3 Then src = task.color
-        If task.heartBeat Or alwaysRun Then
+        If task.heartBeat Or alwaysRun Or histogram.Rows = 0 Then
             Dim bins = task.redOptions.HistBinBar3D.Value
             cvb.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
 

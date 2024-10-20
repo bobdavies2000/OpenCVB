@@ -5674,49 +5674,6 @@ enum FeatureSrc : uint8_t
 
 
 
-class Motion_Simple_CC : public CPP_Parent {
-public:
-    Diff_Basics_CC* diff;
-    double cumulativePixels;
-    float options_cumulativePercentThreshold = 0.1f;
-    int options_motionThreshold;
-    int saveFrameCount;
-    Motion_Simple_CC() : CPP_Parent() {
-        task->pixelDiffThreshold = 25;
-        options_motionThreshold = dst2.rows * dst2.cols / 16;
-        diff = new Diff_Basics_CC();
-        dst3 = Mat::zeros(dst3.size(), CV_8U);
-        labels[3] = "Accumulated changed pixels from the last heartbeat";
-        desc = "Accumulate differences from the previous BGR image.";
-    }
-    void Run(Mat src) override {
-        diff->Run(src);
-        dst2 = diff->dst3;
-        if (task->heartBeat) cumulativePixels = 0;
-        if (diff->changedPixels > 0 || task->heartBeat) {
-            cumulativePixels += diff->changedPixels;
-            if (cumulativePixels / src.total() > options_cumulativePercentThreshold || diff->changedPixels > options_motionThreshold ||
-                task->optionsChanged)
-            {
-                task->motionRect = Rect(0, 0, dst2.cols, dst2.rows);
-            }
-            if (task->motionRect.width == dst2.cols || task->heartBeat) {
-                dst2.copyTo(dst3);
-                cumulativePixels = 0;
-                saveFrameCount = task->frameCount;
-            }
-            else {
-                dst3.setTo(255, dst2);
-            }
-        }
-        int threshold = src.total() * options_cumulativePercentThreshold;
-        string strOut = "Cumulative threshold = " + to_string(threshold / 1000) + "k ";
-        labels[2] = strOut + "Current cumulative pixels changed = " + to_string(cumulativePixels / 1000) + "k";
-    }
-};
-
-
-
 
 class History_Basics_CC : public CPP_Parent {
 public:

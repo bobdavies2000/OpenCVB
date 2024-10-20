@@ -63,6 +63,31 @@ End Class
 
 
 
+Public Class Color8U_Sweep : Inherits VB_Parent
+    Dim color8u As New Color8U_Basics
+    Public classCount As Integer
+    Public Sub New()
+        desc = "Sweep through all the Color8U_Basics algorithms..."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.heartBeatLT Then
+            Dim index = task.redOptions.ColorSource.SelectedIndex + 1
+            If index >= task.redOptions.ColorSource.Items.Count Then index = 0
+            task.redOptions.ColorSource.SelectedIndex = index
+            task.redOptions.Sync()
+        End If
+        color8u.Run(src)
+        classCount = color8u.classCount
+        dst3 = color8u.dst3
+        strOut = "Current color source = " + task.redOptions.colorInputName
+        SetTrueText(strOut, 2)
+    End Sub
+End Class
+
+
+
+
+
 Public Class Color8U_Grayscale : Inherits VB_Parent
     Dim options As New Options_Grayscale8U
     Public classCount = 255
@@ -372,29 +397,6 @@ End Class
 
 
 
-Public Class Color8U_MotionFiltered : Inherits VB_Parent
-    Dim color8U As New Color8U_Basics
-    Public classCount As Integer
-    Dim motion As New Motion_BGSub
-    Public Sub New()
-        desc = "Prepare a Color8U_Basics image using the task.motionRect"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        motion.Run(src)
-
-        dst3 = motion.dst2
-        color8U.Run(motion.dst2)
-        dst2 = color8U.dst3
-        classCount = color8U.classCount
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Color8U_Hue : Inherits VB_Parent
     Public Sub New()
         desc = "Isolate those regions in the image that have a reddish hue."
@@ -425,5 +427,51 @@ Public Class Color8U_BlackAndWhite : Inherits VB_Parent
         dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         dst2 = dst1.Threshold(options.minThreshold, 255, cvb.ThresholdTypes.BinaryInv)
         dst3 = dst1.Threshold(options.maxThreshold, 255, cvb.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Color8U_MotionFiltered : Inherits VB_Parent
+    Dim color8U As New Color8U_Sweep
+    Public classCount As Integer
+    Dim motion As New Motion_BGSub
+    Public Sub New()
+        desc = "Prepare a Color8U_Basics image using the task.motionMask"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.motionMask.CountNonZero Then
+            src.SetTo(0, task.noMotionMask)
+            color8U.Run(src)
+            dst2 = color8U.dst3
+            dst2.CopyTo(dst3, task.motionMask)
+            dst2.SetTo(0, task.noMotionMask)
+            classCount = color8U.classCount
+        End If
+        If task.heartBeatLT Then dst3.SetTo(0)
+        labels(2) = color8U.strOut
+    End Sub
+End Class
+
+
+
+
+
+Public Class Color8U_Edges : Inherits VB_Parent
+    Dim color8u As New Color8U_Sweep
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        desc = "Find edges in the Color8U_Basics output"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        color8u.Run(src)
+        dst2 = color8u.dst3
+
+        edges.Run(dst2)
+        dst3 = edges.dst2
+        labels(2) = color8u.strOut
     End Sub
 End Class

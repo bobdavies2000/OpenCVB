@@ -76,8 +76,6 @@ namespace CPP_Native
         { task->alg = new Resize_Preserve_CC(); task->alg->traceName = "Resize_Preserve_CC"; break; }
         case _History_Basics_CC:
         { task->alg = new History_Basics_CC(); task->alg->traceName = "History_Basics_CC"; break; }
-        case _Motion_Simple_CC:
-        { task->alg = new Motion_Simple_CC(); task->alg->traceName = "Motion_Simple_CC"; break; }
         case _Hist_Kalman_CC:
         { task->alg = new Hist_Kalman_CC(); task->alg->traceName = "Hist_Kalman_CC"; break; }
         case _Kalman_Basics_CC:

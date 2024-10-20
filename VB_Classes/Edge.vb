@@ -13,54 +13,39 @@ Public Class Edge_Basics : Inherits VB_Parent
     Dim resizeAdd As Edge_ResizeAdd
     Dim regions As Edge_Regions
     Public options As New Options_Edge_Basics
+    Dim edges As Object
     Public Sub New()
         desc = "Use Radio Buttons to select the different edge algorithms."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        Select Case options.edgeSelection
-            Case "Canny"
-                If canny Is Nothing Then canny = New Edge_Canny
-                canny.Run(src)
-                dst2 = canny.dst2
-            Case "Scharr"
-                If scharr Is Nothing Then scharr = New Edge_Scharr
-                scharr.Run(src)
-                dst2 = scharr.dst3
-            Case "Binarized Reduction"
-                If binRed Is Nothing Then binRed = New Edge_BinarizedReduction
-                binRed.Run(src)
-                dst2 = binRed.dst2
-            Case "Binarized Sobel"
-                If binSobel Is Nothing Then binSobel = New Bin4Way_Sobel
-                binSobel.Run(src)
-                dst2 = binSobel.dst2
-            Case "Sobel"
-                If sobel Is Nothing Then sobel = New Edge_Sobel
-                sobel.Run(src)
-                dst2 = sobel.dst2
-            Case "Color Gap"
-                If colorGap Is Nothing Then colorGap = New Edge_ColorGap_CPP_VB
-                colorGap.Run(src)
-                dst2 = colorGap.dst2
-            Case "Deriche"
-                If deriche Is Nothing Then deriche = New Edge_Deriche_CPP_VB
-                deriche.Run(src)
-                dst2 = deriche.dst2
-            Case "Laplacian"
-                If Laplacian Is Nothing Then Laplacian = New Edge_Laplacian
-                Laplacian.Run(src)
-                dst2 = Laplacian.dst2
-            Case "Resize And Add"
-                If resizeAdd Is Nothing Then resizeAdd = New Edge_ResizeAdd
-                resizeAdd.Run(src)
-                dst2 = resizeAdd.dst2
-            Case "Depth Region Boundaries"
-                If regions Is Nothing Then regions = New Edge_Regions
-                regions.Run(src)
-                dst2 = regions.dst2
-        End Select
+        Static saveSelection As String = ""
+        If saveSelection <> options.edgeSelection Then
+            saveSelection = options.edgeSelection
+            Select Case options.edgeSelection
+                Case "Canny"
+                    edges = New Edge_Canny
+                Case "Scharr"
+                    edges = New Edge_Scharr
+                Case "Binarized Reduction"
+                    edges = New Edge_BinarizedReduction
+                Case "Binarized Sobel"
+                    edges = New Bin4Way_Sobel
+                Case "Sobel"
+                    edges = New Edge_Sobel
+                Case "Color Gap"
+                    edges = New Edge_ColorGap_CPP_VB
+                Case "Deriche"
+                    edges = New Edge_Deriche_CPP_VB
+                Case "Laplacian"
+                    edges = New Edge_Laplacian
+                Case "Resize And Add"
+                    edges = New Edge_ResizeAdd
+            End Select
+        End If
+        edges.run(src)
+        dst2 = edges.dst2
 
         If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If dst2.Type <> cvb.MatType.CV_8UC1 Then dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
@@ -1454,5 +1439,34 @@ Public Class Edge_Laplacian : Inherits VB_Parent
         If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Laplacian(cvb.MatType.CV_8U, options.LaplaciankernelSize, 1, 0).ConvertScaleAbs()
         dst2 = dst2.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Edge_Sweep : Inherits VB_Parent
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        desc = "Sweep through the various edge algorithms"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static frm = FindFrm("Options_Edge_Basics Radio Buttons")
+
+        Static index As Integer = -1
+        If task.heartBeatLT Then
+            index += 1
+            If index >= frm.check.count Then index = 0
+        End If
+
+        edges.Run(src)
+        dst2 = edges.dst2
+
+        If findRadioIndex(frm.check) <> index Then frm.check(index).checked = True
+        strOut = "Current edge algorithm is " + frm.check(index).text
+        labels(2) = strOut
+        SetTrueText(strOut, 3)
     End Sub
 End Class

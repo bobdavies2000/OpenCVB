@@ -7625,14 +7625,13 @@ Public Class Options_Edge_Basics : Inherits VB_Parent
             radio.Setup(traceName)
             radio.addRadio("Canny")
             radio.addRadio("Scharr")
+            radio.addRadio("Sobel")
+            radio.addRadio("Resize And Add")
             radio.addRadio("Binarized Reduction")
             radio.addRadio("Binarized Sobel")
-            radio.addRadio("Sobel")
             radio.addRadio("Color Gap")
             radio.addRadio("Deriche")
             radio.addRadio("Laplacian")
-            radio.addRadio("Resize And Add")
-            radio.addRadio("Depth Region Boundaries")
             radio.check(0).Checked = True
         End If
     End Sub

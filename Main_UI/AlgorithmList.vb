@@ -62,7 +62,6 @@ _Mat_4to1_CC
 _Mesh_Basics_CC
 _Mesh_Features_CC
 _Motion_BGSub_CC
-_Motion_Simple_CC
 _Palette_Basics_CC
 _Palette_Random_CC
 _Plot_Histogram_CC
@@ -484,6 +483,7 @@ End Enum
 	If algorithmName = "Color8U_Denoise_CS" Then return new Color8U_Denoise_CS
 	If algorithmName = "Color8U_Depth" Then return new Color8U_Depth
 	If algorithmName = "Color8U_Depth_CS" Then return new Color8U_Depth_CS
+	If algorithmName = "Color8U_Edges" Then return new Color8U_Edges
 	If algorithmName = "Color8U_Grayscale" Then return new Color8U_Grayscale
 	If algorithmName = "Color8U_Grayscale_CS" Then return new Color8U_Grayscale_CS
 	If algorithmName = "Color8U_Hue" Then return new Color8U_Hue
@@ -498,6 +498,7 @@ End Enum
 	If algorithmName = "Color8U_RedHue_CS" Then return new Color8U_RedHue_CS
 	If algorithmName = "Color8U_Smoothing" Then return new Color8U_Smoothing
 	If algorithmName = "Color8U_Smoothing_CS" Then return new Color8U_Smoothing_CS
+	If algorithmName = "Color8U_Sweep" Then return new Color8U_Sweep
 	If algorithmName = "Color8U_TopX" Then return new Color8U_TopX
 	If algorithmName = "Color8U_TopX_CS" Then return new Color8U_TopX_CS
 	If algorithmName = "Complexity_Basics" Then return new Complexity_Basics
@@ -945,6 +946,7 @@ End Enum
 	If algorithmName = "Edge_SobelLR_CS" Then return new Edge_SobelLR_CS
 	If algorithmName = "Edge_SobelLRBinarized" Then return new Edge_SobelLRBinarized
 	If algorithmName = "Edge_SobelLRBinarized_CS" Then return new Edge_SobelLRBinarized_CS
+	If algorithmName = "Edge_Sweep" Then return new Edge_Sweep
 	If algorithmName = "EdgeDraw_Basics" Then return new EdgeDraw_Basics
 	If algorithmName = "EdgeDraw_Basics_CC" Then return new CPP_Basics(ccFunctionNames._EdgeDraw_Basics_CC)
 	If algorithmName = "EdgeDraw_Basics_CPP_CS" Then return new EdgeDraw_Basics_CPP_CS
@@ -2205,7 +2207,6 @@ End Enum
 	If algorithmName = "Motion_RectTest_CS" Then return new Motion_RectTest_CS
 	If algorithmName = "Motion_RedCloud" Then return new Motion_RedCloud
 	If algorithmName = "Motion_RedCloud_CS" Then return new Motion_RedCloud_CS
-	If algorithmName = "Motion_Simple_CC" Then return new CPP_Basics(ccFunctionNames._Motion_Simple_CC)
 	If algorithmName = "Motion_TestSingle" Then return new Motion_TestSingle
 	If algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
 	If algorithmName = "Motion_ThruCorrelation_CS" Then return new Motion_ThruCorrelation_CS

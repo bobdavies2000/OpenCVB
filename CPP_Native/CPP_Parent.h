@@ -37,8 +37,6 @@ public:
     std::vector<Point3f> contour3D;
     std::vector<Point> hull;  // Using std::vector for consistency
 
-    bool motionFlag;
-
     Point floodPoint;
     bool depthCell;  // true if no depth.
 
@@ -201,7 +199,7 @@ public:
     bool standalone;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
-    Rect motionRect; rcData rcSelect; int desiredCells;
+    rcData rcSelect; int desiredCells;
 
     bool heartBeat; bool midHeartBeat; bool quarterBeat; bool debugCheckBox; Size lowRes; 
     string advice = "";

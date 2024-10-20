@@ -67,6 +67,7 @@ Public Class VBtask : Implements IDisposable
     Public motionRects As New List(Of cvb.Rect)
     Public motionDetected As Boolean
     Public motionMask As cvb.Mat
+    Public noMotionMask As cvb.Mat
     Public motion As Motion_Basics
     Public motionPercent As Single
     Public MotionLabel As String
@@ -111,7 +112,7 @@ Public Class VBtask : Implements IDisposable
 
     Public frameCount As Integer = 0
     Public heartBeat As Boolean
-    Public heartBeatLT As Boolean ' long term heartbeat - every X seconds.
+    Public heartBeatLT As Boolean = True ' long term heartbeat - every X seconds.
     Public quarterBeat As Boolean
     Public quarter(4) As Boolean
     Public midHeartBeat As Boolean
@@ -723,6 +724,7 @@ Public Class VBtask : Implements IDisposable
             task.color = motion.color.Clone
             task.pointCloud = motion.pointcloud.Clone
             task.motionMask = motion.motionMask
+            task.noMotionMask = Not motionMask
             task.motionDetected = motion.measure.motionDetected
             task.motionRects = New List(Of cvb.Rect)(motion.measure.motionRects)
         End If
@@ -798,6 +800,7 @@ Public Class VBtask : Implements IDisposable
         If task.paused = False Then
             MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             task.FirstPass = False
+            task.heartBeatLT = False
             postProcess(src)
         End If
     End Sub

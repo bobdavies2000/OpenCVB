@@ -79,10 +79,9 @@ Public Module vbc
 
         If task.frameCount = 0 Then task.heartBeat = True
 
-        Static heartBeatCount As Integer = 0
+        Static heartBeatCount As Integer = 5
         If task.heartBeat Then
             heartBeatCount += 1
-            task.heartBeatLT = False
             If heartBeatCount >= 5 Then
                 task.heartBeatLT = True
                 heartBeatCount = 0
@@ -111,6 +110,7 @@ Public Module vbc
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
     End Sub
     Public Function FindFrm(title As String) As System.Windows.Forms.Form
+        On Error Resume Next
         For Each frm In Application.OpenForms
             If frm.text = title Then Return frm
         Next
