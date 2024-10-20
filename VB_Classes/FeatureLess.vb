@@ -259,6 +259,3 @@ Public Class FeatureLess_Groups : Inherits VB_Parent
         labels(3) = CStr(classCount) + " featureless regions were found."
     End Sub
 End Class
-
-
-

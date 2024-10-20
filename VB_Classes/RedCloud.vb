@@ -2729,3 +2729,86 @@ Public Class RedCloud_ReduceTest : Inherits VB_Parent
         dst2 = redC.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class RedCloud_MotionCompare : Inherits VB_Parent
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Compare motion only vs full image RedCloud"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        src.SetTo(0, task.noMotionMask)
+        redC.Run(src)
+        If task.heartBeatLT Then dst3.SetTo(0)
+        redC.dst2.CopyTo(dst3, task.motionMask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_CellFLess : Inherits VB_Parent
+    Dim redC As New RedCloud_Basics
+    Dim edges As New LowRes_Edges
+    Dim tiers As New Depth_Tiers
+    Public classCount As Integer
+    Public Sub New()
+        dst0 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U, 0)
+        desc = "Isolate the featureless regions in the image by cell and depth."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        tiers.Run(src)
+
+        edges.Run(src)
+        labels(2) = edges.labels(2)
+
+        dst1 = tiers.dst2 + task.fLessMask * 1 / 255
+        redC.Run(dst1)
+        dst2 = redC.dst2
+
+        dst3 = redC.dst2
+        dst3.SetTo(0, task.featureMask)
+        labels(3) = CStr(task.fLessRects.Count) + " featureless cells were found."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_CellFeatures : Inherits VB_Parent
+    Dim redC As New RedCloud_Basics
+    Dim edges As New LowRes_Edges
+    Dim tiers As New Depth_Tiers
+    Public classCount As Integer
+    Public Sub New()
+        desc = "Isolate the featureless regions in the image by cell and depth."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        tiers.Run(src)
+
+        edges.Run(src)
+        labels(2) = edges.labels(2)
+
+        src.SetTo(0, task.fLessMask)
+
+        redC.Run(src)
+        dst2 = redC.dst2
+        dst3 = redC.dst2
+        dst3.SetTo(0, task.fLessMask)
+        labels(3) = CStr(task.featureRects.Count) + " feature cells were found."
+    End Sub
+End Class

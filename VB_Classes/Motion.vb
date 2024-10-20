@@ -822,3 +822,48 @@ Public Class Motion_FromEdgeColorize : Inherits VB_Parent
         dst3 = ShowPalette(dst2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Motion_EdgeStability : Inherits VB_Parent
+    Dim lowRes As New LowRes_Edges
+    Public Sub New()
+        labels(3) = "High population cells"
+        desc = "Measure the stability of edges in each grid Rect"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lowRes.Run(src)
+        dst2 = lowRes.edges.dst2
+
+        Dim popSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        Dim pops As New List(Of Integer)
+        For i = 0 To task.featureRects.Count - 1
+            Dim roi = task.featureRects(i)
+            Dim pop = dst2(roi).CountNonZero
+            pops.Add(pop)
+            popSorted.Add(pop, i)
+            dst2.Rectangle(roi, 255, task.lineWidth)
+        Next
+
+        labels(2) = CStr(task.featureRects.Count) + " feature rects with an average population of " +
+                         Format(pops.Average, fmt1) + " and with min = " + CStr(pops.Min) +
+                         " and max = " + CStr(pops.Max) + ".  Circled cell has max features."
+
+        Dim index = pops.IndexOf(pops.Max)
+        Dim gSize = task.gOptions.getGridSize()
+        Dim pt = New cvb.Point(task.featureRects(index).X + gSize / 2, task.featureRects(index).Y + gSize / 2)
+        dst2.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
+
+        dst3.SetTo(0)
+        dst3.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
+        Dim count As Integer
+        For Each index In popSorted.Values
+            dst3.Rectangle(task.featureRects(index), cvb.Scalar.White, task.lineWidth)
+            count += 1
+            If count >= 20 Then Exit For
+        Next
+    End Sub
+End Class

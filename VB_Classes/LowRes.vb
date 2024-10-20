@@ -140,7 +140,6 @@ Public Class LowRes_Edges : Inherits VB_Parent
     Public lowRes As New LowRes_Basics
     Public edges As New Edge_Basics
     Public Sub New()
-        FindRadio("Depth Region Boundaries").Enabled = False
         task.featureMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         task.fLessMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         FindRadio("Laplacian").Checked = True
@@ -186,10 +185,10 @@ Public Class LowRes_Edges : Inherits VB_Parent
                 task.fLessMask(r).SetTo(255)
             Else
                 flipRects.Add(r)
-                task.fLessRects.Add(r)
-                task.fLessMask(r).SetTo(255)
-                task.featureRects.Add(r)
-                task.featureMask(r).SetTo(255)
+                'task.fLessRects.Add(r)
+                'task.fLessMask(r).SetTo(255)
+                'task.featureRects.Add(r)
+                'task.featureMask(r).SetTo(255)
             End If
         Next
 
@@ -580,3 +579,7 @@ Public Class LowRes_MeasureValidate : Inherits VB_Parent
         End If
     End Sub
 End Class
+
+
+
+

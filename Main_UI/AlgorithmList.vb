@@ -2184,6 +2184,7 @@ End Enum
 	If algorithmName = "Motion_Depth" Then return new Motion_Depth
 	If algorithmName = "Motion_Diff" Then return new Motion_Diff
 	If algorithmName = "Motion_Diff_CS" Then return new Motion_Diff_CS
+	If algorithmName = "Motion_EdgeStability" Then return new Motion_EdgeStability
 	If algorithmName = "Motion_Enclosing" Then return new Motion_Enclosing
 	If algorithmName = "Motion_Enclosing_CPP_CS" Then return new Motion_Enclosing_CPP_CS
 	If algorithmName = "Motion_FromEdge" Then return new Motion_FromEdge
@@ -3101,6 +3102,8 @@ End Enum
 	If algorithmName = "RedCloud_CCompColor_CS" Then return new RedCloud_CCompColor_CS
 	If algorithmName = "RedCloud_CellChanges" Then return new RedCloud_CellChanges
 	If algorithmName = "RedCloud_CellChanges_CS" Then return new RedCloud_CellChanges_CS
+	If algorithmName = "RedCloud_CellFeatures" Then return new RedCloud_CellFeatures
+	If algorithmName = "RedCloud_CellFLess" Then return new RedCloud_CellFLess
 	If algorithmName = "RedCloud_Cells" Then return new RedCloud_Cells
 	If algorithmName = "RedCloud_Cells_CS" Then return new RedCloud_Cells_CS
 	If algorithmName = "RedCloud_CellsAtDepth" Then return new RedCloud_CellsAtDepth
@@ -3178,6 +3181,7 @@ End Enum
 	If algorithmName = "RedCloud_MotionBasics_CS" Then return new RedCloud_MotionBasics_CS
 	If algorithmName = "RedCloud_MotionBGsubtract" Then return new RedCloud_MotionBGsubtract
 	If algorithmName = "RedCloud_MotionBGsubtract_CS" Then return new RedCloud_MotionBGsubtract_CS
+	If algorithmName = "RedCloud_MotionCompare" Then return new RedCloud_MotionCompare
 	If algorithmName = "RedCloud_NaturalColor" Then return new RedCloud_NaturalColor
 	If algorithmName = "RedCloud_NaturalColor_CS" Then return new RedCloud_NaturalColor_CS
 	If algorithmName = "RedCloud_NaturalGray" Then return new RedCloud_NaturalGray
