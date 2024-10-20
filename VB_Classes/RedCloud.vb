@@ -133,31 +133,27 @@ Public Class RedCloud_FindCells : Inherits VB_Parent
 
         Dim count As Integer
         dst3.SetTo(0)
-        If task.motionDetected Then
-            dst1 = task.cellMap(task.motionRect).Clone
-            Dim cppData(dst1.Total - 1) As Byte
-            Marshal.Copy(dst1.Data, cppData, 0, cppData.Length)
-            Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-            Dim imagePtr = RedCloud_FindCells_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
-            handleSrc.Free()
+        Dim cppData(dst1.Total - 1) As Byte
+        Marshal.Copy(dst1.Data, cppData, 0, cppData.Length)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim imagePtr = RedCloud_FindCells_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+        handleSrc.Free()
 
-            count = RedCloud_FindCells_TotalCount(cPtr)
-            If count = 0 Then Exit Sub
+        count = RedCloud_FindCells_TotalCount(cPtr)
+        If count = 0 Then Exit Sub
 
-            Dim cellsFound(count - 1) As Integer
-            Marshal.Copy(imagePtr, cellsFound, 0, cellsFound.Length)
+        Dim cellsFound(count - 1) As Integer
+        Marshal.Copy(imagePtr, cellsFound, 0, cellsFound.Length)
 
-            cellList = cellsFound.ToList
-            dst0 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-            dst0 = dst0.Threshold(0, 255, cvb.ThresholdTypes.BinaryInv)
-            For Each index In cellList
-                If task.redCells.Count <= index Then Continue For
-                Dim rc = task.redCells(index)
-                DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-                dst3(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, cvb.Scalar.White), rc.mask)
-            Next
-            dst2.Rectangle(task.motionRect, cvb.Scalar.White, task.lineWidth)
-        End If
+        cellList = cellsFound.ToList
+        dst0 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst0 = dst0.Threshold(0, 255, cvb.ThresholdTypes.BinaryInv)
+        For Each index In cellList
+            If task.redCells.Count <= index Then Continue For
+            Dim rc = task.redCells(index)
+            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            dst3(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, cvb.Scalar.White), rc.mask)
+        Next
         labels(3) = CStr(count) + " cells were found using the motion mask"
     End Sub
     Public Sub Close()
@@ -2712,5 +2708,24 @@ Public Class RedCloud_ReduceHist : Inherits VB_Parent
         plot.Run(dst2)
         dst3 = plot.dst2
         labels(2) = reduce.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_ReduceTest : Inherits VB_Parent
+    Dim redC As New RedCloud_Basics
+    Dim redInput As New RedCloud_Reduce
+    Public Sub New()
+        desc = "Run RedCloud with the depth reduction."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redInput.Run(src)
+
+        redC.Run(redInput.dst2)
+        dst2 = redC.dst2
     End Sub
 End Class

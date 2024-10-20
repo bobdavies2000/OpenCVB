@@ -50,18 +50,8 @@ Public Class Color8U_Basics : Inherits VB_Parent
             End If
         End If
 
-        If task.heartBeat Then
-            dst2 = classifier.dst2.clone
-        ElseIf task.motionDetected Then
-            classifier.dst2.copyto(dst2, task.motionMask)
-        End If
-
+        dst2 = classifier.dst2
         classCount = classifier.classCount
-
-        'If task.maxDepthMask.Rows > 0 Then
-        '    classCount += 1
-        '    dst2.SetTo(classCount, task.maxDepthMask)
-        'End If
 
         dst3 = classifier.dst3
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"

@@ -2180,8 +2180,6 @@ End Enum
 	If algorithmName = "Motion_Contours" Then return new Motion_Contours
 	If algorithmName = "Motion_Contours_CS" Then return new Motion_Contours_CS
 	If algorithmName = "Motion_Depth" Then return new Motion_Depth
-	If algorithmName = "Motion_Depth_CS" Then return new Motion_Depth_CS
-	If algorithmName = "Motion_DepthReconstructed_CS" Then return new Motion_DepthReconstructed_CS
 	If algorithmName = "Motion_Diff" Then return new Motion_Diff
 	If algorithmName = "Motion_Diff_CS" Then return new Motion_Diff_CS
 	If algorithmName = "Motion_Enclosing" Then return new Motion_Enclosing
@@ -2189,7 +2187,6 @@ End Enum
 	If algorithmName = "Motion_FromEdge" Then return new Motion_FromEdge
 	If algorithmName = "Motion_FromEdgeColorize" Then return new Motion_FromEdgeColorize
 	If algorithmName = "Motion_Grayscale" Then return new Motion_Grayscale
-	If algorithmName = "Motion_Grayscale_CS" Then return new Motion_Grayscale_CS
 	If algorithmName = "Motion_Grid" Then return new Motion_Grid
 	If algorithmName = "Motion_Grid_CS" Then return new Motion_Grid_CS
 	If algorithmName = "Motion_Grid_MP" Then return new Motion_Grid_MP
@@ -3210,6 +3207,7 @@ End Enum
 	If algorithmName = "RedCloud_Reduce_CC" Then return new CPP_Basics(ccFunctionNames._RedCloud_Reduce_CC)
 	If algorithmName = "RedCloud_Reduce_CS" Then return new RedCloud_Reduce_CS
 	If algorithmName = "RedCloud_ReduceHist" Then return new RedCloud_ReduceHist
+	If algorithmName = "RedCloud_ReduceTest" Then return new RedCloud_ReduceTest
 	If algorithmName = "RedCloud_Reduction" Then return new RedCloud_Reduction
 	If algorithmName = "RedCloud_Reduction_CS" Then return new RedCloud_Reduction_CS
 	If algorithmName = "RedCloud_ShapeCorrelation" Then return new RedCloud_ShapeCorrelation

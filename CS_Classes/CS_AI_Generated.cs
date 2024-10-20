@@ -39975,36 +39975,6 @@ namespace CS_Classes
 
 
 
-    public class Motion_DepthReconstructed_CS : VB_Parent
-    {
-        public Motion_Basics motion = new Motion_Basics();
-        public Motion_DepthReconstructed_CS()
-        {
-            if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
-            labels[2] = "The yellow rectangle indicates where the motion is and only that portion of the point cloud and depth mask is updated.";
-            desc = "Rebuild the point cloud based on the BGR motion history.";
-        }
-        public void RunAlg(Mat src)
-        {
-            motion.Run(src);
-            dst2 = src;
-            if (vbc.task.motionFlag)
-            {
-                dst0 = src.Clone();
-                dst1 = vbc.task.noDepthMask.Clone();
-                dst3 = vbc.task.pointCloud.Clone();
-                labels[3] = motion.labels[2];
-            }
-            if (!vbc.task.motionDetected) return;
-            src[vbc.task.motionRect].CopyTo(dst0[vbc.task.motionRect]);
-            vbc.task.noDepthMask[vbc.task.motionRect].CopyTo(dst1[vbc.task.motionRect]);
-            vbc.task.pointCloud[vbc.task.motionRect].CopyTo(dst3[vbc.task.motionRect]);
-        }
-    }
-
-
-
 
     public class Motion_Contours_CS : VB_Parent
     {
@@ -40336,69 +40306,6 @@ namespace CS_Classes
         }
     }
 
-
-
-
-    public class Motion_Depth_CS : VB_Parent
-    {
-        Diff_Depth32f diff = new Diff_Depth32f();
-        public Motion_Depth_CS()
-        {
-            labels = new string[] { "", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud" };
-            desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat.";
-        }
-        public void RunAlg(Mat src)
-        {
-            if (vbc.task.heartBeat) dst2 = vbc.task.pcSplit[2].Clone();
-            if (vbc.task.motionDetected) vbc.task.pcSplit[2][vbc.task.motionRect].CopyTo(dst2[vbc.task.motionRect]);
-            if (standaloneTest())
-            {
-                if (diff.lastDepth32f.Width == 0) diff.lastDepth32f = vbc.task.pcSplit[2].Clone();
-                diff.Run(vbc.task.pcSplit[2]);
-                dst3 = diff.dst2;
-                dst3.Rectangle(vbc.task.motionRect, cv.Scalar.All(255), vbc.task.lineWidth);
-                diff.lastDepth32f = vbc.task.pcSplit[2];
-            }
-        }
-    }
-
-
-
-
-    public class Motion_Grayscale_CS : VB_Parent
-    {
-        Diff_Basics diff = new Diff_Basics();
-        public Motion_Grayscale_CS()
-        {
-            labels = new string[] { "", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated grayscale image", "Diff of input and latest accumulated grayscale image" };
-            desc = "Display the grayscale image after updating only the motion rectangle.  Resync every heartbeat.";
-        }
-        public void RunAlg(Mat src)
-        {
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
-            if (vbc.task.heartBeat)
-            {
-                dst2 = src.Clone();
-            }
-            else if (vbc.task.motionDetected)
-            {
-                src[vbc.task.motionRect].CopyTo(dst2[vbc.task.motionRect]);
-            }
-            else
-            {
-                dst2 = src.Clone();
-            }
-            if (standaloneTest())
-            {
-                if (diff.lastFrame == null) diff.lastFrame = dst2.Clone();
-                if (diff.lastFrame.Width == 0) diff.lastFrame = dst2.Clone();
-                diff.Run(src);
-                dst3 = diff.dst2;
-                dst3.Rectangle(vbc.task.motionRect, cv.Scalar.All(255), vbc.task.lineWidth);
-                diff.lastFrame = src.Clone();
-            }
-        }
-    }
 
 
 

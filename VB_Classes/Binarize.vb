@@ -211,15 +211,10 @@ Public Class Binarize_DepthTiers : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         binar4.Run(src)
         tiers.Run(src)
+
+        dst2 = tiers.dst2 + binar4.dst2
         dst3 = tiers.dst3
 
-        dst0 = tiers.dst2 + binar4.dst2
-
-        If task.heartBeat Then
-            dst2 = dst0.Clone
-        ElseIf task.motionDetected Then
-            dst0.CopyTo(dst2, task.motionMask)
-        End If
         classCount = binar4.classCount + tiers.classCount
     End Sub
 End Class

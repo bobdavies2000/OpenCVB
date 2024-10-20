@@ -565,22 +565,12 @@ Public Class Motion_Grayscale : Inherits VB_Parent
         desc = "Display the grayscale image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If task.heartBeat Then
-            dst2 = src.Clone
-        ElseIf task.motionDetected Then
-            src(task.motionRect).CopyTo(dst2(task.motionRect))
-        Else
-            dst2 = src.Clone
-        End If
+        dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         If standaloneTest() Then
-            If diff.lastFrame Is Nothing Then diff.lastFrame = dst2.Clone
-            If diff.lastFrame.Width = 0 Then diff.lastFrame = dst2.Clone
-            diff.Run(src)
+            diff.Run(dst2)
             dst3 = diff.dst2
             dst3.Rectangle(task.motionRect, 255, task.lineWidth)
-            diff.lastFrame = src.Clone
         End If
     End Sub
 End Class
@@ -671,14 +661,9 @@ Public Class Motion_PointCloud : Inherits VB_Parent
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
-        If standaloneTest() Then
-            If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
-            diff.Run(task.pcSplit(2))
-            dst3 = diff.dst2
-            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
-            diff.lastDepth32f = task.pcSplit(2)
-        End If
+        diff.Run(task.pcSplit(2))
+        dst3 = diff.dst2
+        dst3.Rectangle(task.motionRect, 255, task.lineWidth)
     End Sub
 End Class
 
@@ -696,11 +681,9 @@ Public Class Motion_Depth : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then dst2 = task.pcSplit(2).Clone
 
-        If task.motionDetected Then task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
-
+        diff.lastDepth32f = dst2
         diff.Run(task.pcSplit(2))
         diff.dst2.ConvertTo(dst3, cvb.MatType.CV_8U)
-        diff.lastDepth32f = task.pcSplit(2)
     End Sub
 End Class
 

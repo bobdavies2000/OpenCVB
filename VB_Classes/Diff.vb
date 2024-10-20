@@ -38,7 +38,6 @@ Public Class Diff_Color : Inherits VB_Parent
         desc = "Use Diff_Basics with a color image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
         diff.Run(src.Reshape(1, src.Rows * 3))
         dst2 = diff.dst2.Reshape(3, src.Rows)
         dst3 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
