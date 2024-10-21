@@ -1,12 +1,12 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class FeaturePoly_Basics : Inherits VB_Parent
+Public Class FPoly_Basics : Inherits VB_Parent
     Public resync As Boolean
     Public resyncCause As String
     Public resyncFrames As Integer
     Public maskChangePercent As Single
 
-    Dim topFeatures As New FeaturePoly_TopFeatures
-    Public sides As New FeaturePoly_Sides
+    Dim topFeatures As New FPoly_TopFeatures
+    Public sides As New FPoly_Sides
     Public Sub New()
         FindSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then FindSlider("Resync if feature moves > X pixels").Value = 15
@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Sides : Inherits VB_Parent
+Public Class FPoly_Sides : Inherits VB_Parent
     Public currPoly As New List(Of cvb.Point2f)
     Public currSideIndex As Integer
     Public currLengths As New List(Of Single)
@@ -137,7 +137,7 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
         options.RunOpt()
 
         If standaloneTest() And task.heartBeat Then
-            Random.Run(empty)
+            random.Run(empty)
             currPoly = New List(Of cvb.Point2f)(random.PointList)
         End If
 
@@ -232,7 +232,7 @@ End Class
 
 
 
-Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
+Public Class FPoly_BasicsOriginal : Inherits VB_Parent
     Public fPD As New fPolyData
     Public resyncImage As cvb.Mat
     Public resync As Boolean
@@ -240,11 +240,11 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
     Public resyncFrames As Integer
     Public maskChangePercent As Single
 
-    Dim topFeatures As New FeaturePoly_TopFeatures
+    Dim topFeatures As New FPoly_TopFeatures
     Public options As New Options_FPoly
     Public center As Object
     Public Sub New()
-        center = New FeaturePoly_Center ' FeaturePoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
+        center = New FPoly_Center ' FPoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
         FindSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then FindSlider("Resync if feature moves > X pixels").Value = 15
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -357,8 +357,8 @@ End Class
 
 
 
-Public Class FeaturePoly_Plot : Inherits VB_Parent
-    Public fGrid As New FeaturePoly_Core
+Public Class FPoly_Plot : Inherits VB_Parent
+    Public fGrid As New FPoly_Core
     Dim plot As New Plot_Histogram
     Public hist() As Single
     Public distDiff As New List(Of Single)
@@ -413,8 +413,8 @@ End Class
 
 
 
-Public Class FeaturePoly_PlotWeighted : Inherits VB_Parent
-    Public fPlot As New FeaturePoly_Plot
+Public Class FPoly_PlotWeighted : Inherits VB_Parent
+    Public fPlot As New FPoly_Plot
     Dim plot As New Plot_Histogram
     Dim addw As New AddWeighted_Basics
     Dim kalman As New Kalman_Basics
@@ -457,8 +457,8 @@ End Class
 
 
 
-Public Class FeaturePoly_Stablizer : Inherits VB_Parent
-    Public fGrid As New FeaturePoly_Core
+Public Class FPoly_Stablizer : Inherits VB_Parent
+    Public fGrid As New FPoly_Core
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Movement amount - dot is current anchor point", "SyncImage aligned to current image - slide camera left or right",
@@ -501,10 +501,10 @@ End Class
 
 
 
-Public Class FeaturePoly_StartPoints : Inherits VB_Parent
+Public Class FPoly_StartPoints : Inherits VB_Parent
     Public startPoints As New List(Of cvb.Point2f)
     Public goodPoints As New List(Of cvb.Point2f)
-    Dim fGrid As New FeaturePoly_Core
+    Dim fGrid As New FPoly_Core
     Public Sub New()
         dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_8U, 255)
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -559,9 +559,9 @@ End Class
 
 
 
-Public Class FeaturePoly_Triangle : Inherits VB_Parent
+Public Class FPoly_Triangle : Inherits VB_Parent
     Dim triangle As New Area_MinTriangle_CPP_VB
-    Dim fGrid As New FeaturePoly_Core
+    Dim fGrid As New FPoly_Core
     Public Sub New()
         desc = "Find the minimum triangle that contains the feature grid"
     End Sub
@@ -581,7 +581,7 @@ End Class
 
 
 
-Public Class FeaturePoly_TopFeatures : Inherits VB_Parent
+Public Class FPoly_TopFeatures : Inherits VB_Parent
     Public stable As New Stable_BasicsCount
     Public poly As New List(Of cvb.Point2f)
     Public options As New Options_FPoly
@@ -616,14 +616,14 @@ End Class
 
 
 
-Public Class FeaturePoly_WarpAffinePoly : Inherits VB_Parent
+Public Class FPoly_WarpAffinePoly : Inherits VB_Parent
     Dim rotatePoly As New Rotate_PolyQT
     Dim warp As New WarpAffine_BasicsQT
-    Dim fPoly As New FeaturePoly_BasicsOriginal
+    Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
         labels = {"", "", "Feature polygon after just rotation - white (original), yellow (current)",
                   "Feature polygon with rotation and shift - should be aligned"}
-        desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics"
+        desc = "Rotate and shift just the Feature polygon as indicated by FPoly_Basics"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fPoly.Run(src)
@@ -677,7 +677,7 @@ End Class
 
 
 
-Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
+Public Class FPoly_RotatePoints : Inherits VB_Parent
     Dim rotatePoly As New Rotate_PolyQT
     Public poly As New List(Of cvb.Point2f)
     Public polyPrev As New List(Of cvb.Point2f)
@@ -688,7 +688,7 @@ Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Feature polygon after just rotation - white (original), yellow (current)",
                   "Feature polygons with rotation and shift - should be aligned"}
-        desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics"
+        desc = "Rotate and shift just the Feature polygon as indicated by FPoly_Basics"
     End Sub
     Public Function shiftPoly(polyPrev As List(Of cvb.Point2f), poly As List(Of cvb.Point2f)) As cvb.Point2f
         rotatePoly.rotateAngle = rotateAngle
@@ -703,7 +703,7 @@ Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
     End Function
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            SetTrueText(traceName + " is meant only to run with FeaturePoly_Basics to validate the translation")
+            SetTrueText(traceName + " is meant only to run with FPoly_Basics to validate the translation")
             Exit Sub
         End If
 
@@ -740,9 +740,9 @@ End Class
 
 
 
-Public Class FeaturePoly_WarpAffineImage : Inherits VB_Parent
+Public Class FPoly_WarpAffineImage : Inherits VB_Parent
     Dim warp As New WarpAffine_BasicsQT
-    Dim fPoly As New FeaturePoly_BasicsOriginal
+    Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
@@ -788,14 +788,14 @@ End Class
 
 
 ' https://www.google.com/search?q=geometry+find+the+center+of+rotation&rlz=1C1CHBF_enUS838US838&oq=geometry+find+the+center+of+rotation&aqs=chrome..69i57j0i22i30j0i390l3.9576j0j4&sourceid=chrome&ie=UTF-8#kpvalbx=_rgg1Y9rbGM3n0PEP-ae4oAc_34
-Public Class FeaturePoly_Perpendiculars : Inherits VB_Parent
+Public Class FPoly_Perpendiculars : Inherits VB_Parent
     Public altCenterShift As cvb.Point2f
     Public fPD As fPolyData
-    Public rotatePoints As New FeaturePoly_RotatePoints
+    Public rotatePoints As New FPoly_RotatePoints
     Dim near As New Line_Nearest
     Public Sub New()
-        labels = {"", "", "Output of FeaturePoly_Basics", "Center of rotation is where the extended lines intersect"}
-        desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FeaturePoly_Basics"
+        labels = {"", "", "Output of FPoly_Basics", "Center of rotation is where the extended lines intersect"}
+        desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FPoly_Basics"
     End Sub
     Private Function findrotateAngle(p1 As cvb.Point2f, p2 As cvb.Point2f, pt As cvb.Point2f) As Single
         near.lp = New PointPair(p1, p2)
@@ -863,9 +863,9 @@ End Class
 
 
 
-Public Class FeaturePoly_PerpendicularsTest : Inherits VB_Parent
-    Dim center As New FeaturePoly_Perpendiculars
-    Dim fPoly As New FeaturePoly_BasicsOriginal
+Public Class FPoly_PerpendicularsTest : Inherits VB_Parent
+    Dim center As New FPoly_Perpendiculars
+    Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
         fPoly.center = center
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -886,9 +886,9 @@ End Class
 
 
 
-Public Class FeaturePoly_PerpendicularsImage : Inherits VB_Parent
-    Dim center As New FeaturePoly_Perpendiculars
-    Dim fImage As New FeaturePoly_Image
+Public Class FPoly_PerpendicularsImage : Inherits VB_Parent
+    Dim center As New FPoly_Perpendiculars
+    Dim fImage As New FPoly_Image
     Public Sub New()
         fImage.fpoly.center = center
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -910,15 +910,15 @@ End Class
 
 
 
-Public Class FeaturePoly_Image : Inherits VB_Parent
-    Public fpoly As New FeaturePoly_BasicsOriginal
+Public Class FPoly_Image : Inherits VB_Parent
+    Public fpoly As New FPoly_BasicsOriginal
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
-        desc = "Rotate and shift the image as indicated by FeaturePoly_Basics"
+        desc = "Rotate and shift the image as indicated by FPoly_Basics"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim input = src.Clone
@@ -987,8 +987,8 @@ End Class
 
 
 
-Public Class FeaturePoly_ImageMask : Inherits VB_Parent
-    Public fImage As New FeaturePoly_Image
+Public Class FPoly_ImageMask : Inherits VB_Parent
+    Public fImage As New FPoly_Image
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.pixelDiffThreshold = 10
@@ -1011,12 +1011,12 @@ End Class
 
 
 
-Public Class FeaturePoly_PointCloud : Inherits VB_Parent
-    Public fMask As New FeaturePoly_ImageMask
+Public Class FPoly_PointCloud : Inherits VB_Parent
+    Public fMask As New FPoly_ImageMask
     Public fPolyCloud As cvb.Mat
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        desc = "Update changed point cloud pixels as indicated by the FeaturePoly_ImageMask"
+        desc = "Update changed point cloud pixels as indicated by the FPoly_ImageMask"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fMask.Run(src)
@@ -1036,8 +1036,8 @@ End Class
 
 
 
-Public Class FeaturePoly_ResyncCheck : Inherits VB_Parent
-    Dim fPoly As New FeaturePoly_BasicsOriginal
+Public Class FPoly_ResyncCheck : Inherits VB_Parent
+    Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter."
@@ -1071,7 +1071,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Center : Inherits VB_Parent
+Public Class FPoly_Center : Inherits VB_Parent
     Public rotatePoly As New Rotate_PolyQT
     Dim near As New Line_Nearest
     Public fPD As fPolyData
@@ -1085,7 +1085,7 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            SetTrueText(traceName + " is called by FeaturePoly_Basics to get the rotate center and angle." + vbCrLf +
+            SetTrueText(traceName + " is called by FPoly_Basics to get the rotate center and angle." + vbCrLf +
                         "It does not produce any output when run standaloneTest().")
             Exit Sub
         End If
@@ -1168,12 +1168,12 @@ End Class
 
 
 
-Public Class FeaturePoly_EdgeRemoval : Inherits VB_Parent
-    Dim fMask As New FeaturePoly_ImageMask
+Public Class FPoly_EdgeRemoval : Inherits VB_Parent
+    Dim fMask As New FPoly_ImageMask
     Dim edges As New Edge_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        desc = "Remove edges from the FeaturePoly_ImageMask"
+        desc = "Remove edges from the FPoly_ImageMask"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fMask.Run(src)
@@ -1199,15 +1199,15 @@ End Class
 
 
 
-Public Class FeaturePoly_ImageNew : Inherits VB_Parent
-    Public fpoly As New FeaturePoly_Basics
+Public Class FPoly_ImageNew : Inherits VB_Parent
+    Public fpoly As New FPoly_Basics
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
-        desc = "Rotate and shift the image as indicated by FeaturePoly_Basics"
+        desc = "Rotate and shift the image as indicated by FPoly_Basics"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim input = src.Clone
@@ -1268,9 +1268,9 @@ End Class
 
 
 
-Public Class FeaturePoly_LeftRight : Inherits VB_Parent
-    Dim leftPoly As New FeaturePoly_Basics
-    Dim rightPoly As New FeaturePoly_Basics
+Public Class FPoly_LeftRight : Inherits VB_Parent
+    Dim leftPoly As New FPoly_Basics
+    Dim rightPoly As New FPoly_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -1297,7 +1297,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Core : Inherits VB_Parent
+Public Class FPoly_Core : Inherits VB_Parent
     Public stable As New Stable_GoodFeatures
     Public anchor As cvb.Point2f
     Public startAnchor As cvb.Point2f

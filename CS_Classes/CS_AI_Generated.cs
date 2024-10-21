@@ -19567,15 +19567,15 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Basics_CS : VB_Parent
+    public class FPoly_Basics_CS : VB_Parent
     {
         public bool resync;
         public string resyncCause;
         public int resyncFrames;
         public float maskChangePercent;
-        FeaturePoly_TopFeatures topFeatures = new FeaturePoly_TopFeatures();
-        public FeaturePoly_Sides sides = new FeaturePoly_Sides();
-        public FeaturePoly_Basics_CS()
+        FPoly_TopFeatures topFeatures = new FPoly_TopFeatures();
+        public FPoly_Sides sides = new FPoly_Sides();
+        public FPoly_Basics_CS()
         {
             FindSlider("Feature Sample Size").Value = 30;
             if (dst2.Width >= 640) FindSlider("Resync if feature moves > X pixels").Value = 15;
@@ -19664,7 +19664,7 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Sides_CS : VB_Parent
+    public class FPoly_Sides_CS : VB_Parent
     {
         public List<cv.Point2f> currPoly = new List<cv.Point2f>();
         public int currSideIndex;
@@ -19685,7 +19685,7 @@ namespace CS_Classes
         public Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
         List<cv.Point2f> newPoly;
         Random_Basics random = new Random_Basics();
-        public FeaturePoly_Sides_CS()
+        public FPoly_Sides_CS()
         {
             labels[2] = "White is the original FPoly and yellow is the current FPoly.";
             desc = "Compute the lengths of each side in a polygon";
@@ -19785,7 +19785,7 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_BasicsOriginal_CS : VB_Parent
+    public class FPoly_BasicsOriginal_CS : VB_Parent
     {
         public fPolyData fPD = new fPolyData();
         public Mat resyncImage;
@@ -19793,12 +19793,12 @@ namespace CS_Classes
         public string resyncCause;
         public int resyncFrames;
         public float maskChangePercent;
-        FeaturePoly_TopFeatures topFeatures = new FeaturePoly_TopFeatures();
+        FPoly_TopFeatures topFeatures = new FPoly_TopFeatures();
         public Options_FPoly options = new Options_FPoly();
         public object center;
-        public FeaturePoly_BasicsOriginal_CS()
+        public FPoly_BasicsOriginal_CS()
         {
-            center = new FeaturePoly_Center(); // FeaturePoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
+            center = new FPoly_Center(); // FPoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
             FindSlider("Feature Sample Size").Value = 30;
             if (dst2.Width >= 640) FindSlider("Resync if feature moves > X pixels").Value = 15;
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
@@ -19904,13 +19904,13 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Plot_CS : VB_Parent
+    public class FPoly_Plot_CS : VB_Parent
     {
-        public FeaturePoly_Core fGrid = new FeaturePoly_Core();
+        public FPoly_Core fGrid = new FPoly_Core();
         Plot_Histogram plot = new Plot_Histogram();
         public float[] hist;
         public List<float> distDiff = new List<float>();
-        public FeaturePoly_Plot_CS()
+        public FPoly_Plot_CS()
         {
             plot.minRange = 0;
             plot.removeZeroEntry = false;
@@ -19958,13 +19958,13 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_PlotWeighted_CS : VB_Parent
+    public class FPoly_PlotWeighted_CS : VB_Parent
     {
-        public FeaturePoly_Plot fPlot = new FeaturePoly_Plot();
+        public FPoly_Plot fPlot = new FPoly_Plot();
         Plot_Histogram plot = new Plot_Histogram();
         AddWeighted_Basics addw = new AddWeighted_Basics();
         Kalman_Basics kalman = new Kalman_Basics();
-        public FeaturePoly_PlotWeighted_CS()
+        public FPoly_PlotWeighted_CS()
         {
             plot.minRange = 0;
             plot.removeZeroEntry = false;
@@ -20000,16 +20000,16 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Stablizer_CS : VB_Parent
+    public class FPoly_Stablizer_CS : VB_Parent
     {
-        public FeaturePoly_Core fGrid;
-        public FeaturePoly_Stablizer_CS()
+        public FPoly_Core fGrid;
+        public FPoly_Stablizer_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             labels = new string[] { "", "Movement amount - dot is current anchor point", "SyncImage aligned to current image - slide camera left or right",
                   "current image with distance map" };
             desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)";
-            fGrid = new FeaturePoly_Core();
+            fGrid = new FPoly_Core();
         }
         public void RunAlg(Mat src)
         {
@@ -20041,13 +20041,13 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_StartPoints_CS : VB_Parent
+    public class FPoly_StartPoints_CS : VB_Parent
     {
         public List<cv.Point> startPoints;
         public List<cv.Point> goodPoints;
-        public FeaturePoly_Core fGrid = new FeaturePoly_Core();
+        public FPoly_Core fGrid = new FPoly_Core();
         TrackBar resyncSlider;
-        public FeaturePoly_StartPoints_CS()
+        public FPoly_StartPoints_CS()
         {
             resyncSlider = FindSlider("Resync if feature moves > X pixels");
 
@@ -20110,11 +20110,11 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Triangle_CS : VB_Parent
+    public class FPoly_Triangle_CS : VB_Parent
     {
         Area_MinTriangle_CPP_VB triangle = new Area_MinTriangle_CPP_VB();
-        FeaturePoly_Core fGrid = new FeaturePoly_Core();
-        public FeaturePoly_Triangle_CS()
+        FPoly_Core fGrid = new FPoly_Core();
+        public FPoly_Triangle_CS()
         {
             desc = "Find the minimum triangle that contains the feature grid";
         }
@@ -20135,12 +20135,12 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_TopFeatures_CS : VB_Parent
+    public class FPoly_TopFeatures_CS : VB_Parent
     {
         Stable_BasicsCount stable = new Stable_BasicsCount();
         List<cv.Point2f> poly = new List<cv.Point2f>();
         Options_FPoly options = new Options_FPoly();
-        public FeaturePoly_TopFeatures_CS()
+        public FPoly_TopFeatures_CS()
         {
             desc = "Get the top features and validate them";
         }
@@ -20168,16 +20168,16 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_WarpAffinePoly_CS : VB_Parent
+    public class FPoly_WarpAffinePoly_CS : VB_Parent
     {
         Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
         WarpAffine_BasicsQT warp = new WarpAffine_BasicsQT();
-        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
-        public FeaturePoly_WarpAffinePoly_CS()
+        FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
+        public FPoly_WarpAffinePoly_CS()
         {
             labels = new string[] { "", "", "Feature polygon after just rotation - white (original), yellow (current)",
                   "Feature polygon with rotation and shift - should be aligned" };
-            desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics";
+            desc = "Rotate and shift just the Feature polygon as indicated by FPoly_Basics";
         }
         public void RunAlg(Mat src)
         {
@@ -20217,7 +20217,7 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_RotatePoints_CS : VB_Parent
+    public class FPoly_RotatePoints_CS : VB_Parent
     {
         Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
         public List<cv.Point> poly;
@@ -20226,11 +20226,11 @@ namespace CS_Classes
         public cv.Point rotateCenter;
         public int polyPrevSideIndex;
         public cv.Point centerShift;
-        public FeaturePoly_RotatePoints_CS()
+        public FPoly_RotatePoints_CS()
         {
             labels = new string[] { "", "", "Feature polygon after just rotation - white (original), yellow (current)",
                   "Feature polygons with rotation and shift - should be aligned" };
-            desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics";
+            desc = "Rotate and shift just the Feature polygon as indicated by FPoly_Basics";
         }
         public cv.Point shiftPoly(List<cv.Point2f> polyPrev, List<cv.Point> poly)
         {
@@ -20250,7 +20250,7 @@ namespace CS_Classes
         {
             if (standaloneTest())
             {
-                SetTrueText(traceName + " is meant only to run with FeaturePoly_Basics to validate the translation", 3);
+                SetTrueText(traceName + " is meant only to run with FPoly_Basics to validate the translation", 3);
                 return;
             }
             dst2.SetTo(new cv.Scalar(0));
@@ -20281,11 +20281,11 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_WarpAffineImage_CS : VB_Parent
+    public class FPoly_WarpAffineImage_CS : VB_Parent
     {
         WarpAffine_BasicsQT warp = new WarpAffine_BasicsQT();
-        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
-        public FeaturePoly_WarpAffineImage_CS()
+        FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
+        public FPoly_WarpAffineImage_CS()
         {
             if (standaloneTest())
                 vbc.task.gOptions.setDisplay1();
@@ -20320,16 +20320,16 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Perpendiculars_CS : VB_Parent
+    public class FPoly_Perpendiculars_CS : VB_Parent
     {
         public Point2f altCenterShift;
         public fPolyData fPD;
-        public FeaturePoly_RotatePoints rotatePoints = new FeaturePoly_RotatePoints();
+        public FPoly_RotatePoints rotatePoints = new FPoly_RotatePoints();
         Line_Nearest near = new Line_Nearest();
-        public FeaturePoly_Perpendiculars_CS()
+        public FPoly_Perpendiculars_CS()
         {
-            labels = new string[] { "", "", "Output of FeaturePoly_Basics", "Center of rotation is where the extended lines intersect" };
-            desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FeaturePoly_Basics";
+            labels = new string[] { "", "", "Output of FPoly_Basics", "Center of rotation is where the extended lines intersect" };
+            desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FPoly_Basics";
         }
         float findrotateAngle(Point2f p1, Point2f p2, Point2f pt)
         {
@@ -20391,11 +20391,11 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_PerpendicularsTest_CS : VB_Parent
+    public class FPoly_PerpendicularsTest_CS : VB_Parent
     {
-        FeaturePoly_Perpendiculars center = new FeaturePoly_Perpendiculars();
-        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
-        public FeaturePoly_PerpendicularsTest_CS()
+        FPoly_Perpendiculars center = new FPoly_Perpendiculars();
+        FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
+        public FPoly_PerpendicularsTest_CS()
         {
             fPoly.center = center;
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
@@ -20413,11 +20413,11 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_PerpendicularsImage_CS : VB_Parent
+    public class FPoly_PerpendicularsImage_CS : VB_Parent
     {
-        FeaturePoly_Perpendiculars center = new FeaturePoly_Perpendiculars();
-        FeaturePoly_Image fImage = new FeaturePoly_Image();
-        public FeaturePoly_PerpendicularsImage_CS()
+        FPoly_Perpendiculars center = new FPoly_Perpendiculars();
+        FPoly_Image fImage = new FPoly_Image();
+        public FPoly_PerpendicularsImage_CS()
         {
             fImage.fpoly.center = center;
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
@@ -20435,17 +20435,17 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Image_CS : VB_Parent
+    public class FPoly_Image_CS : VB_Parent
     {
-        public FeaturePoly_BasicsOriginal fpoly = new FeaturePoly_BasicsOriginal();
+        public FPoly_BasicsOriginal fpoly = new FPoly_BasicsOriginal();
         Rotate_BasicsQT rotate = new Rotate_BasicsQT();
         public bool resync;
-        public FeaturePoly_Image_CS()
+        public FPoly_Image_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             labels = new string[] { "", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                                 "Resync Image after rotation and translation", "Difference between current image and dst2" };
-            desc = "Rotate and shift the image as indicated by FeaturePoly_Basics";
+            desc = "Rotate and shift the image as indicated by FPoly_Basics";
         }
         public void RunAlg(Mat src)
         {
@@ -20505,10 +20505,10 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_ImageMask_CS : VB_Parent
+    public class FPoly_ImageMask_CS : VB_Parent
     {
-        public FeaturePoly_Image fImage = new FeaturePoly_Image();
-        public FeaturePoly_ImageMask_CS()
+        public FPoly_Image fImage = new FPoly_Image();
+        public FPoly_ImageMask_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             vbc.task.gOptions.pixelDiffThreshold = 10;
@@ -20529,14 +20529,14 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_PointCloud_CS : VB_Parent
+    public class FPoly_PointCloud_CS : VB_Parent
     {
-        public FeaturePoly_ImageMask fMask = new FeaturePoly_ImageMask();
+        public FPoly_ImageMask fMask = new FPoly_ImageMask();
         public Mat fPolyCloud;
-        public FeaturePoly_PointCloud_CS()
+        public FPoly_PointCloud_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            desc = "Update changed point cloud pixels as indicated by the FeaturePoly_ImageMask";
+            desc = "Update changed point cloud pixels as indicated by the FPoly_ImageMask";
         }
         public void RunAlg(Mat src)
         {
@@ -20553,11 +20553,11 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_ResyncCheck_CS : VB_Parent
+    public class FPoly_ResyncCheck_CS : VB_Parent
     {
-        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
+        FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
         int lastPixelCount = 0;
-        public FeaturePoly_ResyncCheck_CS()
+        public FPoly_ResyncCheck_CS()
         {
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter.";
@@ -20584,13 +20584,13 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Center_CS : VB_Parent
+    public class FPoly_Center_CS : VB_Parent
     {
         public Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
         Line_Nearest near = new Line_Nearest();
         public fPolyData fPD;
         List<cv.Point2f> newPoly;
-        public FeaturePoly_Center_CS()
+        public FPoly_Center_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             labels = new string[] { "", "Layout of feature polygons after just translation - red line is used in sine computation",
@@ -20602,7 +20602,7 @@ namespace CS_Classes
         {
             if (standaloneTest())
             {
-                SetTrueText(traceName + " is called by FeaturePoly_Basics to get the rotate center and angle." + "\n" +
+                SetTrueText(traceName + " is called by FPoly_Basics to get the rotate center and angle." + "\n" +
                             "It does not produce any output when run standaloneTest().");
                 return;
             }
@@ -20677,14 +20677,14 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_EdgeRemoval_CS : VB_Parent
+    public class FPoly_EdgeRemoval_CS : VB_Parent
     {
-        FeaturePoly_ImageMask fMask = new FeaturePoly_ImageMask();
+        FPoly_ImageMask fMask = new FPoly_ImageMask();
         Edge_Basics edges = new Edge_Basics();
-        public FeaturePoly_EdgeRemoval_CS()
+        public FPoly_EdgeRemoval_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            desc = "Remove edges from the FeaturePoly_ImageMask";
+            desc = "Remove edges from the FPoly_ImageMask";
         }
         public void RunAlg(Mat src)
         {
@@ -20699,17 +20699,17 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_ImageNew_CS : VB_Parent
+    public class FPoly_ImageNew_CS : VB_Parent
     {
-        public FeaturePoly_Basics fpoly = new FeaturePoly_Basics();
+        public FPoly_Basics fpoly = new FPoly_Basics();
         Rotate_BasicsQT rotate = new Rotate_BasicsQT();
         public bool resync;
-        public FeaturePoly_ImageNew_CS()
+        public FPoly_ImageNew_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             labels = new string[] { "", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                   "Resync Image after rotation and translation", "Difference between current image and dst2" };
-            desc = "Rotate and shift the image as indicated by FeaturePoly_Basics";
+            desc = "Rotate and shift the image as indicated by FPoly_Basics";
         }
         public void RunAlg(Mat src)
         {
@@ -20761,11 +20761,11 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_LeftRight_CS : VB_Parent
+    public class FPoly_LeftRight_CS : VB_Parent
     {
-        FeaturePoly_Basics leftPoly = new FeaturePoly_Basics();
-        FeaturePoly_Basics rightPoly = new FeaturePoly_Basics();
-        public FeaturePoly_LeftRight_CS()
+        FPoly_Basics leftPoly = new FPoly_Basics();
+        FPoly_Basics rightPoly = new FPoly_Basics();
+        public FPoly_LeftRight_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
@@ -20790,7 +20790,7 @@ namespace CS_Classes
 
 
 
-    public class FeaturePoly_Core_CS : VB_Parent
+    public class FPoly_Core_CS : VB_Parent
     {
         public Stable_GoodFeatures stable = new Stable_GoodFeatures();
         public Point2f anchor;
@@ -20799,7 +20799,7 @@ namespace CS_Classes
         public List<List<cv.Point>> goodFacets = new List<List<cv.Point>>();
         Options_FPoly options = new Options_FPoly();
         Options_FPolyCore optionsCore = new Options_FPolyCore();
-        public FeaturePoly_Core_CS()
+        public FPoly_Core_CS()
         {
             dst0 = new Mat(dst0.Size(), MatType.CV_32F, cv.Scalar.All(0));
             FindSlider("Feature Sample Size").Value = 20;
@@ -28655,7 +28655,7 @@ namespace CS_Classes
 
     public class Homography_FPoly_CS : VB_Parent
     {
-        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
+        FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
         Homography_Basics hGraph = new Homography_Basics();
         public Homography_FPoly_CS()
         {
@@ -43553,13 +43553,13 @@ namespace CS_Classes
 
     public class OpenGL_FPolyCloud_CS : VB_Parent
     {
-        FeaturePoly_PointCloud fpolyPC = new FeaturePoly_PointCloud();
+        FPoly_PointCloud fpolyPC = new FPoly_PointCloud();
         public OpenGL_FPolyCloud_CS()
         {
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             vbc.task.OpenGLTitle = "OpenGL_Functions";
-            desc = "Display the pointcloud after FeaturePoly_PointCloud identifies the changes depth pixels";
+            desc = "Display the pointcloud after FPoly_PointCloud identifies the changes depth pixels";
         }
         public void RunAlg(Mat src)
         {

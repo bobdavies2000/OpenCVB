@@ -772,12 +772,12 @@ End Class
 
 
 Public Class OpenGL_FPolyCloud : Inherits VB_Parent
-    Dim fpolyPC As New FeaturePoly_PointCloud
+    Dim fpolyPC As New FPoly_PointCloud
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Display the pointcloud after FeaturePoly_PointCloud identifies the changes depth pixels"
+        desc = "Display the pointcloud after FPoly_PointCloud identifies the changes depth pixels"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fpolyPC.Run(src)

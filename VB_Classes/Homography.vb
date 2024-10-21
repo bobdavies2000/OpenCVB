@@ -34,7 +34,7 @@ End Class
 
 
 Public Class Homography_FPoly : Inherits VB_Parent
-    Dim fPoly As New FeaturePoly_BasicsOriginal
+    Dim fPoly As New FPoly_BasicsOriginal
     Dim hGraph As New Homography_Basics
     Public Sub New()
         desc = "Use the feature polygon to warp the current image to a previous image.  This is not useful but demonstrates how to use homography."
