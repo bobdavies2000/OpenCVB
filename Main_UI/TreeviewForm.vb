@@ -140,7 +140,7 @@ Public Class TreeviewForm
                 Next
 
                 PercentTime.Text = ""
-                PercentTime.Text = "Algorithm FPS = " + Format(Main_UI.fpsAlgorithm, "0") + vbCrLf
+                PercentTime.Text = "Algorithm FPS = " + Format(Main_UI.algorithmFPSrate, "0") + vbCrLf
                 PercentTime.Text += "Camera FPS = " + Format(Main_UI.fpsCamera, "0") + vbCrLf
                 PercentTime.Text += "% = function times for algorithm task only." + vbCrLf + vbCrLf
                 Static boldFont = New Font(PercentTime.Font, FontStyle.Bold)

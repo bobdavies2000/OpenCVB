@@ -1309,7 +1309,7 @@ Public Class FPoly_Core : Inherits VB_Parent
     Public Sub New()
         dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
         FindSlider("Feature Sample Size").Value = 20
-        labels = {"", "Distance change from previous frame", "", "Feature Grid with anchor"}
+        labels(3) = "Feature points with anchor"
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -1335,7 +1335,7 @@ Public Class FPoly_Core : Inherits VB_Parent
             dst0.FillConvexPoly(facet, d, task.lineType)
             Dim lastd = lastDistance.Get(Of Single)(pt.Y, pt.X)
             Dim absDiff = Math.Abs(lastd - d)
-            If absDiff < threshold Then
+            If absDiff < threshold Or threshold = 0 Then
                 goodPoints.Add(pt)
                 goodFacets.Add(facet)
                 SetTrueText(Format(absDiff, fmt1), pt, 2)

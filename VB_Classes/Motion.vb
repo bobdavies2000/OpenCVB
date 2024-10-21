@@ -39,8 +39,10 @@ Public Class Motion_Basics : Inherits VB_Parent
             depthRGB = task.depthRGB.Clone
             pointcloud = task.pointCloud.Clone
         Else
-            task.depthRGB.CopyTo(depthRGB, motionMask)
-            task.pointCloud.CopyTo(pointcloud, motionMask)
+            If depthRGB.Rows > 0 Then
+                task.depthRGB.CopyTo(depthRGB, motionMask)
+                task.pointCloud.CopyTo(pointcloud, motionMask)
+            End If
         End If
     End Sub
 End Class

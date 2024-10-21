@@ -80,7 +80,9 @@ Public Class Main_UI
     Dim myBrush = New SolidBrush(Color.White)
     Dim groupList As New List(Of String)
     Public TreeViewDialog As TreeviewForm
-    Public fpsAlgorithm As Single
+    Public algorithmFPSrate As Single
+    Dim fpsListA As New List(Of Single)
+    Dim fpsListC As New List(Of Single)
     Public fpsCamera As Single
     Dim picLabels() = {"", "", "", ""}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
@@ -131,6 +133,7 @@ Public Class Main_UI
     Dim windowsVersion As Integer
     Dim algolist As algorithmList = New algorithmList
     Dim magIndex As Integer
+    Dim motionLabel As String
 
 #End Region
 #Region "Non-volatile"
@@ -984,6 +987,7 @@ Public Class Main_UI
 
         setupPath()
         jsonRead()
+        camSwitch()
 
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
@@ -1029,6 +1033,8 @@ Public Class Main_UI
                    "All Python algorithms will be disabled for now...")
         End If
 
+        CameraSwitching.Text = "Initializing " + settings.cameraName
+        Me.Show()
         If settings.cameraFound Then
             startCamera()
             While camera Is Nothing ' wait for camera to start...
@@ -1036,6 +1042,7 @@ Public Class Main_UI
                 Thread.Sleep(100)
             End While
         End If
+        CameraSwitching.Text = settings.cameraName + " starting"
 
         frameCount = 0
         setupCamPics()
@@ -1086,9 +1093,10 @@ Public Class Main_UI
 
         fpsTimer.Enabled = True
         XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
-
+        XYLoc.Visible = True
         'detectorObj = New CameraDetector
         'detectorObj.StartDetector()
+        Debug.WriteLine("Main_UI_Load complete.")
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         saveAlgorithmName = "" ' this will close the current algorithm.
@@ -1114,8 +1122,6 @@ Public Class Main_UI
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If
 
-        Static fpsListA As New List(Of Single)
-        Static fpsListC As New List(Of Single)
         If pauseAlgorithmThread = False Then
             Dim timeNow As DateTime = Now
             Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
@@ -1124,32 +1130,39 @@ Public Class Main_UI
             lastTime = timeNow
 
             Dim countFrames = frameCount - lastAlgorithmFrame
-            lastAlgorithmFrame = frameCount
-            fpsListA.Add(CSng(countFrames / (taskTimerInterval / 1000)))
-
             Dim camFrames = camera.cameraFrameCount - lastCameraFrame
+            lastAlgorithmFrame = frameCount
             lastCameraFrame = camera.cameraFrameCount
-            fpsListC.Add(CSng(camFrames / (taskTimerInterval / 1000)))
+
+            If taskTimerInterval > 0 Then
+                fpsListA.Add(CSng(countFrames / (taskTimerInterval / 1000)))
+                fpsListC.Add(CSng(camFrames / (taskTimerInterval / 1000)))
+            Else
+                fpsListA.Add(0)
+                fpsListC.Add(0)
+            End If
+
             If cameraTaskHandle Is Nothing Then Exit Sub
+            CameraSwitching.Text = settings.cameraName + " awaiting first buffer"
             Dim cameraName = settings.cameraName
             cameraName = cameraName.Replace(" 2/2i", "")
             cameraName = cameraName.Replace(" camera", "")
             cameraName = cameraName.Replace(" Camera", "")
             cameraName = cameraName.Replace("Intel(R) RealSense(TM) Depth ", "Intel D")
 
-            fpsAlgorithm = fpsListA.Average
+            algorithmFPSrate = fpsListA.Average
             fpsCamera = fpsListC.Average
-            If fpsAlgorithm >= 100 Then fpsAlgorithm = 99
+            If algorithmFPSrate >= 100 Then algorithmFPSrate = 99
             If fpsCamera >= 100 Then fpsCamera = 99
-            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " + CStr(algorithmCount) + " algorithms = " +
-                      CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + cameraName +
-                          " - Camera FPS/task FPS: " + Format(fpsCamera, "0") + "/" +
-                          Format(fpsAlgorithm, "0")
+            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
+                      CStr(algorithmCount) + " algorithms = " +
+                      CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " +
+                      cameraName + " - Camera FPS/task FPS: " + Format(fpsCamera, "0") + "/" +
+                      Format(algorithmFPSrate, "0")
             If fpsListA.Count > 5 Then
                 fpsListA.RemoveAt(0)
                 fpsListC.RemoveAt(0)
             End If
-            If frameCount > 1 And CameraSwitching.Visible Then CameraSwitching.Visible = False
         End If
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
@@ -1168,8 +1181,7 @@ Public Class Main_UI
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
-            CameraSwitching.Visible = True
-            CameraSwitching.BringToFront()
+            camSwitch()
             task.optionsChanged = True
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
             saveAlgorithmName = ""
@@ -1198,8 +1210,8 @@ Public Class Main_UI
             Debug.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
             While 1
                 If algorithmQueueCount = 0 Then Exit While
-                'Console.Write(".")
-                Application.DoEvents()
+                Debug.Write(".")
+                Thread.Sleep(100)
             End While
         End If
 
@@ -1250,55 +1262,6 @@ Public Class Main_UI
             saveLastAlgorithm = AvailableAlgorithms.Text
         End If
         StartTask()
-    End Sub
-    Private Sub StartTask()
-        Debug.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
-        SyncLock callTraceLock
-            If TreeViewDialog IsNot Nothing Then
-                callTrace.Clear()
-                algorithm_ms.Clear()
-                algorithmNames.Clear()
-                TreeViewDialog.PercentTime.Text = ""
-            End If
-        End SyncLock
-        testAllRunning = TestAllButton.Text = "Stop Test"
-        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
-
-        Dim parms As New VB_Classes.VBtask.algParms
-        parms.fpsRate = settings.desiredFPS
-
-        parms.useRecordedData = GroupCombo.Text = "<All using recorded data>"
-        parms.testAllRunning = testAllRunning
-
-        parms.externalPythonInvocation = externalPythonInvocation
-        parms.showConsoleLog = settings.showConsoleLog
-
-        parms.HomeDir = HomeDir.FullName
-        parms.cameraName = settings.cameraName
-        parms.cameraIndex = settings.cameraIndex
-        If settings.cameraName <> "" Then parms.cameraInfo = camera.cameraInfo
-
-        parms.main_hwnd = Me.Handle
-        parms.mainFormLocation = New cvb.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-
-        parms.workingRes = settings.WorkingRes
-        parms.captureRes = settings.captureRes
-        parms.displayRes = settings.displayRes
-        parms.algName = AvailableAlgorithms.Text
-
-        PausePlayButton.Image = PausePlay
-
-        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
-        ' Clicking on availablealgorithms indicates they are done with using the treeview.
-        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
-
-        Thread.CurrentThread.Priority = ThreadPriority.Lowest
-        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
-        AlgorithmDesc.Text = ""
-        algorithmTaskHandle.Name = AvailableAlgorithms.Text
-        algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
-        algorithmTaskHandle.Start(parms)
-        Debug.WriteLine("Start Algorithm completed.")
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
@@ -1366,7 +1329,7 @@ Public Class Main_UI
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
         Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(WorkingRes.Width) + "x" + CStr(WorkingRes.Height)
-        resolutionDetails += " - Motion: " + task.MotionLabel
+        resolutionDetails += " - Motion: " + motionLabel
         If picLabels(0) <> "" Then
             If camLabel(0).Text <> picLabels(0) + " - RGB " + resolutionDetails Then
                 camLabel(0).Text = picLabels(0)
@@ -1389,6 +1352,7 @@ Public Class Main_UI
             cameraTaskHandle.Name = "Camera Task"
             cameraTaskHandle.Start()
         End If
+        CameraSwitching.Text = settings.cameraName + " starting"
     End Sub
     Private Function getCamera() As Object
         Select Case settings.cameraName
@@ -1471,9 +1435,60 @@ Public Class Main_UI
             restartCameraRequest = False
         End While
     End Sub
+    Private Sub StartTask()
+        Debug.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
+        SyncLock callTraceLock
+            If TreeViewDialog IsNot Nothing Then
+                callTrace.Clear()
+                algorithm_ms.Clear()
+                algorithmNames.Clear()
+                TreeViewDialog.PercentTime.Text = ""
+            End If
+        End SyncLock
+        testAllRunning = TestAllButton.Text = "Stop Test"
+        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
+
+        Dim parms As New VB_Classes.VBtask.algParms
+        parms.fpsRate = settings.desiredFPS
+
+        parms.useRecordedData = GroupCombo.Text = "<All using recorded data>"
+        parms.testAllRunning = testAllRunning
+
+        parms.externalPythonInvocation = externalPythonInvocation
+        parms.showConsoleLog = settings.showConsoleLog
+
+        parms.HomeDir = HomeDir.FullName
+        parms.cameraName = settings.cameraName
+        parms.cameraIndex = settings.cameraIndex
+        If settings.cameraName <> "" Then parms.cameraInfo = camera.cameraInfo
+
+        parms.main_hwnd = Me.Handle
+        parms.mainFormLocation = New cvb.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
+
+        parms.workingRes = settings.WorkingRes
+        parms.captureRes = settings.captureRes
+        parms.displayRes = settings.displayRes
+        parms.algName = AvailableAlgorithms.Text
+
+        PausePlayButton.Image = PausePlay
+
+        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
+        ' Clicking on availablealgorithms indicates they are done with using the treeview.
+        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
+
+        Thread.CurrentThread.Priority = ThreadPriority.Lowest
+        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
+        AlgorithmDesc.Text = ""
+        algorithmTaskHandle.Name = AvailableAlgorithms.Text
+        algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
+        algorithmTaskHandle.Start(parms)
+        Debug.WriteLine("Start Algorithm completed.")
+    End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
         If parms.algName = "" Then Exit Sub
         algorithmQueueCount += 1
+        algorithmFPSrate = 0
+
         ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
         SyncLock algorithmThreadLock
             algorithmQueueCount -= 1
@@ -1636,9 +1651,9 @@ Public Class Main_UI
                 task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
                 Dim updatedDrawRect = task.drawRect
 
-
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 picLabels = task.labels
+                motionLabel = task.MotionLabel
                 SyncLock mouseLock
                     If mousePoint.X < task.gridMap.Width And mousePoint.Y < task.gridMap.Height Then
                         mouseGridCell = task.gridMap.Get(Of Integer)(mousePoint.Y, mousePoint.X)
@@ -1665,10 +1680,10 @@ Public Class Main_UI
                 pixelViewerRect = task.pixelViewerRect
                 pixelViewTag = task.pixelViewTag
 
-                If Single.IsNaN(fpsAlgorithm) Then
-                    task.fpsRate = 1
+                If Single.IsNaN(algorithmFPSrate) Then
+                    task.fpsRate = 0
                 Else
-                    task.fpsRate = If(fpsAlgorithm < 0.01, 1, fpsAlgorithm)
+                    task.fpsRate = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
                 If task.paused = False Then
@@ -1732,6 +1747,38 @@ Public Class Main_UI
         If r.Width = 0 Or r.Height = 0 Then Exit Sub
         Dim img = dst(drawRectPic)(r).Resize(New cvb.Size(drawRect.Width * 5, drawRect.Height * 5))
         cvb.Cv2.ImShow("DrawRect Region " + CStr(magIndex), img)
+    End Sub
+    Private Sub camSwitch()
+        CameraSwitching.Visible = True
+        dst(0) = Nothing
+        CameraSwitching.Text = settings.cameraName + " initializing"
+        CamSwitchProgress.Visible = True
+        CamSwitchProgress.Left = CameraSwitching.Left
+        CamSwitchProgress.Top = CameraSwitching.Top + CameraSwitching.Height
+        CamSwitchProgress.Height = CameraSwitching.Height / 2
+        CameraSwitching.BringToFront()
+        CamSwitchProgress.BringToFront()
+        CamSwitchTimer.Enabled = True
+    End Sub
+    Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
+        Dim count As Integer
+        If dst(0) IsNot Nothing And paintNewImages Then
+            Dim tmp = cvext.BitmapConverter.ToMat(camPic(0).Image)
+            count = tmp.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).CountNonZero
+        End If
+        If count Then
+            CameraSwitching.Visible = False
+            CamSwitchProgress.Visible = False
+            CamSwitchTimer.Enabled = False
+        Else
+            If CamSwitchProgress.Visible Then
+                Static frames As Integer
+                Dim slideCount As Integer = 10
+                CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
+                If frames >= slideCount Then frames = 0
+                frames += 1
+            End If
+        End If
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles Magnify.Click
         MagnifyTimer.Enabled = True

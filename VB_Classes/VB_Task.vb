@@ -70,7 +70,7 @@ Public Class VBtask : Implements IDisposable
     Public noMotionMask As cvb.Mat
     Public motion As Motion_Basics
     Public motionPercent As Single
-    Public MotionLabel As String
+    Public MotionLabel As String = " "
 
     Public reliableDepth As Reliable_Depth
     Public reliableDepthMask As cvb.Mat

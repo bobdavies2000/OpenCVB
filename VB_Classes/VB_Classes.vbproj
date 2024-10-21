@@ -206,7 +206,7 @@
     <Compile Include="CPP.vb" />
     <Compile Include="Crypto.vb" />
     <Compile Include="Denoise.vb" />
-    <Compile Include="FeaturePoly.vb" />
+    <Compile Include="FPoly.vb" />
     <Compile Include="Gif.vb" />
     <Compile Include="Homography.vb" />
     <Compile Include="Model.vb" />
