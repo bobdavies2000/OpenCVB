@@ -1310,21 +1310,16 @@ Public Class Main_UI
 
         ' draw any TrueType font data on the image 
         SyncLock trueDataLock
-            Try
-                For i = 0 To trueData.Count - 1
-                    If trueData(i) Is Nothing Then Continue For
-                    Dim tt = trueData(i)
-                    If tt.text Is Nothing Then Continue For
-                    ' campic(2) has both dst2 and dst3 to assure they are in sync.
-                    If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                        g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
-                                     CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
-                    End If
-                Next
-                trueData.Clear()
-            Catch ex As Exception
-                Debug.WriteLine("Error in trueData update: " + ex.Message)
-            End Try
+            For i = 0 To trueData.Count - 1
+                If trueData(i) Is Nothing Then Continue For
+                Dim tt = trueData(i)
+                If tt.text Is Nothing Then Continue For
+                ' campic(2) has both dst2 and dst3 to insure they are in sync.
+                If tt.text.Length > 0 And tt.picTag = pic.Tag Then
+                    g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
+                                         CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
+                End If
+            Next
         End SyncLock
 
         Dim WorkingRes = settings.WorkingRes

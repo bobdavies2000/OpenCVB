@@ -636,7 +636,7 @@ Public Class TaskParent : Implements IDisposable
             task.dst2 = dst2
             task.dst3 = dst3
         End If
-        task.trueData = trueData
+        task.trueData = New List(Of TrueText)(trueData)
     End Sub
     Public Sub measureStartRun(name As String)
         If task.recordTimings = False Then Exit Sub
