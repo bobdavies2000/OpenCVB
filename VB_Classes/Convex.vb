@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Convex_Basics : Inherits VB_Parent
+Public Class Convex_Basics : Inherits TaskParent
     Public hull() As cvb.Point
     Dim options As New Options_Convex
     Public Sub New()
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Convex_RedCloud : Inherits VB_Parent
+Public Class Convex_RedCloud : Inherits TaskParent
     Dim convex As New Convex_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -79,7 +79,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/31354150/opencv-convexity-defects-drawing
-Public Class Convex_Defects : Inherits VB_Parent
+Public Class Convex_Defects : Inherits TaskParent
     Dim contours As New Contour_Largest
     Public Sub New()
         dst2 = cvb.Cv2.ImRead(task.HomeDir + "Data/star2.png").Threshold(200, 255, cvb.ThresholdTypes.Binary).Resize(New cvb.Size(task.dst2.Width, task.dst2.Height))
@@ -110,7 +110,7 @@ End Class
 
 
 
-Public Class Convex_RedCloudDefects : Inherits VB_Parent
+Public Class Convex_RedCloudDefects : Inherits TaskParent
     Dim convex As New Convex_RedCloud
     Dim contours As New Contour_Largest
     Public Sub New()

@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Cell_Basics : Inherits VB_Parent
+Public Class Cell_Basics : Inherits TaskParent
     Dim plot As New Hist_Depth
     Dim pca As New PCA_Basics
     Dim eq As New Plane_Equation
@@ -81,7 +81,7 @@ End Class
 
 
 
-Public Class Cell_PixelCountCompare : Inherits VB_Parent
+Public Class Cell_PixelCountCompare : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.DebugChecked = True
@@ -119,7 +119,7 @@ End Class
 
 
 
-Public Class Cell_ValidateColorCells : Inherits VB_Parent
+Public Class Cell_ValidateColorCells : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"
@@ -167,7 +167,7 @@ End Class
 
 
 
-Public Class Cell_Distance : Inherits VB_Parent
+Public Class Cell_Distance : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
@@ -211,7 +211,7 @@ End Class
 
 
 
-Public Class Cell_Binarize : Inherits VB_Parent
+Public Class Cell_Binarize : Inherits TaskParent
     Public redC As New RedCloud_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -254,7 +254,7 @@ End Class
 
 
 
-Public Class Cell_Floodfill : Inherits VB_Parent
+Public Class Cell_Floodfill : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim stats As New Cell_Basics
     Public Sub New()
@@ -278,7 +278,7 @@ End Class
 
 
 
-Public Class Cell_BasicsPlot : Inherits VB_Parent
+Public Class Cell_BasicsPlot : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
     Dim stats As New Cell_Basics
@@ -329,7 +329,7 @@ End Class
 
 
 
-Public Class Cell_Stable : Inherits VB_Parent
+Public Class Cell_Stable : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Below are cells that were not exact matches."
@@ -359,7 +359,7 @@ End Class
 
 
 
-Public Class Cell_Generate : Inherits VB_Parent
+Public Class Cell_Generate : Inherits TaskParent
     Public classCount As Integer
     Public rectList As New List(Of cvb.Rect)
     Public floodPoints As New List(Of cvb.Point)

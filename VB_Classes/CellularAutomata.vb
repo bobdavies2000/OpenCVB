@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellularAutomata_Basics : Inherits VB_Parent
+Public Class CellularAutomata_Basics : Inherits TaskParent
     Public i18 As New List(Of String)({"00011110 Rule 30 (chaotic)", "00110110 Rule 54", "00111100 Rule 60", "00111110 Rule 62",
                                        "01011010 Rule 90", "01011110 Rule 94", "01100110 Rule 102", "01101110 Rule 110",
                                        "01111010 Rule 122", "01111110 Rule 126", "10010110 Rule 150", "10011110 Rule 158",
@@ -63,7 +63,7 @@ End Class
 
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-Public Class CellularAutomata_Life : Inherits VB_Parent
+Public Class CellularAutomata_Life : Inherits TaskParent
     Dim random As New Random_Basics
     Dim grid As cvb.Mat
     Dim nextgrid As cvb.Mat
@@ -158,7 +158,7 @@ End Class
 
 
 ' https://natureofcode.com/book/chapter-7-cellular-automata/
-Public Class CellularAutomata_LifeColor : Inherits VB_Parent
+Public Class CellularAutomata_LifeColor : Inherits TaskParent
     Dim game As New CellularAutomata_Life
     Public Sub New()
         game.backColor = cvb.Scalar.White
@@ -189,7 +189,7 @@ End Class
 
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-Public Class CellularAutomata_LifePopulation : Inherits VB_Parent
+Public Class CellularAutomata_LifePopulation : Inherits TaskParent
     Dim plot As New Plot_OverTimeSingle
     Dim game As New CellularAutomata_Life
     Public Sub New()
@@ -210,7 +210,7 @@ End Class
 
 
 
-Public Class CellularAutomata_MultiPoint : Inherits VB_Parent
+Public Class CellularAutomata_MultiPoint : Inherits TaskParent
     Dim cell As New CellularAutomata_Basics
     Dim val1 As Integer = 0
     Dim val2 As Integer = dst2.Width / 2
@@ -237,7 +237,7 @@ End Class
 
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellularAutomata_All256 : Inherits VB_Parent
+Public Class CellularAutomata_All256 : Inherits TaskParent
     Dim cell As New CellularAutomata_Basics
     Dim options As New Options_CellAutomata
     Dim ruleSlider As System.Windows.Forms.TrackBar

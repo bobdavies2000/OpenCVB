@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
-Public Class Smoothing_Exterior : Inherits VB_Parent
+Public Class Smoothing_Exterior : Inherits TaskParent
     Dim hull As New Convex_Basics
     Public inputPoints As List(Of cvb.Point)
 	Public smoothPoints As List(Of cvb.Point)
@@ -74,7 +74,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
-Public Class Smoothing_Interior : Inherits VB_Parent
+Public Class Smoothing_Interior : Inherits TaskParent
     Dim hull As New Convex_Basics
     Public inputPoints As List(Of cvb.Point)
     Public smoothPoints As List(Of cvb.Point)

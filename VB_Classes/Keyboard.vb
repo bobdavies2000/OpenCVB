@@ -1,6 +1,6 @@
 
 Imports cvb = OpenCvSharp
-Public Class Keyboard_Basics : Inherits VB_Parent
+Public Class Keyboard_Basics : Inherits TaskParent
     Public keyInput As New List(Of String)
     Dim flow As New Font_FlowText
     Public checkKeys As New OptionsKeyboardInput

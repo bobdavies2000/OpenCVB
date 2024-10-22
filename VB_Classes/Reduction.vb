@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Reduction_Basics : Inherits VB_Parent
+Public Class Reduction_Basics : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         task.redOptions.enableReductionTypeGroup(True)
@@ -7,7 +7,7 @@ Public Class Reduction_Basics : Inherits VB_Parent
         desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         If task.redOptions.reductionType = "Use Bitwise Reduction" Then
             Dim bits = task.redOptions.getBitReductionBar()
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class Reduction_Floodfill : Inherits VB_Parent
+Public Class Reduction_Floodfill : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -62,7 +62,7 @@ End Class
 
 
 
-Public Class Reduction_HeatMapLines : Inherits VB_Parent
+Public Class Reduction_HeatMapLines : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public lines As New Line_Basics
     Public setupSide As New PointCloud_SetupSide
@@ -94,7 +94,7 @@ End Class
 
 
 
-Public Class Reduction_PointCloud : Inherits VB_Parent
+Public Class Reduction_PointCloud : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         task.redOptions.checkSimpleReduction(True)
@@ -120,7 +120,7 @@ End Class
 
 
 
-Public Class Reduction_XYZ : Inherits VB_Parent
+Public Class Reduction_XYZ : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_Reduction
     Public Sub New()
@@ -157,7 +157,7 @@ End Class
 
 
 
-Public Class Reduction_Edges : Inherits VB_Parent
+Public Class Reduction_Edges : Inherits TaskParent
     Dim edges As New Edge_Laplacian
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -186,7 +186,7 @@ End Class
 
 
 
-Public Class Reduction_Histogram : Inherits VB_Parent
+Public Class Reduction_Histogram : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim plot As New Plot_Histogram
     Public Sub New()
@@ -210,7 +210,7 @@ End Class
 
 
 
-Public Class Reduction_BGR : Inherits VB_Parent
+Public Class Reduction_BGR : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim mats As New Mat_4Click
     Public Sub New()

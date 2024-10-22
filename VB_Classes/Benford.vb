@@ -12,7 +12,7 @@ Imports System.Text.RegularExpressions
 ' This impact is likely the result of how JPEG compression truncates values as insignificant - a definite manipulation of the data.
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_Basics : Inherits VB_Parent
+Public Class Benford_Basics : Inherits TaskParent
     Public expectedDistribution(10 - 1) As Single
     Public counts(expectedDistribution.Count - 1) As Single
     Dim plot As New Plot_Histogram
@@ -96,7 +96,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_NormalizedImage : Inherits VB_Parent
+Public Class Benford_NormalizedImage : Inherits TaskParent
     Public benford As New Benford_Basics
     Public Sub New()
         desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
@@ -119,7 +119,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_NormalizedImage99 : Inherits VB_Parent
+Public Class Benford_NormalizedImage99 : Inherits TaskParent
     Public benford As New Benford_Basics
     Public Sub New()
         benford.setup99()
@@ -144,7 +144,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_JPEG : Inherits VB_Parent
+Public Class Benford_JPEG : Inherits TaskParent
     Public benford As New Benford_Basics
     Dim options As New Options_JpegQuality
     Public Sub New()
@@ -169,7 +169,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_JPEG99 : Inherits VB_Parent
+Public Class Benford_JPEG99 : Inherits TaskParent
     Public benford As New Benford_Basics
     Public options As New Options_JpegQuality
     Public Sub New()
@@ -196,7 +196,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_PNG : Inherits VB_Parent
+Public Class Benford_PNG : Inherits TaskParent
     Dim options As New Options_PNGCompression
     Public benford As New Benford_Basics
     Public Sub New()
@@ -220,7 +220,7 @@ End Class
 
 
 
-Public Class Benford_Depth : Inherits VB_Parent
+Public Class Benford_Depth : Inherits TaskParent
     Public benford As New Benford_Basics
     Public Sub New()
         desc = "Apply Benford to the depth data"
@@ -240,7 +240,7 @@ End Class
 
 
 
-Public Class Benford_Primes : Inherits VB_Parent
+Public Class Benford_Primes : Inherits TaskParent
     Dim sieve As New Sieve_BasicsVB
     Dim benford As New Benford_Basics
     Public Sub New()

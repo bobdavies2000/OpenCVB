@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://stackoverflow.com/questions/6606891/opencv-virtually-camera-rotating-translating-for-birds-eye-view/6667784#6667784
-Public Class WarpPerspective_Basics : Inherits VB_Parent
+Public Class WarpPerspective_Basics : Inherits TaskParent
     Public options As New Options_Warp
     Public Sub New()
         desc = "Essentials of the rotation matrix of WarpPerspective"
@@ -20,7 +20,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class WarpPerspective_WidthHeight : Inherits VB_Parent
+Public Class WarpPerspective_WidthHeight : Inherits TaskParent
     Dim options As New Options_WarpPerspective
     Public Sub New()
         desc = "Use WarpPerspective to transform input images."

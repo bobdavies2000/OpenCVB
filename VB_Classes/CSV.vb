@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.IO
 
-Public Class CSV_Basics : Inherits VB_Parent
+Public Class CSV_Basics : Inherits TaskParent
     Public inputFile As String
     Public array(,) As String
     Public arrayList As New List(Of List(Of String))
@@ -39,7 +39,7 @@ End Class
 
 
 
-'Public Class CSV_Excel : Inherits VB_Parent
+'Public Class CSV_Excel : Inherits TaskParent
 '    Public inputFile As String
 '    Public dataTable As DataTable
 '    Public Sub New()

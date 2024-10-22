@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
-Public Class Bin4Way_Basics : Inherits VB_Parent
+Public Class Bin4Way_Basics : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim binary As New Bin4Way_SplitMean
     Dim diff(3) As Diff_Basics
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class Bin4Way_Canny : Inherits VB_Parent
+Public Class Bin4Way_Canny : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim binary As New Bin4Way_SplitMean
     Dim mats As New Mat_4Click
@@ -143,7 +143,7 @@ End Class
 
 
 
-Public Class Bin4Way_Sobel : Inherits VB_Parent
+Public Class Bin4Way_Sobel : Inherits TaskParent
     Dim edges As New Edge_Sobel
     Dim binary As New Bin4Way_SplitMean
     Public mats As New Mat_4to1
@@ -181,7 +181,7 @@ End Class
 
 
 
-Public Class Bin4Way_Unstable1 : Inherits VB_Parent
+Public Class Bin4Way_Unstable1 : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -202,7 +202,7 @@ End Class
 
 
 
-Public Class Bin4Way_UnstableEdges : Inherits VB_Parent
+Public Class Bin4Way_UnstableEdges : Inherits TaskParent
     Dim canny As New Edge_Basics
     Dim blur As New Blur_Basics
     Dim unstable As New Bin4Way_Unstable
@@ -229,7 +229,7 @@ End Class
 
 
 
-Public Class Bin4Way_UnstablePixels : Inherits VB_Parent
+Public Class Bin4Way_UnstablePixels : Inherits TaskParent
     Dim unstable As New Bin4Way_UnstableEdges
     Public gapValues As New List(Of Byte)
     Public Sub New()
@@ -292,7 +292,7 @@ End Class
 
 
 
-Public Class Bin4Way_SplitValley : Inherits VB_Parent
+Public Class Bin4Way_SplitValley : Inherits TaskParent
     Dim binary As New Binarize_Simple
     Dim valley As New HistValley_Basics
     Public mats As New Mat_4Click
@@ -326,7 +326,7 @@ End Class
 
 
 
-Public Class Bin4Way_UnstablePixels1 : Inherits VB_Parent
+Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
     Dim hist As New Hist_Basics
     Dim unstable As New Bin4Way_UnstableEdges
     Public gapValues As New List(Of Byte)
@@ -404,7 +404,7 @@ End Class
 
 
 
-Public Class Bin4Way_SplitGaps : Inherits VB_Parent
+Public Class Bin4Way_SplitGaps : Inherits TaskParent
     Dim unstable As New Bin4Way_UnstablePixels
     Public mats As New Mat_4Click
     Dim diff(3) As Diff_Basics
@@ -448,7 +448,7 @@ End Class
 
 
 
-Public Class Bin4Way_RegionsLeftRight : Inherits VB_Parent
+Public Class Bin4Way_RegionsLeftRight : Inherits TaskParent
     Dim binaryLeft As New Bin4Way_SplitMean
     Dim binaryRight As New Bin4Way_SplitMean
     Public classCount = 4 ' 4-way split
@@ -485,7 +485,7 @@ End Class
 
 
 
-Public Class Bin4Way_Regions1 : Inherits VB_Parent
+Public Class Bin4Way_Regions1 : Inherits TaskParent
     Dim binary As New Binarize_Simple
     Public mats As New Mat_4Click
     Public classCount = 4 ' 4-way split 
@@ -519,7 +519,7 @@ End Class
 
 
 
-Public Class Bin4Way_BasicsColors : Inherits VB_Parent
+Public Class Bin4Way_BasicsColors : Inherits TaskParent
     Dim quart As New Bin4Way_Basics
     Dim color8U As New Color8U_Basics
     Public Sub New()
@@ -541,7 +541,7 @@ End Class
 
 
 
-Public Class Bin4Way_Unstable : Inherits VB_Parent
+Public Class Bin4Way_Unstable : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
     Dim diff(3) As Diff_Basics
     Public Sub New()
@@ -568,7 +568,7 @@ End Class
 
 
 
-Public Class Bin4Way_BasicsRed : Inherits VB_Parent
+Public Class Bin4Way_BasicsRed : Inherits TaskParent
     Public mats As New Mat_4to1
     Dim hist As New Hist_Basics
     Public Sub New()
@@ -620,7 +620,7 @@ End Class
 
 
 
-Public Class Bin4Way_RedCloud : Inherits VB_Parent
+Public Class Bin4Way_RedCloud : Inherits TaskParent
     Dim bin2 As New Bin4Way_BasicsRed
     Dim flood As New Flood_BasicsMask
     Dim cellMaps(3) As cvb.Mat, redCells(3) As List(Of rcData)
@@ -667,7 +667,7 @@ End Class
 
 
 
-Public Class Bin4Way_Regions : Inherits VB_Parent
+Public Class Bin4Way_Regions : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
     Public classCount As Integer = 4 ' 4-way split 
     Public Sub New()
@@ -702,7 +702,7 @@ End Class
 
 
 
-Public Class Bin4Way_SplitMean : Inherits VB_Parent
+Public Class Bin4Way_SplitMean : Inherits TaskParent
     Public binary As New Binarize_Simple
     Public mats As New Mat_4Click
     Dim botColor As cvb.Scalar, midColor As cvb.Scalar, topColor As cvb.Scalar

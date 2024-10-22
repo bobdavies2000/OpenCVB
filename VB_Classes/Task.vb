@@ -198,7 +198,7 @@ Public Class VBtask : Implements IDisposable
     Public desc As String
     Public advice As String = ""
     Public intermediateName As String
-    Public intermediateObject As VB_Parent
+    Public intermediateObject As TaskParent
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
 
@@ -490,7 +490,7 @@ Public Class VBtask : Implements IDisposable
             task.rc = task.redCells(0)
         End If
     End Sub
-    Private Function checkIntermediateResults() As VB_Parent
+    Private Function checkIntermediateResults() As TaskParent
         If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
         For Each obj In task.activeObjects
             If obj.traceName = task.intermediateName And task.FirstPass = False Then Return obj
@@ -798,6 +798,7 @@ Public Class VBtask : Implements IDisposable
         'End If
 
         If task.paused = False Then
+            task.trueData.Clear()
             MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             task.FirstPass = False
             task.heartBeatLT = False

@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Flann
 
-Public Class Interpolate_Basics : Inherits VB_Parent
+Public Class Interpolate_Basics : Inherits TaskParent
     Public options As New Options_Resize
     Public iOptions As New Options_Interpolate
     Dim direction = 1
@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class Interpolate_Kalman : Inherits VB_Parent
+Public Class Interpolate_Kalman : Inherits TaskParent
     Dim inter As New Interpolate_Basics
     Dim kalman As New Kalman_Basics
     Dim updatedFrames As Integer
@@ -115,7 +115,7 @@ End Class
 
 
 
-Public Class Interpolate_Lines : Inherits VB_Parent
+Public Class Interpolate_Lines : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
@@ -143,7 +143,7 @@ End Class
 
 
 
-Public Class Interpolate_Difference : Inherits VB_Parent
+Public Class Interpolate_Difference : Inherits TaskParent
     Dim inter As New Interpolate_Kalman
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -167,7 +167,7 @@ End Class
 
 
 
-Public Class Interpolate_QuarterBeat : Inherits VB_Parent
+Public Class Interpolate_QuarterBeat : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim updatedFrames As Integer
     Dim myFrameCount As Integer

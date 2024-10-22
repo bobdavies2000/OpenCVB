@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Threading
-Public Class Grid_Basics : Inherits VB_Parent
+Public Class Grid_Basics : Inherits TaskParent
     Public gridRects As New List(Of cvb.Rect)
     Public Sub New()
         desc = "Create a grid of squares covering the entire image."
@@ -127,7 +127,7 @@ End Class
 
 
 
-Public Class Grid_Rectangles : Inherits VB_Parent
+Public Class Grid_Rectangles : Inherits TaskParent
     Public tilesPerRow As Integer
     Public tilesPerCol As Integer
     Dim options As New Options_Grid
@@ -189,7 +189,7 @@ End Class
 
 
 
-Public Class Grid_BasicsTest : Inherits VB_Parent
+Public Class Grid_BasicsTest : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi."}
         If standaloneTest() Then desc = "Validation test for Grid_Basics algorithm"
@@ -228,7 +228,7 @@ End Class
 
 
 
-Public Class Grid_List : Inherits VB_Parent
+Public Class Grid_List : Inherits TaskParent
     Public Sub New()
         labels(2) = "Adjust grid width/height to increase thread count."
         If standaloneTest() Then desc = "List the active threads"
@@ -262,7 +262,7 @@ End Class
 
 
 
-Public Class Grid_FPS : Inherits VB_Parent
+Public Class Grid_FPS : Inherits TaskParent
     Public heartBeat As Boolean
     Dim skipCount As Integer
     Dim saveSkip As Integer
@@ -293,7 +293,7 @@ End Class
 
 
 
-Public Class Grid_Neighbors : Inherits VB_Parent
+Public Class Grid_Neighbors : Inherits TaskParent
     Dim mask As New cvb.Mat
     Public Sub New()
         labels = {"", "", "Grid_Basics output", ""}
@@ -336,7 +336,7 @@ End Class
 
 
 
-Public Class Grid_Special : Inherits VB_Parent
+Public Class Grid_Special : Inherits TaskParent
     Public gridWidth As Integer = 10
     Public gridHeight As Integer = 10
     Public gridRects As New List(Of cvb.Rect)
@@ -415,7 +415,7 @@ End Class
 
 
 
-Public Class Grid_MinMaxDepth : Inherits VB_Parent
+Public Class Grid_MinMaxDepth : Inherits TaskParent
     Public minMaxLocs(0) As PointPair
     Public minMaxVals(0) As cvb.Vec2f
     Public Sub New()
@@ -452,7 +452,7 @@ End Class
 
 
 
-Public Class Grid_TrackCenter : Inherits VB_Parent
+Public Class Grid_TrackCenter : Inherits TaskParent
     Public center As cvb.Point
     Dim match As New Match_Basics
     Public Sub New()
@@ -493,7 +493,7 @@ End Class
 
 
 
-Public Class Grid_ShowMap : Inherits VB_Parent
+Public Class Grid_ShowMap : Inherits TaskParent
     Public Sub New()
         desc = "Verify that task.gridMap is laid out correctly"
     End Sub

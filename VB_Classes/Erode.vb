@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Erode_Basics : Inherits VB_Parent
+Public Class Erode_Basics : Inherits TaskParent
     Public options As New Options_Erode
     Public Sub New()
         UpdateAdvice(traceName + ": use local options to control erosion.")
@@ -25,7 +25,7 @@ End Class
 
 
 
-Public Class Erode_CloudXY : Inherits VB_Parent
+Public Class Erode_CloudXY : Inherits TaskParent
     Dim erode As New Erode_Basics
     Dim dilate As New Dilate_Basics
     Dim erodeMask As New Erode_Basics
@@ -58,7 +58,7 @@ End Class
 
 
 
-Public Class Erode_DepthSeed : Inherits VB_Parent
+Public Class Erode_DepthSeed : Inherits TaskParent
     Dim erode As New Erode_Basics
     Dim options As New Options_Erode
     Public Sub New()
@@ -86,7 +86,7 @@ End Class
 
 
 
-Public Class Erode_Dilate : Inherits VB_Parent
+Public Class Erode_Dilate : Inherits TaskParent
     Dim options As New Options_Dilate
     Public Sub New()
         desc = "Erode and then dilate with MorphologyEx on the input image."

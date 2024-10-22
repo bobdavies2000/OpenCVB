@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class TextureFlow_Basics : Inherits VB_Parent
+Public Class TextureFlow_Basics : Inherits TaskParent
     Dim options As New Options_Texture
     Public Sub New()
         desc = "Find and mark the texture flow in an image - see texture_flow.py"
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class TextureFlow_Depth : Inherits VB_Parent
+Public Class TextureFlow_Depth : Inherits TaskParent
     Dim flow As New TextureFlow_Basics
     Public Sub New()
         desc = "Display texture flow in the depth data"
@@ -43,7 +43,7 @@ End Class
 
 
 
-Public Class TextureFlow_Reduction : Inherits VB_Parent
+Public Class TextureFlow_Reduction : Inherits TaskParent
     Dim flow As New TextureFlow_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -64,7 +64,7 @@ End Class
 
 
 
-Public Class TextureFlow_DepthSegments : Inherits VB_Parent
+Public Class TextureFlow_DepthSegments : Inherits TaskParent
     Dim segments As New Hist_CloudSegments
     Dim diffx As New Edge_DiffX_CPP_VB
     Dim flow As New TextureFlow_Basics

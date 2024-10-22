@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Triangle_Basics : Inherits VB_Parent
+Public Class Triangle_Basics : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
@@ -41,7 +41,7 @@ End Class
 
 
 
-Public Class Triangle_HullContour : Inherits VB_Parent
+Public Class Triangle_HullContour : Inherits TaskParent
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
         task.gOptions.setDisplay1()
@@ -76,7 +76,7 @@ End Class
 
 
 
-Public Class Triangle_RedCloud : Inherits VB_Parent
+Public Class Triangle_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
@@ -119,7 +119,7 @@ End Class
 
 
 
-Public Class Triangle_Cell : Inherits VB_Parent
+Public Class Triangle_Cell : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
@@ -174,7 +174,7 @@ End Class
 
 
 
-Public Class Triangle_Mask : Inherits VB_Parent
+Public Class Triangle_Mask : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()

@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 ' https://github.com/ncosentino/DevLeader/tree/master/AsciiArtGenerator
-Public Class AsciiArt_Basics : Inherits VB_Parent
+Public Class AsciiArt_Basics : Inherits TaskParent
     Dim asciiChars As String() = {"@", "%", "#", "*", "+", "=", "-", ":", ",", ".", " "}
     Dim options As New Options_AsciiArt
     Public Sub New()
@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class AsciiArt_Color : Inherits VB_Parent
+Public Class AsciiArt_Color : Inherits TaskParent
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "A palette'd version of the ascii art data"
@@ -57,7 +57,7 @@ End Class
 
 
 
-Public Class AsciiArt_Diff : Inherits VB_Parent
+Public Class AsciiArt_Diff : Inherits TaskParent
     Dim grayAA As New AsciiArt_Color
     Dim diff As New Diff_Basics
     Public Sub New()

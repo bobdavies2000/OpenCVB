@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 
-Public Class LowRes_Basics : Inherits VB_Parent
+Public Class LowRes_Basics : Inherits TaskParent
     Dim lrColor As New LowRes_Color
     Dim lrDepth As New LowRes_Depth
     Public Sub New()
@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class LowRes_Color : Inherits VB_Parent
+Public Class LowRes_Color : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Grid of mean color values", "Resized task.lowResColor"}
         desc = "The bare minimum needed to make the LowRes image."
@@ -44,7 +44,7 @@ End Class
 
 
 
-Public Class LowRes_Depth : Inherits VB_Parent
+Public Class LowRes_Depth : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Grid of mean depth values", "Resized task.lowResDepth"}
         desc = "The bare minimum needed to make the LowRes image."
@@ -70,7 +70,7 @@ End Class
 
 
 
-Public Class LowRes_Features : Inherits VB_Parent
+Public Class LowRes_Features : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim lowRes As New LowRes_Basics
     Public Sub New()
@@ -136,7 +136,7 @@ End Class
 
 
 
-Public Class LowRes_Edges : Inherits VB_Parent
+Public Class LowRes_Edges : Inherits TaskParent
     Public lowRes As New LowRes_Basics
     Public edges As New Edge_Basics
     Public Sub New()
@@ -219,7 +219,7 @@ End Class
 
 
 
-Public Class LowRes_Boundaries : Inherits VB_Parent
+Public Class LowRes_Boundaries : Inherits TaskParent
     Public feat As New LowRes_Edges
     Public boundaryCells As New List(Of List(Of Integer))
     Public Sub New()
@@ -269,7 +269,7 @@ End Class
 
 
 
-Public Class LowRes_MLColor : Inherits VB_Parent
+Public Class LowRes_MLColor : Inherits TaskParent
     Dim ml As New ML_Basics
     Dim bounds As New LowRes_Boundaries
     Public Sub New()
@@ -342,7 +342,7 @@ End Class
 
 
 
-Public Class LowRes_MLColorDepth : Inherits VB_Parent
+Public Class LowRes_MLColorDepth : Inherits TaskParent
     Dim ml As New ML_Basics
     Dim bounds As New LowRes_Boundaries
     Public Sub New()
@@ -418,7 +418,7 @@ End Class
 
 
 
-Public Class LowRes_DepthMask : Inherits VB_Parent
+Public Class LowRes_DepthMask : Inherits TaskParent
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
         desc = "Create a mask of the cells that are mostly depth - remove speckles in no depth regions"
@@ -436,7 +436,7 @@ End Class
 
 
 
-Public Class LowRes_MeasureColor : Inherits VB_Parent
+Public Class LowRes_MeasureColor : Inherits TaskParent
     Dim lowRes As New LowRes_Color
     Public colors(0) As cvb.Vec3b
     Public distances() As Single
@@ -494,7 +494,7 @@ End Class
 
 
 
-Public Class LowRes_MeasureMotion : Inherits VB_Parent
+Public Class LowRes_MeasureMotion : Inherits TaskParent
     Dim measure As New LowRes_MeasureColor
     Public motionDetected As Boolean
     Public motionRects As New List(Of cvb.Rect)
@@ -548,7 +548,7 @@ End Class
 
 
 
-Public Class LowRes_MeasureValidate : Inherits VB_Parent
+Public Class LowRes_MeasureValidate : Inherits TaskParent
     Dim measure As New LowRes_MeasureMotion
     Dim diff As New Diff_Basics
     Public Sub New()

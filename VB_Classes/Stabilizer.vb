@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Features2D
 Imports cvb = OpenCvSharp
-Public Class Stabilizer_Basics : Inherits VB_Parent
+Public Class Stabilizer_Basics : Inherits TaskParent
     Dim match As New Match_Basics
     Public shiftX As Integer
     Public shiftY As Integer
@@ -87,7 +87,7 @@ End Class
 
 
 
-Public Class Stabilizer_BasicsRandomInput : Inherits VB_Parent
+Public Class Stabilizer_BasicsRandomInput : Inherits TaskParent
     Dim options As New Options_StabilizerOther
     Dim lastShiftX As Integer
     Dim lastShiftY As Integer
@@ -141,7 +141,7 @@ End Class
 
 
 
-Public Class Stabilizer_BasicsTest : Inherits VB_Parent
+Public Class Stabilizer_BasicsTest : Inherits TaskParent
     Dim random As New Stabilizer_BasicsRandomInput
     Dim stable As New Stabilizer_Basics
     Public Sub New()
@@ -166,7 +166,7 @@ End Class
 
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
-Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
+Public Class Stabilizer_OpticalFlow : Inherits TaskParent
     Public feat As New Feature_Stable
     Public inputFeat As New List(Of cvb.Point2f)
     Public borderCrop = 30
@@ -274,7 +274,7 @@ End Class
 
 
 
-Public Class Stabilizer_VerticalIMU : Inherits VB_Parent
+Public Class Stabilizer_VerticalIMU : Inherits TaskParent
     Public stableTest As Boolean
     Public stableStr As String
     Dim angleXValue As New List(Of Single)
@@ -329,7 +329,7 @@ End Class
 
 
 
-Public Class Stabilizer_CornerPoints : Inherits VB_Parent
+Public Class Stabilizer_CornerPoints : Inherits TaskParent
     Public basics As New Stable_Basics
     Public features As New List(Of cvb.Point2f)
     Dim ul As cvb.Rect, ur As cvb.Rect, ll As cvb.Rect, lr As cvb.Rect

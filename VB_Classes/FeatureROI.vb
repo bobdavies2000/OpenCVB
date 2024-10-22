@@ -2,7 +2,7 @@
 Imports OpenCvSharp
 Imports System.Security.Cryptography
 Imports cvb = OpenCvSharp
-Public Class FeatureROI_Basics : Inherits VB_Parent
+Public Class FeatureROI_Basics : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public rects As New List(Of cvb.Rect)
     Public meanList As New List(Of Single)
@@ -54,7 +54,7 @@ End Class
 
 
 
-Public Class FeatureROI_Color : Inherits VB_Parent
+Public Class FeatureROI_Color : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         FindSlider("Add Weighted %").Value = 70
@@ -98,7 +98,7 @@ End Class
 
 
 
-Public Class FeatureROI_Canny : Inherits VB_Parent
+Public Class FeatureROI_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
     Dim devGrid As New FeatureROI_Basics
     Public Sub New()
@@ -121,7 +121,7 @@ End Class
 
 
 
-Public Class FeatureROI_Sorted : Inherits VB_Parent
+Public Class FeatureROI_Sorted : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public sortedStd As New SortedList(Of Single, cvb.Rect)(New compareAllowIdenticalSingle)
     Public bgrList As New List(Of cvb.Vec3b)
@@ -204,7 +204,7 @@ End Class
 
 
 
-Public Class FeatureROI_ColorSplit : Inherits VB_Parent
+Public Class FeatureROI_ColorSplit : Inherits TaskParent
     Dim devGrid As New FeatureROI_Sorted
     Public Sub New()
         devGrid.maskVal = 255
@@ -236,7 +236,7 @@ End Class
 
 
 
-Public Class FeatureROI_Correlation : Inherits VB_Parent
+Public Class FeatureROI_Correlation : Inherits TaskParent
     Public gather As New FeatureROI_Basics
     Dim plot As New Plot_OverTimeSingle
     Dim options As New Options_Features
@@ -280,7 +280,7 @@ End Class
 
 
 
-Public Class FeatureROI_LowStdev : Inherits VB_Parent
+Public Class FeatureROI_LowStdev : Inherits TaskParent
     Public rects As New List(Of cvb.Rect)
     Dim gather As New FeatureROI_Basics
     Public Sub New()
@@ -308,7 +308,7 @@ End Class
 
 
 
-Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Parent
+Public Class FeatureROI_LowStdevCorrelation : Inherits TaskParent
     Dim gather As New FeatureROI_LowStdev
     Dim correlations As New List(Of Single)
     Dim options As New Options_Features
@@ -361,7 +361,7 @@ End Class
 
 
 
-Public Class FeatureROI_LR : Inherits VB_Parent
+Public Class FeatureROI_LR : Inherits TaskParent
     Public gLeft As New FeatureROI_Basics
     Public gRight As New FeatureROI_Basics
     Public Sub New()
@@ -383,7 +383,7 @@ End Class
 
 
 
-Public Class FeatureROI_LRClick : Inherits VB_Parent
+Public Class FeatureROI_LRClick : Inherits TaskParent
     Dim gather As New FeatureROI_Basics
     Dim ClickPoint As cvb.Point, picTag As Integer
     Dim options As New Options_Features
@@ -463,7 +463,7 @@ End Class
 
 
 
-Public Class FeatureROI_LRAll : Inherits VB_Parent
+Public Class FeatureROI_LRAll : Inherits TaskParent
     Dim gather As New FeatureROI_Basics
     Dim options As New Options_Features
     Public sortedRects As New SortedList(Of Single, cvb.Rect)(New compareAllowIdenticalSingleInverted)

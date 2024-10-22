@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/lkdemo.cpp
-Public Class KLT_Basics : Inherits VB_Parent
+Public Class KLT_Basics : Inherits TaskParent
     Public status As New cvb.Mat
     Public outputMat As New cvb.Mat
     Public circleColor = cvb.Scalar.Red
@@ -61,7 +61,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py
-Public Class KLT_OpticalFlow : Inherits VB_Parent
+Public Class KLT_OpticalFlow : Inherits TaskParent
     Dim klt As New KLT_Basics
     Dim lastpoints() As cvb.Point2f
     Public Sub New()

@@ -2,7 +2,7 @@
 Imports OpenCvSharp.XImgProc
 Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
-Public Class BackProject2D_Basics : Inherits VB_Parent
+Public Class BackProject2D_Basics : Inherits TaskParent
     Public hist2d As New Hist2D_Basics
     Public colorFmt As New Color_Basics
     Public backProjectByGrid As Boolean
@@ -57,7 +57,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
-Public Class BackProject2D_BasicsOld : Inherits VB_Parent
+Public Class BackProject2D_BasicsOld : Inherits TaskParent
     Public hist2d As New Hist2D_Basics
     Public xRange As Integer = 255
     Public yRange As Integer = 255
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class BackProject2D_Compare : Inherits VB_Parent
+Public Class BackProject2D_Compare : Inherits TaskParent
     Dim hueSat As New PhotoShop_Hue
     Dim backP As New BackProject2D_Basics
     Dim mats As New Mat_4Click
@@ -140,7 +140,7 @@ End Class
 
 
 
-Public Class BackProject2D_Top : Inherits VB_Parent
+Public Class BackProject2D_Top : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         labels = {"", "", "Top Down HeatMap", "BackProject2D for the top-down view"}
@@ -160,7 +160,7 @@ End Class
 
 
 
-Public Class BackProject2D_Side : Inherits VB_Parent
+Public Class BackProject2D_Side : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         labels = {"", "", "Side View HeatMap", "BackProject2D for the side view"}
@@ -183,7 +183,7 @@ End Class
 
 
 
-Public Class BackProject2D_Filter : Inherits VB_Parent
+Public Class BackProject2D_Filter : Inherits TaskParent
     Public threshold As Integer
     Public histogram As New cvb.Mat
     Public Sub New()
@@ -206,7 +206,7 @@ End Class
 
 
 
-Public Class BackProject2D_FilterSide : Inherits VB_Parent
+Public Class BackProject2D_FilterSide : Inherits TaskParent
     Public filter As New BackProject2D_Filter
     Dim options As New Options_HistXD
     Public Sub New()
@@ -237,7 +237,7 @@ End Class
 
 
 
-Public Class BackProject2D_FilterTop : Inherits VB_Parent
+Public Class BackProject2D_FilterTop : Inherits TaskParent
     Dim filter As New BackProject2D_Filter
     Dim options As New Options_HistXD
     Public Sub New()
@@ -268,7 +268,7 @@ End Class
 
 
 
-Public Class BackProject2D_FilterBoth : Inherits VB_Parent
+Public Class BackProject2D_FilterBoth : Inherits TaskParent
     Dim filterSide As New BackProject2D_FilterSide
     Dim filterTop As New BackProject2D_FilterTop
     Public Sub New()
@@ -289,7 +289,7 @@ End Class
 
 
 
-Public Class BackProject2D_Full : Inherits VB_Parent
+Public Class BackProject2D_Full : Inherits TaskParent
     Dim backP As New BackProject2D_Basics
     Public classCount As Integer
     Public Sub New()
@@ -312,7 +312,7 @@ End Class
 
 
 
-Public Class BackProject2D_RowCol : Inherits VB_Parent
+Public Class BackProject2D_RowCol : Inherits TaskParent
     Dim backp As New BackProject2D_Basics
     Dim options As New Options_BackProject2D
     Public Sub New()

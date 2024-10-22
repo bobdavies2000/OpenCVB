@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 'https://github.com/DinoZ1729/Double-Pendulum/blob/main/pendulum_with_trace.cpp
-Public Class Pendulum_Basics : Inherits VB_Parent
+Public Class Pendulum_Basics : Inherits TaskParent
     Dim l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
     Dim o1 = 2 * cvb.Cv2.PI / 2, o2 = 2 * cvb.Cv2.PI / 3
     Dim w1 As Single, w2 As Single

@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
 ' https://www.codeproject.com/Tips/5308853/Prefer-using-Stream-to-byte
-Public Class Crypto_Hash : Inherits VB_Parent
+Public Class Crypto_Hash : Inherits TaskParent
     Dim flow As New Font_FlowText
     Dim images As New List(Of cvb.Mat)
     Dim guids As New List(Of String)

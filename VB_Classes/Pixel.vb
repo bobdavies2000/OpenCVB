@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
-Public Class Pixel_Viewer : Inherits VB_Parent
+Public Class Pixel_Viewer : Inherits TaskParent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
     Dim mouseLoc = New cvb.Point(10, 10) ' assume 
@@ -184,7 +184,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
-Public Class Pixel_GetSet : Inherits VB_Parent
+Public Class Pixel_GetSet : Inherits TaskParent
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Time to copy using get/set,Generic Index, Marshal Copy"
@@ -246,7 +246,7 @@ End Class
 
 
 
-Public Class Pixel_Measure : Inherits VB_Parent
+Public Class Pixel_Measure : Inherits TaskParent
     Public Sub New()
         Dim maxZ = task.MaxZmeters * 1000
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Distance in mm", 50, If(maxZ < 1500, 1500, maxZ), maxZ)
@@ -274,7 +274,7 @@ End Class
 
 
 
-Public Class Pixel_SampleColor : Inherits VB_Parent
+Public Class Pixel_SampleColor : Inherits TaskParent
     Public random As New Random_Basics
     Public maskColor As cvb.Vec3b
     Public Sub New()
@@ -330,7 +330,7 @@ End Class
 
 
 
-Public Class Pixel_Unstable : Inherits VB_Parent
+Public Class Pixel_Unstable : Inherits TaskParent
     Dim km As New KMeans_Basics
     Dim pixelCounts As New List(Of Integer)
     Dim k As Integer = -1
@@ -381,7 +381,7 @@ End Class
 
 
 
-Public Class Pixel_Zoom : Inherits VB_Parent
+Public Class Pixel_Zoom : Inherits TaskParent
     Public mousePoint = New cvb.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
     Public zoomSlider As TrackBar
     Public Sub New()
@@ -411,7 +411,7 @@ End Class
 
 
 
-Public Class Pixel_SubPixel : Inherits VB_Parent
+Public Class Pixel_SubPixel : Inherits TaskParent
     Public zoom As New Pixel_Zoom
     Public Sub New()
         desc = "Show how to use the GetRectSubPix OpenCV API"
@@ -438,7 +438,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsHorizontal : Inherits VB_Parent
+Public Class Pixel_NeighborsHorizontal : Inherits TaskParent
     Public options As New Options_Neighbors
     Public pt1 As New List(Of cvb.Point)
     Public pt2 As New List(Of cvb.Point)
@@ -480,7 +480,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsVertical : Inherits VB_Parent
+Public Class Pixel_NeighborsVertical : Inherits TaskParent
     Public options As New Options_Neighbors
     Public pt1 As New List(Of cvb.Point)
     Public pt2 As New List(Of cvb.Point)
@@ -521,7 +521,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsMaskH : Inherits VB_Parent
+Public Class Pixel_NeighborsMaskH : Inherits TaskParent
     Dim options As New Options_Neighbors
     Public Sub New()
         desc = "Show where horizontal neighbor depth values are within X mm's"
@@ -548,7 +548,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsMaskV : Inherits VB_Parent
+Public Class Pixel_NeighborsMaskV : Inherits TaskParent
     Dim options As New Options_Neighbors
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
@@ -577,7 +577,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsMask : Inherits VB_Parent
+Public Class Pixel_NeighborsMask : Inherits TaskParent
     Dim maskH As New Pixel_NeighborsMaskH
     Dim maskV As New Pixel_NeighborsMaskV
     Public Sub New()
@@ -597,7 +597,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsPatchNeighbors : Inherits VB_Parent
+Public Class Pixel_NeighborsPatchNeighbors : Inherits TaskParent
     Public options As New Options_Neighbors
     Public Sub New()
         FindSlider("Minimum offset to neighbor pixel").Value = 1
@@ -649,7 +649,7 @@ End Class
 
 
 
-Public Class Pixel_Vector3D : Inherits VB_Parent
+Public Class Pixel_Vector3D : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
@@ -697,7 +697,7 @@ End Class
 
 
 
-Public Class Pixel_Unique_CPP_VB : Inherits VB_Parent
+Public Class Pixel_Unique_CPP_VB : Inherits TaskParent
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         cPtr = Pixels_Vector_Open()
@@ -726,7 +726,7 @@ End Class
 
 
 
-Public Class Pixel_Vectors : Inherits VB_Parent
+Public Class Pixel_Vectors : Inherits TaskParent
     Public redC As New RedCloud_Basics
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
@@ -757,7 +757,7 @@ End Class
 
 
 
-Public Class Pixel_Mapper : Inherits VB_Parent
+Public Class Pixel_Mapper : Inherits TaskParent
     Public colorMap As New cvb.Mat(256, 1, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
     Public Sub New()
         desc = "Resize the input to a small image, convert to gray, and map gray to color"
@@ -808,7 +808,7 @@ End Class
 
 
 
-Public Class Pixel_MapLeftRight : Inherits VB_Parent
+Public Class Pixel_MapLeftRight : Inherits TaskParent
     Dim mapper As New Pixel_Mapper
     Public Sub New()
         labels = {"", "", "Left view with averaged color", "Right view with averaged color"}
@@ -828,7 +828,7 @@ End Class
 
 
 
-Public Class Pixel_MapDistance : Inherits VB_Parent
+Public Class Pixel_MapDistance : Inherits TaskParent
     Dim mapper As New Pixel_Mapper
     Public Sub New()
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
@@ -882,7 +882,7 @@ End Class
 
 
 
-Public Class Pixel_Sampler : Inherits VB_Parent
+Public Class Pixel_Sampler : Inherits TaskParent
     Public random As New Random_Basics
     Public dominantGray As Byte
     Dim width = 25
@@ -949,7 +949,7 @@ End Class
 
 
 
-Public Class Pixel_Display : Inherits VB_Parent
+Public Class Pixel_Display : Inherits TaskParent
     Public random As New Random_Basics
     Dim width = 25
     Dim height = 25
@@ -984,7 +984,7 @@ End Class
 
 
 
-Public Class Pixel_ColorGuess : Inherits VB_Parent
+Public Class Pixel_ColorGuess : Inherits TaskParent
     Dim mapper As New Pixel_Mapper
     Public Sub New()
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}

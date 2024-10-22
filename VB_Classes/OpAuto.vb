@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
-Public Class OpAuto_XRange : Inherits VB_Parent
+Public Class OpAuto_XRange : Inherits TaskParent
     Public histogram As New cvb.Mat
     Dim adjustedCount As Integer = 0
     Public Sub New()
@@ -49,7 +49,7 @@ End Class
 
 
 
-Public Class OpAuto_YRange : Inherits VB_Parent
+Public Class OpAuto_YRange : Inherits TaskParent
     Public histogram As New cvb.Mat
     Dim adjustedCount As Integer = 0
     Public Sub New()
@@ -98,7 +98,7 @@ End Class
 
 
 
-Public Class OpAuto_FloorCeiling : Inherits VB_Parent
+Public Class OpAuto_FloorCeiling : Inherits TaskParent
     Public bpLine As New BackProject_LineSide
     Public yList As New List(Of Single)
     Public floorY As Single
@@ -152,7 +152,7 @@ End Class
 
 
 
-Public Class OpAuto_Valley : Inherits VB_Parent
+Public Class OpAuto_Valley : Inherits TaskParent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
     Dim kalmanHist As New Hist_Kalman
@@ -215,7 +215,7 @@ End Class
 
 
 
-Public Class OpAuto_Peaks2D : Inherits VB_Parent
+Public Class OpAuto_Peaks2D : Inherits TaskParent
     Public options As New Options_Boundary
     Public clusterPoints As New List(Of cvb.Point2f)
     Dim heatmap As New HeatMap_Basics
@@ -256,7 +256,7 @@ End Class
 
 
 
-Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
+Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
     Public clusterPoints As New List(Of cvb.Point2f)
     Dim options As New Options_Boundary
     Dim hist2d As New Hist2D_Basics
@@ -311,7 +311,7 @@ End Class
 
 
 
-Public Class OpAuto_PixelDifference : Inherits VB_Parent
+Public Class OpAuto_PixelDifference : Inherits TaskParent
     Dim diff As New Diff_Basics
     Public Sub New()
         task.gOptions.pixelDiffThreshold = 2 ' set it low so it will move up to the right value.
@@ -345,7 +345,7 @@ End Class
 
 
 
-Public Class OpAuto_MSER : Inherits VB_Parent
+Public Class OpAuto_MSER : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Public classCount As Integer
     Dim checkOften As Boolean = True

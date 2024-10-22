@@ -22,7 +22,7 @@ Public Class TrueText
         setup(_text, _pt, 2)
     End Sub
 End Class
-Public Class VB_Parent : Implements IDisposable
+Public Class TaskParent : Implements IDisposable
     Public check As New OptionsCheckbox
     Public combo As New OptionsCombo
     Public radio As New OptionsRadioButtons
@@ -71,7 +71,7 @@ Public Class VB_Parent : Implements IDisposable
                 If partLine.StartsWith("AlgorithmList.createVBAlgorithm") Then Exit For
                 Dim split() = partLine.Split("\")
                 partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
-                If Not (partLine.StartsWith("VB_Parent") Or partLine.StartsWith("VBtask")) Then
+                If Not (partLine.StartsWith("TaskParent") Or partLine.StartsWith("VBtask")) Then
                     callStack = partLine + "\" + callStack
                 End If
             End If
@@ -636,8 +636,7 @@ Public Class VB_Parent : Implements IDisposable
             task.dst2 = dst2
             task.dst3 = dst3
         End If
-        task.trueData = New List(Of TrueText)(trueData)
-        trueData.Clear()
+        task.trueData = trueData
     End Sub
     Public Sub measureStartRun(name As String)
         If task.recordTimings = False Then Exit Sub
@@ -710,6 +709,7 @@ Public Class VB_Parent : Implements IDisposable
         task.trueData.Clear()
         Try
             If task.paused = False Then
+                trueData.Clear()
                 If VB_Algorithm.traceName.EndsWith("_CPP") Then
                     Static nativeTask As New CPP_ManagedTask()
                     If nativeTask.ManagedObject Is Nothing Then nativeTask.ManagedObject = VB_Algorithm

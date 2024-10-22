@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class LeftRight_Basics : Inherits VB_Parent
+Public Class LeftRight_Basics : Inherits TaskParent
     Public Sub New()
         If task.cameraName = "MYNT-EYE-D1000" Then FindSlider("Alpha (contrast)").Value = 1100
         labels = {"", "", "Left camera image", If(task.cameraName = "Azure Kinect 4K", "No right image", "Right camera image")}
@@ -17,7 +17,7 @@ End Class
 
 
 
-Public Class LeftRight_CompareRaw : Inherits VB_Parent
+Public Class LeftRight_CompareRaw : Inherits TaskParent
     Dim options As New Options_LeftRight
     Public Sub New()
         desc = "Show slices of the left and right view next to each other for visual comparison"
@@ -40,15 +40,15 @@ End Class
 
 
 
-Public Class LeftRight_Palettized : Inherits VB_Parent
+Public Class LeftRight_Palettized : Inherits TaskParent
     Public Sub New()
         desc = "Add color to the 8-bit infrared images."
         labels(2) = "Left Image"
         labels(3) = "Right Image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        dst2 = ShowPalette(task.leftview)
-        dst3 = ShowPalette(task.rightview)
+        dst2 = ShowPalette(task.leftView)
+        dst3 = ShowPalette(task.rightView)
     End Sub
 End Class
 
@@ -59,7 +59,7 @@ End Class
 
 
 
-Public Class LeftRight_BRISK : Inherits VB_Parent
+Public Class LeftRight_BRISK : Inherits TaskParent
     Dim brisk As New BRISK_Basics
     Dim options As New Options_Features
     Public Sub New()
@@ -68,10 +68,10 @@ Public Class LeftRight_BRISK : Inherits VB_Parent
         desc = "Add color to the 8-bit infrared images."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        brisk.Run(task.leftview)
+        brisk.Run(task.leftView)
         dst2 = brisk.dst2.Clone
 
-        brisk.Run(task.rightview)
+        brisk.Run(task.rightView)
         dst3 = brisk.dst2.Clone
     End Sub
 End Class
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class LeftRight_Edges : Inherits VB_Parent
+Public Class LeftRight_Edges : Inherits TaskParent
     Dim edges As New Edge_Basics
     Public Sub New()
         desc = "Display the edges in the left and right views"
@@ -90,10 +90,10 @@ Public Class LeftRight_Edges : Inherits VB_Parent
         labels(3) = "Right Image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        edges.Run(task.leftview)
+        edges.Run(task.leftView)
         dst2 = edges.dst2
 
-        edges.Run(task.rightview)
+        edges.Run(task.rightView)
         dst3 = edges.dst2
     End Sub
 End Class
@@ -103,17 +103,17 @@ End Class
 
 
 
-Public Class LeftRight_Reduction : Inherits VB_Parent
+Public Class LeftRight_Reduction : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Public Sub New()
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Reduce both the left and right color images"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        reduction.Run(task.leftview)
+        reduction.Run(task.leftView)
         dst2 = reduction.dst2.Clone
 
-        reduction.Run(task.rightview)
+        reduction.Run(task.rightView)
         dst3 = reduction.dst2.Clone
     End Sub
 End Class
@@ -123,7 +123,7 @@ End Class
 
 
 
-Public Class LeftRight_Markers : Inherits VB_Parent
+Public Class LeftRight_Markers : Inherits TaskParent
     Dim redView As New LeftRight_Reduction
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -184,7 +184,7 @@ End Class
 
 
 
-Public Class LeftRight_Markers1 : Inherits VB_Parent
+Public Class LeftRight_Markers1 : Inherits TaskParent
     Dim redView As New LeftRight_Reduction
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -239,17 +239,17 @@ End Class
 
 
 
-Public Class LeftRight_Lines : Inherits VB_Parent
+Public Class LeftRight_Lines : Inherits TaskParent
     Dim lines As New Line_Basics
     Public Sub New()
         labels = {"", "", "Left camera lines", "Right camera lines"}
         desc = "Find the lines in the Left and Right images."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        lines.Run(task.leftview)
+        lines.Run(task.leftView)
         dst2 = lines.dst2.Clone
 
-        lines.Run(task.rightview)
+        lines.Run(task.rightView)
         dst3 = lines.dst2
     End Sub
 End Class
@@ -261,7 +261,7 @@ End Class
 
 
 
-Public Class LeftRight_RedCloudRight : Inherits VB_Parent
+Public Class LeftRight_RedCloudRight : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
@@ -280,7 +280,7 @@ End Class
 
 
 
-Public Class LeftRight_RedCloudLeft : Inherits VB_Parent
+Public Class LeftRight_RedCloudLeft : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
@@ -300,7 +300,7 @@ End Class
 
 
 
-Public Class LeftRight_RedCloudBoth : Inherits VB_Parent
+Public Class LeftRight_RedCloudBoth : Inherits TaskParent
     Dim stLeft As New LeftRight_RedCloudRight
     Dim stRight As New LeftRight_RedCloudLeft
     Public Sub New()
@@ -322,7 +322,7 @@ End Class
 
 
 
-Public Class LeftRight_Features : Inherits VB_Parent
+Public Class LeftRight_Features : Inherits TaskParent
     Dim feat As New FeatureLeftRight_Basics
     Public Sub New()
         desc = "Placeholder to make it easier to find FeatureLeftRight_Basics"
@@ -340,7 +340,7 @@ End Class
 
 
 
-Public Class LeftRight_LowRes : Inherits VB_Parent
+Public Class LeftRight_LowRes : Inherits TaskParent
     Dim lowResL As New LowRes_Color
     Dim lowResR As New LowRes_Color
     Public Sub New()
@@ -360,7 +360,7 @@ End Class
 
 
 
-Public Class LeftRight_Motion : Inherits VB_Parent
+Public Class LeftRight_Motion : Inherits TaskParent
     Dim lowResL As New LowRes_Color
     Dim lowResR As New LowRes_Color
     Public Sub New()

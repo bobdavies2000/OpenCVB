@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' http://opencvexamples.blogspot.com/
-Public Class WarpAffine_Basics : Inherits VB_Parent
+Public Class WarpAffine_Basics : Inherits TaskParent
     Public options As New Options_Resize
     Public optionsWarp As New Options_WarpAffine
     Public rotateCenter As cvb.Point2f
@@ -35,7 +35,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class WarpAffine_BasicsQT : Inherits VB_Parent
+Public Class WarpAffine_BasicsQT : Inherits TaskParent
     Public rotateCenter As cvb.Point2f
     Public rotateAngle As Single ' in degrees
     Public Sub New()
@@ -61,7 +61,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class WarpAffine_Captcha : Inherits VB_Parent
+Public Class WarpAffine_Captcha : Inherits TaskParent
     Const charHeight = 40
     Const charWidth = 30
     Const captchaLength = 8
@@ -151,7 +151,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class WarpAffine_3Points : Inherits VB_Parent
+Public Class WarpAffine_3Points : Inherits TaskParent
     Dim triangle As New Area_MinTriangle_CPP_VB
     Dim M As New cvb.Mat
     Public Sub New()
@@ -219,7 +219,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class WarpAffine_4Points : Inherits VB_Parent
+Public Class WarpAffine_4Points : Inherits TaskParent
     Dim mRect As New Area_MinRect
     Dim options As New Options_MinArea
     Dim M As New cvb.Mat
@@ -283,7 +283,7 @@ End Class
 
 
 ' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
-Public Class WarpAffine_Repeated : Inherits VB_Parent
+Public Class WarpAffine_Repeated : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Rotated repeatedly 45 degrees - note the blur", "Rotated repeatedly 90 degrees"}
         desc = "Compare an image before and after repeated and equivalent in degrees rotations."
@@ -339,7 +339,7 @@ End Class
 
 
 ' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
-Public Class WarpAffine_RepeatedExample8 : Inherits VB_Parent
+Public Class WarpAffine_RepeatedExample8 : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Rotated repeatedly 45 degrees", "Rotated repeatedly 90 degrees"}
         desc = "Compare an image before and after repeated rotations."

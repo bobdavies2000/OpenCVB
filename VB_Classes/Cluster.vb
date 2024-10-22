@@ -1,6 +1,6 @@
 ﻿Imports System.Windows
 Imports cvb = OpenCvSharp
-Public Class Cluster_Basics : Inherits VB_Parent
+Public Class Cluster_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public ptInput As New List(Of cvb.Point)
     Public ptList As New List(Of cvb.Point)
@@ -76,7 +76,7 @@ End Class
 
 
 
-Public Class Cluster_Hulls : Inherits VB_Parent
+Public Class Cluster_Hulls : Inherits TaskParent
     Dim cluster As New Cluster_Basics
     Public hulls As New List(Of List(Of cvb.Point))
     Dim feat As New Feature_Stable
@@ -118,7 +118,7 @@ End Class
 
 
 
-Public Class Cluster_RedCloud : Inherits VB_Parent
+Public Class Cluster_RedCloud : Inherits TaskParent
     Dim cluster As New Cluster_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()

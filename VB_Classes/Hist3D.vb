@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Hist3D_Basics : Inherits VB_Parent
+Public Class Hist3D_Basics : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Dim hCloud As New Hist3Dcloud_Basics
     Public classCount As Integer
@@ -33,7 +33,7 @@ End Class
 
 
 
-Public Class Hist3D_BuildHistogram : Inherits VB_Parent
+Public Class Hist3D_BuildHistogram : Inherits TaskParent
     Public threshold As Integer
     Public classCount As Integer
     Public histArray() As Single
@@ -88,7 +88,7 @@ End Class
 
 
 
-Public Class Hist3D_RedCloud : Inherits VB_Parent
+Public Class Hist3D_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim hist3D As New Hist3D_Basics
     Public Sub New()
@@ -113,7 +113,7 @@ End Class
 
 
 
-Public Class Hist3D_RedColor : Inherits VB_Parent
+Public Class Hist3D_RedColor : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
@@ -142,7 +142,7 @@ End Class
 
 
 
-Public Class Hist3D_DepthWithMask : Inherits VB_Parent
+Public Class Hist3D_DepthWithMask : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public depthMask As New cvb.Mat
     Dim fore As New Foreground_KMeans
@@ -174,7 +174,7 @@ End Class
 
 
 
-Public Class Hist3D_Pixel : Inherits VB_Parent
+Public Class Hist3D_Pixel : Inherits TaskParent
     Public histogram As New cvb.Mat
     Public histArray() As Single
     Public classCount As Integer
@@ -208,7 +208,7 @@ End Class
 
 
 
-Public Class Hist3D_PixelCells : Inherits VB_Parent
+Public Class Hist3D_PixelCells : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
     Dim redC As New Flood_Basics
     Public Sub New()
@@ -236,7 +236,7 @@ End Class
 
 
 
-Public Class Hist3D_PixelClassify : Inherits VB_Parent
+Public Class Hist3D_PixelClassify : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -260,7 +260,7 @@ End Class
 
 
 
-Public Class Hist3D_PixelDiffMask : Inherits VB_Parent
+Public Class Hist3D_PixelDiffMask : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -287,7 +287,7 @@ End Class
 
 
 
-Public Class Hist3D_RedCloudGrid : Inherits VB_Parent
+Public Class Hist3D_RedCloudGrid : Inherits TaskParent
     Dim pixels As New Pixel_Vectors
     Dim hVector As New Hist3Dcolor_Vector
     Public Sub New()

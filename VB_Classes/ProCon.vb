@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Threading
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
-Public Class ProCon_Basics : Inherits VB_Parent
+Public Class ProCon_Basics : Inherits TaskParent
     Public mutex = New Mutex(True, "BufferMutex")
     Public p As Thread
     Public c As Thread
@@ -89,7 +89,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
-Public Class ProCon_Variation : Inherits VB_Parent
+Public Class ProCon_Variation : Inherits TaskParent
     Dim procon As ProCon_Basics
     Dim frameCount As Integer
     Public Sub New()

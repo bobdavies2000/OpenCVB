@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Remap_Basics : Inherits VB_Parent
+Public Class Remap_Basics : Inherits TaskParent
     Public direction As Integer = 3 ' default to remap horizontally and vertically
     Dim mapx1 As cvb.Mat, mapx2 As cvb.Mat, mapx3 As cvb.Mat
     Dim mapy1 As cvb.Mat, mapy2 As cvb.Mat, mapy3 As cvb.Mat
@@ -48,7 +48,7 @@ End Class
 
 
 
-Public Class Remap_Flip : Inherits VB_Parent
+Public Class Remap_Flip : Inherits TaskParent
     Public direction = 0
     Public Sub New()
         desc = "Use flip to remap an image."
@@ -79,7 +79,7 @@ End Class
 
 
 
-Public Class Flip_Basics : Inherits VB_Parent
+Public Class Flip_Basics : Inherits TaskParent
     Dim flip As New Remap_Flip
     Public Sub New()
         desc = "Placeholder to make it easy to remember 'Remap'."

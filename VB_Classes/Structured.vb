@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Structured_LinearizeFloor : Inherits VB_Parent
+Public Class Structured_LinearizeFloor : Inherits TaskParent
     Public floor As New Structured_FloorCeiling
     Dim kalman As New Kalman_VB_Basics
     Public sliceMask As cvb.Mat
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class Structured_MultiSliceLines : Inherits VB_Parent
+Public Class Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
     Public lines As New Line_Basics
     Public Sub New()
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class Structured_Depth : Inherits VB_Parent
+Public Class Structured_Depth : Inherits TaskParent
     Dim sliceH As New Structured_SliceH
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -139,7 +139,7 @@ End Class
 
 
 
-Public Class Structured_Rebuild : Inherits VB_Parent
+Public Class Structured_Rebuild : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Dim options As New Options_Structured
     Dim thickness As Single
@@ -222,7 +222,7 @@ End Class
 
 
 
-Public Class Structured_Cloud2 : Inherits VB_Parent
+Public Class Structured_Cloud2 : Inherits TaskParent
     Dim mmPixel As New Pixel_Measure
     Dim options As New Options_StructuredCloud
     Public Sub New()
@@ -277,7 +277,7 @@ End Class
 
 
 
-Public Class Structured_Cloud : Inherits VB_Parent
+Public Class Structured_Cloud : Inherits TaskParent
     Public options As New Options_StructuredCloud
     Public Sub New()
         task.gOptions.setGridSize(10)
@@ -311,7 +311,7 @@ End Class
 
 
 
-Public Class Structured_ROI : Inherits VB_Parent
+Public Class Structured_ROI : Inherits TaskParent
     Public data As New cvb.Mat
     Public oglData As New List(Of cvb.Point3f)
     Public Sub New()
@@ -338,7 +338,7 @@ End Class
 
 
 
-Public Class Structured_Tiles : Inherits VB_Parent
+Public Class Structured_Tiles : Inherits TaskParent
     Public oglData As New List(Of cvb.Vec3f)
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -371,7 +371,7 @@ End Class
 
 
 
-Public Class Structured_TilesQuad : Inherits VB_Parent
+Public Class Structured_TilesQuad : Inherits TaskParent
     Public oglData As New List(Of cvb.Vec3f)
     Dim options As New Options_OpenGLFunctions
     Dim hulls As New RedCloud_Hulls
@@ -423,7 +423,7 @@ End Class
 
 
 
-Public Class Structured_CountTop : Inherits VB_Parent
+Public Class Structured_CountTop : Inherits TaskParent
     Dim slice As New Structured_SliceV
     Dim plot As New Plot_Histogram
     Dim counts As New List(Of Single)
@@ -473,7 +473,7 @@ End Class
 
 
 
-Public Class Structured_FeatureLines : Inherits VB_Parent
+Public Class Structured_FeatureLines : Inherits TaskParent
     Dim struct As New Structured_MultiSlice
     Dim lines As New FeatureLine_Finder
     Public Sub New()
@@ -497,7 +497,7 @@ End Class
 
 
 
-Public Class Structured_FloorCeiling : Inherits VB_Parent
+Public Class Structured_FloorCeiling : Inherits TaskParent
     Public slice As New Structured_SliceEither
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -564,7 +564,7 @@ End Class
 
 
 
-Public Class Structured_MultiSliceH : Inherits VB_Parent
+Public Class Structured_MultiSliceH : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public sliceMask As cvb.Mat
     Dim options As New Options_Structured
@@ -603,7 +603,7 @@ End Class
 
 
 
-Public Class Structured_MultiSliceV : Inherits VB_Parent
+Public Class Structured_MultiSliceV : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Dim options As New Options_Structured
     Public Sub New()
@@ -642,7 +642,7 @@ End Class
 
 
 
-Public Class Structured_SliceXPlot : Inherits VB_Parent
+Public Class Structured_SliceXPlot : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
     Dim options As New Options_Structured
     Public Sub New()
@@ -680,7 +680,7 @@ End Class
 
 
 
-Public Class Structured_SliceYPlot : Inherits VB_Parent
+Public Class Structured_SliceYPlot : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
     Dim options As New Options_Structured
     Public Sub New()
@@ -720,7 +720,7 @@ End Class
 
 
 
-Public Class Structured_MouseSlice : Inherits VB_Parent
+Public Class Structured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
     Dim lines As New Line_Basics
     Public Sub New()
@@ -766,7 +766,7 @@ End Class
 
 
 
-Public Class Structured_SliceEither : Inherits VB_Parent
+Public Class Structured_SliceEither : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public sliceMask As New cvb.Mat
     Dim options As New Options_Structured
@@ -832,7 +832,7 @@ End Class
 
 
 
-Public Class Structured_TransformH : Inherits VB_Parent
+Public Class Structured_TransformH : Inherits TaskParent
     Dim options As New Options_Structured
     Dim histTop As New Projection_HistTop
     Public Sub New()
@@ -877,7 +877,7 @@ End Class
 
 
 
-Public Class Structured_TransformV : Inherits VB_Parent
+Public Class Structured_TransformV : Inherits TaskParent
     Dim options As New Options_Structured
     Dim histSide As New Projection_HistSide
     Public Sub New()
@@ -924,7 +924,7 @@ End Class
 
 
 
-Public Class Structured_CountSide : Inherits VB_Parent
+Public Class Structured_CountSide : Inherits TaskParent
     Dim slice As New Structured_SliceH
     Dim plot As New Plot_Histogram
     Dim rotate As New Rotate_Basics
@@ -974,7 +974,7 @@ End Class
 
 
 
-Public Class Structured_CountSideSum : Inherits VB_Parent
+Public Class Structured_CountSideSum : Inherits TaskParent
     Public counts As New List(Of Single)
     Public maxCountIndex As Integer
     Public yValues As New List(Of Single)
@@ -1034,7 +1034,7 @@ End Class
 
 
 
-Public Class Structured_SliceV : Inherits VB_Parent
+Public Class Structured_SliceV : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public sliceMask As New cvb.Mat
     Public options As New Options_Structured
@@ -1080,7 +1080,7 @@ End Class
 
 
 
-Public Class Structured_SliceH : Inherits VB_Parent
+Public Class Structured_SliceH : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public sliceMask As New cvb.Mat
     Public options As New Options_Structured
@@ -1125,7 +1125,7 @@ End Class
 
 
 
-Public Class Structured_SurveyH : Inherits VB_Parent
+Public Class Structured_SurveyH : Inherits TaskParent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 300
         UpdateAdvice(traceName + ": use Y-Range slider in RedCloud options.")
@@ -1172,7 +1172,7 @@ End Class
 
 
 
-Public Class Structured_SurveyV : Inherits VB_Parent
+Public Class Structured_SurveyV : Inherits TaskParent
     Public Sub New()
         task.redOptions.setXRangeSlider(250)
         UpdateAdvice(traceName + ": use X-Range slider in RedCloud options.")
@@ -1220,7 +1220,7 @@ End Class
 
 
 
-Public Class Structured_MultiSlicePolygon : Inherits VB_Parent
+Public Class Structured_MultiSlicePolygon : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
     Dim options As New Options_StructuredMulti
     Public Sub New()
@@ -1258,7 +1258,7 @@ End Class
 
 
 
-Public Class Structured_Crosshairs : Inherits VB_Parent
+Public Class Structured_Crosshairs : Inherits TaskParent
     Dim sCloud As New Structured_Cloud
     Dim minX As Single, maxX As Single, minY As Single, maxY As Single
     Public Sub New()
@@ -1331,7 +1331,7 @@ End Class
 
 
 
-Public Class Structured_MultiSlice : Inherits VB_Parent
+Public Class Structured_MultiSlice : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public sliceMask As cvb.Mat
     Public options As New Options_Structured

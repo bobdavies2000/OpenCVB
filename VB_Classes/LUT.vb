@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 ' https://docs.opencvb.org/2.4/modules/core/doc/operations_on_arrays.html
-Public Class LUT_Basics : Inherits VB_Parent
+Public Class LUT_Basics : Inherits TaskParent
     Public classCount As Integer
     Dim options As New Options_LUT
     Dim segment(255) As Byte
@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class LUT_Sliders : Inherits VB_Parent
+Public Class LUT_Sliders : Inherits TaskParent
     Dim options As New Options_LUT
     Public Sub New()
         desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image."
@@ -70,7 +70,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class LUT_Reduction : Inherits VB_Parent
+Public Class LUT_Reduction : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Dim vector = New cvb.Mat(256, 1, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
     Public Sub New()
@@ -95,7 +95,7 @@ End Class
 
 
 
-Public Class LUT_RGBDepth : Inherits VB_Parent
+Public Class LUT_RGBDepth : Inherits TaskParent
     Dim lut As New LUT_Basics
     Public Sub New()
         desc = "Use a LUT on the RGBDepth to segregate depth data."
@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class LUT_Depth32f : Inherits VB_Parent
+Public Class LUT_Depth32f : Inherits TaskParent
     Dim lut As New LUT_Basics
     Public Sub New()
         desc = "Use a LUT on the 32-bit depth to segregate depth data."
@@ -135,7 +135,7 @@ End Class
 
 
 
-Public Class LUT_Equalized : Inherits VB_Parent
+Public Class LUT_Equalized : Inherits TaskParent
     Dim eq As New Hist_EqualizeGray
     Dim lut As New LUT_Basics
     Public Sub New()
@@ -162,7 +162,7 @@ End Class
 
 
 
-Public Class LUT_Watershed : Inherits VB_Parent
+Public Class LUT_Watershed : Inherits TaskParent
     Public wShed As New Watershed_Basics
     Public lut As New LUT_Equalized
     Dim edges As New Edge_Basics
@@ -191,7 +191,7 @@ End Class
 
 
 
-Public Class LUT_Custom : Inherits VB_Parent
+Public Class LUT_Custom : Inherits TaskParent
     Dim gradMap As New Palette_RandomColorMap
     Public colorMap As cvb.Mat
     Dim saveColorCount = -1
@@ -218,7 +218,7 @@ End Class
 
 
 
-Public Class LUT_RedCloud : Inherits VB_Parent
+Public Class LUT_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim sort3 As New Sort_3Channel
     Public Sub New()
@@ -244,7 +244,7 @@ End Class
 
 
 
-Public Class LUT_Create : Inherits VB_Parent
+Public Class LUT_Create : Inherits TaskParent
     Dim pixels(2)() As Byte
     Dim options As New Options_LUT_Create
     Public Sub New()

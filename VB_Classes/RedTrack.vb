@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class RedTrack_Basics : Inherits VB_Parent
+Public Class RedTrack_Basics : Inherits TaskParent
     Dim stats As New Cell_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class RedTrack_Lines : Inherits VB_Parent
+Public Class RedTrack_Lines : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
@@ -61,7 +61,7 @@ End Class
 
 
 
-Public Class RedTrack_LineSingle : Inherits VB_Parent
+Public Class RedTrack_LineSingle : Inherits TaskParent
     Dim track As New RedTrack_Basics
     Dim leftMost As Integer, rightmost As Integer
     Dim leftCenter As cvb.Point, rightCenter As cvb.Point
@@ -128,7 +128,7 @@ End Class
 
 
 
-Public Class RedTrack_FeaturesKNN : Inherits VB_Parent
+Public Class RedTrack_FeaturesKNN : Inherits TaskParent
     Public knn As New KNN_Basics
     Public feat As New Feature_Stable
     Public Sub New()
@@ -162,7 +162,7 @@ End Class
 
 
 
-Public Class RedTrack_GoodCell : Inherits VB_Parent
+Public Class RedTrack_GoodCell : Inherits TaskParent
     Dim good As New RedTrack_GoodCellInput
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -188,7 +188,7 @@ End Class
 
 
 
-Public Class RedTrack_GoodCells : Inherits VB_Parent
+Public Class RedTrack_GoodCells : Inherits TaskParent
     Dim good As New RedTrack_GoodCellInput
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -226,7 +226,7 @@ End Class
 
 
 
-Public Class RedTrack_GoodCellInput : Inherits VB_Parent
+Public Class RedTrack_GoodCellInput : Inherits TaskParent
     Public knn As New KNN_Basics
     Public feat As New Feature_Stable
     Public featureList As New List(Of cvb.Point2f)
@@ -261,7 +261,7 @@ End Class
 
 
 
-Public Class RedTrack_Points : Inherits VB_Parent
+Public Class RedTrack_Points : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
@@ -294,7 +294,7 @@ End Class
 
 
 
-Public Class RedTrack_Features : Inherits VB_Parent
+Public Class RedTrack_Features : Inherits TaskParent
     Dim options As New Options_Flood
     Dim feat As New Feature_Stable
     Dim redC As New RedCloud_Basics

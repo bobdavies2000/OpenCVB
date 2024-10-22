@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Color_Basics : Inherits VB_Parent
+Public Class Color_Basics : Inherits TaskParent
     Public options As New Options_Color
     Public Sub New()
         desc = "Choose a color source"

@@ -2,7 +2,7 @@ Imports cvb = OpenCvSharp
 Imports System.Windows.Forms
 
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
-Public Class OilPaint_Pointilism : Inherits VB_Parent
+Public Class OilPaint_Pointilism : Inherits TaskParent
     Dim randomMask As cvb.Mat
     Dim myRNG As New cvb.RNG
     Dim options As New Options_Pointilism
@@ -73,7 +73,7 @@ End Class
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-Public Class OilPaint_ManualVB : Inherits VB_Parent
+Public Class OilPaint_ManualVB : Inherits TaskParent
     Public options As New Options_OilPaint
     Public Sub New()
         task.drawRect = New cvb.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)

@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Linear_Basics : Inherits VB_Parent
+Public Class Linear_Basics : Inherits TaskParent
     Dim inputX As New Linear_InputX
     Dim inputY As New Linear_InputY
     Dim inputZ As New Linear_InputZ
@@ -73,7 +73,7 @@ End Class
 
 
 
-Public Class Linear_Visualize : Inherits VB_Parent
+Public Class Linear_Visualize : Inherits TaskParent
     Public plotHist As New Plot_Histogram
     Public roi As New cvb.Rect(0, 0, dst2.Width, dst2.Height)
     Public pc As cvb.Mat
@@ -141,7 +141,7 @@ End Class
 
 
 
-Public Class Linear_Input : Inherits VB_Parent
+Public Class Linear_Input : Inherits TaskParent
     Public plotHist As New Plot_Histogram
     Public roi As New cvb.Rect(0, 0, dst2.Width, dst2.Height)
     Public pc As cvb.Mat
@@ -195,7 +195,7 @@ End Class
 
 
 
-Public Class Linear_InputX : Inherits VB_Parent
+Public Class Linear_InputX : Inherits TaskParent
     Dim input As New Linear_Input
     Public Sub New()
         FindRadio("X Direction").Checked = True
@@ -211,7 +211,7 @@ End Class
 
 
 
-Public Class Linear_InputY : Inherits VB_Parent
+Public Class Linear_InputY : Inherits TaskParent
     Dim input As New Linear_Input
     Public Sub New()
         FindRadio("Y Direction").Checked = True
@@ -228,7 +228,7 @@ End Class
 
 
 
-Public Class Linear_InputZ : Inherits VB_Parent
+Public Class Linear_InputZ : Inherits TaskParent
     Dim input As New Linear_Input
     Public Sub New()
         FindRadio("Z in X-Direction").Checked = True
@@ -247,7 +247,7 @@ End Class
 
 
 
-Public Class Linear_Slices : Inherits VB_Parent
+Public Class Linear_Slices : Inherits TaskParent
     Dim options As New Options_LinearInput
     Dim plotSLR As New SLR_Basics
     Public Sub New()
@@ -304,7 +304,7 @@ End Class
 
 
 
-Public Class Linear_ImageX : Inherits VB_Parent
+Public Class Linear_ImageX : Inherits TaskParent
     Dim options As New Options_SLR
     Dim inputX As New List(Of Double)
     Dim slr As New SLR()
@@ -351,7 +351,7 @@ End Class
 
 
 
-Public Class Linear_ImageY : Inherits VB_Parent
+Public Class Linear_ImageY : Inherits TaskParent
     Dim options As New Options_SLR
     Dim inputX As New List(Of Double)
     Dim slr As New SLR()

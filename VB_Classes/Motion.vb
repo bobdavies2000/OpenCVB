@@ -1,10 +1,10 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cvb = OpenCvSharp
-Public Class Motion_Basics : Inherits VB_Parent
+Public Class Motion_Basics : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
     Dim diff As New Diff_Basics
-    Dim depthRGB As cvb.Mat
+    Dim depthRGB As New cvb.Mat
     Public pointcloud As cvb.Mat
     Public color As cvb.Mat
     Public motionMask As cvb.Mat
@@ -35,14 +35,12 @@ Public Class Motion_Basics : Inherits VB_Parent
 
         Dim percentChanged = measure.motionRects.Count / task.gridRects.Count
 
-        If task.heartBeatLT And task.gOptions.UpdateOnHeartbeat.Checked Or depthRGB Is Nothing Then
+        If task.heartBeatLT And task.gOptions.UpdateOnHeartbeat.Checked Or depthRGB.Rows = 0 Then
             depthRGB = task.depthRGB.Clone
             pointcloud = task.pointCloud.Clone
         Else
-            If depthRGB.Rows > 0 Then
-                task.depthRGB.CopyTo(depthRGB, motionMask)
-                task.pointCloud.CopyTo(pointcloud, motionMask)
-            End If
+            task.depthRGB.CopyTo(depthRGB, motionMask)
+            task.pointCloud.CopyTo(pointcloud, motionMask)
         End If
     End Sub
 End Class
@@ -52,7 +50,7 @@ End Class
 
 
 
-Public Class Motion_BasicsTest : Inherits VB_Parent
+Public Class Motion_BasicsTest : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim measure As New LowRes_MeasureMotion
     Public Sub New()
@@ -81,7 +79,7 @@ End Class
 
 
 
-Public Class Motion_BGSub : Inherits VB_Parent
+Public Class Motion_BGSub : Inherits TaskParent
     Public bgSub As New BGSubtract_MOG2
     Dim motion As New Motion_BGSub_QT
     Public Sub New()
@@ -101,7 +99,7 @@ End Class
 
 
 
-Public Class Motion_BGSub_QT : Inherits VB_Parent
+Public Class Motion_BGSub_QT : Inherits TaskParent
     Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cvb.Rect)
@@ -148,7 +146,7 @@ End Class
 
 
 
-Public Class Motion_ThruCorrelation : Inherits VB_Parent
+Public Class Motion_ThruCorrelation : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Correlation threshold X1000", 0, 1000, 900)
@@ -209,7 +207,7 @@ End Class
 
 
 
-Public Class Motion_CCmerge : Inherits VB_Parent
+Public Class Motion_CCmerge : Inherits TaskParent
     Dim motionCC As New Motion_ThruCorrelation
     Dim lastFrame As cvb.Mat
     Public Sub New()
@@ -241,7 +239,7 @@ End Class
 
 
 
-Public Class Motion_PixelDiff : Inherits VB_Parent
+Public Class Motion_PixelDiff : Inherits TaskParent
     Public changedPixels As Integer
     Dim changeCount As Integer, frames As Integer
     Public Sub New()
@@ -277,7 +275,7 @@ End Class
 
 
 
-Public Class Motion_Grid_MP : Inherits VB_Parent
+Public Class Motion_Grid_MP : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
@@ -312,7 +310,7 @@ End Class
 
 
 
-Public Class Motion_Grid : Inherits VB_Parent
+Public Class Motion_Grid : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
@@ -348,7 +346,7 @@ End Class
 
 
 
-Public Class Motion_Intersect : Inherits VB_Parent
+Public Class Motion_Intersect : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Dim minCount = 4
     Dim reconstructedRGB As Integer
@@ -444,7 +442,7 @@ End Class
 
 
 
-Public Class Motion_RectTest : Inherits VB_Parent
+Public Class Motion_RectTest : Inherits TaskParent
     Dim motion As New Motion_Enclosing
     Dim diff As New Diff_Basics
     Dim lastRects As New List(Of cvb.Rect)
@@ -489,7 +487,7 @@ End Class
 
 
 
-Public Class Motion_HistoryTest : Inherits VB_Parent
+Public Class Motion_HistoryTest : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim frames As New History_Basics
     Public Sub New()
@@ -514,7 +512,7 @@ End Class
 
 
 
-Public Class Motion_Enclosing : Inherits VB_Parent
+Public Class Motion_Enclosing : Inherits TaskParent
     Dim redMasks As New RedCloud_Basics
     Dim learnRate As Double
     Public motionRect As New cvb.Rect
@@ -559,7 +557,7 @@ End Class
 
 
 
-Public Class Motion_Grayscale : Inherits VB_Parent
+Public Class Motion_Grayscale : Inherits TaskParent
     Dim diff As New Diff_Basics
     Public Sub New()
         labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated grayscale image",
@@ -587,7 +585,7 @@ End Class
 
 
 
-Public Class Motion_RedCloud : Inherits VB_Parent
+Public Class Motion_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Motion detected in the cells below"
@@ -614,7 +612,7 @@ End Class
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_Diff : Inherits VB_Parent
+Public Class Motion_Diff : Inherits TaskParent
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "", "Unstable mask", "Pixel difference"}
@@ -637,7 +635,7 @@ End Class
 
 
 
-Public Class Motion_Contours : Inherits VB_Parent
+Public Class Motion_Contours : Inherits TaskParent
     Public motion As New Motion_MinRect
     Public changedPixels As Integer
     Public Sub New()
@@ -656,7 +654,7 @@ End Class
 
 
 
-Public Class Motion_PointCloud : Inherits VB_Parent
+Public Class Motion_PointCloud : Inherits TaskParent
     Dim diff As New Diff_Depth32f
     Public Sub New()
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
@@ -674,7 +672,7 @@ End Class
 
 
 
-Public Class Motion_Depth : Inherits VB_Parent
+Public Class Motion_Depth : Inherits TaskParent
     Dim diff As New Diff_Depth32f
     Public Sub New()
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
@@ -697,7 +695,7 @@ End Class
 
 
 
-Public Class Motion_TestSingle : Inherits VB_Parent
+Public Class Motion_TestSingle : Inherits TaskParent
     Dim singles As New Denoise_SinglePixels_CPP_VB
     Dim random As New Random_Basics
     Public Sub New()
@@ -727,7 +725,7 @@ End Class
 
 
 
-Public Class Motion_MinRect : Inherits VB_Parent
+Public Class Motion_MinRect : Inherits TaskParent
     Dim mRect As New Area_MinRect
     Dim history As New History_Basics8U
     Dim lastFrame As cvb.Mat
@@ -791,7 +789,7 @@ End Class
 
 
 
-Public Class Motion_FromEdge : Inherits VB_Parent
+Public Class Motion_FromEdge : Inherits TaskParent
     Dim cAccum As New Edge_CannyAccum
     Public Sub New()
         desc = "Detect motion from pixels less that max value in an accumulation."
@@ -812,7 +810,7 @@ End Class
 
 
 
-Public Class Motion_FromEdgeColorize : Inherits VB_Parent
+Public Class Motion_FromEdgeColorize : Inherits TaskParent
     Dim cAccum As New Edge_CannyAccum
     Public Sub New()
         labels = {"", "", "Canny edges accumulated", "Colorized version of dst2 - blue indicates motion."}
@@ -830,7 +828,7 @@ End Class
 
 
 
-Public Class Motion_EdgeStability : Inherits VB_Parent
+Public Class Motion_EdgeStability : Inherits TaskParent
     Dim lowRes As New LowRes_Edges
     Public Sub New()
         labels(3) = "High population cells"

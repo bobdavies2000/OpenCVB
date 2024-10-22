@@ -2,7 +2,7 @@ Imports OpenCvSharp
 Imports System.Windows.Forms
 Imports System.Security.Cryptography
 Imports cvb = OpenCvSharp
-Public Class Blur_Basics : Inherits VB_Parent
+Public Class Blur_Basics : Inherits TaskParent
     Public Options As New Options_Blur
     Public Sub New()
         UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.")
@@ -20,7 +20,7 @@ End Class
 
 
 
-Public Class Blur_Homogeneous : Inherits VB_Parent
+Public Class Blur_Homogeneous : Inherits TaskParent
     Dim blur As New Blur_Basics
     Dim blurKernelSlider As TrackBar
     Public Sub New()
@@ -39,7 +39,7 @@ End Class
 
 
 
-Public Class Blur_Median : Inherits VB_Parent
+Public Class Blur_Median : Inherits TaskParent
     Dim blur As New Blur_Basics
     Dim blurKernelSlider As TrackBar
     Public Sub New()
@@ -58,7 +58,7 @@ End Class
 
 ' https://docs.opencvb.org/2.4/modules/imgproc/doc/filtering.html?highlight=bilateralfilter
 ' https://www.tutorialspoint.com/opencv/opencv_bilateral_filter.htm
-Public Class Blur_Bilateral : Inherits VB_Parent
+Public Class Blur_Bilateral : Inherits TaskParent
     Dim blur As New Blur_Basics
     Dim blurKernelSlider As TrackBar
     Public Sub New()
@@ -76,7 +76,7 @@ End Class
 
 
 
-Public Class Blur_PlusHistogram : Inherits VB_Parent
+Public Class Blur_PlusHistogram : Inherits TaskParent
     Dim mat2to1 As New Mat_2to1
     Dim blur As New Blur_Bilateral
     Dim myhist As New Hist_EqualizeGray
@@ -106,7 +106,7 @@ End Class
 
 
 
-Public Class Blur_TopoMap : Inherits VB_Parent
+Public Class Blur_TopoMap : Inherits TaskParent
     Dim gradient As New Gradient_CartToPolar
     Dim addw As New AddWeighted_Basics
     Dim options As New Options_BlurTopo
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class Blur_Detection : Inherits VB_Parent
+Public Class Blur_Detection : Inherits TaskParent
     Dim laplace As New Laplacian_Basics
     Dim blur As New Blur_Basics
     Public Sub New()
@@ -182,7 +182,7 @@ End Class
 
 
 
-Public Class Blur_Depth : Inherits VB_Parent
+Public Class Blur_Depth : Inherits TaskParent
     Dim blur As New Blur_Basics
     Public Sub New()
         desc = "Blur the depth results to help find the boundaries to large depth regions"
@@ -199,7 +199,7 @@ End Class
 
 
 
-Public Class Blur_Gaussian : Inherits VB_Parent
+Public Class Blur_Gaussian : Inherits TaskParent
     Public options As New Options_Blur()
     Public Sub New()
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
@@ -214,7 +214,7 @@ End Class
 
 
 
-'Public Class KAZE_KeypointsAKAZE_CS : Inherits VB_Parent
+'Public Class KAZE_KeypointsAKAZE_CS : Inherits TaskParent
 '    Dim CS_AKaze As New CS_Classes.AKaze_Basics
 '    Public Sub New()
 '        desc = "Find keypoints using AKAZE algorithm."
@@ -229,7 +229,7 @@ End Class
 '    End Sub
 '    End 
 
-'    ClassPublic Class KAZE_KeypointsKAZE_CS : Inherits VB_Parent
+'    ClassPublic Class KAZE_KeypointsKAZE_CS : Inherits TaskParent
 '        Dim CS_Kaze As New CS_Classes.Kaze_Basics
 '        Public Sub New()
 '            desc = "Find keypoints using KAZE algorithm."

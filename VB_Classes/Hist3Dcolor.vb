@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Hist3Dcolor_Basics : Inherits VB_Parent
+Public Class Hist3Dcolor_Basics : Inherits TaskParent
     Public histogram As New cvb.Mat
     Public histogram1D As New cvb.Mat
     Public classCount As Integer
@@ -40,7 +40,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_UniqueRGBPixels : Inherits VB_Parent
+Public Class Hist3Dcolor_UniqueRGBPixels : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public pixels As New List(Of cvb.Point3f)
     Public counts As New List(Of Integer)
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_TopXColors : Inherits VB_Parent
+Public Class Hist3Dcolor_TopXColors : Inherits TaskParent
     Dim unique As New Hist3Dcolor_UniqueRGBPixels
     Public topXPixels As New List(Of cvb.Point3i)
     Public mapTopX As Integer = 16
@@ -108,7 +108,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Reduction : Inherits VB_Parent
+Public Class Hist3Dcolor_Reduction : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Dim reduction As New Reduction_BGR
     Public classCount As Integer
@@ -135,7 +135,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Parent
+Public Class Hist3Dcolor_ZeroGroups : Inherits TaskParent
     Public maskInput As New cvb.Mat
     Public classCount As Integer
     Public histogram As New cvb.Mat
@@ -192,7 +192,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_PlotHist1D : Inherits VB_Parent
+Public Class Hist3Dcolor_PlotHist1D : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Dim plot As New Plot_Histogram
     Public histogram1D As cvb.Mat
@@ -219,7 +219,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Select : Inherits VB_Parent
+Public Class Hist3Dcolor_Select : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         labels(3) = "The highlighted pixels are in the selected bin"
@@ -248,7 +248,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Basics_CPP_VB : Inherits VB_Parent
+Public Class Hist3Dcolor_Basics_CPP_VB : Inherits TaskParent
     Public histogram As New cvb.Mat
     Public prepareImage As Boolean = True
     Public histogram1D As New cvb.Mat
@@ -278,7 +278,7 @@ Public Class Hist3Dcolor_Basics_CPP_VB : Inherits VB_Parent
 
             cvb.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
 
-            Dim mm as mmData = GetMinMax(dst2)
+            Dim mm As mmData = GetMinMax(dst2)
 
             dst3 = ShowPalette(dst2 * 255 / mm.maxVal)
             labels(2) = simK.labels(2)
@@ -293,7 +293,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Diff : Inherits VB_Parent
+Public Class Hist3Dcolor_Diff : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -319,7 +319,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Vector : Inherits VB_Parent
+Public Class Hist3Dcolor_Vector : Inherits TaskParent
     Public histogram As New cvb.Mat
     Public inputMask As New cvb.Mat
     Public histArray() As Single

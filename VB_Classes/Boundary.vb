@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Boundary_Basics : Inherits VB_Parent
+Public Class Boundary_Basics : Inherits TaskParent
     Public redCPP As New RedCloud_CPP_VB
     Public rects As New List(Of cvb.Rect)
     Public masks As New List(Of cvb.Mat)
@@ -54,7 +54,7 @@ End Class
 
 
 
-Public Class Boundary_Tiers : Inherits VB_Parent
+Public Class Boundary_Tiers : Inherits TaskParent
     Dim cells As New Boundary_Basics
     Dim contours As New Contour_DepthTiers
     Public Sub New()
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class Boundary_Rectangles : Inherits VB_Parent
+Public Class Boundary_Rectangles : Inherits TaskParent
     Public bounds As New Boundary_Basics
     Public rects As New List(Of cvb.Rect)
     Public smallRects As New List(Of cvb.Rect)
@@ -143,7 +143,7 @@ End Class
 
 
 
-Public Class Boundary_RemovedRects : Inherits VB_Parent
+Public Class Boundary_RemovedRects : Inherits TaskParent
     Public bRects As New Boundary_Rectangles
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
@@ -170,7 +170,7 @@ End Class
 
 
 
-Public Class Boundary_Overlap : Inherits VB_Parent
+Public Class Boundary_Overlap : Inherits TaskParent
     Dim bounds As New Boundary_Basics
     Public Sub New()
         dst2 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))

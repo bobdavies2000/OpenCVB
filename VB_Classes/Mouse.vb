@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Mouse_Basics : Inherits VB_Parent
+Public Class Mouse_Basics : Inherits TaskParent
     Dim lastPoint = New cvb.Point
     Dim colorIndex As Integer
     Public Sub New()
@@ -20,7 +20,7 @@ End Class
 
 
 
-Public Class Mouse_LeftClickZoom : Inherits VB_Parent
+Public Class Mouse_LeftClickZoom : Inherits TaskParent
     Public Sub New()
         labels(2) = "Left click and drag to draw a rectangle"
         desc = "Demonstrate what the left-click enables"
@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class Mouse_ClickPointUsage : Inherits VB_Parent
+Public Class Mouse_ClickPointUsage : Inherits TaskParent
     Dim feat As New Feature_Stable
     Public Sub New()
         desc = "This algorithm shows how to use task.ClickPoint to dynamically identify what to break on."

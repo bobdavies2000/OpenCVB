@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Swarm_Basics : Inherits VB_Parent
+Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
     Dim feat As New Feature_Stable
     Public mpList As New List(Of PointPair)
@@ -91,7 +91,7 @@ End Class
 
 
 
-Public Class Swarm_LeftRightFeatures : Inherits VB_Parent
+Public Class Swarm_LeftRightFeatures : Inherits TaskParent
     Public leftList As New List(Of cvb.Point2f)
     Public rightList As New List(Of cvb.Point2f)
     Dim feat As New Feature_Stable
@@ -115,7 +115,7 @@ End Class
 
 
 
-Public Class Swarm_LeftRight : Inherits VB_Parent
+Public Class Swarm_LeftRight : Inherits TaskParent
     Public leftDistance As Single
     Public leftDirection As Single
     Public leftMax As Single
@@ -155,7 +155,7 @@ End Class
 
 
 
-Public Class Swarm_Percentage : Inherits VB_Parent
+Public Class Swarm_Percentage : Inherits TaskParent
     Dim swarm As New Swarm_Flood
     Dim options As New Options_SwarmPercent
     Public Sub New()
@@ -186,7 +186,7 @@ End Class
 
 
 
-Public Class Swarm_Flood : Inherits VB_Parent
+Public Class Swarm_Flood : Inherits TaskParent
     Dim swarm As New Swarm_Basics
     Public flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
@@ -215,7 +215,7 @@ End Class
 
 
 
-Public Class Swarm_Flood2 : Inherits VB_Parent
+Public Class Swarm_Flood2 : Inherits TaskParent
     Public lines As New Line_KNN
     Public flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
@@ -251,7 +251,7 @@ End Class
 
 
 
-Public Class Swarm_Flood3 : Inherits VB_Parent
+Public Class Swarm_Flood3 : Inherits TaskParent
     Dim swarm As New Swarm_Flood2
     Public Sub New()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."

@@ -1,6 +1,6 @@
 ﻿Imports System.Security.Cryptography
 Imports cvb = OpenCvSharp
-Public Class Model_Basics : Inherits VB_Parent
+Public Class Model_Basics : Inherits TaskParent
     Dim oglM As New OpenGL_BasicsMouse
     Public Sub New()
         labels = {"", "", "Captured OpenGL output", ""}
@@ -18,7 +18,7 @@ End Class
 
 
 
-Public Class Model_OpenGL_Sliders : Inherits VB_Parent
+Public Class Model_OpenGL_Sliders : Inherits TaskParent
     Dim model As New Model_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Basics"
@@ -39,7 +39,7 @@ End Class
 
 
 
-Public Class Model_FlatSurfaces : Inherits VB_Parent
+Public Class Model_FlatSurfaces : Inherits TaskParent
     Public totalPixels As Integer
     Dim floorList As New List(Of Single)
     Dim ceilingList As New List(Of Single)
@@ -103,7 +103,7 @@ End Class
 
 
 
-Public Class Model_RedCloud : Inherits VB_Parent
+Public Class Model_RedCloud : Inherits TaskParent
     Public oglD As New OpenGL_DrawHulls
     Public Sub New()
         labels = {"", "", "OpenGL output", "RedCloud Output"}
@@ -122,7 +122,7 @@ End Class
 
 
 
-Public Class Model_CellZoom : Inherits VB_Parent
+Public Class Model_CellZoom : Inherits TaskParent
     Dim oglData As New Model_RedCloud
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()

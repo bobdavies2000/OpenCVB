@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class FeatureLeftRight_Basics : Inherits VB_Parent
+Public Class FeatureLeftRight_Basics : Inherits TaskParent
     Dim prep As New FeatureLeftRight_LeftRightPrep
     Public mpList As New List(Of PointPair)
     Public mpCorrelation As New List(Of Single)
@@ -128,7 +128,7 @@ End Class
 
 
 
-Public Class FeatureLeftRight_LeftRightPrep : Inherits VB_Parent
+Public Class FeatureLeftRight_LeftRightPrep : Inherits TaskParent
     Dim lFeat As New Feature_Stable
     Dim rFeat As New Feature_Stable
     Public leftFeatures As New List(Of cvb.Point)
@@ -160,7 +160,7 @@ End Class
 
 
 
-Public Class FeatureLeftRight_Grid : Inherits VB_Parent
+Public Class FeatureLeftRight_Grid : Inherits TaskParent
     Dim match As New FeatureLeftRight_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
@@ -183,7 +183,7 @@ End Class
 
 
 
-Public Class FeatureLeftRight_Input : Inherits VB_Parent
+Public Class FeatureLeftRight_Input : Inherits TaskParent
     Dim ptLeft As New List(Of cvb.Point)
     Dim ptRight As New List(Of cvb.Point)
     Public mpList As New List(Of PointPair)

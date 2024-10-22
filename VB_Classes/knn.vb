@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
-Public Class KNN_Basics : Inherits VB_Parent
+Public Class KNN_Basics : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Point2f) ' put training data here
     Public queries As New List(Of cvb.Point2f) ' put Query data here
@@ -94,7 +94,7 @@ End Class
 
 
 
-Public Class KNN_NoDups : Inherits VB_Parent
+Public Class KNN_NoDups : Inherits TaskParent
     Public matches As New List(Of PointPair)
     Public noMatch As New List(Of cvb.Point)
     Public knn As New KNN_Basics
@@ -171,7 +171,7 @@ End Class
 
 
 
-Public Class KNN_Basics2DTest : Inherits VB_Parent
+Public Class KNN_Basics2DTest : Inherits TaskParent
     Public knn As New KNN_Basics
     Dim random As New Random_Basics
     Public Sub New()
@@ -218,7 +218,7 @@ End Class
 
 
 
-Public Class KNN_Basics3D : Inherits VB_Parent
+Public Class KNN_Basics3D : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Point3f) ' put training data here
     Public queries As New List(Of cvb.Point3f) ' put Query data here
@@ -266,7 +266,7 @@ End Class
 
 
 
-Public Class KNN_Basics4D : Inherits VB_Parent
+Public Class KNN_Basics4D : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Vec4f) ' put training data here
     Public queries As New List(Of cvb.Vec4f) ' put Query data here
@@ -315,7 +315,7 @@ End Class
 
 
 
-Public Class KNN_BasicsN : Inherits VB_Parent
+Public Class KNN_BasicsN : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of Single) ' put training data here
     Public queries As New List(Of Single) ' put Query data here
@@ -371,7 +371,7 @@ End Class
 
 
 
-Public Class KNN_Basics3DTest : Inherits VB_Parent
+Public Class KNN_Basics3DTest : Inherits TaskParent
     Dim knn As New KNN_Basics3D
     Dim dist As New Distance_Point3D
     Dim random As New Random_Basics3D
@@ -432,7 +432,7 @@ End Class
 
 
 
-Public Class KNN_Basics4DTest : Inherits VB_Parent
+Public Class KNN_Basics4DTest : Inherits TaskParent
     Dim knn As New KNN_Basics4D
     Dim dist As New Distance_Point4D
     Dim random As New Random_Basics4D
@@ -482,7 +482,7 @@ End Class
 
 
 
-Public Class KNN_BasicsNTest : Inherits VB_Parent
+Public Class KNN_BasicsNTest : Inherits TaskParent
     Dim knn As New KNN_BasicsN
     Public Sub New()
         labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
@@ -531,7 +531,7 @@ End Class
 
 
 
-Public Class KNN_Emax : Inherits VB_Parent
+Public Class KNN_Emax : Inherits TaskParent
     Dim random As New Random_Basics
     Public knn As New KNN_Basics
     Dim em As New EMax_Basics
@@ -562,7 +562,7 @@ End Class
 
 
 
-Public Class KNN_TrackMean : Inherits VB_Parent
+Public Class KNN_TrackMean : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Dim knn As New KNN_NoDups
     Dim feat As New Feature_Stable
@@ -662,7 +662,7 @@ End Class
 
 
 
-Public Class KNN_ClosestTracker : Inherits VB_Parent
+Public Class KNN_ClosestTracker : Inherits TaskParent
     Public lines As New Line_Basics
     Public lastPair As New PointPair
     Public trainInput As New List(Of cvb.Point2f)
@@ -735,7 +735,7 @@ End Class
 
 
 
-Public Class KNN_ClosestLine : Inherits VB_Parent
+Public Class KNN_ClosestLine : Inherits TaskParent
     Public lastP1 As cvb.Point2f
     Public lastP2 As cvb.Point2f
     Public lastIndex As Integer
@@ -790,7 +790,7 @@ End Class
 
 
 
-Public Class KNN_ClosestVertical : Inherits VB_Parent
+Public Class KNN_ClosestVertical : Inherits TaskParent
     Public lines As New FeatureLine_Finder
     Public knn As New KNN_ClosestLine
     Public pt1 As New cvb.Point3f
@@ -840,7 +840,7 @@ End Class
 
 
 
-Public Class KNN_NoDupsOld : Inherits VB_Parent
+Public Class KNN_NoDupsOld : Inherits TaskParent
     Public matches As New List(Of PointPair)
     Public noMatch As New List(Of cvb.Point)
     Public knn As New KNN_Basics
@@ -935,7 +935,7 @@ End Class
 
 
 
-Public Class KNN_Farthest : Inherits VB_Parent
+Public Class KNN_Farthest : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public mpFar As PointPair
     Dim random As New Random_Basics
@@ -986,7 +986,7 @@ End Class
 
 
 
-Public Class KNN_TrackEach : Inherits VB_Parent
+Public Class KNN_TrackEach : Inherits TaskParent
     Dim knn As New KNN_NoDups
     Dim feat As New Feature_Stable
     Dim trackAll As New List(Of List(Of PointPair))

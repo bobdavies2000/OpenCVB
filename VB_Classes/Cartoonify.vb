@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://github.com/davemk99/Cartoonify-Image/blob/master/main.cpp
-Public Class Cartoonify_Basics : Inherits VB_Parent
+Public Class Cartoonify_Basics : Inherits TaskParent
     Dim options As New Options_Cartoonify
     Public Sub New()
         labels(2) = "Mask for Cartoon"

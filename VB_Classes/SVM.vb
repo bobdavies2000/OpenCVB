@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class SVM_Basics : Inherits VB_Parent
+Public Class SVM_Basics : Inherits TaskParent
     Public options As New Options_SVM
     Dim sampleData As New SVM_SampleData
     Public points As New List(Of cvb.Point2f)
@@ -55,7 +55,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class SVM_SampleData : Inherits VB_Parent
+Public Class SVM_SampleData : Inherits TaskParent
     ReadOnly options As New Options_SVM
     Public points As New List(Of cvb.Point2f)
     Public responses As New List(Of Integer)
@@ -93,7 +93,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class SVM_TestCase : Inherits VB_Parent
+Public Class SVM_TestCase : Inherits TaskParent
     Dim options As New Options_SVM
     Dim points As New List(Of cvb.Point2f)
     Dim responses As New List(Of Integer)
@@ -156,7 +156,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class SVM_ReuseBasics : Inherits VB_Parent
+Public Class SVM_ReuseBasics : Inherits TaskParent
     Dim svm As New SVM_Basics
     Dim points As New List(Of cvb.Point2f)
     Dim responses As New List(Of Integer)
@@ -205,7 +205,7 @@ End Class
 
 
 
-Public Class SVM_ReuseRandom : Inherits VB_Parent
+Public Class SVM_ReuseRandom : Inherits TaskParent
     ReadOnly svm As New SVM_Basics
     Dim blueCount As Integer
     Public Sub New()

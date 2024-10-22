@@ -6,7 +6,7 @@ Imports System.IO
 ' https://stackoverflow.com/questions/1196322/how-to-create-an-animated-gif-in-net
 ' https://stackoverflow.com/questions/18719302/net-creating-a-looping-gif-using-gifbitmapencoder
 ' https://ezgif.com/optimize
-Public Class Gif_Basics : Inherits VB_Parent
+Public Class Gif_Basics : Inherits TaskParent
     Public options As New Options_Gif
     Public Sub New()
         clearTempDir()
@@ -40,7 +40,7 @@ Public Class Gif_Basics : Inherits VB_Parent
 
         labels(2) = "Images captured: " + CStr(task.gifImages.Count)
         SetTrueText("Gif_Basics is typically called from VB_Task to create the .gif file." + vbCrLf +
-                    "The snapshots that are input to GifBuilder are created in VB_Parent.vb (see GifCreator)", 3)
+                    "The snapshots that are input to GifBuilder are created in TaskParent.vb (see GifCreator)", 3)
     End Sub
 End Class
 
@@ -53,7 +53,7 @@ End Class
 
 
 
-Public Class Gif_OpenGL : Inherits VB_Parent
+Public Class Gif_OpenGL : Inherits TaskParent
     Dim input As New Model_RedCloud
     Dim gifC As New Gif_Basics
     Public Sub New()
@@ -81,7 +81,7 @@ End Class
 
 
 
-Public Class Gif_OpenGLwithColor : Inherits VB_Parent
+Public Class Gif_OpenGLwithColor : Inherits TaskParent
     Dim input As New Model_RedCloud
     Dim gifC As New Gif_Basics
     Public Sub New()
@@ -111,7 +111,7 @@ End Class
 
 
 
-Public Class Gif_OpenCVB : Inherits VB_Parent
+Public Class Gif_OpenCVB : Inherits TaskParent
     Dim gifC As New Gif_Basics
     Public Sub New()
         desc = "Create a GIF of the OpenCVB main screen for any algorithm."

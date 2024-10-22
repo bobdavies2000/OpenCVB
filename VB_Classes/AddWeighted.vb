@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class AddWeighted_Basics : Inherits VB_Parent
+Public Class AddWeighted_Basics : Inherits TaskParent
     Public src2 As cvb.Mat  ' user normally provides src2! 
     Public options As New Options_AddWeighted
     Public weight As Double
@@ -34,7 +34,7 @@ End Class
 
 
 
-Public Class AddWeighted_DepthAccumulate : Inherits VB_Parent
+Public Class AddWeighted_DepthAccumulate : Inherits TaskParent
     Dim options As New Options_AddWeighted
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32F, 0)
@@ -54,7 +54,7 @@ End Class
 
 
 
-Public Class AddWeighted_Accumulate : Inherits VB_Parent
+Public Class AddWeighted_Accumulate : Inherits TaskParent
     Dim options As New Options_AddWeighted
     Public Sub New()
         dst1 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32F, 0)
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class AddWeighted_InfraRed : Inherits VB_Parent
+Public Class AddWeighted_InfraRed : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Dim src2 As New cvb.Mat
     Public Sub New()
@@ -105,7 +105,7 @@ End Class
 
 
 
-Public Class AddWeighted_Edges : Inherits VB_Parent
+Public Class AddWeighted_Edges : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim addw As New AddWeighted_Basics
     Public Sub New()
@@ -129,7 +129,7 @@ End Class
 
 
 
-Public Class AddWeighted_LeftRight : Inherits VB_Parent
+Public Class AddWeighted_LeftRight : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         desc = "Use AddWeighted to add the left and right images."

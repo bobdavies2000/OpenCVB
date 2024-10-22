@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-Public Class Clone_Basics : Inherits VB_Parent
+Public Class Clone_Basics : Inherits TaskParent
     Public colorChangeValues As cvb.Vec3f
     Public illuminationChangeValues As cvb.Vec2f
     Public textureFlatteningValues As cvb.Vec2f
@@ -36,7 +36,7 @@ End Class
 
 
 
-Public Class Clone_ColorChange : Inherits VB_Parent
+Public Class Clone_ColorChange : Inherits TaskParent
     Dim clone As New Clone_Basics
     Dim options As New Options_Clone
     Public Sub New()
@@ -58,7 +58,7 @@ End Class
 
 
 
-Public Class Clone_IlluminationChange : Inherits VB_Parent
+Public Class Clone_IlluminationChange : Inherits TaskParent
     Dim clone As New Clone_Basics
     Dim options As New Options_Clone
     Public Sub New()
@@ -81,7 +81,7 @@ End Class
 
 
 
-Public Class Clone_TextureFlattening : Inherits VB_Parent
+Public Class Clone_TextureFlattening : Inherits TaskParent
     Dim clone As New Clone_Basics
     Dim options As New Options_Clone
     Public Sub New()
@@ -108,7 +108,7 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 ' https://www.learnopencvb.com/seamless-cloning-using-opencv-python-cpp/
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-Public Class Clone_Eagle : Inherits VB_Parent
+Public Class Clone_Eagle : Inherits TaskParent
     Dim sourceImage As cvb.Mat
     Dim mask As cvb.Mat
     Dim srcROI As cvb.Rect
@@ -153,7 +153,7 @@ End Class
 
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
-Public Class Clone_Seamless : Inherits VB_Parent
+Public Class Clone_Seamless : Inherits TaskParent
     Dim options As New Options_Clone
     Public Sub New()
         labels(2) = "Results for SeamlessClone"

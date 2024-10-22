@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class MatchLine_Basics : Inherits VB_Parent
+Public Class MatchLine_Basics : Inherits TaskParent
     Public match As New Match_Basics
     Public lpInput As New PointPair
     Public lpOutput As PointPair
@@ -69,7 +69,7 @@ End Class
 
 
 
-Public Class MatchLine_Longest : Inherits VB_Parent
+Public Class MatchLine_Longest : Inherits TaskParent
     Public knn As New KNN_ClosestTracker
     Public matchLine As New MatchLine_Basics
     Public Sub New()
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class MatchLine_Horizon : Inherits VB_Parent
+Public Class MatchLine_Horizon : Inherits TaskParent
     Dim matchLine As New MatchLine_Basics
     Public Sub New()
         desc = "Verify the horizon using MatchTemplate."
@@ -110,7 +110,7 @@ End Class
 
 
 
-Public Class MatchLine_Gravity : Inherits VB_Parent
+Public Class MatchLine_Gravity : Inherits TaskParent
     Dim matchLine As New MatchLine_Basics
     Public Sub New()
         desc = "Verify the gravity vector using MatchTemplate."

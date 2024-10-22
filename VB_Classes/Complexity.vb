@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.IO
 ' https://www.codeproject.com/Articles/5373108/Understanding-Time-Complexity-on-Simple-Examples
-Public Class Complexity_Basics : Inherits VB_Parent
+Public Class Complexity_Basics : Inherits TaskParent
     Dim complex As New Complexity_Dots
     Public Sub New()
         desc = "Plot all the available complexity runs."
@@ -51,7 +51,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/5373108/Understanding-Time-Complexity-on-Simple-Examples
-Public Class Complexity_PlotOpenCV : Inherits VB_Parent
+Public Class Complexity_PlotOpenCV : Inherits TaskParent
     Public plot As New Plot_Basics_CPP_VB
     Public maxFrameCount As Integer
     Public sortData As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -119,7 +119,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/5373108/Understanding-Time-Complexity-on-Simple-Examples
-Public Class Complexity_Dots : Inherits VB_Parent
+Public Class Complexity_Dots : Inherits TaskParent
     Public options As New Options_Complexity
     Public initialize As Boolean = True, maxTime As Single, fileName As String
     Public plotColor As cvb.Scalar

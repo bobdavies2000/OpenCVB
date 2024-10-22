@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://github.com/shimat/opencvsharp_2410/blob/master/sample/CStyleSamplesCS/Samples/MDS.cs
-Public Class MultiDimensionScaling_Cities : Inherits VB_Parent
+Public Class MultiDimensionScaling_Cities : Inherits TaskParent
     Dim CityDistance() As Double = { ' 10x10 array of distances for 10 cities
         0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,       ' Atlanta
         587, 0, 920, 940, 1745, 1188, 713, 1858, 1737, 597,       ' Chicago

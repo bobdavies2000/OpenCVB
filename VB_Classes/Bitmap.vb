@@ -1,7 +1,7 @@
 Imports System.Drawing
 Imports cvb = OpenCvSharp
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Extensions.BitmapConverter.ToBitmap(OpenCvSharp.Mat)/
-Public Class Bitmap_ToMat : Inherits VB_Parent
+Public Class Bitmap_ToMat : Inherits TaskParent
     Public Sub New()
         labels(2) = "Convert color bitmap to Mat"
         labels(3) = "Convert Mat to bitmap and then back to Mat"

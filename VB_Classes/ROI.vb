@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class ROI_Basics : Inherits VB_Parent
+Public Class ROI_Basics : Inherits TaskParent
     Public diff As New Diff_Basics
     Public aoiRect As cvb.Rect
     Public Sub New()
@@ -31,7 +31,7 @@ End Class
 
 
 
-Public Class ROI_FindNonZeroNoSingle : Inherits VB_Parent
+Public Class ROI_FindNonZeroNoSingle : Inherits TaskParent
     Public diff As New Diff_Basics
     Public aoiRect As cvb.Rect
     Public Sub New()
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class ROI_AccumulateOld : Inherits VB_Parent
+Public Class ROI_AccumulateOld : Inherits TaskParent
     Public diff As New Diff_Basics
     Public aoiRect As cvb.Rect
     Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
@@ -128,7 +128,7 @@ End Class
 
 
 
-Public Class ROI_Accumulate : Inherits VB_Parent
+Public Class ROI_Accumulate : Inherits TaskParent
     Public diff As New Diff_Basics
     Dim roiRect As cvb.Rect
     Dim options As New Options_ROI

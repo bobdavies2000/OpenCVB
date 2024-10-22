@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
-Public Class Random_Basics : Inherits VB_Parent
+Public Class Random_Basics : Inherits TaskParent
     Public PointList As New List(Of cvb.Point2f)
     Public range As cvb.Rect
     Public options As New Options_Random
@@ -33,7 +33,7 @@ End Class
 
 
 
-Public Class Random_Point2d : Inherits VB_Parent
+Public Class Random_Point2d : Inherits TaskParent
     Public PointList As New List(Of cvb.Point2d)
     Public range As cvb.Rect
     Dim options As New Options_Random
@@ -64,7 +64,7 @@ End Class
 
 
 
-Public Class Random_Enumerable : Inherits VB_Parent
+Public Class Random_Enumerable : Inherits TaskParent
     Public options As New Options_Random
     Public points() As cvb.Point2f
     Public Sub New()
@@ -89,7 +89,7 @@ End Class
 
 
 
-Public Class Random_Basics3D : Inherits VB_Parent
+Public Class Random_Basics3D : Inherits TaskParent
     Public Points3f() As cvb.Point3f
     Dim options As New Options_Random
     Public PointList As New List(Of cvb.Point3f)
@@ -123,7 +123,7 @@ End Class
 
 
 
-Public Class Random_Basics4D : Inherits VB_Parent
+Public Class Random_Basics4D : Inherits TaskParent
     Public vec4f() As cvb.Vec4f
     Public PointList As New List(Of cvb.Vec4f)
     Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters, 0, task.MaxZmeters}
@@ -156,7 +156,7 @@ End Class
 
 
 
-Public Class Random_Shuffle : Inherits VB_Parent
+Public Class Random_Shuffle : Inherits TaskParent
     Dim myRNG As New cvb.RNG
     Public Sub New()
         desc = "Use randomShuffle to reorder an image."
@@ -173,7 +173,7 @@ End Class
 
 
 
-Public Class Random_LUTMask : Inherits VB_Parent
+Public Class Random_LUTMask : Inherits TaskParent
     Dim random As New Random_Basics
     Dim km As New KMeans_Image
     Dim lutMat As cvb.Mat
@@ -205,7 +205,7 @@ End Class
 
 
 
-Public Class Random_UniformDist : Inherits VB_Parent
+Public Class Random_UniformDist : Inherits TaskParent
     Dim minVal As Double = 0, maxVal As Double = 255
     Public Sub New()
         desc = "Create a uniform distribution."
@@ -221,7 +221,7 @@ End Class
 
 
 
-Public Class Random_NormalDist : Inherits VB_Parent
+Public Class Random_NormalDist : Inherits TaskParent
     Dim options As New Options_NormalDist
     Public Sub New()
         desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
@@ -239,7 +239,7 @@ End Class
 
 
 
-Public Class Random_CheckUniformSmoothed : Inherits VB_Parent
+Public Class Random_CheckUniformSmoothed : Inherits TaskParent
     Dim histogram As New Hist_Basics
     Dim rUniform As New Random_UniformDist
     Public Sub New()
@@ -259,7 +259,7 @@ End Class
 
 
 
-Public Class Random_CheckUniformDist : Inherits VB_Parent
+Public Class Random_CheckUniformDist : Inherits TaskParent
     Dim histogram As New Hist_Graph
     Dim rUniform As New Random_UniformDist
     Public Sub New()
@@ -279,7 +279,7 @@ End Class
 
 
 
-Public Class Random_CheckNormalDist : Inherits VB_Parent
+Public Class Random_CheckNormalDist : Inherits TaskParent
     Dim histogram As New Hist_Graph
     Dim normalDist As New Random_NormalDist
     Public Sub New()
@@ -298,7 +298,7 @@ End Class
 
 
 
-Public Class Random_CheckNormalDistSmoothed : Inherits VB_Parent
+Public Class Random_CheckNormalDistSmoothed : Inherits TaskParent
     Dim histogram As New Hist_Basics
     Dim normalDist As New Random_NormalDist
     Public Sub New()
@@ -319,7 +319,7 @@ End Class
 
 
 
-Public Class Random_PatternGenerator_CPP_VB : Inherits VB_Parent
+Public Class Random_PatternGenerator_CPP_VB : Inherits TaskParent
     Public Sub New()
         cPtr = Random_PatternGenerator_Open()
         desc = "Generate random patterns for use with 'Random Pattern Calibration'"
@@ -342,7 +342,7 @@ End Class
 
 
 
-Public Class Random_CustomDistribution : Inherits VB_Parent
+Public Class Random_CustomDistribution : Inherits TaskParent
     Public inputCDF As New cvb.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
     Public outputRandom = New cvb.Mat(10000, 1, cvb.MatType.CV_32S, cvb.Scalar.All(0)) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public outputHistogram As cvb.Mat
@@ -388,7 +388,7 @@ End Class
 
 
 ' https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/custom-distribution-of-random-numbers
-Public Class Random_MonteCarlo : Inherits VB_Parent
+Public Class Random_MonteCarlo : Inherits TaskParent
     Public plot As New Plot_Histogram
     Dim options As New Options_MonteCarlo
     Public outputRandom = New cvb.Mat(New cvb.Size(1, 4000), cvb.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
@@ -425,7 +425,7 @@ End Class
 
 
 
-Public Class Random_CustomHistogram : Inherits VB_Parent
+Public Class Random_CustomHistogram : Inherits TaskParent
     Public random As New Random_CustomDistribution
     Public hist As New Hist_Simple
     Public saveHist As cvb.Mat
@@ -466,7 +466,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_StaticTV : Inherits VB_Parent
+Public Class Random_StaticTV : Inherits TaskParent
     Dim options As New Options_StaticTV
     Public Sub New()
         task.drawRect = New cvb.Rect(10, 10, 50, 50)
@@ -497,7 +497,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_StaticTVFaster : Inherits VB_Parent
+Public Class Random_StaticTVFaster : Inherits TaskParent
     Dim random As New Random_UniformDist
     Dim mats As New Mat_4to1
     Dim options As New Random_StaticTV
@@ -541,7 +541,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_StaticTVFastSimple : Inherits VB_Parent
+Public Class Random_StaticTVFastSimple : Inherits TaskParent
     Dim random As New Random_UniformDist
     Dim options As New Random_StaticTV
     Public Sub New()
@@ -576,7 +576,7 @@ End Class
 
 
 
-Public Class Random_KalmanPoints : Inherits VB_Parent
+Public Class Random_KalmanPoints : Inherits TaskParent
     Dim random As New Random_Basics
     Dim kalman As New Kalman_Basics
     Dim targetSet As New List(Of cvb.Point2f)
@@ -633,7 +633,7 @@ End Class
 
 
 
-Public Class Random_Clusters : Inherits VB_Parent
+Public Class Random_Clusters : Inherits TaskParent
     Public clusterLabels As New List(Of List(Of Integer))
     Public clusters As New List(Of List(Of cvb.Point2f))
     Dim options As New Options_Clusters

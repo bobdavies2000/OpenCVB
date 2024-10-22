@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Text
 Imports System.Drawing
 
-Module VB_Externs
+Module TaskExterns
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SemiGlobalMatching_Open(rows As Integer, cols As Integer, disparityRange As Integer) As IntPtr
     End Function

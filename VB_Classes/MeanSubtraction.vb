@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 'https://www.pyimagesearch.com/2017/11/06/deep-learning-opencvs-blobfromimage-works/
-Public Class MeanSubtraction_Basics : Inherits VB_Parent
+Public Class MeanSubtraction_Basics : Inherits TaskParent
     Dim options As New Options_MeanSubtraction
     Public Sub New()
         desc = "Subtract the mean from the image with a scaling factor"

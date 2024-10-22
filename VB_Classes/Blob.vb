@@ -2,7 +2,7 @@ Imports OpenCvSharp
 Imports System.Security.Cryptography
 Imports cvb = OpenCvSharp
 
-Public Class Blob_Basics : Inherits VB_Parent
+Public Class Blob_Basics : Inherits TaskParent
     Dim options As Options_Blob
     Dim input As Blob_Input
 
@@ -43,7 +43,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/14770756/opencv-simpleblobdetector-filterbyinertia-meaning
-Public Class Blob_Input : Inherits VB_Parent
+Public Class Blob_Input : Inherits TaskParent
     Dim rotatedRect As New Rectangle_Rotated
     Dim circles As New Draw_Circles
     Dim ellipses As New Draw_Ellipses
@@ -81,7 +81,7 @@ End Class
 
 
 
-Public Class Blob_RenderBlobs : Inherits VB_Parent
+Public Class Blob_RenderBlobs : Inherits TaskParent
     Dim input As New Blob_Input
     Public Sub New()
         labels(2) = "Input blobs"

@@ -2,7 +2,7 @@ Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 ' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_Basics : Inherits VB_Parent
+Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
     Dim gather As New Feature_Gather
     Public Sub New()
@@ -32,7 +32,7 @@ End Class
 
 
 
-Public Class Feature_Stable : Inherits VB_Parent
+Public Class Feature_Stable : Inherits TaskParent
     Dim nextMatList As New List(Of cvb.Mat)
     Dim ptList As New List(Of cvb.Point2f)
     Dim knn As New KNN_Basics
@@ -135,7 +135,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_KNN : Inherits VB_Parent
+Public Class Feature_KNN : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public featurePoints As New List(Of cvb.Point2f)
     Public feat As New Feature_Stable
@@ -176,7 +176,7 @@ End Class
 
 
 
-Public Class Feature_Reduction : Inherits VB_Parent
+Public Class Feature_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim feat As New Feature_Stable
     Public Sub New()
@@ -202,7 +202,7 @@ End Class
 
 
 
-Public Class Feature_MultiPass : Inherits VB_Parent
+Public Class Feature_MultiPass : Inherits TaskParent
     Dim feat As New Feature_Stable
     Public featurePoints As New List(Of cvb.Point2f)
     Dim sharpen As New PhotoShop_SharpenDetail
@@ -246,7 +246,7 @@ End Class
 
 
 
-Public Class Feature_PointTracker : Inherits VB_Parent
+Public Class Feature_PointTracker : Inherits TaskParent
     Dim flow As New Font_FlowText
     Public feat As New Feature_Stable
     Dim mPoints As New Match_Points
@@ -301,7 +301,7 @@ End Class
 
 
 
-Public Class Feature_Delaunay : Inherits VB_Parent
+Public Class Feature_Delaunay : Inherits TaskParent
     Dim facet As New Delaunay_Contours
     Dim feat As New Feature_Stable
     Public Sub New()
@@ -333,7 +333,7 @@ End Class
 
 
 
-Public Class Feature_LucasKanade : Inherits VB_Parent
+Public Class Feature_LucasKanade : Inherits TaskParent
     Dim pyr As New FeatureFlow_LucasKanade
     Public ptList As New List(Of cvb.Point)
     Public ptLast As New List(Of cvb.Point)
@@ -373,7 +373,7 @@ End Class
 
 
 
-Public Class Feature_NearestCell : Inherits VB_Parent
+Public Class Feature_NearestCell : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim feat As New FeatureLeftRight_Basics
     Dim knn As New KNN_Basics
@@ -414,7 +414,7 @@ End Class
 
 
 
-Public Class Feature_Points : Inherits VB_Parent
+Public Class Feature_Points : Inherits TaskParent
     Public feat As New Feature_Stable
     Public Sub New()
         labels(3) = "Features found in the image"
@@ -438,7 +438,7 @@ End Class
 
 
 
-Public Class Feature_Trace : Inherits VB_Parent
+Public Class Feature_Trace : Inherits TaskParent
     Dim track As New RedTrack_Features
     Public Sub New()
         desc = "Placeholder to help find RedTrack_Features"
@@ -454,7 +454,7 @@ End Class
 
 
 
-Public Class Feature_TraceDelaunay : Inherits VB_Parent
+Public Class Feature_TraceDelaunay : Inherits TaskParent
     Dim features As New Feature_Delaunay
     Public goodList As New List(Of List(Of cvb.Point2f)) ' stable points only
     Public Sub New()
@@ -489,7 +489,7 @@ End Class
 
 
 
-Public Class Feature_ShiTomasi : Inherits VB_Parent
+Public Class Feature_ShiTomasi : Inherits TaskParent
     Dim harris As New Corners_HarrisDetector_CPP_VB
     Dim shiTomasi As New Corners_ShiTomasi_CPP_VB
     Dim options As New Options_ShiTomasi
@@ -523,7 +523,7 @@ End Class
 
 
 
-Public Class Feature_Generations : Inherits VB_Parent
+Public Class Feature_Generations : Inherits TaskParent
     Dim feat As New Feature_Stable
     Dim features As New List(Of cvb.Point)
     Dim gens As New List(Of Integer)
@@ -565,7 +565,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_History : Inherits VB_Parent
+Public Class Feature_History : Inherits TaskParent
     Public features As New List(Of cvb.Point)
     Public feat As New Feature_Stable
     Dim featureHistory As New List(Of List(Of cvb.Point))
@@ -624,7 +624,7 @@ End Class
 
 
 
-Public Class Feature_GridPopulation : Inherits VB_Parent
+Public Class Feature_GridPopulation : Inherits TaskParent
     Dim feat As New Feature_Stable
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -657,7 +657,7 @@ End Class
 
 
 
-Public Class Feature_Compare : Inherits VB_Parent
+Public Class Feature_Compare : Inherits TaskParent
     Dim feat As New Feature_Stable
     Dim noFrill As New Feature_Basics
     Dim saveLFeatures As New List(Of cvb.Point2f)
@@ -685,7 +685,7 @@ End Class
 
 
 
-Public Class Feature_Gather : Inherits VB_Parent
+Public Class Feature_Gather : Inherits TaskParent
     Dim harris As New Corners_HarrisDetector_CPP_VB
     Dim FAST As New Corners_Basics
     Dim myOptions As New Options_FeatureGather
@@ -774,7 +774,7 @@ End Class
 
 
 
-Public Class Feature_Agast : Inherits VB_Parent
+Public Class Feature_Agast : Inherits TaskParent
     Dim stablePoints As List(Of Point2f)
     Dim agastFD As AgastFeatureDetector
     Dim lastPoints As List(Of Point2f)
@@ -825,7 +825,7 @@ End Class
 
 
 
-Public Class Feature_AKaze : Inherits VB_Parent
+Public Class Feature_AKaze : Inherits TaskParent
     Dim kazeKeyPoints As KeyPoint() = Nothing
     Public Sub New()
         labels(2) = "AKAZE key points"

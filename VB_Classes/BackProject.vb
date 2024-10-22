@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
-Public Class BackProject_Basics : Inherits VB_Parent
+Public Class BackProject_Basics : Inherits TaskParent
     Public histK As New Hist_Kalman
     Public minRange As cvb.Scalar, maxRange As cvb.Scalar
     Public Sub New()
@@ -54,7 +54,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
-Public Class BackProject_Full : Inherits VB_Parent
+Public Class BackProject_Full : Inherits TaskParent
     Public classCount As Integer
     Public ranges() As cvb.Rangef = New cvb.Rangef() {New cvb.Rangef(0, 255)}
     Public Sub New()
@@ -84,7 +84,7 @@ End Class
 
 
 
-Public Class BackProject_Reduction : Inherits VB_Parent
+Public Class BackProject_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim backP As New BackProject_Basics
     Public Sub New()
@@ -108,7 +108,7 @@ End Class
 
 
 
-Public Class BackProject_FeatureLess : Inherits VB_Parent
+Public Class BackProject_FeatureLess : Inherits TaskParent
     Dim backP As New BackProject_Basics
     Dim reduction As New Reduction_Basics
     Dim edges As New Edge_ColorGap_CPP_VB
@@ -136,7 +136,7 @@ End Class
 
 
 
-Public Class BackProject_BasicsKeyboard : Inherits VB_Parent
+Public Class BackProject_BasicsKeyboard : Inherits TaskParent
     Dim keys As New Keyboard_Basics
     Dim backP As New BackProject_Image
     Public Sub New()
@@ -178,7 +178,7 @@ End Class
 
 
 
-Public Class BackProject_FullLines : Inherits VB_Parent
+Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_Full
     Dim lines As New Line_Basics
     Public Sub New()
@@ -204,7 +204,7 @@ End Class
 
 
 
-Public Class BackProject_PointCloud : Inherits VB_Parent
+Public Class BackProject_PointCloud : Inherits TaskParent
     Public hist As New Hist_PointCloud
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32FC3, 0)
@@ -240,7 +240,7 @@ End Class
 
 
 
-Public Class BackProject_Display : Inherits VB_Parent
+Public Class BackProject_Display : Inherits TaskParent
     Dim backP As New BackProject_Full
     Public Sub New()
         labels = {"", "", "Back projection", ""}
@@ -259,7 +259,7 @@ End Class
 
 
 
-Public Class BackProject_Unstable : Inherits VB_Parent
+Public Class BackProject_Unstable : Inherits TaskParent
     Dim backP As New BackProject_Full
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -286,7 +286,7 @@ End Class
 
 
 
-Public Class BackProject_FullEqualized : Inherits VB_Parent
+Public Class BackProject_FullEqualized : Inherits TaskParent
     Dim backP As New BackProject_Full
     Dim equalize As New Hist_EqualizeColor
     Public Sub New()
@@ -316,7 +316,7 @@ End Class
 
 
 
-Public Class BackProject_Side : Inherits VB_Parent
+Public Class BackProject_Side : Inherits TaskParent
     Dim autoY As New OpAuto_YRange
     Dim histSide As New Projection_HistSide
     Public Sub New()
@@ -339,7 +339,7 @@ End Class
 
 
 
-Public Class BackProject_Top : Inherits VB_Parent
+Public Class BackProject_Top : Inherits TaskParent
     Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Hotspots in the Top View", "Back projection of the hotspots in the Top View"}
@@ -361,7 +361,7 @@ End Class
 
 
 
-Public Class BackProject_Horizontal : Inherits VB_Parent
+Public Class BackProject_Horizontal : Inherits TaskParent
     Dim bpTop As New BackProject_Top
     Dim bpSide As New BackProject_Side
     Public Sub New()
@@ -385,7 +385,7 @@ End Class
 
 
 
-Public Class BackProject_Vertical : Inherits VB_Parent
+Public Class BackProject_Vertical : Inherits TaskParent
     Dim bpTop As New BackProject_Top
     Dim bpSide As New BackProject_Side
     Public Sub New()
@@ -408,7 +408,7 @@ End Class
 
 
 
-Public Class BackProject_SoloSide : Inherits VB_Parent
+Public Class BackProject_SoloSide : Inherits TaskParent
     Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Solo samples in the Side View", "Back projection of the solo samples in the Side View"}
@@ -431,7 +431,7 @@ End Class
 
 
 
-Public Class BackProject_SoloTop : Inherits VB_Parent
+Public Class BackProject_SoloTop : Inherits TaskParent
     Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Solo samples in the Top View", "Back projection of the solo samples in the Top View"}
@@ -454,7 +454,7 @@ End Class
 
 
 
-Public Class BackProject_LineTop : Inherits VB_Parent
+Public Class BackProject_LineTop : Inherits TaskParent
     Dim line As New Line_ViewTop
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -484,7 +484,7 @@ End Class
 
 
 
-Public Class BackProject_LineSide : Inherits VB_Parent
+Public Class BackProject_LineSide : Inherits TaskParent
     Dim line As New Line_ViewSide
     Public lpList As New List(Of PointPair)
     Public Sub New()
@@ -519,7 +519,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
-Public Class BackProject_Image : Inherits VB_Parent
+Public Class BackProject_Image : Inherits TaskParent
     Public hist As New Hist_Basics
     Public mask As New cvb.Mat
     Dim kalman As New Kalman_Basics
@@ -583,7 +583,7 @@ End Class
 
 
 
-Public Class BackProject_Mouse : Inherits VB_Parent
+Public Class BackProject_Mouse : Inherits TaskParent
     Dim backP As New BackProject_Image
     Public Sub New()
         labels(2) = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
@@ -599,7 +599,7 @@ End Class
 
 
 
-Public Class BackProject_Depth : Inherits VB_Parent
+Public Class BackProject_Depth : Inherits TaskParent
     Dim backp As New BackProject_Image
     Public Sub New()
         desc = "Allow review of the depth backprojection"
@@ -616,7 +616,7 @@ End Class
 
 
 
-Public Class BackProject_MeterByMeter : Inherits VB_Parent
+Public Class BackProject_MeterByMeter : Inherits TaskParent
     Dim histogram As New cvb.Mat
     Public Sub New()
         desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
@@ -648,7 +648,7 @@ End Class
 
 
 
-Public Class BackProject_Hue : Inherits VB_Parent
+Public Class BackProject_Hue : Inherits TaskParent
     Dim hue As New OEX_CalcBackProject_Demo1
     Public classCount As Integer
     Public Sub New()
@@ -669,7 +669,7 @@ End Class
 
 
 
-Public Class BackProject_MaskLines : Inherits VB_Parent
+Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
     Dim lines As New Line_Basics
     Public Sub New()
@@ -702,7 +702,7 @@ End Class
 
 
 
-Public Class BackProject_Masks : Inherits VB_Parent
+Public Class BackProject_Masks : Inherits TaskParent
     Public hist As New Hist_Basics
     Public histIndex As Integer
     Public mask As New cvb.Mat
@@ -746,7 +746,7 @@ End Class
 
 
 
-Public Class BackProject_MaskList : Inherits VB_Parent
+Public Class BackProject_MaskList : Inherits TaskParent
     Public histList As New List(Of List(Of Single))
     Public histogramList As New List(Of cvb.Mat)
     Dim inputMatList As New List(Of cvb.Mat)

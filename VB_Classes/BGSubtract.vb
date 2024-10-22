@@ -4,7 +4,7 @@ Imports System.IO
 Imports OpenCvSharp
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class BGSubtract_Basics : Inherits VB_Parent
+Public Class BGSubtract_Basics : Inherits TaskParent
     Public options As New Options_BGSubtract
     Public Sub New()
         cPtr = BGSubtract_BGFG_Open(options.currMethod)
@@ -38,7 +38,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class BGSubtract_Basics_QT : Inherits VB_Parent
+Public Class BGSubtract_Basics_QT : Inherits TaskParent
     Dim learnRate As Double
     Public Sub New()
         Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
@@ -64,7 +64,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG2 : Inherits VB_Parent
+Public Class BGSubtract_MOG2 : Inherits TaskParent
     Dim MOG2 As cvb.BackgroundSubtractorMOG2
     Dim options As New Options_BGSubtract
     Public Sub New()
@@ -83,7 +83,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG2_QT : Inherits VB_Parent
+Public Class BGSubtract_MOG2_QT : Inherits TaskParent
     Dim MOG2 As cvb.BackgroundSubtractorMOG2
     Public Sub New()
         MOG2 = cvb.BackgroundSubtractorMOG2.Create()
@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class BGSubtract_MotionDetect : Inherits VB_Parent
+Public Class BGSubtract_MotionDetect : Inherits TaskParent
     Dim options As New Options_MotionDetect
     Public Sub New()
         labels(3) = "Only Motion Added"
@@ -143,7 +143,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG : Inherits VB_Parent
+Public Class BGSubtract_MOG : Inherits TaskParent
     Dim MOG As cvb.BackgroundSubtractorMOG
     Dim options As New Options_BGSubtract
     Public Sub New()
@@ -162,7 +162,7 @@ End Class
 
 
 
-Public Class BGSubtract_GMG_KNN : Inherits VB_Parent
+Public Class BGSubtract_GMG_KNN : Inherits TaskParent
     Dim gmg As cvb.BackgroundSubtractorGMG
     Dim knn As cvb.BackgroundSubtractorKNN
     Dim options As New Options_BGSubtract
@@ -190,7 +190,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG_RGBDepth : Inherits VB_Parent
+Public Class BGSubtract_MOG_RGBDepth : Inherits TaskParent
     Public grayMat As New cvb.Mat
     Dim options As New Options_BGSubtract
     Dim MOGDepth As cvb.BackgroundSubtractorMOG
@@ -214,7 +214,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG_Retina : Inherits VB_Parent
+Public Class BGSubtract_MOG_Retina : Inherits TaskParent
     Dim bgSub As New BGSubtract_MOG
     Dim retina As New Retina_Basics_CPP_VB
     Public Sub New()
@@ -232,7 +232,7 @@ End Class
 
 
 
-Public Class BGSubtract_DepthOrColorMotion : Inherits VB_Parent
+Public Class BGSubtract_DepthOrColorMotion : Inherits TaskParent
     Public motion As New Diff_UnstableDepthAndColor
     Public Sub New()
         desc = "Detect motion with both depth and color changes"
@@ -252,7 +252,7 @@ End Class
 
 
 
-Public Class BGSubtract_Video : Inherits VB_Parent
+Public Class BGSubtract_Video : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Dim video As New Video_Basics
     Public Sub New()
@@ -275,7 +275,7 @@ End Class
 
 
 
-Public Class BGSubtract_Synthetic_CPP_VB : Inherits VB_Parent
+Public Class BGSubtract_Synthetic_CPP_VB : Inherits TaskParent
     Dim options As New Options_BGSubtractSynthetic
     Public Sub New()
         labels(2) = "Synthetic background/foreground image."
@@ -308,7 +308,7 @@ End Class
 
 
 
-Public Class BGSubtract_Synthetic : Inherits VB_Parent
+Public Class BGSubtract_Synthetic : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Dim synth As New BGSubtract_Synthetic_CPP_VB
     Public Sub New()
@@ -328,7 +328,7 @@ End Class
 
 
 
-Public Class BGSubtract_Reduction : Inherits VB_Parent
+Public Class BGSubtract_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()

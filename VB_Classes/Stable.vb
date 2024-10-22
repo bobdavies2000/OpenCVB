@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Stable_Basics : Inherits VB_Parent
+Public Class Stable_Basics : Inherits TaskParent
     Public facetGen As New Delaunay_Generations
     Public ptList As New List(Of cvb.Point2f)
     Public anchorPoint As cvb.Point2f
@@ -57,7 +57,7 @@ End Class
 
 
 
-Public Class Stable_BasicsCount : Inherits VB_Parent
+Public Class Stable_BasicsCount : Inherits TaskParent
     Public basics As New Stable_Basics
     Public feat As New Feature_Stable
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class Stable_Lines : Inherits VB_Parent
+Public Class Stable_Lines : Inherits TaskParent
     Public basics As New Stable_Basics
     Dim lines As New Line_Basics
     Public Sub New()
@@ -131,7 +131,7 @@ End Class
 
 
 
-Public Class Stable_FAST : Inherits VB_Parent
+Public Class Stable_FAST : Inherits TaskParent
     Public basics As New Stable_Basics
     ReadOnly fast As New Corners_Basics
     Public Sub New()
@@ -168,7 +168,7 @@ End Class
 
 
 
-Public Class Stable_GoodFeatures : Inherits VB_Parent
+Public Class Stable_GoodFeatures : Inherits TaskParent
     Public basics As New Stable_Basics
     Public feat As New Feature_Stable
     Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)

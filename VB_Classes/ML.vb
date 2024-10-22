@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Imports OpenCvSharp.ML.ANN_MLP
 Imports OpenCvSharp.ML
-Public Class ML_Basics : Inherits VB_Parent
+Public Class ML_Basics : Inherits TaskParent
     Public trainMats() As cvb.Mat ' all entries are 32FCx
     Public trainResponse As cvb.Mat ' 32FC1 format
     Public testMats() As cvb.Mat ' all entries are 32FCx
@@ -121,7 +121,7 @@ End Class
 
 
 
-Public Class ML_BasicsOld : Inherits VB_Parent
+Public Class ML_BasicsOld : Inherits TaskParent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
@@ -265,7 +265,7 @@ Module ML__Exports
         Return depth32f
     End Function
 End Module
-Public Class ML_FillRGBDepth_MT : Inherits VB_Parent
+Public Class ML_FillRGBDepth_MT : Inherits TaskParent
     Dim shadow As New Depth_Holes
     Dim colorizer As New Depth_Colorizer_CPP_VB
     Public Sub New()
@@ -293,7 +293,7 @@ End Class
 
 
 
-Public Class ML_DepthFromColor : Inherits VB_Parent
+Public Class ML_DepthFromColor : Inherits TaskParent
     Dim colorizer As New Depth_Colorizer_CPP_VB
     Dim mats As New Mat_4Click
     Dim resizer As New Resize_Smaller
@@ -354,7 +354,7 @@ End Class
 
 
 
-Public Class ML_DepthFromXYColor : Inherits VB_Parent
+Public Class ML_DepthFromXYColor : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim shadow As New Depth_Holes
     Dim resizer As New Resize_Smaller
@@ -443,7 +443,7 @@ Public Structure mlColor
 End Structure
 
 
-Public Class ML_Color2Depth : Inherits VB_Parent
+Public Class ML_Color2Depth : Inherits TaskParent
     Dim minMax As New Grid_MinMaxDepth
     Dim color8U As New Color8U_Basics
     Public Sub New()
@@ -509,7 +509,7 @@ Public Structure mlColorInTier
     Dim x As Single
     Dim y As Single
 End Structure
-Public Class ML_ColorInTier2Depth : Inherits VB_Parent
+Public Class ML_ColorInTier2Depth : Inherits TaskParent
     Dim minMax As New Grid_MinMaxDepth
     Dim color8U As New Color8U_Basics
     Dim tiers As New Contour_DepthTiers
@@ -573,7 +573,7 @@ End Class
 
 
 
-Public Class ML_RemoveDups_CPP_VB : Inherits VB_Parent
+Public Class ML_RemoveDups_CPP_VB : Inherits TaskParent
     Public Sub New()
         cPtr = ML_RemoveDups_Open()
         labels = {"", "", "BGR input below is converted to BGRA and sorted as integers", ""}
@@ -614,7 +614,7 @@ End Class
 
 
 
-Public Class ML_LearnZfromXGray : Inherits VB_Parent
+Public Class ML_LearnZfromXGray : Inherits TaskParent
     Dim regions As New GuidedBP_Regions
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = False
@@ -658,7 +658,7 @@ End Class
 
 
 
-Public Class ML_LearnRegions : Inherits VB_Parent
+Public Class ML_LearnRegions : Inherits TaskParent
     Dim regions As New GuidedBP_Regions
     Dim color8U As New Color8U_Basics
     Public Sub New()

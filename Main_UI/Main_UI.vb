@@ -16,6 +16,7 @@ Module opencv_module
     Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks.
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
+    Public trueDataLock As New Mutex(True, "TrueDataLock")
     Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As RECT) As Integer
     <StructLayout(LayoutKind.Sequential)> Public Structure RECT
         Dim Left As Integer
@@ -1308,7 +1309,7 @@ Public Class Main_UI
         End If
 
         ' draw any TrueType font data on the image 
-        SyncLock trueData
+        SyncLock trueDataLock
             Try
                 For i = 0 To trueData.Count - 1
                     If trueData(i) Is Nothing Then Continue For
@@ -1320,6 +1321,7 @@ Public Class Main_UI
                                      CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
                     End If
                 Next
+                trueData.Clear()
             Catch ex As Exception
                 Debug.WriteLine("Error in trueData update: " + ex.Message)
             End Try
@@ -1687,11 +1689,9 @@ Public Class Main_UI
                 End If
 
                 If task.paused = False Then
-                    SyncLock trueData
+                    SyncLock trueDataLock
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
-                        Else
-                            trueData = New List(Of VB_Classes.TrueText)
                         End If
                         task.trueData.Clear()
                     End SyncLock

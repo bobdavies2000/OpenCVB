@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
-Public Class Hough_Basics : Inherits VB_Parent
+Public Class Hough_Basics : Inherits TaskParent
     Dim edges As New Edge_Basics
     Public segments() As cvb.LineSegmentPolar
     Public options As New Options_Hough
@@ -38,7 +38,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
-Public Class Hough_Circles : Inherits VB_Parent
+Public Class Hough_Circles : Inherits TaskParent
     Dim circles As New Draw_Circles
     Dim method As Integer = 3
     Public Sub New()
@@ -70,7 +70,7 @@ End Class
 
 
 
-Public Class Hough_Lines_MT : Inherits VB_Parent
+Public Class Hough_Lines_MT : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim options As New Options_Hough
     Public Sub New()
@@ -111,7 +111,7 @@ End Class
 
 
 
-Public Class Hough_Featureless : Inherits VB_Parent
+Public Class Hough_Featureless : Inherits TaskParent
     Public edges As New Edge_Basics
     Public noDepthCount() As Integer
     Public options As New Options_Hough
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class Hough_FeatureLessTopX : Inherits VB_Parent
+Public Class Hough_FeatureLessTopX : Inherits TaskParent
     Public edges As New Edge_Basics
     Public options As New Options_Hough
     Public maskFless As cvb.Mat
@@ -208,7 +208,7 @@ End Class
 
 
 
-Public Class Hough_LaneFinder : Inherits VB_Parent
+Public Class Hough_LaneFinder : Inherits TaskParent
     Dim hls As New LaneFinder_HLSColor
     Public segments As cvb.LineSegmentPoint()
     Public mask As cvb.Mat
@@ -259,7 +259,7 @@ End Class
 
 
 
-Public Class Hough_Sudoku : Inherits VB_Parent
+Public Class Hough_Sudoku : Inherits TaskParent
     Dim hough As New Hough_Basics
     Public Sub New()
         desc = "Successful use of Hough to find lines in Sudoku grid."

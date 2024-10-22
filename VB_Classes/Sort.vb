@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Sort_Basics : Inherits VB_Parent
+Public Class Sort_Basics : Inherits TaskParent
     Dim options As New Options_Sort
     Public Sub New()
         desc = "Sort the pixels of a grayscale image."
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class Sort_RectAndMask : Inherits VB_Parent
+Public Class Sort_RectAndMask : Inherits TaskParent
     Dim sort As New Sort_Basics
     Public mask As cvb.Mat
     Public rect As cvb.Rect
@@ -55,7 +55,7 @@ End Class
 
 
 
-Public Class Sort_MLPrepTest_CPP_VB : Inherits VB_Parent
+Public Class Sort_MLPrepTest_CPP_VB : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Public MLTestData As New cvb.Mat
     Public Sub New()
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class Sort_1Channel : Inherits VB_Parent
+Public Class Sort_1Channel : Inherits TaskParent
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP_VB
     Public rangeStart As New List(Of Integer)
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class Sort_3Channel : Inherits VB_Parent
+Public Class Sort_3Channel : Inherits TaskParent
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP_VB
     Dim bgra As cvb.Mat
@@ -189,7 +189,7 @@ End Class
 
 
 
-Public Class Sort_FeatureLess : Inherits VB_Parent
+Public Class Sort_FeatureLess : Inherits TaskParent
     Public devGrid As New FeatureROI_Basics
     Public sort As New Sort_Basics
     Dim plot As New Plot_Histogram
@@ -221,7 +221,7 @@ End Class
 
 
 
-Public Class Sort_Integer : Inherits VB_Parent
+Public Class Sort_Integer : Inherits TaskParent
     Dim sort As New Sort_Basics
     Public data(dst2.Total - 1) As Integer
     Public vecList As New List(Of Integer)
@@ -257,7 +257,7 @@ End Class
 
 
 
-Public Class Sort_GrayScale1 : Inherits VB_Parent
+Public Class Sort_GrayScale1 : Inherits TaskParent
     Dim sort As New Sort_Integer
     Dim pixels(2)() As Byte
     Public Sub New()
@@ -297,7 +297,7 @@ End Class
 
 
 
-Public Class Sort_GrayScale : Inherits VB_Parent
+Public Class Sort_GrayScale : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Dim pixels(2)() As Byte
     Public Sub New()

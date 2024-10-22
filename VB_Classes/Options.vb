@@ -4,7 +4,7 @@ Imports System.Numerics
 Imports OpenCvSharp.ML
 Imports System.Windows.Forms
 
-Public Class Options_Annealing : Inherits VB_Parent
+Public Class Options_Annealing : Inherits TaskParent
     Public cityCount As Integer = 25
     Public copyBestFlag As Boolean = False
     Public circularFlag As Boolean = True
@@ -44,7 +44,7 @@ End Class
 
 
 
-Public Class Options_CamShift : Inherits VB_Parent
+Public Class Options_CamShift : Inherits TaskParent
     Public camMax As Integer = 255
     Public camSBins As cvb.Scalar = New cvb.Scalar(0, 40, 32)
     Public Sub New()
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class Options_Contours2 : Inherits VB_Parent
+Public Class Options_Contours2 : Inherits TaskParent
     Public ApproximationMode As cvb.ContourApproximationModes = cvb.ContourApproximationModes.ApproxTC89KCOS
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -99,7 +99,7 @@ End Class
 
 
 
-Public Class Options_Contours : Inherits VB_Parent
+Public Class Options_Contours : Inherits TaskParent
     Public retrievalMode As cvb.RetrievalModes = cvb.RetrievalModes.External
     Public ApproximationMode As cvb.ContourApproximationModes = cvb.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Double = 0.03
@@ -150,7 +150,7 @@ End Class
 
 
 
-Public Class Options_DepthTiers : Inherits VB_Parent
+Public Class Options_DepthTiers : Inherits TaskParent
     Public pcSplitIndex As Integer
     Public cmPerTier As Integer = 50
     Public Sub New()
@@ -182,7 +182,7 @@ End Class
 
 
 ' https://answers.opencvb.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
-Public Class Options_Encode : Inherits VB_Parent
+Public Class Options_Encode : Inherits TaskParent
     Public qualityLevel As Integer = 1
     Public scalingLevel As Integer = 85
     Public encodeOption = cvb.ImwriteFlags.JpegProgressive
@@ -225,7 +225,7 @@ End Class
 
 
 
-Public Class Options_Filter : Inherits VB_Parent
+Public Class Options_Filter : Inherits TaskParent
     Public kernelSize As Integer = 3
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Filter kernel size", 1, 21, kernelSize)
@@ -241,7 +241,7 @@ End Class
 
 
 
-Public Class Options_GeneticDrawing : Inherits VB_Parent
+Public Class Options_GeneticDrawing : Inherits TaskParent
     Public stageTotal As Integer = 100
     Public brushPercent As Double = 1.0
     Public strokeCount As Integer = 10
@@ -282,7 +282,7 @@ End Class
 
 
 
-Public Class Options_MatchShapes : Inherits VB_Parent
+Public Class Options_MatchShapes : Inherits TaskParent
     Public matchOption As cvb.ShapeMatchModes = cvb.ShapeMatchModes.I1
     Public matchThreshold As Double = 0.4
     Public maxYdelta As Double = 0.05
@@ -328,7 +328,7 @@ End Class
 
 
 
-Public Class Options_Plane : Inherits VB_Parent
+Public Class Options_Plane : Inherits TaskParent
     Public rmsThreshold As Double = 0.1
     Public useMaskPoints As Boolean = False
     Public useContourPoints As Boolean = False
@@ -371,7 +371,7 @@ End Class
 
 
 
-Public Class Options_Neighbors : Inherits VB_Parent
+Public Class Options_Neighbors : Inherits TaskParent
     Public threshold As Double = 0.005
     Public pixels As Integer = 6
     Public patchZ As Boolean = False
@@ -397,7 +397,7 @@ End Class
 
 
 
-Public Class Options_Interpolate : Inherits VB_Parent
+Public Class Options_Interpolate : Inherits TaskParent
     Public resizePercent As Integer = 2
     Public interpolationThreshold As Integer = 4
     Public pixelCountThreshold As Integer = 0
@@ -427,7 +427,7 @@ End Class
 
 
 
-Public Class Options_Resize : Inherits VB_Parent
+Public Class Options_Resize : Inherits TaskParent
     Public warpFlag As cvb.InterpolationFlags = cvb.InterpolationFlags.Nearest
     Public radioIndex As Integer = 0
     Public Sub New()
@@ -464,7 +464,7 @@ End Class
 
 
 
-Public Class Options_Smoothing : Inherits VB_Parent
+Public Class Options_Smoothing : Inherits TaskParent
     Public iterations As Integer = 8
     Public interiorTension As Double = 0.5
     Public stepSize As Integer = 30
@@ -494,7 +494,7 @@ End Class
 
 
 
-Public Class Options_SuperRes : Inherits VB_Parent
+Public Class Options_SuperRes : Inherits TaskParent
     Public method As String = "farneback"
     Public iterations As Integer = 10
     Public restartWithNewOptions As Boolean = False
@@ -529,7 +529,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class Options_SVM2 : Inherits VB_Parent
+Public Class Options_SVM2 : Inherits TaskParent
     Public SVMType As Integer = cvb.ML.SVM.Types.CSvc
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -565,7 +565,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class Options_SVM : Inherits VB_Parent
+Public Class Options_SVM : Inherits TaskParent
     Public kernelType As cvb.ML.SVM.KernelTypes = cvb.ML.SVM.KernelTypes.Poly
     Public granularity As Integer = 5
     Public svmDegree As Double = 1
@@ -645,7 +645,7 @@ End Class
 
 
 
-Public Class Options_WarpModel : Inherits VB_Parent
+Public Class Options_WarpModel : Inherits TaskParent
     Public useGradient As Boolean = False
     Public pkImage As cvb.Mat
     Public warpMode As Integer = 0
@@ -703,7 +703,7 @@ End Class
 
 
 
-Public Class Options_MinMaxNone : Inherits VB_Parent
+Public Class Options_MinMaxNone : Inherits TaskParent
     Public useMax As Boolean = False
     Public useMin As Boolean = False
     Public useNone As Boolean = False
@@ -729,7 +729,7 @@ End Class
 
 
 
-Public Class Options_OpenGL : Inherits VB_Parent
+Public Class Options_OpenGL : Inherits TaskParent
     Public FOV As Double = 75
     Public yaw As Double = -3
     Public pitch As Double = 3
@@ -802,7 +802,7 @@ End Class
 
 
 
-Public Class Options_OpenGLFunctions : Inherits VB_Parent
+Public Class Options_OpenGLFunctions : Inherits TaskParent
     Public moveAmount As cvb.Scalar = New cvb.Scalar(0, 0, 0)
     Public FOV As Double = 75
     Public yaw As Double = -3
@@ -841,7 +841,7 @@ End Class
 
 
 
-Public Class Options_MinArea : Inherits VB_Parent
+Public Class Options_MinArea : Inherits TaskParent
     Public srcPoints As New List(Of cvb.Point2f)
     Public squareWidth As Integer = 100
     Public numPoints As Integer = 5
@@ -874,7 +874,7 @@ End Class
 
 
 
-Public Class Options_DCT : Inherits VB_Parent
+Public Class Options_DCT : Inherits TaskParent
     Public dctFlag As cvb.DctFlags = New cvb.DctFlags
     Public runLengthMin As Integer = 15
     Public removeFrequency As Integer = 1
@@ -910,7 +910,7 @@ End Class
 
 
 
-Public Class Options_Eigen : Inherits VB_Parent
+Public Class Options_Eigen : Inherits TaskParent
     Public highlight As Boolean = False
     Public recompute As Boolean = False
     Public randomCount As Integer = 100
@@ -949,7 +949,7 @@ End Class
 
 
 
-Public Class Options_FitLine : Inherits VB_Parent
+Public Class Options_FitLine : Inherits TaskParent
     Public radiusAccuracy As Integer = 10
     Public angleAccuracy As Integer = 10
     Public Sub New()
@@ -972,7 +972,7 @@ End Class
 
 
 
-Public Class Options_Fractal : Inherits VB_Parent
+Public Class Options_Fractal : Inherits TaskParent
     Public iterations As Integer = 34
     Public resetCheck As CheckBox
     Public Sub New()
@@ -992,7 +992,7 @@ End Class
 
 
 
-Public Class Options_ProCon : Inherits VB_Parent
+Public Class Options_ProCon : Inherits TaskParent
     Public buffer(9) As Integer
     Public pduration As Integer = 1
     Public cduration As Integer = 1
@@ -1022,7 +1022,7 @@ End Class
 
 
 
-Public Class Options_OilPaint : Inherits VB_Parent
+Public Class Options_OilPaint : Inherits TaskParent
     Public kernelSize As Integer = 4
     Public intensity As Integer = 20
     Public threshold As Integer = 25
@@ -1058,7 +1058,7 @@ End Class
 
 
 
-Public Class Options_Pointilism : Inherits VB_Parent
+Public Class Options_Pointilism : Inherits TaskParent
     Public smoothingRadius As Integer = 32 * 2 + 1
     Public strokeSize As Integer = 3
     Public useElliptical As Boolean = False
@@ -1089,7 +1089,7 @@ End Class
 
 
 
-Public Class Options_MotionBlur : Inherits VB_Parent
+Public Class Options_MotionBlur : Inherits TaskParent
     Public showDirection As Boolean = True
     Public redoCheckBox As CheckBox
     Public kernelSize As Integer = 51
@@ -1138,7 +1138,7 @@ End Class
 
 
 
-Public Class Options_BinarizeNiBlack : Inherits VB_Parent
+Public Class Options_BinarizeNiBlack : Inherits TaskParent
     Public kernelSize As Integer = 51
     Public niBlackK As Double = -200 / 1000
     Public nickK As Double = 100 / 1000
@@ -1172,7 +1172,7 @@ End Class
 
 
 
-Public Class Options_Bernson : Inherits VB_Parent
+Public Class Options_Bernson : Inherits TaskParent
     Public kernelSize As Integer = 51
     Public bgThreshold As Integer = 100
     Public contrastMin As Integer = 50
@@ -1200,7 +1200,7 @@ End Class
 
 
 
-Public Class Options_BlockMatching : Inherits VB_Parent
+Public Class Options_BlockMatching : Inherits TaskParent
     Public numDisparity As Integer = 2 * 16
     Public blockSize As Integer = 15
     Public distance As Integer = 20
@@ -1226,7 +1226,7 @@ End Class
 
 
 
-Public Class Options_Cartoonify : Inherits VB_Parent
+Public Class Options_Cartoonify : Inherits TaskParent
     Public medianBlur As Integer = 7
     Public medianBlur2 As Integer = 3
     Public kernelSize As Integer = 5
@@ -1256,7 +1256,7 @@ End Class
 
 
 
-Public Class Options_Dither : Inherits VB_Parent
+Public Class Options_Dither : Inherits TaskParent
     Public radioIndex As Integer = 0
     Public bppIndex As Integer = 1
     Public Sub New()
@@ -1300,7 +1300,7 @@ End Class
 
 
 
-Public Class Options_SymmetricalShapes : Inherits VB_Parent
+Public Class Options_SymmetricalShapes : Inherits TaskParent
     Public rotateAngle As Double = 0
     Public fillColor As cvb.Scalar = New cvb.Scalar(0, 0, 255)
     Public numPoints As Integer = 0
@@ -1370,7 +1370,7 @@ End Class
 
 
 
-Public Class Options_DrawArc : Inherits VB_Parent
+Public Class Options_DrawArc : Inherits TaskParent
     Public saveMargin As Integer = 32
     Public drawFull As Boolean = False
     Public drawFill As Boolean = False
@@ -1401,7 +1401,7 @@ End Class
 
 
 
-Public Class Options_FilterNorm : Inherits VB_Parent
+Public Class Options_FilterNorm : Inherits TaskParent
     Public kernel As cvb.Mat
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -1437,7 +1437,7 @@ End Class
 
 
 
-Public Class Options_SepFilter2D : Inherits VB_Parent
+Public Class Options_SepFilter2D : Inherits TaskParent
     Public xDim As Integer = 5
     Public yDim As Integer = 11
     Public sigma As Double = 17
@@ -1471,7 +1471,7 @@ End Class
 
 
 
-Public Class Options_IMUFrameTime : Inherits VB_Parent
+Public Class Options_IMUFrameTime : Inherits TaskParent
     Public minDelayIMU As Integer = 4
     Public minDelayHost As Integer = 4
     Public plotLastX As Integer = 20
@@ -1497,7 +1497,7 @@ End Class
 
 
 
-Public Class Options_KLT : Inherits VB_Parent
+Public Class Options_KLT : Inherits TaskParent
     Public ptInput() As cvb.Point2f
     Public maxCorners As Integer = 100
     Public qualityLevel As Double = 0.01
@@ -1546,7 +1546,7 @@ End Class
 
 
 
-Public Class Options_Laplacian : Inherits VB_Parent
+Public Class Options_Laplacian : Inherits TaskParent
     Public kernel As cvb.Size = New cvb.Size(3, 3)
     Public scale As Double = 1
     Public delta As Double = 0
@@ -1592,7 +1592,7 @@ End Class
 
 
 
-Public Class Options_OpticalFlow : Inherits VB_Parent
+Public Class Options_OpticalFlow : Inherits TaskParent
     Public pyrScale As Double = 0.35
     Public levels As Integer = 1
     Public winSize As Integer = 1
@@ -1653,7 +1653,7 @@ End Class
 
 
 
-Public Class Options_OpticalFlowSparse : Inherits VB_Parent
+Public Class Options_OpticalFlowSparse : Inherits TaskParent
     Public OpticalFlowFlag As cvb.OpticalFlowFlags = cvb.OpticalFlowFlags.FarnebackGaussian
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -1685,7 +1685,7 @@ End Class
 
 
 
-Public Class Options_XPhoto : Inherits VB_Parent
+Public Class Options_XPhoto : Inherits TaskParent
     Public colorCode As Integer = cvb.ColorConversionCodes.BGR2GRAY
     Public dynamicRatio As Integer = 0
     Public blockSize As Integer = 0
@@ -1725,7 +1725,7 @@ End Class
 
 
 
-Public Class Options_InPaint : Inherits VB_Parent
+Public Class Options_InPaint : Inherits TaskParent
     Public telea As Boolean = False
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -1749,7 +1749,7 @@ End Class
 
 
 
-Public Class Options_RotatePoly : Inherits VB_Parent
+Public Class Options_RotatePoly : Inherits TaskParent
     Public changeCheck As CheckBox
     Public angleSlider As TrackBar
     Public Sub New()
@@ -1778,7 +1778,7 @@ End Class
 
 
 
-Public Class Options_FPoly : Inherits VB_Parent
+Public Class Options_FPoly : Inherits TaskParent
     Public removeThreshold As Integer = 4
     Public autoResyncAfterX As Integer = 500
     Public Sub New()
@@ -1810,7 +1810,7 @@ End Class
 
 
 
-Public Class Options_Homography : Inherits VB_Parent
+Public Class Options_Homography : Inherits TaskParent
     Public hMethod = cvb.HomographyMethods.None
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -1855,7 +1855,7 @@ End Class
 
 
 
-Public Class Options_Random : Inherits VB_Parent
+Public Class Options_Random : Inherits TaskParent
     Public count As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Pixel Count", 1, dst2.Cols * dst2.Rows, 20)
@@ -1873,7 +1873,7 @@ End Class
 
 
 
-Public Class Options_Hough : Inherits VB_Parent
+Public Class Options_Hough : Inherits TaskParent
     Public rho As Integer = 1
     Public theta As Double = 1000 * Math.PI / 180
     Public threshold As Integer = 3
@@ -1910,7 +1910,7 @@ End Class
 
 
 
-Public Class Options_Canny : Inherits VB_Parent
+Public Class Options_Canny : Inherits TaskParent
     Public threshold1 As Integer = 100
     Public threshold2 As Integer = 150
     Public aperture As Integer = 3
@@ -1938,7 +1938,7 @@ End Class
 
 
 
-Public Class Options_ColorMatch : Inherits VB_Parent
+Public Class Options_ColorMatch : Inherits TaskParent
     Public maxDistanceCheck As Boolean = False
     Public Sub New()
         If FindFrm(traceName + " CheckBoxes") Is Nothing Then
@@ -1960,7 +1960,7 @@ End Class
 
 
 
-Public Class Options_Sort : Inherits VB_Parent
+Public Class Options_Sort : Inherits TaskParent
     Public sortOption As cvb.SortFlags = cvb.SortFlags.EveryColumn + cvb.SortFlags.Ascending
     Public radio0 As RadioButton
     Public radio1 As RadioButton
@@ -2005,7 +2005,7 @@ End Class
 
 
 
-Public Class Options_Distance : Inherits VB_Parent
+Public Class Options_Distance : Inherits TaskParent
     Public distanceType As cvb.DistanceTypes = cvb.DistanceTypes.L1
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -2034,7 +2034,7 @@ End Class
 
 
 
-Public Class Options_Warp : Inherits VB_Parent
+Public Class Options_Warp : Inherits TaskParent
     Public alpha As Double = 0
     Public beta As Double = 0
     Public gamma As Double = 0
@@ -2112,7 +2112,7 @@ End Class
 
 
 
-Public Class Options_HistCompare : Inherits VB_Parent
+Public Class Options_HistCompare : Inherits TaskParent
     Public compareMethod As cvb.HistCompMethods = cvb.HistCompMethods.Correl
     Public compareName As String = "Chi Square Alt"
     Public Sub New()
@@ -2166,7 +2166,7 @@ End Class
 
 
 
-Public Class Options_MatchCell : Inherits VB_Parent
+Public Class Options_MatchCell : Inherits TaskParent
     Public overlapPercent As Double = 0.5
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent overlap", 0, 100, overlapPercent * 100)
@@ -2184,7 +2184,7 @@ End Class
 
 
 
-Public Class Options_Extrinsics : Inherits VB_Parent
+Public Class Options_Extrinsics : Inherits TaskParent
     Public leftCorner As Integer = 0
     Public rightCorner As Integer = 0
     Public topCorner As Integer = 0
@@ -2224,7 +2224,7 @@ End Class
 
 
 
-Public Class Options_Translation : Inherits VB_Parent
+Public Class Options_Translation : Inherits TaskParent
     Public leftTrans As Integer = 0
     Public rightTrans As Integer = 0
     Public Sub New()
@@ -2258,7 +2258,7 @@ End Class
 
 
 
-Public Class Options_OpenGL_Contours : Inherits VB_Parent
+Public Class Options_OpenGL_Contours : Inherits TaskParent
     Public depthPointStyle As Integer = 0
     Public filterThreshold As Double = 0.3
     Public Sub New()
@@ -2301,7 +2301,7 @@ End Class
 
 
 
-Public Class Options_Motion : Inherits VB_Parent
+Public Class Options_Motion : Inherits TaskParent
     Public motionThreshold As Integer = 0
     Public cumulativePercentThreshold As Double = 0.1
     Public Sub New()
@@ -2325,7 +2325,7 @@ End Class
 
 
 
-Public Class Options_Emax : Inherits VB_Parent
+Public Class Options_Emax : Inherits TaskParent
     Public predictionStepSize As Integer = 5
     Public consistentcolors As Boolean = False
     Public covarianceType = cvb.EMTypes.CovMatDefault
@@ -2368,7 +2368,7 @@ End Class
 
 
 
-Public Class Options_Intercepts : Inherits VB_Parent
+Public Class Options_Intercepts : Inherits TaskParent
     Public interceptRange As Integer = 10
     Public mouseMovePoint As Integer = 0
     Public selectedIntercept As Integer = 0
@@ -2405,7 +2405,7 @@ End Class
 
 
 
-Public Class Options_PlaneEstimation : Inherits VB_Parent
+Public Class Options_PlaneEstimation : Inherits TaskParent
     Public useDiagonalLines As Boolean = False
     Public useContour_SidePoints As Boolean = True
     Public Sub New()
@@ -2431,7 +2431,7 @@ End Class
 
 
 
-Public Class Options_ForeGround : Inherits VB_Parent
+Public Class Options_ForeGround : Inherits TaskParent
     Public maxForegroundDepthInMeters As Single = 1500 / 1000
     Public minSizeContour As Integer = 100
     Public depthPerRegion As Double = 0
@@ -2459,7 +2459,7 @@ End Class
 
 
 
-Public Class Options_Flood : Inherits VB_Parent
+Public Class Options_Flood : Inherits TaskParent
     Public floodFlag As cvb.FloodFillFlags = 4 Or cvb.FloodFillFlags.FixedRange
     Public stepSize As Integer = 30
     Public minPixels As Integer = 30
@@ -2491,7 +2491,7 @@ End Class
 
 
 
-Public Class Options_ShapeDetect : Inherits VB_Parent
+Public Class Options_ShapeDetect : Inherits TaskParent
     Public fileName As String = ""
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -2516,7 +2516,7 @@ End Class
 
 
 
-Public Class Options_Blur : Inherits VB_Parent
+Public Class Options_Blur : Inherits TaskParent
     Public kernelSize As Integer = 3
     Public sigma As Double = 1.5
     Public Sub New()
@@ -2541,7 +2541,7 @@ End Class
 
 
 
-Public Class Options_Wavelet : Inherits VB_Parent
+Public Class Options_Wavelet : Inherits TaskParent
     Public useHaar As Boolean = True
     Public iterations As Integer = 3
     Public Sub New()
@@ -2570,7 +2570,7 @@ End Class
 
 
 
-Public Class Options_SOM : Inherits VB_Parent
+Public Class Options_SOM : Inherits TaskParent
     Public iterations As Integer = 3000
     Public learningRate As Double = 0.1
     Public radius As Integer = 15
@@ -2599,7 +2599,7 @@ End Class
 
 
 
-Public Class Options_SURF : Inherits VB_Parent
+Public Class Options_SURF : Inherits TaskParent
     Public hessianThreshold As Integer = 2000
     Public useBFMatcher As Boolean = True
     Public verticalRange As Integer = 1
@@ -2637,7 +2637,7 @@ End Class
 
 
 
-Public Class Options_Sift : Inherits VB_Parent
+Public Class Options_Sift : Inherits TaskParent
     Public useBFMatcher As Boolean = False
     Public pointCount As Integer = 200
     Public stepSize As Integer = 10
@@ -2670,7 +2670,7 @@ End Class
 
 
 
-Public Class Options_Dilate : Inherits VB_Parent
+Public Class Options_Dilate : Inherits TaskParent
     Public kernelSize As Integer = 3
     Public iterations As Integer = 1
     Public morphShape As cvb.MorphShapes = cvb.MorphShapes.Cross
@@ -2715,7 +2715,7 @@ End Class
 
 
 
-Public Class Options_KMeans : Inherits VB_Parent
+Public Class Options_KMeans : Inherits TaskParent
     Public kMeansFlag As cvb.KMeansFlags = cvb.KMeansFlags.RandomCenters
     Public kMeansK As Integer = 5
     Public Sub New()
@@ -2757,7 +2757,7 @@ End Class
 
 
 
-Public Class Options_LUT : Inherits VB_Parent
+Public Class Options_LUT : Inherits TaskParent
     Public lutSegments As Integer = 10
     Public splits(4) As Integer
     Public vals(4) As Integer
@@ -2792,7 +2792,7 @@ End Class
 
 
 
-Public Class Options_WarpModel2 : Inherits VB_Parent
+Public Class Options_WarpModel2 : Inherits TaskParent
     Public warpMode As Integer = 0
     Public useWarpAffine As Boolean = False
     Public useWarpHomography As Boolean = False
@@ -2831,7 +2831,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Options_Photoshop : Inherits VB_Parent
+Public Class Options_Photoshop : Inherits TaskParent
     Public switchColor As Integer = 3
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -2856,7 +2856,7 @@ End Class
 
 
 
-Public Class Options_Gif : Inherits VB_Parent
+Public Class Options_Gif : Inherits TaskParent
     Public buildCheck As CheckBox
     Public restartCheck As CheckBox
     Public dst0Radio As RadioButton
@@ -2923,7 +2923,7 @@ End Class
 
 
 
-Public Class Options_IMU : Inherits VB_Parent
+Public Class Options_IMU : Inherits TaskParent
     Public rotateX As Integer = 0
     Public rotateY As Integer = 0
     Public rotateZ As Integer = 0
@@ -2955,7 +2955,7 @@ End Class
 
 
 
-Public Class Options_FeatureMatch : Inherits VB_Parent
+Public Class Options_FeatureMatch : Inherits TaskParent
     Public matchOption As cvb.TemplateMatchModes = cvb.TemplateMatchModes.CCoeffNormed
     Public matchText As String = "CCoeffNormed"
     Public Sub New()
@@ -2986,7 +2986,7 @@ End Class
 
 
 
-Public Class Options_HeatMap : Inherits VB_Parent
+Public Class Options_HeatMap : Inherits TaskParent
     Public redThreshold As Integer = 20
     Public viewName As String = "vertical"
     Public topView As Boolean = True
@@ -3020,7 +3020,7 @@ End Class
 
 
 
-Public Class Options_Boundary : Inherits VB_Parent
+Public Class Options_Boundary : Inherits TaskParent
     Public desiredBoundaries As Integer = 15
     Public peakDistance As Integer = 20
     Public Sub New()
@@ -3045,7 +3045,7 @@ End Class
 
 
 
-Public Class Options_Denoise : Inherits VB_Parent
+Public Class Options_Denoise : Inherits TaskParent
     Public removeSinglePixels As Boolean = True
     Public Sub New()
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
@@ -3069,7 +3069,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class Options_MSER : Inherits VB_Parent
+Public Class Options_MSER : Inherits TaskParent
     Public delta As Integer = 9
     Public minArea As Integer = 0
     Public maxArea As Integer = 0
@@ -3161,7 +3161,7 @@ End Class
 
 
 
-Public Class Options_Spectrum : Inherits VB_Parent
+Public Class Options_Spectrum : Inherits TaskParent
     Public gapDepth As Integer = 1
     Public gapGray As Integer = 1
     Public sampleThreshold As Integer = 10
@@ -3346,7 +3346,7 @@ End Class
 
 
 
-Public Class Options_HistXD : Inherits VB_Parent
+Public Class Options_HistXD : Inherits TaskParent
     Public sideThreshold As Integer = 5
     Public topThreshold As Integer = 15
     Public threshold3D As Integer = 40
@@ -3372,7 +3372,7 @@ End Class
 
 
 
-Public Class Options_Complexity : Inherits VB_Parent
+Public Class Options_Complexity : Inherits TaskParent
     Public filename As FileInfo
     Public filenames As List(Of String)
     Public plotColor As cvb.Scalar = New cvb.Scalar(255, 255, 0)
@@ -3423,7 +3423,7 @@ End Class
 
 
 
-Public Class Options_BGSubtractSynthetic : Inherits VB_Parent
+Public Class Options_BGSubtractSynthetic : Inherits TaskParent
     Public amplitude As Double = 200
     Public magnitude As Double = 20
     Public waveSpeed As Double = 20
@@ -3454,7 +3454,7 @@ End Class
 
 
 
-Public Class Options_BGSubtract : Inherits VB_Parent
+Public Class Options_BGSubtract : Inherits TaskParent
     Public learnRate As Double = 0.01
     Public methodDesc As String = "MOG2"
     Public currMethod As Integer = 4
@@ -3494,7 +3494,7 @@ End Class
 
 
 
-Public Class Options_Classifier : Inherits VB_Parent
+Public Class Options_Classifier : Inherits TaskParent
     Public methodIndex As Integer = 0
     Public methodName As String = "Normal Bayes (NBC)"
     Public sampleCount As Integer = 200
@@ -3540,7 +3540,7 @@ End Class
 
 
 
-Public Class Options_Derivative : Inherits VB_Parent
+Public Class Options_Derivative : Inherits TaskParent
     Public channel As Integer = 0
     Dim options As New Options_Sobel
     Public kernelSize As Integer = 3
@@ -3573,7 +3573,7 @@ End Class
 
 
 
-Public Class Options_Threshold : Inherits VB_Parent
+Public Class Options_Threshold : Inherits TaskParent
     Public thresholdMethod As cvb.ThresholdTypes = cvb.ThresholdTypes.Binary
     Public thresholdName As String = ""
     Public threshold As Integer = 128
@@ -3628,7 +3628,7 @@ End Class
 
 
 
-Public Class Options_AdaptiveThreshold : Inherits VB_Parent
+Public Class Options_AdaptiveThreshold : Inherits TaskParent
     Public method As cvb.AdaptiveThresholdTypes = cvb.AdaptiveThresholdTypes.GaussianC
     Public blockSize As Integer = 5
     Public constantVal As Integer = 0
@@ -3668,7 +3668,7 @@ End Class
 
 
 
-Public Class Options_Colors : Inherits VB_Parent
+Public Class Options_Colors : Inherits TaskParent
     Public redS As Integer = 180
     Public greenS As Integer = 180
     Public blueS As Integer = 180
@@ -3694,7 +3694,7 @@ End Class
 
 
 
-Public Class Options_Threshold_AdaptiveMin : Inherits VB_Parent
+Public Class Options_Threshold_AdaptiveMin : Inherits TaskParent
     Public adaptiveMethod As cvb.AdaptiveThresholdTypes = cvb.AdaptiveThresholdTypes.GaussianC
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -3717,7 +3717,7 @@ End Class
 
 
 
-Public Class Options_ThresholdAll : Inherits VB_Parent
+Public Class Options_ThresholdAll : Inherits TaskParent
     Public thresholdMethod As cvb.ThresholdTypes = cvb.ThresholdTypes.Binary
     Public blockSize As Integer = 5
     Public constantVal As Integer = 0
@@ -3787,7 +3787,7 @@ End Class
 
 
 
-Public Class Options_StdevGrid : Inherits VB_Parent
+Public Class Options_StdevGrid : Inherits TaskParent
     Public minThreshold As Integer = 30
     Public maxThreshold As Integer = 230
     Public diffThreshold As Integer = 5
@@ -3815,7 +3815,7 @@ End Class
 
 
 
-Public Class Options_DFT : Inherits VB_Parent
+Public Class Options_DFT : Inherits TaskParent
     Public radius As Integer = 120
     Public order As Integer = 2
     Public butterworthFilter(1) As cvb.Mat
@@ -3856,7 +3856,7 @@ End Class
 
 
 
-Public Class Options_DFTShape : Inherits VB_Parent
+Public Class Options_DFTShape : Inherits TaskParent
     Public dftShape As String = "Draw Circle"
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -3881,7 +3881,7 @@ End Class
 
 
 
-Public Class Options_FitEllipse : Inherits VB_Parent
+Public Class Options_FitEllipse : Inherits TaskParent
     Public fitType As Integer = 0
     Public threshold As Integer = 70
     Public Sub New()
@@ -3914,7 +3914,7 @@ End Class
 
 
 
-Public Class Options_TopX : Inherits VB_Parent
+Public Class Options_TopX : Inherits TaskParent
     Public topX As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Show the top X cells", 1, 255, topX)
@@ -3932,7 +3932,7 @@ End Class
 
 
 
-Public Class Options_XNeighbors : Inherits VB_Parent
+Public Class Options_XNeighbors : Inherits TaskParent
     Public xNeighbors As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("X neighbors", 1, 255, xNeighbors)
@@ -3950,7 +3950,7 @@ End Class
 
 
 
-Public Class Options_Sobel : Inherits VB_Parent
+Public Class Options_Sobel : Inherits TaskParent
     Public kernelSize As Integer = 3
     Public threshold As Integer = 50
     Public distanceThreshold As Integer = 10
@@ -4000,7 +4000,7 @@ End Class
 
 
 
-Public Class Options_EdgeOverlay : Inherits VB_Parent
+Public Class Options_EdgeOverlay : Inherits TaskParent
     Public xDisp As Integer = 7
     Public yDisp As Integer = 11
     Public Sub New()
@@ -4023,7 +4023,7 @@ End Class
 
 
 
-Public Class Options_AddWeighted : Inherits VB_Parent
+Public Class Options_AddWeighted : Inherits TaskParent
     Public addWeighted As Double = 0.5
     Public accumWeighted As Double = 0.1
     Public Sub New()
@@ -4046,7 +4046,7 @@ End Class
 
 
 
-Public Class Options_ApproxPoly : Inherits VB_Parent
+Public Class Options_ApproxPoly : Inherits TaskParent
     Public epsilon As Double = 3
     Public closedPoly As Boolean = True
     Public Sub New()
@@ -4072,7 +4072,7 @@ End Class
 
 
 
-Public Class Options_Bin3WayRedCloud : Inherits VB_Parent
+Public Class Options_Bin3WayRedCloud : Inherits TaskParent
     Public startRegion As Integer = 0
     Public endRegion As Integer = 0
     Public Sub New()
@@ -4113,7 +4113,7 @@ End Class
 
 
 
-Public Class Options_Bin2WayRedCloud : Inherits VB_Parent
+Public Class Options_Bin2WayRedCloud : Inherits TaskParent
     Public startRegion As Integer = 0
     Public endRegion As Integer = 0
     Public Sub New()
@@ -4154,7 +4154,7 @@ End Class
 
 
 
-Public Class Options_GuidedBPDepth : Inherits VB_Parent
+Public Class Options_GuidedBPDepth : Inherits TaskParent
     Public bins As Integer = 1000
     Public maxClusters As Double = 5
     Public Sub New()
@@ -4177,7 +4177,7 @@ End Class
 
 
 
-Public Class Options_OpenGL_Duster : Inherits VB_Parent
+Public Class Options_OpenGL_Duster : Inherits TaskParent
     Public useClusterColors As Boolean = False
     Public useTaskPointCloud As Boolean = False
     Public Sub New()
@@ -4197,7 +4197,7 @@ End Class
 
 
 
-Public Class Options_FeatureGather : Inherits VB_Parent
+Public Class Options_FeatureGather : Inherits TaskParent
     Public featureSource As Integer = 0
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -4228,7 +4228,7 @@ End Class
 
 
 
-Public Class Options_AsciiArt : Inherits VB_Parent
+Public Class Options_AsciiArt : Inherits TaskParent
     Public hStep As Double = 31
     Public wStep As Double = 55
     Public size As cvb.Size = New cvb.Size(wStep, hStep)
@@ -4253,7 +4253,7 @@ End Class
 
 
 
-Public Class Options_MotionDetect : Inherits VB_Parent
+Public Class Options_MotionDetect : Inherits TaskParent
     Public threadData As cvb.Vec3i = New cvb.Vec3i(0, 0, 0)
     Public CCthreshold As Double = 0
     Public pad As Integer = 0
@@ -4295,7 +4295,7 @@ End Class
 
 
 
-Public Class Options_JpegQuality : Inherits VB_Parent
+Public Class Options_JpegQuality : Inherits TaskParent
     Public quality As Integer = 90
     Public Sub New()
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("JPEG Quality", 1, 100, quality)
@@ -4309,7 +4309,7 @@ End Class
 
 
 
-Public Class Options_PNGCompression : Inherits VB_Parent
+Public Class Options_PNGCompression : Inherits TaskParent
     Public compression As Integer = 90
     Public Sub New()
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("PNG Compression", 1, 100, compression)
@@ -4324,7 +4324,7 @@ End Class
 
 
 
-Public Class Options_Binarize : Inherits VB_Parent
+Public Class Options_Binarize : Inherits TaskParent
     Public binarizeLabel As String = "Binary"
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -4348,7 +4348,7 @@ End Class
 
 
 
-Public Class Options_BlurTopo : Inherits VB_Parent
+Public Class Options_BlurTopo : Inherits TaskParent
     Public savePercent As Double = 0
     Public nextPercent As Double = 20
     Public reduction As Integer = 20
@@ -4382,7 +4382,7 @@ End Class
 
 
 
-Public Class Options_BoundaryRect : Inherits VB_Parent
+Public Class Options_BoundaryRect : Inherits TaskParent
     Public percentRect As Double = 25
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired percent of rectangles", 0, 100, percentRect)
@@ -4400,7 +4400,7 @@ End Class
 
 
 
-Public Class Options_BrightnessContrast : Inherits VB_Parent
+Public Class Options_BrightnessContrast : Inherits TaskParent
     Public contrast As Integer = 500
     Public brightness As Double = -100
     Public hsvBrightness As Double = 100
@@ -4441,7 +4441,7 @@ End Class
 
 
 
-Public Class Options_HistPointCloud : Inherits VB_Parent
+Public Class Options_HistPointCloud : Inherits TaskParent
     Public threshold As Integer = 60
     Public xBins As Integer = 30
     Public yBins As Integer = 30
@@ -4481,7 +4481,7 @@ End Class
 
 
 
-Public Class Options_Harris : Inherits VB_Parent
+Public Class Options_Harris : Inherits TaskParent
     Public threshold As Double = 0.00001
     Public neighborhood As Integer = 3
     Public aperture As Integer = 21
@@ -4512,7 +4512,7 @@ End Class
 
 
 
-Public Class Options_HarrisCorners : Inherits VB_Parent
+Public Class Options_HarrisCorners : Inherits TaskParent
     Public quality As Integer = 50
     Public qualityMax As Integer = 100
     Public blockSize As Integer = 3
@@ -4539,7 +4539,7 @@ End Class
 
 
 
-Public Class Options_Databases : Inherits VB_Parent
+Public Class Options_Databases : Inherits TaskParent
     Public linkAddress As String = ""
     Dim downloadActive As Boolean = False
     Dim downloadIndex As Integer = 0
@@ -4599,7 +4599,7 @@ End Class
 
 
 
-Public Class Options_EdgeMatching : Inherits VB_Parent '
+Public Class Options_EdgeMatching : Inherits TaskParent '
     Public searchDepth As Integer = 256
     Public threshold As Double = 80
     Public overlayChecked As Boolean = False
@@ -4637,7 +4637,7 @@ End Class
 
 
 
-Public Class Options_EmaxInputClusters : Inherits VB_Parent
+Public Class Options_EmaxInputClusters : Inherits TaskParent
     Public samplesPerRegion As Integer = 10
     Public sigma As Integer = 10
     Public Sub New()
@@ -4658,7 +4658,7 @@ End Class
 
 
 
-Public Class Options_CComp : Inherits VB_Parent
+Public Class Options_CComp : Inherits TaskParent
     Public light As Integer = 127
     Public dark As Integer = 50
     Public threshold As Integer = 0
@@ -4686,7 +4686,7 @@ End Class
 
 
 
-Public Class Options_CellAutomata : Inherits VB_Parent
+Public Class Options_CellAutomata : Inherits TaskParent
     Public currentRule As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Current Rule", 0, 255, currentRule)
@@ -4702,7 +4702,7 @@ End Class
 
 
 
-Public Class Options_BackProject2D : Inherits VB_Parent
+Public Class Options_BackProject2D : Inherits TaskParent
     Public backProjectRow As Boolean = True
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -4723,7 +4723,7 @@ End Class
 
 
 
-Public Class Options_Kaze : Inherits VB_Parent
+Public Class Options_Kaze : Inherits TaskParent
     Public pointsToMatch As Integer = 100
     Public maxDistance As Integer = 100
     Public Sub New()
@@ -4744,7 +4744,7 @@ End Class
 
 
 
-Public Class Options_Blob : Inherits VB_Parent
+Public Class Options_Blob : Inherits TaskParent
     Dim blob As New Blob_Input
     Public blobParams As cvb.SimpleBlobDetector.Params = New cvb.SimpleBlobDetector.Params
     Public Sub New()
@@ -4799,7 +4799,7 @@ End Class
 
 
 
-Public Class Options_SLR : Inherits VB_Parent
+Public Class Options_SLR : Inherits TaskParent
     Public tolerance As Double = 0.3
     Public halfLength As Integer = 10
     Public Sub New()
@@ -4819,7 +4819,7 @@ End Class
 
 
 
-Public Class Options_KNN : Inherits VB_Parent
+Public Class Options_KNN : Inherits TaskParent
     Public knnDimension As Integer = 2
     Public numPoints As Integer = 10
     Public multiplier As Integer = 10
@@ -4851,7 +4851,7 @@ End Class
 
 
 
-Public Class Options_Clone : Inherits VB_Parent
+Public Class Options_Clone : Inherits TaskParent
     Public alpha As Double = 0.2
     Public beta As Double = 0.2
     Public lowThreshold As Integer = 10
@@ -4909,7 +4909,7 @@ End Class
 
 
 
-Public Class Options_Coherence : Inherits VB_Parent
+Public Class Options_Coherence : Inherits TaskParent
     Public sigma As Integer = 9
     Public blend As Double = 10
     Public str_sigma As Integer = 155
@@ -4939,7 +4939,7 @@ End Class
 
 
 
-Public Class Options_Color : Inherits VB_Parent
+Public Class Options_Color : Inherits TaskParent
     Public colorFormat As String = "BGR"
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -4969,7 +4969,7 @@ End Class
 
 
 
-Public Class Options_Grayscale8U : Inherits VB_Parent
+Public Class Options_Grayscale8U : Inherits TaskParent
     Public useOpenCV As Boolean = True
     Public Sub New()
         If check.Setup(traceName) Then
@@ -4987,7 +4987,7 @@ End Class
 
 
 
-Public Class Options_Color8UTopX : Inherits VB_Parent
+Public Class Options_Color8UTopX : Inherits TaskParent
     Public topXcount As Integer = 16
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Top X pixels", 2, 32, topXcount)
@@ -5004,7 +5004,7 @@ End Class
 
 
 
-Public Class Options_Morphology : Inherits VB_Parent
+Public Class Options_Morphology : Inherits TaskParent
     Public widthHeight As Integer = 20
     Public iterations As Integer = 1
     Public scaleFactor As Double = 70
@@ -5029,7 +5029,7 @@ End Class
 
 
 
-Public Class Options_Convex : Inherits VB_Parent
+Public Class Options_Convex : Inherits TaskParent
     Public hullCount As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Hull random points", 4, 20, hullCount)
@@ -5045,7 +5045,7 @@ End Class
 
 
 
-Public Class Options_Corners : Inherits VB_Parent
+Public Class Options_Corners : Inherits TaskParent
     Public useNonMax As Boolean = True
     Public Sub New()
         If check.Setup(traceName) Then
@@ -5060,7 +5060,7 @@ Public Class Options_Corners : Inherits VB_Parent
 End Class
 
 
-Public Class Options_PreCorners : Inherits VB_Parent
+Public Class Options_PreCorners : Inherits TaskParent
     Public kernelSize As Integer = 19
     Public subpixSize As Integer = 3
     Public Sub New()
@@ -5081,7 +5081,7 @@ End Class
 
 
 
-Public Class Options_ShiTomasi : Inherits VB_Parent
+Public Class Options_ShiTomasi : Inherits TaskParent
     Public useShiTomasi As Boolean = True
     Public threshold As Integer = 0
     Public aperture As Integer = 3
@@ -5115,7 +5115,7 @@ End Class
 
 
 
-Public Class Options_FlatLand : Inherits VB_Parent
+Public Class Options_FlatLand : Inherits TaskParent
     Public reductionFactor As Double = 10
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Region Count", 1, 250, reductionFactor)
@@ -5131,7 +5131,7 @@ End Class
 
 
 
-Public Class Options_Depth : Inherits VB_Parent
+Public Class Options_Depth : Inherits TaskParent
     Public millimeters As Integer = 8
     Public mmThreshold As Double = millimeters / 1000
     Public threshold As Double = 250
@@ -5155,7 +5155,7 @@ End Class
 
 
 
-Public Class Options_DepthHoles : Inherits VB_Parent
+Public Class Options_DepthHoles : Inherits TaskParent
     Public borderDilation As Integer = 1
     Public holeDilation As Integer = 0
     Public Sub New()
@@ -5177,7 +5177,7 @@ End Class
 
 
 
-Public Class Options_Uncertainty : Inherits VB_Parent
+Public Class Options_Uncertainty : Inherits TaskParent
     Public uncertaintyThreshold As Integer = 100
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -5196,7 +5196,7 @@ End Class
 
 
 
-Public Class Options_DepthColor : Inherits VB_Parent
+Public Class Options_DepthColor : Inherits TaskParent
     Public alpha As Double = 0.05
     Public beta As Double = 3
     Public Sub New()
@@ -5218,7 +5218,7 @@ End Class
 
 
 
-Public Class Options_DNN : Inherits VB_Parent
+Public Class Options_DNN : Inherits TaskParent
     Public superResModelFileName As String = ""
     Public shortModelName As String = ""
     Public superResMultiplier As Integer = 0
@@ -5282,7 +5282,7 @@ End Class
 
 
 
-Public Class Options_DrawNoise : Inherits VB_Parent
+Public Class Options_DrawNoise : Inherits TaskParent
     Public noiseCount As Integer = 100
     Public noiseWidth As Integer = 3
     Public Sub New()
@@ -5304,7 +5304,7 @@ End Class
 
 
 
-Public Class Options_Edges : Inherits VB_Parent
+Public Class Options_Edges : Inherits TaskParent
     Public scharrMultiplier As Double = 50
     Public EP_Sigma_s As Double = 10
     Public EP_Sigma_r As Double = 40
@@ -5337,7 +5337,7 @@ End Class
 
 
 
-Public Class Options_Edges2 : Inherits VB_Parent
+Public Class Options_Edges2 : Inherits TaskParent
     Public removeFrequencies As Integer = 32
     Public dctThreshold As Integer = 20
     Public edgeRFthreshold As Integer = 35
@@ -5364,7 +5364,7 @@ End Class
 
 
 
-Public Class Options_Edges3 : Inherits VB_Parent
+Public Class Options_Edges3 : Inherits TaskParent
     Public alpha As Double = 100
     Public omega As Double = 100
     Public gapDistance As Integer = 5
@@ -5396,7 +5396,7 @@ End Class
 
 
 
-Public Class Options_DepthEdges : Inherits VB_Parent
+Public Class Options_DepthEdges : Inherits TaskParent
     Public depthDiff As Integer = 200
     Public depthOffset As Double = 0.001
     Public depthDist As Integer = 5
@@ -5428,7 +5428,7 @@ End Class
 
 
 
-Public Class Options_Edges4 : Inherits VB_Parent
+Public Class Options_Edges4 : Inherits TaskParent
     Public vertPixels As Integer = 5
     Public horizPixels As Integer = 5
     Public horizonCheck As Boolean = True
@@ -5466,7 +5466,7 @@ End Class
 
 
 
-Public Class Options_Erode : Inherits VB_Parent
+Public Class Options_Erode : Inherits TaskParent
     Public kernelSize As Integer = 3
     Public iterations As Integer = 1
     Public morphShape As cvb.MorphShapes = cvb.MorphShapes.Cross
@@ -5511,7 +5511,7 @@ End Class
 
 
 
-Public Class Options_Etch_ASketch : Inherits VB_Parent
+Public Class Options_Etch_ASketch : Inherits TaskParent
     Public demoMode As Boolean = False
     Public cleanMode As Boolean = False
     Public Sub New()
@@ -5539,7 +5539,7 @@ End Class
 
 
 
-Public Class Options_Features : Inherits VB_Parent
+Public Class Options_Features : Inherits TaskParent
     Public quality As Double = 0.01
     Public minDistance As Double = 1
     Public matchOption As cvb.TemplateMatchModes = cvb.TemplateMatchModes.CCoeffNormed
@@ -5618,7 +5618,7 @@ End Class
 
 
 
-Public Class Options_LineFinder : Inherits VB_Parent
+Public Class Options_LineFinder : Inherits TaskParent
     Public kernelSize As Integer = 5
     Public tolerance As Integer = 5
     Public kSize As Integer = kernelSize - 1
@@ -5642,7 +5642,7 @@ End Class
 
 
 
-Public Class Options_PCA_NColor : Inherits VB_Parent
+Public Class Options_PCA_NColor : Inherits TaskParent
     Public desiredNcolors As Integer = 8
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired number of colors", 1, 256, desiredNcolors)
@@ -5657,7 +5657,7 @@ End Class
 
 
 
-Public Class Options_FPolyCore : Inherits VB_Parent
+Public Class Options_FPolyCore : Inherits TaskParent
     Public maxShift As Integer = 50
     Public resyncThreshold As Integer = 4
     Public anchorMovement As Integer = 5
@@ -5681,7 +5681,7 @@ End Class
 
 
 
-Public Class Options_FLANN : Inherits VB_Parent
+Public Class Options_FLANN : Inherits TaskParent
     Public reuseData As Boolean = False
     Public matchCount As Integer = 0
     Public queryCount As Integer = 0
@@ -5724,7 +5724,7 @@ End Class
 
 
 
-Public Class Options_TrackerDepth : Inherits VB_Parent
+Public Class Options_TrackerDepth : Inherits TaskParent
     Public displayRect As Boolean = True
     Public minRectSize As Integer = 10000
     Public Sub New()
@@ -5746,7 +5746,7 @@ End Class
 
 
 
-Public Class Options_Gabor : Inherits VB_Parent
+Public Class Options_Gabor : Inherits TaskParent
     Public gKernel As cvb.Mat
     Public ksize As Double = 15
     Public Sigma As Double = 4
@@ -5788,7 +5788,7 @@ End Class
 
 
 
-Public Class Options_GrabCut : Inherits VB_Parent
+Public Class Options_GrabCut : Inherits TaskParent
     Public clearAll As Boolean = False
     Public fineTuning As Boolean = True
     Public Sub New()
@@ -5811,7 +5811,7 @@ End Class
 
 
 
-Public Class Options_Gradient : Inherits VB_Parent
+Public Class Options_Gradient : Inherits TaskParent
     Public exponent As Double = 30
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -5829,7 +5829,7 @@ End Class
 
 
 
-Public Class Options_Grid : Inherits VB_Parent
+Public Class Options_Grid : Inherits TaskParent
     Public desiredFPS As Integer = 2
     Public width As Integer = 32
     Public height As Integer = 32
@@ -5855,7 +5855,7 @@ End Class
 
 
 
-Public Class Options_Histogram : Inherits VB_Parent
+Public Class Options_Histogram : Inherits TaskParent
     Public minGray As Integer = 50
     Public maxGray As Integer = 200
     Public Sub New()
@@ -5879,7 +5879,7 @@ End Class
 
 
 
-Public Class Options_Guess : Inherits VB_Parent
+Public Class Options_Guess : Inherits TaskParent
     Public MaxDistance As Integer = 50
     Public Sub New()
         If (sliders.Setup(traceName)) Then
@@ -5896,7 +5896,7 @@ End Class
 
 
 
-Public Class Options_Hist3D : Inherits VB_Parent
+Public Class Options_Hist3D : Inherits TaskParent
     Public addCloud As Boolean = True
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -5916,7 +5916,7 @@ End Class
 
 
 
-Public Class Options_HOG : Inherits VB_Parent
+Public Class Options_HOG : Inherits TaskParent
     Public thresholdHOG As Integer = 0
     Public strideHOG As Integer = 1
     Public scaleHOG As Double = 0.3
@@ -5943,7 +5943,7 @@ End Class
 
 
 
-Public Class Options_Images : Inherits VB_Parent
+Public Class Options_Images : Inherits TaskParent
     Public fileNameForm As New OptionsFileName
     Public fileIndex As Integer = 0
     Public fileNameList As New List(Of String)
@@ -5996,7 +5996,7 @@ End Class
 
 
 
-Public Class Options_VerticalVerify : Inherits VB_Parent
+Public Class Options_VerticalVerify : Inherits TaskParent
     Public angleThreshold As Integer = 80
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -6015,7 +6015,7 @@ End Class
 
 
 
-Public Class Options_IMUPlot : Inherits VB_Parent
+Public Class Options_IMUPlot : Inherits TaskParent
     Public setBlue As Boolean = True
     Public setGreen As Boolean = True
     Public setRed As Boolean = True
@@ -6044,7 +6044,7 @@ End Class
 
 
 
-Public Class Options_Kalman_VB : Inherits VB_Parent
+Public Class Options_Kalman_VB : Inherits TaskParent
     Public kalmanInput As Double = 0
     Public noisyInput As Integer = 0
     Dim oRand As New System.Random
@@ -6116,7 +6116,7 @@ End Class
 
 
 
-Public Class Options_Kalman : Inherits VB_Parent
+Public Class Options_Kalman : Inherits TaskParent
     Public delta As Double = 0.05
     Public pdotEntry As Double = 0.3
     Public processCovar As Double = 0.0001
@@ -6146,7 +6146,7 @@ End Class
 
 
 
-Public Class Options_LaneFinder : Inherits VB_Parent
+Public Class Options_LaneFinder : Inherits TaskParent
     Public inputName As String = "/Data/challenge.mp4"
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -6170,7 +6170,7 @@ End Class
 
 
 
-Public Class Options_LaPlacianPyramid : Inherits VB_Parent
+Public Class Options_LaPlacianPyramid : Inherits TaskParent
     Public img As New cvb.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -6207,7 +6207,7 @@ End Class
 
 
 
-Public Class Options_LeftRight : Inherits VB_Parent
+Public Class Options_LeftRight : Inherits TaskParent
     Public sliceY As Integer = 25
     Public sliceHeight As Integer = 20
     Public Sub New()
@@ -6229,7 +6229,7 @@ End Class
 
 
 
-Public Class Options_LongLine : Inherits VB_Parent
+Public Class Options_LongLine : Inherits TaskParent
     Public maxCount As Integer = 25
     Public pad As Integer = 3
     Public Sub New()
@@ -6250,7 +6250,7 @@ End Class
 
 
 
-Public Class Options_LUT_Create : Inherits VB_Parent
+Public Class Options_LUT_Create : Inherits TaskParent
     Public lutThreshold As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("LUT entry diff threshold", 1, 100, lutThreshold)
@@ -6266,7 +6266,7 @@ End Class
 
 
 
-Public Class Options_Mat : Inherits VB_Parent
+Public Class Options_Mat : Inherits TaskParent
     Public decompType As cvb.DecompTypes = cvb.DecompTypes.Cholesky
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -6297,7 +6297,7 @@ End Class
 
 
 
-Public Class Options_Match : Inherits VB_Parent
+Public Class Options_Match : Inherits TaskParent
     Public maxDistance As Integer = 5
     Public stdevThreshold As Integer = 10
     Public Sub New()
@@ -6320,7 +6320,7 @@ End Class
 
 
 
-Public Class Options_Math : Inherits VB_Parent
+Public Class Options_Math : Inherits TaskParent
     Public showMean As Boolean = False
     Public showStdev As Boolean = False
     Public Sub New()
@@ -6342,7 +6342,7 @@ End Class
 
 
 
-Public Class Options_MeanSubtraction : Inherits VB_Parent
+Public Class Options_MeanSubtraction : Inherits TaskParent
     Public scaleVal As Double = 1
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -6360,7 +6360,7 @@ End Class
 
 
 
-Public Class Options_Mesh : Inherits VB_Parent
+Public Class Options_Mesh : Inherits TaskParent
     Public nabeCount As Integer = 2
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of nearest neighbors", 1, 10, nabeCount)
@@ -6376,7 +6376,7 @@ End Class
 
 
 
-Public Class Options_OEX : Inherits VB_Parent
+Public Class Options_OEX : Inherits TaskParent
     Public lows As cvb.Scalar = New cvb.Scalar(90, 50, 50)
     Public highs As cvb.Scalar = New cvb.Scalar(180, 150, 150)
     Public Sub New()
@@ -6405,7 +6405,7 @@ End Class
 
 
 
-Public Class Options_ORB : Inherits VB_Parent
+Public Class Options_ORB : Inherits TaskParent
     Public desiredCount As Integer = 100
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("ORB - desired point count", 10, 2000, desiredCount)
@@ -6421,7 +6421,7 @@ End Class
 
 
 
-Public Class Options_Palette : Inherits VB_Parent
+Public Class Options_Palette : Inherits TaskParent
     Public transitions As Integer = 7
     Public convertScale As Integer = 45
     Public schemeName As String = "schemeRandom"
@@ -6461,7 +6461,7 @@ End Class
 
 
 
-Public Class Options_PCA : Inherits VB_Parent
+Public Class Options_PCA : Inherits TaskParent
     Public retainedVariance As Double = 0.95
     Public Sub New()
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Retained Variance X100", 1, 100, retainedVariance * 100)
@@ -6476,7 +6476,7 @@ End Class
 
 
 
-Public Class Options_Pendulum : Inherits VB_Parent
+Public Class Options_Pendulum : Inherits TaskParent
     Public initialize As Boolean = False
     Public fps As Integer = 300
     Public Sub New()
@@ -6501,7 +6501,7 @@ End Class
 
 
 
-Public Class Options_PhaseCorrelate : Inherits VB_Parent
+Public Class Options_PhaseCorrelate : Inherits TaskParent
     Public shiftThreshold As Integer = 30
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -6518,7 +6518,7 @@ End Class
 
 
 
-Public Class Options_PlaneFloor : Inherits VB_Parent
+Public Class Options_PlaneFloor : Inherits TaskParent
     Public countThreshold As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -6536,7 +6536,7 @@ End Class
 
 
 
-Public Class Options_PlyFormat : Inherits VB_Parent
+Public Class Options_PlyFormat : Inherits TaskParent
     Public fileNameForm As New OptionsFileName
     Public fileName As String = ""
     Public playButton As String = ""
@@ -6582,7 +6582,7 @@ End Class
 
 
 
-Public Class Options_PointCloud : Inherits VB_Parent
+Public Class Options_PointCloud : Inherits TaskParent
     Public deltaThreshold As Double = 5
     Public Sub New()
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Delta Z threshold (cm)", 0, 100, deltaThreshold)
@@ -6596,7 +6596,7 @@ End Class
 
 
 
-Public Class Options_PolyLines : Inherits VB_Parent
+Public Class Options_PolyLines : Inherits TaskParent
     Public polyCount As Integer = 100
     Public polyClosed As Boolean = True
     Public Sub New()
@@ -6620,7 +6620,7 @@ End Class
 
 
 
-Public Class Options_Projection : Inherits VB_Parent
+Public Class Options_Projection : Inherits TaskParent
     Public topCheck As Boolean = True
     Public index As Integer = 0
     Public projectionThreshold As Integer = 2
@@ -6645,7 +6645,7 @@ End Class
 
 
 
-Public Class Options_Puzzle : Inherits VB_Parent
+Public Class Options_Puzzle : Inherits TaskParent
     Public startPuzzle As Boolean = True
     Public Sub New()
         If FindFrm(traceName + " CheckBoxes") Is Nothing Then
@@ -6666,7 +6666,7 @@ End Class
 
 
 
-Public Class Options_Pyramid : Inherits VB_Parent
+Public Class Options_Pyramid : Inherits TaskParent
     Public zoom As Integer = 0
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom in and out", -1, 1, zoom)
@@ -6682,7 +6682,7 @@ End Class
 
 
 
-Public Class Options_PyrFilter : Inherits VB_Parent
+Public Class Options_PyrFilter : Inherits TaskParent
     Public spatialRadius As Integer = 1
     Public colorRadius As Integer = 20
     Public maxPyramid As Integer = 3
@@ -6707,7 +6707,7 @@ End Class
 
 
 
-Public Class Options_NormalDist : Inherits VB_Parent
+Public Class Options_NormalDist : Inherits TaskParent
     Public blueVal As Integer = 125
     Public greenVal As Integer = 25
     Public redVal As Integer = 180
@@ -6743,7 +6743,7 @@ End Class
 
 
 
-Public Class Options_MonteCarlo : Inherits VB_Parent
+Public Class Options_MonteCarlo : Inherits TaskParent
     Public dimension As Integer = 91
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of bins", 1, 255, dimension)
@@ -6758,7 +6758,7 @@ End Class
 
 
 
-Public Class Options_StaticTV : Inherits VB_Parent
+Public Class Options_StaticTV : Inherits TaskParent
     Public rangeVal As Integer = 50
     Public threshPercent As Double = 20
     Public Sub New()
@@ -6781,7 +6781,7 @@ End Class
 
 
 
-Public Class Options_Clusters : Inherits VB_Parent
+Public Class Options_Clusters : Inherits TaskParent
     Public numClusters As Integer = 9
     Public numPoints As Integer = 20
     Public stdev As Double = 10
@@ -6807,7 +6807,7 @@ End Class
 
 
 
-Public Class Options_Draw : Inherits VB_Parent
+Public Class Options_Draw : Inherits TaskParent
     Public proximity As Integer = 250
     Public drawCount As Integer = 3
     Public drawFilled As Integer = 2
@@ -6840,7 +6840,7 @@ End Class
 
 
 
-Public Class Options_RBF : Inherits VB_Parent
+Public Class Options_RBF : Inherits TaskParent
     Public RBFCount As Integer = 2
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("RBF Recursion count", 1, 20, RBFCount)
@@ -6857,7 +6857,7 @@ End Class
 
 
 
-Public Class Options_RedCloudOther : Inherits VB_Parent
+Public Class Options_RedCloudOther : Inherits TaskParent
     Public range As Integer = 30
     Public reduceAmt As Integer = 250
     Public threshold As Double = 0.95
@@ -6883,7 +6883,7 @@ End Class
 
 
 
-Public Class Options_RedCloudFeatures : Inherits VB_Parent
+Public Class Options_RedCloudFeatures : Inherits TaskParent
     Public selection As Integer = 3
     Public labelName As String = "Correlation Y to Z"
     Public Sub New()
@@ -6916,7 +6916,7 @@ End Class
 
 
 
-Public Class Options_RedTrack : Inherits VB_Parent
+Public Class Options_RedTrack : Inherits TaskParent
     Public maxDistance As Integer = 10
     Public Sub New()
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, maxDistance)
@@ -6933,7 +6933,7 @@ End Class
 
 
 
-Public Class Options_Reduction : Inherits VB_Parent
+Public Class Options_Reduction : Inherits TaskParent
     Public reduceXYZ() As Boolean = {True, True, True}
     Public Sub New()
         If check.Setup(traceName) Then
@@ -6956,7 +6956,7 @@ End Class
 
 
 
-Public Class Options_Retina : Inherits VB_Parent
+Public Class Options_Retina : Inherits TaskParent
     Public useLogSampling As Boolean = False
     Public sampleFactor As Integer = 2
     Public xmlCheck As Boolean = False
@@ -6983,7 +6983,7 @@ End Class
 
 
 
-Public Class Options_ROI : Inherits VB_Parent
+Public Class Options_ROI : Inherits TaskParent
     Public roiPercent As Double = 0.25
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, roiPercent * 100)
@@ -6999,7 +6999,7 @@ End Class
 
 
 
-Public Class Options_Rotate : Inherits VB_Parent
+Public Class Options_Rotate : Inherits TaskParent
     Public rotateAngle As Double = 24
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees", -180, 180, rotateAngle)
@@ -7014,7 +7014,7 @@ End Class
 
 
 
-Public Class Options_Salience : Inherits VB_Parent
+Public Class Options_Salience : Inherits TaskParent
     Public numScales As Integer = 6
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Salience numScales", 1, 6, numScales)
@@ -7031,7 +7031,7 @@ End Class
 
 
 
-Public Class Options_SLRImages : Inherits VB_Parent
+Public Class Options_SLRImages : Inherits TaskParent
     Public radioText As String = "Grayscale input"
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -7057,7 +7057,7 @@ End Class
 
 
 
-Public Class Options_StabilizerOther : Inherits VB_Parent
+Public Class Options_StabilizerOther : Inherits TaskParent
     Public fastThreshold As Integer = 0
     Public range As Integer = 8
     Public Sub New()
@@ -7079,7 +7079,7 @@ End Class
 
 
 
-Public Class Options_Stabilizer : Inherits VB_Parent
+Public Class Options_Stabilizer : Inherits TaskParent
     Public lostMax As Double = 0.1
     Public width As Integer = 128
     Public height As Integer = 96
@@ -7115,7 +7115,7 @@ End Class
 
 
 
-Public Class Options_Stitch : Inherits VB_Parent
+Public Class Options_Stitch : Inherits TaskParent
     Public imageCount As Integer = 10
     Public width As Integer = 0
     Public height As Integer = 0
@@ -7143,7 +7143,7 @@ End Class
 
 
 
-Public Class Options_StructuredFloor : Inherits VB_Parent
+Public Class Options_StructuredFloor : Inherits TaskParent
     Public xCheck As Boolean = False
     Public yCheck As Boolean = True
     Public zCheck As Boolean = False
@@ -7171,7 +7171,7 @@ End Class
 
 
 
-Public Class Options_StructuredCloud : Inherits VB_Parent
+Public Class Options_StructuredCloud : Inherits TaskParent
     Public xLines As Integer = 50
     Public yLines As Integer = 50
     Public indexX As Integer = 50
@@ -7222,7 +7222,7 @@ End Class
 
 
 
-Public Class Options_StructuredMulti : Inherits VB_Parent
+Public Class Options_StructuredMulti : Inherits TaskParent
     Public maxSides As Integer = 4
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -7239,7 +7239,7 @@ End Class
 
 
 
-Public Class Options_Structured : Inherits VB_Parent
+Public Class Options_Structured : Inherits TaskParent
     Public rebuilt As Boolean = True
     Public sliceSize As Integer = 1
     Public stepSize As Integer = 6
@@ -7270,7 +7270,7 @@ End Class
 
 
 
-Public Class Options_SuperPixels : Inherits VB_Parent
+Public Class Options_SuperPixels : Inherits TaskParent
     Public numSuperPixels As Integer = 400
     Public numIterations As Integer = 4
     Public prior As Integer = 2
@@ -7295,7 +7295,7 @@ End Class
 
 
 
-Public Class Options_Swarm : Inherits VB_Parent
+Public Class Options_Swarm : Inherits TaskParent
     Public ptCount As Integer = 2
     Public border As Integer = 5
     Public Sub New()
@@ -7316,7 +7316,7 @@ End Class
 
 
 
-Public Class Options_SwarmPercent : Inherits VB_Parent
+Public Class Options_SwarmPercent : Inherits TaskParent
     Public percent As Double = 0.8
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, percent * 100)
@@ -7332,7 +7332,7 @@ End Class
 
 
 
-Public Class Options_Texture : Inherits VB_Parent
+Public Class Options_Texture : Inherits TaskParent
     Public TFdelta As Integer = 30
     Public TFblockSize As Integer = 50
     Public TFksize As Integer = 1
@@ -7360,7 +7360,7 @@ End Class
 
 
 
-Public Class Options_ThresholdDef : Inherits VB_Parent
+Public Class Options_ThresholdDef : Inherits TaskParent
     Public threshold As Integer = 127
     Public Sub New()
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Threshold", 0, 255, threshold)
@@ -7375,7 +7375,7 @@ End Class
 
 
 
-Public Class Options_Tracker : Inherits VB_Parent
+Public Class Options_Tracker : Inherits TaskParent
     Public trackType As Integer = 1
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -7409,7 +7409,7 @@ End Class
 
 
 
-Public Class Options_Transform : Inherits VB_Parent
+Public Class Options_Transform : Inherits TaskParent
     Public resizeFactor As Double = 0.5
     Public angle As Integer = 30
     Public scale As Double = 1
@@ -7454,7 +7454,7 @@ End Class
 
 
 
-Public Class Options_TransformationMatrix : Inherits VB_Parent
+Public Class Options_TransformationMatrix : Inherits TaskParent
     Public mul As Integer = 500
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("TMatrix Top View multiplier", 1, 1000, mul)
@@ -7469,7 +7469,7 @@ End Class
 
 
 
-Public Class Options_Vignetting : Inherits VB_Parent
+Public Class Options_Vignetting : Inherits TaskParent
     Public radius As Double = 80
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, radius)
@@ -7484,7 +7484,7 @@ End Class
 
 
 
-Public Class Options_Video : Inherits VB_Parent
+Public Class Options_Video : Inherits TaskParent
     Public fileNameForm As New OptionsFileName
     Public fileInfo As FileInfo
     Public maxFrames As Integer = 1000
@@ -7526,7 +7526,7 @@ End Class
 
 
 
-Public Class Options_WarpAffine : Inherits VB_Parent
+Public Class Options_WarpAffine : Inherits TaskParent
     Public angle As Integer = 10
     Public Sub New()
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Angle", 0, 360, angle)
@@ -7542,7 +7542,7 @@ End Class
 
 
 
-Public Class Options_WarpPerspective : Inherits VB_Parent
+Public Class Options_WarpPerspective : Inherits TaskParent
     Public width As Integer = 0
     Public height As Integer = 0
     Public angle As Integer = 0
@@ -7571,7 +7571,7 @@ End Class
 
 
 
-Public Class Options_XPhotoInpaint : Inherits VB_Parent
+Public Class Options_XPhotoInpaint : Inherits TaskParent
     Public FSRFast As Boolean = False
     Public shiftMap As Boolean = False
     Public Sub New()
@@ -7595,7 +7595,7 @@ End Class
 
 
 
-Public Class Options_Density : Inherits VB_Parent
+Public Class Options_Density : Inherits TaskParent
     Public zCount As Integer = 3
     Public distance As Double = 0
     Public Sub New()
@@ -7618,7 +7618,7 @@ End Class
 
 
 
-Public Class Options_Edge_Basics : Inherits VB_Parent
+Public Class Options_Edge_Basics : Inherits TaskParent
     Public edgeSelection As String = "Canny"
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -7647,7 +7647,7 @@ End Class
 
 
 
-Public Class Options_ColorMethod : Inherits VB_Parent
+Public Class Options_ColorMethod : Inherits TaskParent
     Public Sub New()
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
@@ -7673,7 +7673,7 @@ End Class
 
 
 
-Public Class Options_DiffDepth : Inherits VB_Parent
+Public Class Options_DiffDepth : Inherits TaskParent
     Public millimeters As Integer
     Public meters As Double
     Public Sub New()
@@ -7692,7 +7692,7 @@ End Class
 
 
 
-Public Class Options_Outliers : Inherits VB_Parent
+Public Class Options_Outliers : Inherits TaskParent
     Public cutoffPercent As Single
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -7710,7 +7710,7 @@ End Class
 
 
 
-Public Class Options_BP_Regions : Inherits VB_Parent
+Public Class Options_BP_Regions : Inherits TaskParent
     Public cellCount As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of cells to identify", 1, 100, 50)
@@ -7725,7 +7725,7 @@ End Class
 
 
 
-Public Class Options_ML : Inherits VB_Parent
+Public Class Options_ML : Inherits TaskParent
     Public ML_Name As String
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -7753,7 +7753,7 @@ End Class
 
 
 
-Public Class Options_GridFromResize : Inherits VB_Parent
+Public Class Options_GridFromResize : Inherits TaskParent
     Public lowResPercent As Single
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("LowRes %", 1, 100, 10)
@@ -7769,7 +7769,7 @@ End Class
 
 
 
-Public Class Options_LaplacianKernels : Inherits VB_Parent
+Public Class Options_LaplacianKernels : Inherits TaskParent
     Public gaussiankernelSize As Integer = 1
     Public LaplaciankernelSize As Integer = 3
     Public threshold As Integer
@@ -7795,7 +7795,7 @@ End Class
 
 
 
-Public Class Options_LinearInput : Inherits VB_Parent
+Public Class Options_LinearInput : Inherits TaskParent
     Public delta As Single
     Public dimension As Integer
     Public zy As Boolean ' true means use col while false means use row
@@ -7838,7 +7838,7 @@ End Class
 
 
 
-Public Class Options_ImageOffset : Inherits VB_Parent
+Public Class Options_ImageOffset : Inherits TaskParent
     Public delta As Single
     Public offsetDirection As String
     Public horizontalSlice As Boolean
@@ -7881,7 +7881,7 @@ End Class
 
 
 
-Public Class Options_LowRes : Inherits VB_Parent
+Public Class Options_LowRes : Inherits TaskParent
     Public colorDifferenceThreshold As Integer
     Public Sub New()
         Dim thresholdVal = 3

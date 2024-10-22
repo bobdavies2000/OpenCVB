@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Tessallate_Basics : Inherits VB_Parent
+Public Class Tessallate_Basics : Inherits TaskParent
     Public points As New List(Of cvb.Point3f)
     Public colors As New List(Of cvb.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
@@ -67,7 +67,7 @@ End Class
 
 
 
-Public Class Tessallate_Triangles : Inherits VB_Parent
+Public Class Tessallate_Triangles : Inherits TaskParent
     Public basics As New Tessallate_Basics
     Public oglData As New List(Of cvb.Point3f)
     Public Sub New()
@@ -98,7 +98,7 @@ End Class
 
 
 
-Public Class Tessallate_QuadSimple : Inherits VB_Parent
+Public Class Tessallate_QuadSimple : Inherits TaskParent
     Public oglData As New List(Of cvb.Point3f)
     Public oglOptions As New Options_OpenGLFunctions
     Dim redC As New RedCloud_Basics
@@ -146,7 +146,7 @@ End Class
 
 
 
-Public Class Tessallate_QuadHulls : Inherits VB_Parent
+Public Class Tessallate_QuadHulls : Inherits TaskParent
     Public oglData As New List(Of cvb.Point3f)
     Public depthList As New List(Of List(Of Single))
     Public colorList As New List(Of cvb.Vec3b)
@@ -221,7 +221,7 @@ End Class
 
 
 
-Public Class Tessallate_QuadMinMax : Inherits VB_Parent
+Public Class Tessallate_QuadMinMax : Inherits TaskParent
     Public oglData As New List(Of cvb.Point3f)
     Public depthList1 As New List(Of List(Of Single))
     Public depthList2 As New List(Of List(Of Single))
@@ -316,7 +316,7 @@ End Class
 
 
 
-Public Class Tessallate_Bricks : Inherits VB_Parent
+Public Class Tessallate_Bricks : Inherits TaskParent
     Public oglData As New List(Of cvb.Point3f)
     Public depths As New List(Of Single)
     Public options As New Options_OpenGLFunctions

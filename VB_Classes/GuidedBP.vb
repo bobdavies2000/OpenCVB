@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
-Public Class GuidedBP_Basics : Inherits VB_Parent
+Public Class GuidedBP_Basics : Inherits TaskParent
     Public ptHot As New GuidedBP_HotPoints
     Dim topMap As New cvb.Mat
     Dim sideMap As New cvb.Mat
@@ -53,7 +53,7 @@ End Class
 
 
 
-Public Class GuidedBP_HotPointsKNN : Inherits VB_Parent
+Public Class GuidedBP_HotPointsKNN : Inherits TaskParent
     Dim ptHot As New GuidedBP_HotPoints
     Dim knnSide As New KNN_Basics
     Dim knnTop As New KNN_Basics
@@ -106,7 +106,7 @@ End Class
 
 
 
-Public Class GuidedBP_PlanesPlot : Inherits VB_Parent
+Public Class GuidedBP_PlanesPlot : Inherits TaskParent
     Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Side view", "Plot of nonzero rows in the side view"}
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class GuidedBP_Lookup : Inherits VB_Parent
+Public Class GuidedBP_Lookup : Inherits TaskParent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
         task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
@@ -174,7 +174,7 @@ End Class
 
 
 
-Public Class GuidedBP_Depth : Inherits VB_Parent
+Public Class GuidedBP_Depth : Inherits TaskParent
     Public hist As New PointCloud_Histograms
     Dim myPalette As New Palette_Random
     Public classCount As Integer
@@ -234,7 +234,7 @@ End Class
 
 
 
-Public Class GuidedBP_HotPoints : Inherits VB_Parent
+Public Class GuidedBP_HotPoints : Inherits TaskParent
     Public histTop As New Projection_HistTop
     Public histSide As New Projection_HistSide
     Public topRects As New List(Of cvb.Rect)
@@ -288,7 +288,7 @@ End Class
 
 
 
-Public Class GuidedBP_MultiSlice : Inherits VB_Parent
+Public Class GuidedBP_MultiSlice : Inherits TaskParent
     Dim histTop As New Projection_HistTop
     Dim histSide As New Projection_HistSide
     Public sliceMask As cvb.Mat
@@ -340,7 +340,7 @@ End Class
 
 
 
-Public Class GuidedBP_RedCloud : Inherits VB_Parent
+Public Class GuidedBP_RedCloud : Inherits TaskParent
     Dim guide As New GuidedBP_MultiSlice
     Public redCx As New RedCloud_Basics
     Public redCy As New RedCloud_Basics
@@ -373,7 +373,7 @@ End Class
 
 
 
-Public Class GuidedBP_Regions : Inherits VB_Parent
+Public Class GuidedBP_Regions : Inherits TaskParent
     Public redC As New GuidedBP_RedCloud
     Public mats As New Mat_4Click
     Dim options As New Options_BP_Regions
@@ -434,7 +434,7 @@ End Class
 
 
 
-Public Class GuidedBP_Points : Inherits VB_Parent
+Public Class GuidedBP_Points : Inherits TaskParent
     Public hotPoints As New GuidedBP_Basics
     Public classCount As Integer
     Public selectedPoint As cvb.Point
@@ -475,7 +475,7 @@ End Class
 
 
 
-Public Class GuidedBP_Top : Inherits VB_Parent
+Public Class GuidedBP_Top : Inherits TaskParent
     Public ptHot As New GuidedBP_HotPoints
     Dim hotPoints As New GuidedBP_Basics
     Dim topMap As New cvb.Mat
@@ -500,7 +500,7 @@ End Class
 
 
 
-Public Class GuidedBP_TopView : Inherits VB_Parent
+Public Class GuidedBP_TopView : Inherits TaskParent
     Public hotPoints As New GuidedBP_Top
     Public classCount As Integer
     Public topRects As New List(Of cvb.Rect)

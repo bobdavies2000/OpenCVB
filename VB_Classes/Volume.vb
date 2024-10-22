@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Volume_Basics : Inherits VB_Parent
+Public Class Volume_Basics : Inherits TaskParent
     Public rc As New rcData
     Public volume As Single
     Dim redC As New RedCloud_Basics

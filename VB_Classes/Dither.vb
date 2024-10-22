@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://www.codeproject.com/Articles/5259216/Dither-Ordered-and-Floyd-Steinberg-Monochrome-Colo
-Public Class Dither_Basics : Inherits VB_Parent
+Public Class Dither_Basics : Inherits TaskParent
     Dim options As New Options_Dither
     Public Sub New()
         labels = {"", "", "Dither applied to the BGR image", "Dither applied to the Depth image"}

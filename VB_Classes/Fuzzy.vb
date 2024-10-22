@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
-Public Class Fuzzy_Basics : Inherits VB_Parent
+Public Class Fuzzy_Basics : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_Contours
     Public contours As cvb.Point()()
@@ -74,7 +74,7 @@ End Class
 
 
 
-Public Class Fuzzy_Filter : Inherits VB_Parent
+Public Class Fuzzy_Filter : Inherits TaskParent
     Dim kernel As cvb.Mat
     Dim reduction As New Reduction_Basics
     Public contours As cvb.Point()()
@@ -139,7 +139,7 @@ End Class
 
 
 
-Public Class Fuzzy_ContoursDepth : Inherits VB_Parent
+Public Class Fuzzy_ContoursDepth : Inherits TaskParent
     Public fuzzyD As New Fuzzy_Basics
     Public Sub New()
         desc = "Use contours to outline solids in the depth data"
@@ -157,7 +157,7 @@ End Class
 
 
 
-Public Class Fuzzy_NeighborProof : Inherits VB_Parent
+Public Class Fuzzy_NeighborProof : Inherits TaskParent
     Dim fuzzy As New Fuzzy_Basics
     Dim proofFailed As Boolean = False
     Public Sub New()
@@ -198,7 +198,7 @@ End Class
 
 
 
-Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
+Public Class Fuzzy_TrackerDepth : Inherits TaskParent
     Public fuzzy As New Fuzzy_Basics
     Public centroids As New List(Of cvb.Point)
     Public rects As New List(Of cvb.Rect)
@@ -253,7 +253,7 @@ End Class
 
 
 
-Public Class Fuzzy_TrackerDepthClick : Inherits VB_Parent
+Public Class Fuzzy_TrackerDepthClick : Inherits TaskParent
     Public tracker As New Fuzzy_TrackerDepth
     Public highlightPoint As cvb.Point
     Public highlightRect As cvb.Rect

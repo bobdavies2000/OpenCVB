@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports System.IO
-Public Class SLR_Basics : Inherits VB_Parent
+Public Class SLR_Basics : Inherits TaskParent
     Public slrCore As New SLR_Core
     Public plot As New Plot_Points
     Public Sub New()
@@ -31,7 +31,7 @@ End Class
 
 
 
-Public Class SLR_Core : Inherits VB_Parent
+Public Class SLR_Core : Inherits TaskParent
     Dim slr As New SLR()
     Public inputX As New List(Of Double)
     Public inputY As New List(Of Double)
@@ -70,7 +70,7 @@ End Class
 
 
 
-Public Class SLR_Plot : Inherits VB_Parent
+Public Class SLR_Plot : Inherits TaskParent
     Dim plot As New Plot_Basics_CPP_VB()
     Dim slr As New SLR()
     Dim options As New Options_SLR()
@@ -121,7 +121,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
-Public Class SLR_PlotTest : Inherits VB_Parent
+Public Class SLR_PlotTest : Inherits TaskParent
     Dim plot As New Plot_Basics_CPP_VB
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
@@ -156,7 +156,7 @@ End Class
 
 
 
-Public Class SLR_TrendImages : Inherits VB_Parent
+Public Class SLR_TrendImages : Inherits TaskParent
     Dim trends As New SLR_Trends
     Dim options As New Options_SLRImages
     Public Sub New()
@@ -203,7 +203,7 @@ End Class
 
 
 
-Public Class SLR_SurfaceH : Inherits VB_Parent
+Public Class SLR_SurfaceH : Inherits TaskParent
     Dim surface As New PointCloud_SurfaceH
     Public Sub New()
         desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks."
@@ -222,7 +222,7 @@ End Class
 
 
 
-Public Class SLR_Trends : Inherits VB_Parent
+Public Class SLR_Trends : Inherits TaskParent
     Public hist As New Hist_KalmanAuto
     Dim valList As New List(Of Single)
     Dim barMidPoint As Single

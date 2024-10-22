@@ -1,6 +1,6 @@
 ﻿Imports System.Windows
 Imports cvb = OpenCvSharp
-Public Class MatchRect_Basics : Inherits VB_Parent
+Public Class MatchRect_Basics : Inherits TaskParent
     Public match As New Match_Basics
     Public rectInput As New cvb.Rect
     Public rectOutput As New cvb.Rect
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class MatchRect_RedCloud : Inherits VB_Parent
+Public Class MatchRect_RedCloud : Inherits TaskParent
     Dim matchRect As New MatchRect_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()

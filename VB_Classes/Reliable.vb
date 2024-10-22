@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Reliable_Basics : Inherits VB_Parent
+Public Class Reliable_Basics : Inherits TaskParent
     Dim bgs As New BGSubtract_Basics
     Dim relyDepth As New Reliable_Depth
     Dim diff
@@ -23,7 +23,7 @@ End Class
 
 
 
-Public Class Reliable_Depth : Inherits VB_Parent
+Public Class Reliable_Depth : Inherits TaskParent
     Dim rDepth As New History_ReliableDepth
     Public Sub New()
         labels = {"", "", "Mask of Reliable depth data", "Task.DepthRGB after removing unreliable depth (compare with above.)"}
@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class Reliable_MaxDepth : Inherits VB_Parent
+Public Class Reliable_MaxDepth : Inherits TaskParent
     Public options As New Options_MinMaxNone
     Public Sub New()
         desc = "Create a mas"
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class Reliable_Gray : Inherits VB_Parent
+Public Class Reliable_Gray : Inherits TaskParent
     Dim diff As New Motion_Diff
     Dim history As New History_Basics8U
     Dim options As New Options_Denoise
@@ -110,7 +110,7 @@ End Class
 
 
 
-Public Class Reliable_RGB : Inherits VB_Parent
+Public Class Reliable_RGB : Inherits TaskParent
     Dim diff(2) As Motion_Diff
     Dim history(2) As History_Basics8U
     Public Sub New()
@@ -142,7 +142,7 @@ End Class
 
 
 
-Public Class Reliable_CompareBGR : Inherits VB_Parent
+Public Class Reliable_CompareBGR : Inherits TaskParent
     Dim relyBGR As New Reliable_RGB
     Dim relyGray As New Reliable_Gray
     Public Sub New()
@@ -169,7 +169,7 @@ End Class
 
 
 
-Public Class Reliable_Histogram : Inherits VB_Parent
+Public Class Reliable_Histogram : Inherits TaskParent
     Public hist As New Hist_Basics
     Dim relyGray As New Reliable_Gray
     Public Sub New()
@@ -197,7 +197,7 @@ End Class
 
 
 
-Public Class Reliable_Edges : Inherits VB_Parent
+Public Class Reliable_Edges : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim denoise As New Denoise_SinglePixels_CPP_VB
     Dim relyGray As New Reliable_Gray

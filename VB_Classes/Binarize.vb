@@ -5,7 +5,7 @@ Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/3.4/d7/d4d/tutorial_py_thresholding.html
 ' https://www.learnopencvb.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175
 ' https://github.com/spmallick/learnopencv/tree/master/otsu-method?ck_subscriber_id=785741175
-Public Class Binarize_Basics : Inherits VB_Parent
+Public Class Binarize_Basics : Inherits TaskParent
     Public thresholdType = cvb.ThresholdTypes.Otsu
     Dim minRange = 0
     Dim maxRange = 255
@@ -23,7 +23,7 @@ Public Class Binarize_Basics : Inherits VB_Parent
         meanScalar = cvb.Cv2.Mean(src, mask)
 
         Dim input = src
-        If input.Channels() = 3 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If input.Channels() = 3 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         If useBlur Then
             blur.Run(input)
@@ -39,7 +39,7 @@ End Class
 
 
 'https://docs.opencvb.org/3.4/d7/d4d/tutorial_py_thresholding.html
-Public Class Binarize_OTSU : Inherits VB_Parent
+Public Class Binarize_OTSU : Inherits TaskParent
     Dim binarize As Binarize_Basics
     Dim options As New Options_Binarize
     Public Sub New()
@@ -53,7 +53,7 @@ Public Class Binarize_OTSU : Inherits VB_Parent
         options.RunOpt()
 
         Dim input = src
-        If input.Channels() = 3 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If input.Channels() = 3 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         binarize.meanScalar = cvb.Cv2.Mean(input)
 
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class Binarize_Niblack_Sauvola : Inherits VB_Parent
+Public Class Binarize_Niblack_Sauvola : Inherits TaskParent
     Dim options As New Options_BinarizeNiBlack
     Public Sub New()
         desc = "Binarize an image using Niblack and Sauvola"
@@ -100,7 +100,7 @@ End Class
 
 
 
-Public Class Binarize_Wolf_Nick : Inherits VB_Parent
+Public Class Binarize_Wolf_Nick : Inherits TaskParent
     Dim options As New Options_BinarizeNiBlack
     Public Sub New()
         desc = "Binarize an image using Niblack and Nick"
@@ -110,7 +110,7 @@ Public Class Binarize_Wolf_Nick : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         CvXImgProc.NiblackThreshold(src, dst2, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
         CvXImgProc.NiblackThreshold(src, dst3, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
@@ -122,7 +122,7 @@ End Class
 
 
 
-Public Class Binarize_KMeansMasks : Inherits VB_Parent
+Public Class Binarize_KMeansMasks : Inherits TaskParent
     Dim km As New KMeans_Image
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -151,7 +151,7 @@ End Class
 
 
 
-Public Class Binarize_KMeansRGB : Inherits VB_Parent
+Public Class Binarize_KMeansRGB : Inherits TaskParent
     Dim km As New KMeans_Image
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -179,7 +179,7 @@ End Class
 
 
 
-Public Class Binarize_FourPixelFlips : Inherits VB_Parent
+Public Class Binarize_FourPixelFlips : Inherits TaskParent
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
         desc = "Identify the marginal regions that flip between subdivisions based on brightness."
@@ -200,7 +200,7 @@ End Class
 
 
 
-Public Class Binarize_DepthTiers : Inherits VB_Parent
+Public Class Binarize_DepthTiers : Inherits TaskParent
     Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
@@ -226,7 +226,7 @@ End Class
 
 
 
-Public Class Binarize_Simple : Inherits VB_Parent
+Public Class Binarize_Simple : Inherits TaskParent
     Public meanScalar As cvb.Scalar
     Public injectVal As Integer = 255
     Public Sub New()

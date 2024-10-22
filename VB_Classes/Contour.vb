@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Contour_Basics : Inherits VB_Parent
+Public Class Contour_Basics : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public contourlist As New List(Of cvb.Point())
     Public allContours As cvb.Point()()
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Contour_General : Inherits VB_Parent
+Public Class Contour_General : Inherits TaskParent
     Public contourlist As New List(Of cvb.Point())
     Public allContours As cvb.Point()()
     Public options As New Options_Contours
@@ -96,7 +96,7 @@ End Class
 
 
 
-Public Class Contour_GeneralWithOptions : Inherits VB_Parent
+Public Class Contour_GeneralWithOptions : Inherits TaskParent
     Public contourlist As New List(Of cvb.Point())
     Public allContours As cvb.Point()()
     Public options As New Options_Contours
@@ -142,7 +142,7 @@ End Class
 
 
 
-Public Class Contour_RotatedRects : Inherits VB_Parent
+Public Class Contour_RotatedRects : Inherits TaskParent
     Public rotatedRect As New Rectangle_Rotated
     Dim basics As New Contour_General
     Public Sub New()
@@ -174,7 +174,7 @@ End Class
 
 
 ' https://github.com/SciSharp/SharpCV/blob/master/src/Sharpcvb.Examples/Program.cs
-Public Class Contour_RemoveLines : Inherits VB_Parent
+Public Class Contour_RemoveLines : Inherits TaskParent
     Dim options As New Options_Morphology
     Dim image As cvb.Mat
     Public Sub New()
@@ -235,7 +235,7 @@ End Class
 
 
 
-Public Class Contour_Edges : Inherits VB_Parent
+Public Class Contour_Edges : Inherits TaskParent
     Dim edges As New Edge_ResizeAdd
     Dim contour As New Contour_General
     Dim lastImage = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
@@ -275,7 +275,7 @@ End Class
 
 
 
-Public Class Contour_SidePoints : Inherits VB_Parent
+Public Class Contour_SidePoints : Inherits TaskParent
     Public vecLeft As cvb.Vec3f, vecRight As cvb.Vec3f, vecTop As cvb.Vec3f, vecBot As cvb.Vec3f
     Public ptLeft As cvb.Point, ptRight As cvb.Point, ptTop As cvb.Point, ptBot As cvb.Point
     Public sides As New Profile_Basics
@@ -327,7 +327,7 @@ End Class
 
 
 
-Public Class Contour_Foreground : Inherits VB_Parent
+Public Class Contour_Foreground : Inherits TaskParent
     Dim km As New Foreground_KMeans
     Dim contour As New Contour_General
     Public Sub New()
@@ -359,7 +359,7 @@ End Class
 
 
 
-Public Class Contour_Sorted : Inherits VB_Parent
+Public Class Contour_Sorted : Inherits TaskParent
     Dim contours As New Contour_GeneralWithOptions
     Dim sortedContours As New SortedList(Of Integer, cvb.Point())(New compareAllowIdenticalIntegerInverted)
     Dim sortedByArea As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -412,7 +412,7 @@ End Class
 
 
 
-Public Class Contour_Outline : Inherits VB_Parent
+Public Class Contour_Outline : Inherits TaskParent
     Public rc As New rcData
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -449,7 +449,7 @@ End Class
 
 
 
-Public Class Contour_SelfIntersect : Inherits VB_Parent
+Public Class Contour_SelfIntersect : Inherits TaskParent
     Public rc As New rcData
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -490,7 +490,7 @@ End Class
 
 
 
-Public Class Contour_Largest : Inherits VB_Parent
+Public Class Contour_Largest : Inherits TaskParent
     Public bestContour As New List(Of cvb.Point)
     Public allContours As cvb.Point()()
     Public options As New Options_Contours
@@ -545,7 +545,7 @@ End Class
 
 
 
-Public Class Contour_Compare : Inherits VB_Parent
+Public Class Contour_Compare : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public options As New Options_Contours
     Public Sub New()
@@ -577,7 +577,7 @@ End Class
 
 
 
-Public Class Contour_RedCloudCorners : Inherits VB_Parent
+Public Class Contour_RedCloudCorners : Inherits TaskParent
     Public corners(4 - 1) As cvb.Point
     Public rc As New rcData
     Dim redC As New RedCloud_Basics
@@ -627,7 +627,7 @@ End Class
 
 
 
-Public Class Contour_RedCloudEdges : Inherits VB_Parent
+Public Class Contour_RedCloudEdges : Inherits TaskParent
     Dim redC As New RedCloud_Cells
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
@@ -657,7 +657,7 @@ End Class
 
 
 
-Public Class Contour_RedCloud : Inherits VB_Parent
+Public Class Contour_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -680,7 +680,7 @@ End Class
 
 
 
-Public Class Contour_CompareToFeatureless : Inherits VB_Parent
+Public Class Contour_CompareToFeatureless : Inherits TaskParent
     Dim contour As New Contour_WholeImage
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
@@ -702,7 +702,7 @@ End Class
 
 
 
-Public Class Contour_Smoothing : Inherits VB_Parent
+Public Class Contour_Smoothing : Inherits TaskParent
     Dim options As New Options_Contours2
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -735,7 +735,7 @@ End Class
 
 
 
-Public Class Contour_RC_AddContour : Inherits VB_Parent
+Public Class Contour_RC_AddContour : Inherits TaskParent
     Public contour As New List(Of cvb.Point)
     Public options As New Options_Contours
     Dim myFrameCount As Integer = task.frameCount
@@ -779,7 +779,7 @@ End Class
 
 
 
-Public Class Contour_Gray : Inherits VB_Parent
+Public Class Contour_Gray : Inherits TaskParent
     Public contour As New List(Of cvb.Point)
     Public options As New Options_Contours
     Dim myFrameCount As Integer = task.frameCount
@@ -820,7 +820,7 @@ End Class
 
 
 
-Public Class Contour_WholeImage : Inherits VB_Parent
+Public Class Contour_WholeImage : Inherits TaskParent
     Dim contour As New Contour_Basics
     Public Sub New()
         FindSlider("Max contours").Value = 20
@@ -848,7 +848,7 @@ End Class
 
 
 
-Public Class Contour_DepthTiers : Inherits VB_Parent
+Public Class Contour_DepthTiers : Inherits TaskParent
     Public options As New Options_Contours
     Public optionsTiers As New Options_DepthTiers
     Public classCount As Integer
@@ -901,7 +901,7 @@ End Class
 
 
 
-Public Class Contour_FromPoints : Inherits VB_Parent
+Public Class Contour_FromPoints : Inherits TaskParent
     Dim contour As New Contour_Basics
     Dim random As New Random_Basics
     Public Sub New()

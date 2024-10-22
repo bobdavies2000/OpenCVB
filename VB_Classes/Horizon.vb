@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Horizon_Basics : Inherits VB_Parent
+Public Class Horizon_Basics : Inherits TaskParent
     Public points As New List(Of cvb.Point)
     Dim resizeRatio As Integer = 1
     Public vec As New PointPair
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class Horizon_Perpendicular : Inherits VB_Parent
+Public Class Horizon_Perpendicular : Inherits TaskParent
     Dim perp As New Line_Perpendicular
     Public Sub New()
         labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
@@ -106,7 +106,7 @@ End Class
 
 
 
-Public Class Horizon_BasicsAlt : Inherits VB_Parent
+Public Class Horizon_BasicsAlt : Inherits TaskParent
     Public cloudY As cvb.Mat
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -166,7 +166,7 @@ End Class
 
 
 
-Public Class Horizon_FindNonZero : Inherits VB_Parent
+Public Class Horizon_FindNonZero : Inherits TaskParent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.setDisplay1()
@@ -240,7 +240,7 @@ End Class
 
 
 
-Public Class Horizon_UnstableResults : Inherits VB_Parent
+Public Class Horizon_UnstableResults : Inherits TaskParent
     Dim lines As New Line_Basics
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -298,7 +298,7 @@ End Class
 
 
 
-Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
+Public Class Horizon_FindNonZeroOld : Inherits TaskParent
     Public Sub New()
         task.gOptions.setGravityUsage(False)
         task.redOptions.YRangeSlider.Value = 3
@@ -380,7 +380,7 @@ End Class
 
 
 
-Public Class Horizon_Validate : Inherits VB_Parent
+Public Class Horizon_Validate : Inherits TaskParent
     Dim match As New Match_Basics
     Dim ptLeft As New cvb.Point2f, ptRight As New cvb.Point2f
     Dim leftTemplate As cvb.Mat, rightTemplate As cvb.Mat
@@ -419,7 +419,7 @@ End Class
 
 
 
-Public Class Horizon_Regress : Inherits VB_Parent
+Public Class Horizon_Regress : Inherits TaskParent
     Dim horizon As New Horizon_Basics
     Dim regress As New LinearRegression_Basics
     Public Sub New()
@@ -443,7 +443,7 @@ End Class
 
 
 
-Public Class Horizon_ExternalTest : Inherits VB_Parent
+Public Class Horizon_ExternalTest : Inherits TaskParent
     Dim horizon As New Horizon_Basics
     Public Sub New()
         desc = "Supply the point cloud input to Horizon_Basics"

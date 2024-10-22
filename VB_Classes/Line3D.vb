@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Line3D_Draw : Inherits VB_Parent
+Public Class Line3D_Draw : Inherits TaskParent
     Public p1 As cvb.Point, p2 As cvb.Point
     Dim plot As New Plot_OverTimeScalar
     Dim toggleFirstSecond As Boolean
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class Line3D_Checks : Inherits VB_Parent
+Public Class Line3D_Checks : Inherits TaskParent
     Dim pts As New PointCloud_Basics
     Public pcLines As New List(Of cvb.Point3f)
     Public Sub New()
@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class Line3D_CandidatesFirstLast : Inherits VB_Parent
+Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
     Dim pts As New PointCloud_Basics
     Public pcLines As New List(Of cvb.Point3f)
     Public pcLinesMat As cvb.Mat
@@ -152,7 +152,7 @@ End Class
 
 
 
-Public Class Line3D_CandidatesAll : Inherits VB_Parent
+Public Class Line3D_CandidatesAll : Inherits TaskParent
     Dim pts As New PointCloud_Basics
     Public pcLines As New List(Of cvb.Point3f)
     Public pcLinesMat As cvb.Mat

@@ -99,7 +99,7 @@ Module UI_Generator
 
                     If fn.EndsWith(".py") Then Continue For
                     If line.StartsWith("Public Class") Then ' VB algorithms
-                        If line.EndsWith(" : Inherits VB_Parent") Then
+                        If line.EndsWith(" : Inherits TaskParent") Then
                             Dim split As String() = Regex.Split(line, "\W+")
                             classname = split(2)
                             If classname.StartsWith("OpenGL_") Then opengl.Add(classname, line)
@@ -108,7 +108,7 @@ Module UI_Generator
                             allList.Add(classname, line)
                         End If
                     ElseIf line.StartsWith("public class ") Then ' C# algorithms
-                        If line.EndsWith(" : VB_Parent") Then
+                        If line.EndsWith(" : TaskParent") Then
                             Dim split As String() = Regex.Split(line, "\W+")
                             classname = split(2)
                             csList.Add(classname, line)
@@ -126,7 +126,7 @@ Module UI_Generator
                             ccList.Add(classname, line)
                         End If
                     ElseIf line.StartsWith("public ref class ") Then ' Managed C++ algorithms.
-                        If line.EndsWith(" : public VB_Parent") Then
+                        If line.EndsWith(" : public TaskParent") Then
                             Dim split = line.Split(" ")
                             classname = split(3)
                             cppList.Add(classname, line)
@@ -226,12 +226,12 @@ Module UI_Generator
                         If line = "{" Or line = "}" Then Continue For
 
                         If line.StartsWith("Public Class") Then ' VB algorithms
-                            If line.EndsWith(" : Inherits VB_Parent") Then
+                            If line.EndsWith(" : Inherits TaskParent") Then
                                 Dim split As String() = Regex.Split(line, "\W+")
                                 classname = split(2)
                             End If
                         ElseIf line.StartsWith("public class ") Then ' C# algorithms
-                            If line.EndsWith(" : VB_Parent") Then
+                            If line.EndsWith(" : TaskParent") Then
                                 Dim split As String() = Regex.Split(line, "\W+")
                                 classname = split(2)
                             End If
@@ -241,7 +241,7 @@ Module UI_Generator
                                 classname = split(1)
                             End If
                         ElseIf line.StartsWith("public ref class ") Then ' Managed C++ algorithms.
-                            If line.EndsWith(" : public VB_Parent") Then
+                            If line.EndsWith(" : public TaskParent") Then
                                 Dim split = line.Split(" ")
                                 classname = split(3)
                             End If
@@ -360,7 +360,7 @@ Module UI_Generator
     Private Function checkDates(dirInfo As DirectoryInfo, algorithmGroupNames As FileInfo) As Boolean
         For Each fileInfo As FileInfo In dirInfo.GetFiles()
             If fileInfo.Name = "VB_Common.vb" Then Continue For
-            If fileInfo.Name = "VB_Parent.vb" Then Continue For
+            If fileInfo.Name = "TaskParent.vb" Then Continue For
             If fileInfo.Name = "VB_Task.vb" Then Continue For
             If fileInfo.Name = "VB_Externs.vb" Then Continue For
             If fileInfo.Name.StartsWith("Options") Then Continue For

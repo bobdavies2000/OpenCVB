@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' http://answers.opencvb.org/question/175486/meanshift-sample-code-in-c/
-Public Class MeanShift_Basics : Inherits VB_Parent
+Public Class MeanShift_Basics : Inherits TaskParent
     Public rectangleEdgeWidth As Integer = 2
     Public trackbox As New cvb.Rect
     Dim histogram As New cvb.Mat
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class MeanShift_Depth : Inherits VB_Parent
+Public Class MeanShift_Depth : Inherits TaskParent
     Dim meanShift As New MeanShift_Basics
     Public Sub New()
         labels(2) = "Draw anywhere to start mean shift tracking."

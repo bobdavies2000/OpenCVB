@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports  System.IO
-Public Class QRcode_Basics : Inherits VB_Parent
+Public Class QRcode_Basics : Inherits TaskParent
     Dim qrDecoder As New cvb.QRCodeDetector
     Dim qrInput1 As New cvb.Mat
     Dim qrInput2 As New cvb.Mat

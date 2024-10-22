@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.IO
-Public Class LaneFinder_Basics : Inherits VB_Parent
+Public Class LaneFinder_Basics : Inherits TaskParent
     Dim lane As New LaneFinder_SlopeIntercept
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -21,7 +21,7 @@ End Class
 
 
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-Public Class LaneFinder_Videos : Inherits VB_Parent
+Public Class LaneFinder_Videos : Inherits TaskParent
     Public video As New Video_Basics
     Dim options As New Options_LaneFinder
     Public Sub New()
@@ -51,7 +51,7 @@ End Class
 
 
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-Public Class LaneFinder_Edges : Inherits VB_Parent
+Public Class LaneFinder_Edges : Inherits TaskParent
     Dim input As New LaneFinder_Videos
     Dim edges As New Edge_Basics
     Public Sub New()
@@ -73,7 +73,7 @@ End Class
 
 
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-Public Class LaneFinder_HLSColor : Inherits VB_Parent
+Public Class LaneFinder_HLSColor : Inherits TaskParent
     Public input As New LaneFinder_Videos
     Public Sub New()
         labels = {"HLS color conversion", "InRange White", "InRange Yellow", "Combined InRange White and InRange Yellow results"}
@@ -96,7 +96,7 @@ End Class
 
 
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-Public Class LaneFinder_ROI : Inherits VB_Parent
+Public Class LaneFinder_ROI : Inherits TaskParent
     Dim hls As New LaneFinder_HLSColor
     Dim pListList = New cvb.Point()() {Nothing}
     Public Sub New()
@@ -137,7 +137,7 @@ End Class
 
 
 
-Public Class LaneFinder_SlopeIntercept : Inherits VB_Parent
+Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
     Dim hough As New Hough_LaneFinder
     Public leftLaneIntercept As Single
     Public rightLaneIntercept As Single

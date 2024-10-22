@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class BRISK_Basics : Inherits VB_Parent
+Public Class BRISK_Basics : Inherits TaskParent
     Dim brisk As cvb.BRISK
     Public features As New List(Of cvb.Point2f)
     Dim options As New Options_Features

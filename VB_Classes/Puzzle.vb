@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Threading
 ' https://github.com/nemanja-m/gaps
-Public Class Puzzle_Basics : Inherits VB_Parent
+Public Class Puzzle_Basics : Inherits TaskParent
     Public scrambled As New List(Of cvb.Rect) ' this is every roi regardless of size.
     Public unscrambled As New List(Of cvb.Rect) ' this is every roi regardless of size.
     Public image As New cvb.Mat
@@ -40,7 +40,7 @@ End Class
 
 
 
-Public Class Puzzle_Solver : Inherits VB_Parent
+Public Class Puzzle_Solver : Inherits TaskParent
     Public puzzle As New Puzzle_Basics
     Dim solution As New List(Of cvb.Rect)
     Dim match As New Match_Basics
@@ -83,7 +83,7 @@ End Class
 
 
 
-Public Class Puzzle_SolverDynamic : Inherits VB_Parent
+Public Class Puzzle_SolverDynamic : Inherits TaskParent
     Dim puzzle As New Puzzle_Solver
     Public Sub New()
         If standaloneTest() Then task.gOptions.setGridSize(8)

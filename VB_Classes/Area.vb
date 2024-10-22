@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Area_MinTriangle_CPP_VB : Inherits VB_Parent
+Public Class Area_MinTriangle_CPP_VB : Inherits TaskParent
     Public triangle As cvb.Mat
     Public options As New Options_MinArea
     Public srcPoints As List(Of cvb.Point2f)
@@ -48,7 +48,7 @@ End Class
 
 
 
-Public Class Area_MinMotionRect : Inherits VB_Parent
+Public Class Area_MinMotionRect : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         FindSlider("MOG Learn Rate X1000").Value = 100 ' low threshold to maximize motion
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class Area_FindNonZero : Inherits VB_Parent
+Public Class Area_FindNonZero : Inherits TaskParent
     Public nonZero As cvb.Mat
     Public Sub New()
         labels(2) = "Coordinates of non-zero points"
@@ -124,7 +124,7 @@ End Class
 
 
 
-Public Class Area_SoloPoints : Inherits VB_Parent
+Public Class Area_SoloPoints : Inherits TaskParent
     Dim hotTop As New BackProject_SoloTop
     Dim hotSide As New BackProject_SoloSide
     Dim nZero As New Area_FindNonZero
@@ -154,7 +154,7 @@ End Class
 
 
 
-Public Class Area_MinRect : Inherits VB_Parent
+Public Class Area_MinRect : Inherits TaskParent
     Public minRect As cvb.RotatedRect
     Dim options As New Options_MinArea
     Public inputPoints As New List(Of cvb.Point2f)

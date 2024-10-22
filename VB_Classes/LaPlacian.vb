@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Laplacian_Basics : Inherits VB_Parent
+Public Class Laplacian_Basics : Inherits TaskParent
     Dim options As New Options_Laplacian
     Dim erode As New Erode_Basics
     Dim dilate As New Dilate_Basics
@@ -27,7 +27,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.2.0/de/db2/laplace_8cpp-example.html
-Public Class Laplacian_Blur : Inherits VB_Parent
+Public Class Laplacian_Blur : Inherits TaskParent
     Dim options As New Options_Laplacian
     Public Sub New()
         desc = "Laplacian filter - the second derivative - with different bluring techniques"
@@ -57,7 +57,7 @@ End Class
 
 
 
-Public Class Laplacian_PyramidFilter : Inherits VB_Parent
+Public Class Laplacian_PyramidFilter : Inherits TaskParent
     Dim options As New Options_LaPlacianPyramid
     Public Sub New()
         desc = "VB.Net version of the Laplacian Pyramid Filter - see http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299."

@@ -1,7 +1,7 @@
 Imports System.IO
 Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/3.3.1/de/dd0/grabcut_8cpp-example.html
-Public Class GrabCut_Basics : Inherits VB_Parent
+Public Class GrabCut_Basics : Inherits TaskParent
     Public fgFineTune As cvb.Mat
     Public bgFineTune As cvb.Mat
     Public fore As New Foreground_Basics
@@ -43,7 +43,7 @@ End Class
 
 
 
-Public Class GrabCut_FineTune : Inherits VB_Parent
+Public Class GrabCut_FineTune : Inherits TaskParent
     Dim basics As New GrabCut_Basics
     Dim mats As New Mat_4to1
     Dim options As New Options_GrabCut
@@ -94,7 +94,7 @@ End Class
 
 
 
-Public Class GrabCut_ImageRect : Inherits VB_Parent
+Public Class GrabCut_ImageRect : Inherits TaskParent
     Dim image As cvb.Mat
     Dim bgModel As New cvb.Mat, fgModel As New cvb.Mat
     Dim bgRect1 = New cvb.Rect(482, 0, 128, 640)
@@ -136,7 +136,7 @@ End Class
 
 
 
-Public Class GrabCut_ImageMask : Inherits VB_Parent
+Public Class GrabCut_ImageMask : Inherits TaskParent
     Dim image As cvb.Mat
     Public Sub New()
         Dim fileInputName = New FileInfo(task.HomeDir + "data/cat.jpg")

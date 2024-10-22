@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Color8U_Basics : Inherits VB_Parent
+Public Class Color8U_Basics : Inherits TaskParent
     Public classCount As Integer
     Public classifier As Object
     Dim colorMethods(10) As Object
@@ -63,7 +63,7 @@ End Class
 
 
 
-Public Class Color8U_Sweep : Inherits VB_Parent
+Public Class Color8U_Sweep : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public classCount As Integer
     Public Sub New()
@@ -88,7 +88,7 @@ End Class
 
 
 
-Public Class Color8U_Grayscale : Inherits VB_Parent
+Public Class Color8U_Grayscale : Inherits TaskParent
     Dim options As New Options_Grayscale8U
     Public classCount = 255
     Public Sub New()
@@ -124,7 +124,7 @@ End Class
 
 
 
-Public Class Color8U_Depth : Inherits VB_Parent
+Public Class Color8U_Depth : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Public depth As New Depth_InRange
     Public classCount As Integer
@@ -152,7 +152,7 @@ End Class
 
 
 
-Public Class Color8U_KMeans : Inherits VB_Parent
+Public Class Color8U_KMeans : Inherits TaskParent
     Public km0 As New KMeans_Basics
     Public km1 As New KMeans_Basics
     Public km2 As New KMeans_Basics
@@ -192,7 +192,7 @@ End Class
 
 
 
-Public Class Color8U_RedHue : Inherits VB_Parent
+Public Class Color8U_RedHue : Inherits TaskParent
     Dim options As New Options_CamShift
     Public Sub New()
         UpdateAdvice(traceName + ": This mask of red hue areas is available for use.")
@@ -217,7 +217,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/40233986/python-is-there-a-function-or-formula-to-find-the-complementary-colour-of-a-rgb
-Public Class Color8U_Complementary : Inherits VB_Parent
+Public Class Color8U_Complementary : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Current image in complementary colors", "HSV version of the current image but hue is flipped to complementary value."}
         desc = "Display the current image in complementary colors"
@@ -239,7 +239,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/40233986/python-is-there-a-function-or-formula-to-find-the-complementary-colour-of-a-rgb
-Public Class Color8U_ComplementaryTest : Inherits VB_Parent
+Public Class Color8U_ComplementaryTest : Inherits TaskParent
     Dim images As New Image_Basics
     Dim comp As New Color8U_Complementary
     Public Sub New()
@@ -263,7 +263,7 @@ End Class
 
 
 ' https://github.com/BhanuPrakashNani/Image_Processing/tree/master/Est.%20Transformation
-Public Class Color8U_InRange : Inherits VB_Parent
+Public Class Color8U_InRange : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Original", "After InRange processing"}
         desc = "Use inRange to isolate colors from the background"
@@ -283,7 +283,7 @@ End Class
 
 
 
-Public Class Color8U_TopX : Inherits VB_Parent
+Public Class Color8U_TopX : Inherits TaskParent
     Dim topX As New Hist3Dcolor_TopXColors
     Dim options As New Options_Color8UTopX
     Public Sub New()
@@ -326,7 +326,7 @@ End Class
 
 
 ' https://github.com/AjinkyaChavan9/RGB-Color-Classifier-with-Deep-Learning-using-Keras-and-Tensorflow
-Public Class Color8U_Common : Inherits VB_Parent
+Public Class Color8U_Common : Inherits TaskParent
     Dim common As New List(Of cvb.Vec3b)
     Dim commonScalar As List(Of cvb.Scalar) = {cvb.Scalar.Blue, cvb.Scalar.Green, cvb.Scalar.Red, cvb.Scalar.Yellow, cvb.Scalar.Pink, cvb.Scalar.Purple, cvb.Scalar.Brown,
                                               cvb.Scalar.Gray, cvb.Scalar.Black, cvb.Scalar.White}.ToList
@@ -358,7 +358,7 @@ End Class
 
 
 
-Public Class Color8U_Smoothing : Inherits VB_Parent
+Public Class Color8U_Smoothing : Inherits TaskParent
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "Averaged BGR image over the last X frames", ""}
@@ -378,7 +378,7 @@ End Class
 
 
 
-Public Class Color8U_Denoise : Inherits VB_Parent
+Public Class Color8U_Denoise : Inherits TaskParent
     Dim denoise As New Denoise_Pixels_CPP_VB
     Public Sub New()
         denoise.standalone = True
@@ -397,7 +397,7 @@ End Class
 
 
 
-Public Class Color8U_Hue : Inherits VB_Parent
+Public Class Color8U_Hue : Inherits TaskParent
     Public Sub New()
         desc = "Isolate those regions in the image that have a reddish hue."
     End Sub
@@ -415,7 +415,7 @@ End Class
 
 
 
-Public Class Color8U_BlackAndWhite : Inherits VB_Parent
+Public Class Color8U_BlackAndWhite : Inherits TaskParent
     Dim options As New Options_StdevGrid
     Public Sub New()
         labels = {"", "", "Mask to identify all 'black' regions", "Mask identifies all 'white' regions"}
@@ -424,7 +424,7 @@ Public Class Color8U_BlackAndWhite : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         dst2 = dst1.Threshold(options.minThreshold, 255, cvb.ThresholdTypes.BinaryInv)
         dst3 = dst1.Threshold(options.maxThreshold, 255, cvb.ThresholdTypes.Binary)
     End Sub
@@ -435,7 +435,7 @@ End Class
 
 
 
-Public Class Color8U_MotionFiltered : Inherits VB_Parent
+Public Class Color8U_MotionFiltered : Inherits TaskParent
     Dim color8U As New Color8U_Sweep
     Public classCount As Integer
     Dim motion As New Motion_BGSub
@@ -460,7 +460,7 @@ End Class
 
 
 
-Public Class Color8U_Edges : Inherits VB_Parent
+Public Class Color8U_Edges : Inherits TaskParent
     Dim color8u As New Color8U_Sweep
     Dim edges As New Edge_Canny
     Public Sub New()

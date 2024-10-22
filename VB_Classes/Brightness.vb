@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Brightness_Basics : Inherits VB_Parent
+Public Class Brightness_Basics : Inherits TaskParent
     Dim Options As New Options_BrightnessContrast
     Public Sub New()
         desc = "Implement a brightness effect"
@@ -18,7 +18,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/blob/master/Photoshop-Filters-in-OpenCV/brightness.cpp
-Public Class Brightness_HSV : Inherits VB_Parent
+Public Class Brightness_HSV : Inherits TaskParent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
         labels(3) = "HSV image"

@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Bin3Way_Basics : Inherits VB_Parent
+Public Class Bin3Way_Basics : Inherits TaskParent
     Dim hist As New Hist_Basics
     Public mats As New Mat_4Click
     Dim firstThird As Integer, lastThird As Integer
@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class Bin3Way_KMeans : Inherits VB_Parent
+Public Class Bin3Way_KMeans : Inherits TaskParent
     Public bin3 As New Bin3Way_Basics
     Dim kmeans As New KMeans_Dimensions
     Dim mats As New Mat_4Click
@@ -87,7 +87,7 @@ End Class
 
 
 
-Public Class Bin3Way_Color : Inherits VB_Parent
+Public Class Bin3Way_Color : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloudDarkest : Inherits VB_Parent
+Public Class Bin3Way_RedCloudDarkest : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -130,7 +130,7 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloudLightest : Inherits VB_Parent
+Public Class Bin3Way_RedCloudLightest : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -149,7 +149,7 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloudOther : Inherits VB_Parent
+Public Class Bin3Way_RedCloudOther : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
@@ -174,7 +174,7 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloud1 : Inherits VB_Parent
+Public Class Bin3Way_RedCloud1 : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
@@ -230,7 +230,7 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloud : Inherits VB_Parent
+Public Class Bin3Way_RedCloud : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Dim cellMaps(2) As cvb.Mat, redCells(2) As List(Of rcData)

@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace CS_Classes
 {
-    public class Bitmap_ToMat_CS : VB_Parent
+    public class Bitmap_ToMat_CS : TaskParent
     {
         public Bitmap_ToMat_CS()
         {
@@ -41,7 +41,7 @@ namespace CS_Classes
 
 
 
-    public class Blur_Gaussian_CS : VB_Parent
+    public class Blur_Gaussian_CS : TaskParent
     {
         public Options_Blur options = new Options_Blur();
         public Blur_Gaussian_CS()
@@ -59,7 +59,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Kaze_CS : VB_Parent
+    public class Feature_Kaze_CS : TaskParent
     {
         public KeyPoint[] kazeKeyPoints = null;
         public Feature_Kaze_CS()
@@ -86,7 +86,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_AKaze_CS : VB_Parent
+    public class Feature_AKaze_CS : TaskParent
     {
         KeyPoint[] kazeKeyPoints = null;
         public Feature_AKaze_CS()
@@ -114,7 +114,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_LeftRight_CS : VB_Parent
+    public class Feature_LeftRight_CS : TaskParent
     {
         Options_Kaze options;
         Feature_Kaze_CS KazeLeft;
@@ -176,7 +176,7 @@ namespace CS_Classes
 
 
 
-    public class Blob_Basics_CS : VB_Parent
+    public class Blob_Basics_CS : TaskParent
     {
         Blob_Input input;
         Options_Blob options;
@@ -220,7 +220,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_SiftLeftRight_CS : VB_Parent
+    public class Feature_SiftLeftRight_CS : TaskParent
     {
         public Options_Sift options;
         KeyPoint[] keypoints1, keypoints2;
@@ -266,7 +266,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Sift_CS : VB_Parent
+    public class Feature_Sift_CS : TaskParent
     {
         Options_Sift options;
         public List<cv.Point> stablePoints = new List<cv.Point>();
@@ -325,7 +325,7 @@ namespace CS_Classes
 
 
     // https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-    public class Feature_SiftSlices_CS : VB_Parent
+    public class Feature_SiftSlices_CS : TaskParent
     {
         Options_Sift options;
 
@@ -376,7 +376,7 @@ namespace CS_Classes
         }
     }
     // https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-    public class Feature_SURF_CS : VB_Parent
+    public class Feature_SURF_CS : TaskParent
     {
         public Options_SURF options;
         public bool drawPoints = true;
@@ -428,7 +428,7 @@ namespace CS_Classes
 
 
     // https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-    public class Feature_SURF_Draw_CS : VB_Parent
+    public class Feature_SURF_Draw_CS : TaskParent
     {
         Feature_SURF_CS surf;
 
@@ -488,7 +488,7 @@ namespace CS_Classes
 
 
 
-    public class OilPaint_Manual_CS : VB_Parent
+    public class OilPaint_Manual_CS : TaskParent
     {
         CS_Classes.OilPaintManual oilPaint = new CS_Classes.OilPaintManual();
         public Options_OilPaint options = new Options_OilPaint();
@@ -515,7 +515,7 @@ namespace CS_Classes
 
 
 
-    public class OilPaint_Cartoon_CS : VB_Parent
+    public class OilPaint_Cartoon_CS : TaskParent
     {
         OilPaint_Manual_CS oil;
         Edge_Laplacian Laplacian = new Edge_Laplacian();
@@ -554,7 +554,7 @@ namespace CS_Classes
 
 
 
-    public class SLR_Basics_CS : VB_Parent
+    public class SLR_Basics_CS : TaskParent
     {
         public SLR_PlotTest slrInput = new SLR_PlotTest();
         SLR slr = new SLR();
@@ -607,7 +607,7 @@ namespace CS_Classes
 
 
 
-    public class SLR_DepthHist_CS : VB_Parent
+    public class SLR_DepthHist_CS : TaskParent
     {
         public SLR_Basics_CS slr;
         public Hist_Kalman kalman;
@@ -638,7 +638,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_Sobel_Demo_CS : VB_Parent
+    public class OEX_Sobel_Demo_CS : TaskParent
     {
         Edge_Sobel_CS sobel;
 
@@ -660,7 +660,7 @@ namespace CS_Classes
 
 
     // https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-    public class Voronoi_Basics_CS : VB_Parent
+    public class Voronoi_Basics_CS : TaskParent
     {
         public VoronoiDemo vDemo = new VoronoiDemo();
         public Random_Basics_CS random;
@@ -693,7 +693,7 @@ namespace CS_Classes
     }
 
     // https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-    public class Voronoi_Compare_CS : VB_Parent
+    public class Voronoi_Compare_CS : TaskParent
     {
         Voronoi_Basics_CS basics;
         public Random_Basics random = new Random_Basics();
@@ -719,7 +719,7 @@ namespace CS_Classes
     }
 
     // https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-    public class Voronoi_CS : VB_Parent
+    public class Voronoi_CS : TaskParent
     {
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr VoronoiDemo_Open(string matlabFileName, int rows, int cols);
@@ -762,7 +762,7 @@ namespace CS_Classes
         }
     }
 
-    public class Edge_Motion_CS : VB_Parent
+    public class Edge_Motion_CS : TaskParent
     {
         Diff_Basics diff = new Diff_Basics();
         Edge_Sobel_CS edges;
@@ -786,7 +786,7 @@ namespace CS_Classes
     }
 
 
-    public class Edge_NoDepth_CS : VB_Parent
+    public class Edge_NoDepth_CS : TaskParent
     {
         Edge_Sobel_CS edges;
         Blur_Basics_CS blur;
@@ -819,7 +819,7 @@ namespace CS_Classes
 
 
 
-    public class Sieve_Basics_CS : VB_Parent
+    public class Sieve_Basics_CS : TaskParent
     {
         Sieve_BasicsVB printer = new Sieve_BasicsVB();
         Sieve sieve = new Sieve();
@@ -839,7 +839,7 @@ namespace CS_Classes
 
 
     // https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
-    public class SLR_Image_CS : VB_Parent
+    public class SLR_Image_CS : TaskParent
     {
         public SLR_Basics_CS slr;
         public Hist_Basics hist = new Hist_Basics();
@@ -868,7 +868,7 @@ namespace CS_Classes
     }
 
 
-    public class SLR_TrendCompare_CS : VB_Parent
+    public class SLR_TrendCompare_CS : TaskParent
     {
         public SLR_Image_CS slr;
         List<float> valList = new List<float>();
@@ -923,7 +923,7 @@ namespace CS_Classes
     }
 
 
-    public class Feature_SURFMatch_CS : VB_Parent
+    public class Feature_SURFMatch_CS : TaskParent
     {
         Feature_SURF_CS surf;
         public Feature_SURFMatch_CS()
@@ -977,7 +977,7 @@ namespace CS_Classes
         }
     }
 
-    public class DNN_Caffe_CS : VB_Parent
+    public class DNN_Caffe_CS : TaskParent
     {
         DNN caffeCS = new DNN();
         public DNN_Caffe_CS()
@@ -1000,7 +1000,7 @@ namespace CS_Classes
         }
     }
 
-    public class Dither_Basics_CS : VB_Parent
+    public class Dither_Basics_CS : TaskParent
     {
         Options_Dither options = new Options_Dither();
 
@@ -1189,7 +1189,7 @@ namespace CS_Classes
 
 
 
-    public class DNN_Test_CS : VB_Parent
+    public class DNN_Test_CS : TaskParent
     {
         Net net;
         string[] classnames;
@@ -1228,7 +1228,7 @@ namespace CS_Classes
                         $"{mm.maxVal:0.00%}", new cv.Point(40, 200));
         }
     }
-    public class DNN_Basics_CS : VB_Parent
+    public class DNN_Basics_CS : TaskParent
     {
 
         Net net;
@@ -1353,7 +1353,7 @@ namespace CS_Classes
             }
         }
     }
-    public class DNN_SuperRes_CS : VB_Parent
+    public class DNN_SuperRes_CS : TaskParent
     {
         public Options_DNN options = new Options_DNN();
         public DnnSuperResImpl dnn;
@@ -1395,7 +1395,7 @@ namespace CS_Classes
             labels[3] = $"{multiplier}X resize of selected area using DNN super resolution";
         }
     }
-    //public class DNN_SuperRes_CSize : VB_Parent
+    //public class DNN_SuperRes_CSize : TaskParent
     //{
     //    DNN_SuperRes super;
     //    public DNN_SuperRes_CSize()
@@ -1419,7 +1419,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Sample_CS : VB_Parent
+    public class Feature_Sample_CS : TaskParent
     {
         public Mat img1, img2;
         KeyPoint[] keypoints1, keypoints2;
@@ -1668,7 +1668,7 @@ namespace CS_Classes
 
 
 
-    public class MeanSubtraction_Basics_CS : VB_Parent
+    public class MeanSubtraction_Basics_CS : TaskParent
     {
         Options_MeanSubtraction options = new Options_MeanSubtraction();
         public MeanSubtraction_Basics_CS()

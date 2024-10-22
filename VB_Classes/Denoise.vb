@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
-Public Class Denoise_Basics_CPP_VB : Inherits VB_Parent
+Public Class Denoise_Basics_CPP_VB : Inherits TaskParent
     Dim diff As New Diff_Basics
     Public Sub New()
         cPtr = Denoise_Basics_Open(3)
@@ -32,7 +32,7 @@ End Class
 
 
 
-Public Class Denoise_Pixels_CPP_VB : Inherits VB_Parent
+Public Class Denoise_Pixels_CPP_VB : Inherits TaskParent
     Public classCount As Integer
     Dim reduction As New Reduction_Basics
     Dim options As New Options_Denoise
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class Denoise_Reliable : Inherits VB_Parent
+Public Class Denoise_Reliable : Inherits TaskParent
     Dim denoise As New Denoise_SinglePixels_CPP_VB
     Dim relyGray As New Reliable_Gray
     Public Sub New()
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class Denoise_SinglePixels_CPP_VB : Inherits VB_Parent
+Public Class Denoise_SinglePixels_CPP_VB : Inherits TaskParent
     Dim options As New Options_Denoise
     Public Sub New()
         cPtr = Denoise_SinglePixels_Open()

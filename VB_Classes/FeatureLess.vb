@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class FeatureLess_Basics : Inherits VB_Parent
+Public Class FeatureLess_Basics : Inherits TaskParent
     Dim edges As New EdgeDraw_Basics
     Public classCount As Integer = 2
     Public Sub New()
@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class FeatureLess_Canny : Inherits VB_Parent
+Public Class FeatureLess_Canny : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim options As New Options_Sobel()
     Public Sub New()
@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class FeatureLess_Sobel : Inherits VB_Parent
+Public Class FeatureLess_Sobel : Inherits TaskParent
     Dim edges As New Edge_Sobel
     Dim options As New Options_Sobel()
     Public Sub New()
@@ -65,7 +65,7 @@ End Class
 
 
 
-Public Class FeatureLess_UniquePixels : Inherits VB_Parent
+Public Class FeatureLess_UniquePixels : Inherits TaskParent
     Dim fless As New Hough_FeatureLessTopX
     Dim sort As New Sort_1Channel
     Public Sub New()
@@ -75,7 +75,7 @@ Public Class FeatureLess_UniquePixels : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fless.Run(src)
-        dst2 = fless.dst2.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        dst2 = fless.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         sort.Run(dst2)
         dst3 = sort.dst2
     End Sub
@@ -87,7 +87,7 @@ End Class
 
 
 
-Public Class FeatureLess_Unique3Pixels : Inherits VB_Parent
+Public Class FeatureLess_Unique3Pixels : Inherits TaskParent
     Dim fless As New Hough_FeatureLessTopX
     Dim sort3 As New Sort_3Channel
     Public Sub New()
@@ -95,7 +95,7 @@ Public Class FeatureLess_Unique3Pixels : Inherits VB_Parent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fless.Run(src)
-        dst2 = fless.dst2.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        dst2 = fless.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         sort3.Run(fless.dst2)
         dst3 = sort3.dst2
@@ -107,7 +107,7 @@ End Class
 
 
 
-Public Class FeatureLess_Histogram : Inherits VB_Parent
+Public Class FeatureLess_Histogram : Inherits TaskParent
     Dim backP As New BackProject_FeatureLess
     Public Sub New()
         desc = "Create a histogram of the featureless regions"
@@ -129,7 +129,7 @@ End Class
 
 
 
-Public Class FeatureLess_DCT : Inherits VB_Parent
+Public Class FeatureLess_DCT : Inherits TaskParent
     Dim dct As New DCT_FeatureLess
     Public Sub New()
         labels(3) = "Largest FeatureLess Region"
@@ -177,7 +177,7 @@ End Class
 
 
 
-Public Class FeatureLess_LeftRight : Inherits VB_Parent
+Public Class FeatureLess_LeftRight : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
         labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
@@ -200,7 +200,7 @@ End Class
 
 
 
-Public Class FeatureLess_History : Inherits VB_Parent
+Public Class FeatureLess_History : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Dim frames As New History_Basics
     Public Sub New()
@@ -222,7 +222,7 @@ End Class
 
 
 
-Public Class FeatureLess_RedCloud : Inherits VB_Parent
+Public Class FeatureLess_RedCloud : Inherits TaskParent
     Public redC As New RedCloud_Basics
     Dim fless As New FeatureLess_Basics
     Public Sub New()
@@ -241,7 +241,7 @@ End Class
 
 
 
-Public Class FeatureLess_Groups : Inherits VB_Parent
+Public Class FeatureLess_Groups : Inherits TaskParent
     Dim redCPP As New RedCloud_CPP_VB
     Dim fless As New FeatureLess_Basics
     Public classCount As Integer

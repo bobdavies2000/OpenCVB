@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class HistPeak2D_Basics : Inherits VB_Parent
+Public Class HistPeak2D_Basics : Inherits TaskParent
     Public auto As New OpAuto_Peaks2DGrid
     Dim bgr As New Hist2D_BGR
     Dim delaunay As New Delaunay_ConsistentColor
@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class HistPeak2D_TopAndSide : Inherits VB_Parent
+Public Class HistPeak2D_TopAndSide : Inherits TaskParent
     Dim peak As New HistPeak2D_Basics
     Dim histSide As New Projection_HistSide
     Dim histTop As New Projection_HistTop
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class HistPeak2D_NotHotTop : Inherits VB_Parent
+Public Class HistPeak2D_NotHotTop : Inherits TaskParent
     Public histTop As New Projection_HistTop
     Dim peak As New HistPeak2D_Basics
     Public Sub New()
@@ -105,7 +105,7 @@ End Class
 
 
 
-Public Class HistPeak2D_Edges : Inherits VB_Parent
+Public Class HistPeak2D_Edges : Inherits TaskParent
     Dim peak As New HistPeak2D_Basics
     Dim histTop As New Projection_HistTop
     Dim edges As New Edge_Basics
@@ -132,7 +132,7 @@ End Class
 
 
 
-Public Class HistPeak2D_HSV : Inherits VB_Parent
+Public Class HistPeak2D_HSV : Inherits TaskParent
     Dim hsv As New Hist2D_HSV
     Dim peak As New HistPeak2D_Basics
     Public Sub New()
@@ -154,7 +154,7 @@ End Class
 
 
 
-Public Class HistPeak2D_BGR : Inherits VB_Parent
+Public Class HistPeak2D_BGR : Inherits TaskParent
     Dim bgr As New Hist2D_BGR
     Dim peak As New HistPeak2D_Basics
     Public Sub New()
@@ -178,7 +178,7 @@ End Class
 
 
 
-Public Class HistPeak2D_RGB : Inherits VB_Parent
+Public Class HistPeak2D_RGB : Inherits TaskParent
     Dim peak As New HistPeak2D_BGR
     Public Sub New()
         desc = "Find the peaks in the 2D plot of the BGR image"
@@ -198,7 +198,7 @@ End Class
 
 
 
-Public Class HistPeak2D_HotSide : Inherits VB_Parent
+Public Class HistPeak2D_HotSide : Inherits TaskParent
     Dim peak As New HistPeak2D_Basics
     Dim histSide As New Projection_HistSide
     Public Sub New()
@@ -228,7 +228,7 @@ End Class
 
 
 
-Public Class HistPeak2D_HotTop : Inherits VB_Parent
+Public Class HistPeak2D_HotTop : Inherits TaskParent
     Dim peak As New HistPeak2D_Basics
     Dim histTop As New Projection_HistTop
     Public Sub New()

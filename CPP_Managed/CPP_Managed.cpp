@@ -132,7 +132,7 @@ namespace CPP_Managed {
      
      
 
-    public ref class AddWeighted_Basics_CPP : public VB_Parent
+    public ref class AddWeighted_Basics_CPP : public TaskParent
     {
         Options_AddWeighted^ options = gcnew Options_AddWeighted();
     public:
@@ -177,7 +177,7 @@ namespace CPP_Managed {
      
 
 
-    public ref class AddWeighted_LeftRight_CPP : public VB_Parent
+    public ref class AddWeighted_LeftRight_CPP : public TaskParent
     {
         AddWeighted_Basics_CPP^ addw = gcnew AddWeighted_Basics_CPP();
     public:
@@ -207,7 +207,7 @@ namespace CPP_Managed {
 
 
 
-    public ref class AddWeighted_DepthAccumulate_CPP : public VB_Parent
+    public ref class AddWeighted_DepthAccumulate_CPP : public TaskParent
     {
     private:
         Options_AddWeighted^ options = gcnew Options_AddWeighted();
@@ -237,7 +237,7 @@ namespace CPP_Managed {
 
 
 
-    public ref class Mat_ManualCopyTest_CPP : public VB_Parent
+    public ref class Mat_ManualCopyTest_CPP : public TaskParent
     {
     private:
         Options_BrightnessContrast^ options = gcnew Options_BrightnessContrast();
@@ -277,7 +277,7 @@ namespace CPP_Managed {
 
 
 
-    public ref class Edge_Canny_CPP : public VB_Parent
+    public ref class Edge_Canny_CPP : public TaskParent
     {
     private:
         Options_Canny^ options = gcnew Options_Canny();
@@ -312,7 +312,7 @@ namespace CPP_Managed {
 
 
 
-    //public ref class AddWeighted_Edges_CPP : public VB_Parent
+    //public ref class AddWeighted_Edges_CPP : public TaskParent
     //{
     //private:
     //    Edge_Basics_CPP edges = new Edge_Basics_CPP();
@@ -343,7 +343,7 @@ namespace CPP_Managed {
 
 
 
-    //public ref class Edge_Basics_CPP : public VB_Parent
+    //public ref class Edge_Basics_CPP : public TaskParent
     //{
     //private:
     //    Edge_Canny_CPP canny = new Edge_Canny_CPP();

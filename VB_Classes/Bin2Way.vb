@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Bin2Way_Basics : Inherits VB_Parent
+Public Class Bin2Way_Basics : Inherits TaskParent
     Public hist As New Hist_Basics
     Public mats As New Mat_4Click
     Public fraction As Single
@@ -44,7 +44,7 @@ End Class
 
 
 
-Public Class Bin2Way_KMeans : Inherits VB_Parent
+Public Class Bin2Way_KMeans : Inherits TaskParent
     Public bin2 As New Bin2Way_Basics
     Dim kmeans As New KMeans_Dimensions
     Dim mats As New Mat_4Click
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class Bin2Way_RedCloudDarkest : Inherits VB_Parent
+Public Class Bin2Way_RedCloudDarkest : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -97,7 +97,7 @@ End Class
 
 
 
-Public Class Bin2Way_RedCloudLightest : Inherits VB_Parent
+Public Class Bin2Way_RedCloudLightest : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -116,7 +116,7 @@ End Class
 
 
 
-Public Class Bin2Way_RecurseOnce : Inherits VB_Parent
+Public Class Bin2Way_RecurseOnce : Inherits TaskParent
     Dim bin2 As New Bin2Way_Basics
     Public mats As New Mat_4Click
     Public Sub New()
@@ -155,7 +155,7 @@ End Class
 
 
 
-Public Class Bin2Way_RedCloud : Inherits VB_Parent
+Public Class Bin2Way_RedCloud : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
     Dim cellMaps(3) As cvb.Mat, redCells(3) As List(Of rcData)

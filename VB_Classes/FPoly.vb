@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class FPoly_Basics : Inherits VB_Parent
+Public Class FPoly_Basics : Inherits TaskParent
     Public resync As Boolean
     Public resyncCause As String
     Public resyncFrames As Integer
@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class FPoly_Sides : Inherits VB_Parent
+Public Class FPoly_Sides : Inherits TaskParent
     Public currPoly As New List(Of cvb.Point2f)
     Public currSideIndex As Integer
     Public currLengths As New List(Of Single)
@@ -232,7 +232,7 @@ End Class
 
 
 
-Public Class FPoly_BasicsOriginal : Inherits VB_Parent
+Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Public fPD As New fPolyData
     Public resyncImage As cvb.Mat
     Public resync As Boolean
@@ -357,7 +357,7 @@ End Class
 
 
 
-Public Class FPoly_Plot : Inherits VB_Parent
+Public Class FPoly_Plot : Inherits TaskParent
     Public fGrid As New FPoly_Core
     Dim plot As New Plot_Histogram
     Public hist() As Single
@@ -413,7 +413,7 @@ End Class
 
 
 
-Public Class FPoly_PlotWeighted : Inherits VB_Parent
+Public Class FPoly_PlotWeighted : Inherits TaskParent
     Public fPlot As New FPoly_Plot
     Dim plot As New Plot_Histogram
     Dim addw As New AddWeighted_Basics
@@ -457,7 +457,7 @@ End Class
 
 
 
-Public Class FPoly_Stablizer : Inherits VB_Parent
+Public Class FPoly_Stablizer : Inherits TaskParent
     Public fGrid As New FPoly_Core
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -501,7 +501,7 @@ End Class
 
 
 
-Public Class FPoly_StartPoints : Inherits VB_Parent
+Public Class FPoly_StartPoints : Inherits TaskParent
     Public startPoints As New List(Of cvb.Point2f)
     Public goodPoints As New List(Of cvb.Point2f)
     Dim fGrid As New FPoly_Core
@@ -559,7 +559,7 @@ End Class
 
 
 
-Public Class FPoly_Triangle : Inherits VB_Parent
+Public Class FPoly_Triangle : Inherits TaskParent
     Dim triangle As New Area_MinTriangle_CPP_VB
     Dim fGrid As New FPoly_Core
     Public Sub New()
@@ -581,7 +581,7 @@ End Class
 
 
 
-Public Class FPoly_TopFeatures : Inherits VB_Parent
+Public Class FPoly_TopFeatures : Inherits TaskParent
     Public stable As New Stable_BasicsCount
     Public poly As New List(Of cvb.Point2f)
     Public options As New Options_FPoly
@@ -616,7 +616,7 @@ End Class
 
 
 
-Public Class FPoly_WarpAffinePoly : Inherits VB_Parent
+Public Class FPoly_WarpAffinePoly : Inherits TaskParent
     Dim rotatePoly As New Rotate_PolyQT
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New FPoly_BasicsOriginal
@@ -677,7 +677,7 @@ End Class
 
 
 
-Public Class FPoly_RotatePoints : Inherits VB_Parent
+Public Class FPoly_RotatePoints : Inherits TaskParent
     Dim rotatePoly As New Rotate_PolyQT
     Public poly As New List(Of cvb.Point2f)
     Public polyPrev As New List(Of cvb.Point2f)
@@ -740,7 +740,7 @@ End Class
 
 
 
-Public Class FPoly_WarpAffineImage : Inherits VB_Parent
+Public Class FPoly_WarpAffineImage : Inherits TaskParent
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
@@ -788,7 +788,7 @@ End Class
 
 
 ' https://www.google.com/search?q=geometry+find+the+center+of+rotation&rlz=1C1CHBF_enUS838US838&oq=geometry+find+the+center+of+rotation&aqs=chrome..69i57j0i22i30j0i390l3.9576j0j4&sourceid=chrome&ie=UTF-8#kpvalbx=_rgg1Y9rbGM3n0PEP-ae4oAc_34
-Public Class FPoly_Perpendiculars : Inherits VB_Parent
+Public Class FPoly_Perpendiculars : Inherits TaskParent
     Public altCenterShift As cvb.Point2f
     Public fPD As fPolyData
     Public rotatePoints As New FPoly_RotatePoints
@@ -863,7 +863,7 @@ End Class
 
 
 
-Public Class FPoly_PerpendicularsTest : Inherits VB_Parent
+Public Class FPoly_PerpendicularsTest : Inherits TaskParent
     Dim center As New FPoly_Perpendiculars
     Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
@@ -886,7 +886,7 @@ End Class
 
 
 
-Public Class FPoly_PerpendicularsImage : Inherits VB_Parent
+Public Class FPoly_PerpendicularsImage : Inherits TaskParent
     Dim center As New FPoly_Perpendiculars
     Dim fImage As New FPoly_Image
     Public Sub New()
@@ -910,7 +910,7 @@ End Class
 
 
 
-Public Class FPoly_Image : Inherits VB_Parent
+Public Class FPoly_Image : Inherits TaskParent
     Public fpoly As New FPoly_BasicsOriginal
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
@@ -987,7 +987,7 @@ End Class
 
 
 
-Public Class FPoly_ImageMask : Inherits VB_Parent
+Public Class FPoly_ImageMask : Inherits TaskParent
     Public fImage As New FPoly_Image
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -1011,7 +1011,7 @@ End Class
 
 
 
-Public Class FPoly_PointCloud : Inherits VB_Parent
+Public Class FPoly_PointCloud : Inherits TaskParent
     Public fMask As New FPoly_ImageMask
     Public fPolyCloud As cvb.Mat
     Public Sub New()
@@ -1036,7 +1036,7 @@ End Class
 
 
 
-Public Class FPoly_ResyncCheck : Inherits VB_Parent
+Public Class FPoly_ResyncCheck : Inherits TaskParent
     Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -1071,7 +1071,7 @@ End Class
 
 
 
-Public Class FPoly_Center : Inherits VB_Parent
+Public Class FPoly_Center : Inherits TaskParent
     Public rotatePoly As New Rotate_PolyQT
     Dim near As New Line_Nearest
     Public fPD As fPolyData
@@ -1168,7 +1168,7 @@ End Class
 
 
 
-Public Class FPoly_EdgeRemoval : Inherits VB_Parent
+Public Class FPoly_EdgeRemoval : Inherits TaskParent
     Dim fMask As New FPoly_ImageMask
     Dim edges As New Edge_Basics
     Public Sub New()
@@ -1199,7 +1199,7 @@ End Class
 
 
 
-Public Class FPoly_ImageNew : Inherits VB_Parent
+Public Class FPoly_ImageNew : Inherits TaskParent
     Public fpoly As New FPoly_Basics
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
@@ -1268,7 +1268,7 @@ End Class
 
 
 
-Public Class FPoly_LeftRight : Inherits VB_Parent
+Public Class FPoly_LeftRight : Inherits TaskParent
     Dim leftPoly As New FPoly_Basics
     Dim rightPoly As New FPoly_Basics
     Public Sub New()
@@ -1297,7 +1297,7 @@ End Class
 
 
 
-Public Class FPoly_Core : Inherits VB_Parent
+Public Class FPoly_Core : Inherits TaskParent
     Public stable As New Stable_GoodFeatures
     Public anchor As cvb.Point2f
     Public startAnchor As cvb.Point2f

@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class ImageOffset_Basics : Inherits VB_Parent
+Public Class ImageOffset_Basics : Inherits TaskParent
     Public options As New Options_ImageOffset
     Public masks(2) As cvb.Mat
     Public dst(2) As cvb.Mat
@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class ImageOffset_SliceH : Inherits VB_Parent
+Public Class ImageOffset_SliceH : Inherits TaskParent
     Dim iOff As New ImageOffset_Basics
     Dim plot As New Plot_Points
     Dim options As New Options_SLR
@@ -118,7 +118,7 @@ End Class
 
 
 
-Public Class ImageOffset_SliceV : Inherits VB_Parent
+Public Class ImageOffset_SliceV : Inherits TaskParent
     Dim iOff As New ImageOffset_Basics
     Dim plot As New Plot_Points
     Dim options As New Options_SLR
@@ -177,7 +177,7 @@ End Class
 
 
 
-Public Class ImageOffset_Cloud : Inherits VB_Parent
+Public Class ImageOffset_Cloud : Inherits TaskParent
     Public Sub New()
         desc = "Create a pointcloud with the results of the imageOffset slices"
     End Sub

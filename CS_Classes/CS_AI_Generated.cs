@@ -27,7 +27,7 @@ using System.Diagnostics.Eventing.Reader;
 
 namespace CS_Classes
 {
-    public class AddWeighted_Basics_CS : VB_Parent
+    public class AddWeighted_Basics_CS : TaskParent
     {
         public Mat src2;  // user normally provides src2! 
         public Options_AddWeighted options = new Options_AddWeighted();
@@ -64,7 +64,7 @@ namespace CS_Classes
 
 
 
-    public class AddWeighted_Edges_CS : VB_Parent
+    public class AddWeighted_Edges_CS : TaskParent
     {
         Edge_Basics edges = new Edge_Basics();
         AddWeighted_Basics_CS addw;
@@ -91,7 +91,7 @@ namespace CS_Classes
 
 
 
-    public class AddWeighted_DepthAccumulate_CS : VB_Parent
+    public class AddWeighted_DepthAccumulate_CS : TaskParent
     {
         Options_AddWeighted options = new Options_AddWeighted();
         public AddWeighted_DepthAccumulate_CS()
@@ -114,7 +114,7 @@ namespace CS_Classes
 
 
 
-    public class AddWeighted_InfraRed_CS : VB_Parent
+    public class AddWeighted_InfraRed_CS : TaskParent
     {
         AddWeighted_Basics_CS addw = new AddWeighted_Basics_CS();
         Mat src2 = new Mat();
@@ -224,7 +224,7 @@ namespace CS_Classes
 
 
 
-    public class AlphaChannel_Basics_CS : VB_Parent
+    public class AlphaChannel_Basics_CS : TaskParent
     {
         Form alpha = new Form();
 
@@ -252,7 +252,7 @@ namespace CS_Classes
 
     // https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
     // https://docs.opencv.org/4.x/js_contour_features_approxPolyDP.html
-    public class ApproxPoly_Basics_CS : VB_Parent
+    public class ApproxPoly_Basics_CS : TaskParent
     {
         Contour_Largest contour = new Contour_Largest();
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
@@ -295,7 +295,7 @@ namespace CS_Classes
 
 
 
-    public class ApproxPoly_FindandDraw_CS : VB_Parent
+    public class ApproxPoly_FindandDraw_CS : TaskParent
     {
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
         public cv.Point[][] allContours;
@@ -333,7 +333,7 @@ namespace CS_Classes
 
 
 
-    public class ApproxPoly_Hull_CS : VB_Parent
+    public class ApproxPoly_Hull_CS : TaskParent
     {
         Hull_Basics hull = new Hull_Basics();
         ApproxPoly_Basics aPoly = new ApproxPoly_Basics();
@@ -356,7 +356,7 @@ namespace CS_Classes
 
 
 
-    public class Area_MinTriangle_CPP_CS : VB_Parent
+    public class Area_MinTriangle_CPP_CS : TaskParent
     {
         public Mat triangle;
         public Options_MinArea options = new Options_MinArea();
@@ -416,7 +416,7 @@ namespace CS_Classes
 
 
 
-    public class Annealing_Basics_CPP_CS : VB_Parent
+    public class Annealing_Basics_CPP_CS : TaskParent
     {
         public int numberOfCities = 25;
         public Point2f[] cityPositions;
@@ -516,7 +516,7 @@ namespace CS_Classes
 
 
 
-    public class Annealing_MT_CPP_CS : VB_Parent
+    public class Annealing_MT_CPP_CS : TaskParent
     {
         Options_Annealing options = new Options_Annealing();
         Random_Basics_CS random;
@@ -625,7 +625,7 @@ namespace CS_Classes
 
 
 
-    public class Area_MinMotionRect_CS : VB_Parent
+    public class Area_MinMotionRect_CS : TaskParent
     {
         BGSubtract_Basics bgSub = new BGSubtract_Basics();
 
@@ -666,7 +666,7 @@ namespace CS_Classes
 
 
 
-    public class Area_FindNonZero_CS : VB_Parent
+    public class Area_FindNonZero_CS : TaskParent
     {
         public Mat nonZero;
         public Area_FindNonZero_CS()
@@ -715,7 +715,7 @@ namespace CS_Classes
 
 
 
-    public class Area_SoloPoints_CS : VB_Parent
+    public class Area_SoloPoints_CS : TaskParent
     {
         BackProject_SoloTop hotTop = new BackProject_SoloTop();
         BackProject_SoloSide hotSide = new BackProject_SoloSide();
@@ -752,7 +752,7 @@ namespace CS_Classes
 
 
 
-    public class Area_MinRect_CS : VB_Parent
+    public class Area_MinRect_CS : TaskParent
     {
         public RotatedRect minRect;
         Options_MinArea options = new Options_MinArea();
@@ -789,7 +789,7 @@ namespace CS_Classes
 
 
 
-    public class AsciiArt_Basics_CS : VB_Parent
+    public class AsciiArt_Basics_CS : TaskParent
     {
         string[] asciiChars = { "@", "%", "#", "*", "+", "=", "-", ":", ",", ".", " " };
         Options_AsciiArt options = new Options_AsciiArt();
@@ -822,7 +822,7 @@ namespace CS_Classes
 
 
 
-    public class AsciiArt_Color_CS : VB_Parent
+    public class AsciiArt_Color_CS : TaskParent
     {
         public AsciiArt_Color_CS()
         {
@@ -855,7 +855,7 @@ namespace CS_Classes
 
 
 
-    public class AsciiArt_Diff_CS : VB_Parent
+    public class AsciiArt_Diff_CS : TaskParent
     {
         AsciiArt_Color_CS colorAA;
         Diff_Basics_CS diff;
@@ -881,7 +881,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Basics_CS : VB_Parent
+    public class BackProject_Basics_CS : TaskParent
     {
         public Hist_Kalman histK = new Hist_Kalman();
         public Scalar minRange, maxRange;
@@ -938,7 +938,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Full_CS : VB_Parent
+    public class BackProject_Full_CS : TaskParent
     {
         public int classCount;
 
@@ -971,7 +971,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Reduction_CS : VB_Parent
+    public class BackProject_Reduction_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         BackProject_Basics backP = new BackProject_Basics();
@@ -998,7 +998,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_FeatureLess_CS : VB_Parent
+    public class BackProject_FeatureLess_CS : TaskParent
     {
         BackProject_Basics backP = new BackProject_Basics();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -1027,7 +1027,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_BasicsKeyboard_CS : VB_Parent
+    public class BackProject_BasicsKeyboard_CS : TaskParent
     {
         Keyboard_Basics keys = new Keyboard_Basics();
         BackProject_Image backP = new BackProject_Image();
@@ -1081,7 +1081,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_FullLines_CS : VB_Parent
+    public class BackProject_FullLines_CS : TaskParent
     {
         BackProject_Full backP = new BackProject_Full();
         Line_Basics lines = new Line_Basics();
@@ -1106,7 +1106,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_PointCloud_CS : VB_Parent
+    public class BackProject_PointCloud_CS : TaskParent
     {
         public Hist_PointCloud hist = new Hist_PointCloud();
         public BackProject_PointCloud_CS()
@@ -1140,7 +1140,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Display_CS : VB_Parent
+    public class BackProject_Display_CS : TaskParent
     {
         BackProject_Full backP = new BackProject_Full();
         public BackProject_Display_CS()
@@ -1160,7 +1160,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Unstable_CS : VB_Parent
+    public class BackProject_Unstable_CS : TaskParent
     {
         BackProject_Full backP = new BackProject_Full();
         Diff_Basics diff = new Diff_Basics();
@@ -1185,7 +1185,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_FullEqualized_CS : VB_Parent
+    public class BackProject_FullEqualized_CS : TaskParent
     {
         BackProject_Full backP = new BackProject_Full();
         Hist_EqualizeColor equalize = new Hist_EqualizeColor();
@@ -1215,7 +1215,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_MaskLines_CS : VB_Parent
+    public class BackProject_MaskLines_CS : TaskParent
     {
         BackProject_Masks_CS masks;
         Line_Basics_CS lines;
@@ -1254,7 +1254,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Masks_CS : VB_Parent
+    public class BackProject_Masks_CS : TaskParent
     {
         public Hist_Basics hist = new Hist_Basics();
         public int histIndex;
@@ -1306,7 +1306,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Side_CS : VB_Parent
+    public class BackProject_Side_CS : TaskParent
     {
         OpAuto_YRange autoY = new OpAuto_YRange();
         Projection_HistSide histSide = new Projection_HistSide();
@@ -1332,7 +1332,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Top_CS : VB_Parent
+    public class BackProject_Top_CS : TaskParent
     {
         Projection_HistTop histTop = new Projection_HistTop();
         public BackProject_Top_CS()
@@ -1355,7 +1355,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Horizontal_CS : VB_Parent
+    public class BackProject_Horizontal_CS : TaskParent
     {
         BackProject_Top bpTop = new BackProject_Top();
         BackProject_Side bpSide = new BackProject_Side();
@@ -1378,7 +1378,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Vertical_CS : VB_Parent
+    public class BackProject_Vertical_CS : TaskParent
     {
         BackProject_Top bpTop = new BackProject_Top();
         BackProject_Side bpSide = new BackProject_Side();
@@ -1401,7 +1401,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_SoloSide_CS : VB_Parent
+    public class BackProject_SoloSide_CS : TaskParent
     {
         Projection_HistSide histSide = new Projection_HistSide();
 
@@ -1427,7 +1427,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_SoloTop_CS : VB_Parent
+    public class BackProject_SoloTop_CS : TaskParent
     {
         Projection_HistTop histTop = new Projection_HistTop();
 
@@ -1453,7 +1453,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_LineTop_CS : VB_Parent
+    public class BackProject_LineTop_CS : TaskParent
     {
         Line_ViewTop line = new Line_ViewTop();
         public BackProject_LineTop_CS()
@@ -1486,7 +1486,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_LineSide_CS : VB_Parent
+    public class BackProject_LineSide_CS : TaskParent
     {
         Line_ViewSide line = new Line_ViewSide();
         public List<PointPair> lpList = new List<PointPair>();
@@ -1528,7 +1528,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Image_CS : VB_Parent
+    public class BackProject_Image_CS : TaskParent
     {
         public Hist_Basics hist = new Hist_Basics();
         public Mat mask = new Mat();
@@ -1607,7 +1607,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Mouse_CS : VB_Parent
+    public class BackProject_Mouse_CS : TaskParent
     {
         BackProject_Image_CS backP;
         public BackProject_Mouse_CS()
@@ -1627,7 +1627,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Depth_CS : VB_Parent
+    public class BackProject_Depth_CS : TaskParent
     {
         BackProject_Image_CS backp;
         public BackProject_Depth_CS()
@@ -1648,7 +1648,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_MeterByMeter_CS : VB_Parent
+    public class BackProject_MeterByMeter_CS : TaskParent
     {
         Mat histogram = new Mat();
         public BackProject_MeterByMeter_CS()
@@ -1681,7 +1681,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject_Hue_CS : VB_Parent
+    public class BackProject_Hue_CS : TaskParent
     {
         OEX_CalcBackProject_Demo1 hue = new OEX_CalcBackProject_Demo1();
         public int classCount;
@@ -1701,7 +1701,7 @@ namespace CS_Classes
 
 
 
-    public class Benford_Basics_CS : VB_Parent
+    public class Benford_Basics_CS : TaskParent
     {
         public float[] expectedDistribution = new float[10];
         public float[] counts;
@@ -1801,7 +1801,7 @@ namespace CS_Classes
 
 
 
-    public class Benford_NormalizedImage_CS : VB_Parent
+    public class Benford_NormalizedImage_CS : TaskParent
     {
         public Benford_Basics benford = new Benford_Basics();
         public Benford_NormalizedImage_CS()
@@ -1826,7 +1826,7 @@ namespace CS_Classes
 
 
 
-    public class Benford_NormalizedImage99_CS : VB_Parent
+    public class Benford_NormalizedImage99_CS : TaskParent
     {
         public Benford_Basics benford = new Benford_Basics();
         public Benford_NormalizedImage99_CS()
@@ -1851,7 +1851,7 @@ namespace CS_Classes
 
 
 
-    public class Benford_Depth_CS : VB_Parent
+    public class Benford_Depth_CS : TaskParent
     {
         public Benford_Basics benford = new Benford_Basics();
         public Benford_Depth_CS()
@@ -1870,7 +1870,7 @@ namespace CS_Classes
 
 
 
-    public class Benford_Primes_CS : VB_Parent
+    public class Benford_Primes_CS : TaskParent
     {
         Sieve_BasicsVB sieve = new Sieve_BasicsVB();
         Benford_Basics_CS benford;
@@ -1898,7 +1898,7 @@ namespace CS_Classes
 
 
 
-    public class Bezier_Basics_CS : VB_Parent
+    public class Bezier_Basics_CS : TaskParent
     {
         public cv.Point[] points;
 
@@ -1951,7 +1951,7 @@ namespace CS_Classes
 
 
 
-    public class Bezier_Example_CS : VB_Parent
+    public class Bezier_Example_CS : TaskParent
     {
         Bezier_Basics_CS bezier;
         public cv.Point[] points;
@@ -1990,7 +1990,7 @@ namespace CS_Classes
 
 
 
-    public class BGRPattern_Basics_CS : VB_Parent
+    public class BGRPattern_Basics_CS : TaskParent
     {
         Denoise_Pixels_CPP_VB denoise = new Denoise_Pixels_CPP_VB();
         Color_Basics colorFmt = new Color_Basics();
@@ -2037,7 +2037,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_Basics_CS : VB_Parent
+    public class BGSubtract_Basics_CS : TaskParent
     {
         public Options_BGSubtract options = new Options_BGSubtract();
 
@@ -2082,7 +2082,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_Basics_QT_CS : VB_Parent
+    public class BGSubtract_Basics_QT_CS : TaskParent
     {
         double learnRate;
 
@@ -2116,7 +2116,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_MOG2_CS : VB_Parent
+    public class BGSubtract_MOG2_CS : TaskParent
     {
         BackgroundSubtractorMOG2 MOG2;
         Options_BGSubtract options = new Options_BGSubtract();
@@ -2142,7 +2142,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_MOG2_QT_CS : VB_Parent
+    public class BGSubtract_MOG2_QT_CS : TaskParent
     {
         BackgroundSubtractorMOG2 MOG2;
 
@@ -2166,7 +2166,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_MOG_CS : VB_Parent
+    public class BGSubtract_MOG_CS : TaskParent
     {
         BackgroundSubtractorMOG MOG;
         Options_BGSubtract options = new Options_BGSubtract();
@@ -2187,7 +2187,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_GMG_KNN_CS : VB_Parent
+    public class BGSubtract_GMG_KNN_CS : TaskParent
     {
         BackgroundSubtractorGMG gmg;
         BackgroundSubtractorKNN knn;
@@ -2220,7 +2220,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_MOG_RGBDepth_CS : VB_Parent
+    public class BGSubtract_MOG_RGBDepth_CS : TaskParent
     {
         public Mat grayMat = new Mat();
         Options_BGSubtract options = new Options_BGSubtract();
@@ -2249,7 +2249,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_MotionDetect_CS : VB_Parent
+    public class BGSubtract_MotionDetect_CS : TaskParent
     {
         Options_MotionDetect options = new Options_MotionDetect();
 
@@ -2309,7 +2309,7 @@ namespace CS_Classes
 
 
 
-    public class Benford_JPEG_CS : VB_Parent
+    public class Benford_JPEG_CS : TaskParent
     {
         public Benford_Basics benford = new Benford_Basics();
         Options_JpegQuality options = new Options_JpegQuality();
@@ -2337,7 +2337,7 @@ namespace CS_Classes
 
 
 
-    public class Benford_JPEG99_CS : VB_Parent
+    public class Benford_JPEG99_CS : TaskParent
     {
         public Benford_Basics benford = new Benford_Basics();
         public Options_JpegQuality options = new Options_JpegQuality();
@@ -2366,7 +2366,7 @@ namespace CS_Classes
 
 
 
-    public class Benford_PNG_CS : VB_Parent
+    public class Benford_PNG_CS : TaskParent
     {
         Options_PNGCompression options = new Options_PNGCompression();
         public Benford_Basics benford = new Benford_Basics();
@@ -2393,7 +2393,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_MOG_Retina_CS : VB_Parent
+    public class BGSubtract_MOG_Retina_CS : TaskParent
     {
         BGSubtract_MOG_CS bgSub;
         Retina_Basics_CPP_VB retina = new Retina_Basics_CPP_VB();
@@ -2417,7 +2417,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_DepthOrColorMotion_CS : VB_Parent
+    public class BGSubtract_DepthOrColorMotion_CS : TaskParent
     {
         public Diff_UnstableDepthAndColor motion = new Diff_UnstableDepthAndColor();
 
@@ -2439,7 +2439,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_Video_CS : VB_Parent
+    public class BGSubtract_Video_CS : TaskParent
     {
         BGSubtract_Basics_CS bgSub;
         Video_Basics video = new Video_Basics();
@@ -2464,7 +2464,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_Synthetic_CS : VB_Parent
+    public class BGSubtract_Synthetic_CS : TaskParent
     {
         BGSubtract_Basics_CS bgSub;
         BGSubtract_Synthetic synth = new BGSubtract_Synthetic();
@@ -2487,7 +2487,7 @@ namespace CS_Classes
 
 
 
-    public class BGSubtract_Reduction_CS : VB_Parent
+    public class BGSubtract_Reduction_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         BGSubtract_Basics bgSub = new BGSubtract_Basics();
@@ -2513,7 +2513,7 @@ namespace CS_Classes
 
 
 
-    public class Bin2Way_Basics_CS : VB_Parent
+    public class Bin2Way_Basics_CS : TaskParent
     {
         public Hist_Basics hist = new Hist_Basics();
         public Mat_4Click_CS mats;
@@ -2565,7 +2565,7 @@ namespace CS_Classes
 
 
 
-    public class Bin2Way_KMeans_CS : VB_Parent
+    public class Bin2Way_KMeans_CS : TaskParent
     {
         public Bin2Way_Basics bin2 = new Bin2Way_Basics();
         KMeans_Dimensions kmeans = new KMeans_Dimensions();
@@ -2599,7 +2599,7 @@ namespace CS_Classes
 
 
 
-    public class Bin2Way_RedCloudDarkest_CS : VB_Parent
+    public class Bin2Way_RedCloudDarkest_CS : TaskParent
     {
         Bin2Way_RecurseOnce bin2 = new Bin2Way_RecurseOnce();
         Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -2623,7 +2623,7 @@ namespace CS_Classes
 
 
 
-    public class Bin2Way_RedCloudLightest_CS : VB_Parent
+    public class Bin2Way_RedCloudLightest_CS : TaskParent
     {
         Bin2Way_RecurseOnce bin2 = new Bin2Way_RecurseOnce();
         Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -2647,7 +2647,7 @@ namespace CS_Classes
 
 
 
-    public class Bin2Way_RecurseOnce_CS : VB_Parent
+    public class Bin2Way_RecurseOnce_CS : TaskParent
     {
         Bin2Way_Basics bin2 = new Bin2Way_Basics();
         public Mat_4Click mats = new Mat_4Click();
@@ -2692,7 +2692,7 @@ namespace CS_Classes
 
 
 
-    public class Bin2Way_RedCloud_CS : VB_Parent
+    public class Bin2Way_RedCloud_CS : TaskParent
     {
         Bin2Way_RecurseOnce bin2 = new Bin2Way_RecurseOnce();
         Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -2750,7 +2750,7 @@ namespace CS_Classes
 
 
 
-    public class Bin3Way_Basics_CS : VB_Parent
+    public class Bin3Way_Basics_CS : TaskParent
     {
         Hist_Basics hist = new Hist_Basics();
         public Mat_4Click mats = new Mat_4Click();
@@ -2817,7 +2817,7 @@ namespace CS_Classes
 
 
 
-    public class Bin3Way_KMeans_CS : VB_Parent
+    public class Bin3Way_KMeans_CS : TaskParent
     {
         public Bin3Way_Basics bin3 = new Bin3Way_Basics();
         KMeans_Dimensions kmeans = new KMeans_Dimensions();
@@ -2851,7 +2851,7 @@ namespace CS_Classes
 
 
 
-    public class Bin3Way_Color_CS : VB_Parent
+    public class Bin3Way_Color_CS : TaskParent
     {
         Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
 
@@ -2876,7 +2876,7 @@ namespace CS_Classes
 
 
 
-    public class Bin3Way_RedCloudDarkest_CS : VB_Parent
+    public class Bin3Way_RedCloudDarkest_CS : TaskParent
     {
         Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
         Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -2899,7 +2899,7 @@ namespace CS_Classes
 
 
 
-    public class Bin3Way_RedCloudLightest_CS : VB_Parent
+    public class Bin3Way_RedCloudLightest_CS : TaskParent
     {
         Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
         Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -2922,7 +2922,7 @@ namespace CS_Classes
 
 
 
-    public class Bin3Way_RedCloudOther_CS : VB_Parent
+    public class Bin3Way_RedCloudOther_CS : TaskParent
     {
         Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
         Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -2949,7 +2949,7 @@ namespace CS_Classes
 
 
 
-    public class Bin3Way_RedCloud1_CS : VB_Parent
+    public class Bin3Way_RedCloud1_CS : TaskParent
     {
         Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
         Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -3016,7 +3016,7 @@ namespace CS_Classes
 
 
 
-    public class Bin3Way_RedCloud_CS : VB_Parent
+    public class Bin3Way_RedCloud_CS : TaskParent
     {
         Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
         Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -3071,7 +3071,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_Basics_CS : VB_Parent
+    public class Bin4Way_Basics_CS : TaskParent
     {
         Mat_4to1_CS mats;
         Bin4Way_SplitMean_CS binary;
@@ -3189,7 +3189,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_BasicsColors_CS : VB_Parent
+    public class Bin4Way_BasicsColors_CS : TaskParent
     {
         Bin4Way_Basics quart = new Bin4Way_Basics();
         Color8U_Basics color = new Color8U_Basics();
@@ -3217,7 +3217,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_Unstable_CS : VB_Parent
+    public class Bin4Way_Unstable_CS : TaskParent
     {
         Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
         Diff_Basics[] diff = new Diff_Basics[4];
@@ -3248,7 +3248,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_BasicsRed_CS : VB_Parent
+    public class Bin4Way_BasicsRed_CS : TaskParent
     {
         public Mat_4to1 mats = new Mat_4to1();
         Hist_Basics hist = new Hist_Basics();
@@ -3302,7 +3302,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_Canny_CS : VB_Parent
+    public class Bin4Way_Canny_CS : TaskParent
     {
         Edge_Canny edges = new Edge_Canny();
         Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
@@ -3348,7 +3348,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_Sobel_CS : VB_Parent
+    public class Bin4Way_Sobel_CS : TaskParent
     {
         Edge_Sobel edges = new Edge_Sobel();
         Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
@@ -3388,7 +3388,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_Unstable1_CS : VB_Parent
+    public class Bin4Way_Unstable1_CS : TaskParent
     {
         Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
         Diff_Basics diff = new Diff_Basics();
@@ -3416,7 +3416,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_UnstableEdges_CS : VB_Parent
+    public class Bin4Way_UnstableEdges_CS : TaskParent
     {
         Edge_Canny canny = new Edge_Canny();
         Blur_Basics blur = new Blur_Basics();
@@ -3451,7 +3451,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_UnstablePixels_CS : VB_Parent
+    public class Bin4Way_UnstablePixels_CS : TaskParent
     {
         Bin4Way_UnstableEdges unstable = new Bin4Way_UnstableEdges();
         public List<byte> gapValues = new List<byte>();
@@ -3526,7 +3526,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_SplitValley_CS : VB_Parent
+    public class Bin4Way_SplitValley_CS : TaskParent
     {
         Binarize_Simple binary = new Binarize_Simple();
         HistValley_Basics valley = new HistValley_Basics();
@@ -3563,7 +3563,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_UnstablePixels1_CS : VB_Parent
+    public class Bin4Way_UnstablePixels1_CS : TaskParent
     {
         Hist_Basics hist = new Hist_Basics();
         Bin4Way_UnstableEdges unstable = new Bin4Way_UnstableEdges();
@@ -3656,7 +3656,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_Regions1_CS : VB_Parent
+    public class Bin4Way_Regions1_CS : TaskParent
     {
         Binarize_Simple binary = new Binarize_Simple();
         public Mat_4Click mats = new Mat_4Click();
@@ -3693,7 +3693,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_SplitGaps_CS : VB_Parent
+    public class Bin4Way_SplitGaps_CS : TaskParent
     {
         Bin4Way_UnstablePixels unstable = new Bin4Way_UnstablePixels();
         public Mat_4Click mats = new Mat_4Click();
@@ -3741,7 +3741,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_RegionsLeftRight_CS : VB_Parent
+    public class Bin4Way_RegionsLeftRight_CS : TaskParent
     {
         Bin4Way_SplitGaps binaryLeft = new Bin4Way_SplitGaps();
         Bin4Way_SplitGaps binaryRight = new Bin4Way_SplitGaps();
@@ -3780,7 +3780,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_RedCloud_CS : VB_Parent
+    public class Bin4Way_RedCloud_CS : TaskParent
     {
         Bin4Way_BasicsRed bin2 = new Bin4Way_BasicsRed();
         Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -3834,7 +3834,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_Regions_CS : VB_Parent
+    public class Bin4Way_Regions_CS : TaskParent
     {
         Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
         public int classCount = 4; // 4-way split 
@@ -3873,7 +3873,7 @@ namespace CS_Classes
 
 
 
-    public class Bin4Way_SplitMean_CS : VB_Parent
+    public class Bin4Way_SplitMean_CS : TaskParent
     {
         public Binarize_Simple_CS binary;
         public Mat_4Click_CS mats;
@@ -3916,7 +3916,7 @@ namespace CS_Classes
 
 
 
-    public class Binarize_Basics_CS : VB_Parent
+    public class Binarize_Basics_CS : TaskParent
     {
         public ThresholdTypes thresholdType = ThresholdTypes.Otsu;
         public Mat histogram = new Mat();
@@ -3957,7 +3957,7 @@ namespace CS_Classes
 
 
 
-    public class Binarize_OTSU_CS : VB_Parent
+    public class Binarize_OTSU_CS : TaskParent
     {
         Binarize_Basics binarize;
         Options_Binarize options = new Options_Binarize();
@@ -4004,7 +4004,7 @@ namespace CS_Classes
 
 
 
-    public class Binarize_KMeansMasks_CS : VB_Parent
+    public class Binarize_KMeansMasks_CS : TaskParent
     {
         KMeans_Image km = new KMeans_Image();
         Mat_4Click mats = new Mat_4Click();
@@ -4033,7 +4033,7 @@ namespace CS_Classes
 
 
 
-    public class Binarize_KMeansRGB_CS : VB_Parent
+    public class Binarize_KMeansRGB_CS : TaskParent
     {
         KMeans_Image km = new KMeans_Image();
         Mat_4Click mats = new Mat_4Click();
@@ -4064,7 +4064,7 @@ namespace CS_Classes
 
 
 
-    public class Binarize_FourPixelFlips_CS : VB_Parent
+    public class Binarize_FourPixelFlips_CS : TaskParent
     {
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
         Mat lastSubD;
@@ -4089,7 +4089,7 @@ namespace CS_Classes
 
 
 
-    public class Binarize_DepthTiers_CS : VB_Parent
+    public class Binarize_DepthTiers_CS : TaskParent
     {
         Depth_Tiers tiers = new Depth_Tiers();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
@@ -4125,7 +4125,7 @@ namespace CS_Classes
 
 
 
-    public class Binarize_Simple_CS : VB_Parent
+    public class Binarize_Simple_CS : TaskParent
     {
         public Scalar meanScalar;
         public int injectVal = 255;
@@ -4148,7 +4148,7 @@ namespace CS_Classes
 
 
 
-    public class Binarize_Niblack_Sauvola_CS : VB_Parent
+    public class Binarize_Niblack_Sauvola_CS : TaskParent
     {
         Options_BinarizeNiBlack options = new Options_BinarizeNiBlack();
         //[InlineData(LocalBinarizationMethods.Niblack)]
@@ -4177,7 +4177,7 @@ namespace CS_Classes
 
 
 
-    public class Binarize_Wolf_Nick_CS : VB_Parent
+    public class Binarize_Wolf_Nick_CS : TaskParent
     {
         Options_BinarizeNiBlack options = new Options_BinarizeNiBlack();
         public Binarize_Wolf_Nick_CS()
@@ -4202,7 +4202,7 @@ namespace CS_Classes
 
 
 
-    public class Blob_Input_CS : VB_Parent
+    public class Blob_Input_CS : TaskParent
     {
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
         Draw_Circles circles = new Draw_Circles();
@@ -4246,7 +4246,7 @@ namespace CS_Classes
 
 
 
-    public class Blob_RenderBlobs_CS : VB_Parent
+    public class Blob_RenderBlobs_CS : TaskParent
     {
         Blob_Input input = new Blob_Input();
 
@@ -4290,7 +4290,7 @@ namespace CS_Classes
 
 
 
-    public class BlockMatching_Basics_CS : VB_Parent
+    public class BlockMatching_Basics_CS : TaskParent
     {
         Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
         Options_BlockMatching options = new Options_BlockMatching();
@@ -4351,7 +4351,7 @@ namespace CS_Classes
 
 
 
-    public class Blur_Basics_CS : VB_Parent
+    public class Blur_Basics_CS : TaskParent
     {
         Options_Blur options = new Options_Blur();
         public Blur_Basics_CS()
@@ -4370,7 +4370,7 @@ namespace CS_Classes
 
 
 
-    public class Blur_Homogeneous_CS : VB_Parent
+    public class Blur_Homogeneous_CS : TaskParent
     {
         Blur_Basics blur = new Blur_Basics();
         public Blur_Homogeneous_CS()
@@ -4386,7 +4386,7 @@ namespace CS_Classes
 
 
 
-    public class Blur_Median_CS : VB_Parent
+    public class Blur_Median_CS : TaskParent
     {
         Blur_Basics blur = new Blur_Basics();
         public Blur_Median_CS()
@@ -4405,7 +4405,7 @@ namespace CS_Classes
 
 
 
-    public class Blur_Bilateral_CS : VB_Parent
+    public class Blur_Bilateral_CS : TaskParent
     {
         Blur_Basics blur = new Blur_Basics();
         public Blur_Bilateral_CS()
@@ -4422,7 +4422,7 @@ namespace CS_Classes
 
 
 
-    public class Blur_PlusHistogram_CS : VB_Parent
+    public class Blur_PlusHistogram_CS : TaskParent
     {
         Mat_2to1 mat2to1 = new Mat_2to1();
         Blur_Bilateral blur = new Blur_Bilateral();
@@ -4454,7 +4454,7 @@ namespace CS_Classes
 
 
 
-    public class Blur_Detection_CS : VB_Parent
+    public class Blur_Detection_CS : TaskParent
     {
         Laplacian_Basics laplace = new Laplacian_Basics();
         Blur_Basics blur = new Blur_Basics();
@@ -4496,7 +4496,7 @@ namespace CS_Classes
 
 
 
-    public class Blur_Depth_CS : VB_Parent
+    public class Blur_Depth_CS : TaskParent
     {
         Blur_Basics blur = new Blur_Basics();
 
@@ -4517,7 +4517,7 @@ namespace CS_Classes
 
 
 
-    public class Blur_TopoMap_CS : VB_Parent
+    public class Blur_TopoMap_CS : TaskParent
     {
         Gradient_CartToPolar gradient = new Gradient_CartToPolar();
         AddWeighted_Basics addw = new AddWeighted_Basics();
@@ -4565,7 +4565,7 @@ namespace CS_Classes
 
 
 
-    public class BlurMotion_Basics_CS : VB_Parent
+    public class BlurMotion_Basics_CS : TaskParent
     {
         public Mat kernel;
         public Options_MotionBlur options = new Options_MotionBlur();
@@ -4607,7 +4607,7 @@ namespace CS_Classes
 
 
 
-    public class BlurMotion_Deblur_CS : VB_Parent
+    public class BlurMotion_Deblur_CS : TaskParent
     {
         BlurMotion_Basics_CS mblur;
 
@@ -4751,7 +4751,7 @@ namespace CS_Classes
 
 
 
-    public class Boundary_Basics_CS : VB_Parent
+    public class Boundary_Basics_CS : TaskParent
     {
         public RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public List<cv.Rect> rects = new List<cv.Rect>();
@@ -4821,7 +4821,7 @@ namespace CS_Classes
 
 
 
-    public class Boundary_Tiers_CS : VB_Parent
+    public class Boundary_Tiers_CS : TaskParent
     {
         Boundary_Basics cells = new Boundary_Basics();
         Contour_DepthTiers contours = new Contour_DepthTiers();
@@ -4852,7 +4852,7 @@ namespace CS_Classes
 
 
 
-    public class Boundary_Rectangles_CS : VB_Parent
+    public class Boundary_Rectangles_CS : TaskParent
     {
         public Boundary_Basics bounds = new Boundary_Basics();
         public List<cv.Rect> rects = new List<cv.Rect>();
@@ -4922,7 +4922,7 @@ namespace CS_Classes
 
 
 
-    public class Boundary_RemovedRects_CS : VB_Parent
+    public class Boundary_RemovedRects_CS : TaskParent
     {
         public Boundary_Rectangles bRects = new Boundary_Rectangles();
 
@@ -4953,7 +4953,7 @@ namespace CS_Classes
 
 
 
-    public class Boundary_Overlap_CS : VB_Parent
+    public class Boundary_Overlap_CS : TaskParent
     {
         Boundary_Basics bounds = new Boundary_Basics();
 
@@ -4998,7 +4998,7 @@ namespace CS_Classes
 
 
 
-    public class Brightness_Basics_CS : VB_Parent
+    public class Brightness_Basics_CS : TaskParent
     {
         Options_BrightnessContrast Options = new Options_BrightnessContrast();
 
@@ -5021,7 +5021,7 @@ namespace CS_Classes
 
 
 
-    public class Brightness_HSV_CS : VB_Parent
+    public class Brightness_HSV_CS : TaskParent
     {
         Options_BrightnessContrast Options = new Options_BrightnessContrast();
 
@@ -5056,7 +5056,7 @@ namespace CS_Classes
 
 
 
-    public class BRISK_Basics_CS : VB_Parent
+    public class BRISK_Basics_CS : TaskParent
     {
         BRISK brisk;
         public List<cv.Point2f> features = new List<cv.Point2f>();
@@ -5096,7 +5096,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_Basics_CS : VB_Parent
+    public class BackProject2D_Basics_CS : TaskParent
     {
         public Hist2D_Basics hist2d = new Hist2D_Basics();
         public Color_Basics colorFmt = new Color_Basics();
@@ -5166,7 +5166,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_BasicsOld_CS : VB_Parent
+    public class BackProject2D_BasicsOld_CS : TaskParent
     {
         public Hist2D_Basics hist2d = new Hist2D_Basics();
         public int xRange = 255;
@@ -5212,7 +5212,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_RowCol_CS : VB_Parent
+    public class BackProject2D_RowCol_CS : TaskParent
     {
         BackProject2D_Basics backp = new BackProject2D_Basics();
         Options_BackProject2D options = new Options_BackProject2D();
@@ -5267,7 +5267,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_Compare_CS : VB_Parent
+    public class BackProject2D_Compare_CS : TaskParent
     {
         PhotoShop_Hue hueSat = new PhotoShop_Hue();
         BackProject2D_Basics_CS backP;
@@ -5307,7 +5307,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_Top_CS : VB_Parent
+    public class BackProject2D_Top_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
 
@@ -5332,7 +5332,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_Side_CS : VB_Parent
+    public class BackProject2D_Side_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
 
@@ -5357,7 +5357,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_Filter_CS : VB_Parent
+    public class BackProject2D_Filter_CS : TaskParent
     {
         public int threshold;
 
@@ -5383,7 +5383,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_FilterSide_CS : VB_Parent
+    public class BackProject2D_FilterSide_CS : TaskParent
     {
         public BackProject2D_Filter filter = new BackProject2D_Filter();
         Options_HistXD options = new Options_HistXD();
@@ -5416,7 +5416,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_FilterTop_CS : VB_Parent
+    public class BackProject2D_FilterTop_CS : TaskParent
     {
         BackProject2D_Filter filter = new BackProject2D_Filter();
         Options_HistXD options = new Options_HistXD();
@@ -5449,7 +5449,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_FilterBoth_CS : VB_Parent
+    public class BackProject2D_FilterBoth_CS : TaskParent
     {
         BackProject2D_FilterSide filterSide = new BackProject2D_FilterSide();
         BackProject2D_FilterTop filterTop = new BackProject2D_FilterTop();
@@ -5473,7 +5473,7 @@ namespace CS_Classes
 
 
 
-    public class BackProject2D_Full_CS : VB_Parent
+    public class BackProject2D_Full_CS : TaskParent
     {
         BackProject2D_Basics_CS backP;
         public int classCount;
@@ -5498,7 +5498,7 @@ namespace CS_Classes
 
 
 
-    public class CameraMotion_Basics_CS : VB_Parent
+    public class CameraMotion_Basics_CS : TaskParent
     {
         public int translationX;
         public int translationY;
@@ -5604,7 +5604,7 @@ namespace CS_Classes
 
 
 
-    public class CameraMotion_WithRotation_CS : VB_Parent
+    public class CameraMotion_WithRotation_CS : TaskParent
     {
         public float translationX;
         public float rotationX;
@@ -5713,7 +5713,7 @@ namespace CS_Classes
 
 
 
-    public class CameraMotion_SceneMotion_CS : VB_Parent
+    public class CameraMotion_SceneMotion_CS : TaskParent
     {
         CameraMotion_Basics cMotion = new CameraMotion_Basics();
         Motion_Basics motion = new Motion_Basics();
@@ -5734,7 +5734,7 @@ namespace CS_Classes
 
 
 
-    public class CamShift_Basics_CS : VB_Parent
+    public class CamShift_Basics_CS : TaskParent
     {
         public RotatedRect trackBox = new RotatedRect();
         CamShift_RedHue redHue = new CamShift_RedHue();
@@ -5778,7 +5778,7 @@ namespace CS_Classes
 
 
 
-    public class CamShift_RedHue_CS : VB_Parent
+    public class CamShift_RedHue_CS : TaskParent
     {
         Options_CamShift options = new Options_CamShift();
         public CamShift_RedHue_CS()
@@ -5799,7 +5799,7 @@ namespace CS_Classes
 
 
 
-    public class Cartoonify_Basics_CS : VB_Parent
+    public class Cartoonify_Basics_CS : TaskParent
     {
         Options_Cartoonify options = new Options_Cartoonify();
         public Cartoonify_Basics_CS()
@@ -5825,7 +5825,7 @@ namespace CS_Classes
 
 
 
-    public class Pixel_Unstable_CS : VB_Parent
+    public class Pixel_Unstable_CS : TaskParent
     {
         KMeans_Basics km = new KMeans_Basics();
         List<int> pixelCounts = new List<int>();
@@ -5873,7 +5873,7 @@ namespace CS_Classes
 
 
 
-    public class CComp_Basics_CS : VB_Parent
+    public class CComp_Basics_CS : TaskParent
     {
         public ConnectedComponents connectedComponents;
         public List<cv.Rect> rects = new List<cv.Rect>();
@@ -5916,7 +5916,7 @@ namespace CS_Classes
 
 
 
-    public class CComp_Shapes_CS : VB_Parent
+    public class CComp_Shapes_CS : TaskParent
     {
         Mat shapes;
         Mat_4Click mats = new Mat_4Click();
@@ -5956,7 +5956,7 @@ namespace CS_Classes
 
 
 
-    public class CComp_Both_CS : VB_Parent
+    public class CComp_Both_CS : TaskParent
     {
         CComp_Stats above = new CComp_Stats();
         CComp_Stats below = new CComp_Stats();
@@ -5979,7 +5979,7 @@ namespace CS_Classes
 
 
 
-    public class CComp_Hulls_CS : VB_Parent
+    public class CComp_Hulls_CS : TaskParent
     {
         CComp_Both ccomp = new CComp_Both();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -6002,7 +6002,7 @@ namespace CS_Classes
 
 
 
-    public class CComp_Stats_CS : VB_Parent
+    public class CComp_Stats_CS : TaskParent
     {
         public List<Mat> masks = new List<Mat>();
         public List<cv.Rect> rects = new List<cv.Rect>();
@@ -6069,7 +6069,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_Basics_CS : VB_Parent
+    public class Cell_Basics_CS : TaskParent
     {
         Hist_Depth plot = new Hist_Depth();
         PCA_Basics pca = new PCA_Basics();
@@ -6151,7 +6151,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_PixelCountCompare_CS : VB_Parent
+    public class Cell_PixelCountCompare_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public Cell_PixelCountCompare_CS()
@@ -6194,7 +6194,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_ValidateColorCells_CS : VB_Parent
+    public class Cell_ValidateColorCells_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public Cell_ValidateColorCells_CS()
@@ -6244,7 +6244,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_Distance_CS : VB_Parent
+    public class Cell_Distance_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public Cell_Distance_CS()
@@ -6288,7 +6288,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_Binarize_CS : VB_Parent
+    public class Cell_Binarize_CS : TaskParent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public Cell_Binarize_CS()
@@ -6335,7 +6335,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_Floodfill_CS : VB_Parent
+    public class Cell_Floodfill_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         Cell_Basics stats = new Cell_Basics();
@@ -6358,7 +6358,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_BasicsPlot_CS : VB_Parent
+    public class Cell_BasicsPlot_CS : TaskParent
     {
         Hist_Depth plot = new Hist_Depth();
         public bool runRedCloud;
@@ -6409,7 +6409,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_Stable_CS : VB_Parent
+    public class Cell_Stable_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public Cell_Stable_CS()
@@ -6440,7 +6440,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_Generate_CS : VB_Parent
+    public class Cell_Generate_CS : TaskParent
     {
         public int classCount;
         public List<cv.Rect> rectList = new List<cv.Rect>();
@@ -6596,7 +6596,7 @@ namespace CS_Classes
 
 
 
-    public class CellularAutomata_Life_CS : VB_Parent
+    public class CellularAutomata_Life_CS : TaskParent
     {
         public int lastPopulation;
         Random_Basics_CS random;
@@ -6718,7 +6718,7 @@ namespace CS_Classes
 
 
 
-    public class CellularAutomata_LifeColor_CS : VB_Parent
+    public class CellularAutomata_LifeColor_CS : TaskParent
     {
         CellularAutomata_Life_CS game;
         public CellularAutomata_LifeColor_CS()
@@ -6753,7 +6753,7 @@ namespace CS_Classes
 
 
 
-    public class CellularAutomata_LifePopulation_CS : VB_Parent
+    public class CellularAutomata_LifePopulation_CS : TaskParent
     {
         Plot_OverTimeSingle plot = new Plot_OverTimeSingle();
         CellularAutomata_Life_CS game;
@@ -6778,7 +6778,7 @@ namespace CS_Classes
 
 
 
-    public class CellularAutomata_All256_CS : VB_Parent
+    public class CellularAutomata_All256_CS : TaskParent
     {
         CellularAutomata_Basics_CS cell;
         Options_CellAutomata options = new Options_CellAutomata();
@@ -6826,7 +6826,7 @@ namespace CS_Classes
 
 
 
-    public class CellularAutomata_MultiPoint_CS : VB_Parent
+    public class CellularAutomata_MultiPoint_CS : TaskParent
     {
         CellularAutomata_Basics_CS cell;
         Options_CellAutomata options = new Options_CellAutomata();
@@ -6857,7 +6857,7 @@ namespace CS_Classes
 
 
 
-    public class CellularAutomata_Basics_CS : VB_Parent
+    public class CellularAutomata_Basics_CS : TaskParent
     {
         string[] i18 = {"00011110 Rule 30 (chaotic)", "00110110 Rule 54", "00111100 Rule 60", "00111110 Rule 62",
                                   "01011010 Rule 90", "01011110 Rule 94", "01100110 Rule 102", "01101110 Rule 110",
@@ -6929,7 +6929,7 @@ namespace CS_Classes
 
 
 
-    public class Classifier_Basics_CS : VB_Parent
+    public class Classifier_Basics_CS : TaskParent
     {
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_Open();
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void OEX_Points_Classifier_Close(IntPtr cPtr);
@@ -6970,7 +6970,7 @@ namespace CS_Classes
 
 
 
-    public class Classifier_Bayesian_CS : VB_Parent
+    public class Classifier_Bayesian_CS : TaskParent
     {
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr OEX_Points_Classifier_Open();
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void OEX_Points_Classifier_Close(IntPtr cPtr);
@@ -7012,7 +7012,7 @@ namespace CS_Classes
 
 
 
-    public class Classifier_BayesianTest_CS : VB_Parent
+    public class Classifier_BayesianTest_CS : TaskParent
     {
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr Classifier_Bayesian_Open();
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void Classifier_Bayesian_Close(IntPtr cPtr);
@@ -7115,7 +7115,7 @@ namespace CS_Classes
 
 
 
-    public class Clone_Basics_CS : VB_Parent
+    public class Clone_Basics_CS : TaskParent
     {
         public Vec3f colorChangeValues;
         public Vec2f illuminationChangeValues;
@@ -7161,7 +7161,7 @@ namespace CS_Classes
 
 
 
-    public class Clone_ColorChange_CS : VB_Parent
+    public class Clone_ColorChange_CS : TaskParent
     {
         Clone_Basics clone = new Clone_Basics();
         Options_Clone options = new Options_Clone();
@@ -7188,7 +7188,7 @@ namespace CS_Classes
 
 
 
-    public class Clone_IlluminationChange_CS : VB_Parent
+    public class Clone_IlluminationChange_CS : TaskParent
     {
         Clone_Basics clone = new Clone_Basics();
         Options_Clone options = new Options_Clone();
@@ -7214,7 +7214,7 @@ namespace CS_Classes
 
 
 
-    public class Clone_TextureFlattening_CS : VB_Parent
+    public class Clone_TextureFlattening_CS : TaskParent
     {
         Clone_Basics clone = new Clone_Basics();
         Options_Clone options = new Options_Clone();
@@ -7240,7 +7240,7 @@ namespace CS_Classes
 
 
 
-    public class Clone_Eagle_CS : VB_Parent
+    public class Clone_Eagle_CS : TaskParent
     {
         Mat sourceImage;
         Mat mask;
@@ -7292,7 +7292,7 @@ namespace CS_Classes
 
 
 
-    public class Clone_Seamless_CS : VB_Parent
+    public class Clone_Seamless_CS : TaskParent
     {
         Options_Clone options = new Options_Clone();
         public Clone_Seamless_CS()
@@ -7327,7 +7327,7 @@ namespace CS_Classes
 
 
 
-    public class Cluster_Basics_CS : VB_Parent
+    public class Cluster_Basics_CS : TaskParent
     {
         KNN_Basics knn = new KNN_Basics();
         public List<cv.Point> ptInput = new List<cv.Point>();
@@ -7410,7 +7410,7 @@ namespace CS_Classes
     }
 
 
-    public class Cluster_RedCloud_CS : VB_Parent
+    public class Cluster_RedCloud_CS : TaskParent
     {
         Cluster_Basics cluster = new Cluster_Basics();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -7440,7 +7440,7 @@ namespace CS_Classes
 
 
 
-    public class Cluster_Hulls_CS : VB_Parent
+    public class Cluster_Hulls_CS : TaskParent
     {
         Cluster_Basics cluster = new Cluster_Basics();
         public List<List<cv.Point>> hulls = new List<List<cv.Point>>();
@@ -7484,7 +7484,7 @@ namespace CS_Classes
 
 
 
-    public class Coherence_Basics_CS : VB_Parent
+    public class Coherence_Basics_CS : TaskParent
     {
         Options_Coherence options = new Options_Coherence();
         public Coherence_Basics_CS()
@@ -7569,7 +7569,7 @@ namespace CS_Classes
 
 
 
-    public class Coherence_Depth_CS : VB_Parent
+    public class Coherence_Depth_CS : TaskParent
     {
         Coherence_Basics coherent = new Coherence_Basics();
         public Coherence_Depth_CS()
@@ -7586,7 +7586,7 @@ namespace CS_Classes
 
 
 
-    public class Color_Basics_CS : VB_Parent
+    public class Color_Basics_CS : TaskParent
     {
         public Options_Color options = new Options_Color();
         public Color_Basics_CS()
@@ -7629,7 +7629,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Basics_CS : VB_Parent
+    public class Color8U_Basics_CS : TaskParent
     {
         public int classCount;
         public object classifier;
@@ -7718,7 +7718,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Grayscale_CS : VB_Parent
+    public class Color8U_Grayscale_CS : TaskParent
     {
         Options_Grayscale8U options = new Options_Grayscale8U();
 
@@ -7755,7 +7755,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Depth_CS : VB_Parent
+    public class Color8U_Depth_CS : TaskParent
     {
         public Reduction_Basics reduction = new Reduction_Basics();
         public Depth_InRange_CS depth;
@@ -7786,7 +7786,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_KMeans_CS : VB_Parent
+    public class Color8U_KMeans_CS : TaskParent
     {
         public KMeans_Basics km0 = new KMeans_Basics();
         public KMeans_Basics km1 = new KMeans_Basics();
@@ -7827,7 +7827,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_RedHue_CS : VB_Parent
+    public class Color8U_RedHue_CS : TaskParent
     {
         Options_CamShift options = new Options_CamShift();
 
@@ -7853,7 +7853,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Complementary_CS : VB_Parent
+    public class Color8U_Complementary_CS : TaskParent
     {
         public Color8U_Complementary_CS()
         {
@@ -7875,7 +7875,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_ComplementaryTest_CS : VB_Parent
+    public class Color8U_ComplementaryTest_CS : TaskParent
     {
         Image_Basics images = new Image_Basics();
         Color8U_Complementary comp = new Color8U_Complementary();
@@ -7901,7 +7901,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_InRange_CS : VB_Parent
+    public class Color8U_InRange_CS : TaskParent
     {
         public Color8U_InRange_CS()
         {
@@ -7922,7 +7922,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_TopX_CS : VB_Parent
+    public class Color8U_TopX_CS : TaskParent
     {
         Hist3Dcolor_TopXColors topX = new Hist3Dcolor_TopXColors();
         Options_Color8UTopX options = new Options_Color8UTopX();
@@ -7971,7 +7971,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Common_CS : VB_Parent
+    public class Color8U_Common_CS : TaskParent
     {
         List<Vec3b> common = new List<Vec3b>();
         List<Scalar> commonScalar = new List<Scalar> { Scalar.Blue, Scalar.Green, Scalar.Red, Scalar.Yellow, Scalar.Pink, Scalar.Purple, Scalar.Brown,
@@ -8010,7 +8010,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Smoothing_CS : VB_Parent
+    public class Color8U_Smoothing_CS : TaskParent
     {
         History_Basics frames = new History_Basics();
 
@@ -8033,7 +8033,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Denoise_CS : VB_Parent
+    public class Color8U_Denoise_CS : TaskParent
     {
         Denoise_Pixels_CPP_VB denoise = new Denoise_Pixels_CPP_VB();
 
@@ -8056,7 +8056,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_MotionFiltered_CS : VB_Parent
+    public class Color8U_MotionFiltered_CS : TaskParent
     {
         Color8U_Basics colorClass = new Color8U_Basics();
         public int classCount;
@@ -8082,7 +8082,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Hue_CS : VB_Parent
+    public class Color8U_Hue_CS : TaskParent
     {
         public Color8U_Hue_CS()
         {
@@ -8102,7 +8102,7 @@ namespace CS_Classes
 
 
 
-    public class Color8U_BlackAndWhite_CS : VB_Parent
+    public class Color8U_BlackAndWhite_CS : TaskParent
     {
         Options_StdevGrid options = new Options_StdevGrid();
 
@@ -8128,7 +8128,7 @@ namespace CS_Classes
 
 
 
-    public class Complexity_Basics_CS : VB_Parent
+    public class Complexity_Basics_CS : TaskParent
     {
         Complexity_Dots complex = new Complexity_Dots();
         public Complexity_Basics_CS()
@@ -8181,7 +8181,7 @@ namespace CS_Classes
 
 
 
-    public class Complexity_PlotOpenCV_CS : VB_Parent
+    public class Complexity_PlotOpenCV_CS : TaskParent
     {
         public Plot_Basics_CPP_VB plot = new Plot_Basics_CPP_VB();
         public int maxFrameCount;
@@ -8258,7 +8258,7 @@ namespace CS_Classes
 
 
 
-    public class Complexity_Dots_CS : VB_Parent
+    public class Complexity_Dots_CS : TaskParent
     {
         public Options_Complexity options = new Options_Complexity();
         public bool initialize = true;
@@ -8353,7 +8353,7 @@ namespace CS_Classes
 
 
 
-    public class Concat_Basics_CS : VB_Parent
+    public class Concat_Basics_CS : TaskParent
     {
         public Concat_Basics_CS()
         {
@@ -8375,7 +8375,7 @@ namespace CS_Classes
 
 
 
-    public class Concat_4way_CS : VB_Parent
+    public class Concat_4way_CS : TaskParent
     {
         public Mat[] img = new Mat[4];
         public Concat_4way_CS()
@@ -8411,7 +8411,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_Basics_CS : VB_Parent
+    public class Contour_Basics_CS : TaskParent
     {
         Color8U_Basics colorClass = new Color8U_Basics();
         public List<cv.Point[]> contourlist = new List<cv.Point[]>();
@@ -8470,7 +8470,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_General_CS : VB_Parent
+    public class Contour_General_CS : TaskParent
     {
         public List<cv.Point[]> contourlist = new List<cv.Point[]>();
         public cv.Point[][] allContours;
@@ -8527,7 +8527,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_GeneralWithOptions_CS : VB_Parent
+    public class Contour_GeneralWithOptions_CS : TaskParent
     {
         public List<cv.Point[]> contourlist = new List<cv.Point[]>();
         public cv.Point[][] allContours;
@@ -8584,7 +8584,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_RedCloudEdges_CS : VB_Parent
+    public class Contour_RedCloudEdges_CS : TaskParent
     {
         RedCloud_Cells redC = new RedCloud_Cells();
         EdgeDraw_Basics edges = new EdgeDraw_Basics();
@@ -8609,7 +8609,7 @@ namespace CS_Classes
             dst3 = dst1 & dst2;
         }
     }
-    public class Contour_RedCloud_CS : VB_Parent
+    public class Contour_RedCloud_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public Contour_RedCloud_CS()
@@ -8628,7 +8628,7 @@ namespace CS_Classes
             }
         }
     }
-    public class Contour_CompareToFeatureless_CS : VB_Parent
+    public class Contour_CompareToFeatureless_CS : TaskParent
     {
         Contour_WholeImage contour = new Contour_WholeImage();
         FeatureLess_Basics fLess = new FeatureLess_Basics();
@@ -8645,7 +8645,7 @@ namespace CS_Classes
             dst3 = fLess.dst2;
         }
     }
-    public class Contour_Smoothing_CS : VB_Parent
+    public class Contour_Smoothing_CS : TaskParent
     {
         Options_Contours2 options = new Options_Contours2();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -8669,7 +8669,7 @@ namespace CS_Classes
                                                " to " + approxContour.Count();
         }
     }
-    public class Contour_RC_AddContour_CS : VB_Parent
+    public class Contour_RC_AddContour_CS : TaskParent
     {
         public List<cv.Point> contour = new List<cv.Point>();
         public Options_Contours options = new Options_Contours();
@@ -8714,7 +8714,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_RotatedRects_CS : VB_Parent
+    public class Contour_RotatedRects_CS : TaskParent
     {
         public Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
         Contour_General basics = new Contour_General();
@@ -8747,7 +8747,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_RemoveLines_CS : VB_Parent
+    public class Contour_RemoveLines_CS : TaskParent
     {
         Options_Morphology options = new Options_Morphology();
         Mat image;
@@ -8809,7 +8809,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_Edges_CS : VB_Parent
+    public class Contour_Edges_CS : TaskParent
     {
         Edge_ResizeAdd edges = new Edge_ResizeAdd();
         Contour_General contour = new Contour_General();
@@ -8856,7 +8856,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_SidePoints_CS : VB_Parent
+    public class Contour_SidePoints_CS : TaskParent
     {
         public Vec3f vecLeft, vecRight, vecTop, vecBot;
         public cv.Point ptLeft, ptRight, ptTop, ptBot;
@@ -8915,7 +8915,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_Foreground_CS : VB_Parent
+    public class Contour_Foreground_CS : TaskParent
     {
         Foreground_KMeans km = new Foreground_KMeans();
         Contour_General contour = new Contour_General();
@@ -8945,7 +8945,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_Sorted_CS : VB_Parent
+    public class Contour_Sorted_CS : TaskParent
     {
         Contour_GeneralWithOptions contours = new Contour_GeneralWithOptions();
         SortedList<int, cv.Point[]> sortedContours = new SortedList<int, cv.Point[]>(new compareAllowIdenticalIntegerInverted());
@@ -9003,7 +9003,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_Outline_CS : VB_Parent
+    public class Contour_Outline_CS : TaskParent
     {
         public rcData rc = new rcData();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -9044,7 +9044,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_SelfIntersect_CS : VB_Parent
+    public class Contour_SelfIntersect_CS : TaskParent
     {
         public rcData rc = new rcData();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -9090,7 +9090,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_Largest_CS : VB_Parent
+    public class Contour_Largest_CS : TaskParent
     {
         public List<cv.Point> bestContour = new List<cv.Point>();
         public cv.Point[][] allContours;
@@ -9165,7 +9165,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_Compare_CS : VB_Parent
+    public class Contour_Compare_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public Options_Contours options = new Options_Contours();
@@ -9200,7 +9200,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_RedCloudCorners_CS : VB_Parent
+    public class Contour_RedCloudCorners_CS : TaskParent
     {
         public cv.Point[] corners = new cv.Point[4];
         public rcData rc = new rcData();
@@ -9261,7 +9261,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_Gray_CS : VB_Parent
+    public class Contour_Gray_CS : TaskParent
     {
         public List<cv.Point> contour = new List<cv.Point>();
         public Options_Contours options = new Options_Contours();
@@ -9310,7 +9310,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_WholeImage_CS : VB_Parent
+    public class Contour_WholeImage_CS : TaskParent
     {
         Contour_Basics contour = new Contour_Basics();
 
@@ -9343,7 +9343,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_DepthTiers_CS : VB_Parent
+    public class Contour_DepthTiers_CS : TaskParent
     {
         public Options_Contours options = new Options_Contours();
         public Options_DepthTiers optionsTiers = new Options_DepthTiers();
@@ -9410,7 +9410,7 @@ namespace CS_Classes
 
 
 
-    public class Contour_FromPoints_CS : VB_Parent
+    public class Contour_FromPoints_CS : TaskParent
     {
         Contour_Basics contour = new Contour_Basics();
         Random_Basics random = new Random_Basics();
@@ -9456,7 +9456,7 @@ namespace CS_Classes
 
 
 
-    public class Contrast_POW_CS : VB_Parent
+    public class Contrast_POW_CS : TaskParent
     {
         Options_BrightnessContrast options = new Options_BrightnessContrast();
         public Contrast_POW_CS()
@@ -9480,7 +9480,7 @@ namespace CS_Classes
 
 
 
-    public class Contrast_Basics_CS : VB_Parent
+    public class Contrast_Basics_CS : TaskParent
     {
         Options_BrightnessContrast options = new Options_BrightnessContrast();
 
@@ -9504,7 +9504,7 @@ namespace CS_Classes
 
 
 
-    public class Convex_Basics_CS : VB_Parent
+    public class Convex_Basics_CS : TaskParent
     {
         public cv.Point[] hull;
         Options_Convex options = new Options_Convex();
@@ -9567,7 +9567,7 @@ namespace CS_Classes
 
 
 
-    public class Convex_RedCloud_CS : VB_Parent
+    public class Convex_RedCloud_CS : TaskParent
     {
         Convex_Basics_CS convex;
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -9599,7 +9599,7 @@ namespace CS_Classes
 
 
 
-    public class Convex_Defects_CS : VB_Parent
+    public class Convex_Defects_CS : TaskParent
     {
         Contour_Largest_CS contours;
 
@@ -9637,7 +9637,7 @@ namespace CS_Classes
 
 
 
-    public class Convex_RedCloudDefects_CS : VB_Parent
+    public class Convex_RedCloudDefects_CS : TaskParent
     {
         Convex_RedCloud_CS convex;
         Contour_Largest_CS contours;
@@ -9720,7 +9720,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_Basics_CS : VB_Parent
+    public class Corners_Basics_CS : TaskParent
     {
         public List<cv.Point2f> features = new List<cv.Point2f>();
         public Options_Features options = new Options_Features();
@@ -9764,7 +9764,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_Harris_CS : VB_Parent
+    public class Corners_Harris_CS : TaskParent
     {
         public Options_HarrisCorners options = new Options_HarrisCorners();
         public Mat gray, mc;
@@ -9822,7 +9822,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_PreCornerDetect_CS : VB_Parent
+    public class Corners_PreCornerDetect_CS : TaskParent
     {
         public Math_Median_CDF median = new Math_Median_CDF();
         public Options_PreCorners options = new Options_PreCorners();
@@ -9853,7 +9853,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_ShiTomasi_CPP_CS : VB_Parent
+    public class Corners_ShiTomasi_CPP_CS : TaskParent
     {
         public Options_ShiTomasi options = new Options_ShiTomasi();
 
@@ -9889,7 +9889,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_BasicsCentroid_CS : VB_Parent
+    public class Corners_BasicsCentroid_CS : TaskParent
     {
         public Corners_Basics fast = new Corners_Basics();
         public Kalman_Basics kalman = new Kalman_Basics();
@@ -9924,7 +9924,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_BasicsStablePoints_CS : VB_Parent
+    public class Corners_BasicsStablePoints_CS : TaskParent
     {
         public List<cv.Point> features = new List<cv.Point>();
         public Corners_Basics fast = new Corners_Basics();
@@ -9970,7 +9970,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_BasicsCentroids_CS : VB_Parent
+    public class Corners_BasicsCentroids_CS : TaskParent
     {
         public Corners_Basics fast = new Corners_Basics();
         public Point2f[] fastCenters;
@@ -10011,7 +10011,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_Harris_CPP_CS : VB_Parent
+    public class Corners_Harris_CPP_CS : TaskParent
     {
         public AddWeighted_Basics addw = new AddWeighted_Basics();
         public Options_Harris options = new Options_Harris();
@@ -10062,7 +10062,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_HarrisDetector_CPP_CS : VB_Parent
+    public class Corners_HarrisDetector_CPP_CS : TaskParent
     {
         public List<cv.Point2f> features = new List<cv.Point2f>();
         public Options_Features options = new Options_Features();
@@ -10120,7 +10120,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_RedCloud_CS : VB_Parent
+    public class Corners_RedCloud_CS : TaskParent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public Neighbors_Intersects corners = new Neighbors_Intersects();
@@ -10153,7 +10153,7 @@ namespace CS_Classes
 
 
 
-    public class Corners_SubPix_CS : VB_Parent
+    public class Corners_SubPix_CS : TaskParent
     {
         public Feature_Stable feat = new Feature_Stable();
         public Options_PreCorners options = new Options_PreCorners();
@@ -10188,7 +10188,7 @@ namespace CS_Classes
 
 
 
-    public class Correlation_Basics_CS : VB_Parent
+    public class Correlation_Basics_CS : TaskParent
     {
         KMeans_Edges kFlood = new KMeans_Edges();
         Options_FeatureMatch options = new Options_FeatureMatch();
@@ -10265,7 +10265,7 @@ namespace CS_Classes
 
 
 
-    public class Covariance_Basics_CS : VB_Parent
+    public class Covariance_Basics_CS : TaskParent
     {
         Random_Basics_CS random;
         public Mat mean = new Mat();
@@ -10326,7 +10326,7 @@ namespace CS_Classes
 
 
 
-    public class Covariance_Test_CS : VB_Parent
+    public class Covariance_Test_CS : TaskParent
     {
         Covariance_Basics covar = new Covariance_Basics();
 
@@ -10349,7 +10349,7 @@ namespace CS_Classes
 
 
 
-    public class Covariance_Images_CS : VB_Parent
+    public class Covariance_Images_CS : TaskParent
     {
         Covariance_Basics covar = new Covariance_Basics();
         public Mat mean;
@@ -10387,7 +10387,7 @@ namespace CS_Classes
 
 
 
-    public class Crypto_Hash_CS : VB_Parent
+    public class Crypto_Hash_CS : TaskParent
     {
         Font_FlowText flow = new Font_FlowText();
         List<Mat> images = new List<Mat>();
@@ -10444,7 +10444,7 @@ namespace CS_Classes
 
 
 
-    public class CSV_Basics_CS : VB_Parent
+    public class CSV_Basics_CS : TaskParent
     {
         public string InputFile { get; set; }
         public string[,] Array { get; set; }
@@ -10492,7 +10492,7 @@ namespace CS_Classes
 
 
 
-    public class DCT_Basics_CS : VB_Parent
+    public class DCT_Basics_CS : TaskParent
     {
         public Options_DCT options = new Options_DCT();
 
@@ -10532,7 +10532,7 @@ namespace CS_Classes
 
 
 
-    public class DCT_RGB_CS : VB_Parent
+    public class DCT_RGB_CS : TaskParent
     {
         public DCT_Basics dct = new DCT_Basics();
 
@@ -10575,7 +10575,7 @@ namespace CS_Classes
 
 
 
-    public class DCT_Depth_CS : VB_Parent
+    public class DCT_Depth_CS : TaskParent
     {
         DCT_Basics dct = new DCT_Basics();
 
@@ -10609,7 +10609,7 @@ namespace CS_Classes
 
 
 
-    public class DCT_FeatureLess_CS : VB_Parent
+    public class DCT_FeatureLess_CS : TaskParent
     {
         public DCT_Basics dct = new DCT_Basics();
 
@@ -10665,7 +10665,7 @@ namespace CS_Classes
 
 
 
-    public class DCT_Surfaces_debug_CS : VB_Parent
+    public class DCT_Surfaces_debug_CS : TaskParent
     {
         Mat_4to1 mats = new Mat_4to1();
         DCT_FeatureLess dct = new DCT_FeatureLess();
@@ -10746,7 +10746,7 @@ namespace CS_Classes
 
 
 
-    public class Delaunay_Basics_CS : VB_Parent
+    public class Delaunay_Basics_CS : TaskParent
     {
         public List<cv.Point2f> inputPoints;
         public List<List<cv.Point>> facetList = new List<List<cv.Point>>();
@@ -10799,7 +10799,7 @@ namespace CS_Classes
 
 
 
-    public class Delaunay_SubDiv_CS : VB_Parent
+    public class Delaunay_SubDiv_CS : TaskParent
     {
         Random_Basics random = new Random_Basics();
 
@@ -10862,7 +10862,7 @@ namespace CS_Classes
 
 
 
-    public class Delaunay_Subdiv2D_CS : VB_Parent
+    public class Delaunay_Subdiv2D_CS : TaskParent
     {
         public Delaunay_Subdiv2D_CS()
         {
@@ -10915,7 +10915,7 @@ namespace CS_Classes
 
 
 
-    public class Delaunay_GenerationsNoKNN_CS : VB_Parent
+    public class Delaunay_GenerationsNoKNN_CS : TaskParent
     {
         public List<cv.Point2f> inputPoints;
         public Delaunay_Basics facet = new Delaunay_Basics();
@@ -10975,7 +10975,7 @@ namespace CS_Classes
 
 
 
-    public class Delaunay_Generations_CS : VB_Parent
+    public class Delaunay_Generations_CS : TaskParent
     {
         public List<cv.Point2f> inputPoints;
         public Delaunay_Basics facet = new Delaunay_Basics();
@@ -11041,7 +11041,7 @@ namespace CS_Classes
 
 
 
-    public class Delaunay_ConsistentColor_CS : VB_Parent
+    public class Delaunay_ConsistentColor_CS : TaskParent
     {
         public List<cv.Point2f> inputPoints;
         public List<List<cv.Point>> facetList = new List<List<cv.Point>>();
@@ -11112,7 +11112,7 @@ namespace CS_Classes
 
 
 
-    public class Delaunay_Contours_CS : VB_Parent
+    public class Delaunay_Contours_CS : TaskParent
     {
         public List<cv.Point2f> inputPoints;
         Random_Enumerable randEnum = new Random_Enumerable();
@@ -11159,7 +11159,7 @@ namespace CS_Classes
 
 
 
-    public class Denoise_Basics_CPP_CS : VB_Parent
+    public class Denoise_Basics_CPP_CS : TaskParent
     {
         Diff_Basics diff = new Diff_Basics();
 
@@ -11200,7 +11200,7 @@ namespace CS_Classes
 
 
 
-    public class Denoise_Pixels_CPP_CS : VB_Parent
+    public class Denoise_Pixels_CPP_CS : TaskParent
     {
         public int classCount;
         Options_Denoise options = new Options_Denoise();
@@ -11269,7 +11269,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Basics_CS : VB_Parent
+    public class Depth_Basics_CS : TaskParent
     {
         Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
 
@@ -11301,7 +11301,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_MinMaxToVoronoi_CS : VB_Parent
+    public class Depth_MinMaxToVoronoi_CS : TaskParent
     {
         Kalman_Basics kalman = new Kalman_Basics();
         public Depth_MinMaxToVoronoi_CS()
@@ -11365,7 +11365,7 @@ namespace CS_Classes
             }
         }
     }
-    public class Depth_ColorMap_CS : VB_Parent
+    public class Depth_ColorMap_CS : TaskParent
     {
         Options_DepthColor options = new Options_DepthColor();
         public Depth_ColorMap_CS()
@@ -11382,7 +11382,7 @@ namespace CS_Classes
             dst3 = vbc.task.palette.dst3;
         }
     }
-    public class Depth_NotMissing_CS : VB_Parent
+    public class Depth_NotMissing_CS : TaskParent
     {
         public BGSubtract_Basics bgSub = new BGSubtract_Basics();
         public Depth_NotMissing_CS()
@@ -11406,7 +11406,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Display_CS : VB_Parent
+    public class Depth_Display_CS : TaskParent
     {
         public Depth_Display_CS()
         {
@@ -11428,7 +11428,7 @@ namespace CS_Classes
 
 
 
-    public class Density_Basics_CS : VB_Parent
+    public class Density_Basics_CS : TaskParent
     {
         Options_Density options = new Options_Density();
         public Density_Basics_CS()
@@ -11454,7 +11454,7 @@ namespace CS_Classes
             Density_2D_Close(cPtr);
         }
     }
-    public class Density_Phase_CS : VB_Parent
+    public class Density_Phase_CS : TaskParent
     {
         Density_Basics dense = new Density_Basics();
         Gradient_Depth gradient = new Gradient_Depth();
@@ -11470,7 +11470,7 @@ namespace CS_Classes
             dst2 = dense.dst2;
         }
     }
-    public class Density_Count_CPP_CS : VB_Parent
+    public class Density_Count_CPP_CS : TaskParent
     {
         Options_Density options = new Options_Density();
         public Density_Count_CPP_CS()
@@ -11495,7 +11495,7 @@ namespace CS_Classes
             Density_Count_Close(cPtr);
         }
     }
-    public class Density_Mask_CS : VB_Parent
+    public class Density_Mask_CS : TaskParent
     {
         public List<cv.Point> pointList = new List<cv.Point>();
         public Density_Mask_CS()
@@ -11536,7 +11536,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_FirstLastDistance_CS : VB_Parent
+    public class Depth_FirstLastDistance_CS : TaskParent
     {
         public Depth_FirstLastDistance_CS()
         {
@@ -11570,7 +11570,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_HolesRect_CS : VB_Parent
+    public class Depth_HolesRect_CS : TaskParent
     {
         Depth_Holes shadow = new Depth_Holes();
 
@@ -11611,7 +11611,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_MeanStdev_MT_CS : VB_Parent
+    public class Depth_MeanStdev_MT_CS : TaskParent
     {
         Mat meanSeries;
         float maxMeanVal, maxStdevVal;
@@ -11695,7 +11695,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_MeanStdevPlot_CS : VB_Parent
+    public class Depth_MeanStdevPlot_CS : TaskParent
     {
         Plot_OverTimeSingle plot1 = new Plot_OverTimeSingle();
         Plot_OverTimeSingle plot2 = new Plot_OverTimeSingle();
@@ -11728,7 +11728,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Uncertainty_CS : VB_Parent
+    public class Depth_Uncertainty_CS : TaskParent
     {
         Retina_Basics_CPP_VB retina = new Retina_Basics_CPP_VB();
         Options_Uncertainty options = new Options_Uncertainty();
@@ -11753,7 +11753,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Palette_CS : VB_Parent
+    public class Depth_Palette_CS : TaskParent
     {
         Mat customColorMap = new Mat();
         Gradient_Color gColor = new Gradient_Color();
@@ -11781,7 +11781,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Colorizer_CPP_CS : VB_Parent
+    public class Depth_Colorizer_CPP_CS : TaskParent
     {
         public Depth_Colorizer_CPP_CS()
         {
@@ -11815,7 +11815,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_LocalMinMax_MT_CS : VB_Parent
+    public class Depth_LocalMinMax_MT_CS : TaskParent
     {
         public Point2f[] minPoint = new Point2f[1];
         public Point2f[] maxPoint = new Point2f[1];
@@ -11870,7 +11870,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Median_CS : VB_Parent
+    public class Depth_Median_CS : TaskParent
     {
         Math_Median_CDF median;
         public Depth_Median_CS()
@@ -11902,7 +11902,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_SmoothingMat_CS : VB_Parent
+    public class Depth_SmoothingMat_CS : TaskParent
     {
         Options_Depth options = new Options_Depth();
         Mat lastDepth;
@@ -11932,7 +11932,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Smoothing_CS : VB_Parent
+    public class Depth_Smoothing_CS : TaskParent
     {
         Depth_SmoothingMat smooth = new Depth_SmoothingMat();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -11968,7 +11968,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_HolesOverTime_CS : VB_Parent
+    public class Depth_HolesOverTime_CS : TaskParent
     {
         List<Mat> images = new List<Mat>();
         public Depth_HolesOverTime_CS()
@@ -12006,7 +12006,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Holes_CS : VB_Parent
+    public class Depth_Holes_CS : TaskParent
     {
         Mat element;
         Options_DepthHoles options = new Options_DepthHoles();
@@ -12032,7 +12032,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Dilate_CS : VB_Parent
+    public class Depth_Dilate_CS : TaskParent
     {
         Dilate_Basics dilate = new Dilate_Basics();
         public Depth_Dilate_CS()
@@ -12050,7 +12050,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_ForegroundHead_CS : VB_Parent
+    public class Depth_ForegroundHead_CS : TaskParent
     {
         Depth_ForegroundBlob fgnd = new Depth_ForegroundBlob();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -12100,7 +12100,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_RGBShadow_CS : VB_Parent
+    public class Depth_RGBShadow_CS : TaskParent
     {
         public Depth_RGBShadow_CS()
         {
@@ -12117,7 +12117,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_BGSubtract_CS : VB_Parent
+    public class Depth_BGSubtract_CS : TaskParent
     {
         BGSubtract_Basics bgSub = new BGSubtract_Basics();
         public Depth_BGSubtract_CS()
@@ -12138,7 +12138,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Averaging_CS : VB_Parent
+    public class Depth_Averaging_CS : TaskParent
     {
         Math_ImageAverage avg = new Math_ImageAverage();
         Depth_Colorizer_CPP_VB colorize = new Depth_Colorizer_CPP_VB();
@@ -12162,7 +12162,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_MaxMask_CS : VB_Parent
+    public class Depth_MaxMask_CS : TaskParent
     {
         Contour_General contour = new Contour_General();
         public Depth_MaxMask_CS()
@@ -12191,7 +12191,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_ForegroundOverTime_CS : VB_Parent
+    public class Depth_ForegroundOverTime_CS : TaskParent
     {
         Options_ForeGround options = new Options_ForeGround();
         Depth_Foreground fore = new Depth_Foreground();
@@ -12241,7 +12241,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_ForegroundBlob_CS : VB_Parent
+    public class Depth_ForegroundBlob_CS : TaskParent
     {
         Options_ForeGround options = new Options_ForeGround();
         List<cv.Point> blobLocation = new List<cv.Point>();
@@ -12296,7 +12296,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Foreground_CS : VB_Parent
+    public class Depth_Foreground_CS : TaskParent
     {
         Options_ForeGround options = new Options_ForeGround();
         Contour_Largest contours = new Contour_Largest();
@@ -12337,7 +12337,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Grid_CS : VB_Parent
+    public class Depth_Grid_CS : TaskParent
     {
         public Depth_Grid_CS()
         {
@@ -12367,7 +12367,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_InRange_CS : VB_Parent
+    public class Depth_InRange_CS : TaskParent
     {
         Options_ForeGround options = new Options_ForeGround();
         Contour_Largest contours = new Contour_Largest();
@@ -12434,7 +12434,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Regions_CS : VB_Parent
+    public class Depth_Regions_CS : TaskParent
     {
         int classCount = 5;
 
@@ -12460,7 +12460,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_PunchIncreasing_CS : VB_Parent
+    public class Depth_PunchIncreasing_CS : TaskParent
     {
         Depth_PunchDecreasing depth = new Depth_PunchDecreasing();
 
@@ -12481,7 +12481,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_PunchDecreasing_CS : VB_Parent
+    public class Depth_PunchDecreasing_CS : TaskParent
     {
         public bool Increasing { get; set; }
         Depth_Foreground fore = new Depth_Foreground();
@@ -12522,7 +12522,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_PunchBlob_CS : VB_Parent
+    public class Depth_PunchBlob_CS : TaskParent
     {
         Depth_PunchDecreasing depthDec = new Depth_PunchDecreasing();
         Depth_PunchIncreasing depthInc = new Depth_PunchIncreasing();
@@ -12574,7 +12574,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_PunchBlobNew_CS : VB_Parent
+    public class Depth_PunchBlobNew_CS : TaskParent
     {
         Depth_PunchDecreasing depthDec = new Depth_PunchDecreasing();
         Depth_PunchIncreasing depthInc = new Depth_PunchIncreasing();
@@ -12607,7 +12607,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Contour_CS : VB_Parent
+    public class Depth_Contour_CS : TaskParent
     {
         Contour_General contour = new Contour_General();
 
@@ -12634,7 +12634,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Outline_CS : VB_Parent
+    public class Depth_Outline_CS : TaskParent
     {
         Contour_General contour = new Contour_General();
 
@@ -12669,7 +12669,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_StableAverage_CS : VB_Parent
+    public class Depth_StableAverage_CS : TaskParent
     {
         Depth_Averaging dAvg = new Depth_Averaging();
         Depth_StableMinMax extrema = new Depth_StableMinMax();
@@ -12703,7 +12703,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_MinMaxNone_CS : VB_Parent
+    public class Depth_MinMaxNone_CS : TaskParent
     {
         Options_MinMaxNone options = new Options_MinMaxNone();
         int filtered;
@@ -12749,7 +12749,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_StableMin_CS : VB_Parent
+    public class Depth_StableMin_CS : TaskParent
     {
         Mat stableMin;
         Depth_Colorizer_CPP_VB colorize = new Depth_Colorizer_CPP_VB();
@@ -12787,7 +12787,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_StableMax_CS : VB_Parent
+    public class Depth_StableMax_CS : TaskParent
     {
         Mat stableMax;
         Depth_Colorizer_CPP_VB colorize = new Depth_Colorizer_CPP_VB();
@@ -12825,7 +12825,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_StableMinMax_CS : VB_Parent
+    public class Depth_StableMinMax_CS : TaskParent
     {
         Depth_Colorizer_CPP_VB colorize = new Depth_Colorizer_CPP_VB();
         Depth_StableMin dMin = new Depth_StableMin();
@@ -12871,7 +12871,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_WorldXYMT_CS : VB_Parent
+    public class Depth_WorldXYMT_CS : TaskParent
     {
         bool depthUnitsMeters = false;
 
@@ -12918,7 +12918,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_WorldXYZ_CS : VB_Parent
+    public class Depth_WorldXYZ_CS : TaskParent
     {
         public bool depthUnitsMeters = false;
 
@@ -12960,7 +12960,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_World_CS : VB_Parent
+    public class Depth_World_CS : TaskParent
     {
         Math_Template template = new Math_Template();
 
@@ -12999,7 +12999,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Tiers_CS : VB_Parent
+    public class Depth_Tiers_CS : TaskParent
     {
         public int classCount;
         Options_DepthTiers options = new Options_DepthTiers();
@@ -13030,7 +13030,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_TierCount_CS : VB_Parent
+    public class Depth_TierCount_CS : TaskParent
     {
         public HistValley_Depth1 valley = new HistValley_Depth1();
         public int classCount;
@@ -13062,7 +13062,7 @@ namespace CS_Classes
 
 
 
-    public class Depth_Flatland_CS : VB_Parent
+    public class Depth_Flatland_CS : TaskParent
     {
         Options_FlatLand options = new Options_FlatLand();
 
@@ -13088,7 +13088,7 @@ namespace CS_Classes
 
 
 
-    public class Derivative_Basics_CS : VB_Parent
+    public class Derivative_Basics_CS : TaskParent
     {
         public Options_Derivative options = new Options_Derivative();
         BackProject_Image backp = new BackProject_Image();
@@ -13152,7 +13152,7 @@ namespace CS_Classes
 
 
 
-    public class Derivative_Sobel_CS : VB_Parent
+    public class Derivative_Sobel_CS : TaskParent
     {
         Derivative_Basics_CS deriv;
 
@@ -13193,7 +13193,7 @@ namespace CS_Classes
 
 
 
-    public class Derivative_Laplacian_CS : VB_Parent
+    public class Derivative_Laplacian_CS : TaskParent
     {
         Options_LaplacianKernels options = new Options_LaplacianKernels();
         Derivative_Basics_CS deriv;
@@ -13225,7 +13225,7 @@ namespace CS_Classes
 
 
 
-    public class Derivative_Classes_CS : VB_Parent
+    public class Derivative_Classes_CS : TaskParent
     {
         Derivative_Basics_CS deriv;
         public int classCountX;
@@ -13266,7 +13266,7 @@ namespace CS_Classes
 
 
 
-    public class DFT_Basics_CS : VB_Parent
+    public class DFT_Basics_CS : TaskParent
     {
         Mat_4to1 mats = new Mat_4to1();
         public Mat magnitude = new Mat();
@@ -13336,7 +13336,7 @@ namespace CS_Classes
 
 
 
-    public class DFT_ButterworthFilter_MT_CS : VB_Parent
+    public class DFT_ButterworthFilter_MT_CS : TaskParent
     {
         public DFT_Basics_CS dft; 
         Options_DFT options = new Options_DFT();
@@ -13387,7 +13387,7 @@ namespace CS_Classes
 
 
 
-    public class DFT_Inverse_CS : VB_Parent
+    public class DFT_Inverse_CS : TaskParent
     {
         Mat_2to1 mats = new Mat_2to1();
         DFT_Basics_CS dft;
@@ -13438,7 +13438,7 @@ namespace CS_Classes
 
 
 
-    public class DFT_ButterworthDepth_CS : VB_Parent
+    public class DFT_ButterworthDepth_CS : TaskParent
     {
         DFT_ButterworthFilter_MT bfilter = new DFT_ButterworthFilter_MT();
 
@@ -13461,7 +13461,7 @@ namespace CS_Classes
 
 
 
-    public class DFT_Shapes_CS : VB_Parent
+    public class DFT_Shapes_CS : TaskParent
     {
         DFT_Basics_CS dft;
         Draw_Circles circle = new Draw_Circles();
@@ -13545,7 +13545,7 @@ namespace CS_Classes
 
 
 
-    public class Diff_Basics_CS : VB_Parent
+    public class Diff_Basics_CS : TaskParent
     {
         public int changedPixels;
         public Mat lastFrame;
@@ -13591,7 +13591,7 @@ namespace CS_Classes
 
 
 
-    public class Diff_Identical_CS : VB_Parent
+    public class Diff_Identical_CS : TaskParent
     {
         Diff_Color diffColor = new Diff_Color();
         int noMotionFrames;
@@ -13625,7 +13625,7 @@ namespace CS_Classes
 
 
 
-    public class Diff_Color_CS : VB_Parent
+    public class Diff_Color_CS : TaskParent
     {
         public Diff_Basics_CS diff;
 
@@ -13651,7 +13651,7 @@ namespace CS_Classes
 
 
 
-    public class Diff_UnstableDepthAndColor_CS : VB_Parent
+    public class Diff_UnstableDepthAndColor_CS : TaskParent
     {
         public Diff_Basics_CS diff;
         public Depth_NotMissing depth = new Depth_NotMissing();
@@ -13686,7 +13686,7 @@ namespace CS_Classes
 
 
 
-    public class Diff_RGBAccum_CS : VB_Parent
+    public class Diff_RGBAccum_CS : TaskParent
     {
         public Diff_Basics_CS diff;
         List<Mat> history = new List<Mat>();
@@ -13721,7 +13721,7 @@ namespace CS_Classes
 
 
 
-    public class Diff_Lines_CS : VB_Parent
+    public class Diff_Lines_CS : TaskParent
     {
         Diff_RGBAccum diff = new Diff_RGBAccum();
         Line_Basics lines = new Line_Basics();
@@ -13752,7 +13752,7 @@ namespace CS_Classes
 
 
 
-    public class Diff_Heartbeat_CS : VB_Parent
+    public class Diff_Heartbeat_CS : TaskParent
     {
         public int cumulativePixels;
 
@@ -13784,7 +13784,7 @@ namespace CS_Classes
 
 
 
-    public class Diff_Depth32f_CS : VB_Parent
+    public class Diff_Depth32f_CS : TaskParent
     {
         public Mat lastDepth32f;
         Options_Depth options = new Options_Depth();
@@ -13822,7 +13822,7 @@ namespace CS_Classes
 
 
 
-    public class Dilate_Basics_CS : VB_Parent
+    public class Dilate_Basics_CS : TaskParent
     {
         public Options_Dilate options = new Options_Dilate();
 
@@ -13853,7 +13853,7 @@ namespace CS_Classes
 
 
 
-    public class Dilate_OpenClose_CS : VB_Parent
+    public class Dilate_OpenClose_CS : TaskParent
     {
         Options_Dilate options = new Options_Dilate();
 
@@ -13875,7 +13875,7 @@ namespace CS_Classes
 
 
 
-    public class Dilate_Erode_CS : VB_Parent
+    public class Dilate_Erode_CS : TaskParent
     {
         Options_Dilate options = new Options_Dilate();
 
@@ -13897,7 +13897,7 @@ namespace CS_Classes
 
 
 
-    public class DisparityFunction_Basics_CS : VB_Parent
+    public class DisparityFunction_Basics_CS : TaskParent
     {
         FeatureLeftRight_Basics match = new FeatureLeftRight_Basics();
         string depthStr;
@@ -13986,7 +13986,7 @@ namespace CS_Classes
 
 
 
-    public class Distance_Basics_CS : VB_Parent
+    public class Distance_Basics_CS : TaskParent
     {
         Options_Distance options = new Options_Distance();
 
@@ -14014,7 +14014,7 @@ namespace CS_Classes
 
 
 
-    public class Distance_Labels_CS : VB_Parent
+    public class Distance_Labels_CS : TaskParent
     {
         Options_Distance options = new Options_Distance();
 
@@ -14045,7 +14045,7 @@ namespace CS_Classes
 
 
 
-    public class Distance_Foreground_CS : VB_Parent
+    public class Distance_Foreground_CS : TaskParent
     {
         Distance_Basics dist = new Distance_Basics();
         Foreground_KMeans foreground = new Foreground_KMeans();
@@ -14083,7 +14083,7 @@ namespace CS_Classes
 
 
 
-    public class Distance_Background_CS : VB_Parent
+    public class Distance_Background_CS : TaskParent
     {
         Distance_Foreground dist = new Distance_Foreground();
 
@@ -14107,7 +14107,7 @@ namespace CS_Classes
 
 
 
-    public class Distance_Point3D_CS : VB_Parent
+    public class Distance_Point3D_CS : TaskParent
     {
         public Point3f inPoint1;
         public Point3f inPoint2;
@@ -14150,7 +14150,7 @@ namespace CS_Classes
 
 
 
-    public class Distance_Point4D_CS : VB_Parent
+    public class Distance_Point4D_CS : TaskParent
     {
         public Vec4f inPoint1;
         public Vec4f inPoint2;
@@ -14186,7 +14186,7 @@ namespace CS_Classes
 
 
 
-    public class Distance_RedCloud_CS : VB_Parent
+    public class Distance_RedCloud_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
@@ -14296,7 +14296,7 @@ namespace CS_Classes
 
 
 
-    public class Distance_BinaryImage_CS : VB_Parent
+    public class Distance_BinaryImage_CS : TaskParent
     {
         Binarize_Simple binary = new Binarize_Simple();
         Distance_Basics distance = new Distance_Basics();
@@ -14334,7 +14334,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_Noise_CS : VB_Parent
+    public class Draw_Noise_CS : TaskParent
     {
         public int maxNoiseWidth = 3;
         public bool addRandomColor;
@@ -14369,7 +14369,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_Ellipses_CS : VB_Parent
+    public class Draw_Ellipses_CS : TaskParent
     {
         Options_Draw options = new Options_Draw();
         public Draw_Ellipses_CS()
@@ -14397,7 +14397,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_Circles_CS : VB_Parent
+    public class Draw_Circles_CS : TaskParent
     {
         Options_Draw options = new Options_Draw();
         public Draw_Circles_CS()
@@ -14424,7 +14424,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_Lines_CS : VB_Parent
+    public class Draw_Lines_CS : TaskParent
     {
         Options_Draw options = new Options_Draw();
         public Draw_Lines_CS()
@@ -14451,7 +14451,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_Polygon_CS : VB_Parent
+    public class Draw_Polygon_CS : TaskParent
     {
         Options_Draw options = new Options_Draw();
         public Draw_Polygon_CS()
@@ -14501,7 +14501,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_Shapes_CS : VB_Parent
+    public class Draw_Shapes_CS : TaskParent
     {
         public Draw_Shapes_CS()
         {
@@ -14549,7 +14549,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_SymmetricalShapes_CS : VB_Parent
+    public class Draw_SymmetricalShapes_CS : TaskParent
     {
         Options_SymmetricalShapes options = new Options_SymmetricalShapes();
         public Draw_SymmetricalShapes_CS()
@@ -14589,7 +14589,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_Arc_CS : VB_Parent
+    public class Draw_Arc_CS : TaskParent
     {
         Kalman_Basics kalman = new Kalman_Basics();
         cv.Rect rect;
@@ -14645,7 +14645,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_ClipLine_CS : VB_Parent
+    public class Draw_ClipLine_CS : TaskParent
     {
         Font_FlowText flow = new Font_FlowText();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -14695,7 +14695,7 @@ namespace CS_Classes
 
 
 
-    //	public class CS_Draw_Hexagon : VB_Parent
+    //	public class CS_Draw_Hexagon : TaskParent
     //{
     //    ImageForm alpha = new ImageForm();
     //    public CS_Draw_Hexagon()
@@ -14714,7 +14714,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_Line_CS : VB_Parent
+    public class Draw_Line_CS : TaskParent
     {
         public cv.Point p1, p2;
         public bool externalUse;
@@ -14749,7 +14749,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_LineTest_CS : VB_Parent
+    public class Draw_LineTest_CS : TaskParent
     {
         Draw_Line line = new Draw_Line();
         public Draw_LineTest_CS()
@@ -14771,7 +14771,7 @@ namespace CS_Classes
 
 
 
-    public class Draw_Frustrum_CS : VB_Parent
+    public class Draw_Frustrum_CS : TaskParent
     {
         public Depth_WorldXYZ xyzDepth = new Depth_WorldXYZ();
         public Draw_Frustrum_CS()
@@ -14801,7 +14801,7 @@ namespace CS_Classes
 
 
 
-    public class Duster_Basics_CS : VB_Parent
+    public class Duster_Basics_CS : TaskParent
     {
         public Duster_MaskZ dust = new Duster_MaskZ();
         public Duster_Basics_CS()
@@ -14827,7 +14827,7 @@ namespace CS_Classes
 
 
 
-    public class Duster_MaskZ_CS : VB_Parent
+    public class Duster_MaskZ_CS : TaskParent
     {
         public Hist_Basics hist = new Hist_Basics();
         public int classCount;
@@ -14889,7 +14889,7 @@ namespace CS_Classes
 
 
 
-    public class Duster_BasicsY_CS : VB_Parent
+    public class Duster_BasicsY_CS : TaskParent
     {
         Duster_MaskZ dust = new Duster_MaskZ();
         public Duster_BasicsY_CS()
@@ -14915,7 +14915,7 @@ namespace CS_Classes
 
 
 
-    public class Duster_RedCloud_CS : VB_Parent
+    public class Duster_RedCloud_CS : TaskParent
     {
         Duster_Basics duster = new Duster_Basics();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -14940,7 +14940,7 @@ namespace CS_Classes
 
 
 
-    public class Edge_DepthAndColor_CS : VB_Parent
+    public class Edge_DepthAndColor_CS : TaskParent
     {
         Depth_Holes shadow = new Depth_Holes();
         Edge_Canny canny = new Edge_Canny();
@@ -14965,7 +14965,7 @@ namespace CS_Classes
             dst2 = dilate.dst2;
         }
     }
-    public class Edge_Scharr_CS : VB_Parent
+    public class Edge_Scharr_CS : TaskParent
     {
         Options_Edges options = new Options_Edges();
         public Edge_Scharr_CS()
@@ -14983,7 +14983,7 @@ namespace CS_Classes
             dst3.ConvertTo(dst2, MatType.CV_8U, options.scharrMultiplier);
         }
     }
-    public class Edge_Preserving_CS : VB_Parent
+    public class Edge_Preserving_CS : TaskParent
     {
         Options_Edges options = new Options_Edges();
         public Edge_Preserving_CS()
@@ -15016,7 +15016,7 @@ namespace CS_Classes
             }
         }
     }
-    public class Edge_RandomForest_CPP_CS : VB_Parent
+    public class Edge_RandomForest_CPP_CS : TaskParent
     {
         byte[] rgbData;
         Options_Edges2 options = new Options_Edges2();
@@ -15051,7 +15051,7 @@ namespace CS_Classes
                 cPtr = Edge_RandomForest_Close(cPtr);
         }
     }
-    public class Edge_DCTfrequency_CS : VB_Parent
+    public class Edge_DCTfrequency_CS : TaskParent
     {
         Options_Edges2 options = new Options_Edges2();
         public Edge_DCTfrequency_CS()
@@ -15075,7 +15075,7 @@ namespace CS_Classes
             dst3 = dst2.Threshold(options.dctThreshold, 255, ThresholdTypes.Binary);
         }
     }
-    public class Edge_Deriche_CPP_CS : VB_Parent
+    public class Edge_Deriche_CPP_CS : TaskParent
     {
         Options_Edges3 options = new Options_Edges3();
         public Edge_Deriche_CPP_CS()
@@ -15103,7 +15103,7 @@ namespace CS_Classes
                 cPtr = Edge_Deriche_Close(cPtr);
         }
     }
-    public class Edge_DCTinput_CS : VB_Parent
+    public class Edge_DCTinput_CS : TaskParent
     {
         Edge_Canny edges = new Edge_Canny();
         DCT_FeatureLess dct = new DCT_FeatureLess();
@@ -15123,7 +15123,7 @@ namespace CS_Classes
             dst3 = edges.dst2;
         }
     }
-    public class Edge_Consistent_CS : VB_Parent
+    public class Edge_Consistent_CS : TaskParent
     {
         Bin4Way_Sobel edges = new Bin4Way_Sobel();
         List<Mat> saveFrames = new List<Mat>();
@@ -15148,7 +15148,7 @@ namespace CS_Classes
             src.CopyTo(dst3, ~edges.dst3);
         }
     }
-    public class Edge_BinarizedReduction_CS : VB_Parent
+    public class Edge_BinarizedReduction_CS : TaskParent
     {
         Bin4Way_Sobel edges = new Bin4Way_Sobel();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -15164,7 +15164,7 @@ namespace CS_Classes
             dst2 = edges.dst2;
         }
     }
-    public class Edge_BinarizedBrightness_CS : VB_Parent
+    public class Edge_BinarizedBrightness_CS : TaskParent
     {
         Edge_Basics edges = new Edge_Basics();
         Brightness_Basics bright = new Brightness_Basics();
@@ -15182,7 +15182,7 @@ namespace CS_Classes
             labels[3] = edges.labels[2];
         }
     }
-    public class Edge_SobelLRBinarized_CS : VB_Parent
+    public class Edge_SobelLRBinarized_CS : TaskParent
     {
         Bin4Way_Sobel edges = new Bin4Way_Sobel();
         AddWeighted_Basics addw = new AddWeighted_Basics();
@@ -15218,7 +15218,7 @@ namespace CS_Classes
             }
         }
     }
-    public class Edge_Matching_CS : VB_Parent
+    public class Edge_Matching_CS : TaskParent
     {
         Match_Basics match = new Match_Basics();
         List<int> redRects = new List<int>();
@@ -15292,7 +15292,7 @@ namespace CS_Classes
             labels[3] = "Grid segments > " + options.threshold.ToString("P0") + " correlation coefficient";
         }
     }
-    public class Edge_RGB_CS : VB_Parent
+    public class Edge_RGB_CS : TaskParent
     {
         Edge_Sobel sobel = new Edge_Sobel();
         public Edge_RGB_CS()
@@ -15318,7 +15318,7 @@ namespace CS_Classes
             Cv2.Merge(split, dst2);
         }
     }
-    public class Edge_HSV_CS : VB_Parent
+    public class Edge_HSV_CS : TaskParent
     {
         Edge_RGB edges = new Edge_RGB();
         public Edge_HSV_CS()
@@ -15332,7 +15332,7 @@ namespace CS_Classes
             dst2 = edges.dst2;
         }
     }
-    public class Edge_SobelLR_CS : VB_Parent
+    public class Edge_SobelLR_CS : TaskParent
     {
         Edge_Sobel sobel = new Edge_Sobel();
         public Edge_SobelLR_CS()
@@ -15349,7 +15349,7 @@ namespace CS_Classes
             dst2 = sobel.dst2;
         }
     }
-    public class Edge_ColorGap_CPP_CS : VB_Parent
+    public class Edge_ColorGap_CPP_CS : TaskParent
     {
         Edge_ColorGap_VB gap = new Edge_ColorGap_VB();
         TrackBar distanceSlider;
@@ -15379,7 +15379,7 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = Edge_ColorGap_Close(cPtr);
         }
     }
-    public class Edge_ColorGap_CS : VB_Parent
+    public class Edge_ColorGap_CS : TaskParent
     {
         Options_Edges3 options = new Options_Edges3();
         public Edge_ColorGap_CS()
@@ -15419,7 +15419,7 @@ namespace CS_Classes
             dst1 = dst2 | dst3;
         }
     }
-    public class Edge_DepthGap_Native_CS : VB_Parent
+    public class Edge_DepthGap_Native_CS : TaskParent
     {
         Options_DepthEdges options = new Options_DepthEdges();
         public Edge_DepthGap_Native_CS()
@@ -15459,7 +15459,7 @@ namespace CS_Classes
             dst1 = dst2 | dst3;
         }
     }
-    public class Edge_DepthGap_CPP_CS : VB_Parent
+    public class Edge_DepthGap_CPP_CS : TaskParent
     {
         Options_DepthEdges options = new Options_DepthEdges();
         public Edge_DepthGap_CPP_CS()
@@ -15483,7 +15483,7 @@ namespace CS_Classes
             if (cPtr != IntPtr.Zero) cPtr = Edge_DepthGap_Close(cPtr);
         }
     }
-    public class Edge_CannyMin_CS : VB_Parent
+    public class Edge_CannyMin_CS : TaskParent
     {
         Edge_Canny canny = new Edge_Canny();
         public Edge_CannyMin_CS()
@@ -15499,7 +15499,7 @@ namespace CS_Classes
             dst2 = canny.dst2;
         }
     }
-    public class Edge_CannyLeftRight_CS : VB_Parent
+    public class Edge_CannyLeftRight_CS : TaskParent
     {
         Edge_Canny canny = new Edge_Canny();
         public Edge_CannyLeftRight_CS()
@@ -15517,7 +15517,7 @@ namespace CS_Classes
             dst3 = canny.dst2;
         }
     }
-    public class Edge_Reduction_CS : VB_Parent
+    public class Edge_Reduction_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Edge_Canny edge = new Edge_Canny();
@@ -15535,7 +15535,7 @@ namespace CS_Classes
             dst2 = edge.dst2;
         }
     }
-    public class Edge_Regions_CS : VB_Parent
+    public class Edge_Regions_CS : TaskParent
     {
         Depth_Tiers tiers = new Depth_Tiers();
         Edge_Canny edge = new Edge_Canny();
@@ -15553,7 +15553,7 @@ namespace CS_Classes
             dst2 = edge.dst2;
         }
     }
-    public class Edge_Canny_CS : VB_Parent
+    public class Edge_Canny_CS : TaskParent
     {
         Options_Canny options = new Options_Canny();
         public Edge_Canny_CS()
@@ -15570,7 +15570,7 @@ namespace CS_Classes
             // dst3 = src.Canny(options.threshold1, options.threshold2, options.aperture, false);
         }
     }
-    public class Edge_CannyHistory_CS : VB_Parent
+    public class Edge_CannyHistory_CS : TaskParent
     {
         Options_Canny options = new Options_Canny();
         List<Mat> frameList = new List<Mat>();
@@ -15596,7 +15596,7 @@ namespace CS_Classes
             if (frameList.Count() >= vbc.task.frameHistoryCount) frameList.RemoveAt(0);
         }
     }
-    public class Edge_ResizeAdd_CS : VB_Parent
+    public class Edge_ResizeAdd_CS : TaskParent
     {
         Options_Edges4 options = new Options_Edges4();
         public Edge_ResizeAdd_CS()
@@ -15618,7 +15618,7 @@ namespace CS_Classes
             Cv2.Add(gray, dst2, dst3);
         }
     }
-    public class Edge_CannyCombined_CS : VB_Parent
+    public class Edge_CannyCombined_CS : TaskParent
     {
         Edge_CannyHistory canny = new Edge_CannyHistory();
         Edge_ResizeAdd edges = new Edge_ResizeAdd();
@@ -15633,7 +15633,7 @@ namespace CS_Classes
             dst2 = canny.dst2 | edges.dst2;
         }
     }
-    public class Edge_SobelCustomV_CS : VB_Parent
+    public class Edge_SobelCustomV_CS : TaskParent
     {
         public Edge_SobelCustomV_CS()
         {
@@ -15648,7 +15648,7 @@ namespace CS_Classes
             dst1.ConvertTo(dst3, src.Type());
         }
     }
-    public class Edge_SobelCustomH_CS : VB_Parent
+    public class Edge_SobelCustomH_CS : TaskParent
     {
         public Edge_SobelCustomH_CS()
         {
@@ -15663,7 +15663,7 @@ namespace CS_Classes
             dst1.ConvertTo(dst3, src.Type());
         }
     }
-    public class Edge_SobelCustom_CS : VB_Parent
+    public class Edge_SobelCustom_CS : TaskParent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
         Edge_SobelCustomV edgesV = new Edge_SobelCustomV();
@@ -15700,7 +15700,7 @@ namespace CS_Classes
             }
         }
     }
-    public class Edge_SobelCustomLeftRight_CS : VB_Parent
+    public class Edge_SobelCustomLeftRight_CS : TaskParent
     {
         Edge_SobelCustom custom = new Edge_SobelCustom();
         public Edge_SobelCustomLeftRight_CS()
@@ -15720,7 +15720,7 @@ namespace CS_Classes
             dst3 = custom.dst3;
         }
     }
-    public class Edge_BackProjection_CS : VB_Parent
+    public class Edge_BackProjection_CS : TaskParent
     {
         HistValley_OptionsAuto valley = new HistValley_OptionsAuto();
         Edge_Canny canny = new Edge_Canny();
@@ -15745,7 +15745,7 @@ namespace CS_Classes
             labels[2] = valley.labels[3];
         }
     }
-    public class Edge_Sobel_CS : VB_Parent
+    public class Edge_Sobel_CS : TaskParent
     {
         public AddWeighted_Basics addw = new AddWeighted_Basics();
         Options_Sobel options = new Options_Sobel();
@@ -15779,7 +15779,7 @@ namespace CS_Classes
             }
         }
     }
-    public class Edge_Laplacian_CS : VB_Parent
+    public class Edge_Laplacian_CS : TaskParent
     {
         Options_LaplacianKernels options = new Options_LaplacianKernels();
         public Edge_Laplacian_CS()
@@ -15798,7 +15798,7 @@ namespace CS_Classes
             dst3 = dst3.ConvertScaleAbs();
         }
     }
-    public class Edge_SobelHorizontal_CS : VB_Parent
+    public class Edge_SobelHorizontal_CS : TaskParent
     {
         Edge_Sobel edges = new Edge_Sobel();
         TrackBar thresholdSlider;
@@ -15815,7 +15815,7 @@ namespace CS_Classes
             dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, ThresholdTypes.Binary);
         }
     }
-    public class Edge_MotionFrames_CS : VB_Parent
+    public class Edge_MotionFrames_CS : TaskParent
     {
         Edge_Canny edges = new Edge_Canny();
         History_Basics frames = new History_Basics();
@@ -15834,7 +15834,7 @@ namespace CS_Classes
             dst2 = frames.dst2;
         }
     }
-    public class Edge_MotionOverlay_CS : VB_Parent
+    public class Edge_MotionOverlay_CS : TaskParent
     {
         Options_EdgeOverlay options = new Options_EdgeOverlay();
         Mat offsetImage = new cv.Mat();
@@ -15863,7 +15863,7 @@ namespace CS_Classes
 
 
 
-    public class Edge_Color8U_CS : VB_Parent
+    public class Edge_Color8U_CS : TaskParent
     {
         public object[] colorMethods = {
         new BackProject_Full(), new BackProject2D_Full(), new Bin4Way_Regions(),
@@ -15922,7 +15922,7 @@ namespace CS_Classes
 
 
 
-    public class EdgeDraw_Basics_CPP_CS : VB_Parent
+    public class EdgeDraw_Basics_CPP_CS : TaskParent
     {
         public EdgeDraw_Basics_CPP_CS()
         {
@@ -15952,7 +15952,7 @@ namespace CS_Classes
 
 
 
-    public class EdgeDraw_Segments_CPP_CS : VB_Parent
+    public class EdgeDraw_Segments_CPP_CS : TaskParent
     {
         public List<cv.Point2f> segPoints = new List<cv.Point2f>();
         public EdgeDraw_Segments_CPP_CS()
@@ -15999,7 +15999,7 @@ namespace CS_Classes
 
 
 
-    public class Eigen_Basics_CS : VB_Parent
+    public class Eigen_Basics_CS : TaskParent
     {
         public Eigen_Basics_CS()
         {
@@ -16055,7 +16055,7 @@ namespace CS_Classes
 
 
 
-    public class Eigen_FitLineInput_CS : VB_Parent
+    public class Eigen_FitLineInput_CS : TaskParent
     {
         public List<cv.Point2f> points = new List<cv.Point2f>();
         public float m;
@@ -16124,7 +16124,7 @@ namespace CS_Classes
 
 
 
-    public class Eigen_Fitline_CS : VB_Parent
+    public class Eigen_Fitline_CS : TaskParent
     {
         Eigen_FitLineInput noisyLine = new Eigen_FitLineInput();
         Mat eigenVec = new Mat(2, 2, MatType.CV_32F, cv.Scalar.All(0));
@@ -16205,7 +16205,7 @@ namespace CS_Classes
 
 
 
-    public class EMax_Basics_CPP_CS : VB_Parent
+    public class EMax_Basics_CPP_CS : TaskParent
     {
         public EMax_InputClusters emaxInput = new EMax_InputClusters();
         public List<int> eLabels = new List<int>();
@@ -16278,7 +16278,7 @@ namespace CS_Classes
 
 
 
-    public class EMax_Centers_CS : VB_Parent
+    public class EMax_Centers_CS : TaskParent
     {
         EMax_Basics emax = new EMax_Basics();
         public EMax_Centers_CS()
@@ -16306,7 +16306,7 @@ namespace CS_Classes
 
 
 
-    public class EMax_InputClusters_CS : VB_Parent
+    public class EMax_InputClusters_CS : TaskParent
     {
         public int regionCount;
         public int[] eLabels;
@@ -16360,7 +16360,7 @@ namespace CS_Classes
 
 
 
-    public class EMax_VB_Failing_CS : VB_Parent
+    public class EMax_VB_Failing_CS : TaskParent
     {
         public EMax_InputClusters emaxInput = new EMax_InputClusters();
         public List<int> eLabels = new List<int>();
@@ -16407,7 +16407,7 @@ namespace CS_Classes
 
 
 
-    public class EMax_PointTracker_CS : VB_Parent
+    public class EMax_PointTracker_CS : TaskParent
     {
         KNN_Basics knn = new KNN_Basics();
         EMax_Basics emax = new EMax_Basics();
@@ -16444,7 +16444,7 @@ namespace CS_Classes
 
 
 
-    public class EMax_RandomClusters_CS : VB_Parent
+    public class EMax_RandomClusters_CS : TaskParent
     {
         Random_Clusters clusters = new Random_Clusters();
         EMax_Basics emax = new EMax_Basics();
@@ -16483,7 +16483,7 @@ namespace CS_Classes
 
 
 
-    public class Encode_Basics_CS : VB_Parent
+    public class Encode_Basics_CS : TaskParent
     {
         Options_Encode options = new Options_Encode();
         public Encode_Basics_CS()
@@ -16512,7 +16512,7 @@ namespace CS_Classes
 
 
 
-    public class Encode_Scaling_CS : VB_Parent
+    public class Encode_Scaling_CS : TaskParent
     {
         Options_Encode options = new Options_Encode();
         public Encode_Scaling_CS()
@@ -16540,7 +16540,7 @@ namespace CS_Classes
 
 
 
-    public class Entropy_Basics_CS : VB_Parent
+    public class Entropy_Basics_CS : TaskParent
     {
         Entropy_Rectangle entropy = new Entropy_Rectangle();
         public Entropy_Basics_CS()
@@ -16592,7 +16592,7 @@ namespace CS_Classes
 
 
 
-    public class Entropy_Highest_CS : VB_Parent
+    public class Entropy_Highest_CS : TaskParent
     {
         Entropy_Rectangle entropy = new Entropy_Rectangle();
         public cv.Rect eMaxRect;
@@ -16645,7 +16645,7 @@ namespace CS_Classes
 
 
 
-    public class Entropy_FAST_CS : VB_Parent
+    public class Entropy_FAST_CS : TaskParent
     {
         Corners_Basics fast = new Corners_Basics();
         Entropy_Highest entropy = new Entropy_Highest();
@@ -16667,7 +16667,7 @@ namespace CS_Classes
 
 
 
-    public class Entropy_Rectangle_CS : VB_Parent
+    public class Entropy_Rectangle_CS : TaskParent
     {
         public float entropyVal;
         public Entropy_Rectangle_CS()
@@ -16714,7 +16714,7 @@ namespace CS_Classes
 
 
 
-    public class Entropy_SubDivisions_CS : VB_Parent
+    public class Entropy_SubDivisions_CS : TaskParent
     {
         Entropy_Rectangle entropy = new Entropy_Rectangle();
         List<List<float>> entropies = new List<List<float>>();
@@ -16779,7 +16779,7 @@ namespace CS_Classes
 
 
 
-    public class Entropy_BinaryImage_CS : VB_Parent
+    public class Entropy_BinaryImage_CS : TaskParent
     {
         Binarize_Simple binary = new Binarize_Simple();
         Entropy_Basics entropy = new Entropy_Basics();
@@ -16803,7 +16803,7 @@ namespace CS_Classes
 
 
 
-    public class Erode_Basics_CS : VB_Parent
+    public class Erode_Basics_CS : TaskParent
     {
         public Options_Erode options = new Options_Erode();
         public Erode_Basics_CS()
@@ -16830,7 +16830,7 @@ namespace CS_Classes
 
 
 
-    public class Erode_CloudXY_CS : VB_Parent
+    public class Erode_CloudXY_CS : TaskParent
     {
         Erode_Basics erode = new Erode_Basics();
         Dilate_Basics dilate = new Dilate_Basics();
@@ -16862,7 +16862,7 @@ namespace CS_Classes
 
 
 
-    public class Erode_DepthSeed_CS : VB_Parent
+    public class Erode_DepthSeed_CS : TaskParent
     {
         Erode_Basics erode = new Erode_Basics();
         Options_Erode options = new Options_Erode();
@@ -16888,7 +16888,7 @@ namespace CS_Classes
 
 
 
-    public class Erode_Dilate_CS : VB_Parent
+    public class Erode_Dilate_CS : TaskParent
     {
         Options_Dilate options = new Options_Dilate();
         public Erode_Dilate_CS()
@@ -16910,7 +16910,7 @@ namespace CS_Classes
 
 
 
-    public class Etch_ASketch_CS : VB_Parent
+    public class Etch_ASketch_CS : TaskParent
     {
         Keyboard_Basics keys;
         Scalar slateColor = new Scalar(122, 122, 122);
@@ -16986,7 +16986,7 @@ namespace CS_Classes
 
 
 
-    public class Extrinsics_Basics_CS : VB_Parent
+    public class Extrinsics_Basics_CS : TaskParent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
         public Extrinsics_Basics_CS()
@@ -17021,7 +17021,7 @@ namespace CS_Classes
 
 
 
-    public class Extrinsics_Display_CS : VB_Parent
+    public class Extrinsics_Display_CS : TaskParent
     {
         Options_Extrinsics options = new Options_Extrinsics();
         Options_Translation optTrans = new Options_Translation();
@@ -17051,7 +17051,7 @@ namespace CS_Classes
 
 
 
-    public class Face_Haar_LBP_CS : VB_Parent
+    public class Face_Haar_LBP_CS : TaskParent
     {
         CascadeClassifier haarCascade;
         CascadeClassifier lbpCascade;
@@ -17075,7 +17075,7 @@ namespace CS_Classes
 
 
 
-    public class Face_Haar_Alt_CS : VB_Parent
+    public class Face_Haar_Alt_CS : TaskParent
     {
         CascadeClassifier haarCascade;
         public Face_Haar_Alt_CS()
@@ -17096,7 +17096,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Stable_CS : VB_Parent
+    public class Feature_Stable_CS : TaskParent
     {
         List<Mat> matList = new List<Mat>();
         List<cv.Point2f> ptList = new List<cv.Point2f>();
@@ -17194,7 +17194,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Basics_CS : VB_Parent
+    public class Feature_Basics_CS : TaskParent
     {
         public Options_Features options = new Options_Features();
         Feature_Gather gather = new Feature_Gather();
@@ -17223,7 +17223,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_KNN_CS : VB_Parent
+    public class Feature_KNN_CS : TaskParent
     {
         KNN_Basics knn = new KNN_Basics();
         public List<cv.Point2f> featurePoints = new List<cv.Point2f>();
@@ -17262,7 +17262,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Reduction_CS : VB_Parent
+    public class Feature_Reduction_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Feature_Stable feat = new Feature_Stable();
@@ -17288,7 +17288,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_MultiPass_CS : VB_Parent
+    public class Feature_MultiPass_CS : TaskParent
     {
         Feature_Stable feat = new Feature_Stable();
         public List<cv.Point2f> featurePoints = new List<cv.Point2f>();
@@ -17332,7 +17332,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_PointTracker_CS : VB_Parent
+    public class Feature_PointTracker_CS : TaskParent
     {
         Font_FlowText flow = new Font_FlowText();
         public Feature_Stable feat = new Feature_Stable();
@@ -17389,7 +17389,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Delaunay_CS : VB_Parent
+    public class Feature_Delaunay_CS : TaskParent
     {
         Delaunay_Contours facet = new Delaunay_Contours();
         Feature_Stable feat = new Feature_Stable();
@@ -17421,7 +17421,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_LucasKanade_CS : VB_Parent
+    public class Feature_LucasKanade_CS : TaskParent
     {
         FeatureFlow_LucasKanade pyr = new FeatureFlow_LucasKanade();
         public List<cv.Point> ptList = new List<cv.Point>();
@@ -17462,7 +17462,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_NearestCell_CS : VB_Parent
+    public class Feature_NearestCell_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         FeatureLeftRight_Basics feat = new FeatureLeftRight_Basics();
@@ -17501,7 +17501,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Points_CS : VB_Parent
+    public class Feature_Points_CS : TaskParent
     {
         public Feature_Stable feat = new Feature_Stable();
         public Feature_Points_CS()
@@ -17526,7 +17526,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Trace_CS : VB_Parent
+    public class Feature_Trace_CS : TaskParent
     {
         RedTrack_Features track = new RedTrack_Features();
         public Feature_Trace_CS()
@@ -17544,7 +17544,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_TraceDelaunay_CS : VB_Parent
+    public class Feature_TraceDelaunay_CS : TaskParent
     {
         Feature_Delaunay features = new Feature_Delaunay();
         public List<List<cv.Point2f>> goodList = new List<List<cv.Point2f>>(); // stable points only
@@ -17580,7 +17580,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_ShiTomasi_CS : VB_Parent
+    public class Feature_ShiTomasi_CS : TaskParent
     {
         Corners_HarrisDetector_CPP_VB harris = new Corners_HarrisDetector_CPP_VB();
         Corners_ShiTomasi_CPP_VB shiTomasi = new Corners_ShiTomasi_CPP_VB();
@@ -17616,7 +17616,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Generations_CS : VB_Parent
+    public class Feature_Generations_CS : TaskParent
     {
         Feature_Stable feat = new Feature_Stable();
         List<cv.Point> features = new List<cv.Point>();
@@ -17663,7 +17663,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_History_CS : VB_Parent
+    public class Feature_History_CS : TaskParent
     {
         public List<cv.Point> features = new List<cv.Point>();
         public Feature_Stable feat = new Feature_Stable();
@@ -17730,7 +17730,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_GridPopulation_CS : VB_Parent
+    public class Feature_GridPopulation_CS : TaskParent
     {
         Feature_Stable feat = new Feature_Stable();
         public Feature_GridPopulation_CS()
@@ -17760,7 +17760,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Compare_CS : VB_Parent
+    public class Feature_Compare_CS : TaskParent
     {
         Feature_Stable feat = new Feature_Stable();
         Feature_Basics noFrill = new Feature_Basics();
@@ -17788,7 +17788,7 @@ namespace CS_Classes
 
 
 
-    public class Feature_Gather_CPP_CS : VB_Parent
+    public class Feature_Gather_CPP_CS : TaskParent
     {
         Corners_HarrisDetector_CPP_VB harris = new Corners_HarrisDetector_CPP_VB();
         Corners_Basics FAST = new Corners_Basics();
@@ -17894,7 +17894,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureFlow_Basics_CS : VB_Parent
+    public class FeatureFlow_Basics_CS : TaskParent
     {
         public Feature_Stable feat = new Feature_Stable();
         public List<PointPair> mpList = new List<PointPair>();
@@ -17952,7 +17952,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureFlow_Dense_CS : VB_Parent
+    public class FeatureFlow_Dense_CS : TaskParent
     {
         public Options_OpticalFlow options = new Options_OpticalFlow();
         public FeatureFlow_Dense_CS()
@@ -18002,7 +18002,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureFlow_LucasKanade_CS : VB_Parent
+    public class FeatureFlow_LucasKanade_CS : TaskParent
     {
         public List<cv.Point2f> features = new List<cv.Point2f>();
         public List<cv.Point2f> lastFeatures = new List<cv.Point2f>();
@@ -18056,7 +18056,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureFlow_LeftRight1_CS : VB_Parent
+    public class FeatureFlow_LeftRight1_CS : TaskParent
     {
         public FeatureFlow_LucasKanade pyrLeft = new FeatureFlow_LucasKanade();
         public FeatureFlow_LucasKanade pyrRight = new FeatureFlow_LucasKanade();
@@ -18118,7 +18118,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureFlow_LeftRightHist_CS : VB_Parent
+    public class FeatureFlow_LeftRightHist_CS : TaskParent
     {
         public FeatureFlow_LucasKanade pyrLeft = new FeatureFlow_LucasKanade();
         public FeatureFlow_LucasKanade pyrRight = new FeatureFlow_LucasKanade();
@@ -18214,7 +18214,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureFlow_LeftRight_CS : VB_Parent
+    public class FeatureFlow_LeftRight_CS : TaskParent
     {
         FeatureFlow_LeftRightHist_CS flowHist;
         public List<List<cv.Point>> leftFeatures = new List<List<cv.Point>>();
@@ -18285,7 +18285,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLeftRight_Basics_CS : VB_Parent
+    public class FeatureLeftRight_Basics_CS : TaskParent
     {
         public FeatureLeftRight_LeftRightPrep prep = new FeatureLeftRight_LeftRightPrep();
         public List<PointPair> mpList = new List<PointPair>();
@@ -18411,7 +18411,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLeftRight_LeftRightPrep_CS : VB_Parent
+    public class FeatureLeftRight_LeftRightPrep_CS : TaskParent
     {
         public Feature_Stable lFeat = new Feature_Stable();
         public Feature_Stable rFeat = new Feature_Stable();
@@ -18443,7 +18443,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLeftRight_Grid_CS : VB_Parent
+    public class FeatureLeftRight_Grid_CS : TaskParent
     {
         public FeatureLeftRight_Basics match = new FeatureLeftRight_Basics();
         public FeatureLeftRight_Grid_CS()
@@ -18468,7 +18468,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLeftRight_Input_CS : VB_Parent
+    public class FeatureLeftRight_Input_CS : TaskParent
     {
         public List<cv.Point> ptLeft = new List<cv.Point>();
         public List<cv.Point> ptRight = new List<cv.Point>();
@@ -18597,7 +18597,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_Basics_CS : VB_Parent
+    public class FeatureLess_Basics_CS : TaskParent
     {
         EdgeDraw_Basics edgeD = new EdgeDraw_Basics();
         public int classCount = 2;
@@ -18621,7 +18621,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_Canny_CS : VB_Parent
+    public class FeatureLess_Canny_CS : TaskParent
     {
         Edge_Canny edges = new Edge_Canny();
         Options_Sobel options = new Options_Sobel();
@@ -18641,7 +18641,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_Sobel_CS : VB_Parent
+    public class FeatureLess_Sobel_CS : TaskParent
     {
         Edge_Sobel edges = new Edge_Sobel();
         Options_Sobel options = new Options_Sobel();
@@ -18661,7 +18661,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_UniquePixels_CS : VB_Parent
+    public class FeatureLess_UniquePixels_CS : TaskParent
     {
         Hough_FeatureLessTopX fless = new Hough_FeatureLessTopX();
         Sort_1Channel sort = new Sort_1Channel();
@@ -18684,7 +18684,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_Unique3Pixels_CS : VB_Parent
+    public class FeatureLess_Unique3Pixels_CS : TaskParent
     {
         Hough_FeatureLessTopX fless = new Hough_FeatureLessTopX();
         Sort_3Channel sort3 = new Sort_3Channel();
@@ -18704,7 +18704,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_Histogram_CS : VB_Parent
+    public class FeatureLess_Histogram_CS : TaskParent
     {
         BackProject_FeatureLess backP = new BackProject_FeatureLess();
         public FeatureLess_Histogram_CS()
@@ -18723,7 +18723,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_DCT_CS : VB_Parent
+    public class FeatureLess_DCT_CS : TaskParent
     {
         DCT_FeatureLess dct = new DCT_FeatureLess();
         public FeatureLess_DCT_CS()
@@ -18771,7 +18771,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_LeftRight_CS : VB_Parent
+    public class FeatureLess_LeftRight_CS : TaskParent
     {
         FeatureLess_Basics fLess = new FeatureLess_Basics();
         public FeatureLess_LeftRight_CS()
@@ -18792,7 +18792,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_History_CS : VB_Parent
+    public class FeatureLess_History_CS : TaskParent
     {
         FeatureLess_Basics fLess = new FeatureLess_Basics();
         History_Basics frames = new History_Basics();
@@ -18812,7 +18812,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_RedCloud_CS : VB_Parent
+    public class FeatureLess_RedCloud_CS : TaskParent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         FeatureLess_Basics fless = new FeatureLess_Basics();
@@ -18832,7 +18832,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLess_Groups_CS : VB_Parent
+    public class FeatureLess_Groups_CS : TaskParent
     {
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         FeatureLess_Basics fless = new FeatureLess_Basics();
@@ -18859,7 +18859,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_Basics_CS : VB_Parent
+    public class FeatureLine_Basics_CS : TaskParent
     {
         Line_SubsetRect lines = new Line_SubsetRect();
         Line_DisplayInfo lineDisp = new Line_DisplayInfo();
@@ -18914,7 +18914,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_VerticalVerify_CS : VB_Parent
+    public class FeatureLine_VerticalVerify_CS : TaskParent
     {
         FeatureLine_VH linesVH = new FeatureLine_VH();
         public IMU_VerticalVerify verify = new IMU_VerticalVerify();
@@ -18934,7 +18934,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_VH_CS : VB_Parent
+    public class FeatureLine_VH_CS : TaskParent
     {
         public List<gravityLine> gCells = new List<gravityLine>();
         Match_tCell match = new Match_tCell();
@@ -19003,7 +19003,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_Tutorial1_CS : VB_Parent
+    public class FeatureLine_Tutorial1_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         public FeatureLine_Tutorial1_CS()
@@ -19041,7 +19041,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_Tutorial2_CS : VB_Parent
+    public class FeatureLine_Tutorial2_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         IMU_GMatrix gMat = new IMU_GMatrix();
@@ -19103,7 +19103,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_LongestVerticalKNN_CS : VB_Parent
+    public class FeatureLine_LongestVerticalKNN_CS : TaskParent
     {
         Line_GCloud gLines = new Line_GCloud();
         FeatureLine_Longest longest = new FeatureLine_Longest();
@@ -19152,7 +19152,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_LongestV_Tutorial1_CS : VB_Parent
+    public class FeatureLine_LongestV_Tutorial1_CS : TaskParent
     {
         FeatureLine_Finder lines = new FeatureLine_Finder();
         public FeatureLine_LongestV_Tutorial1_CS()
@@ -19180,7 +19180,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_LongestV_Tutorial2_CS : VB_Parent
+    public class FeatureLine_LongestV_Tutorial2_CS : TaskParent
     {
         FeatureLine_Finder lines = new FeatureLine_Finder();
         KNN_Basics4D knn = new KNN_Basics4D();
@@ -19248,7 +19248,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_Finder_CS : VB_Parent
+    public class FeatureLine_Finder_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         public List<cv.Point2f> lines2D = new List<cv.Point2f>();
@@ -19358,7 +19358,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_VerticalLongLine_CS : VB_Parent
+    public class FeatureLine_VerticalLongLine_CS : TaskParent
     {
         FeatureLine_Finder lines = new FeatureLine_Finder();
         public FeatureLine_VerticalLongLine_CS()
@@ -19396,7 +19396,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_DetailsAll_CS : VB_Parent
+    public class FeatureLine_DetailsAll_CS : TaskParent
     {
         FeatureLine_Finder lines = new FeatureLine_Finder();
         Font_FlowText flow = new Font_FlowText();
@@ -19473,7 +19473,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_LongestKNN_CS : VB_Parent
+    public class FeatureLine_LongestKNN_CS : TaskParent
     {
         Line_GCloud glines = new Line_GCloud();
         public KNN_ClosestTracker knn = new KNN_ClosestTracker();
@@ -19517,7 +19517,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureLine_Longest_CS : VB_Parent
+    public class FeatureLine_Longest_CS : TaskParent
     {
         Line_GCloud glines = new Line_GCloud();
         public KNN_ClosestTracker knn = new KNN_ClosestTracker();
@@ -19567,7 +19567,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Basics_CS : VB_Parent
+    public class FPoly_Basics_CS : TaskParent
     {
         public bool resync;
         public string resyncCause;
@@ -19664,7 +19664,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Sides_CS : VB_Parent
+    public class FPoly_Sides_CS : TaskParent
     {
         public List<cv.Point2f> currPoly = new List<cv.Point2f>();
         public int currSideIndex;
@@ -19785,7 +19785,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_BasicsOriginal_CS : VB_Parent
+    public class FPoly_BasicsOriginal_CS : TaskParent
     {
         public fPolyData fPD = new fPolyData();
         public Mat resyncImage;
@@ -19904,7 +19904,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Plot_CS : VB_Parent
+    public class FPoly_Plot_CS : TaskParent
     {
         public FPoly_Core fGrid = new FPoly_Core();
         Plot_Histogram plot = new Plot_Histogram();
@@ -19958,7 +19958,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_PlotWeighted_CS : VB_Parent
+    public class FPoly_PlotWeighted_CS : TaskParent
     {
         public FPoly_Plot fPlot = new FPoly_Plot();
         Plot_Histogram plot = new Plot_Histogram();
@@ -20000,7 +20000,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Stablizer_CS : VB_Parent
+    public class FPoly_Stablizer_CS : TaskParent
     {
         public FPoly_Core fGrid;
         public FPoly_Stablizer_CS()
@@ -20041,7 +20041,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_StartPoints_CS : VB_Parent
+    public class FPoly_StartPoints_CS : TaskParent
     {
         public List<cv.Point> startPoints;
         public List<cv.Point> goodPoints;
@@ -20110,7 +20110,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Triangle_CS : VB_Parent
+    public class FPoly_Triangle_CS : TaskParent
     {
         Area_MinTriangle_CPP_VB triangle = new Area_MinTriangle_CPP_VB();
         FPoly_Core fGrid = new FPoly_Core();
@@ -20135,7 +20135,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_TopFeatures_CS : VB_Parent
+    public class FPoly_TopFeatures_CS : TaskParent
     {
         Stable_BasicsCount stable = new Stable_BasicsCount();
         List<cv.Point2f> poly = new List<cv.Point2f>();
@@ -20168,7 +20168,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_WarpAffinePoly_CS : VB_Parent
+    public class FPoly_WarpAffinePoly_CS : TaskParent
     {
         Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
         WarpAffine_BasicsQT warp = new WarpAffine_BasicsQT();
@@ -20217,7 +20217,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_RotatePoints_CS : VB_Parent
+    public class FPoly_RotatePoints_CS : TaskParent
     {
         Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
         public List<cv.Point> poly;
@@ -20281,7 +20281,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_WarpAffineImage_CS : VB_Parent
+    public class FPoly_WarpAffineImage_CS : TaskParent
     {
         WarpAffine_BasicsQT warp = new WarpAffine_BasicsQT();
         FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
@@ -20320,7 +20320,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Perpendiculars_CS : VB_Parent
+    public class FPoly_Perpendiculars_CS : TaskParent
     {
         public Point2f altCenterShift;
         public fPolyData fPD;
@@ -20391,7 +20391,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_PerpendicularsTest_CS : VB_Parent
+    public class FPoly_PerpendicularsTest_CS : TaskParent
     {
         FPoly_Perpendiculars center = new FPoly_Perpendiculars();
         FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
@@ -20413,7 +20413,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_PerpendicularsImage_CS : VB_Parent
+    public class FPoly_PerpendicularsImage_CS : TaskParent
     {
         FPoly_Perpendiculars center = new FPoly_Perpendiculars();
         FPoly_Image fImage = new FPoly_Image();
@@ -20435,7 +20435,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Image_CS : VB_Parent
+    public class FPoly_Image_CS : TaskParent
     {
         public FPoly_BasicsOriginal fpoly = new FPoly_BasicsOriginal();
         Rotate_BasicsQT rotate = new Rotate_BasicsQT();
@@ -20505,7 +20505,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_ImageMask_CS : VB_Parent
+    public class FPoly_ImageMask_CS : TaskParent
     {
         public FPoly_Image fImage = new FPoly_Image();
         public FPoly_ImageMask_CS()
@@ -20529,7 +20529,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_PointCloud_CS : VB_Parent
+    public class FPoly_PointCloud_CS : TaskParent
     {
         public FPoly_ImageMask fMask = new FPoly_ImageMask();
         public Mat fPolyCloud;
@@ -20553,7 +20553,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_ResyncCheck_CS : VB_Parent
+    public class FPoly_ResyncCheck_CS : TaskParent
     {
         FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
         int lastPixelCount = 0;
@@ -20584,7 +20584,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Center_CS : VB_Parent
+    public class FPoly_Center_CS : TaskParent
     {
         public Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
         Line_Nearest near = new Line_Nearest();
@@ -20677,7 +20677,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_EdgeRemoval_CS : VB_Parent
+    public class FPoly_EdgeRemoval_CS : TaskParent
     {
         FPoly_ImageMask fMask = new FPoly_ImageMask();
         Edge_Basics edges = new Edge_Basics();
@@ -20699,7 +20699,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_ImageNew_CS : VB_Parent
+    public class FPoly_ImageNew_CS : TaskParent
     {
         public FPoly_Basics fpoly = new FPoly_Basics();
         Rotate_BasicsQT rotate = new Rotate_BasicsQT();
@@ -20761,7 +20761,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_LeftRight_CS : VB_Parent
+    public class FPoly_LeftRight_CS : TaskParent
     {
         FPoly_Basics leftPoly = new FPoly_Basics();
         FPoly_Basics rightPoly = new FPoly_Basics();
@@ -20790,7 +20790,7 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Core_CS : VB_Parent
+    public class FPoly_Core_CS : TaskParent
     {
         public Stable_GoodFeatures stable = new Stable_GoodFeatures();
         public Point2f anchor;
@@ -20854,7 +20854,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_Basics_CS : VB_Parent
+    public class FeatureROI_Basics_CS : TaskParent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
         public List<cv.Rect> rects = new List<cv.Rect>();
@@ -20908,7 +20908,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_Color_CS : VB_Parent
+    public class FeatureROI_Color_CS : TaskParent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
         public FeatureROI_Color_CS()
@@ -20953,7 +20953,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_Canny_CS : VB_Parent
+    public class FeatureROI_Canny_CS : TaskParent
     {
         Edge_Canny canny = new Edge_Canny();
         FeatureROI_Basics devGrid = new FeatureROI_Basics();
@@ -20974,7 +20974,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_Sorted_CS : VB_Parent
+    public class FeatureROI_Sorted_CS : TaskParent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
         public SortedList<float, cv.Rect> sortedStd = new SortedList<float, cv.Rect>(new compareAllowIdenticalSingle());
@@ -21065,7 +21065,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_ColorSplit_CS : VB_Parent
+    public class FeatureROI_ColorSplit_CS : TaskParent
     {
         FeatureROI_Sorted devGrid = new FeatureROI_Sorted();
         public FeatureROI_ColorSplit_CS()
@@ -21105,7 +21105,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_Correlation_CS : VB_Parent
+    public class FeatureROI_Correlation_CS : TaskParent
     {
         public FeatureROI_Basics gather = new FeatureROI_Basics();
         public Plot_OverTimeSingle plot = new Plot_OverTimeSingle();
@@ -21148,7 +21148,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_LowStdev_CS : VB_Parent
+    public class FeatureROI_LowStdev_CS : TaskParent
     {
         public List<cv.Rect> rects = new List<cv.Rect>();
         public FeatureROI_Basics gather = new FeatureROI_Basics();
@@ -21178,7 +21178,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_LowStdevCorrelation_CS : VB_Parent
+    public class FeatureROI_LowStdevCorrelation_CS : TaskParent
     {
         public FeatureROI_LowStdev gather = new FeatureROI_LowStdev();
         public List<float> correlations = new List<float>();
@@ -21231,7 +21231,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_LR_CS : VB_Parent
+    public class FeatureROI_LR_CS : TaskParent
     {
         public FeatureROI_Basics gLeft = new FeatureROI_Basics();
         public FeatureROI_Basics gRight = new FeatureROI_Basics();
@@ -21253,7 +21253,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_LRClick_CS : VB_Parent
+    public class FeatureROI_LRClick_CS : TaskParent
     {
         public FeatureROI_Basics gather = new FeatureROI_Basics();
         public cv.Point ClickPoint = new cv.Point();
@@ -21344,7 +21344,7 @@ namespace CS_Classes
 
 
 
-    public class FeatureROI_LRAll_CS : VB_Parent
+    public class FeatureROI_LRAll_CS : TaskParent
     {
         public FeatureROI_Basics gather = new FeatureROI_Basics();
         public Options_Features options = new Options_Features();
@@ -21389,7 +21389,7 @@ namespace CS_Classes
 
 
 
-    public class Fibonacci_Basics_CS : VB_Parent
+    public class Fibonacci_Basics_CS : TaskParent
     {
         Font_FlowText flow = new Font_FlowText();
         double a = 0, b = 1;
@@ -21416,7 +21416,7 @@ namespace CS_Classes
 
 
 
-    public class Fibonacci_Yield_CS : VB_Parent
+    public class Fibonacci_Yield_CS : TaskParent
     {
         Font_FlowText flow = new Font_FlowText();
         public Fibonacci_Yield_CS()
@@ -21456,7 +21456,7 @@ namespace CS_Classes
 
 
 
-    public class Filter_Laplacian_CS : VB_Parent
+    public class Filter_Laplacian_CS : TaskParent
     {
         public Filter_Laplacian_CS()
         {
@@ -21478,7 +21478,7 @@ namespace CS_Classes
 
 
 
-    public class Filter_NormalizedKernel_CS : VB_Parent
+    public class Filter_NormalizedKernel_CS : TaskParent
     {
         Options_FilterNorm options = new Options_FilterNorm();
         public Filter_NormalizedKernel_CS()
@@ -21502,7 +21502,7 @@ namespace CS_Classes
 
 
 
-    public class Filter_Normalized2D_CS : VB_Parent
+    public class Filter_Normalized2D_CS : TaskParent
     {
         Options_Filter options = new Options_Filter();
         public Filter_Normalized2D_CS()
@@ -21522,7 +21522,7 @@ namespace CS_Classes
 
 
 
-    public class Filter_SepFilter2D_CS : VB_Parent
+    public class Filter_SepFilter2D_CS : TaskParent
     {
         Options_SepFilter2D options = new Options_SepFilter2D();
         public Filter_SepFilter2D_CS()
@@ -21553,7 +21553,7 @@ namespace CS_Classes
 
 
 
-    public class Filter_Minimum_CS : VB_Parent
+    public class Filter_Minimum_CS : TaskParent
     {
         Options_Filter options = new Options_Filter();
         public Filter_Minimum_CS()
@@ -21572,7 +21572,7 @@ namespace CS_Classes
 
 
 
-    public class Filter_Maximum_CS : VB_Parent
+    public class Filter_Maximum_CS : TaskParent
     {
         Options_Filter options = new Options_Filter();
         public Filter_Maximum_CS()
@@ -21591,7 +21591,7 @@ namespace CS_Classes
 
 
 
-    public class Filter_Mean_CS : VB_Parent
+    public class Filter_Mean_CS : TaskParent
     {
         Options_Filter options = new Options_Filter();
         public Filter_Mean_CS()
@@ -21610,7 +21610,7 @@ namespace CS_Classes
 
 
 
-    public class Filter_Median_CS : VB_Parent
+    public class Filter_Median_CS : TaskParent
     {
         Options_Filter options = new Options_Filter();
         public Filter_Median_CS()
@@ -21631,7 +21631,7 @@ namespace CS_Classes
 
 
 
-    public class FitEllipse_Basics_CS : VB_Parent
+    public class FitEllipse_Basics_CS : TaskParent
     {
         Options_MinArea options = new Options_MinArea();
         public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
@@ -21673,7 +21673,7 @@ namespace CS_Classes
 
 
 
-    public class FitEllipse_AMS_CPP_CS : VB_Parent
+    public class FitEllipse_AMS_CPP_CS : TaskParent
     {
         Options_MinArea options = new Options_MinArea();
         public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
@@ -21715,7 +21715,7 @@ namespace CS_Classes
 
 
 
-    public class FitEllipse_Direct_CPP_CS : VB_Parent
+    public class FitEllipse_Direct_CPP_CS : TaskParent
     {
         Options_MinArea options = new Options_MinArea();
         public FitEllipse_Direct_CPP_CS()
@@ -21752,7 +21752,7 @@ namespace CS_Classes
 
 
 
-    public class FitEllipse_RedCloud_CS : VB_Parent
+    public class FitEllipse_RedCloud_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         FitEllipse_Basics fitE = new FitEllipse_Basics();
@@ -21784,7 +21784,7 @@ namespace CS_Classes
 
 
 
-    public class FitLine_Basics_CS : VB_Parent
+    public class FitLine_Basics_CS : TaskParent
     {
         Options_FitLine options = new Options_FitLine();
         public Draw_Lines draw = new Draw_Lines();
@@ -21832,7 +21832,7 @@ namespace CS_Classes
 
 
 
-    public class FitLine_Basics3D_CS : VB_Parent
+    public class FitLine_Basics3D_CS : TaskParent
     {
         Hough_Lines_MT hlines = new Hough_Lines_MT();
         public FitLine_Basics3D_CS()
@@ -21911,7 +21911,7 @@ namespace CS_Classes
 
 
 
-    public class FLANN_Test_CS : VB_Parent
+    public class FLANN_Test_CS : TaskParent
     {
         public FLANN_Test_CS()
         {
@@ -21955,7 +21955,7 @@ namespace CS_Classes
 
 
 
-    public class FLANN_Basics_CS : VB_Parent
+    public class FLANN_Basics_CS : TaskParent
     {
         Random_Basics random = new Random_Basics();
         Point2f[] qArray;
@@ -22030,7 +22030,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_Basics_CS : VB_Parent
+    public class Flood_Basics_CS : TaskParent
     {
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public Cell_Generate genCells = new Cell_Generate();
@@ -22068,7 +22068,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_CellStatsPlot_CS : VB_Parent
+    public class Flood_CellStatsPlot_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         Cell_BasicsPlot stats = new Cell_BasicsPlot();
@@ -22101,7 +22101,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_ContainedCells_CS : VB_Parent
+    public class Flood_ContainedCells_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         public Flood_ContainedCells_CS()
@@ -22145,7 +22145,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_BasicsMask_CS : VB_Parent
+    public class Flood_BasicsMask_CS : TaskParent
     {
         public Mat binarizedImage;
         public Mat inputMask;
@@ -22185,7 +22185,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_Tiers_CS : VB_Parent
+    public class Flood_Tiers_CS : TaskParent
     {
         Flood_BasicsMask flood = new Flood_BasicsMask();
         Depth_Tiers tiers = new Depth_Tiers();
@@ -22221,7 +22221,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_Motion_CS : VB_Parent
+    public class Flood_Motion_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         List<rcData> redCells = new List<rcData>();
@@ -22273,7 +22273,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_Motion1_CS : VB_Parent
+    public class Flood_Motion1_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         Motion_Basics motion = new Motion_Basics();
@@ -22323,7 +22323,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_LeftRight_CS : VB_Parent
+    public class Flood_LeftRight_CS : TaskParent
     {
         RedCloud_Basics redLeft = new RedCloud_Basics();
         RedCloud_Basics redRight = new RedCloud_Basics();
@@ -22377,7 +22377,7 @@ namespace CS_Classes
 
 
 
-    public class Flood_MaxDistPoints_CS : VB_Parent
+    public class Flood_MaxDistPoints_CS : TaskParent
     {
         Boundary_RemovedRects bounds = new Boundary_RemovedRects();
         RedCloud_MaxDist_CPP_VB redCPP = new RedCloud_MaxDist_CPP_VB();
@@ -22417,7 +22417,7 @@ namespace CS_Classes
 
 
 
-    public class Font_OpenCV_CS : VB_Parent
+    public class Font_OpenCV_CS : TaskParent
     {
         public Font_OpenCV_CS()
         {
@@ -22447,7 +22447,7 @@ namespace CS_Classes
 
 
 
-    public class Font_FlowTextOld_CS : VB_Parent
+    public class Font_FlowTextOld_CS : TaskParent
     {
         public List<string> msgs = new List<string>();
         public int dst = 2;
@@ -22488,7 +22488,7 @@ namespace CS_Classes
 
 
 
-    public class Font_FlowText_CS : VB_Parent
+    public class Font_FlowText_CS : TaskParent
     {
         public List<string> flowText = new List<string>();
         public string nextMsg;
@@ -22528,7 +22528,7 @@ namespace CS_Classes
 
 
 
-    public class Foreground_Basics_CS : VB_Parent
+    public class Foreground_Basics_CS : TaskParent
     {
         KMeans_Depth simK = new KMeans_Depth();
         public float fgDepth;
@@ -22583,7 +22583,7 @@ namespace CS_Classes
 
 
 
-    public class Foreground_KMeans_CS : VB_Parent
+    public class Foreground_KMeans_CS : TaskParent
     {
         KMeans_Image km = new KMeans_Image();
         public Foreground_KMeans_CS()
@@ -22619,7 +22619,7 @@ namespace CS_Classes
 
 
 
-    public class Foreground_Contours_CS : VB_Parent
+    public class Foreground_Contours_CS : TaskParent
     {
         public Foreground_Hist3D fore = new Foreground_Hist3D();
         Contour_General contours = new Contour_General();
@@ -22638,7 +22638,7 @@ namespace CS_Classes
 
 
 
-    public class Foreground_Hist3D_CS : VB_Parent
+    public class Foreground_Hist3D_CS : TaskParent
     {
         Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
         public Foreground_Hist3D_CS()
@@ -22659,7 +22659,7 @@ namespace CS_Classes
 
 
 
-    public class Foreground_RedCloud_CS : VB_Parent
+    public class Foreground_RedCloud_CS : TaskParent
     {
         Foreground_CellsFore fore = new Foreground_CellsFore();
         Foreground_CellsBack back = new Foreground_CellsBack();
@@ -22685,7 +22685,7 @@ namespace CS_Classes
 
 
 
-    public class Foreground_CellsFore_CS : VB_Parent
+    public class Foreground_CellsFore_CS : TaskParent
     {
         Foreground_Hist3D fore = new Foreground_Hist3D();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -22714,7 +22714,7 @@ namespace CS_Classes
 
 
 
-    public class Foreground_CellsBack_CS : VB_Parent
+    public class Foreground_CellsBack_CS : TaskParent
     {
         Foreground_Hist3D fore = new Foreground_Hist3D();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -22745,7 +22745,7 @@ namespace CS_Classes
 
 
 
-    public class Fractal_Mandelbrot_CS : VB_Parent
+    public class Fractal_Mandelbrot_CS : TaskParent
     {
         public float startX = -2;
         public float endX = 2;
@@ -22799,7 +22799,7 @@ namespace CS_Classes
 
 
 
-    public class Fractal_MandelbrotZoom_CS : VB_Parent
+    public class Fractal_MandelbrotZoom_CS : TaskParent
     {
         public Fractal_Mandelbrot mandel = new Fractal_Mandelbrot();
         cv.Rect saveDrawRect = new cv.Rect(1, 1, 1, 1);
@@ -22836,7 +22836,7 @@ namespace CS_Classes
 
 
 
-    public class Fractal_MandelbrotZoomColor_CS : VB_Parent
+    public class Fractal_MandelbrotZoomColor_CS : TaskParent
     {
         public Fractal_MandelbrotZoom zoom = new Fractal_MandelbrotZoom();
         public Fractal_MandelbrotZoomColor_CS()
@@ -22855,7 +22855,7 @@ namespace CS_Classes
 
 
 
-    public class Fractal_Julia_CS : VB_Parent
+    public class Fractal_Julia_CS : TaskParent
     {
         Fractal_MandelbrotZoomColor mandel = new Fractal_MandelbrotZoomColor();
         double rt = 0.282;
@@ -22913,7 +22913,7 @@ namespace CS_Classes
 
 
 
-    public class Fractal_Dimension_CS : VB_Parent
+    public class Fractal_Dimension_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public Fractal_Dimension_CS()
@@ -22981,7 +22981,7 @@ namespace CS_Classes
 
 
 
-    public class FrameRate_Basics_CS : VB_Parent
+    public class FrameRate_Basics_CS : TaskParent
     {
         Mat_4to1 mats = new Mat_4to1();
         int[] frameCounts = new int[4];
@@ -23027,7 +23027,7 @@ namespace CS_Classes
 
 
 
-    public class FrameRate_BasicsGray_CS : VB_Parent
+    public class FrameRate_BasicsGray_CS : TaskParent
     {
         Mat_4to1 mats = new Mat_4to1();
         int[] frameCounts = new int[4];
@@ -23084,7 +23084,7 @@ namespace CS_Classes
 
 
 
-    public class FREAK_Basics_CS : VB_Parent
+    public class FREAK_Basics_CS : TaskParent
     {
         ORB_Basics orb = new ORB_Basics();
         public FREAK_Basics_CS()
@@ -23118,7 +23118,7 @@ namespace CS_Classes
 
 
 
-    public class Fuzzy_Basics_CPP_CS : VB_Parent
+    public class Fuzzy_Basics_CPP_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Options_Contours options = new Options_Contours();
@@ -23195,7 +23195,7 @@ namespace CS_Classes
 
 
 
-    public class Fuzzy_Filter_CS : VB_Parent
+    public class Fuzzy_Filter_CS : TaskParent
     {
         Mat kernel;
         Reduction_Basics reduction = new Reduction_Basics();
@@ -23262,7 +23262,7 @@ namespace CS_Classes
 
 
 
-    public class Fuzzy_ContoursDepth_CS : VB_Parent
+    public class Fuzzy_ContoursDepth_CS : TaskParent
     {
         public Fuzzy_Basics fuzzyD = new Fuzzy_Basics();
         public Fuzzy_ContoursDepth_CS()
@@ -23279,7 +23279,7 @@ namespace CS_Classes
 
 
 
-    public class Fuzzy_NeighborProof_CS : VB_Parent
+    public class Fuzzy_NeighborProof_CS : TaskParent
     {
         Fuzzy_Basics fuzzy = new Fuzzy_Basics();
         bool proofFailed = false;
@@ -23325,7 +23325,7 @@ namespace CS_Classes
 
 
 
-    public class Fuzzy_TrackerDepth_CS : VB_Parent
+    public class Fuzzy_TrackerDepth_CS : TaskParent
     {
         public Fuzzy_Basics fuzzy = new Fuzzy_Basics();
         public List<cv.Point> centroids = new List<cv.Point>();
@@ -23378,7 +23378,7 @@ namespace CS_Classes
 
 
 
-    public class Fuzzy_TrackerDepthClick_CS : VB_Parent
+    public class Fuzzy_TrackerDepthClick_CS : TaskParent
     {
         public Fuzzy_TrackerDepth tracker = new Fuzzy_TrackerDepth();
         public cv.Point highlightPoint;
@@ -23412,7 +23412,7 @@ namespace CS_Classes
 
 
 
-    public class Gabor_Basics_CS : VB_Parent
+    public class Gabor_Basics_CS : TaskParent
     {
         public Options_Gabor options = new Options_Gabor();
         public Gabor_Basics_CS()
@@ -23429,7 +23429,7 @@ namespace CS_Classes
 
 
 
-    public class GrabCut_Basics_CS : VB_Parent
+    public class GrabCut_Basics_CS : TaskParent
     {
         public Mat fgFineTune;
         public Mat bgFineTune;
@@ -23466,7 +23466,7 @@ namespace CS_Classes
 
 
 
-    public class GrabCut_ImageRect_CS : VB_Parent
+    public class GrabCut_ImageRect_CS : TaskParent
     {
         Mat image;
         Mat bgModel = new Mat();
@@ -23506,7 +23506,7 @@ namespace CS_Classes
 
 
 
-    public class GrabCut_ImageMask_CS : VB_Parent
+    public class GrabCut_ImageMask_CS : TaskParent
     {
         Mat image;
         Mat bgModel = new Mat(), fgModel = new Mat();
@@ -23539,7 +23539,7 @@ namespace CS_Classes
 
 
 
-    public class GrabCut_FineTune_CS : VB_Parent
+    public class GrabCut_FineTune_CS : TaskParent
     {
         GrabCut_Basics basics = new GrabCut_Basics();
         Mat_4to1 mats = new Mat_4to1();
@@ -23590,7 +23590,7 @@ namespace CS_Classes
 
 
 
-    public class Gradient_Basics_CS : VB_Parent
+    public class Gradient_Basics_CS : TaskParent
     {
         public Edge_Sobel sobel = new Edge_Sobel();
         public Gradient_Basics_CS()
@@ -23610,7 +23610,7 @@ namespace CS_Classes
 
 
 
-    public class Gradient_Depth_CS : VB_Parent
+    public class Gradient_Depth_CS : TaskParent
     {
         Edge_Sobel sobel = new Edge_Sobel();
         public Gradient_Depth_CS()
@@ -23630,7 +23630,7 @@ namespace CS_Classes
 
 
 
-    public class Gradient_Color_CS : VB_Parent
+    public class Gradient_Color_CS : TaskParent
     {
         public Scalar color1 = Scalar.Blue;
         public Scalar color2 = Scalar.Yellow;
@@ -23663,7 +23663,7 @@ namespace CS_Classes
 
 
 
-    public class Gradient_CartToPolar_CS : VB_Parent
+    public class Gradient_CartToPolar_CS : TaskParent
     {
         public Gradient_Basics basics = new Gradient_Basics();
         public Mat magnitude = new Mat();
@@ -23696,7 +23696,7 @@ namespace CS_Classes
 
 
 
-    public class Gravity_Basics_CS : VB_Parent
+    public class Gravity_Basics_CS : TaskParent
     {
         public List<cv.Point> points = new List<cv.Point>();
         int resizeRatio = 1;
@@ -23780,7 +23780,7 @@ namespace CS_Classes
 
 
 
-    public class Gravity_BasicsOriginal_CS : VB_Parent
+    public class Gravity_BasicsOriginal_CS : TaskParent
     {
         public PointPair vec = new PointPair();
         public Gravity_BasicsOriginal_CS()
@@ -23839,7 +23839,7 @@ namespace CS_Classes
 
 
 
-    public class Gravity_HorizonCompare_CS : VB_Parent
+    public class Gravity_HorizonCompare_CS : TaskParent
     {
         Gravity_Basics gravity = new Gravity_Basics();
         Horizon_Basics horizon = new Horizon_Basics();
@@ -23872,7 +23872,7 @@ namespace CS_Classes
 
 
 
-    public class Gravity_Horizon_CS : VB_Parent
+    public class Gravity_Horizon_CS : TaskParent
     {
         Gravity_Basics gravity = new Gravity_Basics();
         Horizon_Basics horizon = new Horizon_Basics();
@@ -23909,7 +23909,7 @@ namespace CS_Classes
 
 
 
-    public class GrayToColor_Palette_CS : VB_Parent
+    public class GrayToColor_Palette_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         public GrayToColor_Palette_CS()
@@ -23950,7 +23950,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_Basics_CS : VB_Parent
+    public class Grid_Basics_CS : TaskParent
     {
         public List<cv.Rect> gridRects = new List<cv.Rect>();
         public Grid_Basics_CS()
@@ -24083,7 +24083,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_BasicsTest_CS : VB_Parent
+    public class Grid_BasicsTest_CS : TaskParent
     {
         public Grid_BasicsTest_CS()
         {
@@ -24114,7 +24114,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_List_CS : VB_Parent
+    public class Grid_List_CS : TaskParent
     {
         public Grid_List_CS()
         {
@@ -24153,7 +24153,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_Rectangles_CS : VB_Parent
+    public class Grid_Rectangles_CS : TaskParent
     {
         public int tilesPerRow;
         public int tilesPerCol;
@@ -24222,7 +24222,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_FPS_CS : VB_Parent
+    public class Grid_FPS_CS : TaskParent
     {
         public bool heartBeat;
         public TrackBar fpsSlider;
@@ -24258,7 +24258,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_Neighbors_CS : VB_Parent
+    public class Grid_Neighbors_CS : TaskParent
     {
         Mat mask = new Mat();
         public Grid_Neighbors_CS()
@@ -24302,7 +24302,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_Special_CS : VB_Parent
+    public class Grid_Special_CS : TaskParent
     {
         public int gridWidth = 10;
         public int gridHeight = 10;
@@ -24408,7 +24408,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_MinMaxDepth_CS : VB_Parent
+    public class Grid_MinMaxDepth_CS : TaskParent
     {
         public PointPair[] minMaxLocs = new PointPair[1];
         public Vec2f[] minMaxVals = new Vec2f[1];
@@ -24447,7 +24447,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_TrackCenter_CS : VB_Parent
+    public class Grid_TrackCenter_CS : TaskParent
     {
         public cv.Point center;
         Match_Basics match = new Match_Basics();
@@ -24487,7 +24487,7 @@ namespace CS_Classes
 
 
 
-    public class Grid_ShowMap_CS : VB_Parent
+    public class Grid_ShowMap_CS : TaskParent
     {
         public Grid_ShowMap_CS()
         {
@@ -24503,7 +24503,7 @@ namespace CS_Classes
 
 
 
-    public class GuidedBP_Basics_CS : VB_Parent
+    public class GuidedBP_Basics_CS : TaskParent
     {
         public GuidedBP_HotPoints ptHot = new GuidedBP_HotPoints();
         Mat topMap = new Mat();
@@ -24558,7 +24558,7 @@ namespace CS_Classes
 
 
 
-    public class GuidedBP_HotPointsKNN_CS : VB_Parent
+    public class GuidedBP_HotPointsKNN_CS : TaskParent
     {
         GuidedBP_HotPoints ptHot = new GuidedBP_HotPoints();
         KNN_Basics knnSide = new KNN_Basics();
@@ -24607,7 +24607,7 @@ namespace CS_Classes
 
 
 
-    public class GuidedBP_HotPoints_CS : VB_Parent
+    public class GuidedBP_HotPoints_CS : TaskParent
     {
         public Projection_HistTop histTop = new Projection_HistTop();
         public Projection_HistSide histSide = new Projection_HistSide();
@@ -24663,7 +24663,7 @@ namespace CS_Classes
 
 
 
-    public class GuidedBP_PlanesPlot_CS : VB_Parent
+    public class GuidedBP_PlanesPlot_CS : TaskParent
     {
         Projection_HistSide histSide = new Projection_HistSide();
         public GuidedBP_PlanesPlot_CS()
@@ -24713,7 +24713,7 @@ namespace CS_Classes
 
 
 
-    public class GuidedBP_Points_CS : VB_Parent
+    public class GuidedBP_Points_CS : TaskParent
     {
         public GuidedBP_Basics hotPoints = new GuidedBP_Basics();
         public int classCount;
@@ -24748,7 +24748,7 @@ namespace CS_Classes
 
 
 
-    public class GuidedBP_Lookup_CS : VB_Parent
+    public class GuidedBP_Lookup_CS : TaskParent
     {
         GuidedBP_Basics guided = new GuidedBP_Basics();
         public GuidedBP_Lookup_CS()
@@ -24767,7 +24767,7 @@ namespace CS_Classes
 
 
 
-    public class GuidedBP_Depth_CS : VB_Parent
+    public class GuidedBP_Depth_CS : TaskParent
     {
         public PointCloud_Histograms hist = new PointCloud_Histograms();
         Palette_Random myPalette = new Palette_Random();
@@ -24820,7 +24820,7 @@ namespace CS_Classes
 
 
 
-    public class HeatMap_Basics_CS : VB_Parent
+    public class HeatMap_Basics_CS : TaskParent
     {
         public History_Basics topframes = new History_Basics();
         public History_Basics sideframes = new History_Basics();
@@ -24853,7 +24853,7 @@ namespace CS_Classes
 
 
 
-    public class HeatMap_Grid_CS : VB_Parent
+    public class HeatMap_Grid_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
         public HeatMap_Grid_CS()
@@ -24916,7 +24916,7 @@ namespace CS_Classes
 
 
 
-    public class HeatMap_HotNot_CS : VB_Parent
+    public class HeatMap_HotNot_CS : TaskParent
     {
         HeatMap_Hot heat = new HeatMap_Hot();
         public HeatMap_HotNot_CS()
@@ -24937,7 +24937,7 @@ namespace CS_Classes
 
 
 
-    public class HeatMap_Hot_CS : VB_Parent
+    public class HeatMap_Hot_CS : TaskParent
     {
         Projection_HistTop histTop = new Projection_HistTop();
         Projection_HistSide histSide = new Projection_HistSide();
@@ -24962,7 +24962,7 @@ namespace CS_Classes
 
 
 
-    public class HeatMap_Cell_CS : VB_Parent
+    public class HeatMap_Cell_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         HeatMap_Hot heat = new HeatMap_Hot();
@@ -24990,7 +24990,7 @@ namespace CS_Classes
 
 
 
-    public class HeatMap_GuidedBP_CS : VB_Parent
+    public class HeatMap_GuidedBP_CS : TaskParent
     {
         GuidedBP_Basics guided = new GuidedBP_Basics();
         public HeatMap_GuidedBP_CS()
@@ -25010,7 +25010,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Basics_CS : VB_Parent
+    public class Hist_Basics_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public mmData mm;
@@ -25100,7 +25100,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_DepthSimple_CS : VB_Parent
+    public class Hist_DepthSimple_CS : TaskParent
     {
         public List<float> histList = new List<float>();
         public float[] histArray;
@@ -25138,7 +25138,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Grayscale_CS : VB_Parent
+    public class Hist_Grayscale_CS : TaskParent
     {
         public Hist_Basics hist = new Hist_Basics();
         public Hist_Grayscale_CS()
@@ -25158,7 +25158,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Graph_CS : VB_Parent
+    public class Hist_Graph_CS : TaskParent
     {
         public Mat[] histRaw = new Mat[3];
         public Mat[] histNormalized = new Mat[3];
@@ -25210,7 +25210,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_NormalizeGray_CS : VB_Parent
+    public class Hist_NormalizeGray_CS : TaskParent
     {
         public Hist_Basics histogram = new Hist_Basics();
         private Options_Histogram options = new Options_Histogram();
@@ -25234,7 +25234,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_EqualizeGray_CS : VB_Parent
+    public class Hist_EqualizeGray_CS : TaskParent
     {
         public Hist_Basics histogramEQ = new Hist_Basics();
         public Hist_Basics histogram = new Hist_Basics();
@@ -25265,7 +25265,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Simple_CS : VB_Parent
+    public class Hist_Simple_CS : TaskParent
     {
         public Plot_Histogram plot = new Plot_Histogram();
         public Hist_Simple_CS()
@@ -25287,7 +25287,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_ColorsAndGray_CS : VB_Parent
+    public class Hist_ColorsAndGray_CS : TaskParent
     {
         Hist_Basics histogram = new Hist_Basics();
         Mat_4Click mats = new Mat_4Click();
@@ -25322,7 +25322,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Frustrum_CS : VB_Parent
+    public class Hist_Frustrum_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
         public Hist_Frustrum_CS()
@@ -25348,7 +25348,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_PeakMax_CS : VB_Parent
+    public class Hist_PeakMax_CS : TaskParent
     {
         Hist_Basics hist;
         public Hist_PeakMax_CS()
@@ -25381,7 +25381,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_PeakFinder_CS : VB_Parent
+    public class Hist_PeakFinder_CS : TaskParent
     {
         public Hist_Basics hist;
         public int peakCount;
@@ -25483,7 +25483,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_PeaksDepth_CS : VB_Parent
+    public class Hist_PeaksDepth_CS : TaskParent
     {
         Hist_PeakFinder peaks;
         public Hist_PeaksDepth_CS()
@@ -25502,7 +25502,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_PeaksRGB_CS : VB_Parent
+    public class Hist_PeaksRGB_CS : TaskParent
     {
         Mat_4Click mats;
         Hist_PeakFinder[] peaks;
@@ -25541,7 +25541,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Color_CS : VB_Parent
+    public class Hist_Color_CS : TaskParent
     {
         Mat histogram = new cv.Mat();
         Plot_Histogram plot = new Plot_Histogram();
@@ -25569,7 +25569,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_KalmanAuto_CS : VB_Parent
+    public class Hist_KalmanAuto_CS : TaskParent
     {
         Mat histogram = new Mat();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -25631,7 +25631,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_EqualizeColor_CS : VB_Parent
+    public class Hist_EqualizeColor_CS : TaskParent
     {
         Hist_Basics kalmanEq = new Hist_Basics();
         Hist_Basics kalman = new Hist_Basics();
@@ -25672,7 +25672,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_CompareGray_CS : VB_Parent
+    public class Hist_CompareGray_CS : TaskParent
     {
         Hist_Kalman histK = new Hist_Kalman();
         Options_HistCompare options = new Options_HistCompare();
@@ -25726,7 +25726,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_ComparePlot_CS : VB_Parent
+    public class Hist_ComparePlot_CS : TaskParent
     {
         Hist_CompareGray comp = new Hist_CompareGray();
         List<TrueText> ttLabels;
@@ -25755,7 +25755,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_CompareNumber_CS : VB_Parent
+    public class Hist_CompareNumber_CS : TaskParent
     {
         Hist_CompareGray comp = new Hist_CompareGray();
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
@@ -25783,7 +25783,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_CompareEMD_hsv_CS : VB_Parent
+    public class Hist_CompareEMD_hsv_CS : TaskParent
     {
         Hist_Basics hist = new Hist_Basics();
         Mat lastHSV;
@@ -25828,7 +25828,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Peaks_CS : VB_Parent
+    public class Hist_Peaks_CS : TaskParent
     {
         BackProject_Masks masks;
         public Hist_Peaks_CS()
@@ -25847,7 +25847,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Lab_CS : VB_Parent
+    public class Hist_Lab_CS : TaskParent
     {
         Hist_Basics hist;
         public Hist_Lab_CS()
@@ -25874,7 +25874,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_PointCloudXYZ_CS : VB_Parent
+    public class Hist_PointCloudXYZ_CS : TaskParent
     {
         public Plot_Histogram plot = new Plot_Histogram();
         List<List<TrueText>> ttlists;
@@ -25937,7 +25937,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_FlatSurfaces_CS : VB_Parent
+    public class Hist_FlatSurfaces_CS : TaskParent
     {
         BackProject_Masks masks = new BackProject_Masks();
         float saveMinVal, saveMaxVal;
@@ -25980,7 +25980,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_ShapeSide_CS : VB_Parent
+    public class Hist_ShapeSide_CS : TaskParent
     {
         public rcData rc = new rcData();
         public Hist_ShapeSide_CS()
@@ -26006,7 +26006,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_ShapeTop_CS : VB_Parent
+    public class Hist_ShapeTop_CS : TaskParent
     {
         public rcData rc = new rcData();
         public Hist_ShapeTop_CS()
@@ -26032,7 +26032,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Gotcha2D_CS : VB_Parent
+    public class Hist_Gotcha2D_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public Hist_Gotcha2D_CS()
@@ -26068,7 +26068,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Gotcha_CS : VB_Parent
+    public class Hist_Gotcha_CS : TaskParent
     {
         public Mat histogram = new Mat();
         Hist_Basics hist = new Hist_Basics();
@@ -26099,7 +26099,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_GotchaFixed_CPP_CS : VB_Parent
+    public class Hist_GotchaFixed_CPP_CS : TaskParent
     {
         public Hist_GotchaFixed_CPP_CS()
         {
@@ -26135,7 +26135,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Byte_CPP_CS : VB_Parent
+    public class Hist_Byte_CPP_CS : TaskParent
     {
         public Plot_Histogram plot = new Plot_Histogram();
         public Hist_Byte_CPP_CS()
@@ -26165,7 +26165,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Xdimension_CS : VB_Parent
+    public class Hist_Xdimension_CS : TaskParent
     {
         Hist_Depth plot = new Hist_Depth();
         public Hist_Xdimension_CS()
@@ -26184,7 +26184,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Ydimension_CS : VB_Parent
+    public class Hist_Ydimension_CS : TaskParent
     {
         Hist_Depth plot = new Hist_Depth();
         public Hist_Ydimension_CS()
@@ -26203,7 +26203,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Zdimension_CS : VB_Parent
+    public class Hist_Zdimension_CS : TaskParent
     {
         Hist_Depth plot = new Hist_Depth();
         public Hist_Zdimension_CS()
@@ -26222,7 +26222,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Depth_CS : VB_Parent
+    public class Hist_Depth_CS : TaskParent
     {
         public Plot_Histogram plot = new Plot_Histogram();
         public rcData rc;
@@ -26274,7 +26274,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Cell_CS : VB_Parent
+    public class Hist_Cell_CS : TaskParent
     {
         Hist_Depth hist = new Hist_Depth();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -26300,7 +26300,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_PointCloud_CS : VB_Parent
+    public class Hist_PointCloud_CS : TaskParent
     {
         public Rangef[] rangesX;
         public Rangef[] rangesY;
@@ -26328,7 +26328,7 @@ namespace CS_Classes
 
 
 
-    public class Hist_Kalman_CS : VB_Parent
+    public class Hist_Kalman_CS : TaskParent
     {
         public Hist_Basics hist = new Hist_Basics();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -26357,7 +26357,7 @@ namespace CS_Classes
 
 
 
-    public class Guess_Depth_CPP_CS : VB_Parent
+    public class Guess_Depth_CPP_CS : TaskParent
     {
         public Guess_Depth_CPP_CS()
         {
@@ -26385,7 +26385,7 @@ namespace CS_Classes
 
 
 
-    public class Guess_ImageEdges_CPP_CS : VB_Parent
+    public class Guess_ImageEdges_CPP_CS : TaskParent
     {
         Options_Guess options = new Options_Guess();
         public Guess_ImageEdges_CPP_CS()
@@ -26421,7 +26421,7 @@ namespace CS_Classes
 
 
 
-    public class Hist2D_Basics_CS : VB_Parent
+    public class Hist2D_Basics_CS : TaskParent
     {
         public int[] histRowsCols;
         public Rangef[] ranges;
@@ -26445,7 +26445,7 @@ namespace CS_Classes
 
 
 
-    public class Hist2D_Cloud_CS : VB_Parent
+    public class Hist2D_Cloud_CS : TaskParent
     {
         Plot_Histogram2D plot1D = new Plot_Histogram2D();
         int[] channels;
@@ -26477,7 +26477,7 @@ namespace CS_Classes
 
 
 
-    public class Hist2D_Depth_CS : VB_Parent
+    public class Hist2D_Depth_CS : TaskParent
     {
         Hist2D_Cloud hist2d = new Hist2D_Cloud();
         public int[] channels;
@@ -26502,7 +26502,7 @@ namespace CS_Classes
 
 
 
-    public class Hist2D_Zoom_CS : VB_Parent
+    public class Hist2D_Zoom_CS : TaskParent
     {
         Hist2D_Basics hist2d = new Hist2D_Basics();
         Magnify_Basics zoom = new Magnify_Basics();
@@ -26523,7 +26523,7 @@ namespace CS_Classes
 
 
 
-    public class Hist2D_HSV_CS : VB_Parent
+    public class Hist2D_HSV_CS : TaskParent
     {
         public Mat histogram01 = new Mat();
         public Mat histogram02 = new Mat();
@@ -26548,7 +26548,7 @@ namespace CS_Classes
 
 
 
-    public class Hist2D_BGR_CS : VB_Parent
+    public class Hist2D_BGR_CS : TaskParent
     {
         public Mat histogram01 = new Mat();
         public Mat histogram02 = new Mat();
@@ -26572,7 +26572,7 @@ namespace CS_Classes
 
 
 
-    public class Hist2D_PlotHistogram1D_CS : VB_Parent
+    public class Hist2D_PlotHistogram1D_CS : TaskParent
     {
         Mat histogram = new Mat();
         Plot_Histogram plot = new Plot_Histogram();
@@ -26598,7 +26598,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_Basics_CS : VB_Parent
+    public class Hist3D_Basics_CS : TaskParent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         Hist3Dcloud_Basics hCloud = new Hist3Dcloud_Basics();
@@ -26632,7 +26632,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_BuildHistogram_CS : VB_Parent
+    public class Hist3D_BuildHistogram_CS : TaskParent
     {
         public int threshold;
         public int classCount;
@@ -26688,7 +26688,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_RedCloud_CS : VB_Parent
+    public class Hist3D_RedCloud_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Hist3D_Basics hist3D = new Hist3D_Basics();
@@ -26711,7 +26711,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_RedColor_CS : VB_Parent
+    public class Hist3D_RedColor_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
@@ -26739,7 +26739,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_DepthWithMask_CS : VB_Parent
+    public class Hist3D_DepthWithMask_CS : TaskParent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         public Mat depthMask = new Mat();
@@ -26770,7 +26770,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_Pixel_CS : VB_Parent
+    public class Hist3D_Pixel_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public float[] histArray;
@@ -26800,7 +26800,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_PixelCells_CS : VB_Parent
+    public class Hist3D_PixelCells_CS : TaskParent
     {
         Hist3D_Pixel pixel = new Hist3D_Pixel();
         Flood_Basics redC = new Flood_Basics();
@@ -26825,7 +26825,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_PixelClassify_CS : VB_Parent
+    public class Hist3D_PixelClassify_CS : TaskParent
     {
         Hist3D_Pixel pixel = new Hist3D_Pixel();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -26849,7 +26849,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_PixelDiffMask_CS : VB_Parent
+    public class Hist3D_PixelDiffMask_CS : TaskParent
     {
         Hist3D_Pixel pixel = new Hist3D_Pixel();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -26872,7 +26872,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3D_RedCloudGrid_CS : VB_Parent
+    public class Hist3D_RedCloudGrid_CS : TaskParent
     {
         Pixel_Vectors pixels = new Pixel_Vectors();
         Hist3Dcolor_Vector hVector = new Hist3Dcolor_Vector();
@@ -26947,7 +26947,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcloud_Basics_CS : VB_Parent
+    public class Hist3Dcloud_Basics_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public Mat histogram1D = new Mat();
@@ -26990,7 +26990,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcloud_DepthSplit_CS : VB_Parent
+    public class Hist3Dcloud_DepthSplit_CS : TaskParent
     {
         List<Hist_Kalman> hist;
         List<Hist2D_Cloud> hist2d;
@@ -27028,7 +27028,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcloud_Highlights_CPP_CS : VB_Parent
+    public class Hist3Dcloud_Highlights_CPP_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public Rangef[] ranges;
@@ -27078,7 +27078,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcloud_BP_Filter_CPP_CS : VB_Parent
+    public class Hist3Dcloud_BP_Filter_CPP_CS : TaskParent
     {
         public Mat histogram = new Mat();
         Options_HistXD options = new Options_HistXD();
@@ -27113,7 +27113,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcloud_PlotHist1D_CS : VB_Parent
+    public class Hist3Dcloud_PlotHist1D_CS : TaskParent
     {
         Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
         Plot_Histogram plot = new Plot_Histogram();
@@ -27143,7 +27143,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_Basics_CS : VB_Parent
+    public class Hist3Dcolor_Basics_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public Mat histogram1D = new Mat();
@@ -27180,7 +27180,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_UniqueRGBPixels_CS : VB_Parent
+    public class Hist3Dcolor_UniqueRGBPixels_CS : TaskParent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         public List<cv.Point3f> pixels = new List<cv.Point3f>();
@@ -27217,7 +27217,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_TopXColors_CS : VB_Parent
+    public class Hist3Dcolor_TopXColors_CS : TaskParent
     {
         Hist3Dcolor_UniqueRGBPixels unique = new Hist3Dcolor_UniqueRGBPixels();
         public List<cv.Point3i> topXPixels = new List<cv.Point3i>();
@@ -27247,7 +27247,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_Reduction_CS : VB_Parent
+    public class Hist3Dcolor_Reduction_CS : TaskParent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         Reduction_BGR reduction = new Reduction_BGR();
@@ -27273,7 +27273,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_ZeroGroups_CS : VB_Parent
+    public class Hist3Dcolor_ZeroGroups_CS : TaskParent
     {
         public Mat maskInput = new Mat();
         public int classCount;
@@ -27330,7 +27330,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_PlotHist1D_CS : VB_Parent
+    public class Hist3Dcolor_PlotHist1D_CS : TaskParent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         Plot_Histogram plot = new Plot_Histogram();
@@ -27357,7 +27357,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_Select_CS : VB_Parent
+    public class Hist3Dcolor_Select_CS : TaskParent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         public Hist3Dcolor_Select_CS()
@@ -27380,7 +27380,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_Basics_CPP_CS : VB_Parent
+    public class Hist3Dcolor_Basics_CPP_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public bool prepareImage = true;
@@ -27420,7 +27420,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_Diff_CS : VB_Parent
+    public class Hist3Dcolor_Diff_CS : TaskParent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         Diff_Basics diff = new Diff_Basics();
@@ -27444,7 +27444,7 @@ namespace CS_Classes
 
 
 
-    public class Hist3Dcolor_Vector_CS : VB_Parent
+    public class Hist3Dcolor_Vector_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public Mat inputMask = new Mat();
@@ -27476,7 +27476,7 @@ namespace CS_Classes
 
 
 
-    public class History_Basics_CS : VB_Parent
+    public class History_Basics_CS : TaskParent
     {
         public List<Mat> saveFrames = new List<Mat>();
         public History_Basics_CS()
@@ -27519,7 +27519,7 @@ namespace CS_Classes
 
 
 
-    public class History_MotionRect_CS : VB_Parent
+    public class History_MotionRect_CS : TaskParent
     {
         public History_MotionRect_CS()
         {
@@ -27539,7 +27539,7 @@ namespace CS_Classes
 
 
 
-    public class History_Cloud_CS : VB_Parent
+    public class History_Cloud_CS : TaskParent
     {
         public History_BasicsNoSaturation frames = new History_BasicsNoSaturation();
         List<Mat> saveFrames = new List<Mat>();
@@ -27572,7 +27572,7 @@ namespace CS_Classes
 
 
 
-    public class History_BasicsNoSaturation_CS : VB_Parent
+    public class History_BasicsNoSaturation_CS : TaskParent
     {
         public List<Mat> saveFrames = new List<Mat>();
         public History_BasicsNoSaturation_CS()
@@ -27609,7 +27609,7 @@ namespace CS_Classes
 
 
 
-    public class History_BasicsDiff_CS : VB_Parent
+    public class History_BasicsDiff_CS : TaskParent
     {
         History_BasicsNoSaturation frames = new History_BasicsNoSaturation();
         Diff_Basics diff = new Diff_Basics();
@@ -27630,7 +27630,7 @@ namespace CS_Classes
 
 
 
-    public class HistPeak2D_Basics_CS : VB_Parent
+    public class HistPeak2D_Basics_CS : TaskParent
     {
         public OpAuto_Peaks2DGrid auto = new OpAuto_Peaks2DGrid();
         Hist2D_BGR bgr = new Hist2D_BGR();
@@ -27674,7 +27674,7 @@ namespace CS_Classes
 
 
 
-    public class HistPeak2D_TopAndSide_CS : VB_Parent
+    public class HistPeak2D_TopAndSide_CS : TaskParent
     {
         HistPeak2D_Basics peak = new HistPeak2D_Basics();
         Projection_HistSide histSide = new Projection_HistSide();
@@ -27708,7 +27708,7 @@ namespace CS_Classes
 
 
 
-    public class HistPeak2D_NotHotTop_CS : VB_Parent
+    public class HistPeak2D_NotHotTop_CS : TaskParent
     {
         public Projection_HistTop histTop = new Projection_HistTop();
         HistPeak2D_Basics peak = new HistPeak2D_Basics();
@@ -27733,7 +27733,7 @@ namespace CS_Classes
 
 
 
-    public class HistPeak2D_Edges_CS : VB_Parent
+    public class HistPeak2D_Edges_CS : TaskParent
     {
         HistPeak2D_Basics peak = new HistPeak2D_Basics();
         Projection_HistTop histTop = new Projection_HistTop();
@@ -27758,7 +27758,7 @@ namespace CS_Classes
 
 
 
-    public class HistPeak2D_HSV_CS : VB_Parent
+    public class HistPeak2D_HSV_CS : TaskParent
     {
         Hist2D_HSV hsv = new Hist2D_HSV();
         HistPeak2D_Basics peak = new HistPeak2D_Basics();
@@ -27780,7 +27780,7 @@ namespace CS_Classes
 
 
 
-    public class HistPeak2D_BGR_CS : VB_Parent
+    public class HistPeak2D_BGR_CS : TaskParent
     {
         Hist2D_BGR bgr = new Hist2D_BGR();
         HistPeak2D_Basics peak = new HistPeak2D_Basics();
@@ -27802,7 +27802,7 @@ namespace CS_Classes
 
 
 
-    public class HistPeak2D_RGB_CS : VB_Parent
+    public class HistPeak2D_RGB_CS : TaskParent
     {
         HistPeak2D_BGR peak = new HistPeak2D_BGR();
         public HistPeak2D_RGB_CS()
@@ -27821,7 +27821,7 @@ namespace CS_Classes
 
 
 
-    public class HistPeak2D_HotSide_CS : VB_Parent
+    public class HistPeak2D_HotSide_CS : TaskParent
     {
         HistPeak2D_Basics peak = new HistPeak2D_Basics();
         Projection_HistSide histSide = new Projection_HistSide();
@@ -27851,7 +27851,7 @@ namespace CS_Classes
 
 
 
-    public class HistPeak2D_HotTop_CS : VB_Parent
+    public class HistPeak2D_HotTop_CS : TaskParent
     {
         HistPeak2D_Basics peak = new HistPeak2D_Basics();
         Projection_HistTop histTop = new Projection_HistTop();
@@ -27881,7 +27881,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Basics_CS : VB_Parent
+    public class HistValley_Basics_CS : TaskParent
     {
         Hist_Basics hist = new Hist_Basics();
         Options_Boundary options = new Options_Boundary();
@@ -27938,7 +27938,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_FromPeaks_CS : VB_Parent
+    public class HistValley_FromPeaks_CS : TaskParent
     {
         public HistValley_Peaks peak = new HistValley_Peaks();
         public List<int> peaks = new List<int>();
@@ -27994,7 +27994,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Peaks_CS : VB_Parent
+    public class HistValley_Peaks_CS : TaskParent
     {
         public Hist_Basics hist = new Hist_Basics();
         public Options_Boundary options = new Options_Boundary();
@@ -28078,7 +28078,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Depth_CS : VB_Parent
+    public class HistValley_Depth_CS : TaskParent
     {
         public HistValley_FromPeaks valley = new HistValley_FromPeaks();
         Mat histogram;
@@ -28115,7 +28115,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Depth1_CS : VB_Parent
+    public class HistValley_Depth1_CS : TaskParent
     {
         public HistValley_OptionsAuto valley = new HistValley_OptionsAuto();
         public SortedList<int, int> valleyOrder = new SortedList<int, int>(new compareAllowIdenticalInteger());
@@ -28137,7 +28137,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Test_CS : VB_Parent
+    public class HistValley_Test_CS : TaskParent
     {
         public SortedList<int, int> valleyOrder = new SortedList<int, int>(new compareAllowIdenticalInteger());
         public Options_Boundary options = new Options_Boundary();
@@ -28206,7 +28206,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_OptionsAuto_CS : VB_Parent
+    public class HistValley_OptionsAuto_CS : TaskParent
     {
         Hist_Kalman kalman = new Hist_Kalman();
         public Mat histogram = new Mat();
@@ -28254,7 +28254,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Diff_CS : VB_Parent
+    public class HistValley_Diff_CS : TaskParent
     {
         Diff_Basics diff = new Diff_Basics();
         HistValley_FromPeaks valley = new HistValley_FromPeaks();
@@ -28274,7 +28274,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_EdgeDraw_CS : VB_Parent
+    public class HistValley_EdgeDraw_CS : TaskParent
     {
         HistValley_FromPeaks valley = new HistValley_FromPeaks();
         EdgeDraw_Basics edges = new EdgeDraw_Basics();
@@ -28295,7 +28295,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Simple_CS : VB_Parent
+    public class HistValley_Simple_CS : TaskParent
     {
         SLR_Trends trends = new SLR_Trends();
         public Kalman_Basics kalman = new Kalman_Basics();
@@ -28346,7 +28346,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Tiers_CS : VB_Parent
+    public class HistValley_Tiers_CS : TaskParent
     {
         HistValley_FromPeaks valleys = new HistValley_FromPeaks();
         public HistValley_Tiers_CS()
@@ -28374,7 +28374,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_Colors_CS : VB_Parent
+    public class HistValley_Colors_CS : TaskParent
     {
         Hist_Kalman hist = new Hist_Kalman();
         OpAuto_Valley auto = new OpAuto_Valley();
@@ -28416,7 +28416,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_GrayKalman_CS : VB_Parent
+    public class HistValley_GrayKalman_CS : TaskParent
     {
         Hist_Kalman hist = new Hist_Kalman();
         OpAuto_Valley auto = new OpAuto_Valley();
@@ -28457,7 +28457,7 @@ namespace CS_Classes
 
 
 
-    public class HistValley_GrayScale1_CS : VB_Parent
+    public class HistValley_GrayScale1_CS : TaskParent
     {
         Hist_Basics hist = new Hist_Basics();
         public HistValley_GrayScale1_CS()
@@ -28515,7 +28515,7 @@ namespace CS_Classes
 
 
 
-    public class HMM_Example_CPP_CS : VB_Parent
+    public class HMM_Example_CPP_CS : TaskParent
     {
         public HMM_Example_CPP_CS()
         {
@@ -28557,7 +28557,7 @@ namespace CS_Classes
 
 
 
-    public class HOG_Basics_CS : VB_Parent
+    public class HOG_Basics_CS : TaskParent
     {
         Mat Image;
         bool ImageProcessed;
@@ -28620,7 +28620,7 @@ namespace CS_Classes
 
 
 
-    public class Homography_Basics_CS : VB_Parent
+    public class Homography_Basics_CS : TaskParent
     {
         public List<cv.Point2d> corners1 = new List<cv.Point2d>();
         public List<cv.Point2d> corners2 = new List<cv.Point2d>();
@@ -28653,7 +28653,7 @@ namespace CS_Classes
 
 
 
-    public class Homography_FPoly_CS : VB_Parent
+    public class Homography_FPoly_CS : TaskParent
     {
         FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
         Homography_Basics hGraph = new Homography_Basics();
@@ -28685,7 +28685,7 @@ namespace CS_Classes
 
 
 
-    public class Horizon_Basics_CS : VB_Parent
+    public class Horizon_Basics_CS : TaskParent
     {
         public List<cv.Point> points = new List<cv.Point>();
         int resizeRatio = 1;
@@ -28763,7 +28763,7 @@ namespace CS_Classes
 
 
 
-    public class Horizon_BasicsAlt_CS : VB_Parent
+    public class Horizon_BasicsAlt_CS : TaskParent
     {
         public Mat cloudY;
         public Horizon_BasicsAlt_CS()
@@ -28831,7 +28831,7 @@ namespace CS_Classes
 
 
 
-    public class Horizon_FindNonZero_CS : VB_Parent
+    public class Horizon_FindNonZero_CS : TaskParent
     {
         public Horizon_FindNonZero_CS()
         {
@@ -28909,7 +28909,7 @@ namespace CS_Classes
 
 
 
-    public class Horizon_UnstableResults_CS : VB_Parent
+    public class Horizon_UnstableResults_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         public Horizon_UnstableResults_CS()
@@ -28965,7 +28965,7 @@ namespace CS_Classes
 
 
 
-    public class Horizon_FindNonZeroOld_CS : VB_Parent
+    public class Horizon_FindNonZeroOld_CS : TaskParent
     {
         public Horizon_FindNonZeroOld_CS()
         {
@@ -29051,7 +29051,7 @@ namespace CS_Classes
 
 
 
-    public class Horizon_Validate_CS : VB_Parent
+    public class Horizon_Validate_CS : TaskParent
     {
         Match_Basics match = new Match_Basics();
         Point2f ptLeft, ptRight;
@@ -29091,7 +29091,7 @@ namespace CS_Classes
 
 
 
-    public class Horizon_Regress_CS : VB_Parent
+    public class Horizon_Regress_CS : TaskParent
     {
         Horizon_Basics horizon = new Horizon_Basics();
         LinearRegression_Basics regress = new LinearRegression_Basics();
@@ -29116,7 +29116,7 @@ namespace CS_Classes
 
 
 
-    public class Horizon_ExternalTest_CS : VB_Parent
+    public class Horizon_ExternalTest_CS : TaskParent
     {
         Horizon_Basics horizon = new Horizon_Basics();
         public Horizon_ExternalTest_CS()
@@ -29134,7 +29134,7 @@ namespace CS_Classes
 
 
 
-    public class Hough_Basics_CS : VB_Parent
+    public class Hough_Basics_CS : TaskParent
     {
         Edge_Canny edges = new Edge_Canny();
         public LineSegmentPolar[] segments;
@@ -29169,7 +29169,7 @@ namespace CS_Classes
 
 
 
-    public class Hough_Circles_CS : VB_Parent
+    public class Hough_Circles_CS : TaskParent
     {
         Draw_Circles circles = new Draw_Circles();
         int method = 3;
@@ -29200,7 +29200,7 @@ namespace CS_Classes
 
 
 
-    public class Hough_Lines_MT_CS : VB_Parent
+    public class Hough_Lines_MT_CS : TaskParent
     {
         Edge_Canny edges = new Edge_Canny();
         Options_Hough options = new Options_Hough();
@@ -29235,7 +29235,7 @@ namespace CS_Classes
 
 
 
-    public class Hough_Featureless_CS : VB_Parent
+    public class Hough_Featureless_CS : TaskParent
     {
         public Edge_Canny edges = new Edge_Canny();
         public int[] noDepthCount;
@@ -29274,7 +29274,7 @@ namespace CS_Classes
 
 
 
-    public class Hough_FeatureLessTopX_CS : VB_Parent
+    public class Hough_FeatureLessTopX_CS : TaskParent
     {
         public Edge_Canny edges = new Edge_Canny();
         public Options_Hough options = new Options_Hough();
@@ -29323,7 +29323,7 @@ namespace CS_Classes
 
 
 
-    public class Hough_LaneFinder_CS : VB_Parent
+    public class Hough_LaneFinder_CS : TaskParent
     {
         LaneFinder_HLSColor hls = new LaneFinder_HLSColor();
         public LineSegmentPoint[] segments;
@@ -29373,7 +29373,7 @@ namespace CS_Classes
 
 
 
-    public class Hough_Sudoku_CS : VB_Parent
+    public class Hough_Sudoku_CS : TaskParent
     {
         Hough_Basics hough = new Hough_Basics();
         public Hough_Sudoku_CS()
@@ -29392,7 +29392,7 @@ namespace CS_Classes
 
 
 
-    public class Hull_Basics_CS : VB_Parent
+    public class Hull_Basics_CS : TaskParent
     {
         Random_Basics random = new Random_Basics();
         public List<cv.Point2f> inputPoints = new List<cv.Point2f>();
@@ -29434,7 +29434,7 @@ namespace CS_Classes
 
 
 
-    public class Hull_Contour_CS : VB_Parent
+    public class Hull_Contour_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public Hull_Contour_CS()
@@ -29468,7 +29468,7 @@ namespace CS_Classes
 
 
 
-    public class Image_Basics_CS : VB_Parent
+    public class Image_Basics_CS : TaskParent
     {
         public string inputFileName;
         public Options_Images options = new Options_Images();
@@ -29500,7 +29500,7 @@ namespace CS_Classes
 
 
 
-    public class Image_Series_CS : VB_Parent
+    public class Image_Series_CS : TaskParent
     {
         public Image_Basics images = new Image_Basics();
         public Image_Series_CS()
@@ -29520,7 +29520,7 @@ namespace CS_Classes
 
 
 
-    public class Image_RedCloudColor_CS : VB_Parent
+    public class Image_RedCloudColor_CS : TaskParent
     {
         public Image_Series images = new Image_Series();
         public RedCloud_Cells redC = new RedCloud_Cells();
@@ -29545,7 +29545,7 @@ namespace CS_Classes
 
 
 
-    public class Image_CellStats_CS : VB_Parent
+    public class Image_CellStats_CS : TaskParent
     {
         Image_RedCloudColor images = new Image_RedCloudColor();
         Cell_Basics stats = new Cell_Basics();
@@ -29573,7 +29573,7 @@ namespace CS_Classes
 
 
 
-    public class Image_MSER_CS : VB_Parent
+    public class Image_MSER_CS : TaskParent
     {
         public Image_Series images = new Image_Series();
         MSER_Detect core = new MSER_Detect();
@@ -29598,7 +29598,7 @@ namespace CS_Classes
 
 
 
-    public class ImShow_Basics_CS : VB_Parent
+    public class ImShow_Basics_CS : TaskParent
     {
         public ImShow_Basics_CS()
         {
@@ -29613,7 +29613,7 @@ namespace CS_Classes
 
 
 
-    public class ImShow_WaitKey_CS : VB_Parent
+    public class ImShow_WaitKey_CS : TaskParent
     {
         Feature_Stable feat = new Feature_Stable();
         public ImShow_WaitKey_CS()
@@ -29632,7 +29632,7 @@ namespace CS_Classes
 
 
 
-    public class ImShow_CV32FC3_CS : VB_Parent
+    public class ImShow_CV32FC3_CS : TaskParent
     {
         public ImShow_CV32FC3_CS()
         {
@@ -29648,7 +29648,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_Basics_CS : VB_Parent
+    public class IMU_Basics_CS : TaskParent
     {
         double lastTimeStamp;
         public IMU_Basics_CS()
@@ -29710,7 +29710,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_BasicsKalman_CS : VB_Parent
+    public class IMU_BasicsKalman_CS : TaskParent
     {
         double lastTimeStamp;
         Kalman_Basics kalman = new Kalman_Basics();
@@ -29757,7 +29757,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_BasicsWithOptions_CS : VB_Parent
+    public class IMU_BasicsWithOptions_CS : TaskParent
     {
         double lastTimeStamp;
         Options_IMU options = new Options_IMU();
@@ -29818,7 +29818,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_GMatrix_CS : VB_Parent
+    public class IMU_GMatrix_CS : TaskParent
     {
         public float cx = 1, sx = 0, cy = 1, sy = 0, cz = 1, sz = 0;
         public Mat gMatrix;
@@ -29878,7 +29878,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_Stabilize_CS : VB_Parent
+    public class IMU_Stabilize_CS : TaskParent
     {
         Kalman_Basics kalman = new Kalman_Basics();
         public IMU_Stabilize_CS()
@@ -29916,7 +29916,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_PlotIMUFrameTime_CS : VB_Parent
+    public class IMU_PlotIMUFrameTime_CS : TaskParent
     {
         Plot_OverTime plot = new Plot_OverTime();
         public double CPUInterval;
@@ -30009,7 +30009,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_PlotTotalDelay_CS : VB_Parent
+    public class IMU_PlotTotalDelay_CS : TaskParent
     {
         IMU_PlotHostFrameTimes host = new IMU_PlotHostFrameTimes();
         IMU_PlotIMUFrameTime imu = new IMU_PlotIMUFrameTime();
@@ -30086,7 +30086,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_VerticalAngles_CS : VB_Parent
+    public class IMU_VerticalAngles_CS : TaskParent
     {
         Line_GCloud vert = new Line_GCloud();
         public IMU_VerticalAngles_CS()
@@ -30119,7 +30119,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_PlotGravityAngles_CS : VB_Parent
+    public class IMU_PlotGravityAngles_CS : TaskParent
     {
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
         public IMU_PlotGravityAngles_CS()
@@ -30143,7 +30143,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_PlotAngularVelocity_CS : VB_Parent
+    public class IMU_PlotAngularVelocity_CS : TaskParent
     {
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
         public IMU_PlotAngularVelocity_CS()
@@ -30169,7 +30169,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_Lines_CS : VB_Parent
+    public class IMU_Lines_CS : TaskParent
     {
         Line_GCloud vert = new Line_GCloud();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -30217,7 +30217,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_PlotAcceleration_CS : VB_Parent
+    public class IMU_PlotAcceleration_CS : TaskParent
     {
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
         public IMU_PlotAcceleration_CS()
@@ -30241,7 +30241,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_Average_CS : VB_Parent
+    public class IMU_Average_CS : TaskParent
     {
         List<Scalar> accList = new List<Scalar>();
         public IMU_Average_CS()
@@ -30265,7 +30265,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_PlotCompareIMU_CS : VB_Parent
+    public class IMU_PlotCompareIMU_CS : TaskParent
     {
         Plot_OverTimeScalar[] plot = new Plot_OverTimeScalar[3];
         IMU_AllMethods imuAll = new IMU_AllMethods();
@@ -30305,7 +30305,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_Kalman_CS : VB_Parent
+    public class IMU_Kalman_CS : TaskParent
     {
         Kalman_Basics kalman = new Kalman_Basics();
         public IMU_Kalman_CS()
@@ -30330,7 +30330,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_AllMethods_CS : VB_Parent
+    public class IMU_AllMethods_CS : TaskParent
     {
         IMU_Basics basics = new IMU_Basics();
         IMU_Average imuAvg = new IMU_Average();
@@ -30351,7 +30351,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_VelocityPlot_CS : VB_Parent
+    public class IMU_VelocityPlot_CS : TaskParent
     {
         IMU_Plot plot = new IMU_Plot();
         public IMU_VelocityPlot_CS()
@@ -30384,7 +30384,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_IscameraStable_CS : VB_Parent
+    public class IMU_IscameraStable_CS : TaskParent
     {
         IMU_Plot plot = new IMU_Plot();
         Options_IMU options = new Options_IMU();
@@ -30411,7 +30411,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_PlotHostFrameTimes_CS : VB_Parent
+    public class IMU_PlotHostFrameTimes_CS : TaskParent
     {
         public Plot_OverTime plot = new Plot_OverTime();
         public double CPUInterval;
@@ -30493,7 +30493,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_PlotHostFrameScalar_CS : VB_Parent
+    public class IMU_PlotHostFrameScalar_CS : TaskParent
     {
         public Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
         public double CPUInterval;
@@ -30543,7 +30543,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_GMatrixWithOptions_CS : VB_Parent
+    public class IMU_GMatrixWithOptions_CS : TaskParent
     {
         public float cx = 1, sx = 0, cy = 1, sy = 0, cz = 1, sz = 0;
         public Mat gMatrix;
@@ -30634,7 +30634,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_VerticalVerify_CS : VB_Parent
+    public class IMU_VerticalVerify_CS : TaskParent
     {
         public List<gravityLine> gCells = new List<gravityLine>();
         FeatureLine_VH linesVH = new FeatureLine_VH();
@@ -30692,7 +30692,7 @@ namespace CS_Classes
 
 
 
-    public class IMU_Plot_CS : VB_Parent
+    public class IMU_Plot_CS : TaskParent
     {
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
         public float blueA, greenA, redA;
@@ -30726,7 +30726,7 @@ namespace CS_Classes
 
 
 
-    public class InPaint_Basics_CS : VB_Parent
+    public class InPaint_Basics_CS : TaskParent
     {
         Options_InPaint options = new Options_InPaint();
         public InPaint_Basics_CS()
@@ -30756,7 +30756,7 @@ namespace CS_Classes
 
 
 
-    public class InPaint_Noise_CS : VB_Parent
+    public class InPaint_Noise_CS : TaskParent
     {
         Draw_Noise noise = new Draw_Noise();
         Options_InPaint options = new Options_InPaint();
@@ -30777,7 +30777,7 @@ namespace CS_Classes
 
 
 
-    public class InPaint_Depth_CS : VB_Parent
+    public class InPaint_Depth_CS : TaskParent
     {
         Options_InPaint options = new Options_InPaint();
         public InPaint_Depth_CS()
@@ -30798,7 +30798,7 @@ namespace CS_Classes
 
 
 
-    public class Interpolate_Basics_CS : VB_Parent
+    public class Interpolate_Basics_CS : TaskParent
     {
         public Options_Resize options = new Options_Resize();
         public Options_Interpolate iOptions = new Options_Interpolate();
@@ -30845,7 +30845,7 @@ namespace CS_Classes
 
 
 
-    public class Interpolate_Kalman_CS : VB_Parent
+    public class Interpolate_Kalman_CS : TaskParent
     {
         Interpolate_Basics inter = new Interpolate_Basics();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -30918,7 +30918,7 @@ namespace CS_Classes
 
 
 
-    public class Interpolate_Lines_CS : VB_Parent
+    public class Interpolate_Lines_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         Interpolate_Basics inter = new Interpolate_Basics();
@@ -30948,7 +30948,7 @@ namespace CS_Classes
 
 
 
-    public class Interpolate_Difference_CS : VB_Parent
+    public class Interpolate_Difference_CS : TaskParent
     {
         Interpolate_Kalman inter = new Interpolate_Kalman();
         Diff_Basics diff = new Diff_Basics();
@@ -30970,7 +30970,7 @@ namespace CS_Classes
 
 
 
-    public class Interpolate_QuarterBeat_CS : VB_Parent
+    public class Interpolate_QuarterBeat_CS : TaskParent
     {
         Diff_Basics diff = new Diff_Basics();
         int updatedFrames;
@@ -31022,7 +31022,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_Basics_CS : VB_Parent
+    public class Kalman_Basics_CS : TaskParent
     {
         Kalman_Simple[] kalman;
         public float[] kInput = new float[4];
@@ -31087,7 +31087,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_Compare_CS : VB_Parent
+    public class Kalman_Compare_CS : TaskParent
     {
         Kalman_Single[] kalman;
         public Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
@@ -31134,7 +31134,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_RotatingPoint_CS : VB_Parent
+    public class Kalman_RotatingPoint_CS : TaskParent
     {
         KalmanFilter kf = new KalmanFilter(2, 1, 0);
         Mat kState = new Mat(2, 1, MatType.CV_32F);
@@ -31192,7 +31192,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_MousePredict_CS : VB_Parent
+    public class Kalman_MousePredict_CS : TaskParent
     {
         Kalman_Basics kalman = new Kalman_Basics();
         cv.Point lastRealMouse = new cv.Point(0, 0);
@@ -31219,7 +31219,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_CVMat_CS : VB_Parent
+    public class Kalman_CVMat_CS : TaskParent
     {
         Kalman_Simple[] kalman;
         public Mat output;
@@ -31292,7 +31292,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_ImageSmall_CS : VB_Parent
+    public class Kalman_ImageSmall_CS : TaskParent
     {
         Kalman_CVMat kalman = new Kalman_CVMat();
         Resize_Smaller resize;
@@ -31325,7 +31325,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_DepthSmall_CS : VB_Parent
+    public class Kalman_DepthSmall_CS : TaskParent
     {
         Kalman_ImageSmall kalman = new Kalman_ImageSmall();
         public Kalman_DepthSmall_CS()
@@ -31345,7 +31345,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_Depth32f_CS : VB_Parent
+    public class Kalman_Depth32f_CS : TaskParent
     {
         Kalman_CVMat kalman = new Kalman_CVMat();
         Resize_Smaller resize;
@@ -31372,7 +31372,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_Single_CS : VB_Parent
+    public class Kalman_Single_CS : TaskParent
     {
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
         KalmanFilter kf = new KalmanFilter(2, 1, 0);
@@ -31458,7 +31458,7 @@ namespace CS_Classes
         }
         public void Dispose()
         {
-            // required dispose function. It is tempting to remove this but it is needed...It does not inherit from VB_Parent...
+            // required dispose function. It is tempting to remove this but it is needed...It does not inherit from TaskParent...
         }
     }
 
@@ -31469,7 +31469,7 @@ namespace CS_Classes
 
 
 
-    public class Kalman_CSharp_Basics_CS : VB_Parent
+    public class Kalman_CSharp_Basics_CS : TaskParent
     {
         public float kInput;
         public float kOutput;
@@ -31558,7 +31558,7 @@ namespace CS_Classes
 
 
 
-    public class KLT_Basics_CS : VB_Parent
+    public class KLT_Basics_CS : TaskParent
     {
         public Mat status = new Mat();
         public Mat outputMat = new Mat();
@@ -31632,7 +31632,7 @@ namespace CS_Classes
 
 
 
-    public class KLT_OpticalFlow_CS : VB_Parent
+    public class KLT_OpticalFlow_CS : TaskParent
     {
         KLT_Basics klt = new KLT_Basics();
         Point2f[] lastpoints;
@@ -31665,7 +31665,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_Basics_CS : VB_Parent
+    public class KMeans_Basics_CS : TaskParent
     {
         public Options_KMeans options = new Options_KMeans();
         public Mat colors = new Mat();
@@ -31718,7 +31718,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_MultiChannel_CS : VB_Parent
+    public class KMeans_MultiChannel_CS : TaskParent
     {
         public Mat colors = new Mat();
         KMeans_Basics km = new KMeans_Basics();
@@ -31744,7 +31744,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_k2_to_k8_CS : VB_Parent
+    public class KMeans_k2_to_k8_CS : TaskParent
     {
         Mat_4Click Mats = new Mat_4Click();
         KMeans_Basics km = new KMeans_Basics();
@@ -31778,7 +31778,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_Fuzzy_CS : VB_Parent
+    public class KMeans_Fuzzy_CS : TaskParent
     {
         KMeans_Image km = new KMeans_Image();
         public Fuzzy_Basics fuzzyD = new Fuzzy_Basics();
@@ -31799,7 +31799,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_MultiGaussian_CS : VB_Parent
+    public class KMeans_MultiGaussian_CS : TaskParent
     {
         public KMeans_MultiGaussian_CS()
         {
@@ -31822,7 +31822,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_CustomData_CS : VB_Parent
+    public class KMeans_CustomData_CS : TaskParent
     {
         KMeans_Basics km = new KMeans_Basics();
         public Mat centers = new Mat();
@@ -31859,7 +31859,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_Simple_CPP_CS : VB_Parent
+    public class KMeans_Simple_CPP_CS : TaskParent
     {
         public KMeans_Simple_CPP_CS()
         {
@@ -31889,7 +31889,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_Edges_CS : VB_Parent
+    public class KMeans_Edges_CS : TaskParent
     {
         Edge_Canny edges = new Edge_Canny();
         public KMeans_Image km = new KMeans_Image();
@@ -31917,7 +31917,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_CompareMulti_CS : VB_Parent
+    public class KMeans_CompareMulti_CS : TaskParent
     {
         KMeans_Image km = new KMeans_Image();
         KMeans_MultiChannel multi = new KMeans_MultiChannel();
@@ -31940,7 +31940,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_TierCount_CS : VB_Parent
+    public class KMeans_TierCount_CS : TaskParent
     {
         KMeans_Basics km = new KMeans_Basics();
         Depth_TierCount kCount = new Depth_TierCount();
@@ -31967,7 +31967,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_Image_CS : VB_Parent
+    public class KMeans_Image_CS : TaskParent
     {
         public KMeans_Basics km = new KMeans_Basics();
         public List<Mat> masks = new List<Mat>();
@@ -32002,7 +32002,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_DepthPlusGray_CS : VB_Parent
+    public class KMeans_DepthPlusGray_CS : TaskParent
     {
         KMeans_Basics km = new KMeans_Basics();
         Mat[] grayPlus = new Mat[2];
@@ -32031,7 +32031,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_Dimensions_CS : VB_Parent
+    public class KMeans_Dimensions_CS : TaskParent
     {
         public KMeans_Basics km = new KMeans_Basics();
         TrackBar dimSlider;
@@ -32091,7 +32091,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_Valleys_CS : VB_Parent
+    public class KMeans_Valleys_CS : TaskParent
     {
         KMeans_Basics km = new KMeans_Basics();
         KMeans_TierCount tiers = new KMeans_TierCount();
@@ -32117,7 +32117,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_Depth_CS : VB_Parent
+    public class KMeans_Depth_CS : TaskParent
     {
         public KMeans_Basics km = new KMeans_Basics();
         public int classCount;
@@ -32141,7 +32141,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_SimKColor_CS : VB_Parent
+    public class KMeans_SimKColor_CS : TaskParent
     {
         Hist3Dcolor_PlotHist1D plot1D = new Hist3Dcolor_PlotHist1D();
         Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
@@ -32171,7 +32171,7 @@ namespace CS_Classes
 
 
 
-    public class KMeans_SimKDepth_CS : VB_Parent
+    public class KMeans_SimKDepth_CS : TaskParent
     {
         Hist3Dcloud_PlotHist1D plot1D = new Hist3Dcloud_PlotHist1D();
         Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
@@ -32202,7 +32202,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_NoDups_CS : VB_Parent
+    public class KNN_NoDups_CS : TaskParent
     {
         public List<PointPair> matches = new List<PointPair>();
         public List<cv.Point2f> noMatch = new List<cv.Point2f>();
@@ -32287,7 +32287,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Basics_CS : VB_Parent
+    public class KNN_Basics_CS : TaskParent
     {
         public KNearest knn;
         public List<cv.Point2f> trainInput = new List<cv.Point2f>(); // put training data here
@@ -32383,7 +32383,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Basics2DTest_CS : VB_Parent
+    public class KNN_Basics2DTest_CS : TaskParent
     {
         public KNN_Basics knn = new KNN_Basics();
         Random_Basics random = new Random_Basics();
@@ -32430,7 +32430,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Basics3D_CS : VB_Parent
+    public class KNN_Basics3D_CS : TaskParent
     {
         public KNearest knn;
         public List<cv.Point3f> trainInput = new List<cv.Point3f>(); // put training data here
@@ -32479,7 +32479,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Basics4D_CS : VB_Parent
+    public class KNN_Basics4D_CS : TaskParent
     {
         public KNearest knn;
         public List<Vec4f> trainInput = new List<Vec4f>(); // put training data here
@@ -32529,7 +32529,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_BasicsN_CS : VB_Parent
+    public class KNN_BasicsN_CS : TaskParent
     {
         public KNearest knn;
         public List<float> trainInput = new List<float>(); // put training data here
@@ -32588,7 +32588,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Basics3DTest_CS : VB_Parent
+    public class KNN_Basics3DTest_CS : TaskParent
     {
         KNN_Basics3D knn = new KNN_Basics3D();
         Distance_Point3D dist = new Distance_Point3D();
@@ -32655,7 +32655,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Basics4DTest_CS : VB_Parent
+    public class KNN_Basics4DTest_CS : TaskParent
     {
         KNN_Basics4D knn = new KNN_Basics4D();
         Distance_Point4D dist = new Distance_Point4D();
@@ -32706,7 +32706,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_BasicsNTest_CS : VB_Parent
+    public class KNN_BasicsNTest_CS : TaskParent
     {
         KNN_BasicsN knn = new KNN_BasicsN();
         public KNN_BasicsNTest_CS()
@@ -32760,7 +32760,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Emax_CS : VB_Parent
+    public class KNN_Emax_CS : TaskParent
     {
         Random_Basics random = new Random_Basics();
         public KNN_Basics knn = new KNN_Basics();
@@ -32787,7 +32787,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_TrackMean_CS : VB_Parent
+    public class KNN_TrackMean_CS : TaskParent
     {
         Plot_Histogram plot = new Plot_Histogram();
         KNN_NoDups knn = new KNN_NoDups();
@@ -32884,7 +32884,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_ClosestTracker_CS : VB_Parent
+    public class KNN_ClosestTracker_CS : TaskParent
     {
         public Line_Basics lines = new Line_Basics();
         public PointPair lastPair = new PointPair();
@@ -32963,7 +32963,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_ClosestLine_CS : VB_Parent
+    public class KNN_ClosestLine_CS : TaskParent
     {
         public Point2f lastP1;
         public Point2f lastP2;
@@ -33012,7 +33012,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_ClosestVertical_CS : VB_Parent
+    public class KNN_ClosestVertical_CS : TaskParent
     {
         public FeatureLine_Finder lines = new FeatureLine_Finder();
         public KNN_ClosestLine knn = new KNN_ClosestLine();
@@ -33058,7 +33058,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_NoDupsOld_CS : VB_Parent
+    public class KNN_NoDupsOld_CS : TaskParent
     {
         public List<PointPair> matches = new List<PointPair>();
         public List<cv.Point> noMatch = new List<cv.Point>();
@@ -33160,7 +33160,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_Farthest_CS : VB_Parent
+    public class KNN_Farthest_CS : TaskParent
     {
         KNN_Basics knn = new KNN_Basics();
         public PointPair mpFar;
@@ -33209,7 +33209,7 @@ namespace CS_Classes
 
 
 
-    public class KNN_TrackEach_CS : VB_Parent
+    public class KNN_TrackEach_CS : TaskParent
     {
         KNN_NoDups knn = new KNN_NoDups();
         Feature_Stable feat = new Feature_Stable();
@@ -33251,7 +33251,7 @@ namespace CS_Classes
 
 
 
-    public class LaneFinder_Basics_CS : VB_Parent
+    public class LaneFinder_Basics_CS : TaskParent
     {
         LaneFinder_SlopeIntercept lane = new LaneFinder_SlopeIntercept();
         public LaneFinder_Basics_CS()
@@ -33273,7 +33273,7 @@ namespace CS_Classes
 
 
 
-    public class LaneFinder_Videos_CS : VB_Parent
+    public class LaneFinder_Videos_CS : TaskParent
     {
         public Video_Basics video = new Video_Basics();
         Options_LaneFinder options = new Options_LaneFinder();
@@ -33301,7 +33301,7 @@ namespace CS_Classes
 
 
 
-    public class LaneFinder_Edges_CS : VB_Parent
+    public class LaneFinder_Edges_CS : TaskParent
     {
         LaneFinder_Videos input = new LaneFinder_Videos();
         Edge_Basics edges = new Edge_Basics();
@@ -33321,7 +33321,7 @@ namespace CS_Classes
 
 
 
-    public class LaneFinder_HLSColor_CS : VB_Parent
+    public class LaneFinder_HLSColor_CS : TaskParent
     {
         public LaneFinder_Videos input = new LaneFinder_Videos();
         public LaneFinder_HLSColor_CS()
@@ -33342,7 +33342,7 @@ namespace CS_Classes
 
 
 
-    public class LaneFinder_ROI_CS : VB_Parent
+    public class LaneFinder_ROI_CS : TaskParent
     {
         LaneFinder_HLSColor hls = new LaneFinder_HLSColor();
         cv.Point[][] pListList = new cv.Point[1][];
@@ -33379,7 +33379,7 @@ namespace CS_Classes
 
 
 
-    public class LaneFinder_SlopeIntercept_CS : VB_Parent
+    public class LaneFinder_SlopeIntercept_CS : TaskParent
     {
         Hough_LaneFinder hough = new Hough_LaneFinder();
         public float leftLaneIntercept;
@@ -33452,7 +33452,7 @@ namespace CS_Classes
 
 
 
-    public class Laplacian_PyramidFilter_CS : VB_Parent
+    public class Laplacian_PyramidFilter_CS : TaskParent
     {
         Options_LaPlacianPyramid options = new Options_LaPlacianPyramid();
         public Laplacian_PyramidFilter_CS()
@@ -33470,7 +33470,7 @@ namespace CS_Classes
 
 
 
-    public class Laplacian_Basics_CS : VB_Parent
+    public class Laplacian_Basics_CS : TaskParent
     {
         Options_Laplacian options = new Options_Laplacian();
         Erode_Basics erode = new Erode_Basics();
@@ -33496,7 +33496,7 @@ namespace CS_Classes
 
 
 
-    public class Laplacian_Blur_CS : VB_Parent
+    public class Laplacian_Blur_CS : TaskParent
     {
         Options_Laplacian options = new Options_Laplacian();
         public Laplacian_Blur_CS()
@@ -33531,7 +33531,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_Basics_CS : VB_Parent
+    public class LeftRight_Basics_CS : TaskParent
     {
         public LeftRight_Basics_CS()
         {
@@ -33549,7 +33549,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_CompareRaw_CS : VB_Parent
+    public class LeftRight_CompareRaw_CS : TaskParent
     {
         Options_LeftRight options = new Options_LeftRight();
         public LeftRight_CompareRaw_CS()
@@ -33572,7 +33572,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_Palettized_CS : VB_Parent
+    public class LeftRight_Palettized_CS : TaskParent
     {
         public LeftRight_Palettized_CS()
         {
@@ -33590,7 +33590,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_BRISK_CS : VB_Parent
+    public class LeftRight_BRISK_CS : TaskParent
     {
         BRISK_Basics brisk = new BRISK_Basics();
         Options_Features options = new Options_Features();
@@ -33612,7 +33612,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_Edges_CS : VB_Parent
+    public class LeftRight_Edges_CS : TaskParent
     {
         Edge_Canny edges = new Edge_Canny();
         public LeftRight_Edges_CS()
@@ -33633,7 +33633,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_Reduction_CS : VB_Parent
+    public class LeftRight_Reduction_CS : TaskParent
     {
         public Reduction_Basics reduction = new Reduction_Basics();
         public LeftRight_Reduction_CS()
@@ -33653,7 +33653,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_Markers_CS : VB_Parent
+    public class LeftRight_Markers_CS : TaskParent
     {
         LeftRight_Reduction redView = new LeftRight_Reduction();
         public LeftRight_Markers_CS()
@@ -33713,7 +33713,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_Markers1_CS : VB_Parent
+    public class LeftRight_Markers1_CS : TaskParent
     {
         LeftRight_Reduction redView = new LeftRight_Reduction();
         public LeftRight_Markers1_CS()
@@ -33769,7 +33769,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_Lines_CS : VB_Parent
+    public class LeftRight_Lines_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         public LeftRight_Lines_CS()
@@ -33789,7 +33789,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_RedCloudRight_CS : VB_Parent
+    public class LeftRight_RedCloudRight_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public LeftRight_RedCloudRight_CS()
@@ -33808,7 +33808,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_RedCloudLeft_CS : VB_Parent
+    public class LeftRight_RedCloudLeft_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public LeftRight_RedCloudLeft_CS()
@@ -33827,7 +33827,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_RedCloudBoth_CS : VB_Parent
+    public class LeftRight_RedCloudBoth_CS : TaskParent
     {
         LeftRight_RedCloudRight stLeft = new LeftRight_RedCloudRight();
         LeftRight_RedCloudLeft stRight = new LeftRight_RedCloudLeft();
@@ -33849,7 +33849,7 @@ namespace CS_Classes
 
 
 
-    public class LeftRight_Features_CS : VB_Parent
+    public class LeftRight_Features_CS : TaskParent
     {
         FeatureLeftRight_Basics feat = new FeatureLeftRight_Basics();
         public LeftRight_Features_CS()
@@ -33868,7 +33868,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Basics_CS : VB_Parent
+    public class Line_Basics_CS : TaskParent
     {
         cv.XImgProc.FastLineDetector ld;
         public List<PointPair> lpList = new List<PointPair>();
@@ -33916,7 +33916,7 @@ namespace CS_Classes
 
 
 
-    public class Line_SubsetRect_CS : VB_Parent
+    public class Line_SubsetRect_CS : TaskParent
     {
         cv.XImgProc.FastLineDetector ld;
         public SortedList<float, PointPair> sortByLen = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
@@ -33971,7 +33971,7 @@ namespace CS_Classes
 
 
 
-    public class Line_InterceptsUI_CS : VB_Parent
+    public class Line_InterceptsUI_CS : TaskParent
     {
         Line_Intercepts lines = new Line_Intercepts();
         cv.Point p2;
@@ -34043,7 +34043,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Intercepts_CS : VB_Parent
+    public class Line_Intercepts_CS : TaskParent
     {
         public LongLine_Extend extended = new LongLine_Extend();
         public Line_Basics lines = new Line_Basics();
@@ -34138,7 +34138,7 @@ namespace CS_Classes
 
 
 
-    public class Line_LeftRightImages_CS : VB_Parent
+    public class Line_LeftRightImages_CS : TaskParent
     {
         public Line_TimeView leftLines = new Line_TimeView();
         public Line_TimeView rightLines = new Line_TimeView();
@@ -34165,7 +34165,7 @@ namespace CS_Classes
 
 
 
-    public class Line_InDepthAndBGR_CS : VB_Parent
+    public class Line_InDepthAndBGR_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         public List<cv.Point2f> p1List = new List<cv.Point2f>();
@@ -34232,7 +34232,7 @@ namespace CS_Classes
 
 
 
-    public class Line_PointSlope_CS : VB_Parent
+    public class Line_PointSlope_CS : TaskParent
     {
         LongLine_Extend extend = new LongLine_Extend();
         Line_Basics lines = new Line_Basics();
@@ -34317,7 +34317,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Movement_CS : VB_Parent
+    public class Line_Movement_CS : TaskParent
     {
         public cv.Point p1;
         public cv.Point p2;
@@ -34365,7 +34365,7 @@ namespace CS_Classes
 
 
 
-    public class Line_GCloud_CS : VB_Parent
+    public class Line_GCloud_CS : TaskParent
     {
         public Line_Basics lines = new Line_Basics();
         public SortedList<float, gravityLine> sortedVerticals = new SortedList<float, gravityLine>(new compareAllowIdenticalSingleInverted());
@@ -34438,7 +34438,7 @@ namespace CS_Classes
 
 
 
-    public class Line_DisplayInfo_CS : VB_Parent
+    public class Line_DisplayInfo_CS : TaskParent
     {
         public List<tCell> tcells = new List<tCell>();
         Edge_Canny canny = new Edge_Canny();
@@ -34498,7 +34498,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Perpendicular_CS : VB_Parent
+    public class Line_Perpendicular_CS : TaskParent
     {
         public Point2f p1; // first input point
         public Point2f p2; // second input point
@@ -34538,7 +34538,7 @@ namespace CS_Classes
 
 
 
-    public class Line_CellsVertHoriz_CS : VB_Parent
+    public class Line_CellsVertHoriz_CS : TaskParent
     {
         FeatureLine_Finder lines = new FeatureLine_Finder();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -34574,7 +34574,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Cells_CS : VB_Parent
+    public class Line_Cells_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -34595,7 +34595,7 @@ namespace CS_Classes
 
 
 
-    public class Line_ViewSide_CS : VB_Parent
+    public class Line_ViewSide_CS : TaskParent
     {
         public OpAuto_YRange autoY = new OpAuto_YRange();
         public Line_Basics lines = new Line_Basics();
@@ -34618,7 +34618,7 @@ namespace CS_Classes
 
 
 
-    public class Line_ViewTop_CS : VB_Parent
+    public class Line_ViewTop_CS : TaskParent
     {
         public OpAuto_XRange autoX = new OpAuto_XRange();
         public Line_Basics lines = new Line_Basics();
@@ -34641,7 +34641,7 @@ namespace CS_Classes
 
 
 
-    public class Line_FromContours_CS : VB_Parent
+    public class Line_FromContours_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Line_Basics lines = new Line_Basics();
@@ -34670,7 +34670,7 @@ namespace CS_Classes
 
 
 
-    public class Line_ColorClass_CS : VB_Parent
+    public class Line_ColorClass_CS : TaskParent
     {
         Color8U_Basics colorClass = new Color8U_Basics();
         Line_Basics lines = new Line_Basics();
@@ -34695,7 +34695,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Canny_CS : VB_Parent
+    public class Line_Canny_CS : TaskParent
     {
         Edge_Canny canny = new Edge_Canny();
         Line_Basics lines = new Line_Basics();
@@ -34717,7 +34717,7 @@ namespace CS_Classes
 
 
 
-    public class Line_TimeViewLines_CS : VB_Parent
+    public class Line_TimeViewLines_CS : TaskParent
     {
         Line_TimeView lines = new Line_TimeView();
         public List<PointPair> lpList = new List<PointPair>();
@@ -34750,7 +34750,7 @@ namespace CS_Classes
 
 
 
-    public class Line_TimeView_CS : VB_Parent
+    public class Line_TimeView_CS : TaskParent
     {
         public List<List<PointPair>> frameList = new List<List<PointPair>>();
         public Line_Basics lines = new Line_Basics();
@@ -34790,7 +34790,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Verticals_CS : VB_Parent
+    public class Line_Verticals_CS : TaskParent
     {
         public Line_Basics lines = new Line_Basics();
         public Options_Features options = new Options_Features();
@@ -34856,7 +34856,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Verts_CS : VB_Parent
+    public class Line_Verts_CS : TaskParent
     {
         Line_Verticals verts = new Line_Verticals();
         Match_tCell match = new Match_tCell();
@@ -34934,7 +34934,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Nearest_CS : VB_Parent
+    public class Line_Nearest_CS : TaskParent
     {
         public Point2f pt; // How close is this point to the input line?
         public PointPair lp = new PointPair(); // the input line.
@@ -35000,7 +35000,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Intersection_CS : VB_Parent
+    public class Line_Intersection_CS : TaskParent
     {
         public Point2f p1, p2, p3, p4;
         public Point2f intersectionPoint;
@@ -35040,7 +35040,7 @@ namespace CS_Classes
 
 
 
-    public class Line_Gravity_CS : VB_Parent
+    public class Line_Gravity_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         Line_Nearest nearest = new Line_Nearest();
@@ -35096,7 +35096,7 @@ namespace CS_Classes
 
 
 
-    public class Line_KNN_CS : VB_Parent
+    public class Line_KNN_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         Swarm_Basics swarm = new Swarm_Basics();
@@ -35129,7 +35129,7 @@ namespace CS_Classes
 
 
 
-    public class Line3D_Draw_CS : VB_Parent
+    public class Line3D_Draw_CS : TaskParent
     {
         public cv.Point p1, p2;
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
@@ -35198,7 +35198,7 @@ namespace CS_Classes
 
 
 
-    public class Line3D_Checks_CS : VB_Parent
+    public class Line3D_Checks_CS : TaskParent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
         public List<cv.Point3f> pcLines = new List<cv.Point3f>();
@@ -35239,7 +35239,7 @@ namespace CS_Classes
 
 
 
-    public class Line3D_CandidatesFirstLast_CS : VB_Parent
+    public class Line3D_CandidatesFirstLast_CS : TaskParent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
         public List<cv.Point3f> pcLines = new List<cv.Point3f>();
@@ -35281,7 +35281,7 @@ namespace CS_Classes
 
 
 
-    public class Line3D_CandidatesAll_CS : VB_Parent
+    public class Line3D_CandidatesAll_CS : TaskParent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
         public List<cv.Point3f> pcLines = new List<cv.Point3f>();
@@ -35329,7 +35329,7 @@ namespace CS_Classes
 
 
 
-    public class LinearRegression_Basics_CS : VB_Parent
+    public class LinearRegression_Basics_CS : TaskParent
     {
         public List<float> x = new List<float>();
         public List<float> y = new List<float>();
@@ -35371,7 +35371,7 @@ namespace CS_Classes
 
 
 
-    public class LinearRegression_Test_CS : VB_Parent
+    public class LinearRegression_Test_CS : TaskParent
     {
         LinearRegression_Basics regress = new LinearRegression_Basics();
         public LinearRegression_Test_CS()
@@ -35397,7 +35397,7 @@ namespace CS_Classes
 
 
 
-    public class LinearRegression_Random_CS : VB_Parent
+    public class LinearRegression_Random_CS : TaskParent
     {
         LinearRegression_Basics regress = new LinearRegression_Basics();
         Random_Basics random = new Random_Basics();
@@ -35423,7 +35423,7 @@ namespace CS_Classes
 
 
 
-    public class LineCoin_Basics_CS : VB_Parent
+    public class LineCoin_Basics_CS : TaskParent
     {
         public LongLine_Basics longLines = new LongLine_Basics();
         public List<PointPair> lpList = new List<PointPair>();
@@ -35499,7 +35499,7 @@ namespace CS_Classes
 
 
 
-    public class LineCoin_HistoryIntercept_CS : VB_Parent
+    public class LineCoin_HistoryIntercept_CS : TaskParent
     {
         LineCoin_Basics coin = new LineCoin_Basics();
         public List<PointPair> lpList = new List<PointPair>();
@@ -35521,7 +35521,7 @@ namespace CS_Classes
 
 
 
-    public class LineCoin_Parallel_CS : VB_Parent
+    public class LineCoin_Parallel_CS : TaskParent
     {
         LongLine_ExtendParallel parallel = new LongLine_ExtendParallel();
         Line_Nearest near = new Line_Nearest();
@@ -35557,7 +35557,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_Basics_CS : VB_Parent
+    public class LongLine_Basics_CS : TaskParent
     {
         public LongLine_Core lines = new LongLine_Core();
         public List<PointPair> lpList = new List<PointPair>();
@@ -35613,7 +35613,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_Core_CS : VB_Parent
+    public class LongLine_Core_CS : TaskParent
     {
         public Line_Basics lines = new Line_Basics();
         public int lineCount = 1; // How many of the longest lines...
@@ -35641,7 +35641,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_Depth_CS : VB_Parent
+    public class LongLine_Depth_CS : TaskParent
     {
         LongLine_Consistent longLine = new LongLine_Consistent();
         Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
@@ -35684,7 +35684,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_Consistent_CS : VB_Parent
+    public class LongLine_Consistent_CS : TaskParent
     {
         LongLine_Core longest = new LongLine_Core();
         public PointPair ptLong;
@@ -35719,7 +35719,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_Point_CS : VB_Parent
+    public class LongLine_Point_CS : TaskParent
     {
         LongLine_Consistent longLine = new LongLine_Consistent();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -35745,7 +35745,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_Match_CS : VB_Parent
+    public class LongLine_Match_CS : TaskParent
     {
         LongLine_Consistent longest = new LongLine_Consistent();
         Mat template = new cv.Mat();
@@ -35784,7 +35784,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_ExtendTest_CS : VB_Parent
+    public class LongLine_ExtendTest_CS : TaskParent
     {
         LongLine_Basics longLine = new LongLine_Basics();
         public LongLine_ExtendTest_CS()
@@ -35811,7 +35811,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_ExtendAll_CS : VB_Parent
+    public class LongLine_ExtendAll_CS : TaskParent
     {
         public Line_Basics lines = new Line_Basics();
         public List<PointPair> lpList = new List<PointPair>();
@@ -35837,7 +35837,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_ExtendParallel_CS : VB_Parent
+    public class LongLine_ExtendParallel_CS : TaskParent
     {
         LongLine_ExtendAll extendAll = new LongLine_ExtendAll();
         KNN_Basics knn = new KNN_Basics();
@@ -35918,7 +35918,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_Extend_CS : VB_Parent
+    public class LongLine_Extend_CS : TaskParent
     {
         LongLine_Basics lines = new LongLine_Basics();
         cv.Point saveP1, saveP2, p1, p2;
@@ -35952,7 +35952,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_NoDepth_CS : VB_Parent
+    public class LongLine_NoDepth_CS : TaskParent
     {
         LineCoin_Basics lineHist = new LineCoin_Basics();
         public LongLine_NoDepth_CS()
@@ -35971,7 +35971,7 @@ namespace CS_Classes
 
 
 
-    public class LongLine_History_CS : VB_Parent
+    public class LongLine_History_CS : TaskParent
     {
         LongLine_Basics lines = new LongLine_Basics();
         public List<PointPair> lpList = new List<PointPair>();
@@ -36021,7 +36021,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_Basics_CS : VB_Parent
+    public class LUT_Basics_CS : TaskParent
     {
         public int classCount;
         Options_LUT options = new Options_LUT();
@@ -36063,7 +36063,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_Sliders_CS : VB_Parent
+    public class LUT_Sliders_CS : TaskParent
     {
         Options_LUT options = new Options_LUT();
         public LUT_Sliders_CS()
@@ -36088,7 +36088,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_Reduction_CS : VB_Parent
+    public class LUT_Reduction_CS : TaskParent
     {
         public Reduction_Basics reduction = new Reduction_Basics();
         Mat vector = new Mat(256, 1, MatType.CV_8UC3, new Scalar(0));
@@ -36111,7 +36111,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_RGBDepth_CS : VB_Parent
+    public class LUT_RGBDepth_CS : TaskParent
     {
         LUT_Basics lut = new LUT_Basics();
         public LUT_RGBDepth_CS()
@@ -36129,7 +36129,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_Depth32f_CS : VB_Parent
+    public class LUT_Depth32f_CS : TaskParent
     {
         LUT_Basics lut = new LUT_Basics();
         public LUT_Depth32f_CS()
@@ -36148,7 +36148,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_Equalized_CS : VB_Parent
+    public class LUT_Equalized_CS : TaskParent
     {
         Hist_EqualizeGray eq = new Hist_EqualizeGray();
         LUT_Basics lut = new LUT_Basics();
@@ -36172,7 +36172,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_Watershed_CS : VB_Parent
+    public class LUT_Watershed_CS : TaskParent
     {
         public Watershed_Basics wShed = new Watershed_Basics();
         public LUT_Equalized lut = new LUT_Equalized();
@@ -36198,7 +36198,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_Custom_CS : VB_Parent
+    public class LUT_Custom_CS : TaskParent
     {
         Palette_RandomColorMap gradMap = new Palette_RandomColorMap();
         public Mat colorMap;
@@ -36228,7 +36228,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_RedCloud_CS : VB_Parent
+    public class LUT_RedCloud_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Sort_3Channel sort3 = new Sort_3Channel();
@@ -36253,7 +36253,7 @@ namespace CS_Classes
 
 
 
-    public class LUT_Create_CS : VB_Parent
+    public class LUT_Create_CS : TaskParent
     {
         byte[][] pixels = new byte[3][];
         Options_LUT_Create options = new Options_LUT_Create();
@@ -36308,7 +36308,7 @@ namespace CS_Classes
 
 
 
-    public class Magnify_Basics_CS : VB_Parent
+    public class Magnify_Basics_CS : TaskParent
     {
         public Magnify_Basics_CS()
         {
@@ -36328,7 +36328,7 @@ namespace CS_Classes
 
 
 
-    public class Magnify_Example_CS : VB_Parent
+    public class Magnify_Example_CS : TaskParent
     {
         Neighbors_Intersects prep = new Neighbors_Intersects();
         Magnify_Basics zoom = new Magnify_Basics();
@@ -36348,7 +36348,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_Repeat_CS : VB_Parent
+    public class Mat_Repeat_CS : TaskParent
     {
         public Mat_Repeat_CS()
         {
@@ -36366,7 +36366,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_PointToMat_CS : VB_Parent
+    public class Mat_PointToMat_CS : TaskParent
     {
         Random_Basics random = new Random_Basics();
         public Mat_PointToMat_CS()
@@ -36398,7 +36398,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_MatToPoint_CS : VB_Parent
+    public class Mat_MatToPoint_CS : TaskParent
     {
         public Mat_MatToPoint_CS()
         {
@@ -36427,7 +36427,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_Tricks_CS : VB_Parent
+    public class Mat_Tricks_CS : TaskParent
     {
         public Mat_Tricks_CS()
         {
@@ -36447,7 +36447,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_RowColRange_CS : VB_Parent
+    public class Mat_RowColRange_CS : TaskParent
     {
         public Mat_RowColRange_CS()
         {
@@ -36468,7 +36468,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_MultiplyReview_CS : VB_Parent
+    public class Mat_MultiplyReview_CS : TaskParent
     {
         public Mat_MultiplyReview_CS()
         {
@@ -36527,7 +36527,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_2to1_CS : VB_Parent
+    public class Mat_2to1_CS : TaskParent
     {
         Mat mat1;
         Mat mat2;
@@ -36574,7 +36574,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_ToList_CS : VB_Parent
+    public class Mat_ToList_CS : TaskParent
     {
         OpAuto_XRange autoX = new OpAuto_XRange();
         Projection_HistTop histTop = new Projection_HistTop();
@@ -36613,7 +36613,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_Inverse_CS : VB_Parent
+    public class Mat_Inverse_CS : TaskParent
     {
         public float[,] matrix = new float[,] { { 1.1688f, 0.23f, 62.2f }, { -0.013f, 1.225f, -6.29f }, { 0, 0, 1 } };
         public bool validateInverse;
@@ -36673,7 +36673,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_Transpose_CS : VB_Parent
+    public class Mat_Transpose_CS : TaskParent
     {
         public Mat_Transpose_CS()
         {
@@ -36693,7 +36693,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_Managed_CS : VB_Parent
+    public class Mat_Managed_CS : TaskParent
     {
         Random autoRand = new Random();
         Vec3b[] img;
@@ -36723,7 +36723,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_Inverse_4D_CS : VB_Parent
+    public class Mat_Inverse_4D_CS : TaskParent
     {
         double[,] defaultInput = new double[,] { { 3, 7, 2, 5 }, { 4, 0, 1, 1 }, { 1, 6, 3, 0 }, { 2, 8, 4, 3 } };
         public Mat input;
@@ -36771,7 +36771,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_4Click_CS : VB_Parent
+    public class Mat_4Click_CS : TaskParent
     {
         public Mat_4to1_CS mats;
         public Mat[] mat;
@@ -36819,7 +36819,7 @@ namespace CS_Classes
 
 
 
-    public class Mat_4to1_CS : VB_Parent
+    public class Mat_4to1_CS : TaskParent
     {
         public Mat[] mat = new Mat[4];
         public bool lineSeparators = true; // if they want lines or not...
@@ -36875,7 +36875,7 @@ namespace CS_Classes
 
 
 
-    public class Match_Basics_CS : VB_Parent
+    public class Match_Basics_CS : TaskParent
     {
         public Mat template;
         public mmData mmData;
@@ -36938,7 +36938,7 @@ namespace CS_Classes
 
 
 
-    public class Match_BasicsTest_CS : VB_Parent
+    public class Match_BasicsTest_CS : TaskParent
     {
         public Match_Basics match = new Match_Basics();
         public Match_BasicsTest_CS()
@@ -36968,7 +36968,7 @@ namespace CS_Classes
 
 
 
-    public class Match_RandomTest_CS : VB_Parent
+    public class Match_RandomTest_CS : TaskParent
     {
         Font_FlowText flow = new Font_FlowText();
         public Mat template;
@@ -37026,7 +37026,7 @@ namespace CS_Classes
 
 
 
-    public class Match_BestEntropy_CS : VB_Parent
+    public class Match_BestEntropy_CS : TaskParent
     {
         Entropy_Highest entropy = new Entropy_Highest();
         Match_DrawRect match = new Match_DrawRect();
@@ -37055,7 +37055,7 @@ namespace CS_Classes
 
 
 
-    public class Match_Lines_CS : VB_Parent
+    public class Match_Lines_CS : TaskParent
     {
         KNN_Basics4D knn = new KNN_Basics4D();
         Line_Basics lines = new Line_Basics();
@@ -37097,7 +37097,7 @@ namespace CS_Classes
 
 
 
-    public class Match_PointSlope_CS : VB_Parent
+    public class Match_PointSlope_CS : TaskParent
     {
         Line_PointSlope lines = new Line_PointSlope();
         bool updateLines = true;
@@ -37196,7 +37196,7 @@ namespace CS_Classes
 
 
 
-    public class Match_TraceRedC_CS : VB_Parent
+    public class Match_TraceRedC_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         List<Mat> frameList = new List<Mat>();
@@ -37235,7 +37235,7 @@ namespace CS_Classes
 
 
 
-    public class Match_DrawRect_CS : VB_Parent
+    public class Match_DrawRect_CS : TaskParent
     {
         Match_Basics match = new Match_Basics();
         public cv.Rect inputRect;
@@ -37283,7 +37283,7 @@ namespace CS_Classes
 
 
 
-    public class Match_tCell_CS : VB_Parent
+    public class Match_tCell_CS : TaskParent
     {
         public List<tCell> tCells = new List<tCell>();
         TrackBar cellSlider;
@@ -37347,7 +37347,7 @@ namespace CS_Classes
 
 
 
-    public class Match_LinePairTest_CS : VB_Parent
+    public class Match_LinePairTest_CS : TaskParent
     {
         public Point2f[] ptx = new Point2f[2];
         public Mat[] target = new Mat[2];
@@ -37413,7 +37413,7 @@ namespace CS_Classes
 
 
 
-    public class Match_GoodFeatureKNN_CS : VB_Parent
+    public class Match_GoodFeatureKNN_CS : TaskParent
     {
         public KNN_NoDups knn = new KNN_NoDups();
         public Feature_Stable feat = new Feature_Stable();
@@ -37460,7 +37460,7 @@ namespace CS_Classes
 
 
 
-    public class Match_Point_CS : VB_Parent
+    public class Match_Point_CS : TaskParent
     {
         public Point2f pt;
         public Mat target;
@@ -37500,7 +37500,7 @@ namespace CS_Classes
 
 
 
-    public class Match_Points_CS : VB_Parent
+    public class Match_Points_CS : TaskParent
     {
         public List<cv.Point2f> ptx = new List<cv.Point2f>();
         public List<float> correlation = new List<float>();
@@ -37537,7 +37537,7 @@ namespace CS_Classes
 
 
 
-    public class Match_Motion_CS : VB_Parent
+    public class Match_Motion_CS : TaskParent
     {
         Options_Features options = new Options_Features();
         public Mat mask;
@@ -37604,7 +37604,7 @@ namespace CS_Classes
 
 
 
-    public class MatchLine_Basics_CS : VB_Parent
+    public class MatchLine_Basics_CS : TaskParent
     {
         public Match_Basics match = new Match_Basics();
         public PointPair lpInput = new PointPair();
@@ -37687,7 +37687,7 @@ namespace CS_Classes
 
 
 
-    public class MatchLine_Longest_CS : VB_Parent
+    public class MatchLine_Longest_CS : TaskParent
     {
         public KNN_ClosestTracker knn = new KNN_ClosestTracker();
         public MatchLine_Basics matchLine = new MatchLine_Basics();
@@ -37710,7 +37710,7 @@ namespace CS_Classes
 
 
 
-    public class MatchLine_Horizon_CS : VB_Parent
+    public class MatchLine_Horizon_CS : TaskParent
     {
         MatchLine_Basics matchLine = new MatchLine_Basics();
         public MatchLine_Horizon_CS()
@@ -37731,7 +37731,7 @@ namespace CS_Classes
 
 
 
-    public class MatchLine_Gravity_CS : VB_Parent
+    public class MatchLine_Gravity_CS : TaskParent
     {
         MatchLine_Basics matchLine = new MatchLine_Basics();
         public MatchLine_Gravity_CS()
@@ -37752,7 +37752,7 @@ namespace CS_Classes
 
 
 
-    public class MatchRect_Basics_CS : VB_Parent
+    public class MatchRect_Basics_CS : TaskParent
     {
         public Match_Basics match = new Match_Basics();
         public cv.Rect rectInput = new cv.Rect();
@@ -37791,7 +37791,7 @@ namespace CS_Classes
 
 
 
-    public class MatchRect_RedCloud_CS : VB_Parent
+    public class MatchRect_RedCloud_CS : TaskParent
     {
         MatchRect_Basics matchRect = new MatchRect_Basics();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -37820,7 +37820,7 @@ namespace CS_Classes
 
 
 
-    public class MatchShapes_Basics_CS : VB_Parent
+    public class MatchShapes_Basics_CS : TaskParent
     {
         public cv.Point[][] hull1;
         public cv.Point[][] hull2;
@@ -37881,7 +37881,7 @@ namespace CS_Classes
 
 
 
-    public class MatchShapes_NearbyHull_CS : VB_Parent
+    public class MatchShapes_NearbyHull_CS : TaskParent
     {
         public List<rcData> similarCells = new List<rcData>();
         public int bestCell;
@@ -37930,7 +37930,7 @@ namespace CS_Classes
 
 
 
-    public class MatchShapes_Nearby_CS : VB_Parent
+    public class MatchShapes_Nearby_CS : TaskParent
     {
         public List<rcData> redCells = new List<rcData>();
         public List<rcData> similarCells = new List<rcData>();
@@ -37998,7 +37998,7 @@ namespace CS_Classes
 
 
 
-    public class MatchShapes_Hulls_CS : VB_Parent
+    public class MatchShapes_Hulls_CS : TaskParent
     {
         Options_MatchShapes options = new Options_MatchShapes();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -38027,7 +38027,7 @@ namespace CS_Classes
 
 
 
-    public class MatchShapes_Contours_CS : VB_Parent
+    public class MatchShapes_Contours_CS : TaskParent
     {
         Options_MatchShapes options = new Options_MatchShapes();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -38056,7 +38056,7 @@ namespace CS_Classes
 
 
 
-    public class Math_Subtract_CS : VB_Parent
+    public class Math_Subtract_CS : TaskParent
     {
         Options_Colors options = new Options_Colors();
         public Math_Subtract_CS()
@@ -38099,7 +38099,7 @@ namespace CS_Classes
 
 
 
-    public class Math_Median_CDF_CS : VB_Parent
+    public class Math_Median_CDF_CS : TaskParent
     {
         public double medianVal;
         public int rangeMin = 0;
@@ -38129,7 +38129,7 @@ namespace CS_Classes
 
 
 
-    public class Math_DepthMeanStdev_CS : VB_Parent
+    public class Math_DepthMeanStdev_CS : TaskParent
     {
         Depth_NotMissing minMax = new Depth_NotMissing();
         public Math_DepthMeanStdev_CS()
@@ -38155,7 +38155,7 @@ namespace CS_Classes
 
 
 
-    public class Math_RGBCorrelation_CS : VB_Parent
+    public class Math_RGBCorrelation_CS : TaskParent
     {
         Font_FlowText flow = new Font_FlowText();
         Match_Basics match = new Match_Basics();
@@ -38185,7 +38185,7 @@ namespace CS_Classes
 
 
 
-    public class Math_StdevBoundary_CS : VB_Parent
+    public class Math_StdevBoundary_CS : TaskParent
     {
         Math_Stdev stdev = new Math_Stdev();
         TrackBar stdevSlider;
@@ -38247,7 +38247,7 @@ namespace CS_Classes
 
 
 
-    public class Math_Template_CS : VB_Parent
+    public class Math_Template_CS : TaskParent
     {
         public Math_Template_CS()
         {
@@ -38282,7 +38282,7 @@ namespace CS_Classes
 
 
 
-    public class Math_ImageAverage_CS : VB_Parent
+    public class Math_ImageAverage_CS : TaskParent
     {
         List<Mat> images = new List<Mat>();
         public Math_ImageAverage_CS()
@@ -38315,7 +38315,7 @@ namespace CS_Classes
 
 
 
-    public class Math_ImageMaskedAverage_CS : VB_Parent
+    public class Math_ImageMaskedAverage_CS : TaskParent
     {
         List<Mat> images = new List<Mat>();
         public Math_ImageMaskedAverage_CS()
@@ -38344,7 +38344,7 @@ namespace CS_Classes
 
 
 
-    public class Math_ParallelTest_CS : VB_Parent
+    public class Math_ParallelTest_CS : TaskParent
     {
         public Point3f v1 = new Point3f(1, 0, 0);
         public Point3f v2 = new Point3f(5, 0, 0);
@@ -38373,7 +38373,7 @@ namespace CS_Classes
 
 
 
-    public class Math_Stdev_CS : VB_Parent
+    public class Math_Stdev_CS : TaskParent
     {
         public Mat highStdevMask;
         public Mat lowStdevMask;
@@ -38432,7 +38432,7 @@ namespace CS_Classes
 
 
 
-    public class MeanShift_Basics_CS : VB_Parent
+    public class MeanShift_Basics_CS : TaskParent
     {
         public int rectangleEdgeWidth = 2;
         public cv.Rect trackbox = new cv.Rect();
@@ -38472,7 +38472,7 @@ namespace CS_Classes
 
 
 
-    public class MeanShift_Depth_CS : VB_Parent
+    public class MeanShift_Depth_CS : TaskParent
     {
         MeanShift_Basics meanShift = new MeanShift_Basics();
         public MeanShift_Depth_CS()
@@ -38491,7 +38491,7 @@ namespace CS_Classes
 
 
 
-    public class Mesh_Basics_CS : VB_Parent
+    public class Mesh_Basics_CS : TaskParent
     {
         KNN_Basics knn = new KNN_Basics();
         public List<Point2f> ptList = new List<Point2f>();
@@ -38537,7 +38537,7 @@ namespace CS_Classes
 
 
 
-    public class Mesh_Features_CS : VB_Parent
+    public class Mesh_Features_CS : TaskParent
     {
         Feature_Stable feat = new Feature_Stable();
         Mesh_Basics mesh = new Mesh_Basics();
@@ -38578,7 +38578,7 @@ namespace CS_Classes
 
 
 
-    public class MiniCloud_Basics_CS : VB_Parent
+    public class MiniCloud_Basics_CS : TaskParent
     {
         readonly Resize_Smaller resize;
         public cv.Rect rect;
@@ -38607,7 +38607,7 @@ namespace CS_Classes
 
 
 
-    public class MiniCloud_Rotate_CS : VB_Parent
+    public class MiniCloud_Rotate_CS : TaskParent
     {
         TrackBar ySlider;
         public MiniCloud_Basics mini = new MiniCloud_Basics();
@@ -38663,7 +38663,7 @@ namespace CS_Classes
 
 
 
-    public class MiniCloud_RotateAngle_CS : VB_Parent
+    public class MiniCloud_RotateAngle_CS : TaskParent
     {
         TrackBar ySlider;
         readonly MiniCloud_Rotate peak = new MiniCloud_Rotate();
@@ -38705,7 +38705,7 @@ namespace CS_Classes
 
 
 
-    public class MiniCloud_RotateSinglePass_CS : VB_Parent
+    public class MiniCloud_RotateSinglePass_CS : TaskParent
     {
         MiniCloud_Rotate peak = new MiniCloud_Rotate();
         TrackBar ySlider;
@@ -38745,7 +38745,7 @@ namespace CS_Classes
 
 
 
-    public class ML_BasicsOld_CS : VB_Parent
+    public class ML_BasicsOld_CS : TaskParent
     {
         public ML_BasicsOld_CS()
         {
@@ -38894,7 +38894,7 @@ namespace CS_Classes
 
 
 
-    public class ML_FillRGBDepth_MT_CS : VB_Parent
+    public class ML_FillRGBDepth_MT_CS : TaskParent
     {
         Depth_Holes shadow = new Depth_Holes();
         Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
@@ -38921,7 +38921,7 @@ namespace CS_Classes
 
 
 
-    public class ML_DepthFromColor_CS : VB_Parent
+    public class ML_DepthFromColor_CS : TaskParent
     {
         Depth_Colorizer_CPP_VB colorizer = new Depth_Colorizer_CPP_VB();
         Mat_4Click mats = new Mat_4Click();
@@ -38974,7 +38974,7 @@ namespace CS_Classes
 
 
 
-    public class ML_DepthFromXYColor_CS : VB_Parent
+    public class ML_DepthFromXYColor_CS : TaskParent
     {
         Mat_4to1 mats = new Mat_4to1();
         Depth_Holes shadow = new Depth_Holes();
@@ -39054,7 +39054,7 @@ namespace CS_Classes
 
 
 
-    public class ML_Color2Depth_CS : VB_Parent
+    public class ML_Color2Depth_CS : TaskParent
     {
         Grid_MinMaxDepth minMax = new Grid_MinMaxDepth();
         Color8U_Basics colorClass = new Color8U_Basics();
@@ -39124,7 +39124,7 @@ namespace CS_Classes
 
 
 
-    public class ML_ColorInTier2Depth_CS : VB_Parent
+    public class ML_ColorInTier2Depth_CS : TaskParent
     {
         Grid_MinMaxDepth minMax = new Grid_MinMaxDepth();
         Color8U_Basics colorClass = new Color8U_Basics();
@@ -39189,7 +39189,7 @@ namespace CS_Classes
 
 
 
-    public class ML_RemoveDups_CPP_CS : VB_Parent
+    public class ML_RemoveDups_CPP_CS : TaskParent
     {
         public ML_RemoveDups_CPP_CS()
         {
@@ -39234,7 +39234,7 @@ namespace CS_Classes
 
 
 
-    public class Model_Basics_CS : VB_Parent
+    public class Model_Basics_CS : TaskParent
     {
         OpenGL_BasicsMouse oglM = new OpenGL_BasicsMouse();
         public Model_Basics_CS()
@@ -39253,7 +39253,7 @@ namespace CS_Classes
 
 
 
-    public class Model_OpenGL_Sliders_CS : VB_Parent
+    public class Model_OpenGL_Sliders_CS : TaskParent
     {
         Model_Basics model = new Model_Basics();
         public Model_OpenGL_Sliders_CS()
@@ -39274,7 +39274,7 @@ namespace CS_Classes
 
 
 
-    public class Model_FlatSurfaces_CS : VB_Parent
+    public class Model_FlatSurfaces_CS : TaskParent
     {
         public int totalPixels;
         List<float> floorList = new List<float>();
@@ -39339,7 +39339,7 @@ namespace CS_Classes
 
 
 
-    public class Model_RedCloud_CS : VB_Parent
+    public class Model_RedCloud_CS : TaskParent
     {
         public OpenGL_DrawHulls oglD = new OpenGL_DrawHulls();
         public Model_RedCloud_CS()
@@ -39357,7 +39357,7 @@ namespace CS_Classes
 
 
 
-    public class Model_CellZoom_CS : VB_Parent
+    public class Model_CellZoom_CS : TaskParent
     {
         Model_RedCloud oglData = new Model_RedCloud();
         public Model_CellZoom_CS()
@@ -39390,7 +39390,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_Basics_CS : VB_Parent
+    public class Projection_Basics_CS : TaskParent
     {
         public List<rcData> redCellInput = new List<rcData>();
         public List<rcData> redCells = new List<rcData>();
@@ -39499,7 +39499,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_HistSide_CS : VB_Parent
+    public class Projection_HistSide_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public Projection_HistSide_CS()
@@ -39521,7 +39521,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_HistTop_CS : VB_Parent
+    public class Projection_HistTop_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public Projection_HistTop_CS()
@@ -39543,7 +39543,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_Lines_CS : VB_Parent
+    public class Projection_Lines_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
         Line_Basics lines = new Line_Basics();
@@ -39574,7 +39574,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_Cell_CS : VB_Parent
+    public class Projection_Cell_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
         HeatMap_Basics heatCell = new HeatMap_Basics();
@@ -39610,7 +39610,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_Top_CS : VB_Parent
+    public class Projection_Top_CS : TaskParent
     {
         public Projection_HistTop histTop = new Projection_HistTop();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -39638,7 +39638,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_Side_CS : VB_Parent
+    public class Projection_Side_CS : TaskParent
     {
         public Projection_HistSide histSide = new Projection_HistSide();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -39667,7 +39667,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_ObjectIsolate_CS : VB_Parent
+    public class Projection_ObjectIsolate_CS : TaskParent
     {
         public Projection_Top top = new Projection_Top();
         public Projection_Side side = new Projection_Side();
@@ -39701,7 +39701,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_Object_CS : VB_Parent
+    public class Projection_Object_CS : TaskParent
     {
         Projection_Top top = new Projection_Top();
         Projection_Side side = new Projection_Side();
@@ -39740,7 +39740,7 @@ namespace CS_Classes
 
 
 
-    public class Projection_Floor_CS : VB_Parent
+    public class Projection_Floor_CS : TaskParent
     {
         Projection_ObjectIsolate isolate = new Projection_ObjectIsolate();
         TrackBar objSlider;
@@ -39768,7 +39768,7 @@ namespace CS_Classes
             var floor = (ranges[0].End - ranges[0].Start) * maxRow / dst2.Height + ranges[0].Start;
         }
     }
-    public class Moments_Basics_CS : VB_Parent
+    public class Moments_Basics_CS : TaskParent
     {
         public Point2f centroid;
         Foreground_KMeans foreground = new Foreground_KMeans();
@@ -39809,7 +39809,7 @@ namespace CS_Classes
 
 
 
-    public class Moments_CentroidKalman_CS : VB_Parent
+    public class Moments_CentroidKalman_CS : TaskParent
     {
         Foreground_KMeans foreground = new Foreground_KMeans();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -39837,7 +39837,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_BGSub_CS : VB_Parent
+    public class Motion_BGSub_CS : TaskParent
     {
         public BGSubtract_MOG2 bgSub = new BGSubtract_MOG2();
         Motion_Basics_QT_CS motion;
@@ -39860,7 +39860,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_ThruCorrelation_CS : VB_Parent
+    public class Motion_ThruCorrelation_CS : TaskParent
     {
         Options_MotionDetect options = new Options_MotionDetect();
         Mat lastFrame = new cv.Mat();
@@ -39914,7 +39914,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_CCmerge_CS : VB_Parent
+    public class Motion_CCmerge_CS : TaskParent
     {
         Mat lastFrame = new cv.Mat();
         Motion_ThruCorrelation motionCC = new Motion_ThruCorrelation();
@@ -39940,7 +39940,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_PixelDiff_CS : VB_Parent
+    public class Motion_PixelDiff_CS : TaskParent
     {
         public int changedPixels;
         int changeCount, frames;
@@ -39976,7 +39976,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_Contours_CS : VB_Parent
+    public class Motion_Contours_CS : TaskParent
     {
         public Motion_MinRect motion = new Motion_MinRect();
         Contour_Largest contours = new Contour_Largest();
@@ -40005,7 +40005,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_Grid_MP_CS : VB_Parent
+    public class Motion_Grid_MP_CS : TaskParent
     {
         Options_MotionDetect options = new Options_MotionDetect();
         public Motion_Grid_MP_CS()
@@ -40040,7 +40040,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_Grid_CS : VB_Parent
+    public class Motion_Grid_CS : TaskParent
     {
         Options_MotionDetect options = new Options_MotionDetect();
         public Motion_Grid_CS()
@@ -40080,7 +40080,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_Intersect_CS : VB_Parent
+    public class Motion_Intersect_CS : TaskParent
     {
         BGSubtract_Basics bgSub = new BGSubtract_Basics();
         int minCount = 4;
@@ -40189,7 +40189,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_RectTest_CS : VB_Parent
+    public class Motion_RectTest_CS : TaskParent
     {
         Motion_Enclosing motion = new Motion_Enclosing();
         Diff_Basics diff = new Diff_Basics();
@@ -40239,7 +40239,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_HistoryTest_CS : VB_Parent
+    public class Motion_HistoryTest_CS : TaskParent
     {
         Diff_Basics diff = new Diff_Basics();
         History_Basics frames = new History_Basics();
@@ -40264,7 +40264,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_Enclosing_CPP_CS : VB_Parent
+    public class Motion_Enclosing_CPP_CS : TaskParent
     {
         RedCloud_Basics redMasks = new RedCloud_Basics();
         double learnRate;
@@ -40310,7 +40310,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_Basics_QT_CS : VB_Parent
+    public class Motion_Basics_QT_CS : TaskParent
     {
         RedCloud_Basics redMasks = new RedCloud_Basics();
         public BGSubtract_MOG2 bgSub = new BGSubtract_MOG2();
@@ -40387,7 +40387,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_PointCloud_CS : VB_Parent
+    public class Motion_PointCloud_CS : TaskParent
     {
         Diff_Depth32f diff = new Diff_Depth32f();
         public Motion_PointCloud_CS()
@@ -40412,7 +40412,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_Color_CS : VB_Parent
+    public class Motion_Color_CS : TaskParent
     {
         public Motion_Color_CS()
         {
@@ -40429,7 +40429,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_Diff_CS : VB_Parent
+    public class Motion_Diff_CS : TaskParent
     {
         public Motion_Diff_CS()
         {
@@ -40453,7 +40453,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_MinRect_CS : VB_Parent
+    public class Motion_MinRect_CS : TaskParent
     {
         public Motion_Diff motion = new Motion_Diff();
         Area_MinRect mRect = new Area_MinRect();
@@ -40494,7 +40494,7 @@ namespace CS_Classes
 
 
 
-    public class Motion_RedCloud_CS : VB_Parent
+    public class Motion_RedCloud_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public Motion_RedCloud_CS()
@@ -40518,7 +40518,7 @@ namespace CS_Classes
 
 
 
-    public class Mouse_Basics_CS : VB_Parent
+    public class Mouse_Basics_CS : TaskParent
     {
         cv.Point lastPoint = new cv.Point();
         int colorIndex;
@@ -40543,7 +40543,7 @@ namespace CS_Classes
 
 
 
-    public class Mouse_LeftClickZoom_CS : VB_Parent
+    public class Mouse_LeftClickZoom_CS : TaskParent
     {
         public Mouse_LeftClickZoom_CS()
         {
@@ -40564,7 +40564,7 @@ namespace CS_Classes
 
 
 
-    public class Mouse_ClickPointUsage_CS : VB_Parent
+    public class Mouse_ClickPointUsage_CS : TaskParent
     {
         Feature_Stable feat = new Feature_Stable();
         public Mouse_ClickPointUsage_CS()
@@ -40589,7 +40589,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Basics_CS : VB_Parent
+    public class MSER_Basics_CS : TaskParent
     {
         MSER_CPP_VB detect = new MSER_CPP_VB();
         public List<rcData> mserCells = new List<rcData>();
@@ -40651,7 +40651,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Detect_CS : VB_Parent
+    public class MSER_Detect_CS : TaskParent
     {
         public cv.Rect[] boxes;
         public cv.Point[][] regions;
@@ -40685,7 +40685,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_SyntheticInput_CS : VB_Parent
+    public class MSER_SyntheticInput_CS : TaskParent
     {
         void addNestedRectangles(Mat img, cv.Point p0, int[] width, int[] color, int n)
         {
@@ -40728,7 +40728,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_LeftRight_CS : VB_Parent
+    public class MSER_LeftRight_CS : TaskParent
     {
         MSER_Left left = new MSER_Left();
         MSER_Right right = new MSER_Right();
@@ -40751,7 +40751,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Left_CS : VB_Parent
+    public class MSER_Left_CS : TaskParent
     {
         MSER_Basics mBase = new MSER_Basics();
         public MSER_Left_CS()
@@ -40771,7 +40771,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Right_CS : VB_Parent
+    public class MSER_Right_CS : TaskParent
     {
         MSER_Basics mBase = new MSER_Basics();
         public MSER_Right_CS()
@@ -40791,7 +40791,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Hulls_CS : VB_Parent
+    public class MSER_Hulls_CS : TaskParent
     {
         Options_MSER options = new Options_MSER();
         MSER_Basics mBase = new MSER_Basics();
@@ -40820,7 +40820,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_TestSynthetic_CS : VB_Parent
+    public class MSER_TestSynthetic_CS : TaskParent
     {
         Options_MSER options = new Options_MSER();
         MSER_SyntheticInput synth = new MSER_SyntheticInput();
@@ -40844,7 +40844,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Grayscale_CS : VB_Parent
+    public class MSER_Grayscale_CS : TaskParent
     {
         MSER_Basics mBase = new MSER_Basics();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -40865,7 +40865,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_ReducedRGB_CS : VB_Parent
+    public class MSER_ReducedRGB_CS : TaskParent
     {
         MSER_Basics mBase = new MSER_Basics();
         Reduction_BGR reduction = new Reduction_BGR();
@@ -40886,7 +40886,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_ROI_CS : VB_Parent
+    public class MSER_ROI_CS : TaskParent
     {
         public List<cv.Rect> containers = new List<cv.Rect>();
         Options_MSER options = new Options_MSER();
@@ -40944,7 +40944,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_TestExample_CS : VB_Parent
+    public class MSER_TestExample_CS : TaskParent
     {
         Mat image;
         MSER mser;
@@ -40994,7 +40994,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_RedCloud_CS : VB_Parent
+    public class MSER_RedCloud_CS : TaskParent
     {
         MSER_Basics mBase = new MSER_Basics();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -41014,7 +41014,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Mask_CPP_CS : VB_Parent
+    public class MSER_Mask_CPP_CS : TaskParent
     {
         Options_MSER options = new Options_MSER();
         RedCloud_Cells redC = new RedCloud_Cells();
@@ -41067,7 +41067,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Binarize_CS : VB_Parent
+    public class MSER_Binarize_CS : TaskParent
     {
         MSER_Basics mser = new MSER_Basics();
         Bin4Way_Regions bin4 = new Bin4Way_Regions();
@@ -41088,7 +41088,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Basics1_CS : VB_Parent
+    public class MSER_Basics1_CS : TaskParent
     {
         MSER_CPP_VB detect = new MSER_CPP_VB();
         RedCloud_Basics flood = new RedCloud_Basics();
@@ -41109,7 +41109,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_BasicsNew_CS : VB_Parent
+    public class MSER_BasicsNew_CS : TaskParent
     {
         MSER_CPP_VB detect = new MSER_CPP_VB();
         int displaycount;
@@ -41145,7 +41145,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_Basics2_CS : VB_Parent
+    public class MSER_Basics2_CS : TaskParent
     {
         MSER_CPP_VB detect = new MSER_CPP_VB();
         Mat cellMap;
@@ -41204,7 +41204,7 @@ namespace CS_Classes
 
 
 
-    public class MSER_CPP_CS : VB_Parent
+    public class MSER_CPP_CS : TaskParent
     {
         Options_MSER options = new Options_MSER();
         public List<cv.Rect> boxes = new List<cv.Rect>();
@@ -41282,7 +41282,7 @@ namespace CS_Classes
 
 
 
-    public class MultiDimensionScaling_Cities_CS : VB_Parent
+    public class MultiDimensionScaling_Cities_CS : TaskParent
     {
         double[] CityDistance = { // 10x10 array of distances for 10 cities
     0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,       // Atlanta
@@ -41385,7 +41385,7 @@ namespace CS_Classes
 
 
 
-    public class Neighbors_Basics_CS : VB_Parent
+    public class Neighbors_Basics_CS : TaskParent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         KNN_Basics knn = new KNN_Basics();
@@ -41442,7 +41442,7 @@ namespace CS_Classes
 
 
 
-    public class Neighbors_Intersects_CS : VB_Parent
+    public class Neighbors_Intersects_CS : TaskParent
     {
         public List<cv.Point> nPoints = new List<cv.Point>();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -41500,7 +41500,7 @@ namespace CS_Classes
 
 
 
-    public class Neighbors_ColorOnly_CS : VB_Parent
+    public class Neighbors_ColorOnly_CS : TaskParent
     {
         Neighbors_Intersects corners = new Neighbors_Intersects();
         RedCloud_Cells redC = new RedCloud_Cells();
@@ -41524,7 +41524,7 @@ namespace CS_Classes
 
 
 
-    public class Neighbors_Precise_CPP_CS : VB_Parent
+    public class Neighbors_Precise_CPP_CS : TaskParent
     {
         public List<List<int>> nabList = new List<List<int>>();
         Cell_Basics stats = new Cell_Basics();
@@ -41609,7 +41609,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_CalcBackProject_Demo1_CS : VB_Parent
+    public class OEX_CalcBackProject_Demo1_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public int classCount;
@@ -41648,7 +41648,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_CalcBackProject_Demo2_CS : VB_Parent
+    public class OEX_CalcBackProject_Demo2_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public int classCount = 10; // initial value is just a guess.  It is refined after the first pass.
@@ -41688,7 +41688,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_bgfg_segm_CS : VB_Parent
+    public class OEX_bgfg_segm_CS : TaskParent
     {
         BGSubtract_Basics bgSub = new BGSubtract_Basics();
         public OEX_bgfg_segm_CS()
@@ -41706,7 +41706,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_bgSub_CS : VB_Parent
+    public class OEX_bgSub_CS : TaskParent
     {
         BackgroundSubtractor pBackSub;
         Options_BGSubtract options = new Options_BGSubtract();
@@ -41742,7 +41742,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_BasicLinearTransforms_CS : VB_Parent
+    public class OEX_BasicLinearTransforms_CS : TaskParent
     {
         Options_BrightnessContrast options = new Options_BrightnessContrast();
         public OEX_BasicLinearTransforms_CS()
@@ -41759,7 +41759,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_BasicLinearTransformsTrackBar_CS : VB_Parent
+    public class OEX_BasicLinearTransformsTrackBar_CS : TaskParent
     {
         Options_BrightnessContrast options = new Options_BrightnessContrast();
         public OEX_BasicLinearTransformsTrackBar_CS()
@@ -41791,7 +41791,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_delaunay2_CS : VB_Parent
+    public class OEX_delaunay2_CS : TaskParent
     {
         Scalar active_facet_color = new Scalar(0, 0, 255);
         Scalar delaunay_color = new Scalar(255, 255, 255);
@@ -41875,7 +41875,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_MeanShift_CS : VB_Parent
+    public class OEX_MeanShift_CS : TaskParent
     {
         TermCriteria term_crit = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.Count, 10, 1.0);
         Rangef[] ranges = new Rangef[] { new Rangef(0, 180) };
@@ -41911,7 +41911,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_PointPolygon_CS : VB_Parent
+    public class OEX_PointPolygon_CS : TaskParent
     {
         Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
         public OEX_PointPolygon_CS()
@@ -41969,7 +41969,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_PointPolygon_demo_CS : VB_Parent
+    public class OEX_PointPolygon_demo_CS : TaskParent
     {
         OEX_PointPolygon pointPoly = new OEX_PointPolygon();
         public OEX_PointPolygon_demo_CS()
@@ -42002,7 +42002,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_Remap_CS : VB_Parent
+    public class OEX_Remap_CS : TaskParent
     {
         Remap_Basics remap = new Remap_Basics();
         public OEX_Remap_CS()
@@ -42020,7 +42020,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_Threshold_CS : VB_Parent
+    public class OEX_Threshold_CS : TaskParent
     {
         Threshold_Basics threshold = new Threshold_Basics();
         public OEX_Threshold_CS()
@@ -42039,7 +42039,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_Threshold_Inrange_CS : VB_Parent
+    public class OEX_Threshold_Inrange_CS : TaskParent
     {
         Options_OEX options = new Options_OEX();
         public OEX_Threshold_Inrange_CS()
@@ -42057,7 +42057,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_Points_Classifier_CS : VB_Parent
+    public class OEX_Points_Classifier_CS : TaskParent
     {
         Classifier_Basics_CS basics;
         public OEX_Points_Classifier_CS()
@@ -42078,7 +42078,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_GoodFeaturesToTrackDemo_CS : VB_Parent
+    public class OEX_GoodFeaturesToTrackDemo_CS : TaskParent
     {
         Feature_Stable feat = new Feature_Stable();
         public OEX_GoodFeaturesToTrackDemo_CS()
@@ -42096,7 +42096,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_Core_Reduce_CS : VB_Parent
+    public class OEX_Core_Reduce_CS : TaskParent
     {
         public OEX_Core_Reduce_CS()
         {
@@ -42145,7 +42145,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_Core_Split_CS : VB_Parent
+    public class OEX_Core_Split_CS : TaskParent
     {
         public OEX_Core_Split_CS()
         {
@@ -42182,7 +42182,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_Filter2D_CS : VB_Parent
+    public class OEX_Filter2D_CS : TaskParent
     {
         MatType ddepth = MatType.CV_8UC3;
         cv.Point anchor = new cv.Point(-1, -1);
@@ -42204,7 +42204,7 @@ namespace CS_Classes
 
 
 
-    public class OEX_FitEllipse_CPP_CS : VB_Parent
+    public class OEX_FitEllipse_CPP_CS : TaskParent
     {
         Mat img;
         Options_FitEllipse options = new Options_FitEllipse();
@@ -42242,7 +42242,7 @@ namespace CS_Classes
 
 
 
-    public class OilPaint_Pointilism_CS : VB_Parent
+    public class OilPaint_Pointilism_CS : TaskParent
     {
         Mat randomMask;
         RNG myRNG = new RNG();
@@ -42314,7 +42314,7 @@ namespace CS_Classes
 
 
 
-    public class OilPaint_ManualVB_CS : VB_Parent
+    public class OilPaint_ManualVB_CS : TaskParent
     {
         public Options_OilPaint options = new Options_OilPaint();
         public OilPaint_ManualVB_CS()
@@ -42371,7 +42371,7 @@ namespace CS_Classes
 
 
 
-    public class OpAuto_XRange_CS : VB_Parent
+    public class OpAuto_XRange_CS : TaskParent
     {
         public Mat histogram = new Mat();
         int adjustedCount = 0;
@@ -42421,7 +42421,7 @@ namespace CS_Classes
 
 
 
-    public class OpAuto_YRange_CS : VB_Parent
+    public class OpAuto_YRange_CS : TaskParent
     {
         public Mat histogram = new Mat();
         int adjustedCount = 0;
@@ -42471,7 +42471,7 @@ namespace CS_Classes
 
 
 
-    public class OpAuto_FloorCeiling_CS : VB_Parent
+    public class OpAuto_FloorCeiling_CS : TaskParent
     {
         public BackProject_LineSide bpLine = new BackProject_LineSide();
         public List<float> yList = new List<float>();
@@ -42522,7 +42522,7 @@ namespace CS_Classes
 
 
 
-    public class OpAuto_Valley_CS : VB_Parent
+    public class OpAuto_Valley_CS : TaskParent
     {
         public SortedList<int, int> valleyOrder = new SortedList<int, int>(new CompareAllowIdenticalInteger());
         public Options_Boundary options = new Options_Boundary();
@@ -42591,7 +42591,7 @@ namespace CS_Classes
 
 
 
-    public class OpAuto_Peaks2D_CS : VB_Parent
+    public class OpAuto_Peaks2D_CS : TaskParent
     {
         public Options_Boundary options = new Options_Boundary();
         public List<Point2f> clusterPoints = new List<Point2f>();
@@ -42634,7 +42634,7 @@ namespace CS_Classes
 
 
 
-    public class OpAuto_Peaks2DGrid_CS : VB_Parent
+    public class OpAuto_Peaks2DGrid_CS : TaskParent
     {
         public List<Point2f> clusterPoints = new List<Point2f>();
         Options_Boundary options = new Options_Boundary();
@@ -42686,7 +42686,7 @@ namespace CS_Classes
 
 
 
-    public class OpAuto_PixelDifference_CS : VB_Parent
+    public class OpAuto_PixelDifference_CS : TaskParent
     {
         Diff_Basics diff = new Diff_Basics();
         public OpAuto_PixelDifference_CS()
@@ -42721,7 +42721,7 @@ namespace CS_Classes
 
 
 
-    public class OpAuto_MSER_CS : VB_Parent
+    public class OpAuto_MSER_CS : TaskParent
     {
         MSER_Basics mBase = new MSER_Basics();
         public int classCount;
@@ -42778,7 +42778,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Basics_CS : VB_Parent
+    public class OpenGL_Basics_CS : TaskParent
     {
         MemoryMappedViewAccessor memMapWriter;
         readonly ProcessStartInfo startInfo = new ProcessStartInfo();
@@ -42944,7 +42944,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_BasicsSliders_CS : VB_Parent
+    public class OpenGL_BasicsSliders_CS : TaskParent
     {
         Options_OpenGL options = new Options_OpenGL();
         public Mat pointCloudInput;
@@ -42977,7 +42977,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_BasicsMouse_CS : VB_Parent
+    public class OpenGL_BasicsMouse_CS : TaskParent
     {
         public OpenGL_BasicsMouse_CS()
         {
@@ -42996,7 +42996,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_ReducedXYZ_CS : VB_Parent
+    public class OpenGL_ReducedXYZ_CS : TaskParent
     {
         readonly Reduction_XYZ reduction = new Reduction_XYZ();
         public OpenGL_ReducedXYZ_CS()
@@ -43017,7 +43017,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Reduction_CS : VB_Parent
+    public class OpenGL_Reduction_CS : TaskParent
     {
         readonly Reduction_PointCloud reduction;
         public OpenGL_Reduction_CS()
@@ -43039,7 +43039,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_ReducedSideView_CS : VB_Parent
+    public class OpenGL_ReducedSideView_CS : TaskParent
     {
         readonly PointCloud_ReducedSideView sideView = new PointCloud_ReducedSideView();
         public OpenGL_ReducedSideView_CS()
@@ -43062,7 +43062,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Rebuilt_CS : VB_Parent
+    public class OpenGL_Rebuilt_CS : TaskParent
     {
         readonly Structured_Rebuild rebuild = new Structured_Rebuild();
         public OpenGL_Rebuilt_CS()
@@ -43083,7 +43083,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_VerticalSingle_CS : VB_Parent
+    public class OpenGL_VerticalSingle_CS : TaskParent
     {
         readonly FeatureLine_LongestV_Tutorial2 vLine = new FeatureLine_LongestV_Tutorial2();
         public OpenGL_VerticalSingle_CS()
@@ -43114,7 +43114,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Pyramid_CS : VB_Parent
+    public class OpenGL_Pyramid_CS : TaskParent
     {
         public OpenGL_Pyramid_CS()
         {
@@ -43133,7 +43133,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_DrawCube_CS : VB_Parent
+    public class OpenGL_DrawCube_CS : TaskParent
     {
         public OpenGL_DrawCube_CS()
         {
@@ -43152,7 +43152,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_QuadSimple_CS : VB_Parent
+    public class OpenGL_QuadSimple_CS : TaskParent
     {
         readonly Tessallate_QuadSimple tess = new Tessallate_QuadSimple();
         public OpenGL_QuadSimple_CS()
@@ -43177,7 +43177,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_QuadHulls_CS : VB_Parent
+    public class OpenGL_QuadHulls_CS : TaskParent
     {
         readonly Tessallate_QuadHulls tess = new Tessallate_QuadHulls();
         public OpenGL_QuadHulls_CS()
@@ -43202,7 +43202,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_QuadMinMax_CS : VB_Parent
+    public class OpenGL_QuadMinMax_CS : TaskParent
     {
         readonly Tessallate_QuadMinMax tess = new Tessallate_QuadMinMax();
         public OpenGL_QuadMinMax_CS()
@@ -43227,7 +43227,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Bricks_CS : VB_Parent
+    public class OpenGL_Bricks_CS : TaskParent
     {
         readonly Tessallate_Bricks tess = new Tessallate_Bricks();
         public OpenGL_Bricks_CS()
@@ -43261,7 +43261,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_StructuredCloud_CS : VB_Parent
+    public class OpenGL_StructuredCloud_CS : TaskParent
     {
         readonly Structured_Cloud sCloud = new Structured_Cloud();
         readonly RedCloud_Basics redC = new RedCloud_Basics();
@@ -43287,7 +43287,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Tiles_CS : VB_Parent
+    public class OpenGL_Tiles_CS : TaskParent
     {
         Structured_Tiles sCloud = new Structured_Tiles();
         public OpenGL_Tiles_CS()
@@ -43312,7 +43312,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_TilesQuad_CS : VB_Parent
+    public class OpenGL_TilesQuad_CS : TaskParent
     {
         Structured_TilesQuad sCloud = new Structured_TilesQuad();
         public OpenGL_TilesQuad_CS()
@@ -43335,7 +43335,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_OnlyPlanes_CS : VB_Parent
+    public class OpenGL_OnlyPlanes_CS : TaskParent
     {
         readonly Plane_OnlyPlanes planes = new Plane_OnlyPlanes();
         public OpenGL_OnlyPlanes_CS()
@@ -43358,7 +43358,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FlatStudy1_CS : VB_Parent
+    public class OpenGL_FlatStudy1_CS : TaskParent
     {
         readonly Structured_LinearizeFloor plane = new Structured_LinearizeFloor();
         public OpenGL_FlatStudy1_CS()
@@ -43380,7 +43380,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FlatStudy2_CS : VB_Parent
+    public class OpenGL_FlatStudy2_CS : TaskParent
     {
         public Structured_LinearizeFloor plane = new Structured_LinearizeFloor();
         public OpenGL_FlatStudy2_CS()
@@ -43408,7 +43408,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FlatStudy3_CS : VB_Parent
+    public class OpenGL_FlatStudy3_CS : TaskParent
     {
         Plane_FloorStudy plane = new Plane_FloorStudy();
         TrackBar cushionSlider;
@@ -43435,7 +43435,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FlatFloor_CS : VB_Parent
+    public class OpenGL_FlatFloor_CS : TaskParent
     {
         Model_FlatSurfaces flatness = new Model_FlatSurfaces();
         public OpenGL_FlatFloor_CS()
@@ -43460,7 +43460,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FlatCeiling_CS : VB_Parent
+    public class OpenGL_FlatCeiling_CS : TaskParent
     {
         Model_FlatSurfaces flatness = new Model_FlatSurfaces();
         public OpenGL_FlatCeiling_CS()
@@ -43485,7 +43485,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_PeakFlat_CS : VB_Parent
+    public class OpenGL_PeakFlat_CS : TaskParent
     {
         Plane_Histogram peak = new Plane_Histogram();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -43512,7 +43512,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_DrawHull_CS : VB_Parent
+    public class OpenGL_DrawHull_CS : TaskParent
     {
         RedCloud_Hulls hulls = new RedCloud_Hulls();
         public OpenGL_DrawHull_CS()
@@ -43551,7 +43551,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FPolyCloud_CS : VB_Parent
+    public class OpenGL_FPolyCloud_CS : TaskParent
     {
         FPoly_PointCloud fpolyPC = new FPoly_PointCloud();
         public OpenGL_FPolyCloud_CS()
@@ -43578,7 +43578,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Sierpinski_CS : VB_Parent
+    public class OpenGL_Sierpinski_CS : TaskParent
     {
         public OpenGL_Sierpinski_CS()
         {
@@ -43598,7 +43598,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_DrawHulls_CS : VB_Parent
+    public class OpenGL_DrawHulls_CS : TaskParent
     {
         public Options_OpenGLFunctions options = new Options_OpenGLFunctions();
         public RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -43660,7 +43660,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Contours_CS : VB_Parent
+    public class OpenGL_Contours_CS : TaskParent
     {
         Options_OpenGL_Contours options2 = new Options_OpenGL_Contours();
         public Options_OpenGLFunctions options = new Options_OpenGLFunctions();
@@ -43732,7 +43732,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_PCLineCandidates_CS : VB_Parent
+    public class OpenGL_PCLineCandidates_CS : TaskParent
     {
         PointCloud_Basics pts = new PointCloud_Basics();
         public OpenGL_PCLineCandidates_CS()
@@ -43756,7 +43756,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_PClinesFirstLast_CS : VB_Parent
+    public class OpenGL_PClinesFirstLast_CS : TaskParent
     {
         Line3D_CandidatesFirstLast lines = new Line3D_CandidatesFirstLast();
         public OpenGL_PClinesFirstLast_CS()
@@ -43780,7 +43780,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_PClinesAll_CS : VB_Parent
+    public class OpenGL_PClinesAll_CS : TaskParent
     {
         Line3D_CandidatesAll lines = new Line3D_CandidatesAll();
         public OpenGL_PClinesAll_CS()
@@ -43804,7 +43804,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_PatchHorizontal_CS : VB_Parent
+    public class OpenGL_PatchHorizontal_CS : TaskParent
     {
         Pixel_NeighborsPatchNeighbors patch = new Pixel_NeighborsPatchNeighbors();
         public OpenGL_PatchHorizontal_CS()
@@ -43826,7 +43826,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_PCpoints_CS : VB_Parent
+    public class OpenGL_PCpoints_CS : TaskParent
     {
         PointCloud_PCPoints pts = new PointCloud_PCPoints();
         public OpenGL_PCpoints_CS()
@@ -43850,7 +43850,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_PCpointsPlane_CS : VB_Parent
+    public class OpenGL_PCpointsPlane_CS : TaskParent
     {
         PointCloud_PCPointsPlane pts = new PointCloud_PCPointsPlane();
         public OpenGL_PCpointsPlane_CS()
@@ -43873,7 +43873,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_PlaneClusters3D_CS : VB_Parent
+    public class OpenGL_PlaneClusters3D_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Plane_Equation eq = new Plane_Equation();
@@ -43914,7 +43914,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Profile_CS : VB_Parent
+    public class OpenGL_Profile_CS : TaskParent
     {
         public Profile_Basics sides = new Profile_Basics();
         public Profile_Rotation rotate = new Profile_Rotation();
@@ -43960,7 +43960,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_ProfileSweep_CS : VB_Parent
+    public class OpenGL_ProfileSweep_CS : TaskParent
     {
         OpenGL_Profile visuals = new OpenGL_Profile();
         Options_IMU options = new Options_IMU();
@@ -44018,7 +44018,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FlatSurfaces_CS : VB_Parent
+    public class OpenGL_FlatSurfaces_CS : TaskParent
     {
         RedCloud_LikelyFlatSurfaces flat = new RedCloud_LikelyFlatSurfaces();
         public OpenGL_FlatSurfaces_CS()
@@ -44039,7 +44039,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_GradientPhase_CS : VB_Parent
+    public class OpenGL_GradientPhase_CS : TaskParent
     {
         Gradient_Depth gradient = new Gradient_Depth();
         public OpenGL_GradientPhase_CS()
@@ -44062,7 +44062,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_GravityTransform_CS : VB_Parent
+    public class OpenGL_GravityTransform_CS : TaskParent
     {
         public OpenGL_GravityTransform_CS()
         {
@@ -44080,7 +44080,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_GravityAverage_CS : VB_Parent
+    public class OpenGL_GravityAverage_CS : TaskParent
     {
         readonly IMU_Average imuAvg = new IMU_Average();
         readonly IMU_Basics imu = new IMU_Basics();
@@ -44111,7 +44111,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_GravityKalman_CS : VB_Parent
+    public class OpenGL_GravityKalman_CS : TaskParent
     {
         readonly IMU_Kalman imuKalman = new IMU_Kalman();
         readonly IMU_Basics imu = new IMU_Basics();
@@ -44143,7 +44143,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_StableMinMax_CS : VB_Parent
+    public class OpenGL_StableMinMax_CS : TaskParent
     {
         readonly Depth_MinMaxNone minmax = new Depth_MinMaxNone();
         public OpenGL_StableMinMax_CS()
@@ -44169,7 +44169,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_CloudMisses_CS : VB_Parent
+    public class OpenGL_CloudMisses_CS : TaskParent
     {
         History_Basics frames = new History_Basics();
         public OpenGL_CloudMisses_CS()
@@ -44192,7 +44192,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_CloudHistory_CS : VB_Parent
+    public class OpenGL_CloudHistory_CS : TaskParent
     {
         History_Cloud hCloud = new History_Cloud();
         public OpenGL_CloudHistory_CS()
@@ -44213,7 +44213,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_TessellateCell_CS : VB_Parent
+    public class OpenGL_TessellateCell_CS : TaskParent
     {
         Triangle_Basics tess = new Triangle_Basics();
         public OpenGL_TessellateCell_CS()
@@ -44237,7 +44237,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Tessellate_CS : VB_Parent
+    public class OpenGL_Tessellate_CS : TaskParent
     {
         Triangle_RedCloud tess = new Triangle_RedCloud();
         public OpenGL_Tessellate_CS()
@@ -44261,7 +44261,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_TessellateRGB_CS : VB_Parent
+    public class OpenGL_TessellateRGB_CS : TaskParent
     {
         Triangle_RedCloud tess = new Triangle_RedCloud();
         public OpenGL_TessellateRGB_CS()
@@ -44285,7 +44285,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_RedTrack_CS : VB_Parent
+    public class OpenGL_RedTrack_CS : TaskParent
     {
         RedTrack_Basics redCC = new RedTrack_Basics();
         public OpenGL_RedTrack_CS()
@@ -44306,7 +44306,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Density2D_CS : VB_Parent
+    public class OpenGL_Density2D_CS : TaskParent
     {
         Density_Basics dense = new Density_Basics();
         public OpenGL_Density2D_CS()
@@ -44328,7 +44328,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_ViewObjects_CS : VB_Parent
+    public class OpenGL_ViewObjects_CS : TaskParent
     {
         GuidedBP_Points bpDoctor = new GuidedBP_Points();
         public OpenGL_ViewObjects_CS()
@@ -44351,7 +44351,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_NoSolo_CS : VB_Parent
+    public class OpenGL_NoSolo_CS : TaskParent
     {
         BackProject_SoloTop hotTop = new BackProject_SoloTop();
         BackProject_SoloSide hotSide = new BackProject_SoloSide();
@@ -44379,7 +44379,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_RedCloud_CS : VB_Parent
+    public class OpenGL_RedCloud_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public OpenGL_RedCloud_CS()
@@ -44399,7 +44399,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_RedCloudSpectrum_CS : VB_Parent
+    public class OpenGL_RedCloudSpectrum_CS : TaskParent
     {
         Spectrum_RedCloud redS = new Spectrum_RedCloud();
         public OpenGL_RedCloudSpectrum_CS()
@@ -44421,7 +44421,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_RedCloudCell_CS : VB_Parent
+    public class OpenGL_RedCloudCell_CS : TaskParent
     {
         Spectrum_Z specZ = new Spectrum_Z();
         Spectrum_Breakdown breakdown = new Spectrum_Breakdown();
@@ -44452,7 +44452,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FilteredSideView_CS : VB_Parent
+    public class OpenGL_FilteredSideView_CS : TaskParent
     {
         BackProject2D_FilterSide filter = new BackProject2D_FilterSide();
         public OpenGL_FilteredSideView_CS()
@@ -44472,7 +44472,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FilteredTopView_CS : VB_Parent
+    public class OpenGL_FilteredTopView_CS : TaskParent
     {
         BackProject2D_FilterTop filter = new BackProject2D_FilterTop();
         public OpenGL_FilteredTopView_CS()
@@ -44492,7 +44492,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_FilteredBoth_CS : VB_Parent
+    public class OpenGL_FilteredBoth_CS : TaskParent
     {
         BackProject2D_FilterBoth filter = new BackProject2D_FilterBoth();
         public OpenGL_FilteredBoth_CS()
@@ -44512,7 +44512,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Filtered3D_CS : VB_Parent
+    public class OpenGL_Filtered3D_CS : TaskParent
     {
         Hist3Dcloud_BP_Filter filter = new Hist3Dcloud_BP_Filter();
         public OpenGL_Filtered3D_CS()
@@ -44534,7 +44534,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_HistNorm3D_CS : VB_Parent
+    public class OpenGL_HistNorm3D_CS : TaskParent
     {
         public OpenGL_HistNorm3D_CS()
         {
@@ -44554,7 +44554,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_HistDepth3D_CS : VB_Parent
+    public class OpenGL_HistDepth3D_CS : TaskParent
     {
         Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
         public OpenGL_HistDepth3D_CS()
@@ -44579,7 +44579,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_SoloPointsRemoved_CS : VB_Parent
+    public class OpenGL_SoloPointsRemoved_CS : TaskParent
     {
         Area_SoloPoints solos = new Area_SoloPoints();
         public OpenGL_SoloPointsRemoved_CS()
@@ -44611,7 +44611,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Duster_CS : VB_Parent
+    public class OpenGL_Duster_CS : TaskParent
     {
         Duster_Basics duster = new Duster_Basics();
         Options_OpenGL_Duster options = new Options_OpenGL_Duster();
@@ -44632,7 +44632,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_DusterY_CS : VB_Parent
+    public class OpenGL_DusterY_CS : TaskParent
     {
         Duster_BasicsY duster = new Duster_BasicsY();
         Options_OpenGL_Duster options = new Options_OpenGL_Duster();
@@ -44653,7 +44653,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_Color3D_CS : VB_Parent
+    public class OpenGL_Color3D_CS : TaskParent
     {
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         public OpenGL_Color3D_CS()
@@ -44682,7 +44682,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_ColorReduced3D_CS : VB_Parent
+    public class OpenGL_ColorReduced3D_CS : TaskParent
     {
         private Color8U_Basics colorClass = new Color8U_Basics();
 
@@ -44714,7 +44714,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_ColorRaw_CS : VB_Parent
+    public class OpenGL_ColorRaw_CS : TaskParent
     {
         public OpenGL_ColorRaw_CS()
         {
@@ -44739,7 +44739,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_ColorBin4Way_CS : VB_Parent
+    public class OpenGL_ColorBin4Way_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public OpenGL_ColorBin4Way_CS()
@@ -44768,7 +44768,7 @@ namespace CS_Classes
 
 
 
-    public class ORB_Basics_CS : VB_Parent
+    public class ORB_Basics_CS : TaskParent
     {
         public KeyPoint[] keypoints;
         ORB orb;
@@ -44797,7 +44797,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_Basics_CS : VB_Parent
+    public class Palette_Basics_CS : TaskParent
     {
         public bool whitebackground;
         ColormapTypes[] choices = { ColormapTypes.Autumn, ColormapTypes.Bone, ColormapTypes.Cividis, ColormapTypes.Cool,
@@ -44825,7 +44825,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_Color_CS : VB_Parent
+    public class Palette_Color_CS : TaskParent
     {
         Options_Colors options = new Options_Colors();
         public Palette_Color_CS()
@@ -44846,7 +44846,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_LinearPolar_CS : VB_Parent
+    public class Palette_LinearPolar_CS : TaskParent
     {
         public Options_Resize rotateOptions = new Options_Resize();
         Point2f pt;
@@ -44878,7 +44878,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_Reduction_CS : VB_Parent
+    public class Palette_Reduction_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         public Palette_Reduction_CS()
@@ -44898,7 +44898,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_DrawTest_CS : VB_Parent
+    public class Palette_DrawTest_CS : TaskParent
     {
         Draw_Shapes draw = new Draw_Shapes();
         public Palette_DrawTest_CS()
@@ -44915,7 +44915,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_Gradient_CS : VB_Parent
+    public class Palette_Gradient_CS : TaskParent
     {
         public Scalar color1;
         public Scalar color2;
@@ -44952,7 +44952,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_DepthColorMap_CS : VB_Parent
+    public class Palette_DepthColorMap_CS : TaskParent
     {
         public Mat gradientColorMap = new Mat();
         Gradient_Color gColor = new Gradient_Color();
@@ -45001,7 +45001,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_RGBDepth_CS : VB_Parent
+    public class Palette_RGBDepth_CS : TaskParent
     {
         Mat gradientColorMap = new Mat();
         Gradient_Color gColor = new Gradient_Color();
@@ -45035,7 +45035,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_Layout2D_CS : VB_Parent
+    public class Palette_Layout2D_CS : TaskParent
     {
         public Palette_Layout2D_CS()
         {
@@ -45056,7 +45056,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_LeftRightImages_CS : VB_Parent
+    public class Palette_LeftRightImages_CS : TaskParent
     {
         public Palette_LeftRightImages_CS()
         {
@@ -45072,7 +45072,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_TaskColors_CS : VB_Parent
+    public class Palette_TaskColors_CS : TaskParent
     {
         int direction = 1;
         public Palette_TaskColors_CS()
@@ -45098,7 +45098,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_Create_CS : VB_Parent
+    public class Palette_Create_CS : TaskParent
     {
         Mat colorGrad = new Mat();
         string activeSchemeName = "";
@@ -45165,7 +45165,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_Random_CS : VB_Parent
+    public class Palette_Random_CS : TaskParent
     {
         public Mat colorMap;
         public Palette_Random_CS()
@@ -45187,7 +45187,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_Variable_CS : VB_Parent
+    public class Palette_Variable_CS : TaskParent
     {
         public Mat colorGrad;
         public Mat originalColorMap;
@@ -45216,7 +45216,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_RandomColorMap_CS : VB_Parent
+    public class Palette_RandomColorMap_CS : TaskParent
     {
         public Mat gradientColorMap = new Mat();
         public int transitionCount = -1;
@@ -45256,7 +45256,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_LoadColorMap_CS : VB_Parent
+    public class Palette_LoadColorMap_CS : TaskParent
     {
         public bool whitebackground;
         public Mat colorMap = new Mat();
@@ -45291,7 +45291,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_CustomColorMap_CS : VB_Parent
+    public class Palette_CustomColorMap_CS : TaskParent
     {
         public Mat colorMap;
         public Palette_CustomColorMap_CS()
@@ -45328,7 +45328,7 @@ namespace CS_Classes
 
 
 
-    public class Palette_GrayToColor_CS : VB_Parent
+    public class Palette_GrayToColor_CS : TaskParent
     {
         public Palette_GrayToColor_CS()
         {
@@ -45372,7 +45372,7 @@ namespace CS_Classes
 
 
 
-    public class ParticleFilter_Example_CS : VB_Parent
+    public class ParticleFilter_Example_CS : TaskParent
     {
         int imageFrame = 12;
         public ParticleFilter_Example_CS()
@@ -45403,7 +45403,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_Prep_CPP_CS : VB_Parent
+    public class PCA_Prep_CPP_CS : TaskParent
     {
         public Mat inputData = new Mat();
         public PCA_Prep_CPP_CS()
@@ -45432,7 +45432,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_Palettize_CS : VB_Parent
+    public class PCA_Palettize_CS : TaskParent
     {
         public byte[] palette;
         public byte[] rgb;
@@ -45471,7 +45471,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_Basics_CS : VB_Parent
+    public class PCA_Basics_CS : TaskParent
     {
         PCA_Prep_CPP_VB prep = new PCA_Prep_CPP_VB();
         public PCA pca_analysis = new PCA();
@@ -45547,7 +45547,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_CellMask_CS : VB_Parent
+    public class PCA_CellMask_CS : TaskParent
     {
         PCA_Basics pca = new PCA_Basics();
         PCA_Prep_CPP_VB pcaPrep = new PCA_Prep_CPP_VB();
@@ -45583,7 +45583,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_Reconstruct_CS : VB_Parent
+    public class PCA_Reconstruct_CS : TaskParent
     {
         Mat[] images = new Mat[8];
         Mat[] images32f = new Mat[8];
@@ -45621,7 +45621,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_Depth_CS : VB_Parent
+    public class PCA_Depth_CS : TaskParent
     {
         PCA_Reconstruct pca = new PCA_Reconstruct();
         public PCA_Depth_CS()
@@ -45638,7 +45638,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_DrawImage_CS : VB_Parent
+    public class PCA_DrawImage_CS : TaskParent
     {
         PCA_Reconstruct pca = new PCA_Reconstruct();
         Mat image = new Mat();
@@ -45705,7 +45705,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_NColor_CS : VB_Parent
+    public class PCA_NColor_CS : TaskParent
     {
 #region "PCS_Details"
         [StructLayout(LayoutKind.Sequential)]
@@ -46215,7 +46215,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_NColor_CPP_CS : VB_Parent
+    public class PCA_NColor_CPP_CS : TaskParent
     {
         Palette_CustomColorMap custom = new Palette_CustomColorMap();
         PCA_Palettize palettize = new PCA_Palettize();
@@ -46264,7 +46264,7 @@ namespace CS_Classes
 
 
 
-    public class PCA_NColorPalettize_CS : VB_Parent
+    public class PCA_NColorPalettize_CS : TaskParent
     {
         Palette_CustomColorMap custom = new Palette_CustomColorMap();
         PCA_Palettize palettize = new PCA_Palettize();
@@ -46295,7 +46295,7 @@ namespace CS_Classes
 
 
 
-    public class Pendulum_Basics_CS : VB_Parent
+    public class Pendulum_Basics_CS : TaskParent
     {
         float l1 = 150, l2 = 150, m1 = 10, m2 = 10;
         float o1 = (float)(2 * Cv2.PI / 2);
@@ -46354,7 +46354,7 @@ namespace CS_Classes
 
 
 
-    public class PhaseCorrelate_Basics_CS : VB_Parent
+    public class PhaseCorrelate_Basics_CS : TaskParent
     {
         Mat hanning = new Mat();
         public cv.Rect stableRect;
@@ -46425,7 +46425,7 @@ namespace CS_Classes
 
 
 
-    public class PhaseCorrelate_BasicsTest_CS : VB_Parent
+    public class PhaseCorrelate_BasicsTest_CS : TaskParent
     {
         Stabilizer_BasicsRandomInput random = new Stabilizer_BasicsRandomInput();
         PhaseCorrelate_Basics stable = new PhaseCorrelate_Basics();
@@ -46448,7 +46448,7 @@ namespace CS_Classes
 
 
 
-    public class PhaseCorrelate_Depth_CS : VB_Parent
+    public class PhaseCorrelate_Depth_CS : TaskParent
     {
         PhaseCorrelate_Basics phaseC = new PhaseCorrelate_Basics();
         Mat lastFrame;
@@ -46484,7 +46484,7 @@ namespace CS_Classes
 
 
 
-    public class PhaseCorrelate_HanningWindow_CS : VB_Parent
+    public class PhaseCorrelate_HanningWindow_CS : TaskParent
     {
         public PhaseCorrelate_HanningWindow_CS()
         {
@@ -46500,7 +46500,7 @@ namespace CS_Classes
 
 
 
-    public class Photon_Basics_CS : VB_Parent
+    public class Photon_Basics_CS : TaskParent
     {
         Hist_Basics hist = new Hist_Basics();
         Mat lastImage = new cv.Mat();
@@ -46529,7 +46529,7 @@ namespace CS_Classes
 
 
 
-    public class Photon_Test_CS : VB_Parent
+    public class Photon_Test_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         List<int>[] counts = new List<int>[4];
@@ -46583,7 +46583,7 @@ namespace CS_Classes
 
 
 
-    public class Photon_Subtraction_CS : VB_Parent
+    public class Photon_Subtraction_CS : TaskParent
     {
         Hist_Basics hist = new Hist_Basics();
         Mat lastImage = new cv.Mat();
@@ -46612,7 +46612,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_Basics_CS : VB_Parent
+    public class Plane_Basics_CS : TaskParent
     {
         History_Basics frames = new History_Basics();
         public Plane_Basics_CS()
@@ -46639,7 +46639,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_From3Points_CS : VB_Parent
+    public class Plane_From3Points_CS : TaskParent
     {
         public Point3f[] input = new Point3f[3];
         public bool showWork = true;
@@ -46687,7 +46687,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_FlatSurfaces_CS : VB_Parent
+    public class Plane_FlatSurfaces_CS : TaskParent
     {
         AddWeighted_Basics addW = new AddWeighted_Basics();
         Plane_CellColor plane = new Plane_CellColor();
@@ -46742,7 +46742,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_OnlyPlanes_CS : VB_Parent
+    public class Plane_OnlyPlanes_CS : TaskParent
     {
         public Plane_CellColor plane = new Plane_CellColor();
         public List<cv.Point> contours;
@@ -46785,7 +46785,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_EqCorrelation_CS : VB_Parent
+    public class Plane_EqCorrelation_CS : TaskParent
     {
         Plane_Points plane = new Plane_Points();
         public List<float> correlations = new List<float>();
@@ -46845,7 +46845,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_CellColor_CS : VB_Parent
+    public class Plane_CellColor_CS : TaskParent
     {
         public Options_Plane options = new Options_Plane();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -46912,7 +46912,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_Points_CS : VB_Parent
+    public class Plane_Points_CS : TaskParent
     {
         Plane_From3Points plane = new Plane_From3Points();
         public List<Vec4f> equations = new List<Vec4f>();
@@ -46985,7 +46985,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_Histogram_CS : VB_Parent
+    public class Plane_Histogram_CS : TaskParent
     {
         PointCloud_Solo solo = new PointCloud_Solo();
         Hist_Basics hist = new Hist_Basics();
@@ -47038,7 +47038,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_Equation_CS : VB_Parent
+    public class Plane_Equation_CS : TaskParent
     {
         public rcData rc = new rcData();
         public string justEquation;
@@ -47123,7 +47123,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_Verticals_CS : VB_Parent
+    public class Plane_Verticals_CS : TaskParent
     {
         PointCloud_Solo solo = new PointCloud_Solo();
         History_Basics frames = new History_Basics();
@@ -47156,7 +47156,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_Horizontals_CS : VB_Parent
+    public class Plane_Horizontals_CS : TaskParent
     {
         PointCloud_Solo solo = new PointCloud_Solo();
         History_Basics frames = new History_Basics();
@@ -47189,7 +47189,7 @@ namespace CS_Classes
 
 
 
-    public class Plane_FloorStudy_CS : VB_Parent
+    public class Plane_FloorStudy_CS : TaskParent
     {
         public Structured_SliceH slice = new Structured_SliceH();
         List<float> yList = new List<float>();
@@ -47235,7 +47235,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_Basics_CS : VB_Parent
+    public class Plot_Basics_CS : TaskParent
     {
         Plot_Basics_CPP_CS plot;
         Hist_Graph hist = new Hist_Graph();
@@ -47267,7 +47267,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_Histogram_CS : VB_Parent
+    public class Plot_Histogram_CS : TaskParent
     {
         public Mat histogram = new Mat();
         public float[] histArray;
@@ -47330,7 +47330,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_Depth_CS : VB_Parent
+    public class Plot_Depth_CS : TaskParent
     {
         Plot_Basics_CPP_VB plotDepth = new Plot_Basics_CPP_VB();
         Hist_Basics hist = new Hist_Basics();
@@ -47370,7 +47370,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_Histogram2D_CS : VB_Parent
+    public class Plot_Histogram2D_CS : TaskParent
     {
         public Color_Basics colorFmt = new Color_Basics();
         public Plot_Histogram2D_CS()
@@ -47396,7 +47396,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_OverTimeSingle_CS : VB_Parent
+    public class Plot_OverTimeSingle_CS : TaskParent
     {
         public float plotData;
         public Scalar backColor = Scalar.DarkGray;
@@ -47451,7 +47451,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_OverTimeScalar_CS : VB_Parent
+    public class Plot_OverTimeScalar_CS : TaskParent
     {
         public Scalar plotData;
         public int plotCount = 3;
@@ -47485,7 +47485,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_OverTime_CS : VB_Parent
+    public class Plot_OverTime_CS : TaskParent
     {
         public Scalar plotData;
         public int plotCount = 3;
@@ -47586,7 +47586,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_OverTimeFixedScale_CS : VB_Parent
+    public class Plot_OverTimeFixedScale_CS : TaskParent
     {
         public Scalar plotData;
         public int plotCount = 3;
@@ -47687,7 +47687,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_Beats_CS : VB_Parent
+    public class Plot_Beats_CS : TaskParent
     {
         Plot_OverTimeFixedScale plot = new Plot_OverTimeFixedScale();
         public Plot_Beats_CS()
@@ -47718,7 +47718,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_Basics_CPP_CS : VB_Parent
+    public class Plot_Basics_CPP_CS : TaskParent
     {
         public List<double> srcX = new List<double>();
         public List<double> srcY = new List<double>();
@@ -47757,7 +47757,7 @@ namespace CS_Classes
 
 
 
-    public class Plot_Dots_CS : VB_Parent
+    public class Plot_Dots_CS : TaskParent
     {
         public List<double> srcX = new List<double>();
         public List<double> srcY = new List<double>();
@@ -47791,7 +47791,7 @@ namespace CS_Classes
 
 
 
-    public class PlyFormat_Basics_CS : VB_Parent
+    public class PlyFormat_Basics_CS : TaskParent
     {
         public Options_PlyFormat options = new Options_PlyFormat();
         string saveFileName;
@@ -47835,7 +47835,7 @@ namespace CS_Classes
 
 
 
-    public class PlyFormat_PlusRGB_CS : VB_Parent
+    public class PlyFormat_PlusRGB_CS : TaskParent
     {
         public Options_PlyFormat options = new Options_PlyFormat();
         string saveFileName;
@@ -47883,7 +47883,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Basics_CS : VB_Parent
+    public class PointCloud_Basics_CS : TaskParent
     {
         Options_PointCloud options = new Options_PointCloud();
         public int actualCount;
@@ -48013,7 +48013,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Point3f_CS : VB_Parent
+    public class PointCloud_Point3f_CS : TaskParent
     {
         public PointCloud_Point3f_CS()
         {
@@ -48028,7 +48028,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Spin2_CS : VB_Parent
+    public class PointCloud_Spin2_CS : TaskParent
     {
         PointCloud_Spin spin = new PointCloud_Spin();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -48052,7 +48052,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_SetupSide_CS : VB_Parent
+    public class PointCloud_SetupSide_CS : TaskParent
     {
         int arcSize;
         public PointCloud_SetupSide_CS()
@@ -48121,7 +48121,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_SetupTop_CS : VB_Parent
+    public class PointCloud_SetupTop_CS : TaskParent
     {
         int arcSize;
         public PointCloud_SetupTop_CS()
@@ -48181,7 +48181,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Raw_CPP_CS : VB_Parent
+    public class PointCloud_Raw_CPP_CS : TaskParent
     {
         byte[] depthBytes;
         public PointCloud_Raw_CPP_CS()
@@ -48212,7 +48212,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Raw_CS : VB_Parent
+    public class PointCloud_Raw_CS : TaskParent
     {
         public PointCloud_Raw_CS()
         {
@@ -48257,7 +48257,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Solo_CS : VB_Parent
+    public class PointCloud_Solo_CS : TaskParent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public PointCloud_Solo_CS()
@@ -48278,7 +48278,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_SoloRegions_CS : VB_Parent
+    public class PointCloud_SoloRegions_CS : TaskParent
     {
         public PointCloud_Solo solo = new PointCloud_Solo();
         Dilate_Basics dilate = new Dilate_Basics();
@@ -48301,7 +48301,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_SurfaceH_CS : VB_Parent
+    public class PointCloud_SurfaceH_CS : TaskParent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Plot_Basics_CPP_VB plot = new Plot_Basics_CPP_VB();
@@ -48346,7 +48346,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_NeighborV_CS : VB_Parent
+    public class PointCloud_NeighborV_CS : TaskParent
     {
         Options_Neighbors options = new Options_Neighbors();
         public PointCloud_NeighborV_CS()
@@ -48372,7 +48372,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Visualize_CS : VB_Parent
+    public class PointCloud_Visualize_CS : TaskParent
     {
         public PointCloud_Visualize_CS()
         {
@@ -48389,7 +48389,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_PCpointsMask_CS : VB_Parent
+    public class PointCloud_PCpointsMask_CS : TaskParent
     {
         public Mat pcPoints;
         public int actualCount;
@@ -48429,7 +48429,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_PCPoints_CS : VB_Parent
+    public class PointCloud_PCPoints_CS : TaskParent
     {
         public List<Point3f> pcPoints = new List<Point3f>();
         public PointCloud_PCPoints_CS()
@@ -48470,7 +48470,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_PCPointsPlane_CS : VB_Parent
+    public class PointCloud_PCPointsPlane_CS : TaskParent
     {
         PointCloud_Basics pcBasics = new PointCloud_Basics();
         public List<cv.Point3f> pcPoints = new List<cv.Point3f>();
@@ -48501,7 +48501,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Inspector_CS : VB_Parent
+    public class PointCloud_Inspector_CS : TaskParent
     {
         public PointCloud_Inspector_CS()
         {
@@ -48539,7 +48539,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Average_CS : VB_Parent
+    public class PointCloud_Average_CS : TaskParent
     {
         List<Mat> pcHistory = new List<Mat>();
         public PointCloud_Average_CS()
@@ -48563,7 +48563,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_FrustrumTop_CS : VB_Parent
+    public class PointCloud_FrustrumTop_CS : TaskParent
     {
         Draw_Frustrum frustrum = new Draw_Frustrum();
         HeatMap_Basics heat = new HeatMap_Basics();
@@ -48587,7 +48587,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_FrustrumSide_CS : VB_Parent
+    public class PointCloud_FrustrumSide_CS : TaskParent
     {
         Draw_Frustrum frustrum = new Draw_Frustrum();
         HeatMap_Basics heat = new HeatMap_Basics();
@@ -48611,7 +48611,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_Histograms_CS : VB_Parent
+    public class PointCloud_Histograms_CS : TaskParent
     {
         Plot_Histogram2D plot2D = new Plot_Histogram2D();
         Plot_Histogram plot = new Plot_Histogram();
@@ -48691,7 +48691,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_ReduceSplit2_CS : VB_Parent
+    public class PointCloud_ReduceSplit2_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         public PointCloud_ReduceSplit2_CS()
@@ -48722,7 +48722,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_ReducedTopView_CS : VB_Parent
+    public class PointCloud_ReducedTopView_CS : TaskParent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public PointCloud_ReducedTopView_CS()
@@ -48743,7 +48743,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_ReducedSideView_CS : VB_Parent
+    public class PointCloud_ReducedSideView_CS : TaskParent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public PointCloud_ReducedSideView_CS()
@@ -48763,7 +48763,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_ReducedViews_CS : VB_Parent
+    public class PointCloud_ReducedViews_CS : TaskParent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public PointCloud_ReducedViews_CS()
@@ -48787,7 +48787,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_XRangeTest_CS : VB_Parent
+    public class PointCloud_XRangeTest_CS : TaskParent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public PointCloud_XRangeTest_CS()
@@ -48808,7 +48808,7 @@ namespace CS_Classes
 
 
 
-    public class PointCloud_YRangeTest_CS : VB_Parent
+    public class PointCloud_YRangeTest_CS : TaskParent
     {
         PointCloud_ReduceSplit2 split2 = new PointCloud_ReduceSplit2();
         public PointCloud_YRangeTest_CS()
@@ -48828,7 +48828,7 @@ namespace CS_Classes
 
 
 
-    public class Polylines_IEnumerableExample_CS : VB_Parent
+    public class Polylines_IEnumerableExample_CS : TaskParent
     {
         Options_PolyLines options = new Options_PolyLines();
         public Polylines_IEnumerableExample_CS()
@@ -48852,7 +48852,7 @@ namespace CS_Classes
 
 
 
-    public class Polylines_Random_CS : VB_Parent
+    public class Polylines_Random_CS : TaskParent
     {
         Pixel_Zoom zoom = new Pixel_Zoom();
         public Polylines_Random_CS()
@@ -48889,7 +48889,7 @@ namespace CS_Classes
 
 
 
-    public class PongWars_Basics_CS : VB_Parent
+    public class PongWars_Basics_CS : TaskParent
     {
         int sqWidth = 25;
         int sqHeight;
@@ -49018,7 +49018,7 @@ namespace CS_Classes
 
 
 
-    public class PongWars_Two_CS : VB_Parent
+    public class PongWars_Two_CS : TaskParent
     {
         PongWars_Basics pong1 = new PongWars_Basics();
         PongWars_Basics pong2 = new PongWars_Basics();
@@ -49040,7 +49040,7 @@ namespace CS_Classes
 
 
 
-    public class ProCon_Basics_CS : VB_Parent
+    public class ProCon_Basics_CS : TaskParent
     {
         readonly object _lockObject = new object();
         public Thread p;
@@ -49140,7 +49140,7 @@ namespace CS_Classes
 
 
 
-    public class ProCon_Variation_CS : VB_Parent
+    public class ProCon_Variation_CS : TaskParent
     {
         readonly object _lockObject = new object();
         ProCon_Basics procon;
@@ -49182,7 +49182,7 @@ namespace CS_Classes
 
 
 
-    public class Profile_Basics_CS : VB_Parent
+    public class Profile_Basics_CS : TaskParent
     {
         public Point3f ptLeft, ptRight, ptTop, ptBot, ptFront, ptBack;
         public List<string> cornerNames = new List<string> { "   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
@@ -49292,7 +49292,7 @@ namespace CS_Classes
 
 
 
-    public class Profile_Rotation_CS : VB_Parent
+    public class Profile_Rotation_CS : TaskParent
     {
         public IMU_GMatrix gMat = new IMU_GMatrix();
         public string strMsg = "Then use the 'Options_IMU' sliders to rotate the cell\n" +
@@ -49333,7 +49333,7 @@ namespace CS_Classes
 
 
 
-    public class Profile_Derivative_CS : VB_Parent
+    public class Profile_Derivative_CS : TaskParent
     {
         public Profile_Basics sides = new Profile_Basics();
         List<TrueText> saveTrueText = new List<TrueText>();
@@ -49402,7 +49402,7 @@ namespace CS_Classes
 
 
 
-    public class Profile_ConcentrationSide_CS : VB_Parent
+    public class Profile_ConcentrationSide_CS : TaskParent
     {
         Profile_ConcentrationTop profile = new Profile_ConcentrationTop();
         public Profile_ConcentrationSide_CS()
@@ -49424,7 +49424,7 @@ namespace CS_Classes
 
 
 
-    public class Profile_ConcentrationTop_CS : VB_Parent
+    public class Profile_ConcentrationTop_CS : TaskParent
     {
         Plot_OverTimeSingle plot = new Plot_OverTimeSingle();
         Profile_Rotation rotate = new Profile_Rotation();
@@ -49488,7 +49488,7 @@ namespace CS_Classes
 
 
 
-    public class Profile_OpenGL_CS : VB_Parent
+    public class Profile_OpenGL_CS : TaskParent
     {
         Profile_Basics sides = new Profile_Basics();
         public Profile_Rotation rotate = new Profile_Rotation();
@@ -49525,7 +49525,7 @@ namespace CS_Classes
 
 
 
-    public class Profile_Kalman_CS : VB_Parent
+    public class Profile_Kalman_CS : TaskParent
     {
         Profile_Basics sides = new Profile_Basics();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -49568,7 +49568,7 @@ namespace CS_Classes
 
 
 
-    public class Puzzle_Basics_CS : VB_Parent
+    public class Puzzle_Basics_CS : TaskParent
     {
         public List<cv.Rect> scrambled = new List<cv.Rect>(); // this is every roi regardless of size.
         public List<cv.Rect> unscrambled = new List<cv.Rect>(); // this is every roi regardless of size.
@@ -49609,7 +49609,7 @@ namespace CS_Classes
 
 
 
-    public class Puzzle_Solver_CS : VB_Parent
+    public class Puzzle_Solver_CS : TaskParent
     {
         public Puzzle_Basics puzzle = new Puzzle_Basics();
         List<cv.Rect> solution = new List<cv.Rect>();
@@ -49651,7 +49651,7 @@ namespace CS_Classes
 
 
 
-    public class Puzzle_SolverDynamic_CS : VB_Parent
+    public class Puzzle_SolverDynamic_CS : TaskParent
     {
         Puzzle_Solver puzzle = new Puzzle_Solver();
         public Puzzle_SolverDynamic_CS()
@@ -49673,7 +49673,7 @@ namespace CS_Classes
 
 
 
-    public class Pyramid_Basics_CS : VB_Parent
+    public class Pyramid_Basics_CS : TaskParent
     {
         Options_Pyramid options = new Options_Pyramid();
         public Pyramid_Basics_CS()
@@ -49708,7 +49708,7 @@ namespace CS_Classes
 
 
 
-    public class Pyramid_Filter_CS : VB_Parent
+    public class Pyramid_Filter_CS : TaskParent
     {
         Laplacian_PyramidFilter laplace = new Laplacian_PyramidFilter();
         public Pyramid_Filter_CS()
@@ -49725,7 +49725,7 @@ namespace CS_Classes
 
 
 
-    public class PyrFilter_Basics_CS : VB_Parent
+    public class PyrFilter_Basics_CS : TaskParent
     {
         Options_PyrFilter options = new Options_PyrFilter();
         public PyrFilter_Basics_CS()
@@ -49742,7 +49742,7 @@ namespace CS_Classes
 
 
 
-    public class PyrFilter_RedCloud_CS : VB_Parent
+    public class PyrFilter_RedCloud_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -49766,7 +49766,7 @@ namespace CS_Classes
 
 
 
-    public class Python_Basics_CS : VB_Parent
+    public class Python_Basics_CS : TaskParent
     {
         public bool StartPython(string arguments)
         {
@@ -49823,7 +49823,7 @@ namespace CS_Classes
 
 
 
-    public class Python_Run_CS : VB_Parent
+    public class Python_Run_CS : TaskParent
     {
         Python_Basics python = new Python_Basics();
         public Python_Stream pyStream;
@@ -49890,7 +49890,7 @@ namespace CS_Classes
 
 
 
-    public class Python_MemMap_CS : VB_Parent
+    public class Python_MemMap_CS : TaskParent
     {
         Python_Basics python = new Python_Basics();
         MemoryMappedViewAccessor memMapWriter;
@@ -49934,7 +49934,7 @@ namespace CS_Classes
 
 
 
-    public class Python_Stream_CS : VB_Parent
+    public class Python_Stream_CS : TaskParent
     {
         Python_Basics python = new Python_Basics();
         byte[] rgbBuffer = new byte[2];
@@ -50028,7 +50028,7 @@ namespace CS_Classes
 
 
 
-    public class QRcode_Basics_CS : VB_Parent
+    public class QRcode_Basics_CS : TaskParent
     {
         QRCodeDetector qrDecoder = new QRCodeDetector();
         Mat qrInput1 = new Mat();
@@ -50080,7 +50080,7 @@ namespace CS_Classes
 
 
 
-    public class Quadrant_Basics_CS : VB_Parent
+    public class Quadrant_Basics_CS : TaskParent
     {
         cv.Point p1 = new cv.Point();
         cv.Point p2;
@@ -50118,7 +50118,7 @@ namespace CS_Classes
 
 
 
-    public class Quaterion_Basics_CS : VB_Parent
+    public class Quaterion_Basics_CS : TaskParent
     {
         Options_Quaternion options = new Options_Quaternion();
         public Quaterion_Basics_CS()
@@ -50137,7 +50137,7 @@ namespace CS_Classes
 
 
 
-    public class Quaterion_IMUPrediction_CS : VB_Parent
+    public class Quaterion_IMUPrediction_CS : TaskParent
     {
         IMU_PlotHostFrameTimes host = new IMU_PlotHostFrameTimes();
         public Quaterion_IMUPrediction_CS()
@@ -50201,7 +50201,7 @@ namespace CS_Classes
 
 
 
-    public class Random_Basics_CS : VB_Parent
+    public class Random_Basics_CS : TaskParent
     {
         public List<cv.Point2f> PointList = new List<cv.Point2f>();
         public List<cv.Point2d> PointList2d = new List<cv.Point2d>();
@@ -50245,7 +50245,7 @@ namespace CS_Classes
 
 
 
-    public class Random_Point2d_CS : VB_Parent
+    public class Random_Point2d_CS : TaskParent
     {
         public List<cv.Point2d> PointList { get; } = new List<cv.Point2d>();
         public cv.Rect range;
@@ -50280,7 +50280,7 @@ namespace CS_Classes
 
 
 
-    public class Random_Enumerable_CS : VB_Parent
+    public class Random_Enumerable_CS : TaskParent
     {
         public Options_Random options = new Options_Random();
         public Point2f[] points;
@@ -50305,7 +50305,7 @@ namespace CS_Classes
 
 
 
-    public class Random_Basics3D_CS : VB_Parent
+    public class Random_Basics3D_CS : TaskParent
     {
         public Point3f[] Points3f;
         Options_Random options = new Options_Random();
@@ -50346,7 +50346,7 @@ namespace CS_Classes
 
 
 
-    public class Random_Basics4D_CS : VB_Parent
+    public class Random_Basics4D_CS : TaskParent
     {
         public Vec4f[] vec4f;
         public List<Vec4f> PointList { get; } = new List<Vec4f>();
@@ -50388,7 +50388,7 @@ namespace CS_Classes
 
 
 
-    public class Random_Shuffle_CS : VB_Parent
+    public class Random_Shuffle_CS : TaskParent
     {
         RNG myRNG = new RNG();
         public Random_Shuffle_CS()
@@ -50406,7 +50406,7 @@ namespace CS_Classes
 
 
 
-    public class Random_LUTMask_CS : VB_Parent
+    public class Random_LUTMask_CS : TaskParent
     {
         Random_Basics random = new Random_Basics();
         KMeans_Image km = new KMeans_Image();
@@ -50440,7 +50440,7 @@ namespace CS_Classes
 
 
 
-    public class Random_UniformDist_CS : VB_Parent
+    public class Random_UniformDist_CS : TaskParent
     {
         double minVal = 0, maxVal = 255;
         public Random_UniformDist_CS()
@@ -50457,7 +50457,7 @@ namespace CS_Classes
 
 
 
-    public class Random_NormalDist_CS : VB_Parent
+    public class Random_NormalDist_CS : TaskParent
     {
         Options_NormalDist options = new Options_NormalDist();
         public Random_NormalDist_CS()
@@ -50475,7 +50475,7 @@ namespace CS_Classes
 
 
 
-    public class Random_CheckUniformSmoothed_CS : VB_Parent
+    public class Random_CheckUniformSmoothed_CS : TaskParent
     {
         Hist_Basics histogram = new Hist_Basics();
         Random_UniformDist rUniform = new Random_UniformDist();
@@ -50496,7 +50496,7 @@ namespace CS_Classes
 
 
 
-    public class Random_CheckUniformDist_CS : VB_Parent
+    public class Random_CheckUniformDist_CS : TaskParent
     {
         Hist_Graph histogram = new Hist_Graph();
         Random_UniformDist rUniform = new Random_UniformDist();
@@ -50517,7 +50517,7 @@ namespace CS_Classes
 
 
 
-    public class Random_CheckNormalDist_CS : VB_Parent
+    public class Random_CheckNormalDist_CS : TaskParent
     {
         Hist_Graph histogram = new Hist_Graph();
         Random_NormalDist normalDist = new Random_NormalDist();
@@ -50538,7 +50538,7 @@ namespace CS_Classes
 
 
 
-    public class Random_CheckNormalDistSmoothed_CS : VB_Parent
+    public class Random_CheckNormalDistSmoothed_CS : TaskParent
     {
         Hist_Basics histogram = new Hist_Basics();
         Random_NormalDist normalDist = new Random_NormalDist();
@@ -50559,7 +50559,7 @@ namespace CS_Classes
 
 
 
-    public class Random_PatternGenerator_CS : VB_Parent
+    public class Random_PatternGenerator_CS : TaskParent
     {
         public Random_PatternGenerator_CS()
         {
@@ -50582,7 +50582,7 @@ namespace CS_Classes
 
 
 
-    public class Random_CustomDistribution_CS : VB_Parent
+    public class Random_CustomDistribution_CS : TaskParent
     {
         public Mat inputCDF; // place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
         public Mat outputRandom = new Mat(10000, 1, MatType.CV_32S, cv.Scalar.All(0)); // allocate the desired number of random numbers - size can be just one to get the next random value
@@ -50628,7 +50628,7 @@ namespace CS_Classes
 
 
 
-    public class Random_MonteCarlo_CS : VB_Parent
+    public class Random_MonteCarlo_CS : TaskParent
     {
         public Plot_Histogram plot = new Plot_Histogram();
         Options_MonteCarlo options = new Options_MonteCarlo();
@@ -50669,7 +50669,7 @@ namespace CS_Classes
 
 
 
-    public class Random_StaticTV_CS : VB_Parent
+    public class Random_StaticTV_CS : TaskParent
     {
         Options_StaticTV options = new Options_StaticTV();
         public Random_StaticTV_CS()
@@ -50702,7 +50702,7 @@ namespace CS_Classes
 
 
 
-    public class Random_StaticTVFaster_CS : VB_Parent
+    public class Random_StaticTVFaster_CS : TaskParent
     {
         Random_UniformDist random = new Random_UniformDist();
         Mat_4to1 mats = new Mat_4to1();
@@ -50741,7 +50741,7 @@ namespace CS_Classes
 
 
 
-    public class Random_StaticTVFastSimple_CS : VB_Parent
+    public class Random_StaticTVFastSimple_CS : TaskParent
     {
         Random_UniformDist random = new Random_UniformDist();
         Random_StaticTV options = new Random_StaticTV();
@@ -50774,7 +50774,7 @@ namespace CS_Classes
 
 
 
-    public class Random_KalmanPoints_CS : VB_Parent
+    public class Random_KalmanPoints_CS : TaskParent
     {
         Random_Basics random = new Random_Basics();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -50830,7 +50830,7 @@ namespace CS_Classes
 
 
 
-    public class Random_Clusters_CS : VB_Parent
+    public class Random_Clusters_CS : TaskParent
     {
         public List<List<int>> clusterLabels = new List<List<int>>();
         public List<List<cv.Point2f>> clusters = new List<List<cv.Point2f>>();
@@ -50877,7 +50877,7 @@ namespace CS_Classes
 
 
 
-    public class Rectangle_Basics_CS : VB_Parent
+    public class Rectangle_Basics_CS : TaskParent
     {
         public List<cv.Rect> rectangles = new List<cv.Rect>();
         public List<RotatedRect> rotatedRectangles = new List<RotatedRect>();
@@ -50922,7 +50922,7 @@ namespace CS_Classes
 
 
 
-    public class Rectangle_Rotated_CS : VB_Parent
+    public class Rectangle_Rotated_CS : TaskParent
     {
         public Rectangle_Basics rectangle = new Rectangle_Basics();
         public Rectangle_Rotated_CS()
@@ -50940,7 +50940,7 @@ namespace CS_Classes
 
 
 
-    public class Rectangle_Overlap_CS : VB_Parent
+    public class Rectangle_Overlap_CS : TaskParent
     {
         public cv.Rect rect1;
         public cv.Rect rect2;
@@ -50995,7 +50995,7 @@ namespace CS_Classes
 
 
 
-    public class Rectangle_Union_CS : VB_Parent
+    public class Rectangle_Union_CS : TaskParent
     {
         Rectangle_Basics draw = new Rectangle_Basics();
         public List<cv.Rect> inputRects = new List<cv.Rect>();
@@ -51049,7 +51049,7 @@ namespace CS_Classes
 
 
 
-    public class Rectangle_MultiOverlap_CS : VB_Parent
+    public class Rectangle_MultiOverlap_CS : TaskParent
     {
         public List<cv.Rect> inputRects = new List<cv.Rect>();
         public List<cv.Rect> outputRects = new List<cv.Rect>();
@@ -51113,7 +51113,7 @@ namespace CS_Classes
 
 
 
-    public class Rectangle_EnclosingPoints_CS : VB_Parent
+    public class Rectangle_EnclosingPoints_CS : TaskParent
     {
         public List<cv.Point2f> pointList = new List<cv.Point2f>();
         public Rectangle_EnclosingPoints_CS()
@@ -51139,7 +51139,7 @@ namespace CS_Classes
 
 
 
-    public class Rectangle_Intersection_CS : VB_Parent
+    public class Rectangle_Intersection_CS : TaskParent
     {
         public List<cv.Rect> inputRects = new List<cv.Rect>();
         Rectangle_Basics draw = new Rectangle_Basics();
@@ -51219,7 +51219,7 @@ namespace CS_Classes
 
 
 
-    public class RecursiveBilateralFilter_CPP_CS : VB_Parent
+    public class RecursiveBilateralFilter_CPP_CS : TaskParent
     {
         byte[] dataSrc = new byte[1];
         Options_RBF options = new Options_RBF();
@@ -51250,7 +51250,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Basics_CS : VB_Parent
+    public class RedCloud_Basics_CS : TaskParent
     {
         public Cell_Generate genCells = new Cell_Generate();
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
@@ -51299,7 +51299,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Reduction_CS : VB_Parent
+    public class RedCloud_Reduction_CS : TaskParent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_Reduction_CS()
@@ -51321,7 +51321,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Hulls_CS : VB_Parent
+    public class RedCloud_Hulls_CS : TaskParent
     {
         Convex_RedCloudDefects convex = new Convex_RedCloudDefects();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -51366,7 +51366,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_FindCells_CPP_CS : VB_Parent
+    public class RedCloud_FindCells_CPP_CS : TaskParent
     {
         public List<int> cellList = new List<int>();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -51423,7 +51423,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Planes_CS : VB_Parent
+    public class RedCloud_Planes_CS : TaskParent
     {
         public RedCloud_PlaneColor planes = new RedCloud_PlaneColor();
         public RedCloud_Planes_CS()
@@ -51442,7 +51442,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Equations_CS : VB_Parent
+    public class RedCloud_Equations_CS : TaskParent
     {
         Plane_Equation eq = new Plane_Equation();
         public List<rcData> redCells = new List<rcData>();
@@ -51495,7 +51495,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_CellsAtDepth_CS : VB_Parent
+    public class RedCloud_CellsAtDepth_CS : TaskParent
     {
         Plot_Histogram plot = new Plot_Histogram();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -51548,7 +51548,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_ShapeCorrelation_CS : VB_Parent
+    public class RedCloud_ShapeCorrelation_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_ShapeCorrelation_CS()
@@ -51579,7 +51579,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_FPS_CS : VB_Parent
+    public class RedCloud_FPS_CS : TaskParent
     {
         Grid_FPS fps = new Grid_FPS();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -51606,7 +51606,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_PlaneColor_CS : VB_Parent
+    public class RedCloud_PlaneColor_CS : TaskParent
     {
         public Options_Plane options = new Options_Plane();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -51655,7 +51655,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_PlaneFromContour_CS : VB_Parent
+    public class RedCloud_PlaneFromContour_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_PlaneFromContour_CS()
@@ -51691,7 +51691,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_PlaneFromMask_CS : VB_Parent
+    public class RedCloud_PlaneFromMask_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_PlaneFromMask_CS()
@@ -51731,7 +51731,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_BProject3D_CS : VB_Parent
+    public class RedCloud_BProject3D_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
@@ -51752,7 +51752,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_YZ_CS : VB_Parent
+    public class RedCloud_YZ_CS : TaskParent
     {
         Cell_Basics stats = new Cell_Basics();
         public RedCloud_YZ_CS()
@@ -51774,7 +51774,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_XZ_CS : VB_Parent
+    public class RedCloud_XZ_CS : TaskParent
     {
         Cell_Basics stats = new Cell_Basics();
         public RedCloud_XZ_CS()
@@ -51796,7 +51796,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_World_CS : VB_Parent
+    public class RedCloud_World_CS : TaskParent
     {
         RedCloud_Reduce redC = new RedCloud_Reduce();
         Depth_World world = new Depth_World();
@@ -51819,7 +51819,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_KMeans_CS : VB_Parent
+    public class RedCloud_KMeans_CS : TaskParent
     {
         KMeans_MultiChannel km = new KMeans_MultiChannel();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -51840,7 +51840,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Diff_CS : VB_Parent
+    public class RedCloud_Diff_CS : TaskParent
     {
         Diff_RGBAccum diff = new Diff_RGBAccum();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -51864,7 +51864,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_ProjectCell_CS : VB_Parent
+    public class RedCloud_ProjectCell_CS : TaskParent
     {
         Hist_ShapeTop topView = new Hist_ShapeTop();
         Hist_ShapeSide sideView = new Hist_ShapeSide();
@@ -51888,7 +51888,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_LikelyFlatSurfaces_CS : VB_Parent
+    public class RedCloud_LikelyFlatSurfaces_CS : TaskParent
     {
         Plane_Basics verts = new Plane_Basics();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -51934,7 +51934,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_PlaneEq3D_CS : VB_Parent
+    public class RedCloud_PlaneEq3D_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Plane_Equation eq = new Plane_Equation();
@@ -51963,7 +51963,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_DelaunayGuidedFeatures_CS : VB_Parent
+    public class RedCloud_DelaunayGuidedFeatures_CS : TaskParent
     {
         Feature_Delaunay features = new Feature_Delaunay();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -51998,7 +51998,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_UnstableCells_CS : VB_Parent
+    public class RedCloud_UnstableCells_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         List<cv.Point> prevList = new List<cv.Point>();
@@ -52035,7 +52035,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_UnstableHulls_CS : VB_Parent
+    public class RedCloud_UnstableHulls_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         List<cv.Point> prevList = new List<cv.Point>();
@@ -52073,7 +52073,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_CellChanges_CS : VB_Parent
+    public class RedCloud_CellChanges_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Mat dst2Last;
@@ -52106,7 +52106,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_FloodPoint_CS : VB_Parent
+    public class RedCloud_FloodPoint_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Cell_Basics stats = new Cell_Basics();
@@ -52134,7 +52134,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_CellStatsPlot_CS : VB_Parent
+    public class RedCloud_CellStatsPlot_CS : TaskParent
     {
         Cell_BasicsPlot cells = new Cell_BasicsPlot();
         public RedCloud_CellStatsPlot_CS()
@@ -52157,7 +52157,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_MostlyColor_CS : VB_Parent
+    public class RedCloud_MostlyColor_CS : TaskParent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_MostlyColor_CS()
@@ -52181,7 +52181,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_OutlineColor_CS : VB_Parent
+    public class RedCloud_OutlineColor_CS : TaskParent
     {
         Depth_Outline outline = new Depth_Outline();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -52207,7 +52207,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_DepthOutline_CS : VB_Parent
+    public class RedCloud_DepthOutline_CS : TaskParent
     {
         Depth_Outline outline = new Depth_Outline();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -52233,7 +52233,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_MeterByMeter_CS : VB_Parent
+    public class RedCloud_MeterByMeter_CS : TaskParent
     {
         BackProject_MeterByMeter meter = new BackProject_MeterByMeter();
         public RedCloud_MeterByMeter_CS()
@@ -52254,7 +52254,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_FourColor_CS : VB_Parent
+    public class RedCloud_FourColor_CS : TaskParent
     {
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -52278,7 +52278,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_CCompColor_CS : VB_Parent
+    public class RedCloud_CCompColor_CS : TaskParent
     {
         CComp_Both ccomp = new CComp_Both();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -52302,7 +52302,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Cells_CS : VB_Parent
+    public class RedCloud_Cells_CS : TaskParent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public Mat cellmap = new Mat();
@@ -52325,7 +52325,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Flippers_CS : VB_Parent
+    public class RedCloud_Flippers_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Mat lastMap;
@@ -52366,7 +52366,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Overlaps_CS : VB_Parent
+    public class RedCloud_Overlaps_CS : TaskParent
     {
         public List<rcData> redCells = new List<rcData>();
         public Mat cellMap;
@@ -52404,7 +52404,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_OnlyColorHist3D_CS : VB_Parent
+    public class RedCloud_OnlyColorHist3D_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
@@ -52427,7 +52427,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_OnlyColorAlt_CS : VB_Parent
+    public class RedCloud_OnlyColorAlt_CS : TaskParent
     {
         public RedCloud_Basics redMasks = new RedCloud_Basics();
         public RedCloud_OnlyColorAlt_CS()
@@ -52481,7 +52481,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Gaps_CS : VB_Parent
+    public class RedCloud_Gaps_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         History_Basics frames = new History_Basics();
@@ -52514,7 +52514,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_SizeOrder_CS : VB_Parent
+    public class RedCloud_SizeOrder_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_SizeOrder_CS()
@@ -52543,7 +52543,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_StructuredH_CS : VB_Parent
+    public class RedCloud_StructuredH_CS : TaskParent
     {
         RedCloud_MotionBGsubtract motion = new RedCloud_MotionBGsubtract();
         Structured_TransformH transform = new Structured_TransformH();
@@ -52583,7 +52583,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_StructuredV_CS : VB_Parent
+    public class RedCloud_StructuredV_CS : TaskParent
     {
         RedCloud_MotionBGsubtract motion = new RedCloud_MotionBGsubtract();
         Structured_TransformV transform = new Structured_TransformV();
@@ -52624,7 +52624,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_MotionBasics_CS : VB_Parent
+    public class RedCloud_MotionBasics_CS : TaskParent
     {
         public RedCloud_Basics redMasks = new RedCloud_Basics();
         public List<rcData> redCells = new List<rcData>();
@@ -52688,7 +52688,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_ContourVsFeatureLess_CS : VB_Parent
+    public class RedCloud_ContourVsFeatureLess_CS : TaskParent
     {
         RedCloud_Basics redMasks = new RedCloud_Basics();
         Contour_WholeImage contour = new Contour_WholeImage();
@@ -52716,7 +52716,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_UnmatchedCount_CS : VB_Parent
+    public class RedCloud_UnmatchedCount_CS : TaskParent
     {
         public List<rcData> redCells = new List<rcData>();
         int myFrameCount;
@@ -52783,7 +52783,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_ContourUpdate_CS : VB_Parent
+    public class RedCloud_ContourUpdate_CS : TaskParent
     {
         public List<rcData> redCells = new List<rcData>();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -52815,7 +52815,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_MaxDist_CS : VB_Parent
+    public class RedCloud_MaxDist_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         RedCloud_ContourUpdate addTour = new RedCloud_ContourUpdate();
@@ -52847,7 +52847,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Tiers_CS : VB_Parent
+    public class RedCloud_Tiers_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Depth_Tiers tiers = new Depth_Tiers();
@@ -52873,7 +52873,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_TiersBinarize_CS : VB_Parent
+    public class RedCloud_TiersBinarize_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Depth_Tiers tiers = new Depth_Tiers();
@@ -52897,7 +52897,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Combine_CS : VB_Parent
+    public class RedCloud_Combine_CS : TaskParent
     {
         public Color8U_Basics colorClass = new Color8U_Basics();
         public GuidedBP_Depth guided = new GuidedBP_Depth();
@@ -52963,7 +52963,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_TopX_CS : VB_Parent
+    public class RedCloud_TopX_CS : TaskParent
     {
         public RedCloud_Basics redC = new RedCloud_Basics();
         public Options_TopX options = new Options_TopX();
@@ -52988,7 +52988,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_TopXNeighbors_CS : VB_Parent
+    public class RedCloud_TopXNeighbors_CS : TaskParent
     {
         Options_TopX options = new Options_TopX();
         Neighbors_Precise nab = new Neighbors_Precise();
@@ -53009,7 +53009,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_TopXHulls_CS : VB_Parent
+    public class RedCloud_TopXHulls_CS : TaskParent
     {
         RedCloud_TopX topX = new RedCloud_TopX();
         public RedCloud_TopXHulls_CS()
@@ -53043,7 +53043,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Hue_CS : VB_Parent
+    public class RedCloud_Hue_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Color8U_Hue hue = new Color8U_Hue();
@@ -53065,7 +53065,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_GenCellContains_CS : VB_Parent
+    public class RedCloud_GenCellContains_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         Flood_ContainedCells contains = new Flood_ContainedCells();
@@ -53100,7 +53100,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_PlusTiers_CS : VB_Parent
+    public class RedCloud_PlusTiers_CS : TaskParent
     {
         Depth_Tiers tiers = new Depth_Tiers();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
@@ -53123,7 +53123,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Depth_CS : VB_Parent
+    public class RedCloud_Depth_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         public RedCloud_Depth_CS()
@@ -53142,7 +53142,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Consistent1_CS : VB_Parent
+    public class RedCloud_Consistent1_CS : TaskParent
     {
         Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
         Diff_Basics diff = new Diff_Basics();
@@ -53210,7 +53210,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Consistent2_CS : VB_Parent
+    public class RedCloud_Consistent2_CS : TaskParent
     {
         Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
         Diff_Basics diff = new Diff_Basics();
@@ -53278,7 +53278,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Consistent_CS : VB_Parent
+    public class RedCloud_Consistent_CS : TaskParent
     {
         Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
         List<Mat> cellmaps = new List<Mat>();
@@ -53341,7 +53341,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_NaturalColor_CS : VB_Parent
+    public class RedCloud_NaturalColor_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public RedCloud_NaturalColor_CS()
@@ -53360,7 +53360,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_MotionBGsubtract_CS : VB_Parent
+    public class RedCloud_MotionBGsubtract_CS : TaskParent
     {
         public BGSubtract_Basics bgSub = new BGSubtract_Basics();
         public List<rcData> redCells = new List<rcData>();
@@ -53397,7 +53397,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_JoinCells_CS : VB_Parent
+    public class RedCloud_JoinCells_CS : TaskParent
     {
         FeatureLess_RedCloud fLess = new FeatureLess_RedCloud();
         public RedCloud_JoinCells_CS()
@@ -53423,7 +53423,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_LeftRight_CS : VB_Parent
+    public class RedCloud_LeftRight_CS : TaskParent
     {
         Flood_LeftRight redC = new Flood_LeftRight();
         public RedCloud_LeftRight_CS()
@@ -53444,7 +53444,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_ColorAndDepth_CS : VB_Parent
+    public class RedCloud_ColorAndDepth_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
         Flood_Basics floodPC = new Flood_Basics();
@@ -53500,7 +53500,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Delaunay_CS : VB_Parent
+    public class RedCloud_Delaunay_CS : TaskParent
     {
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         Feature_Delaunay delaunay = new Feature_Delaunay();
@@ -53529,7 +53529,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_CPP_CS : VB_Parent
+    public class RedCloud_CPP_CS : TaskParent
     {
         public Mat inputMask;
         public int classCount;
@@ -53592,7 +53592,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_MaxDist_CPP_CS : VB_Parent
+    public class RedCloud_MaxDist_CPP_CS : TaskParent
     {
         public int classCount;
         public List<cv.Rect> RectList = new List<cv.Rect>();
@@ -53652,7 +53652,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Reduce_CS : VB_Parent
+    public class RedCloud_Reduce_CS : TaskParent
     {
         public int classCount;
         Options_RedCloudOther options = new Options_RedCloudOther();
@@ -53700,7 +53700,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_NaturalGray_CS : VB_Parent
+    public class RedCloud_NaturalGray_CS : TaskParent
     {
         RedCloud_Consistent redC = new RedCloud_Consistent();
         Options_RedCloudOther options = new Options_RedCloudOther();
@@ -53727,7 +53727,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_FeatureLessReduce_CS : VB_Parent
+    public class RedCloud_FeatureLessReduce_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         FeatureROI_Basics devGrid = new FeatureROI_Basics();
@@ -53775,7 +53775,7 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Features_CS : VB_Parent
+    public class RedCloud_Features_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Options_RedCloudFeatures options = new Options_RedCloudFeatures();
@@ -53841,7 +53841,7 @@ namespace CS_Classes
 
 
 
-    public class RedTrack_Basics_CS : VB_Parent
+    public class RedTrack_Basics_CS : TaskParent
     {
         Cell_Basics stats = new Cell_Basics();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -53870,7 +53870,7 @@ namespace CS_Classes
 
 
 
-    public class RedTrack_Lines_CS : VB_Parent
+    public class RedTrack_Lines_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         RedTrack_Basics track = new RedTrack_Basics();
@@ -53900,7 +53900,7 @@ namespace CS_Classes
 
 
 
-    public class RedTrack_LineSingle_CS : VB_Parent
+    public class RedTrack_LineSingle_CS : TaskParent
     {
         RedTrack_Basics track = new RedTrack_Basics();
         int leftMost, rightmost;
@@ -53969,7 +53969,7 @@ namespace CS_Classes
 
 
 
-    public class RedTrack_FeaturesKNN_CS : VB_Parent
+    public class RedTrack_FeaturesKNN_CS : TaskParent
     {
         public KNN_Basics knn = new KNN_Basics();
         public Feature_Stable feat = new Feature_Stable();
@@ -54001,7 +54001,7 @@ namespace CS_Classes
 
 
 
-    public class RedTrack_GoodCell_CS : VB_Parent
+    public class RedTrack_GoodCell_CS : TaskParent
     {
         RedTrack_GoodCellInput good = new RedTrack_GoodCellInput();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -54026,7 +54026,7 @@ namespace CS_Classes
 
 
 
-    public class RedTrack_GoodCells_CS : VB_Parent
+    public class RedTrack_GoodCells_CS : TaskParent
     {
         RedTrack_GoodCellInput good = new RedTrack_GoodCellInput();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -54064,7 +54064,7 @@ namespace CS_Classes
 
 
 
-    public class RedTrack_GoodCellInput_CS : VB_Parent
+    public class RedTrack_GoodCellInput_CS : TaskParent
     {
         public KNN_Basics knn = new KNN_Basics();
         public Feature_Stable feat = new Feature_Stable();
@@ -54097,7 +54097,7 @@ namespace CS_Classes
 
 
 
-    public class RedTrack_Points_CS : VB_Parent
+    public class RedTrack_Points_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
         RedTrack_Basics track = new RedTrack_Basics();
@@ -54129,7 +54129,7 @@ namespace CS_Classes
 
 
 
-    public class RedTrack_Features_CS : VB_Parent
+    public class RedTrack_Features_CS : TaskParent
     {
         Options_Flood options = new Options_Flood();
         Feature_Stable feat = new Feature_Stable();
@@ -54165,7 +54165,7 @@ namespace CS_Classes
 
 
 
-    public class Reduction_Basics_CS : VB_Parent
+    public class Reduction_Basics_CS : TaskParent
     {
         public int classCount;
         public Reduction_Basics_CS()
@@ -54206,7 +54206,7 @@ namespace CS_Classes
 
 
 
-    public class Reduction_Floodfill_CS : VB_Parent
+    public class Reduction_Floodfill_CS : TaskParent
     {
         public Reduction_Basics reduction = new Reduction_Basics();
         public RedCloud_Basics redC = new RedCloud_Basics();
@@ -54231,7 +54231,7 @@ namespace CS_Classes
 
 
 
-    public class Reduction_HeatMapLines_CS : VB_Parent
+    public class Reduction_HeatMapLines_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
         public Line_Basics lines = new Line_Basics();
@@ -54262,7 +54262,7 @@ namespace CS_Classes
 
 
 
-    public class Reduction_PointCloud_CS : VB_Parent
+    public class Reduction_PointCloud_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         public Reduction_PointCloud_CS()
@@ -54287,7 +54287,7 @@ namespace CS_Classes
 
 
 
-    public class Reduction_XYZ_CS : VB_Parent
+    public class Reduction_XYZ_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Options_Reduction options = new Options_Reduction();
@@ -54323,7 +54323,7 @@ namespace CS_Classes
 
 
 
-    public class Reduction_Edges_CS : VB_Parent
+    public class Reduction_Edges_CS : TaskParent
     {
         Edge_Laplacian edges = new Edge_Laplacian();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -54348,7 +54348,7 @@ namespace CS_Classes
 
 
 
-    public class Reduction_Histogram_CS : VB_Parent
+    public class Reduction_Histogram_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Plot_Histogram plot = new Plot_Histogram();
@@ -54372,7 +54372,7 @@ namespace CS_Classes
 
 
 
-    public class Reduction_BGR_CS : VB_Parent
+    public class Reduction_BGR_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
         Mat_4Click mats = new Mat_4Click();
@@ -54402,7 +54402,7 @@ namespace CS_Classes
 
 
 
-    public class Remap_Basics_CS : VB_Parent
+    public class Remap_Basics_CS : TaskParent
     {
         public int direction = 3; // default to remap horizontally and vertically
         Mat mapx1, mapx2, mapx3;
@@ -54458,7 +54458,7 @@ namespace CS_Classes
 
 
 
-    public class Remap_Flip_CS : VB_Parent
+    public class Remap_Flip_CS : TaskParent
     {
         public int direction = 0;
         public Remap_Flip_CS()
@@ -54494,7 +54494,7 @@ namespace CS_Classes
 
 
 
-    public class Flip_Basics_CS : VB_Parent
+    public class Flip_Basics_CS : TaskParent
     {
         Remap_Flip flip = new Remap_Flip();
         public Flip_Basics_CS()
@@ -54512,7 +54512,7 @@ namespace CS_Classes
 
 
 
-    public class Resize_Basics_CS : VB_Parent
+    public class Resize_Basics_CS : TaskParent
     {
         public cv.Size newSize;
         public Options_Resize options = new Options_Resize();
@@ -54538,7 +54538,7 @@ namespace CS_Classes
 
 
 
-    public class Resize_Smaller_CS : VB_Parent
+    public class Resize_Smaller_CS : TaskParent
     {
         public Options_Resize options = new Options_Resize();
         public cv.Size newSize;
@@ -54560,7 +54560,7 @@ namespace CS_Classes
 
 
 
-    public class Resize_Proportional_CS : VB_Parent
+    public class Resize_Proportional_CS : TaskParent
     {
         Options_Spectrum options = new Options_Spectrum();
         public Resize_Proportional_CS()
@@ -54594,7 +54594,7 @@ namespace CS_Classes
 
 
 
-    public class Retina_Basics_CPP_CS : VB_Parent
+    public class Retina_Basics_CPP_CS : TaskParent
     {
         ProcessStartInfo startInfo = new ProcessStartInfo();
         byte[] magnoData = new byte[1];
@@ -54669,7 +54669,7 @@ namespace CS_Classes
 
 
 
-    public class Retina_Depth_CS : VB_Parent
+    public class Retina_Depth_CS : TaskParent
     {
         Retina_Basics_CPP_VB retina = new Retina_Basics_CPP_VB();
         Mat lastMotion = new Mat();
@@ -54692,7 +54692,7 @@ namespace CS_Classes
 
 
 
-    public class ROI_Basics_CS : VB_Parent
+    public class ROI_Basics_CS : TaskParent
     {
         public Diff_Basics diff = new Diff_Basics();
         public cv.Rect aoiRect;
@@ -54723,7 +54723,7 @@ namespace CS_Classes
 
 
 
-    public class ROI_FindNonZeroNoSingle_CS : VB_Parent
+    public class ROI_FindNonZeroNoSingle_CS : TaskParent
     {
         public Diff_Basics diff = new Diff_Basics();
         public cv.Rect aoiRect;
@@ -54771,7 +54771,7 @@ namespace CS_Classes
 
 
 
-    public class ROI_AccumulateOld_CS : VB_Parent
+    public class ROI_AccumulateOld_CS : TaskParent
     {
         public Diff_Basics diff = new Diff_Basics();
         public cv.Rect aoiRect;
@@ -54826,7 +54826,7 @@ namespace CS_Classes
 
 
 
-    public class ROI_Accumulate_CS : VB_Parent
+    public class ROI_Accumulate_CS : TaskParent
     {
         public Diff_Basics diff = new Diff_Basics();
         cv.Rect roiRect;
@@ -54870,7 +54870,7 @@ namespace CS_Classes
 
 
 
-    public class Rotate_Basics_CS : VB_Parent
+    public class Rotate_Basics_CS : TaskParent
     {
         public Mat M;
         public Mat Mflip;
@@ -54901,7 +54901,7 @@ namespace CS_Classes
 
 
 
-    public class Rotate_BasicsQT_CS : VB_Parent
+    public class Rotate_BasicsQT_CS : TaskParent
     {
         public float rotateAngle = 24;
         public Point2f rotateCenter;
@@ -54920,7 +54920,7 @@ namespace CS_Classes
 
 
 
-    public class Rotate_Box_CS : VB_Parent
+    public class Rotate_Box_CS : TaskParent
     {
         readonly Rotate_Basics rotation = new Rotate_Basics();
         public Rotate_Box_CS()
@@ -54962,7 +54962,7 @@ namespace CS_Classes
 
 
 
-    public class Rotate_Poly_CS : VB_Parent
+    public class Rotate_Poly_CS : TaskParent
     {
         Options_FPoly optionsFPoly = new Options_FPoly();
         public Options_RotatePoly options = new Options_RotatePoly();
@@ -54999,7 +54999,7 @@ namespace CS_Classes
 
 
 
-    public class Rotate_PolyQT_CS : VB_Parent
+    public class Rotate_PolyQT_CS : TaskParent
     {
         public List<cv.Point2f> poly = new List<cv.Point2f>();
         public Point2f rotateCenter;
@@ -55051,7 +55051,7 @@ namespace CS_Classes
 
 
 
-    public class Rotate_Example_CS : VB_Parent
+    public class Rotate_Example_CS : TaskParent
     {
         Rotate_Basics rotate = new Rotate_Basics();
         public Rotate_Example_CS()
@@ -55072,7 +55072,7 @@ namespace CS_Classes
 
 
 
-    public class Rotate_Horizon_CS : VB_Parent
+    public class Rotate_Horizon_CS : TaskParent
     {
         Rotate_Basics rotate = new Rotate_Basics();
         CameraMotion_WithRotation edges = new CameraMotion_WithRotation();
@@ -55119,7 +55119,7 @@ namespace CS_Classes
 
 
 
-    public class Salience_Basics_CPP_CS : VB_Parent
+    public class Salience_Basics_CPP_CS : TaskParent
     {
         byte[] grayData = new byte[1];
         public Options_Salience options = new Options_Salience();
@@ -55148,7 +55148,7 @@ namespace CS_Classes
 
 
 
-    public class Salience_Basics_MT_CPP_CS : VB_Parent
+    public class Salience_Basics_MT_CPP_CS : TaskParent
     {
         Salience_Basics_CPP_VB salience = new Salience_Basics_CPP_VB();
         public Salience_Basics_MT_CPP_CS()
@@ -55182,7 +55182,7 @@ namespace CS_Classes
 
 
 
-    public class Sides_Basics_CS : VB_Parent
+    public class Sides_Basics_CS : TaskParent
     {
         public Profile_Basics sides = new Profile_Basics();
         public Contour_RedCloudCorners corners = new Contour_RedCloudCorners();
@@ -55214,7 +55214,7 @@ namespace CS_Classes
 
 
 
-    public class Sides_Profile_CS : VB_Parent
+    public class Sides_Profile_CS : TaskParent
     {
         Contour_SidePoints sides = new Contour_SidePoints();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -55236,7 +55236,7 @@ namespace CS_Classes
 
 
 
-    public class Sides_Corner_CS : VB_Parent
+    public class Sides_Corner_CS : TaskParent
     {
         Contour_RedCloudCorners sides = new Contour_RedCloudCorners();
         RedCloud_Basics redC = new RedCloud_Basics();
@@ -55258,7 +55258,7 @@ namespace CS_Classes
 
 
 
-    public class Sides_ColorC_CS : VB_Parent
+    public class Sides_ColorC_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         Sides_Basics sides = new Sides_Basics();
@@ -55279,7 +55279,7 @@ namespace CS_Classes
 
 
 
-    public class Sieve_Image_CS : VB_Parent
+    public class Sieve_Image_CS : TaskParent
     {
         Pixel_Zoom zoom = new Pixel_Zoom();
         byte[] numArray;
@@ -55327,7 +55327,7 @@ namespace CS_Classes
 
 
 
-    public class SLR_PlotData_CS : VB_Parent
+    public class SLR_PlotData_CS : TaskParent
     {
         Plot_Basics_CPP_VB plot = new Plot_Basics_CPP_VB();
         public List<double> dataX = new List<double>();
@@ -55362,7 +55362,7 @@ namespace CS_Classes
 
 
 
-    public class SLR_SurfaceH_CS : VB_Parent
+    public class SLR_SurfaceH_CS : TaskParent
     {
         PointCloud_SurfaceH surface = new PointCloud_SurfaceH();
         public SLR_SurfaceH_CS()
@@ -55379,7 +55379,7 @@ namespace CS_Classes
 
 
 
-    public class SLR_Trends_CS : VB_Parent
+    public class SLR_Trends_CS : TaskParent
     {
         public Hist_KalmanAuto hist = new Hist_KalmanAuto();
         List<float> valList = new List<float>();
@@ -55436,7 +55436,7 @@ namespace CS_Classes
 
 
 
-    public class SLR_TrendImages_CS : VB_Parent
+    public class SLR_TrendImages_CS : TaskParent
     {
         SLR_Trends trends = new SLR_Trends();
         Options_SLRImages options = new Options_SLRImages();
@@ -55484,7 +55484,7 @@ namespace CS_Classes
 
 
 
-    public class Smoothing_Exterior_CS : VB_Parent
+    public class Smoothing_Exterior_CS : TaskParent
     {
         Convex_Basics hull = new Convex_Basics();
         public List<cv.Point> inputPoints { get; set; }
@@ -55561,7 +55561,7 @@ namespace CS_Classes
 
 
 
-    public class Smoothing_Interior_CS : VB_Parent
+    public class Smoothing_Interior_CS : TaskParent
     {
         Convex_Basics hull = new Convex_Basics();
         public List<cv.Point> inputPoints { get; set; }
@@ -55642,7 +55642,7 @@ namespace CS_Classes
 
 
 
-    public class Solve_ByMat_CS : VB_Parent
+    public class Solve_ByMat_CS : TaskParent
     {
         public Solve_ByMat_CS()
         {
@@ -55666,7 +55666,7 @@ namespace CS_Classes
 
 
 
-    public class Solve_ByArray_CS : VB_Parent
+    public class Solve_ByArray_CS : TaskParent
     {
         public Solve_ByArray_CS()
         {
@@ -55688,7 +55688,7 @@ namespace CS_Classes
 
 
 
-    public class Sort_Basics_CS : VB_Parent
+    public class Sort_Basics_CS : TaskParent
     {
         Options_Sort options = new Options_Sort();
         public Sort_Basics_CS()
@@ -55717,7 +55717,7 @@ namespace CS_Classes
 
 
 
-    public class Sort_RectAndMask_CS : VB_Parent
+    public class Sort_RectAndMask_CS : TaskParent
     {
         Sort_Basics sort = new Sort_Basics();
         public Mat mask;
@@ -55748,7 +55748,7 @@ namespace CS_Classes
 
 
 
-    public class Sort_MLPrepTest_CPP_CS : VB_Parent
+    public class Sort_MLPrepTest_CPP_CS : TaskParent
     {
         public Reduction_Basics reduction = new Reduction_Basics();
         public Mat MLTestData = new Mat();
@@ -55780,7 +55780,7 @@ namespace CS_Classes
 
 
 
-    public class Sort_1Channel_CS : VB_Parent
+    public class Sort_1Channel_CS : TaskParent
     {
         Sort_Basics sort = new Sort_Basics();
         ML_RemoveDups_CPP_VB dups = new ML_RemoveDups_CPP_VB();
@@ -55839,7 +55839,7 @@ namespace CS_Classes
 
 
 
-    public class Sort_3Channel_CS : VB_Parent
+    public class Sort_3Channel_CS : TaskParent
     {
         Sort_Basics sort = new Sort_Basics();
         ML_RemoveDups_CPP_VB dups = new ML_RemoveDups_CPP_VB();
@@ -55873,7 +55873,7 @@ namespace CS_Classes
 
 
 
-    public class Sort_FeatureLess_CS : VB_Parent
+    public class Sort_FeatureLess_CS : TaskParent
     {
         public FeatureROI_Basics devGrid = new FeatureROI_Basics();
         public Sort_Basics sort = new Sort_Basics();
@@ -55903,7 +55903,7 @@ namespace CS_Classes
 
 
 
-    public class Sort_Integer_CS : VB_Parent
+    public class Sort_Integer_CS : TaskParent
     {
         Sort_Basics sort = new Sort_Basics();
         public int[] data;
@@ -55941,7 +55941,7 @@ namespace CS_Classes
 
 
 
-    public class Sort_GrayScale1_CS : VB_Parent
+    public class Sort_GrayScale1_CS : TaskParent
     {
         Sort_Integer sort = new Sort_Integer();
         byte[][] pixels = new byte[3][];
@@ -55979,7 +55979,7 @@ namespace CS_Classes
 
 
 
-    public class Sort_GrayScale_CS : VB_Parent
+    public class Sort_GrayScale_CS : TaskParent
     {
         Plot_Histogram plot = new Plot_Histogram();
         byte[][] pixels = new byte[3][];
@@ -56012,7 +56012,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_Basics_CS : VB_Parent
+    public class Spectrum_Basics_CS : TaskParent
     {
         Spectrum_Z dSpec = new Spectrum_Z();
         Spectrum_Gray gSpec = new Spectrum_Gray();
@@ -56037,7 +56037,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_X_CS : VB_Parent
+    public class Spectrum_X_CS : TaskParent
     {
         public Options_Spectrum options = new Options_Spectrum();
         public Spectrum_X_CS()
@@ -56060,7 +56060,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_Y_CS : VB_Parent
+    public class Spectrum_Y_CS : TaskParent
     {
         public Options_Spectrum options = new Options_Spectrum();
         public Spectrum_Y_CS()
@@ -56083,7 +56083,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_Z_CS : VB_Parent
+    public class Spectrum_Z_CS : TaskParent
     {
         public Options_Spectrum options = new Options_Spectrum();
         public Spectrum_Z_CS()
@@ -56106,7 +56106,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_Cloud_CS : VB_Parent
+    public class Spectrum_Cloud_CS : TaskParent
     {
         public Options_Spectrum options = new Options_Spectrum();
         Spectrum_X specX = new Spectrum_X();
@@ -56136,7 +56136,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_GrayAndCloud_CS : VB_Parent
+    public class Spectrum_GrayAndCloud_CS : TaskParent
     {
         Options_Spectrum options = new Options_Spectrum();
         Spectrum_Gray gSpec = new Spectrum_Gray();
@@ -56163,7 +56163,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_RGB_CS : VB_Parent
+    public class Spectrum_RGB_CS : TaskParent
     {
         Options_Spectrum options = new Options_Spectrum();
         Spectrum_Gray gSpec = new Spectrum_Gray();
@@ -56192,7 +56192,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_CellZoom_CS : VB_Parent
+    public class Spectrum_CellZoom_CS : TaskParent
     {
         Resize_Proportional proportion = new Resize_Proportional();
         Spectrum_Breakdown breakdown = new Spectrum_Breakdown();
@@ -56221,7 +56221,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_Breakdown_CS : VB_Parent
+    public class Spectrum_Breakdown_CS : TaskParent
     {
         public Options_Spectrum options = new Options_Spectrum();
         public bool buildMaskOnly;
@@ -56295,7 +56295,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_RedCloud_CS : VB_Parent
+    public class Spectrum_RedCloud_CS : TaskParent
     {
         Spectrum_Breakdown breakdown = new Spectrum_Breakdown();
         public List<rcData> redCells = new List<rcData>();
@@ -56324,7 +56324,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_Mask_CS : VB_Parent
+    public class Spectrum_Mask_CS : TaskParent
     {
         Spectrum_Gray gSpec = new Spectrum_Gray();
         public Spectrum_Mask_CS()
@@ -56345,7 +56345,7 @@ namespace CS_Classes
 
 
 
-    public class Spectrum_Gray_CS : VB_Parent
+    public class Spectrum_Gray_CS : TaskParent
     {
         Options_Spectrum options = new Options_Spectrum();
         public string typeSpec = "GrayScale";
@@ -56368,7 +56368,7 @@ namespace CS_Classes
 
 
 
-    public class Stabilizer_Basics_CS : VB_Parent
+    public class Stabilizer_Basics_CS : TaskParent
     {
         Match_Basics match = new Match_Basics();
         public int shiftX;
@@ -56454,7 +56454,7 @@ namespace CS_Classes
 
 
 
-    public class Stabilizer_BasicsTest_CS : VB_Parent
+    public class Stabilizer_BasicsTest_CS : TaskParent
     {
         Stabilizer_BasicsRandomInput random = new Stabilizer_BasicsRandomInput();
         Stabilizer_Basics stable = new Stabilizer_Basics();
@@ -56477,7 +56477,7 @@ namespace CS_Classes
 
 
 
-    public class Stabilizer_OpticalFlow_CS : VB_Parent
+    public class Stabilizer_OpticalFlow_CS : TaskParent
     {
         public Feature_Stable feat = new Feature_Stable();
         public List<cv.Point2f> inputFeat = new List<cv.Point2f>();
@@ -56579,7 +56579,7 @@ namespace CS_Classes
 
 
 
-    public class Stabilizer_VerticalIMU_CS : VB_Parent
+    public class Stabilizer_VerticalIMU_CS : TaskParent
     {
         public bool stableTest;
         public string stableStr;
@@ -56629,7 +56629,7 @@ namespace CS_Classes
 
 
 
-    public class Stabilizer_CornerPoints_CS : VB_Parent
+    public class Stabilizer_CornerPoints_CS : TaskParent
     {
         public Stable_Basics basics = new Stable_Basics();
         public List<cv.Point2f> features = new List<cv.Point2f>();
@@ -56677,7 +56677,7 @@ namespace CS_Classes
 
 
 
-    public class Stabilizer_BasicsRandomInput_CS : VB_Parent
+    public class Stabilizer_BasicsRandomInput_CS : TaskParent
     {
         Options_StabilizerOther options = new Options_StabilizerOther();
         int lastShiftX;
@@ -56725,7 +56725,7 @@ namespace CS_Classes
 
 
 
-    public class Stable_Basics_CS : VB_Parent
+    public class Stable_Basics_CS : TaskParent
     {
         public Delaunay_Generations facetGen = new Delaunay_Generations();
         public List<cv.Point2f> ptList = new List<cv.Point2f>();
@@ -56780,7 +56780,7 @@ namespace CS_Classes
 
 
 
-    public class Stable_BasicsCount_CS : VB_Parent
+    public class Stable_BasicsCount_CS : TaskParent
     {
         public Stable_Basics basics = new Stable_Basics();
         public Feature_Stable feat = new Feature_Stable();
@@ -56813,7 +56813,7 @@ namespace CS_Classes
 
 
 
-    public class Stable_Lines_CS : VB_Parent
+    public class Stable_Lines_CS : TaskParent
     {
         public Stable_Basics basics = new Stable_Basics();
         Line_Basics lines = new Line_Basics();
@@ -56854,7 +56854,7 @@ namespace CS_Classes
 
 
 
-    public class Stable_FAST_CS : VB_Parent
+    public class Stable_FAST_CS : TaskParent
     {
         public Stable_Basics basics = new Stable_Basics();
         readonly Corners_Basics fast = new Corners_Basics();
@@ -56889,7 +56889,7 @@ namespace CS_Classes
 
 
 
-    public class Stable_GoodFeatures_CS : VB_Parent
+    public class Stable_GoodFeatures_CS : TaskParent
     {
         public Stable_Basics basics = new Stable_Basics();
         public Feature_Stable feat = new Feature_Stable();
@@ -56927,7 +56927,7 @@ namespace CS_Classes
 
 
 
-    public class Stitch_Basics_CS : VB_Parent
+    public class Stitch_Basics_CS : TaskParent
     {
         Options_Stitch options = new Options_Stitch();
         public Stitch_Basics_CS()
@@ -56977,7 +56977,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_LinearizeFloor_CS : VB_Parent
+    public class Structured_LinearizeFloor_CS : TaskParent
     {
         public Structured_FloorCeiling floor = new Structured_FloorCeiling();
         Kalman_VB_Basics kalman = new Kalman_VB_Basics();
@@ -57066,7 +57066,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_MultiSlice_CS : VB_Parent
+    public class Structured_MultiSlice_CS : TaskParent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask;
@@ -57117,7 +57117,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_MultiSliceLines_CS : VB_Parent
+    public class Structured_MultiSliceLines_CS : TaskParent
     {
         Structured_MultiSlice multi = new Structured_MultiSlice();
         public Line_Basics lines = new Line_Basics();
@@ -57137,7 +57137,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_Depth_CS : VB_Parent
+    public class Structured_Depth_CS : TaskParent
     {
         Structured_SliceH sliceH = new Structured_SliceH();
         public Structured_Depth_CS()
@@ -57174,7 +57174,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_Rebuild_CS : VB_Parent
+    public class Structured_Rebuild_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
         Options_Structured options = new Options_Structured();
@@ -57258,7 +57258,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_Cloud2_CS : VB_Parent
+    public class Structured_Cloud2_CS : TaskParent
     {
         Pixel_Measure mmPixel = new Pixel_Measure();
         Options_StructuredCloud options = new Options_StructuredCloud();
@@ -57314,7 +57314,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_Cloud_CS : VB_Parent
+    public class Structured_Cloud_CS : TaskParent
     {
         public Options_StructuredCloud options = new Options_StructuredCloud();
         public Structured_Cloud_CS()
@@ -57348,7 +57348,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_ROI_CS : VB_Parent
+    public class Structured_ROI_CS : TaskParent
     {
         public Mat data = new Mat();
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
@@ -57375,7 +57375,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_Tiles_CS : VB_Parent
+    public class Structured_Tiles_CS : TaskParent
     {
         public List<Vec3f> oglData = new List<Vec3f>();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
@@ -57406,7 +57406,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_CountTop_CS : VB_Parent
+    public class Structured_CountTop_CS : TaskParent
     {
         Structured_SliceV slice = new Structured_SliceV();
         Plot_Histogram plot = new Plot_Histogram();
@@ -57454,7 +57454,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_FeatureLines_CS : VB_Parent
+    public class Structured_FeatureLines_CS : TaskParent
     {
         Structured_MultiSlice mStruct = new Structured_MultiSlice();
         FeatureLine_Finder lines = new FeatureLine_Finder();
@@ -57480,7 +57480,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_FloorCeiling_CS : VB_Parent
+    public class Structured_FloorCeiling_CS : TaskParent
     {
         public Structured_SliceEither slice = new Structured_SliceEither();
         Kalman_Basics kalman = new Kalman_Basics();
@@ -57548,7 +57548,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_MultiSliceH_CS : VB_Parent
+    public class Structured_MultiSliceH_CS : TaskParent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask;
@@ -57586,7 +57586,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_MultiSliceV_CS : VB_Parent
+    public class Structured_MultiSliceV_CS : TaskParent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         Options_Structured options = new Options_Structured();
@@ -57623,7 +57623,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_SliceXPlot_CS : VB_Parent
+    public class Structured_SliceXPlot_CS : TaskParent
     {
         Structured_MultiSlice multi = new Structured_MultiSlice();
         Options_Structured options = new Options_Structured();
@@ -57656,7 +57656,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_SliceYPlot_CS : VB_Parent
+    public class Structured_SliceYPlot_CS : TaskParent
     {
         Structured_MultiSlice multi = new Structured_MultiSlice();
         Options_Structured options = new Options_Structured();
@@ -57690,7 +57690,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_MouseSlice_CS : VB_Parent
+    public class Structured_MouseSlice_CS : TaskParent
     {
         Structured_SliceEither slice = new Structured_SliceEither();
         Line_Basics lines = new Line_Basics();
@@ -57732,7 +57732,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_SliceEither_CS : VB_Parent
+    public class Structured_SliceEither_CS : TaskParent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask = new Mat();
@@ -57791,7 +57791,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_TransformH_CS : VB_Parent
+    public class Structured_TransformH_CS : TaskParent
     {
         Options_Structured options = new Options_Structured();
         Projection_HistTop histTop = new Projection_HistTop();
@@ -57832,7 +57832,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_TransformV_CS : VB_Parent
+    public class Structured_TransformV_CS : TaskParent
     {
         Options_Structured options = new Options_Structured();
         Projection_HistSide histSide = new Projection_HistSide();
@@ -57874,7 +57874,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_CountSide_CS : VB_Parent
+    public class Structured_CountSide_CS : TaskParent
     {
         Structured_SliceH slice = new Structured_SliceH();
         Plot_Histogram plot = new Plot_Histogram();
@@ -57922,7 +57922,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_CountSideSum_CS : VB_Parent
+    public class Structured_CountSideSum_CS : TaskParent
     {
         public List<float> counts = new List<float>();
         public int maxCountIndex;
@@ -57981,7 +57981,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_SliceV_CS : VB_Parent
+    public class Structured_SliceV_CS : TaskParent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask = new Mat();
@@ -58021,7 +58021,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_SliceH_CS : VB_Parent
+    public class Structured_SliceH_CS : TaskParent
     {
         public HeatMap_Basics heat = new HeatMap_Basics();
         public Mat sliceMask = new Mat();
@@ -58061,7 +58061,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_SurveyH_CS : VB_Parent
+    public class Structured_SurveyH_CS : TaskParent
     {
         public Structured_SurveyH_CS()
         {
@@ -58107,7 +58107,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_SurveyV_CS : VB_Parent
+    public class Structured_SurveyV_CS : TaskParent
     {
         public Structured_SurveyV_CS()
         {
@@ -58153,7 +58153,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_MultiSlicePolygon_CS : VB_Parent
+    public class Structured_MultiSlicePolygon_CS : TaskParent
     {
         Structured_MultiSlice multi = new Structured_MultiSlice();
         Options_StructuredMulti options = new Options_StructuredMulti();
@@ -58190,7 +58190,7 @@ namespace CS_Classes
 
 
 
-    public class Structured_Crosshairs_CS : VB_Parent
+    public class Structured_Crosshairs_CS : TaskParent
     {
         Structured_Cloud sCloud = new Structured_Cloud();
         double minX, maxX, minY, maxY;
@@ -58265,7 +58265,7 @@ namespace CS_Classes
 
 
 
-    public class SuperPixel_Basics_CS : VB_Parent
+    public class SuperPixel_Basics_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public SuperPixel_Basics_CS()
@@ -58288,7 +58288,7 @@ namespace CS_Classes
 
 
 
-    public class SuperPixel_Basics_CPP_CS : VB_Parent
+    public class SuperPixel_Basics_CPP_CS : TaskParent
     {
         public Mat wireGrid;
         public Scalar gridColor = Scalar.White;
@@ -58331,7 +58331,7 @@ namespace CS_Classes
 
 
 
-    public class SuperPixel_BinarizedImage_CS : VB_Parent
+    public class SuperPixel_BinarizedImage_CS : TaskParent
     {
         SuperPixel_Basics_CPP_VB pixels = new SuperPixel_Basics_CPP_VB();
         Binarize_Basics binarize;
@@ -58355,7 +58355,7 @@ namespace CS_Classes
 
 
 
-    public class SuperPixel_Depth_CS : VB_Parent
+    public class SuperPixel_Depth_CS : TaskParent
     {
         SuperPixel_Basics_CPP_VB pixels = new SuperPixel_Basics_CPP_VB();
         public SuperPixel_Depth_CS()
@@ -58373,7 +58373,7 @@ namespace CS_Classes
 
 
 
-    public class SuperPixel_WithCanny_CS : VB_Parent
+    public class SuperPixel_WithCanny_CS : TaskParent
     {
         SuperPixel_Basics_CPP_VB pixels = new SuperPixel_Basics_CPP_VB();
         Edge_Canny edges = new Edge_Canny();
@@ -58397,7 +58397,7 @@ namespace CS_Classes
 
 
 
-    public class SuperPixel_WithLineDetector_CS : VB_Parent
+    public class SuperPixel_WithLineDetector_CS : TaskParent
     {
         SuperPixel_Basics_CPP_VB pixels = new SuperPixel_Basics_CPP_VB();
         Line_Basics lines = new Line_Basics();
@@ -58418,7 +58418,7 @@ namespace CS_Classes
 
 
 
-    public class SuperRes_Basics_CS : VB_Parent
+    public class SuperRes_Basics_CS : TaskParent
     {
         SuperRes_Input video = new SuperRes_Input();
         Options_SuperRes options = new Options_SuperRes();
@@ -58485,7 +58485,7 @@ namespace CS_Classes
 
 
 
-    public class SuperRes_Input_CS : VB_Parent
+    public class SuperRes_Input_CS : TaskParent
     {
         public Video_Basics video = new Video_Basics();
         public string inputFileName;
@@ -58505,7 +58505,7 @@ namespace CS_Classes
 
 
 
-    public class SuperRes_SubPixelZoom_CS : VB_Parent
+    public class SuperRes_SubPixelZoom_CS : TaskParent
     {
         Pixel_SubPixel zoom = new Pixel_SubPixel();
         SuperRes_Input video = new SuperRes_Input();
@@ -58530,7 +58530,7 @@ namespace CS_Classes
 
 
 
-    public class SVD_Example_CS : VB_Parent
+    public class SVD_Example_CS : TaskParent
     {
         public SVD_Example_CS()
         {
@@ -58567,7 +58567,7 @@ namespace CS_Classes
 
 
 
-    public class SVD_Example2_CS : VB_Parent
+    public class SVD_Example2_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public SVD_Example2_CS()
@@ -58617,7 +58617,7 @@ namespace CS_Classes
 
 
 
-    public class SVD_Gaussian_CS : VB_Parent
+    public class SVD_Gaussian_CS : TaskParent
     {
         Covariance_Images covar = new Covariance_Images();
         public SVD_Gaussian_CS()
@@ -58674,7 +58674,7 @@ namespace CS_Classes
 
 
 
-    public class SVM_Basics_CS : VB_Parent
+    public class SVM_Basics_CS : TaskParent
     {
         public Options_SVM options = new Options_SVM();
         SVM_SampleData sampleData = new SVM_SampleData();
@@ -58732,7 +58732,7 @@ namespace CS_Classes
 
 
 
-    public class SVM_SampleData_CS : VB_Parent
+    public class SVM_SampleData_CS : TaskParent
     {
         readonly Options_SVM options = new Options_SVM();
         public List<cv.Point2f> points = new List<cv.Point2f>();
@@ -58773,7 +58773,7 @@ namespace CS_Classes
 
 
 
-    public class SVM_TestCase_CS : VB_Parent
+    public class SVM_TestCase_CS : TaskParent
     {
         Options_SVM options = new Options_SVM();
         List<cv.Point2f> points = new List<cv.Point2f>();
@@ -58833,7 +58833,7 @@ namespace CS_Classes
 
 
 
-    public class SVM_ReuseBasics_CS : VB_Parent
+    public class SVM_ReuseBasics_CS : TaskParent
     {
         SVM_Basics svm = new SVM_Basics();
         List<cv.Point2f> points = new List<cv.Point2f>();
@@ -58882,7 +58882,7 @@ namespace CS_Classes
 
 
 
-    public class SVM_ReuseRandom_CS : VB_Parent
+    public class SVM_ReuseRandom_CS : TaskParent
     {
         readonly SVM_Basics svm = new SVM_Basics();
         int blueCount;
@@ -58949,7 +58949,7 @@ namespace CS_Classes
 
 
 
-    public class Swarm_Basics_CS : VB_Parent
+    public class Swarm_Basics_CS : TaskParent
     {
         public KNN_Basics knn = new KNN_Basics();
         Feature_Stable feat = new Feature_Stable();
@@ -59045,7 +59045,7 @@ namespace CS_Classes
 
 
 
-    public class Swarm_LeftRightFeatures_CS : VB_Parent
+    public class Swarm_LeftRightFeatures_CS : TaskParent
     {
         public List<cv.Point2f> leftList = new List<cv.Point2f>();
         public List<cv.Point2f> rightList = new List<cv.Point2f>();
@@ -59069,7 +59069,7 @@ namespace CS_Classes
 
 
 
-    public class Swarm_LeftRight_CS : VB_Parent
+    public class Swarm_LeftRight_CS : TaskParent
     {
         public float leftDistance;
         public float leftDirection;
@@ -59107,7 +59107,7 @@ namespace CS_Classes
 
 
 
-    public class Swarm_Flood_CS : VB_Parent
+    public class Swarm_Flood_CS : TaskParent
     {
         Swarm_Basics swarm = new Swarm_Basics();
         public Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -59133,7 +59133,7 @@ namespace CS_Classes
 
 
 
-    public class Swarm_Percentage_CS : VB_Parent
+    public class Swarm_Percentage_CS : TaskParent
     {
         Swarm_Flood swarm = new Swarm_Flood();
         Options_SwarmPercent options = new Options_SwarmPercent();
@@ -59168,7 +59168,7 @@ namespace CS_Classes
 
 
 
-    public class Swarm_Flood2_CS : VB_Parent
+    public class Swarm_Flood2_CS : TaskParent
     {
         public Line_KNN lines = new Line_KNN();
         public Flood_BasicsMask flood = new Flood_BasicsMask();
@@ -59201,7 +59201,7 @@ namespace CS_Classes
 
 
 
-    public class Swarm_Flood3_CS : VB_Parent
+    public class Swarm_Flood3_CS : TaskParent
     {
         Swarm_Flood2 swarm = new Swarm_Flood2();
         public Swarm_Flood3_CS()
@@ -59221,7 +59221,7 @@ namespace CS_Classes
 
 
 
-    public class Tessallate_Basics_CS : VB_Parent
+    public class Tessallate_Basics_CS : TaskParent
     {
         public List<cv.Point3f> points = new List<cv.Point3f>();
         public List<Scalar> colors = new List<Scalar>();
@@ -59285,7 +59285,7 @@ namespace CS_Classes
 
 
 
-    public class Tessallate_Triangles_CS : VB_Parent
+    public class Tessallate_Triangles_CS : TaskParent
     {
         public Tessallate_Basics basics = new Tessallate_Basics();
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
@@ -59317,7 +59317,7 @@ namespace CS_Classes
 
 
 
-    public class Tessallate_QuadSimple_CS : VB_Parent
+    public class Tessallate_QuadSimple_CS : TaskParent
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
@@ -59360,7 +59360,7 @@ namespace CS_Classes
 
 
 
-    public class Tessallate_QuadHulls_CS : VB_Parent
+    public class Tessallate_QuadHulls_CS : TaskParent
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public List<List<double>> depthList = new List<List<double>>();
@@ -59427,7 +59427,7 @@ namespace CS_Classes
 
 
 
-    public class Tessallate_QuadMinMax_CS : VB_Parent
+    public class Tessallate_QuadMinMax_CS : TaskParent
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public List<List<double>> depthList1 = new List<List<double>>();
@@ -59517,7 +59517,7 @@ namespace CS_Classes
 
 
 
-    public class Tessallate_Bricks_CS : VB_Parent
+    public class Tessallate_Bricks_CS : TaskParent
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public List<double> depths = new List<double>();
@@ -59620,7 +59620,7 @@ namespace CS_Classes
 
 
 
-    public class Texture_Basics_CS : VB_Parent
+    public class Texture_Basics_CS : TaskParent
     {
         Draw_Ellipses ellipse = new Draw_Ellipses();
         public Mat texture = new Mat();
@@ -59671,7 +59671,7 @@ namespace CS_Classes
 
 
 
-    public class Texture_Flow_CS : VB_Parent
+    public class Texture_Flow_CS : TaskParent
     {
         Options_Texture options = new Options_Texture();
         public Texture_Flow_CS()
@@ -59704,7 +59704,7 @@ namespace CS_Classes
 
 
 
-    public class Texture_Flow_Depth_CS : VB_Parent
+    public class Texture_Flow_Depth_CS : TaskParent
     {
         TextureFlow_Basics texture;
         public Texture_Flow_Depth_CS()
@@ -59722,7 +59722,7 @@ namespace CS_Classes
 
 
 
-    public class Texture_Flow_Reduction_CS : VB_Parent
+    public class Texture_Flow_Reduction_CS : TaskParent
     {
         TextureFlow_Basics texture;
         Reduction_Basics reduction = new Reduction_Basics();
@@ -59743,7 +59743,7 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_TextureShuffle_CS : VB_Parent
+    public class OpenGL_TextureShuffle_CS : TaskParent
     {
         Random_Shuffle shuffle = new Random_Shuffle();
         OpenGL_FlatStudy2 floor = new OpenGL_FlatStudy2();
@@ -59787,7 +59787,7 @@ namespace CS_Classes
 
 
 
-    public class Thickness_Basics_CS : VB_Parent
+    public class Thickness_Basics_CS : TaskParent
     {
         public rcData rc = new rcData();
         public Volume_Basics volZ = new Volume_Basics();
@@ -59814,7 +59814,7 @@ namespace CS_Classes
 
 
 
-    public class Threading_Test_CS : VB_Parent
+    public class Threading_Test_CS : TaskParent
     {
         Thread thread1;
         Thread thread2;
@@ -59879,7 +59879,7 @@ namespace CS_Classes
 
 
 
-    public class Threading_Test1_CS : VB_Parent
+    public class Threading_Test1_CS : TaskParent
     {
         Gravity_Basics gravity = new Gravity_Basics();
         Thread thread;
@@ -59924,7 +59924,7 @@ namespace CS_Classes
 
 
 
-    public class Threshold_Basics_CS : VB_Parent
+    public class Threshold_Basics_CS : TaskParent
     {
         public Options_Threshold options = new Options_Threshold();
         public Threshold_Basics_CS()
@@ -59950,7 +59950,7 @@ namespace CS_Classes
 
 
 
-    public class Threshold_Adaptive_CS : VB_Parent
+    public class Threshold_Adaptive_CS : TaskParent
     {
         Options_Threshold options = new Options_Threshold();
         Options_AdaptiveThreshold options1 = new Options_AdaptiveThreshold();
@@ -59972,7 +59972,7 @@ namespace CS_Classes
 
 
 
-    public class Threshold_Definitions_CS : VB_Parent
+    public class Threshold_Definitions_CS : TaskParent
     {
         Gradient_Color gradient = new Gradient_Color();
         Mat_4Click mats = new Mat_4Click();
@@ -60011,7 +60011,7 @@ namespace CS_Classes
 
 
 
-    public class Threshold_ByChannels_CS : VB_Parent
+    public class Threshold_ByChannels_CS : TaskParent
     {
         Options_Colors optionsColor = new Options_Colors();
         Options_Threshold options = new Options_Threshold();
@@ -60046,7 +60046,7 @@ namespace CS_Classes
 
 
 
-    public class Threshold_ColorSource_CS : VB_Parent
+    public class Threshold_ColorSource_CS : TaskParent
     {
         Color8U_Basics colorClass = new Color8U_Basics();
         Threshold_ByChannels byChan = new Threshold_ByChannels();
@@ -60068,7 +60068,7 @@ namespace CS_Classes
 
 
 
-    public class Tracker_Basics_CPP_CS : VB_Parent
+    public class Tracker_Basics_CPP_CS : TaskParent
     {
         public cv.Rect tRect;
         cv.Rect saveRect = new cv.Rect();
@@ -60116,7 +60116,7 @@ namespace CS_Classes
 
 
 
-    public class Transform_Resize_CS : VB_Parent
+    public class Transform_Resize_CS : TaskParent
     {
         Options_Transform options = new Options_Transform();
         public Transform_Resize_CS()
@@ -60147,7 +60147,7 @@ namespace CS_Classes
 
 
 
-    public class Transform_Affine3D_CS : VB_Parent
+    public class Transform_Affine3D_CS : TaskParent
     {
         Mat pc1;
         Mat pc2;
@@ -60211,7 +60211,7 @@ namespace CS_Classes
 
 
 
-    public class Transform_Rotate_CS : VB_Parent
+    public class Transform_Rotate_CS : TaskParent
     {
         public Point2f imageCenter;
         Options_Transform options = new Options_Transform();
@@ -60233,7 +60233,7 @@ namespace CS_Classes
 
 
 
-    public class TransformationMatrix_Basics_CS : VB_Parent
+    public class TransformationMatrix_Basics_CS : TaskParent
     {
         List<cv.Point3d> topLocations = new List<cv.Point3d>();
         Options_TransformationMatrix options = new Options_TransformationMatrix();
@@ -60279,7 +60279,7 @@ namespace CS_Classes
 
 
 
-    public class Triangle_Basics_CS : VB_Parent
+    public class Triangle_Basics_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
@@ -60320,7 +60320,7 @@ namespace CS_Classes
 
 
 
-    public class Triangle_HullContour_CS : VB_Parent
+    public class Triangle_HullContour_CS : TaskParent
     {
         RedCloud_Hulls hulls = new RedCloud_Hulls();
         public Triangle_HullContour_CS()
@@ -60354,7 +60354,7 @@ namespace CS_Classes
 
 
 
-    public class Triangle_RedCloud_CS : VB_Parent
+    public class Triangle_RedCloud_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
@@ -60397,7 +60397,7 @@ namespace CS_Classes
 
 
 
-    public class Triangle_Cell_CS : VB_Parent
+    public class Triangle_Cell_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
@@ -60454,7 +60454,7 @@ namespace CS_Classes
 
 
 
-    public class Triangle_Mask_CS : VB_Parent
+    public class Triangle_Mask_CS : TaskParent
     {
         RedCloud_Basics redC = new RedCloud_Basics();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
@@ -60510,7 +60510,7 @@ namespace CS_Classes
 
 
 
-    public class VectorMagnitude_CS : VB_Parent
+    public class VectorMagnitude_CS : TaskParent
     {
         public VectorMagnitude_CS()
         {
@@ -60545,7 +60545,7 @@ namespace CS_Classes
 
 
 
-    public class Video_Basics_CS : VB_Parent
+    public class Video_Basics_CS : TaskParent
     {
         public VideoCapture captureVideo = new VideoCapture();
         public Options_Video options = new Options_Video();
@@ -60578,7 +60578,7 @@ namespace CS_Classes
 
 
 
-    public class Video_CarCounting_CS : VB_Parent
+    public class Video_CarCounting_CS : TaskParent
     {
         Font_FlowText flow = new Font_FlowText();
         Video_Basics video = new Video_Basics();
@@ -60628,7 +60628,7 @@ namespace CS_Classes
 
 
 
-    public class Video_CarCComp_CS : VB_Parent
+    public class Video_CarCComp_CS : TaskParent
     {
         CComp_Both cc = new CComp_Both();
         Video_Basics video = new Video_Basics();
@@ -60653,7 +60653,7 @@ namespace CS_Classes
 
 
 
-    public class Video_MinRect_CS : VB_Parent
+    public class Video_MinRect_CS : TaskParent
     {
         public Video_Basics video = new Video_Basics();
         public BGSubtract_MOG bgSub = new BGSubtract_MOG();
@@ -60688,7 +60688,7 @@ namespace CS_Classes
 
 
 
-    public class Video_MinCircle_CS : VB_Parent
+    public class Video_MinCircle_CS : TaskParent
     {
         Video_MinRect video = new Video_MinRect();
         public Video_MinCircle_CS()
@@ -60717,7 +60717,7 @@ namespace CS_Classes
 
 
 
-    public class Vignetting_Basics_CPP_CS : VB_Parent
+    public class Vignetting_Basics_CPP_CS : TaskParent
     {
         public bool removeVig;
         cv.Point center;
@@ -60750,7 +60750,7 @@ namespace CS_Classes
 
 
 
-    public class Vignetting_VB_CS : VB_Parent
+    public class Vignetting_VB_CS : TaskParent
     {
         public bool removeVig;
         cv.Point center;
@@ -60800,7 +60800,7 @@ namespace CS_Classes
 
 
 
-    public class Vignetting_Removal_CS : VB_Parent
+    public class Vignetting_Removal_CS : TaskParent
     {
         Vignetting_Basics basics = new Vignetting_Basics();
         Mat defaultImage;
@@ -60831,7 +60831,7 @@ namespace CS_Classes
 
 
 
-    public class Vignetting_Devignetting_CS : VB_Parent
+    public class Vignetting_Devignetting_CS : TaskParent
     {
         Vignetting_Removal devignet = new Vignetting_Removal();
         Vignetting_Basics basics = new Vignetting_Basics();
@@ -60852,7 +60852,7 @@ namespace CS_Classes
 
 
 
-    public class Volume_Basics_CS : VB_Parent
+    public class Volume_Basics_CS : TaskParent
     {
         public rcData rc = new rcData();
         public float volume;
@@ -60904,7 +60904,7 @@ namespace CS_Classes
 
 
 
-    public class WarpAffine_Basics_CS : VB_Parent
+    public class WarpAffine_Basics_CS : TaskParent
     {
         public Options_Resize options = new Options_Resize();
         Options_WarpAffine optionsWarp = new Options_WarpAffine();
@@ -60938,7 +60938,7 @@ namespace CS_Classes
 
 
 
-    public class WarpAffine_BasicsQT_CS : VB_Parent
+    public class WarpAffine_BasicsQT_CS : TaskParent
     {
         public Point2f rotateCenter;
         public float rotateAngle; // in degrees
@@ -60963,7 +60963,7 @@ namespace CS_Classes
 
 
 
-    public class WarpAffine_Captcha_CS : VB_Parent
+    public class WarpAffine_Captcha_CS : TaskParent
     {
         const int charHeight = 40;
         const int charWidth = 30;
@@ -61050,7 +61050,7 @@ namespace CS_Classes
 
 
 
-    public class WarpAffine_3Points_CS : VB_Parent
+    public class WarpAffine_3Points_CS : TaskParent
     {
         Area_MinTriangle_CPP_VB triangle = new Area_MinTriangle_CPP_VB();
         Mat M = new Mat();
@@ -61118,7 +61118,7 @@ namespace CS_Classes
 
 
 
-    public class WarpAffine_4Points_CS : VB_Parent
+    public class WarpAffine_4Points_CS : TaskParent
     {
         Area_MinRect mRect = new Area_MinRect();
         Options_MinArea options = new Options_MinArea();
@@ -61175,7 +61175,7 @@ namespace CS_Classes
 
 
 
-    public class WarpAffine_Repeated_CS : VB_Parent
+    public class WarpAffine_Repeated_CS : TaskParent
     {
         public WarpAffine_Repeated_CS()
         {
@@ -61224,7 +61224,7 @@ namespace CS_Classes
 
 
 
-    public class WarpAffine_RepeatedExample8_CS : VB_Parent
+    public class WarpAffine_RepeatedExample8_CS : TaskParent
     {
         public WarpAffine_RepeatedExample8_CS()
         {
@@ -61268,7 +61268,7 @@ namespace CS_Classes
 
 
 
-    public class WarpModel_Basics_CS : VB_Parent
+    public class WarpModel_Basics_CS : TaskParent
     {
         readonly WarpModel_ECC ecc = new WarpModel_ECC();
         Options_WarpModel options = new Options_WarpModel();
@@ -61316,7 +61316,7 @@ namespace CS_Classes
 
 
 
-    public class WarpModel_ECC_CPP_CS : VB_Parent
+    public class WarpModel_ECC_CPP_CS : TaskParent
     {
         public WarpModel_Input warpInput = new WarpModel_Input();
         public float[] warpMatrix;
@@ -61402,7 +61402,7 @@ namespace CS_Classes
 
 
 
-    public class WarpModel_Input_CS : VB_Parent
+    public class WarpModel_Input_CS : TaskParent
     {
         public Mat[] rgb = new Mat[3];
         public Mat[] gradient = new Mat[3];
@@ -61454,7 +61454,7 @@ namespace CS_Classes
 
 
 
-    public class WarpPerspective_Basics_CS : VB_Parent
+    public class WarpPerspective_Basics_CS : TaskParent
     {
         public Options_Warp options = new Options_Warp();
         public WarpPerspective_Basics_CS()
@@ -61473,7 +61473,7 @@ namespace CS_Classes
 
 
 
-    public class WarpPerspective_WidthHeight_CS : VB_Parent
+    public class WarpPerspective_WidthHeight_CS : TaskParent
     {
         Options_WarpPerspective options = new Options_WarpPerspective();
         public WarpPerspective_WidthHeight_CS()
@@ -61497,7 +61497,7 @@ namespace CS_Classes
 
 
 
-    public class Watershed_Basics_CS : VB_Parent
+    public class Watershed_Basics_CS : TaskParent
     {
         AddWeighted_Basics addW = new AddWeighted_Basics();
         List<cv.Rect> rects = new List<cv.Rect>();
@@ -61561,7 +61561,7 @@ namespace CS_Classes
 
 
 
-    public class Watershed_DepthReduction_CS : VB_Parent
+    public class Watershed_DepthReduction_CS : TaskParent
     {
         Watershed_Basics watershed = new Watershed_Basics();
         Reduction_Basics reduction = new Reduction_Basics();
@@ -61585,7 +61585,7 @@ namespace CS_Classes
 
 
 
-    public class Watershed_DepthAuto_CS : VB_Parent
+    public class Watershed_DepthAuto_CS : TaskParent
     {
         Watershed_Basics watershed = new Watershed_Basics();
         public Watershed_DepthAuto_CS()
@@ -61604,7 +61604,7 @@ namespace CS_Classes
 
 
 
-    public class XFeatures2D_StarDetector_CS : VB_Parent
+    public class XFeatures2D_StarDetector_CS : TaskParent
     {
         public XFeatures2D_StarDetector_CS()
         {
@@ -61632,7 +61632,7 @@ namespace CS_Classes
 
 
 
-    public class XPhoto_Bm3dDenoise_CS : VB_Parent
+    public class XPhoto_Bm3dDenoise_CS : TaskParent
     {
         public XPhoto_Bm3dDenoise_CS()
         {
@@ -61655,7 +61655,7 @@ namespace CS_Classes
 
 
 
-    public class XPhoto_Bm3dDenoiseDepthImage_CS : VB_Parent
+    public class XPhoto_Bm3dDenoiseDepthImage_CS : TaskParent
     {
         public XPhoto_Bm3dDenoiseDepthImage_CS()
         {
@@ -61678,7 +61678,7 @@ namespace CS_Classes
 
 
 
-    public class XPhoto_OilPaint_CPP_CS : VB_Parent
+    public class XPhoto_OilPaint_CPP_CS : TaskParent
     {
         readonly Options_XPhoto options = new Options_XPhoto();
         public XPhoto_OilPaint_CPP_CS()
@@ -61706,7 +61706,7 @@ namespace CS_Classes
 
 
 
-    public class XPhoto_Inpaint_CS : VB_Parent
+    public class XPhoto_Inpaint_CS : TaskParent
     {
         public InPaint_Basics basics = new InPaint_Basics();
         public Options_XPhotoInpaint options = new Options_XPhotoInpaint();
@@ -61732,7 +61732,7 @@ namespace CS_Classes
 
 
 
-    public class XPhoto_Inpaint_CPP_CS : VB_Parent
+    public class XPhoto_Inpaint_CPP_CS : TaskParent
     {
         readonly XPhoto_Inpaint inpVB = new XPhoto_Inpaint();
         public XPhoto_Inpaint_CPP_CS()
@@ -61770,7 +61770,7 @@ namespace CS_Classes
 
 
 
-    public class Horizon_Perpendicular_CS : VB_Parent
+    public class Horizon_Perpendicular_CS : TaskParent
     {
         Line_Perpendicular perp = new Line_Perpendicular();
         public Horizon_Perpendicular_CS()
@@ -61794,7 +61794,7 @@ namespace CS_Classes
     }
 
 
-    public class Feature_Agast_CS : VB_Parent
+    public class Feature_Agast_CS : TaskParent
     {
         private List<Point2f> stablePoints;
         private AgastFeatureDetector agastFD;
@@ -61855,7 +61855,7 @@ namespace CS_Classes
 
 
 
-    public class Edge_Basics_CS : VB_Parent
+    public class Edge_Basics_CS : TaskParent
     {
         Edge_Canny canny;
         Edge_Scharr scharr;

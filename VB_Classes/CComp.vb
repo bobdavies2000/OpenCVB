@@ -1,7 +1,7 @@
 Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
-Public Class CComp_Basics : Inherits VB_Parent
+Public Class CComp_Basics : Inherits TaskParent
     Public connectedComponents As ConnectedComponents
     Public rects As New List(Of cvb.Rect)
     Public centroids As New List(Of cvb.Point2f)
@@ -51,7 +51,7 @@ End Class
 
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.ConnectedComponents.RenderBlobs(OpenCvSharp.Mat)/
-Public Class CComp_Shapes : Inherits VB_Parent
+Public Class CComp_Shapes : Inherits TaskParent
     Dim shapes As cvb.Mat
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -94,7 +94,7 @@ End Class
 
 
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
-Public Class CComp_Both : Inherits VB_Parent
+Public Class CComp_Both : Inherits TaskParent
     Dim above As New CComp_Stats
     Dim below As New CComp_Stats
     Public Sub New()
@@ -125,7 +125,7 @@ End Class
 
 
 
-Public Class CComp_Hulls : Inherits VB_Parent
+Public Class CComp_Hulls : Inherits TaskParent
     Dim ccomp As New CComp_Both
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -148,7 +148,7 @@ End Class
 
 
 ' https://docs.opencvb.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
-Public Class CComp_Stats : Inherits VB_Parent
+Public Class CComp_Stats : Inherits TaskParent
     Public masks As New List(Of cvb.Mat)
     Public rects As New List(Of cvb.Rect)
     Public areas As New List(Of Integer)

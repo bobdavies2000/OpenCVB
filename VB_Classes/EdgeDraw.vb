@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
-Public Class EdgeDraw_Basics : Inherits VB_Parent
+Public Class EdgeDraw_Basics : Inherits TaskParent
     Public Sub New()
         cPtr = EdgeDraw_Edges_Open()
         labels = {"", "", "EdgeDraw_Basics output", ""}
@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class EdgeDraw_Segments : Inherits VB_Parent
+Public Class EdgeDraw_Segments : Inherits TaskParent
     Public segPoints As New List(Of cvb.Point2f)
     Public Sub New()
         cPtr = EdgeDraw_Lines_Open()
@@ -71,7 +71,7 @@ End Class
 
 
 
-Public Class EdgeDraw_LeftRight : Inherits VB_Parent
+Public Class EdgeDraw_LeftRight : Inherits TaskParent
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
         desc = "Find edges is the left and right images using EdgeDraw..."
@@ -91,7 +91,7 @@ End Class
 
 
 
-Public Class EdgeDraw_LeftRightVertical : Inherits VB_Parent
+Public Class EdgeDraw_LeftRightVertical : Inherits TaskParent
     Dim edges As New EdgeDraw_Basics
     Dim vert As New Rotate_Verticalize
     Public Sub New()
@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class EdgeDraw_SplitMean : Inherits VB_Parent
+Public Class EdgeDraw_SplitMean : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
     Dim edges As New EdgeDraw_Basics
     Public Sub New()

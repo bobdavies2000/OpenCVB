@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
-Public Class Hist3Dcloud_Basics : Inherits VB_Parent
+Public Class Hist3Dcloud_Basics : Inherits TaskParent
     Public histogram As New cvb.Mat
     Public histogram1D As New cvb.Mat
     Public histArray() As Single
@@ -52,7 +52,7 @@ End Class
 
 
 
-Public Class Hist3Dcloud_DepthSplit : Inherits VB_Parent
+Public Class Hist3Dcloud_DepthSplit : Inherits TaskParent
     Dim hist As List(Of Hist_Kalman)
     Dim hist2d As List(Of Hist2D_Cloud)
     Dim mats1 As New Mat_4Click
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
+Public Class Hist3Dcloud_Highlights : Inherits TaskParent
     Public histogram As New cvb.Mat
     Public ranges() As cvb.Rangef
     Dim maskval As Integer
@@ -152,7 +152,7 @@ End Class
 
 
 
-Public Class Hist3Dcloud_BP_Filter : Inherits VB_Parent
+Public Class Hist3Dcloud_BP_Filter : Inherits TaskParent
     Public histogram As New cvb.Mat
     Dim options As New Options_HistXD
     Public Sub New()
@@ -194,7 +194,7 @@ End Class
 
 
 
-Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Parent
+Public Class Hist3Dcloud_PlotHist1D : Inherits TaskParent
     Dim hcloud As New Hist3Dcloud_Basics
     Dim plot As New Plot_Histogram
     Public histogram As cvb.Mat

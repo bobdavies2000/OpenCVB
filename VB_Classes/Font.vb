@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Font_OpenCV : Inherits VB_Parent
+Public Class Font_OpenCV : Inherits TaskParent
     Public Sub New()
         desc = "Display different font options available in OpenCV"
     End Sub
@@ -25,7 +25,7 @@ End Class
 
 
 
-Public Class Font_FlowTextOld : Inherits VB_Parent
+Public Class Font_FlowTextOld : Inherits TaskParent
     Public msgs As New List(Of String)
     Public dst As Integer = 2
     Public Sub New()
@@ -70,7 +70,7 @@ End Class
 
 
 
-Public Class Font_FlowText : Inherits VB_Parent
+Public Class Font_FlowText : Inherits TaskParent
     Public flowText As New List(Of String)
     Public nextMsg As String
     Public maxLines As Integer = 23

@@ -2,7 +2,7 @@ Imports cvb = OpenCvSharp
 Imports  System.IO
 Imports System.Net
 Imports System.Threading
-Public Class Download_Databases : Inherits VB_Parent
+Public Class Download_Databases : Inherits TaskParent
     Dim downloadActive As Boolean
     Dim pythonActive As Boolean
     Dim linkAddress As String = ""

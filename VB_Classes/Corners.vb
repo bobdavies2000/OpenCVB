@@ -2,7 +2,7 @@ Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
-Public Class Corners_Basics : Inherits VB_Parent
+Public Class Corners_Basics : Inherits TaskParent
     Public features As New List(Of cvb.Point2f)
     Dim options As New Options_Features
     Dim optionCorner As New Options_Corners
@@ -40,7 +40,7 @@ End Class
 
 
 ' https://docs.opencvb.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_Harris : Inherits VB_Parent
+Public Class Corners_Harris : Inherits TaskParent
     Dim options As New Options_HarrisCorners
     Dim gray As New cvb.Mat
     Dim mc As New cvb.Mat, mm As mmData
@@ -91,7 +91,7 @@ End Class
 
 
 
-Public Class Corners_PreCornerDetect : Inherits VB_Parent
+Public Class Corners_PreCornerDetect : Inherits TaskParent
     Dim median As New Math_Median_CDF
     Dim options As New Options_PreCorners
     Public Sub New()
@@ -117,7 +117,7 @@ End Class
 
 
 ' https://docs.opencvb.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_ShiTomasi_CPP_VB : Inherits VB_Parent
+Public Class Corners_ShiTomasi_CPP_VB : Inherits TaskParent
     Dim options As New Options_ShiTomasi
     Public Sub New()
         desc = "Find corners using Eigen values and vectors"
@@ -145,7 +145,7 @@ End Class
 
 
 
-Public Class Corners_BasicsCentroid : Inherits VB_Parent
+Public Class Corners_BasicsCentroid : Inherits TaskParent
     Dim fast As New Corners_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -175,7 +175,7 @@ End Class
 
 
 
-Public Class Corners_BasicsStablePoints : Inherits VB_Parent
+Public Class Corners_BasicsStablePoints : Inherits TaskParent
     Public features As New List(Of cvb.Point)
     Dim fast As New Corners_Basics
     Public Sub New()
@@ -214,7 +214,7 @@ End Class
 
 
 
-Public Class Corners_BasicsCentroids : Inherits VB_Parent
+Public Class Corners_BasicsCentroids : Inherits TaskParent
     Dim fast As New Corners_Basics
     Dim fastCenters() As cvb.Point2f
     Public Sub New()
@@ -251,7 +251,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Corners_Harris_CPP_VB : Inherits VB_Parent
+Public Class Corners_Harris_CPP_VB : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Dim options As New Options_Harris
     Public Sub New()
@@ -288,7 +288,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Corners_HarrisDetector_CPP_VB : Inherits VB_Parent
+Public Class Corners_HarrisDetector_CPP_VB : Inherits TaskParent
     Public features As New List(Of cvb.Point2f)
     Dim options As New Options_Features
     Public Sub New()
@@ -329,7 +329,7 @@ End Class
 
 
 
-Public Class Corners_RedCloud : Inherits VB_Parent
+Public Class Corners_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim corners As New Neighbors_Intersects
     Public Sub New()
@@ -354,7 +354,7 @@ End Class
 
 
 
-Public Class Corners_SubPix : Inherits VB_Parent
+Public Class Corners_SubPix : Inherits TaskParent
     Public feat As New Feature_Stable
     Dim options As New Options_PreCorners
     Public Sub New()

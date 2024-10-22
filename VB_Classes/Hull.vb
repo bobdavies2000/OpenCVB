@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Hull_Basics : Inherits VB_Parent
+Public Class Hull_Basics : Inherits TaskParent
     Dim random As New Random_Basics
     Public inputPoints As New List(Of cvb.Point2f)
     Public hull As New List(Of cvb.Point)
@@ -38,7 +38,7 @@ End Class
 
 
 
-Public Class Hull_Contour : Inherits VB_Parent
+Public Class Hull_Contour : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compare the hull to the contour of a RedCloud cell"

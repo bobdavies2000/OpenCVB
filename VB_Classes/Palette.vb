@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports System.IO
-Public Class Palette_Basics : Inherits VB_Parent
+Public Class Palette_Basics : Inherits TaskParent
     Public whitebackground As Boolean
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class Palette_Color : Inherits VB_Parent
+Public Class Palette_Color : Inherits TaskParent
     Dim options As New Options_Colors
     Public Sub New()
         desc = "Define a color Using sliders."
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Palette_LinearPolar : Inherits VB_Parent
+Public Class Palette_LinearPolar : Inherits TaskParent
     Public rotateOptions As New Options_Resize
     Dim pt = New cvb.Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1))
     Public Sub New()
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class Palette_Reduction : Inherits VB_Parent
+Public Class Palette_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         UpdateAdvice(traceName + ": redOptions 'Reduction' to control results.")
@@ -103,7 +103,7 @@ End Class
 
 
 
-Public Class Palette_DrawTest : Inherits VB_Parent
+Public Class Palette_DrawTest : Inherits TaskParent
     Dim draw As New Draw_Shapes
     Public Sub New()
         desc = "Experiment With palette Using a drawn image"
@@ -118,7 +118,7 @@ End Class
 
 
 
-Public Class Palette_Gradient : Inherits VB_Parent
+Public Class Palette_Gradient : Inherits TaskParent
     Public color1 As cvb.Scalar
     Public color2 As cvb.Scalar
     Public Sub New()
@@ -150,7 +150,7 @@ End Class
 
 
 
-Public Class Palette_DepthColorMap : Inherits VB_Parent
+Public Class Palette_DepthColorMap : Inherits TaskParent
     Public gradientColorMap As New cvb.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
@@ -200,7 +200,7 @@ End Class
 
 
 
-Public Class Palette_RGBDepth : Inherits VB_Parent
+Public Class Palette_RGBDepth : Inherits TaskParent
     Dim gradientColorMap As New cvb.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
@@ -237,7 +237,7 @@ End Class
 
 
 
-Public Class Palette_Layout2D : Inherits VB_Parent
+Public Class Palette_Layout2D : Inherits TaskParent
     Public Sub New()
         desc = "Layout the available colors in a 2D grid"
     End Sub
@@ -258,7 +258,7 @@ End Class
 
 
 
-Public Class Palette_LeftRightImages : Inherits VB_Parent
+Public Class Palette_LeftRightImages : Inherits TaskParent
     Public Sub New()
         desc = "Use a palette with the left and right images."
     End Sub
@@ -267,7 +267,7 @@ Public Class Palette_LeftRightImages : Inherits VB_Parent
         dst3 = ShowPalette(task.rightView.ConvertScaleAbs)
     End Sub
 End Class
-Public Class Palette_TaskColors : Inherits VB_Parent
+Public Class Palette_TaskColors : Inherits TaskParent
     Dim direction = 1
     Public Sub New()
         labels = {"", "", "ScalarColors", "VecColors"}
@@ -293,7 +293,7 @@ End Class
 
 
 
-Public Class Palette_Create : Inherits VB_Parent
+Public Class Palette_Create : Inherits TaskParent
     Dim schemes() As FileInfo
     Dim schemeName As String
     Dim colorGrad As New cvb.Mat
@@ -368,7 +368,7 @@ End Class
 
 
 
-Public Class Palette_Random : Inherits VB_Parent
+Public Class Palette_Random : Inherits TaskParent
     Public colorMap As cvb.Mat
     Public Sub New()
         UpdateAdvice(traceName + ": There are no options" + vbCrLf + "Just produces a colorMap filled with random vec3b's.")
@@ -388,7 +388,7 @@ End Class
 
 
 
-Public Class Palette_Variable : Inherits VB_Parent
+Public Class Palette_Variable : Inherits TaskParent
     Public colorGrad As cvb.Mat
     Public originalColorMap As cvb.Mat
     Public colors As New List(Of cvb.Vec3b)
@@ -413,7 +413,7 @@ End Class
 
 
 
-Public Class Palette_RandomColorMap : Inherits VB_Parent
+Public Class Palette_RandomColorMap : Inherits TaskParent
     Public gradientColorMap As New cvb.Mat
     Public transitionCount As Integer = -1
     Dim gColor As New Gradient_Color
@@ -453,7 +453,7 @@ End Class
 
 
 
-Public Class Palette_LoadColorMap : Inherits VB_Parent
+Public Class Palette_LoadColorMap : Inherits TaskParent
     Public whitebackground As Boolean
     Public colorMap As New cvb.Mat
     Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
@@ -487,7 +487,7 @@ End Class
 
 
 
-Public Class Palette_CustomColorMap : Inherits VB_Parent
+Public Class Palette_CustomColorMap : Inherits TaskParent
     Public colorMap As cvb.Mat
     Public Sub New()
         labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
@@ -522,7 +522,7 @@ End Class
 
 
 
-Public Class Palette_GrayToColor : Inherits VB_Parent
+Public Class Palette_GrayToColor : Inherits TaskParent
     Public Sub New()
         desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like."
     End Sub
@@ -562,7 +562,7 @@ End Class
 
 
 
-Public Class Palette_Bin4Way : Inherits VB_Parent
+Public Class Palette_Bin4Way : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
     Dim tiers As New Depth_Tiers
     Public classCount As Integer

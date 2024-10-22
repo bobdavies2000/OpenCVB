@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Threading
 ' https://answers.opencvb.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
-Public Class Math_Subtract : Inherits VB_Parent
+Public Class Math_Subtract : Inherits TaskParent
     Dim options As New Options_Colors
     Public Sub New()
         desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero."
@@ -42,7 +42,7 @@ End Module
 
 
 
-Public Class Math_Median_CDF : Inherits VB_Parent
+Public Class Math_Median_CDF : Inherits TaskParent
     Public medianVal As Double
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class Math_DepthMeanStdev : Inherits VB_Parent
+Public Class Math_DepthMeanStdev : Inherits TaskParent
     Dim minMax As New Depth_NotMissing
     Public Sub New()
         desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
@@ -100,7 +100,7 @@ End Class
 
 
 
-Public Class Math_RGBCorrelation : Inherits VB_Parent
+Public Class Math_RGBCorrelation : Inherits TaskParent
     Dim flow As New Font_FlowText
     Dim match As New Match_Basics
     Public Sub New()
@@ -135,7 +135,7 @@ End Class
 
 
 
-Public Class Math_StdevBoundary : Inherits VB_Parent
+Public Class Math_StdevBoundary : Inherits TaskParent
     Dim stdev As New Math_Stdev
     Public Sub New()
         labels(2) = "Low stdev regions.  Gaps filled with OTSU results"
@@ -191,7 +191,7 @@ End Class
 
 
 
-Public Class Math_Template : Inherits VB_Parent
+Public Class Math_Template : Inherits TaskParent
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
@@ -226,7 +226,7 @@ End Class
 
 
 
-Public Class Math_ImageAverage : Inherits VB_Parent
+Public Class Math_ImageAverage : Inherits TaskParent
     Dim images As New List(Of cvb.Mat)
     Public Sub New()
         desc = "Create an image that is the mean of x number of previous images."
@@ -257,7 +257,7 @@ End Class
 
 
 
-Public Class Math_ImageMaskedAverage : Inherits VB_Parent
+Public Class Math_ImageMaskedAverage : Inherits TaskParent
     Dim images As New List(Of cvb.Mat)
     Public Sub New()
         desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images."
@@ -292,7 +292,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/7572640/how-do-i-know-if-two-vectors-are-near-parallel
-Public Class Math_ParallelTest : Inherits VB_Parent
+Public Class Math_ParallelTest : Inherits TaskParent
     Public v1 = New cvb.Point3f(1, 0, 0)
     Public v2 = New cvb.Point3f(5, 0, 0)
     Public showWork As Boolean = True
@@ -321,7 +321,7 @@ End Class
 
 
 
-Public Class Math_Stdev : Inherits VB_Parent
+Public Class Math_Stdev : Inherits TaskParent
     Public highStdevMask As cvb.Mat
     Public lowStdevMask As cvb.Mat
     Public saveFrame As cvb.Mat

@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Flood_Basics : Inherits VB_Parent
+Public Class Flood_Basics : Inherits TaskParent
     Dim redCPP As New RedCloud_CPP_VB
     Public genCells As New Cell_Generate
     Dim color As Color8U_Basics
@@ -41,7 +41,7 @@ End Class
 
 
 
-Public Class Flood_CellStatsPlot : Inherits VB_Parent
+Public Class Flood_CellStatsPlot : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim stats As New Cell_BasicsPlot
     Public Sub New()
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class Flood_ContainedCells : Inherits VB_Parent
+Public Class Flood_ContainedCells : Inherits TaskParent
     Dim flood As New Flood_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
@@ -118,7 +118,7 @@ End Class
 
 
 
-Public Class Flood_BasicsMask : Inherits VB_Parent
+Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cvb.Mat
     Public inputMask As cvb.Mat
     Public genCells As New Cell_Generate
@@ -160,7 +160,7 @@ End Class
 
 
 
-Public Class Flood_Tiers : Inherits VB_Parent
+Public Class Flood_Tiers : Inherits TaskParent
     Dim flood As New Flood_BasicsMask
     Dim tiers As New Depth_Tiers
     Dim color8U As New Color8U_Basics
@@ -200,7 +200,7 @@ End Class
 
 
 
-Public Class Flood_Motion : Inherits VB_Parent
+Public Class Flood_Motion : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim redCells As New List(Of rcData)
     Dim cellMap As New cvb.Mat
@@ -246,7 +246,7 @@ End Class
 
 
 
-Public Class Flood_Motion1 : Inherits VB_Parent
+Public Class Flood_Motion1 : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim motion As New Motion_Basics
     Dim redCells As New List(Of rcData)
@@ -292,7 +292,7 @@ End Class
 
 
 
-Public Class Flood_LeftRight : Inherits VB_Parent
+Public Class Flood_LeftRight : Inherits TaskParent
     Dim redLeft As New RedCloud_Basics
     Dim redRight As New RedCloud_Basics
     Public mapLeft As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -348,7 +348,7 @@ End Class
 
 
 
-Public Class Flood_MaxDistPoints : Inherits VB_Parent
+Public Class Flood_MaxDistPoints : Inherits TaskParent
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaxDist_CPP_VB
     Public genCells As New Cell_Generate

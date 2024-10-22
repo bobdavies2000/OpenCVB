@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
-Public Class Annealing_Basics_CPP_VB : Inherits VB_Parent
+Public Class Annealing_Basics_CPP_VB : Inherits TaskParent
     Public numberOfCities As Integer = 25
     Public cityPositions() As cvb.Point2f
     Public cityOrder() As Integer
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class Annealing_MT_CPP_VB : Inherits VB_Parent
+Public Class Annealing_MT_CPP_VB : Inherits TaskParent
     Dim random As New Random_Basics
     Dim anneal() As Annealing_Basics_CPP_VB
     Dim mats As New Mat_4to1

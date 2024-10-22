@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Dilate_Basics : Inherits VB_Parent
+Public Class Dilate_Basics : Inherits TaskParent
     Public options As New Options_Dilate
     Public Sub New()
         desc = "Dilate the image provided."
@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class Dilate_OpenClose : Inherits VB_Parent
+Public Class Dilate_OpenClose : Inherits TaskParent
     Dim options As New Options_Dilate
     Public Sub New()
         desc = "Erode and dilate with MorphologyEx on the BGR and Depth image."
@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class Dilate_Erode : Inherits VB_Parent
+Public Class Dilate_Erode : Inherits TaskParent
     Dim options As New Options_Dilate
     Public Sub New()
         desc = "Erode and dilate with MorphologyEx on the input image."

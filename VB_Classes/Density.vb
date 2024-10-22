@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Imports cvb = OpenCvSharp
-Public Class Density_Basics : Inherits VB_Parent
+Public Class Density_Basics : Inherits TaskParent
     Dim options = New Options_Density
     Public Sub New()
         cPtr = Density_2D_Open()
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class Density_Phase : Inherits VB_Parent
+Public Class Density_Phase : Inherits TaskParent
     Dim dense As New Density_Basics
     Dim gradient As New Gradient_Depth
     Public Sub New()
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Density_Count_CPP_VB : Inherits VB_Parent
+Public Class Density_Count_CPP_VB : Inherits TaskParent
     Dim options = New Options_Density
     Public Sub New()
         cPtr = Density_Count_Open()
@@ -81,7 +81,7 @@ End Class
 
 
 
-Public Class Density_Mask : Inherits VB_Parent
+Public Class Density_Mask : Inherits TaskParent
     Public pointList As New List(Of cvb.Point)
     Public Sub New()
         desc = "Measure a mask's size in any image and track the biggest regions."

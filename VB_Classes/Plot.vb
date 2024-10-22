@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
-Public Class Plot_Basics : Inherits VB_Parent
+Public Class Plot_Basics : Inherits TaskParent
     Dim plot As New Plot_Basics_CPP_VB
     Dim hist As New Hist_Graph
     Public plotCount As Integer = 3
@@ -32,7 +32,7 @@ End Class
 
 
 
-Public Class Plot_Depth : Inherits VB_Parent
+Public Class Plot_Depth : Inherits TaskParent
     Dim plotDepth As New Plot_Basics_CPP_VB
     Dim hist As New Hist_Basics
     Public Sub New()
@@ -71,7 +71,7 @@ End Class
 
 
 
-Public Class Plot_Histogram2D : Inherits VB_Parent
+Public Class Plot_Histogram2D : Inherits TaskParent
     Public colorFmt As New Color_Basics
     Public Sub New()
         labels = {"", "", "2D Histogram", ""}
@@ -99,7 +99,7 @@ End Class
 
 
 
-Public Class Plot_OverTimeSingle : Inherits VB_Parent
+Public Class Plot_OverTimeSingle : Inherits TaskParent
     Public plotData As Single
     Public backColor = cvb.Scalar.DarkGray
     Public max As Single, min As Single, avg, fmt As String
@@ -151,7 +151,7 @@ End Class
 
 
 
-Public Class Plot_OverTimeScalar : Inherits VB_Parent
+Public Class Plot_OverTimeScalar : Inherits TaskParent
     Public plotData As cvb.Scalar
     Public plotCount As Integer = 3
     Public plotList As New List(Of Plot_OverTimeSingle)
@@ -183,7 +183,7 @@ End Class
 
 
 
-Public Class Plot_OverTime : Inherits VB_Parent
+Public Class Plot_OverTime : Inherits TaskParent
     Public plotData As cvb.Scalar
     Public plotCount As Integer = 3
     Public plotColors() As cvb.Scalar = {cvb.Scalar.Blue, cvb.Scalar.LawnGreen, cvb.Scalar.Red, cvb.Scalar.White}
@@ -276,7 +276,7 @@ End Class
 
 
 
-Public Class Plot_OverTimeFixedScale : Inherits VB_Parent
+Public Class Plot_OverTimeFixedScale : Inherits TaskParent
     Public plotData As cvb.Scalar
     Public plotCount As Integer = 3
     Public plotColors() As cvb.Scalar = {cvb.Scalar.Blue, cvb.Scalar.Green, cvb.Scalar.Red, cvb.Scalar.White}
@@ -370,7 +370,7 @@ End Class
 
 
 
-Public Class Plot_Beats : Inherits VB_Parent
+Public Class Plot_Beats : Inherits TaskParent
     Dim plot As New Plot_OverTimeFixedScale
     Public Sub New()
         plot.plotCount = 4
@@ -401,7 +401,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-Public Class Plot_Basics_CPP_VB : Inherits VB_Parent
+Public Class Plot_Basics_CPP_VB : Inherits TaskParent
     Public srcX As New List(Of Double)
     Public srcY As New List(Of Double)
     Public Sub New()
@@ -437,7 +437,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-Public Class Plot_Dots : Inherits VB_Parent
+Public Class Plot_Dots : Inherits TaskParent
     Public srcX As New List(Of Double)
     Public srcY As New List(Of Double)
     Public plotColor = cvb.Scalar.Yellow
@@ -465,7 +465,7 @@ End Class
 
 
 
-Public Class Plot_Histogram : Inherits VB_Parent
+Public Class Plot_Histogram : Inherits TaskParent
     Public histogram As New cvb.Mat
     Public histArray() As Single
     Public minRange As Single = 0
@@ -528,7 +528,7 @@ End Class
 
 
 
-Public Class Plot_Points : Inherits VB_Parent
+Public Class Plot_Points : Inherits TaskParent
     Public input As New List(Of cvb.Point2d)
     Public output As New List(Of cvb.Point)
     Public minX As Double = 0, maxX As Double = dst2.Width

@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class PointCloud_Basics : Inherits VB_Parent
+Public Class PointCloud_Basics : Inherits TaskParent
     Public actualCount As Integer
 
     Public allPointsH As New List(Of cvb.Point3f)
@@ -119,7 +119,7 @@ End Class
 
 
 
-Public Class PointCloud_Point3f : Inherits VB_Parent
+Public Class PointCloud_Point3f : Inherits TaskParent
     Public Sub New()
         desc = "Display the point cloud CV_32FC3 format"
     End Sub
@@ -134,7 +134,7 @@ End Class
 
 
 
-Public Class PointCloud_Spin : Inherits VB_Parent
+Public Class PointCloud_Spin : Inherits TaskParent
     Dim options As New Options_IMU
     Dim gMat As New IMU_GMatrixWithOptions
     Dim xBump = 1, yBump = 1, zBump = 1
@@ -190,7 +190,7 @@ End Class
 
 
 
-Public Class PointCloud_Spin2 : Inherits VB_Parent
+Public Class PointCloud_Spin2 : Inherits TaskParent
     Dim spin As New PointCloud_Spin
     Dim redC As New RedCloud_Basics
     Dim redCSpin As New RedCloud_Basics
@@ -214,7 +214,7 @@ End Class
 
 
 
-Public Class PointCloud_Continuous_VB : Inherits VB_Parent
+Public Class PointCloud_Continuous_VB : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Threshold of continuity in mm", 0, 1000, 10)
@@ -256,7 +256,7 @@ End Class
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
-Public Class PointCloud_SetupSide : Inherits VB_Parent
+Public Class PointCloud_SetupSide : Inherits TaskParent
     Dim arcSize As Integer
     Public Sub New()
         arcSize = dst2.Width / 15
@@ -333,7 +333,7 @@ End Class
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
-Public Class PointCloud_SetupTop : Inherits VB_Parent
+Public Class PointCloud_SetupTop : Inherits TaskParent
     Dim arcSize As Integer
     Public Sub New()
         arcSize = dst2.Width / 15
@@ -399,7 +399,7 @@ End Class
 
 
 
-Public Class PointCloud_Raw_CPP_VB : Inherits VB_Parent
+Public Class PointCloud_Raw_CPP_VB : Inherits TaskParent
     Dim depthBytes() As Byte
     Public Sub New()
         labels(2) = "Top View"
@@ -431,7 +431,7 @@ End Class
 
 
 
-Public Class PointCloud_Raw : Inherits VB_Parent
+Public Class PointCloud_Raw : Inherits TaskParent
     Public Sub New()
         labels(2) = "Top View"
         labels(3) = "Side View"
@@ -474,7 +474,7 @@ End Class
 
 
 
-Public Class PointCloud_Solo : Inherits VB_Parent
+Public Class PointCloud_Solo : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public Sub New()
         FindCheckBox("Top View (Unchecked Side View)").Checked = True
@@ -494,7 +494,7 @@ End Class
 
 
 
-Public Class PointCloud_SoloRegions : Inherits VB_Parent
+Public Class PointCloud_SoloRegions : Inherits TaskParent
     Public solo As New PointCloud_Solo
     Dim dilate As New Dilate_Basics
     Public Sub New()
@@ -518,7 +518,7 @@ End Class
 
 
 
-Public Class PointCloud_SurfaceH_CPP_VB : Inherits VB_Parent
+Public Class PointCloud_SurfaceH_CPP_VB : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public plot As New Plot_Basics_CPP_VB
     Public topRow As Integer
@@ -561,7 +561,7 @@ End Class
 
 
 
-Public Class PointCloud_SurfaceH : Inherits VB_Parent
+Public Class PointCloud_SurfaceH : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public plot As New Plot_Histogram
     Public topRow As Integer
@@ -616,7 +616,7 @@ End Class
 
 
 
-Public Class PointCloud_NeighborV : Inherits VB_Parent
+Public Class PointCloud_NeighborV : Inherits TaskParent
     Dim options As New Options_Neighbors
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within Y mm's"
@@ -642,7 +642,7 @@ End Class
 
 
 
-Public Class PointCloud_Visualize : Inherits VB_Parent
+Public Class PointCloud_Visualize : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Pointcloud visualized", ""}
         desc = "Display the pointcloud as a BGR image."
@@ -659,7 +659,7 @@ End Class
 
 
 
-Public Class PointCloud_PCpointsMask : Inherits VB_Parent
+Public Class PointCloud_PCpointsMask : Inherits TaskParent
     Public pcPoints As cvb.Mat
     Public actualCount As Integer
     Public Sub New()
@@ -698,7 +698,7 @@ End Class
 
 
 
-Public Class PointCloud_PCPoints : Inherits VB_Parent
+Public Class PointCloud_PCPoints : Inherits TaskParent
     Public pcPoints As New List(Of cvb.Point3f)
     Public Sub New()
         setPointCloudGrid()
@@ -732,7 +732,7 @@ End Class
 
 
 
-Public Class PointCloud_PCPointsPlane : Inherits VB_Parent
+Public Class PointCloud_PCPointsPlane : Inherits TaskParent
     Dim pcBasics As New PointCloud_Basics
     Public pcPoints As New List(Of cvb.Point3f)
     Public xyList As New List(Of cvb.Point)
@@ -764,7 +764,7 @@ End Class
 
 
 
-Public Class PointCloud_Inspector : Inherits VB_Parent
+Public Class PointCloud_Inspector : Inherits TaskParent
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         task.mouseMovePoint.X = dst2.Width / 2
@@ -806,7 +806,7 @@ End Class
 
 
 
-Public Class PointCloud_Average : Inherits VB_Parent
+Public Class PointCloud_Average : Inherits TaskParent
     Dim pcHistory As New List(Of cvb.Mat)
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_32FC3, 0)
@@ -829,7 +829,7 @@ End Class
 
 
 
-Public Class PointCloud_FrustrumTop : Inherits VB_Parent
+Public Class PointCloud_FrustrumTop : Inherits TaskParent
     Dim frustrum As New Draw_Frustrum
     Dim heat As New HeatMap_Basics
     Dim setupTop As New PointCloud_SetupTop
@@ -856,7 +856,7 @@ End Class
 
 
 
-Public Class PointCloud_FrustrumSide : Inherits VB_Parent
+Public Class PointCloud_FrustrumSide : Inherits TaskParent
     Dim frustrum As New Draw_Frustrum
     Dim heat As New HeatMap_Basics
     Dim setupSide As New PointCloud_SetupSide
@@ -882,7 +882,7 @@ End Class
 
 
 
-Public Class PointCloud_Histograms : Inherits VB_Parent
+Public Class PointCloud_Histograms : Inherits TaskParent
     Dim plot2D As New Plot_Histogram2D
     Dim plot As New Plot_Histogram
     Dim hcloud As New Hist3Dcloud_Basics
@@ -954,7 +954,7 @@ End Class
 
 
 
-Public Class PointCloud_ReduceSplit2 : Inherits VB_Parent
+Public Class PointCloud_ReduceSplit2 : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         UpdateAdvice(traceName + ": redOptions 'X/Y-Range X100' sliders to test further.")
@@ -983,7 +983,7 @@ End Class
 
 
 
-Public Class PointCloud_ReducedTopView : Inherits VB_Parent
+Public Class PointCloud_ReducedTopView : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         UpdateAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.")
@@ -1004,7 +1004,7 @@ End Class
 
 
 
-Public Class PointCloud_ReducedSideView : Inherits VB_Parent
+Public Class PointCloud_ReducedSideView : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
@@ -1024,7 +1024,7 @@ End Class
 
 
 
-Public Class PointCloud_ReducedViews : Inherits VB_Parent
+Public Class PointCloud_ReducedViews : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         labels = {"", "", "Reduced side view", "Reduced top view"}
@@ -1052,7 +1052,7 @@ End Class
 
 
 
-Public Class PointCloud_XRangeTest : Inherits VB_Parent
+Public Class PointCloud_XRangeTest : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         UpdateAdvice(traceName + ": redOptions 'X-Range X100' slider has high impact.")
@@ -1076,7 +1076,7 @@ End Class
 
 
 
-Public Class PointCloud_YRangeTest : Inherits VB_Parent
+Public Class PointCloud_YRangeTest : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         UpdateAdvice(traceName + ": redOptions 'Y-Range X100' slider has high impact.")
@@ -1096,7 +1096,7 @@ End Class
 
 
 
-Public Class PointCloud_Split : Inherits VB_Parent
+Public Class PointCloud_Split : Inherits TaskParent
     Public Sub New()
         desc = "Attempting to debug pointcloud problem - display the 3 components"
     End Sub

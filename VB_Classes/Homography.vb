@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Homography_Basics : Inherits VB_Parent
+Public Class Homography_Basics : Inherits TaskParent
     Public corners1 As New List(Of cvb.Point2d)
     Public corners2 As New List(Of cvb.Point2d)
     Dim random As New Random_Point2d
@@ -33,7 +33,7 @@ End Class
 
 
 
-Public Class Homography_FPoly : Inherits VB_Parent
+Public Class Homography_FPoly : Inherits TaskParent
     Dim fPoly As New FPoly_BasicsOriginal
     Dim hGraph As New Homography_Basics
     Public Sub New()

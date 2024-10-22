@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Resize_Basics : Inherits VB_Parent
+Public Class Resize_Basics : Inherits TaskParent
     Public newSize As cvb.Size
     Public options As New Options_Resize
     Public Sub New()
@@ -25,7 +25,7 @@ End Class
 
 
 
-Public Class Resize_Smaller : Inherits VB_Parent
+Public Class Resize_Smaller : Inherits TaskParent
     Public options As New Options_Resize
     Public newSize As cvb.Size
     Dim optGrid As New Options_GridFromResize
@@ -49,7 +49,7 @@ End Class
 
 
 
-Public Class Resize_Proportional : Inherits VB_Parent
+Public Class Resize_Proportional : Inherits TaskParent
     Dim options As New Options_Spectrum
     Public Sub New()
         desc = "Resize the input but keep the results proportional to the original."

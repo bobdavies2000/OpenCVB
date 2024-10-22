@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
-Public Class Coherence_Basics : Inherits VB_Parent
+Public Class Coherence_Basics : Inherits TaskParent
     Dim options As New Options_Coherence
     Public Sub New()
         labels(2) = "Coherence - draw rectangle to apply"
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class Coherence_Depth : Inherits VB_Parent
+Public Class Coherence_Depth : Inherits TaskParent
     Dim coherent As New Coherence_Basics
     Public Sub New()
         desc = "Find coherent lines in the depth image"

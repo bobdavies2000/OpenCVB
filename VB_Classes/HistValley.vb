@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class HistValley_Basics : Inherits VB_Parent
+Public Class HistValley_Basics : Inherits TaskParent
     Dim hist As New Hist_Basics
     Dim options As New Options_Boundary
     Public valleys(3) As Integer ' grayscale values for low points in the histogram.
@@ -59,7 +59,7 @@ End Class
 
 
 
-Public Class HistValley_FromPeaks : Inherits VB_Parent
+Public Class HistValley_FromPeaks : Inherits TaskParent
     Public peak As New HistValley_Peaks
     Public peaks As New List(Of Integer)
     Public valleyIndex As New List(Of Integer)
@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class HistValley_Peaks : Inherits VB_Parent
+Public Class HistValley_Peaks : Inherits TaskParent
     Public hist As New Hist_Basics
     Public options As New Options_Boundary
     Public peaks As New List(Of Integer)
@@ -191,7 +191,7 @@ End Class
 
 
 
-Public Class HistValley_Depth : Inherits VB_Parent
+Public Class HistValley_Depth : Inherits TaskParent
     Public valley As New HistValley_FromPeaks
     Dim histogram As cvb.Mat
     Public Sub New()
@@ -229,7 +229,7 @@ End Class
 
 
 
-Public Class HistValley_Depth1 : Inherits VB_Parent
+Public Class HistValley_Depth1 : Inherits TaskParent
     Public valley As New HistValley_OptionsAuto
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public Sub New()
@@ -251,7 +251,7 @@ End Class
 
 
 
-Public Class HistValley_Test : Inherits VB_Parent
+Public Class HistValley_Test : Inherits TaskParent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
     Dim kalmanHist As New Hist_Kalman
@@ -316,7 +316,7 @@ End Class
 
 
 
-Public Class HistValley_OptionsAuto : Inherits VB_Parent
+Public Class HistValley_OptionsAuto : Inherits TaskParent
     Dim kalman As New Hist_Kalman
     Public histogram As New cvb.Mat
     Public auto As New OpAuto_Valley
@@ -365,7 +365,7 @@ End Class
 
 
 
-Public Class HistValley_Diff : Inherits VB_Parent
+Public Class HistValley_Diff : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim valley As New HistValley_FromPeaks
     Public Sub New()
@@ -388,7 +388,7 @@ End Class
 
 
 
-Public Class HistValley_EdgeDraw : Inherits VB_Parent
+Public Class HistValley_EdgeDraw : Inherits TaskParent
     Dim valley As New HistValley_FromPeaks
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
@@ -412,7 +412,7 @@ End Class
 
 
 
-Public Class HistValley_Simple : Inherits VB_Parent
+Public Class HistValley_Simple : Inherits TaskParent
     Dim trends As New SLR_Trends
     Public kalman As New Kalman_Basics
     Public depthRegions As New List(Of Integer)
@@ -463,7 +463,7 @@ End Class
 
 
 
-Public Class HistValley_Tiers : Inherits VB_Parent
+Public Class HistValley_Tiers : Inherits TaskParent
     Dim valleys As New HistValley_FromPeaks
     Public Sub New()
         labels = {"", "", "CV_8U tier map with values ranging from 0 to the desired valley count", "vbPalette output of dst2."}
@@ -492,7 +492,7 @@ End Class
 
 
 
-Public Class HistValley_Colors : Inherits VB_Parent
+Public Class HistValley_Colors : Inherits TaskParent
     Dim hist As New Hist_Kalman
     Dim auto As New OpAuto_Valley
     Dim splitIndex As Integer
@@ -529,7 +529,7 @@ End Class
 
 
 
-Public Class HistValley_GrayKalman : Inherits VB_Parent
+Public Class HistValley_GrayKalman : Inherits TaskParent
     Dim hist As New Hist_Kalman
     Dim auto As New OpAuto_Valley
     Dim kalman As New Kalman_Basics
@@ -570,7 +570,7 @@ End Class
 
 
 
-Public Class HistValley_GrayScale1 : Inherits VB_Parent
+Public Class HistValley_GrayScale1 : Inherits TaskParent
     Dim hist As New Hist_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(256)

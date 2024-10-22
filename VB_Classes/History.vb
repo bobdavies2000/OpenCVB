@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class History_Basics : Inherits VB_Parent
+Public Class History_Basics : Inherits TaskParent
     Public saveFrames As New List(Of cvb.Mat)
     Public Sub New()
         desc = "Create a frame history to sum the last X frames"
@@ -38,7 +38,7 @@ End Class
 
 
 
-Public Class History_MotionRect : Inherits VB_Parent
+Public Class History_MotionRect : Inherits TaskParent
     Public Sub New()
         desc = "Create an image that is the motionRect applied to the previous image."
     End Sub
@@ -58,7 +58,7 @@ End Class
 
 
 
-Public Class History_Cloud : Inherits VB_Parent
+Public Class History_Cloud : Inherits TaskParent
     Public frames As New History_BasicsNoSaturation
     Dim saveFrames As New List(Of cvb.Mat)
     Public Sub New()
@@ -90,7 +90,7 @@ End Class
 
 
 
-Public Class History_BasicsNoSaturation : Inherits VB_Parent
+Public Class History_BasicsNoSaturation : Inherits TaskParent
     Public saveFrames As New List(Of cvb.Mat)
     Public Sub New()
         desc = "Create a frame history and sum the last X frames (without saturation!)"
@@ -125,7 +125,7 @@ End Class
 
 
 
-Public Class History_BasicsDiff : Inherits VB_Parent
+Public Class History_BasicsDiff : Inherits TaskParent
     Dim frames As New History_BasicsNoSaturation
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -145,7 +145,7 @@ End Class
 
 
 
-Public Class History_Basics8U : Inherits VB_Parent
+Public Class History_Basics8U : Inherits TaskParent
     Public saveFrames As New List(Of cvb.Mat)
     Dim mats As New Mat_4to1
     Dim lastFrame As cvb.Mat
@@ -189,7 +189,7 @@ End Class
 
 
 
-Public Class History_ReliableDepth : Inherits VB_Parent
+Public Class History_ReliableDepth : Inherits TaskParent
     Public saveFrames As New List(Of cvb.Mat)
     Public Sub New()
         desc = "Create a frame history by Or'ing the last X frames of CV_8U data"

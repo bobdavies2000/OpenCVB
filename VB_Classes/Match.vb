@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
-Public Class Match_Basics : Inherits VB_Parent
+Public Class Match_Basics : Inherits TaskParent
     Public template As cvb.Mat
     Public mmData As mmData
     Public correlation As Single
@@ -58,7 +58,7 @@ End Class
 
 
 
-Public Class Match_BasicsTest : Inherits VB_Parent
+Public Class Match_BasicsTest : Inherits TaskParent
     Public match As New Match_Basics
     Public Sub New()
         labels = {"", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest point below"}
@@ -89,7 +89,7 @@ End Class
 
 
 
-Public Class Match_RandomTest : Inherits VB_Parent
+Public Class Match_RandomTest : Inherits TaskParent
     Dim flow As New Font_FlowText
     Public template As cvb.Mat
     Public correlationMat As New cvb.Mat
@@ -148,7 +148,7 @@ End Class
 
 
 
-Public Class Match_BestEntropy : Inherits VB_Parent
+Public Class Match_BestEntropy : Inherits TaskParent
     Dim entropy As New Entropy_Highest
     Dim match As New Match_DrawRect
     Public Sub New()
@@ -180,7 +180,7 @@ End Class
 
 
 
-Public Class Match_Motion : Inherits VB_Parent
+Public Class Match_Motion : Inherits TaskParent
     Dim options As New Options_Features
     Public mask As cvb.Mat
     Dim optionsMatch As New Options_Match
@@ -244,7 +244,7 @@ End Class
 
 
 
-Public Class Match_Lines : Inherits VB_Parent
+Public Class Match_Lines : Inherits TaskParent
     Dim knn As New KNN_Basics4D
     Dim lines As New Line_Basics
     Public Sub New()
@@ -286,7 +286,7 @@ End Class
 
 
 
-Public Class Match_PointSlope : Inherits VB_Parent
+Public Class Match_PointSlope : Inherits TaskParent
     Dim lines As New Line_PointSlope
     Dim updateLines As Boolean = True
     Public matches As New List(Of matchRect)
@@ -386,7 +386,7 @@ End Class
 
 
 
-Public Class Match_TraceRedC : Inherits VB_Parent
+Public Class Match_TraceRedC : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim frameList As New List(Of cvb.Mat)
     Public Sub New()
@@ -428,7 +428,7 @@ End Class
 
 
 
-Public Class Match_DrawRect : Inherits VB_Parent
+Public Class Match_DrawRect : Inherits TaskParent
     Dim match As New Match_Basics
     Public inputRect As cvb.Rect
     Public showOutput As Boolean
@@ -474,7 +474,7 @@ End Class
 
 
 
-Public Class Match_tCell : Inherits VB_Parent
+Public Class Match_tCell : Inherits TaskParent
     Public tCells As New List(Of tCell)
     Dim cellSlider As TrackBar
     Dim options As New Options_Features
@@ -535,7 +535,7 @@ End Class
 
 
 
-Public Class Match_LinePairTest : Inherits VB_Parent
+Public Class Match_LinePairTest : Inherits TaskParent
     Public ptx(2 - 1) As cvb.Point2f
     Public target(ptx.Count - 1) As cvb.Mat
     Public correlation(ptx.Count - 1)
@@ -604,7 +604,7 @@ End Class
 
 
 
-Public Class Match_GoodFeatureKNN : Inherits VB_Parent
+Public Class Match_GoodFeatureKNN : Inherits TaskParent
     Public knn As New KNN_NoDups
     Public feat As New Feature_Stable
     Dim frameList As New List(Of cvb.Mat)
@@ -652,7 +652,7 @@ End Class
 
 
 
-Public Class Match_Point : Inherits VB_Parent
+Public Class Match_Point : Inherits TaskParent
     Public pt As cvb.Point2f
     Public target As cvb.Mat
     Public correlation As Single
@@ -693,7 +693,7 @@ End Class
 
 
 
-Public Class Match_Points : Inherits VB_Parent
+Public Class Match_Points : Inherits TaskParent
     Public ptx As New List(Of cvb.Point2f)
     Public correlation As New List(Of Single)
     Public mPoint As New Match_Point

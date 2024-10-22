@@ -154,8 +154,8 @@
     <Compile Include="Stripes.vb" />
     <Compile Include="Swarm.vb" />
     <Compile Include="TextureFlow.vb" />
-    <Compile Include="VB_Common.vb" />
-    <Compile Include="VB_Externs.vb" />
+    <Compile Include="TaskCommon.vb" />
+    <Compile Include="TaskExterns.vb" />
     <Compile Include="Foreground.vb" />
     <Compile Include="FrameRate.vb" />
     <Compile Include="Hist3D.vb" />
@@ -412,8 +412,8 @@
     <Compile Include="SuperPixels.vb" />
     <Compile Include="Tracker.vb" />
     <Compile Include="TransformationMatrix.vb" />
-    <Compile Include="VB_Parent.vb" />
-    <Compile Include="VB_Task.vb" />
+    <Compile Include="TaskParent.vb" />
+    <Compile Include="Task.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
     </Compile>

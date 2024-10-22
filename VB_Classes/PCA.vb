@@ -18,7 +18,7 @@ Imports System.Runtime.InteropServices
 ' distribution of cities in ‘the United States.
 ' PCA is a powerful tool that can be used to find the main direction of a series of points.
 
-Public Class PCA_Basics : Inherits VB_Parent
+Public Class PCA_Basics : Inherits TaskParent
     Dim prep As New PCA_Prep_CPP_VB
     Public pca_analysis As New cvb.PCA
     Public runRedCloud As Boolean
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class PCA_CellMask : Inherits VB_Parent
+Public Class PCA_CellMask : Inherits TaskParent
     Dim pca As New PCA_Basics
     Dim pcaPrep As New PCA_Prep_CPP_VB
     Public Sub New()
@@ -129,7 +129,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
-Public Class PCA_Reconstruct : Inherits VB_Parent
+Public Class PCA_Reconstruct : Inherits TaskParent
     Dim images(7) As cvb.Mat
     Dim images32f(images.Length) As cvb.Mat
     Public Sub New()
@@ -163,7 +163,7 @@ End Class
 
 
 
-Public Class PCA_Depth : Inherits VB_Parent
+Public Class PCA_Depth : Inherits TaskParent
     Dim pca As New PCA_Reconstruct
     Public Sub New()
         desc = "Reconstruct a depth stream as a composite of X images."
@@ -178,7 +178,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.1.0/d1/dee/tutorial_introduction_to_pca.html
-Public Class PCA_DrawImage : Inherits VB_Parent
+Public Class PCA_DrawImage : Inherits TaskParent
     Dim pca As New PCA_Reconstruct
     Dim image As New cvb.Mat
     Public Sub New()
@@ -245,7 +245,7 @@ End Class
 
 
 
-Public Class PCA_Prep_CPP_VB : Inherits VB_Parent
+Public Class PCA_Prep_CPP_VB : Inherits TaskParent
     Public inputData As New cvb.Mat
     Public Sub New()
         cPtr = PCA_Prep_Open()
@@ -289,7 +289,7 @@ End Module
 
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
-Public Class PCA_Palettize : Inherits VB_Parent
+Public Class PCA_Palettize : Inherits TaskParent
     Public palette As Byte()
     Public rgb(dst1.Total * dst1.ElemSize - 1) As Byte
     Public buff(rgb.Length - 1) As Byte
@@ -327,7 +327,7 @@ End Class
 
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
-Public Class PCA_NColor : Inherits VB_Parent
+Public Class PCA_NColor : Inherits TaskParent
 #Region "PCA_Specifics"
 
     <StructLayout(LayoutKind.Sequential)>
@@ -869,7 +869,7 @@ End Class
 
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
-Public Class PCA_NColor_CPP_VB : Inherits VB_Parent
+Public Class PCA_NColor_CPP_VB : Inherits TaskParent
     Dim custom As New Palette_CustomColorMap
     Dim palettize As New PCA_Palettize
     Public rgb(dst1.Total * dst1.ElemSize - 1) As Byte
@@ -911,7 +911,7 @@ End Class
 
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
-Public Class PCA_NColorPalettize : Inherits VB_Parent
+Public Class PCA_NColorPalettize : Inherits TaskParent
     Dim custom As New Palette_CustomColorMap
     Dim palettize As New PCA_Palettize
     Dim answer(dst2.Width * dst2.Height - 1) As Byte

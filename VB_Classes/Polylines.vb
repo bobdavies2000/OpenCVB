@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Polylines_IEnumerableExample : Inherits VB_Parent
+Public Class Polylines_IEnumerableExample : Inherits TaskParent
     Dim options As New Options_PolyLines
     Public Sub New()
         desc = "Manually create an ienumerable(of ienumerable(of cvb.point))."
@@ -26,7 +26,7 @@ End Class
 
 ' VB.Net implementation of the browse example in Opencvb.
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
-Public Class Polylines_Random : Inherits VB_Parent
+Public Class Polylines_Random : Inherits TaskParent
     Dim zoom As New Pixel_Zoom
     Public Sub New()
         labels(2) = "To zoom move the mouse over the image"

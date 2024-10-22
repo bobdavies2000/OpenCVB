@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports  System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_Basics : Inherits VB_Parent
+Public Class Video_Basics : Inherits TaskParent
     Public captureVideo As New cvb.VideoCapture
     Public options As New Options_Video
     Public Sub New()
@@ -35,7 +35,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_CarCounting : Inherits VB_Parent
+Public Class Video_CarCounting : Inherits TaskParent
     Dim flow As New Font_FlowText
     Dim video As New Video_Basics
     Dim bgSub As New BGSubtract_MOG
@@ -83,7 +83,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_CarCComp : Inherits VB_Parent
+Public Class Video_CarCComp : Inherits TaskParent
     Dim cc As New CComp_Both
     Dim video As New Video_Basics
     Dim bgSub As New BGSubtract_MOG
@@ -108,7 +108,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_MinRect : Inherits VB_Parent
+Public Class Video_MinRect : Inherits TaskParent
     Public video As New Video_Basics
     Public bgSub As New BGSubtract_MOG
     Public contours As cvb.Point()()
@@ -139,7 +139,7 @@ End Class
 
 
 
-Public Class Video_MinCircle : Inherits VB_Parent
+Public Class Video_MinCircle : Inherits TaskParent
     Dim video As New Video_MinRect
     Public Sub New()
         desc = "Find area of car outline - example of using MinEnclosingCircle"

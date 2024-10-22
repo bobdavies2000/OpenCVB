@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class RedCloud_Basics : Inherits VB_Parent
+Public Class RedCloud_Basics : Inherits TaskParent
     Public genCells As New Cell_Generate
     Dim redCPP As New RedCloud_CPP_VB
     Public inputMask As New cvb.Mat
@@ -50,7 +50,7 @@ End Class
 
 
 
-Public Class RedCloud_Reduction : Inherits VB_Parent
+Public Class RedCloud_Reduction : Inherits TaskParent
     Public redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class RedCloud_Hulls : Inherits VB_Parent
+Public Class RedCloud_Hulls : Inherits TaskParent
     Dim convex As New Convex_RedCloudDefects
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -115,7 +115,7 @@ End Class
 
 
 
-Public Class RedCloud_FindCells : Inherits VB_Parent
+Public Class RedCloud_FindCells : Inherits TaskParent
     Public cellList As New List(Of Integer)
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -171,7 +171,7 @@ End Class
 
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
-Public Class RedCloud_Planes : Inherits VB_Parent
+Public Class RedCloud_Planes : Inherits TaskParent
     Public planes As New RedCloud_PlaneColor
     Public Sub New()
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
@@ -191,7 +191,7 @@ End Class
 
 
 
-Public Class RedCloud_Equations : Inherits VB_Parent
+Public Class RedCloud_Equations : Inherits TaskParent
     Dim eq As New Plane_Equation
     Public redCells As New List(Of rcData)
     Dim redC As New RedCloud_Basics
@@ -242,7 +242,7 @@ End Class
 
 
 
-Public Class RedCloud_CellsAtDepth : Inherits VB_Parent
+Public Class RedCloud_CellsAtDepth : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Dim kalman As New Kalman_Basics
     Dim redC As New RedCloud_Basics
@@ -297,7 +297,7 @@ End Class
 
 
 
-Public Class RedCloud_ShapeCorrelation : Inherits VB_Parent
+Public Class RedCloud_ShapeCorrelation : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "A shape correlation is between each x and y in list of contours points.  It allows classification based on angle and shape."
@@ -327,7 +327,7 @@ End Class
 
 
 
-Public Class RedCloud_FPS : Inherits VB_Parent
+Public Class RedCloud_FPS : Inherits TaskParent
     Dim fps As New Grid_FPS
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -357,7 +357,7 @@ End Class
 
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
-Public Class RedCloud_PlaneColor : Inherits VB_Parent
+Public Class RedCloud_PlaneColor : Inherits TaskParent
     Public options As New Options_Plane
     Public redC As New RedCloud_Basics
     Dim planeMask As New RedCloud_PlaneFromMask
@@ -402,7 +402,7 @@ End Class
 
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
-Public Class RedCloud_PlaneFromContour : Inherits VB_Parent
+Public Class RedCloud_PlaneFromContour : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
@@ -438,7 +438,7 @@ End Class
 
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
-Public Class RedCloud_PlaneFromMask : Inherits VB_Parent
+Public Class RedCloud_PlaneFromMask : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
@@ -474,7 +474,7 @@ End Class
 
 
 
-Public Class RedCloud_BProject3D : Inherits VB_Parent
+Public Class RedCloud_BProject3D : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
@@ -498,7 +498,7 @@ End Class
 
 
 
-Public Class RedCloud_YZ : Inherits VB_Parent
+Public Class RedCloud_YZ : Inherits TaskParent
     Dim stats As New Cell_Basics
     Public Sub New()
         stats.runRedCloud = True
@@ -519,7 +519,7 @@ End Class
 
 
 
-Public Class RedCloud_XZ : Inherits VB_Parent
+Public Class RedCloud_XZ : Inherits TaskParent
     Dim stats As New Cell_Basics
     Public Sub New()
         stats.runRedCloud = True
@@ -540,7 +540,7 @@ End Class
 
 
 
-Public Class RedCloud_World : Inherits VB_Parent
+Public Class RedCloud_World : Inherits TaskParent
     Dim redC As New RedCloud_Reduce
     Dim world As New Depth_World
     Public Sub New()
@@ -564,7 +564,7 @@ End Class
 
 
 
-Public Class RedCloud_KMeans : Inherits VB_Parent
+Public Class RedCloud_KMeans : Inherits TaskParent
     Dim km As New KMeans_MultiChannel
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -589,7 +589,7 @@ End Class
 
 
 
-Public Class RedCloud_Diff : Inherits VB_Parent
+Public Class RedCloud_Diff : Inherits TaskParent
     Dim diff As New Diff_RGBAccum
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -616,7 +616,7 @@ End Class
 
 
 
-Public Class RedCloud_ProjectCell : Inherits VB_Parent
+Public Class RedCloud_ProjectCell : Inherits TaskParent
     Dim topView As New Hist_ShapeTop
     Dim sideView As New Hist_ShapeSide
     Dim mats As New Mat_4Click
@@ -666,7 +666,7 @@ End Class
 
 
 
-Public Class RedCloud_LikelyFlatSurfaces : Inherits VB_Parent
+Public Class RedCloud_LikelyFlatSurfaces : Inherits TaskParent
     Dim verts As New Plane_Basics
     Dim redC As New RedCloud_Basics
     Public vCells As New List(Of rcData)
@@ -712,7 +712,7 @@ End Class
 
 
 
-Public Class RedCloud_PlaneEq3D : Inherits VB_Parent
+Public Class RedCloud_PlaneEq3D : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim eq As New Plane_Equation
     Public Sub New()
@@ -747,7 +747,7 @@ End Class
 
 
 
-Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Parent
+Public Class RedCloud_DelaunayGuidedFeatures : Inherits TaskParent
     Dim features As New Feature_Delaunay
     Dim redC As New RedCloud_Basics
     Dim goodList As New List(Of List(Of cvb.Point2f))
@@ -786,7 +786,7 @@ End Class
 
 
 
-Public Class RedCloud_UnstableCells : Inherits VB_Parent
+Public Class RedCloud_UnstableCells : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim prevList As New List(Of cvb.Point)
     Public Sub New()
@@ -824,7 +824,7 @@ End Class
 
 
 
-Public Class RedCloud_UnstableHulls : Inherits VB_Parent
+Public Class RedCloud_UnstableHulls : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim prevList As New List(Of cvb.Point)
     Public Sub New()
@@ -865,7 +865,7 @@ End Class
 
 
 
-Public Class RedCloud_CellChanges : Inherits VB_Parent
+Public Class RedCloud_CellChanges : Inherits TaskParent
     Dim redC As Object
     Dim dst2Last = dst2.Clone
     Public Sub New()
@@ -899,7 +899,7 @@ End Class
 
 
 
-Public Class RedCloud_FloodPoint : Inherits VB_Parent
+Public Class RedCloud_FloodPoint : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim stats As New Cell_Basics
     Public Sub New()
@@ -926,7 +926,7 @@ End Class
 
 
 
-Public Class RedCloud_CellStatsPlot : Inherits VB_Parent
+Public Class RedCloud_CellStatsPlot : Inherits TaskParent
     Dim cells As New Cell_BasicsPlot
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
@@ -950,7 +950,7 @@ End Class
 
 
 
-Public Class RedCloud_MostlyColor : Inherits VB_Parent
+Public Class RedCloud_MostlyColor : Inherits TaskParent
     Public redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Cells that have no depth data."
@@ -975,7 +975,7 @@ End Class
 
 
 
-Public Class RedCloud_OutlineColor : Inherits VB_Parent
+Public Class RedCloud_OutlineColor : Inherits TaskParent
     Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
     Dim color8U As New Color8U_Basics
@@ -1003,7 +1003,7 @@ End Class
 
 
 
-Public Class RedCloud_DepthOutline : Inherits VB_Parent
+Public Class RedCloud_DepthOutline : Inherits TaskParent
     Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -1032,7 +1032,7 @@ End Class
 
 
 
-Public Class RedCloud_MeterByMeter : Inherits VB_Parent
+Public Class RedCloud_MeterByMeter : Inherits TaskParent
     Dim meter As New BackProject_MeterByMeter
     Public Sub New()
         desc = "Run RedCloud meter by meter"
@@ -1057,7 +1057,7 @@ End Class
 
 
 
-Public Class RedCloud_FourColor : Inherits VB_Parent
+Public Class RedCloud_FourColor : Inherits TaskParent
     Dim binar4 As New Bin4Way_Regions
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -1085,7 +1085,7 @@ End Class
 
 
 ' https://docs.opencvb.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
-Public Class RedCloud_CCompColor : Inherits VB_Parent
+Public Class RedCloud_CCompColor : Inherits TaskParent
     Dim ccomp As New CComp_Both
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -1113,7 +1113,7 @@ End Class
 
 
 
-Public Class RedCloud_Cells : Inherits VB_Parent
+Public Class RedCloud_Cells : Inherits TaskParent
     Public redC As New RedCloud_Basics
     Public cellmap As New cvb.Mat
     Public redCells As New List(Of rcData)
@@ -1139,7 +1139,7 @@ End Class
 
 
 
-Public Class RedCloud_Flippers : Inherits VB_Parent
+Public Class RedCloud_Flippers : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
@@ -1178,7 +1178,7 @@ End Class
 
 
 
-Public Class RedCloud_Overlaps : Inherits VB_Parent
+Public Class RedCloud_Overlaps : Inherits TaskParent
     Public redCells As New List(Of rcData)
     Public cellMap As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
     Dim redC As New RedCloud_Basics
@@ -1216,7 +1216,7 @@ End Class
 
 
 
-Public Class RedCloud_OnlyColorHist3D : Inherits VB_Parent
+Public Class RedCloud_OnlyColorHist3D : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
@@ -1239,7 +1239,7 @@ End Class
 
 
 
-Public Class RedCloud_OnlyColorAlt : Inherits VB_Parent
+Public Class RedCloud_OnlyColorAlt : Inherits TaskParent
     Public redMasks As New RedCloud_Basics
     Public Sub New()
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
@@ -1290,7 +1290,7 @@ End Class
 
 
 
-Public Class RedCloud_Gaps : Inherits VB_Parent
+Public Class RedCloud_Gaps : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim frames As New History_Basics
     Public Sub New()
@@ -1324,7 +1324,7 @@ End Class
 
 
 
-Public Class RedCloud_SizeOrder : Inherits VB_Parent
+Public Class RedCloud_SizeOrder : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
@@ -1352,7 +1352,7 @@ End Class
 
 
 
-Public Class RedCloud_StructuredH : Inherits VB_Parent
+Public Class RedCloud_StructuredH : Inherits TaskParent
     Dim motion As New RedCloud_MotionBGsubtract
     Dim transform As New Structured_TransformH
     Dim histTop As New Projection_HistTop
@@ -1394,7 +1394,7 @@ End Class
 
 
 
-Public Class RedCloud_StructuredV : Inherits VB_Parent
+Public Class RedCloud_StructuredV : Inherits TaskParent
     Dim motion As New RedCloud_MotionBGsubtract
     Dim transform As New Structured_TransformV
     Dim histSide As New Projection_HistSide
@@ -1437,7 +1437,7 @@ End Class
 
 
 
-Public Class RedCloud_MotionBasics : Inherits VB_Parent
+Public Class RedCloud_MotionBasics : Inherits TaskParent
     Public redMasks As New RedCloud_Basics
     Public redCells As New List(Of rcData)
     Public rMotion As New RedCloud_MotionBGsubtract
@@ -1501,7 +1501,7 @@ End Class
 
 
 
-Public Class RedCloud_ContourVsFeatureLess : Inherits VB_Parent
+Public Class RedCloud_ContourVsFeatureLess : Inherits TaskParent
     Dim redMasks As New RedCloud_Basics
     Dim contour As New Contour_WholeImage
     Dim fLess As New FeatureLess_Basics
@@ -1533,7 +1533,7 @@ End Class
 
 
 
-Public Class RedCloud_UnmatchedCount : Inherits VB_Parent
+Public Class RedCloud_UnmatchedCount : Inherits TaskParent
     Public redCells As New List(Of rcData)
     Dim myFrameCount As Integer
     Dim changedCellCounts As New List(Of Integer)
@@ -1596,7 +1596,7 @@ End Class
 
 
 
-Public Class RedCloud_ContourUpdate : Inherits VB_Parent
+Public Class RedCloud_ContourUpdate : Inherits TaskParent
     Public redCells As New List(Of rcData)
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -1628,7 +1628,7 @@ End Class
 
 
 
-Public Class RedCloud_MaxDist : Inherits VB_Parent
+Public Class RedCloud_MaxDist : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim addTour As New RedCloud_ContourUpdate
     Public Sub New()
@@ -1661,7 +1661,7 @@ End Class
 
 
 
-Public Class RedCloud_Tiers : Inherits VB_Parent
+Public Class RedCloud_Tiers : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
@@ -1686,7 +1686,7 @@ End Class
 
 
 
-Public Class RedCloud_TiersBinarize : Inherits VB_Parent
+Public Class RedCloud_TiersBinarize : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
@@ -1713,7 +1713,7 @@ End Class
 
 
 
-Public Class RedCloud_Combine : Inherits VB_Parent
+Public Class RedCloud_Combine : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public guided As New GuidedBP_Depth
     Public redMasks As New RedCloud_Basics
@@ -1773,7 +1773,7 @@ End Class
 
 
 
-Public Class RedCloud_TopX : Inherits VB_Parent
+Public Class RedCloud_TopX : Inherits TaskParent
     Public redC As New RedCloud_Basics
     Public options As New Options_TopX
     Public Sub New()
@@ -1799,7 +1799,7 @@ End Class
 
 
 
-Public Class RedCloud_TopXNeighbors : Inherits VB_Parent
+Public Class RedCloud_TopXNeighbors : Inherits TaskParent
     Dim options As New Options_TopX
     Dim nab As New Neighbors_Precise
     Public Sub New()
@@ -1854,7 +1854,7 @@ End Class
 
 
 
-Public Class RedCloud_TopXHulls : Inherits VB_Parent
+Public Class RedCloud_TopXHulls : Inherits TaskParent
     Dim topX As New RedCloud_TopX
     Public Sub New()
         desc = "Build the hulls for the top X RedCloud cells"
@@ -1888,7 +1888,7 @@ End Class
 
 
 
-Public Class RedCloud_Hue : Inherits VB_Parent
+Public Class RedCloud_Hue : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim hue As New Color8U_Hue
     Public Sub New()
@@ -1911,7 +1911,7 @@ End Class
 
 
 
-Public Class RedCloud_GenCellContains : Inherits VB_Parent
+Public Class RedCloud_GenCellContains : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim contains As New Flood_ContainedCells
     Public Sub New()
@@ -1947,7 +1947,7 @@ End Class
 
 
 
-Public Class RedCloud_PlusTiers : Inherits VB_Parent
+Public Class RedCloud_PlusTiers : Inherits TaskParent
     Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
     Dim redC As New RedCloud_Basics
@@ -1970,7 +1970,7 @@ End Class
 
 
 
-Public Class RedCloud_Depth : Inherits VB_Parent
+Public Class RedCloud_Depth : Inherits TaskParent
     Dim flood As New Flood_Basics
     Public Sub New()
         task.redOptions.UseDepth.Checked = True
@@ -1991,7 +1991,7 @@ End Class
 
 
 
-Public Class RedCloud_Consistent1 : Inherits VB_Parent
+Public Class RedCloud_Consistent1 : Inherits TaskParent
     Dim redC As New Bin3Way_RedCloud
     Dim diff As New Diff_Basics
     Dim cellmaps As New List(Of cvb.Mat)
@@ -2059,7 +2059,7 @@ End Class
 
 
 
-Public Class RedCloud_Consistent2 : Inherits VB_Parent
+Public Class RedCloud_Consistent2 : Inherits TaskParent
     Dim redC As New Bin3Way_RedCloud
     Dim diff As New Diff_Basics
     Dim cellmaps As New List(Of cvb.Mat)
@@ -2127,7 +2127,7 @@ End Class
 
 
 
-Public Class RedCloud_Consistent : Inherits VB_Parent
+Public Class RedCloud_Consistent : Inherits TaskParent
     Dim redC As New Bin3Way_RedCloud
     Dim cellmaps As New List(Of cvb.Mat)
     Dim cellLists As New List(Of List(Of rcData))
@@ -2185,7 +2185,7 @@ End Class
 
 
 
-Public Class RedCloud_NaturalColor : Inherits VB_Parent
+Public Class RedCloud_NaturalColor : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Display the RedCloud results with the mean color of the cell"
@@ -2205,7 +2205,7 @@ End Class
 
 
 
-Public Class RedCloud_MotionBGsubtract : Inherits VB_Parent
+Public Class RedCloud_MotionBGsubtract : Inherits TaskParent
     Public bgSub As New BGSubtract_Basics
     Public redCells As New List(Of rcData)
     Dim redC As New RedCloud_Basics
@@ -2243,7 +2243,7 @@ End Class
 
 
 
-Public Class RedCloud_JoinCells : Inherits VB_Parent
+Public Class RedCloud_JoinCells : Inherits TaskParent
     Dim fLess As New FeatureLess_RedCloud
     Public Sub New()
         task.gOptions.setHistogramBins(20)
@@ -2270,7 +2270,7 @@ End Class
 
 
 
-Public Class RedCloud_LeftRight : Inherits VB_Parent
+Public Class RedCloud_LeftRight : Inherits TaskParent
     Dim redC As New Flood_LeftRight
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
@@ -2290,7 +2290,7 @@ End Class
 
 
 
-Public Class RedCloud_ColorAndDepth : Inherits VB_Parent
+Public Class RedCloud_ColorAndDepth : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim floodPC As New Flood_Basics
     Dim colorCells As New List(Of rcData)
@@ -2341,7 +2341,7 @@ End Class
 
 
 
-Public Class RedCloud_Delaunay : Inherits VB_Parent
+Public Class RedCloud_Delaunay : Inherits TaskParent
     Dim redCPP As New RedCloud_CPP_VB
     Dim delaunay As New Feature_Delaunay
     Dim color As Color8U_Basics
@@ -2371,7 +2371,7 @@ End Class
 
 
 
-Public Class RedCloud_CPP_VB : Inherits VB_Parent
+Public Class RedCloud_CPP_VB : Inherits TaskParent
     Public inputMask As cvb.Mat
     Public classCount As Integer
     Public rectList As New List(Of cvb.Rect)
@@ -2437,7 +2437,7 @@ End Class
 
 
 
-Public Class RedCloud_MaxDist_CPP_VB : Inherits VB_Parent
+Public Class RedCloud_MaxDist_CPP_VB : Inherits TaskParent
     Public classCount As Integer
     Public RectList As New List(Of cvb.Rect)
     Public floodPoints As New List(Of cvb.Point)
@@ -2502,7 +2502,7 @@ End Class
 
 
 
-Public Class RedCloud_NaturalGray : Inherits VB_Parent
+Public Class RedCloud_NaturalGray : Inherits TaskParent
     Dim redC As New RedCloud_Consistent
     Dim options As New Options_RedCloudOther
     Public Sub New()
@@ -2533,7 +2533,7 @@ End Class
 
 
 
-Public Class RedCloud_FeatureLessReduce : Inherits VB_Parent
+Public Class RedCloud_FeatureLessReduce : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim devGrid As New FeatureROI_Basics
     Public redCells As New List(Of rcData)
@@ -2585,7 +2585,7 @@ End Class
 
 
 
-Public Class RedCloud_Features : Inherits VB_Parent
+Public Class RedCloud_Features : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim options As New Options_RedCloudFeatures
     Public Sub New()
@@ -2646,7 +2646,7 @@ End Class
 
 
 
-Public Class RedCloud_Reduce : Inherits VB_Parent
+Public Class RedCloud_Reduce : Inherits TaskParent
     Public classCount As Integer
     Dim options As New Options_RedCloudOther
     Public Sub New()
@@ -2692,7 +2692,7 @@ End Class
 
 
 
-Public Class RedCloud_ReduceHist : Inherits VB_Parent
+Public Class RedCloud_ReduceHist : Inherits TaskParent
     Dim reduce As New RedCloud_Reduce
     Dim plot As New Plot_Histogram
     Public Sub New()
@@ -2716,7 +2716,7 @@ End Class
 
 
 
-Public Class RedCloud_ReduceTest : Inherits VB_Parent
+Public Class RedCloud_ReduceTest : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim redInput As New RedCloud_Reduce
     Public Sub New()
@@ -2736,7 +2736,7 @@ End Class
 
 
 
-Public Class RedCloud_MotionCompare : Inherits VB_Parent
+Public Class RedCloud_MotionCompare : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compare motion only vs full image RedCloud"
@@ -2758,7 +2758,7 @@ End Class
 
 
 
-Public Class RedCloud_CellFLess : Inherits VB_Parent
+Public Class RedCloud_CellFLess : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim edges As New LowRes_Edges
     Dim tiers As New Depth_Tiers
@@ -2789,7 +2789,7 @@ End Class
 
 
 
-Public Class RedCloud_CellFeatures : Inherits VB_Parent
+Public Class RedCloud_CellFeatures : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim edges As New LowRes_Edges
     Dim tiers As New Depth_Tiers

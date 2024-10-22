@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
-Public Class Face_Haar_LBP : Inherits VB_Parent
+Public Class Face_Haar_LBP : Inherits TaskParent
     Dim haarCascade As cvb.CascadeClassifier
     Dim lbpCascade As cvb.CascadeClassifier
     Public Sub New()
@@ -22,7 +22,7 @@ End Class
 
 
 
-Public Class Face_Haar_Alt : Inherits VB_Parent
+Public Class Face_Haar_Alt : Inherits TaskParent
     Dim haarCascade As cvb.CascadeClassifier
     Public Sub New()
         haarCascade = New cvb.CascadeClassifier(task.HomeDir + "Data/haarcascade_frontalface_alt.xml")

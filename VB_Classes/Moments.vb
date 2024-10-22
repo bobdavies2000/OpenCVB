@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Moments_Basics : Inherits VB_Parent
+Public Class Moments_Basics : Inherits TaskParent
     Public centroid As cvb.Point2f
     Dim fore As New Foreground_KMeans
     Public scaleFactor As Integer = 1
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class Moments_CentroidKalman : Inherits VB_Parent
+Public Class Moments_CentroidKalman : Inherits TaskParent
     Dim fore As New Foreground_KMeans
     Dim kalman As New Kalman_Basics
     Public Sub New()

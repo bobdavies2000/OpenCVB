@@ -2,7 +2,7 @@
 Imports System.Drawing
 Imports cvb = OpenCvSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
-Public Class Image_Basics : Inherits VB_Parent
+Public Class Image_Basics : Inherits TaskParent
     Public inputFileName As String
     Public options As New Options_Images
     Public Sub New()
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class Image_Series : Inherits VB_Parent
+Public Class Image_Series : Inherits TaskParent
     Public images As New Image_Basics
     Public Sub New()
         images.options.imageSeries = True
@@ -58,7 +58,7 @@ End Class
 
 
 
-Public Class Image_RedCloudColor : Inherits VB_Parent
+Public Class Image_RedCloudColor : Inherits TaskParent
     Public images As New Image_Series
     Public redC As New RedCloud_Cells
     Public Sub New()
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class Image_CellStats : Inherits VB_Parent
+Public Class Image_CellStats : Inherits TaskParent
     Dim images As New Image_RedCloudColor
     Dim stats As New Cell_Basics
     Public Sub New()
@@ -117,7 +117,7 @@ End Class
 
 
 
-Public Class Image_MSER : Inherits VB_Parent
+Public Class Image_MSER : Inherits TaskParent
     Public images As New Image_Series
     Dim core As New MSER_Detect
     Dim options As New Options_Images
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class Image_Icon : Inherits VB_Parent
+Public Class Image_Icon : Inherits TaskParent
     Dim inputImage As bitmap
     Public Sub New()
         inputImage = New Bitmap(task.HomeDir + "/Main_UI/Data/OpenCVB.bmp")

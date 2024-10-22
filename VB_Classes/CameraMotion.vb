@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class CameraMotion_Basics : Inherits VB_Parent
+Public Class CameraMotion_Basics : Inherits TaskParent
     Public translationX As Integer
     Public translationY As Integer
     Dim gravity As New Gravity_Horizon
@@ -83,7 +83,7 @@ End Class
 
 
 
-Public Class CameraMotion_WithRotation : Inherits VB_Parent
+Public Class CameraMotion_WithRotation : Inherits TaskParent
     Public translationX As Single
     Public rotationX As Single
     Public centerX As cvb.Point2f
@@ -178,7 +178,7 @@ End Class
 
 
 
-Public Class CameraMotion_SceneMotion : Inherits VB_Parent
+Public Class CameraMotion_SceneMotion : Inherits TaskParent
     Dim cMotion As New CameraMotion_Basics
     Dim motion As New Motion_BGSub
     Public Sub New()

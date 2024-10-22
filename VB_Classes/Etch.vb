@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Etch_ASketch : Inherits VB_Parent
+Public Class Etch_ASketch : Inherits TaskParent
     Dim keys As Keyboard_Basics
     Dim slateColor = New cvb.Scalar(122, 122, 122)
     Dim cursor As cvb.Point

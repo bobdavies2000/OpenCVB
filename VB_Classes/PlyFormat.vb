@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Imports cvb = OpenCvSharp
-Public Class PlyFormat_Basics : Inherits VB_Parent
+Public Class PlyFormat_Basics : Inherits TaskParent
     Public options As New Options_PlyFormat
     Dim saveFileName As String
     Public Sub New()
@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class PlyFormat_PlusRGB : Inherits VB_Parent
+Public Class PlyFormat_PlusRGB : Inherits TaskParent
     Public options As New Options_PlyFormat
     Dim saveFileName As String
     Public Sub New()

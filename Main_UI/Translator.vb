@@ -230,7 +230,7 @@ Public Class Translator
                 'Case "C# to VB.Net (back)"
                 '    If trimLine.StartsWith("Public Class ") Then
                 '        className = className.Replace("_CS", "")
-                '        inline = "Public Class " + className + " : Inherits VB_Parent"
+                '        inline = "Public Class " + className + " : Inherits TaskParent"
                 '    End If
 
                 '    inline = inline.Replace("Round(", "Math.Round(")
@@ -248,7 +248,7 @@ Public Class Translator
                         Dim split = trimLine.Split(" ")
                         originalName = split(1)
                         className = originalName.Replace("_CS", "_CPP")
-                        trimLine = "public ref class " + className + " : public VB_Parent"
+                        trimLine = "public ref class " + className + " : public TaskParent"
                     End If
 
                     If originalName <> "" Then trimLine = trimLine.Replace(originalName, className)

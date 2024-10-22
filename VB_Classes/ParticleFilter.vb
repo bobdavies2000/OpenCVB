@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports System.IO
-'Public Class ParticleFilter_Basics : Inherits VB_Parent
+'Public Class ParticleFilter_Basics : Inherits TaskParent
 '    Dim trace As New Swarm_Basics
 '    Dim plot1D As New Plot_Histogram2D
 '    Dim histogram As New cvb.Mat
@@ -54,7 +54,7 @@ Imports System.IO
 
 
 ' https://github.com/masaddev/OpenCVParticleFilter/tree/master/OpenCVParticleFilter
-Public Class ParticleFilter_Example : Inherits VB_Parent
+Public Class ParticleFilter_Example : Inherits TaskParent
     Dim imageFrame = 12
     Public Sub New()
         cPtr = ParticleFilterTest_Open(task.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
@@ -82,7 +82,7 @@ End Class
 
 
 
-'Public Class ParticleFilter_Net : Inherits VB_Parent
+'Public Class ParticleFilter_Net : Inherits TaskParent
 '    Dim trace As New Swarm_Basics
 '    Public Sub New()
 '        labels = {"", "", "Particle traffic", "Net movement of all the particles"}

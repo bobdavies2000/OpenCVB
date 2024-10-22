@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Diff_Basics : Inherits VB_Parent
+Public Class Diff_Basics : Inherits TaskParent
     Public changedPixels As Integer
     Public lastFrame As cvb.Mat
     Public Sub New()
@@ -8,7 +8,7 @@ Public Class Diff_Basics : Inherits VB_Parent
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.FirstPass Or lastFrame Is Nothing Then lastFrame = src.Clone
         If task.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
 
@@ -31,7 +31,7 @@ End Class
 
 
 
-Public Class Diff_Color : Inherits VB_Parent
+Public Class Diff_Color : Inherits TaskParent
     Public diff As New Diff_Basics
     Public Sub New()
         labels = {"", "", "Each channel displays the channel's difference", "Mask with all differences"}
@@ -40,7 +40,7 @@ Public Class Diff_Color : Inherits VB_Parent
     Public Sub RunAlg(src As cvb.Mat)
         diff.Run(src.Reshape(1, src.Rows * 3))
         dst2 = diff.dst2.Reshape(3, src.Rows)
-        dst3 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        dst3 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
 
@@ -48,7 +48,7 @@ End Class
 
 
 
-Public Class Diff_UnstableDepthAndColor : Inherits VB_Parent
+Public Class Diff_UnstableDepthAndColor : Inherits TaskParent
     Public diff As New Diff_Basics
     Public depth As New Depth_NotMissing
     Public Sub New()
@@ -62,7 +62,7 @@ Public Class Diff_UnstableDepthAndColor : Inherits VB_Parent
         Dim unstableDepth As New cvb.Mat
         Dim mask As New cvb.Mat
         unstableDepth = Not depth.dst3
-        If unstableGray.Channels() = 3 Then unstableGray = unstableGray.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If unstableGray.Channels() = 3 Then unstableGray = unstableGray.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         mask = unstableGray Or unstableDepth
         dst2 = src.Clone()
         dst2.SetTo(0, mask)
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class Diff_RGBAccum : Inherits VB_Parent
+Public Class Diff_RGBAccum : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim history As New List(Of cvb.Mat)
     Public Sub New()
@@ -103,7 +103,7 @@ End Class
 
 
 
-Public Class Diff_Lines : Inherits VB_Parent
+Public Class Diff_Lines : Inherits TaskParent
     Dim diff As New Diff_RGBAccum
     Dim lines As New Line_Basics
     Public Sub New()
@@ -127,7 +127,7 @@ End Class
 
 
 
-Public Class Diff_Heartbeat : Inherits VB_Parent
+Public Class Diff_Heartbeat : Inherits TaskParent
     Public cumulativePixels As Integer
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -135,7 +135,7 @@ Public Class Diff_Heartbeat : Inherits VB_Parent
         desc = "Diff an image with one from the last heartbeat."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then
             dst1 = src.Clone
             dst2.SetTo(0)
@@ -152,7 +152,7 @@ End Class
 
 
 
-Public Class Diff_Depth32f : Inherits VB_Parent
+Public Class Diff_Depth32f : Inherits TaskParent
     Public lastDepth32f As New cvb.Mat
     Dim options As New Options_DiffDepth
     Public Sub New()
@@ -184,7 +184,7 @@ End Class
 
 
 
-Public Class Diff_Identical : Inherits VB_Parent
+Public Class Diff_Identical : Inherits TaskParent
     Dim diffColor As New Diff_Color
     Dim noMotionFrames As Integer
     Dim flowText As New List(Of String)

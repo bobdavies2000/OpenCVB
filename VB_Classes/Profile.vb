@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Profile_Basics : Inherits VB_Parent
+Public Class Profile_Basics : Inherits TaskParent
     Public ptLeft As cvb.Point3f, ptRight As cvb.Point3f, ptTop As cvb.Point3f, ptBot As cvb.Point3f, ptFront As cvb.Point3f, ptBack As cvb.Point3f
     Public cornerNames As New List(Of String)({"   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
                                                "   Bottom (white)", "   Front (yellow)", "   Back (blue)"})
@@ -75,7 +75,7 @@ Public Class Profile_Basics : Inherits VB_Parent
         Next
 
         For i = 0 To corners.Count - 1
-            DrawCircle(dst3,corners(i), task.DotSize + 2, cornerColors(i))
+            DrawCircle(dst3, corners(i), task.DotSize + 2, cornerColors(i))
         Next
 
         If task.heartBeat Then
@@ -97,7 +97,7 @@ End Class
 
 
 
-Public Class Profile_Rotation : Inherits VB_Parent
+Public Class Profile_Rotation : Inherits TaskParent
     Public gMat As New IMU_GMatrix
     Public strMsg As String = "Then use the 'Options_IMU' sliders to rotate the cell" + vbCrLf +
                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders"
@@ -137,7 +137,7 @@ End Class
 
 
 
-Public Class Profile_Derivative : Inherits VB_Parent
+Public Class Profile_Derivative : Inherits TaskParent
     Public sides As New Profile_Basics
     Dim saveTrueText As New List(Of TrueText)
     Public Sub New()
@@ -172,12 +172,12 @@ Public Class Profile_Derivative : Inherits VB_Parent
                 Else
                     color = cvb.Scalar.White
                 End If
-                DrawCircle(dst3,pt, task.DotSize, color)
+                DrawCircle(dst3, pt, task.DotSize, color)
 
                 If sides.cornersRaw.Contains(rc.contour(i)) Then
                     Dim index = sides.cornersRaw.IndexOf(rc.contour(i))
-                    DrawCircle(dst1,pt, task.DotSize + 5, cvb.Scalar.White)
-                    DrawCircle(dst1,pt, task.DotSize + 3, sides.cornerColors(index))
+                    DrawCircle(dst1, pt, task.DotSize + 5, cvb.Scalar.White)
+                    DrawCircle(dst1, pt, task.DotSize + 3, sides.cornerColors(index))
                     SetTrueText(sides.cornerNames(index), pt, 3)
                 End If
             Next
@@ -190,7 +190,7 @@ Public Class Profile_Derivative : Inherits VB_Parent
         For i = 0 To sides.corners.Count - 1
             color = sides.cornerColors(i)
             SetTrueText(sides.cornerNames(i), sides.corners(i), 1)
-            DrawCircle(dst1,sides.corners(i), task.DotSize, color)
+            DrawCircle(dst1, sides.corners(i), task.DotSize, color)
         Next
         SetTrueText(strOut, 1)
         saveTrueText = New List(Of TrueText)(trueData)
@@ -205,7 +205,7 @@ End Class
 
 
 
-Public Class Profile_ConcentrationSide : Inherits VB_Parent
+Public Class Profile_ConcentrationSide : Inherits TaskParent
     Dim profile As New Profile_ConcentrationTop
     Public Sub New()
         FindCheckBox("Top View (Unchecked Side View)").Checked = False
@@ -228,7 +228,7 @@ End Class
 
 
 
-Public Class Profile_ConcentrationTop : Inherits VB_Parent
+Public Class Profile_ConcentrationTop : Inherits TaskParent
     Dim plot As New Plot_OverTimeSingle
     Dim rotate As New Profile_Rotation
     Public sides As New Profile_Basics
@@ -293,7 +293,7 @@ End Class
 
 
 
-Public Class Profile_OpenGL : Inherits VB_Parent
+Public Class Profile_OpenGL : Inherits TaskParent
     Dim sides As New Profile_Basics
     Public rotate As New Profile_Rotation
     Dim heat As New HeatMap_Basics
@@ -333,7 +333,7 @@ End Class
 
 
 
-Public Class Profile_Kalman : Inherits VB_Parent
+Public Class Profile_Kalman : Inherits TaskParent
     Dim sides As New Profile_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()

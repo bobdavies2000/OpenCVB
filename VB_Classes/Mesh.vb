@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Mesh_Basics : Inherits VB_Parent
+Public Class Mesh_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public ptList As New List(Of cvb.Point2f)
     Dim options As New Options_Mesh
@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class Mesh_Features : Inherits VB_Parent
+Public Class Mesh_Features : Inherits TaskParent
     Dim feat As New Feature_Stable
     Dim mesh As New Mesh_Basics
     Public Sub New()

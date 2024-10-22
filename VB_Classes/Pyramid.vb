@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/3.3.1/d6/d73/Pyramids_8cpp-example.html
-Public Class Pyramid_Basics : Inherits VB_Parent
+Public Class Pyramid_Basics : Inherits TaskParent
     Dim options As New Options_Pyramid
     Public Sub New()
         desc = "Use pyrup and pyrdown to zoom in and out of an image."
@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class Pyramid_Filter : Inherits VB_Parent
+Public Class Pyramid_Filter : Inherits TaskParent
     Dim laplace As New Laplacian_PyramidFilter
     Public Sub New()
         desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"

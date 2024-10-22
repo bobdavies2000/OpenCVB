@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class Stripes_Basics : Inherits VB_Parent
+Public Class Stripes_Basics : Inherits TaskParent
     Dim classCount As Integer
     Public Sub New()
         task.redOptions.ReductionSliders.Enabled = True
@@ -32,7 +32,7 @@ End Class
 
 
 
-Public Class Stripes_CloudX : Inherits VB_Parent
+Public Class Stripes_CloudX : Inherits TaskParent
     Dim stripes As New Stripes_Basics
     Public Sub New()
         desc = "Create stripes throughout the image with reduction"
@@ -49,7 +49,7 @@ End Class
 
 
 
-Public Class Stripes_CloudY : Inherits VB_Parent
+Public Class Stripes_CloudY : Inherits TaskParent
     Dim stripes As New Stripes_Basics
     Public Sub New()
         desc = "Create stripes throughout the image with reduction"
@@ -66,7 +66,7 @@ End Class
 
 
 
-Public Class Stripes_CloudZ : Inherits VB_Parent
+Public Class Stripes_CloudZ : Inherits TaskParent
     Dim stripes As New Stripes_Basics
     Public Sub New()
         desc = "Create stripes throughout the image with reduction"
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class Stripes_XYZ : Inherits VB_Parent
+Public Class Stripes_XYZ : Inherits TaskParent
     Dim stripeX As New Stripes_CloudX
     Dim stripeY As New Stripes_CloudY
     Dim stripeZ As New Stripes_CloudZ
@@ -106,7 +106,7 @@ End Class
 
 
 
-Public Class Stripes_Histogram : Inherits VB_Parent
+Public Class Stripes_Histogram : Inherits TaskParent
     Dim stripes As New Stripes_XYZ
     Public Sub New()
         desc = "Show a histogram for the output of stripes"

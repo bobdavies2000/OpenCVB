@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Flann
 Imports cvb = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_Basics : Inherits VB_Parent
+Public Class MSER_Basics : Inherits TaskParent
     Dim detect As New MSER_CPP_VB
     Public mserCells As New List(Of rcData)
     Public floodPoints As New List(Of cvb.Point)
@@ -66,7 +66,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_Detect : Inherits VB_Parent
+Public Class MSER_Detect : Inherits TaskParent
     Public boxes() As cvb.Rect
     Public regions()() As cvb.Point
     Public mser = cvb.MSER.Create
@@ -104,7 +104,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_SyntheticInput : Inherits VB_Parent
+Public Class MSER_SyntheticInput : Inherits TaskParent
     Private Sub addNestedRectangles(img As cvb.Mat, p0 As cvb.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
             img.Rectangle(New cvb.Rect(p0.X, p0.Y, width(i), width(i)), color(i), 1)
@@ -147,7 +147,7 @@ End Class
 
 
 
-Public Class MSER_LeftRight : Inherits VB_Parent
+Public Class MSER_LeftRight : Inherits TaskParent
     Dim left As New MSER_Left
     Dim right As New MSER_Right
     Public Sub New()
@@ -171,7 +171,7 @@ End Class
 
 
 
-Public Class MSER_Left : Inherits VB_Parent
+Public Class MSER_Left : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Public Sub New()
         labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics rectangles found"}
@@ -192,7 +192,7 @@ End Class
 
 
 
-Public Class MSER_Right : Inherits VB_Parent
+Public Class MSER_Right : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Public Sub New()
         labels = {"", "", "MSER_Basics output for right camera", "MSER_Basics rectangles found"}
@@ -213,7 +213,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
-Public Class MSER_Hulls : Inherits VB_Parent
+Public Class MSER_Hulls : Inherits TaskParent
     Dim options As New Options_MSER
     Dim mBase As New MSER_Basics
     Public Sub New()
@@ -245,7 +245,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_TestSynthetic : Inherits VB_Parent
+Public Class MSER_TestSynthetic : Inherits TaskParent
     Dim options As New Options_MSER
     Dim synth As New MSER_SyntheticInput
     Dim mBase As New MSER_Basics
@@ -272,7 +272,7 @@ End Class
 
 
 
-Public Class MSER_Grayscale : Inherits VB_Parent
+Public Class MSER_Grayscale : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -294,7 +294,7 @@ End Class
 
 
 
-Public Class MSER_ReducedRGB : Inherits VB_Parent
+Public Class MSER_ReducedRGB : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Dim reduction As New Reduction_BGR
     Public Sub New()
@@ -317,7 +317,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_rr.cpp
-Public Class MSER_ROI : Inherits VB_Parent
+Public Class MSER_ROI : Inherits TaskParent
     Public containers As New List(Of cvb.Rect)
     Dim options As New Options_MSER
     Dim core As New MSER_Detect
@@ -379,7 +379,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/MSER
-Public Class MSER_TestExample : Inherits VB_Parent
+Public Class MSER_TestExample : Inherits TaskParent
     Dim image As cvb.Mat
     Dim mser As cvb.MSER
     Dim options As New Options_MSER
@@ -429,7 +429,7 @@ End Class
 
 
 
-Public Class MSER_RedCloud : Inherits VB_Parent
+Public Class MSER_RedCloud : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -450,7 +450,7 @@ End Class
 
 
 
-Public Class MSER_Mask_CPP_VB : Inherits VB_Parent
+Public Class MSER_Mask_CPP_VB : Inherits TaskParent
     Dim options As New Options_MSER
     Dim redC As New RedCloud_Cells
     Public classCount As Integer
@@ -500,7 +500,7 @@ End Class
 
 
 
-Public Class MSER_Binarize : Inherits VB_Parent
+Public Class MSER_Binarize : Inherits TaskParent
     Dim mser As New MSER_Basics
     Dim bin4 As New Bin4Way_Regions
     Public Sub New()
@@ -520,7 +520,7 @@ End Class
 
 
 
-Public Class MSER_Basics1 : Inherits VB_Parent
+Public Class MSER_Basics1 : Inherits TaskParent
     Dim detect As New MSER_CPP_VB
     Dim flood As New RedCloud_Basics
     Public Sub New()
@@ -539,7 +539,7 @@ End Class
 
 
 
-Public Class MSER_BasicsNew : Inherits VB_Parent
+Public Class MSER_BasicsNew : Inherits TaskParent
     Dim detect As New MSER_CPP_VB
     Dim displaycount As Integer
     Public Sub New()
@@ -574,7 +574,7 @@ End Class
 
 
 
-Public Class MSER_Basics2 : Inherits VB_Parent
+Public Class MSER_Basics2 : Inherits TaskParent
     Dim detect As New MSER_CPP_VB
     Dim cellMap As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
     Public Sub New()
@@ -632,7 +632,7 @@ End Class
 
 
 
-Public Class MSER_CPP_VB : Inherits VB_Parent
+Public Class MSER_CPP_VB : Inherits TaskParent
     Dim options As New Options_MSER
     Public boxes As New List(Of cvb.Rect)
     Public floodPoints As New List(Of cvb.Point)

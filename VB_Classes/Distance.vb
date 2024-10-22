@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Distance_Basics : Inherits VB_Parent
+Public Class Distance_Basics : Inherits TaskParent
     Dim options As New Options_Distance
     Public Sub New()
         labels = {"", "", "Distance transform - create a mask with threshold", ""}
@@ -23,7 +23,7 @@ End Class
 
 
 
-Public Class Distance_Labels : Inherits VB_Parent
+Public Class Distance_Labels : Inherits TaskParent
     Dim options As New Options_Distance
     Public Sub New()
         labels(2) = "Distance results"
@@ -49,7 +49,7 @@ End Class
 
 
 
-Public Class Distance_Foreground : Inherits VB_Parent
+Public Class Distance_Foreground : Inherits TaskParent
     Dim dist As New Distance_Basics
     Dim foreground As New Foreground_KMeans
     Public useBackgroundAsInput As Boolean
@@ -84,7 +84,7 @@ End Class
 
 
 
-Public Class Distance_Background : Inherits VB_Parent
+Public Class Distance_Background : Inherits TaskParent
     Dim dist As New Distance_Foreground
     Public Sub New()
         dist.useBackgroundAsInput = True
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class Distance_Point3D : Inherits VB_Parent
+Public Class Distance_Point3D : Inherits TaskParent
     Public inPoint1 As cvb.Point3f
     Public inPoint2 As cvb.Point3f
     Public distance As Single
@@ -142,7 +142,7 @@ End Class
 
 
 
-Public Class Distance_Point4D : Inherits VB_Parent
+Public Class Distance_Point4D : Inherits TaskParent
     Public inPoint1 As cvb.Vec4f
     Public inPoint2 As cvb.Vec4f
     Public distance As Single
@@ -175,7 +175,7 @@ End Class
 
 
 
-Public Class Distance_RedCloud : Inherits VB_Parent
+Public Class Distance_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
@@ -269,7 +269,7 @@ End Class
 
 
 
-Public Class Distance_BinaryImage : Inherits VB_Parent
+Public Class Distance_BinaryImage : Inherits TaskParent
     Dim binary As New Binarize_Simple
     Dim distance As New Distance_Basics
     Public Sub New()

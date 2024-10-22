@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Spectrum_Basics : Inherits VB_Parent
+Public Class Spectrum_Basics : Inherits TaskParent
     Dim dSpec As New Spectrum_Z
     Dim gSpec As New Spectrum_Gray
     Public options As New Options_Spectrum
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class Spectrum_X : Inherits VB_Parent
+Public Class Spectrum_X : Inherits TaskParent
     Public options As New Options_Spectrum
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Spectrum_Y : Inherits VB_Parent
+Public Class Spectrum_Y : Inherits TaskParent
     Public options As New Options_Spectrum
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class Spectrum_Z : Inherits VB_Parent
+Public Class Spectrum_Z : Inherits TaskParent
     Public options As New Options_Spectrum
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
@@ -100,7 +100,7 @@ End Class
 
 
 
-Public Class Spectrum_Cloud : Inherits VB_Parent
+Public Class Spectrum_Cloud : Inherits TaskParent
     Public options As New Options_Spectrum
     Dim specX As New Spectrum_X
     Dim specY As New Spectrum_Y
@@ -132,7 +132,7 @@ End Class
 
 
 
-Public Class Spectrum_GrayAndCloud : Inherits VB_Parent
+Public Class Spectrum_GrayAndCloud : Inherits TaskParent
     Dim options As New Options_Spectrum
     Dim gSpec As New Spectrum_Gray
     Dim sCloud As New Spectrum_Cloud
@@ -160,7 +160,7 @@ End Class
 
 
 
-Public Class Spectrum_RGB : Inherits VB_Parent
+Public Class Spectrum_RGB : Inherits TaskParent
     Dim options As New Options_Spectrum
     Dim gSpec As New Spectrum_Gray
     Public Sub New()
@@ -194,7 +194,7 @@ End Class
 
 
 
-Public Class Spectrum_CellZoom : Inherits VB_Parent
+Public Class Spectrum_CellZoom : Inherits TaskParent
     Dim proportion As New Resize_Proportional
     Dim breakdown As New Spectrum_Breakdown
     Public Sub New()
@@ -227,7 +227,7 @@ End Class
 
 
 
-Public Class Spectrum_Breakdown : Inherits VB_Parent
+Public Class Spectrum_Breakdown : Inherits TaskParent
     Public options As New Options_Spectrum
     Public buildMaskOnly As Boolean
     Dim proportion As New Resize_Proportional
@@ -296,7 +296,7 @@ End Class
 
 
 
-Public Class Spectrum_RedCloud : Inherits VB_Parent
+Public Class Spectrum_RedCloud : Inherits TaskParent
     Dim breakdown As New Spectrum_Breakdown
     Public redCells As New List(Of rcData)
     Public Sub New()
@@ -326,7 +326,7 @@ End Class
 
 
 
-Public Class Spectrum_Mask : Inherits VB_Parent
+Public Class Spectrum_Mask : Inherits TaskParent
     Dim gSpec As New Spectrum_Gray
     Public Sub New()
         If standaloneTest() Then strOut = "Select a cell to see its depth spectrum"
@@ -347,7 +347,7 @@ End Class
 
 
 
-Public Class Spectrum_Gray : Inherits VB_Parent
+Public Class Spectrum_Gray : Inherits TaskParent
     Dim options As New Options_Spectrum
     Public typeSpec As String = "GrayScale"
     Public Sub New()

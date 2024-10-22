@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class DCT_Basics : Inherits VB_Parent
+Public Class DCT_Basics : Inherits TaskParent
     Public options As New Options_DCT
     Public Sub New()
         labels(3) = "Difference from original"
@@ -32,7 +32,7 @@ End Class
 
 
 
-Public Class DCT_RGB : Inherits VB_Parent
+Public Class DCT_RGB : Inherits TaskParent
     Public dct As New DCT_Basics
     Public Sub New()
         labels(3) = "Difference from original"
@@ -67,7 +67,7 @@ End Class
 
 
 
-Public Class DCT_Depth : Inherits VB_Parent
+Public Class DCT_Depth : Inherits TaskParent
     Dim dct As New DCT_Basics
     Public Sub New()
         labels(3) = "Subtract DCT inverse from Grayscale depth"
@@ -95,7 +95,7 @@ End Class
 
 
 
-Public Class DCT_FeatureLess : Inherits VB_Parent
+Public Class DCT_FeatureLess : Inherits TaskParent
     Public dct As New DCT_Basics
     Public Sub New()
         desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
@@ -137,7 +137,7 @@ End Class
 
 
 
-Public Class DCT_Surfaces_debug : Inherits VB_Parent
+Public Class DCT_Surfaces_debug : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim dct As New DCT_FeatureLess
     Dim flow As New Font_FlowText

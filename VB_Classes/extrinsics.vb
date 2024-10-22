@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Extrinsics_Basics : Inherits VB_Parent
+Public Class Extrinsics_Basics : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.DotSizeSlider.Value = 5
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class Extrinsics_Display : Inherits VB_Parent
+Public Class Extrinsics_Display : Inherits TaskParent
     Dim options As New Options_Extrinsics
     Dim optTrans As New Options_Translation
     Dim addw As New AddWeighted_Basics

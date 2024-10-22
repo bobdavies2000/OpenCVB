@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class LongLine_Basics : Inherits VB_Parent
+Public Class LongLine_Basics : Inherits TaskParent
     Public lines As New LongLine_Core
     Public lpList As New List(Of PointPair)
     Dim options As New Options_LongLine
@@ -53,7 +53,7 @@ End Class
 
 
 
-Public Class LongLine_Core : Inherits VB_Parent
+Public Class LongLine_Core : Inherits TaskParent
     Public lines As New Line_Basics
     Public lineCount As Integer = 1 ' How many of the longest lines...
     Public lpList As New List(Of PointPair) ' this will be sorted by length - longest first
@@ -79,7 +79,7 @@ End Class
 
 
 
-Public Class LongLine_Depth : Inherits VB_Parent
+Public Class LongLine_Depth : Inherits TaskParent
     Dim longLine As New LongLine_Consistent
     Dim plot As New Plot_OverTimeScalar
     Dim kalman As New Kalman_Basics
@@ -134,7 +134,7 @@ End Class
 
 
 
-Public Class LongLine_Consistent : Inherits VB_Parent
+Public Class LongLine_Consistent : Inherits TaskParent
     Dim longest As New LongLine_Core
     Public ptLong As PointPair
     Public Sub New()
@@ -171,7 +171,7 @@ End Class
 
 
 
-Public Class LongLine_Point : Inherits VB_Parent
+Public Class LongLine_Point : Inherits TaskParent
     Dim longLine As New LongLine_Consistent
     Dim kalman As New Kalman_Basics
     Public longPt As cvb.Point
@@ -197,7 +197,7 @@ End Class
 
 
 
-Public Class LongLine_Match : Inherits VB_Parent
+Public Class LongLine_Match : Inherits TaskParent
     Dim longest As New LongLine_Consistent
     Dim options As New Options_LongLine
     Public Sub New()
@@ -239,7 +239,7 @@ End Class
 
 
 
-Public Class LongLine_ExtendTest : Inherits VB_Parent
+Public Class LongLine_ExtendTest : Inherits TaskParent
     Dim longLine As New LongLine_Basics
     Public Sub New()
         labels = {"", "", "Random Line drawn", ""}
@@ -268,7 +268,7 @@ End Class
 
 
 
-Public Class LongLine_ExtendAll : Inherits VB_Parent
+Public Class LongLine_ExtendAll : Inherits TaskParent
     Public lines As New Line_Basics
     Public lpList As New List(Of PointPair)
     Public Sub New()
@@ -293,7 +293,7 @@ End Class
 
 
 
-Public Class LongLine_ExtendParallel : Inherits VB_Parent
+Public Class LongLine_ExtendParallel : Inherits TaskParent
     Dim extendAll As New LongLine_ExtendAll
     Dim knn As New KNN_Basics
     Dim near As New Line_Nearest
@@ -372,7 +372,7 @@ End Class
 
 
 
-Public Class LongLine_Extend : Inherits VB_Parent
+Public Class LongLine_Extend : Inherits TaskParent
     Dim lines As New LongLine_Basics
     Dim saveP1 As cvb.Point, saveP2 As cvb.Point, p1 As cvb.Point, p2 As cvb.Point
     Public Sub New()
@@ -406,7 +406,7 @@ End Class
 
 
 
-Public Class LongLine_NoDepth : Inherits VB_Parent
+Public Class LongLine_NoDepth : Inherits TaskParent
     Dim lineHist As New LineCoin_Basics
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -428,7 +428,7 @@ End Class
 
 
 
-Public Class LongLine_History : Inherits VB_Parent
+Public Class LongLine_History : Inherits TaskParent
     Dim lines As New LongLine_Basics
     Public lpList As New List(Of PointPair)
     Dim mpList As New List(Of List(Of PointPair))

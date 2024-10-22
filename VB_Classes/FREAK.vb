@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports OpenCvSharp.XFeatures2D
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Public Class FREAK_Basics : Inherits VB_Parent
+Public Class FREAK_Basics : Inherits TaskParent
     Dim orb As New ORB_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()

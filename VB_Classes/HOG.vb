@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HOGSample.vb
-Public Class HOG_Basics : Inherits VB_Parent
+Public Class HOG_Basics : Inherits TaskParent
     Dim Image As cvb.Mat
     Dim ImageProcessed As Boolean
     Dim options As New Options_HOG

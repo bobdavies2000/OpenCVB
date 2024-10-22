@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Correlation_Basics : Inherits VB_Parent
+Public Class Correlation_Basics : Inherits TaskParent
     Dim kFlood As New KMeans_Edges
     Dim options As New Options_FeatureMatch
     Public Sub New()

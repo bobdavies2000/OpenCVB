@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports System.Threading
-Public Class Texture_Basics : Inherits VB_Parent
+Public Class Texture_Basics : Inherits TaskParent
     Dim ellipse As New Draw_Ellipses
     Public texture As New cvb.Mat
     Public tRect As cvb.Rect
@@ -46,7 +46,7 @@ End Class
 
 
 
-Public Class OpenGL_TextureShuffle : Inherits VB_Parent
+Public Class OpenGL_TextureShuffle : Inherits TaskParent
     Dim shuffle As New Random_Shuffle
     Dim floor As New OpenGL_FlatStudy2
     Dim texture As Texture_Basics

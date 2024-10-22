@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.IO
 ' https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
-Public Class SuperRes_Basics : Inherits VB_Parent
+Public Class SuperRes_Basics : Inherits TaskParent
     Dim video As New SuperRes_Input
     Dim options As New Options_SuperRes
     Dim optFlow As cvb.DenseOpticalFlowExt
@@ -63,7 +63,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
-Public Class SuperRes_Input : Inherits VB_Parent
+Public Class SuperRes_Input : Inherits TaskParent
     Public video As New Video_Basics
     Public inputFileName As String
     Public Sub New()
@@ -86,7 +86,7 @@ End Class
 
 
 
-Public Class SuperRes_SubPixelZoom : Inherits VB_Parent
+Public Class SuperRes_SubPixelZoom : Inherits TaskParent
     Dim zoom As New Pixel_SubPixel
     Dim video As New SuperRes_Input
     Public Sub New()

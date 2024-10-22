@@ -1,5 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
-Public Class Quadrant_Basics : Inherits VB_Parent
+Public Class Quadrant_Basics : Inherits TaskParent
     Dim p1 As New cvb.Point, p2 As New cvb.Point(dst2.Width - 1, 0), p3 As New cvb.Point(0, dst2.Height - 1)
     Dim p4 As New cvb.Point(dst2.Width - 1, dst2.Height - 1), rect As New cvb.Rect, mask As New cvb.Mat
     Public Sub New()

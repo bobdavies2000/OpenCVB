@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 ' this module is somewhat redundant but it consolidates the algorithms that locate extrema in RedCloud cell contour.
-Public Class Sides_Basics : Inherits VB_Parent
+Public Class Sides_Basics : Inherits TaskParent
     Public sides As New Profile_Basics
     Public corners As New Contour_RedCloudCorners
     Public Sub New()
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class Sides_Profile : Inherits VB_Parent
+Public Class Sides_Profile : Inherits TaskParent
     Dim sides As New Contour_SidePoints
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -54,7 +54,7 @@ End Class
 
 
 
-Public Class Sides_Corner : Inherits VB_Parent
+Public Class Sides_Corner : Inherits TaskParent
     Dim sides As New Contour_RedCloudCorners
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class Sides_ColorC : Inherits VB_Parent
+Public Class Sides_ColorC : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim sides As New Sides_Basics
     Public Sub New()

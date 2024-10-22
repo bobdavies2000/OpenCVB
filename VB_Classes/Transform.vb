@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Transform_Resize : Inherits VB_Parent
+Public Class Transform_Resize : Inherits TaskParent
     Dim options As New Options_Transform
     Public Sub New()
         desc = "Resize an image based on the slider value."
@@ -26,7 +26,7 @@ End Class
 
 
 
-Public Class Transform_Affine3D : Inherits VB_Parent
+Public Class Transform_Affine3D : Inherits TaskParent
     Dim pc1 As cvb.Mat
     Dim pc2 As cvb.Mat
     Dim affineTransform As cvb.Mat
@@ -90,7 +90,7 @@ End Class
 
 
 
-Public Class Transform_Rotate : Inherits VB_Parent
+Public Class Transform_Rotate : Inherits TaskParent
     Public imageCenter As cvb.Point2f
     Dim options As New Options_Transform
     Public Sub New()

@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class Gradient_Basics : Inherits VB_Parent
+Public Class Gradient_Basics : Inherits TaskParent
     Public sobel As New Edge_Sobel
     Public Sub New()
         dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
@@ -16,7 +16,7 @@ End Class
 
 
 
-Public Class Gradient_Depth : Inherits VB_Parent
+Public Class Gradient_Depth : Inherits TaskParent
     Dim sobel As New Edge_Sobel
     Public Sub New()
         labels(3) = "Phase Output"
@@ -36,7 +36,7 @@ End Class
 
 
 ' https://github.com/anopara/genetic-drawing
-Public Class Gradient_CartToPolar : Inherits VB_Parent
+Public Class Gradient_CartToPolar : Inherits TaskParent
     Public basics As New Gradient_Basics
     Public magnitude As New cvb.Mat
     Public angle As New cvb.Mat
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class Gradient_Color : Inherits VB_Parent
+Public Class Gradient_Color : Inherits TaskParent
     Public color1 = cvb.Scalar.Blue
     Public color2 = cvb.Scalar.Yellow
     Public gradientWidth As Integer

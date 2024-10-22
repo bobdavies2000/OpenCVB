@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 ' https://docs.opencvb.org/2.4/modules/imgproc/doc/histograms.html
-Public Class Hist2D_Basics : Inherits VB_Parent
+Public Class Hist2D_Basics : Inherits TaskParent
     Public histRowsCols() As Integer
     Public ranges() As cvb.Rangef
     Public histogram As New cvb.Mat
@@ -23,7 +23,7 @@ End Class
 
 
 
-Public Class Hist2D_Cloud : Inherits VB_Parent
+Public Class Hist2D_Cloud : Inherits TaskParent
     Dim plot1D As New Plot_Histogram2D
     Dim channels() As Integer
     Public ranges() As cvb.Rangef
@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class Hist2D_Depth : Inherits VB_Parent
+Public Class Hist2D_Depth : Inherits TaskParent
     Dim hist2d As New Hist2D_Cloud
     Public channels() As Integer
     Public ranges() As cvb.Rangef
@@ -86,7 +86,7 @@ End Class
 
 
 
-Public Class Hist2D_Zoom : Inherits VB_Parent
+Public Class Hist2D_Zoom : Inherits TaskParent
     Dim hist2d As New Hist2D_Basics
     Dim zoom As New Magnify_Basics
     Public Sub New()
@@ -111,7 +111,7 @@ End Class
 
 
 ' https://docs.opencvb.org/2.4/modules/imgproc/doc/histograms.html
-Public Class Hist2D_HSV : Inherits VB_Parent
+Public Class Hist2D_HSV : Inherits TaskParent
     Public histogram01 As New cvb.Mat
     Public histogram02 As New cvb.Mat
     Public Sub New()
@@ -138,7 +138,7 @@ End Class
 
 
 
-Public Class Hist2D_BGR : Inherits VB_Parent
+Public Class Hist2D_BGR : Inherits TaskParent
     Public histogram01 As New cvb.Mat
     Public histogram02 As New cvb.Mat
     Public Sub New()
@@ -163,7 +163,7 @@ End Class
 
 
 
-Public Class Hist2D_PlotHistogram1D : Inherits VB_Parent
+Public Class Hist2D_PlotHistogram1D : Inherits TaskParent
     Dim histogram As New cvb.Mat
     Dim plot As New Plot_Histogram
     Public histArray() As Single

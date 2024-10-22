@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://learnopencvb.com/object-tracking-using-opencv-cpp-python/
-Public Class Tracker_Basics : Inherits VB_Parent
+Public Class Tracker_Basics : Inherits TaskParent
     Public tRect As cvb.Rect
     Dim saveRect As New cvb.Rect
     Dim options As New Options_Tracker

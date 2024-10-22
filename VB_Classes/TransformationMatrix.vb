@@ -1,5 +1,5 @@
 Imports cvb = OpenCvSharp
-Public Class TransformationMatrix_Basics : Inherits VB_Parent
+Public Class TransformationMatrix_Basics : Inherits TaskParent
     Dim topLocations As New List(Of cvb.Point3d)
     Dim options As New Options_TransformationMatrix
     Public Sub New()

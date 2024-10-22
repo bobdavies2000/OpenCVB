@@ -4,7 +4,7 @@ Imports System.Text
 Imports OpenCvSharp
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 
-Public Class CPP_Basics : Inherits VB_Parent
+Public Class CPP_Basics : Inherits TaskParent
     Dim cppFunction As Integer
     Public result As cvb.Mat
     Public neighbors As New List(Of cvb.Point2f)
@@ -138,7 +138,7 @@ End Module
 
 
 
-Public Class CPP_ManagedTask : Inherits VB_Parent
+Public Class CPP_ManagedTask : Inherits TaskParent
     Dim hColor As GCHandle
     Dim hLeft As GCHandle
     Dim hRight As GCHandle
