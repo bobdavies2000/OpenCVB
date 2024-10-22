@@ -19591,7 +19591,7 @@ namespace CS_Classes
 
             topFeatures.Run(src);
             dst2 = topFeatures.dst2;
-            sides.currPoly = new List<cv.Point2f>(topFeatures.poly);
+            sides.currPoly = new List<cv.Point2f>(vbc.task.topFeatures);
             if (sides.currPoly.Count < vbc.task.polyCount) return;
             sides.Run(src);
             dst3 = sides.dst2;
@@ -19599,7 +19599,6 @@ namespace CS_Classes
             {
                 SetTrueText(i.ToString(), new cv.Point(sides.currPoly[i].X, sides.currPoly[i].Y), 3);
             }
-            SetTrueText("Rotate center", new cv.Point(sides.rotateCenter.X + 10, sides.rotateCenter.Y), 3);
             string causes = "";
             if (Math.Abs(sides.rotateAngle * 57.2958) > 10)
             {
@@ -19646,7 +19645,6 @@ namespace CS_Classes
             resyncFrames++;
             strOut = $"Rotation: {sides.rotateAngle * 57.2958:F1} degrees{"\n"}";
             strOut += $"Translation: {(int)sides.centerShift.X}, {(int)sides.centerShift.Y}{"\n"}";
-            strOut += $"Rotate center: {sides.rotateCenter.X:F0}, {sides.rotateCenter.Y:F0}{"\n"}";
             strOut += $"Frames since last resync: {resyncFrames:000}{"\n"}{"\n"}";
             strOut += $"Resync last caused by: {"\n"}{resyncCause}";
             foreach (var keyval in topFeatures.stable.goodCounts)
@@ -19798,7 +19796,7 @@ namespace CS_Classes
         public object center;
         public FPoly_BasicsOriginal_CS()
         {
-            center = new FPoly_Center(); // FPoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
+            center = new FPoly_Center(); 
             FindSlider("Feature Sample Size").Value = 30;
             if (dst2.Width >= 640) FindSlider("Resync if feature moves > X pixels").Value = 15;
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
@@ -19813,7 +19811,7 @@ namespace CS_Classes
             topFeatures.Run(src);
             dst2 = topFeatures.dst2;
             dst1 = topFeatures.dst3;
-            fPD.currPoly = new List<cv.Point2f>(topFeatures.poly);
+            fPD.currPoly = new List<cv.Point2f>(vbc.task.topFeatures);
             if (vbc.task.optionsChanged) fPD = new fPolyData(fPD.currPoly);
             if (fPD.currPoly.Count < vbc.task.polyCount) return;
             fPD.computeCurrLengths();
@@ -19885,7 +19883,6 @@ namespace CS_Classes
             }
             strOut = $"Rotation: {fPD.rotateAngle * 57.2958:F1} degrees{"\n"}";
             strOut += $"Translation: {(int)fPD.centerShift.X}, {(int)fPD.centerShift.Y}{"\n"}";
-            strOut += $"Rotate center: {fPD.rotateCenter.X:F0}, {fPD.rotateCenter.Y:F0}{"\n"}";
             strOut += $"Frames since last resync: {resyncFrames:000}{"\n"}";
             strOut += $"Last resync cause(s): {"\n"}{resyncCause}";
             foreach (var keyval in topFeatures.stable.goodCounts)
@@ -20138,7 +20135,6 @@ namespace CS_Classes
     public class FPoly_TopFeatures_CS : TaskParent
     {
         Stable_BasicsCount stable = new Stable_BasicsCount();
-        List<cv.Point2f> poly = new List<cv.Point2f>();
         Options_FPoly options = new Options_FPoly();
         public FPoly_TopFeatures_CS()
         {
@@ -20149,18 +20145,19 @@ namespace CS_Classes
             options.RunOpt();
             stable.Run(src);
             dst2 = stable.dst2;
-            poly.Clear();
+            vbc.task.topFeatures.Clear();
             foreach (KeyValuePair<int, int> keyVal in stable.goodCounts)
             {
                 var ptmp = stable.basics.ptList[keyVal.Value];
                 var pt = new cv.Point((int)ptmp.X, (int)ptmp.Y);
                 int g = stable.basics.facetGen.dst0.Get<int>(pt.Y, pt.X);
                 SetTrueText(g.ToString(), pt);
-                if (poly.Count < vbc.task.polyCount) poly.Add(pt);
+                if (vbc.task.topFeatures.Count < vbc.task.polyCount) vbc.task.topFeatures.Add(pt);
             }
-            for (int i = 0; i < poly.Count - 1; i++)
+            for (int i = 0; i < vbc.task.topFeatures.Count - 1; i++)
             {
-                DrawLine(dst2, poly[i], poly[i + 1], new cv.Scalar(255), 2);
+                DrawLine(dst2, vbc.task.topFeatures[i], vbc.task.topFeatures[i + 1], 
+                         new cv.Scalar(255), 2);
             }
         }
     }
@@ -20391,50 +20388,6 @@ namespace CS_Classes
 
 
 
-    public class FPoly_PerpendicularsTest_CS : TaskParent
-    {
-        FPoly_Perpendiculars center = new FPoly_Perpendiculars();
-        FPoly_BasicsOriginal fPoly = new FPoly_BasicsOriginal();
-        public FPoly_PerpendicularsTest_CS()
-        {
-            fPoly.center = center;
-            if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            desc = "Test the perpendicular method of finding the rotate center of the Feature Polygon";
-        }
-        public void RunAlg(Mat src)
-        {
-            fPoly.Run(src);
-            dst1 = fPoly.dst1;
-            dst2 = fPoly.dst2;
-            dst3 = fPoly.dst3;
-        }
-    }
-
-
-
-
-    public class FPoly_PerpendicularsImage_CS : TaskParent
-    {
-        FPoly_Perpendiculars center = new FPoly_Perpendiculars();
-        FPoly_Image fImage = new FPoly_Image();
-        public FPoly_PerpendicularsImage_CS()
-        {
-            fImage.fpoly.center = center;
-            if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            desc = "Rotate the image using the perpendicular method of finding the rotate center";
-        }
-        public void RunAlg(Mat src)
-        {
-            fImage.Run(src);
-            dst1 = fImage.dst1;
-            dst2 = fImage.dst2;
-            dst3 = fImage.dst3;
-        }
-    }
-
-
-
-
     public class FPoly_Image_CS : TaskParent
     {
         public FPoly_BasicsOriginal fpoly = new FPoly_BasicsOriginal();
@@ -20443,8 +20396,9 @@ namespace CS_Classes
         public FPoly_Image_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            labels = new string[] { "", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
-                                "Resync Image after rotation and translation", "Difference between current image and dst2" };
+            labels = new string[] { "", 
+ "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
+ "Resync Image after rotation and translation", "Difference between current image and dst2" };
             desc = "Rotate and shift the image as indicated by FPoly_Basics";
         }
         public void RunAlg(Mat src)
@@ -20602,7 +20556,7 @@ namespace CS_Classes
         {
             if (standaloneTest())
             {
-                SetTrueText(traceName + " is called by FPoly_Basics to get the rotate center and angle." + "\n" +
+                SetTrueText(traceName + " is called by FPoly_Basics to get the image movement." + "\n" +
                             "It does not produce any output when run standaloneTest().");
                 return;
             }
@@ -20637,7 +20591,7 @@ namespace CS_Classes
             fPD.rotateCenter = new Point2f(fPD.rotateCenter.X - fPD.centerShift.X, fPD.rotateCenter.Y - fPD.centerShift.Y);
             dst1.SetTo(0);
             fPD.DrawPolys(dst1, transPoly, this);
-            SetTrueText("Rotate center", new cv.Point(fPD.rotateCenter.X, fPD.rotateCenter.Y), 1);
+
             strOut = "No rotation" + "\n";
             fPD.rotateAngle = 0;
             if (d1 != d2)

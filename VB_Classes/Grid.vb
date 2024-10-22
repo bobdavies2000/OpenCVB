@@ -73,19 +73,19 @@ Public Class Grid_Basics : Inherits TaskParent
                     task.gridNeighbors.Add(nextList)
                 Next
 
-                task.gridAllNabes.Clear()
-                For Each nlist In task.gridNeighbors
-                    Dim cellx As New List(Of Integer)
-                    Dim celly As New List(Of Integer)
-                    For Each n In nlist
-                        Dim roi = gridRects(n)
-                        cellx.Add(roi.X)
-                        celly.Add(roi.Y)
+                task.gridNabeRects.Clear()
+                For Each nabeList In task.gridNeighbors
+                    Dim xList As New List(Of Integer), yList As New List(Of Integer)
+                    For Each index In nabeList
+                        Dim roi = gridRects(index)
+                        xList.Add(roi.X)
+                        yList.Add(roi.Y)
+                        xList.Add(roi.BottomRight.X)
+                        yList.Add(roi.BottomRight.Y)
                     Next
-
-                    Dim nabes = New cvb.Rect(cellx.Min, celly.Min, cellx.Max - cellx.Min,
-                                                                   celly.Max - celly.Min)
-                    task.gridAllNabes.Add(nabes)
+                    task.gridNabeRects.Add(New cvb.Rect(xList.Min, yList.Min,
+                                                        xList.Max - xList.Min,
+                                                        yList.Max - yList.Min))
                 Next
             End If
 

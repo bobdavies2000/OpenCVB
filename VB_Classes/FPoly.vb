@@ -4,7 +4,6 @@ Public Class FPoly_Basics : Inherits TaskParent
     Public resyncCause As String
     Public resyncFrames As Integer
     Public maskChangePercent As Single
-
     Dim topFeatures As New FPoly_TopFeatures
     Public sides As New FPoly_Sides
     Public Sub New()
@@ -21,7 +20,7 @@ Public Class FPoly_Basics : Inherits TaskParent
 
         topFeatures.Run(src)
         dst2 = topFeatures.dst2
-        sides.currPoly = New List(Of cvb.Point2f)(topFeatures.poly)
+        sides.currPoly = New List(Of cvb.Point2f)(task.topFeatures)
         If sides.currPoly.Count < task.polyCount Then Exit Sub
         sides.Run(src)
         dst3 = sides.dst2
@@ -29,7 +28,6 @@ Public Class FPoly_Basics : Inherits TaskParent
         For i = 0 To sides.currPoly.Count - 1
             SetTrueText(CStr(i), sides.currPoly(i), 3)
         Next
-        SetTrueText("Rotate center", New cvb.Point2f(sides.rotateCenter.X + 10, sides.rotateCenter.Y), 3)
 
         Dim causes As String = ""
         If Math.Abs(sides.rotateAngle * 57.2958) > 10 Then
@@ -37,12 +35,6 @@ Public Class FPoly_Basics : Inherits TaskParent
             causes += " - Rotation angle exceeded threshold."
             sides.rotateAngle = 0
         End If
-        causes += vbCrLf
-
-        'If maskChangePercent > 0.2 Then
-        '    resync = True
-        '    causes += " - Difference of startFrame and current frame exceeded 20% of image size"
-        'End If
         causes += vbCrLf
 
         If task.optionsChanged Then
@@ -81,7 +73,6 @@ Public Class FPoly_Basics : Inherits TaskParent
 
         strOut = "Rotation: " + Format(sides.rotateAngle * 57.2958, fmt1) + " degrees" + vbCrLf
         strOut += "Translation: " + CStr(CInt(sides.centerShift.X)) + ", " + CStr(CInt(sides.centerShift.Y)) + vbCrLf
-        strOut += "Rotate center: " + Format(sides.rotateCenter.X, fmt0) + ", " + Format(sides.rotateCenter.Y, fmt0) + vbCrLf
         strOut += "Frames since last resync: " + Format(resyncFrames, "000") + vbCrLf + vbCrLf
         strOut += "Resync last caused by: " + vbCrLf + resyncCause
 
@@ -244,11 +235,12 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Public options As New Options_FPoly
     Public center As Object
     Public Sub New()
-        center = New FPoly_Center ' FPoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
+        center = New FPoly_Center
         FindSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then FindSlider("Resync if feature moves > X pixels").Value = 15
         If standaloneTest() Then task.gOptions.setDisplay1()
-        labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
+        labels = {"", "Feature Polygon with perpendicular lines for center of rotation.",
+                      "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
@@ -259,7 +251,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
         topFeatures.Run(src)
         dst2 = topFeatures.dst2
         dst1 = topFeatures.dst3
-        fPD.currPoly = New List(Of cvb.Point2f)(topFeatures.poly)
+        fPD.currPoly = New List(Of cvb.Point2f)(task.topFeatures)
 
         If task.optionsChanged Then fPD = New fPolyData(fPD.currPoly)
         If fPD.currPoly.Count < task.polyCount Then Exit Sub
@@ -333,7 +325,6 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
 
         strOut = "Rotation: " + Format(fPD.rotateAngle * 57.2958, fmt1) + " degrees" + vbCrLf
         strOut += "Translation: " + CStr(CInt(fPD.centerShift.X)) + ", " + CStr(CInt(fPD.centerShift.Y)) + vbCrLf
-        strOut += "Rotate center: " + Format(fPD.rotateCenter.X, fmt0) + ", " + Format(fPD.rotateCenter.Y, fmt0) + vbCrLf
         strOut += "Frames since last resync: " + Format(resyncFrames, "000") + vbCrLf
         strOut += "Last resync cause(s): " + vbCrLf + resyncCause
 
@@ -580,42 +571,6 @@ End Class
 
 
 
-
-Public Class FPoly_TopFeatures : Inherits TaskParent
-    Public stable As New Stable_BasicsCount
-    Public poly As New List(Of cvb.Point2f)
-    Public options As New Options_FPoly
-    Public Sub New()
-        desc = "Get the top features and validate them"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        stable.Run(src)
-        dst2 = stable.dst2
-        poly.Clear()
-        For Each keyVal In stable.goodCounts
-            Dim pt = stable.basics.ptList(keyVal.Value)
-            Dim g = stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
-            SetTrueText(CStr(g), pt)
-            If poly.Count < task.polyCount Then poly.Add(pt)
-        Next
-
-        For i = 0 To poly.Count - 2
-            DrawLine(dst2, poly(i), poly(i + 1), cvb.Scalar.White)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
 Public Class FPoly_WarpAffinePoly : Inherits TaskParent
     Dim rotatePoly As New Rotate_PolyQT
     Dim warp As New WarpAffine_BasicsQT
@@ -702,7 +657,7 @@ Public Class FPoly_RotatePoints : Inherits TaskParent
         Return New cvb.Point2f(totalX, totalY)
     End Function
     Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Then
+        If standalone Then
             SetTrueText(traceName + " is meant only to run with FPoly_Basics to validate the translation")
             Exit Sub
         End If
@@ -809,7 +764,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         Return angle
     End Function
     Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Then
+        If standalone Then
             SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().")
             Exit Sub
         End If
@@ -855,53 +810,6 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         dst3 = rotatePoints.dst3
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Public Class FPoly_PerpendicularsTest : Inherits TaskParent
-    Dim center As New FPoly_Perpendiculars
-    Dim fPoly As New FPoly_BasicsOriginal
-    Public Sub New()
-        fPoly.center = center
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        desc = "Test the perpendicular method of finding the rotate center of the Feature Polygon"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        fPoly.Run(src)
-        dst1 = fPoly.dst1
-        dst2 = fPoly.dst2
-        dst3 = fPoly.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class FPoly_PerpendicularsImage : Inherits TaskParent
-    Dim center As New FPoly_Perpendiculars
-    Dim fImage As New FPoly_Image
-    Public Sub New()
-        fImage.fpoly.center = center
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        desc = "Rotate the image using the perpendicular method of finding the rotate center"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        fImage.Run(src)
-        dst1 = fImage.dst1
-        dst2 = fImage.dst2
-        dst3 = fImage.dst3
-    End Sub
-End Class
-
 
 
 
@@ -1077,15 +985,15 @@ Public Class FPoly_Center : Inherits TaskParent
     Public fPD As fPolyData
     Dim newPoly As List(Of cvb.Point2f)
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "Layout of feature polygons after just translation - red line is used in sine computation",
                       "Layout of the starting (white) and current (yellow) feature polygons",
                       "Layout of feature polygons after rotation and translation"}
         desc = "Manually rotate and translate the current feature polygon to a previous feature polygon."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Then
-            SetTrueText(traceName + " is called by FPoly_Basics to get the rotate center and angle." + vbCrLf +
+        If standalone Then
+            SetTrueText(traceName + " is called by FPoly_Basics to get the image movement." + vbCrLf +
                         "It does not produce any output when run standaloneTest().")
             Exit Sub
         End If
@@ -1121,7 +1029,6 @@ Public Class FPoly_Center : Inherits TaskParent
 
         dst1.SetTo(0)
         fPD.DrawPolys(dst1, transPoly, Me)
-        SetTrueText("Rotate center", fPD.rotateCenter, 1)
 
         strOut = "No rotation" + vbCrLf
         fPD.rotateAngle = 0
@@ -1185,12 +1092,6 @@ Public Class FPoly_EdgeRemoval : Inherits TaskParent
         dst3 = dst2 And Not dst1
     End Sub
 End Class
-
-
-
-
-
-
 
 
 
@@ -1348,5 +1249,37 @@ Public Class FPoly_Core : Inherits TaskParent
         If goodPoints.Count = 0 Or Math.Abs(shift.X) > optionsCore.maxShift Or Math.Abs(shift.Y) > optionsCore.maxShift Then startAnchor = anchor
         labels(2) = "Distance change (after threshholding) since last reset = " + shift.ToString
         lastAnchor = anchor
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FPoly_TopFeatures : Inherits TaskParent
+    Public stable As New Stable_BasicsCount
+    Public options As New Options_FPoly
+    Public Sub New()
+        desc = "Get the top features and validate them using Delaunay regions."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        stable.Run(src)
+        dst2 = stable.dst2
+        task.topFeatures.Clear()
+        Dim showText = standaloneTest()
+        For Each keyVal In stable.goodCounts
+            Dim pt = stable.basics.ptList(keyVal.Value)
+            Dim g = stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
+            If showText Then SetTrueText(CStr(g), pt)
+            If task.topFeatures.Count < task.polyCount Then task.topFeatures.Add(pt)
+        Next
+
+        For i = 0 To task.topFeatures.Count - 2
+            DrawLine(dst2, task.topFeatures(i), task.topFeatures(i + 1), cvb.Scalar.White)
+        Next
     End Sub
 End Class

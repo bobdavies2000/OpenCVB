@@ -45,6 +45,7 @@ Public Class TaskParent : Implements IDisposable
     Public strOut As String
     Dim retryCount As Integer
     Public Const depthListMaxCount As Integer = 10
+    Public primaryAlg As Boolean
 
     Public term As New cvb.TermCriteria(cvb.CriteriaTypes.Eps + cvb.CriteriaTypes.Count, 10, 1.0)
 
@@ -523,20 +524,26 @@ Public Class TaskParent : Implements IDisposable
         Return mm
     End Function
     Public Sub SetTrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
-        Dim str As New TrueText(text, pt, picTag)
-        trueData.Add(str)
+        If primaryAlg Then
+            Dim str As New TrueText(text, pt, picTag)
+            trueData.Add(str)
+        End If
     End Sub
     Public Sub SetTrueText(text As String)
-        Dim pt = New cvb.Point(0, 0)
-        Dim picTag = 2
-        Dim str As New TrueText(text, pt, picTag)
-        trueData.Add(str)
+        If primaryAlg Then
+            Dim pt = New cvb.Point(0, 0)
+            Dim picTag = 2
+            Dim str As New TrueText(text, pt, picTag)
+            trueData.Add(str)
+        End If
     End Sub
     Public Sub SetTrueText(text As String, picTag As Integer)
         If text Is Nothing Then Return
-        Dim pt = New cvb.Point(0, 0)
-        Dim str As New TrueText(text, pt, picTag)
-        trueData.Add(str)
+        If primaryAlg Then
+            Dim pt = New cvb.Point(0, 0)
+            Dim str As New TrueText(text, pt, picTag)
+            trueData.Add(str)
+        End If
     End Sub
     Public Function standaloneTest() As Boolean
         If standalone Or ShowIntermediate() Then Return True

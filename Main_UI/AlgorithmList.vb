@@ -1249,10 +1249,6 @@ End Enum
 	If algorithmName = "FPoly_LeftRight_CS" Then return new FPoly_LeftRight_CS
 	If algorithmName = "FPoly_Perpendiculars" Then return new FPoly_Perpendiculars
 	If algorithmName = "FPoly_Perpendiculars_CS" Then return new FPoly_Perpendiculars_CS
-	If algorithmName = "FPoly_PerpendicularsImage" Then return new FPoly_PerpendicularsImage
-	If algorithmName = "FPoly_PerpendicularsImage_CS" Then return new FPoly_PerpendicularsImage_CS
-	If algorithmName = "FPoly_PerpendicularsTest" Then return new FPoly_PerpendicularsTest
-	If algorithmName = "FPoly_PerpendicularsTest_CS" Then return new FPoly_PerpendicularsTest_CS
 	If algorithmName = "FPoly_Plot" Then return new FPoly_Plot
 	If algorithmName = "FPoly_Plot_CS" Then return new FPoly_Plot_CS
 	If algorithmName = "FPoly_PlotWeighted" Then return new FPoly_PlotWeighted
@@ -2211,6 +2207,7 @@ End Enum
 	If algorithmName = "Motion_TestSingle" Then return new Motion_TestSingle
 	If algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
 	If algorithmName = "Motion_ThruCorrelation_CS" Then return new Motion_ThruCorrelation_CS
+	If algorithmName = "Motion_TopFeatures" Then return new Motion_TopFeatures
 	If algorithmName = "Mouse_Basics" Then return new Mouse_Basics
 	If algorithmName = "Mouse_Basics_CS" Then return new Mouse_Basics_CS
 	If algorithmName = "Mouse_ClickPointUsage" Then return new Mouse_ClickPointUsage

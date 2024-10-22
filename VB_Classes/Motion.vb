@@ -867,3 +867,33 @@ Public Class Motion_EdgeStability : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Motion_TopFeatures : Inherits TaskParent
+    Dim fPoly As New FPoly_TopFeatures
+    Public Sub New()
+        labels(2) = "Track the feature rect (small one) in each larger rectangle"
+        desc = "Find the top feature cells and track them precisely in the next frame."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fPoly.Run(src)
+
+        dst2 = src.Clone
+        Dim half As Integer = CInt(task.gridSize / 2)
+        For Each pt In task.topFeatures
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+            roi = ValidateRect(roi)
+            dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
+        Next
+    End Sub
+End Class
+
+
+
+

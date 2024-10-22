@@ -90,7 +90,7 @@ Public Class Main_UI
     Dim textDesc As String = ""
     Dim textAdvice As String = ""
     Dim totalBytesOfMemoryUsed As Integer
-    Dim trueData As New List(Of VB_Classes.TrueText)
+    Dim trueData As New List(Of TrueText)
 
     Dim uiColor As cvb.Mat
     Dim uiLeft As cvb.Mat
@@ -1034,7 +1034,6 @@ Public Class Main_UI
                    "All Python algorithms will be disabled for now...")
         End If
 
-        CameraSwitching.Text = "Initializing " + settings.cameraName
         Me.Show()
         If settings.cameraFound Then
             startCamera()
@@ -1144,7 +1143,7 @@ Public Class Main_UI
             End If
 
             If cameraTaskHandle Is Nothing Then Exit Sub
-            CameraSwitching.Text = settings.cameraName + " awaiting first buffer"
+            CameraSwitching.Text = AvailableAlgorithms.Text + " awaiting first buffer"
             Dim cameraName = settings.cameraName
             cameraName = cameraName.Replace(" 2/2i", "")
             cameraName = cameraName.Replace(" camera", "")
@@ -1466,6 +1465,7 @@ Public Class Main_UI
         parms.captureRes = settings.captureRes
         parms.displayRes = settings.displayRes
         parms.algName = AvailableAlgorithms.Text
+        trueData = New List(Of TrueText)
 
         PausePlayButton.Image = PausePlay
 
@@ -1502,6 +1502,7 @@ Public Class Main_UI
             ' then remove the json file, click the OpenCVB options button and click 'Update Algorithm XRef'
             ' (it is toward the bottom of the options form.)
             textDesc = task.MainUI_Algorithm.desc
+            task.MainUI_Algorithm.primaryAlg = True
 
             intermediateReview = ""
 
@@ -1531,6 +1532,8 @@ Public Class Main_UI
             mousePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
 
             Dim saveDrawRect As cvb.Rect
+            task.trueData.Clear()
+
             While 1
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.

@@ -1784,7 +1784,7 @@ Public Class Options_FPoly : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Resync if feature moves > X pixels", 1, 20, removeThreshold)
-            sliders.setupTrackBar("Points to use in Feature Poly", 3, 20, 10)
+            sliders.setupTrackBar("Points to use in Feature Poly", 3, 100, 10)
             sliders.setupTrackBar("Automatically resync after X frames", 10, 1000, autoResyncAfterX)
         End If
     End Sub

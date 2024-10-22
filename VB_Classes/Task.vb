@@ -27,7 +27,8 @@ Public Class VBtask : Implements IDisposable
     Public gridLowResIndices As cvb.Mat
     Public gridHighResIndices As cvb.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
-    Public gridAllNabes As New List(Of cvb.Rect)
+    Public gridNabeRects As New List(Of cvb.Rect)
+    Public gridNabeMap As New cvb.Mat
     Public gridROIclicked As Integer
 
     Public optionsChanged As Boolean ' global or local options changed.
@@ -71,6 +72,7 @@ Public Class VBtask : Implements IDisposable
     Public motion As Motion_Basics
     Public motionPercent As Single
     Public MotionLabel As String = " "
+    Public topFeatures As New List(Of cvb.Point2f)
 
     Public reliableDepth As Reliable_Depth
     Public reliableDepthMask As cvb.Mat

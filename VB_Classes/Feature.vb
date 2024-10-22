@@ -695,6 +695,7 @@ Public Class Feature_Gather : Inherits TaskParent
     Public options As New Options_Features
     Public Sub New()
         FindSlider("Feature Sample Size").Value = 400
+        FindSlider("Min Distance to next").Value = 10
         cPtr = Agast_Open()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
     End Sub
