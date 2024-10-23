@@ -1001,3 +1001,13 @@ End Class
 
 
 
+
+Public Class Motion_FPolyRect : Inherits TaskParent
+    Dim fRect As New FPoly_LineRect
+    Public Sub New()
+        desc = "Confirm the FPoly_LineRect matched the previous image."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+    End Sub
+End Class

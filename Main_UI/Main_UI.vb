@@ -1045,7 +1045,6 @@ Public Class Main_UI
                 Thread.Sleep(100)
             End While
         End If
-        CameraSwitching.Text = settings.cameraName + " starting"
 
         frameCount = 0
         setupCamPics()

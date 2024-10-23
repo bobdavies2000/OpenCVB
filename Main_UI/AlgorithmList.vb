@@ -1247,6 +1247,8 @@ End Enum
 	If algorithmName = "FPoly_ImageNew_CS" Then return new FPoly_ImageNew_CS
 	If algorithmName = "FPoly_LeftRight" Then return new FPoly_LeftRight
 	If algorithmName = "FPoly_LeftRight_CS" Then return new FPoly_LeftRight_CS
+	If algorithmName = "FPoly_Line" Then return new FPoly_Line
+	If algorithmName = "FPoly_LineRect" Then return new FPoly_LineRect
 	If algorithmName = "FPoly_Perpendiculars" Then return new FPoly_Perpendiculars
 	If algorithmName = "FPoly_Perpendiculars_CS" Then return new FPoly_Perpendiculars_CS
 	If algorithmName = "FPoly_Plot" Then return new FPoly_Plot
@@ -2183,6 +2185,7 @@ End Enum
 	If algorithmName = "Motion_EdgeStability" Then return new Motion_EdgeStability
 	If algorithmName = "Motion_Enclosing" Then return new Motion_Enclosing
 	If algorithmName = "Motion_Enclosing_CPP_CS" Then return new Motion_Enclosing_CPP_CS
+	If algorithmName = "Motion_FPolyRect" Then return new Motion_FPolyRect
 	If algorithmName = "Motion_FromEdge" Then return new Motion_FromEdge
 	If algorithmName = "Motion_FromEdgeColorize" Then return new Motion_FromEdgeColorize
 	If algorithmName = "Motion_Grayscale" Then return new Motion_Grayscale
