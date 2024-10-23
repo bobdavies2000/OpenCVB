@@ -83,6 +83,10 @@ int ManagedCPP_Resume(int ioIndex, int* colorPtr, int* leftPtr, int* rightPtr, i
     task.pointCloud = Mat(task.rows, task.cols, CV_32FC3, cloudPtr).clone();
     split(task.pointCloud, task.pcSplit);
 
+    if (ioList.size() == 0)
+    {
+        ioList.push_back(new unManagedIO);
+    }
     ioList[ioIndex]->src = task.color.clone();
     return (int)ioList.size() - 1;
 }

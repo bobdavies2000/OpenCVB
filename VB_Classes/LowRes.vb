@@ -483,7 +483,7 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
             If task.gOptions.UseMotionConstructed.Checked = False Then
                 labels(3) = "100% of each image has motion."
             Else
-                labels(3) = Format(task.motionPercent, "0%") + " each image contained motion (on average)."
+                labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")
             End If
             task.MotionLabel = labels(3)
         End If
