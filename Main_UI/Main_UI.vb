@@ -1285,27 +1285,22 @@ Public Class Main_UI
             If pic.Tag = 2 Then
                 g.DrawRectangle(myWhitePen, drawRect.X + camPic(0).Width, drawRect.Y, drawRect.Width, drawRect.Height)
             End If
-
         End If
 
-        If paintNewImages Then
-            paintNewImages = False
-            Try
-                SyncLock cameraLock
-                    If uiColor IsNot Nothing Then
-                        If uiColor.Width > 0 And dst(0) IsNot Nothing Then
-                            Dim camSize = New cvb.Size(camPic(0).Size.Width, camPic(0).Size.Height)
-                            For i = 0 To dst.Count - 1
-                                Dim tmp = dst(i).Resize(camSize)
-                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
-                            Next
-                        End If
+        SyncLock cameraLock
+            If paintNewImages Then
+                paintNewImages = False
+                If uiColor IsNot Nothing Then
+                    If uiColor.Width > 0 And dst(0) IsNot Nothing Then
+                        Dim camSize = New cvb.Size(camPic(0).Size.Width, camPic(0).Size.Height)
+                        For i = 0 To dst.Count - 1
+                            Dim tmp = dst(i).Resize(camSize)
+                            cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                        Next
                     End If
-                End SyncLock
-            Catch ex As Exception
-                Debug.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
-            End Try
-        End If
+                End If
+            End If
+        End SyncLock
 
         ' draw any TrueType font data on the image 
         SyncLock trueDataLock
@@ -1313,10 +1308,9 @@ Public Class Main_UI
                 If trueData(i) Is Nothing Then Continue For
                 Dim tt = trueData(i)
                 If tt.text Is Nothing Then Continue For
-                ' campic(2) has both dst2 and dst3 to insure they are in sync.
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
                     g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
-                                         CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
+                                 CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
                 End If
             Next
         End SyncLock

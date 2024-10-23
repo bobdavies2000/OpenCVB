@@ -353,7 +353,7 @@ namespace CPP_Native
         return outMat;
     }
 
-    Mat MakeSureImage8uC3(const Mat& input) {
+    Mat Check8uC3(const Mat& input) {
         Mat outMat;
         if (input.type() == CV_8UC3) {
             outMat = input.clone();
@@ -442,10 +442,10 @@ namespace CPP_Native
         if (src.size() != task->alg->dst2.size()) resize(task->alg->dst2, task->alg->dst2, src.size());
         if (src.size() != task->alg->dst3.size()) resize(task->alg->dst3, task->alg->dst3, src.size());
 
-        //if (task->alg->dst0.type() != CV_8UC3) task->alg->dst0 = MakeSureImage8uC3(task->alg->dst0);
-        //if (task->alg->dst1.type() != CV_8UC3) task->alg->dst1 = MakeSureImage8uC3(task->alg->dst1);
-        //if (task->alg->dst2.type() != CV_8UC3) task->alg->dst2 = MakeSureImage8uC3(task->alg->dst2);
-        //if (task->alg->dst3.type() != CV_8UC3) task->alg->dst3 = MakeSureImage8uC3(task->alg->dst3);
+        //if (task->alg->dst0.type() != CV_8UC3) task->alg->dst0 = Check8uC3(task->alg->dst0);
+        //if (task->alg->dst1.type() != CV_8UC3) task->alg->dst1 = Check8uC3(task->alg->dst1);
+        //if (task->alg->dst2.type() != CV_8UC3) task->alg->dst2 = Check8uC3(task->alg->dst2);
+        //if (task->alg->dst3.type() != CV_8UC3) task->alg->dst3 = Check8uC3(task->alg->dst3);
 
         return 0;
     }

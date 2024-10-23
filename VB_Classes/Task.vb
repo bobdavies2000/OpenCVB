@@ -492,10 +492,10 @@ Public Class VBtask : Implements IDisposable
             task.rc = task.redCells(0)
         End If
     End Sub
-    Private Function checkIntermediateResults() As TaskParent
+    Private Function checkIntermediateResults(lookupName As String) As TaskParent
         If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
         For Each obj In task.activeObjects
-            If obj.traceName = task.intermediateName And task.FirstPass = False Then Return obj
+            If obj.traceName = lookupName And task.FirstPass = False Then Return obj
         Next
         Return Nothing
     End Function
@@ -526,22 +526,21 @@ Public Class VBtask : Implements IDisposable
                 If task.PixelViewer IsNot Nothing Then If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
             End If
 
-            Dim obj = checkIntermediateResults()
-            task.intermediateObject = obj
+            Dim lookupName = task.intermediateName
+            If lookupName = "" Then lookupName = task.algName
+            Dim obj = checkIntermediateResults(lookupName)
+            If task.intermediateName <> "" Then task.intermediateObject = obj
+
             If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(trueData)
-            If obj IsNot Nothing Then
-                If task.gOptions.displayDst0.Checked Then dst0 = MakeSureImage8uC3(obj.dst0) Else dst0 = task.color
-                If task.gOptions.displayDst1.Checked Then dst1 = MakeSureImage8uC3(obj.dst1) Else dst1 = task.depthRGB
-                dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, MakeSureImage8uC3(obj.dst2))
-                dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, MakeSureImage8uC3(obj.dst3))
-                task.labels = obj.labels
-                If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
-            Else
-                If task.gOptions.displayDst0.Checked Then dst0 = MakeSureImage8uC3(dst0) Else dst0 = task.color
-                If task.gOptions.displayDst1.Checked Then dst1 = MakeSureImage8uC3(dst1) Else dst1 = task.depthRGB
-                If dst2.Type <> cvb.MatType.CV_8UC3 Then dst2 = MakeSureImage8uC3(dst2)
-                If dst3.Type <> cvb.MatType.CV_8UC3 Then dst3 = MakeSureImage8uC3(dst3)
-            End If
+
+            If task.gOptions.displayDst0.Checked Then dst0 = Check8uC3(obj.dst0) Else dst0 = task.color
+            If task.gOptions.displayDst1.Checked Then dst1 = Check8uC3(obj.dst1) Else dst1 = task.depthRGB
+
+            dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, Check8uC3(obj.dst2))
+            dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, Check8uC3(obj.dst3))
+
+            task.labels = obj.labels
+            If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
 
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 

@@ -32,7 +32,7 @@ Public Module vbc
         outMat.ConvertTo(outMat, cvb.MatType.CV_8UC3)
         Return outMat
     End Function
-    Public Function MakeSureImage8uC3(ByVal input As cvb.Mat) As cvb.Mat
+    Public Function Check8uC3(ByVal input As cvb.Mat) As cvb.Mat
         Dim outMat As New cvb.Mat
         If input.Type = cvb.MatType.CV_8UC3 Then Return input
         If input.Type = cvb.MatType.CV_32F Then
