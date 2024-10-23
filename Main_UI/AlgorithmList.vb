@@ -2207,6 +2207,7 @@ End Enum
 	If algorithmName = "Motion_TestSingle" Then return new Motion_TestSingle
 	If algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
 	If algorithmName = "Motion_ThruCorrelation_CS" Then return new Motion_ThruCorrelation_CS
+	If algorithmName = "Motion_TopFeatureFail" Then return new Motion_TopFeatureFail
 	If algorithmName = "Motion_TopFeatures" Then return new Motion_TopFeatures
 	If algorithmName = "Mouse_Basics" Then return new Mouse_Basics
 	If algorithmName = "Mouse_Basics_CS" Then return new Mouse_Basics_CS

@@ -303,7 +303,10 @@ Public Class Main_UI
         settings.locationMain = New cvb.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
         settings.treeButton = TreeButton.Checked
         settings.PixelViewerButton = False
-        settings.displayRes = New cvb.Size(camPic(0).Width, camPic(0).Height) ' used only when .snapCustom is true
+        If camPic(0) IsNot Nothing Then
+            ' used only when .snapCustom is true
+            settings.displayRes = New cvb.Size(camPic(0).Width, camPic(0).Height)
+        End If
         If settings.translatorMode = "" Then settings.translatorMode = "VB.Net to C#"
 
         Dim setlist = New List(Of jsonClass.ApplicationStorage)

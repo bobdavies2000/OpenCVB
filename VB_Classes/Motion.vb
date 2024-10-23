@@ -873,19 +873,20 @@ End Class
 
 
 
-Public Class Motion_TopFeatures : Inherits TaskParent
+Public Class Motion_TopFeatureFail : Inherits TaskParent
     Dim fPoly As New FPoly_TopFeatures
     Public featureRects As New List(Of cvb.Rect)
     Public searchRects As New List(Of cvb.Rect)
+    Dim match As New Match_Basics
     Dim saveMat As New cvb.Mat
     Public Sub New()
         labels(2) = "Track the feature rect (small one) in each larger rectangle"
-        desc = "Find the top feature cells and track them precisely in the next frame."
+        desc = "Find the top feature cells and track them in the next frame."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim half As Integer = CInt(task.gridSize / 2)
 
-        If task.heartBeat Then
+        If task.heartBeatLT Then
             fPoly.Run(src)
             searchRects.Clear()
             featureRects.Clear()
@@ -908,8 +909,91 @@ Public Class Motion_TopFeatures : Inherits TaskParent
             Next
         End If
 
-        For Each roi In featureRects
+        dst3 = src.Clone
+        Dim matchRects As New List(Of cvb.Rect)
+        For i = 0 To featureRects.Count - 1
+            Dim roi = featureRects(i)
+            match.template = saveMat(roi)
+            match.searchRect = searchRects(i)
+            match.Run(src)
+            dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
+            matchRects.Add(match.matchRect)
+        Next
 
+        saveMat = src.Clone
+        searchRects.Clear()
+        featureRects.Clear()
+        For Each roi In matchRects
+            Dim pt = New cvb.Point(roi.X + half, roi.Y + half)
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            featureRects.Add(roi)
+            searchRects.Add(task.gridNabeRects(index))
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_TopFeatures : Inherits TaskParent
+    Dim fPoly As New FPoly_TopFeatures
+    Public featureRects As New List(Of cvb.Rect)
+    Public searchRects As New List(Of cvb.Rect)
+    Dim match As New Match_Basics
+    Dim half As Integer
+    Public Sub New()
+        labels(2) = "Track the feature rect (small one) in each larger rectangle"
+        desc = "Find the top feature cells and track them in the next frame."
+    End Sub
+    Private Sub snapShotFeatures()
+        searchRects.Clear()
+        featureRects.Clear()
+        For Each pt In task.topFeatures
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+            roi = ValidateRect(roi)
+            featureRects.Add(roi)
+            searchRects.Add(task.gridNabeRects(index))
+        Next
+
+        dst2 = dst1.Clone
+        For Each pt In task.topFeatures
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+            roi = ValidateRect(roi)
+            dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
+        Next
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        half = CInt(task.gridSize / 2)
+
+        dst1 = src.Clone
+        fPoly.Run(src)
+
+        If task.heartBeatLT Then
+            snapShotFeatures()
+        End If
+
+        dst3 = src.Clone
+        Dim matchRects As New List(Of cvb.Rect)
+        For i = 0 To featureRects.Count - 1
+            Dim roi = featureRects(i)
+            match.template = dst1(roi)
+            match.searchRect = searchRects(i)
+            match.Run(src)
+            dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
+            matchRects.Add(match.matchRect)
+        Next
+
+        searchRects.Clear()
+        featureRects.Clear()
+        For Each roi In matchRects
+            Dim pt = New cvb.Point(roi.X + half, roi.Y + half)
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            featureRects.Add(roi)
+            searchRects.Add(task.gridNabeRects(index))
         Next
     End Sub
 End Class
