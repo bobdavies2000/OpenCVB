@@ -1,35 +1,32 @@
-# Recent Changes – October 2024
+# Recent Changes – October 2024 (Part 2)
 
--   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
--   A magnifying glass button was added to the OpenCVB toolbar.
-    -   It can provide more detailed images of specific areas.
-    -   The detailed image is dynamic – it will update with each frame.
-    -   Mouse movement can provide additional flexibility while drawing.
-    -   Magnifying glass works with static images while OpenCVB is paused.
-    -   All 4 images show the rectangle being drawn.
-    -   See the image below to help find the new button and see sample output
--   Contrast: the “Microscope” button (next button to the left) provides more detail.
-    -   The “Microscope” button produces hex values.
--   OpenCV’s machine learning algorithms are all available in a single algorithm.
-    -   See the second sample image below; image segmented by features.
-    -   ML_Basics mimics the functionality of OpenCV’s Points Classifier example.
-    -   Feature detected is the output of the Laplacian 2nd derivative.
-        -   Laplacian was more accurate in finding the edge pixels for use with ML.
--   C\# algorithms are now always configured in Release mode.
-    -   Makes it easier to determine the value of optimizing any VB.Net algorithm.
--   Orbbec Gemini 335L is now working at 30 FPS.
-    -   Care must be taken to make sure it is on a USB-C port.
+-   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
+-   Motion_Basics was replaced with another motion detection algorithm.
+    -   The mean color of each cell in the grid is compared to previous values.
+        -   A 3D distance in color value is used to compare cells.
+    -   If color distance is more than a fixed value, the grid cell has motion.
+        -   Computation is low-cost and could have been done decades ago.
+    -   Rather than more resolution, low resolution proved beneficial.
+    -   Often just individual pixels are different – Motion_Basics output below.
+    -   Depth, color, and left may be constructed using motion (not right image.)
+    -   Motion_Basics works well across all cameras at all resolutions.
+        -   Grid cell size is approximately the same in all cases by default.
+    -   A motion mask allows other algorithms to simplify their actions.
+-   An OpenCVB global option determines using raw or motion-constructed images.
+-   The C++ camera interface for StereoLabs ZED 2i cameras was restored.
+    -   The VB.Net interface was not getting 100 FPS initially.
+    -   After the restored C++ interface got 100 FPS, the VB.Net interface did too.
+    -   Both interfaces are available in the OpenCVB options list of cameras.
+-   VB.Net version for Kinect 4 Azure camera support is under development.
+    -   Existing Kinect 4 Azure camera support is still available (UI updated).
+-   A long-term heartbeat is now available in the task structure.
+    -   Images can now be refreshed on a heartbeat or heartbeatLT (long term).
+    -   The current heartbeat is 1 second while heartbeatLT is X seconds.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/a4ade72e34b35bccb590db3772e53c01.png)
+![](media/9ecba468726fbd244063f9aa06417b68.gif)
 
-**Magnifying Button on Toolbar:** *First draw a rectangle in any of the 4 images then click the magnifying button to see a 5X copy of the region. The magnified image will reflect the image contents where the rectangle is drawn but all 4 images while outline the rectangle.*
-
-![A collage of images of a person Description automatically generated](media/5ae98b4c9bad297ea31fd84e9da6369a.png)
-
-**LowRes_MLColorDepth:** *ML is used to segment the image between cells with features (Laplacian edges) and featureless regions. The lower left image shows all the cells with featureless areas while the lower right image shows the more work is required for complete segmentation. The ML input is color and depth.*
-
-# 
+**Motion_Basics:** *This motion detection algorithm uses low resolution mean values to find areas that contain motion. The top left image is the original color image (optionally overlaid with cells where motion was detected) while the image below left was constructed from an earlier image (often seconds earlier) updated with cells containing motion. The depth data in the upper right is also a composite of an earlier image and the latest depth where motion was found. The image in the lower right is the difference between the current color image and the image in the lower left. The implication is that almost all motion has been detected and no artifacts have been generated in the color image. Depth data has visible artifacts and will require more work because of shadow.*
 
 # Introduction
 
@@ -1556,3 +1553,34 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of people sitting in a chair Description automatically generated](media/3b7fcfc4ec5dcb8a1619770024131824.png)
 
 **Motion_FromEdgeColorize:** *This algorithm uses the palette to identify motion. Motion is blue while red is not.*
+
+# Recent Changes – October 2024
+
+-   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
+-   A magnifying glass button was added to the OpenCVB toolbar.
+    -   It can provide more detailed images of specific areas.
+    -   The detailed image is dynamic – it will update with each frame.
+    -   Mouse movement can provide additional flexibility while drawing.
+    -   Magnifying glass works with static images while OpenCVB is paused.
+    -   All 4 images show the rectangle being drawn.
+    -   See the image below to help find the new button and see sample output
+-   Contrast: the “Microscope” button (next button to the left) provides more detail.
+    -   The “Microscope” button produces hex values.
+-   OpenCV’s machine learning algorithms are all available in a single algorithm.
+    -   See the second sample image below; image segmented by features.
+    -   ML_Basics mimics the functionality of OpenCV’s Points Classifier example.
+    -   Feature detected is the output of the Laplacian 2nd derivative.
+        -   Laplacian was more accurate in finding the edge pixels for use with ML.
+-   C\# algorithms are now always configured in Release mode.
+    -   Makes it easier to determine the value of optimizing any VB.Net algorithm.
+-   Orbbec Gemini 335L is now working at 30 FPS.
+    -   Care must be taken to make sure it is on a USB-C port.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer Description automatically generated](media/a4ade72e34b35bccb590db3772e53c01.png)
+
+**Magnifying Button on Toolbar:** *First draw a rectangle in any of the 4 images then click the magnifying button to see a 5X copy of the region. The magnified image will reflect the image contents where the rectangle is drawn but all 4 images while outline the rectangle.*
+
+![A collage of images of a person Description automatically generated](media/5ae98b4c9bad297ea31fd84e9da6369a.png)
+
+**LowRes_MLColorDepth:** *ML is used to segment the image between cells with features (Laplacian edges) and featureless regions. The lower left image shows all the cells with featureless areas while the lower right image shows the more work is required for complete segmentation. The ML input is color and depth.*
