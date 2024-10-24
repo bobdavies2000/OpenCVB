@@ -294,9 +294,20 @@ Module UI_Generator
 
 
         Try
-            Dim sw = New StreamWriter(HomeDir.FullName + "Data/GroupComboBox.txt")
+            Dim sw = New StreamWriter(HomeDir.FullName + "Data/GroupButtonList.txt")
+            Dim lastGroup As String = ""
+            For Each alg In allList.Keys
+                If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
+                If alg.EndsWith(".py") Then Continue For
+                Dim split = alg.Split("_")
+                If lastGroup <> split(0) Then sw.WriteLine(split(0))
+                lastGroup = split(0)
+            Next
+            sw.Close()
+
+            sw = New StreamWriter(HomeDir.FullName + "Data/GroupComboBox.txt")
             sw.Write("(" + CStr(allList.Count) + ") < All >")
-            For Each alg In allButPython.Keys
+            For Each alg In allList.Keys
                 If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
                 sw.Write("," + alg)
             Next

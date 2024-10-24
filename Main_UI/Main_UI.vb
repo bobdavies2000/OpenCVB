@@ -28,6 +28,7 @@ End Module
 Public Class Main_UI
     Public Shared settings As jsonClass.ApplicationStorage
     Public Shared cameraNames As List(Of String)
+    Public groupButtonSelection As String
     Dim jsonfs As New jsonClass.FileOperations
     Dim upArrow As Boolean, downArrow As Boolean
 
@@ -466,6 +467,9 @@ Public Class Main_UI
         End If
 
         XYLoc.Location = New Point(camPic(2).Left, camPic(2).Top + camPic(2).Height)
+        AlgorithmDesc.Visible = settings.snap640
+        GroupCombo.Visible = settings.snap640
+        If settings.snap320 Then Me.Width = 720 ' expose the list of available algorithms.
     End Sub
     Private Sub BluePlusButton_Click(sender As Object, e As EventArgs) Handles BluePlusButton.Click
         Dim OKcancel = InsertAlgorithm.ShowDialog()
@@ -733,7 +737,7 @@ Public Class Main_UI
     Private Sub Advice_Click(sender As Object, e As EventArgs) Handles Advice.Click
         MsgBox(textAdvice)
     End Sub
-    Private Sub jumpToAlgorithm(algName As String)
+    Public Sub jumpToAlgorithm(algName As String)
         If AvailableAlgorithms.Items.Contains(algName) = False Then
             AvailableAlgorithms.SelectedIndex = 0
         Else
@@ -1773,6 +1777,23 @@ Public Class Main_UI
                 frames += 1
             End If
         End If
+    End Sub
+    Private Sub GroupButtonList_Click(sender As Object, e As EventArgs) Handles GroupButtonList.Click
+        Groups.homedir = HomeDir
+        Groups.ShowDialog()
+        If groupButtonSelection = "" Then Exit Sub
+        If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
+        For Each alg In AvailableAlgorithms.Items
+            If alg.startswith(groupButtonSelection) Then
+                AvailableAlgorithms.Text = alg
+                Exit For
+            End If
+        Next
+
+        jsonWrite()
+        StartTask()
+        updateAlgorithmHistory()
+        groupButtonSelection = ""
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles Magnify.Click
         MagnifyTimer.Enabled = True
