@@ -4,7 +4,7 @@ Public Class Groups
     Public homeDir As DirectoryInfo
     Private Sub Groups_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = 960
-        Me.Height = 540
+        Me.Height = 560
         GroupDataView.Columns.Clear()
         GroupDataView.Rows.Clear()
 
@@ -15,6 +15,7 @@ Public Class Groups
         Dim grplines = File.ReadAllLines(homeDir.FullName + "Data/GroupButtonList.txt")
 
         Dim colsPerRow = 10
+        Dim rowsPerCol = 26
         For i = 0 To colsPerRow - 1
             Dim column As New DataGridViewTextBoxColumn()
             column.Name = "Column" & i
@@ -22,12 +23,18 @@ Public Class Groups
             GroupDataView.Columns.Add(column)
         Next
 
-        For i = 0 To grplines.Count - 1 Step colsPerRow
+        Dim rowCount = 0
+        For i = 0 To grplines.Count - 1
             Dim row As String() = New String(colsPerRow - 1) {}
-            For j = i To Math.Min(i + colsPerRow, grplines.Count) - 1
-                row(j - i) = grplines(j)
+            Dim index As Integer = 0
+            For j = i To grplines.Count - 1 Step rowsPerCol
+                If index >= row.Length Then Exit For
+                row(index) = grplines(j)
+                index += 1
             Next
             GroupDataView.Rows.Add(row)
+            rowCount += 1
+            If rowCount >= rowsPerCol Then Exit For
         Next
     End Sub
     Private Sub GroupDataView_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles GroupDataView.CellContentClick
