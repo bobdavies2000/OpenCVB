@@ -343,3 +343,27 @@ Public Class Delaunay_Contours : Inherits TaskParent
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Delaunay_Points2 : Inherits TaskParent
+    Dim delaunay As New Delaunay_Basics
+    Dim fLine As New FPoly_Line
+    Public Sub New()
+        desc = "This algorithm explores what happens when Delaunay is used on 2 points"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static mp As PointPair
+        fLine.Run(src)
+        dst3 = fLine.dst3
+        mp = fLine.mp
+
+        delaunay.inputPoints = New List(Of cvb.Point2f)({mp.p1, mp.p2})
+        delaunay.Run(src)
+
+        dst2 = delaunay.dst2
+    End Sub
+End Class

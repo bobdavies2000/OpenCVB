@@ -873,7 +873,7 @@ Public Class Main_UI
         algorithmCount = Split(1)
         sr.Close()
 
-        Dim groupFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
+        Dim groupFileInfo = New FileInfo(HomeDir.FullName + "Data/GroupComboBox.txt")
         If groupFileInfo.Exists = False Then
             MsgBox("The groupFileInfo.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
         End If

@@ -1308,10 +1308,8 @@ Public Class FPoly_Line : Inherits TaskParent
 
         Dim index = distances.IndexOf(distances.Max)
         mp = New PointPair(pts(index), pts(index + 1))
-        If standaloneTest() Then
-            dst3 = src
-            DrawLine(dst3, mp.p1, mp.p2, task.HighlightColor)
-        End If
+        dst3 = src
+        DrawLine(dst3, mp.p1, mp.p2, task.HighlightColor)
     End Sub
 End Class
 
@@ -1336,11 +1334,10 @@ Public Class FPoly_LineRect : Inherits TaskParent
         mpRect = New cvb.Rect(x, y, Math.Abs(mp.p1.X - mp.p2.X), Math.Abs(mp.p1.Y - mp.p2.Y))
         If mpRect.Width < task.gridSize Then mpRect.Width = task.gridSize
         If mpRect.Height < task.gridSize Then mpRect.Height = task.gridSize
+        mpRect = ValidateRect(mpRect)
 
-        If standaloneTest() Then
-            dst2 = src
-            DrawLine(dst2, mp.p1, mp.p2, task.HighlightColor)
-            dst2.Rectangle(mpRect, task.HighlightColor, task.lineWidth)
-        End If
+        dst2 = src
+        DrawLine(dst2, mp.p1, mp.p2, task.HighlightColor)
+        dst2.Rectangle(mpRect, task.HighlightColor, task.lineWidth)
     End Sub
 End Class

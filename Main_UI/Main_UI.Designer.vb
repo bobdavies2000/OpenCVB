@@ -56,6 +56,8 @@ Partial Class Main_UI
         Me.CameraSwitching = New System.Windows.Forms.Label()
         Me.CamSwitchProgress = New System.Windows.Forms.PictureBox()
         Me.CamSwitchTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.CamSwitchProgress, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -64,10 +66,10 @@ Partial Class Main_UI
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackButton, Me.ForwardButton, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.RecentSep, Me.AvailableAlgorithms, Me.GroupCombo})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackButton, Me.ForwardButton, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.ToolStripSeparator1, Me.ToolStripButton1, Me.RecentSep, Me.AvailableAlgorithms, Me.GroupCombo})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1400, 34)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1583, 34)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -218,7 +220,7 @@ Partial Class Main_UI
         '
         'AlgorithmDesc
         '
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(1120, 33)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(1204, 33)
         Me.AlgorithmDesc.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.AlgorithmDesc.Multiline = True
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
@@ -247,12 +249,13 @@ Partial Class Main_UI
         '
         'MenuStrip1
         '
+        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(5, 2, 0, 2)
-        Me.MenuStrip1.Size = New System.Drawing.Size(1400, 33)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1583, 33)
         Me.MenuStrip1.TabIndex = 4
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -297,9 +300,9 @@ Partial Class Main_UI
         'CamSwitchProgress
         '
         Me.CamSwitchProgress.BackColor = System.Drawing.SystemColors.MenuHighlight
-        Me.CamSwitchProgress.Location = New System.Drawing.Point(611, 233)
+        Me.CamSwitchProgress.Location = New System.Drawing.Point(30, 162)
         Me.CamSwitchProgress.Name = "CamSwitchProgress"
-        Me.CamSwitchProgress.Size = New System.Drawing.Size(36, 76)
+        Me.CamSwitchProgress.Size = New System.Drawing.Size(36, 36)
         Me.CamSwitchProgress.TabIndex = 6
         Me.CamSwitchProgress.TabStop = False
         '
@@ -307,11 +310,29 @@ Partial Class Main_UI
         '
         Me.CamSwitchTimer.Enabled = True
         '
+        'ToolStripButton1
+        '
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(74, 29)
+        Me.ToolStripButton1.Text = "Groups"
+        Me.ToolStripButton1.ToolTipText = "Algorithm Groups"
+        '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.AutoSize = False
+        Me.ToolStripSeparator1.BackColor = System.Drawing.SystemColors.ActiveCaptionText
+        Me.ToolStripSeparator1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(20, 34)
+        '
         'Main_UI
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1400, 748)
+        Me.ClientSize = New System.Drawing.Size(1583, 748)
         Me.Controls.Add(Me.CamSwitchProgress)
         Me.Controls.Add(Me.CameraSwitching)
         Me.Controls.Add(Me.XYLoc)
@@ -366,4 +387,6 @@ Partial Class Main_UI
     Friend WithEvents CameraSwitching As Label
     Friend WithEvents CamSwitchProgress As PictureBox
     Friend WithEvents CamSwitchTimer As Timer
+    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
+    Friend WithEvents ToolStripButton1 As ToolStripButton
 End Class

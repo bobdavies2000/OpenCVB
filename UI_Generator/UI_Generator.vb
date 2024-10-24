@@ -37,7 +37,6 @@ Module UI_Generator
         Dim opengl As New SortedList(Of String, String)
         Dim CodeLineCount As Integer
 
-
         Dim srcList As New List(Of String)({HomeDir.FullName + "CPP_Managed/CPP_Managed.cpp",    ' all the managed C++ code
                                             HomeDir.FullName + "CS_Classes/CS_AI_Generated.cs",  ' all the C# code
                                             HomeDir.FullName + "CPP_Native/CPP_NativeClasses.h", ' all the native C++ code
@@ -58,7 +57,7 @@ Module UI_Generator
                 ConvertOptionsToCPP(OptionsFile)
             End If
 
-            Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/AlgorithmGroupNames.txt")
+            Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/GroupComboBox.txt")
 
             If fullXRef Then
                 Console.WriteLine("Starting work to generate the user interface with updated XRef algorithms.")
@@ -295,7 +294,7 @@ Module UI_Generator
 
 
         Try
-            Dim sw = New StreamWriter(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
+            Dim sw = New StreamWriter(HomeDir.FullName + "Data/GroupComboBox.txt")
             sw.Write("(" + CStr(allList.Count) + ") < All >")
             For Each alg In allButPython.Keys
                 If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For

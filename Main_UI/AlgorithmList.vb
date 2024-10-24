@@ -629,6 +629,7 @@ End Enum
 	If algorithmName = "Delaunay_GenerationsNoKNN" Then return new Delaunay_GenerationsNoKNN
 	If algorithmName = "Delaunay_GenerationsNoKNN_CC" Then return new CPP_Basics(ccFunctionNames._Delaunay_GenerationsNoKNN_CC)
 	If algorithmName = "Delaunay_GenerationsNoKNN_CS" Then return new Delaunay_GenerationsNoKNN_CS
+	If algorithmName = "Delaunay_Points2" Then return new Delaunay_Points2
 	If algorithmName = "Delaunay_SubDiv" Then return new Delaunay_SubDiv
 	If algorithmName = "Delaunay_SubDiv_CS" Then return new Delaunay_SubDiv_CS
 	If algorithmName = "Delaunay_Subdiv2D" Then return new Delaunay_Subdiv2D

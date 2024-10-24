@@ -1004,10 +1004,23 @@ End Class
 
 Public Class Motion_FPolyRect : Inherits TaskParent
     Dim fRect As New FPoly_LineRect
+    Public match As New Match_Basics
+    Dim srcSave As New cvb.Mat
     Public Sub New()
+        match.searchRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
         desc = "Confirm the FPoly_LineRect matched the previous image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        fRect.Run(src)
+
+        If task.heartBeatLT Or match.correlation < 0.5 Then
+            srcSave = src.Clone
+            dst2 = fRect.dst2.Clone()
+        End If
+        match.template = srcSave(fRect.mpRect).Clone
+        match.Run(src)
+        dst3 = src
+        dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
+        labels(3) = "Correlation Coefficient = " + Format(match.correlation * 100, fmt1)
     End Sub
 End Class
