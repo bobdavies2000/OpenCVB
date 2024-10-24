@@ -40,8 +40,6 @@ Namespace jsonClass
 
         Public treeButton As Boolean
 
-        Public PixelViewerButton As Boolean
-
         Public fontInfo As Font
         Public desiredFPS As Integer
         Public translatorMode As String

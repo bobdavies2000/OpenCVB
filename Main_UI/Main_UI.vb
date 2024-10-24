@@ -112,6 +112,7 @@ Public Class Main_UI
 
     Public intermediateReview As String
     Dim pixelViewerRect As cvb.Rect
+    Dim pixelViewerOn As Boolean
     Dim pixelViewTag As Integer
 
     Dim PausePlay As Bitmap
@@ -303,7 +304,6 @@ Public Class Main_UI
 
         settings.locationMain = New cvb.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
         settings.treeButton = TreeButton.Checked
-        settings.PixelViewerButton = False
         If camPic(0) IsNot Nothing Then
             ' used only when .snapCustom is true
             settings.displayRes = New cvb.Size(camPic(0).Width, camPic(0).Height)
@@ -859,7 +859,7 @@ Public Class Main_UI
             SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
         End If
         PixelViewerButton.Checked = Not PixelViewerButton.Checked
-        settings.PixelViewerButton = PixelViewerButton.Checked
+        pixelViewerOn = PixelViewerButton.Checked
     End Sub
     Private Sub loadAlgorithmComboBoxes()
         Dim countFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmCounts.txt")
@@ -1279,7 +1279,7 @@ Public Class Main_UI
         Static myWhitePen As New Pen(Color.White)
         Static myBlackPen As New Pen(Color.Black)
 
-        If settings.PixelViewerButton And mousePicTag = pic.Tag Then
+        If pixelViewerOn And mousePicTag = pic.Tag Then
             Dim r = pixelViewerRect
             Dim rect = New cvb.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
                                    CInt(r.Width * ratio), CInt(r.Height * ratio))
@@ -1594,7 +1594,11 @@ Public Class Main_UI
                         End If
                         If intermediateReview <> "" Then task.intermediateName = intermediateReview
 
-                        task.pixelViewerOn = If(testAllRunning, False, settings.PixelViewerButton)
+                        If testAllRunning Then
+                            task.pixelViewerOn = False
+                        Else
+                            task.pixelViewerOn = pixelViewerOn
+                        End If
 
                         If GrabRectangleData Then
                             GrabRectangleData = False

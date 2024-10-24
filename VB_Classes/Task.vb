@@ -308,7 +308,6 @@ Public Class VBtask : Implements IDisposable
         Public testAllRunning As Boolean
         Public RotationMatrix() As Single
         Public RotationVector As cvb.Point3f
-        Public pixelViewerOn As Boolean
 
         Public mainFormLocation As cvb.Rect
         Public main_hwnd As IntPtr
@@ -510,20 +509,20 @@ Public Class VBtask : Implements IDisposable
             If dst3.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst3.Width > 0 Then dst3 = dst3.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
 
             If task.pixelViewerOn Then
-                If task.PixelViewer IsNot Nothing Then If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
-            Else
-                If task.intermediateObject IsNot Nothing Then
-                    dst0 = task.intermediateObject.dst0
-                    dst1 = task.intermediateObject.dst1
-                    dst2 = task.intermediateObject.dst2
-                    dst3 = task.intermediateObject.dst3
-                Else
-                    dst0 = If(task.gOptions.displayDst0.Checked, dst0, task.color)
-                    dst1 = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
-                End If
+                task.PixelViewer.viewerForm.Visible = True
                 task.PixelViewer.viewerForm.Show()
                 task.PixelViewer.Run(src)
+            Else
+                task.PixelViewer.viewerForm.Visible = False
             End If
+            If task.intermediateObject IsNot Nothing Then
+                dst0 = task.intermediateObject.dst0
+                dst1 = task.intermediateObject.dst1
+                dst2 = task.intermediateObject.dst2
+                dst3 = task.intermediateObject.dst3
+            End If
+            dst0 = If(task.gOptions.displayDst0.Checked, dst0, task.color)
+            dst1 = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
 
             Dim lookupName = task.intermediateName
             If lookupName = "" Then lookupName = task.algName
