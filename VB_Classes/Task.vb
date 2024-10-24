@@ -510,6 +510,8 @@ Public Class VBtask : Implements IDisposable
             If dst3.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst3.Width > 0 Then dst3 = dst3.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
 
             If task.pixelViewerOn Then
+                If task.PixelViewer IsNot Nothing Then If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
+            Else
                 If task.intermediateObject IsNot Nothing Then
                     dst0 = task.intermediateObject.dst0
                     dst1 = task.intermediateObject.dst1
@@ -521,8 +523,6 @@ Public Class VBtask : Implements IDisposable
                 End If
                 task.PixelViewer.viewerForm.Show()
                 task.PixelViewer.Run(src)
-            Else
-                If task.PixelViewer IsNot Nothing Then If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
             End If
 
             Dim lookupName = task.intermediateName
