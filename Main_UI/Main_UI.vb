@@ -1405,7 +1405,7 @@ Public Class Main_UI
                         uiRight = camera.uiRight.clone
                         ' a problem with the K4A interface was corrected here...
                         If camera.uipointcloud Is Nothing Then
-                            camera.uipointcloud = New cvb.Mat(uiColor.Size, cvb.MatType.CV_32FC3, New cvb.Scalar(0))
+                            camera.uipointcloud = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_32FC3)
                         End If
                         uiPointCloud = camera.uiPointCloud.clone
 

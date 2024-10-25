@@ -150,6 +150,11 @@ Public Class Edge_RandomForest_CPP_VB : Inherits TaskParent
         labels(3) = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        If standalone And task.testAllRunning Then
+            SetTrueText("The RandomForest edge detection takes so long " +
+                        "that it is not tested during 'Test All' overnight runs.")
+            Exit Sub
+        End If
         options.RunOpt()
 
         If task.frameCount < 100 Then SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", New cvb.Point(10, 100))

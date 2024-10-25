@@ -15028,6 +15028,13 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
+            if (standalone && vbc.task.testAllRunning)
+            {
+                SetTrueText("The RandomForest edge detection takes so long " +
+                            "that it is not tested during 'Test All' overnight runs.");
+                return;
+            }
+
             options.RunOpt();
             if (vbc.task.frameCount < 100)
                 SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", new cv.Point(10, 100));
