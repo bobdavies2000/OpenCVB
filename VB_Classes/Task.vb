@@ -534,11 +534,17 @@ Public Class VBtask : Implements IDisposable
             If task.gOptions.displayDst0.Checked Then dst0 = Check8uC3(obj.dst0) Else dst0 = task.color
             If task.gOptions.displayDst1.Checked Then dst1 = Check8uC3(obj.dst1) Else dst1 = task.depthRGB
 
-            dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, Check8uC3(obj.dst2))
-            dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, Check8uC3(obj.dst3))
-
-            task.labels = obj.labels
-            If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
+            If lookupName.EndsWith("_CC") Then
+                dst2 = If(dst2.Type = cvb.MatType.CV_8UC3, dst2, Check8uC3(dst2))
+                dst3 = If(dst3.Type = cvb.MatType.CV_8UC3, dst3, Check8uC3(dst3))
+                task.labels = labels
+            Else
+                dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, Check8uC3(obj.dst2))
+                dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, Check8uC3(obj.dst3))
+                task.labels = obj.labels
+                task.trueData = New List(Of TrueText)(trueData)
+                If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
+            End If
 
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
