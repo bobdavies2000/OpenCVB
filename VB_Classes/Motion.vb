@@ -1032,39 +1032,93 @@ End Class
 
 
 Public Class Motion_CenterRect : Inherits TaskParent
-    Dim searchRect As cvb.Rect
+    Dim centerRect As cvb.Rect
     Dim matchRect As cvb.Rect
     Dim template As cvb.Mat
     Public options As New Options_Features
+    Public matchCenter As cvb.Point
+    Dim correlation As Single
     Public Sub New()
-        searchRect = New cvb.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
+        task.gOptions.setDisplay1()
+        centerRect = New cvb.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
         desc = "Build a center rectangle and track it with MatchTemplate."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        If task.heartBeatLT Or template Is Nothing Then
-            dst2 = src.Clone
-            template = src(searchRect).Clone
-            dst2.Rectangle(searchRect, task.HighlightColor, task.lineWidth)
+
+        If task.heartBeatLT Or template Is Nothing Or correlation < 0.9 Then
+            dst1 = src.Clone
+            template = src(centerRect).Clone
+            dst1.Rectangle(centerRect, task.HighlightColor, task.lineWidth)
         End If
 
-        cvb.Cv2.MatchTemplate(template, src(searchRect), dst0, options.matchOption)
+        cvb.Cv2.MatchTemplate(template, src, dst0, options.matchOption)
 
         Dim mmData = GetMinMax(dst0)
 
-        Dim correlation = mmData.maxVal
+        correlation = mmData.maxVal
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
         Dim w = template.Width, h = template.Height
-        If searchRect.Width = 0 Then
-            matchRect = New cvb.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h)
-        Else
-            matchRect = New cvb.Rect(searchRect.X + mmData.maxLoc.X, searchRect.Y + mmData.maxLoc.Y, w, h)
-        End If
+        matchCenter = New cvb.Point(mmData.maxLoc.X - w / 2, mmData.maxLoc.Y - h / 2)
+        matchRect = New cvb.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h)
 
         dst3 = src
-        dst3.Rectangle(searchRect, cvb.Scalar.White, task.lineWidth)
         dst3.Rectangle(matchRect, task.HighlightColor, task.lineWidth)
 
-        labels(2) = "Correlation is " + Format(correlation, fmt3)
+        dst0 = dst0.Normalize(0, 255, cvb.NormTypes.MinMax)
+        DrawCircle(dst0, matchCenter, task.DotSize, cvb.Scalar.White)
+
+        labels(3) = "Correlation is " + Format(correlation, fmt3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_CenterRotation : Inherits TaskParent
+    Dim trans As New Motion_CenterRect
+    Dim distance As New Distance_Basics
+    Dim vertRect As cvb.Rect
+    Dim options As New Options_Threshold
+    Public mp As PointPair
+    Public Sub New()
+        Dim w = dst2.Width
+        vertRect = New cvb.Rect(w / 2 - w / 10, 0, w / 5, dst2.Height)
+        dst0 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U, 0)
+        FindSlider("Threshold value").Value = 200
+        desc = "Find the rotation angle of the camera"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        trans.Run(src)
+        dst1 = trans.dst0.Resize(task.color.Size)
+
+        dst0.SetTo(0)
+        dst1(vertRect).ConvertTo(dst0(vertRect), cvb.MatType.CV_8U)
+
+        Dim mm = GetMinMax(dst0)
+        dst0 = dst0.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary)
+
+        distance.Run(dst0)
+        dst2 = distance.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst3 = src.Clone
+
+        Dim tmp As New cvb.Mat
+        cvb.Cv2.FindNonZero(dst2, tmp)
+
+        If tmp.Rows > 2 Then
+            Dim points(tmp.Total * 2 - 1) As Integer
+            Marshal.Copy(tmp.Data, points, 0, points.Length)
+
+            Dim topPoint = New cvb.Point(points(0), points(1))
+            Dim index = points.Length - 2
+            Dim botPoint = New cvb.Point(points(index), points(index + 1))
+
+            Dim pair = New PointPair(topPoint, botPoint)
+            mp = pair.edgeToEdgeLine(dst2.Size)
+            dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1)
+        End If
     End Sub
 End Class

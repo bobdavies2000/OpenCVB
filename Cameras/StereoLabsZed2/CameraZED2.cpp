@@ -162,7 +162,13 @@ public:
 
 extern "C" __declspec(dllexport) int* Zed2Open(int w, int h) { StereoLabsZed2* cPtr = new StereoLabsZed2(w, h); return (int*)cPtr; }
 extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * cPtr) { cPtr->zed.close(); }
-extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.linear_acceleration; }
+extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * cPtr) 
+{ 
+	sl::float3 acc = cPtr->sensordata.imu.linear_acceleration;
+	Point3f acc3f = Point3f(acc.x, acc.y, acc.z);
+	printf("x = %f y = %f z = %f", acc.x, acc.y, acc.z);
+	return (int*)&acc3f;
+}
 extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.angular_velocity; }
 extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * cPtr) { return cPtr->serialNumber; }
 extern "C" __declspec(dllexport) void Zed2WaitForFrame(StereoLabsZed2 * cPtr) { cPtr->waitForFrame(); }

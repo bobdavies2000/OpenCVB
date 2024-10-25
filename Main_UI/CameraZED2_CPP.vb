@@ -77,8 +77,8 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
                                                  cvb.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone
 
             Dim accPtr = Zed2Acceleration(cPtr)
-            Dim accel = Marshal.PtrToStructure(Of cvb.Point3d)(accPtr)
-            IMU_Acceleration = New cvb.Point3f(accel.X, accel.Y, accel.Z)
+            Dim accel = Marshal.PtrToStructure(Of cvb.Point3f)(accPtr)
+            IMU_Acceleration = New cvb.Point3f(accel.X, accel.Y, -accel.Z)
 
             Dim angPtr = Zed2AngularVelocity(cPtr)
             IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(angPtr)

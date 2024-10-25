@@ -38,9 +38,7 @@ Partial Class Main_UI
         Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
         Me.Advice = New System.Windows.Forms.ToolStripButton()
         Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
-        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.GroupButtonList = New System.Windows.Forms.ToolStripButton()
-        Me.RecentSep = New System.Windows.Forms.ToolStripSeparator()
         Me.AvailableAlgorithms = New System.Windows.Forms.ToolStripComboBox()
         Me.GroupCombo = New System.Windows.Forms.ToolStripComboBox()
         Me.AlgorithmDesc = New System.Windows.Forms.TextBox()
@@ -66,7 +64,7 @@ Partial Class Main_UI
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackButton, Me.ForwardButton, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.ToolStripSeparator1, Me.GroupButtonList, Me.RecentSep, Me.AvailableAlgorithms, Me.GroupCombo})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackButton, Me.ForwardButton, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.GroupButtonList, Me.AvailableAlgorithms, Me.GroupCombo})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(1583, 34)
@@ -193,14 +191,6 @@ Partial Class Main_UI
         Me.RecentList.Size = New System.Drawing.Size(68, 29)
         Me.RecentList.Text = "Recent"
         '
-        'ToolStripSeparator1
-        '
-        Me.ToolStripSeparator1.AutoSize = False
-        Me.ToolStripSeparator1.BackColor = System.Drawing.SystemColors.ActiveCaptionText
-        Me.ToolStripSeparator1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
-        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(20, 34)
-        '
         'GroupButtonList
         '
         Me.GroupButtonList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
@@ -210,14 +200,6 @@ Partial Class Main_UI
         Me.GroupButtonList.Size = New System.Drawing.Size(45, 29)
         Me.GroupButtonList.Text = "A-Z"
         Me.GroupButtonList.ToolTipText = "Jump to Algorithm Group"
-        '
-        'RecentSep
-        '
-        Me.RecentSep.AutoSize = False
-        Me.RecentSep.BackColor = System.Drawing.SystemColors.ActiveCaptionText
-        Me.RecentSep.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
-        Me.RecentSep.Name = "RecentSep"
-        Me.RecentSep.Size = New System.Drawing.Size(20, 34)
         '
         'AvailableAlgorithms
         '
@@ -267,6 +249,7 @@ Partial Class Main_UI
         '
         'MenuStrip1
         '
+        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
@@ -382,10 +365,8 @@ Partial Class Main_UI
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents Magnify As ToolStripButton
     Friend WithEvents MagnifyTimer As Timer
-    Friend WithEvents RecentSep As ToolStripSeparator
     Friend WithEvents CameraSwitching As Label
     Friend WithEvents CamSwitchProgress As PictureBox
     Friend WithEvents CamSwitchTimer As Timer
-    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents GroupButtonList As ToolStripButton
 End Class

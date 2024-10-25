@@ -82,7 +82,7 @@ Public Module vbc
         Static heartBeatCount As Integer = 5
         If task.heartBeat Then
             heartBeatCount += 1
-            If heartBeatCount >= 15 Then
+            If heartBeatCount >= 5 Then
                 task.heartBeatLT = True
                 heartBeatCount = 0
             End If
