@@ -349,21 +349,25 @@ End Class
 
 
 
-Public Class Delaunay_Points2 : Inherits TaskParent
+
+Public Class Delaunay_Points : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
-    Dim fLine As New FPoly_Line
+    Dim fPoly As New FPoly_TopFeatures
     Public Sub New()
+        FindSlider("Points to use in Feature Poly").Value = 2
         desc = "This algorithm explores what happens when Delaunay is used on 2 points"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Static mp As PointPair
-        fLine.Run(src)
-        dst3 = fLine.dst3
-        mp = fLine.mp
+        Static ptSlider = FindSlider("Points to use in Feature Poly")
 
-        delaunay.inputPoints = New List(Of cvb.Point2f)({mp.p1, mp.p2})
+        fPoly.Run(src)
+        dst3 = fPoly.dst3
+
+        delaunay.inputPoints.Clear()
+        For i = 0 To ptSlider.value - 1
+            delaunay.inputPoints.Add(task.topFeatures(i))
+        Next
         delaunay.Run(src)
-
         dst2 = delaunay.dst2
     End Sub
 End Class

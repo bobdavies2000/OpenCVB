@@ -534,7 +534,7 @@ Public Class VBtask : Implements IDisposable
             If task.gOptions.displayDst0.Checked Then dst0 = Check8uC3(obj.dst0) Else dst0 = task.color
             If task.gOptions.displayDst1.Checked Then dst1 = Check8uC3(obj.dst1) Else dst1 = task.depthRGB
 
-            If lookupName.EndsWith("_CC") Then
+            If lookupName.EndsWith("_CC") Or lookupName.StartsWith("CPP_") Then
                 dst2 = If(dst2.Type = cvb.MatType.CV_8UC3, dst2, Check8uC3(dst2))
                 dst3 = If(dst3.Type = cvb.MatType.CV_8UC3, dst3, Check8uC3(dst3))
                 task.labels = labels

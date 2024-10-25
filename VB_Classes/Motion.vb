@@ -1,5 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
+Imports System.Web.UI
 Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
@@ -1022,5 +1023,48 @@ Public Class Motion_FPolyRect : Inherits TaskParent
         dst3 = src
         dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
         labels(3) = "Correlation Coefficient = " + Format(match.correlation * 100, fmt1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_CenterRect : Inherits TaskParent
+    Dim searchRect As cvb.Rect
+    Dim matchRect As cvb.Rect
+    Dim template As cvb.Mat
+    Public options As New Options_Features
+    Public Sub New()
+        searchRect = New cvb.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
+        desc = "Build a center rectangle and track it with MatchTemplate."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        If task.heartBeatLT Or template Is Nothing Then
+            dst2 = src.Clone
+            template = src(searchRect).Clone
+            dst2.Rectangle(searchRect, task.HighlightColor, task.lineWidth)
+        End If
+
+        cvb.Cv2.MatchTemplate(template, src(searchRect), dst0, options.matchOption)
+
+        Dim mmData = GetMinMax(dst0)
+
+        Dim correlation = mmData.maxVal
+        labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
+        Dim w = template.Width, h = template.Height
+        If searchRect.Width = 0 Then
+            matchRect = New cvb.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h)
+        Else
+            matchRect = New cvb.Rect(searchRect.X + mmData.maxLoc.X, searchRect.Y + mmData.maxLoc.Y, w, h)
+        End If
+
+        dst3 = src
+        dst3.Rectangle(searchRect, cvb.Scalar.White, task.lineWidth)
+        dst3.Rectangle(matchRect, task.HighlightColor, task.lineWidth)
+
+        labels(2) = "Correlation is " + Format(correlation, fmt3)
     End Sub
 End Class

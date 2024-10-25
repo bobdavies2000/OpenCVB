@@ -629,7 +629,7 @@ End Enum
 	If algorithmName = "Delaunay_GenerationsNoKNN" Then return new Delaunay_GenerationsNoKNN
 	If algorithmName = "Delaunay_GenerationsNoKNN_CC" Then return new CPP_Basics(ccFunctionNames._Delaunay_GenerationsNoKNN_CC)
 	If algorithmName = "Delaunay_GenerationsNoKNN_CS" Then return new Delaunay_GenerationsNoKNN_CS
-	If algorithmName = "Delaunay_Points2" Then return new Delaunay_Points2
+	If algorithmName = "Delaunay_Points" Then return new Delaunay_Points
 	If algorithmName = "Delaunay_SubDiv" Then return new Delaunay_SubDiv
 	If algorithmName = "Delaunay_SubDiv_CS" Then return new Delaunay_SubDiv_CS
 	If algorithmName = "Delaunay_Subdiv2D" Then return new Delaunay_Subdiv2D
@@ -2177,6 +2177,7 @@ End Enum
 	If algorithmName = "Motion_BGSub_QT" Then return new Motion_BGSub_QT
 	If algorithmName = "Motion_CCmerge" Then return new Motion_CCmerge
 	If algorithmName = "Motion_CCmerge_CS" Then return new Motion_CCmerge_CS
+	If algorithmName = "Motion_CenterRect" Then return new Motion_CenterRect
 	If algorithmName = "Motion_Color_CS" Then return new Motion_Color_CS
 	If algorithmName = "Motion_Contours" Then return new Motion_Contours
 	If algorithmName = "Motion_Contours_CS" Then return new Motion_Contours_CS
