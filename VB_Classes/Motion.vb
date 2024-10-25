@@ -1077,32 +1077,36 @@ End Class
 
 
 Public Class Motion_CenterRotation : Inherits TaskParent
-    Dim trans As New Motion_CenterRect
-    Dim distance As New Distance_Basics
+    Dim motion As New Motion_CenterRect
     Dim vertRect As cvb.Rect
     Dim options As New Options_Threshold
     Public mp As PointPair
     Public Sub New()
         Dim w = dst2.Width
-        vertRect = New cvb.Rect(w / 2 - w / 10, 0, w / 5, dst2.Height)
+        vertRect = New cvb.Rect(w / 2 - w / 4, 0, w / 2, dst2.Height)
         dst0 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U, 0)
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         FindSlider("Threshold value").Value = 200
         desc = "Find the rotation angle of the camera"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        trans.Run(src)
-        dst1 = trans.dst0.Resize(task.color.Size)
+        Dim dCount = dst2.CountNonZero
+        If dCount < dst2.Total / 100 Then
+            Static tSlider = FindSlider("Threshold value")
+            tSlider.value -= 1
+        End If
+
+        motion.Run(src)
+        dst1 = motion.dst0.Resize(task.color.Size)
 
         dst0.SetTo(0)
         dst1(vertRect).ConvertTo(dst0(vertRect), cvb.MatType.CV_8U)
 
         Dim mm = GetMinMax(dst0)
-        dst0 = dst0.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary)
+        dst2 = dst0.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary)
 
-        distance.Run(dst0)
-        dst2 = distance.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         dst3 = src.Clone
 
         Dim tmp As New cvb.Mat
