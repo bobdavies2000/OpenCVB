@@ -2178,9 +2178,7 @@ End Enum
 	If algorithmName = "Motion_BGSub_QT" Then return new Motion_BGSub_QT
 	If algorithmName = "Motion_CCmerge" Then return new Motion_CCmerge
 	If algorithmName = "Motion_CCmerge_CS" Then return new Motion_CCmerge_CS
-	If algorithmName = "Motion_CenterKalman" Then return new Motion_CenterKalman
 	If algorithmName = "Motion_CenterRect" Then return new Motion_CenterRect
-	If algorithmName = "Motion_CenterRotation" Then return new Motion_CenterRotation
 	If algorithmName = "Motion_Color_CS" Then return new Motion_Color_CS
 	If algorithmName = "Motion_Contours" Then return new Motion_Contours
 	If algorithmName = "Motion_Contours_CS" Then return new Motion_Contours_CS

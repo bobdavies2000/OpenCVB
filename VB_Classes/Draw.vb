@@ -441,20 +441,20 @@ End Class
 
 
 Public Class Draw_RotatedRect : Inherits TaskParent
-    Public vertices() As cvb.Point2f
+    Public rr As cvb.RotatedRect
     Public Sub New()
         desc = "Draw an OpenCV rotated rect"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             Static angle As Single = -10
-            Dim rr = New cvb.RotatedRect(New cvb.Point2f(dst2.Width / 2, dst2.Height / 2),
-                                         task.centerRect.Size, angle)
+            rr = New cvb.RotatedRect(New cvb.Point2f(dst2.Width / 2, dst2.Height / 2),
+                                     task.centerRect.Size, angle)
             angle += 1
             If angle > 10 Then angle = -10
-            vertices = rr.Points()
         End If
 
+        Dim vertices = rr.Points()
         dst2 = src
         For i As Integer = 0 To vertices.Count - 1
             dst2.Line(vertices(i), vertices((i + 1) Mod 4), cvb.Scalar.Green, task.lineWidth, task.lineType)
