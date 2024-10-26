@@ -1040,7 +1040,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
     Public matchCenter As cvb.Point
     Dim correlation As Single
     Public Sub New()
-        task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         centerRect = New cvb.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
         desc = "Build a center rectangle and track it with MatchTemplate."
     End Sub
@@ -1113,12 +1113,8 @@ Public Class Motion_CenterRotation : Inherits TaskParent
         cvb.Cv2.FindNonZero(dst2, tmp)
 
         If tmp.Rows > 2 Then
-            Dim points(tmp.Total * 2 - 1) As Integer
-            Marshal.Copy(tmp.Data, points, 0, points.Length)
-
-            Dim topPoint = New cvb.Point(points(0), points(1))
-            Dim index = points.Length - 2
-            Dim botPoint = New cvb.Point(points(index), points(index + 1))
+            Dim topPoint = tmp.Get(Of cvb.Point)(0, 0)
+            Dim botPoint = tmp.Get(Of cvb.Point)(tmp.Rows - 1, 0)
 
             Dim pair = New PointPair(topPoint, botPoint)
             mp = pair.edgeToEdgeLine(dst2.Size)
@@ -1134,5 +1130,33 @@ Public Class Motion_CenterRotation : Inherits TaskParent
                 Cv2.Line(dst3, vertices(i), vertices((i + 1) Mod 4), Scalar.Green, 2)
             Next
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Motion_CenterKalman : Inherits TaskParent
+    Dim motion As New Motion_CenterRotation
+    Dim kalman As New Kalman_Basics
+    Public Sub New()
+        ReDim kalman.kInput(2 - 1)
+        desc = "Kalmanize the output of center rotation"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        motion.Run(src)
+        dst2 = motion.dst3
+
+        kalman.kInput = {motion.mp.p1.X, motion.mp.p2.X}
+        kalman.Run(empty)
+
+        Dim topPoint = New cvb.Point(kalman.kOutput(0), 0)
+        Dim botPoint = New cvb.Point(kalman.kOutput(1), dst2.Height)
+
+        dst3 = src.Clone
+        dst3.Line(topPoint, botPoint, task.HighlightColor, task.lineWidth + 1)
     End Sub
 End Class
