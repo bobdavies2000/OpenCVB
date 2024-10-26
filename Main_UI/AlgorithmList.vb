@@ -839,6 +839,7 @@ End Enum
 	If algorithmName = "Draw_Noise_CS" Then return new Draw_Noise_CS
 	If algorithmName = "Draw_Polygon" Then return new Draw_Polygon
 	If algorithmName = "Draw_Polygon_CS" Then return new Draw_Polygon_CS
+	If algorithmName = "Draw_RotatedRect" Then return new Draw_RotatedRect
 	If algorithmName = "Draw_Shapes" Then return new Draw_Shapes
 	If algorithmName = "Draw_Shapes_CS" Then return new Draw_Shapes_CS
 	If algorithmName = "Draw_SymmetricalShapes" Then return new Draw_SymmetricalShapes

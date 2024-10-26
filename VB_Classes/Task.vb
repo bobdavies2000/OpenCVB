@@ -93,6 +93,9 @@ Public Class VBtask : Implements IDisposable
     Public ogl As OpenGL_Basics
     Public palette As Palette_LoadColorMap
 
+    Public drawRotatedRect As Draw_RotatedRect
+    Public centerRect As cvb.Rect
+
     Public pythonPipeIn As NamedPipeServerStream
     Public pythonPipeOut As NamedPipeServerStream
     Public pythonTaskName As String
@@ -378,10 +381,10 @@ Public Class VBtask : Implements IDisposable
         cols = parms.workingRes.Width
         task.optionsChanged = True
 
-        task.dst0 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        task.dst1 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        task.dst2 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        task.dst3 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        dst0 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        dst1 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        dst2 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        dst3 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
 
         OpenGL_Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
         OpenGL_Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
@@ -413,6 +416,8 @@ Public Class VBtask : Implements IDisposable
         task.gOptions.Show()
         palette = New Palette_LoadColorMap
         ogl = New OpenGL_Basics
+        drawRotatedRect = New Draw_RotatedRect
+        centerRect = New cvb.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
 
         callTrace.Clear()
         task.callTraceMain.Clear()

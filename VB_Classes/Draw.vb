@@ -37,7 +37,7 @@ Public Class Draw_Ellipses : Inherits TaskParent
         desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Options.RunOpt()
+        options.RunOpt()
         If task.heartBeat Then
             dst2.SetTo(cvb.Scalar.Black)
             For i = 0 To options.drawCount - 1
@@ -61,7 +61,7 @@ Public Class Draw_Circles : Inherits TaskParent
         desc = "Draw the requested number of circles."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Options.RunOpt()
+        options.RunOpt()
         If task.heartBeat Then
             dst2.SetTo(cvb.Scalar.Black)
             For i = 0 To options.drawCount - 1
@@ -87,7 +87,7 @@ Public Class Draw_Lines : Inherits TaskParent
         desc = "Draw the requested number of Lines."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Options.RunOpt()
+        options.RunOpt()
         If task.heartBeat Then
             dst2.SetTo(cvb.Scalar.Black)
             For i = 0 To options.drawCount - 1
@@ -113,9 +113,9 @@ Public Class Draw_Polygon : Inherits TaskParent
         labels = {"", "", "Convex Hull for the same points", "Polylines output"}
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Options.RunOpt()
+        options.RunOpt()
 
-        If not task.heartBeat Then Exit Sub
+        If Not task.heartBeat Then Exit Sub
         Dim height = src.Height / 8
         Dim width = src.Width / 8
         Dim polyColor = New cvb.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -247,9 +247,9 @@ Public Class Draw_Arc : Inherits TaskParent
         desc = "Use OpenCV's ellipse function to draw an arc"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Options.RunOpt()
+        options.RunOpt()
         If task.heartBeat Then
-            rect = initRandomRect(options.saveMargin)
+            rect = InitRandomRect(options.saveMargin)
             angle = msRNG.Next(0, 360)
             colorIndex = msRNG.Next(0, 255)
             thickness = msRNG.Next(1, 5)
@@ -298,10 +298,10 @@ Public Class Draw_ClipLine : Inherits TaskParent
     Dim hitCount = 0
     Private Sub setup()
         ReDim kalman.kInput(8)
-        Dim r = initRandomRect(25)
+        Dim r = InitRandomRect(25)
         pt1 = New cvb.Point(r.X, r.Y)
         pt2 = New cvb.Point(r.X + r.Width, r.Y + r.Height)
-        rect = initRandomRect(25)
+        rect = InitRandomRect(25)
         If task.gOptions.UseKalman.Checked Then flow.flowText.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
@@ -328,7 +328,7 @@ Public Class Draw_ClipLine : Inherits TaskParent
         linenum += 1
 
         hitCount += If(clipped, 1, 0)
-        setTrueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
+        SetTrueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                      New cvb.Point(src.Width / 2, 200))
         If r = rect Then setup()
         flow.Run(empty)
@@ -345,7 +345,7 @@ End Class
 Public Class Draw_Hexagon : Inherits TaskParent
     Dim alpha As New ImageForm
     Public Sub New()
-        alpha.imagePic.Image = Image.FromFile(task.homeDir + "Data/GestaltCube.gif")
+        alpha.imagePic.Image = Image.FromFile(task.HomeDir + "Data/GestaltCube.gif")
         alpha.Show()
         alpha.Size = New Size(512, 512)
         alpha.Text = "Perception is the key"
@@ -369,24 +369,23 @@ Public Class Draw_Line : Inherits TaskParent
         desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.firstPass Then task.ClickPoint = New cvb.Point
+        If task.FirstPass Then task.ClickPoint = New cvb.Point
 
-        If p1 <> New cvb.Point And p2 <> New cvb.Point And task.clickPoint <> New cvb.Point Then
+        If p1 <> New cvb.Point And p2 <> New cvb.Point And task.ClickPoint <> New cvb.Point Then
             p1 = New cvb.Point
             p2 = New cvb.Point
         End If
         dst2 = src
-        If task.clickPoint <> New cvb.Point Or externalUse Then
-            If p1 = New cvb.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
+        If task.ClickPoint <> New cvb.Point Or externalUse Then
+            If p1 = New cvb.Point Then p1 = task.ClickPoint Else p2 = task.ClickPoint
         End If
-
-        If p1 <> New cvb.Point And p2 = New cvb.Point Then DrawCircle(dst2, p1, task.DotSize, task.highlightColor)
+        If p1 <> New cvb.Point And p2 = New cvb.Point Then DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
         If p1 <> New cvb.Point And p2 <> New cvb.Point Then
-            DrawLine(dst2, p1, p2, task.highlightColor)
+            DrawLine(dst2, p1, p2, task.HighlightColor)
         End If
         SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
                     "P1 = " + p1.ToString + vbCrLf + "P2 = " + p2.ToString, 3)
-        task.clickPoint = New cvb.Point
+        task.ClickPoint = New cvb.Point
     End Sub
 End Class
 
@@ -435,5 +434,30 @@ Public Class Draw_Frustrum : Inherits TaskParent
         Next
         xyzDepth.Run(dst2)
         dst3 = xyzDepth.dst2.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height))
+    End Sub
+End Class
+
+
+
+
+Public Class Draw_RotatedRect : Inherits TaskParent
+    Public vertices() As cvb.Point2f
+    Public Sub New()
+        desc = "Draw an OpenCV rotated rect"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static angle As Single = -10
+            Dim rr = New cvb.RotatedRect(New cvb.Point2f(dst2.Width / 2, dst2.Height / 2),
+                                         task.centerRect.Size, angle)
+            angle += 1
+            If angle > 10 Then angle = -10
+            vertices = rr.Points()
+        End If
+
+        dst2 = src
+        For i As Integer = 0 To vertices.Count - 1
+            dst2.Line(vertices(i), vertices((i + 1) Mod 4), cvb.Scalar.Green, task.lineWidth, task.lineType)
+        Next
     End Sub
 End Class

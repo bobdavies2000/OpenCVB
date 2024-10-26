@@ -1039,9 +1039,9 @@ Public Class Motion_CenterRect : Inherits TaskParent
     Public options As New Options_Features
     Public matchCenter As cvb.Point
     Dim correlation As Single
+    Public gravitySnap As PointPair
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        centerRect = New cvb.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
         desc = "Build a center rectangle and track it with MatchTemplate."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -1051,6 +1051,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
             dst1 = src.Clone
             template = src(centerRect).Clone
             dst1.Rectangle(centerRect, task.HighlightColor, task.lineWidth)
+            gravitySnap = task.gravityVec
         End If
 
         cvb.Cv2.MatchTemplate(template, src, dst0, options.matchOption)
@@ -1082,6 +1083,8 @@ Public Class Motion_CenterRotation : Inherits TaskParent
     Dim vertRect As cvb.Rect
     Dim options As New Options_Threshold
     Public mp As PointPair
+    Public angle As Single
+    Public rotatedRect As cvb.RotatedRect
     Public Sub New()
         Dim w = dst2.Width
         vertRect = New cvb.Rect(w / 2 - w / 4, 0, w / 2, dst2.Height)
@@ -1118,17 +1121,16 @@ Public Class Motion_CenterRotation : Inherits TaskParent
 
             Dim pair = New PointPair(topPoint, botPoint)
             mp = pair.edgeToEdgeLine(dst2.Size)
-            dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1)
+            dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
 
             Dim sideAdjacent = Math.Abs(mp.p1.X - mp.p2.X)
-            Dim angle = Math.Atan(dst2.Height / sideAdjacent) * 180 / cvb.Cv2.PI
+            angle = Math.Atan(dst2.Height / sideAdjacent) * 180 / cvb.Cv2.PI
             If mp.p1.Y = 0 Then angle -= 90 Else angle = 90 - angle
-            Dim rr As New cvb.RotatedRect(mm.maxLoc, motion.matchRect.Size, angle)
+            rotatedRect = New cvb.RotatedRect(mm.maxLoc, motion.matchRect.Size, angle)
             labels(3) = "angle = " + Format(angle, fmt1) + " degrees"
-            Dim vertices() As Point2f = rr.Points()
-            For i As Integer = 0 To 3
-                Cv2.Line(dst3, vertices(i), vertices((i + 1) Mod 4), Scalar.Green, 2)
-            Next
+            task.drawRotatedRect.vertices = rotatedRect.Points()
+            task.drawRotatedRect.Run(dst3)
+            dst3 = task.drawRotatedRect.dst2
         End If
     End Sub
 End Class
@@ -1142,6 +1144,7 @@ End Class
 Public Class Motion_CenterKalman : Inherits TaskParent
     Dim motion As New Motion_CenterRotation
     Dim kalman As New Kalman_Basics
+    Dim kalmanRR As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(2 - 1)
         desc = "Kalmanize the output of center rotation"
@@ -1151,12 +1154,26 @@ Public Class Motion_CenterKalman : Inherits TaskParent
         dst2 = motion.dst3
 
         kalman.kInput = {motion.mp.p1.X, motion.mp.p2.X}
+        If motion.angle > 0 Then kalman.kInput = {motion.mp.p2.X, motion.mp.p1.X}
         kalman.Run(empty)
 
         Dim topPoint = New cvb.Point(kalman.kOutput(0), 0)
         Dim botPoint = New cvb.Point(kalman.kOutput(1), dst2.Height)
 
         dst3 = src.Clone
-        dst3.Line(topPoint, botPoint, task.HighlightColor, task.lineWidth + 1)
+        dst3.Line(topPoint, botPoint, task.HighlightColor, task.lineWidth + 1, task.lineType)
+
+        Dim rp = motion.rotatedRect.Points()
+        kalmanRR.kInput = New Single() {rp(0).X, rp(0).Y, rp(1).X, rp(1).Y,
+                                        rp(2).X, rp(2).Y, rp(3).X, rp(3).Y}
+        kalmanRR.Run(empty)
+        Dim rr = kalmanRR.kOutput
+
+        task.drawRotatedRect.vertices = New Point2f() {New Point2f(rr(0), rr(1)),
+                                                       New Point2f(rr(2), rr(3)),
+                                                       New Point2f(rr(4), rr(5)),
+                                                       New Point2f(rr(6), rr(7))}
+        task.drawRotatedRect.Run(dst3)
+        dst3 = task.drawRotatedRect.dst2
     End Sub
 End Class
