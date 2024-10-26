@@ -1,6 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports System.Web.UI
+Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
@@ -1032,8 +1033,8 @@ End Class
 
 
 Public Class Motion_CenterRect : Inherits TaskParent
-    Dim centerRect As cvb.Rect
-    Dim matchRect As cvb.Rect
+    Public centerRect As cvb.Rect
+    Public matchRect As cvb.Rect
     Dim template As cvb.Mat
     Public options As New Options_Features
     Public matchCenter As cvb.Point
@@ -1059,10 +1060,10 @@ Public Class Motion_CenterRect : Inherits TaskParent
         correlation = mmData.maxVal
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
         Dim w = template.Width, h = template.Height
-        matchCenter = New cvb.Point(mmData.maxLoc.X - w / 2, mmData.maxLoc.Y - h / 2)
+        matchCenter = New cvb.Point(mmData.maxLoc.X, mmData.maxLoc.Y)
         matchRect = New cvb.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h)
 
-        dst3 = src
+        dst3 = src.Clone
         dst3.Rectangle(matchRect, task.HighlightColor, task.lineWidth)
 
         dst0 = dst0.Normalize(0, 255, cvb.NormTypes.MinMax)
@@ -1101,10 +1102,9 @@ Public Class Motion_CenterRotation : Inherits TaskParent
         motion.Run(src)
         dst1 = motion.dst0.Resize(task.color.Size)
 
-        dst0.SetTo(0)
         dst1(vertRect).ConvertTo(dst0(vertRect), cvb.MatType.CV_8U)
 
-        Dim mm = GetMinMax(dst0)
+        Dim mm = GetMinMax(dst1)
         dst2 = dst0.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary)
 
         dst3 = src.Clone
@@ -1123,6 +1123,16 @@ Public Class Motion_CenterRotation : Inherits TaskParent
             Dim pair = New PointPair(topPoint, botPoint)
             mp = pair.edgeToEdgeLine(dst2.Size)
             dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1)
+
+            Dim sideAdjacent = Math.Abs(mp.p1.X - mp.p2.X)
+            Dim angle = Math.Atan(dst2.Height / sideAdjacent) * 180 / cvb.Cv2.PI
+            If mp.p1.Y = 0 Then angle -= 90 Else angle = 90 - angle
+            Dim rr As New cvb.RotatedRect(mm.maxLoc, motion.matchRect.Size, angle)
+            labels(3) = "angle = " + Format(angle, fmt1) + " degrees"
+            Dim vertices() As Point2f = rr.Points()
+            For i As Integer = 0 To 3
+                Cv2.Line(dst3, vertices(i), vertices((i + 1) Mod 4), Scalar.Green, 2)
+            Next
         End If
     End Sub
 End Class
