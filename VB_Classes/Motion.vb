@@ -1169,11 +1169,21 @@ Public Class Motion_CenterLeftRight : Inherits TaskParent
         dst1 = CenterC.dst2
         labels(1) = CenterC.labels(2)
 
-        leftC.Run(task.leftView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR))
+        If task.leftView.Channels = 1 Then
+            leftC.Run(task.leftView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR))
+        Else
+            leftC.Run(task.leftView)
+        End If
+
         dst2 = leftC.dst2
         labels(2) = leftC.labels(2)
 
-        rightC.Run(task.rightView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR))
+        If task.rightView.Channels = 1 Then
+            rightC.Run(task.rightView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR))
+        Else
+            rightC.Run(task.rightView)
+        End If
+
         dst3 = rightC.dst2
         labels(3) = rightC.labels(2)
 
