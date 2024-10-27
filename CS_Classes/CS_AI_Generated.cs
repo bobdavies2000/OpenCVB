@@ -5502,7 +5502,7 @@ namespace CS_Classes
     {
         public int translationX;
         public int translationY;
-        Gravity_Horizon gravity = new Gravity_Horizon();
+        Gravity_Basics gravity = new Gravity_Basics();
         public bool secondOpinion;
         Swarm_Basics feat = new Swarm_Basics();
         PointPair gravityVec;
@@ -20324,76 +20324,6 @@ namespace CS_Classes
 
 
 
-    public class FPoly_Perpendiculars_CS : TaskParent
-    {
-        public Point2f altCenterShift;
-        public fPolyData fPD;
-        public FPoly_RotatePoints rotatePoints = new FPoly_RotatePoints();
-        Line_Nearest near = new Line_Nearest();
-        public FPoly_Perpendiculars_CS()
-        {
-            labels = new string[] { "", "", "Output of FPoly_Basics", "Center of rotation is where the extended lines intersect" };
-            desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FPoly_Basics";
-        }
-        float findrotateAngle(Point2f p1, Point2f p2, Point2f pt)
-        {
-            near.lp = new PointPair(p1, p2);
-            near.pt = pt;
-            near.Run(empty);
-            DrawLine(dst2, pt, near.nearPoint, Scalar.Red, vbc.task.lineWidth);
-            double d1 = fPD.rotateCenter.DistanceTo(pt);
-            double d2 = fPD.rotateCenter.DistanceTo(near.nearPoint);
-            double angle = Math.Asin(near.nearPoint.DistanceTo(pt) / (d1 > d2 ? d1 : d2));
-            if (double.IsNaN(angle)) return 0;
-            return (float)angle;
-        }
-        public void RunAlg(Mat src)
-        {
-            if (standaloneTest())
-            {
-                SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().");
-                return;
-            }
-            Kalman_Basics kalman = new Kalman_Basics();
-            Line_Perpendicular perp1 = new Line_Perpendicular();
-            Line_Perpendicular perp2 = new Line_Perpendicular();
-            dst2.SetTo(0);
-            perp1.p1 = fPD.currPoly[fPD.polyPrevSideIndex];
-            perp1.p2 = fPD.currPoly[(fPD.polyPrevSideIndex + 1) % vbc.task.polyCount];
-            perp1.Run(empty);
-            DrawLine(dst2, perp1.r1, perp1.r2, Scalar.Yellow, vbc.task.lineWidth);
-            perp2.p1 = fPD.prevPoly[fPD.polyPrevSideIndex];
-            perp2.p2 = fPD.prevPoly[(fPD.polyPrevSideIndex + 1) % vbc.task.polyCount];
-            perp2.Run(empty);
-            DrawLine(dst2, perp2.r1, perp2.r2, Scalar.White, vbc.task.lineWidth);
-            fPD.rotateCenter = IntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, new cv.Rect(0, 0, src.Width, src.Height));
-            if (fPD.rotateCenter == new Point2f())
-            {
-                fPD.rotateAngle = 0;
-            }
-            else
-            {
-                DrawCircle(dst2, fPD.rotateCenter, vbc.task.DotSize + 2, Scalar.Red);
-                fPD.rotateAngle = findrotateAngle(perp2.r1, perp2.r2, perp1.r1);
-            }
-            if (fPD.rotateAngle == 0) fPD.rotateCenter = new Point2f();
-            altCenterShift = new Point2f(fPD.currPoly[fPD.polyPrevSideIndex].X - fPD.prevPoly[fPD.polyPrevSideIndex].X,
-                                         fPD.currPoly[fPD.polyPrevSideIndex].Y - fPD.prevPoly[fPD.polyPrevSideIndex].Y);
-            kalman.kInput = new float[] { fPD.rotateAngle };
-            kalman.Run(empty);
-            fPD.rotateAngle = kalman.kOutput[0];
-            rotatePoints.poly = fPD.currPoly;
-            rotatePoints.polyPrev = fPD.prevPoly;
-            rotatePoints.polyPrevSideIndex = fPD.polyPrevSideIndex;
-            rotatePoints.rotateAngle = fPD.rotateAngle;
-            rotatePoints.Run(src);
-            fPD.centerShift = rotatePoints.centerShift;
-            dst3 = rotatePoints.dst3;
-        }
-    }
-
-
-
 
     public class FPoly_Image_CS : TaskParent
     {
@@ -23793,76 +23723,6 @@ namespace CS_Classes
             {
                 dst2.SetTo(0);
                 DrawLine(dst2, vec.p1, vec.p2, cv.Scalar.All(255), vbc.task.lineWidth);
-            }
-        }
-    }
-
-
-
-
-    public class Gravity_HorizonCompare_CS : TaskParent
-    {
-        Gravity_Basics gravity = new Gravity_Basics();
-        Horizon_Basics horizon = new Horizon_Basics();
-        public Gravity_HorizonCompare_CS()
-        {
-            gravity.autoDisplay = true;
-            horizon.autoDisplay = true;
-            desc = "Collect results from Horizon_Basics with Gravity_Basics";
-        }
-        public void RunAlg(Mat src)
-        {
-            gravity.Run(src);
-            var g1 = gravity.vec;
-            var h1 = gravity.vec;
-            horizon.Run(src);
-            var g2 = horizon.vec;
-            var h2 = horizon.vec;
-            if (standaloneTest())
-            {
-                SetTrueText("Gravity vector (yellow):" + "\n" + gravity.strOut + "\n" + "\n" + "Horizon Vector (red): " + "\n" + horizon.strOut, 3);
-                dst2.SetTo(0);
-                DrawLine(dst2, g1.p1, g1.p2, vbc.task.HighlightColor, vbc.task.lineWidth);
-                DrawLine(dst2, g2.p1, g2.p2, vbc.task.HighlightColor, vbc.task.lineWidth);
-                DrawLine(dst2, h1.p1, h1.p2, Scalar.Red, vbc.task.lineWidth);
-                DrawLine(dst2, h2.p1, h2.p2, Scalar.Red, vbc.task.lineWidth);
-            }
-        }
-    }
-
-
-
-
-    public class Gravity_Horizon_CS : TaskParent
-    {
-        Gravity_Basics gravity = new Gravity_Basics();
-        Horizon_Basics horizon = new Horizon_Basics();
-        PointPair lastVec;
-        public Gravity_Horizon_CS()
-        {
-            gravity.autoDisplay = true;
-            horizon.autoDisplay = true;
-            labels[2] = "Gravity vector in yellow and Horizon vector in red.";
-            desc = "Compute the gravity vector and the horizon vector separately";
-        }
-        public void RunAlg(Mat src)
-        {
-            gravity.Run(src);
-            if (gravity.vec.p2.Y > 0 || gravity.vec.p1.Y > 0)
-                vbc.task.gravityVec = gravity.vec; // don't update if not found
-            horizon.Run(src);
-            if (vbc.task.FirstPass) lastVec = horizon.vec;
-            if (horizon.vec.p1.Y > 0)
-                lastVec = horizon.vec;
-            if (horizon.vec.p1.Y == 0)
-                horizon.vec = lastVec;
-            vbc.task.horizonVec = horizon.vec;
-            if (standaloneTest())
-            {
-                SetTrueText("Gravity vector (yellow):" + "\n" + gravity.strOut + "\n" + "\n" + "Horizon Vector (red): " + "\n" + horizon.strOut, 3);
-                dst2.SetTo(0);
-                DrawLine(dst2, vbc.task.gravityVec.p1, vbc.task.gravityVec.p2, vbc.task.HighlightColor, vbc.task.lineWidth);
-                DrawLine(dst2, vbc.task.horizonVec.p1, vbc.task.horizonVec.p2, Scalar.Red, vbc.task.lineWidth);
             }
         }
     }
@@ -34745,150 +34605,6 @@ namespace CS_Classes
             if (frameList.Count() >= vbc.task.frameHistoryCount) frameList.RemoveAt(0);
             pixelcount = Cv2.CountNonZero(dst3);
             labels[3] = "There were " + lineTotal + " lines detected using " + (pixelcount / 1000.0).ToString("#.0") + "k pixels";
-        }
-    }
-
-
-
-
-    public class Line_Verticals_CS : TaskParent
-    {
-        public Line_Basics lines = new Line_Basics();
-        public Options_Features options = new Options_Features();
-        public List<gravityLine> verticals = new List<gravityLine>();
-        public int maxAngleX;
-        public int maxAngleZ;
-        IMU_GMatrix gMat = new IMU_GMatrix();
-        TrackBar cellSlider;
-        TrackBar angleXSlider;
-        TrackBar angleZSlider;
-        public Line_Verticals_CS()
-        {
-            cellSlider = FindSlider("MatchTemplate Cell Size");
-            angleXSlider = FindSlider("X angle tolerance in degrees");
-            angleZSlider = FindSlider("Z angle tolerance in degrees");
-            desc = "Capture all vertical and horizontal lines.";
-        }
-        public void RunAlg(Mat src)
-        {
-            options.RunOpt();
-            maxAngleX = angleXSlider.Value;
-            maxAngleZ = angleZSlider.Value;
-            int radius = (int)(cellSlider.Value / 2);
-            lines.Run(src.Clone());
-            if (lines.lpList.Count() == 0) return; // nothing to work with...
-            var lines2 = new List<cv.Point2f>();
-            var lines3 = new List<cv.Point3f>();
-            foreach (var lp in lines.lpList)
-            {
-                lines2.Add(new Point2f(lp.p1.X, lp.p1.Y));
-                lines2.Add(new Point2f(lp.p2.X, lp.p2.Y));
-                lines3.Add(vbc.task.pointCloud.Get<cv.Point3f>((int)lp.p1.Y, (int)lp.p1.X));
-                lines3.Add(vbc.task.pointCloud.Get<cv.Point3f>((int)lp.p2.Y, (int)lp.p2.X));
-            }
-            dst2 = src.Clone();
-            gMat.Run(empty);
-            var points = cv.Mat.FromPixelData(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
-            var gPoints = (points * gMat.gMatrix).ToMat();
-            verticals.Clear();
-            for (int i = 0; i < gPoints.Rows; i += 2)
-            {
-                gravityLine vert = new gravityLine();
-                vert.tc1.center = lines2[i];
-                vert.tc2.center = lines2[i + 1];
-                vert.pt1 = gPoints.Get<cv.Point3f>(i + 0, 0);
-                vert.pt2 = gPoints.Get<cv.Point3f>(i + 1, 0);
-                vert.len3D = distance3D(vert.pt1, vert.pt2);
-                double arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958;
-                double arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958;
-                if (Math.Abs(arcX) <= maxAngleX && Math.Abs(arcZ) <= maxAngleZ)
-                {
-                    cv.Point pt = new cv.Point(lines2[i].X, lines2[i].Y);
-                    SetTrueText(arcX.ToString(vbc.fmt1) + " X" + "\n" + arcZ.ToString(vbc.fmt1) + " Z", pt, 2);
-                    SetTrueText(arcX.ToString(vbc.fmt1) + " X" + "\n" + arcZ.ToString(vbc.fmt1) + " Z", pt, 3);
-                    DrawLine(dst2, lines2[i], lines2[i + 1], vbc.task.HighlightColor);
-                    verticals.Add(vert);
-                }
-            }
-            labels[2] = verticals.Count() + " vertical lines were found.  Total lines found = " + lines.lpList.Count();
-        }
-    }
-
-
-
-
-    public class Line_Verts_CS : TaskParent
-    {
-        Line_Verticals verts = new Line_Verticals();
-        Match_tCell match = new Match_tCell();
-        public List<gravityLine> verticals = new List<gravityLine>();
-        IMU_GMatrix gMat = new IMU_GMatrix();
-        public Line_Verts_CS()
-        {
-            labels[3] = "Numbers below are: correlation coefficient, distance in meters, angle from vertical in the X-direction, angle from vertical in the Z-direction";
-            desc = "Find the list of vertical lines and track them until most are lost, then recapture the vertical lines again.";
-        }
-        public void RunAlg(Mat src)
-        {
-            if (verticals.Count() < 2 || verticals.Count() < verts.verticals.Count() / 3 || vbc.task.optionsChanged)
-            {
-                verts.Run(src);
-                foreach (var vert in verts.verticals)
-                {
-                    var vtmp = vert;
-                    vtmp.tc1 = match.createCell(src, 0, vert.tc1.center);
-                    vtmp.tc2 = match.createCell(src, 0, vert.tc2.center);
-                    verticals.Add(vtmp);
-                }
-            }
-            dst2 = src.Clone();
-            List<cv.Point2f> lines2 = new List<cv.Point2f>();
-            List<cv.Point3f> lines3 = new List<cv.Point3f>();
-            List<gravityLine> newVerts = new List<gravityLine>();
-            for (int i = 0; i < verticals.Count(); i++)
-            {
-                var vert = verticals[i];
-                match.tCells.Clear();
-                match.tCells.Add(vert.tc1);
-                match.tCells.Add(vert.tc2);
-                match.Run(src);
-                vert.tc1 = match.tCells[0];
-                vert.tc2 = match.tCells[1];
-                double correlationMin = verts.options.correlationMin;
-                if (vert.tc1.correlation >= correlationMin && vert.tc2.correlation >= correlationMin)
-                {
-                    lines2.Add(vert.tc1.center);
-                    lines2.Add(vert.tc2.center);
-                    lines3.Add(vbc.task.pointCloud.Get<cv.Point3f>((int)vert.tc1.center.Y, (int)vert.tc1.center.X));
-                    lines3.Add(vbc.task.pointCloud.Get<cv.Point3f>((int)vert.tc2.center.Y, (int)vert.tc2.center.X));
-                }
-                newVerts.Add(vert);
-            }
-            if (lines3.Count() > 0)
-            {
-                gMat.Run(empty);
-                Mat points = cv.Mat.FromPixelData(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
-                Mat gPoints = (points * gMat.gMatrix).ToMat();
-                verticals.Clear();
-                for (int i = 0; i < gPoints.Rows; i += 2)
-                {
-                    var vert = newVerts[i / 2];
-                    vert.pt1 = gPoints.Get<cv.Point3f>(i + 0, 0);
-                    vert.pt2 = gPoints.Get<cv.Point3f>(i + 1, 0);
-                    vert.len3D = distance3D(vert.pt1, vert.pt2);
-                    float arcX = (float)(Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958);
-                    float arcZ = (float)(Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958);
-                    if (Math.Abs(arcX) <= verts.maxAngleX && Math.Abs(arcZ) <= verts.maxAngleZ)
-                    {
-                        SetTrueText(vert.tc1.strOut, new cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y));
-                        SetTrueText(vert.tc1.strOut + "\n" + string.Format(vbc.fmt1, arcX) + " X" + "\n" + string.Format(vbc.fmt1, arcZ) + " Z",
-                                    new cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y), 3);
-                        DrawLine(dst2, vert.tc1.center, vert.tc2.center, vbc.task.HighlightColor);
-                        verticals.Add(vert);
-                    }
-                }
-            }
-            labels[2] = "Starting with " + verts.verticals.Count().ToString() + " there are " + verticals.Count().ToString() + " lines remaining";
         }
     }
 
@@ -61729,30 +61445,6 @@ namespace CS_Classes
         }
     }
 
-
-
-    public class Horizon_Perpendicular_CS : TaskParent
-    {
-        Line_Perpendicular perp = new Line_Perpendicular();
-        public Horizon_Perpendicular_CS()
-        {
-            labels[2] = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU.";
-            desc = "Find the gravity vector using the perpendicular to the horizon.";
-        }
-        public void RunAlg(Mat src)
-        {
-            dst2 = src;
-            DrawLine(dst2, vbc.task.horizonVec.p1, vbc.task.horizonVec.p2, Scalar.White);
-            perp.p1 = vbc.task.horizonVec.p1;
-            perp.p2 = vbc.task.horizonVec.p2;
-            perp.Run(src);
-            DrawLine(dst2, perp.r1, perp.r2, Scalar.Yellow);
-            var gVec = vbc.task.gravityVec;
-            gVec.p1.X += 10;
-            gVec.p2.X += 10;
-            DrawLine(dst2, gVec.p1, gVec.p2, Scalar.White);
-        }
-    }
 
 
     public class Feature_Agast_CS : TaskParent

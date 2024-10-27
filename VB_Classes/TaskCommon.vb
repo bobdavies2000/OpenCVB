@@ -210,7 +210,7 @@ End Structure
 
 
 
-Public Class PointPair
+Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
     Public p1 As cvb.Point2f
     Public p2 As cvb.Point2f
     Public slope As Single
@@ -220,8 +220,7 @@ Public Class PointPair
     Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
         p1 = _p1
         p2 = _p2
-        If CInt(p1.X) = CInt(p2.X) Then If p1.X < p2.X Then p2.X += 1 Else p1.X += 1 ' shift it so we can be sane.
-        slope = (p1.Y - p2.Y) / (p1.X - p2.X)
+        If p1.X = p2.X Then slope = 1 / 100000 Else slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         yIntercept = p1.Y - slope * p1.X
         length = p1.DistanceTo(p2)
     End Sub
@@ -233,6 +232,7 @@ Public Class PointPair
         Dim lp As New PointPair(p1, p2)
         lp.p1 = New cvb.Point2f(0, yIntercept)
         lp.p2 = New cvb.Point2f(size.Width, size.Width * slope + yIntercept)
+        If p1.X = p2.X Then slope = 1 / 100000 Else slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         xIntercept = -yIntercept / slope
         If lp.p1.Y > size.Height Then
             lp.p1.X = (size.Height - yIntercept) / slope

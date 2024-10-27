@@ -1,3 +1,4 @@
+Imports System.Windows
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Dim ld As cvb.XImgProc.FastLineDetector
@@ -150,11 +151,10 @@ Public Class Line_InterceptsUI : Inherits TaskParent
             DrawLine(dst3, center, p2, cvb.Scalar.Black)
         End If
         DrawCircle(dst3, center, task.DotSize, cvb.Scalar.White)
-
-        If color(0) = 0 Then redRadio.checked = True
-        If color(0) = 1 Then greenRadio.checked = True
-        If color(0) = 2 Then yellowRadio.checked = True
-        If color(0) = 254 Then blueRadio.checked = True
+        If color(0) = 0 Then redRadio.Checked = True
+        If color(0) = 1 Then greenRadio.Checked = True
+        If color(0) = 2 Then yellowRadio.Checked = True
+        If color(0) = 254 Then blueRadio.Checked = True
 
         lines.hightLightIntercept(dst3)
         dst2 = lines.dst2
@@ -611,36 +611,29 @@ End Class
 
 
 Public Class Line_Perpendicular : Inherits TaskParent
-    Public p1 As cvb.Point2f ' first input point
-    Public p2 As cvb.Point2f ' second input point
-    Public r1 As cvb.Point2f ' first output point (perpendicalar to input)
-    Public r2 As cvb.Point2f ' second output point (perpendicalar to input) 
+    Public input As PointPair
+    Public output As PointPair
+    Dim midPoint As cvb.Point2f
     Public Sub New()
         labels = {"", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", ""}
         desc = "Find the line perpendicular to the line created by the points provided."
     End Sub
+    Public Function computePerp(lp As PointPair) As PointPair
+        midPoint = New cvb.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
+
+        Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
+
+        Dim b = midPoint.Y - m * midPoint.X
+        Return New PointPair(New cvb.Point2f(-b / m, 0), New cvb.Point2f((dst2.Height - b) / m, dst2.Height))
+    End Function
     Public Sub RunAlg(src As cvb.Mat)
-        Static externalUse = If(p1 = New cvb.Point2f, False, True)
-        If task.heartBeat Or externalUse Then
-            If standaloneTest() Then
-                p1 = New cvb.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-                p2 = New cvb.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            End If
-            dst2.SetTo(0)
-            DrawLine(dst2, p1, p2, cvb.Scalar.White)
+        If standaloneTest() Then input = task.gravityVec
+        dst2.SetTo(0)
+        DrawLine(dst2, input.p1, input.p2, cvb.Scalar.White)
 
-            Dim slope As Single
-            If p1.X = p2.X Then slope = 100000 Else slope = (p1.Y - p2.Y) / (p1.X - p2.X)
-            Dim midPoint = New cvb.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-
-            DrawCircle(dst2, midPoint, task.DotSize + 2, cvb.Scalar.Red)
-            Dim m = If(slope = 0, 100000, -1 / slope)
-
-            Dim b = midPoint.Y - m * midPoint.X
-            r1 = New cvb.Point2f(-b / m, 0)
-            r2 = New cvb.Point2f((dst2.Height - b) / m, dst2.Height)
-            DrawLine(dst2, r1, r2, cvb.Scalar.Yellow)
-        End If
+        output = computePerp(input)
+        DrawCircle(dst2, midPoint, task.DotSize + 2, cvb.Scalar.Red)
+        DrawLine(dst2, output.p1, output.p2, cvb.Scalar.Yellow)
     End Sub
 End Class
 
@@ -1006,158 +999,6 @@ End Class
 
 
 
-
-
-
-
-Public Class Line_Verticals : Inherits TaskParent
-    Public lines As New Line_Basics
-    Public options As New Options_Features
-    Public verticals As New List(Of gravityLine)
-    Public maxAngleX As Integer
-    Public maxAngleZ As Integer
-    Dim gMat As New IMU_GMatrix
-    Dim cellSlider As System.Windows.Forms.TrackBar
-    Dim angleXSlider As System.Windows.Forms.TrackBar
-    Dim angleZSlider As System.Windows.Forms.TrackBar
-    Public Sub New()
-        cellSlider = FindSlider("MatchTemplate Cell Size")
-        angleXSlider = FindSlider("X angle tolerance in degrees")
-        angleZSlider = FindSlider("Z angle tolerance in degrees")
-        desc = "Capture all vertical and horizontal lines."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        maxAngleX = angleXSlider.Value
-        maxAngleZ = angleZSlider.Value
-        Dim radius = CInt(cellSlider.Value / 2)
-        lines.Run(src.Clone)
-
-        If lines.lpList.Count = 0 Then Exit Sub ' nothing to work with...
-        Dim lines2 As New List(Of cvb.Point2f)
-        Dim lines3 As New List(Of cvb.Point3f)
-        For Each lp In lines.lpList
-            lines2.Add(New cvb.Point2f(lp.p1.X, lp.p1.Y))
-            lines2.Add(New cvb.Point2f(lp.p2.X, lp.p2.Y))
-            For j = 0 To 2 - 1
-                Dim pt = Choose(j + 1, lp.p1, lp.p2)
-                lines3.Add(task.pointCloud.Get(Of cvb.Point3f)(pt.y, pt.x))
-            Next
-        Next
-
-        dst2 = src.Clone
-
-        gMat.Run(empty)
-
-        Dim points As cvb.Mat = cvb.Mat.FromPixelData(lines3.Count, 3, cvb.MatType.CV_32F, lines3.ToArray)
-        Dim gPoints As cvb.Mat = (points * gMat.gMatrix).ToMat
-
-        verticals.Clear()
-        For i = 0 To gPoints.Rows - 1 Step 2
-            Dim vert As gravityLine
-            vert.tc1.center = lines2(i)
-            vert.tc2.center = lines2(i + 1)
-            vert.pt1 = gPoints.Get(Of cvb.Point3f)(i + 0, 0)
-            vert.pt2 = gPoints.Get(Of cvb.Point3f)(i + 1, 0)
-            vert.len3D = distance3D(vert.pt1, vert.pt2)
-            Dim arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958
-            Dim arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958
-            If Math.Abs(arcX) <= maxAngleX And Math.Abs(arcZ) <= maxAngleZ Then
-                SetTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 2)
-                SetTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 3)
-                DrawLine(dst2, lines2(i), lines2(i + 1), task.HighlightColor)
-                verticals.Add(vert)
-            End If
-        Next
-        labels(2) = CStr(verticals.Count) + " vertical lines were found.  Total lines found = " + CStr(lines.lpList.Count)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Line_Verts : Inherits TaskParent
-    Dim verts As New Line_Verticals
-    Dim match As New Match_tCell
-    Public verticals As New List(Of gravityLine)
-    Dim gMat As New IMU_GMatrix
-    Public Sub New()
-        labels(3) = "Numbers below are: correlation coefficient, distance in meters, angle from vertical in the X-direction, angle from vertical in the Z-direction"
-        desc = "Find the list of vertical lines and track them until most are lost, then recapture the vertical lines again."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-
-        If verticals.Count < 2 Or verticals.Count < verts.verticals.Count / 3 Or task.optionsChanged Then
-            verts.Run(src)
-            For Each vert In verts.verticals
-                vert.tc1 = match.createCell(src, 0, vert.tc1.center)
-                vert.tc2 = match.createCell(src, 0, vert.tc2.center)
-                verticals.Add(vert)
-            Next
-        End If
-
-        dst2 = src.Clone
-        Dim lines2 As New List(Of cvb.Point2f)
-        Dim lines3 As New List(Of cvb.Point3f)
-        Dim newVerts As New List(Of gravityLine)
-        For i = 0 To verticals.Count - 1
-            Dim vert = verticals(i)
-
-            match.tCells.Clear()
-            match.tCells.Add(vert.tc1)
-            match.tCells.Add(vert.tc2)
-            match.Run(src)
-            vert.tc1 = match.tCells(0)
-            vert.tc2 = match.tCells(1)
-
-            Dim correlationMin = verts.options.correlationMin
-            If vert.tc1.correlation >= correlationMin And vert.tc2.correlation >= correlationMin Then
-                lines2.Add(vert.tc1.center)
-                lines2.Add(vert.tc2.center)
-                lines3.Add(task.pointCloud.Get(Of cvb.Point3f)(vert.tc1.center.Y, vert.tc1.center.X))
-                lines3.Add(task.pointCloud.Get(Of cvb.Point3f)(vert.tc2.center.Y, vert.tc2.center.X))
-            End If
-
-            newVerts.Add(vert)
-        Next
-        If lines3.Count Then
-            gMat.Run(empty)
-
-            Dim points As cvb.Mat = cvb.Mat.FromPixelData(lines3.Count, 3, cvb.MatType.CV_32F, lines3.ToArray)
-            Dim gPoints As cvb.Mat = (points * gMat.gMatrix).ToMat
-
-            verticals.Clear()
-            For i = 0 To gPoints.Rows - 1 Step 2
-                Dim vert = newVerts(i / 2)
-                vert.pt1 = gPoints.Get(Of cvb.Point3f)(i + 0, 0)
-                vert.pt2 = gPoints.Get(Of cvb.Point3f)(i + 1, 0)
-                vert.len3D = distance3D(vert.pt1, vert.pt2)
-                Dim arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958
-                Dim arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958
-                If Math.Abs(arcX) <= verts.maxAngleX And Math.Abs(arcZ) <= verts.maxAngleZ Then
-                    SetTrueText(vert.tc1.strOut, New cvb.Point(vert.tc1.rect.X, vert.tc1.rect.Y))
-                    SetTrueText(vert.tc1.strOut + vbCrLf + Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z",
-                                New cvb.Point(vert.tc1.rect.X, vert.tc1.rect.Y), 3)
-                    DrawLine(dst2, vert.tc1.center, vert.tc2.center, task.HighlightColor)
-                    verticals.Add(vert)
-                End If
-            Next
-        End If
-        labels(2) = "Starting with " + CStr(verts.verticals.Count) + " there are " + CStr(verticals.Count) + " lines remaining"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Line_Nearest : Inherits TaskParent
     Public pt As cvb.Point2f ' How close is this point to the input line?
     Public lp As New PointPair ' the input line.
@@ -1344,5 +1185,73 @@ Public Class Line_KNN : Inherits TaskParent
 
         swarm.DrawLines(dst3)
         labels(2) = lines.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Vertical : Inherits TaskParent
+    Public lines As New Line_Basics
+    Public vertList As New List(Of PointPair)
+    Public Sub New()
+        desc = "Find all the vertical lines with gravity vector"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = src.Clone
+        lines.Run(src)
+        dst3 = lines.dst2
+
+        Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
+        Dim sideOpposite = p2.X - p1.X
+        If p1.Y = 0 Then sideOpposite = p1.X - p2.X
+        Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
+
+        vertList.Clear()
+        For Each lp In lines.lpList
+            sideOpposite = lp.p2.X - lp.p1.X
+            If lp.p1.Y < lp.p2.Y Then sideOpposite = lp.p1.X - lp.p2.X
+            Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.Y - lp.p2.Y)) * 57.2958
+            If Math.Abs(angle - gAngle) < 2 Then
+                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+                vertList.Add(lp)
+            End If
+        Next
+        labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Horizontal : Inherits TaskParent
+    Public lines As New Line_Basics
+    Public horizonList As New List(Of PointPair)
+    Public Sub New()
+        desc = "Find all the Horizontal lines with horizon vector"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = src.Clone
+        lines.Run(src)
+        dst3 = lines.dst2
+
+        Dim p1 = task.horizonVec.p1, p2 = task.horizonVec.p2
+        Dim sideOpposite = p2.Y - p1.Y
+        If p1.X = 0 Then sideOpposite = p1.Y - p2.Y
+        Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
+
+        horizonList.Clear()
+        For Each lp In lines.lpList
+            sideOpposite = lp.p2.Y - lp.p1.Y
+            If lp.p1.X < lp.p2.X Then sideOpposite = lp.p1.Y - lp.p2.Y
+            Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.X - lp.p2.X)) * 57.2958
+            If Math.Abs(angle - hAngle) < 2 Then
+                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+                horizonList.Add(lp)
+            End If
+        Next
+        labels(2) = "There are " + CStr(horizonList.Count) + " lines similar to the horizon " + Format(hAngle, fmt1) + " degrees"
     End Sub
 End Class

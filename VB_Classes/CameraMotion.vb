@@ -2,7 +2,7 @@
 Public Class CameraMotion_Basics : Inherits TaskParent
     Public translationX As Integer
     Public translationY As Integer
-    Dim gravity As New Gravity_Horizon
+    Dim gravity As New Gravity_Basics
     Public secondOpinion As Boolean
     Dim feat As New Swarm_Basics
     Public Sub New()

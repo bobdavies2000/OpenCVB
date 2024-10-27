@@ -1,9 +1,8 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
-    Public points As New List(Of cvb.Point)
-    Dim resizeRatio As Integer = 1
-    Public vec As New PointPair
+    Public points As New List(Of cvb.Point2f)
     Public autoDisplay As Boolean
+    Dim perp As New Line_Perpendicular
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find all the points where depth X-component transitions from positive to negative"
@@ -16,21 +15,14 @@ Public Class Gravity_Basics : Inherits TaskParent
         dst2.SetTo(0)
         dst3.SetTo(0)
         For Each pt In points
-            pt = New cvb.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-            DrawCircle(dst2,pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
         Next
 
-        DrawLine(dst2, vec.p1, vec.p2, cvb.Scalar.White)
-        DrawLine(dst3, vec.p1, vec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+        DrawLine(dst3, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
-
-        Dim resolution = task.quarterRes
-        If dst0.Size <> resolution Then
-            dst0 = dst0.Resize(resolution, 0, 0, cvb.InterpolationFlags.Nearest)
-            resizeRatio = CInt(dst2.Height / resolution.Height)
-        End If
 
         dst0 = dst0.Abs()
         dst1 = dst0.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -47,24 +39,25 @@ Public Class Gravity_Basics : Inherits TaskParent
         Next
 
         labels(2) = CStr(points.Count) + " points found. "
-        Dim p1 As cvb.Point
-        Dim p2 As cvb.Point
+        Dim p1 As cvb.Point2f
+        Dim p2 As cvb.Point2f
         If points.Count >= 2 Then
-            p1 = New cvb.Point(resizeRatio * points(points.Count - 1).X, resizeRatio * points(points.Count - 1).Y)
-            p2 = New cvb.Point(resizeRatio * points(0).X, resizeRatio * points(0).Y)
+            p1 = New cvb.Point2f(points(points.Count - 1).X, points(points.Count - 1).Y)
+            p2 = New cvb.Point2f(points(0).X, points(0).Y)
         End If
 
         Dim distance = p1.DistanceTo(p2)
         If distance < 10 Then ' enough to get a line with some credibility
             points.Clear()
-            vec = New PointPair
+            task.gravityVec = New PointPair
             strOut = "Gravity vector not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
         Else
             Dim lp = New PointPair(p1, p2)
-            vec = lp.edgeToEdgeLine(dst2.Size)
+            task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
+        task.horizonVec = perp.computePerp(task.gravityVec)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -136,12 +129,12 @@ Public Class Gravity_HorizonCompare : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         gravity.Run(src)
-        Dim g1 = gravity.vec
-        Dim h1 = gravity.vec
+        Dim g1 = task.gravityVec
+        Dim h1 = task.gravityVec
 
         horizon.Run(src)
-        Dim g2 = horizon.vec
-        Dim h2 = horizon.vec
+        Dim g2 = task.horizonVec
+        Dim h2 = task.horizonVec
 
         If standaloneTest() Then
             SetTrueText(strOut, 3)
@@ -163,6 +156,7 @@ End Class
 
 
 
+
 Public Class Gravity_Horizon : Inherits TaskParent
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
@@ -175,7 +169,6 @@ Public Class Gravity_Horizon : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         gravity.RunAlg(src)
-        If gravity.vec.p2.Y > 0 Or gravity.vec.p1.Y > 0 Then task.gravityVec = gravity.vec ' don't update if not found
 
         horizon.RunAlg(src)
         If task.FirstPass Then lastVec = horizon.vec

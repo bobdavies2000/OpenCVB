@@ -44,3 +44,39 @@ Public Class Brightness_HSV : Inherits TaskParent
         labels(2) = "Brightness level = " + CStr(options.hsvBrightness)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Brightness_Grid : Inherits TaskParent
+    Dim bright As New Brightness_Basics
+    Public brightRect As cvb.Rect
+    Public Sub New()
+        desc = "Find the grid element with the highest brightness"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static alphaSlider = FindSlider("Alpha (contrast)")
+
+        bright.Run(src)
+        dst2 = bright.dst2
+
+        Dim meanVals As New List(Of Single)
+        For Each r In task.gridNabeRects
+            meanVals.Add(dst2(r).Mean()(0))
+        Next
+
+        Dim max = meanVals.Max
+        If max > 200 Then
+            Dim nextVal = alphaSlider.value - 10
+            If nextVal > 0 Then alphaSlider.value = nextVal
+        End If
+        brightRect = task.gridNabeRects(meanVals.IndexOf(max))
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            dst2(brightRect).CopyTo(dst3(brightRect))
+        End If
+    End Sub
+End Class

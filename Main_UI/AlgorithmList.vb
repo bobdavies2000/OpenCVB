@@ -382,6 +382,7 @@ End Enum
 	If algorithmName = "Boundary_Tiers_CS" Then return new Boundary_Tiers_CS
 	If algorithmName = "Brightness_Basics" Then return new Brightness_Basics
 	If algorithmName = "Brightness_Basics_CS" Then return new Brightness_Basics_CS
+	If algorithmName = "Brightness_Grid" Then return new Brightness_Grid
 	If algorithmName = "Brightness_HSV" Then return new Brightness_HSV
 	If algorithmName = "Brightness_HSV_CS" Then return new Brightness_HSV_CS
 	If algorithmName = "BRISK_Basics" Then return new BRISK_Basics
@@ -1252,7 +1253,6 @@ End Enum
 	If algorithmName = "FPoly_Line" Then return new FPoly_Line
 	If algorithmName = "FPoly_LineRect" Then return new FPoly_LineRect
 	If algorithmName = "FPoly_Perpendiculars" Then return new FPoly_Perpendiculars
-	If algorithmName = "FPoly_Perpendiculars_CS" Then return new FPoly_Perpendiculars_CS
 	If algorithmName = "FPoly_Plot" Then return new FPoly_Plot
 	If algorithmName = "FPoly_Plot_CS" Then return new FPoly_Plot_CS
 	If algorithmName = "FPoly_PlotWeighted" Then return new FPoly_PlotWeighted
@@ -1336,9 +1336,7 @@ End Enum
 	If algorithmName = "Gravity_BasicsOriginal" Then return new Gravity_BasicsOriginal
 	If algorithmName = "Gravity_BasicsOriginal_CS" Then return new Gravity_BasicsOriginal_CS
 	If algorithmName = "Gravity_Horizon" Then return new Gravity_Horizon
-	If algorithmName = "Gravity_Horizon_CS" Then return new Gravity_Horizon_CS
 	If algorithmName = "Gravity_HorizonCompare" Then return new Gravity_HorizonCompare
-	If algorithmName = "Gravity_HorizonCompare_CS" Then return new Gravity_HorizonCompare_CS
 	If algorithmName = "GrayToColor_Palette" Then return new GrayToColor_Palette
 	If algorithmName = "GrayToColor_Palette_CS" Then return new GrayToColor_Palette_CS
 	If algorithmName = "Grid_Basics" Then return new Grid_Basics
@@ -1619,9 +1617,9 @@ End Enum
 	If algorithmName = "Horizon_FindNonZeroOld" Then return new Horizon_FindNonZeroOld
 	If algorithmName = "Horizon_FindNonZeroOld_CS" Then return new Horizon_FindNonZeroOld_CS
 	If algorithmName = "Horizon_Perpendicular" Then return new Horizon_Perpendicular
-	If algorithmName = "Horizon_Perpendicular_CS" Then return new Horizon_Perpendicular_CS
 	If algorithmName = "Horizon_Regress" Then return new Horizon_Regress
 	If algorithmName = "Horizon_Regress_CS" Then return new Horizon_Regress_CS
+	If algorithmName = "Horizon_Simple" Then return new Horizon_Simple
 	If algorithmName = "Horizon_UnstableResults" Then return new Horizon_UnstableResults
 	If algorithmName = "Horizon_UnstableResults_CS" Then return new Horizon_UnstableResults_CS
 	If algorithmName = "Horizon_Validate" Then return new Horizon_Validate
@@ -1893,6 +1891,7 @@ End Enum
 	If algorithmName = "Line_GCloud_CS" Then return new Line_GCloud_CS
 	If algorithmName = "Line_Gravity" Then return new Line_Gravity
 	If algorithmName = "Line_Gravity_CS" Then return new Line_Gravity_CS
+	If algorithmName = "Line_Horizontal" Then return new Line_Horizontal
 	If algorithmName = "Line_InDepthAndBGR" Then return new Line_InDepthAndBGR
 	If algorithmName = "Line_InDepthAndBGR_CS" Then return new Line_InDepthAndBGR_CS
 	If algorithmName = "Line_Intercepts" Then return new Line_Intercepts
@@ -1920,10 +1919,7 @@ End Enum
 	If algorithmName = "Line_TimeView_CS" Then return new Line_TimeView_CS
 	If algorithmName = "Line_TimeViewLines" Then return new Line_TimeViewLines
 	If algorithmName = "Line_TimeViewLines_CS" Then return new Line_TimeViewLines_CS
-	If algorithmName = "Line_Verticals" Then return new Line_Verticals
-	If algorithmName = "Line_Verticals_CS" Then return new Line_Verticals_CS
-	If algorithmName = "Line_Verts" Then return new Line_Verts
-	If algorithmName = "Line_Verts_CS" Then return new Line_Verts_CS
+	If algorithmName = "Line_Vertical" Then return new Line_Vertical
 	If algorithmName = "Line_ViewSide" Then return new Line_ViewSide
 	If algorithmName = "Line_ViewSide_CS" Then return new Line_ViewSide_CS
 	If algorithmName = "Line_ViewTop" Then return new Line_ViewTop
@@ -2178,7 +2174,10 @@ End Enum
 	If algorithmName = "Motion_BGSub_QT" Then return new Motion_BGSub_QT
 	If algorithmName = "Motion_CCmerge" Then return new Motion_CCmerge
 	If algorithmName = "Motion_CCmerge_CS" Then return new Motion_CCmerge_CS
+	If algorithmName = "Motion_CenterKalman" Then return new Motion_CenterKalman
+	If algorithmName = "Motion_CenterLeftRight" Then return new Motion_CenterLeftRight
 	If algorithmName = "Motion_CenterRect" Then return new Motion_CenterRect
+	If algorithmName = "Motion_CenterRotation" Then return new Motion_CenterRotation
 	If algorithmName = "Motion_Color_CS" Then return new Motion_Color_CS
 	If algorithmName = "Motion_Contours" Then return new Motion_Contours
 	If algorithmName = "Motion_Contours_CS" Then return new Motion_Contours_CS

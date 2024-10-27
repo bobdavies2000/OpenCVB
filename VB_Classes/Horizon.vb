@@ -78,33 +78,6 @@ End Class
 
 
 
-Public Class Horizon_Perpendicular : Inherits TaskParent
-    Dim perp As New Line_Perpendicular
-    Public Sub New()
-        labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
-        desc = "Find the gravity vector using the perpendicular to the horizon."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        dst2 = src
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
-
-        perp.p1 = task.horizonVec.p1
-        perp.p2 = task.horizonVec.p2
-        perp.Run(src)
-        DrawLine(dst2, perp.r1, perp.r2, cvb.Scalar.Yellow)
-
-        Dim gVec = task.gravityVec
-        gVec.p1.X += 10
-        gVec.p2.X += 10
-        DrawLine(dst2, gVec.p1, gVec.p2, cvb.Scalar.White)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Horizon_BasicsAlt : Inherits TaskParent
     Public cloudY As cvb.Mat
@@ -452,5 +425,49 @@ Public Class Horizon_ExternalTest : Inherits TaskParent
         dst0 = PrepareDepthInput(1)
         horizon.Run(dst0)
         dst2 = horizon.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Horizon_Perpendicular : Inherits TaskParent
+    Dim perp As New Line_Perpendicular
+    Public Sub New()
+        labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
+        desc = "Find the gravity vector using the perpendicular to the horizon."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = src
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
+
+        perp.input = task.horizonVec
+        perp.Run(src)
+        DrawLine(dst2, perp.output.p1, perp.output.p2, cvb.Scalar.Yellow)
+
+        Dim gVec = task.gravityVec
+        gVec.p1.X += 10
+        gVec.p2.X += 10
+        DrawLine(dst2, gVec.p1, gVec.p2, cvb.Scalar.White)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Horizon_Simple : Inherits TaskParent
+    Dim perp As New Line_Perpendicular
+    Public Sub New()
+        desc = "Find the horizon with the perpendicular to gravity"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then dst2 = src.Clone
+
+        task.horizonVec = perp.computePerp(task.gravityVec)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.Yellow)
     End Sub
 End Class

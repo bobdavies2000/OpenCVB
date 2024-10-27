@@ -1033,14 +1033,15 @@ End Class
 
 
 Public Class Motion_CenterRect : Inherits TaskParent
-    Public matchRect As cvb.Rect
-    Dim template As cvb.Mat
+    Dim gravitySnap As New PointPair
+    Public template As cvb.Mat
     Dim options As New Options_Features
     Dim correlation As Single
-    Dim matchCenter As cvb.Point
+    Dim matchRect As cvb.Rect
+    Public inputRect As cvb.Rect
+    Public matchCenter As cvb.Point
     Public translation As cvb.Point2f
-    Public rotation As Single ' in degrees.
-    Dim gravitySnap As New PointPair
+    Public angle As Single ' in degrees.
     Public rotatedRect As cvb.RotatedRect
     Public Sub New()
         labels(3) = "MatchTemplate output for centerRect - center is black"
@@ -1049,8 +1050,10 @@ Public Class Motion_CenterRect : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        Dim correlationThreshold = 0.9 '= If(task.gOptions.debugChecked, 0.5, 0.9)
+        ' set a low threshold to make the results more visible.
+        Dim correlationThreshold = 0.5 ' If(task.gOptions.debugChecked, 0.5, 0.9)
         If task.heartBeatLT Or gravitySnap.p1.X = 0 Or correlation < correlationThreshold Then
+            If inputRect.Width <> 0 Then task.centerRect = inputRect
             template = src(task.centerRect).Clone
             gravitySnap = task.gravityVec
         End If
@@ -1067,7 +1070,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
         dst2 = src.Clone
         dst2.Rectangle(matchRect, task.HighlightColor, task.lineWidth)
 
-        dst3 = dst3.Normalize(0, 255, cvb.NormTypes.MinMax)
+        dst3 = dst3.Normalize(0, 255, cvb.NormTypes.MinMax).Resize(dst2.Size)
         DrawCircle(dst3, matchCenter, task.DotSize, cvb.Scalar.Black)
 
         Dim smp = New PointPair(gravitySnap.p1, gravitySnap.p2)
@@ -1087,8 +1090,8 @@ Public Class Motion_CenterRect : Inherits TaskParent
         sideOpposite = Math.Abs(mp.p1.X - dst2.Width / 2)
         Dim rotationGravity = Math.Atan(sideOpposite / sideAdjacent) * 180 / cvb.Cv2.PI
 
-        rotation = rotationSnap - rotationGravity
-        rotatedRect = New cvb.RotatedRect(matchCenter, matchRect.Size, rotation)
+        angle = rotationSnap - rotationGravity
+        rotatedRect = New cvb.RotatedRect(matchCenter, matchRect.Size, angle)
 
         task.drawRotatedRect.rr = rotatedRect
         task.drawRotatedRect.Run(dst2)
@@ -1096,7 +1099,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
 
         labels(2) = "Correlation = " + Format(correlation, fmt3) + ", Translation = (" +
                     Format(xDisp, fmt1) + "," + Format(yDisp, fmt1) + ") " +
-                    "Rotation = " + Format(rotation, fmt1) + " degrees"
+                    "Rotation = " + Format(angle, fmt1) + " degrees"
     End Sub
 End Class
 
@@ -1106,39 +1109,149 @@ End Class
 
 
 
-'Public Class Motion_CenterKalman : Inherits TaskParent
-'    Dim motion As New Motion_CenterRotation
-'    Dim kalman As New Kalman_Basics
-'    Dim kalmanRR As New Kalman_Basics
-'    Public Sub New()
-'        ReDim kalman.kInput(2 - 1)
-'        desc = "Kalmanize the output of center rotation"
-'    End Sub
-'    Public Sub RunAlg(src As cvb.Mat)
-'        motion.Run(src)
-'        dst2 = motion.dst3
+Public Class Motion_CenterKalman : Inherits TaskParent
+    Dim motion As New Motion_CenterRect
+    Dim kalman As New Kalman_Basics
+    Dim kalmanRR As New Kalman_Basics
+    Dim centerRect As cvb.Rect
+    Public Sub New()
+        ReDim kalman.kInput(2 - 1)
+        labels(3) = "Template for motion matchTemplate."
+        desc = "Kalmanize the output of center rotation"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.FirstPass Then centerRect = task.centerRect
+        dst2 = src.Clone
+        motion.Run(src)
 
-'        kalman.kInput = {motion.mp.p1.X, motion.mp.p2.X}
-'        If motion.angle > 0 Then kalman.kInput = {motion.mp.p2.X, motion.mp.p1.X}
-'        kalman.Run(empty)
+        Dim newRect As cvb.Rect
+        If motion.translation.X = 0 And motion.translation.Y = 0 And motion.angle = 0 Then
+            newRect = centerRect
+            task.drawRotatedRect.rr = New cvb.RotatedRect(motion.matchCenter, task.centerRect.Size, 0)
+        Else
+            kalman.kInput = {motion.translation.X, motion.translation.Y}
+            kalman.Run(empty)
 
-'        Dim topPoint = New cvb.Point(kalman.kOutput(0), 0)
-'        Dim botPoint = New cvb.Point(kalman.kOutput(1), dst2.Height)
+            newRect = New cvb.Rect(centerRect.X + kalman.kOutput(0), centerRect.Y + kalman.kOutput(1),
+                                       centerRect.Width, centerRect.Height)
 
-'        dst3 = src.Clone
-'        dst3.Line(topPoint, botPoint, task.HighlightColor, task.lineWidth + 1, task.lineType)
+            kalmanRR.kInput = New Single() {motion.matchCenter.X, motion.matchCenter.Y, motion.angle}
+            kalmanRR.Run(empty)
 
-'        Dim rp = motion.rotatedRect.Points()
-'        kalmanRR.kInput = New Single() {rp(0).X, rp(0).Y, rp(1).X, rp(1).Y,
-'                                        rp(2).X, rp(2).Y, rp(3).X, rp(3).Y}
-'        kalmanRR.Run(empty)
-'        Dim rr = kalmanRR.kOutput
+            Dim pt = New cvb.Point2f(kalmanRR.kOutput(0), kalmanRR.kOutput(1))
+            task.drawRotatedRect.rr = New cvb.RotatedRect(pt, task.centerRect.Size, kalmanRR.kOutput(2))
+        End If
 
-'        task.drawRotatedRect.rr = New Point2f() {New Point2f(rr(0), rr(1)),
-'                                                       New Point2f(rr(2), rr(3)),
-'                                                       New Point2f(rr(4), rr(5)),
-'                                                       New Point2f(rr(6), rr(7))}
-'        task.drawRotatedRect.Run(dst3)
-'        dst3 = task.drawRotatedRect.dst2
-'    End Sub
-'End Class
+        task.drawRotatedRect.Run(dst2)
+        dst2 = task.drawRotatedRect.dst2
+        dst2.Rectangle(newRect, task.HighlightColor, task.lineWidth)
+
+        dst3(centerRect) = motion.template
+        labels(2) = motion.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_CenterLeftRight : Inherits TaskParent
+    Dim CenterC As New Motion_CenterRect
+    Dim leftC As New Motion_CenterRect
+    Dim rightC As New Motion_CenterRect
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        desc = "Calculate translation and rotation for both left and right images"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        CenterC.Run(src)
+        dst1 = CenterC.dst2
+        labels(1) = CenterC.labels(2)
+
+        leftC.Run(task.leftView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR))
+        dst2 = leftC.dst2
+        labels(2) = leftC.labels(2)
+
+        rightC.Run(task.rightView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR))
+        dst3 = rightC.dst2
+        labels(3) = rightC.labels(2)
+
+        Debug.WriteLine("translation X,Y (C/L/R): " + Format(CenterC.translation.X, fmt0) + "/" +
+                         Format(leftC.translation.X, fmt0) + "/" + Format(rightC.translation.X, fmt0) +
+                         ", " + Format(CenterC.translation.Y, fmt0) + "/" + Format(leftC.translation.Y, fmt0) +
+                         "/" + Format(rightC.translation.Y, fmt0) + " rotation angle = " + Format(CenterC.angle, fmt1) +
+                         "/" + Format(leftC.angle, fmt1) + "/" + Format(rightC.angle, fmt1))
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Motion_CenterRotation : Inherits TaskParent
+    Dim motion As New Motion_CenterRect
+    Dim vertRect As cvb.Rect
+    Dim options As New Options_Threshold
+    Public mp As PointPair
+    Public angle As Single
+    Public rotatedRect As cvb.RotatedRect
+    Public Sub New()
+        Dim w = dst2.Width
+        vertRect = New cvb.Rect(w / 2 - w / 4, 0, w / 2, dst2.Height)
+        dst0 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U, 0)
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        FindSlider("Threshold value").Value = 200
+        desc = "Find the rotation angle using an unreliable diamond shape from the thresholded MatchTemplate output."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        Dim dCount = dst2.CountNonZero
+        Static tSlider = FindSlider("Threshold value")
+        If dCount > dst2.Total / 100 Then
+            Dim nextval = tSlider.value + 1
+            If nextval < tSlider.maximum Then tSlider.value = nextval
+        ElseIf dCount < dst2.Total / 200 Then
+            Dim nextval = tSlider.value - 1
+            If nextval >= 0 Then tSlider.value = nextval
+        End If
+
+        motion.Run(src)
+        dst1 = motion.dst3
+
+        dst1(vertRect).ConvertTo(dst0(vertRect), cvb.MatType.CV_8U)
+
+        Dim mm = GetMinMax(dst1)
+        dst2 = dst0.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary)
+
+        dst3 = src.Clone
+
+        Dim tmp As New cvb.Mat
+        cvb.Cv2.FindNonZero(dst2, tmp)
+
+        If tmp.Rows > 2 Then
+            Dim topPoint = tmp.Get(Of cvb.Point)(0, 0)
+            Dim botPoint = tmp.Get(Of cvb.Point)(tmp.Rows - 1, 0)
+
+            Dim pair = New PointPair(topPoint, botPoint)
+            mp = pair.edgeToEdgeLine(dst2.Size)
+            dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+
+            Dim sideAdjacent = Math.Abs(mp.p1.X - mp.p2.X)
+            angle = Math.Atan(dst2.Height / sideAdjacent) * 180 / cvb.Cv2.PI
+            If mp.p1.Y = 0 Then angle -= 90 Else angle = 90 - angle
+            rotatedRect = New cvb.RotatedRect(mm.maxLoc, task.centerRect.Size, angle)
+            labels(3) = "angle = " + Format(angle, fmt1) + " degrees"
+            task.drawRotatedRect.rr = rotatedRect
+            task.drawRotatedRect.Run(dst3)
+            dst3 = task.drawRotatedRect.dst2
+        End If
+        labels(3) = motion.labels(2)
+    End Sub
+End Class
+

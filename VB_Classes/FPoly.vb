@@ -774,23 +774,24 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         Static perp2 As New Line_Perpendicular
 
         dst2.SetTo(0)
-        perp1.p1 = fPD.currPoly(fPD.polyPrevSideIndex)
-        perp1.p2 = fPD.currPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount)
+        perp1.input = New PointPair(fPD.currPoly(fPD.polyPrevSideIndex),
+                                    fPD.currPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
         perp1.Run(empty)
 
-        DrawLine(dst2, perp1.r1, perp1.r2, cvb.Scalar.Yellow)
+        DrawLine(dst2, perp1.output.p1, perp1.output.p2, cvb.Scalar.Yellow)
 
-        perp2.p1 = fPD.prevPoly(fPD.polyPrevSideIndex)
-        perp2.p2 = fPD.prevPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount)
+        perp2.input = New PointPair(fPD.prevPoly(fPD.polyPrevSideIndex),
+                                   fPD.prevPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
         perp2.Run(empty)
-        DrawLine(dst2, perp2.r1, perp2.r2, white)
+        DrawLine(dst2, perp2.output.p1, perp2.output.p2, white)
 
-        fPD.rotateCenter = IntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, New cvb.Rect(0, 0, src.Width, src.Height))
+        fPD.rotateCenter = IntersectTest(perp2.output.p1, perp2.output.p2,
+                                         perp1.output.p1, perp1.output.p2, New cvb.Rect(0, 0, src.Width, src.Height))
         If fPD.rotateCenter = New cvb.Point2f Then
             fPD.rotateAngle = 0
         Else
             DrawCircle(dst2, fPD.rotateCenter, task.DotSize + 2, cvb.Scalar.Red)
-            fPD.rotateAngle = findrotateAngle(perp2.r1, perp2.r2, perp1.r1)
+            fPD.rotateAngle = findrotateAngle(perp2.output.p1, perp2.output.p2, perp1.output.p1)
         End If
         If fPD.rotateAngle = 0 Then fPD.rotateCenter = New cvb.Point2f
 
