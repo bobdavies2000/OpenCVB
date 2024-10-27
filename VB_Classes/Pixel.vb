@@ -1023,7 +1023,13 @@ Public Class Pixel_ColorGuess : Inherits TaskParent
                 myColorMap.Set(Of cvb.Vec3b)(i, 0, vec)
             Next
         End If
-        cvb.Cv2.ApplyColorMap(task.leftView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
-        cvb.Cv2.ApplyColorMap(task.rightView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)
+
+        If task.leftView.Channels = 1 Then
+            cvb.Cv2.ApplyColorMap(task.leftView, dst2, myColorMap)
+            cvb.Cv2.ApplyColorMap(task.rightView, dst3, myColorMap)
+        Else
+            cvb.Cv2.ApplyColorMap(task.leftView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
+            cvb.Cv2.ApplyColorMap(task.rightView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)
+        End If
     End Sub
 End Class
