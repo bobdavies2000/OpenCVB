@@ -87,7 +87,7 @@ End Class
 
 Public Class Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
-    Public lines As New Line_Basics
+    Public lines As New Line_Core
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub
@@ -722,7 +722,7 @@ End Class
 
 Public Class Structured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Public Sub New()
         labels(2) = "Center Slice in yellow"
         labels(3) = "White = SliceV output, Red Dot is avgPt"

@@ -1,6 +1,47 @@
-Imports System.Windows
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
+    Public lineList As New List(Of PointPair)
+    Public lines As New Line_Core
+    Public lpList As New List(Of PointPair)
+    Public Sub New()
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Dim minLength = dst2.Height / 20
+        dst2 = src.Clone
+
+        lines.Run(src)
+
+        Dim nextSet As New List(Of PointPair)
+        dst3.SetTo(0)
+        For Each lp In lpList
+            If task.motionMask(lp.rect).CountNonZero() = 0 Then
+                nextSet.Add(lp)
+                dst3.Line(lp.p1, lp.p2, 255, 1)
+            End If
+        Next
+
+        For Each lp In lines.lpList
+            If dst3(lp.rect).CountNonZero() < 5 And lp.length > minLength Then
+                nextSet.Add(lp)
+            End If
+        Next
+
+        lpList = New List(Of PointPair)(nextSet)
+
+        For Each lp In lpList
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Core : Inherits TaskParent
     Dim ld As cvb.XImgProc.FastLineDetector
     Public lpList As New List(Of PointPair)
     Public lineColor = cvb.Scalar.White
@@ -37,6 +78,26 @@ Public Class Line_Basics : Inherits TaskParent
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
 End Class
+
+
+
+
+
+Public Class Line_Rects : Inherits TaskParent
+    Dim lines As New Line_Core
+    Public Sub New()
+        desc = "Show the rectangle for each line"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lines.Run(src)
+        dst2 = lines.dst2
+
+        For Each lp In lines.lpList
+            dst2.Rectangle(lp.rect, task.HighlightColor, task.lineWidth)
+        Next
+    End Sub
+End Class
+
 
 
 
@@ -156,7 +217,22 @@ Public Class Line_InterceptsUI : Inherits TaskParent
         If color(0) = 2 Then yellowRadio.Checked = True
         If color(0) = 254 Then blueRadio.Checked = True
 
-        lines.hightLightIntercept(dst3)
+        For Each inter In lines.intercept
+            Select Case lines.options.selectedIntercept
+                Case 0
+                    dst3.Line(New cvb.Point(inter.Key, 0), New cvb.Point(inter.Key, 10), cvb.Scalar.White,
+                             task.lineWidth)
+                Case 1
+                    dst3.Line(New cvb.Point(inter.Key, dst3.Height), New cvb.Point(inter.Key, dst3.Height - 10),
+                             cvb.Scalar.White, task.lineWidth)
+                Case 2
+                    dst3.Line(New cvb.Point(0, inter.Key), New cvb.Point(10, inter.Key), cvb.Scalar.White,
+                             task.lineWidth)
+                Case 3
+                    dst3.Line(New cvb.Point(dst3.Width, inter.Key), New cvb.Point(dst3.Width - 10, inter.Key),
+                             cvb.Scalar.White, task.lineWidth)
+            End Select
+        Next
         dst2 = lines.dst2
     End Sub
 End Class
@@ -183,26 +259,6 @@ Public Class Line_Intercepts : Inherits TaskParent
     Public Sub New()
         labels(2) = "Highlight line x- and y-intercepts.  Move mouse over the image."
         desc = "Show lines with similar y-intercepts"
-    End Sub
-    Public Sub hightLightIntercept(dst As cvb.Mat)
-        For Each inter In intercept
-            If Math.Abs(options.mouseMovePoint - inter.Key) < options.interceptRange Then
-                DrawLine(dst2, p1List(inter.Value), p2List(inter.Value), cvb.Scalar.White)
-                DrawLine(dst2, p1List(inter.Value), p2List(inter.Value), cvb.Scalar.Blue)
-            End If
-        Next
-        For Each inter In intercept
-            Select Case options.selectedIntercept
-                Case 0
-                    dst.Line(New cvb.Point(inter.Key, 0), New cvb.Point(inter.Key, 10), cvb.Scalar.White, task.lineWidth)
-                Case 1
-                    dst.Line(New cvb.Point(inter.Key, dst2.Height), New cvb.Point(inter.Key, dst2.Height - 10), cvb.Scalar.White, task.lineWidth)
-                Case 2
-                    dst.Line(New cvb.Point(0, inter.Key), New cvb.Point(10, inter.Key), cvb.Scalar.White, task.lineWidth)
-                Case 3
-                    dst.Line(New cvb.Point(dst2.Width, inter.Key), New cvb.Point(dst2.Width - 10, inter.Key), cvb.Scalar.White, task.lineWidth)
-            End Select
-        Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
@@ -246,7 +302,13 @@ Public Class Line_Intercepts : Inherits TaskParent
             index += 1
         Next
 
-        If standaloneTest() Then hightLightIntercept(dst2)
+        If standaloneTest() Then
+            For Each inter In intercept
+                If Math.Abs(options.mouseMovePoint - inter.Key) < options.interceptRange Then
+                    DrawLine(dst2, p1List(inter.Value), p2List(inter.Value), cvb.Scalar.Blue)
+                End If
+            Next
+        End If
     End Sub
 End Class
 
@@ -289,7 +351,7 @@ End Class
 
 
 Public Class Line_InDepthAndBGR : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Public p1List As New List(Of cvb.Point2f)
     Public p2List As New List(Of cvb.Point2f)
     Public z1List As New List(Of cvb.Point3f) ' the point cloud values corresponding to p1 and p2
@@ -305,7 +367,8 @@ Public Class Line_InDepthAndBGR : Inherits TaskParent
         If lines.lpList.Count = 0 Then Exit Sub
 
         Dim lineList = New List(Of cvb.Rect)
-        If task.motionFlag Or task.optionsChanged Then dst3.SetTo(0)
+        If task.optionsChanged Then dst3.SetTo(0)
+        dst3.SetTo(0, task.motionMask)
         p1List.Clear()
         p2List.Clear()
         z1List.Clear()
@@ -353,7 +416,7 @@ End Class
 
 Public Class Line_PointSlope : Inherits TaskParent
     Dim extend As New LongLine_Extend
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Dim knn As New KNN_BasicsN
     Public bestLines As New List(Of PointPair)
     Const lineCount As Integer = 3
@@ -388,7 +451,7 @@ Public Class Line_PointSlope : Inherits TaskParent
             For j = 0 To knn.options.knnDimension - 1
                 knn.trainInput.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
             Next
-            dst1.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+            dst1.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
         Next
         If knn.trainInput.Count = 0 Then
             SetTrueText("There were no lines detected!  Were there any unusual settings for this run?", 3)
@@ -475,7 +538,7 @@ End Class
 
 
 Public Class Line_GCloud : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines As New Line_Core
     Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
@@ -678,7 +741,7 @@ End Class
 
 
 Public Class Line_Cells : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Identify all lines in the RedCloud_Basics cell boundaries"
@@ -699,7 +762,7 @@ End Class
 
 Public Class Line_ViewSide : Inherits TaskParent
     Public autoY As New OpAuto_YRange
-    Public lines As New Line_Basics
+    Public lines As New Line_Core
     Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
@@ -723,7 +786,7 @@ End Class
 
 Public Class Line_ViewTop : Inherits TaskParent
     Public autoX As New OpAuto_XRange
-    Public lines As New Line_Basics
+    Public lines As New Line_Core
     Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View."}
@@ -747,7 +810,7 @@ End Class
 
 Public Class Line_FromContours : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Dim contours As New Contour_Gray
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
@@ -777,7 +840,7 @@ End Class
 
 Public Class Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Lines for the current color class", "Color Class input"}
@@ -791,7 +854,7 @@ Public Class Line_ColorClass : Inherits TaskParent
         dst2 = lines.dst2
         dst3 = lines.dst3
 
-        labels(1) = "Input to Line_Basics"
+        labels(1) = "Input to Line_Core"
         labels(2) = "Lines found in the " + color8U.classifier.traceName + " output"
     End Sub
 End Class
@@ -804,10 +867,10 @@ End Class
 
 Public Class Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Public Sub New()
         FindSlider("Canny Aperture").Value = 7
-        labels = {"", "", "Straight lines in Canny output", "Input to Line_Basics"}
+        labels = {"", "", "Straight lines in Canny output", "Input to Line_Core"}
         desc = "Find lines in the Canny output"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -865,7 +928,7 @@ End Class
 
 Public Class Line_TimeView : Inherits TaskParent
     Public frameList As New List(Of List(Of PointPair))
-    Public lines As New Line_Basics
+    Public lines As New Line_Core
     Public pixelcount As Integer
     Public mpList As New List(Of PointPair)
     Public Sub New()
@@ -1078,8 +1141,8 @@ Public Class Line_Intersection : Inherits TaskParent
         intersectionPoint = IntersectTest(p1, p2, p3, p4, New cvb.Rect(0, 0, src.Width, src.Height))
 
         dst2.SetTo(0)
-        dst2.Line(p1, p2, cvb.Scalar.Yellow, task.lineWidth + 1, task.lineType)
-        dst2.Line(p3, p4, cvb.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        dst2.Line(p1, p2, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
+        dst2.Line(p3, p4, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
         If intersectionPoint <> New cvb.Point2f Then
             DrawCircle(dst2, intersectionPoint, task.DotSize + 4, cvb.Scalar.White)
             labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
@@ -1097,71 +1160,9 @@ End Class
 
 
 
-Public Class Line_Gravity : Inherits TaskParent
-    Dim lines As New Line_Basics
-    Dim nearest As New Line_Nearest
-    Public Sub New()
-        task.gOptions.LineWidth.Value = 2
-        desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Dim pixelDiff = task.gOptions.pixelDiffThreshold
-
-        dst2 = src.Clone
-        lines.Run(src)
-        If standaloneTest() Then dst3 = lines.dst2
-
-        nearest.lp = task.gravityVec
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
-        For Each lp In lines.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cvb.Rect(0, 0, src.Width, src.Height))
-            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
-
-            nearest.pt = lp.p1
-            nearest.Run(Nothing)
-            Dim d1 = nearest.distance
-            'DrawLine(dst2,nearest.nearPoint, lp.p1, cvb.Scalar.Red)
-
-            nearest.pt = lp.p2
-            nearest.Run(Nothing)
-            Dim d2 = nearest.distance
-            'DrawLine(dst2,nearest.nearPoint, lp.p2, cvb.Scalar.Red)
-
-            If Math.Abs(d1 - d2) <= pixelDiff Then
-                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
-            End If
-        Next
-
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
-        nearest.lp = task.horizonVec
-        For Each lp In lines.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cvb.Rect(0, 0, src.Width, src.Height))
-            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
-
-            nearest.pt = lp.p1
-            nearest.Run(Nothing)
-            Dim d1 = nearest.distance
-
-            nearest.pt = lp.p2
-            nearest.Run(Nothing)
-            Dim d2 = nearest.distance
-
-            If Math.Abs(d1 - d2) <= pixelDiff Then
-                DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Red)
-            End If
-        Next
-        labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Line_KNN : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Dim swarm As New Swarm_Basics
     Public Sub New()
         FindSlider("Connect X KNN points").Value = 1
@@ -1193,7 +1194,7 @@ End Class
 
 
 Public Class Line_Vertical : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines As New Line_Core
     Public ptList As New List(Of PointPair)
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
@@ -1260,10 +1261,71 @@ End Class
 
 
 
+
+Public Class Line_VerticalHorizontal1 : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Dim nearest As New Line_Nearest
+    Public Sub New()
+        task.gOptions.LineWidth.Value = 2
+        desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Dim pixelDiff = task.gOptions.pixelDiffThreshold
+
+        dst2 = src.Clone
+        lines.Run(src)
+        If standaloneTest() Then dst3 = lines.dst2
+
+        nearest.lp = task.gravityVec
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+        For Each lp In lines.lpList
+            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cvb.Rect(0, 0, src.Width, src.Height))
+            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
+
+            nearest.pt = lp.p1
+            nearest.Run(Nothing)
+            Dim d1 = nearest.distance
+
+            nearest.pt = lp.p2
+            nearest.Run(Nothing)
+            Dim d2 = nearest.distance
+
+            If Math.Abs(d1 - d2) <= pixelDiff Then
+                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+            End If
+        Next
+
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
+        nearest.lp = task.horizonVec
+        For Each lp In lines.lpList
+            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cvb.Rect(0, 0, src.Width, src.Height))
+            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
+
+            nearest.pt = lp.p1
+            nearest.Run(Nothing)
+            Dim d1 = nearest.distance
+
+            nearest.pt = lp.p2
+            nearest.Run(Nothing)
+            Dim d2 = nearest.distance
+
+            If Math.Abs(d1 - d2) <= pixelDiff Then
+                DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Red)
+            End If
+        Next
+        labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
+    End Sub
+End Class
+
+
+
+
+
 Public Class Line_VerticalHorizontal : Inherits TaskParent
     Dim verts As New Line_Vertical
     Dim horiz As New Line_Horizontal
-    Public ptList As New List(Of PointPair)
+    Public vList As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
+    Public hList As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         desc = "Highlight both vertical and horizontal lines"
     End Sub
@@ -1277,5 +1339,25 @@ Public Class Line_VerticalHorizontal : Inherits TaskParent
         For Each lp In horiz.ptList
             DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
         Next
+
+        vList.Clear()
+        For Each lp In verts.ptList
+            If lp.p1.Y < lp.p2.Y Then
+                vList.Add(lp.length, lp)
+            Else
+                vList.Add(lp.length, New PointPair(lp.p2, lp.p1))
+            End If
+        Next
+
+        hList.Clear()
+
+        For Each lp In horiz.ptList
+            If lp.p1.X < lp.p2.X Then
+                hList.Add(lp.length, lp)
+            Else
+                hList.Add(lp.length, New PointPair(lp.p2, lp.p1))
+            End If
+        Next
     End Sub
 End Class
+

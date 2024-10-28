@@ -246,7 +246,7 @@ End Class
 
 Public Class Match_Lines : Inherits TaskParent
     Dim knn As New KNN_Basics4D
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Public Sub New()
         labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"

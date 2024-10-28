@@ -68,8 +68,8 @@ namespace CPP_Native
         { task->alg = new Palette_Basics_CC(); task->alg->traceName = "Palette_Basics_CC"; break; }
         case _FeatureLess_History_CC:
         { task->alg = new FeatureLess_History_CC(); task->alg->traceName = "FeatureLess_History_CC"; break; }
-        case _Line_BasicsOld_CC:
-        { task->alg = new Line_BasicsOld_CC(); task->alg->traceName = "Line_BasicsOld_CC"; break; }
+        case _Line_FastDetect_CC:
+        { task->alg = new Line_FastDetect_CC(); task->alg->traceName = "Line_FastDetect_CC"; break; }
         case _Convex_Basics_CC:
         { task->alg = new Convex_Basics_CC(); task->alg->traceName = "Convex_Basics_CC"; break; }
         case _Resize_Preserve_CC:

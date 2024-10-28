@@ -214,7 +214,7 @@ End Class
 
 
 Public Class Horizon_UnstableResults : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Create lines for the gravity vector and horizon vector in the camera image"

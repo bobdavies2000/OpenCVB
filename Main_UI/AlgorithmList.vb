@@ -56,7 +56,7 @@ _IMU_GMatrix_QT_CC
 _Kalman_Basics_CC
 _KNN_Basics_CC
 _KNN_NoDups_CC
-_Line_BasicsOld_CC
+_Line_FastDetect_CC
 _Mat_4Click_CC
 _Mat_4to1_CC
 _Mesh_Basics_CC
@@ -1874,7 +1874,6 @@ End Enum
 	If algorithmName = "LeftRight_Reduction_CS" Then return new LeftRight_Reduction_CS
 	If algorithmName = "Line_Basics" Then return new Line_Basics
 	If algorithmName = "Line_Basics_CS" Then return new Line_Basics_CS
-	If algorithmName = "Line_BasicsOld_CC" Then return new CPP_Basics(ccFunctionNames._Line_BasicsOld_CC)
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Canny_CS" Then return new Line_Canny_CS
 	If algorithmName = "Line_Cells" Then return new Line_Cells
@@ -1883,13 +1882,14 @@ End Enum
 	If algorithmName = "Line_CellsVertHoriz_CS" Then return new Line_CellsVertHoriz_CS
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
 	If algorithmName = "Line_ColorClass_CS" Then return new Line_ColorClass_CS
+	If algorithmName = "Line_Core" Then return new Line_Core
 	If algorithmName = "Line_DisplayInfo" Then return new Line_DisplayInfo
 	If algorithmName = "Line_DisplayInfo_CS" Then return new Line_DisplayInfo_CS
+	If algorithmName = "Line_FastDetect_CC" Then return new CPP_Basics(ccFunctionNames._Line_FastDetect_CC)
 	If algorithmName = "Line_FromContours" Then return new Line_FromContours
 	If algorithmName = "Line_FromContours_CS" Then return new Line_FromContours_CS
 	If algorithmName = "Line_GCloud" Then return new Line_GCloud
 	If algorithmName = "Line_GCloud_CS" Then return new Line_GCloud_CS
-	If algorithmName = "Line_Gravity" Then return new Line_Gravity
 	If algorithmName = "Line_Gravity_CS" Then return new Line_Gravity_CS
 	If algorithmName = "Line_Horizontal" Then return new Line_Horizontal
 	If algorithmName = "Line_InDepthAndBGR" Then return new Line_InDepthAndBGR
@@ -1912,6 +1912,7 @@ End Enum
 	If algorithmName = "Line_Perpendicular_CS" Then return new Line_Perpendicular_CS
 	If algorithmName = "Line_PointSlope" Then return new Line_PointSlope
 	If algorithmName = "Line_PointSlope_CS" Then return new Line_PointSlope_CS
+	If algorithmName = "Line_Rects" Then return new Line_Rects
 	If algorithmName = "Line_RegionsVB" Then return new Line_RegionsVB
 	If algorithmName = "Line_SubsetRect" Then return new Line_SubsetRect
 	If algorithmName = "Line_SubsetRect_CS" Then return new Line_SubsetRect_CS
@@ -1921,6 +1922,7 @@ End Enum
 	If algorithmName = "Line_TimeViewLines_CS" Then return new Line_TimeViewLines_CS
 	If algorithmName = "Line_Vertical" Then return new Line_Vertical
 	If algorithmName = "Line_VerticalHorizontal" Then return new Line_VerticalHorizontal
+	If algorithmName = "Line_VerticalHorizontal1" Then return new Line_VerticalHorizontal1
 	If algorithmName = "Line_ViewSide" Then return new Line_ViewSide
 	If algorithmName = "Line_ViewSide_CS" Then return new Line_ViewSide_CS
 	If algorithmName = "Line_ViewTop" Then return new Line_ViewTop

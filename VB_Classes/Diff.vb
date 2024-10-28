@@ -105,7 +105,7 @@ End Class
 
 Public Class Diff_Lines : Inherits TaskParent
     Dim diff As New Diff_RGBAccum
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Public Sub New()
         labels = {"", "", "Add motion to see Diff output and lines input", "Lines output"}
         desc = "identify lines in the diff output"

@@ -1084,7 +1084,7 @@ namespace CS_Classes
     public class BackProject_FullLines_CS : TaskParent
     {
         BackProject_Full backP = new BackProject_Full();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
 
         public BackProject_FullLines_CS()
         {
@@ -13724,7 +13724,7 @@ namespace CS_Classes
     public class Diff_Lines_CS : TaskParent
     {
         Diff_RGBAccum diff = new Diff_RGBAccum();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
 
         public Diff_Lines_CS()
         {
@@ -19012,7 +19012,7 @@ namespace CS_Classes
 
     public class FeatureLine_Tutorial1_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public FeatureLine_Tutorial1_CS()
         {
             labels[3] = "The highlighted lines are also lines in 3D.";
@@ -19050,7 +19050,7 @@ namespace CS_Classes
 
     public class FeatureLine_Tutorial2_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         IMU_GMatrix gMat = new IMU_GMatrix();
         Options_LineFinder options = new Options_LineFinder();
         public FeatureLine_Tutorial2_CS()
@@ -19257,7 +19257,7 @@ namespace CS_Classes
 
     public class FeatureLine_Finder_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public List<cv.Point2f> lines2D = new List<cv.Point2f>();
         public List<cv.Point3f> lines3D = new List<cv.Point3f>();
         public SortedList<float, int> sorted2DV = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
@@ -28732,7 +28732,7 @@ namespace CS_Classes
 
     public class Horizon_UnstableResults_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public Horizon_UnstableResults_CS()
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -30741,7 +30741,7 @@ namespace CS_Classes
 
     public class Interpolate_Lines_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         Interpolate_Basics inter = new Interpolate_Basics();
         public Interpolate_Lines_CS()
         {
@@ -32707,7 +32707,7 @@ namespace CS_Classes
 
     public class KNN_ClosestTracker_CS : TaskParent
     {
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         public PointPair lastPair = new PointPair();
         public List<cv.Point2f> trainInput = new List<cv.Point2f>();
         List<float> minDistances = new List<float>();
@@ -33592,7 +33592,7 @@ namespace CS_Classes
 
     public class LeftRight_Lines_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public LeftRight_Lines_CS()
         {
             labels = new string[] { "", "", "Left camera lines", "Right camera lines" };
@@ -33794,7 +33794,7 @@ namespace CS_Classes
 
     public class Line_InterceptsUI_CS : TaskParent
     {
-        Line_Intercepts lines = new Line_Intercepts();
+        Line_Intercepts_CS lines = new Line_Intercepts_CS();
         cv.Point p2;
         System.Windows.Forms.RadioButton redRadio;
         System.Windows.Forms.RadioButton greenRadio;
@@ -33856,7 +33856,29 @@ namespace CS_Classes
             if (color[0] == 1) greenRadio.Checked = true;
             if (color[0] == 2) yellowRadio.Checked = true;
             if (color[0] == 254) blueRadio.Checked = true;
-            lines.hightLightIntercept(dst3);
+
+            foreach (var inter in lines.intercept)
+            {
+                switch (lines.options.selectedIntercept)
+                {
+                    case 0:
+                        dst3.Line(new cv.Point(inter.Key, 0), new cv.Point(inter.Key, 10), Scalar.White, 
+                                  vbc.task.lineWidth);
+                        break;
+                    case 1:
+                        dst3.Line(new cv.Point(inter.Key, dst3.Height), new cv.Point(inter.Key, dst3.Height - 10), 
+                                  Scalar.White, vbc.task.lineWidth);
+                        break;
+                    case 2:
+                        dst3.Line(new cv.Point(0, inter.Key), new cv.Point(10, inter.Key), Scalar.White, 
+                                  vbc.task.lineWidth);
+                        break;
+                    case 3:
+                        dst3.Line(new cv.Point(dst3.Width, inter.Key), new cv.Point(dst3.Width - 10, inter.Key), 
+                                  Scalar.White, vbc.task.lineWidth);
+                        break;
+                }
+            }
             dst2 = lines.dst2;
         }
     }
@@ -33867,7 +33889,7 @@ namespace CS_Classes
     public class Line_Intercepts_CS : TaskParent
     {
         public LongLine_Extend extended = new LongLine_Extend();
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         public List<cv.Point2f> p1List = new List<cv.Point2f>();
         public List<cv.Point2f> p2List = new List<cv.Point2f>();
         LongLine_Basics longLine = new LongLine_Basics();
@@ -33886,32 +33908,6 @@ namespace CS_Classes
         }
         public void hightLightIntercept(Mat dst)
         {
-            foreach (var inter in intercept)
-            {
-                if (Math.Abs(options.mouseMovePoint - inter.Key) < options.interceptRange)
-                {
-                    DrawLine(dst2, p1List[inter.Value], p2List[inter.Value], Scalar.White);
-                    DrawLine(dst2, p1List[inter.Value], p2List[inter.Value], Scalar.Blue);
-                }
-            }
-            foreach (var inter in intercept)
-            {
-                switch (options.selectedIntercept)
-                {
-                    case 0:
-                        dst.Line(new cv.Point(inter.Key, 0), new cv.Point(inter.Key, 10), Scalar.White, vbc.task.lineWidth);
-                        break;
-                    case 1:
-                        dst.Line(new cv.Point(inter.Key, dst2.Height), new cv.Point(inter.Key, dst2.Height - 10), Scalar.White, vbc.task.lineWidth);
-                        break;
-                    case 2:
-                        dst.Line(new cv.Point(0, inter.Key), new cv.Point(10, inter.Key), Scalar.White, vbc.task.lineWidth);
-                        break;
-                    case 3:
-                        dst.Line(new cv.Point(dst2.Width, inter.Key), new cv.Point(dst2.Width - 10, inter.Key), Scalar.White, vbc.task.lineWidth);
-                        break;
-                }
-            }
         }
         public void RunAlg(Mat src)
         {
@@ -33952,7 +33948,16 @@ namespace CS_Classes
                 if (emps.p2.Y == dst2.Height) botIntercepts.Add((int)saveP2.X, index);
                 index++;
             }
-            if (standaloneTest()) hightLightIntercept(dst2);
+            if (standaloneTest())
+            {
+                foreach (var inter in intercept)
+                {
+                    if (Math.Abs(options.mouseMovePoint - inter.Key) < options.interceptRange)
+                    {
+                        DrawLine(dst2, p1List[inter.Value], p2List[inter.Value], Scalar.Blue);
+                    }
+                }
+            }
         }
     }
 
@@ -33988,7 +33993,7 @@ namespace CS_Classes
 
     public class Line_InDepthAndBGR_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public List<cv.Point2f> p1List = new List<cv.Point2f>();
         public List<cv.Point2f> p2List = new List<cv.Point2f>();
         public List<cv.Point3f> z1List = new List<cv.Point3f>(); // the point cloud values corresponding to p1 and p2
@@ -34056,7 +34061,7 @@ namespace CS_Classes
     public class Line_PointSlope_CS : TaskParent
     {
         LongLine_Extend extend = new LongLine_Extend();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         KNN_BasicsN knn = new KNN_BasicsN();
         public List<PointPair> bestLines = new List<PointPair>();
         const int lineCount = 3;
@@ -34188,7 +34193,7 @@ namespace CS_Classes
 
     public class Line_GCloud_CS : TaskParent
     {
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         public SortedList<float, gravityLine> sortedVerticals = new SortedList<float, gravityLine>(new compareAllowIdenticalSingleInverted());
         public SortedList<float, gravityLine> sortedHorizontals = new SortedList<float, gravityLine>(new compareAllowIdenticalSingleInverted());
         public SortedList<float, gravityLine> allLines = new SortedList<float, gravityLine>(new compareAllowIdenticalSingleInverted());
@@ -34397,7 +34402,7 @@ namespace CS_Classes
 
     public class Line_Cells_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         RedCloud_Basics redC = new RedCloud_Basics();
         public Line_Cells_CS()
         {
@@ -34419,7 +34424,7 @@ namespace CS_Classes
     public class Line_ViewSide_CS : TaskParent
     {
         public OpAuto_YRange autoY = new OpAuto_YRange();
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         Projection_HistSide histSide = new Projection_HistSide();
         public Line_ViewSide_CS()
         {
@@ -34442,7 +34447,7 @@ namespace CS_Classes
     public class Line_ViewTop_CS : TaskParent
     {
         public OpAuto_XRange autoX = new OpAuto_XRange();
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         Projection_HistTop histTop = new Projection_HistTop();
         public Line_ViewTop_CS()
         {
@@ -34465,7 +34470,7 @@ namespace CS_Classes
     public class Line_FromContours_CS : TaskParent
     {
         Reduction_Basics reduction = new Reduction_Basics();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         Contour_Gray contours = new Contour_Gray();
         public Line_FromContours_CS()
         {
@@ -34494,7 +34499,7 @@ namespace CS_Classes
     public class Line_ColorClass_CS : TaskParent
     {
         Color8U_Basics colorClass = new Color8U_Basics();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public Line_ColorClass_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
@@ -34508,7 +34513,7 @@ namespace CS_Classes
             lines.Run(dst1 * 255 / colorClass.classCount);
             dst2 = lines.dst2;
             dst3 = lines.dst3;
-            labels[1] = "Input to Line_Basics";
+            labels[1] = "Input to Line_Core";
             labels[2] = "Lines found in the " + vbc.task.redOptions.colorMethods[vbc.task.redOptions.colorInputIndex] + " output";
         }
     }
@@ -34519,11 +34524,11 @@ namespace CS_Classes
     public class Line_Canny_CS : TaskParent
     {
         Edge_Canny canny = new Edge_Canny();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public Line_Canny_CS()
         {
             FindSlider("Canny Aperture").Value = 7;
-            labels = new string[] { "", "", "Straight lines in Canny output", "Input to Line_Basics" };
+            labels = new string[] { "", "", "Straight lines in Canny output", "Input to Line_Core" };
             desc = "Find lines in the Canny output";
         }
         public void RunAlg(Mat src)
@@ -34574,7 +34579,7 @@ namespace CS_Classes
     public class Line_TimeView_CS : TaskParent
     {
         public List<List<PointPair>> frameList = new List<List<PointPair>>();
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         public int pixelcount;
         public List<PointPair> mpList = new List<PointPair>();
         public Line_TimeView_CS()
@@ -34719,7 +34724,7 @@ namespace CS_Classes
 
     public class Line_Gravity_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         Line_Nearest nearest = new Line_Nearest();
         public Line_Gravity_CS()
         {
@@ -34775,7 +34780,7 @@ namespace CS_Classes
 
     public class Line_KNN_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         Swarm_Basics swarm = new Swarm_Basics();
         public Line_KNN_CS()
         {
@@ -35292,7 +35297,7 @@ namespace CS_Classes
 
     public class LongLine_Core_CS : TaskParent
     {
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         public int lineCount = 1; // How many of the longest lines...
         public List<PointPair> lpList = new List<PointPair>(); // this will be sorted by length - longest first
         public LongLine_Core_CS()
@@ -35490,11 +35495,11 @@ namespace CS_Classes
 
     public class LongLine_ExtendAll_CS : TaskParent
     {
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         public List<PointPair> lpList = new List<PointPair>();
         public LongLine_ExtendAll_CS()
         {
-            labels = new string[] { "", "", "Image output from Line_Basics", "The extended line for each line found in Line_Basics" };
+            labels = new string[] { "", "", "Image output from Line_Core", "The extended line for each line found in Line_Core" };
             desc = "Create a list of all the extended lines in an image";
         }
         public void RunAlg(Mat src)
@@ -35522,7 +35527,7 @@ namespace CS_Classes
         public List<coinPoints> parList = new List<coinPoints>();
         public LongLine_ExtendParallel_CS()
         {
-            labels = new string[] { "", "", "Image output from Line_Basics", "Parallel extended lines" };
+            labels = new string[] { "", "", "Image output from Line_Core", "Parallel extended lines" };
             desc = "Use KNN to find which lines are near each other and parallel";
         }
         public void RunAlg(Mat src)
@@ -36735,7 +36740,7 @@ namespace CS_Classes
     public class Match_Lines_CS : TaskParent
     {
         KNN_Basics4D knn = new KNN_Basics4D();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         List<PointPair> lastPt = new List<PointPair>();
         public Match_Lines_CS()
         {
@@ -39223,7 +39228,7 @@ namespace CS_Classes
     public class Projection_Lines_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         Options_Projection options = new Options_Projection();
         public Projection_Lines_CS()
         {
@@ -53549,7 +53554,7 @@ namespace CS_Classes
 
     public class RedTrack_Lines_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         RedTrack_Basics track = new RedTrack_Basics();
         public RedTrack_Lines_CS()
         {
@@ -53776,7 +53781,7 @@ namespace CS_Classes
 
     public class RedTrack_Points_CS : TaskParent
     {
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         RedTrack_Basics track = new RedTrack_Basics();
         public RedTrack_Points_CS()
         {
@@ -53911,7 +53916,7 @@ namespace CS_Classes
     public class Reduction_HeatMapLines_CS : TaskParent
     {
         HeatMap_Basics heat = new HeatMap_Basics();
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         public PointCloud_SetupSide setupSide = new PointCloud_SetupSide();
         public PointCloud_SetupTop setupTop = new PointCloud_SetupTop();
         Reduction_PointCloud reduction = new Reduction_PointCloud();
@@ -56493,7 +56498,7 @@ namespace CS_Classes
     public class Stable_Lines_CS : TaskParent
     {
         public Stable_Basics basics = new Stable_Basics();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public Stable_Lines_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
@@ -56797,7 +56802,7 @@ namespace CS_Classes
     public class Structured_MultiSliceLines_CS : TaskParent
     {
         Structured_MultiSlice multi = new Structured_MultiSlice();
-        public Line_Basics lines = new Line_Basics();
+        public Line_Core lines = new Line_Core();
         public Structured_MultiSliceLines_CS()
         {
             desc = "Detect lines in the multiSlice output";
@@ -57370,7 +57375,7 @@ namespace CS_Classes
     public class Structured_MouseSlice_CS : TaskParent
     {
         Structured_SliceEither slice = new Structured_SliceEither();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public Structured_MouseSlice_CS()
         {
             labels[2] = "Center Slice in yellow";
@@ -58077,7 +58082,7 @@ namespace CS_Classes
     public class SuperPixel_WithLineDetector_CS : TaskParent
     {
         SuperPixel_Basics_CPP_VB pixels = new SuperPixel_Basics_CPP_VB();
-        Line_Basics lines = new Line_Basics();
+        Line_Core lines = new Line_Core();
         public SuperPixel_WithLineDetector_CS()
         {
             labels[3] = "Input to superpixel basics.";

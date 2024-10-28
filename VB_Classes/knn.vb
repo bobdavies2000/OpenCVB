@@ -663,7 +663,7 @@ End Class
 
 
 Public Class KNN_ClosestTracker : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines As New Line_Core
     Public lastPair As New PointPair
     Public trainInput As New List(Of cvb.Point2f)
     Dim minDistances As New List(Of Single)

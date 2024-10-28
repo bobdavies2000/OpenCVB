@@ -54,7 +54,7 @@ End Class
 
 
 Public Class LongLine_Core : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines As New Line_Core
     Public lineCount As Integer = 1 ' How many of the longest lines...
     Public lpList As New List(Of PointPair) ' this will be sorted by length - longest first
     Public Sub New()
@@ -269,10 +269,10 @@ End Class
 
 
 Public Class LongLine_ExtendAll : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
     Public Sub New()
-        labels = {"", "", "Image output from Line_Basics", "The extended line for each line found in Line_Basics"}
+        labels = {"", "", "Image output from Line_Core", "The extended line for each line found in Line_Core"}
         desc = "Create a list of all the extended lines in an image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -299,7 +299,7 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
     Dim near As New Line_Nearest
     Public parList As New List(Of coinPoints)
     Public Sub New()
-        labels = {"", "", "Image output from Line_Basics", "Parallel extended lines"}
+        labels = {"", "", "Image output from Line_Core", "Parallel extended lines"}
         desc = "Use KNN to find which lines are near each other and parallel"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)

@@ -5882,22 +5882,22 @@ public:
 
 
 
-class Line_BasicsOld_CC : public CPP_Parent {
+class Line_FastDetect_CC : public CPP_Parent {
 public: 
     Ptr<ximgproc::FastLineDetector> ld;
     map<float, int> sortLength;
     vector<PointPair> mpList;
     vector<Point2f> ptList;
     Rect subsetRect;
-    int options_lineLengthThreshold = 20;
     // vector<tCell> tCells;
-    Line_BasicsOld_CC() : CPP_Parent() {
+    Line_FastDetect_CC() : CPP_Parent() {
         subsetRect = Rect(0, 0, dst2.cols, dst2.rows);
         dst3 = Mat::zeros(dst3.size(), CV_8U);
         ld = ximgproc::createFastLineDetector();
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
     }
     void Run(Mat src) override {
+        int options_lineLengthThreshold = dst2.rows / 10;
         if (src.channels() == 3) {
             cvtColor(src, dst2, COLOR_BGR2GRAY);
         }
