@@ -1920,6 +1920,7 @@ End Enum
 	If algorithmName = "Line_TimeViewLines" Then return new Line_TimeViewLines
 	If algorithmName = "Line_TimeViewLines_CS" Then return new Line_TimeViewLines_CS
 	If algorithmName = "Line_Vertical" Then return new Line_Vertical
+	If algorithmName = "Line_VerticalHorizontal" Then return new Line_VerticalHorizontal
 	If algorithmName = "Line_ViewSide" Then return new Line_ViewSide
 	If algorithmName = "Line_ViewSide_CS" Then return new Line_ViewSide_CS
 	If algorithmName = "Line_ViewTop" Then return new Line_ViewTop

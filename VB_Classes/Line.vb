@@ -1194,7 +1194,7 @@ End Class
 
 Public Class Line_Vertical : Inherits TaskParent
     Public lines As New Line_Basics
-    Public vertList As New List(Of PointPair)
+    Public ptList As New List(Of PointPair)
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
     End Sub
@@ -1208,17 +1208,17 @@ Public Class Line_Vertical : Inherits TaskParent
         If p1.Y = 0 Then sideOpposite = p1.X - p2.X
         Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
 
-        vertList.Clear()
+        ptList.Clear()
         For Each lp In lines.lpList
             sideOpposite = lp.p2.X - lp.p1.X
             If lp.p1.Y < lp.p2.Y Then sideOpposite = lp.p1.X - lp.p2.X
             Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.Y - lp.p2.Y)) * 57.2958
             If Math.Abs(angle - gAngle) < 2 Then
                 dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
-                vertList.Add(lp)
+                ptList.Add(lp)
             End If
         Next
-        labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
+        labels(2) = "There are " + CStr(ptList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
     End Sub
 End Class
 
@@ -1228,7 +1228,7 @@ End Class
 
 Public Class Line_Horizontal : Inherits TaskParent
     Public lines As New Line_Basics
-    Public horizonList As New List(Of PointPair)
+    Public ptList As New List(Of PointPair)
     Public Sub New()
         desc = "Find all the Horizontal lines with horizon vector"
     End Sub
@@ -1242,16 +1242,40 @@ Public Class Line_Horizontal : Inherits TaskParent
         If p1.X = 0 Then sideOpposite = p1.Y - p2.Y
         Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
 
-        horizonList.Clear()
+        ptList.Clear()
         For Each lp In lines.lpList
             sideOpposite = lp.p2.Y - lp.p1.Y
             If lp.p1.X < lp.p2.X Then sideOpposite = lp.p1.Y - lp.p2.Y
             Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.X - lp.p2.X)) * 57.2958
             If Math.Abs(angle - hAngle) < 2 Then
                 dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
-                horizonList.Add(lp)
+                ptList.Add(lp)
             End If
         Next
-        labels(2) = "There are " + CStr(horizonList.Count) + " lines similar to the horizon " + Format(hAngle, fmt1) + " degrees"
+        labels(2) = "There are " + CStr(ptList.Count) + " lines similar to the horizon " + Format(hAngle, fmt1) + " degrees"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_VerticalHorizontal : Inherits TaskParent
+    Dim verts As New Line_Vertical
+    Dim horiz As New Line_Horizontal
+    Public ptList As New List(Of PointPair)
+    Public Sub New()
+        desc = "Highlight both vertical and horizontal lines"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        verts.Run(src)
+        horiz.Run(src)
+
+        dst3 = horiz.dst3
+
+        dst2 = verts.dst2
+        For Each lp In horiz.ptList
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+        Next
     End Sub
 End Class
