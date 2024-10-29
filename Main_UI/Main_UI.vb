@@ -1270,6 +1270,11 @@ Public Class Main_UI
         StartTask()
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
+        If CameraSwitching.Visible And paintNewImages Then
+            CameraSwitching.Visible = False
+            CamSwitchProgress.Visible = False
+        End If
+
         Dim g As Graphics = e.Graphics
         Dim pic = DirectCast(sender, PictureBox)
         Dim ratio = camPic(2).Width / settings.WorkingRes.Width
@@ -1760,7 +1765,6 @@ Public Class Main_UI
         CamSwitchProgress.Height = CameraSwitching.Height / 2
         CameraSwitching.BringToFront()
         CamSwitchProgress.BringToFront()
-        CamSwitchTimer.Enabled = True
     End Sub
     Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
         Dim count As Integer

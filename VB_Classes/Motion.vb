@@ -1,7 +1,5 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
-Imports System.Web.UI
-Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
@@ -57,7 +55,7 @@ Public Class Motion_BasicsTest : Inherits TaskParent
     Dim measure As New LowRes_MeasureMotion
     Public Sub New()
         task.gOptions.UseMotionConstructed.Checked = False
-        task.gOptions.ShowMotionRectangle.Checked = True
+        task.gOptions.showMotionMask.Checked = True
         desc = "Display the difference between task.color and src to verify Motion_Basics is working"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -111,8 +109,6 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
         desc = "The option-free version of Motion_BGSub"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        task.motionDetected = True
-
         If src.Channels() <> 1 Then
             bgSub.Run(src)
             src = bgSub.dst2
@@ -122,7 +118,6 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
 
         redMasks.Run(src.Threshold(0, 255, cvb.ThresholdTypes.Binary))
         If task.redCells.Count < 2 Then
-            task.motionDetected = False
             rectList.Clear()
         Else
             Dim nextRect = task.redCells.ElementAt(1).rect
@@ -255,9 +250,9 @@ Public Class Motion_PixelDiff : Inherits TaskParent
         cvb.Cv2.Absdiff(src, lastFrame, dst2)
         dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
         changedPixels = dst2.CountNonZero
-        task.motionFlag = changedPixels > 0
+        Dim motionFlag = changedPixels > 0
 
-        If task.motionFlag Then changeCount += 1
+        If motionFlag Then changeCount += 1
         frames += 1
         If task.heartBeat Then
             strOut = "Pixels changed = " + CStr(changedPixels) + " at last heartbeat.  Since last heartbeat: " +
@@ -266,7 +261,7 @@ Public Class Motion_PixelDiff : Inherits TaskParent
             frames = 0
         End If
         SetTrueText(strOut, 3)
-        If task.motionFlag Then lastFrame = src
+        If motionFlag Then lastFrame = src
     End Sub
 End Class
 
@@ -393,9 +388,9 @@ Public Class Motion_Intersect : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         Static color = src.Clone
         Static lastMotionRect As cvb.Rect = task.motionRect
-        task.motionFlag = False
+        Dim motionFlag = False
         If task.heartBeat Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
-            task.motionFlag = True
+            motionFlag = True
         Else
             bgSub.Run(src)
             dst1 = bgSub.dst2
@@ -403,17 +398,21 @@ Public Class Motion_Intersect : Inherits TaskParent
             cvb.Cv2.FindNonZero(dst1, tmp)
 
             If tmp.Total > src.Total / 2 Then
-                task.motionFlag = True
+                motionFlag = True
             ElseIf tmp.Total > 0 Then
                 reconstructedRGB += 1
                 task.motionRect = buildEnclosingRect(tmp)
-                If task.motionRect.IntersectsWith(lastMotionRect) Then task.motionRect = task.motionRect.Union(lastMotionRect)
-                If task.motionRect.Width * task.motionRect.Height > src.Total / 2 Then task.motionFlag = True
+                If task.motionRect.IntersectsWith(lastMotionRect) Then
+                    task.motionRect = task.motionRect.Union(lastMotionRect)
+                End If
+                If task.motionRect.Width * task.motionRect.Height > src.Total / 2 Then
+                    motionFlag = True
+                End If
             End If
         End If
 
         dst3.SetTo(0)
-        If task.motionFlag Then
+        If motionFlag Then
             labels(2) = CStr(reconstructedRGB) + " frames since last full image"
             reconstructedRGB = 0
             task.motionRect = New cvb.Rect

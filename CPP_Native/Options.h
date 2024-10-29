@@ -2151,3 +2151,9 @@ public:
 	Options_LowRes() {
 	}
 };
+class Options_Line {
+public:
+	void RunOpt() {}
+	Options_Line() {
+	}
+};

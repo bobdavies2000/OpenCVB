@@ -186,7 +186,7 @@ Public Class Corners_BasicsStablePoints : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         fast.Run(src)
 
-        If task.motionFlag Or task.optionsChanged Then
+        If task.optionsChanged Then
             For Each pt In fast.features
                 features.Add(pt)
             Next

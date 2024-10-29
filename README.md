@@ -1,32 +1,24 @@
-# Recent Changes – October 2024 (Part 2)
+# Recent Changes – October 2024 (Part 3)
 
 -   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
--   Motion_Basics was replaced with another motion detection algorithm.
-    -   The mean color of each cell in the grid is compared to previous values.
-        -   A 3D distance in color value is used to compare cells.
-    -   If color distance is more than a fixed value, the grid cell has motion.
-        -   Computation is low-cost and could have been done decades ago.
-    -   Rather than more resolution, low resolution proved beneficial.
-    -   Often just individual pixels are different – Motion_Basics output below.
-    -   Depth, color, and left may be constructed using motion (not right image.)
-    -   Motion_Basics works well across all cameras at all resolutions.
-        -   Grid cell size is approximately the same in all cases by default.
-    -   A motion mask allows other algorithms to simplify their actions.
--   An OpenCVB global option determines using raw or motion-constructed images.
--   The C++ camera interface for StereoLabs ZED 2i cameras was restored.
-    -   The VB.Net interface was not getting 100 FPS initially.
-    -   After the restored C++ interface got 100 FPS, the VB.Net interface did too.
-    -   Both interfaces are available in the OpenCVB options list of cameras.
--   VB.Net version for Kinect 4 Azure camera support is under development.
-    -   Existing Kinect 4 Azure camera support is still available (UI updated).
--   A long-term heartbeat is now available in the task structure.
-    -   Images can now be refreshed on a heartbeat or heartbeatLT (long term).
-    -   The current heartbeat is 1 second while heartbeatLT is X seconds.
+-   The “A-Z” toolbar button in the main OpenCVB form allows speedy group access.
+
+    ![](media/8bd14069867788f1015665e05437d1b9.png)
+
+    -   There are almost 250 algorithm groups in OpenCVB – now one click away.
+    -   Clicking in the grid will land at the first algorithm in that group.
+    -   Faster than scrolling through the entire list of available algorithms.
+-   **Line_VerticalHorizontal** identifies gravity and the horizon in the color image.
+    -   Combined with scene motion, identified lines are retained across images.
+-   Camera Motion can be identified in the color, left image, and right image.
+    -   With 3 votes, camera motion can be verified.
+-   Horizon can move below the plane causing pointcloud Y-values above/below zero.
+    -   Horizon is now also computed as the perpendicular of the gravity vector.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/9ecba468726fbd244063f9aa06417b68.gif)
+![](media/baa4fe87e03b08a9288be72cdb139c41.png)
 
-**Motion_Basics:** *This motion detection algorithm uses low resolution mean values to find areas that contain motion. The top left image is the original color image (optionally overlaid with cells where motion was detected) while the image below left was constructed from an earlier image (often seconds earlier) updated with cells containing motion. The depth data in the upper right is also a composite of an earlier image and the latest depth where motion was found. The image in the lower right is the difference between the current color image and the image in the lower left. The implication is that almost all motion has been detected and no artifacts have been generated in the color image. Depth data has visible artifacts and will require more work because of shadow.*
+**A-Z Toolbar Button:** *There are almost 250 algorithm groups in OpenCVB, and the A-Z toolbar button allows speedy access to any of the groups. Clicking on any of grid entries will land the user at the first algorithm in the group in one click. Accessing a specific algorithm in that group is a click away in the pulldown of the list of available algorithms.*
 
 # Introduction
 
@@ -1153,7 +1145,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
@@ -1584,3 +1576,33 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of a person Description automatically generated](media/5ae98b4c9bad297ea31fd84e9da6369a.png)
 
 **LowRes_MLColorDepth:** *ML is used to segment the image between cells with features (Laplacian edges) and featureless regions. The lower left image shows all the cells with featureless areas while the lower right image shows the more work is required for complete segmentation. The ML input is color and depth.*
+
+# Recent Changes – October 2024 (Part 2)
+
+-   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
+-   Motion_Basics was replaced with another motion detection algorithm.
+    -   The mean color of each cell in the grid is compared to previous values.
+        -   A 3D distance in color value is used to compare cells.
+    -   If color distance is more than a fixed value, the grid cell has motion.
+        -   Computation is low-cost and could have been done decades ago.
+    -   Rather than more resolution, low resolution proved beneficial.
+    -   Often just individual pixels are different – Motion_Basics output below.
+    -   Depth, color, and left may be constructed using motion (not right image.)
+    -   Motion_Basics works well across all cameras at all resolutions.
+        -   Grid cell size is approximately the same in all cases by default.
+    -   A motion mask allows other algorithms to simplify their actions.
+-   An OpenCVB global option determines using raw or motion-constructed images.
+-   The C++ camera interface for StereoLabs ZED 2i cameras was restored.
+    -   The VB.Net interface was not getting 100 FPS initially.
+    -   After the restored C++ interface got 100 FPS, the VB.Net interface did too.
+    -   Both interfaces are available in the OpenCVB options list of cameras.
+-   VB.Net version for Kinect 4 Azure camera support is under development.
+    -   Existing Kinect 4 Azure camera support is still available (UI updated).
+-   A long-term heartbeat is now available in the task structure.
+    -   Images can now be refreshed on a heartbeat or heartbeatLT (long term).
+    -   The current heartbeat is 1 second while heartbeatLT is X seconds.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer Description automatically generated](media/9ecba468726fbd244063f9aa06417b68.gif)
+
+**Motion_Basics:** *This motion detection algorithm uses low resolution mean values to find areas that contain motion. The top left image is the original color image (optionally overlaid with cells where motion was detected) while the image below left was constructed from an earlier image (often seconds earlier) updated with cells containing motion. The depth data in the upper right is also a composite of an earlier image and the latest depth where motion was found. The image in the lower right is the difference between the current color image and the image in the lower left. The implication is that almost all motion has been detected and no artifacts have been generated in the color image. Depth data has visible artifacts and will require more work because of shadow.*

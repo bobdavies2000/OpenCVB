@@ -37,7 +37,7 @@ Public Class RedTrack_Lines : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
 
-        If task.heartBeat Or task.motionFlag Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
         Dim index As Integer
         For Each lp In lines.lpList
             DrawLine(dst3, lp.p1, lp.p2, 255)

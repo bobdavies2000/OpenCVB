@@ -37,27 +37,6 @@ End Class
 
 
 
-
-Public Class History_MotionRect : Inherits TaskParent
-    Public Sub New()
-        desc = "Create an image that is the motionRect applied to the previous image."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If task.heartBeat Then dst2 = src.Clone
-
-        If task.motionDetected Then
-            src.CopyTo(dst2, task.motionMask)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class History_Cloud : Inherits TaskParent
     Public frames As New History_BasicsNoSaturation
     Dim saveFrames As New List(Of cvb.Mat)

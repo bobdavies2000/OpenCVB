@@ -3,10 +3,12 @@ Imports System.Runtime
 Public Class Groups
     Public homeDir As DirectoryInfo
     Private Sub Groups_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Width = 960
-        Me.Height = 560
+        Me.Width = 1220
+        Me.Height = 785
         GroupDataView.Columns.Clear()
         GroupDataView.Rows.Clear()
+        Dim newFont As New Font("Arial", 12, FontStyle.Bold)
+        GroupDataView.DefaultCellStyle.Font = newFont
 
         Me.Text = "Click on an algorithm group to jump to the first algorithm in that group."
         GroupDataView.CellBorderStyle = DataGridViewCellBorderStyle.None
@@ -14,8 +16,8 @@ Public Class Groups
         GroupDataView.RowHeadersVisible = False
         Dim grplines = File.ReadAllLines(homeDir.FullName + "Data/GroupButtonList.txt")
 
-        Dim colsPerRow = 10
-        Dim rowsPerCol = 26
+        Dim colsPerRow = 8
+        Dim rowsPerCol = 32
         For i = 0 To colsPerRow - 1
             Dim column As New DataGridViewTextBoxColumn()
             column.Name = "Column" & i

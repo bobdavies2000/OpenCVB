@@ -368,7 +368,6 @@ Public Class RedCloud_PlaneColor : Inherits TaskParent
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.motionDetected = False Then Exit Sub
         options.RunOpt()
 
         redC.Run(src)

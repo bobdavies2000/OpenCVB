@@ -36,14 +36,14 @@ Partial Class Groups
         Me.GroupDataView.Name = "GroupDataView"
         Me.GroupDataView.RowHeadersWidth = 62
         Me.GroupDataView.RowTemplate.Height = 28
-        Me.GroupDataView.Size = New System.Drawing.Size(1660, 992)
+        Me.GroupDataView.Size = New System.Drawing.Size(1994, 1358)
         Me.GroupDataView.TabIndex = 0
         '
         'Groups
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1660, 992)
+        Me.ClientSize = New System.Drawing.Size(1994, 1358)
         Me.Controls.Add(Me.GroupDataView)
         Me.Name = "Groups"
         Me.Text = "Groups"

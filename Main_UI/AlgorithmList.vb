@@ -1549,7 +1549,6 @@ End Enum
 	If algorithmName = "History_BasicsNoSaturation_CS" Then return new History_BasicsNoSaturation_CS
 	If algorithmName = "History_Cloud" Then return new History_Cloud
 	If algorithmName = "History_Cloud_CS" Then return new History_Cloud_CS
-	If algorithmName = "History_MotionRect" Then return new History_MotionRect
 	If algorithmName = "History_MotionRect_CS" Then return new History_MotionRect_CS
 	If algorithmName = "History_ReliableDepth" Then return new History_ReliableDepth
 	If algorithmName = "HistPeak2D_Basics" Then return new HistPeak2D_Basics
@@ -1608,7 +1607,6 @@ End Enum
 	If algorithmName = "Homography_FPoly_CS" Then return new Homography_FPoly_CS
 	If algorithmName = "Horizon_Basics" Then return new Horizon_Basics
 	If algorithmName = "Horizon_Basics_CS" Then return new Horizon_Basics_CS
-	If algorithmName = "Horizon_BasicsAlt" Then return new Horizon_BasicsAlt
 	If algorithmName = "Horizon_BasicsAlt_CS" Then return new Horizon_BasicsAlt_CS
 	If algorithmName = "Horizon_ExternalTest" Then return new Horizon_ExternalTest
 	If algorithmName = "Horizon_ExternalTest_CS" Then return new Horizon_ExternalTest_CS
@@ -2169,7 +2167,6 @@ End Enum
 	If algorithmName = "Moments_CentroidKalman" Then return new Moments_CentroidKalman
 	If algorithmName = "Moments_CentroidKalman_CS" Then return new Moments_CentroidKalman_CS
 	If algorithmName = "Motion_Basics" Then return new Motion_Basics
-	If algorithmName = "Motion_Basics_QT_CS" Then return new Motion_Basics_QT_CS
 	If algorithmName = "Motion_BasicsTest" Then return new Motion_BasicsTest
 	If algorithmName = "Motion_BGSub" Then return new Motion_BGSub
 	If algorithmName = "Motion_BGSub_CC" Then return new CPP_Basics(ccFunctionNames._Motion_BGSub_CC)
@@ -2181,7 +2178,6 @@ End Enum
 	If algorithmName = "Motion_CenterLeftRight" Then return new Motion_CenterLeftRight
 	If algorithmName = "Motion_CenterRect" Then return new Motion_CenterRect
 	If algorithmName = "Motion_CenterRotation" Then return new Motion_CenterRotation
-	If algorithmName = "Motion_Color_CS" Then return new Motion_Color_CS
 	If algorithmName = "Motion_Contours" Then return new Motion_Contours
 	If algorithmName = "Motion_Contours_CS" Then return new Motion_Contours_CS
 	If algorithmName = "Motion_Depth" Then return new Motion_Depth
@@ -2207,7 +2203,6 @@ End Enum
 	If algorithmName = "Motion_PixelDiff" Then return new Motion_PixelDiff
 	If algorithmName = "Motion_PixelDiff_CS" Then return new Motion_PixelDiff_CS
 	If algorithmName = "Motion_PointCloud" Then return new Motion_PointCloud
-	If algorithmName = "Motion_PointCloud_CS" Then return new Motion_PointCloud_CS
 	If algorithmName = "Motion_RectTest" Then return new Motion_RectTest
 	If algorithmName = "Motion_RectTest_CS" Then return new Motion_RectTest_CS
 	If algorithmName = "Motion_RedCloud" Then return new Motion_RedCloud
@@ -2608,6 +2603,7 @@ End Enum
 	If algorithmName = "Options_LaplacianKernels" Then return new Options_LaplacianKernels
 	If algorithmName = "Options_LaPlacianPyramid" Then return new Options_LaPlacianPyramid
 	If algorithmName = "Options_LeftRight" Then return new Options_LeftRight
+	If algorithmName = "Options_Line" Then return new Options_Line
 	If algorithmName = "Options_LinearInput" Then return new Options_LinearInput
 	If algorithmName = "Options_LineFinder" Then return new Options_LineFinder
 	If algorithmName = "Options_LongLine" Then return new Options_LongLine

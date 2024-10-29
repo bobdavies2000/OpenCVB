@@ -76,69 +76,6 @@ End Class
 
 
 
-
-
-
-Public Class Horizon_BasicsAlt : Inherits TaskParent
-    Public cloudY As cvb.Mat
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Search for the transition from positive to negative to find the horizon."
-    End Sub
-    Private Function findTransition(startCol As Integer, stopCol As Integer, stepCol As Integer) As cvb.Point2f
-        Dim val As Single, lastVal As Single
-        Dim ptX As New List(Of Single)
-        Dim ptY As New List(Of Single)
-        For x = startCol To stopCol Step stepCol
-            For y = 0 To cloudY.Rows - 1
-                lastVal = val
-                val = cloudY.Get(Of Single)(y, x)
-                If val >= 0 And lastVal <= 0 Then
-                    ' change sub-pixel accuracy here 
-                    Dim pt = New cvb.Point2f(x, y + Math.Abs(val) / Math.Abs(val - lastVal))
-                    ptX.Add(pt.X)
-                    ptY.Add(pt.Y)
-                    If ptX.Count >= task.gOptions.FrameHistory.Value Then Return New cvb.Point2f(ptX.Average, ptY.Average)
-                End If
-            Next
-        Next
-        Return New cvb.Point
-    End Function
-    Public Sub RunAlg(src As cvb.Mat)
-        If task.useGravityPointcloud Then
-            cloudY = task.pcSplit(1) ' already oriented to gravity
-        Else
-            ' rebuild the pointcloud so it is oriented to gravity.
-            Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
-            Dim split = pc.Split()
-            cloudY = split(1)
-        End If
-
-        Dim p1 = findTransition(0, cloudY.Width - 1, 1)
-        Dim p2 = findTransition(cloudY.Width - 1, 0, -1)
-        Dim lp = New PointPair(p1, p2)
-        task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
-
-        If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then
-            strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
-                      Format(cloudY.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(cloudY.Get(Of Single)(p1.Y - 1, p1.X))
-        End If
-        SetTrueText(strOut, 3)
-
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
-            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Horizon_FindNonZero : Inherits TaskParent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 3

@@ -1294,7 +1294,7 @@ Public Class Depth_StableMin : Inherits TaskParent
         If task.heartBeat Then
             stableMin = src.Clone
             dst3.SetTo(0)
-        ElseIf task.motionDetected Then
+        Else
             src.CopyTo(stableMin, task.motionMask)
             If src.Type <> stableMin.Type Then src.ConvertTo(src, stableMin.Type)
             stableMin.CopyTo(src, task.noDepthMask)
@@ -1325,7 +1325,7 @@ Public Class Depth_StableMax : Inherits TaskParent
         If task.heartBeat Then
             stableMax = src.Clone
             dst3.SetTo(0)
-        ElseIf task.motionDetected Then
+        Else
             src.CopyTo(stableMax, task.motionMask)
             If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
             stableMax.CopyTo(src, task.noDepthMask)

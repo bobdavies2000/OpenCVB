@@ -7896,3 +7896,25 @@ Public Class Options_LowRes : Inherits TaskParent
         colorDifferenceThreshold = diffSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_Line : Inherits TaskParent
+    Public minLength As Integer
+    Public maxIntersection As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Min Line Length", 1, 100, dst2.Height / 10)
+            sliders.setupTrackBar("Intersection Maximum Pixel Count", 1, 100, 15)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static lenSlider = FindSlider("Min Line Length")
+        Static interSlider = FindSlider("Intersection Maximum Pixel Count")
+        minLength = lenSlider.value
+        maxIntersection = interSlider.value
+    End Sub
+End Class

@@ -62,10 +62,8 @@ Public Class VBtask : Implements IDisposable
     Public depthRGB As New cvb.Mat
     Public srcThread As cvb.Mat
 
-    Public motionFlag As Boolean
     Public motionRect As New cvb.Rect ' get rid of this...
     Public motionRects As New List(Of cvb.Rect)
-    Public motionDetected As Boolean
     Public motionMask As cvb.Mat
     Public noMotionMask As cvb.Mat
     Public motion As Motion_Basics
@@ -611,7 +609,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If task.motionDetected And task.gOptions.ShowMotionRectangle.Checked Then
+            If task.gOptions.showMotionMask.Checked Then
                 For Each roi In task.motionRects
                     task.color.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
                 Next
@@ -735,7 +733,6 @@ Public Class VBtask : Implements IDisposable
             task.pointCloud = motion.pointcloud.Clone
             task.motionMask = motion.motionMask
             task.noMotionMask = Not motionMask
-            task.motionDetected = motion.measure.motionDetected
             task.motionRects = New List(Of cvb.Rect)(motion.measure.motionRects)
         End If
 

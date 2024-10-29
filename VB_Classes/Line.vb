@@ -3,12 +3,14 @@ Public Class Line_Basics : Inherits TaskParent
     Public lineList As New List(Of PointPair)
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
+    Public options As New Options_Line
     Public Sub New()
         dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
         desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Dim minLength = dst2.Height / 20
+        options.RunOpt()
+
         dst2 = src.Clone
 
         lines.Run(src)
@@ -18,12 +20,12 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In lpList
             If task.motionMask(lp.rect).CountNonZero() = 0 Then
                 nextSet.Add(lp)
-                dst3.Line(lp.p1, lp.p2, 255, 1)
+                dst3.Line(lp.p1, lp.p2, 255, 2, task.lineType)
             End If
         Next
 
         For Each lp In lines.lpList
-            If dst3(lp.rect).CountNonZero() < 5 And lp.length > minLength Then
+            If dst3(lp.rect).CountNonZero() < options.maxIntersection And lp.length > options.minLength Then
                 nextSet.Add(lp)
             End If
         Next
@@ -33,6 +35,7 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In lpList
             DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
         Next
+        labels(2) = CStr(lpList.Count) + " Lines identified"
     End Sub
 End Class
 
@@ -84,7 +87,7 @@ End Class
 
 
 Public Class Line_Rects : Inherits TaskParent
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Public Sub New()
         desc = "Show the rectangle for each line"
     End Sub
@@ -374,26 +377,22 @@ Public Class Line_InDepthAndBGR : Inherits TaskParent
         z1List.Clear()
         z2List.Clear()
         For Each lp In lines.lpList
-            Dim minXX = Math.Min(lp.p1.X, lp.p2.X)
-            Dim minYY = Math.Min(lp.p1.Y, lp.p2.Y)
-            Dim w = Math.Abs(lp.p1.X - lp.p2.X)
-            Dim h = Math.Abs(lp.p1.Y - lp.p2.Y)
-            Dim r = New cvb.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
-            Dim mask = New cvb.Mat(New cvb.Size(w, h), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-            mask.Line(New cvb.Point(CInt(lp.p1.X - r.X), CInt(lp.p1.Y - r.Y)), New cvb.Point(CInt(lp.p2.X - r.X), CInt(lp.p2.Y - r.Y)), 255, task.lineWidth, cvb.LineTypes.Link4)
-            Dim mean = task.pointCloud(r).Mean(mask)
+            Dim mask = New cvb.Mat(New cvb.Size(lp.rect.Width, lp.rect.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+            mask.Line(New cvb.Point(CInt(lp.p1.X - lp.rect.X), CInt(lp.p1.Y - lp.rect.Y)),
+                      New cvb.Point(CInt(lp.p2.X - lp.rect.X), CInt(lp.p2.Y - lp.rect.Y)), 255, task.lineWidth, cvb.LineTypes.Link4)
+            Dim mean = task.pointCloud(lp.rect).Mean(mask)
 
             If mean <> New cvb.Scalar Then
-                Dim mmX = GetMinMax(task.pcSplit(0)(r), mask)
-                Dim mmY = GetMinMax(task.pcSplit(1)(r), mask)
+                Dim mmX = GetMinMax(task.pcSplit(0)(lp.rect), mask)
+                Dim mmY = GetMinMax(task.pcSplit(1)(lp.rect), mask)
                 Dim len1 = mmX.minLoc.DistanceTo(mmX.maxLoc)
                 Dim len2 = mmY.minLoc.DistanceTo(mmY.maxLoc)
                 If len1 > len2 Then
-                    lp.p1 = New cvb.Point(mmX.minLoc.X + r.X, mmX.minLoc.Y + r.Y)
-                    lp.p2 = New cvb.Point(mmX.maxLoc.X + r.X, mmX.maxLoc.Y + r.Y)
+                    lp.p1 = New cvb.Point(mmX.minLoc.X + lp.rect.X, mmX.minLoc.Y + lp.rect.Y)
+                    lp.p2 = New cvb.Point(mmX.maxLoc.X + lp.rect.X, mmX.maxLoc.Y + lp.rect.Y)
                 Else
-                    lp.p1 = New cvb.Point(mmY.minLoc.X + r.X, mmY.minLoc.Y + r.Y)
-                    lp.p2 = New cvb.Point(mmY.maxLoc.X + r.X, mmY.maxLoc.Y + r.Y)
+                    lp.p1 = New cvb.Point(mmY.minLoc.X + lp.rect.X, mmY.minLoc.Y + lp.rect.Y)
+                    lp.p2 = New cvb.Point(mmY.maxLoc.X + lp.rect.X, mmY.maxLoc.Y + lp.rect.Y)
                 End If
                 If lp.p1.DistanceTo(lp.p2) > 1 Then
                     DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.Yellow)
@@ -938,7 +937,7 @@ Public Class Line_TimeView : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
 
-        If task.optionsChanged Or task.motionFlag Then frameList.Clear()
+        If task.optionsChanged Then frameList.Clear()
         Dim nextMpList = New List(Of PointPair)(lines.lpList)
         frameList.Add(nextMpList)
 
@@ -1194,7 +1193,7 @@ End Class
 
 
 Public Class Line_Vertical : Inherits TaskParent
-    Public lines As New Line_Core
+    Public lines As New Line_Basics
     Public ptList As New List(Of PointPair)
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"

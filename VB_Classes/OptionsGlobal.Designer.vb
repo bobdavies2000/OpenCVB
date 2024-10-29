@@ -47,7 +47,7 @@ Partial Class OptionsGlobal
         Me.Label1 = New System.Windows.Forms.Label()
         Me.HighlightColor = New System.Windows.Forms.ComboBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
-        Me.ShowMotionRectangle = New System.Windows.Forms.CheckBox()
+        Me.showMotionMask = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
         Me.MotionFilteredColorAndCloud = New System.Windows.Forms.RadioButton()
@@ -380,15 +380,15 @@ Partial Class OptionsGlobal
         Me.CrossHairs.Text = "Show crosshairs"
         Me.CrossHairs.UseVisualStyleBackColor = True
         '
-        'ShowMotionRectangle
+        'showMotionMask
         '
-        Me.ShowMotionRectangle.AutoSize = True
-        Me.ShowMotionRectangle.Location = New System.Drawing.Point(14, 28)
-        Me.ShowMotionRectangle.Name = "ShowMotionRectangle"
-        Me.ShowMotionRectangle.Size = New System.Drawing.Size(162, 24)
-        Me.ShowMotionRectangle.TabIndex = 70
-        Me.ShowMotionRectangle.Text = "Show motion cells"
-        Me.ShowMotionRectangle.UseVisualStyleBackColor = True
+        Me.showMotionMask.AutoSize = True
+        Me.showMotionMask.Location = New System.Drawing.Point(14, 28)
+        Me.showMotionMask.Name = "showMotionMask"
+        Me.showMotionMask.Size = New System.Drawing.Size(162, 24)
+        Me.showMotionMask.TabIndex = 70
+        Me.showMotionMask.Text = "Show motion cells"
+        Me.showMotionMask.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
@@ -731,7 +731,7 @@ Partial Class OptionsGlobal
         'MotionBox
         '
         Me.MotionBox.Controls.Add(Me.UpdateOnHeartbeat)
-        Me.MotionBox.Controls.Add(Me.ShowMotionRectangle)
+        Me.MotionBox.Controls.Add(Me.showMotionMask)
         Me.MotionBox.Controls.Add(Me.UseMotionConstructed)
         Me.MotionBox.Location = New System.Drawing.Point(6, 325)
         Me.MotionBox.Name = "MotionBox"
@@ -826,7 +826,7 @@ Partial Class OptionsGlobal
     Friend WithEvents unFiltered As System.Windows.Forms.RadioButton
     Friend WithEvents MotionFilteredColorOnly As System.Windows.Forms.RadioButton
     Friend WithEvents MotionFilteredColorAndCloud As System.Windows.Forms.RadioButton
-    Friend WithEvents ShowMotionRectangle As System.Windows.Forms.CheckBox
+    Friend WithEvents showMotionMask As System.Windows.Forms.CheckBox
     Friend WithEvents CrossHairs As System.Windows.Forms.CheckBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
