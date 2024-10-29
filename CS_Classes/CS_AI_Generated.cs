@@ -1470,9 +1470,8 @@ namespace CS_Classes
             int w = vbc.task.lineWidth + 5;
             foreach (var lp in line.lines.lpList)
             {
-                var lpNew = lp.edgeToEdgeLine(dst2.Size());
-                cv.Point p1 = new cv.Point((int)lpNew.p1.X, (int)lpNew.p1.Y);
-                cv.Point p2 = new cv.Point((int)lpNew.p2.X, (int)lpNew.p2.Y);
+                cv.Point p1 = new cv.Point((int)lp.ep1.X, (int)lp.ep1.Y);
+                cv.Point p2 = new cv.Point((int)lp.ep2.X, (int)lp.ep2.Y);
                 dst2.Line(p1, p2, Scalar.White, w, vbc.task.lineType);
             }
 
@@ -1508,9 +1507,8 @@ namespace CS_Classes
             {
                 if (Math.Abs(lp.slope) < 0.1)
                 {
-                    var lpNew = lp.edgeToEdgeLine(dst2.Size());
-                    cv.Point p1 = new cv.Point((int)lpNew.p1.X, (int)lpNew.p1.Y);
-                    cv.Point p2 = new cv.Point((int)lpNew.p2.X, (int)lpNew.p2.Y);
+                    cv.Point p1 = new cv.Point((int)lp.ep1.X, (int)lp.ep1.Y);
+                    cv.Point p2 = new cv.Point((int)lp.ep2.X, (int)lp.ep2.Y);
                     dst2.Line(p1, p2, Scalar.White, w, vbc.task.lineType);
                     lpList.Add(lp);
                 }
@@ -23654,7 +23652,7 @@ namespace CS_Classes
             else
             {
                 var lp = new PointPair(p1, p2);
-                vec = lp.edgeToEdgeLine(dst2.Size());
+                vec = new PointPair(lp.ep1, lp.ep2);
                 if (standaloneTest() || autoDisplay)
                     displayResults(p1, p2);
             }
@@ -23706,7 +23704,7 @@ namespace CS_Classes
             var p1 = findTransition(0, dst0.Height - 1, 1);
             var p2 = findTransition(dst0.Height - 1, 0, -1);
             var lp = new PointPair(p1, p2);
-            vec = lp.edgeToEdgeLine(dst2.Size());
+            vec = new PointPair(lp.ep1, lp.ep2);
             if (p1.X >= 1)
             {
                 strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n" + "      val =  " +
@@ -28563,7 +28561,7 @@ namespace CS_Classes
             else
             {
                 PointPair lp = new PointPair(p1, p2);
-                vec = lp.edgeToEdgeLine(dst2.Size());
+                vec = new PointPair(lp.ep1, lp.ep2);
                 vecPresent = true;
                 if (standaloneTest() || autoDisplay) displayResults(p1, p2);
             }
@@ -28622,7 +28620,7 @@ namespace CS_Classes
             Point2f p1 = findTransition(0, cloudY.Width - 1, 1);
             Point2f p2 = findTransition(cloudY.Width - 1, cloudY.Width - 1, -1);
             PointPair lp = new PointPair(p1, p2);
-            vbc.task.horizonVec = lp.edgeToEdgeLine(dst2.Size());
+            vbc.task.horizonVec = new PointPair(lp.ep1, lp.ep2);
             if (p1.Y >= 1 && p1.Y <= dst2.Height - 1)
             {
                 strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n" + "      val =  " +
@@ -28684,7 +28682,7 @@ namespace CS_Classes
                 Point2f p1 = points[xVals.IndexOf(xVals.Min())];
                 Point2f p2 = points[xVals.IndexOf(xVals.Max())];
                 PointPair lp = new PointPair(p1, p2);
-                vbc.task.horizonVec = lp.edgeToEdgeLine(dst2.Size());
+                vbc.task.horizonVec = new PointPair(lp.ep1, lp.ep2);
                 DrawLine(dst2, vbc.task.horizonVec.p1, vbc.task.horizonVec.p2, new cv.Scalar(255), vbc.task.lineWidth);
             }
             dst3 = split[0].InRange(-0.01, 0.01);
@@ -28710,7 +28708,7 @@ namespace CS_Classes
                 else
                 {
                     PointPair lp = new PointPair(p1, p2);
-                    vbc.task.gravityVec = lp.edgeToEdgeLine(dst2.Size());
+                    vbc.task.gravityVec = new PointPair(lp.ep1, lp.ep2);
                 }
                 DrawLine(dst2, vbc.task.gravityVec.p1, vbc.task.gravityVec.p2, new cv.Scalar(255), vbc.task.lineWidth);
             }
@@ -28820,7 +28818,7 @@ namespace CS_Classes
                 Point2f p1 = points[xVals.IndexOf(xVals.Min())];
                 Point2f p2 = points[xVals.IndexOf(xVals.Max())];
                 PointPair lp = new PointPair(p1, p2);
-                vbc.task.horizonVec = lp.edgeToEdgeLine(dst2.Size());
+                vbc.task.horizonVec = new PointPair(lp.ep1, lp.ep2);
                 DrawLine(dst2, vbc.task.horizonVec.p1, vbc.task.horizonVec.p2, new cv.Scalar(255), 255);
             }
             //If vbc.task.horizonVec.originalLength < dst2.Width / 2 And vbc.task.redOptions.YRangeSlider.Value < vbc.task.redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
@@ -28849,7 +28847,7 @@ namespace CS_Classes
                 else
                 {
                     PointPair lp = new PointPair(p1, p2);
-                    vbc.task.gravityVec = lp.edgeToEdgeLine(dst2.Size());
+                    vbc.task.gravityVec = new PointPair(lp.ep1, lp.ep2);
                 }
                 DrawLine(dst2, vbc.task.gravityVec.p1, vbc.task.gravityVec.p2, new cv.Scalar(255), 255);
             }

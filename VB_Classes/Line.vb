@@ -705,60 +705,6 @@ End Class
 
 
 
-
-
-Public Class Line_CellsVertHoriz : Inherits TaskParent
-    Dim lines As New FeatureLine_Finder
-    Dim hulls As New RedCloud_Hulls
-    Public Sub New()
-        labels(2) = "RedCloud_Hulls output with lines highlighted"
-        desc = "Identify the lines created by the RedCloud Cells and separate vertical from horizontal"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst2
-
-        lines.Run(dst2.Clone)
-        dst3 = src
-        For i = 0 To lines.sortedHorizontals.Count - 1
-            Dim index = lines.sortedHorizontals.ElementAt(i).Value
-            Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
-            DrawLine(dst3, p1, p2, cvb.Scalar.Yellow)
-        Next
-        For i = 0 To lines.sortedVerticals.Count - 1
-            Dim index = lines.sortedVerticals.ElementAt(i).Value
-            Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
-            DrawLine(dst3, p1, p2, cvb.Scalar.Blue)
-        Next
-        labels(3) = CStr(lines.sortedVerticals.Count) + " vertical and " + CStr(lines.sortedHorizontals.Count) + " horizontal lines identified in the RedCloud output"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line_Cells : Inherits TaskParent
-    Dim lines As New Line_Core
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "Identify all lines in the RedCloud_Basics cell boundaries"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        lines.Run(dst2.Clone)
-        dst3 = lines.dst3
-        labels(2) = CStr(lines.lpList.Count / 2) + " lines identified"
-    End Sub
-End Class
-
-
-
-
-
 Public Class Line_ViewSide : Inherits TaskParent
     Public autoY As New OpAuto_YRange
     Public lines As New Line_Core
@@ -857,33 +803,6 @@ Public Class Line_ColorClass : Inherits TaskParent
         labels(2) = "Lines found in the " + color8U.classifier.traceName + " output"
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class Line_Canny : Inherits TaskParent
-    Dim canny As New Edge_Basics
-    Dim lines As New Line_Core
-    Public Sub New()
-        FindSlider("Canny Aperture").Value = 7
-        labels = {"", "", "Straight lines in Canny output", "Input to Line_Core"}
-        desc = "Find lines in the Canny output"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        canny.Run(src)
-        dst3 = canny.dst2.Clone
-
-        lines.Run(canny.dst2)
-        dst2 = lines.dst3
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -1210,9 +1129,12 @@ Public Class Line_Vertical : Inherits TaskParent
 
         ptList.Clear()
         For Each lp In lines.lpList
+            If lp.p1.Y > lp.p2.Y Then lp = New PointPair(lp.p2, lp.p1)
+
             sideOpposite = lp.p2.X - lp.p1.X
             If lp.p1.Y < lp.p2.Y Then sideOpposite = lp.p1.X - lp.p2.X
             Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.Y - lp.p2.Y)) * 57.2958
+
             If Math.Abs(angle - gAngle) < 2 Then
                 dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
                 ptList.Add(lp)
@@ -1244,15 +1166,143 @@ Public Class Line_Horizontal : Inherits TaskParent
 
         ptList.Clear()
         For Each lp In lines.lpList
+            If lp.p1.X > lp.p2.X Then lp = New PointPair(lp.p2, lp.p1)
+
             sideOpposite = lp.p2.Y - lp.p1.Y
             If lp.p1.X < lp.p2.X Then sideOpposite = lp.p1.Y - lp.p2.Y
             Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.X - lp.p2.X)) * 57.2958
+
             If Math.Abs(angle - hAngle) < 2 Then
                 dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
                 ptList.Add(lp)
             End If
         Next
         labels(2) = "There are " + CStr(ptList.Count) + " lines similar to the horizon " + Format(hAngle, fmt1) + " degrees"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_VerticalHorizontal : Inherits TaskParent
+    Dim verts As New Line_Vertical
+    Dim horiz As New Line_Horizontal
+    Public vList As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
+    Public hList As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
+    Public Sub New()
+        task.gOptions.LineWidth.Value = 2
+        labels(3) = "Vertical lines are in yellow and horizontal lines in red."
+        desc = "Highlight both vertical and horizontal lines"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = src.Clone
+        verts.Run(src)
+        horiz.Run(src)
+
+        vList.Clear()
+        hList.Clear()
+
+        dst3.SetTo(0)
+        For Each lp In verts.ptList
+            vList.Add(lp.length, lp)
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+        Next
+
+        For Each lp In horiz.ptList
+            hList.Add(lp.length, lp)
+            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Red)
+            DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.Red)
+        Next
+        labels(2) = "Number of lines identified (vertical/horizontal): " + CStr(vList.Count) + "/" + CStr(hList.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_Canny : Inherits TaskParent
+    Dim canny As New Edge_Basics
+    Dim lines As New Line_Basics
+    Public lpList As New List(Of PointPair)
+    Public Sub New()
+        FindSlider("Canny Aperture").Value = 7
+        FindSlider("Min Line Length").Value = 30
+        labels(3) = "Input to Line_Basics"
+        desc = "Find lines in the Canny output"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        canny.Run(src)
+        dst3 = canny.dst2.Clone
+
+        lines.Run(canny.dst2)
+        dst2 = lines.dst3
+        lpList = New List(Of PointPair)(lines.lpList)
+        labels(2) = "Number of lines identified: " + CStr(lpList.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Cells : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Dim redC As New RedCloud_Basics
+    Public lpList As New List(Of PointPair)
+    Public Sub New()
+        desc = "Identify all lines in the RedCloud_Basics cell boundaries"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        lines.Run(dst2.Clone)
+        dst3 = lines.dst3
+        lpList = New List(Of PointPair)(lines.lpList)
+        labels(2) = "Number of lines identified: " + CStr(lpList.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Line_CellsVertHoriz : Inherits TaskParent
+    Dim lines As New FeatureLine_Finder
+    Dim hulls As New RedCloud_Hulls
+    Public Sub New()
+        labels(2) = "RedCloud_Hulls output with lines highlighted"
+        desc = "Identify the lines created by the RedCloud Cells and separate vertical from horizontal"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        hulls.Run(src)
+        dst2 = hulls.dst2
+
+        lines.Run(dst2.Clone)
+        dst3 = src
+        For i = 0 To lines.sortedHorizontals.Count - 1
+            Dim index = lines.sortedHorizontals.ElementAt(i).Value
+            Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
+            DrawLine(dst3, p1, p2, cvb.Scalar.Yellow)
+        Next
+        For i = 0 To lines.sortedVerticals.Count - 1
+            Dim index = lines.sortedVerticals.ElementAt(i).Value
+            Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
+            DrawLine(dst3, p1, p2, cvb.Scalar.Blue)
+        Next
+        labels(3) = CStr(lines.sortedVerticals.Count) + " vertical and " + CStr(lines.sortedHorizontals.Count) + " horizontal lines identified in the RedCloud output"
     End Sub
 End Class
 
@@ -1278,8 +1328,11 @@ Public Class Line_VerticalHorizontal1 : Inherits TaskParent
         nearest.lp = task.gravityVec
         DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
         For Each lp In lines.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cvb.Rect(0, 0, src.Width, src.Height))
-            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
+            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2,
+                                        New cvb.Rect(0, 0, src.Width, src.Height))
+            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then
+                Continue For
+            End If
 
             nearest.pt = lp.p1
             nearest.Run(Nothing)
@@ -1320,43 +1373,40 @@ End Class
 
 
 
-Public Class Line_VerticalHorizontal : Inherits TaskParent
-    Dim verts As New Line_Vertical
-    Dim horiz As New Line_Horizontal
-    Public vList As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
-    Public hList As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
+Public Class Line_VerticalHorizontal2 : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Public vList As New List(Of PointPair)
+    Public hList As New List(Of PointPair)
     Public Sub New()
-        desc = "Highlight both vertical and horizontal lines"
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max Distance threshold", 0, 100, 5)
+        labels(3) = "NOTE: this is not always working..."
+        desc = "Use the edgeToEdge offset to determine parallel - fail..."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        verts.Run(src)
-        horiz.Run(src)
+        Static maxSlider = FindSlider("Max Distance threshold")
+        Dim maxDistance = maxSlider.value
 
-        dst3 = horiz.dst3
+        Dim gDist = task.gravityVec.xDistance
+        Dim hDist = task.horizonVec.yDistance
 
-        dst2 = verts.dst2
-        For Each lp In horiz.ptList
-            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
-        Next
+        lines.Run(src)
 
         vList.Clear()
-        For Each lp In verts.ptList
-            If lp.p1.Y < lp.p2.Y Then
-                vList.Add(lp.length, lp)
-            Else
-                vList.Add(lp.length, New PointPair(lp.p2, lp.p1))
-            End If
-        Next
-
         hList.Clear()
-
-        For Each lp In horiz.ptList
-            If lp.p1.X < lp.p2.X Then
-                hList.Add(lp.length, lp)
-            Else
-                hList.Add(lp.length, New PointPair(lp.p2, lp.p1))
+        dst2 = src.Clone
+        dst3.SetTo(0)
+        For Each lp In lines.lpList
+            If Math.Abs(lp.xDistance - gDist) <= maxDistance Then
+                vList.Add(lp)
+                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+                DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+            End If
+            If Math.Abs(lp.yDistance - hDist) <= maxDistance Then
+                hList.Add(lp)
+                DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Red)
+                DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.Red)
             End If
         Next
+        labels(2) = "Number of lines identified (vertical/horizontal): " + CStr(vList.Count) + "/" + CStr(hList.Count)
     End Sub
 End Class
-

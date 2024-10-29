@@ -466,8 +466,7 @@ Public Class BackProject_LineTop : Inherits TaskParent
         dst2.SetTo(0)
         Dim w = task.lineWidth + 5
         For Each lp In line.lines.lpList
-            Dim lpNew = lp.edgeToEdgeLine(dst2.Size)
-            dst2.Line(lpNew.p1, lpNew.p2, 255, w, task.lineType)
+            dst2.Line(lp.ep1, lp.ep2, 255, w, task.lineType)
         Next
 
         Dim histogram = line.autoX.histogram
@@ -499,8 +498,7 @@ Public Class BackProject_LineSide : Inherits TaskParent
         lpList.Clear()
         For Each lp In line.lines.lpList
             If Math.Abs(lp.slope) < 0.1 Then
-                Dim lpNew = lp.edgeToEdgeLine(dst2.Size)
-                dst2.Line(lpNew.p1, lpNew.p2, 255, w, task.lineType)
+                dst2.Line(lp.ep1, lp.ep2, 255, w, task.lineType)
                 lpList.Add(lp)
             End If
         Next

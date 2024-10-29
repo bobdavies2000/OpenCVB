@@ -48,12 +48,12 @@ Public Class Gravity_Basics : Inherits TaskParent
 
         Dim distance = p1.DistanceTo(p2)
         If distance < 10 Then ' enough to get a line with some credibility
-            points.Clear()
-            task.gravityVec = New PointPair
-            strOut = "Gravity vector not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
+            strOut = "Gravity vector not found " + vbCrLf + "The distance of p1 to p2 is " +
+                     CStr(CInt(distance)) + " pixels." + vbCrLf
+            strOut += "Using the previous value for the gravity vector."
         Else
             Dim lp = New PointPair(p1, p2)
-            task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
+            task.gravityVec = New PointPair(lp.ep1, lp.ep2)
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
@@ -97,7 +97,7 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
         Dim lp = New PointPair(p1, p2)
-        vec = lp.edgeToEdgeLine(dst2.Size)
+        vec = New PointPair(lp.ep1, lp.ep2)
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +

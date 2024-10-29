@@ -1248,7 +1248,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
             Dim botPoint = tmp.Get(Of cvb.Point)(tmp.Rows - 1, 0)
 
             Dim pair = New PointPair(topPoint, botPoint)
-            mp = pair.edgeToEdgeLine(dst2.Size)
+            mp = New PointPair(pair.ep1, pair.ep2)
             dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
 
             Dim sideAdjacent = Math.Abs(mp.p1.X - mp.p2.X)

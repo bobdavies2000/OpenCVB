@@ -61,7 +61,7 @@ Public Class Horizon_Basics : Inherits TaskParent
             strOut = "Horizon not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
         Else
             Dim lp = New PointPair(p1, p2)
-            vec = lp.edgeToEdgeLine(dst2.Size)
+            vec = New PointPair(lp.ep1, lp.ep2)
             vecPresent = True
             If standaloneTest() Or autoDisplay Then
                 displayResults(p1, p2)
@@ -115,7 +115,7 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
             Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
             Dim lp = New PointPair(p1, p2)
-            task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
+            task.horizonVec = New PointPair(lp.ep1, lp.ep2)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
@@ -137,7 +137,7 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
                 task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
             Else
                 Dim lp = New PointPair(p1, p2)
-                task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
+                task.gravityVec = New PointPair(lp.ep1, lp.ep2)
             End If
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
@@ -248,7 +248,7 @@ Public Class Horizon_FindNonZeroOld : Inherits TaskParent
             Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
             Dim lp = New PointPair(p1, p2)
-            task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
+            task.horizonVec = New PointPair(lp.ep1, lp.ep2)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
@@ -274,7 +274,7 @@ Public Class Horizon_FindNonZeroOld : Inherits TaskParent
                 task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
             Else
                 Dim lp = New PointPair(p1, p2)
-                task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
+                task.gravityVec = New PointPair(lp.ep1, lp.ep2)
             End If
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
