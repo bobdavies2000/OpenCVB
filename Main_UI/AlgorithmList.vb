@@ -1618,7 +1618,6 @@ End Enum
 	If algorithmName = "Horizon_Regress" Then return new Horizon_Regress
 	If algorithmName = "Horizon_Regress_CS" Then return new Horizon_Regress_CS
 	If algorithmName = "Horizon_Simple" Then return new Horizon_Simple
-	If algorithmName = "Horizon_UnstableResults" Then return new Horizon_UnstableResults
 	If algorithmName = "Horizon_UnstableResults_CS" Then return new Horizon_UnstableResults_CS
 	If algorithmName = "Horizon_Validate" Then return new Horizon_Validate
 	If algorithmName = "Horizon_Validate_CS" Then return new Horizon_Validate_CS
@@ -1873,7 +1872,7 @@ End Enum
 	If algorithmName = "Line_Basics" Then return new Line_Basics
 	If algorithmName = "Line_Basics_CS" Then return new Line_Basics_CS
 	If algorithmName = "Line_Basics1" Then return new Line_Basics1
-	If algorithmName = "Line_BasicsNew" Then return new Line_BasicsNew
+	If algorithmName = "Line_Basics2" Then return new Line_Basics2
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Canny_CS" Then return new Line_Canny_CS
 	If algorithmName = "Line_Cells" Then return new Line_Cells
@@ -1882,7 +1881,6 @@ End Enum
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
 	If algorithmName = "Line_ColorClass_CS" Then return new Line_ColorClass_CS
 	If algorithmName = "Line_Core" Then return new Line_Core
-	If algorithmName = "Line_DisplayInfo" Then return new Line_DisplayInfo
 	If algorithmName = "Line_DisplayInfoOld" Then return new Line_DisplayInfoOld
 	If algorithmName = "Line_DisplayInfoOld_CS" Then return new Line_DisplayInfoOld_CS
 	If algorithmName = "Line_FastDetect_CC" Then return new CPP_Basics(ccFunctionNames._Line_FastDetect_CC)
@@ -1894,6 +1892,7 @@ End Enum
 	If algorithmName = "Line_Horizontal" Then return new Line_Horizontal
 	If algorithmName = "Line_InDepthAndBGR" Then return new Line_InDepthAndBGR
 	If algorithmName = "Line_InDepthAndBGR_CS" Then return new Line_InDepthAndBGR_CS
+	If algorithmName = "Line_Info" Then return new Line_Info
 	If algorithmName = "Line_Intercepts" Then return new Line_Intercepts
 	If algorithmName = "Line_Intercepts_CS" Then return new Line_Intercepts_CS
 	If algorithmName = "Line_InterceptsUI" Then return new Line_InterceptsUI

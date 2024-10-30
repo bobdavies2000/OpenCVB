@@ -1,6 +1,5 @@
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Public lineList As New List(Of PointPair)
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
     Public options As New Options_Line
@@ -21,7 +20,7 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In lpList
             If task.motionMask(lp.rect).CountNonZero() = 0 Then
                 nextSet.Add(lp)
-                dst3.Line(lp.p1, lp.p2, 255, 2, task.lineType)
+                dst3.Line(lp.p1, lp.p2, cvb.Scalar.White, 2, cvb.LineTypes.Link8)
             Else
                 motionToss += 1
             End If
@@ -39,7 +38,7 @@ Public Class Line_Basics : Inherits TaskParent
         lpList = New List(Of PointPair)(nextSet)
 
         For Each lp In lpList
-            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+            dst2.Line(lp.p1, lp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
         Next
         If task.heartBeat Then
             labels(2) = CStr(lpList.Count) + " Lines identified.  Motion toss: " + CStr(motionToss) +
@@ -1426,67 +1425,6 @@ End Class
 
 
 
-
-
-Public Class Line_DisplayInfo : Inherits TaskParent
-    Dim canny As New Line_Canny
-    Public distance As Integer
-    Public maskCount As Integer
-    Dim myCurrentFrame As Integer = -1
-    Dim savePointCloud As cvb.Mat
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        labels(2) = "Click on a line to get details about the line"
-        labels(3) = "Details from the point cloud for the selected line"
-        desc = "Display details about the line selected."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        canny.Run(src)
-        dst2 = src
-        dst2.SetTo(255, canny.dst2)
-
-        Static lp As PointPair = canny.lpList(0)
-
-        If task.mouseClickFlag Or task.FirstPass Then
-            Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-            For i = 0 To canny.lpList.Count - 1
-                Dim mp = canny.lpList(i)
-                lineMap.Line(mp.p1, mp.p2, i + 1, 3, cvb.LineTypes.Link8)
-            Next
-
-            Dim lpIndex = lineMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-            If task.FirstPass = False And lpIndex > 0 Then lp = canny.lpList(lpIndex - 1)
-
-            Dim mask As New cvb.Mat
-            lineMap(lp.rect).ConvertTo(mask, cvb.MatType.CV_8U)
-            mask.SetTo(0, task.noDepthMask(lp.rect))
-            strOut = "Lines identified in the image: " + CStr(canny.lpList.Count) + vbCrLf + vbCrLf
-            For i = 0 To 2
-                Dim mm = GetMinMax(task.pcSplit(i)(lp.rect), mask)
-                Dim dm = Choose(i + 1, "X", "Y", "Z")
-                strOut += "Min " + dm + " = " + Format(mm.minVal, fmt1) + " max " + dm + " = " +
-                           Format(mm.maxVal, fmt1) + vbCrLf
-            Next
-
-            strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
-            strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
-            strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
-            strOut += "xpDelta = (" + Format(lp.xpDelta.X, fmt1) + "," + Format(lp.xpDelta.Y, fmt1) + ")" + vbCrLf
-            strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
-
-            dst3.SetTo(0)
-            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
-            dst3.Rectangle(lp.rect, task.HighlightColor, task.lineWidth, task.lineType)
-        End If
-        SetTrueText(strOut, 1)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Line_ViewLeft : Inherits TaskParent
     Dim lines As New Line_Basics
     Public Sub New()
@@ -1521,58 +1459,7 @@ End Class
 
 
 
-
 Public Class Line_Basics1 : Inherits TaskParent
-    Public lineList As New List(Of List(Of PointPair))
-    Public lines As New Line_Core
-    Public lpList As New List(Of PointPair)
-    Public options As New Options_Line
-    Public Sub New()
-        FindSlider("Min Line Length").Value = 30
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        dst2 = src.Clone
-        lines.Run(src)
-
-        dst3.SetTo(0)
-        For index = 0 To lineList.Count - 1
-            Dim removeList As New List(Of Integer)
-            Dim ll = lineList(index)
-            For i = 0 To ll.Count - 1
-                Dim lp = ll(i)
-                If task.motionMask(lp.rect).CountNonZero() > 0 Then removeList.Add(i)
-            Next
-            For i = removeList.Count - 1 To 0 Step -1
-                ll.RemoveAt(i)
-            Next
-
-            lineList(index) = ll
-        Next
-
-        lineList.Add(lines.lpList)
-        If lineList.Count > task.gOptions.FrameHistory.Value Then lineList.RemoveAt(0)
-
-        Dim totalLines As Integer
-        For Each ll In lineList
-            For Each lp In ll
-                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
-                dst3.Line(lp.p1, lp.p2, 255, 2, task.lineType)
-            Next
-            totalLines += ll.Count
-        Next
-
-        If task.heartBeat Then labels(2) = CStr(totalLines) + " Lines identified"
-    End Sub
-End Class
-
-
-
-
-Public Class Line_BasicsNew : Inherits TaskParent
     Public lineList As New List(Of PointPair)
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
@@ -1642,5 +1529,101 @@ Public Class Line_BasicsNew : Inherits TaskParent
             labels(2) = CStr(lpList.Count) + " Lines identified. Correlation tossed " + CStr(tossCorrelation) +
                                          ", motion tossed " + CStr(tossMotion)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Basics2 : Inherits TaskParent
+    Public lines As New Line_Core
+    Public lpList As New List(Of PointPair)
+    Public options As New Options_Line
+    Public Sub New()
+        FindSlider("Min Line Length").Value = 30
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = src.Clone
+        lines.Run(src)
+
+        dst3.SetTo(0)
+        Dim tolerance = 0.1
+        For i = 0 To lines.lpList.Count - 1
+            Dim lp = lines.lpList(i)
+            For j = 0 To lpList.Count - 1
+                If Math.Abs(lp.slope - lpList(j).slope) < tolerance Then
+
+                End If
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Line_Info : Inherits TaskParent
+    Public lpInput As New List(Of PointPair)
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        labels(2) = "Click on the oversized line to get details about the line"
+        labels(3) = "Details from the point cloud for the selected line"
+        desc = "Display details about the line selected."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static canny As New Line_Canny
+            canny.Run(src)
+            lpInput = canny.lpList
+        End If
+        dst2 = src
+        For Each mp In lpInput
+            dst2.Line(mp.p1, mp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
+        Next
+
+        Static lp As PointPair = lpInput(0)
+
+        If task.mouseClickFlag Or task.FirstPass Then
+            Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+            For i = 0 To lpInput.Count - 1
+                Dim mp = lpInput(i)
+                lineMap.Line(mp.p1, mp.p2, i + 1, 3, cvb.LineTypes.Link8)
+            Next
+
+            Dim lpIndex = lineMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+            If task.FirstPass = False And lpIndex > 0 Then lp = lpInput(lpIndex - 1)
+
+            Dim mask As New cvb.Mat
+            lineMap(lp.rect).ConvertTo(mask, cvb.MatType.CV_8U)
+            mask.SetTo(0, task.noDepthMask(lp.rect))
+            strOut = "Lines identified in the image: " + CStr(lpInput.Count) + vbCrLf + vbCrLf
+            For i = 0 To 2
+                Dim mm = GetMinMax(task.pcSplit(i)(lp.rect), mask)
+                Dim dm = Choose(i + 1, "X", "Y", "Z")
+                strOut += "Min " + dm + " = " + Format(mm.minVal, fmt1) + " max " + dm + " = " +
+                           Format(mm.maxVal, fmt1) + vbCrLf
+            Next
+
+            strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
+            strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
+            strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
+            strOut += "xpDelta = (" + Format(lp.xpDelta.X, fmt1) + "," + Format(lp.xpDelta.Y, fmt1) + ")" + vbCrLf
+            strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
+
+            dst3.SetTo(0)
+            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+            dst3.Rectangle(lp.rect, task.HighlightColor, task.lineWidth, task.lineType)
+        End If
+        SetTrueText(strOut, 1)
     End Sub
 End Class
