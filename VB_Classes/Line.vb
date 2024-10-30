@@ -1,3 +1,4 @@
+Imports System.Windows
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lines As New Line_Core
@@ -1536,42 +1537,6 @@ End Class
 
 
 
-Public Class Line_Basics2 : Inherits TaskParent
-    Public lines As New Line_Core
-    Public lpList As New List(Of PointPair)
-    Public options As New Options_Line
-    Public Sub New()
-        FindSlider("Min Line Length").Value = 30
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        dst2 = src.Clone
-        lines.Run(src)
-
-        dst3.SetTo(0)
-        Dim tolerance = 0.1
-        For i = 0 To lines.lpList.Count - 1
-            Dim lp = lines.lpList(i)
-            For j = 0 To lpList.Count - 1
-                If Math.Abs(lp.slope - lpList(j).slope) < tolerance Then
-
-                End If
-            Next
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Line_Info : Inherits TaskParent
     Public lpInput As New List(Of PointPair)
     Public Sub New()
@@ -1625,5 +1590,162 @@ Public Class Line_Info : Inherits TaskParent
             dst3.Rectangle(lp.rect, task.HighlightColor, task.lineWidth, task.lineType)
         End If
         SetTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+Public Class Line_Basics2 : Inherits TaskParent
+    Public lines As New Line_Core
+    Public lpInput As New List(Of PointPair)
+    Public options As New Options_Line
+    Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+    Dim lpList As New List(Of PointPair)
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        FindSlider("Min Line Length").Value = 30
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Private Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
+        If Math.Abs(lp.slope) >= 1 Then
+            If lp.p1.Y < mp.p1.Y Then
+                Return New PointPair(lp.p1, mp.p2)
+            Else
+                Return New PointPair(mp.p1, lp.p2)
+            End If
+        Else
+            If lp.p1.X < mp.p1.X Then
+                Return New PointPair(lp.p1, mp.p2)
+            Else
+                Return New PointPair(mp.p1, lp.p2)
+            End If
+        End If
+    End Function
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+
+        If standalone Then
+            Static lines As New Line_Core
+            lines.Run(src)
+            lpInput = lines.lpList
+        End If
+
+        dst3.SetTo(0)
+        Dim tolerance = 0.1
+        Dim newSet As New List(Of PointPair)
+        Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        Dim addList As New List(Of PointPair)
+        For i = 0 To lpInput.Count - 1
+            Dim lp = lpInput(i)
+            Dim lpRemove As Boolean = False
+            For j = 0 To 1
+                Dim pt = Choose(j + 1, lp.p1, lp.p2)
+                Dim val = lineMap.Get(Of Integer)(pt.Y, pt.X)
+                If val = 0 Then Continue For
+                Dim mp = lpList(val - 1)
+                If Math.Abs(mp.slope - lp.slope) < tolerance Then
+                    Dim lpNew = combine2Lines(lp, mp)
+                    If lpNew IsNot Nothing Then
+                        addList.Add(lpNew)
+                        removeList.Add(j, j)
+                        lpRemove = True
+                    End If
+                End If
+            Next
+            If lpRemove Then removeList.Add(i, i)
+        Next
+
+        For i = 0 To removeList.Count - 1
+            lpInput.RemoveAt(removeList.ElementAt(i).Value)
+        Next
+
+        For Each lp In addList
+            lpInput.Add(lp)
+        Next
+        lpList = New List(Of PointPair)(lpInput)
+        lineMap.SetTo(0)
+        For i = 0 To lpList.Count - 1
+            Dim lp = lpList(i)
+            If lp.length > options.minLength Then lineMap.Line(lp.p1, lp.p2, i + 1, 2, cvb.LineTypes.Link8)
+        Next
+        lineMap.ConvertTo(dst1, cvb.MatType.CV_8U)
+        dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_CombineLines : Inherits TaskParent
+    Public lpInput As New List(Of PointPair)
+    Public options As New Options_Line
+    Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+    Dim lpList As New List(Of PointPair)
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        FindSlider("Min Line Length").Value = 30
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Public Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
+        If Math.Abs(lp.slope) >= 1 Then
+            If lp.p1.Y < mp.p1.Y Then
+                If lp.p2.DistanceTo(mp.p1) > 10 Then Return Nothing
+                Return New PointPair(lp.p1, mp.p2)
+            Else
+                If mp.p2.DistanceTo(lp.p1) > 10 Then Return Nothing
+                Return New PointPair(mp.p1, lp.p2)
+            End If
+        Else
+            If lp.p1.X < mp.p1.X Then
+                If mp.p1.DistanceTo(lp.p2) > 10 Then Return Nothing
+                Return New PointPair(lp.p1, mp.p2)
+            Else
+                If mp.p2.DistanceTo(lp.p1) > 10 Then Return Nothing
+                Return New PointPair(mp.p1, lp.p2)
+            End If
+        End If
+    End Function
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+
+        If standalone Then
+            Static lines As New Line_Core
+            lines.Run(src)
+            lpInput = lines.lpList
+        End If
+
+        dst3.SetTo(0)
+        For i = 0 To lpInput.Count - 1
+            Dim lp = lpInput(i)
+            Dim v1 = lineMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            Dim v2 = lineMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+            If v1 <> 0 And v2 <> 0 Then
+                If v1 = v2 Then
+                    Dim mp = lpList(v1 - 1)
+                    Dim lpNew = combine2Lines(lp, mp)
+                    If lpNew IsNot Nothing Then DrawLine(dst3, lpNew.p1, lpNew.p2, 255, task.lineWidth)
+                End If
+            End If
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+        Next
+
+        lpList = New List(Of PointPair)(lpInput)
+        lineMap.SetTo(0)
+        For i = 0 To lpList.Count - 1
+            Dim lp = lpList(i)
+            If lp.length > options.minLength Then lineMap.Line(lp.xp1, lp.xp2, i + 1, 2, cvb.LineTypes.Link8)
+        Next
+
+        lineMap.ConvertTo(dst1, cvb.MatType.CV_8U)
+        dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary)
     End Sub
 End Class

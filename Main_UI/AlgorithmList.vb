@@ -1880,6 +1880,7 @@ End Enum
 	If algorithmName = "Line_CellsVertHoriz_CS" Then return new Line_CellsVertHoriz_CS
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
 	If algorithmName = "Line_ColorClass_CS" Then return new Line_ColorClass_CS
+	If algorithmName = "Line_CombineLines" Then return new Line_CombineLines
 	If algorithmName = "Line_Core" Then return new Line_Core
 	If algorithmName = "Line_DisplayInfoOld" Then return new Line_DisplayInfoOld
 	If algorithmName = "Line_DisplayInfoOld_CS" Then return new Line_DisplayInfoOld_CS
