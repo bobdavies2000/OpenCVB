@@ -116,7 +116,7 @@ End Class
 
 
 Public Class Interpolate_Lines : Inherits TaskParent
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
         FindSlider("Interpolation Resize %").Value = 80

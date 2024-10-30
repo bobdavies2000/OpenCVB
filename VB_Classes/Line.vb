@@ -17,16 +17,22 @@ Public Class Line_Basics : Inherits TaskParent
 
         Dim nextSet As New List(Of PointPair)
         dst3.SetTo(0)
+        Dim motionToss As Integer
         For Each lp In lpList
             If task.motionMask(lp.rect).CountNonZero() = 0 Then
                 nextSet.Add(lp)
                 dst3.Line(lp.p1, lp.p2, 255, 2, task.lineType)
+            Else
+                motionToss += 1
             End If
         Next
 
+        Dim intersectToss As Integer
         For Each lp In lines.lpList
             If dst3(lp.rect).CountNonZero() < options.maxIntersection And lp.length > options.minLength Then
                 nextSet.Add(lp)
+            Else
+                intersectToss += 1
             End If
         Next
 
@@ -35,9 +41,13 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In lpList
             DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
         Next
-        labels(2) = CStr(lpList.Count) + " Lines identified"
+        If task.heartBeat Then
+            labels(2) = CStr(lpList.Count) + " Lines identified.  Motion toss: " + CStr(motionToss) +
+                        " intersect toss: " + CStr(intersectToss)
+        End If
     End Sub
 End Class
+
 
 
 
@@ -354,7 +364,7 @@ End Class
 
 
 Public Class Line_InDepthAndBGR : Inherits TaskParent
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Public p1List As New List(Of cvb.Point2f)
     Public p2List As New List(Of cvb.Point2f)
     Public z1List As New List(Of cvb.Point3f) ' the point cloud values corresponding to p1 and p2
@@ -415,7 +425,7 @@ End Class
 
 Public Class Line_PointSlope : Inherits TaskParent
     Dim extend As New LongLine_Extend
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Dim knn As New KNN_BasicsN
     Public bestLines As New List(Of PointPair)
     Const lineCount As Integer = 3
@@ -537,7 +547,7 @@ End Class
 
 
 Public Class Line_GCloud : Inherits TaskParent
-    Public lines As New Line_Core
+    Public lines As New Line_Basics
     Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
@@ -645,7 +655,7 @@ End Class
 
 Public Class Line_ViewSide : Inherits TaskParent
     Public autoY As New OpAuto_YRange
-    Public lines As New Line_Core
+    Public lines As New Line_Basics
     Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
@@ -669,7 +679,7 @@ End Class
 
 Public Class Line_ViewTop : Inherits TaskParent
     Public autoX As New OpAuto_XRange
-    Public lines As New Line_Core
+    Public lines As New Line_Basics
     Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View."}
@@ -784,7 +794,7 @@ End Class
 
 Public Class Line_TimeView : Inherits TaskParent
     Public frameList As New List(Of List(Of PointPair))
-    Public lines As New Line_Core
+    Public lines As New Line_Basics
     Public pixelcount As Integer
     Public mpList As New List(Of PointPair)
     Public Sub New()
@@ -1018,7 +1028,7 @@ End Class
 
 
 Public Class Line_KNN : Inherits TaskParent
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Dim swarm As New Swarm_Basics
     Public Sub New()
         FindSlider("Connect X KNN points").Value = 1
@@ -1486,6 +1496,7 @@ Public Class Line_ViewLeft : Inherits TaskParent
         lines.Run(task.leftView)
         dst2 = lines.dst2
         dst3 = lines.dst3
+        labels(2) = lines.labels(2)
     End Sub
 End Class
 
@@ -1503,5 +1514,133 @@ Public Class Line_ViewRight : Inherits TaskParent
         lines.Run(task.rightView)
         dst2 = lines.dst2
         dst3 = lines.dst3
+        labels(2) = lines.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Basics1 : Inherits TaskParent
+    Public lineList As New List(Of List(Of PointPair))
+    Public lines As New Line_Core
+    Public lpList As New List(Of PointPair)
+    Public options As New Options_Line
+    Public Sub New()
+        FindSlider("Min Line Length").Value = 30
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = src.Clone
+        lines.Run(src)
+
+        dst3.SetTo(0)
+        For index = 0 To lineList.Count - 1
+            Dim removeList As New List(Of Integer)
+            Dim ll = lineList(index)
+            For i = 0 To ll.Count - 1
+                Dim lp = ll(i)
+                If task.motionMask(lp.rect).CountNonZero() > 0 Then removeList.Add(i)
+            Next
+            For i = removeList.Count - 1 To 0 Step -1
+                ll.RemoveAt(i)
+            Next
+
+            lineList(index) = ll
+        Next
+
+        lineList.Add(lines.lpList)
+        If lineList.Count > task.gOptions.FrameHistory.Value Then lineList.RemoveAt(0)
+
+        Dim totalLines As Integer
+        For Each ll In lineList
+            For Each lp In ll
+                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+                dst3.Line(lp.p1, lp.p2, 255, 2, task.lineType)
+            Next
+            totalLines += ll.Count
+        Next
+
+        If task.heartBeat Then labels(2) = CStr(totalLines) + " Lines identified"
+    End Sub
+End Class
+
+
+
+
+Public Class Line_BasicsNew : Inherits TaskParent
+    Public lineList As New List(Of PointPair)
+    Public lines As New Line_Core
+    Public lpList As New List(Of PointPair)
+    Public options As New Options_Line
+    Public Sub New()
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = src.Clone
+
+        lines.Run(src)
+
+        Dim nextSet As New List(Of PointPair)
+        dst3.SetTo(0)
+        Dim tossMotion As Integer
+        'For Each lp In lpList
+        '    If task.motionMask(lp.rect).CountNonZero() = 0 Then
+        '        nextSet.Add(lp)
+        '        dst3.Line(lp.p1, lp.p2, 255, 2, task.lineType)
+        '    Else
+        '        tossMotion += 1
+        '    End If
+        'Next
+
+        'For Each lp In lines.lpList
+        '    If dst3(lp.rect).CountNonZero() < options.maxIntersection And lp.length > options.minLength Then
+        '        nextSet.Add(lp)
+        '    Else
+        '        tossCount += 1
+        '    End If
+        'Next
+
+
+
+        Static lastImage As cvb.Mat = dst2.Clone
+        Dim tossCorrelation As Integer
+        Dim correlation As New cvb.Mat
+        For Each lp In lines.lpList
+            If lp.length > options.minLength Then
+                For i = 0 To 1
+                    Dim pt = Choose(i + 1, lp.p1, lp.p2)
+                    Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                    Dim roi = task.gridRects(index)
+                    cvb.Cv2.MatchTemplate(dst2(roi), lastImage(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
+                    If correlation.Get(Of Single)(0, 0) < options.correlation Then
+                        tossCorrelation += 1
+                        Exit For
+                    End If
+                    If i = 1 Then nextSet.Add(lp)
+                Next
+            End If
+        Next
+        lastImage = dst2.Clone
+
+        If task.heartBeatLT Then lpList.Clear()
+        For Each lp In nextSet
+            lpList.Add(lp)
+        Next
+
+        For Each lp In lpList
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+        Next
+        If task.heartBeat Then
+            labels(2) = CStr(lpList.Count) + " Lines identified. Correlation tossed " + CStr(tossCorrelation) +
+                                         ", motion tossed " + CStr(tossMotion)
+        End If
     End Sub
 End Class

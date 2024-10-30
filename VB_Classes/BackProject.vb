@@ -180,7 +180,7 @@ End Class
 
 Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_Full
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Public Sub New()
         task.gOptions.RGBFilterActive.Checked = False
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
@@ -192,6 +192,9 @@ Public Class BackProject_FullLines : Inherits TaskParent
 
         lines.Run(backP.dst2)
         dst2 = lines.dst2
+        For Each lp In lines.lpList
+            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.White)
+        Next
         labels(3) = CStr(lines.lpList.Count) + " lines were found"
     End Sub
 End Class
@@ -669,10 +672,11 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        FindSlider("Min Line Length").Value = 1 ' show all lines...
         labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
                   "Yellow is backProjection, lines detected are highlighted"}
         desc = "Inspect the lines from individual backprojection masks from a histogram"

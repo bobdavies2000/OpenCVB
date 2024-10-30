@@ -28,7 +28,7 @@ End Class
 
 
 Public Class RedTrack_Lines : Inherits TaskParent
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -262,7 +262,7 @@ End Class
 
 
 Public Class RedTrack_Points : Inherits TaskParent
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))

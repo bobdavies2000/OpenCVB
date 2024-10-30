@@ -150,63 +150,6 @@ End Class
 
 
 
-Public Class Horizon_UnstableResults : Inherits TaskParent
-    Dim lines As New Line_Core
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Create lines for the gravity vector and horizon vector in the camera image"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
-
-        dst1 = task.pcSplit(1).InRange(-0.05, 0.05)
-        dst0.SetTo(0)
-        dst0.SetTo(cvb.Scalar.White, dst1)
-        dst0.SetTo(0, task.noDepthMask)
-        lines.Run(dst0)
-
-        dst2.SetTo(0)
-        If lines.lpList.Count > 0 Then
-            Dim distances As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
-            For Each lp In lines.lpList
-                distances.Add(lp.p1.DistanceTo(lp.p2), lp)
-            Next
-
-            Dim lpBest = distances.ElementAt(0).Value
-            Dim p1 = New cvb.Point2f(0, lpBest.yIntercept)
-            Dim p2 = New cvb.Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept)
-            task.horizonVec = New PointPair(p1, p2)
-            DrawLine(dst2, p1, p2, cvb.Scalar.White)
-            labels(2) = "horizonVec slope/intercept = " + Format(lpBest.slope, fmt1) + "/" + Format(lpBest.yIntercept, fmt1)
-        End If
-
-        dst1 = task.pcSplit(0).InRange(-0.01, 0.01)
-        dst0.SetTo(0)
-        dst0.SetTo(cvb.Scalar.White, dst1)
-        dst0.SetTo(0, task.noDepthMask)
-        lines.Run(dst0)
-
-        If lines.lpList.Count > 0 Then
-            Dim distances As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
-            For Each lp In lines.lpList
-                distances.Add(lp.p1.DistanceTo(lp.p2), lp)
-            Next
-
-            Dim lpBest = distances.ElementAt(0).Value
-            Dim p1 = New cvb.Point2f(0, lpBest.yIntercept)
-            Dim p2 = New cvb.Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept)
-            task.gravityVec = New PointPair(p1, p2)
-            DrawLine(dst2, p1, p2, cvb.Scalar.White)
-            labels(3) = "gravityVec slope/intercept = " + Format(lpBest.slope, fmt1) + "/" + Format(lpBest.yIntercept, fmt1)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Horizon_FindNonZeroOld : Inherits TaskParent
     Public Sub New()

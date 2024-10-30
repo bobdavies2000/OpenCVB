@@ -1872,6 +1872,8 @@ End Enum
 	If algorithmName = "LeftRight_Reduction_CS" Then return new LeftRight_Reduction_CS
 	If algorithmName = "Line_Basics" Then return new Line_Basics
 	If algorithmName = "Line_Basics_CS" Then return new Line_Basics_CS
+	If algorithmName = "Line_Basics1" Then return new Line_Basics1
+	If algorithmName = "Line_BasicsNew" Then return new Line_BasicsNew
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Canny_CS" Then return new Line_Canny_CS
 	If algorithmName = "Line_Cells" Then return new Line_Cells
