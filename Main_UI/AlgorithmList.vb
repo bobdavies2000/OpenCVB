@@ -1881,8 +1881,8 @@ End Enum
 	If algorithmName = "Line_ColorClass_CS" Then return new Line_ColorClass_CS
 	If algorithmName = "Line_Core" Then return new Line_Core
 	If algorithmName = "Line_DisplayInfo" Then return new Line_DisplayInfo
-	If algorithmName = "Line_DisplayInfo_CS" Then return new Line_DisplayInfo_CS
-	If algorithmName = "Line_DisplayInfoNew" Then return new Line_DisplayInfoNew
+	If algorithmName = "Line_DisplayInfoOld" Then return new Line_DisplayInfoOld
+	If algorithmName = "Line_DisplayInfoOld_CS" Then return new Line_DisplayInfoOld_CS
 	If algorithmName = "Line_FastDetect_CC" Then return new CPP_Basics(ccFunctionNames._Line_FastDetect_CC)
 	If algorithmName = "Line_FromContours" Then return new Line_FromContours
 	If algorithmName = "Line_FromContours_CS" Then return new Line_FromContours_CS

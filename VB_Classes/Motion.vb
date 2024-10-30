@@ -1050,7 +1050,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
         options.RunOpt()
 
         ' set a low threshold to make the results more visible.
-        Dim correlationThreshold = 0.5 ' If(task.gOptions.debugChecked, 0.5, 0.9)
+        Dim correlationThreshold = 0.95 ' If(task.gOptions.debugChecked, 0.5, 0.9)
         If task.heartBeatLT Or gravitySnap.p1.X = 0 Or correlation < correlationThreshold Then
             If inputRect.Width <> 0 Then task.centerRect = inputRect
             template = src(task.centerRect).Clone

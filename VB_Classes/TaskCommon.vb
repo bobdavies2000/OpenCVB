@@ -218,8 +218,7 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
     Public xIntercept As Single
     Public rect As cvb.Rect
     Public length As Single
-    Public xDistance As Single
-    Public yDistance As Single
+    Public xpDelta As cvb.Point2f
     Public xp1 As cvb.Point2f
     Public xp2 As cvb.Point2f
     Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
@@ -231,11 +230,11 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
         If rect.Width < 2 Then rect.Width = 2
         If rect.Height < 2 Then rect.Height = 2
         If p1.X = p2.X Then
-            slope = -(p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
+            slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
         Else
-            slope = -(p1.Y - p2.Y) / (p1.X - p2.X)
+            slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
-        yIntercept = -p1.Y + slope * p1.X
+        yIntercept = p1.Y - slope * p1.X
 
         ' ordered left to right if largely horizontal or ordered top to bottom if largely vertical.
         If Math.Abs(slope) < 1 Then
@@ -277,8 +276,7 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
             xp2.Y = 0
         End If
 
-        xDistance = xp1.X - xp2.X
-        yDistance = xp1.Y - xp2.Y
+        xpDelta = New cvb.Point2f(xp1.X - xp2.X, xp1.Y - xp2.Y)
     End Sub
     Sub New()
         p1 = New cvb.Point2f()

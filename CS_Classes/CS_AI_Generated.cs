@@ -18861,7 +18861,7 @@ namespace CS_Classes
     public class FeatureLine_Basics_CS : TaskParent
     {
         Line_SubsetRect lines = new Line_SubsetRect();
-        Line_DisplayInfo lineDisp = new Line_DisplayInfo();
+        Line_DisplayInfoOld lineDisp = new Line_DisplayInfoOld();
         Options_Features options = new Options_Features();
         Match_tCell match = new Match_tCell();
         public List<tCell> tcells;
@@ -34249,7 +34249,7 @@ namespace CS_Classes
 
 
 
-    public class Line_DisplayInfo_CS : TaskParent
+    public class Line_DisplayInfoOld_CS : TaskParent
     {
         public List<tCell> tcells = new List<tCell>();
         Edge_Canny canny = new Edge_Canny();
@@ -34257,7 +34257,7 @@ namespace CS_Classes
         public int distance;
         public int maskCount;
         int myCurrentFrame = -1;
-        public Line_DisplayInfo_CS()
+        public Line_DisplayInfoOld_CS()
         {
             dst1 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -36958,7 +36958,7 @@ namespace CS_Classes
         public List<tCell> tCells = new List<tCell>();
         TrackBar cellSlider;
         Options_Features options = new Options_Features();
-        Line_DisplayInfo lineDisp = new Line_DisplayInfo();
+        Line_DisplayInfoOld lineDisp = new Line_DisplayInfoOld();
         public Match_tCell_CS()
         {
             tCell tc = new tCell();

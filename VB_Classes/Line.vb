@@ -1324,8 +1324,8 @@ Public Class Line_VerticalHorizontal2 : Inherits TaskParent
         Static maxSlider = FindSlider("Max Distance threshold")
         Dim maxDistance = maxSlider.value
 
-        Dim gDist = task.gravityVec.xDistance
-        Dim hDist = task.horizonVec.yDistance
+        Dim gDist = task.gravityVec.xpDelta.X
+        Dim hDist = task.horizonVec.xpDelta.Y
 
         lines.Run(src)
 
@@ -1334,12 +1334,12 @@ Public Class Line_VerticalHorizontal2 : Inherits TaskParent
         dst2 = src.Clone
         dst3.SetTo(0)
         For Each lp In lines.lpList
-            If Math.Abs(lp.xDistance - gDist) <= maxDistance Then
+            If Math.Abs(lp.xpDelta.X - gDist) <= maxDistance Then
                 vList.Add(lp)
                 DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
                 DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
             End If
-            If Math.Abs(lp.yDistance - hDist) <= maxDistance Then
+            If Math.Abs(lp.xpDelta.Y - hDist) <= maxDistance Then
                 hList.Add(lp)
                 DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Red)
                 DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.Red)
@@ -1356,7 +1356,7 @@ End Class
 
 
 
-Public Class Line_DisplayInfo : Inherits TaskParent
+Public Class Line_DisplayInfoOld : Inherits TaskParent
     Public tcells As New List(Of tCell)
     Dim canny As New Edge_Basics
     Dim blur As New Blur_Basics
@@ -1418,7 +1418,7 @@ End Class
 
 
 
-Public Class Line_DisplayInfoNew : Inherits TaskParent
+Public Class Line_DisplayInfo : Inherits TaskParent
     Dim canny As New Line_Canny
     Public distance As Integer
     Public maskCount As Integer
@@ -1446,8 +1446,6 @@ Public Class Line_DisplayInfoNew : Inherits TaskParent
             Dim lpIndex = lineMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
             If task.FirstPass = False And lpIndex > 0 Then lp = canny.lpList(lpIndex - 1)
 
-            Dim testPt = New PointPair(lp.p1, lp.p2)
-
             Dim mask = lineMap(lp.rect)
             mask.SetTo(0, task.noDepthMask(lp.rect))
             strOut = "Lines identified in the image: " + CStr(canny.lpList.Count) + vbCrLf + vbCrLf
@@ -1461,8 +1459,8 @@ Public Class Line_DisplayInfoNew : Inherits TaskParent
             strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
             strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
             strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
-            strOut += "Xdistance = " + Format(lp.xDistance, fmt1) + vbCrLf
-            strOut += "Ydistance = " + Format(lp.yDistance, fmt1) + vbCrLf
+            strOut += "xpDelta = (" + Format(lp.xpDelta.X, fmt1) + "," + Format(lp.xpDelta.Y, fmt1) + ")" + vbCrLf
+            strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
 
             dst3.SetTo(0)
             DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)

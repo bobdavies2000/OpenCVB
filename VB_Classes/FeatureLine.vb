@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class FeatureLine_Basics : Inherits TaskParent
     Dim lines As New Line_SubsetRect
-    Dim lineDisp As New Line_DisplayInfo
+    Dim lineDisp As New Line_DisplayInfoOld
     Dim options As New Options_Features
     Dim match As New Match_tCell
     Public tcells As List(Of tCell)
