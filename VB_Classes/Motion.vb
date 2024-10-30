@@ -208,7 +208,7 @@ Public Class Motion_CCmerge : Inherits TaskParent
     Dim motionCC As New Motion_ThruCorrelation
     Dim lastFrame As cvb.Mat
     Public Sub New()
-        desc = "Use the correlation coefficient to maintain an up-to-date image"
+        desc = "Use the correlation coefficient to maintain an up-to-date image - epic fail..."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
@@ -1248,7 +1248,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
             Dim botPoint = tmp.Get(Of cvb.Point)(tmp.Rows - 1, 0)
 
             Dim pair = New PointPair(topPoint, botPoint)
-            mp = New PointPair(pair.ep1, pair.ep2)
+            mp = New PointPair(pair.xp1, pair.xp2)
             dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
 
             Dim sideAdjacent = Math.Abs(mp.p1.X - mp.p2.X)

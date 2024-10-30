@@ -1876,13 +1876,13 @@ End Enum
 	If algorithmName = "Line_Canny_CS" Then return new Line_Canny_CS
 	If algorithmName = "Line_Cells" Then return new Line_Cells
 	If algorithmName = "Line_Cells_CS" Then return new Line_Cells_CS
-	If algorithmName = "Line_CellsVertHoriz" Then return new Line_CellsVertHoriz
 	If algorithmName = "Line_CellsVertHoriz_CS" Then return new Line_CellsVertHoriz_CS
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
 	If algorithmName = "Line_ColorClass_CS" Then return new Line_ColorClass_CS
 	If algorithmName = "Line_Core" Then return new Line_Core
 	If algorithmName = "Line_DisplayInfo" Then return new Line_DisplayInfo
 	If algorithmName = "Line_DisplayInfo_CS" Then return new Line_DisplayInfo_CS
+	If algorithmName = "Line_DisplayInfoNew" Then return new Line_DisplayInfoNew
 	If algorithmName = "Line_FastDetect_CC" Then return new CPP_Basics(ccFunctionNames._Line_FastDetect_CC)
 	If algorithmName = "Line_FromContours" Then return new Line_FromContours
 	If algorithmName = "Line_FromContours_CS" Then return new Line_FromContours_CS
@@ -1922,6 +1922,7 @@ End Enum
 	If algorithmName = "Line_VerticalHorizontal" Then return new Line_VerticalHorizontal
 	If algorithmName = "Line_VerticalHorizontal1" Then return new Line_VerticalHorizontal1
 	If algorithmName = "Line_VerticalHorizontal2" Then return new Line_VerticalHorizontal2
+	If algorithmName = "Line_VerticalHorizontalCells" Then return new Line_VerticalHorizontalCells
 	If algorithmName = "Line_ViewSide" Then return new Line_ViewSide
 	If algorithmName = "Line_ViewSide_CS" Then return new Line_ViewSide_CS
 	If algorithmName = "Line_ViewTop" Then return new Line_ViewTop

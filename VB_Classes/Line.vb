@@ -610,68 +610,6 @@ End Class
 
 
 
-Public Class Line_DisplayInfo : Inherits TaskParent
-    Public tcells As New List(Of tCell)
-    Dim canny As New Edge_Basics
-    Dim blur As New Blur_Basics
-    Public distance As Integer
-    Public maskCount As Integer
-    Dim myCurrentFrame As Integer = -1
-    Public Sub New()
-        dst1 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        labels(2) = "When running standaloneTest(), a pair of random points is used to test the algorithm."
-        desc = "Display the line provided in mp"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        dst2 = src
-        If standaloneTest() And task.heartBeat Then
-            Dim tc As tCell
-            tcells.Clear()
-            For i = 0 To 2 - 1
-                tc.center = New cvb.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-                tcells.Add(tc)
-            Next
-        End If
-        If tcells.Count < 2 Then Exit Sub
-
-        If myCurrentFrame < task.frameCount Then
-            canny.Run(src)
-            blur.Run(canny.dst2)
-            myCurrentFrame = task.frameCount
-        End If
-        dst1.SetTo(0)
-        Dim p1 = tcells(0).center
-        Dim p2 = tcells(1).center
-        DrawLine(dst1, p1, p2, 255)
-
-        dst3.SetTo(0)
-        blur.dst2.Threshold(1, 255, cvb.ThresholdTypes.Binary).CopyTo(dst3, dst1)
-        distance = p1.DistanceTo(p2)
-        maskCount = dst3.CountNonZero
-
-        For Each tc In tcells
-            'dst2.Rectangle(tc.rect, myHighlightColor)
-            'dst2.Rectangle(tc.searchRect, cvb.Scalar.White, task.lineWidth)
-            SetTrueText(tc.strOut, New cvb.Point(tc.rect.X, tc.rect.Y))
-        Next
-
-        strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + Format(maskCount / distance, "0%") + vbCrLf
-        DrawLine(dst2, p1, p2, task.HighlightColor)
-
-        strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
-                  "Correlation coefficient is shown with the depth in meters."
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Line_Perpendicular : Inherits TaskParent
     Public input As PointPair
     Public output As PointPair
@@ -785,7 +723,7 @@ End Class
 
 Public Class Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Lines for the current color class", "Color Class input"}
@@ -793,13 +731,13 @@ Public Class Line_ColorClass : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         color8U.Run(src)
-        dst1 = color8U.dst2
+        dst1 = color8U.dst3
 
         lines.Run(dst1 * 255 / color8U.classCount)
         dst2 = lines.dst2
         dst3 = lines.dst3
 
-        labels(1) = "Input to Line_Core"
+        labels(1) = "Input to Line_Basics"
         labels(2) = "Lines found in the " + color8U.classifier.traceName + " output"
     End Sub
 End Class
@@ -1279,7 +1217,7 @@ End Class
 
 
 
-Public Class Line_CellsVertHoriz : Inherits TaskParent
+Public Class Line_VerticalHorizontalCells : Inherits TaskParent
     Dim lines As New FeatureLine_Finder
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -1408,5 +1346,128 @@ Public Class Line_VerticalHorizontal2 : Inherits TaskParent
             End If
         Next
         labels(2) = "Number of lines identified (vertical/horizontal): " + CStr(vList.Count) + "/" + CStr(hList.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_DisplayInfo : Inherits TaskParent
+    Public tcells As New List(Of tCell)
+    Dim canny As New Edge_Basics
+    Dim blur As New Blur_Basics
+    Public distance As Integer
+    Public maskCount As Integer
+    Dim myCurrentFrame As Integer = -1
+    Public Sub New()
+        dst1 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        labels(2) = "When running standaloneTest(), a pair of random points is used to test the algorithm."
+        desc = "Display the line provided in mp"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = src
+        If standaloneTest() And task.heartBeat Then
+            Dim tc As tCell
+            tcells.Clear()
+            For i = 0 To 2 - 1
+                tc.center = New cvb.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+                tcells.Add(tc)
+            Next
+        End If
+        If tcells.Count < 2 Then Exit Sub
+
+        If myCurrentFrame < task.frameCount Then
+            canny.Run(src)
+            blur.Run(canny.dst2)
+            myCurrentFrame = task.frameCount
+        End If
+        dst1.SetTo(0)
+        Dim p1 = tcells(0).center
+        Dim p2 = tcells(1).center
+        DrawLine(dst1, p1, p2, 255)
+
+        dst3.SetTo(0)
+        blur.dst2.Threshold(1, 255, cvb.ThresholdTypes.Binary).CopyTo(dst3, dst1)
+        distance = p1.DistanceTo(p2)
+        maskCount = dst3.CountNonZero
+
+        For Each tc In tcells
+            'dst2.Rectangle(tc.rect, myHighlightColor)
+            'dst2.Rectangle(tc.searchRect, cvb.Scalar.White, task.lineWidth)
+            SetTrueText(tc.strOut, New cvb.Point(tc.rect.X, tc.rect.Y))
+        Next
+
+        strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + Format(maskCount / distance, "0%") + vbCrLf
+        DrawLine(dst2, p1, p2, task.HighlightColor)
+
+        strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
+                  "Correlation coefficient is shown with the depth in meters."
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_DisplayInfoNew : Inherits TaskParent
+    Dim canny As New Line_Canny
+    Public distance As Integer
+    Public maskCount As Integer
+    Dim myCurrentFrame As Integer = -1
+    Dim savePointCloud As cvb.Mat
+    Public Sub New()
+        labels(2) = "Click on a line to get details about the line"
+        labels(3) = "Details from the point cloud for the selected line"
+        desc = "Display details about the line selected."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        canny.Run(src)
+        dst2 = src
+        dst2.SetTo(255, canny.dst2)
+
+        Static lp As PointPair = canny.lpList(0)
+
+        If task.mouseClickFlag Or task.FirstPass Then
+            Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+            For i = 0 To canny.lpList.Count - 1
+                Dim mp = canny.lpList(i)
+                lineMap.Line(mp.p1, mp.p2, i + 1, 3, cvb.LineTypes.Link8)
+            Next
+
+            Dim lpIndex = lineMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+            If task.FirstPass = False And lpIndex > 0 Then lp = canny.lpList(lpIndex - 1)
+
+            Dim testPt = New PointPair(lp.p1, lp.p2)
+
+            Dim mask = lineMap(lp.rect)
+            mask.SetTo(0, task.noDepthMask(lp.rect))
+            strOut = "Lines identified in the image: " + CStr(canny.lpList.Count) + vbCrLf + vbCrLf
+            For i = 0 To 2
+                Dim mm = GetMinMax(task.pcSplit(i)(lp.rect), mask)
+                Dim dm = Choose(i + 1, "X", "Y", "Z")
+                strOut += "Min " + dm + " = " + Format(mm.minVal, fmt1) + " max " + dm + " = " +
+                           Format(mm.maxVal, fmt1) + vbCrLf
+            Next
+
+            strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
+            strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
+            strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
+            strOut += "Xdistance = " + Format(lp.xDistance, fmt1) + vbCrLf
+            strOut += "Ydistance = " + Format(lp.yDistance, fmt1) + vbCrLf
+
+            dst3.SetTo(0)
+            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+            dst3.Rectangle(lp.rect, task.HighlightColor, task.lineWidth, task.lineType)
+        End If
+        SetTrueText(strOut, 3)
     End Sub
 End Class

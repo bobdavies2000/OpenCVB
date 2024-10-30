@@ -220,27 +220,22 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
     Public length As Single
     Public xDistance As Single
     Public yDistance As Single
-    Public ep1 As cvb.Point2f
-    Public ep2 As cvb.Point2f
+    Public xp1 As cvb.Point2f
+    Public xp2 As cvb.Point2f
     Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
-        If _p1.X < _p2.X Then ' p1 always has the lower x
-            p1 = _p1
-            p2 = _p2
-        Else
-            p1 = _p2
-            p2 = _p1
-        End If
-        rect = New cvb.Rect(p1.X, p1.Y, Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
-        If p1.Y > p2.Y Then rect = New cvb.Rect(p1.X, p2.Y, Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
+        p1 = _p1
+        p2 = _p2
+
+        rect = New cvb.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y),
+                            Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
         If rect.Width < 2 Then rect.Width = 2
         If rect.Height < 2 Then rect.Height = 2
         If p1.X = p2.X Then
-            slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
-            yIntercept = p1.Y
+            slope = -(p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
         Else
-            slope = (p1.Y - p2.Y) / (p1.X - p2.X)
-            yIntercept = p1.Y - slope * p1.X
+            slope = -(p1.Y - p2.Y) / (p1.X - p2.X)
         End If
+        yIntercept = -p1.Y + slope * p1.X
 
         ' ordered left to right if largely horizontal or ordered top to bottom if largely vertical.
         If Math.Abs(slope) < 1 Then
@@ -261,29 +256,29 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
 
         ' compute the edge to edge line - might be useful...
         Dim w = task.cols, h = task.rows
-        ep1 = New cvb.Point2f(0, yIntercept)
-        ep2 = New cvb.Point2f(w, w * slope + yIntercept)
-        Dim xCept = -yIntercept / slope
-        If ep1.Y > h Then
-            ep1.X = (h - yIntercept) / slope
-            ep1.Y = h
+        xp1 = New cvb.Point2f(0, yIntercept)
+        xp2 = New cvb.Point2f(w, w * slope + yIntercept)
+        xIntercept = -yIntercept / slope
+        If xp1.Y > h Then
+            xp1.X = (h - yIntercept) / slope
+            xp1.Y = h
         End If
-        If ep1.Y < 0 Then
-            ep1.X = xCept
-            ep1.Y = 0
-        End If
-
-        If ep2.Y > h Then
-            ep2.X = (h - yIntercept) / slope
-            ep2.Y = h
-        End If
-        If ep2.Y < 0 Then
-            ep2.X = xCept
-            ep2.Y = 0
+        If xp1.Y < 0 Then
+            xp1.X = xIntercept
+            xp1.Y = 0
         End If
 
-        xDistance = ep1.X - ep2.X
-        yDistance = ep1.Y - ep2.Y
+        If xp2.Y > h Then
+            xp2.X = (h - yIntercept) / slope
+            xp2.Y = h
+        End If
+        If xp2.Y < 0 Then
+            xp2.X = xIntercept
+            xp2.Y = 0
+        End If
+
+        xDistance = xp1.X - xp2.X
+        yDistance = xp1.Y - xp2.Y
     End Sub
     Sub New()
         p1 = New cvb.Point2f()
