@@ -1263,4 +1263,3 @@ Public Class Motion_CenterRotation : Inherits TaskParent
         labels(3) = motion.labels(2)
     End Sub
 End Class
-

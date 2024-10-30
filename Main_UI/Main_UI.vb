@@ -599,8 +599,6 @@ Public Class Main_UI
         If goodPoint.X > Me.Left Then Me.Left = goodPoint.X
         If goodPoint.Y > Me.Top Then Me.Top = goodPoint.Y
 
-        trueData = New List(Of VB_Classes.TrueText)
-
         If camLabel(0) Is Nothing Then
             For i = 0 To camLabel.Length - 1
                 camLabel(i) = New Label
@@ -1537,7 +1535,7 @@ Public Class Main_UI
             mousePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
 
             Dim saveDrawRect As cvb.Rect
-            task.trueData.Clear()
+            trueData.Clear()
 
             While 1
                 Dim waitTime = Now
@@ -1699,8 +1697,8 @@ Public Class Main_UI
                     SyncLock trueDataLock
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
+                            task.trueData.Clear()
                         End If
-                        task.trueData.Clear()
                     End SyncLock
                 End If
 

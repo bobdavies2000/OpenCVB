@@ -1923,6 +1923,8 @@ End Enum
 	If algorithmName = "Line_VerticalHorizontal1" Then return new Line_VerticalHorizontal1
 	If algorithmName = "Line_VerticalHorizontal2" Then return new Line_VerticalHorizontal2
 	If algorithmName = "Line_VerticalHorizontalCells" Then return new Line_VerticalHorizontalCells
+	If algorithmName = "Line_ViewLeft" Then return new Line_ViewLeft
+	If algorithmName = "Line_ViewRight" Then return new Line_ViewRight
 	If algorithmName = "Line_ViewSide" Then return new Line_ViewSide
 	If algorithmName = "Line_ViewSide_CS" Then return new Line_ViewSide_CS
 	If algorithmName = "Line_ViewTop" Then return new Line_ViewTop

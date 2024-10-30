@@ -1425,6 +1425,7 @@ Public Class Line_DisplayInfo : Inherits TaskParent
     Dim myCurrentFrame As Integer = -1
     Dim savePointCloud As cvb.Mat
     Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
         labels(2) = "Click on a line to get details about the line"
         labels(3) = "Details from the point cloud for the selected line"
         desc = "Display details about the line selected."
@@ -1437,16 +1438,17 @@ Public Class Line_DisplayInfo : Inherits TaskParent
         Static lp As PointPair = canny.lpList(0)
 
         If task.mouseClickFlag Or task.FirstPass Then
-            Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+            Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
             For i = 0 To canny.lpList.Count - 1
                 Dim mp = canny.lpList(i)
                 lineMap.Line(mp.p1, mp.p2, i + 1, 3, cvb.LineTypes.Link8)
             Next
 
-            Dim lpIndex = lineMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+            Dim lpIndex = lineMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
             If task.FirstPass = False And lpIndex > 0 Then lp = canny.lpList(lpIndex - 1)
 
-            Dim mask = lineMap(lp.rect)
+            Dim mask As New cvb.Mat
+            lineMap(lp.rect).ConvertTo(mask, cvb.MatType.CV_8U)
             mask.SetTo(0, task.noDepthMask(lp.rect))
             strOut = "Lines identified in the image: " + CStr(canny.lpList.Count) + vbCrLf + vbCrLf
             For i = 0 To 2
@@ -1466,6 +1468,40 @@ Public Class Line_DisplayInfo : Inherits TaskParent
             DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
             dst3.Rectangle(lp.rect, task.HighlightColor, task.lineWidth, task.lineType)
         End If
-        SetTrueText(strOut, 3)
+        SetTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_ViewLeft : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Public Sub New()
+        desc = "Find lines in the left image"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lines.Run(task.leftView)
+        dst2 = lines.dst2
+        dst3 = lines.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_ViewRight : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Public Sub New()
+        desc = "Find lines in the right image"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lines.Run(task.rightView)
+        dst2 = lines.dst2
+        dst3 = lines.dst3
     End Sub
 End Class
