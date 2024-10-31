@@ -82,9 +82,8 @@ Public Class Line_Core : Inherits TaskParent
 
         dst2 = src
         dst3.SetTo(0)
-        lpList.Clear()
-        For Each lp In sortByLen.Values
-            lpList.Add(lp)
+        lpList = New List(Of PointPair)(sortByLen.Values)
+        For Each lp In lpList
             DrawLine(dst2, lp.p1, lp.p2, lineColor)
             DrawLine(dst3, lp.p1, lp.p2, 255)
         Next
@@ -1754,22 +1753,22 @@ End Class
 
 
 Public Class Line_PointSlope1 : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Dim knn As New KNN_BasicsN
     Dim dimension As Integer = 5
     Public Sub New()
-        knn.options.knnDimension = dimension ' slope, xp1.x, xp1.y, xp2.x, xp2.y
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        knn.options.knnDimension = dimension ' yIntercept, p1.x, p1.y, p2.x, p2.y
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
-        dst2 = src
+        dst3 = lines.dst3
 
         knn.queries.Clear()
         For Each lp In lines.lpList
             For j = 0 To knn.options.knnDimension - 1
-                knn.queries.Add(Choose(j + 1, lp.slope, lp.xp1.X, lp.xp1.Y, lp.xp2.X, lp.xp2.Y))
+                knn.queries.Add(Choose(j + 1, lp.yIntercept, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
             Next
         Next
 
@@ -1779,14 +1778,16 @@ Public Class Line_PointSlope1 : Inherits TaskParent
         knn.Run(empty)
 
         dst2.SetTo(0)
-
+        dst1.SetTo(0)
         For i = 0 To 0
             Dim lp = lines.lpList(i)
-            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.White)
-            For j = dimension To knn.result.GetUpperBound(1) Step dimension
-                lp = lastLines(CInt(knn.result(i, j) / dimension))
-                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
-                If j = dimension Then Exit For
+            DrawLine(dst2, lp.xp1, lp.xp2, cvb.Scalar.White)
+            DrawLine(dst1, lp.p1, lp.p2, task.HighlightColor)
+            For j = 0 To knn.result.GetUpperBound(1) Step dimension
+                Dim mp = lastLines(CInt(knn.result(i, j) / dimension))
+                DrawLine(dst2, mp.xp1, mp.xp2, task.HighlightColor)
+                DrawLine(dst1, mp.p1, mp.p2, cvb.Scalar.White)
+                If j = 0 Then Exit For
             Next
         Next
 
