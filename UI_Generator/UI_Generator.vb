@@ -12,6 +12,7 @@ Module UI_Generator
 
         Dim fullXRef As Boolean
         If args.Length > 0 Then If args(0) = "All" Then fullXRef = True
+        ' fullXRef = True
 
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
@@ -207,7 +208,7 @@ Module UI_Generator
         Dim refCounts As New List(Of String)
         Try
             If fullXRef Then
-                Console.WriteLine("Now preparing the sorted algorithm cross reference.")
+                Console.WriteLine("The algorithm cross reference needs to be prepared.")
                 Dim tokens(allButPython.Count - 1) As String
                 For i = 0 To allButPython.Keys.Count - 1
                     tokens(i) = allButPython.Keys(i)
@@ -215,6 +216,7 @@ Module UI_Generator
                 Dim references As New SortedList(Of String, String)
                 For Each fn In srcList
                     If fn.EndsWith(".py") Then Continue For
+
                     Dim srclines = File.ReadAllLines(fn)
                     Dim classname As String = ""
                     For Each line In srclines

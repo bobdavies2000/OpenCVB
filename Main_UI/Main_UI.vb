@@ -1185,7 +1185,6 @@ Public Class Main_UI
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
-            camSwitch()
             task.optionsChanged = True
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
             saveAlgorithmName = ""
@@ -1197,6 +1196,8 @@ Public Class Main_UI
 
             frameCount = 0
             setupCamPics()
+
+            camSwitch()
 
             jsonWrite()
             jsonRead() ' this will apply all the changes...
@@ -1268,11 +1269,6 @@ Public Class Main_UI
         StartTask()
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
-        If CameraSwitching.Visible And paintNewImages Then
-            CameraSwitching.Visible = False
-            CamSwitchProgress.Visible = False
-        End If
-
         Dim g As Graphics = e.Graphics
         Dim pic = DirectCast(sender, PictureBox)
         Dim ratio = camPic(2).Width / settings.WorkingRes.Width
@@ -1300,6 +1296,11 @@ Public Class Main_UI
             If paintNewImages Then
                 paintNewImages = False
                 If uiColor IsNot Nothing Then
+                    If CameraSwitching.Visible Then
+                        CameraSwitching.Visible = False
+                        CamSwitchProgress.Visible = False
+                        CamSwitchTimer.Enabled = False
+                    End If
                     If uiColor.Width > 0 And dst(0) IsNot Nothing Then
                         Dim camSize = New cvb.Size(camPic(0).Size.Width, camPic(0).Size.Height)
                         For i = 0 To dst.Count - 1
@@ -1493,7 +1494,8 @@ Public Class Main_UI
             algorithmQueueCount -= 1
             AlgorithmTestAllCount += 1
             drawRect = New cvb.Rect
-            Dim task = New VBtask(parms)
+            task = New VBtask(parms)
+
 
             ' make sure unmanaged portion of the CPP_Managed library is initialized with critical data before the first C++/CLR algorithm.
             Dim setup = New CPP_Managed.CPP_IntializeManaged(task.rows, task.cols)
@@ -1538,7 +1540,6 @@ Public Class Main_UI
             SyncLock trueDataLock
                 trueData.Clear()
             End SyncLock
-
             While 1
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.
@@ -1760,7 +1761,6 @@ Public Class Main_UI
     End Sub
     Private Sub camSwitch()
         CameraSwitching.Visible = True
-        dst(0) = Nothing
         CameraSwitching.Text = settings.cameraName + " initializing"
         CamSwitchProgress.Visible = True
         CamSwitchProgress.Left = CameraSwitching.Left
@@ -1768,25 +1768,16 @@ Public Class Main_UI
         CamSwitchProgress.Height = CameraSwitching.Height / 2
         CameraSwitching.BringToFront()
         CamSwitchProgress.BringToFront()
+        uiColor = Nothing
+        CamSwitchTimer.Enabled = True
     End Sub
     Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
-        Dim count As Integer
-        If dst(0) IsNot Nothing And paintNewImages Then
-            Dim tmp = cvext.BitmapConverter.ToMat(camPic(0).Image)
-            count = tmp.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).CountNonZero
-        End If
-        If count Then
-            CameraSwitching.Visible = False
-            CamSwitchProgress.Visible = False
-            CamSwitchTimer.Enabled = False
-        Else
-            If CamSwitchProgress.Visible Then
-                Static frames As Integer
-                Dim slideCount As Integer = 10
-                CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
-                If frames >= slideCount Then frames = 0
-                frames += 1
-            End If
+        If CamSwitchProgress.Visible Then
+            Static frames As Integer
+            Dim slideCount As Integer = 10
+            CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
+            If frames >= slideCount Then frames = 0
+            frames += 1
         End If
     End Sub
     Private Sub GroupButtonList_Click(sender As Object, e As EventArgs) Handles GroupButtonList.Click

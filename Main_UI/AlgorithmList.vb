@@ -1871,9 +1871,6 @@ End Enum
 	If algorithmName = "LeftRight_Reduction_CS" Then return new LeftRight_Reduction_CS
 	If algorithmName = "Line_Basics" Then return new Line_Basics
 	If algorithmName = "Line_Basics_CS" Then return new Line_Basics_CS
-	If algorithmName = "Line_Basics1" Then return new Line_Basics1
-	If algorithmName = "Line_Basics2" Then return new Line_Basics2
-	If algorithmName = "Line_Basics3" Then return new Line_Basics3
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Canny_CS" Then return new Line_Canny_CS
 	If algorithmName = "Line_Cells" Then return new Line_Cells
@@ -1934,6 +1931,9 @@ End Enum
 	If algorithmName = "Line_ViewSide_CS" Then return new Line_ViewSide_CS
 	If algorithmName = "Line_ViewTop" Then return new Line_ViewTop
 	If algorithmName = "Line_ViewTop_CS" Then return new Line_ViewTop_CS
+	If algorithmName = "Line_xBasics1" Then return new Line_xBasics1
+	If algorithmName = "Line_xBasics2" Then return new Line_xBasics2
+	If algorithmName = "Line_xBasics3" Then return new Line_xBasics3
 	If algorithmName = "Line3D_CandidatesAll" Then return new Line3D_CandidatesAll
 	If algorithmName = "Line3D_CandidatesAll_CS" Then return new Line3D_CandidatesAll_CS
 	If algorithmName = "Line3D_CandidatesFirstLast" Then return new Line3D_CandidatesFirstLast

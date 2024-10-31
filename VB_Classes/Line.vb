@@ -55,7 +55,7 @@ End Class
 
 
 
-Public Class Line_Basics3 : Inherits TaskParent
+Public Class Line_xBasics3 : Inherits TaskParent
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
     Public Sub New()
@@ -1834,7 +1834,7 @@ End Class
 
 
 
-Public Class Line_Basics1 : Inherits TaskParent
+Public Class Line_xBasics1 : Inherits TaskParent
     Public lineList As New List(Of PointPair)
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
@@ -1910,7 +1910,7 @@ End Class
 
 
 
-Public Class Line_Basics2 : Inherits TaskParent
+Public Class Line_xBasics2 : Inherits TaskParent
     Public lines As New Line_Core
     Public lpInput As New List(Of PointPair)
     Public options As New Options_Line

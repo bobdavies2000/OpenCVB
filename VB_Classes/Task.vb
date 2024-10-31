@@ -30,7 +30,7 @@ Public Class VBtask : Implements IDisposable
     Public gridNabeRects As New List(Of cvb.Rect)
     Public gridROIclicked As Integer
 
-    Public optionsChanged As Boolean ' global or local options changed.
+    Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer
     Public cols As Integer
     Public TaskTimer As New System.Timers.Timer(1000)
