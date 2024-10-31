@@ -1314,7 +1314,6 @@ Public Class Main_UI
         ' draw any TrueType font data on the image 
         SyncLock trueDataLock
             For i = 0 To trueData.Count - 1
-                If trueData(i) Is Nothing Then Continue For
                 Dim tt = trueData(i)
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
@@ -1535,7 +1534,10 @@ Public Class Main_UI
             mousePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
 
             Dim saveDrawRect As cvb.Rect
-            trueData.Clear()
+
+            SyncLock trueDataLock
+                trueData.Clear()
+            End SyncLock
 
             While 1
                 Dim waitTime = Now
@@ -1543,7 +1545,7 @@ Public Class Main_UI
                 While 1
                     ' camera has exited or resolution is changed.
                     If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or
-                    saveWorkingRes <> settings.WorkingRes Then Exit While
+                        saveWorkingRes <> settings.WorkingRes Then Exit While
                     If saveAlgorithmName <> task.algName Then Exit While
                     ' switching camera resolution means stopping the current algorithm
                     If saveWorkingRes <> settings.WorkingRes Then Exit While
@@ -1587,166 +1589,166 @@ Public Class Main_UI
                         End SyncLock
 
                         Dim endCopyTime = Now
-                        Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
-                        Dim spanCopy = New TimeSpan(elapsedCopyTicks)
-                        task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+                            Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
+                            Dim spanCopy = New TimeSpan(elapsedCopyTicks)
+                            task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
 
-                        If intermediateReview = task.algName Then
-                            task.intermediateName = ""
-                            intermediateReview = ""
-                        End If
-                        If intermediateReview <> "" Then task.intermediateName = intermediateReview
-
-                        If testAllRunning Then
-                            task.pixelViewerOn = False
-                        Else
-                            task.pixelViewerOn = pixelViewerOn
-                        End If
-
-                        If GrabRectangleData Then
-                            GrabRectangleData = False
-                            ' relative size of algorithm size image to displayed image
-                            Dim ratio = task.dst2.Width / camPic(0).Width
-                            Dim tmpDrawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                            task.drawRect = New cvb.Rect
-                            If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
-                                If saveDrawRect <> tmpDrawRect Then
-                                    task.optionsChanged = True
-                                    saveDrawRect = tmpDrawRect
-                                End If
-                                task.drawRect = tmpDrawRect
+                            If intermediateReview = task.algName Then
+                                task.intermediateName = ""
+                                intermediateReview = ""
                             End If
-                            BothFirstAndLastReady = False
+                            If intermediateReview <> "" Then task.intermediateName = intermediateReview
+
+                            If testAllRunning Then
+                                task.pixelViewerOn = False
+                            Else
+                                task.pixelViewerOn = pixelViewerOn
+                            End If
+
+                            If GrabRectangleData Then
+                                GrabRectangleData = False
+                                ' relative size of algorithm size image to displayed image
+                                Dim ratio = task.dst2.Width / camPic(0).Width
+                                Dim tmpDrawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                                task.drawRect = New cvb.Rect
+                                If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
+                                    If saveDrawRect <> tmpDrawRect Then
+                                        task.optionsChanged = True
+                                        saveDrawRect = tmpDrawRect
+                                    End If
+                                    task.drawRect = tmpDrawRect
+                                End If
+                                BothFirstAndLastReady = False
+                            End If
+
+                            textAdvice = task.advice
+
+                            If task.pointCloud.Width = 0 Then Continue While Else Exit While
                         End If
+                    End While
 
-                        textAdvice = task.advice
-
-                        If task.pointCloud.Width = 0 Then Continue While Else Exit While
+                    ' camera has exited or resolution is changed.
+                    If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or
+                saveAlgorithmName <> task.algName Then
+                        Exit While
                     End If
+
+                    If activeMouseDown = False Then
+                        SyncLock mouseLock
+                            If mousePoint.X < 0 Then mousePoint.X = 0
+                            If mousePoint.Y < 0 Then mousePoint.Y = 0
+                            If mousePoint.X >= task.dst2.Width Then mousePoint.X = task.dst2.Width - 1
+                            If mousePoint.Y >= task.dst2.Height Then mousePoint.Y = task.dst2.Height - 1
+
+                            task.mouseMovePoint = mousePoint
+                            If task.mouseMovePoint = New cvb.Point(0, 0) Then
+                                task.mouseMovePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2)
+                            End If
+                            task.mousePicTag = mousePicTag
+                            If mouseClickFlag Then
+                                task.mouseClickFlag = mouseClickFlag
+                                task.ClickPoint = mousePoint
+                                ClickPoint = task.ClickPoint
+                                mouseClickFlag = False
+                            End If
+                        End SyncLock
+                    End If
+
+                    Dim endWaitTime = Now
+                    Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
+                    Dim spanWait = New TimeSpan(elapsedWaitTicks)
+                    task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
+                    Dim updatedDrawRect = task.drawRect
+
+                    task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
+                    picLabels = task.labels
+                    motionLabel = task.MotionLabel
+                    SyncLock mouseLock
+                        If mousePoint.X < task.gridMap.Width And mousePoint.Y < task.gridMap.Height Then
+                            Try
+                                mouseGridCell = task.gridMap.Get(Of Integer)(mousePoint.Y, mousePoint.X)
+                            Catch ex As Exception
+                            End Try
+                        Else
+                            mousePoint = New cvb.Point(0, 0)
+                        End If
+                    End SyncLock
+                    Dim returnTime = Now
+
+                    ' in case the algorithm has changed the mouse location...
+                    If task.mouseMovePointUpdated Then mousePoint = task.mouseMovePoint
+                    If updatedDrawRect <> task.drawRect Then
+                        drawRect = task.drawRect
+                        ' relative size of algorithm size image to displayed image
+                        Dim ratio = camPic(0).Width / task.dst2.Width
+                        drawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                    End If
+                    If task.drawRectClear Then
+                        drawRect = New cvb.Rect
+                        task.drawRect = drawRect
+                        task.drawRectClear = False
+                    End If
+
+                    pixelViewerRect = task.pixelViewerRect
+                    pixelViewTag = task.pixelViewTag
+
+                    If Single.IsNaN(algorithmFPSrate) Then
+                        task.fpsRate = 0
+                    Else
+                        task.fpsRate = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
+                    End If
+
+                    If task.paused = False Then
+                        SyncLock trueDataLock
+                            If task.trueData.Count Then
+                                trueData = New List(Of VB_Classes.TrueText)(task.trueData)
+                                task.trueData.Clear()
+                            End If
+                        End SyncLock
+                    End If
+
+                    If task.algName.StartsWith("Options_") Then
+                        task.labels(2) = "Options algorithms have no output"
+                        Continue While
+                    End If
+                    If task.dst0 IsNot Nothing Then
+                        SyncLock cameraLock
+                            dst(0) = task.dst0.Clone
+                            dst(1) = task.dst1.Clone
+                            dst(2) = task.dst2.Clone
+                            dst(3) = task.dst3.Clone
+                            paintNewImages = True ' trigger the paint 
+                        End SyncLock
+                        algorithmRefresh = True
+                    End If
+
+                    If task.fpsRate = 0 Then task.fpsRate = 1
+                    If frameCount Mod task.fpsRate = 0 Then
+                        SyncLock callTraceLock
+                            callTrace = New List(Of String)(task.callTraceMain)
+                            algorithm_ms = New List(Of Single)(task.algorithm_msMain)
+                            algorithmNames = New List(Of String)(task.algorithmNamesMain)
+                        End SyncLock
+                    End If
+
+                    Dim elapsedTicks = Now.Ticks - returnTime.Ticks
+                    Dim span = New TimeSpan(elapsedTicks)
+                    task.returnCopyTime = span.Ticks / TimeSpan.TicksPerMillisecond
+
+                    task.mouseClickFlag = False
+                    frameCount = task.frameCount
+                    ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
+                    ' Each image will represent the one just finished by the algorithm.
+                    If task.debugSyncUI Then Thread.Sleep(100)
                 End While
 
-                ' camera has exited or resolution is changed.
-                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or
-                saveAlgorithmName <> task.algName Then
-                    Exit While
-                End If
+                Debug.WriteLine(parms.algName + " ending.  Thread closing...")
+                task.frameCount = -1
+                Application.DoEvents()
+                task.Dispose()
+            End SyncLock
 
-                If activeMouseDown = False Then
-                    SyncLock mouseLock
-                        If mousePoint.X < 0 Then mousePoint.X = 0
-                        If mousePoint.Y < 0 Then mousePoint.Y = 0
-                        If mousePoint.X >= task.dst2.Width Then mousePoint.X = task.dst2.Width - 1
-                        If mousePoint.Y >= task.dst2.Height Then mousePoint.Y = task.dst2.Height - 1
-
-                        task.mouseMovePoint = mousePoint
-                        If task.mouseMovePoint = New cvb.Point(0, 0) Then
-                            task.mouseMovePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2)
-                        End If
-                        task.mousePicTag = mousePicTag
-                        If mouseClickFlag Then
-                            task.mouseClickFlag = mouseClickFlag
-                            task.ClickPoint = mousePoint
-                            ClickPoint = task.ClickPoint
-                            mouseClickFlag = False
-                        End If
-                    End SyncLock
-                End If
-
-                Dim endWaitTime = Now
-                Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
-                Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
-                Dim updatedDrawRect = task.drawRect
-
-                task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
-                picLabels = task.labels
-                motionLabel = task.MotionLabel
-                SyncLock mouseLock
-                    If mousePoint.X < task.gridMap.Width And mousePoint.Y < task.gridMap.Height Then
-                        Try
-                            mouseGridCell = task.gridMap.Get(Of Integer)(mousePoint.Y, mousePoint.X)
-                        Catch ex As Exception
-                        End Try
-                    Else
-                        mousePoint = New cvb.Point(0, 0)
-                    End If
-                End SyncLock
-                Dim returnTime = Now
-
-                ' in case the algorithm has changed the mouse location...
-                If task.mouseMovePointUpdated Then mousePoint = task.mouseMovePoint
-                If updatedDrawRect <> task.drawRect Then
-                    drawRect = task.drawRect
-                    ' relative size of algorithm size image to displayed image
-                    Dim ratio = camPic(0).Width / task.dst2.Width
-                    drawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                End If
-                If task.drawRectClear Then
-                    drawRect = New cvb.Rect
-                    task.drawRect = drawRect
-                    task.drawRectClear = False
-                End If
-
-                pixelViewerRect = task.pixelViewerRect
-                pixelViewTag = task.pixelViewTag
-
-                If Single.IsNaN(algorithmFPSrate) Then
-                    task.fpsRate = 0
-                Else
-                    task.fpsRate = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
-                End If
-
-                If task.paused = False Then
-                    SyncLock trueDataLock
-                        If task.trueData.Count Then
-                            trueData = New List(Of VB_Classes.TrueText)(task.trueData)
-                            task.trueData.Clear()
-                        End If
-                    End SyncLock
-                End If
-
-                If task.algName.StartsWith("Options_") Then
-                    task.labels(2) = "Options algorithms have no output"
-                    Continue While
-                End If
-                If task.dst0 IsNot Nothing Then
-                    SyncLock cameraLock
-                        dst(0) = task.dst0.Clone
-                        dst(1) = task.dst1.Clone
-                        dst(2) = task.dst2.Clone
-                        dst(3) = task.dst3.Clone
-                        paintNewImages = True ' trigger the paint 
-                    End SyncLock
-                    algorithmRefresh = True
-                End If
-
-                If task.fpsRate = 0 Then task.fpsRate = 1
-                If frameCount Mod task.fpsRate = 0 Then
-                    SyncLock callTraceLock
-                        callTrace = New List(Of String)(task.callTraceMain)
-                        algorithm_ms = New List(Of Single)(task.algorithm_msMain)
-                        algorithmNames = New List(Of String)(task.algorithmNamesMain)
-                    End SyncLock
-                End If
-
-                Dim elapsedTicks = Now.Ticks - returnTime.Ticks
-                Dim span = New TimeSpan(elapsedTicks)
-                task.returnCopyTime = span.Ticks / TimeSpan.TicksPerMillisecond
-
-                task.mouseClickFlag = False
-                frameCount = task.frameCount
-                ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
-                ' Each image will represent the one just finished by the algorithm.
-                If task.debugSyncUI Then Thread.Sleep(100)
-            End While
-
-            Debug.WriteLine(parms.algName + " ending.  Thread closing...")
-            task.frameCount = -1
-            Application.DoEvents()
-            task.Dispose()
-        End SyncLock
-
-        If parms.algName.EndsWith(".py") Then killPython()
+            If parms.algName.EndsWith(".py") Then killPython()
         frameCount = 0
     End Sub
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
