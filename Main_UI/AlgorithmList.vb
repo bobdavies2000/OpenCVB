@@ -1921,6 +1921,7 @@ End Enum
 	If algorithmName = "Line_TimeView_CS" Then return new Line_TimeView_CS
 	If algorithmName = "Line_TimeViewLines" Then return new Line_TimeViewLines
 	If algorithmName = "Line_TimeViewLines_CS" Then return new Line_TimeViewLines_CS
+	If algorithmName = "Line_TopXlines" Then return new Line_TopXlines
 	If algorithmName = "Line_Vertical" Then return new Line_Vertical
 	If algorithmName = "Line_VerticalHorizontal" Then return new Line_VerticalHorizontal
 	If algorithmName = "Line_VerticalHorizontal1" Then return new Line_VerticalHorizontal1

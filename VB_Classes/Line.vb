@@ -1,16 +1,14 @@
 Imports System.Windows
+Imports OpenCvSharp.Flann
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
-    Public options As New Options_Line
     Public Sub New()
         dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
         desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
         dst2 = src.Clone
 
         lines.Run(src)
@@ -29,7 +27,7 @@ Public Class Line_Basics : Inherits TaskParent
 
         Dim intersectToss As Integer
         For Each lp In lines.lpList
-            If dst3(lp.rect).CountNonZero() < options.maxIntersection And lp.length > options.minLength Then
+            If dst3(lp.rect).CountNonZero() < lines.options.maxIntersection Then
                 nextSet.Add(lp.length, lp)
             Else
                 intersectToss += 1
@@ -58,12 +56,15 @@ Public Class Line_Core : Inherits TaskParent
     Dim ld As cvb.XImgProc.FastLineDetector
     Public lpList As New List(Of PointPair)
     Public lineColor = cvb.Scalar.White
+    Public options As New Options_Line
     Public Sub New()
         ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
         If src.Channels() = 3 Then dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
         If dst2.Type <> cvb.MatType.CV_8U Then dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
 
@@ -76,7 +77,7 @@ Public Class Line_Core : Inherits TaskParent
                 Dim p1 = New cvb.Point(v(0), v(1))
                 Dim p2 = New cvb.Point(v(2), v(3))
                 Dim lp = New PointPair(p1, p2)
-                sortByLen.Add(lp.length, lp)
+                If lp.length > options.minLength Then sortByLen.Add(lp.length, lp)
             End If
         Next
 
@@ -1793,29 +1794,103 @@ Public Class Line_PointSlope1 : Inherits TaskParent
 
         lastTrainInput = New List(Of Single)(knn.queries)
         lastLines = New List(Of PointPair)(lines.lpList)
-
-        'Dim nextLines As New List(Of PointPair)
-        'Dim usedBest As New List(Of Integer)
-        'Dim index As Integer
-        'For i = 0 To knn.result.GetUpperBound(0)
-        '    For j = 0 To knn.result.GetUpperBound(1)
-        '        index = knn.result(i, j)
-        '        If usedBest.Contains(index) = False Then Exit For
-        '    Next
-        '    usedBest.Add(index)
-
-        '    If index * knn.options.knnDimension + 4 < knn.trainInput.Count Then
-        '        Dim mps = New PointPair(New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension + 0), knn.trainInput(index * knn.options.knnDimension + 1)),
-        '                  New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension + 2), knn.trainInput(index * knn.options.knnDimension + 3)))
-        '        mps.slope = knn.trainInput(index * knn.options.knnDimension)
-        '        nextLines.Add(mps)
-        '    End If
-        'Next
-
-        'bestLines = New List(Of PointPair)(nextLines)
-        'For Each ptS In bestLines
-        '    DrawLine(dst2, ptS.p1, ptS.p2, task.HighlightColor)
-        '    DrawLine(dst1, ptS.p1, ptS.p2, cvb.Scalar.Red)
-        'Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Line_TopXlines : Inherits TaskParent
+    Dim lines As New Line_Core
+    Public lpList As New List(Of PointPair)
+    Dim delaunay As New Delaunay_Basics
+    Public Sub New()
+        desc = "Isolate the top X lines in the latest lpList of lines."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static regionMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+
+        If task.optionsChanged Then
+            regionMap.SetTo(0)
+            lpList.Clear()
+        End If
+
+        Dim removeList As New List(Of Integer)
+        For i = 0 To lpList.Count - 1
+            Dim lp = lpList(i)
+            Dim val = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            If val > 0 Then
+                removeList.Add(i)
+                Continue For
+            Else
+                val = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+                If val > 0 Then removeList.Add(i)
+            End If
+        Next
+
+        dst2 = src.Clone
+        lines.Run(src)
+
+        dst3.SetTo(0)
+        Dim topX = lines.options.topX
+        Dim newList As New List(Of PointPair)
+        For i = 0 To lines.lpList.Count - 1
+            Dim lp = lines.lpList(i)
+            Dim index = regionMap.Get(Of Byte)(lp.center.Y, lp.center.X)
+            If index > 0 And removeList.Contains(index) = False Then
+                Dim mp = lpList(index - 1)
+                If mp.rect.IntersectsWith(lp.rect) Then
+                    Dim r = mp.rect.Union(lp.rect)
+                    If lp.rect.Width * lp.rect.Height / (r.Width * r.Height) < lines.options.overlapPercent Then
+                        newList.Add(lp)
+                    End If
+                End If
+            Else
+                newList.Add(lp)
+            End If
+
+            If newList.Count >= topX Then Exit For
+        Next
+
+        For Each index In removeList
+            lpList.RemoveAt(index)
+        Next
+
+        For Each lp In newList
+            Dim dupLine As Boolean = False
+            For Each mp In lpList
+                If mp.rect.IntersectsWith(lp.rect) Then
+                    Dim r = mp.rect.Union(lp.rect)
+                    If lp.rect.Width * lp.rect.Height / (r.Width * r.Height) < lines.options.overlapPercent Then
+                        dupLine = True
+                    End If
+                End If
+            Next
+            If dupLine = False Then lpList.Add(lp)
+        Next
+
+        delaunay.inputPoints.Clear()
+        For Each lp In lpList
+            delaunay.inputPoints.Add(lp.center)
+        Next
+
+        delaunay.Run(src)
+        regionMap = delaunay.dst3.Clone
+        dst3 = delaunay.dst2
+
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            DrawCircle(dst3, lp.center, task.DotSize, cvb.Scalar.White)
+        Next
+
+        If task.heartBeat Then labels(2) = CStr(lpList.Count) + " unique lines have been identified."
+    End Sub
+End Class
+
+
+
+
+

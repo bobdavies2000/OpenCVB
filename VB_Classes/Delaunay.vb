@@ -33,7 +33,8 @@ Public Class Delaunay_Basics : Inherits TaskParent
             facetList.Add(nextFacet)
         Next
         facet32s.ConvertTo(dst3, cvb.MatType.CV_8U)
-        dst2 = ShowPalette(dst3)
+        dst3 += 1 ' no zero values in dst3...
+        dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
 End Class

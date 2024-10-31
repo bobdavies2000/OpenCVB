@@ -211,6 +211,7 @@ End Structure
 
 
 Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
+    Public center As cvb.Point2f
     Public p1 As cvb.Point2f
     Public p2 As cvb.Point2f
     Public slope As Single
@@ -224,7 +225,7 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
     Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
         p1 = _p1
         p2 = _p2
-
+        center = New cvb.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
         rect = New cvb.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y),
                             Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
         If rect.Width < 2 Then rect.Width = 2
