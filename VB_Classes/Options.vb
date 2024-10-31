@@ -7908,6 +7908,7 @@ Public Class Options_Line : Inherits TaskParent
     Public correlation As Single
     Public topX As Integer
     Public overlapPercent As Single
+    Public minDistance As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Min Line Length", 1, 100, dst2.Height / 10)
@@ -7915,6 +7916,7 @@ Public Class Options_Line : Inherits TaskParent
             sliders.setupTrackBar("Min Correlation", 1, 100, 95)
             sliders.setupTrackBar("Top X line count", 1, 254, 3)
             sliders.setupTrackBar("Same line overlap %", 1, 100, 50)
+            sliders.setupTrackBar("Distance to next center", 1, 100, 30)
         End If
     End Sub
     Public Sub RunOpt()
@@ -7923,10 +7925,12 @@ Public Class Options_Line : Inherits TaskParent
         Static correlSlider = FindSlider("Min Correlation")
         Static topXSlider = FindSlider("Top X line count")
         Static overlapSlider = FindSlider("Same line overlap %")
+        Static distanceSlider = FindSlider("Distance to next center")
         minLength = lenSlider.value
         maxIntersection = interSlider.value
         correlation = correlSlider.value / 100
         topX = topXSlider.value
         overlapPercent = overlapSlider.value / 100
+        minDistance = distanceSlider.value
     End Sub
 End Class

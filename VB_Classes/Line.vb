@@ -83,10 +83,25 @@ Public Class Line_Core : Inherits TaskParent
 
         dst2 = src
         dst3.SetTo(0)
-        lpList = New List(Of PointPair)(sortByLen.Values)
+        Dim lpFiltered As New List(Of PointPair)(sortByLen.Values)
+        For i = 0 To sortByLen.Values.Count - 1
+            Dim lp = sortByLen.Values(i)
+            Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+            For j = i + 1 To lpFiltered.Count - 1
+                Dim mp = lpFiltered(j)
+                If mp.center.DistanceTo(lp.center) < options.minDistance Then
+                    removeList.Add(j, j)
+                End If
+            Next
+            For Each index In removeList.keys
+                lpFiltered.RemoveAt(index)
+            Next
+        Next
+        lpList = New List(Of PointPair)(lpFiltered)
         For Each lp In lpList
             DrawLine(dst2, lp.p1, lp.p2, lineColor)
             DrawLine(dst3, lp.p1, lp.p2, 255)
+            DrawCircle(dst3, lp.center, task.DotSize + 1, cvb.Scalar.White, -1)
         Next
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
@@ -1807,6 +1822,7 @@ Public Class Line_TopXlines : Inherits TaskParent
     Public lpList As New List(Of PointPair)
     Dim delaunay As New Delaunay_Basics
     Public Sub New()
+        task.gOptions.DotSizeSlider.Value = 3
         desc = "Isolate the top X lines in the latest lpList of lines."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -1817,16 +1833,16 @@ Public Class Line_TopXlines : Inherits TaskParent
             lpList.Clear()
         End If
 
-        Dim removeList As New List(Of Integer)
+        Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             Dim val = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             If val > 0 Then
-                removeList.Add(i)
+                removeList.Add(i, i)
                 Continue For
             Else
                 val = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-                If val > 0 Then removeList.Add(i)
+                If val > 0 Then removeList.Add(i, i)
             End If
         Next
 
@@ -1839,7 +1855,7 @@ Public Class Line_TopXlines : Inherits TaskParent
         For i = 0 To lines.lpList.Count - 1
             Dim lp = lines.lpList(i)
             Dim index = regionMap.Get(Of Byte)(lp.center.Y, lp.center.X)
-            If index > 0 And removeList.Contains(index) = False Then
+            If index > 0 And removeList.Keys.Contains(index) = False And lpList.Count > index Then
                 Dim mp = lpList(index - 1)
                 If mp.rect.IntersectsWith(lp.rect) Then
                     Dim r = mp.rect.Union(lp.rect)
@@ -1854,17 +1870,19 @@ Public Class Line_TopXlines : Inherits TaskParent
             If newList.Count >= topX Then Exit For
         Next
 
-        For Each index In removeList
+        For Each index In removeList.Keys
             lpList.RemoveAt(index)
         Next
 
         For Each lp In newList
             Dim dupLine As Boolean = False
             For Each mp In lpList
-                If mp.rect.IntersectsWith(lp.rect) Then
-                    Dim r = mp.rect.Union(lp.rect)
-                    If lp.rect.Width * lp.rect.Height / (r.Width * r.Height) < lines.options.overlapPercent Then
-                        dupLine = True
+                If mp.center.DistanceTo(lp.center) > 10 Then
+                    If mp.rect.IntersectsWith(lp.rect) Then
+                        Dim r = mp.rect.Union(lp.rect)
+                        If lp.rect.Width * lp.rect.Height / (r.Width * r.Height) < lines.options.overlapPercent Then
+                            dupLine = True
+                        End If
                     End If
                 End If
             Next
@@ -1872,9 +1890,34 @@ Public Class Line_TopXlines : Inherits TaskParent
         Next
 
         delaunay.inputPoints.Clear()
+        Dim inputList As New List(Of PointPair)
         For Each lp In lpList
-            delaunay.inputPoints.Add(lp.center)
+            Dim dupLine As Boolean = False
+            For Each pt In delaunay.inputPoints
+                If lp.center.DistanceTo(pt) < lines.options.minDistance Then
+                    dupLine = True
+                    Exit For
+                End If
+            Next
+            If dupLine = False Then
+                If delaunay.inputPoints.Contains(lp.center) = False Then
+                    delaunay.inputPoints.Add(lp.center)
+                    inputList.Add(lp)
+                End If
+            End If
         Next
+
+        lpList = New List(Of PointPair)(inputList)
+
+        If delaunay.inputPoints.Count < topX Then
+            For Each lp In newList
+                If delaunay.inputPoints.Contains(lp.center) = False Then
+                    delaunay.inputPoints.Add(lp.center)
+                    lpList.Add(lp)
+                    If delaunay.inputPoints.Count >= topX Then Exit For
+                End If
+            Next
+        End If
 
         delaunay.Run(src)
         regionMap = delaunay.dst3.Clone
@@ -1882,7 +1925,7 @@ Public Class Line_TopXlines : Inherits TaskParent
 
         For Each lp In lpList
             dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
-            dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, cvb.Scalar.Black, task.lineWidth, task.lineType)
             DrawCircle(dst3, lp.center, task.DotSize, cvb.Scalar.White)
         Next
 
