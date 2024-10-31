@@ -534,7 +534,7 @@
 (1) DCT_RGB_CS,DCT_RGB_CS
 (2) DCT_Surfaces_debug,DCT_Surfaces_debug,DCT_Surfaces_debug_CS
 (1) DCT_Surfaces_debug_CS,DCT_Surfaces_debug_CS
-(8) Delaunay_Basics,Delaunay_Basics,Delaunay_Basics_CC,Delaunay_Basics_CS,Delaunay_Generations_CC,Delaunay_Generations_CS,Delaunay_GenerationsNoKNN_CC,Delaunay_GenerationsNoKNN_CS,Delaunay_Points
+(9) Delaunay_Basics,Delaunay_Basics,Delaunay_Basics_CC,Delaunay_Basics_CS,Delaunay_Generations_CC,Delaunay_Generations_CS,Delaunay_GenerationsNoKNN_CC,Delaunay_GenerationsNoKNN_CS,Delaunay_Points,Line_TopXlines
 (3) Delaunay_Basics_CC,Delaunay_Basics_CC,Delaunay_Generations_CC,Delaunay_GenerationsNoKNN_CC
 (1) Delaunay_Basics_CS,Delaunay_Basics_CS
 (3) Delaunay_ConsistentColor,Delaunay_ConsistentColor,Delaunay_ConsistentColor_CS,HistPeak2D_Basics_CS
@@ -1704,7 +1704,7 @@
 (1) KMeans_TierCount_CS,KMeans_TierCount_CS
 (2) KMeans_Valleys,KMeans_Valleys,KMeans_Valleys_CS
 (1) KMeans_Valleys_CS,KMeans_Valleys_CS
-(33) KNN_Basics,Cluster_Basics_CS,EMax_PointTracker_CS,Feature_KNN_CS,Feature_NearestCell_CS,Feature_Stable_CS,FeatureLeftRight_Basics_CS,FeatureLeftRight_Input_CS,FeatureLine_LongestV_Tutorial2_CS,GuidedBP_HotPointsKNN_CS,KNN_Basics,KNN_Basics_CC,KNN_Basics_CS,KNN_Basics2DTest_CS,KNN_Basics3D_CS,KNN_Basics3DTest_CS,KNN_Basics4D_CS,KNN_Basics4DTest_CS,KNN_BasicsN_CS,KNN_BasicsNTest_CS,KNN_Emax_CS,KNN_Farthest_CS,KNN_NoDups_CC,KNN_NoDups_CS,KNN_NoDupsOld_CS,Line_PointSlope_CS,LongLine_ExtendParallel_CS,Match_Lines_CS,Mesh_Basics_CC,Mesh_Basics_CS,Neighbors_Basics_CS,RedTrack_FeaturesKNN_CS,RedTrack_GoodCellInput_CS,Swarm_Basics_CS
+(34) KNN_Basics,Cluster_Basics_CS,EMax_PointTracker_CS,Feature_KNN_CS,Feature_NearestCell_CS,Feature_Stable_CS,FeatureLeftRight_Basics_CS,FeatureLeftRight_Input_CS,FeatureLine_LongestV_Tutorial2_CS,GuidedBP_HotPointsKNN_CS,KNN_Basics,KNN_Basics_CC,KNN_Basics_CS,KNN_Basics2DTest_CS,KNN_Basics3D_CS,KNN_Basics3DTest_CS,KNN_Basics4D_CS,KNN_Basics4DTest_CS,KNN_BasicsN_CS,KNN_BasicsNTest_CS,KNN_Emax_CS,KNN_Farthest_CS,KNN_NoDups_CC,KNN_NoDups_CS,KNN_NoDupsOld_CS,Line_PointSlope_CS,Line_PointSlope1,LongLine_ExtendParallel_CS,Match_Lines_CS,Mesh_Basics_CC,Mesh_Basics_CS,Neighbors_Basics_CS,RedTrack_FeaturesKNN_CS,RedTrack_GoodCellInput_CS,Swarm_Basics_CS
 (3) KNN_Basics_CC,KNN_Basics_CC,KNN_NoDups_CC,Mesh_Basics_CC
 (1) KNN_Basics_CS,KNN_Basics_CS
 (2) KNN_Basics2DTest,KNN_Basics2DTest,KNN_Basics2DTest_CS
@@ -1717,7 +1717,7 @@
 (1) KNN_Basics4D_CS,KNN_Basics4D_CS
 (2) KNN_Basics4DTest,KNN_Basics4DTest,KNN_Basics4DTest_CS
 (1) KNN_Basics4DTest_CS,KNN_Basics4DTest_CS
-(4) KNN_BasicsN,KNN_BasicsN,KNN_BasicsN_CS,KNN_BasicsNTest_CS,Line_PointSlope_CS
+(5) KNN_BasicsN,KNN_BasicsN,KNN_BasicsN_CS,KNN_BasicsNTest_CS,Line_PointSlope_CS,Line_PointSlope1
 (1) KNN_BasicsN_CS,KNN_BasicsN_CS
 (2) KNN_BasicsNTest,KNN_BasicsNTest,KNN_BasicsNTest_CS
 (1) KNN_BasicsNTest_CS,KNN_BasicsNTest_CS
@@ -1790,15 +1790,16 @@
 (5) Line_Basics_CS,FeatureLine_Basics_CS,FitLine_Basics_CS,Line_Basics_CS,LongLine_Basics_CS,MatchLine_Basics_CS
 (1) Line_Basics1,Line_Basics1
 (1) Line_Basics2,Line_Basics2
-(3) Line_Canny,Line_Canny,Line_Canny_CS,Line_DisplayInfo
+(2) Line_Basics3,FitLine_Basics3D_CS,Line_Basics3
+(3) Line_Canny,Line_Canny,Line_Canny_CS,Line_Info
 (1) Line_Canny_CS,Line_Canny_CS
 (3) Line_Cells,Line_Cells,Line_Cells_CS,Line_CellsVertHoriz_CS
 (1) Line_Cells_CS,Line_Cells_CS
 (1) Line_CellsVertHoriz_CS,Line_CellsVertHoriz_CS
 (2) Line_ColorClass,Line_ColorClass,Line_ColorClass_CS
 (1) Line_ColorClass_CS,Line_ColorClass_CS
-(9) Line_Core,Line_Basics1,Line_Basics2,Line_Core,Line_FromContours,LongLine_Basics_CS,LongLine_Consistent_CS,LongLine_Core_CS,LongLine_ExtendAll,LongLine_ExtendParallel
-(4) Line_DisplayInfo,FeatureLine_Basics_CS,Line_DisplayInfo,Line_DisplayInfoOld_CS,Match_tCell_CS
+(1) Line_CombineLines,Line_CombineLines
+(13) Line_Core,Line_Basics1,Line_Basics2,Line_Basics3,Line_CombineLines,Line_Core,Line_FromContours,Line_PointSlope1,Line_TopXlines,LongLine_Basics_CS,LongLine_Consistent_CS,LongLine_Core_CS,LongLine_ExtendAll,LongLine_ExtendParallel
 (4) Line_DisplayInfoOld,FeatureLine_Basics_CS,Line_DisplayInfoOld,Line_DisplayInfoOld_CS,Match_tCell_CS
 (1) Line_DisplayInfoOld_CS,Line_DisplayInfoOld_CS
 (1) Line_FastDetect_CC,Line_FastDetect_CC
@@ -1810,6 +1811,7 @@
 (2) Line_Horizontal,Line_Horizontal,Line_VerticalHorizontal
 (2) Line_InDepthAndBGR,Line_InDepthAndBGR,Line_InDepthAndBGR_CS
 (1) Line_InDepthAndBGR_CS,Line_InDepthAndBGR_CS
+(1) Line_Info,Line_Info
 (3) Line_Intercepts,Line_Intercepts,Line_Intercepts_CS,Line_InterceptsUI_CS
 (2) Line_Intercepts_CS,Line_Intercepts_CS,Line_InterceptsUI_CS
 (2) Line_InterceptsUI,Line_InterceptsUI,Line_InterceptsUI_CS
@@ -1826,8 +1828,9 @@
 (1) Line_Nearest_CS,Line_Nearest_CS
 (6) Line_Perpendicular,FPoly_Perpendiculars,Gravity_Basics,Horizon_Perpendicular,Horizon_Simple,Line_Perpendicular,Line_Perpendicular_CS
 (1) Line_Perpendicular_CS,Line_Perpendicular_CS
-(3) Line_PointSlope,Line_PointSlope,Line_PointSlope_CS,Match_PointSlope_CS
+(4) Line_PointSlope,Line_PointSlope,Line_PointSlope_CS,Line_PointSlope1,Match_PointSlope_CS
 (1) Line_PointSlope_CS,Line_PointSlope_CS
+(1) Line_PointSlope1,Line_PointSlope1
 (1) Line_Rects,Line_Rects
 (1) Line_RegionsVB,Line_RegionsVB
 (3) Line_SubsetRect,FeatureLine_Basics_CS,Line_SubsetRect,Line_SubsetRect_CS
@@ -1836,6 +1839,7 @@
 (1) Line_TimeView_CS,Line_TimeView_CS
 (2) Line_TimeViewLines,Line_TimeViewLines,Line_TimeViewLines_CS
 (1) Line_TimeViewLines_CS,Line_TimeViewLines_CS
+(1) Line_TopXlines,Line_TopXlines
 (7) Line_Vertical,FeatureLine_VerticalLongLine_CS,FeatureLine_VerticalVerify_CS,Line_Vertical,Line_VerticalHorizontal,Line_VerticalHorizontal1,Line_VerticalHorizontal2,Line_VerticalHorizontalCells
 (4) Line_VerticalHorizontal,Line_VerticalHorizontal,Line_VerticalHorizontal1,Line_VerticalHorizontal2,Line_VerticalHorizontalCells
 (1) Line_VerticalHorizontal1,Line_VerticalHorizontal1
@@ -2525,7 +2529,7 @@
 (4) Options_LaplacianKernels,Derivative_Laplacian_CS,Edge_Laplacian_CS,Edge_LaplacianColor,Options_LaplacianKernels
 (2) Options_LaPlacianPyramid,Laplacian_PyramidFilter_CS,Options_LaPlacianPyramid
 (2) Options_LeftRight,LeftRight_CompareRaw_CS,Options_LeftRight
-(12) Options_Line,FeatureLine_Finder_CS,FeatureLine_Tutorial2_CS,Line_Basics,Line_Basics1,Line_Basics2,Linear_Basics,Linear_Input,Linear_Slices,Linear_Visualize,Options_Line,Options_LinearInput,Options_LineFinder
+(13) Options_Line,FeatureLine_Finder_CS,FeatureLine_Tutorial2_CS,Line_Basics1,Line_Basics2,Line_CombineLines,Line_Core,Linear_Basics,Linear_Input,Linear_Slices,Linear_Visualize,Options_Line,Options_LinearInput,Options_LineFinder
 (5) Options_LinearInput,Linear_Basics,Linear_Input,Linear_Slices,Linear_Visualize,Options_LinearInput
 (3) Options_LineFinder,FeatureLine_Finder_CS,FeatureLine_Tutorial2_CS,Options_LineFinder
 (3) Options_LongLine,LongLine_Basics_CS,LongLine_Match_CS,Options_LongLine

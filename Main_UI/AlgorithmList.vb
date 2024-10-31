@@ -1873,6 +1873,7 @@ End Enum
 	If algorithmName = "Line_Basics_CS" Then return new Line_Basics_CS
 	If algorithmName = "Line_Basics1" Then return new Line_Basics1
 	If algorithmName = "Line_Basics2" Then return new Line_Basics2
+	If algorithmName = "Line_Basics3" Then return new Line_Basics3
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Canny_CS" Then return new Line_Canny_CS
 	If algorithmName = "Line_Cells" Then return new Line_Cells

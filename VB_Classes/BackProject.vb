@@ -686,9 +686,16 @@ Public Class BackProject_MaskLines : Inherits TaskParent
         dst2 = masks.dst2
         dst3 = src.Clone
 
-        If task.heartBeat Then dst1.SetTo(0)
+        Static saveHistIndex As Integer = masks.histIndex
+        If masks.histIndex <> saveHistIndex Then
+            lines.Run(src)
+            lines.lpList = New List(Of PointPair)(lines.lpList)
+            dst1.SetTo(0)
+        End If
 
         lines.Run(masks.mask)
+        cvb.Cv2.ImShow("mask", masks.mask)
+
         For Each lp In lines.lpList
             Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, cvb.Scalar.White)

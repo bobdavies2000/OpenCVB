@@ -7914,7 +7914,7 @@ Public Class Options_Line : Inherits TaskParent
             sliders.setupTrackBar("Min Line Length", 1, 100, dst2.Height / 10)
             sliders.setupTrackBar("Intersection Maximum Pixel Count", 1, 100, 15)
             sliders.setupTrackBar("Min Correlation", 1, 100, 95)
-            sliders.setupTrackBar("Top X line count", 1, 254, 3)
+            sliders.setupTrackBar("Top X count", 1, 254, 3)
             sliders.setupTrackBar("Same line overlap %", 1, 100, 50)
             sliders.setupTrackBar("Distance to next center", 1, 100, 30)
         End If
@@ -7923,7 +7923,7 @@ Public Class Options_Line : Inherits TaskParent
         Static lenSlider = FindSlider("Min Line Length")
         Static interSlider = FindSlider("Intersection Maximum Pixel Count")
         Static correlSlider = FindSlider("Min Correlation")
-        Static topXSlider = FindSlider("Top X line count")
+        Static topXSlider = FindSlider("Top X count")
         Static overlapSlider = FindSlider("Same line overlap %")
         Static distanceSlider = FindSlider("Distance to next center")
         minLength = lenSlider.value

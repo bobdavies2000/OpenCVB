@@ -1,7 +1,61 @@
-Imports System.Windows
-Imports OpenCvSharp.Flann
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
+    Public lines As New Line_Core
+    Public lpList As New List(Of PointPair)
+    Public Sub New()
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = src.Clone
+
+        lines.Run(src)
+
+        If lpList.Count = 0 Then lpList = New List(Of PointPair)(lines.lpList)
+
+        Dim nextSet As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
+        dst3.SetTo(0)
+        Dim motionToss As Integer
+        For Each lp In lpList
+            Dim v1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            Dim v2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+            If v1 = 0 And v2 = 0 Then
+                nextSet.Add(lp.length, lp)
+                dst3.Line(lp.p1, lp.p2, cvb.Scalar.White, 2, cvb.LineTypes.Link8)
+            Else
+                motionToss += 1
+            End If
+        Next
+
+        Dim motionLineCount As Integer
+        For Each lp In lines.lpList
+            Dim v1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            Dim v2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+            If v1 <> 0 Or v2 <> 0 Then
+                nextSet.Add(lp.length, lp)
+                dst3.Line(lp.p1, lp.p2, cvb.Scalar.White, 2, cvb.LineTypes.Link8)
+            Else
+                motionLineCount += 1
+            End If
+        Next
+
+        lpList = New List(Of PointPair)(nextSet.Values)
+
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
+        Next
+        If task.heartBeat Then
+            labels(2) = CStr(lpList.Count) + " Lines identified.  Motion tossed: " + CStr(motionToss) +
+                        " Lines in Motion: " + CStr(motionLineCount)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Basics3 : Inherits TaskParent
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
     Public Sub New()
@@ -1527,164 +1581,6 @@ End Class
 
 
 
-Public Class Line_Basics1 : Inherits TaskParent
-    Public lineList As New List(Of PointPair)
-    Public lines As New Line_Core
-    Public lpList As New List(Of PointPair)
-    Public options As New Options_Line
-    Public Sub New()
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        dst2 = src.Clone
-
-        lines.Run(src)
-
-        Dim nextSet As New List(Of PointPair)
-        dst3.SetTo(0)
-        Dim tossMotion As Integer
-        'For Each lp In lpList
-        '    If task.motionMask(lp.rect).CountNonZero() = 0 Then
-        '        nextSet.Add(lp)
-        '        dst3.Line(lp.p1, lp.p2, 255, 2, task.lineType)
-        '    Else
-        '        tossMotion += 1
-        '    End If
-        'Next
-
-        'For Each lp In lines.lpList
-        '    If dst3(lp.rect).CountNonZero() < options.maxIntersection And lp.length > options.minLength Then
-        '        nextSet.Add(lp)
-        '    Else
-        '        tossCount += 1
-        '    End If
-        'Next
-
-
-
-        Static lastImage As cvb.Mat = dst2.Clone
-        Dim tossCorrelation As Integer
-        Dim correlation As New cvb.Mat
-        For Each lp In lines.lpList
-            If lp.length > options.minLength Then
-                For i = 0 To 1
-                    Dim pt = Choose(i + 1, lp.p1, lp.p2)
-                    Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                    Dim roi = task.gridRects(index)
-                    cvb.Cv2.MatchTemplate(dst2(roi), lastImage(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
-                    If correlation.Get(Of Single)(0, 0) < options.correlation Then
-                        tossCorrelation += 1
-                        Exit For
-                    End If
-                    If i = 1 Then nextSet.Add(lp)
-                Next
-            End If
-        Next
-        lastImage = dst2.Clone
-
-        If task.heartBeatLT Then lpList.Clear()
-        For Each lp In nextSet
-            lpList.Add(lp)
-        Next
-
-        For Each lp In lpList
-            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
-        Next
-        If task.heartBeat Then
-            labels(2) = CStr(lpList.Count) + " Lines identified. Correlation tossed " + CStr(tossCorrelation) +
-                                         ", motion tossed " + CStr(tossMotion)
-        End If
-    End Sub
-End Class
-
-
-
-
-Public Class Line_Basics2 : Inherits TaskParent
-    Public lines As New Line_Core
-    Public lpInput As New List(Of PointPair)
-    Public options As New Options_Line
-    Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-    Dim lpList As New List(Of PointPair)
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        FindSlider("Min Line Length").Value = 30
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
-    End Sub
-    Private Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
-        If Math.Abs(lp.slope) >= 1 Then
-            If lp.p1.Y < mp.p1.Y Then
-                Return New PointPair(lp.p1, mp.p2)
-            Else
-                Return New PointPair(mp.p1, lp.p2)
-            End If
-        Else
-            If lp.p1.X < mp.p1.X Then
-                Return New PointPair(lp.p1, mp.p2)
-            Else
-                Return New PointPair(mp.p1, lp.p2)
-            End If
-        End If
-    End Function
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        dst2 = src.Clone
-
-        If standalone Then
-            Static lines As New Line_Core
-            lines.Run(src)
-            lpInput = lines.lpList
-        End If
-
-        dst3.SetTo(0)
-        Dim tolerance = 0.1
-        Dim newSet As New List(Of PointPair)
-        Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        Dim addList As New List(Of PointPair)
-        For i = 0 To lpInput.Count - 1
-            Dim lp = lpInput(i)
-            Dim lpRemove As Boolean = False
-            For j = 0 To 1
-                Dim pt = Choose(j + 1, lp.p1, lp.p2)
-                Dim val = lineMap.Get(Of Integer)(pt.Y, pt.X)
-                If val = 0 Then Continue For
-                Dim mp = lpList(val - 1)
-                If Math.Abs(mp.slope - lp.slope) < tolerance Then
-                    Dim lpNew = combine2Lines(lp, mp)
-                    If lpNew IsNot Nothing Then
-                        addList.Add(lpNew)
-                        removeList.Add(j, j)
-                        lpRemove = True
-                    End If
-                End If
-            Next
-            If lpRemove Then removeList.Add(i, i)
-        Next
-
-        For i = 0 To removeList.Count - 1
-            lpInput.RemoveAt(removeList.ElementAt(i).Value)
-        Next
-
-        For Each lp In addList
-            lpInput.Add(lp)
-        Next
-        lpList = New List(Of PointPair)(lpInput)
-        lineMap.SetTo(0)
-        For i = 0 To lpList.Count - 1
-            Dim lp = lpList(i)
-            If lp.length > options.minLength Then lineMap.Line(lp.p1, lp.p2, i + 1, 2, cvb.LineTypes.Link8)
-        Next
-        lineMap.ConvertTo(dst1, cvb.MatType.CV_8U)
-        dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
 
 
 
@@ -1937,3 +1833,159 @@ End Class
 
 
 
+
+Public Class Line_Basics1 : Inherits TaskParent
+    Public lineList As New List(Of PointPair)
+    Public lines As New Line_Core
+    Public lpList As New List(Of PointPair)
+    Public options As New Options_Line
+    Public Sub New()
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = src.Clone
+
+        lines.Run(src)
+
+        Dim nextSet As New List(Of PointPair)
+        dst3.SetTo(0)
+        Dim tossMotion As Integer
+        'For Each lp In lpList
+        '    If task.motionMask(lp.rect).CountNonZero() = 0 Then
+        '        nextSet.Add(lp)
+        '        dst3.Line(lp.p1, lp.p2, 255, 2, task.lineType)
+        '    Else
+        '        tossMotion += 1
+        '    End If
+        'Next
+
+        'For Each lp In lines.lpList
+        '    If dst3(lp.rect).CountNonZero() < options.maxIntersection And lp.length > options.minLength Then
+        '        nextSet.Add(lp)
+        '    Else
+        '        tossCount += 1
+        '    End If
+        'Next
+
+
+
+        Static lastImage As cvb.Mat = dst2.Clone
+        Dim tossCorrelation As Integer
+        Dim correlation As New cvb.Mat
+        For Each lp In lines.lpList
+            If lp.length > options.minLength Then
+                For i = 0 To 1
+                    Dim pt = Choose(i + 1, lp.p1, lp.p2)
+                    Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                    Dim roi = task.gridRects(index)
+                    cvb.Cv2.MatchTemplate(dst2(roi), lastImage(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
+                    If correlation.Get(Of Single)(0, 0) < options.correlation Then
+                        tossCorrelation += 1
+                        Exit For
+                    End If
+                    If i = 1 Then nextSet.Add(lp)
+                Next
+            End If
+        Next
+        lastImage = dst2.Clone
+
+        If task.heartBeatLT Then lpList.Clear()
+        For Each lp In nextSet
+            lpList.Add(lp)
+        Next
+
+        For Each lp In lpList
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+        Next
+        If task.heartBeat Then
+            labels(2) = CStr(lpList.Count) + " Lines identified. Correlation tossed " + CStr(tossCorrelation) +
+                                         ", motion tossed " + CStr(tossMotion)
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class Line_Basics2 : Inherits TaskParent
+    Public lines As New Line_Core
+    Public lpInput As New List(Of PointPair)
+    Public options As New Options_Line
+    Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+    Dim lpList As New List(Of PointPair)
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        FindSlider("Min Line Length").Value = 30
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Private Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
+        If Math.Abs(lp.slope) >= 1 Then
+            If lp.p1.Y < mp.p1.Y Then
+                Return New PointPair(lp.p1, mp.p2)
+            Else
+                Return New PointPair(mp.p1, lp.p2)
+            End If
+        Else
+            If lp.p1.X < mp.p1.X Then
+                Return New PointPair(lp.p1, mp.p2)
+            Else
+                Return New PointPair(mp.p1, lp.p2)
+            End If
+        End If
+    End Function
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+
+        If standalone Then
+            Static lines As New Line_Core
+            lines.Run(src)
+            lpInput = lines.lpList
+        End If
+
+        dst3.SetTo(0)
+        Dim tolerance = 0.1
+        Dim newSet As New List(Of PointPair)
+        Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        Dim addList As New List(Of PointPair)
+        For i = 0 To lpInput.Count - 1
+            Dim lp = lpInput(i)
+            Dim lpRemove As Boolean = False
+            For j = 0 To 1
+                Dim pt = Choose(j + 1, lp.p1, lp.p2)
+                Dim val = lineMap.Get(Of Integer)(pt.Y, pt.X)
+                If val = 0 Then Continue For
+                Dim mp = lpList(val - 1)
+                If Math.Abs(mp.slope - lp.slope) < tolerance Then
+                    Dim lpNew = combine2Lines(lp, mp)
+                    If lpNew IsNot Nothing Then
+                        addList.Add(lpNew)
+                        removeList.Add(j, j)
+                        lpRemove = True
+                    End If
+                End If
+            Next
+            If lpRemove Then removeList.Add(i, i)
+        Next
+
+        For i = 0 To removeList.Count - 1
+            lpInput.RemoveAt(removeList.ElementAt(i).Value)
+        Next
+
+        For Each lp In addList
+            lpInput.Add(lp)
+        Next
+        lpList = New List(Of PointPair)(lpInput)
+        lineMap.SetTo(0)
+        For i = 0 To lpList.Count - 1
+            Dim lp = lpList(i)
+            If lp.length > options.minLength Then lineMap.Line(lp.p1, lp.p2, i + 1, 2, cvb.LineTypes.Link8)
+        Next
+        lineMap.ConvertTo(dst1, cvb.MatType.CV_8U)
+        dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+    End Sub
+End Class
