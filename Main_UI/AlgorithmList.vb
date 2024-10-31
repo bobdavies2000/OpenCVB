@@ -1912,6 +1912,7 @@ End Enum
 	If algorithmName = "Line_Perpendicular_CS" Then return new Line_Perpendicular_CS
 	If algorithmName = "Line_PointSlope" Then return new Line_PointSlope
 	If algorithmName = "Line_PointSlope_CS" Then return new Line_PointSlope_CS
+	If algorithmName = "Line_PointSlope1" Then return new Line_PointSlope1
 	If algorithmName = "Line_Rects" Then return new Line_Rects
 	If algorithmName = "Line_RegionsVB" Then return new Line_RegionsVB
 	If algorithmName = "Line_SubsetRect" Then return new Line_SubsetRect

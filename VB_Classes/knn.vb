@@ -345,10 +345,13 @@ Public Class KNN_BasicsN : Inherits TaskParent
             SetTrueText("There were no queries provided.  There is nothing to do...")
             Exit Sub
         End If
+
         Dim queryMat = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
 
-        Dim trainData = cvb.Mat.FromPixelData(CInt(trainInput.Count / options.knnDimension), options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray)
-        Dim response = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
+        Dim trainData = cvb.Mat.FromPixelData(CInt(trainInput.Count / options.knnDimension),
+                                              options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray)
+        Dim response = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S,
+                                             Enumerable.Range(start:=0, trainData.Rows).ToArray)
         knn.Train(trainData, cvb.ML.SampleTypes.RowSample, response)
         Dim neighbors As New cvb.Mat
         Dim dm = trainInput.Count

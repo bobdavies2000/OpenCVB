@@ -15,12 +15,12 @@ Public Class Line_Basics : Inherits TaskParent
 
         lines.Run(src)
 
-        Dim nextSet As New List(Of PointPair)
+        Dim nextSet As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
         dst3.SetTo(0)
         Dim motionToss As Integer
         For Each lp In lpList
             If task.motionMask(lp.rect).CountNonZero() = 0 Then
-                nextSet.Add(lp)
+                nextSet.Add(lp.length, lp)
                 dst3.Line(lp.p1, lp.p2, cvb.Scalar.White, 2, cvb.LineTypes.Link8)
             Else
                 motionToss += 1
@@ -30,13 +30,13 @@ Public Class Line_Basics : Inherits TaskParent
         Dim intersectToss As Integer
         For Each lp In lines.lpList
             If dst3(lp.rect).CountNonZero() < options.maxIntersection And lp.length > options.minLength Then
-                nextSet.Add(lp)
+                nextSet.Add(lp.length, lp)
             Else
                 intersectToss += 1
             End If
         Next
 
-        lpList = New List(Of PointPair)(nextSet)
+        lpList = New List(Of PointPair)(nextSet.Values)
 
         For Each lp In lpList
             dst2.Line(lp.p1, lp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
@@ -415,86 +415,6 @@ Public Class Line_InDepthAndBGR : Inherits TaskParent
         Next
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Public Class Line_PointSlope : Inherits TaskParent
-    Dim extend As New LongLine_Extend
-    Dim lines As New Line_Basics
-    Dim knn As New KNN_BasicsN
-    Public bestLines As New List(Of PointPair)
-    Const lineCount As Integer = 3
-    Const searchCount As Integer = 100
-    Public Sub New()
-        knn.options.knnDimension = 5 ' slope, p1.x, p1.y, p2.x, p2.y
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
-        desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        lines.Run(src)
-        dst2 = src
-
-        If bestLines.Count < lineCount Or task.heartBeat Then
-            dst3.SetTo(0)
-            bestLines.Clear()
-            knn.queries.Clear()
-            For Each lp In lines.lpList
-                bestLines.Add(lp)
-                For j = 0 To knn.options.knnDimension - 1
-                    knn.queries.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
-                Next
-                DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
-                If bestLines.Count >= lineCount Then Exit For
-            Next
-        End If
-
-        dst1.SetTo(0)
-        knn.trainInput.Clear()
-        For Each lp In lines.lpList
-            For j = 0 To knn.options.knnDimension - 1
-                knn.trainInput.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
-            Next
-            dst1.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
-        Next
-        If knn.trainInput.Count = 0 Then
-            SetTrueText("There were no lines detected!  Were there any unusual settings for this run?", 3)
-            Exit Sub
-        End If
-
-        knn.Run(empty)
-        If knn.result Is Nothing Then Exit Sub
-        Dim nextLines As New List(Of PointPair)
-        Dim usedBest As New List(Of Integer)
-        Dim index As Integer
-        For i = 0 To knn.result.GetUpperBound(0)
-            For j = 0 To knn.result.GetUpperBound(1)
-                index = knn.result(i, j)
-                If usedBest.Contains(index) = False Then Exit For
-            Next
-            usedBest.Add(index)
-
-            If index * knn.options.knnDimension + 4 < knn.trainInput.Count Then
-                Dim mps = New PointPair(New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension + 0), knn.trainInput(index * knn.options.knnDimension + 1)),
-                          New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension + 2), knn.trainInput(index * knn.options.knnDimension + 3)))
-                mps.slope = knn.trainInput(index * knn.options.knnDimension)
-                nextLines.Add(mps)
-            End If
-        Next
-
-        bestLines = New List(Of PointPair)(nextLines)
-        For Each ptS In bestLines
-            DrawLine(dst2, ptS.p1, ptS.p2, task.HighlightColor)
-            DrawLine(dst1, ptS.p1, ptS.p2, cvb.Scalar.Red)
-        Next
-    End Sub
-End Class
-
 
 
 
@@ -1460,6 +1380,138 @@ End Class
 
 
 
+
+Public Class Line_Info : Inherits TaskParent
+    Public lpInput As New List(Of PointPair)
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        labels(2) = "Click on the oversized line to get details about the line"
+        labels(3) = "Details from the point cloud for the selected line"
+        desc = "Display details about the line selected."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static canny As New Line_Canny
+            canny.Run(src)
+            lpInput = canny.lpList
+        End If
+        dst2 = src
+        For Each mp In lpInput
+            dst2.Line(mp.p1, mp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
+        Next
+
+        Static lp As PointPair = lpInput(0)
+
+        If task.mouseClickFlag Or task.FirstPass Then
+            Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+            For i = 0 To lpInput.Count - 1
+                Dim mp = lpInput(i)
+                lineMap.Line(mp.p1, mp.p2, i + 1, 3, cvb.LineTypes.Link8)
+            Next
+
+            Dim lpIndex = lineMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+            If task.FirstPass = False And lpIndex > 0 Then lp = lpInput(lpIndex - 1)
+
+            Dim mask As New cvb.Mat
+            lineMap(lp.rect).ConvertTo(mask, cvb.MatType.CV_8U)
+            mask.SetTo(0, task.noDepthMask(lp.rect))
+            strOut = "Lines identified in the image: " + CStr(lpInput.Count) + vbCrLf + vbCrLf
+            For i = 0 To 2
+                Dim mm = GetMinMax(task.pcSplit(i)(lp.rect), mask)
+                Dim dm = Choose(i + 1, "X", "Y", "Z")
+                strOut += "Min " + dm + " = " + Format(mm.minVal, fmt1) + " max " + dm + " = " +
+                           Format(mm.maxVal, fmt1) + vbCrLf
+            Next
+
+            strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
+            strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
+            strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
+            strOut += "xpDelta = (" + Format(lp.xpDelta.X, fmt1) + "," + Format(lp.xpDelta.Y, fmt1) + ")" + vbCrLf
+            strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
+
+            dst3.SetTo(0)
+            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+            dst3.Rectangle(lp.rect, task.HighlightColor, task.lineWidth, task.lineType)
+        End If
+        SetTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_CombineLines : Inherits TaskParent
+    Public lpInput As New List(Of PointPair)
+    Public options As New Options_Line
+    Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+    Dim lpList As New List(Of PointPair)
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        FindSlider("Min Line Length").Value = 30
+        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
+        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+    End Sub
+    Public Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
+        If Math.Abs(lp.slope) >= 1 Then
+            If lp.p1.Y < mp.p1.Y Then
+                If lp.p2.DistanceTo(mp.p1) > 10 Then Return Nothing
+                Return New PointPair(lp.p1, mp.p2)
+            Else
+                If mp.p2.DistanceTo(lp.p1) > 10 Then Return Nothing
+                Return New PointPair(mp.p1, lp.p2)
+            End If
+        Else
+            If lp.p1.X < mp.p1.X Then
+                If mp.p1.DistanceTo(lp.p2) > 10 Then Return Nothing
+                Return New PointPair(lp.p1, mp.p2)
+            Else
+                If mp.p2.DistanceTo(lp.p1) > 10 Then Return Nothing
+                Return New PointPair(mp.p1, lp.p2)
+            End If
+        End If
+    End Function
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+
+        If standalone Then
+            Static lines As New Line_Core
+            lines.Run(src)
+            lpInput = lines.lpList
+        End If
+
+        dst3.SetTo(0)
+        For i = 0 To lpInput.Count - 1
+            Dim lp = lpInput(i)
+            Dim v1 = lineMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            Dim v2 = lineMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+            If v1 <> 0 And v2 <> 0 Then
+                If v1 = v2 Then
+                    Dim mp = lpList(v1 - 1)
+                    Dim lpNew = combine2Lines(lp, mp)
+                    If lpNew IsNot Nothing Then DrawLine(dst3, lpNew.p1, lpNew.p2, 255, task.lineWidth)
+                End If
+            End If
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+        Next
+
+        lpList = New List(Of PointPair)(lpInput)
+        lineMap.SetTo(0)
+        For i = 0 To lpList.Count - 1
+            Dim lp = lpList(i)
+            If lp.length > options.minLength Then lineMap.Line(lp.xp1, lp.xp2, i + 1, 2, cvb.LineTypes.Link8)
+        Next
+
+        lineMap.ConvertTo(dst1, cvb.MatType.CV_8U)
+        dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
 Public Class Line_Basics1 : Inherits TaskParent
     Public lineList As New List(Of PointPair)
     Public lines As New Line_Core
@@ -1530,66 +1582,6 @@ Public Class Line_Basics1 : Inherits TaskParent
             labels(2) = CStr(lpList.Count) + " Lines identified. Correlation tossed " + CStr(tossCorrelation) +
                                          ", motion tossed " + CStr(tossMotion)
         End If
-    End Sub
-End Class
-
-
-
-
-
-Public Class Line_Info : Inherits TaskParent
-    Public lpInput As New List(Of PointPair)
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        labels(2) = "Click on the oversized line to get details about the line"
-        labels(3) = "Details from the point cloud for the selected line"
-        desc = "Display details about the line selected."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            Static canny As New Line_Canny
-            canny.Run(src)
-            lpInput = canny.lpList
-        End If
-        dst2 = src
-        For Each mp In lpInput
-            dst2.Line(mp.p1, mp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
-        Next
-
-        Static lp As PointPair = lpInput(0)
-
-        If task.mouseClickFlag Or task.FirstPass Then
-            Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-            For i = 0 To lpInput.Count - 1
-                Dim mp = lpInput(i)
-                lineMap.Line(mp.p1, mp.p2, i + 1, 3, cvb.LineTypes.Link8)
-            Next
-
-            Dim lpIndex = lineMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-            If task.FirstPass = False And lpIndex > 0 Then lp = lpInput(lpIndex - 1)
-
-            Dim mask As New cvb.Mat
-            lineMap(lp.rect).ConvertTo(mask, cvb.MatType.CV_8U)
-            mask.SetTo(0, task.noDepthMask(lp.rect))
-            strOut = "Lines identified in the image: " + CStr(lpInput.Count) + vbCrLf + vbCrLf
-            For i = 0 To 2
-                Dim mm = GetMinMax(task.pcSplit(i)(lp.rect), mask)
-                Dim dm = Choose(i + 1, "X", "Y", "Z")
-                strOut += "Min " + dm + " = " + Format(mm.minVal, fmt1) + " max " + dm + " = " +
-                           Format(mm.maxVal, fmt1) + vbCrLf
-            Next
-
-            strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
-            strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
-            strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
-            strOut += "xpDelta = (" + Format(lp.xpDelta.X, fmt1) + "," + Format(lp.xpDelta.Y, fmt1) + ")" + vbCrLf
-            strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
-
-            dst3.SetTo(0)
-            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
-            dst3.Rectangle(lp.rect, task.HighlightColor, task.lineWidth, task.lineType)
-        End If
-        SetTrueText(strOut, 1)
     End Sub
 End Class
 
@@ -1683,69 +1675,146 @@ End Class
 
 
 
-Public Class Line_CombineLines : Inherits TaskParent
-    Public lpInput As New List(Of PointPair)
-    Public options As New Options_Line
-    Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-    Dim lpList As New List(Of PointPair)
+Public Class Line_PointSlope : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Dim knn As New KNN_BasicsN
+    Public bestLines As New List(Of PointPair)
+    Const lineCount As Integer = 3
+    Const searchCount As Integer = 100
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        FindSlider("Min Line Length").Value = 30
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+        knn.options.knnDimension = 5 ' slope, p1.x, p1.y, p2.x, p2.y
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
+        desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
     End Sub
-    Public Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
-        If Math.Abs(lp.slope) >= 1 Then
-            If lp.p1.Y < mp.p1.Y Then
-                If lp.p2.DistanceTo(mp.p1) > 10 Then Return Nothing
-                Return New PointPair(lp.p1, mp.p2)
-            Else
-                If mp.p2.DistanceTo(lp.p1) > 10 Then Return Nothing
-                Return New PointPair(mp.p1, lp.p2)
-            End If
-        Else
-            If lp.p1.X < mp.p1.X Then
-                If mp.p1.DistanceTo(lp.p2) > 10 Then Return Nothing
-                Return New PointPair(lp.p1, mp.p2)
-            Else
-                If mp.p2.DistanceTo(lp.p1) > 10 Then Return Nothing
-                Return New PointPair(mp.p1, lp.p2)
-            End If
-        End If
-    End Function
     Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        dst2 = src.Clone
+        lines.Run(src)
+        dst2 = src
 
-        If standalone Then
-            Static lines As New Line_Core
-            lines.Run(src)
-            lpInput = lines.lpList
+        If bestLines.Count < lineCount Or task.heartBeat Then
+            dst3.SetTo(0)
+            bestLines.Clear()
+            knn.queries.Clear()
+            For Each lp In lines.lpList
+                bestLines.Add(lp)
+                For j = 0 To knn.options.knnDimension - 1
+                    knn.queries.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
+                Next
+                DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+                If bestLines.Count >= lineCount Then Exit For
+            Next
         End If
 
-        dst3.SetTo(0)
-        For i = 0 To lpInput.Count - 1
-            Dim lp = lpInput(i)
-            Dim v1 = lineMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-            Dim v2 = lineMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
-            If v1 <> 0 And v2 <> 0 Then
-                If v1 = v2 Then
-                    Dim mp = lpList(v1 - 1)
-                    Dim lpNew = combine2Lines(lp, mp)
-                    If lpNew IsNot Nothing Then DrawLine(dst3, lpNew.p1, lpNew.p2, 255, task.lineWidth)
-                End If
+        dst1.SetTo(0)
+        knn.trainInput.Clear()
+        For Each lp In lines.lpList
+            For j = 0 To knn.options.knnDimension - 1
+                knn.trainInput.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
+            Next
+            dst1.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+        Next
+        If knn.trainInput.Count = 0 Then
+            SetTrueText("There were no lines detected!  Were there any unusual settings for this run?", 3)
+            Exit Sub
+        End If
+
+        knn.Run(empty)
+        If knn.result Is Nothing Then Exit Sub
+        Dim nextLines As New List(Of PointPair)
+        Dim usedBest As New List(Of Integer)
+        Dim index As Integer
+        For i = 0 To knn.result.GetUpperBound(0)
+            For j = 0 To knn.result.GetUpperBound(1)
+                index = knn.result(i, j)
+                If usedBest.Contains(index) = False Then Exit For
+            Next
+            usedBest.Add(index)
+
+            If index * knn.options.knnDimension + 4 < knn.trainInput.Count Then
+                Dim mps = New PointPair(New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension + 0), knn.trainInput(index * knn.options.knnDimension + 1)),
+                          New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension + 2), knn.trainInput(index * knn.options.knnDimension + 3)))
+                mps.slope = knn.trainInput(index * knn.options.knnDimension)
+                nextLines.Add(mps)
             End If
-            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
         Next
 
-        lpList = New List(Of PointPair)(lpInput)
-        lineMap.SetTo(0)
-        For i = 0 To lpList.Count - 1
-            Dim lp = lpList(i)
-            If lp.length > options.minLength Then lineMap.Line(lp.xp1, lp.xp2, i + 1, 2, cvb.LineTypes.Link8)
+        bestLines = New List(Of PointPair)(nextLines)
+        For Each ptS In bestLines
+            DrawLine(dst2, ptS.p1, ptS.p2, task.HighlightColor)
+            DrawLine(dst1, ptS.p1, ptS.p2, cvb.Scalar.Red)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_PointSlope1 : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Dim knn As New KNN_BasicsN
+    Dim dimension As Integer = 5
+    Public Sub New()
+        knn.options.knnDimension = dimension ' slope, xp1.x, xp1.y, xp2.x, xp2.y
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lines.Run(src)
+        dst2 = src
+
+        knn.queries.Clear()
+        For Each lp In lines.lpList
+            For j = 0 To knn.options.knnDimension - 1
+                knn.queries.Add(Choose(j + 1, lp.slope, lp.xp1.X, lp.xp1.Y, lp.xp2.X, lp.xp2.Y))
+            Next
         Next
 
-        lineMap.ConvertTo(dst1, cvb.MatType.CV_8U)
-        dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        Static lastTrainInput As New List(Of Single)(knn.queries)
+        Static lastLines As New List(Of PointPair)(lines.lpList)
+        knn.trainInput = New List(Of Single)(lastTrainInput)
+        knn.Run(empty)
+
+        dst2.SetTo(0)
+
+        For i = 0 To 0
+            Dim lp = lines.lpList(i)
+            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.White)
+            For j = dimension To knn.result.GetUpperBound(1) Step dimension
+                lp = lastLines(CInt(knn.result(i, j) / dimension))
+                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+                If j = dimension Then Exit For
+            Next
+        Next
+
+        lastTrainInput = New List(Of Single)(knn.queries)
+        lastLines = New List(Of PointPair)(lines.lpList)
+
+        'Dim nextLines As New List(Of PointPair)
+        'Dim usedBest As New List(Of Integer)
+        'Dim index As Integer
+        'For i = 0 To knn.result.GetUpperBound(0)
+        '    For j = 0 To knn.result.GetUpperBound(1)
+        '        index = knn.result(i, j)
+        '        If usedBest.Contains(index) = False Then Exit For
+        '    Next
+        '    usedBest.Add(index)
+
+        '    If index * knn.options.knnDimension + 4 < knn.trainInput.Count Then
+        '        Dim mps = New PointPair(New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension + 0), knn.trainInput(index * knn.options.knnDimension + 1)),
+        '                  New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension + 2), knn.trainInput(index * knn.options.knnDimension + 3)))
+        '        mps.slope = knn.trainInput(index * knn.options.knnDimension)
+        '        nextLines.Add(mps)
+        '    End If
+        'Next
+
+        'bestLines = New List(Of PointPair)(nextLines)
+        'For Each ptS In bestLines
+        '    DrawLine(dst2, ptS.p1, ptS.p2, task.HighlightColor)
+        '    DrawLine(dst1, ptS.p1, ptS.p2, cvb.Scalar.Red)
+        'Next
     End Sub
 End Class
