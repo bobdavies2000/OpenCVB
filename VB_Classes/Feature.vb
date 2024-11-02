@@ -31,6 +31,57 @@ End Class
 
 
 
+Public Class Feature_BasicsNew : Inherits TaskParent
+    Public options As New Options_Features
+    Dim gather As New Feature_Gather
+    Public Sub New()
+        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
+        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+
+        gather.Run(src)
+
+        Static ptList As New List(Of cvb.Point2f)
+        If task.FirstPass Then
+            ptList = New List(Of cvb.Point2f)(gather.features)
+        Else
+            Dim newSet As New List(Of cvb.Point2f)
+            For Each pt In ptList
+                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                If val = 0 Then newSet.Add(pt)
+            Next
+
+            For Each pt In gather.features
+                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                If val <> 0 Then newSet.Add(pt)
+            Next
+            ptList = New List(Of cvb.Point2f)(newSet)
+        End If
+
+        task.features.Clear()
+        task.featurePoints.Clear()
+        For Each pt In ptList
+            task.features.Add(pt)
+            task.featurePoints.Add(New cvb.Point(pt.X, pt.X))
+        Next
+
+        If standaloneTest() Then
+            For Each pt In ptList
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            Next
+        End If
+
+        labels(2) = gather.labels(2)
+    End Sub
+End Class
+
+
+
+
+
 
 Public Class Feature_Stable : Inherits TaskParent
     Dim nextMatList As New List(Of cvb.Mat)

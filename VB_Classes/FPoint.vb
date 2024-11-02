@@ -47,7 +47,7 @@ End Class
 Public Class FPoint_BasicsNew : Inherits TaskParent
     Public fpList As New List(Of fPoint)
     Public fpMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_BasicsNew
     Dim subdiv As New cvb.Subdiv2D
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
@@ -56,27 +56,6 @@ Public Class FPoint_BasicsNew : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
-
-        Static ptList As New List(Of cvb.Point2f)
-        If task.FirstPass Then
-            ptList = New List(Of cvb.Point2f)(task.features)
-        Else
-            Dim newSet As New List(Of cvb.Point2f)
-            For Each pt In ptList
-                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
-                If val = 0 Then newSet.Add(pt)
-            Next
-
-            For Each pt In task.features
-                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
-                If val <> 0 Then newSet.Add(pt)
-            Next
-            ptList = New List(Of cvb.Point2f)(newSet)
-        End If
-
-
-
-
 
         'Dim facetList As New List(Of List(Of cvb.Point))
         'Dim facet32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
@@ -104,7 +83,7 @@ Public Class FPoint_BasicsNew : Inherits TaskParent
 
 
         subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
-        subdiv.Insert(ptList)
+        subdiv.Insert(task.features)
 
         Dim facets = New cvb.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)

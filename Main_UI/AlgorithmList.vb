@@ -1018,6 +1018,7 @@ End Enum
 	If algorithmName = "Feature_AKaze_CS" Then return new Feature_AKaze_CS
 	If algorithmName = "Feature_Basics" Then return new Feature_Basics
 	If algorithmName = "Feature_Basics_CS" Then return new Feature_Basics_CS
+	If algorithmName = "Feature_BasicsNew" Then return new Feature_BasicsNew
 	If algorithmName = "Feature_Compare" Then return new Feature_Compare
 	If algorithmName = "Feature_Compare_CS" Then return new Feature_Compare_CS
 	If algorithmName = "Feature_Delaunay" Then return new Feature_Delaunay
