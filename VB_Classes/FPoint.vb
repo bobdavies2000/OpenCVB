@@ -45,10 +45,10 @@ End Class
 
 
 Public Class FPoint_BasicsNew : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Dim subdiv As New cvb.Subdiv2D
     Public fpList As New List(Of fPoint)
     Public fpMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+    Dim feat As New Feature_Basics
+    Dim subdiv As New cvb.Subdiv2D
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
         FindSlider("Feature Sample Size").Value = 255 ' keep within a byte boundary.
@@ -73,6 +73,35 @@ Public Class FPoint_BasicsNew : Inherits TaskParent
             Next
             ptList = New List(Of cvb.Point2f)(newSet)
         End If
+
+
+
+
+
+        'Dim facetList As New List(Of List(Of cvb.Point))
+        'Dim facet32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+
+        'subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
+        'subdiv.Insert(ptList)
+
+        'Dim facets1 = New cvb.Point2f()() {Nothing}
+        'subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets1, Nothing)
+
+        'facetList.Clear()
+        'For i = 0 To facets1.Length - 1
+        '    Dim nextFacet As New List(Of cvb.Point)
+        '    For j = 0 To facets1(i).Length - 1
+        '        nextFacet.Add(New cvb.Point(facets1(i)(j).X, facets1(i)(j).Y))
+        '    Next
+
+        '    facet32s.FillConvexPoly(nextFacet, i, task.lineType)
+        '    facetList.Add(nextFacet)
+        'Next
+        'facet32s.ConvertTo(dst1, cvb.MatType.CV_8U)
+
+
+
+
 
         subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(ptList)
@@ -111,29 +140,33 @@ Public Class FPoint_BasicsNew : Inherits TaskParent
         Next
 
         dst3.SetTo(0)
-        If task.FirstPass Then
+        If task.heartBeat Then
             For i = 1 To fpList.Count - 1
                 Dim fp = fpList(i)
                 fp.index = i
                 fpList(i) = fp
             Next
         Else
-            Dim usedList As New List(Of Integer)
+            Dim usedList(fpList.Count - 1) As Boolean
             For i = 1 To fpList.Count - 1
                 Dim fp = fpList(i)
-                If usedList.Contains(fp.index) Then
-                    For j = fpList.Count To 1 Step -1
-                        If usedList.Contains(j) = False Then
+                If usedList(fp.index) Then
+                    For j = 0 To usedList.Count - 1
+                        If usedList(j) = False Then
                             fp.index = j
                             Exit For
                         End If
                     Next
-                    fpList(i) = fp
                 End If
-                usedList.Add(fp.index)
-                dst3(fp.rect).SetTo(fp.index, fp.mask)
+                usedList(fp.index) = True
+                fpList(i) = fp
             Next
         End If
+
+        For i = 1 To fpList.Count - 1
+            Dim fp = fpList(i)
+            dst3(fp.rect).SetTo(fp.index, fp.mask)
+        Next
 
         dst2 = ShowPalette(dst3)
         fpMap = dst3.Clone
