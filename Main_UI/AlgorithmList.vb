@@ -1238,6 +1238,7 @@ End Enum
 	If algorithmName = "FPoint_BasicsOld" Then return new FPoint_BasicsOld
 	If algorithmName = "FPoint_Core" Then return new FPoint_Core
 	If algorithmName = "FPoint_Info" Then return new FPoint_Info
+	If algorithmName = "FPoint_Lines" Then return new FPoint_Lines
 	If algorithmName = "FPoint_NoTracking" Then return new FPoint_NoTracking
 	If algorithmName = "FPoly_Basics" Then return new FPoly_Basics
 	If algorithmName = "FPoly_Basics_CS" Then return new FPoly_Basics_CS

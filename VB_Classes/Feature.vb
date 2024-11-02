@@ -38,11 +38,9 @@ Public Class Feature_Basics : Inherits TaskParent
             task.featurePoints.Add(New cvb.Point(pt.X, pt.X))
         Next
 
-        If standaloneTest() Then
-            For Each pt In ptList
-                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
-            Next
-        End If
+        For Each pt In ptList
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
 
         labels(2) = gather.labels(2)
     End Sub

@@ -4,7 +4,8 @@ Public Class FPoint_Basics : Inherits TaskParent
     Dim fpt As New FPoint_Core
     Dim fInfo As New FPoint_Info
     Public Sub New()
-        FindSlider("Feature Sample Size").Value = 255 ' keep within a byte boundary.
+        FindSlider("Min Distance to next").Value = task.fPointMinDistance
+        FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
         desc = "Create the fpList with rect, mask, index, and facets"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -247,5 +248,34 @@ Public Class FPoint_NoTracking : Inherits TaskParent
         dst3.SetTo(0, dst1)
         dst2.SetTo(cvb.Scalar.White, dst1)
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+    End Sub
+End Class
+
+
+
+
+
+Public Class FPoint_Lines : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Dim feat As New Feature_Basics
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
+        desc = "Run Feature_Basics and Line_Basics for comparison."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        edges.Run(src)
+        dst1 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+
+        lines.Run(src)
+        dst2 = lines.dst3
+
+        feat.Run(src)
+        dst3 = feat.dst2
+
+        For Each pt In task.features
+            DrawCircle(dst1, pt, task.DotSize, task.HighlightColor)
+        Next
     End Sub
 End Class

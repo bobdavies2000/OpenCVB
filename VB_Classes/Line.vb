@@ -137,7 +137,6 @@ Public Class Line_Core : Inherits TaskParent
             End If
         Next
 
-        dst2 = src
         dst3.SetTo(0)
         Dim lpFiltered As New List(Of PointPair)(sortByLen.Values)
         For i = 0 To sortByLen.Values.Count - 1

@@ -69,6 +69,7 @@ Public Class OptionsGlobal
 
         task.DotSize = 1
         task.cvFontThickness = 1
+        task.fPointMinDistance = 10
         Select Case task.dst2.Width
             Case 1920
                 GridSlider.Value = 64
@@ -80,6 +81,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cvb.Size(480, 270)
                 task.densityMetric = 40
                 task.FASTthreshold = 25
+                task.fPointMinDistance = 75
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 960
                 GridSlider.Value = 40
@@ -91,6 +93,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cvb.Size(480, 270)
                 task.densityMetric = 200
                 task.FASTthreshold = 40
+                task.fPointMinDistance = 50
             Case 480
                 GridSlider.Value = 20
                 task.cvFontSize = 1.2
@@ -99,6 +102,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cvb.Size(480, 270)
                 task.densityMetric = 650
                 task.FASTthreshold = 10
+                task.fPointMinDistance = 20
             Case 1280
                 GridSlider.Value = 48
                 task.cvFontSize = 2.5
@@ -109,6 +113,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cvb.Size(320, 180)
                 task.densityMetric = 150
                 task.FASTthreshold = 40
+                task.fPointMinDistance = 50
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 640
                 GridSlider.Value = 24
@@ -119,6 +124,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cvb.Size(320, 180)
                 task.densityMetric = 200
                 task.FASTthreshold = 30
+                task.fPointMinDistance = 25
             Case 320
                 GridSlider.Value = 14
                 task.cvFontSize = 1.0
@@ -128,6 +134,7 @@ Public Class OptionsGlobal
                 If task.dst2.Height = 240 Then task.lowRes = New cvb.Size(160, 120)
                 task.densityMetric = 500
                 task.FASTthreshold = 10
+                task.fPointMinDistance = 12
             Case 160
                 GridSlider.Value = 8
                 task.cvFontSize = 1.0
@@ -136,6 +143,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cvb.Size(320, 180)
                 task.densityMetric = 100
                 task.FASTthreshold = 10
+                task.fPointMinDistance = 5
             Case 672
                 GridSlider.Value = 24
                 task.cvFontSize = 1.5
@@ -145,6 +153,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cvb.Size(336, 188)
                 task.densityMetric = 300
                 task.FASTthreshold = 10
+                task.fPointMinDistance = 25
             Case 336
                 GridSlider.Value = 12
                 task.cvFontSize = 1.0
@@ -154,6 +163,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cvb.Size(336, 188)
                 task.densityMetric = 700
                 task.FASTthreshold = 10
+                task.fPointMinDistance = 10
             Case 168
                 GridSlider.Value = 8
                 task.cvFontSize = 0.5
@@ -162,6 +172,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cvb.Size(336, 188)
                 task.densityMetric = 1700
                 task.FASTthreshold = 10
+                task.fPointMinDistance = 7
         End Select
 
         task.depthThresholdPercent = 0.01
