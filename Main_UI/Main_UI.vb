@@ -1488,6 +1488,7 @@ Public Class Main_UI
         If parms.algName = "" Then Exit Sub
         algorithmQueueCount += 1
         algorithmFPSrate = 0
+        newCameraImages = False
 
         ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
         SyncLock algorithmThreadLock
@@ -1495,7 +1496,6 @@ Public Class Main_UI
             AlgorithmTestAllCount += 1
             drawRect = New cvb.Rect
             task = New VBtask(parms)
-
 
             ' make sure unmanaged portion of the CPP_Managed library is initialized with critical data before the first C++/CLR algorithm.
             Dim setup = New CPP_Managed.CPP_IntializeManaged(task.rows, task.cols)
@@ -1559,7 +1559,7 @@ Public Class Main_UI
                     End If
 
                     If newCameraImages Then
-                        ' Debug.WriteLine("New camera images arrived.")
+                        newCameraImages = False
                         Dim copyTime = Now
 
                         SyncLock cameraLock
@@ -1586,7 +1586,6 @@ Public Class Main_UI
                             task.IMU_FrameTime = camera.IMU_FrameTime
                             task.CPU_TimeStamp = camera.CPU_TimeStamp
                             task.CPU_FrameTime = camera.CPU_FrameTime
-                            newCameraImages = False
                         End SyncLock
 
                         Dim endCopyTime = Now
@@ -1622,14 +1621,13 @@ Public Class Main_UI
                                 BothFirstAndLastReady = False
                             End If
 
-                            textAdvice = task.advice
+                        textAdvice = task.advice
+                        Exit While
+                    End If
+                End While
 
-                            If task.pointCloud.Width = 0 Then Continue While Else Exit While
-                        End If
-                    End While
-
-                    ' camera has exited or resolution is changed.
-                    If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or
+                ' camera has exited or resolution is changed.
+                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or
                 saveAlgorithmName <> task.algName Then
                         Exit While
                     End If

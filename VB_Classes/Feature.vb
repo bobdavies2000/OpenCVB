@@ -1,37 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
-' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_Basics : Inherits TaskParent
-    Public options As New Options_Features
-    Dim gather As New Feature_Gather
-    Public Sub New()
-        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
-        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        dst2 = src.Clone
-
-        gather.Run(src)
-
-        task.features.Clear()
-        task.featurePoints.Clear()
-        For Each pt In gather.features
-            task.features.Add(pt)
-            task.featurePoints.Add(New cvb.Point(pt.X, pt.X))
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
-        Next
-
-        labels(2) = gather.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-Public Class Feature_BasicsNew : Inherits TaskParent
     Public options As New Options_Features
     Dim gather As New Feature_Gather
     Public Sub New()
@@ -79,6 +49,34 @@ Public Class Feature_BasicsNew : Inherits TaskParent
 End Class
 
 
+
+
+
+' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+Public Class Feature_NoMotionTest : Inherits TaskParent
+    Public options As New Options_Features
+    Dim gather As New Feature_Gather
+    Public Sub New()
+        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
+        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+
+        gather.Run(src)
+
+        task.features.Clear()
+        task.featurePoints.Clear()
+        For Each pt In gather.features
+            task.features.Add(pt)
+            task.featurePoints.Add(New cvb.Point(pt.X, pt.X))
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
+
+        labels(2) = gather.labels(2)
+    End Sub
+End Class
 
 
 

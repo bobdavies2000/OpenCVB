@@ -211,7 +211,6 @@ End Structure
 
 
 Public Class fPoint ' feature point
-    Public pt As cvb.Point2f
     Public index As Integer
     Public mask As New cvb.Mat
     Public rect As cvb.Rect

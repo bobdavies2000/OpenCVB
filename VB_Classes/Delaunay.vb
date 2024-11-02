@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 Public Class Delaunay_Basics : Inherits TaskParent
     Public inputPoints As New List(Of cvb.Point2f)
@@ -56,6 +57,102 @@ End Class
 
 
 
+
+Public Class Delaunay_FPoint : Inherits TaskParent
+    Public fpList As New List(Of fPoint)
+    Public inputPoints As New List(Of cvb.Point2f)
+    Dim facetList As New List(Of List(Of cvb.Point))
+    Public facet32s As cvb.Mat
+    Dim randEnum As New Random_Enumerable
+    Dim subdiv As New cvb.Subdiv2D
+    Public Sub New()
+        facet32s = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32SC1, 0)
+        dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U, 0)
+        labels(3) = "CV_8U map of Delaunay cells"
+        desc = "Subdivide an image based on the points provided."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.heartBeat And standalone Then
+            randEnum.Run(empty)
+            inputPoints = New List(Of cvb.Point2f)(randEnum.points)
+        End If
+
+        subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
+        subdiv.Insert(inputPoints)
+
+        Dim facets = New cvb.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        fpList.Clear()
+        fpList.Add(New fPoint) ' index = 0
+        Dim mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+        For i = 0 To facets.Length - 1
+            Dim fp = New fPoint
+            fp.facet2f = New List(Of Point2f)(facets(i))
+            fp.facets = New List(Of cvb.Point)
+            fp.index = i
+
+            Dim xlist As New List(Of Integer)
+            Dim ylist As New List(Of Integer)
+            For j = 0 To facets(i).Length - 1
+                Dim pt = New cvb.Point(facets(i)(j).X, facets(i)(j).Y)
+                If pt.X < 0 Then pt.X = 0
+                If pt.Y < 0 Then pt.Y = 0
+                If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
+                If pt.Y >= dst2.Height Then pt.Y = dst2.Height - 1
+                xlist.Add(pt.X)
+                ylist.Add(pt.Y)
+                fp.facets.Add(pt)
+            Next
+
+            fp.rect = New cvb.Rect(xlist.Min, ylist.Min, xlist.Max - xlist.Min, ylist.Max - ylist.Min)
+
+            mask32s(fp.rect).SetTo(0)
+            mask32s.FillConvexPoly(fp.facets, 255, task.lineType)
+            mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
+            fpList.Add(fp)
+        Next
+
+        facetList.Clear()
+        For i = 0 To facets.Length - 1
+            Dim nextFacet As New List(Of cvb.Point)
+            For j = 0 To facets(i).Length - 1
+                Dim pt = New cvb.Point(facets(i)(j).X, facets(i)(j).Y)
+                If pt.X < 0 Then pt.X = 0
+                If pt.Y < 0 Then pt.Y = 0
+                If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
+                If pt.Y >= dst2.Height Then pt.Y = dst2.Height - 1
+                nextFacet.Add(pt)
+            Next
+
+            facet32s.FillConvexPoly(nextFacet, i, task.lineType)
+            facetList.Add(nextFacet)
+        Next
+
+        task.fGridOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        For i = 0 To facets.Length - 1
+            Dim ptList As New List(Of cvb.Point)
+            For j = 0 To facets(i).Length - 1
+                ptList.Add(New cvb.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            DrawContour(task.fGridOutline, ptList, 255, 1)
+        Next
+
+        facet32s.ConvertTo(dst3, cvb.MatType.CV_8U)
+        dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
+
+        If standalone Then
+            dst3.SetTo(0, dst1)
+            dst2.SetTo(cvb.Scalar.White, dst1)
+        End If
+        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+    End Sub
+End Class
+
+
+
+
 Public Class Delaunay_Contours : Inherits TaskParent
     Public inputPoints As New List(Of cvb.Point2f)
     Dim randEnum As New Random_Enumerable
@@ -103,7 +200,7 @@ Public Class Delaunay_SubDiv : Inherits TaskParent
         desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Then If not task.heartBeat Then Exit Sub
+        If standaloneTest() Then If Not task.heartBeat Then Exit Sub
         Dim subdiv As New cvb.Subdiv2D(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
         random.Run(empty)
         dst2.SetTo(0)
@@ -119,7 +216,7 @@ Public Class Delaunay_SubDiv : Inherits TaskParent
         Next
 
         For Each pt In random.PointList
-            DrawCircle(dst2,pt, task.DotSize + 1, cvb.Scalar.Red)
+            DrawCircle(dst2, pt, task.DotSize + 1, cvb.Scalar.Red)
         Next
 
         Dim facets = New cvb.Point2f()() {Nothing}
@@ -154,7 +251,7 @@ Public Class Delaunay_Subdiv2D : Inherits TaskParent
         desc = "Generate random points and divide the image around those points."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If not task.heartBeat Then Exit Sub ' too fast otherwise...
+        If Not task.heartBeat Then Exit Sub ' too fast otherwise...
         dst2.SetTo(0)
         Dim points = Enumerable.Range(0, 100).Select(Of cvb.Point2f)(
             Function(i)

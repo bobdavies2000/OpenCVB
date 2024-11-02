@@ -24,11 +24,14 @@ Public Class VBtask : Implements IDisposable
     Public subDivisionCount As Integer = 9
     Public gridMask As cvb.Mat
     Public gridMap As New cvb.Mat
-    Public gridLowResIndices As cvb.Mat
-    Public gridHighResIndices As cvb.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridNabeRects As New List(Of cvb.Rect)
     Public gridROIclicked As Integer
+
+    Public fGridList As New List(Of fPoint)
+    Public fGridOutline As cvb.Mat
+    Public fGridMap As cvb.Mat
+    Public fpSelected As New fPoint
 
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer
@@ -428,6 +431,11 @@ Public Class VBtask : Implements IDisposable
             task.advice = "No advice for " + algName + " yet." + vbCrLf +
                                "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
         End If
+
+        fGridList.Clear()
+        fGridOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        fGridMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        fpSelected = New fPoint
 
         If parms.useRecordedData Then recordedData = New Replay_Play()
 
