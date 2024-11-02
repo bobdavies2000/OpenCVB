@@ -213,6 +213,7 @@ End Structure
 
 Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
     Public center As cvb.Point2f
+    Public colorIndex As Integer
     Public p1 As cvb.Point2f
     Public p2 As cvb.Point2f
     Public slope As Single
@@ -220,7 +221,6 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
     Public xIntercept As Single
     Public rect As cvb.Rect
     Public length As Single
-    Public xpDelta As cvb.Point2f
     Public xp1 As cvb.Point2f
     Public xp2 As cvb.Point2f
     Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
@@ -277,8 +277,7 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
             xp2.X = xIntercept
             xp2.Y = 0
         End If
-
-        xpDelta = New cvb.Point2f(xp1.X - xp2.X, xp1.Y - xp2.Y)
+        colorIndex = -1
     End Sub
     Sub New()
         p1 = New cvb.Point2f()

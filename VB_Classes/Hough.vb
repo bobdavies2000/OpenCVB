@@ -35,6 +35,48 @@ End Class
 
 
 
+Public Class Hough_Sudoku : Inherits TaskParent
+    Dim hough As New Hough_Basics
+    Public Sub New()
+        FindSlider("Canny threshold1").Value = 50
+        FindSlider("Canny threshold2").Value = 200
+        FindSlider("Hough rho").Value = 1
+        FindSlider("Hough theta").Value = 1000 * cvb.Cv2.PI / 180
+        FindSlider("Hough threshold").Value = 150
+        desc = "Successful use of Hough to find lines in Sudoku grid."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = cvb.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
+        dst3 = dst2.Clone
+        hough.Run(dst2)
+        houghShowLines(dst3, hough.segments, hough.options.lineCount)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Hough_Sudoku1 : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Public Sub New()
+        desc = "FastLineDetect version for finding lines in the Sudoku input."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst3 = cvb.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
+        lines.Run(dst3.Clone)
+        dst2 = lines.dst2
+        For Each lp In lines.lpList
+            dst3.Line(lp.xp1, lp.xp2, cvb.Scalar.Red, task.lineWidth, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
 
 
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
@@ -258,16 +300,89 @@ End Class
 
 
 
-
-Public Class Hough_Sudoku : Inherits TaskParent
-    Dim hough As New Hough_Basics
+Public Class Hough_Lines : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Dim options As New Options_Hough
     Public Sub New()
-        desc = "Successful use of Hough to find lines in Sudoku grid."
+        task.gOptions.GridSlider.Value = 30
+        labels(2) = "Output of the Canny Edge algorithm (no Hough lines)"
+        labels(3) = "Hough Lines for each threaded cell or if no lines, the featureless cell depth data."
+        desc = "Multithread Houghlines to find lines in image fragments."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        dst2 = cvb.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
-        dst3 = dst2.Clone
-        hough.Run(dst2)
-        houghShowLines(dst3, hough.segments, hough.options.lineCount)
+        options.RunOpt()
+        edges.Run(src)
+        dst2 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+
+        dst3.SetTo(0)
+        For Each roi In task.gridRects
+            Dim segments = cvb.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
+            If segments.Count = 0 Then Continue For
+            houghShowLines(dst2(roi), segments, 2)
+            houghShowLines(dst3(roi), segments, 2)
+        Next
+        dst2.SetTo(cvb.Scalar.White, task.gridMask)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Hough_FullImage : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Public segments() As cvb.LineSegmentPolar
+    Public options As New Options_Hough
+    Public Sub New()
+        desc = "Use Houghlines to find lines in the image."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        edges.Run(src)
+
+        Dim segments = cvb.Cv2.HoughLines(edges.dst2, options.rho, options.theta, options.threshold)
+        labels(2) = "Found " + CStr(segments.Length) + " Lines"
+
+        If standaloneTest() Then
+            src.CopyTo(dst2)
+            dst2.SetTo(cvb.Scalar.White, edges.dst2)
+            houghShowLines(dst2, segments, options.lineCount)
+
+            dst3.SetTo(0)
+            houghShowLines(dst3, segments, options.lineCount)
+            dst3.SetTo(cvb.Scalar.White, edges.dst2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Hough_Probabilistic : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Public segments() As cvb.LineSegmentPolar
+    Public options As New Options_Hough
+    Public Sub New()
+        task.gOptions.GridSlider.Value = 30
+        desc = "Use Houghlines to find lines in the image."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        edges.Run(src)
+
+        Static segments As cvb.LineSegmentPoint()
+        If task.gOptions.debugChecked Then
+            src.CopyTo(dst2)
+            dst2.SetTo(cvb.Scalar.White, edges.dst2)
+            dst3.SetTo(0)
+            segments = cvb.Cv2.HoughLinesP(edges.dst2, options.rho, options.theta, options.threshold)
+            For i = 0 To Math.Min(segments.Length, options.lineCount) - 1
+                Dim line = segments(i)
+                dst3.Line(line.P1, line.P2, cvb.Scalar.Red, task.lineWidth + 2, task.lineType)
+            Next
+            labels(3) = "Probablistic lines = " + CStr(segments.Length)
+        End If
     End Sub
 End Class

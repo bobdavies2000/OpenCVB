@@ -4,7 +4,7 @@ Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of PointPair)
     Public Sub New()
         dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+        desc = "Where motion, remove existing lines but add new lines.  Keep existing lines where no motion."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
@@ -45,8 +45,9 @@ Public Class Line_Basics : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
         Next
         If task.heartBeat Then
-            labels(2) = CStr(lpList.Count) + " Lines identified.  Motion tossed: " + CStr(motionToss) +
-                        " Lines in Motion: " + CStr(motionLineCount)
+            labels(2) = "Existing lines tossed because of motion: " + CStr(motionToss) +
+                        " Lines added in Motion areas: " + CStr(motionLineCount)
+            labels(3) = CStr(lpList.Count) + " lines were identified."
         End If
     End Sub
 End Class
@@ -55,12 +56,12 @@ End Class
 
 
 
-Public Class Line_xBasics3 : Inherits TaskParent
+Public Class Line_OriginalBasics : Inherits TaskParent
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
     Public Sub New()
         dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+        desc = "Where motion, remove existing lines but didn't (!) add new lines.  Keep existing lines where no motion."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
@@ -94,8 +95,9 @@ Public Class Line_xBasics3 : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
         Next
         If task.heartBeat Then
-            labels(2) = CStr(lpList.Count) + " Lines identified.  Motion toss: " + CStr(motionToss) +
-                        " intersect toss: " + CStr(intersectToss)
+            labels(2) = "Existing lines tossed because of motion: " + CStr(motionToss) +
+                        " Lines added in Motion areas: " + CStr(intersectToss)
+            labels(3) = CStr(lpList.Count) + " lines were identified."
         End If
     End Sub
 End Class
@@ -1310,50 +1312,6 @@ End Class
 
 
 
-Public Class Line_VerticalHorizontal2 : Inherits TaskParent
-    Dim lines As New Line_Basics
-    Public vList As New List(Of PointPair)
-    Public hList As New List(Of PointPair)
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max Distance threshold", 0, 100, 5)
-        labels(3) = "NOTE: this is not always working..."
-        desc = "Use the edgeToEdge offset to determine parallel - fail..."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Static maxSlider = FindSlider("Max Distance threshold")
-        Dim maxDistance = maxSlider.value
-
-        Dim gDist = task.gravityVec.xpDelta.X
-        Dim hDist = task.horizonVec.xpDelta.Y
-
-        lines.Run(src)
-
-        vList.Clear()
-        hList.Clear()
-        dst2 = src.Clone
-        dst3.SetTo(0)
-        For Each lp In lines.lpList
-            If Math.Abs(lp.xpDelta.X - gDist) <= maxDistance Then
-                vList.Add(lp)
-                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
-                DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
-            End If
-            If Math.Abs(lp.xpDelta.Y - hDist) <= maxDistance Then
-                hList.Add(lp)
-                DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Red)
-                DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.Red)
-            End If
-        Next
-        labels(2) = "Number of lines identified (vertical/horizontal): " + CStr(vList.Count) + "/" + CStr(hList.Count)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Line_DisplayInfoOld : Inherits TaskParent
     Public tcells As New List(Of tCell)
@@ -1495,7 +1453,6 @@ Public Class Line_Info : Inherits TaskParent
             strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
             strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
             strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
-            strOut += "xpDelta = (" + Format(lp.xpDelta.X, fmt1) + "," + Format(lp.xpDelta.Y, fmt1) + ")" + vbCrLf
             strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
 
             dst3.SetTo(0)
@@ -1505,80 +1462,6 @@ Public Class Line_Info : Inherits TaskParent
         SetTrueText(strOut, 1)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Line_CombineLines : Inherits TaskParent
-    Public lpInput As New List(Of PointPair)
-    Public options As New Options_Line
-    Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-    Dim lpList As New List(Of PointPair)
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        FindSlider("Min Line Length").Value = 30
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
-    End Sub
-    Public Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
-        If Math.Abs(lp.slope) >= 1 Then
-            If lp.p1.Y < mp.p1.Y Then
-                If lp.p2.DistanceTo(mp.p1) > 10 Then Return Nothing
-                Return New PointPair(lp.p1, mp.p2)
-            Else
-                If mp.p2.DistanceTo(lp.p1) > 10 Then Return Nothing
-                Return New PointPair(mp.p1, lp.p2)
-            End If
-        Else
-            If lp.p1.X < mp.p1.X Then
-                If mp.p1.DistanceTo(lp.p2) > 10 Then Return Nothing
-                Return New PointPair(lp.p1, mp.p2)
-            Else
-                If mp.p2.DistanceTo(lp.p1) > 10 Then Return Nothing
-                Return New PointPair(mp.p1, lp.p2)
-            End If
-        End If
-    End Function
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        dst2 = src.Clone
-
-        If standalone Then
-            Static lines As New Line_Core
-            lines.Run(src)
-            lpInput = lines.lpList
-        End If
-
-        dst3.SetTo(0)
-        For i = 0 To lpInput.Count - 1
-            Dim lp = lpInput(i)
-            Dim v1 = lineMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-            Dim v2 = lineMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
-            If v1 <> 0 And v2 <> 0 Then
-                If v1 = v2 Then
-                    Dim mp = lpList(v1 - 1)
-                    Dim lpNew = combine2Lines(lp, mp)
-                    If lpNew IsNot Nothing Then DrawLine(dst3, lpNew.p1, lpNew.p2, 255, task.lineWidth)
-                End If
-            End If
-            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
-        Next
-
-        lpList = New List(Of PointPair)(lpInput)
-        lineMap.SetTo(0)
-        For i = 0 To lpList.Count - 1
-            Dim lp = lpList(i)
-            If lp.length > options.minLength Then lineMap.Line(lp.xp1, lp.xp2, i + 1, 2, cvb.LineTypes.Link8)
-        Next
-
-        lineMap.ConvertTo(dst1, cvb.MatType.CV_8U)
-        dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
 
 
 
@@ -1834,7 +1717,7 @@ End Class
 
 
 
-Public Class Line_xBasics1 : Inherits TaskParent
+Public Class Line_Regions : Inherits TaskParent
     Public lineList As New List(Of PointPair)
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
@@ -1852,25 +1735,6 @@ Public Class Line_xBasics1 : Inherits TaskParent
 
         Dim nextSet As New List(Of PointPair)
         dst3.SetTo(0)
-        Dim tossMotion As Integer
-        'For Each lp In lpList
-        '    If task.motionMask(lp.rect).CountNonZero() = 0 Then
-        '        nextSet.Add(lp)
-        '        dst3.Line(lp.p1, lp.p2, 255, 2, task.lineType)
-        '    Else
-        '        tossMotion += 1
-        '    End If
-        'Next
-
-        'For Each lp In lines.lpList
-        '    If dst3(lp.rect).CountNonZero() < options.maxIntersection And lp.length > options.minLength Then
-        '        nextSet.Add(lp)
-        '    Else
-        '        tossCount += 1
-        '    End If
-        'Next
-
-
 
         Static lastImage As cvb.Mat = dst2.Clone
         Dim tossCorrelation As Integer
@@ -1901,8 +1765,7 @@ Public Class Line_xBasics1 : Inherits TaskParent
             DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
         Next
         If task.heartBeat Then
-            labels(2) = CStr(lpList.Count) + " Lines identified. Correlation tossed " + CStr(tossCorrelation) +
-                                         ", motion tossed " + CStr(tossMotion)
+            labels(2) = CStr(lpList.Count) + " Lines identified. Correlation tossed " + CStr(tossCorrelation)
         End If
     End Sub
 End Class
@@ -1910,17 +1773,16 @@ End Class
 
 
 
-Public Class Line_xBasics2 : Inherits TaskParent
+Public Class Line_MatchedLines : Inherits TaskParent
     Public lines As New Line_Core
     Public lpInput As New List(Of PointPair)
     Public options As New Options_Line
     Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
     Dim lpList As New List(Of PointPair)
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
         FindSlider("Min Line Length").Value = 30
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
+        labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_Core in Treeview to see."
+        desc = "Combine lines that a approximately the same line."
     End Sub
     Private Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
         If Math.Abs(lp.slope) >= 1 Then
@@ -1942,16 +1804,15 @@ Public Class Line_xBasics2 : Inherits TaskParent
         dst2 = src.Clone
 
         If standalone Then
-            Static lines As New Line_Core
             lines.Run(src)
             lpInput = lines.lpList
         End If
 
-        dst3.SetTo(0)
         Dim tolerance = 0.1
         Dim newSet As New List(Of PointPair)
         Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Dim addList As New List(Of PointPair)
+        Dim combineCount As Integer
         For i = 0 To lpInput.Count - 1
             Dim lp = lpInput(i)
             Dim lpRemove As Boolean = False
@@ -1964,12 +1825,16 @@ Public Class Line_xBasics2 : Inherits TaskParent
                     Dim lpNew = combine2Lines(lp, mp)
                     If lpNew IsNot Nothing Then
                         addList.Add(lpNew)
-                        removeList.Add(j, j)
+                        DrawLine(dst2, lpNew.p1, lpNew.p2, task.HighlightColor)
+                        If removeList.Values.Contains(j) = False Then removeList.Add(j, j)
                         lpRemove = True
+                        combineCount += 1
                     End If
                 End If
             Next
-            If lpRemove Then removeList.Add(i, i)
+            If lpRemove Then
+                If removeList.Values.Contains(i) = False Then removeList.Add(i, i)
+            End If
         Next
 
         For i = 0 To removeList.Count - 1
@@ -1985,7 +1850,11 @@ Public Class Line_xBasics2 : Inherits TaskParent
             Dim lp = lpList(i)
             If lp.length > options.minLength Then lineMap.Line(lp.p1, lp.p2, i + 1, 2, cvb.LineTypes.Link8)
         Next
-        lineMap.ConvertTo(dst1, cvb.MatType.CV_8U)
-        dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        lineMap.ConvertTo(dst3, cvb.MatType.CV_8U)
+        dst3 = dst3.Threshold(0, cvb.Scalar.White, cvb.ThresholdTypes.Binary)
+        If task.heartBeat Then
+            labels(2) = CStr(lpInput.Count) + " lines were input and " + CStr(combineCount) +
+                        " lines were matched to the previous frame"
+        End If
     End Sub
 End Class

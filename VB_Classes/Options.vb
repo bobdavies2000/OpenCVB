@@ -1884,7 +1884,7 @@ Public Class Options_Hough : Inherits TaskParent
             sliders.setupTrackBar("Relative Intensity (Accord)", 1, 100, relativeIntensity * 1000)
             sliders.setupTrackBar("Hough rho", 1, 100, rho)
             sliders.setupTrackBar("Hough theta", 1, 1000, theta * 1000)
-            sliders.setupTrackBar("Hough threshold", 1, 100, threshold)
+            sliders.setupTrackBar("Hough threshold", 1, 500, threshold)
             sliders.setupTrackBar("Lines to Plot", 1, 1000, lineCount)
             sliders.setupTrackBar("Minimum feature pixels", 0, 250, 25)
         End If
