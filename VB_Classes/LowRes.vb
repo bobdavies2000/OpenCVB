@@ -1,6 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
-
 Public Class LowRes_Basics : Inherits TaskParent
     Dim lrColor As New LowRes_Color
     Dim lrDepth As New LowRes_Depth

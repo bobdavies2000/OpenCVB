@@ -624,7 +624,6 @@ End Enum
 	If algorithmName = "Delaunay_ConsistentColor_CS" Then return new Delaunay_ConsistentColor_CS
 	If algorithmName = "Delaunay_Contours" Then return new Delaunay_Contours
 	If algorithmName = "Delaunay_Contours_CS" Then return new Delaunay_Contours_CS
-	If algorithmName = "Delaunay_Features" Then return new Delaunay_Features
 	If algorithmName = "Delaunay_Generations" Then return new Delaunay_Generations
 	If algorithmName = "Delaunay_Generations_CC" Then return new CPP_Basics(ccFunctionNames._Delaunay_Generations_CC)
 	If algorithmName = "Delaunay_Generations_CS" Then return new Delaunay_Generations_CS
@@ -1233,6 +1232,9 @@ End Enum
 	If algorithmName = "Foreground_KMeans_CS" Then return new Foreground_KMeans_CS
 	If algorithmName = "Foreground_RedCloud" Then return new Foreground_RedCloud
 	If algorithmName = "Foreground_RedCloud_CS" Then return new Foreground_RedCloud_CS
+	If algorithmName = "FPoint_Basics" Then return new FPoint_Basics
+	If algorithmName = "FPoint_BasicsNew" Then return new FPoint_BasicsNew
+	If algorithmName = "FPoint_Delaunay" Then return new FPoint_Delaunay
 	If algorithmName = "FPoly_Basics" Then return new FPoly_Basics
 	If algorithmName = "FPoly_Basics_CS" Then return new FPoly_Basics_CS
 	If algorithmName = "FPoly_BasicsOriginal" Then return new FPoly_BasicsOriginal

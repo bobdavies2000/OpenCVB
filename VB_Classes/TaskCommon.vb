@@ -210,6 +210,18 @@ End Structure
 
 
 
+Public Class fPoint ' feature point
+    Public pt As cvb.Point2f
+    Public index As Integer
+    Public mask As New cvb.Mat
+    Public rect As cvb.Rect
+    Public facet2f As List(Of cvb.Point2f)
+    Public facets As List(Of cvb.Point)
+    Public ptFeature As cvb.Point2f
+End Class
+
+
+
 
 Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
     Public center As cvb.Point2f

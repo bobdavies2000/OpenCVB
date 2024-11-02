@@ -86,6 +86,7 @@ Flip
 Flood
 Font
 Foreground
+FPoint
 FPoly
 Fractal
 FrameRate
