@@ -216,7 +216,8 @@ Public Class fPoint ' feature point
     Public rect As cvb.Rect
     Public facet2f As List(Of cvb.Point2f)
     Public facets As List(Of cvb.Point)
-    Public ptFeature As cvb.Point2f
+    Public pt As cvb.Point2f
+    Public center As cvb.Point2f
 End Class
 
 

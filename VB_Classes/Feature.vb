@@ -6,6 +6,7 @@ Public Class Feature_Basics : Inherits TaskParent
     Dim gather As New Feature_Gather
     Public Sub New()
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -13,33 +14,39 @@ Public Class Feature_Basics : Inherits TaskParent
         dst2 = src.Clone
 
         gather.Run(src)
+        Static ptList = New List(Of cvb.Point2f)(gather.features)
 
-        Static ptList As New List(Of cvb.Point2f)
-        If task.FirstPass Then
-            ptList = New List(Of cvb.Point2f)(gather.features)
-        Else
-            Dim newSet As New List(Of cvb.Point2f)
-            For Each pt In ptList
-                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
-                If val = 0 Then newSet.Add(pt)
-            Next
+        Dim newSet As New List(Of cvb.Point2f)
+        For Each pt In ptList
+            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val = 0 Then newSet.Add(pt)
+        Next
 
-            For Each pt In gather.features
-                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
-                If val <> 0 Then newSet.Add(pt)
-            Next
-            ptList = New List(Of cvb.Point2f)(newSet)
-        End If
+        For Each pt In gather.features
+            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val <> 0 Then newSet.Add(pt)
+        Next
+
+        Dim ptSort As New SortedList(Of Integer, cvb.Point2f)(New compareAllowIdenticalInteger)
+        For Each pt In newSet
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+            ptSort.Add(index, pt)
+        Next
+
+        ptList = New List(Of cvb.Point2f)(ptSort.Values)
 
         task.features.Clear()
         task.featurePoints.Clear()
         For Each pt In ptList
             task.features.Add(pt)
-            task.featurePoints.Add(New cvb.Point(pt.X, pt.X))
+            task.featurePoints.Add(New cvb.Point(CInt(pt.X), CInt(pt.X)))
         Next
 
-        For Each pt In ptList
+        dst3.SetTo(0)
+        For i = 0 To ptList.count - 1
+            Dim pt = ptList(i)
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
         labels(2) = gather.labels(2)

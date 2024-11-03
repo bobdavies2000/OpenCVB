@@ -7,7 +7,7 @@ Public Class Grid_Basics : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.mouseClickFlag And Not task.FirstPass Then
-            task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.gridROIclicked = task.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
 
         Dim testGridCols As Integer
@@ -15,7 +15,7 @@ Public Class Grid_Basics : Inherits TaskParent
         If task.optionsChanged Or testGridCols <> task.gridCols Then
             task.gridSize = task.gOptions.GridSlider.Value
             task.gridMask = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
-            task.gridMap = New cvb.Mat(src.Size(), cvb.MatType.CV_32S, 255)
+            task.gridMap32S = New cvb.Mat(src.Size(), cvb.MatType.CV_32S, 255)
 
             gridRects.Clear()
             task.gridIndex.Clear()
@@ -51,7 +51,7 @@ Public Class Grid_Basics : Inherits TaskParent
 
                 For i = 0 To gridRects.Count - 1
                     Dim roi = gridRects(i)
-                    task.gridMap.Rectangle(roi, i, -1)
+                    task.gridMap32S.Rectangle(roi, i, -1)
                 Next
 
                 task.gridNeighbors.Clear()
@@ -66,7 +66,7 @@ Public Class Grid_Basics : Inherits TaskParent
                         Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                           roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                         If x >= 0 And x < src.Width And y >= 0 And y < src.Height Then
-                            Dim val = task.gridMap.Get(Of Integer)(y, x)
+                            Dim val = task.gridMap32S.Get(Of Integer)(y, x)
                             If nextList.Contains(val) = False Then nextList.Add(val)
                         End If
                     Next
@@ -319,7 +319,7 @@ Public Class Grid_Neighbors : Inherits TaskParent
 
         If task.mouseClickFlag Then
             mask = task.gridMask.Clone
-            Dim roiIndex = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+            Dim roiIndex = task.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
 
             For Each index In task.gridNeighbors(roiIndex)
                 Dim roi = task.gridRects(index)
@@ -463,7 +463,7 @@ Public Class Grid_TrackCenter : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         If match.correlation < match.options.correlationMin Or task.gOptions.debugChecked Then
             task.gOptions.debugChecked = False
-            Dim index = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
+            Dim index = task.gridMap32S.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridRects(index)
             match.template = src(roi).Clone
             center = New cvb.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
@@ -495,10 +495,10 @@ End Class
 
 Public Class Grid_ShowMap : Inherits TaskParent
     Public Sub New()
-        desc = "Verify that task.gridMap is laid out correctly"
+        desc = "Verify that task.gridMap32S is laid out correctly"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        task.gridMap.ConvertTo(dst2, cvb.MatType.CV_8U)
+        task.gridMap32S.ConvertTo(dst2, cvb.MatType.CV_8U)
         dst3 = ShowPalette(dst2)
     End Sub
 End Class

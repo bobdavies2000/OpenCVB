@@ -1742,7 +1742,7 @@ Public Class Line_Regions : Inherits TaskParent
             If lp.length > options.minLength Then
                 For i = 0 To 1
                     Dim pt = Choose(i + 1, lp.p1, lp.p2)
-                    Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                    Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
                     Dim roi = task.gridRects(index)
                     cvb.Cv2.MatchTemplate(dst2(roi), lastImage(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
                     If correlation.Get(Of Single)(0, 0) < options.correlation Then

@@ -16,8 +16,8 @@ Public Class Bin4Way_Basics : Inherits TaskParent
         desc = "Highlight the contours for each grid element with stats for each."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Static index = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        If task.mousePicTag = 1 Then index = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Static index = task.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        If task.mousePicTag = 1 Then index = task.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         Dim roiSave = If(index < task.gridRects.Count, task.gridRects(index), New cvb.Rect)
 
         If task.optionsChanged Then index = 0

@@ -3094,7 +3094,7 @@ namespace CS_Classes
 
         public void RunAlg(Mat src)
         {
-            if (vbc.task.mousePicTag == 1) index = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
+            if (vbc.task.mousePicTag == 1) index = vbc.task.gridMap32S.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
             cv.Rect roiSave = index < vbc.task.gridRects.Count ? vbc.task.gridRects[index] : new cv.Rect();
 
             if (vbc.task.optionsChanged) index = 0;
@@ -5109,7 +5109,7 @@ namespace CS_Classes
 
         public void RunAlg(Mat src)
         {
-            int index = vbc.task.gridMap.At<int>(vbc.task.mouseMovePoint.Y, vbc.task.mouseMovePoint.X);
+            int index = vbc.task.gridMap32S.At<int>(vbc.task.mouseMovePoint.Y, vbc.task.mouseMovePoint.X);
             var roi = vbc.task.gridRects[index];
 
             colorFmt.Run(src);
@@ -5124,7 +5124,7 @@ namespace CS_Classes
             Mat histogram = new Mat();
             if (backProjectByGrid)
             {
-                vbc.task.gridMap.ConvertTo(histogram, MatType.CV_32F);
+                vbc.task.gridMap32S.ConvertTo(histogram, MatType.CV_32F);
             }
             else
             {
@@ -5229,7 +5229,7 @@ namespace CS_Classes
             labels[2] = "Histogram 2D with Backprojection by " + selection;
             backp.Run(src);
             dst2 = Convert32f_To_8UC3(backp.dst2) * 255;
-            var roi = vbc.task.gridRects[vbc.task.gridMap.Get<int>(vbc.task.mouseMovePoint.Y, vbc.task.mouseMovePoint.X)];
+            var roi = vbc.task.gridRects[vbc.task.gridMap32S.Get<int>(vbc.task.mouseMovePoint.Y, vbc.task.mouseMovePoint.X)];
             cv.Rect rect;
             if (options.backProjectRow)
             {
@@ -6084,7 +6084,7 @@ namespace CS_Classes
             if (vbc.task.heartBeat)
             {
                 var rc = vbc.task.rc;
-                var gridID = vbc.task.gridMap.Get<int>(rc.maxDist.Y, rc.maxDist.X);
+                var gridID = vbc.task.gridMap32S.Get<int>(rc.maxDist.Y, rc.maxDist.X);
                 strOut = "rc.index = " + rc.index.ToString() + "\t" + " gridID = " + gridID.ToString() + "\r\n";
                 strOut += "rc.rect: " + rc.rect.X.ToString() + ", " + rc.rect.Y.ToString() + ", ";
                 strOut += rc.rect.Width.ToString() + ", " + rc.rect.Height.ToString() + "\r\n" + "rc.color = " + rc.color.ToString() + "\r\n";
@@ -21173,7 +21173,7 @@ namespace CS_Classes
             if (vbc.task.mouseClickFlag) setClickPoint(vbc.task.ClickPoint, vbc.task.mousePicTag);
             if (ClickPoint == new cv.Point()) setClickPoint(gather.rects[gather.rects.Count / 2].TopLeft, 2);
 
-            int gridIndex = vbc.task.gridMap.Get<int>(ClickPoint.Y, ClickPoint.X);
+            int gridIndex = vbc.task.gridMap32S.Get<int>(ClickPoint.Y, ClickPoint.X);
             cv.Rect roi = vbc.task.gridRects[gridIndex];
             dst2.Rectangle(roi, Scalar.White, vbc.task.lineWidth);
 
@@ -23774,13 +23774,13 @@ namespace CS_Classes
         {
             if (vbc.task.mouseClickFlag && !vbc.task.FirstPass)
             {
-                vbc.task.gridROIclicked = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
+                vbc.task.gridROIclicked = vbc.task.gridMap32S.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
             }
             if (vbc.task.optionsChanged)
             {
                 vbc.task.gridSize = vbc.task.gOptions.getGridSize();
                 vbc.task.gridMask = new Mat(src.Size(), MatType.CV_8U);
-                vbc.task.gridMap = new Mat(src.Size(), MatType.CV_32S, cv.Scalar.All(255));
+                vbc.task.gridMap32S = new Mat(src.Size(), MatType.CV_32S, cv.Scalar.All(255));
                 gridRects.Clear();
                 vbc.task.gridIndex.Clear();
                 vbc.task.gridRows = 0;
@@ -23821,7 +23821,7 @@ namespace CS_Classes
                     for (int i = 0; i < gridRects.Count; i++)
                     {
                         cv.Rect roi = gridRects[i];
-                        vbc.task.gridMap.Rectangle(roi, cv.Scalar.All(i), -1);
+                        vbc.task.gridMap32S.Rectangle(roi, cv.Scalar.All(i), -1);
                     }
                     vbc.task.gridNeighbors.Clear();
                     int xx = 0, yy = 0;
@@ -23852,7 +23852,7 @@ namespace CS_Classes
 
                             if (xx >= 0 && xx < src.Width && yy >= 0 && yy < src.Height)
                             {
-                                vbc.task.gridNeighbors.Last().Add(vbc.task.gridMap.At<int>(yy, xx));
+                                vbc.task.gridNeighbors.Last().Add(vbc.task.gridMap32S.At<int>(yy, xx));
                             }
                         }
                     }
@@ -24101,7 +24101,7 @@ namespace CS_Classes
             if (vbc.task.mouseClickFlag)
             {
                 mask = vbc.task.gridMask.Clone();
-                int roiIndex = vbc.task.gridMap.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
+                int roiIndex = vbc.task.gridMap32S.At<int>(vbc.task.ClickPoint.Y, vbc.task.ClickPoint.X);
                 foreach (int index in vbc.task.gridNeighbors[roiIndex])
                 {
                     var roi = vbc.task.gridRects[index];
@@ -24274,7 +24274,7 @@ namespace CS_Classes
             if (match.correlation < match.options.correlationMin || vbc.task.gOptions.getDebugCheckBox())
             {
                 vbc.task.gOptions.setDebugCheckBox(false);
-                int index = vbc.task.gridMap.Get<int>(dst2.Height / 2, dst2.Width / 2);
+                int index = vbc.task.gridMap32S.Get<int>(dst2.Height / 2, dst2.Width / 2);
                 var roi = vbc.task.gridRects[index];
                 match.template = src[roi].Clone();
                 center = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
@@ -24304,11 +24304,11 @@ namespace CS_Classes
     {
         public Grid_ShowMap_CS()
         {
-            desc = "Verify that vbc.task.gridMap is laid out correctly";
+            desc = "Verify that vbc.task.gridMap32S is laid out correctly";
         }
         public void RunAlg(Mat src)
         {
-            vbc.task.gridMap.ConvertTo(dst2, MatType.CV_8U);
+            vbc.task.gridMap32S.ConvertTo(dst2, MatType.CV_8U);
             dst3 = ShowPalette(dst2);
         }
     }

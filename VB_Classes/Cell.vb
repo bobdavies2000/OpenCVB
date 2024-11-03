@@ -13,7 +13,7 @@ Public Class Cell_Basics : Inherits TaskParent
         If task.heartBeat Then
             Dim rc = task.rc
 
-            Dim gridID = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            Dim gridID = task.gridMap32S.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
             strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf
             strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
             strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf + "rc.color = " + rc.color.ToString() + vbCrLf

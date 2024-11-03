@@ -1,5 +1,6 @@
 ﻿Imports OpenCvSharp
 Imports cvb = OpenCvSharp
+Imports System.Runtime.InteropServices
 Public Class FPoint_Basics : Inherits TaskParent
     Dim fpt As New FPoint_Core
     Dim fInfo As New FPoint_Info
@@ -10,29 +11,35 @@ Public Class FPoint_Basics : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fpt.Run(src)
-        dst2 = fpt.dst3
-        task.fGridMap = dst2.Clone
-        task.fGridList = New List(Of fPoint)(fpt.delaunay.fpList)
+        Static lastMap As cvb.Mat = fpt.delaunayF.dst3.Clone
+        Static lastList As New List(Of fPoint)(task.fpList)
 
+        dst2.SetTo(0)
+        Dim currList As New List(Of fPoint)(task.fpList)
+        task.fpList.Clear()
         For i = 0 To task.features.Count - 1
             Dim pt = task.features(i)
-            Dim index = task.fGridMap.Get(Of Byte)(pt.Y, pt.X)
-            If index < task.fGridList.Count - 1 Then
-                Dim fp = task.fGridList(index + 1)
-                fp.ptFeature = pt
-                task.fGridList(i) = fp
-            End If
+            Dim index = lastMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim fp = lastList(index)
+            fp.pt = pt
+            task.fpList.Add(fp)
+            dst2(fp.rect).SetTo(fp.index, fp.mask)
         Next
 
-        dst2.SetTo(0, task.fGridOutline)
+        lastMap = dst2.Clone
+        lastList = New List(Of fPoint)(task.fpList)
+
+        task.fpMap = dst2.Clone
+        dst2.SetTo(0, task.fpOutline)
         If task.heartBeat Then labels(2) = CStr(task.features.Count) + " feature grid cells."
 
         If task.ClickPoint <> New cvb.Point Then
-            Dim index = task.fGridMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-            task.fpSelected = task.fGridList(index)
-            If task.ClickPoint.DistanceTo(task.fpSelected.ptFeature) < task.fpSelected.rect.Width / 2 And
-                task.ClickPoint.DistanceTo(task.fpSelected.ptFeature) < task.fpSelected.rect.Height / 2 Then
-                task.ClickPoint = task.fpSelected.ptFeature
+            Dim index = task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.fpSelected = task.fpList(index)
+
+            If task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Width / 2 And
+                task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Height / 2 Then
+                task.ClickPoint = task.fpSelected.pt
             End If
 
             dst2(task.fpSelected.rect).SetTo(255, task.fpSelected.mask)
@@ -47,6 +54,37 @@ End Class
 
 
 
+Public Class FPoint_Core : Inherits TaskParent
+    Dim feat As New Feature_Basics
+    Public delaunayF As New Delaunay_FPoint
+    Public Sub New()
+        FindSlider("Feature Sample Size").Value = 255 ' keep within a byte boundary.
+        desc = "Divide up the image based on the features found."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        feat.Run(src)
+
+        delaunayF.inputPoints = task.features
+        delaunayF.Run(src)
+
+        dst2 = delaunayF.dst2
+        dst3 = delaunayF.dst3
+
+        If standaloneTest() Then
+            For i = 0 To delaunayF.inputPoints.Count - 1
+                Dim pt = delaunayF.inputPoints(i)
+                DrawCircle(dst3, pt, task.DotSize, 255, -1)
+            Next
+        End If
+        If task.heartBeat Then labels(3) = CStr(task.features.Count) + " feature grid cells."
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class FPoint_Info : Inherits TaskParent
     Public Sub New()
         desc = "Display the contents of the FPoint cell."
@@ -54,7 +92,7 @@ Public Class FPoint_Info : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         If task.fpSelected.index > 0 Then
             strOut = "FPoint selected: " + vbCrLf
-            strOut += "Feature point: " + task.fpSelected.ptFeature.ToString + vbCrLf
+            strOut += "Feature point: " + task.fpSelected.pt.ToString + vbCrLf
             strOut += task.fpSelected.rect.ToString + vbCrLf
             strOut += "index = " + CStr(task.fpSelected.index) + vbCrLf
             strOut += "Facet count = " + CStr(task.fpSelected.facet2f.Count) + " facets" + vbCrLf
@@ -65,38 +103,6 @@ Public Class FPoint_Info : Inherits TaskParent
         End If
     End Sub
 End Class
-
-
-
-
-
-Public Class FPoint_Core : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Public delaunay As New Delaunay_FPoint
-    Public Sub New()
-        FindSlider("Feature Sample Size").Value = 255 ' keep within a byte boundary.
-        desc = "Divide up the image based on the features found."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-
-        delaunay.inputPoints = New List(Of cvb.Point2f)(task.features)
-        delaunay.Run(src)
-
-        dst2 = delaunay.dst2
-        dst3 = delaunay.dst3
-
-        If standaloneTest() Then
-            For Each pt In task.features
-                DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White, -1)
-            Next
-        End If
-
-        If task.heartBeat Then labels(3) = CStr(task.features.Count) + " feature grid cells."
-    End Sub
-End Class
-
-
 
 
 
@@ -187,7 +193,7 @@ Public Class FPoint_BasicsOld : Inherits TaskParent
 
         For i = 1 To fpList.Count - 1
             Dim fp = fpList(i)
-            DrawCircle(dst3, fp.ptFeature, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3, fp.pt, task.DotSize, cvb.Scalar.White)
         Next
         If task.heartBeat Then labels(3) = CStr(fpList.Count) + " feature grid entries."
     End Sub

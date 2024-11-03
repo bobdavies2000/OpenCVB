@@ -893,7 +893,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             featureRects.Clear()
             saveMat = src.Clone
             For Each pt In task.topFeatures
-                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
                 Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
                 roi = ValidateRect(roi)
                 featureRects.Add(roi)
@@ -902,7 +902,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
 
             dst2 = saveMat.Clone
             For Each pt In task.topFeatures
-                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
                 Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
                 roi = ValidateRect(roi)
                 dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
@@ -926,7 +926,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
         featureRects.Clear()
         For Each roi In matchRects
             Dim pt = New cvb.Point(roi.X + half, roi.Y + half)
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
         Next
@@ -951,7 +951,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         searchRects.Clear()
         featureRects.Clear()
         For Each pt In task.topFeatures
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
             Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
             roi = ValidateRect(roi)
             featureRects.Add(roi)
@@ -960,7 +960,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
 
         dst2 = dst1.Clone
         For Each pt In task.topFeatures
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
             Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
             roi = ValidateRect(roi)
             dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
@@ -992,7 +992,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         featureRects.Clear()
         For Each roi In matchRects
             Dim pt = New cvb.Point(roi.X + half, roi.Y + half)
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
         Next

@@ -1663,10 +1663,10 @@ Public Class Main_UI
                     picLabels = task.labels
                     motionLabel = task.MotionLabel
                     SyncLock mouseLock
-                        If mousePoint.X < task.gridMap.Width And mousePoint.Y < task.gridMap.Height Then
-                            Try
-                                mouseGridCell = task.gridMap.Get(Of Integer)(mousePoint.Y, mousePoint.X)
-                            Catch ex As Exception
+                    If mousePoint.X < task.gridMap32S.Width And mousePoint.Y < task.gridMap32S.Height Then
+                        Try
+                            mouseGridCell = task.gridMap32S.Get(Of Integer)(mousePoint.Y, mousePoint.X)
+                        Catch ex As Exception
                             End Try
                         Else
                             mousePoint = New cvb.Point(0, 0)

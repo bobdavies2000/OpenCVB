@@ -23,14 +23,14 @@ Public Class VBtask : Implements IDisposable
     Public subDivisions As New List(Of Integer)
     Public subDivisionCount As Integer = 9
     Public gridMask As cvb.Mat
-    Public gridMap As New cvb.Mat
+    Public gridMap32S As New cvb.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridNabeRects As New List(Of cvb.Rect)
     Public gridROIclicked As Integer
 
-    Public fGridList As New List(Of fPoint)
-    Public fGridOutline As cvb.Mat
-    Public fGridMap As cvb.Mat
+    Public fpList As New List(Of fPoint)
+    Public fpOutline As cvb.Mat
+    Public fpMap As cvb.Mat
     Public fpSelected As New fPoint
     Public fPointMinDistance As Integer
 
@@ -433,9 +433,9 @@ Public Class VBtask : Implements IDisposable
                                "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
         End If
 
-        fGridList.Clear()
-        fGridOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
-        fGridMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        fpList.Clear()
+        fpOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        fpMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         fpSelected = New fPoint
 
         If parms.useRecordedData Then recordedData = New Replay_Play()
