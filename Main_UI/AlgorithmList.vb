@@ -624,7 +624,6 @@ End Enum
 	If algorithmName = "Delaunay_ConsistentColor_CS" Then return new Delaunay_ConsistentColor_CS
 	If algorithmName = "Delaunay_Contours" Then return new Delaunay_Contours
 	If algorithmName = "Delaunay_Contours_CS" Then return new Delaunay_Contours_CS
-	If algorithmName = "Delaunay_FPoint" Then return new Delaunay_FPoint
 	If algorithmName = "Delaunay_Generations" Then return new Delaunay_Generations
 	If algorithmName = "Delaunay_Generations_CC" Then return new CPP_Basics(ccFunctionNames._Delaunay_Generations_CC)
 	If algorithmName = "Delaunay_Generations_CS" Then return new Delaunay_Generations_CS
@@ -1011,6 +1010,13 @@ End Enum
 	If algorithmName = "Face_Haar_Alt_CS" Then return new Face_Haar_Alt_CS
 	If algorithmName = "Face_Haar_LBP" Then return new Face_Haar_LBP
 	If algorithmName = "Face_Haar_LBP_CS" Then return new Face_Haar_LBP_CS
+	If algorithmName = "FCS_Basics" Then return new FCS_Basics
+	If algorithmName = "FCS_BasicsOld" Then return new FCS_BasicsOld
+	If algorithmName = "FCS_Core" Then return new FCS_Core
+	If algorithmName = "FCS_Delaunay" Then return new FCS_Delaunay
+	If algorithmName = "FCS_Info" Then return new FCS_Info
+	If algorithmName = "FCS_Lines" Then return new FCS_Lines
+	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "Feature_Agast" Then return new Feature_Agast
 	If algorithmName = "Feature_Agast_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Agast_CC)
 	If algorithmName = "Feature_Agast_CS" Then return new Feature_Agast_CS
@@ -1234,12 +1240,6 @@ End Enum
 	If algorithmName = "Foreground_KMeans_CS" Then return new Foreground_KMeans_CS
 	If algorithmName = "Foreground_RedCloud" Then return new Foreground_RedCloud
 	If algorithmName = "Foreground_RedCloud_CS" Then return new Foreground_RedCloud_CS
-	If algorithmName = "FPoint_Basics" Then return new FPoint_Basics
-	If algorithmName = "FPoint_BasicsOld" Then return new FPoint_BasicsOld
-	If algorithmName = "FPoint_Core" Then return new FPoint_Core
-	If algorithmName = "FPoint_Info" Then return new FPoint_Info
-	If algorithmName = "FPoint_Lines" Then return new FPoint_Lines
-	If algorithmName = "FPoint_NoTracking" Then return new FPoint_NoTracking
 	If algorithmName = "FPoly_Basics" Then return new FPoly_Basics
 	If algorithmName = "FPoly_Basics_CS" Then return new FPoly_Basics_CS
 	If algorithmName = "FPoly_BasicsOriginal" Then return new FPoly_BasicsOriginal

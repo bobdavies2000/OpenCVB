@@ -71,6 +71,7 @@ Erode
 Etch
 Extrinsics
 Face
+FCS
 Feature
 FeatureFlow
 FeatureLeftRight
@@ -86,7 +87,6 @@ Flip
 Flood
 Font
 Foreground
-FPoint
 FPoly
 Fractal
 FrameRate

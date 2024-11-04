@@ -1,18 +1,18 @@
 ﻿Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class FPoint_Basics : Inherits TaskParent
-    Dim fpt As New FPoint_Core
-    Dim fInfo As New FPoint_Info
+Public Class FCS_Basics : Inherits TaskParent
+    Dim fCore As New FCS_Core
+    Dim fInfo As New FCS_Info
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         FindSlider("Min Distance to next").Value = task.fPointMinDistance
         FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
         labels(1) = "The index for each of the cells (if standalonetest)"
-        desc = "Create the fpList with rect, mask, index, and facets"
+        desc = "Feature Coordinate System (FCS) - Create the fpList with rect, mask, index, and facets"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        fpt.Run(src)
+        fCore.Run(src)
 
         dst2.SetTo(0)
         For i = 0 To task.fpList.Count - 1
@@ -57,25 +57,25 @@ End Class
 
 
 
-Public Class FPoint_Core : Inherits TaskParent
+Public Class FCS_Core : Inherits TaskParent
     Dim feat As New Feature_Basics
-    Public delaunayF As New Delaunay_FPoint
+    Public fcs As New FCS_Delaunay
     Public Sub New()
         FindSlider("Feature Sample Size").Value = 255 ' keep within a byte boundary.
-        desc = "Divide up the image based on the features found."
+        desc = "Feature Coordinate System (FCS) - Divide up the image based on the features found."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
 
-        delaunayF.inputPoints = task.features
-        delaunayF.Run(src)
+        fcs.inputPoints = task.features
+        fcs.Run(src)
 
-        dst2 = delaunayF.dst2
-        dst3 = delaunayF.dst3
+        dst2 = fcs.dst2
+        dst3 = fcs.dst3
 
         If standaloneTest() Then
-            For i = 0 To delaunayF.inputPoints.Count - 1
-                Dim pt = delaunayF.inputPoints(i)
+            For i = 0 To fcs.inputPoints.Count - 1
+                Dim pt = fcs.inputPoints(i)
                 DrawCircle(dst3, pt, task.DotSize, 255, -1)
             Next
         End If
@@ -88,13 +88,13 @@ End Class
 
 
 
-Public Class FPoint_Info : Inherits TaskParent
+Public Class FCS_Info : Inherits TaskParent
     Public Sub New()
-        desc = "Display the contents of the FPoint cell."
+        desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.fpSelected.index > 0 Then
-            strOut = "FPoint selected: " + vbCrLf
+            strOut = "FCS cell selected: " + vbCrLf
             strOut += "Feature point: " + task.fpSelected.pt.ToString + vbCrLf
             strOut += task.fpSelected.rect.ToString + vbCrLf
             strOut += "index = " + CStr(task.fpSelected.index) + vbCrLf
@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class FPoint_BasicsOld : Inherits TaskParent
+Public Class FCS_BasicsOld : Inherits TaskParent
     Public fpList As New List(Of fPoint)
     Public fpMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
     Dim feat As New Feature_Basics
@@ -206,7 +206,7 @@ End Class
 
 
 
-Public Class FPoint_NoTracking : Inherits TaskParent
+Public Class FCS_NoTracking : Inherits TaskParent
     Public inputPoints As New List(Of cvb.Point2f)
     Public facetList As New List(Of List(Of cvb.Point))
     Public facet32s As cvb.Mat
@@ -264,7 +264,7 @@ End Class
 
 
 
-Public Class FPoint_Lines : Inherits TaskParent
+Public Class FCS_Lines : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim feat As New Feature_Basics
     Dim edges As New Edge_Basics
@@ -286,5 +286,83 @@ Public Class FPoint_Lines : Inherits TaskParent
         For Each pt In task.features
             DrawCircle(dst1, pt, task.DotSize, task.HighlightColor)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_Delaunay : Inherits TaskParent
+    Public inputPoints As New List(Of cvb.Point2f)
+    Dim facetList As New List(Of List(Of cvb.Point))
+    Dim subdiv As New cvb.Subdiv2D
+    Public Sub New()
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        labels(3) = "CV_8U map of Delaunay cells"
+        desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static feat As New Feature_Basics
+            feat.Run(src)
+            inputPoints = task.features
+        End If
+
+        subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
+        subdiv.Insert(inputPoints)
+
+        Dim facets = New cvb.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        task.fpList.Clear()
+        Dim mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+        For i = 0 To facets.Length - 1
+            Dim fp = New fPoint
+            fp.facet2f = New List(Of Point2f)(facets(i))
+            fp.facets = New List(Of cvb.Point)
+            fp.index = i
+
+            Dim xlist As New List(Of Integer)
+            Dim ylist As New List(Of Integer)
+            For j = 0 To facets(i).Length - 1
+                Dim pt = New cvb.Point(facets(i)(j).X, facets(i)(j).Y)
+                xlist.Add(pt.X)
+                ylist.Add(pt.Y)
+                fp.facets.Add(pt)
+            Next
+
+            Dim minx = xlist.Min, miny = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
+            fp.rect = ValidateRect(New cvb.Rect(minx, miny, maxX - minx, maxY - miny))
+
+            mask32s(fp.rect).SetTo(0)
+            mask32s.FillConvexPoly(fp.facets, 255, task.lineType)
+            mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
+            fp.pt = task.features(i)
+            task.fpList.Add(fp)
+        Next
+
+        dst3.SetTo(0)
+        For Each fp In task.fpList
+            dst3(fp.rect).SetTo(fp.index, fp.mask)
+        Next
+
+        task.fpOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        For i = 0 To facets.Length - 1
+            Dim ptList As New List(Of cvb.Point)
+            For j = 0 To facets(i).Length - 1
+                ptList.Add(New cvb.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            DrawContour(task.fpOutline, ptList, 255, 1)
+        Next
+
+        dst2 = ShowPalette(dst3)
+
+        If standalone Then
+            dst2.SetTo(cvb.Scalar.White, task.fpOutline)
+        End If
+        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
 End Class
