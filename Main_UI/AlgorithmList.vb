@@ -1015,6 +1015,7 @@ End Enum
 	If algorithmName = "FCS_Delaunay" Then return new FCS_Delaunay
 	If algorithmName = "FCS_Info" Then return new FCS_Info
 	If algorithmName = "FCS_Lines" Then return new FCS_Lines
+	If algorithmName = "FCS_LinesAndEdges" Then return new FCS_LinesAndEdges
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "Feature_Agast" Then return new Feature_Agast
 	If algorithmName = "Feature_Agast_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Agast_CC)
@@ -1933,6 +1934,7 @@ End Enum
 	If algorithmName = "Line_TimeViewLines" Then return new Line_TimeViewLines
 	If algorithmName = "Line_TimeViewLines_CS" Then return new Line_TimeViewLines_CS
 	If algorithmName = "Line_TopXlines" Then return new Line_TopXlines
+	If algorithmName = "Line_Unordered" Then return new Line_Unordered
 	If algorithmName = "Line_Vertical" Then return new Line_Vertical
 	If algorithmName = "Line_VerticalHorizontal" Then return new Line_VerticalHorizontal
 	If algorithmName = "Line_VerticalHorizontal1" Then return new Line_VerticalHorizontal1

@@ -217,7 +217,6 @@ Public Class fPoint ' feature point
     Public facet2f As List(Of cvb.Point2f)
     Public facets As List(Of cvb.Point)
     Public pt As cvb.Point2f
-    Public pt3D As cvb.Point3f
 End Class
 
 

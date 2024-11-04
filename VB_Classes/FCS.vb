@@ -5,7 +5,9 @@ Public Class FCS_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim fcs As New FCS_Delaunay
     Dim fInfo As New FCS_Info
+    Public features As New List(Of cvb.Point2f)
     Public Sub New()
+        features = task.features
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
         FindSlider("Min Distance to next").Value = task.fPointMinDistance
@@ -17,15 +19,15 @@ Public Class FCS_Basics : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         dst0 = src.Clone
 
-        feat.Run(src)
+        If standalone Then feat.Run(src)
 
-        fcs.inputPoints = task.features
+        fcs.inputPoints = features
         fcs.Run(src)
 
         dst2 = fcs.dst2
         task.fpMap = fcs.dst3.Clone
 
-        If task.heartBeat Then labels(3) = CStr(task.features.Count) + " feature grid cells."
+        If task.heartBeat Then labels(3) = CStr(features.Count) + " feature grid cells."
 
         dst2.SetTo(0, task.fpOutline)
         If standaloneTest() Then
@@ -36,10 +38,11 @@ Public Class FCS_Basics : Inherits TaskParent
             Next
         End If
 
-        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " feature grid cells."
+        If task.heartBeat Then labels(2) = CStr(features.Count) + " feature grid cells."
 
         If task.ClickPoint <> newPoint Then
             fInfo.Run(empty)
+            strOut = fInfo.strOut
 
             Dim fp = task.fpSelected
             dst2(fp.rect).SetTo(white, fp.mask)
@@ -47,11 +50,81 @@ Public Class FCS_Basics : Inherits TaskParent
             dst0.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
             dst1.SetTo(0)
             dst1.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
-            SetTrueText(fInfo.strOut, 3)
+            SetTrueText(strOut, 3)
         End If
     End Sub
 End Class
 
+
+
+
+
+Public Class FCS_Lines : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Dim fcs As New FCS_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
+        labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
+        desc = "Use lines as input to FCS."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst0 = src
+
+        lines.Run(src)
+        dst2 = lines.dst3
+
+        fcs.features.Clear()
+        For Each lp In lines.lpList
+            fcs.features.Add(lp.center)
+        Next
+
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        dst2.SetTo(white, lines.dst3)
+
+        For i = 0 To lines.lpList.Count - 1
+            Dim lp = lines.lpList(i)
+            DrawCircle(dst2, lp.center, task.DotSize, red, -1)
+            dst0.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+            SetTrueText(CStr(i), lp.center, 1)
+        Next
+
+        SetTrueText(fcs.strOut, 3)
+        If task.heartBeat Then labels(2) = CStr(fcs.features.Count) + " lines were found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_LinesAndEdges : Inherits TaskParent
+    Dim lines As New Line_Basics
+    Dim feat As New Feature_Basics
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
+        desc = "Run Feature_Basics and Line_Basics for comparison."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        edges.Run(src)
+        dst1 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+
+        lines.Run(src)
+        dst2 = lines.dst3
+
+        feat.Run(src)
+        dst3 = feat.dst2
+
+        For Each pt In task.features
+            DrawCircle(dst1, pt, task.DotSize, task.HighlightColor)
+        Next
+    End Sub
+End Class
 
 
 
@@ -85,7 +158,7 @@ Public Class FCS_Info : Inherits TaskParent
             strOut += "Pointcloud entry: " + Format(vec.X, fmt1) + "/" + Format(vec.Y, fmt1) + "/" + Format(vec.Z, fmt1) + vbCrLf
 
             strOut += vbCrLf + vbCrLf + "NOTE: " + vbTab + "At image edges (only), the rect may appear larger"
-            strOut += vbCrLf + vbTab + "than necessary because the delaunay intersection " + vbCrLf
+            strOut += vbCrLf + vbTab + "than necessary because the Delaunay intersection " + vbCrLf
             strOut += vbTab + "points are well off screen."
         End If
         If standalone Then
@@ -251,34 +324,6 @@ End Class
 
 
 
-Public Class FCS_Lines : Inherits TaskParent
-    Dim lines As New Line_Basics
-    Dim feat As New Feature_Basics
-    Dim edges As New Edge_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
-        desc = "Run Feature_Basics and Line_Basics for comparison."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        edges.Run(src)
-        dst1 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
-
-        lines.Run(src)
-        dst2 = lines.dst3
-
-        feat.Run(src)
-        dst3 = feat.dst2
-
-        For Each pt In task.features
-            DrawCircle(dst1, pt, task.DotSize, task.HighlightColor)
-        Next
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class FCS_Delaunay : Inherits TaskParent
@@ -327,7 +372,6 @@ Public Class FCS_Delaunay : Inherits TaskParent
             mask32s.FillConvexPoly(fp.facets, white, task.lineType)
             mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
             fp.pt = task.features(i)
-            fp.pt3D = task.pointCloud.Get(Of cvb.Vec3f)(fp.pt.Y, fp.pt.X)
             task.fpList.Add(fp)
         Next
 

@@ -1,5 +1,39 @@
+Imports System.Windows.Documents
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
+    Public lines As New Line_Unordered
+    Public lpList As New List(Of PointPair)
+    Public Sub New()
+        desc = "Create a feature coordinate layout for line endpoints."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lines.Run(src)
+
+        Dim ptSort As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalInteger)
+        For Each lp In lines.lpList
+            Dim val = task.gridMap32S.Get(Of Integer)(lp.center.Y, lp.center.X)
+            ptSort.Add(val, lp)
+        Next
+
+        lpList = New List(Of PointPair)(ptSort.Values)
+        dst2 = lines.dst2
+
+        If standaloneTest() Then
+            For i = 0 To lpList.Count - 1
+                Dim lp = lpList(i)
+                SetTrueText(CStr(i), lp.center, 3)
+            Next
+        End If
+
+        If task.heartBeat Then labels(2) = CStr(lpList.Count) + " lines were identified."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Unordered : Inherits TaskParent
     Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
     Public Sub New()
@@ -111,7 +145,7 @@ End Class
 Public Class Line_Core : Inherits TaskParent
     Dim ld As cvb.XImgProc.FastLineDetector
     Public lpList As New List(Of PointPair)
-    Public lineColor = white
+    Public lineColor As cvb.Vec3b = white
     Public options As New Options_Line
     Public Sub New()
         ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -697,7 +731,7 @@ Public Class Line_FromContours : Inherits TaskParent
     Dim contours As New Contour_Gray
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
-        lines.lineColor = cvb.Scalar.Red
+        lines.lineColor = red
         UpdateAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
         desc = "Find the lines in the contours."
     End Sub
