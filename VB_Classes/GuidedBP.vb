@@ -77,7 +77,7 @@ Public Class GuidedBP_HotPointsKNN : Inherits TaskParent
             Dim dist = p1.DistanceTo(p2)
             Dim r = rectList(i)
             If dist < r.Width / 2 And dist < r.Height / 2 Then
-                dst.Rectangle(r, cvb.Scalar.White, task.lineWidth)
+                dst.Rectangle(r, white, task.lineWidth)
                 Dim pt = New cvb.Point(r.X + r.Width, r.Y + r.Height)
                 SetTrueText(CStr(index), pt, dstindex)
             End If
@@ -121,7 +121,7 @@ Public Class GuidedBP_PlanesPlot : Inherits TaskParent
         For i = 0 To dst2.Rows - 1
             Dim x = dst2.Row(i).CountNonZero
             sumList.Add(x)
-            DrawLine(dst3, New cvb.Point(0, i), New cvb.Point(x, i), cvb.Scalar.White)
+            DrawLine(dst3, New cvb.Point(0, i), New cvb.Point(x, i), white)
         Next
 
         Dim flatSurfacesInRow As New List(Of Integer)

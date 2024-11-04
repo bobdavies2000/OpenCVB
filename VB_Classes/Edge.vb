@@ -264,7 +264,7 @@ Public Class Edge_DCTinput : Inherits TaskParent
         dst2 = edges.dst2.Clone
 
         dct.Run(src)
-        Dim tmp = src.SetTo(cvb.Scalar.White, dct.dst2)
+        Dim tmp = src.SetTo(white, dct.dst2)
         edges.Run(tmp)
         dst3 = edges.dst2
     End Sub
@@ -1013,7 +1013,7 @@ Public Class Edge_BackProjection : Inherits TaskParent
         Dim offset = 1
         Dim r1 = New cvb.Rect(offset, offset, dst2.Width - offset - 1, dst2.Height - offset - 1)
         Dim r2 = New cvb.Rect(0, 0, dst2.Width - offset - 1, dst2.Height - offset - 1)
-        dst3.SetTo(cvb.Scalar.White)
+        dst3.SetTo(white)
         dst3(r1).SetTo(cvb.Scalar.Blue, canny.dst2(r2))
         dst3.SetTo(cvb.Scalar.Red, dst1)
         labels(2) = valley.labels(3)
@@ -1297,8 +1297,8 @@ Public Class Edge_DiffX_CPP_VB : Inherits TaskParent
 
         dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr)
         dst3 = segments.dst3
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
     Public Sub Close()
         Edge_DiffX_Close(cPtr)
@@ -1330,8 +1330,8 @@ Public Class Edge_DiffY_CPP_VB : Inherits TaskParent
 
         dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr)
         dst3 = segments.dst3
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
     Public Sub Close()
         Edge_DiffY_Close(cPtr)
@@ -1363,8 +1363,8 @@ Public Class Edge_DiffZ_CPP_VB : Inherits TaskParent
 
         dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr)
         dst3 = segments.dst3
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
     Public Sub Close()
         Edge_DiffY_Close(cPtr)

@@ -234,7 +234,7 @@ Public Class EMax_PointTracker : Inherits TaskParent
             Dim p2 = knn.trainInput(knn.result(i, 0))
             DrawCircle(dst3,p1, task.DotSize, task.HighlightColor)
             DrawCircle(dst3,p2, task.DotSize, cvb.Scalar.Red)
-            DrawLine(dst3, p1, p2, cvb.Scalar.White)
+            DrawLine(dst3, p1, p2, white)
         Next
         knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
         dst2 = dst2 Or emax.emaxInput.dst2

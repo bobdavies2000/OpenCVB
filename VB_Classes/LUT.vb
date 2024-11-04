@@ -177,7 +177,7 @@ Public Class LUT_Watershed : Inherits TaskParent
         dst3 = lut.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
         edges.Run(src)
-        dst3.SetTo(cvb.Scalar.White, edges.dst2)
+        dst3.SetTo(white, edges.dst2)
 
         wShed.Run(dst3)
         dst2 = wShed.dst3

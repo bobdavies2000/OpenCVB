@@ -160,7 +160,7 @@ Public Class KNN_NoDups : Inherits TaskParent
             Else
                 Dim nn = knn.trainInput(neighbors(i))
                 matches.Add(New PointPair(pt, nn))
-                DrawLine(dst3, nn, pt, cvb.Scalar.White)
+                DrawLine(dst3, nn, pt, white)
             End If
         Next
         If standaloneTest() = False Then knn.trainInput = New List(Of cvb.Point2f)(queries)
@@ -639,11 +639,11 @@ Public Class KNN_TrackMean : Inherits TaskParent
         Dim xLabel As String, yLabel As String
         shiftX = multiplier * plotDiff(diffX, " X ", 3, xLabel)
         dst3 = plot.dst2.Clone
-        dst3.Line(New cvb.Point(plot.plotCenter, 0), New cvb.Point(plot.plotCenter, dst2.Height), cvb.Scalar.White, 1)
+        dst3.Line(New cvb.Point(plot.plotCenter, 0), New cvb.Point(plot.plotCenter, dst2.Height), white, 1)
 
         shiftY = multiplier * plotDiff(diffY, " Y ", 1, yLabel)
         dst1 = plot.dst2
-        dst1.Line(New cvb.Point(plot.plotCenter, 0), New cvb.Point(plot.plotCenter, dst2.Height), cvb.Scalar.White, 1)
+        dst1.Line(New cvb.Point(plot.plotCenter, 0), New cvb.Point(plot.plotCenter, dst2.Height), white, 1)
 
         lastImage = src.Clone
 
@@ -651,7 +651,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
         If motionTrack.Count > task.fpsRate Then motionTrack.RemoveAt(0)
         Dim lastpt = motionTrack(0)
         For Each pt In motionTrack
-            DrawLine(dst2, pt, lastpt, cvb.Scalar.White)
+            DrawLine(dst2, pt, lastpt, white)
             lastpt = pt
         Next
         SetTrueText(yLabel, 1)
@@ -923,7 +923,7 @@ Public Class KNN_NoDupsOld : Inherits TaskParent
                 If nearest(i) < knn.trainInput.Count Then ' there seems like a boundary condition when there is only 1 traininput...
                     Dim nn = knn.trainInput(nearest(i))
                     matches.Add(New PointPair(pt, nn))
-                    DrawLine(dst3, nn, pt, cvb.Scalar.White)
+                    DrawLine(dst3, nn, pt, white)
                 End If
             End If
         Next
@@ -977,7 +977,7 @@ Public Class KNN_Farthest : Inherits TaskParent
 
         Dim maxIndex = distances.IndexOf(distances.Max())
         mpFar = farthest(maxIndex)
-        DrawLine(dst3, mpFar.p1, mpFar.p2, cvb.Scalar.White)
+        DrawLine(dst3, mpFar.p1, mpFar.p2, white)
     End Sub
 End Class
 

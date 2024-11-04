@@ -46,7 +46,7 @@ Public Class Kalman_Basics : Inherits TaskParent
                 kInput = New Single() {r.X, r.Y, r.Width, r.Height}
             End If
             lastRect = rect
-            dst2.Rectangle(rect, cvb.Scalar.White, task.lineWidth + 1)
+            dst2.Rectangle(rect, white, task.lineWidth + 1)
             dst2.Rectangle(rect, cvb.Scalar.Red, task.lineWidth)
         End If
     End Sub
@@ -152,9 +152,9 @@ Public Class Kalman_RotatingPoint : Inherits TaskParent
         Dim measPt = calcPoint(center, radius, measAngle)
 
         dst2.SetTo(0)
-        drawCross(dst2, statePt, cvb.Scalar.White)
-        drawCross(dst2, measPt, cvb.Scalar.White)
-        drawCross(dst2, predictPt, cvb.Scalar.White)
+        drawCross(dst2, statePt, white)
+        drawCross(dst2, measPt, white)
+        drawCross(dst2, predictPt, white)
         dst2.Line(statePt, measPt, New cvb.Scalar(0, 0, 255), task.lineWidth + 2, task.lineType)
         dst2.Line(statePt, predictPt, New cvb.Scalar(0, 255, 255), task.lineWidth + 2, task.lineType)
 

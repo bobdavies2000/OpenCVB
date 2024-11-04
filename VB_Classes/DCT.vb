@@ -152,7 +152,7 @@ Public Class DCT_Surfaces_debug : Inherits TaskParent
         ' If task.heartBeat Then flow.msgs.Clear()
 
         mats.mat(0) = src.Clone
-        mats.mat(0).SetTo(cvb.Scalar.White, task.gridMask)
+        mats.mat(0).SetTo(white, task.gridMask)
 
         dct.Run(src)
         mats.mat(1) = dct.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone()

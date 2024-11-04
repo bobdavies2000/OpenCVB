@@ -218,6 +218,6 @@ Public Class Fractal_Dimension : Inherits TaskParent
         If task.rc.rect.Width = 0 Or task.rc.rect.Height = 0 Then Exit Sub
         task.rc.mask.CopyTo(dst3(New cvb.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)))
         If rect.Width < rect.Height Then rect.Width = rect.Height Else rect.Height = rect.Width
-        dst3.Rectangle(rect, cvb.Scalar.White, task.lineWidth, task.lineType)
+        dst3.Rectangle(rect, white, task.lineWidth, task.lineType)
     End Sub
 End Class

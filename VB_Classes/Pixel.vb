@@ -315,9 +315,9 @@ Public Class Pixel_SampleColor : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Rectangle(random.range, cvb.Scalar.White, 1)
+            dst2.Rectangle(random.range, white, 1)
             For Each pt In random.PointList
-                DrawCircle(dst2,pt, task.DotSize, cvb.Scalar.White)
+                DrawCircle(dst2,pt, task.DotSize, white)
             Next
             labels(2) = "Dominant color value = " + CStr(maskColor(0)) + ", " + CStr(maskColor(1)) + ", " + CStr(maskColor(2))
             SetTrueText("Draw in the image to select a region for testing.", New cvb.Point(10, 200), 3)
@@ -934,9 +934,9 @@ Public Class Pixel_Sampler : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Rectangle(random.range, cvb.Scalar.White, 1)
+            dst2.Rectangle(random.range, white, 1)
             For Each pt In random.PointList
-                DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+                DrawCircle(dst2, pt, task.DotSize, white)
             Next
             labels(2) = "Dominant gray value = " + CStr(dominantGray)
             SetTrueText("Draw in the image to select a region for testing.", New cvb.Point(10, 200), 3)

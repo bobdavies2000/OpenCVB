@@ -29,7 +29,7 @@ Public Class PointCloud_Basics : Inherits TaskParent
                 If vec.Z > 0 Then
                     If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.X < vec.X) Or lastVec.Z = 0 Then
                         actualCount += 1
-                        DrawCircle(dst2, New cvb.Point(x, y), task.DotSize, cvb.Scalar.White)
+                        DrawCircle(dst2, New cvb.Point(x, y), task.DotSize, white)
                         vecList.Add(vec)
                         xyVec.Add(New cvb.Point(x, y))
                     Else
@@ -61,7 +61,7 @@ Public Class PointCloud_Basics : Inherits TaskParent
                 If vec.Z > 0 Then
                     If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.Y < vec.Y) Or lastVec.Z = 0 Then
                         actualCount += 1
-                        DrawCircle(dst2, New cvb.Point(x, y), task.DotSize, cvb.Scalar.White)
+                        DrawCircle(dst2, New cvb.Point(x, y), task.DotSize, white)
                         vecList.Add(vec)
                         xyVec.Add(New cvb.Point(x, y))
                     Else
@@ -312,8 +312,8 @@ Public Class PointCloud_SetupSide : Inherits TaskParent
         Dim fovTop = New cvb.Point(dst2.Width, cam.Y - y)
         Dim fovBot = New cvb.Point(dst2.Width, cam.Y + y)
 
-        dst2.Line(cam, fovTop, cvb.Scalar.White, 1, task.lineType)
-        dst2.Line(cam, fovBot, cvb.Scalar.White, 1, task.lineType)
+        dst2.Line(cam, fovTop, white, 1, task.lineType)
+        dst2.Line(cam, fovBot, white, 1, task.lineType)
 
         DrawCircle(dst2, markerLeft, task.DotSize + 3, cvb.Scalar.Red)
         DrawCircle(dst2, markerRight, task.DotSize + 3, cvb.Scalar.Red)
@@ -379,7 +379,7 @@ Public Class PointCloud_SetupTop : Inherits TaskParent
         Dim fovRight = New cvb.Point(task.topCameraPoint.X + x, 0)
         Dim fovLeft = New cvb.Point(task.topCameraPoint.X - x, fovRight.Y)
 
-        dst2.Line(task.topCameraPoint, fovLeft, cvb.Scalar.White, 1, task.lineType)
+        dst2.Line(task.topCameraPoint, fovLeft, white, 1, task.lineType)
 
         DrawCircle(dst2, markerLeft, task.DotSize + 3, cvb.Scalar.Red)
         DrawCircle(dst2, markerRight, task.DotSize + 3, cvb.Scalar.Red)
@@ -389,7 +389,7 @@ Public Class PointCloud_SetupTop : Inherits TaskParent
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cvb.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16)
         SetTrueText("hFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cvb.Point(4, dst2.Height * 7 / 8))
-        DrawLine(dst2, task.topCameraPoint, fovRight, cvb.Scalar.White)
+        DrawLine(dst2, task.topCameraPoint, fovRight, white)
     End Sub
 End Class
 
@@ -442,7 +442,7 @@ Public Class PointCloud_Raw : Inherits TaskParent
         Dim range As Single = task.MaxZmeters
 
         ' this VB.Net version is much slower than the optimized C++ version below.
-        dst2 = src.EmptyClone.SetTo(cvb.Scalar.White)
+        dst2 = src.EmptyClone.SetTo(white)
         dst3 = dst2.Clone()
         Dim black = New cvb.Vec3b(0, 0, 0)
         Parallel.ForEach(task.gridRects,
@@ -683,7 +683,7 @@ Public Class PointCloud_PCpointsMask : Inherits TaskParent
 
                     pcPoints.Set(Of cvb.Point3f)(y, x, New cvb.Point3f(mean(0), mean(1), mean(2)))
                     actualCount += 1
-                    DrawCircle(dst2, New cvb.Point(roi.X, roi.Y), task.DotSize * Math.Max(mean(2), 1), cvb.Scalar.White)
+                    DrawCircle(dst2, New cvb.Point(roi.X, roi.Y), task.DotSize * Math.Max(mean(2), 1), white)
                 End If
                 lastMeanZ = mean(2)
             Next
@@ -707,7 +707,7 @@ Public Class PointCloud_PCPoints : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         Dim rw = task.gridRects(0).Width / 2, rh = task.gridRects(0).Height / 2
         Dim red32 = New cvb.Point3f(0, 0, 1), blue32 = New cvb.Point3f(1, 0, 0), white32 = New cvb.Point3f(1, 1, 1)
-        Dim red = cvb.Scalar.Red, blue = cvb.Scalar.Blue, white = cvb.Scalar.White
+        Dim red = cvb.Scalar.Red, blue = cvb.Scalar.Blue
 
         pcPoints.Clear()
         dst2 = src
@@ -787,7 +787,7 @@ Public Class PointCloud_Inspector : Inherits TaskParent
         For i = 1 To yLines - 1
             Dim pt1 = New cvb.Point2f(dst2.Width, i * stepY)
             Dim pt2 = New cvb.Point2f(0, i * stepY)
-            DrawLine(dst2, pt1, pt2, cvb.Scalar.White)
+            DrawLine(dst2, pt1, pt2, white)
 
             Dim pt = New cvb.Point2f(cLine, i * stepY)
             Dim xyz = task.pointCloud.Get(Of cvb.Vec3f)(pt.Y, pt.X)

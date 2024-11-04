@@ -43,7 +43,7 @@ Public Class SVM_Basics : Inherits TaskParent
             For x = 1 To src.Height - 1
                 Dim y1 = CInt(sampleData.inputFunction(x - 1))
                 Dim y2 = CInt(sampleData.inputFunction(x))
-                DrawLine(dst3, New cvb.Point2f(x - 1, y1), New cvb.Point2f(x, y2), cvb.Scalar.White)
+                DrawLine(dst3, New cvb.Point2f(x - 1, y1), New cvb.Point2f(x, y2), white)
             Next
         End If
     End Sub
@@ -106,7 +106,7 @@ Public Class SVM_TestCase : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        dst2.SetTo(cvb.Scalar.White)
+        dst2.SetTo(white)
         dst3.SetTo(0)
         Dim labeled = 1
         Dim nonlabel = -1
@@ -190,7 +190,7 @@ Public Class SVM_ReuseBasics : Inherits TaskParent
         svm.Run(src)
         dst3 = svm.dst3
 
-        dst2.SetTo(cvb.Scalar.White)
+        dst2.SetTo(white)
         For i = 0 To svm.points.Count - 1
             Dim color = If(svm.response(i) = 1, cvb.Scalar.Blue, cvb.Scalar.Red)
             DrawCircle(dst2,svm.points(i), task.DotSize, color)

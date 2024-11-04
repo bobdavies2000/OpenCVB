@@ -157,7 +157,7 @@ Public Class Corners_BasicsCentroid : Inherits TaskParent
         dst2 = fast.dst2
         dst3.SetTo(0)
         For Each pt In fast.features
-            DrawCircle(dst3, pt, task.DotSize + 2, cvb.Scalar.White)
+            DrawCircle(dst3, pt, task.DotSize + 2, white)
         Next
         Dim gray = dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Dim m = cvb.Cv2.Moments(gray, True)
@@ -238,7 +238,7 @@ Public Class Corners_BasicsCentroids : Inherits TaskParent
         For i = 0 To fastCenters.Count - 1
             DrawCircle(dst2, fastCenters(i), task.DotSize, cvb.Scalar.Yellow)
         Next
-        dst2.SetTo(cvb.Scalar.White, task.gridMask)
+        dst2.SetTo(white, task.gridMask)
     End Sub
 End Class
 

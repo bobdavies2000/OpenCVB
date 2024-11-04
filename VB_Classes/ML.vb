@@ -284,7 +284,7 @@ Public Class ML_FillRGBDepth_MT : Inherits TaskParent
 
         colorizer.Run(task.pcSplit(2))
         dst2 = colorizer.dst2.Clone()
-        dst2.SetTo(cvb.Scalar.White, task.gridMask)
+        dst2.SetTo(white, task.gridMask)
     End Sub
 End Class
 

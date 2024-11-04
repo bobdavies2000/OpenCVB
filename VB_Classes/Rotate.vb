@@ -64,7 +64,7 @@ Public Class Rotate_Box : Inherits TaskParent
 
         Dim r = task.drawRect
         dst2 = src.Clone()
-        dst2.Rectangle(r, cvb.Scalar.White, 1)
+        dst2.Rectangle(r, white, 1)
 
         Dim center = New cvb.Point2f(r.X + r.Width / 2, r.Y + r.Height / 2)
         Dim drawBox = New cvb.RotatedRect(center, New cvb.Size2f(r.Width, r.Height), 0)
@@ -80,7 +80,7 @@ Public Class Rotate_Box : Inherits TaskParent
         For i = 0 To dstpoints.Width - 1
             Dim p1 = dstpoints.Get(Of cvb.Point2f)(0, i)
             Dim p2 = dstpoints.Get(Of cvb.Point2f)(0, (i + 1) Mod 4)
-            dst3.Line(p1, p2, cvb.Scalar.White, task.lineWidth + 1, task.lineType)
+            dst3.Line(p1, p2, white, task.lineWidth + 1, task.lineType)
         Next
     End Sub
 End Class
@@ -242,7 +242,7 @@ Public Class Rotate_Horizon : Inherits TaskParent
         horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle)
 
         DrawLine(dst2, horizonVec.p1, horizonVec.p2, task.HighlightColor)
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
 
         Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
         Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y

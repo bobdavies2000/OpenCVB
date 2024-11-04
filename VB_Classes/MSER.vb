@@ -485,7 +485,7 @@ Public Class MSER_Mask_CPP_VB : Inherits TaskParent
         End If
         labels(3) = CStr(classCount) + " regions identified"
 
-        src.SetTo(cvb.Scalar.White, dst3)
+        src.SetTo(white, dst3)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)

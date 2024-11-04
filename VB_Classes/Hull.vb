@@ -21,7 +21,7 @@ Public Class Hull_Basics : Inherits TaskParent
             random.Run(empty)
             dst2.SetTo(0)
             For Each pt In random.PointList
-                DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+                DrawCircle(dst2, pt, task.DotSize, white)
             Next
             inputPoints = New List(Of cvb.Point2f)(random.PointList)
         End If
@@ -62,6 +62,6 @@ Public Class Hull_Contour : Inherits TaskParent
         rc.hull = cvb.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
         DrawContour(dst3, rc.contour, cvb.Scalar.LightBlue, task.lineWidth)
         If rc.hull.Count > 0 Then rc.hull.RemoveAt(rc.hull.Count - 1)
-        DrawContour(dst3, rc.hull, cvb.Scalar.White, task.lineWidth)
+        DrawContour(dst3, rc.hull, white, task.lineWidth)
     End Sub
 End Class

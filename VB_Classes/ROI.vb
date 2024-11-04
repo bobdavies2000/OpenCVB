@@ -21,7 +21,7 @@ Public Class ROI_Basics : Inherits TaskParent
 
         If aoiRect.Width > 0 And aoiRect.Height > 0 Then
             task.color.Rectangle(aoiRect, cvb.Scalar.Yellow, task.lineWidth)
-            dst2.Rectangle(aoiRect, cvb.Scalar.White, task.lineWidth)
+            dst2.Rectangle(aoiRect, white, task.lineWidth)
         End If
     End Sub
 End Class
@@ -65,7 +65,7 @@ Public Class ROI_FindNonZeroNoSingle : Inherits TaskParent
         If minX <> Integer.MaxValue Then
             aoiRect = New cvb.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
             task.color.Rectangle(aoiRect, cvb.Scalar.Yellow, task.lineWidth)
-            dst2.Rectangle(aoiRect, cvb.Scalar.White, task.lineWidth)
+            dst2.Rectangle(aoiRect, white, task.lineWidth)
         End If
     End Sub
 End Class
@@ -106,7 +106,7 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
         If aoiRect <> New cvb.Rect Then
             task.color(aoiRect).CopyTo(dst0(aoiRect))
             dst0.Rectangle(aoiRect, cvb.Scalar.Yellow, task.lineWidth)
-            dst2.Rectangle(aoiRect, cvb.Scalar.White, task.lineWidth)
+            dst2.Rectangle(aoiRect, white, task.lineWidth)
         End If
         If tmp.Rows = 0 Then Exit Sub
         For i = 0 To tmp.Rows - 1
@@ -118,7 +118,7 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
         Next
         aoiRect = New cvb.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
         dst1.CopyTo(dst2)
-        dst2.Rectangle(aoiRect, cvb.Scalar.White, task.lineWidth)
+        dst2.Rectangle(aoiRect, white, task.lineWidth)
     End Sub
 End Class
 
@@ -160,7 +160,7 @@ Public Class ROI_Accumulate : Inherits TaskParent
                 cvb.Cv2.BitwiseOr(diff.dst2, dst2, dst2)
             End If
         End If
-        dst2.Rectangle(roiRect, cvb.Scalar.White, task.lineWidth)
+        dst2.Rectangle(roiRect, white, task.lineWidth)
         task.color.Rectangle(roiRect, task.HighlightColor, task.lineWidth)
     End Sub
 End Class

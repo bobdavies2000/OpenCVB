@@ -58,7 +58,7 @@ Public Class Cluster_Basics : Inherits TaskParent
         For Each group In clusters
             For i = 0 To group.Value.Count - 1
                 For j = 0 To group.Value.Count - 1
-                    DrawLine(dst2, group.Value(i), group.Value(j), cvb.Scalar.White)
+                    DrawLine(dst2, group.Value(i), group.Value(j), white)
                 Next
             Next
         Next
@@ -101,13 +101,13 @@ Public Class Cluster_Hulls : Inherits TaskParent
                     hull.Add(New cvb.Point(pt.X, pt.Y))
                 Next
             ElseIf hullPoints.Count = 2 Then
-                DrawLine(dst3, hullPoints(0), hullPoints(1), cvb.Scalar.White)
+                DrawLine(dst3, hullPoints(0), hullPoints(1), white)
             Else
                 DrawCircle(dst3, hullPoints(0), task.DotSize, task.HighlightColor)
             End If
 
             hulls.Add(hull)
-            If (hull.Count > 0) Then DrawContour(dst3, hull, cvb.Scalar.White, task.lineWidth)
+            If (hull.Count > 0) Then DrawContour(dst3, hull, white, task.lineWidth)
         Next
         labels(3) = feat.labels(3)
     End Sub

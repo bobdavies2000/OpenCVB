@@ -17,7 +17,7 @@ Public Class MiniCloud_Basics : Inherits TaskParent
         If rect.Height < dst2.Height / 2 Then rect.Y = dst2.Height / 4 ' move it below the dst2 caption
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         dst2(rect) = split(2).ConvertScaleAbs(255)
-        dst2.Rectangle(rect, cvb.Scalar.White, 1)
+        dst2.Rectangle(rect, white, 1)
         cvb.Cv2.Merge(split, dst3)
         labels(2) = "MiniPC is " + CStr(rect.Width) + "x" + CStr(rect.Height) + " total pixels = " + CStr(rect.Width * rect.Height)
     End Sub

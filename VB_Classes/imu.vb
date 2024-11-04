@@ -463,7 +463,7 @@ Public Class IMU_VerticalAngles : Inherits TaskParent
             SetTrueText(CStr(i), gc.tc1.center, 2)
             SetTrueText(CStr(i), gc.tc1.center, 3)
             DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.HighlightColor)
-            DrawLine(dst3, gc.tc1.center, gc.tc2.center, cvb.Scalar.White)
+            DrawLine(dst3, gc.tc1.center, gc.tc2.center, white)
         Next
         SetTrueText(strOut, 3)
     End Sub
@@ -559,9 +559,9 @@ Public Class IMU_Lines : Inherits TaskParent
             p2 = New cvb.Point(kalman.kOutput(2), kalman.kOutput(3))
             DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
             DrawCircle(dst2, p2, task.DotSize, task.HighlightColor)
-            DrawCircle(dst3, p1, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3, p1, task.DotSize, white)
 
-            DrawCircle(dst3, p2, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3, p2, task.DotSize, white)
             lastGcell = gcell
             strOut += CStr(0) + vbTab + Format(gcell.len3D, fmt1) + "m" + vbTab +
                                                 Format(gcell.tc1.depth, fmt1) + "m" + vbTab +
@@ -1064,7 +1064,7 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
                 SetTrueText(CStr(index), gc.tc1.center, 2)
                 SetTrueText(CStr(index), gc.tc1.center, 3)
                 DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.HighlightColor)
-                DrawLine(dst3, gc.tc1.center, gc.tc2.center, cvb.Scalar.White)
+                DrawLine(dst3, gc.tc1.center, gc.tc2.center, white)
                 gCells(i) = gc
             Else
                 gCells.RemoveAt(i)

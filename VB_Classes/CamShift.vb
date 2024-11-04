@@ -34,7 +34,7 @@ Public Class CamShift_Basics : Inherits TaskParent
             dst3 = dst3.CvtColor(cvb.ColorConversionCodes.HSV2BGR)
         End If
         If trackBox.Size.Width > 0 Then
-            dst2.Ellipse(trackBox, cvb.Scalar.White, task.lineWidth + 1, task.lineType)
+            dst2.Ellipse(trackBox, white, task.lineWidth + 1, task.lineType)
         End If
     End Sub
 End Class

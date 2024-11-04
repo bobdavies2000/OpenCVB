@@ -193,7 +193,7 @@ Public Class BackProject_FullLines : Inherits TaskParent
         lines.Run(backP.dst2)
         dst2 = lines.dst2
         For Each lp In lines.lpList
-            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.White)
+            DrawLine(dst2, lp.p1, lp.p2, white)
         Next
         labels(3) = CStr(lines.lpList.Count) + " lines were found"
     End Sub
@@ -511,7 +511,7 @@ Public Class BackProject_LineSide : Inherits TaskParent
         cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst1, task.rangesSide)
         dst1 = dst1.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
         dst3 = src
-        dst3.SetTo(cvb.Scalar.White, dst1)
+        dst3.SetTo(white, dst1)
     End Sub
 End Class
 
@@ -610,7 +610,7 @@ Public Class BackProject_Depth : Inherits TaskParent
         backp.Run(depth * 1000)
         dst2 = backp.dst2
         dst3 = src
-        dst3.SetTo(cvb.Scalar.White, backp.mask)
+        dst3.SetTo(white, backp.mask)
     End Sub
 End Class
 
@@ -698,7 +698,7 @@ Public Class BackProject_MaskLines : Inherits TaskParent
 
         For Each lp In lines.lpList
             Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, cvb.Scalar.White)
+            If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, white)
         Next
         dst3.SetTo(cvb.Scalar.Yellow, masks.mask)
         dst3.SetTo(task.HighlightColor, dst1)
@@ -747,7 +747,7 @@ Public Class BackProject_Masks : Inherits TaskParent
         dst3 = task.color.Clone
         dst1 = maskDetect(gray, histIndex)
         If dst1.Width = 0 Then Exit Sub
-        dst3.SetTo(cvb.Scalar.White, dst1)
+        dst3.SetTo(white, dst1)
         dst2.Rectangle(New cvb.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cvb.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class

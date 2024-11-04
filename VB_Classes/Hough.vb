@@ -17,7 +17,7 @@ Public Class Hough_Basics : Inherits TaskParent
 
         If standaloneTest() Then
             src.CopyTo(dst2)
-            dst2.SetTo(cvb.Scalar.White, edges.dst2)
+            dst2.SetTo(white, edges.dst2)
             src.CopyTo(dst3)
             houghShowLines(dst2, segments, options.lineCount)
             Dim probSegments = cvb.Cv2.HoughLinesP(edges.dst2, options.rho, options.theta, options.threshold)
@@ -137,7 +137,7 @@ Public Class Hough_Lines_MT : Inherits TaskParent
             dst3(roi).SetTo(0)
             houghShowLines(dst3(roi), segments, 1)
         End Sub)
-        dst2.SetTo(cvb.Scalar.White, task.gridMask)
+        dst2.SetTo(white, task.gridMask)
     End Sub
 End Class
 
@@ -272,7 +272,7 @@ Public Class Hough_LaneFinder : Inherits TaskParent
 
             Dim pList() As cvb.Point = {bl, tl, tr, br}
             mask = New cvb.Mat(New cvb.Size(w, h), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-            mask.FillConvexPoly(pList, cvb.Scalar.White, task.lineType)
+            mask.FillConvexPoly(pList, white, task.lineType)
         End If
         dst1 = mask.Clone
 
@@ -321,7 +321,7 @@ Public Class Hough_Lines : Inherits TaskParent
             houghShowLines(dst2(roi), segments, 2)
             houghShowLines(dst3(roi), segments, 2)
         Next
-        dst2.SetTo(cvb.Scalar.White, task.gridMask)
+        dst2.SetTo(white, task.gridMask)
     End Sub
 End Class
 
@@ -345,12 +345,12 @@ Public Class Hough_FullImage : Inherits TaskParent
 
         If standaloneTest() Then
             src.CopyTo(dst2)
-            dst2.SetTo(cvb.Scalar.White, edges.dst2)
+            dst2.SetTo(white, edges.dst2)
             houghShowLines(dst2, segments, options.lineCount)
 
             dst3.SetTo(0)
             houghShowLines(dst3, segments, options.lineCount)
-            dst3.SetTo(cvb.Scalar.White, edges.dst2)
+            dst3.SetTo(white, edges.dst2)
         End If
     End Sub
 End Class
@@ -375,7 +375,7 @@ Public Class Hough_Probabilistic : Inherits TaskParent
         Static segments As cvb.LineSegmentPoint()
         If task.gOptions.debugChecked Then
             src.CopyTo(dst2)
-            dst2.SetTo(cvb.Scalar.White, edges.dst2)
+            dst2.SetTo(white, edges.dst2)
             dst3.SetTo(0)
             segments = cvb.Cv2.HoughLinesP(edges.dst2, options.rho, options.theta, options.threshold)
             For i = 0 To Math.Min(segments.Length, options.lineCount) - 1

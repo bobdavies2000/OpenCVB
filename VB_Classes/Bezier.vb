@@ -60,11 +60,11 @@ Public Class Bezier_Example : Inherits TaskParent
         Next
 
         For i = 0 To points.Count - 1
-            DrawCircle(dst2, points(i), task.DotSize + 2, cvb.Scalar.White)
+            DrawCircle(dst2, points(i), task.DotSize + 2, white)
         Next
 
-        DrawLine(dst2, points(0), points(1), cvb.Scalar.White)
-        DrawLine(dst2, points(2), points(3), cvb.Scalar.White)
+        DrawLine(dst2, points(0), points(1), white)
+        DrawLine(dst2, points(2), points(3), white)
     End Sub
 End Class
 

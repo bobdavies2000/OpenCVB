@@ -32,12 +32,12 @@ Public Class Texture_Basics : Inherits TaskParent
             For Each roi In task.gridRects
                 sortcounts.Add(dst2(roi).CountNonZero, roi)
             Next
-            If standaloneTest() Then dst3.Rectangle(sortcounts.ElementAt(0).Value, cvb.Scalar.White, 2)
+            If standaloneTest() Then dst3.Rectangle(sortcounts.ElementAt(0).Value, white, 2)
             tRect = sortcounts.ElementAt(0).Value
             texture = task.color(tRect)
             texturePop = dst2(tRect).CountNonZero
         End If
-        If standaloneTest() Then dst3.Rectangle(tRect, cvb.Scalar.White, 2)
+        If standaloneTest() Then dst3.Rectangle(tRect, white, 2)
     End Sub
 End Class
 
@@ -71,7 +71,7 @@ Public Class OpenGL_TextureShuffle : Inherits TaskParent
 
         texture.Run(src)
         dst2 = texture.dst3
-        dst3.Rectangle(texture.tRect, cvb.Scalar.White, task.lineWidth)
+        dst3.Rectangle(texture.tRect, white, task.lineWidth)
         shuffle.Run(texture.texture)
         tRect = New cvb.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4)
         dst2(tRect) = shuffle.dst2.Repeat(4, 4)

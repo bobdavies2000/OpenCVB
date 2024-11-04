@@ -30,7 +30,7 @@ Public Class Entropy_Basics : Inherits TaskParent
             entropy.Run(src(task.drawRect))
         End If
         dst2 = entropy.dst2
-        dst2.Rectangle(task.drawRect, cvb.Scalar.White, task.lineWidth)
+        dst2.Rectangle(task.drawRect, white, task.lineWidth)
         If task.heartBeat Then strOut = "Click anywhere to measure the entropy with rect(pt.x, pt.y, " +
                                          CStr(stdSize) + ", " + CStr(stdSize) + ")" + vbCrLf + vbCrLf + "Total entropy = " +
                                          Format(entropy.entropyVal, fmt1) + vbCrLf + entropy.strOut
@@ -83,7 +83,7 @@ Public Class Entropy_Highest : Inherits TaskParent
         If standaloneTest() Then
             dst2.Rectangle(eMaxRect, 255, task.lineWidth)
             dst3.SetTo(0)
-            dst3.Rectangle(eMaxRect, cvb.Scalar.White, task.lineWidth)
+            dst3.Rectangle(eMaxRect, white, task.lineWidth)
         End If
         labels(2) = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
     End Sub
@@ -149,7 +149,7 @@ Public Class Entropy_Rectangle : Inherits TaskParent
         entropyVal = channelEntropy(src.Total, histNormalized) * 1000
         strOut = "Entropy X1000 " + Format(entropyVal, fmt1) + vbCrLf
         dst2 = src
-        dst2.Rectangle(task.drawRect, cvb.Scalar.White, task.lineWidth)
+        dst2.Rectangle(task.drawRect, white, task.lineWidth)
         dst3 = src
         SetTrueText(strOut, 3)
     End Sub
@@ -202,21 +202,21 @@ Public Class Entropy_SubDivisions : Inherits TaskParent
             Dim maxEntropy = eList.Max
             Dim roi = eROI(i)(eList.IndexOf(maxEntropy))
             roiList.Add(roi)
-            dst2.Rectangle(roi, cvb.Scalar.White)
+            dst2.Rectangle(roi, white)
         Next
 
         Dim p1 = New cvb.Point(0, dst2.Height / 3)
         Dim p2 = New cvb.Point(dst2.Width, dst2.Height / 3)
-        DrawLine(dst2, p1, p2, cvb.Scalar.White)
+        DrawLine(dst2, p1, p2, white)
         p1 = New cvb.Point(0, dst2.Height * 2 / 3)
         p2 = New cvb.Point(dst2.Width, dst2.Height * 2 / 3)
-        DrawLine(dst2, p1, p2, cvb.Scalar.White)
+        DrawLine(dst2, p1, p2, white)
         p1 = New cvb.Point(dst2.Width / 3, 0)
         p2 = New cvb.Point(dst2.Width / 3, dst2.Height)
-        DrawLine(dst2, p1, p2, cvb.Scalar.White)
+        DrawLine(dst2, p1, p2, white)
         p1 = New cvb.Point(dst2.Width * 2 / 3, 0)
         p2 = New cvb.Point(dst2.Width * 2 / 3, dst2.Height)
-        DrawLine(dst2, p1, p2, cvb.Scalar.White)
+        DrawLine(dst2, p1, p2, white)
     End Sub
 End Class
 

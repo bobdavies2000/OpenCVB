@@ -42,7 +42,7 @@ Public Class Derivative_Basics : Inherits TaskParent
         mask = mask.InRange(histIndex, histIndex)
 
         dst3 = task.color.Clone
-        dst3.SetTo(cvb.Scalar.White, mask)
+        dst3.SetTo(white, mask)
         dst3.SetTo(0, task.noDepthMask)
         dst2.Rectangle(New cvb.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cvb.Scalar.Yellow, task.lineWidth)
         Dim deriv = Format(options.derivativeRange, fmt2)

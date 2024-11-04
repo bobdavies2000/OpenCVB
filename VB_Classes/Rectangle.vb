@@ -89,7 +89,7 @@ Public Class Rectangle_Overlap : Inherits TaskParent
         enclosingRect = New cvb.Rect
         If rect1.IntersectsWith(rect2) Then
             enclosingRect = rect1.Union(rect2)
-            dst3.Rectangle(enclosingRect, cvb.Scalar.White, 4)
+            dst3.Rectangle(enclosingRect, white, 4)
             labels(3) = "Rectangles intersect - red marks overlapping rectangle"
             dst3.Rectangle(rect1.Intersect(rect2), cvb.Scalar.Red, -1)
         Else

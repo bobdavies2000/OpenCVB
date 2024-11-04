@@ -75,7 +75,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
             src.CopyTo(lastFrame)
             dst3 = lastFrame.clone
         End If
-        If standaloneTest() Then dst3.Rectangle(templateRect, cvb.Scalar.White, 1) ' when not standaloneTest(), traceName doesn't want artificial rectangle.
+        If standaloneTest() Then dst3.Rectangle(templateRect, white, 1) ' when not standaloneTest(), traceName doesn't want artificial rectangle.
     End Sub
 End Class
 
@@ -155,7 +155,7 @@ Public Class Stabilizer_BasicsTest : Inherits TaskParent
 
         dst2 = stable.dst2
         dst3 = stable.dst3
-        If standaloneTest() Then dst3.Rectangle(stable.templateRect, cvb.Scalar.White, 1)
+        If standaloneTest() Then dst3.Rectangle(stable.templateRect, white, 1)
         labels(3) = stable.labels(3)
     End Sub
 End Class

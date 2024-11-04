@@ -37,7 +37,7 @@ Public Class LongLine_Basics : Inherits TaskParent
         lpList.Clear()
         For Each lp In lines.lpList
             lp = BuildLongLine(lp)
-            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.White)
+            DrawLine(dst2, lp.p1, lp.p2, white)
             If lp.p1.X > lp.p2.X Then lp = New PointPair(lp.p2, lp.p1)
             lpList.Add(lp)
             If lpList.Count >= options.maxCount Then Exit For
@@ -462,7 +462,7 @@ Public Class LongLine_History : Inherits TaskParent
         Next
 
         For Each lp In lpList
-            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.White)
+            DrawLine(dst2, lp.p1, lp.p2, white)
         Next
         If mpList.Count > task.gOptions.FrameHistory.Value Then mpList.RemoveAt(0)
 

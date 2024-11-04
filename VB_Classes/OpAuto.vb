@@ -140,7 +140,7 @@ Public Class OpAuto_FloorCeiling : Inherits TaskParent
                 If yList.Min < 0 Then rebuildMask("ceiling", -task.yRange, yList.Min + pad)
             End If
 
-            dst2.SetTo(cvb.Scalar.White, dst1)
+            dst2.SetTo(white, dst1)
         End If
         SetTrueText(strOut, 3)
     End Sub
@@ -204,7 +204,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
         If standaloneTest() Then
             For Each entry In valleyOrder
                 Dim col = entry.Value * dst2.Width / task.histogramBins
-                DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), cvb.Scalar.White)
+                DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), white)
             Next
             SetTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
         End If
@@ -247,7 +247,7 @@ Public Class OpAuto_Peaks2D : Inherits TaskParent
         If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
-            DrawCircle(dst2,pt, task.DotSize * 3, cvb.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize * 3, white)
         Next
     End Sub
 End Class
@@ -293,10 +293,10 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
         If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
-            DrawCircle(dst2,pt, task.DotSize * 3, cvb.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize * 3, white)
         Next
 
-        dst2.SetTo(cvb.Scalar.White, task.gridMask)
+        dst2.SetTo(white, task.gridMask)
         labels(3) = CStr(pointPop.Count) + " grid samples trimmed to " + CStr(clusterPoints.Count)
     End Sub
 End Class

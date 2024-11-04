@@ -49,7 +49,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
         dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
 
         dst3.SetTo(0, dst1)
-        dst2.SetTo(cvb.Scalar.White, dst1)
+        dst2.SetTo(white, dst1)
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
 End Class
@@ -116,7 +116,7 @@ Public Class Delaunay_SubDiv : Inherits TaskParent
                 Dim e = edgeList(i)
                 Dim p0 = New cvb.Point(Math.Round(e(0)), Math.Round(e(1)))
                 Dim p1 = New cvb.Point(Math.Round(e(2)), Math.Round(e(3)))
-                DrawLine(dst2, p0, p1, cvb.Scalar.White)
+                DrawLine(dst2, p0, p1, white)
             Next
         Next
 
@@ -359,6 +359,7 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
 End Class
+
 
 
 

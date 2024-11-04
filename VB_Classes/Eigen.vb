@@ -77,7 +77,7 @@ Public Class Eigen_FitLineInput : Inherits TaskParent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                DrawCircle(dst2,points(i), task.DotSize, cvb.Scalar.White)
+                DrawCircle(dst2, points(i), task.DotSize, cvb.Scalar.White)
             Next
 
             Dim p1 As cvb.Point2f, p2 As cvb.Point2f
@@ -95,10 +95,8 @@ Public Class Eigen_FitLineInput : Inherits TaskParent
             bb = p2.Y - p2.X * m
             Dim startx = Math.Min(p1.X, p2.X)
             Dim incr = (Math.Max(p1.X, p2.X) - startx) / options.linePairCount
-            Dim highLight = cvb.Scalar.White
-            If options.highlight Then
-                highLight = cvb.Scalar.Gray
-            End If
+            Dim highLight As cvb.Scalar = white
+            If options.highlight Then highLight = cvb.Scalar.Gray
             For i = 0 To options.linePairCount - 1
                 Dim noiseOffsetX = (Rnd() * 2 - 1) * options.noiseOffset
                 Dim noiseOffsetY = (Rnd() * 2 - 1) * options.noiseOffset
@@ -108,7 +106,7 @@ Public Class Eigen_FitLineInput : Inherits TaskParent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                DrawCircle(dst2,pt, task.DotSize + 1, highLight)
+                DrawCircle(dst2, pt, task.DotSize + 1, highLight)
             Next
         End If
     End Sub

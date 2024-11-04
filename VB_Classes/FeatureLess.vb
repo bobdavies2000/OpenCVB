@@ -166,7 +166,7 @@ Public Class FeatureLess_DCT : Inherits TaskParent
         Dim label = mask.InRange(maxIndex + 1, maxIndex + 1)
         Dim nonZ = label.CountNonZero()
         labels(3) = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
-        dst3.SetTo(cvb.Scalar.White, label)
+        dst3.SetTo(white, label)
     End Sub
 End Class
 

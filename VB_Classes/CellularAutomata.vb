@@ -70,7 +70,7 @@ Public Class CellularAutomata_Life : Inherits TaskParent
     Dim factor = 8
     Dim generation As Integer
     Public population As Integer
-    Public nodeColor = cvb.Scalar.White
+    Public nodeColor = white
     Public backColor = cvb.Scalar.Black
     Dim savePointCount As Integer
     Dim lastPopulation As Integer
@@ -161,7 +161,7 @@ End Class
 Public Class CellularAutomata_LifeColor : Inherits TaskParent
     Dim game As New CellularAutomata_Life
     Public Sub New()
-        game.backColor = cvb.Scalar.White
+        game.backColor = white
         game.nodeColor = cvb.Scalar.Black
 
         labels(2) = "Births are blue, deaths are red"

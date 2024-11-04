@@ -44,7 +44,7 @@ Public Class Match_Basics : Inherits TaskParent
         End If
         If standalone Then
             dst2 = src
-            DrawCircle(dst2, matchCenter, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2, matchCenter, task.DotSize, white)
             dst3 = dst0.Normalize(0, 255, cvb.NormTypes.MinMax)
         End If
     End Sub
@@ -75,7 +75,7 @@ Public Class Match_BasicsTest : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            DrawCircle(dst2,match.matchCenter, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2,match.matchCenter, task.DotSize, white)
             dst3 = match.dst0.Normalize(0, 255, cvb.NormTypes.MinMax)
             SetTrueText(Format(match.correlation, fmt3), match.matchCenter)
         End If
@@ -165,7 +165,7 @@ Public Class Match_BestEntropy : Inherits TaskParent
         match.Run(src)
         dst2 = match.dst2
         dst3 = match.dst3
-        dst2.SetTo(cvb.Scalar.White, task.gridMask)
+        dst2.SetTo(white, task.gridMask)
     End Sub
 End Class
 
@@ -312,11 +312,11 @@ Public Class Match_PointSlope : Inherits TaskParent
             For Each pts In lines.bestLines
                 Dim rect = ValidateRect(New cvb.Rect(pts.p1.X - w, pts.p1.Y - h, w * 2, h * 2))
                 templates.Add(src(rect))
-                dst1.Rectangle(rect, cvb.Scalar.White, task.lineWidth)
+                dst1.Rectangle(rect, white, task.lineWidth)
 
                 rect = ValidateRect(New cvb.Rect(pts.p2.X - w, pts.p2.Y - h, w * 2, h * 2))
                 templates.Add(src(rect))
-                dst1.Rectangle(rect, cvb.Scalar.White, task.lineWidth)
+                dst1.Rectangle(rect, white, task.lineWidth)
 
                 DrawLine(dst1, pts.p1, pts.p2, task.HighlightColor)
             Next
@@ -454,7 +454,7 @@ Public Class Match_DrawRect : Inherits TaskParent
             dst0 = match.dst0.Normalize(0, 255, cvb.NormTypes.MinMax)
             dst3.SetTo(0)
             dst0.CopyTo(dst3(New cvb.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)))
-            dst3.Rectangle(inputRect, cvb.Scalar.White, task.lineWidth, task.lineType)
+            dst3.Rectangle(inputRect, white, task.lineWidth, task.lineType)
             dst2 = src
         End If
 
@@ -681,7 +681,7 @@ Public Class Match_Point : Inherits TaskParent
         Dim mmData = GetMinMax(dst0)
         correlation = mmData.maxVal
         pt = New cvb.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-        DrawCircle(src, pt, task.DotSize, cvb.Scalar.White)
+        DrawCircle(src, pt, task.DotSize, white)
         src.Rectangle(searchRect, cvb.Scalar.Yellow, 1)
     End Sub
 End Class

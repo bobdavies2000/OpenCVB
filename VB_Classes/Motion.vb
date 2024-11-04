@@ -294,7 +294,7 @@ Public Class Motion_Grid_MP : Inherits TaskParent
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     src(roi).CopyTo(dst3(roi))
-                    dst2.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
+                    dst2.Rectangle(roi, white, task.lineWidth)
                 End If
             End Sub)
         labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridRects.Count)
@@ -330,7 +330,7 @@ Public Class Motion_Grid : Inherits TaskParent
         Next
         dst2 = src
         For Each roi In roiMotion
-            dst2.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
+            dst2.Rectangle(roi, white, task.lineWidth)
         Next
         labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count)
         labels(3) = CStr(task.gridRects.Count - roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
@@ -430,7 +430,7 @@ Public Class Motion_Intersect : Inherits TaskParent
         If standaloneTest() Then
             If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
                 src(task.motionRect).CopyTo(dst0(task.motionRect))
-                color.Rectangle(task.motionRect, cvb.Scalar.White, task.lineWidth, task.lineType)
+                color.Rectangle(task.motionRect, white, task.lineWidth, task.lineType)
             End If
         End If
         lastMotionRect = task.motionRect
@@ -779,7 +779,7 @@ Public Class Motion_MinRect : Inherits TaskParent
 
             mRect.inputPoints = New List(Of cvb.Point2f)({p1, p2, p3, p4})
             mRect.Run(empty)
-            DrawRotatedRect(mRect.minRect, dst3, cvb.Scalar.White)
+            DrawRotatedRect(mRect.minRect, dst3, white)
             If dst3.CountNonZero > dst3.Total / 2 Then dst3.SetTo(255)
         End If
     End Sub
@@ -862,7 +862,7 @@ Public Class Motion_EdgeStability : Inherits TaskParent
         dst3.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
         Dim count As Integer
         For Each index In popSorted.Values
-            dst3.Rectangle(task.featureRects(index), cvb.Scalar.White, task.lineWidth)
+            dst3.Rectangle(task.featureRects(index), white, task.lineWidth)
             count += 1
             If count >= 20 Then Exit For
         Next

@@ -209,8 +209,8 @@ Public Class Projection_Cell : Inherits TaskParent
         Dim maskTop = heatCell.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cvb.ThresholdTypes.Binary)
         Dim maskSide = heatCell.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cvb.ThresholdTypes.Binary)
         If maskTop.CountNonZero = 0 And maskSide.CountNonZero = 0 Then SetTrueText("The selected cell has no depth data.", 3)
-        dst1.SetTo(cvb.Scalar.White, maskTop)
-        dst3.SetTo(cvb.Scalar.White, maskSide)
+        dst1.SetTo(white, maskTop)
+        dst3.SetTo(white, maskSide)
     End Sub
 End Class
 

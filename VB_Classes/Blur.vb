@@ -172,7 +172,7 @@ Public Class Blur_Detection : Inherits TaskParent
         cvb.Cv2.MeanStdDev(dst2, mean, stdev)
         SetTrueText("Blur variance is " + Format(stdev * stdev, fmt3), 3)
 
-        If standaloneTest() Then dst2.Rectangle(r, cvb.Scalar.White, task.lineWidth)
+        If standaloneTest() Then dst2.Rectangle(r, white, task.lineWidth)
     End Sub
 End Class
 

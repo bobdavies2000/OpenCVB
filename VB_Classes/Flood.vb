@@ -332,11 +332,11 @@ Public Class Flood_LeftRight : Inherits TaskParent
         If task.redOptions.IdentifyCells.Checked Then
             If task.mousePicTag = 2 Then
                 task.setSelectedContour(cellsLeft, mapLeft)
-                task.color(task.rc.rect).SetTo(cvb.Scalar.White, task.rc.mask)
+                task.color(task.rc.rect).SetTo(white, task.rc.mask)
             Else
                 task.setSelectedContour(cellsRight, mapRight)
                 dst1 = task.rightView
-                dst1(task.rc.rect).SetTo(cvb.Scalar.White, task.rc.mask)
+                dst1(task.rc.rect).SetTo(white, task.rc.mask)
             End If
         End If
     End Sub

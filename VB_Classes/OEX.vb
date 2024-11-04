@@ -79,7 +79,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits TaskParent
         cvb.Cv2.CalcBackProject({hsv}, {0, 1}, histogram, dst2, ranges)
 
         dst3 = src
-        dst3.SetTo(cvb.Scalar.White, dst1)
+        dst3.SetTo(white, dst1)
 
         SetTrueText("Click anywhere to isolate that region.", 1)
     End Sub
@@ -295,7 +295,7 @@ Public Class OEX_MeanShift : Inherits TaskParent
         cvb.Cv2.CalcBackProject({hsv}, {0}, histogram, dst3, ranges)
         If trackWindow.Width <> 0 Then
             cvb.Cv2.MeanShift(dst3, trackWindow, cvb.TermCriteria.Both(10, 1))
-            src.Rectangle(trackWindow, cvb.Scalar.White, task.lineWidth, task.lineType)
+            src.Rectangle(trackWindow, white, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -373,7 +373,7 @@ Public Class OEX_PointPolygon_demo : Inherits TaskParent
 
         dst2.SetTo(0)
         For i As Integer = 0 To vert.Count - 1
-            DrawLine(dst2, vert(i), vert((i + 1) Mod 6), cvb.Scalar.White)
+            DrawLine(dst2, vert(i), vert((i + 1) Mod 6), white)
         Next
 
         pointPoly.Run(dst2)

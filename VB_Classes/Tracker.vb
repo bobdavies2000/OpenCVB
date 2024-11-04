@@ -33,7 +33,7 @@ Public Class Tracker_Basics : Inherits TaskParent
             Marshal.Copy(imagePtr, rectData, 0, rectData.Length)
 
             tRect = New cvb.Rect(rectData(0), rectData(1), rectData(2), rectData(3))
-            dst2.Rectangle(tRect, cvb.Scalar.White, task.lineWidth)
+            dst2.Rectangle(tRect, white, task.lineWidth)
         Else
             SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", New cvb.Point(10, 140))
         End If

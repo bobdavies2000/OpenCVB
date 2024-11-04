@@ -114,7 +114,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
                 Next
             Next
             If RMSerror / pixelCount <= plane.options.rmsThreshold Then
-                addW.src2(rc.rect).SetTo(cvb.Scalar.White, rc.mask)
+                addW.src2(rc.rect).SetTo(white, rc.mask)
                 flatCount += 1
             End If
         Next
@@ -526,7 +526,7 @@ Public Class Plane_Verticals : Inherits TaskParent
         frames.dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
         dst2 = frames.dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
         dst2.ConvertTo(dst0, cvb.MatType.CV_8U)
-        task.color.SetTo(cvb.Scalar.White, dst0)
+        task.color.SetTo(white, dst0)
     End Sub
 End Class
 
@@ -560,7 +560,7 @@ Public Class Plane_Horizontals : Inherits TaskParent
         frames.dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
         dst2 = frames.dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
         dst2.ConvertTo(dst0, cvb.MatType.CV_8U)
-        task.color.SetTo(cvb.Scalar.White, dst0)
+        task.color.SetTo(white, dst0)
     End Sub
 End Class
 
@@ -599,7 +599,7 @@ Public Class Plane_FloorStudy : Inherits TaskParent
                 SetTrueText(labels(2), 3)
                 Dim sliceMask = task.pcSplit(1).InRange(cvb.Scalar.All(planeY), cvb.Scalar.All(3.0))
                 dst2 = src
-                dst2.SetTo(cvb.Scalar.White, sliceMask)
+                dst2.SetTo(white, sliceMask)
                 Exit For
             End If
         Next

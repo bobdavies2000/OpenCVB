@@ -55,7 +55,7 @@ Public Class Smoothing_Exterior : Inherits TaskParent
                 hull.Run(src)
                 Dim nextHull = cvb.Cv2.ConvexHull(hullList.ToArray, True)
                 inputPoints = nextHull.ToList
-                DrawPoly(dst2, inputPoints, cvb.Scalar.White)
+                DrawPoly(dst2, inputPoints, white)
             Else
                 Exit Sub
             End If
@@ -133,7 +133,7 @@ Public Class Smoothing_Interior : Inherits TaskParent
                 hull.Run(src)
                 Dim nextHull = cvb.Cv2.ConvexHull(hullList.ToArray, True)
                 inputPoints = nextHull.ToList
-                DrawPoly(dst2, nextHull.ToList, cvb.Scalar.White)
+                DrawPoly(dst2, nextHull.ToList, white)
             Else
                 Exit Sub
             End If

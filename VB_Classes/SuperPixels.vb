@@ -12,7 +12,7 @@ Public Class SuperPixel_Basics : Inherits TaskParent
 
         dst3 = src
         For Each rc In task.redCells
-            DrawContour(dst3(rc.rect), rc.contour, cvb.Scalar.White, task.lineWidth)
+            DrawContour(dst3(rc.rect), rc.contour, white, task.lineWidth)
         Next
     End Sub
 End Class
@@ -23,7 +23,7 @@ End Class
 
 Public Class SuperPixel_Basics_CPP_VB : Inherits TaskParent
     Public wireGrid As cvb.Mat
-    Public gridColor = cvb.Scalar.White
+    Public gridColor = white
     Dim options As New Options_SuperPixels
     Public Sub New()
         labels(3) = "Superpixel label data (0-255)"
@@ -80,7 +80,7 @@ Public Class SuperPixel_BinarizedImage : Inherits TaskParent
         pixels.Run(binarize.dst2)
         dst2 = pixels.dst2
         dst3 = pixels.dst3
-        dst3.SetTo(cvb.Scalar.White, pixels.wireGrid)
+        dst3.SetTo(white, pixels.wireGrid)
     End Sub
 End Class
 
@@ -115,7 +115,7 @@ Public Class SuperPixel_WithCanny : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         edges.Run(src)
         src = task.color.Clone()
-        src.SetTo(cvb.Scalar.White, edges.dst2)
+        src.SetTo(white, edges.dst2)
         pixels.Run(src)
         dst2 = pixels.dst2
         dst3 = pixels.dst3.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)

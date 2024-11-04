@@ -119,7 +119,7 @@ Public Class LowRes_Features : Inherits TaskParent
         If standaloneTest() Then
             dst3.SetTo(0)
             For Each r In rects
-                dst3.Rectangle(r, cvb.Scalar.White, -1)
+                dst3.Rectangle(r, white, -1)
             Next
             dst3 = Not dst3
         End If
@@ -534,7 +534,7 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
             If motionRects.Count > 0 Then
                 For Each roi In motionRects
                     src(roi).CopyTo(dst3(roi))
-                    If standaloneTest() Then dst0.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
+                    If standaloneTest() Then dst0.Rectangle(roi, white, task.lineWidth)
                 Next
                 motionDetected = True
             End If

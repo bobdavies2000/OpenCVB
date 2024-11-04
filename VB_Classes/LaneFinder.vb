@@ -117,7 +117,7 @@ Public Class LaneFinder_ROI : Inherits TaskParent
 
             Dim pList() As cvb.Point = {bl, tl, tr, br}
             dst1 = New cvb.Mat(New cvb.Size(w, h), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-            dst1.FillConvexPoly(pList, cvb.Scalar.White, task.lineType)
+            dst1.FillConvexPoly(pList, white, task.lineType)
             pListList(0) = pList
         End If
 
@@ -192,11 +192,11 @@ Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
 
         Dim p1 = New cvb.Point(0, leftLaneIntercept)
         Dim p2 = New cvb.Point(-leftLaneIntercept / leftAvgSlope, 0)
-        tmp.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+        tmp.Line(p1, p2, white, task.lineWidth, task.lineType)
 
         p1 = New cvb.Point(0, rightLaneIntercept)
         p2 = New cvb.Point((dst0.Height - rightLaneIntercept) / rightAvgSlope, dst2.Height)
-        tmp.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+        tmp.Line(p1, p2, white, task.lineWidth, task.lineType)
 
         tmp.CopyTo(dst2, hough.mask)
         dst2.CopyTo(dst3, dst2)

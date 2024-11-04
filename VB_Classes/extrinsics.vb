@@ -12,7 +12,7 @@ Public Class Extrinsics_Basics : Inherits TaskParent
         Dim gray = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
 
         If task.drawRect.Width > 0 Then
-            dst2.Rectangle(task.drawRect, cvb.Scalar.White, task.lineWidth, task.lineType)
+            dst2.Rectangle(task.drawRect, white, task.lineWidth, task.lineType)
             addw.src2 = dst2(task.drawRect).Resize(dst2.Size)
             addw.Run(gray)
             dst1 = addw.dst2
@@ -20,11 +20,11 @@ Public Class Extrinsics_Basics : Inherits TaskParent
 
         Dim pt = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         If standaloneTest() Then
-            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
-            DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, white)
+            DrawCircle(dst3, pt, task.DotSize, white)
             DrawCircle(dst2, pt, task.DotSize - 2, cvb.Scalar.Black)
             DrawCircle(dst3, pt, task.DotSize - 2, cvb.Scalar.Black)
-            DrawCircle(task.color, pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(task.color, pt, task.DotSize, white)
         End If
     End Sub
 End Class

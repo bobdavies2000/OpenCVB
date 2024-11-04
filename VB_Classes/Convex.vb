@@ -38,10 +38,10 @@ Public Class Convex_Basics : Inherits TaskParent
 
         Dim pMat As cvb.Mat = cvb.Mat.FromPixelData(hull.Count, 1, cvb.MatType.CV_32SC2, hull)
         Dim sum = pMat.Sum()
-        DrawContour(dst2, hullList, cvb.Scalar.White, -1)
+        DrawContour(dst2, hullList, white, -1)
 
         For i = 0 To hull.Count - 1
-            DrawLine(dst2, hull(i), hull((i + 1) Mod hull.Count), cvb.Scalar.White)
+            DrawLine(dst2, hull(i), hull((i + 1) Mod hull.Count), white)
         Next
     End Sub
 End Class
@@ -67,7 +67,7 @@ Public Class Convex_RedCloud : Inherits TaskParent
 
             dst3.SetTo(0)
             dst3(task.rc.rect) = convex.dst2(New cvb.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height))
-            DrawCircle(dst3,task.rc.maxDist, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3,task.rc.maxDist, task.DotSize, white)
         End If
     End Sub
 End Class

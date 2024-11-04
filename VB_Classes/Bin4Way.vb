@@ -92,8 +92,8 @@ Public Class Bin4Way_Basics : Inherits TaskParent
         mats.Run(src)
         dst3 = mats.dst2
 
-        dst1.Rectangle(roiSave, cvb.Scalar.White, task.lineWidth)
-        task.color.Rectangle(roiSave, cvb.Scalar.White, task.lineWidth)
+        dst1.Rectangle(roiSave, white, task.lineWidth)
+        task.color.Rectangle(roiSave, white, task.lineWidth)
     End Sub
 End Class
 
@@ -597,7 +597,7 @@ Public Class Bin4Way_BasicsRed : Inherits TaskParent
 
         For i = 0 To quartiles.Count - 1
             Dim offset = quartiles(i) / bins * dst3.Width
-            DrawLine(dst3, New cvb.Point(offset, 0), New cvb.Point(offset, dst3.Height), cvb.Scalar.White)
+            DrawLine(dst3, New cvb.Point(offset, 0), New cvb.Point(offset, dst3.Height), white)
         Next
 
         mats.mat(0) = src.InRange(0, quartiles(0) - 1)

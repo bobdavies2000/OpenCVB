@@ -226,7 +226,7 @@ Public Class KMeans_Edges : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         edges.Run(src)
-        src.SetTo(cvb.Scalar.White, edges.dst2)
+        src.SetTo(white, edges.dst2)
 
         km.Run(src)
         dst3 = km.dst2 + 1

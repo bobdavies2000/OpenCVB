@@ -20,7 +20,7 @@ Public Class Draw_Noise : Inherits TaskParent
             If addRandomColor = False Then c = cvb.Scalar.Black
             Dim noiseWidth = msRNG.Next(1, options.noiseWidth)
             DrawCircle(dst2, center, noiseWidth, c)
-            DrawCircle(noiseMask, center, noiseWidth, cvb.Scalar.White)
+            DrawCircle(noiseMask, center, noiseWidth, white)
         Next
     End Sub
 End Class
@@ -267,7 +267,7 @@ Public Class Draw_Arc : Inherits TaskParent
         Dim rr = New cvb.RotatedRect(New cvb.Point2f(r.X, r.Y), New cvb.Size2f(r.Width, r.Height), angle)
         Dim color = task.scalarColors(colorIndex)
 
-        dst2.SetTo(cvb.Scalar.White)
+        dst2.SetTo(white)
         If options.drawFull Then
             dst2.Ellipse(rr, color, thickness, task.lineType)
             DrawRotatedOutline(rr, dst2, task.scalarColors(colorIndex))
@@ -321,7 +321,7 @@ Public Class Draw_ClipLine : Inherits TaskParent
         Dim r = New cvb.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
 
         Dim clipped = cvb.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
-        dst3.Line(p1, p2, If(clipped, cvb.Scalar.White, cvb.Scalar.Black), task.lineWidth + 1, task.lineType)
+        dst3.Line(p1, p2, If(clipped, white, cvb.Scalar.Black), task.lineWidth + 1, task.lineType)
         dst3.Rectangle(r, If(clipped, cvb.Scalar.Yellow, cvb.Scalar.Red), task.lineWidth + 1, task.lineType)
 
         flow.nextMsg = "(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle")

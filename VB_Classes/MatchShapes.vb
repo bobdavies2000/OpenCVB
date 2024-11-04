@@ -98,7 +98,7 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
                     minMatch = matchVal
                     bestCell = similarCells.Count
                 End If
-                DrawContour(dst3(rc2.rect), rc2.hull, cvb.Scalar.White, -1)
+                DrawContour(dst3(rc2.rect), rc2.hull, white, -1)
                 similarCells.Add(rc2)
             End If
         Next
@@ -169,7 +169,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
 
         If bestCell >= 0 Then
             Dim rc = similarCells(bestCell)
-            DrawCircle(dst3,rc.maxDist, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3,rc.maxDist, task.DotSize, white)
             SetTrueText("Best match", rc.maxDist, 3)
         End If
         If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cvb.Point(5, 5), 3)
@@ -202,7 +202,7 @@ Public Class MatchShapes_Hulls : Inherits TaskParent
         For Each rc In task.redCells
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
             Dim matchVal = cvb.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
-            If matchVal < options.matchThreshold Then DrawContour(dst3(rc.rect), rc.hull, cvb.Scalar.White, -1)
+            If matchVal < options.matchThreshold Then DrawContour(dst3(rc.rect), rc.hull, white, -1)
         Next
     End Sub
 End Class
@@ -237,7 +237,7 @@ Public Class MatchShapes_Contours : Inherits TaskParent
         For Each rc In task.redCells
             If rc.contour Is Nothing Then Continue For
             Dim matchVal = cvb.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
-            If matchVal < options.matchThreshold Then DrawContour(dst3(rc.rect), rc.contour, cvb.Scalar.White, -1)
+            If matchVal < options.matchThreshold Then DrawContour(dst3(rc.rect), rc.contour, white, -1)
         Next
     End Sub
 End Class

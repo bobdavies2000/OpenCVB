@@ -122,7 +122,7 @@ Public Class HistPeak2D_Edges : Inherits TaskParent
 
         edges.Run(dst2)
         dst3 = src
-        dst3.SetTo(cvb.Scalar.White, edges.dst2)
+        dst3.SetTo(white, edges.dst2)
     End Sub
 End Class
 
@@ -211,7 +211,7 @@ Public Class HistPeak2D_HotSide : Inherits TaskParent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            DrawCircle(dst3,pt, task.DotSize * 3, cvb.Scalar.White)
+            DrawCircle(dst3,pt, task.DotSize * 3, white)
         Next
 
         peak.histogram = histSide.histogram
@@ -241,7 +241,7 @@ Public Class HistPeak2D_HotTop : Inherits TaskParent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            DrawCircle(dst3,pt, task.DotSize * 3, cvb.Scalar.White)
+            DrawCircle(dst3,pt, task.DotSize * 3, white)
         Next
 
         peak.histogram = histTop.histogram

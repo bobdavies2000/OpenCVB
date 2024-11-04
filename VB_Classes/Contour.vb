@@ -305,8 +305,8 @@ Public Class Contour_SidePoints : Inherits TaskParent
             If rc.contour.Count > 0 Then
                 dst3.SetTo(0)
                 DrawContour(dst3(rc.rect), rc.contour, cvb.Scalar.Yellow)
-                DrawLine(dst3, ptLeft, ptRight, cvb.Scalar.White)
-                DrawLine(dst3, ptTop, ptBot, cvb.Scalar.White)
+                DrawLine(dst3, ptLeft, ptRight, white)
+                DrawLine(dst3, ptTop, ptBot, white)
             End If
             If task.heartBeat Then
                 strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + " 3D location (units=meters)" + vbCrLf
@@ -391,7 +391,7 @@ Public Class Contour_Sorted : Inherits TaskParent
                 sortedByArea.Add(area, i)
                 sortedContours.Add(area, cvb.Cv2.ApproxPolyDP(contours.contourlist(i),
                                                              contours.options.epsilon, True))
-                DrawContour(dst3, contours.contourlist(i).ToList, cvb.Scalar.White, -1)
+                DrawContour(dst3, contours.contourlist(i).ToList, white, -1)
             End If
         Next
 
@@ -433,11 +433,11 @@ Public Class Contour_Outline : Inherits TaskParent
         For i = 0 To rc.contour.Count - 2
             p1 = rc.contour(i)
             p2 = rc.contour(i + 1)
-            dst3(rc.rect).Line(p1, p2, cvb.Scalar.White, task.lineWidth + 1)
+            dst3(rc.rect).Line(p1, p2, white, task.lineWidth + 1)
             newContour.Add(p2)
         Next
         rc.contour = New List(Of cvb.Point)(newContour)
-        dst3(rc.rect).Line(rc.contour(rc.contour.Count - 1), rc.contour(0), cvb.Scalar.White, task.lineWidth + 1)
+        dst3(rc.rect).Line(rc.contour(rc.contour.Count - 1), rc.contour(0), white, task.lineWidth + 1)
 
         labels(2) = "Input points = " + CStr(rc.contour.Count)
     End Sub
@@ -460,7 +460,7 @@ Public Class Contour_SelfIntersect : Inherits TaskParent
             redC.Run(src)
             dst2 = redC.dst2
             rc = task.rc
-            DrawContour(dst2(rc.rect), rc.contour, cvb.Scalar.White, -1)
+            DrawContour(dst2(rc.rect), rc.contour, white, -1)
             labels(2) = redC.labels(2)
         End If
 
@@ -533,7 +533,7 @@ Public Class Contour_Largest : Inherits TaskParent
         If standaloneTest() Then
             dst3.SetTo(0)
             If maxIndex >= 0 And maxCount >= 2 Then
-                DrawContour(dst3, allContours(maxIndex).ToList, cvb.Scalar.White)
+                DrawContour(dst3, allContours(maxIndex).ToList, white)
             End If
         End If
     End Sub
@@ -594,7 +594,7 @@ Public Class Contour_RedCloudCorners : Inherits TaskParent
         End If
 
         dst3.SetTo(0)
-        DrawCircle(dst3, rc.maxDist, task.DotSize, cvb.Scalar.White)
+        DrawCircle(dst3, rc.maxDist, task.DotSize, white)
         Dim center As New cvb.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
         Dim maxDistance(4 - 1) As Single
         For i = 0 To corners.Length - 1
@@ -614,9 +614,9 @@ Public Class Contour_RedCloudCorners : Inherits TaskParent
             End If
         Next
 
-        DrawContour(dst3(rc.rect), rc.contour, cvb.Scalar.White)
+        DrawContour(dst3(rc.rect), rc.contour, white)
         For i = 0 To corners.Count - 1
-            DrawLine(dst3(rc.rect), center, corners(i), cvb.Scalar.White)
+            DrawLine(dst3(rc.rect), center, corners(i), white)
         Next
     End Sub
 End Class
@@ -719,7 +719,7 @@ Public Class Contour_Smoothing : Inherits TaskParent
         dst3.SetTo(0)
 
         Dim bestContour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone)
-        DrawContour(dst3(rc.rect), bestContour, cvb.Scalar.White, task.lineWidth + 3)
+        DrawContour(dst3(rc.rect), bestContour, white, task.lineWidth + 3)
 
         Dim approxContour = ContourBuild(rc.mask, options.ApproximationMode)
         DrawContour(dst3(rc.rect), approxContour, cvb.Scalar.Red)
@@ -806,7 +806,7 @@ Public Class Contour_Gray : Inherits TaskParent
 
         dst2 = src
         For Each tour In allContours
-            DrawContour(dst2, tour.ToList, cvb.Scalar.White, task.lineWidth)
+            DrawContour(dst2, tour.ToList, white, task.lineWidth)
         Next
         labels(2) = $"There were {allContours.Count} contours found."
     End Sub
@@ -915,7 +915,7 @@ Public Class Contour_FromPoints : Inherits TaskParent
             dst2.SetTo(0)
             For Each p1 In random.PointList
                 For Each p2 In random.PointList
-                    DrawLine(dst2, p1, p2, cvb.Scalar.White)
+                    DrawLine(dst2, p1, p2, white)
                 Next
             Next
         End If
@@ -928,6 +928,6 @@ Public Class Contour_FromPoints : Inherits TaskParent
         Next
 
         dst3.SetTo(0)
-        DrawContour(dst3, hull, cvb.Scalar.White, -1)
+        DrawContour(dst3, hull, white, -1)
     End Sub
 End Class

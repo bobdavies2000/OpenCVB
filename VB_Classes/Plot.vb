@@ -12,7 +12,7 @@ Public Class Plot_Basics : Inherits TaskParent
         desc = "Plot data provided in src Mat"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        hist.plotColors(0) = cvb.Scalar.White
+        hist.plotColors(0) = white
         hist.Run(src)
         dst2 = hist.dst2
 
@@ -59,7 +59,7 @@ Public Class Plot_Depth : Inherits TaskParent
             Dim meterDepth = CInt(src.Width / lineCount)
             For i = 1 To lineCount
                 Dim x = i * meterDepth
-                DrawLine(dst2, New cvb.Point(x, 0), New cvb.Point(x, src.Height), cvb.Scalar.White)
+                DrawLine(dst2, New cvb.Point(x, 0), New cvb.Point(x, src.Height), white)
                 SetTrueText(Format(i, "0") + "m", New cvb.Point(x + 4, src.Height - 10))
             Next
         End If
@@ -133,13 +133,13 @@ Public Class Plot_OverTimeSingle : Inherits TaskParent
             For i = 0 To 2
                 Dim nextText = Format(Choose(i + 1, max, inputList.Average, min), fmt)
                 Dim pt = Choose(i + 1, New cvb.Point(0, 10), New cvb.Point(0, dst2.Height / 2 - 5), New cvb.Point(0, dst2.Height - 3))
-                cvb.Cv2.PutText(dst2, nextText, pt, cvb.HersheyFonts.HersheyPlain, 0.7, cvb.Scalar.White, 1, task.lineType)
+                cvb.Cv2.PutText(dst2, nextText, pt, cvb.HersheyFonts.HersheyPlain, 0.7, white, 1, task.lineType)
             Next
         End If
 
         Dim p1 = New cvb.Point(0, dst2.Height / 2)
         Dim p2 = New cvb.Point(dst2.Width, dst2.Height / 2)
-        dst2.Line(p1, p2, cvb.Scalar.White, task.cvFontThickness)
+        dst2.Line(p1, p2, white, task.cvFontThickness)
         If standaloneTest() Then SetTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3)
     End Sub
 End Class
@@ -186,7 +186,7 @@ End Class
 Public Class Plot_OverTime : Inherits TaskParent
     Public plotData As cvb.Scalar
     Public plotCount As Integer = 3
-    Public plotColors() As cvb.Scalar = {cvb.Scalar.Blue, cvb.Scalar.LawnGreen, cvb.Scalar.Red, cvb.Scalar.White}
+    Public plotColors() As cvb.Scalar = {cvb.Scalar.Blue, cvb.Scalar.LawnGreen, cvb.Scalar.Red, white}
     Public backColor = cvb.Scalar.DarkGray
     Public minScale As Integer = 50
     Public maxScale As Integer = 200
@@ -259,7 +259,7 @@ Public Class Plot_OverTime : Inherits TaskParent
 
 
         If task.heartBeat Then
-            dst2.Line(New cvb.Point(columnIndex, 0), New cvb.Point(columnIndex, dst2.Height), cvb.Scalar.White, 1)
+            dst2.Line(New cvb.Point(columnIndex, 0), New cvb.Point(columnIndex, dst2.Height), white, 1)
         End If
 
         columnIndex += task.DotSize
@@ -279,7 +279,7 @@ End Class
 Public Class Plot_OverTimeFixedScale : Inherits TaskParent
     Public plotData As cvb.Scalar
     Public plotCount As Integer = 3
-    Public plotColors() As cvb.Scalar = {cvb.Scalar.Blue, cvb.Scalar.Green, cvb.Scalar.Red, cvb.Scalar.White}
+    Public plotColors() As cvb.Scalar = {cvb.Scalar.Blue, cvb.Scalar.Green, cvb.Scalar.Red, white}
     Public backColor = cvb.Scalar.DarkGray
     Public minScale As Integer = 50
     Public maxScale As Integer = 200
@@ -338,7 +338,7 @@ Public Class Plot_OverTimeFixedScale : Inherits TaskParent
         If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
 
         If task.heartBeat Then
-            plotOutput.Line(New cvb.Point(columnIndex, 0), New cvb.Point(columnIndex, plotOutput.Height), cvb.Scalar.White, task.lineWidth)
+            plotOutput.Line(New cvb.Point(columnIndex, 0), New cvb.Point(columnIndex, plotOutput.Height), white, task.lineWidth)
         End If
 
         For i = 0 To plotCount - 1

@@ -13,7 +13,7 @@ Public Class Covariance_Basics : Inherits TaskParent
             random.Run(empty)
             src = cvb.Mat.FromPixelData(random.PointList.Count, 2, cvb.MatType.CV_32F, random.PointList.ToArray)
             For i = 0 To random.PointList.Count - 1
-                DrawCircle(dst3,random.PointList(i), 3, cvb.Scalar.White)
+                DrawCircle(dst3,random.PointList(i), 3, white)
             Next
         End If
         Dim samples2 = src.Reshape(2)

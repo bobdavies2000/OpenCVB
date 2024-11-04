@@ -215,8 +215,8 @@ Public Class Feature_KNN : Inherits TaskParent
         src.CopyTo(dst2)
         dst3.SetTo(0)
         For Each pt In featurePoints
-            DrawCircle(dst2, pt, task.DotSize + 2, cvb.Scalar.White)
-            DrawCircle(dst3, pt, task.DotSize + 2, cvb.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize + 2, white)
+            DrawCircle(dst3, pt, task.DotSize + 2, white)
         Next
 
         labels(2) = feat.labels(2)
@@ -244,8 +244,8 @@ Public Class Feature_Reduction : Inherits TaskParent
         feat.Run(reduction.dst2)
         If task.heartBeat Then dst3.SetTo(0)
         For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
-            DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, white)
+            DrawCircle(dst3, pt, task.DotSize, white)
         Next
     End Sub
 End Class
@@ -375,7 +375,7 @@ Public Class Feature_Delaunay : Inherits TaskParent
         facet.Run(src)
         dst3 = facet.dst2
         For Each pt In task.features
-            DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3, pt, task.DotSize, white)
         Next
         labels(3) = "There were " + CStr(task.features.Count) + " Delaunay contours"
     End Sub
@@ -411,7 +411,7 @@ Public Class Feature_LucasKanade : Inherits TaskParent
                 DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
                 stationary += 1
             Else
-                DrawLine(dst3, pyr.lastFeatures(i), pyr.features(i), cvb.Scalar.White)
+                DrawLine(dst3, pyr.lastFeatures(i), pyr.features(i), white)
                 motion += 1
             End If
         Next
@@ -559,7 +559,7 @@ Public Class Feature_ShiTomasi : Inherits TaskParent
             dst2 = task.leftView
             dst3 = task.rightView
             shiTomasi.Run(task.leftView)
-            dst2.SetTo(cvb.Scalar.White, shiTomasi.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
+            dst2.SetTo(white, shiTomasi.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
 
             shiTomasi.Run(task.rightView)
             dst3.SetTo(task.HighlightColor, shiTomasi.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
@@ -606,7 +606,7 @@ Public Class Feature_Generations : Inherits TaskParent
         For i = 0 To features.Count - 1
             If gens(i) = 1 Then Exit For
             Dim pt = features(i)
-            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, white)
         Next
 
         If task.heartBeat Then
@@ -792,7 +792,7 @@ Public Class Feature_Gather : Inherits TaskParent
                 For i = 0 To ptMat.Rows - 1
                     Dim pt = ptMat.Get(Of cvb.Point2f)(i, 0)
                     features.Add(pt)
-                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
                 Next
 
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"

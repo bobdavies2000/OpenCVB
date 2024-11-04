@@ -116,7 +116,7 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
                     dst2.Line(pt1, pt2, task.HighlightColor, task.lineWidth + task.lineWidth, task.lineType)
-                    DrawCircle(dst3, pt1, task.DotSize + 3, cvb.Scalar.White)
+                    DrawCircle(dst3, pt1, task.DotSize + 3, white)
                     DrawCircle(dst3, pt2, task.DotSize + 1, cvb.Scalar.Red)
                 End If
             End If

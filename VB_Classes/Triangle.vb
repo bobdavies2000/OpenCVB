@@ -146,7 +146,7 @@ Public Class Triangle_Cell : Inherits TaskParent
             xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
             yFactor = dst2.Height
         End If
-        dst3.Rectangle(cellRect, cvb.Scalar.White, task.lineWidth)
+        dst3.Rectangle(cellRect, white, task.lineWidth)
 
         For Each pt In rc.contour
             Dim vec = task.pointCloud(rc.rect).Get(Of cvb.Point3f)(pt.Y, pt.X)
@@ -202,7 +202,7 @@ Public Class Triangle_Mask : Inherits TaskParent
             xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
             yFactor = dst2.Height
         End If
-        dst3.Rectangle(cellRect, cvb.Scalar.White, task.lineWidth)
+        dst3.Rectangle(cellRect, white, task.lineWidth)
 
         triangles.Clear()
         For y = 0 To rc.rect.Height - 1

@@ -17,7 +17,7 @@ Public Class Horizon_Basics : Inherits TaskParent
         dst2.SetTo(0)
         For Each pt In points
             pt = New cvb.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, white)
         Next
 
         DrawLine(dst2, vec.p1, vec.p2, 255)
@@ -322,7 +322,7 @@ Public Class Horizon_Perpendicular : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
 
         perp.input = task.horizonVec
         perp.Run(src)
@@ -331,7 +331,7 @@ Public Class Horizon_Perpendicular : Inherits TaskParent
         Dim gVec = task.gravityVec
         gVec.p1.X += 10
         gVec.p2.X += 10
-        DrawLine(dst2, gVec.p1, gVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, gVec.p1, gVec.p2, white)
     End Sub
 End Class
 

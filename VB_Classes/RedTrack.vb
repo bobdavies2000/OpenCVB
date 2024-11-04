@@ -14,7 +14,7 @@ Public Class RedTrack_Basics : Inherits TaskParent
         dst2.SetTo(0)
         For Each rc As rcData In task.redCells
             DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If rc.index = task.rc.index Then DrawContour(dst2(rc.rect), rc.contour, cvb.Scalar.White, -1)
+            If rc.index = task.rc.index Then DrawContour(dst2(rc.rect), rc.contour, white, -1)
         Next
         strOut = stats.strOut
         SetTrueText(strOut, 3)
@@ -117,7 +117,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
         rightmost = findNearest(rightCenter)
         rightCenter = task.redCells(rightmost).maxDist
 
-        DrawLine(dst2, leftCenter, rightCenter, cvb.Scalar.White)
+        DrawLine(dst2, leftCenter, rightCenter, white)
         labels(2) = track.redC.labels(2)
     End Sub
 End Class
@@ -149,7 +149,7 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
             Dim p2 = knn.trainInput(index)
             DrawCircle(dst3, p1, task.DotSize, cvb.Scalar.Yellow)
             DrawCircle(dst3, p2, task.DotSize, cvb.Scalar.Yellow)
-            DrawLine(dst3, p1, p2, cvb.Scalar.White)
+            DrawLine(dst3, p1, p2, white)
         Next
         knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
     End Sub
@@ -176,7 +176,7 @@ Public Class RedTrack_GoodCell : Inherits TaskParent
         good.Run(src)
         dst3.SetTo(0)
         For Each pt In good.featureList
-            DrawCircle(dst3,pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3,pt, task.DotSize, white)
         Next
     End Sub
 End Class
@@ -208,11 +208,11 @@ Public Class RedTrack_GoodCells : Inherits TaskParent
             If trackIndex.Contains(index) = False Then
                 Dim rc = task.redCells(index)
                 If rc.hull Is Nothing Then Continue For
-                DrawContour(dst2(rc.rect), rc.hull, cvb.Scalar.White, -1)
+                DrawContour(dst2(rc.rect), rc.hull, white, -1)
                 trackIndex.Add(index)
 
                 DrawCircle(dst0, pt, task.DotSize, task.HighlightColor)
-                DrawCircle(dst3,pt, task.DotSize, cvb.Scalar.White)
+                DrawCircle(dst3,pt, task.DotSize, white)
                 trackCells.Add(rc)
             End If
         Next

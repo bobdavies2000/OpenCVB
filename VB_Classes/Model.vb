@@ -137,7 +137,7 @@ Public Class Model_CellZoom : Inherits TaskParent
         Dim rcX = task.rc
 
         dst1.SetTo(0)
-        Dim mask = dst3.InRange(cvb.Scalar.White, cvb.Scalar.White)
+        Dim mask = dst3.InRange(white, white)
 
         dst3.CopyTo(dst1, mask)
         Dim points = mask.FindNonZero()
@@ -147,7 +147,7 @@ Public Class Model_CellZoom : Inherits TaskParent
             Dim mmY = GetMinMax(split(1))
 
             Dim r = New cvb.Rect(mmX.minVal, mmY.minVal, mmX.maxVal - mmX.minVal, mmY.maxVal - mmY.minVal)
-            dst1.Rectangle(r, cvb.Scalar.White, 1, task.lineType)
+            dst1.Rectangle(r, white, 1, task.lineType)
         End If
     End Sub
 End Class

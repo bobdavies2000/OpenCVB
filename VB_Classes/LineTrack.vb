@@ -48,7 +48,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
             If i < 10 Then
                 SetTrueText("lp " + CStr(i), lp.p1, 3)
                 SetTrueText("mp " + CStr(i), mp.p2, 3)
-                dst3.Line(lp.p1, lp.p2, cvb.Scalar.White, task.lineWidth + 2, task.lineType)
+                dst3.Line(lp.p1, lp.p2, white, task.lineWidth + 2, task.lineType)
                 dst3.Line(mp.p1, mp.p2, cvb.Scalar.Red, task.lineWidth, task.lineType)
             End If
 
@@ -73,7 +73,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
                 lpList(i) = lp
             End If
             'dst3.Line(lp.p1, lp.p2, task.vecColors(lp.colorIndex), 3, task.lineType)
-            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.White, task.lineWidth)
+            DrawLine(dst2, lp.p1, lp.p2, white, task.lineWidth)
             DrawCircle(dst2, lp.center, task.DotSize, task.HighlightColor, -1)
         Next
 
@@ -110,7 +110,7 @@ Public Class LineTrack_RedCloud : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each lp In lines.lpList
-            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.White, task.lineWidth)
+            DrawLine(dst2, lp.p1, lp.p2, white, task.lineWidth)
             DrawCircle(dst2, lp.center, task.DotSize, task.HighlightColor, -1)
         Next
     End Sub
@@ -182,7 +182,7 @@ Public Class LineTrack_Basics1 : Inherits TaskParent
                 lpList(i) = lp
             End If
             dst3.Line(lp.p1, lp.p2, task.vecColors(lp.colorIndex), 3, task.lineType)
-            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.White, task.lineWidth)
+            DrawLine(dst2, lp.p1, lp.p2, white, task.lineWidth)
             DrawCircle(dst2, lp.center, task.DotSize, task.HighlightColor, -1)
         Next
 

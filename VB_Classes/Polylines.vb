@@ -16,7 +16,7 @@ Public Class Polylines_IEnumerableExample : Inherits TaskParent
 
         dst2 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         ' NOTE: when there are 2 points, there will be 1 line.
-        dst2.Polylines(pts, options.polyClosed, cvb.Scalar.White, task.lineWidth, task.lineType)
+        dst2.Polylines(pts, options.polyClosed, white, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -47,7 +47,7 @@ Public Class Polylines_Random : Inherits TaskParent
             pts.Add(points)
 
             dst2 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-            dst2.Polylines(pts, False, cvb.Scalar.White, task.lineWidth, task.lineType)
+            dst2.Polylines(pts, False, white, task.lineWidth, task.lineType)
             dst2 = dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
         End If
 

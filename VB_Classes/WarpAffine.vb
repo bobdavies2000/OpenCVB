@@ -102,7 +102,7 @@ Public Class WarpAffine_Captcha : Inherits TaskParent
         Dim angle = rng.Next(0, 29) * sign ' between -30 and 30
         Dim center = New cvb.Point2f(input.Cols / 2, input.Rows / 2)
         Dim rotationMatrix = cvb.Cv2.GetRotationMatrix2D(center, angle, 1)
-        cvb.Cv2.WarpAffine(input, output, rotationMatrix, input.Size(), cvb.InterpolationFlags.Linear, cvb.BorderTypes.Constant, cvb.Scalar.White)
+        cvb.Cv2.WarpAffine(input, output, rotationMatrix, input.Size(), cvb.InterpolationFlags.Linear, cvb.BorderTypes.Constant, white)
     End Sub
     Private Sub transformPerspective(ByRef charImage As cvb.Mat)
         Dim srcPt() = {New cvb.Point2f(0, 0), New cvb.Point2f(0, charHeight), New cvb.Point2f(charWidth, 0), New cvb.Point2f(charWidth, charHeight)}
@@ -116,16 +116,16 @@ Public Class WarpAffine_Captcha : Inherits TaskParent
 
         Dim perpectiveTranx = cvb.Cv2.GetPerspectiveTransform(srcPt, dstPt)
         cvb.Cv2.WarpPerspective(charImage, charImage, perpectiveTranx, New cvb.Size(charImage.Cols, charImage.Rows), cvb.InterpolationFlags.Cubic,
-                               cvb.BorderTypes.Constant, cvb.Scalar.White)
+                               cvb.BorderTypes.Constant, white)
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim characters() As String = {"a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
         Dim charactersSize = characters.Length / characters(0).Length
 
-        Dim outImage As New cvb.Mat(charHeight, charWidth * captchaLength, cvb.MatType.CV_8UC3, cvb.Scalar.White)
+        Dim outImage As New cvb.Mat(charHeight, charWidth * captchaLength, cvb.MatType.CV_8UC3, white)
 
         For i = 0 To captchaLength - 1
-            Dim charImage = New cvb.Mat(charHeight, charWidth, cvb.MatType.CV_8UC3, cvb.Scalar.White)
+            Dim charImage = New cvb.Mat(charHeight, charWidth, cvb.MatType.CV_8UC3, white)
             Dim c = characters(rng.Next(0, characters.Length - 1))
             cvb.Cv2.PutText(charImage, c, New cvb.Point(10, charHeight - 10), msRNG.Next(1, 6), msRNG.Next(3, 4),
                            task.vecColors(i), msRNG.Next(1, 5), cvb.LineTypes.AntiAlias)
@@ -179,11 +179,11 @@ Public Class WarpAffine_3Points : Inherits TaskParent
                 For i = 0 To triangles(j).Rows - 1
                     Dim p1 = triangles(j).Get(Of cvb.Point2f)(i) + New cvb.Point2f(j * src.Width, 0)
                     Dim p2 = triangles(j).Get(Of cvb.Point2f)((i + 1) Mod 3) + New cvb.Point2f(j * src.Width, 0)
-                    Dim color = Choose(i + 1, cvb.Scalar.Red, cvb.Scalar.White, cvb.Scalar.Yellow)
+                    Dim color = Choose(i + 1, cvb.Scalar.Red, white, cvb.Scalar.Yellow)
                     wideMat.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
                     If j = 0 Then
                         Dim p3 = triangles(j + 1).Get(Of cvb.Point2f)(i) + New cvb.Point2f(src.Width, 0)
-                        DrawLine(wideMat, p1, p3, cvb.Scalar.White)
+                        DrawLine(wideMat, p1, p3, white)
                     End If
                 Next
             Next
@@ -199,9 +199,9 @@ Public Class WarpAffine_3Points : Inherits TaskParent
             Dim pt As cvb.Point
             For i = 0 To srcPoints1.Count - 1
                 pt = New cvb.Point(CInt(srcPoints1(i).X), CInt(srcPoints1(i).Y))
-                DrawCircle(dst2, pt, task.DotSize + 2, cvb.Scalar.White)
+                DrawCircle(dst2, pt, task.DotSize + 2, white)
                 pt = New cvb.Point(CInt(srcPoints2(i).X), CInt(srcPoints2(i).Y))
-                DrawCircle(dst3, pt, task.DotSize + 2, cvb.Scalar.White)
+                DrawCircle(dst3, pt, task.DotSize + 2, white)
             Next
         End If
         SetTrueText("M defined as: " + vbCrLf +
@@ -252,9 +252,9 @@ Public Class WarpAffine_4Points : Inherits TaskParent
                     Dim p2 = rectangles(j).Points((i + 1) Mod rectangles(j).Points.Length)
                     If j = 0 Then
                         Dim p3 = rectangles(1).Points(i)
-                        DrawLine(dst2, p1, p3, cvb.Scalar.White)
+                        DrawLine(dst2, p1, p3, white)
                     End If
-                    Dim color = Choose(i + 1, cvb.Scalar.Red, cvb.Scalar.White, cvb.Scalar.Yellow, cvb.Scalar.Green)
+                    Dim color = Choose(i + 1, cvb.Scalar.Red, white, cvb.Scalar.Yellow, cvb.Scalar.Green)
                     dst2.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
                 Next
             Next
@@ -327,8 +327,8 @@ Public Class WarpAffine_Repeated : Inherits TaskParent
         For i = 0 To 2
             cvb.Cv2.WarpAffine(dst3(rect), dst3(rect), m2, New cvb.Size(bound_w, bound_h))
         Next
-        dst2.Rectangle(rect, cvb.Scalar.White, task.lineWidth, task.lineType)
-        dst3.Rectangle(rect, cvb.Scalar.White, task.lineWidth, task.lineType)
+        dst2.Rectangle(rect, white, task.lineWidth, task.lineType)
+        dst3.Rectangle(rect, white, task.lineWidth, task.lineType)
     End Sub
 End Class
 

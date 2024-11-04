@@ -233,7 +233,7 @@ Public Class Hist3Dcolor_Select : Inherits TaskParent
         Dim saveCount = dst2.CountNonZero
 
         dst3 = src.Clone
-        dst3.SetTo(cvb.Scalar.White, dst2)
+        dst3.SetTo(white, dst2)
 
         labels(2) = CStr(saveCount) + " pixels were found in bin " + CStr(selection)
     End Sub

@@ -18,7 +18,7 @@ Public Class FitEllipse_Basics : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2,pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize, white)
         Next
 
         If inputPoints.Count > 4 Then
@@ -54,7 +54,7 @@ Public Class FitEllipse_AMS_CPP_VB : Inherits TaskParent
         End If
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, white)
         Next
 
         Dim input As cvb.Mat = cvb.Mat.FromPixelData(inputPoints.Count, 1, cvb.MatType.CV_32FC2, inputPoints.ToArray)
@@ -97,7 +97,7 @@ Public Class FitEllipse_Direct_CPP_VB : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each pt In options.srcPoints
-            DrawCircle(dst2,pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize, white)
         Next
 
         Dim input As cvb.Mat = cvb.Mat.FromPixelData(options.srcPoints.Count, 1, cvb.MatType.CV_32FC2, options.srcPoints.ToArray)
@@ -144,8 +144,8 @@ Public Class FitEllipse_RedCloud : Inherits TaskParent
         Next
         fitE.Run(empty)
         dst3.SetTo(0)
-        dst3(task.rc.rect).SetTo(cvb.Scalar.White, task.rc.mask)
-        dst3.Rectangle(task.rc.rect, cvb.Scalar.White, task.lineWidth, task.lineType)
+        dst3(task.rc.rect).SetTo(white, task.rc.mask)
+        dst3.Rectangle(task.rc.rect, white, task.lineWidth, task.lineType)
         dst3(task.rc.rect).Ellipse(fitE.box, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
     End Sub
 End Class

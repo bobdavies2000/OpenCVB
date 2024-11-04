@@ -21,7 +21,7 @@ Public Class Line_Basics : Inherits TaskParent
             Dim v2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
             If v1 = 0 And v2 = 0 Then
                 nextSet.Add(lp.length, lp)
-                dst3.Line(lp.p1, lp.p2, cvb.Scalar.White, 2, cvb.LineTypes.Link8)
+                dst3.Line(lp.p1, lp.p2, white, 2, cvb.LineTypes.Link8)
             Else
                 motionToss += 1
             End If
@@ -33,7 +33,7 @@ Public Class Line_Basics : Inherits TaskParent
             Dim v2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
             If v1 <> 0 Or v2 <> 0 Then
                 nextSet.Add(lp.length, lp)
-                dst3.Line(lp.p1, lp.p2, cvb.Scalar.White, 2, cvb.LineTypes.Link8)
+                dst3.Line(lp.p1, lp.p2, white, 2, cvb.LineTypes.Link8)
             Else
                 motionLineCount += 1
             End If
@@ -42,7 +42,7 @@ Public Class Line_Basics : Inherits TaskParent
         lpList = New List(Of PointPair)(nextSet.Values)
 
         For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
+            dst2.Line(lp.p1, lp.p2, white, 3, cvb.LineTypes.Link8)
         Next
         If task.heartBeat Then
             labels(2) = "Existing lines tossed because of motion: " + CStr(motionToss) +
@@ -74,7 +74,7 @@ Public Class Line_OriginalBasics : Inherits TaskParent
         For Each lp In lpList
             If task.motionMask(lp.rect).CountNonZero() = 0 Then
                 nextSet.Add(lp.length, lp)
-                dst3.Line(lp.p1, lp.p2, cvb.Scalar.White, 2, cvb.LineTypes.Link8)
+                dst3.Line(lp.p1, lp.p2, white, 2, cvb.LineTypes.Link8)
             Else
                 motionToss += 1
             End If
@@ -92,7 +92,7 @@ Public Class Line_OriginalBasics : Inherits TaskParent
         lpList = New List(Of PointPair)(nextSet.Values)
 
         For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
+            dst2.Line(lp.p1, lp.p2, white, 3, cvb.LineTypes.Link8)
         Next
         If task.heartBeat Then
             labels(2) = "Existing lines tossed because of motion: " + CStr(motionToss) +
@@ -111,7 +111,7 @@ End Class
 Public Class Line_Core : Inherits TaskParent
     Dim ld As cvb.XImgProc.FastLineDetector
     Public lpList As New List(Of PointPair)
-    Public lineColor = cvb.Scalar.White
+    Public lineColor = white
     Public options As New Options_Line
     Public Sub New()
         ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -156,7 +156,7 @@ Public Class Line_Core : Inherits TaskParent
         For Each lp In lpList
             DrawLine(dst2, lp.p1, lp.p2, lineColor)
             DrawLine(dst3, lp.p1, lp.p2, 255)
-            DrawCircle(dst3, lp.center, task.DotSize + 1, cvb.Scalar.White, -1)
+            DrawCircle(dst3, lp.center, task.DotSize + 1, white, -1)
         Next
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
@@ -193,7 +193,7 @@ Public Class Line_SubsetRect : Inherits TaskParent
     Public mpList As New List(Of PointPair)
     Public ptList As New List(Of cvb.Point2f)
     Public subsetRect As cvb.Rect
-    Public lineColor = cvb.Scalar.White
+    Public lineColor = white
     Public Sub New()
         subsetRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
         ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -294,7 +294,7 @@ Public Class Line_InterceptsUI : Inherits TaskParent
             If color(0) = 254 Then p2 = New cvb.Point(0, b) ' blue
             DrawLine(dst3, center, p2, cvb.Scalar.Black)
         End If
-        DrawCircle(dst3, center, task.DotSize, cvb.Scalar.White)
+        DrawCircle(dst3, center, task.DotSize, white)
         If color(0) = 0 Then redRadio.Checked = True
         If color(0) = 1 Then greenRadio.Checked = True
         If color(0) = 2 Then yellowRadio.Checked = True
@@ -303,17 +303,17 @@ Public Class Line_InterceptsUI : Inherits TaskParent
         For Each inter In lines.intercept
             Select Case lines.options.selectedIntercept
                 Case 0
-                    dst3.Line(New cvb.Point(inter.Key, 0), New cvb.Point(inter.Key, 10), cvb.Scalar.White,
+                    dst3.Line(New cvb.Point(inter.Key, 0), New cvb.Point(inter.Key, 10), white,
                              task.lineWidth)
                 Case 1
                     dst3.Line(New cvb.Point(inter.Key, dst3.Height), New cvb.Point(inter.Key, dst3.Height - 10),
-                             cvb.Scalar.White, task.lineWidth)
+                             white, task.lineWidth)
                 Case 2
-                    dst3.Line(New cvb.Point(0, inter.Key), New cvb.Point(10, inter.Key), cvb.Scalar.White,
+                    dst3.Line(New cvb.Point(0, inter.Key), New cvb.Point(10, inter.Key), white,
                              task.lineWidth)
                 Case 3
                     dst3.Line(New cvb.Point(dst3.Width, inter.Key), New cvb.Point(dst3.Width - 10, inter.Key),
-                             cvb.Scalar.White, task.lineWidth)
+                             white, task.lineWidth)
             End Select
         Next
         dst2 = lines.dst2
@@ -410,10 +410,10 @@ Public Class Line_LeftRightImages : Inherits TaskParent
         desc = "Find lines in the infrared images and overlay them in a single image"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.cameraStable = False Then dst2.SetTo(cvb.Scalar.White)
+        If task.cameraStable = False Then dst2.SetTo(white)
 
         leftLines.Run(task.leftView)
-        dst2.SetTo(cvb.Scalar.White)
+        dst2.SetTo(white)
         dst2.SetTo(cvb.Scalar.Red, leftLines.dst3)
 
         rightLines.Run(task.rightView)
@@ -629,7 +629,7 @@ Public Class Line_Perpendicular : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then input = task.gravityVec
         dst2.SetTo(0)
-        DrawLine(dst2, input.p1, input.p2, cvb.Scalar.White)
+        DrawLine(dst2, input.p1, input.p2, white)
 
         output = computePerp(input)
         DrawCircle(dst2, midPoint, task.DotSize + 2, cvb.Scalar.Red)
@@ -709,7 +709,7 @@ Public Class Line_FromContours : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each lp In lines.lpList
-            DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.White)
+            DrawLine(dst3, lp.p1, lp.p2, white)
         Next
     End Sub
 End Class
@@ -764,7 +764,7 @@ Public Class Line_TimeViewLines : Inherits TaskParent
         lpList.Clear()
 
         dst2 = lines.dst3
-        dst3.SetTo(cvb.Scalar.White)
+        dst3.SetTo(white)
         Dim index = lines.frameList.Count - 1 ' the most recent.
         For Each lp In lines.lines.lpList
             DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.Green)
@@ -806,7 +806,7 @@ Public Class Line_TimeView : Inherits TaskParent
             lineTotal += frameList(i).Count
             For Each lp In frameList(i)
                 DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Yellow)
-                DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.White)
+                DrawLine(dst3, lp.p1, lp.p2, white)
                 mpList.Add(lp)
             Next
         Next
@@ -968,8 +968,8 @@ Public Class Line_Nearest : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Yellow)
-            DrawLine(dst2, pt, nearPoint, cvb.Scalar.White)
-            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+            DrawLine(dst2, pt, nearPoint, white)
+            DrawCircle(dst2, pt, task.DotSize, white)
         End If
         distance = Math.Sqrt(Math.Pow(pt.X - nearPoint.X, 2) + Math.Pow(pt.Y - nearPoint.Y, 2))
     End Sub
@@ -1000,7 +1000,7 @@ Public Class Line_Intersection : Inherits TaskParent
         dst2.Line(p1, p2, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
         dst2.Line(p3, p4, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
         If intersectionPoint <> New cvb.Point2f Then
-            DrawCircle(dst2, intersectionPoint, task.DotSize + 4, cvb.Scalar.White)
+            DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
             labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
         Else
             labels(2) = "Parallel!!!"
@@ -1264,7 +1264,7 @@ Public Class Line_VerticalHorizontal1 : Inherits TaskParent
         If standaloneTest() Then dst3 = lines.dst2
 
         nearest.lp = task.gravityVec
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
         For Each lp In lines.lpList
             Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2,
                                         New cvb.Rect(0, 0, src.Width, src.Height))
@@ -1285,7 +1285,7 @@ Public Class Line_VerticalHorizontal1 : Inherits TaskParent
             End If
         Next
 
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
         nearest.lp = task.horizonVec
         For Each lp In lines.lpList
             Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cvb.Rect(0, 0, src.Width, src.Height))
@@ -1354,7 +1354,7 @@ Public Class Line_DisplayInfoOld : Inherits TaskParent
 
         For Each tc In tcells
             'dst2.Rectangle(tc.rect, myHighlightColor)
-            'dst2.Rectangle(tc.searchRect, cvb.Scalar.White, task.lineWidth)
+            'dst2.Rectangle(tc.searchRect, white, task.lineWidth)
             SetTrueText(tc.strOut, New cvb.Point(tc.rect.X, tc.rect.Y))
         Next
 
@@ -1423,7 +1423,7 @@ Public Class Line_Info : Inherits TaskParent
         End If
         dst2 = src
         For Each mp In lpInput
-            dst2.Line(mp.p1, mp.p2, cvb.Scalar.White, 3, cvb.LineTypes.Link8)
+            dst2.Line(mp.p1, mp.p2, white, 3, cvb.LineTypes.Link8)
         Next
 
         Static lp As PointPair = lpInput(0)
@@ -1575,12 +1575,12 @@ Public Class Line_PointSlope1 : Inherits TaskParent
         dst1.SetTo(0)
         For i = 0 To 0
             Dim lp = lines.lpList(i)
-            DrawLine(dst2, lp.xp1, lp.xp2, cvb.Scalar.White)
+            DrawLine(dst2, lp.xp1, lp.xp2, white)
             DrawLine(dst1, lp.p1, lp.p2, task.HighlightColor)
             For j = 0 To knn.result.GetUpperBound(1) Step dimension
                 Dim mp = lastLines(CInt(knn.result(i, j) / dimension))
                 DrawLine(dst2, mp.xp1, mp.xp2, task.HighlightColor)
-                DrawLine(dst1, mp.p1, mp.p2, cvb.Scalar.White)
+                DrawLine(dst1, mp.p1, mp.p2, white)
                 If j = 0 Then Exit For
             Next
         Next
@@ -1704,7 +1704,7 @@ Public Class Line_TopXlines : Inherits TaskParent
         For Each lp In lpList
             dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, cvb.Scalar.Black, task.lineWidth, task.lineType)
-            DrawCircle(dst3, lp.center, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3, lp.center, task.DotSize, white)
         Next
 
         If task.heartBeat Then labels(2) = CStr(lpList.Count) + " unique lines have been identified."

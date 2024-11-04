@@ -15,11 +15,11 @@ Public Class Gravity_Basics : Inherits TaskParent
         dst2.SetTo(0)
         dst3.SetTo(0)
         For Each pt In points
-            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, white)
         Next
 
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
-        DrawLine(dst3, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
+        DrawLine(dst3, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src

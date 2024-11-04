@@ -129,7 +129,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
         For Each ptlist In xyList
             Dim p1 = ptlist(0)
             Dim p2 = ptlist(ptlist.Count - 1)
-            DrawLine(dst2, p1, p2, cvb.Scalar.White)
+            DrawLine(dst2, p1, p2, white)
         Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -175,7 +175,7 @@ Public Class Line3D_CandidatesAll : Inherits TaskParent
             For i = 0 To ptlist.Count - 2
                 Dim p1 = ptlist(i)
                 Dim p2 = ptlist(i + 1)
-                DrawLine(dst2, p1, p2, cvb.Scalar.White)
+                DrawLine(dst2, p1, p2, white)
             Next
         Next
     End Sub

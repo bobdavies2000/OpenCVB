@@ -458,7 +458,7 @@ Public Class Structured_CountTop : Inherits TaskParent
         Dim index = counts.IndexOf(max)
         dst0 = makeXSlice(index)
         dst2 = task.color.Clone
-        dst2.SetTo(cvb.Scalar.White, dst0)
+        dst2.SetTo(white, dst0)
         dst1.Line(New cvb.Point(index, 0), New cvb.Point(index, dst1.Height), cvb.Scalar.Red, slice.options.sliceSize)
 
         Dim hist As cvb.Mat = cvb.Mat.FromPixelData(dst0.Width, 1, cvb.MatType.CV_32F, counts.ToArray)
@@ -593,7 +593,7 @@ Public Class Structured_MultiSliceH : Inherits TaskParent
         Next
 
         dst2 = task.color.Clone
-        dst2.SetTo(cvb.Scalar.White, sliceMask)
+        dst2.SetTo(white, sliceMask)
         labels(3) = heat.labels(3)
     End Sub
 End Class
@@ -631,7 +631,7 @@ Public Class Structured_MultiSliceV : Inherits TaskParent
         Next
 
         dst2 = task.color.Clone
-        dst2.SetTo(cvb.Scalar.White, sliceMask)
+        dst2.SetTo(white, sliceMask)
         labels(3) = heat.labels(3)
     End Sub
 End Class
@@ -666,7 +666,7 @@ Public Class Structured_SliceXPlot : Inherits TaskParent
         Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters
         If filterZ > 0 Then
             Dim depthMask = task.pcSplit(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
-            dst2.SetTo(cvb.Scalar.White, depthMask)
+            dst2.SetTo(white, depthMask)
         End If
 
         labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / dst2.Height / task.MaxZmeters, fmt2) + " m"
@@ -705,7 +705,7 @@ Public Class Structured_SliceYPlot : Inherits TaskParent
 
             Dim depthMask = task.pcSplit(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
             dst2 = task.color.Clone
-            dst2.SetTo(cvb.Scalar.White, depthMask)
+            dst2.SetTo(white, depthMask)
             Dim pixelsPerMeter = dst2.Width / task.MaxZmeters
             labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / pixelsPerMeter, fmt2) + " m"
         End If
@@ -755,7 +755,7 @@ Public Class Structured_MouseSlice : Inherits TaskParent
         End If
         If standaloneTest() Then
             dst2 = src
-            dst2.SetTo(cvb.Scalar.White, dst3)
+            dst2.SetTo(white, dst3)
         End If
     End Sub
 End Class
@@ -818,7 +818,7 @@ Public Class Structured_SliceEither : Inherits TaskParent
         End If
         If standaloneTest() Then
             dst2 = src
-            dst2.SetTo(cvb.Scalar.White, sliceMask)
+            dst2.SetTo(white, sliceMask)
         End If
     End Sub
 End Class
@@ -867,7 +867,7 @@ Public Class Structured_TransformH : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.SetTo(cvb.Scalar.White, sliceMask)
+            dst2.SetTo(white, sliceMask)
         End If
     End Sub
 End Class
@@ -914,7 +914,7 @@ Public Class Structured_TransformV : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.SetTo(cvb.Scalar.White, sliceMask)
+            dst2.SetTo(white, sliceMask)
         End If
     End Sub
 End Class
@@ -1004,7 +1004,7 @@ Public Class Structured_CountSideSum : Inherits TaskParent
         Dim surfaces As New List(Of Single)
         For i = 0 To counts.Count - 1
             If counts(i) >= max / 2 Then
-                DrawLine(dst2, New cvb.Point(0, i), New cvb.Point(dst2.Width, i), cvb.Scalar.White)
+                DrawLine(dst2, New cvb.Point(0, i), New cvb.Point(dst2.Width, i), white)
                 surfaces.Add(yValues(i))
             End If
         Next
@@ -1069,7 +1069,7 @@ Public Class Structured_SliceV : Inherits TaskParent
         dst3.Line(New cvb.Point(xCoordinate, 0), New cvb.Point(xCoordinate, dst3.Height), task.HighlightColor, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
-            dst2.SetTo(cvb.Scalar.White, sliceMask)
+            dst2.SetTo(white, sliceMask)
         End If
     End Sub
 End Class
@@ -1114,7 +1114,7 @@ Public Class Structured_SliceH : Inherits TaskParent
         dst3.Line(New cvb.Point(0, yPlaneOffset), New cvb.Point(dst3.Width, yPlaneOffset), task.HighlightColor, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
-            dst2.SetTo(cvb.Scalar.White, sliceMask)
+            dst2.SetTo(white, sliceMask)
         End If
     End Sub
 End Class

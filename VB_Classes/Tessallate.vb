@@ -43,10 +43,10 @@ Public Class Tessallate_Basics : Inherits TaskParent
                 corners(i) = New cvb.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
             Next
             Dim center = New cvb.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
-            DrawLine(dst2, corners(0), center, cvb.Scalar.White)
-            DrawLine(dst2, corners(1), center, cvb.Scalar.White)
-            DrawLine(dst2, corners(2), center, cvb.Scalar.White)
-            DrawLine(dst2, corners(3), center, cvb.Scalar.White)
+            DrawLine(dst2, corners(0), center, white)
+            DrawLine(dst2, corners(1), center, white)
+            DrawLine(dst2, corners(2), center, white)
+            DrawLine(dst2, corners(3), center, white)
 
             listOfPoints.Add(addTriangle(corners(0), corners(3), center, rc, shift))
             listOfPoints.Add(addTriangle(corners(1), corners(0), center, rc, shift))

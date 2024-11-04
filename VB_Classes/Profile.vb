@@ -3,8 +3,8 @@ Public Class Profile_Basics : Inherits TaskParent
     Public ptLeft As cvb.Point3f, ptRight As cvb.Point3f, ptTop As cvb.Point3f, ptBot As cvb.Point3f, ptFront As cvb.Point3f, ptBack As cvb.Point3f
     Public cornerNames As New List(Of String)({"   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
                                                "   Bottom (white)", "   Front (yellow)", "   Back (blue)"})
-    Public cornerColors As New List(Of cvb.Scalar)({cvb.Scalar.White, cvb.Scalar.LightBlue, cvb.Scalar.Red, cvb.Scalar.Green,
-                                                   cvb.Scalar.White, cvb.Scalar.Yellow, cvb.Scalar.Blue})
+    Public cornerColors As New List(Of cvb.Scalar)({white, cvb.Scalar.LightBlue, cvb.Scalar.Red, cvb.Scalar.Green,
+                                                   white, cvb.Scalar.Yellow, cvb.Scalar.Blue})
     Public corners3D As New List(Of cvb.Point3f)
     Public corners As New List(Of cvb.Point)
     Public cornersRaw As New List(Of cvb.Point)
@@ -170,13 +170,13 @@ Public Class Profile_Derivative : Inherits TaskParent
                     Dim r = ((1 - t) * near(2) + t * far(2))
                     color = New cvb.Scalar(b, g, r)
                 Else
-                    color = cvb.Scalar.White
+                    color = white
                 End If
                 DrawCircle(dst3, pt, task.DotSize, color)
 
                 If sides.cornersRaw.Contains(rc.contour(i)) Then
                     Dim index = sides.cornersRaw.IndexOf(rc.contour(i))
-                    DrawCircle(dst1, pt, task.DotSize + 5, cvb.Scalar.White)
+                    DrawCircle(dst1, pt, task.DotSize + 5, white)
                     DrawCircle(dst1, pt, task.DotSize + 3, sides.cornerColors(index))
                     SetTrueText(sides.cornerNames(index), pt, 3)
                 End If

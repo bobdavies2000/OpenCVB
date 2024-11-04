@@ -51,7 +51,7 @@ Public Class LineCoin_Basics : Inherits TaskParent
         If standaloneTest() Then
             dst3 = src
             For Each lp In lpList
-                dst3.Line(lp.p1, lp.p2, cvb.Scalar.White)
+                dst3.Line(lp.p1, lp.p2, white)
             Next
         End If
 

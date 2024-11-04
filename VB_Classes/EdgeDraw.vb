@@ -54,7 +54,7 @@ Public Class EdgeDraw_Segments : Inherits TaskParent
         For i = 0 To ptData.Rows - 1 Step 2
             Dim pt1 = ptData.Get(Of cvb.Point2f)(i, 0)
             Dim pt2 = ptData.Get(Of cvb.Point2f)(i, 1)
-            DrawLine(dst2, pt1, pt2, cvb.Scalar.White)
+            DrawLine(dst2, pt1, pt2, white)
             dst3 += dst2
             segPoints.Add(pt1)
             segPoints.Add(pt2)

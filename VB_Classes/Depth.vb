@@ -104,7 +104,7 @@ Public Class Depth_HolesRect : Inherits TaskParent
             Dim minRect = cvb.Cv2.MinAreaRect(contour)
             Dim nextColor = New cvb.Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
             DrawRotatedRect(minRect, dst2, nextColor)
-            DrawContour(dst3, contour.ToList, cvb.Scalar.White, task.lineWidth)
+            DrawContour(dst3, contour.ToList, white, task.lineWidth)
         Next
         cvb.Cv2.AddWeighted(dst2, 0.5, task.depthRGB, 0.5, 0, dst2)
     End Sub
@@ -302,7 +302,7 @@ Public Class Depth_LocalMinMax_MT : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
             src.CopyTo(dst2)
-            dst2.SetTo(cvb.Scalar.White, task.gridMask)
+            dst2.SetTo(white, task.gridMask)
         End If
 
         If minPoint.Length <> task.gridRects.Count Then
@@ -353,7 +353,7 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
         If task.optionsChanged Then ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
 
         dst2 = src.Clone()
-        dst2.SetTo(cvb.Scalar.White, task.gridMask)
+        dst2.SetTo(white, task.gridMask)
 
         Dim depthmask As cvb.Mat = task.depthMask
 
@@ -743,12 +743,12 @@ Public Class Depth_MaxMask : Inherits TaskParent
         dst2 = src
 
         task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
-        dst2.SetTo(cvb.Scalar.White, task.maxDepthMask)
+        dst2.SetTo(white, task.maxDepthMask)
         contour.Run(task.maxDepthMask)
         dst3.SetTo(0)
         For Each c In contour.allContours
             Dim hull = cvb.Cv2.ConvexHull(c, True).ToList
-            DrawContour(dst3, hull, cvb.Scalar.White, -1)
+            DrawContour(dst3, hull, white, -1)
         Next
     End Sub
 End Class
@@ -789,8 +789,8 @@ Public Class Depth_ForegroundOverTime : Inherits TaskParent
         dst3.SetTo(0)
         For Each ctr In contours.allContours
             If ctr.Length >= options.minSizeContour Then
-                DrawContour(dst2, ctr.ToList, cvb.Scalar.White, -1)
-                DrawContour(dst3, ctr.ToList, cvb.Scalar.White)
+                DrawContour(dst2, ctr.ToList, white, -1)
+                DrawContour(dst3, ctr.ToList, white)
             End If
         Next
     End Sub
@@ -874,8 +874,8 @@ Public Class Depth_Foreground : Inherits TaskParent
         dst3.SetTo(0)
         For Each ctr In contours.allContours
             If ctr.Length >= options.minSizeContour Then
-                DrawContour(dst2, ctr.ToList, cvb.Scalar.White, -1)
-                DrawContour(dst3, ctr.ToList, cvb.Scalar.White)
+                DrawContour(dst2, ctr.ToList, white, -1)
+                DrawContour(dst3, ctr.ToList, white)
             End If
         Next
     End Sub
@@ -901,7 +901,7 @@ Public Class Depth_Grid : Inherits TaskParent
         dst2 = task.gridMask.Clone
         For Each roi In task.gridRects
             Dim mm As mmData = GetMinMax(dst3(roi))
-            If Math.Abs(mm.minVal - mm.maxVal) > 0.1 Then dst2(roi).SetTo(cvb.Scalar.White)
+            If Math.Abs(mm.minVal - mm.maxVal) > 0.1 Then dst2(roi).SetTo(white)
         Next
     End Sub
 End Class
@@ -944,13 +944,13 @@ Public Class Depth_InRange : Inherits TaskParent
                 If ctr.Length >= options.minSizeContour Then
                     DrawContour(dst2, ctr.ToList, classCount, -1)
                     classCount += 1
-                    DrawContour(dst3, ctr.ToList, cvb.Scalar.White)
+                    DrawContour(dst3, ctr.ToList, white)
                 End If
             Next
         Next
 
         dst0 = src.Clone
-        dst0.SetTo(cvb.Scalar.White, dst3)
+        dst0.SetTo(white, dst3)
 
         If standaloneTest() Then dst2 = ShowPalette(dst2 * 255 / classCount)
         If task.heartBeat Then labels(2) = Format(classCount, "000") + " regions were found"

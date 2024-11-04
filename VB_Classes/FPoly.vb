@@ -207,9 +207,9 @@ Public Class FPoly_Sides : Inherits TaskParent
             newPoly = New List(Of cvb.Point2f)(rotatePoly.poly)
         End If
 
-        DrawFPoly(dst2, prevPoly, cvb.Scalar.White)
+        DrawFPoly(dst2, prevPoly, white)
         DrawFPoly(dst2, currPoly, cvb.Scalar.Yellow)
-        DrawFatLine(mpPrev.p1, mpPrev.p2, dst2, cvb.Scalar.White)
+        DrawFatLine(mpPrev.p1, mpPrev.p2, dst2, white)
         DrawFatLine(mpCurr.p1, mpCurr.p2, dst2, cvb.Scalar.Yellow)
     End Sub
 End Class
@@ -473,7 +473,7 @@ Public Class FPoly_Stablizer : Inherits TaskParent
 
         dst1.SetTo(0)
         dst1(rect) = syncImage(rect)
-        DrawFatLine(fGrid.startAnchor, fGrid.anchor, dst1, cvb.Scalar.White)
+        DrawFatLine(fGrid.startAnchor, fGrid.anchor, dst1, white)
         DrawPolkaDot(fGrid.anchor, dst1)
 
         Dim r = New cvb.Rect(0, 0, rect.Width, rect.Height)
@@ -539,7 +539,7 @@ Public Class FPoly_StartPoints : Inherits TaskParent
             If mp.p1.DistanceTo(mp.p2) <= maxShift Then DrawLine(dst1, mp.p1, mp.p2, cvb.Scalar.Yellow)
             DrawCircle(dst1, mp.p1, task.DotSize, cvb.Scalar.Yellow)
         Next
-        dst1.Line(fGrid.anchor, fGrid.startAnchor, cvb.Scalar.White, task.lineWidth + 1, task.lineType)
+        dst1.Line(fGrid.anchor, fGrid.startAnchor, white, task.lineWidth + 1, task.lineType)
     End Sub
 End Class
 
@@ -1280,7 +1280,7 @@ Public Class FPoly_TopFeatures : Inherits TaskParent
         Next
 
         For i = 0 To task.topFeatures.Count - 2
-            DrawLine(dst2, task.topFeatures(i), task.topFeatures(i + 1), cvb.Scalar.White)
+            DrawLine(dst2, task.topFeatures(i), task.topFeatures(i + 1), white)
         Next
     End Sub
 End Class

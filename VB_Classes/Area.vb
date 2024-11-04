@@ -18,7 +18,7 @@ Public Class Area_MinTriangle_CPP_VB : Inherits TaskParent
         Dim dataSrc(srcPoints.Count * 2 - 1) As Single ' input is a list of points.
         Dim dstData(3 * 2 - 1) As Single ' minTriangle returns 3 points
 
-        dst2.SetTo(cvb.Scalar.White)
+        dst2.SetTo(white)
 
         Dim input As cvb.Mat = cvb.Mat.FromPixelData(1, srcPoints.Count, cvb.MatType.CV_32FC2, srcPoints.ToArray)
         Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
@@ -105,7 +105,7 @@ Public Class Area_FindNonZero : Inherits TaskParent
         dst3 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         ' mark the points so they are visible...
         For i = 0 To nonZero.Rows - 1
-            DrawCircle(dst3, nonZero.Get(Of cvb.Point)(0, i), task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst3, nonZero.Get(Of cvb.Point)(0, i), task.DotSize, white)
         Next
 
         Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf

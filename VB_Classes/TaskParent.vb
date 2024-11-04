@@ -162,12 +162,12 @@ Public Class TaskParent : Implements IDisposable
         For i = 0 To lineCount
             Dim p1 = New cvb.Point(0, spacer * i)
             Dim p2 = New cvb.Point(dst.Width, spacer * i)
-            dst.Line(p1, p2, cvb.Scalar.White, task.cvFontThickness)
+            dst.Line(p1, p2, white, task.cvFontThickness)
             Dim nextVal = (maxVal - spaceVal * i)
             Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt2))
             Dim p3 = New cvb.Point(0, p1.Y + 12)
             cvb.Cv2.PutText(dst, nextText, p3, cvb.HersheyFonts.HersheyPlain, task.cvFontSize,
-                            cvb.Scalar.White, task.cvFontThickness, task.lineType)
+                            white, task.cvFontThickness, task.lineType)
         Next
     End Sub
     Public Sub DrawFatLine(p1 As cvb.Point2f, p2 As cvb.Point2f, dst As cvb.Mat, fatColor As cvb.Scalar)
@@ -579,7 +579,7 @@ Public Class TaskParent : Implements IDisposable
         dst.Circle(pt, radius, color, fillFlag, task.lineType)
     End Sub
     Public Sub DrawPolkaDot(pt As cvb.Point2f, dst As cvb.Mat)
-        dst.Circle(pt, task.DotSize + 2, cvb.Scalar.White, -1, task.lineType)
+        dst.Circle(pt, task.DotSize + 2, white, -1, task.lineType)
         DrawCircle(dst, pt, task.DotSize, cvb.Scalar.Black)
     End Sub
 

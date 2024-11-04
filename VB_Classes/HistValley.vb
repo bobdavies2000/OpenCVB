@@ -48,7 +48,7 @@ Public Class HistValley_Basics : Inherits TaskParent
         Dim wPlot = dst2.Width / task.histogramBins
         For i = 0 To valleys.Count - 1
             Dim col = valleys(i) * wPlot
-            dst2.Line(New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), cvb.Scalar.White, task.lineWidth + 1)
+            dst2.Line(New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), white, task.lineWidth + 1)
         Next
     End Sub
 End Class
@@ -72,7 +72,7 @@ Public Class HistValley_FromPeaks : Inherits TaskParent
     Public Sub updatePlot(dst As cvb.Mat, bins As Integer)
         For Each valley In valleyIndex
             Dim col = dst.Width * valley / bins
-            dst.Line(New cvb.Point(col, dst.Height), New cvb.Point(col, dst.Height * 9 / 10), cvb.Scalar.White, task.lineWidth)
+            dst.Line(New cvb.Point(col, dst.Height), New cvb.Point(col, dst.Height * 9 / 10), white, task.lineWidth)
         Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -180,7 +180,7 @@ Public Class HistValley_Peaks : Inherits TaskParent
         For Each index In sortPeaks.Keys
             Dim col = dst2.Width * index / task.histogramBins
             peaks.Add(index)
-            DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height / 10), cvb.Scalar.White)
+            DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height / 10), white)
         Next
         labels(2) = CStr(peaks.Count - 2) + " peaks (marked at top) were found in the histogram"
     End Sub
@@ -303,7 +303,7 @@ Public Class HistValley_Test : Inherits TaskParent
         If standaloneTest() Then
             For Each entry In valleyOrder
                 Dim col = entry.Value * dst2.Width / task.histogramBins
-                DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), cvb.Scalar.White)
+                DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), white)
             Next
             SetTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
         End If
@@ -342,7 +342,7 @@ Public Class HistValley_OptionsAuto : Inherits TaskParent
                     histogram.Set(Of Single)(j, 0, index)
                 Next
                 Dim col = dst2.Width * entry.Value / task.histogramBins
-                DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), cvb.Scalar.White)
+                DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), white)
             Next
         End If
 
@@ -519,7 +519,7 @@ Public Class HistValley_Colors : Inherits TaskParent
                 hist.hist.histogram.Set(Of Single)(j, 0, index)
             Next
             Dim col = dst2.Width * entry.Value / task.histogramBins
-            DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), cvb.Scalar.White)
+            DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), white)
         Next
     End Sub
 End Class
@@ -559,7 +559,7 @@ Public Class HistValley_GrayKalman : Inherits TaskParent
                 hist.hist.histogram.Set(Of Single)(j, 0, i)
             Next
             Dim col = dst2.Width * entry / task.histogramBins
-            DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), cvb.Scalar.White)
+            DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), white)
             lastEntry = entry
         Next
     End Sub
@@ -616,7 +616,7 @@ Public Class HistValley_GrayScale1 : Inherits TaskParent
         Dim wPlot = dst2.Width / task.histogramBins
         For i = 0 To minEntries.Count - 1
             Dim col = minEntries(i) * wPlot
-            dst2.Line(New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), cvb.Scalar.White, task.lineWidth + 1)
+            dst2.Line(New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), white, task.lineWidth + 1)
         Next
     End Sub
 End Class

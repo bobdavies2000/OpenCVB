@@ -40,7 +40,7 @@ Imports System.IO
 '        Dim h = CInt(dst2.Height / matSize)
 '        Dim maxLoc = New cvb.Point2f(w * mm.maxLoc.X, h * mm.maxLoc.Y)
 '        dst1.SetTo(0)
-'        dst1.Rectangle(New cvb.Rect(maxLoc.X, maxLoc.Y, w, h), cvb.Scalar.White, task.lineWidth, task.lineType)
+'        dst1.Rectangle(New cvb.Rect(maxLoc.X, maxLoc.Y, w, h), white, task.lineWidth, task.lineType)
 
 '        Dim center = New cvb.Point2f(mm.maxLoc.X - halfsize, mm.maxLoc.Y - halfsize)
 '        SetTrueText("Histogram peak is at " + center.ToString, 1)
@@ -100,7 +100,7 @@ End Class
 '        net.X = dst2.Width / 2 + net.X / trace.mpList.Count
 '        net.Y = dst2.Height / 2 + net.Y / trace.mpList.Count
 '        dst3.SetTo(0)
-'        DrawLine(dst3, New cvb.Point2f(dst2.Width / 2, dst2.Height / 2), net, cvb.Scalar.White, task.lineWidth, task.lineType)
+'        DrawLine(dst3, New cvb.Point2f(dst2.Width / 2, dst2.Height / 2), net, white, task.lineWidth, task.lineType)
 '        SetTrueText(trace.strOut, 3)
 '    End Sub
 'End Class

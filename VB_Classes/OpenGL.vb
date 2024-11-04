@@ -1563,7 +1563,7 @@ Public Class OpenGL_Density2D : Inherits TaskParent
         task.pointCloud.CopyTo(dst2, dense.dst2)
 
         task.ogl.pointCloudInput = dst2
-        task.ogl.Run(New cvb.Mat(dst2.Size(), cvb.MatType.CV_8UC3, cvb.Scalar.White))
+        task.ogl.Run(New cvb.Mat(dst2.Size(), cvb.MatType.CV_8UC3, white))
     End Sub
 End Class
 
@@ -2007,7 +2007,7 @@ Public Class OpenGL_ColorBin4Way : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         task.ogl.options.PointSizeSlider.Value = 10
-        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_8UC3, cvb.Scalar.White)
+        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_8UC3, white)
         desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -2232,7 +2232,7 @@ Public Class OpenGL_PCdiff : Inherits TaskParent
 
         If task.toggleOnOff Then
             Dim r = New cvb.Rect(0, 0, dst2.Width, 2)
-            task.color(r).SetTo(cvb.Scalar.White)
+            task.color(r).SetTo(white)
         End If
         task.ogl.pointCloudInput = dst2
         task.ogl.Run(task.color)

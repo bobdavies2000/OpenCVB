@@ -64,7 +64,7 @@ Public Class FLANN_Basics : Inherits TaskParent
         Dim features As cvb.Mat = cvb.Mat.FromPixelData(random.PointList.Count, 2, cvb.MatType.CV_32F, random.PointList.ToArray)
 
         Dim matchCount = Math.Min(options.matchCount, random.PointList.Count - 1)
-        dst2.SetTo(cvb.Scalar.White)
+        dst2.SetTo(white)
         For i = 0 To features.Rows - 1
             Dim pt = random.PointList(i)
             DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Blue)

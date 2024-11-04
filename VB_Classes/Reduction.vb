@@ -80,12 +80,12 @@ Public Class Reduction_HeatMapLines : Inherits TaskParent
         lines.Run(heat.dst2)
         setupTop.Run(heat.dst2)
         dst2 = setupTop.dst2
-        dst2.SetTo(cvb.Scalar.White, lines.dst3)
+        dst2.SetTo(white, lines.dst3)
 
         lines.Run(heat.dst3)
         setupSide.Run(heat.dst3)
         dst3 = setupSide.dst2
-        dst3.SetTo(cvb.Scalar.White, lines.dst3)
+        dst3.SetTo(white, lines.dst3)
     End Sub
 End Class
 

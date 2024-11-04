@@ -141,7 +141,7 @@ Public Class Color8U_Depth : Inherits TaskParent
         depth.Run(src)
         dst2.SetTo(0, depth.dst3)
         dst3.SetTo(0)
-        dst3.SetTo(cvb.Scalar.White, depth.dst3)
+        dst3.SetTo(white, depth.dst3)
     End Sub
 End Class
 
@@ -329,7 +329,7 @@ End Class
 Public Class Color8U_Common : Inherits TaskParent
     Dim common As New List(Of cvb.Vec3b)
     Dim commonScalar As List(Of cvb.Scalar) = {cvb.Scalar.Blue, cvb.Scalar.Green, cvb.Scalar.Red, cvb.Scalar.Yellow, cvb.Scalar.Pink, cvb.Scalar.Purple, cvb.Scalar.Brown,
-                                              cvb.Scalar.Gray, cvb.Scalar.Black, cvb.Scalar.White}.ToList
+                                              cvb.Scalar.Gray, cvb.Scalar.Black, white}.ToList
     Public Sub New()
         For Each c In commonScalar
             common.Add(New cvb.Vec3b(c(0), c(1), c(2)))

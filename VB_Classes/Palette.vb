@@ -467,7 +467,7 @@ Public Class Palette_LoadColorMap : Inherits TaskParent
             Dim mapFile As New FileInfo(str)
             Dim tmp = cvb.Cv2.ImRead(mapFile.FullName)
 
-            tmp.Col(0).SetTo(If(whitebackground, cvb.Scalar.White, cvb.Scalar.Black))
+            tmp.Col(0).SetTo(If(whitebackground, white, cvb.Scalar.Black))
             tmp = tmp.Row(0)
             colorMap = cvb.Mat.FromPixelData(256, 1, cvb.MatType.CV_8UC3, tmp.Data).Clone
         End If

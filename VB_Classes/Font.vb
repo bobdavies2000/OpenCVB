@@ -16,9 +16,9 @@ Public Class Font_OpenCV : Inherits TaskParent
         dst3.SetTo(0)
         For i = 1 To 10
             Dim size = 1.5 - i * 0.1
-            cvb.Cv2.PutText(dst2, hersheyName + " " + Format(size, fmt1), New cvb.Point(10, 30 + i * 30), hersheyFont, size, cvb.Scalar.White, task.lineWidth, task.lineType)
+            cvb.Cv2.PutText(dst2, hersheyName + " " + Format(size, fmt1), New cvb.Point(10, 30 + i * 30), hersheyFont, size, white, task.lineWidth, task.lineType)
             Dim hersheyFontItalics = hersheyFont + cvb.HersheyFonts.Italic
-            cvb.Cv2.PutText(dst3, hersheyName + " " + Format(size, fmt1), New cvb.Point(10, 30 + i * 30), hersheyFontItalics, size, cvb.Scalar.White, task.lineWidth, task.lineType)
+            cvb.Cv2.PutText(dst3, hersheyName + " " + Format(size, fmt1), New cvb.Point(10, 30 + i * 30), hersheyFontItalics, size, white, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class

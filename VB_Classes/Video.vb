@@ -68,7 +68,7 @@ Public Class Video_CarCounting : Inherits TaskParent
                 activeState(i) = False
                 carCount += 1
             End If
-            dst3.Rectangle(lane, cvb.Scalar.White, 2)
+            dst3.Rectangle(lane, white, 2)
         Next
 
         Dim tmp = videoImage.Resize(src.Size())
@@ -154,7 +154,7 @@ Public Class Video_MinCircle : Inherits TaskParent
         If video.contours IsNot Nothing Then
             For i = 0 To video.contours.Length - 1
                 cvb.Cv2.MinEnclosingCircle(video.contours(i), center, radius)
-                DrawCircle(dst2, center, radius, cvb.Scalar.White)
+                DrawCircle(dst2, center, radius, white)
             Next
         End If
     End Sub

@@ -916,7 +916,7 @@ Public Class Hist_FlatSurfaces : Inherits TaskParent
         masks.Run(cloudY)
         dst2 = masks.dst2
         dst3 = src
-        dst3 = dst3.SetTo(cvb.Scalar.White, masks.dst1)
+        dst3 = dst3.SetTo(white, masks.dst1)
         labels(2) = "Range for the histogram is from " + Format(saveMinVal, fmt1) + " to " + Format(saveMaxVal, fmt1)
     End Sub
 End Class
@@ -1234,7 +1234,7 @@ Public Class Hist_Depth : Inherits TaskParent
 
         Dim stepsize = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters) - 1
-            dst2.Line(New cvb.Point(stepsize * i, 0), New cvb.Point(stepsize * i, dst2.Height), cvb.Scalar.White, task.cvFontThickness)
+            dst2.Line(New cvb.Point(stepsize * i, 0), New cvb.Point(stepsize * i, dst2.Height), white, task.cvFontThickness)
         Next
 
         If standaloneTest() Then

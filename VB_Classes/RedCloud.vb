@@ -152,7 +152,7 @@ Public Class RedCloud_FindCells : Inherits TaskParent
             If task.redCells.Count <= index Then Continue For
             Dim rc = task.redCells(index)
             DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-            dst3(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, cvb.Scalar.White), rc.mask)
+            dst3(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, white), rc.mask)
         Next
         labels(3) = CStr(count) + " cells were found using the motion mask"
     End Sub
@@ -805,9 +805,9 @@ Public Class RedCloud_UnstableCells : Inherits TaskParent
         Dim currList As New List(Of cvb.Point)
         For Each rc In task.redCells
             If prevList.Contains(rc.maxDStable) = False Then
-                DrawContour(dst1(rc.rect), rc.contour, cvb.Scalar.White, -1)
+                DrawContour(dst1(rc.rect), rc.contour, white, -1)
                 DrawContour(dst1(rc.rect), rc.contour, cvb.Scalar.Black)
-                DrawContour(dst3(rc.rect), rc.contour, cvb.Scalar.White, -1)
+                DrawContour(dst3(rc.rect), rc.contour, white, -1)
             End If
             currList.Add(rc.maxDStable)
         Next
@@ -844,9 +844,9 @@ Public Class RedCloud_UnstableHulls : Inherits TaskParent
         For Each rc In task.redCells
             rc.hull = cvb.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             If prevList.Contains(rc.maxDStable) = False Then
-                DrawContour(dst1(rc.rect), rc.hull, cvb.Scalar.White, -1)
+                DrawContour(dst1(rc.rect), rc.hull, white, -1)
                 DrawContour(dst1(rc.rect), rc.hull, cvb.Scalar.Black)
-                DrawContour(dst3(rc.rect), rc.hull, cvb.Scalar.White, -1)
+                DrawContour(dst3(rc.rect), rc.hull, white, -1)
             End If
             currList.Add(rc.maxDStable)
         Next
@@ -912,7 +912,7 @@ Public Class RedCloud_FloodPoint : Inherits TaskParent
 
         dst1 = task.depthRGB
         For Each rc In task.redCells
-            DrawCircle(dst1, rc.floodPoint, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst1, rc.floodPoint, task.DotSize, white)
             DrawCircle(dst2, rc.floodPoint, task.DotSize, cvb.Scalar.Yellow)
         Next
         stats.Run(src)
@@ -1305,7 +1305,7 @@ Public Class RedCloud_Gaps : Inherits TaskParent
         dst3 = frames.dst2
 
         If task.redCells.Count > 0 Then
-            dst2(task.rc.rect).SetTo(cvb.Scalar.White, task.rc.mask)
+            dst2(task.rc.rect).SetTo(white, task.rc.mask)
         End If
 
         If task.redCells.Count > 0 Then
@@ -1370,7 +1370,7 @@ Public Class RedCloud_StructuredH : Inherits TaskParent
         motion.Run(sliceMask.Clone)
 
         If task.heartBeat Then dst1.SetTo(0)
-        dst1.SetTo(cvb.Scalar.White, sliceMask)
+        dst1.SetTo(white, sliceMask)
         labels = motion.labels
 
         dst2.SetTo(0)
@@ -1383,8 +1383,8 @@ Public Class RedCloud_StructuredH : Inherits TaskParent
         histTop.Run(pc)
         dst3 = histTop.dst2
 
-        dst2.SetTo(cvb.Scalar.White, sliceMask)
-        dst0.SetTo(cvb.Scalar.White, sliceMask)
+        dst2.SetTo(white, sliceMask)
+        dst0.SetTo(white, sliceMask)
     End Sub
 End Class
 
@@ -1412,7 +1412,7 @@ Public Class RedCloud_StructuredV : Inherits TaskParent
         motion.Run(sliceMask.Clone)
 
         If task.heartBeat Then dst1.SetTo(0)
-        dst1.SetTo(cvb.Scalar.White, sliceMask)
+        dst1.SetTo(white, sliceMask)
         labels = motion.labels
         SetTrueText("Move mouse in image to see impact.", 3)
 
@@ -1426,8 +1426,8 @@ Public Class RedCloud_StructuredV : Inherits TaskParent
         histSide.Run(pc)
         dst3 = histSide.dst2
 
-        dst2.SetTo(cvb.Scalar.White, sliceMask)
-        dst0.SetTo(cvb.Scalar.White, sliceMask)
+        dst2.SetTo(white, sliceMask)
+        dst0.SetTo(white, sliceMask)
     End Sub
 End Class
 
@@ -2330,7 +2330,7 @@ Public Class RedCloud_ColorAndDepth : Inherits TaskParent
                 task.setSelectedContour(depthCells, depthMap)
         End Select
         dst2.Rectangle(task.rc.rect, task.HighlightColor, task.lineWidth)
-        dst3(task.rc.rect).SetTo(cvb.Scalar.White, task.rc.mask)
+        dst3(task.rc.rect).SetTo(white, task.rc.mask)
     End Sub
 End Class
 
@@ -2522,7 +2522,7 @@ Public Class RedCloud_NaturalGray : Inherits TaskParent
 
         Dim color = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
         dst3.SetTo(0)
-        dst3.SetTo(cvb.Scalar.White, dst0)
+        dst3.SetTo(white, dst0)
     End Sub
 End Class
 

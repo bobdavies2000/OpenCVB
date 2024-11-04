@@ -28,7 +28,7 @@ Public Class LinearRegression_Basics : Inherits TaskParent
         p1 = New cvb.Point(0, CInt(c))
         p2 = New cvb.Point(dst2.Width, CInt(m * dst2.Width + c))
         dst2.SetTo(0)
-        DrawLine(dst2, p1, p2, cvb.Scalar.White)
+        DrawLine(dst2, p1, p2, white)
 
         For i = 0 To x.Count - 1
             Dim pt As New cvb.Point(x(i), y(i))

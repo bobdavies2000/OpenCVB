@@ -33,7 +33,7 @@ Public Class WarpPerspective_WidthHeight : Inherits TaskParent
                      New cvb.Point2f(options.width, options.height)}
 
         Dim perpectiveTranx = cvb.Cv2.GetPerspectiveTransform(srcPt, pts)
-        cvb.Cv2.WarpPerspective(src, dst2, perpectiveTranx, New cvb.Size(src.Cols, src.Rows), cvb.InterpolationFlags.Cubic, cvb.BorderTypes.Constant, cvb.Scalar.White)
+        cvb.Cv2.WarpPerspective(src, dst2, perpectiveTranx, New cvb.Size(src.Cols, src.Rows), cvb.InterpolationFlags.Cubic, cvb.BorderTypes.Constant, white)
 
         Dim center = New cvb.Point2f(src.Cols / 2, src.Rows / 2)
         Dim rotationMatrix = cvb.Cv2.GetRotationMatrix2D(center, options.angle, 1.0)

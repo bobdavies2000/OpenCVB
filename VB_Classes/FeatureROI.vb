@@ -31,7 +31,7 @@ Public Class FeatureROI_Basics : Inherits TaskParent
             Dim roi = task.gridRects(i)
             Dim depthCheck = task.noDepthMask(roi)
             If stdevList(i) < stdevAverage Or depthCheck.CountNonZero / depthCheck.Total > 0.5 Then
-                dst3.Rectangle(roi, cvb.Scalar.White, -1)
+                dst3.Rectangle(roi, white, -1)
             Else
                 rects.Add(roi)
             End If
@@ -81,7 +81,7 @@ Public Class FeatureROI_Color : Inherits TaskParent
         For i = 0 To stdevList0.Count - 1
             Dim roi = task.gridRects(i)
             If stdevList0(i) < avg0 And stdevList1(i) < avg1 And stdevList2(i) < avg2 Then
-                dst3.Rectangle(roi, cvb.Scalar.White, -1)
+                dst3.Rectangle(roi, white, -1)
             End If
         Next
         labels(3) = "Stdev average X/Y/Z = " + CInt(stdevList0.Average).ToString + ", " + CInt(stdevList1.Average).ToString + ", " + CInt(stdevList2.Average).ToString
@@ -416,7 +416,7 @@ Public Class FeatureROI_LRClick : Inherits TaskParent
         If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
         Dim gridIndex = task.gridMap32S.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
         Dim roi = task.gridRects(gridIndex)
-        dst2.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
+        dst2.Rectangle(roi, white, task.lineWidth)
 
         Dim correlationMat As New cvb.Mat
         Dim corr As New List(Of Single)

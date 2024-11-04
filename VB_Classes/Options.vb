@@ -3399,7 +3399,7 @@ Public Class Options_Complexity : Inherits TaskParent
         For index = 0 To filenames.Count - 1
             If filename.FullName = filenames(index) Then Exit For
         Next
-        plotColor = Choose(index Mod 4 + 1, cvb.Scalar.White, cvb.Scalar.Red, cvb.Scalar.Green, cvb.Scalar.Yellow)
+        plotColor = Choose(index Mod 4 + 1, white, cvb.Scalar.Red, cvb.Scalar.Green, cvb.Scalar.Yellow)
         Return plotColor
     End Function
     Public Sub RunOpt()
@@ -3407,7 +3407,7 @@ Public Class Options_Complexity : Inherits TaskParent
         For i = 0 To frm.check.count - 1
             If frm.check(i).checked Then
                 filename = New FileInfo(task.HomeDir + "Complexity/" + frm.check(i).text)
-                plotColor = Choose((i + 1) Mod 4, cvb.Scalar.White, cvb.Scalar.Red, cvb.Scalar.Green, cvb.Scalar.Yellow)
+                plotColor = Choose((i + 1) Mod 4, white, cvb.Scalar.Red, cvb.Scalar.Green, cvb.Scalar.Yellow)
                 Exit For
             End If
         Next

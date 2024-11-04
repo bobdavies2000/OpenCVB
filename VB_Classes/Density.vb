@@ -98,7 +98,7 @@ Public Class Density_Mask : Inherits TaskParent
                  Dim roi = task.gridRects(i)
                  Dim count = src(roi).CountNonZero
                  If count > threshold Then
-                     dst3(roi).SetTo(cvb.Scalar.White)
+                     dst3(roi).SetTo(white)
                      activeList(i) = True
                  End If
              End Sub)

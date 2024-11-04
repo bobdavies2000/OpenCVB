@@ -113,7 +113,7 @@ Public Class Grid_Basics : Inherits TaskParent
         If standaloneTest() Then
             dst2 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)
             task.color.CopyTo(dst2)
-            dst2.SetTo(cvb.Scalar.White, task.gridMask)
+            dst2.SetTo(white, task.gridMask)
             labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
                               CStr(task.gridSize) + "X" + CStr(task.gridSize) + " regions"
         End If
@@ -174,7 +174,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
         End If
         If standaloneTest() Then
             task.color.CopyTo(dst2)
-            dst2.SetTo(cvb.Scalar.White, gridMask)
+            dst2.SetTo(white, gridMask)
             labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
                           CStr(options.width) + "X" + CStr(options.height) + " regions"
         End If
@@ -207,14 +207,14 @@ Public Class Grid_BasicsTest : Inherits TaskParent
             SetTrueText(CStr(i), New cvb.Point(roi.X, roi.Y))
         Next
         'End Sub)
-        dst2.SetTo(cvb.Scalar.White, task.gridMask)
+        dst2.SetTo(white, task.gridMask)
 
         dst3.SetTo(0)
         Parallel.For(0, task.gridRects.Count,
          Sub(i)
              Dim roi = task.gridRects(i)
              cvb.Cv2.Subtract(mean, src(roi), dst3(roi))
-             DrawLine(dst3(roi), New cvb.Point(0, 0), New cvb.Point(roi.Width, roi.Height), cvb.Scalar.White)
+             DrawLine(dst3(roi), New cvb.Point(0, 0), New cvb.Point(roi.Width, roi.Height), white)
          End Sub)
     End Sub
 End Class
@@ -323,10 +323,10 @@ Public Class Grid_Neighbors : Inherits TaskParent
 
             For Each index In task.gridNeighbors(roiIndex)
                 Dim roi = task.gridRects(index)
-                mask.Rectangle(roi, cvb.Scalar.White)
+                mask.Rectangle(roi, white)
             Next
         End If
-        dst2.SetTo(cvb.Scalar.White, mask)
+        dst2.SetTo(white, mask)
     End Sub
 End Class
 
@@ -402,7 +402,7 @@ Public Class Grid_Special : Inherits TaskParent
         End If
         If standaloneTest() Then
             task.color.CopyTo(dst2)
-            dst2.SetTo(cvb.Scalar.White, gridMask)
+            dst2.SetTo(white, gridMask)
             labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(gridRows) + "X" + CStr(gridCols) + ") " +
                           CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
         End If
@@ -439,9 +439,9 @@ Public Class Grid_MinMaxDepth : Inherits TaskParent
             For i = 0 To minMaxLocs.Count - 1
                 Dim lp = minMaxLocs(i)
                 DrawCircle(dst2(task.gridRects(i)), lp.p2, task.DotSize, cvb.Scalar.Red)
-                DrawCircle(dst2(task.gridRects(i)), lp.p1, task.DotSize, cvb.Scalar.White)
+                DrawCircle(dst2(task.gridRects(i)), lp.p1, task.DotSize, white)
             Next
-            dst2.SetTo(cvb.Scalar.White, task.gridMask)
+            dst2.SetTo(white, task.gridMask)
         End If
     End Sub
 End Class
@@ -478,7 +478,7 @@ Public Class Grid_TrackCenter : Inherits TaskParent
         If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth + 1, task.lineType)
-            DrawCircle(dst2, center, task.DotSize, cvb.Scalar.White)
+            DrawCircle(dst2, center, task.DotSize, white)
 
             If task.heartBeat Then dst3.SetTo(0)
             DrawCircle(dst3, center, task.DotSize, task.HighlightColor)

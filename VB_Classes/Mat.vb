@@ -399,7 +399,7 @@ Public Class Mat_2to1 : Inherits TaskParent
                 If mat(i).Empty = False Then dst2(roi) = mat(i).Resize(nSize)
             Next
             If lineSeparators Then
-                dst2.Line(New cvb.Point(0, dst2.Height / 2), New cvb.Point(dst2.Width, dst2.Height / 2), cvb.Scalar.White, task.lineWidth + 1)
+                dst2.Line(New cvb.Point(0, dst2.Height / 2), New cvb.Point(dst2.Width, dst2.Height / 2), white, task.lineWidth + 1)
             End If
         End If
     End Sub
@@ -487,8 +487,8 @@ Public Class Mat_4to1 : Inherits TaskParent
             dst2(roi) = tmp.Resize(nSize)
         Next
         If lineSeparators Then
-            dst2.Line(New cvb.Point(0, dst2.Height / 2), New cvb.Point(dst2.Width, dst2.Height / 2), cvb.Scalar.White, task.lineWidth + 1)
-            dst2.Line(New cvb.Point(dst2.Width / 2, 0), New cvb.Point(dst2.Width / 2, dst2.Height), cvb.Scalar.White, task.lineWidth + 1)
+            dst2.Line(New cvb.Point(0, dst2.Height / 2), New cvb.Point(dst2.Width, dst2.Height / 2), white, task.lineWidth + 1)
+            dst2.Line(New cvb.Point(dst2.Width / 2, 0), New cvb.Point(dst2.Width / 2, dst2.Height), white, task.lineWidth + 1)
         End If
     End Sub
 End Class
