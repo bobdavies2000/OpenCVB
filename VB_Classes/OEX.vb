@@ -58,7 +58,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim count As Integer
-        If task.ClickPoint <> New cvb.Point Then
+        If task.ClickPoint <> newPoint Then
             Dim connectivity As Integer = 8
             Dim flags = connectivity Or (255 << 8) Or cvb.FloodFillFlags.FixedRange Or cvb.FloodFillFlags.MaskOnly
             Dim mask2 As New cvb.Mat(src.Rows + 2, src.Cols + 2, cvb.MatType.CV_8U, cvb.Scalar.All(0))

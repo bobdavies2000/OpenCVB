@@ -1687,7 +1687,7 @@ Public Class OpenGL_RedCloudCell : Inherits TaskParent
         specZ.Run(src)
         SetTrueText(specZ.strOut, 3)
 
-        If task.ClickPoint = New cvb.Point And task.redCells.Count > 1 Then
+        If task.ClickPoint = newPoint And task.redCells.Count > 1 Then
             task.rc = task.redCells(1) ' pick the largest cell
             task.ClickPoint = task.rc.maxDist
         End If

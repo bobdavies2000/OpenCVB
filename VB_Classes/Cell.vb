@@ -304,7 +304,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            If task.ClickPoint = New cvb.Point Then
+            If task.ClickPoint = newPoint Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)
                     task.ClickPoint = task.rc.maxDist

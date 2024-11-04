@@ -596,7 +596,7 @@ Public Class VBtask : Implements IDisposable
                     task.depthRGB.Rectangle(rc.rect, cvb.Scalar.Yellow, task.lineWidth)
                     If task.redOptions.DisplayCellStats.Checked Then
                         dst3.SetTo(0)
-                        If task.ClickPoint = New cvb.Point Then
+                        If task.ClickPoint = newPoint Then
                             If task.redCells.Count > 1 Then
                                 task.rc = task.redCells(1)
                                 task.ClickPoint = task.rc.maxDist
@@ -611,7 +611,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If task.redOptions.DisplayCellStats.Checked And task.ClickPoint = New cvb.Point Then
+            If task.redOptions.DisplayCellStats.Checked And task.ClickPoint = newPoint Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)
                     task.ClickPoint = task.rc.maxDist

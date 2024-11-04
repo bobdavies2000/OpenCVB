@@ -260,7 +260,7 @@ Public Class Linear_Slices : Inherits TaskParent
         options.RunOpt()
 
         Dim pt = task.mouseMovePoint
-        If standalone And task.mouseMovePoint = New cvb.Point Then
+        If standalone And task.mouseMovePoint = newPoint Then
             pt = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         End If
 

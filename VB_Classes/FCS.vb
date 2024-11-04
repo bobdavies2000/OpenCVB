@@ -6,13 +6,17 @@ Public Class FCS_Basics : Inherits TaskParent
     Dim fcs As New FCS_Delaunay
     Dim fInfo As New FCS_Info
     Public Sub New()
+        If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
         FindSlider("Min Distance to next").Value = task.fPointMinDistance
         FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
+        task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         labels(1) = "The index for each of the cells (if standalonetest)"
         desc = "Feature Coordinate System (FCS) - Create the fpList with rect, mask, index, and facets"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        dst0 = src.Clone
+
         feat.Run(src)
 
         fcs.inputPoints = task.features
@@ -27,26 +31,22 @@ Public Class FCS_Basics : Inherits TaskParent
         If standaloneTest() Then
             For Each fp In task.fpList
                 DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
                 SetTrueText(CStr(fp.index), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
             Next
         End If
 
         If task.heartBeat Then labels(2) = CStr(task.features.Count) + " feature grid cells."
 
-        If task.ClickPoint <> New cvb.Point Then
-            Dim index = task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-            task.fpSelected = task.fpList(index)
-
-            If task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Width / 2 And
-                task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Height / 2 Then
-                task.ClickPoint = task.fpSelected.pt
-            End If
-
-            dst2(task.fpSelected.rect).SetTo(white, task.fpSelected.mask)
-            dst2.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
-            dst1.SetTo(0)
-            dst1.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
+        If task.ClickPoint <> newPoint Then
             fInfo.Run(empty)
+
+            Dim fp = task.fpSelected
+            dst2(fp.rect).SetTo(white, fp.mask)
+            dst2.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
+            dst0.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
+            dst1.SetTo(0)
+            dst1.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
             SetTrueText(fInfo.strOut, 3)
         End If
     End Sub
@@ -62,13 +62,31 @@ Public Class FCS_Info : Inherits TaskParent
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        Dim index = task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        If task.fpList.Count = 0 Then Exit Sub
+        If task.ClickPoint = newPoint Then Exit Sub
+
+        task.fpSelected = task.fpList(index)
+
+        If task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Width / 2 And
+           task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Height / 2 Then
+            task.ClickPoint = task.fpSelected.pt
+        End If
+
         If task.fpSelected.index > 0 Then
+            Dim fp = task.fpSelected
             strOut = "FCS cell selected: " + vbCrLf
-            strOut += "Feature point: " + task.fpSelected.pt.ToString + vbCrLf
-            strOut += task.fpSelected.rect.ToString + vbCrLf
-            strOut += "index = " + CStr(task.fpSelected.index) + vbCrLf
-            strOut += "Facet count = " + CStr(task.fpSelected.facet2f.Count) + " facets" + vbCrLf
-            strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf
+            strOut += "Feature point: " + fp.pt.ToString + vbCrLf
+            strOut += fp.rect.ToString + vbCrLf
+            strOut += "index = " + CStr(fp.index) + vbCrLf
+            strOut += "Facet count = " + CStr(fp.facet2f.Count) + " facets" + vbCrLf
+            strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
+            Dim vec = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
+            strOut += "Pointcloud entry: " + Format(vec.X, fmt1) + "/" + Format(vec.Y, fmt1) + "/" + Format(vec.Z, fmt1) + vbCrLf
+
+            strOut += vbCrLf + vbCrLf + "NOTE: " + vbTab + "At image edges (only), the rect may appear larger"
+            strOut += vbCrLf + vbTab + "than necessary because the delaunay intersection " + vbCrLf
+            strOut += vbTab + "points are well off screen."
         End If
         If standalone Then
             SetTrueText("Select a feature grid cell to get more information.", 2)
@@ -309,6 +327,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             mask32s.FillConvexPoly(fp.facets, white, task.lineType)
             mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
             fp.pt = task.features(i)
+            fp.pt3D = task.pointCloud.Get(Of cvb.Vec3f)(fp.pt.Y, fp.pt.X)
             task.fpList.Add(fp)
         Next
 

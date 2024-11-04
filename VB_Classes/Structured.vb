@@ -729,7 +729,7 @@ Public Class Structured_MouseSlice : Inherits TaskParent
         desc = "Find the vertical center line with accurate depth data.."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.mouseMovePoint = New cvb.Point Then task.mouseMovePoint = New cvb.Point(dst2.Width / 2, dst2.Height)
+        If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cvb.Point(dst2.Width / 2, dst2.Height)
         slice.Run(src)
 
         lines.Run(slice.sliceMask)
@@ -888,7 +888,7 @@ Public Class Structured_TransformV : Inherits TaskParent
         options.RunOpt()
 
         Dim sliceMask As New cvb.Mat
-        If task.mouseMovePoint = New cvb.Point Then task.mouseMovePoint = New cvb.Point(dst2.Width / 2, dst2.Height)
+        If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cvb.Point(dst2.Width / 2, dst2.Height)
         Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
         Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
@@ -1045,7 +1045,7 @@ Public Class Structured_SliceV : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.mouseMovePoint = New cvb.Point Then task.mouseMovePoint = New cvb.Point(dst2.Width / 2, dst2.Height)
+        If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cvb.Point(dst2.Width / 2, dst2.Height)
         Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
         heat.Run(src)

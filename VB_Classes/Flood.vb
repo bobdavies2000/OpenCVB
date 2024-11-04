@@ -59,7 +59,7 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
         dst2 = flood.dst2
         SetTrueText(stats.strOut, 3)
 
-        If task.ClickPoint = New cvb.Point Then
+        If task.ClickPoint = newPoint Then
             If task.redCells.Count > 1 Then
                 task.rc = task.redCells(1)
                 task.ClickPoint = task.rc.maxDist

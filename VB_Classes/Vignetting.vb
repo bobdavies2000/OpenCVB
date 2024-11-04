@@ -12,7 +12,7 @@ Public Class Vignetting_Basics : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.ClickPoint <> New cvb.Point Then center = task.ClickPoint
+        If task.ClickPoint <> newPoint Then center = task.ClickPoint
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -49,7 +49,7 @@ Public Class Vignetting_VB : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.ClickPoint <> New cvb.Point Then center = task.ClickPoint
+        If task.ClickPoint <> newPoint Then center = task.ClickPoint
         Dim maxDist = New cvb.Point(0, 0).DistanceTo(center) * options.radius
         Dim tmp As Double
         For y = 0 To src.Height - 1

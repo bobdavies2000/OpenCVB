@@ -47,7 +47,7 @@ Public Class Pixel_Viewer : Inherits TaskParent
         Dim drHeight As Integer = CInt(viewerForm.Height / 16) + If(viewerForm.Height < 400, -3, If(viewerForm.Height < 800, -1, 1))
         If drHeight < 20 Then drHeight = 20
 
-        If viewerForm.mousePoint <> New cvb.Point Then
+        If viewerForm.mousePoint <> newPoint Then
             task.mouseMovePoint += viewerForm.mousePoint
             task.mouseMovePointUpdated = True
             viewerForm.mousePoint = New cvb.Point
@@ -394,7 +394,7 @@ Public Class Pixel_Zoom : Inherits TaskParent
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoomSlider.Value)
 
-        If task.mouseMovePoint <> New cvb.Point Then mousePoint = task.mouseMovePoint
+        If task.mouseMovePoint <> newPoint Then mousePoint = task.mouseMovePoint
         Dim width As Double = src.Width / zoomFactor
         Dim height As Double = src.Height / zoomFactor
         Dim x = Math.Min(mousePoint.X, src.Width - width)
@@ -420,7 +420,7 @@ Public Class Pixel_SubPixel : Inherits TaskParent
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoom.zoomSlider.Value)
 
-        If task.mouseMovePoint <> New cvb.Point Then zoom.mousePoint = task.mouseMovePoint
+        If task.mouseMovePoint <> newPoint Then zoom.mousePoint = task.mouseMovePoint
         Dim width As Double = src.Width / zoomFactor
         Dim height As Double = src.Height / zoomFactor
         Dim x = Math.Min(zoom.mousePoint.X, src.Width - width)

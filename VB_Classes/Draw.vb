@@ -371,16 +371,16 @@ Public Class Draw_Line : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         If task.FirstPass Then task.ClickPoint = New cvb.Point
 
-        If p1 <> New cvb.Point And p2 <> New cvb.Point And task.ClickPoint <> New cvb.Point Then
-            p1 = New cvb.Point
-            p2 = New cvb.Point
+        If p1 <> newPoint And p2 <> New cvb.Point And task.ClickPoint <> newPoint Then
+            p1 = newPoint
+            p2 = newPoint
         End If
         dst2 = src
         If task.ClickPoint <> New cvb.Point Or externalUse Then
             If p1 = New cvb.Point Then p1 = task.ClickPoint Else p2 = task.ClickPoint
         End If
-        If p1 <> New cvb.Point And p2 = New cvb.Point Then DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
-        If p1 <> New cvb.Point And p2 <> New cvb.Point Then
+        If p1 <> newPoint And p2 = newPoint Then DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
+        If p1 <> newPoint And p2 <> newPoint Then
             DrawLine(dst2, p1, p2, task.HighlightColor)
         End If
         SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
