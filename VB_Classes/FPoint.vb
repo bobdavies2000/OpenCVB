@@ -5,32 +5,33 @@ Public Class FPoint_Basics : Inherits TaskParent
     Dim fpt As New FPoint_Core
     Dim fInfo As New FPoint_Info
     Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
         FindSlider("Min Distance to next").Value = task.fPointMinDistance
         FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
+        labels(1) = "The index for each of the cells (if standalonetest)"
         desc = "Create the fpList with rect, mask, index, and facets"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fpt.Run(src)
-        Static lastMap As cvb.Mat = fpt.delaunayF.dst3.Clone
-        Static lastList As New List(Of fPoint)(task.fpList)
 
         dst2.SetTo(0)
-        Dim currList As New List(Of fPoint)(task.fpList)
-        task.fpList.Clear()
-        For i = 0 To task.features.Count - 1
-            Dim pt = task.features(i)
-            Dim index = lastMap.Get(Of Byte)(pt.Y, pt.X)
-            Dim fp = lastList(index)
-            fp.pt = pt
-            task.fpList.Add(fp)
+        For i = 0 To task.fpList.Count - 1
+            Dim fp = task.fpList(i)
+            fp.index = i
+            task.fpList(i) = fp
             dst2(fp.rect).SetTo(fp.index, fp.mask)
         Next
 
-        lastMap = dst2.Clone
-        lastList = New List(Of fPoint)(task.fpList)
-
         task.fpMap = dst2.Clone
         dst2.SetTo(0, task.fpOutline)
+
+        If standaloneTest() Then
+            For Each fp In task.fpList
+                DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+                SetTrueText(CStr(fp.index), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
+            Next
+        End If
+
         If task.heartBeat Then labels(2) = CStr(task.features.Count) + " feature grid cells."
 
         If task.ClickPoint <> New cvb.Point Then
@@ -43,7 +44,9 @@ Public Class FPoint_Basics : Inherits TaskParent
             End If
 
             dst2(task.fpSelected.rect).SetTo(255, task.fpSelected.mask)
-            dst2.Rectangle(task.fpSelected.rect, 255, task.lineWidth)
+            dst2.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
+            dst1.SetTo(0)
+            dst1.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
             fInfo.Run(empty)
             SetTrueText(fInfo.strOut, 3)
         End If

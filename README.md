@@ -1,4 +1,4 @@
-# Recent Changes – October 2024 (Part 3)
+# Recent Changes – November 2024
 
 -   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
 -   The “A-Z” toolbar button in the main OpenCVB form allows speedy group access.
@@ -18,7 +18,7 @@
 
 ![](media/baa4fe87e03b08a9288be72cdb139c41.png)
 
-**A-Z Toolbar Button:** *There are almost 250 algorithm groups in OpenCVB, and the A-Z toolbar button allows speedy access to any of the groups. Clicking on any of grid entries will land the user at the first algorithm in the group in one click. Accessing a specific algorithm in that group is a click away in the pulldown of the list of available algorithms.*
+**“A-Z” Toolbar Button:** *There are almost 250 algorithm groups in OpenCVB, and the “A-Z” toolbar button allows speedy access to any of the groups. Clicking on any of grid entries will land the user at the first algorithm in the group in one click. Accessing a specific algorithm in that group is a click away in the pulldown of the list of available algorithms.*
 
 # Introduction
 

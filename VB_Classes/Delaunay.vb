@@ -99,11 +99,11 @@ Public Class Delaunay_FPoint : Inherits TaskParent
 
             Dim minx = xlist.Min, miny = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
             fp.rect = ValidateRect(New cvb.Rect(minx, miny, maxX - minx, maxY - miny))
-            fp.center = New cvb.Point2f(xlist.Average, ylist.Average)
 
             mask32s(fp.rect).SetTo(0)
             mask32s.FillConvexPoly(fp.facets, 255, task.lineType)
             mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
+            fp.pt = task.features(i)
             task.fpList.Add(fp)
         Next
 
