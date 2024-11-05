@@ -146,7 +146,7 @@ End Class
 Public Class Line_Core : Inherits TaskParent
     Dim ld As cvb.XImgProc.FastLineDetector
     Public lpList As New List(Of PointPair)
-    Public lineColor As cvb.Vec3b = white
+    Public lineColor = cvb.Scalar.White
     Public options As New Options_Line
     Public Sub New()
         ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -191,7 +191,7 @@ Public Class Line_Core : Inherits TaskParent
         For Each lp In lpList
             DrawLine(dst2, lp.p1, lp.p2, lineColor)
             DrawLine(dst3, lp.p1, lp.p2, 255)
-            DrawCircle(dst3, lp.center, task.DotSize + 1, white, -1)
+            DrawCircle(dst3, lp.center, task.DotSize + 1, cvb.Scalar.White, -1)
         Next
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
