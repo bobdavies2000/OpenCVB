@@ -15,8 +15,8 @@
 -   Horizon can move below the plane causing pointcloud Y-values above/below zero.
     -   Horizon is now also computed as the perpendicular of the gravity vector.
 -   This update includes the Feature Coordinate System – see FCS_Basics.
-    -   Features such as OpenCV’s GoodFeatures and FastLineDetector are ordered.
-    -   Ordered features are more easily tracked but even when they come and go.
+    -   A Delaunay map is created using the features or lines.
+    -   The map allows tracking the area even as the features come and go.
 -   A log of previous changes is included at the bottom of this document.
 
 ![](media/baa4fe87e03b08a9288be72cdb139c41.png)
