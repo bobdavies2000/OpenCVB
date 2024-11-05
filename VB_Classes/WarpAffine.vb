@@ -254,7 +254,7 @@ Public Class WarpAffine_4Points : Inherits TaskParent
                         Dim p3 = rectangles(1).Points(i)
                         DrawLine(dst2, p1, p3, white)
                     End If
-                    Dim color = Choose(i + 1, cvb.Scalar.Red, white, cvb.Scalar.Yellow, cvb.Scalar.Green)
+                    Dim color = Choose(i + 1, cvb.Scalar.Red, cvb.Scalar.White, cvb.Scalar.Yellow, cvb.Scalar.Green)
                     dst2.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
                 Next
             Next

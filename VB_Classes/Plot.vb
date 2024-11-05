@@ -12,7 +12,7 @@ Public Class Plot_Basics : Inherits TaskParent
         desc = "Plot data provided in src Mat"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        hist.plotColors(0) = white
+        hist.plotColors(0) = cvb.Scalar.White
         hist.Run(src)
         dst2 = hist.dst2
 

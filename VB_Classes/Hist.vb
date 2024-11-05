@@ -108,7 +108,7 @@ Public Class Hist_Graph : Inherits TaskParent
     Public maxRange As Single = 255
     Public backColor = cvb.Scalar.Gray
     Public plotRequested As Boolean
-    Public plotColors() = {cvb.Scalar.Blue, cvb.Scalar.Green, cvb.Scalar.Red}
+    Public plotColors() As cvb.Scalar = {cvb.Scalar.Blue, cvb.Scalar.Green, cvb.Scalar.Red}
     Public plotMaxValue As Single
     Public Sub New()
         desc = "Plot histograms for up to 3 channels."
