@@ -901,7 +901,7 @@ Public Class Depth_Grid : Inherits TaskParent
         dst2 = task.gridMask.Clone
         For Each roi In task.gridRects
             Dim mm As mmData = GetMinMax(dst3(roi))
-            If Math.Abs(mm.minVal - mm.maxVal) > 0.1 Then dst2(roi).SetTo(white)
+            If Math.Abs(mm.minVal - mm.maxVal) > 0.1 Then dst2(roi).SetTo(cvb.Scalar.White)
         Next
     End Sub
 End Class

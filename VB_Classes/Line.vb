@@ -17,6 +17,7 @@ Public Class Line_Basics : Inherits TaskParent
 
         lpList = New List(Of PointPair)(ptSort.Values)
         dst2 = lines.dst2
+        dst3 = lines.dst3
 
         If standaloneTest() Then
             For i = 0 To lpList.Count - 1
@@ -227,7 +228,7 @@ Public Class Line_SubsetRect : Inherits TaskParent
     Public mpList As New List(Of PointPair)
     Public ptList As New List(Of cvb.Point2f)
     Public subsetRect As cvb.Rect
-    Public lineColor = white
+    Public lineColor = cvb.Scalar.White
     Public Sub New()
         subsetRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
         ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector

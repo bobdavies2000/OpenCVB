@@ -718,7 +718,7 @@ Public Class PointCloud_PCPoints : Inherits TaskParent
             If mean(2) > 0 Then
                 pcPoints.Add(Choose(pt.Y Mod 3 + 1, red32, blue32, white32))
                 pcPoints.Add(New cvb.Point3f(mean(0), mean(1), mean(2)))
-                DrawCircle(dst2, pt, task.DotSize, Choose(pt.Y Mod 3 + 1, red, blue, white))
+                DrawCircle(dst2, pt, task.DotSize, Choose(CInt(pt.Y) Mod 3 + 1, red, blue, cvb.Scalar.White))
             End If
         Next
         labels(2) = "PointCloud Point Points found = " + CStr(pcPoints.Count / 2)
