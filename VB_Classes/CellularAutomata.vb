@@ -70,7 +70,7 @@ Public Class CellularAutomata_Life : Inherits TaskParent
     Dim factor = 8
     Dim generation As Integer
     Public population As Integer
-    Public nodeColor = white
+    Public nodeColor = cvb.Scalar.White
     Public backColor = cvb.Scalar.Black
     Dim savePointCount As Integer
     Dim lastPopulation As Integer

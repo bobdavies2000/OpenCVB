@@ -137,7 +137,7 @@ Public Class Hough_Lines_MT : Inherits TaskParent
             dst3(roi).SetTo(0)
             houghShowLines(dst3(roi), segments, 1)
         End Sub)
-        dst2.SetTo(white, task.gridMask)
+        dst2.SetTo(cvb.Scalar.White, task.gridMask)
     End Sub
 End Class
 

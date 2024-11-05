@@ -130,49 +130,6 @@ End Class
 
 
 
-Public Class FCS_Info : Inherits TaskParent
-    Public Sub New()
-        desc = "Display the contents of the Feature Coordinate System (FCS) cell."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Dim index = task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        If task.fpList.Count = 0 Then Exit Sub
-        If task.ClickPoint = newPoint Then Exit Sub
-
-        task.fpSelected = task.fpList(index)
-
-        If task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Width / 2 And
-           task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Height / 2 Then
-            task.ClickPoint = task.fpSelected.pt
-        End If
-
-        If task.fpSelected.index > 0 Then
-            Dim fp = task.fpSelected
-            strOut = "FCS cell selected: " + vbCrLf
-            strOut += "Feature point: " + fp.pt.ToString + vbCrLf
-            strOut += fp.rect.ToString + vbCrLf
-            strOut += "index = " + CStr(fp.index) + vbCrLf
-            strOut += "Facet count = " + CStr(fp.facet2f.Count) + " facets" + vbCrLf
-            strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
-            Dim vec = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
-            strOut += "Pointcloud entry: " + Format(vec.X, fmt1) + "/" + Format(vec.Y, fmt1) + "/" + Format(vec.Z, fmt1) + vbCrLf
-
-            strOut += vbCrLf + vbCrLf + "NOTE: " + vbTab + "At image edges (only), the rect may appear larger"
-            strOut += vbCrLf + vbTab + "than necessary because the Delaunay intersection " + vbCrLf
-            strOut += vbTab + "points are well off screen."
-        End If
-        If standalone Then
-            SetTrueText("Select a feature grid cell to get more information.", 2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class FCS_BasicsOld : Inherits TaskParent
     Public fpList As New List(Of fPoint)
@@ -324,17 +281,130 @@ End Class
 
 
 
+Public Class FCS_Info : Inherits TaskParent
+    Public Sub New()
+        desc = "Display the contents of the Feature Coordinate System (FCS) cell."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Dim index = task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        If task.fpList.Count = 0 Then Exit Sub
+        If task.ClickPoint = newPoint Then Exit Sub
+
+        task.fpSelected = task.fpList(index)
+
+        If task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Width / 2 And
+           task.ClickPoint.DistanceTo(task.fpSelected.pt) < task.fpSelected.rect.Height / 2 Then
+            task.ClickPoint = task.fpSelected.pt
+        End If
+
+        If task.fpSelected.index > 0 Then
+            Dim fp = task.fpSelected
+            strOut = "FCS cell selected: " + vbCrLf
+            strOut += "Feature point: " + fp.pt.ToString + vbCrLf
+            strOut += fp.rect.ToString + vbCrLf
+            strOut += "index = " + CStr(fp.index) + vbCrLf
+            strOut += "Facet count = " + CStr(fp.facet2f.Count) + " facets" + vbCrLf
+            strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
+            Dim vec = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
+            strOut += "Pointcloud entry: " + Format(vec.X, fmt1) + "/" + Format(vec.Y, fmt1) + "/" + Format(vec.Z, fmt1) + vbCrLf
+
+            strOut += vbCrLf + vbCrLf + "NOTE: " + vbTab + "At image edges (only), the rect may appear larger"
+            strOut += vbCrLf + vbTab + "than necessary because the Delaunay intersection " + vbCrLf
+            strOut += vbTab + "points are well off screen."
+        End If
+        If standalone Then
+            SetTrueText("Select a feature grid cell to get more information.", 2)
+        End If
+    End Sub
+End Class
+
+
+
+
 
 
 Public Class FCS_Delaunay : Inherits TaskParent
     Public inputPoints As New List(Of cvb.Point2f)
     Dim facetList As New List(Of List(Of cvb.Point))
     Dim subdiv As New cvb.Subdiv2D
+    Dim mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
+    Private Function buildRect(fp As fPoint, mms() As Single) As fPoint
+        fp.rect = ValidateRect(New cvb.Rect(mms(0), mms(1), mms(2) - mms(0), mms(3) - mms(1)))
+
+        mask32s(fp.rect).SetTo(0)
+        mask32s.FillConvexPoly(fp.facets, white, task.lineType)
+        mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
+
+        Return fp
+    End Function
+    Private Function checkRect1(fp As fPoint, mms() As Single) As Single()
+        If mms(0) < 0 Then
+            Dim pts As cvb.Mat = fp.mask.Col(0).FindNonZero()
+            If pts.Rows = 0 Then pts = fp.mask.Row(0).FindNonZero()
+            mms(0) = pts.Get(Of cvb.Point)(0, 0).X
+        End If
+        If mms(1) < 0 Then
+            Dim pts As cvb.Mat = fp.mask.Col(0).FindNonZero()
+            If pts.Rows = 0 Then pts = fp.mask.Row(0).FindNonZero()
+            mms(1) = pts.Get(Of cvb.Point)(0, 0).X
+        End If
+        If mms(2) < 0 Then
+            Dim pts As cvb.Mat = fp.mask.Col(dst2.Width).FindNonZero()
+            If pts.Rows > 0 Then
+                mms(2) = pts.Get(Of cvb.Point)(pts.Cols, 0).X
+            Else
+                pts = fp.mask.Row(dst2.Height).FindNonZero()
+                mms(2) = pts.Get(Of cvb.Point)(0, pts.Rows).X
+            End If
+        End If
+        If mms(3) < 0 Then
+            Dim pts As cvb.Mat = fp.mask.Col(dst2.Width).FindNonZero()
+            If pts.Rows > 0 Then
+                mms(3) = pts.Get(Of cvb.Point)(pts.Cols, 0).X
+            Else
+                pts = fp.mask.Row(dst2.Height).FindNonZero()
+                mms(3) = pts.Get(Of cvb.Point)(0, pts.Rows).X
+            End If
+        End If
+        Return mms
+    End Function
+    Private Function checkRect(fp As fPoint, mms() As Single) As Single()
+        Dim pts As cvb.Mat = fp.mask.Col(0).FindNonZero()
+        If mms(0) < 0 Or mms(1) < 0 Then
+            If pts.Rows > 0 Then
+                mms(0) = pts.Get(Of cvb.Point)(0, 0).X
+                mms(1) = pts.Get(Of cvb.Point)(0, 0).Y
+            Else
+                pts = fp.mask.Row(0).FindNonZero()
+                mms(0) = pts.Get(Of cvb.Point)(0, 0).X
+                mms(1) = pts.Get(Of cvb.Point)(0, 0).Y
+            End If
+        End If
+        'If mms(2) >= dst2.Width Or mms(3) >= dst2.Height Then
+        '    pts = fp.mask.Col(fp.mask.Width - 1).FindNonZero()
+        '    If pts.Rows > 0 Then
+        '        mms(2) = pts.Get(Of cvb.Point)(pts.Cols, 0).X
+        '        mms(3) = pts.Get(Of cvb.Point)(pts.Cols, 0).Y
+        '    Else
+        '        pts = fp.mask.Row(fp.mask.Height - 1).FindNonZero()
+        '        If pts.Rows > 0 Then
+        '            mms(2) = pts.Get(Of cvb.Point)(0, pts.Cols).X
+        '            mms(3) = pts.Get(Of cvb.Point)(0, pts.Cols).Y
+        '        End If
+        '    End If
+        'End If
+        Return mms
+    End Function
+    Private Function checkRectX(fp As fPoint) As Single
+        Dim pts As cvb.Mat = fp.mask.Col(dst2.Width).FindNonZero()
+        If pts.Rows = 0 Then pts = fp.mask.Row(dst2.Height).FindNonZero()
+        Return pts.Get(Of cvb.Point)(pts.Cols, 0).X
+    End Function
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             Static feat As New Feature_Basics
@@ -349,7 +419,6 @@ Public Class FCS_Delaunay : Inherits TaskParent
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         task.fpList.Clear()
-        Dim mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
         For i = 0 To facets.Length - 1
             Dim fp = New fPoint
             fp.facet2f = New List(Of Point2f)(facets(i))
@@ -365,12 +434,15 @@ Public Class FCS_Delaunay : Inherits TaskParent
                 fp.facets.Add(pt)
             Next
 
-            Dim minx = xlist.Min, miny = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
-            fp.rect = ValidateRect(New cvb.Rect(minx, miny, maxX - minx, maxY - miny))
+            Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
+            Dim mms() As Single = {minX, minY, maxX, maxY}
+            fp = buildRect(fp, mms)
 
-            mask32s(fp.rect).SetTo(0)
-            mask32s.FillConvexPoly(fp.facets, white, task.lineType)
-            mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
+            If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then
+                mms = checkRect(fp, mms)
+                fp = buildRect(fp, mms)
+            End If
+
             fp.pt = task.features(i)
             task.fpList.Add(fp)
         Next
