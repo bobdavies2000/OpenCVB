@@ -179,7 +179,7 @@ Public Class WarpAffine_3Points : Inherits TaskParent
                 For i = 0 To triangles(j).Rows - 1
                     Dim p1 = triangles(j).Get(Of cvb.Point2f)(i) + New cvb.Point2f(j * src.Width, 0)
                     Dim p2 = triangles(j).Get(Of cvb.Point2f)((i + 1) Mod 3) + New cvb.Point2f(j * src.Width, 0)
-                    Dim color = Choose(i + 1, cvb.Scalar.Red, white, cvb.Scalar.Yellow)
+                    Dim color = Choose(i + 1, cvb.Scalar.Red, cvb.Scalar.White, cvb.Scalar.Yellow)
                     wideMat.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
                     If j = 0 Then
                         Dim p3 = triangles(j + 1).Get(Of cvb.Point2f)(i) + New cvb.Point2f(src.Width, 0)
@@ -199,9 +199,9 @@ Public Class WarpAffine_3Points : Inherits TaskParent
             Dim pt As cvb.Point
             For i = 0 To srcPoints1.Count - 1
                 pt = New cvb.Point(CInt(srcPoints1(i).X), CInt(srcPoints1(i).Y))
-                DrawCircle(dst2, pt, task.DotSize + 2, white)
+                DrawCircle(dst2, pt, task.DotSize + 2, cvb.Scalar.White)
                 pt = New cvb.Point(CInt(srcPoints2(i).X), CInt(srcPoints2(i).Y))
-                DrawCircle(dst3, pt, task.DotSize + 2, white)
+                DrawCircle(dst3, pt, task.DotSize + 2, cvb.Scalar.White)
             Next
         End If
         SetTrueText("M defined as: " + vbCrLf +
