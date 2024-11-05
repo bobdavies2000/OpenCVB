@@ -80,7 +80,7 @@ Public Class SuperPixel_BinarizedImage : Inherits TaskParent
         pixels.Run(binarize.dst2)
         dst2 = pixels.dst2
         dst3 = pixels.dst3
-        dst3.SetTo(white, pixels.wireGrid)
+        dst3.SetTo(cvb.Scalar.White, pixels.wireGrid)
     End Sub
 End Class
 

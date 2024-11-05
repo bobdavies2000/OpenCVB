@@ -146,7 +146,7 @@ End Class
 Public Class Line_Core : Inherits TaskParent
     Dim ld As cvb.XImgProc.FastLineDetector
     Public lpList As New List(Of PointPair)
-    Public lineColor = cvb.Scalar.White
+    Public lineColor As cvb.Scalar = cvb.Scalar.White
     Public options As New Options_Line
     Public Sub New()
         ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
