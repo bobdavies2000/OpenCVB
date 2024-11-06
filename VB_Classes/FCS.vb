@@ -6,10 +6,10 @@ Public Class FCS_Basics : Inherits TaskParent
     Dim fcs As New FCS_Delaunay
     Dim fInfo As New FCS_Info
     Public featureInput As New List(Of cvb.Point2f)
-    Dim clickPoint As New cvb.Point(dst2.Width / 2, dst2.Height / 2)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
+        task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         FindSlider("Min Distance to next").Value = task.fPointMinDistance
         FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
         labels(1) = "The index for each of the cells (if standalonetest)"
@@ -28,12 +28,10 @@ Public Class FCS_Basics : Inherits TaskParent
         fcs.Run(src)
 
         dst2 = fcs.dst2
-        task.fpMap = fcs.dst3.Clone
 
         If task.heartBeat Then labels(2) = CStr(featureInput.Count) + " feature grid cells."
 
-        If task.mouseClickFlag Then clickPoint = task.ClickPoint
-        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(clickPoint.Y, clickPoint.X))
+        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
         fInfo.Run(empty)
         strOut = fInfo.strOut
 
@@ -56,7 +54,9 @@ Public Class FCS_Basics : Inherits TaskParent
         For Each fp In task.fpList
             DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
             DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
-            SetTrueText(CStr(fp.index), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
+            If fp.indexLast >= 0 Then
+                SetTrueText(Format(fp.ID, fmt1), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
+            End If
         Next
     End Sub
 End Class
@@ -73,6 +73,7 @@ Public Class FCS_Info : Inherits TaskParent
         If task.fpList.Count = 0 Then Exit Sub
 
         Dim fp = task.fpSelected
+        If fp Is Nothing Then Exit Sub
         If task.ClickPoint.DistanceTo(fp.pt) < fp.rect.Width / 2 And
            task.ClickPoint.DistanceTo(fp.pt) < fp.rect.Height / 2 Then
             task.ClickPoint = task.fpSelected.pt
@@ -82,7 +83,7 @@ Public Class FCS_Info : Inherits TaskParent
         strOut += "Feature point: " + fp.pt.ToString + vbCrLf
         strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
         strOut += CStr(fp.rect.Width) + "/" + CStr(fp.rect.Height) + vbCrLf
-        strOut += "index = " + CStr(fp.index) + vbCrLf
+        strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf
         strOut += "Facet count = " + CStr(fp.facet2f.Count) + " facets" + vbCrLf
         strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
         ' Dim vec = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
@@ -174,98 +175,6 @@ Public Class FCS_LinesAndEdges : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class FCS_BasicsOld : Inherits TaskParent
-    Public fpList As New List(Of fPoint)
-    Public fpMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
-    Dim feat As New Feature_Basics
-    Dim subdiv As New cvb.Subdiv2D
-    Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
-        FindSlider("Feature Sample Size").Value = 255 ' keep within a byte boundary.
-        desc = "Divide up the image based on the features found and track each cell."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-
-        subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
-        subdiv.Insert(task.features)
-
-        Dim facets = New cvb.Point2f()() {Nothing}
-        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-        fpList.Clear()
-        fpList.Add(New fPoint) ' index = 0
-        Dim mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-        For i = 0 To facets.Length - 1
-            Dim fp = New fPoint
-            fp.facet2f = New List(Of Point2f)(facets(i))
-            fp.facets = New List(Of cvb.Point)
-
-            Dim xlist As New List(Of Integer)
-            Dim ylist As New List(Of Integer)
-            For j = 0 To facets(i).Length - 1
-                Dim pt = New cvb.Point(facets(i)(j).X, facets(i)(j).Y)
-                If pt.X < 0 Then pt.X = 0
-                If pt.Y < 0 Then pt.Y = 0
-                If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
-                If pt.Y >= dst2.Height Then pt.Y = dst2.Height - 1
-                xlist.Add(pt.X)
-                ylist.Add(pt.Y)
-                fp.facets.Add(pt)
-            Next
-
-            fp.rect = New cvb.Rect(xlist.Min, ylist.Min, xlist.Max - xlist.Min, ylist.Max - ylist.Min)
-
-            mask32s(fp.rect).SetTo(0)
-            mask32s.FillConvexPoly(fp.facets, 255, task.lineType)
-            mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
-            fpList.Add(fp)
-        Next
-
-        dst3.SetTo(0)
-        If task.heartBeat Then
-            For i = 1 To fpList.Count - 1
-                Dim fp = fpList(i)
-                fp.index = i
-                fpList(i) = fp
-            Next
-        Else
-            Dim usedList(fpList.Count - 1) As Boolean
-            For i = 1 To fpList.Count - 1
-                Dim fp = fpList(i)
-                If usedList(fp.index) Then
-                    For j = 0 To usedList.Count - 1
-                        If usedList(j) = False Then
-                            fp.index = j
-                            Exit For
-                        End If
-                    Next
-                End If
-                usedList(fp.index) = True
-                fpList(i) = fp
-            Next
-        End If
-
-        For i = 1 To fpList.Count - 1
-            Dim fp = fpList(i)
-            dst3(fp.rect).SetTo(fp.index, fp.mask)
-        Next
-
-        dst2 = ShowPalette(dst3)
-        fpMap = dst3.Clone
-
-        For i = 1 To fpList.Count - 1
-            Dim fp = fpList(i)
-            DrawCircle(dst3, fp.pt, task.DotSize, white)
-        Next
-        If task.heartBeat Then labels(3) = CStr(fpList.Count) + " feature grid entries."
-    End Sub
-End Class
 
 
 
@@ -412,8 +321,6 @@ Public Class FCS_Delaunay : Inherits TaskParent
     Dim subdiv As New cvb.Subdiv2D
     Dim mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
     Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
-        labels(3) = "CV_8U map of Delaunay cells"
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
     Private Function buildRect(fp As fPoint, mms() As Single) As fPoint
@@ -442,7 +349,20 @@ Public Class FCS_Delaunay : Inherits TaskParent
             If y > maxY Then maxY = y
         Next
 
-        fp.mask = fp.mask(New cvb.Rect(minX, miny, maxX - minX, maxY - miny))
+        Dim newRect = New cvb.Rect(minX, miny, maxX - minX, maxY - miny)
+        'For Each pt In fp.facet2f
+        '    If pt.X >= 0 And pt.X < dst2.Width And pt.Y >= 0 And pt.Y < dst2.Height Then
+        '        If pt.X < minX Then minX = pt.X
+        '        If pt.Y < miny Then miny = pt.Y
+        '        If pt.X > maxX Then maxX = pt.X
+        '        If pt.Y > maxY Then maxY = pt.Y
+        '    End If
+        'Next
+        'If newRect.Width <= fp.mask.Width And newRect.Height <= fp.mask.Height Then
+        '    newRect = New cvb.Rect(minX, miny, maxX - minX, maxY - miny)
+        'End If
+
+        fp.mask = fp.mask(newRect)
         fp.rect = New cvb.Rect(fp.rect.X + minX, fp.rect.Y + miny, maxX - minX, maxY - miny)
         Return fp
     End Function
@@ -459,9 +379,26 @@ Public Class FCS_Delaunay : Inherits TaskParent
         Dim facets = New cvb.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
+        task.fpLastList = New List(Of fPoint)(task.fpList)
+        task.fpLastIDs = New List(Of Single)(task.fpIDlist)
         task.fpList.Clear()
+        task.fpIDlist.Clear()
+        Dim fpLast As fPoint
         For i = 0 To facets.Length - 1
             Dim fp = New fPoint
+            fp.pt = task.features(i)
+            fp.ID = CSng(task.gridMap32S.Get(Of Integer)(fp.pt.Y, fp.pt.X))
+            If task.fpLastIDs.Contains(fp.ID) Then
+                fp.indexLast = task.fpLastIDs.IndexOf(fp.ID)
+                fpLast = task.fpLastList(fp.indexLast)
+            Else
+                While task.fpIDlist.Contains(fp.ID)
+                    If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1
+                End While
+            End If
+
+            task.fpIDlist.Add(fp.ID)
+
             fp.facet2f = New List(Of Point2f)(facets(i))
             fp.facets = New List(Of cvb.Point)
             fp.index = i
@@ -481,17 +418,17 @@ Public Class FCS_Delaunay : Inherits TaskParent
 
             If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then
                 fp = findRect(fp, mms)
+                fp.periph = True
             End If
 
-            fp.pt = task.features(i)
             fp.pt3D = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
             cvb.Cv2.MeanStdDev(task.pointCloud(fp.rect), fp.depthMean, fp.depthStdev, fp.mask)
             task.fpList.Add(fp)
         Next
 
-        dst3.SetTo(0)
+        task.fpMap.SetTo(0)
         For Each fp In task.fpList
-            dst3(fp.rect).SetTo(fp.index, fp.mask)
+            task.fpMap(fp.rect).SetTo(fp.index, fp.mask)
         Next
 
         task.fpOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
@@ -504,7 +441,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             DrawContour(task.fpOutline, ptList, white, 1)
         Next
 
-        dst2 = ShowPalette(dst3)
+        dst2 = ShowPalette(task.fpMap)
         labels(2) = traceName + ": " + Format(featureInput.Count, "000") + " cells were present."
     End Sub
 End Class
@@ -517,10 +454,10 @@ End Class
 
 Public Class FCS_DepthCells : Inherits TaskParent
     Dim fcs As New FCS_Basics
-    Dim clickPoint As New cvb.Point(dst2.Width / 2, dst2.Height / 2)
     Dim fInfo As New FCS_Info
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
+        task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
         dst1 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
         desc = "Assign the depth of the feature point to the whole cell and display."
     End Sub
@@ -528,8 +465,7 @@ Public Class FCS_DepthCells : Inherits TaskParent
         dst0 = src.Clone
         fcs.Run(src)
 
-        If task.mouseClickFlag Then clickPoint = task.ClickPoint
-        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(clickPoint.Y, clickPoint.X))
+        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
         fInfo.Run(empty)
         SetTrueText(fInfo.strOut, 3)
 
@@ -544,7 +480,9 @@ Public Class FCS_DepthCells : Inherits TaskParent
         For Each fp In task.fpList
             DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
             DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
-            SetTrueText(CStr(fp.index), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
+            If fp.indexLast >= 0 Then
+                SetTrueText(Format(fp.ID, fmt1), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
+            End If
         Next
 
         For i = 0 To task.fpSelected.facets.Count - 1

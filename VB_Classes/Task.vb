@@ -29,8 +29,11 @@ Public Class VBtask : Implements IDisposable
     Public gridROIclicked As Integer
 
     Public fpList As New List(Of fPoint)
-    Public fpOutline As cvb.Mat
+    Public fpIDlist As New List(Of Single)
+    Public fpLastList As New List(Of fPoint)
+    Public fpLastIDs As New List(Of Single)
     Public fpMap As cvb.Mat
+    Public fpOutline As cvb.Mat
     Public fpSelected As New fPoint
     Public fPointMinDistance As Integer
 
