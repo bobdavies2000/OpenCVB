@@ -1013,7 +1013,10 @@ End Enum
 	If algorithmName = "FCS_Basics" Then return new FCS_Basics
 	If algorithmName = "FCS_BasicsOld" Then return new FCS_BasicsOld
 	If algorithmName = "FCS_Delaunay" Then return new FCS_Delaunay
+	If algorithmName = "FCS_DepthCells" Then return new FCS_DepthCells
 	If algorithmName = "FCS_Info" Then return new FCS_Info
+	If algorithmName = "FCS_LeftRight" Then return new FCS_LeftRight
+	If algorithmName = "FCS_LeftView" Then return new FCS_LeftView
 	If algorithmName = "FCS_Lines" Then return new FCS_Lines
 	If algorithmName = "FCS_LinesAndEdges" Then return new FCS_LinesAndEdges
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
