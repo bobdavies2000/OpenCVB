@@ -1015,8 +1015,8 @@ Public Class Depth_Colorizer_VB : Inherits TaskParent
                 If pixel > 0 And pixel <= task.MaxZmeters Then
                     Dim t = pixel / task.MaxZmeters
                     Dim color = New cvb.Vec3b(((1 - t) * nearColor(0) + t * farColor(0)),
-                                             ((1 - t) * nearColor(1) + t * farColor(1)),
-                                             ((1 - t) * nearColor(2) + t * farColor(2)))
+                                              ((1 - t) * nearColor(1) + t * farColor(1)),
+                                              ((1 - t) * nearColor(2) + t * farColor(2)))
                     dst2.Set(Of cvb.Vec3b)(y, x, color)
                 End If
             Next

@@ -1,5 +1,4 @@
 Imports cvb = OpenCvSharp
-Imports OpenCvSharp.Text
 ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Filter_Laplacian : Inherits TaskParent
     Public Sub New()

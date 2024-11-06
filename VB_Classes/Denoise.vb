@@ -1,6 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Public Class Denoise_Basics_CPP_VB : Inherits TaskParent
     Dim diff As New Diff_Basics
     Public Sub New()

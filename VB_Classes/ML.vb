@@ -1,7 +1,5 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-Imports OpenCvSharp.ML.ANN_MLP
 Imports OpenCvSharp.ML
 Public Class ML_Basics : Inherits TaskParent
     Public trainMats() As cvb.Mat ' all entries are 32FCx

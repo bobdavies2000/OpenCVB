@@ -1,7 +1,4 @@
-Imports OpenCvSharp
-Imports System.Security.Cryptography
 Imports cvb = OpenCvSharp
-
 Public Class Blob_Basics : Inherits TaskParent
     Dim options As Options_Blob
     Dim input As Blob_Input
@@ -23,18 +20,17 @@ Public Class Blob_Basics : Inherits TaskParent
             dst2 = src
         End If
 
-        Dim binaryImage = dst2.CvtColor(ColorConversionCodes.BGR2GRAY)
-        Cv2.Threshold(binaryImage, binaryImage, thresh:=0, maxval:=255, type:=ThresholdTypes.Binary)
+        Dim binaryImage = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        cvb.Cv2.Threshold(binaryImage, binaryImage, thresh:=0, maxval:=255, type:=cvb.ThresholdTypes.Binary)
 
-        Dim simpleBlob = SimpleBlobDetector.Create(CType(options.blobParams, SimpleBlobDetector.Params))
+        Dim simpleBlob = cvb.SimpleBlobDetector.Create(CType(options.blobParams, cvb.SimpleBlobDetector.Params))
         Dim keypoint = simpleBlob.Detect(dst2)
 
-        Cv2.DrawKeypoints(
-            image:=binaryImage,
-            keypoints:=keypoint,
-            outImage:=dst3,
-            color:=Scalar.FromRgb(255, 0, 0),
-            flags:=DrawMatchesFlags.DrawRichKeypoints)
+        cvb.Cv2.DrawKeypoints(image:=binaryImage,
+                              keypoints:=keypoint,
+                              outImage:=dst3,
+                              color:=cvb.Scalar.FromRgb(255, 0, 0),
+                              flags:=cvb.DrawMatchesFlags.DrawRichKeypoints)
     End Sub
 End Class
 

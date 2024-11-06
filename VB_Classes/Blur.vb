@@ -1,4 +1,3 @@
-Imports OpenCvSharp
 Imports System.Windows.Forms
 Imports System.Security.Cryptography
 Imports cvb = OpenCvSharp
@@ -206,7 +205,7 @@ Public Class Blur_Gaussian : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        Cv2.GaussianBlur(src, dst2, New Size(options.kernelSize, options.kernelSize), 0, 0)
+        cvb.Cv2.GaussianBlur(src, dst2, New cvb.Size(options.kernelSize, options.kernelSize), 0, 0)
     End Sub
 End Class
 

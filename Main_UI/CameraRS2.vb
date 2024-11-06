@@ -1,8 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 Imports Intel.RealSense
-Imports System.Text
-Imports OpenCvSharp
 '  The CameraRS2 project would have to be added back to turn off the VB.Net version of the camera interface.
 #If 1 Then
 Public Class CameraRS2 : Inherits GenericCamera

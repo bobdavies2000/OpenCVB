@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 Public Class Density_Basics : Inherits TaskParent
     Dim options = New Options_Density

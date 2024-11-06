@@ -1,4 +1,3 @@
-Imports OpenCvSharp
 Imports OpenCvSharp.XImgProc
 Imports cvb = OpenCvSharp
 
@@ -88,10 +87,10 @@ Public Class Binarize_Niblack_Sauvola : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
-        dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR)
-        CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
-        dst3 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR)
+        CvXImgProc.NiblackThreshold(src, dst0, 255, cvb.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
+        dst2 = dst0.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+        CvXImgProc.NiblackThreshold(src, dst0, 255, cvb.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
+        dst3 = dst0.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -112,8 +111,8 @@ Public Class Binarize_Wolf_Nick : Inherits TaskParent
 
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        CvXImgProc.NiblackThreshold(src, dst2, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
-        CvXImgProc.NiblackThreshold(src, dst3, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
+        CvXImgProc.NiblackThreshold(src, dst2, 255, cvb.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
+        CvXImgProc.NiblackThreshold(src, dst3, 255, cvb.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
     End Sub
 End Class
 

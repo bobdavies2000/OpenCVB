@@ -1,6 +1,5 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Public Class Guess_Depth_CPP_VB : Inherits TaskParent
     Public Sub New()
         cPtr = Guess_Depth_Open()

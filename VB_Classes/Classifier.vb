@@ -1,7 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-
 Public Class Classifier_Basics_CPP_VB : Inherits TaskParent
     Dim options As New Options_Classifier
     Public Sub New()

@@ -1,6 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Public Class Hist3Dcloud_Basics : Inherits TaskParent
     Public histogram As New cvb.Mat
     Public histogram1D As New cvb.Mat

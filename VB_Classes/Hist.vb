@@ -1,7 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
-Imports NAudio.Gui
-Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 Public Class Hist_Basics : Inherits TaskParent
     Public histogram As New cvb.Mat

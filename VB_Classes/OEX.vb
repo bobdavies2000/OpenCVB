@@ -1,7 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
-Imports OpenCvSharp
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
 Public Class OEX_CalcBackProject_Demo1 : Inherits TaskParent
     Public histogram As New cvb.Mat
@@ -317,7 +316,7 @@ Public Class OEX_PointPolygon : Inherits TaskParent
 
         dst2 = src.Clone
         Dim contours As cvb.Point()()
-        cvb.Cv2.FindContours(src, contours, Nothing, RetrievalModes.Tree, cvb.ContourApproximationModes.ApproxSimple)
+        cvb.Cv2.FindContours(src, contours, Nothing, cvb.RetrievalModes.Tree, cvb.ContourApproximationModes.ApproxSimple)
 
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
         For i = 0 To dst1.Rows - 1

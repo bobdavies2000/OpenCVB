@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp
-Imports cvb = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class FCS_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
@@ -399,7 +398,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
 
             task.fpIDlist.Add(fp.ID)
 
-            fp.facet2f = New List(Of Point2f)(facets(i))
+            fp.facet2f = New List(Of cvb.Point2f)(facets(i))
             fp.facets = New List(Of cvb.Point)
             fp.index = i
 
@@ -478,8 +477,13 @@ Public Class FCS_DepthCells : Inherits TaskParent
         dst2 = ShowPalette(dst1)
 
         For Each fp In task.fpList
-            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
-            DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
+            If fp.indexLast Then
+                DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
+            Else
+                DrawCircle(dst2, fp.pt, task.DotSize + 2, cvb.Scalar.Red)
+                DrawCircle(dst0, fp.pt, task.DotSize + 2, cvb.Scalar.Red)
+            End If
             If fp.indexLast >= 0 Then
                 SetTrueText(Format(fp.ID, fmt1), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
             End If
@@ -490,6 +494,30 @@ Public Class FCS_DepthCells : Inherits TaskParent
             Dim p2 = task.fpSelected.facets((i + 1) Mod task.fpSelected.facets.Count)
             dst2.Line(p1, p2, cvb.Scalar.White, task.lineWidth + 1, task.lineType)
             dst0.Line(p1, p2, cvb.Scalar.White, task.lineWidth + 1, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_Periphery : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Public Sub New()
+        desc = "Display the cells which are on the periphery of the image"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+
+        dst3 = dst2.Clone
+        For Each fp In task.fpList
+            If fp.periph Then
+                dst3(fp.rect).SetTo(cvb.Scalar.Gray, fp.mask)
+                DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            End If
         Next
     End Sub
 End Class

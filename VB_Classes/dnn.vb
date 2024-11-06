@@ -3,8 +3,6 @@ Imports OpenCvSharp.Dnn
 Imports System.Net
 Imports System.IO
 Imports OpenCvSharp.DnnSuperres
-Imports OpenCvSharp
-
 Public Class DNN_Test : Inherits TaskParent
     Dim net As Net
     Dim classnames() As String

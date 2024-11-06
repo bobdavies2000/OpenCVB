@@ -1,6 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
 Imports sl
-Imports OpenCvSharp
 Public Class CameraZED2 : Inherits GenericCamera
     Dim zed As sl.Camera
     Dim init_params As New InitParameters()

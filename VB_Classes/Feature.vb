@@ -1,6 +1,5 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
     Dim gather As New Feature_Gather
@@ -830,41 +829,41 @@ End Class
 
 
 Public Class Feature_Agast : Inherits TaskParent
-    Dim stablePoints As List(Of Point2f)
-    Dim agastFD As AgastFeatureDetector
-    Dim lastPoints As List(Of Point2f)
+    Dim stablePoints As List(Of cvb.Point2f)
+    Dim agastFD As cvb.AgastFeatureDetector
+    Dim lastPoints As List(Of cvb.Point2f)
     Public Sub New()
-        agastFD = AgastFeatureDetector.Create(10, True, AgastFeatureDetector.DetectorType.OAST_9_16)
+        agastFD = cvb.AgastFeatureDetector.Create(10, True, cvb.AgastFeatureDetector.DetectorType.OAST_9_16)
         desc = "Use the Agast Feature Detector in the OpenCV Contrib."
-        stablePoints = New List(Of Point2f)()
-        lastPoints = New List(Of Point2f)()
+        stablePoints = New List(Of cvb.Point2f)()
+        lastPoints = New List(Of cvb.Point2f)()
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim resizeFactor As Integer = 1
-        Dim input As New Mat()
+        Dim input As New cvb.Mat()
         If src.Cols >= 1280 Then
-            Cv2.Resize(src, input, New cvb.Size(src.Cols \ 4, src.Rows \ 4))
+            cvb.Cv2.Resize(src, input, New cvb.Size(src.Cols \ 4, src.Rows \ 4))
             resizeFactor = 4
         Else
             input = src
         End If
-        Dim keypoints As KeyPoint() = agastFD.Detect(input)
+        Dim keypoints As cvb.KeyPoint() = agastFD.Detect(input)
         If task.heartBeat OrElse lastPoints.Count < 10 Then
             lastPoints.Clear()
-            For Each kpt As KeyPoint In keypoints
-                lastPoints.Add(New Point2f(CSng(Math.Round(kpt.Pt.X)) * resizeFactor, CSng(Math.Round(kpt.Pt.Y)) * resizeFactor))
+            For Each kpt As cvb.KeyPoint In keypoints
+                lastPoints.Add(New cvb.Point2f(CSng(Math.Round(kpt.Pt.X)) * resizeFactor, CSng(Math.Round(kpt.Pt.Y)) * resizeFactor))
             Next
         End If
         stablePoints.Clear()
         dst2 = src.Clone()
-        For Each pt As KeyPoint In keypoints
-            Dim p1 As New Point2f(CSng(Math.Round(pt.Pt.X * resizeFactor)), CSng(Math.Round(pt.Pt.Y * resizeFactor)))
+        For Each pt As cvb.KeyPoint In keypoints
+            Dim p1 As New cvb.Point2f(CSng(Math.Round(pt.Pt.X * resizeFactor)), CSng(Math.Round(pt.Pt.Y * resizeFactor)))
             If lastPoints.Contains(p1) Then
                 stablePoints.Add(p1)
-                DrawCircle(dst2, p1, task.DotSize, New Scalar(0, 0, 255))
+                DrawCircle(dst2, p1, task.DotSize, New cvb.Scalar(0, 0, 255))
             End If
         Next
-        lastPoints = New List(Of Point2f)(stablePoints)
+        lastPoints = New List(Of cvb.Point2f)(stablePoints)
         If task.midHeartBeat Then
             labels(2) = $"{keypoints.Length} features found and {stablePoints.Count} of them were stable"
         End If
@@ -881,7 +880,7 @@ End Class
 
 
 Public Class Feature_AKaze : Inherits TaskParent
-    Dim kazeKeyPoints As KeyPoint() = Nothing
+    Dim kazeKeyPoints As cvb.KeyPoint() = Nothing
     Public Sub New()
         labels(2) = "AKAZE key points"
         desc = "Find keypoints using AKAZE algorithm."
@@ -889,10 +888,10 @@ Public Class Feature_AKaze : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone()
         If src.Channels() <> 1 Then
-            src = src.CvtColor(ColorConversionCodes.BGR2GRAY)
+            src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         End If
-        Dim kaze = AKAZE.Create()
-        Dim kazeDescriptors As New Mat()
+        Dim kaze = cvb.AKAZE.Create()
+        Dim kazeDescriptors As New cvb.Mat()
         kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
         For i As Integer = 0 To kazeKeyPoints.Length - 1
             DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.HighlightColor)

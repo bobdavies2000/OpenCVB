@@ -1,7 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Flann
-
 Public Class Interpolate_Basics : Inherits TaskParent
     Public options As New Options_Resize
     Public iOptions As New Options_Interpolate

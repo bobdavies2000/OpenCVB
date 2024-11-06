@@ -1,10 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports OpenCvSharp
-Imports System.IO.Pipes
-Imports System.Runtime.InteropServices
-
 Public Class TrueText
     Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
     Public text As String

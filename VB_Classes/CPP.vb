@@ -1,9 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
-Imports OpenCvSharp
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
-
 Public Class CPP_Basics : Inherits TaskParent
     Dim cppFunction As Integer
     Public result As cvb.Mat

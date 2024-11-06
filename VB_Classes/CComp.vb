@@ -1,8 +1,7 @@
-Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics : Inherits TaskParent
-    Public connectedComponents As ConnectedComponents
+    Public connectedComponents As cvb.ConnectedComponents
     Public rects As New List(Of cvb.Rect)
     Public centroids As New List(Of cvb.Point2f)
     Dim lastImage As cvb.Mat

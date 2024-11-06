@@ -1,7 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-Imports System.Security.Cryptography
-Imports cvb = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class FeatureROI_Basics : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public rects As New List(Of cvb.Rect)

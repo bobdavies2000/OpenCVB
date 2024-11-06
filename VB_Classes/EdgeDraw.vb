@@ -1,6 +1,5 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Public Class EdgeDraw_Basics : Inherits TaskParent
     Public Sub New()
         cPtr = EdgeDraw_Edges_Open()

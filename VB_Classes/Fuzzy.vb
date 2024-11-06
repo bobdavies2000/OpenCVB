@@ -1,6 +1,5 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Public Class Fuzzy_Basics : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_Contours

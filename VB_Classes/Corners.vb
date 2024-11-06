@@ -1,6 +1,5 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class Corners_Basics : Inherits TaskParent
     Public features As New List(Of cvb.Point2f)
