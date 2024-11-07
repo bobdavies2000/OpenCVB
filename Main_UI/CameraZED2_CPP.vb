@@ -1,6 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 Imports sl
+Imports Intel.RealSense
 Module Zed2_CPP_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Open(width As Integer, height As Integer) As IntPtr
@@ -75,6 +76,10 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
 
             uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
                                                  cvb.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone
+
+            uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC4,
+                                           Zed2PointCloud(cPtr)).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+
 
             Dim accPtr = Zed2Acceleration(cPtr)
             Dim accel = Marshal.PtrToStructure(Of cvb.Point3f)(accPtr)

@@ -239,22 +239,27 @@ End Class
 
 
 
-Public Class FCS_LeftRight : Inherits TaskParent
+Public Class FCS_ViewLeftRight : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim fcsL As New FCS_Basics
     Dim fcsR As New FCS_Basics
+
     Dim saveLeftMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
     Dim saveLeftList As New List(Of fPoint)
+    Dim saveLeftIDs As New List(Of Single)
+
     Dim saveRightMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
     Dim saveRightList As New List(Of fPoint)
+    Dim saveRightIDs As New List(Of Single)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
-        desc = "Build an FCS for both left and right views."
+        desc = "Build an FCS for both left and right views.  NOT WORKING - right image is just what the left has.  NEEDSWORK"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         task.fpMap = saveLeftMap.Clone
-        task.fpList = saveLeftList
+        task.fpList = New List(Of fPoint)(saveLeftList)
+        task.fpIDlist = New List(Of Single)(saveLeftIDs)
 
         feat.Run(task.leftView)
         fcsL.featureInput = New List(Of cvb.Point2f)(task.features)
@@ -265,9 +270,11 @@ Public Class FCS_LeftRight : Inherits TaskParent
 
         saveLeftMap = task.fpMap.Clone
         saveLeftList = New List(Of fPoint)(task.fpList)
+        saveLeftIDs = New List(Of Single)(task.fpIDlist)
 
         task.fpMap = saveRightMap.Clone
-        task.fpList = saveRightList
+        task.fpList = New List(Of fPoint)(saveRightList)
+        task.fpIDlist = New List(Of Single)(saveRightIDs)
 
         feat.Run(task.rightView)
         fcsR.featureInput = New List(Of cvb.Point2f)(task.features)
@@ -278,6 +285,7 @@ Public Class FCS_LeftRight : Inherits TaskParent
 
         saveRightMap = task.fpMap.Clone
         saveRightList = New List(Of fPoint)(task.fpList)
+        saveRightIDs = New List(Of Single)(task.fpIDlist)
     End Sub
 End Class
 
@@ -287,13 +295,12 @@ End Class
 
 
 
-Public Class FCS_LeftView : Inherits TaskParent
+Public Class FCS_ViewLeft : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim fcs As New FCS_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
-        If standalone Then task.gOptions.setDisplay1()
-        desc = "Build an FCS for both left and right views."
+        desc = "Build an FCS for left view."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(task.leftView)
@@ -305,6 +312,33 @@ Public Class FCS_LeftView : Inherits TaskParent
         dst2 = fcs.dst2
         dst3 = fcs.dst3
 
+        labels(2) = fcs.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_ViewRight : Inherits TaskParent
+    Dim feat As New Feature_Basics
+    Dim fcs As New FCS_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay0()
+        desc = "Build an FCS for right view."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        feat.Run(task.rightView)
+        fcs.featureInput = New List(Of cvb.Point2f)(task.features)
+
+        fcs.Run(task.rightView)
+        dst0 = fcs.dst0
+        dst1 = fcs.dst1
+        dst2 = fcs.dst2
+        dst3 = fcs.dst3
+        labels(2) = fcs.labels(2)
     End Sub
 End Class
 
@@ -440,7 +474,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             DrawContour(task.fpOutline, ptList, white, 1)
         Next
 
-        dst2 = ShowPalette(task.fpMap)
+        dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
         labels(2) = traceName + ": " + Format(featureInput.Count, "000") + " cells were present."
     End Sub
 End Class
@@ -474,7 +508,7 @@ Public Class FCS_DepthCells : Inherits TaskParent
             dst1(fp.rect).SetTo(255 * fp.depthMean(2) / task.MaxZmeters, mask)
         Next
 
-        dst2 = ShowPalette(dst1)
+        dst2 = ShowPalette(dst1 * 255 / task.fpList.Count)
 
         For Each fp In task.fpList
             If fp.indexLast Then

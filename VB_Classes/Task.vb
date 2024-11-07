@@ -646,6 +646,15 @@ Public Class VBtask : Implements IDisposable
             Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
     End Sub
+    Public Function GetMinMax(mat As cvb.Mat, Optional mask As cvb.Mat = Nothing) As mmData
+        Dim mm As mmData
+        If mask Is Nothing Then
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
+        Else
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
+        End If
+        Return mm
+    End Function
     Public Sub RunAlgorithm()
         If allOptions.titlesAdded Then
             allOptions.titlesAdded = False
@@ -728,9 +737,30 @@ Public Class VBtask : Implements IDisposable
                     task.pointCloud = New cvb.Mat(src.Size, cvb.MatType.CV_32FC3, 0)
                 End If
 
-                '******* this is the rotation *******
+                '******* this is the gravity rotation *******
                 task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).
                                    ToMat.Reshape(3, src.Rows)
+
+
+
+
+                Dim split = task.pointCloud.Split()
+                Dim r = New cvb.Rect(task.pointCloud.Width / 2, task.pointCloud.Height / 2, task.pointCloud.Width / 2, task.pointCloud.Height / 2)
+                Dim test(split(2)(r).Total - 1) As Single
+                Marshal.Copy(split(2)(r).Data, test, 0, test.Length)
+                Dim count = split(2)(r).CountNonZero
+                Dim mm = getminmax(split(2))
+
+                Dim r2 = New cvb.Rect(0, 0, task.pointCloud.Width / 2, task.pointCloud.Height / 2)
+                Dim test2(split(2)(r2).Total - 1) As Single
+                Marshal.Copy(split(2)(r2).Data, test2, 0, test2.Length)
+                count = split(2)(r2).CountNonZero
+                mm = getminmax(split(2))
+                Dim k = 0
+
+
+
+
             End If
 
             If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split

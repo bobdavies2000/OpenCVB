@@ -44,7 +44,7 @@ Public Class CameraZED2 : Inherits GenericCamera
         Dim color As New cvb.Mat, leftView As New cvb.Mat, rightView As New cvb.Mat, pointCloud As New cvb.Mat
         Static colorSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
         Static rightSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
-        Static pointCloudSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
+        Static pointCloudSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C4)
 
         zed.RetrieveImage(colorSL, sl.VIEW.LEFT)
         color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, colorSL.GetPtr).
@@ -54,14 +54,9 @@ Public Class CameraZED2 : Inherits GenericCamera
         rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, rightSL.GetPtr).
                                           CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
 
-        zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZ)
+        zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZBGRA) ' tried XYZ but it still comes with BGRA
         pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC4,
                                            pointCloudSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
-        cvb.Cv2.PatchNaNs(pointCloud, 0)
-        Dim infNans As cvb.Mat = pointCloud.Reshape(1, pointCloud.Rows * pointCloud.Cols)
-        Dim mask As cvb.Mat = infNans.Equals(Single.PositiveInfinity)
-        mask = mask.Reshape(3, pointCloud.Rows)
-        pointCloud.SetTo(0, mask)
 
         Dim zed_pose As New sl.Pose
         zed.GetPosition(zed_pose, REFERENCE_FRAME.WORLD)

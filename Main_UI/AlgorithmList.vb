@@ -1014,12 +1014,13 @@ End Enum
 	If algorithmName = "FCS_Delaunay" Then return new FCS_Delaunay
 	If algorithmName = "FCS_DepthCells" Then return new FCS_DepthCells
 	If algorithmName = "FCS_Info" Then return new FCS_Info
-	If algorithmName = "FCS_LeftRight" Then return new FCS_LeftRight
-	If algorithmName = "FCS_LeftView" Then return new FCS_LeftView
 	If algorithmName = "FCS_Lines" Then return new FCS_Lines
 	If algorithmName = "FCS_LinesAndEdges" Then return new FCS_LinesAndEdges
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "FCS_Periphery" Then return new FCS_Periphery
+	If algorithmName = "FCS_ViewLeft" Then return new FCS_ViewLeft
+	If algorithmName = "FCS_ViewLeftRight" Then return new FCS_ViewLeftRight
+	If algorithmName = "FCS_ViewRight" Then return new FCS_ViewRight
 	If algorithmName = "Feature_Agast" Then return new Feature_Agast
 	If algorithmName = "Feature_Agast_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Agast_CC)
 	If algorithmName = "Feature_Agast_CS" Then return new Feature_Agast_CS

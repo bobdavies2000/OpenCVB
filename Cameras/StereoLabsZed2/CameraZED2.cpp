@@ -137,17 +137,15 @@ public:
 		zed.retrieveImage(rightViewSL, VIEW::RIGHT);
 		rightView = getMat((void*)rightViewSL.getPtr<sl::uchar1>(), w, h);
 
-		zed.retrieveMeasure(pcMatSL, MEASURE::XYZBGRA); // XYZ has an extra float!
+		zed.retrieveMeasure(pcMatSL, MEASURE::XYZ); // XYZ has an extra float!
 
 		pointCloud = cv::Mat(captureHeight, captureWidth, CV_32FC4, pcMatSL.getPtr<sl::uchar1>());
 		if (captureWidth != w) resize(pointCloud, pointCloud, Size(w, h), 0, 0, INTER_NEAREST);
-		cvtColor(pointCloud, pointCloud, ColorConversionCodes::COLOR_BGRA2BGR);
-
-		cv::patchNaNs(pointCloud); 
-		cv::Mat infNans = pointCloud.reshape(1, pointCloud.rows * pointCloud.cols);
-		cv::Mat mask = infNans == std::numeric_limits<float>::infinity();
-		mask = mask.reshape(3, pointCloud.rows);
-		pointCloud.setTo(0, mask);
+		//cvtColor(pointCloud, pointCloud, ColorConversionCodes::COLOR_BGRA2BGR);
+		//std::vector<cv::Mat> pcsplit;
+		//cv::split(pointCloud, pcsplit);
+		//pcsplit.pop_back();
+		//cv::merge(pcsplit, pointCloud);
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 		RotationMatrix = zed_pose.getRotationMatrix();
