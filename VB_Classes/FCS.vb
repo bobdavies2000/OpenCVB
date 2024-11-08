@@ -357,7 +357,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
     Private Function buildRect(fp As fPoint, mms() As Single) As fPoint
-        fp.rect = ValidateRect(New cvb.Rect(mms(0), mms(1), mms(2) - mms(0), mms(3) - mms(1)))
+        fp.rect = ValidateRect(New cvb.Rect(mms(0), mms(1), mms(2) - mms(0) + 1, mms(3) - mms(1) + 1))
 
         mask32s(fp.rect).SetTo(0)
         mask32s.FillConvexPoly(fp.facets, white, task.lineType)
@@ -382,21 +382,8 @@ Public Class FCS_Delaunay : Inherits TaskParent
             If y > maxY Then maxY = y
         Next
 
-        Dim newRect = New cvb.Rect(minX, miny, maxX - minX, maxY - miny)
-        'For Each pt In fp.facet2f
-        '    If pt.X >= 0 And pt.X < dst2.Width And pt.Y >= 0 And pt.Y < dst2.Height Then
-        '        If pt.X < minX Then minX = pt.X
-        '        If pt.Y < miny Then miny = pt.Y
-        '        If pt.X > maxX Then maxX = pt.X
-        '        If pt.Y > maxY Then maxY = pt.Y
-        '    End If
-        'Next
-        'If newRect.Width <= fp.mask.Width And newRect.Height <= fp.mask.Height Then
-        '    newRect = New cvb.Rect(minX, miny, maxX - minX, maxY - miny)
-        'End If
-
-        fp.mask = fp.mask(newRect)
-        fp.rect = New cvb.Rect(fp.rect.X + minX, fp.rect.Y + miny, maxX - minX, maxY - miny)
+        fp.mask = fp.mask(New cvb.Rect(minX, miny, maxX - minX + 1, maxY - miny + 1))
+        fp.rect = New cvb.Rect(fp.rect.X + minX, fp.rect.Y + miny, maxX - minX + 1, maxY - miny + 1)
         Return fp
     End Function
     Public Sub RunAlg(src As cvb.Mat)
@@ -553,5 +540,6 @@ Public Class FCS_Periphery : Inherits TaskParent
                 DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
             End If
         Next
+        dst3.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
     End Sub
 End Class

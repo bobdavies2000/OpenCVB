@@ -351,18 +351,18 @@ Public Class TaskParent : Implements IDisposable
     End Function
 
     Public Function ValidateRect(ByVal r As cvb.Rect, Optional ratio As Integer = 1) As cvb.Rect
-        If r.Width <= 0 Then r.Width = 1
-        If r.Height <= 0 Then r.Height = 1
+        'If r.Width <= 0 Then r.Width = 1
+        'If r.Height <= 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > task.dst2.Width * ratio Then r.X = task.dst2.Width * ratio - 1
-        If r.Y > task.dst2.Height * ratio Then r.Y = task.dst2.Height * ratio - 1
-        If r.X + r.Width > task.dst2.Width * ratio Then r.Width = task.dst2.Width * ratio - r.X
-        If r.Y + r.Height > task.dst2.Height * ratio Then r.Height = task.dst2.Height * ratio - r.Y
+        'If r.X >= task.dst2.Width * ratio Then r.X = task.dst2.Width * ratio
+        'If r.Y >= task.dst2.Height * ratio Then r.Y = task.dst2.Height * ratio
+        If r.X + r.Width >= task.dst2.Width * ratio Then r.Width = task.dst2.Width * ratio - r.X
+        If r.Y + r.Height >= task.dst2.Height * ratio Then r.Height = task.dst2.Height * ratio - r.Y
+        'If r.X = task.dst2.Width * ratio Then r.X = r.X - 1
+        'If r.Y = task.dst2.Height * ratio Then r.Y = r.Y - 1
         If r.Width <= 0 Then r.Width = 1 ' check again (it might have changed.)
         If r.Height <= 0 Then r.Height = 1
-        If r.X = task.dst2.Width * ratio Then r.X = r.X - 1
-        If r.Y = task.dst2.Height * ratio Then r.Y = r.Y - 1
         Return r
     End Function
     Public Function FindSlider(opt As String) As TrackBar
