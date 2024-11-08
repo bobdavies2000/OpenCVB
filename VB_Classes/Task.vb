@@ -36,6 +36,7 @@ Public Class VBtask : Implements IDisposable
     Public fpOutline As cvb.Mat
     Public fpSelected As New fPoint
     Public fPointMinDistance As Integer
+    Public fpCorners(3) As Integer
 
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer

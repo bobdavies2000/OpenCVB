@@ -1,9 +1,11 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim fcs As New FCS_Delaunay
-    Dim fInfo As New FCS_Info
+    Dim nabes As New FCS_Neighbors
+    Public getNabes As Boolean = True
     Public featureInput As New List(Of cvb.Point2f)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
@@ -31,8 +33,11 @@ Public Class FCS_Basics : Inherits TaskParent
         If task.heartBeat Then labels(2) = CStr(featureInput.Count) + " feature grid cells."
 
         task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
-        fInfo.Run(empty)
-        strOut = fInfo.strOut
+        If getNabes Then
+            nabes.Run(src)
+            strOut = nabes.strOut
+            dst3 = nabes.dst3
+        End If
 
         dst2.SetTo(0, task.fpOutline)
         Dim fp = task.fpSelected
@@ -42,6 +47,7 @@ Public Class FCS_Basics : Inherits TaskParent
             Dim p1 = fp.facets(i)
             Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
             dst2.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+            dst0.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
         Next
 
         dst2.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
@@ -92,9 +98,15 @@ Public Class FCS_Info : Inherits TaskParent
                               Format(fp.depthMean(1), fmt1) + "/" + Format(fp.depthMean(2), fmt1) + vbCrLf
         strOut += "Pointcloud stdev X/Y/Z: " + Format(fp.depthStdev(0), fmt1) + "/" +
                               Format(fp.depthStdev(1), fmt1) + "/" + Format(fp.depthStdev(2), fmt1) + vbCrLf
-        strOut += "Facets: " + vbCrLf
+        strOut += "Neighbor Count = " + CStr(fp.nabeList.Count) + vbCrLf
+        strOut += "Neighbors: "
+        For Each index In fp.nabeList
+            strOut += CStr(index) + ", "
+        Next
+        strOut += vbCrLf
+        strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
         For i = 0 To fp.facets.Count - 1
-            strOut += CStr(i) + ": " + CStr(fp.facets(i).X) + ", " + CStr(fp.facets(i).Y) + vbCrLf
+            strOut += CStr(i) + ":" + vbTab + CStr(fp.facets(i).X) + vbTab + CStr(fp.facets(i).Y) + vbCrLf
         Next
 
         If standalone Then
@@ -406,7 +418,9 @@ Public Class FCS_Delaunay : Inherits TaskParent
         Dim fpLast As fPoint
         For i = 0 To facets.Length - 1
             Dim fp = New fPoint
-            fp.pt = task.features(i)
+            If i < task.features.Count Then
+                fp.pt = task.features(i)
+            End If
             fp.ID = CSng(task.gridMap32S.Get(Of Integer)(fp.pt.Y, fp.pt.X))
             If task.fpLastIDs.Contains(fp.ID) Then
                 fp.indexLast = task.fpLastIDs.IndexOf(fp.ID)
@@ -441,6 +455,9 @@ Public Class FCS_Delaunay : Inherits TaskParent
                 fp.periph = True
             End If
 
+            If fp.pt = newPoint Then fp.pt = New cvb.Point(CInt(xlist.Average), CInt(ylist.Average))
+            If fp.pt.X >= dst2.Width Or fp.pt.X < 0 Then fp.pt.X = CInt(fp.rect.X + fp.rect.Width / 2)
+            If fp.pt.Y >= dst2.Height Or fp.pt.Y < 0 Then fp.pt.Y = CInt(fp.rect.Y + fp.rect.Height / 2)
             fp.pt3D = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
             cvb.Cv2.MeanStdDev(task.pointCloud(fp.rect), fp.depthMean, fp.depthStdev, fp.mask)
             task.fpList.Add(fp)
@@ -541,5 +558,86 @@ Public Class FCS_Periphery : Inherits TaskParent
             End If
         Next
         dst3.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_Neighbors : Inherits TaskParent
+    Dim fInfo As New FCS_Info
+    Public Sub New()
+        dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U)
+        desc = "Show the midpoints in each cell and build the nabelist for each cell"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static fcs As New FCS_Basics
+            fcs.getNabes = False
+            fcs.Run(src)
+            dst2 = fcs.dst2
+        End If
+
+        Dim fp As fPoint
+        For i = 0 To task.fpList.Count - 1
+            fp = task.fpList(i)
+            If fp.ID = 57.0 Then Dim k = 0
+            For Each pt In fp.facets
+                If pt.X < 0 Or pt.X > dst2.Width Then Continue For
+                If pt.Y < 0 Or pt.Y > dst2.Height Then Continue For
+                Dim index As Integer
+                For j = 0 To 8
+                    Dim ptNabe = Choose(j + 1, New cvb.Point(pt.X - 1, pt.Y - 1),
+                                               New cvb.Point(pt.X, pt.Y - 1),
+                                               New cvb.Point(pt.X + 1, pt.Y - 1),
+                                               New cvb.Point(pt.X - 1, pt.Y),
+                                               New cvb.Point(pt.X, pt.Y),
+                                               New cvb.Point(pt.X + 1, pt.Y),
+                                               New cvb.Point(pt.X - 1, pt.Y + 1),
+                                               New cvb.Point(pt.X, pt.Y + 1),
+                                               New cvb.Point(pt.X + 1, pt.Y + 1))
+                    If ptNabe.x >= 0 And ptNabe.x <= dst2.Width And
+                       ptNabe.y >= 0 And ptNabe.y <= dst2.Height Then
+                        index = task.fpMap.Get(Of Byte)(ptNabe.y, ptNabe.x)
+                    End If
+                    If fp.nabeList.Contains(index) = False Then fp.nabeList.Add(index)
+                Next
+            Next
+            task.fpList(i) = fp
+        Next
+
+        For Each fp In task.fpList
+            Dim r = fp.rect
+            If r.X = 0 And r.Y = 0 Then task.fpCorners(0) = fp.index
+            If r.Y = 0 And r.BottomRight.X = dst2.Width Then task.fpCorners(1) = fp.index
+            If r.X = 0 And r.BottomRight.Y = dst2.Height Then task.fpCorners(2) = fp.index
+            If r.BottomRight.X = dst2.Width Then task.fpCorners(3) = fp.index
+        Next
+
+        fInfo.Run(empty)
+        SetTrueText(fInfo.strOut, 3)
+
+        fp = task.fpSelected
+        dst1.SetTo(0)
+        fp.nabeRect = fp.rect
+        For i = 0 To fp.nabeList.Count - 1
+            If fp.nabeList(i) < task.fpList.Count Then
+                Dim fpNabe = task.fpList(fp.nabeList(i))
+                dst1(fpNabe.rect).SetTo(i + 1, fpNabe.mask)
+                fp.nabeRect = fp.nabeRect.Union(fpNabe.rect)
+            End If
+        Next
+        task.fpList(fp.index) = fp
+        dst3 = ShowPalette(dst1 * 255 / fp.nabeList.Count)
+        dst3.Rectangle(fp.nabeRect, task.HighlightColor, task.lineWidth)
+        For i = 0 To task.fpCorners.Count - 1
+            dst3.Rectangle(task.fpList(task.fpCorners(i)).rect, task.HighlightColor, task.lineWidth)
+        Next
+        If standalone = False Then
+            fInfo.Run(empty)
+            strOut = fInfo.strOut
+        End If
     End Sub
 End Class

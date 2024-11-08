@@ -219,8 +219,10 @@ Public Class fPoint ' feature point
     Public rect As cvb.Rect
     Public facet2f As List(Of cvb.Point2f)
     Public facets As List(Of cvb.Point)
-    Public pt As cvb.Point2f
+    Public pt As cvb.Point
     Public pt3D As cvb.Point3f
+    Public nabeList As New List(Of Integer)
+    Public nabeRect As cvb.Rect
     Public depthMean As cvb.Scalar
     Public depthStdev As cvb.Scalar
     Public clickPoint As cvb.Point ' the initial click point
