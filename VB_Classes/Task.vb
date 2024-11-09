@@ -741,27 +741,6 @@ Public Class VBtask : Implements IDisposable
                 '******* this is the gravity rotation *******
                 task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).
                                    ToMat.Reshape(3, src.Rows)
-
-
-
-
-                Dim split = task.pointCloud.Split()
-                Dim r = New cvb.Rect(task.pointCloud.Width / 2, task.pointCloud.Height / 2, task.pointCloud.Width / 2, task.pointCloud.Height / 2)
-                Dim test(split(2)(r).Total - 1) As Single
-                Marshal.Copy(split(2)(r).Data, test, 0, test.Length)
-                Dim count = split(2)(r).CountNonZero
-                Dim mm = getminmax(split(2))
-
-                Dim r2 = New cvb.Rect(0, 0, task.pointCloud.Width / 2, task.pointCloud.Height / 2)
-                Dim test2(split(2)(r2).Total - 1) As Single
-                Marshal.Copy(split(2)(r2).Data, test2, 0, test2.Length)
-                count = split(2)(r2).CountNonZero
-                mm = getminmax(split(2))
-                Dim k = 0
-
-
-
-
             End If
 
             If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split

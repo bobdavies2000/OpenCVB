@@ -301,8 +301,7 @@ Public Class Match_PointSlope : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
-        Dim w = task.gridSize
-        Dim h = w
+        Dim sz = task.gridSize
 
         If updateLines Then
             updateLines = False
@@ -310,11 +309,11 @@ Public Class Match_PointSlope : Inherits TaskParent
             lines.Run(src)
             dst1 = src.Clone
             For Each pts In lines.bestLines
-                Dim rect = ValidateRect(New cvb.Rect(pts.p1.X - w, pts.p1.Y - h, w * 2, h * 2))
+                Dim rect = ValidateRect(New cvb.Rect(pts.p1.X - sz, pts.p1.Y - sz, sz * 2, sz * 2))
                 templates.Add(src(rect))
                 dst1.Rectangle(rect, white, task.lineWidth)
 
-                rect = ValidateRect(New cvb.Rect(pts.p2.X - w, pts.p2.Y - h, w * 2, h * 2))
+                rect = ValidateRect(New cvb.Rect(pts.p2.X - sz, pts.p2.Y - sz, sz * 2, sz * 2))
                 templates.Add(src(rect))
                 dst1.Rectangle(rect, white, task.lineWidth)
 
@@ -343,14 +342,14 @@ Public Class Match_PointSlope : Inherits TaskParent
                 End If
 
                 If j = 0 Then
-                    mr.p1 = New cvb.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h)
+                    mr.p1 = New cvb.Point(mm.maxLoc.X + sz, mm.maxLoc.Y + sz)
                     mr.correlation1 = mm.maxVal
-                    Dim rect = ValidateRect(New cvb.Rect(mr.p1.X - w, mr.p1.Y - h, w * 2, h * 2))
+                    Dim rect = ValidateRect(New cvb.Rect(mr.p1.X - sz, mr.p1.Y - sz, sz * 2, sz * 2))
                     newTemplates.Add(src(rect))
                 Else
-                    mr.p2 = New cvb.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h)
+                    mr.p2 = New cvb.Point(mm.maxLoc.X + sz, mm.maxLoc.Y + sz)
                     mr.correlation2 = mm.maxVal
-                    Dim rect = ValidateRect(New cvb.Rect(mr.p2.X - w, mr.p2.Y - h, w * 2, h * 2))
+                    Dim rect = ValidateRect(New cvb.Rect(mr.p2.X - sz, mr.p2.Y - sz, sz * 2, sz * 2))
                     newTemplates.Add(src(rect))
                 End If
             Next

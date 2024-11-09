@@ -1,9 +1,8 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
-    Dim fcs As New FCS_Delaunay
+    Dim fcsD As New FCS_Delaunay
     Dim nabes As New FCS_Neighbors
     Public getNabes As Boolean = True
     Public featureInput As New List(Of cvb.Point2f)
@@ -21,16 +20,16 @@ Public Class FCS_Basics : Inherits TaskParent
 
         If featureInput.Count = 0 Then
             feat.Run(src)
-            fcs.featureInput = New List(Of cvb.Point2f)(task.features)
+            fcsD.featureInput = New List(Of cvb.Point2f)(task.features)
         Else
-            fcs.featureInput = featureInput
+            fcsD.featureInput = featureInput
         End If
 
-        fcs.Run(src)
+        fcsD.Run(src)
 
-        dst2 = fcs.dst2
+        dst2 = fcsD.dst2
 
-        If task.heartBeat Then labels(2) = CStr(featureInput.Count) + " feature grid cells."
+        If task.heartBeat Then labels(2) = CStr(featureInput.Count) + " feature cells."
 
         task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
         If getNabes Then
@@ -41,7 +40,6 @@ Public Class FCS_Basics : Inherits TaskParent
 
         dst2.SetTo(0, task.fpOutline)
         Dim fp = task.fpSelected
-        ' dst2(fp.rect).SetTo(cvb.Scalar.White, fp.mask)
 
         For i = 0 To fp.facets.Count - 1
             Dim p1 = fp.facets(i)
@@ -572,18 +570,9 @@ Public Class FCS_Neighbors : Inherits TaskParent
         dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U)
         desc = "Show the midpoints in each cell and build the nabelist for each cell"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            Static fcs As New FCS_Basics
-            fcs.getNabes = False
-            fcs.Run(src)
-            dst2 = fcs.dst2
-        End If
-
-        Dim fp As fPoint
+    Public Sub buildNeighbors()
         For i = 0 To task.fpList.Count - 1
-            fp = task.fpList(i)
-            If fp.ID = 57.0 Then Dim k = 0
+            Dim fp = task.fpList(i)
             For Each pt In fp.facets
                 If pt.X < 0 Or pt.X > dst2.Width Then Continue For
                 If pt.Y < 0 Or pt.Y > dst2.Height Then Continue For
@@ -607,6 +596,30 @@ Public Class FCS_Neighbors : Inherits TaskParent
             Next
             task.fpList(i) = fp
         Next
+    End Sub
+    Public Sub buildNeighborImage()
+        Dim fp = task.fpSelected
+        dst1.SetTo(0)
+        fp.nabeRect = fp.rect
+        For i = 0 To fp.nabeList.Count - 1
+            If fp.nabeList(i) < task.fpList.Count Then
+                Dim fpNabe = task.fpList(fp.nabeList(i))
+                dst1(fpNabe.rect).SetTo(i + 1, fpNabe.mask)
+                fp.nabeRect = fp.nabeRect.Union(fpNabe.rect)
+            End If
+        Next
+        task.fpList(fp.index) = fp
+        task.fpSelected = fp
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static fcs As New FCS_Basics
+            fcs.getNabes = False
+            fcs.Run(src)
+            dst2 = fcs.dst2
+        End If
+
+        buildNeighbors()
 
         For Each fp In task.fpList
             Dim r = fp.rect
@@ -619,25 +632,58 @@ Public Class FCS_Neighbors : Inherits TaskParent
         fInfo.Run(empty)
         SetTrueText(fInfo.strOut, 3)
 
-        fp = task.fpSelected
-        dst1.SetTo(0)
-        fp.nabeRect = fp.rect
-        For i = 0 To fp.nabeList.Count - 1
-            If fp.nabeList(i) < task.fpList.Count Then
-                Dim fpNabe = task.fpList(fp.nabeList(i))
-                dst1(fpNabe.rect).SetTo(i + 1, fpNabe.mask)
-                fp.nabeRect = fp.nabeRect.Union(fpNabe.rect)
-            End If
-        Next
-        task.fpList(fp.index) = fp
-        dst3 = ShowPalette(dst1 * 255 / fp.nabeList.Count)
-        dst3.Rectangle(fp.nabeRect, task.HighlightColor, task.lineWidth)
+        buildNeighborImage()
+
+        dst3 = ShowPalette(dst1 * 255 / task.fpSelected.nabeList.Count)
+        dst3.Rectangle(task.fpSelected.nabeRect, task.HighlightColor, task.lineWidth)
         For i = 0 To task.fpCorners.Count - 1
             dst3.Rectangle(task.fpList(task.fpCorners(i)).rect, task.HighlightColor, task.lineWidth)
         Next
         If standalone = False Then
             fInfo.Run(empty)
             strOut = fInfo.strOut
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_Minimal : Inherits TaskParent
+    Dim options As New Options_Features
+    Dim fcsD As New FCS_Delaunay
+    Dim nabes As New FCS_Neighbors
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
+        FindSlider("Min Distance to next").Value = task.fPointMinDistance
+        FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
+        labels(3) = "Click any cell at left to see its neighbors."
+        desc = "Build the task.fp... info with minimal overhead.  Intended to be run on every image."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst0 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        fcsD.featureInput = cvb.Cv2.GoodFeaturesToTrack(dst0, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
+                                                              options.blockSize, True, options.k).ToList
+
+        Dim ptlist = feat.motionFilter(fcsD.featureInput)
+
+        fcsD.Run(dst0)
+        If task.heartBeat Then labels(2) = CStr(ptlist.Count) + " feature cells."
+
+        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
+
+        nabes.buildNeighbors()
+
+        If standalone Then
+            dst2 = fcsD.dst2
+            nabes.buildNeighborImage()
+            dst3 = ShowPalette(nabes.dst1 * 255 / task.fpSelected.nabeList.Count)
         End If
     End Sub
 End Class

@@ -1016,6 +1016,7 @@ End Enum
 	If algorithmName = "FCS_Info" Then return new FCS_Info
 	If algorithmName = "FCS_Lines" Then return new FCS_Lines
 	If algorithmName = "FCS_LinesAndEdges" Then return new FCS_LinesAndEdges
+	If algorithmName = "FCS_Minimal" Then return new FCS_Minimal
 	If algorithmName = "FCS_Neighbors" Then return new FCS_Neighbors
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "FCS_Periphery" Then return new FCS_Periphery

@@ -8,12 +8,8 @@ Public Class Feature_Basics : Inherits TaskParent
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        dst2 = src.Clone
-
-        gather.Run(src)
-        Static ptList = New List(Of cvb.Point2f)(gather.features)
+    Public Function motionFilter(featureInput As List(Of cvb.Point2f)) As List(Of cvb.Point2f)
+        Static ptList = New List(Of cvb.Point2f)(featureInput)
 
         Dim newSet As New List(Of cvb.Point2f)
         For Each pt In ptList
@@ -21,7 +17,7 @@ Public Class Feature_Basics : Inherits TaskParent
             If val = 0 Then newSet.Add(pt)
         Next
 
-        For Each pt In gather.features
+        For Each pt In featureInput
             Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
             If val <> 0 Then newSet.Add(pt)
         Next
@@ -33,6 +29,15 @@ Public Class Feature_Basics : Inherits TaskParent
         Next
 
         ptList = New List(Of cvb.Point2f)(ptSort.Values)
+        Return ptList
+    End Function
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+
+        gather.Run(src)
+
+        Dim ptlist = motionFilter(gather.features)
 
         task.features.Clear()
         task.featurePoints.Clear()
