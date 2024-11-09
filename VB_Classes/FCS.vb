@@ -1,5 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
 Public Class FCS_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim fcsD As New FCS_Delaunay
@@ -473,7 +474,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
                 ptList.Add(New cvb.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
 
-            DrawContour(task.fpOutline, ptList, white, 1)
+            DrawContour(task.fpOutline, ptList, 255, 1)
         Next
 
         dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
@@ -602,14 +603,13 @@ Public Class FCS_Neighbors : Inherits TaskParent
         dst1.SetTo(0)
         fp.nabeRect = fp.rect
         For i = 0 To fp.nabeList.Count - 1
-            If fp.nabeList(i) < task.fpList.Count Then
-                Dim fpNabe = task.fpList(fp.nabeList(i))
-                dst1(fpNabe.rect).SetTo(i + 1, fpNabe.mask)
-                fp.nabeRect = fp.nabeRect.Union(fpNabe.rect)
-            End If
+            Dim fpNabe = task.fpList(fp.nabeList(i))
+            dst1(fpNabe.rect).SetTo(fpNabe.index, fpNabe.mask)
+            fp.nabeRect = fp.nabeRect.Union(fpNabe.rect)
         Next
         task.fpList(fp.index) = fp
         task.fpSelected = fp
+        dst1(fp.nabeRect).SetTo(0, task.fpOutline(fp.nabeRect))
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
@@ -634,10 +634,12 @@ Public Class FCS_Neighbors : Inherits TaskParent
 
         buildNeighborImage()
 
-        dst3 = ShowPalette(dst1 * 255 / task.fpSelected.nabeList.Count)
+        dst3 = ShowPalette(dst1 * 255 / task.fpList.Count)
         dst3.Rectangle(task.fpSelected.nabeRect, task.HighlightColor, task.lineWidth)
         For i = 0 To task.fpCorners.Count - 1
-            dst3.Rectangle(task.fpList(task.fpCorners(i)).rect, task.HighlightColor, task.lineWidth)
+            Dim fp = task.fpList(task.fpCorners(i))
+            dst3.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
+            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
         Next
         If standalone = False Then
             fInfo.Run(empty)
@@ -671,19 +673,20 @@ Public Class FCS_Minimal : Inherits TaskParent
         fcsD.featureInput = cvb.Cv2.GoodFeaturesToTrack(dst0, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
                                                               options.blockSize, True, options.k).ToList
 
-        Dim ptlist = feat.motionFilter(fcsD.featureInput)
+        fcsD.featureInput = feat.motionFilter(fcsD.featureInput)
 
         fcsD.Run(dst0)
-        If task.heartBeat Then labels(2) = CStr(ptlist.Count) + " feature cells."
+        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " feature cells."
 
         task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
 
         nabes.buildNeighbors()
 
         If standalone Then
-            dst2 = fcsD.dst2
+            dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
+            dst2.SetTo(0, task.fpOutline)
             nabes.buildNeighborImage()
-            dst3 = ShowPalette(nabes.dst1 * 255 / task.fpSelected.nabeList.Count)
+            dst3 = ShowPalette(nabes.dst1 * 255 / task.fpList.Count)
         End If
     End Sub
 End Class
