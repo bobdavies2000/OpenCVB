@@ -43,11 +43,13 @@ Partial Class OptionsGlobal
         Me.MaxDepthBar = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.UseReliableDepth = New System.Windows.Forms.CheckBox()
+        Me.MotionBox = New System.Windows.Forms.GroupBox()
+        Me.UpdateOnHeartbeat = New System.Windows.Forms.CheckBox()
+        Me.showMotionMask = New System.Windows.Forms.CheckBox()
+        Me.UseMotionConstructed = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.HighlightColor = New System.Windows.Forms.ComboBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
-        Me.showMotionMask = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
         Me.MotionFilteredColorAndCloud = New System.Windows.Forms.RadioButton()
@@ -79,9 +81,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.UseMotionConstructed = New System.Windows.Forms.CheckBox()
-        Me.UpdateOnHeartbeat = New System.Windows.Forms.CheckBox()
-        Me.MotionBox = New System.Windows.Forms.GroupBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -90,11 +89,11 @@ Partial Class OptionsGlobal
         CType(Me.GridSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MaxDepthBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
+        Me.MotionBox.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GeometrySettings.SuspendLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.MotionBox.SuspendLayout()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -311,7 +310,6 @@ Partial Class OptionsGlobal
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.MotionBox)
-        Me.GroupBox2.Controls.Add(Me.UseReliableDepth)
         Me.GroupBox2.Controls.Add(Me.Label1)
         Me.GroupBox2.Controls.Add(Me.HighlightColor)
         Me.GroupBox2.Controls.Add(Me.CrossHairs)
@@ -341,15 +339,49 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
-        'UseReliableDepth
+        'MotionBox
         '
-        Me.UseReliableDepth.AutoSize = True
-        Me.UseReliableDepth.Location = New System.Drawing.Point(24, 201)
-        Me.UseReliableDepth.Name = "UseReliableDepth"
-        Me.UseReliableDepth.Size = New System.Drawing.Size(254, 24)
-        Me.UseReliableDepth.TabIndex = 75
-        Me.UseReliableDepth.Text = "Use Reliable Depth/PointCloud"
-        Me.UseReliableDepth.UseVisualStyleBackColor = True
+        Me.MotionBox.Controls.Add(Me.UpdateOnHeartbeat)
+        Me.MotionBox.Controls.Add(Me.showMotionMask)
+        Me.MotionBox.Controls.Add(Me.UseMotionConstructed)
+        Me.MotionBox.Location = New System.Drawing.Point(6, 325)
+        Me.MotionBox.Name = "MotionBox"
+        Me.MotionBox.Size = New System.Drawing.Size(356, 110)
+        Me.MotionBox.TabIndex = 76
+        Me.MotionBox.TabStop = False
+        Me.MotionBox.Text = "Motion"
+        '
+        'UpdateOnHeartbeat
+        '
+        Me.UpdateOnHeartbeat.AutoSize = True
+        Me.UpdateOnHeartbeat.Location = New System.Drawing.Point(15, 86)
+        Me.UpdateOnHeartbeat.Name = "UpdateOnHeartbeat"
+        Me.UpdateOnHeartbeat.Size = New System.Drawing.Size(230, 24)
+        Me.UpdateOnHeartbeat.TabIndex = 77
+        Me.UpdateOnHeartbeat.Text = "Update image on heartbeat"
+        Me.UpdateOnHeartbeat.UseVisualStyleBackColor = True
+        '
+        'showMotionMask
+        '
+        Me.showMotionMask.AutoSize = True
+        Me.showMotionMask.Location = New System.Drawing.Point(14, 28)
+        Me.showMotionMask.Name = "showMotionMask"
+        Me.showMotionMask.Size = New System.Drawing.Size(162, 24)
+        Me.showMotionMask.TabIndex = 70
+        Me.showMotionMask.Text = "Show motion cells"
+        Me.showMotionMask.UseVisualStyleBackColor = True
+        '
+        'UseMotionConstructed
+        '
+        Me.UseMotionConstructed.AutoSize = True
+        Me.UseMotionConstructed.Checked = True
+        Me.UseMotionConstructed.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.UseMotionConstructed.Location = New System.Drawing.Point(14, 56)
+        Me.UseMotionConstructed.Name = "UseMotionConstructed"
+        Me.UseMotionConstructed.Size = New System.Drawing.Size(263, 24)
+        Me.UseMotionConstructed.TabIndex = 76
+        Me.UseMotionConstructed.Text = "Use Motion-Constructed images"
+        Me.UseMotionConstructed.UseVisualStyleBackColor = True
         '
         'Label1
         '
@@ -373,22 +405,12 @@ Partial Class OptionsGlobal
         Me.CrossHairs.AutoSize = True
         Me.CrossHairs.Checked = True
         Me.CrossHairs.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CrossHairs.Location = New System.Drawing.Point(25, 231)
+        Me.CrossHairs.Location = New System.Drawing.Point(24, 202)
         Me.CrossHairs.Name = "CrossHairs"
         Me.CrossHairs.Size = New System.Drawing.Size(151, 24)
         Me.CrossHairs.TabIndex = 71
         Me.CrossHairs.Text = "Show crosshairs"
         Me.CrossHairs.UseVisualStyleBackColor = True
-        '
-        'showMotionMask
-        '
-        Me.showMotionMask.AutoSize = True
-        Me.showMotionMask.Location = New System.Drawing.Point(14, 28)
-        Me.showMotionMask.Name = "showMotionMask"
-        Me.showMotionMask.Size = New System.Drawing.Size(162, 24)
-        Me.showMotionMask.TabIndex = 70
-        Me.showMotionMask.Text = "Show motion cells"
-        Me.showMotionMask.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
@@ -543,7 +565,7 @@ Partial Class OptionsGlobal
         'gravityPointCloud
         '
         Me.gravityPointCloud.AutoSize = True
-        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 291)
+        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 262)
         Me.gravityPointCloud.Name = "gravityPointCloud"
         Me.gravityPointCloud.Size = New System.Drawing.Size(294, 24)
         Me.gravityPointCloud.TabIndex = 23
@@ -688,7 +710,7 @@ Partial Class OptionsGlobal
         'UseKalman
         '
         Me.UseKalman.AutoSize = True
-        Me.UseKalman.Location = New System.Drawing.Point(24, 261)
+        Me.UseKalman.Location = New System.Drawing.Point(24, 232)
         Me.UseKalman.Name = "UseKalman"
         Me.UseKalman.Size = New System.Drawing.Size(176, 24)
         Me.UseKalman.TabIndex = 0
@@ -705,40 +727,6 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'UseMotionConstructed
-        '
-        Me.UseMotionConstructed.AutoSize = True
-        Me.UseMotionConstructed.Checked = True
-        Me.UseMotionConstructed.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.UseMotionConstructed.Location = New System.Drawing.Point(14, 56)
-        Me.UseMotionConstructed.Name = "UseMotionConstructed"
-        Me.UseMotionConstructed.Size = New System.Drawing.Size(263, 24)
-        Me.UseMotionConstructed.TabIndex = 76
-        Me.UseMotionConstructed.Text = "Use Motion-Constructed images"
-        Me.UseMotionConstructed.UseVisualStyleBackColor = True
-        '
-        'UpdateOnHeartbeat
-        '
-        Me.UpdateOnHeartbeat.AutoSize = True
-        Me.UpdateOnHeartbeat.Location = New System.Drawing.Point(15, 86)
-        Me.UpdateOnHeartbeat.Name = "UpdateOnHeartbeat"
-        Me.UpdateOnHeartbeat.Size = New System.Drawing.Size(230, 24)
-        Me.UpdateOnHeartbeat.TabIndex = 77
-        Me.UpdateOnHeartbeat.Text = "Update image on heartbeat"
-        Me.UpdateOnHeartbeat.UseVisualStyleBackColor = True
-        '
-        'MotionBox
-        '
-        Me.MotionBox.Controls.Add(Me.UpdateOnHeartbeat)
-        Me.MotionBox.Controls.Add(Me.showMotionMask)
-        Me.MotionBox.Controls.Add(Me.UseMotionConstructed)
-        Me.MotionBox.Location = New System.Drawing.Point(6, 325)
-        Me.MotionBox.Name = "MotionBox"
-        Me.MotionBox.Size = New System.Drawing.Size(356, 110)
-        Me.MotionBox.TabIndex = 76
-        Me.MotionBox.TabStop = False
-        Me.MotionBox.Text = "Motion"
         '
         'OptionsGlobal
         '
@@ -761,14 +749,14 @@ Partial Class OptionsGlobal
         CType(Me.MaxDepthBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        Me.MotionBox.ResumeLayout(False)
+        Me.MotionBox.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.GeometrySettings.ResumeLayout(False)
         Me.GeometrySettings.PerformLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.MotionBox.ResumeLayout(False)
-        Me.MotionBox.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -830,7 +818,6 @@ Partial Class OptionsGlobal
     Friend WithEvents CrossHairs As System.Windows.Forms.CheckBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
-    Friend WithEvents UseReliableDepth As Windows.Forms.CheckBox
     Friend WithEvents UseMotionConstructed As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
     Friend WithEvents UpdateOnHeartbeat As Windows.Forms.CheckBox

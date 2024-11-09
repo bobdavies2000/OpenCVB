@@ -79,9 +79,6 @@ Public Class VBtask : Implements IDisposable
     Public MotionLabel As String = " "
     Public topFeatures As New List(Of cvb.Point2f)
 
-    Public reliableDepth As Reliable_Depth
-    Public reliableDepthMask As cvb.Mat
-
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
 
@@ -412,7 +409,6 @@ Public Class VBtask : Implements IDisposable
         colorizer = New Depth_Colorizer_CPP_VB
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
-        reliableDepth = New Reliable_Depth
         gravityHorizon = New Gravity_Horizon
         imuStabilityTest = New Stabilizer_VerticalIMU
         motion = New Motion_Basics
@@ -779,13 +775,6 @@ Public Class VBtask : Implements IDisposable
 
         colorizer.RunAlg(task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc))
         task.depthRGB = colorizer.dst2.Clone
-
-        If task.gOptions.UseReliableDepth.Checked Then
-            reliableDepth.Run(src)
-            task.reliableDepthMask = reliableDepth.dst2
-            task.pointCloud.SetTo(0, Not task.reliableDepthMask)
-            task.pcSplit(2).SetTo(0, Not task.reliableDepthMask)
-        End If
 
         TaskTimer.Enabled = True
 
