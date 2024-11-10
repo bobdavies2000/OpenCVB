@@ -586,7 +586,22 @@ Public Class TaskParent : Implements IDisposable
         Next
     End Sub
     Public Function ShowPalette(input As cvb.Mat) As cvb.Mat
-        If input.Type = cvb.MatType.CV_32SC1 Then input.ConvertTo(input, cvb.MatType.CV_8U)
+        If input.Type = cvb.MatType.CV_32S Then
+            Dim mm = GetMinMax(input)
+            Dim tmp = input.ConvertScaleAbs(255 / (mm.maxVal - mm.minVal), mm.minVal)
+            input = tmp
+        End If
+        task.palette.Run(input)
+        Return task.palette.dst2.Clone
+    End Function
+    Public Function ShowPaletteMM(input As cvb.Mat) As cvb.Mat
+        Dim mm = GetMinMax(input)
+        If input.Type = cvb.MatType.CV_32S Then
+            Dim tmp = input.ConvertScaleAbs(255 / (mm.maxVal - mm.minVal), mm.minVal)
+            input = tmp
+        Else
+            input *= 255 / mm.maxVal
+        End If
         task.palette.Run(input)
         Return task.palette.dst2.Clone
     End Function

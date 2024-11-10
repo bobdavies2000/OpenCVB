@@ -686,7 +686,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
         For i = 0 To facets.Length - 1
             Dim fp = New fPoint
             If i < task.features.Count Then fp.pt = task.features(i)
-            fp.ID = CSng(task.gridMap32S.Get(Of Integer)(fp.pt.Y, fp.pt.X))
+            fp.ID = CSng(task.gridMap32S.Get(Of Byte)(fp.pt.Y, fp.pt.X))
             If task.fpLastIDs.Contains(fp.ID) Then
                 fp.indexLast = task.fpLastIDs.IndexOf(fp.ID)
                 fpLast = task.fpLastList(fp.indexLast)

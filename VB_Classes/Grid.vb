@@ -498,8 +498,6 @@ Public Class Grid_ShowMap : Inherits TaskParent
         desc = "Verify that task.gridMap32S is laid out correctly"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Dim tmp As cvb.Mat = task.gridMap32S * 255 / task.gridRects.Count
-        tmp.ConvertTo(dst2, cvb.MatType.CV_8U)
-        dst3 = ShowPalette(dst2)
+        dst2 = ShowPaletteMM(task.gridMap32S)
     End Sub
 End Class
