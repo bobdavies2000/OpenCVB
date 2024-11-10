@@ -437,7 +437,7 @@ Public Class VBtask : Implements IDisposable
 
         fpList.Clear()
         fpOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
-        fpMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        fpMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
         fpSelected = New fPoint
 
         If parms.useRecordedData Then recordedData = New Replay_Play()

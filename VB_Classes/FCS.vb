@@ -25,7 +25,7 @@ Public Class FCS_BareBones : Inherits TaskParent
 
         fcsD.Run(dst0)
 
-        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
+        task.fpSelected = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
 
         nabes.buildNeighbors()
         nabes.buildNeighborImage()
@@ -34,7 +34,7 @@ Public Class FCS_BareBones : Inherits TaskParent
         dst2.SetTo(0, task.fpOutline)
 
         dst3 = nabes.dst3
-        labels(2) = CStr(task.fpList.Count) + " FCS cells identified"
+        labels(2) = fcsD.labels(2)
     End Sub
 End Class
 
@@ -75,7 +75,7 @@ Public Class FCS_Basics : Inherits TaskParent
 
         If task.heartBeat Then labels(2) = CStr(featureInput.Count) + " feature cells."
 
-        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
+        task.fpSelected = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
         If getNabes Then
             nabes.Run(src)
             strOut = nabes.strOut
@@ -414,7 +414,7 @@ Public Class FCS_DepthCells : Inherits TaskParent
         dst0 = src.Clone
         fcs.Run(src)
 
-        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
+        task.fpSelected = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
         fInfo.Run(empty)
         SetTrueText(fInfo.strOut, 3)
 
@@ -504,7 +504,7 @@ Public Class FCS_Neighbors : Inherits TaskParent
                                                New cvb.Point(pt.X + 1, pt.Y + 1))
                     If ptNabe.x >= 0 And ptNabe.x <= dst2.Width And
                        ptNabe.y >= 0 And ptNabe.y <= dst2.Height Then
-                        index = task.fpMap.Get(Of Byte)(ptNabe.y, ptNabe.x)
+                        index = task.fpMap.Get(Of Integer)(ptNabe.y, ptNabe.x)
                     End If
                     If fp.nabeList.Contains(index) = False Then fp.nabeList.Add(index)
                 Next
@@ -686,7 +686,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
         For i = 0 To facets.Length - 1
             Dim fp = New fPoint
             If i < task.features.Count Then fp.pt = task.features(i)
-            fp.ID = CSng(task.gridMap32S.Get(Of Byte)(fp.pt.Y, fp.pt.X))
+            fp.ID = CSng(task.gridMap32S.Get(Of Integer)(fp.pt.Y, fp.pt.X))
             If task.fpLastIDs.Contains(fp.ID) Then
                 fp.indexLast = task.fpLastIDs.IndexOf(fp.ID)
                 fpLast = task.fpLastList(fp.indexLast)
