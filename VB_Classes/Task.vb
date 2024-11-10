@@ -37,6 +37,8 @@ Public Class VBtask : Implements IDisposable
     Public fpSelected As New fPoint
     Public fPointMinDistance As Integer
     Public fpCorners(3) As Integer
+    Public fpCornerRect(3) As cvb.Rect
+    Public fpSearchRect(3) As cvb.Rect
 
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer

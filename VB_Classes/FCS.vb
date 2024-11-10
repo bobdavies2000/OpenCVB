@@ -1,6 +1,49 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
+Imports System.Web.UI
+Public Class FCS_BareBones : Inherits TaskParent
+    Dim options As New Options_Features
+    Dim fcsD As New FCS_Delaunay
+    Dim nabes As New FCS_Neighbors
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
+        FindSlider("Min Distance to next").Value = task.fPointMinDistance
+        FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
+        labels(3) = "Click any cell at left to see its neighbors.  Below are the neighbor cells and corner feature rectangles"
+        desc = "Build the task.fp... info with minimal overhead.  Intended to be run on every image."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst0 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        fcsD.featureInput = cvb.Cv2.GoodFeaturesToTrack(dst0, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
+                                                              options.blockSize, True, options.k).ToList
+
+        fcsD.featureInput = feat.motionFilter(fcsD.featureInput)
+
+        fcsD.Run(dst0)
+        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " feature cells."
+
+        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
+
+        nabes.buildNeighbors()
+        nabes.buildNeighborImage()
+
+        dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
+        dst2.SetTo(0, task.fpOutline)
+
+        dst3 = nabes.dst3
+        labels(2) = CStr(task.fpList.Count) + " FCS cells identified"
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class FCS_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim fcsD As New FCS_Delaunay
@@ -569,6 +612,7 @@ Public Class FCS_Neighbors : Inherits TaskParent
     Dim fInfo As New FCS_Info
     Public Sub New()
         dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U)
+        labels(3) = "The neighbor cells with the corner feature rectangles."
         desc = "Show the midpoints in each cell and build the nabelist for each cell"
     End Sub
     Public Sub buildNeighbors()
@@ -598,6 +642,13 @@ Public Class FCS_Neighbors : Inherits TaskParent
             task.fpList(i) = fp
         Next
     End Sub
+    Private Function verifyRect(r As cvb.Rect, sz As Integer, szNew As Integer) As cvb.Rect
+        If r.X < 0 Then r.X = 0
+        If r.Y < 0 Then r.Y = 0
+        If r.BottomRight.X >= dst2.Width Then r.X = dst2.Width - szNew
+        If r.BottomRight.Y >= dst2.Height Then r.Y = dst2.Height - szNew
+        Return r
+    End Function
     Public Sub buildNeighborImage()
         Dim fp = task.fpSelected
         dst1.SetTo(0)
@@ -610,6 +661,28 @@ Public Class FCS_Neighbors : Inherits TaskParent
         task.fpList(fp.index) = fp
         task.fpSelected = fp
         dst1(fp.nabeRect).SetTo(0, task.fpOutline(fp.nabeRect))
+
+        For Each fp In task.fpList
+            Dim r = fp.rect
+            If r.X = 0 And r.Y = 0 Then task.fpCorners(0) = fp.index
+            If r.Y = 0 And r.BottomRight.X = dst2.Width Then task.fpCorners(1) = fp.index
+            If r.X = 0 And r.BottomRight.Y = dst2.Height Then task.fpCorners(2) = fp.index
+            If r.BottomRight.X = dst2.Width Then task.fpCorners(3) = fp.index
+        Next
+        dst3 = ShowPalette(dst1 * 255 / task.fpList.Count)
+        dst3.Rectangle(task.fpSelected.nabeRect, task.HighlightColor, task.lineWidth)
+        Dim sz = task.gOptions.GridSlider.Value
+        For i = 0 To task.fpCorners.Count - 1
+            fp = task.fpList(task.fpCorners(i))
+            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            Dim r = New cvb.Rect(fp.pt.X - sz, fp.pt.Y - sz, sz * 2, sz * 2)
+            task.fpCornerRect(i) = verifyRect(r, sz, sz * 2)
+            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
+
+            r = New cvb.Rect(r.X - sz, r.Y - sz, sz * 4, sz * 4)
+            task.fpSearchRect(i) = verifyRect(r, sz, sz * 4)
+            dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
+        Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
@@ -620,27 +693,11 @@ Public Class FCS_Neighbors : Inherits TaskParent
         End If
 
         buildNeighbors()
-
-        For Each fp In task.fpList
-            Dim r = fp.rect
-            If r.X = 0 And r.Y = 0 Then task.fpCorners(0) = fp.index
-            If r.Y = 0 And r.BottomRight.X = dst2.Width Then task.fpCorners(1) = fp.index
-            If r.X = 0 And r.BottomRight.Y = dst2.Height Then task.fpCorners(2) = fp.index
-            If r.BottomRight.X = dst2.Width Then task.fpCorners(3) = fp.index
-        Next
+        buildNeighborImage()
 
         fInfo.Run(empty)
         SetTrueText(fInfo.strOut, 3)
 
-        buildNeighborImage()
-
-        dst3 = ShowPalette(dst1 * 255 / task.fpList.Count)
-        dst3.Rectangle(task.fpSelected.nabeRect, task.HighlightColor, task.lineWidth)
-        For i = 0 To task.fpCorners.Count - 1
-            Dim fp = task.fpList(task.fpCorners(i))
-            dst3.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
-            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
-        Next
         If standalone = False Then
             fInfo.Run(empty)
             strOut = fInfo.strOut
@@ -652,41 +709,43 @@ End Class
 
 
 
-
-
-Public Class FCS_Minimal : Inherits TaskParent
-    Dim options As New Options_Features
-    Dim fcsD As New FCS_Delaunay
-    Dim nabes As New FCS_Neighbors
-    Dim feat As New Feature_Basics
+Public Class FCS_CornerCorrelation : Inherits TaskParent
+    Public options As New Options_Features
+    Dim fcsBare As New FCS_BareBones
     Public Sub New()
-        task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
-        FindSlider("Min Distance to next").Value = task.fPointMinDistance
-        FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
-        labels(3) = "Click any cell at left to see its neighbors."
-        desc = "Build the task.fp... info with minimal overhead.  Intended to be run on every image."
+        If standalone Then task.gOptions.setDisplay1()
+        desc = "Search for the previous image corners in the current image to get the camera movement."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        dst0 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        fcsD.featureInput = cvb.Cv2.GoodFeaturesToTrack(dst0, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
-                                                              options.blockSize, True, options.k).ToList
+        Static lastImage As cvb.Mat = src.Clone
 
-        fcsD.featureInput = feat.motionFilter(fcsD.featureInput)
+        fcsBare.Run(src)
+        dst2 = fcsBare.dst2
 
-        fcsD.Run(dst0)
-        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " feature cells."
+        strOut = "Correlation Coefficients:" + vbCrLf
+        dst1.SetTo(0)
+        dst3.SetTo(0)
+        Dim sz = task.gOptions.getGridSize()
+        For i = 0 To task.fpCorners.Count - 1
+            Dim r = task.fpCornerRect(i)
+            Dim searchRect = task.fpSearchRect(i)
 
-        task.fpSelected = task.fpList(task.fpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
+            cvb.Cv2.MatchTemplate(lastImage(r), src(searchRect), dst0, options.matchOption)
+            Dim mm = GetMinMax(dst0)
 
-        nabes.buildNeighbors()
+            dst3(r) = src(r)
+            Dim rLast = ValidateRect(New cvb.Rect(r.X + mm.maxLoc.X - sz, r.Y + mm.maxLoc.Y - sz, sz * 2, sz * 2))
+            dst1(rLast) = lastImage(rLast)
 
-        If standalone Then
-            dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
-            dst2.SetTo(0, task.fpOutline)
-            nabes.buildNeighborImage()
-            dst3 = ShowPalette(nabes.dst1 * 255 / task.fpList.Count)
-        End If
+            Dim correlation = mm.maxVal
+
+            Dim name = Choose(i + 1, "Upper left", "Upper right", "Lower left", "Lower right")
+            strOut += name + " " + Format(correlation, fmt3) + vbCrLf
+        Next
+        SetTrueText(strOut, New cvb.Point(dst2.Width / 2, dst2.Height / 2), 3)
+
+        If task.heartBeatLT Then lastImage = src.Clone()
     End Sub
 End Class

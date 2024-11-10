@@ -2,13 +2,15 @@ Imports cvb = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
 Public Class Match_Basics : Inherits TaskParent
-    Public template As cvb.Mat
-    Public mmData As mmData
-    Public correlation As Single
     Public options As New Options_Features
+
+    Public template As cvb.Mat ' Provide this
+    Public searchRect As New cvb.Rect ' Provide this 
+
+    Public mmData As mmData
+    Public correlation As Single ' Resulting Correlation coefficient
     Public matchCenter As cvb.Point
     Public matchRect As New cvb.Rect
-    Public searchRect As New cvb.Rect
     Public Sub New()
         If standalone Then task.gOptions.debugChecked = True
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
