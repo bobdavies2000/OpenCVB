@@ -57,6 +57,7 @@ Public Class CameraZED2 : Inherits GenericCamera
         zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZBGRA) ' tried XYZ but it still comes with BGRA
         pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC4,
                                            pointCloudSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+        cvb.Cv2.PatchNaNs(pointCloud) ' This should not be necessary!  What is 
 
         Dim zed_pose As New sl.Pose
         zed.GetPosition(zed_pose, REFERENCE_FRAME.WORLD)

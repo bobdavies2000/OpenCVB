@@ -77,7 +77,7 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
             uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
                                                  cvb.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone
 
-            uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC4,
+            uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC3,
                                            Zed2PointCloud(cPtr)).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
 
 

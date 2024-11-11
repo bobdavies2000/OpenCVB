@@ -9,7 +9,6 @@ Public Class FCS_BareBones : Inherits TaskParent
     Public Sub New()
         task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         FindSlider("Min Distance to next").Value = task.fPointMinDistance
-        FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
         labels(3) = "Click any cell at left to see its neighbors.  Below are the neighbor cells and corner feature rectangles"
         desc = "Build the task.fp... info with minimal overhead.  Intended to be run on every image."
     End Sub
@@ -52,10 +51,8 @@ Public Class FCS_Basics : Inherits TaskParent
     Public featureInput As New List(Of cvb.Point2f)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
-        If standalone Then task.gOptions.setDisplay1()
         task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         FindSlider("Min Distance to next").Value = task.fPointMinDistance
-        FindSlider("Feature Sample Size").Value = 250 ' keep within a byte boundary.
         labels(1) = "The index for each of the cells (if standalonetest)"
         desc = "Feature Coordinate System (FCS) - Create the fpList with rect, mask, index, and facets"
     End Sub
@@ -101,10 +98,9 @@ Public Class FCS_Basics : Inherits TaskParent
         For Each fp In task.fpList
             DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
             DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
-            If fp.indexLast >= 0 Then
-                SetTrueText(Format(fp.ID, fmt1), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
-            End If
+            ' If fp.indexLast >= 0 Then SetTrueText(Format(fp.ID, fmt1), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
         Next
+        labels(2) = fcsD.labels(2)
     End Sub
 End Class
 
@@ -133,9 +129,9 @@ Public Class FCS_Info : Inherits TaskParent
         strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf
         strOut += "Facet count = " + CStr(fp.facet2f.Count) + " facets" + vbCrLf
         strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
-        ' Dim vec = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
-        strOut += "Pointcloud entry: " + Format(fp.pt3D.X, fmt1) + "/" +
-                                         Format(fp.pt3D.Y, fmt1) + "/" + Format(fp.pt3D.Z, fmt1) + vbCrLf
+        Dim vec = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
+        strOut += "Pointcloud entry: " + Format(vec.X, fmt1) + "/" + Format(vec.Y, fmt1) + "/" +
+                                         Format(vec.Z, fmt1) + vbCrLf
         strOut += "Pointcloud mean X/Y/Z: " + Format(fp.depthMean(0), fmt1) + "/" +
                               Format(fp.depthMean(1), fmt1) + "/" + Format(fp.depthMean(2), fmt1) + vbCrLf
         strOut += "Pointcloud stdev X/Y/Z: " + Format(fp.depthStdev(0), fmt1) + "/" +
@@ -502,8 +498,8 @@ Public Class FCS_Neighbors : Inherits TaskParent
                                                New cvb.Point(pt.X - 1, pt.Y + 1),
                                                New cvb.Point(pt.X, pt.Y + 1),
                                                New cvb.Point(pt.X + 1, pt.Y + 1))
-                    If ptNabe.x >= 0 And ptNabe.x <= dst2.Width And
-                       ptNabe.y >= 0 And ptNabe.y <= dst2.Height Then
+                    If ptNabe.x >= 0 And ptNabe.x < dst2.Width And
+                       ptNabe.y >= 0 And ptNabe.y < dst2.Height Then
                         index = task.fpMap.Get(Of Integer)(ptNabe.y, ptNabe.x)
                     End If
                     If fp.nabeList.Contains(index) = False Then fp.nabeList.Add(index)
@@ -524,9 +520,11 @@ Public Class FCS_Neighbors : Inherits TaskParent
         dst1.SetTo(0)
         fp.nabeRect = fp.rect
         For i = 0 To fp.nabeList.Count - 1
-            Dim fpNabe = task.fpList(fp.nabeList(i))
-            dst1(fpNabe.rect).SetTo(fpNabe.index, fpNabe.mask)
-            fp.nabeRect = fp.nabeRect.Union(fpNabe.rect)
+            If fp.nabeList(i) >= 0 And fp.nabeList(i) < task.fpList.Count Then
+                Dim fpNabe = task.fpList(fp.nabeList(i))
+                dst1(fpNabe.rect).SetTo(fpNabe.index, fpNabe.mask)
+                fp.nabeRect = fp.nabeRect.Union(fpNabe.rect)
+            End If
         Next
         task.fpList(fp.index) = fp
         task.fpSelected = fp
@@ -724,7 +722,6 @@ Public Class FCS_Delaunay : Inherits TaskParent
             If fp.pt = newPoint Then fp.pt = New cvb.Point(CInt(xlist.Average), CInt(ylist.Average))
             If fp.pt.X >= dst2.Width Or fp.pt.X < 0 Then fp.pt.X = CInt(fp.rect.X + fp.rect.Width / 2)
             If fp.pt.Y >= dst2.Height Or fp.pt.Y < 0 Then fp.pt.Y = CInt(fp.rect.Y + fp.rect.Height / 2)
-            fp.pt3D = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
             cvb.Cv2.MeanStdDev(task.pointCloud(fp.rect), fp.depthMean, fp.depthStdev, fp.mask)
             task.fpList.Add(fp)
         Next
@@ -746,8 +743,46 @@ Public Class FCS_Delaunay : Inherits TaskParent
 
         dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
         If task.heartBeat Then
-            labels(2) = traceName + ": " + Format(featureInput.Count, "000") + " input cells and " + CStr(genMatched) +
-                        " were matched to the previous generation."
+            labels(2) = traceName + " identified " + Format(featureInput.Count, "000") + " input cells and " +
+                        CStr(genMatched) + " were matched to the previous generation."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_Motion : Inherits TaskParent
+    Dim fcsB As New FCS_BareBones
+    Dim distances As New List(Of Single)
+    Public Sub New()
+        desc = "Highlight the motion of each feature identified in the current and previous frame"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcsB.Run(src)
+        dst2 = fcsB.dst2
+
+        dst3.SetTo(0)
+        Dim motionCount As Integer, linkedCount As Integer
+        For Each fp In task.fpList
+            If fp.indexLast <> -1 Then
+                linkedCount += 1
+                Dim p1 = fp.pt
+                Dim p2 = task.fpLastList(fp.indexLast).pt
+                If p1 <> p2 Then
+                    dst3.Line(p1, p2, task.HighlightColor, task.lineWidth, task.lineType)
+                    motionCount += 1
+                End If
+            End If
+        Next
+        If task.heartBeat Then
+            labels(2) = Format(100 * linkedCount / task.fpList.Count, fmt1) + "% linked to previous frame or " +
+                        CStr(linkedCount) + " of " + CStr(task.fpList.Count)
+            labels(3) = Format(100 * motionCount / linkedCount, fmt1) + "% of linked cells had motion or " +
+                        CStr(motionCount) + " of " + CStr(linkedCount)
         End If
     End Sub
 End Class

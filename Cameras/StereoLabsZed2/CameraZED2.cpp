@@ -140,12 +140,25 @@ public:
 		zed.retrieveMeasure(pcMatSL, MEASURE::XYZ); // XYZ has an extra float!
 
 		pointCloud = cv::Mat(captureHeight, captureWidth, CV_32FC4, pcMatSL.getPtr<sl::uchar1>());
+		cvtColor(pointCloud, pointCloud, ColorConversionCodes::COLOR_BGRA2BGR);
 		if (captureWidth != w) resize(pointCloud, pointCloud, Size(w, h), 0, 0, INTER_NEAREST);
-		//cvtColor(pointCloud, pointCloud, ColorConversionCodes::COLOR_BGRA2BGR);
+
 		//std::vector<cv::Mat> pcsplit;
 		//cv::split(pointCloud, pcsplit);
 		//pcsplit.pop_back();
 		//cv::merge(pcsplit, pointCloud);
+
+		std::vector<cv::Mat> pcsplit;
+		cv::split(pointCloud, pcsplit);
+
+		cv::Mat mask;
+		cv::inRange(pcsplit[2], -100, 100, mask);
+		cv::Mat zeros(pcsplit[2].rows, pcsplit[2].cols, CV_32F);
+		zeros.setTo(0);
+		cv::absdiff(pcsplit[2], zeros, pcsplit[2]);
+		cv::merge(pcsplit, pointCloud);
+
+		pointCloud.setTo(0, ~mask);
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 		RotationMatrix = zed_pose.getRotationMatrix();

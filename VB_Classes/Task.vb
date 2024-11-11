@@ -764,6 +764,7 @@ Public Class VBtask : Implements IDisposable
 
         task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary).
                                          ConvertScaleAbs()
+
         task.noDepthMask = Not task.depthMask
 
         If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
