@@ -1019,6 +1019,8 @@ End Enum
 	If algorithmName = "FCS_Lines" Then return new FCS_Lines
 	If algorithmName = "FCS_LinesAndEdges" Then return new FCS_LinesAndEdges
 	If algorithmName = "FCS_Motion" Then return new FCS_Motion
+	If algorithmName = "FCS_MotionApplied" Then return new FCS_MotionApplied
+	If algorithmName = "FCS_MotionDirection" Then return new FCS_MotionDirection
 	If algorithmName = "FCS_Neighbors" Then return new FCS_Neighbors
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "FCS_Periphery" Then return new FCS_Periphery

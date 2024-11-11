@@ -123,7 +123,9 @@ Public Class FCS_Info : Inherits TaskParent
         End If
 
         strOut = "FCS cell selected: " + vbCrLf
-        strOut += "Feature point: " + fp.pt.ToString + vbCrLf
+        strOut += "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
+        strOut += "Travel distance: " + Format(fp.travelDistance, fmt1) + vbCrLf
+        strOut += "Average Travel distance: " + Format(task.fpTravelAvg, fmt1) + vbCrLf + vbCrLf
         strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
         strOut += CStr(fp.rect.Width) + "/" + CStr(fp.rect.Height) + vbCrLf
         strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf
@@ -629,6 +631,9 @@ Public Class FCS_Delaunay : Inherits TaskParent
     Dim facetList As New List(Of List(Of cvb.Point))
     Dim subdiv As New cvb.Subdiv2D
     Dim mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+    Public genMatched As Integer
+    Public removedMatches As Integer
+
     Public Sub New()
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
@@ -680,7 +685,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
         task.fpList.Clear()
         task.fpIDlist.Clear()
         Dim fpLast As fPoint
-        Dim genMatched As Integer
+        genMatched = 0
         For i = 0 To facets.Length - 1
             Dim fp = New fPoint
             If i < task.features.Count Then fp.pt = task.features(i)
@@ -723,13 +728,48 @@ Public Class FCS_Delaunay : Inherits TaskParent
             If fp.pt.X >= dst2.Width Or fp.pt.X < 0 Then fp.pt.X = CInt(fp.rect.X + fp.rect.Width / 2)
             If fp.pt.Y >= dst2.Height Or fp.pt.Y < 0 Then fp.pt.Y = CInt(fp.rect.Y + fp.rect.Height / 2)
             cvb.Cv2.MeanStdDev(task.pointCloud(fp.rect), fp.depthMean, fp.depthStdev, fp.mask)
+
+            If fp.indexLast >= 0 Then
+                Dim p1 = fp.pt
+                Dim p2 = task.fpLastList(fp.indexLast).pt
+                fp.travelDistance = p1.DistanceTo(p2)
+            End If
+
             task.fpList.Add(fp)
         Next
 
         task.fpMap.SetTo(0)
+        Dim travelList As New List(Of Double)
+        Dim idList As New List(Of Single)
         For Each fp In task.fpList
             task.fpMap(fp.rect).SetTo(fp.index, fp.mask)
+            If fp.indexLast >= 0 Then travelList.Add(fp.travelDistance)
+            idList.Add(fp.ID)
         Next
+
+        removedMatches = 0
+        If travelList.Count > 0 Then
+            task.fpTravelAvg = travelList.Average()
+            If task.fpTravelAvg > 0.1 Then
+                For i = 0 To task.fpList.Count - 1
+                    Dim fp = task.fpList(i)
+                    If fp.indexLast >= 0 Then
+                        If fp.travelDistance > 2 * task.fpTravelAvg Then
+                            fp.indexLast = -1
+                            fp.travelDistance = 0
+                            fp.ID = task.gridMap32S.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+                            While idList.Contains(fp.ID)
+                                fp.ID += 0.1
+                            End While
+                            task.fpList(i) = fp
+                            removedMatches += 1
+                        End If
+                    End If
+                Next
+            Else
+                task.camMotionPixels = 0
+            End If
+        End If
 
         task.fpOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         For i = 0 To facets.Length - 1
@@ -743,8 +783,9 @@ Public Class FCS_Delaunay : Inherits TaskParent
 
         dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
         If task.heartBeat Then
-            labels(2) = traceName + " identified " + Format(featureInput.Count, "000") + " input cells and " +
-                        CStr(genMatched) + " were matched to the previous generation."
+            labels(2) = CStr(featureInput.Count) + " cells found and " +
+                        CStr(genMatched) + " were matched to a previous frame.  " + CStr(removedMatches) +
+                        " matches were removed (improbable distance)"
         End If
     End Sub
 End Class
@@ -757,16 +798,28 @@ End Class
 
 Public Class FCS_Motion : Inherits TaskParent
     Dim fcsB As New FCS_BareBones
-    Dim distances As New List(Of Single)
+    Dim plot As New Plot_OverTime
+    Public xDist As New List(Of Single), yDist As New List(Of Single)
+    Public motionPercent As Single
     Public Sub New()
+        plot.maxScale = 100
+        plot.minScale = 0
+        plot.plotCount = 1
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Highlight the motion of each feature identified in the current and previous frame"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fcsB.Run(src)
         dst2 = fcsB.dst2
 
+        For Each fp In task.fpList
+            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+        Next
+
         dst3.SetTo(0)
         Dim motionCount As Integer, linkedCount As Integer
+        xDist.Clear()
+        yDist.Clear()
         For Each fp In task.fpList
             If fp.indexLast <> -1 Then
                 linkedCount += 1
@@ -775,14 +828,137 @@ Public Class FCS_Motion : Inherits TaskParent
                 If p1 <> p2 Then
                     dst3.Line(p1, p2, task.HighlightColor, task.lineWidth, task.lineType)
                     motionCount += 1
+                    xDist.Add(p2.X - p1.X)
+                    yDist.Add(p2.Y - p1.Y)
                 End If
             End If
         Next
+        motionPercent = 100 * motionCount / linkedCount
         If task.heartBeat Then
-            labels(2) = Format(100 * linkedCount / task.fpList.Count, fmt1) + "% linked to previous frame or " +
-                        CStr(linkedCount) + " of " + CStr(task.fpList.Count)
-            labels(3) = Format(100 * motionCount / linkedCount, fmt1) + "% of linked cells had motion or " +
-                        CStr(motionCount) + " of " + CStr(linkedCount)
+            labels(2) = fcsB.labels(2)
+            labels(3) = Format(motionPercent, fmt1) + "% of linked cells had motion or " +
+                        CStr(motionCount) + " of " + CStr(linkedCount) + ".    " + Format(task.fpTravelAvg, fmt1) +
+                        " average travel distance."
+        End If
+
+        plot.plotData = New cvb.Scalar(motionPercent, 0, 0)
+        plot.Run(empty)
+        dst1 = plot.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_MotionDirection : Inherits TaskParent
+    Dim fcsM As New FCS_Motion
+    Dim plothist As New Plot_Histogram
+    Dim mats As New Mat_4Click
+    Dim range As Integer, rangeText As String
+    Public Sub New()
+        plothist.createHistogram = True
+        plothist.addLabels = False
+        plothist.minRange = -7
+        plothist.maxRange = 7
+        rangeText = " ranging from " + CStr(plothist.minRange) + " to " + CStr(plothist.maxRange)
+        range = Math.Abs(plothist.maxRange - plothist.minRange)
+        task.gOptions.setHistogramBins(15) ' should this be an odd number.
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
+        desc = "Using all the feature points with motion, determine any with a common direction."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcsM.Run(src)
+        mats.mat(2) = fcsM.dst2
+        mats.mat(3) = fcsM.dst3
+
+        Dim incr = range / task.histogramBins
+
+        plothist.Run(cvb.Mat.FromPixelData(fcsM.xDist.Count, 1, cvb.MatType.CV_32F, fcsM.xDist.ToArray))
+        Dim xDist As New List(Of Single)(plothist.histArray)
+        task.fpMotion.X = plothist.minRange + xDist.IndexOf(xDist.Max) * incr
+        mats.mat(0) = plothist.dst2.Clone
+
+        plothist.Run(cvb.Mat.FromPixelData(fcsM.xDist.Count, 1, cvb.MatType.CV_32F, fcsM.yDist.ToArray))
+        Dim yDist As New List(Of Single)(plothist.histArray)
+        task.fpMotion.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
+        mats.mat(1) = plothist.dst2.Clone
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+
+        If fcsM.motionPercent < 50 Then
+            task.fpMotion.X = 0
+            task.fpMotion.Y = 0
+        End If
+
+        If task.heartBeat Then
+            strOut = "CameraMotion estimate: " + vbCrLf + vbCrLf
+            strOut += "Displacement in X: " + CStr(task.fpMotion.X) + vbCrLf
+            strOut += "Displacement in Y: " + CStr(task.fpMotion.Y) + vbCrLf
+        End If
+        SetTrueText(strOut, 1)
+        SetTrueText("X distances" + rangeText, 2)
+        SetTrueText("Y distances " + rangeText, New cvb.Point(dst2.Width / 2 + 2, 0), 2)
+        labels = fcsM.labels
+
+        If standalone Then
+            dst0 = src.Clone
+            For Each fp In task.fpList
+                DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_MotionApplied : Inherits TaskParent
+    Dim fcsMD As New FCS_MotionDirection
+    Dim stableRect As cvb.Rect
+    Dim cDiff As New Diff_Color
+    Public Sub New()
+        desc = "Apply the results of FCS_MotionDirection to the RGB image and display the result"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static accumX As Single, accumY As Single
+
+        fcsMD.Run(src)
+        If task.heartBeat Then
+            dst0 = src.Clone
+            accumX = 0
+            accumY = 0
+        End If
+
+        accumX += task.fpMotion.X
+        accumY += task.fpMotion.Y
+
+        If accumX < 0 Then
+            stableRect = New cvb.Rect(-accumX, accumY, dst0.Width - Math.Abs(2 * accumX),
+                                      dst0.Height - Math.Abs(2 * accumY))
+            If accumY < 0 Then stableRect.Y = -accumY
+        Else
+            stableRect = New cvb.Rect(accumX, accumY, dst0.Width - Math.Abs(2 * accumX),
+                                      dst0.Height - Math.Abs(2 * accumY))
+            If accumY < 0 Then stableRect.Y = -accumY
+        End If
+
+        dst2.SetTo(0)
+        dst0(stableRect).CopyTo(dst2(stableRect))
+        Dim mask = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        task.motionMask(stableRect).CopyTo(mask(stableRect))
+
+        src.CopyTo(dst0, mask)
+        src.CopyTo(dst2, mask)
+
+        If standalone Then
+            cDiff.diff.lastFrame = dst0.Reshape(1, dst0.Rows * 3)
+            cDiff.Run(dst2)
+            dst3 = cDiff.dst2
         End If
     End Sub
 End Class

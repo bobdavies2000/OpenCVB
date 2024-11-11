@@ -147,11 +147,11 @@ Public Class Main_UI
         cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
         With settings
             .cameraSupported = New List(Of Boolean)({True, True, True, True, True, True,
-                                                     True, False, True}) ' Mynt support updated below
+                                                     False, True}) ' Mynt support updated below
             .camera640x480Support = New List(Of Boolean)({False, False, True, True, False,
-                                                          False, False, False, True})
+                                                          False, False, True})
             .camera1920x1080Support = New List(Of Boolean)({True, True, False, False, False,
-                                                            True, True, False, False})
+                                                            True, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
             Dim sr = New StreamReader(defines.FullName)
             If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then
@@ -1367,8 +1367,6 @@ Public Class Main_UI
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
                 Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case "StereoLabs ZED 2/2i C++"
-                Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L"

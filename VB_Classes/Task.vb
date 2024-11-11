@@ -39,6 +39,8 @@ Public Class VBtask : Implements IDisposable
     Public fpCorners(3) As Integer
     Public fpCornerRect(3) As cvb.Rect
     Public fpSearchRect(3) As cvb.Rect
+    Public fpTravelAvg As Single
+    Public fpMotion As cvb.Point2f
 
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer
@@ -297,13 +299,13 @@ Public Class VBtask : Implements IDisposable
 
     Public Structure algParms
         ' The order of cameras in cameraNames is important. Add new cameras at the end.
+        '  "StereoLabs ZED 2/2i C++", turned off
         Public Shared cameraNames As New List(Of String)({"Azure Kinect 4K",
                                                           "Azure Kinect 4K C++",
                                                           "Intel(R) RealSense(TM) Depth Camera 435i",
                                                           "Intel(R) RealSense(TM) Depth Camera 455",
                                                           "Oak-D camera",
                                                           "StereoLabs ZED 2/2i",
-                                                          "StereoLabs ZED 2/2i C++",
                                                           "MYNT-EYE-D1000",
                                                           "Orbbec Gemini 335L"})
         Public cameraName As String

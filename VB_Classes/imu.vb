@@ -373,10 +373,10 @@ End Class
 
 
 Public Class IMU_PlotTotalDelay : Inherits TaskParent
-    ReadOnly host As New IMU_PlotHostFrameTimes
-    ReadOnly imu As New IMU_PlotIMUFrameTime
-    ReadOnly plot As New Plot_OverTime
-    ReadOnly kalman As New Kalman_Single
+    Dim host As New IMU_PlotHostFrameTimes
+    Dim imu As New IMU_PlotIMUFrameTime
+    Dim plot As New Plot_OverTime
+    Dim kalman As New Kalman_Single
     Public Sub New()
         plot.dst2 = dst3
         plot.maxScale = 50

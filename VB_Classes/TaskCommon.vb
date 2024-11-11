@@ -214,6 +214,7 @@ Public Class fPoint ' feature point
     Public index As Integer
     Public indexLast As Integer = -1
     Public ID As Single
+    Public travelDistance As Single
     Public periph As Boolean
     Public mask As New cvb.Mat
     Public rect As cvb.Rect
