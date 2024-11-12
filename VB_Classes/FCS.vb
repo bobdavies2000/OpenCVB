@@ -296,11 +296,11 @@ Public Class FCS_ViewLeftRight : Inherits TaskParent
     Dim fcsL As New FCS_Basics
     Dim fcsR As New FCS_Basics
 
-    Dim saveLeftMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+    Dim saveLeftMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
     Dim saveLeftList As New List(Of fPoint)
     Dim saveLeftIDs As New List(Of Single)
 
-    Dim saveRightMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+    Dim saveRightMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
     Dim saveRightList As New List(Of fPoint)
     Dim saveRightIDs As New List(Of Single)
     Public Sub New()
@@ -919,8 +919,8 @@ End Class
 
 Public Class FCS_MotionApplied : Inherits TaskParent
     Dim fcsMD As New FCS_MotionDirection
-    Dim stableRect As cvb.Rect
     Dim cDiff As New Diff_Color
+    Public stableRect As cvb.Rect
     Public Sub New()
         desc = "Apply the results of FCS_MotionDirection to the RGB image and display the result"
     End Sub
@@ -932,20 +932,27 @@ Public Class FCS_MotionApplied : Inherits TaskParent
             dst0 = src.Clone
             accumX = 0
             accumY = 0
+            stableRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
         End If
 
         accumX += task.fpMotion.X
         accumY += task.fpMotion.Y
 
+        Dim newRect As cvb.Rect
         If accumX < 0 Then
-            stableRect = New cvb.Rect(-accumX, accumY, dst0.Width - Math.Abs(2 * accumX),
-                                      dst0.Height - Math.Abs(2 * accumY))
-            If accumY < 0 Then stableRect.Y = -accumY
+            newRect = New cvb.Rect(-accumX, accumY, dst0.Width - Math.Abs(accumX),
+                                      dst0.Height - Math.Abs(accumY))
+            If accumY < 0 Then newRect.Y = -accumY
         Else
-            stableRect = New cvb.Rect(accumX, accumY, dst0.Width - Math.Abs(2 * accumX),
-                                      dst0.Height - Math.Abs(2 * accumY))
-            If accumY < 0 Then stableRect.Y = -accumY
+            newRect = New cvb.Rect(accumX, accumY, dst0.Width - Math.Abs(accumX),
+                                      dst0.Height - Math.Abs(accumY))
+            If accumY < 0 Then newRect.Y = -accumY
         End If
+
+        If stableRect.X <= newRect.X Then stableRect.X = newRect.X
+        If stableRect.Y <= newRect.Y Then stableRect.Y = newRect.Y
+        If stableRect.Width >= newRect.Width Then stableRect.Width = newRect.Width
+        If stableRect.Height >= newRect.Height Then stableRect.Height = newRect.Height
 
         dst2.SetTo(0)
         dst0(stableRect).CopyTo(dst2(stableRect))
