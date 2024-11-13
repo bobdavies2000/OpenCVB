@@ -31,7 +31,9 @@ Public Class FCS_BareBones : Inherits TaskParent
 
         dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
         dst2.SetTo(0, task.fpOutline)
-
+        For Each fp In task.fpList
+            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+        Next
         dst3 = nabes.dst3
         labels(2) = fcsD.labels(2)
     End Sub
@@ -541,18 +543,19 @@ Public Class FCS_Neighbors : Inherits TaskParent
         Next
         dst3 = ShowPalette(dst1 * 255 / task.fpList.Count)
         dst3.Rectangle(task.fpSelected.nabeRect, task.HighlightColor, task.lineWidth)
-        Dim sz = task.gOptions.GridSlider.Value
-        For i = 0 To task.fpCorners.Count - 1
-            fp = task.fpList(task.fpCorners(i))
-            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
-            Dim r = New cvb.Rect(fp.pt.X - sz, fp.pt.Y - sz, sz * 2, sz * 2)
-            task.fpCornerRect(i) = verifyRect(r, sz, sz * 2)
-            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
 
-            r = New cvb.Rect(r.X - sz, r.Y - sz, sz * 4, sz * 4)
-            task.fpSearchRect(i) = verifyRect(r, sz, sz * 4)
-            dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
-        Next
+        'Dim sz = task.gOptions.GridSlider.Value
+        'For i = 0 To task.fpCorners.Count - 1
+        '    fp = task.fpList(task.fpCorners(i))
+        '    DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+        '    Dim r = New cvb.Rect(fp.pt.X - sz, fp.pt.Y - sz, sz * 2, sz * 2)
+        '    task.fpCornerRect(i) = verifyRect(r, sz, sz * 2)
+        '    dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
+
+        '    r = New cvb.Rect(r.X - sz, r.Y - sz, sz * 4, sz * 4)
+        '    task.fpSearchRect(i) = verifyRect(r, sz, sz * 4)
+        '    dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
+        'Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
@@ -806,6 +809,7 @@ Public Class FCS_Motion : Inherits TaskParent
         plot.minScale = 0
         plot.plotCount = 1
         If standalone Then task.gOptions.setDisplay1()
+        labels(1) = "Plot of % of cells that moved - move camera to see value."
         desc = "Highlight the motion of each feature identified in the current and previous frame"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -921,51 +925,59 @@ Public Class FCS_MotionApplied : Inherits TaskParent
     Dim fcsMD As New FCS_MotionDirection
     Dim cDiff As New Diff_Color
     Public stableRect As cvb.Rect
+    Dim addw As New AddWeighted_Basics
     Public Sub New()
+        task.gOptions.displayDst0.Checked = True
+        task.gOptions.displayDst1.Checked = True
         desc = "Apply the results of FCS_MotionDirection to the RGB image and display the result"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Static accumX As Single, accumY As Single
+        Static leftX As Single, rightX As Single
+        Static topY As Single, botY As Single
 
         fcsMD.Run(src)
-        If task.heartBeat Then
+        If task.heartBeatLT Then
             dst0 = src.Clone
-            accumX = 0
-            accumY = 0
+            leftX = 0
+            rightX = dst2.Width
+            topY = 0
+            botY = dst2.Height
             stableRect = New cvb.Rect(0, 0, dst2.Width, dst2.Height)
         End If
 
-        accumX += task.fpMotion.X
-        accumY += task.fpMotion.Y
+        leftX = Math.Max(0, leftX - task.fpMotion.X)
+        rightX = Math.Min(dst2.Width, rightX - task.fpMotion.X)
 
-        Dim newRect As cvb.Rect
-        If accumX < 0 Then
-            newRect = New cvb.Rect(-accumX, accumY, dst0.Width - Math.Abs(accumX),
-                                      dst0.Height - Math.Abs(accumY))
-            If accumY < 0 Then newRect.Y = -accumY
-        Else
-            newRect = New cvb.Rect(accumX, accumY, dst0.Width - Math.Abs(accumX),
-                                      dst0.Height - Math.Abs(accumY))
-            If accumY < 0 Then newRect.Y = -accumY
-        End If
+        topY = -Math.Max(0, topY + task.fpMotion.Y)
+        botY = Math.Min(dst2.Height, botY + task.fpMotion.Y)
 
-        If stableRect.X <= newRect.X Then stableRect.X = newRect.X
-        If stableRect.Y <= newRect.Y Then stableRect.Y = newRect.Y
-        If stableRect.Width >= newRect.Width Then stableRect.Width = newRect.Width
-        If stableRect.Height >= newRect.Height Then stableRect.Height = newRect.Height
+        topY = 0
+        botY = dst2.Height ' working on this some other time...
 
+        Dim newRect As cvb.Rect = ValidateRect(New cvb.Rect(leftX, topY, rightX - leftX, botY - topY))
+        Dim oldRect As cvb.Rect = New cvb.Rect(0, 0, rightX - leftX, botY - topY)
+        If leftX = 0 Then oldRect = New cvb.Rect(dst2.Width - rightX, 0, newRect.Width, botY)
+        If topY = 0 Then oldRect = New cvb.Rect(oldRect.X, dst2.Height - botY, oldRect.Width, newRect.Height)
+
+        dst1.SetTo(0)
         dst2.SetTo(0)
-        dst0(stableRect).CopyTo(dst2(stableRect))
-        Dim mask = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
-        task.motionMask(stableRect).CopyTo(mask(stableRect))
+        dst0(oldRect).CopyTo(dst1(newRect))
+        dst0(oldRect).CopyTo(dst2(newRect))
 
-        src.CopyTo(dst0, mask)
-        src.CopyTo(dst2, mask)
+        addw.src2 = src
+        addw.Run(dst1)
+        dst3 = addw.dst2
 
-        If standalone Then
-            cDiff.diff.lastFrame = dst0.Reshape(1, dst0.Rows * 3)
-            cDiff.Run(dst2)
-            dst3 = cDiff.dst2
-        End If
+        'Dim mask = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        'task.motionMask(stableRect).CopyTo(mask(stableRect))
+
+        'src.CopyTo(dst0, mask)
+        'src.CopyTo(dst2, mask)
+
+        'If standalone Then
+        '    cDiff.diff.lastFrame = dst0.Reshape(1, dst0.Rows * 3)
+        '    cDiff.Run(dst2)
+        '    dst3 = cDiff.dst2
+        'End If
     End Sub
 End Class

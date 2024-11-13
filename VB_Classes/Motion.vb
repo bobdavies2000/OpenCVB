@@ -4,8 +4,8 @@ Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
     Dim diff As New Diff_Basics
-    Dim depthRGB As New cvb.Mat
-    Public pointcloud As cvb.Mat
+    Public depthRGB As New cvb.Mat ' not currently used
+    Public pointcloud As cvb.Mat ' not currently used
     Public color As cvb.Mat
     Public motionMask As cvb.Mat
     Public Sub New()
@@ -33,9 +33,7 @@ Public Class Motion_Basics : Inherits TaskParent
             dst3 = diff.dst2
         End If
 
-        Dim percentChanged = measure.motionRects.Count / task.gridRects.Count
-
-        If task.heartBeatLT And task.gOptions.UpdateOnHeartbeat.Checked Or depthRGB.Rows = 0 Then
+        If task.heartBeatLT Or depthRGB.Rows = 0 Then
             depthRGB = task.depthRGB.Clone
             pointcloud = task.pointCloud.Clone
         Else

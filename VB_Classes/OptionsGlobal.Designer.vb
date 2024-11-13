@@ -44,7 +44,6 @@ Partial Class OptionsGlobal
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
-        Me.UpdateOnHeartbeat = New System.Windows.Forms.CheckBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
         Me.UseMotionConstructed = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -341,7 +340,6 @@ Partial Class OptionsGlobal
         '
         'MotionBox
         '
-        Me.MotionBox.Controls.Add(Me.UpdateOnHeartbeat)
         Me.MotionBox.Controls.Add(Me.showMotionMask)
         Me.MotionBox.Controls.Add(Me.UseMotionConstructed)
         Me.MotionBox.Location = New System.Drawing.Point(6, 325)
@@ -350,16 +348,6 @@ Partial Class OptionsGlobal
         Me.MotionBox.TabIndex = 76
         Me.MotionBox.TabStop = False
         Me.MotionBox.Text = "Motion"
-        '
-        'UpdateOnHeartbeat
-        '
-        Me.UpdateOnHeartbeat.AutoSize = True
-        Me.UpdateOnHeartbeat.Location = New System.Drawing.Point(15, 86)
-        Me.UpdateOnHeartbeat.Name = "UpdateOnHeartbeat"
-        Me.UpdateOnHeartbeat.Size = New System.Drawing.Size(230, 24)
-        Me.UpdateOnHeartbeat.TabIndex = 77
-        Me.UpdateOnHeartbeat.Text = "Update image on heartbeat"
-        Me.UpdateOnHeartbeat.UseVisualStyleBackColor = True
         '
         'showMotionMask
         '
@@ -820,5 +808,4 @@ Partial Class OptionsGlobal
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
     Friend WithEvents UseMotionConstructed As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
-    Friend WithEvents UpdateOnHeartbeat As Windows.Forms.CheckBox
 End Class

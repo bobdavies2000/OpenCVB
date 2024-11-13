@@ -752,7 +752,6 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.UseMotionConstructed.Checked Then
             task.color = motion.color.Clone
-            task.pointCloud = motion.pointcloud.Clone
             task.motionMask = motion.motionMask
             task.noMotionMask = Not motionMask
             task.motionRects = New List(Of cvb.Rect)(motion.measure.motionRects)
