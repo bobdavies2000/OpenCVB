@@ -51,7 +51,7 @@ End Class
 
 
 Public Class Rotate_Box : Inherits TaskParent
-    ReadOnly rotation As New Rotate_Basics
+    Dim rotation As New Rotate_Basics
     Public Sub New()
         task.drawRect = New cvb.Rect(100, 100, 100, 100)
         labels(2) = "Original Rectangle in the original perspective"

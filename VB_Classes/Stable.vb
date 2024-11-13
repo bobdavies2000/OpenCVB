@@ -133,7 +133,7 @@ End Class
 
 Public Class Stable_FAST : Inherits TaskParent
     Public basics As New Stable_Basics
-    ReadOnly fast As New Corners_Basics
+    Dim fast As New Corners_Basics
     Public Sub New()
         FindSlider("FAST Threshold").Value = 100
         desc = "Track the FAST feature points found in the BGR image and track those that appear stable."

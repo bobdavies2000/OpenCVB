@@ -31,7 +31,7 @@ End Class
 
 ' https://docs.opencvb.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
 Public Class BlurMotion_Deblur : Inherits TaskParent
-    ReadOnly mblur As New BlurMotion_Basics
+    Dim mblur As New BlurMotion_Basics
     Private Function calcPSF(filterSize As cvb.Size, len As Integer, theta As Double) As cvb.Mat
         Dim h As New cvb.Mat(filterSize, cvb.MatType.CV_32F, cvb.Scalar.All(0))
         Dim pt = New cvb.Point(filterSize.Width / 2, filterSize.Height / 2)

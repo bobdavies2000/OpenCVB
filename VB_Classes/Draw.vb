@@ -82,7 +82,7 @@ End Class
 
 
 Public Class Draw_Lines : Inherits TaskParent
-    ReadOnly options As New Options_Draw
+    Dim options As New Options_Draw
     Public Sub New()
         desc = "Draw the requested number of Lines."
     End Sub
@@ -107,7 +107,7 @@ End Class
 
 
 Public Class Draw_Polygon : Inherits TaskParent
-    ReadOnly options As New Options_Draw
+    Dim options As New Options_Draw
     Public Sub New()
         desc = "Draw Polygon figures"
         labels = {"", "", "Convex Hull for the same points", "Polylines output"}
@@ -396,7 +396,7 @@ End Class
 
 
 Public Class Draw_LineTest : Inherits TaskParent
-    ReadOnly line As New Draw_Line
+    Dim line As New Draw_Line
     Public Sub New()
         desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line..."
     End Sub

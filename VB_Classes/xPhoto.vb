@@ -49,7 +49,7 @@ End Class
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
 Public Class XPhoto_OilPaint_CPP_VB : Inherits TaskParent
-    ReadOnly options As New Options_XPhoto
+    Dim options As New Options_XPhoto
     Public Sub New()
         cPtr = xPhoto_OilPaint_Open()
         desc = "Use the xPhoto Oil Painting transform"
@@ -104,7 +104,7 @@ End Class
 
 
 Public Class XPhoto_Inpaint_CPP_VB : Inherits TaskParent
-    ReadOnly inpVB As New XPhoto_Inpaint
+    Dim inpVB As New XPhoto_Inpaint
     Public Sub New()
         cPtr = xPhoto_Inpaint_Open()
         labels = {"", "Mask for inpainted repair", "output with inpainted data repaired", "Input to the inpaint C++ algorithm - not working!!!"}

@@ -444,11 +444,11 @@ Public Class Color8U_MotionFiltered : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.motionMask.CountNonZero Then
-            src.SetTo(0, task.noMotionMask)
+            src.SetTo(0, Not task.motionMask)
             color8U.Run(src)
             dst2 = color8U.dst3
             dst2.CopyTo(dst3, task.motionMask)
-            dst2.SetTo(0, task.noMotionMask)
+            dst2.SetTo(0, Not task.motionMask)
             classCount = color8U.classCount
         End If
         If task.heartBeatLT Then dst3.SetTo(0)

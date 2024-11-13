@@ -2744,7 +2744,7 @@ Public Class RedCloud_MotionCompare : Inherits TaskParent
         redC.Run(src)
         dst2 = redC.dst2
 
-        src.SetTo(0, task.noMotionMask)
+        src.SetTo(0, Not task.motionMask)
         redC.Run(src)
         If task.heartBeatLT Then dst3.SetTo(0)
         redC.dst2.CopyTo(dst3, task.motionMask)

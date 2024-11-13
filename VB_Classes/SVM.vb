@@ -56,7 +56,7 @@ End Class
 
 ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_SampleData : Inherits TaskParent
-    ReadOnly options As New Options_SVM
+    Dim options As New Options_SVM
     Public points As New List(Of cvb.Point2f)
     Public responses As New List(Of Integer)
     Public Sub New()
@@ -206,7 +206,7 @@ End Class
 
 
 Public Class SVM_ReuseRandom : Inherits TaskParent
-    ReadOnly svm As New SVM_Basics
+    Dim svm As New SVM_Basics
     Dim blueCount As Integer
     Public Sub New()
         FindSlider("Granularity").Value = 15

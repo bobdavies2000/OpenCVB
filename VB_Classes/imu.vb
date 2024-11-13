@@ -442,7 +442,7 @@ End Class
 
 
 Public Class IMU_VerticalAngles : Inherits TaskParent
-    ReadOnly vert As New Line_GCloud
+    Dim vert As New Line_GCloud
     Public Sub New()
         labels = {"", "", "Highlighted vertical lines", "Line details"}
         desc = "Compare the IMU changes to the angle changes in the vertical lines."
@@ -477,7 +477,7 @@ End Class
 
 
 Public Class IMU_PlotGravityAngles : Inherits TaskParent
-    ReadOnly plot As New Plot_OverTimeScalar
+    Dim plot As New Plot_OverTimeScalar
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the motion of the camera based on the IMU data in degrees"
@@ -504,7 +504,7 @@ End Class
 
 
 Public Class IMU_PlotAngularVelocity : Inherits TaskParent
-    ReadOnly plot As New Plot_OverTimeScalar
+    Dim plot As New Plot_OverTimeScalar
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the IMU Velocity over time."
@@ -583,7 +583,7 @@ End Class
 
 
 Public Class IMU_PlotAcceleration : Inherits TaskParent
-    ReadOnly plot As New Plot_OverTimeScalar
+    Dim plot As New Plot_OverTimeScalar
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the IMU Acceleration in m/Sec^2 over time."
@@ -631,8 +631,8 @@ End Class
 
 
 Public Class IMU_PlotCompareIMU : Inherits TaskParent
-    ReadOnly plot(3 - 1) As Plot_OverTimeScalar
-    ReadOnly imuAll As New IMU_AllMethods
+    Dim plot(3 - 1) As Plot_OverTimeScalar
+    Dim imuAll As New IMU_AllMethods
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -678,7 +678,7 @@ End Class
 
 
 Public Class IMU_Kalman : Inherits TaskParent
-    ReadOnly kalman As New Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Public Sub New()
         desc = "Use Kalman Filter to stabilize the IMU acceleration and velocity"
     End Sub
@@ -708,7 +708,7 @@ End Class
 
 Public Class IMU_AllMethods : Inherits TaskParent
     Dim basics As New IMU_Basics
-    ReadOnly imuAvg As New IMU_Average
+    Dim imuAvg As New IMU_Average
     Dim kalman As New IMU_Kalman
     Public Sub New()
         desc = "Compute the IMU acceleration using all available methods - raw, Kalman, averaging, and velocity-filtered."

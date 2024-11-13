@@ -3,7 +3,7 @@ Imports  System.IO
 Imports System.Runtime.InteropServices
 ' https://www.learnopencvb.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_Basics : Inherits TaskParent
-    ReadOnly ecc As New WarpModel_ECC
+    Dim ecc As New WarpModel_ECC
     Dim options As New Options_WarpModel
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -55,7 +55,7 @@ Public Class WarpModel_ECC : Inherits TaskParent
     Public src2 As New cvb.Mat
     Public aligned As New cvb.Mat
     Public outputRect As cvb.Rect
-    ReadOnly options As New Options_WarpModel
+    Dim options As New Options_WarpModel
     Public Sub New()
         cPtr = WarpModel_Open()
 
@@ -138,8 +138,8 @@ End Class
 Public Class WarpModel_Input : Inherits TaskParent
     Public rgb(3 - 1) As cvb.Mat
     Public gradient(3 - 1) As cvb.Mat
-    ReadOnly sobel as new Edge_Sobel
-    ReadOnly options As New Options_WarpModel
+    Dim sobel As New Edge_Sobel
+    Dim options As New Options_WarpModel
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()

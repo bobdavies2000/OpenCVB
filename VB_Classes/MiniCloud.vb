@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 Public Class MiniCloud_Basics : Inherits TaskParent
-    ReadOnly resize As Resize_Smaller
+    Dim resize As Resize_Smaller
     Public rect As cvb.Rect
     Public options As New Options_IMU
     Public Sub New()
@@ -84,10 +84,10 @@ End Class
 
 
 Public Class MiniCloud_RotateAngle : Inherits TaskParent
-    ReadOnly peak As New MiniCloud_Rotate
+    Dim peak As New MiniCloud_Rotate
     Dim mats As New Mat_4to1
     Public plot As New Plot_OverTimeSingle
-    ReadOnly resetCheck As System.Windows.Forms.CheckBox
+    Dim resetCheck As System.Windows.Forms.CheckBox
     Public Sub New()
         task.accRadians.Y = -cvb.Cv2.PI / 2
 

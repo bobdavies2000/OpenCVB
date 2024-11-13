@@ -7,7 +7,7 @@ Imports cvext = OpenCvSharp.Extensions
 
 Public Class OpenGL_Basics : Inherits TaskParent
     Dim memMapWriter As MemoryMappedViewAccessor
-    ReadOnly startInfo As New ProcessStartInfo
+    Dim startInfo As New ProcessStartInfo
     Dim memMapPtr As IntPtr
     Public dataInput As New cvb.Mat
     Public pointCloudInput As cvb.Mat
@@ -209,7 +209,7 @@ End Class
 
 
 Public Class OpenGL_ReducedXYZ : Inherits TaskParent
-    ReadOnly reduction As New Reduction_XYZ
+    Dim reduction As New Reduction_XYZ
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
@@ -230,7 +230,7 @@ End Class
 
 
 Public Class OpenGL_Reduction : Inherits TaskParent
-    ReadOnly reduction As Reduction_PointCloud
+    Dim reduction As Reduction_PointCloud
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         reduction = New Reduction_PointCloud
@@ -252,7 +252,7 @@ End Class
 
 
 Public Class OpenGL_ReducedSideView : Inherits TaskParent
-    ReadOnly sideView As New PointCloud_ReducedSideView
+    Dim sideView As New PointCloud_ReducedSideView
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
@@ -274,7 +274,7 @@ End Class
 
 
 Public Class OpenGL_Rebuilt : Inherits TaskParent
-    ReadOnly rebuild As New Structured_Rebuild
+    Dim rebuild As New Structured_Rebuild
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Review the rebuilt point cloud from Structured_Rebuild"
@@ -295,7 +295,7 @@ End Class
 
 
 Public Class OpenGL_VerticalSingle : Inherits TaskParent
-    ReadOnly vLine As New FeatureLine_LongestV_Tutorial2
+    Dim vLine As New FeatureLine_LongestV_Tutorial2
     Public Sub New()
         task.ogl.oglFunction = oCase.verticalLines
         desc = "Visualize the vertical line found with FeatureLine_LongestV_Tutorial"
@@ -546,7 +546,7 @@ End Class
 
 
 Public Class OpenGL_OnlyPlanes : Inherits TaskParent
-    ReadOnly planes As New Plane_OnlyPlanes
+    Dim planes As New Plane_OnlyPlanes
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels = {"", "", "RedCloud Cells", "Planes built in the point cloud"}
@@ -571,7 +571,7 @@ End Class
 
 
 Public Class OpenGL_FlatStudy1 : Inherits TaskParent
-    ReadOnly plane As New Structured_LinearizeFloor
+    Dim plane As New Structured_LinearizeFloor
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels = {"", "", "Side view of point cloud - use mouse to highlight the floor", "Highlight the floor in BGR image"}
@@ -1312,8 +1312,8 @@ End Class
 ' https://open.gl/transformations
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
 Public Class OpenGL_GravityAverage : Inherits TaskParent
-    ReadOnly imuAvg As New IMU_Average
-    ReadOnly imu As New IMU_Basics
+    Dim imuAvg As New IMU_Average
+    Dim imu As New IMU_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL"
@@ -1346,8 +1346,8 @@ End Class
 ' https://open.gl/transformations
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
 Public Class OpenGL_GravityKalman : Inherits TaskParent
-    ReadOnly imuKalman As New IMU_Kalman
-    ReadOnly imu As New IMU_Basics
+    Dim imuKalman As New IMU_Kalman
+    Dim imu As New IMU_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL"
@@ -2008,7 +2008,7 @@ End Class
 
 
 Public Class OpenGL_World : Inherits TaskParent
-    ReadOnly world As New Depth_World
+    Dim world As New Depth_World
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -2045,7 +2045,7 @@ End Class
 
 
 Public Class OpenGL_VerticalOrHorizontal : Inherits TaskParent
-    ReadOnly vLine As New FeatureLine_Finder
+    Dim vLine As New FeatureLine_Finder
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -2221,7 +2221,7 @@ End Class
 
 
 Public Class OpenGL_StableMinMax : Inherits TaskParent
-    ReadOnly minmax As New Depth_MinMaxNone
+    Dim minmax As New Depth_MinMaxNone
     Public Sub New()
         task.gOptions.unFiltered.Checked = True
         task.ogl.oglFunction = oCase.pointCloudAndRGB
