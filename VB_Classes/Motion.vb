@@ -4,8 +4,8 @@ Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
     Dim diff As New Diff_Basics
-    Public depthRGB As New cvb.Mat ' not currently used
-    Public pointcloud As cvb.Mat ' not currently used
+    Public depthRGB As New cvb.Mat
+    Public pointcloud As cvb.Mat
     Public color As cvb.Mat
     Public motionMask As cvb.Mat
     Public Sub New()

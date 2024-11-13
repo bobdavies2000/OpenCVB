@@ -1380,34 +1380,6 @@ End Class
 
 
 
-
-
-Public Class OpenGL_StableMinMax : Inherits TaskParent
-    ReadOnly minmax As New Depth_MinMaxNone
-    Public Sub New()
-        task.gOptions.unFiltered.Checked = True
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        labels = {"", "", "Pointcloud Max", "Pointcloud Min"}
-        desc = "display the Pointcloud Min or Max in OpenGL"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        minmax.Run(task.pointCloud)
-        dst2 = minmax.dst2
-
-        If minmax.options.useMax Or minmax.options.useMin Then task.ogl.pointCloudInput = dst2 Else task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.Run(task.color)
-
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels(2) = minmax.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class OpenGL_CloudMisses : Inherits TaskParent
     Dim frames As New History_Basics
     Public Sub New()
@@ -1708,7 +1680,7 @@ End Class
 
 
 
-Public Class OpenGL_FilteredSideView : Inherits TaskParent
+Public Class OpenGL_BPFilteredSideView : Inherits TaskParent
     Dim filter As New BackProject2D_FilterSide
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1729,7 +1701,7 @@ End Class
 
 
 
-Public Class OpenGL_FilteredTopView : Inherits TaskParent
+Public Class OpenGL_BPFilteredTopView : Inherits TaskParent
     Dim filter As New BackProject2D_FilterTop
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1750,7 +1722,7 @@ End Class
 
 
 
-Public Class OpenGL_FilteredBoth : Inherits TaskParent
+Public Class OpenGL_BPFilteredBoth : Inherits TaskParent
     Dim filter As New BackProject2D_FilterBoth
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1771,7 +1743,7 @@ End Class
 
 
 
-Public Class OpenGL_Filtered3D : Inherits TaskParent
+Public Class OpenGL_BPFiltered3D : Inherits TaskParent
     Dim filter As New Hist3Dcloud_BP_Filter
     Public Sub New()
         task.gOptions.setOpenGLCapture(True)
@@ -2236,5 +2208,38 @@ Public Class OpenGL_PCdiff : Inherits TaskParent
         End If
         task.ogl.pointCloudInput = dst2
         task.ogl.Run(task.color)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class OpenGL_StableMinMax : Inherits TaskParent
+    ReadOnly minmax As New Depth_MinMaxNone
+    Public Sub New()
+        task.gOptions.unFiltered.Checked = True
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        labels = {"", "", "Pointcloud Max", "Pointcloud Min"}
+        desc = "display the Pointcloud Min or Max in OpenGL"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        minmax.Run(task.pointCloud)
+        dst2 = minmax.dst2
+
+        If minmax.options.useMax Or minmax.options.useMin Then
+            task.ogl.pointCloudInput = dst2
+        Else
+            task.ogl.pointCloudInput = task.pointCloud
+        End If
+        task.ogl.Run(task.color)
+
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        labels(2) = minmax.labels(2)
     End Sub
 End Class

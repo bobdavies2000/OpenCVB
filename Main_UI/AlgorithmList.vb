@@ -2366,6 +2366,10 @@ End Enum
 	If algorithmName = "OpenGL_BasicsMouse_CS" Then return new OpenGL_BasicsMouse_CS
 	If algorithmName = "OpenGL_BasicsSliders" Then return new OpenGL_BasicsSliders
 	If algorithmName = "OpenGL_BasicsSliders_CS" Then return new OpenGL_BasicsSliders_CS
+	If algorithmName = "OpenGL_BPFiltered3D" Then return new OpenGL_BPFiltered3D
+	If algorithmName = "OpenGL_BPFilteredBoth" Then return new OpenGL_BPFilteredBoth
+	If algorithmName = "OpenGL_BPFilteredSideView" Then return new OpenGL_BPFilteredSideView
+	If algorithmName = "OpenGL_BPFilteredTopView" Then return new OpenGL_BPFilteredTopView
 	If algorithmName = "OpenGL_Bricks" Then return new OpenGL_Bricks
 	If algorithmName = "OpenGL_Bricks_CS" Then return new OpenGL_Bricks_CS
 	If algorithmName = "OpenGL_CloudHistory" Then return new OpenGL_CloudHistory
@@ -2394,13 +2398,9 @@ End Enum
 	If algorithmName = "OpenGL_Duster_CS" Then return new OpenGL_Duster_CS
 	If algorithmName = "OpenGL_DusterY" Then return new OpenGL_DusterY
 	If algorithmName = "OpenGL_DusterY_CS" Then return new OpenGL_DusterY_CS
-	If algorithmName = "OpenGL_Filtered3D" Then return new OpenGL_Filtered3D
 	If algorithmName = "OpenGL_Filtered3D_CS" Then return new OpenGL_Filtered3D_CS
-	If algorithmName = "OpenGL_FilteredBoth" Then return new OpenGL_FilteredBoth
 	If algorithmName = "OpenGL_FilteredBoth_CS" Then return new OpenGL_FilteredBoth_CS
-	If algorithmName = "OpenGL_FilteredSideView" Then return new OpenGL_FilteredSideView
 	If algorithmName = "OpenGL_FilteredSideView_CS" Then return new OpenGL_FilteredSideView_CS
-	If algorithmName = "OpenGL_FilteredTopView" Then return new OpenGL_FilteredTopView
 	If algorithmName = "OpenGL_FilteredTopView_CS" Then return new OpenGL_FilteredTopView_CS
 	If algorithmName = "OpenGL_FlatCeiling" Then return new OpenGL_FlatCeiling
 	If algorithmName = "OpenGL_FlatCeiling_CS" Then return new OpenGL_FlatCeiling_CS

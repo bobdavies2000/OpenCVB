@@ -1240,45 +1240,6 @@ End Class
 
 
 
-Public Class Depth_MinMaxNone : Inherits TaskParent
-    Public options As New Options_MinMaxNone
-    Dim filtered As Integer
-    Public Sub New()
-        desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        Dim split() As cvb.Mat
-        If src.Type = cvb.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
-
-        If task.heartBeat Then
-            dst3 = split(2)
-            filtered = 0
-        End If
-        labels(2) = "Point cloud unchanged"
-        If options.useMax Then
-            labels(2) = "Point cloud maximum values at each pixel"
-            cvb.Cv2.Max(split(2), dst3, split(2))
-        End If
-        If options.useMin Then
-            labels(2) = "Point cloud minimum values at each pixel"
-            Dim saveMat = split(2).Clone
-            cvb.Cv2.Min(split(2), dst3, split(2))
-            Dim mask = split(2).InRange(0, 0.1)
-            saveMat.CopyTo(split(2), mask)
-        End If
-        cvb.Cv2.Merge(split, dst2)
-        dst3 = split(2)
-        filtered += 1
-        labels(2) += " after " + CStr(filtered) + " images"
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Depth_StableMin : Inherits TaskParent
     Public stableMin As cvb.Mat
@@ -1306,36 +1267,6 @@ Public Class Depth_StableMin : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Depth_StableMax : Inherits TaskParent
-    Public stableMax As cvb.Mat
-    Dim colorize As New Depth_Colorizer_CPP_VB
-    Public Sub New()
-        task.gOptions.unFiltered.Checked = True
-        labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
-        desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If src.Type <> cvb.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-        If task.heartBeat Then
-            stableMax = src.Clone
-            dst3.SetTo(0)
-        Else
-            src.CopyTo(stableMax, task.motionMask)
-            If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
-            stableMax.CopyTo(src, task.noDepthMask)
-            cvb.Cv2.Min(src, stableMax, stableMax)
-        End If
-
-        colorize.Run(stableMax)
-        dst2 = colorize.dst2
-    End Sub
-End Class
 
 
 
@@ -1592,5 +1523,67 @@ End Class
 
 
 
+Public Class Depth_StableMax : Inherits TaskParent
+    Public stableMax As cvb.Mat
+    Dim colorize As New Depth_Colorizer_CPP_VB
+    Public Sub New()
+        task.gOptions.unFiltered.Checked = True
+        labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
+        desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If src.Type <> cvb.MatType.CV_32FC1 Then src = task.pcSplit(2)
+
+        If task.heartBeat Then
+            stableMax = src.Clone
+            dst3.SetTo(0)
+        Else
+            src.CopyTo(stableMax, task.motionMask)
+            If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
+            stableMax.CopyTo(src, task.noDepthMask)
+            cvb.Cv2.Min(src, stableMax, stableMax)
+        End If
+
+        colorize.Run(stableMax)
+        dst2 = colorize.dst2
+    End Sub
+End Class
 
 
+
+
+
+
+Public Class Depth_MinMaxNone : Inherits TaskParent
+    Public options As New Options_MinMaxNone
+    Dim filtered As Integer
+    Public Sub New()
+        desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        Dim split() As cvb.Mat
+        If src.Type = cvb.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
+
+        If task.heartBeat Then
+            dst3 = split(2)
+            filtered = 0
+        End If
+        labels(2) = "Point cloud unchanged"
+        If options.useMax Then
+            labels(2) = "Point cloud maximum values at each pixel"
+            cvb.Cv2.Max(split(2), dst3, split(2))
+        End If
+        If options.useMin Then
+            labels(2) = "Point cloud minimum values at each pixel"
+            Dim saveMat = split(2).Clone
+            cvb.Cv2.Min(split(2), dst3, split(2))
+            Dim mask = split(2).InRange(0, 0.1)
+            saveMat.CopyTo(split(2), mask)
+        End If
+        cvb.Cv2.Merge(split, dst2)
+        dst3 = split(2)
+        filtered += 1
+        labels(2) += " after " + CStr(filtered) + " images"
+    End Sub
+End Class
