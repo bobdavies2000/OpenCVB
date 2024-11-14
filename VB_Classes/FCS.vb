@@ -454,7 +454,7 @@ End Class
 
 
 Public Class FCS_Periphery : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_BareBones
     Public Sub New()
         desc = "Display the cells which are on the periphery of the image"
     End Sub
@@ -544,18 +544,18 @@ Public Class FCS_Neighbors : Inherits TaskParent
         dst3 = ShowPalette(dst1 * 255 / task.fpList.Count)
         dst3.Rectangle(task.fpSelected.nabeRect, task.HighlightColor, task.lineWidth)
 
-        'Dim sz = task.gOptions.GridSlider.Value
-        'For i = 0 To task.fpCorners.Count - 1
-        '    fp = task.fpList(task.fpCorners(i))
-        '    DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
-        '    Dim r = New cvb.Rect(fp.pt.X - sz, fp.pt.Y - sz, sz * 2, sz * 2)
-        '    task.fpCornerRect(i) = verifyRect(r, sz, sz * 2)
-        '    dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
+        Dim sz = task.gOptions.GridSlider.Value
+        For i = 0 To task.fpCorners.Count - 1
+            fp = task.fpList(task.fpCorners(i))
+            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            Dim r = New cvb.Rect(fp.pt.X - sz, fp.pt.Y - sz, sz * 2, sz * 2)
+            task.fpCornerRect(i) = verifyRect(r, sz, sz * 2)
+            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
 
-        '    r = New cvb.Rect(r.X - sz, r.Y - sz, sz * 4, sz * 4)
-        '    task.fpSearchRect(i) = verifyRect(r, sz, sz * 4)
-        '    dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
-        'Next
+            r = New cvb.Rect(r.X - sz, r.Y - sz, sz * 4, sz * 4)
+            task.fpSearchRect(i) = verifyRect(r, sz, sz * 4)
+            dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
+        Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
@@ -979,5 +979,81 @@ Public Class FCS_MotionApplied : Inherits TaskParent
         '    cDiff.Run(dst2)
         '    dst3 = cDiff.dst2
         'End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_FloodFill : Inherits TaskParent
+    Dim flood As New Flood_Basics
+    Dim fcsB As New FCS_BareBones
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use color to connect FCS cells - visualize the data mostly."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        flood.Run(src)
+        dst2 = flood.dst2
+
+        fcsB.Run(src)
+        dst1 = src
+
+        edges.Run(src)
+        dst3 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+
+        For i = 0 To task.fpList.Count - 1
+            Dim fp = task.fpList(i)
+            DrawCircle(dst1, fp.pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+            fp.rcIndex = task.cellMap.Get(Of Byte)(fp.pt.Y, fp.pt.X)
+
+            task.fpList(i) = fp
+
+            'Dim rc = task.redCells(fp.rcIndex)
+            'dst3(fp.rect).SetTo(rc.naturalColor, fp.mask)
+            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+        Next
+        dst3.SetTo(cvb.Scalar.White, task.fpOutline)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_Edges : Inherits TaskParent
+    Dim fcsB As New FCS_BareBones
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use edges to connect feature points to their neighbors."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcsB.Run(src)
+        dst2 = src
+
+        edges.Run(src)
+        dst3 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+
+        For i = 0 To task.fpList.Count - 1
+            Dim fp = task.fpList(i)
+            DrawCircle(dst1, fp.pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+            fp.rcIndex = task.cellMap.Get(Of Byte)(fp.pt.Y, fp.pt.X)
+
+            task.fpList(i) = fp
+
+            'Dim rc = task.redCells(fp.rcIndex)
+            'dst3(fp.rect).SetTo(rc.naturalColor, fp.mask)
+            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+        Next
+        dst3.SetTo(cvb.Scalar.White, task.fpOutline)
     End Sub
 End Class

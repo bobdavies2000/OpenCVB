@@ -1015,6 +1015,8 @@ End Enum
 	If algorithmName = "FCS_CornerCorrelation" Then return new FCS_CornerCorrelation
 	If algorithmName = "FCS_Delaunay" Then return new FCS_Delaunay
 	If algorithmName = "FCS_DepthCells" Then return new FCS_DepthCells
+	If algorithmName = "FCS_Edges" Then return new FCS_Edges
+	If algorithmName = "FCS_FloodFill" Then return new FCS_FloodFill
 	If algorithmName = "FCS_Info" Then return new FCS_Info
 	If algorithmName = "FCS_Lines" Then return new FCS_Lines
 	If algorithmName = "FCS_LinesAndEdges" Then return new FCS_LinesAndEdges

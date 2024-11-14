@@ -10,7 +10,7 @@ Public Class Motion_Basics : Inherits TaskParent
     Public motionMask As cvb.Mat
     Public Sub New()
         motionMask = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
-        labels(3) = "The difference between the motion-constructed image and the current image.  " +
+        labels(3) = "The difference between the motion-filtered image and the current image.  " +
                     "Highlighted pixels may often be nearly identical."
         desc = "Isolate all motion in the scene"
     End Sub
@@ -33,12 +33,14 @@ Public Class Motion_Basics : Inherits TaskParent
             dst3 = diff.dst2
         End If
 
-        If task.heartBeatLT Or depthRGB.Rows = 0 Then
-            depthRGB = task.depthRGB.Clone
-            pointcloud = task.pointCloud.Clone
-        Else
-            task.depthRGB.CopyTo(depthRGB, motionMask)
-            task.pointCloud.CopyTo(pointcloud, motionMask)
+        If task.gOptions.UseMotionDepth.Checked Then
+            If task.heartBeatLT Or depthRGB.Rows = 0 Then
+                depthRGB = task.depthRGB.Clone
+                pointcloud = task.pointCloud.Clone
+            Else
+                task.depthRGB.CopyTo(depthRGB, motionMask)
+                task.pointCloud.CopyTo(pointcloud, motionMask)
+            End If
         End If
     End Sub
 End Class
@@ -52,12 +54,12 @@ Public Class Motion_BasicsTest : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim measure As New LowRes_MeasureMotion
     Public Sub New()
-        task.gOptions.UseMotionConstructed.Checked = False
+        task.gOptions.UseMotionColor.Checked = False
         task.gOptions.showMotionMask.Checked = True
         desc = "Display the difference between task.color and src to verify Motion_Basics is working"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.gOptions.UseMotionConstructed.Checked Then
+        If task.gOptions.UseMotionColor.Checked Then
             SetTrueText("Uncheck 'Use Motion-Constructed images' to validate Motion_Basics", 3)
             Exit Sub
         End If

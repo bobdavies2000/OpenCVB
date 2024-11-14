@@ -45,7 +45,7 @@ Partial Class OptionsGlobal
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
-        Me.UseMotionConstructed = New System.Windows.Forms.CheckBox()
+        Me.UseMotionColor = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.HighlightColor = New System.Windows.Forms.ComboBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
@@ -80,6 +80,7 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.UseMotionDepth = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -340,11 +341,12 @@ Partial Class OptionsGlobal
         '
         'MotionBox
         '
+        Me.MotionBox.Controls.Add(Me.UseMotionDepth)
         Me.MotionBox.Controls.Add(Me.showMotionMask)
-        Me.MotionBox.Controls.Add(Me.UseMotionConstructed)
-        Me.MotionBox.Location = New System.Drawing.Point(6, 325)
+        Me.MotionBox.Controls.Add(Me.UseMotionColor)
+        Me.MotionBox.Location = New System.Drawing.Point(6, 292)
         Me.MotionBox.Name = "MotionBox"
-        Me.MotionBox.Size = New System.Drawing.Size(356, 110)
+        Me.MotionBox.Size = New System.Drawing.Size(356, 132)
         Me.MotionBox.TabIndex = 76
         Me.MotionBox.TabStop = False
         Me.MotionBox.Text = "Motion"
@@ -359,17 +361,17 @@ Partial Class OptionsGlobal
         Me.showMotionMask.Text = "Show motion cells"
         Me.showMotionMask.UseVisualStyleBackColor = True
         '
-        'UseMotionConstructed
+        'UseMotionColor
         '
-        Me.UseMotionConstructed.AutoSize = True
-        Me.UseMotionConstructed.Checked = True
-        Me.UseMotionConstructed.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.UseMotionConstructed.Location = New System.Drawing.Point(14, 56)
-        Me.UseMotionConstructed.Name = "UseMotionConstructed"
-        Me.UseMotionConstructed.Size = New System.Drawing.Size(263, 24)
-        Me.UseMotionConstructed.TabIndex = 76
-        Me.UseMotionConstructed.Text = "Use Motion-Constructed images"
-        Me.UseMotionConstructed.UseVisualStyleBackColor = True
+        Me.UseMotionColor.AutoSize = True
+        Me.UseMotionColor.Checked = True
+        Me.UseMotionColor.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.UseMotionColor.Location = New System.Drawing.Point(14, 56)
+        Me.UseMotionColor.Name = "UseMotionColor"
+        Me.UseMotionColor.Size = New System.Drawing.Size(215, 24)
+        Me.UseMotionColor.TabIndex = 76
+        Me.UseMotionColor.Text = "Use Motion-Filtered Color"
+        Me.UseMotionColor.UseVisualStyleBackColor = True
         '
         'Label1
         '
@@ -716,6 +718,18 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
+        'UseMotionDepth
+        '
+        Me.UseMotionDepth.AutoSize = True
+        Me.UseMotionDepth.Checked = True
+        Me.UseMotionDepth.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.UseMotionDepth.Location = New System.Drawing.Point(14, 89)
+        Me.UseMotionDepth.Name = "UseMotionDepth"
+        Me.UseMotionDepth.Size = New System.Drawing.Size(222, 24)
+        Me.UseMotionDepth.TabIndex = 77
+        Me.UseMotionDepth.Text = "Use Motion-Filtered Depth"
+        Me.UseMotionDepth.UseVisualStyleBackColor = True
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -806,6 +820,7 @@ Partial Class OptionsGlobal
     Friend WithEvents CrossHairs As System.Windows.Forms.CheckBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
-    Friend WithEvents UseMotionConstructed As Windows.Forms.CheckBox
+    Friend WithEvents UseMotionColor As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
+    Friend WithEvents UseMotionDepth As Windows.Forms.CheckBox
 End Class

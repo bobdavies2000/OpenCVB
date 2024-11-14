@@ -423,4 +423,8 @@ Public Class OptionsGlobal
     Public Sub SetDotSize(val As Integer)
         DotSizeSlider.Value = val
     End Sub
+
+    Private Sub UseMotionColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseMotionColor.CheckedChanged
+
+    End Sub
 End Class

@@ -183,38 +183,6 @@ public:
 	Options_MinMaxNone() {
 	}
 };
-class Options_OpenGL {
-public:
-	double FOV =  75;
-	double yaw =  -3;
-	double pitch =  3;
-	double roll =  0;
-	double zNear =  0;
-	double zFar =  20;
-	int pointSize =  2;
-	double zTrans =  0.5;
-	cv::Vec3f eye =  cv::Vec3f(0, 0, -40);
-	cv::Vec3f scaleXYZ =  cv::Vec3f(10, 10, 1);
-	void RunOpt() {}
-	Options_OpenGL() {
-	}
-};
-class Options_OpenGLFunctions {
-public:
-	cv::Scalar moveAmount =  cv::Scalar(0, 0, 0);
-	double FOV =  75;
-	double yaw =  -3;
-	double pitch =  3;
-	double roll =  0;
-	double zNear =  0;
-	double zFar =  20.0;
-	double zTrans =  0.5;
-	cv::Vec3f eye =  cv::Vec3f(0, 0, -40);
-	cv::Vec3f scaleXYZ =  cv::Vec3f(10, 10, 1);
-	void RunOpt() {}
-	Options_OpenGLFunctions() {
-	}
-};
 class Options_MinArea {
 public:
 vector<cv::Point2f> srcPoints;
@@ -2155,5 +2123,37 @@ class Options_Line {
 public:
 	void RunOpt() {}
 	Options_Line() {
+	}
+};
+class Options_OpenGLFunctions {
+public:
+	cv::Scalar moveAmount =  cv::Scalar(0, 0, 0);
+	double FOV =  75;
+	double yaw =  -3;
+	double pitch =  3;
+	double roll =  0;
+	double zNear =  0;
+	double zFar =  20.0;
+	double zTrans =  0.5;
+	cv::Vec3f eye =  cv::Vec3f(0, 0, -40);
+	cv::Vec3f scaleXYZ =  cv::Vec3f(10, 10, 1);
+	void RunOpt() {}
+	Options_OpenGLFunctions() {
+	}
+};
+class Options_OpenGL {
+public:
+	double FOV =  75;
+	double yaw =  -3;
+	double pitch =  3;
+	double roll =  0;
+	double zNear =  0;
+	double zFar =  20;
+	int pointSize =  2;
+	double zTrans =  0.5;
+	cv::Vec3f eye =  cv::Vec3f(0, 0, -40);
+	cv::Vec3f scaleXYZ =  cv::Vec3f(10, 10, 1);
+	void RunOpt() {}
+	Options_OpenGL() {
 	}
 };

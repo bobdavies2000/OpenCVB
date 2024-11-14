@@ -162,7 +162,11 @@ Public Class OpenGL_BasicsSliders : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If standaloneTest() Then task.ogl.pointCloudInput = task.pointCloud Else task.ogl.pointCloudInput = pointCloudInput
+        If standaloneTest() Then
+            task.ogl.pointCloudInput = task.pointCloud
+        Else
+            task.ogl.pointCloudInput = pointCloudInput
+        End If
 
         ' update all the options from the slider values.
         task.ogl.options.FOV = options.FOV
@@ -194,7 +198,10 @@ Public Class OpenGL_BasicsMouse : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.testAllRunning Then Exit Sub ' seems to not like it when running overnight but it runs fine.
+
+        Static MotionCheck = FindCheckBox("Use Motion Mask on the pointcloud")
         task.ogl.pointCloudInput = task.pointCloud
+
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
@@ -2230,6 +2237,7 @@ Public Class OpenGL_StableMinMax : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         minmax.Run(task.pointCloud)
+
         dst2 = minmax.dst2
 
         If minmax.options.useMax Or minmax.options.useMin Then

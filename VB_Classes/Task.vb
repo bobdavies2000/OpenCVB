@@ -77,7 +77,6 @@ Public Class VBtask : Implements IDisposable
     Public motionRect As New cvb.Rect ' get rid of this...
     Public motionRects As New List(Of cvb.Rect)
     Public motionMask As cvb.Mat
-    Public motionCloud As cvb.Mat
     Public motion As Motion_Basics
     Public motionPercent As Single
     Public MotionLabel As String = " "
@@ -750,11 +749,14 @@ Public Class VBtask : Implements IDisposable
 
         motion.Run(src)
 
-        If task.gOptions.UseMotionConstructed.Checked Then
+        If task.gOptions.UseMotionColor.Checked Then
             task.color = motion.color.Clone
-            task.motionCloud = motion.pointcloud.Clone
             task.motionMask = motion.motionMask
             task.motionRects = New List(Of cvb.Rect)(motion.measure.motionRects)
+        End If
+
+        If task.gOptions.UseMotionDepth.Checked Then
+            task.pointCloud = motion.pointcloud.Clone
         End If
 
         task.pcSplit = task.pointCloud.Split

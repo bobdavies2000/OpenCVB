@@ -479,7 +479,7 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
             percentList.Add(motionList.Count / task.gridRects.Count)
             If percentList.Count > 3 Then percentList.RemoveAt(0)
             task.motionPercent = percentList.Average
-            If task.gOptions.UseMotionConstructed.Checked = False Then
+            If task.gOptions.UseMotionColor.Checked = False Then
                 labels(3) = "100% of each image has motion."
             Else
                 labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")

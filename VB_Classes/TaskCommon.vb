@@ -221,6 +221,7 @@ Public Class fPoint ' feature point
     Public facet2f As List(Of cvb.Point2f)
     Public facets As List(Of cvb.Point)
     Public pt As cvb.Point
+    Public rcIndex As Integer
     Public nabeList As New List(Of Integer)
     Public nabeRect As cvb.Rect
     Public depthMean As cvb.Scalar
