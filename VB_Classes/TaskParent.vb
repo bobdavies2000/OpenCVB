@@ -456,10 +456,10 @@ Public Class TaskParent : Implements IDisposable
     End Function
     Public Function DisplayCells() As cvb.Mat
         Dim dst As New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
-        task.cellMap.SetTo(0)
+        task.redMap.SetTo(0)
         For Each rc In task.redCells
             dst(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
-            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
         Return dst
     End Function

@@ -2723,11 +2723,11 @@ namespace CS_Classes
             SortedList<int, rcData> sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
             for (int i = options.startRegion; i <= options.endRegion; i++)
             {
-                vbc.task.cellMap = cellMaps[i];
+                vbc.task.redMap = cellMaps[i];
                 vbc.task.redCells = redCells[i];
                 flood.inputMask = ~bin2.mats.mat[i];
                 flood.Run(bin2.mats.mat[i]);
-                cellMaps[i] = vbc.task.cellMap.Clone();
+                cellMaps[i] = vbc.task.redMap.Clone();
                 redCells[i] = new List<rcData>(vbc.task.redCells);
                 foreach (var rc in vbc.task.redCells)
                 {
@@ -2978,7 +2978,7 @@ namespace CS_Classes
 
             for (int i = options.startRegion; i <= options.endRegion; i++)
             {
-                vbc.task.cellMap = cellMaps[i];
+                vbc.task.redMap = cellMaps[i];
                 vbc.task.redCells = redCells[i];
                 if (i == 2)
                 {
@@ -2991,7 +2991,7 @@ namespace CS_Classes
                     flood.inputMask = ~bin3.bin3.mats.mat[i];
                     flood.Run(bin3.bin3.mats.mat[i]);
                 }
-                cellMaps[i] = vbc.task.cellMap.Clone();
+                cellMaps[i] = vbc.task.redMap.Clone();
                 redCells[i] = new List<rcData>(vbc.task.redCells);
             }
 
@@ -3047,11 +3047,11 @@ namespace CS_Classes
             SortedList<int, rcData> sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
             for (int i = options.startRegion; i <= options.endRegion; i++)
             {
-                vbc.task.cellMap = cellMaps[i];
+                vbc.task.redMap = cellMaps[i];
                 vbc.task.redCells = redCells[i];
                 flood.inputMask = ~bin3.bin3.mats.mat[i];
                 flood.Run(bin3.bin3.mats.mat[i]);
-                cellMaps[i] = vbc.task.cellMap.Clone();
+                cellMaps[i] = vbc.task.redMap.Clone();
                 redCells[i] = new List<rcData>(vbc.task.redCells);
                 foreach (var rc in redCells[i])
                 {
@@ -3810,11 +3810,11 @@ namespace CS_Classes
             var sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
             for (int i = options.startRegion; i <= options.endRegion; i++)
             {
-                vbc.task.cellMap = cellMaps[i];
+                vbc.task.redMap = cellMaps[i];
                 vbc.task.redCells = redCells[i];
                 flood.inputMask = ~bin2.mats.mat[i];
                 flood.Run(bin2.mats.mat[i]);
-                cellMaps[i] = vbc.task.cellMap.Clone();
+                cellMaps[i] = vbc.task.redMap.Clone();
                 redCells[i] = new List<rcData>(vbc.task.redCells);
                 foreach (var rc in vbc.task.redCells)
                 {
@@ -6452,7 +6452,7 @@ namespace CS_Classes
         int saveRetained = -1;
         public Cell_Generate_CS()
         {
-            vbc.task.cellMap = new cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0));
+            vbc.task.redMap = new cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0));
             vbc.task.redCells = new List<rcData>();
             desc = "Generate the RedCloud cells from the rects, mask, and pixel counts.";
         }
@@ -6461,10 +6461,10 @@ namespace CS_Classes
             if (standalone)
             {
                 bounds.Run(src);
-                vbc.task.cellMap = bounds.bRects.bounds.dst2;
-                src = vbc.task.cellMap.BitwiseOr(bounds.dst2);
+                vbc.task.redMap = bounds.bRects.bounds.dst2;
+                src = vbc.task.redMap.BitwiseOr(bounds.dst2);
                 if (vbc.task.FirstPass)
-                    vbc.task.cellMap.SetTo(0);
+                    vbc.task.redMap.SetTo(0);
                 redCPP = bounds.bRects.bounds.redCPP;
                 if (redCPP.classCount == 0)
                     return; // no data to process.
@@ -6504,7 +6504,7 @@ namespace CS_Classes
                 rc.naturalColor = new cv.Vec3b((byte)rc.colorMean[0], (byte)rc.colorMean[1], (byte)rc.colorMean[2]);
                 rc.naturalGray = (int)(rc.colorMean[2] * 0.299 + rc.colorMean[1] * 0.587 + rc.colorMean[0] * 0.114);
                 rc.maxDist = GetMaxDist(ref rc);
-                rc.indexLast = vbc.task.cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
+                rc.indexLast = vbc.task.redMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
                 if (useLeftImage)
                     rc.motionPixels = diffLeft.dst2[rc.rect].CountNonZero();
                 else
@@ -6531,7 +6531,7 @@ namespace CS_Classes
                     if (removeContour)
                         DrawContour(rc.mask, rc.contour, cv.Scalar.All(0), 2); // no overlap with neighbors.
                     rc.maxDStable = rc.maxDist; // assume it has to use the latest.
-                    rc.indexLast = vbc.task.cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
+                    rc.indexLast = vbc.task.redMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
                     if (rc.indexLast > 0 && rc.indexLast < vbc.task.redCells.Count)
                     {
                         var lrc = vbc.task.redCells[rc.indexLast];
@@ -6543,10 +6543,10 @@ namespace CS_Classes
                         else
                         {
                             rc.color = lrc.color;
-                            byte stableCheck = vbc.task.cellMap.Get<byte>(lrc.maxDist.Y, lrc.maxDist.X);
+                            byte stableCheck = vbc.task.redMap.Get<byte>(lrc.maxDist.Y, lrc.maxDist.X);
                             if (stableCheck == rc.indexLast)
                                 rc.maxDStable = lrc.maxDStable; // keep maxDStable if cell matched to previous
-                            byte val = vbc.task.cellMap.Get<byte>(rc.maxDStable.Y, rc.maxDStable.X);
+                            byte val = vbc.task.redMap.Get<byte>(rc.maxDStable.Y, rc.maxDStable.X);
                             if (val != rc.indexLast)
                                 rc.maxDStable = rc.maxDist; // maxDist has finally hit the edges of the cell.
                             rc.pointMatch = true;
@@ -7037,7 +7037,7 @@ namespace CS_Classes
 
             SetTrueText("Review the neighbors_Precise algorithm");
             // nabs.redCells = vbc.task.redCells;
-            // nabs.Run(vbc.task.cellMap);
+            // nabs.Run(vbc.task.redMap);
 
             // List<Scalar> trainList = new List<Scalar>();
             // List<int> responseList = new List<int>();
@@ -10131,7 +10131,7 @@ namespace CS_Classes
             dst2 = redC.dst2;
             labels[2] = redC.labels[2];
 
-            corners.Run(vbc.task.cellMap);
+            corners.Run(vbc.task.redMap);
 
             dst3 = new Mat();
             src.CopyTo(dst3);
@@ -22122,7 +22122,7 @@ namespace CS_Classes
             {
                 flood.Run(src);
                 redCells = new List<rcData>(vbc.task.redCells);
-                cellMap = vbc.task.cellMap.Clone();
+                cellMap = vbc.task.redMap.Clone();
                 dst2 = flood.dst2.Clone();
                 dst3 = flood.dst2.Clone();
                 labels[2] = flood.labels[2];
@@ -22225,21 +22225,21 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             vbc.task.redCells = new List<rcData>(cellsLeft);
-            vbc.task.cellMap = mapLeft.Clone();
+            vbc.task.redMap = mapLeft.Clone();
             redLeft.genCells.useLeftImage = true;
             redLeft.Run(vbc.task.leftView);
             labels[2] = redLeft.labels[2];
             dst2 = redLeft.dst2;
             cellsLeft = new List<rcData>(vbc.task.redCells);
-            mapLeft = vbc.task.cellMap.Clone();
+            mapLeft = vbc.task.redMap.Clone();
             vbc.task.redCells = new List<rcData>(cellsRight);
-            vbc.task.cellMap = mapRight.Clone();
+            vbc.task.redMap = mapRight.Clone();
             redRight.genCells.useLeftImage = false;
             redRight.Run(vbc.task.rightView);
             labels[3] = redRight.labels[2];
             dst3 = redRight.dst2;
             cellsRight = new List<rcData>(vbc.task.redCells);
-            mapRight = vbc.task.cellMap.Clone();
+            mapRight = vbc.task.redMap.Clone();
             if (vbc.task.redOptions.getIdentifyCells())
             {
                 if (vbc.task.mousePicTag == 2)
@@ -26715,11 +26715,11 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             pixels.Run(src);
-            dst2 = vbc.task.cellMap;
+            dst2 = vbc.task.redMap;
             dst3 = dst2.InRange(0, 0);
             if (pixels.pixelVector.Count == 0) return;
             dst1.SetTo(0);
-            dst0 = vbc.task.cellMap;
+            dst0 = vbc.task.redMap;
             foreach (var roi in vbc.task.gridRects)
             {
                 if (dst3[roi].CountNonZero() > 0)
@@ -29345,7 +29345,7 @@ namespace CS_Classes
             dst1 = images.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
             redC.Run(dst0);
             dst2 = redC.dst2;
-            var mask = vbc.task.cellMap.InRange(0, 0);
+            var mask = vbc.task.redMap.InRange(0, 0);
             dst2.SetTo(Scalar.Black, mask);
             labels[2] = redC.labels[2];
         }
@@ -40177,7 +40177,7 @@ namespace CS_Classes
                 DrawContour(rc.mask, rc.contour, cv.Scalar.All(255), -1);
                 rc.floodPoint = floodPoints[index];
                 rc.maxDist = GetMaxDist(ref rc);
-                rc.indexLast = vbc.task.cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
+                rc.indexLast = vbc.task.redMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
                 if (rc.indexLast != 0 && rc.indexLast < vbc.task.redCells.Count())
                 {
                     var lrc = vbc.task.redCells[rc.indexLast];
@@ -41009,7 +41009,7 @@ namespace CS_Classes
             {
                 redC.Run(src);
                 dst2 = redC.dst2;
-                src = vbc.task.cellMap;
+                src = vbc.task.redMap;
                 labels[2] = redC.labels[2];
             }
             byte[] samples = new byte[src.Total()];
@@ -41065,7 +41065,7 @@ namespace CS_Classes
         {
             redC.Run(src);
             dst2 = redC.dst2;
-            corners.Run(vbc.task.cellMap.Clone());
+            corners.Run(vbc.task.redMap.Clone());
             foreach (var pt in corners.nPoints)
             {
                 DrawCircle(dst2, pt, vbc.task.DotSize, vbc.task.HighlightColor);
@@ -41097,7 +41097,7 @@ namespace CS_Classes
                 redC.Run(src);
                 dst2 = redC.dst2;
                 labels = redC.labels;
-                src = vbc.task.cellMap;
+                src = vbc.task.redMap;
                 redCells = vbc.task.redCells;
             }
             byte[] mapData = new byte[src.Total()];
@@ -50865,7 +50865,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             redC.Run(src);
-            dst3 = vbc.task.cellMap;
+            dst3 = vbc.task.redMap;
             dst2 = redC.dst2;
             labels = redC.labels;
         }
@@ -50889,7 +50889,7 @@ namespace CS_Classes
             dst2 = redC.dst2;
             dst3.SetTo(0);
             int defectCount = 0;
-            vbc.task.cellMap.SetTo(0);
+            vbc.task.redMap.SetTo(0);
             var redCells = new List<rcData>();
             foreach (var rc in vbc.task.redCells)
             {
@@ -50907,7 +50907,7 @@ namespace CS_Classes
                         defectCount++;
                     }
                     DrawContour(dst3[rc.rect], rc.hull, vecToScalar(rc.color), -1);
-                    DrawContour(vbc.task.cellMap[rc.rect], rc.hull, cv.Scalar.All(rc.index), -1);
+                    DrawContour(vbc.task.redMap[rc.rect], rc.hull, cv.Scalar.All(rc.index), -1);
                 }
                 redCells.Add(rc);
             }
@@ -50940,7 +50940,7 @@ namespace CS_Classes
             dst3.SetTo(0);
             if (vbc.task.motionMask.CountNonZero() > 0)
             {
-                dst1 = vbc.task.cellMap[vbc.task.motionRect].Clone();
+                dst1 = vbc.task.redMap[vbc.task.motionRect].Clone();
                 var cppData = new byte[dst1.Total() - 1];
                 Marshal.Copy(dst1.Data, cppData, 0, cppData.Length);
                 var handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
@@ -51870,7 +51870,7 @@ namespace CS_Classes
             redC.Run(src);
             dst2 = redC.dst2;
             labels[2] = redC.labels[2];
-            cellmap = vbc.task.cellMap;
+            cellmap = vbc.task.redMap;
             redCells = vbc.task.redCells;
         }
     }
@@ -51884,7 +51884,7 @@ namespace CS_Classes
         Mat lastMap;
         public RedCloud_Flippers_CS()
         {
-            lastMap = vbc.task.cellMap.Clone();
+            lastMap = vbc.task.redMap.Clone();
             vbc.task.redOptions.setIdentifyCells(true);
             vbc.task.redOptions.setUseColorOnly(true);
             labels[3] = "Highlighted below are the cells which flipped in color from the previous frame.";
@@ -51971,7 +51971,7 @@ namespace CS_Classes
             dst2 = hColor.dst3;
             labels[2] = hColor.labels[3];
             redC.Run(dst2);
-            dst3 = vbc.task.cellMap;
+            dst3 = vbc.task.redMap;
             dst3.SetTo(0, vbc.task.noDepthMask);
             labels[3] = redC.labels[2];
         }
@@ -51991,10 +51991,10 @@ namespace CS_Classes
         {
             redMasks.Run(src);
             List<rcData> lastCells = new List<rcData>(vbc.task.redCells);
-            Mat lastMap = vbc.task.cellMap.Clone();
+            Mat lastMap = vbc.task.redMap.Clone();
             Mat lastColors = dst3.Clone();
             List<rcData> newCells = new List<rcData>();
-            vbc.task.cellMap.SetTo(0);
+            vbc.task.redMap.SetTo(0);
             dst3.SetTo(0);
             List<Vec3b> usedColors = new List<Vec3b> { black };
             int unmatched = 0;
@@ -52015,11 +52015,11 @@ namespace CS_Classes
                     cell.color = randomCellColor();
                 }
                 usedColors.Add(cell.color);
-                if (vbc.task.cellMap.Get<byte>(cell.maxDist.Y, cell.maxDist.X) == 0)
+                if (vbc.task.redMap.Get<byte>(cell.maxDist.Y, cell.maxDist.X) == 0)
                 {
                     cell.index = vbc.task.redCells.Count();
                     newCells.Add(cell);
-                    vbc.task.cellMap[cell.rect].SetTo(cell.index, cell.mask);
+                    vbc.task.redMap[cell.rect].SetTo(cell.index, cell.mask);
                     dst3[cell.rect].SetTo(cell.color, cell.mask);
                 }
             }
@@ -52048,7 +52048,7 @@ namespace CS_Classes
             redC.Run(src);
             dst2 = redC.dst2;
             labels[2] = redC.labels[3];
-            frames.Run(vbc.task.cellMap.InRange(0, 0));
+            frames.Run(vbc.task.redMap.InRange(0, 0));
             dst3 = frames.dst2;
             if (vbc.task.redCells.Count() > 0)
             {
@@ -52574,7 +52574,7 @@ namespace CS_Classes
             topX.Run(src);
             labels = topX.redC.labels;
             var newCells = new List<rcData>();
-            vbc.task.cellMap.SetTo(0);
+            vbc.task.redMap.SetTo(0);
             dst2.SetTo(0);
             foreach (var rc in vbc.task.redCells)
             {
@@ -52583,7 +52583,7 @@ namespace CS_Classes
                     rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
                     DrawContour(dst2[rc.rect], rc.hull, vecToScalar(rc.color), -1);
                     DrawContour(rc.mask, rc.hull, cv.Scalar.All(255), -1);
-                    vbc.task.cellMap[rc.rect].SetTo(rc.index, rc.mask);
+                    vbc.task.redMap[rc.rect].SetTo(rc.index, rc.mask);
                 }
                 newCells.Add(rc);
                 if (rc.index > topX.options.topX) break;
@@ -52712,10 +52712,10 @@ namespace CS_Classes
         {
             redC.Run(src);
             dst2 = redC.dst2;
-            diff.Run(vbc.task.cellMap);
+            diff.Run(vbc.task.redMap);
             dst1 = diff.dst2;
             cellLists.Add(new List<rcData>(vbc.task.redCells));
-            cellmaps.Add(vbc.task.cellMap & ~dst1);
+            cellmaps.Add(vbc.task.redMap & ~dst1);
             diffs.Add(dst1.Clone());
             vbc.task.redCells.Clear();
             vbc.task.redCells.Add(new rcData());
@@ -52741,11 +52741,11 @@ namespace CS_Classes
                 }
             }
             dst2.SetTo(0);
-            vbc.task.cellMap.SetTo(0);
+            vbc.task.redMap.SetTo(0);
             foreach (var rc in vbc.task.redCells)
             {
                 dst2[rc.rect].SetTo(rc.color, rc.mask);
-                vbc.task.cellMap[rc.rect].SetTo(rc.index, rc.mask);
+                vbc.task.redMap[rc.rect].SetTo(rc.index, rc.mask);
             }
             foreach (var mat in diffs)
             {
@@ -52780,10 +52780,10 @@ namespace CS_Classes
         {
             redC.Run(src);
             dst2 = redC.dst2;
-            diff.Run(vbc.task.cellMap);
+            diff.Run(vbc.task.redMap);
             dst1 = diff.dst2;
             cellLists.Add(new List<rcData>(vbc.task.redCells));
-            cellmaps.Add(vbc.task.cellMap & ~dst1);
+            cellmaps.Add(vbc.task.redMap & ~dst1);
             diffs.Add(dst1.Clone());
             vbc.task.redCells.Clear();
             vbc.task.redCells.Add(new rcData());
@@ -52809,11 +52809,11 @@ namespace CS_Classes
                 }
             }
             dst2.SetTo(0);
-            vbc.task.cellMap.SetTo(0);
+            vbc.task.redMap.SetTo(0);
             foreach (var rc in vbc.task.redCells)
             {
                 dst2[rc.rect].SetTo(rc.color, rc.mask);
-                vbc.task.cellMap[rc.rect].SetTo(rc.index, rc.mask);
+                vbc.task.redMap[rc.rect].SetTo(rc.index, rc.mask);
             }
             foreach (var mat in diffs)
             {
@@ -52846,7 +52846,7 @@ namespace CS_Classes
         {
             redC.Run(src);
             cellLists.Add(new List<rcData>(vbc.task.redCells));
-            cellmaps.Add(vbc.task.cellMap.Clone());
+            cellmaps.Add(vbc.task.redMap.Clone());
             List<rcData> newCells = new List<rcData>();
             newCells.Add(new rcData());
             foreach (var rc in vbc.task.redCells)
@@ -53018,19 +53018,19 @@ namespace CS_Classes
         {
             vbc.task.redOptions.setUseColorOnly(true);
             vbc.task.redCells = new List<rcData>(colorCells);
-            vbc.task.cellMap = colorMap.Clone();
+            vbc.task.redMap = colorMap.Clone();
             flood.Run(src);
             dst2 = flood.dst2;
             colorCells = new List<rcData>(vbc.task.redCells);
-            colorMap = vbc.task.cellMap.Clone();
+            colorMap = vbc.task.redMap.Clone();
             labels[2] = flood.labels[2];
             vbc.task.redOptions.setUseDepth(true);
             vbc.task.redCells = new List<rcData>(depthCells);
-            vbc.task.cellMap = depthMap.Clone();
+            vbc.task.redMap = depthMap.Clone();
             floodPC.Run(src);
             dst3 = floodPC.dst2;
             depthCells = new List<rcData>(vbc.task.redCells);
-            depthMap = vbc.task.cellMap.Clone();
+            depthMap = vbc.task.redMap.Clone();
             labels[3] = floodPC.labels[2];
             if (vbc.task.mouseClickFlag) mousePicTag = vbc.task.mousePicTag;
             switch (mousePicTag)
@@ -53598,7 +53598,7 @@ namespace CS_Classes
             var trackIndex = new List<int>();
             foreach (var pt in good.featureList)
             {
-                int index = vbc.task.cellMap.Get<byte>((int)pt.Y, (int)pt.X);
+                int index = vbc.task.redMap.Get<byte>((int)pt.Y, (int)pt.X);
                 if (!trackIndex.Contains(index))
                 {
                     var rc = vbc.task.redCells[index];
@@ -58893,7 +58893,7 @@ namespace CS_Classes
             {
                 var roi = vbc.task.gridRects[i];
                 var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
-                var index = vbc.task.cellMap.Get<byte>(center.Y, center.X);
+                var index = vbc.task.redMap.Get<byte>(center.Y, center.X);
                 if (index <= 0) continue;
                 var rc = vbc.task.redCells[index];
                 dst3[roi].SetTo(rc.color);
@@ -58947,7 +58947,7 @@ namespace CS_Classes
             {
                 var roi = vbc.task.gridRects[i];
                 var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
-                var index = vbc.task.cellMap.Get<byte>(center.Y, center.X);
+                var index = vbc.task.redMap.Get<byte>(center.Y, center.X);
                 if (index <= 0)
                 {
                     depthList[i].Clear();
@@ -59019,7 +59019,7 @@ namespace CS_Classes
             {
                 var roi = vbc.task.gridRects[i];
                 var center = new cv.Point((int)(roi.X + roi.Width / 2), (int)(roi.Y + roi.Height / 2));
-                var index = vbc.task.cellMap.Get<byte>(center.Y, center.X);
+                var index = vbc.task.redMap.Get<byte>(center.Y, center.X);
                 if (index <= 0)
                 {
                     depthList1[i].Clear();
@@ -59109,7 +59109,7 @@ namespace CS_Classes
             {
                 var roi = vbc.task.gridRects[i];
                 var center = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
-                var index = vbc.task.cellMap.Get<byte>(center.Y, center.X);
+                var index = vbc.task.redMap.Get<byte>(center.Y, center.X);
                 double depthMin = 0, depthMax = 0;
                 cv.Point minLoc, maxLoc;
                 if (index >= 0)

@@ -344,10 +344,10 @@ Public Class GuidedBP_RedCloud : Inherits TaskParent
     Dim guide As New GuidedBP_MultiSlice
     Public redCx As New RedCloud_Basics
     Public redCy As New RedCloud_Basics
-    Public xCells As New List(Of rcData)
-    Public yCells As New List(Of rcData)
-    Public cellMapX As New cvb.Mat
-    Public cellMapY As New cvb.Mat
+    Public redCellsX As New List(Of rcData)
+    Public redCellsY As New List(Of rcData)
+    Public redMapX As New cvb.Mat
+    Public redMapY As New cvb.Mat
     Public Sub New()
         desc = "Identify each segment in the X and Y point cloud data"
     End Sub
@@ -355,14 +355,14 @@ Public Class GuidedBP_RedCloud : Inherits TaskParent
         guide.Run(src)
 
         redCx.Run(guide.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
-        cellMapX = task.cellMap.Clone
+        redMapX = task.redMap.Clone
         dst2 = redCx.dst2
-        xCells = New List(Of rcData)(task.redCells)
+        redCellsX = New List(Of rcData)(task.redCells)
 
         redCx.Run(guide.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
-        cellMapY = task.cellMap.Clone
+        redMapY = task.redMap.Clone
         dst3 = redCx.dst2
-        yCells = New List(Of rcData)(task.redCells)
+        redCellsY = New List(Of rcData)(task.redCells)
     End Sub
 End Class
 
@@ -377,10 +377,10 @@ Public Class GuidedBP_Regions : Inherits TaskParent
     Public redC As New GuidedBP_RedCloud
     Public mats As New Mat_4Click
     Dim options As New Options_BP_Regions
-    Public xCells As New List(Of rcData)
-    Public yCells As New List(Of rcData)
-    Public cellMapX As New cvb.Mat
-    Public cellMapY As New cvb.Mat
+    Public redCellsX As New List(Of rcData)
+    Public redCellsY As New List(Of rcData)
+    Public redMapX As New cvb.Mat
+    Public redMapY As New cvb.Mat
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
@@ -393,11 +393,11 @@ Public Class GuidedBP_Regions : Inherits TaskParent
 
         redC.Run(src)
 
-        cellMapX = redC.cellMapX.Threshold(options.cellCount - 1, 255, cvb.ThresholdTypes.TozeroInv)
-        cellMapY = redC.cellMapY.Threshold(options.cellCount - 1, 255, cvb.ThresholdTypes.TozeroInv)
+        redMapX = redC.redMapX.Threshold(options.cellCount - 1, 255, cvb.ThresholdTypes.TozeroInv)
+        redMapY = redC.redMapY.Threshold(options.cellCount - 1, 255, cvb.ThresholdTypes.TozeroInv)
         If standaloneTest() Then
-            dst0 = ShowPalette(cellMapX * 255 / options.cellCount)
-            dst1 = ShowPalette(cellMapY * 255 / options.cellCount)
+            dst0 = ShowPalette(redMapX * 255 / options.cellCount)
+            dst1 = ShowPalette(redMapY * 255 / options.cellCount)
         End If
 
         mats.mat(0) = redC.dst2
@@ -406,17 +406,17 @@ Public Class GuidedBP_Regions : Inherits TaskParent
         mats.mat(2).SetTo(0)
         mats.mat(3).SetTo(0)
 
-        xCells.Clear()
-        yCells.Clear()
+        redCellsX.Clear()
+        redCellsY.Clear()
 
         For i = 1 To options.cellCount
-            Dim rc = redC.xCells(i)
+            Dim rc = redC.redCellsX(i)
             mats.mat(2)(rc.rect).SetTo(rc.naturalColor, rc.mask)
-            xCells.Add(rc)
+            redCellsX.Add(rc)
 
-            rc = redC.yCells(i)
+            rc = redC.redCellsY(i)
             mats.mat(3)(rc.rect).SetTo(rc.naturalColor, rc.mask)
-            yCells.Add(rc)
+            redCellsY.Add(rc)
         Next
 
         mats.Run(empty)

@@ -340,7 +340,7 @@ Public Class Corners_RedCloud : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        corners.Run(task.cellMap)
+        corners.Run(task.redMap)
 
         dst3 = task.color.Clone
         For Each pt In corners.nPoints

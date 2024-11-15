@@ -125,7 +125,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
 
         SetTrueText("Review the neighbors_Precise algorithm")
         'nabs.redCells = task.redCells
-        'nabs.Run(task.cellMap)
+        'nabs.Run(task.redMap)
 
         'Dim trainList As New List(Of cvb.Scalar)
         'Dim responseList As New List(Of Integer)

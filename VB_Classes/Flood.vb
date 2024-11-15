@@ -214,7 +214,7 @@ Public Class Flood_Motion : Inherits TaskParent
         If task.heartBeat Then
             flood.Run(src)
             redCells = New List(Of rcData)(task.redCells)
-            cellMap = task.cellMap.Clone
+            cellMap = task.redMap.Clone
             dst2 = flood.dst2.Clone
             dst3 = flood.dst2.Clone
             labels(2) = flood.labels(2)
@@ -306,7 +306,7 @@ Public Class Flood_LeftRight : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         task.redCells = New List(Of rcData)(cellsLeft)
-        task.cellMap = mapLeft.Clone
+        task.redMap = mapLeft.Clone
 
         redLeft.genCells.useLeftImage = True
         redLeft.Run(task.leftView)
@@ -315,10 +315,10 @@ Public Class Flood_LeftRight : Inherits TaskParent
         dst2 = redLeft.dst2
 
         cellsLeft = New List(Of rcData)(task.redCells)
-        mapLeft = task.cellMap.Clone
+        mapLeft = task.redMap.Clone
 
         task.redCells = New List(Of rcData)(cellsRight)
-        task.cellMap = mapRight.Clone
+        task.redMap = mapRight.Clone
 
         redRight.genCells.useLeftImage = False
         redRight.Run(task.rightView)
@@ -327,7 +327,7 @@ Public Class Flood_LeftRight : Inherits TaskParent
         dst3 = redRight.dst2
 
         cellsRight = New List(Of rcData)(task.redCells)
-        mapRight = task.cellMap.Clone
+        mapRight = task.redMap.Clone
 
         If task.redOptions.IdentifyCells.Checked Then
             If task.mousePicTag = 2 Then

@@ -59,7 +59,7 @@ Public Class RedCloud_Reduction : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
-        dst3 = task.cellMap
+        dst3 = task.redMap
         dst2 = redC.dst2
         labels = redC.labels
     End Sub
@@ -84,7 +84,7 @@ Public Class RedCloud_Hulls : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim defectCount As Integer
-        task.cellMap.SetTo(0)
+        task.redMap.SetTo(0)
         Dim redCells As New List(Of rcData)
         For Each rc In task.redCells
             If rc.contour.Count >= 5 Then
@@ -97,7 +97,7 @@ Public Class RedCloud_Hulls : Inherits TaskParent
                     defectCount += 1
                 End Try
                 DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
-                DrawContour(task.cellMap(rc.rect), rc.hull, rc.index, -1)
+                DrawContour(task.redMap(rc.rect), rc.hull, rc.index, -1)
             End If
             redCells.Add(rc)
         Next
@@ -1124,7 +1124,7 @@ Public Class RedCloud_Cells : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        cellmap = task.cellMap
+        cellmap = task.redMap
         redCells = task.redCells
     End Sub
 End Class
@@ -1150,7 +1150,7 @@ Public Class RedCloud_Flippers : Inherits TaskParent
         dst3 = redC.dst3
         labels(3) = redC.labels(2)
 
-        Static lastMap As cvb.Mat = task.cellMap.Clone
+        Static lastMap As cvb.Mat = task.redMap.Clone
         dst2.SetTo(0)
         Dim unMatched As Integer
         Dim unMatchedPixels As Integer
@@ -1226,7 +1226,7 @@ Public Class RedCloud_OnlyColorHist3D : Inherits TaskParent
         labels(2) = hColor.labels(3)
 
         redC.Run(dst2)
-        dst3 = task.cellMap
+        dst3 = task.redMap
         dst3.SetTo(0, task.noDepthMask)
         labels(3) = redC.labels(2)
     End Sub
@@ -1245,11 +1245,11 @@ Public Class RedCloud_OnlyColorAlt : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         redMasks.Run(src)
         Dim lastCells As New List(Of rcData)(task.redCells)
-        Dim lastMap As cvb.Mat = task.cellMap.Clone
+        Dim lastMap As cvb.Mat = task.redMap.Clone
         Dim lastColors As cvb.Mat = dst3.Clone
 
         Dim newCells As New List(Of rcData)
-        task.cellMap.SetTo(0)
+        task.redMap.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cvb.Vec3b)({black})
         Dim unmatched As Integer
@@ -1266,10 +1266,10 @@ Public Class RedCloud_OnlyColorAlt : Inherits TaskParent
             End If
             usedColors.Add(cell.color)
 
-            If task.cellMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
+            If task.redMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
                 cell.index = task.redCells.Count
                 newCells.Add(cell)
-                task.cellMap(cell.rect).SetTo(cell.index, cell.mask)
+                task.redMap(cell.rect).SetTo(cell.index, cell.mask)
                 dst3(cell.rect).SetTo(cell.color, cell.mask)
             End If
         Next
@@ -1300,7 +1300,7 @@ Public Class RedCloud_Gaps : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(3)
 
-        frames.Run(task.cellMap.InRange(0, 0))
+        frames.Run(task.redMap.InRange(0, 0))
         dst3 = frames.dst2
 
         If task.redCells.Count > 0 Then
@@ -1804,14 +1804,14 @@ Public Class RedCloud_TopXHulls : Inherits TaskParent
         labels = topX.redC.labels
 
         Dim newCells As New List(Of rcData)
-        task.cellMap.SetTo(0)
+        task.redMap.SetTo(0)
         dst2.SetTo(0)
         For Each rc In task.redCells
             If rc.contour.Count >= 5 Then
                 rc.hull = cvb.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
                 DrawContour(dst2(rc.rect), rc.hull, rc.color, -1)
                 DrawContour(rc.mask, rc.hull, 255, -1)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+                task.redMap(rc.rect).SetTo(rc.index, rc.mask)
             End If
             newCells.Add(rc)
             If rc.index > topX.options.topX Then Exit For
@@ -1946,11 +1946,11 @@ Public Class RedCloud_Consistent1 : Inherits TaskParent
         redC.Run(src)
         dst2 = redC.dst2
 
-        diff.Run(task.cellMap)
+        diff.Run(task.redMap)
         dst1 = diff.dst2
 
         cellLists.Add(New List(Of rcData)(task.redCells))
-        cellmaps.Add(task.cellMap And Not dst1)
+        cellmaps.Add(task.redMap And Not dst1)
         diffs.Add(dst1.Clone)
 
         task.redCells.Clear()
@@ -1973,10 +1973,10 @@ Public Class RedCloud_Consistent1 : Inherits TaskParent
         Next
 
         dst2.SetTo(0)
-        task.cellMap.SetTo(0)
+        task.redMap.SetTo(0)
         For Each rc In task.redCells
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
         For Each mat In diffs
@@ -2014,11 +2014,11 @@ Public Class RedCloud_Consistent2 : Inherits TaskParent
         redC.Run(src)
         dst2 = redC.dst2
 
-        diff.Run(task.cellMap)
+        diff.Run(task.redMap)
         dst1 = diff.dst2
 
         cellLists.Add(New List(Of rcData)(task.redCells))
-        cellmaps.Add(task.cellMap And Not dst1)
+        cellmaps.Add(task.redMap And Not dst1)
         diffs.Add(dst1.Clone)
 
         task.redCells.Clear()
@@ -2041,10 +2041,10 @@ Public Class RedCloud_Consistent2 : Inherits TaskParent
         Next
 
         dst2.SetTo(0)
-        task.cellMap.SetTo(0)
+        task.redMap.SetTo(0)
         For Each rc In task.redCells
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
         For Each mat In diffs
@@ -2079,7 +2079,7 @@ Public Class RedCloud_Consistent : Inherits TaskParent
         redC.Run(src)
 
         cellLists.Add(New List(Of rcData)(task.redCells))
-        cellmaps.Add(task.cellMap.Clone)
+        cellmaps.Add(task.redMap.Clone)
 
         Dim newCells As New List(Of rcData)
         newCells.Add(New rcData)
@@ -2245,20 +2245,20 @@ Public Class RedCloud_ColorAndDepth : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         task.redOptions.setUseColorOnly(True)
         task.redCells = New List(Of rcData)(colorCells)
-        task.cellMap = colorMap.Clone
+        task.redMap = colorMap.Clone
         flood.Run(src)
         dst2 = flood.dst2
         colorCells = New List(Of rcData)(task.redCells)
-        colorMap = task.cellMap.Clone
+        colorMap = task.redMap.Clone
         labels(2) = flood.labels(2)
 
         task.redOptions.UseDepth.Checked = True
         task.redCells = New List(Of rcData)(depthCells)
-        task.cellMap = depthMap.Clone
+        task.redMap = depthMap.Clone
         floodPC.Run(src)
         dst3 = floodPC.dst2
         depthCells = New List(Of rcData)(task.redCells)
-        depthMap = task.cellMap.Clone
+        depthMap = task.redMap.Clone
         labels(3) = floodPC.labels(2)
 
         If task.mouseClickFlag Then mousePicTag = task.mousePicTag

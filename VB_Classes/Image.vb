@@ -73,7 +73,7 @@ Public Class Image_RedCloudColor : Inherits TaskParent
         redC.Run(dst0)
         dst2 = redC.dst2
 
-        Dim mask = task.cellMap.InRange(0, 0)
+        Dim mask = task.redMap.InRange(0, 0)
         dst2.SetTo(cvb.Scalar.Black, mask)
 
         labels(2) = redC.labels(2)

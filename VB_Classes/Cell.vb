@@ -370,7 +370,7 @@ Public Class Cell_Generate : Inherits TaskParent
     Dim bounds As Boundary_RemovedRects
     Dim redCPP As RedCloud_CPP_VB
     Public Sub New()
-        task.cellMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.redMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         task.redCells = New List(Of rcData)
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub
@@ -378,9 +378,9 @@ Public Class Cell_Generate : Inherits TaskParent
         If standalone Then
             If bounds Is Nothing Then bounds = New Boundary_RemovedRects
             bounds.Run(src)
-            task.cellMap = bounds.bRects.bounds.dst2
-            src = task.cellMap Or bounds.dst2
-            If task.FirstPass Then task.cellMap.SetTo(0)
+            task.redMap = bounds.bRects.bounds.dst2
+            src = task.redMap Or bounds.dst2
+            If task.FirstPass Then task.redMap.SetTo(0)
 
             redCPP = bounds.bRects.bounds.redCPP
 
@@ -419,7 +419,7 @@ Public Class Cell_Generate : Inherits TaskParent
             rc.naturalGray = CInt(rc.colorMean(2) * 0.299 + rc.colorMean(1) * 0.587 + rc.colorMean(0) * 0.114)
 
             rc.maxDist = GetMaxDist(rc)
-            rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If useLeftImage Then rc.motionPixels = diffLeft.dst2(rc.rect).CountNonZero Else rc.motionPixels = diffRight.dst2(rc.rect).CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
@@ -439,7 +439,7 @@ Public Class Cell_Generate : Inherits TaskParent
                 If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
 
                 rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-                rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
                 If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                     Dim lrc = task.redCells(rc.indexLast)
@@ -448,9 +448,9 @@ Public Class Cell_Generate : Inherits TaskParent
                         rc.exactMatch = True
                     Else
                         rc.color = lrc.color
-                        Dim stableCheck = task.cellMap.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
+                        Dim stableCheck = task.redMap.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
                         If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-                        Dim val = task.cellMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                        Dim val = task.redMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                         If val <> rc.indexLast Then rc.maxDStable = rc.maxDist ' maxDist has finally hit the edges of the cell.
                         rc.pointMatch = True
                     End If

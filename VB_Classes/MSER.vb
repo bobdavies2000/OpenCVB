@@ -39,7 +39,7 @@ Public Class MSER_Basics : Inherits TaskParent
             rc.floodPoint = floodPoints(index)
             rc.maxDist = GetMaxDist(rc)
 
-            rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If rc.indexLast <> 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
                 rc.maxDStable = lrc.maxDStable

@@ -63,7 +63,7 @@ Public Class Neighbors_Intersects : Inherits TaskParent
         If standaloneTest() Or src.Type <> cvb.MatType.CV_8U Then
             redC.Run(src)
             dst2 = redC.dst2
-            src = task.cellMap
+            src = task.redMap
             labels(2) = redC.labels(2)
         End If
 
@@ -119,7 +119,7 @@ Public Class Neighbors_ColorOnly : Inherits TaskParent
         redC.Run(src)
         dst2 = redC.dst2
 
-        corners.Run(task.cellMap.Clone())
+        corners.Run(task.redMap.Clone())
         For Each pt In corners.nPoints
             DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
         Next
@@ -151,7 +151,7 @@ Public Class Neighbors_Precise : Inherits TaskParent
             dst2 = redC.dst2
             labels = redC.labels
 
-            src = task.cellMap
+            src = task.redMap
             redCells = task.redCells
         End If
 

@@ -120,7 +120,7 @@ Public Class Tessallate_QuadSimple : Inherits TaskParent
             Dim roi = task.gridRects(i)
 
             Dim center = New cvb.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then Continue For
             Dim rc = task.redCells(index)
@@ -179,7 +179,7 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
             Dim roi = task.gridRects(i)
 
             Dim center = New cvb.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then
                 depthList(i).Clear()
@@ -259,7 +259,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
             Dim roi = task.gridRects(i)
 
             Dim center = New cvb.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then
                 depthList1(i).Clear()
@@ -351,7 +351,7 @@ Public Class Tessallate_Bricks : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
             Dim center = New cvb.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-            Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
             Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cvb.Point, maxLoc As cvb.Point
             If index >= 0 Then
                 task.pcSplit(2)(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))

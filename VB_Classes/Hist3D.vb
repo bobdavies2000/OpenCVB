@@ -310,11 +310,11 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
     End Function
     Public Sub RunAlg(src As cvb.Mat)
         pixels.Run(src)
-        dst2 = task.cellMap
+        dst2 = task.redMap
         dst3 = dst2.InRange(0, 0)
         If pixels.pixelVector.Count = 0 Then Exit Sub
         dst1.SetTo(0)
-        dst0 = task.cellMap
+        dst0 = task.redMap
         For Each roi In task.gridRects
             If dst3(roi).CountNonZero Then
                 Dim candidates As New List(Of Integer)

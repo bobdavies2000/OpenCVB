@@ -196,7 +196,7 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
         bin3.Run(src)
 
         For i = options.startRegion To options.endRegion
-            task.cellMap = cellMaps(i)
+            task.redMap = cellMaps(i)
             task.redCells = redCells(i)
             If i = 2 Then
                 flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
@@ -206,7 +206,7 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
                 flood.inputMask = Not bin3.bin3.mats.mat(i)
                 flood.Run(bin3.bin3.mats.mat(i))
             End If
-            cellMaps(i) = task.cellMap.Clone
+            cellMaps(i) = task.redMap.Clone
             redCells(i) = New List(Of rcData)(task.redCells)
         Next
 
@@ -253,11 +253,11 @@ Public Class Bin3Way_RedCloud : Inherits TaskParent
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
-            task.cellMap = cellMaps(i)
+            task.redMap = cellMaps(i)
             task.redCells = redCells(i)
             flood.inputMask = Not bin3.bin3.mats.mat(i)
             flood.Run(bin3.bin3.mats.mat(i))
-            cellMaps(i) = task.cellMap.Clone
+            cellMaps(i) = task.redMap.Clone
             redCells(i) = New List(Of rcData)(task.redCells)
             For Each rc In redCells(i)
                 If rc.index = 0 Then Continue For

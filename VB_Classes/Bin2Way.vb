@@ -178,11 +178,11 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
-            task.cellMap = cellMaps(i)
+            task.redMap = cellMaps(i)
             task.redCells = redCells(i)
             flood.inputMask = Not bin2.mats.mat(i)
             flood.Run(bin2.mats.mat(i))
-            cellMaps(i) = task.cellMap.Clone
+            cellMaps(i) = task.redMap.Clone
             redCells(i) = New List(Of rcData)(task.redCells)
             For Each rc In task.redCells
                 If rc.index = 0 Then Continue For

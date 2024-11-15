@@ -204,7 +204,7 @@ Public Class RedTrack_GoodCells : Inherits TaskParent
         Dim trackCells As New List(Of rcData)
         Dim trackIndex As New List(Of Integer)
         For Each pt In good.featureList
-            Dim index = task.cellMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim index = task.redMap.Get(Of Byte)(pt.Y, pt.X)
             If trackIndex.Contains(index) = False Then
                 Dim rc = task.redCells(index)
                 If rc.hull Is Nothing Then Continue For

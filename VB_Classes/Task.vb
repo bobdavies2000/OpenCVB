@@ -265,7 +265,7 @@ Public Class VBtask : Implements IDisposable
 
     Public rc As New rcData
     Public redCells As New List(Of rcData)
-    Public cellMap As cvb.Mat
+    Public redMap As cvb.Mat
 
     Public features As New List(Of cvb.Point2f)
     Public featurePoints As New List(Of cvb.Point)
@@ -404,7 +404,7 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add("Options_XYRanges") ' so calltrace is not nothing on initial call...
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
-        task.cellMap = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.redMap = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
 
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
@@ -497,7 +497,7 @@ Public Class VBtask : Implements IDisposable
     Public Sub setSelectedContour()
         If task.redCells.Count = 0 Then Exit Sub
         If task.ClickPoint = newPoint And task.redCells.Count > 1 Then task.ClickPoint = task.redCells(1).maxDist
-        Dim index = task.cellMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim index = task.redMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
         If index > 0 And index < task.redCells.Count Then
             ' task.ClickPoint = task.redCells(index).maxDist
             task.rc = task.redCells(index)
