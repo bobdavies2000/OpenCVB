@@ -33,11 +33,10 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
         labels(2) = genCells.labels(2)
 
-        dst3.SetTo(0)
         Dim cellCount As Integer
         For Each rc In task.redCells
             If rc.pixels > smallCellThreshold Then
-                DrawCircle(dst3, rc.maxDist, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, rc.maxDist, task.DotSize, task.HighlightColor)
                 cellCount += 1
             End If
         Next
@@ -1712,64 +1711,6 @@ End Class
 
 
 
-Public Class RedCloud_Combine : Inherits TaskParent
-    Dim color8U As New Color8U_Basics
-    Public guided As New GuidedBP_Depth
-    Public redMasks As New RedCloud_Basics
-    Public combinedCells As New List(Of rcData)
-    Dim maxDepth As New Depth_MaxMask
-    Dim prep As New RedCloud_Reduce
-    Public Sub New()
-        desc = "Combined the color and cloud as indicated in the RedOptions panel."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        maxDepth.Run(src)
-        If task.redOptions.UseColorOnly.Checked Or task.redOptions.UseGuidedProjection.Checked Then
-            redMasks.inputMask.SetTo(0)
-            If src.Channels() = 3 Then
-                color8U.Run(src)
-                dst2 = color8U.dst2.Clone
-            Else
-                dst2 = src
-            End If
-        Else
-            redMasks.inputMask = task.noDepthMask
-            dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        End If
-
-        If task.redOptions.UseDepth.Checked Or task.redOptions.UseGuidedProjection.Checked Then
-            Select Case task.redOptions.depthInputIndex
-                Case 0 ' "GuidedBP_Depth"
-                    guided.Run(src)
-                    If color8U.classCount > 0 Then guided.dst2 += color8U.classCount
-                    guided.dst2.CopyTo(dst2, task.depthMask)
-                Case 1 ' "RedCloud_Reduce"
-                    prep.Run(task.pointCloud)
-                    If color8U.classCount > 0 Then prep.dst2 += color8U.classCount
-                    prep.dst2.CopyTo(dst2, task.depthMask)
-            End Select
-        End If
-
-        redMasks.Run(dst2)
-        dst2 = redMasks.dst2
-        dst3 = redMasks.dst3
-
-        combinedCells.Clear()
-        Dim drawRectOnlyRun As Boolean
-        If task.drawRect.Width * task.drawRect.Height > 10 Then drawRectOnlyRun = True
-        For Each rc In task.redCells
-            If drawRectOnlyRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
-            combinedCells.Add(rc)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class RedCloud_TopX : Inherits TaskParent
@@ -2809,5 +2750,64 @@ Public Class RedCloud_CellFeatures : Inherits TaskParent
         dst3 = redC.dst2
         dst3.SetTo(0, task.fLessMask)
         labels(3) = CStr(task.featureRects.Count) + " feature cells were found."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_Combine : Inherits TaskParent
+    Dim color8U As New Color8U_Basics
+    Public guided As New GuidedBP_Depth
+    Public redC As New RedCloud_Basics
+    Public combinedCells As New List(Of rcData)
+    Dim maxDepth As New Depth_MaxMask
+    Dim prep As New RedCloud_Reduce
+    Public Sub New()
+        desc = "Combine the color and cloud as indicated in the RedOptions panel."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        maxDepth.Run(src)
+        If task.redOptions.UseColorOnly.Checked Or task.redOptions.UseGuidedProjection.Checked Then
+            redC.inputMask.SetTo(0)
+            If src.Channels() = 3 Then
+                color8U.Run(src)
+                dst2 = color8U.dst2.Clone
+            Else
+                dst2 = src
+            End If
+        Else
+            redC.inputMask = task.noDepthMask
+            dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        End If
+
+        If task.redOptions.UseDepth.Checked Or task.redOptions.UseGuidedProjection.Checked Then
+            Select Case task.redOptions.depthInputIndex
+                Case 0 ' "GuidedBP_Depth"
+                    guided.Run(src)
+                    If color8U.classCount > 0 Then guided.dst2 += color8U.classCount
+                    guided.dst2.CopyTo(dst2, task.depthMask)
+                Case 1 ' "RedCloud_Reduce"
+                    prep.Run(task.pointCloud)
+                    If color8U.classCount > 0 Then prep.dst2 += color8U.classCount
+                    prep.dst2.CopyTo(dst2, task.depthMask)
+            End Select
+        End If
+
+        redC.Run(dst2)
+        dst2 = redC.dst2
+
+        combinedCells.Clear()
+        Dim drawRectOnlyRun As Boolean
+        If task.drawRect.Width * task.drawRect.Height > 10 Then drawRectOnlyRun = True
+        For Each rc In task.redCells
+            If drawRectOnlyRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
+            combinedCells.Add(rc)
+        Next
+        labels(2) = CStr(combinedCells.Count) + " cells were found.  Dots indicate maxDist points."
     End Sub
 End Class

@@ -6,6 +6,7 @@ Public Class FCS_BareBones : Inherits TaskParent
     Dim fcsD As New FCS_Delaunay
     Dim nabes As New FCS_Neighbors
     Dim feat As New Feature_Basics
+    Public inputPoints As New List(Of cvb.Point2f)
     Public Sub New()
         task.ClickPoint = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
         FindSlider("Min Distance to next").Value = task.fPointMinDistance
@@ -16,8 +17,14 @@ Public Class FCS_BareBones : Inherits TaskParent
         options.RunOpt()
 
         dst0 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        task.features = cvb.Cv2.GoodFeaturesToTrack(dst0, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
-                                                          options.blockSize, True, options.k).ToList
+
+        If inputPoints.Count = 0 Then
+            task.features = cvb.Cv2.GoodFeaturesToTrack(dst0, options.featurePoints, options.quality,
+                                                        options.minDistance, New cvb.Mat, options.blockSize,
+                                                        True, options.k).ToList
+        Else
+            task.features = inputPoints
+        End If
 
         task.features = feat.motionFilter(task.features)
         fcsD.featureInput = task.features
@@ -1055,5 +1062,55 @@ Public Class FCS_Edges : Inherits TaskParent
             DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
         Next
         dst3.SetTo(cvb.Scalar.White, task.fpOutline)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_RedCloud : Inherits TaskParent
+    Dim redC As New RedCloud_Combine
+    Dim fcs As New FCS_BareBones
+    Dim knn As New KNN_Basics
+    Public Sub New()
+        desc = "Use the RedCloud maxDist points as feature points in an FCS display."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static minSlider = FindSlider("Min Distance to next")
+        Dim minDistance = minSlider.value
+
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        knn.queries.Clear()
+        For Each rc In task.redCells
+            knn.queries.Add(rc.maxDist)
+        Next
+        knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
+        knn.Run(empty)
+
+        Dim tooClose As New List(Of (cvb.Point2f, cvb.Point2f))
+        For i = 0 To knn.result.GetUpperBound(0)
+            For j = 1 To knn.result.GetUpperBound(1)
+                Dim p1 = knn.queries(knn.result(i, j))
+                Dim p2 = knn.queries(knn.result(i, j - 1))
+                If p1.DistanceTo(p2) > minDistance Then Exit For
+                If tooClose.Contains((p2, p1)) = False Then tooClose.Add((p1, p2))
+            Next
+        Next
+
+        For Each tuple In tooClose
+            If knn.queries.Contains(tuple.Item2) Then
+                knn.queries.RemoveAt(knn.queries.IndexOf(tuple.Item2))
+            End If
+        Next
+
+        fcs.inputPoints = New List(Of cvb.Point2f)(knn.queries)
+        fcs.Run(src)
+        dst3 = fcs.dst2
+        labels(3) = fcs.labels(2)
     End Sub
 End Class

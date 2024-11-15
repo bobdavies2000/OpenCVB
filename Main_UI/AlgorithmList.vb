@@ -1026,6 +1026,7 @@ End Enum
 	If algorithmName = "FCS_Neighbors" Then return new FCS_Neighbors
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "FCS_Periphery" Then return new FCS_Periphery
+	If algorithmName = "FCS_RedCloud" Then return new FCS_RedCloud
 	If algorithmName = "FCS_ViewLeft" Then return new FCS_ViewLeft
 	If algorithmName = "FCS_ViewLeftRight" Then return new FCS_ViewLeftRight
 	If algorithmName = "FCS_ViewRight" Then return new FCS_ViewRight
@@ -2947,6 +2948,7 @@ End Enum
 	If algorithmName = "PointCloud_FrustrumTop_CS" Then return new PointCloud_FrustrumTop_CS
 	If algorithmName = "PointCloud_Histograms" Then return new PointCloud_Histograms
 	If algorithmName = "PointCloud_Histograms_CS" Then return new PointCloud_Histograms_CS
+	If algorithmName = "PointCloud_Infinities" Then return new PointCloud_Infinities
 	If algorithmName = "PointCloud_Inspector" Then return new PointCloud_Inspector
 	If algorithmName = "PointCloud_Inspector_CS" Then return new PointCloud_Inspector_CS
 	If algorithmName = "PointCloud_NeighborV" Then return new PointCloud_NeighborV

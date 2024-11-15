@@ -677,6 +677,9 @@ Public Class PointCloud_PCpointsMask : Inherits TaskParent
             For x = 0 To task.gridCols - 1
                 Dim roi = task.gridRects(y * task.gridCols + x)
                 Dim mean = task.pointCloud(roi).Mean(task.depthMask(roi))
+                If Single.IsNaN(mean(0)) Then Continue For
+                If Single.IsNaN(mean(1)) Then Continue For
+                If Single.IsInfinity(mean(2)) Then Continue For
                 Dim depthPresent = task.depthMask(roi).CountNonZero > roi.Width * roi.Height / 2
                 If (depthPresent And mean(2) > 0 And Math.Abs(lastMeanZ - mean(2)) < 0.2 And
                     mean(2) < task.MaxZmeters) Or (lastMeanZ = 0 And mean(2) > 0) Then
@@ -1112,5 +1115,29 @@ Public Class PointCloud_Split : Inherits TaskParent
         labels(1) = "Min/Max for X " + Format(mmx.minVal, fmt1) + " / " + Format(mmx.maxVal, fmt1)
         labels(2) = "Min/Max for Y " + Format(mmy.minVal, fmt1) + " / " + Format(mmy.maxVal, fmt1)
         labels(3) = "Min/Max for Z " + Format(mmz.minVal, fmt1) + " / " + Format(mmz.maxVal, fmt1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_Infinities : Inherits TaskParent
+    Public Sub New()
+        desc = "Find out if pointcloud has an nan's or inf's."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Dim infTotal(2) As Integer
+        For y = 0 To src.Rows - 1
+            For x = 0 To src.Cols - 1
+                Dim vec = task.pointCloud.Get(Of cvb.Vec3f)(y, x)
+                If Single.IsInfinity(vec(0)) Then infTotal(0) += 1
+                If Single.IsInfinity(vec(1)) Then infTotal(1) += 1
+                If Single.IsInfinity(vec(2)) Then infTotal(2) += 1
+            Next
+        Next
+        SetTrueText("infinities: X " + CStr(infTotal(0)) + ", Y = " + CStr(infTotal(1)) + " Z = " +
+                    CStr(infTotal(2)))
     End Sub
 End Class

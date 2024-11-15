@@ -156,7 +156,8 @@ Public Class Feature_Stable : Inherits TaskParent
 
                 For i = 0 To knn.queries.Count - 1
                     Dim pt = knn.queries(i)
-                    Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                    Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad,
+                                                         options.templateSize, options.templateSize))
                     featureMatList.Add(src(rect))
                     task.features.Add(knn.trainInput(knn.result(i, 0)))
                 Next

@@ -5423,9 +5423,6 @@ End Class
 
 
 
-
-
-
 Public Class Options_Features : Inherits TaskParent
     Public quality As Double = 0.01
     Public minDistance As Double = 1

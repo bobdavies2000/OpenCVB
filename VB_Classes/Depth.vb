@@ -1435,7 +1435,9 @@ Public Class Depth_Tiers : Inherits TaskParent
         dst1.ConvertTo(dst2, cvb.MatType.CV_8U)
 
         Dim mm = GetMinMax(src)
-        classCount = (mm.maxVal - mm.minVal) * 100 / options.cmPerTier + 1
+        If Not Single.IsInfinity(mm.minVal) And Not Single.IsInfinity(mm.maxVal) Then
+            classCount = (mm.maxVal - mm.minVal) * 100 / options.cmPerTier + 1
+        End If
 
         dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(2) = $"{classCount} regions found."
