@@ -1346,6 +1346,7 @@ public:
 	double alpha =  100;
 	double omega =  100;
 	int gapDistance =  5;
+	int threshold =  128;
 	int gapdiff =  10;
 	void RunOpt() {}
 	Options_Edges3() {

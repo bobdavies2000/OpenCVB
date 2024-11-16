@@ -5255,11 +5255,13 @@ Public Class Options_Edges3 : Inherits TaskParent
     Public alpha As Double = 100
     Public omega As Double = 100
     Public gapDistance As Integer = 5
+    Public threshold As Integer = 128
     Public gapdiff As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Deriche Alpha X100", 1, 400, alpha)
             sliders.setupTrackBar("Deriche Omega X1000", 1, 1000, omega)
+            sliders.setupTrackBar("Output filter threshold", 0, 255, threshold)
             sliders.setupTrackBar("Input pixel distance", 0, 20, gapDistance)
             sliders.setupTrackBar("Input pixel difference", 0, 50, If(task.dst2.Width = 640, gapdiff, 20))
         End If
@@ -5267,8 +5269,10 @@ Public Class Options_Edges3 : Inherits TaskParent
     Public Sub RunOpt()
         Static alphaSlider = FindSlider("Deriche Alpha X100")
         Static omegaSlider = FindSlider("Deriche Omega X1000")
+        Static thresholdSlider = FindSlider("Output filter threshold")
         alpha = alphaSlider.value / 100
         omega = omegaSlider.value / 100
+        threshold = thresholdSlider.value
 
         Static distanceSlider = FindSlider("Input pixel distance")
         Static diffSlider = FindSlider("Input pixel difference")

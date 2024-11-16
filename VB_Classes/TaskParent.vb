@@ -513,6 +513,16 @@ Public Class TaskParent : Implements IDisposable
         Else
             mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
         End If
+
+        If Double.IsInfinity(mm.maxVal) Then
+            Console.WriteLine("Infinity encountered in " + traceName + " algorithm")
+            If mat.Type = cvb.MatType.CV_32F Then
+                mm.maxVal = Single.MaxValue
+            Else
+                mm.maxVal = Double.MaxValue
+            End If
+        End If
+
         Return mm
     End Function
     Public Sub SetTrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)

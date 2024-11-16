@@ -937,6 +937,119 @@ End Class
 
 
 
+Public Class KNN_TrackEach : Inherits TaskParent
+    Dim knn As New KNN_NoDups
+    Dim feat As New Feature_Stable
+    Dim trackAll As New List(Of List(Of PointPair))
+    Public Sub New()
+        desc = "Track each good feature with KNN and match the goodFeatures from frame to frame"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Dim minDistance = feat.options.minDistance
+        ' if there was no motion, use minDistance to eliminate the unstable points.
+        If task.optionsChanged = False Then minDistance = 2
+
+        feat.Run(src)
+
+        knn.queries = New List(Of cvb.Point2f)(task.features)
+        knn.Run(src)
+
+        Dim tracker As New List(Of PointPair)
+        dst2 = src.Clone
+        For Each mp In knn.matches
+            If mp.p1.DistanceTo(mp.p2) < minDistance Then tracker.Add(mp)
+        Next
+
+        trackAll.Add(tracker)
+
+        For i = 0 To trackAll.Count - 1 Step 2
+            Dim t1 = trackAll(i)
+            For Each mp In t1
+                DrawCircle(dst2,mp.p1, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2,mp.p2, task.DotSize, task.HighlightColor)
+                DrawLine(dst2, mp.p1, mp.p2, cvb.Scalar.Red)
+            Next
+        Next
+
+        labels(2) = CStr(task.features.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
+        SetTrueText(labels(2) + vbCrLf + "The highlighted dots are the good feature points", 3)
+
+        If trackAll.Count > task.frameHistoryCount Then trackAll.RemoveAt(0)
+    End Sub
+End Class
+
+
+
+
+
+Public Class KNN_MinDistance : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Public inputPoints As New List(Of cvb.Point2f)
+    Public outputPoints2f As New List(Of cvb.Point2f)
+    Public outputPoints As New List(Of cvb.Point)
+    Public Sub New()
+        desc = "Enforce a minimum distance to the next feature threshold"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static options As New Options_Edges3
+            Static feat As New Feature_Basics
+            Static agastRadio = FindRadio("Agast Features")
+            If task.FirstPass Then agastRadio.checked = True
+            feat.Run(src)
+            inputPoints = task.features
+        End If
+
+        Static minSlider = FindSlider("Min Distance to next")
+        Dim minDistance = minSlider.value
+
+        knn.queries = New List(Of cvb.Point2f)(inputPoints)
+        knn.trainInput = knn.queries
+        knn.Run(empty)
+
+        dst3.SetTo(0)
+        For Each pt In inputPoints
+            DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White)
+        Next
+        labels(3) = "There were " + CStr(inputPoints.Count) + " points in the input"
+
+        Dim tooClose As New List(Of (cvb.Point2f, cvb.Point2f))
+        For i = 0 To knn.result.GetUpperBound(0)
+            For j = 1 To knn.result.GetUpperBound(1)
+                Dim p1 = knn.queries(knn.result(i, j))
+                Dim p2 = knn.queries(knn.result(i, j - 1))
+                If p1.DistanceTo(p2) > minDistance Then Exit For
+                If tooClose.Contains((p2, p1)) = False Then tooClose.Add((p1, p2))
+            Next
+        Next
+
+        For Each tuple In tooClose
+            Dim p1 = tuple.Item1
+            Dim p2 = tuple.Item2
+            Dim pt = If(p1.X <= p2.X, p1, p2)  ' trim the point with higher x to avoid flickering...
+            If p1.X = p2.X Then pt = If(p1.Y <= p2.Y, p1, p2)
+            If knn.queries.Contains(pt) Then knn.queries.RemoveAt(knn.queries.IndexOf(pt))
+        Next
+
+        dst2 = src
+        outputPoints.Clear()
+        outputPoints2f.Clear()
+        For Each pt In knn.queries
+            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+            outputPoints.Add(pt)
+            outputPoints2f.Add(pt)
+        Next
+        labels(2) = "After filtering for min distance = " + CStr(minDistance) + " there are " +
+                    CStr(knn.queries.Count) + " points"
+    End Sub
+End Class
+
+
+
+
+
+
+
 
 Public Class KNN_Farthest : Inherits TaskParent
     Dim knn As New KNN_Basics
@@ -987,45 +1100,64 @@ End Class
 
 
 
-
-
-Public Class KNN_TrackEach : Inherits TaskParent
-    Dim knn As New KNN_NoDups
-    Dim feat As New Feature_Stable
-    Dim trackAll As New List(Of List(Of PointPair))
+Public Class KNN_MaxDistance : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Public inputPoints As New List(Of cvb.Point2f)
+    Public outputPoints2f As New List(Of cvb.Point2f)
+    Public outputPoints As New List(Of cvb.Point)
     Public Sub New()
-        desc = "Track each good feature with KNN and match the goodFeatures from frame to frame"
+        desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Dim minDistance = feat.options.minDistance
-        ' if there was no motion, use minDistance to eliminate the unstable points.
-        If task.optionsChanged = False Then minDistance = 2
+        If standalone Then
+            Static options As New Options_Edges3
+            Static feat As New Feature_Basics
+            Static agastRadio = FindRadio("Agast Features")
+            If task.FirstPass Then agastRadio.checked = True
+            feat.Run(src)
+            inputPoints = task.features
+        End If
 
-        feat.Run(src)
+        Static minSlider = FindSlider("Min Distance to next")
+        Dim minDistance = minSlider.value
 
-        knn.queries = New List(Of cvb.Point2f)(task.features)
-        knn.Run(src)
+        knn.queries = New List(Of cvb.Point2f)(inputPoints)
+        knn.trainInput = knn.queries
+        knn.Run(empty)
 
-        Dim tracker As New List(Of PointPair)
-        dst2 = src.Clone
-        For Each mp In knn.matches
-            If mp.p1.DistanceTo(mp.p2) < minDistance Then tracker.Add(mp)
+        dst3.SetTo(0)
+        For Each pt In inputPoints
+            DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White)
         Next
+        labels(3) = "There were " + CStr(inputPoints.Count) + " points in the input"
 
-        trackAll.Add(tracker)
-
-        For i = 0 To trackAll.Count - 1 Step 2
-            Dim t1 = trackAll(i)
-            For Each mp In t1
-                DrawCircle(dst2,mp.p1, task.DotSize, task.HighlightColor)
-                DrawCircle(dst2,mp.p2, task.DotSize, task.HighlightColor)
-                DrawLine(dst2, mp.p1, mp.p2, cvb.Scalar.Red)
+        Dim tooClose As New List(Of (cvb.Point2f, cvb.Point2f))
+        For i = 0 To knn.result.GetUpperBound(0)
+            For j = 1 To knn.result.GetUpperBound(1)
+                Dim p1 = knn.queries(knn.result(i, j))
+                Dim p2 = knn.queries(knn.result(i, j - 1))
+                If p1.DistanceTo(p2) > minDistance Then Exit For
+                If tooClose.Contains((p2, p1)) = False Then tooClose.Add((p1, p2))
             Next
         Next
 
-        labels(2) = CStr(task.features.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
-        SetTrueText(labels(2) + vbCrLf + "The highlighted dots are the good feature points", 3)
+        For Each tuple In tooClose
+            Dim p1 = tuple.Item1
+            Dim p2 = tuple.Item2
+            Dim pt = If(p1.X <= p2.X, p1, p2)  ' trim the point with higher x to avoid flickering...
+            If p1.X = p2.X Then pt = If(p1.Y <= p2.Y, p1, p2)
+            If knn.queries.Contains(pt) Then knn.queries.RemoveAt(knn.queries.IndexOf(pt))
+        Next
 
-        If trackAll.Count > task.frameHistoryCount Then trackAll.RemoveAt(0)
+        dst2 = src
+        outputPoints.Clear()
+        outputPoints2f.Clear()
+        For Each pt In knn.queries
+            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
+            outputPoints.Add(pt)
+            outputPoints2f.Add(pt)
+        Next
+        labels(2) = "After filtering for min distance = " + CStr(minDistance) + " there are " +
+                    CStr(knn.queries.Count) + " points"
     End Sub
 End Class

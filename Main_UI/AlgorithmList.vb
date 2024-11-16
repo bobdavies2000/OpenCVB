@@ -896,6 +896,7 @@ End Enum
 	If algorithmName = "Edge_DepthGap_Native_CS" Then return new Edge_DepthGap_Native_CS
 	If algorithmName = "Edge_Deriche_CPP_CS" Then return new Edge_Deriche_CPP_CS
 	If algorithmName = "Edge_Deriche_CPP_VB" Then return new Edge_Deriche_CPP_VB
+	If algorithmName = "Edge_DericheFiltered" Then return new Edge_DericheFiltered
 	If algorithmName = "Edge_DiffX_CPP_VB" Then return new Edge_DiffX_CPP_VB
 	If algorithmName = "Edge_DiffXYZ" Then return new Edge_DiffXYZ
 	If algorithmName = "Edge_DiffY_CPP_VB" Then return new Edge_DiffY_CPP_VB
@@ -1839,6 +1840,8 @@ End Enum
 	If algorithmName = "KNN_Emax_CS" Then return new KNN_Emax_CS
 	If algorithmName = "KNN_Farthest" Then return new KNN_Farthest
 	If algorithmName = "KNN_Farthest_CS" Then return new KNN_Farthest_CS
+	If algorithmName = "KNN_MaxDistance" Then return new KNN_MaxDistance
+	If algorithmName = "KNN_MinDistance" Then return new KNN_MinDistance
 	If algorithmName = "KNN_NoDups" Then return new KNN_NoDups
 	If algorithmName = "KNN_NoDups_CC" Then return new CPP_Basics(ccFunctionNames._KNN_NoDups_CC)
 	If algorithmName = "KNN_NoDups_CS" Then return new KNN_NoDups_CS

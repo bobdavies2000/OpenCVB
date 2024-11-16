@@ -460,30 +460,6 @@ End Class
 
 
 
-Public Class FCS_Periphery : Inherits TaskParent
-    Dim fcs As New FCS_BareBones
-    Public Sub New()
-        desc = "Display the cells which are on the periphery of the image"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        fcs.Run(src)
-        dst2 = fcs.dst2
-
-        dst3 = dst2.Clone
-        For Each fp In task.fpList
-            If fp.periph Then
-                dst3(fp.rect).SetTo(cvb.Scalar.Gray, fp.mask)
-                DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
-            End If
-        Next
-        dst3.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class FCS_Neighbors : Inherits TaskParent
     Dim fInfo As New FCS_Info
@@ -1073,44 +1049,50 @@ End Class
 Public Class FCS_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Combine
     Dim fcs As New FCS_BareBones
-    Dim knn As New KNN_Basics
+    Dim knnMin As New KNN_MinDistance
     Public Sub New()
         desc = "Use the RedCloud maxDist points as feature points in an FCS display."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Static minSlider = FindSlider("Min Distance to next")
-        Dim minDistance = minSlider.value
-
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        knn.queries.Clear()
+        knnMin.inputPoints.Clear()
         For Each rc In task.redCells
-            knn.queries.Add(rc.maxDist)
+            knnMin.inputPoints.Add(rc.maxDist)
         Next
-        knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
-        knn.Run(empty)
+        knnMin.Run(src)
 
-        Dim tooClose As New List(Of (cvb.Point2f, cvb.Point2f))
-        For i = 0 To knn.result.GetUpperBound(0)
-            For j = 1 To knn.result.GetUpperBound(1)
-                Dim p1 = knn.queries(knn.result(i, j))
-                Dim p2 = knn.queries(knn.result(i, j - 1))
-                If p1.DistanceTo(p2) > minDistance Then Exit For
-                If tooClose.Contains((p2, p1)) = False Then tooClose.Add((p1, p2))
-            Next
-        Next
-
-        For Each tuple In tooClose
-            If knn.queries.Contains(tuple.Item2) Then
-                knn.queries.RemoveAt(knn.queries.IndexOf(tuple.Item2))
-            End If
-        Next
-
-        fcs.inputPoints = New List(Of cvb.Point2f)(knn.queries)
+        fcs.inputPoints = New List(Of cvb.Point2f)(knnMin.outputPoints2f)
         fcs.Run(src)
         dst3 = fcs.dst2
         labels(3) = fcs.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_Periphery : Inherits TaskParent
+    Dim fcs As New FCS_BareBones
+    Public Sub New()
+        desc = "Display the cells which are on the periphery of the image"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+
+        dst3 = dst2.Clone
+        For Each fp In task.fpList
+            If fp.periph Then
+                dst3(fp.rect).SetTo(cvb.Scalar.Gray, fp.mask)
+                DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            End If
+        Next
+        dst3.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
     End Sub
 End Class

@@ -216,40 +216,6 @@ End Class
 
 
 
-' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
-Public Class Edge_Deriche_CPP_VB : Inherits TaskParent
-    Dim options As New Options_Edges3
-    Public Sub New()
-        cPtr = Edge_Deriche_Open()
-        labels(3) = "Image enhanced with Deriche results"
-        desc = "Edge detection using the Deriche X and Y gradients"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        If src.Channels = 1 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
-
-        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Dim imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega)
-        handleSrc.Free()
-
-        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC3, imagePtr).Clone
-        dst3 = src Or dst2
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = Edge_Deriche_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Edge_DCTinput : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim dct As New DCT_FeatureLess
@@ -1473,5 +1439,59 @@ Public Class Edge_Sweep : Inherits TaskParent
         strOut = "Current edge algorithm is " + frm.check(index).text
         labels(2) = strOut
         SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
+Public Class Edge_Deriche_CPP_VB : Inherits TaskParent
+    Public options As New Options_Edges3
+    Public Sub New()
+        cPtr = Edge_Deriche_Open()
+        labels(3) = "Image enhanced with Deriche results"
+        desc = "Edge detection using the Deriche X and Y gradients"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        If src.Channels = 1 Then src = src.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+
+        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+        Dim imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega)
+        handleSrc.Free()
+
+        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC3, imagePtr).Clone
+        dst3 = src Or dst2
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = Edge_Deriche_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Edge_DericheFiltered : Inherits TaskParent
+    Dim deriche As New Edge_Deriche_CPP_VB
+    Public Sub New()
+        desc = "Filter the data from the Deriche algorithm to highlight the edges."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        deriche.Run(src)
+        dst3 = deriche.dst2
+        labels(3) = deriche.labels(2)
+
+        dst1 = dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst1.Threshold(deriche.options.threshold, 255, cvb.ThresholdTypes.Binary)
+
+        labels(2) = "All edges above the " + CStr(deriche.options.threshold) + " threshold in the grayscale copy of dst2"
     End Sub
 End Class
