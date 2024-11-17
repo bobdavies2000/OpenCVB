@@ -1,6 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
+Imports OpenCvSharp
 Public Class KNN_Basics : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Point2f) ' put training data here
@@ -965,8 +966,8 @@ Public Class KNN_TrackEach : Inherits TaskParent
         For i = 0 To trackAll.Count - 1 Step 2
             Dim t1 = trackAll(i)
             For Each mp In t1
-                DrawCircle(dst2,mp.p1, task.DotSize, task.HighlightColor)
-                DrawCircle(dst2,mp.p2, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, mp.p1, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, mp.p2, task.DotSize, task.HighlightColor)
                 DrawLine(dst2, mp.p1, mp.p2, cvb.Scalar.Red)
             Next
         Next
@@ -1026,7 +1027,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
         For Each tuple In tooClose
             Dim p1 = tuple.Item1
             Dim p2 = tuple.Item2
-            Dim pt = If(p1.X <= p2.X, p1, p2)  ' trim the point with higher x to avoid flickering...
+            Dim pt = If(p1.X <= p2.X, p1, p2)  ' trim the point with lower x to avoid flickering...
             If p1.X = p2.X Then pt = If(p1.Y <= p2.Y, p1, p2)
             If knn.queries.Contains(pt) Then knn.queries.RemoveAt(knn.queries.IndexOf(pt))
         Next
@@ -1103,61 +1104,93 @@ End Class
 Public Class KNN_MaxDistance : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public inputPoints As New List(Of cvb.Point2f)
-    Public outputPoints2f As New List(Of cvb.Point2f)
-    Public outputPoints As New List(Of cvb.Point)
+    Public inputIDs As New List(Of Single)
+    Public outputPoints As New List(Of (cvb.Point2f, cvb.Point2f))
+    Public options As New Options_KNN
     Public Sub New()
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            Static options As New Options_Edges3
-            Static feat As New Feature_Basics
-            Static agastRadio = FindRadio("Agast Features")
-            If task.FirstPass Then agastRadio.checked = True
-            feat.Run(src)
-            inputPoints = task.features
+        Static pairList As New List(Of (cvb.Point2f, cvb.Point2f))
+        Static pairIDs As New List(Of Single)
+        options.RunOpt()
+
+        If standalone Or inputPoints.Count = 0 Or task.optionsChanged Then
+            Static peri As New FCS_Periphery
+            peri.Run(src)
+            If task.heartBeat Or task.optionsChanged Then
+                If options.useOutSide Then
+                    inputPoints = peri.ptOutside
+                    inputIDs = peri.ptOutID
+                Else
+                    inputPoints = peri.ptInside
+                    inputIDs = peri.ptInID
+                End If
+
+                knn.queries = New List(Of cvb.Point2f)(inputPoints)
+                knn.trainInput = knn.queries
+                knn.Run(empty)
+
+                dst3 = src.Clone
+                For Each pt In inputPoints
+                    DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White)
+                Next
+                labels(3) = "There were " + CStr(inputPoints.Count) + " points in the input"
+
+                Dim distances As New SortedList(Of Single, (cvb.Point2f, cvb.Point2f))(
+                                                New compareAllowIdenticalSingleInverted)
+
+                For i = 0 To knn.result.GetUpperBound(0)
+                    Dim ptLast = knn.result.GetUpperBound(0)
+                    Dim p1 = knn.queries(knn.result(i, ptLast))
+                    Dim p2 = knn.queries(knn.result(i, 0))
+                    distances.Add(p1.DistanceTo(p2), (p1, p2))
+                Next
+
+                pairList.Clear()
+                For i = 0 To Math.Min(options.topXDistances, distances.Count) - 1
+                    Dim pair = distances.ElementAt(i).Value
+                    If pairList.Contains(pair) = False Then
+                        pairList.Add(pair)
+                    End If
+                Next
+            Else
+                Dim nextPairs As New List(Of (cvb.Point2f, cvb.Point2f))
+                Dim nextIDs As New List(Of Single)
+                For Each pair In pairList
+                    Dim p1 = pair.Item1
+                    Dim p2 = pair.Item2
+                    Dim val = task.fpMap.Get(Of Integer)(p1.Y, p1.X)
+                    Dim fp = task.fpList(val)
+                    Dim index = inputIDs.IndexOf(fp.ID)
+                    If index >= 0 Then
+                        nextPairs.Add((p1, p2))
+                        nextIDs.Add(inputIDs(index))
+                    Else
+                        nextIDs.Add(-1)
+                    End If
+                Next
+
+                pairList.Clear()
+                pairIDs.Clear()
+                For i = 0 To nextPairs.Count - 1
+                    If nextIDs(i) >= 0 Then
+                        pairList.Add(nextPairs(i))
+                        pairIDs.Add(nextIDs(i))
+                    End If
+                Next
+            End If
         End If
-
-        Static minSlider = FindSlider("Min Distance to next")
-        Dim minDistance = minSlider.value
-
-        knn.queries = New List(Of cvb.Point2f)(inputPoints)
-        knn.trainInput = knn.queries
-        knn.Run(empty)
-
-        dst3.SetTo(0)
-        For Each pt In inputPoints
-            DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.White)
-        Next
-        labels(3) = "There were " + CStr(inputPoints.Count) + " points in the input"
-
-        Dim tooClose As New List(Of (cvb.Point2f, cvb.Point2f))
-        For i = 0 To knn.result.GetUpperBound(0)
-            For j = 1 To knn.result.GetUpperBound(1)
-                Dim p1 = knn.queries(knn.result(i, j))
-                Dim p2 = knn.queries(knn.result(i, j - 1))
-                If p1.DistanceTo(p2) > minDistance Then Exit For
-                If tooClose.Contains((p2, p1)) = False Then tooClose.Add((p1, p2))
-            Next
-        Next
-
-        For Each tuple In tooClose
-            Dim p1 = tuple.Item1
-            Dim p2 = tuple.Item2
-            Dim pt = If(p1.X <= p2.X, p1, p2)  ' trim the point with higher x to avoid flickering...
-            If p1.X = p2.X Then pt = If(p1.Y <= p2.Y, p1, p2)
-            If knn.queries.Contains(pt) Then knn.queries.RemoveAt(knn.queries.IndexOf(pt))
-        Next
 
         dst2 = src
         outputPoints.Clear()
-        outputPoints2f.Clear()
-        For Each pt In knn.queries
-            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.White)
-            outputPoints.Add(pt)
-            outputPoints2f.Add(pt)
+        For Each pair In pairList
+            Dim p1 = New cvb.Point(pair.Item1.X, pair.Item1.Y)
+            Dim p2 = New cvb.Point(pair.Item2.X, pair.Item2.Y)
+            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth, task.lineType)
+            outputPoints.Add(pair)
         Next
-        labels(2) = "After filtering for min distance = " + CStr(minDistance) + " there are " +
-                    CStr(knn.queries.Count) + " points"
+        labels(2) = "There were " + CStr(inputPoints.Count) + " input points and " +
+                    CStr(outputPoints.Count) + " pairs output."
     End Sub
 End Class

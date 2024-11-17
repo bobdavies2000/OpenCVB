@@ -1079,6 +1079,12 @@ End Class
 
 Public Class FCS_Periphery : Inherits TaskParent
     Dim fcs As New FCS_BareBones
+
+    Public ptOutside As New List(Of cvb.Point2f)
+    Public ptOutID As New List(Of Single)
+
+    Public ptInside As New List(Of cvb.Point2f)
+    Public ptInID As New List(Of Single)
     Public Sub New()
         desc = "Display the cells which are on the periphery of the image"
     End Sub
@@ -1087,10 +1093,17 @@ Public Class FCS_Periphery : Inherits TaskParent
         dst2 = fcs.dst2
 
         dst3 = dst2.Clone
+        ptOutside.Clear()
+        ptInside.Clear()
         For Each fp In task.fpList
             If fp.periph Then
                 dst3(fp.rect).SetTo(cvb.Scalar.Gray, fp.mask)
                 DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+                ptOutside.Add(fp.pt)
+                ptOutID.Add(fp.ID)
+            Else
+                ptInside.Add(fp.pt)
+                ptInID.Add(fp.ID)
             End If
         Next
         dst3.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)

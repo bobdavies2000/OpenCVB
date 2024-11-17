@@ -1172,6 +1172,7 @@ public:
 	int knnDimension =  2;
 	int numPoints =  10;
 	int multiplier =  10;
+	int topXDistances =  20;
 	void RunOpt() {}
 	Options_KNN() {
 	}
