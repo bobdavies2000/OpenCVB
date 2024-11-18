@@ -225,7 +225,7 @@ Partial Class Main_UI
         Me.AlgorithmDesc.Multiline = True
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
         Me.AlgorithmDesc.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.AlgorithmDesc.Size = New System.Drawing.Size(98, 53)
+        Me.AlgorithmDesc.Size = New System.Drawing.Size(367, 34)
         Me.AlgorithmDesc.TabIndex = 2
         '
         'fpsTimer

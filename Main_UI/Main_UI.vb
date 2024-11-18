@@ -1040,14 +1040,6 @@ Public Class Main_UI
         End If
 
         Me.Show()
-        If settings.cameraFound Then
-            startCamera()
-            While camera Is Nothing ' wait for camera to start...
-                Application.DoEvents()
-                Thread.Sleep(100)
-            End While
-        End If
-
         frameCount = 0
         setupCamPics()
 
@@ -1100,6 +1092,15 @@ Public Class Main_UI
         XYLoc.Visible = True
         'detectorObj = New CameraDetector
         'detectorObj.StartDetector()
+
+        If settings.cameraFound Then
+            startCamera()
+            While camera Is Nothing ' wait for camera to start...
+                Application.DoEvents()
+                Thread.Sleep(100)
+            End While
+        End If
+
         Debug.WriteLine("Main_UI_Load complete.")
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
@@ -1457,7 +1458,6 @@ Public Class Main_UI
         parms.HomeDir = HomeDir.FullName
         parms.cameraName = settings.cameraName
         parms.cameraIndex = settings.cameraIndex
-        If settings.cameraName <> "" Then parms.cameraInfo = camera.cameraInfo
 
         parms.main_hwnd = Me.Handle
         parms.mainFormLocation = New cvb.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
@@ -1480,13 +1480,20 @@ Public Class Main_UI
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
         algorithmTaskHandle.Start(parms)
-        Debug.WriteLine("Start Algorithm completed.")
+        Debug.WriteLine("Main_UI.StartTask completed.")
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
         If parms.algName = "" Then Exit Sub
         algorithmQueueCount += 1
         algorithmFPSrate = 0
         newCameraImages = False
+
+        While 1
+            If camera IsNot Nothing Then
+                parms.cameraInfo = camera.cameraInfo
+                Exit While
+            End If
+        End While
 
         ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
         SyncLock algorithmThreadLock
