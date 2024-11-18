@@ -1781,6 +1781,7 @@ End Enum
 	If algorithmName = "KLT_OpticalFlow_CS" Then return new KLT_OpticalFlow_CS
 	If algorithmName = "KMeans_Basics" Then return new KMeans_Basics
 	If algorithmName = "KMeans_Basics_CS" Then return new KMeans_Basics_CS
+	If algorithmName = "KMeans_Basics1" Then return new KMeans_Basics1
 	If algorithmName = "KMeans_CompareMulti" Then return new KMeans_CompareMulti
 	If algorithmName = "KMeans_CompareMulti_CS" Then return new KMeans_CompareMulti_CS
 	If algorithmName = "KMeans_CustomData" Then return new KMeans_CustomData

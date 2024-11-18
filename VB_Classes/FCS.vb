@@ -1094,7 +1094,10 @@ Public Class FCS_Periphery : Inherits TaskParent
 
         dst3 = dst2.Clone
         ptOutside.Clear()
+        ptOutID.Clear()
         ptInside.Clear()
+        ptInID.Clear()
+
         For Each fp In task.fpList
             If fp.periph Then
                 dst3(fp.rect).SetTo(cvb.Scalar.Gray, fp.mask)

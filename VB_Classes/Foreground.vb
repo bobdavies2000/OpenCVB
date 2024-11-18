@@ -61,6 +61,8 @@ Public Class Foreground_KMeans : Inherits TaskParent
         desc = "Separate foreground and background using Kmeans with k=2."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        task.optionsChanged = True
+
         km.Run(task.pcSplit(2))
 
         Dim minDistance = Single.MaxValue
