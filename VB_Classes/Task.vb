@@ -33,10 +33,6 @@ Public Class VBtask : Implements IDisposable
     Public fpMap As cvb.Mat
     Public fpSrc As cvb.Mat
 
-    Public fpLastList As New List(Of fpData)
-    Public fpLastIDs As New List(Of Single)
-    Public fpLastMap As cvb.Mat
-
     Public fpOutline As cvb.Mat
     Public fpSelected As New fpData
     Public fPointMinDistance As Integer

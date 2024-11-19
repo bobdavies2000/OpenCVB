@@ -605,6 +605,9 @@ Public Class TaskParent : Implements IDisposable
             lastPt = pt
         Next
     End Sub
+    Public Sub drawFeaturePoints(dst As cvb.Mat, ptlist As List(Of cvb.Point), color As cvb.Scalar)
+        DrawContour(dst, ptlist, color, 1)
+    End Sub
     Public Function ShowPalette(input As cvb.Mat) As cvb.Mat
         If input.Type = cvb.MatType.CV_32S Then
             Dim mm = GetMinMax(input)
