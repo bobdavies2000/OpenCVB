@@ -210,17 +210,19 @@ End Structure
 
 
 
-Public Class fPoint ' feature point
+Public Class fpData ' feature point
     Public index As Integer
     Public indexLast As Integer = -1
     Public ID As Single
     Public travelDistance As Single
     Public periph As Boolean
     Public mask As New cvb.Mat
+    Public matRect As New cvb.Rect
     Public rect As cvb.Rect
     Public facet2f As List(Of cvb.Point2f)
     Public facets As List(Of cvb.Point)
     Public pt As cvb.Point
+    Public ptCenter As cvb.Point
     Public rcIndex As Integer
     Public nabeList As New List(Of Integer)
     Public nabeRect As cvb.Rect

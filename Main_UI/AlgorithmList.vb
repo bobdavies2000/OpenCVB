@@ -1028,6 +1028,8 @@ End Enum
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "FCS_Periphery" Then return new FCS_Periphery
 	If algorithmName = "FCS_RedCloud" Then return new FCS_RedCloud
+	If algorithmName = "FCS_TrackList" Then return new FCS_TrackList
+	If algorithmName = "FCS_ValidateID" Then return new FCS_ValidateID
 	If algorithmName = "FCS_ViewLeft" Then return new FCS_ViewLeft
 	If algorithmName = "FCS_ViewLeftRight" Then return new FCS_ViewLeftRight
 	If algorithmName = "FCS_ViewRight" Then return new FCS_ViewRight

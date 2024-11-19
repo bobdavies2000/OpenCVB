@@ -28,13 +28,17 @@ Public Class VBtask : Implements IDisposable
     Public gridNabeRects As New List(Of cvb.Rect)
     Public gridROIclicked As Integer
 
-    Public fpList As New List(Of fPoint)
+    Public fpList As New List(Of fpData)
     Public fpIDlist As New List(Of Single)
-    Public fpLastList As New List(Of fPoint)
-    Public fpLastIDs As New List(Of Single)
     Public fpMap As cvb.Mat
+    Public fpSrc As cvb.Mat
+
+    Public fpLastList As New List(Of fpData)
+    Public fpLastIDs As New List(Of Single)
+    Public fpLastMap As cvb.Mat
+
     Public fpOutline As cvb.Mat
-    Public fpSelected As New fPoint
+    Public fpSelected As New fpData
     Public fPointMinDistance As Integer
     Public fpCorners(3) As Integer
     Public fpCornerRect(3) As cvb.Rect
@@ -439,7 +443,7 @@ Public Class VBtask : Implements IDisposable
         fpList.Clear()
         fpOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         fpMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-        fpSelected = New fPoint
+        fpSelected = New fpData
 
         If parms.useRecordedData Then recordedData = New Replay_Play()
 
