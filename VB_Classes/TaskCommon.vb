@@ -213,6 +213,7 @@ End Structure
 Public Class fpData ' feature point
     Public index As Integer
     Public indexLast As Integer = -1
+    Public generation As Integer
     Public ID As Single
     Public travelDistance As Single
     Public periph As Boolean

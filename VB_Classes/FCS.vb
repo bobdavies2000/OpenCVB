@@ -1,6 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Web.UI
+Imports NAudio.SoundFont
 Public Class FCS_BareBones : Inherits TaskParent
     Dim options As New Options_Features
     Dim fcsD As New FCS_Delaunay
@@ -470,7 +471,15 @@ Public Class FCS_Neighbors : Inherits TaskParent
     Public Sub buildNeighbors()
         For i = 0 To task.fpList.Count - 1
             Dim fp = task.fpList(i)
-            For Each pt In fp.facets
+            Dim facets As New List(Of cvb.Point)(fp.facets)
+            If fp.periph Then
+                facets.Add(fp.rect.TopLeft)
+                facets.Add(fp.rect.Location)
+                facets.Add(fp.rect.BottomRight)
+                facets.Add(New cvb.Point(fp.rect.Location.X + fp.rect.Width, fp.rect.Location.Y))
+            End If
+            fp.nabeRect = fp.rect
+            For Each pt In facets
                 If pt.X < 0 Or pt.X > dst2.Width Then Continue For
                 If pt.Y < 0 Or pt.Y > dst2.Height Then Continue For
                 Dim index As Integer
@@ -488,7 +497,10 @@ Public Class FCS_Neighbors : Inherits TaskParent
                        ptNabe.y >= 0 And ptNabe.y < dst2.Height Then
                         index = task.fpMap.Get(Of Integer)(ptNabe.y, ptNabe.x)
                     End If
-                    If fp.nabeList.Contains(index) = False Then fp.nabeList.Add(index)
+                    If fp.nabeList.Contains(index) = False Then
+                        fp.nabeList.Add(index)
+                        fp.nabeRect = fp.nabeRect.Union(task.fpList(index).rect)
+                    End If
                 Next
             Next
             task.fpList(i) = fp
@@ -504,14 +516,7 @@ Public Class FCS_Neighbors : Inherits TaskParent
     Public Sub buildNeighborImage()
         Dim fp = task.fpSelected
         dst1.SetTo(0)
-        fp.nabeRect = fp.rect
-        For i = 0 To fp.nabeList.Count - 1
-            If fp.nabeList(i) >= 0 And fp.nabeList(i) < task.fpList.Count Then
-                Dim fpNabe = task.fpList(fp.nabeList(i))
-                dst1(fpNabe.rect).SetTo(fpNabe.index, fpNabe.mask)
-                fp.nabeRect = fp.nabeRect.Union(fpNabe.rect)
-            End If
-        Next
+
         task.fpList(fp.index) = fp
         task.fpSelected = fp
         dst1(fp.nabeRect).SetTo(0, task.fpOutline(fp.nabeRect))
@@ -1048,6 +1053,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             fp.ptCenter = GetMaxDist(fp)
             fp.matRect = New cvb.Rect(fp.pt.X - task.gridSize, fp.pt.Y - task.gridSize, task.gridSize * 2, task.gridSize * 2)
             fp.matRect = ValidateRect(fp.matRect)
+            fp.generation = 1
             task.fpList.Add(fp)
             drawFeaturePoints(task.fpOutline, fp.facets, cvb.Scalar.White)
         Next
@@ -1089,10 +1095,8 @@ Public Class FCS_ValidateID : Inherits TaskParent
             For Each index In fp.nabeList
                 Dim fpNabe = task.fpList(index)
                 DrawCircle(dst1, fpNabe.ptCenter, task.DotSize, task.HighlightColor)
-                SetTrueText(Format(fpNabe.ID, "0.0"), fpNabe.ptCenter, 1)
-                Debug.Write(Format(fpNabe.ID, "0.0" + ", "))
+                SetTrueText(CStr(fpNabe.generation), fpNabe.ptCenter, 1)
             Next
-            Debug.WriteLine("")
         End If
         Static finfo As New FCS_Info
         finfo.Run(empty)
@@ -1113,18 +1117,27 @@ Public Class FCS_TrackList : Inherits TaskParent
     Public Sub New()
         desc = "Track each feature with FCS"
     End Sub
+    Private Function fpUpdate(fp As fpData, fpLast As fpData) As fpData
+        While 1
+            If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
+        End While
+        fp.ID = fpLast.ID
+        fp.travelDistance = fp.pt.DistanceTo(fpLast.pt)
+        fp.indexLast = fpLast.index
+        fp.generation = fpLast.generation + 1
+        Return fp
+    End Function
     Public Sub RunAlg(src As cvb.Mat)
-        Dim fpLastList = New List(Of fpData)(task.fpList)
-        Dim fpLastIDs = New List(Of Single)(task.fpIDlist)
-        Dim fpLastMap = task.fpMap.Clone
-        Static fpLastSrc = src.Clone
-
         fcs.Run(src)
         dst2 = fcs.dst2
         Dim fp1 = task.fpSelected
         dst2(fp1.rect).SetTo(cvb.Scalar.White, fp1.mask)
         labels(2) = fcs.labels(2)
 
+        Static fpLastList = New List(Of fpData)(task.fpList)
+        Static fpLastIDs = New List(Of Single)(task.fpIDlist)
+        Static fpLastMap = task.fpMap.Clone
+        Static fpLastSrc = src.Clone
         For i = 0 To task.fpList.Count - 1
             Dim fp = task.fpList(i)
             Dim index = fpLastMap.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
@@ -1133,28 +1146,29 @@ Public Class FCS_TrackList : Inherits TaskParent
                 match.template = fpLastSrc(fpLast.matRect)
                 match.Run(src(fpLast.matRect))
                 If match.correlation > 0.98 Then
-                    While 1
-                        If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
-                    End While
-                    fp.ID = fpLast.ID
-                    fp.travelDistance = fp.pt.DistanceTo(fpLast.pt)
-                    fp.indexLast = fpLast.index
+                    fp = fpUpdate(fp, fpLast)
                 Else
-                    If fp.nabeList.Count > 0 Then
-                        Dim distances As New List(Of Single)
-                        For j = 0 To fp.nabeList.Count - 1
-                            distances.Add(Math.Abs(task.fpList(j).depthMean - fp.depthMean))
-                        Next
-                        fp.indexLast = fp.nabeList(distances.IndexOf(distances.Min))
+                    Dim distances As New List(Of Single)
+                    For j = 0 To fp.nabeList.Count - 1
+                        distances.Add(Math.Abs(task.fpList(j).depthMean - fp.depthMean))
+                    Next
+                    Dim lastIndex = fp.nabeList(distances.IndexOf(distances.Min))
+                    If lastIndex < fpLastList.count Then
+                        fp = fpUpdate(fp, fpLastList(lastIndex))
                     Else
                         fp.indexLast = -1
+                        fp.generation = 1
                     End If
                 End If
                 task.fpList(i) = fp
             End If
         Next
 
+        If task.fpList(0) Is Nothing Then Dim k = 0
 
+        fpLastList = New List(Of fpData)(task.fpList)
+        fpLastIDs = New List(Of Single)(task.fpIDlist)
+        fpLastMap = task.fpMap.Clone
         fpLastSrc = src.Clone
     End Sub
 End Class
