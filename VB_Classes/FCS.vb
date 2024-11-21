@@ -139,11 +139,12 @@ Public Class FCS_Info : Inherits TaskParent
         strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
         strOut += CStr(fp.rect.Width) + "/" + CStr(fp.rect.Height) + vbCrLf
         strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf
+        strOut += "age (in frames) = " + CStr(fp.age) + ", indexLast = " + CStr(fp.indexLast) + vbCrLf
         strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
         strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
         Dim vec = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
-        strOut += "Pointcloud entry: " + Format(vec.X, fmt1) + "/" + Format(vec.Y, fmt1) + "/" +
-                                         Format(vec.Z, fmt1) + vbCrLf
+        strOut += "Pointcloud at fp.pt: " + Format(vec.X, fmt1) + "/" + Format(vec.Y, fmt1) + "/" +
+                                            Format(vec.Z, fmt1) + vbCrLf
         strOut += "Pointcloud mean: " + Format(fp.depthMean, fmt1) + vbCrLf
         strOut += "Color mean B/G/R: " + Format(fp.colorMean(0), fmt1) + "/" +
                               Format(fp.colorMean(1), fmt1) + "/" + Format(fp.colorMean(2), fmt1) + vbCrLf
@@ -845,41 +846,6 @@ End Class
 
 
 
-Public Class FCS_Edges : Inherits TaskParent
-    Dim fcs As New FCS_BareBones
-    Dim edges As New Edge_Canny
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use edges to connect feature points to their neighbors."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        fcs.Run(src)
-        dst2 = src
-
-        edges.Run(src)
-        dst3 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
-
-        For i = 0 To task.fpList.Count - 1
-            Dim fp = task.fpList(i)
-            DrawCircle(dst1, fp.pt, task.DotSize, task.HighlightColor)
-            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
-            fp.rcIndex = task.redMap.Get(Of Byte)(fp.pt.Y, fp.pt.X)
-
-            task.fpList(i) = fp
-
-            'Dim rc = task.redCells(fp.rcIndex)
-            'dst3(fp.rect).SetTo(rc.naturalColor, fp.mask)
-            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
-        Next
-        dst3.SetTo(cvb.Scalar.White, task.fpOutline)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class FCS_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Combine
     Dim fcs As New FCS_BareBones
@@ -1051,9 +1017,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             cvb.Cv2.MeanStdDev(task.color(fp.rect), fp.colorMean, stdev, fp.mask)
 
             fp.ptCenter = GetMaxDist(fp)
-            fp.matRect = New cvb.Rect(fp.pt.X - task.gridSize, fp.pt.Y - task.gridSize, task.gridSize * 2, task.gridSize * 2)
-            fp.matRect = ValidateRect(fp.matRect)
-            fp.generation = 1
+            fp.age = 1
             task.fpList.Add(fp)
             drawFeaturePoints(task.fpOutline, fp.facets, cvb.Scalar.White)
         Next
@@ -1075,13 +1039,10 @@ End Class
 
 
 
-Public Class FCS_ValidateID : Inherits TaskParent
-    Dim fcs As New FCS_TrackList
+Public Class FCS_MatchNeighbors : Inherits TaskParent
+    Dim fcs As New FCS_MatchDepthColor
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
-        If standalone Then task.gOptions.setDisplay1()
-        labels(1) = "fp.index at the fp.ptCenter point."
-        labels(3) = "fp.ID at the fp.ptCenter point"
         desc = "Track all the feature points and show their ID"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -1090,18 +1051,17 @@ Public Class FCS_ValidateID : Inherits TaskParent
         dst2 = fcs.dst2
 
         Dim fp = task.fpSelected
-        If fp.indexLast >= 0 Then
-            dst1.SetTo(0)
-            For Each index In fp.nabeList
-                Dim fpNabe = task.fpList(index)
-                DrawCircle(dst1, fpNabe.ptCenter, task.DotSize, task.HighlightColor)
-                SetTrueText(CStr(fpNabe.generation), fpNabe.ptCenter, 1)
-            Next
-        End If
+        dst3.SetTo(0)
+        For Each index In fp.nabeList
+            Dim fpNabe = task.fpList(index)
+            DrawCircle(dst3, fpNabe.ptCenter, task.DotSize, task.HighlightColor)
+            SetTrueText(CStr(fpNabe.age), fpNabe.ptCenter, 3)
+        Next
         Static finfo As New FCS_Info
         finfo.Run(empty)
-        SetTrueText(finfo.strOut, 1)
-        labels(2) = CStr(task.fpList.Count) + " cells found.  Dots below are at fp.ptCenter (not feature point)"
+        SetTrueText(finfo.strOut, 3)
+        labels(2) = fcs.labels(2)
+        labels(3) = CStr(task.fpList.Count) + " cells found.  Dots below are at fp.ptCenter (not feature point)"
         drawFeaturePoints(dst0, fp.facets, cvb.Scalar.White)
     End Sub
 End Class
@@ -1111,57 +1071,64 @@ End Class
 
 
 
-Public Class FCS_TrackList : Inherits TaskParent
+Public Class FCS_MatchDepthColor : Inherits TaskParent
     Dim fcs As New FCS_BareBones
     Dim match As New Match_Basics
+    Dim options As New Options_FCSMatch
     Public Sub New()
         desc = "Track each feature with FCS"
     End Sub
-    Private Function fpUpdate(fp As fpData, fpLast As fpData) As fpData
-        While 1
-            If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
-        End While
-        fp.ID = fpLast.ID
-        fp.travelDistance = fp.pt.DistanceTo(fpLast.pt)
-        fp.indexLast = fpLast.index
-        fp.generation = fpLast.generation + 1
-        Return fp
-    End Function
     Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
         fcs.Run(src)
         dst2 = fcs.dst2
         Dim fp1 = task.fpSelected
         dst2(fp1.rect).SetTo(cvb.Scalar.White, fp1.mask)
-        labels(2) = fcs.labels(2)
 
         Static fpLastList = New List(Of fpData)(task.fpList)
         Static fpLastIDs = New List(Of Single)(task.fpIDlist)
         Static fpLastMap = task.fpMap.Clone
         Static fpLastSrc = src.Clone
+        Dim correlationCount As Integer, depthColorCount As Integer
+        Dim noMatchCount As Integer, matchMap As Integer
+        Dim depthIndex As Integer, colorIndex As Integer
         For i = 0 To task.fpList.Count - 1
             Dim fp = task.fpList(i)
-            Dim index = fpLastMap.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
-            If index < fpLastList.Count Then
-                Dim fpLast = fpLastList(index)
-                match.template = fpLastSrc(fpLast.matRect)
-                match.Run(src(fpLast.matRect))
-                If match.correlation > 0.98 Then
+            Dim indexLast = fpLastMap.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
+            Dim fpLast = fpLastList(indexLast)
+            Dim index = task.fpMap.Get(Of Integer)(fpLast.ptCenter.Y, fpLast.ptCenter.X)
+            If index = fp.index Then
+                fp = fpUpdate(fp, fpLast)
+                matchMap += 1
+            Else
+                match.template = fpLastSrc(fpLast.rect)
+                match.Run(src(fpLast.naberect))
+                If match.correlation > options.MinCorrelation Then
                     fp = fpUpdate(fp, fpLast)
+                    correlationCount += 1
                 Else
                     Dim distances As New List(Of Single)
                     For j = 0 To fp.nabeList.Count - 1
-                        distances.Add(Math.Abs(task.fpList(j).depthMean - fp.depthMean))
+                        distances.Add(Math.Abs(task.fpList(j).depthMean - fpLast.depthMean))
                     Next
-                    Dim lastIndex = fp.nabeList(distances.IndexOf(distances.Min))
-                    If lastIndex < fpLastList.count Then
-                        fp = fpUpdate(fp, fpLastList(lastIndex))
+                    depthIndex = fp.nabeList(distances.IndexOf(distances.Min))
+                    Dim colorDistance As New List(Of Single)
+                    For j = 0 To fp.nabeList.Count - 1
+                        colorDistance.Add(distance3D(task.fpList(j).colorMean, fpLast.colorMean))
+                    Next
+                    colorIndex = colorDistance.IndexOf(colorDistance.Min)
+                    If colorIndex = depthIndex Then
+                        fp = fpUpdate(fp, fpLastList(colorIndex))
+                        depthColorCount += 1
                     Else
                         fp.indexLast = -1
-                        fp.generation = 1
+                        fp.age = 1
+                        noMatchCount += 1
                     End If
                 End If
-                task.fpList(i) = fp
             End If
+            task.fpList(i) = fp
         Next
 
         If task.fpList(0) Is Nothing Then Dim k = 0
@@ -1170,5 +1137,120 @@ Public Class FCS_TrackList : Inherits TaskParent
         fpLastIDs = New List(Of Single)(task.fpIDlist)
         fpLastMap = task.fpMap.Clone
         fpLastSrc = src.Clone
+        labels(2) = fcs.labels(2) + " Matched with Map/Correlation/Neighbor/Unmatched: " +
+                    CStr(matchMap) + "/" + CStr(correlationCount) + "/" +
+                    CStr(depthColorCount) + "/" + CStr(noMatchCount)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_Edges : Inherits TaskParent
+    Dim fcs As New FCS_BareBones
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use edges to connect feature points to their neighbors."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcs.Run(src)
+        dst2 = src
+
+        edges.Run(src)
+        dst3 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+        dst1.SetTo(0)
+        For i = 0 To task.fpList.Count - 1
+            Dim fp = task.fpList(i)
+            DrawCircle(dst1, fp.pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+            fp.rcIndex = task.redMap.Get(Of Byte)(fp.pt.Y, fp.pt.X)
+
+            task.fpList(i) = fp
+
+            'Dim rc = task.redCells(fp.rcIndex)
+            'dst3(fp.rect).SetTo(rc.naturalColor, fp.mask)
+            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+        Next
+        dst3.SetTo(cvb.Scalar.White, task.fpOutline)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_MatchEdges : Inherits TaskParent
+    Dim fcs As New FCS_BareBones
+    Dim edges As New Edge_Canny
+    Dim match As New Match_Basics
+    Dim options As New Options_FCSMatch
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        labels(3) = "The age of each feature point cell."
+        desc = "Match a feature point cell using edges"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        edges.Run(src)
+        dst1 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        labels(2) = fcs.labels(2)
+
+        Static fpLastList = New List(Of fpData)(task.fpList)
+        Static fpLastIDs = New List(Of Single)(task.fpIDlist)
+        Static fpLastMap = task.fpMap.Clone
+        Static fpLastEdges = dst1.Clone
+        Static fpLastSrc = src.Clone
+
+        Dim matchEdges As Integer, matchSrc As Integer
+        For i = 0 To task.fpList.Count - 1
+            Dim fp As fpData = task.fpList(i)
+            Dim indexLast = fpLastMap.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
+            Dim fpLast = fpLastList(indexLast)
+            Dim index = task.fpMap.Get(Of Integer)(fpLast.ptCenter.Y, fpLast.ptCenter.X)
+            If index = fp.index Then
+                fp = fpUpdate(fp, fpLast)
+            Else
+                match.template = fpLastEdges(fpLast.rect)
+                match.Run(dst1(fpLast.naberect))
+                If match.correlation > options.MinCorrelation Then
+                    fp = fpUpdate(fp, fpLast)
+                    matchEdges += 1
+                Else
+                    match.template = fpLastSrc(fpLast.rect)
+                    match.Run(src(fpLast.nabeRect))
+                    If match.correlation > options.MinCorrelation Then
+                        fp = fpUpdate(fp, fpLast)
+                        matchSrc += 1
+                    Else
+                        fp.indexLast = -1
+                        fp.age = 1
+                    End If
+                End If
+            End If
+            task.fpList(i) = fp
+        Next
+
+        fpLastList = New List(Of fpData)(task.fpList)
+        fpLastIDs = New List(Of Single)(task.fpIDlist)
+        fpLastMap = task.fpMap.Clone
+        fpLastEdges = dst1.Clone
+        fpLastEdges = src.Clone
+        labels(2) = CStr(matchEdges) + " cells were edge matched.  " + CStr(matchSrc) + " cells match with src"
+
+        dst3.SetTo(0)
+        For Each fp In task.fpList
+            DrawCircle(dst1, fp.ptCenter, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, fp.ptCenter, task.DotSize, task.HighlightColor)
+            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
+        Next
     End Sub
 End Class

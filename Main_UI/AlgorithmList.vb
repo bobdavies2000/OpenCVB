@@ -1021,6 +1021,9 @@ End Enum
 	If algorithmName = "FCS_Info" Then return new FCS_Info
 	If algorithmName = "FCS_Lines" Then return new FCS_Lines
 	If algorithmName = "FCS_LinesAndEdges" Then return new FCS_LinesAndEdges
+	If algorithmName = "FCS_MatchDepthColor" Then return new FCS_MatchDepthColor
+	If algorithmName = "FCS_MatchEdges" Then return new FCS_MatchEdges
+	If algorithmName = "FCS_MatchNeighbors" Then return new FCS_MatchNeighbors
 	If algorithmName = "FCS_Motion" Then return new FCS_Motion
 	If algorithmName = "FCS_MotionApplied" Then return new FCS_MotionApplied
 	If algorithmName = "FCS_MotionDirection" Then return new FCS_MotionDirection
@@ -1028,8 +1031,6 @@ End Enum
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "FCS_Periphery" Then return new FCS_Periphery
 	If algorithmName = "FCS_RedCloud" Then return new FCS_RedCloud
-	If algorithmName = "FCS_TrackList" Then return new FCS_TrackList
-	If algorithmName = "FCS_ValidateID" Then return new FCS_ValidateID
 	If algorithmName = "FCS_ViewLeft" Then return new FCS_ViewLeft
 	If algorithmName = "FCS_ViewLeftRight" Then return new FCS_ViewLeftRight
 	If algorithmName = "FCS_ViewRight" Then return new FCS_ViewRight
@@ -2589,6 +2590,7 @@ End Enum
 	If algorithmName = "Options_Erode" Then return new Options_Erode
 	If algorithmName = "Options_Etch_ASketch" Then return new Options_Etch_ASketch
 	If algorithmName = "Options_Extrinsics" Then return new Options_Extrinsics
+	If algorithmName = "Options_FCSMatch" Then return new Options_FCSMatch
 	If algorithmName = "Options_FeatureGather" Then return new Options_FeatureGather
 	If algorithmName = "Options_FeatureMatch" Then return new Options_FeatureMatch
 	If algorithmName = "Options_Features" Then return new Options_Features

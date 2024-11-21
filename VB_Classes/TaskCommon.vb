@@ -213,12 +213,11 @@ End Structure
 Public Class fpData ' feature point
     Public index As Integer
     Public indexLast As Integer = -1
-    Public generation As Integer
+    Public age As Integer
     Public ID As Single
     Public travelDistance As Single
     Public periph As Boolean
     Public mask As New cvb.Mat
-    Public matRect As New cvb.Rect
     Public rect As cvb.Rect
     Public facet2f As List(Of cvb.Point2f)
     Public facets As List(Of cvb.Point)

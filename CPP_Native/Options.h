@@ -2159,3 +2159,9 @@ public:
 	Options_OpenGL() {
 	}
 };
+class Options_FCSMatch {
+public:
+	void RunOpt() {}
+	Options_FCSMatch() {
+	}
+};

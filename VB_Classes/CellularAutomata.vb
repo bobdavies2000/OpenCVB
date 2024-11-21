@@ -68,7 +68,7 @@ Public Class CellularAutomata_Life : Inherits TaskParent
     Dim grid As cvb.Mat
     Dim nextgrid As cvb.Mat
     Dim factor = 8
-    Dim generation As Integer
+    Dim age As Integer
     Public population As Integer
     Public nodeColor = cvb.Scalar.White
     Public backColor = cvb.Scalar.Black
@@ -101,15 +101,15 @@ Public Class CellularAutomata_Life : Inherits TaskParent
         desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If random.options.count <> savePointCount Or generation = 0 Then
+        If random.options.count <> savePointCount Or age = 0 Then
             random.Run(empty)
-            generation = 0
+            age = 0
             savePointCount = random.options.count
             For i = 0 To random.PointList.Count - 1
                 grid.Set(Of Byte)(random.PointList(i).Y, random.PointList(i).X, 1)
             Next
         End If
-        generation += 1
+        age += 1
 
         population = 0
         dst2.SetTo(backColor)
@@ -141,12 +141,12 @@ Public Class CellularAutomata_Life : Inherits TaskParent
             countdownText = " Restart in " + CStr(countdown)
             If countdown = 0 Then
                 countdownText = ""
-                generation = 0
+                age = 0
                 countdown = countInit
             End If
         End If
         lastPopulation = population
-        labels(2) = "Population " + CStr(population) + " Generation = " + CStr(generation) + countdownText
+        labels(2) = "Population " + CStr(population) + " Generation = " + CStr(age) + countdownText
         grid = nextgrid.Clone()
     End Sub
 End Class

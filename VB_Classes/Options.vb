@@ -7939,3 +7939,20 @@ Public Class Options_OpenGL : Inherits TaskParent
         scaleXYZ = New cvb.Vec3f(scaleXSlider.Value, scaleYSlider.Value, scaleZSlider.Value)
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_FCSMatch : Inherits TaskParent
+    Public MinCorrelation As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Min Correlation Coefficient", 0, 100, 90)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static correlSlider = FindSlider("Min Correlation Coefficient")
+        MinCorrelation = correlSlider.value / 100
+    End Sub
+End Class
