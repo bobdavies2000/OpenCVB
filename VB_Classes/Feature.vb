@@ -43,7 +43,7 @@ Public Class Feature_Basics : Inherits TaskParent
         task.featurePoints.Clear()
         For Each pt In ptList
             task.features.Add(pt)
-            task.featurePoints.Add(New cvb.Point(CInt(pt.X), CInt(pt.X)))
+            task.featurePoints.Add(New cvb.Point(CInt(pt.X), CInt(pt.Y)))
         Next
 
         dst3.SetTo(0)
@@ -753,8 +753,6 @@ Public Class Feature_Gather : Inherits TaskParent
     Dim brisk As New BRISK_Basics
     Public options As New Options_Features
     Public Sub New()
-        FindSlider("Feature Sample Size").Value = 400
-        FindSlider("Min Distance to next").Value = 10
         cPtr = Agast_Open()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
     End Sub

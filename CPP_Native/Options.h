@@ -1395,7 +1395,7 @@ public:
 class Options_Features {
 public:
 	double quality =  0.01;
-	double minDistance =  1;
+	double minDistance =  10;
 	int matchOption =  cv::TemplateMatchModes::TM_CCOEFF_NORMED;
 	string matchText =  "";
 	double k =  0.04;

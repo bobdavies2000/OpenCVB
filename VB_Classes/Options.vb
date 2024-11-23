@@ -5437,7 +5437,7 @@ End Class
 
 Public Class Options_Features : Inherits TaskParent
     Public quality As Double = 0.01
-    Public minDistance As Double = 1
+    Public minDistance As Double = 10
     Public matchOption As cvb.TemplateMatchModes = cvb.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
     Public k As Double = 0.04
