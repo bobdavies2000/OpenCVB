@@ -1156,7 +1156,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
         For i = 0 To facets.Length - 1
             Dim fp As New fpData
             fp.pt = task.features(i)
-            fp.index = task.fpMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+            fp.index = i
 
             fp.ID = CSng(task.gridMap32S.Get(Of Integer)(fp.pt.Y, fp.pt.X))
 
