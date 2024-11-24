@@ -608,6 +608,12 @@ Public Class TaskParent : Implements IDisposable
     Public Sub drawFeaturePoints(dst As cvb.Mat, ptlist As List(Of cvb.Point), color As cvb.Scalar)
         DrawContour(dst, ptlist, color, 1)
     End Sub
+    Public Sub displayAge()
+        dst3 = task.fpOutline
+        For Each fp In task.fpList
+            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
+        Next
+    End Sub
     Public Function fpUpdate(fp As fpData, fpLast As fpData) As fpData
         While 1
             If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While

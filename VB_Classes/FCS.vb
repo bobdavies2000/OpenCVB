@@ -337,10 +337,7 @@ Public Class FCS_Lines : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next
 
-        dst3 = task.fpOutline
-        For Each fp In task.fpList
-            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
-        Next
+        displayAge()
 
         If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were found."
     End Sub
@@ -363,6 +360,9 @@ Public Class FCS_ViewLeft : Inherits TaskParent
         dst0 = fcs.dst0
         dst2 = fcs.dst2
         dst3 = fcs.dst3
+
+        displayAge()
+
         labels(2) = fcs.labels(2)
     End Sub
 End Class
@@ -384,6 +384,9 @@ Public Class FCS_ViewRight : Inherits TaskParent
         dst0 = fcs.dst0
         dst2 = fcs.dst2
         dst3 = fcs.dst3
+
+        displayAge()
+
         labels(2) = fcs.labels(2)
     End Sub
 End Class
