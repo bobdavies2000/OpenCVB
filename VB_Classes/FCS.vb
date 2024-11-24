@@ -94,21 +94,23 @@ Public Class FCS_Basics : Inherits TaskParent
             Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
             Dim mms() As Single = {minX, minY, maxX, maxY}
             fp = buildRect(fp, mms)
+            fp.ptCenter = GetMaxDist(fp)
 
             If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then
                 fp = findRect(fp, mms)
                 fp.periph = True
             End If
 
-            If fp.pt = newPoint Then fp.pt = New cvb.Point(CInt(xlist.Average), CInt(ylist.Average))
-            If fp.pt.X >= dst2.Width Or fp.pt.X < 0 Then fp.pt.X = CInt(fp.rect.X + fp.rect.Width / 2)
-            If fp.pt.Y >= dst2.Height Or fp.pt.Y < 0 Then fp.pt.Y = CInt(fp.rect.Y + fp.rect.Height / 2)
+            If fp.pt.X >= dst2.Width Or fp.pt.X < 0 Or fp.pt.Y >= dst2.Height Or fp.pt.Y < 0 Then
+                fp.pt = fp.ptCenter
+            End If
+
             cvb.Cv2.MeanStdDev(task.pcSplit(2)(fp.rect), depthMean, stdev, fp.mask)
             fp.depthMean = depthMean(0)
+            fp.depthStdev = stdev(0)
 
             cvb.Cv2.MeanStdDev(task.color(fp.rect), fp.colorMean, stdev, fp.mask)
 
-            fp.ptCenter = GetMaxDist(fp)
             fp.age = 1
             task.fpList.Add(fp)
             drawFeaturePoints(task.fpOutline, fp.facets, cvb.Scalar.White)
@@ -315,63 +317,6 @@ End Class
 
 
 
-Public Class FCS_NoTracking : Inherits TaskParent
-    Public facetList As New List(Of List(Of cvb.Point))
-    Public facet32s As cvb.Mat
-    Dim subdiv As New cvb.Subdiv2D
-    Public Sub New()
-        facet32s = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32SC1, 0)
-        dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U, 0)
-        labels(3) = "CV_8U map of Delaunay cells"
-        desc = "Subdivide an image based on the points provided."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Static feat As New Feature_Basics
-        feat.Run(src)
-
-        subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
-        subdiv.Insert(task.features)
-
-        Dim facets = New cvb.Point2f()() {Nothing}
-        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-        facetList.Clear()
-        For i = 0 To facets.Length - 1
-            Dim nextFacet As New List(Of cvb.Point)
-            For j = 0 To facets(i).Length - 1
-                nextFacet.Add(New cvb.Point(facets(i)(j).X, facets(i)(j).Y))
-            Next
-
-            facet32s.FillConvexPoly(nextFacet, i, task.lineType)
-            facetList.Add(nextFacet)
-        Next
-
-        dst1.SetTo(0)
-        For i = 0 To facets.Length - 1
-            Dim ptList As New List(Of cvb.Point)
-            For j = 0 To facets(i).Length - 1
-                ptList.Add(New cvb.Point(facets(i)(j).X, facets(i)(j).Y))
-            Next
-
-            DrawContour(dst1, ptList, 255, 1)
-        Next
-
-        facet32s.ConvertTo(dst3, cvb.MatType.CV_8U)
-        dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
-
-        dst3.SetTo(0, dst1)
-        dst2.SetTo(white, dst1)
-        labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells were present."
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class FCS_ViewLeft : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
@@ -524,6 +469,7 @@ Public Class FCS_Motion : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         fcs.Run(src)
         dst2 = fcs.dst1
+        If task.fpListLast.Count = 0 Then task.fpListLast = New List(Of fpData)(task.fpList)
 
         For Each fp In task.fpList
             DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
@@ -531,27 +477,28 @@ Public Class FCS_Motion : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim motionCount As Integer, linkedCount As Integer
-        xDist.Clear()
-        yDist.Clear()
+        xDist = New List(Of Single)
+        yDist = New List(Of Single)
+        xDist.Add(0)
+        yDist.Add(0)
         For Each fp In task.fpList
-            If fp.indexLast >= 0 Then
-                linkedCount += 1
-                Dim p1 = fp.pt
-                Dim p2 = task.fpListLast(fp.indexLast).pt
-                If p1 <> p2 Then
-                    dst3.Line(p1, p2, task.HighlightColor, task.lineWidth, task.lineType)
-                    motionCount += 1
-                    xDist.Add(p2.X - p1.X)
-                    yDist.Add(p2.Y - p1.Y)
-                End If
+            If fp.indexLast >= 0 Then linkedCount += 1
+            Dim p1 = fp.pt
+            Dim p2 = If(fp.indexLast < 0, fp.pt, task.fpListLast(fp.indexLast).pt)
+            dst3.Line(p1, p2, task.HighlightColor, task.lineWidth, task.lineType)
+            If p1 <> p2 Then
+                motionCount += 1
+                xDist.Add(p2.X - p1.X)
+                yDist.Add(p2.Y - p1.Y)
             End If
         Next
         motionPercent = 100 * motionCount / linkedCount
         If task.heartBeat Then
             labels(2) = fcs.labels(2)
             labels(3) = Format(motionPercent, fmt1) + "% of linked cells had motion or " +
-                        CStr(motionCount) + " of " + CStr(linkedCount) + ".    " + Format(task.fpTravelAvg, fmt3) +
-                        " average travel distance."
+                        CStr(motionCount) + " of " + CStr(linkedCount) + ".  Distance moved X/Y " +
+                        Format(xDist.Average, fmt1) + "/" + Format(yDist.Average, fmt1) +
+                        " pixels."
         End If
 
         plot.plotData = New cvb.Scalar(motionPercent, 0, 0)
@@ -572,11 +519,7 @@ Public Class FCS_MotionDirection : Inherits TaskParent
     Public Sub New()
         plothist.createHistogram = True
         plothist.addLabels = False
-        plothist.minRange = -7
-        plothist.maxRange = 7
-        rangeText = " ranging from " + CStr(plothist.minRange) + " to " + CStr(plothist.maxRange)
-        range = Math.Abs(plothist.maxRange - plothist.minRange)
-        task.gOptions.setHistogramBins(15) ' should this be an odd number.
+        task.gOptions.setHistogramBins(64) ' should this be an odd number.
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
         desc = "Using all the feature points with motion, determine any with a common direction."
@@ -586,6 +529,11 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         mats.mat(2) = fcsM.dst2
         mats.mat(3) = fcsM.dst3
 
+        plothist.maxRange = task.histogramBins / 2 Or 1
+        plothist.minRange = -plothist.maxRange
+        rangeText = " ranging from " + CStr(plothist.minRange) + " to " + CStr(plothist.maxRange)
+        range = Math.Abs(plothist.maxRange - plothist.minRange)
+
         Dim incr = range / task.histogramBins
 
         plothist.Run(cvb.Mat.FromPixelData(fcsM.xDist.Count, 1, cvb.MatType.CV_32F, fcsM.xDist.ToArray))
@@ -593,7 +541,7 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         task.fpMotion.X = plothist.minRange + xDist.IndexOf(xDist.Max) * incr
         mats.mat(0) = plothist.dst2.Clone
 
-        plothist.Run(cvb.Mat.FromPixelData(fcsM.xDist.Count, 1, cvb.MatType.CV_32F, fcsM.yDist.ToArray))
+        plothist.Run(cvb.Mat.FromPixelData(fcsM.yDist.Count, 1, cvb.MatType.CV_32F, fcsM.yDist.ToArray))
         Dim yDist As New List(Of Single)(plothist.histArray)
         task.fpMotion.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
         mats.mat(1) = plothist.dst2.Clone
@@ -607,11 +555,10 @@ Public Class FCS_MotionDirection : Inherits TaskParent
             task.fpMotion.Y = 0
         End If
 
-        If task.heartBeat Then
-            strOut = "CameraMotion estimate: " + vbCrLf + vbCrLf
-            strOut += "Displacement in X: " + CStr(task.fpMotion.X) + vbCrLf
-            strOut += "Displacement in Y: " + CStr(task.fpMotion.Y) + vbCrLf
-        End If
+        strOut = "CameraMotion estimate: " + vbCrLf + vbCrLf
+        strOut += "Displacement in X: " + CStr(task.fpMotion.X) + vbCrLf
+        strOut += "Displacement in Y: " + CStr(task.fpMotion.Y) + vbCrLf
+
         SetTrueText(strOut, 1)
         SetTrueText("X distances" + rangeText, 2)
         SetTrueText("Y distances " + rangeText, New cvb.Point(dst2.Width / 2 + 2, 0), 2)
@@ -1010,18 +957,18 @@ Public Class FCS_Neighbors : Inherits TaskParent
         dst3 = ShowPalette(dst1 * 255 / task.fpList.Count)
         dst3.Rectangle(task.fpSelected.nabeRect, task.HighlightColor, task.lineWidth)
 
-        Dim sz = task.gOptions.GridSlider.Value
-        For i = 0 To task.fpCorners.Count - 1
-            fp = task.fpList(task.fpCorners(i))
-            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
-            Dim r = New cvb.Rect(fp.pt.X - sz, fp.pt.Y - sz, sz * 2, sz * 2)
-            task.fpCornerRect(i) = verifyRect(r, sz, sz * 2)
-            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
+        'Dim sz = task.gOptions.GridSlider.Value
+        'For i = 0 To task.fpCorners.Count - 1
+        '    fp = task.fpList(task.fpCorners(i))
+        '    DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+        '    Dim r = New cvb.Rect(fp.pt.X - sz, fp.pt.Y - sz, sz * 2, sz * 2)
+        '    task.fpCornerRect(i) = verifyRect(r, sz, sz * 2)
+        '    dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
 
-            r = New cvb.Rect(r.X - sz, r.Y - sz, sz * 4, sz * 4)
-            task.fpSearchRect(i) = verifyRect(r, sz, sz * 4)
-            dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
-        Next
+        '    r = New cvb.Rect(r.X - sz, r.Y - sz, sz * 4, sz * 4)
+        '    task.fpSearchRect(i) = verifyRect(r, sz, sz * 4)
+        '    dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
+        'Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         SetTrueText("FCS_Neighbors provides the functions to find neighbors." + vbCrLf +
@@ -1088,5 +1035,263 @@ Public Class FCS_ViewLeftRight : Inherits TaskParent
         labels(2) = CStr(task.features.Count) + " features with "
         labels(3) = "Left image (blue) had " + CStr(ptLeft.Count) + " points while the right image (red) had " +
                     CStr(ptRight.Count) + " points"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_NoTracking : Inherits TaskParent
+    Public facetList As New List(Of List(Of cvb.Point))
+    Public facet32s As cvb.Mat
+    Dim subdiv As New cvb.Subdiv2D
+    Public Sub New()
+        facet32s = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32SC1, 0)
+        dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U, 0)
+        labels(3) = "CV_8U map of Delaunay cells"
+        desc = "Subdivide an image based on the points provided."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static feat As New Feature_Basics
+        feat.Run(src)
+
+        subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
+        subdiv.Insert(task.features)
+
+        Dim facets = New cvb.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        facetList.Clear()
+        For i = 0 To facets.Length - 1
+            Dim nextFacet As New List(Of cvb.Point)
+            For j = 0 To facets(i).Length - 1
+                nextFacet.Add(New cvb.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            facet32s.FillConvexPoly(nextFacet, i, task.lineType)
+            facetList.Add(nextFacet)
+        Next
+
+        dst1.SetTo(0)
+        For i = 0 To facets.Length - 1
+            Dim ptList As New List(Of cvb.Point)
+            For j = 0 To facets(i).Length - 1
+                ptList.Add(New cvb.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            DrawContour(dst1, ptList, 255, 1)
+        Next
+
+        facet32s.ConvertTo(dst3, cvb.MatType.CV_8U)
+        dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
+
+        dst3.SetTo(0, dst1)
+        dst2.SetTo(white, dst1)
+        labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells were present."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_Delaunay : Inherits TaskParent
+    Dim subdiv As New cvb.Subdiv2D
+    Public Sub New()
+        task.fpMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32SC1, 0)
+        labels(3) = "CV_8U map of Delaunay cells"
+        desc = "Subdivide an image based on the points provided."
+    End Sub
+    Private Function buildRect(fp As fpData, mms() As Single) As fpData
+        fp.rect = ValidateRect(New cvb.Rect(mms(0), mms(1), mms(2) - mms(0) + 1, mms(3) - mms(1) + 1))
+
+        Static mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+        mask32s(fp.rect).SetTo(0)
+        mask32s.FillConvexPoly(fp.facets, white, task.lineType)
+        mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
+
+        Return fp
+    End Function
+    Private Function findRect(fp As fpData, mms() As Single) As fpData
+        Dim pts As cvb.Mat = fp.mask.FindNonZero()
+
+        Dim points(pts.Total * 2 - 1) As Integer
+        Marshal.Copy(pts.Data, points, 0, points.Length)
+
+        Dim minX As Integer = Integer.MaxValue, miny As Integer = Integer.MaxValue
+        Dim maxX As Integer, maxY As Integer
+        For i = 0 To points.Length - 1 Step 2
+            Dim x = points(i)
+            Dim y = points(i + 1)
+            If x < minX Then minX = x
+            If y < miny Then miny = y
+            If x > maxX Then maxX = x
+            If y > maxY Then maxY = y
+        Next
+
+        fp.mask = fp.mask(New cvb.Rect(minX, miny, maxX - minX + 1, maxY - miny + 1))
+        fp.rect = New cvb.Rect(fp.rect.X + minX, fp.rect.Y + miny, maxX - minX + 1, maxY - miny + 1)
+        Return fp
+    End Function
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static feat As New Feature_Basics
+            feat.Run(src)
+        End If
+
+        subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
+        subdiv.Insert(task.features)
+
+        Dim facets = New cvb.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        task.fpList.Clear()
+        task.fpIDlist.Clear()
+        task.fpOutline.SetTo(0)
+        Dim depthMean As cvb.Scalar, stdev As cvb.Scalar
+        For i = 0 To facets.Length - 1
+            Dim fp As New fpData
+            fp.pt = task.features(i)
+            fp.index = task.fpMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+
+            fp.ID = CSng(task.gridMap32S.Get(Of Integer)(fp.pt.Y, fp.pt.X))
+
+            While 1
+                If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
+            End While
+
+            task.fpIDlist.Add(fp.ID)
+
+            fp.facets = New List(Of cvb.Point)
+            For j = 0 To facets(i).Length - 1
+                fp.facets.Add(New cvb.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            task.fpMap.FillConvexPoly(fp.facets, i, task.lineType)
+            Dim xlist As New List(Of Integer)
+            Dim ylist As New List(Of Integer)
+            For j = 0 To facets(i).Length - 1
+                Dim pt = New cvb.Point(facets(i)(j).X, facets(i)(j).Y)
+                xlist.Add(pt.X)
+                ylist.Add(pt.Y)
+                fp.facets.Add(pt)
+            Next
+
+            Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
+            Dim mms() As Single = {minX, minY, maxX, maxY}
+            fp = buildRect(fp, mms)
+            fp.ptCenter = GetMaxDist(fp)
+
+            If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then
+                fp = findRect(fp, mms)
+                fp.periph = True
+            End If
+
+            If fp.pt.X >= dst2.Width Or fp.pt.X < 0 Or fp.pt.Y >= dst2.Height Or fp.pt.Y < 0 Then
+                fp.pt = fp.ptCenter
+            End If
+
+            cvb.Cv2.MeanStdDev(task.pcSplit(2)(fp.rect), depthMean, stdev, fp.mask)
+            fp.depthMean = depthMean(0)
+            fp.depthStdev = stdev(0)
+
+            cvb.Cv2.MeanStdDev(task.color(fp.rect), fp.colorMean, fp.colorStdev, fp.mask)
+
+            fp.age = 1
+            task.fpList.Add(fp)
+            DrawContour(task.fpOutline, fp.facets, 255, 1)
+        Next
+
+        task.fpMap.ConvertTo(dst3, cvb.MatType.CV_8U)
+        dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
+
+        dst2.SetTo(black, task.fpOutline)
+        labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells were present."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_BasicsNew : Inherits TaskParent
+    Dim delaunay As New FCS_Delaunay
+    Public buildFeatures As Boolean = True
+    Dim match As New Match_Basics
+    Dim nabes As New FCS_Neighbors
+    Dim options As New Options_FCSMatch
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
+        task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
+        desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        task.fpSrc = src.Clone
+        If buildFeatures Then feat.Run(src)
+
+        task.fpListLast = New List(Of fpData)(task.fpList)
+        task.fpMapLast = task.fpMap.Clone
+        Static fpLastSrc = src.Clone
+
+        delaunay.Run(src)
+
+        nabes.buildNeighbors()
+        nabes.buildNeighborImage()
+
+        Dim matchCount As Integer
+        For i = 0 To task.fpList.Count - 1
+            Dim fp = task.fpList(i)
+            Dim indexLast = task.fpMapLast.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
+            If indexLast < task.fpListLast.Count Then
+                Dim fpLast = task.fpListLast(indexLast)
+                Dim index = task.fpMap.Get(Of Integer)(fpLast.ptCenter.Y, fpLast.ptCenter.X)
+                If index = fp.index Then
+                    ' is this the same point?
+                    match.template = fpLastSrc(fpLast.rect)
+                    match.Run(src(fpLast.rect))
+                    fp.correlation = match.correlation
+                    If match.correlation > options.MinCorrelation Then
+                        task.fpList(i) = fpUpdate(fp, fpLast)
+                        matchCount += 1
+                    End If
+                End If
+            End If
+        Next
+
+        dst3 = task.fpOutline
+        If task.heartBeat Then dst1.SetTo(0)
+        For Each fp In task.fpList
+            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
+            If fp.correlation > options.MinCorrelation And fp.age > 5 Then
+                DrawCircle(dst1, fp.pt, task.DotSize, task.HighlightColor)
+            End If
+        Next
+        dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
+
+        dst0 = src.Clone
+        SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
+        For i = 0 To task.fpSelected.facets.Count - 1
+            Dim p1 = task.fpSelected.facets(i)
+            Dim p2 = task.fpSelected.facets((i + 1) Mod task.fpSelected.facets.Count)
+            dst2.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+            dst0.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+        Next
+
+        Dim matchPercent = matchCount / task.features.Count
+        If task.heartBeat Then
+            labels(2) = Format(matchPercent, "0%") + " were found and matched to the previous frame or " +
+                        CStr(matchCount) + " of " + CStr(task.features.Count)
+        End If
+        labels(3) = Format(matchPercent, "0%") + " matched to previous frame (instantaneous update)"
+        fpLastSrc = src.Clone
     End Sub
 End Class

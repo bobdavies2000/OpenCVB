@@ -1012,8 +1012,10 @@ End Enum
 	If algorithmName = "Face_Haar_LBP" Then return new Face_Haar_LBP
 	If algorithmName = "Face_Haar_LBP_CS" Then return new Face_Haar_LBP_CS
 	If algorithmName = "FCS_Basics" Then return new FCS_Basics
+	If algorithmName = "FCS_BasicsNew" Then return new FCS_BasicsNew
 	If algorithmName = "FCS_CornerCells" Then return new FCS_CornerCells
 	If algorithmName = "FCS_CornerCorrelation" Then return new FCS_CornerCorrelation
+	If algorithmName = "FCS_Delaunay" Then return new FCS_Delaunay
 	If algorithmName = "FCS_DepthCells" Then return new FCS_DepthCells
 	If algorithmName = "FCS_Edges" Then return new FCS_Edges
 	If algorithmName = "FCS_FloodFill" Then return new FCS_FloodFill
