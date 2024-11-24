@@ -2,6 +2,88 @@
 Imports System.Windows.Documents
 Imports cvb = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
+    Dim delaunay As New FCS_Delaunay
+    Public buildFeatures As Boolean = True
+    Dim match As New Match_Basics
+    Dim nabes As New FCS_Neighbors
+    Dim options As New Options_FCSMatch
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
+        task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
+        desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        task.fpSrc = src.Clone
+        If buildFeatures Then feat.Run(src)
+
+        task.fpListLast = New List(Of fpData)(task.fpList)
+        task.fpMapLast = task.fpMap.Clone
+        Static fpLastSrc = src.Clone
+
+        delaunay.Run(src)
+
+        nabes.buildNeighbors()
+        nabes.buildNeighborImage()
+
+        Dim matchCount As Integer
+        For i = 0 To task.fpList.Count - 1
+            Dim fp = task.fpList(i)
+            Dim indexLast = task.fpMapLast.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
+            If indexLast < task.fpListLast.Count Then
+                Dim fpLast = task.fpListLast(indexLast)
+                Dim index = task.fpMap.Get(Of Integer)(fpLast.ptCenter.Y, fpLast.ptCenter.X)
+                If index = fp.index Then
+                    ' is this the same point?
+                    match.template = fpLastSrc(fpLast.rect)
+                    match.Run(src(fpLast.rect))
+                    fp.correlation = match.correlation
+                    If match.correlation > options.MinCorrelation Then
+                        task.fpList(i) = fpUpdate(fp, fpLast)
+                        matchCount += 1
+                    End If
+                End If
+            End If
+        Next
+
+        dst3 = task.fpOutline
+        If task.heartBeat Then dst1.SetTo(0)
+        For Each fp In task.fpList
+            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
+            If fp.correlation > options.MinCorrelation And fp.age > 5 Then
+                DrawCircle(dst1, fp.pt, task.DotSize, task.HighlightColor)
+            End If
+        Next
+        dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
+
+        dst0 = src.Clone
+        SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
+        For i = 0 To task.fpSelected.facets.Count - 1
+            Dim p1 = task.fpSelected.facets(i)
+            Dim p2 = task.fpSelected.facets((i + 1) Mod task.fpSelected.facets.Count)
+            dst2.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+            dst0.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+        Next
+
+        Dim matchPercent = matchCount / task.features.Count
+        If task.heartBeat Then
+            labels(2) = Format(matchPercent, "0%") + " were found and matched to the previous frame or " +
+                        CStr(matchCount) + " of " + CStr(task.features.Count)
+        End If
+        labels(3) = Format(matchPercent, "0%") + " matched to previous frame (instantaneous update)"
+        fpLastSrc = src.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_BasicsOld : Inherits TaskParent
     Public feat As New Feature_Basics
     Public buildFeatures As Boolean = True
     Dim match As New Match_Basics
@@ -178,55 +260,6 @@ End Class
 
 
 
-
-
-Public Class FCS_CornerCells : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-    Dim nabes As New FCS_Neighbors
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
-        FindSlider("Min Distance to next").Value = task.fPointMinDistance
-        labels(1) = "The index for each of the cells (if standalonetest)"
-        desc = "Feature Coordinate System (FCS) - Create the fpList with rect, mask, index, and facets"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        dst0 = src.Clone
-
-        fcs.Run(src)
-        dst2 = fcs.dst2
-
-        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " feature cells."
-
-        nabes.Run(src)
-        strOut = nabes.strOut
-        dst3 = nabes.dst3
-
-        dst2.SetTo(0, task.fpOutline)
-        Dim fp = task.fpSelected
-        For i = 0 To fp.facets.Count - 1
-            Dim p1 = fp.facets(i)
-            Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
-            dst0.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
-        Next
-
-        dst0.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
-        dst1.SetTo(0)
-        dst1.Rectangle(fp.rect, task.HighlightColor, task.lineWidth)
-        SetTrueText(strOut, 3)
-
-        For Each fp In task.fpList
-            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
-            DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
-            ' If fp.indexLast >= 0 Then SetTrueText(Format(fp.ID, fmt1), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
-        Next
-        labels(2) = fcs.labels(2)
-    End Sub
-End Class
-
-
-
-
-
 Public Class FCS_Info : Inherits TaskParent
     Public Sub New()
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
@@ -280,7 +313,6 @@ Public Class FCS_Lines : Inherits TaskParent
     Public Sub New()
         fcs.buildFeatures = False
         If standalone Then task.gOptions.setDisplay0()
-        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
         desc = "Use lines as input to FCS."
     End Sub
@@ -295,7 +327,7 @@ Public Class FCS_Lines : Inherits TaskParent
         Next
 
         fcs.Run(src)
-        dst2 = fcs.dst2.Clone
+        dst2 = fcs.dst2
         dst2.SetTo(white, lines.dst3)
 
         For i = 0 To lines.lpList.Count - 1
@@ -303,10 +335,13 @@ Public Class FCS_Lines : Inherits TaskParent
             DrawCircle(dst2, lp.center, task.DotSize, red, -1)
             dst0.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-            SetTrueText(CStr(i), lp.center, 1)
         Next
 
-        SetTrueText(fcs.strOut, 3)
+        dst3 = task.fpOutline
+        For Each fp In task.fpList
+            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
+        Next
+
         If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were found."
     End Sub
 End Class
@@ -354,99 +389,6 @@ Public Class FCS_ViewRight : Inherits TaskParent
 End Class
 
 
-
-
-
-
-Public Class FCS_DepthCells : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-    Dim fInfo As New FCS_Info
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
-        dst1 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
-        desc = "Assign the depth of the feature point to the whole cell and display."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        dst0 = src.Clone
-        fcs.Run(src)
-
-        fInfo.Run(empty)
-        SetTrueText(fInfo.strOut, 3)
-
-        dst1.SetTo(0)
-        For Each fp In task.fpList
-            Dim mask = fp.mask And task.depthMask(fp.rect)
-            dst1(fp.rect).SetTo(255 * fp.depthMean / task.MaxZmeters, mask)
-        Next
-
-        dst2 = ShowPalette(dst1 * 255 / task.fpList.Count)
-
-        For Each fp In task.fpList
-            If fp.indexLast Then
-                DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
-                DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
-            Else
-                DrawCircle(dst2, fp.pt, task.DotSize + 2, cvb.Scalar.Red)
-                DrawCircle(dst0, fp.pt, task.DotSize + 2, cvb.Scalar.Red)
-            End If
-            If fp.indexLast >= 0 Then
-                SetTrueText(Format(fp.ID, fmt1), New cvb.Point(CInt(fp.pt.X), CInt(fp.pt.Y)), 1)
-            End If
-        Next
-
-        For i = 0 To task.fpSelected.facets.Count - 1
-            Dim p1 = task.fpSelected.facets(i)
-            Dim p2 = task.fpSelected.facets((i + 1) Mod task.fpSelected.facets.Count)
-            dst2.Line(p1, p2, cvb.Scalar.White, task.lineWidth + 1, task.lineType)
-            dst0.Line(p1, p2, cvb.Scalar.White, task.lineWidth + 1, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-Public Class FCS_CornerCorrelation : Inherits TaskParent
-    Public options As New Options_Features
-    Dim fcs As New FCS_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        desc = "Search for the previous image corners in the current image to get the camera movement."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        Static lastImage As cvb.Mat = src.Clone
-
-        fcs.Run(src)
-        dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
-        dst2.SetTo(0, task.fpOutline)
-
-        strOut = "correlation coefficients:" + vbCrLf
-        dst1.SetTo(0)
-        dst3.SetTo(0)
-        Dim sz = task.gOptions.getGridSize()
-        For i = 0 To task.fpCorners.Count - 1
-            Dim r = task.fpCornerRect(i)
-            Dim searchrect = task.fpSearchRect(i)
-
-            cvb.Cv2.MatchTemplate(lastImage(r), src(searchrect), dst0, options.matchOption)
-            Dim mm = GetMinMax(dst0)
-
-            dst3(r) = src(r)
-            Dim rlast = ValidateRect(New cvb.Rect(r.X + mm.maxLoc.X - sz, r.Y + mm.maxLoc.Y - sz, sz * 2, sz * 2))
-            dst1(rlast) = lastImage(rlast)
-
-            Dim correlation = mm.maxVal
-
-            Dim name = Choose(i + 1, "upper left", "upper right", "lower left", "lower right")
-            strOut += name + " " + Format(correlation, fmt3) + vbCrLf
-        Next
-        SetTrueText(strOut, New cvb.Point(dst2.Width / 2, dst2.Height / 2), 3)
-
-        lastImage = src.Clone()
-    End Sub
-End Class
 
 
 
@@ -1211,87 +1153,5 @@ Public Class FCS_Delaunay : Inherits TaskParent
 
         dst2.SetTo(black, task.fpOutline)
         labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells were present."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class FCS_BasicsNew : Inherits TaskParent
-    Dim delaunay As New FCS_Delaunay
-    Public buildFeatures As Boolean = True
-    Dim match As New Match_Basics
-    Dim nabes As New FCS_Neighbors
-    Dim options As New Options_FCSMatch
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
-        If standalone Then task.gOptions.setDisplay1()
-        task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
-        desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        task.fpSrc = src.Clone
-        If buildFeatures Then feat.Run(src)
-
-        task.fpListLast = New List(Of fpData)(task.fpList)
-        task.fpMapLast = task.fpMap.Clone
-        Static fpLastSrc = src.Clone
-
-        delaunay.Run(src)
-
-        nabes.buildNeighbors()
-        nabes.buildNeighborImage()
-
-        Dim matchCount As Integer
-        For i = 0 To task.fpList.Count - 1
-            Dim fp = task.fpList(i)
-            Dim indexLast = task.fpMapLast.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
-            If indexLast < task.fpListLast.Count Then
-                Dim fpLast = task.fpListLast(indexLast)
-                Dim index = task.fpMap.Get(Of Integer)(fpLast.ptCenter.Y, fpLast.ptCenter.X)
-                If index = fp.index Then
-                    ' is this the same point?
-                    match.template = fpLastSrc(fpLast.rect)
-                    match.Run(src(fpLast.rect))
-                    fp.correlation = match.correlation
-                    If match.correlation > options.MinCorrelation Then
-                        task.fpList(i) = fpUpdate(fp, fpLast)
-                        matchCount += 1
-                    End If
-                End If
-            End If
-        Next
-
-        dst3 = task.fpOutline
-        If task.heartBeat Then dst1.SetTo(0)
-        For Each fp In task.fpList
-            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
-            If fp.correlation > options.MinCorrelation And fp.age > 5 Then
-                DrawCircle(dst1, fp.pt, task.DotSize, task.HighlightColor)
-            End If
-        Next
-        dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
-
-        dst0 = src.Clone
-        SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
-        For i = 0 To task.fpSelected.facets.Count - 1
-            Dim p1 = task.fpSelected.facets(i)
-            Dim p2 = task.fpSelected.facets((i + 1) Mod task.fpSelected.facets.Count)
-            dst2.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
-            dst0.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
-        Next
-
-        Dim matchPercent = matchCount / task.features.Count
-        If task.heartBeat Then
-            labels(2) = Format(matchPercent, "0%") + " were found and matched to the previous frame or " +
-                        CStr(matchCount) + " of " + CStr(task.features.Count)
-        End If
-        labels(3) = Format(matchPercent, "0%") + " matched to previous frame (instantaneous update)"
-        fpLastSrc = src.Clone
     End Sub
 End Class
