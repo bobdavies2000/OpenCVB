@@ -14,6 +14,16 @@ Public Class FCS_Basics : Inherits TaskParent
         task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
+    Public Function fpUpdate(fp As fpData, fpLast As fpData) As fpData
+        While 1
+            If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
+        End While
+        fp.ID = fpLast.ID
+        fp.travelDistance = fp.pt.DistanceTo(fpLast.pt)
+        fp.indexLast = fpLast.index
+        fp.age = fpLast.age + 1
+        Return fp
+    End Function
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
@@ -83,6 +93,11 @@ End Class
 
 
 
+
+
+
+
+
 Public Class FCS_BasicsOld : Inherits TaskParent
     Public feat As New Feature_Basics
     Public buildFeatures As Boolean = True
@@ -97,6 +112,16 @@ Public Class FCS_BasicsOld : Inherits TaskParent
         task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
+    Private Function fpUpdate(fp As fpData, fpLast As fpData) As fpData
+        While 1
+            If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
+        End While
+        fp.ID = fpLast.ID
+        fp.travelDistance = fp.pt.DistanceTo(fpLast.pt)
+        fp.indexLast = fpLast.index
+        fp.age = fpLast.age + 1
+        Return fp
+    End Function
     Private Function buildRect(fp As fpData, mms() As Single) As fpData
         fp.rect = ValidateRect(New cvb.Rect(mms(0), mms(1), mms(2) - mms(0) + 1, mms(3) - mms(1) + 1))
 
@@ -254,7 +279,6 @@ Public Class FCS_BasicsOld : Inherits TaskParent
         fpLastSrc = src.Clone
     End Sub
 End Class
-
 
 
 

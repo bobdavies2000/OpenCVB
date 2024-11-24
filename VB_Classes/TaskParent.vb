@@ -614,16 +614,6 @@ Public Class TaskParent : Implements IDisposable
             SetTrueText(CStr(fp.age), fp.ptCenter, 3)
         Next
     End Sub
-    Public Function fpUpdate(fp As fpData, fpLast As fpData) As fpData
-        While 1
-            If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
-        End While
-        fp.ID = fpLast.ID
-        fp.travelDistance = fp.pt.DistanceTo(fpLast.pt)
-        fp.indexLast = fpLast.index
-        fp.age = fpLast.age + 1
-        Return fp
-    End Function
     Public Function ShowPalette(input As cvb.Mat) As cvb.Mat
         If input.Type = cvb.MatType.CV_32S Then
             Dim mm = GetMinMax(input)
