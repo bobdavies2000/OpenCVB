@@ -222,6 +222,7 @@ Public Class fpData ' feature point
     Public facet2f As List(Of cvb.Point2f)
     Public facets As List(Of cvb.Point)
     Public pt As cvb.Point
+    Public ptHistory As New List(Of cvb.Point)
     Public ptCenter As cvb.Point
     Public rcIndex As Integer
     Public nabeList As New List(Of Integer)

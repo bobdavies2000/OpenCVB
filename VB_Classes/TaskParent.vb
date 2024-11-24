@@ -506,6 +506,32 @@ Public Class TaskParent : Implements IDisposable
 
         Return mm.maxLoc
     End Function
+    Public Sub displayAge()
+        dst3 = task.fpOutline
+        For Each fp In task.fpList
+            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
+        Next
+    End Sub
+    Public Sub displayMotion()
+        dst1.SetTo(0)
+        For Each fp In task.fpList
+            For Each pt In fp.ptHistory
+                DrawCircle(dst1, pt, task.DotSize, task.HighlightColor)
+            Next
+        Next
+    End Sub
+    Public Function fpUpdate(fp As fpData, fpLast As fpData) As fpData
+        While 1
+            If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
+        End While
+        fp.ID = fpLast.ID
+        fp.travelDistance = fp.pt.DistanceTo(fpLast.pt)
+        fp.indexLast = fpLast.index
+        fp.age = fpLast.age + 1
+        fp.ptHistory = New List(Of cvb.Point)(fpLast.ptHistory) From {fp.pt}
+        If fp.ptHistory.Count > 20 Then fp.ptHistory.RemoveAt(0)
+        Return fp
+    End Function
     Public Function GetMaxDist(ByRef fp As fpData) As cvb.Point
         Dim mask = fp.mask.Clone
         mask.Rectangle(New cvb.Rect(0, 0, mask.Width, mask.Height), 0, 1)
@@ -607,12 +633,6 @@ Public Class TaskParent : Implements IDisposable
     End Sub
     Public Sub drawFeaturePoints(dst As cvb.Mat, ptlist As List(Of cvb.Point), color As cvb.Scalar)
         DrawContour(dst, ptlist, color, 1)
-    End Sub
-    Public Sub displayAge()
-        dst3 = task.fpOutline
-        For Each fp In task.fpList
-            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
-        Next
     End Sub
     Public Function ShowPalette(input As cvb.Mat) As cvb.Mat
         If input.Type = cvb.MatType.CV_32S Then
