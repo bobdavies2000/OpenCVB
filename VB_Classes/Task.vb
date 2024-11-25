@@ -37,7 +37,7 @@ Public Class VBtask : Implements IDisposable
     Public fpSrc As cvb.Mat
 
     Public fpOutline As cvb.Mat
-    Public fpSelected As New fpData
+    Public fpSelected As fpData
     Public fPointMinDistance As Integer
     Public fpCorners(3) As Integer
     Public fpCornerRect(3) As cvb.Rect
@@ -442,7 +442,6 @@ Public Class VBtask : Implements IDisposable
         fpList.Clear()
         fpOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         fpMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-        fpSelected = New fpData
 
         If parms.useRecordedData Then recordedData = New Replay_Play()
 

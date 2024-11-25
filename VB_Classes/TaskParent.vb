@@ -521,6 +521,13 @@ Public Class TaskParent : Implements IDisposable
             Next
         Next
     End Sub
+    Public Sub fpCellContour(fp As fpData, dst As cvb.Mat)
+        For i = 0 To fp.facets.Count - 1
+            Dim p1 = fp.facets(i)
+            Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
+            dst.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+        Next
+    End Sub
     Public Function buildRect(fp As fpData, mms() As Single) As fpData
         fp.rect = ValidateRect(New cvb.Rect(mms(0), mms(1), mms(2) - mms(0) + 1, mms(3) - mms(1) + 1))
 

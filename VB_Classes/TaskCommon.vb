@@ -217,15 +217,15 @@ Public Class fpData ' feature point
     Public ID As Single
     Public travelDistance As Single
     Public periph As Boolean
-    Public mask As New cvb.Mat
+    Public mask As cvb.Mat
     Public rect As cvb.Rect
     Public facet2f As List(Of cvb.Point2f)
     Public facets As List(Of cvb.Point)
     Public pt As cvb.Point
-    Public ptHistory As New List(Of cvb.Point)
+    Public ptHistory As List(Of cvb.Point)
     Public ptCenter As cvb.Point
     Public rcIndex As Integer
-    Public nabeList As New List(Of Integer)
+    Public nabeList As List(Of Integer)
     Public nabeRect As cvb.Rect
     Public depthMean As Single
     Public depthMin As Single
@@ -234,6 +234,13 @@ Public Class fpData ' feature point
     Public colorMean As cvb.Scalar
     Public colorStdev As cvb.Scalar
     Public correlation As Single
+    Sub New()
+        mask = New cvb.Mat
+        facet2f = New List(Of cvb.Point2f)
+        facets = New List(Of cvb.Point)
+        ptHistory = New List(Of cvb.Point)
+        nabeList = New List(Of Integer)
+    End Sub
 End Class
 
 

@@ -147,11 +147,11 @@ Public Class Main_UI
         cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
         With settings
             .cameraSupported = New List(Of Boolean)({True, True, True, True, True, True,
-                                                     False, True}) ' Mynt support updated below
+                                                         False, True}) ' Mynt support updated below
             .camera640x480Support = New List(Of Boolean)({False, False, True, True, False,
-                                                          False, False, True})
+                                                              False, False, True})
             .camera1920x1080Support = New List(Of Boolean)({True, True, False, False, False,
-                                                            True, False, False})
+                                                                True, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
             Dim sr = New StreamReader(defines.FullName)
             If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then
@@ -205,9 +205,9 @@ Public Class Main_UI
             Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
             If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False Then
                 MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
-                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and rebuild OpenCVB with the StereoLabs SDK.")
+                           "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                           "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                           "and rebuild OpenCVB with the StereoLabs SDK.")
             End If
 
             settings.cameraFound = False
@@ -354,24 +354,24 @@ Public Class Main_UI
                     usblist.Add(Name)
                     ' why do this?  So enumeration can tell us about the cameras present in a short list.
                     If InStr(Name, "Xeon") Or InStr(Name, "Chipset") Or InStr(Name, "Generic") Or InStr(Name, "Bluetooth") Or
-                        InStr(Name, "Monitor") Or InStr(Name, "Mouse") Or InStr(Name, "NVIDIA") Or InStr(Name, "HID-compliant") Or
-                        InStr(Name, " CPU ") Or InStr(Name, "PCI Express") Or Name.StartsWith("USB ") Or
-                        Name.StartsWith("Microsoft") Or Name.StartsWith("Motherboard") Or InStr(Name, "SATA") Or
-                        InStr(Name, "Volume") Or Name.StartsWith("WAN") Or InStr(Name, "ACPI") Or
-                        Name.StartsWith("HID") Or InStr(Name, "OneNote") Or Name.StartsWith("Samsung") Or
-                        Name.StartsWith("System ") Or Name.StartsWith("HP") Or InStr(Name, "Wireless") Or
-                        Name.StartsWith("SanDisk") Or InStr(Name, "Wi-Fi") Or Name.StartsWith("Media ") Or
-                        Name.StartsWith("High precision") Or Name.StartsWith("High Definition ") Or
-                        InStr(Name, "Remote") Or InStr(Name, "Numeric") Or InStr(Name, "UMBus ") Or
-                        Name.StartsWith("Plug or Play") Or InStr(Name, "Print") Or Name.StartsWith("Direct memory") Or
-                        InStr(Name, "interrupt controller") Or Name.StartsWith("NVVHCI") Or Name.StartsWith("Plug and Play") Or
-                        Name.StartsWith("ASMedia") Or Name = "Fax" Or Name.StartsWith("Speakers") Or
-                        InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or InStr(Name, "Legacy") Or
-                        Name.StartsWith("NDIS") Or Name.StartsWith("Logitech USB Input Device") Or
-                        Name.StartsWith("Simple Device") Or InStr(Name, "Ethernet") Or Name.StartsWith("WD ") Or
-                        InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("Realtek") Or
-                        Name.StartsWith("PCI-to-PCI") Or Name.StartsWith("Network Controller") Or Name.StartsWith("ATAPI ") Or
-                        Name.Contains("Gen Intel(R) ") Then
+                            InStr(Name, "Monitor") Or InStr(Name, "Mouse") Or InStr(Name, "NVIDIA") Or InStr(Name, "HID-compliant") Or
+                            InStr(Name, " CPU ") Or InStr(Name, "PCI Express") Or Name.StartsWith("USB ") Or
+                            Name.StartsWith("Microsoft") Or Name.StartsWith("Motherboard") Or InStr(Name, "SATA") Or
+                            InStr(Name, "Volume") Or Name.StartsWith("WAN") Or InStr(Name, "ACPI") Or
+                            Name.StartsWith("HID") Or InStr(Name, "OneNote") Or Name.StartsWith("Samsung") Or
+                            Name.StartsWith("System ") Or Name.StartsWith("HP") Or InStr(Name, "Wireless") Or
+                            Name.StartsWith("SanDisk") Or InStr(Name, "Wi-Fi") Or Name.StartsWith("Media ") Or
+                            Name.StartsWith("High precision") Or Name.StartsWith("High Definition ") Or
+                            InStr(Name, "Remote") Or InStr(Name, "Numeric") Or InStr(Name, "UMBus ") Or
+                            Name.StartsWith("Plug or Play") Or InStr(Name, "Print") Or Name.StartsWith("Direct memory") Or
+                            InStr(Name, "interrupt controller") Or Name.StartsWith("NVVHCI") Or Name.StartsWith("Plug and Play") Or
+                            Name.StartsWith("ASMedia") Or Name = "Fax" Or Name.StartsWith("Speakers") Or
+                            InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or InStr(Name, "Legacy") Or
+                            Name.StartsWith("NDIS") Or Name.StartsWith("Logitech USB Input Device") Or
+                            Name.StartsWith("Simple Device") Or InStr(Name, "Ethernet") Or Name.StartsWith("WD ") Or
+                            InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("Realtek") Or
+                            Name.StartsWith("PCI-to-PCI") Or Name.StartsWith("Network Controller") Or Name.StartsWith("ATAPI ") Or
+                            Name.Contains("Gen Intel(R) ") Then
                     Else
                         Debug.WriteLine(Name) ' looking for new cameras 
                     End If
@@ -570,7 +570,7 @@ Public Class Main_UI
                 drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
                 If drawRect.X + drawRect.Width > camPic(0).Width Then drawRect.Width = camPic(0).Width - drawRect.X
                 If drawRect.Y + drawRect.Height > camPic(0).
-                    Height Then drawRect.Height = camPic(0).Height - drawRect.Y
+                        Height Then drawRect.Height = camPic(0).Height - drawRect.Y
                 BothFirstAndLastReady = True
             End If
 
@@ -580,7 +580,7 @@ Public Class Main_UI
             mousePoint *= settings.WorkingRes.Width / camPic(0).Width
 
             XYLoc.Text = mousePoint.ToString + ", grid cell = " + CStr(mouseGridCell) +
-                         ", last click point at: " + ClickPoint.ToString
+                             ", last click point at: " + ClickPoint.ToString
 
         Catch ex As Exception
             Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
@@ -660,12 +660,12 @@ Public Class Main_UI
             Dim endTime = Now
             Dim span As TimeSpan = endTime - complexityStartTime
             complexityResults.Add("Ending " + vbTab + CStr(frameCount) + vbTab +
-                                  Format(span.TotalMilliseconds / 1000, "0.000") + " seconds")
+                                      Format(span.TotalMilliseconds / 1000, "0.000") + " seconds")
             complexityStartTime = Now
         End If
         complexityResults.Add("-------------------")
         complexityResults.Add("Image" + vbTab + CStr(settings.WorkingRes.Width) + vbTab +
-                                      CStr(settings.WorkingRes.Height))
+                                          CStr(settings.WorkingRes.Height))
         jsonWrite()
         jsonRead()
         LineUpCamPics()
@@ -749,7 +749,7 @@ Public Class Main_UI
         Dim item = TryCast(sender, ToolStripMenuItem)
         If AvailableAlgorithms.Items.Contains(item.Text) = False Then
             MsgBox("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed or " + vbCrLf +
-                   "The currently selected group does not contain " + item.Text + vbCrLf + "Change the group to <All> to guarantee access.")
+                       "The currently selected group does not contain " + item.Text + vbCrLf + "Change the group to <All> to guarantee access.")
         Else
             jumpToAlgorithm(item.Text)
         End If
@@ -891,11 +891,11 @@ Public Class Main_UI
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
         MsgBox("The objective is to solve many small computer vision problems " + vbCrLf +
-               "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
-               "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
-               "problems.  The hypothesis behind this approach is that human vision" + vbCrLf +
-               "is not computationally intensive but is built on many almost trivial" + vbCrLf +
-               "algorithms working together." + vbCrLf)
+                   "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
+                   "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
+                   "problems.  The hypothesis behind this approach is that human vision" + vbCrLf +
+                   "is not computationally intensive but is built on many almost trivial" + vbCrLf +
+                   "algorithms working together." + vbCrLf)
     End Sub
     Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
         Me.Close()
@@ -903,8 +903,8 @@ Public Class Main_UI
     Private Sub ComplexityButton_Click(sender As Object, e As EventArgs) Handles ComplexityButton.Click
         If ComplexityTimer.Enabled = False Then
             Dim ret = MsgBox("Do you want to test the complexity of the current algorithm?" + vbCrLf +
-                             "Algorithm will run at all available resolutions until you stop it.", MsgBoxStyle.OkCancel,
-                         "Test algorithm at all resolutions.")
+                                 "Algorithm will run at all available resolutions until you stop it.", MsgBoxStyle.OkCancel,
+                             "Test algorithm at all resolutions.")
             If ret = MsgBoxResult.Ok Then
                 complexityResults.Clear()
                 ComplexityTimer.Interval = 30000
@@ -969,9 +969,9 @@ Public Class Main_UI
         Dim K4ADLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
         If K4ADLL.Exists = False Then
             MsgBox("The Microsoft installer for the Kinect 4 Azure camera proprietary portion" + vbCrLf +
-                   "was not installed in:" + vbCrLf + vbCrLf + K4ADLL.FullName + vbCrLf + vbCrLf +
-                   "Did a new Version get installed?" + vbCrLf +
-                   "Support for the K4A camera may not work until you update the code near this message.")
+                       "was not installed in:" + vbCrLf + vbCrLf + K4ADLL.FullName + vbCrLf + vbCrLf +
+                       "Did a new Version get installed?" + vbCrLf +
+                       "Support for the K4A camera may not work until you update the code near this message.")
             Dim k4aIndex = cameraNames.IndexOf("Azure Kinect 4K")
             settings.cameraPresent(k4aIndex) = False ' we can't use this device
             settings.cameraSupported(k4aIndex) = False
@@ -1035,8 +1035,8 @@ Public Class Main_UI
         pythonPresent = InStr(systemPath.ToLower, "python")
         If pythonPresent = False Then
             MsgBox("Python needs to be in the path in order to run all the algorithms written in python." + vbCrLf +
-                   "That is how you control which version of python is active for OpenCVB." + vbCrLf +
-                   "All Python algorithms will be disabled for now...")
+                       "That is how you control which version of python is active for OpenCVB." + vbCrLf +
+                       "All Python algorithms will be disabled for now...")
         End If
 
         Me.Show()
@@ -1066,7 +1066,7 @@ Public Class Main_UI
 
         If AvailableAlgorithms.Items.Count = 0 Then
             MsgBox("There were no algorithms listed for the " + GroupCombo.Text + vbCrLf +
-                   "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
+                       "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
         Else
             If settings.MainUI_AlgName Is Nothing Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -1160,10 +1160,10 @@ Public Class Main_UI
             If algorithmFPSrate >= 100 Then algorithmFPSrate = 99
             If fpsCamera >= 100 Then fpsCamera = 99
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
-                      CStr(algorithmCount) + " algorithms = " +
-                      CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " +
-                      cameraName + " - Camera FPS/task FPS: " + Format(fpsCamera, "0") + "/" +
-                      Format(algorithmFPSrate, "0")
+                          CStr(algorithmCount) + " algorithms = " +
+                          CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " +
+                          cameraName + " - Camera FPS/task FPS: " + Format(fpsCamera, "0") + "/" +
+                          Format(algorithmFPSrate, "0")
             If fpsListA.Count > 5 Then
                 fpsListA.RemoveAt(0)
                 fpsListC.RemoveAt(0)
@@ -1282,7 +1282,7 @@ Public Class Main_UI
         If pixelViewerOn And mousePicTag = pic.Tag Then
             Dim r = pixelViewerRect
             Dim rect = New cvb.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
-                                   CInt(r.Width * ratio), CInt(r.Height * ratio))
+                                       CInt(r.Width * ratio), CInt(r.Height * ratio))
             g.DrawRectangle(myWhitePen, rect.X, rect.Y, rect.Width, rect.Height)
         End If
 
@@ -1320,7 +1320,7 @@ Public Class Main_UI
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
                     g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
-                                 CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
+                                     CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
                 End If
             Next
         End SyncLock
@@ -1518,22 +1518,22 @@ Public Class Main_UI
             If ComplexityTimer.Enabled = False Then
                 Debug.WriteLine(CStr(Now))
                 Debug.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + vbCrLf + vbTab +
-                                  CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
+                                      CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
                 Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
                 totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
                 Debug.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
-                                  parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
+                                      parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
 
                 Debug.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
-                                  CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
-                                  CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
+                                      CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
+                                      CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
             End If
             ' Adjust drawrect for the ratio of the actual size and WorkingRes.
             If task.drawRect <> New cvb.Rect Then
                 ' relative size of algorithm size image to displayed image
                 Dim ratio = camPic(0).Width / task.dst2.Width
                 drawRect = New cvb.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
-                                        task.drawRect.Width * ratio, task.drawRect.Height * ratio)
+                                            task.drawRect.Width * ratio, task.drawRect.Height * ratio)
             End If
 
             Dim saveWorkingRes = settings.WorkingRes
@@ -1551,7 +1551,7 @@ Public Class Main_UI
                 While 1
                     ' camera has exited or resolution is changed.
                     If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or
-                        saveWorkingRes <> settings.WorkingRes Then Exit While
+                            saveWorkingRes <> settings.WorkingRes Then Exit While
                     If saveAlgorithmName <> task.algName Then Exit While
                     ' switching camera resolution means stopping the current algorithm
                     If saveWorkingRes <> settings.WorkingRes Then Exit While
@@ -1594,37 +1594,37 @@ Public Class Main_UI
                         End SyncLock
 
                         Dim endCopyTime = Now
-                            Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
-                            Dim spanCopy = New TimeSpan(elapsedCopyTicks)
-                            task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+                        Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
+                        Dim spanCopy = New TimeSpan(elapsedCopyTicks)
+                        task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
 
-                            If intermediateReview = task.algName Then
-                                task.intermediateName = ""
-                                intermediateReview = ""
-                            End If
-                            If intermediateReview <> "" Then task.intermediateName = intermediateReview
+                        If intermediateReview = task.algName Then
+                            task.intermediateName = ""
+                            intermediateReview = ""
+                        End If
+                        If intermediateReview <> "" Then task.intermediateName = intermediateReview
 
-                            If testAllRunning Then
-                                task.pixelViewerOn = False
-                            Else
-                                task.pixelViewerOn = pixelViewerOn
-                            End If
+                        If testAllRunning Then
+                            task.pixelViewerOn = False
+                        Else
+                            task.pixelViewerOn = pixelViewerOn
+                        End If
 
-                            If GrabRectangleData Then
-                                GrabRectangleData = False
-                                ' relative size of algorithm size image to displayed image
-                                Dim ratio = task.dst2.Width / camPic(0).Width
-                                Dim tmpDrawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                                task.drawRect = New cvb.Rect
-                                If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
-                                    If saveDrawRect <> tmpDrawRect Then
-                                        task.optionsChanged = True
-                                        saveDrawRect = tmpDrawRect
-                                    End If
-                                    task.drawRect = tmpDrawRect
+                        If GrabRectangleData Then
+                            GrabRectangleData = False
+                            ' relative size of algorithm size image to displayed image
+                            Dim ratio = task.dst2.Width / camPic(0).Width
+                            Dim tmpDrawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                            task.drawRect = New cvb.Rect
+                            If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
+                                If saveDrawRect <> tmpDrawRect Then
+                                    task.optionsChanged = True
+                                    saveDrawRect = tmpDrawRect
                                 End If
-                                BothFirstAndLastReady = False
+                                task.drawRect = tmpDrawRect
                             End If
+                            BothFirstAndLastReady = False
+                        End If
 
                         textAdvice = task.advice
                         Exit While
@@ -1633,126 +1633,124 @@ Public Class Main_UI
 
                 ' camera has exited or resolution is changed.
                 If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or
-                saveAlgorithmName <> task.algName Then
-                        Exit While
-                    End If
+                    saveAlgorithmName <> task.algName Then
+                    Exit While
+                End If
 
-                    If activeMouseDown = False Then
-                        SyncLock mouseLock
-                            If mousePoint.X < 0 Then mousePoint.X = 0
-                            If mousePoint.Y < 0 Then mousePoint.Y = 0
-                            If mousePoint.X >= task.dst2.Width Then mousePoint.X = task.dst2.Width - 1
-                            If mousePoint.Y >= task.dst2.Height Then mousePoint.Y = task.dst2.Height - 1
-
-                            task.mouseMovePoint = mousePoint
-                            If task.mouseMovePoint = New cvb.Point(0, 0) Then
-                                task.mouseMovePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2)
-                            End If
-                            task.mousePicTag = mousePicTag
-                            If mouseClickFlag Then
-                                task.mouseClickFlag = mouseClickFlag
-                                task.ClickPoint = mousePoint
-                                ClickPoint = task.ClickPoint
-                                mouseClickFlag = False
-                            End If
-                        End SyncLock
-                    End If
-
-                    Dim endWaitTime = Now
-                    Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
-                    Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                    task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
-                    Dim updatedDrawRect = task.drawRect
-
-                    task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
-                    picLabels = task.labels
-                    motionLabel = task.MotionLabel
+                If activeMouseDown = False Then
                     SyncLock mouseLock
+                        If mousePoint.X < 0 Then mousePoint.X = 0
+                        If mousePoint.Y < 0 Then mousePoint.Y = 0
+                        If mousePoint.X >= task.dst2.Width Then mousePoint.X = task.dst2.Width - 1
+                        If mousePoint.Y >= task.dst2.Height Then mousePoint.Y = task.dst2.Height - 1
+
+                        task.mouseMovePoint = mousePoint
+                        If task.mouseMovePoint = New cvb.Point(0, 0) Then
+                            task.mouseMovePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2)
+                        End If
+                        task.mousePicTag = mousePicTag
+                        If mouseClickFlag Then
+                            task.mouseClickFlag = mouseClickFlag
+                            task.ClickPoint = mousePoint
+                            ClickPoint = task.ClickPoint
+                            mouseClickFlag = False
+                        End If
+                    End SyncLock
+                End If
+
+                Dim endWaitTime = Now
+                Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
+                Dim spanWait = New TimeSpan(elapsedWaitTicks)
+                task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
+                Dim updatedDrawRect = task.drawRect
+
+                task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
+                picLabels = task.labels
+                motionLabel = task.MotionLabel
+                SyncLock mouseLock
                     If mousePoint.X < task.gridMap32S.Width And mousePoint.Y < task.gridMap32S.Height Then
                         Try
                             mouseGridCell = task.gridMap32S.Get(Of Integer)(mousePoint.Y, mousePoint.X)
                         Catch ex As Exception
-                            End Try
-                        Else
-                            mousePoint = New cvb.Point(0, 0)
-                        End If
-                    End SyncLock
-                    Dim returnTime = Now
-
-                    ' in case the algorithm has changed the mouse location...
-                    If task.mouseMovePointUpdated Then mousePoint = task.mouseMovePoint
-                    If updatedDrawRect <> task.drawRect Then
-                        drawRect = task.drawRect
-                        ' relative size of algorithm size image to displayed image
-                        Dim ratio = camPic(0).Width / task.dst2.Width
-                        drawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                    End If
-                    If task.drawRectClear Then
-                        drawRect = New cvb.Rect
-                        task.drawRect = drawRect
-                        task.drawRectClear = False
-                    End If
-
-                    pixelViewerRect = task.pixelViewerRect
-                    pixelViewTag = task.pixelViewTag
-
-                    If Single.IsNaN(algorithmFPSrate) Then
-                        task.fpsRate = 0
+                        End Try
                     Else
-                        task.fpsRate = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
+                        mousePoint = New cvb.Point(0, 0)
                     End If
+                End SyncLock
+                Dim returnTime = Now
 
-                    If task.paused = False Then
-                        SyncLock trueDataLock
-                            If task.trueData.Count Then
-                                trueData = New List(Of VB_Classes.TrueText)(task.trueData)
-                                task.trueData.Clear()
-                            End If
-                        End SyncLock
-                    End If
+                ' in case the algorithm has changed the mouse location...
+                If task.mouseMovePointUpdated Then mousePoint = task.mouseMovePoint
+                If updatedDrawRect <> task.drawRect Then
+                    drawRect = task.drawRect
+                    ' relative size of algorithm size image to displayed image
+                    Dim ratio = camPic(0).Width / task.dst2.Width
+                    drawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                End If
+                If task.drawRectClear Then
+                    drawRect = New cvb.Rect
+                    task.drawRect = drawRect
+                    task.drawRectClear = False
+                End If
 
-                    If task.algName.StartsWith("Options_") Then
-                        task.labels(2) = "Options algorithms have no output"
-                        Continue While
-                    End If
-                    If task.dst0 IsNot Nothing Then
-                        SyncLock cameraLock
-                            dst(0) = task.dst0.Clone
-                            dst(1) = task.dst1.Clone
-                            dst(2) = task.dst2.Clone
-                            dst(3) = task.dst3.Clone
-                            paintNewImages = True ' trigger the paint 
-                        End SyncLock
-                        algorithmRefresh = True
-                    End If
+                pixelViewerRect = task.pixelViewerRect
+                pixelViewTag = task.pixelViewTag
 
-                    If task.fpsRate = 0 Then task.fpsRate = 1
-                    If frameCount Mod task.fpsRate = 0 Then
-                        SyncLock callTraceLock
-                            callTrace = New List(Of String)(task.callTraceMain)
-                            algorithm_ms = New List(Of Single)(task.algorithm_msMain)
-                            algorithmNames = New List(Of String)(task.algorithmNamesMain)
-                        End SyncLock
-                    End If
+                If Single.IsNaN(algorithmFPSrate) Then
+                    task.fpsRate = 0
+                Else
+                    task.fpsRate = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
+                End If
 
-                    Dim elapsedTicks = Now.Ticks - returnTime.Ticks
-                    Dim span = New TimeSpan(elapsedTicks)
-                    task.returnCopyTime = span.Ticks / TimeSpan.TicksPerMillisecond
+                If task.paused = False Then
+                    SyncLock trueDataLock
+                        If task.trueData.Count Then trueData = New List(Of VB_Classes.TrueText)(task.trueData)
+                        task.trueData.Clear()
+                    End SyncLock
+                End If
 
-                    task.mouseClickFlag = False
-                    frameCount = task.frameCount
-                    ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
-                    ' Each image will represent the one just finished by the algorithm.
-                    If task.debugSyncUI Then Thread.Sleep(100)
-                End While
+                If task.algName.StartsWith("Options_") Then
+                    task.labels(2) = "Options algorithms have no output"
+                    Continue While
+                End If
+                If task.dst0 IsNot Nothing Then
+                    SyncLock cameraLock
+                        dst(0) = task.dst0.Clone
+                        dst(1) = task.dst1.Clone
+                        dst(2) = task.dst2.Clone
+                        dst(3) = task.dst3.Clone
+                        paintNewImages = True ' trigger the paint 
+                    End SyncLock
+                    algorithmRefresh = True
+                End If
 
-                Debug.WriteLine(parms.algName + " ending.  Thread closing...")
-                task.frameCount = -1
-                Application.DoEvents()
-                task.Dispose()
-            End SyncLock
+                If task.fpsRate = 0 Then task.fpsRate = 1
+                If frameCount Mod task.fpsRate = 0 Then
+                    SyncLock callTraceLock
+                        callTrace = New List(Of String)(task.callTraceMain)
+                        algorithm_ms = New List(Of Single)(task.algorithm_msMain)
+                        algorithmNames = New List(Of String)(task.algorithmNamesMain)
+                    End SyncLock
+                End If
 
-            If parms.algName.EndsWith(".py") Then killPython()
+                Dim elapsedTicks = Now.Ticks - returnTime.Ticks
+                Dim span = New TimeSpan(elapsedTicks)
+                task.returnCopyTime = span.Ticks / TimeSpan.TicksPerMillisecond
+
+                task.mouseClickFlag = False
+                frameCount = task.frameCount
+                ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
+                ' Each image will represent the one just finished by the algorithm.
+                If task.debugSyncUI Then Thread.Sleep(100)
+            End While
+
+            Debug.WriteLine(parms.algName + " ending.  Thread closing...")
+            task.frameCount = -1
+            Application.DoEvents()
+            task.Dispose()
+        End SyncLock
+
+        If parms.algName.EndsWith(".py") Then killPython()
         frameCount = 0
     End Sub
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
@@ -1784,7 +1782,7 @@ Public Class Main_UI
         End If
     End Sub
     Private Sub GroupButtonList_Click(sender As Object, e As EventArgs) Handles GroupButtonList.Click
-        Groups.homedir = HomeDir
+        Groups.homeDir = HomeDir
         Groups.ShowDialog()
         If groupButtonSelection = "" Then Exit Sub
         If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
