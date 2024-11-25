@@ -1222,7 +1222,8 @@ End Class
 
 Public Class KNN_NNBasicsNormalized : Inherits TaskParent
     Public knn As cvb.ML.KNearest
-    Public queries As New List(Of Single) ' put Query data here
+    Public queries As New List(Of Single)
+    Public trainInput As New List(Of Single)
     Public result(,) As Integer ' Get results here...
     Public options As New Options_KNN
     Public Sub New()
@@ -1248,10 +1249,8 @@ Public Class KNN_NNBasicsNormalized : Inherits TaskParent
 
         Dim split(options.knnDimension - 1) As cvb.Mat
         For i = 0 To options.knnDimension - 1
-            split(i) = queryMat.Col(i).Clone
-            split(i) = split(i).Normalize()
-            Dim mm = GetMinMax(split(i))
-            split(i) = split(i) * 1 / mm.maxVal - mm.minVal
+            split(i) = queryMat.Col(i)
+            cvb.Cv2.Normalize(split(i), split(i), 0, 1, cvb.NormTypes.MinMax)
         Next
         cvb.Cv2.Merge(split, queryMat)
         queryMat = queryMat.Reshape(1)
@@ -1259,8 +1258,9 @@ Public Class KNN_NNBasicsNormalized : Inherits TaskParent
         Dim samples(queryMat.Cols * queryMat.Rows - 1) As Single
         Marshal.Copy(queryMat.Data, samples, 0, samples.Length)
 
-        Static trainData As cvb.Mat = queryMat.Clone
-        If task.optionsChanged Then trainData = queryMat.Clone
+        Dim tRows = CInt(trainInput.Count / options.knnDimension)
+        Dim trainData As cvb.Mat = cvb.Mat.FromPixelData(tRows, options.knnDimension, cvb.MatType.CV_32F,
+                                                         trainInput.ToArray())
 
         Dim response As cvb.Mat = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S,
                                   Enumerable.Range(start:=0, trainData.Rows).ToArray)
@@ -1276,6 +1276,5 @@ Public Class KNN_NNBasicsNormalized : Inherits TaskParent
                 If test < trainData.Rows And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
             Next
         Next
-        trainData = queryMat.Clone
     End Sub
 End Class

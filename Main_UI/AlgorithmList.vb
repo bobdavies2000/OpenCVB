@@ -1016,6 +1016,7 @@ End Enum
 	If algorithmName = "FCS_Edges" Then return new FCS_Edges
 	If algorithmName = "FCS_FloodFill" Then return new FCS_FloodFill
 	If algorithmName = "FCS_Info" Then return new FCS_Info
+	If algorithmName = "FCS_InfoTest" Then return new FCS_InfoTest
 	If algorithmName = "FCS_KNNfeatures" Then return new FCS_KNNfeatures
 	If algorithmName = "FCS_Lines" Then return new FCS_Lines
 	If algorithmName = "FCS_Motion" Then return new FCS_Motion

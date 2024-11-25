@@ -1,6 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Windows.Forms
 Imports System.Drawing
+Imports System.Runtime.InteropServices
 Public Class TrueText
     Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
     Public text As String
@@ -520,6 +521,39 @@ Public Class TaskParent : Implements IDisposable
             Next
         Next
     End Sub
+    Public Function buildRect(fp As fpData, mms() As Single) As fpData
+        fp.rect = ValidateRect(New cvb.Rect(mms(0), mms(1), mms(2) - mms(0) + 1, mms(3) - mms(1) + 1))
+
+        Static mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+        mask32s(fp.rect).SetTo(0)
+        mask32s.FillConvexPoly(fp.facets, white, task.lineType)
+        mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
+        fp.mask.SetTo(0, task.noDepthMask(fp.rect))
+        If fp.mask.CountNonZero = 0 Then fp.mask.SetTo(255)
+
+        Return fp
+    End Function
+    Public Function findRect(fp As fpData, mms() As Single) As fpData
+        Dim pts As cvb.Mat = fp.mask.FindNonZero()
+
+        Dim points(pts.Total * 2 - 1) As Integer
+        Marshal.Copy(pts.Data, points, 0, points.Length)
+
+        Dim minX As Integer = Integer.MaxValue, miny As Integer = Integer.MaxValue
+        Dim maxX As Integer, maxY As Integer
+        For i = 0 To points.Length - 1 Step 2
+            Dim x = points(i)
+            Dim y = points(i + 1)
+            If x < minX Then minX = x
+            If y < miny Then miny = y
+            If x > maxX Then maxX = x
+            If y > maxY Then maxY = y
+        Next
+
+        fp.mask = fp.mask(New cvb.Rect(minX, miny, maxX - minX + 1, maxY - miny + 1))
+        fp.rect = New cvb.Rect(fp.rect.X + minX, fp.rect.Y + miny, maxX - minX + 1, maxY - miny + 1)
+        Return fp
+    End Function
     Public Function fpUpdate(fp As fpData, fpLast As fpData) As fpData
         While 1
             If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While

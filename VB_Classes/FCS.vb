@@ -1,4 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
+Imports System.Threading
 Imports cvb = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim delaunay As New FCS_Delaunay
@@ -71,54 +72,6 @@ Public Class FCS_Basics : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class FCS_Info : Inherits TaskParent
-    Public Sub New()
-        desc = "Display the contents of the Feature Coordinate System (FCS) cell."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            SetTrueText("Call FCS_Info from any algorithm to display the task.fpSelected fpData")
-            Exit Sub
-        End If
-        Dim fp = task.fpSelected
-        strOut = "FCS cell selected: " + vbCrLf
-        strOut += "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
-        strOut += "Travel distance: " + Format(fp.travelDistance, fmt1) + vbCrLf
-        strOut += "Average Travel distance: " + Format(task.fpTravelAvg, fmt1) + vbCrLf + vbCrLf
-        strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
-        strOut += CStr(fp.rect.Width) + "/" + CStr(fp.rect.Height) + vbCrLf
-        strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf
-        strOut += "age (in frames) = " + CStr(fp.age) + ", indexLast = " + CStr(fp.indexLast) + vbCrLf
-        strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
-        strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
-        Dim vec = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
-        strOut += "Pointcloud at fp.pt: " + Format(vec.X, fmt1) + "/" + Format(vec.Y, fmt1) + "/" +
-                                            Format(vec.Z, fmt1) + vbCrLf
-        strOut += "Pointcloud mean: " + Format(fp.depthMean, fmt1) + vbCrLf
-        strOut += "Color mean B/G/R: " + Format(fp.colorMean(0), fmt1) + "/" +
-                              Format(fp.colorMean(1), fmt1) + "/" + Format(fp.colorMean(2), fmt1) + vbCrLf
-        strOut += "Neighbor Count = " + CStr(fp.nabeList.Count) + vbCrLf
-        strOut += "Neighbors: "
-        For Each index In fp.nabeList
-            strOut += CStr(index) + ", "
-        Next
-        strOut += vbCrLf
-        strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
-        For i = 0 To fp.facets.Count - 1
-            strOut += CStr(i) + ":" + vbTab + CStr(fp.facets(i).X) + vbTab + CStr(fp.facets(i).Y) + vbCrLf
-        Next
-
-        If standalone Then
-            SetTrueText("Select a feature grid cell to get more information.", 2)
-        End If
-    End Sub
-End Class
 
 
 
@@ -867,37 +820,6 @@ Public Class FCS_Delaunay : Inherits TaskParent
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Private Function buildRect(fp As fpData, mms() As Single) As fpData
-        fp.rect = ValidateRect(New cvb.Rect(mms(0), mms(1), mms(2) - mms(0) + 1, mms(3) - mms(1) + 1))
-
-        Static mask32s As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-        mask32s(fp.rect).SetTo(0)
-        mask32s.FillConvexPoly(fp.facets, white, task.lineType)
-        mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
-
-        Return fp
-    End Function
-    Private Function findRect(fp As fpData, mms() As Single) As fpData
-        Dim pts As cvb.Mat = fp.mask.FindNonZero()
-
-        Dim points(pts.Total * 2 - 1) As Integer
-        Marshal.Copy(pts.Data, points, 0, points.Length)
-
-        Dim minX As Integer = Integer.MaxValue, miny As Integer = Integer.MaxValue
-        Dim maxX As Integer, maxY As Integer
-        For i = 0 To points.Length - 1 Step 2
-            Dim x = points(i)
-            Dim y = points(i + 1)
-            If x < minX Then minX = x
-            If y < miny Then miny = y
-            If x > maxX Then maxX = x
-            If y > maxY Then maxY = y
-        Next
-
-        fp.mask = fp.mask(New cvb.Rect(minX, miny, maxX - minX + 1, maxY - miny + 1))
-        fp.rect = New cvb.Rect(fp.rect.X + minX, fp.rect.Y + miny, maxX - minX + 1, maxY - miny + 1)
-        Return fp
-    End Function
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             Static feat As New Feature_Basics
@@ -1018,44 +940,130 @@ End Class
 
 
 
+
+Public Class FCS_Info : Inherits TaskParent
+    Public Sub New()
+        desc = "Display the contents of the Feature Coordinate System (FCS) cell."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.fpList.Count = 0 Then
+            SetTrueText("FCS_Info can be called in any algorithm that has setup the task.fplist." + vbCrLf +
+                        "It does not appear that task.fpList has any contents so no results to show.")
+            Exit Sub
+        End If
+        Dim fp = task.fpSelected
+        strOut = "FCS cell selected: " + vbCrLf
+        strOut += "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
+        strOut += "Travel distance: " + Format(fp.travelDistance, fmt1) + vbCrLf
+        strOut += "Average Travel distance: " + Format(task.fpTravelAvg, fmt1) + vbCrLf + vbCrLf
+        strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
+        strOut += CStr(fp.rect.Width) + "/" + CStr(fp.rect.Height) + vbCrLf
+        strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf
+        strOut += "age (in frames) = " + CStr(fp.age) + ", indexLast = " + CStr(fp.indexLast) + vbCrLf
+        strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
+        strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
+        Dim vec = task.pointCloud.Get(Of cvb.Point3f)(fp.pt.Y, fp.pt.X)
+        strOut += "Pointcloud at fp.pt: " + Format(vec.X, fmt1) + "/" + Format(vec.Y, fmt1) + "/" +
+                                            Format(vec.Z, fmt1) + vbCrLf
+        strOut += "Depth max/mean/min: " + Format(fp.depthMin, fmt1) + "/" + Format(fp.depthMean, fmt1) + "/" +
+                                           Format(fp.depthMax, fmt1) + vbCrLf
+        strOut += "Color mean B/G/R: " + Format(fp.colorMean(0), fmt1) + "/" +
+                              Format(fp.colorMean(1), fmt1) + "/" + Format(fp.colorMean(2), fmt1) + vbCrLf
+        strOut += "Neighbor Count = " + CStr(fp.nabeList.Count) + vbCrLf
+        strOut += "Neighbors: "
+        For Each index In fp.nabeList
+            strOut += CStr(index) + ", "
+        Next
+        strOut += vbCrLf
+        strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
+        For i = 0 To fp.facets.Count - 1
+            strOut += CStr(i) + ":" + vbTab + CStr(fp.facets(i).X) + vbTab + CStr(fp.facets(i).Y) + vbCrLf
+        Next
+
+        If standalone Then
+            SetTrueText("Select a feature grid cell to get more information.", 2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_InfoTest : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Dim info As New FCS_Info
+    Public Sub New()
+        desc = "Invoke FCS_Basics and display the contents of the selected feature point cell"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+
+        info.Run(empty)
+        SetTrueText(info.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class FCS_KNNfeatures : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Dim knn As New KNN_NNBasicsNormalized
+    Dim info As New FCS_Info
+    Dim dimension As Integer
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
-        FindSlider("KNN Dimension").Value = 11
+        FindSlider("KNN Dimension").Value = 8
         desc = "Can we distinguish each feature point cell with color, depth, and grid."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Static dimensionSlider = FindSlider("KNN Dimension")
-        Dim dimension As Integer = dimensionSlider.value
+        dimension = dimensionSlider.value
         Static indexLast As Integer
 
         fcs.Run(src)
         dst0 = fcs.dst0
         dst2 = fcs.dst2
 
-        knn.queries.Clear()
+        knn.trainInput.Clear()
+        Dim LUT As New List(Of Integer)
         Dim minDepth = task.fpSelected.depthMin, maxDepth = task.fpSelected.depthMax
+        Dim fpIndex As Integer
         For Each fp In task.fpList
             If fp.depthMean < maxDepth And fp.depthMean > minDepth Then
+                If fp.index = task.fpSelected.index Then fpIndex = LUT.Count
+                LUT.Add(fp.index)
                 For i = 0 To dimension - 1
-                    knn.queries.Add(Choose(i + 1, fp.index, fp.indexLast, fp.ID, fp.depthMean, fp.depthStdev,
-                                           fp.colorMean(0), fp.colorMean(1), fp.colorMean(2),
-                                           fp.colorStdev(0), fp.colorStdev(1), fp.colorStdev(2)))
+                    knn.trainInput.Add(Choose(i + 1, fp.depthMean, fp.depthStdev,
+                                                     fp.colorMean(0), fp.colorMean(1), fp.colorMean(2),
+                                                     fp.colorStdev(0), fp.colorStdev(1), fp.colorStdev(2)))
                 Next
             End If
+        Next
+
+        knn.queries.Clear()
+        For i = 0 To dimension - 1
+            knn.queries.Add(Choose(i + 1, task.fpSelected.depthMean, task.fpSelected.depthStdev,
+                                           task.fpSelected.colorMean(0), task.fpSelected.colorMean(1),
+                                           task.fpSelected.colorMean(2), task.fpSelected.colorStdev(0),
+                                           task.fpSelected.colorStdev(1), task.fpSelected.colorStdev(2)))
         Next
 
         If task.FirstPass Or task.optionsChanged Then indexLast = task.fpSelected.index
 
         knn.Run(empty)
 
-        indexLast = task.fpSelected.indexLast
-        If indexLast < 0 Then indexLast = task.fpSelected.index
-        If indexLast >= knn.result.GetUpperBound(0) Then indexLast = task.fpSelected.index
-        Dim result = knn.result(indexLast, 0)
-        If result >= task.fpList.Count Then result = task.fpSelected.index
-        task.ClickPoint = task.fpList(result).ptCenter
+        info.Run(empty)
+        SetTrueText(info.strOut, 3)
+        'If LUT.Count > 0 Then
+        '    Dim result = knn.result(LUT(fpIndex), 0)
+        '    If result >= task.fpList.Count Then result = task.fpSelected.index
+        '    task.ClickPoint = task.fpList(result).ptCenter
+        'End If
     End Sub
 End Class
