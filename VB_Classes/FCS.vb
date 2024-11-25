@@ -1,11 +1,9 @@
 ﻿Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
 Imports cvb = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim delaunay As New FCS_Delaunay
     Public buildFeatures As Boolean = True
     Dim match As New Match_Basics
-    Dim nabes As New FCS_Neighbors
     Dim options As New Options_FCSMatch
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -52,17 +50,16 @@ Public Class FCS_Basics : Inherits TaskParent
         displayAge()
         displayMotion()
         dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
+        dst2.SetTo(0, task.fpOutline)
 
-        If standalone Then
-            dst0 = src.Clone
-            SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
-            For i = 0 To task.fpSelected.facets.Count - 1
-                Dim p1 = task.fpSelected.facets(i)
-                Dim p2 = task.fpSelected.facets((i + 1) Mod task.fpSelected.facets.Count)
-                dst2.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
-                dst0.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
-            Next
-        End If
+        dst0 = src.Clone
+        SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
+        For i = 0 To task.fpSelected.facets.Count - 1
+            Dim p1 = task.fpSelected.facets(i)
+            Dim p2 = task.fpSelected.facets((i + 1) Mod task.fpSelected.facets.Count)
+            dst2.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+            dst0.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+        Next
 
         Dim matchPercent = matchCount / task.features.Count
         If task.heartBeat Then
@@ -963,6 +960,9 @@ Public Class FCS_Delaunay : Inherits TaskParent
             cvb.Cv2.MeanStdDev(task.pcSplit(2)(fp.rect), depthMean, stdev, fp.mask)
             fp.depthMean = depthMean(0)
             fp.depthStdev = stdev(0)
+            Dim mm = GetMinMax(task.pcSplit(2)(fp.rect), fp.mask)
+            fp.depthMin = mm.minVal
+            fp.depthMax = mm.maxVal
 
             cvb.Cv2.MeanStdDev(task.color(fp.rect), fp.colorMean, fp.colorStdev, fp.mask)
 
@@ -982,3 +982,80 @@ End Class
 
 
 
+
+Public Class FCS_TravelDistance : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        desc = "Display the travel distance "
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        dst2.SetTo(0, task.fpOutline)
+        labels(2) = fcs.labels(2)
+
+        dst3.SetTo(0)
+        Dim travelCount As Integer
+        Dim distanceList As New List(Of Single)
+        distanceList.Add(0)
+        For Each fp In task.fpList
+            If fp.age > 20 Then
+                If fp.travelDistance > 0.5 Then
+                    SetTrueText(Format(fp.travelDistance, fmt0), fp.ptCenter, 3)
+                    travelCount += 1
+                    distanceList.Add(fp.travelDistance)
+                End If
+            End If
+        Next
+        labels(3) = "Travel distance average = " + Format(distanceList.Average, fmt1) + ", max = " +
+                    Format(distanceList.Max, fmt1)
+        displayMotion()
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_KNNfeatures : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Dim knn As New KNN_NNBasicsNormalized
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay0()
+        FindSlider("KNN Dimension").Value = 11
+        desc = "Can we distinguish each feature point cell with color, depth, and grid."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static dimensionSlider = FindSlider("KNN Dimension")
+        Dim dimension As Integer = dimensionSlider.value
+        Static indexLast As Integer
+
+        fcs.Run(src)
+        dst0 = fcs.dst0
+        dst2 = fcs.dst2
+
+        knn.queries.Clear()
+        Dim minDepth = task.fpSelected.depthMin, maxDepth = task.fpSelected.depthMax
+        For Each fp In task.fpList
+            If fp.depthMean < maxDepth And fp.depthMean > minDepth Then
+                For i = 0 To dimension - 1
+                    knn.queries.Add(Choose(i + 1, fp.index, fp.indexLast, fp.ID, fp.depthMean, fp.depthStdev,
+                                           fp.colorMean(0), fp.colorMean(1), fp.colorMean(2),
+                                           fp.colorStdev(0), fp.colorStdev(1), fp.colorStdev(2)))
+                Next
+            End If
+        Next
+
+        If task.FirstPass Or task.optionsChanged Then indexLast = task.fpSelected.index
+
+        knn.Run(empty)
+
+        indexLast = task.fpSelected.indexLast
+        If indexLast < 0 Then indexLast = task.fpSelected.index
+        If indexLast >= knn.result.GetUpperBound(0) Then indexLast = task.fpSelected.index
+        Dim result = knn.result(indexLast, 0)
+        If result >= task.fpList.Count Then result = task.fpSelected.index
+        task.ClickPoint = task.fpList(result).ptCenter
+    End Sub
+End Class

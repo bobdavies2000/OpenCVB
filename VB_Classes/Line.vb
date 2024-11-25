@@ -1505,7 +1505,7 @@ End Class
 
 Public Class Line_PointSlope : Inherits TaskParent
     Dim lines As New Line_Basics
-    Dim knn As New KNN_BasicsN
+    Dim knn As New KNN_NNBasics
     Public bestLines As New List(Of PointPair)
     Const lineCount As Integer = 3
     Const searchCount As Integer = 100
@@ -1583,7 +1583,7 @@ End Class
 
 Public Class Line_PointSlope1 : Inherits TaskParent
     Dim lines As New Line_Core
-    Dim knn As New KNN_BasicsN
+    Dim knn As New KNN_NNBasics
     Dim dimension As Integer = 5
     Public Sub New()
         knn.options.knnDimension = dimension ' yIntercept, p1.x, p1.y, p2.x, p2.y

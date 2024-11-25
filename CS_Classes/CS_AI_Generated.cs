@@ -19182,7 +19182,7 @@ namespace CS_Classes
     public class FeatureLine_LongestV_Tutorial2_CS : TaskParent
     {
         FeatureLine_Finder lines = new FeatureLine_Finder();
-        KNN_Basics4D knn = new KNN_Basics4D();
+        KNN_N4Basics knn = new KNN_N4Basics();
         public cv.Point3f pt1 = new cv.Point3f();
         public cv.Point3f pt2 = new cv.Point3f();
         int lengthReject;
@@ -32044,7 +32044,7 @@ namespace CS_Classes
             }
             knn.queries = queries;
             knn.Run(empty);
-            knn.displayResults();
+            knn.knn2.displayResults();
             dst2 = knn.dst2;
             neighbors.Clear();
             for (int i = 0; i < knn.neighbors.Count(); i++)
@@ -32229,7 +32229,7 @@ namespace CS_Classes
             random.Run(empty);
             knn.queries = new List<cv.Point2f>(random.PointList);
             knn.Run(empty);
-            knn.displayResults();
+            knn.knn2.displayResults();
             dst2 = knn.dst2;
             accumulateDisplay();
             labels[2] = "The top " + knn.trainInput.Count() + " best matches are shown. Red=TrainingData, yellow = queries";
@@ -32399,7 +32399,7 @@ namespace CS_Classes
 
     public class KNN_Basics3DTest_CS : TaskParent
     {
-        KNN_Basics3D knn = new KNN_Basics3D();
+        KNN_N3Basics knn = new KNN_N3Basics();
         Distance_Point3D dist = new Distance_Point3D();
         Random_Basics3D random = new Random_Basics3D();
         public KNN_Basics3DTest_CS()
@@ -32466,7 +32466,7 @@ namespace CS_Classes
 
     public class KNN_Basics4DTest_CS : TaskParent
     {
-        KNN_Basics4D knn = new KNN_Basics4D();
+        KNN_N4Basics knn = new KNN_N4Basics();
         Distance_Point4D dist = new Distance_Point4D();
         Random_Basics4D random = new Random_Basics4D();
         public KNN_Basics4DTest_CS()
@@ -32517,7 +32517,7 @@ namespace CS_Classes
 
     public class KNN_BasicsNTest_CS : TaskParent
     {
-        KNN_BasicsN knn = new KNN_BasicsN();
+        KNN_NNBasics knn = new KNN_NNBasics();
         public KNN_BasicsNTest_CS()
         {
             labels[2] = "Highlight color (Yellow) is query.  The red dots are the training set.";
@@ -32587,7 +32587,7 @@ namespace CS_Classes
             knn.queries = new List<cv.Point2f>(em.centers);
             knn.Run(src);
             dst2 = em.dst2 + knn.dst2;
-            knn.displayResults();
+            knn.knn2.displayResults();
             dst3 = knn.dst2;
             knn.trainInput = new List<cv.Point2f>(knn.queries);
         }
@@ -32899,7 +32899,7 @@ namespace CS_Classes
             }
             knn.queries = queries;
             knn.Run(empty);
-            knn.displayResults();
+            knn.knn2.displayResults();
             dst2 = knn.dst2;
             var nearest = new List<int>();
             var sortedResults = new SortedList<int, int>(new CompareAllowIdenticalInteger());
@@ -34047,7 +34047,7 @@ namespace CS_Classes
     {
         LongLine_Extend extend = new LongLine_Extend();
         Line_Basics lines = new Line_Basics();
-        KNN_BasicsN knn = new KNN_BasicsN();
+        KNN_NNBasics knn = new KNN_NNBasics();
         public List<PointPair> bestLines = new List<PointPair>();
         const int lineCount = 3;
         const int searchCount = 100;
@@ -36727,7 +36727,7 @@ namespace CS_Classes
 
     public class Match_Lines_CS : TaskParent
     {
-        KNN_Basics4D knn = new KNN_Basics4D();
+        KNN_N4Basics knn = new KNN_N4Basics();
         Line_Basics lines = new Line_Basics();
         List<PointPair> lastPt = new List<PointPair>();
         public Match_Lines_CS()

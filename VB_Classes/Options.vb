@@ -4714,7 +4714,7 @@ Public Class Options_KNN : Inherits TaskParent
     Public useOutSide As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("KNN Dimension", 2, 10, knnDimension)
+            sliders.setupTrackBar("KNN Dimension", 2, 20, knnDimension)
             sliders.setupTrackBar("Random input points", 5, 100, numPoints)
             sliders.setupTrackBar("Average distance multiplier", 1, 20, multiplier)
             sliders.setupTrackBar("Top X distances", 1, 100, topXDistances)

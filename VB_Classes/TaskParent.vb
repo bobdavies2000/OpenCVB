@@ -525,10 +525,10 @@ Public Class TaskParent : Implements IDisposable
             If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
         End While
         fp.ID = fpLast.ID
-        fp.travelDistance = fp.pt.DistanceTo(fpLast.pt)
         fp.indexLast = fpLast.index
         fp.age = fpLast.age + 1
         fp.ptHistory = New List(Of cvb.Point)(fpLast.ptHistory) From {fp.pt}
+        fp.travelDistance = fp.pt.DistanceTo(fp.ptHistory(0))
         If fp.ptHistory.Count > 20 Then fp.ptHistory.RemoveAt(0)
         Return fp
     End Function
@@ -780,4 +780,3 @@ Public Class TaskParent : Implements IDisposable
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
 End Class
-

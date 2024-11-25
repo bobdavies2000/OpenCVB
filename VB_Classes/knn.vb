@@ -1,8 +1,28 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
-Imports OpenCvSharp
+
 Public Class KNN_Basics : Inherits TaskParent
+    Public knn2 As New KNN_N2Basics
+    Public trainInput As New List(Of cvb.Point2f) ' put training data here
+    Public queries As New List(Of cvb.Point2f) ' put Query data here
+    Public neighbors As New List(Of List(Of Integer))
+    Public result(,) As Integer ' Get results here...
+    Public desiredMatches As Integer = -1 ' -1 indicates it is to use the number of queries.
+    Public Sub New()
+        desc = "Default unnormalized KNN with dimension 2"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        knn2.trainInput = trainInput
+        knn2.queries = queries
+        knn2.desiredMatches = desiredMatches
+        knn2.Run(src)
+        neighbors = knn2.neighbors
+        result = knn2.result
+    End Sub
+End Class
+
+Public Class KNN_N2Basics : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Point2f) ' put training data here
     Public queries As New List(Of cvb.Point2f) ' put Query data here
@@ -124,7 +144,7 @@ Public Class KNN_NoDups : Inherits TaskParent
 
         knn.queries = queries
         knn.Run(empty)
-        knn.displayResults()
+        knn.knn2.displayResults()
         dst2 = knn.dst2
 
         neighbors.Clear()
@@ -172,7 +192,7 @@ End Class
 
 
 
-Public Class KNN_Basics2DTest : Inherits TaskParent
+Public Class KNN_N2BasicsTest : Inherits TaskParent
     Public knn As New KNN_Basics
     Dim random As New Random_Basics
     Public Sub New()
@@ -194,7 +214,6 @@ Public Class KNN_Basics2DTest : Inherits TaskParent
             DrawCircle(dst3, pt, task.DotSize + 4, cvb.Scalar.Red)
         Next
     End Sub
-
     Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Then
             dst3.SetTo(0)
@@ -205,7 +224,7 @@ Public Class KNN_Basics2DTest : Inherits TaskParent
         knn.queries = New List(Of cvb.Point2f)(random.PointList)
 
         knn.Run(empty)
-        knn.displayResults()
+        knn.knn2.displayResults()
         dst2 = knn.dst2
         accumulateDisplay()
 
@@ -219,7 +238,7 @@ End Class
 
 
 
-Public Class KNN_Basics3D : Inherits TaskParent
+Public Class KNN_N3Basics : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Point3f) ' put training data here
     Public queries As New List(Of cvb.Point3f) ' put Query data here
@@ -267,7 +286,7 @@ End Class
 
 
 
-Public Class KNN_Basics4D : Inherits TaskParent
+Public Class KNN_N4Basics : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Vec4f) ' put training data here
     Public queries As New List(Of cvb.Vec4f) ' put Query data here
@@ -316,67 +335,9 @@ End Class
 
 
 
-Public Class KNN_BasicsN : Inherits TaskParent
-    Public knn As cvb.ML.KNearest
-    Public trainInput As New List(Of Single) ' put training data here
-    Public queries As New List(Of Single) ' put Query data here
-    Public result(,) As Integer ' Get results here...
-    Dim messageSent As Boolean
-    Public options As New Options_KNN
-    Public Sub New()
-        knn = cvb.ML.KNearest.Create()
-        desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
 
-        Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
-        If standaloneTest() Then
-            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")
-            Exit Sub
-        End If
-
-        If options.knnDimension = 0 Then
-            If messageSent = False Then MsgBox("The KNN dimension needs to be set for the general purpose KNN_Basics to start")
-            Exit Sub
-        End If
-
-        Dim qRows = CInt(queries.Count / options.knnDimension)
-        If qRows = 0 Then
-            SetTrueText("There were no queries provided.  There is nothing to do...")
-            Exit Sub
-        End If
-
-        Dim queryMat = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
-
-        Dim trainData = cvb.Mat.FromPixelData(CInt(trainInput.Count / options.knnDimension),
-                                              options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray)
-        Dim response = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S,
-                                             Enumerable.Range(start:=0, trainData.Rows).ToArray)
-        knn.Train(trainData, cvb.ML.SampleTypes.RowSample, response)
-        Dim neighbors As New cvb.Mat
-        Dim dm = trainInput.Count
-        knn.FindNearest(queryMat, dm, New cvb.Mat, neighbors)
-
-        ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
-        For i = 0 To neighbors.Rows - 1
-            For j = 0 To neighbors.Cols - 1
-                Dim test = neighbors.Get(Of Single)(i, j)
-                If test < trainInput.Count And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
-            Next
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class KNN_Basics3DTest : Inherits TaskParent
-    Dim knn As New KNN_Basics3D
+Public Class KNN_N3BasicsTest : Inherits TaskParent
+    Dim knn As New KNN_N3Basics
     Dim dist As New Distance_Point3D
     Dim random As New Random_Basics3D
     Public Sub New()
@@ -436,8 +397,8 @@ End Class
 
 
 
-Public Class KNN_Basics4DTest : Inherits TaskParent
-    Dim knn As New KNN_Basics4D
+Public Class KNN_N4BasicsTest : Inherits TaskParent
+    Dim knn As New KNN_N4Basics
     Dim dist As New Distance_Point4D
     Dim random As New Random_Basics4D
     Public Sub New()
@@ -486,55 +447,6 @@ End Class
 
 
 
-Public Class KNN_BasicsNTest : Inherits TaskParent
-    Dim knn As New KNN_BasicsN
-    Public Sub New()
-        labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
-        desc = "Test the use of the general form KNN_BasicsN algorithm"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If task.heartBeat Then
-            knn.trainInput.Clear()
-            For i = 0 To knn.options.numPoints - 1
-                For j = 0 To knn.options.knnDimension - 1
-                    knn.trainInput.Add(msRNG.Next(dst2.Height))
-                Next
-            Next
-
-            knn.queries.Clear()
-            For j = 0 To knn.options.knnDimension - 1
-                knn.queries.Add(msRNG.Next(dst2.Height))
-            Next
-        End If
-
-        knn.Run(empty)
-        dst2.SetTo(0)
-        For i = 0 To knn.trainInput.Count - 1 Step knn.options.knnDimension
-            Dim pt = New cvb.Point2f(knn.trainInput(i), knn.trainInput(i + 1))
-            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Red)
-        Next
-        For i = 0 To knn.queries.Count - 1 Step knn.options.knnDimension
-            Dim pt = New cvb.Point2f(knn.queries(i), knn.queries(i + 1))
-            Dim index = knn.result(i, 0)
-            If index * knn.options.knnDimension >= knn.trainInput.Count Or index < 0 Then Continue For
-            Dim nn = New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension), knn.trainInput(index * knn.options.knnDimension + 1))
-            DrawCircle(dst2, pt, task.DotSize + 1, task.HighlightColor)
-            DrawLine(dst2, pt, nn, task.HighlightColor)
-        Next
-        If standaloneTest() Then
-            SetTrueText("Results are easily verified for the 2-dimensional case.  For higher dimension, " + vbCrLf +
-                        "the results may appear incorrect because the higher dimensions are projected into " + vbCrLf +
-                        "a 2-dimensional presentation.", 3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class KNN_Emax : Inherits TaskParent
     Dim random As New Random_Basics
     Public knn As New KNN_Basics
@@ -552,7 +464,7 @@ Public Class KNN_Emax : Inherits TaskParent
         knn.Run(src)
         dst2 = em.dst2 + knn.dst2
 
-        knn.displayResults()
+        knn.knn2.displayResults()
         dst3 = knn.dst2
 
         knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
@@ -872,7 +784,7 @@ Public Class KNN_NoDupsOld : Inherits TaskParent
 
         knn.queries = queries
         knn.Run(empty)
-        knn.displayResults()
+        knn.knn2.displayResults()
         dst2 = knn.dst2
 
         Dim nearest As New List(Of Integer)
@@ -1192,5 +1104,178 @@ Public Class KNN_MaxDistance : Inherits TaskParent
         Next
         labels(2) = "There were " + CStr(inputPoints.Count) + " input points and " +
                     CStr(outputPoints.Count) + " pairs output."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class KNN_NBasicsTest : Inherits TaskParent
+    Dim knn As New KNN_NNBasics
+    Public Sub New()
+        labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
+        desc = "Test the use of the general form KNN_BasicsN algorithm"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.heartBeat Then
+            knn.trainInput.Clear()
+            For i = 0 To knn.options.numPoints - 1
+                For j = 0 To knn.options.knnDimension - 1
+                    knn.trainInput.Add(msRNG.Next(dst2.Height))
+                Next
+            Next
+
+            knn.queries.Clear()
+            For j = 0 To knn.options.knnDimension - 1
+                knn.queries.Add(msRNG.Next(dst2.Height))
+            Next
+        End If
+
+        knn.Run(empty)
+        dst2.SetTo(0)
+        For i = 0 To knn.trainInput.Count - 1 Step knn.options.knnDimension
+            Dim pt = New cvb.Point2f(knn.trainInput(i), knn.trainInput(i + 1))
+            DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Red)
+        Next
+        For i = 0 To knn.queries.Count - 1 Step knn.options.knnDimension
+            Dim pt = New cvb.Point2f(knn.queries(i), knn.queries(i + 1))
+            Dim index = knn.result(i, 0)
+            If index * knn.options.knnDimension >= knn.trainInput.Count Or index < 0 Then Continue For
+            Dim nn = New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension), knn.trainInput(index * knn.options.knnDimension + 1))
+            DrawCircle(dst2, pt, task.DotSize + 1, task.HighlightColor)
+            DrawLine(dst2, pt, nn, task.HighlightColor)
+        Next
+        If standaloneTest() Then
+            SetTrueText("Results are easily verified for the 2-dimensional case.  For higher dimension, " + vbCrLf +
+                        "the results may appear incorrect because the higher dimensions are projected into " + vbCrLf +
+                        "a 2-dimensional presentation.", 3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_NNBasics : Inherits TaskParent
+    Public knn As cvb.ML.KNearest
+    Public trainInput As New List(Of Single) ' put training data here
+    Public queries As New List(Of Single) ' put Query data here
+    Public result(,) As Integer ' Get results here...
+    Dim messageSent As Boolean
+    Public options As New Options_KNN
+    Public Sub New()
+        knn = cvb.ML.KNearest.Create()
+        desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
+        If standaloneTest() Then
+            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")
+            Exit Sub
+        End If
+
+        If options.knnDimension = 0 Then
+            If messageSent = False Then MsgBox("The KNN dimension needs to be set for the general purpose KNN_Basics to start")
+            Exit Sub
+        End If
+
+        Dim qRows = CInt(queries.Count / options.knnDimension)
+        If qRows = 0 Then
+            SetTrueText("There were no queries provided.  There is nothing to do...")
+            Exit Sub
+        End If
+
+        Dim queryMat = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
+
+        Dim trainData = cvb.Mat.FromPixelData(CInt(trainInput.Count / options.knnDimension),
+                                              options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray)
+        Dim response = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S,
+                                             Enumerable.Range(start:=0, trainData.Rows).ToArray)
+
+        knn.Train(trainData, cvb.ML.SampleTypes.RowSample, response)
+        Dim neighbors As New cvb.Mat
+        Dim dm = trainInput.Count
+        knn.FindNearest(queryMat, dm, New cvb.Mat, neighbors)
+
+        ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
+        For i = 0 To neighbors.Rows - 1
+            For j = 0 To neighbors.Cols - 1
+                Dim test = neighbors.Get(Of Single)(i, j)
+                If test < trainInput.Count And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class KNN_NNBasicsNormalized : Inherits TaskParent
+    Public knn As cvb.ML.KNearest
+    Public queries As New List(Of Single) ' put Query data here
+    Public result(,) As Integer ' Get results here...
+    Public options As New Options_KNN
+    Public Sub New()
+        knn = cvb.ML.KNearest.Create()
+        desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
+        If standaloneTest() Then
+            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")
+            Exit Sub
+        End If
+
+        Dim qRows = CInt(queries.Count / options.knnDimension)
+        If qRows = 0 Then
+            SetTrueText("There were no queries provided.  There is nothing to do...")
+            Exit Sub
+        End If
+
+        Dim queryMat = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
+
+        Dim split(options.knnDimension - 1) As cvb.Mat
+        For i = 0 To options.knnDimension - 1
+            split(i) = queryMat.Col(i).Clone
+            split(i) = split(i).Normalize()
+            Dim mm = GetMinMax(split(i))
+            split(i) = split(i) * 1 / mm.maxVal - mm.minVal
+        Next
+        cvb.Cv2.Merge(split, queryMat)
+        queryMat = queryMat.Reshape(1)
+
+        Dim samples(queryMat.Cols * queryMat.Rows - 1) As Single
+        Marshal.Copy(queryMat.Data, samples, 0, samples.Length)
+
+        Static trainData As cvb.Mat = queryMat.Clone
+        If task.optionsChanged Then trainData = queryMat.Clone
+
+        Dim response As cvb.Mat = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S,
+                                  Enumerable.Range(start:=0, trainData.Rows).ToArray)
+
+        knn.Train(trainData, cvb.ML.SampleTypes.RowSample, response)
+        Dim neighbors As New cvb.Mat
+        knn.FindNearest(queryMat, trainData.Rows, New cvb.Mat, neighbors)
+
+        ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
+        For i = 0 To neighbors.Rows - 1
+            For j = 0 To neighbors.Cols - 1
+                Dim test = neighbors.Get(Of Single)(i, j)
+                If test < trainData.Rows And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
+            Next
+        Next
+        trainData = queryMat.Clone
     End Sub
 End Class

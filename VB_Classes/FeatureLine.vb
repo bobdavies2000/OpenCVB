@@ -323,7 +323,7 @@ End Class
 
 Public Class FeatureLine_LongestV_Tutorial2 : Inherits TaskParent
     Dim lines As New FeatureLine_Finder
-    Dim knn As New KNN_Basics4D
+    Dim knn As New KNN_N4Basics
     Public pt1 As New cvb.Point3f
     Public pt2 As New cvb.Point3f
     Dim lengthReject As Integer

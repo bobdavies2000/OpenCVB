@@ -228,6 +228,8 @@ Public Class fpData ' feature point
     Public nabeList As New List(Of Integer)
     Public nabeRect As cvb.Rect
     Public depthMean As Single
+    Public depthMin As Single
+    Public depthMax As Single
     Public depthStdev As Single
     Public colorMean As cvb.Scalar
     Public colorStdev As cvb.Scalar
