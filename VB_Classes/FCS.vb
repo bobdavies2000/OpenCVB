@@ -25,7 +25,7 @@ Public Class FCS_Basics : Inherits TaskParent
         Static fpLastSrc = src.Clone
 
         delaunay.Run(src)
-        ' task.fpSelected = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
+        task.fpSelected = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
 
         Dim matchCount As Integer
         For i = 0 To task.fpList.Count - 1
@@ -1070,5 +1070,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         End If
         fpCellContour(fpSave, dst0)
         fpCellContour(info.fpSelection, dst2)
+
+        fpSave = info.fpSelection
     End Sub
 End Class

@@ -1842,6 +1842,7 @@ End Enum
 	If algorithmName = "KNN_NBasicsTest" Then return new KNN_NBasicsTest
 	If algorithmName = "KNN_NNBasics" Then return new KNN_NNBasics
 	If algorithmName = "KNN_NNBasicsNormalized" Then return new KNN_NNBasicsNormalized
+	If algorithmName = "KNN_NNBasicsTest" Then return new KNN_NNBasicsTest
 	If algorithmName = "KNN_NoDups" Then return new KNN_NoDups
 	If algorithmName = "KNN_NoDups_CC" Then return new CPP_Basics(ccFunctionNames._KNN_NoDups_CC)
 	If algorithmName = "KNN_NoDups_CS" Then return new KNN_NoDups_CS

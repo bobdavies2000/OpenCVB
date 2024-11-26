@@ -535,8 +535,8 @@ Public Class TaskParent : Implements IDisposable
         mask32s(fp.rect).SetTo(0)
         mask32s.FillConvexPoly(fp.facets, white, task.lineType)
         mask32s(fp.rect).ConvertTo(fp.mask, cvb.MatType.CV_8U)
-        fp.mask.SetTo(0, task.noDepthMask(fp.rect))
-        If fp.mask.CountNonZero = 0 Then fp.mask.SetTo(255)
+        'fp.mask.SetTo(0, task.noDepthMask(fp.rect))
+        'If fp.mask.CountNonZero = 0 Then fp.mask.SetTo(255)
 
         Return fp
     End Function

@@ -1,6 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
+Imports OpenCvSharp.Flann
 
 Public Class KNN_Basics : Inherits TaskParent
     Public knn2 As New KNN_N2Basics
@@ -37,7 +38,6 @@ Public Class KNN_N2Basics : Inherits TaskParent
     End Sub
     Public Sub displayResults()
         dst2.SetTo(0)
-        Dim dm = Math.Min(trainInput.Count, queries.Count)
         For i = 0 To queries.Count - 1
             Dim pt = queries(i)
             Dim test = result(i, 0)
@@ -131,7 +131,7 @@ Public Class KNN_NoDups : Inherits TaskParent
         If standaloneTest() Then
             If task.heartBeat Then
                 random.Run(empty)
-                knn.trainInput = New List(Of cvb.Point2f)(random.PointList)
+                knn.knn2.trainInput = New List(Of cvb.Point2f)(random.PointList)
             End If
             random.Run(empty)
             queries = New List(Of cvb.Point2f)(random.PointList)
@@ -155,7 +155,7 @@ Public Class KNN_NoDups : Inherits TaskParent
         For i = 0 To neighbors.Count - 1
             Dim p1 = knn.queries(i)
             If neighbors(i) = -1 Then Continue For
-            Dim ptn = knn.trainInput(neighbors(i))
+            Dim ptn = knn.knn2.trainInput(neighbors(i))
             For j = i + 1 To neighbors.Count - 1
                 If neighbors(j) = neighbors(i) Then
                     Dim p2 = knn.queries(j)
@@ -167,7 +167,7 @@ Public Class KNN_NoDups : Inherits TaskParent
         Next
 
         dst3.SetTo(0)
-        For Each pt In knn.trainInput
+        For Each pt In knn.knn2.trainInput
             DrawCircle(dst3, pt, task.DotSize + 4, cvb.Scalar.Red)
         Next
 
@@ -179,12 +179,12 @@ Public Class KNN_NoDups : Inherits TaskParent
             If neighbors(i) = -1 Then
                 noMatch.Add(pt)
             Else
-                Dim nn = knn.trainInput(neighbors(i))
+                Dim nn = knn.knn2.trainInput(neighbors(i))
                 matches.Add(New PointPair(pt, nn))
                 DrawLine(dst3, nn, pt, white)
             End If
         Next
-        If standaloneTest() = False Then knn.trainInput = New List(Of cvb.Point2f)(queries)
+        If standaloneTest() = False Then knn.knn2.trainInput = New List(Of cvb.Point2f)(queries)
     End Sub
 End Class
 
@@ -225,7 +225,7 @@ Public Class KNN_N2BasicsTest : Inherits TaskParent
 
         knn.Run(empty)
         knn.knn2.displayResults()
-        dst2 = knn.dst2
+        dst2 = knn.knn2.dst2
         accumulateDisplay()
 
         labels(2) = "The top " + CStr(knn.trainInput.Count) + " best matches are shown. Red=TrainingData, yellow = queries"
@@ -378,7 +378,6 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
             Dim pt = New cvb.Point2f(knn.queries(i).X, knn.queries(i).Y)
             For j = 0 To Math.Min(2, knn.trainInput.Count) - 1
                 Dim index = knn.result(i, j)
-                If index >= knn.trainInput.Count Or index < 0 Then Continue For
                 Dim nn = New cvb.Point2f(knn.trainInput(index).X, knn.trainInput(index).Y)
                 DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Yellow)
                 DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
@@ -429,7 +428,6 @@ Public Class KNN_N4BasicsTest : Inherits TaskParent
             Dim pt = New cvb.Point2f(knn.queries(i)(0), knn.queries(i)(1))
             For j = knn.result.GetLowerBound(1) To knn.result.GetUpperBound(1)
                 Dim index = knn.result(i, j)
-                If index >= knn.trainInput.Count Or index < 0 Then Continue For
                 Dim nn = New cvb.Point2f(knn.trainInput(index)(0), knn.trainInput(index)(1))
                 DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Yellow)
                 DrawLine(dst2, pt, nn, task.HighlightColor)
@@ -1220,10 +1218,64 @@ End Class
 
 
 
+Public Class KNN_NNBasicsTest : Inherits TaskParent
+    Public knn As New KNN_NNBasicsNormalized
+    Dim random As New Random_Basics
+    Public Sub New()
+        FindSlider("KNN Dimension").Value = 2
+        FindSlider("Random Pixel Count").Value = 3
+        desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors."
+    End Sub
+    Public Sub displayResults()
+        dst2.SetTo(0)
+        For i = 0 To knn.queryData.Rows - 1
+            Dim pt = knn.queryData.Get(Of cvb.Point2f)(i, 0)
+            Dim index = knn.result(i, 0)
+            Dim nn = knn.trainData.Get(Of cvb.Point2f)(index, 0)
+            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
+            DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
+        Next
+
+        For i = 0 To knn.trainData.Rows - 1
+            Dim pt = knn.trainData.Get(Of cvb.Point2f)(i, 0)
+            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Red)
+        Next
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.heartBeat Then
+            dst3.SetTo(0)
+            random.Run(empty)
+            knn.trainInput.Clear()
+            For Each pt In random.PointList
+                knn.trainInput.Add(pt.X)
+                knn.trainInput.Add(pt.Y)
+            Next
+        End If
+        random.Run(empty)
+        knn.queries.Clear()
+        For Each pt In random.PointList
+            knn.queries.Add(pt.X)
+            knn.queries.Add(pt.Y)
+        Next
+
+        knn.Run(empty)
+        displayResults()
+        dst2 = knn.dst2
+
+        labels(2) = "The top " + CStr(knn.trainInput.Count / 2) + " best matches are shown. Red=TrainingData, yellow = queries"
+    End Sub
+End Class
+
+
+
+
+
 Public Class KNN_NNBasicsNormalized : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public queries As New List(Of Single)
     Public trainInput As New List(Of Single)
+    Public trainData As cvb.Mat
+    Public queryData As cvb.Mat
     Public result(,) As Integer ' Get results here...
     Public options As New Options_KNN
     Public Sub New()
@@ -1245,22 +1297,12 @@ Public Class KNN_NNBasicsNormalized : Inherits TaskParent
             Exit Sub
         End If
 
-        Dim queryMat = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
-
-        Dim split(options.knnDimension - 1) As cvb.Mat
-        For i = 0 To options.knnDimension - 1
-            split(i) = queryMat.Col(i)
-            cvb.Cv2.Normalize(split(i), split(i), 0, 1, cvb.NormTypes.MinMax)
-        Next
-        cvb.Cv2.Merge(split, queryMat)
-        queryMat = queryMat.Reshape(1)
-
-        Dim samples(queryMat.Cols * queryMat.Rows - 1) As Single
-        Marshal.Copy(queryMat.Data, samples, 0, samples.Length)
+        queryData = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
+        Dim queryMat As cvb.Mat = queryData.Clone
+        ' cvb.Cv2.Normalize(queryData, queryMat, 0, 1, cvb.NormTypes.L2)
 
         Dim tRows = CInt(trainInput.Count / options.knnDimension)
-        Dim trainData As cvb.Mat = cvb.Mat.FromPixelData(tRows, options.knnDimension, cvb.MatType.CV_32F,
-                                                         trainInput.ToArray())
+        trainData = cvb.Mat.FromPixelData(tRows, options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray())
 
         Dim response As cvb.Mat = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S,
                                   Enumerable.Range(start:=0, trainData.Rows).ToArray)

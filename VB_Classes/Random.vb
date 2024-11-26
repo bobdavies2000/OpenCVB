@@ -16,8 +16,8 @@ Public Class Random_Basics : Inherits TaskParent
         If task.paused = False Then
             pointList.Clear()
             While pointList.Count < sizeRequest
-                pointList.Add(New cvb.Point2f(msRNG.Next(range.X, range.X + range.Width),
-                                             msRNG.Next(range.Y, range.Y + range.Height)))
+                PointList.Add(New cvb.Point2f(msRNG.Next(range.X, range.X + range.Width),
+                                              msRNG.Next(range.Y, range.Y + range.Height)))
             End While
             If standaloneTest() Then
                 dst2.SetTo(0)
