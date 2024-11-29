@@ -513,6 +513,15 @@ Public Class TaskParent : Implements IDisposable
             SetTrueText(CStr(fp.age), fp.ptCenter, 3)
         Next
     End Sub
+    Public Sub displayCell()
+        If task.ClickPoint.X = 0 And task.ClickPoint.Y = 0 Then
+            task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
+        End If
+        Dim index = task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        task.fpSelected = task.fpList(index)
+        SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
+        fpCellContour(task.fpSelected, task.color)
+    End Sub
     Public Sub displayMotion()
         dst1.SetTo(0)
         For Each fp In task.fpList

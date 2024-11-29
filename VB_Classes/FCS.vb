@@ -8,9 +8,7 @@ Public Class FCS_Basics : Inherits TaskParent
     Dim options As New Options_FCSMatch
     Dim feat As New Feature_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
-        task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
         labels(1) = "The feature point history of each cell."
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
@@ -53,11 +51,7 @@ Public Class FCS_Basics : Inherits TaskParent
         dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
         dst2.SetTo(0, task.fpOutline)
 
-        dst0 = src.Clone
-        If task.fpSelected IsNot Nothing Then
-            SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
-            fpCellContour(task.fpSelected, dst0)
-        End If
+        If standalone Then displayCell()
 
         Dim matchPercent = matchCount / task.features.Count
         If task.heartBeat Then
@@ -79,13 +73,10 @@ Public Class FCS_Lines : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
         fcs.buildFeatures = False
-        If standalone Then task.gOptions.setDisplay0()
         labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
         desc = "Use lines as input to FCS."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        dst0 = src
-
         lines.Run(src)
 
         task.features.Clear()
@@ -105,6 +96,7 @@ Public Class FCS_Lines : Inherits TaskParent
         Next
 
         displayAge()
+        displayCell()
 
         If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were found."
     End Sub
@@ -119,17 +111,15 @@ End Class
 Public Class FCS_ViewLeft : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
         desc = "Build an FCS for left view."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fcs.Run(task.leftView)
-        dst0 = fcs.dst0
         dst2 = fcs.dst2
         dst3 = fcs.dst3
 
         displayAge()
-
+        displayCell()
         labels(2) = fcs.labels(2)
     End Sub
 End Class
@@ -143,17 +133,15 @@ End Class
 Public Class FCS_ViewRight : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
         desc = "Build an FCS for right view."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fcs.Run(task.rightView)
-        dst0 = fcs.dst0
         dst2 = fcs.dst2
         dst3 = fcs.dst3
 
         displayAge()
-
+        displayCell()
         labels(2) = fcs.labels(2)
     End Sub
 End Class
@@ -181,7 +169,6 @@ Public Class FCS_Motion : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         fcs.Run(src)
         dst2 = fcs.dst1
-        If task.fpListLast.Count = 0 Then task.fpListLast = New List(Of fpData)(task.fpList)
 
         For Each fp In task.fpList
             DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
@@ -216,6 +203,7 @@ Public Class FCS_Motion : Inherits TaskParent
         plot.plotData = New cvb.Scalar(motionPercent, 0, 0)
         plot.Run(empty)
         dst1 = plot.dst2
+        displayCell()
     End Sub
 End Class
 
@@ -232,7 +220,6 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         plothist.createHistogram = True
         plothist.addLabels = False
         task.gOptions.setHistogramBins(64) ' should this be an odd number.
-        If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
         desc = "Using all the feature points with motion, determine any with a common direction."
     End Sub
@@ -275,13 +262,7 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         SetTrueText("X distances" + rangeText, 2)
         SetTrueText("Y distances " + rangeText, New cvb.Point(dst2.Width / 2 + 2, 0), 2)
         labels = fcsM.labels
-
-        If standalone Then
-            dst0 = src.Clone
-            For Each fp In task.fpList
-                DrawCircle(dst0, fp.pt, task.DotSize, task.HighlightColor)
-            Next
-        End If
+        displayCell()
     End Sub
 End Class
 
@@ -340,7 +321,7 @@ Public Class FCS_RedCloud : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
-        dst2 = redC.dst2
+        dst3 = redC.dst2
         labels(2) = redC.labels(2)
 
         knnMin.inputPoints.Clear()
@@ -351,7 +332,8 @@ Public Class FCS_RedCloud : Inherits TaskParent
 
         task.features = New List(Of cvb.Point2f)(knnMin.outputPoints2f)
         fcs.Run(src)
-        dst3 = fcs.dst2
+        dst2 = fcs.dst2
+        displayCell()
         labels(3) = fcs.labels(2)
     End Sub
 End Class
@@ -394,6 +376,7 @@ Public Class FCS_Periphery : Inherits TaskParent
                 ptInID.Add(fp.ID)
             End If
         Next
+        displayCell()
         dst3.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
     End Sub
 End Class
@@ -412,7 +395,6 @@ Public Class FCS_Edges : Inherits TaskParent
         desc = "Use edges to connect feature points to their neighbors."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-
         fcs.Run(src)
         dst2 = src
 
@@ -423,6 +405,7 @@ Public Class FCS_Edges : Inherits TaskParent
             DrawCircle(dst3, fp.ptCenter, task.DotSize, task.HighlightColor)
         Next
         dst3.SetTo(cvb.Scalar.White, task.fpOutline)
+        displayCell()
     End Sub
 End Class
 
@@ -602,8 +585,8 @@ End Class
 
 Public Class FCS_Neighbors : Inherits TaskParent
     Dim fInfo As New FCS_Info
+    Dim fcs As New FCS_Basics
     Public Sub New()
-        dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_8U)
         labels(3) = "The neighbor cells with the corner feature rectangles."
         desc = "Show the midpoints in each cell and build the nabelist for each cell"
     End Sub
@@ -652,38 +635,21 @@ Public Class FCS_Neighbors : Inherits TaskParent
         If r.BottomRight.Y >= dst2.Height Then r.Y = dst2.Height - szNew
         Return r
     End Function
-    Public Sub buildNeighborImage()
-        Dim fp = task.fpSelected
-        dst1.SetTo(0)
-
-        dst1(fp.nabeRect).SetTo(0, task.fpOutline(fp.nabeRect))
-
-        For Each fp In task.fpList
-            Dim r = fp.rect
-            If r.X = 0 And r.Y = 0 Then task.fpCorners(0) = fp.index
-            If r.Y = 0 And r.BottomRight.X = dst2.Width Then task.fpCorners(1) = fp.index
-            If r.X = 0 And r.BottomRight.Y = dst2.Height Then task.fpCorners(2) = fp.index
-            If r.BottomRight.X = dst2.Width Then task.fpCorners(3) = fp.index
-        Next
-        dst3 = ShowPalette(dst1 * 255 / task.fpList.Count)
-        dst3.Rectangle(task.fpSelected.nabeRect, task.HighlightColor, task.lineWidth)
-
-        'Dim sz = task.gOptions.GridSlider.Value
-        'For i = 0 To task.fpCorners.Count - 1
-        '    fp = task.fpList(task.fpCorners(i))
-        '    DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
-        '    Dim r = New cvb.Rect(fp.pt.X - sz, fp.pt.Y - sz, sz * 2, sz * 2)
-        '    task.fpCornerRect(i) = verifyRect(r, sz, sz * 2)
-        '    dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
-
-        '    r = New cvb.Rect(r.X - sz, r.Y - sz, sz * 4, sz * 4)
-        '    task.fpSearchRect(i) = verifyRect(r, sz, sz * 4)
-        '    dst3.Rectangle(r, cvb.Scalar.White, task.lineWidth)
-        'Next
-    End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        SetTrueText("FCS_Neighbors provides the functions to find neighbors." + vbCrLf +
-                    "FCS_Basics always finds the neighbors so it cannot run FCS_Basics.")
+        fcs.Run(src)
+        dst2 = fcs.dst2
+
+        buildNeighbors()
+
+        dst3.SetTo(0)
+        Dim fp = task.fpSelected
+        For Each index In fp.nabeList
+            Dim nabe = task.fpList(index)
+            Dim color = vecToScalar(dst2.Get(Of cvb.Vec3b)(nabe.ptCenter.Y, nabe.ptCenter.X))
+            dst3(nabe.rect).SetTo(color, nabe.mask)
+        Next
+        fpCellContour(task.fpSelected, dst3)
+        displayCell()
     End Sub
 End Class
 
@@ -746,6 +712,7 @@ Public Class FCS_ViewLeftRight : Inherits TaskParent
         labels(2) = CStr(task.features.Count) + " features with "
         labels(3) = "Left image (blue) had " + CStr(ptLeft.Count) + " points while the right image (red) had " +
                     CStr(ptRight.Count) + " points"
+        displayCell()
     End Sub
 End Class
 
@@ -893,6 +860,8 @@ Public Class FCS_Delaunay : Inherits TaskParent
         task.fpMap.ConvertTo(dst3, cvb.MatType.CV_8U)
         dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
 
+        displayCell()
+
         dst2.SetTo(black, task.fpOutline)
         labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells were present."
     End Sub
@@ -930,6 +899,7 @@ Public Class FCS_TravelDistance : Inherits TaskParent
         labels(3) = "Travel distance average = " + Format(distanceList.Average, fmt1) + ", max = " +
                     Format(distanceList.Max, fmt1)
         displayMotion()
+        displayCell()
     End Sub
 End Class
 
@@ -1003,6 +973,8 @@ Public Class FCS_InfoTest : Inherits TaskParent
 
         info.Run(empty)
         SetTrueText(info.strOut, 3)
+
+        displayCell()
     End Sub
 End Class
 
@@ -1018,7 +990,6 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
     Dim dimension As Integer
     Public Sub New()
         task.gOptions.debugSyncUI.Checked = True
-        If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
         FindSlider("KNN Dimension").Value = 4
         desc = "Can we distinguish each feature point cell with color, depth, and grid."
@@ -1041,7 +1012,6 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         SetTrueText(info.strOut, 1)
 
         knn.trainInput.Clear()
-        If task.FirstPass Then task.fpListLast = New List(Of fpData)(task.fpList)
         For Each fp In task.fpList
             For i = 0 To dimension - 1
                 knn.trainInput.Add(Choose(i + 1, fp.depthMean, fp.depthStdev,
@@ -1062,13 +1032,14 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
 
         knn.Run(empty)
 
+        displayCell()
+
         Dim index = knn.result(0, 0)
         If index < task.fpList.Count Then
             info.fpSelection = task.fpList(index)
             info.Run(empty)
             SetTrueText(info.strOut, 3)
         End If
-        fpCellContour(fpSave, dst0)
         fpCellContour(info.fpSelection, dst2)
 
         fpSave = info.fpSelection
