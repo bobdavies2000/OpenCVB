@@ -1,6 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports System.Threading
-Imports cvb = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim delaunay As New FCS_Delaunay
     Public buildFeatures As Boolean = True
@@ -9,7 +7,7 @@ Public Class FCS_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        labels(1) = "The feature point history of each cell."
+        labels(1) = "The feature point of each cell."
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -23,35 +21,39 @@ Public Class FCS_Basics : Inherits TaskParent
         Static fpLastSrc = src.Clone
 
         delaunay.Run(src)
-        task.fpSelected = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
 
         Dim matchCount As Integer
-        For i = 0 To task.fpList.Count - 1
-            Dim fp = task.fpList(i)
-            Dim indexLast = task.fpMapLast.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
-            If indexLast < task.fpListLast.Count Then
+        If task.FirstPass = False Then
+            For i = 0 To task.fpList.Count - 1
+                Dim fp = task.fpList(i)
+                Dim indexLast = task.fpMapLast.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
                 Dim fpLast = task.fpListLast(indexLast)
-                Dim index = task.fpMap.Get(Of Integer)(fpLast.ptCenter.Y, fpLast.ptCenter.X)
-                If index = fp.index Then
-                    ' is this the same point?
-                    match.template = fpLastSrc(fpLast.rect)
-                    match.Run(src(fpLast.rect))
-                    fp.correlation = match.correlation
-                    If match.correlation > options.MinCorrelation Then
-                        task.fpList(i) = fpUpdate(fp, fpLast)
-                        matchCount += 1
-                    End If
+                ' is this the same point?
+                match.template = fpLastSrc(fpLast.rect)
+                match.Run(src(fpLast.rect))
+                fp.correlation = match.correlation
+                If match.correlation > options.MinCorrelation Then
+                    task.fpList(i) = fpUpdate(fp, fpLast)
+                    matchCount += 1
+                Else
+                    Dim k = 0
                 End If
-            End If
-        Next
+
+                If fp.index = 0 Then
+                    DrawCircle(task.color, fp.ptCenter, task.DotSize, task.HighlightColor)
+                End If
+            Next
+        End If
 
         dst3 = task.fpOutline
-        displayAge()
-        displayMotion()
         dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
         dst2.SetTo(0, task.fpOutline)
 
-        If standalone Then displayCell()
+        If standalone Then
+            fpDisplayAge()
+            fpDisplayMotion()
+            fpDisplayCell()
+        End If
 
         Dim matchPercent = matchCount / task.features.Count
         If task.heartBeat Then
@@ -60,6 +62,8 @@ Public Class FCS_Basics : Inherits TaskParent
         End If
         labels(3) = Format(matchPercent, "0%") + " matched to previous frame (instantaneous update)"
         fpLastSrc = src.Clone
+        cvb.Cv2.ImShow("fpLastSrc", fpLastSrc)
+        DrawCircle(task.color, task.ClickPoint, task.DotSize, task.HighlightColor)
     End Sub
 End Class
 
@@ -95,8 +99,8 @@ Public Class FCS_Lines : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next
 
-        displayAge()
-        displayCell()
+        fpDisplayAge()
+        fpDisplayCell()
 
         If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were found."
     End Sub
@@ -118,8 +122,8 @@ Public Class FCS_ViewLeft : Inherits TaskParent
         dst2 = fcs.dst2
         dst3 = fcs.dst3
 
-        displayAge()
-        displayCell()
+        fpDisplayAge()
+        fpDisplayCell()
         labels(2) = fcs.labels(2)
     End Sub
 End Class
@@ -140,8 +144,8 @@ Public Class FCS_ViewRight : Inherits TaskParent
         dst2 = fcs.dst2
         dst3 = fcs.dst3
 
-        displayAge()
-        displayCell()
+        fpDisplayAge()
+        fpDisplayCell()
         labels(2) = fcs.labels(2)
     End Sub
 End Class
@@ -203,7 +207,7 @@ Public Class FCS_Motion : Inherits TaskParent
         plot.plotData = New cvb.Scalar(motionPercent, 0, 0)
         plot.Run(empty)
         dst1 = plot.dst2
-        displayCell()
+        fpDisplayCell()
     End Sub
 End Class
 
@@ -262,7 +266,7 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         SetTrueText("X distances" + rangeText, 2)
         SetTrueText("Y distances " + rangeText, New cvb.Point(dst2.Width / 2 + 2, 0), 2)
         labels = fcsM.labels
-        displayCell()
+        fpDisplayCell()
     End Sub
 End Class
 
@@ -333,7 +337,7 @@ Public Class FCS_RedCloud : Inherits TaskParent
         task.features = New List(Of cvb.Point2f)(knnMin.outputPoints2f)
         fcs.Run(src)
         dst2 = fcs.dst2
-        displayCell()
+        fpDisplayCell()
         labels(3) = fcs.labels(2)
     End Sub
 End Class
@@ -376,7 +380,7 @@ Public Class FCS_Periphery : Inherits TaskParent
                 ptInID.Add(fp.ID)
             End If
         Next
-        displayCell()
+        fpDisplayCell()
         dst3.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
     End Sub
 End Class
@@ -405,7 +409,7 @@ Public Class FCS_Edges : Inherits TaskParent
             DrawCircle(dst3, fp.ptCenter, task.DotSize, task.HighlightColor)
         Next
         dst3.SetTo(cvb.Scalar.White, task.fpOutline)
-        displayCell()
+        fpDisplayCell()
     End Sub
 End Class
 
@@ -649,7 +653,7 @@ Public Class FCS_Neighbors : Inherits TaskParent
             dst3(nabe.rect).SetTo(color, nabe.mask)
         Next
         fpCellContour(task.fpSelected, dst3)
-        displayCell()
+        fpDisplayCell()
     End Sub
 End Class
 
@@ -712,7 +716,7 @@ Public Class FCS_ViewLeftRight : Inherits TaskParent
         labels(2) = CStr(task.features.Count) + " features with "
         labels(3) = "Left image (blue) had " + CStr(ptLeft.Count) + " points while the right image (red) had " +
                     CStr(ptRight.Count) + " points"
-        displayCell()
+        fpDisplayCell()
     End Sub
 End Class
 
@@ -860,7 +864,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
         task.fpMap.ConvertTo(dst3, cvb.MatType.CV_8U)
         dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
 
-        displayCell()
+        If standalone Then fpDisplayCell()
 
         dst2.SetTo(black, task.fpOutline)
         labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells were present."
@@ -898,8 +902,8 @@ Public Class FCS_TravelDistance : Inherits TaskParent
         Next
         labels(3) = "Travel distance average = " + Format(distanceList.Average, fmt1) + ", max = " +
                     Format(distanceList.Max, fmt1)
-        displayMotion()
-        displayCell()
+        fpDisplayMotion()
+        fpDisplayCell()
     End Sub
 End Class
 
@@ -974,7 +978,7 @@ Public Class FCS_InfoTest : Inherits TaskParent
         info.Run(empty)
         SetTrueText(info.strOut, 3)
 
-        displayCell()
+        fpDisplayCell()
     End Sub
 End Class
 
@@ -1032,7 +1036,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
 
         knn.Run(empty)
 
-        displayCell()
+        fpDisplayCell()
 
         Dim index = knn.result(0, 0)
         If index < task.fpList.Count Then
@@ -1043,5 +1047,80 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         fpCellContour(info.fpSelection, dst2)
 
         fpSave = info.fpSelection
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_ByDepth : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Dim fcs As New FCS_Basics
+    Dim palInput As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+    Public Sub New()
+        plot.addLabels = False
+        plot.removeZeroEntry = True
+        plot.createHistogram = True
+        If standalone Then task.gOptions.setDisplay1()
+        task.gOptions.setHistogramBins(20)
+        desc = "Use cell depth to break down the layers in an image."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        labels(2) = fcs.labels(2)
+
+        Dim cellList As New List(Of Single)
+        For Each fp In task.fpList
+            cellList.Add(fp.depthMean)
+        Next
+
+        plot.minRange = 0
+        plot.maxRange = task.MaxZmeters
+        plot.Run(cvb.Mat.FromPixelData(cellList.Count, 1, cvb.MatType.CV_32F, cellList.ToArray))
+        dst1 = plot.dst2
+
+        Dim incr = dst1.Width / task.histogramBins
+        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / incr)
+        dst1.Rectangle(New cvb.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), cvb.Scalar.Yellow, task.lineWidth)
+        Dim depthIncr = (plot.maxRange - plot.minRange) / task.histogramBins
+        Dim depthStart = histIndex * depthIncr
+        Dim depthEnd = (histIndex + 1) * depthIncr
+
+        Static depthCells As New List(Of (fpData, Integer))
+        Static histIndexSave = histIndex
+
+        If histIndexSave <> histIndex Or task.optionsChanged Then
+            histIndexSave = histIndex
+            depthCells.Clear()
+        End If
+        palInput.SetTo(0)
+
+        For Each fp In task.fpList
+            If fp.depthMean > depthStart And fp.depthMean < depthEnd Then
+                Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
+                If val = 0 Then
+                    palInput(fp.rect).SetTo(fp.index, fp.mask)
+                    depthCells.Add((fp, task.frameCount))
+                End If
+            End If
+        Next
+
+        For Each ele In depthCells
+            Dim fp As fpData = ele.Item1
+            SetTrueText(Format(fp.age, fmt0), fp.ptCenter, 0)
+            fpCellContour(fp, task.color, 0)
+        Next
+        dst3 = ShowPalette(palInput * 255 / task.fpList.Count)
+
+        Dim removeFrame As Integer = If(task.frameCount > task.frameHistoryCount, task.frameCount - task.frameHistoryCount, -1)
+        For i = depthCells.Count - 1 To 0 Step -1
+            Dim frame = depthCells(i).Item2
+            If frame = removeFrame Then depthCells.RemoveAt(i)
+        Next
+
+        labels(3) = "Cells with depth between " + Format(depthStart, fmt1) + "m to " + Format(depthEnd, fmt1) + "m"
     End Sub
 End Class

@@ -507,22 +507,20 @@ Public Class TaskParent : Implements IDisposable
 
         Return mm.maxLoc
     End Function
-    Public Sub displayAge()
+    Public Sub fpDisplayAge()
         dst3 = task.fpOutline
         For Each fp In task.fpList
             SetTrueText(CStr(fp.age), fp.ptCenter, 3)
         Next
     End Sub
-    Public Sub displayCell()
-        If task.ClickPoint.X = 0 And task.ClickPoint.Y = 0 Then
-            task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
-        End If
+    Public Sub fpDisplayCell()
+        If task.ClickPoint.X = 0 And task.ClickPoint.Y = 0 Then task.ClickPoint = New cvb.Point2f(dst2.Width / 2, dst2.Height / 2)
         Dim index = task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         task.fpSelected = task.fpList(index)
         SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
         fpCellContour(task.fpSelected, task.color)
     End Sub
-    Public Sub displayMotion()
+    Public Sub fpDisplayMotion()
         dst1.SetTo(0)
         For Each fp In task.fpList
             For Each pt In fp.ptHistory
@@ -530,11 +528,12 @@ Public Class TaskParent : Implements IDisposable
             Next
         Next
     End Sub
-    Public Sub fpCellContour(fp As fpData, dst As cvb.Mat)
+    Public Sub fpCellContour(fp As fpData, dst As cvb.Mat, Optional colorIndex As Integer = 0)
+        Dim color = Choose(colorIndex + 1, cvb.Scalar.White, cvb.Scalar.Black)
         For i = 0 To fp.facets.Count - 1
             Dim p1 = fp.facets(i)
             Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
-            dst.Line(p1, p2, cvb.Scalar.White, task.lineWidth, task.lineType)
+            dst.Line(p1, p2, color, task.lineWidth, task.lineType)
         Next
     End Sub
     Public Function buildRect(fp As fpData, mms() As Single) As fpData
